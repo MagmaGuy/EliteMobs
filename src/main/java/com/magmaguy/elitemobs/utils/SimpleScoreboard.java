@@ -12,7 +12,8 @@ import org.bukkit.scoreboard.Scoreboard;
 import java.util.List;
 
 public class SimpleScoreboard {
-    public static Scoreboard temporaryScoreboard(Player player, String displayName, List<String> scoreboardContents, int ticksTimeout) {
+
+    public static Scoreboard lazyScoreboard(Player player, String displayName, List<String> scoreboardContents) {
         Scoreboard scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
         int lineCount = Math.min(scoreboardContents.size(), 15);
 
@@ -26,6 +27,12 @@ public class SimpleScoreboard {
         }
 
         player.setScoreboard(scoreboard);
+
+        return scoreboard;
+    }
+
+    public static Scoreboard temporaryScoreboard(Player player, String displayName, List<String> scoreboardContents, int ticksTimeout) {
+        Scoreboard scoreboard = lazyScoreboard(player, displayName, scoreboardContents);
         new BukkitRunnable() {
             @Override
             public void run() {

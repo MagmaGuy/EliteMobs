@@ -180,6 +180,17 @@ public class UserCommands {
                     QuestCommand.joinQuest(commandContext.get("questID"), (Player) commandContext.getSender());
                 }));
 
+        // /em quest track <questID>
+        manager.command(builder.literal("quest")
+                .literal("track")
+                .argument(StringArgument.newBuilder("questID"), ArgumentDescription.of("Quest ID"))
+                .meta(CommandMeta.DESCRIPTION, "Toggles quest tracking")
+                .senderType(Player.class)
+                .permission("elitemobs.quest.command")
+                .handler(commandContext -> {
+                    QuestCommand.trackQuest(commandContext.get("questID"), (Player) commandContext.getSender());
+                }));
+
         // /em quest complete
         manager.command(builder.literal("quest")
                 .literal("complete")

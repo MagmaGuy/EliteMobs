@@ -20,7 +20,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class NPCInteractions implements Listener {
 
-    @EventHandler (priority = EventPriority.HIGHEST)
+    @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void playerNPCInteract(PlayerInteractAtEntityEvent event) {
 
         NPCEntity npcEntity = EntityTracker.getNPCEntity(event.getRightClicked());

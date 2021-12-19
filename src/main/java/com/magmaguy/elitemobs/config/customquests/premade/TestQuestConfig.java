@@ -12,6 +12,6 @@ public class TestQuestConfig extends CustomQuestsConfigFields {
                 Arrays.asList("filename=magmaguys_toothpick.yml:amount=1:chance=1"),
                 0,
                 "Kill the Test Boss",
-                "&cEnd the test boss' reign of terror!");
+                Arrays.asList("&cEnd the test boss' reign of terror!"));
     }
 }

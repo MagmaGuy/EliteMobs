@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.commands.quests;
 
 import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.Quest;
+import com.magmaguy.elitemobs.quests.QuestTracking;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
@@ -23,6 +24,10 @@ public class QuestCommand {
     // /em quest join questFilename
     public static void joinQuest(String questID, Player player) {
         CustomQuest.startQuest(questID, player);
+    }
+
+    public static void trackQuest(String questID, Player player) {
+        QuestTracking.toggleTracking(player, questID);
     }
 
     // /em quest leave questFilename
