@@ -40,7 +40,7 @@ public class CustomQuestsConfigFields extends CustomConfigFields implements Cust
     private String questName = "";
     @Getter
     @Setter
-    private String questLore = "";
+    private List<String> questLore = new ArrayList<>();
     @Getter
     @Setter
     private List<String> questCompleteDialog = new ArrayList<>();
@@ -54,6 +54,9 @@ public class CustomQuestsConfigFields extends CustomConfigFields implements Cust
     @Getter
     @Setter
     private boolean customQuestFormat = false;
+    @Getter
+    @Setter
+    private boolean trackable = true;
 
     public CustomQuestsConfigFields(String filename,
                                     boolean isEnabled,
@@ -61,7 +64,7 @@ public class CustomQuestsConfigFields extends CustomConfigFields implements Cust
                                     List<String> customQuestReward,
                                     int questLevel,
                                     String questName,
-                                    String questLore) {
+                                    List<String> questLore) {
         super(filename, isEnabled);
         this.customObjectivesList = customQuestObjective;
         this.customRewardsList = customQuestReward;
@@ -82,7 +85,7 @@ public class CustomQuestsConfigFields extends CustomConfigFields implements Cust
     }
 
     public void setQuestLockoutPermission() {
-        this.questLockoutPermission = "elitemobs." + getFilename();
+        this.questLockoutPermission = "elitequest." + getFilename();
     }
 
     @Override
@@ -94,13 +97,14 @@ public class CustomQuestsConfigFields extends CustomConfigFields implements Cust
         this.questLockoutPermission = processString("questLockoutPermission", questLockoutPermission, null, false);
         this.questLockoutMinutes = processInt("questLockoutMinutes", questLockoutMinutes, -1, false);
         this.questName = processString("name", questName, filename, true);
-        this.questLore = processString("questLore", questLore, "", false);
+        this.questLore = processStringList("questLore", questLore, new ArrayList<>(), false);
         this.temporaryPermissions = processStringList("temporaryPermissions", temporaryPermissions, new ArrayList<>(), false);
         this.questAcceptDialog = processStringList("questAcceptDialog", questAcceptDialog, new ArrayList<>(), false);
         this.questCompleteDialog = processStringList("questCompleteMessage", questCompleteDialog, new ArrayList<>(), false);
         this.questCompleteCommands = processStringList("questCompleteCommands", questCompleteCommands, new ArrayList<>(), false);
         this.turnInNPC = processString("turnInNPC", turnInNPC, "", false);
         this.customQuestFormat = processBoolean("customQuestFormat", customQuestFormat, false, false);
+        this.trackable = processBoolean("trackable", trackable, true, false);
     }
 
 

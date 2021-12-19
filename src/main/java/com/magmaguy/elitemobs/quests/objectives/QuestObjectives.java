@@ -73,13 +73,13 @@ public class QuestObjectives implements Serializable {
      * @return
      */
     public boolean isOver() {
-        boolean over = true;
+        boolean checkOver = true;
         for (Objective objective : objectives)
             if (!objective.isObjectiveCompleted()) {
-                over = false;
+                checkOver = false;
                 break;
             }
-        return over;
+        return checkOver;
     }
 
     public void updateQuestStatus(UUID playerUUID) {
@@ -94,12 +94,20 @@ public class QuestObjectives implements Serializable {
     }
 
 
-    public Scoreboard displayObjectivesScoreboard(Player player) {
+    public Scoreboard displayTemporaryObjectivesScoreboard(Player player) {
         List<String> strings = new ArrayList<>();
         for (Objective objective : objectives)
             strings.add(QuestsConfig.getQuestScoreboardProgressionLine(objective));
 
         return SimpleScoreboard.temporaryScoreboard(player, ChatColorConverter.convert(getQuest().getQuestName()), strings, 20 * 20);
+    }
+
+    public Scoreboard displayLazyObjectivesScoreboard(Player player) {
+        List<String> strings = new ArrayList<>();
+        for (Objective objective : objectives)
+            strings.add(QuestsConfig.getQuestScoreboardProgressionLine(objective));
+
+        return SimpleScoreboard.lazyScoreboard(player, ChatColorConverter.convert(getQuest().getQuestName()), strings);
     }
 
 

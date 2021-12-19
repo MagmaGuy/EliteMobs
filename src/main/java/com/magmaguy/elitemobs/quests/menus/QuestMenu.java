@@ -9,6 +9,7 @@ import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.DynamicQuest;
 import com.magmaguy.elitemobs.quests.Quest;
+import com.magmaguy.elitemobs.quests.QuestTracking;
 import com.magmaguy.elitemobs.quests.objectives.DialogObjective;
 import com.magmaguy.elitemobs.quests.objectives.DynamicKillObjective;
 import com.magmaguy.elitemobs.quests.objectives.KillObjective;
@@ -68,6 +69,9 @@ public class QuestMenu {
         TextComponent fixedRewards = generateFixedRewards(quest);
         List<TextComponent> rewards = generateRewards(quest);
         TextComponent accept = generateAccept(quest, npcEntity);
+        TextComponent track = null;
+        if (quest instanceof CustomQuest)
+            track = generateTrack(player, quest);
 
         //Condense all page elements
         List<TextComponent> elements = new ArrayList<>();
@@ -79,6 +83,8 @@ public class QuestMenu {
         elements.add(fixedRewards);
         elements.addAll(rewards);
         elements.add(accept);
+        if (quest instanceof CustomQuest)
+            elements.add(track);
 
         //Arrange them into pages, taking character count into account
         List<TextComponent> pagesList = new ArrayList<>();
@@ -123,7 +129,7 @@ public class QuestMenu {
     private static List<TextComponent> generateBody(Quest quest) {
         List<TextComponent> body = new ArrayList<>();
         if (quest instanceof CustomQuest)
-            for (String splitString : ((CustomQuest) quest).getCustomQuestsConfigFields().getQuestLore().split("\n"))
+            for (String splitString : ((CustomQuest) quest).getCustomQuestsConfigFields().getQuestLore())
                 body.add(new TextComponent(ChatColorConverter.convert(splitString)));
         else if (quest instanceof DynamicQuest)
             body.add(new TextComponent(DynamicQuestMenuConfig.getDefaultLoreTextLines()
@@ -215,6 +221,18 @@ public class QuestMenu {
                     DynamicQuestMenuConfig.getAcceptedHoverLines(),
                     DynamicQuestMenuConfig.getAcceptedCommandLines().replace("$questID", quest.getQuestID().toString()));
         }
+    }
+
+    private static TextComponent generateTrack(Player player, Quest quest) {
+        if (!((CustomQuest) quest).getCustomQuestsConfigFields().isTrackable()) return new TextComponent();
+        if (!CustomQuestMenuConfig.isUseQuestTracking()) return new TextComponent();
+        if (!quest.isAccepted()) return new TextComponent();
+        if (!QuestTracking.isTracking(player))
+            return SpigotMessage.commandHoverMessage(CustomQuestMenuConfig.getTrackTextLines(),
+                    CustomQuestMenuConfig.getTrackHoverLines(), CustomQuestMenuConfig.getTrackCommandLines().replace("$questID", quest.getQuestID() + ""));
+        else
+            return SpigotMessage.commandHoverMessage(CustomQuestMenuConfig.getUntrackTextLines(),
+                    CustomQuestMenuConfig.getUntrackHoverLines(), CustomQuestMenuConfig.getUntrackCommandLines().replace("$questID", quest.getQuestID() + ""));
     }
 
     //Appears when the player has completed the quest

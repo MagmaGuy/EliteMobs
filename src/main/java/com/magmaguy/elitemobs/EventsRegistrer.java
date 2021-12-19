@@ -61,6 +61,8 @@ import com.magmaguy.elitemobs.powers.offensivepowers.*;
 import com.magmaguy.elitemobs.powers.specialpowers.EnderCrystalLightningRod;
 import com.magmaguy.elitemobs.powerstances.EffectEventHandlers;
 import com.magmaguy.elitemobs.powerstances.VisualEffectObfuscator;
+import com.magmaguy.elitemobs.quests.CustomQuest;
+import com.magmaguy.elitemobs.quests.QuestTracking;
 import com.magmaguy.elitemobs.quests.objectives.CustomFetchObjective;
 import com.magmaguy.elitemobs.quests.objectives.DialogObjective;
 import com.magmaguy.elitemobs.quests.objectives.KillObjective;
@@ -316,6 +318,8 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new QuestCompleteEvent.QuestCompleteEventHandler(), plugin);
         pluginManager.registerEvents(new QuestLeaveEvent.QuestLeaveEventHandler(), plugin);
         pluginManager.registerEvents(new QuestProgressionEvent.QuestProgressionEventHandler(), plugin);
+        pluginManager.registerEvents(new QuestTracking.QuestTrackingEvents(), plugin);
+        pluginManager.registerEvents(new CustomQuest.CustomQuestEvents(), plugin);
 
         //Combat tag
         if (CombatTagConfig.enableCombatTag)

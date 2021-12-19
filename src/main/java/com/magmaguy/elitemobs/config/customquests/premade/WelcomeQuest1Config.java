@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.config.customquests.premade;
 import com.magmaguy.elitemobs.config.customquests.CustomQuestsConfigFields;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 public class WelcomeQuest1Config extends CustomQuestsConfigFields {
     public WelcomeQuest1Config() {
@@ -29,7 +30,7 @@ public class WelcomeQuest1Config extends CustomQuestsConfigFields {
                 ),
                 1,
                 "&2Welcome to the AG!",
-                "&aMeet the Adventurer's Guild NPCs!"
+                Collections.singletonList("&aMeet the Adventurer's Guild NPCs!")
         );
         setQuestLockoutPermission();
     }

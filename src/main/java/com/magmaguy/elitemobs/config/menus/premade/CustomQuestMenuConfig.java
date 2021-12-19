@@ -34,6 +34,18 @@ public class CustomQuestMenuConfig extends MenusConfigFields {
     @Getter
     private static String acceptedCommandLines;
     @Getter
+    private static String trackTextLines;
+    @Getter
+    private static String trackHoverLines;
+    @Getter
+    private static String trackCommandLines;
+    @Getter
+    private static String untrackTextLines;
+    @Getter
+    private static String untrackHoverLines;
+    @Getter
+    private static String untrackCommandLines;
+    @Getter
     private static String completedTextLines;
     @Getter
     private static String completedHoverLines;
@@ -54,6 +66,8 @@ public class CustomQuestMenuConfig extends MenusConfigFields {
     private static String fetchQuestDefaultSummaryLine;
     private static String dialogQuestDefaultSummaryLine;
     private static String rewardsDefaultSummaryLine;
+    @Getter
+    private static boolean useQuestTracking;
 
     public CustomQuestMenuConfig() {
         super("custom_quest_screen", true);
@@ -109,6 +123,16 @@ public class CustomQuestMenuConfig extends MenusConfigFields {
         acceptedTextLines = ConfigurationEngine.setString(fileConfiguration, "acceptedTextLines", "&2&lAccepted! &4[Abandon]");
         acceptedHoverLines = ConfigurationEngine.setString(fileConfiguration, "acceptedHoverLines", "&aClick to abandon quest!");
         acceptedCommandLines = ConfigurationEngine.setString(fileConfiguration, "acceptedCommandLines3", "/em quest leave $questID");
+
+        useQuestTracking = ConfigurationEngine.setBoolean(fileConfiguration, "useQuestTracking", true);
+
+        trackTextLines = ConfigurationEngine.setString(fileConfiguration, "trackTextLines", "&2&l[Track]");
+        trackHoverLines = ConfigurationEngine.setString(fileConfiguration, "trackHoverLines", "&aClick to track quest!");
+        trackCommandLines = ConfigurationEngine.setString(fileConfiguration, "trackCommandLines3", "/em quest track $questID");
+
+        untrackTextLines = ConfigurationEngine.setString(fileConfiguration, "untrackTextLines", "&4&l[Untrack]");
+        untrackHoverLines = ConfigurationEngine.setString(fileConfiguration, "untrackHoverLines", "&cClick to untrack quest!");
+        untrackCommandLines = ConfigurationEngine.setString(fileConfiguration, "untrackCommandLines", "/em quest track $questID");
 
         completedTextLines = ConfigurationEngine.setString(fileConfiguration, "completedTextLines", "&2&l[Turn in!]");
         completedHoverLines = ConfigurationEngine.setString(fileConfiguration, "completedHoverLines", "&aClick to turn quest in!");
