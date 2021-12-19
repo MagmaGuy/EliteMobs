@@ -240,6 +240,7 @@ public class PlayerData {
             UUID questUUID = UUID.fromString(questID);
             return getQuest(uuid, questUUID);
         } catch (Exception ex) {
+            new WarningMessage("Failed to convert quest ID from command into a valid UUID format!");
             return null;
         }
     }

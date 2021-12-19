@@ -59,8 +59,8 @@ public class QuestAcceptEvent extends Event implements Cancellable {
             event.getQuest().setAccepted(true);
             if (QuestsConfig.useQuestAcceptTitles)
                 event.getPlayer().sendTitle(
-                        QuestsConfig.questStartTitle.replace("$questName", event.getQuest().getQuestName()),
-                        QuestsConfig.questStartSubtitle.replace("$questName", event.getQuest().getQuestName()),
+                        ChatColorConverter.convert(QuestsConfig.questStartTitle.replace("$questName", event.getQuest().getQuestName())),
+                        ChatColorConverter.convert(QuestsConfig.questStartSubtitle.replace("$questName", event.getQuest().getQuestName())),
                         20, 60, 20);
 
             if (event.getQuest() instanceof CustomQuest) {
@@ -76,6 +76,7 @@ public class QuestAcceptEvent extends Event implements Cancellable {
                     for (String dialog : customQuest.getCustomQuestsConfigFields().getQuestAcceptDialog())
                         event.getPlayer().sendMessage(dialog);
             }
+            event.getQuest().getQuestObjectives().displayTemporaryObjectivesScoreboard(event.getPlayer());
             PlayerData.addQuest(event.getPlayer().getUniqueId(), event.getQuest());
         }
     }

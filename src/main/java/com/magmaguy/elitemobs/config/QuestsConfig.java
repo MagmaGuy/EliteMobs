@@ -42,6 +42,13 @@ public class QuestsConfig {
     private static String questCapMessage;
     @Getter
     private static List<EntityType> questEntityTypes = new ArrayList<>();
+    @Getter
+    private static String chatTrackMessage;
+    @Getter
+    private static String chatTrackHover;
+    @Getter
+    private static String chatTrackCommand;
+
     private static File file;
 
     public static void initializeConfig() {
@@ -79,11 +86,15 @@ public class QuestsConfig {
 
         questEntityTypes = setEntityTypes(fileConfiguration);
 
+        chatTrackMessage = ConfigurationEngine.setString(fileConfiguration, "chatTrackMessage", "&8[EliteMobs]&2 Click here to track your quest!");
+        chatTrackHover = ConfigurationEngine.setString(fileConfiguration, "chatTrackHover", "&2Click to track!");
+        chatTrackCommand = ConfigurationEngine.setString(fileConfiguration, "chatTrackCommand", "/elitemobs quest track $questID");
+
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }
 
     private static List<EntityType> setEntityTypes(FileConfiguration fileConfiguration) {
-        List<String> entityTypes = ConfigurationEngine.setList(fileConfiguration, "questEntityTypes", Arrays.asList(
+        List<String> entityTypes = new ArrayList<>(Arrays.asList(
                 EntityType.BLAZE.toString(),
                 EntityType.CAVE_SPIDER.toString(),
                 EntityType.DROWNED.toString(),
@@ -110,14 +121,16 @@ public class QuestsConfig {
         ));
 
         if (!VersionChecker.serverVersionOlderThan(16, 0)) {
-            entityTypes.addAll(Arrays.asList(
+            List<String> laterEntities = Arrays.asList(
                     EntityType.HOGLIN.toString(),
                     EntityType.ZOGLIN.toString(),
                     EntityType.PIGLIN_BRUTE.toString(),
                     EntityType.PIGLIN.toString(),
-                    EntityType.ZOMBIFIED_PIGLIN.toString()
-            ));
+                    EntityType.ZOMBIFIED_PIGLIN.toString());
+            entityTypes.addAll(laterEntities);
         }
+
+        ConfigurationEngine.setList(fileConfiguration, "questEntityTypes", entityTypes);
 
         List<EntityType> parsedTypes = new ArrayList<>();
         for (String string : entityTypes)

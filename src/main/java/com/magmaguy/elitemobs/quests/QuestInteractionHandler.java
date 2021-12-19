@@ -54,8 +54,9 @@ public class QuestInteractionHandler {
 
     private static boolean playerHasPermissionToAcceptQuest(Player player, CustomQuest customQuest) {
         if (!customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission().isEmpty() &&
-                player.hasPermission(customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission()))
+                player.hasPermission(customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission())){
             return false;
+        }
         return customQuest.getCustomQuestsConfigFields().getQuestAcceptPermission().isEmpty() ||
                 player.hasPermission(customQuest.getCustomQuestsConfigFields().getQuestAcceptPermission());
     }

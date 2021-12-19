@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.npcs.NPCInteractions;
 import org.bukkit.entity.Villager;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 public class Guide1Config extends NPCsConfigFields {
     public Guide1Config() {
@@ -31,6 +32,6 @@ public class Guide1Config extends NPCsConfigFields {
                 true,
                 5,
                 NPCInteractions.NPCInteractionType.CUSTOM_QUEST_GIVER);
-        super.setQuestFilenames(Arrays.asList("ag_welcome_quest_1.yml"));
+        super.setQuestFilenames(Collections.singletonList("ag_welcome_quest_1.yml"));
     }
 }

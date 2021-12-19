@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.api;
 import com.magmaguy.elitemobs.config.QuestsConfig;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.Quest;
+import com.magmaguy.elitemobs.quests.QuestTracking;
 import com.magmaguy.elitemobs.quests.objectives.Objective;
 import lombok.Getter;
 import org.bukkit.entity.Player;
@@ -38,7 +39,8 @@ public class QuestProgressionEvent extends Event {
             event.getQuest().getQuestObjectives().updateQuestStatus(event.getPlayer().getUniqueId());
             if (QuestsConfig.doQuestChatProgression)
                 event.getPlayer().sendMessage(QuestsConfig.getQuestChatProgressionMessage(event.getObjective()));
-            event.getQuest().getQuestObjectives().displayObjectivesScoreboard(event.getPlayer());
+            if (!QuestTracking.isTracking(event.player))
+                event.getQuest().getQuestObjectives().displayTemporaryObjectivesScoreboard(event.getPlayer());
             PlayerData.updateQuestStatus(event.getPlayer().getUniqueId(), event.getQuest());
         }
     }
