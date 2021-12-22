@@ -35,11 +35,11 @@ public class QuestLeaveEvent extends Event {
         @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
         public void onQuestLeave(QuestLeaveEvent event) {
             PlayerData.removeQuest(event.getPlayer().getUniqueId(), event.getQuest());
-            event.getPlayer().sendMessage(QuestsConfig.questLeaveMessage.replace("$questName", event.getQuest().getQuestName()));
-            if (QuestsConfig.useQuestLeaveTitles)
+            event.getPlayer().sendMessage(QuestsConfig.getQuestLeaveMessage().replace("$questName", event.getQuest().getQuestName()));
+            if (QuestsConfig.isUseQuestLeaveTitles())
                 event.getPlayer().sendTitle(
-                        QuestsConfig.questLeaveTitle.replace("$questName", event.getQuest().getQuestName()),
-                        QuestsConfig.questLeaveSubtitle.replace("$questName", event.getQuest().getQuestName()),
+                        QuestsConfig.getQuestLeaveTitle().replace("$questName", event.getQuest().getQuestName()),
+                        QuestsConfig.getQuestLeaveSubtitle().replace("$questName", event.getQuest().getQuestName()),
                         20, 60, 20);
             if (event.getQuest() instanceof CustomQuest) {
                 CustomQuest customQuest = (CustomQuest) event.getQuest();

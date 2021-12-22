@@ -31,6 +31,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class CustomSpawn {
 
+    @Getter
     private final CustomSpawnConfigFields customSpawnConfigFields;
     @Getter
     private final ArrayList<CustomBossEntity> customBossEntities = new ArrayList<>();
@@ -52,8 +53,14 @@ public class CustomSpawn {
      * Used by the TimedEvent system to find valid locations
      */
     public CustomSpawn(String customSpawnConfig, List<String> customBossesFilenames, TimedEvent timedEvent) {
-        this.customSpawnConfigFields = CustomSpawnConfig.customSpawnConfig.getCustomEvent(customSpawnConfig);
+        this.customSpawnConfigFields = CustomSpawnConfig.getCustomEvent(customSpawnConfig);
         this.timedEvent = timedEvent;
+
+        if (customSpawnConfigFields == null) {
+            new WarningMessage("Invalid custom spawn detected for file " + customSpawnConfig + " in event " + timedEvent.getCustomEventsConfigFields().getFilename());
+            return;
+        }
+
         customBossesFilenames.forEach(bossString -> {
             CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(bossString);
             if (customBossesConfigFields == null) {
@@ -67,7 +74,11 @@ public class CustomSpawn {
     }
 
     public CustomSpawn(String customSpawnConfig, CustomBossEntity customBossEntity) {
-        this.customSpawnConfigFields = CustomSpawnConfig.customSpawnConfig.getCustomEvent(customSpawnConfig);
+        this.customSpawnConfigFields = CustomSpawnConfig.getCustomEvent(customSpawnConfig);
+        if (customSpawnConfigFields == null) {
+            new WarningMessage("Invalid custom spawn detected for file " + customSpawnConfig);
+            return;
+        }
         customBossEntities.add(customBossEntity);
     }
 

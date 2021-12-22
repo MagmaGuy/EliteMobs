@@ -99,6 +99,10 @@ public class TimedEvent extends CustomEvent implements Listener {
                 customEventsConfigFields.getBossFilenames(),
                 timedEvent);
 
+        //Failed to initialize event
+        if (timedEvent.customSpawn.getCustomSpawnConfigFields() == null)
+            return;
+
         //This handles the elitemobs-events flag
         timedEvent.customSpawn.setEvent(true);
 

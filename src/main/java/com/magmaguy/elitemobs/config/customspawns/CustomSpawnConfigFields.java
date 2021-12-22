@@ -64,7 +64,7 @@ public class CustomSpawnConfigFields extends CustomConfigFields implements Custo
         this.validBiomes = processEnumList("validBiomes", validBiomes, new ArrayList<>(), Biome.class, false);
         this.earliestTime = processLong("earliestTime", earliestTime, 0, false);
         this.latestTime = processLong("latestTime", latestTime, 24000, false);
-        this.moonPhase = processEnum("moonPhase", moonPhase, null, false);
+        this.moonPhase = processEnum("moonPhase", moonPhase, null, MoonPhaseDetector.MoonPhase.class, false);
         this.bypassWorldGuard = processBoolean("bypassWorldGuard", bypassWorldGuard, false, false);
         this.canSpawnInLight = processBoolean("canSpawnInLight", canSpawnInLight, false, false);
         this.isSurfaceSpawn = processBoolean("isSurfaceSpawn", isSurfaceSpawn, false, false);

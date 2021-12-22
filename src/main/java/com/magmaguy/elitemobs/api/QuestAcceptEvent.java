@@ -55,12 +55,12 @@ public class QuestAcceptEvent extends Event implements Cancellable {
 
         @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
         public void onQuestAccept(QuestAcceptEvent event) {
-            event.getPlayer().sendMessage(QuestsConfig.questJoinMessage.replace("$questName", ChatColorConverter.convert(event.getQuest().getQuestName())));
+            event.getPlayer().sendMessage(QuestsConfig.getQuestJoinMessage().replace("$questName", ChatColorConverter.convert(event.getQuest().getQuestName())));
             event.getQuest().setAccepted(true);
-            if (QuestsConfig.useQuestAcceptTitles)
+            if (QuestsConfig.isUseQuestAcceptTitles())
                 event.getPlayer().sendTitle(
-                        ChatColorConverter.convert(QuestsConfig.questStartTitle.replace("$questName", event.getQuest().getQuestName())),
-                        ChatColorConverter.convert(QuestsConfig.questStartSubtitle.replace("$questName", event.getQuest().getQuestName())),
+                        ChatColorConverter.convert(QuestsConfig.getQuestStartTitle().replace("$questName", event.getQuest().getQuestName())),
+                        ChatColorConverter.convert(QuestsConfig.getQuestStartSubtitle().replace("$questName", event.getQuest().getQuestName())),
                         20, 60, 20);
 
             if (event.getQuest() instanceof CustomQuest) {

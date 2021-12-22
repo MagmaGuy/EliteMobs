@@ -260,7 +260,7 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     @Override
     public void processConfigFields() {
         this.isEnabled = processBoolean("isEnabled", isEnabled, true, true);
-        this.entityType = processEnum("entityType", entityType, EntityType.ZOMBIE, true);
+        this.entityType = processEnum("entityType", entityType, EntityType.ZOMBIE,EntityType.class, true);
         this.name = processString("name", name, "Default Name", true);
         //Levels are strings because "dynamic" is a valid value
         this.level = processString("level", level, "dynamic", true);
@@ -285,7 +285,10 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
                 CustomItem customItem = CustomItem.getCustomItem(entry.split(":")[0]);
                 if (customItem == null)
                     throw new Exception();
-                this.parsedUniqueLootList.add(new UniqueLoot(Double.parseDouble(entry.split(":")[1]), customItem));
+                String permissionRequired = "";
+                if (entry.split(":").length > 2)
+                    permissionRequired = entry.split(":")[2];
+                this.parsedUniqueLootList.add(new UniqueLoot(Double.parseDouble(entry.split(":")[1]), customItem, permissionRequired));
             } catch (Exception ex) {
                 new WarningMessage("Boss " + this.getName() + " has an invalid loot entry - " + entry + " - Skipping it!");
             }
@@ -430,9 +433,7 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
 
     private List<String> deserializeDamageModifiers(HashMap<Material, Double> damageModifiers) {
         List<String> deserializedDamageModifiers = new ArrayList<>();
-        damageModifiers.entrySet().forEach((entry) -> {
-            deserializedDamageModifiers.add("material=" + entry.getKey().toString() + ":" + "multiplier=" + entry.getValue());
-        });
+        damageModifiers.forEach((key, value) -> deserializedDamageModifiers.add("material=" + key.toString() + ":" + "multiplier=" + value));
         return deserializedDamageModifiers;
     }
 
@@ -450,10 +451,13 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     public class UniqueLoot {
         public double chance;
         public CustomItem customItem;
+        @Getter
+        private final String requiredPermission;
 
-        public UniqueLoot(double chance, CustomItem customItem) {
+        public UniqueLoot(double chance, CustomItem customItem, String requiredPermission) {
             this.chance = chance;
             this.customItem = customItem;
+            this.requiredPermission = requiredPermission;
         }
     }
 

@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.quests.rewards;
 import com.magmaguy.elitemobs.config.customquests.CustomQuestsConfigFields;
 import com.magmaguy.elitemobs.items.LootTables;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
+import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.objectives.Objective;
 import com.magmaguy.elitemobs.quests.objectives.QuestObjectives;
 import com.magmaguy.elitemobs.utils.WarningMessage;
@@ -26,7 +27,7 @@ public class QuestReward implements Serializable {
         int killAmount = questObjectives.getObjectives().stream().mapToInt(Objective::getTargetAmount).sum();
         double baselineReward = mobLevel / 2D * killAmount;
         rewardEntries.add(new RewardEntry(baselineReward, 1d, 1, player));
-        ItemStack itemReward = LootTables.generateItemStack(questLevel * 10, player, null);
+        ItemStack itemReward = LootTables.generateItemStack(Math.min(questLevel * 10, PlayerData.getMaxGuildLevel(player.getUniqueId()) * 10), player, null);
         rewardEntries.add(new RewardEntry(itemReward, 1d, 1));
     }
 
@@ -111,7 +112,7 @@ public class QuestReward implements Serializable {
     }
 
     public void doRewards(UUID playerUUID, int questLevel) {
-        rewardEntries.forEach((rewardEntries) -> rewardEntries.doReward(playerUUID, questLevel));
+        rewardEntries.forEach((rewardEntries) -> rewardEntries.doReward(playerUUID));
     }
 
 }

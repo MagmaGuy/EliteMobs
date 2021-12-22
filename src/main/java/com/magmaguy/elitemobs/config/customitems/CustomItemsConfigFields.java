@@ -43,6 +43,9 @@ public class CustomItemsConfigFields extends CustomConfigFields implements Custo
     @Setter
     //todo: implement
     private List<String> nbtTags = new ArrayList<>();
+    @Getter
+    @Setter
+    private String permission = "";
 
     public CustomItemsConfigFields(String fileName,
                                    boolean isEnabled,
@@ -66,14 +69,15 @@ public class CustomItemsConfigFields extends CustomConfigFields implements Custo
     @Override
     public void processConfigFields() {
         this.isEnabled = processBoolean("isEnabled", isEnabled, true, true);
-        this.material = processEnum("material", material, Material.WOODEN_SWORD, true);
+        this.material = processEnum("material", material, Material.WOODEN_SWORD, Material.class, true);
         this.name = processString("name", name, "Default name", true);
         this.lore = processStringList("lore", lore, new ArrayList<>(), true);
         this.enchantments = processStringList("enchantments", enchantments, new ArrayList<>(), false);
         this.potionEffects = processStringList("potionEffects", potionEffects, new ArrayList<>(), false);
         this.dropWeight = processString("dropWeight", dropWeight, "dynamic", false);
-        this.scalability = processEnum("scalability", scalability, CustomItem.Scalability.SCALABLE, false);
-        this.itemType = processEnum("itemType", itemType, CustomItem.ItemType.CUSTOM, false);
+        this.scalability = processEnum("scalability", scalability, CustomItem.Scalability.SCALABLE, CustomItem.Scalability.class, false);
+        this.itemType = processEnum("itemType", itemType, CustomItem.ItemType.CUSTOM, CustomItem.ItemType.class, false);
         this.customModelID = processInt("customModelID", customModelID, -1, false);
+        this.permission = processString("permission", permission, "", false);
     }
 }
