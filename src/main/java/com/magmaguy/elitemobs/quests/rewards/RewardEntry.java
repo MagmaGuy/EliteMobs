@@ -63,7 +63,8 @@ public class RewardEntry implements Serializable {
             }
     }
 
-    public void doReward(UUID playerUUID, int questLevel) {
+    public void doReward(UUID playerUUID) {
+        //todo: check if quest is limiting loot level as it should
         Player player = Bukkit.getPlayer(playerUUID);
         if (ThreadLocalRandom.current().nextDouble() < chance)
             for (int i = 0; i < amount; i++)

@@ -18,12 +18,16 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class ScalableItemConstructor {
 
+    private ScalableItemConstructor() {
+    }
+
     public static ItemStack randomizeScalableItem(int itemTier, Player player, EliteEntity eliteEntity) {
         CustomItem customItem = CustomItem.getScalableItems().get(ThreadLocalRandom.current().nextInt(CustomItem.getScalableItems().size()));
         return constructScalableItem(itemTier, customItem, player, eliteEntity);
     }
 
     public static ItemStack constructScalableItem(int itemTier, CustomItem customItem, Player player, EliteEntity eliteEntity) {
+        if (!customItem.getPermission().isEmpty() && !player.hasPermission(customItem.getPermission())) return null;
         HashMap<Enchantment, Integer> newEnchantmentList = updateDynamicEnchantments(customItem.getEnchantments(), itemTier, false);
         return ItemConstructor.constructItem(
                 customItem.getName(),
@@ -128,6 +132,7 @@ public class ScalableItemConstructor {
             ItemStackGenerator.generateItemStack(Material.AIR);
 
         CustomItem customItem = localLootList.get(ThreadLocalRandom.current().nextInt(localLootList.size()));
+        if (!customItem.getPermission().isEmpty() && !player.hasPermission(customItem.getPermission())) return null;
 
         return constructLimitedItem(itemTier, customItem, player, eliteEntity);
 

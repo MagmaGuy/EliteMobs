@@ -190,7 +190,9 @@ public class QuestMenu {
             return initialQuestAccept(quest);
 
         //Quest is complete, turn in placeholder
-        if (quest.getQuestObjectives().isOver() && quest.getQuestTaker().equals(npcEntity.getNpCsConfigFields().getFilename()))
+        if (quest.getQuestObjectives().isOver() &&
+                (npcEntity == null ||
+                        quest.getQuestTaker().equals(npcEntity.getNpCsConfigFields().getFilename())))
             return questAcceptComplete(quest);
 
         //Quest has begun but is either not over or the player is not talking to the turn in npc

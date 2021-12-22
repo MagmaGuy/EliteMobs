@@ -56,6 +56,8 @@ public class CustomSummonPower extends ElitePower implements Listener {
                         return;
                     }
                     CustomSpawn customSpawn = new CustomSpawn(customBossReinforcement.customSpawn, customBossEntity);
+                    //Case if the spawn fails
+                    if (customSpawn.getCustomSpawnConfigFields() == null) continue;
                     customSpawn.setWorld(summoningEntity.getSpawnLocation().getWorld());
                     customSpawn.queueSpawn();
                     summoningEntity.addGlobalReinforcement(customBossEntity);
@@ -186,7 +188,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
                         }
                         break;
                     case "customspawn":
-                        if (CustomSpawnConfig.customSpawnConfig.getCustomEvent(getSubstringField(substring)) == null)
+                        if (CustomSpawnConfig.getCustomEvent(getSubstringField(substring)) == null)
                             new WarningMessage("Failed to determine Custom Spawn file for filename " + substring);
                         else
                             customSpawn = getSubstringField(substring);

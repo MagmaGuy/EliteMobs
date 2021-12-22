@@ -119,7 +119,7 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
     public void processConfigFields() {
         this.isEnabled = processBoolean("isEnabled", isEnabled, false, true);
         this.name = processString("name", name, "name", true);
-        this.dungeonLocationType = processEnum("dungeonLocationType", dungeonLocationType, null, true);
+        this.dungeonLocationType = processEnum("dungeonLocationType", dungeonLocationType, null, DungeonLocationType.class, true);
         if (dungeonLocationType == null) {
             new WarningMessage("File " + filename + " does not have a valid dungeonLocationType!");
             this.fileConfiguration = null;
@@ -129,7 +129,7 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
         this.relativeBossLocations = processStringList("relativeBossLocations", relativeBossLocations, new ArrayList<>(), false);
         this.relativeTreasureChestLocations = processStringList("relativeTreasureChestLocations", relativeTreasureChestLocations, new ArrayList<>(), false);
         this.downloadLink = processString("downloadLink", downloadLink, "", false);
-        this.dungeonSizeCategory = processEnum("dungeonSizeCategory", dungeonSizeCategory, null, false);
+        this.dungeonSizeCategory = processEnum("dungeonSizeCategory", dungeonSizeCategory, null, DungeonSizeCategory.class, false);
         if (dungeonSizeCategory == null) {
             new WarningMessage("File " + filename + " does not have a valid dungeonSizeCategory!");
             this.fileConfiguration = null;
@@ -137,7 +137,7 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
         }
         this.worldName = processString("worldName", worldName, "", false);
         this.schematicName = processString("schematicName", schematicName, "", false);
-        this.environment = processEnum("environment", environment, null, false);
+        this.environment = processEnum("environment", environment, null, World.Environment.class, false);
         this.protect = processBoolean("protect", protect, true, true);
         this.anchorPoint = processLocation("anchorPoint", anchorPoint, null, false);
         this.rotation = processDouble("rotation", rotation, 0, false);

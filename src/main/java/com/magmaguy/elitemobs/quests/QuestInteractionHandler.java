@@ -55,10 +55,17 @@ public class QuestInteractionHandler {
     private static boolean playerHasPermissionToAcceptQuest(Player player, CustomQuest customQuest) {
         if (!customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission().isEmpty() &&
                 player.hasPermission(customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission())){
+            player.sendMessage("[EliteMobs] You are locked out from this quest! " + customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission());
             return false;
         }
-        return customQuest.getCustomQuestsConfigFields().getQuestAcceptPermission().isEmpty() ||
-                player.hasPermission(customQuest.getCustomQuestsConfigFields().getQuestAcceptPermission());
+        if (customQuest.getCustomQuestsConfigFields().getQuestAcceptPermission().isEmpty() ||
+                player.hasPermission(customQuest.getCustomQuestsConfigFields().getQuestAcceptPermission())){
+            return true;
+        }
+         else {
+            player.sendMessage("[EliteMobs] You don't have the required permission! " + customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission());
+             return false;
+        }
     }
 
     private static void scanQuestTakerNPC(NPCEntity npcEntity, List<Quest> activeQuests, List<CustomQuest> npcQuests) {

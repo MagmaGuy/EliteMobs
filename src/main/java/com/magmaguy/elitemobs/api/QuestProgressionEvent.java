@@ -37,7 +37,7 @@ public class QuestProgressionEvent extends Event {
         @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
         public void onQuestProgression(QuestProgressionEvent event) {
             event.getQuest().getQuestObjectives().updateQuestStatus(event.getPlayer().getUniqueId());
-            if (QuestsConfig.doQuestChatProgression)
+            if (QuestsConfig.isDoQuestChatProgression())
                 event.getPlayer().sendMessage(QuestsConfig.getQuestChatProgressionMessage(event.getObjective()));
             if (!QuestTracking.isTracking(event.player))
                 event.getQuest().getQuestObjectives().displayTemporaryObjectivesScoreboard(event.getPlayer());

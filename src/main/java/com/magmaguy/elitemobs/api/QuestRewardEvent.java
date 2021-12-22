@@ -33,11 +33,11 @@ public class QuestRewardEvent extends Event {
     }
 
     private void doMessages() {
-        player.sendMessage(QuestsConfig.questCompleteMesage.replace("$questName", quest.getQuestName()));
-        if (QuestsConfig.useQuestCompleteTitles)
+        player.sendMessage(QuestsConfig.getQuestCompleteMessage().replace("$questName", quest.getQuestName()));
+        if (QuestsConfig.isUseQuestCompleteTitles())
             player.sendTitle(
-                    QuestsConfig.questCompleteTitle.replace("$questName", quest.getQuestName()),
-                    QuestsConfig.questCompleteSubtitle.replace("$questName", quest.getQuestName()),
+                    QuestsConfig.getQuestCompleteTitle().replace("$questName", quest.getQuestName()),
+                    QuestsConfig.getQuestCompleteSubtitle().replace("$questName", quest.getQuestName()),
                     20, 60, 20);
     }
 

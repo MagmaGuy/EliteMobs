@@ -31,15 +31,17 @@ public class CustomBossDeath implements Listener {
     public static void dropLoot(Player player, CustomBossEntity customBossEntity) {
         if (customBossEntity.customBossesConfigFields.getUniqueLootList().isEmpty()) return;
         for (CustomBossesConfigFields.UniqueLoot uniqueLoot : customBossEntity.customBossesConfigFields.getParsedUniqueLootList())
-            if (ThreadLocalRandom.current().nextDouble() < uniqueLoot.chance)
-                CustomItem.dropPlayerLoot(player, customBossEntity.getLevel(), uniqueLoot.customItem.getFileName(), customBossEntity.getLocation());
+            if (uniqueLoot.getRequiredPermission().isEmpty() ||
+                    !uniqueLoot.getRequiredPermission().isEmpty() && player.hasPermission(uniqueLoot.getRequiredPermission()))
+                if (ThreadLocalRandom.current().nextDouble() < uniqueLoot.chance)
+                    CustomItem.dropPlayerLoot(player, customBossEntity.getLevel(), uniqueLoot.customItem.getFileName(), customBossEntity.getLocation());
         for (SpecialLoot specialLoot : customBossEntity.customBossesConfigFields.getSpecialLoot().values())
             if (ThreadLocalRandom.current().nextDouble() < specialLoot.getChance())
                 customBossEntity.getLocation().getWorld().dropItem(customBossEntity.getLocation(),
                         specialLoot.generateItemStack(player, Math.max(customBossEntity.getLevel() - 3, 1), customBossEntity.getLevel() + 3));
-            for (VanillaItemDrop vanillaItemDrop : customBossEntity.customBossesConfigFields.getParsedVanillaLootList())
-                if (ThreadLocalRandom.current().nextDouble() < vanillaItemDrop.getChance())
-                    customBossEntity.getLocation().getWorld().dropItem(customBossEntity.getLocation(), vanillaItemDrop.getItemStack());
+        for (VanillaItemDrop vanillaItemDrop : customBossEntity.customBossesConfigFields.getParsedVanillaLootList())
+            if (ThreadLocalRandom.current().nextDouble() < vanillaItemDrop.getChance())
+                customBossEntity.getLocation().getWorld().dropItem(customBossEntity.getLocation(), vanillaItemDrop.getItemStack());
     }
 
     private static void doDeathMessage(CustomBossEntity customBossEntity) {
@@ -165,7 +167,7 @@ public class CustomBossDeath implements Listener {
         return sortedMap;
     }
 
-    @EventHandler (priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onEliteMobDeath(EliteMobDeathEvent event) {
         if (!(event.getEliteEntity() instanceof CustomBossEntity)) return;
         CustomBossEntity customBossEntity = (CustomBossEntity) event.getEliteEntity();

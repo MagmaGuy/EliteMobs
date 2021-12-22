@@ -67,7 +67,7 @@ public class Quest implements Serializable {
 
     public static void stopPlayerQuest(Player player, String questID) {
         if (PlayerData.getQuests(player.getUniqueId()) == null) {
-            player.sendMessage(QuestsConfig.leaveWhenNoActiveQuestsExist);
+            player.sendMessage(QuestsConfig.getLeaveWhenNoActiveQuestsExist());
             return;
         }
         QuestLeaveEvent questLeaveEvent = new QuestLeaveEvent(player, PlayerData.getQuest(player.getUniqueId(), questID));
