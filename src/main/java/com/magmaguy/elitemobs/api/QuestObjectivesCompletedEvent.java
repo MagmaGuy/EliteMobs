@@ -31,7 +31,7 @@ public class QuestObjectivesCompletedEvent extends Event {
     public static class QuestObjectivesCompletedEventHandler implements Listener {
         @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
         public void onObjectivesCompleted(QuestObjectivesCompletedEvent event) {
-            if (!QuestsConfig.requireQuestTurnIn) {
+            if (!QuestsConfig.isRequireQuestTurnIn()) {
                 QuestCompleteEvent questCompleteEvent = new QuestCompleteEvent(event.getPlayer(), event.getQuest());
                 new EventCaller(questCompleteEvent);
             }

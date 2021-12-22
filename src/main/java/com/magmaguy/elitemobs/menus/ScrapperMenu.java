@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.menus;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.api.EliteMobsItemDetector;
 import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.TranslationConfig;
 import com.magmaguy.elitemobs.config.menus.premade.ScrapperMenuConfig;
 import com.magmaguy.elitemobs.config.menus.premade.SellMenuConfig;
@@ -131,11 +132,11 @@ public class ScrapperMenu extends EliteMenu {
                         int tier = ItemTierFinder.findBattleTier(itemStack);
                         for (int i = 0; i < itemStack.getAmount(); i++) {
                             if (ThreadLocalRandom.current().nextDouble() > .75) {
-                                player.sendMessage(ChatColorConverter.convert("Scrap failed!"));
+                                player.sendMessage(ChatColorConverter.convert(ItemSettingsConfig.getScrapFailedMessage()));
                                 continue;
                             }
                             player.getInventory().addItem(ItemConstructor.constructScrapItem(tier, player, false));
-                            player.sendMessage(ChatColorConverter.convert("Scrap succeeded!"));
+                            player.sendMessage(ChatColorConverter.convert(ItemSettingsConfig.getScrapSucceededMessage()));
                         }
                         itemStack.setAmount(0);
                     }

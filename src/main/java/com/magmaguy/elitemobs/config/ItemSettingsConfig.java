@@ -11,6 +11,9 @@ import java.util.List;
 public class ItemSettingsConfig {
 
     @Getter
+    private static String shopItemSource;
+
+    @Getter
     private static boolean doEliteMobsLoot;
     @Getter
     private static boolean doMmorpgColors;
@@ -19,13 +22,31 @@ public class ItemSettingsConfig {
     @Getter
     private static List<String> loreStructure;
     @Getter
-    private static String shopItemSource, mobItemSource, loreWorth, loreResale;
+    private static String mobItemSource;
     @Getter
-    private static double flatDropRate, tierIncreaseDropRate;
+    private static String loreWorth;
     @Getter
-    private static double proceduralItemWeight, weighedItemWeight, fixedItemWeight, limitedItemWeight, scalableItemWeight;
+    private static String loreResale;
     @Getter
-    private static double defaultLootMultiplier, defaultExperienceMultiplier;
+    private static double flatDropRate;
+    @Getter
+    private static double tierIncreaseDropRate;
+    @Getter
+    private static double proceduralItemWeight;
+    @Getter
+    private static double weighedItemWeight;
+    @Getter
+    private static double fixedItemWeight;
+    @Getter
+    private static double limitedItemWeight;
+    @Getter
+    private static double scalableItemWeight;
+    @Getter
+    private static double defaultLootMultiplier;
+    @Getter
+    private static double defaultExperienceMultiplier;
+    @Getter
+    private static String potionEffectOnHitTargetLore;
     @Getter
     private static int maxLevelForDefaultLootMultiplier;
     @Getter
@@ -39,7 +60,11 @@ public class ItemSettingsConfig {
     @Getter
     private static boolean enableRareItemParticleEffects;
     @Getter
-    private static String potionEffectOnHitTargetLore, potionEffectOnHitSelfLore, potionEffectContinuousLore;
+    private static String potionEffectOnHitSelfLore;
+    @Getter
+    private static String potionEffectContinuousLore;
+    @Getter
+    private static String scrapSucceededMessage;
     @Getter
     private static String eliteEnchantmentColor;
     @Getter
@@ -58,6 +83,10 @@ public class ItemSettingsConfig {
     private static boolean eliteDurability;
     @Getter
     private static double eliteDurabilityMultiplier;
+    @Getter
+    private static String scrapFailedMessage;
+    private ItemSettingsConfig() {
+    }
 
     public static void initializeConfig() {
         File file = ConfigurationEngine.fileCreator("ItemSettings.yml");
@@ -114,6 +143,8 @@ public class ItemSettingsConfig {
         preventEliteItemDiamondToNetheriteUpgrade = ConfigurationEngine.setBoolean(fileConfiguration, "preventEliteItemDiamondToNetheriteUpgrade", true);
         eliteDurability = ConfigurationEngine.setBoolean(fileConfiguration, "eliteItemsDurabilityLossOnlyOnDeath", true);
         eliteDurabilityMultiplier = ConfigurationEngine.setDouble(fileConfiguration, "eliteItemsDurabilityLossMultiplier", 1d);
+        scrapSucceededMessage = ConfigurationEngine.setString(fileConfiguration, "scrapSucceededMessage", "&8[EliteMobs] &2Scrap succeeded!");
+        scrapFailedMessage = ConfigurationEngine.setString(fileConfiguration, "scrapFailedMessage", "&8[EliteMobs] &cScrap failed!");
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }

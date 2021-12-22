@@ -13,7 +13,6 @@ import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.scoreboard.Scoreboard;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -29,7 +28,7 @@ public class QuestObjectives implements Serializable {
     protected QuestReward questReward;
     @Getter
     @Setter
-    protected List<Objective> objectives;
+    private List<Objective> objectives;
     //The CustomQuest this objective belongs to
     @Getter
     private Quest quest;
@@ -94,20 +93,22 @@ public class QuestObjectives implements Serializable {
     }
 
 
-    public Scoreboard displayTemporaryObjectivesScoreboard(Player player) {
+    public void displayTemporaryObjectivesScoreboard(Player player) {
+        if (!QuestsConfig.isUseQuestScoreboards()) return;
         List<String> strings = new ArrayList<>();
         for (Objective objective : objectives)
             strings.add(QuestsConfig.getQuestScoreboardProgressionLine(objective));
 
-        return SimpleScoreboard.temporaryScoreboard(player, ChatColorConverter.convert(getQuest().getQuestName()), strings, 20 * 20);
+        SimpleScoreboard.temporaryScoreboard(player, ChatColorConverter.convert(getQuest().getQuestName()), strings, 20 * 20);
     }
 
-    public Scoreboard displayLazyObjectivesScoreboard(Player player) {
+    public void displayLazyObjectivesScoreboard(Player player) {
+        if (!QuestsConfig.isUseQuestScoreboards()) return;
         List<String> strings = new ArrayList<>();
         for (Objective objective : objectives)
             strings.add(QuestsConfig.getQuestScoreboardProgressionLine(objective));
 
-        return SimpleScoreboard.lazyScoreboard(player, ChatColorConverter.convert(getQuest().getQuestName()), strings);
+        SimpleScoreboard.lazyScoreboard(player, ChatColorConverter.convert(getQuest().getQuestName()), strings);
     }
 
 

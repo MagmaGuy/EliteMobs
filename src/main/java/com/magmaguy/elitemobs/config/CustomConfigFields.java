@@ -13,10 +13,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.util.Vector;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 public class CustomConfigFields implements CustomConfigFieldsInterface {
 
@@ -145,28 +142,36 @@ public class CustomConfigFields implements CustomConfigFieldsInterface {
     }
 
 
-    protected <T extends Enum> List<T> processEnumList(String path, List<T> value, List<T> pluginDefault, Class enumClass, boolean forceWriteDefault) {
+    protected <T extends Enum<T>> List<T> processEnumList(String path, List<T> value, List<T> pluginDefault, Class<T> enumClass, boolean forceWriteDefault) {
         if (!configHas(path)) {
             if (forceWriteDefault || value != pluginDefault)
-                processStringList(path, enumListToStringListConverter(pluginDefault), enumListToStringListConverter(value), forceWriteDefault);
+                processStringList(path, enumListToStringListConverter(value), enumListToStringListConverter(pluginDefault), forceWriteDefault);
             return value;
         }
         try {
             List<T> newList = new ArrayList<>();
-            List<String> stringList = processStringList(path, enumListToStringListConverter(pluginDefault), enumListToStringListConverter(value), forceWriteDefault);
-            stringList.forEach((string) -> newList.add((T) Enum.valueOf(enumClass, string)));
+            List<String> stringList = processStringList(path, enumListToStringListConverter(value), enumListToStringListConverter(pluginDefault), forceWriteDefault);
+            stringList.forEach(string -> {
+                try {
+                    newList.add(Enum.valueOf(enumClass, string.toUpperCase()));
+                } catch (Exception ex) {
+                    new WarningMessage(filename + " : " + "Value " + string + " is not a valid for " + path + " ! This may be due to your server version, or due to an invalid value!");
+                }
+            });
             return newList;
-        } catch (Exception ex) {
+        } catch (
+                Exception ex) {
+            ex.printStackTrace();
             new WarningMessage("File " + filename + " has an incorrect entry for " + path);
             new WarningMessage("Entry: " + value);
         }
         return value;
     }
 
-    private <T extends Enum> List<String> enumListToStringListConverter(List<T> pluginDefault) {
-        if (pluginDefault == null) return null;
+    private <T extends Enum<T>> List<String> enumListToStringListConverter(List<T> list) {
+        if (list == null) return Collections.emptyList();
         List<String> newList = new ArrayList<>();
-        pluginDefault.forEach((element) -> newList.add(element.toString()));
+        list.forEach(element -> newList.add(element.toString()));
         return newList;
     }
 
@@ -227,7 +232,7 @@ public class CustomConfigFields implements CustomConfigFieldsInterface {
         return value;
     }
 
-    public <T extends Enum> T processEnum(String path, T value, T pluginDefault, boolean forceWriteDefault) {
+    public <T extends Enum<T>> T processEnum(String path, T value, T pluginDefault, Class<T> enumClass, boolean forceWriteDefault) {
         if (!configHas(path)) {
             if (forceWriteDefault || value != pluginDefault) {
                 String valueString = null;
@@ -241,7 +246,7 @@ public class CustomConfigFields implements CustomConfigFieldsInterface {
             return value;
         }
         try {
-            return (T) Enum.valueOf(value.getClass(), fileConfiguration.getString(path).toUpperCase());
+            return (T) Enum.valueOf(enumClass, fileConfiguration.getString(path).toUpperCase());
         } catch (Exception ex) {
             new WarningMessage("File " + filename + " has an incorrect entry for " + path);
             new WarningMessage("Entry: " + value);

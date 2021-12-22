@@ -12,6 +12,7 @@ import com.magmaguy.elitemobs.items.customenchantments.*;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.utils.WarningMessage;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -51,6 +52,8 @@ public class CustomItem {
     private double dropWeight = 0;
     private Scalability scalability;
     private ItemType itemType;
+    @Getter
+    private final String permission;
 
     /**
      * Generates a CustomItem object. This holds values for limited and dynamic items until a tier is determined for them.
@@ -59,6 +62,7 @@ public class CustomItem {
      */
     public CustomItem(CustomItemsConfigFields customItemsConfigFields) {
         this.customItemsConfigFields = customItemsConfigFields;
+        this.permission = customItemsConfigFields.getPermission();
         parseFileName();
         if (!parseIsEnabled()) return;
         if (!parseMaterial()) return;
@@ -95,6 +99,8 @@ public class CustomItem {
 
     public static Item dropPlayerLoot(Player player, int tier, String customItemFileName, Location location) {
         CustomItem customItem = getCustomItem(customItemFileName);
+        if (customItem == null) return null;
+        if (!customItem.permission.isEmpty() && !player.hasPermission(customItem.permission)) return null;
         Item loot = null;
         int itemTier = 0;
 
@@ -365,6 +371,7 @@ public class CustomItem {
     }
 
     public ItemStack generateDefaultsItemStack(Player player, boolean showItemWorth, EliteEntity eliteEntity) {
+        if (player != null && !permission.isEmpty() && !player.hasPermission(permission)) return null;
         ItemStack itemStack =
                 ItemConstructor.constructItem(
                         getName(),

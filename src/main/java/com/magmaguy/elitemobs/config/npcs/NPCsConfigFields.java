@@ -107,14 +107,14 @@ public class NPCsConfigFields extends CustomConfigFields implements CustomConfig
         this.isEnabled = processBoolean("isEnabled", isEnabled, true, true);
         this.name = processString("name", name, "", true);
         this.role = processString("role", role, "", true);
-        this.profession = processEnum("profession", profession, Villager.Profession.NITWIT, true);
+        this.profession = processEnum("profession", profession, Villager.Profession.NITWIT, Villager.Profession.class, true);
         this.location = processString("spawnLocation", location, null, true);
         this.greetings = processStringList("greetings", greetings, new ArrayList<>(), true);
         this.dialog = processStringList("dialog", dialog, new ArrayList<>(), true);
         this.farewell = processStringList("farewell", farewell, new ArrayList<>(), true);
         this.canTalk = processBoolean("canTalk", canTalk, true, true);
         this.activationRadius = processDouble("activationRadius", activationRadius, 3, true);
-        this.interactionType = processEnum("interactionType", interactionType, NPCInteractions.NPCInteractionType.NONE, true);
+        this.interactionType = processEnum("interactionType", interactionType, NPCInteractions.NPCInteractionType.NONE, NPCInteractions.NPCInteractionType.class, true);
         this.timeout = processDouble("timeout", timeout, 0, false);
         this.noPreviousLocationMessage = processString("noPreviousLocationMessage", noPreviousLocationMessage, "", false);
         this.questFilenames = processStringList("questFileName", questFilenames,  new ArrayList<>(), false);

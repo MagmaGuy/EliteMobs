@@ -18,24 +18,58 @@ import java.util.List;
 
 public class QuestsConfig {
 
-    public static boolean requireQuestTurnIn;
-    public static String questJoinMessage;
-    public static String questLeaveMessage;
-    public static String questCompleteMesage;
-    public static String leaveWhenNoActiveQuestsExist;
-    public static String questLeaveConfirmationMessage;
-    public static boolean useQuestAcceptTitles;
-    public static String questStartTitle, questStartSubtitle;
-    public static boolean useQuestCompleteTitles;
-    public static String questCompleteTitle, questCompleteSubtitle;
-    public static boolean useQuestLeaveTitles;
-    public static String questLeaveTitle, questLeaveSubtitle;
-    public static boolean doQuestChatProgression;
-    public static String ongoingColorCode, completedColorCode;
-    public static String killQuestChatProgressionMessage, fetchQuestChatProgressionMessage, dialogQuestChatProgressionMessage;
-    public static boolean showQuestProgressionOnScoreboard;
-    public static FileConfiguration fileConfiguration;
-    private static String killQuestScoreboardProgressionLine, fetchQuestScoreboardProgressionLine, dialogQuestScoreboardProgressionLine;
+    @Getter
+    private static boolean requireQuestTurnIn;
+    @Getter
+    private static String questJoinMessage;
+    @Getter
+    private static String questLeaveMessage;
+    @Getter
+    private static String questCompleteMessage;
+    @Getter
+    private static String leaveWhenNoActiveQuestsExist;
+    @Getter
+    private static String questLeaveConfirmationMessage;
+    @Getter
+    private static boolean useQuestAcceptTitles;
+    @Getter
+    private static String questStartTitle;
+    @Getter
+    private static String questStartSubtitle;
+    @Getter
+    private static boolean useQuestCompleteTitles;
+    @Getter
+    private static String questCompleteTitle;
+    @Getter
+    private static String questCompleteSubtitle;
+    @Getter
+    private static boolean useQuestLeaveTitles;
+    @Getter
+    private static String questLeaveTitle;
+    @Getter
+    private static String questLeaveSubtitle;
+    @Getter
+    private static boolean doQuestChatProgression;
+    @Getter
+    private static String ongoingColorCode;
+    @Getter
+    private static String completedColorCode;
+    @Getter
+    private static String killQuestChatProgressionMessage;
+    @Getter
+    private static String fetchQuestChatProgressionMessage;
+    @Getter
+    private static String dialogQuestChatProgressionMessage;
+    @Getter
+    private static boolean useQuestScoreboards;
+    @Getter
+    private static String killQuestScoreboardProgressionLine;
+    @Getter
+    private static String fetchQuestScoreboardProgressionLine;
+    @Getter
+    private static String dialogQuestScoreboardProgressionLine;
+    private QuestsConfig() {
+    }
     @Getter
     private static int maximumActiveQuests;
     @Getter
@@ -49,16 +83,14 @@ public class QuestsConfig {
     @Getter
     private static String chatTrackCommand;
 
-    private static File file;
-
     public static void initializeConfig() {
-        file = ConfigurationEngine.fileCreator("Quests.yml");
-        fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
+        File file = ConfigurationEngine.fileCreator("Quests.yml");
+        FileConfiguration fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
 
         requireQuestTurnIn = ConfigurationEngine.setBoolean(fileConfiguration, "requireQuestTurnIn", true);
         questJoinMessage = ConfigurationEngine.setString(fileConfiguration, "questJoinMessage", "&aYou have accepted the quest $questName &a!");
         questLeaveMessage = ConfigurationEngine.setString(fileConfiguration, "questLeaveMessage", "&cYou have abandoned the quest $questName &c!");
-        questCompleteMesage = ConfigurationEngine.setString(fileConfiguration, "questCompleteMessage", "&2You completed the quest $questName &2!");
+        questCompleteMessage = ConfigurationEngine.setString(fileConfiguration, "questCompleteMessage", "&2You completed the quest $questName &2!");
         leaveWhenNoActiveQuestsExist = ConfigurationEngine.setString(fileConfiguration, "leaveWhenNoActiveQuestsExist", "&cYou don't currently have an active quest!");
         questLeaveConfirmationMessage = ConfigurationEngine.setString(fileConfiguration, "questLeaveConfirmationMessage", "&cAre you sure you want to abandon your current quest? Do &a/em confirm &c to confirm your choice!");
         useQuestAcceptTitles = ConfigurationEngine.setBoolean(fileConfiguration, "useQuestAcceptTitles", true);
@@ -79,6 +111,8 @@ public class QuestsConfig {
         maximumActiveQuests = ConfigurationEngine.setInt(fileConfiguration, "maximumActiveQuests", 10);
         questCapMessage = ConfigurationEngine.setString(fileConfiguration, "questCapMessage", "&8[EliteMobs] &cYou have reached the maximum amount of active quests (10)! " +
                 "&4Abandon or complete at least one active quest if you want to get more quests!");
+
+        useQuestScoreboards = ConfigurationEngine.setBoolean(fileConfiguration, "useQuestScoreboards", true);
 
         killQuestScoreboardProgressionLine = ConfigurationEngine.setString(fileConfiguration, "killQuestScoreboardProgressionMessage", "&c➤Kill $name:$color$current&0/$color$target");
         fetchQuestScoreboardProgressionLine = ConfigurationEngine.setString(fileConfiguration, "fetchQuestScoreboardProgressionMessage", "&c➤Get $name:$color$current&0/$color$target");
@@ -150,7 +184,7 @@ public class QuestsConfig {
             newString = fetchQuestChatProgressionMessage;
         else if (objective instanceof DialogObjective)
             newString = dialogQuestChatProgressionMessage;
-        newString = newString.replace("$name", ChatColor.BLACK + ChatColor.stripColor(objective.getObjectiveName()));
+        newString = newString.replace("$name", ChatColor.WHITE + ChatColor.stripColor(objective.getObjectiveName()));
         newString = newString.replace("$current", objective.getCurrentAmount() + "");
         newString = newString.replace("$target", objective.getTargetAmount() + "");
         if (!objective.isObjectiveCompleted())

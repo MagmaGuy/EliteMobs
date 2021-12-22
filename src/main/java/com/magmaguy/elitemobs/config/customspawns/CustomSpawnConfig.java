@@ -6,21 +6,21 @@ import java.util.HashMap;
 
 public class CustomSpawnConfig extends CustomConfig {
 
-    public static CustomSpawnConfig customSpawnConfig;
-    private final HashMap<String, CustomSpawnConfigFields> customSpawns = new HashMap<>();
+    private static HashMap<String, CustomSpawnConfigFields> customSpawns = new HashMap<>();
 
     public CustomSpawnConfig() {
         super("customspawns", "com.magmaguy.elitemobs.config.customspawns.premade", CustomSpawnConfigFields.class);
+        customSpawns = new HashMap<>();
         for (String key : super.getCustomConfigFieldsHashMap().keySet())
-            customSpawns.put(key, (CustomSpawnConfigFields) super.getCustomConfigFieldsHashMap().get(key));
-        customSpawnConfig = this;
+            if (super.getCustomConfigFieldsHashMap().get(key).isEnabled())
+                customSpawns.put(key, (CustomSpawnConfigFields) super.getCustomConfigFieldsHashMap().get(key));
     }
 
-    public HashMap<String, ? extends CustomSpawnConfigFields> getCustomSpawns() {
+    public static HashMap<String, ? extends CustomSpawnConfigFields> getCustomSpawns() {
         return customSpawns;
     }
 
-    public CustomSpawnConfigFields getCustomEvent(String fileName) {
+    public static CustomSpawnConfigFields getCustomEvent(String fileName) {
         return customSpawns.get(fileName);
     }
 

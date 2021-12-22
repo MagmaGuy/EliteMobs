@@ -91,13 +91,13 @@ public class CustomTreasureChestConfigFields extends CustomConfigFields {
     @Override
     public void processConfigFields() {
         this.isEnabled = processBoolean("isEnabled", isEnabled, false, false);
-        this.chestMaterial = processEnum("chestType", chestMaterial, Material.CHEST, true);
-        this.facing = processEnum("facing", facing, BlockFace.NORTH, true);
+        this.chestMaterial = processEnum("chestType", chestMaterial, Material.CHEST, Material.class, true);
+        this.facing = processEnum("facing", facing, BlockFace.NORTH, BlockFace.class, true);
         this.chestTier = processInt("chestTier", chestTier, 0, true);
         this.worldName = processString("location", worldName, null, false);
         if (worldName != null)
             worldName = worldName.split(",")[0];
-        this.dropStyle = processEnum("dropStyle", dropStyle, TreasureChest.DropStyle.SINGLE, true);
+        this.dropStyle = processEnum("dropStyle", dropStyle, TreasureChest.DropStyle.SINGLE, TreasureChest.DropStyle.class, true);
         this.restockTimer = processInt("restockTimer", restockTimer, 0, true);
         this.lootList = processStringList("lootList", lootList, new ArrayList<>(), true);
         for (String string : lootList)

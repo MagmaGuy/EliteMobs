@@ -1,9 +1,12 @@
 package com.magmaguy.elitemobs.quests.objectives;
 
+import com.magmaguy.elitemobs.api.QuestAcceptEvent;
 import com.magmaguy.elitemobs.api.QuestCompleteEvent;
+import com.magmaguy.elitemobs.api.QuestRewardEvent;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.Quest;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.entity.EntityType;
@@ -11,8 +14,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDropItemEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
@@ -37,7 +40,6 @@ public class CustomFetchObjective extends Objective {
         this.key = customItemFilename;
     }
 
-
     private static void checkEvent(@NotNull Player player, @NotNull ItemStack itemStack, boolean increment) {
         for (Quest quest : PlayerData.getQuests(player.getUniqueId()))
             for (Objective objective : quest.getQuestObjectives().getObjectives())
@@ -54,31 +56,55 @@ public class CustomFetchObjective extends Objective {
     }
 
     private void incrementCount(Player player, int amount, QuestObjectives questObjectives) {
-        super.currentAmount++;
-        checkProgress(player, questObjectives);
+        super.currentAmount += amount;
+        checkProgress(player, questObjectives, amount);
     }
 
     private void decrementCount(Player player, int amount, QuestObjectives questObjectives) {
-        super.currentAmount--;
-        checkProgress(player, questObjectives);
+        super.currentAmount -= amount;
+        checkProgress(player, questObjectives, -amount);
     }
 
-    private void checkProgress(Player player, QuestObjectives questObjectives) {
+    private void checkProgress(Player player, QuestObjectives questObjectives, int pendingAmount) {
         boolean strictCheck = super.currentAmount < 0 || super.currentAmount >= super.targetAmount;
-        super.currentAmount = 0;
-        if (strictCheck)
-            for (ItemStack itemStack : player.getInventory())
-                if (ItemTagger.hasKey(itemStack, this.key))
-                    super.currentAmount += itemStack.getAmount();
+        if (strictCheck) {
+            if (pendingAmount > 0) strictCheck(player, pendingAmount);
+            else strictCheck(player, 0);
+        }
         progressNonlinearObjective(questObjectives);
     }
 
-    public static class CustomFetchObjectiveEvents implements Listener {
+    private void strictCheck(Player player, int pendingAmount) {
+        super.currentAmount = 0;
+        for (ItemStack itemStack : player.getInventory())
+            if (ItemTagger.hasKey(itemStack, this.key))
+                super.currentAmount += itemStack.getAmount();
+        super.currentAmount += pendingAmount;
+    }
 
+    private void turnItemsIn(Player player) {
+        int deletedItems = 0;
+        for (ItemStack itemStack : player.getInventory()) {
+            if (ItemTagger.hasKey(itemStack, this.key)) {
+                int existingAmount = itemStack.getAmount();
+                int missingAmount = targetAmount - deletedItems;
+                if (existingAmount >= missingAmount) {
+                    existingAmount -= missingAmount;
+                    deletedItems += missingAmount;
+                } else
+                    existingAmount = 0;
+                itemStack.setAmount(existingAmount);
+                if (deletedItems == targetAmount)
+                    return;
+            }
+        }
+        new WarningMessage("Player " + player.getName() + " managed to complete objective " + objectiveName + " without turning in the required amount of items! This isn't good, tell the developer!");
+    }
+
+    public static class CustomFetchObjectiveEvents implements Listener {
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-        public void onItemDrop(EntityDropItemEvent event) {
-            if (event.getEntity().getType() != EntityType.PLAYER) return;
-            checkEvent((Player) event.getEntity(), event.getItemDrop().getItemStack(), false);
+        public void onItemDrop(PlayerDropItemEvent event) {
+            checkEvent(event.getPlayer(), event.getItemDrop().getItemStack(), false);
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -88,15 +114,28 @@ public class CustomFetchObjective extends Objective {
         }
 
         @EventHandler(ignoreCancelled = true)
-        public void onQuestCompleteEvent(QuestCompleteEvent event){
+        public void onQuestAcceptEvent(QuestAcceptEvent event) {
             for (Objective objective : event.getQuest().getQuestObjectives().getObjectives())
-                if (objective instanceof CustomFetchObjective){
-                    ((CustomFetchObjective) objective).checkProgress(event.getPlayer(), event.getQuest().getQuestObjectives());
-               if (objective.getCurrentAmount() < objective.getTargetAmount())
-                   event.setCancelled(true);
+                if (objective instanceof CustomFetchObjective)
+                    ((CustomFetchObjective) objective).strictCheck(event.getPlayer(), 0);
+        }
+
+        @EventHandler(ignoreCancelled = true)
+        public void onQuestCompleteEvent(QuestCompleteEvent event) {
+            for (Objective objective : event.getQuest().getQuestObjectives().getObjectives())
+                if (objective instanceof CustomFetchObjective) {
+                    ((CustomFetchObjective) objective).checkProgress(event.getPlayer(), event.getQuest().getQuestObjectives(), 0);
+                    if (objective.getCurrentAmount() < objective.getTargetAmount())
+                        event.setCancelled(true);
                 }
         }
 
+        @EventHandler(ignoreCancelled = true)
+        public void onQuestRewardEvent(QuestRewardEvent event) {
+            for (Objective objective : event.getQuest().getQuestObjectives().getObjectives())
+                if (objective instanceof CustomFetchObjective)
+                    ((CustomFetchObjective) objective).turnItemsIn(event.getPlayer());
+        }
     }
 
 

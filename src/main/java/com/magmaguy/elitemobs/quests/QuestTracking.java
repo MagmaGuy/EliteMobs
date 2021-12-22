@@ -25,7 +25,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
@@ -44,15 +43,15 @@ public class QuestTracking {
     private BukkitTask locationRefresher;
     private BukkitTask compassTask;
     private BossBar compassBar;
-    private Scoreboard scoreboard;
     private boolean questIsDone = false;
+
     public QuestTracking(Player player, CustomQuest customQuest) {
         this.player = player;
         this.customQuest = customQuest;
         startLocationGetter();
         startCompass();
         playerTrackingQuests.put(player, this);
-        scoreboard = customQuest.getQuestObjectives().displayLazyObjectivesScoreboard(player);
+        customQuest.getQuestObjectives().displayLazyObjectivesScoreboard(player);
     }
 
     public static boolean isTracking(Player player) {
@@ -77,7 +76,7 @@ public class QuestTracking {
         }
     }
 
-    public void refreshScoreboard(){
+    public void refreshScoreboard() {
         customQuest.getQuestObjectives().displayLazyObjectivesScoreboard(player);
     }
 

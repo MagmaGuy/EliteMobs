@@ -72,7 +72,7 @@ public class CustomEventsConfigFields extends CustomConfigFields implements Cust
     @Override
     public void processConfigFields() {
         this.isEnabled = processBoolean("isEnabled", isEnabled, true, true);
-        this.eventType = processEnum("eventType", eventType, CustomEvent.EventType.DEFAULT, true);
+        this.eventType = processEnum("eventType", eventType, CustomEvent.EventType.DEFAULT, CustomEvent.EventType.class, true);
         if (eventType == CustomEvent.EventType.DEFAULT) {
             new WarningMessage("Failed to determine a valid event type for " + filename + " ! This event will not be registered.");
             return;

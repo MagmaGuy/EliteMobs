@@ -12,7 +12,6 @@ import com.magmaguy.elitemobs.quests.rewards.QuestReward;
 import com.magmaguy.elitemobs.quests.rewards.RewardEntry;
 import lombok.Getter;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.apache.commons.lang.WordUtils;
 import org.bukkit.ChatColor;
 
 import java.util.ArrayList;
@@ -96,8 +95,13 @@ public class CustomQuestMenuConfig extends MenusConfigFields {
             if (rewardEntry.getItemStack() != null) {
                 textComponent.add(new TextComponent(rewardsDefaultSummaryLine
                         .replace("$amount", rewardEntry.getAmount() + "")
-                        .replace("$rewardName", WordUtils.capitalizeFully(rewardEntry.getItemStack().getType().toString()).replace("_", " "))
+                        .replace("$rewardName", rewardEntry.getItemStack().getItemMeta().getDisplayName())
                         .replace("$chance", (int) (rewardEntry.getChance() * 100) + "")));
+                //todo: find cleaner implementation for vanilla item rewards
+                //textComponent.add(new TextComponent(rewardsDefaultSummaryLine
+                //        .replace("$amount", rewardEntry.getAmount() + "")
+                //        .replace("$rewardName", WordUtils.capitalizeFully(rewardEntry.getItemStack().getType().toString()).replace("_", " "))
+                //        .replace("$chance", (int) (rewardEntry.getChance() * 100) + "")));
 
             } else if (rewardEntry.getCurrencyAmount() != 0) {
                 textComponent.add(new TextComponent(rewardsDefaultSummaryLine
