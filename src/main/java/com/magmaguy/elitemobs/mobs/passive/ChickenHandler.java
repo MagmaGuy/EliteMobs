@@ -101,7 +101,7 @@ public class ChickenHandler implements Listener {
         eggMeta.setLore(lore);
         eggStack.setItemMeta(eggMeta);
 
-        Iterator<LivingEntity> superChickenIterator = EntityTracker.getSuperMobs().values().iterator();
+        Iterator<LivingEntity> superChickenIterator = EntityTracker.getSuperMobs().iterator();
 
         while (superChickenIterator.hasNext()) {
 

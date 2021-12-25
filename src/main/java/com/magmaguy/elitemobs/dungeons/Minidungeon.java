@@ -464,7 +464,7 @@ public class Minidungeon {
         }
 
         public void uncommitLocations(Minidungeon minidungeon) {
-            Collection<EliteEntity> eliteEntities = new ArrayList<>(EntityTracker.getEliteMobs().values());
+            Collection<EliteEntity> eliteEntities = new ArrayList<>(EntityTracker.getEliteMobEntities().values());
             for (EliteEntity eliteEntity : eliteEntities)
                 if (eliteEntity instanceof CustomBossEntity)
                     if (((CustomBossEntity) eliteEntity).getMinidungeon() == minidungeon) {

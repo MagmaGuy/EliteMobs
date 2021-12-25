@@ -85,6 +85,8 @@ public class ItemSettingsConfig {
     private static double eliteDurabilityMultiplier;
     @Getter
     private static String scrapFailedMessage;
+    @Getter
+    private static boolean putLootDirectlyIntoPlayerInventory;
     private ItemSettingsConfig() {
     }
 
@@ -145,6 +147,7 @@ public class ItemSettingsConfig {
         eliteDurabilityMultiplier = ConfigurationEngine.setDouble(fileConfiguration, "eliteItemsDurabilityLossMultiplier", 1d);
         scrapSucceededMessage = ConfigurationEngine.setString(fileConfiguration, "scrapSucceededMessage", "&8[EliteMobs] &2Scrap succeeded!");
         scrapFailedMessage = ConfigurationEngine.setString(fileConfiguration, "scrapFailedMessage", "&8[EliteMobs] &cScrap failed!");
+        putLootDirectlyIntoPlayerInventory = ConfigurationEngine.setBoolean(fileConfiguration, "putLootDirectlyIntoPlayerInventory", false);
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }

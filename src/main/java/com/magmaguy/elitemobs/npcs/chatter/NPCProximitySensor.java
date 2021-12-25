@@ -40,8 +40,8 @@ public class NPCProximitySensor implements Listener {
 
                 HashSet<Player> seenPlayerList = (HashSet<Player>) nearbyPlayers.clone();
 
-                for (NPCEntity npcEntity : EntityTracker.getNPCEntities().values())
-                    if (npcEntity.getVillager().isValid()) {
+                for (NPCEntity npcEntity : EntityTracker.getNpcEntities().values())
+                    if (npcEntity.isValid()) {
                         boolean alreadySpoke = false;
                         for (Entity entity : npcEntity.getVillager().getNearbyEntities(npcEntity.getNpCsConfigFields().getActivationRadius(),
                                 npcEntity.getNpCsConfigFields().getActivationRadius(), npcEntity.getNpCsConfigFields().getActivationRadius()))

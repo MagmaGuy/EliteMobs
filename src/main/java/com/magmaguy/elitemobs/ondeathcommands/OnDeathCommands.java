@@ -20,8 +20,8 @@ public class OnDeathCommands implements Listener {
             string = string.replace("$level", eliteEntity.getLevel() + "");
         if (string.contains("$name"))
             string = string.replace("$name", eliteEntity.getName());
-        if (string.contains("$locationWorldName"))
-            string = string.replace("$locationWorldName", eliteEntity.getLocation().getWorld().getName());
+        if (string.contains("$locationWorldName") && eliteEntity.getLocation() != null)
+            string = string.replace("$locationWorldName", Objects.requireNonNull(eliteEntity.getLocation().getWorld()).getName());
         if (string.contains("$locationX"))
             string = string.replace("$locationX", eliteEntity.getLocation().getX() + "");
         if (string.contains("$locationY"))
@@ -86,21 +86,18 @@ public class OnDeathCommands implements Listener {
 
     private static HashMap<Player, Double> sortByComparator(HashMap<Player, Double> unsortMap, final boolean order) {
 
-        List<Map.Entry<Player, Double>> list = new LinkedList<Map.Entry<Player, Double>>(unsortMap.entrySet());
+        List<Map.Entry<Player, Double>> list = new LinkedList<>(unsortMap.entrySet());
 
         // Sorting the list based on values
-        Collections.sort(list, new Comparator<Map.Entry<Player, Double>>() {
-            public int compare(Map.Entry<Player, Double> o1,
-                               Map.Entry<Player, Double> o2) {
-                if (order)
-                    return o1.getValue().compareTo(o2.getValue());
-                else
-                    return o2.getValue().compareTo(o1.getValue());
-            }
+        list.sort((o1, o2) -> {
+            if (order)
+                return o1.getValue().compareTo(o2.getValue());
+            else
+                return o2.getValue().compareTo(o1.getValue());
         });
 
         // Maintaining insertion order with the help of LinkedList
-        HashMap<Player, Double> sortedMap = new LinkedHashMap<Player, Double>();
+        HashMap<Player, Double> sortedMap = new LinkedHashMap<>();
         for (Map.Entry<Player, Double> entry : list)
             sortedMap.put(entry.getKey(), entry.getValue());
 

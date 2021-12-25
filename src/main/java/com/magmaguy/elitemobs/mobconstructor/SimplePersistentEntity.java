@@ -94,7 +94,7 @@ public class SimplePersistentEntity {
      * @param chunkLocation
      */
     private static void loadChunk(int chunkLocation, List<SimplePersistentEntity> simplePersistentEntityList) {
-        simplePersistentEntityList.forEach((simplePersistentEntity) -> {
+        simplePersistentEntityList.forEach(simplePersistentEntity -> {
             if (simplePersistentEntity.customBossEntity != null)
                 simplePersistentEntity.customBossEntity.chunkLoad();
             else if (simplePersistentEntity.npcEntity != null)

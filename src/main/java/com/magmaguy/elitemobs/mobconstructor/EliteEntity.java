@@ -11,7 +11,6 @@ import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
-import com.magmaguy.elitemobs.entitytracker.EliteEntityTracker;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.events.CustomEvent;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
@@ -21,6 +20,7 @@ import com.magmaguy.elitemobs.powers.meta.MajorPower;
 import com.magmaguy.elitemobs.powers.meta.MinorPower;
 import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
+import com.magmaguy.elitemobs.tagger.PersistentTagger;
 import com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.elitemobs.utils.VersionChecker;
@@ -221,7 +221,6 @@ public class EliteEntity implements SimplePersistentEntityInterface {
     }
 
     public void setLivingEntity(LivingEntity livingEntity, CreatureSpawnEvent.SpawnReason spawnReason) {
-        if (this.livingEntity != null) EntityTracker.unregister(this.livingEntity.getUniqueId(), RemovalReason.ENTITY_REPLACEMENT);
         if (livingEntity == null) return;
         this.livingEntity = livingEntity;
         this.unsyncedLivingEntity = livingEntity;
@@ -265,6 +264,7 @@ public class EliteEntity implements SimplePersistentEntityInterface {
 
         this.name = livingEntity.getCustomName();
 
+        PersistentTagger.tagElite(livingEntity, eliteUUID);
         EntityTracker.registerEliteMob(this);
     }
 
@@ -304,7 +304,7 @@ public class EliteEntity implements SimplePersistentEntityInterface {
     }
 
     public void setHealth(double health) {
-        this.health =  Math.min(health, this.maxHealth);
+        this.health = Math.min(health, this.maxHealth);
         livingEntity.setHealth(this.health);
     }
 
@@ -312,7 +312,7 @@ public class EliteEntity implements SimplePersistentEntityInterface {
         this.health = health;
     }
 
-    public void heal(double healAmount){
+    public void heal(double healAmount) {
         EliteMobHealEvent eliteMobHealEvent = new EliteMobHealEvent(this, healAmount);
         new EventCaller(eliteMobHealEvent);
         if (eliteMobHealEvent.isCancelled()) return;
@@ -613,22 +613,21 @@ public class EliteEntity implements SimplePersistentEntityInterface {
         return !livingEntity.isDead();
     }
 
-    public Location getLocation(){
+    public Location getLocation() {
         if (livingEntity != null) return livingEntity.getLocation();
         return null;
     }
 
-    public void  remove(RemovalReason removalReason) {
+    public void remove(RemovalReason removalReason) {
         //This prevents the entity tracker from running this code twice when removing due to specific reasons
-        if (livingEntity != null){
-            EliteEntityTracker.eliteMobEntities.remove(livingEntity.getUniqueId());
-            EliteEntityTracker.trackedEntities.remove(livingEntity.getUniqueId());
-        }
+        //Custom bosses have their own tracking removal rules
+        if (livingEntity != null && (!(this instanceof CustomBossEntity)))
+            EntityTracker.getEliteMobEntities().remove(eliteUUID);
         if (livingEntity != null && !removalReason.equals(RemovalReason.DEATH))
             livingEntity.remove();
         if (livingEntity instanceof EnderDragon && removalReason.equals(RemovalReason.DEATH)) {
             ((EnderDragon) livingEntity).setPhase(EnderDragon.Phase.DYING);
-            ((EnderDragon) livingEntity).getDragonBattle().generateEndPortal(false);
+            Objects.requireNonNull(((EnderDragon) livingEntity).getDragonBattle()).generateEndPortal(false);
         }
         this.livingEntity = null;
     }

@@ -3,17 +3,15 @@ package com.magmaguy.elitemobs.api;
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
 import com.magmaguy.elitemobs.dungeons.Minidungeon;
+import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
 
-import java.util.HashMap;
-
 public class PlayerTeleportEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
-    public static HashMap<Player, Location> previousLocations = new HashMap<>();
     private final Location destination;
     private final Location originalLocation;
     private final Player player;
@@ -78,7 +76,7 @@ public class PlayerTeleportEvent extends Event implements Cancellable {
         if (AdventurersGuildConfig.guildWorldLocation != null)
             if (AdventurersGuildConfig.guildWorldLocation.getWorld().equals(originalLocation.getWorld()))
                 return;
-        previousLocations.put(player, originalLocation);
+        PlayerData.setBackTeleportLocation(player, originalLocation);
     }
 
     public static class PlayerTeleportEventExecutor implements Listener {

@@ -26,48 +26,59 @@ public class DebugScreen {
         TextComponent[] pages = new TextComponent[100];
 
         int counter = 0;
-        for (EliteEntity eliteEntity : EntityTracker.getEliteMobs().values())
-            if (eliteEntity instanceof CustomBossEntity) {
-                CustomBossEntity customBossEntity = (CustomBossEntity) eliteEntity;
-
-                if (!customBossEntity.getCustomBossesConfigFields().getFilename().contains(argument) &&
-                        !customBossEntity.getCustomBossesConfigFields().getName().toLowerCase().contains(argument.toLowerCase()))
-                    continue;
-                TextComponent page = new TextComponent();
-                page.addExtra(customBossEntity.getCustomBossesConfigFields().getFilename() + "\n");
-                page.addExtra("Name: " + ChatColorConverter.convert(customBossEntity.getCustomBossesConfigFields().getName()) + ChatColor.BLACK + "\n");
-                page.addExtra("Level: " + customBossEntity.getCustomBossesConfigFields().getLevel() + "\n");
-                if (customBossEntity.getLivingEntity() != null) {
-                    page.addExtra("Is Alive (MC): " + !customBossEntity.getLivingEntity().isDead() + "\n");
-                    page.addExtra(SpigotMessage.commandHoverMessage(ChatColor.BLUE + "XYZ: " + "\n",
-                            customBossEntity.getLocation().getBlockX() + ", " +
-                            customBossEntity.getLocation().getBlockY() + ", " +
-                            customBossEntity.getLocation().getBlockZ() + "\n" +
-                            ChatColor.BLUE + "Click to teleport! (if alive)",
-                            "/em debugtp " + customBossEntity.getEliteUUID().toString()));
-                    page.addExtra("Has AI: " + !customBossEntity.getLivingEntity().hasAI() + "\n");
-                } else
-                    page.addExtra("Is Alive (MC): false\n");
-                if (customBossEntity.getLocation() != null && player.getWorld().equals(customBossEntity.getLocation().getWorld()))
-                    page.addExtra(SpigotMessage.hoverMessage(ChatColor.BLUE + "Spawn distance",
-                            "Spawn distance: X=" + (int) (player.getLocation().getX() - customBossEntity.getSpawnLocation().getX())
-                            + " | Y=" + (int) (player.getLocation().getY() - customBossEntity.getSpawnLocation().getY()) +
-                            " | Z=" + (int) (player.getLocation().getZ() - customBossEntity.getSpawnLocation().getZ()) + "\n"));
-                page.addExtra("Is Persistent: " + customBossEntity.getCustomBossesConfigFields().isPersistent() + "\n");
-                if (customBossEntity instanceof RegionalBossEntity) {
-                    page.addExtra("Is Respawning: " + ((RegionalBossEntity) customBossEntity).isRespawning() + "\n");
+        for (EliteEntity eliteEntity : EntityTracker.getEliteMobEntities().values())
+            if (!(eliteEntity instanceof RegionalBossEntity))
+                if (eliteEntity instanceof CustomBossEntity) {
+                    TextComponent textComponent = generateEntry((CustomBossEntity) eliteEntity, argument, player);
+                    if (textComponent == null) continue;
+                    pages[counter] = textComponent;
+                    counter++;
                 }
 
-                page.addExtra(SpigotMessage.commandHoverMessage(ChatColor.BLUE + "Boss trace!",
-                        "Remember, it requires debug mode to be on! This is used for advanced debugging, ask on discord if you want to know more about it.",
-                        "/elitemobs trace " + customBossEntity.getEliteUUID().toString()));
-
-                pages[counter] = page;
-                counter++;
-            }
+        for (RegionalBossEntity regionalBossEntity : RegionalBossEntity.getRegionalBossEntities()) {
+            TextComponent textComponent = generateEntry(regionalBossEntity, argument, player);
+            if (textComponent == null) continue;
+            pages[counter] = textComponent;
+            counter++;
+        }
 
         BookMaker.generateBook(player, pages);
 
+    }
+
+    private static TextComponent generateEntry(CustomBossEntity customBossEntity, String argument, Player player) {
+        if (!customBossEntity.getCustomBossesConfigFields().getFilename().contains(argument) &&
+                !customBossEntity.getCustomBossesConfigFields().getName().toLowerCase().contains(argument.toLowerCase()))
+            return null;
+        TextComponent page = new TextComponent();
+        page.addExtra(customBossEntity.getCustomBossesConfigFields().getFilename() + "\n");
+        page.addExtra("Name: " + ChatColorConverter.convert(customBossEntity.getCustomBossesConfigFields().getName()) + ChatColor.BLACK + "\n");
+        page.addExtra("Level: " + customBossEntity.getCustomBossesConfigFields().getLevel() + "\n");
+        if (customBossEntity.getLivingEntity() != null) {
+            page.addExtra("Is Alive (MC): " + !customBossEntity.getLivingEntity().isDead() + "\n");
+            page.addExtra(SpigotMessage.commandHoverMessage(ChatColor.BLUE + "XYZ: " + "\n",
+                    customBossEntity.getLocation().getBlockX() + ", " +
+                            customBossEntity.getLocation().getBlockY() + ", " +
+                            customBossEntity.getLocation().getBlockZ() + "\n" +
+                            ChatColor.BLUE + "Click to teleport! (if alive)",
+                    "/em debugtp " + customBossEntity.getEliteUUID().toString()));
+            page.addExtra("Has AI: " + !customBossEntity.getLivingEntity().hasAI() + "\n");
+        } else
+            page.addExtra("Is Alive (MC): false\n");
+        if (customBossEntity.getLocation() != null && player.getWorld().equals(customBossEntity.getLocation().getWorld()))
+            page.addExtra(SpigotMessage.hoverMessage(ChatColor.BLUE + "Spawn distance",
+                    "Spawn distance: X=" + (int) (player.getLocation().getX() - customBossEntity.getSpawnLocation().getX())
+                            + " | Y=" + (int) (player.getLocation().getY() - customBossEntity.getSpawnLocation().getY()) +
+                            " | Z=" + (int) (player.getLocation().getZ() - customBossEntity.getSpawnLocation().getZ()) + "\n"));
+        page.addExtra("Is Persistent: " + customBossEntity.getCustomBossesConfigFields().isPersistent() + "\n");
+        if (customBossEntity instanceof RegionalBossEntity) {
+            page.addExtra("Is Respawning: " + ((RegionalBossEntity) customBossEntity).isRespawning() + "\n");
+        }
+
+        page.addExtra(SpigotMessage.commandHoverMessage(ChatColor.BLUE + "Boss trace!",
+                "Remember, it requires debug mode to be on! This is used for advanced debugging, ask on discord if you want to know more about it.",
+                "/elitemobs trace " + customBossEntity.getEliteUUID().toString()));
+        return page;
     }
 
 }
