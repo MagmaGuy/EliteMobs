@@ -9,30 +9,36 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.UUID;
 
 public class QuestCooldown implements Serializable {
     @Getter
-    private long targetUnixTime;
+    private final String permission;
+    private boolean permanent = true;
     @Getter
-    private String permission;
+    private long targetUnixTime = 0;
     @Getter
     private transient BukkitTask bukkitTask = null;
 
     public QuestCooldown(int delayInMinutes, String permission, UUID player) {
-        this.targetUnixTime = System.currentTimeMillis() + 60L * 1000 * delayInMinutes;
+        this.permanent = delayInMinutes == 0;
+        if (!permanent)
+            this.targetUnixTime = System.currentTimeMillis() + 60L * 1000 * delayInMinutes;
         this.permission = permission;
         startCooldown(player);
     }
 
     public void startCooldown(UUID player) {
+        PermissionAttachment permissionAttachment = Objects.requireNonNull(Bukkit.getPlayer(player)).addAttachment(MetadataHandler.PLUGIN);
+        permissionAttachment.setPermission(permission, true);
         PlayerData.updatePlayerQuestCooldowns(player);
         long delay = Math.min((targetUnixTime - System.currentTimeMillis()) / 1000L * 20L, 0L);
         bukkitTask = new BukkitRunnable() {
             @Override
             public void run() {
                 if (Bukkit.getPlayer(player) == null) return;
-                PermissionAttachment permissionAttachment = Bukkit.getPlayer(player).addAttachment(MetadataHandler.PLUGIN);
+                PermissionAttachment permissionAttachment = Objects.requireNonNull(Bukkit.getPlayer(player)).addAttachment(MetadataHandler.PLUGIN);
                 permissionAttachment.setPermission(permission, false);
                 PlayerData.updatePlayerQuestCooldowns(player);
 

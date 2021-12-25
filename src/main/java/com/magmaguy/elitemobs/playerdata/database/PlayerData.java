@@ -3,11 +3,13 @@ package com.magmaguy.elitemobs.playerdata.database;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.quests.Quest;
 import com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldowns;
+import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.ObjectSerializer;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -43,6 +45,7 @@ public class PlayerData {
     private int questsCompleted;
     private List<Quest> quests = new ArrayList<>();
     private PlayerQuestCooldowns playerQuestCooldowns = null;
+    private Location backTeleportLocation;
 
     /**
      * Called when a player logs in, storing their data in memory
@@ -96,12 +99,12 @@ public class PlayerData {
     }
 
     @Nullable
-    public static PlayerQuestCooldowns getPlayerQuestCooldowns(UUID uuid){
+    public static PlayerQuestCooldowns getPlayerQuestCooldowns(UUID uuid) {
         try {
             if (!isInMemory(uuid))
                 return (PlayerQuestCooldowns) ObjectSerializer.fromString((String) getDatabaseBlob(uuid, "PlayerQuestCooldowns"));
             if (playerDataHashMap.get(uuid) == null) return PlayerQuestCooldowns.initializePlayer();
-            return playerDataHashMap.get(uuid).playerQuestCooldowns == null ? PlayerQuestCooldowns.initializePlayer(): playerDataHashMap.get(uuid).playerQuestCooldowns;
+            return playerDataHashMap.get(uuid).playerQuestCooldowns == null ? PlayerQuestCooldowns.initializePlayer() : playerDataHashMap.get(uuid).playerQuestCooldowns;
         } catch (Exception ex) {
             return null;
         }
@@ -282,10 +285,10 @@ public class PlayerData {
         updateQuestStatus(uuid);
     }
 
-    public static void updatePlayerQuestCooldowns(UUID uuid){
-        try{
+    public static void updatePlayerQuestCooldowns(UUID uuid) {
+        try {
             setDatabaseValue(uuid, "PlayerQuestCooldowns", ObjectSerializer.toString(getPlayerQuestCooldowns(uuid)));
-        } catch (Exception ex){
+        } catch (Exception ex) {
             new WarningMessage("Failed to register player quest cooldowns!");
             ex.printStackTrace();
         }
@@ -409,6 +412,18 @@ public class PlayerData {
             playerDataHashMap.get(uuid).questsCompleted += 1;
     }
 
+    public static Location getBackTeleportLocation(Player player) {
+        if (!isInMemory(player.getUniqueId()))
+            return ConfigurationLocation.serialize(getDatabaseString(player.getUniqueId(), "BackTeleportLocation"));
+
+        return playerDataHashMap.get(player.getUniqueId()).backTeleportLocation;
+    }
+
+    public static void setBackTeleportLocation(Player player, Location location) {
+        setDatabaseValue(player.getUniqueId(), "BackTeleportLocation", ConfigurationLocation.deserialize(location));
+        playerDataHashMap.get(player.getUniqueId()).backTeleportLocation = location;
+    }
+
     private static String getDatabaseString(UUID uuid, String value) {
         try {
             Statement statement = getConnection().createStatement();
@@ -494,6 +509,7 @@ public class PlayerData {
         highestLevelKilled = resultSet.getInt("HighestLevelKilled");
         deaths = resultSet.getInt("Deaths");
         questsCompleted = resultSet.getInt("QuestsCompleted");
+        backTeleportLocation = ConfigurationLocation.serialize(resultSet.getString("BackTeleportLocation"));
 
         if (resultSet.getBytes("QuestStatus") != null) {
             try {

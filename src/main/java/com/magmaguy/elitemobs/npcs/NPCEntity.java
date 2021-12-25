@@ -6,7 +6,6 @@ import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
-import com.magmaguy.elitemobs.entitytracker.NPCEntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntity;
 import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntityInterface;
 import com.magmaguy.elitemobs.npcs.chatter.NPCChatBubble;
@@ -16,6 +15,7 @@ import com.magmaguy.elitemobs.utils.ChunkLocationChecker;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.NonSolidBlockTypes;
 import com.magmaguy.elitemobs.utils.WarningMessage;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
@@ -33,7 +33,8 @@ import java.util.concurrent.ThreadLocalRandom;
 public class NPCEntity implements SimplePersistentEntityInterface {
 
     public final NPCsConfigFields npCsConfigFields;
-    public UUID uuid;
+    @Getter
+    private final UUID uuid = UUID.randomUUID();
     public SimplePersistentEntity simplePersistentEntity;
     private Villager villager = null;
     private Location spawnLocation;
@@ -83,18 +84,17 @@ public class NPCEntity implements SimplePersistentEntityInterface {
     private void spawn() {
         if (villager != null && villager.isValid()) return;
         WorldGuardSpawnEventBypasser.forceSpawn();
-        villager = spawnLocation.getWorld().spawn(spawnLocation, Villager.class, (villager) -> {
-            villager.setAI(false);
-            villager.setPersistent(false);
-            villager.setRemoveWhenFarAway(false);
-            villager.setCustomName(ChatColorConverter.convert(npCsConfigFields.getName()));
-            villager.setCustomNameVisible(true);
-            villager.setProfession(npCsConfigFields.getProfession());
-            setDisguise(villager);
+        villager = spawnLocation.getWorld().spawn(spawnLocation, Villager.class, villagerInstance -> {
+            villagerInstance.setAI(false);
+            villagerInstance.setPersistent(false);
+            villagerInstance.setRemoveWhenFarAway(false);
+            villagerInstance.setCustomName(ChatColorConverter.convert(npCsConfigFields.getName()));
+            villagerInstance.setCustomNameVisible(true);
+            villagerInstance.setProfession(npCsConfigFields.getProfession());
+            setDisguise(villagerInstance);
         });
         EntityTracker.registerNPCEntity(this);
         initializeRole();
-        uuid = villager.getUniqueId();
         setTimeout();
         simplePersistentEntity = null;
     }
@@ -114,6 +114,11 @@ public class NPCEntity implements SimplePersistentEntityInterface {
 
     public Villager getVillager() {
         return villager;
+    }
+
+    public boolean isValid() {
+        if (villager == null) return false;
+        return villager.isValid();
     }
 
     public NPCsConfigFields getNpCsConfigFields() {
@@ -145,7 +150,7 @@ public class NPCEntity implements SimplePersistentEntityInterface {
         if (villager != null)
             villager.remove();
         if (getNpCsConfigFields().getTimeout() > 0) return;
-        simplePersistentEntity = new SimplePersistentEntity(this);
+
         if (villager != null)
             villager.remove();
     }
@@ -181,7 +186,7 @@ public class NPCEntity implements SimplePersistentEntityInterface {
                 armorStand.setPersistent(false);
             }
         });
-        EntityTracker.registerArmorStands(roleDisplay);
+        EntityTracker.registerVisualEffects(roleDisplay);
     }
 
     /**
@@ -212,9 +217,14 @@ public class NPCEntity implements SimplePersistentEntityInterface {
             roleDisplay.remove();
         if (villager != null) {
             villager.remove();
-            NPCEntityTracker.npcEntities.remove(villager.getUniqueId());
+            EntityTracker.getNpcEntities().remove(villager.getUniqueId());
             this.villager = null;
         }
+
+        if (removalReason.equals(RemovalReason.CHUNK_UNLOAD)) {
+            simplePersistentEntity = new SimplePersistentEntity(this);
+        }
+
         boolean permanentRemoval = false;
 
         if (removalReason.equals(RemovalReason.REMOVE_COMMAND))
@@ -224,9 +234,8 @@ public class NPCEntity implements SimplePersistentEntityInterface {
                 removalReason.equals(RemovalReason.REMOVE_COMMAND))
             permanentRemoval = true;
 
-        if (permanentRemoval) {
+        if (permanentRemoval)
             spawnLocation = null;
-        }
     }
 
     /**

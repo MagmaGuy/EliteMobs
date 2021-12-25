@@ -680,7 +680,7 @@ public class AdminCommands {
                 .permission("elitemobs.*")
                 .meta(CommandMeta.DESCRIPTION, "Traces the life of a custom boss entity. Used by the debug menu.")
                 .handler(commandContext -> {
-                    for (EliteEntity eliteEntity : EntityTracker.getEliteMobs().values())
+                    for (EliteEntity eliteEntity : EntityTracker.getEliteMobEntities().values())
                         if (eliteEntity.getEliteUUID().toString().equals(commandContext.get("uuid")))
                             if (eliteEntity instanceof CustomBossEntity) {
                                 ((CustomBossEntity) eliteEntity).getBossTrace().postLog((Player) commandContext.getSender());
@@ -696,7 +696,7 @@ public class AdminCommands {
                 .permission("elitemobs.*")
                 .meta(CommandMeta.DESCRIPTION, "Traces the life of a custom boss entity. Used by the debug menu.")
                 .handler(commandContext -> {
-                    for (EliteEntity eliteEntity : EntityTracker.getEliteMobs().values())
+                    for (EliteEntity eliteEntity : EntityTracker.getEliteMobEntities().values())
                         if (eliteEntity.getEliteUUID().toString().equals(commandContext.get("uuid")))
                             if (eliteEntity instanceof CustomBossEntity) {
                                 if (eliteEntity.getLocation() != null)

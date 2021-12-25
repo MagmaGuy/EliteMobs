@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.api.internal.NewMinidungeonRelativeBossLocationEve
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntityInterface;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.transitiveblocks.TransitiveBlock;
 import com.magmaguy.elitemobs.powers.bosspowers.SpiritWalk;
@@ -246,6 +247,7 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
             case REMOVE_COMMAND:
                 if (phaseBossEntity != null)
                     phaseBossEntity.silentReset();
+                EntityTracker.getEliteMobEntities().remove(super.eliteUUID);
                 regionalBossesFromConfigFields.remove(customBossesConfigFields, this);
                 getCustomBossesConfigFields().setFilesOutOfSync(true);
                 break;

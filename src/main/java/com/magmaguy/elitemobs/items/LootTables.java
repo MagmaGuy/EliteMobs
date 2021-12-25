@@ -50,7 +50,6 @@ public class LootTables implements Listener {
             if (eliteEntity.getPower("bonus_coins.yml") == null)
                 new ItemLootShower(eliteEntity.getLevel(), eliteEntity.getUnsyncedLivingEntity().getLocation(), player);
 
-            Item item = null;
 
             if (AdventurersGuildConfig.guildLootLimiter) {
                 double itemTier = setItemTier(eliteEntity.getLevel());
@@ -63,25 +62,12 @@ public class LootTables implements Listener {
                         }
                     }.runTaskLater(MetadataHandler.PLUGIN, 20 * 10);
                 }
-                item = generateLoot((int) Math.floor(itemTier), eliteEntity, player);
+                generateLoot((int) Math.floor(itemTier), eliteEntity, player);
             } else
-                item = generateLoot(eliteEntity, player);
-
-            if (item != null &&
-                    item.getItemStack() != null &&
-                    item.getItemStack().hasItemMeta() &&
-                    item.getItemStack().getItemMeta().hasDisplayName()) {
-                item.setCustomName(item.getItemStack().getItemMeta().getDisplayName());
-                item.setCustomNameVisible(true);
-            }
-
-            SoulbindEnchantment.addPhysicalDisplay(item, player);
-
-            if (item == null) continue;
-
-            RareDropEffect.runEffect(item);
+                generateLoot(eliteEntity, player);
         }
     }
+
 
     public static void initialize() {
         proceduralItemsOn = ProceduralItemGenerationSettingsConfig.doProceduralItemDrops;
@@ -92,7 +78,7 @@ public class LootTables implements Listener {
         scalableItemsExist = CustomItem.getScalableItems() != null && !CustomItem.getScalableItems().isEmpty();
     }
 
-    private static Item generateLoot(EliteEntity eliteEntity, Player player) {
+    private static ItemStack generateLoot(EliteEntity eliteEntity, Player player) {
 
         int mobTier = (int) MobTierCalculator.findMobTier(eliteEntity);
 
@@ -105,7 +91,7 @@ public class LootTables implements Listener {
 
     }
 
-    public static Item generateLoot(int itemTier, EliteEntity eliteEntity, Player player) {
+    public static ItemStack generateLoot(int itemTier, EliteEntity eliteEntity, Player player) {
 
          /*
         Handle the odds of an item dropping
@@ -164,7 +150,7 @@ public class LootTables implements Listener {
      * @param player
      * @return
      */
-    public static Item generateLoot(int itemTier, Location location, Player player) {
+    public static ItemStack generateLoot(int itemTier, Location location, Player player) {
 
          /*
         Handle the odds of an item dropping
@@ -272,13 +258,19 @@ public class LootTables implements Listener {
 
     }
 
-    public static Item dropWeighedFixedItem(EliteEntity eliteEntity, Player player) {
-        return eliteEntity.getUnsyncedLivingEntity().getLocation().getWorld().dropItem(eliteEntity.getUnsyncedLivingEntity().getLocation(), generateWeighedFixedItemStack(player));
+    public static ItemStack dropWeighedFixedItem(EliteEntity eliteEntity, Player player) {
+        ItemStack itemStack = generateWeighedFixedItemStack(player);
+        if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory()) player.getInventory().addItem(itemStack);
+        else processPhysicalItem(eliteEntity.getLocation(), itemStack, player);
+        return itemStack;
     }
 
 
-    public static Item dropWeighedFixedItem(Location location, Player player) {
-        return location.getWorld().dropItem(location, generateWeighedFixedItemStack(player));
+    public static ItemStack dropWeighedFixedItem(Location location, Player player) {
+        ItemStack itemStack = generateWeighedFixedItemStack(player);
+        if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory()) player.getInventory().addItem(itemStack);
+        else processPhysicalItem(location, itemStack, player);
+        return itemStack;
     }
 
     private static ItemStack generateWeighedFixedItemStack(Player player) {
@@ -307,58 +299,89 @@ public class LootTables implements Listener {
         return generatedItemStack;
     }
 
-    private static Item dropProcedurallyGeneratedItem(int tierLevel, EliteEntity eliteEntity, Player player) {
-        return eliteEntity.getUnsyncedLivingEntity().getWorld().dropItem(eliteEntity.getUnsyncedLivingEntity().getLocation(),
-                generateProcedurallyGeneratedItem(tierLevel, player, eliteEntity));
+    private static ItemStack dropProcedurallyGeneratedItem(int tierLevel, EliteEntity eliteEntity, Player player) {
+        ItemStack itemStack = generateProcedurallyGeneratedItem(tierLevel, player, eliteEntity);
+        if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory()) player.getInventory().addItem(itemStack);
+        else processPhysicalItem(eliteEntity.getLocation(), itemStack, player);
+        return itemStack;
     }
 
-    private static Item dropProcedurallyGeneratedItem(int tierLevel, Location location, Player player) {
-        return location.getWorld().dropItem(location, generateProcedurallyGeneratedItem(tierLevel, player, null));
+    private static ItemStack dropProcedurallyGeneratedItem(int tierLevel, Location location, Player player) {
+        ItemStack itemStack = generateProcedurallyGeneratedItem(tierLevel, player, null);
+        if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory()) player.getInventory().addItem(itemStack);
+        else processPhysicalItem(location, itemStack, player);
+        return itemStack;
     }
 
     private static ItemStack generateProcedurallyGeneratedItem(int tierLevel, Player player, EliteEntity eliteEntity) {
         return ItemConstructor.constructItem(tierLevel, eliteEntity, player, false);
     }
 
-    private static Item dropScalableItem(EliteEntity eliteEntity, int itemTier, Player player) {
-        return eliteEntity.getUnsyncedLivingEntity().getWorld().dropItem(eliteEntity.getUnsyncedLivingEntity().getLocation(),
-                generateScalableItem(itemTier, player, eliteEntity));
+    private static ItemStack dropScalableItem(EliteEntity eliteEntity, int itemTier, Player player) {
+        ItemStack itemStack = generateScalableItem(itemTier, player, eliteEntity);
+        if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory()) player.getInventory().addItem(itemStack);
+        else processPhysicalItem(eliteEntity.getLocation(), itemStack, player);
+        return itemStack;
     }
 
-    private static Item dropScalableItem(Location location, int itemTier, Player player) {
-        return location.getWorld().dropItem(location, generateScalableItem(itemTier, player, null));
+    private static ItemStack dropScalableItem(Location location, int itemTier, Player player) {
+        ItemStack itemStack = generateScalableItem(itemTier, player, null);
+        if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory()) player.getInventory().addItem(itemStack);
+        else processPhysicalItem(location, itemStack, player);
+        return itemStack;
     }
 
     private static ItemStack generateScalableItem(int itemTier, Player player, EliteEntity eliteEntity) {
         return ScalableItemConstructor.randomizeScalableItem(itemTier, player, eliteEntity);
     }
 
-    private static Item dropLimitedItem(EliteEntity eliteEntity, int itemTier, Player player) {
-        return eliteEntity.getUnsyncedLivingEntity().getWorld().dropItem(eliteEntity.getUnsyncedLivingEntity().getLocation(),
-                generateLimitedItem(itemTier, player, eliteEntity));
+    private static ItemStack dropLimitedItem(EliteEntity eliteEntity, int itemTier, Player player) {
+        ItemStack itemStack = generateLimitedItem(itemTier, player, eliteEntity);
+        if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory()) player.getInventory().addItem(itemStack);
+        else processPhysicalItem(eliteEntity.getLocation(), itemStack, player);
+        return itemStack;
     }
 
-    private static Item dropLimitedItem(Location location, int itemTier, Player player) {
-        return location.getWorld().dropItem(location, generateLimitedItem(itemTier, player, null));
+    private static ItemStack dropLimitedItem(Location location, int itemTier, Player player) {
+        ItemStack itemStack = generateLimitedItem(itemTier, player, null);
+        if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory()) player.getInventory().addItem(itemStack);
+        else processPhysicalItem(location, itemStack, player);
+        return itemStack;
     }
 
     private static ItemStack generateLimitedItem(int itemTier, Player player, EliteEntity eliteEntity) {
         return ScalableItemConstructor.randomizeLimitedItem(itemTier, player, eliteEntity);
     }
 
-    private static Item dropFixedItem(EliteEntity eliteEntity, int itemTier, Player player) {
-        return eliteEntity.getUnsyncedLivingEntity().getWorld().dropItem(
-                eliteEntity.getUnsyncedLivingEntity().getLocation(), generateFixedItem(itemTier, player, eliteEntity));
+    private static ItemStack dropFixedItem(EliteEntity eliteEntity, int itemTier, Player player) {
+        ItemStack itemStack = generateFixedItem(itemTier, player, eliteEntity);
+        if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory()) player.getInventory().addItem(itemStack);
+        else processPhysicalItem(eliteEntity.getLocation(), itemStack, player);
+        return itemStack;
     }
 
-    private static Item dropFixedItem(Location location, int itemTier, Player player) {
-        return location.getWorld().dropItem(location, generateFixedItem(itemTier, player, null));
+    private static ItemStack dropFixedItem(Location location, int itemTier, Player player) {
+        ItemStack itemStack = generateFixedItem(itemTier, player, null);
+        if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory()) player.getInventory().addItem(itemStack);
+        else processPhysicalItem(location, itemStack, player);
+        return itemStack;
     }
 
     private static ItemStack generateFixedItem(int itemTier, Player player, EliteEntity eliteEntity) {
         return CustomItem.getFixedItems().get(itemTier)
                 .get(ThreadLocalRandom.current().nextInt(CustomItem.getFixedItems().get(itemTier).size()))
                 .generateDefaultsItemStack(player, false, eliteEntity);
+    }
+
+    private static void processPhysicalItem(Location location, ItemStack itemStack, Player player) {
+        Item item = location.getWorld().dropItem(location, itemStack);
+        if (item.getItemStack().hasItemMeta() &&
+                item.getItemStack().getItemMeta().hasDisplayName()) {
+            item.setCustomName(item.getItemStack().getItemMeta().getDisplayName());
+            item.setCustomNameVisible(true);
+        }
+        SoulbindEnchantment.addPhysicalDisplay(item, player);
+        RareDropEffect.runEffect(item);
     }
 
 

@@ -13,20 +13,6 @@ public class GenerateDatabase {
 
     public static void generate() throws Exception {
         Statement statement = PlayerData.getConnection().createStatement();
-       //String sql = "CREATE TABLE IF NOT EXISTS " + PlayerData.getPLAYER_DATA_TABLE_NAME() +
-       //        "(PlayerUUID             TEXT PRIMARY KEY    NOT NULL," +
-       //        " DisplayName                       TEXT," +
-       //        " Currency                          REAL," +
-       //        " GuildPrestigeLevel                 INT," +
-       //        " GuildMaxLevel                      INT," +
-       //        " GuildActiveLevel                   INT," +
-       //        " QuestStatus                       BLOB," +
-       //        " Score                              INT," +
-       //        " Kills                              INT," +
-       //        " HighestLevelKilled                 INT," +
-       //        " Deaths                             INT," +
-       //        " QuestsCompleted                    INT," +
-       //        " PlayerQuestCooldowns               BLOB);";
         String sql = "CREATE TABLE IF NOT EXISTS " + PlayerData.getPLAYER_DATA_TABLE_NAME() +
                 "(PlayerUUID             TEXT PRIMARY KEY    NOT NULL);" ;
         statement.executeUpdate(sql);
@@ -43,6 +29,7 @@ public class GenerateDatabase {
         addEntryIfEmpty("Deaths", ColumnValues.INT);
         addEntryIfEmpty("QuestsCompleted", ColumnValues.INT);
         addEntryIfEmpty("PlayerQuestCooldowns", ColumnValues.BLOB);
+        addEntryIfEmpty("BackTeleportLocation", ColumnValues.TEXT);
     }
 
     private static void addEntryIfEmpty(String columnName, ColumnValues columnValues){

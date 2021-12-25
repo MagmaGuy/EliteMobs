@@ -155,21 +155,7 @@ public class UserCommands {
                         CurrencyCommandsHandler.walletCommand((Player) commandContext.getSender());
                 }));
 
-        // /em quest
-        // /em quest join <fileName>
-        manager.command(builder.literal("quest")
-                .meta(CommandMeta.DESCRIPTION, "Joins a quest")
-                .senderType(Player.class)
-                .permission("elitemobs.quest.command")
-                .handler(commandContext -> {
-
-                    //todo: readd
-                    //if (!AdventurersGuildCommand.adventurersGuildTeleport((Player) commandContext.getSender()))
-                    //    new QuestCommand((Player) commandContext.getSender());
-                }));
-
-
-        // /em quest accept <fileName>
+        // /em quest accept <questID>
         manager.command(builder.literal("quest")
                 .literal("accept")
                 .argument(StringArgument.newBuilder("questID"), ArgumentDescription.of("Quest ID"))

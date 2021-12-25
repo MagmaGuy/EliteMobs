@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.CUSTOM;
+import static org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.DROWNED;
 
 /**
  * Created by MagmaGuy on 24/04/2017.
@@ -79,6 +80,8 @@ public class NaturalMobSpawnEventHandler implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onSpawn(CreatureSpawnEvent event) {
+
+        if (event.getSpawnReason().equals(DROWNED)) return;
 
         if (!VersionChecker.serverVersionOlderThan(15, 0))
             if (event.getEntity().getType().equals(EntityType.BEE))

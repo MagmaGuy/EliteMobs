@@ -109,7 +109,7 @@ public class CustomBossBossBar {
             @Override
             public void run() {
                 //This can happen on phase changes where boss bars might not be configured on subsequent entities
-                if (customBossEntity.getCustomBossesConfigFields().getLocationMessage() == null) {
+                if (!customBossEntity.exists() || customBossEntity.getCustomBossesConfigFields().getLocationMessage() == null) {
                     cancel();
                     return;
                 }
@@ -122,7 +122,7 @@ public class CustomBossBossBar {
                 }
 
                 //Remove players that have stopped
-                bossBars.entrySet().removeIf((entry) -> {
+                bossBars.entrySet().removeIf(entry -> {
                     if (!trackingPlayers.contains(entry.getKey())) {
                         entry.getValue().removeAll();
                         return true;

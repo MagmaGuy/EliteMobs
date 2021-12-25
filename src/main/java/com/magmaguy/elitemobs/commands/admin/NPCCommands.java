@@ -29,7 +29,7 @@ public class NPCCommands {
                 + Round.twoDecimalPlaces(playerLocation.getPitch());
 
         try {
-            for (NPCEntity npcEntity : EntityTracker.getNPCEntities().values())
+            for (NPCEntity npcEntity : EntityTracker.getNpcEntities().values())
                 if (npcEntity.npCsConfigFields.equals(npCsConfigFields))
                     npcEntity.remove(RemovalReason.REMOVE_COMMAND);
         } catch (Exception ex) {

@@ -49,12 +49,12 @@ public class BossTrackingPage {
             }
         }
 
+        TextComponent[] textComponent;
         if (counter == 0) {
-            TextComponent[] textComponent = new TextComponent[1];
+            textComponent = new TextComponent[1];
             textComponent[0] = configTextComponent;
-            return textComponent;
         } else {
-            TextComponent[] textComponent = new TextComponent[(int) Math.floor(counter / 6D) + 1];
+            textComponent = new TextComponent[(int) Math.floor(counter / 6D) + 1];
             int internalCounter = 0;
             textComponent[0] = configTextComponent;
             for (TextComponent text : textComponents) {
@@ -64,7 +64,7 @@ public class BossTrackingPage {
                 textComponent[currentPage].addExtra(text);
                 internalCounter++;
             }
-            return textComponent;
         }
+        return textComponent;
     }
 }

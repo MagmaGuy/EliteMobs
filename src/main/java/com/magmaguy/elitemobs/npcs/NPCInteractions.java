@@ -4,9 +4,9 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.GuildRankMenuHandler;
 import com.magmaguy.elitemobs.api.PlayerPreTeleportEvent;
-import com.magmaguy.elitemobs.api.PlayerTeleportEvent;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.menus.*;
+import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.QuestInteractionHandler;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -95,7 +95,7 @@ public class NPCInteractions implements Listener {
                 break;
             case TELEPORT_BACK:
                 if (event.getPlayer().hasPermission("elitemobs.back.npc")) {
-                    Location previousLocation = PlayerTeleportEvent.previousLocations.get(event.getPlayer());
+                    Location previousLocation = PlayerData.getBackTeleportLocation(event.getPlayer());
                     if (previousLocation == null) {
                         if (npcEntity.npCsConfigFields.noPreviousLocationMessage != null)
                             event.getPlayer().sendMessage(ChatColorConverter.convert(npcEntity.npCsConfigFields.noPreviousLocationMessage));
@@ -182,7 +182,7 @@ public class NPCInteractions implements Listener {
 
         if (!event.getInventory().getType().equals(InventoryType.MERCHANT)) return;
 
-        for (NPCEntity npcEntity : EntityTracker.getNPCEntities().values())
+        for (NPCEntity npcEntity : EntityTracker.getNpcEntities().values())
             if (event.getView().getTitle().equals(npcEntity.getNpCsConfigFields().getName())) {
                 event.setCancelled(true);
                 return;

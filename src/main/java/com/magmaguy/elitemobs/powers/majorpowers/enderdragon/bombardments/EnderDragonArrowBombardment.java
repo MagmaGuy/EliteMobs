@@ -1,10 +1,8 @@
 package com.magmaguy.elitemobs.powers.majorpowers.enderdragon.bombardments;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.combatsystem.EliteProjectile;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
-import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.meta.Bombardment;
 import org.bukkit.entity.Entity;
@@ -39,8 +37,6 @@ public class EnderDragonArrowBombardment extends Bombardment {
                 new BukkitRunnable() {
                     @Override
                     public void run() {
-                        if (arrow.isValid())
-                            EntityTracker.unregister(arrow.getUniqueId(), RemovalReason.EFFECT_TIMEOUT);
                         arrow.remove();
                     }
                 }.runTaskLater(MetadataHandler.PLUGIN, 20L * 4);

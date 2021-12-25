@@ -15,19 +15,19 @@ public class EffectEventHandlers implements Listener {
 
     @EventHandler
     public void playerPickupSafeguard(EntityPickupItemEvent event) {
-        if (EntityTracker.isItemVisualEffect(event.getItem()))
+        if (EntityTracker.isVisualEffect(event.getItem()))
             event.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void hopperPickupSafeguard(InventoryPickupItemEvent event) {
-        if (EntityTracker.isItemVisualEffect(event.getItem()))
+        if (EntityTracker.isVisualEffect(event.getItem()))
             event.setCancelled(true);
     }
 
     @EventHandler
     public void portalPickupSafeguard(EntityPortalEvent event) {
-        if (EntityTracker.isItemVisualEffect(event.getEntity()) || EntityTracker.isEliteMob(event.getEntity()))
+        if (EntityTracker.isVisualEffect(event.getEntity()) || EntityTracker.isEliteMob(event.getEntity()))
             event.setCancelled(true);
     }
 

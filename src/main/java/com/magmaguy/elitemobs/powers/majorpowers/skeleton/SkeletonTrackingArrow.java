@@ -2,9 +2,7 @@ package com.magmaguy.elitemobs.powers.majorpowers.skeleton;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobTargetPlayerEvent;
-import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
-import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.meta.MajorPower;
 import com.magmaguy.elitemobs.powers.offensivepowers.AttackArrow;
@@ -37,11 +35,9 @@ public class SkeletonTrackingArrow extends MajorPower implements Listener {
                     arrow.getWorld().spawnParticle(Particle.FLAME, arrow.getLocation(), 10, 0.01, 0.01, 0.01, 0.01);
                 } else {
                     arrow.setGravity(true);
-                    EntityTracker.unregister(arrow.getUniqueId(), RemovalReason.EFFECT_TIMEOUT);
                     cancel();
                 }
                 if (counter > 20 * 60) {
-                    EntityTracker.unregister(arrow.getUniqueId(), RemovalReason.EFFECT_TIMEOUT);
                     arrow.setGravity(true);
                     cancel();
                 }

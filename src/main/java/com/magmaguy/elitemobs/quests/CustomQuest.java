@@ -90,10 +90,9 @@ public class CustomQuest extends Quest {
                 if (!customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission().isEmpty()) {
                     PermissionAttachment permissionAttachment = event.getPlayer().addAttachment(MetadataHandler.PLUGIN);
                     permissionAttachment.setPermission(customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission(), true);
-                    if (customQuest.getCustomQuestsConfigFields().getQuestLockoutMinutes() > 0)
-                        PlayerQuestCooldowns.addCooldown(event.getPlayer(),
-                                customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission(),
-                                customQuest.getCustomQuestsConfigFields().getQuestLockoutMinutes());
+                    PlayerQuestCooldowns.addCooldown(event.getPlayer(),
+                            customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission(),
+                            customQuest.getCustomQuestsConfigFields().getQuestLockoutMinutes());
                 }
                 if (!customQuest.getCustomQuestsConfigFields().getQuestCompleteDialog().isEmpty())
                     for (String dialog : customQuest.getCustomQuestsConfigFields().getQuestCompleteDialog())

@@ -22,7 +22,7 @@ public class VisualArmorStand {
                 armorStand.setPersistent(false);
             }
         });
-        EntityTracker.registerArmorStands(visualArmorStand);
+        EntityTracker.registerVisualEffects(visualArmorStand);
         return visualArmorStand;
     }
 
