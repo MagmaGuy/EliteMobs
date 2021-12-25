@@ -1,6 +1,6 @@
 package com.magmaguy.elitemobs.api;
 
-import com.magmaguy.elitemobs.entitytracker.SuperMobEntityTracker;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.*;
@@ -61,8 +61,7 @@ public class SuperMobDamageEvent extends Event implements Cancellable {
     public static class SuperMobDamageEventFilter implements Listener {
         @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
         public void superMobDamageFilter(EntityDamageEvent event) {
-            LivingEntity livingEntity = SuperMobEntityTracker.superMobEntities.get(event.getEntity().getUniqueId());
-            if (livingEntity == null) return;
+            if (!EntityTracker.isSuperMob(event.getEntity())) return;
             SuperMobDamageEvent superMobDamageEvent = new SuperMobDamageEvent((LivingEntity) event.getEntity(), event);
             new EventCaller(superMobDamageEvent);
             if (superMobDamageEvent.isCancelled()) event.setCancelled(true);

@@ -112,7 +112,7 @@ public class QuestTracking {
     }
 
     private void getKillLocations(CustomKillObjective customKillObjective) {
-        EntityTracker.getEliteMobs().values().forEach(eliteEntity -> {
+        EntityTracker.getEliteMobEntities().values().forEach(eliteEntity -> {
             List<Location> locations = new ArrayList<>();
             if (eliteEntity instanceof CustomBossEntity &&
                     ((CustomBossEntity) eliteEntity).getCustomBossesConfigFields().getFilename()
@@ -123,7 +123,7 @@ public class QuestTracking {
     }
 
     private void getDialogLocations(DialogObjective dialogObjective) {
-        EntityTracker.getNPCEntities().values().forEach(npcEntity -> {
+        EntityTracker.getNpcEntities().values().forEach(npcEntity -> {
             List<Location> locations = new ArrayList<>();
             if (npcEntity.getNpCsConfigFields().getFilename().equals(dialogObjective.getNpcFilename()))
                 locations.add(npcEntity.getSpawnLocation());
@@ -132,7 +132,7 @@ public class QuestTracking {
     }
 
     private void getFetchLocations(CustomFetchObjective customFetchObjective) {
-        EntityTracker.getEliteMobs().values().forEach(eliteEntity -> {
+        EntityTracker.getEliteMobEntities().values().forEach(eliteEntity -> {
             List<Location> locations = new ArrayList<>();
             if (eliteEntity instanceof CustomBossEntity)
                 for (String loot : ((CustomBossEntity) eliteEntity).getCustomBossesConfigFields().getUniqueLootList())
@@ -143,7 +143,7 @@ public class QuestTracking {
     }
 
     private void getTurnInNPC() {
-        EntityTracker.getNPCEntities().values().forEach(npcEntity -> {
+        EntityTracker.getNpcEntities().values().forEach(npcEntity -> {
             if (npcEntity.getNpCsConfigFields().getFilename().equals(customQuest.getQuestTaker()))
                 turnInNPCs.add(npcEntity.getSpawnLocation());
         });

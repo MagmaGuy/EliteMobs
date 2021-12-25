@@ -14,9 +14,10 @@ public class SuperMobDeathEvent extends Event {
 
     private static final HandlerList handlers = new HandlerList();
     private final LivingEntity livingEntity;
+
     public SuperMobDeathEvent(LivingEntity livingEntity) {
         this.livingEntity = livingEntity;
-        new SuperMobRemoveEvent(livingEntity.getUniqueId(), RemovalReason.DEATH);
+        new SuperMobRemoveEvent(livingEntity, RemovalReason.DEATH);
     }
 
     public static void callEvent(LivingEntity livingEntity) {
@@ -49,9 +50,8 @@ public class SuperMobDeathEvent extends Event {
     public static class SuperMobDeathEventFilter implements Listener {
         @EventHandler
         public void onMobDeath(EntityDeathEvent event) {
-            LivingEntity livingEntity = EntityTracker.getSuperMob(event.getEntity());
-            if (livingEntity == null) return;
-            new EventCaller(new SuperMobDeathEvent(livingEntity));
+            if (!EntityTracker.isSuperMob(event.getEntity())) return;
+            new EventCaller(new SuperMobDeathEvent(event.getEntity()));
         }
     }
 

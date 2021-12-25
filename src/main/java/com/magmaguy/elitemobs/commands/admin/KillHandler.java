@@ -20,7 +20,7 @@ public class KillHandler {
 
     public static void killAggressiveMobs(CommandSender commandSender) {
         int counter = 0;
-        for (EliteEntity eliteEntity : new ArrayList<>(EntityTracker.getEliteMobs().values())) {
+        for (EliteEntity eliteEntity : new ArrayList<>(EntityTracker.getEliteMobEntities().values())) {
             eliteEntity.remove(RemovalReason.REMOVE_COMMAND);
             counter++;
         }
@@ -30,8 +30,8 @@ public class KillHandler {
 
     public static void killPassiveMobs(CommandSender commandSender) {
         int counter = 0;
-        for (LivingEntity superMobEntity : new ArrayList<>(EntityTracker.getSuperMobs().values())) {
-            EntityTracker.unregister(superMobEntity.getUniqueId(), RemovalReason.KILL_COMMAND);
+        for (LivingEntity superMobEntity : EntityTracker.getSuperMobs()) {
+            superMobEntity.remove();
             counter++;
         }
         commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Killed " + counter + " Super Mobs."));
@@ -40,7 +40,7 @@ public class KillHandler {
     public static void killEntityType(CommandSender commandSender, EntityType entityType) {
         if (EliteMobProperties.getValidMobTypes().contains(entityType)) {
             int counter = 0;
-            for (EliteEntity eliteEntity : new ArrayList<>(EntityTracker.getEliteMobs().values())) {
+            for (EliteEntity eliteEntity : EntityTracker.getEliteMobEntities().values()) {
                 if (!eliteEntity.getLivingEntity().getType().equals(entityType)) continue;
                 eliteEntity.remove(RemovalReason.REMOVE_COMMAND);
                 counter++;
@@ -48,9 +48,9 @@ public class KillHandler {
             commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Killed " + counter + " Elite " + entityType.toString() + "."));
         } else if (SuperMobProperties.superMobTypeList.contains(entityType)) {
             int counter = 0;
-            for (LivingEntity superMobEntity : new ArrayList<>(EntityTracker.getSuperMobs().values())) {
+            for (LivingEntity superMobEntity : EntityTracker.getSuperMobs()) {
                 if (!superMobEntity.getType().equals(entityType)) continue;
-                EntityTracker.unregister(superMobEntity.getUniqueId(), RemovalReason.KILL_COMMAND);
+                superMobEntity.remove();
                 counter++;
             }
             commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Killed " + counter + " Super " + entityType.toString() + "."));

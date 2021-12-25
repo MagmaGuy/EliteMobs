@@ -6,7 +6,6 @@ import com.magmaguy.elitemobs.api.EliteExplosionEvent;
 import com.magmaguy.elitemobs.combatsystem.EliteProjectile;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
-import com.magmaguy.elitemobs.entitytracker.TemporaryBlockTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
@@ -81,7 +80,7 @@ public class Explosion {
                     block.getType().equals(Material.FIRE) ||
                     block.isLiquid())
                 continue;
-            if (TemporaryBlockTracker.temporaryBlocks.contains(block))
+            if (EntityTracker.isTemporaryBlock(block))
                 continue;
             nearbyBlockScan(blockStates, block.getState());
         }
@@ -326,10 +325,8 @@ public class Explosion {
                 generateExplosion(event);
                 return;
             }
-            Projectile eliteProjectile = EntityTracker.getProjectileEntity(event.getEntity().getUniqueId());
-            if (eliteProjectile != null) {
+            if (EntityTracker.isProjectileEntity(event.getEntity()))
                 generateExplosion(event);
-            }
             //binder of worlds fight bypass, set in the custom reinforcements
             if (event.getEntity().getPersistentDataContainer().has(new NamespacedKey(MetadataHandler.PLUGIN, "eliteCrystal"), PersistentDataType.STRING))
                 generateExplosion(event);

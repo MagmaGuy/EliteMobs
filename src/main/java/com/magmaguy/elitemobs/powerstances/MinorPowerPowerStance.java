@@ -119,7 +119,7 @@ public class MinorPowerPowerStance implements Listener {
         if (!VersionChecker.serverVersionOlderThan(1, 11))
             item.setGravity(false);
         item.setInvulnerable(true);
-        EntityTracker.registerItemVisualEffects(item);
+        EntityTracker.registerVisualEffects(item);
         return item;
 
     }

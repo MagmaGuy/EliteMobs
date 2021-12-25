@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
+import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
@@ -54,11 +55,27 @@ public class ItemLootShower implements Listener {
                     ChatColorConverter.convert("&8EM] &4You are too well equipped to get coins for killing this Elite!")));
             return;
         }
+        if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory())
+            addDirectly(eliteMobTier);
+        else
+            addIndirectly(eliteMobTier, location);
+    }
 
+    private int getCurrencyAmount(double eliteMobTier) {
+        return (int) (eliteMobTier / 2D * EconomySettingsConfig.currencyShowerMultiplier *
+                GuildRank.currencyBonusMultiplier(GuildRank.getGuildPrestigeRank(player)));
+    }
+
+    private void addDirectly(double eliteMobTier) {
+        EconomyHandler.addCurrency(player.getUniqueId(), getCurrencyAmount(eliteMobTier));
+        player.sendMessage(ChatColorConverter.convert(EconomySettingsConfig.chatCurrencyShowerMessage
+                .replace("$currency_name", EconomySettingsConfig.currencyName)
+                .replace("$amount", getCurrencyAmount(eliteMobTier) + "")));
+    }
+
+    private void addIndirectly(double eliteMobTier, Location location) {
         new BukkitRunnable() {
-
-            int currencyAmount = (int) (eliteMobTier / 2D * EconomySettingsConfig.currencyShowerMultiplier *
-                    GuildRank.currencyBonusMultiplier(GuildRank.getGuildPrestigeRank(player)));
+            int currencyAmount = getCurrencyAmount(eliteMobTier);
 
             @Override
             public void run() {
@@ -125,7 +142,6 @@ public class ItemLootShower implements Listener {
                 }
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 2, 2);
-
     }
 
     private static void sendCurrencyNotification(Player player) {
@@ -173,7 +189,7 @@ public class ItemLootShower implements Listener {
                 Arrays.asList("EliteMobsCurrencyItem", value + "", ThreadLocalRandom.current().nextDouble() + "")), player);
         setCoinModel(currencyItemStack, 1);
         Item currencyItem = location.getWorld().dropItem(location.clone().add(new Vector(0, 1, 0)), currencyItemStack);
-        EntityTracker.registerItemVisualEffects(currencyItem);
+        EntityTracker.registerVisualEffects(currencyItem);
 
         currencyItem.setVelocity(new Vector(
                 (ThreadLocalRandom.current().nextDouble() - 0.5) / 2,

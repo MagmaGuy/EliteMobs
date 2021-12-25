@@ -15,7 +15,7 @@ public class SimLootCommand {
 
     public static void run(Player player, int level) {
         try {
-            new EliteItemLore(LootTables.generateLoot(level, player.getLocation(), player).getItemStack(), false);
+            new EliteItemLore(LootTables.generateLoot(level, player.getLocation(), player), false);
         } catch (Exception ex) {
             player.sendMessage("Your loot simulation resulted in no loot. This is probably normal based on drop chances.");
         }

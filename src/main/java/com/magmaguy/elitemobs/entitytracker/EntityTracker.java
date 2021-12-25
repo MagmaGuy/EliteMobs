@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.entitytracker;
 
 import com.magmaguy.elitemobs.CrashFix;
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobSpawnEvent;
 import com.magmaguy.elitemobs.api.NPCEntitySpawnEvent;
 import com.magmaguy.elitemobs.api.SuperMobSpawnEvent;
@@ -9,47 +10,58 @@ import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
+import com.magmaguy.elitemobs.tagger.PersistentTagger;
 import com.magmaguy.elitemobs.utils.EventCaller;
+import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.HashMap;
-import java.util.UUID;
+import javax.annotation.Nullable;
+import java.util.*;
 
 public class EntityTracker implements Listener {
 
-    //Elite Mobs
-    public static HashMap<UUID, EliteEntity> getEliteMobs() {
-        return EliteEntityTracker.eliteMobEntities;
-    }
+    @Getter
+    private static final HashMap<UUID, EliteEntity> eliteMobEntities = new HashMap<>();
+    @Getter
+    private static final HashMap<UUID, NPCEntity> npcEntities = new HashMap<>();
+    @Getter
+    private static final HashSet<Block> temporaryBlocks = new HashSet<>();
 
-    public static boolean registerEliteMob(EliteEntity eliteEntity) {
+    public static void registerEliteMob(EliteEntity eliteEntity) {
         EliteMobSpawnEvent eliteMobSpawnEvent = new EliteMobSpawnEvent(eliteEntity);
         new EventCaller(eliteMobSpawnEvent);
-        if (eliteMobSpawnEvent.isCancelled()) return false;
-        new EliteEntityTracker(eliteEntity, eliteEntity.getIsPersistent());
-        return true;
+        if (eliteMobSpawnEvent.isCancelled()) return;
+        PersistentTagger.tagElite(eliteEntity.getLivingEntity(), eliteEntity.getEliteUUID());
+        eliteMobEntities.put(eliteEntity.getEliteUUID(), eliteEntity);
     }
 
     public static boolean isEliteMob(Entity entity) {
-        return EliteEntityTracker.eliteMobEntities.containsKey(entity.getUniqueId());
+        return PersistentTagger.isEliteEntity(entity);
     }
 
+    @Nullable
     public static EliteEntity getEliteMobEntity(Entity entity) {
-        return entity == null ? null : getEliteMobEntity(entity.getUniqueId());
+        return PersistentTagger.getEliteEntity(entity);
     }
 
-    public static EliteEntity getEliteMobEntity(UUID uuid) {
-        return EliteEntityTracker.eliteMobEntities.get(uuid);
+    public static void unregisterEliteEntity(Entity entity, RemovalReason removalReason) {
+        EliteEntity eliteEntity = getEliteMobEntity(entity);
+        if (eliteEntity == null) return;
+        //Removal from the hashmap is not guaranteed here as some forms of removal don't completely wipe the elite entity out
+        eliteEntity.remove(removalReason);
     }
 
     //Super Mobs
@@ -57,116 +69,113 @@ public class EntityTracker implements Listener {
         SuperMobSpawnEvent superMobSpawnEvent = new SuperMobSpawnEvent(livingEntity);
         new EventCaller(superMobSpawnEvent);
         if (superMobSpawnEvent.isCancelled()) return;
-        new SuperMobEntityTracker(livingEntity.getUniqueId(), livingEntity);
+        PersistentTagger.tagSuperMob(livingEntity);
     }
 
     public static boolean isSuperMob(Entity entity) {
-        return SuperMobEntityTracker.superMobEntities.containsKey(entity.getUniqueId());
+        return PersistentTagger.isSuperMob(entity);
     }
 
-    public static LivingEntity getSuperMob(Entity entity) {
-        return SuperMobEntityTracker.superMobEntities.get(entity.getUniqueId());
+    public static List<LivingEntity> getSuperMobs() {
+        List<LivingEntity> superMobs = new ArrayList<>();
+        for (World world : Bukkit.getWorlds())
+            for (Entity entity : world.getEntities())
+                if (isSuperMob(entity))
+                    superMobs.add((LivingEntity) entity);
+        return superMobs;
     }
-
-    public static HashMap<UUID, LivingEntity> getSuperMobs() {
-        return SuperMobEntityTracker.superMobEntities;
-    }
-
-
-    //Armor Stands - for dialogue, damage displays, health displays...
-    public static void registerArmorStands(ArmorStand armorStand) {
-        new ArmorStandEntityTracker(armorStand.getUniqueId(), armorStand);
-    }
-
-    public static boolean isArmorStand(Entity entity) {
-        return ArmorStandEntityTracker.armorStands.containsKey(entity.getUniqueId());
-    }
-
 
     //Visual effects - usually trails around elites
-    public static HashMap<UUID, Item> getItemVisualEffects() {
-        return VisualEffectsEntityTracker.visualEffectEntities;
+    public static List<Entity> getItemVisualEffects() {
+        List<Entity> visualEffects = new ArrayList<>();
+        for (World world : Bukkit.getWorlds())
+            for (Entity entity : world.getEntities())
+                if (isSuperMob(entity))
+                    visualEffects.add(entity);
+        return visualEffects;
     }
 
-    public static void registerItemVisualEffects(Item item) {
-        new VisualEffectsEntityTracker(item.getUniqueId(), item);
+    public static void registerVisualEffects(Entity entity) {
+        PersistentTagger.tagVisualEffect(entity);
     }
 
-    public static boolean isItemVisualEffect(Entity entity) {
-        return (getItemVisualEffects().containsKey(entity.getUniqueId()));
+    public static boolean isVisualEffect(Entity entity) {
+        return PersistentTagger.isVisualEffect(entity);
     }
 
-
-    //NPC Entities
-    public static HashMap<UUID, NPCEntity> getNPCEntities() {
-        return NPCEntityTracker.npcEntities;
+    public static void unregisterVisualEffect(Entity entity) {
+        if (isVisualEffect(entity)) entity.remove();
     }
 
-    public static boolean registerNPCEntity(NPCEntity npc) {
+    public static void registerNPCEntity(NPCEntity npc) {
         NPCEntitySpawnEvent npcEntitySpawnEvent = new NPCEntitySpawnEvent(npc.getVillager(), npc);
         new EventCaller(npcEntitySpawnEvent);
-        if (npcEntitySpawnEvent.isCancelled()) return false;
-        new NPCEntityTracker(npc.getVillager().getUniqueId(), npc);
-        return true;
+        if (npcEntitySpawnEvent.isCancelled()) return;
+        npcEntities.put(npc.getUuid(), npc);
+        PersistentTagger.tagNPC(npc.getVillager(), npc.getUuid());
     }
 
     public static boolean isNPCEntity(Entity entity) {
-        return getNPCEntities().containsKey(entity.getUniqueId());
+        return PersistentTagger.isNPC(entity);
     }
 
     public static NPCEntity getNPCEntity(Entity entity) {
-        return getNPCEntities().get(entity.getUniqueId());
+        return PersistentTagger.getNPC(entity);
     }
 
+    public static void unregisterNPCEntity(Entity entity, RemovalReason removalReason) {
+        NPCEntity npcEntity = getNPCEntity(entity);
+        if (npcEntity == null) return;
+        //Removal from the hashmap is not guaranteed here as some forms of removal don't completely wipe the elite entity out
+        npcEntity.remove(removalReason);
+    }
 
     //Temporary blocks - blocks in powers
     public static void addTemporaryBlock(Block block, int ticks, Material replacementMaterial) {
-        TemporaryBlockTracker.addTemporaryBlock(block, ticks, replacementMaterial);
+        temporaryBlocks.add(block);
+        block.setType(replacementMaterial);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (block.getType().equals(replacementMaterial))
+                    block.setType(Material.AIR);
+                temporaryBlocks.remove(block);
+            }
+        }.runTaskLater(MetadataHandler.PLUGIN, ticks);
     }
 
-    public static boolean getIsTemporaryBlock(Block block) {
-        return TemporaryBlockTracker.temporaryBlocks.contains(block);
+    public static boolean isTemporaryBlock(Block block) {
+        return temporaryBlocks.contains(block);
     }
 
     public static void removeTemporaryBlock(Block block) {
-        TemporaryBlockTracker.temporaryBlocks.remove(block);
+        temporaryBlocks.remove(block);
     }
-
 
     //Projectile entities - Minecraft already stores data about who fired them, so just simple entities.
     //NOTE: there are no events for firing elitemobs projectiles, does not seem like it would serve a good function as of right now
     public static void registerProjectileEntity(Projectile projectile) {
-        new ProjectileEntityTracker(projectile.getUniqueId(), projectile);
+        PersistentTagger.tagEliteProjectile(projectile);
     }
 
-    public static Projectile getProjectileEntity(UUID uuid) {
-        return ProjectileEntityTracker.projectileEntities.get(uuid);
+    public static boolean isProjectileEntity(Entity entity) {
+        return PersistentTagger.isEliteProjectile(entity);
     }
 
-
-    //Global unregister
-    public static void unregister(UUID uuid, RemovalReason removalReason) {
-        TrackedEntity trackedEntity = TrackedEntity.trackedEntities.get(uuid);
-        if (trackedEntity != null)
-            TrackedEntity.trackedEntities.get(uuid).remove(removalReason);
+    public static void unregisterProjectileEntity(Entity entity) {
+        if (isProjectileEntity(entity)) entity.remove();
     }
 
     public static void unregister(Entity entity, RemovalReason removalReason) {
-        if (entity != null)
-            unregister(entity.getUniqueId(), removalReason);
-    }
-
-
-    //Entity wiper
-    public static void wipeEntity(Entity entity, RemovalReason removalReason) {
-        TrackedEntity trackedEntity = TrackedEntity.trackedEntities.get(entity.getUniqueId());
-        if (trackedEntity == null) return;
-        trackedEntity.doUnload(removalReason);
+        unregisterEliteEntity(entity, removalReason);
+        unregisterVisualEffect(entity);
+        unregisterProjectileEntity(entity);
+        unregisterNPCEntity(entity, removalReason);
     }
 
     public static void wipeChunk(Chunk chunk, RemovalReason removalReason) {
         for (Entity entity : chunk.getEntities())
-            wipeEntity(entity, removalReason);
+            unregister(entity, removalReason);
     }
 
     public static void wipeWorld(World world, RemovalReason removalReason) {
@@ -175,19 +184,15 @@ public class EntityTracker implements Listener {
     }
 
     public static void wipeShutdown() {
-        HashMap<UUID, TrackedEntity> trackedEntities = new HashMap<>(TrackedEntity.trackedEntities);
-        for (TrackedEntity trackedEntity : trackedEntities.values())
-            trackedEntity.doShutdown();
-        TrackedEntity.trackedEntities.clear();
-        EliteEntityTracker.eliteMobEntities.clear();
-        SuperMobEntityTracker.superMobEntities.clear();
-        ProjectileEntityTracker.projectileEntities.clear();
-        NPCEntityTracker.npcEntities.clear();
-        VisualEffectsEntityTracker.visualEffectEntities.clear();
-        ArmorStandEntityTracker.armorStands.clear();
-        for (Block block : TemporaryBlockTracker.temporaryBlocks)
+        for (EliteEntity eliteEntity : ((HashMap<UUID, EliteEntity>) eliteMobEntities.clone()).values())
+            eliteEntity.remove(RemovalReason.SHUTDOWN);
+        getEliteMobEntities().clear();
+        for (NPCEntity npcEntity : ((HashMap<UUID, NPCEntity>) npcEntities.clone()).values())
+            npcEntity.remove(RemovalReason.SHUTDOWN);
+        getNpcEntities().clear();
+        for (Block block : temporaryBlocks)
             block.setType(Material.AIR);
-        TemporaryBlockTracker.temporaryBlocks.clear();
+        temporaryBlocks.clear();
         SimplePersistentEntity.persistentEntities.clear();
         CustomBossEntity.getTrackableCustomBosses().clear();
         CrashFix.knownSessionChunks.clear();
@@ -200,22 +205,14 @@ public class EntityTracker implements Listener {
         EntityTracker.wipeChunk(event.getChunk(), RemovalReason.CHUNK_UNLOAD);
     }
 
-
     @EventHandler(ignoreCancelled = true)
     public void onWorldUnload(WorldUnloadEvent event) {
         EntityTracker.wipeWorld(event.getWorld(), RemovalReason.WORLD_UNLOAD);
     }
 
-    @EventHandler
-    public void onEntityDeath(EntityDeathEvent event) {
-        TrackedEntity trackedEntity = TrackedEntity.trackedEntities.get(event.getEntity().getUniqueId());
-        if (trackedEntity != null)
-            trackedEntity.doDeath();
-    }
-
     @EventHandler(ignoreCancelled = true)
     public void onMine(BlockBreakEvent event) {
-        if (!getIsTemporaryBlock(event.getBlock())) return;
+        if (!isTemporaryBlock(event.getBlock())) return;
         event.setDropItems(false);
         removeTemporaryBlock(event.getBlock());
     }

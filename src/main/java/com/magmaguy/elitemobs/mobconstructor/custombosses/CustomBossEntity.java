@@ -11,6 +11,7 @@ import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.dungeons.Minidungeon;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.events.CustomEvent;
 import com.magmaguy.elitemobs.mobconstructor.CustomSpawn;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
@@ -40,6 +41,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 
 public class CustomBossEntity extends EliteEntity implements Listener, SimplePersistentEntityInterface {
 
@@ -66,7 +68,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
     protected boolean chunkLoad = false;
     private long lastTick = 0;
     private int attemptsCounter = 1;
-    private List<BukkitTask> globalReinforcements = new ArrayList<>();
+    private final List<BukkitTask> globalReinforcements = new ArrayList<>();
     //For use by the phase switcher, which requires passing a specific spawn location for the phase, but when it's for a
     //regional boss this causes issues such as reinforcements getting shifted over to the new spawn location
     @Getter
@@ -77,7 +79,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
     @Setter
     private Minidungeon minidungeon = null;
     @Getter
-    private BossTrace bossTrace = new BossTrace();
+    private final BossTrace bossTrace = new BossTrace();
     @Setter
     private CustomSpawn customSpawn = null;
     private int existsFailureCount = 0;
@@ -188,9 +190,9 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
             else
                 level = 1;
 
-            Boolean isChunkLoadedSpawn = null;
+        Boolean isChunkLoadedSpawn = null;
 
-        if (chunkLoad || ChunkLocationChecker.locationIsLoaded(spawnLocation) || isMount)  {
+        if (chunkLoad || ChunkLocationChecker.locationIsLoaded(spawnLocation) || isMount) {
             chunkLoad = false;
             super.livingEntity = new CustomBossMegaConsumer(this).spawn();
             isChunkLoadedSpawn = true;
@@ -212,12 +214,12 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
             //correctly as not have a valid living entity but the checks are set up in such a way that if a living entity
             //object is referenced then trying to spawn it again is a double spawn of the same entity
             super.livingEntity = null;
-            if (existsFailureCount > 10){
-                if (existsFailureCount == 11){
+            if (existsFailureCount > 10) {
+                if (existsFailureCount == 11) {
                     new WarningMessage("EliteMobs tried and failed to spawn " + customBossesConfigFields.getFilename() + " " + existsFailureCount + "times, probably due to regional protections or third party plugin incompatibilities.");
                     new WarningMessage("To avoid cluttering up console, these warnings will now only appear once 6000 attempts for this boss. ");
                 }
-                if (existsFailureCount % 6000 == 0){
+                if (existsFailureCount % 6000 == 0) {
                     new WarningMessage("EliteMobs tried and failed to spawn " + customBossesConfigFields.getFilename() + " " + existsFailureCount + "times, probably due to regional protections or third party plugin incompatibilities.");
                     new WarningMessage("To avoid cluttering up console, these warnings will now only appear once 6000 attempts for this boss. ");
                 }
@@ -311,7 +313,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
 
     public void getDynamicLevel(Location bossLocation) {
         int bossLevel = 1;
-        for (Entity entity : bossLocation.getWorld().getNearbyEntities(bossLocation, Math.max(Bukkit.getViewDistance() * 16, 5 * 16), 256, Bukkit.getViewDistance() * 16))
+        for (Entity entity : bossLocation.getWorld().getNearbyEntities(bossLocation, Math.max(Bukkit.getViewDistance() * 16, 5 * 16), 256, Bukkit.getViewDistance() * 16D))
             if (entity instanceof Player)
                 if (ElitePlayerInventory.playerInventories.get(entity.getUniqueId()) != null)
                     if (ElitePlayerInventory.playerInventories.get(entity.getUniqueId()).getNaturalMobSpawnLevel(true) > bossLevel)
@@ -406,10 +408,12 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
         if (!isPersistent) bossInstanceEnd = true;
 
         if (bossInstanceEnd) {
+            if (!(this instanceof RegionalBossEntity))
+                EntityTracker.getEliteMobEntities().remove(super.eliteUUID);
             new EventCaller(new EliteMobRemoveEvent(this, removalReason));
             if (escapeMechanism != null) Bukkit.getScheduler().cancelTask(escapeMechanism);
             trackableCustomBosses.remove(this);
-            if (simplePersistentEntity != null){
+            if (simplePersistentEntity != null) {
                 simplePersistentEntity.remove();
                 simplePersistentEntity = null;
             }
@@ -483,7 +487,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
             if (!(eliteMobEnterCombatEvent.getEliteMobEntity() instanceof CustomBossEntity)) return;
             if (eliteMobEnterCombatEvent.getEliteMobEntity().getLivingEntity().getPotionEffect(PotionEffectType.SLOW) == null)
                 return;
-            if (eliteMobEnterCombatEvent.getEliteMobEntity().getLivingEntity().getPotionEffect(PotionEffectType.SLOW).getAmplifier() == 10)
+            if (Objects.requireNonNull(eliteMobEnterCombatEvent.getEliteMobEntity().getLivingEntity().getPotionEffect(PotionEffectType.SLOW)).getAmplifier() == 10)
                 return;
             eliteMobEnterCombatEvent.getEliteMobEntity().getLivingEntity().removePotionEffect(PotionEffectType.SLOW);
         }
