@@ -4,35 +4,62 @@ import lombok.Getter;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class MobCombatSettingsConfig {
-
-    public static boolean doNaturalMobSpawning;
-    public static boolean doSpawnersSpawnEliteMobs;
-    public static double aggressiveMobConversionPercentage;
-    public static int superMobsStackRange;
-    public static int naturalElitemobLevelCap;
-    public static boolean doEliteArmor;
-    public static boolean doEliteHelmets;
-    public static boolean enableVisualEffectsForNaturalMobs;
-    public static boolean disableVisualEffectsForSpawnerMobs;
-    public static boolean enableWarningVisualEffects;
-    public static boolean enableDeathMessages;
-    public static boolean displayHealthOnHit;
-    public static boolean displayDamageOnHit;
-    public static boolean increaseDifficultyWithSpawnDistance;
-    public static double distanceToIncrement;
-    public static double levelToIncrement;
-    public static boolean obfuscateMobPowers;
-    public static double damageToEliteMultiplier, damageToPlayerMultiplier;
-    public static boolean showCustomBossLocation;
-    public static String bossLocationMessage;
-    public static List<String> commandsOnDeath;
-    public static String bossKillParticipationMessage;
-    public static boolean regenerateCustomBossHealthOnCombatEnd;
-    public static String defaultOtherWorldBossLocationMessage;
+    @Getter
+    private static boolean doNaturalMobSpawning;
+    @Getter
+    private static boolean doSpawnersSpawnEliteMobs;
+    @Getter
+    private static double aggressiveMobConversionPercentage;
+    @Getter
+    private static int superMobsStackRange;
+    @Getter
+    private static int naturalEliteMobLevelCap;
+    @Getter
+    private static boolean doEliteArmor;
+    @Getter
+    private static boolean doEliteHelmets;
+    @Getter
+    private static boolean enableVisualEffectsForNaturalMobs;
+    @Getter
+    private static boolean disableVisualEffectsForSpawnerMobs;
+    @Getter
+    private static boolean enableWarningVisualEffects;
+    @Getter
+    private static boolean enableDeathMessages;
+    @Getter
+    private static boolean displayHealthOnHit;
+    @Getter
+    private static boolean displayDamageOnHit;
+    @Getter
+    private static boolean increaseDifficultyWithSpawnDistance;
+    @Getter
+    private static double distanceToIncrement;
+    @Getter
+    private static double levelToIncrement;
+    @Getter
+    private static boolean obfuscateMobPowers;
+    @Getter
+    private static double damageToEliteMultiplier;
+    @Getter
+    private static double damageToPlayerMultiplier;
+    @Getter
+    private static boolean showCustomBossLocation;
+    @Getter
+    private static String bossLocationMessage;
+    @Getter
+    private static List<String> commandsOnDeath;
+    @Getter
+    private static String bossKillParticipationMessage;
+    @Getter
+    private static boolean regenerateCustomBossHealthOnCombatEnd;
+    @Getter
+    private static String defaultOtherWorldBossLocationMessage;
+    private MobCombatSettingsConfig() {
+    }
     @Getter
     private static String weakTextColor;
     @Getter
@@ -55,7 +82,7 @@ public class MobCombatSettingsConfig {
         doSpawnersSpawnEliteMobs = ConfigurationEngine.setBoolean(fileConfiguration, "doSpawnersSpawnEliteMobs", false);
         aggressiveMobConversionPercentage = ConfigurationEngine.setDouble(fileConfiguration, "eliteMobsSpawnPercentage", 0.05);
         superMobsStackRange = Math.max(ConfigurationEngine.setInt(fileConfiguration, "superMobStackRange", 15), 2);
-        naturalElitemobLevelCap = ConfigurationEngine.setInt(fileConfiguration, "naturalEliteMobsLevelCap", 250);
+        naturalEliteMobLevelCap = ConfigurationEngine.setInt(fileConfiguration, "naturalEliteMobsLevelCap", 250);
         doEliteArmor = ConfigurationEngine.setBoolean(fileConfiguration, "doElitesWearArmor", true);
         doEliteHelmets = ConfigurationEngine.setBoolean(fileConfiguration, "doElitesWearHelmets", true);
         enableVisualEffectsForNaturalMobs = ConfigurationEngine.setBoolean(fileConfiguration, "doNaturalEliteMobVisualEffects", true);
@@ -73,7 +100,7 @@ public class MobCombatSettingsConfig {
         showCustomBossLocation = ConfigurationEngine.setBoolean(fileConfiguration, "showCustomBossLocation", true);
         bossLocationMessage = ConfigurationEngine.setString(fileConfiguration, "bossLocationMessage", "&7[EM] &2[Click to track!]");
         //Accepts placeholders $players, $level and $name
-        commandsOnDeath = ConfigurationEngine.setList(fileConfiguration, "commandsOnEliteMobDeath", new ArrayList());
+        commandsOnDeath = ConfigurationEngine.setList(fileConfiguration, "commandsOnEliteMobDeath", Collections.emptyList());
         //Accepts placeholder $playerDamage
         bossKillParticipationMessage = ConfigurationEngine.setString(fileConfiguration, "bossKillParticipationMessage", "&eYour damage: &2$playerDamage");
         regenerateCustomBossHealthOnCombatEnd = ConfigurationEngine.setBoolean(fileConfiguration, "regenerateCustomBossHealthOnCombatEnd", true);
@@ -86,7 +113,5 @@ public class MobCombatSettingsConfig {
         doResistEffect = ConfigurationEngine.setBoolean(fileConfiguration, "doResistEffect", true);
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
-
     }
-
 }

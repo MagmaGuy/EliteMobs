@@ -63,7 +63,7 @@ public class NaturalMobSpawnEventHandler implements Listener {
          */
         eliteMobLevel += playerCount * 2 * MobTierCalculator.PER_TIER_LEVEL_INCREASE;
 
-        if (MobCombatSettingsConfig.increaseDifficultyWithSpawnDistance) {
+        if (MobCombatSettingsConfig.isIncreaseDifficultyWithSpawnDistance()) {
             int levelIncrement = SpawnRadiusDifficultyIncrementer.distanceFromSpawnLevelIncrease(spawnLocation);
             eliteMobLevel += levelIncrement;
         }
@@ -104,12 +104,12 @@ public class NaturalMobSpawnEventHandler implements Listener {
          */
         if (EntityTracker.isEliteMob(event.getEntity())) return;
 
-        if (!MobCombatSettingsConfig.doNaturalMobSpawning)
+        if (!MobCombatSettingsConfig.isDoNaturalMobSpawning())
             return;
         if (!ValidWorldsConfig.fileConfiguration.getBoolean("Valid worlds." + event.getEntity().getWorld().getName()))
             return;
         if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.SPAWNER) &&
-                !MobCombatSettingsConfig.doSpawnersSpawnEliteMobs || event.getSpawnReason() == CUSTOM && DefaultConfig.doStrictSpawningRules)
+                !MobCombatSettingsConfig.isDoSpawnersSpawnEliteMobs() || event.getSpawnReason() == CUSTOM && DefaultConfig.doStrictSpawningRules)
             return;
         if (event.getEntity().getCustomName() != null && DefaultConfig.preventEliteMobConversionOfNamedMobs)
             return;
@@ -120,7 +120,7 @@ public class NaturalMobSpawnEventHandler implements Listener {
         LivingEntity livingEntity = event.getEntity();
 
 
-        double validChance = MobCombatSettingsConfig.aggressiveMobConversionPercentage;
+        double validChance = MobCombatSettingsConfig.getAggressiveMobConversionPercentage();
 
         List<Player> nearbyPlayers = PlayerScanner.getNearbyPlayers(livingEntity.getLocation());
 
@@ -130,8 +130,7 @@ public class NaturalMobSpawnEventHandler implements Listener {
         if (ValidWorldsConfig.nightmareWorlds.contains(event.getEntity().getWorld().getName()))
             validChance += DefaultConfig.nightmareWorldSpawnBonus;
 
-        if (!(ThreadLocalRandom.current().nextDouble() < validChance))
-            return;
+        if (ThreadLocalRandom.current().nextDouble() >= validChance) return;
 
         if (ValidWorldsConfig.zoneBasedWorlds.contains(livingEntity.getWorld().getName())) {
             int eliteMobLevel = (int) (Grid.getMobTierFromLocation(livingEntity.getLocation()));
@@ -155,8 +154,8 @@ public class NaturalMobSpawnEventHandler implements Listener {
 
         if (eliteMobLevel < 0) return;
 
-        if (eliteMobLevel > MobCombatSettingsConfig.naturalElitemobLevelCap)
-            eliteMobLevel = MobCombatSettingsConfig.naturalElitemobLevelCap;
+        if (eliteMobLevel > MobCombatSettingsConfig.getNaturalEliteMobLevelCap())
+            eliteMobLevel = MobCombatSettingsConfig.getNaturalEliteMobLevelCap();
 
         EliteEntity eliteEntity = new EliteEntity(livingEntity, eliteMobLevel, event.getSpawnReason());
 

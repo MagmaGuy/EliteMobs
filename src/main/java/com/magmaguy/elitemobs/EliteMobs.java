@@ -243,11 +243,11 @@ public class EliteMobs extends JavaPlugin {
         //Load minidungeons, most of all load the worlds of minidungeons
         new DungeonPackagerConfig();
         //Load Adventurer's Guild
-        if (AdventurersGuildConfig.guildWorldIsEnabled) {
+        if (AdventurersGuildConfig.isGuildWorldIsEnabled()) {
             try {
                 CustomWorldLoading.startupWorldInitialization();
                 AdventurersGuildCommand.defineTeleportLocation();
-                if (AdventurersGuildConfig.guildWorldLocation == null)
+                if (AdventurersGuildConfig.getGuildWorldLocation() == null)
                     AdventurersGuildConfig.toggleGuildInstall();
             } catch (Exception e) {
                 AdventurersGuildConfig.toggleGuildInstall();

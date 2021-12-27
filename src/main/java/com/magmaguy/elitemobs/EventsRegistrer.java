@@ -108,7 +108,7 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new EliteCreeperExplosionHandler(), plugin);
         pluginManager.registerEvents(new EliteMobGenericDamagedHandler(), plugin);
         pluginManager.registerEvents(new EliteMobDamagedByEliteMobHandler(), plugin);
-        if (MobCombatSettingsConfig.enableDeathMessages)
+        if (MobCombatSettingsConfig.isEnableDeathMessages())
             pluginManager.registerEvents(new PlayerDeathMessageByEliteMob(), plugin);
 
         //explosion regenerator
@@ -238,7 +238,7 @@ public class EventsRegistrer {
 
         //Visual effects
         pluginManager.registerEvents(new EffectEventHandlers(), plugin);
-        if (MobCombatSettingsConfig.obfuscateMobPowers)
+        if (MobCombatSettingsConfig.isObfuscateMobPowers())
             pluginManager.registerEvents(new VisualEffectObfuscator(), plugin);
 
         //Loot
@@ -292,9 +292,9 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new ActionEvent.ActionEventEvents(), plugin);
 
         //Set up health and damage displays
-        if (MobCombatSettingsConfig.displayHealthOnHit)
+        if (MobCombatSettingsConfig.isDisplayHealthOnHit())
             pluginManager.registerEvents(new HealthDisplay(), plugin);
-        if (MobCombatSettingsConfig.displayDamageOnHit)
+        if (MobCombatSettingsConfig.isDisplayDamageOnHit())
             pluginManager.registerEvents(new PopupDisplay(), plugin);
 
         //Initialize items from custom events

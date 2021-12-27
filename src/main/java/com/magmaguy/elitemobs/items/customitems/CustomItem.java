@@ -40,8 +40,8 @@ public class CustomItem {
     private static final List<CustomItem> scalableItems = new ArrayList<>();
     private static final HashMap<Integer, ArrayList<CustomItem>> limitedItems = new HashMap<>();
     private final CustomItemsConfigFields customItemsConfigFields;
-    private final HashMap<Enchantment, Integer> enchantments = new HashMap();
-    private final HashMap<String, Integer> customEnchantments = new HashMap();
+    private final HashMap<Enchantment, Integer> enchantments = new HashMap<>();
+    private final HashMap<String, Integer> customEnchantments = new HashMap<>();
     private String fileName;
     private boolean isEnabled = true;
     private Material material;
@@ -104,7 +104,7 @@ public class CustomItem {
         Item loot = null;
         int itemTier = 0;
 
-        if (AdventurersGuildConfig.guildLootLimiter) {
+        if (AdventurersGuildConfig.isGuildLootLimiter()) {
             itemTier = (int) LootTables.setItemTier(tier);
             if (itemTier > GuildRank.getActiveGuildRank(player) * 10)
                 itemTier = GuildRank.getActiveGuildRank(player) * 10;

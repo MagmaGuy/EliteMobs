@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.elitemobs.items.itemconstructor.MaterialGenerator;
+import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -11,18 +12,57 @@ import java.util.List;
 
 public class ProceduralItemGenerationSettingsConfig {
 
-    public static FileConfiguration fileConfiguration;
-
-    public static boolean doProceduralItemDrops;
-    public static double customEnchantmentChance;
-    public static List<String> validMaterials = new ArrayList<>();
-    public static String swordName, bowName, pickaxeName, spadeName, hoeName, axeName, helmetName, chestplateName,
-            leggingsName, bootsName, shearsName, fishingRodName, shieldName, tridentName, crossbowName;
-    public static List<String> nameFormat;
-    public static List<String> nouns;
-    public static List<String> adjectives;
-    public static List<String> verbs;
-    public static List<String> verbers;
+    @Getter
+    private static FileConfiguration fileConfiguration;
+    @Getter
+    private
+    static boolean doProceduralItemDrops;
+    @Getter
+    private static double customEnchantmentChance;
+    @Getter
+    private static List<String> validMaterials = new ArrayList<>();
+    @Getter
+    private static String swordName;
+    @Getter
+    private static String bowName;
+    @Getter
+    private static String pickaxeName;
+    @Getter
+    private static String spadeName;
+    @Getter
+    private static String hoeName;
+    @Getter
+    private static String axeName;
+    @Getter
+    private static String helmetName;
+    @Getter
+    private static String chestplateName;
+    @Getter
+    private static String leggingsName;
+    @Getter
+    private static String bootsName;
+    @Getter
+    private static String shearsName;
+    @Getter
+    private static String fishingRodName;
+    @Getter
+    private static String shieldName;
+    @Getter
+    private static String tridentName;
+    @Getter
+    private static String crossbowName;
+    @Getter
+    private static List<String> nameFormat;
+    @Getter
+    private static List<String> nouns;
+    @Getter
+    private static List<String> adjectives;
+    @Getter
+    private static List<String> verbs;
+    @Getter
+    private static List<String> verbers;
+    private ProceduralItemGenerationSettingsConfig() {
+    }
 
 
     public static void initializeConfig() {
@@ -39,7 +79,6 @@ public class ProceduralItemGenerationSettingsConfig {
 
         addMaterial(Material.DIAMOND_SWORD);
         addMaterial(Material.DIAMOND_AXE);
-        //addMaterial(Material.DIAMOND_HOE);
 
 
         addMaterial(Material.IRON_HELMET);
@@ -49,7 +88,6 @@ public class ProceduralItemGenerationSettingsConfig {
 
         addMaterial(Material.IRON_SWORD);
         addMaterial(Material.IRON_AXE);
-        //addMaterial(Material.IRON_HOE);
 
 
         addMaterial(Material.GOLDEN_HELMET);
@@ -59,7 +97,6 @@ public class ProceduralItemGenerationSettingsConfig {
 
         addMaterial(Material.GOLDEN_SWORD);
         addMaterial(Material.GOLDEN_AXE);
-        //addMaterial(Material.GOLDEN_HOE);
 
 
         addMaterial(Material.CHAINMAIL_HELMET);

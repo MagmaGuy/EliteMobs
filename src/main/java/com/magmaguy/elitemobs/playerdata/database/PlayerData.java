@@ -98,18 +98,6 @@ public class PlayerData {
         }
     }
 
-    @Nullable
-    public static PlayerQuestCooldowns getPlayerQuestCooldowns(UUID uuid) {
-        try {
-            if (!isInMemory(uuid))
-                return (PlayerQuestCooldowns) ObjectSerializer.fromString((String) getDatabaseBlob(uuid, "PlayerQuestCooldowns"));
-            if (playerDataHashMap.get(uuid) == null) return PlayerQuestCooldowns.initializePlayer();
-            return playerDataHashMap.get(uuid).playerQuestCooldowns == null ? PlayerQuestCooldowns.initializePlayer() : playerDataHashMap.get(uuid).playerQuestCooldowns;
-        } catch (Exception ex) {
-            return null;
-        }
-    }
-
     public static void clearPlayerData(UUID uuid) {
         playerDataHashMap.remove(uuid);
     }
@@ -270,8 +258,7 @@ public class PlayerData {
     }
 
     public static void removeQuest(UUID uuid, Quest quest) {
-        Quest finalQuest = quest;
-        playerDataHashMap.get(uuid).quests.removeIf(iteratedQuest -> iteratedQuest.getQuestID().equals(finalQuest.getQuestID()));
+        playerDataHashMap.get(uuid).quests.removeIf(iteratedQuest -> iteratedQuest.getQuestID().equals(quest.getQuestID()));
         updateQuestStatus(uuid);
     }
 
@@ -285,9 +272,25 @@ public class PlayerData {
         updateQuestStatus(uuid);
     }
 
-    public static void updatePlayerQuestCooldowns(UUID uuid) {
+    @Nullable
+    public static PlayerQuestCooldowns getPlayerQuestCooldowns(UUID uuid) {
         try {
-            setDatabaseValue(uuid, "PlayerQuestCooldowns", ObjectSerializer.toString(getPlayerQuestCooldowns(uuid)));
+            if (!isInMemory(uuid))
+                return (PlayerQuestCooldowns) ObjectSerializer.fromString((String) getDatabaseBlob(uuid, "PlayerQuestCooldowns"));
+            if (playerDataHashMap.get(uuid) == null) return PlayerQuestCooldowns.initializePlayer();
+            return playerDataHashMap.get(uuid).playerQuestCooldowns == null ? PlayerQuestCooldowns.initializePlayer() : playerDataHashMap.get(uuid).playerQuestCooldowns;
+        } catch (Exception ex) {
+            return null;
+        }
+    }
+
+    public static void resetPlayerQuestCooldowns(UUID uuid) {
+        updatePlayerQuestCooldowns(uuid, PlayerQuestCooldowns.initializePlayer());
+    }
+
+    public static void updatePlayerQuestCooldowns(UUID uuid, PlayerQuestCooldowns playerQuestCooldowns) {
+        try {
+            setDatabaseValue(uuid, "PlayerQuestCooldowns", ObjectSerializer.toString(playerQuestCooldowns));
         } catch (Exception ex) {
             new WarningMessage("Failed to register player quest cooldowns!");
             ex.printStackTrace();
@@ -312,7 +315,7 @@ public class PlayerData {
 
                 } catch (Exception e) {
                     new WarningMessage("Failed to update database value.");
-                    new WarningMessage(e.getClass().getName() + ": " + e.getMessage());
+                    e.printStackTrace();
                 }
             }
         }.runTaskAsynchronously(MetadataHandler.PLUGIN);
@@ -323,13 +326,14 @@ public class PlayerData {
         try {
             Statement statement = getConnection().createStatement();
             ResultSet resultSet = statement.executeQuery("SELECT * FROM " + PLAYER_DATA_TABLE_NAME + " WHERE PlayerUUID = '" + uuid.toString() + "';");
-            Object blob = resultSet.getBlob(value);
+            byte[] bytes = resultSet.getBytes(value);
             resultSet.close();
             statement.close();
-            return blob;
+            return new String(bytes);
         } catch (Exception e) {
-            new WarningMessage("Failed to get string value from database!");
-            new WarningMessage(e.getClass().getName() + ": " + e.getMessage());
+            new WarningMessage("Failed to get blob value from database!");
+            new WarningMessage("UUID: " + uuid + " | Value: " + value);
+            e.printStackTrace();
             return null;
         }
     }
@@ -500,6 +504,7 @@ public class PlayerData {
     }
 
     private void readExistingData(Statement statement, UUID uuid, ResultSet resultSet) throws Exception {
+        playerDataHashMap.put(uuid, this);
         currency = resultSet.getDouble("Currency");
         guildPrestigeLevel = resultSet.getInt("GuildPrestigeLevel");
         maxGuildLevel = resultSet.getInt("GuildMaxLevel");
@@ -531,14 +536,17 @@ public class PlayerData {
         if (resultSet.getBytes("PlayerQuestCooldowns") != null) {
             try {
                 playerQuestCooldowns = (PlayerQuestCooldowns) ObjectSerializer.fromString(new String(resultSet.getBytes("PlayerQuestCooldowns"), "UTF-8"));
-                PlayerQuestCooldowns.initializePlayer(uuid, playerQuestCooldowns);
+                playerQuestCooldowns.startCooldowns(uuid);
             } catch (Exception exception) {
-                new WarningMessage("Failed to get player quest cooldowns!");
+                new WarningMessage("Failed to get player quest cooldowns!  ! This player's quest cooldowns will be wiped to prevent future errors.");
+                try{
+                    resetPlayerQuestCooldowns(uuid);
+                } catch (Exception ex2){
+                    new WarningMessage("Failed to reset quest cooldowns! Ironic.");
+                    ex2.printStackTrace();
+                }
             }
         }
-
-        playerDataHashMap.put(uuid, this);
-
     }
 
     public static void closeConnection() {
@@ -551,6 +559,7 @@ public class PlayerData {
     }
 
     private void writeNewData(Statement statement, UUID uuid) throws Exception {
+        playerDataHashMap.put(uuid, this);
         currency = 0;
         guildPrestigeLevel = 0;
         maxGuildLevel = 1;
@@ -560,9 +569,6 @@ public class PlayerData {
         highestLevelKilled = 0;
         deaths = 0;
         questsCompleted = 0;
-
-        playerDataHashMap.put(uuid, this);
-
         statement = getConnection().createStatement();
         String sql = "INSERT INTO " + PLAYER_DATA_TABLE_NAME +
                 " (PlayerUUID," +

@@ -60,11 +60,11 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
         zombieNecronomicon.setFiring(true);
         nameScroller(livingEntity, zombieNecronomicon);
 
-        if (!MobCombatSettingsConfig.enableWarningVisualEffects)
+        if (!MobCombatSettingsConfig.isEnableWarningVisualEffects())
             return;
 
         new BukkitRunnable() {
-            final HashMap<Integer, List<Item>> fourTrack = new HashMap();
+            final HashMap<Integer, List<Item>> fourTrack = new HashMap<>();
             int counter = 0;
 
             @Override

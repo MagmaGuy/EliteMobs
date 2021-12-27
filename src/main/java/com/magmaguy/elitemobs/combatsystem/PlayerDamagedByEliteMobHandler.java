@@ -114,7 +114,7 @@ public class PlayerDamagedByEliteMobHandler implements Listener {
         double customBossDamageMultiplier = eliteEntity.getDamageMultiplier();
 
         double finalDamage = (baseDamage + bonusDamage - damageReduction - secondaryDamageReduction) *
-                MobCombatSettingsConfig.damageToPlayerMultiplier * customBossDamageMultiplier;
+                MobCombatSettingsConfig.getDamageToPlayerMultiplier() * customBossDamageMultiplier;
 
         double playerMaxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
 

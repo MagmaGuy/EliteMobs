@@ -55,7 +55,7 @@ public class ZombieBloat extends MajorPower implements Listener {
                     eventZombie.setAI(false);
 
 
-                if (MobCombatSettingsConfig.enableWarningVisualEffects)
+                if (MobCombatSettingsConfig.isEnableWarningVisualEffects())
                     eventZombie.getWorld().spawnParticle(Particle.TOTEM, new Location(eventZombie.getWorld(),
                                     eventZombie.getLocation().getX(), eventZombie.getLocation().getY() +
                                     eventZombie.getHeight(), eventZombie.getLocation().getZ()), 20, timer / 24,
@@ -125,7 +125,7 @@ public class ZombieBloat extends MajorPower implements Listener {
 
     private void livingEntityEffect(List<LivingEntity> livingEntities) {
         if (livingEntities.size() == 0) return;
-        if (!MobCombatSettingsConfig.enableWarningVisualEffects)
+        if (!MobCombatSettingsConfig.isEnableWarningVisualEffects())
             return;
 
         new BukkitRunnable() {

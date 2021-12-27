@@ -76,24 +76,26 @@ public class CustomQuest extends Quest {
         return customQuestsConfigFields;
     }
 
+    public void applyEndPermissions(Player player){
+        if (!getCustomQuestsConfigFields().getTemporaryPermissions().isEmpty()) {
+            PermissionAttachment permissionAttachment = player.addAttachment(MetadataHandler.PLUGIN);
+            for (String permission : getCustomQuestsConfigFields().getTemporaryPermissions())
+                permissionAttachment.unsetPermission(permission);
+        }
+        if (!getCustomQuestsConfigFields().getQuestLockoutPermission().isEmpty()) {
+            PlayerQuestCooldowns.addCooldown(player,
+                    getCustomQuestsConfigFields().getQuestLockoutPermission(),
+                    getCustomQuestsConfigFields().getQuestLockoutMinutes());
+        }
+    }
+
     public static class CustomQuestEvents implements Listener {
         @EventHandler
         public void onQuestReward(QuestRewardEvent event) {
             if (event.getQuest() instanceof CustomQuest) {
                 CustomQuest customQuest = (CustomQuest) event.getQuest();
                 CustomQuestsConfigFields customQuestsConfigFields = customQuest.getCustomQuestsConfigFields();
-                if (!customQuest.getCustomQuestsConfigFields().getTemporaryPermissions().isEmpty()) {
-                    PermissionAttachment permissionAttachment = event.getPlayer().addAttachment(MetadataHandler.PLUGIN);
-                    for (String permission : customQuest.getCustomQuestsConfigFields().getTemporaryPermissions())
-                        permissionAttachment.setPermission(permission, false);
-                }
-                if (!customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission().isEmpty()) {
-                    PermissionAttachment permissionAttachment = event.getPlayer().addAttachment(MetadataHandler.PLUGIN);
-                    permissionAttachment.setPermission(customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission(), true);
-                    PlayerQuestCooldowns.addCooldown(event.getPlayer(),
-                            customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission(),
-                            customQuest.getCustomQuestsConfigFields().getQuestLockoutMinutes());
-                }
+                customQuest.applyEndPermissions(event.getPlayer());
                 if (!customQuest.getCustomQuestsConfigFields().getQuestCompleteDialog().isEmpty())
                     for (String dialog : customQuest.getCustomQuestsConfigFields().getQuestCompleteDialog())
                         event.getPlayer().sendMessage(dialog);

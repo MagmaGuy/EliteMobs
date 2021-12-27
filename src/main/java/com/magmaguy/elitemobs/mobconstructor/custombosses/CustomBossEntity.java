@@ -292,7 +292,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
 
     private void setTracking() {
         if (customBossesConfigFields.getAnnouncementPriority() < 1 ||
-                !MobCombatSettingsConfig.showCustomBossLocation ||
+                !MobCombatSettingsConfig.isShowCustomBossLocation() ||
                 customBossesConfigFields.getLocationMessage() == null)
             return;
         trackableCustomBosses.add(this);

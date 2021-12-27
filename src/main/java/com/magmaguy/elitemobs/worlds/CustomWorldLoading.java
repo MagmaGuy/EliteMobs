@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.WorldCreator;
 
 import java.io.File;
+import java.util.Objects;
 
 public class CustomWorldLoading {
 
@@ -17,13 +18,14 @@ public class CustomWorldLoading {
         File folder = new File(Bukkit.getWorldContainer().getAbsolutePath());
         File[] listOfFiles = folder.listFiles();
 
+        assert listOfFiles != null;
         for (File listOfFile : listOfFiles) {
-            if (listOfFile.isDirectory() && listOfFile.getName().equals(AdventurersGuildConfig.guildWorldName)) {
-                new InfoMessage("[EliteMobs] World " + AdventurersGuildConfig.guildWorldName + " found! Loading it in...");
+            if (listOfFile.isDirectory() && listOfFile.getName().equals(AdventurersGuildConfig.getGuildWorldName())) {
+                new InfoMessage("[EliteMobs] World " + AdventurersGuildConfig.getGuildWorldName() + " found! Loading it in...");
                 try {
-                    WorldCreator worldCreator = new WorldCreator(AdventurersGuildConfig.guildWorldName);
-                    Bukkit.createWorld(worldCreator).setKeepSpawnInMemory(false);
-                    new InfoMessage("[EliteMobs] World " + AdventurersGuildConfig.guildWorldName +
+                    WorldCreator worldCreator = new WorldCreator(AdventurersGuildConfig.getGuildWorldName());
+                    Objects.requireNonNull(Bukkit.createWorld(worldCreator)).setKeepSpawnInMemory(false);
+                    new InfoMessage("[EliteMobs] World " + AdventurersGuildConfig.getGuildWorldName() +
                             " has been successfully loaded! It can be accessed through the '/ag' command, unless you changed that config option!");
                 } catch (Exception ex) {
                     new WarningMessage("Failed to generate Adventurer's Guild World!");
@@ -39,9 +41,10 @@ public class CustomWorldLoading {
         File folder = new File(Bukkit.getWorldContainer().getAbsolutePath());
         File[] listOfFiles = folder.listFiles();
 
+        assert listOfFiles != null;
         for (File listOfFile : listOfFiles)
             if (listOfFile.isDirectory() &&
-                    listOfFile.getName().equals(AdventurersGuildConfig.guildWorldName))
+                    listOfFile.getName().equals(AdventurersGuildConfig.getGuildWorldName()))
                 return true;
         return false;
     }

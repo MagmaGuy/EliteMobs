@@ -2,31 +2,75 @@ package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.commands.guild.AdventurersGuildCommand;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class AdventurersGuildConfig {
-
-    public static boolean addMaxHealth, addCrit, addDodge;
-    public static boolean guildWorldIsEnabled;
-    public static String guildWorldName;
-    public static String guildLocationString;
-    public static Location guildWorldLocation;
-    public static boolean agTeleport;
-    public static String[][] rankNames = new String[11][21];
-    public static String[][] shortRankNames = new String[11][21];
-    public static boolean guildLootLimiter;
-    public static String lootLimiterMessage;
-    public static List<String> onRankUpCommand, onPrestigeUpCommand;
-    public static double dodge1, dodge2, dodge3, crit1, crit2, crit3, health1, health2, health3, health4;
-    public static String adventurersGuildMenuName;
-    public static int baseKillsForRankUp, additionalKillsForRankUpPerTier;
+    @Getter
+    private static final String[][] rankNames = new String[11][21];
+    @Getter
+    private static final String[][] shortRankNames = new String[11][21];
+    @Getter
+    private static boolean addMaxHealth;
+    @Getter
+    private static boolean addCrit;
+    @Getter
+    private static boolean addDodge;
+    @Getter
+    private static boolean guildWorldIsEnabled;
+    @Getter
+    private static String guildWorldName;
+    @Getter
+    private static String guildLocationString;
+    @Getter
+    @Setter
+    private static Location guildWorldLocation;
+    @Getter
+    private static boolean agTeleport;
+    @Getter
+    private static boolean guildLootLimiter;
+    @Getter
+    private static String lootLimiterMessage;
+    @Getter
+    private static List<String> onRankUpCommand;
+    @Getter
+    private static List<String> onPrestigeUpCommand;
+    @Getter
+    private static double dodge1;
+    @Getter
+    private static double dodge2;
+    @Getter
+    private static double dodge3;
+    @Getter
+    private static double crit1;
+    @Getter
+    private static double crit2;
+    @Getter
+    private static double crit3;
+    @Getter
+    private static double health1;
+    @Getter
+    private static double health2;
+    @Getter
+    private static double health3;
+    @Getter
+    private static double health4;
+    @Getter
+    private static String adventurersGuildMenuName;
+    @Getter
+    private static int baseKillsForRankUp;
+    @Getter
+    private static int additionalKillsForRankUpPerTier;
     private static File file;
     private static FileConfiguration fileConfiguration;
+    private AdventurersGuildConfig() {
+    }
 
     public static void toggleGuildInstall() {
         guildWorldIsEnabled = !guildWorldIsEnabled;
@@ -302,14 +346,16 @@ public class AdventurersGuildConfig {
                         rankNames[prestigeRank][normalRank] = rankName;
                         shortRankNames[prestigeRank][normalRank] = shortRankName;
                         break;
+                    default:
+                        throw new IllegalStateException("Unexpected value: " + normalRank);
                 }
 
             }
 
         guildLootLimiter = ConfigurationEngine.setBoolean(fileConfiguration, "limitLootBasedOnGuildTier", true);
         lootLimiterMessage = ConfigurationEngine.setString(fileConfiguration, "lootLimiterMessage", "&7[EM] &cYou must unlock the next guild rank through /ag to loot better items!");
-        onRankUpCommand = ConfigurationEngine.setList(fileConfiguration, "onRankUpCommand", Arrays.asList());
-        onPrestigeUpCommand = ConfigurationEngine.setList(fileConfiguration, "onPrestigeUpCommand", Arrays.asList());
+        onRankUpCommand = ConfigurationEngine.setList(fileConfiguration, "onRankUpCommand", Collections.emptyList());
+        onPrestigeUpCommand = ConfigurationEngine.setList(fileConfiguration, "onPrestigeUpCommand", Collections.emptyList());
         dodge1 = ConfigurationEngine.setDouble(fileConfiguration, "dodgePrestige3Bonus", 3);
         dodge2 = ConfigurationEngine.setDouble(fileConfiguration, "dodgePrestige6Bonus", 6);
         dodge3 = ConfigurationEngine.setDouble(fileConfiguration, "dodgePrestige9Bonus", 10);

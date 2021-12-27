@@ -193,7 +193,7 @@ public class EntityTracker implements Listener {
         for (Block block : temporaryBlocks)
             block.setType(Material.AIR);
         temporaryBlocks.clear();
-        SimplePersistentEntity.persistentEntities.clear();
+        SimplePersistentEntity.getPersistentEntities().clear();
         CustomBossEntity.getTrackableCustomBosses().clear();
         CrashFix.knownSessionChunks.clear();
     }

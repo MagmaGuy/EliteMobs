@@ -50,7 +50,7 @@ public class PassiveEliteMobDeathHandler implements Listener {
     }
 
     public static class SuperMobScanner {
-        private static final int passiveRange = MobCombatSettingsConfig.superMobsStackRange;
+        private static final int passiveRange = MobCombatSettingsConfig.getSuperMobsStackRange();
 
         public static void scanSuperMobs() {
             for (World world : validWorldList) {

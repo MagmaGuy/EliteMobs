@@ -25,18 +25,18 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class Taunt extends MinorPower implements Listener {
 
-    private final static List<String> TARGET_TAUNT_LIST = PowersConfig.getPower("taunt.yml").getFileConfiguration().getStringList("onTarget");
-    private final static List<String> GENERIC_DAMAGED_LIST = PowersConfig.getPower("taunt.yml").getFileConfiguration().getStringList("onDamaged");
-    private final static List<String> DAMAGED_BY_BOW_LIST = PowersConfig.getPower("taunt.yml").getFileConfiguration().getStringList("onDamagedByBow");
-    private final static List<String> HIT_LIST = PowersConfig.getPower("taunt.yml").getFileConfiguration().getStringList("onDamage");
-    private final static List<String> DEATH_LIST = PowersConfig.getPower("taunt.yml").getFileConfiguration().getStringList("onDeath");
+    private static final List<String> TARGET_TAUNT_LIST = PowersConfig.getPower("taunt.yml").getFileConfiguration().getStringList("onTarget");
+    private static final List<String> GENERIC_DAMAGED_LIST = PowersConfig.getPower("taunt.yml").getFileConfiguration().getStringList("onDamaged");
+    private static final List<String> DAMAGED_BY_BOW_LIST = PowersConfig.getPower("taunt.yml").getFileConfiguration().getStringList("onDamagedByBow");
+    private static final List<String> HIT_LIST = PowersConfig.getPower("taunt.yml").getFileConfiguration().getStringList("onDamage");
+    private static final List<String> DEATH_LIST = PowersConfig.getPower("taunt.yml").getFileConfiguration().getStringList("onDeath");
 
     public Taunt() {
         super(PowersConfig.getPower("taunt.yml"));
     }
 
     //Also used by the custom bosses
-    public static void nametagProcessor(Entity entity, List<String> list) {
+    public static void nameTagProcessor(EliteEntity eliteEntity, Entity entity, List<String> list) {
         int randomizedKey = ThreadLocalRandom.current().nextInt(list.size());
         String tempName = list.get(randomizedKey);
         entity.setCustomName(ChatColorConverter.convert(tempName));
@@ -46,11 +46,11 @@ public class Taunt extends MinorPower implements Listener {
             public void run() {
                 if (!entity.isValid())
                     return;
-                entity.setCustomName(EntityTracker.getEliteMobEntity(entity).getName());
+                entity.setCustomName(eliteEntity.getName());
             }
 
 
-        }.runTaskLater(MetadataHandler.PLUGIN, 4 * 20);
+        }.runTaskLater(MetadataHandler.PLUGIN, 4 * 20L);
     }
 
     /**
@@ -61,7 +61,7 @@ public class Taunt extends MinorPower implements Listener {
     @EventHandler
     public void onTarget(EliteMobTargetPlayerEvent event) {
         if (!event.getEliteMobEntity().hasPower(this)) return;
-        nametagProcessor(event.getEliteMobEntity().getLivingEntity(), TARGET_TAUNT_LIST);
+        nameTagProcessor(event.getEliteMobEntity(), event.getEliteMobEntity().getLivingEntity(), TARGET_TAUNT_LIST);
     }
 
     /**
@@ -84,9 +84,9 @@ public class Taunt extends MinorPower implements Listener {
             Entity entity = event.getEntity();
 
             if (event.getEntityDamageEvent().getCause().equals(EntityDamageEvent.DamageCause.PROJECTILE))
-                nametagProcessor(entity, DAMAGED_BY_BOW_LIST);
+                nameTagProcessor(eliteEntity, entity, DAMAGED_BY_BOW_LIST);
             else
-                nametagProcessor(entity, GENERIC_DAMAGED_LIST);
+                nameTagProcessor(eliteEntity, entity, GENERIC_DAMAGED_LIST);
         }
 
     }
@@ -99,7 +99,7 @@ public class Taunt extends MinorPower implements Listener {
     @EventHandler
     public void onHit(PlayerDamagedByEliteMobEvent event) {
         if (!event.getEliteMobEntity().hasPower(this)) return;
-        nametagProcessor(event.getEliteMobEntity().getLivingEntity(), HIT_LIST);
+        nameTagProcessor(event.getEliteMobEntity(), event.getEliteMobEntity().getLivingEntity(), HIT_LIST);
     }
 
     /**
@@ -110,7 +110,7 @@ public class Taunt extends MinorPower implements Listener {
     @EventHandler
     public void onDeath(EliteMobDeathEvent event) {
         if (!event.getEliteEntity().hasPower(this)) return;
-        nametagProcessor(event.getEntity(), DEATH_LIST);
+        nameTagProcessor(event.getEliteEntity(), event.getEntity(), DEATH_LIST);
     }
 
 }

@@ -395,7 +395,7 @@ public class EnchantmentGenerator {
         if (itemTier < 2 || secondaryEnchantmentTotalParsedLevel < 1 || validSecondaryEnchantments.size() == 0)
             return enchantmentMap;
 
-        if (ThreadLocalRandom.current().nextDouble() > ProceduralItemGenerationSettingsConfig.customEnchantmentChance)
+        if (ThreadLocalRandom.current().nextDouble() > ProceduralItemGenerationSettingsConfig.getCustomEnchantmentChance())
             return enchantmentMap;
 
         /*

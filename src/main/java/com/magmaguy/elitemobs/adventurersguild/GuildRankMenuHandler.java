@@ -35,7 +35,7 @@ public class GuildRankMenuHandler implements Listener {
     private static void selectRankToUnlock(Player player, int guildRank) {
         double price = tierPriceCalculator(guildRank, GuildRank.getGuildPrestigeRank(player));
         if (EconomyHandler.checkCurrency(player.getUniqueId()) < price) {
-            player.sendMessage(GuildRankMenuConfig.notEnoughCurrencyMessage
+            player.sendMessage(GuildRankMenuConfig.getNotEnoughCurrencyMessage()
                     .replace("$neededAmount", tierPriceCalculator(guildRank, GuildRank.getGuildPrestigeRank(player)) + "")
                     .replace("$currentAmount", EconomyHandler.checkCurrency(player.getUniqueId()) + "")
                     .replace("$currencyName", EconomySettingsConfig.currencyName));
@@ -44,16 +44,16 @@ public class GuildRankMenuHandler implements Listener {
         EconomyHandler.subtractCurrency(player.getUniqueId(), price);
         GuildRank.setActiveGuildRank(player, guildRank);
         GuildRank.setMaxGuildRank(player, guildRank);
-        player.sendMessage(GuildRankMenuConfig.unlockMessage
+        player.sendMessage(GuildRankMenuConfig.getUnlockMessage()
                 .replace("$rankName", GuildRank.getRankName(GuildRank.getGuildPrestigeRank(player), guildRank))
                 .replace("$price", tierPriceCalculator(guildRank, GuildRank.getGuildPrestigeRank(player)) + "")
                 .replace("$currencyName", EconomySettingsConfig.currencyName));
 
-        Bukkit.broadcastMessage(GuildRankMenuConfig.broadcastMessage
+        Bukkit.broadcastMessage(GuildRankMenuConfig.getBroadcastMessage()
                 .replace("$player", player.getDisplayName())
                 .replace("$rankName", GuildRank.getRankName(GuildRank.getGuildPrestigeRank(player), guildRank)));
-        if (!AdventurersGuildConfig.onRankUpCommand.isEmpty())
-            for (String command : AdventurersGuildConfig.onRankUpCommand)
+        if (!AdventurersGuildConfig.getOnRankUpCommand().isEmpty())
+            for (String command : AdventurersGuildConfig.getOnRankUpCommand())
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
                         command.replace("$player", player.getName())
                                 .replace("$prestigeRank", GuildRank.getActiveGuildRank(player) + "")
@@ -74,8 +74,8 @@ public class GuildRankMenuHandler implements Listener {
             iteratedPlayer.sendTitle(player.getDisplayName(), ChatColor.DARK_GREEN + "has unlocked Prestige " + GuildRank.getGuildPrestigeRank(player) + "!");
         }
         player.closeInventory();
-        if (!AdventurersGuildConfig.onPrestigeUpCommand.isEmpty())
-            for (String command : AdventurersGuildConfig.onPrestigeUpCommand)
+        if (!AdventurersGuildConfig.getOnPrestigeUpCommand().isEmpty())
+            for (String command : AdventurersGuildConfig.getOnPrestigeUpCommand())
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
                         command.replace("$player", player.getName())
                                 .replace("$prestigeRank", GuildRank.getActiveGuildRank(player) + "")
@@ -96,7 +96,7 @@ public class GuildRankMenuHandler implements Listener {
      * @return Returns the inventory generated
      */
     public static Inventory initializeGuildRankMenu(Player player) {
-        Inventory difficultyMenu = Bukkit.createInventory(player, 54, GuildRankMenuConfig.menuName);
+        Inventory difficultyMenu = Bukkit.createInventory(player, 54, GuildRankMenuConfig.getMenuName());
         difficultyMenu = populateInventory(difficultyMenu, player);
         inventories.add(difficultyMenu);
         player.openInventory(difficultyMenu);
@@ -154,22 +154,22 @@ public class GuildRankMenuHandler implements Listener {
         }
         switch (guildRankStatus) {
             case UNLOCKED:
-                itemStack = constructButtonItemStack(activeGuildRank, GuildRankMenuConfig.unlockedButton.clone(), player, priceString);
+                itemStack = constructButtonItemStack(activeGuildRank, GuildRankMenuConfig.getUnlockedButton().clone(), player, priceString);
                 break;
             case LOCKED:
-                itemStack = constructButtonItemStack(activeGuildRank, GuildRankMenuConfig.lockedButton.clone(), player, priceString);
+                itemStack = constructButtonItemStack(activeGuildRank, GuildRankMenuConfig.getLockedButton().clone(), player, priceString);
                 break;
             case SELECTED:
-                itemStack = constructButtonItemStack(activeGuildRank, GuildRankMenuConfig.currentButton.clone(), player, priceString);
+                itemStack = constructButtonItemStack(activeGuildRank, GuildRankMenuConfig.getCurrentButton().clone(), player, priceString);
                 break;
             case NEXT_UNLOCK:
-                itemStack = constructButtonItemStack(activeGuildRank, GuildRankMenuConfig.nextButton.clone(), player, priceString);
+                itemStack = constructButtonItemStack(activeGuildRank, GuildRankMenuConfig.getNextButton().clone(), player, priceString);
                 break;
             case PRESTIGE_LOCKED:
-                itemStack = constructButtonItemStack(activeGuildRank, GuildRankMenuConfig.prestigeLockedButton.clone(), player, priceString);
+                itemStack = constructButtonItemStack(activeGuildRank, GuildRankMenuConfig.getPrestigeLockedButton().clone(), player, priceString);
                 break;
             case PRESTIGE_NEXT_UNLOCK:
-                itemStack = constructButtonItemStack(activeGuildRank, GuildRankMenuConfig.prestigeNextUnlockButton.clone(), player, priceString);
+                itemStack = constructButtonItemStack(activeGuildRank, GuildRankMenuConfig.getPrestigeNextUnlockButton().clone(), player, priceString);
                 break;
         }
 
@@ -241,33 +241,33 @@ public class GuildRankMenuHandler implements Listener {
     }
 
     private static String lootTierString(int activeGuildRank) {
-        if (!AdventurersGuildConfig.guildLootLimiter) return null;
-        return GuildRankMenuConfig.lootTierMessage.replace("$tier", GuildRank.lootTierValue(activeGuildRank) + "");
+        if (!AdventurersGuildConfig.isGuildLootLimiter()) return null;
+        return GuildRankMenuConfig.getLootTierMessage().replace("$tier", GuildRank.lootTierValue(activeGuildRank) + "");
     }
 
     private static String currencyBonusString(int activeGuildRank) {
-        return GuildRankMenuConfig.currencyBonusMessage.replace("$amount", GuildRank.currencyBonusMultiplier(activeGuildRank) + "");
+        return GuildRankMenuConfig.getCurrencyBonusMessage().replace("$amount", GuildRank.currencyBonusMultiplier(activeGuildRank) + "");
     }
 
     private static String healthBonusString(int prestigeLevel, int guildRank) {
-        if (!AdventurersGuildConfig.addMaxHealth) return null;
+        if (!AdventurersGuildConfig.isAddMaxHealth()) return null;
         if (prestigeLevel < 1)
             return null;
-        return GuildRankMenuConfig.healthBonusMessage.replace("$amount", GuildRank.healthBonusValue(prestigeLevel, guildRank) + "");
+        return GuildRankMenuConfig.getHealthBonusMessage().replace("$amount", GuildRank.healthBonusValue(prestigeLevel, guildRank) + "");
     }
 
     private static String critBonusString(int prestigeLevel, int guildRank) {
-        if (!AdventurersGuildConfig.addMaxHealth) return null;
+        if (!AdventurersGuildConfig.isAddMaxHealth()) return null;
         if (prestigeLevel < 3)
             return null;
-        return GuildRankMenuConfig.critBonusMessage.replace("$amount", GuildRank.critBonusValue(prestigeLevel, guildRank) + "");
+        return GuildRankMenuConfig.getCritBonusMessage().replace("$amount", GuildRank.critBonusValue(prestigeLevel, guildRank) + "");
     }
 
     private static String dodgeBonusString(int prestigeLevel, int guildRank) {
-        if (!AdventurersGuildConfig.addMaxHealth) return null;
+        if (!AdventurersGuildConfig.isAddMaxHealth()) return null;
         if (prestigeLevel < 4)
             return null;
-        return GuildRankMenuConfig.dodgeBonusMessage.replace("$amount", GuildRank.dodgeBonusValue(prestigeLevel, guildRank) + "");
+        return GuildRankMenuConfig.getDodgeBonusMessage().replace("$amount", GuildRank.dodgeBonusValue(prestigeLevel, guildRank) + "");
     }
 
     private static int tierPriceCalculator(int tier, int prestigeLevel) {
@@ -276,8 +276,8 @@ public class GuildRankMenuHandler implements Listener {
         max mob tier / 2 = loot shower payout for killing 1 em at max level for that player
         payout * 1000 = amount of elite mobs to kill before going up a rank
          */
-        double eliteMobsToKillBeforeGuildRankup = AdventurersGuildConfig.baseKillsForRankUp + AdventurersGuildConfig.additionalKillsForRankUpPerTier * (tier - 1);
-        return (int) ((tier - 1) * 10 / 2 * eliteMobsToKillBeforeGuildRankup * (GuildRank.currencyBonusMultiplier(prestigeLevel)));
+        double eliteMobsToKillBeforeGuildRankUp = AdventurersGuildConfig.getBaseKillsForRankUp() + AdventurersGuildConfig.getAdditionalKillsForRankUpPerTier() * (tier - 1);
+        return (int) ((tier - 1) * 10D / 2D * eliteMobsToKillBeforeGuildRankUp * (GuildRank.currencyBonusMultiplier(prestigeLevel)));
     }
 
     @EventHandler

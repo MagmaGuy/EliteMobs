@@ -23,15 +23,15 @@ public class AdventurersGuildCommand {
 
     public static boolean adventurersGuildTeleport(Player player) {
         if (!player.hasPermission("elitemobs.adventurersguild.teleport")) return false;
-        if (!AdventurersGuildConfig.agTeleport) return false;
-        if (AdventurersGuildConfig.guildWorldLocation == null)
+        if (!AdventurersGuildConfig.isAgTeleport()) return false;
+        if (AdventurersGuildConfig.getGuildWorldLocation() == null)
             defineTeleportLocation();
-        if (AdventurersGuildConfig.guildWorldLocation == null) return false;
+        if (AdventurersGuildConfig.getGuildWorldLocation() == null) return false;
 
         if (CombatTagConfig.enableCombatTag)
-            new EventCaller(new PlayerPreTeleportEvent(player, AdventurersGuildConfig.guildWorldLocation));
+            new EventCaller(new PlayerPreTeleportEvent(player, AdventurersGuildConfig.getGuildWorldLocation()));
         else
-            new EventCaller(new PlayerTeleportEvent(player, AdventurersGuildConfig.guildWorldLocation));
+            new EventCaller(new PlayerTeleportEvent(player, AdventurersGuildConfig.getGuildWorldLocation()));
 
         return true;
 
@@ -40,12 +40,12 @@ public class AdventurersGuildCommand {
     public static Location defineTeleportLocation() {
 
         for (World world : Bukkit.getWorlds())
-            if (world.getName().equals(AdventurersGuildConfig.guildWorldName)) {
+            if (world.getName().equals(AdventurersGuildConfig.getGuildWorldName())) {
                 double x = 0, y = 0, z = 0;
                 float yaw = 0, pitch = 0;
                 int counter = 0;
 
-                for (String substring : AdventurersGuildConfig.guildLocationString.split(",")) {
+                for (String substring : AdventurersGuildConfig.getGuildLocationString().split(",")) {
                     switch (counter) {
                         case 0:
                             x = Double.parseDouble(substring);
@@ -67,7 +67,9 @@ public class AdventurersGuildCommand {
 
                 }
 
-                return AdventurersGuildConfig.guildWorldLocation = new Location(world, x, y, z, yaw, pitch);
+                Location location = new Location(world, x, y, z, yaw, pitch);
+                AdventurersGuildConfig.setGuildWorldLocation(location);
+                return location;
 
             }
 
