@@ -23,7 +23,7 @@ import java.util.Map;
 
 public class RefinerMenu extends EliteMenu {
 
-    private static final List<Integer> inputSlots = RefinerMenuConfig.inputSlots;
+    private static final List<Integer> inputSlots = RefinerMenuConfig.getInputSlots();
 
     protected static final Map<Player, Inventory> inventories = new HashMap<>();
 
@@ -84,39 +84,39 @@ public class RefinerMenu extends EliteMenu {
      */
     public void constructRefinerMenu(Player player) {
 
-        Inventory refinerInventory = Bukkit.createInventory(player, 54, RefinerMenuConfig.shopName);
+        Inventory refinerInventory = Bukkit.createInventory(player, 54, RefinerMenuConfig.getShopName());
 
         for (int i = 0; i < 54; i++) {
 
-            if (i == RefinerMenuConfig.infoSlot) {
-                refinerInventory.setItem(i, RefinerMenuConfig.infoButton);
+            if (i == RefinerMenuConfig.getInfoSlot()) {
+                refinerInventory.setItem(i, RefinerMenuConfig.getInfoButton());
                 continue;
             }
 
-            if (i == RefinerMenuConfig.cancelSlot) {
-                refinerInventory.setItem(i, RefinerMenuConfig.cancelButton);
+            if (i == RefinerMenuConfig.getCancelSlot()) {
+                refinerInventory.setItem(i, RefinerMenuConfig.getCancelButton());
                 continue;
             }
 
-            if (i == RefinerMenuConfig.inputInformationSlot) {
-                refinerInventory.setItem(i, RefinerMenuConfig.inputInfoButton);
+            if (i == RefinerMenuConfig.getInputInformationSlot()) {
+                refinerInventory.setItem(i, RefinerMenuConfig.getInputInfoButton());
                 continue;
             }
 
-            if (i == RefinerMenuConfig.outputInformationSlot) {
-                refinerInventory.setItem(i, RefinerMenuConfig.outputInfoButton);
+            if (i == RefinerMenuConfig.getOutputInformationSlot()) {
+                refinerInventory.setItem(i, RefinerMenuConfig.getOutputInfoButton());
                 continue;
             }
 
 
-            if (i == RefinerMenuConfig.confirmSlot) {
+            if (i == RefinerMenuConfig.getConfirmSlot()) {
 
-                ItemStack clonedConfirmButton = RefinerMenuConfig.confirmButton.clone();
+                ItemStack clonedConfirmButton = RefinerMenuConfig.getConfirmButton().clone();
 
                 List<String> lore = new ArrayList<>();
-                for (String string : RefinerMenuConfig.confirmButton.getItemMeta().getLore())
+                for (String string : RefinerMenuConfig.getConfirmButton().getItemMeta().getLore())
                     lore.add(string);
-                RefinerMenuConfig.confirmButton.getItemMeta().setLore(lore);
+                RefinerMenuConfig.getConfirmButton().getItemMeta().setLore(lore);
                 ItemMeta clonedMeta = clonedConfirmButton.getItemMeta();
                 clonedMeta.setLore(lore);
                 clonedConfirmButton.setItemMeta(clonedMeta);
@@ -125,7 +125,7 @@ public class RefinerMenu extends EliteMenu {
 
             }
 
-            if (inputSlots.contains(i) || RefinerMenuConfig.outputSlots.contains(i))
+            if (inputSlots.contains(i) || RefinerMenuConfig.getOutputSlots().contains(i))
                 continue;
 
             refinerInventory.setItem(i, ItemStackGenerator.generateItemStack(Material.GLASS_PANE));
@@ -155,7 +155,7 @@ public class RefinerMenu extends EliteMenu {
                 boolean isFull = true;
 
                 //If the shop is full, don't let the player put stuff in it
-                for (int i : RefinerMenuConfig.inputSlots)
+                for (int i : RefinerMenuConfig.getInputSlots())
                     if (shopInventory.getItem(i) == null)
                         isFull = false;
 
@@ -169,7 +169,7 @@ public class RefinerMenu extends EliteMenu {
                         break;
                     }
 
-                refreshOutputVisuals(shopInventory, RefinerMenuConfig.outputSlots, player);
+                refreshOutputVisuals(shopInventory, RefinerMenuConfig.getOutputSlots(), player);
 
             } else if (EliteMenu.isTopMenu(event)) {
                 //CASE: Player clicked on the shop
@@ -185,9 +185,9 @@ public class RefinerMenu extends EliteMenu {
                         for (ItemStack itemStack : calculateOutput(shopInventory, player)[i])
                             player.getInventory().addItem(itemStack);
 
-                    for (int slot : RefinerMenuConfig.inputSlots)
+                    for (int slot : RefinerMenuConfig.getInputSlots())
                         shopInventory.setItem(slot, null);
-                    for (int slot : RefinerMenuConfig.outputSlots)
+                    for (int slot : RefinerMenuConfig.getOutputSlots())
                         shopInventory.setItem(slot, null);
 
                     return;
@@ -205,7 +205,7 @@ public class RefinerMenu extends EliteMenu {
                 //If player clicks on one of the items already in the shop, return to their inventory
                 playerInventory.addItem(event.getCurrentItem());
                 shopInventory.clear(event.getSlot());
-                refreshOutputVisuals(shopInventory, RefinerMenuConfig.outputSlots, player);
+                refreshOutputVisuals(shopInventory, RefinerMenuConfig.getOutputSlots(), player);
 
             }
 

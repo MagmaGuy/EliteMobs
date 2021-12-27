@@ -32,7 +32,7 @@ public class PopupDisplay implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onHit(EliteMobDamagedByPlayerEvent event) {
-        if (!MobCombatSettingsConfig.displayDamageOnHit) return;
+        if (!MobCombatSettingsConfig.isDisplayDamageOnHit()) return;
 
         Location mobLocation = event.getEliteMobEntity().getLocation();
 
@@ -69,7 +69,7 @@ public class PopupDisplay implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onHit(EliteMobHealEvent event) {
-        if (!MobCombatSettingsConfig.displayDamageOnHit) return;
+        if (!MobCombatSettingsConfig.isDisplayDamageOnHit()) return;
         if (!event.getEliteEntity().isValid()) return;
 
         Vector offset = new Vector(ThreadLocalRandom.current().nextDouble(-1, 1), 0, ThreadLocalRandom.current().nextDouble(-1, 1));

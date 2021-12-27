@@ -31,11 +31,11 @@ import java.util.*;
 
 public class Explosion {
 
-    public static HashSet<Explosion> explosions = new HashSet();
+    private static final HashSet<Explosion> explosions = new HashSet<>();
     private final int delayBeforeRegen = 2;
-    public ArrayList<BlockState> detonatedBlocks = new ArrayList<>();
+    public final List<BlockState> detonatedBlocks = new ArrayList<>();
 
-    public Explosion(ArrayList<BlockState> detonatedBlocks) {
+    public Explosion(List<BlockState> detonatedBlocks) {
         if (detonatedBlocks == null || detonatedBlocks.isEmpty()) return;
         //sort blocks bottom to top
         HashMap<BlockState, Integer> unsortedBlocks = new HashMap<>();
@@ -68,19 +68,18 @@ public class Explosion {
 
     private static void generateExplosion(List<Block> blockList, Entity entity, ElitePower elitePower, Location explosionSource) {
         if (!DefaultConfig.doExplosionRegen) return;
-        if (EliteMobs.worldGuardIsEnabled)
-            if (explosionSource != null)
-                if (!WorldGuardFlagChecker.doExplosionRegenFlag(explosionSource))
-                    return;
+        if (EliteMobs.worldGuardIsEnabled &&
+                explosionSource != null &&
+                !WorldGuardFlagChecker.doExplosionRegenFlag(explosionSource))
+            return;
 
         ArrayList<BlockState> blockStates = new ArrayList<>();
 
         for (Block block : blockList) {
             if (block.getType().isAir() ||
                     block.getType().equals(Material.FIRE) ||
-                    block.isLiquid())
-                continue;
-            if (EntityTracker.isTemporaryBlock(block))
+                    block.isLiquid() ||
+                    EntityTracker.isTemporaryBlock(block))
                 continue;
             nearbyBlockScan(blockStates, block.getState());
         }
@@ -99,16 +98,14 @@ public class Explosion {
                     elitePower = ElitePower.getElitePower(EliteProjectile.readExplosivePower((Projectile) entity)),
                     entity.getLocation(),
                     blockStates);
-            if (eliteExplosionEvent.isCancelled()) return;
-
         } else {
             eliteExplosionEvent = new EliteExplosionEvent(
                     eliteEntity,
                     elitePower,
                     entity.getLocation(),
                     blockStates);
-            if (eliteExplosionEvent.isCancelled()) return;
         }
+        if (eliteExplosionEvent.isCancelled()) return;
 
         if (explosionSource != null)
             eliteExplosionEvent.setExplosionSourceLocation(explosionSource);

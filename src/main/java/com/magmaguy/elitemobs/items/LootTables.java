@@ -51,14 +51,14 @@ public class LootTables implements Listener {
                 new ItemLootShower(eliteEntity.getLevel(), eliteEntity.getUnsyncedLivingEntity().getLocation(), player);
 
 
-            if (AdventurersGuildConfig.guildLootLimiter) {
+            if (AdventurersGuildConfig.isGuildLootLimiter()) {
                 double itemTier = setItemTier(eliteEntity.getLevel());
                 if (itemTier > GuildRank.getActiveGuildRank(player) * 10) {
                     itemTier = GuildRank.getActiveGuildRank(player) * 10;
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(AdventurersGuildConfig.lootLimiterMessage));
+                            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(AdventurersGuildConfig.getLootLimiterMessage()));
                         }
                     }.runTaskLater(MetadataHandler.PLUGIN, 20 * 10);
                 }
@@ -70,7 +70,7 @@ public class LootTables implements Listener {
 
 
     public static void initialize() {
-        proceduralItemsOn = ProceduralItemGenerationSettingsConfig.doProceduralItemDrops;
+        proceduralItemsOn = ProceduralItemGenerationSettingsConfig.isDoProceduralItemDrops();
         customItemsOn = ItemSettingsConfig.isDoEliteMobsLoot() && !CustomItem.getCustomItemStackList().isEmpty();
         weighedItemsExist = CustomItem.getWeighedFixedItems() != null && !CustomItem.getWeighedFixedItems().isEmpty();
         fixedItemsExist = CustomItem.getFixedItems() != null && !CustomItem.getFixedItems().isEmpty();

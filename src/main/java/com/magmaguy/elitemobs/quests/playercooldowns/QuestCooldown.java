@@ -15,14 +15,14 @@ import java.util.UUID;
 public class QuestCooldown implements Serializable {
     @Getter
     private final String permission;
-    private boolean permanent = true;
+    private final boolean permanent;
     @Getter
     private long targetUnixTime = 0;
     @Getter
     private transient BukkitTask bukkitTask = null;
 
     public QuestCooldown(int delayInMinutes, String permission, UUID player) {
-        this.permanent = delayInMinutes == 0;
+        this.permanent = delayInMinutes < 1;
         if (!permanent)
             this.targetUnixTime = System.currentTimeMillis() + 60L * 1000 * delayInMinutes;
         this.permission = permission;
@@ -30,20 +30,23 @@ public class QuestCooldown implements Serializable {
     }
 
     public void startCooldown(UUID player) {
+        long delay = Math.max((targetUnixTime - System.currentTimeMillis()) / 1000L * 20L, 0L);
         PermissionAttachment permissionAttachment = Objects.requireNonNull(Bukkit.getPlayer(player)).addAttachment(MetadataHandler.PLUGIN);
+        if (!permanent && delay < 1) {
+            permissionAttachment.unsetPermission(permission);
+            return;
+        }
         permissionAttachment.setPermission(permission, true);
-        PlayerData.updatePlayerQuestCooldowns(player);
-        long delay = Math.min((targetUnixTime - System.currentTimeMillis()) / 1000L * 20L, 0L);
-        bukkitTask = new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (Bukkit.getPlayer(player) == null) return;
-                PermissionAttachment permissionAttachment = Objects.requireNonNull(Bukkit.getPlayer(player)).addAttachment(MetadataHandler.PLUGIN);
-                permissionAttachment.setPermission(permission, false);
-                PlayerData.updatePlayerQuestCooldowns(player);
-
-            }
-        }.runTaskLater(MetadataHandler.PLUGIN, delay);
+        if (!permanent)
+            bukkitTask = new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if (Bukkit.getPlayer(player) != null) {
+                        permissionAttachment.unsetPermission(permission);
+                        PlayerData.updatePlayerQuestCooldowns(player, PlayerData.getPlayerQuestCooldowns(player));
+                    }
+                }
+            }.runTaskLater(MetadataHandler.PLUGIN, delay);
     }
 
 }

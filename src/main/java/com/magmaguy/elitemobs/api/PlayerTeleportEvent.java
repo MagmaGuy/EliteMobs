@@ -9,6 +9,8 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
 
+import java.util.Objects;
+
 public class PlayerTeleportEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
@@ -68,14 +70,14 @@ public class PlayerTeleportEvent extends Event implements Cancellable {
     public void executeTeleport() {
         player.teleport(destination);
         for (Minidungeon minidungeon : Minidungeon.minidungeons.values())
-            if (minidungeon.isInstalled())
-                if (minidungeon.getDungeonPackagerConfigFields().getDungeonLocationType().equals(DungeonPackagerConfigFields.DungeonLocationType.WORLD))
-                    if (minidungeon.getWorld().equals(originalLocation.getWorld()))
-                        return;
-
-        if (AdventurersGuildConfig.guildWorldLocation != null)
-            if (AdventurersGuildConfig.guildWorldLocation.getWorld().equals(originalLocation.getWorld()))
+            if (minidungeon.isInstalled() &&
+                    minidungeon.getDungeonPackagerConfigFields().getDungeonLocationType().equals(DungeonPackagerConfigFields.DungeonLocationType.WORLD) &&
+                    minidungeon.getWorld().equals(originalLocation.getWorld()))
                 return;
+
+        if (AdventurersGuildConfig.getGuildWorldLocation() != null &&
+                Objects.equals(AdventurersGuildConfig.getGuildWorldLocation().getWorld(), originalLocation.getWorld()))
+            return;
         PlayerData.setBackTeleportLocation(player, originalLocation);
     }
 

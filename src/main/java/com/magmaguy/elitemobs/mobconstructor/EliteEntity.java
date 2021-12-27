@@ -338,7 +338,7 @@ public class EliteEntity implements SimplePersistentEntityInterface {
     }
 
     private void setArmor() {
-        if (!MobCombatSettingsConfig.doEliteArmor) return;
+        if (!MobCombatSettingsConfig.isDoEliteArmor()) return;
 
         if (!(livingEntity instanceof Zombie || livingEntity instanceof PigZombie ||
                 livingEntity instanceof Skeleton || livingEntity instanceof WitherSkeleton)) return;
@@ -348,25 +348,24 @@ public class EliteEntity implements SimplePersistentEntityInterface {
         livingEntity.getEquipment().setChestplate(new ItemStack(Material.AIR));
         livingEntity.getEquipment().setHelmet(new ItemStack(Material.AIR));
 
-        if (level >= 5)
-            if (MobCombatSettingsConfig.doEliteHelmets)
+        if (level >= 5 && MobCombatSettingsConfig.isDoEliteHelmets())
                 livingEntity.getEquipment().setHelmet(new ItemStack(Material.LEATHER_HELMET));
 
         if (level >= 10) livingEntity.getEquipment().setBoots(new ItemStack(Material.LEATHER_BOOTS));
         if (level >= 15) livingEntity.getEquipment().setLeggings(new ItemStack(Material.LEATHER_LEGGINGS));
         if (level >= 20) livingEntity.getEquipment().setChestplate(new ItemStack(Material.LEATHER_CHESTPLATE));
-        if (level >= 25) if (MobCombatSettingsConfig.doEliteHelmets)
+        if (level >= 25 && MobCombatSettingsConfig.isDoEliteHelmets())
             livingEntity.getEquipment().setHelmet(new ItemStack(Material.CHAINMAIL_HELMET));
         if (level >= 30) livingEntity.getEquipment().setBoots(new ItemStack(Material.CHAINMAIL_BOOTS));
         if (level >= 35) livingEntity.getEquipment().setLeggings(new ItemStack(Material.CHAINMAIL_LEGGINGS));
         if (level >= 40) livingEntity.getEquipment().setChestplate(new ItemStack(Material.CHAINMAIL_CHESTPLATE));
-        if (level >= 45) if (MobCombatSettingsConfig.doEliteHelmets)
+        if (level >= 45 && MobCombatSettingsConfig.isDoEliteHelmets())
             livingEntity.getEquipment().setHelmet(new ItemStack(Material.IRON_HELMET));
         if (level >= 50) livingEntity.getEquipment().setBoots(new ItemStack(Material.IRON_BOOTS));
         if (level >= 55) livingEntity.getEquipment().setLeggings(new ItemStack(Material.IRON_LEGGINGS));
         if (level >= 60) livingEntity.getEquipment().setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
         if (level >= 65) livingEntity.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
-        if (level >= 70) if (MobCombatSettingsConfig.doEliteHelmets)
+        if (level >= 70 && MobCombatSettingsConfig.isDoEliteHelmets())
             livingEntity.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
         if (level >= 75) livingEntity.getEquipment().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
         if (level >= 80) livingEntity.getEquipment().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
@@ -615,6 +614,7 @@ public class EliteEntity implements SimplePersistentEntityInterface {
 
     public Location getLocation() {
         if (livingEntity != null) return livingEntity.getLocation();
+        if (unsyncedLivingEntity != null) return unsyncedLivingEntity.getLocation();
         return null;
     }
 

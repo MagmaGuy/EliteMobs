@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.menus.MenusConfigFields;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import com.magmaguy.elitemobs.utils.ItemStackSerializer;
+import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -11,19 +12,32 @@ import java.util.Arrays;
 import java.util.List;
 
 public class RefinerMenuConfig extends MenusConfigFields {
-    public static String shopName;
-    public static ItemStack infoButton;
-    public static ItemStack inputInfoButton;
-    public static ItemStack outputInfoButton;
-    public static int infoSlot;
-    public static int inputInformationSlot;
-    public static int outputInformationSlot;
-    public static List<Integer> inputSlots;
-    public static List<Integer> outputSlots;
-    public static ItemStack cancelButton;
-    public static int cancelSlot;
-    public static ItemStack confirmButton;
-    public static int confirmSlot;
+    @Getter
+    private static String shopName;
+    @Getter
+    private static ItemStack infoButton;
+    @Getter
+    private static ItemStack inputInfoButton;
+    @Getter
+    private static ItemStack outputInfoButton;
+    @Getter
+    private static int infoSlot;
+    @Getter
+    private static int inputInformationSlot;
+    @Getter
+    private static int outputInformationSlot;
+    @Getter
+    private static List<Integer> inputSlots;
+    @Getter
+    private static List<Integer> outputSlots;
+    @Getter
+    private static ItemStack cancelButton;
+    @Getter
+    private static int cancelSlot;
+    @Getter
+    private static ItemStack confirmButton;
+    @Getter
+    private static int confirmSlot;
 
     public RefinerMenuConfig() {
         super("refiner_menu", true);

@@ -88,16 +88,16 @@ public class MaterialGenerator {
 
     public static void initializeValidProceduralMaterials() {
 
-        if (ProceduralItemGenerationSettingsConfig.validMaterials.isEmpty()) {
+        if (ProceduralItemGenerationSettingsConfig.getValidMaterials().isEmpty()) {
             ProceduralItemGenerationSettingsConfig.cacheMaterials();
-            if (ProceduralItemGenerationSettingsConfig.validMaterials.isEmpty()) {
+            if (ProceduralItemGenerationSettingsConfig.getValidMaterials().isEmpty()) {
                 new WarningMessage("No valid materials detected for the procedural item settings. If you are trying to disable" +
                         " them, use the 'dropProcedurallyGeneratedItems' option instead. Warn the developer.");
                 return;
             }
         }
 
-        for (String string : ProceduralItemGenerationSettingsConfig.validMaterials) {
+        for (String string : ProceduralItemGenerationSettingsConfig.getValidMaterials()) {
             try {
                 validProceduralMaterials.add(getMaterial(string));
             } catch (Exception e) {

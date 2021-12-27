@@ -28,12 +28,12 @@ public class PlayerPotionEffects implements Listener {
             @Override
             public void run() {
                 //scan through what players are wearing
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    for (ElitePotionEffect elitePotionEffect : ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getContinuousPotionEffects(true))
-                        doContinuousPotionEffect(elitePotionEffect, player);
-                }
+                for (Player player : Bukkit.getOnlinePlayers())
+                    if (ElitePlayerInventory.playerInventories.get(player.getUniqueId()) != null)
+                        for (ElitePotionEffect elitePotionEffect : ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getContinuousPotionEffects(true))
+                            doContinuousPotionEffect(elitePotionEffect, player);
             }
-        }.runTaskTimer(MetadataHandler.PLUGIN, 20, 20 * 1);
+        }.runTaskTimer(MetadataHandler.PLUGIN, 20L, 20L);
     }
 
     public static void addOnHitCooldown(HashSet<Player> cooldownList, Player player, long delay) {

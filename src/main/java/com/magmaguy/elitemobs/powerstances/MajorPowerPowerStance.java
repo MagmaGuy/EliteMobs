@@ -26,9 +26,9 @@ public class MajorPowerPowerStance implements Listener {
 
     public MajorPowerPowerStance(EliteEntity eliteEntity) {
 
-        if (!MobCombatSettingsConfig.enableVisualEffectsForNaturalMobs)
+        if (!MobCombatSettingsConfig.isEnableVisualEffectsForNaturalMobs())
             return;
-        if (MobCombatSettingsConfig.disableVisualEffectsForSpawnerMobs && !eliteEntity.isNaturalEntity())
+        if (MobCombatSettingsConfig.isDisableVisualEffectsForSpawnerMobs() && !eliteEntity.isNaturalEntity())
             return;
 
         this.eliteEntity = eliteEntity;
@@ -42,7 +42,7 @@ public class MajorPowerPowerStance implements Listener {
         /*
         Obfuscate powers to prevent TPS loss
          */
-        if (MobCombatSettingsConfig.obfuscateMobPowers)
+        if (MobCombatSettingsConfig.isObfuscateMobPowers())
             if (eliteEntity.isVisualEffectObfuscated()) {
                 Object[][] multiDimensionalTrailTracker = new Object[trackAmount][individualEffectsPerTrack];
 

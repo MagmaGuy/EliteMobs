@@ -4,24 +4,63 @@ import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.menus.MenusConfigFields;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import com.magmaguy.elitemobs.utils.ItemStackSerializer;
+import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
 
 public class GuildRankMenuConfig extends MenusConfigFields {
-    public static String menuName;
-    public static String lowTierWarning, normalTierWarning;
-    public static ItemStack unlockedButton, lockedButton, currentButton, nextButton, prestigeLockedButton, prestigeNextUnlockButton;
-    public static String notEnoughCurrencyMessage, unlockMessage, broadcastMessage, failedMessage;
-    public static String spawnRateModifierMessage, lootModifierMessage, difficultyModifierMessage, lootTierMessage, currencyBonusMessage,
-            healthBonusMessage, critBonusMessage, dodgeBonusMessage;
+    @Getter
+    private static String menuName;
+    @Getter
+    private static String lowTierWarning;
+    @Getter
+    private static String normalTierWarning;
+    @Getter
+    private static ItemStack unlockedButton;
+    @Getter
+    private static ItemStack lockedButton;
+    @Getter
+    private static ItemStack currentButton;
+    @Getter
+    private static ItemStack nextButton;
+    @Getter
+    private static ItemStack prestigeLockedButton;
+    @Getter
+    private static ItemStack prestigeNextUnlockButton;
+    @Getter
+    private static String notEnoughCurrencyMessage;
+    @Getter
+    private static String unlockMessage;
+    @Getter
+    private static String broadcastMessage;
+    @Getter
+    private static String failedMessage;
+    @Getter
+    private static String spawnRateModifierMessage;
+    @Getter
+    private static String lootModifierMessage;
+    @Getter
+    private static String difficultyModifierMessage;
+    @Getter
+    private static String lootTierMessage;
+    @Getter
+    private static String currencyBonusMessage;
+    @Getter
+    private static String healthBonusMessage;
+    @Getter
+    private static String critBonusMessage;
+    @Getter
+    private static String dodgeBonusMessage;
+
     public GuildRankMenuConfig() {
         super("guild_rank_selector_menu", true);
     }
 
     @Override
     public void processAdditionalFields() {
+
         menuName = ConfigurationEngine.setString(fileConfiguration, "questTierSelectorMenuTitle", "[EM] Guild Rank Selection");
         lowTierWarning = ConfigurationEngine.setString(fileConfiguration, "lowTierWarning", "&cElites can't drop better loot!");
         normalTierWarning = ConfigurationEngine.setString(fileConfiguration, "normalTierWarning", "&aElite can drop better loot!");
