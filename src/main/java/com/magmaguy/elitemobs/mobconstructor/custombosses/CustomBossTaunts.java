@@ -12,7 +12,7 @@ public class CustomBossTaunts implements Listener {
         if (!(eliteMobDamagedEvent.getEliteMobEntity() instanceof CustomBossEntity)) return;
         if (((CustomBossEntity) eliteMobDamagedEvent.getEliteMobEntity()).getCustomBossesConfigFields().getOnDamagedMessages().isEmpty())
             return;
-        Taunt.nametagProcessor(eliteMobDamagedEvent.getEliteMobEntity().getLivingEntity(),
+        Taunt.nameTagProcessor(eliteMobDamagedEvent.getEliteMobEntity(), eliteMobDamagedEvent.getEliteMobEntity().getLivingEntity(),
                 ((CustomBossEntity) eliteMobDamagedEvent.getEliteMobEntity()).getCustomBossesConfigFields().getOnDamagedMessages());
     }
 
@@ -21,7 +21,7 @@ public class CustomBossTaunts implements Listener {
         if (!(playerDamagedByEliteMobEvent.getEliteMobEntity() instanceof CustomBossEntity)) return;
         if (((CustomBossEntity) playerDamagedByEliteMobEvent.getEliteMobEntity()).getCustomBossesConfigFields().getOnDamageMessages().isEmpty())
             return;
-        Taunt.nametagProcessor(playerDamagedByEliteMobEvent.getEliteMobEntity().getLivingEntity(),
+        Taunt.nameTagProcessor(playerDamagedByEliteMobEvent.getEliteMobEntity(), playerDamagedByEliteMobEvent.getEliteMobEntity().getLivingEntity(),
                 ((CustomBossEntity) playerDamagedByEliteMobEvent.getEliteMobEntity()).getCustomBossesConfigFields().getOnDamageMessages());
     }
 }

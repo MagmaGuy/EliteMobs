@@ -105,10 +105,10 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
             if (!ranged)
                 finalDamage = getCooledAttackStrength(player) *
                         (playerWeaponTier + secondaryEnchantmentDamageIncrease(player, eliteEntity.getLivingEntity())) *
-                        MobCombatSettingsConfig.damageToEliteMultiplier;
+                        MobCombatSettingsConfig.getDamageToEliteMultiplier();
             else
                 finalDamage = (playerWeaponTier + secondaryEnchantmentDamageIncrease(player, eliteEntity.getLivingEntity())) *
-                        MobCombatSettingsConfig.damageToEliteMultiplier;
+                        MobCombatSettingsConfig.getDamageToEliteMultiplier();
 
             finalDamage *= damageModifier;
 

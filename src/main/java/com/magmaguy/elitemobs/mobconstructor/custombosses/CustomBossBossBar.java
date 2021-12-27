@@ -41,7 +41,7 @@ public class CustomBossBossBar {
     private void sendLocation() {
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (!player.getWorld().equals(customBossEntity.getLocation().getWorld())) continue;
-            TextComponent interactiveMessage = new TextComponent(MobCombatSettingsConfig.bossLocationMessage);
+            TextComponent interactiveMessage = new TextComponent(MobCombatSettingsConfig.getBossLocationMessage());
             interactiveMessage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/elitemobs trackcustomboss " + customBossEntity.getEliteUUID()));
             interactiveMessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(TranslationConfig.TRACK_MESSAGE.replace("$name", customBossEntity.getName())).create()));
             player.spigot().sendMessage(interactiveMessage);
@@ -80,7 +80,7 @@ public class CustomBossBossBar {
         if (customBossEntity.getCustomBossesConfigFields().getLocationMessage().contains("$distance") ||
                 customBossEntity.getCustomBossesConfigFields().getLocationMessage().contains("$location")) {
             if (!player.getLocation().getWorld().equals(customBossEntity.getLocation().getWorld()))
-                return ChatColorConverter.convert(MobCombatSettingsConfig.defaultOtherWorldBossLocationMessage
+                return ChatColorConverter.convert(MobCombatSettingsConfig.getDefaultOtherWorldBossLocationMessage()
                         .replace("$name", customBossEntity.getName()));
 
             return ChatColorConverter.convert(customBossEntity.getCustomBossesConfigFields().getLocationMessage()

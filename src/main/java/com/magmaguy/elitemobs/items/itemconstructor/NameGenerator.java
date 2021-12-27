@@ -10,23 +10,22 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class NameGenerator {
-
-    private static final List<String> nouns = ProceduralItemGenerationSettingsConfig.nouns;
-    private static final List<String> adjectives = ProceduralItemGenerationSettingsConfig.adjectives;
-    private static final List<String> verbs = ProceduralItemGenerationSettingsConfig.verbs;
-    private static final List<String> verbers = ProceduralItemGenerationSettingsConfig.verbers;
+    private static final List<String> nouns = ProceduralItemGenerationSettingsConfig.getNouns();
+    private static final List<String> adjectives = ProceduralItemGenerationSettingsConfig.getAdjectives();
+    private static final List<String> verbs = ProceduralItemGenerationSettingsConfig.getVerbs();
+    private static final List<String> verbers = ProceduralItemGenerationSettingsConfig.getVerbers();
+    private NameGenerator() {
+    }
 
     public static String generateName(String rawName) {
-
         return ChatColorConverter.convert(rawName);
-
     }
 
     public static String generateName(Material material) {
 
-        int nounConstructorSelector = ThreadLocalRandom.current().nextInt(ProceduralItemGenerationSettingsConfig.nameFormat.size());
+        int nounConstructorSelector = ThreadLocalRandom.current().nextInt(ProceduralItemGenerationSettingsConfig.getNameFormat().size());
 
-        return (ProceduralItemGenerationSettingsConfig.nameFormat.get(nounConstructorSelector))
+        return (ProceduralItemGenerationSettingsConfig.getNameFormat().get(nounConstructorSelector))
                 .replace("$noun", nouns.get(ThreadLocalRandom.current().nextInt(nouns.size())))
                 .replace("$verb-er", verbers.get(ThreadLocalRandom.current().nextInt(verbers.size())))
                 .replace("$verb", verbs.get(ThreadLocalRandom.current().nextInt(verbs.size())))
@@ -43,72 +42,72 @@ public class NameGenerator {
             case IRON_SWORD:
             case STONE_SWORD:
             case WOODEN_SWORD:
-                return ProceduralItemGenerationSettingsConfig.swordName;
+                return ProceduralItemGenerationSettingsConfig.getSwordName();
             case BOW:
-                return ProceduralItemGenerationSettingsConfig.bowName;
+                return ProceduralItemGenerationSettingsConfig.getBowName();
             case DIAMOND_PICKAXE:
             case GOLDEN_PICKAXE:
             case IRON_PICKAXE:
             case STONE_PICKAXE:
             case WOODEN_PICKAXE:
-                return ProceduralItemGenerationSettingsConfig.pickaxeName;
+                return ProceduralItemGenerationSettingsConfig.getPickaxeName();
             case DIAMOND_SHOVEL:
             case GOLDEN_SHOVEL:
             case IRON_SHOVEL:
             case STONE_SHOVEL:
             case WOODEN_SHOVEL:
-                return ProceduralItemGenerationSettingsConfig.spadeName;
+                return ProceduralItemGenerationSettingsConfig.getSpadeName();
             case DIAMOND_HOE:
             case GOLDEN_HOE:
             case IRON_HOE:
             case STONE_HOE:
             case WOODEN_HOE:
-                return ProceduralItemGenerationSettingsConfig.hoeName;
+                return ProceduralItemGenerationSettingsConfig.getHoeName();
             case DIAMOND_AXE:
             case GOLDEN_AXE:
             case IRON_AXE:
             case STONE_AXE:
             case WOODEN_AXE:
-                return ProceduralItemGenerationSettingsConfig.axeName;
+                return ProceduralItemGenerationSettingsConfig.getAxeName();
             case CHAINMAIL_HELMET:
             case DIAMOND_HELMET:
             case GOLDEN_HELMET:
             case IRON_HELMET:
             case LEATHER_HELMET:
             case TURTLE_HELMET:
-                return ProceduralItemGenerationSettingsConfig.helmetName;
+                return ProceduralItemGenerationSettingsConfig.getHelmetName();
             case CHAINMAIL_CHESTPLATE:
             case DIAMOND_CHESTPLATE:
             case GOLDEN_CHESTPLATE:
             case IRON_CHESTPLATE:
             case LEATHER_CHESTPLATE:
-                return ProceduralItemGenerationSettingsConfig.chestplateName;
+                return ProceduralItemGenerationSettingsConfig.getChestplateName();
             case CHAINMAIL_LEGGINGS:
             case DIAMOND_LEGGINGS:
             case GOLDEN_LEGGINGS:
             case IRON_LEGGINGS:
             case LEATHER_LEGGINGS:
-                return ProceduralItemGenerationSettingsConfig.leggingsName;
+                return ProceduralItemGenerationSettingsConfig.getLeggingsName();
             case CHAINMAIL_BOOTS:
             case DIAMOND_BOOTS:
             case GOLDEN_BOOTS:
             case IRON_BOOTS:
             case LEATHER_BOOTS:
-                return ProceduralItemGenerationSettingsConfig.bootsName;
+                return ProceduralItemGenerationSettingsConfig.getBootsName();
             case SHEARS:
-                return ProceduralItemGenerationSettingsConfig.shearsName;
+                return ProceduralItemGenerationSettingsConfig.getShearsName();
             case FISHING_ROD:
-                return ProceduralItemGenerationSettingsConfig.fishingRodName;
+                return ProceduralItemGenerationSettingsConfig.getFishingRodName();
             case SHIELD:
-                return ProceduralItemGenerationSettingsConfig.shieldName;
+                return ProceduralItemGenerationSettingsConfig.getShieldName();
             case TRIDENT:
-                return ProceduralItemGenerationSettingsConfig.tridentName;
+                return ProceduralItemGenerationSettingsConfig.getTridentName();
             case CROSSBOW:
-                return ProceduralItemGenerationSettingsConfig.crossbowName;
+                return ProceduralItemGenerationSettingsConfig.getCrossbowName();
         }
 
-        if (ProceduralItemGenerationSettingsConfig.fileConfiguration.getString("materialNames." + material.toString().toLowerCase()) != null)
-            return ProceduralItemGenerationSettingsConfig.fileConfiguration.getString("materialNames." + material.toString().toLowerCase());
+        if (ProceduralItemGenerationSettingsConfig.getFileConfiguration().getString("materialNames." + material.toString().toLowerCase()) != null)
+            return ProceduralItemGenerationSettingsConfig.getFileConfiguration().getString("materialNames." + material.toString().toLowerCase());
 
         Bukkit.getLogger().warning("[EliteMobs] Found unexpected material type in procedurally generated loot. Can't generate item type name.");
         Bukkit.getLogger().warning("[EliteMobs] Material name: " + material);

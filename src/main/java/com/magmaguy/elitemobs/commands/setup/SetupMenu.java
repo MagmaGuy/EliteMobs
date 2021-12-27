@@ -59,7 +59,7 @@ public class SetupMenu {
             material = Material.RED_STAINED_GLASS_PANE;
             lore = ChatColor.RED + "Not downloaded! Click to download!";
         } else {
-            if (!AdventurersGuildConfig.guildWorldIsEnabled) {
+            if (!AdventurersGuildConfig.isGuildWorldIsEnabled()) {
                 material = Material.ORANGE_STAINED_GLASS_PANE;
                 lore = ChatColor.RED + "Not setup! Click to install!";
             } else {
@@ -196,7 +196,7 @@ public class SetupMenu {
                     player.sendMessage("----------------------------------------------------");
                 } else {
                     //case for install
-                    if (!AdventurersGuildConfig.guildWorldIsEnabled) {
+                    if (!AdventurersGuildConfig.isGuildWorldIsEnabled()) {
                         try {
                             player.closeInventory();
                             player.sendMessage("----------------------------------------------------");
@@ -208,10 +208,10 @@ public class SetupMenu {
                                 player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2The Adventurer's Guild Hub has been protected against griefing and mob spawning (among others)!"));
                             } else
                                 player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4It is highly recommended you install WorldGuard to protect the Adventurer's Guild Hub World! Reinstall the hub through /em setup after installing WorldGuard in order to automatically protect the area!"));
-                            PlayerTeleportEvent playerTeleportEvent = new PlayerTeleportEvent(player, AdventurersGuildConfig.guildWorldLocation);
+                            PlayerTeleportEvent playerTeleportEvent = new PlayerTeleportEvent(player, AdventurersGuildConfig.getGuildWorldLocation());
                             new EventCaller(playerTeleportEvent);
                             if (!playerTeleportEvent.isCancelled())
-                                player.teleport(AdventurersGuildConfig.guildWorldLocation);
+                                player.teleport(AdventurersGuildConfig.getGuildWorldLocation());
                             player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2Successfully installed Adventurer's Guild Hub! Do &a/ag &2to go there and talk to the transporter or open the Teleports page in /em to go back!"));
                             player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2Need help? &9&n" + DiscordLinks.mainLink));
                             player.sendMessage("----------------------------------------------------");
@@ -225,8 +225,8 @@ public class SetupMenu {
                     } else {
                         try {
                             player.closeInventory();
-                            Bukkit.unloadWorld(AdventurersGuildConfig.guildWorldLocation.getWorld(), true);
-                            AdventurersGuildConfig.guildWorldLocation = null;
+                            Bukkit.unloadWorld(AdventurersGuildConfig.getGuildWorldLocation().getWorld(), true);
+                            AdventurersGuildConfig.setGuildWorldLocation(null);
                             AdventurersGuildConfig.toggleGuildInstall();
                             player.sendMessage("----------------------------------------------------");
                             player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2Successfully uninstalled Adventurer's Guild Hub!"));

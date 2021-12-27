@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.utils.ChunkVectorizer;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -22,17 +23,15 @@ import java.util.List;
 
 public class SimplePersistentEntity {
 
-    //private static final HashSet<Integer> chunkLocations = new HashSet<>();
     //Values are stored for the chunk load events
-    public static ArrayListMultimap<Integer, SimplePersistentEntity> persistentEntities = ArrayListMultimap.create();
-    public static ArrayListMultimap<String, SimplePersistentEntity> persistentEntitiesForQueuedWorlds = ArrayListMultimap.create();
-
-
-    public int chunk;
-    public Location location;
-    public CustomBossEntity customBossEntity;
-    public String worldName;
-    public NPCEntity npcEntity;
+    @Getter
+    private static final ArrayListMultimap<Integer, SimplePersistentEntity> persistentEntities = ArrayListMultimap.create();
+    private static final ArrayListMultimap<String, SimplePersistentEntity> persistentEntitiesForQueuedWorlds = ArrayListMultimap.create();
+    private final Location location;
+    private int chunk;
+    private CustomBossEntity customBossEntity;
+    private String worldName;
+    private NPCEntity npcEntity;
 
     /**
      * Used to store the locations of custom bosses that have gone into unloaded chunks.
@@ -74,7 +73,7 @@ public class SimplePersistentEntity {
      * Used to add persistent entities to the list. This inserts an arbitrary amount of persistent entities into a chunk.
      * Called when a SimplePersistentEntity is created.
      *
-     * @param simplePersistentEntity
+     * @param simplePersistentEntity Entity to be added
      */
     private static void addPersistentEntity(SimplePersistentEntity simplePersistentEntity) {
         persistentEntities.put(simplePersistentEntity.chunk, simplePersistentEntity);
@@ -84,67 +83,22 @@ public class SimplePersistentEntity {
         persistentEntitiesForQueuedWorlds.put(simplePersistentEntity.worldName, simplePersistentEntity);
     }
 
-    private static int chunkLocation(Chunk chunk) {
-        return ChunkVectorizer.hash(chunk);
-    }
-
-    /**
-     * Behavior that runs when a chunk loads, spawning the entity
-     *
-     * @param chunkLocation
-     */
-    private static void loadChunk(int chunkLocation, List<SimplePersistentEntity> simplePersistentEntityList) {
-        simplePersistentEntityList.forEach(simplePersistentEntity -> {
-            if (simplePersistentEntity.customBossEntity != null)
-                simplePersistentEntity.customBossEntity.chunkLoad();
-            else if (simplePersistentEntity.npcEntity != null)
-                simplePersistentEntity.npcEntity.chunkLoad();
-        });
-        persistentEntities.removeAll(chunkLocation);
-        //chunkLocations.remove(chunkLocation);
-    }
-
-    private static void unloadWorld(World world) {
-        persistentEntities.values().removeIf((simplePersistentEntity -> {
-            if (simplePersistentEntity.location == null) return false;
-            if (simplePersistentEntity.location.getWorld() == null) return false;
-            if (!simplePersistentEntity.location.getWorld().equals(world)) return false;
-            if (simplePersistentEntity.customBossEntity != null)
-                simplePersistentEntity.customBossEntity.worldUnload();
-            else if (simplePersistentEntity.npcEntity != null)
-                simplePersistentEntity.npcEntity.worldUnload();
-            return true;
-        }));
-    }
-
     public void remove() {
         persistentEntities.remove(this.chunk, this);
     }
 
     public static class PersistentEntityEvent implements Listener {
-        public static boolean ignore = false;
-        private static HashSet<Integer> loadingChunks = new HashSet<>();
+        private static final HashSet<Integer> loadingChunks = new HashSet<>();
 
-        @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-        public void worldLoadEvent(WorldLoadEvent event) {
-            if (persistentEntitiesForQueuedWorlds.get(event.getWorld().getName()) == null) return;
-            Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, (task) -> {
-                for (SimplePersistentEntity simplePersistentEntity : persistentEntitiesForQueuedWorlds.get(event.getWorld().getName()))
-                    if (simplePersistentEntity.customBossEntity != null)
-                        simplePersistentEntity.customBossEntity.worldLoad();
-                    else if (simplePersistentEntity.npcEntity != null)
-                        simplePersistentEntity.npcEntity.worldLoad();
-                persistentEntitiesForQueuedWorlds.removeAll(event.getWorld().getName());
-            }, 20);
+        private static int chunkLocation(Chunk chunk) {
+            return ChunkVectorizer.hash(chunk);
         }
 
         //Store world names and serialized locations
         @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
         public void chunkLoadEvent(ChunkLoadEvent event) {
-            if (ignore) return;
             int chunkLocation = chunkLocation(event.getChunk());
             List<SimplePersistentEntity> simplePersistentEntityList = new ArrayList<>(persistentEntities.get(chunkLocation));
-            if (persistentEntities.get(chunkLocation) == null) return;
             if (loadingChunks.contains(chunkLocation)) return;
             loadingChunks.add(chunkLocation);
             Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> loadChunk(chunkLocation, simplePersistentEntityList), 1);
@@ -154,6 +108,46 @@ public class SimplePersistentEntity {
         @EventHandler(ignoreCancelled = true)
         public void worldUnloadEvent(WorldUnloadEvent event) {
             unloadWorld(event.getWorld());
+        }
+
+        /**
+         * Behavior that runs when a chunk loads, spawning the entity
+         *
+         * @param chunkLocation
+         */
+        private static void loadChunk(int chunkLocation, List<SimplePersistentEntity> simplePersistentEntityList) {
+            simplePersistentEntityList.forEach(simplePersistentEntity -> {
+                if (simplePersistentEntity.customBossEntity != null)
+                    simplePersistentEntity.customBossEntity.chunkLoad();
+                else if (simplePersistentEntity.npcEntity != null)
+                    simplePersistentEntity.npcEntity.chunkLoad();
+            });
+            persistentEntities.removeAll(chunkLocation);
+        }
+
+        private static void unloadWorld(World world) {
+            persistentEntities.values().removeIf(simplePersistentEntity -> {
+                if (simplePersistentEntity.location == null) return false;
+                if (simplePersistentEntity.location.getWorld() == null) return false;
+                if (!simplePersistentEntity.location.getWorld().equals(world)) return false;
+                if (simplePersistentEntity.customBossEntity != null)
+                    simplePersistentEntity.customBossEntity.worldUnload();
+                else if (simplePersistentEntity.npcEntity != null)
+                    simplePersistentEntity.npcEntity.worldUnload();
+                return true;
+            });
+        }
+
+        @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+        public void worldLoadEvent(WorldLoadEvent event) {
+            Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, task -> {
+                for (SimplePersistentEntity simplePersistentEntity : persistentEntitiesForQueuedWorlds.get(event.getWorld().getName()))
+                    if (simplePersistentEntity.customBossEntity != null)
+                        simplePersistentEntity.customBossEntity.worldLoad();
+                    else if (simplePersistentEntity.npcEntity != null)
+                        simplePersistentEntity.npcEntity.worldLoad();
+                persistentEntitiesForQueuedWorlds.removeAll(event.getWorld().getName());
+            }, 20);
         }
     }
 }

@@ -28,7 +28,7 @@ public class HealthDisplay implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onHit(EliteMobDamagedByPlayerEvent event) {
-        if (!MobCombatSettingsConfig.displayHealthOnHit) return;
+        if (!MobCombatSettingsConfig.isDisplayHealthOnHit()) return;
         int maxHealth = (int) event.getEliteMobEntity().getMaxHealth();
         int currentHealth = (int) (event.getEliteMobEntity().getHealth() - event.getDamage());
         DialogArmorStand.createDialogArmorStand(event.getEliteMobEntity().getLivingEntity(), setHealthColor(currentHealth, maxHealth) + "" + currentHealth + "/" + maxHealth);

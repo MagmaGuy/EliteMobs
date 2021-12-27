@@ -98,7 +98,7 @@ public class SpecialLoot {
                 level = ThreadLocalRandom.current().nextInt(minLevel, maxLevel);
         }
         if (!ignorePlayerLevel)
-            if (AdventurersGuildConfig.guildLootLimiter)
+            if (AdventurersGuildConfig.isGuildLootLimiter())
                 level = Math.min(level, GuildRank.getMaxGuildRank(player) * 10);
         ItemStack itemStack;
         switch (specialLootType) {

@@ -23,7 +23,7 @@ public class ZombieParents extends MajorPower implements Listener {
         super(PowersConfig.getPower("zombie_parents.yml"));
     }
 
-    private static void startDialog(CustomBossEntity reinforcementMom, CustomBossEntity reinforcementDad, CustomBossEntity bossEntity) {
+    private static void startDialog(CustomBossEntity reinforcementMom, CustomBossEntity reinforcementDad, EliteEntity bossEntity) {
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -51,7 +51,7 @@ public class ZombieParents extends MajorPower implements Listener {
         }
     }
 
-    private static void doDialog(CustomBossEntity reinforcementDad, CustomBossEntity reinforcementMom, CustomBossEntity bossEntity) {
+    private static void doDialog(CustomBossEntity reinforcementDad, CustomBossEntity reinforcementMom, EliteEntity bossEntity) {
         if (ThreadLocalRandom.current().nextDouble() < 0.5) {
             nameClearer(bossEntity);
             bossEntity.getLivingEntity().setCustomName(ZombieParentsConfig.getBossEntityDialog().
@@ -107,7 +107,7 @@ public class ZombieParents extends MajorPower implements Listener {
             return;
         }
 
-        startDialog(reinforcementMom, reinforcementDad, (CustomBossEntity) event.getEliteMobEntity());
+        startDialog(reinforcementMom, reinforcementDad,  event.getEliteMobEntity());
     }
 
 }

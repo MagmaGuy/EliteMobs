@@ -15,27 +15,9 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class OnDeathCommands implements Listener {
 
-    public static String parseCommonCommandStrings(String string, EliteEntity eliteEntity) {
-        if (string.contains("$level"))
-            string = string.replace("$level", eliteEntity.getLevel() + "");
-        if (string.contains("$name"))
-            string = string.replace("$name", eliteEntity.getName());
-        if (string.contains("$locationWorldName") && eliteEntity.getLocation() != null)
-            string = string.replace("$locationWorldName", Objects.requireNonNull(eliteEntity.getLocation().getWorld()).getName());
-        if (string.contains("$locationX"))
-            string = string.replace("$locationX", eliteEntity.getLocation().getX() + "");
-        if (string.contains("$locationY"))
-            string = string.replace("$locationY", eliteEntity.getLocation().getY() + "");
-        if (string.contains("$locationZ"))
-            string = string.replace("$locationZ", eliteEntity.getLocation().getZ() + "");
-        return string;
-    }
-
     public static void parseConsoleCommand(List<String> configStrings, EliteMobDeathEvent event) {
         Player topDamager = null, secondDamager = null, thirdDamager = null;
-
         HashMap<Player, Double> sortedMap = sortByComparator(event.getEliteEntity().getDamagers(), false);
-
         Iterator<Player> sortedMapIterator = sortedMap.keySet().iterator();
         for (int i = 1; i < 4; i++) {
             if (i > sortedMap.size())
@@ -56,21 +38,24 @@ public class OnDeathCommands implements Listener {
         for (String string : configStrings) {
             double chance = 1;
             string = parseCommonCommandStrings(string, event.getEliteEntity());
-            if (string.contains("$damager1name"))
+            if (string.contains("$damager1name")) {
                 if (topDamager != null)
                     string = string.replace("$damager1name", topDamager.getName());
                 else
                     string = "";
-            if (string.contains("$damager2name"))
+            }
+            if (string.contains("$damager2name")) {
                 if (secondDamager != null)
                     string = string.replace("$damager2name", secondDamager.getName());
                 else
                     string = "";
-            if (string.contains("$damager3name"))
+            }
+            if (string.contains("$damager3name")) {
                 if (thirdDamager != null)
                     string = string.replace("$damager3name", thirdDamager.getName());
                 else
                     string = "";
+            }
             RunChance runChance = new RunChance(string);
             string = runChance.getString();
             chance = runChance.getChance();
@@ -82,6 +67,30 @@ public class OnDeathCommands implements Listener {
                         else return;
             } else if (chance == 1 || ThreadLocalRandom.current().nextDouble() < chance) runConsoleCommand(string);
         }
+    }
+
+    public static String parseCommonCommandStrings(String string, EliteEntity eliteEntity) {
+        if (string.contains("$level"))
+            string = string.replace("$level", eliteEntity.getLevel() + "");
+        if (string.contains("$name"))
+            string = string.replace("$name", eliteEntity.getName());
+        if (eliteEntity.getLocation() != null) {
+            if (string.contains("$locationWorldName") && eliteEntity.getLocation() != null)
+                string = string.replace("$locationWorldName", Objects.requireNonNull(eliteEntity.getLocation().getWorld()).getName());
+            if (string.contains("$locationX"))
+                string = string.replace("$locationX", eliteEntity.getLocation().getX() + "");
+            if (string.contains("$locationY"))
+                string = string.replace("$locationY", eliteEntity.getLocation().getY() + "");
+            if (string.contains("$locationZ"))
+                string = string.replace("$locationZ", eliteEntity.getLocation().getZ() + "");
+        }
+        return string;
+    }
+
+    @EventHandler
+    public void onEliteMobDeath(EliteMobDeathEvent event) {
+        if (MobCombatSettingsConfig.getCommandsOnDeath().isEmpty()) return;
+        parseConsoleCommand(MobCombatSettingsConfig.getCommandsOnDeath(), event);
     }
 
     private static HashMap<Player, Double> sortByComparator(HashMap<Player, Double> unsortMap, final boolean order) {
@@ -106,12 +115,6 @@ public class OnDeathCommands implements Listener {
 
     private static void runConsoleCommand(String command) {
         Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), command);
-    }
-
-    @EventHandler
-    public void onEliteMobDeath(EliteMobDeathEvent event) {
-        if (MobCombatSettingsConfig.commandsOnDeath.isEmpty()) return;
-        parseConsoleCommand(MobCombatSettingsConfig.commandsOnDeath, event);
     }
 
     public static class RunChance {

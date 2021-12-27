@@ -11,7 +11,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 
-public class EliteMobDeathEvent extends Event {
+public class  EliteMobDeathEvent extends Event {
 
     private static final HandlerList handlers = new HandlerList();
     private final Entity entity;
