@@ -43,7 +43,7 @@ public class CustomBossBossBar {
             if (!player.getWorld().equals(customBossEntity.getLocation().getWorld())) continue;
             TextComponent interactiveMessage = new TextComponent(MobCombatSettingsConfig.getBossLocationMessage());
             interactiveMessage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/elitemobs trackcustomboss " + customBossEntity.getEliteUUID()));
-            interactiveMessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(TranslationConfig.TRACK_MESSAGE.replace("$name", customBossEntity.getName())).create()));
+            interactiveMessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(TranslationConfig.getTrackMessage().replace("$name", customBossEntity.getName())).create()));
             player.spigot().sendMessage(interactiveMessage);
         }
     }

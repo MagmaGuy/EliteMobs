@@ -503,7 +503,7 @@ public class EliteEntity implements SimplePersistentEntityInterface {
                 eliteMobProperties.getName().replace(
                         "$level", level + ""));
         livingEntity.setCustomName(this.name);
-        livingEntity.setCustomNameVisible(DefaultConfig.alwaysShowNametags);
+        livingEntity.setCustomNameVisible(DefaultConfig.isAlwaysShowNametags());
     }
 
     public void setName(String name, boolean applyToLivingEntity) {
@@ -555,7 +555,7 @@ public class EliteEntity implements SimplePersistentEntityInterface {
 
     public void incrementAntiExploit(int value, String cause) {
         antiExploitPoints += value;
-        if (antiExploitPoints > AntiExploitConfig.antiExploitThreshold) {
+        if (antiExploitPoints > AntiExploitConfig.getAntiExploitThreshold()) {
             setTriggeredAntiExploit(true);
             AntiExploitMessage.sendWarning(livingEntity, cause);
         }

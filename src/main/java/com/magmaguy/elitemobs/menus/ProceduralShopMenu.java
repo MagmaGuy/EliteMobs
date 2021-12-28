@@ -32,7 +32,7 @@ public class ProceduralShopMenu implements Listener {
 
     public static void shopInitializer(Player player) {
 
-        if (!EconomySettingsConfig.enableEconomy) return;
+        if (!EconomySettingsConfig.isEnableEconomy()) return;
         BuyOrSellMenu.constructBuyOrSellMenu(player, BuyOrSellMenuConfig.BUY_PROCEDURAL_ITEM);
 
     }

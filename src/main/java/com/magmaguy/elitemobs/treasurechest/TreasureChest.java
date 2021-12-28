@@ -182,11 +182,11 @@ public class TreasureChest {
     }
 
     private void lowRankMessage(Player player) {
-        player.sendMessage(ChatColorConverter.convert(TranslationConfig.CHEST_LOW_RANK_MESSAGE.replace("$rank", GuildRank.getRankName(Math.max(0, customTreasureChestConfigFields.getChestTier() - 10), customTreasureChestConfigFields.getChestTier()))));
+        player.sendMessage(ChatColorConverter.convert(TranslationConfig.getChestLowRankMessage().replace("$rank", GuildRank.getRankName(Math.max(0, customTreasureChestConfigFields.getChestTier() - 10), customTreasureChestConfigFields.getChestTier()))));
     }
 
     private void groupTimerCooldownMessage(Player player, long targetTime) {
-        player.sendMessage(ChatColorConverter.convert(TranslationConfig.CHEST_COOLDOWN_MESSAGE.replace("$time", timeConverter(targetTime - Instant.now().getEpochSecond()))));
+        player.sendMessage(ChatColorConverter.convert(TranslationConfig.getChestCooldownMessage().replace("$time", timeConverter(targetTime - Instant.now().getEpochSecond()))));
     }
 
     private boolean playerIsInCooldown(Player player) {

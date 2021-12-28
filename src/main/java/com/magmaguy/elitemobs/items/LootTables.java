@@ -10,6 +10,7 @@ import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import net.md_5.bungee.api.ChatMessageType;
@@ -40,12 +41,12 @@ public class LootTables implements Listener {
     private static boolean scalableItemsExist;
 
     public static void generatePlayerLoot(EliteEntity eliteEntity) {
-        if (eliteEntity.isTriggeredAntiExploit())
-            return;
+        if (eliteEntity.isTriggeredAntiExploit()) return;
         for (Player player : eliteEntity.getDamagers().keySet()) {
 
-            if (eliteEntity.getDamagers().get(player) / eliteEntity.getMaxHealth() < 0.1)
-                continue;
+            if (player.hasMetadata("NPC") || !PlayerData.isInMemory(player.getUniqueId())) continue;
+
+            if (eliteEntity.getDamagers().get(player) / eliteEntity.getMaxHealth() < 0.1) continue;
 
             if (eliteEntity.getPower("bonus_coins.yml") == null)
                 new ItemLootShower(eliteEntity.getLevel(), eliteEntity.getUnsyncedLivingEntity().getLocation(), player);
@@ -63,8 +64,7 @@ public class LootTables implements Listener {
                     }.runTaskLater(MetadataHandler.PLUGIN, 20 * 10);
                 }
                 generateLoot((int) Math.floor(itemTier), eliteEntity, player);
-            } else
-                generateLoot(eliteEntity, player);
+            } else generateLoot(eliteEntity, player);
         }
     }
 
@@ -99,29 +99,22 @@ public class LootTables implements Listener {
         double baseChance = ItemSettingsConfig.getFlatDropRate();
         double dropChanceBonus = ItemSettingsConfig.getTierIncreaseDropRate() * itemTier;
 
-        if (ThreadLocalRandom.current().nextDouble() > baseChance + dropChanceBonus)
-            return null;
+        if (ThreadLocalRandom.current().nextDouble() > baseChance + dropChanceBonus) return null;
 
         HashMap<String, Double> weightedProbability = new HashMap<>();
-        if (proceduralItemsOn)
-            weightedProbability.put("procedural", ItemSettingsConfig.getProceduralItemWeight());
+        if (proceduralItemsOn) weightedProbability.put("procedural", ItemSettingsConfig.getProceduralItemWeight());
         if (customItemsOn) {
-            if (weighedItemsExist)
-                weightedProbability.put("weighed", ItemSettingsConfig.getWeighedItemWeight());
-            if (fixedItemsExist)
-                if (CustomItem.getFixedItems().containsKey(itemTier))
-                    weightedProbability.put("fixed", ItemSettingsConfig.getFixedItemWeight());
-            if (limitedItemsExist)
-                weightedProbability.put("limited", ItemSettingsConfig.getLimitedItemWeight());
-            if (scalableItemsExist)
-                weightedProbability.put("scalable", ItemSettingsConfig.getScalableItemWeight());
+            if (weighedItemsExist) weightedProbability.put("weighed", ItemSettingsConfig.getWeighedItemWeight());
+            if (fixedItemsExist) if (CustomItem.getFixedItems().containsKey(itemTier))
+                weightedProbability.put("fixed", ItemSettingsConfig.getFixedItemWeight());
+            if (limitedItemsExist) weightedProbability.put("limited", ItemSettingsConfig.getLimitedItemWeight());
+            if (scalableItemsExist) weightedProbability.put("scalable", ItemSettingsConfig.getScalableItemWeight());
         }
 
         String selectedLootSystem = pickWeighedProbability(weightedProbability);
 
         if (selectedLootSystem == null) {
-            new InfoMessage("Your EliteMobs loot configuration resulted in no loot getting dropped. This is not a bug. " +
-                    "If you want players to be able to progress at all in the EliteMobs plugin, review your configuration settings.");
+            new InfoMessage("Your EliteMobs loot configuration resulted in no loot getting dropped. This is not a bug. " + "If you want players to be able to progress at all in the EliteMobs plugin, review your configuration settings.");
             return null;
         }
 
@@ -158,22 +151,16 @@ public class LootTables implements Listener {
         double baseChance = ItemSettingsConfig.getFlatDropRate();
         double dropChanceBonus = ItemSettingsConfig.getTierIncreaseDropRate() * itemTier;
 
-        if (ThreadLocalRandom.current().nextDouble() > baseChance + dropChanceBonus)
-            return null;
+        if (ThreadLocalRandom.current().nextDouble() > baseChance + dropChanceBonus) return null;
 
         HashMap<String, Double> weightedProbability = new HashMap<>();
-        if (proceduralItemsOn)
-            weightedProbability.put("procedural", ItemSettingsConfig.getProceduralItemWeight());
+        if (proceduralItemsOn) weightedProbability.put("procedural", ItemSettingsConfig.getProceduralItemWeight());
         if (customItemsOn) {
-            if (weighedItemsExist)
-                weightedProbability.put("weighed", ItemSettingsConfig.getWeighedItemWeight());
-            if (fixedItemsExist)
-                if (CustomItem.getFixedItems().containsKey(itemTier))
-                    weightedProbability.put("fixed", ItemSettingsConfig.getFixedItemWeight());
-            if (limitedItemsExist)
-                weightedProbability.put("limited", ItemSettingsConfig.getLimitedItemWeight());
-            if (scalableItemsExist)
-                weightedProbability.put("scalable", ItemSettingsConfig.getScalableItemWeight());
+            if (weighedItemsExist) weightedProbability.put("weighed", ItemSettingsConfig.getWeighedItemWeight());
+            if (fixedItemsExist) if (CustomItem.getFixedItems().containsKey(itemTier))
+                weightedProbability.put("fixed", ItemSettingsConfig.getFixedItemWeight());
+            if (limitedItemsExist) weightedProbability.put("limited", ItemSettingsConfig.getLimitedItemWeight());
+            if (scalableItemsExist) weightedProbability.put("scalable", ItemSettingsConfig.getScalableItemWeight());
         }
 
         String selectedLootSystem = pickWeighedProbability(weightedProbability);
@@ -198,18 +185,13 @@ public class LootTables implements Listener {
     public static ItemStack generateItemStack(int itemTier, Player player, EliteEntity eliteEntity) {
 
         HashMap<String, Double> weightedProbability = new HashMap<>();
-        if (proceduralItemsOn)
-            weightedProbability.put("procedural", ItemSettingsConfig.getProceduralItemWeight());
+        if (proceduralItemsOn) weightedProbability.put("procedural", ItemSettingsConfig.getProceduralItemWeight());
         if (customItemsOn) {
-            if (weighedItemsExist)
-                weightedProbability.put("weighed", ItemSettingsConfig.getWeighedItemWeight());
-            if (fixedItemsExist)
-                if (CustomItem.getFixedItems().containsKey(itemTier))
-                    weightedProbability.put("fixed", ItemSettingsConfig.getFixedItemWeight());
-            if (limitedItemsExist)
-                weightedProbability.put("limited", ItemSettingsConfig.getLimitedItemWeight());
-            if (scalableItemsExist)
-                weightedProbability.put("scalable", ItemSettingsConfig.getScalableItemWeight());
+            if (weighedItemsExist) weightedProbability.put("weighed", ItemSettingsConfig.getWeighedItemWeight());
+            if (fixedItemsExist) if (CustomItem.getFixedItems().containsKey(itemTier))
+                weightedProbability.put("fixed", ItemSettingsConfig.getFixedItemWeight());
+            if (limitedItemsExist) weightedProbability.put("limited", ItemSettingsConfig.getLimitedItemWeight());
+            if (scalableItemsExist) weightedProbability.put("scalable", ItemSettingsConfig.getScalableItemWeight());
         }
 
         String selectedLootSystem = pickWeighedProbability(weightedProbability);
@@ -235,8 +217,7 @@ public class LootTables implements Listener {
 
         double chanceToUpgradeTier = 10 / (double) mobTier * ItemSettingsConfig.getMaximumLootTier();
 
-        if (ThreadLocalRandom.current().nextDouble() * 100 < chanceToUpgradeTier)
-            return mobTier + 1;
+        if (ThreadLocalRandom.current().nextDouble() * 100 < chanceToUpgradeTier) return mobTier + 1;
 
 
         double diceRoll = ThreadLocalRandom.current().nextDouble();
@@ -247,10 +228,8 @@ public class LootTables implements Listener {
         50% of the time, give an item better than what the player is wearing
         If you're wondering why this isn't configurable, wonder instead why no one has noticed it isn't before you reading this
          */
-        if (diceRoll < 0.10)
-            mobTier -= 2;
-        else if (diceRoll < 0.50)
-            mobTier -= 1;
+        if (diceRoll < 0.10) mobTier -= 2;
+        else if (diceRoll < 0.50) mobTier -= 1;
 
         if (mobTier < 0) mobTier = 0;
 
@@ -278,10 +257,8 @@ public class LootTables implements Listener {
 
         for (ItemStack itemStack : CustomItem.getWeighedFixedItems().keySet()) {
             Double shouldntBeNull = CustomItem.getWeighedFixedItems().get(itemStack);
-            if (shouldntBeNull != null)
-                totalWeight += CustomItem.getWeighedFixedItems().get(itemStack);
-            else
-                new WarningMessage("Item " + itemStack.getItemMeta().getDisplayName() + " reported a null weight!");
+            if (shouldntBeNull != null) totalWeight += CustomItem.getWeighedFixedItems().get(itemStack);
+            else new WarningMessage("Item " + itemStack.getItemMeta().getDisplayName() + " reported a null weight!");
         }
 
         ItemStack generatedItemStack = null;
@@ -368,15 +345,12 @@ public class LootTables implements Listener {
     }
 
     private static ItemStack generateFixedItem(int itemTier, Player player, EliteEntity eliteEntity) {
-        return CustomItem.getFixedItems().get(itemTier)
-                .get(ThreadLocalRandom.current().nextInt(CustomItem.getFixedItems().get(itemTier).size()))
-                .generateDefaultsItemStack(player, false, eliteEntity);
+        return CustomItem.getFixedItems().get(itemTier).get(ThreadLocalRandom.current().nextInt(CustomItem.getFixedItems().get(itemTier).size())).generateDefaultsItemStack(player, false, eliteEntity);
     }
 
     private static void processPhysicalItem(Location location, ItemStack itemStack, Player player) {
         Item item = location.getWorld().dropItem(location, itemStack);
-        if (item.getItemStack().hasItemMeta() &&
-                item.getItemStack().getItemMeta().hasDisplayName()) {
+        if (item.getItemStack().hasItemMeta() && item.getItemStack().getItemMeta().hasDisplayName()) {
             item.setCustomName(item.getItemStack().getItemMeta().getDisplayName());
             item.setCustomNameVisible(true);
         }
@@ -387,8 +361,7 @@ public class LootTables implements Listener {
 
     @EventHandler
     public void onDeath(EliteMobDeathEvent event) {
-        if (!event.getEliteEntity().isVanillaLoot())
-            event.getEntityDeathEvent().getDrops().clear();
+        if (!event.getEliteEntity().isVanillaLoot()) event.getEntityDeathEvent().getDrops().clear();
         if (!event.getEliteEntity().isEliteLoot()) return;
         if (event.getEliteEntity().getLevel() < 1) return;
         if (event.getEliteEntity().getDamagers().isEmpty()) return;

@@ -1,14 +1,19 @@
 package com.magmaguy.elitemobs.config;
 
+import lombok.Getter;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
 
 public class CombatTagConfig {
-
-    public static boolean enableCombatTag;
-    public static String combatTagMessage;
-    public static boolean enableTeleportTimer;
+    @Getter
+    private static boolean enableCombatTag;
+    @Getter
+    private static String combatTagMessage;
+    @Getter
+    private static boolean enableTeleportTimer;
+    private CombatTagConfig() {
+    }
 
     public static void initializeConfig() {
         File file = ConfigurationEngine.fileCreator("CombatTag.yml");

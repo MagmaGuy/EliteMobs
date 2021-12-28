@@ -14,7 +14,6 @@ import com.magmaguy.elitemobs.commands.admin.CheckTierOthersCommand;
 import com.magmaguy.elitemobs.commands.combat.CheckTierCommand;
 import com.magmaguy.elitemobs.commands.guild.AdventurersGuildCommand;
 import com.magmaguy.elitemobs.commands.quests.QuestCommand;
-import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.TranslationConfig;
@@ -149,7 +148,7 @@ public class UserCommands {
                 .senderType(Player.class)
                 .permission("elitemobs.currency.check")
                 .handler(commandContext -> {
-                    if (DefaultConfig.otherCommandsLeadToEMStatusMenu)
+                    if (DefaultConfig.isOtherCommandsLeadToEMStatusMenu())
                         new PlayerStatusScreen((Player) commandContext.getSender());
                     else
                         CurrencyCommandsHandler.walletCommand((Player) commandContext.getSender());
@@ -212,11 +211,11 @@ public class UserCommands {
                 /* Timeout */ 30L,
                 /* Timeout unit */ TimeUnit.SECONDS,
                 /* Action when confirmation is required */ context -> context.getCommandContext().getSender().sendMessage(
-                ChatColorConverter.convert(ConfigValues.translationConfig.getString(TranslationConfig.ECONOMY_TAX_MESSAGE)
+                ChatColorConverter.convert(TranslationConfig.getEconomyTaxMessage()
                         .replace("$command", "/em confirm")
-                        .replace("$percentage", (EconomySettingsConfig.playerToPlayerTaxes * 100) + ""))),
+                        .replace("$percentage", (EconomySettingsConfig.getPlayerToPlayerTaxes() * 100) + ""))),
                 /* Action when no confirmation is pending */ sender -> sender.sendMessage(
-                ChatColorConverter.convert(ConfigValues.translationConfig.getString(TranslationConfig.NO_PENDING_COMMANDS)))
+                ChatColorConverter.convert(TranslationConfig.getNoPendingCommands()))
         );
 
         // Register the confirmation processor. This will enable confirmations for commands that require it
@@ -265,7 +264,7 @@ public class UserCommands {
                 .meta(CommandMeta.DESCRIPTION, "Checks your equipped EliteMobs gear tier.")
                 .senderType(Player.class)
                 .handler(commandContext -> {
-                    if (DefaultConfig.otherCommandsLeadToEMStatusMenu)
+                    if (DefaultConfig.isOtherCommandsLeadToEMStatusMenu())
                         new PlayerStatusScreen((Player) commandContext.getSender());
                     else new CheckTierCommand((Player) commandContext.getSender());
                 }));
@@ -319,8 +318,8 @@ public class UserCommands {
                 .senderType(Player.class)
                 .permission("elitemobs.spawntp")
                 .handler(commandContext -> {
-                    if (DefaultConfig.defaultSpawnLocation != null)
-                        PlayerPreTeleportEvent.teleportPlayer((Player) commandContext.getSender(), DefaultConfig.defaultSpawnLocation);
+                    if (DefaultConfig.getDefaultSpawnLocation() != null)
+                        PlayerPreTeleportEvent.teleportPlayer((Player) commandContext.getSender(), DefaultConfig.getDefaultSpawnLocation());
                 }));
 
     }

@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.menus;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.api.EliteMobsItemDetector;
-import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.TranslationConfig;
 import com.magmaguy.elitemobs.config.menus.premade.SellMenuConfig;
@@ -49,7 +48,7 @@ public class SellMenu extends EliteMenu implements Listener {
         for (String string : clonedConfirmButton.getItemMeta().getLore())
             lore.add(string
                     .replace("$currency_amount", itemWorth + "")
-                    .replace("$currency_name", EconomySettingsConfig.currencyName));
+                    .replace("$currency_name", EconomySettingsConfig.getCurrencyName()));
 
         ItemMeta clonedMeta = clonedConfirmButton.getItemMeta();
         clonedMeta.setLore(lore);
@@ -96,7 +95,7 @@ public class SellMenu extends EliteMenu implements Listener {
                 for (String string : SellMenuConfig.confirmButton.getItemMeta().getLore())
                     lore.add(string
                             .replace("$currency_amount", 0 + "")
-                            .replace("$currency_name", EconomySettingsConfig.currencyName));
+                            .replace("$currency_name", EconomySettingsConfig.getCurrencyName()));
                 SellMenuConfig.confirmButton.getItemMeta().setLore(lore);
                 ItemMeta clonedMeta = clonedConfirmButton.getItemMeta();
                 clonedMeta.setLore(lore);
@@ -134,13 +133,13 @@ public class SellMenu extends EliteMenu implements Listener {
 
             //Check if it's an elitemobs item. The soulbind check only says if the player would be able to pick it up, and vanilla items can be picked up
             if (!EliteMobsItemDetector.isEliteMobsItem(event.getCurrentItem())) {
-                event.getWhoClicked().sendMessage(ChatColorConverter.convert(ConfigValues.translationConfig.getString(TranslationConfig.SHOP_SALE_INSTRUCTIONS)));
+                event.getWhoClicked().sendMessage(ChatColorConverter.convert(TranslationConfig.getShopSaleInstructions()));
                 return;
             }
 
             //If the item isn't soulbound to the player, it can't be sold by that player
             if (!SoulbindEnchantment.isValidSoulbindUser(currentItem.getItemMeta(), player)) {
-                player.sendMessage(ChatColorConverter.convert(ConfigValues.translationConfig.getString(TranslationConfig.SHOP_SALE_OTHERS_ITEMS)));
+                player.sendMessage(ChatColorConverter.convert(TranslationConfig.getShopSaleOthersItems()));
                 return;
             }
 
@@ -177,23 +176,23 @@ public class SellMenu extends EliteMenu implements Listener {
 
                     if (amount < 4)
                         player.sendMessage(ChatColorConverter.convert(
-                                ConfigValues.translationConfig.getString(TranslationConfig.SHOP_SELL_MESSAGE)
+                               TranslationConfig.getShopSellMessage()
                                         .replace("$item_name", itemStack.getItemMeta().getDisplayName())
                                         .replace("$currency_amount", itemValue + "")
-                                        .replace("$currency_name", EconomySettingsConfig.currencyName)));
+                                        .replace("$currency_name", EconomySettingsConfig.getCurrencyName())));
                     shopInventory.clear(validSlot);
                 }
 
                 if (amount >= 3)
                     player.sendMessage(ChatColorConverter.convert(
-                            TranslationConfig.shopBatchSellMessage
+                            TranslationConfig.getShopBatchSellMessage()
                                     .replace("$currency_amount", totalItemValue + "")
-                                    .replace("$currency_name", EconomySettingsConfig.currencyName)));
+                                    .replace("$currency_name", EconomySettingsConfig.getCurrencyName())));
 
                 player.sendMessage(ChatColorConverter.convert(
-                        ConfigValues.translationConfig.getString(TranslationConfig.SHOP_CURRENT_BALANCE)
+                       TranslationConfig.getShopCurrentBalance()
                                 .replace("$currency_amount", EconomyHandler.checkCurrency(player.getUniqueId()) + "")
-                                .replace("$currency_name", EconomySettingsConfig.currencyName)));
+                                .replace("$currency_name", EconomySettingsConfig.getCurrencyName())));
                 updateConfirmButton(0);
                 return;
             }

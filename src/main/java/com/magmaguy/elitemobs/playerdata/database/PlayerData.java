@@ -100,6 +100,7 @@ public class PlayerData {
 
     public static void clearPlayerData(UUID uuid) {
         playerDataHashMap.remove(uuid);
+
     }
 
     public static boolean isInMemory(Player player) {
@@ -341,7 +342,6 @@ public class PlayerData {
     public static int getScore(UUID uuid) {
         if (!isInMemory(uuid))
             return getDatabaseInteger(uuid, "Score");
-
         return playerDataHashMap.get(uuid).score;
     }
 
@@ -354,7 +354,6 @@ public class PlayerData {
 
     public static void decrementScore(UUID uuid) {
         setDatabaseValue(uuid, "Score", getScore(uuid) - 100);
-
         if (playerDataHashMap.containsKey(uuid))
             playerDataHashMap.get(uuid).score -= 100;
     }
@@ -362,13 +361,11 @@ public class PlayerData {
     public static int getKills(UUID uuid) {
         if (!isInMemory(uuid))
             return getDatabaseInteger(uuid, "Kills");
-
         return playerDataHashMap.get(uuid).kills;
     }
 
     public static void incrementKills(UUID uuid) {
         setDatabaseValue(uuid, "Kills", getKills(uuid) + 1);
-
         if (playerDataHashMap.containsKey(uuid))
             playerDataHashMap.get(uuid).kills += 1;
     }
@@ -376,7 +373,6 @@ public class PlayerData {
     public static int getHighestLevelKilled(UUID uuid) {
         if (!isInMemory(uuid))
             return getDatabaseInteger(uuid, "HighestLevelKilled");
-
         return playerDataHashMap.get(uuid).highestLevelKilled;
     }
 
@@ -438,7 +434,7 @@ public class PlayerData {
             return reply;
         } catch (Exception e) {
             new WarningMessage("Failed to get string value from database!");
-            new WarningMessage(e.getClass().getName() + ": " + e.getMessage());
+            e.printStackTrace();
             return null;
         }
     }
@@ -453,7 +449,7 @@ public class PlayerData {
             return reply;
         } catch (Exception e) {
             new WarningMessage("Failed to get double value from database!");
-            new WarningMessage(e.getClass().getName() + ": " + e.getMessage());
+            e.printStackTrace();
             return null;
         }
     }
@@ -468,7 +464,7 @@ public class PlayerData {
             return reply;
         } catch (Exception e) {
             new WarningMessage("Failed to get integer value from database!");
-            new WarningMessage(e.getClass().getName() + ": " + e.getMessage());
+            e.printStackTrace();
             return null;
         }
     }
@@ -485,16 +481,11 @@ public class PlayerData {
 
     public static void initializeDatabaseConnection() {
         new File(MetadataHandler.PLUGIN.getDataFolder().getPath() + "/data").mkdirs();
-        Statement statement = null;
-
         try {
             new InfoMessage("Opened database successfully");
-
             GenerateDatabase.generate();
-
             for (Player player : Bukkit.getOnlinePlayers())
                 new PlayerData(player.getUniqueId());
-
         } catch (Exception e) {
             new WarningMessage(e.getClass().getName() + ": " + e.getMessage());
             new WarningMessage("Failed to establish a connection to the SQLite database. This is not good.");
@@ -547,6 +538,7 @@ public class PlayerData {
                 }
             }
         }
+        new InfoMessage("User " + uuid + " data successfully read!");
     }
 
     public static void closeConnection() {

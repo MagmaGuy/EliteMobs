@@ -103,7 +103,7 @@ public class CommandHandler {
                 .senderType(Player.class)
                 //permission is dealt inside of the command
                 .handler(commandContext -> {
-                    if (DefaultConfig.emLeadsToStatusMenu)
+                    if (DefaultConfig.isEmLeadsToStatusMenu())
                         AdventurersGuildCommand.adventurersGuildCommand((Player) commandContext.getSender());
                 }));
 
@@ -132,7 +132,7 @@ public class CommandHandler {
                 .meta(CommandMeta.DESCRIPTION, "Opens the main player interface")
                 .senderType(Player.class)
                 .handler(commandContext -> {
-                    if (DefaultConfig.emLeadsToStatusMenu)
+                    if (DefaultConfig.isEmLeadsToStatusMenu())
                         new PlayerStatusScreen((Player) commandContext.getSender());
                 }));
 

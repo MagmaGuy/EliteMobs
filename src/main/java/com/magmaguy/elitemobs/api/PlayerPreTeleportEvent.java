@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.api;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.CombatTagConfig;
-import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.TranslationConfig;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import net.md_5.bungee.api.ChatMessageType;
@@ -35,7 +34,7 @@ public class PlayerPreTeleportEvent extends Event implements Cancellable {
     }
 
     public static void teleportPlayer(Player player, Location destination) {
-        if (CombatTagConfig.enableTeleportTimer)
+        if (CombatTagConfig.isEnableTeleportTimer())
             new EventCaller(new PlayerPreTeleportEvent(player, destination));
         else
             PlayerTeleportEvent.teleportPlayer(player, destination);
@@ -63,18 +62,14 @@ public class PlayerPreTeleportEvent extends Event implements Cancellable {
 
                 if (isCancelled) {
                     player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                            TextComponent.fromLegacyText(ChatColorConverter.convert(
-                                    ConfigValues.translationConfig.getString(
-                                            TranslationConfig.TELEPORT_CANCELLED))));
+                            TextComponent.fromLegacyText(ChatColorConverter.convert(TranslationConfig.getTeleportCancelled())));
                     cancel();
                     return;
                 }
 
                 player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                        TextComponent.fromLegacyText(ChatColorConverter.convert(
-                                ConfigValues.translationConfig.getString(
-                                        TranslationConfig.TELEPORT_TIME_LEFT
-                                ).replace("$time", timerLeft + ""))));
+                        TextComponent.fromLegacyText(ChatColorConverter.convert(TranslationConfig.getTeleportTimeLeft())
+                                .replace("$time", timerLeft + "")));
 
 
                 if (timerLeft == 0) {

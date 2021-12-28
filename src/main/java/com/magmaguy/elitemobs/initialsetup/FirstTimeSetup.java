@@ -16,7 +16,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class FirstTimeSetup implements Listener {
     @EventHandler
     public void onPlayerLogin(PlayerJoinEvent event) {
-        if (DefaultConfig.setupDone) return;
+        if (DefaultConfig.isSetupDone()) return;
         if (!event.getPlayer().hasPermission("elitemobs.*")) return;
         new BukkitRunnable() {
             @Override

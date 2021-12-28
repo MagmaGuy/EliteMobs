@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.elitemobs.combatsystem.CombatSystem;
 import com.magmaguy.elitemobs.utils.VersionChecker;
+import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -11,35 +12,60 @@ import java.io.File;
  * Created by MagmaGuy on 17/06/2017.
  */
 public class EconomySettingsConfig {
-
-    public static boolean enableEconomy;
-    public static double resaleValue;
-    public static String currencyName;
-    public static boolean useVault;
-    public static boolean enableCurrencyShower;
-    public static double currencyShowerMultiplier;
-    public static String chatCurrencyShowerMessage;
-    public static String actionBarCurrencyShowerMessage;
-    public static String lootShowerMaterial1, lootShowerMaterial5, lootShowerMaterial10, lootShowerMaterial20,
-            lootShowerMaterial50, lootShowerMaterial100, lootShowerMaterial500, lootShowerMaterial1000;
-    public static String adventurersGuildNotificationMessage;
-    public static double defaultMaterialWorth;
-    public static FileConfiguration thisConfiguration;
-    public static double playerToPlayerTaxes;
-    public static int lootShowerData1, lootShowerData5, lootShowerData10, lootShowerData20, lootShowerData50,
-            lootShowerData100, lootShowerData500, lootShowerData1000;
+    @Getter
+    private static boolean enableEconomy;
+    @Getter
+    private static double resaleValue;
+    @Getter
+    private static String currencyName;
+    @Getter
+    private static boolean useVault;
+    @Getter
+    private static boolean enableCurrencyShower;
+    @Getter
+    private static double currencyShowerMultiplier;
+    @Getter
+    private static String chatCurrencyShowerMessage;
+    @Getter
+    private static String actionBarCurrencyShowerMessage;
+    @Getter
+    private static String lootShowerMaterial1;
+    @Getter
+    private static String lootShowerMaterial5;
+    @Getter
+    private static String lootShowerMaterial10;
+    @Getter
+    private static String lootShowerMaterial20;
+    @Getter
+    private static String lootShowerMaterial50;
+    @Getter
+    private static String lootShowerMaterial100;
+    @Getter
+    private static String lootShowerMaterial500;
+    @Getter
+    private static String lootShowerMaterial1000;
+    @Getter
+    private static String adventurersGuildNotificationMessage;
+    @Getter
+    private static double defaultMaterialWorth;
+    @Getter
+    private static FileConfiguration thisConfiguration;
+    @Getter
+    private static double playerToPlayerTaxes;
+    private EconomySettingsConfig() {
+    }
 
     public static void initializeConfig() {
 
         File file = ConfigurationEngine.fileCreator("EconomySettings.yml");
         FileConfiguration fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
 
-        double netheriteLevel = CombatSystem.NETHERITE_TIER_LEVEL + 10;
-        double tridentLevel = CombatSystem.TRIDENT_TIER_LEVEL + 10;
-        double diamondLevel = CombatSystem.DIAMOND_TIER_LEVEL + 10;
-        double ironLevel = CombatSystem.IRON_TIER_LEVEL + 10;
-        double stoneChainLevel = CombatSystem.STONE_CHAIN_TIER_LEVEL + 10;
-        double goldWoodLeatherLevel = CombatSystem.GOLD_WOOD_LEATHER_TIER_LEVEL + 10;
+        double netheriteLevel = CombatSystem.NETHERITE_TIER_LEVEL + 10D;
+        double tridentLevel = CombatSystem.TRIDENT_TIER_LEVEL + 10D;
+        double diamondLevel = CombatSystem.DIAMOND_TIER_LEVEL + 10D;
+        double ironLevel = CombatSystem.IRON_TIER_LEVEL + 10D;
+        double stoneChainLevel = CombatSystem.STONE_CHAIN_TIER_LEVEL + 10D;
+        double goldWoodLeatherLevel = CombatSystem.GOLD_WOOD_LEATHER_TIER_LEVEL + 10D;
 
         enableEconomy = ConfigurationEngine.setBoolean(fileConfiguration, "enableEconomy", true);
         resaleValue = ConfigurationEngine.setDouble(fileConfiguration, "itemResaleValue", 5);
@@ -50,21 +76,21 @@ public class EconomySettingsConfig {
         chatCurrencyShowerMessage = ConfigurationEngine.setString(fileConfiguration, "chatCurrencyShowerMessage", "&7[EM] You've picked up &a$amount $currency_name!");
         actionBarCurrencyShowerMessage = ConfigurationEngine.setString(fileConfiguration, "actionbarCurrencyShowerMessage", "&7[EM] You've picked up &a$amount $currency_name!");
         lootShowerMaterial1 = ConfigurationEngine.setString(fileConfiguration, "lootShowerMaterial.1", Material.GOLD_NUGGET.name());
-        lootShowerData1 = ConfigurationEngine.setInt(fileConfiguration, "lootShowerData.1", 1);
+        ConfigurationEngine.setInt(fileConfiguration, "lootShowerData.1", 1);
         lootShowerMaterial5 = ConfigurationEngine.setString(fileConfiguration, "lootShowerMaterial.5", Material.GOLD_INGOT.name());
-        lootShowerData5 = ConfigurationEngine.setInt(fileConfiguration, "lootShowerData.5", 1);
+        ConfigurationEngine.setInt(fileConfiguration, "lootShowerData.5", 1);
         lootShowerMaterial10 = ConfigurationEngine.setString(fileConfiguration, "lootShowerMaterial.10", Material.GOLD_BLOCK.name());
-        lootShowerData10 = ConfigurationEngine.setInt(fileConfiguration, "lootShowerData.10", 1);
+        ConfigurationEngine.setInt(fileConfiguration, "lootShowerData.10", 1);
         lootShowerMaterial20 = ConfigurationEngine.setString(fileConfiguration, "lootShowerMaterial.20", Material.EMERALD.name());
-        lootShowerData20 = ConfigurationEngine.setInt(fileConfiguration, "lootShowerData.20", 1);
+        ConfigurationEngine.setInt(fileConfiguration, "lootShowerData.20", 1);
         lootShowerMaterial50 = ConfigurationEngine.setString(fileConfiguration, "lootShowerMaterial.50", Material.EMERALD_BLOCK.name());
-        lootShowerData50 = ConfigurationEngine.setInt(fileConfiguration, "lootShowerData.50", 1);
+        ConfigurationEngine.setInt(fileConfiguration, "lootShowerData.50", 1);
         lootShowerMaterial100 = ConfigurationEngine.setString(fileConfiguration, "lootShowerMaterial.100", Material.DIAMOND.name());
-        lootShowerData100 = ConfigurationEngine.setInt(fileConfiguration, "lootShowerData.100", 1);
+        ConfigurationEngine.setInt(fileConfiguration, "lootShowerData.100", 1);
         lootShowerMaterial500 = ConfigurationEngine.setString(fileConfiguration, "lootShowerMaterial.500", Material.DIAMOND_BLOCK.name());
-        lootShowerData500 = ConfigurationEngine.setInt(fileConfiguration, "lootShowerData.500", 1);
+        ConfigurationEngine.setInt(fileConfiguration, "lootShowerData.500", 1);
         lootShowerMaterial1000 = ConfigurationEngine.setString(fileConfiguration, "lootShowerMaterial.1000", Material.NETHER_STAR.name());
-        lootShowerData1000 = ConfigurationEngine.setInt(fileConfiguration, "lootShowerData.1000", 1);
+        ConfigurationEngine.setInt(fileConfiguration, "lootShowerData.1000", 1);
         adventurersGuildNotificationMessage = ConfigurationEngine.setString(fileConfiguration, "adventurersGuildNotificationMessages", "&7[EM] Extra spending money? Try &a/em !");
 
         addMaterial(fileConfiguration, Material.DIAMOND_AXE, diamondLevel);

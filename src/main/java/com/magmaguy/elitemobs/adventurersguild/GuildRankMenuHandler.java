@@ -38,7 +38,7 @@ public class GuildRankMenuHandler implements Listener {
             player.sendMessage(GuildRankMenuConfig.getNotEnoughCurrencyMessage()
                     .replace("$neededAmount", tierPriceCalculator(guildRank, GuildRank.getGuildPrestigeRank(player)) + "")
                     .replace("$currentAmount", EconomyHandler.checkCurrency(player.getUniqueId()) + "")
-                    .replace("$currencyName", EconomySettingsConfig.currencyName));
+                    .replace("$currencyName", EconomySettingsConfig.getCurrencyName()));
             return;
         }
         EconomyHandler.subtractCurrency(player.getUniqueId(), price);
@@ -47,7 +47,7 @@ public class GuildRankMenuHandler implements Listener {
         player.sendMessage(GuildRankMenuConfig.getUnlockMessage()
                 .replace("$rankName", GuildRank.getRankName(GuildRank.getGuildPrestigeRank(player), guildRank))
                 .replace("$price", tierPriceCalculator(guildRank, GuildRank.getGuildPrestigeRank(player)) + "")
-                .replace("$currencyName", EconomySettingsConfig.currencyName));
+                .replace("$currencyName", EconomySettingsConfig.getCurrencyName()));
 
         Bukkit.broadcastMessage(GuildRankMenuConfig.getBroadcastMessage()
                 .replace("$player", player.getDisplayName())
@@ -222,13 +222,13 @@ public class GuildRankMenuHandler implements Listener {
                         newLore.add(
                                 ChatColorConverter.convert(
                                         string.replace("$price", priceString)
-                                                .replace("$currencyName", EconomySettingsConfig.currencyName)));
+                                                .replace("$currencyName", EconomySettingsConfig.getCurrencyName())));
                         continue;
                     }
                     if (string.contains("$currentCurrency")) {
                         newLore.add(string
                                 .replace("$currentCurrency", EconomyHandler.checkCurrency(player.getUniqueId()) + "")
-                                .replace("$currencyName", EconomySettingsConfig.currencyName));
+                                .replace("$currencyName", EconomySettingsConfig.getCurrencyName()));
                         continue;
                     }
                     newLore.add(string);

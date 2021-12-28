@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.menus;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.TranslationConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
@@ -15,9 +14,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class SharedShopElements {
 
     public static boolean inventoryNullPointerPreventer(InventoryClickEvent event) {
-
         return sellMenuNullPointPreventer(event);
-
     }
 
     public static boolean sellMenuNullPointPreventer(InventoryClickEvent event) {
@@ -38,16 +35,16 @@ public class SharedShopElements {
 
                 player.sendMessage(
                         ChatColorConverter.convert(
-                                ConfigValues.translationConfig.getString(TranslationConfig.SHOP_BUY_MESSAGE)
+                                TranslationConfig.getShopBuyMessage()
                                         .replace("$item_name", itemDisplayName)
                                         .replace("$item_value", itemValue + "")
-                                        .replace("$currency_name", EconomySettingsConfig.currencyName)));
+                                        .replace("$currency_name", EconomySettingsConfig.getCurrencyName())));
 
                 player.sendMessage(
                         ChatColorConverter.convert(
-                                ConfigValues.translationConfig.getString(TranslationConfig.SHOP_CURRENT_BALANCE)
+                                TranslationConfig.getShopCurrentBalance()
                                         .replace("$currency_amount", EconomyHandler.checkCurrency(player.getUniqueId()) + "")
-                                        .replace("$currency_name", EconomySettingsConfig.currencyName)));
+                                        .replace("$currency_name", EconomySettingsConfig.getCurrencyName())));
 
 
             }
@@ -66,20 +63,20 @@ public class SharedShopElements {
 
                 player.sendMessage(
                         ChatColorConverter.convert(
-                                ConfigValues.translationConfig.getString(TranslationConfig.SHOP_INSUFFICIENT_FUNDS_MESSAGE)
-                                        .replace("$currency_name", EconomySettingsConfig.currencyName)));
+                                TranslationConfig.getShopInsufficientFundsMessage()
+                                        .replace("$currency_name", EconomySettingsConfig.getCurrencyName())));
 
                 player.sendMessage(
                         ChatColorConverter.convert(
-                                ConfigValues.translationConfig.getString(TranslationConfig.SHOP_CURRENT_BALANCE)
+                                TranslationConfig.getShopCurrentBalance()
                                         .replace("$currency_amount", EconomyHandler.checkCurrency(player.getUniqueId()) + "")
-                                        .replace("$currency_name", EconomySettingsConfig.currencyName)));
+                                        .replace("$currency_name", EconomySettingsConfig.getCurrencyName())));
 
                 player.sendMessage(
                         ChatColorConverter.convert(
-                                ConfigValues.translationConfig.getString(TranslationConfig.SHOP_ITEM_PRICE)
+                                TranslationConfig.getShopItemPrice()
                                         .replace("$item_value", itemValue + "")
-                                        .replace("$currency_name", EconomySettingsConfig.currencyName)));
+                                        .replace("$currency_name", EconomySettingsConfig.getCurrencyName())));
 
             }
 

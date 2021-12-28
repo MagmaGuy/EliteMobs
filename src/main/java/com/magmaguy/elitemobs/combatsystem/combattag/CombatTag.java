@@ -47,7 +47,7 @@ public class CombatTag implements Listener {
         if (player.isFlying()) {
             player.setFlying(false);
             player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                    TextComponent.fromLegacyText(CombatTagConfig.combatTagMessage));
+                    TextComponent.fromLegacyText(CombatTagConfig.getCombatTagMessage()));
             player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, 20 * 60, 0));
             new BukkitRunnable() {
                 @Override
