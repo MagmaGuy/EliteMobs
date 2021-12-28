@@ -39,7 +39,7 @@ public abstract class PluginMobProperties {
     }
 
     public double getSuperMobMaxHealth() {
-        return defaultMaxHealth * DefaultConfig.superMobStackAmount;
+        return defaultMaxHealth * DefaultConfig.getSuperMobStackAmount();
     }
 
 }

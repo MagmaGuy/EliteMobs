@@ -212,7 +212,7 @@ public class CustomSpawn {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 if (!PlayerData.isInMemory(player.getUniqueId())) continue;
                 Location playerLocation = player.getLocation();
-                if (!ValidWorldsConfig.validWorlds.contains(playerLocation.getWorld().getName()))
+                if (!ValidWorldsConfig.getValidWorlds().contains(playerLocation.getWorld().getName()))
                     continue;
                 if (!playerLocation.getWorld().getGameRuleValue(GameRule.DO_MOB_SPAWNING)) continue;
                 if (!customSpawnConfigFields.getValidWorlds().isEmpty())

@@ -29,7 +29,7 @@ public class EliteMobEnterCombatEvent extends Event {
         this.targetEntity = targetEntity;
         this.eliteEntity = eliteEntity;
         eliteEntity.setInCombat(true);
-        if (!DefaultConfig.alwaysShowNametags)
+        if (!DefaultConfig.isAlwaysShowNametags())
             eliteEntity.setNameVisible(true);
         if (eliteEntity instanceof CustomBossEntity)
             CommandRunner.runCommandFromList(((CustomBossEntity) eliteEntity).getCustomBossesConfigFields().getOnCombatEnterCommands(), new ArrayList<>());

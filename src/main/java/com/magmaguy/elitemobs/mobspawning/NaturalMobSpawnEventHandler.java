@@ -106,12 +106,12 @@ public class NaturalMobSpawnEventHandler implements Listener {
 
         if (!MobCombatSettingsConfig.isDoNaturalMobSpawning())
             return;
-        if (!ValidWorldsConfig.fileConfiguration.getBoolean("Valid worlds." + event.getEntity().getWorld().getName()))
+        if (!ValidWorldsConfig.getFileConfiguration().getBoolean("Valid worlds." + event.getEntity().getWorld().getName()))
             return;
         if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.SPAWNER) &&
-                !MobCombatSettingsConfig.isDoSpawnersSpawnEliteMobs() || event.getSpawnReason() == CUSTOM && DefaultConfig.doStrictSpawningRules)
+                !MobCombatSettingsConfig.isDoSpawnersSpawnEliteMobs() || event.getSpawnReason() == CUSTOM && DefaultConfig.isDoStrictSpawningRules())
             return;
-        if (event.getEntity().getCustomName() != null && DefaultConfig.preventEliteMobConversionOfNamedMobs)
+        if (event.getEntity().getCustomName() != null && DefaultConfig.isPreventEliteMobConversionOfNamedMobs())
             return;
 
         if (!EliteMobProperties.isValidEliteMobType(event.getEntityType()))
@@ -127,12 +127,12 @@ public class NaturalMobSpawnEventHandler implements Listener {
         double huntingGearChanceAdder = HunterEnchantment.getHuntingGearBonus(nearbyPlayers);
         validChance += huntingGearChanceAdder;
 
-        if (ValidWorldsConfig.nightmareWorlds.contains(event.getEntity().getWorld().getName()))
-            validChance += DefaultConfig.nightmareWorldSpawnBonus;
+        if (ValidWorldsConfig.getNightmareWorlds().contains(event.getEntity().getWorld().getName()))
+            validChance += DefaultConfig.getNightmareWorldSpawnBonus();
 
         if (ThreadLocalRandom.current().nextDouble() >= validChance) return;
 
-        if (ValidWorldsConfig.zoneBasedWorlds.contains(livingEntity.getWorld().getName())) {
+        if (ValidWorldsConfig.getZoneBasedWorlds().contains(livingEntity.getWorld().getName())) {
             int eliteMobLevel = (int) (Grid.getMobTierFromLocation(livingEntity.getLocation()));
             EliteEntity eliteEntity = new EliteEntity(livingEntity, eliteMobLevel, event.getSpawnReason());
             if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.SPAWNER))

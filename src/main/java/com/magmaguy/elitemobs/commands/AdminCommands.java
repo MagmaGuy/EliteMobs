@@ -61,7 +61,7 @@ public class AdminCommands {
                 .permission("elitemobs.*")
                 .handler(commandContext -> {
                     DefaultConfig.toggleSetupDone();
-                    if (DefaultConfig.setupDone)
+                    if (DefaultConfig.isSetupDone())
                         commandContext.getSender().sendMessage(ChatColorConverter.convert("&8[EliteMobs] &aEliteMobs" +
                                 " will no longer send messages on login. You can do [/em setup done] again to revert this."));
                     else commandContext.getSender().sendMessage(ChatColorConverter.convert("&8[EliteMobs] &aEliteMobs" +

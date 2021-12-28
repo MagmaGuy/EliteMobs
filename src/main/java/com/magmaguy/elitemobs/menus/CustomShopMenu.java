@@ -39,7 +39,7 @@ public class CustomShopMenu implements Listener {
      */
     public static void customShopInitializer(Player player) {
 
-        if (!EconomySettingsConfig.enableEconomy) return;
+        if (!EconomySettingsConfig.isEnableEconomy()) return;
         BuyOrSellMenu.constructBuyOrSellMenu(player, BuyOrSellMenuConfig.BUY_CUSTOM_ITEM);
 
     }

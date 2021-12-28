@@ -97,7 +97,6 @@ public class ArrowFireworks extends MinorPower implements Listener {
 
         if (ThreadLocalRandom.current().nextDouble() > 0.15) return;
         doArrowFireworks(event.getEliteMobEntity());
-
     }
 
 }

@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
-import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.TranslationConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
@@ -35,14 +34,13 @@ public class CurrencyCommandsHandler {
         if (senderCurrency - amount < 0) {
             sender.sendMessage(
                     ChatColorConverter.convert(
-                            ConfigValues.translationConfig
-                                    .getString(TranslationConfig.ECONOMY_PAYMENT_INSUFICIENT_CURRENCY)
-                                    .replace("$currency_name", EconomySettingsConfig.currencyName)));
+                            TranslationConfig.getEconomyPaymentInsufficientCurrency()
+                                    .replace("$currency_name", EconomySettingsConfig.getCurrencyName())));
             return;
         }
 
-        double actuallyReceivedAmount = Round.twoDecimalPlaces(amount - amount * EconomySettingsConfig.playerToPlayerTaxes);
-        double taxes = Round.twoDecimalPlaces(amount * EconomySettingsConfig.playerToPlayerTaxes);
+        double actuallyReceivedAmount = Round.twoDecimalPlaces(amount - amount * EconomySettingsConfig.getPlayerToPlayerTaxes());
+        double taxes = Round.twoDecimalPlaces(amount * EconomySettingsConfig.getPlayerToPlayerTaxes());
 
         //CASE: Successful payment
         EconomyHandler.addCurrency(recipient.getUniqueId(), actuallyReceivedAmount);
@@ -50,37 +48,33 @@ public class CurrencyCommandsHandler {
 
         sender.sendMessage(
                 ChatColorConverter.convert(
-                        ConfigValues.translationConfig
-                                .getString(TranslationConfig.ECONOMY_PAY_MESSAGE)
+                        TranslationConfig.getEconomyPayMessage()
                                 .replace("$amount_sent", amount + "")
                                 .replace("$amount_received", actuallyReceivedAmount + "")
                                 .replace("$taxes", taxes + "")
-                                .replace("$currency_name", EconomySettingsConfig.currencyName)
+                                .replace("$currency_name", EconomySettingsConfig.getCurrencyName())
                                 .replace("$receiver", recipient.getDisplayName())));
 
         sender.sendMessage(
                 ChatColorConverter.convert(
-                        ConfigValues.translationConfig
-                                .getString(TranslationConfig.ECONOMY_CURRENCY_LEFT_MESSAGE)
+                        TranslationConfig.getEconomyCurrencyLeftMessage()
                                 .replace("$amount_left", String.valueOf(EconomyHandler.checkCurrency(sender.getUniqueId())))
-                                .replace("$currency_name", EconomySettingsConfig.currencyName)));
+                                .replace("$currency_name", EconomySettingsConfig.getCurrencyName())));
 
         recipient.sendMessage(
                 ChatColorConverter.convert(
-                        ConfigValues.translationConfig
-                                .getString(TranslationConfig.ECONOMY_PAYMENT_RECEIVED_MESSAGE)
+                        TranslationConfig.getEconomyPaymentReceivedMessage()
                                 .replace("$amount_sent", amount + "")
                                 .replace("$amount_received", actuallyReceivedAmount + "")
                                 .replace("$taxes", taxes + "")
                                 .replace("$sender", sender.getDisplayName())
-                                .replace("$currency_name", EconomySettingsConfig.currencyName)));
+                                .replace("$currency_name", EconomySettingsConfig.getCurrencyName())));
 
         recipient.sendMessage(
                 ChatColorConverter.convert(
-                        ConfigValues.translationConfig
-                                .getString(TranslationConfig.ECONOMY_CURRENCY_LEFT_MESSAGE)
+                        TranslationConfig.getEconomyCurrencyLeftMessage()
                                 .replace("$amount_left", String.valueOf(EconomyHandler.checkCurrency(recipient.getUniqueId())))
-                                .replace("$currency_name", EconomySettingsConfig.currencyName)));
+                                .replace("$currency_name", EconomySettingsConfig.getCurrencyName())));
 
     }
 
@@ -127,7 +121,7 @@ public class CurrencyCommandsHandler {
             return;
         }
         EconomyHandler.setCurrency(player.getUniqueId(), amount);
-        commandSender.sendMessage("You set " + onlinePlayer + "'s " + EconomySettingsConfig.currencyName + " to " + amount);
+        commandSender.sendMessage("You set " + onlinePlayer + "'s " + EconomySettingsConfig.getCurrencyName() + " to " + amount);
     }
 
 
@@ -138,16 +132,15 @@ public class CurrencyCommandsHandler {
             return;
         }
         double money = EconomyHandler.checkCurrency(player.getUniqueId());
-        commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs]&f " + playerName + " &2has " + money + " " + EconomySettingsConfig.currencyName));
+        commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs]&f " + playerName + " &2has " + money + " " + EconomySettingsConfig.getCurrencyName()));
     }
 
     public static void walletCommand(Player player) {
         player.sendMessage(
                 ChatColorConverter.convert(
-                        ConfigValues.translationConfig
-                                .getString(TranslationConfig.ECONOMY_WALLET_COMMAND)
+                        TranslationConfig.getEconomyWalletCommand()
                                 .replace("$balance", String.valueOf(EconomyHandler.checkCurrency(player.getUniqueId())))
-                                .replace("$currency_name", EconomySettingsConfig.currencyName)));
+                                .replace("$currency_name", EconomySettingsConfig.getCurrencyName())));
     }
 
 }

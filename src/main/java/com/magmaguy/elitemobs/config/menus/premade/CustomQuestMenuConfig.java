@@ -106,7 +106,7 @@ public class CustomQuestMenuConfig extends MenusConfigFields {
             } else if (rewardEntry.getCurrencyAmount() != 0) {
                 textComponent.add(new TextComponent(rewardsDefaultSummaryLine
                         .replace("$amount", rewardEntry.getAmount() + "")
-                        .replace("$rewardName", rewardEntry.getCurrencyAmount() + " " + EconomySettingsConfig.currencyName)
+                        .replace("$rewardName", rewardEntry.getCurrencyAmount() + " " + EconomySettingsConfig.getCurrencyName())
                         .replace("$chance", (int) (rewardEntry.getChance() * 100) + "")));
             }
         }

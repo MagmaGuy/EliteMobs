@@ -46,7 +46,7 @@ public class ActionEvent extends CustomEvent {
      * events for the server to run
      */
     public static void initializeBlueprintEvents() {
-        if (!EventsConfig.actionEventsEnabled) return;
+        if (!EventsConfig.isActionEventsEnabled()) return;
         for (CustomEventsConfigFields customEventsConfigFields : CustomEventsConfig.getCustomEvents().values()) {
             if (customEventsConfigFields.isEnabled())
                 switch (customEventsConfigFields.getEventType()) {
@@ -98,7 +98,7 @@ public class ActionEvent extends CustomEvent {
     @Override
     public void startModifiers() {
         playerCooldowns.add(player);
-        Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> playerCooldowns.remove(player), 20L * 60L * EventsConfig.actionEventMinimumCooldown);
+        Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> playerCooldowns.remove(player), 20L * 60L * EventsConfig.getActionEventMinimumCooldown());
     }
 
     @Override

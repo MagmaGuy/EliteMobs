@@ -112,7 +112,7 @@ public class EventsRegistrer {
             pluginManager.registerEvents(new PlayerDeathMessageByEliteMob(), plugin);
 
         //explosion regenerator
-        if (DefaultConfig.doExplosionRegen)
+        if (DefaultConfig.isDoExplosionRegen())
             pluginManager.registerEvents(new Explosion.ExplosionEvent(), plugin);
 
         //Mob loot
@@ -261,12 +261,12 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new UnbindMenu.UnbinderMenuEvents(), plugin);
 
         //Minecraft behavior canceller
-        if (DefaultConfig.preventCreeperDamageToPassiveMobs)
+        if (DefaultConfig.isPreventCreeperDamageToPassiveMobs())
             pluginManager.registerEvents(new PreventCreeperPassiveEntityDamage(), plugin);
         if (!VersionChecker.serverVersionOlderThan(15, 0))
             pluginManager.registerEvents(new PreventEliteBeeHiveEnter(), plugin);
         pluginManager.registerEvents(new EnderDragonUnstuck(), plugin);
-        if (DefaultConfig.preventVanillaReinforcementsForEliteEntities)
+        if (DefaultConfig.isPreventVanillaReinforcementsForEliteEntities())
             pluginManager.registerEvents(new VanillaReinforcementsCanceller(), plugin);
         pluginManager.registerEvents(new LightningSpawnBypass(), plugin);
         if (ItemSettingsConfig.isEliteDurability())
@@ -280,9 +280,9 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new PreventLargeDarkroomExploit(), plugin);
         pluginManager.registerEvents(new PreventTowerExploit(), plugin);
         pluginManager.registerEvents(new PreventEndermanHeightExploit(), plugin);
-        if (AntiExploitConfig.noItemPickup)
+        if (AntiExploitConfig.isNoItemPickup())
             pluginManager.registerEvents(new PreventItemPickupByMobs(), plugin);
-        if (AntiExploitConfig.ambientDamageExploit)
+        if (AntiExploitConfig.isAmbientDamageExploit())
             pluginManager.registerEvents(new AmbientDamageExploit(), plugin);
         if (!VersionChecker.serverVersionOlderThan(14, 0)) {
             pluginManager.registerEvents(new HoneyBlockJumpExploit(), plugin);
@@ -322,7 +322,7 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new CustomQuest.CustomQuestEvents(), plugin);
 
         //Combat tag
-        if (CombatTagConfig.enableCombatTag)
+        if (CombatTagConfig.isEnableCombatTag())
             pluginManager.registerEvents(new CombatTag(), plugin);
 
 

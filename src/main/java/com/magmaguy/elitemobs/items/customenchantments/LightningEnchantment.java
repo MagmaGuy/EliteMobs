@@ -15,10 +15,12 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class LightningEnchantment extends CustomEnchantment {
-    public static String key = "lightning";
+    public static final String key = "lightning";
 
     public LightningEnchantment() {
         super(key, false);
@@ -26,7 +28,7 @@ public class LightningEnchantment extends CustomEnchantment {
 
     public static void playerLightning(Player player, Location location) {
         LightningSpawnBypass.bypass();
-        location.getWorld().strikeLightningEffect(location);
+        Objects.requireNonNull(location.getWorld()).strikeLightningEffect(location);
         location.getWorld().getNearbyEntities(location, 2.5, 2.5, 2.5).forEach((entity -> {
             EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(entity);
             if (eliteEntity == null) return;
@@ -36,11 +38,12 @@ public class LightningEnchantment extends CustomEnchantment {
     }
 
     public static class LightningEnchantmentEvents implements Listener {
-        public static HashSet<Player> playersInCooldown = new HashSet<>();
+        private static final Set<Player> playersInCooldown = new HashSet<>();
 
         @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
         public void onEntityDamagedByPlayer(EliteMobDamagedByPlayerEvent event) {
-            if (event.getPlayer().hasMetadata("NPC")) return;
+            if (event.getPlayer().hasMetadata("NPC") ||
+                    ElitePlayerInventory.playerInventories.containsKey(event.getPlayer().getUniqueId())) return;
             if (playersInCooldown.contains(event.getPlayer())) return;
             double lightningChance = ElitePlayerInventory.playerInventories.get(event.getPlayer().getUniqueId()).getLightningChance(true);
             if (lightningChance <= 0) return;

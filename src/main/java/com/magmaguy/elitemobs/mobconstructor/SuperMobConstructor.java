@@ -24,7 +24,7 @@ public class SuperMobConstructor {
         }
 
         String name = ChatColorConverter.convert(SuperMobProperties.getDataInstance(livingEntity).getName());
-        double newMaxHealth = SuperMobProperties.getDataInstance(livingEntity).getDefaultMaxHealth() * DefaultConfig.superMobStackAmount;
+        double newMaxHealth = SuperMobProperties.getDataInstance(livingEntity).getDefaultMaxHealth() * DefaultConfig.getSuperMobStackAmount();
 
         livingEntity.setCustomName(name);
         livingEntity.setCustomNameVisible(true);

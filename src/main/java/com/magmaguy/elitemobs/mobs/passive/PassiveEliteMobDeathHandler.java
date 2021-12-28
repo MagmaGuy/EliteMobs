@@ -83,18 +83,18 @@ public class PassiveEliteMobDeathHandler implements Listener {
             if (livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() ==
                     SuperMobProperties.getSuperMobMaxHealth(livingEntity))
                 return;
-            if (ThreadLocalRandom.current().nextDouble() < 1 / DefaultConfig.superMobStackAmount)
+            if (ThreadLocalRandom.current().nextDouble() < 1 / (DefaultConfig.getSuperMobStackAmount() + 0D))
                 return;
             ArrayList<LivingEntity> livingEntities = new ArrayList<>();
             for (Entity entity : livingEntity.getNearbyEntities(passiveRange, passiveRange, passiveRange)) {
                 if (!entity.getType().equals(livingEntity.getType())) continue;
                 if (EntityTracker.isSuperMob(entity)) continue;
                 livingEntities.add((LivingEntity) entity);
-                if (livingEntities.size() >= DefaultConfig.superMobStackAmount)
+                if (livingEntities.size() >= DefaultConfig.getSuperMobStackAmount())
                     break;
             }
 
-            if (livingEntities.size() < DefaultConfig.superMobStackAmount)
+            if (livingEntities.size() < DefaultConfig.getSuperMobStackAmount())
                 return;
 
             SuperMobConstructor.constructSuperMob(livingEntity);

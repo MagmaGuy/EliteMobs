@@ -42,7 +42,7 @@ public class TimedEvent extends CustomEvent implements Listener {
     }
 
     public static void initializeBlueprintEvents() {
-        if (!EventsConfig.timedEventsEnabled) return;
+        if (!EventsConfig.isTimedEventsEnabled()) return;
         for (CustomEventsConfigFields customEventsConfigFields : CustomEventsConfig.getCustomEvents().values())
             if (customEventsConfigFields.isEnabled() && customEventsConfigFields.getEventType() == EventType.TIMED)
                 blueprintEvents.add(new TimedEvent(customEventsConfigFields));

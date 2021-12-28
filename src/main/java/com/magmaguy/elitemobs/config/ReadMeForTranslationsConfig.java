@@ -9,6 +9,8 @@ import java.io.InputStream;
 import java.nio.file.Paths;
 
 public class ReadMeForTranslationsConfig {
+    private ReadMeForTranslationsConfig() {
+    }
 
     public static void initialize() {
         InputStream inputStream = MetadataHandler.PLUGIN.getResource("READ_ME_FOR_TRANSLATIONS.yml");

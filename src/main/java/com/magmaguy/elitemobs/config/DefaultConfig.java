@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.WarningMessage;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -12,22 +13,38 @@ import java.io.File;
  * Created by MagmaGuy on 08/06/2017.
  */
 public class DefaultConfig {
-
-    public static boolean alwaysShowNametags;
-    public static int superMobStackAmount;
-    public static boolean preventCreeperDamageToPassiveMobs;
-    public static boolean doPermissionTitles;
-    public static boolean preventEliteMobConversionOfNamedMobs;
-    public static boolean doStrictSpawningRules;
-    public static double nightmareWorldSpawnBonus;
-    public static boolean emLeadsToStatusMenu;
-    public static boolean otherCommandsLeadToEMStatusMenu;
-    public static boolean setupDone;
-    public static Location defaultSpawnLocation;
-    public static boolean doExplosionRegen;
-    public static boolean preventVanillaReinforcementsForEliteEntities;
-    public static boolean doRegenerateContainers;
-    public static int defaultTransitiveBlockLimiter;
+    @Getter
+    private static boolean alwaysShowNametags;
+    @Getter
+    private static int superMobStackAmount;
+    @Getter
+    private static boolean preventCreeperDamageToPassiveMobs;
+    @Getter
+    private static boolean doPermissionTitles;
+    @Getter
+    private static boolean preventEliteMobConversionOfNamedMobs;
+    @Getter
+    private static boolean doStrictSpawningRules;
+    @Getter
+    private static double nightmareWorldSpawnBonus;
+    @Getter
+    private static boolean emLeadsToStatusMenu;
+    @Getter
+    private static boolean otherCommandsLeadToEMStatusMenu;
+    @Getter
+    private static boolean setupDone;
+    @Getter
+    private static Location defaultSpawnLocation;
+    @Getter
+    private static boolean doExplosionRegen;
+    @Getter
+    private static boolean preventVanillaReinforcementsForEliteEntities;
+    @Getter
+    private static boolean doRegenerateContainers;
+    @Getter
+    private static int defaultTransitiveBlockLimiter;
+    private DefaultConfig() {
+    }
 
     private static File file = null;
     private static FileConfiguration fileConfiguration = null;
@@ -47,7 +64,6 @@ public class DefaultConfig {
 
         file = ConfigurationEngine.fileCreator("config.yml");
         fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
-
         alwaysShowNametags = ConfigurationEngine.setBoolean(fileConfiguration, "alwaysShowEliteMobNameTags", false);
         superMobStackAmount = Math.max(ConfigurationEngine.setInt(fileConfiguration, "superMobStackAmount", 50), 1);
         preventCreeperDamageToPassiveMobs = ConfigurationEngine.setBoolean(fileConfiguration, "preventEliteCreeperDamageToPassiveMobs", true);

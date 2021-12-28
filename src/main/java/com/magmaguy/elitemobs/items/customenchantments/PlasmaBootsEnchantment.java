@@ -18,6 +18,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -65,7 +66,7 @@ public class PlasmaBootsEnchantment extends CustomEnchantment {
     private static void createProjectile(Vector shotVector, Location sourceLocation, Player player) {
         new BukkitRunnable() {
             int counter = 0;
-            Location currentLocation = sourceLocation.clone();
+            final Location currentLocation = sourceLocation.clone();
 
             @Override
             public void run() {
@@ -74,7 +75,8 @@ public class PlasmaBootsEnchantment extends CustomEnchantment {
                     return;
                 }
                 counter++;
-                for (Entity entity : currentLocation.getWorld().getNearbyEntities(currentLocation, 0.1, 0.1, 0.1)) {
+                for (Entity entity : Objects.requireNonNull(currentLocation.getWorld())
+                        .getNearbyEntities(currentLocation, 0.1, 0.1, 0.1)) {
                     if (!(entity instanceof LivingEntity)) continue;
                     if (entity.getType().equals(EntityType.PLAYER)) continue;
                     cancel();
@@ -97,7 +99,8 @@ public class PlasmaBootsEnchantment extends CustomEnchantment {
     }
 
     private static void doVisualEffect(Location currentLocation) {
-        currentLocation.getWorld().spawnParticle(Particle.REDSTONE, currentLocation.getX(), currentLocation.getY(), currentLocation.getZ(),
+        Objects.requireNonNull(currentLocation.getWorld())
+                .spawnParticle(Particle.REDSTONE, currentLocation.getX(), currentLocation.getY(), currentLocation.getZ(),
                 5, 0.1, 0.1, 0.1, 1, new Particle.DustOptions(Color.fromRGB(
                         ThreadLocalRandom.current().nextInt(0, 100),
                         ThreadLocalRandom.current().nextInt(122, 255),
@@ -106,8 +109,8 @@ public class PlasmaBootsEnchantment extends CustomEnchantment {
     }
 
     public static class PlasmaBootsEnchantmentEvents implements Listener {
-        private static HashSet<UUID> players = new HashSet<>();
-        private static HashSet<UUID> cooldownPlayers = new HashSet<>();
+        private static final HashSet<UUID> players = new HashSet<>();
+        private static final HashSet<UUID> cooldownPlayers = new HashSet<>();
 
         @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
         public void onSneak(PlayerToggleSneakEvent event) {
@@ -120,12 +123,12 @@ public class PlasmaBootsEnchantment extends CustomEnchantment {
             if (plasmaBootLevel < 1) return;
             if (!players.contains(event.getPlayer().getUniqueId())) {
                 players.add(event.getPlayer().getUniqueId());
-                Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, (task) -> players.remove(event.getPlayer().getUniqueId()), 10);
+                Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, task -> players.remove(event.getPlayer().getUniqueId()), 10);
                 return;
             }
             players.remove(event.getPlayer().getUniqueId());
             cooldownPlayers.add(event.getPlayer().getUniqueId());
-            Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, (task) -> cooldownPlayers.remove(event.getPlayer().getUniqueId()), 20L * 60 * 2);
+            Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, task -> cooldownPlayers.remove(event.getPlayer().getUniqueId()), 20L * 60 * 2);
 
             doPlasmaBootsEnchantment((int) plasmaBootLevel, event.getPlayer());
 

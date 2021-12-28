@@ -8,6 +8,9 @@ import java.util.Collections;
 import java.util.List;
 
 public class MobCombatSettingsConfig {
+    private MobCombatSettingsConfig() {
+    }
+
     @Getter
     private static boolean doNaturalMobSpawning;
     @Getter
@@ -58,8 +61,6 @@ public class MobCombatSettingsConfig {
     private static boolean regenerateCustomBossHealthOnCombatEnd;
     @Getter
     private static String defaultOtherWorldBossLocationMessage;
-    private MobCombatSettingsConfig() {
-    }
     @Getter
     private static String weakTextColor;
     @Getter

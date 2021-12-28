@@ -12,7 +12,7 @@ public class AnnouncementPriority {
     }
 
     public static void announce(String message, World world, int announcementPriority) {
-        if (announcementPriority == 1 && !EventsConfig.announcementBroadcastWorldOnly)
+        if (announcementPriority == 1 && !EventsConfig.isAnnouncementBroadcastWorldOnly())
             Bukkit.broadcastMessage(ChatColorConverter.convert(message));
         else
             for (Player player : world.getPlayers())

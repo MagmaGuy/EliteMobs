@@ -14,6 +14,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
+import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class ArrowRain extends MinorPower implements Listener {
@@ -56,7 +57,7 @@ public class ArrowRain extends MinorPower implements Listener {
             int randZ = ThreadLocalRandom.current().nextInt(30) - 15;
             Location newLocation = location.clone().add(new Vector(randX, randY, randZ));
             newLocation = newLocation.setDirection(new Vector(ThreadLocalRandom.current().nextDouble() - 0.5, -0.5, ThreadLocalRandom.current().nextDouble() - 0.5));
-            Arrow arrow = (Arrow) location.getWorld().spawnEntity(newLocation, EntityType.ARROW);
+            Arrow arrow = (Arrow) Objects.requireNonNull(location.getWorld()).spawnEntity(newLocation, EntityType.ARROW);
             arrow.setShooter(eliteEntity.getLivingEntity());
         }
     }

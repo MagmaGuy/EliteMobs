@@ -13,8 +13,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import static com.magmaguy.elitemobs.config.EconomySettingsConfig.resaleValue;
-
 public class ItemWorthCalculator {
 
     public static double determineItemWorth(ItemStack itemStack, Player player) {
@@ -45,8 +43,8 @@ public class ItemWorthCalculator {
 
     public static double determineResaleWorth(ItemStack itemStack, Player player) {
         double value = ItemTagger.getItemValue(itemStack);
-        value = value == -1 ? Round.twoDecimalPlaces(determineItemWorth(itemStack, player) * (resaleValue / 100)) :
-                Round.twoDecimalPlaces(value * (resaleValue / 100));
+        value = value == -1 ? Round.twoDecimalPlaces(determineItemWorth(itemStack, player) * (EconomySettingsConfig.getResaleValue() / 100)) :
+                Round.twoDecimalPlaces(value * (EconomySettingsConfig.getResaleValue() / 100));
         return value;
     }
 

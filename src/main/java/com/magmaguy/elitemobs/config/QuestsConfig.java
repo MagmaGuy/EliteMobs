@@ -18,6 +18,9 @@ import java.util.List;
 
 public class QuestsConfig {
 
+    private QuestsConfig() {
+    }
+
     @Getter
     private static boolean requireQuestTurnIn;
     @Getter
@@ -68,8 +71,6 @@ public class QuestsConfig {
     private static String fetchQuestScoreboardProgressionLine;
     @Getter
     private static String dialogQuestScoreboardProgressionLine;
-    private QuestsConfig() {
-    }
     @Getter
     private static int maximumActiveQuests;
     @Getter
