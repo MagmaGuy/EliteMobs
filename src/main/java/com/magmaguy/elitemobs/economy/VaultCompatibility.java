@@ -18,8 +18,8 @@ public class VaultCompatibility {
 
     public static void vaultSetup() {
         if (Bukkit.getServer().getPluginManager().isPluginEnabled("Vault")) {
-            Bukkit.getLogger().info("[EliteMobs] Vault detected.");
-            if (EconomySettingsConfig.useVault) {
+            Bukkit.getLogger().info("[(EliteMobs] Vault detected.");
+            if (EconomySettingsConfig.isUseVault()) {
                 Bukkit.getLogger().warning("[EliteMobs] Vault preference detected. This is not the recommended setting. " +
                         "Ask the dev or check the wiki as to why.");
                 VAULT_ENABLED = true;

@@ -67,7 +67,7 @@ public class Explosion {
     }
 
     private static void generateExplosion(List<Block> blockList, Entity entity, ElitePower elitePower, Location explosionSource) {
-        if (!DefaultConfig.doExplosionRegen) return;
+        if (!DefaultConfig.isDoExplosionRegen()) return;
         if (EliteMobs.worldGuardIsEnabled &&
                 explosionSource != null &&
                 !WorldGuardFlagChecker.doExplosionRegenFlag(explosionSource))
@@ -237,7 +237,7 @@ public class Explosion {
     }
 
     private static void queueBlock(ArrayList<BlockState> blockStates, BlockState blockState) {
-        if (!DefaultConfig.doRegenerateContainers && blockState instanceof Container)
+        if (!DefaultConfig.isDoRegenerateContainers() && blockState instanceof Container)
             return;
         blockStates.add(blockState.getBlock().getState());
         if (blockState instanceof Container)

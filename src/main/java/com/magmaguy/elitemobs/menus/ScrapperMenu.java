@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.menus;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.api.EliteMobsItemDetector;
-import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.TranslationConfig;
 import com.magmaguy.elitemobs.config.menus.premade.ScrapperMenuConfig;
@@ -97,13 +96,13 @@ public class ScrapperMenu extends EliteMenu {
 
                 //Check if it's an elitemobs item. The soulbind check only says if the player would be able to pick it up, and vanilla items can be picked up
                 if (!EliteMobsItemDetector.isEliteMobsItem(event.getCurrentItem())) {
-                    event.getWhoClicked().sendMessage(ChatColorConverter.convert(ConfigValues.translationConfig.getString(TranslationConfig.SHOP_SALE_INSTRUCTIONS)));
+                    event.getWhoClicked().sendMessage(ChatColorConverter.convert(TranslationConfig.getShopSaleInstructions()));
                     return;
                 }
 
                 //If the item isn't soulbound to the player, it can't be sold by that player
                 if (!SoulbindEnchantment.isValidSoulbindUser(currentItem.getItemMeta(), player)) {
-                    player.sendMessage(ChatColorConverter.convert(ConfigValues.translationConfig.getString(TranslationConfig.SHOP_SALE_OTHERS_ITEMS)));
+                    player.sendMessage(ChatColorConverter.convert(TranslationConfig.getShopSaleOthersItems()));
                     return;
                 }
 

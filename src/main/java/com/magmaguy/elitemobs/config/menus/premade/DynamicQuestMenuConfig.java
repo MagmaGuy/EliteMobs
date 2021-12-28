@@ -84,7 +84,7 @@ public class DynamicQuestMenuConfig extends MenusConfigFields {
             } else if (rewardEntry.getCurrencyAmount() != 0) {
                 TextComponent customItemTextComponent = new TextComponent((rewardsDefaultSummaryLine)
                         .replace("$amount", rewardEntry.getAmount() + "")
-                        .replace("$rewardName", rewardEntry.getCurrencyAmount() + " " + EconomySettingsConfig.currencyName)
+                        .replace("$rewardName", rewardEntry.getCurrencyAmount() + " " + EconomySettingsConfig.getCurrencyName())
                         .replace("$chance", (int) (rewardEntry.getChance() * 100) + ""));
                 textComponents.add(customItemTextComponent);
             }

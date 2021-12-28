@@ -9,10 +9,11 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ItemSettingsConfig {
+    private ItemSettingsConfig() {
+    }
 
     @Getter
     private static String shopItemSource;
-
     @Getter
     private static boolean doEliteMobsLoot;
     @Getter
@@ -87,8 +88,6 @@ public class ItemSettingsConfig {
     private static String scrapFailedMessage;
     @Getter
     private static boolean putLootDirectlyIntoPlayerInventory;
-    private ItemSettingsConfig() {
-    }
 
     public static void initializeConfig() {
         File file = ConfigurationEngine.fileCreator("ItemSettings.yml");

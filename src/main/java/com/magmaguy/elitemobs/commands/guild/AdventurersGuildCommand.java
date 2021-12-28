@@ -28,7 +28,7 @@ public class AdventurersGuildCommand {
             defineTeleportLocation();
         if (AdventurersGuildConfig.getGuildWorldLocation() == null) return false;
 
-        if (CombatTagConfig.enableCombatTag)
+        if (CombatTagConfig.isEnableCombatTag())
             new EventCaller(new PlayerPreTeleportEvent(player, AdventurersGuildConfig.getGuildWorldLocation()));
         else
             new EventCaller(new PlayerTeleportEvent(player, AdventurersGuildConfig.getGuildWorldLocation()));

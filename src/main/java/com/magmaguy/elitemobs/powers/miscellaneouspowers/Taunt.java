@@ -37,6 +37,7 @@ public class Taunt extends MinorPower implements Listener {
 
     //Also used by the custom bosses
     public static void nameTagProcessor(EliteEntity eliteEntity, Entity entity, List<String> list) {
+        if (entity == null || !eliteEntity.isValid()) return;
         int randomizedKey = ThreadLocalRandom.current().nextInt(list.size());
         String tempName = list.get(randomizedKey);
         entity.setCustomName(ChatColorConverter.convert(tempName));

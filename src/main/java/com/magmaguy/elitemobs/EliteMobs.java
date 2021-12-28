@@ -84,9 +84,9 @@ public class EliteMobs extends JavaPlugin {
         ItemSettingsConfig.initializeConfig();
         ProceduralItemGenerationSettingsConfig.initializeConfig();
         PotionEffectsConfig.initializeConfigs();
-        ConfigValues.initializeConfigurations();
-        ConfigValues.initializeCachedConfigurations();
+        TranslationConfig.initializeConfig();
         EconomySettingsConfig.initializeConfig();
+        EventsConfig.initializeConfig();
         new EnchantmentsConfig();
         AntiExploitConfig.initializeConfig();
         CombatTagConfig.initializeConfig();
@@ -110,11 +110,11 @@ public class EliteMobs extends JavaPlugin {
 
     public static void worldScanner() {
         for (World world : Bukkit.getWorlds())
-            if (ValidWorldsConfig.fileConfiguration.getBoolean("Valid worlds." + world.getName())) {
+            if (ValidWorldsConfig.getFileConfiguration().getBoolean("Valid worlds." + world.getName())) {
                 validWorldList.add(world);
-                if (ValidWorldsConfig.zoneBasedWorlds.contains(world.getName()))
+                if (ValidWorldsConfig.getZoneBasedWorlds().contains(world.getName()))
                     zoneBasedSpawningWorlds.add(world);
-                if (ValidWorldsConfig.nightmareWorlds.contains(world.getName())) {
+                if (ValidWorldsConfig.getNightmareWorlds().contains(world.getName())) {
                     nightmareWorlds.add(world);
                     DaylightWatchdog.preventDaylight(world);
                 }
@@ -376,9 +376,9 @@ public class EliteMobs extends JavaPlugin {
     private void launchRunnables() {
         if (!zoneBasedSpawningWorlds.isEmpty())
             Grid.initializeGrid();
-        int eggTimerInterval = 20 * 60 * 10 / DefaultConfig.superMobStackAmount;
+        int eggTimerInterval = 20 * 60 * 10 / DefaultConfig.getSuperMobStackAmount();
         new PlayerPotionEffects();
-        if (MobPropertiesConfig.getMobProperties().get(EntityType.CHICKEN).isEnabled() && DefaultConfig.superMobStackAmount > 0) {
+        if (MobPropertiesConfig.getMobProperties().get(EntityType.CHICKEN).isEnabled() && DefaultConfig.getSuperMobStackAmount() > 0) {
             new EggRunnable().runTaskTimer(this, eggTimerInterval, eggTimerInterval);
         }
         //save regional bosses when the files update

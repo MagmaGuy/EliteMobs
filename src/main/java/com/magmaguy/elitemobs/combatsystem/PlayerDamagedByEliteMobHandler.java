@@ -48,6 +48,7 @@ public class PlayerDamagedByEliteMobHandler implements Listener {
         //From this point on, the damage event is fully altered by Elite Mobs
 
         Player player = (Player) event.getEntity();
+        if (ElitePlayerInventory.playerInventories.get(player.getUniqueId()) == null) return;
 
         if (player.isBlocking()) {
             if (player.getInventory().getItemInOffHand().getType().equals(Material.SHIELD)) {

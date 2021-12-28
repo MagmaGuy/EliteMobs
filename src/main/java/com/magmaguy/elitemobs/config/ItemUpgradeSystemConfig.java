@@ -9,6 +9,9 @@ import java.util.List;
 
 public class ItemUpgradeSystemConfig {
 
+    private ItemUpgradeSystemConfig() {
+    }
+
     @Getter
     private static String scrapItemName;
     @Getter
@@ -17,9 +20,6 @@ public class ItemUpgradeSystemConfig {
     private static String upgradeItemName;
     @Getter
     private static List<String> upgradeItemLore;
-
-    private ItemUpgradeSystemConfig() {
-    }
 
     public static void initializeConfig() {
         File file = ConfigurationEngine.fileCreator("ScrapItemSettings.yml");

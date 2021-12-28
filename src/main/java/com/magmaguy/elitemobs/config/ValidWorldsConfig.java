@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.config;
 
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
@@ -10,16 +11,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ValidWorldsConfig {
+    @Getter
+    private static List<String> validWorlds = new ArrayList<>();
+    @Getter
+    private static List<String> zoneBasedWorlds = new ArrayList<>();
+    @Getter
+    private static List<String> nightmareWorlds = new ArrayList<>();
+    @Getter
+    private static FileConfiguration fileConfiguration;
 
-    public static List<String> validWorlds = new ArrayList<>(), zoneBasedWorlds = new ArrayList<>(), nightmareWorlds = new ArrayList<>();
-
-    public static FileConfiguration fileConfiguration;
+    private ValidWorldsConfig() {
+    }
     private static File file;
 
     public static void initializeConfig() {
         file = ConfigurationEngine.fileCreator("ValidWorlds.yml");
         fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
-
 
         for (World world : Bukkit.getWorlds())
             ConfigurationEngine.setBoolean(fileConfiguration, "Valid worlds." + world.getName(), true);

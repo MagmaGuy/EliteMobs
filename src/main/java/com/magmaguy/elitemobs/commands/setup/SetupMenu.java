@@ -21,14 +21,11 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class SetupMenu {
 
-    public static HashMap<Inventory, SetupMenu> setupMenus = new HashMap<>();
+    public static Map<Inventory, SetupMenu> setupMenus = new HashMap<>();
 
     Inventory inventory;
     Player player;

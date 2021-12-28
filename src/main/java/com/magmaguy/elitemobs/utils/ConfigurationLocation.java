@@ -5,10 +5,14 @@ import org.bukkit.Location;
 import org.bukkit.World;
 
 import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 public class ConfigurationLocation {
+    private static final Set<String> notLoadedWorldNames = new HashSet<>();
 
-    public static HashSet<String> notLoadedWorldNames = new HashSet<>();
+    private ConfigurationLocation() {
+    }
 
     /*
     Location format: worldname,x,y,z,pitch,yaw
@@ -18,7 +22,7 @@ public class ConfigurationLocation {
     }
 
     public static String deserialize(Location location) {
-        return deserialize(location.getWorld().getName(), location.getX(), location.getY(), location.getZ(), location.getPitch(), location.getYaw());
+        return deserialize(Objects.requireNonNull(location.getWorld()).getName(), location.getX(), location.getY(), location.getZ(), location.getPitch(), location.getYaw());
     }
 
     public static Location serialize(String locationString) {
@@ -58,10 +62,6 @@ public class ConfigurationLocation {
             return null;
         }
         return new Location(world, x, y, z, yaw, pitch);
-    }
-
-    private static String getSubString(String originalString, int index, String splitter) {
-        return originalString.split(splitter)[index];
     }
 
 }

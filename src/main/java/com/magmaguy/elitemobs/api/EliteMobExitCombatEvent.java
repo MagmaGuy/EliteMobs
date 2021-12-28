@@ -31,7 +31,7 @@ public class EliteMobExitCombatEvent extends Event {
                 !reason.equals(EliteMobExitCombatReason.PHASE_SWITCH) &&
                 !eliteEntity.getUnsyncedLivingEntity().getType().equals(EntityType.PHANTOM))
             eliteEntity.fullHeal();
-        if (!DefaultConfig.alwaysShowNametags)
+        if (!DefaultConfig.isAlwaysShowNametags())
             eliteEntity.setNameVisible(false);
     }
 

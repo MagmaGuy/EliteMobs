@@ -1,12 +1,14 @@
 package com.magmaguy.elitemobs.config;
 
+import lombok.Getter;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
 
 public class DiscordSRVConfig {
 
-    public static String announcementRoomName;
+    @Getter
+    private static String announcementRoomName;
 
     public static void initializeConfig() {
         File file = ConfigurationEngine.fileCreator("DiscordSRV.yml");

@@ -159,11 +159,11 @@ public class EliteItemLore {
         if (showItemWorth)
             itemWorth = ItemSettingsConfig.getLoreWorth()
                     .replace("$worth", ItemWorthCalculator.determineItemWorth(itemStack, soulboundPlayer) + "")
-                    .replace("$currencyName", EconomySettingsConfig.currencyName);
+                    .replace("$currencyName", EconomySettingsConfig.getCurrencyName());
         else
             itemWorth = ItemSettingsConfig.getLoreResale()
                     .replace("$resale", ItemWorthCalculator.determineResaleWorth(itemStack, soulboundPlayer) + "")
-                    .replace("$currencyName", EconomySettingsConfig.currencyName);
+                    .replace("$currencyName", EconomySettingsConfig.getCurrencyName());
     }
 
     private void constructSoulboundOwner() {

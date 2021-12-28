@@ -11,17 +11,14 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class CustomConfig {
 
     //This stores configurations long term, ? is the specific extended custom config field
     private final HashMap<String, CustomConfigFields> customConfigFieldsHashMap = new HashMap<>();
     //This is only used for loading configurations in to check if the machine has all of the default files
-    private final ArrayList customConfigFieldsArrayList = new ArrayList<>();
+    private final List customConfigFieldsArrayList = new ArrayList<>();
     private final String folderName;
     private final Class<? extends CustomConfigFields> customConfigFields;
 
@@ -74,7 +71,7 @@ public class CustomConfig {
     }
 
     private void directoryCrawler(String path){
-        for (File file : (new File(path)).listFiles()) {
+        for (File file : Objects.requireNonNull((new File(path)).listFiles())) {
             if (file.isFile())
                 fileInitializer(file);
             else if (file.isDirectory())

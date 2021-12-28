@@ -147,8 +147,8 @@ public class CustomBossMegaConsumer {
                 .replace("$reinforcementLevel", ChatColorConverter.convert("&8〔&7") + this.level + "&8〕&f")
                 .replace("$eventBossLevel", ChatColorConverter.convert("&4「&c" + this.level + "&4」&f")));
         livingEntity.setCustomName(parsedName);
-        livingEntity.setCustomNameVisible(DefaultConfig.alwaysShowNametags);
-        DisguiseEntity.setDisguiseNameVisibility(DefaultConfig.alwaysShowNametags, livingEntity);
+        livingEntity.setCustomNameVisible(DefaultConfig.isAlwaysShowNametags());
+        DisguiseEntity.setDisguiseNameVisibility(DefaultConfig.isAlwaysShowNametags(), livingEntity);
         customBossEntity.setName(parsedName, false);
     }
 
