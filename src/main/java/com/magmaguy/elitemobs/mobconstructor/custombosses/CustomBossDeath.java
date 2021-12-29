@@ -143,7 +143,7 @@ public class CustomBossDeath implements Listener {
     }
 
     //sorts damagers
-    private static HashMap<Player, Double> sortByComparator(HashMap<Player, Double> unsortMap, final boolean order) {
+    private static HashMap<Player, Double> sortByComparator(Map<Player, Double> unsortMap, final boolean order) {
 
         List<Map.Entry<Player, Double>> list = new LinkedList<Map.Entry<Player, Double>>(unsortMap.entrySet());
 
