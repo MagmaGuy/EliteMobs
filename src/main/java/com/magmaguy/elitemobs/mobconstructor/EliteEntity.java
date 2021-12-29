@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobHealEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
+import com.magmaguy.elitemobs.collateralminecraftchanges.KeepPassivesAngry;
 import com.magmaguy.elitemobs.combatsystem.CombatSystem;
 import com.magmaguy.elitemobs.combatsystem.antiexploit.AntiExploitMessage;
 import com.magmaguy.elitemobs.config.AntiExploitConfig;
@@ -180,7 +181,7 @@ public class EliteEntity implements SimplePersistentEntityInterface {
         this.damagers.put(player, damage);
     }
 
-    public void addDamagers(HashMap<Player, Double> newDamagers) {
+    public void addDamagers(Map<Player, Double> newDamagers) {
         this.damagers.putAll(newDamagers);
     }
 
@@ -188,7 +189,7 @@ public class EliteEntity implements SimplePersistentEntityInterface {
         return !damagers.isEmpty();
     }
 
-    public HashMap<Player, Double> getDamagers() {
+    public Map<Player, Double> getDamagers() {
         return damagers;
     }
 
@@ -234,22 +235,24 @@ public class EliteEntity implements SimplePersistentEntityInterface {
         livingEntity.getEquipment().setLeggingsDropChance(0);
         livingEntity.getEquipment().setBootsDropChance(0);
 
-        if (livingEntity.getType().equals(EntityType.RABBIT))
+        if (livingEntity.getType().equals(EntityType.RABBIT)) {
             ((Rabbit) livingEntity).setRabbitType(Rabbit.Type.THE_KILLER_BUNNY);
+        }
 
         if (entityType.equals(EntityType.WOLF)) {
             Wolf wolf = (Wolf) livingEntity;
             wolf.setAngry(true);
             wolf.setBreed(false);
+            KeepPassivesAngry.showMeYouWarFace(this);
         }
 
         if (entityType.equals(EntityType.ENDER_DRAGON))
             ((EnderDragon) livingEntity).getBossBar().setTitle(getName());
 
-        if (!VersionChecker.serverVersionOlderThan(15, 0))
-            if (livingEntity instanceof Bee)
-                ((Bee) livingEntity).setCannotEnterHiveTicks(Integer.MAX_VALUE);
-
+        if (!VersionChecker.serverVersionOlderThan(15, 0) && livingEntity instanceof Bee) {
+            KeepPassivesAngry.showMeYouWarFace(this);
+            ((Bee) livingEntity).setCannotEnterHiveTicks(Integer.MAX_VALUE);
+        }
         this.spawnReason = spawnReason;
 
         //This sets whether the entity gets despawned when beyond a certain distance from the player, should only happen
@@ -349,7 +352,7 @@ public class EliteEntity implements SimplePersistentEntityInterface {
         livingEntity.getEquipment().setHelmet(new ItemStack(Material.AIR));
 
         if (level >= 5 && MobCombatSettingsConfig.isDoEliteHelmets())
-                livingEntity.getEquipment().setHelmet(new ItemStack(Material.LEATHER_HELMET));
+            livingEntity.getEquipment().setHelmet(new ItemStack(Material.LEATHER_HELMET));
 
         if (level >= 10) livingEntity.getEquipment().setBoots(new ItemStack(Material.LEATHER_BOOTS));
         if (level >= 15) livingEntity.getEquipment().setLeggings(new ItemStack(Material.LEATHER_LEGGINGS));

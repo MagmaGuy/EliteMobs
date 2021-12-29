@@ -70,6 +70,12 @@ public class ConfigurationImporter {
                         case "customspawns":
                             moveDirectory(file, Paths.get(configurationsPath.normalize() + "" + File.separatorChar + "customspawns"));
                             break;
+                        case "customquests":
+                            moveDirectory(file, Paths.get(configurationsPath.normalize() + "" + File.separatorChar + "customquests"));
+                            break;
+                        case "npcs":
+                            moveDirectory(file, Paths.get(configurationsPath.normalize() + "" + File.separatorChar + "npcs"));
+                            break;
                         case "worldcontainer":
                             moveWorlds(file);
                             break;

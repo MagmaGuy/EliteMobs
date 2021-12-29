@@ -61,18 +61,19 @@ public class AlternativeDurabilityLoss implements Listener {
         itemsList.add(event.getEntity().getInventory().getItemInOffHand());
 
         for (ItemStack itemStack : itemsList)
-            if (itemStack != null)
-                if (EliteMobsItemDetector.isEliteMobsItem(itemStack))
-                    if (itemStack.getItemMeta() instanceof Damageable) {
-                        Damageable damageable = (Damageable) itemStack.getItemMeta();
-                        int maxDurability = itemStack.getType().getMaxDurability();
-                        int durabilityLoss = (int) (maxDurability * durabilityLoss(itemStack));
-                        int currentDurability = damageable.getDamage();
-                        int newDurability = currentDurability + durabilityLoss;
-                        damageable.setDamage(newDurability);
-                        itemStack.setItemMeta((ItemMeta) damageable);
-                        if (newDurability >= maxDurability)
-                            itemStack.setAmount(0);
-                    }
+            if (itemStack != null &&
+                    itemStack.getType().getMaxDurability() != 0 &&
+                    EliteMobsItemDetector.isEliteMobsItem(itemStack) &&
+                    itemStack.getItemMeta() instanceof Damageable) {
+                Damageable damageable = (Damageable) itemStack.getItemMeta();
+                int maxDurability = itemStack.getType().getMaxDurability();
+                int durabilityLoss = (int) (maxDurability * durabilityLoss(itemStack));
+                int currentDurability = damageable.getDamage();
+                int newDurability = currentDurability + durabilityLoss;
+                damageable.setDamage(newDurability);
+                itemStack.setItemMeta((ItemMeta) damageable);
+                if (newDurability >= maxDurability)
+                    itemStack.setAmount(0);
+            }
     }
 }
