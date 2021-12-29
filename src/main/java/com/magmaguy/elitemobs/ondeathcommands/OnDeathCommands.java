@@ -16,7 +16,9 @@ import java.util.concurrent.ThreadLocalRandom;
 public class OnDeathCommands implements Listener {
 
     public static void parseConsoleCommand(List<String> configStrings, EliteMobDeathEvent event) {
-        Player topDamager = null, secondDamager = null, thirdDamager = null;
+        Player topDamager = null;
+        Player secondDamager = null;
+        Player thirdDamager = null;
         HashMap<Player, Double> sortedMap = sortByComparator(event.getEliteEntity().getDamagers(), false);
         Iterator<Player> sortedMapIterator = sortedMap.keySet().iterator();
         for (int i = 1; i < 4; i++) {
@@ -93,7 +95,7 @@ public class OnDeathCommands implements Listener {
         parseConsoleCommand(MobCombatSettingsConfig.getCommandsOnDeath(), event);
     }
 
-    private static HashMap<Player, Double> sortByComparator(HashMap<Player, Double> unsortMap, final boolean order) {
+    private static HashMap<Player, Double> sortByComparator(Map<Player, Double> unsortMap, final boolean order) {
 
         List<Map.Entry<Player, Double>> list = new LinkedList<>(unsortMap.entrySet());
 

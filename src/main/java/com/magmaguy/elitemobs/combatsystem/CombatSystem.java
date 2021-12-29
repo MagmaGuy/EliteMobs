@@ -1,6 +1,8 @@
 package com.magmaguy.elitemobs.combatsystem;
 
 public class CombatSystem {
+    private CombatSystem() {
+    }
 
     public static final double PER_LEVEL_POWER_INCREASE = 0.5;
 
