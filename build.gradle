@@ -10,7 +10,7 @@ compileJava.options.encoding = "UTF-8"
 compileTestJava.options.encoding = "UTF-8"
 
 group 'com.magmaguy'
-version '7.3.12-SNAPSHOT-4'
+version '7.3.12-SNAPSHOT-5'
 
 repositories {
     maven {
@@ -50,6 +50,9 @@ repositories {
 
     //WorldGuard API
     maven { url = 'https://maven.enginehub.org/repo/' }
+
+    //Model Engine
+    maven { url = 'https://mvn.lumine.io/repository/maven-public/' }
 
 }
 
@@ -93,8 +96,11 @@ dependencies {
     implementation group: 'org.reflections', name: 'reflections', version: '0.9.12'
 
     //lombok
-    compileOnly 'org.projectlombok:lombok:1.18.20'
-    annotationProcessor 'org.projectlombok:lombok:1.18.20'
+    compileOnly 'org.projectlombok:lombok:1.18.22'
+    annotationProcessor 'org.projectlombok:lombok:1.18.22'
+
+    //Model Engine
+    compileOnly "com.ticxo.modelengine:api:R2.2.0"
 
     testCompileOnly 'org.projectlombok:lombok:1.18.20'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.20'

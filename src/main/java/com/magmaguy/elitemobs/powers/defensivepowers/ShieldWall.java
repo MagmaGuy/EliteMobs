@@ -28,12 +28,16 @@ import org.bukkit.util.Vector;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class ShieldWall extends MinorPower {
-    private double northHealthPool, southHealthPool, eastHealthPool, westHealthPool;
-    private HashMap<Direction, List<ArmorStand>> armorStands = new HashMap<>();
-    private HashMap<Direction, Vector> armorStandOffBaseOffsets = new HashMap<>();
+    private final HashMap<Direction, List<ArmorStand>> armorStands = new HashMap<>();
+    private final HashMap<Direction, Vector> armorStandOffBaseOffsets = new HashMap<>();
+    private double northHealthPool;
+    private double southHealthPool;
+    private double eastHealthPool;
+    private double westHealthPool;
     @Getter
     @Setter
     private boolean isActive = false;
@@ -44,7 +48,8 @@ public class ShieldWall extends MinorPower {
     }
 
     public boolean preventDamage(Player player, EliteEntity eliteEntity, double damage) {
-        Vector direction = player.getLocation().subtract(eliteEntity.getLivingEntity().getLocation()).toVector().normalize();
+        if (!Objects.equals(player.getLocation().getWorld(), eliteEntity.getLocation().getWorld())) return false;
+        Vector direction = player.getLocation().subtract(eliteEntity.getLocation()).toVector().normalize();
         Direction damageDirection;
         if (Math.abs(direction.getX()) > Math.abs(direction.getZ())) {
             if (direction.getX() > 0)
