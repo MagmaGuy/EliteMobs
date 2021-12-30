@@ -22,6 +22,7 @@ import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.powers.meta.CustomSummonPower;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
+import com.magmaguy.elitemobs.thirdparty.modelengine.ModelEntity;
 import com.magmaguy.elitemobs.utils.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -86,6 +87,9 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
     @Getter
     @Setter
     private boolean isMount = false;
+    @Getter
+    @Setter
+    private ModelEntity modelEntity = null;
 
     /**
      * Uses a builder pattern in order to construct a CustomBossEntity at an arbitrary point in the future. Does not

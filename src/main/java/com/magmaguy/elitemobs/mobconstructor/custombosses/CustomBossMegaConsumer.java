@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity;
+import com.magmaguy.elitemobs.thirdparty.modelengine.ModelEntity;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser;
@@ -84,6 +85,7 @@ public class CustomBossMegaConsumer {
         setBaby(livingEntity);
         setFrozen(livingEntity);
         setDisguise(livingEntity);
+        setCustomModel(livingEntity);
         setName(livingEntity);
         setFollowRange(livingEntity);
 
@@ -103,12 +105,28 @@ public class CustomBossMegaConsumer {
 
 
     private void setDisguise(LivingEntity livingEntity) {
-        if (customBossesConfigFields.getDisguise() == null) return;
+        if (customBossesConfigFields.getDisguise() == null ||
+                Bukkit.getPluginManager().isPluginEnabled("ModelEngine") &&
+                        customBossesConfigFields.getCustomModel() != null &&
+                        !customBossesConfigFields.getCustomModel().isEmpty())
+            return;
         if (!Bukkit.getPluginManager().isPluginEnabled("LibsDisguises")) return;
         try {
             DisguiseEntity.disguise(customBossesConfigFields.getDisguise(), livingEntity, customBossesConfigFields.getCustomDisguiseData(), customBossesConfigFields.getFilename());
         } catch (Exception ex) {
             new WarningMessage("Failed to load LibsDisguises disguise correctly!");
+        }
+    }
+
+    private void setCustomModel(LivingEntity livingEntity) {
+        if (!Bukkit.getPluginManager().isPluginEnabled("ModelEngine")) return;
+        if (customBossesConfigFields.getCustomModel() == null || customBossesConfigFields.getCustomModel().isEmpty())
+            return;
+        try {
+            customBossEntity.setModelEntity(new ModelEntity(livingEntity, customBossesConfigFields.getCustomModel()));
+        } catch (Exception exception) {
+            customBossEntity.setModelEntity(null);
+            new WarningMessage("Failed to initialize Custom Model for Custom Boss " + customBossesConfigFields.getFilename());
         }
     }
 

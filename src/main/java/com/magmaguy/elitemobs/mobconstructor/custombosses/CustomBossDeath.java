@@ -7,6 +7,7 @@ import com.magmaguy.elitemobs.config.VanillaItemDrop;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.items.itemconstructor.SpecialLoot;
+import com.magmaguy.elitemobs.ondeathcommands.OnDeathCommands;
 import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
 import com.magmaguy.elitemobs.utils.Round;
 import org.bukkit.Bukkit;
@@ -176,6 +177,12 @@ public class CustomBossDeath implements Listener {
 
         //untrack from trackable custom bosses
         CustomBossEntity.trackableCustomBosses.remove(customBossEntity);
+
+        //todo this should be moved to the death event
+        if (customBossEntity.customBossesConfigFields.getOnDeathCommands() != null &&
+                !customBossEntity.customBossesConfigFields.getOnDeathCommands().isEmpty())
+            OnDeathCommands.parseConsoleCommand(customBossEntity.customBossesConfigFields.getOnDeathCommands(), event);
+
 
         //todo this should be set by the elite entity not the custom boss
         if (!customBossEntity.customBossesConfigFields.isDropsVanillaLoot()) {

@@ -67,6 +67,7 @@ import com.magmaguy.elitemobs.quests.objectives.CustomFetchObjective;
 import com.magmaguy.elitemobs.quests.objectives.DialogObjective;
 import com.magmaguy.elitemobs.quests.objectives.KillObjective;
 import com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldownsLogout;
+import com.magmaguy.elitemobs.thirdparty.modelengine.ModelEntity;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardDungeonFlag;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardEliteMobOnlySpawnFlag;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser;
@@ -221,6 +222,7 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new AdvancedAggroManager(), plugin);
         pluginManager.registerEvents(new TransitiveBossBlock(), plugin);
         pluginManager.registerEvents(new TransitiveBlockCommand.TemporaryBossBlockCommandEvents(), plugin);
+        pluginManager.registerEvents(new ModelEntity.ModelEntityEvents(), plugin);
 
         //Metadata (player purger)
         pluginManager.registerEvents(new MetadataHandler(), plugin);
