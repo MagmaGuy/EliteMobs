@@ -193,6 +193,10 @@ public class EntityTracker implements Listener {
         for (Block block : temporaryBlocks)
             block.setType(Material.AIR);
         temporaryBlocks.clear();
+        //Necessary for things such as visual effects which are not stored in memory, only tagged
+        for (World world : Bukkit.getWorlds())
+            for (Entity entity : world.getEntities())
+                unregister(entity, RemovalReason.SHUTDOWN);
         SimplePersistentEntity.getPersistentEntities().clear();
         CustomBossEntity.getTrackableCustomBosses().clear();
         CrashFix.knownSessionChunks.clear();

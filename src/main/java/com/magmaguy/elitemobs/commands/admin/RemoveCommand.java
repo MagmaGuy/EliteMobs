@@ -7,6 +7,7 @@ import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
+import com.magmaguy.elitemobs.npcs.NPCEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -14,10 +15,14 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 public class RemoveCommand {
-    public static HashSet<UUID> removingPlayers = new HashSet<>();
+    private static final Set<UUID> removingPlayers = new HashSet<>();
+
+    private RemoveCommand() {
+    }
 
     public static void remove(Player player) {
         if (removingPlayers.contains(player.getUniqueId())) {
@@ -31,7 +36,7 @@ public class RemoveCommand {
 
     public static class RemoveCommandEvents implements Listener {
         @EventHandler(priority = EventPriority.LOWEST)
-        public void otherDamageEvents(EntityDamageByEntityEvent event) {
+        public void removeEliteEntity(EntityDamageByEntityEvent event) {
             if (!removingPlayers.contains(event.getDamager().getUniqueId())) return;
             EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(event.getEntity());
             if (eliteEntity == null) return;
@@ -39,12 +44,24 @@ public class RemoveCommand {
                 event.getDamager().sendMessage(ChatColorConverter.convert(
                         "&8[EliteMobs] &cRemoved a spawn location for boss " +
                                 ((RegionalBossEntity) eliteEntity).getCustomBossesConfigFields().getFilename()));
-            if (eliteEntity instanceof RegionalBossEntity)
-                if (((CustomBossEntity) eliteEntity).getMinidungeon() != null)
-                    if (((CustomBossEntity) eliteEntity).getMinidungeon().getDungeonPackagerConfigFields().getDungeonLocationType().equals(DungeonPackagerConfigFields.DungeonLocationType.SCHEMATIC))
-                        ((CustomBossEntity) eliteEntity).getMinidungeon().removeRelativeLocation((RegionalBossEntity) eliteEntity);
+            if (eliteEntity instanceof RegionalBossEntity &&
+                    ((CustomBossEntity) eliteEntity).getMinidungeon() != null &&
+                    ((CustomBossEntity) eliteEntity).getMinidungeon().getDungeonPackagerConfigFields().getDungeonLocationType()
+                            .equals(DungeonPackagerConfigFields.DungeonLocationType.SCHEMATIC))
+                ((CustomBossEntity) eliteEntity).getMinidungeon().removeRelativeLocation((RegionalBossEntity) eliteEntity);
             eliteEntity.remove(RemovalReason.REMOVE_COMMAND);
             event.setCancelled(true);
         }
+
+        @EventHandler(priority = EventPriority.LOWEST)
+        public void removeNPC(EntityDamageByEntityEvent event) {
+            if (!removingPlayers.contains(event.getDamager().getUniqueId())) return;
+            NPCEntity npcEntity = EntityTracker.getNPCEntity(event.getEntity());
+            if (npcEntity == null) return;
+            npcEntity.remove(RemovalReason.REMOVE_COMMAND);
+            event.setCancelled(true);
+        }
     }
+
 }
+

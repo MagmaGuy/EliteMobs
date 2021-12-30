@@ -20,7 +20,7 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
 
 
     private static final HashSet<CustomBossesConfigFields> naturallySpawnedElites = new HashSet<>();
-    public static HashMap<String, CustomBossesConfigFields> regionalElites = new HashMap<>();
+    public static Map<String, CustomBossesConfigFields> regionalElites = new HashMap<>();
     @Getter
     private final List<UniqueLoot> parsedUniqueLootList = new ArrayList<>();
     @Getter
@@ -116,6 +116,9 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     @Getter
     @Setter
     private String customDisguiseData = null;
+    @Getter
+    @Setter
+    private String customModel = null;
     /**
      * Announcement priority:
      * 0 - no messages
@@ -351,6 +354,7 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         this.escapeMessage = processString("escapeMessage", escapeMessage, null, false);
         this.disguise = processString("disguise", disguise, null, false);
         this.customDisguiseData = processString("customDisguiseData", customDisguiseData, null, false);
+        this.customModel = processString("customModel", customModel, null, false);
         this.announcementPriority = processInt("announcementPriority", announcementPriority, 0, false);
         this.followDistance = processInt("followDistance", followDistance, 0, false);
         this.spawnCooldown = processInt("spawnCooldown", spawnCooldown, 0, false);
