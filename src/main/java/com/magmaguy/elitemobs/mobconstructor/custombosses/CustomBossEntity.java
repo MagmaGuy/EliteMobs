@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.api.EliteMobEnterCombatEvent;
 import com.magmaguy.elitemobs.api.EliteMobExitCombatEvent;
 import com.magmaguy.elitemobs.api.EliteMobRemoveEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
@@ -18,11 +19,13 @@ import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntity;
 import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntityInterface;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.transitiveblocks.TransitiveBlock;
+import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.powers.meta.CustomSummonPower;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
-import com.magmaguy.elitemobs.thirdparty.modelengine.ModelEntity;
+import com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity;
+import com.magmaguy.elitemobs.thirdparty.modelengine.CustomModel;
 import com.magmaguy.elitemobs.utils.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -89,7 +92,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
     private boolean isMount = false;
     @Getter
     @Setter
-    private ModelEntity modelEntity = null;
+    private CustomModel customModel = null;
 
     /**
      * Uses a builder pattern in order to construct a CustomBossEntity at an arbitrary point in the future. Does not
@@ -271,7 +274,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
 
     private void setPluginName() {
         if (this.level == -1)
-            super.setName(ChatColorConverter.convert(customBossesConfigFields.getName().replace("$level", "?" + "")
+            setName(ChatColorConverter.convert(customBossesConfigFields.getName().replace("$level", "?" + "")
                             .replace("$normalLevel", ChatColorConverter.convert("&2[&a" + "?" + "&2]&f"))
                             .replace("$minibossLevel", ChatColorConverter.convert("&6〖&e" + "?" + "&6〗&f"))
                             .replace("$bossLevel", ChatColorConverter.convert("&4『&c" + "?" + "&4』&f"))
@@ -279,13 +282,37 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
                             .replace("$eventBossLevel", ChatColorConverter.convert("&4「&c" + "?" + "&4」&f"))),
                     false);
         else
-            super.setName(ChatColorConverter.convert(customBossesConfigFields.getName().replace("$level", this.level + "")
+            setName(ChatColorConverter.convert(customBossesConfigFields.getName().replace("$level", this.level + "")
                             .replace("$normalLevel", ChatColorConverter.convert("&2[&a" + this.level + "&2]&f"))
                             .replace("$minibossLevel", ChatColorConverter.convert("&6〖&e" + this.level + "&6〗&f"))
                             .replace("$bossLevel", ChatColorConverter.convert("&4『&c" + this.level + "&4』&f"))
                             .replace("$reinforcementLevel", ChatColorConverter.convert("&8〔&7") + this.level + "&8〕&f")
                             .replace("$eventBossLevel", ChatColorConverter.convert("&4「&c" + this.level + "&4」&f"))),
                     false);
+    }
+
+    @Override
+    public void setName(String name, boolean applyToLivingEntity) {
+        super.setName(name, applyToLivingEntity);
+        if (isValid() && customModel != null)
+            customModel.setName(name, true);
+    }
+
+    @Override
+    public void setName(EliteMobProperties eliteMobProperties) {
+        super.setName(eliteMobProperties);
+        if (isValid() && customModel != null)
+            customModel.setName(name, DefaultConfig.isAlwaysShowNametags());
+    }
+
+    @Override
+    public void setNameVisible(boolean isVisible) {
+        //Check if the boss is already dead
+        if (livingEntity == null) return;
+        super.setNameVisible(isVisible);
+        DisguiseEntity.setDisguiseNameVisibility(isVisible, livingEntity);
+        if (customModel != null && isValid())
+            customModel.setNameVisible(isVisible);
     }
 
     public void announceSpawn() {
