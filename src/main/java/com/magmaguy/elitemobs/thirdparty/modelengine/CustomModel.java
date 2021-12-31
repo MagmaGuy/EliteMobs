@@ -14,29 +14,51 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 
-public class ModelEntity {
-    ActiveModel activeModel;
-    ModeledEntity modeledEntity;
-
-    public ModelEntity(LivingEntity livingEntity, String modelName) {
+public class CustomModel {
+    public CustomModel(LivingEntity livingEntity, String modelName, String nametagName) {
         activeModel = ModelEngineAPI.api.getModelManager().createActiveModel(modelName);
         if (activeModel == null) {
             new WarningMessage("Failed to get valid model entity from " + modelName + " ! Is the model name correct, and has the model been installed correctly?");
             return;
         }
         modeledEntity = ModelEngineAPI.api.getModelManager().createModeledEntity(livingEntity);
-
         modeledEntity.addActiveModel(activeModel);
         modeledEntity.detectPlayers();
         modeledEntity.setInvisible(true);
+        setName(nametagName, true);
+    }
+
+    ActiveModel activeModel;
+    ModeledEntity modeledEntity;
+
+    public static void reloadModels() {
+        try{
+        ModelEngineAPI.api.getModelManager().registerModels();} catch (Exception ex){
+            new WarningMessage("Failed to reload models through ModelEngine!");
+        }
     }
 
     public void shoot() {
-        activeModel.addState("attack", 1, 1, 1);
+        if (activeModel.getState("attack_ranged") != null)
+            activeModel.addState("attack_ranged", 1, 1, 1);
+        else
+            activeModel.addState("attack", 1, 1, 1);
     }
 
     public void melee() {
-        activeModel.addState("attack", 1, 1, 1);
+        if (activeModel.getState("attack_melee") != null)
+            activeModel.addState("attack_melee", 1, 1, 1);
+        else
+            activeModel.addState("attack", 1, 1, 1);
+    }
+
+    public void setName(String nametagName, boolean visible) {
+        modeledEntity.setNametag(nametagName);
+        modeledEntity.setNametagVisible(visible);
+    }
+
+    public void setNameVisible(boolean visible) {
+        modeledEntity.setNametagVisible(visible);
     }
 
     public static class ModelEntityEvents implements Listener {
@@ -44,8 +66,8 @@ public class ModelEntity {
         public void onMeleeHit(EntityDamageByEntityEvent event) {
             EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(event.getDamager());
             if (!(eliteEntity instanceof CustomBossEntity)) return;
-            if (((CustomBossEntity) eliteEntity).getModelEntity() == null) return;
-            ((CustomBossEntity) eliteEntity).getModelEntity().melee();
+            if (((CustomBossEntity) eliteEntity).getCustomModel() == null) return;
+            ((CustomBossEntity) eliteEntity).getCustomModel().melee();
         }
 
         @EventHandler
@@ -54,8 +76,8 @@ public class ModelEntity {
             if (!(((Projectile) event.getEntity()).getShooter() instanceof LivingEntity)) return;
             EliteEntity eliteEntity = EntityTracker.getEliteMobEntity((LivingEntity) ((Projectile) event.getEntity()).getShooter());
             if (!(eliteEntity instanceof CustomBossEntity)) return;
-            if (((CustomBossEntity) eliteEntity).getModelEntity() == null) return;
-            ((CustomBossEntity) eliteEntity).getModelEntity().shoot();
+            if (((CustomBossEntity) eliteEntity).getCustomModel() == null) return;
+            ((CustomBossEntity) eliteEntity).getCustomModel().shoot();
         }
     }
 }

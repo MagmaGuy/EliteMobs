@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.dungeons.Minidungeon;
 import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
+import org.bukkit.Difficulty;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 
@@ -27,11 +28,13 @@ public class MinidungeonWorldLoader {
                 world.setKeepSpawnInMemory(false);
             new InfoMessage("Minidungeons world " + minidungeon.getDungeonPackagerConfigFields().getWorldName() + " was loaded successfully!");
             minidungeon.setInstalled(true);
+            world.setDifficulty(Difficulty.HARD);
             //if (EliteMobs.worldGuardIsEnabled && minidungeon.dungeonPackagerConfigFields.isProtect())
             //    WorldGuardCompatibility.protectWorldMinidugeonArea(world.getSpawnLocation(), minidungeon);
             return world;
         } catch (Exception exception) {
             new WarningMessage("Failed to load Minidungeon world " + minidungeon.getDungeonPackagerConfigFields().getWorldName() + " !");
+            exception.printStackTrace();
         }
 
         return null;

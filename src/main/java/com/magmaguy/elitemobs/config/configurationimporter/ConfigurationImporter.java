@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.config.configurationimporter;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.thirdparty.modelengine.CustomModel;
 import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.UnzipFile;
 import com.magmaguy.elitemobs.utils.WarningMessage;
@@ -37,6 +38,7 @@ public class ConfigurationImporter {
 
         if (importsFile.listFiles().length == 0)
             return;
+        boolean importedModels = false;
 
         for (File zippedFile : importsFile.listFiles()) {
             File unzippedFile;
@@ -79,6 +81,11 @@ public class ConfigurationImporter {
                         case "worldcontainer":
                             moveWorlds(file);
                             break;
+                        case "ModelEngine":
+                            if (Bukkit.getPluginManager().isPluginEnabled("ModelEngine")) {
+                                moveDirectory(file, Paths.get(file.getParentFile().getParentFile().getParentFile().getParentFile().toString() + File.separatorChar + "ModelEngine" + File.separatorChar + "blueprints"));
+                                importedModels = true;
+                            } else new WarningMessage("You need ModelEngine to install schematic-based minidungeons!");
                         case "schematics":
                             if (Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit")) {
                                 moveDirectory(file, Paths.get(file.getParentFile().getParentFile().getParentFile().getParentFile().toString() + File.separatorChar + "FastAsyncWorldEdit" + File.separatorChar + "schematics"));
@@ -104,6 +111,10 @@ public class ConfigurationImporter {
                 new WarningMessage("Failed to delete zipped file " + zippedFile.getName() + "! Tell the dev!");
                 ex.printStackTrace();
             }
+        }
+
+        if (importedModels) {
+            CustomModel.reloadModels();
         }
 
     }

@@ -49,7 +49,8 @@ public class MobPropertiesConfig {
             new SuperMushroomCowConfig(),
             new SuperPigConfig(),
             new SuperSheepConfig(),
-            new EliteKillerBunnyConfig()
+            new EliteKillerBunnyConfig(),
+            new EliteLlamaConfig()
     ));
 
     public static HashMap<EntityType, MobPropertiesConfigFields> getMobProperties() {
@@ -61,6 +62,9 @@ public class MobPropertiesConfig {
     }
 
     public static void initializeConfigs() {
+        if (!VersionChecker.serverVersionOlderThan(17, 0)) {
+            mobPropertiesConfigFieldsList.add(new EliteGoatConfig());
+        }
 
         if (!VersionChecker.serverVersionOlderThan(16, 0)) {
             mobPropertiesConfigFieldsList.add(new EliteZombiefiedPiglin());

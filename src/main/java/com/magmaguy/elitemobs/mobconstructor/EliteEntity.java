@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobHealEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
-import com.magmaguy.elitemobs.collateralminecraftchanges.KeepPassivesAngry;
+import com.magmaguy.elitemobs.collateralminecraftchanges.KeepNeutralsAngry;
 import com.magmaguy.elitemobs.combatsystem.CombatSystem;
 import com.magmaguy.elitemobs.combatsystem.antiexploit.AntiExploitMessage;
 import com.magmaguy.elitemobs.config.AntiExploitConfig;
@@ -22,7 +22,6 @@ import com.magmaguy.elitemobs.powers.meta.MinorPower;
 import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import com.magmaguy.elitemobs.tagger.PersistentTagger;
-import com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.elitemobs.utils.VersionChecker;
 import com.magmaguy.elitemobs.utils.WarningMessage;
@@ -243,14 +242,26 @@ public class EliteEntity implements SimplePersistentEntityInterface {
             Wolf wolf = (Wolf) livingEntity;
             wolf.setAngry(true);
             wolf.setBreed(false);
-            KeepPassivesAngry.showMeYouWarFace(this);
+            KeepNeutralsAngry.showMeYouWarFace(this);
+        }
+
+        if (entityType.equals(EntityType.POLAR_BEAR)) {
+            KeepNeutralsAngry.showMeYouWarFace(this);
         }
 
         if (entityType.equals(EntityType.ENDER_DRAGON))
-            ((EnderDragon) livingEntity).getBossBar().setTitle(getName());
+            Objects.requireNonNull(((EnderDragon) livingEntity).getBossBar()).setTitle(getName());
+
+        if (entityType.equals(EntityType.LLAMA)){
+            KeepNeutralsAngry.showMeYouWarFace(this);
+        }
+
+        if (!VersionChecker.serverVersionOlderThan(17, 0) && entityType.equals(EntityType.GOAT)) {
+            ((Goat) livingEntity).setScreaming(true);
+        }
 
         if (!VersionChecker.serverVersionOlderThan(15, 0) && livingEntity instanceof Bee) {
-            KeepPassivesAngry.showMeYouWarFace(this);
+            KeepNeutralsAngry.showMeYouWarFace(this);
             ((Bee) livingEntity).setCannotEnterHiveTicks(Integer.MAX_VALUE);
         }
         this.spawnReason = spawnReason;
@@ -275,8 +286,6 @@ public class EliteEntity implements SimplePersistentEntityInterface {
         //Check if the boss is already dead
         if (livingEntity == null) return;
         livingEntity.setCustomNameVisible(isVisible);
-        if (isCustomBossEntity())
-            DisguiseEntity.setDisguiseNameVisibility(isVisible, livingEntity);
     }
 
     private void setMaxHealth() {
@@ -418,11 +427,7 @@ public class EliteEntity implements SimplePersistentEntityInterface {
     }
 
     public void applyPowers(HashSet<ElitePower> elitePowers, int availablePowerAmount) {
-        for (Iterator<ElitePower> elitePowerIterator = elitePowers.iterator(); elitePowerIterator.hasNext(); ) {
-            ElitePower elitePower = elitePowerIterator.next();
-            if (!PowersConfig.getPower(elitePower.getFileName()).isEnabled())
-                elitePowerIterator.remove();
-        }
+        elitePowers.removeIf(elitePower -> !PowersConfig.getPower(elitePower.getFileName()).isEnabled());
 
         if (availablePowerAmount < 1) return;
 

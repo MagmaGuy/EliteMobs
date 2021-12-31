@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.collateralminecraftchanges;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Mob;
@@ -12,34 +13,40 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.util.HashSet;
 import java.util.Objects;
 
-public class KeepPassivesAngry {
+public class KeepNeutralsAngry {
     private static final HashSet<EliteEntity> angryMobs = new HashSet<>();
 
-    private KeepPassivesAngry() {
+    private KeepNeutralsAngry() {
     }
 
     public static void showMeYouWarFace(EliteEntity eliteEntity) {
         //might already contain
+        EntityType entityType = eliteEntity.getLivingEntity().getType();
         if (angryMobs.contains(eliteEntity)) return;
         new BukkitRunnable() {
             @Override
             public void run() {
                 //It is possible for entities to change type during combat, in which case they need to be wiped
-                if (!eliteEntity.isValid() || !eliteEntity.getLivingEntity().getType().equals(EntityType.WOLF)) {
+                if (!eliteEntity.isValid() || !entityType.equals(eliteEntity.getLivingEntity().getType())) {
                     cancel();
                     angryMobs.remove(eliteEntity);
                     return;
                 }
 
-                if (((Mob) eliteEntity.getLivingEntity()).getTarget() != null) return;
+                if (!eliteEntity.getLivingEntity().getType().equals(EntityType.LLAMA) &&
+                        ((Mob) eliteEntity.getLivingEntity()).getTarget() != null)
+                    return;
 
                 for (Player player : Bukkit.getOnlinePlayers())
-                    if (Objects.equals(player.getLocation().getWorld(), eliteEntity.getLocation().getWorld()) &&
-                            player.getLocation().distanceSquared(eliteEntity.getLocation()) <
+                    if (!player.getGameMode().equals(GameMode.SPECTATOR) && !player.getGameMode().equals(GameMode.CREATIVE) &&
+                            Objects.equals(player.getLocation().getWorld(), eliteEntity.getLocation().getWorld()) &&
+                            player.getLocation().distance(eliteEntity.getLocation()) <
                                     Objects.requireNonNull(eliteEntity.getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE)).getBaseValue()) {
                         ((Mob) eliteEntity.getLivingEntity()).setTarget(player);
                         return;
                     }
+
+                ((Mob) eliteEntity.getLivingEntity()).setTarget(null);
 
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 20);
