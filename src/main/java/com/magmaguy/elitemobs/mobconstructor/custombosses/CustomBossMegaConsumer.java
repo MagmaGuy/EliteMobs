@@ -6,7 +6,7 @@ import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity;
-import com.magmaguy.elitemobs.thirdparty.modelengine.ModelEntity;
+import com.magmaguy.elitemobs.thirdparty.modelengine.CustomModel;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser;
@@ -123,9 +123,9 @@ public class CustomBossMegaConsumer {
         if (customBossesConfigFields.getCustomModel() == null || customBossesConfigFields.getCustomModel().isEmpty())
             return;
         try {
-            customBossEntity.setModelEntity(new ModelEntity(livingEntity, customBossesConfigFields.getCustomModel()));
+            customBossEntity.setCustomModel(new CustomModel(livingEntity, customBossesConfigFields.getCustomModel(), customBossEntity.getName()));
         } catch (Exception exception) {
-            customBossEntity.setModelEntity(null);
+            customBossEntity.setCustomModel(null);
             new WarningMessage("Failed to initialize Custom Model for Custom Boss " + customBossesConfigFields.getFilename());
         }
     }

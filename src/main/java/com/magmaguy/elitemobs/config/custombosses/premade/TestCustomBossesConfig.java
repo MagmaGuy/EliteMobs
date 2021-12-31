@@ -46,5 +46,6 @@ public class TestCustomBossesConfig extends CustomBossesConfigFields {
         setOnDamagedMessages(Collections.singletonList("I've been hit!"));
         setOnDeathCommands(Collections.singletonList("broadcast $players has killed $name! That was level $level!"));
         setAnnouncementPriority(3);
+        setCustomModel("showcase_boss");
     }
 }

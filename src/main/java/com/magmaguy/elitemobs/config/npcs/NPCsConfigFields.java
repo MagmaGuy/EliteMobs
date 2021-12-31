@@ -61,6 +61,9 @@ public class NPCsConfigFields extends CustomConfigFields implements CustomConfig
     @Getter
     @Setter
     private String customDisguiseData = null;
+    @Getter
+    @Setter
+    private String customModel = null;
 
     public NPCsConfigFields(String fileName,
                             boolean isEnabled,
@@ -120,6 +123,7 @@ public class NPCsConfigFields extends CustomConfigFields implements CustomConfig
         this.questFilenames = processStringList("questFileName", questFilenames,  new ArrayList<>(), false);
         this.disguise = processString("disguise", disguise, null, false);
         this.customDisguiseData = processString("customDisguiseData", customDisguiseData, null, false);
+        this.customModel = processString("customModel", customModel, null, false);
     }
 
     public void setEnabled(boolean enabled) {

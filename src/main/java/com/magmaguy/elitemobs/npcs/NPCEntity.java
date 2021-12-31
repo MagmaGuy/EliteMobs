@@ -10,6 +10,7 @@ import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntity;
 import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntityInterface;
 import com.magmaguy.elitemobs.npcs.chatter.NPCChatBubble;
 import com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity;
+import com.magmaguy.elitemobs.thirdparty.modelengine.CustomModel;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser;
 import com.magmaguy.elitemobs.utils.ChunkLocationChecker;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
@@ -91,7 +92,10 @@ public class NPCEntity implements SimplePersistentEntityInterface {
             villagerInstance.setCustomName(ChatColorConverter.convert(npCsConfigFields.getName()));
             villagerInstance.setCustomNameVisible(true);
             villagerInstance.setProfession(npCsConfigFields.getProfession());
-            setDisguise(villagerInstance);
+            if (getNpCsConfigFields().getCustomModel() != null && !getNpCsConfigFields().getCustomModel().isEmpty())
+                setCustomModel(villagerInstance);
+            else
+                setDisguise(villagerInstance);
         });
         EntityTracker.registerNPCEntity(this);
         initializeRole();
@@ -110,6 +114,10 @@ public class NPCEntity implements SimplePersistentEntityInterface {
         } catch (Exception ex) {
             new WarningMessage("Failed to load LibsDisguises disguise correctly!");
         }
+    }
+
+    private void setCustomModel(LivingEntity livingEntity) {
+        new CustomModel(livingEntity, getNpCsConfigFields().getCustomModel(), getNpCsConfigFields().getName());
     }
 
     public Villager getVillager() {

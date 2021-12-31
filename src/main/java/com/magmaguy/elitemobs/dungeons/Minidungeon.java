@@ -273,6 +273,9 @@ public class Minidungeon {
     private void loadWorld(Player player) {
         try {
             world = MinidungeonWorldLoader.runtimeLoadWorld(this);
+            if (world == null){
+                player.sendMessage("Failed to get world " + this.dungeonPackagerConfigFields.getWorldName());
+            }
             WorldGuardCompatibility.protectWorldMinidugeonArea(world.getSpawnLocation(), this);
             player.teleport(world.getSpawnLocation());
             player.sendMessage("Minidungeon " + dungeonPackagerConfigFields.getWorldName() +
