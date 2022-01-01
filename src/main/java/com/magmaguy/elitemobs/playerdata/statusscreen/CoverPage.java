@@ -11,7 +11,7 @@ public class CoverPage {
 
         for (int i = 0; i < 13; i++) {
             TextComponent line = new TextComponent(
-                    PlayerStatusMenuConfig.indexTextLines[i]
+                    PlayerStatusMenuConfig.getIndexTextLines()[i]
                             .replace("$statsPage", statsPage + "")
                             .replace("$gearPage", gearPage + "")
                             .replace("$teleportsPage", teleportsPage + "")
@@ -20,24 +20,24 @@ public class CoverPage {
                             .replace("$bossTrackingPage", bossTrackingPage + "")
                             + "\n");
 
-            if (!PlayerStatusMenuConfig.indexHoverLines[i].isEmpty())
-                PlayerStatusScreen.setHoverText(line, PlayerStatusMenuConfig.indexHoverLines[i]);
+            if (!PlayerStatusMenuConfig.getIndexHoverLines()[i].isEmpty())
+                PlayerStatusScreen.setHoverText(line, PlayerStatusMenuConfig.getIndexHoverLines()[i]);
 
-            if (PlayerStatusMenuConfig.indexCommandLines[i].contains("$statsPage"))
-                line.setClickEvent(new ClickEvent(ClickEvent.Action.CHANGE_PAGE, PlayerStatusMenuConfig.indexCommandLines[i].replace("$statsPage", statsPage + "")));
-            else if (PlayerStatusMenuConfig.indexCommandLines[i].contains("$gearPage"))
-                line.setClickEvent(new ClickEvent(ClickEvent.Action.CHANGE_PAGE, PlayerStatusMenuConfig.indexCommandLines[i].replace("$gearPage", gearPage + "")));
-            else if (PlayerStatusMenuConfig.indexCommandLines[i].contains("$teleportsPage"))
-                line.setClickEvent(new ClickEvent(ClickEvent.Action.CHANGE_PAGE, PlayerStatusMenuConfig.indexCommandLines[i].replace("$teleportsPage", teleportsPage + "")));
-            else if (PlayerStatusMenuConfig.indexCommandLines[i].contains("$commandsPage"))
-                line.setClickEvent(new ClickEvent(ClickEvent.Action.CHANGE_PAGE, PlayerStatusMenuConfig.indexCommandLines[i].replace("$commandsPage", commandsPage + "")));
-            else if (PlayerStatusMenuConfig.indexCommandLines[i].contains("$questsPage"))
-                line.setClickEvent(new ClickEvent(ClickEvent.Action.CHANGE_PAGE, PlayerStatusMenuConfig.indexCommandLines[i].replace("$questsPage", questsPage + "")));
-            else if (PlayerStatusMenuConfig.indexCommandLines[i].contains("$bossTrackingPage"))
-                line.setClickEvent(new ClickEvent(ClickEvent.Action.CHANGE_PAGE, PlayerStatusMenuConfig.indexCommandLines[i].replace("$bossTrackingPage", bossTrackingPage + "")));
+            if (PlayerStatusMenuConfig.getIndexCommandLines()[i].contains("$statsPage"))
+                line.setClickEvent(new ClickEvent(ClickEvent.Action.CHANGE_PAGE, PlayerStatusMenuConfig.getIndexCommandLines()[i].replace("$statsPage", statsPage + "")));
+            else if (PlayerStatusMenuConfig.getIndexCommandLines()[i].contains("$gearPage"))
+                line.setClickEvent(new ClickEvent(ClickEvent.Action.CHANGE_PAGE, PlayerStatusMenuConfig.getIndexCommandLines()[i].replace("$gearPage", gearPage + "")));
+            else if (PlayerStatusMenuConfig.getIndexCommandLines()[i].contains("$teleportsPage"))
+                line.setClickEvent(new ClickEvent(ClickEvent.Action.CHANGE_PAGE, PlayerStatusMenuConfig.getIndexCommandLines()[i].replace("$teleportsPage", teleportsPage + "")));
+            else if (PlayerStatusMenuConfig.getIndexCommandLines()[i].contains("$commandsPage"))
+                line.setClickEvent(new ClickEvent(ClickEvent.Action.CHANGE_PAGE, PlayerStatusMenuConfig.getIndexCommandLines()[i].replace("$commandsPage", commandsPage + "")));
+            else if (PlayerStatusMenuConfig.getIndexCommandLines()[i].contains("$questsPage"))
+                line.setClickEvent(new ClickEvent(ClickEvent.Action.CHANGE_PAGE, PlayerStatusMenuConfig.getIndexCommandLines()[i].replace("$questsPage", questsPage + "")));
+            else if (PlayerStatusMenuConfig.getIndexCommandLines()[i].contains("$bossTrackingPage"))
+                line.setClickEvent(new ClickEvent(ClickEvent.Action.CHANGE_PAGE, PlayerStatusMenuConfig.getIndexCommandLines()[i].replace("$bossTrackingPage", bossTrackingPage + "")));
 
             else
-                line.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, PlayerStatusMenuConfig.indexCommandLines[i]));
+                line.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, PlayerStatusMenuConfig.getIndexCommandLines()[i]));
 
             textComponent.addExtra(line);
         }

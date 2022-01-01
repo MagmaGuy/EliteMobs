@@ -9,7 +9,6 @@ import com.magmaguy.elitemobs.commands.CommandHandler;
 import com.magmaguy.elitemobs.commands.guild.AdventurersGuildCommand;
 import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.config.commands.CommandsConfig;
-import com.magmaguy.elitemobs.config.configurationimporter.ConfigurationImporter;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.config.customevents.CustomEventsConfig;
@@ -234,6 +233,7 @@ public class EliteMobs extends JavaPlugin {
 
         //Imports custom configurations and mindungeons from the import folder
         ConfigurationImporter.initializeConfigs();
+        ConfigurationExporter.initializeConfigs();
 
         //Import custom items after potentially importing new items
         new CustomItemsConfig();
@@ -326,6 +326,10 @@ public class EliteMobs extends JavaPlugin {
 
         new InfoMessage("Wiping Elite entities clean...");
         EntityTracker.wipeShutdown();
+
+        new InfoMessage("Clearing events...");
+        TimedEvent.shutdown();
+        ActionEvent.shutdown();
 
         new InfoMessage("Clearing valid worlds...");
         validWorldList.clear();

@@ -9,6 +9,7 @@ import cloud.commandframework.paper.PaperCommandManager;
 import cloud.commandframework.types.tuples.Triplet;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.commands.admin.*;
+import com.magmaguy.elitemobs.config.ConfigurationExporter;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
@@ -704,6 +705,21 @@ public class AdminCommands {
                                 return;
                             }
                 }));
+
+        // /em generateresourcepack
+        manager.command(builder.literal("generateresourcepack")
+                .senderType(CommandSender.class)
+                .permission("elitemobs.*")
+                .meta(CommandMeta.DESCRIPTION, "Generates a resource pack for EliteMobs using ModelEngine")
+                .handler(commandContext -> ConfigurationExporter.createResourcePack(commandContext.getSender())));
+
+        // /em updateresourcepack
+        manager.command(builder.literal("updateresourcepack")
+                .senderType(CommandSender.class)
+                .permission("elitemobs.*")
+                .meta(CommandMeta.DESCRIPTION, "Updates the SHA1 texture pack code based on the zipped resource pack in the exports.")
+                .handler(commandContext -> ConfigurationExporter.overwriteSHA1(commandContext.getSender())));
+
 
     }
 

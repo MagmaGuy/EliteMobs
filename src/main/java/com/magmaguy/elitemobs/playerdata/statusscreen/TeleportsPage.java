@@ -17,15 +17,15 @@ public class TeleportsPage {
         TextComponent configTextComponent = new TextComponent();
         //Fills the non-dungeon lines
         int textLineCounter = 0;
-        for (String string : PlayerStatusMenuConfig.teleportTextLines) {
+        for (String string : PlayerStatusMenuConfig.getTeleportTextLines()) {
             if (string == null || string.equals("null"))
                 continue;
             TextComponent line = new TextComponent(string + "\n");
-            if (PlayerStatusMenuConfig.teleportHoverLines[textLineCounter] != null && !PlayerStatusMenuConfig.teleportHoverLines[textLineCounter].isEmpty())
-                PlayerStatusScreen.setHoverText(line, PlayerStatusMenuConfig.teleportHoverLines[textLineCounter]);
+            if (PlayerStatusMenuConfig.getTeleportHoverLines()[textLineCounter] != null && !PlayerStatusMenuConfig.getTeleportHoverLines()[textLineCounter].isEmpty())
+                PlayerStatusScreen.setHoverText(line, PlayerStatusMenuConfig.getTeleportHoverLines()[textLineCounter]);
 
-            if (PlayerStatusMenuConfig.teleportCommandLines[textLineCounter] != null && !PlayerStatusMenuConfig.teleportCommandLines[textLineCounter].isEmpty())
-                line.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, PlayerStatusMenuConfig.teleportCommandLines[textLineCounter]));
+            if (PlayerStatusMenuConfig.getTeleportCommandLines()[textLineCounter] != null && !PlayerStatusMenuConfig.getTeleportCommandLines()[textLineCounter].isEmpty())
+                line.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, PlayerStatusMenuConfig.getTeleportCommandLines()[textLineCounter]));
 
             configTextComponent.addExtra(line);
             textLineCounter++;
@@ -39,7 +39,7 @@ public class TeleportsPage {
             if (!minidungeon.isInstalled()) continue;
 
             TextComponent message = new TextComponent(PlayerStatusScreen.convertLightColorsToBlack(minidungeon.getDungeonPackagerConfigFields().getName() + "\n"));
-            String hoverMessage = ChatColorConverter.convert(PlayerStatusMenuConfig.onTeleportHover + "\n" +
+            String hoverMessage = ChatColorConverter.convert(PlayerStatusMenuConfig.getOnTeleportHover() + "\n" +
                     minidungeon.getDungeonPackagerConfigFields().getPlayerInfo()
                             .replace("$bossCount", minidungeon.getRegionalBossCount() + "")
                             .replace("$lowestTier", minidungeon.getLowestTier() + "")

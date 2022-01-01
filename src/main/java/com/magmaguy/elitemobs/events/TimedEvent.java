@@ -23,6 +23,10 @@ public class TimedEvent extends CustomEvent implements Listener {
     @Getter
     protected static List<TimedEvent> blueprintEvents = new ArrayList<>();
     protected static List<TimedEvent> timedEvents = new ArrayList<>();
+    public static void shutdown() {
+        blueprintEvents.clear();
+        timedEvents.clear();
+    }
     //stores the time of the last global trigger
     private static double nextEventTrigger = System.currentTimeMillis() + 5D * 60D * 1000D;
     private final double localCooldown;

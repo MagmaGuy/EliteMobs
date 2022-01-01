@@ -4,18 +4,73 @@ import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.menus.MenusConfigFields;
 import com.magmaguy.elitemobs.playerdata.statusscreen.PlayerStatusScreen;
+import lombok.Getter;
 import org.bukkit.configuration.file.FileConfiguration;
 
 public class PlayerStatusMenuConfig extends MenusConfigFields {
-    public static boolean doIndexPage, doStatsPage, doGearPage, doTeleportsPage, doCommandsPage, doQuestTrackingPage, doBossTrackingPage;
-    public static String[] indexTextLines = new String[13], indexHoverLines = new String[13], indexCommandLines = new String[13];
-    public static String[] statsTextLines = new String[13], statsHoverLines = new String[13], statsCommandLines = new String[13];
-    public static String[] gearTextLines = new String[13], gearHoverLines = new String[13], gearCommandLines = new String[13];
-    public static String[] teleportTextLines = new String[13], teleportHoverLines = new String[13], teleportCommandLines = new String[13];
-    public static String[] commandsTextLines = new String[13], commandsHoverLines = new String[13], commandsCommandLines = new String[13];
-    public static String[] bossTrackerTextLines = new String[13], bossTrackerHoverLines = new String[13], bossTrackerCommandLines = new String[13];
-    public static String[] questTrackerTextLines = new String[13], questTrackerHoverLines = new String[13], questTrackerCommandLines = new String[13];
-    public static String onBossTrackHover, onQuestTrackHover, onTeleportHover;
+    @Getter
+    private static boolean doIndexPage;
+    @Getter
+    private static boolean doStatsPage;
+    @Getter
+    private static boolean doGearPage;
+    @Getter
+    private static boolean doTeleportsPage;
+    @Getter
+    private static boolean doCommandsPage;
+    @Getter
+    private static boolean doQuestTrackingPage;
+    @Getter
+    private static boolean doBossTrackingPage;
+    @Getter
+    private static String[] indexTextLines = new String[13];
+    @Getter
+    private static String[]  indexHoverLines = new String[13];
+    @Getter
+    private static String[] indexCommandLines = new String[13];
+    @Getter
+    private static String[] statsTextLines = new String[13];
+    @Getter
+    private static String[]  statsHoverLines = new String[13];
+    @Getter
+    private static String[]  statsCommandLines = new String[13];
+    @Getter
+    private static String[] gearTextLines = new String[13];
+    @Getter
+    private static String[] gearHoverLines = new String[13];
+    @Getter
+    private static String[]  gearCommandLines = new String[13];
+    @Getter
+    private static String[] teleportTextLines = new String[13];
+    @Getter
+    private static String[] teleportHoverLines = new String[13];
+    @Getter
+    private static String[] teleportCommandLines = new String[13];
+    @Getter
+    private static String[] commandsTextLines = new String[13];
+    @Getter
+    private static String[] commandsHoverLines = new String[13];
+    @Getter
+    private static String[]  commandsCommandLines = new String[13];
+    @Getter
+    private static String[] bossTrackerTextLines = new String[13];
+    @Getter
+    private static String[]  bossTrackerHoverLines = new String[13];
+    @Getter
+    private static String[]  bossTrackerCommandLines = new String[13];
+    @Getter
+    private static String[] questTrackerTextLines = new String[13];
+    @Getter
+    private static String[]  questTrackerHoverLines = new String[13];
+    @Getter
+    private static String[]  questTrackerCommandLines = new String[13];
+    @Getter
+    private static String onBossTrackHover;
+    @Getter
+    private static String  onQuestTrackHover;
+    @Getter
+    private static String  onTeleportHover;
+
     public PlayerStatusMenuConfig() {
         super("player_status_screen", true);
     }
