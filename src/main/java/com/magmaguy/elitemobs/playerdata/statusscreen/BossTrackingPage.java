@@ -2,10 +2,9 @@ package com.magmaguy.elitemobs.playerdata.statusscreen;
 
 import com.magmaguy.elitemobs.config.menus.premade.PlayerStatusMenuConfig;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.utils.SpigotMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.Player;
 
@@ -21,13 +20,13 @@ public class BossTrackingPage {
 
         for (int i = 0; i < 3; i++) {
 
-            TextComponent line = new TextComponent(PlayerStatusMenuConfig.bossTrackerTextLines[i] + "\n");
+            TextComponent line = new TextComponent(PlayerStatusMenuConfig.getBossTrackerTextLines()[i] + "\n");
 
-            if (!PlayerStatusMenuConfig.bossTrackerHoverLines[i].isEmpty())
-                PlayerStatusScreen.setHoverText(line, PlayerStatusMenuConfig.bossTrackerHoverLines[i]);
+            if (!PlayerStatusMenuConfig.getBossTrackerHoverLines()[i].isEmpty())
+                PlayerStatusScreen.setHoverText(line, PlayerStatusMenuConfig.getBossTrackerHoverLines()[i]);
 
-            if (!PlayerStatusMenuConfig.bossTrackerCommandLines[i].isEmpty())
-                line.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, PlayerStatusMenuConfig.bossTrackerCommandLines[i]));
+            if (!PlayerStatusMenuConfig.getBossTrackerCommandLines()[i].isEmpty())
+                line.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, PlayerStatusMenuConfig.getBossTrackerCommandLines()[i]));
 
             configTextComponent.addExtra(line);
         }
@@ -37,10 +36,10 @@ public class BossTrackingPage {
 
         for (CustomBossEntity customBossEntity : CustomBossEntity.getTrackableCustomBosses()) {
             try {
-                TextComponent message = new TextComponent(customBossEntity.getCustomBossBossBar().bossBarMessage(player, customBossEntity.getCustomBossesConfigFields().getLocationMessage()) + "\n");
-                message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PlayerStatusMenuConfig.onBossTrackHover).create()));
-                message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/elitemobs trackcustomboss " + customBossEntity.getEliteUUID()));
-                textComponents.add(message);
+                textComponents.add(  SpigotMessage.commandHoverMessage(
+                        customBossEntity.getCustomBossBossBar().bossBarMessage(player, customBossEntity.getCustomBossesConfigFields().getLocationMessage()) + "\n",
+                        PlayerStatusMenuConfig.getOnBossTrackHover(),
+                        "/elitemobs trackcustomboss " + customBossEntity.getEliteUUID()));
 
                 counter++;
             } catch (Exception ex) {

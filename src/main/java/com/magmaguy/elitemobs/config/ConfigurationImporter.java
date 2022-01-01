@@ -1,12 +1,15 @@
-package com.magmaguy.elitemobs.config.configurationimporter;
+package com.magmaguy.elitemobs.config;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.thirdparty.modelengine.CustomModel;
 import com.magmaguy.elitemobs.utils.InfoMessage;
-import com.magmaguy.elitemobs.utils.UnzipFile;
+import com.magmaguy.elitemobs.utils.SpigotMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.elitemobs.utils.ZipFile;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -15,6 +18,8 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 public class ConfigurationImporter {
+    private ConfigurationImporter() {
+    }
 
     public static void initializeConfigs() {
         Path configurationsPath = Paths.get(MetadataHandler.PLUGIN.getDataFolder().getAbsolutePath());
@@ -44,7 +49,7 @@ public class ConfigurationImporter {
             File unzippedFile;
             try {
                 if (zippedFile.getName().contains(".zip"))
-                    unzippedFile = UnzipFile.run(zippedFile.getName());
+                    unzippedFile = ZipFile.unzip(zippedFile.getName());
                 else unzippedFile = zippedFile;
             } catch (Exception e) {
                 new WarningMessage("Failed to unzip config file " + zippedFile.getName() + " ! Tell the dev!");
@@ -115,6 +120,13 @@ public class ConfigurationImporter {
 
         if (importedModels) {
             CustomModel.reloadModels();
+            for (Player player : Bukkit.getOnlinePlayers())
+                if (player.hasPermission("elitemobs.*"))
+                    player.spigot().sendMessage(SpigotMessage.commandHoverMessage(
+                            ChatColorConverter.convert("&8[EliteMobs] &fEliteMobs just detected that recently imported files had Custom Models in them! " +
+                                    "&2Click here to generate the EliteMobs resource pack for those models!"),
+                            "Clicking will run the command /em generateresourcepack",
+                            "/em generateresourcepack"));
         }
 
     }

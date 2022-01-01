@@ -18,7 +18,7 @@ public class StatsPage {
         TextComponent textComponent = new TextComponent();
 
         for (int i = 0; i < 13; i++) {
-            TextComponent line = new TextComponent(PlayerStatusMenuConfig.statsTextLines[i]
+            TextComponent line = new TextComponent(PlayerStatusMenuConfig.getStatsTextLines()[i]
                     .replace("$money", EconomyHandler.checkCurrency(targetPlayer.getUniqueId()) + "")
                     .replace("$guildtier", PlayerStatusScreen.convertLightColorsToBlack(AdventurersGuildConfig.getShortenedRankName(GuildRank.getGuildPrestigeRank(targetPlayer), GuildRank.getActiveGuildRank(targetPlayer))))
                     .replace("$kills", PlayerData.getKills(targetPlayer.getUniqueId()) + "")
@@ -27,11 +27,11 @@ public class StatsPage {
                     .replace("$quests", PlayerData.getQuestsCompleted(targetPlayer.getUniqueId()) + "")
                     .replace("$score", PlayerData.getScore(targetPlayer.getUniqueId()) + "") + "\n");
 
-            if (!PlayerStatusMenuConfig.statsHoverLines[i].isEmpty())
-                PlayerStatusScreen.setHoverText(line, PlayerStatusMenuConfig.statsHoverLines[i]);
+            if (!PlayerStatusMenuConfig.getStatsHoverLines()[i].isEmpty())
+                PlayerStatusScreen.setHoverText(line, PlayerStatusMenuConfig.getStatsHoverLines()[i]);
 
-            if (!PlayerStatusMenuConfig.statsCommandLines[i].isEmpty())
-                line.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, PlayerStatusMenuConfig.statsCommandLines[i]));
+            if (!PlayerStatusMenuConfig.getStatsCommandLines()[i].isEmpty())
+                line.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, PlayerStatusMenuConfig.getStatsCommandLines()[i]));
 
             textComponent.addExtra(line);
         }
