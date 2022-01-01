@@ -46,10 +46,6 @@ public class BossTrace {
         return "[" + (ServerTime.getTime() - creationTicksStamp) + "t] ";
     }
 
-    private long getTime() {
-        return System.currentTimeMillis() - creationTimeStamp;
-    }
-
     public void postLog(Player player) {
         if (!DebugMessage.isDebugMode())
             player.sendMessage(ChatColor.RED + "[EliteMobs] Debug mode must be on for this to work! Do " + ChatColor.GREEN + "/em debugmode");

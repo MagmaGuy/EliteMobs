@@ -38,6 +38,8 @@ public class PlayerQuestCooldowns implements Serializable {
     }
 
     public static void flushPlayer(Player player) {
+        PlayerQuestCooldowns playerQuestCooldowns =  PlayerData.getPlayerQuestCooldowns(player.getUniqueId());
+        if (playerQuestCooldowns == null) return;
         for (QuestCooldown questCooldown : Objects.requireNonNull(PlayerData.getPlayerQuestCooldowns(player.getUniqueId())).questCooldowns)
             if (questCooldown.getBukkitTask() != null)
                 questCooldown.getBukkitTask().cancel();

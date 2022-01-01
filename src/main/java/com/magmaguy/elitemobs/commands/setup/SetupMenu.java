@@ -187,7 +187,7 @@ public class SetupMenu {
                 if (!setupMenu.adventurersGuildIsDownloaded) {
                     player.closeInventory();
                     player.sendMessage("----------------------------------------------------");
-                    player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2Adventurer's Guild Hub download link: &9&nhttps://magmaguy.com/downloads/em_adventurers_guild.zip"));
+                    player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2Adventurer's Guild Hub download link: https://magmaguy.itch.io/"));
                     player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &aOnce downloaded, follow this setup guide: &9&nhttps://youtu.be/boRg2X4qhw4"));
                     player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2Need help? " + DiscordLinks.mainLink));
                     player.sendMessage("----------------------------------------------------");

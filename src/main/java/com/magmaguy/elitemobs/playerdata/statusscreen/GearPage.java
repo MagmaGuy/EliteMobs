@@ -18,18 +18,18 @@ public class GearPage {
 
             TextComponent line;
 
-            if (!PlayerStatusMenuConfig.gearTextLines[i].contains("{")) {
-                line = new TextComponent(parseGearPlaceholders(PlayerStatusMenuConfig.gearTextLines[i], targetPlayer) + "\n");
+            if (!PlayerStatusMenuConfig.getGearTextLines()[i].contains("{")) {
+                line = new TextComponent(parseGearPlaceholders(PlayerStatusMenuConfig.getGearTextLines()[i], targetPlayer) + "\n");
                 gearMultiComponentLine(textComponent, line, i, targetPlayer, false, 0);
             } else {
-                TextComponent prePlaceholderElements = new TextComponent(parseGearPlaceholders(PlayerStatusMenuConfig.gearTextLines[i].split("\\{")[0], targetPlayer));
+                TextComponent prePlaceholderElements = new TextComponent(parseGearPlaceholders(PlayerStatusMenuConfig.getGearTextLines()[i].split("\\{")[0], targetPlayer));
                 gearMultiComponentLine(textComponent, prePlaceholderElements, i, targetPlayer, false, 0);
-                for (int j = 0; j < PlayerStatusMenuConfig.gearTextLines[i].split("\\{").length; j++) {
-                    TextComponent placeholderString = new TextComponent(parseGearPlaceholders(PlayerStatusMenuConfig.gearTextLines[i].split("\\{")[j].split("}")[0], targetPlayer));
+                for (int j = 0; j < PlayerStatusMenuConfig.getGearTextLines()[i].split("\\{").length; j++) {
+                    TextComponent placeholderString = new TextComponent(parseGearPlaceholders(PlayerStatusMenuConfig.getGearTextLines()[i].split("\\{")[j].split("}")[0], targetPlayer));
                     gearMultiComponentLine(textComponent, placeholderString, i, targetPlayer, true, j);
-                    if (PlayerStatusMenuConfig.gearTextLines[i].split("}").length > j
-                            && PlayerStatusMenuConfig.gearTextLines[i].split("}")[j].contains("{")) {
-                        TextComponent spaceBetweenPlaceholders = new TextComponent(parseGearPlaceholders(PlayerStatusMenuConfig.gearTextLines[i].split("}")[j].split("\\{")[0], targetPlayer));
+                    if (PlayerStatusMenuConfig.getGearTextLines()[i].split("}").length > j
+                            && PlayerStatusMenuConfig.getGearTextLines()[i].split("}")[j].contains("{")) {
+                        TextComponent spaceBetweenPlaceholders = new TextComponent(parseGearPlaceholders(PlayerStatusMenuConfig.getGearTextLines()[i].split("}")[j].split("\\{")[0], targetPlayer));
                         gearMultiComponentLine(textComponent, spaceBetweenPlaceholders, i, targetPlayer, false, 0);
                     }
                 }
@@ -98,8 +98,8 @@ public class GearPage {
 
     private static void gearMultiComponentLine(TextComponent textComponent, TextComponent line, int i, Player targetPlayer, boolean brackets, int bracketCount) {
 
-        if (!PlayerStatusMenuConfig.gearHoverLines[i].isEmpty()) {
-            String hoverLines = PlayerStatusMenuConfig.gearHoverLines[i];
+        if (!PlayerStatusMenuConfig.getGearHoverLines()[i].isEmpty()) {
+            String hoverLines = PlayerStatusMenuConfig.getGearHoverLines()[i];
             if (hoverLines.contains("$helmet"))
                 ShareItem.setItemHoverEvent(line, targetPlayer.getInventory().getHelmet());
             else if (hoverLines.contains("$chestplate"))
@@ -121,7 +121,7 @@ public class GearPage {
                                 PlayerStatusScreen.setHoverText(line, parsedLine);
                         }
             } else if (!(hoverLines.contains("{") && hoverLines.contains("}")))
-                PlayerStatusScreen.setHoverText(line, PlayerStatusMenuConfig.gearHoverLines[i]);
+                PlayerStatusScreen.setHoverText(line, PlayerStatusMenuConfig.getGearHoverLines()[i]);
 
         }
 

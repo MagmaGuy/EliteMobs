@@ -58,29 +58,29 @@ public class PlayerStatusScreen implements Listener {
         int commandsPage = -1;
         int questsPage = -1;
         int bossTrackingPage = -1;
-        if (PlayerStatusMenuConfig.doStatsPage) {
+        if (PlayerStatusMenuConfig.isDoStatsPage()) {
             statsPage = pageCounter;
             pages[pageCounter] = StatsPage.statsPage(targetPlayer);
             pageCounter++;
         }
-        if (PlayerStatusMenuConfig.doGearPage) {
+        if (PlayerStatusMenuConfig.isDoGearPage()) {
             gearPage = pageCounter;
             pages[pageCounter] = GearPage.gearPage(targetPlayer);
             pageCounter++;
         }
-        if (PlayerStatusMenuConfig.doTeleportsPage) {
+        if (PlayerStatusMenuConfig.isDoTeleportsPage()) {
             teleportsPage = pageCounter;
             for (TextComponent textComponent : TeleportsPage.teleportsPage()) {
                 pages[pageCounter] = textComponent;
                 pageCounter++;
             }
         }
-        if (PlayerStatusMenuConfig.doCommandsPage) {
+        if (PlayerStatusMenuConfig.isDoCommandsPage()) {
             commandsPage = pageCounter;
             pages[pageCounter] = CommandsPage.commandsPage();
             pageCounter++;
         }
-        if (PlayerStatusMenuConfig.doQuestTrackingPage) {
+        if (PlayerStatusMenuConfig.isDoQuestTrackingPage()) {
             questsPage = pageCounter;
             for (TextComponent textComponent : QuestsPage.questsPage(targetPlayer)) {
                 pages[pageCounter] = textComponent;
@@ -88,7 +88,7 @@ public class PlayerStatusScreen implements Listener {
             }
         }
 
-        if (PlayerStatusMenuConfig.doBossTrackingPage) {
+        if (PlayerStatusMenuConfig.isDoBossTrackingPage()) {
             bossTrackingPage = pageCounter;
             for (TextComponent textComponent : BossTrackingPage.bossTrackingPage(targetPlayer)) {
                 pages[pageCounter] = textComponent;

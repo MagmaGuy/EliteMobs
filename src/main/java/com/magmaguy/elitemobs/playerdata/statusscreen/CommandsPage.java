@@ -15,13 +15,13 @@ public class CommandsPage {
 
         for (int i = 0; i < 13; i++) {
 
-            TextComponent line = new TextComponent(PlayerStatusMenuConfig.commandsTextLines[i] + "\n");
+            TextComponent line = new TextComponent(PlayerStatusMenuConfig.getCommandsTextLines()[i] + "\n");
 
-            if (!PlayerStatusMenuConfig.commandsHoverLines[i].isEmpty())
-                PlayerStatusScreen.setHoverText(line, PlayerStatusMenuConfig.commandsHoverLines[i]);
+            if (!PlayerStatusMenuConfig.getCommandsHoverLines()[i].isEmpty())
+                PlayerStatusScreen.setHoverText(line, PlayerStatusMenuConfig.getCommandsHoverLines()[i]);
 
-            if (!PlayerStatusMenuConfig.commandsCommandLines[i].isEmpty())
-                line.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, PlayerStatusMenuConfig.commandsCommandLines[i]));
+            if (!PlayerStatusMenuConfig.getCommandsCommandLines()[i].isEmpty())
+                line.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, PlayerStatusMenuConfig.getCommandsCommandLines()[i]));
 
             textComponent.addExtra(line);
         }

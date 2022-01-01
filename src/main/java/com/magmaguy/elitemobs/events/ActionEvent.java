@@ -30,6 +30,10 @@ public class ActionEvent extends CustomEvent {
 
     private static final List<ActionEvent> blueprintEvents = new ArrayList<>();
     private static final HashSet<Player> playerCooldowns = new HashSet<>();
+    public static void shutdown() {
+        blueprintEvents.clear();
+        playerCooldowns.clear();
+    }
     private final double chance;
     private final List<Material> breakableMaterials;
     private Player player;
