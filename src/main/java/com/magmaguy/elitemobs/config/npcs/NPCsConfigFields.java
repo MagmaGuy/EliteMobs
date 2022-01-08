@@ -134,7 +134,6 @@ public class NPCsConfigFields extends CustomConfigFields implements CustomConfig
         } catch (Exception e) {
             Bukkit.getLogger().warning("[EliteMobs] Attempted to update the enabled status for an NPC with no config file! Did you delete it during runtime?");
         }
-
     }
 
 }

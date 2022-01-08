@@ -58,6 +58,10 @@ public class TranslationConfig {
     private static String chestLowRankMessage;
     @Getter
     private static String chestCooldownMessage;
+    @Getter
+    private static String insufficientCurrencyForWormholeMessage;
+    @Getter
+    private static String missingWormholeDestinationMessage;
     private TranslationConfig() {
     }
 
@@ -86,7 +90,8 @@ public class TranslationConfig {
         trackMessage = ConfigurationEngine.setString(fileConfiguration, "trackMessage", "Track the $name");
         chestLowRankMessage = ConfigurationEngine.setString(fileConfiguration, "chestLowRankMessage", "&7[EM] &cYour guild rank needs to be at least $rank &cin order to open this chest!");
         chestCooldownMessage = ConfigurationEngine.setString(fileConfiguration, "chestCooldownMessage", "&7[EM] &cYou've already opened this chest recently! Wait $time!");
-
+        insufficientCurrencyForWormholeMessage = ConfigurationEngine.setString(fileConfiguration, "insufficientCurrencyForWormholeMessage", "&8[EliteMobs] &cInsufficient currency! You need $amount to use this wormhole!");
+        missingWormholeDestinationMessage = ConfigurationEngine.setString(fileConfiguration, "missingWormholeDestinationMessage", "&8[EliteMobs] &cDestination not found! Seems like you have not installed this content!");
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
 
     }

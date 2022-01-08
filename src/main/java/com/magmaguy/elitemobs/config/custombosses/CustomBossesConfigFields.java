@@ -381,10 +381,11 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
             return pluginDefaults;
 
         for (String rawDamageModifier : fileConfiguration.getStringList(path)) {
+            String[] parsedStrings;
+            Material material = null;
+            Double multiplier = null;
             if (rawDamageModifier.contains(",")) {
-                String[] parsedStrings = rawDamageModifier.split(",");
-                Material material = null;
-                Double multiplier = null;
+                parsedStrings = rawDamageModifier.split(",");
                 for (String parsedDamageModifier : parsedStrings) {
                     if (parsedDamageModifier.contains("material:"))
                         try {
@@ -402,13 +403,8 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
                         new WarningMessage("Entry " + parsedDamageModifier + " is invalid for boss file " + getFilename() + " !");
                 }
 
-                if (material != null && multiplier != null)
-                    hashMap.put(material, multiplier);
-
             } else {
-                String[] parsedStrings = rawDamageModifier.split(":");
-                Material material = null;
-                Double multiplier = null;
+                parsedStrings = rawDamageModifier.split(":");
                 for (String parsedDamageModifier : parsedStrings) {
                     if (parsedDamageModifier.contains("material="))
                         try {
@@ -426,9 +422,9 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
                         new WarningMessage("Entry " + parsedDamageModifier + " is invalid for boss file " + getFilename() + " !");
                 }
 
-                if (material != null && multiplier != null)
-                    hashMap.put(material, multiplier);
             }
+            if (material != null && multiplier != null)
+                hashMap.put(material, multiplier);
         }
         if (!hashMap.isEmpty())
             fileConfiguration.addDefault(path, deserializeDamageModifiers(hashMap));
