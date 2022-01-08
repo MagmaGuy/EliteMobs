@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
+import com.magmaguy.elitemobs.utils.Developer;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.*;
@@ -123,8 +124,10 @@ public class CustomConfigFields implements CustomConfigFieldsInterface {
             if (!validWorldStrings.isEmpty())
                 for (String string : validWorldStrings) {
                     World world = Bukkit.getWorld(string);
-                    if (world != null)
+                    if (world != null){
                         validWorlds.add(world);
+                        Developer.message("added world " + string);
+                    }
                 }
             return validWorlds;
         } catch (Exception ex) {
@@ -272,19 +275,17 @@ public class CustomConfigFields implements CustomConfigFieldsInterface {
                 return playerHead;
             }
             if (materialString.contains(":")) {
+                ItemStack itemStack = ItemStackGenerator.generateItemStack(Material.getMaterial(materialString.split(":")[0]));
                 if (materialString.split(":")[1].contains("leather_") || materialString.split(":")[1].contains("LEATHER_")) {
-                    ItemStack itemStack = ItemStackGenerator.generateItemStack(Material.getMaterial(materialString.split(":")[0]));
                     LeatherArmorMeta leatherArmorMeta = (LeatherArmorMeta) itemStack.getItemMeta();
                     leatherArmorMeta.setColor(Color.fromRGB(Integer.parseInt(materialString.split(":")[1])));
                     itemStack.setItemMeta(leatherArmorMeta);
-                    return itemStack;
                 } else {
-                    ItemStack itemStack = ItemStackGenerator.generateItemStack(Material.getMaterial(materialString.split(":")[0]));
                     ItemMeta itemMeta = itemStack.getItemMeta();
                     itemMeta.setCustomModelData(Integer.parseInt(materialString.split(":")[1]));
                     itemStack.setItemMeta(itemMeta);
-                    return itemStack;
                 }
+                return itemStack;
             } else
                 return ItemStackGenerator.generateItemStack(Material.getMaterial(materialString));
         } catch (Exception ex) {

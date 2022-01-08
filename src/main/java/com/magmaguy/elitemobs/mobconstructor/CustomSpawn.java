@@ -199,7 +199,7 @@ public class CustomSpawn {
         }
 
         //If there are no players online, don't spawn anything - this condition shouldn't be reachable in the first place
-        if (Bukkit.getOnlinePlayers().size() == 0) {
+        if (Bukkit.getOnlinePlayers().isEmpty()) {
             keepTrying = false;
             if (timedEvent != null)
                 timedEvent.end();

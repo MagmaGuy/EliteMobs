@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.announcements.AnnouncementPriority;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
+import com.magmaguy.elitemobs.config.ValidWorldsConfig;
 import com.magmaguy.elitemobs.config.customevents.CustomEventsConfigFields;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
@@ -17,6 +18,7 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class CustomEvent {
@@ -53,7 +55,10 @@ public abstract class CustomEvent {
     }
 
     public static boolean isLocationValid(Location location) {
-        return !(EliteMobs.worldGuardIsEnabled && !WorldGuardFlagChecker.checkFlag(location, WorldGuardCompatibility.getEliteMobsEventsFlag()));
+        if (!ValidWorldsConfig.getValidWorlds().contains(Objects.requireNonNull(location.getWorld()).getName()))
+            return false;
+        return !(EliteMobs.worldGuardIsEnabled &&
+                !WorldGuardFlagChecker.checkFlag(location, WorldGuardCompatibility.getEliteMobsEventsFlag()));
     }
 
     public CustomEventsConfigFields getCustomEventsConfigFields() {

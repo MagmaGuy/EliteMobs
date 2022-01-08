@@ -24,6 +24,7 @@ import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
 import com.magmaguy.elitemobs.config.potioneffects.PotionEffectsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
+import com.magmaguy.elitemobs.config.wormholes.WormholeConfig;
 import com.magmaguy.elitemobs.dungeons.Minidungeon;
 import com.magmaguy.elitemobs.economy.VaultCompatibility;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
@@ -62,6 +63,7 @@ import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
+import wormhole.Wormhole;
 
 import java.io.File;
 import java.io.IOException;
@@ -260,7 +262,6 @@ public class EliteMobs extends JavaPlugin {
         new CustomBossesConfig();
         new CustomTreasureChestsConfig();
 
-
         //Find the stats of bosses in minidungeons
         for (Minidungeon minidungeon : Minidungeon.minidungeons.values()) {
             if (minidungeon.getDungeonPackagerConfigFields().getDungeonLocationType() != null)
@@ -286,6 +287,8 @@ public class EliteMobs extends JavaPlugin {
         }
 
         new CustomQuestsConfig();
+
+        new WormholeConfig();
 
         //Commands
         new CommandHandler();
@@ -317,6 +320,9 @@ public class EliteMobs extends JavaPlugin {
 
         new InfoMessage("Cancelling tasks...");
         Bukkit.getServer().getScheduler().cancelTasks(MetadataHandler.PLUGIN);
+
+        new InfoMessage("Closing wormholes...");
+        Wormhole.shutdown();
 
         new InfoMessage("Spinning Regional Bosses down...");
         //save all pending respawns
