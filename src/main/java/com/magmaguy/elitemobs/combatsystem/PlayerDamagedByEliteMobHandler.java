@@ -43,6 +43,11 @@ public class PlayerDamagedByEliteMobHandler implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void eliteMobDamageHandler(PlayerDamagedByEliteMobEvent event) {
 
+        if (!event.getEliteMobEntity().isValid()) {
+            event.setCancelled(true);
+            return;
+        }
+
         if (event.getEntityDamageByEntityEvent().isCancelled() && !bypass) return;
 
         //From this point on, the damage event is fully altered by Elite Mobs

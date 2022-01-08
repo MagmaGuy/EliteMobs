@@ -10,7 +10,13 @@ import java.util.List;
 
 public class ZombieParentsConfig extends PowersConfigFields {
     @Getter
-    private static List<String> deathMessage, bossEntityDialog, zombieDad, zombieMom;
+    private static List<String> deathMessage;
+    @Getter
+    private static List<String> bossEntityDialog;
+    @Getter
+    private static List<String> zombieDad;
+    @Getter
+    private static List<String> zombieMom;
 
     public ZombieParentsConfig() {
         super("zombie_parents",
