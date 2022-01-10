@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
-import com.magmaguy.elitemobs.utils.Developer;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.*;
@@ -124,10 +123,8 @@ public class CustomConfigFields implements CustomConfigFieldsInterface {
             if (!validWorldStrings.isEmpty())
                 for (String string : validWorldStrings) {
                     World world = Bukkit.getWorld(string);
-                    if (world != null){
+                    if (world != null)
                         validWorlds.add(world);
-                        Developer.message("added world " + string);
-                    }
                 }
             return validWorlds;
         } catch (Exception ex) {

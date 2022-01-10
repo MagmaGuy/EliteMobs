@@ -55,13 +55,13 @@ public class LootTables implements Listener {
             if (AdventurersGuildConfig.isGuildLootLimiter()) {
                 double itemTier = setItemTier(eliteEntity.getLevel());
                 if (itemTier > GuildRank.getActiveGuildRank(player) * 10) {
-                    itemTier = GuildRank.getActiveGuildRank(player) * 10;
+                    itemTier = GuildRank.getActiveGuildRank(player) * 10D;
                     new BukkitRunnable() {
                         @Override
                         public void run() {
                             player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(AdventurersGuildConfig.getLootLimiterMessage()));
                         }
-                    }.runTaskLater(MetadataHandler.PLUGIN, 20 * 10);
+                    }.runTaskLater(MetadataHandler.PLUGIN, 20 * 10L);
                 }
                 generateLoot((int) Math.floor(itemTier), eliteEntity, player);
             } else generateLoot(eliteEntity, player);
