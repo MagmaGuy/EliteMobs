@@ -16,10 +16,19 @@ public class WormholeConfigFields extends CustomConfigFields implements CustomCo
     private String location2;
     @Getter
     @Setter
+    private String location1Text;
+    @Getter
+    @Setter
+    private String location2Text;
+    @Getter
+    @Setter
     private String permission;
     @Getter
     @Setter
-    private Wormhole.WormholeStyle style = Wormhole.WormholeStyle.CUBE;
+    private Wormhole.WormholeStyle style;
+    @Getter
+    @Setter
+    private int particleColor;
     @Getter
     @Setter
     private double coinCost;
@@ -46,10 +55,13 @@ public class WormholeConfigFields extends CustomConfigFields implements CustomCo
     public void processConfigFields() {
         this.isEnabled = processBoolean("isEnabled", isEnabled, true, true);
         this.location1 = processString("location1", location1, null, true);
+        this.location1Text = processString("location1Text", location1Text, null, false);
         this.location2 = processString("location2", location2, null, true);
+        this.location2Text = processString("location2Text", location2Text, null, false);
         this.permission = processString("permission", permission, null, false);
         this.coinCost = processDouble("coinCost", coinCost, 0, false);
         this.style = processEnum("style", style, Wormhole.WormholeStyle.CUBE, Wormhole.WormholeStyle.class, false);
+        this.particleColor = processInt("particleColor", particleColor, 0x800080, false);
         this.blindPlayer = processBoolean("blindPlayer", blindPlayer, false, false);
     }
 

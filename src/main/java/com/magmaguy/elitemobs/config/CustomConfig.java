@@ -70,7 +70,7 @@ public class CustomConfig {
 
     }
 
-    private void directoryCrawler(String path){
+    private void directoryCrawler(String path) {
         for (File file : Objects.requireNonNull((new File(path)).listFiles())) {
             if (file.isFile())
                 fileInitializer(file);
@@ -79,10 +79,11 @@ public class CustomConfig {
         }
     }
 
-    private void fileInitializer(File file){
-        try {
-            boolean isPremade = false;
-            for (Object object : customConfigFieldsArrayList) {
+    private void fileInitializer(File file) {
+
+        boolean isPremade = false;
+        for (Object object : customConfigFieldsArrayList) {
+            try {
                 Method getFilename = CustomConfigFields.class.getDeclaredMethod("getFilename");
                 if (file.getName().equalsIgnoreCase((String) getFilename.invoke(object))) {
                     customConfigFieldsArrayList.remove(object);
@@ -90,14 +91,15 @@ public class CustomConfig {
                     isPremade = true;
                     break;
                 }
+            } catch (Exception ex) {
+                new WarningMessage("Failed to read plugin files for " + folderName + " ! This is very bad, warn the developer!");
+                isPremade = true;
+                ex.printStackTrace();
             }
-            if (!isPremade)
-                initialize(file);
-        } catch (Exception ex) {
-            new WarningMessage("Failed to read plugin files for " + folderName + " ! This is very bad, warn the developer!");
-            ex.printStackTrace();
-            return;
         }
+        if (!isPremade)
+            initialize(file);
+
     }
 
     public HashMap<String, ? extends CustomConfigFields> getCustomConfigFieldsHashMap() {
@@ -142,8 +144,8 @@ public class CustomConfig {
         ConfigurationEngine.fileSaverCustomValues(fileConfiguration, file);
 
         //if (customConfigFields.isEnabled)
-            //Store for use by the plugin
-            addCustomConfigFields(file.getName(), customConfigFields);
+        //Store for use by the plugin
+        addCustomConfigFields(file.getName(), customConfigFields);
     }
 
     /**
@@ -151,9 +153,8 @@ public class CustomConfig {
      */
     private void initialize(File file) {
         //Load file configuration from file
-        FileConfiguration fileConfiguration = YamlConfiguration.loadConfiguration(file);
-
         try {
+            FileConfiguration fileConfiguration = YamlConfiguration.loadConfiguration(file);
             //Instantiate the correct CustomConfigFields instance
             Constructor<?> constructor = customConfigFields.getConstructor(String.class, boolean.class);
             CustomConfigFields instancedCustomConfigFields = (CustomConfigFields) constructor.newInstance(file.getName(), true);
@@ -162,10 +163,10 @@ public class CustomConfig {
             //Parse actual fields and load into RAM to be used
             instancedCustomConfigFields.processConfigFields();
             //if (instancedCustomConfigFields.isEnabled)
-                //Store for use by the plugin
-                addCustomConfigFields(file.getName(), instancedCustomConfigFields);
+            //Store for use by the plugin
+            addCustomConfigFields(file.getName(), instancedCustomConfigFields);
         } catch (Exception ex) {
-            new WarningMessage("Bad constructor");
+            new WarningMessage("Bad constructor for file " + file.getName());
             ex.printStackTrace();
         }
 
