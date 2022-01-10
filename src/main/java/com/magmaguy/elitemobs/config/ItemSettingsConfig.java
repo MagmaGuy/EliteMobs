@@ -88,6 +88,8 @@ public class ItemSettingsConfig {
     private static String scrapFailedMessage;
     @Getter
     private static boolean putLootDirectlyIntoPlayerInventory;
+    @Getter
+    private static int lootLevelDifferenceLockout;
 
     public static void initializeConfig() {
         File file = ConfigurationEngine.fileCreator("ItemSettings.yml");
@@ -147,6 +149,7 @@ public class ItemSettingsConfig {
         scrapSucceededMessage = ConfigurationEngine.setString(fileConfiguration, "scrapSucceededMessage", "&8[EliteMobs] &2Scrap succeeded!");
         scrapFailedMessage = ConfigurationEngine.setString(fileConfiguration, "scrapFailedMessage", "&8[EliteMobs] &cScrap failed!");
         putLootDirectlyIntoPlayerInventory = ConfigurationEngine.setBoolean(fileConfiguration, "putLootDirectlyIntoPlayerInventory", false);
+        lootLevelDifferenceLockout = ConfigurationEngine.setInt(fileConfiguration, "lootLevelDifferenceLockout", 10);
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }

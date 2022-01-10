@@ -107,6 +107,7 @@ public class EliteMobs extends JavaPlugin {
         ItemUpgradeSystemConfig.initializeConfig();
         new CustomEventsConfig();
         QuestsConfig.initializeConfig();
+        WormholesConfig.initializeConfig();
     }
 
     public static void worldScanner() {

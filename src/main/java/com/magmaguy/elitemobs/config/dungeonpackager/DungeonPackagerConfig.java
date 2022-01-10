@@ -2,12 +2,15 @@ package com.magmaguy.elitemobs.config.dungeonpackager;
 
 import com.magmaguy.elitemobs.config.CustomConfig;
 import com.magmaguy.elitemobs.dungeons.Minidungeon;
+import lombok.Getter;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class DungeonPackagerConfig extends CustomConfig {
 
-    public static HashMap<String, DungeonPackagerConfigFields> dungeonPackages = new HashMap<>();
+    @Getter
+    private static Map<String, DungeonPackagerConfigFields> dungeonPackages = new HashMap<>();
 
     public DungeonPackagerConfig() {
         super("dungeonpackages", "com.magmaguy.elitemobs.config.dungeonpackager.premade", DungeonPackagerConfigFields.class);

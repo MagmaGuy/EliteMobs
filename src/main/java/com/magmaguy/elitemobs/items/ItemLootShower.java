@@ -50,7 +50,7 @@ public class ItemLootShower implements Listener {
         if (!EconomySettingsConfig.isEnableCurrencyShower() || !SoulbindEnchantment.isEnabled)
             return;
 
-        if (eliteMobTier - ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getFullPlayerTier(false) < -20) {
+        if (eliteMobTier - ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getFullPlayerTier(false) < -ItemSettingsConfig.getLootLevelDifferenceLockout()) {
             player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(
                     ChatColorConverter.convert("&8EM] &4You are too well equipped to get coins for killing this Elite!")));
             return;
