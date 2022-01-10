@@ -161,6 +161,7 @@ public class Wormhole {
     }
 
     private ArmorStand initializeTextDisplay(Location location, String locationText) {
+        if (location == null || location.getWorld() == null) return null;
         ArmorStand armorStand = location.getWorld().spawn(location.clone().add(new Vector(0, 1.2, 0)), ArmorStand.class, new Consumer<ArmorStand>() {
             @Override
             public void accept(ArmorStand armorStand) {
