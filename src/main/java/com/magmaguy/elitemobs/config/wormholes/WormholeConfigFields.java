@@ -35,6 +35,9 @@ public class WormholeConfigFields extends CustomConfigFields implements CustomCo
     @Getter
     @Setter
     private boolean blindPlayer;
+    @Getter
+    @Setter
+    private double sizeMultiplier = 1D;
 
     public WormholeConfigFields(String filename,
                                 boolean isEnabled,
@@ -63,6 +66,7 @@ public class WormholeConfigFields extends CustomConfigFields implements CustomCo
         this.style = processEnum("style", style, Wormhole.WormholeStyle.CUBE, Wormhole.WormholeStyle.class, false);
         this.particleColor = processInt("particleColor", particleColor, 0x800080, false);
         this.blindPlayer = processBoolean("blindPlayer", blindPlayer, false, false);
+        this.sizeMultiplier = processDouble("sizeMultiplier", sizeMultiplier, 1D, false);
     }
 
 }

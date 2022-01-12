@@ -7,7 +7,7 @@ public class AGDarkSpireWormholeConfig extends WormholeConfigFields {
     public AGDarkSpireWormholeConfig() {
         super("ag_dark_spire_wormhole",
                 true,
-                "em_adventurers_guild,285.5,67,212.5,0,0",
+                "em_adventurers_guild,284.5,105,296.5,0,0",
                 "dark_spire_minidungeon.yml",
                 Wormhole.WormholeStyle.CUBE);
         setBlindPlayer(true);

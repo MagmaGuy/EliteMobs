@@ -7,7 +7,7 @@ public class AGHallosseumWormholeConfig extends WormholeConfigFields {
     public AGHallosseumWormholeConfig() {
         super("ag_hallosseum_wormhole",
                 true,
-                "em_adventurers_guild,278.5,77,222.5,-110,0",
+                "em_adventurers_guild,290.5,101.5,293.5,-40,0",
                 "hallosseum_lair.yml",
                 Wormhole.WormholeStyle.CUBE);
         setBlindPlayer(true);

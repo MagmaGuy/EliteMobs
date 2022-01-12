@@ -7,7 +7,7 @@ public class AGSewersWormholeConfig extends WormholeConfigFields {
     public AGSewersWormholeConfig() {
         super("ag_sewers_wormhole",
                 true,
-                "em_adventurers_guild,285.5,77,226.5,-180,0",
+                "em_adventurers_guild,299.5,98.5,302.5,133,0",
                 "sewers_minidungeon.yml",
                 Wormhole.WormholeStyle.CUBE);
         setBlindPlayer(true);

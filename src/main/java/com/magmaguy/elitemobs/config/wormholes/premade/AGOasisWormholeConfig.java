@@ -7,7 +7,7 @@ public class AGOasisWormholeConfig extends WormholeConfigFields {
     public AGOasisWormholeConfig() {
         super("ag_oasis_wormhole",
                 true,
-                "em_adventurers_guild,292.5,77,222.5,112,0",
+                "em_adventurers_guild,290.5,97.5,293.5,54,0",
                 "oasis_adventure.yml",
                 Wormhole.WormholeStyle.CUBE);
         setBlindPlayer(true);
