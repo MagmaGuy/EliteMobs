@@ -118,7 +118,7 @@ public class UserCommands {
                     }
                 }));
 
-        // /em smelt
+        // /em scrap
         manager.command(builder.literal("scrap")
                 .meta(CommandMeta.DESCRIPTION, "Opens the custom item shop or teleports the player to the Adventurer's Guild Hub")
                 .senderType(Player.class)
@@ -255,7 +255,7 @@ public class UserCommands {
 
         // /em menu
         manager.command(builder.literal("menu")
-                .meta(CommandMeta.DESCRIPTION, "Opens the EliteMobs rank menu.")
+                .meta(CommandMeta.DESCRIPTION, "Opens the EliteMobs status screen.")
                 .senderType(Player.class)
                 .handler(commandContext -> new PlayerStatusScreen((Player) commandContext.getSender())));
 

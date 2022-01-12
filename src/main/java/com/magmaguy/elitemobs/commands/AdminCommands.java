@@ -574,7 +574,7 @@ public class AdminCommands {
                     commandContext.getSender().sendMessage(ChatColorConverter.convert("&8[EliteMobs] &aAttempted to send a message to Discord!"));
                 }));
 
-        // /em unbind
+        // /em forceunbind
         manager.command(builder.literal("forceunbind")
                 .senderType(Player.class)
                 .permission("elitemobs.*")
@@ -647,7 +647,7 @@ public class AdminCommands {
                 .handler(commandContext -> TransitiveBlockCommand.processCommand((Player) commandContext.getSender(),
                         commandContext.get("regionalBoss"), commandContext.get("blockTransitionPhase"), false, true)));
 
-        // /em registerblocksarea <regional_boss_file.yml> <on_spawn/on_remove>
+        // /em registerblocksareaedit <regional_boss_file.yml> <on_spawn/on_remove>
         manager.command(builder.literal("registerblocksareaedit")
                 .senderType(Player.class)
                 .argument(StringArgument.<CommandSender>newBuilder("regionalBoss").withSuggestionsProvider(((objectCommandContext, s) -> customBosses)),
@@ -655,7 +655,7 @@ public class AdminCommands {
                 .argument(StringArgument.<CommandSender>newBuilder("blockTransitionPhase").withSuggestionsProvider(((objectCommandContext, s) -> blockTransitionPhases)),
                         ArgumentDescription.of("Block transition phase"))
                 .permission("elitemobs.*")
-                .meta(CommandMeta.DESCRIPTION, "Registers large transitive blocks areas for use by regional bosses.")
+                .meta(CommandMeta.DESCRIPTION, "Edits large transitive blocks areas for use by regional bosses.")
                 .handler(commandContext -> TransitiveBlockCommand.processCommand((Player) commandContext.getSender(),
                         commandContext.get("regionalBoss"), commandContext.get("blockTransitionPhase"), true, true)));
 

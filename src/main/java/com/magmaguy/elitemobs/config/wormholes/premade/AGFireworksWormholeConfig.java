@@ -7,7 +7,7 @@ public class AGFireworksWormholeConfig extends WormholeConfigFields {
     public AGFireworksWormholeConfig() {
         super("ag_fireworks_wormhole",
                 true,
-                "em_adventurers_guild,278.5,77,219.5,-90,0",
+                "em_adventurers_guild,296.5,102,296.5,-90,0",
                 "fireworks_lair.yml",
                 Wormhole.WormholeStyle.CUBE);
         setBlindPlayer(true);

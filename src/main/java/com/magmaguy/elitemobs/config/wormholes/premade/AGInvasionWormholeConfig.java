@@ -7,7 +7,7 @@ public class AGInvasionWormholeConfig extends WormholeConfigFields {
     public AGInvasionWormholeConfig() {
         super("ag_invasion_wormhole",
                 true,
-                "em_adventurers_guild,282.5,77,226.5,-156,0",
+                "em_adventurers_guild,281.5,100.5,302.5,-46,0",
                 "invasion_minidungeon.yml",
                 Wormhole.WormholeStyle.CUBE);
         setBlindPlayer(true);

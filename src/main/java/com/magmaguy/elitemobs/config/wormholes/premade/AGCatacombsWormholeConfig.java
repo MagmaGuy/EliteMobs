@@ -7,7 +7,7 @@ public class AGCatacombsWormholeConfig  extends WormholeConfigFields {
     public AGCatacombsWormholeConfig() {
         super("ag_catacombs_wormhole",
                 true,
-                "em_adventurers_guild,291.5,77,225.5,-135,0",
+                "em_adventurers_guild,296.5,98,296.5,98,0",
                 "catacombs_lair.yml",
                 Wormhole.WormholeStyle.CUBE);
         setBlindPlayer(true);

@@ -76,6 +76,7 @@ import com.magmaguy.elitemobs.utils.VersionChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
+import wormhole.WormholeEntry;
 
 public class EventsRegistrer {
 
@@ -140,6 +141,9 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new SuperMobDamageEvent.SuperMobDamageEventFilter(), plugin);
         pluginManager.registerEvents(new EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter(), plugin);
         pluginManager.registerEvents(new EliteExplosionEvent.EliteExplosionEvents(), plugin);
+
+        //Wormholes
+        pluginManager.registerEvents(new WormholeEntry.WormholeEntryEvent(), plugin);
 
 
         /*
