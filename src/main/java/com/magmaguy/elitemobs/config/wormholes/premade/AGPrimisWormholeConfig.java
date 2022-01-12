@@ -7,9 +7,9 @@ public class AGPrimisWormholeConfig extends WormholeConfigFields {
     public AGPrimisWormholeConfig() {
         super("ag_primis_wormhole",
                 true,
-                "em_adventurers_guild,292.5,77,219.5,90,0",
+                "em_adventurers_guild,290.5,97,302.5,109,0",
                 "primis_adventure.yml",
-                Wormhole.WormholeStyle.CUBE);
+                Wormhole.WormholeStyle.ICOSAHEDRON);
         setBlindPlayer(true);
         setLocation1Text("&2『Primis Adventure』 &aLvls 0-15");
         setParticleColor(0x008000);

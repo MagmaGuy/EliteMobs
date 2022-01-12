@@ -299,7 +299,7 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         for (String string : uniqueLootList)
             if (SpecialLoot.isSpecialLootEntry(string))
                 specialLoot.put(string, new SpecialLoot(string));
-        // minecraft:type=ITEM_TYPE:amount=AMOUNT
+        // minecraft:type=ITEM_TYPE:amount=AMOUNT:chance=CHANCE
         for (String string : uniqueLootList)
             if (string.contains("minecraft:")) {
                 try {
