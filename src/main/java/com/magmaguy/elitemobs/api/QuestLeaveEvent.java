@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.config.QuestsConfig;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.Quest;
+import com.magmaguy.elitemobs.quests.QuestTracking;
 import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
@@ -47,6 +48,12 @@ public class QuestLeaveEvent extends Event {
                     PermissionAttachment permissionAttachment = event.getPlayer().addAttachment(MetadataHandler.PLUGIN);
                     for (String permission : customQuest.getCustomQuestsConfigFields().getTemporaryPermissions())
                         permissionAttachment.setPermission(permission, false);
+                }
+
+                if (QuestTracking.getPlayerTrackingQuests().containsKey(event.getPlayer())){
+                    QuestTracking questTracking = QuestTracking.getPlayerTrackingQuests().get(event.getPlayer());
+                    if (questTracking.getCustomQuest().getCustomQuestsConfigFields().equals(customQuest.getCustomQuestsConfigFields()))
+                        questTracking.stop();
                 }
             }
         }

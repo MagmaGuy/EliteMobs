@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class WormholeEntry {
-    public static HashMap<Integer, List<WormholeEntry>> wormholeEntries = new HashMap<>();
+    private static HashMap<Integer, List<WormholeEntry>> wormholeEntries = new HashMap<>();
 
     @Getter
     private final Location location;

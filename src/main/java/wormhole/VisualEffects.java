@@ -12,7 +12,7 @@ public class VisualEffects {
     private final WormholeConfigFields wormholeConfigFields;
     private final List<Vector> cachedLocations = new ArrayList<>();
     @Getter
-    private final List<List<Vector>> cachedRotations = new ArrayList<List<Vector>>();
+    private final List<List<Vector>> cachedRotations = new ArrayList<>();
 
     public VisualEffects(WormholeConfigFields wormholeConfigFields) {
         this.wormholeConfigFields = wormholeConfigFields;
