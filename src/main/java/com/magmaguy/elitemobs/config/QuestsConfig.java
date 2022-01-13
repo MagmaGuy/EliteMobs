@@ -83,6 +83,10 @@ public class QuestsConfig {
     private static String chatTrackHover;
     @Getter
     private static String chatTrackCommand;
+    @Getter
+    private static String noQuestDestinationFound;
+    @Getter
+    private static String questDestinationInOtherWorld;
 
     public static void initializeConfig() {
         File file = ConfigurationEngine.fileCreator("Quests.yml");
@@ -124,6 +128,9 @@ public class QuestsConfig {
         chatTrackMessage = ConfigurationEngine.setString(fileConfiguration, "chatTrackMessage", "&8[EliteMobs]&2 Click here to track your quest!");
         chatTrackHover = ConfigurationEngine.setString(fileConfiguration, "chatTrackHover", "&2Click to track!");
         chatTrackCommand = ConfigurationEngine.setString(fileConfiguration, "chatTrackCommand", "/elitemobs quest track $questID");
+
+        noQuestDestinationFound = ConfigurationEngine.setString(fileConfiguration, "noQuestDestinationFound", "[EM] No quest destination found!");
+        questDestinationInOtherWorld = ConfigurationEngine.setString(fileConfiguration, "questDestinationInOtherWorld", "[EM] Go to world $world!");
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }

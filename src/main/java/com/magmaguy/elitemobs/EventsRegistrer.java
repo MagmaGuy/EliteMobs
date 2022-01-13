@@ -74,76 +74,82 @@ import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
 import com.magmaguy.elitemobs.utils.VersionChecker;
 import org.bukkit.Bukkit;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import wormhole.WormholeEntry;
 
 public class EventsRegistrer {
 
+    private static PluginManager pluginManager;
+    private static Plugin plugin;
+    private EventsRegistrer() {
+    }
+
     public static void registerEvents() {
 
-        PluginManager pluginManager = Bukkit.getPluginManager();
-        Plugin plugin = MetadataHandler.PLUGIN;
+        pluginManager = Bukkit.getPluginManager();
+        plugin = MetadataHandler.PLUGIN;
 
-        pluginManager.registerEvents(new FirstTimeSetup(), plugin);
+        register(new FirstTimeSetup());
 
-        pluginManager.registerEvents(new PlayerData.PlayerDataEvents(), plugin);
-        pluginManager.registerEvents(new ElitePlayerInventory.ElitePlayerInventoryEvents(), plugin);
-        pluginManager.registerEvents(new PlayerStatsTracker(), plugin);
-        pluginManager.registerEvents(new PlayerQuestCooldownsLogout(), plugin);
+        register(new PlayerData.PlayerDataEvents());
+        register(new ElitePlayerInventory.ElitePlayerInventoryEvents());
+        register(new PlayerStatsTracker());
+        register(new PlayerQuestCooldownsLogout());
 
-        pluginManager.registerEvents(new ChickenHandler(), plugin);
-        pluginManager.registerEvents(new CowHandler(), plugin);
-        pluginManager.registerEvents(new MushroomCowHandler(), plugin);
-        pluginManager.registerEvents(new PassiveEliteMobDeathHandler(), plugin);
-        pluginManager.registerEvents(new PigHandler(), plugin);
-        pluginManager.registerEvents(new SheepHandler(), plugin);
-        pluginManager.registerEvents(new FindSuperMobs(), plugin);
+        register(new ChickenHandler());
+        register(new CowHandler());
+        register(new MushroomCowHandler());
+        register(new PassiveEliteMobDeathHandler());
+        register(new PigHandler());
+        register(new SheepHandler());
+        register(new FindSuperMobs());
         if (ItemSettingsConfig.isPreventEliteItemEnchantment())
-            pluginManager.registerEvents(new ItemEnchantmentPrevention(), plugin);
+            register(new ItemEnchantmentPrevention());
         if (!VersionChecker.serverVersionOlderThan(15, 2))
             if (ItemSettingsConfig.isPreventEliteItemDiamondToNetheriteUpgrade())
-                pluginManager.registerEvents(new PreventUpgradeDiamondToNetherite(), plugin);
+                register(new PreventUpgradeDiamondToNetherite());
 
         //Mob damage
-        pluginManager.registerEvents(new PlayerDamagedByEliteMobHandler(), plugin);
-        pluginManager.registerEvents(new EliteCreeperExplosionHandler(), plugin);
-        pluginManager.registerEvents(new EliteMobGenericDamagedHandler(), plugin);
-        pluginManager.registerEvents(new EliteMobDamagedByEliteMobHandler(), plugin);
+        register(new PlayerDamagedByEliteMobHandler());
+        register(new EliteCreeperExplosionHandler());
+        register(new EliteMobGenericDamagedHandler());
+        register(new EliteMobDamagedByEliteMobHandler());
         if (MobCombatSettingsConfig.isEnableDeathMessages())
-            pluginManager.registerEvents(new PlayerDeathMessageByEliteMob(), plugin);
+            register(new PlayerDeathMessageByEliteMob());
 
         //explosion regenerator
         if (DefaultConfig.isDoExplosionRegen())
-            pluginManager.registerEvents(new Explosion.ExplosionEvent(), plugin);
+            register(new Explosion.ExplosionEvent());
 
         //Mob loot
-        pluginManager.registerEvents(new DefaultDropsHandler(), plugin);
-        pluginManager.registerEvents(new ItemLootShower.ItemLootShowerEvents(), plugin);
+        register(new DefaultDropsHandler());
+        register(new ItemLootShower.ItemLootShowerEvents());
 
         //potion effects
-        pluginManager.registerEvents(new PlayerPotionEffects(), plugin);
+        register(new PlayerPotionEffects());
 
         //getloot AdventurersGuildMenu
-        pluginManager.registerEvents(new GetLootMenu.GetLootMenuListener(), plugin);
+        register(new GetLootMenu.GetLootMenuListener());
 
         /*
         Register API events
          */
-        pluginManager.registerEvents(new EliteMobDeathEvent.EliteMobDeathEventFilter(), plugin);
-        pluginManager.registerEvents(new EliteMobTargetPlayerEvent.EliteMobTargetPlayerEventFilter(), plugin);
-        pluginManager.registerEvents(new EliteMobDamagedEvent.EliteMobDamageEventFilter(), plugin);
-        pluginManager.registerEvents(new PlayerDamagedByEliteMobEvent.PlayerDamagedByEliteMobEventFilter(), plugin);
-        pluginManager.registerEvents(new EliteMobDamagedByEliteMobEvent.EliteMobDamagedByEliteMobFilter(), plugin);
-        pluginManager.registerEvents(new EliteMobEnterCombatEvent.EliteMobEnterCombatEventFilter(), plugin);
-        pluginManager.registerEvents(new PlayerPreTeleportEvent.PlayerPreTeleportEventEvents(), plugin);
-        pluginManager.registerEvents(new PlayerTeleportEvent.PlayerTeleportEventExecutor(), plugin);
-        pluginManager.registerEvents(new SuperMobDamageEvent.SuperMobDamageEventFilter(), plugin);
-        pluginManager.registerEvents(new EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter(), plugin);
-        pluginManager.registerEvents(new EliteExplosionEvent.EliteExplosionEvents(), plugin);
+        register(new EliteMobDeathEvent.EliteMobDeathEventFilter());
+        register(new EliteMobTargetPlayerEvent.EliteMobTargetPlayerEventFilter());
+        register(new EliteMobDamagedEvent.EliteMobDamageEventFilter());
+        register(new PlayerDamagedByEliteMobEvent.PlayerDamagedByEliteMobEventFilter());
+        register(new EliteMobDamagedByEliteMobEvent.EliteMobDamagedByEliteMobFilter());
+        register(new EliteMobEnterCombatEvent.EliteMobEnterCombatEventFilter());
+        register(new PlayerPreTeleportEvent.PlayerPreTeleportEventEvents());
+        register(new PlayerTeleportEvent.PlayerTeleportEventExecutor());
+        register(new SuperMobDamageEvent.SuperMobDamageEventFilter());
+        register(new EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter());
+        register(new EliteExplosionEvent.EliteExplosionEvents());
 
         //Wormholes
-        pluginManager.registerEvents(new WormholeEntry.WormholeEntryEvent(), plugin);
+        register(new WormholeEntry.WormholeEntryEvent());
 
 
         /*
@@ -151,222 +157,226 @@ public class EventsRegistrer {
         silent errors without ever noticing, and ultimately the amount of manual input required is pretty minimal
          */
         //Minor mob powers
-        pluginManager.registerEvents(new InvulnerabilityArrow(), plugin);
-        pluginManager.registerEvents(new InvulnerabilityFallDamage(), plugin);
-        pluginManager.registerEvents(new InvulnerabilityKnockback(), plugin);
-        pluginManager.registerEvents(new BonusLoot(), plugin);
-        pluginManager.registerEvents(new Taunt(), plugin);
-        pluginManager.registerEvents(new Corpse(), plugin);
-        pluginManager.registerEvents(new Implosion(), plugin);
-        pluginManager.registerEvents(new AttackArrow(), plugin);
-        pluginManager.registerEvents(new ArrowFireworks(), plugin);
-        pluginManager.registerEvents(new AttackBlinding(), plugin);
-        pluginManager.registerEvents(new AttackFire(), plugin);
-        pluginManager.registerEvents(new AttackFireball(), plugin);
-        pluginManager.registerEvents(new TrackingFireball.TrackingFireballEvents(), plugin);
-        pluginManager.registerEvents(new AttackFreeze(), plugin);
-        pluginManager.registerEvents(new AttackGravity(), plugin);
-        pluginManager.registerEvents(new AttackLightning(), plugin);
-        pluginManager.registerEvents(new AttackPoison(), plugin);
-        pluginManager.registerEvents(new AttackPush(), plugin);
-        pluginManager.registerEvents(new AttackWeakness(), plugin);
-        pluginManager.registerEvents(new AttackWeb(), plugin);
-        pluginManager.registerEvents(new AttackWither(), plugin);
-        pluginManager.registerEvents(new AttackVacuum(), plugin);
-        pluginManager.registerEvents(new ArrowRain(), plugin);
-        pluginManager.registerEvents(new GroundPound(), plugin);
-        pluginManager.registerEvents(new LightningBolts(), plugin);
-        pluginManager.registerEvents(new FrostCone(), plugin);
-        pluginManager.registerEvents(new Thunderstorm(), plugin);
-        pluginManager.registerEvents(new Firestorm(), plugin);
-        pluginManager.registerEvents(new Bombardment.BombardmentEvents(), plugin);
-        pluginManager.registerEvents(new ShieldWall.ShieldWallEvents(), plugin);
+        register(new InvulnerabilityArrow());
+        register(new InvulnerabilityFallDamage());
+        register(new InvulnerabilityKnockback());
+        register(new BonusLoot());
+        register(new Taunt());
+        register(new Corpse());
+        register(new Implosion());
+        register(new AttackArrow());
+        register(new ArrowFireworks());
+        register(new AttackBlinding());
+        register(new AttackFire());
+        register(new AttackFireball());
+        register(new TrackingFireball.TrackingFireballEvents());
+        register(new AttackFreeze());
+        register(new AttackGravity());
+        register(new AttackLightning());
+        register(new AttackPoison());
+        register(new AttackPush());
+        register(new AttackWeakness());
+        register(new AttackWeb());
+        register(new AttackWither());
+        register(new AttackVacuum());
+        register(new ArrowRain());
+        register(new GroundPound());
+        register(new LightningBolts());
+        register(new FrostCone());
+        register(new Thunderstorm());
+        register(new Firestorm());
+        register(new Bombardment.BombardmentEvents());
+        register(new ShieldWall.ShieldWallEvents());
 
         //Major mob powers
-        pluginManager.registerEvents(new SkeletonPillar(), plugin);
-        pluginManager.registerEvents(new SkeletonTrackingArrow(), plugin);
-        pluginManager.registerEvents(new ZombieBloat(), plugin);
-        pluginManager.registerEvents(new ZombieFriends(), plugin);
-        pluginManager.registerEvents(new ZombieNecronomicon(), plugin);
-        pluginManager.registerEvents(new ZombieParents(), plugin);
+        register(new SkeletonPillar());
+        register(new SkeletonTrackingArrow());
+        register(new ZombieBloat());
+        register(new ZombieFriends());
+        register(new ZombieNecronomicon());
+        register(new ZombieParents());
 
         //boss powers
-        pluginManager.registerEvents(new SpiritWalk(), plugin);
-        pluginManager.registerEvents(new GoldShotgun(), plugin);
-        pluginManager.registerEvents(new GoldExplosion(), plugin);
-        pluginManager.registerEvents(new Flamethrower(), plugin);
-        pluginManager.registerEvents(new PlasmaBootsEnchantment.PlasmaBootsEnchantmentEvents(), plugin);
+        register(new SpiritWalk());
+        register(new GoldShotgun());
+        register(new GoldExplosion());
+        register(new Flamethrower());
+        register(new PlasmaBootsEnchantment.PlasmaBootsEnchantmentEvents());
         if (EnchantmentsConfig.getEnchantment(SoulbindEnchantment.key + ".yml").isEnabled())
-            pluginManager.registerEvents(new SoulbindEnchantment.SoulbindEnchantmentEvents(), plugin);
-        pluginManager.registerEvents(new FlamePyre(), plugin);
-        pluginManager.registerEvents(new SummonTheReturned(), plugin);
-        pluginManager.registerEvents(new HyperLoot(), plugin);
-        pluginManager.registerEvents(new SummonTheReturned(), plugin);
-        pluginManager.registerEvents(new SummonEmbers(), plugin);
-        pluginManager.registerEvents(new MeteorShower(), plugin);
-        pluginManager.registerEvents(new BulletHell(), plugin);
-        pluginManager.registerEvents(new DeathSlice(), plugin);
-        pluginManager.registerEvents(new FireworksBarrage.FireworksBarrageEvents(), plugin);
-        pluginManager.registerEvents(new CustomSummonPower.CustomSummonPowerEvent(), plugin);
-        pluginManager.registerEvents(new EnderDragonEmpoweredLightning.EnderDragonEmpoweredLightningEvents(), plugin);
-        pluginManager.registerEvents(new CombatEnterScanPower.MajorCombatEnterScanningPowerEvents(), plugin);
-        pluginManager.registerEvents(new LightningEnchantment.LightningEnchantmentEvents(), plugin);
-        pluginManager.registerEvents(new BonusCoins.BonusCoinsEvents(), plugin);
+            register(new SoulbindEnchantment.SoulbindEnchantmentEvents());
+        register(new FlamePyre());
+        register(new SummonTheReturned());
+        register(new HyperLoot());
+        register(new SummonTheReturned());
+        register(new SummonEmbers());
+        register(new MeteorShower());
+        register(new BulletHell());
+        register(new DeathSlice());
+        register(new FireworksBarrage.FireworksBarrageEvents());
+        register(new CustomSummonPower.CustomSummonPowerEvent());
+        register(new EnderDragonEmpoweredLightning.EnderDragonEmpoweredLightningEvents());
+        register(new CombatEnterScanPower.MajorCombatEnterScanningPowerEvents());
+        register(new LightningEnchantment.LightningEnchantmentEvents());
+        register(new BonusCoins.BonusCoinsEvents());
 
         //special powers
-        pluginManager.registerEvents(new EnderCrystalLightningRod.EnderCrystalLightningRodEvents(), plugin);
+        register(new EnderCrystalLightningRod.EnderCrystalLightningRodEvents());
 
         //Custom bosses
-        pluginManager.registerEvents(new CustomBossEntity.CustomBossEntityEvents(), plugin);
-        pluginManager.registerEvents(new CustomBossDeath(), plugin);
-        pluginManager.registerEvents(new SimplePersistentEntity.PersistentEntityEvent(), plugin);
-        pluginManager.registerEvents(new CustomBossTaunts(), plugin);
-        pluginManager.registerEvents(new PhaseBossEntity.PhaseBossEntityListener(), plugin);
-        pluginManager.registerEvents(new RegionalBossEntity.RegionalBossEntityEvents(), plugin);
-        pluginManager.registerEvents(new AdvancedAggroManager(), plugin);
-        pluginManager.registerEvents(new TransitiveBossBlock(), plugin);
-        pluginManager.registerEvents(new TransitiveBlockCommand.TemporaryBossBlockCommandEvents(), plugin);
-        pluginManager.registerEvents(new CustomModel.ModelEntityEvents(), plugin);
+        register(new CustomBossEntity.CustomBossEntityEvents());
+        register(new CustomBossDeath());
+        register(new SimplePersistentEntity.PersistentEntityEvent());
+        register(new CustomBossTaunts());
+        register(new PhaseBossEntity.PhaseBossEntityListener());
+        register(new RegionalBossEntity.RegionalBossEntityEvents());
+        register(new AdvancedAggroManager());
+        register(new TransitiveBossBlock());
+        register(new TransitiveBlockCommand.TemporaryBossBlockCommandEvents());
+        register(new CustomModel.ModelEntityEvents());
 
         //Metadata (player purger)
-        pluginManager.registerEvents(new MetadataHandler(), plugin);
+        register(new MetadataHandler());
 
         //Mob merger
-        pluginManager.registerEvents(new MergeHandler(), plugin);
+        register(new MergeHandler());
 
         //Natural EliteMobs Spawning
-        pluginManager.registerEvents(new EntityTracker(), plugin);
+        register(new EntityTracker());
         //Fix lingering entity after crashes
-        pluginManager.registerEvents(new CrashFix(), plugin);
+        register(new CrashFix());
 
         //Natural Mob Metadata Assigner
-        pluginManager.registerEvents(new NaturalMobSpawnEventHandler(), plugin);
+        register(new NaturalMobSpawnEventHandler());
 
         //Visual effects
-        pluginManager.registerEvents(new EffectEventHandlers(), plugin);
+        register(new EffectEventHandlers());
         if (MobCombatSettingsConfig.isObfuscateMobPowers())
-            pluginManager.registerEvents(new VisualEffectObfuscator(), plugin);
+            register(new VisualEffectObfuscator());
 
         //Loot
         if (ItemSettingsConfig.isDoEliteMobsLoot()) {
-            pluginManager.registerEvents(new LootTables(), plugin);
-            pluginManager.registerEvents(new PlaceEventPrevent(), plugin);
+            register(new LootTables());
+            register(new PlaceEventPrevent());
         }
 
         //Shops
-        pluginManager.registerEvents(new ProceduralShopMenu(), plugin);
-        pluginManager.registerEvents(new CustomShopMenu(), plugin);
-        pluginManager.registerEvents(new BuyOrSellMenu(), plugin);
-        pluginManager.registerEvents(new SellMenu(), plugin);
-        pluginManager.registerEvents(new SetupMenu.SetupMenuListeners(), plugin);
-        pluginManager.registerEvents(new ScrapperMenu.ScrapperMenuEvents(), plugin);
-        pluginManager.registerEvents(new SmeltMenu.SmeltMenuEvents(), plugin);
-        pluginManager.registerEvents(new RepairMenu.RepairMenuEvents(), plugin);
-        pluginManager.registerEvents(new RefinerMenu.RefinerMenuEvents(), plugin);
-        pluginManager.registerEvents(new EnhancementMenu.EnhancementMenuEvents(), plugin);
-        pluginManager.registerEvents(new UnbindMenu.UnbinderMenuEvents(), plugin);
+        register(new ProceduralShopMenu());
+        register(new CustomShopMenu());
+        register(new BuyOrSellMenu());
+        register(new SellMenu());
+        register(new SetupMenu.SetupMenuListeners());
+        register(new ScrapperMenu.ScrapperMenuEvents());
+        register(new SmeltMenu.SmeltMenuEvents());
+        register(new RepairMenu.RepairMenuEvents());
+        register(new RefinerMenu.RefinerMenuEvents());
+        register(new EnhancementMenu.EnhancementMenuEvents());
+        register(new UnbindMenu.UnbinderMenuEvents());
 
         //Minecraft behavior canceller
         if (DefaultConfig.isPreventCreeperDamageToPassiveMobs())
-            pluginManager.registerEvents(new PreventCreeperPassiveEntityDamage(), plugin);
+            register(new PreventCreeperPassiveEntityDamage());
         if (!VersionChecker.serverVersionOlderThan(15, 0))
-            pluginManager.registerEvents(new PreventEliteBeeHiveEnter(), plugin);
-        pluginManager.registerEvents(new EnderDragonUnstuck(), plugin);
+            register(new PreventEliteBeeHiveEnter());
+        register(new EnderDragonUnstuck());
         if (DefaultConfig.isPreventVanillaReinforcementsForEliteEntities())
-            pluginManager.registerEvents(new VanillaReinforcementsCanceller(), plugin);
-        pluginManager.registerEvents(new LightningSpawnBypass(), plugin);
+            register(new VanillaReinforcementsCanceller());
+        register(new LightningSpawnBypass());
         if (ItemSettingsConfig.isEliteDurability())
-            pluginManager.registerEvents(new AlternativeDurabilityLoss(), plugin);
-        pluginManager.registerEvents(new EnderCrystalDamageProtectionBypass(), plugin);
+            register(new AlternativeDurabilityLoss());
+        register(new EnderCrystalDamageProtectionBypass());
 
 
         //Antiexploits
-        pluginManager.registerEvents(new PreventMountExploit(), plugin);
-        pluginManager.registerEvents(new PreventDarkroomExploit(), plugin);
-        pluginManager.registerEvents(new PreventLargeDarkroomExploit(), plugin);
-        pluginManager.registerEvents(new PreventTowerExploit(), plugin);
-        pluginManager.registerEvents(new PreventEndermanHeightExploit(), plugin);
+        register(new PreventMountExploit());
+        register(new PreventDarkroomExploit());
+        register(new PreventLargeDarkroomExploit());
+        register(new PreventTowerExploit());
+        register(new PreventEndermanHeightExploit());
         if (AntiExploitConfig.isNoItemPickup())
-            pluginManager.registerEvents(new PreventItemPickupByMobs(), plugin);
+            register(new PreventItemPickupByMobs());
         if (AntiExploitConfig.isAmbientDamageExploit())
-            pluginManager.registerEvents(new AmbientDamageExploit(), plugin);
+            register(new AmbientDamageExploit());
         if (!VersionChecker.serverVersionOlderThan(14, 0)) {
-            pluginManager.registerEvents(new HoneyBlockJumpExploit(), plugin);
+            register(new HoneyBlockJumpExploit());
         }
-        pluginManager.registerEvents(new EliteMobDamagedByPlayerAntiExploitListener(), plugin);
+        register(new EliteMobDamagedByPlayerAntiExploitListener());
 
-        pluginManager.registerEvents(new ActionEvent.ActionEventEvents(), plugin);
+        register(new ActionEvent.ActionEventEvents());
 
         //Set up health and damage displays
         if (MobCombatSettingsConfig.isDisplayHealthOnHit())
-            pluginManager.registerEvents(new HealthDisplay(), plugin);
+            register(new HealthDisplay());
         if (MobCombatSettingsConfig.isDisplayDamageOnHit())
-            pluginManager.registerEvents(new PopupDisplay(), plugin);
+            register(new PopupDisplay());
 
         //Initialize items from custom events
-        pluginManager.registerEvents(new FlamethrowerEnchantment.FlamethrowerEnchantmentEvents(), plugin);
-        pluginManager.registerEvents(new SummonMerchantEnchantment.SummonMerchantEvents(), plugin);
-        pluginManager.registerEvents(new SummonWolfEnchantment.SummonWolfEnchantmentEvent(), plugin);
-        pluginManager.registerEvents(new MeteorShowerEnchantment.MeteorShowerEvents(), plugin);
-        pluginManager.registerEvents(new DrillingEnchantment.DrillingEnchantmentEvents(), plugin);
-        pluginManager.registerEvents(new IceBreakerEnchantment.IceBreakerEnchantmentEvent(), plugin);
-        pluginManager.registerEvents(new GrapplingHookEnchantment.GrapplingHookEnchantmentEvents(), plugin);
-        pluginManager.registerEvents(new EarthquakeEnchantment.EarthquakeEnchantmentEvents(), plugin);
-        //pluginManager.registerEvents(new UnbindEnchantment.UnbindEvents(), plugin);
+        register(new FlamethrowerEnchantment.FlamethrowerEnchantmentEvents());
+        register(new SummonMerchantEnchantment.SummonMerchantEvents());
+        register(new SummonWolfEnchantment.SummonWolfEnchantmentEvent());
+        register(new MeteorShowerEnchantment.MeteorShowerEvents());
+        register(new DrillingEnchantment.DrillingEnchantmentEvents());
+        register(new IceBreakerEnchantment.IceBreakerEnchantmentEvent());
+        register(new GrapplingHookEnchantment.GrapplingHookEnchantmentEvents());
+        register(new EarthquakeEnchantment.EarthquakeEnchantmentEvents());
+        //register(new UnbindEnchantment.UnbindEvents());
 
         //Initialize adventurer's guild
-        pluginManager.registerEvents(new GuildRankMenuHandler(), plugin);
+        register(new GuildRankMenuHandler());
         //register quests
-        pluginManager.registerEvents(new KillObjective.KillObjectiveEvents(), plugin);
-        pluginManager.registerEvents(new CustomFetchObjective.CustomFetchObjectiveEvents(), plugin);
-        pluginManager.registerEvents(new DialogObjective.DialogObjectiveEvents(), plugin);
-        pluginManager.registerEvents(new QuestAcceptEvent.QuestAcceptEventHandler(), plugin);
-        pluginManager.registerEvents(new QuestCompleteEvent.QuestCompleteEventHandler(), plugin);
-        pluginManager.registerEvents(new QuestLeaveEvent.QuestLeaveEventHandler(), plugin);
-        pluginManager.registerEvents(new QuestProgressionEvent.QuestProgressionEventHandler(), plugin);
-        pluginManager.registerEvents(new QuestTracking.QuestTrackingEvents(), plugin);
-        pluginManager.registerEvents(new CustomQuest.CustomQuestEvents(), plugin);
+        register(new KillObjective.KillObjectiveEvents());
+        register(new CustomFetchObjective.CustomFetchObjectiveEvents());
+        register(new DialogObjective.DialogObjectiveEvents());
+        register(new QuestAcceptEvent.QuestAcceptEventHandler());
+        register(new QuestCompleteEvent.QuestCompleteEventHandler());
+        register(new QuestLeaveEvent.QuestLeaveEventHandler());
+        register(new QuestProgressionEvent.QuestProgressionEventHandler());
+        register(new QuestTracking.QuestTrackingEvents());
+        register(new CustomQuest.CustomQuestEvents());
 
         //Combat tag
         if (CombatTagConfig.isEnableCombatTag())
-            pluginManager.registerEvents(new CombatTag(), plugin);
+            register(new CombatTag());
 
 
         //Prevent elitemob on elitemob aggro
-        pluginManager.registerEvents(new EnderDragonUnstuck.AggroPrevention(), plugin);
+        register(new EnderDragonUnstuck.AggroPrevention());
 
         //Player effect when a rare item is on the ground
-        pluginManager.registerEvents(new RareDropEffect(), plugin);
+        register(new RareDropEffect());
 
         //NPCs
-        pluginManager.registerEvents(new NPCDamageEvent(), plugin);
-        pluginManager.registerEvents(new NPCInteractions(), plugin);
-        pluginManager.registerEvents(new NPCProximitySensor(), plugin);
-        pluginManager.registerEvents(new FindNewWorlds(), plugin);
-        pluginManager.registerEvents(new WorldGuardSpawnEventBypasser(), plugin);
-        pluginManager.registerEvents(new WorldGuardEliteMobOnlySpawnFlag(), plugin);
-        pluginManager.registerEvents(new WorldGuardDungeonFlag(), plugin);
+        register(new NPCDamageEvent());
+        register(new NPCInteractions());
+        register(new NPCProximitySensor());
+        register(new FindNewWorlds());
+        register(new WorldGuardSpawnEventBypasser());
+        register(new WorldGuardEliteMobOnlySpawnFlag());
+        register(new WorldGuardDungeonFlag());
 
-        pluginManager.registerEvents(new EntityTransformHandler(), plugin);
-        pluginManager.registerEvents(new EliteBlazeWaterDamagePrevention(), plugin);
-        pluginManager.registerEvents(new PreventEliteEquipmentDrop(), plugin);
-        pluginManager.registerEvents(new CombustionPrevention(), plugin);
+        register(new EntityTransformHandler());
+        register(new EliteBlazeWaterDamagePrevention());
+        register(new PreventEliteEquipmentDrop());
+        register(new CombustionPrevention());
 
-        pluginManager.registerEvents(new TreasureChest.TreasureChestEvents(), plugin);
+        register(new TreasureChest.TreasureChestEvents());
 
         //Zone based spawning
-        pluginManager.registerEvents(new ZoneWarner(), plugin);
-        pluginManager.registerEvents(new DaylightWatchdog(), plugin);
+        register(new ZoneWarner());
+        register(new DaylightWatchdog());
 
         //On death commands
-        pluginManager.registerEvents(new OnDeathCommands(), plugin);
+        register(new OnDeathCommands());
 
         //Player stuff
-        pluginManager.registerEvents(new GuildRank.GuildRankEvents(), plugin);
+        register(new GuildRank.GuildRankEvents());
 
         //Commands
-        pluginManager.registerEvents(new RemoveCommand.RemoveCommandEvents(), plugin);
+        register(new RemoveCommand.RemoveCommandEvents());
 
+    }
+
+    private static void register(Listener listener) {
+        pluginManager.registerEvents(listener, plugin);
     }
 
 }

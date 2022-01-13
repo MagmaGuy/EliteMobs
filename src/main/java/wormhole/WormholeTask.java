@@ -20,6 +20,9 @@ import org.bukkit.util.Vector;
 import java.util.Objects;
 
 public class WormholeTask {
+    private WormholeTask() {
+    }
+
     public static BukkitTask startWormholeTask(WormholeEntry wormholeEntry) {
         return new BukkitRunnable() {
             int counter = 0;
@@ -42,7 +45,7 @@ public class WormholeTask {
                     counter++;
                 }
             }
-        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 5);
+        }.runTaskTimerAsynchronously(MetadataHandler.PLUGIN, 0, 5);
     }
 
     private static void checkPoint(WormholeEntry wormholeEntry, Location playerLocation, Player player) {
@@ -81,13 +84,16 @@ public class WormholeTask {
             }
             return;
         }
-        if (wormholeEntry.getWormhole().getWormholeConfigFields().isBlindPlayer())
-            player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20 * 2, 0));
-        player.teleport(destination);
-        player.playSound(player.getLocation(), Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, 1f, 1f);
-        player.setVelocity(destination.getDirection().normalize());
-        Wormhole.getPlayerCooldowns().add(player);
-        Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, () -> Wormhole.getPlayerCooldowns().remove(player), 20 * 5L);
+        Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, () -> {
+            if (wormholeEntry.getWormhole().getWormholeConfigFields().isBlindPlayer())
+                player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20 * 2, 0));
+            player.teleport(destination);
+            player.playSound(player.getLocation(), Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, 1f, 1f);
+            player.setVelocity(destination.getDirection().normalize());
+            Wormhole.getPlayerCooldowns().add(player);
+            Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, () -> Wormhole.getPlayerCooldowns().remove(player), 20 * 5L);
+        });
+
     }
 
     private static void visualEffect(int counter, WormholeEntry wormholeEntry) {

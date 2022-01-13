@@ -4,6 +4,8 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 
 public class ChunkLocationChecker {
+    private ChunkLocationChecker() {
+    }
 
     /*
     Checks if a location is in a given chunk

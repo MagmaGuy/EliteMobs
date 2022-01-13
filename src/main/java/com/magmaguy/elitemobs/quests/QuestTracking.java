@@ -14,6 +14,7 @@ import com.magmaguy.elitemobs.utils.SpigotMessage;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarFlag;
 import org.bukkit.boss.BarStyle;
@@ -26,6 +27,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
+import wormhole.Wormhole;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -149,7 +151,7 @@ public class QuestTracking {
         });
     }
 
-    private void stop() {
+    public void stop() {
         playerTrackingQuests.remove(player);
         player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
         locationRefresher.cancel();
@@ -174,9 +176,59 @@ public class QuestTracking {
     private void updateCompassContents() {
         //for reference, character 32 is straight ahead
         String compassText = "---------------------------------------------------------------";
-        for (LocationAndSymbol pair : projectLocations()) {
-            compassText = compassText.substring(0, pair.getKey()) + pair.getValue() + compassText.substring(pair.getKey() + 1);
+        List<LocationAndSymbol> locationAndSymbols = projectLocations();
+        if (!locationAndSymbols.isEmpty())
+            for (LocationAndSymbol pair : locationAndSymbols)
+                compassText = compassText.substring(0, pair.getKey()) + pair.getValue() + compassText.substring(pair.getKey() + 1);
+        else {
+            World world = null;
+            boolean locationsOutOfBounds = false;
+            for (ObjectiveDestinations objectiveDestinations : objectiveDestinations)
+                for (Location location : objectiveDestinations.getDestinations())
+                    if (location != null && location.getWorld() != null) {
+                        world = location.getWorld();
+                        if (world.equals(player.getWorld())) {
+                            locationsOutOfBounds = true;
+                            break;
+                        }
+                    }
+
+            if (!locationsOutOfBounds) {
+                if (world != null) {
+                    boolean wormholeIsViable = false;
+                    for (Wormhole wormhole : Wormhole.getWormholes()) {
+                        if (wormhole.getWormholeEntry1().getLocation() != null &&
+                                wormhole.getWormholeEntry1().getLocation().getWorld() != null &&
+                                wormhole.getWormholeEntry1().getLocation().getWorld().equals(player.getWorld())) {
+                            if (wormhole.getWormholeEntry2().getLocation() != null &&
+                                    wormhole.getWormholeEntry2().getLocation().getWorld() != null &&
+                                    wormhole.getWormholeEntry2().getLocation().getWorld().equals(world)) {
+                                LocationAndSymbol pair = processLocations(wormhole.getWormholeEntry1().getLocation(), null);
+                                if (pair != null)
+                                    compassText = compassText.substring(0, pair.getKey()) + pair.getValue() + compassText.substring(pair.getKey() + 1);
+                                wormholeIsViable = true;
+                            }
+
+                        } else if (wormhole.getWormholeEntry2().getLocation() != null &&
+                                wormhole.getWormholeEntry2().getLocation().getWorld() != null &&
+                                wormhole.getWormholeEntry2().getLocation().getWorld().equals(player.getWorld())) {
+                            if (wormhole.getWormholeEntry1().getLocation() != null &&
+                                    wormhole.getWormholeEntry1().getLocation().getWorld() != null &&
+                                    wormhole.getWormholeEntry1().getLocation().getWorld().equals(world)) {
+                                LocationAndSymbol pair = processLocations(wormhole.getWormholeEntry2().getLocation(), null);
+                                if (pair != null)
+                                    compassText = compassText.substring(0, pair.getKey()) + pair.getValue() + compassText.substring(pair.getKey() + 1);
+                                wormholeIsViable = true;
+                            }
+                        }
+                    }
+                    if (!wormholeIsViable)
+                        compassText = QuestsConfig.getQuestDestinationInOtherWorld().replace("$world", world.getName());
+                } else
+                    compassText = QuestsConfig.getNoQuestDestinationFound();
+            }
         }
+
         compassBar.setTitle(compassText);
         compassBar.addPlayer(player);
     }
@@ -201,9 +253,9 @@ public class QuestTracking {
         if (player.getWorld().equals(location.getWorld())) {
             Vector toTarget = toTargetVector(player, location);
             double angle = getAngle(toTarget, player);
-            if (angle > Math.abs(Math.PI / 2D)) return null;
-            //Convert to degrees, each character has a resolution of 6 degrees
-            return new LocationAndSymbol((int) (angle * 57D / 6d), getSymbol(objective));
+            if (Math.abs(angle) > Math.PI / 2D) return null;
+            //Convert to degrees, each character has a resolution of 3 degrees
+            return new LocationAndSymbol((int) (angle * 57D / 3D), getSymbol(objective));
         }
         return null;
     }
@@ -220,6 +272,9 @@ public class QuestTracking {
     }
 
     private String getSymbol(Objective objective) {
+        //case for portals
+        if (objective == null) return "⬯";
+
         if (questIsDone)
             return "⦿";
         if (objective instanceof KillObjective)
