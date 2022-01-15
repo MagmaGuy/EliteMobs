@@ -14,43 +14,36 @@ import java.nio.file.Paths;
 
 public class MinidungeonWorldLoader {
     public static World loadWorld(Minidungeon minidungeon) {
+        return loadWorld(minidungeon, minidungeon.getDungeonPackagerConfigFields().getWorldName(), minidungeon.getDungeonPackagerConfigFields().getEnvironment());
+    }
+
+    public static World loadWorld(Minidungeon minidungeon, String worldName, World.Environment environment) {
         File folder = new File(Bukkit.getWorldContainer().getAbsolutePath());
 
-        new InfoMessage("Trying to load Minidungeon world " + minidungeon.getDungeonPackagerConfigFields().getWorldName());
-        if (!Files.exists(Paths.get(folder.getAbsolutePath() + "/" + minidungeon.getDungeonPackagerConfigFields().getWorldName())))
+        new InfoMessage("Trying to load Minidungeon world " + worldName);
+        if (!Files.exists(Paths.get(folder.getAbsolutePath() + "/" + worldName)))
             return null;
-        new InfoMessage("Detected Minidungeon world " + minidungeon.getDungeonPackagerConfigFields().getWorldName());
+        new InfoMessage("Detected Minidungeon world " + worldName);
         try {
-            WorldCreator worldCreator = new WorldCreator(minidungeon.getDungeonPackagerConfigFields().getWorldName());
-            worldCreator.environment(minidungeon.getDungeonPackagerConfigFields().getEnvironment());
+            WorldCreator worldCreator = new WorldCreator(worldName);
+            worldCreator.environment(environment);
             World world = Bukkit.createWorld(worldCreator);
             if (world != null)
                 world.setKeepSpawnInMemory(false);
-            new InfoMessage("Minidungeons world " + minidungeon.getDungeonPackagerConfigFields().getWorldName() + " was loaded successfully!");
+            new InfoMessage("Minidungeons world " + worldName + " was loaded successfully!");
             minidungeon.setInstalled(true);
             world.setDifficulty(Difficulty.HARD);
-            //if (EliteMobs.worldGuardIsEnabled && minidungeon.dungeonPackagerConfigFields.isProtect())
-            //    WorldGuardCompatibility.protectWorldMinidugeonArea(world.getSpawnLocation(), minidungeon);
             return world;
         } catch (Exception exception) {
-            new WarningMessage("Failed to load Minidungeon world " + minidungeon.getDungeonPackagerConfigFields().getWorldName() + " !");
+            new WarningMessage("Failed to load Minidungeon world " + worldName + " !");
             exception.printStackTrace();
         }
 
         return null;
     }
 
-
     public static void unloadWorld(Minidungeon minidungeon) {
-        Bukkit.unloadWorld(minidungeon.getDungeonPackagerConfigFields().getWorldName(), true);
-    }
-
-    public static World runtimeLoadWorld(Minidungeon minidungeon) {
-        World world = loadWorld(minidungeon);
-        if (world == null) return null;
-        //for (RegionalBossEntity regionalBossEntity : RegionalBossEntity.getRegionalBossEntitySet())
-        //    if (regionalBossEntity.getWorldName().equals(world.getName()))
-        //        regionalBossEntity.worldLoad();
-        return world;
+        Bukkit.unloadWorld(minidungeon.getWorld(), true);
+        if (minidungeon.getWormholeWorld() != null) Bukkit.unloadWorld(minidungeon.getWormholeWorld(), true);
     }
 }

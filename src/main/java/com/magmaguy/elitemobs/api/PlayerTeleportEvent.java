@@ -69,7 +69,7 @@ public class PlayerTeleportEvent extends Event implements Cancellable {
 
     public void executeTeleport() {
         player.teleport(destination);
-        for (Minidungeon minidungeon : Minidungeon.minidungeons.values())
+        for (Minidungeon minidungeon : Minidungeon.getMinidungeons().values())
             if (minidungeon.isInstalled() &&
                     minidungeon.getDungeonPackagerConfigFields().getDungeonLocationType().equals(DungeonPackagerConfigFields.DungeonLocationType.WORLD) &&
                     minidungeon.getWorld().equals(originalLocation.getWorld()))

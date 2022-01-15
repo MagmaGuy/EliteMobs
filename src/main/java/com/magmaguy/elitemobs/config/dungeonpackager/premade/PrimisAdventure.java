@@ -27,7 +27,7 @@ public class PrimisAdventure extends DungeonPackagerConfigFields {
                 new Vector(0, 0, 0),
                 new Vector(0, 0, 0),
                 new Vector(0, 0, 0),
-                0D,
+                66D,
                 0D,
                 0,
                 "Difficulty: &2Easy\n" +
@@ -35,5 +35,7 @@ public class PrimisAdventure extends DungeonPackagerConfigFields {
                         "&6A tutorial adventure for new players!",
                 "&8[EM] &6Primis awaits, strike the earth!",
                 "&8[EM] &6You have left Primis!");
+        setWormholeWorldName("em_primis_wormhole");
+        setWormholeEnvironment(World.Environment.NORMAL);
     }
 }

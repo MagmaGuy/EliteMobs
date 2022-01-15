@@ -16,25 +16,25 @@ public class SetupHandler {
     }
 
     public static void setupMinidungeonCommand(Player player, String minidungeonName) {
-        Minidungeon minidungeon = Minidungeon.minidungeons.get(minidungeonName);
+        Minidungeon minidungeon = Minidungeon.getMinidungeons().get(minidungeonName);
         minidungeon.finalizeMinidungeonInstallation(player, true);
         player.performCommand("/rotate " + minidungeon.getDungeonPackagerConfigFields().getRotation());
         player.performCommand("/paste");
     }
 
     public static void setupMinidungeonNoPasteCommand(Player player, String minidungeonName) {
-        Minidungeon minidungeon = Minidungeon.minidungeons.get(minidungeonName);
+        Minidungeon minidungeon = Minidungeon.getMinidungeons().get(minidungeonName);
         minidungeon.finalizeMinidungeonInstallation(player, false);
     }
 
     public static void setupUnminidungeonCommand(Player player, String minidungeonName) {
-        Minidungeon minidungeon = Minidungeon.minidungeons.get(minidungeonName);
+        Minidungeon minidungeon = Minidungeon.getMinidungeons().get(minidungeonName);
         minidungeon.uninstallSchematicMinidungeon(player);
         player.performCommand("/undo");
     }
 
     public static void setupUnminidungeonNoPasteCommand(Player player, String minidungeonName) {
-        Minidungeon minidungeon = Minidungeon.minidungeons.get(minidungeonName);
+        Minidungeon minidungeon = Minidungeon.getMinidungeons().get(minidungeonName);
         minidungeon.finalizeMinidungeonInstallation(player, false);
     }
 

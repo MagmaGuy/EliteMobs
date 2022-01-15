@@ -10,7 +10,7 @@ import org.bukkit.util.Vector;
 public class RelativeCoordinatesCommand {
     public static void get(Player player, String minidungeonString) {
 
-        Minidungeon minidungeon = Minidungeon.minidungeons.get(minidungeonString);
+        Minidungeon minidungeon = Minidungeon.getMinidungeons().get(minidungeonString);
         if (minidungeon == null) {
             player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Minidungeons name " + minidungeonString + " &4isn't valid!"));
             return;

@@ -14,7 +14,7 @@ public class CustomCharts {
         Metrics metrics = EliteMobs.metrics;
         metrics.addCustomChart(new AdvancedPie("minidungeons", () -> {
             Map<String, Integer> valueMap = new HashMap<>();
-            for (Minidungeon minidungeon : Minidungeon.minidungeons.values()) {
+            for (Minidungeon minidungeon : Minidungeon.getMinidungeons().values()) {
                 valueMap.put(
                         ChatColor.stripColor(minidungeon.getDungeonPackagerConfigFields().getFilename()),
                         minidungeon.isInstalled() ? 1 : 0);

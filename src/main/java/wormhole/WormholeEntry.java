@@ -22,7 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 
 public class WormholeEntry {
-    private static HashMap<Integer, List<WormholeEntry>> wormholeEntries = new HashMap<>();
+    @Getter
+    private static final HashMap<Integer, List<WormholeEntry>> wormholeEntries = new HashMap<>();
 
     @Getter
     private final Location location;
@@ -56,6 +57,7 @@ public class WormholeEntry {
 
     public void chunkLoad() {
         initializeTextDisplay();
+        if (wormholeTask != null && !wormholeTask.isCancelled()) wormholeTask.cancel();
         wormholeTask = WormholeTask.startWormholeTask(this);
     }
 
@@ -69,6 +71,7 @@ public class WormholeEntry {
     }
 
     private void initializeTextDisplay() {
+        if (text != null && text.isValid()) return;
         if (locationText == null) return;
         if (location == null || location.getWorld() == null) return;
         text = location.getWorld().spawn(

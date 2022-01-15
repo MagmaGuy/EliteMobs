@@ -330,6 +330,7 @@ public class PlayerData {
             byte[] bytes = resultSet.getBytes(value);
             resultSet.close();
             statement.close();
+            if (bytes == null) return null;
             return new String(bytes);
         } catch (Exception e) {
             new WarningMessage("Failed to get blob value from database!");
