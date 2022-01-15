@@ -8,7 +8,7 @@ public class TreasureChestCommands {
     }
 
     public static void addRelativeTreasureChest(Player player, String treasureChestFilename, String minidungeonName) {
-        Minidungeon minidungeon = Minidungeon.minidungeons.get(minidungeonName);
+        Minidungeon minidungeon = Minidungeon.getMinidungeons().get(minidungeonName);
         if (minidungeon == null) {
             player.sendMessage("Invalid minidungeon name!");
             return;

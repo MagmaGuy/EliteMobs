@@ -22,7 +22,7 @@ public class RefinerConfig extends NPCsConfigFields {
                         "I'll recycle your scrap!"),
                 Arrays.asList(
                         "Need your scrap upgraded?",
-                        "Upgrading scrap here!",
+                        "Upgrade your scrap here!",
                         "Upgrade 10 scrap to a higher level!",
                         "Make your scrap more useful!",
                         "Got low level scrap?"),

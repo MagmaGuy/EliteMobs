@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.api.QuestAcceptEvent;
 import com.magmaguy.elitemobs.api.QuestCompleteEvent;
 import com.magmaguy.elitemobs.api.QuestProgressionEvent;
 import com.magmaguy.elitemobs.config.QuestsConfig;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
@@ -96,52 +97,59 @@ public class QuestTracking {
     }
 
     public void updateLocations(Quest quest) {
-        objectiveDestinations.clear();
+        List<ObjectiveDestinations> destinations = new ArrayList<>();
         if (!quest.getQuestObjectives().isOver()) {
             questIsDone = false;
             for (Objective objective : quest.getQuestObjectives().getObjectives())
                 if (!objective.isObjectiveCompleted())
                     if (objective instanceof CustomKillObjective)
-                        getKillLocations((CustomKillObjective) objective);
+                        destinations.addAll(getKillLocations((CustomKillObjective) objective));
                     else if (objective instanceof DialogObjective)
-                        getDialogLocations((DialogObjective) objective);
+                        destinations.addAll(getDialogLocations((DialogObjective) objective));
                     else if (objective instanceof CustomFetchObjective)
-                        getFetchLocations((CustomFetchObjective) objective);
+                        destinations.addAll(getFetchLocations((CustomFetchObjective) objective));
+            Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, () -> objectiveDestinations = destinations);
         } else {
             questIsDone = true;
             getTurnInNPC();
         }
     }
 
-    private void getKillLocations(CustomKillObjective customKillObjective) {
+    private List<ObjectiveDestinations> getKillLocations(CustomKillObjective customKillObjective) {
+        List<ObjectiveDestinations> destinations = new ArrayList<>();
         EntityTracker.getEliteMobEntities().values().forEach(eliteEntity -> {
             List<Location> locations = new ArrayList<>();
             if (eliteEntity instanceof CustomBossEntity &&
                     ((CustomBossEntity) eliteEntity).getCustomBossesConfigFields().getFilename()
-                            .equals(customKillObjective.getEntityName()))
+                            .equals(customKillObjective.getCustomBossFilename()))
                 locations.add(eliteEntity.getLocation());
-            new ObjectiveDestinations(customKillObjective, locations);
+            destinations.add(new ObjectiveDestinations(customKillObjective, locations));
         });
+        return destinations;
     }
 
-    private void getDialogLocations(DialogObjective dialogObjective) {
+    private List<ObjectiveDestinations> getDialogLocations(DialogObjective dialogObjective) {
+        List<ObjectiveDestinations> destinations = new ArrayList<>();
         EntityTracker.getNpcEntities().values().forEach(npcEntity -> {
             List<Location> locations = new ArrayList<>();
             if (npcEntity.getNpCsConfigFields().getFilename().equals(dialogObjective.getNpcFilename()))
                 locations.add(npcEntity.getSpawnLocation());
-            new ObjectiveDestinations(dialogObjective, locations);
+            destinations.add(new ObjectiveDestinations(dialogObjective, locations));
         });
+        return destinations;
     }
 
-    private void getFetchLocations(CustomFetchObjective customFetchObjective) {
+    private List<ObjectiveDestinations> getFetchLocations(CustomFetchObjective customFetchObjective) {
+        List<ObjectiveDestinations> destinations = new ArrayList<>();
         EntityTracker.getEliteMobEntities().values().forEach(eliteEntity -> {
             List<Location> locations = new ArrayList<>();
             if (eliteEntity instanceof CustomBossEntity)
-                for (String loot : ((CustomBossEntity) eliteEntity).getCustomBossesConfigFields().getUniqueLootList())
-                    if (loot.contains(customFetchObjective.getKey()))
+                for (CustomBossesConfigFields.UniqueLoot uniqueLoot : ((CustomBossEntity) eliteEntity).getCustomBossesConfigFields().getParsedUniqueLootList())
+                    if (uniqueLoot.getCustomItem().getFileName().equals(customFetchObjective.getKey()))
                         locations.add(eliteEntity.getLocation());
-            new ObjectiveDestinations(customFetchObjective, locations);
+            destinations.add(new ObjectiveDestinations(customFetchObjective, locations));
         });
+        return destinations;
     }
 
     private void getTurnInNPC() {
@@ -183,8 +191,8 @@ public class QuestTracking {
         else {
             World world = null;
             boolean locationsOutOfBounds = false;
-            for (ObjectiveDestinations objectiveDestinations : objectiveDestinations)
-                for (Location location : objectiveDestinations.getDestinations())
+            for (ObjectiveDestinations destinations : objectiveDestinations)
+                for (Location location : destinations.getDestinations())
                     if (location != null && location.getWorld() != null) {
                         world = location.getWorld();
                         if (world.equals(player.getWorld())) {

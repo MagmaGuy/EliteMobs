@@ -35,9 +35,15 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
     @Getter
     private String worldName;
     @Getter
+    @Setter
+    private String wormholeWorldName;
+    @Getter
     private String schematicName = "";
     @Getter
     private World.Environment environment = World.Environment.NORMAL;
+    @Getter
+    @Setter
+    private World.Environment wormholeEnvironment = World.Environment.NORMAL;
     @Getter
     private boolean protect = true;
     @Getter
@@ -49,9 +55,15 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
     @Getter
     private Vector teleportPoint = new Vector(0,0,0);
     @Getter
+    private Vector wormholeTeleportPoint = new Vector(0,0,0);
+    @Getter
     private double teleportPointPitch = 0d;
     @Getter
+    private double wormholeTeleportPointPitch = 0d;
+    @Getter
     private double teleportPointYaw = 0d;
+    @Getter
+    private double wormholeTeleportPointYaw = 0d;
     @Getter
     private int dungeonVersion = 0;
     @Getter
@@ -101,7 +113,6 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
         this.dungeonSizeCategory = dungeonSizeCategory;
         this.worldName = worldName;
         this.schematicName = schematicName;
-        this.worldName = worldName;
         this.environment = environment;
         this.protect = protect;
         this.corner1 = corner1;
@@ -136,8 +147,10 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
             return;
         }
         this.worldName = processString("worldName", worldName, "", false);
+        this.wormholeWorldName = processString("wormholeWorldName", wormholeWorldName, "", false);
         this.schematicName = processString("schematicName", schematicName, "", false);
         this.environment = processEnum("environment", environment, null, World.Environment.class, false);
+        this.wormholeEnvironment = processEnum("wormholeEnvironment", wormholeEnvironment, null, World.Environment.class, false);
         this.protect = processBoolean("protect", protect, true, true);
         this.anchorPoint = processLocation("anchorPoint", anchorPoint, null, false);
         this.rotation = processDouble("rotation", rotation, 0, false);

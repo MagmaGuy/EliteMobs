@@ -264,7 +264,7 @@ public class EliteMobs extends JavaPlugin {
         new CustomTreasureChestsConfig();
 
         //Find the stats of bosses in minidungeons
-        for (Minidungeon minidungeon : Minidungeon.minidungeons.values()) {
+        for (Minidungeon minidungeon : Minidungeon.getMinidungeons().values()) {
             if (minidungeon.getDungeonPackagerConfigFields().getDungeonLocationType() != null)
                 if (minidungeon.getDungeonPackagerConfigFields().getDungeonLocationType().equals(DungeonPackagerConfigFields.DungeonLocationType.WORLD))
                     minidungeon.quantifyWorldBosses();
@@ -358,7 +358,7 @@ public class EliteMobs extends JavaPlugin {
         CustomItem.getTieredLoot().clear();
         CustomItem.getWeighedFixedItems().clear();
         new InfoMessage("Clearing Minidungeons...");
-        Minidungeon.minidungeons.clear();
+        Minidungeon.getMinidungeons().clear();
         RegionalBossEntity.regionalBossesShutdown();
 
         new InfoMessage("Unregistering placeholders...");

@@ -263,7 +263,7 @@ public class AdminCommands {
                 .handler(commandContext -> CustomTreasureChestsConfig.addTreasureChestEntry(
                         (Player) commandContext.getSender(), commandContext.get("fileName"))));
 
-        ArrayList<String> minidungeonFileNames = new ArrayList<>(Minidungeon.minidungeons.keySet());
+        ArrayList<String> minidungeonFileNames = new ArrayList<>(Minidungeon.getMinidungeons().keySet());
 
         // /em addRelativeSpawnLocation <customBossFileName> <minidungeonFileName>
         manager.command(builder.literal("addRelativeSpawnLocation", "arsp")

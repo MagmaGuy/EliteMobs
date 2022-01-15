@@ -449,8 +449,10 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     }
 
     public class UniqueLoot {
-        public double chance;
-        public CustomItem customItem;
+        @Getter
+        private double chance;
+        @Getter
+        private CustomItem customItem;
         @Getter
         private final String requiredPermission;
 

@@ -127,6 +127,7 @@ public class CustomBossMegaConsumer {
         } catch (Exception exception) {
             customBossEntity.setCustomModel(null);
             new WarningMessage("Failed to initialize Custom Model for Custom Boss " + customBossesConfigFields.getFilename());
+            exception.printStackTrace();
         }
     }
 

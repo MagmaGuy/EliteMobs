@@ -60,8 +60,15 @@ public class Wormhole {
         wormholes.add(this);
     }
 
+    public static void shutdown() {
+        for (Wormhole wormhole : wormholes)
+            wormhole.stop();
+        wormholes.clear();
+        WormholeEntry.getWormholeEntries().clear();
+    }
+
     private Location getDungeonLocation(String dungeonFilename) {
-        Minidungeon minidungeon = Minidungeon.minidungeons.get(dungeonFilename);
+        Minidungeon minidungeon = Minidungeon.getMinidungeons().get(dungeonFilename);
         if (minidungeon == null) {
             new WarningMessage("Dungeon " + dungeonFilename + " is not a valid dungeon packager name! Wormhole " + getWormholeConfigFields().getFilename() + " will not lead anywhere.");
             setPortalMissingMessage(WormholesConfig.getDefaultPortalMissingMessage());
@@ -79,16 +86,10 @@ public class Wormhole {
             return null;
         }
         Vector offsetVector = minidungeon.getTeleportLocation().getDirection().clone().setY(0).normalize()
-                .multiply(2 * getWormholeConfigFields().getSizeMultiplier())
+                .multiply(1.5 * getWormholeConfigFields().getSizeMultiplier())
                 .setY(-1 * getWormholeConfigFields().getSizeMultiplier());
 
         return minidungeon.getTeleportLocation().clone().subtract(offsetVector);
-    }
-
-    public static void shutdown() {
-        for (Wormhole wormhole : wormholes)
-            wormhole.stop();
-        wormholes.clear();
     }
 
     private void stop() {

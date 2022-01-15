@@ -70,7 +70,7 @@ public class SetupMenu {
     private void dungeonStatuses() {
         //continue counting from used inventory slots
         int counter = 1;
-        for (Minidungeon minidungeon : Minidungeon.minidungeons.values()) {
+        for (Minidungeon minidungeon : Minidungeon.getMinidungeons().values()) {
 
             if (!Bukkit.getPluginManager().isPluginEnabled("WorldGuard"))
                 inventory.setItem(validSlots.get(counter), ItemStackGenerator.generateItemStack(Material.RED_STAINED_GLASS_PANE,

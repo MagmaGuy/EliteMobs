@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 
 public class DungeonCommands {
     public static void teleport(Player player, String minidungeonName) {
-        Minidungeon minidungeon = Minidungeon.minidungeons.get(minidungeonName);
+        Minidungeon minidungeon = Minidungeon.getMinidungeons().get(minidungeonName);
         if (minidungeon != null)
             if (minidungeon.getDungeonPackagerConfigFields().getDungeonLocationType().equals(DungeonPackagerConfigFields.DungeonLocationType.SCHEMATIC))
                 PlayerPreTeleportEvent.teleportPlayer(player, minidungeon.getTeleportLocation());

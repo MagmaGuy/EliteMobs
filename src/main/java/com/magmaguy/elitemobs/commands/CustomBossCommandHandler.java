@@ -40,7 +40,7 @@ public class CustomBossCommandHandler {
     }
 
     public static void addRelativeSpawnLocation(Player player, String customBossConfigFieldsString, String minidungeonString) {
-        Minidungeon minidungeon = Minidungeon.minidungeons.get(minidungeonString);
+        Minidungeon minidungeon = Minidungeon.getMinidungeons().get(minidungeonString);
         if (minidungeon == null) {
             player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Failed to add relative location! Minidungeon is not valid!"));
             return;
