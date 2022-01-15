@@ -7,9 +7,8 @@ import lombok.Getter;
 
 public class CustomKillObjective extends KillObjective {
 
-    private final String customBossFilename;
     @Getter
-    protected String entityName = null;
+    private final String customBossFilename;
 
     public CustomKillObjective(String customBossFilename, int targetKillAmount, int questLevel) {
         super(targetKillAmount, CustomBossesConfig.getCustomBosses().get(customBossFilename).getCleanName(questLevel * 10));

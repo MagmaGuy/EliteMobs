@@ -233,7 +233,7 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
         this.isRespawning = false;
         if (livingEntity != null) {
             checkLeash();
-            getLivingEntity().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 3));
+            getLivingEntity().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 4));
         }
     }
 

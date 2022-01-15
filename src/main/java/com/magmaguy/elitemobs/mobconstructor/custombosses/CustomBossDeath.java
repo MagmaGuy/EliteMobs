@@ -32,9 +32,9 @@ public class CustomBossDeath implements Listener {
         if (customBossEntity.customBossesConfigFields.getUniqueLootList().isEmpty()) return;
         for (CustomBossesConfigFields.UniqueLoot uniqueLoot : customBossEntity.customBossesConfigFields.getParsedUniqueLootList())
             if (uniqueLoot.getRequiredPermission().isEmpty() ||
-                    !uniqueLoot.getRequiredPermission().isEmpty() && player.hasPermission(uniqueLoot.getRequiredPermission()))
-                if (ThreadLocalRandom.current().nextDouble() < uniqueLoot.chance)
-                    CustomItem.dropPlayerLoot(player, customBossEntity.getLevel(), uniqueLoot.customItem.getFileName(), customBossEntity.getLocation());
+                    !uniqueLoot.getRequiredPermission().isEmpty() && player.hasPermission(uniqueLoot.getRequiredPermission()) &&
+                            ThreadLocalRandom.current().nextDouble() < uniqueLoot.getChance())
+                CustomItem.dropPlayerLoot(player, customBossEntity.getLevel(), uniqueLoot.getCustomItem().getFileName(), customBossEntity.getLocation());
         for (SpecialLoot specialLoot : customBossEntity.customBossesConfigFields.getSpecialLoot().values())
             if (ThreadLocalRandom.current().nextDouble() < specialLoot.getChance())
                 customBossEntity.getLocation().getWorld().dropItem(customBossEntity.getLocation(),
@@ -46,17 +46,17 @@ public class CustomBossDeath implements Listener {
 
     private static void doDeathMessage(CustomBossEntity customBossEntity) {
         //Do death message
-        String playersList = "";
+        StringBuilder playersList = new StringBuilder();
         for (Player player : customBossEntity.getDamagers().keySet()) {
-            if (playersList.isEmpty())
-                playersList += player.getDisplayName();
+            if (playersList.length() == 0)
+                playersList.append(player.getDisplayName());
             else
-                playersList += ", &f" + player.getDisplayName();
+                playersList.append(", &f").append(player.getDisplayName());
         }
 
-        playersList = ChatColorConverter.convert(playersList);
+        playersList = new StringBuilder(ChatColorConverter.convert(playersList.toString()));
 
-        if (customBossEntity.customBossesConfigFields.getAnnouncementPriority() > 0 && customBossEntity.hasDamagers())
+        if (customBossEntity.hasDamagers())
             if (customBossEntity.customBossesConfigFields.getDeathMessages() != null &&
                     customBossEntity.customBossesConfigFields.getDeathMessages().size() > 0) {
                 Player topDamager = null, secondDamager = null, thirdDamager = null;
@@ -116,11 +116,15 @@ public class CustomBossDeath implements Listener {
                         else
                             string = "";
                     if (string.contains("$players"))
-                        string = string.replace("$players", playersList);
-                    Bukkit.broadcastMessage(ChatColorConverter.convert(string));
+                        string = string.replace("$players", playersList.toString());
+                    if (customBossEntity.customBossesConfigFields.getAnnouncementPriority() > 0)
+                        Bukkit.broadcastMessage(ChatColorConverter.convert(string));
                     if (string.length() > 0)
                         if (customBossEntity.customBossesConfigFields.getAnnouncementPriority() > 2)
                             new DiscordSRVAnnouncement(ChatColorConverter.convert(string));
+                        else
+                            for (Player player : customBossEntity.getDamagers().keySet())
+                                player.sendMessage(ChatColorConverter.convert(string));
                 }
 
                 for (Player player : Bukkit.getOnlinePlayers())
@@ -133,12 +137,16 @@ public class CustomBossDeath implements Listener {
 
             } else {
                 if (customBossEntity.customBossesConfigFields.getDeathMessage() != null) {
+                    if (customBossEntity.customBossesConfigFields.getAnnouncementPriority() == 0)
+                        for (Player player : customBossEntity.getDamagers().keySet())
+                            player.sendMessage(ChatColorConverter.convert(
+                                    customBossEntity.customBossesConfigFields.getDeathMessage().replace("$players", playersList.toString())));
                     if (customBossEntity.customBossesConfigFields.getAnnouncementPriority() > 0)
                         Bukkit.broadcastMessage(ChatColorConverter.convert(
-                                customBossEntity.customBossesConfigFields.getDeathMessage().replace("$players", playersList)));
+                                customBossEntity.customBossesConfigFields.getDeathMessage().replace("$players", playersList.toString())));
                     if (customBossEntity.customBossesConfigFields.getAnnouncementPriority() > 2)
                         new DiscordSRVAnnouncement(ChatColorConverter.convert(
-                                customBossEntity.customBossesConfigFields.getDeathMessage().replace("$players", playersList)));
+                                customBossEntity.customBossesConfigFields.getDeathMessage().replace("$players", playersList.toString())));
                 }
             }
     }

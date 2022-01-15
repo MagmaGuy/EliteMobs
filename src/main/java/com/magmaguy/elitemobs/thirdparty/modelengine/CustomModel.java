@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.thirdparty.modelengine;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import com.ticxo.modelengine.api.ModelEngineAPI;
 import com.ticxo.modelengine.api.model.ActiveModel;
@@ -16,24 +17,40 @@ import org.bukkit.event.entity.EntitySpawnEvent;
 
 public class CustomModel {
     public CustomModel(LivingEntity livingEntity, String modelName, String nametagName) {
+        if (ModelEngineAPI.api.getModelBlueprint(modelName) == null){
+            new InfoMessage("Model " + modelName + " was not found! Make sure you install the model correctly if you have it. This entry will be skipped!");
+            return;
+        }
+
         activeModel = ModelEngineAPI.api.getModelManager().createActiveModel(modelName);
         if (activeModel == null) {
-            new WarningMessage("Failed to get valid model entity from " + modelName + " ! Is the model name correct, and has the model been installed correctly?");
+            new WarningMessage("Failed to load model from " + modelName + " ! Is the model name correct, and has the model been installed correctly?");
             return;
         }
         modeledEntity = ModelEngineAPI.api.getModelManager().createModeledEntity(livingEntity);
-        modeledEntity.addActiveModel(activeModel);
-        modeledEntity.detectPlayers();
-        modeledEntity.setInvisible(true);
-        setName(nametagName, true);
+        if (modeledEntity == null) {
+            new WarningMessage("Failed to create model entity " + modelName + " ! Is the model name correct, and has the model been installed correctly?");
+            return;t
+        }
+
+        try {
+            modeledEntity.addActiveModel(activeModel);
+            modeledEntity.detectPlayers();
+            modeledEntity.setInvisible(true);
+            setName(nametagName, true);
+        } catch (Exception exception) {
+            modeledEntity.removeModel(modelName);
+            new WarningMessage("Failed to make model entity " + modelName + " ! Is the model name correct, and has the model been installed correctly?");
+        }
     }
 
     ActiveModel activeModel;
     ModeledEntity modeledEntity;
 
     public static void reloadModels() {
-        try{
-        ModelEngineAPI.api.getModelManager().registerModels();} catch (Exception ex){
+        try {
+            ModelEngineAPI.api.getModelManager().registerModels();
+        } catch (Exception ex) {
             new WarningMessage("Failed to reload models through ModelEngine!");
         }
     }

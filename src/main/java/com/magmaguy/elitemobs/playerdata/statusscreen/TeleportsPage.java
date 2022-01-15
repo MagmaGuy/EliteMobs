@@ -35,7 +35,7 @@ public class TeleportsPage {
         int counter = 0;
         ArrayList<TextComponent> textComponents = new ArrayList<>();
 
-        for (Minidungeon minidungeon : Minidungeon.minidungeons.values()) {
+        for (Minidungeon minidungeon : Minidungeon.getMinidungeons().values()) {
             if (!minidungeon.isInstalled()) continue;
 
             TextComponent message = new TextComponent(PlayerStatusScreen.convertLightColorsToBlack(minidungeon.getDungeonPackagerConfigFields().getName() + "\n"));
