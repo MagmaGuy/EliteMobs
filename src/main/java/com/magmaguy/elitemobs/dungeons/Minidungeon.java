@@ -100,7 +100,8 @@ public class Minidungeon {
                 !dungeonPackagerConfigFields.getWormholeWorldName().isEmpty() &&
                 Bukkit.getWorld(dungeonPackagerConfigFields.getWormholeWorldName()) == null) {
             wormholeWorld = MinidungeonWorldLoader.loadWorld(this, dungeonPackagerConfigFields.getWormholeWorldName(), dungeonPackagerConfigFields.getEnvironment());
-            WorldGuardCompatibility.protectWorldMinidugeonArea(Objects.requireNonNull(wormholeWorld).getSpawnLocation(), this);
+            if (wormholeWorld != null)
+                WorldGuardCompatibility.protectWorldMinidugeonArea(Objects.requireNonNull(wormholeWorld).getSpawnLocation(), this);
         }
     }
 
@@ -170,7 +171,7 @@ public class Minidungeon {
 
         if (dungeonPackagerConfigFields.getAnchorPoint() != null) {
             this.isInstalled = true;
-            initializeWorldBasedMinidungeon();
+            initializeWormholeWorld();
         }
 
     }
@@ -487,7 +488,7 @@ public class Minidungeon {
         public void uncommitLocations(Minidungeon minidungeon) {
             Collection<EliteEntity> eliteEntities = new ArrayList<>(EntityTracker.getEliteMobEntities().values());
             for (EliteEntity eliteEntity : eliteEntities)
-                if (eliteEntity instanceof CustomBossEntity customBossEntity && customBossEntity.getMinidungeon() == minidungeon) {
+                if (eliteEntity instanceof CustomBossEntity && ((CustomBossEntity) eliteEntity).getMinidungeon() == minidungeon) {
                     new InfoMessage("Removed " + eliteEntity.getName());
                     eliteEntity.remove(RemovalReason.REMOVE_COMMAND);
                 }

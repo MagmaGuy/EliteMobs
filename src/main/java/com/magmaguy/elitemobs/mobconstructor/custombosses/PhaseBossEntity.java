@@ -65,6 +65,7 @@ public class PhaseBossEntity {
         }
         customBossEntity.setHealth(customBossEntity.getMaxHealth() * healthPercentage);
         currentPhase = bossPhase;
+        if (customBossEntity.getCustomModel() != null) customBossEntity.getCustomModel().switchPhase();
     }
 
     public void resetToFirstPhase() {

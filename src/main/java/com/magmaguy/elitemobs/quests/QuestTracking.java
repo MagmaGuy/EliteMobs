@@ -325,11 +325,19 @@ public class QuestTracking {
         public void onQuestAcceptEvent(QuestAcceptEvent event) {
             if (!(event.getQuest() instanceof CustomQuest)) return;
             if (!((CustomQuest) event.getQuest()).getCustomQuestsConfigFields().isTrackable()) return;
-            event.getPlayer().spigot().sendMessage(SpigotMessage.commandHoverMessage(
-                    ChatColorConverter.convert(QuestsConfig.getChatTrackMessage()),
-                    ChatColorConverter.convert(QuestsConfig.getChatTrackHover()),
-                    QuestsConfig.getChatTrackCommand().replace("$questID", event.getQuest().getQuestID().toString())
-            ));
+            if (QuestsConfig.isAutoTrackQuestsOnAccept()) {
+                toggleTracking(event.getPlayer(), event.getQuest().getQuestID().toString());
+                event.getPlayer().spigot().sendMessage(SpigotMessage.commandHoverMessage(
+                        ChatColorConverter.convert(QuestsConfig.getChatTrackingMessage()),
+                        ChatColorConverter.convert(QuestsConfig.getChatTrackingHover()),
+                        QuestsConfig.getChatTrackingCommand().replace("$questID", event.getQuest().getQuestID().toString())
+                ));
+            }else
+                event.getPlayer().spigot().sendMessage(SpigotMessage.commandHoverMessage(
+                        ChatColorConverter.convert(QuestsConfig.getChatTrackMessage()),
+                        ChatColorConverter.convert(QuestsConfig.getChatTrackHover()),
+                        QuestsConfig.getChatTrackCommand().replace("$questID", event.getQuest().getQuestID().toString())
+                ));
         }
 
     }

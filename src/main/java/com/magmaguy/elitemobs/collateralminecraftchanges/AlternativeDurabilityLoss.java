@@ -17,7 +17,6 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -71,7 +70,7 @@ public class AlternativeDurabilityLoss implements Listener {
                 int currentDurability = damageable.getDamage();
                 int newDurability = currentDurability + durabilityLoss;
                 damageable.setDamage(newDurability);
-                itemStack.setItemMeta((ItemMeta) damageable);
+                itemStack.setItemMeta(damageable);
                 if (newDurability >= maxDurability)
                     itemStack.setAmount(0);
             }

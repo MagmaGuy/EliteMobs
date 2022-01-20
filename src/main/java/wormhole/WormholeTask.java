@@ -2,6 +2,7 @@ package wormhole;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.TranslationConfig;
 import com.magmaguy.elitemobs.config.WormholesConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
@@ -59,11 +60,13 @@ public class WormholeTask {
         if (wormholeEntry.getLocation().distance(playerLocation) > 1.5 * wormholeEntry.getWormhole().getWormholeConfigFields().getSizeMultiplier())
             return;
         if (wormholeEntry.getWormhole().getWormholeConfigFields().getCoinCost() > 0) {
-            if (EconomyHandler.checkCurrency(player.getUniqueId()) < wormholeEntry.getWormhole().getWormholeConfigFields().getCoinCost()) {
-                player.sendMessage(ChatColorConverter.convert(TranslationConfig.getInsufficientCurrencyForWormholeMessage()).replace("$amount", "" + wormholeEntry.getWormhole().getWormholeConfigFields().getCoinCost()));
+            double coinCost = wormholeEntry.getWormhole().getWormholeConfigFields().getCoinCost() +
+                    wormholeEntry.getWormhole().getWormholeConfigFields().getCoinCost() * GuildRank.currencyBonusMultiplier(player.getUniqueId());
+            if (EconomyHandler.checkCurrency(player.getUniqueId()) < coinCost) {
+                player.sendMessage(ChatColorConverter.convert(TranslationConfig.getInsufficientCurrencyForWormholeMessage()).replace("$amount", "" + coinCost));
                 return;
             } else
-                EconomyHandler.subtractCurrency(player.getUniqueId(), wormholeEntry.getWormhole().getWormholeConfigFields().getCoinCost());
+                EconomyHandler.subtractCurrency(player.getUniqueId(), coinCost);
         }
 
         teleport(wormholeEntry, player);
@@ -74,7 +77,7 @@ public class WormholeTask {
         if (wormholeEntry == wormholeEntry.getWormhole().getWormholeEntry1())
             destination = wormholeEntry.getWormhole().getWormholeEntry2().getLocation();
         else destination = wormholeEntry.getWormhole().getWormholeEntry1().getLocation();
-        if (destination == null) {
+        if (destination == null || destination.getWorld() == null) {
             if (wormholeEntry.getWormhole().getPortalMissingMessage() == null)
                 player.sendMessage(ChatColorConverter.convert(WormholesConfig.getDefaultPortalMissingMessage()));
             else {

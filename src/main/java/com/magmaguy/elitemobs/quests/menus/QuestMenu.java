@@ -98,6 +98,7 @@ public class QuestMenu {
                 pagesList.add(textComponent);
             } else if (characterCount > characterLimit) {
                 characterCount = 0;
+                characterCount += ChatColor.stripColor(textComponent.getText()).length();
                 pageIndex++;
                 textComponent.addExtra("\n");
                 pagesList.add(textComponent);

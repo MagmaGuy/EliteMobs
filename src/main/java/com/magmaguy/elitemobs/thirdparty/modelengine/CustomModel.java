@@ -8,6 +8,7 @@ import com.magmaguy.elitemobs.utils.WarningMessage;
 import com.ticxo.modelengine.api.ModelEngineAPI;
 import com.ticxo.modelengine.api.model.ActiveModel;
 import com.ticxo.modelengine.api.model.ModeledEntity;
+import lombok.Getter;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
@@ -16,10 +17,16 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 
 public class CustomModel {
-    public CustomModel(LivingEntity livingEntity, String modelName, String nametagName) {
-        if (ModelEngineAPI.api.getModelBlueprint(modelName) == null){
-            new InfoMessage("Model " + modelName + " was not found! Make sure you install the model correctly if you have it. This entry will be skipped!");
-            return;
+
+    @Getter
+    private boolean success = false;
+
+    private CustomModel(LivingEntity livingEntity, String modelName, String nametagName) {
+        try {
+            if (ModelEngineAPI.api.getModelManager().getModelRegistry().getModelBlueprint(modelName) == null)
+                new InfoMessage("Model " + modelName + " was not found! Make sure you install the model correctly if you have it. This entry will be skipped!");
+        } catch (NoSuchMethodError ex) {
+            new WarningMessage("Model Engine API version is not supported. Currently Elitemobs can only support Model Engine R2.2.0, documentation for other versions doesn't exist.");
         }
 
         activeModel = ModelEngineAPI.api.getModelManager().createActiveModel(modelName);
@@ -27,22 +34,41 @@ public class CustomModel {
             new WarningMessage("Failed to load model from " + modelName + " ! Is the model name correct, and has the model been installed correctly?");
             return;
         }
+
+        try {
+            if (activeModel.getModelId() == null) return;
+        } catch (Exception exception) {
+            new WarningMessage("Well fuck me I guess");
+            return;
+        }
+
         modeledEntity = ModelEngineAPI.api.getModelManager().createModeledEntity(livingEntity);
         if (modeledEntity == null) {
             new WarningMessage("Failed to create model entity " + modelName + " ! Is the model name correct, and has the model been installed correctly?");
-            return;t
+            return;
         }
 
         try {
-            modeledEntity.addActiveModel(activeModel);
-            modeledEntity.detectPlayers();
-            modeledEntity.setInvisible(true);
-            setName(nametagName, true);
-        } catch (Exception exception) {
-            modeledEntity.removeModel(modelName);
+            try {
+                modeledEntity.addActiveModel(activeModel);
+                modeledEntity.detectPlayers();
+                modeledEntity.setInvisible(true);
+                setName(nametagName, true);
+                success = true;
+            } catch (Exception exception) {
+                modeledEntity.removeModel(modelName);
+                new WarningMessage("Failed to make model entity " + modelName + " ! Is the model name correct, and has the model been installed correctly?");
+            }
+        } catch (NoSuchMethodError error) {
             new WarningMessage("Failed to make model entity " + modelName + " ! Is the model name correct, and has the model been installed correctly?");
         }
     }
+
+    public static CustomModel generateCustomModel(LivingEntity livingEntity, String modelName, String nametagName) {
+        CustomModel customModel = new CustomModel(livingEntity, modelName, nametagName);
+        return customModel.isSuccess() ? customModel : null;
+    }
+
 
     ActiveModel activeModel;
     ModeledEntity modeledEntity;
@@ -51,11 +77,12 @@ public class CustomModel {
         try {
             ModelEngineAPI.api.getModelManager().registerModels();
         } catch (Exception ex) {
-            new WarningMessage("Failed to reload models through ModelEngine!");
+            new WarningMessage("Model Engine API version is not supported. Currently Elitemobs can only support Model Engine R2.2.0, documentation for other versions doesn't exist.");
         }
     }
 
     public void shoot() {
+        if (activeModel == null) return;
         if (activeModel.getState("attack_ranged") != null)
             activeModel.addState("attack_ranged", 1, 1, 1);
         else
@@ -63,6 +90,7 @@ public class CustomModel {
     }
 
     public void melee() {
+        if (activeModel == null) return;
         if (activeModel.getState("attack_melee") != null)
             activeModel.addState("attack_melee", 1, 1, 1);
         else
@@ -70,8 +98,13 @@ public class CustomModel {
     }
 
     public void setName(String nametagName, boolean visible) {
+        if (modeledEntity == null) return;
         modeledEntity.setNametag(nametagName);
         modeledEntity.setNametagVisible(visible);
+    }
+
+    public void switchPhase() {
+        activeModel.removeState("death", true);
     }
 
     public void setNameVisible(boolean visible) {

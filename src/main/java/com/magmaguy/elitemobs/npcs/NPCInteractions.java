@@ -82,6 +82,7 @@ public class NPCInteractions implements Listener {
                 event.getPlayer().sendMessage("[EliteMobs] This feature is coming soon!");
                 break;
             case ARENA:
+                event.getPlayer().sendMessage("[EliteMobs] This feature is coming soon!");
                 break;
             case SELL:
                 if (event.getPlayer().hasPermission("elitemobs.shop.npc"))
