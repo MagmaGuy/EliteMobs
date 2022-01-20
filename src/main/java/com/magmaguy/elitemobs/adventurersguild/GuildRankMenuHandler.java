@@ -26,7 +26,7 @@ public class GuildRankMenuHandler implements Listener {
     private static final HashSet<Inventory> inventories = new HashSet<>();
     private static final ArrayList<Integer> rankSlots = new ArrayList<>(Arrays.asList(
             4, 11, 12, 13, 14, 15, 20, 21, 22, 23, 24, 29, 30, 31, 32, 33, 38, 39, 40, 41, 42));
-    private static final int prestigetRankSlot = 49;
+    private static final int prestigeRankSlot = 49;
 
     private static void selectUnlockedRank(Player player, int guildRank) {
         GuildRank.setActiveGuildRank(player, guildRank);
@@ -126,10 +126,10 @@ public class GuildRankMenuHandler implements Listener {
 
         if (GuildRank.getGuildPrestigeRank(player) < 10) {
             if (GuildRank.getActiveGuildRank(player) < 10 + GuildRank.getGuildPrestigeRank(player))
-                difficultyMenu.setItem(prestigetRankSlot, difficultyItemStackConstructor
+                difficultyMenu.setItem(prestigeRankSlot, difficultyItemStackConstructor
                         (guildRankStatus.PRESTIGE_LOCKED, GuildRank.getGuildPrestigeRank(player) + 1, player, true));
             else
-                difficultyMenu.setItem(prestigetRankSlot, difficultyItemStackConstructor
+                difficultyMenu.setItem(prestigeRankSlot, difficultyItemStackConstructor
                         (guildRankStatus.PRESTIGE_NEXT_UNLOCK, GuildRank.getGuildPrestigeRank(player) + 1, player, true));
         }
 
@@ -287,7 +287,7 @@ public class GuildRankMenuHandler implements Listener {
         event.setCancelled(true);
         Player player = (Player) event.getWhoClicked();
 
-        if (event.getSlot() == prestigetRankSlot) {
+        if (event.getSlot() == prestigeRankSlot) {
             selectPrestigeUnlock(player);
             return;
         }

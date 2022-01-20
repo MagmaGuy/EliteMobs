@@ -117,7 +117,7 @@ public class NPCEntity implements SimplePersistentEntityInterface {
     }
 
     private void setCustomModel(LivingEntity livingEntity) {
-        new CustomModel(livingEntity, getNpCsConfigFields().getCustomModel(), getNpCsConfigFields().getName());
+        CustomModel.generateCustomModel(livingEntity, getNpCsConfigFields().getCustomModel(), getNpCsConfigFields().getName());
     }
 
     public Villager getVillager() {

@@ -333,10 +333,11 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
     private void spawnMessage() {
         if (customBossesConfigFields.getSpawnMessage() == null) return;
         if (customBossesConfigFields.getAnnouncementPriority() < 1) return;
+        if (getLocation() == null) return;
         if (!EventsConfig.isAnnouncementBroadcastWorldOnly())
             Bukkit.broadcastMessage(ChatColorConverter.convert(customBossesConfigFields.getSpawnMessage()));
         else
-            for (Player player : livingEntity.getWorld().getPlayers())
+            for (Player player : getLocation().getWorld().getPlayers())
                 player.sendMessage(ChatColorConverter.convert(customBossesConfigFields.getSpawnMessage()));
         if (customBossesConfigFields.getAnnouncementPriority() < 3) return;
         new DiscordSRVAnnouncement(ChatColorConverter.convert(customBossesConfigFields.getSpawnMessage()));

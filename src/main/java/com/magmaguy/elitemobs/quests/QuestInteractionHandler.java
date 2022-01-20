@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.quests;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
@@ -54,17 +55,19 @@ public class QuestInteractionHandler {
 
     private static boolean playerHasPermissionToAcceptQuest(Player player, CustomQuest customQuest) {
         if (!customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission().isEmpty() &&
-                player.hasPermission(customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission())){
-            player.sendMessage("[EliteMobs] You are locked out from this quest! " + customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission());
+                player.hasPermission(customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission())) {
+            if (player.hasPermission("elitemobs.*")) {
+                player.sendMessage("[EliteMobs - Admin message] You are locked out from this quest! The permission is " + customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission());
+                player.sendMessage(ChatColorConverter.convert("&cNote: If you are an admin and are blocked from all quests, make sure you deny the permission elitequest.*"));
+            }
             return false;
         }
         if (customQuest.getCustomQuestsConfigFields().getQuestAcceptPermission().isEmpty() ||
-                player.hasPermission(customQuest.getCustomQuestsConfigFields().getQuestAcceptPermission())){
+                player.hasPermission(customQuest.getCustomQuestsConfigFields().getQuestAcceptPermission())) {
             return true;
-        }
-         else {
+        } else {
             player.sendMessage("[EliteMobs] You don't have the required permission! " + customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission());
-             return false;
+            return false;
         }
     }
 

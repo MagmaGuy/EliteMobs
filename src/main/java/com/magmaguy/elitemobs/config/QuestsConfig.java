@@ -84,6 +84,14 @@ public class QuestsConfig {
     @Getter
     private static String chatTrackCommand;
     @Getter
+    private static String chatTrackingMessage;
+    @Getter
+    private static String chatTrackingHover;
+    @Getter
+    private static String chatTrackingCommand;
+    @Getter
+    private static boolean autoTrackQuestsOnAccept;
+    @Getter
     private static String noQuestDestinationFound;
     @Getter
     private static String questDestinationInOtherWorld;
@@ -128,6 +136,12 @@ public class QuestsConfig {
         chatTrackMessage = ConfigurationEngine.setString(fileConfiguration, "chatTrackMessage", "&8[EliteMobs]&2 Click here to track your quest!");
         chatTrackHover = ConfigurationEngine.setString(fileConfiguration, "chatTrackHover", "&2Click to track!");
         chatTrackCommand = ConfigurationEngine.setString(fileConfiguration, "chatTrackCommand", "/elitemobs quest track $questID");
+
+        chatTrackingMessage = ConfigurationEngine.setString(fileConfiguration, "chatTrackingMessage", "&8[EliteMobs]&9 You are now tracking a quest!");
+        chatTrackingHover = ConfigurationEngine.setString(fileConfiguration, "chatTrackingHover", "&2Click to untrack/track! /em -> Quests to track a different quest!");
+        chatTrackingCommand = ConfigurationEngine.setString(fileConfiguration, "chatTrackingCommand", "/elitemobs quest track $questID");
+
+        autoTrackQuestsOnAccept = ConfigurationEngine.setBoolean(fileConfiguration, "autoTrackQuestsOnAccept", true);
 
         noQuestDestinationFound = ConfigurationEngine.setString(fileConfiguration, "noQuestDestinationFound", "[EM] No quest destination found!");
         questDestinationInOtherWorld = ConfigurationEngine.setString(fileConfiguration, "questDestinationInOtherWorld", "[EM] Go to world $world!");

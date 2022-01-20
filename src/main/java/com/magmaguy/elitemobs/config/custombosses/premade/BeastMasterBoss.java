@@ -18,7 +18,7 @@ public class BeastMasterBoss extends CustomBossesConfigFields {
         setDeathMessage("&aThe Best Master has been slain by $players!");
         setDeathMessages(Arrays.asList(
                 "&e&l---------------------------------------------",
-                "&eThe The Beast Master has beens savaged!",
+                "&eThe Beast Master has been savaged!",
                 "&c&l    1st Damager: $damager1name &cwith $damager1damage damage!",
                 "&6&l    2nd Damager: $damager2name &6with $damager2damage damage!",
                 "&e&l    3rd Damager: $damager3name &ewith $damager3damage damage!",
