@@ -94,6 +94,7 @@ public class ConfigurationImporter {
                                 moveDirectory(file, Paths.get(file.getParentFile().getParentFile().getParentFile().getParentFile().toString() + File.separatorChar + "ModelEngine" + File.separatorChar + "blueprints"));
                                 importedModels = true;
                             } else new WarningMessage("You need ModelEngine to install schematic-based minidungeons!");
+                            break;
                         case "schematics":
                             if (Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit")) {
                                 moveDirectory(file, Paths.get(file.getParentFile().getParentFile().getParentFile().getParentFile().toString() + File.separatorChar + "FastAsyncWorldEdit" + File.separatorChar + "schematics"));

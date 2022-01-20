@@ -123,7 +123,7 @@ public class CustomBossMegaConsumer {
         if (customBossesConfigFields.getCustomModel() == null || customBossesConfigFields.getCustomModel().isEmpty())
             return;
         try {
-            customBossEntity.setCustomModel(new CustomModel(livingEntity, customBossesConfigFields.getCustomModel(), customBossEntity.getName()));
+            customBossEntity.setCustomModel(CustomModel.generateCustomModel(livingEntity, customBossesConfigFields.getCustomModel(), customBossEntity.getName()));
         } catch (Exception exception) {
             customBossEntity.setCustomModel(null);
             new WarningMessage("Failed to initialize Custom Model for Custom Boss " + customBossesConfigFields.getFilename());
