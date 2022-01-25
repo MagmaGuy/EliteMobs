@@ -3,7 +3,10 @@ package com.magmaguy.elitemobs.commands.quests;
 import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.Quest;
 import com.magmaguy.elitemobs.quests.QuestTracking;
+import com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldowns;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
@@ -33,6 +36,16 @@ public class QuestCommand {
     // /em quest leave questFilename
     public static void leaveQuest(Player player, String questID) {
         Quest.stopPlayerQuest(player, questID);
+    }
+
+    public static void resetQuests(CommandSender commandSender, String playerString){
+        Player player = Bukkit.getPlayer(playerString);
+        if (player == null){
+            commandSender.sendMessage("[EliteMobs] Error - player name not valid!");
+            return;
+        }
+        PlayerQuestCooldowns.resetPlayerQuestCooldowns(player);
+        commandSender.sendMessage("[EliteMobs] Successfully reset quests for player " + playerString);
     }
 
 }

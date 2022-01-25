@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.config.customtreasurechests;
 
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.CustomConfigFields;
-import com.magmaguy.elitemobs.items.itemconstructor.SpecialLoot;
+import com.magmaguy.elitemobs.items.customloottable.CustomLootTable;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.InfoMessage;
@@ -14,7 +14,6 @@ import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class CustomTreasureChestConfigFields extends CustomConfigFields {
@@ -32,8 +31,6 @@ public class CustomTreasureChestConfigFields extends CustomConfigFields {
     @Getter
     private List<String> lootList = new ArrayList<>();
     @Getter
-    private HashMap<String, SpecialLoot> specialLootList = new HashMap<>();
-    @Getter
     private double mimicChance = 0;
     @Getter
     private List<String> mimicCustomBossesList = new ArrayList<>();
@@ -49,6 +46,8 @@ public class CustomTreasureChestConfigFields extends CustomConfigFields {
     private long restockTime = 0L;
     @Getter
     private List<String> locations = new ArrayList<>();
+    @Getter
+    private CustomLootTable customLootTable = null;
 
 
     public CustomTreasureChestConfigFields(String filename, boolean isEnabled) {
@@ -100,9 +99,7 @@ public class CustomTreasureChestConfigFields extends CustomConfigFields {
         this.dropStyle = processEnum("dropStyle", dropStyle, TreasureChest.DropStyle.SINGLE, TreasureChest.DropStyle.class, true);
         this.restockTimer = processInt("restockTimer", restockTimer, 0, true);
         this.lootList = processStringList("lootList", lootList, new ArrayList<>(), true);
-        for (String string : lootList)
-            if (SpecialLoot.isSpecialLootEntry(string))
-                specialLootList.put(string, new SpecialLoot(string));
+        this.customLootTable = new CustomLootTable(this);
         this.mimicChance = processDouble("mimicChance", mimicChance, 0, true);
         this.mimicCustomBossesList = processStringList("mimicCustomBossesList", mimicCustomBossesList, new ArrayList<>(), true);
         this.restockTime = processLong("restockTime", restockTimer, 0, false);

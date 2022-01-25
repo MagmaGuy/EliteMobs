@@ -16,7 +16,8 @@ public class WormholeConfig extends CustomConfig {
         for (String key : super.getCustomConfigFieldsHashMap().keySet()) {
             if (super.getCustomConfigFieldsHashMap().get(key).isEnabled()) {
                 wormholes.put(key, (WormholeConfigFields) super.getCustomConfigFieldsHashMap().get(key));
-                new Wormhole((WormholeConfigFields) super.getCustomConfigFieldsHashMap().get(key));
+                if (super.getCustomConfigFieldsHashMap().get(key).isEnabled())
+                    new Wormhole((WormholeConfigFields) super.getCustomConfigFieldsHashMap().get(key));
             }
         }
     }

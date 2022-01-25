@@ -53,9 +53,6 @@ public class CustomQuestsConfigFields extends CustomConfigFields implements Cust
     private String turnInNPC = "";
     @Getter
     @Setter
-    private boolean customQuestFormat = false;
-    @Getter
-    @Setter
     private boolean trackable = true;
 
     public CustomQuestsConfigFields(String filename,
@@ -103,7 +100,6 @@ public class CustomQuestsConfigFields extends CustomConfigFields implements Cust
         this.questCompleteDialog = processStringList("questCompleteMessage", questCompleteDialog, new ArrayList<>(), false);
         this.questCompleteCommands = processStringList("questCompleteCommands", questCompleteCommands, new ArrayList<>(), false);
         this.turnInNPC = processString("turnInNPC", turnInNPC, "", false);
-        this.customQuestFormat = processBoolean("customQuestFormat", customQuestFormat, false, false);
         this.trackable = processBoolean("trackable", trackable, true, false);
     }
 

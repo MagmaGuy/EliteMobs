@@ -114,7 +114,7 @@ public class LootTables implements Listener {
         String selectedLootSystem = pickWeighedProbability(weightedProbability);
 
         if (selectedLootSystem == null) {
-            new InfoMessage("Your EliteMobs loot configuration resulted in no loot getting dropped. This is not a bug. " + "If you want players to be able to progress at all in the EliteMobs plugin, review your configuration settings.");
+            new InfoMessage("Your EliteMobs loot configuration resulted in no loot getting dropped. This is not a bug. " + "If you want! players to be able to progress at all in the EliteMobs plugin, review your configuration settings.");
             return null;
         }
 

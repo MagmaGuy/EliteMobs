@@ -23,49 +23,51 @@ public class SpecialLoot {
     @Getter
     private boolean dynamicLevel = false;
 
-    //format: scrap:level=x-y:amount=x-y:ignorePlayerLevel=x:chance=1
-    public SpecialLoot(String rawConfigurationString) {
+    //format: scrap/upgrade_item:level=x-y:amount=x-y:ignorePlayerLevel=x:chance=1
+    public SpecialLoot(String rawConfigurationString, String filename) {
         String[] configSubstrings = rawConfigurationString.split(":");
         try {
             specialLootType = SpecialLootType.valueOf(configSubstrings[0].toUpperCase());
         } catch (Exception ex) {
+            new WarningMessage("Failed to load Special Item for file " + filename + "!");
             new WarningMessage("Invalid entry for " + rawConfigurationString);
         }
 
         for (String option : configSubstrings)
-            try{
-            if (option.contains("level")) {
-                String finalOption = option.split("=")[1];
-                if (finalOption.contains("-")) {
-                    String[] minMax = finalOption.split("-");
-                    minLevel = Integer.parseInt(minMax[0]);
-                    maxLevel = Integer.parseInt(minMax[1]);
-                } else if (finalOption.equalsIgnoreCase("dynamic")) {
-                    //this get set elsewhere when it is dynamic
-                    minLevel = maxLevel = 1;
-                    dynamicLevel = true;
-                } else {
-                    minLevel = Integer.parseInt(finalOption);
-                    maxLevel = Integer.parseInt(finalOption);
+            try {
+                if (option.contains("level")) {
+                    String finalOption = option.split("=")[1];
+                    if (finalOption.contains("-")) {
+                        String[] minMax = finalOption.split("-");
+                        minLevel = Integer.parseInt(minMax[0]);
+                        maxLevel = Integer.parseInt(minMax[1]);
+                    } else if (finalOption.equalsIgnoreCase("dynamic")) {
+                        //this get set elsewhere when it is dynamic
+                        minLevel = maxLevel = 1;
+                        dynamicLevel = true;
+                    } else {
+                        minLevel = Integer.parseInt(finalOption);
+                        maxLevel = Integer.parseInt(finalOption);
+                    }
+                } else if (option.contains("amount")) {
+                    String finalOption = option.split("=")[1];
+                    if (finalOption.contains("-")) {
+                        String[] minMax = finalOption.split("-");
+                        minAmount = Integer.parseInt(minMax[0]);
+                        maxAmount = Integer.parseInt(minMax[1]);
+                    } else {
+                        minAmount = Integer.parseInt(finalOption);
+                        maxAmount = Integer.parseInt(finalOption);
+                    }
+                } else if (option.contains("ignorePlayerLevel")) {
+                    String finalOption = option.split("=")[1];
+                    ignorePlayerLevel = Boolean.parseBoolean(finalOption);
+                } else if (option.contains("chance")) {
+                    String finalOption = option.split("=")[1];
+                    chance = Double.parseDouble(finalOption);
                 }
-            } else if (option.contains("amount")) {
-                String finalOption = option.split("=")[1];
-                if (finalOption.contains("-")) {
-                    String[] minMax = finalOption.split("-");
-                    minAmount = Integer.parseInt(minMax[0]);
-                    maxAmount = Integer.parseInt(minMax[1]);
-                } else {
-                    minAmount = Integer.parseInt(finalOption);
-                    maxAmount = Integer.parseInt(finalOption);
-                }
-            } else if (option.contains("ignorePlayerLevel")) {
-                String finalOption = option.split("=")[1];
-                ignorePlayerLevel = Boolean.parseBoolean(finalOption);
-            } else if (option.contains("chance")) {
-                String finalOption = option.split("=")[1];
-                chance = Double.parseDouble(finalOption);
-            }} catch (Exception exception){
-                new WarningMessage("Failed to load Special Item! Problematic entry: " + option);
+            } catch (Exception exception) {
+                new WarningMessage("Failed to load Special Item for file " + filename + "! Problematic entry: " + option);
             }
     }
 
@@ -76,7 +78,7 @@ public class SpecialLoot {
         return configSection.equalsIgnoreCase("SCRAP") || configSection.equalsIgnoreCase("UPGRADE_ITEM");
     }
 
-    public ItemStack generateItemStack(Player player, int minLevel, int maxLevel) {
+    public ItemStack generateItemStack(Player player) {
         if (specialLootType == null) return null;
 
         int amount;

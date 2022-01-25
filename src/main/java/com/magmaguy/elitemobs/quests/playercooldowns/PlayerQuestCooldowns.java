@@ -1,9 +1,11 @@
 package com.magmaguy.elitemobs.quests.playercooldowns;
 
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.PermissionAttachment;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -19,6 +21,20 @@ public class PlayerQuestCooldowns implements Serializable {
 
     @Getter
     private final List<QuestCooldown> questCooldowns = new ArrayList<>();
+
+    public static void resetPlayerQuestCooldowns(Player player) {
+        if (PlayerData.getPlayerQuestCooldowns(player.getUniqueId()) == null) return;
+        PermissionAttachment permissionAttachment = Objects.requireNonNull(player).addAttachment(MetadataHandler.PLUGIN);
+        PlayerQuestCooldowns playerQuestCooldowns = PlayerData.getPlayerQuestCooldowns(player.getUniqueId());
+        for (QuestCooldown questCooldown : playerQuestCooldowns.getQuestCooldowns()) {
+            if (questCooldown.getBukkitTask() != null)
+                questCooldown.getBukkitTask().cancel();
+            permissionAttachment.setPermission(questCooldown.getPermission(), false);
+        }
+        playerQuestCooldowns.getQuestCooldowns().clear();
+        PlayerData.resetQuests(player.getUniqueId());
+        PlayerData.resetPlayerQuestCooldowns(player.getUniqueId());
+    }
 
     /**
      * Initializes cooldowns from scratch, assuming no preexisting player data
@@ -38,7 +54,7 @@ public class PlayerQuestCooldowns implements Serializable {
     }
 
     public static void flushPlayer(Player player) {
-        PlayerQuestCooldowns playerQuestCooldowns =  PlayerData.getPlayerQuestCooldowns(player.getUniqueId());
+        PlayerQuestCooldowns playerQuestCooldowns = PlayerData.getPlayerQuestCooldowns(player.getUniqueId());
         if (playerQuestCooldowns == null) return;
         for (QuestCooldown questCooldown : Objects.requireNonNull(PlayerData.getPlayerQuestCooldowns(player.getUniqueId())).questCooldowns)
             if (questCooldown.getBukkitTask() != null)

@@ -76,7 +76,7 @@ public class QuestMenu {
         //Condense all page elements
         List<TextComponent> elements = new ArrayList<>();
         elements.add(header);
-        if (quest instanceof CustomQuest)
+        if (quest instanceof CustomQuest && !quest.getQuestObjectives().isOver())
             elements.addAll(body);
         elements.add(fixedSummary);
         elements.addAll(summary);
@@ -90,7 +90,7 @@ public class QuestMenu {
         List<TextComponent> pagesList = new ArrayList<>();
         int pageIndex = 0;
         int characterCount = 0;
-        int characterLimit = 170;
+        int characterLimit = 200;
         for (TextComponent textComponent : elements) {
             characterCount += ChatColor.stripColor(textComponent.getText()).length();
             if (pagesList.isEmpty()) {
@@ -191,9 +191,9 @@ public class QuestMenu {
             return initialQuestAccept(quest);
 
         //Quest is complete, turn in placeholder
-        if (quest.getQuestObjectives().isOver() &&
-                (npcEntity == null ||
-                        quest.getQuestTaker().equals(npcEntity.getNpCsConfigFields().getFilename())))
+        if (npcEntity != null &&
+                quest.getQuestObjectives().isOver() &&
+                quest.getQuestTaker().equals(npcEntity.getNpCsConfigFields().getFilename()))
             return questAcceptComplete(quest);
 
         //Quest has begun but is either not over or the player is not talking to the turn in npc

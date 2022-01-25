@@ -23,7 +23,6 @@ import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -34,7 +33,6 @@ import static com.magmaguy.elitemobs.ChatColorConverter.convert;
  */
 public class ZombieNecronomicon extends MajorPower implements Listener {
 
-    private static final HashSet<EliteEntity> chantingMobs = new HashSet<>();
     private int chantIndex = 0;
     //todo: Shouldn't this be static?
 
@@ -190,7 +188,6 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
 
                     if (eliteEntity.isValid())
                         targetter.setAI(true);
-                    chantingMobs.remove(targetter);
                     cancel();
                     return;
 
@@ -212,6 +209,12 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
                         CustomBossEntity customBossEntity = CustomBossEntity.createCustomBossEntity("necronomicon_zombie.yml");
                         customBossEntity.spawn(targetter.getLocation(), eliteEntity.getLevel(), false);
 
+                        if (!customBossEntity.getLivingEntity().isValid()) {
+                            targetter.setAI(true);
+                            cancel();
+                            return;
+                        }
+
                         customBossEntity.getLivingEntity().setVelocity(new Vector((ThreadLocalRandom.current().nextDouble() - 0.5) / 30, 0.5,
                                 (ThreadLocalRandom.current().nextDouble() - 0.5) / 30));
 
@@ -223,6 +226,12 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
 
                         CustomBossEntity customBossEntity = CustomBossEntity.createCustomBossEntity("necronomicon_skeleton.yml");
                         customBossEntity.spawn(targetter.getLocation(), eliteEntity.getLevel(), false);
+
+                        if (!customBossEntity.getLivingEntity().isValid()) {
+                            targetter.setAI(true);
+                            cancel();
+                            return;
+                        }
 
                         customBossEntity.getLivingEntity().setVelocity(new Vector((ThreadLocalRandom.current().nextDouble() - 0.5) / 30, 0.5,
                                 (ThreadLocalRandom.current().nextDouble() - 0.5) / 30));
@@ -236,10 +245,9 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
                 } else
                     targetter.setAI(true);
 
-
             }
 
-        }.runTaskTimer(MetadataHandler.PLUGIN, 20 * 3, 20 * 3);
+        }.runTaskTimer(MetadataHandler.PLUGIN, 20 * 3L, 20 * 3L);
 
     }
 
