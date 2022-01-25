@@ -90,6 +90,12 @@ public class ItemSettingsConfig {
     private static boolean putLootDirectlyIntoPlayerInventory;
     @Getter
     private static int lootLevelDifferenceLockout;
+    @Getter
+    private static boolean preventEliteItemsFromBreaking;
+    @Getter
+    private static String lowArmorDurabilityItemDropMessage;
+    @Getter
+    private static String lowWeaponDurabilityItemDropMessage;
 
     public static void initializeConfig() {
         File file = ConfigurationEngine.fileCreator("ItemSettings.yml");
@@ -150,6 +156,9 @@ public class ItemSettingsConfig {
         scrapFailedMessage = ConfigurationEngine.setString(fileConfiguration, "scrapFailedMessage", "&8[EliteMobs] &cScrap failed!");
         putLootDirectlyIntoPlayerInventory = ConfigurationEngine.setBoolean(fileConfiguration, "putLootDirectlyIntoPlayerInventory", false);
         lootLevelDifferenceLockout = ConfigurationEngine.setInt(fileConfiguration, "lootLevelDifferenceLockout", 10);
+        preventEliteItemsFromBreaking = ConfigurationEngine.setBoolean(fileConfiguration, "preventEliteItemsFromBreaking", true);
+        lowArmorDurabilityItemDropMessage = ConfigurationEngine.setString(fileConfiguration, "lowDurabilityItemDropMessage", "&8[EliteMobs] &cDropped armor due to low durability! &8Repair it at the NPC with scrap to use it!");
+        lowWeaponDurabilityItemDropMessage = ConfigurationEngine.setString(fileConfiguration, "lowWeaponItemDropMessage", "&8[EliteMobs] &cDropped weapon due to low durability! &8Repair it at the NPC with scrap to use it!");
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }

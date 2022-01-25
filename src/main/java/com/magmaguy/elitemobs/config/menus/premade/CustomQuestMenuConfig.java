@@ -4,15 +4,17 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.menus.MenusConfigFields;
+import com.magmaguy.elitemobs.items.customloottable.*;
 import com.magmaguy.elitemobs.quests.objectives.CustomFetchObjective;
 import com.magmaguy.elitemobs.quests.objectives.CustomKillObjective;
 import com.magmaguy.elitemobs.quests.objectives.DialogObjective;
 import com.magmaguy.elitemobs.quests.objectives.Objective;
 import com.magmaguy.elitemobs.quests.rewards.QuestReward;
-import com.magmaguy.elitemobs.quests.rewards.RewardEntry;
 import lombok.Getter;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -91,23 +93,39 @@ public class CustomQuestMenuConfig extends MenusConfigFields {
 
     public static List<TextComponent> getRewardsDefaultSummaryLine(QuestReward questReward) {
         List<TextComponent> textComponent = new ArrayList<>();
-        for (RewardEntry rewardEntry : questReward.getRewardEntries()) {
-            if (rewardEntry.getItemStack() != null) {
+        if (questReward.getCustomLootTable() == null) return textComponent;
+        for (CustomLootEntry customLootEntry : questReward.getCustomLootTable().getEntries()) {
+            ItemStack itemStack = null;
+            if (customLootEntry instanceof EliteCustomLootEntry)
+                itemStack = ((EliteCustomLootEntry) customLootEntry).generateItemStack(questReward.getRewardLevel(), Bukkit.getPlayer(questReward.getPlayerUUID()));
+            else if (customLootEntry instanceof SpecialCustomLootEntry)
+                itemStack = ((SpecialCustomLootEntry) customLootEntry).generateItemStack(Bukkit.getPlayer(questReward.getPlayerUUID()));
+            else if (customLootEntry instanceof ItemStackCustomLootEntry)
+                itemStack = ((ItemStackCustomLootEntry) customLootEntry).generateItemStack();
+            if (itemStack != null) {
                 textComponent.add(new TextComponent(rewardsDefaultSummaryLine
-                        .replace("$amount", rewardEntry.getAmount() + "")
-                        .replace("$rewardName", rewardEntry.getItemStack().getItemMeta().getDisplayName())
-                        .replace("$chance", (int) (rewardEntry.getChance() * 100) + "")));
-                //todo: find cleaner implementation for vanilla item rewards
-                //textComponent.add(new TextComponent(rewardsDefaultSummaryLine
-                //        .replace("$amount", rewardEntry.getAmount() + "")
-                //        .replace("$rewardName", WordUtils.capitalizeFully(rewardEntry.getItemStack().getType().toString()).replace("_", " "))
-                //        .replace("$chance", (int) (rewardEntry.getChance() * 100) + "")));
+                        .replace("$amount", customLootEntry.getAmount() + "")
+                        .replace("$rewardName", itemStack.getItemMeta().getDisplayName())
+                        .replace("$chance", (int) (customLootEntry.getChance() * 100) + "")));
+                continue;
+            }
 
-            } else if (rewardEntry.getCurrencyAmount() != 0) {
+            if (customLootEntry instanceof VanillaCustomLootEntry)
+                itemStack = ((VanillaCustomLootEntry) customLootEntry).generateItemStack();
+            if (itemStack != null) {
                 textComponent.add(new TextComponent(rewardsDefaultSummaryLine
-                        .replace("$amount", rewardEntry.getAmount() + "")
-                        .replace("$rewardName", rewardEntry.getCurrencyAmount() + " " + EconomySettingsConfig.getCurrencyName())
-                        .replace("$chance", (int) (rewardEntry.getChance() * 100) + "")));
+                        .replace("$amount", customLootEntry.getAmount() + "")
+                        .replace("$rewardName", itemStack.getType().toString().replace("_", " "))
+                        .replace("$chance", (int) (customLootEntry.getChance() * 100) + "")));
+                continue;
+            }
+
+            if (customLootEntry instanceof CurrencyCustomLootEntry) {
+                textComponent.add(new TextComponent(rewardsDefaultSummaryLine
+                        .replace("$amount", customLootEntry.getAmount() + "")
+                        .replace("$rewardName", ((CurrencyCustomLootEntry) customLootEntry).getCurrencyAmount() + " " + EconomySettingsConfig.getCurrencyName())
+                        .replace("$chance", (int) (customLootEntry.getChance() * 100) + "")));
+
             }
         }
         return textComponent;

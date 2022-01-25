@@ -100,7 +100,11 @@ public class CustomItem {
     public static Item dropPlayerLoot(Player player, int tier, String customItemFileName, Location location) {
         CustomItem customItem = getCustomItem(customItemFileName);
         if (customItem == null) return null;
-        if (!customItem.permission.isEmpty() && !player.hasPermission(customItem.permission)) return null;
+        return customItem.dropPlayerLoot(player, tier, location);
+    }
+
+    public Item dropPlayerLoot(Player player, int tier, Location location) {
+        if (!permission.isEmpty() && !player.hasPermission(permission)) return null;
         Item loot = null;
         int itemTier = 0;
 
@@ -111,18 +115,18 @@ public class CustomItem {
         } else
             itemTier = tier + 1;
 
-        switch (customItem.getScalability()) {
+        switch (getScalability()) {
             case LIMITED:
                 loot = location.getWorld().dropItem(location,
-                        ScalableItemConstructor.constructLimitedItem(itemTier, customItem, player, null));
+                        ScalableItemConstructor.constructLimitedItem(itemTier, this, player, null));
                 break;
             case SCALABLE:
                 loot = location.getWorld().dropItem(location,
-                        ScalableItemConstructor.constructScalableItem(itemTier + 1, customItem, player, null));
+                        ScalableItemConstructor.constructScalableItem(itemTier + 1, this, player, null));
                 break;
             case FIXED:
                 loot = location.getWorld().dropItem(location,
-                        customItem.generateItemStack(itemTier + 1, player));
+                        generateItemStack(itemTier + 1, player));
             default:
         }
 

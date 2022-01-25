@@ -9,6 +9,7 @@ import cloud.commandframework.paper.PaperCommandManager;
 import cloud.commandframework.types.tuples.Triplet;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.commands.admin.*;
+import com.magmaguy.elitemobs.commands.quests.QuestCommand;
 import com.magmaguy.elitemobs.config.ConfigurationExporter;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
@@ -721,6 +722,18 @@ public class AdminCommands {
                 .handler(commandContext -> ConfigurationExporter.overwriteSHA1(commandContext.getSender())));
 
 
+        // /em quest reset player
+        manager.command(builder.literal("quest")
+                .literal("reset")
+                .argument(StringArgument.<CommandSender>newBuilder("player").withSuggestionsProvider(((objectCommandContext, s) -> {
+                    ArrayList<String> arrayList = new ArrayList<>();
+                    Bukkit.getOnlinePlayers().forEach(player -> arrayList.add(player.getName()));
+                    return arrayList;
+                })))
+                .senderType(CommandSender.class)
+                .permission("elitemobs.*")
+                .meta(CommandMeta.DESCRIPTION, "Resets player quest progress.")
+                .handler(commandContext -> QuestCommand.resetQuests(commandContext.getSender(), commandContext.get("player"))));
     }
 
     private void testFireball(Player player) {

@@ -46,7 +46,7 @@ public class SummonWolfEnchantment extends CustomEnchantment {
         customBossEntity.setSpawnLocation(player.getLocation());
         customBossEntity.setLevel(ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getFullPlayerTier(true));
         customBossEntity.spawn(false);
-        if (customBossEntity.getLivingEntity().getType() != EntityType.WOLF) {
+        if (customBossEntity.getCustomBossesConfigFields().getEntityType() != EntityType.WOLF) {
             new WarningMessage("snoopy.yml boss file was not set to a wolf entity type! It must be a wolf for the summon mechanic to work correctly!");
             return null;
         }

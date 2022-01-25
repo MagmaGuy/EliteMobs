@@ -58,7 +58,12 @@ public class ItemLootShower implements Listener {
         if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory())
             addDirectly(eliteMobTier);
         else
-            addIndirectly(eliteMobTier, location);
+            addIndirectly(location, getCurrencyAmount(eliteMobTier));
+    }
+
+    public ItemLootShower(Location location, Player player, int amount) {
+        this.player = player;
+        addIndirectly(location, amount);
     }
 
     private static void sendCurrencyNotification(Player player) {
@@ -100,9 +105,9 @@ public class ItemLootShower implements Listener {
                 TextComponent.fromLegacyText(ChatColorConverter.convert(EconomySettingsConfig.getAdventurersGuildNotificationMessage())));
     }
 
-    private void addIndirectly(double eliteMobTier, Location location) {
+    private void addIndirectly(Location location, int currencyAmount2) {
         new BukkitRunnable() {
-            int currencyAmount = getCurrencyAmount(eliteMobTier);
+            int currencyAmount = currencyAmount2;
 
             @Override
             public void run() {

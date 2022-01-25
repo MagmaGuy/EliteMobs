@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.menus;
 import com.magmaguy.elitemobs.api.EliteMobsItemDetector;
 import com.magmaguy.elitemobs.config.menus.premade.RepairMenuConfig;
 import com.magmaguy.elitemobs.items.ItemTagger;
+import com.magmaguy.elitemobs.items.ItemTierFinder;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -35,14 +36,17 @@ public class RepairMenu extends EliteMenu {
             repairInventory.setItem(RepairMenuConfig.outputSlot, null);
             return;
         }
-        int repairScore = ItemTagger.getEnchantment(repairInventory.getItem(RepairMenuConfig.eliteScrapInputSlot).getItemMeta(), "EliteScrap");
+
+        int scrapLevel = ItemTagger.getEnchantment(repairInventory.getItem(RepairMenuConfig.eliteScrapInputSlot).getItemMeta(), "EliteScrap");
         ItemStack outputItem = repairInventory.getItem(RepairMenuConfig.eliteItemInputSlot).clone();
-        ItemMeta itemMeta = outputItem.getItemMeta();
-        Damageable damageable = (Damageable) itemMeta;
-        int damage = Math.max(damageable.getDamage() - repairScore, 0);
+        int itemLevel = ItemTierFinder.findBattleTier(outputItem);
+        int baselineRepair = 300;
+        int levelDifferenceModifier = (scrapLevel - itemLevel) * 10;
+        int newDamage = baselineRepair + levelDifferenceModifier;
+        Damageable damageable = (Damageable) outputItem.getItemMeta();
+        int damage = Math.min(damageable.getDamage() - newDamage, damageable.getDamage());
         damageable.setDamage(damage);
-        itemMeta = (ItemMeta) damageable;
-        outputItem.setItemMeta(itemMeta);
+        outputItem.setItemMeta(damageable);
         repairInventory.setItem(outputSlot, outputItem);
     }
 

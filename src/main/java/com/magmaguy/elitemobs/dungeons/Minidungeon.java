@@ -417,7 +417,7 @@ public class Minidungeon {
             CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(bossFileName);
             quantificationFilter(customBossesConfigFields);
             RegionalBossEntity.getRegionalBossEntities(customBossesConfigFields).forEach((regionalBossEntity -> regionalBossEntity.setMinidungeon(this)));
-            if (customBossesConfigFields.isRegionalBoss())
+            if (customBossesConfigFields != null && customBossesConfigFields.isRegionalBoss())
                 regionalBossCount++;
         }
     }

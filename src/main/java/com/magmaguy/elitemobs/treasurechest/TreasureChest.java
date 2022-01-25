@@ -7,7 +7,6 @@ import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.TranslationConfig;
 import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestConfigFields;
 import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestsConfig;
-import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.Round;
@@ -38,9 +37,11 @@ public class TreasureChest {
     @Getter
     private static ArrayListMultimap<String, TreasureChest> unloadedChests = ArrayListMultimap.create();
     private static HashMap<Location, TreasureChest> treasureChestHashMap = new HashMap<>();
+    @Getter
     private final CustomTreasureChestConfigFields customTreasureChestConfigFields;
     private long restockTime;
-    private Location location;
+    @Getter
+    private final Location location;
 
     public TreasureChest(CustomTreasureChestConfigFields customTreasureChestConfigFields, Location location, long restockTime) {
         this.customTreasureChestConfigFields = customTreasureChestConfigFields;
@@ -155,26 +156,7 @@ public class TreasureChest {
     }
 
     private void doTreasure(Player player) {
-        for (String string : this.customTreasureChestConfigFields.getLootList())
-            try {
-                String filename = string.split(":")[0];
-                double odds;
-                if (customTreasureChestConfigFields.getSpecialLootList().get(string) != null) {
-                    odds = customTreasureChestConfigFields.getSpecialLootList().get(string).getChance();
-                } else
-                    odds = Double.valueOf(string.split(":")[1]);
-                if (ThreadLocalRandom.current().nextDouble() < odds)
-                    if (customTreasureChestConfigFields.getSpecialLootList().get(string) != null) {
-                        location.getWorld().dropItem(location, customTreasureChestConfigFields.getSpecialLootList().
-                                get(string).generateItemStack(player, customTreasureChestConfigFields.getChestTier() * 10, (customTreasureChestConfigFields.getChestTier() + 1) * 10));
-                    } else
-                        CustomItem.dropPlayerLoot(player, randomizeTier(), filename, location);
-            } catch (Exception ex) {
-                new WarningMessage("Malformed loot entry for " + this.customTreasureChestConfigFields.getFile() + " !");
-                new WarningMessage("Entry: " + string);
-                new WarningMessage("Correct format: filename.yml:odds");
-                ex.printStackTrace();
-            }
+        this.customTreasureChestConfigFields.getCustomLootTable().treasureChestDrop(player, customTreasureChestConfigFields.getChestTier(), location);
     }
 
     private int randomizeTier() {

@@ -4,9 +4,7 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.config.CustomConfigFieldsInterface;
-import com.magmaguy.elitemobs.config.VanillaItemDrop;
-import com.magmaguy.elitemobs.items.customitems.CustomItem;
-import com.magmaguy.elitemobs.items.itemconstructor.SpecialLoot;
+import com.magmaguy.elitemobs.items.customloottable.CustomLootTable;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,11 +20,7 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     private static final HashSet<CustomBossesConfigFields> naturallySpawnedElites = new HashSet<>();
     public static Map<String, CustomBossesConfigFields> regionalElites = new HashMap<>();
     @Getter
-    private final List<UniqueLoot> parsedUniqueLootList = new ArrayList<>();
-    @Getter
-    private final List<VanillaItemDrop> parsedVanillaLootList = new ArrayList<>();
-    @Getter
-    private final HashMap<String, SpecialLoot> specialLoot = new HashMap();
+    private CustomLootTable customLootTable = null;
     @Getter
     @Setter
     private EntityType entityType = EntityType.ZOMBIE;
@@ -281,65 +275,7 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         this.onCombatLeaveCommands = processStringList("onCombatLeaveCommands", onCombatLeaveCommands, new ArrayList<>(), false);
         this.deathMessages = processStringList("deathMessages", deathMessages, new ArrayList<>(), false);
         this.uniqueLootList = processStringList("uniqueLootList", uniqueLootList, new ArrayList<>(), false);
-        for (String entry : this.uniqueLootList) {
-            if (SpecialLoot.isSpecialLootEntry(entry)) continue;
-            if (entry.contains("minecraft:")) continue;
-            try {
-                CustomItem customItem = CustomItem.getCustomItem(entry.split(":")[0]);
-                if (customItem == null)
-                    throw new Exception();
-                String permissionRequired = "";
-                if (entry.split(":").length > 2)
-                    permissionRequired = entry.split(":")[2];
-                this.parsedUniqueLootList.add(new UniqueLoot(Double.parseDouble(entry.split(":")[1]), customItem, permissionRequired));
-            } catch (Exception ex) {
-                new WarningMessage("Boss " + this.getName() + " has an invalid loot entry - " + entry + " - Skipping it!");
-            }
-        }
-        for (String string : uniqueLootList)
-            if (SpecialLoot.isSpecialLootEntry(string))
-                specialLoot.put(string, new SpecialLoot(string));
-        // minecraft:type=ITEM_TYPE:amount=AMOUNT:chance=CHANCE
-        for (String string : uniqueLootList)
-            if (string.contains("minecraft:")) {
-                try {
-                    String[] processedStrings = string.split(":");
-                    Material type = null;
-                    int amount = 1;
-                    double chance = 1d;
-                    for (String processedString : processedStrings) {
-                        if (processedString.equals("minecraft"))
-                            continue;
-                        else if (processedString.contains("type="))
-                            try {
-                                type = Material.valueOf(processedString.split("=")[1]);
-                            } catch (Exception ex) {
-                                new WarningMessage("Custom Item entry " + string + " for boss " + getFilename() + " is not a valid entry!");
-                                new WarningMessage("Material type " + processedString.split("=")[1] + " is not valid! Make sure you are using valid Spigot API material values! These may not be the same as Minecraft item names.");
-                            }
-                        else if (processedString.contains("amount="))
-                            try {
-                                amount = Integer.parseInt(processedString.split("=")[1]);
-                            } catch (Exception ex) {
-                                new WarningMessage("Custom Item entry " + string + " for boss " + getFilename() + " is not a valid entry!");
-                                new WarningMessage("Amount " + processedString.split("=")[1] + " is not valid! Make sure you have a valid natural number.");
-                            }
-                        else if (processedString.contains("chance="))
-                            try {
-                                chance = Double.parseDouble(processedString.split("=")[1]);
-                            } catch (Exception ex) {
-                                new WarningMessage("Custom Item entry " + string + " for boss " + getFilename() + " is not a valid entry!");
-                                new WarningMessage("Chance " + processedString.split("=")[1] + " is not valid! Make sure you have a valid number between 0 and 1.");
-                            }
-                    }
-                    if (type == null) continue;
-                    ItemStack processedItemStack = new ItemStack(type, amount);
-                    parsedVanillaLootList.add(new VanillaItemDrop(processedItemStack, chance));
-                } catch (Exception ex) {
-                    new WarningMessage("Custom Item entry " + string + " for boss " + getFilename() + " is not a valid entry! Are you using the correct spigot API material names?");
-                    new WarningMessage("Correct format: " + "minecraft:type=MATERIAL_TYPE:amount=AMOUNT");
-                }
-            }
+        this.customLootTable = new CustomLootTable(this);
 
         //this can't be converted directly to an enum list because there are some special string features in here
         this.powers = processStringList("powers", powers, new ArrayList<>(), false);
@@ -446,21 +382,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
                 "&e&l    3rd Damager: $damager3name &ewith $damager3damage damage!",
                 "&aSlayers: $players",
                 "&e&l---------------------------------------------");
-    }
-
-    public class UniqueLoot {
-        @Getter
-        private double chance;
-        @Getter
-        private CustomItem customItem;
-        @Getter
-        private final String requiredPermission;
-
-        public UniqueLoot(double chance, CustomItem customItem, String requiredPermission) {
-            this.chance = chance;
-            this.customItem = customItem;
-            this.requiredPermission = requiredPermission;
-        }
     }
 
 }

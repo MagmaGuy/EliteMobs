@@ -3,10 +3,6 @@ package com.magmaguy.elitemobs.mobconstructor.custombosses;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
-import com.magmaguy.elitemobs.config.VanillaItemDrop;
-import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
-import com.magmaguy.elitemobs.items.customitems.CustomItem;
-import com.magmaguy.elitemobs.items.itemconstructor.SpecialLoot;
 import com.magmaguy.elitemobs.ondeathcommands.OnDeathCommands;
 import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
 import com.magmaguy.elitemobs.utils.Round;
@@ -18,7 +14,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class CustomBossDeath implements Listener {
 
@@ -30,18 +25,7 @@ public class CustomBossDeath implements Listener {
 
     public static void dropLoot(Player player, CustomBossEntity customBossEntity) {
         if (customBossEntity.customBossesConfigFields.getUniqueLootList().isEmpty()) return;
-        for (CustomBossesConfigFields.UniqueLoot uniqueLoot : customBossEntity.customBossesConfigFields.getParsedUniqueLootList())
-            if (uniqueLoot.getRequiredPermission().isEmpty() ||
-                    !uniqueLoot.getRequiredPermission().isEmpty() && player.hasPermission(uniqueLoot.getRequiredPermission()) &&
-                            ThreadLocalRandom.current().nextDouble() < uniqueLoot.getChance())
-                CustomItem.dropPlayerLoot(player, customBossEntity.getLevel(), uniqueLoot.getCustomItem().getFileName(), customBossEntity.getLocation());
-        for (SpecialLoot specialLoot : customBossEntity.customBossesConfigFields.getSpecialLoot().values())
-            if (ThreadLocalRandom.current().nextDouble() < specialLoot.getChance())
-                customBossEntity.getLocation().getWorld().dropItem(customBossEntity.getLocation(),
-                        specialLoot.generateItemStack(player, Math.max(customBossEntity.getLevel() - 3, 1), customBossEntity.getLevel() + 3));
-        for (VanillaItemDrop vanillaItemDrop : customBossEntity.customBossesConfigFields.getParsedVanillaLootList())
-            if (ThreadLocalRandom.current().nextDouble() < vanillaItemDrop.getChance())
-                customBossEntity.getLocation().getWorld().dropItem(customBossEntity.getLocation(), vanillaItemDrop.getItemStack());
+        customBossEntity.customBossesConfigFields.getCustomLootTable().bossDrop(player, customBossEntity.getLevel(), customBossEntity.getLocation());
     }
 
     private static void doDeathMessage(CustomBossEntity customBossEntity) {

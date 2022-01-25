@@ -8,8 +8,10 @@ import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.menus.*;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.QuestInteractionHandler;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -18,10 +20,19 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.HashSet;
+
 public class NPCInteractions implements Listener {
 
-    @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    private static HashSet<Player> cooldowns = new HashSet<>();
+
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void playerNPCInteract(PlayerInteractAtEntityEvent event) {
+
+        if (cooldowns.contains(event.getPlayer())) return;
+        cooldowns.add(event.getPlayer());
+        Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> cooldowns.remove(event.getPlayer()), 1);
+        if (event.isCancelled()) return;
 
         NPCEntity npcEntity = EntityTracker.getNPCEntity(event.getRightClicked());
         if (npcEntity == null) return;
