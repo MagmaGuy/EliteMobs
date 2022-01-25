@@ -39,8 +39,7 @@ public class CustomObjectivesParser {
         String filename = null;
         String location = null;
         String dialog = null;
-        String npcName = null;
-        String itemname = null;
+        String name = null;
         int amount = 1;
         for (String rawString : rawStrings) {
             String[] processedStrings = rawString.split("=");
@@ -62,10 +61,9 @@ public class CustomObjectivesParser {
                     dialog = ChatColorConverter.convert(processedStrings[1]);
                     break;
                 case "npcName":
-                    npcName = ChatColorConverter.convert(processedStrings[1]);
-                    break;
                 case "itemName":
-                    itemname = processedStrings[1];
+                case "name":
+                    name = ChatColorConverter.convert(processedStrings[1]);
                     break;
             }
         }
@@ -77,9 +75,9 @@ public class CustomObjectivesParser {
             if (objectiveType.equals(ObjectiveType.KILL_CUSTOM))
                 return new CustomKillObjective(filename, amount, customQuest.getQuestLevel());
             else if (objectiveType.equals(ObjectiveType.FETCH_ITEM))
-                return new CustomFetchObjective(amount, itemname, filename);
+                return new CustomFetchObjective(amount, name, filename);
             else if (objectiveType.equals(ObjectiveType.DIALOG))
-                return new DialogObjective(filename, npcName, location, dialog);
+                return new DialogObjective(filename, name, location, dialog);
         } catch (Exception ex) {
             new WarningMessage("Failed to register objective type for quest " + customQuest.getCustomQuestsConfigFields().getFilename() + " ! This quest will be skipped");
         }

@@ -6,11 +6,13 @@ import com.magmaguy.elitemobs.api.QuestAcceptEvent;
 import com.magmaguy.elitemobs.api.QuestCompleteEvent;
 import com.magmaguy.elitemobs.api.QuestProgressionEvent;
 import com.magmaguy.elitemobs.config.QuestsConfig;
-import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
+import com.magmaguy.elitemobs.items.customloottable.CustomLootEntry;
+import com.magmaguy.elitemobs.items.customloottable.EliteCustomLootEntry;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.objectives.*;
+import com.magmaguy.elitemobs.treasurechest.TreasureChest;
 import com.magmaguy.elitemobs.utils.SpigotMessage;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -66,16 +68,24 @@ public class QuestTracking {
     }
 
     public static void toggleTracking(Player player, String questID) {
+        CustomQuest customQuest = (CustomQuest) PlayerData.getQuest(player.getUniqueId(), questID);
+        if (customQuest == null) {
+            player.sendMessage("[EliteMobs] Failed to get a valid quest with that quest ID!");
+            return;
+        }
+        toggleTracking(player, customQuest);
+    }
+
+    public static void toggleTracking(Player player, CustomQuest quest) {
         if (playerTrackingQuests.containsKey(player))
             playerTrackingQuests.get(player).stop();
         else {
-            CustomQuest customQuest = (CustomQuest) PlayerData.getQuest(player.getUniqueId(), questID);
-            if (customQuest == null) {
+            if (quest == null) {
                 player.sendMessage("[EliteMobs] Failed to get a valid quest with that quest ID!");
                 return;
             }
-            if (!customQuest.getCustomQuestsConfigFields().isTrackable()) return;
-            new QuestTracking(player, customQuest);
+            if (!quest.getCustomQuestsConfigFields().isTrackable()) return;
+            new QuestTracking(player, quest);
         }
     }
 
@@ -119,10 +129,15 @@ public class QuestTracking {
         List<ObjectiveDestinations> destinations = new ArrayList<>();
         EntityTracker.getEliteMobEntities().values().forEach(eliteEntity -> {
             List<Location> locations = new ArrayList<>();
-            if (eliteEntity instanceof CustomBossEntity &&
-                    ((CustomBossEntity) eliteEntity).getCustomBossesConfigFields().getFilename()
-                            .equals(customKillObjective.getCustomBossFilename()))
-                locations.add(eliteEntity.getLocation());
+            if (eliteEntity instanceof CustomBossEntity)
+                if (((CustomBossEntity) eliteEntity).getPhaseBossEntity() != null &&
+                        ((CustomBossEntity) eliteEntity).getPhaseBossEntity().getPhase1Config().getFilename().equals(customKillObjective.getCustomBossFilename())) {
+                    locations.add(eliteEntity.getLocation());
+                } else if (((CustomBossEntity) eliteEntity).getCustomBossesConfigFields().getFilename()
+                        .equals(customKillObjective.getCustomBossFilename())) {
+                    locations.add(eliteEntity.getLocation());
+                }
+            locations.add(eliteEntity.getLocation());
             destinations.add(new ObjectiveDestinations(customKillObjective, locations));
         });
         return destinations;
@@ -141,14 +156,19 @@ public class QuestTracking {
 
     private List<ObjectiveDestinations> getFetchLocations(CustomFetchObjective customFetchObjective) {
         List<ObjectiveDestinations> destinations = new ArrayList<>();
+        List<Location> locations = new ArrayList<>();
         EntityTracker.getEliteMobEntities().values().forEach(eliteEntity -> {
-            List<Location> locations = new ArrayList<>();
             if (eliteEntity instanceof CustomBossEntity)
-                for (CustomBossesConfigFields.UniqueLoot uniqueLoot : ((CustomBossEntity) eliteEntity).getCustomBossesConfigFields().getParsedUniqueLootList())
-                    if (uniqueLoot.getCustomItem().getFileName().equals(customFetchObjective.getKey()))
+                for (CustomLootEntry customLootEntry : ((CustomBossEntity) eliteEntity).getCustomBossesConfigFields().getCustomLootTable().getEntries())
+                    if (customLootEntry instanceof EliteCustomLootEntry && ((EliteCustomLootEntry) customLootEntry).getFilename().equals(customFetchObjective.getKey()))
                         locations.add(eliteEntity.getLocation());
-            destinations.add(new ObjectiveDestinations(customFetchObjective, locations));
         });
+        TreasureChest.getTreasureChestHashMap().values().forEach((treasureChest -> {
+            for (CustomLootEntry customLootEntry : treasureChest.getCustomTreasureChestConfigFields().getCustomLootTable().getEntries())
+                if (customLootEntry instanceof EliteCustomLootEntry && ((EliteCustomLootEntry) customLootEntry).getFilename().equals(customFetchObjective.getKey()))
+                    locations.add(treasureChest.getLocation());
+        }));
+        destinations.add(new ObjectiveDestinations(customFetchObjective, locations));
         return destinations;
     }
 
@@ -326,13 +346,13 @@ public class QuestTracking {
             if (!(event.getQuest() instanceof CustomQuest)) return;
             if (!((CustomQuest) event.getQuest()).getCustomQuestsConfigFields().isTrackable()) return;
             if (QuestsConfig.isAutoTrackQuestsOnAccept()) {
-                toggleTracking(event.getPlayer(), event.getQuest().getQuestID().toString());
+                toggleTracking(event.getPlayer(), (CustomQuest) event.getQuest());
                 event.getPlayer().spigot().sendMessage(SpigotMessage.commandHoverMessage(
                         ChatColorConverter.convert(QuestsConfig.getChatTrackingMessage()),
                         ChatColorConverter.convert(QuestsConfig.getChatTrackingHover()),
                         QuestsConfig.getChatTrackingCommand().replace("$questID", event.getQuest().getQuestID().toString())
                 ));
-            }else
+            } else
                 event.getPlayer().spigot().sendMessage(SpigotMessage.commandHoverMessage(
                         ChatColorConverter.convert(QuestsConfig.getChatTrackMessage()),
                         ChatColorConverter.convert(QuestsConfig.getChatTrackHover()),

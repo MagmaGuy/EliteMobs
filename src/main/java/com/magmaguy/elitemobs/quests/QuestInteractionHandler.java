@@ -21,6 +21,11 @@ public class QuestInteractionHandler {
 
     public static void processNPCQuests(Player player, NPCEntity npcEntity) {
         List<CustomQuest> customQuestList = new ArrayList<>();
+
+        List<Quest> quests = PlayerData.getQuests(player.getUniqueId());
+        scanQuestTakerNPC(npcEntity, quests, customQuestList);
+
+
         //This value can be null for NPC entities that have the custom quest interaction but are only used to turn quests in
         if (npcEntity.getNpCsConfigFields().getQuestFilenames() != null)
             for (String questString : npcEntity.getNpCsConfigFields().getQuestFilenames()) {
@@ -36,13 +41,11 @@ public class QuestInteractionHandler {
                 }
             }
 
-        List<Quest> quests = PlayerData.getQuests(player.getUniqueId());
-        scanQuestTakerNPC(npcEntity, quests, customQuestList);
-        for (Quest quest : quests)
-            if (quest instanceof CustomQuest &&
-                    (!((CustomQuest) quest).getCustomQuestsConfigFields().getTurnInNPC().isEmpty() &&
-                            ((CustomQuest) quest).getCustomQuestsConfigFields().getTurnInNPC().equals(npcEntity.getNpCsConfigFields().getFilename())))
-                customQuestList.add((CustomQuest) quest);
+      // for (Quest quest : quests)
+      //     if (quest instanceof CustomQuest &&
+      //             (!((CustomQuest) quest).getCustomQuestsConfigFields().getTurnInNPC().isEmpty() &&
+      //                     ((CustomQuest) quest).getCustomQuestsConfigFields().getTurnInNPC().equals(npcEntity.getNpCsConfigFields().getFilename())))
+      //         customQuestList.add((CustomQuest) quest);
 
         if (!customQuestList.isEmpty())
             new BukkitRunnable() {

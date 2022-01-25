@@ -512,8 +512,8 @@ public class PlayerData {
             try {
                 quests = (List<Quest>) ObjectSerializer.fromString(new String(resultSet.getBytes("QuestStatus"), "UTF-8"));
                 //Serializes ItemStack which require specific handling, necessary recovering the rewards
-                for (Quest quest : quests)
-                    quest.getQuestObjectives().getQuestReward().serializeRewards();
+               // for (Quest quest : quests)
+               //     quest.getQuestObjectives().getQuestReward().serializeRewards();
             } catch (Exception ex) {
                 new WarningMessage("Failed to serialize quest data for player " + Bukkit.getPlayer(uuid) + " ! This player's quest data will be wiped to prevent future errors.");
                 try {

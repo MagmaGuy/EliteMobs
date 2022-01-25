@@ -17,9 +17,13 @@ public class CustomKillObjective extends KillObjective {
 
     @Override
     public void checkProgress(EliteMobDeathEvent event, QuestObjectives questObjectives) {
-        if (event.getEliteEntity() instanceof CustomBossEntity &&
-                ((CustomBossEntity) event.getEliteEntity()).getCustomBossesConfigFields().getFilename().equals(customBossFilename))
-            progressObjective(questObjectives);
+        if (!(event.getEliteEntity() instanceof CustomBossEntity)) return;
+        CustomBossEntity customBossEntity = (CustomBossEntity) event.getEliteEntity();
+        String filename = customBossEntity.getCustomBossesConfigFields().getFilename();
+        if (customBossEntity.getPhaseBossEntity() != null)
+            filename = customBossEntity.getPhaseBossEntity().getPhase1Config().getFilename();
+        if (!filename.equals(customBossFilename)) return;
+        progressObjective(questObjectives);
     }
 
 }
