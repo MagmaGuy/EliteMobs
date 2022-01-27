@@ -233,7 +233,7 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
             execute(eliteMobDamagedByPlayerEvent);
 
             //nullify vanilla reductions
-            for (EntityDamageEvent.DamageModifier modifier : EntityDamageEvent.DamageModifier.values())
+            for (EntityDamageEvent.DamageModifier modifier : EntityDamageByEntityEvent.DamageModifier.values())
                 if (event.isApplicable(modifier))
                     event.setDamage(modifier, 0);
 
@@ -251,7 +251,7 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
                     }
                 }
 
-            event.setDamage(damage);
+            event.setDamage(EntityDamageEvent.DamageModifier.BASE, damage);
             eliteEntity.syncPluginHealth(((LivingEntity) event.getEntity()).getHealth());
 
             //No antiexploit checks for dungeons

@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
 import com.magmaguy.elitemobs.collateralminecraftchanges.PlayerDeathMessageByEliteMob;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
+import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.MobTierCalculator;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
@@ -102,6 +103,12 @@ public class PlayerDamagedByEliteMobHandler implements Listener {
 
         double newDamage = eliteToPlayerDamageFormula(eliteTier, playerTier, player, event.getEliteMobEntity(), event.getEntityDamageByEntityEvent());
 
+
+        //nullify vanilla reductions
+        for (EntityDamageEvent.DamageModifier modifier : EntityDamageByEntityEvent.DamageModifier.values())
+            if (event.getEntityDamageByEntityEvent().isApplicable(modifier))
+                event.getEntityDamageByEntityEvent().setDamage(modifier, 0);
+
         //Set the final damage value
         event.getEntityDamageByEntityEvent().setDamage(EntityDamageEvent.DamageModifier.BASE, newDamage);
 
@@ -113,14 +120,23 @@ public class PlayerDamagedByEliteMobHandler implements Listener {
 
     private double eliteToPlayerDamageFormula(double eliteTier, double playerTier, Player player, EliteEntity eliteEntity, EntityDamageByEntityEvent event) {
 
-        double baseDamage = EliteMobProperties.getPluginData(eliteEntity.getLivingEntity().getType()).baseDamage;
+        /*
+        Note: all baseline damage gets divided by 2 because this damage level expects players to be wearing armor.
+        This method applies armor reduction and essentially nullifies any protection the armor gives.
+        This means that the baseline damage divided by 2 is the amount of damage a mob will deal to a player in a
+        balanced setting.
+        Regional bosses have normalized damage, so they use stats similar to a zombie's. Everything else uses their own
+        stats, which can make them vary pretty significantly in difficulty, which is pretty much intended as per Minecraft's
+        own system.
+         */
+        double baseDamage = EliteMobProperties.getBaselineDamage(eliteEntity.getLivingEntity().getType(), eliteEntity) / 2D;
         double bonusDamage = eliteTier;
         double damageReduction = playerTier;
         double secondaryDamageReduction = secondaryEnchantmentDamageReduction(player, event);
         double customBossDamageMultiplier = eliteEntity.getDamageMultiplier();
 
-        double finalDamage = (baseDamage + bonusDamage - damageReduction - secondaryDamageReduction) *
-                MobCombatSettingsConfig.getDamageToPlayerMultiplier() * customBossDamageMultiplier;
+        double finalDamage = (baseDamage * customBossDamageMultiplier + bonusDamage - damageReduction - secondaryDamageReduction) *
+                MobCombatSettingsConfig.getDamageToPlayerMultiplier();
 
         double playerMaxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
 
@@ -136,13 +152,12 @@ public class PlayerDamagedByEliteMobHandler implements Listener {
         double totalReductionLevel = 0;
 
         for (ItemStack itemStack : player.getInventory().getArmorContents()) {
-            if (itemStack == null) continue;
-            for (Enchantment enchantment : itemStack.getEnchantments().keySet())
-                if (enchantment.getName().equals(Enchantment.PROTECTION_PROJECTILE.getName()) && event.getDamager() instanceof Projectile)
-                    totalReductionLevel += getDamageIncreasePercentage(enchantment, itemStack);
+            if (itemStack == null || itemStack.getItemMeta() == null) continue;
+            if (event.getDamager() instanceof Projectile)
+                totalReductionLevel += ItemTagger.getEnchantment(itemStack.getItemMeta(), Enchantment.PROTECTION_ENVIRONMENTAL.getKey());
         }
 
-        totalReductionLevel = totalReductionLevel / 4;
+        totalReductionLevel = totalReductionLevel / 4 / 10;
 
         return totalReductionLevel;
 

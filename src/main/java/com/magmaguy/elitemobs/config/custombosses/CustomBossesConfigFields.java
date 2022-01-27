@@ -101,6 +101,9 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     @Getter
     @Setter
     private boolean dropsVanillaLoot = true;
+    @Getter
+    @Setter
+    private boolean dropsRandomLoot = true;
     /**
      * Integration with LibsDisguises. Only used if that plugin is loaded.
      */
@@ -164,6 +167,9 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     @Getter
     @Setter
     private HashMap<Material, Double> damageModifiers = new HashMap();
+    @Getter
+    @Setter
+    private boolean normalizedCombat = false;
 
     //this saves files for regional boss respawn cooldowns
     @Getter
@@ -171,6 +177,7 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     private boolean filesOutOfSync = false;
     @Getter
     private List<String> onSpawnBlockStates = new ArrayList<>(), onRemoveBlockStates = new ArrayList<>();
+
 
     /**
      * Creates a new default pre-made Custom Boss. The boss is further customized through a builder pattern.
@@ -267,6 +274,7 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         this.baby = processBoolean("isBaby", baby, false, false);
         this.dropsEliteMobsLoot = processBoolean("dropsEliteMobsLoot", dropsEliteMobsLoot, true, false);
         this.dropsVanillaLoot = processBoolean("dropsVanillaLoot", dropsVanillaLoot, true, false);
+        this.dropsRandomLoot = processBoolean("dropsRandomLoot", dropsRandomLoot, true, false);
         this.frozen = processBoolean("frozen", frozen, false, false);
         this.reinforcement = processBoolean("reinforcement", reinforcement, false, false);
         this.onDeathCommands = processStringList("onDeathCommands", onDeathCommands, new ArrayList<>(), false);
@@ -303,6 +311,7 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         this.mainHand = processItemStack("mainHand", mainHand, null, false);
         this.offHand = processItemStack("offHand", offHand, null, false);
         this.regionalBoss = processBoolean("isRegionalBoss", isRegionalBoss(), false, false);
+        this.normalizedCombat = processBoolean("normalizedCombat", normalizedCombat, false, false);
 
         this.onSpawnBlockStates = processStringList("onSpawnBlockStates", onSpawnBlockStates, new ArrayList<>(), false);
         this.onRemoveBlockStates = processStringList("onRemoveBlockStates", onRemoveBlockStates, new ArrayList<>(), false);

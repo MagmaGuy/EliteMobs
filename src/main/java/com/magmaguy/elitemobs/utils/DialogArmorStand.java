@@ -3,7 +3,9 @@ package com.magmaguy.elitemobs.utils;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
-import org.bukkit.entity.*;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -38,17 +40,8 @@ public class DialogArmorStand {
 
     private static Vector getDisplacementVector(Entity sourceEntity) {
         double height = 2.3;
-
-        if (sourceEntity instanceof Ageable) {
-            if (!((Ageable) sourceEntity).isAdult())
-                height -= 1;
-        } else if (sourceEntity.getType().equals(EntityType.IRON_GOLEM))
-            height += 1;
-        else if (sourceEntity.getType().equals(EntityType.RAVAGER))
-            height += 0.5;
-        else if (sourceEntity.getType().equals(EntityType.ENDER_DRAGON))
-            height += 2;
-
+        if (sourceEntity instanceof LivingEntity)
+            height = ((LivingEntity) sourceEntity).getEyeHeight() + 0.4;
         return new Vector(0, height, 0);
     }
 

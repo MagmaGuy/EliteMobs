@@ -87,7 +87,11 @@ public class EliteEntity implements SimplePersistentEntityInterface {
     @Setter
     protected boolean vanillaLoot = true;
     @Getter
+    @Setter
     protected boolean eliteLoot = true;
+    @Getter
+    @Setter
+    protected boolean randomLoot = true;
     @Getter
     protected CreatureSpawnEvent.SpawnReason spawnReason;
     @Getter
@@ -296,6 +300,14 @@ public class EliteEntity implements SimplePersistentEntityInterface {
         this.health = maxHealth;
     }
 
+    public void setNormalizedMaxHealth(){
+        this.defaultMaxHealth = MobCombatSettingsConfig.getNormalizedBaselineHealth();
+        this.maxHealth = (level * CombatSystem.TARGET_HITS_TO_KILL + this.defaultMaxHealth) * healthMultiplier;
+        livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(maxHealth);
+        livingEntity.setHealth(maxHealth);
+        this.health = maxHealth;
+    }
+
     public void resetMaxHealth() {
         livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(maxHealth);
         livingEntity.setHealth(maxHealth);
@@ -497,15 +509,6 @@ public class EliteEntity implements SimplePersistentEntityInterface {
         return null;
     }
 
-    private void setMaxHealth(double healthMultiplier) {
-        this.defaultMaxHealth = EliteMobProperties.getPluginData(this.getLivingEntity().getType()).getDefaultMaxHealth();
-        this.maxHealth = (level * CombatSystem.TARGET_HITS_TO_KILL + this.defaultMaxHealth) * healthMultiplier;
-        //7 is the base damage of a diamond sword
-        livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(maxHealth);
-        livingEntity.setHealth(maxHealth);
-        this.health = maxHealth;
-    }
-
     public void setName(EliteMobProperties eliteMobProperties) {
         this.name = ChatColorConverter.convert(
                 eliteMobProperties.getName().replace(
@@ -525,12 +528,6 @@ public class EliteEntity implements SimplePersistentEntityInterface {
         this.isPersistent = bool;
         if (livingEntity != null)
             livingEntity.setRemoveWhenFarAway(!isPersistent);
-    }
-
-    public void setHasSpecialLoot(boolean bool) {
-        this.isNaturalEntity = bool;
-        this.eliteLoot = bool;
-        this.vanillaLoot = bool;
     }
 
     public void doCooldown() {

@@ -5,7 +5,7 @@ import com.magmaguy.elitemobs.config.ProceduralItemGenerationSettingsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfigFields;
 import com.magmaguy.elitemobs.items.EliteEnchantments;
-import com.magmaguy.elitemobs.items.MaterialTier;
+import com.magmaguy.elitemobs.items.ItemTierFinder;
 import com.magmaguy.elitemobs.items.customenchantments.CriticalStrikesEnchantment;
 import com.magmaguy.elitemobs.items.customenchantments.HunterEnchantment;
 import com.magmaguy.elitemobs.utils.VersionChecker;
@@ -51,7 +51,7 @@ public class EnchantmentGenerator {
 
         HashMap<Enchantment, Integer> enchantmentMap = new HashMap<>();
 
-        itemTier -= MaterialTier.getMaterialTier(material);
+        itemTier -= ItemTierFinder.getMaterialTier(material);
 
         /*
         No enchantments for items too low tier to have one
@@ -260,8 +260,10 @@ public class EnchantmentGenerator {
         int maxSecondaryEnchantmentLevel = (secondaryEnchantmentTotalParsedLevel < itemTier - 2) ? secondaryEnchantmentTotalParsedLevel : (int) itemTier;
         int secondaryEnchantmentCount = ThreadLocalRandom.current().nextInt(maxSecondaryEnchantmentLevel + 1);
 
-        if (itemTier < 2 || secondaryEnchantmentCount < 1 || validSecondaryEnchantments.size() == 0)
+        if (itemTier < 2 || secondaryEnchantmentCount < 1 || validSecondaryEnchantments.size() == 0){
+            generateEnchantments(itemMeta, enchantmentMap);
             return enchantmentMap;
+        }
 
         HashMap<Enchantment, Integer> validEnchantmentsClone = (HashMap<Enchantment, Integer>) validSecondaryEnchantments.clone();
 
@@ -413,7 +415,7 @@ public class EnchantmentGenerator {
 
         if (enchantmentsConfigFields.isEnabled()) {
             Enchantment enchantment = enchantmentsConfigFields.getEnchantment();
-            int enchantmentLevel = (enchantmentsConfigFields.getMaxLevel() < itemTier) ? enchantmentsConfigFields.getMaxLevel() : (int) itemTier;
+            int enchantmentLevel = Math.min(enchantmentsConfigFields.getMaxLevel(), (int) itemTier);
             if (enchantmentLevel < 0) enchantmentLevel = 0;
             enchantmentMap.put(enchantment, enchantmentLevel);
         }

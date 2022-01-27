@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.playerdata.database;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.Quest;
 import com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldowns;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
@@ -100,7 +101,6 @@ public class PlayerData {
 
     public static void clearPlayerData(UUID uuid) {
         playerDataHashMap.remove(uuid);
-
     }
 
     public static boolean isInMemory(Player player) {
@@ -512,8 +512,9 @@ public class PlayerData {
             try {
                 quests = (List<Quest>) ObjectSerializer.fromString(new String(resultSet.getBytes("QuestStatus"), "UTF-8"));
                 //Serializes ItemStack which require specific handling, necessary recovering the rewards
-               // for (Quest quest : quests)
-               //     quest.getQuestObjectives().getQuestReward().serializeRewards();
+                for (Quest quest : quests)
+                    if (quest instanceof CustomQuest)
+                        ((CustomQuest) quest).applyTemporaryPermissions(Bukkit.getPlayer(uuid));
             } catch (Exception ex) {
                 new WarningMessage("Failed to serialize quest data for player " + Bukkit.getPlayer(uuid) + " ! This player's quest data will be wiped to prevent future errors.");
                 try {
@@ -531,9 +532,9 @@ public class PlayerData {
                 playerQuestCooldowns.startCooldowns(uuid);
             } catch (Exception exception) {
                 new WarningMessage("Failed to get player quest cooldowns!  ! This player's quest cooldowns will be wiped to prevent future errors.");
-                try{
+                try {
                     resetPlayerQuestCooldowns(uuid);
-                } catch (Exception ex2){
+                } catch (Exception ex2) {
                     new WarningMessage("Failed to reset quest cooldowns! Ironic.");
                     ex2.printStackTrace();
                 }

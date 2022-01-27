@@ -1,6 +1,9 @@
 package com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs;
 
+import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.PluginMobProperties;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import com.magmaguy.elitemobs.powers.meta.MajorPower;
@@ -84,6 +87,17 @@ public abstract class EliteMobProperties extends PluginMobProperties {
             if (eliteMobProperties.getEntityType().equals(entityType))
                 return eliteMobProperties;
         return null;
+    }
+
+    public static double getBaselineDamage(EntityType entityType, EliteEntity eliteEntity){
+        if (eliteEntity instanceof CustomBossEntity &&
+                ((CustomBossEntity) eliteEntity).getCustomBossesConfigFields().isNormalizedCombat())
+                return MobCombatSettingsConfig.getNormalizedBaselineDamage();
+        return getBaselineDamage(entityType);
+    }
+
+    public static double getBaselineDamage(EntityType entityType){
+        return getPluginData(entityType).baseDamage;
     }
 
     public static EliteMobProperties getPluginData(Entity entity) {

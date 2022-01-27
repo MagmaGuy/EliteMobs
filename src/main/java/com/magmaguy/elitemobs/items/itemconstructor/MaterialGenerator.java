@@ -1,8 +1,8 @@
 package com.magmaguy.elitemobs.items.itemconstructor;
 
 import com.magmaguy.elitemobs.combatsystem.CombatSystem;
+import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.ProceduralItemGenerationSettingsConfig;
-import com.magmaguy.elitemobs.utils.VersionChecker;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -29,25 +29,21 @@ public class MaterialGenerator {
 
         if (localValidMaterials.isEmpty()) initializeValidProceduralMaterials();
 
-
-        if (itemTier < CombatSystem.TRIDENT_TIER_LEVEL)
+        if (itemTier < CombatSystem.TRIDENT_TIER_LEVEL + ItemSettingsConfig.getMinimumProcedurallyGeneratedDiamondLootLevelPlusSeven())
             localValidMaterials.remove(TRIDENT);
 
-        if (VersionChecker.serverVersionOlderThan(16, 0) && itemTier < CombatSystem.NETHERITE_TIER_LEVEL)
-
-            if (itemTier < CombatSystem.DIAMOND_TIER_LEVEL) {
-                localValidMaterials.remove(DIAMOND_AXE);
-                localValidMaterials.remove(DIAMOND_HORSE_ARMOR);
-                localValidMaterials.remove(DIAMOND_CHESTPLATE);
-                localValidMaterials.remove(DIAMOND_HELMET);
-                localValidMaterials.remove(DIAMOND_HOE);
-                localValidMaterials.remove(DIAMOND_LEGGINGS);
-                localValidMaterials.remove(DIAMOND_PICKAXE);
-                localValidMaterials.remove(DIAMOND_SHOVEL);
-                localValidMaterials.remove(DIAMOND_SWORD);
-                localValidMaterials.remove(DIAMOND_BOOTS);
-
-            }
+        if (itemTier < CombatSystem.DIAMOND_TIER_LEVEL + ItemSettingsConfig.getMinimumProcedurallyGeneratedDiamondLootLevelPlusSeven()) {
+            localValidMaterials.remove(DIAMOND_AXE);
+            localValidMaterials.remove(DIAMOND_HORSE_ARMOR);
+            localValidMaterials.remove(DIAMOND_CHESTPLATE);
+            localValidMaterials.remove(DIAMOND_HELMET);
+            localValidMaterials.remove(DIAMOND_HOE);
+            localValidMaterials.remove(DIAMOND_LEGGINGS);
+            localValidMaterials.remove(DIAMOND_PICKAXE);
+            localValidMaterials.remove(DIAMOND_SHOVEL);
+            localValidMaterials.remove(DIAMOND_SWORD);
+            localValidMaterials.remove(DIAMOND_BOOTS);
+        }
 
         if (itemTier < CombatSystem.IRON_TIER_LEVEL) {
 
@@ -61,7 +57,9 @@ public class MaterialGenerator {
             localValidMaterials.remove(IRON_PICKAXE);
             localValidMaterials.remove(IRON_SHOVEL);
             localValidMaterials.remove(IRON_SWORD);
-
+            localValidMaterials.remove(BOW);
+            localValidMaterials.remove(CROSSBOW);
+            localValidMaterials.remove(TURTLE_HELMET);
         }
 
         if (itemTier < CombatSystem.STONE_CHAIN_TIER_LEVEL) {
@@ -78,15 +76,25 @@ public class MaterialGenerator {
 
         }
 
-        int index = ThreadLocalRandom.current().nextInt(localValidMaterials.size());
+        if (itemTier < CombatSystem.GOLD_WOOD_LEATHER_TIER_LEVEL) {
+            localValidMaterials.remove(GOLDEN_BOOTS);
+            localValidMaterials.remove(GOLDEN_CHESTPLATE);
+            localValidMaterials.remove(GOLDEN_HELMET);
+            localValidMaterials.remove(GOLDEN_LEGGINGS);
+            localValidMaterials.remove(GOLDEN_SWORD);
+            localValidMaterials.remove(GOLDEN_HOE);
+            localValidMaterials.remove(GOLDEN_SHOVEL);
+            localValidMaterials.remove(GOLDEN_PICKAXE);
+            localValidMaterials.remove(GOLDEN_AXE);
+        }
 
-        Material material = localValidMaterials.get(index);
-
-        return material;
+        return localValidMaterials.get(ThreadLocalRandom.current().nextInt(localValidMaterials.size()));
 
     }
 
     public static void initializeValidProceduralMaterials() {
+
+        validProceduralMaterials.clear();
 
         if (ProceduralItemGenerationSettingsConfig.getValidMaterials().isEmpty()) {
             ProceduralItemGenerationSettingsConfig.cacheMaterials();

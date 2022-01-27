@@ -51,6 +51,7 @@ public class LootTables implements Listener {
             if (eliteEntity.getPower("bonus_coins.yml") == null)
                 new ItemLootShower(eliteEntity.getLevel(), eliteEntity.getUnsyncedLivingEntity().getLocation(), player);
 
+            if (!(eliteEntity.isRandomLoot())) continue;
 
             if (AdventurersGuildConfig.isGuildLootLimiter()) {
                 double itemTier = setItemTier(eliteEntity.getLevel());
@@ -217,7 +218,7 @@ public class LootTables implements Listener {
 
         double chanceToUpgradeTier = 10 / (double) mobTier * ItemSettingsConfig.getMaximumLootTier();
 
-        if (ThreadLocalRandom.current().nextDouble() * 100 < chanceToUpgradeTier) return mobTier + 1;
+        if (ThreadLocalRandom.current().nextDouble() * 100 < chanceToUpgradeTier) return mobTier + 1D;
 
 
         double diceRoll = ThreadLocalRandom.current().nextDouble();

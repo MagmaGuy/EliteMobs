@@ -136,7 +136,7 @@ public class NaturalMobSpawnEventHandler implements Listener {
             int eliteMobLevel = (int) (Grid.getMobTierFromLocation(livingEntity.getLocation()));
             EliteEntity eliteEntity = new EliteEntity(livingEntity, eliteMobLevel, event.getSpawnReason());
             if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.SPAWNER))
-                eliteEntity.setHasSpecialLoot(false);
+                eliteEntity.setEliteLoot(false);
             return;
         }
 
@@ -160,7 +160,7 @@ public class NaturalMobSpawnEventHandler implements Listener {
         EliteEntity eliteEntity = new EliteEntity(livingEntity, eliteMobLevel, event.getSpawnReason());
 
         if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.SPAWNER))
-            eliteEntity.setHasSpecialLoot(false);
+            eliteEntity.setEliteLoot(false);
 
     }
 
