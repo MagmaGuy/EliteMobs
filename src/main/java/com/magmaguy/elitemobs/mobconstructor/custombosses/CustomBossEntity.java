@@ -139,7 +139,8 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
         this.customBossesConfigFields = customBossesConfigFields;
         super.setDamageMultiplier(customBossesConfigFields.getDamageMultiplier());
         super.setHealthMultiplier(customBossesConfigFields.getHealthMultiplier());
-        super.setHasSpecialLoot(customBossesConfigFields.isDropsEliteMobsLoot());
+        super.setEliteLoot(customBossesConfigFields.isDropsEliteMobsLoot());
+        super.setRandomLoot(customBossesConfigFields.isDropsRandomLoot());
         super.setVanillaLoot(customBossesConfigFields.isDropsVanillaLoot());
         super.setLevel(customBossesConfigFields.getLevel());
         setPluginName();
@@ -202,6 +203,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
         if (chunkLoad || ChunkLocationChecker.locationIsLoaded(spawnLocation) || isMount) {
             chunkLoad = false;
             super.livingEntity = new CustomBossMegaConsumer(this).spawn();
+            setNormalizedHealth();
             isChunkLoadedSpawn = true;
             if (super.livingEntity == null)
                 new WarningMessage("Something just prevented EliteMobs from spawning a Custom Boss! More info up next.");
@@ -270,6 +272,11 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
                     }));
 
         CommandRunner.runCommandFromList(customBossesConfigFields.getOnSpawnCommands(), new ArrayList<>());
+    }
+
+    private void setNormalizedHealth() {
+        if (customBossesConfigFields.isNormalizedCombat())
+            super.setNormalizedMaxHealth();
     }
 
     private void setPluginName() {

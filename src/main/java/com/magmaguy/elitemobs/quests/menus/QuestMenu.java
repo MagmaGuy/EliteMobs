@@ -10,7 +10,6 @@ import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.DynamicQuest;
 import com.magmaguy.elitemobs.quests.Quest;
 import com.magmaguy.elitemobs.quests.QuestTracking;
-import com.magmaguy.elitemobs.quests.objectives.DialogObjective;
 import com.magmaguy.elitemobs.quests.objectives.DynamicKillObjective;
 import com.magmaguy.elitemobs.quests.objectives.KillObjective;
 import com.magmaguy.elitemobs.quests.objectives.Objective;
@@ -90,7 +89,7 @@ public class QuestMenu {
         List<TextComponent> pagesList = new ArrayList<>();
         int pageIndex = 0;
         int characterCount = 0;
-        int characterLimit = 200;
+        int characterLimit = 185;
         for (TextComponent textComponent : elements) {
             characterCount += ChatColor.stripColor(textComponent.getText()).length();
             if (pagesList.isEmpty()) {
@@ -151,14 +150,8 @@ public class QuestMenu {
     private static List<TextComponent> generateSummary(Quest quest) {
         List<TextComponent> textComponents = new ArrayList<>();
         if (quest instanceof CustomQuest) {
-            for (Objective objective : quest.getQuestObjectives().getObjectives()) {
-                if (objective instanceof KillObjective) {
-                    //todo: hover should show more boss details, command string should allow players to try to track the boss
-                    textComponents.add(new TextComponent(SpigotMessage.commandHoverMessage(CustomQuestMenuConfig.getObjectiveLine(objective), "", "")));
-                } else if (objective instanceof DialogObjective) {
-                    textComponents.add(new TextComponent(SpigotMessage.hoverMessage(CustomQuestMenuConfig.getObjectiveLine(objective), "")));
-                }
-            }
+            for (Objective objective : quest.getQuestObjectives().getObjectives())
+                textComponents.add(new TextComponent(SpigotMessage.commandHoverMessage(CustomQuestMenuConfig.getObjectiveLine(objective), "", "")));
         } else if (quest instanceof DynamicQuest) {
             for (Objective objective : quest.getQuestObjectives().getObjectives())
                 if (objective instanceof KillObjective) {

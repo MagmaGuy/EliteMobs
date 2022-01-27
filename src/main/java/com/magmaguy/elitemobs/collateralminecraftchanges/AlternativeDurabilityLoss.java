@@ -40,6 +40,7 @@ public class AlternativeDurabilityLoss implements Listener {
         if (itemStack == null) return false;
         if (!itemStack.hasItemMeta()) return false;
         if (!(itemStack.getItemMeta() instanceof Damageable)) return false;
+        if (itemStack.getType().getMaxDurability() == 0) return false;
         if (((Damageable) itemStack.getItemMeta()).getDamage() + 1 < itemStack.getType().getMaxDurability())
             return false;
         return true;
@@ -81,6 +82,8 @@ public class AlternativeDurabilityLoss implements Listener {
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onPlayerDamaged(EntityDamageEvent event) {
         if (!event.getEntity().getType().equals(EntityType.PLAYER)) return;
+        //citizens spams this really hard for some reason
+        if (event.getEntity().hasMetadata("NPC"))return;
         Player player = (Player) event.getEntity();
         for (ItemStack itemStack : player.getInventory().getArmorContents())
             if (isOnLastDamage(itemStack)) {
@@ -95,7 +98,7 @@ public class AlternativeDurabilityLoss implements Listener {
         LivingEntity livingEntity = EntityFinder.filterRangedDamagers(event.getDamager());
         if (livingEntity == null) return;
         if (!livingEntity.getType().equals(EntityType.PLAYER)) return;
-        Player player = (Player) event.getDamager();
+        Player player = (Player) livingEntity;
         ItemStack itemStack = player.getInventory().getItemInMainHand();
         if (isOnLastDamage(itemStack)) {
             player.getWorld().dropItem(player.getLocation(), itemStack.clone());

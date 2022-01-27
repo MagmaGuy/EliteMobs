@@ -42,7 +42,7 @@ public class CustomBossDeath implements Listener {
 
         if (customBossEntity.hasDamagers())
             if (customBossEntity.customBossesConfigFields.getDeathMessages() != null &&
-                    customBossEntity.customBossesConfigFields.getDeathMessages().size() > 0) {
+                    !customBossEntity.customBossesConfigFields.getDeathMessages().isEmpty()) {
                 Player topDamager = null, secondDamager = null, thirdDamager = null;
 
                 HashMap<Player, Double> sortedMap = sortByComparator(customBossEntity.getDamagers(), false);
@@ -170,13 +170,10 @@ public class CustomBossDeath implements Listener {
         //untrack from trackable custom bosses
         CustomBossEntity.trackableCustomBosses.remove(customBossEntity);
 
-        //todo this should be moved to the death event
         if (customBossEntity.customBossesConfigFields.getOnDeathCommands() != null &&
                 !customBossEntity.customBossesConfigFields.getOnDeathCommands().isEmpty())
             OnDeathCommands.parseConsoleCommand(customBossEntity.customBossesConfigFields.getOnDeathCommands(), event);
 
-
-        //todo this should be set by the elite entity not the custom boss
         if (!customBossEntity.customBossesConfigFields.isDropsVanillaLoot()) {
             event.getEntityDeathEvent().setDroppedExp(0);
             for (ItemStack itemStack : event.getEntityDeathEvent().getDrops())

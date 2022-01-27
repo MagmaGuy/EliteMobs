@@ -80,7 +80,7 @@ public class SummonWolfEnchantment extends CustomEnchantment {
                 public void run() {
                     playerCooldowns.remove(event.getPlayer());
                 }
-            }.runTaskLater(MetadataHandler.PLUGIN, 20 * 60);
+            }.runTaskLater(MetadataHandler.PLUGIN, 20 * 60L);
             if (!(event.getAction().equals(Action.RIGHT_CLICK_AIR) || event.getAction().equals(Action.RIGHT_CLICK_BLOCK)))
                 return;
             if (getEnchantment(event.getPlayer().getInventory().getItemInMainHand().getItemMeta()) > 0)

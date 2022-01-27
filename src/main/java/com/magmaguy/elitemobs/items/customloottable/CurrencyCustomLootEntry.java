@@ -45,7 +45,7 @@ public class CurrencyCustomLootEntry extends CustomLootEntry implements Serializ
                     break;
                 case "permission":
                     try {
-                        super.setPermission( strings[1]);
+                        super.setPermission(strings[1]);
                     } catch (Exception ex) {
                         errorMessage(rawString, configFilename, "permission");
                     }
@@ -63,11 +63,13 @@ public class CurrencyCustomLootEntry extends CustomLootEntry implements Serializ
 
     @Override
     public void locationDrop(int itemTier, Player player, Location location) {
-        new ItemLootShower(location, player, currencyAmount);
+        for (int i = 0; i < getAmount(); i++)
+            new ItemLootShower(location, player, currencyAmount);
     }
 
     @Override
     public void directDrop(int itemTier, Player player) {
-        EconomyHandler.addCurrency(player.getUniqueId(), currencyAmount);
+        for (int i = 0; i < getAmount(); i++)
+            EconomyHandler.addCurrency(player.getUniqueId(), currencyAmount);
     }
 }
