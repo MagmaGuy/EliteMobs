@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.api;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
-import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.QuestsConfig;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.CustomQuest;
@@ -9,7 +8,6 @@ import com.magmaguy.elitemobs.quests.Quest;
 import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
-import org.bukkit.permissions.PermissionAttachment;
 
 public class QuestAcceptEvent extends Event implements Cancellable {
 
@@ -66,11 +64,7 @@ public class QuestAcceptEvent extends Event implements Cancellable {
             if (event.getQuest() instanceof CustomQuest) {
                 CustomQuest customQuest = (CustomQuest) event.getQuest();
 
-                if (!customQuest.getCustomQuestsConfigFields().getTemporaryPermissions().isEmpty()) {
-                    PermissionAttachment permissionAttachment = event.getPlayer().addAttachment(MetadataHandler.PLUGIN);
-                    for (String permission : customQuest.getCustomQuestsConfigFields().getTemporaryPermissions())
-                        permissionAttachment.setPermission(permission, true);
-                }
+                customQuest.applyTemporaryPermissions(event.getPlayer());
 
                 if (!customQuest.getCustomQuestsConfigFields().getQuestAcceptDialog().isEmpty())
                     for (String dialog : customQuest.getCustomQuestsConfigFields().getQuestAcceptDialog())

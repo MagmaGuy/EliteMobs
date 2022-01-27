@@ -76,6 +76,14 @@ public class CustomQuest extends Quest {
         return customQuestsConfigFields;
     }
 
+    public void applyTemporaryPermissions(Player player){
+        if (!getCustomQuestsConfigFields().getTemporaryPermissions().isEmpty()) {
+            PermissionAttachment permissionAttachment = player.addAttachment(MetadataHandler.PLUGIN);
+            for (String permission : getCustomQuestsConfigFields().getTemporaryPermissions())
+                permissionAttachment.setPermission(permission, true);
+        }
+    }
+
     public void applyEndPermissions(Player player){
         if (!getCustomQuestsConfigFields().getTemporaryPermissions().isEmpty()) {
             PermissionAttachment permissionAttachment = player.addAttachment(MetadataHandler.PLUGIN);

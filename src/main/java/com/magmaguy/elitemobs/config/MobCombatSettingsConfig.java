@@ -73,6 +73,10 @@ public class MobCombatSettingsConfig {
     private static boolean doWeakEffect;
     @Getter
     private static boolean doResistEffect;
+    @Getter
+    private static double normalizedBaselineDamage;
+    @Getter
+    private static double normalizedBaselineHealth;
 
     public static void initializeConfig() {
 
@@ -112,6 +116,8 @@ public class MobCombatSettingsConfig {
         resistText = ConfigurationEngine.setString(fileConfiguration, "resistText", "&c&lResist!");
         doWeakEffect = ConfigurationEngine.setBoolean(fileConfiguration, "doWeakEffect", true);
         doResistEffect = ConfigurationEngine.setBoolean(fileConfiguration, "doResistEffect", true);
+        normalizedBaselineDamage = ConfigurationEngine.setDouble(fileConfiguration, "normalizedRegionalBossBaselineDamage", 5);
+        normalizedBaselineHealth = ConfigurationEngine.setDouble(fileConfiguration, "normalizedRegionalBossBaselineHealth", 20);
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }

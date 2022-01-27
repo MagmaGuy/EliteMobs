@@ -1459,6 +1459,7 @@ public class ProceduralItemGenerationSettingsConfig {
     }
 
     public static void cacheMaterials() {
+        validMaterials.clear();
         for (String material : fileConfiguration.getConfigurationSection("validMaterials").getKeys(false))
             if (fileConfiguration.getConfigurationSection("validMaterials").getBoolean(material))
                 validMaterials.add(material);

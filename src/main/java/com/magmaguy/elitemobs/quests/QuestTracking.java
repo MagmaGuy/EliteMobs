@@ -127,8 +127,8 @@ public class QuestTracking {
 
     private List<ObjectiveDestinations> getKillLocations(CustomKillObjective customKillObjective) {
         List<ObjectiveDestinations> destinations = new ArrayList<>();
+        List<Location> locations = new ArrayList<>();
         EntityTracker.getEliteMobEntities().values().forEach(eliteEntity -> {
-            List<Location> locations = new ArrayList<>();
             if (eliteEntity instanceof CustomBossEntity)
                 if (((CustomBossEntity) eliteEntity).getPhaseBossEntity() != null &&
                         ((CustomBossEntity) eliteEntity).getPhaseBossEntity().getPhase1Config().getFilename().equals(customKillObjective.getCustomBossFilename())) {
@@ -137,9 +137,8 @@ public class QuestTracking {
                         .equals(customKillObjective.getCustomBossFilename())) {
                     locations.add(eliteEntity.getLocation());
                 }
-            locations.add(eliteEntity.getLocation());
-            destinations.add(new ObjectiveDestinations(customKillObjective, locations));
         });
+        destinations.add(new ObjectiveDestinations(customKillObjective, locations));
         return destinations;
     }
 

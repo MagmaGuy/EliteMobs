@@ -55,11 +55,13 @@ public class VanillaCustomLootEntry extends CustomLootEntry implements Serializa
 
     @Override
     public void locationDrop(int itemTier, Player player, Location location) {
-        location.getWorld().dropItem(location, generateItemStack());
+        for (int i = 0; i < getAmount(); i++)
+            location.getWorld().dropItem(location, generateItemStack());
     }
 
     @Override
     public void directDrop(int itemTier, Player player) {
-        player.getInventory().addItem(generateItemStack());
+        for (int i = 0; i < getAmount(); i++)
+            player.getInventory().addItem(generateItemStack());
     }
 }

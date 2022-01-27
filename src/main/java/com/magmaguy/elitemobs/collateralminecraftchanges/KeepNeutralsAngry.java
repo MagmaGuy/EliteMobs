@@ -8,6 +8,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Wolf;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashSet;
@@ -27,7 +28,9 @@ public class KeepNeutralsAngry {
             @Override
             public void run() {
                 //It is possible for entities to change type during combat, in which case they need to be wiped
-                if (!eliteEntity.isValid() || !entityType.equals(eliteEntity.getLivingEntity().getType())) {
+                if (!eliteEntity.isValid() ||
+                        !entityType.equals(eliteEntity.getLivingEntity().getType()) ||
+                        entityType.equals(EntityType.WOLF) && ((Wolf) eliteEntity.getLivingEntity()).isTamed()) {
                     cancel();
                     angryMobs.remove(eliteEntity);
                     return;

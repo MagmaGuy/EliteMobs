@@ -75,6 +75,9 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
     @Getter
     @Setter
     private List<String> worldGuardFlags = new ArrayList<>();
+    @Getter
+    @Setter
+    private boolean hasCustomModels = false;
 
 
     public DungeonPackagerConfigFields(String fileName, boolean isEnabled){
@@ -163,6 +166,7 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
         this.playerInfo = processString("playerInfo", playerInfo, "", false);
         this.regionEnterMessage = processString("regionEnterMessage", regionEnterMessage, "", false);
         this.regionLeaveMessage = processString("regionLeaveMessage", regionLeaveMessage, "", false);
+        this.hasCustomModels = processBoolean("hasCustomModels", hasCustomModels, false , false);
     }
 
     @Override

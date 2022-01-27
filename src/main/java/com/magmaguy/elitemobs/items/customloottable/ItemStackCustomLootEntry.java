@@ -30,6 +30,7 @@ public class ItemStackCustomLootEntry extends CustomLootEntry implements Seriali
     public void directDrop(int itemTier, Player player) {
         ItemStack itemStack = generateItemStack();
         if (itemStack == null) return;
-        player.getInventory().addItem(itemStack);
+        for (int i = 0; i < getAmount(); i++)
+            player.getInventory().addItem(itemStack);
     }
 }

@@ -96,6 +96,8 @@ public class ItemSettingsConfig {
     private static String lowArmorDurabilityItemDropMessage;
     @Getter
     private static String lowWeaponDurabilityItemDropMessage;
+    @Getter
+    private static int minimumProcedurallyGeneratedDiamondLootLevelPlusSeven;
 
     public static void initializeConfig() {
         File file = ConfigurationEngine.fileCreator("ItemSettings.yml");
@@ -159,6 +161,7 @@ public class ItemSettingsConfig {
         preventEliteItemsFromBreaking = ConfigurationEngine.setBoolean(fileConfiguration, "preventEliteItemsFromBreaking", true);
         lowArmorDurabilityItemDropMessage = ConfigurationEngine.setString(fileConfiguration, "lowDurabilityItemDropMessage", "&8[EliteMobs] &cDropped armor due to low durability! &8Repair it at the NPC with scrap to use it!");
         lowWeaponDurabilityItemDropMessage = ConfigurationEngine.setString(fileConfiguration, "lowWeaponItemDropMessage", "&8[EliteMobs] &cDropped weapon due to low durability! &8Repair it at the NPC with scrap to use it!");
+        minimumProcedurallyGeneratedDiamondLootLevelPlusSeven = ConfigurationEngine.setInt(fileConfiguration, "minimumProcedurallyGeneratedDiamondLootLevelPlusSeven", 10);
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }
