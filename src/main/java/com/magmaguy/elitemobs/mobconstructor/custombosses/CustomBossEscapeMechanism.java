@@ -15,13 +15,14 @@ public class CustomBossEscapeMechanism {
         }, 20L * 60L * timeout);
     }
 
-    public static void doEscapeMessage(CustomBossEntity customBossEntity){
+    public static void doEscapeMessage(CustomBossEntity customBossEntity) {
         customBossEntity.remove(RemovalReason.BOSS_TIMEOUT);
+        if (customBossEntity.customBossesConfigFields.getEscapeMessage() == null) return;
+        if (customBossEntity.customBossesConfigFields.getEscapeMessage().isEmpty()) return;
         if (customBossEntity.customBossesConfigFields.getAnnouncementPriority() < 1) return;
-        if (customBossEntity.customBossesConfigFields.getEscapeMessage() != null)
-            for (Player player : Bukkit.getOnlinePlayers())
-                if (player.getWorld().equals(customBossEntity.getLocation().getWorld()))
-                    player.sendMessage(ChatColorConverter.convert(customBossEntity.customBossesConfigFields.getEscapeMessage()));
+        for (Player player : Bukkit.getOnlinePlayers())
+            if (player.getWorld().equals(customBossEntity.getLocation().getWorld()))
+                player.sendMessage(ChatColorConverter.convert(customBossEntity.customBossesConfigFields.getEscapeMessage()));
         if (customBossEntity.customBossesConfigFields.getAnnouncementPriority() < 3) return;
         new DiscordSRVAnnouncement(ChatColorConverter.convert(customBossEntity.customBossesConfigFields.getEscapeMessage()));
     }
