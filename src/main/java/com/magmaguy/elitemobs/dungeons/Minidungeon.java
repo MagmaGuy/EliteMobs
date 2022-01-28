@@ -571,8 +571,10 @@ public class Minidungeon {
                             vectorGetter(rawLocationString, 1),
                             //z
                             vectorGetter(rawLocationString, 2));
-                    if (customBossesConfigFields == null && customTreasureChestConfigFields == null)
-                        new WarningMessage("Failed to correctly parse line " + rawLocationString + " for minidungeon " + dungeonPackagerConfigFields.getFilename());
+                    if (customBossesConfigFields == null && customTreasureChestConfigFields == null) {
+                        //todo: figure this issue out, not sure if misfiring
+                        //new WarningMessage("Failed to correctly parse line " + rawLocationString + " for minidungeon " + dungeonPackagerConfigFields.getFilename());
+                    }
                 } catch (Exception ex) {
                     new WarningMessage("Failed to generate dungeon from raw " + rawLocationString);
                     ex.printStackTrace();

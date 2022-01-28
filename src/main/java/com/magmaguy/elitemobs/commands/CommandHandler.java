@@ -3,11 +3,11 @@ package com.magmaguy.elitemobs.commands;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.arguments.standard.StringArgument;
+import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
 import cloud.commandframework.minecraft.extras.MinecraftHelp;
-import cloud.commandframework.paper.PaperCommandManager;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.commands.guild.AdventurersGuildCommand;
 import com.magmaguy.elitemobs.config.DefaultConfig;
@@ -30,7 +30,7 @@ import static net.kyori.adventure.text.Component.text;
 
 public class CommandHandler {
 
-    private PaperCommandManager<CommandSender> manager;
+    private BukkitCommandManager<CommandSender> manager;
     //private CommandConfirmationManager<CommandSender> paymentConfirmationManager;
     private MinecraftHelp<CommandSender> minecraftHelp;
     private BukkitAudiences bukkitAudiences;
@@ -49,7 +49,7 @@ public class CommandHandler {
             e.printStackTrace();
         }
         try {
-            manager = new PaperCommandManager(
+            manager = new BukkitCommandManager(
                     /* Owning plugin */ MetadataHandler.PLUGIN,
                     /* Coordinator function */ commandExecutionCoordinator,
                     /* Command Sender -> C */ Function.identity(),
