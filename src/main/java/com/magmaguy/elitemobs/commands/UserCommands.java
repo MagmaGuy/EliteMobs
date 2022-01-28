@@ -5,9 +5,9 @@ import cloud.commandframework.Command;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.standard.DoubleArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
+import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
 import cloud.commandframework.meta.CommandMeta;
-import cloud.commandframework.paper.PaperCommandManager;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.api.PlayerPreTeleportEvent;
 import com.magmaguy.elitemobs.commands.admin.CheckTierOthersCommand;
@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 
 public class UserCommands {
 
-    public UserCommands(PaperCommandManager<CommandSender> manager, Command.Builder<CommandSender> builder) {
+    public UserCommands(BukkitCommandManager<CommandSender> manager, Command.Builder<CommandSender> builder) {
         // /em adventurersguild
         manager.command(builder.literal("adventurersguild", "ag")
                 .meta(CommandMeta.DESCRIPTION, "Teleports players to the Adventurer's Guild Hub or opens the Adventurer's Guild menu.")

@@ -4,8 +4,8 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.Command;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.standard.*;
+import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.meta.CommandMeta;
-import cloud.commandframework.paper.PaperCommandManager;
 import cloud.commandframework.types.tuples.Triplet;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.commands.admin.*;
@@ -46,7 +46,7 @@ import java.util.List;
 
 public class AdminCommands {
 
-    public AdminCommands(PaperCommandManager<CommandSender> manager, Command.Builder<CommandSender> builder) {
+    public AdminCommands(BukkitCommandManager<CommandSender> manager, Command.Builder<CommandSender> builder) {
 
         // /em setup
         manager.command(builder.literal("setup")

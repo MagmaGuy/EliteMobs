@@ -268,7 +268,7 @@ public class QuestTracking {
                 if (locationAndSymbol != null) parsedVectors.add(locationAndSymbol);
             }
         } else
-            for (ObjectiveDestinations iteratedObjectiveDestinations : objectiveDestinations)
+            for (ObjectiveDestinations iteratedObjectiveDestinations : new ArrayList<>(objectiveDestinations))
                 for (Location location : iteratedObjectiveDestinations.getDestinations()) {
                     LocationAndSymbol locationAndSymbol = processLocations(location, iteratedObjectiveDestinations.getObjective());
                     if (locationAndSymbol != null) parsedVectors.add(locationAndSymbol);
