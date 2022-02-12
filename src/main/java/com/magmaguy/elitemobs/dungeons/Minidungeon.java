@@ -72,6 +72,9 @@ public class Minidungeon {
     private Integer highestTier;
     @Getter
     private Integer regionalBossCount = 0;
+    @Getter
+    @Setter
+    private boolean outOfDate = false;
 
     public Minidungeon(DungeonPackagerConfigFields dungeonPackagerConfigFields) {
         minidungeons.put(dungeonPackagerConfigFields.getFilename(), this);
@@ -302,7 +305,7 @@ public class Minidungeon {
             if (dungeonPackagerConfigFields.isHasCustomModels())
                 if (!Bukkit.getPluginManager().isPluginEnabled("ModelEngine")) {
                     player.sendMessage(ChatColorConverter.convert("&c[EliteMobs] The dungeon you just installed has custom models, but you do not have Model Engine! Download it here if you want to use Custom Models: https://www.spigotmc.org/resources/conxeptworks-model-engine%E2%80%94ultimate-custom-entity-model-manager-1-14-1-18-1.79477/"));
-                    player.sendMessage(ChatColorConverter.convert("&c[EliteMobs] Please note that currently only version 2.2.0 works, which requires to compatibility patch to work for 1.18."));
+                    player.sendMessage(ChatColorConverter.convert("&c[EliteMobs] Please note that currently only version 2.4.0 is supported!"));
                 } else
                     player.spigot().sendMessage(SpigotMessage.commandHoverMessage(
                             ChatColorConverter.convert("&8[EliteMobs] &2The dungeon you just installed has Custom Models! " +

@@ -55,7 +55,6 @@ import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.ServerTime;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
-import com.magmaguy.elitemobs.versionnotifier.VersionWarner;
 import com.magmaguy.elitemobs.worlds.CustomWorldLoading;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
@@ -210,18 +209,6 @@ public class EliteMobs extends JavaPlugin {
          */
         PassiveEliteMobDeathHandler.SuperMobScanner.scanSuperMobs();
 
-        /*
-        Check for new plugin version
-         */
-        VersionChecker.updateComparer();
-        if (!VersionChecker.pluginIsUpToDate)
-            this.getServer().getPluginManager().registerEvents(new VersionWarner(), this);
-
-        /*
-        Launch quests
-         */
-        //QuestRefresher.generateNewQuestMenus();
-
         // Small check to make sure that PlaceholderAPI is installed
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             Placeholders placeholders = new Placeholders();
@@ -293,6 +280,11 @@ public class EliteMobs extends JavaPlugin {
 
         //Commands
         new CommandHandler();
+
+        /*
+        Check for new plugin version or for dungeon updates
+         */
+        VersionChecker.check();
     }
 
     @Override
@@ -343,9 +335,7 @@ public class EliteMobs extends JavaPlugin {
         new InfoMessage("Clearing zone based worlds...");
         zoneBasedSpawningWorlds.clear();
         new InfoMessage("Clearing config regional elites...");
-        CustomBossesConfigFields.regionalElites.clear();
-        new InfoMessage("Clearing config natural elites...");
-        CustomBossesConfigFields.getNaturallySpawnedElites().clear();
+        CustomBossesConfigFields.getRegionalElites().clear();
         new InfoMessage("Clearing custom enchantments...");
         CustomEnchantment.getCustomEnchantments().clear();
         new InfoMessage("Clearing custom items...");

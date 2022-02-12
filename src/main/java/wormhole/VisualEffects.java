@@ -1,5 +1,6 @@
 package wormhole;
 
+import com.magmaguy.elitemobs.config.WormholesConfig;
 import com.magmaguy.elitemobs.config.wormholes.WormholeConfigFields;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
@@ -142,9 +143,17 @@ public class VisualEffects {
         Vector clonedSource = source.clone();
         int counter = 0;
         while (clonedSource.distance(target) > 0.1 && counter < 20) {
-            clonedSource = clonedSource.add(ray);
-            cachedLocations.add(clonedSource.clone());
-            counter++;
+            if (WormholesConfig.isReducedParticlesMode()) {
+                if (counter % 2 == 0) {
+                    clonedSource = clonedSource.add(ray);
+                    cachedLocations.add(clonedSource.clone());
+                    counter++;
+                }
+            } else {
+                clonedSource = clonedSource.add(ray);
+                cachedLocations.add(clonedSource.clone());
+                counter++;
+            }
         }
     }
 

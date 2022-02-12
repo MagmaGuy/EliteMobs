@@ -263,7 +263,7 @@ public class QuestTracking {
     private List<LocationAndSymbol> projectLocations() {
         List<LocationAndSymbol> parsedVectors = new ArrayList<>();
         if (questIsDone) {
-            for (Location location : turnInNPCs) {
+            for (Location location : new ArrayList<>(turnInNPCs)) {
                 LocationAndSymbol locationAndSymbol = processLocations(location, null);
                 if (locationAndSymbol != null) parsedVectors.add(locationAndSymbol);
             }

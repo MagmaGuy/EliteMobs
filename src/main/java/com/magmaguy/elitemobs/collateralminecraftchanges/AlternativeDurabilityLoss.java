@@ -39,6 +39,7 @@ public class AlternativeDurabilityLoss implements Listener {
     private static boolean isOnLastDamage(ItemStack itemStack) {
         if (itemStack == null) return false;
         if (!itemStack.hasItemMeta()) return false;
+        if (!ItemTagger.isEliteItem(itemStack)) return false;
         if (!(itemStack.getItemMeta() instanceof Damageable)) return false;
         if (itemStack.getType().getMaxDurability() == 0) return false;
         if (((Damageable) itemStack.getItemMeta()).getDamage() + 1 < itemStack.getType().getMaxDurability())

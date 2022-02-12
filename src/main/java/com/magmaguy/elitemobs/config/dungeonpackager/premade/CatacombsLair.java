@@ -4,14 +4,14 @@ import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 public class CatacombsLair extends DungeonPackagerConfigFields {
     public CatacombsLair() {
         super("catacombs_lair",
                 false,
-                "&fThe Catacombs",
+                "&8The Catacombs",
                 DungeonLocationType.SCHEMATIC,
                 Arrays.asList("&fThe best starter dungeon for players!",
                         "&6Credits: Realm of Lotheridon"),
@@ -20,7 +20,7 @@ public class CatacombsLair extends DungeonPackagerConfigFields {
                         "catacombs_tier_5_illusioner_guard_1.yml:-2.5,2.5,16.5",
                         "catacombs_tier_15_boss.yml:0.5,-7.5,45.5",
                         "catacombs_tier_10_miniboss.yml:-8.5,-15.5,36.5"),
-                new ArrayList<>(),
+                Collections.singletonList("catacombs_tier_15_treasure_chest.yml:-1,-14,15"),
                 DiscordLinks.premiumMinidungeons,
                 DungeonSizeCategory.LAIR,
                 null,
@@ -32,10 +32,10 @@ public class CatacombsLair extends DungeonPackagerConfigFields {
                 new Vector(0, 0, 0),
                 0,
                 0,
-                2,
-                "Difficulty: &aEasy\n" +
+                0,
+                "Difficulty: &cHard\n" +
                         "$bossCount bosses, from tier $lowestTier to $highestTier\n" +
-                        "&2The best minidungeon for beginners!",
+                        "&2The best Lair challenge for groups of beginners!",
                 "&8[EM] &8Now entering the Catacombs. Be careful with what dwells below...",
                 "&8[EM] &8You have left the Catacombs. Was it worth it?");
     }

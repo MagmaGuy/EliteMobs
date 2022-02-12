@@ -7,11 +7,11 @@ public class AGFireworksWormholeConfig extends WormholeConfigFields {
     public AGFireworksWormholeConfig() {
         super("ag_fireworks_wormhole",
                 true,
-                "em_adventurers_guild,296.5,102,296.5,-90,0",
+                "em_adventurers_guild,296.5,99,308.5,-174,0",
                 "fireworks_lair.yml",
-                Wormhole.WormholeStyle.CUBE);
+                Wormhole.WormholeStyle.CRYSTAL);
         setBlindPlayer(true);
-        setLocation1Text("&6『Fireworks Lair』 &aLvl 50");
+        setLocation1Text("&6『Fireworks Lair』 &aLvl 20");
         setParticleColor(0xFFE100);
     }
 }

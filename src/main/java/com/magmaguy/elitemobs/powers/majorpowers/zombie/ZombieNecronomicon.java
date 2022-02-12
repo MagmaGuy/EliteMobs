@@ -10,6 +10,7 @@ import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.powers.meta.MajorPower;
 import com.magmaguy.elitemobs.powerstances.GenericRotationMatrixMath;
 import com.magmaguy.elitemobs.powerstances.VisualItemInitializer;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
@@ -207,9 +208,15 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
                     if (randomizedNumber < 5) {
 
                         CustomBossEntity customBossEntity = CustomBossEntity.createCustomBossEntity("necronomicon_zombie.yml");
+                        if (customBossEntity == null){
+                            new WarningMessage("necronomicon_zombie.yml is not valid!");
+                            return;
+                        }
                         customBossEntity.spawn(targetter.getLocation(), eliteEntity.getLevel(), false);
 
                         if (!customBossEntity.getLivingEntity().isValid()) {
+                            targetter.setAI(true);
+                            cancel();
                             targetter.setAI(true);
                             cancel();
                             return;
@@ -225,6 +232,12 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
                     } else {
 
                         CustomBossEntity customBossEntity = CustomBossEntity.createCustomBossEntity("necronomicon_skeleton.yml");
+                        if (customBossEntity == null){
+                            new WarningMessage("necronomicon_skeleton.yml is not valid!");
+                            targetter.setAI(true);
+                            cancel();
+                            return;
+                        }
                         customBossEntity.spawn(targetter.getLocation(), eliteEntity.getLevel(), false);
 
                         if (!customBossEntity.getLivingEntity().isValid()) {

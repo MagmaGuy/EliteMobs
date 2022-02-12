@@ -41,6 +41,7 @@ public class ElitePotionEffect {
 
         } catch (Exception ex) {
             new WarningMessage("Detected invalid potion effect entry: " + string);
+            ex.printStackTrace();
         }
     }
 

@@ -99,8 +99,8 @@ public class CustomModel {
 
     public void setName(String nametagName, boolean visible) {
         if (modeledEntity == null) return;
-        modeledEntity.setNametag(nametagName);
-        modeledEntity.setNametagVisible(visible);
+        modeledEntity.getNametagHandler().setCustomName("hitbox", nametagName);
+        modeledEntity.getNametagHandler().setCustomNameVisibility("hitbox", true);
     }
 
     public void switchPhase() {
@@ -108,7 +108,7 @@ public class CustomModel {
     }
 
     public void setNameVisible(boolean visible) {
-        modeledEntity.setNametagVisible(visible);
+        modeledEntity.getNametagHandler().setCustomNameVisibility("hitbox", visible);
     }
 
     public static class ModelEntityEvents implements Listener {

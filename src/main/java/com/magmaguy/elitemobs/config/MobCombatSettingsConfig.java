@@ -77,6 +77,8 @@ public class MobCombatSettingsConfig {
     private static double normalizedBaselineDamage;
     @Getter
     private static double normalizedBaselineHealth;
+    @Getter
+    private static boolean normalizeRegionalBosses;
 
     public static void initializeConfig() {
 
@@ -117,7 +119,8 @@ public class MobCombatSettingsConfig {
         doWeakEffect = ConfigurationEngine.setBoolean(fileConfiguration, "doWeakEffect", true);
         doResistEffect = ConfigurationEngine.setBoolean(fileConfiguration, "doResistEffect", true);
         normalizedBaselineDamage = ConfigurationEngine.setDouble(fileConfiguration, "normalizedRegionalBossBaselineDamage", 5);
-        normalizedBaselineHealth = ConfigurationEngine.setDouble(fileConfiguration, "normalizedRegionalBossBaselineHealth", 20);
+        normalizedBaselineHealth = ConfigurationEngine.setDouble(fileConfiguration, "normalizedRegionalBossBaselineHealthV2", 7);
+        normalizeRegionalBosses = ConfigurationEngine.setBoolean(fileConfiguration, "normalizeRegionalBosses", true);
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }

@@ -12,6 +12,7 @@ import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffect;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffectContainer;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.utils.WarningMessage;
+import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -24,6 +25,7 @@ import java.util.List;
 
 public class EliteItemLore {
 
+    @Getter
     private ItemStack itemStack;
     private ItemMeta itemMeta;
     private List<String> vanillaEnchantmentsLore = new ArrayList<>();

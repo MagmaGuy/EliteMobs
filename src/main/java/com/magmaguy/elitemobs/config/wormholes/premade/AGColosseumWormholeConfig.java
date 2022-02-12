@@ -9,7 +9,7 @@ public class AGColosseumWormholeConfig extends WormholeConfigFields {
                 true,
                 "em_adventurers_guild,296.5,103,308.5,-175,0",
                 "colosseum_lair.yml",
-                Wormhole.WormholeStyle.CUBE);
+                Wormhole.WormholeStyle.CRYSTAL);
         setBlindPlayer(true);
         setLocation1Text("&6『Colosseum Minidungeon』 &6Lvl 70");
         setParticleColor(0xFFB000);

@@ -30,9 +30,9 @@ public class OasisAdventure extends DungeonPackagerConfigFields {
                 0D,
                 0D,
                 2,
-                "Difficulty: &6Medium\n" +
+                "Difficulty: &2Solo-able\n" +
                         "$bossCount bosses, from level $lowestTier to $highestTier\n" +
-                        "&6A big adventure for beginners!",
+                        "&6A big adventure for people who know the ropes!",
                 "&8[EM] &6You have arrived at the Oasis!",
                 "&8[EM] &6You have left the Oasis!");
     }

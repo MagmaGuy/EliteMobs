@@ -29,8 +29,8 @@ public class DarkSpireMinidungeon extends DungeonPackagerConfigFields {
                 new Vector(0, 0, 0),
                 150D,
                 0D,
-                1,
-                "Difficulty: &cHard\n" +
+                0,
+                "Difficulty: &6Medium\n" +
                         "$bossCount bosses, from level $lowestTier to $highestTier\n" +
                         "&cA vast challenge for advanced players!",
                 "&8[EM] &1An invasion is in progress. &9Stop the insurrection!",
