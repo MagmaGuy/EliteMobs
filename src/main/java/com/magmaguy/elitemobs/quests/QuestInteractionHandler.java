@@ -5,6 +5,8 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.menus.QuestMenu;
+import com.magmaguy.elitemobs.quests.objectives.CustomFetchObjective;
+import com.magmaguy.elitemobs.quests.objectives.Objective;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -25,7 +27,6 @@ public class QuestInteractionHandler {
         List<Quest> quests = PlayerData.getQuests(player.getUniqueId());
         scanQuestTakerNPC(npcEntity, quests, customQuestList);
 
-
         //This value can be null for NPC entities that have the custom quest interaction but are only used to turn quests in
         if (npcEntity.getNpCsConfigFields().getQuestFilenames() != null)
             for (String questString : npcEntity.getNpCsConfigFields().getQuestFilenames()) {
@@ -40,12 +41,6 @@ public class QuestInteractionHandler {
                     customQuest.setQuestGiver(npcEntity.getNpCsConfigFields().getFilename());
                 }
             }
-
-      // for (Quest quest : quests)
-      //     if (quest instanceof CustomQuest &&
-      //             (!((CustomQuest) quest).getCustomQuestsConfigFields().getTurnInNPC().isEmpty() &&
-      //                     ((CustomQuest) quest).getCustomQuestsConfigFields().getTurnInNPC().equals(npcEntity.getNpCsConfigFields().getFilename())))
-      //         customQuestList.add((CustomQuest) quest);
 
         if (!customQuestList.isEmpty())
             new BukkitRunnable() {
@@ -78,8 +73,12 @@ public class QuestInteractionHandler {
         for (Quest quest : activeQuests)
             if (quest instanceof CustomQuest &&
                     !quest.getQuestTaker().equals(quest.getQuestGiver()) &&
-                    npcEntity.getNpCsConfigFields().getFilename().equals(quest.getQuestTaker()))
+                    npcEntity.getNpCsConfigFields().getFilename().equals(quest.getQuestTaker())) {
                 npcQuests.add((CustomQuest) quest);
+                for (Objective objective : quest.getQuestObjectives().getObjectives())
+                    if (objective instanceof CustomFetchObjective)
+                        objective.progressNonlinearObjective(quest.getQuestObjectives());
+            }
     }
 
 }

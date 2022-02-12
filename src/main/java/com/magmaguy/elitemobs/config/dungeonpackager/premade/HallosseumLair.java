@@ -28,8 +28,8 @@ public class HallosseumLair extends DungeonPackagerConfigFields {
                 new Vector(0, 0, 0),
                 -130D,
                 0D,
-                2,
-                "Difficulty: &6Medium\n" +
+                0,
+                "Difficulty: &chard\n" +
                         "$bossCount level $lowestTier Big Boss!\n" +
                         "&6A fun Halloween challenge!",
                 "&8[EM] &4Trick or treat! &8Your soul is mine!",

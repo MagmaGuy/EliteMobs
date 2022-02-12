@@ -23,4 +23,10 @@ public final class SpigotMessage {
             textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, commandString));
         return textComponent;
     }
+
+    public static TextComponent hoverLinkMessage(String message, String hoverMessage, String link) {
+        TextComponent textComponent = hoverMessage(message, hoverMessage);
+        textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, link));
+        return textComponent;
+    }
 }

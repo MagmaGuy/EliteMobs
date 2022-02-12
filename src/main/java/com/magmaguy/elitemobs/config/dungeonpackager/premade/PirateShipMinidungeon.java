@@ -57,7 +57,7 @@ public class PirateShipMinidungeon extends DungeonPackagerConfigFields {
                 new Vector(-17, 1, 49),
                 0,
                 0,
-                3,
+                0,
                 "Difficulty: &6Medium\n" +
                         "$bossCount bosses, from level $lowestTier to $highestTier\n" +
                         "&6One of the best hunting grounds for" +

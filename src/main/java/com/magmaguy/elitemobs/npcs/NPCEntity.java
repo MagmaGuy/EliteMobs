@@ -109,10 +109,11 @@ public class NPCEntity implements SimplePersistentEntityInterface {
         try {
             DisguiseEntity.disguise(npCsConfigFields.getDisguise(), livingEntity, npCsConfigFields.getCustomDisguiseData(), npCsConfigFields.getFilename());
             DisguiseEntity.setDisguiseNameVisibility(true, livingEntity);
-            villager.setCustomNameVisible(true);
+            livingEntity.setCustomNameVisible(true);
             isDisguised = true;
         } catch (Exception ex) {
             new WarningMessage("Failed to load LibsDisguises disguise correctly!");
+            ex.printStackTrace();
         }
     }
 

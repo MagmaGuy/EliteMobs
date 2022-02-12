@@ -31,6 +31,10 @@ public class ItemSettingsConfig {
     @Getter
     private static double flatDropRate;
     @Getter
+    private static double regionalBossNonUniqueDropRate;
+    @Getter
+    private static boolean regionalBossesDropVanillaLoot;
+    @Getter
     private static double tierIncreaseDropRate;
     @Getter
     private static double proceduralItemWeight;
@@ -98,6 +102,10 @@ public class ItemSettingsConfig {
     private static String lowWeaponDurabilityItemDropMessage;
     @Getter
     private static int minimumProcedurallyGeneratedDiamondLootLevelPlusSeven;
+    @Getter
+    private static String simlootMessageSuccess;
+    @Getter
+    private static String simlootMessageFailure;
 
     public static void initializeConfig() {
         File file = ConfigurationEngine.fileCreator("ItemSettings.yml");
@@ -127,7 +135,9 @@ public class ItemSettingsConfig {
         mobItemSource = ConfigurationEngine.setString(fileConfiguration, "mobSourceItemLores", "&7Looted from $mob");
         loreWorth = ConfigurationEngine.setString(fileConfiguration, "loreWorths", "&7Worth $worth $currencyName");
         loreResale = ConfigurationEngine.setString(fileConfiguration, "loreResaleValues", "&7Sells for $resale $currencyName");
-        flatDropRate = ConfigurationEngine.setDouble(fileConfiguration, "flatDropRateV2", 0.33);
+        flatDropRate = ConfigurationEngine.setDouble(fileConfiguration, "flatDropRateV3", 0.20);
+        regionalBossNonUniqueDropRate = ConfigurationEngine.setDouble(fileConfiguration, "regionalBossNonUniqueDropRate", 0.05);
+        regionalBossesDropVanillaLoot = ConfigurationEngine.setBoolean(fileConfiguration, "regionalBossesDropVanillaLoot", false);
         tierIncreaseDropRate = ConfigurationEngine.setDouble(fileConfiguration, "tierIncreaseDropRateV2", 0.00);
         proceduralItemWeight = ConfigurationEngine.setDouble(fileConfiguration, "proceduralItemDropWeight", 90);
         weighedItemWeight = ConfigurationEngine.setDouble(fileConfiguration, "weighedItemDropWeight", 1);
@@ -162,6 +172,8 @@ public class ItemSettingsConfig {
         lowArmorDurabilityItemDropMessage = ConfigurationEngine.setString(fileConfiguration, "lowDurabilityItemDropMessage", "&8[EliteMobs] &cDropped armor due to low durability! &8Repair it at the NPC with scrap to use it!");
         lowWeaponDurabilityItemDropMessage = ConfigurationEngine.setString(fileConfiguration, "lowWeaponItemDropMessage", "&8[EliteMobs] &cDropped weapon due to low durability! &8Repair it at the NPC with scrap to use it!");
         minimumProcedurallyGeneratedDiamondLootLevelPlusSeven = ConfigurationEngine.setInt(fileConfiguration, "minimumProcedurallyGeneratedDiamondLootLevelPlusSeven", 10);
+        simlootMessageSuccess = ConfigurationEngine.setString(fileConfiguration, "simlootMessageSuccess", "&8[EliteMobs] &2Rolled for loot and got $itemName &2!");
+        simlootMessageFailure = ConfigurationEngine.setString(fileConfiguration, "simlootMessageFailure", "&8[EliteMobs] &cRolled for loot and got nothing!");
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }

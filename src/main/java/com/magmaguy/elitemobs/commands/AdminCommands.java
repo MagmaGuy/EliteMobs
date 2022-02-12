@@ -163,7 +163,7 @@ public class AdminCommands {
                         commandContext.get("powers"))));
 
         ArrayList<String> customBosses = new ArrayList<>(CustomBossesConfig.getCustomBosses().keySet());
-        ArrayList<String> regionalBosses = new ArrayList<>(CustomBossesConfigFields.regionalElites.keySet());
+        ArrayList<String> regionalBosses = new ArrayList<>(CustomBossesConfigFields.getRegionalElites().keySet());
 
         // /em spawncustom <fileName>
         manager.command(builder.literal("spawncustom", "spawncustomboss")
@@ -409,6 +409,42 @@ public class AdminCommands {
                         (Player) commandContext.getSender(),
                         commandContext.get("level"),
                         commandContext.get("times"))));
+
+        // /em simlootother <level> <player>
+        manager.command(builder.literal("simlootother")
+                .argument(IntegerArgument.newBuilder("level"),
+                        ArgumentDescription.of("Level of Elite Mob to simulate"))
+                .meta(CommandMeta.DESCRIPTION, "Simulates drops from an Elite Mob from the set tier")
+                .argument(StringArgument.<CommandSender>newBuilder("player").withSuggestionsProvider(((objectCommandContext, s) -> {
+                            ArrayList<String> arrayList = new ArrayList<>();
+                            Bukkit.getOnlinePlayers().forEach(player -> arrayList.add(player.getName()));
+                            return arrayList;
+                        })),
+                        ArgumentDescription.of("Name of the player that will get the custom item"))
+                .senderType(CommandSender.class)
+                .permission("elitemobs.*")
+                .handler(commandContext -> SimLootCommand.run(commandContext.getSender(), commandContext.get("level"), commandContext.get("player"))));
+
+        // /em simlootothermultiple <level> <times> <player>
+        manager.command(builder.literal("simlootothermultiple")
+                .argument(IntegerArgument.newBuilder("level"),
+                        ArgumentDescription.of("Level of Elite Mob to simulate"))
+                .argument(IntegerArgument.newBuilder("times"),
+                        ArgumentDescription.of("Number of times that the simulation will run"))
+                .meta(CommandMeta.DESCRIPTION, "Simulates drops from an Elite Mob from the set tier a set amount of times")
+                .argument(StringArgument.<CommandSender>newBuilder("target").withSuggestionsProvider(((objectCommandContext, s) -> {
+                            ArrayList<String> arrayList = new ArrayList<>();
+                            Bukkit.getOnlinePlayers().forEach(player -> arrayList.add(player.getName()));
+                            return arrayList;
+                        })),
+                        ArgumentDescription.of("Name of the player that will get the custom item"))
+                .senderType(CommandSender.class)
+                .permission("elitemobs.*")
+                .handler(commandContext -> SimLootCommand.runMultipleTimes(
+                       commandContext.getSender(),
+                        commandContext.get("level"),
+                        commandContext.get("times"),
+                        commandContext.get("target"))));
 
         // /em version
         manager.command(builder.literal("version")

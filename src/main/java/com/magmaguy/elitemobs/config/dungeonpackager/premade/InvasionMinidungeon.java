@@ -12,7 +12,7 @@ public class InvasionMinidungeon extends DungeonPackagerConfigFields {
     public InvasionMinidungeon(){
         super("invasion_minidungeon",
                 false,
-                "The Invasion",
+                "&2The Invasion",
                 DungeonLocationType.WORLD,
                 Arrays.asList("&fThe Halloween Minidungeon!",
                         "&6Credits: MagmaGuy & 69OzCanOfBepis"),
@@ -29,7 +29,7 @@ public class InvasionMinidungeon extends DungeonPackagerConfigFields {
                 new Vector(0, 0, 0),
                 0D,
                 0D,
-                1,
+                0,
                 "Difficulty: &6Medium\n" +
                         "$bossCount aliens, from level $lowestTier to $highestTier\n" +
                         "&6Don't get abducted!",

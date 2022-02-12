@@ -29,7 +29,7 @@ public class RuinsLair extends DungeonPackagerConfigFields {
                 new Vector(-1, -4, 18),
                 0,
                 0,
-                3,
+                0,
                 "Difficulty: &cHard\n" +
                         "$bossCount level $lowestTier Big Boss!\n"  +
                         "&cA tough fight against a Norse god!",

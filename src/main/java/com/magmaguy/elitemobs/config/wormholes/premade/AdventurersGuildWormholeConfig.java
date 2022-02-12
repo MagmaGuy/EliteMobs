@@ -9,7 +9,7 @@ public class AdventurersGuildWormholeConfig extends WormholeConfigFields {
                 true,
                 "em_adventurers_guild,204.5,89,235.5,-89,0",
                 "your_world_here,0.5,64,0.5,0,0",
-                Wormhole.WormholeStyle.CUBE);
+                Wormhole.WormholeStyle.ICOSAHEDRON);
         setBlindPlayer(true);
     }
 }

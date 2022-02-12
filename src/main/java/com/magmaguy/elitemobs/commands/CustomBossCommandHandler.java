@@ -11,6 +11,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 public class CustomBossCommandHandler {
+    private CustomBossCommandHandler() {
+    }
 
     public static Location autoSeekSafeSpawnLocation(Location originalLocation) {
         Location newLocation = new Location(originalLocation.getWorld(),
@@ -26,7 +28,7 @@ public class CustomBossCommandHandler {
     }
 
     public static void addSpawnLocation(String customBossConfigFieldsString, Player player) {
-        CustomBossesConfigFields customBossesConfigFields = CustomBossesConfigFields.regionalElites.get(customBossConfigFieldsString);
+        CustomBossesConfigFields customBossesConfigFields = CustomBossesConfigFields.getRegionalElites().get(customBossConfigFieldsString);
         if (customBossesConfigFields == null)
             player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Failed to add spawn location! Custom Boss " + customBossConfigFieldsString + " is not valid regional boss!"));
         else {
@@ -34,7 +36,7 @@ public class CustomBossCommandHandler {
             if (safeSpawnLocation == null)
                 player.sendMessage("[EliteMobs] No safe spawn location found! Make sure the area is passable!");
             else {
-                RegionalBossEntity regionalBossEntity = RegionalBossEntity.createPermanentRegionalBossEntity(customBossesConfigFields, safeSpawnLocation);
+                RegionalBossEntity.createPermanentRegionalBossEntity(customBossesConfigFields, safeSpawnLocation);
             }
         }
     }
@@ -45,7 +47,7 @@ public class CustomBossCommandHandler {
             player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Failed to add relative location! Minidungeon is not valid!"));
             return;
         }
-        CustomBossesConfigFields customBossesConfigFields = CustomBossesConfigFields.regionalElites.get(customBossConfigFieldsString);
+        CustomBossesConfigFields customBossesConfigFields = CustomBossesConfigFields.getRegionalElites().get(customBossConfigFieldsString);
         if (customBossesConfigFields == null)
             player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Failed to add relative location! Custom boss is not valid!"));
         else {
@@ -58,7 +60,7 @@ public class CustomBossCommandHandler {
     }
 
     public static void setLeashRadius(String customBossConfigFieldsString, CommandSender commandSender, int leashRadius) {
-        CustomBossesConfigFields customBossesConfigFields = CustomBossesConfigFields.regionalElites.get(customBossConfigFieldsString);
+        CustomBossesConfigFields customBossesConfigFields = CustomBossesConfigFields.getRegionalElites().get(customBossConfigFieldsString);
         if (customBossesConfigFields == null) {
             commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Failed set the leash radius! Was the boss a valid regional boss?"));
             return;

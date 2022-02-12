@@ -1,9 +1,11 @@
 package com.magmaguy.elitemobs.items.potioneffects;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.items.potioneffects.custom.Harm;
 import com.magmaguy.elitemobs.items.potioneffects.custom.Heal;
 import com.magmaguy.elitemobs.items.potioneffects.custom.Saturation;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.utils.EntityFinder;
 import org.bukkit.Bukkit;
@@ -114,6 +116,13 @@ public class PlayerPotionEffects implements Listener {
                 if (elitePotionEffect.getPotionEffect().getType().equals(PotionEffectType.HARM)) {
                     Harm.doHarm(player, elitePotionEffect);
                     return;
+                }
+                if (elitePotionEffect.getPotionEffect().getType().equals(PotionEffectType.LEVITATION)) {
+                    EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(damagee);
+                    if (eliteEntity != null && eliteEntity.getHealthMultiplier() > 1)
+                        return;
+                    if (damagee.getType().equals(EntityType.PLAYER))
+                        return;
                 }
 
                 player.addPotionEffect(elitePotionEffect.getPotionEffect());

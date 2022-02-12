@@ -28,8 +28,8 @@ public class FireworksLair extends DungeonPackagerConfigFields {
                 new Vector(0, 0, 0),
                 -130D,
                 0D,
-                2,
-                "Difficulty: &6Medium\n" +
+                0,
+                "Difficulty: &cHard\n" +
                         "$bossCount level $lowestTier Big Boss!\n" +
                         "&6An encounter full of explosions!",
                 "&8[EM] &eWelcome to the fireworks show!",

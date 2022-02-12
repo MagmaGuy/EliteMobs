@@ -69,6 +69,7 @@ public class EliteMobDamagedByEliteMobEvent extends Event implements Cancellable
             LivingEntity livingEntity = EntityFinder.filterRangedDamagers(event.getDamager());
             EliteEntity damager = EntityTracker.getEliteMobEntity(livingEntity);
             if (damager == null) return;
+            if (damager.getLivingEntity() == null) return;
             if (EliteMobProperties.getPluginData(damager.getLivingEntity().getType()) == null) return;
             double damage = EliteMobProperties.getBaselineDamage(damager.getLivingEntity().getType(), damager) + damager.getLevel();
             EliteMobDamagedByEliteMobEvent eliteMobDamagedByEliteMobEvent = new EliteMobDamagedByEliteMobEvent(damager, damagee, event, damage);

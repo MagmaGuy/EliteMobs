@@ -11,7 +11,7 @@ public class AGDarkSpireWormholeConfig extends WormholeConfigFields {
                 "dark_spire_minidungeon.yml",
                 Wormhole.WormholeStyle.CUBE);
         setBlindPlayer(true);
-        setLocation1Text("&0『Dark Spire Minidungeon』 &cLvls 100-130");
+        setLocation1Text("&0『Dark Spire Minidungeon』 &cLvls 100-120");
         setParticleColor(0x000000);
     }
 }

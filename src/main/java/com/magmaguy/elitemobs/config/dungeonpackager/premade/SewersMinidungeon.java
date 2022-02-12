@@ -28,7 +28,7 @@ public class SewersMinidungeon extends DungeonPackagerConfigFields {
                 new Vector(0, 0, 0),
                 90D,
                 0D,
-                2,
+                0,
                 "Difficulty: &6Medium\n" +
                         "$bossCount bosses, from level $lowestTier to $highestTier\n" +
                         "&6A complex dungeon maze with a challenging sections!",

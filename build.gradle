@@ -10,7 +10,7 @@ compileJava.options.encoding = "UTF-8"
 compileTestJava.options.encoding = "UTF-8"
 
 group 'com.magmaguy'
-version '7.3.12'
+version '7.3.13-SNAPSHOT-1'
 
 repositories {
     maven {
@@ -52,7 +52,12 @@ repositories {
     maven { url = 'https://maven.enginehub.org/repo/' }
 
     //Model Engine
-    maven { url = 'https://mvn.lumine.io/repository/maven-public/' }
+    maven {
+        url = 'https://mvn.lumine.io/repository/maven-public/'
+        metadataSources {
+            artifact()
+        }
+    }
 
 }
 
@@ -100,7 +105,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.22'
 
     //Model Engine
-    compileOnly "com.ticxo.modelengine:api:R2.2.0"
+    compileOnly "com.ticxo.modelengine:api:R2.4.0"
 
     testCompileOnly 'org.projectlombok:lombok:1.18.20'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.20'

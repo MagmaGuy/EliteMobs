@@ -10,6 +10,9 @@ public class WormholesConfig {
     private static String dungeonNotInstalledMessage;
     @Getter
     private static String defaultPortalMissingMessage;
+    @Getter
+    private static boolean reducedParticlesMode;
+
     private WormholesConfig() {
     }
 
@@ -19,6 +22,7 @@ public class WormholesConfig {
 
         dungeonNotInstalledMessage = ConfigurationEngine.setString(fileConfiguration, "dungeonNotInstalledMessage", "&8[EliteMobs] &cDungeon $dungeonID &cis not installed! This teleport will not work.");
         defaultPortalMissingMessage = ConfigurationEngine.setString(fileConfiguration, "defaultPortalMissingMessage", "&8[EliteMobs] &cThis portal doesn't seem to lead anywhere!");
+        reducedParticlesMode = ConfigurationEngine.setBoolean(fileConfiguration, "reducedParticlesMode", false);
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }

@@ -6,7 +6,6 @@ import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.menus.premade.GuildRankMenuConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -61,17 +60,27 @@ public class GuildRankMenuHandler implements Listener {
     }
 
     private static void selectPrestigeUnlock(Player player) {
+        if (GuildRank.getGuildPrestigeRank(player) >= 10) return;
         if (GuildRank.getActiveGuildRank(player) != 10 + GuildRank.getGuildPrestigeRank(player))
             return;
-        if (EconomyHandler.checkCurrency(player.getUniqueId()) < tierPriceCalculator(GuildRank.getGuildPrestigeRank(player) + 12, GuildRank.getGuildPrestigeRank(player)))
+        if (EconomyHandler.checkCurrency(player.getUniqueId()) < tierPriceCalculator(GuildRank.getGuildPrestigeRank(player) + 12, GuildRank.getGuildPrestigeRank(player))) {
+            player.sendMessage(GuildRankMenuConfig.getNotEnoughCurrencyMessage()
+                    .replace("$neededAmount", tierPriceCalculator(GuildRank.getGuildPrestigeRank(player) + 12, GuildRank.getGuildPrestigeRank(player)) + "")
+                    .replace("$currentAmount", EconomyHandler.checkCurrency(player.getUniqueId()) + "")
+                    .replace("$currencyName", EconomySettingsConfig.getCurrencyName()));
             return;
+        }
         EconomyHandler.setCurrency(player.getUniqueId(), 0);
         GuildRank.setMaxGuildRank(player, 1);
         GuildRank.setActiveGuildRank(player, 1);
         GuildRank.setGuildPrestigeRank(player, GuildRank.getGuildPrestigeRank(player) + 1);
 
         for (Player iteratedPlayer : Bukkit.getOnlinePlayers()) {
-            iteratedPlayer.sendTitle(player.getDisplayName(), ChatColor.DARK_GREEN + "has unlocked Prestige " + GuildRank.getGuildPrestigeRank(player) + "!");
+            iteratedPlayer.sendTitle(
+                    ChatColorConverter.convert(AdventurersGuildConfig.getPrestigeUnlockMessageSubtitle().replace("$player", player.getDisplayName()
+                            .replace("$tier", GuildRank.getGuildPrestigeRank(player) + ""))),
+                    ChatColorConverter.convert(AdventurersGuildConfig.getPrestigeUnlockMessageSubtitle().replace("$player", player.getDisplayName()
+                            .replace("$tier", GuildRank.getGuildPrestigeRank(player) + ""))));
         }
         player.closeInventory();
         if (!AdventurersGuildConfig.getOnPrestigeUpCommand().isEmpty())

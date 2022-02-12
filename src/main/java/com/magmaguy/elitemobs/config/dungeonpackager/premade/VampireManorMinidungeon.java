@@ -158,7 +158,7 @@ public class VampireManorMinidungeon extends DungeonPackagerConfigFields {
                 0D,
                 0D,
                 0,
-                "Difficulty: &6Hard\n" +
+                "Difficulty: &6Medium\n" +
                         "$bossCount bosses, from level $lowestTier to $highestTier\n" +
                         "&6A deadly manor full of blood thristy creatures!\n" +
                         "&6Are you ready to face that which haunts the night?",
