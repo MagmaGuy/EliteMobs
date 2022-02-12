@@ -65,7 +65,7 @@ public class CustomFetchObjective extends Objective {
         checkProgress(player, questObjectives, -amount);
     }
 
-    private void checkProgress(Player player, QuestObjectives questObjectives, int pendingAmount) {
+    public void checkProgress(Player player, QuestObjectives questObjectives, int pendingAmount) {
         boolean strictCheck = super.currentAmount < 0 || super.currentAmount >= super.targetAmount;
         if (strictCheck) {
             if (pendingAmount > 0) strictCheck(player, pendingAmount);

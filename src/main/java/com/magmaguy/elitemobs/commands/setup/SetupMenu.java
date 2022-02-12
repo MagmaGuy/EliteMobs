@@ -145,7 +145,8 @@ public class SetupMenu {
         try {
             lore.add("&fRegional boss count: " + minidungeon.getRelativeBossLocations().getBossCount());
         } catch (Exception ex) {
-            new WarningMessage("Failed to determine regional boss count! Are the relative dungeon locations correct?");
+            //todo: fix this
+            //new WarningMessage("Failed to determine regional boss count! Are the relative dungeon locations correct?");
         }
     }
 

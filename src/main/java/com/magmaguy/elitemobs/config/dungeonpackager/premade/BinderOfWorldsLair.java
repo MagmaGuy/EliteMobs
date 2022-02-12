@@ -12,7 +12,7 @@ public class BinderOfWorldsLair extends DungeonPackagerConfigFields {
     public BinderOfWorldsLair() {
         super("binder_of_worlds_lair",
                 false,
-                "Binder Of Worlds",
+                "&5Binder Of Worlds",
                 DungeonLocationType.WORLD,
                 Arrays.asList("&5The ultimate challenge. Be prepared!",
                         "&6Credits: MagmaGuy & 69OzCanOfBepis"),
@@ -29,7 +29,7 @@ public class BinderOfWorldsLair extends DungeonPackagerConfigFields {
                 new Vector(0, 0, 0),
                 0D,
                 0D,
-                1,
+                0,
                 "Difficulty: &6Nightmare\n" +
                         "$bossCount level $highestTier final boss!\n" +
                         "&5This is the hardest fight in EliteMobs!",

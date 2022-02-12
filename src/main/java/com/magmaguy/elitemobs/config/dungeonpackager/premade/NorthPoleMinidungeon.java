@@ -12,7 +12,7 @@ public class NorthPoleMinidungeon extends DungeonPackagerConfigFields {
     public NorthPoleMinidungeon() {
         super("north_pole_minidungeon",
                 false,
-                "The North Pole",
+                "&9The North Pole",
                 DungeonLocationType.WORLD,
                 Arrays.asList("&fThe Christmas minidungeon!",
                         "&6Credits: MagmaGuy & 69OzCanOfBepis"),
@@ -29,7 +29,7 @@ public class NorthPoleMinidungeon extends DungeonPackagerConfigFields {
                 new Vector(0, 0, 0),
                 0D,
                 0D,
-                1,
+                0,
                 "Difficulty: &6Medium\n" +
                         "$bossCount bosses, from level $lowestTier to $highestTier\n" +
                         "&6Christmas in a snow globe!",

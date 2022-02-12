@@ -42,7 +42,13 @@ public class WormholeTask {
                 if (!wormholeEntry.getWormhole().getWormholeConfigFields().getStyle().equals(Wormhole.WormholeStyle.NONE)) {
                     if (counter >= wormholeEntry.getWormhole().getCachedRotations().size())
                         counter = 0;
-                    visualEffect(counter, wormholeEntry);
+                    if (WormholesConfig.isReducedParticlesMode()) {
+                        if (counter % 2 == 0)
+                            visualEffect(counter, wormholeEntry);
+                    } else
+                        visualEffect(counter, wormholeEntry);
+                    if (counter + 1 >= Integer.MAX_VALUE)
+                        counter = 0;
                     counter++;
                 }
             }

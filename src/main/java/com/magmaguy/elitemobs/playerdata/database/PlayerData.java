@@ -17,6 +17,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import javax.annotation.Nullable;
@@ -54,6 +55,13 @@ public class PlayerData {
      * @param uuid
      */
     public PlayerData(UUID uuid) {
+        Player player = Bukkit.getPlayer(uuid);
+        if (player == null) {
+            new WarningMessage("EliteMobs did not initialize player data for uuid " + uuid + " because Minecraft does not recognize this as a valid player!");
+            return;
+        }
+        PermissionAttachment permissionAttachment = player.addAttachment(MetadataHandler.PLUGIN);
+        permissionAttachment.setPermission("elitequest.*", false);
         new BukkitRunnable() {
             @Override
             public void run() {

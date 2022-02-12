@@ -83,6 +83,7 @@ public class EventsRegistrer {
 
     private static PluginManager pluginManager;
     private static Plugin plugin;
+
     private EventsRegistrer() {
     }
 
@@ -92,6 +93,8 @@ public class EventsRegistrer {
         plugin = MetadataHandler.PLUGIN;
 
         register(new FirstTimeSetup());
+
+        register(new com.magmaguy.elitemobs.versionnotifier.VersionChecker.VersionCheckerEvents());
 
         register(new PlayerData.PlayerDataEvents());
         register(new ElitePlayerInventory.ElitePlayerInventoryEvents());

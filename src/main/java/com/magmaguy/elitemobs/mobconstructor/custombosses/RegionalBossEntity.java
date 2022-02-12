@@ -4,6 +4,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.internal.NewMinidungeonRelativeBossLocationEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
+import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
@@ -231,6 +232,8 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
     public void spawn(boolean silent) {
         super.spawn(silent);
         this.isRespawning = false;
+        if (!ItemSettingsConfig.isRegionalBossesDropVanillaLoot())
+            super.vanillaLoot = false;
         if (livingEntity != null) {
             checkLeash();
             getLivingEntity().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 4));

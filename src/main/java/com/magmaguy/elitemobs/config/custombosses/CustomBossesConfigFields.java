@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.config.CustomConfigFieldsInterface;
+import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.items.customloottable.CustomLootTable;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
@@ -16,9 +17,8 @@ import java.util.*;
 
 public class CustomBossesConfigFields extends CustomConfigFields implements CustomConfigFieldsInterface {
 
-
-    private static final HashSet<CustomBossesConfigFields> naturallySpawnedElites = new HashSet<>();
-    public static Map<String, CustomBossesConfigFields> regionalElites = new HashMap<>();
+    @Getter
+    private static Map<String, CustomBossesConfigFields> regionalElites = new HashMap<>();
     @Getter
     private CustomLootTable customLootTable = null;
     @Getter
@@ -182,11 +182,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     /**
      * Creates a new default pre-made Custom Boss. The boss is further customized through a builder pattern.
      *
-     * @param fileName
-     * @param entityType
-     * @param isEnabled
-     * @param name
-     * @param level
      */
     public CustomBossesConfigFields(String fileName,
                                     EntityType entityType,
@@ -204,9 +199,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         super(fileName, isEnabled);
     }
 
-    public static HashSet<CustomBossesConfigFields> getNaturallySpawnedElites() {
-        return naturallySpawnedElites;
-    }
 
     //This method unifies all level placeholders down to $level and applies a custom level for quest display purposes
     public String getCleanName(int level) {
@@ -264,7 +256,7 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     @Override
     public void processConfigFields() {
         this.isEnabled = processBoolean("isEnabled", isEnabled, true, true);
-        this.entityType = processEnum("entityType", entityType, EntityType.ZOMBIE,EntityType.class, true);
+        this.entityType = processEnum("entityType", entityType, EntityType.ZOMBIE, EntityType.class, true);
         this.name = processString("name", name, "Default Name", true);
         //Levels are strings because "dynamic" is a valid value
         this.level = processString("level", level, "dynamic", true);
@@ -310,14 +302,17 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         this.boots = processItemStack("boots", boots, null, false);
         this.mainHand = processItemStack("mainHand", mainHand, null, false);
         this.offHand = processItemStack("offHand", offHand, null, false);
-        this.regionalBoss = processBoolean("isRegionalBoss", isRegionalBoss(), false, false);
-        this.normalizedCombat = processBoolean("normalizedCombat", normalizedCombat, false, false);
-
+        this.regionalBoss = processBoolean("isRegionalBoss", regionalBoss, false, false);
         this.onSpawnBlockStates = processStringList("onSpawnBlockStates", onSpawnBlockStates, new ArrayList<>(), false);
         this.onRemoveBlockStates = processStringList("onRemoveBlockStates", onRemoveBlockStates, new ArrayList<>(), false);
 
         cullReinforcements = processBoolean("cullReinforcements", cullReinforcements, true, false);
         damageModifiers = processDamageModifiers("damageModifiers", damageModifiers);
+
+        if (MobCombatSettingsConfig.isNormalizeRegionalBosses() && isRegionalBoss())
+            this.normalizedCombat = true;
+        else
+            this.normalizedCombat = processBoolean("normalizedCombat", normalizedCombat, false, false);
     }
 
     private HashMap<Material, Double> processDamageModifiers(String path, HashMap<Material, Double> pluginDefaults) {

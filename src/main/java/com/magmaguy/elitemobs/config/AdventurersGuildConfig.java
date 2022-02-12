@@ -70,6 +70,10 @@ public class AdventurersGuildConfig {
     private static int baseKillsForRankUp;
     @Getter
     private static int additionalKillsForRankUpPerTier;
+    @Getter
+    private static String prestigeUnlockMessageTitle;
+    @Getter
+    private static String prestigeUnlockMessageSubtitle;
     private static File file;
     private static FileConfiguration fileConfiguration;
 
@@ -370,6 +374,9 @@ public class AdventurersGuildConfig {
 
         baseKillsForRankUp = ConfigurationEngine.setInt(fileConfiguration, "baseKillsForRankUp", 100);
         additionalKillsForRankUpPerTier = ConfigurationEngine.setInt(fileConfiguration, "additionalKillsForRankUpPerTier", 50);
+
+        prestigeUnlockMessageTitle = ConfigurationEngine.setString(fileConfiguration, "prestigeUnlockMessageTitle", "$player");
+        prestigeUnlockMessageSubtitle = ConfigurationEngine.setString(fileConfiguration, "prestigeUnlockMessageSubtitle", "&2has unlocked $tier&2!");
 
         //initializes the AG location
         AdventurersGuildCommand.defineTeleportLocation();

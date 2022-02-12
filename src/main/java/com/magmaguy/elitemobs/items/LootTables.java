@@ -10,6 +10,7 @@ import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
@@ -98,6 +99,8 @@ public class LootTables implements Listener {
         Handle the odds of an item dropping
          */
         double baseChance = ItemSettingsConfig.getFlatDropRate();
+        if (eliteEntity instanceof RegionalBossEntity)
+            baseChance = ItemSettingsConfig.getRegionalBossNonUniqueDropRate();
         double dropChanceBonus = ItemSettingsConfig.getTierIncreaseDropRate() * itemTier;
 
         if (ThreadLocalRandom.current().nextDouble() > baseChance + dropChanceBonus) return null;
