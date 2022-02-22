@@ -18,7 +18,15 @@ public class QuestInteractionHandler {
     }
 
     public static void processDynamicQuests(Player player, NPCEntity npcEntity) {
-        QuestMenu.generateDynamicQuestMenu(DynamicQuest.getQuests(player), player);
+        List<DynamicQuest> dynamicQuests = new ArrayList<>();
+        DynamicQuest.getQuests(player).forEach(quest -> {
+            if (!quest.getQuestObjectives().isTurnedIn()) dynamicQuests.add(quest);
+        });
+        if (PlayerData.getQuests(player.getUniqueId()) != null)
+            for (Quest quest : PlayerData.getQuests(player.getUniqueId()))
+                if (quest instanceof DynamicQuest && !dynamicQuests.contains(quest))
+                    dynamicQuests.add((DynamicQuest) quest);
+        QuestMenu.generateDynamicQuestMenu(dynamicQuests, player, npcEntity);
     }
 
     public static void processNPCQuests(Player player, NPCEntity npcEntity) {

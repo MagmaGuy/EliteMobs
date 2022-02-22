@@ -23,6 +23,7 @@ import java.util.Scanner;
 public class VersionChecker {
     private static final List<Minidungeon> outdatedDungeons = new ArrayList<>();
     private static boolean pluginIsUpToDate = true;
+
     private VersionChecker() {
     }
 
@@ -87,6 +88,7 @@ public class VersionChecker {
             outdatedDungeons.clear();
             for (Minidungeon minidungeon : Minidungeon.getMinidungeons().values())
                 if (minidungeon.isInstalled()) {
+                    if (!minidungeon.getDungeonPackagerConfigFields().isDefaultDungeon()) continue;
                     try {
                         String versionString = readStringFromURL("https://www.magmaguy.com/api/" + minidungeon.getDungeonPackagerConfigFields().getFilename().replace(".yml", ""));
                         int releaseVersion = Integer.parseInt(versionString);

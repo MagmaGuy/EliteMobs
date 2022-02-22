@@ -50,7 +50,7 @@ public class VanillaCustomLootEntry extends CustomLootEntry implements Serializa
     }
 
     public ItemStack generateItemStack() {
-        return new ItemStack(material, getAmount());
+        return new ItemStack(material, 1);
     }
 
     @Override

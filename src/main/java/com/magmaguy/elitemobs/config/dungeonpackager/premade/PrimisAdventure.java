@@ -36,7 +36,6 @@ public class PrimisAdventure extends DungeonPackagerConfigFields {
                 "&8[EM] &6Primis awaits, strike the earth!",
                 "&8[EM] &6You have left Primis!");
         setWormholeWorldName("em_primis_wormhole");
-        setWormholeEnvironment(World.Environment.NORMAL);
         setHasCustomModels(true);
     }
 }

@@ -22,6 +22,7 @@ public class CustomModel {
     private boolean success = false;
 
     private CustomModel(LivingEntity livingEntity, String modelName, String nametagName) {
+
         try {
             if (ModelEngineAPI.api.getModelManager().getModelRegistry().getModelBlueprint(modelName) == null)
                 new InfoMessage("Model " + modelName + " was not found! Make sure you install the model correctly if you have it. This entry will be skipped!");
@@ -30,38 +31,31 @@ public class CustomModel {
         }
 
         activeModel = ModelEngineAPI.api.getModelManager().createActiveModel(modelName);
-        if (activeModel == null) {
+
+        if (activeModel == null || activeModel.getModelId() == null) {
             new WarningMessage("Failed to load model from " + modelName + " ! Is the model name correct, and has the model been installed correctly?");
             return;
         }
 
-        try {
-            if (activeModel.getModelId() == null) return;
-        } catch (Exception exception) {
-            new WarningMessage("Well fuck me I guess");
-            return;
-        }
-
         modeledEntity = ModelEngineAPI.api.getModelManager().createModeledEntity(livingEntity);
+
         if (modeledEntity == null) {
             new WarningMessage("Failed to create model entity " + modelName + " ! Is the model name correct, and has the model been installed correctly?");
             return;
         }
 
         try {
-            try {
-                modeledEntity.addActiveModel(activeModel);
-                modeledEntity.detectPlayers();
-                modeledEntity.setInvisible(true);
-                setName(nametagName, true);
-                success = true;
-            } catch (Exception exception) {
-                modeledEntity.removeModel(modelName);
-                new WarningMessage("Failed to make model entity " + modelName + " ! Is the model name correct, and has the model been installed correctly?");
-            }
-        } catch (NoSuchMethodError error) {
+            modeledEntity.addActiveModel(activeModel);
+            modeledEntity.detectPlayers();
+            modeledEntity.setInvisible(true);
+            setName(nametagName, true);
+            success = true;
+        } catch (Exception exception) {
+            modeledEntity.removeModel(modelName);
             new WarningMessage("Failed to make model entity " + modelName + " ! Is the model name correct, and has the model been installed correctly?");
+            exception.printStackTrace();
         }
+
     }
 
     public static CustomModel generateCustomModel(LivingEntity livingEntity, String modelName, String nametagName) {
@@ -99,8 +93,13 @@ public class CustomModel {
 
     public void setName(String nametagName, boolean visible) {
         if (modeledEntity == null) return;
+        /*
+        modeledEntity.setNametag(nametagName);
+        modeledEntity.setNametagVisible(visible);
+        */
         modeledEntity.getNametagHandler().setCustomName("hitbox", nametagName);
         modeledEntity.getNametagHandler().setCustomNameVisibility("hitbox", true);
+
     }
 
     public void switchPhase() {
@@ -108,6 +107,7 @@ public class CustomModel {
     }
 
     public void setNameVisible(boolean visible) {
+       // modeledEntity.setNametagVisible(visible);
         modeledEntity.getNametagHandler().setCustomNameVisibility("hitbox", visible);
     }
 

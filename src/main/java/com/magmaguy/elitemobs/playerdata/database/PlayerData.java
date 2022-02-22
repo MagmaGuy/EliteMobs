@@ -267,6 +267,7 @@ public class PlayerData {
     }
 
     public static void removeQuest(UUID uuid, Quest quest) {
+        if (quest == null) return;
         playerDataHashMap.get(uuid).quests.removeIf(iteratedQuest -> iteratedQuest.getQuestID().equals(quest.getQuestID()));
         updateQuestStatus(uuid);
     }

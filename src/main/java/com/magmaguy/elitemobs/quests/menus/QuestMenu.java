@@ -32,8 +32,8 @@ public class QuestMenu {
         BookMaker.generateBook(player, generateQuestEntries(customQuestList, player, npcEntity));
     }
 
-    public static void generateDynamicQuestMenu(List<DynamicQuest> dynamicQuests, Player player) {
-        BookMaker.generateBook(player, generateQuestEntries(dynamicQuests, player, null));
+    public static void generateDynamicQuestMenu(List<DynamicQuest> dynamicQuests, Player player, NPCEntity npcEntity) {
+        BookMaker.generateBook(player, generateQuestEntries(dynamicQuests, player, npcEntity));
     }
 
     public static TextComponent[] generateQuestEntries(List<? extends Quest> quests, Player player, NPCEntity npcEntity) {
@@ -186,7 +186,9 @@ public class QuestMenu {
         //Quest is complete, turn in placeholder
         if (npcEntity != null &&
                 quest.getQuestObjectives().isOver() &&
-                quest.getQuestTaker().equals(npcEntity.getNpCsConfigFields().getFilename()))
+                quest instanceof DynamicQuest ||
+                quest instanceof CustomQuest &&
+                        quest.getQuestTaker().equals(npcEntity.getNpCsConfigFields().getFilename()))
             return questAcceptComplete(quest);
 
         //Quest has begun but is either not over or the player is not talking to the turn in npc
