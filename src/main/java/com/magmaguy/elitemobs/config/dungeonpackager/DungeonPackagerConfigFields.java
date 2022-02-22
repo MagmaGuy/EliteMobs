@@ -42,9 +42,6 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
     @Getter
     private World.Environment environment = World.Environment.NORMAL;
     @Getter
-    @Setter
-    private World.Environment wormholeEnvironment = World.Environment.NORMAL;
-    @Getter
     private boolean protect = true;
     @Getter
     private Location anchorPoint;
@@ -78,6 +75,8 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
     @Getter
     @Setter
     private boolean hasCustomModels = false;
+    @Getter
+    private boolean defaultDungeon = false;
 
 
     public DungeonPackagerConfigFields(String fileName, boolean isEnabled){
@@ -127,6 +126,7 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
         this.playerInfo = playerInfo;
         this.regionEnterMessage = regionEnterMessage;
         this.regionLeaveMessage = regionLeaveMessage;
+        defaultDungeon = true;
     }
 
     @Override
@@ -153,7 +153,6 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
         this.wormholeWorldName = processString("wormholeWorldName", wormholeWorldName, "", false);
         this.schematicName = processString("schematicName", schematicName, "", false);
         this.environment = processEnum("environment", environment, null, World.Environment.class, false);
-        this.wormholeEnvironment = processEnum("wormholeEnvironment", wormholeEnvironment, null, World.Environment.class, false);
         this.protect = processBoolean("protect", protect, true, true);
         this.anchorPoint = processLocation("anchorPoint", anchorPoint, null, false);
         this.rotation = processDouble("rotation", rotation, 0, false);
