@@ -1,5 +1,5 @@
 name: EliteMobs
-version: 7.3.13-SNAPSHOT-1
+version: 7.3.13-SNAPSHOT-2
 author: MagmaGuy
 main: com.magmaguy.elitemobs.EliteMobs
 api-version: 1.14
@@ -48,7 +48,7 @@ permissions:
     description: Allows players to run /elitemobs checktier [player]
     default: op
   elitemobs.gettier:
-    description: Allows players tu run /elitemobs gettier [tier]
+    description: Allows players to run /elitemobs gettier [tier]
     default: op
   elitemobs.versionnotification:
     description: Allows players to get notified about plugin updates
