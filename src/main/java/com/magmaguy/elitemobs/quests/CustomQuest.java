@@ -10,6 +10,7 @@ import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.objectives.QuestObjectives;
 import com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldowns;
 import com.magmaguy.elitemobs.quests.rewards.QuestReward;
+import com.magmaguy.elitemobs.utils.Developer;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
@@ -52,12 +53,16 @@ public class CustomQuest extends Quest {
 
     public static Quest startQuest(String questID, Player player) {
         Quest quest = null;
+        Developer.message("pending player quests " + pendingPlayerQuests.get(player.getUniqueId()).size());
         for (Quest iteratedQuest : pendingPlayerQuests.get(player.getUniqueId()))
             if (iteratedQuest.getQuestID().equals(UUID.fromString(questID))) {
                 quest = iteratedQuest;
                 break;
             }
-        if (quest == null) player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &cInvalid quest ID!"));
+        if (quest == null) {
+            player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &cInvalid quest ID for ID " + questID));
+            return null;
+        }
         QuestAcceptEvent questAcceptEvent = new QuestAcceptEvent(player, quest);
         new EventCaller(questAcceptEvent);
         if (questAcceptEvent.isCancelled()) return null;
@@ -76,7 +81,7 @@ public class CustomQuest extends Quest {
         return customQuestsConfigFields;
     }
 
-    public void applyTemporaryPermissions(Player player){
+    public void applyTemporaryPermissions(Player player) {
         if (!getCustomQuestsConfigFields().getTemporaryPermissions().isEmpty()) {
             PermissionAttachment permissionAttachment = player.addAttachment(MetadataHandler.PLUGIN);
             for (String permission : getCustomQuestsConfigFields().getTemporaryPermissions())
@@ -84,7 +89,7 @@ public class CustomQuest extends Quest {
         }
     }
 
-    public void applyEndPermissions(Player player){
+    public void applyEndPermissions(Player player) {
         if (!getCustomQuestsConfigFields().getTemporaryPermissions().isEmpty()) {
             PermissionAttachment permissionAttachment = player.addAttachment(MetadataHandler.PLUGIN);
             for (String permission : getCustomQuestsConfigFields().getTemporaryPermissions())
