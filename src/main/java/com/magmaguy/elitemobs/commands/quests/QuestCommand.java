@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.Quest;
 import com.magmaguy.elitemobs.quests.QuestTracking;
 import com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldowns;
+import com.magmaguy.elitemobs.utils.Developer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -26,6 +27,7 @@ public class QuestCommand {
 
     // /em quest join questFilename
     public static void joinQuest(String questID, Player player) {
+        Developer.message("Quest ID: " + questID);
         CustomQuest.startQuest(questID, player);
     }
 

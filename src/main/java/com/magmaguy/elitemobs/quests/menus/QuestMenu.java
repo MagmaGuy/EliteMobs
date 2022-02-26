@@ -15,8 +15,8 @@ import com.magmaguy.elitemobs.quests.objectives.KillObjective;
 import com.magmaguy.elitemobs.quests.objectives.Objective;
 import com.magmaguy.elitemobs.utils.BookMaker;
 import com.magmaguy.elitemobs.utils.SpigotMessage;
+import lombok.Getter;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -29,19 +29,28 @@ public class QuestMenu {
     }
 
     public static void generateCustomQuestMenu(List<CustomQuest> customQuestList, Player player, NPCEntity npcEntity) {
-        BookMaker.generateBook(player, generateQuestEntries(customQuestList, player, npcEntity));
+        generateQuestMenu(customQuestList, player, npcEntity);
     }
 
     public static void generateDynamicQuestMenu(List<DynamicQuest> dynamicQuests, Player player, NPCEntity npcEntity) {
-        BookMaker.generateBook(player, generateQuestEntries(dynamicQuests, player, npcEntity));
+        generateQuestMenu(dynamicQuests, player, npcEntity);
     }
 
-    public static TextComponent[] generateQuestEntries(List<? extends Quest> quests, Player player, NPCEntity npcEntity) {
+    public static void generateQuestMenu(List<? extends Quest> quests, Player player, NPCEntity npcEntity) {
+        QuestInventoryMenu.generateInventoryQuestEntries(quests, player, npcEntity);
+        /*
+        if (GeyserDetector.bedrockPlayer(player)) {
+            generateInventoryQuestEntries(quests, player, npcEntity);
+        } else {
+            generateBookQuestEntries(quests, player, npcEntity);
+        }*/
+    }
 
+    public static void generateBookQuestEntries(List<? extends Quest> quests, Player player, NPCEntity npcEntity) {
         List<TextComponent[]> textComponents = new ArrayList<>();
         int counter = 0;
         for (Quest quest : quests) {
-            TextComponent[] iteratedTextComponent = generateQuestEntry(quest, player, npcEntity);
+            TextComponent[] iteratedTextComponent = QuestBookMenu.generateQuestEntry(quest, player, npcEntity);
             counter += iteratedTextComponent.length;
             textComponents.add(iteratedTextComponent);
         }
@@ -55,67 +64,7 @@ public class QuestMenu {
                 counter2++;
             }
 
-        return allQuests;
-    }
-
-    //NPC entity is null when the entry is generated based on a command and not a npc interaction
-    public static TextComponent[] generateQuestEntry(Quest quest, Player player, NPCEntity npcEntity) {
-
-        TextComponent header = generateHeader(quest);
-        List<TextComponent> body = generateBody(quest);
-        TextComponent fixedSummary = generateFixedSummary(quest);
-        List<TextComponent> summary = generateSummary(quest);
-        TextComponent fixedRewards = generateFixedRewards(quest);
-        List<TextComponent> rewards = generateRewards(quest);
-        TextComponent accept = generateAccept(quest, npcEntity);
-        TextComponent track = null;
-        if (quest instanceof CustomQuest)
-            track = generateTrack(player, quest);
-
-        //Condense all page elements
-        List<TextComponent> elements = new ArrayList<>();
-        elements.add(header);
-        if (quest instanceof CustomQuest && !quest.getQuestObjectives().isOver())
-            elements.addAll(body);
-        elements.add(fixedSummary);
-        elements.addAll(summary);
-        elements.add(fixedRewards);
-        elements.addAll(rewards);
-        elements.add(accept);
-        if (quest instanceof CustomQuest)
-            elements.add(track);
-
-        //Arrange them into pages, taking character count into account
-        List<TextComponent> pagesList = new ArrayList<>();
-        int pageIndex = 0;
-        int characterCount = 0;
-        int characterLimit = 185;
-        for (TextComponent textComponent : elements) {
-            characterCount += ChatColor.stripColor(textComponent.getText()).length();
-            if (pagesList.isEmpty()) {
-                textComponent.addExtra("\n");
-                pagesList.add(textComponent);
-            } else if (characterCount > characterLimit) {
-                characterCount = 0;
-                characterCount += ChatColor.stripColor(textComponent.getText()).length();
-                pageIndex++;
-                textComponent.addExtra("\n");
-                pagesList.add(textComponent);
-            } else {
-                textComponent.addExtra("\n");
-                pagesList.get(pageIndex).addExtra(textComponent);
-            }
-        }
-
-        TextComponent[] pages = new TextComponent[pagesList.size()];
-
-        int pageCounter = 0;
-        for (TextComponent textComponent : pagesList) {
-            pages[pageCounter] = textComponent;
-            pageCounter++;
-        }
-
-        return pages;
+        BookMaker.generateBook(player, allQuests);
     }
 
 
@@ -248,7 +197,41 @@ public class QuestMenu {
 
     public static TextComponent[] generateQuestEntry(Player player, NPCEntity npcEntity) {
         if (PlayerData.getQuests(player.getUniqueId()) == null) return new TextComponent[0];
-        return generateQuestEntries(PlayerData.getQuests(player.getUniqueId()), player, npcEntity);
+        return new TextComponent[1];
+        //TODO: RESTORE THIS
+        // return generateQuestMenu(PlayerData.getQuests(player.getUniqueId()), player, npcEntity);
+    }
+
+    public static class QuestText {
+        @Getter
+        private final TextComponent header;
+        @Getter
+        private final List<TextComponent> body;
+        @Getter
+        private final TextComponent fixedSummary;
+        @Getter
+        private final List<TextComponent> summary;
+        @Getter
+        private final TextComponent fixedRewards;
+        @Getter
+        private final List<TextComponent> rewards;
+        @Getter
+        private final TextComponent accept;
+        @Getter
+        private TextComponent track;
+
+        public QuestText(Quest quest, NPCEntity npcEntity, Player player) {
+            header = generateHeader(quest);
+            body = generateBody(quest);
+            fixedSummary = generateFixedSummary(quest);
+            summary = generateSummary(quest);
+            fixedRewards = generateFixedRewards(quest);
+            rewards = generateRewards(quest);
+            accept = generateAccept(quest, npcEntity);
+            track = null;
+            if (quest instanceof CustomQuest)
+                track = generateTrack(player, quest);
+        }
     }
 
 }

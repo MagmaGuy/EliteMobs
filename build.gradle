@@ -10,7 +10,7 @@ compileJava.options.encoding = "UTF-8"
 compileTestJava.options.encoding = "UTF-8"
 
 group 'com.magmaguy'
-version '7.3.13'
+version '7.3.14-SNAPSHOT-1'
 
 repositories {
     maven {
@@ -58,6 +58,9 @@ repositories {
             artifact()
         }
     }
+
+    //Geyser
+    maven {url="https://repo.opencollab.dev/maven-snapshots/"}
 
 }
 
@@ -109,6 +112,9 @@ dependencies {
 
     testCompileOnly 'org.projectlombok:lombok:1.18.20'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.20'
+
+    //Geyser for bedrock player detection
+    implementation "org.geysermc.floodgate:api:2.0-SNAPSHOT"
 
 }
 
