@@ -63,6 +63,7 @@ import com.magmaguy.elitemobs.powerstances.EffectEventHandlers;
 import com.magmaguy.elitemobs.powerstances.VisualEffectObfuscator;
 import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.QuestTracking;
+import com.magmaguy.elitemobs.quests.menus.QuestInventoryMenu;
 import com.magmaguy.elitemobs.quests.objectives.CustomFetchObjective;
 import com.magmaguy.elitemobs.quests.objectives.DialogObjective;
 import com.magmaguy.elitemobs.quests.objectives.KillObjective;
@@ -335,6 +336,7 @@ public class EventsRegistrer {
         register(new QuestProgressionEvent.QuestProgressionEventHandler());
         register(new QuestTracking.QuestTrackingEvents());
         register(new CustomQuest.CustomQuestEvents());
+        register(new QuestInventoryMenu.QuestInventoryMenuEvents());
 
         //Combat tag
         if (CombatTagConfig.isEnableCombatTag())
