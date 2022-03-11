@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.config.wormholes.premade;
 
 import com.magmaguy.elitemobs.config.wormholes.WormholeConfigFields;
-import wormhole.Wormhole;
+import com.magmaguy.elitemobs.wormhole.Wormhole;
 
 public class AGInvasionWormholeConfig extends WormholeConfigFields {
     public AGInvasionWormholeConfig() {

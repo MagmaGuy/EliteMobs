@@ -30,6 +30,8 @@ public class GenerateDatabase {
         addEntryIfEmpty("QuestsCompleted", ColumnValues.INT);
         addEntryIfEmpty("PlayerQuestCooldowns", ColumnValues.BLOB);
         addEntryIfEmpty("BackTeleportLocation", ColumnValues.TEXT);
+        addEntryIfEmpty("UseBookMenus", ColumnValues.BOOLEAN);
+        addEntryIfEmpty("DismissEMStatusScreenMessage", ColumnValues.BOOLEAN);
     }
 
     private static void addEntryIfEmpty(String columnName, ColumnValues columnValues){
@@ -65,7 +67,8 @@ public class GenerateDatabase {
         BLOB,
         INT,
         TEXT,
-        REAL
+        REAL,
+        BOOLEAN
     }
 
 }

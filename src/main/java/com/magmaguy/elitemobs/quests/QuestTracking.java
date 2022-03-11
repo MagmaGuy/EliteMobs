@@ -14,6 +14,7 @@ import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.objectives.*;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
 import com.magmaguy.elitemobs.utils.SpigotMessage;
+import com.magmaguy.elitemobs.wormhole.Wormhole;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -30,7 +31,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
-import wormhole.Wormhole;
 
 import java.util.ArrayList;
 import java.util.HashMap;

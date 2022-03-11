@@ -2,13 +2,21 @@ package com.magmaguy.elitemobs.playerdata.statusscreen;
 
 import com.magmaguy.elitemobs.config.menus.premade.PlayerStatusMenuConfig;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import com.magmaguy.elitemobs.utils.SpigotMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.inventory.Inventory;
 
-import java.util.ArrayList;
+import java.util.*;
 
 public class BossTrackingPage {
     private BossTrackingPage() {
@@ -65,5 +73,47 @@ public class BossTrackingPage {
             }
         }
         return textComponent;
+    }
+
+    protected static void bossTrackingPage(Player targetPlayer, Player requestingPlayer) {
+        Inventory inventory = Bukkit.createInventory(requestingPlayer, 54, PlayerStatusMenuConfig.getGearChestMenuName());
+        int counter = 0;
+        BossTrackingPageEvents.bosses.clear();
+        for (CustomBossEntity customBossEntity : CustomBossEntity.getTrackableCustomBosses()) {
+            BossTrackingPageEvents.bosses.add(customBossEntity);
+            inventory.setItem(counter, ItemStackGenerator.generateItemStack(Material.ZOMBIE_HEAD,
+                    customBossEntity.getCustomBossBossBar().bossBarMessage(targetPlayer, customBossEntity.getCustomBossesConfigFields().getLocationMessage()),
+                    Collections.singletonList("Click to track!")));
+            counter++;
+        }
+        inventory.setItem(53, PlayerStatusMenuConfig.getBackItem());
+        requestingPlayer.openInventory(inventory);
+        BossTrackingPageEvents.pageInventories.put(requestingPlayer, inventory);
+    }
+
+    public static class BossTrackingPageEvents implements Listener {
+        private static final Map<Player, Inventory> pageInventories = new HashMap<>();
+        private static final List<CustomBossEntity> bosses = new ArrayList<>();
+
+        @EventHandler
+        public void onInventoryInteract(InventoryClickEvent event) {
+            Player player = ((Player) event.getWhoClicked()).getPlayer();
+            if (!pageInventories.containsKey(player)) return;
+            event.setCancelled(true);
+            if (bosses.size() - 1 >= event.getSlot()){
+                player.closeInventory();
+                bosses.get(event.getSlot()).getCustomBossBossBar().addTrackingPlayer(player);
+                return;
+            }
+            if (event.getSlot() == 53) {
+                player.closeInventory();
+                CoverPage.coverPage(player);
+            }
+        }
+
+        @EventHandler
+        public void onInventoryClose(InventoryCloseEvent event) {
+            pageInventories.remove(event.getPlayer());
+        }
     }
 }

@@ -60,6 +60,11 @@ public class TranslationConfig {
     private static String chestCooldownMessage;
     @Getter
     private static String insufficientCurrencyForWormholeMessage;
+    @Getter
+    private static String dismissEMMessage;
+    @Getter
+    private static String switchEMStyleMessage;
+
     private TranslationConfig() {
     }
 
@@ -88,7 +93,9 @@ public class TranslationConfig {
         trackMessage = ConfigurationEngine.setString(fileConfiguration, "trackMessage", "Track the $name");
         chestLowRankMessage = ConfigurationEngine.setString(fileConfiguration, "chestLowRankMessage", "&7[EM] &cYour guild rank needs to be at least $rank &cin order to open this chest!");
         chestCooldownMessage = ConfigurationEngine.setString(fileConfiguration, "chestCooldownMessage", "&7[EM] &cYou've already opened this chest recently! Wait $time!");
-        insufficientCurrencyForWormholeMessage = ConfigurationEngine.setString(fileConfiguration, "insufficientCurrencyForWormholeMessage", "&8[EliteMobs] &cInsufficient currency! You need $amount to use this wormhole!");
+        insufficientCurrencyForWormholeMessage = ConfigurationEngine.setString(fileConfiguration, "insufficientCurrencyForWormholeMessage", "&8[EliteMobs] &cInsufficient currency! You need $amount to use this com.magmaguy.elitemobs.wormhole!");
+        dismissEMMessage = ConfigurationEngine.setString(fileConfiguration, "dismissEMMessage", "&8[EliteMobs] &2/elitemobs &fmenu not working for you? Try &2/elitemobs alt &fto see an alternative version of the menu! &cDon't want to see this message again? &4/em dismiss");
+        switchEMStyleMessage = ConfigurationEngine.setString(fileConfiguration, "switchEMStyleMessage", "&8[EliteMobs] &2/elitemobs &fmenu style changed! Check it out!");
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
 
     }
