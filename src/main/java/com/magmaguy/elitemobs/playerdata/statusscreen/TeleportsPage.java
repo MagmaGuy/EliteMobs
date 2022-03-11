@@ -1,14 +1,24 @@
 package com.magmaguy.elitemobs.playerdata.statusscreen;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.commands.DungeonCommands;
 import com.magmaguy.elitemobs.config.menus.premade.PlayerStatusMenuConfig;
 import com.magmaguy.elitemobs.dungeons.Minidungeon;
+import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.inventory.Inventory;
 
-import java.util.ArrayList;
+import java.util.*;
 
 
 public class TeleportsPage {
@@ -67,6 +77,51 @@ public class TeleportsPage {
                 internalCounter++;
             }
             return textComponent;
+        }
+    }
+
+    protected static void teleportsPage(Player targetPlayer, Player requestingPlayer) {
+        Inventory inventory = Bukkit.createInventory(requestingPlayer, 54, PlayerStatusMenuConfig.getGearChestMenuName());
+        int counter = 0;
+        TeleportsPageEvents.orderedDungeons.clear();
+        for (Minidungeon minidungeon : Minidungeon.getMinidungeons().values()) {
+            if (!minidungeon.isInstalled()) continue;
+            TeleportsPageEvents.orderedDungeons.add(minidungeon);
+            inventory.setItem(counter, ItemStackGenerator.generateItemStack(Material.PAPER, minidungeon.getDungeonPackagerConfigFields().getName()
+                    , Collections.singletonList(minidungeon.getDungeonPackagerConfigFields().getPlayerInfo()
+                            .replace("$bossCount", minidungeon.getRegionalBossCount() + "")
+                            .replace("$lowestTier", minidungeon.getLowestTier() + "")
+                            .replace("$highestTier", minidungeon.getHighestTier() + ""))));
+            counter++;
+        }
+        inventory.setItem(53, PlayerStatusMenuConfig.getBackItem());
+        requestingPlayer.openInventory(inventory);
+        TeleportsPageEvents.pageInventories.put(requestingPlayer, inventory);
+    }
+
+    public static class TeleportsPageEvents implements Listener {
+        private static final Map<Player, Inventory> pageInventories = new HashMap<>();
+        private static List<Minidungeon> orderedDungeons = new ArrayList<>();
+
+        @EventHandler
+        public void onInventoryInteract(InventoryClickEvent event) {
+            Player player = ((Player) event.getWhoClicked()).getPlayer();
+            if (!pageInventories.containsKey(player)) return;
+            event.setCancelled(true);
+            if (orderedDungeons.size() - 1 >= event.getSlot()){
+                player.closeInventory();
+                DungeonCommands.teleport(player, orderedDungeons.get(event.getSlot()).getDungeonPackagerConfigFields().getFilename());
+                return;
+            }
+            if (event.getSlot() == 53) {
+                player.closeInventory();
+                CoverPage.coverPage(player);
+            }
+        }
+
+        @EventHandler
+        public void onInventoryClose(InventoryCloseEvent event) {
+            pageInventories.remove(event.getPlayer());
         }
     }
 

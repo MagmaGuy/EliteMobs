@@ -1,4 +1,4 @@
-package wormhole;
+package com.magmaguy.elitemobs.wormhole;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;

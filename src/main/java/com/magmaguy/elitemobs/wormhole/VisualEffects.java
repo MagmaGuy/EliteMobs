@@ -1,4 +1,4 @@
-package wormhole;
+package com.magmaguy.elitemobs.wormhole;
 
 import com.magmaguy.elitemobs.config.WormholesConfig;
 import com.magmaguy.elitemobs.config.wormholes.WormholeConfigFields;
@@ -32,7 +32,7 @@ public class VisualEffects {
                 generateIcosahedron();
                 break;
             default:
-                new WarningMessage("Missing wormhole style for " + wormholeConfigFields.getStyle());
+                new WarningMessage("Missing com.magmaguy.elitemobs.wormhole style for " + wormholeConfigFields.getStyle());
         }
     }
 
@@ -147,13 +147,12 @@ public class VisualEffects {
                 if (counter % 2 == 0) {
                     clonedSource = clonedSource.add(ray);
                     cachedLocations.add(clonedSource.clone());
-                    counter++;
                 }
             } else {
                 clonedSource = clonedSource.add(ray);
                 cachedLocations.add(clonedSource.clone());
-                counter++;
             }
+            counter++;
         }
     }
 

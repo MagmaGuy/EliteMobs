@@ -56,13 +56,13 @@ import com.magmaguy.elitemobs.utils.ServerTime;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import com.magmaguy.elitemobs.worlds.CustomWorldLoading;
+import com.magmaguy.elitemobs.wormhole.Wormhole;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
-import wormhole.Wormhole;
 
 import java.io.File;
 import java.io.IOException;

@@ -2,9 +2,9 @@ package com.magmaguy.elitemobs.config.wormholes;
 
 import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.config.CustomConfigFieldsInterface;
+import com.magmaguy.elitemobs.wormhole.Wormhole;
 import lombok.Getter;
 import lombok.Setter;
-import wormhole.Wormhole;
 
 public class WormholeConfigFields extends CustomConfigFields implements CustomConfigFieldsInterface {
 

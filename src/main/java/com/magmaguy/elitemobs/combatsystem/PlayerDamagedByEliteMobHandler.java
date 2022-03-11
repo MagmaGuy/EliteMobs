@@ -49,7 +49,11 @@ public class PlayerDamagedByEliteMobHandler implements Listener {
             return;
         }
 
-        if (event.getEntityDamageByEntityEvent().isCancelled() && !bypass) return;
+        if (event.getEntityDamageByEntityEvent().isCancelled()){
+            if (bypass)
+                bypass = false;
+            return;
+        }
 
         //From this point on, the damage event is fully altered by Elite Mobs
 

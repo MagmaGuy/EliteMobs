@@ -1,8 +1,10 @@
 package com.magmaguy.elitemobs.playerdata.statusscreen;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.config.TranslationConfig;
 import com.magmaguy.elitemobs.config.menus.premade.PlayerStatusMenuConfig;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
+import com.magmaguy.elitemobs.thirdparty.geyser.GeyserDetector;
 import com.magmaguy.elitemobs.utils.BookMaker;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -29,11 +31,14 @@ public class PlayerStatusScreen implements Listener {
     }
 
     public PlayerStatusScreen(Player player) {
-        generateBook(player, player);
-    }
-
-    public PlayerStatusScreen(Player player, int page) {
-        generateBook(player, player);
+        if (!PlayerData.getUseBookMenus(player.getUniqueId()) || GeyserDetector.bedrockPlayer(player)) {
+            generateChestMenu(player, player);
+        } else {
+            generateBook(player, player);
+        }
+        if (!PlayerData.getDismissEMStatusScreenMessage(player.getUniqueId())){
+            player.sendMessage(TranslationConfig.getDismissEMMessage());
+        }
     }
 
     protected static void setHoverText(TextComponent textComponent, String text) {
@@ -46,6 +51,10 @@ public class PlayerStatusScreen implements Listener {
         if (!string.startsWith("§"))
             string = "§0" + string;
         return string;
+    }
+
+    private void generateChestMenu(Player requestingPlayer, Player targetPlayer){
+        CoverPage.coverPage(requestingPlayer);
     }
 
     private ItemStack generateBook(Player requestingPlayer, Player targetPlayer) {

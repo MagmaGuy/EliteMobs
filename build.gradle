@@ -10,7 +10,7 @@ compileJava.options.encoding = "UTF-8"
 compileTestJava.options.encoding = "UTF-8"
 
 group 'com.magmaguy'
-version '7.3.14-SNAPSHOT-1'
+version '7.3.14-SNAPSHOT-2'
 
 repositories {
     maven {
@@ -60,7 +60,7 @@ repositories {
     }
 
     //Geyser
-    maven {url="https://repo.opencollab.dev/maven-snapshots/"}
+    maven { url = 'https://repo.opencollab.dev/main/' }
 
 }
 
@@ -114,7 +114,8 @@ dependencies {
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.20'
 
     //Geyser for bedrock player detection
-    implementation "org.geysermc.floodgate:api:2.0-SNAPSHOT"
+    //This needs java 16 to work so you will want to change gradle.properties to match your directory for it
+    compileOnly("org.geysermc:geyser-api:2.0.2-SNAPSHOT")
 
 }
 

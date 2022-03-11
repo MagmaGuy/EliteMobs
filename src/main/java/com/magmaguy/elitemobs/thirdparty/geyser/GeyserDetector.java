@@ -1,20 +1,16 @@
 package com.magmaguy.elitemobs.thirdparty.geyser;
 
-import com.magmaguy.elitemobs.utils.Developer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.geysermc.floodgate.api.FloodgateApi;
+import org.geysermc.api.Geyser;
+import org.geysermc.api.session.Connection;
 
 public class GeyserDetector {
-    private static FloodgateApi floodgateApi = FloodgateApi.getInstance();
 
     public static boolean bedrockPlayer(Player player) {
-        if (!Bukkit.getPluginManager().isPluginEnabled("Geyser")) {
-            Developer.message("geyser could not be detected");
-            if (Bukkit.getPluginManager().isPluginEnabled("GeyserMC"))
-                Developer.message("geyser was under the name GeyserMC");
+        if (!Bukkit.getPluginManager().isPluginEnabled("Geyser-Spigot"))
             return false;
-        }
-        return floodgateApi.isFloodgatePlayer(player.getUniqueId());
+        Connection playerConnection = Geyser.api().connectionByUuid(player.getUniqueId());
+        return playerConnection != null;
     }
 }

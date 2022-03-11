@@ -48,6 +48,8 @@ public class PlayerData {
     private List<Quest> quests = new ArrayList<>();
     private PlayerQuestCooldowns playerQuestCooldowns = null;
     private Location backTeleportLocation;
+    private boolean useBookMenus;
+    private boolean dismissEMStatusScreenMessage;
 
     /**
      * Called when a player logs in, storing their data in memory
@@ -434,6 +436,44 @@ public class PlayerData {
         playerDataHashMap.get(player.getUniqueId()).backTeleportLocation = location;
     }
 
+    public static boolean getUseBookMenus(UUID uuid) {
+        if (!isInMemory(uuid))
+            return getDatabaseBoolean(uuid, "UseBookMenus");
+        return playerDataHashMap.get(uuid).useBookMenus;
+    }
+
+    public static void setUseBookMenus(Player player, boolean use) {
+        setDatabaseValue(player.getUniqueId(), "UseBookMenus", use);
+        playerDataHashMap.get(player.getUniqueId()).useBookMenus = use;
+    }
+
+    public static boolean getDismissEMStatusScreenMessage(UUID uuid) {
+        if (!isInMemory(uuid))
+            return getDatabaseBoolean(uuid, "DismissEMStatusScreenMessage");
+        return playerDataHashMap.get(uuid).dismissEMStatusScreenMessage;
+    }
+
+    public static void setDismissEMStatusScreenMessage(Player player, boolean use) {
+        setDatabaseValue(player.getUniqueId(), "DismissEMStatusScreenMessage", use);
+        playerDataHashMap.get(player.getUniqueId()).dismissEMStatusScreenMessage = use;
+    }
+
+    private static Boolean getDatabaseBoolean(UUID uuid, String value) {
+        try {
+            Statement statement = getConnection().createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM " + PLAYER_DATA_TABLE_NAME + " WHERE PlayerUUID = '" + uuid.toString() + "';");
+            boolean reply = resultSet.getBoolean(value);
+            resultSet.close();
+            statement.close();
+            return reply;
+        } catch (Exception e) {
+            new WarningMessage("Failed to get double value from database!");
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+
     private static String getDatabaseString(UUID uuid, String value) {
         try {
             Statement statement = getConnection().createStatement();
@@ -549,6 +589,20 @@ public class PlayerData {
                 }
             }
         }
+
+        if (resultSet.getObject("UseBookMenus") != null) {
+            useBookMenus = resultSet.getBoolean("UseBookMenus");
+
+        } else {
+            setUseBookMenus(Bukkit.getPlayer(uuid), true);
+        }
+
+        if (resultSet.getObject("DismissEMStatusScreenMessage") != null) {
+            dismissEMStatusScreenMessage = resultSet.getBoolean("UseBookMenus");
+        } else {
+            setDismissEMStatusScreenMessage(Bukkit.getPlayer(uuid), false);
+        }
+
         new InfoMessage("User " + uuid + " data successfully read!");
     }
 
