@@ -77,10 +77,10 @@ public class GuildRankMenuHandler implements Listener {
 
         for (Player iteratedPlayer : Bukkit.getOnlinePlayers()) {
             iteratedPlayer.sendTitle(
-                    ChatColorConverter.convert(AdventurersGuildConfig.getPrestigeUnlockMessageSubtitle().replace("$player", player.getDisplayName()
-                            .replace("$tier", GuildRank.getGuildPrestigeRank(player) + ""))),
-                    ChatColorConverter.convert(AdventurersGuildConfig.getPrestigeUnlockMessageSubtitle().replace("$player", player.getDisplayName()
-                            .replace("$tier", GuildRank.getGuildPrestigeRank(player) + ""))));
+                    ChatColorConverter.convert(AdventurersGuildConfig.getPrestigeUnlockMessageSubtitle().replace("$player", player.getDisplayName())
+                            .replace("$tier", GuildRank.getGuildPrestigeRank(player) + "")),
+                    ChatColorConverter.convert(AdventurersGuildConfig.getPrestigeUnlockMessageSubtitle().replace("$player", player.getDisplayName())
+                            .replace("$tier", GuildRank.getGuildPrestigeRank(player) + "")));
         }
         player.closeInventory();
         if (!AdventurersGuildConfig.getOnPrestigeUpCommand().isEmpty())

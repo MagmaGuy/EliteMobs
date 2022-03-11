@@ -21,6 +21,7 @@ import com.magmaguy.elitemobs.items.EliteItemLore;
 import com.magmaguy.elitemobs.items.ShareItem;
 import com.magmaguy.elitemobs.menus.*;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.playerdata.statusscreen.PlayerStatusScreen;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -320,6 +321,23 @@ public class UserCommands {
                 .handler(commandContext -> {
                     if (DefaultConfig.getDefaultSpawnLocation() != null)
                         PlayerPreTeleportEvent.teleportPlayer((Player) commandContext.getSender(), DefaultConfig.getDefaultSpawnLocation());
+                }));
+
+        // /em alt
+        manager.command(builder.literal("alt")
+                .meta(CommandMeta.DESCRIPTION, "Changes the style of the /em menu.")
+                .senderType(Player.class)
+                .handler(commandContext -> {
+                    PlayerData.setUseBookMenus(((Player) commandContext.getSender()), !PlayerData.getUseBookMenus(((Player) commandContext.getSender()).getUniqueId()));
+                    commandContext.getSender().sendMessage(TranslationConfig.getSwitchEMStyleMessage());
+                }));
+
+        // /em dismiss
+        manager.command(builder.literal("dismiss")
+                .meta(CommandMeta.DESCRIPTION, "Dismisses /em menu message.")
+                .senderType(Player.class)
+                .handler(commandContext -> {
+                    PlayerData.setDismissEMStatusScreenMessage(((Player) commandContext.getSender()), !PlayerData.getDismissEMStatusScreenMessage(((Player) commandContext.getSender()).getUniqueId()));
                 }));
 
     }

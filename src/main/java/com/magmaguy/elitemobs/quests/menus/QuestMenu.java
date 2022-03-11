@@ -13,6 +13,7 @@ import com.magmaguy.elitemobs.quests.QuestTracking;
 import com.magmaguy.elitemobs.quests.objectives.DynamicKillObjective;
 import com.magmaguy.elitemobs.quests.objectives.KillObjective;
 import com.magmaguy.elitemobs.quests.objectives.Objective;
+import com.magmaguy.elitemobs.thirdparty.geyser.GeyserDetector;
 import com.magmaguy.elitemobs.utils.BookMaker;
 import com.magmaguy.elitemobs.utils.SpigotMessage;
 import lombok.Getter;
@@ -21,6 +22,8 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.magmaguy.elitemobs.quests.menus.QuestInventoryMenu.generateInventoryQuestEntries;
 
 
 public class QuestMenu {
@@ -37,16 +40,18 @@ public class QuestMenu {
     }
 
     public static void generateQuestMenu(List<? extends Quest> quests, Player player, NPCEntity npcEntity) {
-        QuestInventoryMenu.generateInventoryQuestEntries(quests, player, npcEntity);
-        /*
-        if (GeyserDetector.bedrockPlayer(player)) {
+        if (!PlayerData.getUseBookMenus(player.getUniqueId()) || GeyserDetector.bedrockPlayer(player)) {
             generateInventoryQuestEntries(quests, player, npcEntity);
         } else {
             generateBookQuestEntries(quests, player, npcEntity);
-        }*/
+        }
     }
 
     public static void generateBookQuestEntries(List<? extends Quest> quests, Player player, NPCEntity npcEntity) {
+        BookMaker.generateBook(player, generateBookQuestEntriesComponents(quests, player, npcEntity));
+    }
+
+    public static TextComponent[] generateBookQuestEntriesComponents(List<? extends Quest> quests, Player player, NPCEntity npcEntity) {
         List<TextComponent[]> textComponents = new ArrayList<>();
         int counter = 0;
         for (Quest quest : quests) {
@@ -64,7 +69,7 @@ public class QuestMenu {
                 counter2++;
             }
 
-        BookMaker.generateBook(player, allQuests);
+        return allQuests;
     }
 
 
@@ -197,9 +202,7 @@ public class QuestMenu {
 
     public static TextComponent[] generateQuestEntry(Player player, NPCEntity npcEntity) {
         if (PlayerData.getQuests(player.getUniqueId()) == null) return new TextComponent[0];
-        return new TextComponent[1];
-        //TODO: RESTORE THIS
-        // return generateQuestMenu(PlayerData.getQuests(player.getUniqueId()), player, npcEntity);
+        return generateBookQuestEntriesComponents(PlayerData.getQuests(player.getUniqueId()), player, npcEntity);
     }
 
     public static class QuestText {

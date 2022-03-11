@@ -10,7 +10,6 @@ import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.objectives.QuestObjectives;
 import com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldowns;
 import com.magmaguy.elitemobs.quests.rewards.QuestReward;
-import com.magmaguy.elitemobs.utils.Developer;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
@@ -53,7 +52,6 @@ public class CustomQuest extends Quest {
 
     public static Quest startQuest(String questID, Player player) {
         Quest quest = null;
-        Developer.message("pending player quests " + pendingPlayerQuests.get(player.getUniqueId()).size());
         for (Quest iteratedQuest : pendingPlayerQuests.get(player.getUniqueId()))
             if (iteratedQuest.getQuestID().equals(UUID.fromString(questID))) {
                 quest = iteratedQuest;

@@ -40,6 +40,7 @@ import com.magmaguy.elitemobs.ondeathcommands.OnDeathCommands;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.playerdata.PlayerStatsTracker;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
+import com.magmaguy.elitemobs.playerdata.statusscreen.*;
 import com.magmaguy.elitemobs.powers.bosspowers.*;
 import com.magmaguy.elitemobs.powers.defensivepowers.InvulnerabilityArrow;
 import com.magmaguy.elitemobs.powers.defensivepowers.InvulnerabilityFallDamage;
@@ -74,11 +75,11 @@ import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardEliteMobOnlySpawnF
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
 import com.magmaguy.elitemobs.utils.VersionChecker;
+import com.magmaguy.elitemobs.wormhole.WormholeEntry;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
-import wormhole.WormholeEntry;
 
 public class EventsRegistrer {
 
@@ -262,6 +263,14 @@ public class EventsRegistrer {
             register(new LootTables());
             register(new PlaceEventPrevent());
         }
+
+        //player status menu
+        register(new CoverPage.CoverPageEvents());
+        register(new StatsPage.StatsPageEvents());
+        register(new GearPage.GearPageEvents());
+        register(new TeleportsPage.TeleportsPageEvents());
+        register(new CommandsPage.CommandsPageEvents());
+        register(new BossTrackingPage.BossTrackingPageEvents());
 
         //Shops
         register(new ProceduralShopMenu());

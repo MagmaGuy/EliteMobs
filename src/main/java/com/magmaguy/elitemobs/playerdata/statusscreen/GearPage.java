@@ -1,13 +1,25 @@
 package com.magmaguy.elitemobs.playerdata.statusscreen;
 
+import com.magmaguy.elitemobs.api.EliteMobsItemDetector;
 import com.magmaguy.elitemobs.config.menus.premade.PlayerStatusMenuConfig;
 import com.magmaguy.elitemobs.items.ShareItem;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.utils.VersionChecker;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class GearPage {
     protected static TextComponent gearPage(Player targetPlayer) {
@@ -194,6 +206,66 @@ public class GearPage {
                         return ChatColor.BLACK;
                 }
                 return ChatColor.DARK_GRAY;
+        }
+    }
+
+    protected static void gearPage(Player requestingPlayer, Player targetPlayer) {
+        Inventory inventory = Bukkit.createInventory(requestingPlayer, 54, PlayerStatusMenuConfig.getGearChestMenuName());
+        //head
+        if (EliteMobsItemDetector.isEliteMobsItem(targetPlayer.getInventory().getArmorContents()[3]))
+            inventory.setItem(11, targetPlayer.getInventory().getArmorContents()[3]);
+        //main hand
+        if (EliteMobsItemDetector.isEliteMobsItem(targetPlayer.getInventory().getItemInMainHand()))
+            inventory.setItem(19, targetPlayer.getInventory().getItemInMainHand());
+        //chestplate
+        if (EliteMobsItemDetector.isEliteMobsItem(targetPlayer.getInventory().getArmorContents()[2]))
+            inventory.setItem(20, targetPlayer.getInventory().getArmorContents()[2]);
+        //shield
+        if (EliteMobsItemDetector.isEliteMobsItem(targetPlayer.getInventory().getItemInOffHand()))
+            inventory.setItem(21, targetPlayer.getInventory().getItemInOffHand());
+        //leggings
+        if (EliteMobsItemDetector.isEliteMobsItem(targetPlayer.getInventory().getArmorContents()[1]))
+            inventory.setItem(29, targetPlayer.getInventory().getArmorContents()[1]);
+        //boots
+        inventory.setItem(38, targetPlayer.getInventory().getArmorContents()[0]);
+        inventory.setItem(PlayerStatusMenuConfig.getGearDamageSlot(),
+                replaceItemNamePlaceholder(PlayerStatusMenuConfig.getGearDamageItem().clone(), "$damage",
+                        ElitePlayerInventory.playerInventories.get(targetPlayer.getUniqueId()).baseDamage() + ""));
+        inventory.setItem(PlayerStatusMenuConfig.getGearArmorSlot(),
+                replaceItemNamePlaceholder(PlayerStatusMenuConfig.getGearArmorItem().clone(), "$defense",
+                        ElitePlayerInventory.playerInventories.get(targetPlayer.getUniqueId()).baseDamageReduction() + ""));
+        inventory.setItem(PlayerStatusMenuConfig.getGearThreatSlot(),
+                replaceItemNamePlaceholder(PlayerStatusMenuConfig.getGearThreatItem().clone(), "$threat",
+                        ElitePlayerInventory.playerInventories.get(targetPlayer.getUniqueId()).getNaturalMobSpawnLevel(true) + ""));
+        inventory.setItem(53, PlayerStatusMenuConfig.getBackItem());
+        GearPageEvents.pageInventories.put(requestingPlayer, inventory);
+        requestingPlayer.openInventory(inventory);
+    }
+
+    private static ItemStack replaceItemNamePlaceholder(ItemStack itemStack, String placeholder, String replacement) {
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        itemMeta.setDisplayName(itemMeta.getDisplayName().replace(placeholder, replacement));
+        itemStack.setItemMeta(itemMeta);
+        return itemStack;
+    }
+
+    public static class GearPageEvents implements Listener {
+        private static final Map<Player, Inventory> pageInventories = new HashMap<>();
+
+        @EventHandler
+        public void onInventoryInteract(InventoryClickEvent event) {
+            Player player = ((Player) event.getWhoClicked()).getPlayer();
+            if (!pageInventories.containsKey(player)) return;
+            event.setCancelled(true);
+            if (event.getSlot() == 53){
+                player.closeInventory();
+                CoverPage.coverPage(player);
+            }
+        }
+
+        @EventHandler
+        public void onInventoryClose(InventoryCloseEvent event) {
+            pageInventories.remove(event.getPlayer());
         }
     }
 }
