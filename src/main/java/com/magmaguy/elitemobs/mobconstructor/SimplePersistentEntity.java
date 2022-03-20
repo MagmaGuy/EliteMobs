@@ -94,22 +94,6 @@ public class SimplePersistentEntity {
             return ChunkVectorizer.hash(chunk);
         }
 
-        //Store world names and serialized locations
-        @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-        public void chunkLoadEvent(ChunkLoadEvent event) {
-            int chunkLocation = chunkLocation(event.getChunk());
-            List<SimplePersistentEntity> simplePersistentEntityList = new ArrayList<>(persistentEntities.get(chunkLocation));
-            if (loadingChunks.contains(chunkLocation)) return;
-            loadingChunks.add(chunkLocation);
-            Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> loadChunk(chunkLocation, simplePersistentEntityList), 1);
-            Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> loadingChunks.remove(chunkLocation), 1);
-        }
-
-        @EventHandler(ignoreCancelled = true)
-        public void worldUnloadEvent(WorldUnloadEvent event) {
-            unloadWorld(event.getWorld());
-        }
-
         /**
          * Behavior that runs when a chunk loads, spawning the entity
          *
@@ -136,6 +120,22 @@ public class SimplePersistentEntity {
                     simplePersistentEntity.npcEntity.worldUnload();
                 return true;
             });
+        }
+
+        //Store world names and serialized locations
+        @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+        public void chunkLoadEvent(ChunkLoadEvent event) {
+            int chunkLocation = chunkLocation(event.getChunk());
+            List<SimplePersistentEntity> simplePersistentEntityList = new ArrayList<>(persistentEntities.get(chunkLocation));
+            if (loadingChunks.contains(chunkLocation)) return;
+            loadingChunks.add(chunkLocation);
+            Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> loadChunk(chunkLocation, simplePersistentEntityList), 1);
+            Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> loadingChunks.remove(chunkLocation), 1);
+        }
+
+        @EventHandler(ignoreCancelled = true)
+        public void worldUnloadEvent(WorldUnloadEvent event) {
+            unloadWorld(event.getWorld());
         }
 
         @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)

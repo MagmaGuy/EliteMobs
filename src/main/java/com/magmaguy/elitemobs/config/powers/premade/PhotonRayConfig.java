@@ -3,11 +3,11 @@ package com.magmaguy.elitemobs.config.powers.premade;
 import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
 
 public class PhotonRayConfig extends PowersConfigFields {
-    public PhotonRayConfig(){
+    public PhotonRayConfig() {
         super("photon_ray",
                 true,
                 "Photon Ray",
-                 null,
+                null,
                 60,
                 20);
     }

@@ -8,7 +8,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Arrays;
 
 public class TotemZombie5Boss extends CustomBossesConfigFields {
-    public TotemZombie5Boss(){
+    public TotemZombie5Boss() {
         super("totem_zombie_5", EntityType.ZOMBIE, true, "$eventBossLevel Totem Zombie", "dynamic");
         setMountedEntity("totem_zombie_6.yml");
         setPowers(Arrays.asList("attack_gravity.yml", "attack_blinding.yml", "bonus_loot.yml"));

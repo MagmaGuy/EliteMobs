@@ -7,8 +7,8 @@ import org.bukkit.Material;
 
 import java.util.Arrays;
 
-public class GoblinLeggingsItem  extends CustomItemsConfigFields {
-    public GoblinLeggingsItem(){
+public class GoblinLeggingsItem extends CustomItemsConfigFields {
+    public GoblinLeggingsItem() {
         super("goblin_leggings",
                 true,
                 Material.GOLDEN_LEGGINGS,

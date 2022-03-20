@@ -11,14 +11,14 @@ import java.util.Arrays;
 
 public class CommandsConfig {
 
-    private CommandsConfig(){
-
-    }
-
     private static final ArrayList<CommandsConfigFields> commandsConfigFields = new ArrayList<>(Arrays.asList(
             new CheckTierConfig(),
             new CheckTierOthersConfig()
     ));
+
+    private CommandsConfig() {
+
+    }
 
     public static void initializeConfigs() {
         //Checks if the directory doesn't exist

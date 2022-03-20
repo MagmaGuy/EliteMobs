@@ -108,7 +108,7 @@ public class TeleportsPage {
             Player player = ((Player) event.getWhoClicked()).getPlayer();
             if (!pageInventories.containsKey(player)) return;
             event.setCancelled(true);
-            if (orderedDungeons.size() - 1 >= event.getSlot()){
+            if (orderedDungeons.size() - 1 >= event.getSlot()) {
                 player.closeInventory();
                 DungeonCommands.teleport(player, orderedDungeons.get(event.getSlot()).getDungeonPackagerConfigFields().getFilename());
                 return;

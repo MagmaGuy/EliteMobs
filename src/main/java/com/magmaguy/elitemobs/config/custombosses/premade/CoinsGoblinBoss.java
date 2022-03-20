@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 public class CoinsGoblinBoss extends CustomBossesConfigFields {
-    public CoinsGoblinBoss(){
+    public CoinsGoblinBoss() {
         super("coins_goblin",
                 EntityType.ZOMBIE,
                 true,

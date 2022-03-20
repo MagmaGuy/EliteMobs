@@ -15,6 +15,7 @@ public class MenusConfigFields extends CustomConfigFields implements CustomConfi
         processAdditionalFields();
     }
 
-    public void processAdditionalFields(){}
+    public void processAdditionalFields() {
+    }
 
 }

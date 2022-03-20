@@ -8,7 +8,7 @@ import org.bukkit.Material;
 import java.util.Arrays;
 
 public class GoblinSlasherItem extends CustomItemsConfigFields {
-    public GoblinSlasherItem(){
+    public GoblinSlasherItem() {
         super("goblin_slasher",
                 true,
                 Material.GOLDEN_SWORD,

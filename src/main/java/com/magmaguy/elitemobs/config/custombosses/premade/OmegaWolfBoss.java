@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 public class OmegaWolfBoss extends CustomBossesConfigFields {
-    public OmegaWolfBoss(){
+    public OmegaWolfBoss() {
         super("omega_wolf",
                 EntityType.WOLF,
                 true,

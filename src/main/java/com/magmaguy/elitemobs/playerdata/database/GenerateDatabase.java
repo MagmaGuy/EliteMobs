@@ -14,7 +14,7 @@ public class GenerateDatabase {
     public static void generate() throws Exception {
         Statement statement = PlayerData.getConnection().createStatement();
         String sql = "CREATE TABLE IF NOT EXISTS " + PlayerData.getPLAYER_DATA_TABLE_NAME() +
-                "(PlayerUUID             TEXT PRIMARY KEY    NOT NULL);" ;
+                "(PlayerUUID             TEXT PRIMARY KEY    NOT NULL);";
         statement.executeUpdate(sql);
         statement.close();
         addEntryIfEmpty("DisplayName", ColumnValues.TEXT);
@@ -34,12 +34,12 @@ public class GenerateDatabase {
         addEntryIfEmpty("DismissEMStatusScreenMessage", ColumnValues.BOOLEAN);
     }
 
-    private static void addEntryIfEmpty(String columnName, ColumnValues columnValues){
+    private static void addEntryIfEmpty(String columnName, ColumnValues columnValues) {
         try {
             DatabaseMetaData metaData = PlayerData.getConnection().getMetaData();
             ResultSet resultSet = metaData.getColumns(null, null, PlayerData.getPLAYER_DATA_TABLE_NAME(), columnName);
             if (resultSet.next()) {
-               //Developer.message("Database already had " + columnName);
+                //Developer.message("Database already had " + columnName);
             } else {
                 new InfoMessage("Adding new database column " + columnName);
                 addColumn(columnName, columnValues);

@@ -15,6 +15,7 @@ public abstract class CombatEnterScanPower extends MajorPower implements Listene
     public static HashSet<CombatEnterScanPower> combatEnterScanPowers = new HashSet<>();
     public BukkitTask bukkitTask = null;
     private boolean isActive = false;
+
     public CombatEnterScanPower(PowersConfigFields powersConfigFields) {
         super(powersConfigFields);
         combatEnterScanPowers.add(this);

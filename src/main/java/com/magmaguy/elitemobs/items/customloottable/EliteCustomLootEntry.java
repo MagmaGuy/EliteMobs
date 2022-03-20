@@ -91,6 +91,20 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
                         errorMessage(rawString, configFilename, "permission");
                     }
                     break;
+                case "itemlevel":
+                    try {
+                        super.setItemLevel(Integer.parseInt(strings[1]));
+                    } catch (Exception ex) {
+                        errorMessage(rawString, configFilename, "levl");
+                    }
+                    break;
+                case "wave":
+                    try {
+                        super.setWave(Integer.parseInt(strings[1]));
+                    } catch (Exception ex) {
+                        errorMessage(rawString, configFilename, "wave");
+                    }
+                    break;
                 default:
             }
         }

@@ -44,7 +44,7 @@ public class BossTrackingPage {
 
         for (CustomBossEntity customBossEntity : CustomBossEntity.getTrackableCustomBosses()) {
             try {
-                textComponents.add(  SpigotMessage.commandHoverMessage(
+                textComponents.add(SpigotMessage.commandHoverMessage(
                         customBossEntity.getCustomBossBossBar().bossBarMessage(player, customBossEntity.getCustomBossesConfigFields().getLocationMessage()) + "\n",
                         PlayerStatusMenuConfig.getOnBossTrackHover(),
                         "/elitemobs trackcustomboss " + customBossEntity.getEliteUUID()));
@@ -100,7 +100,7 @@ public class BossTrackingPage {
             Player player = ((Player) event.getWhoClicked()).getPlayer();
             if (!pageInventories.containsKey(player)) return;
             event.setCancelled(true);
-            if (bosses.size() - 1 >= event.getSlot()){
+            if (bosses.size() - 1 >= event.getSlot()) {
                 player.closeInventory();
                 bosses.get(event.getSlot()).getCustomBossBossBar().addTrackingPlayer(player);
                 return;

@@ -6,7 +6,7 @@ import org.bukkit.entity.EntityType;
 import java.util.Arrays;
 
 public class EliteLlamaConfig extends MobPropertiesConfigFields {
-    public EliteLlamaConfig(){
+    public EliteLlamaConfig() {
         super("elite_llama",
                 EntityType.LLAMA,
                 true,

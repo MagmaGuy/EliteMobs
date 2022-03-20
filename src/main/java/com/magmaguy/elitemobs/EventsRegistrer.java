@@ -22,6 +22,8 @@ import com.magmaguy.elitemobs.explosionregen.Explosion;
 import com.magmaguy.elitemobs.gamemodes.nightmaremodeworld.DaylightWatchdog;
 import com.magmaguy.elitemobs.gamemodes.zoneworld.ZoneWarner;
 import com.magmaguy.elitemobs.initialsetup.FirstTimeSetup;
+import com.magmaguy.elitemobs.instanced.ArenaInstance;
+import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.items.*;
 import com.magmaguy.elitemobs.items.customenchantments.*;
 import com.magmaguy.elitemobs.items.potioneffects.PlayerPotionEffects;
@@ -132,7 +134,7 @@ public class EventsRegistrer {
         register(new DefaultDropsHandler());
         register(new ItemLootShower.ItemLootShowerEvents());
 
-        //potion effects
+        //potion effects - also initializes the task
         register(new PlayerPotionEffects());
 
         //getloot AdventurersGuildMenu
@@ -346,6 +348,11 @@ public class EventsRegistrer {
         register(new QuestTracking.QuestTrackingEvents());
         register(new CustomQuest.CustomQuestEvents());
         register(new QuestInventoryMenu.QuestInventoryMenuEvents());
+
+        //Arenas
+        register(new ArenaMenu.ArenaMenuEvents());
+        register(new ArenaInstance.ArenaInstanceEvents());
+        register(new MatchInstance.MatchInstanceEvents());
 
         //Combat tag
         if (CombatTagConfig.isEnableCombatTag())

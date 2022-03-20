@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class InvasionMinidungeon extends DungeonPackagerConfigFields {
-    public InvasionMinidungeon(){
+    public InvasionMinidungeon() {
         super("invasion_minidungeon",
                 false,
                 "&2The Invasion",

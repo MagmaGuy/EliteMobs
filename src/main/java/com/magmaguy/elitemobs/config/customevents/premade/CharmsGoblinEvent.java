@@ -6,7 +6,7 @@ import com.magmaguy.elitemobs.events.CustomEvent;
 import java.util.Arrays;
 
 public class CharmsGoblinEvent extends CustomEventsConfigFields {
-    public CharmsGoblinEvent(){
+    public CharmsGoblinEvent() {
         super("charms_goblin",
                 true);
         setEventType(CustomEvent.EventType.TIMED);

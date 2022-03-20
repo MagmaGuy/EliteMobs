@@ -40,7 +40,7 @@ public class SummonEmbers extends BossPower implements Listener {
             @Override
             public void run() {
                 counter++;
-                if (!eliteEntity.isValid()){
+                if (!eliteEntity.isValid()) {
                     cancel();
                     return;
                 }

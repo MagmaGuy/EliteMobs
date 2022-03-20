@@ -16,6 +16,7 @@ public class ProceduralShopMenuConfig extends MenusConfigFields {
     public static List<Integer> storeSlots;
     public static int minTier, maxTier;
     public static String messageFullInventory;
+
     public ProceduralShopMenuConfig() {
         super("procedural_shop_menu", true);
     }

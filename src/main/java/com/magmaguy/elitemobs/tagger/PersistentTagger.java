@@ -25,6 +25,7 @@ public class PersistentTagger {
     private static final String VISUAL_EFFECT = "VisualEffect";
     @Getter
     private static final String ELITE_PROJECTILE = "EliteProjectile";
+
     private PersistentTagger() {
     }
 
@@ -80,7 +81,7 @@ public class PersistentTagger {
         return entity.getPersistentDataContainer().has(new NamespacedKey(MetadataHandler.PLUGIN, VISUAL_EFFECT), PersistentDataType.STRING);
     }
 
-    public static void tagEliteProjectile(Projectile projectile){
+    public static void tagEliteProjectile(Projectile projectile) {
         tag(projectile, ELITE_PROJECTILE, "");
     }
 

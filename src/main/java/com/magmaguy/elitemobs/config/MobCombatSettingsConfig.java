@@ -8,9 +8,6 @@ import java.util.Collections;
 import java.util.List;
 
 public class MobCombatSettingsConfig {
-    private MobCombatSettingsConfig() {
-    }
-
     @Getter
     private static boolean doNaturalMobSpawning;
     @Getter
@@ -79,6 +76,8 @@ public class MobCombatSettingsConfig {
     private static double normalizedBaselineHealth;
     @Getter
     private static boolean normalizeRegionalBosses;
+    private MobCombatSettingsConfig() {
+    }
 
     public static void initializeConfig() {
 

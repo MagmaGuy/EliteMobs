@@ -129,7 +129,7 @@ public class ElitePower {
         return this.powerCooldownActive || eliteEntity.isInCooldown();
     }
 
-    public void setInCooldown(EliteEntity eliteEntity, boolean inCooldown){
+    public void setInCooldown(EliteEntity eliteEntity, boolean inCooldown) {
         eliteEntity.setInCooldown(inCooldown);
         setInGlobalCooldown(inCooldown);
     }

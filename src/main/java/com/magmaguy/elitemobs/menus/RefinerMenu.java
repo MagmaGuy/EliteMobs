@@ -23,9 +23,8 @@ import java.util.Map;
 
 public class RefinerMenu extends EliteMenu {
 
-    private static final List<Integer> inputSlots = RefinerMenuConfig.getInputSlots();
-
     protected static final Map<Player, Inventory> inventories = new HashMap<>();
+    private static final List<Integer> inputSlots = RefinerMenuConfig.getInputSlots();
 
     private static ArrayList<ItemStack>[] calculateOutput(Inventory inventory, Player player) {
         ArrayList<ItemStack> inputItemStacks = new ArrayList<>();

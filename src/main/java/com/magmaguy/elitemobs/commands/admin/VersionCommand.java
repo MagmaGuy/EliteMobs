@@ -7,7 +7,7 @@ import org.bukkit.command.CommandSender;
 
 public class VersionCommand {
 
-    private VersionCommand(){
+    private VersionCommand() {
     }
 
     public static void getVersion(CommandSender commandSender) {

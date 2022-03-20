@@ -10,7 +10,7 @@ public class TestNPCConfig extends NPCsConfigFields {
     public TestNPCConfig() {
         super("test_npc",
                 true,
-                 "Test NPC",
+                "Test NPC",
                 "Testing!",
                 Villager.Profession.NITWIT,
                 null,

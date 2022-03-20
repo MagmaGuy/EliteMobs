@@ -13,7 +13,7 @@ public class WarningMessage {
         Bukkit.getLogger().warning("[EliteMobs] " + message);
         if (stackTrace) {
             Bukkit.getLogger().warning("[EliteMobs] Report the following to the developer at " + DiscordLinks.mainLink);
-            Bukkit.getLogger().info("EliteMobs version: " +  MetadataHandler.PLUGIN.getDescription().getVersion() + " | Server version: " + Bukkit.getServer().getVersion());
+            Bukkit.getLogger().info("EliteMobs version: " + MetadataHandler.PLUGIN.getDescription().getVersion() + " | Server version: " + Bukkit.getServer().getVersion());
             for (StackTraceElement element : Thread.currentThread().getStackTrace())
                 Bukkit.getLogger().info(element.toString());
         }

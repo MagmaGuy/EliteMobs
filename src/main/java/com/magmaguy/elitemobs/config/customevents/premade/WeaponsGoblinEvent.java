@@ -6,7 +6,7 @@ import com.magmaguy.elitemobs.events.CustomEvent;
 import java.util.Arrays;
 
 public class WeaponsGoblinEvent extends CustomEventsConfigFields {
-    public WeaponsGoblinEvent(){
+    public WeaponsGoblinEvent() {
         super("weapons_goblin", true);
         setEventType(CustomEvent.EventType.TIMED);
         setBossFilenames(Arrays.asList("weapons_goblin.yml"));

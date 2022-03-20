@@ -7,7 +7,7 @@ import org.bukkit.util.Vector;
 import java.util.Arrays;
 
 public class RuinsLair extends DungeonPackagerConfigFields {
-    public RuinsLair(){
+    public RuinsLair() {
         super("the_ruins",
                 false,
                 "&6The Ruins",
@@ -31,7 +31,7 @@ public class RuinsLair extends DungeonPackagerConfigFields {
                 0,
                 0,
                 "Difficulty: &cHard\n" +
-                        "$bossCount level $lowestTier Big Boss!\n"  +
+                        "$bossCount level $lowestTier Big Boss!\n" +
                         "&cA tough fight against a Norse god!",
                 "&8[EM] &3Those who challenge the myths must be prepared for their downfall!",
                 "&8[EM] &3You now know what it takes to make a legend!");

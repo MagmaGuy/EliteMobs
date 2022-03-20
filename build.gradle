@@ -10,7 +10,7 @@ compileJava.options.encoding = "UTF-8"
 compileTestJava.options.encoding = "UTF-8"
 
 group 'com.magmaguy'
-version '7.3.14-SNAPSHOT-2'
+version '7.3.14-SNAPSHOT-3'
 
 repositories {
     maven {
@@ -117,6 +117,12 @@ dependencies {
     //This needs java 16 to work so you will want to change gradle.properties to match your directory for it
     compileOnly("org.geysermc:geyser-api:2.0.2-SNAPSHOT")
 
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(16))
+    }
 }
 
 artifacts { // task 'build' runs generates uberjar

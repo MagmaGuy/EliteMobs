@@ -6,7 +6,7 @@ import org.bukkit.entity.EntityType;
 import java.util.Arrays;
 
 public class PillagerCaravanGuardBoss extends CustomBossesConfigFields {
-    public PillagerCaravanGuardBoss(){
+    public PillagerCaravanGuardBoss() {
         super("pillager_caravan_guard",
                 EntityType.PILLAGER,
                 true,

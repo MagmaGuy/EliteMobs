@@ -29,7 +29,7 @@ public class TransitiveBossBlock implements Listener {
                     spawnLocation.getZ() + transitiveBlock.getRelativeLocation().getZ());
         else {
             location = customBossEntity.getMinidungeon().getRotatedFinalLocation(spawnLocation.getBlock().getLocation().clone().add(new Vector(0.5, 0.5, 0.5)),
-                    transitiveBlock.getRelativeLocation().clone().add(new Vector(0.5,0.5,0.5)));
+                    transitiveBlock.getRelativeLocation().clone().add(new Vector(0.5, 0.5, 0.5)));
             if (blockData instanceof Directional)
                 ((Directional) blockData).setFacing(rotateBlockFace(((Directional) blockData).getFacing(), rotation));
         }

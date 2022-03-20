@@ -16,6 +16,7 @@ public class QuestMenuConfig extends MenusConfigFields {
     public static ItemStack killObjectiveButton;
     public static String questCancelMessage, questStartTitle, questStartSubtitle, questCompleteTitle, questCompleteSubtitle,
             objectiveString, rewardMessage, questCompleteBroadcastMessage, questStatusMessage, questStartBroadcastMessage;
+
     public QuestMenuConfig() {
         super("quest_menu", true);
     }

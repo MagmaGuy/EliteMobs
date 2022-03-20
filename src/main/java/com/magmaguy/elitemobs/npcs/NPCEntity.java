@@ -41,6 +41,7 @@ public class NPCEntity implements SimplePersistentEntityInterface {
     private Location spawnLocation;
     private boolean isTalking = false;
     private ArmorStand roleDisplay;
+    private boolean isDisguised = false;
 
     /**
      * Spawns NPC based off of the values in the NPCsConfig config file. Runs at startup and on reload.
@@ -79,8 +80,6 @@ public class NPCEntity implements SimplePersistentEntityInterface {
         }
         simplePersistentEntity = new SimplePersistentEntity(this);
     }
-
-    private boolean isDisguised = false;
 
     private void spawn() {
         if (villager != null && villager.isValid()) return;

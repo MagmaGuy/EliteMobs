@@ -32,7 +32,7 @@ public class Quest implements Serializable {
     @Getter
     @Setter
     //NPC the quest originates from
-    protected String questGiver= "";
+    protected String questGiver = "";
     @Setter
     //NPC the quest is turned in to
     protected String questTaker = "";
@@ -46,10 +46,6 @@ public class Quest implements Serializable {
     @Setter
     private boolean accepted = false;
 
-    public String getQuestTaker() {
-        return questTaker.isEmpty() ? questGiver : questTaker;
-    }
-
     public Quest(Player player, QuestObjectives questObjectives, int questLevel) {
         this.playerUUID = player.getUniqueId();
         this.questObjectives = questObjectives;
@@ -58,8 +54,8 @@ public class Quest implements Serializable {
             List<Quest> quests = new ArrayList<>();
             quests.add(this);
             pendingPlayerQuests.put(playerUUID, quests);
-        } else{
-            List<Quest> quests =  pendingPlayerQuests.get(playerUUID);
+        } else {
+            List<Quest> quests = pendingPlayerQuests.get(playerUUID);
             quests.add(this);
             pendingPlayerQuests.put(playerUUID, quests);
         }
@@ -82,6 +78,10 @@ public class Quest implements Serializable {
         QuestCompleteEvent questCompleteEvent = new QuestCompleteEvent(player, quest);
         new EventCaller(questCompleteEvent);
         return quest;
+    }
+
+    public String getQuestTaker() {
+        return questTaker.isEmpty() ? questGiver : questTaker;
     }
 
 }

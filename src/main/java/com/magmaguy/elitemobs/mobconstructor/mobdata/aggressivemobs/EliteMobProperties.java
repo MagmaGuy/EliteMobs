@@ -89,14 +89,14 @@ public abstract class EliteMobProperties extends PluginMobProperties {
         return null;
     }
 
-    public static double getBaselineDamage(EntityType entityType, EliteEntity eliteEntity){
+    public static double getBaselineDamage(EntityType entityType, EliteEntity eliteEntity) {
         if (eliteEntity instanceof CustomBossEntity &&
-                ((CustomBossEntity) eliteEntity).getCustomBossesConfigFields().isNormalizedCombat())
-                return MobCombatSettingsConfig.getNormalizedBaselineDamage();
+                ((CustomBossEntity) eliteEntity).isNormalizedCombat())
+            return MobCombatSettingsConfig.getNormalizedBaselineDamage();
         return getBaselineDamage(entityType);
     }
 
-    public static double getBaselineDamage(EntityType entityType){
+    public static double getBaselineDamage(EntityType entityType) {
         return getPluginData(entityType).baseDamage;
     }
 

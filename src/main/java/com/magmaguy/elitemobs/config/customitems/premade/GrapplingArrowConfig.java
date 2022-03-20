@@ -7,7 +7,7 @@ import org.bukkit.Material;
 import java.util.Arrays;
 
 public class GrapplingArrowConfig extends CustomItemsConfigFields {
-    public GrapplingArrowConfig(){
+    public GrapplingArrowConfig() {
         super("grappling_arrow",
                 true,
                 Material.SPECTRAL_ARROW,

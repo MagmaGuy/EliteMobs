@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.metadata.LazyMetadataValue;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -37,12 +38,14 @@ public class QuestCooldown implements Serializable {
             return;
         }
         permissionAttachment.setPermission(permission, true);
+        Bukkit.getPlayer(player).setMetadata(permission, new LazyMetadataValue(MetadataHandler.PLUGIN, () -> true));
         if (!permanent)
             bukkitTask = new BukkitRunnable() {
                 @Override
                 public void run() {
                     if (Bukkit.getPlayer(player) != null) {
                         permissionAttachment.unsetPermission(permission);
+                        Bukkit.getPlayer(player).removeMetadata(permission, MetadataHandler.PLUGIN);
                         PlayerData.updatePlayerQuestCooldowns(player, PlayerData.getPlayerQuestCooldowns(player));
                     }
                 }

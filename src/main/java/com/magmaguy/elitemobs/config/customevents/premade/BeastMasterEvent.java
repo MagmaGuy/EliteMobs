@@ -6,7 +6,7 @@ import com.magmaguy.elitemobs.events.CustomEvent;
 import java.util.Arrays;
 
 public class BeastMasterEvent extends CustomEventsConfigFields {
-    public BeastMasterEvent(){
+    public BeastMasterEvent() {
         super("beast_master", true);
         setEventType(CustomEvent.EventType.TIMED);
         setBossFilenames(Arrays.asList("beast_master.yml"));

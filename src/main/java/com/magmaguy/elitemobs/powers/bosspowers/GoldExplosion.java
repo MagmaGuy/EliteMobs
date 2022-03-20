@@ -48,7 +48,7 @@ public class GoldExplosion extends BossPower implements Listener {
 
             @Override
             public void run() {
-                if (!eliteEntity.isValid()){
+                if (!eliteEntity.isValid()) {
                     cancel();
                     return;
                 }

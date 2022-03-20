@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.config.wormholes.premade;
 import com.magmaguy.elitemobs.config.wormholes.WormholeConfigFields;
 import com.magmaguy.elitemobs.wormhole.Wormhole;
 
-public class AGVampireManorWormholeConfig  extends WormholeConfigFields {
+public class AGVampireManorWormholeConfig extends WormholeConfigFields {
     public AGVampireManorWormholeConfig() {
         super("ag_vampire_manor_wormhole",
                 true,

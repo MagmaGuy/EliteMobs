@@ -28,7 +28,7 @@ public class ZombieKingBoss extends CustomBossesConfigFields {
                 "summonable:summonType=GLOBAL:filename=the_living_dead.yml:amount=5:customSpawn=normal_surface_spawn.yml"));
         setSpawnMessage("&cThe Zombie King has been sighted!");
         setDeathMessage("&aThe Zombie King has been slain by $players!");
-        majorBossDeathString( "The Zombie King has been slain!");
+        majorBossDeathString("The Zombie King has been slain!");
         setEscapeMessage("&4The Zombie King has escaped!");
         setLocationMessage("&cZombie King: $distance blocks away!");
         setUniqueLootList(Collections.singletonList("zombie_kings_axe.yml:1"));

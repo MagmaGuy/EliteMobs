@@ -132,7 +132,7 @@ public class TauntConfig extends PowersConfigFields {
                 "No retreat!",
                 "Hit me with your best shot!"));
 
-        onDamage = ConfigurationEngine.setList(fileConfiguration,"onDamage", Arrays.asList(
+        onDamage = ConfigurationEngine.setList(fileConfiguration, "onDamage", Arrays.asList(
                 "A solid hit!",
                 "He shoots, and he scores!",
                 "You'll feel that in the morning!",
@@ -197,7 +197,7 @@ public class TauntConfig extends PowersConfigFields {
                 "A taste of pain to come!",
                 "I'll make you endangered!"));
 
-        onDeath = ConfigurationEngine.setList(fileConfiguration,"onDeath", Arrays.asList(
+        onDeath = ConfigurationEngine.setList(fileConfiguration, "onDeath", Arrays.asList(
                 "Alas, poor Yorick!",
                 "The rest is silence",
                 "I shall return",
@@ -242,7 +242,7 @@ public class TauntConfig extends PowersConfigFields {
                 "You monster...",
                 "Mediocre..."));
 
-        onTarget = ConfigurationEngine.setList(fileConfiguration,"onTarget", Arrays.asList(
+        onTarget = ConfigurationEngine.setList(fileConfiguration, "onTarget", Arrays.asList(
                 "OI! Get over here!",
                 "What's that I see? A coward?",
                 "Sir, prepare your fisticuffs!",

@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.playerdata.database;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.Quest;
 import com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldowns;
@@ -50,6 +51,8 @@ public class PlayerData {
     private Location backTeleportLocation;
     private boolean useBookMenus;
     private boolean dismissEMStatusScreenMessage;
+    //This is currently not stored in the database, time will tell if it is necessary to do so
+    private MatchInstance matchInstance = null;
 
     /**
      * Called when a player logs in, storing their data in memory
@@ -95,6 +98,10 @@ public class PlayerData {
                 }
             }
         }.runTaskAsynchronously(MetadataHandler.PLUGIN);
+    }
+
+    private static PlayerData getPlayerData(UUID player) {
+        return playerDataHashMap.get(player);
     }
 
     public static void updateQuestStatus(UUID uuid) {
@@ -458,6 +465,14 @@ public class PlayerData {
         playerDataHashMap.get(player.getUniqueId()).dismissEMStatusScreenMessage = use;
     }
 
+    public static MatchInstance getMatchInstance(Player player) {
+        return playerDataHashMap.get(player.getUniqueId()).matchInstance;
+    }
+
+    public static void setMatchInstance(Player player, MatchInstance newMatchInstance) {
+        playerDataHashMap.get(player.getUniqueId()).matchInstance = newMatchInstance;
+    }
+
     private static Boolean getDatabaseBoolean(UUID uuid, String value) {
         try {
             Statement statement = getConnection().createStatement();
@@ -544,6 +559,15 @@ public class PlayerData {
         new PortOldData();
     }
 
+    public static void closeConnection() {
+        try {
+            if (connection == null) return;
+            connection.close();
+        } catch (Exception ex) {
+            new WarningMessage("Could not correctly close database connection.");
+        }
+    }
+
     private void readExistingData(Statement statement, UUID uuid, ResultSet resultSet) throws Exception {
         playerDataHashMap.put(uuid, this);
         currency = resultSet.getDouble("Currency");
@@ -604,15 +628,6 @@ public class PlayerData {
         }
 
         new InfoMessage("User " + uuid + " data successfully read!");
-    }
-
-    public static void closeConnection() {
-        try {
-            if (connection == null) return;
-            connection.close();
-        } catch (Exception ex) {
-            new WarningMessage("Could not correctly close database connection.");
-        }
     }
 
     private void writeNewData(Statement statement, UUID uuid) throws Exception {

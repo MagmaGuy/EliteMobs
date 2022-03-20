@@ -8,7 +8,7 @@ import org.bukkit.Material;
 import java.util.Arrays;
 
 public class GoblinHelmetItem extends CustomItemsConfigFields {
-    public GoblinHelmetItem(){
+    public GoblinHelmetItem() {
         super("goblin_helmet",
                 true,
                 Material.GOLDEN_HELMET,

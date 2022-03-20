@@ -56,6 +56,7 @@ public class PowersConfigFields extends CustomConfigFields {
         processAdditionalFields();
     }
 
-    public void processAdditionalFields(){}
+    public void processAdditionalFields() {
+    }
 
 }

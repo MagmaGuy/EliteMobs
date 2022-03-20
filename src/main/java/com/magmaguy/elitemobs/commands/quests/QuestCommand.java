@@ -38,9 +38,9 @@ public class QuestCommand {
         Quest.stopPlayerQuest(player, questID);
     }
 
-    public static void resetQuests(CommandSender commandSender, String playerString){
+    public static void resetQuests(CommandSender commandSender, String playerString) {
         Player player = Bukkit.getPlayer(playerString);
-        if (player == null){
+        if (player == null) {
             commandSender.sendMessage("[EliteMobs] Error - player name not valid!");
             return;
         }

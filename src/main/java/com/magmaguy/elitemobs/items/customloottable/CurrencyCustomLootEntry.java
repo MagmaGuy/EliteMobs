@@ -50,6 +50,13 @@ public class CurrencyCustomLootEntry extends CustomLootEntry implements Serializ
                         errorMessage(rawString, configFilename, "permission");
                     }
                     break;
+                case "wave":
+                    try {
+                        super.setWave(Integer.parseInt(strings[1]));
+                    } catch (Exception ex) {
+                        errorMessage(rawString, configFilename, "wave");
+                    }
+                    break;
                 default:
             }
         }
