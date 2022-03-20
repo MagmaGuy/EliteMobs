@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 public class SantaConfig extends NPCsConfigFields {
-    public SantaConfig(){
+    public SantaConfig() {
         super("santa.yml",
                 false,
                 "&4Saint Nick",

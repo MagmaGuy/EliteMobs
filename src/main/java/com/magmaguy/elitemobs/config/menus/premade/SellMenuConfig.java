@@ -19,6 +19,7 @@ public class SellMenuConfig extends MenusConfigFields {
     public static int cancelSlot;
     public static ItemStack confirmButton;
     public static int confirmSlot;
+
     public SellMenuConfig() {
         super("sell_menu", true);
     }

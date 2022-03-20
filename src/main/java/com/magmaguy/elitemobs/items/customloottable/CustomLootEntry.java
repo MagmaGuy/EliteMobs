@@ -19,6 +19,12 @@ public class CustomLootEntry implements Serializable {
     @Getter
     @Setter
     private String permission = "";
+    @Getter
+    @Setter
+    private int wave = -1;
+    @Getter
+    @Setter
+    private int itemLevel = 1;
 
     public CustomLootEntry() {
     }

@@ -7,7 +7,7 @@ import org.bukkit.Material;
 import java.util.Arrays;
 
 public class GoblinBallistaItem extends CustomItemsConfigFields {
-    public GoblinBallistaItem(){
+    public GoblinBallistaItem() {
         super("goblin_ballista",
                 true,
                 Material.CROSSBOW,

@@ -19,10 +19,10 @@ public class ValidWorldsConfig {
     private static List<String> nightmareWorlds = new ArrayList<>();
     @Getter
     private static FileConfiguration fileConfiguration;
+    private static File file;
 
     private ValidWorldsConfig() {
     }
-    private static File file;
 
     public static void initializeConfig() {
         file = ConfigurationEngine.fileCreator("ValidWorlds.yml");

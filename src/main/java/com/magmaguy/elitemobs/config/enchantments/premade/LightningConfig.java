@@ -5,7 +5,8 @@ import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfigFields;
 
 public class LightningConfig extends EnchantmentsConfigFields {
     public static int minimumCooldown;
-    public LightningConfig(){
+
+    public LightningConfig() {
         super("lightning",
                 true,
                 "Lightning",
@@ -14,7 +15,7 @@ public class LightningConfig extends EnchantmentsConfigFields {
     }
 
     @Override
-    public void processAdditionalFields(){
+    public void processAdditionalFields() {
         minimumCooldown = ConfigurationEngine.setInt(super.fileConfiguration, "minimumCooldownSeconds", 60 * 2);
     }
 }

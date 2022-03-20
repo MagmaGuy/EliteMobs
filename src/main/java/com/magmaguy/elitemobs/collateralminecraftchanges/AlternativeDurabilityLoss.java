@@ -84,7 +84,7 @@ public class AlternativeDurabilityLoss implements Listener {
     public void onPlayerDamaged(EntityDamageEvent event) {
         if (!event.getEntity().getType().equals(EntityType.PLAYER)) return;
         //citizens spams this really hard for some reason
-        if (event.getEntity().hasMetadata("NPC"))return;
+        if (event.getEntity().hasMetadata("NPC")) return;
         Player player = (Player) event.getEntity();
         for (ItemStack itemStack : player.getInventory().getArmorContents())
             if (isOnLastDamage(itemStack)) {

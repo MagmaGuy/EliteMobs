@@ -7,7 +7,7 @@ import org.bukkit.Material;
 import java.util.Arrays;
 
 public class WerewolfBoneItem extends CustomItemsConfigFields {
-    public WerewolfBoneItem(){
+    public WerewolfBoneItem() {
         super("werewolf_bone",
                 true,
                 Material.BONE,

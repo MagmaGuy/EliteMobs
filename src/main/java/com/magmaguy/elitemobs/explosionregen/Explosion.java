@@ -32,8 +32,8 @@ import java.util.*;
 public class Explosion {
 
     private static final HashSet<Explosion> explosions = new HashSet<>();
-    private final int delayBeforeRegen = 2;
     public final List<BlockState> detonatedBlocks = new ArrayList<>();
+    private final int delayBeforeRegen = 2;
 
     public Explosion(List<BlockState> detonatedBlocks) {
         if (detonatedBlocks == null || detonatedBlocks.isEmpty()) return;

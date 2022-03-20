@@ -6,7 +6,7 @@ import com.magmaguy.elitemobs.events.CustomEvent;
 import java.util.Arrays;
 
 public class ZombieTotemEvent extends CustomEventsConfigFields {
-    public ZombieTotemEvent(){
+    public ZombieTotemEvent() {
         super("zombie_totem", true);
         setEventType(CustomEvent.EventType.TIMED);
         setBossFilenames(Arrays.asList("totem_zombie_1.yml"));

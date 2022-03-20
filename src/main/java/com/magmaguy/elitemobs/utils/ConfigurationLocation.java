@@ -51,8 +51,13 @@ public class ConfigurationLocation {
             x = Double.parseDouble(slicedString[1]);
             y = Double.parseDouble(slicedString[2]);
             z = Double.parseDouble(slicedString[3]);
-            yaw = Float.parseFloat(slicedString[4]);
-            pitch = Float.parseFloat(slicedString[5]);
+            if (slicedString.length > 4) {
+                yaw = Float.parseFloat(slicedString[4]);
+                pitch = Float.parseFloat(slicedString[5]);
+            } else {
+                yaw = 0;
+                pitch = 0;
+            }
         } catch (Exception ex) {
             if (locationString.equals("null"))
                 return null;

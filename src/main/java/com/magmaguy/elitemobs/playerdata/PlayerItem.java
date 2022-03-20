@@ -174,7 +174,7 @@ public class PlayerItem {
         return this.plasmaBootsLevel;
     }
 
-    public double getEarthquakeLevel(ItemStack itemStack, boolean update){
+    public double getEarthquakeLevel(ItemStack itemStack, boolean update) {
         if (update)
             fullUpdate(itemStack);
         return this.earthquakeLevel;

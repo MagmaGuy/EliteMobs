@@ -6,6 +6,7 @@ import org.bukkit.Material;
 
 public class AttackFreezeConfig extends PowersConfigFields {
     public static String freezeMessage;
+
     public AttackFreezeConfig() {
         super("attack_freeze",
                 true,
@@ -14,7 +15,7 @@ public class AttackFreezeConfig extends PowersConfigFields {
     }
 
     @Override
-    public void processAdditionalFields(){
+    public void processAdditionalFields() {
         freezeMessage = ConfigurationEngine.setString(fileConfiguration, "freezeMessage", "&8[EM] &9You've been frozen!");
     }
 }

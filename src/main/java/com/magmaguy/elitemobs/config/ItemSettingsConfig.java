@@ -9,9 +9,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ItemSettingsConfig {
-    private ItemSettingsConfig() {
-    }
-
     @Getter
     private static String shopItemSource;
     @Getter
@@ -106,6 +103,8 @@ public class ItemSettingsConfig {
     private static String simlootMessageSuccess;
     @Getter
     private static String simlootMessageFailure;
+    private ItemSettingsConfig() {
+    }
 
     public static void initializeConfig() {
         File file = ConfigurationEngine.fileCreator("ItemSettings.yml");

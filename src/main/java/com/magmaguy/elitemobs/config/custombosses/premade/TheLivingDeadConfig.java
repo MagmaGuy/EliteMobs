@@ -8,7 +8,7 @@ import org.bukkit.entity.EntityType;
 import java.util.Arrays;
 
 public class TheLivingDeadConfig extends CustomBossesConfigFields {
-    public TheLivingDeadConfig(){
+    public TheLivingDeadConfig() {
         super("the_living_dead",
                 EntityType.HUSK,
                 true,

@@ -7,7 +7,7 @@ import org.bukkit.Material;
 import java.util.Arrays;
 
 public class GoblinPokerItem extends CustomItemsConfigFields {
-    public GoblinPokerItem(){
+    public GoblinPokerItem() {
         super("goblin_poker",
                 true,
                 Material.TRIDENT,

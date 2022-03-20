@@ -14,7 +14,7 @@ public class CustomQuestsConfig extends CustomConfig {
             customQuests.put(key, (CustomQuestsConfigFields) super.getCustomConfigFieldsHashMap().get(key));
     }
 
-    public static HashMap<String, CustomQuestsConfigFields> getCustomQuests(){
+    public static HashMap<String, CustomQuestsConfigFields> getCustomQuests() {
         return customQuests;
     }
 }

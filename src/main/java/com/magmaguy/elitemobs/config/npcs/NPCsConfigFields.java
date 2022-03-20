@@ -64,6 +64,9 @@ public class NPCsConfigFields extends CustomConfigFields implements CustomConfig
     @Getter
     @Setter
     private String customModel = null;
+    @Getter
+    @Setter
+    private String arenaFilename;
 
     public NPCsConfigFields(String fileName,
                             boolean isEnabled,
@@ -120,7 +123,7 @@ public class NPCsConfigFields extends CustomConfigFields implements CustomConfig
         this.interactionType = processEnum("interactionType", interactionType, NPCInteractions.NPCInteractionType.NONE, NPCInteractions.NPCInteractionType.class, true);
         this.timeout = processDouble("timeout", timeout, 0, false);
         this.noPreviousLocationMessage = processString("noPreviousLocationMessage", noPreviousLocationMessage, "", false);
-        this.questFilenames = processStringList("questFileName", questFilenames,  new ArrayList<>(), false);
+        this.questFilenames = processStringList("questFileName", questFilenames, new ArrayList<>(), false);
         this.disguise = processString("disguise", disguise, null, false);
         this.customDisguiseData = processString("customDisguiseData", customDisguiseData, null, false);
         this.customModel = processString("customModel", customModel, null, false);

@@ -256,7 +256,7 @@ public class EliteEntity implements SimplePersistentEntityInterface {
         if (entityType.equals(EntityType.ENDER_DRAGON))
             Objects.requireNonNull(((EnderDragon) livingEntity).getBossBar()).setTitle(getName());
 
-        if (entityType.equals(EntityType.LLAMA)){
+        if (entityType.equals(EntityType.LLAMA)) {
             KeepNeutralsAngry.showMeYouWarFace(this);
         }
 
@@ -300,7 +300,7 @@ public class EliteEntity implements SimplePersistentEntityInterface {
         this.health = maxHealth;
     }
 
-    public void setNormalizedMaxHealth(){
+    public void setNormalizedMaxHealth() {
         this.defaultMaxHealth = MobCombatSettingsConfig.getNormalizedBaselineHealth();
         this.maxHealth = (level * CombatSystem.TARGET_HITS_TO_KILL + this.defaultMaxHealth) * healthMultiplier;
         livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(maxHealth);

@@ -13,6 +13,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.potion.PotionEffectType;
@@ -75,10 +76,8 @@ public class PlayerPotionEffects implements Listener {
         player.addPotionEffect(elitePotionEffect.getPotionEffect());
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onPlayerHitWithPotionEffect(EntityDamageByEntityEvent event) {
-        if (event.isCancelled()) return;
-
         LivingEntity damager = EntityFinder.getRealDamager(event);
         if (damager == null || !damager.getType().equals(EntityType.PLAYER)) return;
         Player player = (Player) damager;

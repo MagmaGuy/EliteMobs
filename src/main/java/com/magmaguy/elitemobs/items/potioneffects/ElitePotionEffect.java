@@ -11,6 +11,7 @@ public class ElitePotionEffect {
     private Target target;
     private ApplicationMethod applicationMethod;
     private double value;
+
     public ElitePotionEffect(String string) {
         try {
             String[] stringObject = string.split(",");

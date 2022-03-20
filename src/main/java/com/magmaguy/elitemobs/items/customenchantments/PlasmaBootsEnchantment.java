@@ -65,8 +65,8 @@ public class PlasmaBootsEnchantment extends CustomEnchantment {
 
     private static void createProjectile(Vector shotVector, Location sourceLocation, Player player) {
         new BukkitRunnable() {
-            int counter = 0;
             final Location currentLocation = sourceLocation.clone();
+            int counter = 0;
 
             @Override
             public void run() {
@@ -101,11 +101,11 @@ public class PlasmaBootsEnchantment extends CustomEnchantment {
     private static void doVisualEffect(Location currentLocation) {
         Objects.requireNonNull(currentLocation.getWorld())
                 .spawnParticle(Particle.REDSTONE, currentLocation.getX(), currentLocation.getY(), currentLocation.getZ(),
-                5, 0.1, 0.1, 0.1, 1, new Particle.DustOptions(Color.fromRGB(
-                        ThreadLocalRandom.current().nextInt(0, 100),
-                        ThreadLocalRandom.current().nextInt(122, 255),
-                        ThreadLocalRandom.current().nextInt(0, 100)),
-                        1));
+                        5, 0.1, 0.1, 0.1, 1, new Particle.DustOptions(Color.fromRGB(
+                                ThreadLocalRandom.current().nextInt(0, 100),
+                                ThreadLocalRandom.current().nextInt(122, 255),
+                                ThreadLocalRandom.current().nextInt(0, 100)),
+                                1));
     }
 
     public static class PlasmaBootsEnchantmentEvents implements Listener {

@@ -52,6 +52,7 @@ public class EconomySettingsConfig {
     private static FileConfiguration thisConfiguration;
     @Getter
     private static double playerToPlayerTaxes;
+
     private EconomySettingsConfig() {
     }
 

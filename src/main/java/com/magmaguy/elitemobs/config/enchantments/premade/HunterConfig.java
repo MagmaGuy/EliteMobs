@@ -15,7 +15,7 @@ public class HunterConfig extends EnchantmentsConfigFields {
     }
 
     @Override
-    public void processAdditionalFields(){
+    public void processAdditionalFields() {
         hunterSpawnBonus = ConfigurationEngine.setDouble(super.fileConfiguration, "hunterSpawnBonus", 0.05);
     }
 }

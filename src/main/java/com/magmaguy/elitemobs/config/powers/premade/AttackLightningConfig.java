@@ -6,6 +6,7 @@ import org.bukkit.Material;
 
 public class AttackLightningConfig extends PowersConfigFields {
     public static int delayBetweenStrikes;
+
     public AttackLightningConfig() {
         super("attack_lightning",
                 true,
@@ -14,7 +15,7 @@ public class AttackLightningConfig extends PowersConfigFields {
     }
 
     @Override
-    public void processAdditionalFields(){
+    public void processAdditionalFields() {
         delayBetweenStrikes = ConfigurationEngine.setInt(fileConfiguration, "delayBetweenStrikes", 15);
     }
 }

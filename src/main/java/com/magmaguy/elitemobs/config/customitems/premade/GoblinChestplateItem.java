@@ -8,7 +8,7 @@ import org.bukkit.Material;
 import java.util.Arrays;
 
 public class GoblinChestplateItem extends CustomItemsConfigFields {
-    public GoblinChestplateItem(){
+    public GoblinChestplateItem() {
         super("goblin_chestplate",
                 true,
                 Material.GOLDEN_CHESTPLATE,

@@ -14,6 +14,7 @@ public class NameGenerator {
     private static final List<String> adjectives = ProceduralItemGenerationSettingsConfig.getAdjectives();
     private static final List<String> verbs = ProceduralItemGenerationSettingsConfig.getVerbs();
     private static final List<String> verbers = ProceduralItemGenerationSettingsConfig.getVerbers();
+
     private NameGenerator() {
     }
 

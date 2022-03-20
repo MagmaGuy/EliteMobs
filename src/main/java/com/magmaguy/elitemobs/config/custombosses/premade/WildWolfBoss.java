@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import org.bukkit.entity.EntityType;
 
 public class WildWolfBoss extends CustomBossesConfigFields {
-    public WildWolfBoss(){
+    public WildWolfBoss() {
         super("wild_wolf.yml",
                 EntityType.WOLF,
                 true,

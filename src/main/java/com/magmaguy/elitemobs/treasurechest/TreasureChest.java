@@ -39,9 +39,9 @@ public class TreasureChest {
     private static HashMap<Location, TreasureChest> treasureChestHashMap = new HashMap<>();
     @Getter
     private final CustomTreasureChestConfigFields customTreasureChestConfigFields;
-    private long restockTime;
     @Getter
     private final Location location;
+    private long restockTime;
 
     public TreasureChest(CustomTreasureChestConfigFields customTreasureChestConfigFields, Location location, long restockTime) {
         this.customTreasureChestConfigFields = customTreasureChestConfigFields;

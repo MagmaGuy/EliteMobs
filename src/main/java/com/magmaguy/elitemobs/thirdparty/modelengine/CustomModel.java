@@ -18,8 +18,11 @@ import org.bukkit.event.entity.EntitySpawnEvent;
 
 public class CustomModel {
 
+    ActiveModel activeModel;
+    ModeledEntity modeledEntity;
     @Getter
     private boolean success = false;
+
 
     private CustomModel(LivingEntity livingEntity, String modelName, String nametagName) {
 
@@ -63,10 +66,6 @@ public class CustomModel {
         return customModel.isSuccess() ? customModel : null;
     }
 
-
-    ActiveModel activeModel;
-    ModeledEntity modeledEntity;
-
     public static void reloadModels() {
         try {
             ModelEngineAPI.api.getModelManager().registerModels();
@@ -107,7 +106,7 @@ public class CustomModel {
     }
 
     public void setNameVisible(boolean visible) {
-       // modeledEntity.setNametagVisible(visible);
+        // modeledEntity.setNametagVisible(visible);
         modeledEntity.getNametagHandler().setCustomNameVisibility("hitbox", visible);
     }
 

@@ -208,7 +208,7 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
                     if (randomizedNumber < 5) {
 
                         CustomBossEntity customBossEntity = CustomBossEntity.createCustomBossEntity("necronomicon_zombie.yml");
-                        if (customBossEntity == null){
+                        if (customBossEntity == null) {
                             new WarningMessage("necronomicon_zombie.yml is not valid!");
                             return;
                         }
@@ -232,7 +232,7 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
                     } else {
 
                         CustomBossEntity customBossEntity = CustomBossEntity.createCustomBossEntity("necronomicon_skeleton.yml");
-                        if (customBossEntity == null){
+                        if (customBossEntity == null) {
                             new WarningMessage("necronomicon_skeleton.yml is not valid!");
                             targetter.setAI(true);
                             cancel();

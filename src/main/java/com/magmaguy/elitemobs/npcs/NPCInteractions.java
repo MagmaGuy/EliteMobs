@@ -181,6 +181,15 @@ public class NPCInteractions implements Listener {
                     }.runTaskLater(MetadataHandler.PLUGIN, 1);
                 }
                 break;
+            case ARENA_MASTER:
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        ArenaMenu arenaMenu = new ArenaMenu();
+                        arenaMenu.constructArenaMenu(event.getPlayer(), npcEntity.getNpCsConfigFields().getArenaFilename());
+                    }
+                }.runTaskLater(MetadataHandler.PLUGIN, 1);
+                break;
             case NONE:
             default:
                 break;
@@ -219,7 +228,8 @@ public class NPCInteractions implements Listener {
         REPAIRMAN,
         ENHANCER,
         REFINER,
-        UNBINDER
+        UNBINDER,
+        ARENA_MASTER
     }
 
 

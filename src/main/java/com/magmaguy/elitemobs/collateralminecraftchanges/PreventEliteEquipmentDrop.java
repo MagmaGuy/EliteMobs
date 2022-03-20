@@ -18,7 +18,7 @@ public class PreventEliteEquipmentDrop implements Listener {
         for (ItemStack drop : event.getEntityDeathEvent().getDrops())
             for (ItemStack equipment : ((Mob) event.getEntity()).getEquipment().getArmorContents())
                 if (equipment != null && drop != null && drop.equals(equipment))
-                        drop.setType(Material.AIR);
+                    drop.setType(Material.AIR);
     }
 
 }

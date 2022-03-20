@@ -12,6 +12,7 @@ public class CombatTagConfig {
     private static String combatTagMessage;
     @Getter
     private static boolean enableTeleportTimer;
+
     private CombatTagConfig() {
     }
 

@@ -8,7 +8,7 @@ import org.bukkit.Material;
 import java.util.Arrays;
 
 public class GoblinCleaverItem extends CustomItemsConfigFields {
-    public GoblinCleaverItem(){
+    public GoblinCleaverItem() {
         super("goblin_cleaver",
                 true,
                 Material.GOLDEN_AXE,

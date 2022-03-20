@@ -218,6 +218,20 @@ public class CustomConfigFields implements CustomConfigFieldsInterface {
         return value;
     }
 
+    protected Double processDouble(String path, Double value, Double pluginDefault, boolean forceWriteDefault) {
+        if (!configHas(path)) {
+            if (forceWriteDefault || !Objects.equals(value, pluginDefault)) fileConfiguration.addDefault(path, value);
+            return value;
+        }
+        try {
+            return fileConfiguration.getDouble(path);
+        } catch (Exception ex) {
+            new WarningMessage("File " + filename + " has an incorrect entry for " + path);
+            new WarningMessage("Entry: " + value);
+        }
+        return value;
+    }
+
     protected boolean processBoolean(String path, boolean value, boolean pluginDefault, boolean forceWriteDefault) {
         if (!configHas(path)) {
             if (forceWriteDefault || value != pluginDefault) fileConfiguration.addDefault(path, value);

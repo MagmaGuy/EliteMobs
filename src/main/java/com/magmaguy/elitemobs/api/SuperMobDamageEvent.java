@@ -12,6 +12,7 @@ public class SuperMobDamageEvent extends Event implements Cancellable {
     private final LivingEntity livingEntity;
     private final EntityDamageEvent entityDamageEvent;
     private boolean cancelled = false;
+
     public SuperMobDamageEvent(LivingEntity livingEntity, EntityDamageEvent entityDamageEvent) {
         this.livingEntity = livingEntity;
         this.entityDamageEvent = entityDamageEvent;

@@ -10,7 +10,7 @@ public class CommandRunner {
 
     public static void runCommandFromList(List<String> commands, List<ConfigPlaceholder> placeholders) {
         if (commands == null || commands.isEmpty()) return;
-        for (String string : commands){
+        for (String string : commands) {
             if (string == null || string.isEmpty()) continue;
             if (placeholders.isEmpty()) {
                 OnDeathCommands.RunChance runChance = new OnDeathCommands.RunChance(string);
@@ -24,7 +24,8 @@ public class CommandRunner {
                 string = runChance.getString();
                 if (ThreadLocalRandom.current().nextDouble() < runChance.getChance())
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), string);
-            }}
+            }
+        }
     }
 
     public class ConfigPlaceholder {

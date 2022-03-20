@@ -39,7 +39,8 @@ public class WormholeTask {
                 for (Player player : Bukkit.getServer().getOnlinePlayers())
                     checkPoint(wormholeEntry, player.getLocation(), player);
 
-                if (!wormholeEntry.getWormhole().getWormholeConfigFields().getStyle().equals(Wormhole.WormholeStyle.NONE)) {
+                if (!WormholesConfig.isNoParticlesMode() &&
+                        !wormholeEntry.getWormhole().getWormholeConfigFields().getStyle().equals(Wormhole.WormholeStyle.NONE)) {
                     if (counter >= wormholeEntry.getWormhole().getCachedRotations().size())
                         counter = 0;
                     if (WormholesConfig.isReducedParticlesMode()) {

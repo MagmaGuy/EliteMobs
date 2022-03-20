@@ -13,6 +13,7 @@ public class SuperMobRemoveEvent extends Event {
     private static final HandlerList handlers = new HandlerList();
     @Getter
     private final LivingEntity livingEntity;
+
     public SuperMobRemoveEvent(LivingEntity livingEntity, RemovalReason removalReason) {
         this.livingEntity = livingEntity;
         EntityTracker.unregister(livingEntity, removalReason);

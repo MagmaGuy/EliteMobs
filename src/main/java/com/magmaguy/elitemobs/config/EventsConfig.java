@@ -15,6 +15,7 @@ public class EventsConfig {
     private static boolean actionEventsEnabled;
     @Getter
     private static boolean timedEventsEnabled;
+
     private EventsConfig() {
     }
 

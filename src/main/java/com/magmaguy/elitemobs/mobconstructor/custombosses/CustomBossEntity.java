@@ -51,6 +51,9 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
 
     @Getter
     protected static HashSet<CustomBossEntity> trackableCustomBosses = new HashSet<>();
+    private final List<BukkitTask> globalReinforcements = new ArrayList<>();
+    @Getter
+    private final BossTrace bossTrace = new BossTrace();
     @Getter
     protected CustomBossesConfigFields customBossesConfigFields;
     protected CustomBossEntity customBossMount = null;
@@ -72,7 +75,6 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
     protected boolean chunkLoad = false;
     private long lastTick = 0;
     private int attemptsCounter = 1;
-    private final List<BukkitTask> globalReinforcements = new ArrayList<>();
     //For use by the phase switcher, which requires passing a specific spawn location for the phase, but when it's for a
     //regional boss this causes issues such as reinforcements getting shifted over to the new spawn location
     @Getter
@@ -82,8 +84,6 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
     @Getter
     @Setter
     private Minidungeon minidungeon = null;
-    @Getter
-    private final BossTrace bossTrace = new BossTrace();
     @Setter
     private CustomSpawn customSpawn = null;
     private int existsFailureCount = 0;
@@ -93,6 +93,8 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
     @Getter
     @Setter
     private CustomModel customModel = null;
+    @Getter
+    private boolean normalizedCombat;
 
     /**
      * Uses a builder pattern in order to construct a CustomBossEntity at an arbitrary point in the future. Does not
@@ -137,6 +139,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
      */
     public void setCustomBossesConfigFields(CustomBossesConfigFields customBossesConfigFields) {
         this.customBossesConfigFields = customBossesConfigFields;
+        normalizedCombat = customBossesConfigFields.isNormalizedCombat();
         super.setDamageMultiplier(customBossesConfigFields.getDamageMultiplier());
         super.setHealthMultiplier(customBossesConfigFields.getHealthMultiplier());
         super.setEliteLoot(customBossesConfigFields.isDropsEliteMobsLoot());
@@ -275,8 +278,14 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
     }
 
     private void setNormalizedHealth() {
-        if (customBossesConfigFields.isNormalizedCombat())
+        if (normalizedCombat)
             super.setNormalizedMaxHealth();
+    }
+
+    public void setNormalizedCombat() {
+        normalizedCombat = true;
+        if (livingEntity != null)
+            setNormalizedMaxHealth();
     }
 
     private void setPluginName() {
@@ -442,7 +451,8 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
                 removalReason.equals(RemovalReason.DEATH) ||
                 removalReason.equals(RemovalReason.BOSS_TIMEOUT) ||
                 removalReason.equals(RemovalReason.WORLD_UNLOAD) ||
-                removalReason.equals(RemovalReason.SHUTDOWN);
+                removalReason.equals(RemovalReason.SHUTDOWN) ||
+                removalReason.equals(RemovalReason.ARENA_RESET);
 
         if (!isPersistent) bossInstanceEnd = true;
 
@@ -458,7 +468,9 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
             }
             if (customBossBossBar != null)
                 customBossBossBar.remove();
-            if (!removalReason.equals(RemovalReason.SHUTDOWN) && !removalReason.equals(RemovalReason.DEATH))
+            if (!removalReason.equals(RemovalReason.SHUTDOWN) &&
+                    !removalReason.equals(RemovalReason.DEATH) &&
+                    !removalReason.equals(RemovalReason.ARENA_RESET))
                 if (phaseBossEntity != null)
                     phaseBossEntity.silentReset();
             globalReinforcements.forEach((bukkitTask -> {

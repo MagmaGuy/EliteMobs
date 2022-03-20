@@ -95,7 +95,7 @@ public class FlamethrowerEnchantment extends CustomEnchantment {
                 @Override
                 public void run() {
 
-                    if (!player.isValid() || !player.getLocation().getWorld().equals(targetLocation.getWorld())){
+                    if (!player.isValid() || !player.getLocation().getWorld().equals(targetLocation.getWorld())) {
                         cancel();
                         return;
                     }
@@ -140,7 +140,7 @@ public class FlamethrowerEnchantment extends CustomEnchantment {
 
                 @Override
                 public void run() {
-                    if (!player.isValid() || !player.getLocation().getWorld().equals(target.getWorld())){
+                    if (!player.isValid() || !player.getLocation().getWorld().equals(target.getWorld())) {
                         cancel();
                         return;
                     }
@@ -167,7 +167,7 @@ public class FlamethrowerEnchantment extends CustomEnchantment {
 
                 @Override
                 public void run() {
-                    if (!player.isValid() || !player.getLocation().getWorld().equals(fixedPlayerLocation.getWorld())){
+                    if (!player.isValid() || !player.getLocation().getWorld().equals(fixedPlayerLocation.getWorld())) {
                         cancel();
                         return;
                     }

@@ -37,7 +37,7 @@ public class AdvancedAggroManager implements Listener {
         }
 
         if (player == null) return;
-        
+
         if (((Mob) event.getEliteMobEntity().getLivingEntity()).getTarget() == null ||
                 !((Mob) event.getEliteMobEntity().getLivingEntity()).getTarget().getUniqueId().equals(player.getUniqueId())) {
             ((Mob) event.getEliteMobEntity().getLivingEntity()).setTarget(player);

@@ -8,7 +8,7 @@ import org.bukkit.event.world.WorldLoadEvent;
 
 public class FindNewWorlds implements Listener {
 
-    @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onWorldLoad(WorldLoadEvent event) {
         ValidWorldsConfig.addWorld(event.getWorld().getName());
     }

@@ -176,7 +176,7 @@ public class SellMenu extends EliteMenu implements Listener {
 
                     if (amount < 4)
                         player.sendMessage(ChatColorConverter.convert(
-                               TranslationConfig.getShopSellMessage()
+                                TranslationConfig.getShopSellMessage()
                                         .replace("$item_name", itemStack.getItemMeta().getDisplayName())
                                         .replace("$currency_amount", itemValue + "")
                                         .replace("$currency_name", EconomySettingsConfig.getCurrencyName())));
@@ -190,7 +190,7 @@ public class SellMenu extends EliteMenu implements Listener {
                                     .replace("$currency_name", EconomySettingsConfig.getCurrencyName())));
 
                 player.sendMessage(ChatColorConverter.convert(
-                       TranslationConfig.getShopCurrentBalance()
+                        TranslationConfig.getShopCurrentBalance()
                                 .replace("$currency_amount", EconomyHandler.checkCurrency(player.getUniqueId()) + "")
                                 .replace("$currency_name", EconomySettingsConfig.getCurrencyName())));
                 updateConfirmButton(0);

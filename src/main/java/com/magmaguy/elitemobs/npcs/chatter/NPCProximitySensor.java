@@ -90,8 +90,7 @@ public class NPCProximitySensor implements Listener {
                         if (quest instanceof CustomQuest &&
                                 questString.equals(((CustomQuest) quest).getCustomQuestsConfigFields().getFilename()))
                             if (!quest.isAccepted()) {
-                                if (!((CustomQuest) quest).getCustomQuestsConfigFields().getQuestLockoutPermission().isEmpty() &&
-                                        player.hasPermission(((CustomQuest) quest).getCustomQuestsConfigFields().getQuestLockoutPermission()))
+                                if (!((CustomQuest) quest).hasPermissionForQuest(player))
                                     return;
                                 //Quest yet to be accepted
                                 unacceptedQuestIndicator(npcEntity, player);

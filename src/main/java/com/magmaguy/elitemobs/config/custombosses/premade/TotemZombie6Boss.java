@@ -8,7 +8,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Arrays;
 
 public class TotemZombie6Boss extends CustomBossesConfigFields {
-    public TotemZombie6Boss(){
+    public TotemZombie6Boss() {
         super("totem_zombie_6", EntityType.ZOMBIE, true, "$eventBossLevel Totem Zombie", "dynamic");
         setBaby(true);
         setHelmet(new ItemStack(Material.LEATHER_HELMET));

@@ -17,6 +17,7 @@ import com.magmaguy.elitemobs.commands.quests.QuestCommand;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.TranslationConfig;
+import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.items.EliteItemLore;
 import com.magmaguy.elitemobs.items.ShareItem;
 import com.magmaguy.elitemobs.menus.*;
@@ -340,6 +341,34 @@ public class UserCommands {
                     PlayerData.setDismissEMStatusScreenMessage(((Player) commandContext.getSender()), !PlayerData.getDismissEMStatusScreenMessage(((Player) commandContext.getSender()).getUniqueId()));
                 }));
 
+        // /em arena <arenaFilename>
+        manager.command(builder.literal("arena")
+                .meta(CommandMeta.DESCRIPTION, "Opens the arena menu.")
+                .argument(StringArgument.newBuilder("dungeonid"), ArgumentDescription.of("Name of the arena to go to."))
+                .senderType(Player.class)
+                .handler(commandContext -> {
+                    ArenaCommands.openArenaMenu(((Player) commandContext.getSender()), commandContext.get("arena"));
+                }));
+
+        // /em start - this is for instanced content
+        manager.command(builder.literal("start")
+                .meta(CommandMeta.DESCRIPTION, "When in instanced content, starts the countdown to start doing the content.")
+                .senderType(Player.class)
+                .handler(commandContext -> {
+                    MatchInstance matchInstance = MatchInstance.getPlayerInstance(((Player) commandContext.getSender()));
+                    if (matchInstance != null)
+                        matchInstance.countdownMatch();
+                }));
+
+        // /em quit - this is for instanced content
+        manager.command(builder.literal("quit")
+                .meta(CommandMeta.DESCRIPTION, "When in instanced content, makes the player leave the instance.")
+                .senderType(Player.class)
+                .handler(commandContext -> {
+                    MatchInstance matchInstance = MatchInstance.getAnyPlayerInstance(((Player) commandContext.getSender()));
+                    if (matchInstance != null)
+                        matchInstance.removeAnyKind((Player) commandContext.getSender());
+                }));
     }
 
 }

@@ -19,6 +19,7 @@ public abstract class CustomEnchantment {
     private final boolean dynamic;
     private final EnchantmentsConfigFields enchantmentsConfigFields;
     private final Enchantment originalEnchantment = null;
+
     public CustomEnchantment(String key, boolean dynamic) {
         this.key = key;
         this.dynamic = dynamic;

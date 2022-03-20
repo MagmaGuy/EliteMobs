@@ -44,10 +44,15 @@ public class QuestInteractionHandler {
                     return;
                 }
 
-                if (playerHasPermissionToAcceptQuest(player, customQuest)) {
+                if (customQuest.hasPermissionForQuest(player)) {
                     customQuestList.add(customQuest);
                     customQuest.setQuestGiver(npcEntity.getNpCsConfigFields().getFilename());
-                }
+                } else if (!customQuest.getCustomQuestsConfigFields().getQuestAcceptPermission().isEmpty() &&
+                        !player.hasMetadata(customQuest.getCustomQuestsConfigFields().getQuestAcceptPermission())) {
+                    player.sendMessage(ChatColorConverter.convert("&4[EliteMobs] You can't accept this quest yet!"));
+                } else if (!customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission().isEmpty() &&
+                        player.hasMetadata(customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission()))
+                    player.sendMessage(ChatColorConverter.convert("&4[EliteMobs] You already completed this quest!"));
             }
 
         if (!customQuestList.isEmpty())
@@ -57,24 +62,6 @@ public class QuestInteractionHandler {
                     QuestMenu.generateCustomQuestMenu(customQuestList, player, npcEntity);
                 }
             }.runTaskLater(MetadataHandler.PLUGIN, 1);
-    }
-
-    private static boolean playerHasPermissionToAcceptQuest(Player player, CustomQuest customQuest) {
-        if (!customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission().isEmpty() &&
-                player.hasPermission(customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission())) {
-            if (player.hasPermission("elitemobs.*")) {
-                player.sendMessage("[EliteMobs - Admin message] You are locked out from this quest! The permission is " + customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission());
-                player.sendMessage(ChatColorConverter.convert("&cNote: If you are an admin and are blocked from all quests, make sure you deny the permission elitequest.*"));
-            }
-            return false;
-        }
-        if (customQuest.getCustomQuestsConfigFields().getQuestAcceptPermission().isEmpty() ||
-                player.hasPermission(customQuest.getCustomQuestsConfigFields().getQuestAcceptPermission())) {
-            return true;
-        } else {
-            player.sendMessage("[EliteMobs] You don't have the required permission! " + customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission());
-            return false;
-        }
     }
 
     private static void scanQuestTakerNPC(NPCEntity npcEntity, List<Quest> activeQuests, List<CustomQuest> npcQuests) {

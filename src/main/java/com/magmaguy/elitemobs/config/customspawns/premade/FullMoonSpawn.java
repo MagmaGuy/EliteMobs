@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class FullMoonSpawn extends CustomSpawnConfigFields {
-    public FullMoonSpawn(){
+    public FullMoonSpawn() {
         super("full_moon_spawn", true);
         setSurfaceSpawn(true);
         try {

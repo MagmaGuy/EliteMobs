@@ -13,6 +13,7 @@ public class GetLootMenuConfig extends MenusConfigFields {
     public static ItemStack infoItem;
     public static ItemStack leftArrowItem, rightArrowItem, previousLootItem, nextLootItem;
     public static String tierTranslation, itemFilterTranslation;
+
     public GetLootMenuConfig() {
         super("get_loot_menu", true);
     }

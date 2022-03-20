@@ -15,12 +15,19 @@ import java.util.UUID;
 
 public class PlayerQuestCooldowns implements Serializable {
 
+    @Getter
+    private final List<QuestCooldown> questCooldowns = new ArrayList<>();
+
+    /**
+     * Initializes cooldowns from scratch, assuming no preexisting player data
+     */
+    public PlayerQuestCooldowns() {
+        //This just initializes the cooldown list
+    }
+
     public static PlayerQuestCooldowns initializePlayer() {
         return new PlayerQuestCooldowns();
     }
-
-    @Getter
-    private final List<QuestCooldown> questCooldowns = new ArrayList<>();
 
     public static void resetPlayerQuestCooldowns(Player player) {
         if (PlayerData.getPlayerQuestCooldowns(player.getUniqueId()) == null) return;
@@ -34,13 +41,6 @@ public class PlayerQuestCooldowns implements Serializable {
         playerQuestCooldowns.getQuestCooldowns().clear();
         PlayerData.resetQuests(player.getUniqueId());
         PlayerData.resetPlayerQuestCooldowns(player.getUniqueId());
-    }
-
-    /**
-     * Initializes cooldowns from scratch, assuming no preexisting player data
-     */
-    public PlayerQuestCooldowns() {
-        //This just initializes the cooldown list
     }
 
     public static void addCooldown(Player player, String permission, int delayInMinutes) {
