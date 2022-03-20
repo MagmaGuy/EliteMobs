@@ -34,6 +34,7 @@ public class PlayerPreTeleportEvent extends Event implements Cancellable {
     }
 
     public static void teleportPlayer(Player player, Location destination) {
+        if (destination.getWorld() == null) return;
         if (CombatTagConfig.isEnableTeleportTimer())
             new EventCaller(new PlayerPreTeleportEvent(player, destination));
         else

@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.config.wormholes.premade;
 import com.magmaguy.elitemobs.config.wormholes.WormholeConfigFields;
 import com.magmaguy.elitemobs.wormhole.Wormhole;
 
-public class AGCatacombsWormholeConfig  extends WormholeConfigFields {
+public class AGCatacombsWormholeConfig extends WormholeConfigFields {
     public AGCatacombsWormholeConfig() {
         super("ag_catacombs_wormhole",
                 true,

@@ -79,9 +79,10 @@ public class PhaseBossEntity {
 
     /**
      * Used to set the respawn time in the config file of Regional Bosses
+     *
      * @return The configuration file for phase 1 of Phase Bosses
      */
-    public CustomBossesConfigFields getPhase1Config(){
+    public CustomBossesConfigFields getPhase1Config() {
         return bossPhases.get(0).customBossesConfigFields;
     }
 

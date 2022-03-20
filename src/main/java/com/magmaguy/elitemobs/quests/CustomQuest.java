@@ -100,6 +100,16 @@ public class CustomQuest extends Quest {
         }
     }
 
+    public boolean hasPermissionForQuest(Player player) {
+        if (!customQuestsConfigFields.getQuestAcceptPermission().isEmpty() &&
+                !player.hasMetadata(customQuestsConfigFields.getQuestAcceptPermission()))
+            return false;
+        if (!customQuestsConfigFields.getQuestLockoutPermission().isEmpty() &&
+                player.hasMetadata(customQuestsConfigFields.getQuestLockoutPermission()))
+            return false;
+        return true;
+    }
+
     public static class CustomQuestEvents implements Listener {
         @EventHandler
         public void onQuestReward(QuestRewardEvent event) {

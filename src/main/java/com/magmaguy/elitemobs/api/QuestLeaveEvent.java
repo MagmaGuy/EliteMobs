@@ -50,7 +50,7 @@ public class QuestLeaveEvent extends Event {
                         permissionAttachment.setPermission(permission, false);
                 }
 
-                if (QuestTracking.getPlayerTrackingQuests().containsKey(event.getPlayer())){
+                if (QuestTracking.getPlayerTrackingQuests().containsKey(event.getPlayer())) {
                     QuestTracking questTracking = QuestTracking.getPlayerTrackingQuests().get(event.getPlayer());
                     if (questTracking.getCustomQuest().getCustomQuestsConfigFields().equals(customQuest.getCustomQuestsConfigFields()))
                         questTracking.stop();

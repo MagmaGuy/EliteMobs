@@ -61,6 +61,19 @@ public class ZipFile {
         return finalDirectory;
     }
 
+    private static File newFile(File destinationDir, ZipEntry zipEntry) throws IOException {
+        File destFile = new File(destinationDir, zipEntry.getName());
+
+        String destDirPath = destinationDir.getCanonicalPath();
+        String destFilePath = destFile.getCanonicalPath();
+
+        if (!destFilePath.startsWith(destDirPath + File.separatorChar)) {
+            throw new IOException("Entry is outside of the target dir: " + zipEntry.getName());
+        }
+
+        return destFile;
+    }
+
     public static class ZipUtility {
         /**
          * A constants for buffer size used to read/write data
@@ -80,7 +93,7 @@ public class ZipFile {
             //This slight tweak avoids making the directory zipped be in the zipped file when what we are looking for is to
             //zip the contents of the directory, outside of the directory itself
             if (file.isDirectory()) {
-                for (File file1 : file.listFiles()){
+                for (File file1 : file.listFiles()) {
                     if (file1.isDirectory())
                         zipDirectory(file1, file1.getName(), zos);
                     else
@@ -144,18 +157,5 @@ public class ZipFile {
             }
             zos.closeEntry();
         }
-    }
-
-    private static File newFile(File destinationDir, ZipEntry zipEntry) throws IOException {
-        File destFile = new File(destinationDir, zipEntry.getName());
-
-        String destDirPath = destinationDir.getCanonicalPath();
-        String destFilePath = destFile.getCanonicalPath();
-
-        if (!destFilePath.startsWith(destDirPath + File.separatorChar)) {
-            throw new IOException("Entry is outside of the target dir: " + zipEntry.getName());
-        }
-
-        return destFile;
     }
 }

@@ -7,7 +7,7 @@ import org.bukkit.Material;
 import java.util.Arrays;
 
 public class GoblinShooterItem extends CustomItemsConfigFields {
-    public GoblinShooterItem(){
+    public GoblinShooterItem() {
         super("goblin_shooter",
                 true,
                 Material.BOW,

@@ -88,6 +88,7 @@ public class CustomBossMegaConsumer {
         setCustomModel(livingEntity);
         setName(livingEntity);
         setFollowRange(livingEntity);
+        setMovementSpeed(livingEntity);
 
         if (livingEntity.getType().equals(EntityType.ENDER_DRAGON)) {
             ((EnderDragon) livingEntity).setPhase(EnderDragon.Phase.CIRCLING);
@@ -176,6 +177,11 @@ public class CustomBossMegaConsumer {
                 customBossesConfigFields.getFollowDistance() > 0 &&
                 livingEntity instanceof Mob)
             livingEntity.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(customBossesConfigFields.getFollowDistance());
+    }
+
+    private void setMovementSpeed(LivingEntity livingEntity) {
+        if (customBossesConfigFields.getMovementSpeedAttribute() != null)
+            livingEntity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(customBossesConfigFields.getMovementSpeedAttribute());
     }
 
 }

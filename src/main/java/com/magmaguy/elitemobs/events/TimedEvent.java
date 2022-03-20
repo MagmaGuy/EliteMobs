@@ -23,26 +23,26 @@ public class TimedEvent extends CustomEvent implements Listener {
     @Getter
     protected static List<TimedEvent> blueprintEvents = new ArrayList<>();
     protected static List<TimedEvent> timedEvents = new ArrayList<>();
-    public static void shutdown() {
-        blueprintEvents.clear();
-        timedEvents.clear();
-    }
     //stores the time of the last global trigger
     private static double nextEventTrigger = System.currentTimeMillis() + 5D * 60D * 1000D;
     private final double localCooldown;
-    private double nextLocalEventTrigger = 0;
     private final double globalCooldown;
     private final double weight;
     private final String filename;
+    private double nextLocalEventTrigger = 0;
     private CustomSpawn customSpawn;
     private boolean silentRetry = false;
-
     public TimedEvent(CustomEventsConfigFields customEventsConfigFields) {
         super(customEventsConfigFields);
         this.localCooldown = customEventsConfigFields.getLocalCooldown();
         this.globalCooldown = customEventsConfigFields.getGlobalCooldown();
         this.weight = customEventsConfigFields.getWeight();
         this.filename = customEventsConfigFields.getFilename();
+    }
+
+    public static void shutdown() {
+        blueprintEvents.clear();
+        timedEvents.clear();
     }
 
     public static void initializeBlueprintEvents() {

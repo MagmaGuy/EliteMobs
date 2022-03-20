@@ -270,8 +270,8 @@ public class ShieldWall extends MinorPower {
             }
         }
 
-        @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGH)
-        public void onCombatLeaveEvent(EliteMobExitCombatEvent event){
+        @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
+        public void onCombatLeaveEvent(EliteMobExitCombatEvent event) {
             ElitePower elitePower = event.getEliteMobEntity().getPower(PowersConfig.getPower("shield_wall.yml"));
             if (elitePower == null) return;
             ShieldWall shieldWall = (ShieldWall) elitePower;

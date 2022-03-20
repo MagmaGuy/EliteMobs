@@ -257,7 +257,7 @@ public class GearPage {
             Player player = ((Player) event.getWhoClicked()).getPlayer();
             if (!pageInventories.containsKey(player)) return;
             event.setCancelled(true);
-            if (event.getSlot() == 53){
+            if (event.getSlot() == 53) {
                 player.closeInventory();
                 CoverPage.coverPage(player);
             }

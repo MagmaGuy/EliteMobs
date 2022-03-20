@@ -10,7 +10,7 @@ import org.bukkit.entity.Entity;
 
 public class DisguiseEntity {
 
-    public static void initialize(){
+    public static void initialize() {
         DisguiseConfig.setPlayerNameType(DisguiseConfig.PlayerNameType.ARMORSTANDS);
     }
 

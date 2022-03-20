@@ -31,7 +31,7 @@ public class EarthquakeEnchantment extends CustomEnchantment {
 
     public static void doEarthquakeEnchantment(int earthquakeLevel, Player player) {
         player.sendMessage(EarthquakeConfig.getEarthquakeActivationMessage());
-        player.setVelocity(player.getLocation().getDirection().normalize().multiply((Math.log(earthquakeLevel+2 / 2D) + 1) / 20D).setY(Math.log(earthquakeLevel+2 / 2D)));
+        player.setVelocity(player.getLocation().getDirection().normalize().multiply((Math.log(earthquakeLevel + 2 / 2D) + 1) / 20D).setY(Math.log(earthquakeLevel + 2 / 2D)));
         Bukkit.getScheduler().runTaskTimer(MetadataHandler.PLUGIN, (task) -> {
             player.setFallDistance(0f);
             if (!player.isValid() || !player.getLocation().clone().subtract(new Vector(0, 1, 0)).getBlock().isPassable()
@@ -50,7 +50,7 @@ public class EarthquakeEnchantment extends CustomEnchantment {
     }
 
     public static void doLanding(int level, Player player) {
-        double distance = Math.log(level+2 / 2D) * 3;
+        double distance = Math.log(level + 2 / 2D) * 3;
         for (Entity entity : player.getNearbyEntities(distance, distance, distance)) {
             if (entity instanceof LivingEntity) {
                 if (entity.getType().equals(EntityType.PLAYER)) continue;

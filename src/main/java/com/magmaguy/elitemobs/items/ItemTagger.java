@@ -150,7 +150,7 @@ public class ItemTagger {
         return itemMeta.getPersistentDataContainer().has(enchantmentKey, PersistentDataType.INTEGER);
     }
 
-    public static boolean hasKey(ItemStack itemStack, String key){
+    public static boolean hasKey(ItemStack itemStack, String key) {
         if (itemStack == null) return false;
         if (!itemStack.hasItemMeta()) return false;
         return Objects.requireNonNull(itemStack.getItemMeta()).getPersistentDataContainer().has(new NamespacedKey(MetadataHandler.PLUGIN, key), PersistentDataType.STRING);

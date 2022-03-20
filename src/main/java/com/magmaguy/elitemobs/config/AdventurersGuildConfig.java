@@ -12,9 +12,6 @@ import java.util.Collections;
 import java.util.List;
 
 public class AdventurersGuildConfig {
-    private AdventurersGuildConfig() {
-    }
-
     @Getter
     private static final String[][] rankNames = new String[11][21];
     @Getter
@@ -76,6 +73,8 @@ public class AdventurersGuildConfig {
     private static String prestigeUnlockMessageSubtitle;
     private static File file;
     private static FileConfiguration fileConfiguration;
+    private AdventurersGuildConfig() {
+    }
 
     public static void toggleGuildInstall() {
         guildWorldIsEnabled = !guildWorldIsEnabled;

@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 public class ArmorGoblinBoss extends CustomBossesConfigFields {
-    public ArmorGoblinBoss(){
+    public ArmorGoblinBoss() {
         super("armor_goblin",
                 EntityType.ZOMBIE,
                 true,
@@ -45,7 +45,7 @@ public class ArmorGoblinBoss extends CustomBossesConfigFields {
                 "goblin_chestplate.yml:0.2",
                 "goblin_leggings.yml:0.2",
                 "goblin_boots.yml:0.2"
-                ));
+        ));
         setFollowDistance(100);
     }
 }

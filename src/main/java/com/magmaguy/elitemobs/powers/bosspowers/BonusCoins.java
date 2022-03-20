@@ -11,6 +11,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
 public class BonusCoins extends BossPower {
+    private double coinMultiplier = 2D;
+
     public BonusCoins() {
         super(PowersConfig.getPower("bonus_coins.yml"));
     }
@@ -18,8 +20,6 @@ public class BonusCoins extends BossPower {
     public void setCoinMultiplier(double coinMultiplier) {
         this.coinMultiplier = coinMultiplier;
     }
-
-    private double coinMultiplier = 2D;
 
     public void doCoinDrop(EliteEntity eliteEntity, Player player) {
         new ItemLootShower(eliteEntity.getLevel() * coinMultiplier, eliteEntity.getUnsyncedLivingEntity().getLocation(), player);

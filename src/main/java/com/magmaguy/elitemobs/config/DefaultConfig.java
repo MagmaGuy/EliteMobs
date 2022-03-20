@@ -43,11 +43,10 @@ public class DefaultConfig {
     private static boolean doRegenerateContainers;
     @Getter
     private static int defaultTransitiveBlockLimiter;
-    private DefaultConfig() {
-    }
-
     private static File file = null;
     private static FileConfiguration fileConfiguration = null;
+    private DefaultConfig() {
+    }
 
     public static void toggleSetupDone() {
         setupDone = !setupDone;

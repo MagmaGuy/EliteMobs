@@ -441,7 +441,7 @@ public class AdminCommands {
                 .senderType(CommandSender.class)
                 .permission("elitemobs.*")
                 .handler(commandContext -> SimLootCommand.runMultipleTimes(
-                       commandContext.getSender(),
+                        commandContext.getSender(),
                         commandContext.get("level"),
                         commandContext.get("times"),
                         commandContext.get("target"))));

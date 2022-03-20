@@ -11,6 +11,6 @@ public class CombustionPrevention implements Listener {
     public void onCombust(EntityCombustEvent event) {
         if (event.getEntity() instanceof LivingEntity &&
                 ((LivingEntity) event.getEntity()).hasPotionEffect(PotionEffectType.FIRE_RESISTANCE))
-                event.setCancelled(true);
+            event.setCancelled(true);
     }
 }

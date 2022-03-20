@@ -20,7 +20,7 @@ public class PlayerStatsTracker implements Listener {
         //todo : optimize
         for (Player player : event.getEliteEntity().getDamagers().keySet()) {
             if (player.hasMetadata("NPC")) continue;
-            if (!PlayerData.isInMemory(player.getUniqueId()))continue;
+            if (!PlayerData.isInMemory(player.getUniqueId())) continue;
             PlayerData.incrementKills(player.getUniqueId());
             PlayerData.setHighestLevelKilled(player.getUniqueId(), event.getEliteEntity().getLevel());
             PlayerData.incrementScore(player.getUniqueId(), event.getEliteEntity().getLevel());

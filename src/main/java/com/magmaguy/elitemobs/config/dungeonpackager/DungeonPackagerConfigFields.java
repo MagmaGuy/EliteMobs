@@ -48,11 +48,11 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
     @Getter
     private double rotation;
     @Getter
-    private Vector corner1 = new Vector(0,0,0), corner2 = new Vector(0,0,0);
+    private Vector corner1 = new Vector(0, 0, 0), corner2 = new Vector(0, 0, 0);
     @Getter
-    private Vector teleportPoint = new Vector(0,0,0);
+    private Vector teleportPoint = new Vector(0, 0, 0);
     @Getter
-    private Vector wormholeTeleportPoint = new Vector(0,0,0);
+    private Vector wormholeTeleportPoint = new Vector(0, 0, 0);
     @Getter
     private double teleportPointPitch = 0d;
     @Getter
@@ -79,7 +79,7 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
     private boolean defaultDungeon = false;
 
 
-    public DungeonPackagerConfigFields(String fileName, boolean isEnabled){
+    public DungeonPackagerConfigFields(String fileName, boolean isEnabled) {
         super(fileName, isEnabled);
     }
 
@@ -165,7 +165,7 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
         this.playerInfo = processString("playerInfo", playerInfo, "", false);
         this.regionEnterMessage = processString("regionEnterMessage", regionEnterMessage, "", false);
         this.regionLeaveMessage = processString("regionLeaveMessage", regionLeaveMessage, "", false);
-        this.hasCustomModels = processBoolean("hasCustomModels", hasCustomModels, false , false);
+        this.hasCustomModels = processBoolean("hasCustomModels", hasCustomModels, false, false);
     }
 
     @Override
@@ -188,7 +188,7 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
         return ConfigurationEngine.writeValue(relativeBossLocations, file, fileConfiguration, "relativeBossLocations");
     }
 
-    public void removeRelativeBossLocation(CustomBossesConfigFields customBossesConfigFields, Vector relativeLocation){
+    public void removeRelativeBossLocation(CustomBossesConfigFields customBossesConfigFields, Vector relativeLocation) {
         String configurationLocation = customBossesConfigFields.getFilename() + ":" + relativeLocation.getX() + "," + relativeLocation.getY() + "," + relativeLocation.getZ();
         relativeBossLocations.remove(configurationLocation);
         ConfigurationEngine.writeValue(relativeBossLocations, file, fileConfiguration, "relativeBossLocations");

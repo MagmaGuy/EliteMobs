@@ -45,6 +45,13 @@ public class VanillaCustomLootEntry extends CustomLootEntry implements Serializa
                         errorMessage(rawString, configFilename, "chance");
                     }
                     break;
+                case "wave":
+                    try {
+                        super.setWave(Integer.parseInt(strings[1]));
+                    } catch (Exception ex) {
+                        errorMessage(rawString, configFilename, "wave");
+                    }
+                    break;
             }
         }
     }

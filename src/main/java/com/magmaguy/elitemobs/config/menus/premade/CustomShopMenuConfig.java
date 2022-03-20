@@ -16,6 +16,7 @@ public class CustomShopMenuConfig extends MenusConfigFields {
     public static int rerollSlot;
     public static List<Integer> storeSlots;
     public static String messageFullInventory;
+
     public CustomShopMenuConfig() {
         super("custom_shop_menu", true);
     }

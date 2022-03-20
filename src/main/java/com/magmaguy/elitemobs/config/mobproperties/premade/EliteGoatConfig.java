@@ -5,8 +5,8 @@ import org.bukkit.entity.EntityType;
 
 import java.util.Arrays;
 
-public class EliteGoatConfig  extends MobPropertiesConfigFields {
-    public EliteGoatConfig(){
+public class EliteGoatConfig extends MobPropertiesConfigFields {
+    public EliteGoatConfig() {
         super("elite_goat",
                 EntityType.GOAT,
                 true,

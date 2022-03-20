@@ -20,6 +20,7 @@ public class ScrapperMenuConfig extends MenusConfigFields {
     public static int cancelSlot;
     public static ItemStack confirmButton;
     public static int confirmSlot;
+
     public ScrapperMenuConfig() {
         super("scrapper_menu", true);
     }

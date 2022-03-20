@@ -89,12 +89,6 @@ public class OnDeathCommands implements Listener {
         return string;
     }
 
-    @EventHandler
-    public void onEliteMobDeath(EliteMobDeathEvent event) {
-        if (MobCombatSettingsConfig.getCommandsOnDeath().isEmpty()) return;
-        parseConsoleCommand(MobCombatSettingsConfig.getCommandsOnDeath(), event);
-    }
-
     private static HashMap<Player, Double> sortByComparator(Map<Player, Double> unsortMap, final boolean order) {
 
         List<Map.Entry<Player, Double>> list = new LinkedList<>(unsortMap.entrySet());
@@ -117,6 +111,12 @@ public class OnDeathCommands implements Listener {
 
     private static void runConsoleCommand(String command) {
         Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), command);
+    }
+
+    @EventHandler
+    public void onEliteMobDeath(EliteMobDeathEvent event) {
+        if (MobCombatSettingsConfig.getCommandsOnDeath().isEmpty()) return;
+        parseConsoleCommand(MobCombatSettingsConfig.getCommandsOnDeath(), event);
     }
 
     public static class RunChance {

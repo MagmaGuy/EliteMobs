@@ -36,7 +36,7 @@ public class PlayerStatusScreen implements Listener {
         } else {
             generateBook(player, player);
         }
-        if (!PlayerData.getDismissEMStatusScreenMessage(player.getUniqueId())){
+        if (!PlayerData.getDismissEMStatusScreenMessage(player.getUniqueId())) {
             player.sendMessage(TranslationConfig.getDismissEMMessage());
         }
     }
@@ -53,7 +53,7 @@ public class PlayerStatusScreen implements Listener {
         return string;
     }
 
-    private void generateChestMenu(Player requestingPlayer, Player targetPlayer){
+    private void generateChestMenu(Player requestingPlayer, Player targetPlayer) {
         CoverPage.coverPage(requestingPlayer);
     }
 

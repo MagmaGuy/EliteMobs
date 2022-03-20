@@ -18,9 +18,6 @@ import java.util.List;
 
 public class QuestsConfig {
 
-    private QuestsConfig() {
-    }
-
     @Getter
     private static boolean requireQuestTurnIn;
     @Getter
@@ -95,6 +92,8 @@ public class QuestsConfig {
     private static String noQuestDestinationFound;
     @Getter
     private static String questDestinationInOtherWorld;
+    private QuestsConfig() {
+    }
 
     public static void initializeConfig() {
         File file = ConfigurationEngine.fileCreator("Quests.yml");

@@ -9,13 +9,12 @@ import org.bukkit.inventory.ItemStack;
 
 public class ItemTierFinder {
 
-    private ItemTierFinder() {
-    }
-
     private static final int IRON_TIER = CombatSystem.IRON_TIER_LEVEL;
     private static final int STONE_CHAIN_TIER = CombatSystem.IRON_TIER_LEVEL;
     private static final int GOLD_WOOD_LEATHER_TIER = CombatSystem.GOLD_WOOD_LEATHER_TIER_LEVEL;
     private static final int DIAMOND_TIER = CombatSystem.DIAMOND_TIER_LEVEL;
+    private ItemTierFinder() {
+    }
 
     public static int findBattleTier(ItemStack itemStack) {
         return parseBattleMaterials(itemStack);

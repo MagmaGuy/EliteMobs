@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.config.wormholes.premade;
 import com.magmaguy.elitemobs.config.wormholes.WormholeConfigFields;
 import com.magmaguy.elitemobs.wormhole.Wormhole;
 
-public class AGNorthPoleWormholeConfig  extends WormholeConfigFields {
+public class AGNorthPoleWormholeConfig extends WormholeConfigFields {
     public AGNorthPoleWormholeConfig() {
         super("ag_north_pole_wormhole",
                 true,

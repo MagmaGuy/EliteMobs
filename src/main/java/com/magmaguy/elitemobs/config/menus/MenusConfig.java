@@ -8,14 +8,14 @@ public class MenusConfig extends CustomConfig {
 
     private static HashMap<String, MenusConfigFields> menusConfigFields = new HashMap<>();
 
-    public MenusConfig(){
+    public MenusConfig() {
         super("menus", "com.magmaguy.elitemobs.config.menus.premade", MenusConfigFields.class);
         menusConfigFields = new HashMap<>();
         for (String key : super.getCustomConfigFieldsHashMap().keySet())
             menusConfigFields.put(key, (MenusConfigFields) super.getCustomConfigFieldsHashMap().get(key));
     }
 
-    public static HashMap<String, MenusConfigFields> getCustomQuests(){
+    public static HashMap<String, MenusConfigFields> getCustomQuests() {
         return menusConfigFields;
     }
 

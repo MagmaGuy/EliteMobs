@@ -170,6 +170,9 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     @Getter
     @Setter
     private boolean normalizedCombat = false;
+    @Getter
+    @Setter
+    private Double movementSpeedAttribute = null;
 
     //this saves files for regional boss respawn cooldowns
     @Getter
@@ -181,7 +184,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
 
     /**
      * Creates a new default pre-made Custom Boss. The boss is further customized through a builder pattern.
-     *
      */
     public CustomBossesConfigFields(String fileName,
                                     EntityType entityType,
@@ -313,6 +315,8 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
             this.normalizedCombat = true;
         else
             this.normalizedCombat = processBoolean("normalizedCombat", normalizedCombat, false, false);
+
+        this.movementSpeedAttribute = processDouble("movementSpeedAttribute", movementSpeedAttribute, null, false);
     }
 
     private HashMap<Material, Double> processDamageModifiers(String path, HashMap<Material, Double> pluginDefaults) {

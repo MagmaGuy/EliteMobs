@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.playerdata;
 
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.items.MobTierCalculator;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffect;
 import org.bukkit.Bukkit;
@@ -19,6 +20,8 @@ public class ElitePlayerInventory {
     public static HashMap<UUID, ElitePlayerInventory> playerInventories = new HashMap<>();
     public final PlayerItem helmet, chestplate, leggings, boots, mainhand, offhand;
     private final Player player;
+    private boolean getArmorCooldown = false;
+    private boolean getWeaponCooldown = false;
 
     /**
      * Object of the player's inventory for EliteMobs.
@@ -49,11 +52,19 @@ public class ElitePlayerInventory {
      * @return Average of all armor tiers
      */
     public double getArmorTier(boolean update) {
+        if (!armorCheck()) update = false;
         return (helmet.getTier(player.getInventory().getHelmet(), update) +
                 chestplate.getTier(player.getInventory().getChestplate(), update) +
                 leggings.getTier(player.getInventory().getLeggings(), update) +
                 boots.getTier(player.getInventory().getBoots(), update))
                 / 4D;
+    }
+
+    private boolean armorCheck() {
+        if (getArmorCooldown) return false;
+        getArmorCooldown = true;
+        Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> getArmorCooldown = false, 1);
+        return true;
     }
 
     /**
@@ -62,7 +73,15 @@ public class ElitePlayerInventory {
      * @return Tier of the weapon in the main hand.
      */
     public int getWeaponTier(boolean update) {
+        if (!weaponCheck()) update = false;
         return mainhand.getTier(player.getInventory().getItemInMainHand(), update);
+    }
+
+    private boolean weaponCheck() {
+        if (getWeaponCooldown) return false;
+        getWeaponCooldown = true;
+        Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> getWeaponCooldown = false, 1);
+        return true;
     }
 
     public int getFullPlayerTier(boolean update) {
@@ -135,11 +154,11 @@ public class ElitePlayerInventory {
                 boots.getHunterChance(player.getInventory().getBoots(), update);
     }
 
-    public double getPlasmaBootsLevel(boolean update){
+    public double getPlasmaBootsLevel(boolean update) {
         return boots.getPlasmaBootsLevel(player.getInventory().getBoots(), update);
     }
 
-    public double getEarthquakeLevel(boolean update){
+    public double getEarthquakeLevel(boolean update) {
         return helmet.getEarthquakeLevel(player.getInventory().getHelmet(), update) +
                 chestplate.getEarthquakeLevel(player.getInventory().getChestplate(), update) +
                 leggings.getEarthquakeLevel(player.getInventory().getLeggings(), update) +

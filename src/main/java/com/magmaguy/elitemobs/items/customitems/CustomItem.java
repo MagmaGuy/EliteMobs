@@ -42,6 +42,8 @@ public class CustomItem {
     private final CustomItemsConfigFields customItemsConfigFields;
     private final HashMap<Enchantment, Integer> enchantments = new HashMap<>();
     private final HashMap<String, Integer> customEnchantments = new HashMap<>();
+    @Getter
+    private final String permission;
     private String fileName;
     private boolean isEnabled = true;
     private Material material;
@@ -52,8 +54,6 @@ public class CustomItem {
     private double dropWeight = 0;
     private Scalability scalability;
     private ItemType itemType;
-    @Getter
-    private final String permission;
 
     /**
      * Generates a CustomItem object. This holds values for limited and dynamic items until a tier is determined for them.
@@ -101,40 +101,6 @@ public class CustomItem {
         CustomItem customItem = getCustomItem(customItemFileName);
         if (customItem == null) return null;
         return customItem.dropPlayerLoot(player, tier, location);
-    }
-
-    public Item dropPlayerLoot(Player player, int tier, Location location) {
-        if (!permission.isEmpty() && !player.hasPermission(permission)) return null;
-        Item loot = null;
-        int itemTier = 0;
-
-        if (AdventurersGuildConfig.isGuildLootLimiter()) {
-            itemTier = (int) LootTables.setItemTier(tier);
-            if (itemTier > GuildRank.getActiveGuildRank(player) * 10)
-                itemTier = GuildRank.getActiveGuildRank(player) * 10;
-        } else
-            itemTier = tier + 1;
-
-        switch (getScalability()) {
-            case LIMITED:
-                loot = location.getWorld().dropItem(location,
-                        ScalableItemConstructor.constructLimitedItem(itemTier, this, player, null));
-                break;
-            case SCALABLE:
-                loot = location.getWorld().dropItem(location,
-                        ScalableItemConstructor.constructScalableItem(itemTier + 1, this, player, null));
-                break;
-            case FIXED:
-                loot = location.getWorld().dropItem(location,
-                        generateItemStack(itemTier + 1, player));
-            default:
-        }
-
-        SoulbindEnchantment.addPhysicalDisplay(loot, player);
-        loot.setCustomName(loot.getItemStack().getItemMeta().getDisplayName());
-        loot.setCustomNameVisible(true);
-
-        return loot;
     }
 
     private static void addCustomItem(String fileName, CustomItem customItem) {
@@ -231,6 +197,40 @@ public class CustomItem {
                 new WarningMessage("Failed to generate custom item in file " + configFields.getFilename() + " !");
                 ex.printStackTrace();
             }
+    }
+
+    public Item dropPlayerLoot(Player player, int tier, Location location) {
+        if (!permission.isEmpty() && !player.hasPermission(permission)) return null;
+        Item loot = null;
+        int itemTier = 0;
+
+        if (AdventurersGuildConfig.isGuildLootLimiter()) {
+            itemTier = (int) LootTables.setItemTier(tier);
+            if (itemTier > GuildRank.getActiveGuildRank(player) * 10)
+                itemTier = GuildRank.getActiveGuildRank(player) * 10;
+        } else
+            itemTier = tier + 1;
+
+        switch (getScalability()) {
+            case LIMITED:
+                loot = location.getWorld().dropItem(location,
+                        ScalableItemConstructor.constructLimitedItem(itemTier, this, player, null));
+                break;
+            case SCALABLE:
+                loot = location.getWorld().dropItem(location,
+                        ScalableItemConstructor.constructScalableItem(itemTier + 1, this, player, null));
+                break;
+            case FIXED:
+                loot = location.getWorld().dropItem(location,
+                        generateItemStack(itemTier + 1, player));
+            default:
+        }
+
+        SoulbindEnchantment.addPhysicalDisplay(loot, player);
+        loot.setCustomName(loot.getItemStack().getItemMeta().getDisplayName());
+        loot.setCustomNameVisible(true);
+
+        return loot;
     }
 
     private void parseFileName() {

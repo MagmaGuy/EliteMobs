@@ -16,12 +16,12 @@ public class CustomBossesConfig extends CustomConfig {
         super("custombosses", "com.magmaguy.elitemobs.config.custombosses.premade", CustomBossesConfigFields.class);
         customBosses = new HashMap<>();
         for (String key : super.getCustomConfigFieldsHashMap().keySet())
-            if (super.getCustomConfigFieldsHashMap().get(key).isEnabled()){
+            if (super.getCustomConfigFieldsHashMap().get(key).isEnabled()) {
                 CustomBossesConfigFields customBossesConfigFields = (CustomBossesConfigFields) super.getCustomConfigFieldsHashMap().get(key);
                 customBosses.put(key, customBossesConfigFields);
             }
         //This one initializes mobs, which require all mobs to be initialized for phases / reinforcements
-        for (CustomBossesConfigFields customBossesConfigFields : customBosses.values()){
+        for (CustomBossesConfigFields customBossesConfigFields : customBosses.values()) {
             if (customBossesConfigFields.isRegionalBoss()) {
                 CustomBossesConfigFields.getRegionalElites().put(customBossesConfigFields.getFilename(), customBossesConfigFields);
                 //Reinforcement elites are only temporary and situational, don't initialize them

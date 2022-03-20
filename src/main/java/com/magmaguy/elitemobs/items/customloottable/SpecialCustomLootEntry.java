@@ -17,6 +17,19 @@ public class SpecialCustomLootEntry extends CustomLootEntry implements Serializa
     public SpecialCustomLootEntry(List<CustomLootEntry> entries, String rawString, String configFilename) {
         this.rawString = rawString;
         this.configFilename = configFilename;
+        //todo: Integrate Special Loot in its entirety to this class to make it mesh with how the rest of the loot works
+        for (String processedString : rawString.split(":")) {
+            String[] strings = processedString.split("=");
+            switch (strings[0].toLowerCase()) {
+                case "wave":
+                    try {
+                        super.setWave(Integer.parseInt(strings[1]));
+                    } catch (Exception ex) {
+                        errorMessage(rawString, configFilename, "wave");
+                    }
+                    break;
+            }
+        }
         entries.add(this);
     }
 
@@ -24,7 +37,7 @@ public class SpecialCustomLootEntry extends CustomLootEntry implements Serializa
         return new SpecialLoot(rawString, configFilename);
     }
 
-    public ItemStack generateItemStack(Player player){
+    public ItemStack generateItemStack(Player player) {
         return generateSpecialLoot().generateItemStack(player);
     }
 

@@ -107,7 +107,7 @@ public class ZombieParents extends MajorPower implements Listener {
             return;
         }
 
-        startDialog(reinforcementMom, reinforcementDad,  event.getEliteMobEntity());
+        startDialog(reinforcementMom, reinforcementDad, event.getEliteMobEntity());
     }
 
 }

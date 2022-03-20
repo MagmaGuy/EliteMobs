@@ -43,13 +43,12 @@ public class PlayerDamagedByEliteMobHandler implements Listener {
      */
     @EventHandler(priority = EventPriority.HIGHEST)
     public void eliteMobDamageHandler(PlayerDamagedByEliteMobEvent event) {
-
         if (!event.getEliteMobEntity().isValid()) {
             event.setCancelled(true);
             return;
         }
 
-        if (event.getEntityDamageByEntityEvent().isCancelled()){
+        if (event.getEntityDamageByEntityEvent().isCancelled()) {
             if (bypass)
                 bypass = false;
             return;

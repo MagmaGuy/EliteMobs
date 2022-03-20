@@ -41,6 +41,7 @@ public class EnchantmentsConfigFields extends CustomConfigFields {
         processAdditionalFields();
     }
 
-    public void processAdditionalFields(){}
+    public void processAdditionalFields() {
+    }
 
 }

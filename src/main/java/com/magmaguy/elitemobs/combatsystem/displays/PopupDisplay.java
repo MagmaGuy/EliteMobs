@@ -74,7 +74,7 @@ public class PopupDisplay implements Listener {
 
         Vector offset = new Vector(ThreadLocalRandom.current().nextDouble(-1, 1), 0, ThreadLocalRandom.current().nextDouble(-1, 1));
 
-        if (event.isFullHeal()){
+        if (event.isFullHeal()) {
             DialogArmorStand.createDialogArmorStand(event.getEliteEntity().getUnsyncedLivingEntity(),
                     ChatColor.GREEN + "FULL HEAL!", offset.clone().subtract(new Vector(0, 0.2, 0)));
         } else {

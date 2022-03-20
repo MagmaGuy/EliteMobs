@@ -17,8 +17,9 @@ public class EarthquakeConfig extends EnchantmentsConfigFields {
                 5,
                 50);
     }
+
     @Override
-    public void processAdditionalFields(){
+    public void processAdditionalFields() {
         earthquakeActivationMessage = ConfigurationEngine.setString(fileConfiguration, "earthquakeActivationMessage", "&8[EliteMobs] &aEarthquake triggered! &c2 min cooldown!");
         earthquakeAvailableMessage = ConfigurationEngine.setString(fileConfiguration, "earthquakeAvailableMessage", "&8[EliteMobs] &2Earthquake cooldown over!");
     }

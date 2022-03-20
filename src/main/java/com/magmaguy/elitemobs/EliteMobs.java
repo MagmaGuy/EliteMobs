@@ -9,6 +9,7 @@ import com.magmaguy.elitemobs.commands.CommandHandler;
 import com.magmaguy.elitemobs.commands.guild.AdventurersGuildCommand;
 import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.config.commands.CommandsConfig;
+import com.magmaguy.elitemobs.config.customarenas.CustomArenasConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.config.customevents.CustomEventsConfig;
@@ -33,10 +34,10 @@ import com.magmaguy.elitemobs.events.TimedEvent;
 import com.magmaguy.elitemobs.explosionregen.Explosion;
 import com.magmaguy.elitemobs.gamemodes.nightmaremodeworld.DaylightWatchdog;
 import com.magmaguy.elitemobs.gamemodes.zoneworld.Grid;
+import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.items.LootTables;
 import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantment;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
-import com.magmaguy.elitemobs.items.potioneffects.PlayerPotionEffects;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.PluginMobProperties;
 import com.magmaguy.elitemobs.mobs.passive.EggRunnable;
@@ -107,6 +108,7 @@ public class EliteMobs extends JavaPlugin {
         new CustomEventsConfig();
         QuestsConfig.initializeConfig();
         WormholesConfig.initializeConfig();
+        ArenasConfig.initializeConfig();
     }
 
     public static void worldScanner() {
@@ -281,6 +283,9 @@ public class EliteMobs extends JavaPlugin {
         //Commands
         new CommandHandler();
 
+        //Arenas
+        new CustomArenasConfig();
+
         /*
         Check for new plugin version or for dungeon updates
          */
@@ -364,6 +369,8 @@ public class EliteMobs extends JavaPlugin {
         new InfoMessage("Untracking quests...");
         QuestTracking.clear();
 
+        MatchInstance.shutdown();
+
         //save cached data
         Bukkit.getLogger().info("[EliteMobs] Saving EliteMobs databases...");
         PlayerData.closeConnection();
@@ -378,7 +385,6 @@ public class EliteMobs extends JavaPlugin {
         if (!zoneBasedSpawningWorlds.isEmpty())
             Grid.initializeGrid();
         int eggTimerInterval = 20 * 60 * 10 / DefaultConfig.getSuperMobStackAmount();
-        new PlayerPotionEffects();
         if (MobPropertiesConfig.getMobProperties().get(EntityType.CHICKEN).isEnabled() && DefaultConfig.getSuperMobStackAmount() > 0) {
             new EggRunnable().runTaskTimer(this, eggTimerInterval, eggTimerInterval);
         }

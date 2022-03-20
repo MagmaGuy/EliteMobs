@@ -11,9 +11,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ProceduralItemGenerationSettingsConfig {
-    private ProceduralItemGenerationSettingsConfig() {
-    }
-
     @Getter
     private static FileConfiguration fileConfiguration;
     @Getter
@@ -63,6 +60,8 @@ public class ProceduralItemGenerationSettingsConfig {
     private static List<String> verbs;
     @Getter
     private static List<String> verbers;
+    private ProceduralItemGenerationSettingsConfig() {
+    }
 
     public static void initializeConfig() {
         File file = ConfigurationEngine.fileCreator("ProceduralItemGenerationSettings.yml");
