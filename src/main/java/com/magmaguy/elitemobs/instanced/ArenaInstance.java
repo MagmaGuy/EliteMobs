@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.instanced;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
@@ -65,7 +66,7 @@ public class ArenaInstance extends MatchInstance {
                 }
             }
             if (!message.isEmpty() && wave > 0)
-                waveMessage.put(wave, message);
+                waveMessage.put(wave, ChatColorConverter.convert(message));
         }
     }
 
@@ -164,14 +165,14 @@ public class ArenaInstance extends MatchInstance {
         //victory state
         if (currentWave > getCustomArenasConfigFields().getWaveCount()) {
             participants.forEach(player -> player.sendTitle(ArenasConfig.getVictoryTitle().replace("$wave", customArenasConfigFields.getWaveCount() + ""),
-                    ArenasConfig.getVictorySubtitle().replace("$wave", customArenasConfigFields.getWaveCount() + ""), 60, 60 * 10, 60));
+                    ArenasConfig.getVictorySubtitle().replace("$wave", customArenasConfigFields.getWaveCount() + ""), 20, 20 * 10, 20));
             StringBuilder playerNames = new StringBuilder();
             for (Player player : participants)
                 playerNames.append(player.getName()).append(" ");
             Bukkit.getServer().broadcastMessage(ArenasConfig.getVictoryBroadcast().replace("$players", playerNames.toString()));
         } else
             participants.forEach(player -> player.sendTitle(ArenasConfig.getDefeatTitle().replace("$wave", currentWave + ""),
-                    ArenasConfig.getDefeatSubtitle().replace("$wave", currentWave + ""), 60, 60 * 10, 60));
+                    ArenasConfig.getDefeatSubtitle().replace("$wave", currentWave + ""), 20, 20 * 10, 20));
 
         Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, this::resetMatch, customArenasConfigFields.getDelayBetweenWaves());
     }

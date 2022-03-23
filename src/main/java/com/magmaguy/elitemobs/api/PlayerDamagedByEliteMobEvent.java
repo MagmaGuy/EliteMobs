@@ -100,7 +100,7 @@ public class PlayerDamagedByEliteMobEvent extends Event implements Cancellable {
 
             //dodge chance
             if (ThreadLocalRandom.current().nextDouble() < GuildRank.dodgeBonusValue(GuildRank.getGuildPrestigeRank(player), GuildRank.getActiveGuildRank(player)) / 100) {
-                player.sendTitle("", "Dodged!");
+                player.sendTitle(" ", "Dodged!");
                 event.setCancelled(true);
                 return;
             }
