@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.instanced;
 
 
+import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.ArenasConfig;
@@ -9,6 +10,7 @@ import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.VisualArmorStand;
 import com.magmaguy.elitemobs.utils.WarningMessage;
+import lombok.Getter;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
@@ -18,6 +20,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -31,6 +34,7 @@ public class MatchInstance {
 
     private static HashSet<MatchInstance> instances = new HashSet<>();
     protected HashSet<Player> players = new HashSet<>();
+    protected HashMap<Player, Integer> playerLives = new HashMap();
     protected HashSet<Player> participants = new HashSet<>();
     protected HashSet<Player> spectators = new HashSet<>();
     protected InstancedRegionState state;
@@ -48,7 +52,8 @@ public class MatchInstance {
     private int minZ;
     private int maxZ;
     private World world;
-    private HashMap<Player, DeathLocation> deathBanners = new HashMap<>();
+    @Getter
+    private HashMap<Block, DeathLocation> deathBanners = new HashMap<>();
 
     public MatchInstance(Location corner1, Location corner2, Location startLocation, Location exitLocation, int minPlayers, int maxPlayers, List<String> spawnPoints) {
         this.corner1 = corner1;
@@ -157,12 +162,19 @@ public class MatchInstance {
         players.add(player);
         player.teleport(startLocation);
         PlayerData.setMatchInstance(player, this);
+        playerLives.put(player, 3);
     }
 
     public void removePlayer(Player player) {
         PlayerData.setMatchInstance(player, null);
         players.remove(player);
         if (player.isOnline()) player.teleport(exitLocation);
+        else if (getDeathLocationByPlayer(player) != null)
+            getDeathLocationByPlayer(player).clear(false);
+        if (players.size() < 1)
+            resetMatch();
+        playerLives.remove(player);
+
     }
 
     public void playerDeath(Player player) {
@@ -176,6 +188,15 @@ public class MatchInstance {
         }
         new DeathLocation(player);
         addSpectator(player);
+    }
+
+    public void revivePlayer(Player player, DeathLocation deathLocation) {
+        playerLives.put(player, playerLives.get(player) - 1);
+        players.add(player);
+        player.setGameMode(GameMode.SURVIVAL);
+        spectators.remove(player);
+        player.teleport(deathLocation.bannerBlock.getLocation());
+        PlayerData.setMatchInstance(player, this);
     }
 
     public void addSpectator(Player player) {
@@ -192,6 +213,9 @@ public class MatchInstance {
         player.setGameMode(GameMode.SURVIVAL);
         player.teleport(exitLocation);
         PlayerData.setMatchInstance(player, null);
+        playerLives.remove(player);
+        if (getDeathLocationByPlayer(player) != null)
+            getDeathLocationByPlayer(player).clear(false);
     }
 
     public void removeAnyKind(Player player) {
@@ -305,6 +329,13 @@ public class MatchInstance {
         IDLE, STARTING, ONGOING, COMPLETED
     }
 
+    private DeathLocation getDeathLocationByPlayer(Player player) {
+        for (DeathLocation deathLocation : deathBanners.values())
+            if (deathLocation.deadPlayer.equals(player))
+                return deathLocation;
+        return null;
+    }
+
     public static class MatchInstanceEvents implements Listener {
         @EventHandler
         public void onPlayerLeave(PlayerQuitEvent event) {
@@ -321,6 +352,14 @@ public class MatchInstance {
             event.setCancelled(true);
             matchInstance.playerDeath(player);
         }
+
+        @EventHandler
+        public void onPlayerBreakBlockEvent(BlockBreakEvent event) {
+            for (MatchInstance matchInstance : instances)
+                if (matchInstance.state.equals(InstancedRegionState.ONGOING))
+                    if (matchInstance.getDeathBanners().get(event.getBlock()) != null)
+                        matchInstance.getDeathBanners().get(event.getBlock()).clear(true);
+        }
     }
 
     private class DeathLocation {
@@ -328,14 +367,20 @@ public class MatchInstance {
         private Player deadPlayer;
         private Location deathLocation = null;
         private ArmorStand nameTag;
+        private ArmorStand livesLeft;
+        private ArmorStand instructions;
 
         private DeathLocation(Player player) {
+            if (playerLives.get(player) < 1)
+                return;
             this.deadPlayer = player;
             this.bannerBlock = player.getLocation().getBlock();
             findBannerLocation(player.getLocation());
+            instructions = VisualArmorStand.VisualArmorStand(deathLocation.clone().add(new Vector(0, 2.2, 0)), ChatColorConverter.convert("&2Punch to rez!"));
             nameTag = VisualArmorStand.VisualArmorStand(deathLocation.clone().add(new Vector(0, 2, 0)), player.getDisplayName());
+            livesLeft = VisualArmorStand.VisualArmorStand(deathLocation.clone().add(new Vector(0, 1.8, 0)), playerLives.get(deadPlayer) + " lives left!");
             if (deathLocation != null)
-                deathBanners.put(player, this);
+                deathBanners.put(bannerBlock, this);
         }
 
         private void findBannerLocation(Location location) {
@@ -354,6 +399,11 @@ public class MatchInstance {
         public void clear(boolean resurrect) {
             bannerBlock.setType(Material.AIR);
             EntityTracker.unregister(nameTag, RemovalReason.EFFECT_TIMEOUT);
+            EntityTracker.unregister(instructions, RemovalReason.EFFECT_TIMEOUT);
+            EntityTracker.unregister(livesLeft, RemovalReason.EFFECT_TIMEOUT);
+            deathBanners.remove(bannerBlock);
+            if (resurrect)
+                revivePlayer(deadPlayer, this);
         }
     }
 

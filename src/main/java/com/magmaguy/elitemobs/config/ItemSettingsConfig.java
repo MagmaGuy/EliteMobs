@@ -176,6 +176,4 @@ public class ItemSettingsConfig {
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }
-
-
 }

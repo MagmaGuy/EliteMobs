@@ -220,7 +220,7 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
                         false,
                         false,
                         1);
-                damage = event.getFinalDamage();
+                damage = event.getDamage();
             }
 
             damage = Round.twoDecimalPlaces(damage);
