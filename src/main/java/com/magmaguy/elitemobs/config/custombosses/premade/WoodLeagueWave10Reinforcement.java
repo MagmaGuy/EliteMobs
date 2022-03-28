@@ -17,5 +17,9 @@ public class WoodLeagueWave10Reinforcement extends CustomBossesConfigFields {
         setMovementSpeedAttribute(0.6D);
         setHealthMultiplier(0.25D);
         setDamageMultiplier(0.8D);
+        setDropsRandomLoot(false);
+        setDropsEliteMobsLoot(false);
+        setDropsVanillaLoot(false);
+        setNormalizedCombat(true);
     }
 }

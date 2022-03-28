@@ -10,7 +10,7 @@ import java.util.Arrays;
 public class WoodLeagueWave19Ranged extends CustomBossesConfigFields {
     public WoodLeagueWave19Ranged(){
         super("wood_league_wave_19_ranged",
-                EntityType.SKELETON,
+                EntityType.PILLAGER,
                 true,
                 "$normalLevel Archery Club Enthusiast",
                 "19");

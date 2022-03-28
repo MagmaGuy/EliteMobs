@@ -8,9 +8,9 @@ import org.bukkit.inventory.ItemStack;
 public class WoodLeagueWave6Ranged extends CustomBossesConfigFields {
     public WoodLeagueWave6Ranged(){
         super("wood_league_wave_6_ranged",
-                EntityType.SKELETON,
+                EntityType.PILLAGER,
                 true,
-                "$normalLevel Arena Skeleton",
+                "$normalLevel Arena Crossbowman",
                 "6");
         setFollowDistance(60);
         setHelmet(new ItemStack(Material.STICK));
