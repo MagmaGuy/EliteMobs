@@ -8,9 +8,9 @@ import org.bukkit.inventory.ItemStack;
 public class WoodLeagueWave1Ranged extends CustomBossesConfigFields {
     public WoodLeagueWave1Ranged() {
         super("wood_league_wave_1_ranged",
-                EntityType.SKELETON,
+                EntityType.PILLAGER,
                 true,
-                "$normalLevel Arena Skeleton",
+                "$normalLevel Arena Crossbowman",
                 "1");
         setMainHand(new ItemStack(Material.BOW));
         setFollowDistance(60);
