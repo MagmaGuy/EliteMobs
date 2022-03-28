@@ -214,7 +214,7 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
                         }
                         customBossEntity.spawn(targetter.getLocation(), eliteEntity.getLevel(), false);
 
-                        if (!customBossEntity.getLivingEntity().isValid()) {
+                        if (!customBossEntity.exists() || !customBossEntity.getLivingEntity().isValid()) {
                             targetter.setAI(true);
                             cancel();
                             targetter.setAI(true);

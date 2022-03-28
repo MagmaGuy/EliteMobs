@@ -125,6 +125,9 @@ public class EliteEntity implements SimplePersistentEntityInterface {
     @Getter
     @Setter
     private boolean dying = false;
+    @Getter
+    @Setter
+    private boolean healing = false;
 
     /**
      * Functions as a placeholder for {@link CustomBossEntity} that haven't been initialized yet. Uses the builder pattern

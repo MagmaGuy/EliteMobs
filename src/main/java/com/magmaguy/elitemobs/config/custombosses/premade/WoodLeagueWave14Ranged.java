@@ -10,9 +10,9 @@ import java.util.Arrays;
 public class WoodLeagueWave14Ranged extends CustomBossesConfigFields {
     public WoodLeagueWave14Ranged(){
         super("wood_league_wave_14_ranged",
-                EntityType.SKELETON,
+                EntityType.PILLAGER,
                 true,
-                "$normalLevel Arena Skeleton",
+                "$normalLevel Arena Crossbowman",
                 "14");
         setFollowDistance(60);
         setHelmet(new ItemStack(Material.STICK));

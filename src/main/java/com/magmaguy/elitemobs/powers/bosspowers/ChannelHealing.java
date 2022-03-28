@@ -28,7 +28,7 @@ public class ChannelHealing extends CombatEnterScanPower {
                 }
                 doPower(eliteEntity);
             }
-        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 20);
+        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 20 * 2);
     }
 
     private void doPower(EliteEntity eliteEntity) {
@@ -36,6 +36,7 @@ public class ChannelHealing extends CombatEnterScanPower {
             EliteEntity parsedEntity = EntityTracker.getEliteMobEntity(entity);
             if (parsedEntity == null) continue;
             if (parsedEntity.getHealth() / parsedEntity.getMaxHealth() > .8) continue;
+            if (parsedEntity.isHealing()) continue;
             channelHealing(eliteEntity, parsedEntity);
             return;
         }
@@ -45,6 +46,7 @@ public class ChannelHealing extends CombatEnterScanPower {
     private void channelHealing(EliteEntity healer, EliteEntity damagedEntity) {
         super.setInCooldown(healer, true);
         healer.getLivingEntity().setAI(false);
+        damagedEntity.setHealing(true);
         new BukkitRunnable() {
             int timer = 0;
 
@@ -57,12 +59,13 @@ public class ChannelHealing extends CombatEnterScanPower {
                     cancel();
                     setInCooldown(healer, false);
                     doCooldown(healer);
+                    damagedEntity.setHealing(false);
                     if (healer.isValid())
                         healer.getLivingEntity().setAI(true);
                     return;
                 }
 
-                if (timer % 10 == 0) {
+                if (timer % 10 == 0 && timer > 0) {
                     double healAmount = healer.getLevel() / 2d;
                     damagedEntity.heal(healAmount);
                     damagedEntity.getLocation().getWorld().spawnParticle(Particle.TOTEM, damagedEntity.getLocation().add(new Vector(0, 1, 0)), 20, 0.1, 0.1, 0.1);
