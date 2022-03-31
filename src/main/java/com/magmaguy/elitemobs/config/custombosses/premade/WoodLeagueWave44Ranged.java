@@ -19,7 +19,7 @@ public class WoodLeagueWave44Ranged extends CustomBossesConfigFields {
         setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
         setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
         setBoots(new ItemStack(Material.DIAMOND_BOOTS));
-        setMainHand(new ItemStack(Material.BOW));
+        setMainHand(new ItemStack(Material.CROSSBOW));
         setPowers(Arrays.asList("attack_freeze.yml", "skeleton_tracking_arrow.yml", "shield_wall.yml"));
     }
 }

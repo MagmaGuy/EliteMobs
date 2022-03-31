@@ -16,7 +16,7 @@ public class WoodLeagueWave17Ranged extends CustomBossesConfigFields {
                 "17");
         setFollowDistance(60);
         setHelmet(new ItemStack(Material.STICK));
-        setMainHand(new ItemStack(Material.BOW));
+        setMainHand(new ItemStack(Material.CROSSBOW));
         setPowers(Arrays.asList("attack_vacuum.yml", "skeleton_tracking_arrow.yml"));
     }
 }

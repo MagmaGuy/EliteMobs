@@ -40,7 +40,7 @@ public class QuestCompleteEvent extends Event implements Cancellable {
 
     public static class QuestCompleteEventHandler implements Listener {
         @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-        public void onQuestAccept(QuestCompleteEvent event) {
+        public void onQuestComplete(QuestCompleteEvent event) {
             new EventCaller(new QuestRewardEvent(event.getPlayer(), event.quest));
         }
     }
