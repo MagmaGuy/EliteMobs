@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.commands.quests;
 
+import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.Quest;
 import com.magmaguy.elitemobs.quests.QuestTracking;
@@ -9,6 +10,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 public class QuestCommand {
@@ -46,6 +48,13 @@ public class QuestCommand {
         }
         PlayerQuestCooldowns.resetPlayerQuestCooldowns(player);
         commandSender.sendMessage("[EliteMobs] Successfully reset quests for player " + playerString);
+    }
+
+    public static void completeQuest(Player player){
+        for (Quest quest : new ArrayList<Quest>(PlayerData.getQuests(player.getUniqueId()))){
+            quest.getQuestObjectives().setForceOver(true);
+            Quest.completeQuest(quest.getQuestID(), player);
+        }
     }
 
 }
