@@ -770,6 +770,14 @@ public class AdminCommands {
                 .permission("elitemobs.*")
                 .meta(CommandMeta.DESCRIPTION, "Resets player quest progress.")
                 .handler(commandContext -> QuestCommand.resetQuests(commandContext.getSender(), commandContext.get("player"))));
+
+        // /em quest forcecomplete
+        manager.command(builder.literal("quest")
+                .literal("forcecomplete")
+                .senderType(CommandSender.class)
+                .permission("elitemobs.*")
+                .meta(CommandMeta.DESCRIPTION, "Forces completion of all player quests.")
+                .handler(commandContext -> QuestCommand.completeQuest((Player) commandContext.getSender())));
     }
 
     private void testFireball(Player player) {

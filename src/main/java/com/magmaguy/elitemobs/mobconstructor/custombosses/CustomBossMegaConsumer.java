@@ -17,8 +17,6 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import java.util.HashSet;
 
@@ -134,9 +132,9 @@ public class CustomBossMegaConsumer {
 
     private void setFrozen(LivingEntity livingEntity) {
         if (!customBossesConfigFields.isFrozen()) return;
-        livingEntity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 10));
+        livingEntity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0);
         livingEntity.setCollidable(false);
-        livingEntity.setGravity(false);
+        //livingEntity.setGravity(false);
     }
 
     private void setEquipment(LivingEntity livingEntity) {

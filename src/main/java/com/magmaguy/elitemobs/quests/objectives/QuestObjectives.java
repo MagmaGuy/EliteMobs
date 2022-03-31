@@ -36,6 +36,8 @@ public class QuestObjectives implements Serializable {
     @Getter
     @Setter
     private boolean turnedIn = false;
+    @Setter
+    private boolean forceOver = false;
 
     /**
      * Used for dynamic quests
@@ -72,6 +74,8 @@ public class QuestObjectives implements Serializable {
      * @return
      */
     public boolean isOver() {
+        //used by the force bypass
+        if (forceOver) return true;
         boolean checkOver = true;
         for (Objective objective : objectives)
             if (!objective.isObjectiveCompleted()) {

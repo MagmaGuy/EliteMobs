@@ -19,7 +19,7 @@ public class WoodLeagueWave26Ranged extends CustomBossesConfigFields {
         setChestplate(new ItemStack(Material.LEATHER_CHESTPLATE));
         setLeggings(new ItemStack(Material.LEATHER_LEGGINGS));
         setBoots(new ItemStack(Material.LEATHER_BOOTS));
-        setMainHand(new ItemStack(Material.BOW));
+        setMainHand(new ItemStack(Material.CROSSBOW));
         setPowers(Arrays.asList("attack_vacuum.yml", "skeleton_tracking_arrow.yml"));
         setDamageMultiplier(0.5D);
         setHealthMultiplier(0.75D);
