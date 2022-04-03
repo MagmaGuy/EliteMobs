@@ -13,6 +13,7 @@ import com.magmaguy.elitemobs.utils.Round;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import com.magmaguy.elitemobs.utils.WeightedProbability;
 import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.data.Directional;
@@ -68,7 +69,9 @@ public class TreasureChest {
                 return;
             }
 
-        generateChest();
+        int time = (int) ((restockTime - Instant.now().getEpochSecond()) * 20);
+        Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, this::generateChest, time);
+
         treasureChestHashMap.put(location, this);
 
     }
@@ -105,7 +108,6 @@ public class TreasureChest {
                     customTreasureChestConfigFields.getChestMaterial() + " ! Chest materials are directional, is your chest a chest?");
         }
         location.getBlock().getState().update();
-
     }
 
     public void doInteraction(Player player) {
@@ -136,6 +138,8 @@ public class TreasureChest {
 
         restockTime = cooldownTime();
         customTreasureChestConfigFields.setRestockTime(location, restockTime);
+
+        Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, this::generateChest, 20L * 60 * customTreasureChestConfigFields.getRestockTimer());
 
     }
 

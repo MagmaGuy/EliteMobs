@@ -128,6 +128,8 @@ public class EliteMobs extends JavaPlugin {
     @Override
     public void onEnable() {
 
+        Bukkit.getLogger().info("test2");
+
         Bukkit.getLogger().info(" _____ _     _____ _____ ________  ______________  _____");
         Bukkit.getLogger().info("|  ___| |   |_   _|_   _|  ___|  \\/  |  _  | ___ \\/  ___|");
         Bukkit.getLogger().info("| |__ | |     | |   | | | |__ | .  . | | | | |_/ /\\ `--.");
