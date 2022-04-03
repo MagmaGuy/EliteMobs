@@ -102,7 +102,7 @@ public class CustomTreasureChestConfigFields extends CustomConfigFields {
         this.customLootTable = new CustomLootTable(this);
         this.mimicChance = processDouble("mimicChance", mimicChance, 0, true);
         this.mimicCustomBossesList = processStringList("mimicCustomBossesList", mimicCustomBossesList, new ArrayList<>(), true);
-        this.restockTime = processLong("restockTime", restockTimer, 0, false);
+        this.restockTime = processLong("restockTime", restockTime, 0, false);
         this.restockTimers = processStringList("restockTimers", restockTimers, new ArrayList<>(), false);
         this.effects = processStringList("effects", effects, new ArrayList<>(), false);
         this.locations = processStringList("locations", locations, new ArrayList<>(), false);
@@ -130,6 +130,12 @@ public class CustomTreasureChestConfigFields extends CustomConfigFields {
         }
     }
 
+    /**
+     * For the new format of Treasure chests, which have multiple locations per file
+     * @param chestInstanceLocation
+     * @param unixTimeStamp
+     * @return
+     */
     public TreasureChest updateTreasureChest(Location chestInstanceLocation, long unixTimeStamp) {
         int index = -1;
         String deserializedLocation = ConfigurationLocation.deserialize(chestInstanceLocation.getBlock().getLocation());
@@ -141,8 +147,10 @@ public class CustomTreasureChestConfigFields extends CustomConfigFields {
         String serializedUpdatedLocation = deserializedLocation + ":" + unixTimeStamp;
         TreasureChest treasureChest = null;
         if (index != -1) {
+            //case for existing treasure chest getting a cooldown
             locations.set(index, serializedUpdatedLocation);
         } else {
+            //case for a new treasure chest
             locations.add(serializedUpdatedLocation);
             treasureChest = new TreasureChest(this, chestInstanceLocation, unixTimeStamp);
         }
@@ -152,7 +160,7 @@ public class CustomTreasureChestConfigFields extends CustomConfigFields {
     }
 
     public void removeTreasureChest(Location chestInstanceLocation) {
-        if (locations.size() < 1) return;
+        if (locations.isEmpty()) return;
         int index = -1;
         String deserializedLocation = ConfigurationLocation.deserialize(chestInstanceLocation.getBlock().getLocation());
         for (String string : locations)
