@@ -254,14 +254,34 @@ public class CustomSpawn {
             location.setY(ThreadLocalRandom.current().nextInt(-64, 256));
         World world = location.getWorld();
 
+        if (!customSpawnConfigFields.getValidBiomes().isEmpty() && !customSpawnConfigFields.getValidBiomes().contains(location.getBlock().getBiome()))
+            return null;
+
         //Set Y level - Location isn't final yet
         if (customSpawnConfigFields.isSurfaceSpawn())
             //this won't work for Nether environments, but who wants surface spawns on the Nether?
             location = Objects.requireNonNull(location.getWorld()).getHighestBlockAt(location).getLocation().add(new Vector(0.5, 1, 0.5));
         else if (customSpawnConfigFields.isUndergroundSpawn()) {
+            int highestBlockYAt = Objects.requireNonNull(location.getWorld()).getHighestBlockYAt(location);
             //Let's hope there's caves
-            if (location.getY() > Objects.requireNonNull(location.getWorld()).getHighestBlockAt(location).getY()) {
+            if (location.getY() > highestBlockYAt ||
+                    location.getY() > highestBlockYAt / 2D) {
                 for (int y = (int) location.getY(); y > -64; y--) {
+                    Location tempLocation = location.clone();
+                    tempLocation.setY(y);
+                    if (location.getBlock().getType().equals(Material.VOID_AIR)) return null;
+                    if (y < customSpawnConfigFields.getLowestYLevel()) return null;
+                    Block groundBlock = location.clone().subtract(new Vector(0, 1, 0)).getBlock();
+                    if (!groundBlock.getType().isSolid()) continue;
+                    //Check temp location block
+                    if (!tempLocation.getBlock().getType().isAir()) continue;
+                    //Check block above temp location
+                    if (!tempLocation.add(new Vector(0, 1, 0)).getBlock().getType().isAir()) continue;
+                    location = tempLocation;
+                    break;
+                }
+            } else {
+                for (int y = (int) location.getY(); y < highestBlockYAt; y++) {
                     Location tempLocation = location.clone();
                     tempLocation.setY(y);
                     if (location.getBlock().getType().equals(Material.VOID_AIR)) return null;

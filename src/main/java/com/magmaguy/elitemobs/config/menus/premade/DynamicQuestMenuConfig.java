@@ -78,7 +78,7 @@ public class DynamicQuestMenuConfig extends MenusConfigFields {
         for (CustomLootEntry customLootEntry : questReward.getCustomLootTable().getEntries()) {
             ItemStack itemStack = null;
             if (customLootEntry instanceof EliteCustomLootEntry)
-                itemStack = ((EliteCustomLootEntry) customLootEntry).generateItemStack(questReward.getRewardLevel(), Bukkit.getPlayer(questReward.getPlayerUUID()));
+                itemStack = ((EliteCustomLootEntry) customLootEntry).generateItemStack(questReward.getRewardLevel(), Bukkit.getPlayer(questReward.getPlayerUUID()), null);
             else if (customLootEntry instanceof SpecialCustomLootEntry)
                 itemStack = ((SpecialCustomLootEntry) customLootEntry).generateItemStack(Bukkit.getPlayer(questReward.getPlayerUUID()));
             else if (customLootEntry instanceof ItemStackCustomLootEntry)

@@ -194,7 +194,7 @@ public class ItemLootShower implements Listener {
                 Arrays.asList("EliteMobsCurrencyItem", value + "", ThreadLocalRandom.current().nextDouble() + "")), player);
         int model = 1;
         try {
-            model = EconomySettingsConfig.getThisConfiguration().getInt("lootShowerMaterial." + (int) value);
+            model = EconomySettingsConfig.getThisConfiguration().getInt("lootShowerData." + (int) value);
         } catch (Exception ex) {
             new WarningMessage("Failed to get coin model for value " + value + " !");
         }

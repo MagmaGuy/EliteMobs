@@ -8,6 +8,7 @@ import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -71,8 +72,14 @@ public class AdventurersGuildConfig {
     private static String prestigeUnlockMessageTitle;
     @Getter
     private static String prestigeUnlockMessageSubtitle;
+    @Getter
+    private static List<String> worldsWithoutAGBonuses;
+    @Getter
+    private static double peacefulModeEliteChanceDecrease;
+
     private static File file;
     private static FileConfiguration fileConfiguration;
+
     private AdventurersGuildConfig() {
     }
 
@@ -108,7 +115,7 @@ public class AdventurersGuildConfig {
                     case 0:
                         if (prestigeRank == 0) {
                             rankName = ConfigurationEngine.setString(fileConfiguration,
-                                    "Prestige " + prestigeRank + " rank " + normalRank, "&8Commoner");
+                                    "Prestige " + prestigeRank + " rank " + normalRank, "&8Commoner - disables elites!");
                             shortRankName = ConfigurationEngine.setString(fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", "&6&l✧&e" + romanNumerals(normalRank));
                         } else {
@@ -379,6 +386,10 @@ public class AdventurersGuildConfig {
 
         //initializes the AG location
         AdventurersGuildCommand.defineTeleportLocation();
+
+        peacefulModeEliteChanceDecrease = ConfigurationEngine.setDouble(fileConfiguration, "peacefulModeEliteChanceDecrease", 0.2);
+
+        worldsWithoutAGBonuses = ConfigurationEngine.setList(fileConfiguration, "worldsWithoutAGBonuses", new ArrayList());
 
         save();
     }

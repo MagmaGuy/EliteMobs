@@ -97,11 +97,13 @@ public class CustomItem {
         return customItems.get(fileName);
     }
 
+    /*
     public static Item dropPlayerLoot(Player player, int tier, String customItemFileName, Location location) {
         CustomItem customItem = getCustomItem(customItemFileName);
         if (customItem == null) return null;
         return customItem.dropPlayerLoot(player, tier, location);
     }
+     */
 
     private static void addCustomItem(String fileName, CustomItem customItem) {
         customItems.put(fileName, customItem);
@@ -199,7 +201,7 @@ public class CustomItem {
             }
     }
 
-    public Item dropPlayerLoot(Player player, int tier, Location location) {
+    public Item dropPlayerLoot(Player player, int tier, Location location, EliteEntity eliteEntity) {
         if (!permission.isEmpty() && !player.hasPermission(permission)) return null;
         Item loot = null;
         int itemTier = 0;
@@ -214,15 +216,15 @@ public class CustomItem {
         switch (getScalability()) {
             case LIMITED:
                 loot = location.getWorld().dropItem(location,
-                        ScalableItemConstructor.constructLimitedItem(itemTier, this, player, null));
+                        ScalableItemConstructor.constructLimitedItem(itemTier, this, player, eliteEntity));
                 break;
             case SCALABLE:
                 loot = location.getWorld().dropItem(location,
-                        ScalableItemConstructor.constructScalableItem(itemTier + 1, this, player, null));
+                        ScalableItemConstructor.constructScalableItem(itemTier + 1, this, player, eliteEntity));
                 break;
             case FIXED:
                 loot = location.getWorld().dropItem(location,
-                        generateItemStack(itemTier + 1, player));
+                        generateItemStack(itemTier + 1, player, eliteEntity));
             default:
         }
 
@@ -395,17 +397,17 @@ public class CustomItem {
         return itemStack;
     }
 
-    public ItemStack generateItemStack(int itemTier, Player player) {
+    public ItemStack generateItemStack(int itemTier, Player player, EliteEntity eliteEntity) {
         ItemStack itemStack = null;
         switch (this.scalability) {
             case FIXED:
-                itemStack = generateDefaultsItemStack(player, false, null);
+                itemStack = generateDefaultsItemStack(player, false, eliteEntity);
                 break;
             case LIMITED:
-                itemStack = ScalableItemConstructor.constructLimitedItem(itemTier, this, player, null);
+                itemStack = ScalableItemConstructor.constructLimitedItem(itemTier, this, player, eliteEntity);
                 break;
             case SCALABLE:
-                itemStack = ScalableItemConstructor.constructScalableItem(itemTier, this, player, null);
+                itemStack = ScalableItemConstructor.constructScalableItem(itemTier, this, player, eliteEntity);
         }
         return itemStack;
     }

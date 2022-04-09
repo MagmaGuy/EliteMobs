@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.config.customarenas.CustomArenasConfigFields;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.config.customquests.CustomQuestsConfigFields;
 import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestConfigFields;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -78,13 +79,13 @@ public class CustomLootTable implements Serializable {
         new ItemStackCustomLootEntry(entries, itemStack);
     }
 
-    public void bossDrop(Player player, int level, Location dropLocation) {
+    public void bossDrop(Player player, int level, Location dropLocation, EliteEntity eliteEntity) {
         for (CustomLootEntry customLootEntry : entries)
             if (customLootEntry.willDrop(player))
                 if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory())
-                    customLootEntry.directDrop(level, player);
+                    customLootEntry.directDrop(level, player, eliteEntity);
                 else
-                    customLootEntry.locationDrop(level, player, dropLocation);
+                    customLootEntry.locationDrop(level, player, dropLocation, eliteEntity);
     }
 
     public void treasureChestDrop(Player player, int chestLevel, Location dropLocation) {

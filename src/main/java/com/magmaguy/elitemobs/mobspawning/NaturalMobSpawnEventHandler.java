@@ -1,6 +1,8 @@
 package com.magmaguy.elitemobs.mobspawning;
 
 import com.magmaguy.elitemobs.EliteMobs;
+import com.magmaguy.elitemobs.adventurersguild.GuildRank;
+import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.ValidWorldsConfig;
@@ -28,6 +30,7 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.CUSTOM;
 import static org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.DROWNED;
@@ -129,6 +132,14 @@ public class NaturalMobSpawnEventHandler implements Listener {
 
         if (ValidWorldsConfig.getNightmareWorlds().contains(event.getEntity().getWorld().getName()))
             validChance += DefaultConfig.getNightmareWorldSpawnBonus();
+
+        AtomicInteger peacefulModeDebuffs = new AtomicInteger();
+        nearbyPlayers.forEach(player -> {
+            if (GuildRank.getActiveGuildRank(player) == 0)
+                peacefulModeDebuffs.getAndIncrement();
+        });
+
+        validChance -= peacefulModeDebuffs.get() * AdventurersGuildConfig.getPeacefulModeEliteChanceDecrease();
 
         if (ThreadLocalRandom.current().nextDouble() >= validChance) return;
 

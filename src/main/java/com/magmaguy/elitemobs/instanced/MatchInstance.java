@@ -171,8 +171,8 @@ public class MatchInstance {
         if (player.isOnline()) player.teleport(exitLocation);
         else if (getDeathLocationByPlayer(player) != null)
             getDeathLocationByPlayer(player).clear(false);
-        if (players.size() < 1)
-            resetMatch();
+        if (players.isEmpty())
+            endMatch();
         playerLives.remove(player);
 
     }
@@ -221,7 +221,6 @@ public class MatchInstance {
     public void removeAnyKind(Player player) {
         if (players.contains(player)) removePlayer(player);
         if (spectators.contains(player)) removeSpectator(player);
-        if (players.isEmpty()) endMatch();
     }
 
     private void startWatchdogs() {
