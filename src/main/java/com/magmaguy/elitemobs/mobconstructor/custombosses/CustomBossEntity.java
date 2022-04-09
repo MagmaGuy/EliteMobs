@@ -350,6 +350,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
         if (customBossesConfigFields.getSpawnMessage() == null) return;
         if (customBossesConfigFields.getAnnouncementPriority() < 1) return;
         if (getLocation() == null) return;
+        if (getLocation().getWorld() == null) return;
         if (!EventsConfig.isAnnouncementBroadcastWorldOnly())
             Bukkit.broadcastMessage(ChatColorConverter.convert(customBossesConfigFields.getSpawnMessage()));
         else

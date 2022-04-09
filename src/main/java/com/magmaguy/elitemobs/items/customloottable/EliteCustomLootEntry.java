@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.items.customloottable;
 
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -95,7 +96,7 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
                     try {
                         super.setItemLevel(Integer.parseInt(strings[1]));
                     } catch (Exception ex) {
-                        errorMessage(rawString, configFilename, "levl");
+                        errorMessage(rawString, configFilename, "level");
                     }
                     break;
                 case "wave":
@@ -114,19 +115,19 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
         return CustomItem.getCustomItem(filename);
     }
 
-    public ItemStack generateItemStack(int level, Player player) {
-        return generateCustomItem().generateItemStack(level, player);
+    public ItemStack generateItemStack(int level, Player player, EliteEntity eliteEntity) {
+        return generateCustomItem().generateItemStack(level, player, eliteEntity);
     }
 
     @Override
-    public void locationDrop(int itemTier, Player player, Location location) {
+    public void locationDrop(int itemTier, Player player, Location location, EliteEntity eliteEntity) {
         for (int i = 0; i < getAmount(); i++)
-            generateCustomItem().dropPlayerLoot(player, itemTier, location);
+            generateCustomItem().dropPlayerLoot(player, itemTier, location, eliteEntity);
     }
 
     @Override
-    public void directDrop(int itemTier, Player player) {
+    public void directDrop(int itemTier, Player player, EliteEntity eliteEntity) {
         for (int i = 0; i < getAmount(); i++)
-            player.getInventory().addItem(generateCustomItem().generateItemStack(itemTier, player));
+            player.getInventory().addItem(generateCustomItem().generateItemStack(itemTier, player, eliteEntity));
     }
 }

@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.items.customloottable;
 
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import lombok.Setter;
@@ -39,8 +40,20 @@ public class CustomLootEntry implements Serializable {
     }
 
     public void locationDrop(int itemTier, Player player, Location dropLocation) {
+        //meant to be overriden by the classes that extend it
     }
 
     public void directDrop(int itemTier, Player player) {
+        //meant to be overriden by the classes that extend it
+    }
+
+    //used specifically so loot can be attributed to the right source
+    public void locationDrop(int itemTier, Player player, Location dropLocation, EliteEntity eliteEntity) {
+        //meant to be overriden by the classes that extend it
+    }
+
+    //used specifically so loot can be attributed to the right source
+    public void directDrop(int itemTier, Player player, EliteEntity eliteEntity) {
+        //meant to be overriden by the classes that extend it
     }
 }

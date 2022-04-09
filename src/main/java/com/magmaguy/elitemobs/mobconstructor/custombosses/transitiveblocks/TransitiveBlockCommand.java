@@ -140,7 +140,8 @@ public class TransitiveBlockCommand {
 
         if (corner1 != null && corner2 != null && corner1.getWorld() == corner2.getWorld()) {
             int blockCount = (int) ((Math.abs(corner1.getX() - corner2.getX()) + 1) * (Math.abs(corner1.getY() - corner2.getY()) + 1) * (Math.abs(corner1.getZ() - corner2.getZ()) + 1));
-            player.sendMessage("[EliteMobs] Current selection has " + blockCount + " blocks selected. For performance reasons, you are not allowed to go over " + DefaultConfig.getDefaultTransitiveBlockLimiter() + " blocks!");
+            if (blockCount > DefaultConfig.getDefaultTransitiveBlockLimiter())
+                player.sendMessage("[EliteMobs] Current selection has " + blockCount + " blocks selected. For performance reasons, it is recommended you don't go over " + DefaultConfig.getDefaultTransitiveBlockLimiter() + " blocks!");
         }
 
     }
@@ -185,9 +186,7 @@ public class TransitiveBlockCommand {
         if (regionalSelection) {
             int blockCount = (int) ((Math.abs(corner1.getX() - corner2.getX()) + 1) * (Math.abs(corner1.getY() - corner2.getY()) + 1) * (Math.abs(corner1.getZ() - corner2.getZ()) + 1));
             if (blockCount > DefaultConfig.getDefaultTransitiveBlockLimiter()) {
-                player.sendMessage("[EliteMobs] You attempted to register more than " + DefaultConfig.getDefaultTransitiveBlockLimiter() + " blocks at once. For performance reasons, you are not allowed to do this in one registration command." +
-                        " Please keep in mind that air blocks are also getting registered, and consider whether you should be using the manual input instead!");
-                return;
+                player.sendMessage("[EliteMobs] You registered more than " + DefaultConfig.getDefaultTransitiveBlockLimiter() + " blocks at once. For performance reasons, it is recommended you keep the selections low. Avoid things like selecting a lot of unnecessary air blocks!");
             }
             int lowestX, highestX, lowestY, highestY, lowestZ, highestZ;
             lowestX = (int) Math.min(corner1.getX(), corner2.getX());
@@ -240,20 +239,6 @@ public class TransitiveBlockCommand {
     }
 
     public static class TemporaryBossBlockCommandEvents implements Listener {
-        // @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
-        // public void onPlayerBreakBlock(BlockBreakEvent event) {
-        //     if (!activePlayers.containsKey(event.getPlayer())) return;
-        //     activePlayers.get(event.getPlayer()).registerAir(event.getBlock());
-        //     event.setCancelled(true);
-        // }
-//
-        // @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
-        // public void onPlayerPlaceBlock(BlockPlaceEvent event) {
-        //     if (!activePlayers.containsKey(event.getPlayer())) return;
-        //     activePlayers.get(event.getPlayer()).registerBlock(event.getBlock());
-        //     event.setCancelled(true);
-        // }
-
         @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
         public void onPlayerInteractBlockEvent(PlayerInteractEvent event) {
             if (!activePlayers.containsKey(event.getPlayer())) return;

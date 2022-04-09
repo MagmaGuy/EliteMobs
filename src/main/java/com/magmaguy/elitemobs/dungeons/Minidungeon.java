@@ -125,13 +125,13 @@ public class Minidungeon {
             return;
         }
 
-        //Since the world isn't loaded, there is no chance that the world is installed
-        this.isInstalled = false;
+        //Since the world isn't loaded, check if it should be
+        this.isInstalled = dungeonPackagerConfigFields.isEnabled();
 
         //Check if the world's been downloaded
         isDownloaded = Files.exists(Paths.get(Bukkit.getWorldContainer() + File.separator + dungeonPackagerConfigFields.getWorldName()));
 
-        if (isDownloaded && dungeonPackagerConfigFields.isEnabled()) {
+        if (isDownloaded && isInstalled) {
             world = MinidungeonWorldLoader.loadWorld(this);
             initializeWormholeWorld();
         }
@@ -438,6 +438,7 @@ public class Minidungeon {
 
     public void quantifyWorldBosses() {
         if (!isInstalled) return;
+        if (world == null) return;
         for (RegionalBossEntity regionalBossEntity : RegionalBossEntity.getRegionalBossEntitySet())
             if (Objects.equals(regionalBossEntity.getWorldName(), world.getName())) {
                 regionalBossEntity.setMinidungeon(this);
