@@ -71,7 +71,7 @@ public class WormholeEntry {
     }
 
     private void initializeTextDisplay() {
-        if (text != null && text.isValid()) return;
+        if (text != null && text.isValid() && !text.isEmpty()) return;
         if (locationText == null) return;
         if (location == null || location.getWorld() == null) return;
         text = location.getWorld().spawn(

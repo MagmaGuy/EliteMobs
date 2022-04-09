@@ -413,7 +413,7 @@ public class EnchantmentGenerator {
 
         HashMap<Enchantment, Integer> enchantmentMap = new HashMap<>();
 
-        if (enchantmentsConfigFields.isEnabled()) {
+        if (enchantmentsConfigFields != null && enchantmentsConfigFields.isEnabled()) {
             Enchantment enchantment = enchantmentsConfigFields.getEnchantment();
             int enchantmentLevel = Math.min(enchantmentsConfigFields.getMaxLevel(), (int) itemTier);
             if (enchantmentLevel < 0) enchantmentLevel = 0;
@@ -435,7 +435,7 @@ public class EnchantmentGenerator {
             if (ThreadLocalRandom.current().nextDouble() < 0.5)
                 return enchantmentMap;
 
-        if (enchantmentsConfigFields.isEnabled()) {
+        if (enchantmentsConfigFields != null && enchantmentsConfigFields.isEnabled()) {
             Enchantment enchantment = enchantmentsConfigFields.getEnchantment();
             enchantmentMap.put(enchantment, enchantmentsConfigFields.getMaxLevel());
         }
@@ -450,7 +450,7 @@ public class EnchantmentGenerator {
 
         HashMap<String, Integer> enchantmentMap = new HashMap<>();
 
-        if (enchantmentsConfigFields.isEnabled())
+        if (enchantmentsConfigFields != null && enchantmentsConfigFields.isEnabled())
             enchantmentMap.put(string, ThreadLocalRandom.current().nextInt(enchantmentsConfigFields.getMaxLevel()) + 1);
 
         return enchantmentMap;

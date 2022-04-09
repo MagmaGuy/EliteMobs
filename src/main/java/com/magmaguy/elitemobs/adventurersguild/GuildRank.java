@@ -110,6 +110,10 @@ public class GuildRank {
         player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(newMaxHealth);
     }
 
+    public static void setMaxHealth(Player player) {
+        setMaxHealth(player, PlayerData.getActiveGuildLevel(player.getUniqueId()), PlayerData.getGuildPrestigeLevel(player.getUniqueId()));
+    }
+
     public static double lootTierValue(int activeGuildRank) {
         return activeGuildRank * 10;
     }

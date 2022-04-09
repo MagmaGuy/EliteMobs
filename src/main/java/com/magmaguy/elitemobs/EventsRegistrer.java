@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs;
 
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.adventurersguild.GuildRankMenuHandler;
+import com.magmaguy.elitemobs.adventurersguild.WorldSwitchBehavior;
 import com.magmaguy.elitemobs.api.*;
 import com.magmaguy.elitemobs.collateralminecraftchanges.*;
 import com.magmaguy.elitemobs.combatsystem.EliteCreeperExplosionHandler;
@@ -337,6 +338,7 @@ public class EventsRegistrer {
 
         //Initialize adventurer's guild
         register(new GuildRankMenuHandler());
+        register(new WorldSwitchBehavior());
         //register quests
         register(new KillObjective.KillObjectiveEvents());
         register(new CustomFetchObjective.CustomFetchObjectiveEvents());

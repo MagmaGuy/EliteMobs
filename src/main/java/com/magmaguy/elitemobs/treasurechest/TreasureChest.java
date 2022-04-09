@@ -69,8 +69,11 @@ public class TreasureChest {
                 return;
             }
 
-        int time = (int) ((restockTime - Instant.now().getEpochSecond()) * 20);
-        Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, this::generateChest, time);
+        long time = (restockTime - Instant.now().getEpochSecond()) * 20L;
+        if (time < 0)
+            generateChest();
+        else
+            Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, this::generateChest, time);
 
         treasureChestHashMap.put(location, this);
 
