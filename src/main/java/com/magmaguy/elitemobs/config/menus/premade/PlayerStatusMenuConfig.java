@@ -46,6 +46,8 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
     @Getter
     private static String[] gearCommandLines = new String[13];
     @Getter
+    private static String teleportChestMenuName;
+    @Getter
     private static String[] teleportTextLines = new String[13];
     @Getter
     private static String[] teleportHoverLines = new String[13];
@@ -57,6 +59,8 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
     private static String[] commandsHoverLines = new String[13];
     @Getter
     private static String[] commandsCommandLines = new String[13];
+    @Getter
+    private static String bossTrackerChestMenuName;
     @Getter
     private static String[] bossTrackerTextLines = new String[13];
     @Getter
@@ -123,6 +127,8 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
     @Getter
     private static int gearThreatSlot;
     @Getter
+    private static String statsChestMenuName;
+    @Getter
     private static ItemStack statsMoneyItem;
     @Getter
     private static int statsMoneySlot;
@@ -150,6 +156,8 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
     private static ItemStack statsScoreItem;
     @Getter
     private static int statsScoreSlot;
+    @Getter
+    private static String commandsChestMenuName;
     @Getter
     private static ItemStack commandsAGItem;
     @Getter
@@ -328,6 +336,10 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
 
         onBossTrackHover = ConfigurationEngine.setString(fileConfiguration, "onBossTrackHover", "Click to track/untrack!");
 
+        teleportChestMenuName = ConfigurationEngine.setString(fileConfiguration, "teleportChestMenuName", "&2EliteMobs Teleports");
+
+        bossTrackerChestMenuName = ConfigurationEngine.setString(fileConfiguration, "bossTrackerChestMenuName", "&2EliteMobs Boss Tracking");
+
         //inventory-based menus for bedrock
         indexChestMenuName = ConfigurationEngine.setString(fileConfiguration, "indexChestMenuName", "&2EliteMobs Index");
         indexHeaderItem = ConfigurationEngine.setItemStack(fileConfiguration, "indexHeaderItem",
@@ -402,6 +414,8 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
                                 "&ftier into account.")));
         gearThreatSlot = ConfigurationEngine.setInt(fileConfiguration, "gearThreatSlot", 25);
 
+        statsChestMenuName = ConfigurationEngine.setString(fileConfiguration, "statsChestMenuName", "&2EliteMobs Stats");
+
         statsMoneyItem = ConfigurationEngine.setItemStack(fileConfiguration, "statsMoneyItem",
                 ItemStackGenerator.generateItemStack(Material.GOLD_INGOT,
                         "&2Elite Coins: $money",
@@ -459,6 +473,8 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
                                 "&fto an elite. Higher level",
                                 "&felites give more score.")));
         statsScoreSlot = ConfigurationEngine.setInt(fileConfiguration, "statsScoreSlot", 16);
+
+        commandsChestMenuName = ConfigurationEngine.setString(fileConfiguration, "commandsChestMenuName", "&2EliteMobs Commands");
 
         commandsAGItem = ConfigurationEngine.setItemStack(fileConfiguration, "commandsAGItem",
                 ItemStackGenerator.generateItemStack(Material.END_PORTAL_FRAME,

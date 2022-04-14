@@ -76,7 +76,7 @@ public class BossTrackingPage {
     }
 
     protected static void bossTrackingPage(Player targetPlayer, Player requestingPlayer) {
-        Inventory inventory = Bukkit.createInventory(requestingPlayer, 54, PlayerStatusMenuConfig.getGearChestMenuName());
+        Inventory inventory = Bukkit.createInventory(requestingPlayer, 54, PlayerStatusMenuConfig.getBossTrackerChestMenuName());
         int counter = 0;
         BossTrackingPageEvents.bosses.clear();
         for (CustomBossEntity customBossEntity : CustomBossEntity.getTrackableCustomBosses()) {
@@ -95,7 +95,7 @@ public class BossTrackingPage {
         private static final Map<Player, Inventory> pageInventories = new HashMap<>();
         private static final List<CustomBossEntity> bosses = new ArrayList<>();
 
-        @EventHandler
+        @EventHandler (ignoreCancelled = true)
         public void onInventoryInteract(InventoryClickEvent event) {
             Player player = ((Player) event.getWhoClicked()).getPlayer();
             if (!pageInventories.containsKey(player)) return;

@@ -103,6 +103,15 @@ public class ItemSettingsConfig {
     private static String simlootMessageSuccess;
     @Getter
     private static String simlootMessageFailure;
+    @Getter
+    private static String directDropCustomLootMessage;
+    @Getter
+    private static String directDropMinecraftLootMessage;
+    @Getter
+    private static String directDropCoinMessage;
+    @Getter
+    private static String directDropSpecialMessage;
+
     private ItemSettingsConfig() {
     }
 
@@ -173,6 +182,10 @@ public class ItemSettingsConfig {
         minimumProcedurallyGeneratedDiamondLootLevelPlusSeven = ConfigurationEngine.setInt(fileConfiguration, "minimumProcedurallyGeneratedDiamondLootLevelPlusSeven", 10);
         simlootMessageSuccess = ConfigurationEngine.setString(fileConfiguration, "simlootMessageSuccess", "&8[EliteMobs] &2Rolled for loot and got $itemName &2!");
         simlootMessageFailure = ConfigurationEngine.setString(fileConfiguration, "simlootMessageFailure", "&8[EliteMobs] &cRolled for loot and got nothing!");
+        directDropCustomLootMessage = ConfigurationEngine.setString(fileConfiguration, "directDropCustomLootMessage", "&8[EliteMobs] &2Obtained $itemName &2!");
+        directDropMinecraftLootMessage = ConfigurationEngine.setString(fileConfiguration, "directDropMinecraftLootMessage", "&8[EliteMobs] &aObtained $itemName &a!");
+        directDropCoinMessage = ConfigurationEngine.setString(fileConfiguration, "directDropCoinMessage", "&8[EliteMobs] &aObtained &2$amount $currencyName &a!");
+        directDropSpecialMessage = ConfigurationEngine.setString(fileConfiguration, "directDropSpecialMessage", "&8[EliteMobs] &aObtained &2$amount $name &a!");
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }

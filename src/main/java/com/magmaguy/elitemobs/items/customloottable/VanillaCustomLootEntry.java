@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.items.customloottable;
 
+import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -8,6 +9,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 public class VanillaCustomLootEntry extends CustomLootEntry implements Serializable {
     @Getter
@@ -68,7 +70,10 @@ public class VanillaCustomLootEntry extends CustomLootEntry implements Serializa
 
     @Override
     public void directDrop(int itemTier, Player player) {
-        for (int i = 0; i < getAmount(); i++)
-            player.getInventory().addItem(generateItemStack());
+        for (int i = 0; i < getAmount(); i++){
+            ItemStack itemStack = generateItemStack();
+            player.getInventory().addItem(itemStack);
+            player.sendMessage(ItemSettingsConfig.getDirectDropCoinMessage().replace("$itemName", Objects.requireNonNull(itemStack.getItemMeta()).getDisplayName()));
+        }
     }
 }
