@@ -252,7 +252,7 @@ public class GearPage {
     public static class GearPageEvents implements Listener {
         private static final Map<Player, Inventory> pageInventories = new HashMap<>();
 
-        @EventHandler
+        @EventHandler (ignoreCancelled = true)
         public void onInventoryInteract(InventoryClickEvent event) {
             Player player = ((Player) event.getWhoClicked()).getPlayer();
             if (!pageInventories.containsKey(player)) return;

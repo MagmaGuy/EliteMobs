@@ -43,6 +43,9 @@ public class DefaultConfig {
     private static boolean doRegenerateContainers;
     @Getter
     private static int defaultTransitiveBlockLimiter;
+    @Getter
+    private static boolean onlyUseBedrockMenus;
+
     private static File file = null;
     private static FileConfiguration fileConfiguration = null;
     private DefaultConfig() {
@@ -86,6 +89,7 @@ public class DefaultConfig {
         doExplosionRegen = ConfigurationEngine.setBoolean(fileConfiguration, "doExplosionRegen", true);
         doRegenerateContainers = ConfigurationEngine.setBoolean(fileConfiguration, "doRegenerateContainers", true);
         defaultTransitiveBlockLimiter = ConfigurationEngine.setInt(fileConfiguration, "defaultTransitiveBlockLimiter", 500);
+        onlyUseBedrockMenus = ConfigurationEngine.setBoolean(fileConfiguration, "onlyUseBedrockMenus", false);
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }

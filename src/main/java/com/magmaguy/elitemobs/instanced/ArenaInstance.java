@@ -155,7 +155,9 @@ public class ArenaInstance extends MatchInstance {
     }
 
     private void doRewards() {
-        super.players.forEach(player -> customArenasConfigFields.getArenaRewards().arenaReward(player, currentWave));
+        //Note: here current wave is decreased by 1 because the reward runs at the top of the next wave method.
+        //So basically it runs at the start of the wave, hence it should reward whatever the previous wave had.
+        super.players.forEach(player -> customArenasConfigFields.getArenaRewards().arenaReward(player, currentWave - 1));
     }
 
     @Override

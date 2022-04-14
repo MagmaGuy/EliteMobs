@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.items.customloottable;
 
+import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import lombok.Getter;
@@ -10,6 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 public class EliteCustomLootEntry extends CustomLootEntry implements Serializable {
     @Getter
@@ -126,8 +128,20 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
     }
 
     @Override
+    public void directDrop(int itemTier, Player player) {
+        for (int i = 0; i < getAmount(); i++){
+            ItemStack itemStack = generateCustomItem().generateItemStack(itemTier, player, null);
+            player.getInventory().addItem(itemStack);
+            player.sendMessage(ItemSettingsConfig.getDirectDropCustomLootMessage().replace("$itemName", Objects.requireNonNull(itemStack.getItemMeta()).getDisplayName()));
+        }
+    }
+
+    @Override
     public void directDrop(int itemTier, Player player, EliteEntity eliteEntity) {
-        for (int i = 0; i < getAmount(); i++)
-            player.getInventory().addItem(generateCustomItem().generateItemStack(itemTier, player, eliteEntity));
+        for (int i = 0; i < getAmount(); i++){
+            ItemStack itemStack = generateCustomItem().generateItemStack(itemTier, player, eliteEntity);
+            player.getInventory().addItem(itemStack);
+            player.sendMessage(ItemSettingsConfig.getDirectDropCustomLootMessage().replace("$itemName", Objects.requireNonNull(itemStack.getItemMeta()).getDisplayName()));
+        }
     }
 }

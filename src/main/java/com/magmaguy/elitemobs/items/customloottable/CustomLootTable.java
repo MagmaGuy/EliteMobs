@@ -54,7 +54,7 @@ public class CustomLootTable implements Serializable {
                     new SpecialCustomLootEntry(entries, rawString, filename);
                     break;
                 default:
-                    if (rawString.contains("currencyAmount="))
+                    if (rawString.toLowerCase(Locale.ROOT).contains("currencyamount="))
                         new CurrencyCustomLootEntry(entries, rawString, filename);
                     else if (rawString.contains("material="))
                         new VanillaCustomLootEntry(entries, rawString, filename);
@@ -63,10 +63,12 @@ public class CustomLootTable implements Serializable {
             }
         for (CustomLootEntry customLootEntry : entries) {
             if (customLootEntry.getWave() > 0) {
-                if (waveRewards.get(customLootEntry.getWave()) != null)
-                    waveRewards.get(customLootEntry.getWave()).add(customLootEntry);
-                else
-                    waveRewards.put(customLootEntry.getWave(), Arrays.asList(customLootEntry));
+                if (this.waveRewards.get(customLootEntry.getWave()) != null) {
+                    List<CustomLootEntry> rewards = this.waveRewards.get(customLootEntry.getWave());
+                    rewards.add(customLootEntry);
+                    this.waveRewards.put(customLootEntry.getWave(), rewards);
+                } else
+                    waveRewards.put(customLootEntry.getWave(), new ArrayList<>(Arrays.asList(customLootEntry)));
             }
         }
     }

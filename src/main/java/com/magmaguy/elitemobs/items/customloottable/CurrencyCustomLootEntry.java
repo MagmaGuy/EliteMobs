@@ -1,5 +1,7 @@
 package com.magmaguy.elitemobs.items.customloottable;
 
+import com.magmaguy.elitemobs.config.EconomySettingsConfig;
+import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.items.ItemLootShower;
 import lombok.Getter;
@@ -76,7 +78,11 @@ public class CurrencyCustomLootEntry extends CustomLootEntry implements Serializ
 
     @Override
     public void directDrop(int itemTier, Player player) {
-        for (int i = 0; i < getAmount(); i++)
+        for (int i = 0; i < getAmount(); i++){
             EconomyHandler.addCurrency(player.getUniqueId(), currencyAmount);
+            player.sendMessage(ItemSettingsConfig.getDirectDropCoinMessage()
+                    .replace("$amount", currencyAmount+"")
+                    .replace("$currencyName", EconomySettingsConfig.getCurrencyName()));
+        }
     }
 }

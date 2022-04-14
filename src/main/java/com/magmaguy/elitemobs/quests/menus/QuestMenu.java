@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.quests.menus;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.menus.premade.CustomQuestMenuConfig;
 import com.magmaguy.elitemobs.config.menus.premade.DynamicQuestMenuConfig;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
@@ -40,7 +41,7 @@ public class QuestMenu {
     }
 
     public static void generateQuestMenu(List<? extends Quest> quests, Player player, NPCEntity npcEntity) {
-        if (!PlayerData.getUseBookMenus(player.getUniqueId()) || GeyserDetector.bedrockPlayer(player)) {
+        if (!PlayerData.getUseBookMenus(player.getUniqueId()) || GeyserDetector.bedrockPlayer(player) || DefaultConfig.isOnlyUseBedrockMenus()) {
             generateInventoryQuestEntries(quests, player, npcEntity);
         } else {
             generateBookQuestEntries(quests, player, npcEntity);

@@ -81,7 +81,7 @@ public class TeleportsPage {
     }
 
     protected static void teleportsPage(Player targetPlayer, Player requestingPlayer) {
-        Inventory inventory = Bukkit.createInventory(requestingPlayer, 54, PlayerStatusMenuConfig.getGearChestMenuName());
+        Inventory inventory = Bukkit.createInventory(requestingPlayer, 54, PlayerStatusMenuConfig.getTeleportChestMenuName());
         int counter = 0;
         TeleportsPageEvents.orderedDungeons.clear();
         for (Minidungeon minidungeon : Minidungeon.getMinidungeons().values()) {
@@ -103,11 +103,12 @@ public class TeleportsPage {
         private static final Map<Player, Inventory> pageInventories = new HashMap<>();
         private static List<Minidungeon> orderedDungeons = new ArrayList<>();
 
-        @EventHandler
+        @EventHandler (ignoreCancelled = true)
         public void onInventoryInteract(InventoryClickEvent event) {
             Player player = ((Player) event.getWhoClicked()).getPlayer();
             if (!pageInventories.containsKey(player)) return;
             event.setCancelled(true);
+            if (event.getSlot() < 0) return;
             if (orderedDungeons.size() - 1 >= event.getSlot()) {
                 player.closeInventory();
                 DungeonCommands.teleport(player, orderedDungeons.get(event.getSlot()).getDungeonPackagerConfigFields().getFilename());

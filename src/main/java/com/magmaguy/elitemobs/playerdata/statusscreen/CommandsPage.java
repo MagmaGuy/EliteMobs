@@ -39,7 +39,7 @@ public class CommandsPage {
     }
 
     protected static void commandsPage(Player targetPlayer, Player requestingPlayer) {
-        Inventory inventory = Bukkit.createInventory(requestingPlayer, 27, PlayerStatusMenuConfig.getGearChestMenuName());
+        Inventory inventory = Bukkit.createInventory(requestingPlayer, 27, PlayerStatusMenuConfig.getCommandsChestMenuName());
         inventory.setItem(PlayerStatusMenuConfig.getCommandsAGSlot(), PlayerStatusMenuConfig.getCommandsAGItem());
         inventory.setItem(PlayerStatusMenuConfig.getCommandsShareItemSlot(), PlayerStatusMenuConfig.getCommandsShareItemItem());
         inventory.setItem(26, PlayerStatusMenuConfig.getBackItem());
@@ -50,7 +50,7 @@ public class CommandsPage {
     public static class CommandsPageEvents implements Listener {
         private static final Map<Player, Inventory> pageInventories = new HashMap<>();
 
-        @EventHandler
+        @EventHandler (ignoreCancelled = true)
         public void onInventoryInteract(InventoryClickEvent event) {
             Player player = ((Player) event.getWhoClicked()).getPlayer();
             if (!pageInventories.containsKey(player)) return;
