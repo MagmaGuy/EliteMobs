@@ -13,7 +13,7 @@ public class DeadMoonSpawn extends CustomSpawnConfigFields {
         setSurfaceSpawn(true);
         try {
             setValidWorldEnvironments(new ArrayList<>(Arrays.asList(World.Environment.NORMAL, World.Environment.CUSTOM)));
-        } catch (Exception ex) {
+        } catch (NoSuchFieldError err) {
             //So this happens when CUSTOM doesn't exist, which it should but in some bugged releases it doesn't.
             setValidWorldEnvironments(new ArrayList<>(Arrays.asList(World.Environment.NORMAL)));
         }

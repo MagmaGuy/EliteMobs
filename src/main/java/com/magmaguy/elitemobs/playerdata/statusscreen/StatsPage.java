@@ -52,7 +52,7 @@ public class StatsPage {
     }
 
     protected static void statsPage(Player targetPlayer, Player requestingPlayer) {
-        Inventory inventory = Bukkit.createInventory(requestingPlayer, 27, PlayerStatusMenuConfig.getGearChestMenuName());
+        Inventory inventory = Bukkit.createInventory(requestingPlayer, 27, PlayerStatusMenuConfig.getStatsChestMenuName());
         inventory.setItem(PlayerStatusMenuConfig.getStatsMoneySlot(),
                 replaceItemNamePlaceholder(PlayerStatusMenuConfig.getStatsMoneyItem().clone(), "$money",
                         EconomyHandler.checkCurrency(targetPlayer.getUniqueId()) + ""));
