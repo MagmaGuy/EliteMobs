@@ -380,6 +380,8 @@ public class MatchInstance {
             livesLeft = VisualArmorStand.VisualArmorStand(deathLocation.clone().add(new Vector(0, 1.8, 0)), playerLives.get(deadPlayer) + " lives left!");
             if (deathLocation != null)
                 deathBanners.put(bannerBlock, this);
+
+            bannerWatchdog();
         }
 
         private void findBannerLocation(Location location) {
@@ -404,6 +406,25 @@ public class MatchInstance {
             if (resurrect)
                 revivePlayer(deadPlayer, this);
         }
+
+        //This is necessary because physics updates might remove the banner while it should still be on there
+        public void bannerWatchdog(){
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if (!deathBanners.containsKey(bannerBlock)){
+                        cancel();
+                        return;
+                    }
+                    if (bannerBlock.getType().equals(Material.RED_BANNER)) return;
+                    EntityTracker.unregister(nameTag, RemovalReason.EFFECT_TIMEOUT);
+                    EntityTracker.unregister(instructions, RemovalReason.EFFECT_TIMEOUT);
+                    EntityTracker.unregister(livesLeft, RemovalReason.EFFECT_TIMEOUT);
+                    findBannerLocation(deathLocation);
+                }
+            }.runTaskTimer(MetadataHandler.PLUGIN, 5, 5);
+        }
+
     }
 
 }

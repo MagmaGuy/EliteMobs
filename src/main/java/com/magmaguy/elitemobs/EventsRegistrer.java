@@ -291,7 +291,7 @@ public class EventsRegistrer {
         //Minecraft behavior canceller
         if (DefaultConfig.isPreventCreeperDamageToPassiveMobs())
             register(new PreventCreeperPassiveEntityDamage());
-        if (!VersionChecker.serverVersionOlderThan(15, 0))
+        if (!VersionChecker.serverVersionOlderThan(16, 0))
             register(new PreventEliteBeeHiveEnter());
         register(new EnderDragonUnstuck());
         if (DefaultConfig.isPreventVanillaReinforcementsForEliteEntities())

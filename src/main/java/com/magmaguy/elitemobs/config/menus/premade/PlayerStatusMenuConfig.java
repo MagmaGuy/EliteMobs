@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.menus.MenusConfigFields;
 import com.magmaguy.elitemobs.playerdata.statusscreen.PlayerStatusScreen;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
+import com.magmaguy.elitemobs.utils.VersionChecker;
 import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -382,10 +383,16 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
                         Arrays.asList("Click to go!")));
         indexQuestTrackingSlot = ConfigurationEngine.setInt(fileConfiguration, "indexQuestTrackingSlot", 20);
 
-        indexBossTrackingItem = ConfigurationEngine.setItemStack(fileConfiguration, "indexBossTrackingItem",
-                ItemStackGenerator.generateItemStack(Material.TARGET,
-                        "&6Boss Tracking",
-                        Arrays.asList("Click to go!")));
+        if (!VersionChecker.serverVersionOlderThan(16, 0))
+            indexBossTrackingItem = ConfigurationEngine.setItemStack(fileConfiguration, "indexBossTrackingItem",
+                    ItemStackGenerator.generateItemStack(Material.TARGET,
+                            "&6Boss Tracking",
+                            Arrays.asList("Click to go!")));
+        else
+            indexBossTrackingItem = ConfigurationEngine.setItemStack(fileConfiguration, "indexBossTrackingItem",
+                    ItemStackGenerator.generateItemStack(Material.DIAMOND,
+                            "&6Boss Tracking",
+                            Arrays.asList("Click to go!")));
         indexBossTrackingSlot = ConfigurationEngine.setInt(fileConfiguration, "indexBossTrackingSlot", 24);
 
 
@@ -405,13 +412,22 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
                         Arrays.asList("&fBase damage reduction from Elites.",
                                 "&fBased on the average level of your armor!")));
         gearArmorSlot = ConfigurationEngine.setInt(fileConfiguration, "gearArmorSlot", 24);
-        gearThreatItem = ConfigurationEngine.setItemStack(fileConfiguration, "gearThreatItem",
-                ItemStackGenerator.generateItemStack(Material.TARGET,
-                        "&cTreat Level: $threat",
-                        Arrays.asList("&fThis determines the level of the",
-                                "&fElite Mobs that spawns near you",
-                                "&fTakes armor, weapon in hand, guild",
-                                "&ftier into account.")));
+        if (!VersionChecker.serverVersionOlderThan(16, 0))
+            gearThreatItem = ConfigurationEngine.setItemStack(fileConfiguration, "gearThreatItem",
+                    ItemStackGenerator.generateItemStack(Material.TARGET,
+                            "&cTreat Level: $threat",
+                            Arrays.asList("&fThis determines the level of the",
+                                    "&fElite Mobs that spawns near you",
+                                    "&fTakes armor, weapon in hand, guild",
+                                    "&ftier into account.")));
+        else
+            gearThreatItem = ConfigurationEngine.setItemStack(fileConfiguration, "gearThreatItem",
+                    ItemStackGenerator.generateItemStack(Material.DIAMOND,
+                            "&cTreat Level: $threat",
+                            Arrays.asList("&fThis determines the level of the",
+                                    "&fElite Mobs that spawns near you",
+                                    "&fTakes armor, weapon in hand, guild",
+                                    "&ftier into account.")));
         gearThreatSlot = ConfigurationEngine.setInt(fileConfiguration, "gearThreatSlot", 25);
 
         statsChestMenuName = ConfigurationEngine.setString(fileConfiguration, "statsChestMenuName", "&2EliteMobs Stats");
@@ -424,16 +440,28 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
                                 "&fcomplete quests!")));
         statsMoneySlot = ConfigurationEngine.setInt(fileConfiguration, "statsMoneySlot", 10);
 
-        statsGuildTierItem = ConfigurationEngine.setItemStack(fileConfiguration, "statsGuildTierItem",
-                ItemStackGenerator.generateItemStack(Material.TARGET,
-                        "&6Guild Tier: $tier",
-                        Arrays.asList("&fGuild Rank determines how good your loot can ",
-                                "&fbe, sets your bonus from the Prestige Tier, among ",
-                                "&fother things. The Prestige Tier unlocks extremely ",
-                                "&fpowerful rewards, like increased max health, chance ",
-                                "&fto dodge/crit, increased currency rewards and more! ",
-                                "&fYou can unlock Guild Ranks and Prestige Tiers at /ag!",
-                                "&f⚜ = prestige rank, ✧ = guild rank!")));
+        if (!VersionChecker.serverVersionOlderThan(16, 0))
+            statsGuildTierItem = ConfigurationEngine.setItemStack(fileConfiguration, "statsGuildTierItem",
+                    ItemStackGenerator.generateItemStack(Material.TARGET,
+                            "&6Guild Tier: $tier",
+                            Arrays.asList("&fGuild Rank determines how good your loot can ",
+                                    "&fbe, sets your bonus from the Prestige Tier, among ",
+                                    "&fother things. The Prestige Tier unlocks extremely ",
+                                    "&fpowerful rewards, like increased max health, chance ",
+                                    "&fto dodge/crit, increased currency rewards and more! ",
+                                    "&fYou can unlock Guild Ranks and Prestige Tiers at /ag!",
+                                    "&f⚜ = prestige rank, ✧ = guild rank!")));
+        else
+            statsGuildTierItem = ConfigurationEngine.setItemStack(fileConfiguration, "statsGuildTierItem",
+                    ItemStackGenerator.generateItemStack(Material.DIAMOND,
+                            "&6Guild Tier: $tier",
+                            Arrays.asList("&fGuild Rank determines how good your loot can ",
+                                    "&fbe, sets your bonus from the Prestige Tier, among ",
+                                    "&fother things. The Prestige Tier unlocks extremely ",
+                                    "&fpowerful rewards, like increased max health, chance ",
+                                    "&fto dodge/crit, increased currency rewards and more! ",
+                                    "&fYou can unlock Guild Ranks and Prestige Tiers at /ag!",
+                                    "&f⚜ = prestige rank, ✧ = guild rank!")));
         statsGuildTierSlot = ConfigurationEngine.setInt(fileConfiguration, "statsGuildTierSlot", 11);
 
         statsEliteKillsItem = ConfigurationEngine.setItemStack(fileConfiguration, "statsEliteKillsItem",

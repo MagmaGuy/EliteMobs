@@ -9,7 +9,7 @@ import java.util.Arrays;
 
 public class InvictusPickaxeConfig extends CustomItemsConfigFields {
     public InvictusPickaxeConfig(){
-        super("invictus_boots", true, Material.DIAMOND_PICKAXE, "&4Invictus Boots", Arrays.asList("&2Awarded to the champions of the", "&2Wood League Arena!"));
+        super("invictus_pickaxe", true, Material.DIAMOND_PICKAXE, "&4Invictus Pickaxe", Arrays.asList("&2Awarded to the champions of the", "&2Wood League Arena!"));
         if (!VersionChecker.serverVersionOlderThan(16, 0))
             setMaterial(Material.NETHERITE_PICKAXE);
         setEnchantments(Arrays.asList("DIG_SPEED,6", "DRILLING,3", "DURABILITY,5"));
