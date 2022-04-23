@@ -14,6 +14,7 @@ public class ChatColorConverter {
     }
 
     public static String convert(String string) {
+        if (string == null) return "";
         return ChatColor.translateAlternateColorCodes('&', string);
     }
 

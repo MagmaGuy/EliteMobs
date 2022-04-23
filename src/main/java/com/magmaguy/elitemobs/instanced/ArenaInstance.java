@@ -116,6 +116,7 @@ public class ArenaInstance extends MatchInstance {
         }, 20L * customArenasConfigFields.getDelayBetweenWaves());
     }
 
+
     private void arenaWatchdog() {
         new BukkitRunnable() {
             @Override
@@ -123,7 +124,6 @@ public class ArenaInstance extends MatchInstance {
                 if (arenaState != ArenaState.ACTIVE) return;
                 for (CustomBossEntity customBossEntity : (HashSet<CustomBossEntity>) customBosses.clone())
                     if (!customBossEntity.exists()) removeBoss(customBossEntity);
-                if (customBosses.isEmpty()) nextWave();
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0L, 20L);
     }
@@ -171,7 +171,7 @@ public class ArenaInstance extends MatchInstance {
             StringBuilder playerNames = new StringBuilder();
             for (Player player : participants)
                 playerNames.append(player.getName()).append(" ");
-            Bukkit.getServer().broadcastMessage(ArenasConfig.getVictoryBroadcast().replace("$players", playerNames.toString()));
+            Bukkit.getServer().broadcastMessage(ArenasConfig.getVictoryBroadcast().replace("$players", playerNames.toString()).replace("$arenaName", customArenasConfigFields.getArenaName()));
         } else
             participants.forEach(player -> player.sendTitle(ArenasConfig.getDefeatTitle().replace("$wave", currentWave + ""),
                     ArenasConfig.getDefeatSubtitle().replace("$wave", currentWave + ""), 20, 20 * 10, 20));

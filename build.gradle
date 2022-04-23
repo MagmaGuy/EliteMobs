@@ -10,7 +10,7 @@ compileJava.options.encoding = "UTF-8"
 compileTestJava.options.encoding = "UTF-8"
 
 group 'com.magmaguy'
-version '7.3.14-SNAPSHOT-9'
+version '7.3.14'
 
 repositories {
     maven {
@@ -115,15 +115,17 @@ dependencies {
 
     //Geyser for bedrock player detection
     //This needs java 16 to work so you will want to change gradle.properties to match your directory for it
-    compileOnly("org.geysermc:geyser-api:2.0.2-SNAPSHOT")
+    //compileOnly("org.geysermc:geyser-api:2.0.2-SNAPSHOT") disabled because I couldn't find an easy way to see if a player is using geyser through their api due to the bungeecord / waterfall specific implementations
 
 }
 
+/*
 java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(16))
     }
 }
+ */
 
 artifacts { // task 'build' runs generates uberjar
     archives shadowJar
