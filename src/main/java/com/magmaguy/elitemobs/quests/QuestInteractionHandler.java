@@ -41,7 +41,9 @@ public class QuestInteractionHandler {
                 CustomQuest customQuest = CustomQuest.getQuest(questString, player);
                 if (customQuest == null) {
                     player.sendMessage("[EliteMobs] This NPC's quest is not valid! This might be a configuration error on the NPC or on the quest.");
-                    return;
+                    if (player.hasPermission("elitemobs.*"))
+                        player.sendMessage("Invalid quest: " + questString);
+                    continue;
                 }
 
                 if (customQuest.hasPermissionForQuest(player)) {

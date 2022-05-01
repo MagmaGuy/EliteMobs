@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.powers.bosspowers;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.events.BossCustomAttackDamage;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.meta.BossPower;
@@ -77,7 +78,7 @@ public class DeathSlice extends BossPower implements Listener {
         if (ThreadLocalRandom.current().nextDouble() < 0.3)
             location.getWorld().spawnParticle(Particle.FLAME, location, 1, 0.1, 0.1, 0.1, 0.05);
         for (Entity entity : location.getWorld().getNearbyEntities(location, 0.5, 0.5, 0.5))
-            if (entity instanceof LivingEntity)
+            if (entity instanceof LivingEntity && !EntityTracker.isEliteMob(entity))
                 BossCustomAttackDamage.dealCustomDamage(eliteEntity.getLivingEntity(), (LivingEntity) entity, 1);
     }
 

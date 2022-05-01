@@ -122,6 +122,12 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
     }
 
     @Override
+    public void locationDrop(int itemTier, Player player, Location location) {
+        for (int i = 0; i < getAmount(); i++)
+            generateCustomItem().dropPlayerLoot(player, itemTier, location, null);
+    }
+
+    @Override
     public void locationDrop(int itemTier, Player player, Location location, EliteEntity eliteEntity) {
         for (int i = 0; i < getAmount(); i++)
             generateCustomItem().dropPlayerLoot(player, itemTier, location, eliteEntity);
