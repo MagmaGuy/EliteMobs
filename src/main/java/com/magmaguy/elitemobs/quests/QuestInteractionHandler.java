@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.quests;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.QuestsConfig;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.menus.QuestMenu;
@@ -35,6 +35,8 @@ public class QuestInteractionHandler {
         List<Quest> quests = PlayerData.getQuests(player.getUniqueId());
         scanQuestTakerNPC(npcEntity, quests, customQuestList);
 
+        boolean anyQuestIsValid = false;
+        int questCompleteCount = 0;
         //This value can be null for NPC entities that have the custom quest interaction but are only used to turn quests in
         if (npcEntity.getNpCsConfigFields().getQuestFilenames() != null)
             for (String questString : npcEntity.getNpCsConfigFields().getQuestFilenames()) {
@@ -49,13 +51,16 @@ public class QuestInteractionHandler {
                 if (customQuest.hasPermissionForQuest(player)) {
                     customQuestList.add(customQuest);
                     customQuest.setQuestGiver(npcEntity.getNpCsConfigFields().getFilename());
-                } else if (!customQuest.getCustomQuestsConfigFields().getQuestAcceptPermission().isEmpty() &&
-                        !player.hasMetadata(customQuest.getCustomQuestsConfigFields().getQuestAcceptPermission())) {
-                    player.sendMessage(ChatColorConverter.convert("&4[EliteMobs] You can't accept this quest yet!"));
+                    anyQuestIsValid = true;
                 } else if (!customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission().isEmpty() &&
                         player.hasMetadata(customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission()))
-                    player.sendMessage(ChatColorConverter.convert("&4[EliteMobs] You already completed this quest!"));
+                    questCompleteCount++;
             }
+
+        if (questCompleteCount ==  npcEntity.getNpCsConfigFields().getQuestFilenames().size())
+            player.sendMessage(QuestsConfig.getQuestAlreadyCompletedMessage());
+        else if (!anyQuestIsValid)
+            player.sendMessage(QuestsConfig.getQuestPrerequisitesMissingMessage());
 
         if (!customQuestList.isEmpty())
             new BukkitRunnable() {

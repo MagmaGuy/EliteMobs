@@ -687,6 +687,7 @@ public class PlayerData {
             new BukkitRunnable() {
                 @Override
                 public void run() {
+                    if (Bukkit.getPlayer(event.getPlayer().getUniqueId()) == null) return;
                     new PlayerData(event.getPlayer().getUniqueId());
                 }
             }.runTaskLaterAsynchronously(MetadataHandler.PLUGIN, 20);

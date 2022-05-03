@@ -73,7 +73,7 @@ public class VanillaCustomLootEntry extends CustomLootEntry implements Serializa
         for (int i = 0; i < getAmount(); i++){
             ItemStack itemStack = generateItemStack();
             player.getInventory().addItem(itemStack);
-            player.sendMessage(ItemSettingsConfig.getDirectDropCoinMessage().replace("$itemName", Objects.requireNonNull(itemStack.getItemMeta()).getDisplayName()));
+            player.sendMessage(ItemSettingsConfig.getDirectDropMinecraftLootMessage().replace("$itemName", Objects.requireNonNull(itemStack.getItemMeta()).getDisplayName()));
         }
     }
 }
