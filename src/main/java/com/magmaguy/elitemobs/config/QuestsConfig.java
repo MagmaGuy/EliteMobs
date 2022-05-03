@@ -92,6 +92,10 @@ public class QuestsConfig {
     private static String noQuestDestinationFound;
     @Getter
     private static String questDestinationInOtherWorld;
+    @Getter
+    private static String questAlreadyCompletedMessage;
+    @Getter
+    private static String questPrerequisitesMissingMessage;
     private QuestsConfig() {
     }
 
@@ -144,6 +148,9 @@ public class QuestsConfig {
 
         noQuestDestinationFound = ConfigurationEngine.setString(fileConfiguration, "noQuestDestinationFound", "[EM] No quest destination found!");
         questDestinationInOtherWorld = ConfigurationEngine.setString(fileConfiguration, "questDestinationInOtherWorld", "[EM] Go to world $world!");
+
+        questAlreadyCompletedMessage = ConfigurationEngine.setString(fileConfiguration, "questAlreadyCompletedMessage", "&8[EliteMobs] &cYou already completed this quest!");
+        questPrerequisitesMissingMessage = ConfigurationEngine.setString(fileConfiguration, "questPrerequisitesMissingMessage", "&8[EliteMobs] &cCan't accept this quest yet!");
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }

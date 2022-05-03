@@ -37,6 +37,7 @@ public class PlayerQuestCooldowns implements Serializable {
             if (questCooldown.getBukkitTask() != null)
                 questCooldown.getBukkitTask().cancel();
             permissionAttachment.setPermission(questCooldown.getPermission(), false);
+            player.removeMetadata(questCooldown.getPermission(), MetadataHandler.PLUGIN);
         }
         playerQuestCooldowns.getQuestCooldowns().clear();
         PlayerData.resetQuests(player.getUniqueId());
