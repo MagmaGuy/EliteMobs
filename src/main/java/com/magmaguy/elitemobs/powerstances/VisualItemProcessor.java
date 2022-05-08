@@ -12,7 +12,7 @@ import java.util.Arrays;
 
 public class VisualItemProcessor {
 
-    private final boolean hasValidEffect;
+    private boolean hasValidEffect;
 
     public VisualItemProcessor(Object[][] multiDimensionalTrailTracker, Vector[][] cachedVectorPositions,
                                boolean visualEffectBoolean, int pointsPerRotation, EliteEntity eliteEntity) {
@@ -128,6 +128,12 @@ public class VisualItemProcessor {
 //            item.setVelocity(new Vector(0.01, 0.01, 0.01));
 //            return;
 //        }
+
+        //this sometimes happens due to other plugins which is really annoying
+        if (newLocation.getWorld() != currentLocation.getWorld()){
+            hasValidEffect = false;
+            return;
+        }
 
         Vector movementVector = (newLocation.subtract(currentLocation)).toVector();
         movementVector = movementVector.multiply(0.3);
