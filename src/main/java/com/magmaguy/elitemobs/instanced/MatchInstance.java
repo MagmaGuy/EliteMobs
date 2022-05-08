@@ -276,7 +276,7 @@ public class MatchInstance {
     }
 
     public void countdownMatch() {
-        if (state == InstancedRegionState.STARTING) return;
+        if (state != InstancedRegionState.IDLE) return;
         if (players.size() < minPlayers) {
             players.forEach(player -> player.sendMessage(ArenasConfig.getNotEnoughPlayersMessage().replace("$amount", minPlayers + "")));
             return;

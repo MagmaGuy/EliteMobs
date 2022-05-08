@@ -45,6 +45,8 @@ public class DefaultConfig {
     private static int defaultTransitiveBlockLimiter;
     @Getter
     private static boolean onlyUseBedrockMenus;
+    @Getter
+    private static int characterLimitForBookMenuPages;
 
     private static File file = null;
     private static FileConfiguration fileConfiguration = null;
@@ -90,6 +92,7 @@ public class DefaultConfig {
         doRegenerateContainers = ConfigurationEngine.setBoolean(fileConfiguration, "doRegenerateContainers", true);
         defaultTransitiveBlockLimiter = ConfigurationEngine.setInt(fileConfiguration, "defaultTransitiveBlockLimiter", 500);
         onlyUseBedrockMenus = ConfigurationEngine.setBoolean(fileConfiguration, "onlyUseBedrockMenus", false);
+        characterLimitForBookMenuPages = ConfigurationEngine.setInt(fileConfiguration, "characterLimitForBookMenuPages", 185);
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }
