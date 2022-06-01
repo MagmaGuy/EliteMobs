@@ -64,7 +64,7 @@ public class SimplePersistentEntity {
                     location.getWorld().getUID());
             addPersistentEntity(this);
         } else {
-            this.worldName = npcEntity.getNpCsConfigFields().getLocation().split(",")[0];
+            this.worldName = npcEntity.getNPCsConfigFields().getLocation().split(",")[0];
             addPersistentEntityForWorld(this);
         }
     }

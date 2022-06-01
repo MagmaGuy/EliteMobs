@@ -146,6 +146,7 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
     public void directDrop(int itemTier, Player player, EliteEntity eliteEntity) {
         for (int i = 0; i < getAmount(); i++){
             ItemStack itemStack = generateCustomItem().generateItemStack(itemTier, player, eliteEntity);
+            if (itemStack == null) return;
             player.getInventory().addItem(itemStack);
             player.sendMessage(ItemSettingsConfig.getDirectDropCustomLootMessage().replace("$itemName", Objects.requireNonNull(itemStack.getItemMeta()).getDisplayName()));
         }

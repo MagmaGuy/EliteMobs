@@ -43,15 +43,15 @@ public class NPCProximitySensor implements Listener {
                 for (NPCEntity npcEntity : EntityTracker.getNpcEntities().values())
                     if (npcEntity.isValid()) {
                         boolean alreadySpoke = false;
-                        for (Entity entity : npcEntity.getVillager().getNearbyEntities(npcEntity.getNpCsConfigFields().getActivationRadius(),
-                                npcEntity.getNpCsConfigFields().getActivationRadius(), npcEntity.getNpCsConfigFields().getActivationRadius()))
+                        for (Entity entity : npcEntity.getVillager().getNearbyEntities(npcEntity.getNPCsConfigFields().getActivationRadius(),
+                                npcEntity.getNPCsConfigFields().getActivationRadius(), npcEntity.getNPCsConfigFields().getActivationRadius()))
                             if (entity.getType().equals(EntityType.PLAYER)) {
                                 Player player = (Player) entity;
                                 Location rotatedLocation = npcEntity.getVillager().getLocation().setDirection(entity.getLocation().subtract(npcEntity.getVillager().getLocation()).toVector());
                                 npcEntity.getVillager().teleport(rotatedLocation);
                                 if (nearbyPlayers.contains(player)) {
                                     if (!alreadySpoke)
-                                        if (!npcEntity.getNpCsConfigFields().getInteractionType().equals(NPCInteractions.NPCInteractionType.CHAT))
+                                        if (!npcEntity.getNPCsConfigFields().getInteractionType().equals(NPCInteractions.NPCInteractionType.CHAT))
                                             npcEntity.sayDialog(player);
                                     seenPlayerList.remove(player);
                                     alreadySpoke = true;
@@ -75,17 +75,17 @@ public class NPCProximitySensor implements Listener {
     }
 
     private void startQuestIndicator(NPCEntity npcEntity, Player player) {
-        if (!npcEntity.getNpCsConfigFields().getInteractionType().equals(NPCInteractions.NPCInteractionType.QUEST_GIVER) &&
-                !npcEntity.getNpCsConfigFields().getInteractionType().equals(NPCInteractions.NPCInteractionType.CUSTOM_QUEST_GIVER))
+        if (!npcEntity.getNPCsConfigFields().getInteractionType().equals(NPCInteractions.NPCInteractionType.QUEST_GIVER) &&
+                !npcEntity.getNPCsConfigFields().getInteractionType().equals(NPCInteractions.NPCInteractionType.CUSTOM_QUEST_GIVER))
             return;
         findQuestState(npcEntity, player);
 
     }
 
     private void findQuestState(NPCEntity npcEntity, Player player) {
-        if (npcEntity.getNpCsConfigFields().getInteractionType().equals(NPCInteractions.NPCInteractionType.CUSTOM_QUEST_GIVER)) {
+        if (npcEntity.getNPCsConfigFields().getInteractionType().equals(NPCInteractions.NPCInteractionType.CUSTOM_QUEST_GIVER)) {
             if (!PlayerData.getQuests(player.getUniqueId()).isEmpty()) {
-                for (String questString : npcEntity.getNpCsConfigFields().getQuestFilenames())
+                for (String questString : npcEntity.getNPCsConfigFields().getQuestFilenames())
                     for (Quest quest : PlayerData.getQuests(player.getUniqueId()))
                         if (quest instanceof CustomQuest &&
                                 questString.equals(((CustomQuest) quest).getCustomQuestsConfigFields().getFilename()))
@@ -105,7 +105,7 @@ public class NPCProximitySensor implements Listener {
                                 return;
                             }
             }
-        } else if (npcEntity.getNpCsConfigFields().getInteractionType().equals(NPCInteractions.NPCInteractionType.QUEST_GIVER)) {
+        } else if (npcEntity.getNPCsConfigFields().getInteractionType().equals(NPCInteractions.NPCInteractionType.QUEST_GIVER)) {
             for (Quest quest : PlayerData.getQuests(player.getUniqueId()))
                 if (quest instanceof DynamicQuest)
                     //Dynamic quest
@@ -153,7 +153,7 @@ public class NPCProximitySensor implements Listener {
                     npcEntity.getVillager() == null ||
                     !npcEntity.getVillager().isValid() ||
                     !npcEntity.getVillager().getWorld().equals(player.getWorld()) ||
-                    npcEntity.getVillager().getLocation().distance(player.getLocation()) > npcEntity.getNpCsConfigFields().getActivationRadius()) {
+                    npcEntity.getVillager().getLocation().distance(player.getLocation()) > npcEntity.getNPCsConfigFields().getActivationRadius()) {
                 task.cancel();
                 EntityTracker.unregister(visualArmorStand, RemovalReason.EFFECT_TIMEOUT);
                 return;

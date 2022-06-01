@@ -7,6 +7,7 @@ import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.menus.QuestMenu;
 import com.magmaguy.elitemobs.quests.objectives.CustomFetchObjective;
 import com.magmaguy.elitemobs.quests.objectives.Objective;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -38,8 +39,8 @@ public class QuestInteractionHandler {
         boolean anyQuestIsValid = false;
         int questCompleteCount = 0;
         //This value can be null for NPC entities that have the custom quest interaction but are only used to turn quests in
-        if (npcEntity.getNpCsConfigFields().getQuestFilenames() != null)
-            for (String questString : npcEntity.getNpCsConfigFields().getQuestFilenames()) {
+        if (npcEntity.getNPCsConfigFields().getQuestFilenames() != null)
+            for (String questString : npcEntity.getNPCsConfigFields().getQuestFilenames()) {
                 CustomQuest customQuest = CustomQuest.getQuest(questString, player);
                 if (customQuest == null) {
                     player.sendMessage("[EliteMobs] This NPC's quest is not valid! This might be a configuration error on the NPC or on the quest.");
@@ -50,14 +51,18 @@ public class QuestInteractionHandler {
 
                 if (customQuest.hasPermissionForQuest(player)) {
                     customQuestList.add(customQuest);
-                    customQuest.setQuestGiver(npcEntity.getNpCsConfigFields().getFilename());
+                    customQuest.setQuestGiver(npcEntity.getNPCsConfigFields().getFilename());
                     anyQuestIsValid = true;
                 } else if (!customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission().isEmpty() &&
                         player.hasMetadata(customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission()))
                     questCompleteCount++;
             }
 
-        if (questCompleteCount ==  npcEntity.getNpCsConfigFields().getQuestFilenames().size())
+        if (npcEntity.getNPCsConfigFields().getQuestFilenames() == null){
+            new WarningMessage("NPC" + npcEntity.getNPCsConfigFields().getFilename() + " is listed a quest NPC but has no valid quest filenames associated to it! Check if the quests are valid and if the filenames in the NPC's config are typed correctly!");
+        }
+
+        if (questCompleteCount ==  npcEntity.getNPCsConfigFields().getQuestFilenames().size())
             player.sendMessage(QuestsConfig.getQuestAlreadyCompletedMessage());
         else if (!anyQuestIsValid)
             player.sendMessage(QuestsConfig.getQuestPrerequisitesMissingMessage());
@@ -75,7 +80,7 @@ public class QuestInteractionHandler {
         for (Quest quest : activeQuests)
             if (quest instanceof CustomQuest &&
                     !quest.getQuestTaker().equals(quest.getQuestGiver()) &&
-                    npcEntity.getNpCsConfigFields().getFilename().equals(quest.getQuestTaker())) {
+                    npcEntity.getNPCsConfigFields().getFilename().equals(quest.getQuestTaker())) {
                 npcQuests.add((CustomQuest) quest);
                 for (Objective objective : quest.getQuestObjectives().getObjectives())
                     if (objective instanceof CustomFetchObjective)

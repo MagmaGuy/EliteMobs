@@ -127,6 +127,7 @@ public class NPCsConfigFields extends CustomConfigFields implements CustomConfig
         this.disguise = processString("disguise", disguise, null, false);
         this.customDisguiseData = processString("customDisguiseData", customDisguiseData, null, false);
         this.customModel = processString("customModel", customModel, null, false);
+        this.arenaFilename = processString("arena", arenaFilename, null, false);
     }
 
     public void setEnabled(boolean enabled) {

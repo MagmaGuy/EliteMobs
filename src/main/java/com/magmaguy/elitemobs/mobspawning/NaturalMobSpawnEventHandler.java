@@ -14,6 +14,7 @@ import com.magmaguy.elitemobs.items.customenchantments.HunterEnchantment;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
+import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser;
@@ -135,7 +136,8 @@ public class NaturalMobSpawnEventHandler implements Listener {
 
         AtomicInteger peacefulModeDebuffs = new AtomicInteger();
         nearbyPlayers.forEach(player -> {
-            if (GuildRank.getActiveGuildRank(player) == 0)
+            //Handles situations where fake players got caught in the detection
+            if (PlayerData.getPlayerData(player.getUniqueId()) != null && GuildRank.getActiveGuildRank(player) == 0)
                 peacefulModeDebuffs.getAndIncrement();
         });
 
