@@ -331,6 +331,7 @@ public class EliteEntity implements SimplePersistentEntityInterface {
     }
 
     public void setHealth(double health) {
+        if (livingEntity == null) return;
         this.health = Math.min(health, this.maxHealth);
         livingEntity.setHealth(this.health);
     }

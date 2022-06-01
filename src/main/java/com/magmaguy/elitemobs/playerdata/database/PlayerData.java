@@ -100,7 +100,7 @@ public class PlayerData {
         }.runTaskAsynchronously(MetadataHandler.PLUGIN);
     }
 
-    private static PlayerData getPlayerData(UUID player) {
+    public static PlayerData getPlayerData(UUID player) {
         return playerDataHashMap.get(player);
     }
 

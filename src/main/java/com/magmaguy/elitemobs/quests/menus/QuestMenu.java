@@ -143,7 +143,7 @@ public class QuestMenu {
                 quest.getQuestObjectives().isOver() &&
                 (quest instanceof DynamicQuest ||
                         quest instanceof CustomQuest &&
-                                quest.getQuestTaker().equals(npcEntity.getNpCsConfigFields().getFilename())))
+                                quest.getQuestTaker().equals(npcEntity.getNPCsConfigFields().getFilename())))
             return questAcceptComplete(quest);
 
         //Quest has begun but is either not over or the player is not talking to the turn in npc

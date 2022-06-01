@@ -75,6 +75,7 @@ public class CustomQuestMenuConfig extends MenusConfigFields {
     }
 
     public static String getObjectiveLine(Objective objective) {
+        if (objective == null) return "";
         String newString = "";
         if (objective instanceof CustomKillObjective)
             newString = killQuestDefaultSummaryLine;

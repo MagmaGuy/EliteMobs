@@ -44,7 +44,7 @@ public class NPCInteractions implements Listener {
 
         event.setCancelled(true);
 
-        switch (npcEntity.getNpCsConfigFields().getInteractionType()) {
+        switch (npcEntity.getNPCsConfigFields().getInteractionType()) {
             case GUILD_GREETER:
                 if (event.getPlayer().hasPermission("elitemobs.rank.npc")) {
                     new BukkitRunnable() {
@@ -186,7 +186,7 @@ public class NPCInteractions implements Listener {
                     @Override
                     public void run() {
                         ArenaMenu arenaMenu = new ArenaMenu();
-                        arenaMenu.constructArenaMenu(event.getPlayer(), npcEntity.getNpCsConfigFields().getArenaFilename());
+                        arenaMenu.constructArenaMenu(event.getPlayer(), npcEntity.getNPCsConfigFields().getArenaFilename());
                     }
                 }.runTaskLater(MetadataHandler.PLUGIN, 1);
                 break;
@@ -204,7 +204,7 @@ public class NPCInteractions implements Listener {
         if (!event.getInventory().getType().equals(InventoryType.MERCHANT)) return;
 
         for (NPCEntity npcEntity : EntityTracker.getNpcEntities().values())
-            if (event.getView().getTitle().equals(npcEntity.getNpCsConfigFields().getName())) {
+            if (event.getView().getTitle().equals(npcEntity.getNPCsConfigFields().getName())) {
                 event.setCancelled(true);
                 return;
             }

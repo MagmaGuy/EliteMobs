@@ -42,7 +42,7 @@ public class DialogObjective extends Objective {
             for (Quest quest : PlayerData.getQuests(event.getPlayer().getUniqueId()))
                 for (Objective objective : quest.getQuestObjectives().getObjectives())
                     if (objective instanceof DialogObjective &&
-                            ((DialogObjective) objective).getNpcFilename().equals(npcEntity.getNpCsConfigFields().getFilename()))
+                            ((DialogObjective) objective).getNpcFilename().equals(npcEntity.getNPCsConfigFields().getFilename()))
                         if (((DialogObjective) objective).checkProgress(event.getPlayer(), quest.getQuestObjectives())) {
                             event.setCancelled(true);
                         }

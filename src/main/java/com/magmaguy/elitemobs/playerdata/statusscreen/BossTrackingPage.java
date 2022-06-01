@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.playerdata.statusscreen;
 
+import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.menus.premade.PlayerStatusMenuConfig;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
@@ -83,7 +84,7 @@ public class BossTrackingPage {
             BossTrackingPageEvents.bosses.add(customBossEntity);
             inventory.setItem(counter, ItemStackGenerator.generateItemStack(Material.ZOMBIE_HEAD,
                     customBossEntity.getCustomBossBossBar().bossBarMessage(targetPlayer, customBossEntity.getCustomBossesConfigFields().getLocationMessage()),
-                    Collections.singletonList("Click to track!")));
+                    Collections.singletonList(MobCombatSettingsConfig.getBossLocationMessage())));
             counter++;
         }
         inventory.setItem(53, PlayerStatusMenuConfig.getBackItem());
