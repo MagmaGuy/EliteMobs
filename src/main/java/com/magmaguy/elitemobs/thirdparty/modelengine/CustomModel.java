@@ -30,7 +30,7 @@ public class CustomModel {
             if (ModelEngineAPI.api.getModelManager().getModelRegistry().getModelBlueprint(modelName) == null)
                 new InfoMessage("Model " + modelName + " was not found! Make sure you install the model correctly if you have it. This entry will be skipped!");
         } catch (NoSuchMethodError ex) {
-            new WarningMessage("Model Engine API version is not supported. Currently Elitemobs can only support Model Engine R2.2.0, documentation for other versions doesn't exist.");
+            new WarningMessage("Model Engine API version is not supported. Currently Elitemobs can only support ModelEngine R2.5.0, documentation for other versions doesn't exist.");
         }
 
         activeModel = ModelEngineAPI.api.getModelManager().createActiveModel(modelName);
@@ -70,7 +70,7 @@ public class CustomModel {
         try {
             ModelEngineAPI.api.getModelManager().registerModels();
         } catch (Exception ex) {
-            new WarningMessage("Model Engine API version is not supported. Currently Elitemobs can only support Model Engine R2.2.0, documentation for other versions doesn't exist.");
+            new WarningMessage("Model Engine API version is not supported. Currently Elitemobs can only support ModelEngine R2.5.0, documentation for other versions doesn't exist.");
         }
     }
 

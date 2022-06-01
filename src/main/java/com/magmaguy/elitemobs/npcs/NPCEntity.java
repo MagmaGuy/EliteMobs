@@ -91,7 +91,7 @@ public class NPCEntity implements SimplePersistentEntityInterface {
             villagerInstance.setCustomName(ChatColorConverter.convert(npCsConfigFields.getName()));
             villagerInstance.setCustomNameVisible(true);
             villagerInstance.setProfession(npCsConfigFields.getProfession());
-            if (getNpCsConfigFields().getCustomModel() != null && !getNpCsConfigFields().getCustomModel().isEmpty())
+            if (getNPCsConfigFields().getCustomModel() != null && !getNPCsConfigFields().getCustomModel().isEmpty())
                 setCustomModel(villagerInstance);
             else
                 setDisguise(villagerInstance);
@@ -117,7 +117,7 @@ public class NPCEntity implements SimplePersistentEntityInterface {
     }
 
     private void setCustomModel(LivingEntity livingEntity) {
-        CustomModel.generateCustomModel(livingEntity, getNpCsConfigFields().getCustomModel(), getNpCsConfigFields().getName());
+        CustomModel.generateCustomModel(livingEntity, getNPCsConfigFields().getCustomModel(), getNPCsConfigFields().getName());
     }
 
     public Villager getVillager() {
@@ -129,7 +129,7 @@ public class NPCEntity implements SimplePersistentEntityInterface {
         return villager.isValid();
     }
 
-    public NPCsConfigFields getNpCsConfigFields() {
+    public NPCsConfigFields getNPCsConfigFields() {
         return npCsConfigFields;
     }
 
@@ -157,7 +157,7 @@ public class NPCEntity implements SimplePersistentEntityInterface {
     public void chunkUnload() {
         if (villager != null)
             villager.remove();
-        if (getNpCsConfigFields().getTimeout() > 0) return;
+        if (getNPCsConfigFields().getTimeout() > 0) return;
 
         if (villager != null)
             villager.remove();

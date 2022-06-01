@@ -153,7 +153,7 @@ public class MatchInstance {
             player.sendMessage(ArenasConfig.getArenasOngoingMessage());
             return;
         }
-        if (players.size() > maxPlayers) {
+        if (players.size() + 1 > maxPlayers) {
             player.sendMessage(ArenasConfig.getArenaFullMessage());
             return;
         }

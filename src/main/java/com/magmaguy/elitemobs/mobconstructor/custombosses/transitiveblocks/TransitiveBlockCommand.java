@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.PhaseBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.ChatColor;
@@ -43,15 +44,21 @@ public class TransitiveBlockCommand {
         this.customBossesConfigFields = customBossesConfigFields;
         this.transitiveBlockType = transitiveBlockType;
         List<RegionalBossEntity> regionalBossEntities = RegionalBossEntity.getRegionalBossEntities(customBossesConfigFields);
-        if (regionalBossEntities.size() < 1) {
+        if (regionalBossEntities.isEmpty()) {
             //check phase bosses
-            for (RegionalBossEntity regionalBossEntity : RegionalBossEntity.getRegionalBossEntitySet())
-                if (regionalBossEntity.getPhaseBossEntity() != null)
-                    for (PhaseBossEntity.BossPhase bossPhase : regionalBossEntity.getPhaseBossEntity().getBossPhases())
+            for (RegionalBossEntity iteratedRegionalBossEntity : RegionalBossEntity.getRegionalBossEntitySet())
+                if (iteratedRegionalBossEntity.getPhaseBossEntity() != null)
+                    for (PhaseBossEntity.BossPhase bossPhase : iteratedRegionalBossEntity.getPhaseBossEntity().getBossPhases()) {
+                        if (bossPhase.customBossesConfigFields == null) {
+                            String message = "Could not find valid custom boss config fields for phase boss! This is probably a configuration issue. Check why your phase boss isn't valid on console logs on /em reload and make sure to test the phases in-game!";
+                            new WarningMessage(message);
+                            player.sendMessage(message);
+                        }
                         if (bossPhase.customBossesConfigFields.equals(customBossesConfigFields)) {
-                            this.regionalBossEntity = regionalBossEntity;
+                            this.regionalBossEntity = iteratedRegionalBossEntity;
                             break;
                         }
+                    }
             if (this.regionalBossEntity == null) {
                 player.sendMessage(ChatColor.RED + "[EliteMobs] Transitive blocks require one Regional Boss from the configuration files to be placed in order to add transitive blocks relative to the spawn coordinates of that boss.");
                 player.sendMessage(ChatColor.RED + "[EliteMobs] Cancelling block registration!");

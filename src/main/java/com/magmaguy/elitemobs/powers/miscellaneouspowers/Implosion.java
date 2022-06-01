@@ -46,7 +46,11 @@ public class Implosion extends MinorPower implements Listener {
                             }
                             if (entity.getType().equals(EntityType.PLAYER) && ((Player) entity).getGameMode().equals(GameMode.SPECTATOR))
                                 continue;
-                            entity.setVelocity(event.getEliteEntity().getLocation().clone().subtract(entity.getLocation()).toVector().normalize());
+                            try {
+                                entity.setVelocity(event.getEliteEntity().getLocation().clone().subtract(entity.getLocation()).toVector().normalize());
+                            } catch (Exception ex) {
+                                //Sometimes this is infinite. That just means players shouldn't move.
+                            }
                         }
                     cancel();
                 }

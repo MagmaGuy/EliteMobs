@@ -146,7 +146,7 @@ public class QuestTracking {
         List<ObjectiveDestinations> destinations = new ArrayList<>();
         EntityTracker.getNpcEntities().values().forEach(npcEntity -> {
             List<Location> locations = new ArrayList<>();
-            if (npcEntity.getNpCsConfigFields().getFilename().equals(dialogObjective.getNpcFilename()))
+            if (npcEntity.getNPCsConfigFields().getFilename().equals(dialogObjective.getNpcFilename()))
                 locations.add(npcEntity.getSpawnLocation());
             destinations.add(new ObjectiveDestinations(dialogObjective, locations));
         });
@@ -173,7 +173,7 @@ public class QuestTracking {
 
     private void getTurnInNPC() {
         EntityTracker.getNpcEntities().values().forEach(npcEntity -> {
-            if (npcEntity.getNpCsConfigFields().getFilename().equals(customQuest.getQuestTaker()))
+            if (npcEntity.getNPCsConfigFields().getFilename().equals(customQuest.getQuestTaker()))
                 turnInNPCs.add(npcEntity.getSpawnLocation());
         });
     }

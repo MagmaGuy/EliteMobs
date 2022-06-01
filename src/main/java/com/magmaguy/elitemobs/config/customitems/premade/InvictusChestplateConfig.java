@@ -13,7 +13,7 @@ public class InvictusChestplateConfig extends CustomItemsConfigFields {
         if (!VersionChecker.serverVersionOlderThan(16, 0))
             setMaterial(Material.NETHERITE_CHESTPLATE);
         setEnchantments(Arrays.asList("PROTECTION_ENVIRONMENTAL,50", "PROTECTION_EXPLOSIONS,25", "PROTECTION_PROJECTILE,25", "MENDING,1", "DURABILITY,5"));
-        setPotionEffects(Arrays.asList("HEAL,0,target,onHit"));
+        setPotionEffects(Arrays.asList("HEAL,0,self,onHit"));
         setItemType(CustomItem.ItemType.UNIQUE);
     }
 }
