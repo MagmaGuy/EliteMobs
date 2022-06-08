@@ -2,13 +2,16 @@ package com.magmaguy.elitemobs.quests.objectives;
 
 import com.magmaguy.elitemobs.api.QuestAcceptEvent;
 import com.magmaguy.elitemobs.api.QuestCompleteEvent;
+import com.magmaguy.elitemobs.api.QuestProgressionEvent;
 import com.magmaguy.elitemobs.api.QuestRewardEvent;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.Quest;
+import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -71,7 +74,7 @@ public class CustomFetchObjective extends Objective {
             if (pendingAmount > 0) strictCheck(player, pendingAmount);
             else strictCheck(player, 0);
         }
-        progressNonlinearObjective(questObjectives);
+        progressNonlinearObjective(questObjectives, player, false);
     }
 
     private void strictCheck(Player player, int pendingAmount) {
@@ -99,6 +102,37 @@ public class CustomFetchObjective extends Objective {
             }
         }
         new WarningMessage("Player " + player.getName() + " managed to complete objective " + objectiveName + " without turning in the required amount of items! This isn't good, tell the developer!");
+    }
+
+    /**
+     * Updates a non-linear objective, sending an event
+     *
+     * @param questObjectives Objectives to update
+     * @param player          Player to update
+     * @param fullUpdate      Whether the update should rescan the objectives
+     */
+    @Override
+    public void progressNonlinearObjective(QuestObjectives questObjectives, Player player, boolean fullUpdate) {
+        if (fullUpdate)
+            fullUpdate(player);
+        QuestProgressionEvent questProgressionEvent = new QuestProgressionEvent(
+                Bukkit.getPlayer(questObjectives.getQuest().getPlayerUUID()),
+                questObjectives.getQuest(),
+                this);
+        new EventCaller(questProgressionEvent);
+        objectiveCompleted = currentAmount >= targetAmount;
+    }
+
+    /**
+     * Fully updates the inventory and total amount
+     *
+     * @param player Player to update
+     */
+    private void fullUpdate(Player player) {
+        super.currentAmount = 0;
+        for (ItemStack itemStack : player.getInventory())
+            if (ItemTagger.hasKey(itemStack, this.key))
+                super.currentAmount += itemStack.getAmount();
     }
 
     public static class CustomFetchObjectiveEvents implements Listener {

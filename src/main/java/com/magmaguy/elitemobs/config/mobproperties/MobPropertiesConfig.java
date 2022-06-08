@@ -62,6 +62,10 @@ public class MobPropertiesConfig {
     }
 
     public static void initializeConfigs() {
+        if (!VersionChecker.serverVersionOlderThan(19, 0)) {
+            mobPropertiesConfigFieldsList.add(new EliteWardenConfig());
+        }
+
         if (!VersionChecker.serverVersionOlderThan(17, 0)) {
             mobPropertiesConfigFieldsList.add(new EliteGoatConfig());
         }

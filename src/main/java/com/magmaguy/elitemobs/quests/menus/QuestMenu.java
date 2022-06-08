@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.menus.premade.CustomQuestMenuConfig;
 import com.magmaguy.elitemobs.config.menus.premade.DynamicQuestMenuConfig;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
@@ -166,9 +167,19 @@ public class QuestMenu {
     //Appears when the player has accepted the quest but has not completed it yet, so it is not ready for turn in
     private static TextComponent questAcceptAlreadyAccepted(Quest quest) {
         if (quest instanceof CustomQuest) {
-            return SpigotMessage.commandHoverMessage(CustomQuestMenuConfig.getAcceptedTextLines(),
+            String npcName = "";
+            if (CustomQuestMenuConfig.getAcceptedTextLines().contains("$npcName")) {
+                for (NPCEntity npcEntity : EntityTracker.getNpcEntities().values())
+                    if (npcEntity.getNPCsConfigFields().getFilename().equals(quest.getQuestTaker())) {
+                        npcName = npcEntity.getNPCsConfigFields().getName();
+                        break;
+                    }
+            }
+            return SpigotMessage.commandHoverMessage(
+                    CustomQuestMenuConfig.getAcceptedTextLines().replace("$npcName", npcName),
                     CustomQuestMenuConfig.getAcceptedHoverLines(),
-                    CustomQuestMenuConfig.getAcceptedCommandLines().replace("$questID", quest.getQuestID().toString()));
+                    CustomQuestMenuConfig.getAcceptedCommandLines()
+                            .replace("$questID", quest.getQuestID().toString()));
         } else {
             return SpigotMessage.commandHoverMessage(DynamicQuestMenuConfig.getAcceptedTextLines(),
                     DynamicQuestMenuConfig.getAcceptedHoverLines(),

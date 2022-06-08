@@ -34,7 +34,7 @@ public class QuestInteractionHandler {
         List<CustomQuest> customQuestList = new ArrayList<>();
 
         List<Quest> quests = PlayerData.getQuests(player.getUniqueId());
-        scanQuestTakerNPC(npcEntity, quests, customQuestList);
+        scanQuestTakerNPC(npcEntity, quests, customQuestList, player);
 
         boolean anyQuestIsValid = false;
         int questCompleteCount = 0;
@@ -58,11 +58,11 @@ public class QuestInteractionHandler {
                     questCompleteCount++;
             }
 
-        if (npcEntity.getNPCsConfigFields().getQuestFilenames() == null){
+        if (npcEntity.getNPCsConfigFields().getQuestFilenames() == null) {
             new WarningMessage("NPC" + npcEntity.getNPCsConfigFields().getFilename() + " is listed a quest NPC but has no valid quest filenames associated to it! Check if the quests are valid and if the filenames in the NPC's config are typed correctly!");
         }
 
-        if (questCompleteCount ==  npcEntity.getNPCsConfigFields().getQuestFilenames().size())
+        if (questCompleteCount == npcEntity.getNPCsConfigFields().getQuestFilenames().size())
             player.sendMessage(QuestsConfig.getQuestAlreadyCompletedMessage());
         else if (!anyQuestIsValid)
             player.sendMessage(QuestsConfig.getQuestPrerequisitesMissingMessage());
@@ -76,16 +76,16 @@ public class QuestInteractionHandler {
             }.runTaskLater(MetadataHandler.PLUGIN, 1);
     }
 
-    private static void scanQuestTakerNPC(NPCEntity npcEntity, List<Quest> activeQuests, List<CustomQuest> npcQuests) {
-        for (Quest quest : activeQuests)
+    private static void scanQuestTakerNPC(NPCEntity npcEntity, List<Quest> activeQuests, List<CustomQuest> npcQuests, Player player) {
+        for (Quest quest : activeQuests) {
             if (quest instanceof CustomQuest &&
-                    !quest.getQuestTaker().equals(quest.getQuestGiver()) &&
-                    npcEntity.getNPCsConfigFields().getFilename().equals(quest.getQuestTaker())) {
+                    quest.getQuestTaker().equals(npcEntity.getNPCsConfigFields().getFilename())) {
                 npcQuests.add((CustomQuest) quest);
                 for (Objective objective : quest.getQuestObjectives().getObjectives())
                     if (objective instanceof CustomFetchObjective)
-                        objective.progressNonlinearObjective(quest.getQuestObjectives());
+                        objective.progressNonlinearObjective(quest.getQuestObjectives(), player, true);
             }
+        }
     }
 
 }
