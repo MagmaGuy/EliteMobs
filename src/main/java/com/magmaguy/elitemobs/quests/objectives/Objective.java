@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.utils.EventCaller;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 import java.io.Serializable;
 
@@ -40,13 +41,8 @@ public abstract class Objective implements Serializable {
         new EventCaller(questProgressionEvent);
     }
 
-    public void progressNonlinearObjective(QuestObjectives questObjectives) {
-        QuestProgressionEvent questProgressionEvent = new QuestProgressionEvent(
-                Bukkit.getPlayer(questObjectives.getQuest().getPlayerUUID()),
-                questObjectives.getQuest(),
-                this);
-        new EventCaller(questProgressionEvent);
-        objectiveCompleted = currentAmount >= targetAmount;
+    public void progressNonlinearObjective(QuestObjectives questObjectives, Player player, boolean fullUpdate) {
+        //This gets implemented by extended classes, right now it's just fetch quests
     }
 
 }

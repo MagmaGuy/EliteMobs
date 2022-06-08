@@ -127,10 +127,12 @@ public class SimplePersistentEntity {
         public void chunkLoadEvent(ChunkLoadEvent event) {
             int chunkLocation = chunkLocation(event.getChunk());
             List<SimplePersistentEntity> simplePersistentEntityList = new ArrayList<>(persistentEntities.get(chunkLocation));
+            //todo: this is the result of a fun cat-and-mouse game where sometimes I need to wait a tick before spawning stuff and sometimes I don't, based on a "bug-of-the-version" game I'm playing with Mojang.
+            //The code for waiting a tick was needed to fix a 1.18 bug, but in 1.19 it causes a different bug
             if (loadingChunks.contains(chunkLocation)) return;
             loadingChunks.add(chunkLocation);
-            Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> loadChunk(chunkLocation, simplePersistentEntityList), 1);
-            Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> loadingChunks.remove(chunkLocation), 1);
+            loadChunk(chunkLocation, simplePersistentEntityList);
+            loadingChunks.remove(chunkLocation);
         }
 
         @EventHandler(ignoreCancelled = true)

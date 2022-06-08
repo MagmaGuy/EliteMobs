@@ -10,7 +10,7 @@ compileJava.options.encoding = "UTF-8"
 compileTestJava.options.encoding = "UTF-8"
 
 group 'com.magmaguy'
-version '7.3.15-SNAPSHOT-6'
+version '7.3.16'
 
 repositories {
     maven {
@@ -66,7 +66,7 @@ repositories {
 
 dependencies {
     //Spigot API
-    compileOnly "org.spigotmc:spigot-api:1.18-R0.1-SNAPSHOT"
+    compileOnly "org.spigotmc:spigot-api:1.19-R0.1-SNAPSHOT"
 
     //compileOnly 'org.spigotmc:spigot:1.17-R0.1-SNAPSHOT'
     // The full CraftBukkit server with no shadowing. Requires mavenLocal.
@@ -118,14 +118,6 @@ dependencies {
     //compileOnly("org.geysermc:geyser-api:2.0.2-SNAPSHOT") disabled because I couldn't find an easy way to see if a player is using geyser through their api due to the bungeecord / waterfall specific implementations
 
 }
-
-/*
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(16))
-    }
-}
- */
 
 artifacts { // task 'build' runs generates uberjar
     archives shadowJar
