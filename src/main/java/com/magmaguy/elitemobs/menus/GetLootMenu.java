@@ -141,6 +141,8 @@ public class GetLootMenu extends EliteMenu implements Listener {
             if (!isTopMenu(event)) return;
             //CASE: If the player clicked something in the actual getloot menu
 
+            if (currentItem == null) return;
+
             //CASE: If it was one of the items that they can get
             if (lootSlots.contains(event.getSlot())) {
                 player.getInventory().addItem(currentItem);
