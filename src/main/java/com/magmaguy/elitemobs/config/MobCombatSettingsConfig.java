@@ -78,6 +78,11 @@ public class MobCombatSettingsConfig {
     private static boolean normalizeRegionalBosses;
     @Getter
     private static String fullHealMessage;
+    @Getter
+    private static double strengthAndWeaknessDamageMultipliers;
+    @Getter
+    private static double resistanceDamageMultiplier;
+
     private MobCombatSettingsConfig() {
     }
 
@@ -123,6 +128,8 @@ public class MobCombatSettingsConfig {
         normalizedBaselineHealth = ConfigurationEngine.setDouble(fileConfiguration, "normalizedRegionalBossBaselineHealthV2", 7);
         normalizeRegionalBosses = ConfigurationEngine.setBoolean(fileConfiguration, "normalizeRegionalBosses", true);
         fullHealMessage = ConfigurationEngine.setString(fileConfiguration, "fullHealMessage", "&2FULL HEAL!");
+        strengthAndWeaknessDamageMultipliers = ConfigurationEngine.setDouble(fileConfiguration, "strengthAndWeaknessDamageMultipliers", 2D);
+        resistanceDamageMultiplier = ConfigurationEngine.setDouble(fileConfiguration, "resistanceDamageMultiplier", 2);
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }

@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.config.menus.premade;
 
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.menus.MenusConfigFields;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
@@ -31,7 +32,7 @@ public class QuestMenuConfig extends MenusConfigFields {
                         "&2Take on a $rank &2quest!",
                         Arrays.asList(
                                 "&aAccept a $rank &aquest and",
-                                "&aget special rewards!")),
+                                "&aget special rewards!"), MetadataHandler.signatureID),
                 fileConfiguration);
         validTierButton = ItemStackSerializer.deserialize("validTierButton", fileConfiguration);
 
@@ -50,7 +51,7 @@ public class QuestMenuConfig extends MenusConfigFields {
                         Arrays.asList(
                                 "&aKill $objectiveAmount $objectiveName &amobs.",
                                 "&fProgress: &a$currentAmount &f/&c $objectiveAmount",
-                                "&aReward: &e $rewardAmount")),
+                                "&aReward: &e $rewardAmount"), MetadataHandler.signatureID),
                 fileConfiguration);
         killObjectiveButton = ItemStackSerializer.deserialize("killObjectiveButton", fileConfiguration);
 

@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.config.menus.premade;
 
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.menus.MenusConfigFields;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
@@ -36,18 +37,18 @@ public class SellMenuConfig extends MenusConfigFields {
                                 "&cYou can only sell special",
                                 "&cElite Mobs drops in this",
                                 "&cshop! These should have",
-                                "&ca value on their lore.")),
+                                "&ca value on their lore."), MetadataHandler.signatureID),
                 fileConfiguration);
         infoButton = ItemStackSerializer.deserialize("infoButton", fileConfiguration);
         infoSlot = ConfigurationEngine.setInt(fileConfiguration, "infoButtonSlot", 4);
         storeSlots = ConfigurationEngine.setList(fileConfiguration, "sellSlots", Arrays.asList(19, 20, 21, 22, 23,
                 24, 25, 28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 43));
         ItemStackSerializer.serialize("cancelButton", ItemStackGenerator.generateItemStack(Material.BARRIER,
-                "&4Cancel", Arrays.asList("&cCancel purchase!")), fileConfiguration);
+                "&4Cancel", Arrays.asList("&cCancel purchase!"), MetadataHandler.signatureID), fileConfiguration);
         cancelButton = ItemStackSerializer.deserialize("cancelButton", fileConfiguration);
         cancelSlot = ConfigurationEngine.setInt(fileConfiguration, "cancelButtonSlot", 27);
         ItemStackSerializer.serialize("confirmButton", ItemStackGenerator.generateItemStack(Material.EMERALD,
-                "&2Confirm Sale", Arrays.asList("&aSell item for", "&a$currency_amount $currency_name")), fileConfiguration);
+                "&2Confirm Sale", Arrays.asList("&aSell item for", "&a$currency_amount $currency_name"), MetadataHandler.signatureID), fileConfiguration);
         confirmButton = ItemStackSerializer.deserialize("confirmButton", fileConfiguration);
         confirmSlot = ConfigurationEngine.setInt(fileConfiguration, "confirmSaleSlot", 35);
     }

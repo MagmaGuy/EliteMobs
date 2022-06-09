@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.menus;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.api.EliteMobsItemDetector;
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.TranslationConfig;
 import com.magmaguy.elitemobs.config.menus.premade.SellMenuConfig;
@@ -108,7 +109,8 @@ public class SellMenu extends EliteMenu implements Listener {
             if (validSlots.contains(i))
                 continue;
 
-            sellInventory.setItem(i, ItemStackGenerator.generateItemStack(Material.GLASS_PANE));
+            if (DefaultConfig.isUseGlassToFillMenuEmptySpace())
+                sellInventory.setItem(i, ItemStackGenerator.generateItemStack(Material.GLASS_PANE));
 
         }
 
@@ -144,10 +146,16 @@ public class SellMenu extends EliteMenu implements Listener {
             }
 
             //If the shop is full, don't let the player put stuff in it
-            if (shopInventory.firstEmpty() == -1) return;
+            int firstEmptySlot = -1;
+            for (int i : validSlots)
+                if (shopInventory.getItem(i) == null) {
+                    firstEmptySlot = i;
+                    break;
+                }
+            if (firstEmptySlot == -1) return;
 
             //Do transfer
-            shopInventory.addItem(currentItem);
+            shopInventory.setItem(firstEmptySlot, currentItem);
             playerInventory.clear(event.getSlot());
 
             //Update worth of things to be sold, now using cached prices

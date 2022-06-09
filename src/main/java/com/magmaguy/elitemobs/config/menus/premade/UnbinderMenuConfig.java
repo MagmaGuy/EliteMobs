@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.config.menus.premade;
 
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.menus.MenusConfigFields;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
@@ -57,7 +58,7 @@ public class UnbinderMenuConfig extends MenusConfigFields {
                 ItemStackGenerator.generateSkullItemStack("magmaguy",
                         "&4&lEliteMobs &r&cby &4&lMagmaGuy",
                         Arrays.asList("&8Support the plugins you enjoy!",
-                                "&aUse an &5Unbind Scroll &ato remove Soulbind from an item!")),
+                                "&aUse an &5Unbind Scroll &ato remove Soulbind from an item!"), MetadataHandler.signatureID),
                 fileConfiguration);
         infoButton = ItemStackSerializer.deserialize("infoButton", fileConfiguration);
         infoSlot = ConfigurationEngine.setInt(fileConfiguration, "infoButtonSlot", 4);
@@ -67,7 +68,7 @@ public class UnbinderMenuConfig extends MenusConfigFields {
                 "eliteItemInputInformationButton",
                 ItemStackGenerator.generateItemStack(Material.GREEN_BANNER,
                         "&2Elite Item Input slots",
-                        Arrays.asList("&aThis slot is for your elite item!")),
+                        Arrays.asList("&aThis slot is for your elite item!"), MetadataHandler.signatureID),
                 fileConfiguration);
         eliteItemInputInfoButton = ItemStackSerializer.deserialize("eliteItemInputInformationButton", fileConfiguration);
         eliteScrapInputInformationSlot = ConfigurationEngine.setInt(fileConfiguration, "unbindScrollInputInformationSlot", 22);
@@ -76,24 +77,24 @@ public class UnbinderMenuConfig extends MenusConfigFields {
                 "unbindScrollInputInformationButton",
                 ItemStackGenerator.generateItemStack(Material.GREEN_BANNER,
                         "&5Unbind Scroll &aInput slots",
-                        Arrays.asList("&aThis slot is for your &9Unbind Scroll&a!")),
+                        Arrays.asList("&aThis slot is for your &9Unbind Scroll&a!"), MetadataHandler.signatureID),
                 fileConfiguration);
         eliteUnbindInputInfoButton = ItemStackSerializer.deserialize("unbindScrollInputInformationButton", fileConfiguration);
         outputInformationSlot = ConfigurationEngine.setInt(fileConfiguration, "informationOutputButtonSlot", 24);
         outputSlot = ConfigurationEngine.setInt(fileConfiguration, "outputSlot", 33);
         ItemStackSerializer.serialize("cancelButton", ItemStackGenerator.generateItemStack(Material.BARRIER,
-                "&4Cancel", Arrays.asList("&cCancel unbind!")), fileConfiguration);
+                "&4Cancel", Arrays.asList("&cCancel unbind!"), MetadataHandler.signatureID), fileConfiguration);
         ItemStackSerializer.serialize(
                 "outputInformationButton",
                 ItemStackGenerator.generateItemStack(Material.RED_BANNER,
                         "&2Unbound Item Output slot",
-                        Arrays.asList("&aThis slot previews the result of your unbind!")),
+                        Arrays.asList("&aThis slot previews the result of your unbind!"), MetadataHandler.signatureID),
                 fileConfiguration);
         outputInfoButton = ItemStackSerializer.deserialize("outputInformationButton", fileConfiguration);
         cancelButton = ItemStackSerializer.deserialize("cancelButton", fileConfiguration);
         cancelSlot = ConfigurationEngine.setInt(fileConfiguration, "cancelButtonSlot", 27);
         ItemStackSerializer.serialize("confirmButton", ItemStackGenerator.generateItemStack(Material.EMERALD,
-                "&2Confirm!", Arrays.asList("&aUnbind item!")), fileConfiguration);
+                "&2Confirm!", Arrays.asList("&aUnbind item!"), MetadataHandler.signatureID), fileConfiguration);
         confirmButton = ItemStackSerializer.deserialize("confirmButton", fileConfiguration);
         confirmSlot = ConfigurationEngine.setInt(fileConfiguration, "confirmUnbindSlot", 35);
     }

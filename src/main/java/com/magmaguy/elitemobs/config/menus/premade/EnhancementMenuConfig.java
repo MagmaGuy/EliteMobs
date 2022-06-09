@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.config.menus.premade;
 
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.menus.MenusConfigFields;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
@@ -46,27 +47,31 @@ public class EnhancementMenuConfig extends MenusConfigFields {
                 ItemStackGenerator.generateSkullItemStack("magmaguy",
                         "&4&lEliteMobs &r&cby &4&lMagmaGuy",
                         Arrays.asList("&8Support the plugins you enjoy!",
-                                "&aUse Item Upgrade Orbs one level higher", " than your Elite Item in order to", "upgrade Elite Items!")),
+                                "&aUse Item Upgrade Orbs one level higher", " than your Elite Item in order to", "upgrade Elite Items!"),
+                        MetadataHandler.signatureID),
                 fileConfiguration);
         ItemStackSerializer.serialize(
                 "eliteItemInputInformationButton",
                 ItemStackGenerator.generateItemStack(Material.GREEN_BANNER,
                         "&2Elite Item Input slots",
-                        Arrays.asList("&aThis slot is for your elite item!")),
+                        Arrays.asList("&aThis slot is for your elite item!"),
+                        MetadataHandler.signatureID),
                 fileConfiguration);
         ItemStackSerializer.serialize(
                 "eliteUpgradeOrbInputInformationButton",
                 ItemStackGenerator.generateItemStack(Material.GREEN_BANNER,
                         "&2Upgrade Orb Input slot",
-                        Arrays.asList("&aThis slot is for your Elite Item Upgrade Orb!")),
+                        Arrays.asList("&aThis slot is for your Elite Item Upgrade Orb!"),
+                        MetadataHandler.signatureID),
                 fileConfiguration);
         ItemStackSerializer.serialize("cancelButton", ItemStackGenerator.generateItemStack(Material.BARRIER,
-                "&4Cancel", Arrays.asList("&cCancel upgrade!")), fileConfiguration);
+                "&4Cancel", Arrays.asList("&cCancel upgrade!"), MetadataHandler.signatureID), fileConfiguration);
         ItemStackSerializer.serialize(
                 "outputInformationButton",
                 ItemStackGenerator.generateItemStack(Material.RED_BANNER,
                         "&2Output slots",
-                        Arrays.asList("&aThis slot previews the result of your upgrade!")),
+                        Arrays.asList("&aThis slot previews the result of your upgrade!"),
+                        MetadataHandler.signatureID),
                 fileConfiguration);
         outputInfoButton = ItemStackSerializer.deserialize("outputInformationButton", fileConfiguration);
         cancelButton = ItemStackSerializer.deserialize("cancelButton", fileConfiguration);
@@ -75,7 +80,7 @@ public class EnhancementMenuConfig extends MenusConfigFields {
         cancelSlot = ConfigurationEngine.setInt(fileConfiguration, "cancelButtonSlot", 27);
         infoButton = ItemStackSerializer.deserialize("infoButton", fileConfiguration);
         ItemStackSerializer.serialize("confirmButton", ItemStackGenerator.generateItemStack(Material.EMERALD,
-                "&2Confirm!", Arrays.asList("&aUpgrade items!")), fileConfiguration);
+                "&2Confirm!", Arrays.asList("&aUpgrade items!"), MetadataHandler.signatureID), fileConfiguration);
         confirmButton = ItemStackSerializer.deserialize("confirmButton", fileConfiguration);
         confirmSlot = ConfigurationEngine.setInt(fileConfiguration, "confirmRepairSlot", 35);
     }

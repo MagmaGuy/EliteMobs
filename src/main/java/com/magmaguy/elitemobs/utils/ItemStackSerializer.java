@@ -21,6 +21,8 @@ public class ItemStackSerializer {
             fileConfiguration.addDefault(identifier + ".lore", itemStack.getItemMeta().getLore());
         if (itemStack.getType().equals(Material.PLAYER_HEAD))
             fileConfiguration.addDefault(identifier + ".owner", ((SkullMeta) itemStack.getItemMeta()).getOwner());
+        if (itemStack.hasItemMeta() && itemStack.getItemMeta().hasCustomModelData() && itemStack.getItemMeta().getCustomModelData() != 0)
+            fileConfiguration.addDefault(identifier + ".customModelID", itemStack.getItemMeta().getCustomModelData());
 
         return fileConfiguration;
     }
@@ -48,7 +50,12 @@ public class ItemStackSerializer {
             return ItemStackGenerator.generateSkullItemStack(owner, name, lore);
         }
 
-        return ItemStackGenerator.generateItemStack(material, name, lore);
+        int customModelID = 0;
+        if (fileConfiguration.contains(identifier + "customModelID")) {
+            customModelID = fileConfiguration.getInt(identifier + "customModelID");
+        }
+
+        return ItemStackGenerator.generateItemStack(material, name, lore, customModelID);
     }
 
     /**
