@@ -129,7 +129,7 @@ public class MobCombatSettingsConfig {
         normalizeRegionalBosses = ConfigurationEngine.setBoolean(fileConfiguration, "normalizeRegionalBosses", true);
         fullHealMessage = ConfigurationEngine.setString(fileConfiguration, "fullHealMessage", "&2FULL HEAL!");
         strengthAndWeaknessDamageMultipliers = ConfigurationEngine.setDouble(fileConfiguration, "strengthAndWeaknessDamageMultipliers", 2D);
-        resistanceDamageMultiplier = ConfigurationEngine.setDouble(fileConfiguration, "resistanceDamageMultiplier", 2);
+        resistanceDamageMultiplier = ConfigurationEngine.setDouble(fileConfiguration, "resistanceDamageMultiplier", 1);
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }
