@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.menus;
 
 import com.magmaguy.elitemobs.api.EliteMobsItemDetector;
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.menus.premade.EnhancementMenuConfig;
 import com.magmaguy.elitemobs.items.EliteItemLore;
 import com.magmaguy.elitemobs.items.ItemTagger;
@@ -116,7 +117,8 @@ public class EnhancementMenu extends EliteMenu {
 
             if (i == EnhancementMenuConfig.eliteItemInputSlot || i == EnhancementMenuConfig.eliteUpgradeOrbInputSlot || i == EnhancementMenuConfig.outputSlot)
                 continue;
-            EnhancementInventory.setItem(i, ItemStackGenerator.generateItemStack(Material.GLASS_PANE));
+            if (DefaultConfig.isUseGlassToFillMenuEmptySpace())
+                EnhancementInventory.setItem(i, ItemStackGenerator.generateItemStack(Material.GLASS_PANE));
 
         }
 

@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.config.menus.premade;
 
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.menus.MenusConfigFields;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
@@ -77,7 +78,7 @@ public class GuildRankMenuConfig extends MenusConfigFields {
                                 "$currencyBonusMessage",
                                 "$maxHealthIncrease",
                                 "$chanceToCrit",
-                                "$chanceToDodge")), fileConfiguration);
+                                "$chanceToDodge"), MetadataHandler.signatureID), fileConfiguration);
         unlockedButton = ItemStackSerializer.deserialize("unlockedButtons", fileConfiguration);
 
         ItemStackSerializer.serialize(
@@ -92,7 +93,7 @@ public class GuildRankMenuConfig extends MenusConfigFields {
                                 "$currencyBonusMessage",
                                 "$maxHealthIncrease",
                                 "$chanceToCrit",
-                                "$chanceToDodge")), fileConfiguration);
+                                "$chanceToDodge"), MetadataHandler.signatureID), fileConfiguration);
         lockedButton = ItemStackSerializer.deserialize("lockedButtons", fileConfiguration);
 
         ItemStackSerializer.serialize(
@@ -106,7 +107,7 @@ public class GuildRankMenuConfig extends MenusConfigFields {
                                 "$currencyBonusMessage",
                                 "$maxHealthIncrease",
                                 "$chanceToCrit",
-                                "$chanceToDodge")), fileConfiguration);
+                                "$chanceToDodge"), MetadataHandler.signatureID), fileConfiguration);
         currentButton = ItemStackSerializer.deserialize("currentButtons", fileConfiguration);
 
         ItemStackSerializer.serialize(
@@ -123,7 +124,7 @@ public class GuildRankMenuConfig extends MenusConfigFields {
                                 "$currencyBonusMessage",
                                 "$maxHealthIncrease",
                                 "$chanceToCrit",
-                                "$chanceToDodge")), fileConfiguration);
+                                "$chanceToDodge"), MetadataHandler.signatureID), fileConfiguration);
         nextButton = ItemStackSerializer.deserialize("nextButtons", fileConfiguration);
 
         ItemStackSerializer.serialize(
@@ -132,7 +133,7 @@ public class GuildRankMenuConfig extends MenusConfigFields {
                         "Prestige $rank",
                         Arrays.asList("&f&m-------------------------------",
                                 "&4You must unlock all guild ranks first!",
-                                "&f&m-------------------------------")), fileConfiguration);
+                                "&f&m-------------------------------"), MetadataHandler.signatureID), fileConfiguration);
         prestigeLockedButton = ItemStackSerializer.deserialize("prestigeLockedButtons", fileConfiguration);
 
         ItemStackSerializer.serialize(
@@ -152,7 +153,7 @@ public class GuildRankMenuConfig extends MenusConfigFields {
                                 "&a- Base chance to dodge",
                                 "&4Warning: this resets you current",
                                 "&4EliteMobs ITEMS AND CURRENCY!",
-                                "&f&m-------------------------------")), fileConfiguration);
+                                "&f&m-------------------------------"), MetadataHandler.signatureID), fileConfiguration);
         prestigeNextUnlockButton = ItemStackSerializer.deserialize("prestigeNextUnlockButtons", fileConfiguration);
 
         notEnoughCurrencyMessage = ConfigurationEngine.setString(fileConfiguration, "notEnoughCurrencyMessages",

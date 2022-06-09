@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.menus;
 
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.menus.premade.RefinerMenuConfig;
 import com.magmaguy.elitemobs.config.menus.premade.SellMenuConfig;
 import com.magmaguy.elitemobs.items.ItemTagger;
@@ -127,7 +128,8 @@ public class RefinerMenu extends EliteMenu {
             if (inputSlots.contains(i) || RefinerMenuConfig.getOutputSlots().contains(i))
                 continue;
 
-            refinerInventory.setItem(i, ItemStackGenerator.generateItemStack(Material.GLASS_PANE));
+            if (DefaultConfig.isUseGlassToFillMenuEmptySpace())
+                refinerInventory.setItem(i, ItemStackGenerator.generateItemStack(Material.GLASS_PANE));
 
         }
 

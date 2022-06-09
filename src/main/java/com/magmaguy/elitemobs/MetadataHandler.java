@@ -23,4 +23,6 @@ public class MetadataHandler implements Listener {
     public static Plugin PLUGIN = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
 
 
+    public static int signatureID = 31173;
+
 }
