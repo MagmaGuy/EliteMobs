@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.config.menus.premade;
 
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.menus.MenusConfigFields;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
@@ -53,7 +54,7 @@ public class RefinerMenuConfig extends MenusConfigFields {
                         Arrays.asList("&8Support the plugins you enjoy!",
                                 "&aClick on &c10 &ascrap in your inventory",
                                 "&ain order to upgrade it to higher",
-                                "&alevel scrap!")),
+                                "&alevel scrap!"), MetadataHandler.signatureID),
                 fileConfiguration);
         infoButton = ItemStackSerializer.deserialize("infoButton", fileConfiguration);
         infoSlot = ConfigurationEngine.setInt(fileConfiguration, "infoButtonSlot", 4);
@@ -64,24 +65,24 @@ public class RefinerMenuConfig extends MenusConfigFields {
                 ItemStackGenerator.generateItemStack(Material.GREEN_BANNER,
                         "&2Scrap Input slots",
                         Arrays.asList("&aPut 10 scrap here to upgrade your",
-                                "&ascrap to a &9higher level&a!")),
+                                "&ascrap to a &9higher level&a!"), MetadataHandler.signatureID),
                 fileConfiguration);
         inputInfoButton = ItemStackSerializer.deserialize("inputInformationButton", fileConfiguration);
         outputInformationSlot = ConfigurationEngine.setInt(fileConfiguration, "informationOutputButtonSlot", 15);
         outputSlots = ConfigurationEngine.setList(fileConfiguration, "outputSlots", Arrays.asList(23, 24, 25, 32, 33, 34, 41, 42, 43));
         ItemStackSerializer.serialize("cancelButton", ItemStackGenerator.generateItemStack(Material.BARRIER,
-                "&4Cancel", Arrays.asList("&cCancel upgrade!")), fileConfiguration);
+                "&4Cancel", Arrays.asList("&cCancel upgrade!"), MetadataHandler.signatureID), fileConfiguration);
         ItemStackSerializer.serialize(
                 "outputInformationButton",
                 ItemStackGenerator.generateItemStack(Material.RED_BANNER,
                         "&2Scrap Output slots",
-                        Arrays.asList("&aPreview what you're crafting here!")),
+                        Arrays.asList("&aPreview what you're crafting here!"), MetadataHandler.signatureID),
                 fileConfiguration);
         outputInfoButton = ItemStackSerializer.deserialize("outputInformationButton", fileConfiguration);
         cancelButton = ItemStackSerializer.deserialize("cancelButton", fileConfiguration);
         cancelSlot = ConfigurationEngine.setInt(fileConfiguration, "cancelButtonSlot", 27);
         ItemStackSerializer.serialize("confirmButton", ItemStackGenerator.generateItemStack(Material.EMERALD,
-                "&2Confirm Scrap", Arrays.asList("&aUpgrade your scrap!")), fileConfiguration);
+                "&2Confirm Scrap", Arrays.asList("&aUpgrade your scrap!"), MetadataHandler.signatureID), fileConfiguration);
         confirmButton = ItemStackSerializer.deserialize("confirmButton", fileConfiguration);
         confirmSlot = ConfigurationEngine.setInt(fileConfiguration, "confirmScrapSlot", 35);
     }

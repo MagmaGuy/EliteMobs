@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.menus;
 
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.menus.premade.ScrapperMenuConfig;
 import com.magmaguy.elitemobs.config.menus.premade.SmeltMenuConfig;
 import com.magmaguy.elitemobs.items.ItemTagger;
@@ -115,7 +116,8 @@ public class SmeltMenu extends EliteMenu {
             if (inputSlots.contains(i) || outputSlots.contains(i))
                 continue;
 
-            smeltInventory.setItem(i, ItemStackGenerator.generateItemStack(Material.GLASS_PANE));
+            if (DefaultConfig.isUseGlassToFillMenuEmptySpace())
+                smeltInventory.setItem(i, ItemStackGenerator.generateItemStack(Material.GLASS_PANE));
 
         }
 

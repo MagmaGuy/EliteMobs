@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.config.menus.premade;
 
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.menus.MenusConfigFields;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
@@ -38,18 +39,18 @@ public class ScrapperMenuConfig extends MenusConfigFields {
                                 "&cThere is a 50% chance to get",
                                 "&cscrap when scrapping items!",
                                 "&aUse scrap at the smelter,",
-                                "&arepairman and refiner!")),
+                                "&arepairman and refiner!"), MetadataHandler.signatureID),
                 fileConfiguration);
         infoButton = ItemStackSerializer.deserialize("infoButton", fileConfiguration);
         infoSlot = ConfigurationEngine.setInt(fileConfiguration, "infoButtonSlot", 4);
         storeSlots = ConfigurationEngine.setList(fileConfiguration, "scrapSlots", Arrays.asList(19, 20, 21, 22, 23,
                 24, 25, 28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 43));
         ItemStackSerializer.serialize("cancelButton", ItemStackGenerator.generateItemStack(Material.BARRIER,
-                "&4Cancel", Arrays.asList("&cCancel scrap!")), fileConfiguration);
+                "&4Cancel", Arrays.asList("&cCancel scrap!"), MetadataHandler.signatureID), fileConfiguration);
         cancelButton = ItemStackSerializer.deserialize("cancelButton", fileConfiguration);
         cancelSlot = ConfigurationEngine.setInt(fileConfiguration, "cancelButtonSlot", 27);
         ItemStackSerializer.serialize("confirmButton", ItemStackGenerator.generateItemStack(Material.EMERALD,
-                "&2Confirm Scrap", Arrays.asList("&aScrap items!", "&a50% chance of success!")), fileConfiguration);
+                "&2Confirm Scrap", Arrays.asList("&aScrap items!", "&a50% chance of success!"), MetadataHandler.signatureID), fileConfiguration);
         confirmButton = ItemStackSerializer.deserialize("confirmButton", fileConfiguration);
         confirmSlot = ConfigurationEngine.setInt(fileConfiguration, "confirmScrapSlot", 35);
     }

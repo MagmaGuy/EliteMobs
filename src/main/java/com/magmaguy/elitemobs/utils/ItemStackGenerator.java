@@ -10,6 +10,15 @@ import java.util.List;
 
 public class ItemStackGenerator {
 
+    public static ItemStack generateSkullItemStack(String owner, String name, List<String> lore, int customModelID) {
+        ItemStack itemStack = generateSkullItemStack(owner, name, lore);
+        if (customModelID < 1) return itemStack;
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        itemMeta.setCustomModelData(customModelID);
+        itemStack.setItemMeta(itemMeta);
+        return itemStack;
+    }
+
     public static ItemStack generateSkullItemStack(String owner, String name, List<String> lore) {
         ItemStack itemStack = new ItemStack(Material.PLAYER_HEAD);
         SkullMeta skullMeta = (SkullMeta) itemStack.getItemMeta();
@@ -24,6 +33,16 @@ public class ItemStackGenerator {
         ItemMeta itemMeta = itemStack.getItemMeta();
         itemMeta.setDisplayName(ChatColorConverter.convert(name));
         itemMeta.setLore(ChatColorConverter.convert(lore));
+        itemStack.setItemMeta(itemMeta);
+        return itemStack;
+    }
+
+    public static ItemStack generateItemStack(Material material, String name, List<String> lore, int customModelID) {
+        ItemStack itemStack = generateItemStack(material, ChatColorConverter.convert(name));
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        itemMeta.setLore(ChatColorConverter.convert(lore));
+        if (customModelID > 0)
+            itemMeta.setCustomModelData(customModelID);
         itemStack.setItemMeta(itemMeta);
         return itemStack;
     }

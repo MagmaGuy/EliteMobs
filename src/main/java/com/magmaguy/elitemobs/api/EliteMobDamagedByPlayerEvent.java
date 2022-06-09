@@ -24,6 +24,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
@@ -100,13 +101,14 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
          * @param player Player object
          * @return
          */
-        private static double finalDamageCalculator(double playerWeaponTier, Player player, EliteEntity eliteEntity, boolean ranged, double damageModifier) {
+        private static double finalDamageCalculator(double playerWeaponTier, Player player, EliteEntity eliteEntity, boolean ranged, double damageModifier, int finalPotionBonus) {
             double finalDamage;
-            if (!ranged)
+            if (!ranged) {
+                double appliedPotionDamage = finalPotionBonus * MobCombatSettingsConfig.getStrengthAndWeaknessDamageMultipliers();
                 finalDamage = getCooledAttackStrength(player) *
-                        (playerWeaponTier + secondaryEnchantmentDamageIncrease(player, eliteEntity.getLivingEntity())) *
+                        (playerWeaponTier + secondaryEnchantmentDamageIncrease(player, eliteEntity.getLivingEntity()) + appliedPotionDamage) *
                         MobCombatSettingsConfig.getDamageToEliteMultiplier();
-            else
+            } else
                 finalDamage = (playerWeaponTier + secondaryEnchantmentDamageIncrease(player, eliteEntity.getLivingEntity())) *
                         MobCombatSettingsConfig.getDamageToEliteMultiplier();
 
@@ -189,7 +191,7 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
             //Thorns overrides all other possible damage
             if (event.getCause().equals(EntityDamageEvent.DamageCause.THORNS)) {
                 int thornsLevel = ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getThornsLevel();
-                Strike strike = new Strike(thornsLevel, false, true, 1);
+                Strike strike = new Strike(thornsLevel, false, true, 1, 0);
                 eliteMobDamagedByPlayerEvent = new EliteMobDamagedByPlayerEvent(eliteEntity,
                         player,
                         event,
@@ -268,14 +270,14 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
         public Strike getDamage(Player player, EliteEntity eliteEntity, EntityDamageByEntityEvent event) {
             //citizens
             if (player.hasMetadata("NPC")) {
-                return new Strike(DamageEliteMob.getDamageValue(eliteEntity, DamageEliteMob.DamageAmount.LOW), false, true, 1);
+                return new Strike(DamageEliteMob.getDamageValue(eliteEntity, DamageEliteMob.DamageAmount.LOW), false, true, 1, 0);
             }
 
             //if the damage source is custom , the damage is final
             if (CombatSystem.bypass) {
                 double rawDamage = event.getDamage();
                 CombatSystem.bypass = false;
-                return new Strike(rawDamage, false, true, 1);
+                return new Strike(rawDamage, false, true, 1, 0);
             }
 
             double playerWeaponTier;
@@ -291,7 +293,17 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
             if (eliteEntity instanceof CustomBossEntity)
                 damageModifier = ((CustomBossEntity) eliteEntity).getDamageModifier(player.getInventory().getItemInMainHand().getType());
 
-            double newDamage = finalDamageCalculator(playerWeaponTier, player, eliteEntity, event.getDamager() instanceof Arrow, damageModifier);
+            int strengthBonus = 0;
+            if (player.hasPotionEffect(PotionEffectType.INCREASE_DAMAGE))
+                strengthBonus = player.getPotionEffect(PotionEffectType.INCREASE_DAMAGE).getAmplifier() + 1;
+
+            int weaknessBonus = 0;
+            if (player.hasPotionEffect(PotionEffectType.WEAKNESS))
+                weaknessBonus = player.getPotionEffect(PotionEffectType.WEAKNESS).getAmplifier() + 1;
+
+            int finalPotionBonus = strengthBonus - weaknessBonus;
+
+            double newDamage = finalDamageCalculator(playerWeaponTier, player, eliteEntity, event.getDamager() instanceof Arrow, damageModifier, finalPotionBonus);
 
             if (event.getDamager() instanceof Arrow) {
                 //note: the arrow velocity amplitude at full load is about 2.8
@@ -307,7 +319,7 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
 
             if (criticalHit) newDamage += newDamage * 0.5;
 
-            return new Strike(newDamage, criticalHit, false, damageModifier);
+            return new Strike(newDamage, criticalHit, false, damageModifier, finalPotionBonus);
         }
 
         @EventHandler(priority = EventPriority.MONITOR)
@@ -327,12 +339,15 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
             private final boolean customDamage;
             @Getter
             private final double damageModifier;
+            @Getter
+            private final int potionBonus;
 
-            public Strike(double damage, boolean criticalStrike, boolean customDamage, double damageModifier) {
+            public Strike(double damage, boolean criticalStrike, boolean customDamage, double damageModifier, int potionBonus) {
                 this.damage = damage;
                 this.criticalStrike = criticalStrike;
                 this.customDamage = customDamage;
                 this.damageModifier = damageModifier;
+                this.potionBonus = potionBonus;
             }
         }
 

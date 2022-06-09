@@ -23,6 +23,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -137,8 +138,11 @@ public class PlayerDamagedByEliteMobHandler implements Listener {
         double damageReduction = playerTier;
         double secondaryDamageReduction = secondaryEnchantmentDamageReduction(player, event);
         double customBossDamageMultiplier = eliteEntity.getDamageMultiplier();
+        double potionEffectDamageReduction = 0;
+        if (player.hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE))
+            potionEffectDamageReduction = (player.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE).getAmplifier() + 1) * MobCombatSettingsConfig.getResistanceDamageMultiplier();
 
-        double finalDamage = (baseDamage * customBossDamageMultiplier + bonusDamage - damageReduction - secondaryDamageReduction) *
+        double finalDamage = (baseDamage * customBossDamageMultiplier + bonusDamage - damageReduction - secondaryDamageReduction - potionEffectDamageReduction) *
                 MobCombatSettingsConfig.getDamageToPlayerMultiplier();
 
         double playerMaxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();

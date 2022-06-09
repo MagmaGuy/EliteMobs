@@ -47,9 +47,12 @@ public class DefaultConfig {
     private static boolean onlyUseBedrockMenus;
     @Getter
     private static int characterLimitForBookMenuPages;
+    @Getter
+    private static boolean useGlassToFillMenuEmptySpace;
 
     private static File file = null;
     private static FileConfiguration fileConfiguration = null;
+
     private DefaultConfig() {
     }
 
@@ -93,6 +96,7 @@ public class DefaultConfig {
         defaultTransitiveBlockLimiter = ConfigurationEngine.setInt(fileConfiguration, "defaultTransitiveBlockLimiter", 500);
         onlyUseBedrockMenus = ConfigurationEngine.setBoolean(fileConfiguration, "onlyUseBedrockMenus", false);
         characterLimitForBookMenuPages = ConfigurationEngine.setInt(fileConfiguration, "characterLimitForBookMenuPages", 185);
+        useGlassToFillMenuEmptySpace = ConfigurationEngine.setBoolean(fileConfiguration, "useGlassToFillMenuEmptySpace", false);
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }

@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.menus;
 
 import com.magmaguy.elitemobs.api.EliteMobsItemDetector;
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.menus.premade.UnbinderMenuConfig;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.customenchantments.UnbindEnchantment;
@@ -95,7 +96,8 @@ public class UnbindMenu extends EliteMenu {
 
             if (i == UnbinderMenuConfig.getEliteItemInputSlot() || i == UnbinderMenuConfig.getEliteUnbindInputSlot() || i == UnbinderMenuConfig.getOutputSlot())
                 continue;
-            UnbinderInventory.setItem(i, ItemStackGenerator.generateItemStack(Material.GLASS_PANE));
+            if (DefaultConfig.isUseGlassToFillMenuEmptySpace())
+                UnbinderInventory.setItem(i, ItemStackGenerator.generateItemStack(Material.GLASS_PANE));
 
         }
 

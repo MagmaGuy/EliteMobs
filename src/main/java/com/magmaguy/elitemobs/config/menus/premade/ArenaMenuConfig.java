@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.config.menus.premade;
 
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.menus.MenusConfigFields;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
@@ -31,10 +32,10 @@ public class ArenaMenuConfig extends MenusConfigFields {
         playerItemSlot = ConfigurationEngine.setInt(fileConfiguration, "playerItemSlot", 6);
         if (!VersionChecker.serverVersionOlderThan(17, 0))
             spectatorItem = ConfigurationEngine.setItemStack(fileConfiguration, "spectatorItem",
-                    ItemStackGenerator.generateItemStack(Material.SPYGLASS, "&aSpectate!", Arrays.asList("&2Spectate players in the arena!")));
+                    ItemStackGenerator.generateItemStack(Material.SPYGLASS, "&aSpectate!", Arrays.asList("&2Spectate players in the arena!"), MetadataHandler.signatureID));
         else
             spectatorItem = ConfigurationEngine.setItemStack(fileConfiguration, "spectatorItem",
-                    ItemStackGenerator.generateItemStack(Material.NOTE_BLOCK, "&aSpectate!", Arrays.asList("&2Spectate players in the arena!")));
+                    ItemStackGenerator.generateItemStack(Material.NOTE_BLOCK, "&aSpectate!", Arrays.asList("&2Spectate players in the arena!"), MetadataHandler.signatureID));
         spectatorItemSlot = ConfigurationEngine.setInt(fileConfiguration, "spectatorItemSlot", 2);
     }
 

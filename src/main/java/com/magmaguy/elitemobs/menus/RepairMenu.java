@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.menus;
 
 import com.magmaguy.elitemobs.api.EliteMobsItemDetector;
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.menus.premade.RepairMenuConfig;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.ItemTierFinder;
@@ -105,7 +106,9 @@ public class RepairMenu extends EliteMenu {
 
             if (i == RepairMenuConfig.eliteItemInputSlot || i == RepairMenuConfig.eliteScrapInputSlot || i == RepairMenuConfig.outputSlot)
                 continue;
-            repairInventory.setItem(i, ItemStackGenerator.generateItemStack(Material.GLASS_PANE));
+
+            if (DefaultConfig.isUseGlassToFillMenuEmptySpace())
+                repairInventory.setItem(i, ItemStackGenerator.generateItemStack(Material.GLASS_PANE));
 
         }
 
