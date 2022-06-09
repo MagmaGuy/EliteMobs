@@ -301,6 +301,9 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
             if (player.hasPotionEffect(PotionEffectType.WEAKNESS))
                 weaknessBonus = player.getPotionEffect(PotionEffectType.WEAKNESS).getAmplifier() + 1;
 
+            if (eliteEntity.getLivingEntity().hasPotionEffect(PotionEffectType.WEAKNESS))
+                strengthBonus += eliteEntity.getLivingEntity().getPotionEffect(PotionEffectType.WEAKNESS).getAmplifier() + 1;
+
             int finalPotionBonus = strengthBonus - weaknessBonus;
 
             double newDamage = finalDamageCalculator(playerWeaponTier, player, eliteEntity, event.getDamager() instanceof Arrow, damageModifier, finalPotionBonus);
