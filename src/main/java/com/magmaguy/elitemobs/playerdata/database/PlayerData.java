@@ -618,7 +618,7 @@ public class PlayerData {
             useBookMenus = resultSet.getBoolean("UseBookMenus");
 
         } else {
-            setUseBookMenus(Bukkit.getPlayer(uuid), true);
+            setUseBookMenus(Bukkit.getPlayer(uuid), false);
         }
 
         if (resultSet.getObject("DismissEMStatusScreenMessage") != null) {
