@@ -12,6 +12,7 @@ import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import com.magmaguy.elitemobs.utils.CommandRunner;
 import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -163,7 +164,7 @@ public abstract class CustomEvent {
         if (this.endMessage != null)
             AnnouncementPriority.announce(this.endMessage, eventStartLocation.getWorld(), this.announcementPriority);
         if (this.endEventCommands != null)
-            CommandRunner.runCommandFromList(this.endEventCommands, new ArrayList<>());
+            Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, () -> CommandRunner.runCommandFromList(this.endEventCommands, new ArrayList<>()));
         endModifiers();
     }
 
