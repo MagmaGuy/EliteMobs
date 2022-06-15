@@ -33,8 +33,7 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.CUSTOM;
-import static org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.DROWNED;
+import static org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.*;
 
 /**
  * Created by MagmaGuy on 24/04/2017.
@@ -85,7 +84,7 @@ public class NaturalMobSpawnEventHandler implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onSpawn(CreatureSpawnEvent event) {
 
-        if (event.getSpawnReason().equals(DROWNED)) return;
+        if (event.getSpawnReason().equals(DROWNED) || event.getSpawnReason().equals(BREEDING)) return;
 
         if (!VersionChecker.serverVersionOlderThan(15, 0))
             if (event.getEntity().getType().equals(EntityType.BEE))
