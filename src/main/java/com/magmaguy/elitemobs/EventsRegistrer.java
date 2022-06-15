@@ -301,6 +301,7 @@ public class EventsRegistrer {
         if (ItemSettingsConfig.isEliteDurability())
             register(new AlternativeDurabilityLoss());
         register(new EnderCrystalDamageProtectionBypass());
+        register(new NPCsBecomeWitches());
 
 
         //Antiexploits
