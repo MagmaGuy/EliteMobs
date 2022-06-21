@@ -50,5 +50,6 @@ public class WeaponsGoblinBoss extends CustomBossesConfigFields {
                 "goblin_shooter.yml:0.2",
                 "goblin_ballista.yml:0.2"));
         setFollowDistance(100);
+        setCustomModel("em_goblin_weapon");
     }
 }

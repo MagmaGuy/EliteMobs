@@ -39,5 +39,6 @@ public class TreasureGoblinBoss extends CustomBossesConfigFields {
         setAnnouncementPriority(2);
         setPersistent(true);
         setFollowDistance(100);
+        setCustomModel("em_goblin_treasure");
     }
 }
