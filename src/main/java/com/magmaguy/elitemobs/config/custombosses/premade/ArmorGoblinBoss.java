@@ -47,5 +47,6 @@ public class ArmorGoblinBoss extends CustomBossesConfigFields {
                 "goblin_boots.yml:0.2"
         ));
         setFollowDistance(100);
+        setCustomModel("em_goblin_armor");
     }
 }

@@ -52,7 +52,7 @@ public class EnhancementMenu extends EliteMenu {
         NamespacedKey enchantmentKey = mainCombatEnchantment.getKey();
         ItemMeta itemMeta = outputItem.getItemMeta();
         int enchantmentLevel = ItemTagger.getEnchantment(outputItem.getItemMeta(), enchantmentKey) + 1;
-        if (outputItem.getEnchantmentLevel(mainCombatEnchantment) < mainCombatEnchantment.getMaxLevel())
+        if (outputItem.getEnchantmentLevel(mainCombatEnchantment) + 1 <= mainCombatEnchantment.getMaxLevel())
             outputItem.addEnchantment(mainCombatEnchantment, enchantmentLevel);
         ItemTagger.registerEnchantment(itemMeta, enchantmentKey, enchantmentLevel);
         outputItem.setItemMeta(itemMeta);
