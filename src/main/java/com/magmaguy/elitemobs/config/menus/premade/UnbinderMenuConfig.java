@@ -94,7 +94,7 @@ public class UnbinderMenuConfig extends MenusConfigFields {
         cancelButton = ItemStackSerializer.deserialize("cancelButton", fileConfiguration);
         cancelSlot = ConfigurationEngine.setInt(fileConfiguration, "cancelButtonSlot", 27);
         ItemStackSerializer.serialize("confirmButton", ItemStackGenerator.generateItemStack(Material.EMERALD,
-                "&2Confirm!", Arrays.asList("&aUnbind item!"), MetadataHandler.signatureID), fileConfiguration);
+                "&2Confirm!", Arrays.asList("&aUnbind item!"), 31175), fileConfiguration);
         confirmButton = ItemStackSerializer.deserialize("confirmButton", fileConfiguration);
         confirmSlot = ConfigurationEngine.setInt(fileConfiguration, "confirmUnbindSlot", 35);
     }

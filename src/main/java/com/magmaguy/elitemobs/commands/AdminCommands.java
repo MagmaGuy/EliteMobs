@@ -10,6 +10,7 @@ import cloud.commandframework.types.tuples.Triplet;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.commands.admin.*;
 import com.magmaguy.elitemobs.commands.quests.QuestCommand;
+import com.magmaguy.elitemobs.commands.setup.SetupMenu;
 import com.magmaguy.elitemobs.config.ConfigurationExporter;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
@@ -778,6 +779,13 @@ public class AdminCommands {
                 .permission("elitemobs.*")
                 .meta(CommandMeta.DESCRIPTION, "Forces completion of all player quests.")
                 .handler(commandContext -> QuestCommand.completeQuest((Player) commandContext.getSender())));
+
+        // /em forceresourcepack
+        manager.command(builder.literal("forceresourcepack")
+                .senderType(CommandSender.class)
+                .permission("elitemobs.*")
+                .meta(CommandMeta.DESCRIPTION, "Forces server resource packs to be used in your server.")
+                .handler(commandContext -> SetupMenu.forceResourcePack((Player) commandContext.getSender())));
     }
 
     private void testFireball(Player player) {

@@ -1,13 +1,16 @@
 package com.magmaguy.elitemobs.menus;
 
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobsItemDetector;
 import com.magmaguy.elitemobs.config.DefaultConfig;
+import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
 import com.magmaguy.elitemobs.config.menus.premade.EnhancementMenuConfig;
 import com.magmaguy.elitemobs.items.EliteItemLore;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.ItemTierFinder;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
@@ -68,12 +71,22 @@ public class EnhancementMenu extends EliteMenu {
      * @param player Player for whom the inventory will be created
      */
     public void constructEnhancementMenu(Player player) {
-        Inventory EnhancementInventory = Bukkit.createInventory(player, 54, EnhancementMenuConfig.shopName);
+        String menuName = EnhancementMenuConfig.shopName;
+        if (ResourcePackDataConfig.isEliteMobsResourcePackEnabled())
+            menuName = ChatColor.WHITE + "\uF801\uDB80\uDC2A\uF805       " + menuName;
+        Inventory EnhancementInventory = Bukkit.createInventory(player, 54, menuName);
 
         for (int i = 0; i < EnhancementInventory.getSize(); i++) {
 
             if (i == EnhancementMenuConfig.infoSlot) {
-                EnhancementInventory.setItem(i, EnhancementMenuConfig.infoButton);
+                ItemStack infoButton = EnhancementMenuConfig.infoButton;
+                if (ResourcePackDataConfig.isEliteMobsResourcePackEnabled()) {
+                    infoButton.setType(Material.PAPER);
+                    ItemMeta itemMeta = infoButton.getItemMeta();
+                    itemMeta.setCustomModelData(MetadataHandler.signatureID);
+                    infoButton.setItemMeta(itemMeta);
+                }
+                EnhancementInventory.setItem(i, infoButton);
                 continue;
             }
 
@@ -123,7 +136,7 @@ public class EnhancementMenu extends EliteMenu {
         }
 
         player.openInventory(EnhancementInventory);
-        createEliteMenu(player, EnhancementInventory, inventories);
+        createEliteMenu(player, EnhancementInventory, inventories, menuName);
     }
 
     public static class EnhancementMenuEvents implements Listener {

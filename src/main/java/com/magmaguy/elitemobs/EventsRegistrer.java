@@ -277,9 +277,9 @@ public class EventsRegistrer {
         register(new BossTrackingPage.BossTrackingPageEvents());
 
         //Shops
-        register(new ProceduralShopMenu());
-        register(new CustomShopMenu());
-        register(new BuyOrSellMenu());
+        register(new ProceduralShopMenu.ProceduralShopMenuEvents());
+        register(new CustomShopMenu.CustomShopMenuEvents());
+        register(new BuyOrSellMenu.BuyOrSellMenuEvents());
         register(new SellMenu());
         register(new SetupMenu.SetupMenuListeners());
         register(new ScrapperMenu.ScrapperMenuEvents());

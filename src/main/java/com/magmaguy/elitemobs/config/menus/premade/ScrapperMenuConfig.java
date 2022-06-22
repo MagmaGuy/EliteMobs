@@ -50,7 +50,7 @@ public class ScrapperMenuConfig extends MenusConfigFields {
         cancelButton = ItemStackSerializer.deserialize("cancelButton", fileConfiguration);
         cancelSlot = ConfigurationEngine.setInt(fileConfiguration, "cancelButtonSlot", 27);
         ItemStackSerializer.serialize("confirmButton", ItemStackGenerator.generateItemStack(Material.EMERALD,
-                "&2Confirm Scrap", Arrays.asList("&aScrap items!", "&a50% chance of success!"), MetadataHandler.signatureID), fileConfiguration);
+                "&2Confirm Scrap", Arrays.asList("&aScrap items!", "&a50% chance of success!"), 31174), fileConfiguration);
         confirmButton = ItemStackSerializer.deserialize("confirmButton", fileConfiguration);
         confirmSlot = ConfigurationEngine.setInt(fileConfiguration, "confirmScrapSlot", 35);
     }
