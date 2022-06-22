@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.menus;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
 import com.magmaguy.elitemobs.config.menus.premade.ArenaMenuConfig;
 import com.magmaguy.elitemobs.instanced.ArenaInstance;
 import lombok.Getter;
@@ -22,7 +23,10 @@ public class ArenaMenu {
             player.sendMessage(ChatColorConverter.convert("&4[EliteMobs] &cInvalid arena name!"));
             return;
         }
-        Inventory shopInventory = Bukkit.createInventory(player, 9, arenaInstance.getCustomArenasConfigFields().getArenaName());
+        String menuName = ArenaMenuConfig.getMenuName() +arenaInstance.getCustomArenasConfigFields().getArenaName();
+        if (ResourcePackDataConfig.isEliteMobsResourcePackEnabled())
+            menuName = "\uF801\uDB80\uDD0B\uF805          " + menuName;
+        Inventory shopInventory = Bukkit.createInventory(player, 9, menuName);
         shopInventory.setItem(ArenaMenuConfig.getPlayerItemSlot(), ArenaMenuConfig.getPlayerItem());
         shopInventory.setItem(ArenaMenuConfig.getSpectatorItemSlot(), ArenaMenuConfig.getSpectatorItem());
         player.openInventory(shopInventory);
@@ -51,7 +55,7 @@ public class ArenaMenu {
 
         @EventHandler
         public void onInventoryClose(InventoryCloseEvent event) {
-            menus.remove(event.getPlayer());
+            menus.remove((Player) event.getPlayer());
         }
     }
 

@@ -2,10 +2,7 @@ package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.utils.InfoMessage;
-import com.magmaguy.elitemobs.utils.SpigotMessage;
-import com.magmaguy.elitemobs.utils.WarningMessage;
-import com.magmaguy.elitemobs.utils.ZipFile;
+import com.magmaguy.elitemobs.utils.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -13,7 +10,6 @@ import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,7 +18,6 @@ import java.nio.file.StandardCopyOption;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Properties;
 
 public class ConfigurationExporter {
     private ConfigurationExporter() {
@@ -187,23 +182,15 @@ public class ConfigurationExporter {
 
         String sha1 = generateResourcePackSHA1(commandSender);
         if (sha1 == null) return;
-        try {
-            FileInputStream in = new FileInputStream(serverProperties);
-            Properties props = new Properties();
-            props.load(in);
-            in.close();
+        if (ServerPropertiesModifier.modify((Player) commandSender, "resource-pack-sha1", sha1)) {
 
-            FileOutputStream out = new FileOutputStream(serverProperties);
-            props.setProperty("resource-pack-sha1", sha1);
-            props.store(out, null);
-            out.close();
-        } catch (Exception ex) {
-            commandSender.sendMessage("[EliteMobs] Failed to save SHA1 value " + sha1 + " ! You will have to do this manually.");
+            commandSender.sendMessage(ChatColor.GREEN + "[EliteMobs] Successfully set the value resource-pack-sha1=" + sha1 + " in server.properties!");
+            commandSender.sendMessage(ChatColor.RED + "[EliteMobs] Don't forget to update the downloadable resource pack at your online location of choice!" +
+                    " If you don't update the version people download things won't work correctly!");
+            commandSender.sendMessage(ChatColor.GREEN + "[EliteMobs] The server.properties modification will work starting with the next restart!");
+        } else {
+            commandSender.sendMessage(ChatColor.RED + "[EliteMobs] Failed to write SHA1 value! You will have to add this manually. For reference, you SHA1 value is " + sha1);
         }
-        commandSender.sendMessage(ChatColor.GREEN + "[EliteMobs] Successfully set the value resource-pack-sha1=" + sha1 + " in server.properties!");
-        commandSender.sendMessage(ChatColor.RED + "[EliteMobs] Don't forget to update the downloadable resource pack at your online location of choice!" +
-                " If you don't update the version people download things won't work correctly!");
-        commandSender.sendMessage(ChatColor.GREEN + "[EliteMobs] The server.properties modification will work starting with the next restart!");
 
     }
 }

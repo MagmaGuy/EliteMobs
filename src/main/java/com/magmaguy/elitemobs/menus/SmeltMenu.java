@@ -1,12 +1,15 @@
 package com.magmaguy.elitemobs.menus;
 
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.DefaultConfig;
+import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
 import com.magmaguy.elitemobs.config.menus.premade.ScrapperMenuConfig;
 import com.magmaguy.elitemobs.config.menus.premade.SmeltMenuConfig;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -72,12 +75,23 @@ public class SmeltMenu extends EliteMenu {
      * @param player Player for whom the inventory will be created
      */
     public void constructSmeltMenu(Player player) {
-        Inventory smeltInventory = Bukkit.createInventory(player, 54, SmeltMenuConfig.shopName);
+        String menuName = SmeltMenuConfig.shopName;
+        if (ResourcePackDataConfig.isEliteMobsResourcePackEnabled())
+            menuName = ChatColor.WHITE + "\uF801\uDB80\uDC4B\uF805         " + menuName;
+        Inventory smeltInventory = Bukkit.createInventory(player, 54, menuName);
 
         for (int i = 0; i < 54; i++) {
 
             if (i == ScrapperMenuConfig.infoSlot) {
-                smeltInventory.setItem(i, SmeltMenuConfig.infoButton);
+                ItemStack infoButton = SmeltMenuConfig.infoButton;
+                if (ResourcePackDataConfig.isEliteMobsResourcePackEnabled()) {
+                    infoButton.setType(Material.PAPER);
+                    ItemMeta itemMeta = infoButton.getItemMeta();
+                    itemMeta.setCustomModelData(MetadataHandler.signatureID);
+                    infoButton.setItemMeta(itemMeta);
+                }
+
+                smeltInventory.setItem(i, infoButton);
                 continue;
             }
 
@@ -122,7 +136,7 @@ public class SmeltMenu extends EliteMenu {
         }
 
         player.openInventory(smeltInventory);
-        createEliteMenu(player, smeltInventory, inventories);
+        createEliteMenu(player, smeltInventory, inventories, menuName);
     }
 
     public static class SmeltMenuEvents implements Listener {

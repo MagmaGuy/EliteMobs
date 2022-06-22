@@ -1,12 +1,15 @@
 package com.magmaguy.elitemobs.menus;
 
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobsItemDetector;
 import com.magmaguy.elitemobs.config.DefaultConfig;
+import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
 import com.magmaguy.elitemobs.config.menus.premade.RepairMenuConfig;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.ItemTierFinder;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -56,13 +59,23 @@ public class RepairMenu extends EliteMenu {
      *
      * @param player Player for whom the inventory will be created
      */
-    public void constructRepairMenu(Player player) {
-        Inventory repairInventory = Bukkit.createInventory(player, 54, RepairMenuConfig.shopName);
+    public void constructRepairMenu(Player player) {        String menuName = RepairMenuConfig.shopName;
+        if (ResourcePackDataConfig.isEliteMobsResourcePackEnabled())
+            menuName = ChatColor.WHITE + "\uF801\uDB80\uDC2A\uF805           " + menuName;
+
+        Inventory repairInventory = Bukkit.createInventory(player, 54, menuName);
 
         for (int i = 0; i < repairInventory.getSize(); i++) {
 
             if (i == RepairMenuConfig.infoSlot) {
-                repairInventory.setItem(i, RepairMenuConfig.infoButton);
+                ItemStack infoButton = RepairMenuConfig.infoButton;
+                if (ResourcePackDataConfig.isEliteMobsResourcePackEnabled()) {
+                    infoButton.setType(Material.PAPER);
+                    ItemMeta itemMeta = infoButton.getItemMeta();
+                    itemMeta.setCustomModelData(MetadataHandler.signatureID);
+                    infoButton.setItemMeta(itemMeta);
+                }
+                repairInventory.setItem(i, infoButton);
                 continue;
             }
 
@@ -113,7 +126,7 @@ public class RepairMenu extends EliteMenu {
         }
 
         player.openInventory(repairInventory);
-        createEliteMenu(player, repairInventory, inventories);
+        createEliteMenu(player, repairInventory, inventories, menuName);
     }
 
     public static class RepairMenuEvents implements Listener {

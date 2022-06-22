@@ -3,9 +3,11 @@ package com.magmaguy.elitemobs.adventurersguild;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
+import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
 import com.magmaguy.elitemobs.config.menus.premade.GuildRankMenuConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -105,7 +107,10 @@ public class GuildRankMenuHandler implements Listener {
      * @return Returns the inventory generated
      */
     public static Inventory initializeGuildRankMenu(Player player) {
-        Inventory difficultyMenu = Bukkit.createInventory(player, 54, GuildRankMenuConfig.getMenuName());
+        String menuName = GuildRankMenuConfig.getMenuName();
+        if (ResourcePackDataConfig.eliteMobsResourcePackEnabled)
+            menuName = ChatColor.WHITE +  "\uF801\uDA90\uDEFA\uF805           " + menuName;
+        Inventory difficultyMenu = Bukkit.createInventory(player, 54, menuName);
         difficultyMenu = populateInventory(difficultyMenu, player);
         inventories.add(difficultyMenu);
         player.openInventory(difficultyMenu);

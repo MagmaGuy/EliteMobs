@@ -13,7 +13,7 @@ import java.util.Map;
 
 public class EliteMenu implements Listener {
 
-    public static void createEliteMenu(Player player, Inventory inventory, Map<Player, Inventory> inventories) {
+    public static void createEliteMenu(Player player, Inventory inventory, Map<Player, Inventory> inventories, String name) {
         inventories.put(player, inventory);
     }
 

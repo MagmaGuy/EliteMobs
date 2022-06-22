@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.api.EliteMobsItemDetector;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
+import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
 import com.magmaguy.elitemobs.config.TranslationConfig;
 import com.magmaguy.elitemobs.config.menus.premade.SellMenuConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
@@ -115,7 +116,10 @@ public class SellMenu extends EliteMenu implements Listener {
         }
 
         player.openInventory(sellInventory);
-        createEliteMenu(player, sellInventory, inventories);
+        String menuName = SellMenuConfig.shopName;
+        if (ResourcePackDataConfig.isEliteMobsResourcePackEnabled())
+            menuName = "\uF801\uDB80\uDC5B\uF805            " + menuName;
+        createEliteMenu(player, sellInventory, inventories, menuName);
 
     }
 
