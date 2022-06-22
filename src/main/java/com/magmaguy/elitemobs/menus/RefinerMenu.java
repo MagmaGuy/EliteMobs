@@ -1,12 +1,15 @@
 package com.magmaguy.elitemobs.menus;
 
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.DefaultConfig;
+import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
 import com.magmaguy.elitemobs.config.menus.premade.RefinerMenuConfig;
 import com.magmaguy.elitemobs.config.menus.premade.SellMenuConfig;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -83,13 +86,22 @@ public class RefinerMenu extends EliteMenu {
      * @param player Player for whom the inventory will be created
      */
     public void constructRefinerMenu(Player player) {
-
-        Inventory refinerInventory = Bukkit.createInventory(player, 54, RefinerMenuConfig.getShopName());
+        String menuName = RefinerMenuConfig.getShopName();
+        if (ResourcePackDataConfig.isEliteMobsResourcePackEnabled())
+            menuName = ChatColor.WHITE + "\uF801\uDB80\uDC3B\uF805         " + menuName;
+        Inventory refinerInventory = Bukkit.createInventory(player, 54, menuName);
 
         for (int i = 0; i < 54; i++) {
 
             if (i == RefinerMenuConfig.getInfoSlot()) {
-                refinerInventory.setItem(i, RefinerMenuConfig.getInfoButton());
+                ItemStack infoButton = RefinerMenuConfig.getInfoButton();
+                if (ResourcePackDataConfig.isEliteMobsResourcePackEnabled()) {
+                    infoButton.setType(Material.PAPER);
+                    ItemMeta itemMeta = infoButton.getItemMeta();
+                    itemMeta.setCustomModelData(MetadataHandler.signatureID);
+                    infoButton.setItemMeta(itemMeta);
+                }
+                refinerInventory.setItem(i, infoButton);
                 continue;
             }
 
@@ -134,7 +146,7 @@ public class RefinerMenu extends EliteMenu {
         }
 
         player.openInventory(refinerInventory);
-        createEliteMenu(player, refinerInventory, inventories);
+        createEliteMenu(player, refinerInventory, inventories, menuName);
     }
 
     public static class RefinerMenuEvents implements Listener {

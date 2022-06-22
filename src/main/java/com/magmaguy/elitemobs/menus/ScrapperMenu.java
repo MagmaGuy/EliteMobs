@@ -1,9 +1,11 @@
 package com.magmaguy.elitemobs.menus;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobsItemDetector;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
+import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
 import com.magmaguy.elitemobs.config.TranslationConfig;
 import com.magmaguy.elitemobs.config.menus.premade.ScrapperMenuConfig;
 import com.magmaguy.elitemobs.config.menus.premade.SellMenuConfig;
@@ -12,6 +14,7 @@ import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -39,12 +42,23 @@ public class ScrapperMenu extends EliteMenu {
      */
     public void constructScrapMenu(Player player) {
 
-        Inventory scrapInventory = Bukkit.createInventory(player, 54, ScrapperMenuConfig.shopName);
+        String menuName = ScrapperMenuConfig.shopName;
+        if (ResourcePackDataConfig.isEliteMobsResourcePackEnabled())
+            menuName = ChatColor.WHITE +  "\uF801\uDB80\uDC2B\uF805         " + menuName;
+
+        Inventory scrapInventory = Bukkit.createInventory(player, 54, menuName);
 
         for (int i = 0; i < 54; i++) {
 
             if (i == ScrapperMenuConfig.infoSlot) {
-                scrapInventory.setItem(i, ScrapperMenuConfig.infoButton);
+                ItemStack infoButton = ScrapperMenuConfig.infoButton;
+                if (ResourcePackDataConfig.isEliteMobsResourcePackEnabled()) {
+                    infoButton.setType(Material.PAPER);
+                    ItemMeta itemMeta = infoButton.getItemMeta();
+                    itemMeta.setCustomModelData(MetadataHandler.signatureID);
+                    infoButton.setItemMeta(itemMeta);
+                }
+                scrapInventory.setItem(i, infoButton);
                 continue;
             }
 
@@ -78,7 +92,7 @@ public class ScrapperMenu extends EliteMenu {
         }
 
         player.openInventory(scrapInventory);
-        createEliteMenu(player, scrapInventory, inventories);
+        createEliteMenu(player, scrapInventory, inventories, menuName);
 
     }
 

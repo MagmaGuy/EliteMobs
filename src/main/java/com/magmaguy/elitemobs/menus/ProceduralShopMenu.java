@@ -1,6 +1,8 @@
 package com.magmaguy.elitemobs.menus;
 
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
+import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
 import com.magmaguy.elitemobs.config.menus.premade.BuyOrSellMenuConfig;
 import com.magmaguy.elitemobs.config.menus.premade.ProceduralShopMenuConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
@@ -8,26 +10,28 @@ import com.magmaguy.elitemobs.items.EliteItemLore;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.ItemWorthCalculator;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
-import com.magmaguy.elitemobs.utils.ObfuscatedStringHandler;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
 /**
  * Created by MagmaGuy on 17/06/2017.
  */
-public class ProceduralShopMenu implements Listener {
+public class ProceduralShopMenu {
 
-    private static final String SHOP_KEY = ObfuscatedStringHandler.obfuscateString("/");
-    private static final String SHOP_NAME = ProceduralShopMenuConfig.shopName + SHOP_KEY;
     private static final List<Integer> validSlots = ProceduralShopMenuConfig.storeSlots;
 
     public static void shopInitializer(Player player) {
@@ -38,8 +42,11 @@ public class ProceduralShopMenu implements Listener {
     }
 
     public static void shopConstructor(Player player) {
-
-        Inventory shopInventory = Bukkit.createInventory(player, 54, SHOP_NAME);
+        String menuName = ProceduralShopMenuConfig.shopName;
+        if (ResourcePackDataConfig.isEliteMobsResourcePackEnabled())
+            menuName = ChatColor.WHITE + "\uF801\uDB80\uDC3B\uF805         " + menuName;
+        Inventory shopInventory = Bukkit.createInventory(player, 54, menuName);
+        ProceduralShopMenuEvents.menus.put(player, shopInventory);
         populateShop(shopInventory, player);
         player.openInventory(shopInventory);
 
@@ -47,7 +54,15 @@ public class ProceduralShopMenu implements Listener {
 
     private static void populateShop(Inventory shopInventory, Player player) {
 
-        shopInventory.setItem(ProceduralShopMenuConfig.rerollSlot, ProceduralShopMenuConfig.rerollItem);
+        ItemStack rerollButton = ProceduralShopMenuConfig.rerollItem;
+        if (ResourcePackDataConfig.isEliteMobsResourcePackEnabled()) {
+            rerollButton.setType(Material.PAPER);
+            ItemMeta itemMeta = rerollButton.getItemMeta();
+            itemMeta.setCustomModelData(MetadataHandler.signatureID);
+            rerollButton.setItemMeta(itemMeta);
+        }
+
+        shopInventory.setItem(ProceduralShopMenuConfig.rerollSlot, rerollButton);
         shopContents(shopInventory, player);
 
     }
@@ -73,67 +88,77 @@ public class ProceduralShopMenu implements Listener {
 
     }
 
-    @EventHandler
-    public void onClick(InventoryClickEvent event) {
+    public static class ProceduralShopMenuEvents implements Listener {
+        public static HashMap<Player, Inventory> menus = new HashMap<>();
 
-        if (!event.getView().getTitle().equals(SHOP_NAME)) return;
-        if (event.getClickedInventory() == null || !event.getClickedInventory().getType().equals(InventoryType.CHEST)) {
-            event.setCancelled(true);
-            return;
-        }
-        event.setCancelled(true);
-        if (!SharedShopElements.inventoryNullPointerPreventer(event)) return;
+        @EventHandler
+        public void onClick(InventoryClickEvent event) {
 
-        //reroll loot button
-        if (event.getCurrentItem().getItemMeta().getDisplayName().equals(ProceduralShopMenuConfig.rerollItem.getItemMeta().getDisplayName())) {
-            populateShop(event.getInventory(), Bukkit.getPlayer(event.getWhoClicked().getUniqueId()));
-            event.setCancelled(true);
-            return;
-        }
-
-        if (!ItemTagger.isEliteItem(event.getCurrentItem())) {
-            event.setCancelled(true);
-            return;
-        }
-
-        Player player = (Player) event.getWhoClicked();
-        ItemStack itemStack = event.getCurrentItem();
-        String itemDisplayName = itemStack.getItemMeta().getDisplayName();
-
-        double itemValue = ItemWorthCalculator.determineItemWorth(itemStack, player);
-
-        boolean inventoryHasFreeSlots = false;
-        for (ItemStack iteratedStack : player.getInventory().getStorageContents())
-            if (iteratedStack == null) {
-                inventoryHasFreeSlots = true;
-                break;
+            if (!EliteMenu.isEliteMenu(event, menus)) return;
+            if (event.getClickedInventory() == null || !event.getClickedInventory().getType().equals(InventoryType.CHEST)) {
+                event.setCancelled(true);
+                return;
             }
+            event.setCancelled(true);
+            if (!SharedShopElements.inventoryNullPointerPreventer(event)) return;
 
-        //These slots are for buying items
-        if (event.getView().getTitle().equalsIgnoreCase(SHOP_NAME) && validSlots.contains(event.getSlot())) {
-
-            if (!inventoryHasFreeSlots) {
-
-                player.sendMessage(ProceduralShopMenuConfig.messageFullInventory);
-                player.closeInventory();
-
-            } else if (EconomyHandler.checkCurrency(player.getUniqueId()) >= itemValue) {
-                //player has enough money
-                EconomyHandler.subtractCurrency(player.getUniqueId(), itemValue);
-                new EliteItemLore(itemStack, false);
-                player.getInventory().addItem(itemStack);
+            //reroll loot button
+            if (event.getCurrentItem().getItemMeta().getDisplayName().equals(ProceduralShopMenuConfig.rerollItem.getItemMeta().getDisplayName())) {
                 populateShop(event.getInventory(), Bukkit.getPlayer(event.getWhoClicked().getUniqueId()));
-                SharedShopElements.buyMessage(player, itemDisplayName, itemValue);
+                event.setCancelled(true);
+                return;
+            }
 
-            } else {
+            if (!ItemTagger.isEliteItem(event.getCurrentItem())) {
+                event.setCancelled(true);
+                return;
+            }
 
-                player.closeInventory();
-                SharedShopElements.insufficientFundsMessage(player, itemValue);
+            Player player = (Player) event.getWhoClicked();
+            ItemStack itemStack = event.getCurrentItem();
+            String itemDisplayName = itemStack.getItemMeta().getDisplayName();
+
+            double itemValue = ItemWorthCalculator.determineItemWorth(itemStack, player);
+
+            boolean inventoryHasFreeSlots = false;
+            for (ItemStack iteratedStack : player.getInventory().getStorageContents())
+                if (iteratedStack == null) {
+                    inventoryHasFreeSlots = true;
+                    break;
+                }
+
+            //These slots are for buying items
+            if (EliteMenu.isTopMenu(event)) {
+
+                if (!inventoryHasFreeSlots) {
+
+                    player.sendMessage(ProceduralShopMenuConfig.messageFullInventory);
+                    player.closeInventory();
+
+                } else if (EconomyHandler.checkCurrency(player.getUniqueId()) >= itemValue) {
+                    //player has enough money
+                    EconomyHandler.subtractCurrency(player.getUniqueId(), itemValue);
+                    new EliteItemLore(itemStack, false);
+                    player.getInventory().addItem(itemStack);
+                    populateShop(event.getInventory(), Bukkit.getPlayer(event.getWhoClicked().getUniqueId()));
+                    SharedShopElements.buyMessage(player, itemDisplayName, itemValue);
+
+                } else {
+
+                    player.closeInventory();
+                    SharedShopElements.insufficientFundsMessage(player, itemValue);
+
+                }
 
             }
 
         }
 
+        @EventHandler
+        public void onInventoryClose(InventoryCloseEvent event) {
+            if (!EliteMenu.onInventoryClose(event, menus)) return;
+            EliteMenu.cancel(event.getView().getTopInventory(), event.getView().getBottomInventory(), validSlots);
+        }
     }
 
 }

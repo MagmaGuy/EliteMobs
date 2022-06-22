@@ -24,7 +24,7 @@ public class CustomShopMenuConfig extends MenusConfigFields {
 
     @Override
     public void processAdditionalFields() {
-        shopName = ConfigurationEngine.setString(fileConfiguration, "Shop name", "[EM] Buy or Sell");
+        shopName = ConfigurationEngine.setString(fileConfiguration, "Shop name", "[EM] Custom Shop");
         ItemStackSerializer.serialize("Reroll button",
                 ItemStackGenerator.generateSkullItemStack("magmaguy",
                         "&4&lEliteMobs &r&cby &4&lMagmaGuy",

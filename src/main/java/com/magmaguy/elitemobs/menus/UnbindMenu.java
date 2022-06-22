@@ -1,12 +1,15 @@
 package com.magmaguy.elitemobs.menus;
 
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobsItemDetector;
 import com.magmaguy.elitemobs.config.DefaultConfig;
+import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
 import com.magmaguy.elitemobs.config.menus.premade.UnbinderMenuConfig;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.customenchantments.UnbindEnchantment;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -47,12 +50,22 @@ public class UnbindMenu extends EliteMenu {
      * @param player Player for whom the inventory will be created
      */
     public void constructUnbinderMenu(Player player) {
-        Inventory UnbinderInventory = Bukkit.createInventory(player, 54, UnbinderMenuConfig.getShopName());
+        String menuName = UnbinderMenuConfig.getShopName();
+        if (ResourcePackDataConfig.isEliteMobsResourcePackEnabled())
+            menuName = ChatColor.WHITE + "\uF801\uDB80\uDC9B\uF805          " + menuName;
+        Inventory UnbinderInventory = Bukkit.createInventory(player, 54, menuName);
 
         for (int i = 0; i < UnbinderInventory.getSize(); i++) {
 
             if (i == UnbinderMenuConfig.getInfoSlot()) {
-                UnbinderInventory.setItem(i, UnbinderMenuConfig.getInfoButton());
+                ItemStack infoButton = UnbinderMenuConfig.getInfoButton();
+                if (ResourcePackDataConfig.isEliteMobsResourcePackEnabled()) {
+                    infoButton.setType(Material.PAPER);
+                    ItemMeta itemMeta = infoButton.getItemMeta();
+                    itemMeta.setCustomModelData(MetadataHandler.signatureID);
+                    infoButton.setItemMeta(itemMeta);
+                }
+                UnbinderInventory.setItem(i, infoButton);
                 continue;
             }
 
@@ -102,7 +115,7 @@ public class UnbindMenu extends EliteMenu {
         }
 
         player.openInventory(UnbinderInventory);
-        createEliteMenu(player, UnbinderInventory, inventories);
+        createEliteMenu(player, UnbinderInventory, inventories, menuName);
     }
 
     public static class UnbinderMenuEvents implements Listener {

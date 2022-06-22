@@ -13,6 +13,8 @@ import java.util.Arrays;
 
 public class ArenaMenuConfig extends MenusConfigFields {
     @Getter
+    private static String menuName;
+    @Getter
     private static ItemStack playerItem;
     @Getter
     private static int playerItemSlot;
@@ -27,6 +29,7 @@ public class ArenaMenuConfig extends MenusConfigFields {
 
     @Override
     public void processAdditionalFields() {
+        menuName = ConfigurationEngine.setString(fileConfiguration, "menuName", "");
         playerItem = ConfigurationEngine.setItemStack(fileConfiguration, "playerItem",
                 ItemStackGenerator.generateItemStack(Material.DIAMOND_SWORD, "&4Challenge the arena!", Arrays.asList("&2Fight in the arena!")));
         playerItemSlot = ConfigurationEngine.setInt(fileConfiguration, "playerItemSlot", 6);

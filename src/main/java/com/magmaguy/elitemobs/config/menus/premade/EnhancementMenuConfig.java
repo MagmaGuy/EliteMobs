@@ -80,7 +80,7 @@ public class EnhancementMenuConfig extends MenusConfigFields {
         cancelSlot = ConfigurationEngine.setInt(fileConfiguration, "cancelButtonSlot", 27);
         infoButton = ItemStackSerializer.deserialize("infoButton", fileConfiguration);
         ItemStackSerializer.serialize("confirmButton", ItemStackGenerator.generateItemStack(Material.EMERALD,
-                "&2Confirm!", Arrays.asList("&aUpgrade items!"), MetadataHandler.signatureID), fileConfiguration);
+                "&2Confirm!", Arrays.asList("&aUpgrade items!"), 31174), fileConfiguration);
         confirmButton = ItemStackSerializer.deserialize("confirmButton", fileConfiguration);
         confirmSlot = ConfigurationEngine.setInt(fileConfiguration, "confirmRepairSlot", 35);
     }
