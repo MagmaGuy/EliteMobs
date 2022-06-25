@@ -12,6 +12,7 @@ import com.magmaguy.elitemobs.items.ItemWorthCalculator;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -75,7 +76,11 @@ public class SellMenu extends EliteMenu implements Listener {
      */
     public void constructSellMenu(Player player) {
 
-        Inventory sellInventory = Bukkit.createInventory(player, 54, SellMenuConfig.shopName);
+        String menuName = SellMenuConfig.shopName;
+        if (ResourcePackDataConfig.isEliteMobsResourcePackEnabled())
+            menuName = ChatColor.WHITE + "\uF801\uDB80\uDC5B\uF805          " + menuName;
+
+        Inventory sellInventory = Bukkit.createInventory(player, 54, menuName);
 
         for (int i = 0; i < 54; i++) {
 
@@ -116,7 +121,6 @@ public class SellMenu extends EliteMenu implements Listener {
         }
 
         player.openInventory(sellInventory);
-        String menuName = SellMenuConfig.shopName;
         if (ResourcePackDataConfig.isEliteMobsResourcePackEnabled())
             menuName = "\uF801\uDB80\uDC5B\uF805            " + menuName;
         createEliteMenu(player, sellInventory, inventories, menuName);

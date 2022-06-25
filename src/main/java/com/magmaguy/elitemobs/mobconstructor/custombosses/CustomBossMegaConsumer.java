@@ -90,7 +90,8 @@ public class CustomBossMegaConsumer {
 
         if (livingEntity.getType().equals(EntityType.ENDER_DRAGON)) {
             ((EnderDragon) livingEntity).setPhase(EnderDragon.Phase.CIRCLING);
-            ((EnderDragon) livingEntity).getDragonBattle().generateEndPortal(false);
+            if (((EnderDragon) livingEntity).getDragonBattle() != null)
+                ((EnderDragon) livingEntity).getDragonBattle().generateEndPortal(false);
         }
     }
 
