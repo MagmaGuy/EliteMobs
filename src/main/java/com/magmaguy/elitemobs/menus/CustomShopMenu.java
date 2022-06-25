@@ -174,7 +174,6 @@ public class CustomShopMenu {
         @EventHandler
         public void onInventoryClose(InventoryCloseEvent event) {
             if (!EliteMenu.onInventoryClose(event, menus)) return;
-            EliteMenu.cancel(event.getView().getTopInventory(), event.getView().getBottomInventory(), CustomShopMenuConfig.storeSlots);
         }
     }
 
