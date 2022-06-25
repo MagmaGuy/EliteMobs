@@ -157,7 +157,6 @@ public class ProceduralShopMenu {
         @EventHandler
         public void onInventoryClose(InventoryCloseEvent event) {
             if (!EliteMenu.onInventoryClose(event, menus)) return;
-            EliteMenu.cancel(event.getView().getTopInventory(), event.getView().getBottomInventory(), validSlots);
         }
     }
 
