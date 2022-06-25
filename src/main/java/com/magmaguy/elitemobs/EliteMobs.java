@@ -49,6 +49,7 @@ import com.magmaguy.elitemobs.powerstances.MinorPowerStanceMath;
 import com.magmaguy.elitemobs.quests.QuestTracking;
 import com.magmaguy.elitemobs.thirdparty.bstats.CustomCharts;
 import com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity;
+import com.magmaguy.elitemobs.thirdparty.modelengine.ModelEngineReservedAddresses;
 import com.magmaguy.elitemobs.thirdparty.placeholderapi.Placeholders;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
@@ -161,6 +162,9 @@ public class EliteMobs extends JavaPlugin {
 
         if (Bukkit.getPluginManager().isPluginEnabled("LibsDisguises"))
             DisguiseEntity.initialize();
+
+        //Reserves ModelEngine addresses if present
+        ModelEngineReservedAddresses.reserve();
 
         if (worldGuardIsEnabled)
             Bukkit.getLogger().info("[EliteMobs] WorldGuard compatibility is enabled!");

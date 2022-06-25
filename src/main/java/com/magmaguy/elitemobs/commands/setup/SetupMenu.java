@@ -121,7 +121,7 @@ public class SetupMenu {
 
     private void dungeonStatuses() {
         //continue counting from used inventory slots
-        int counter = 1;
+        int counter = 2;
         for (Minidungeon minidungeon : Minidungeon.getMinidungeons().values()) {
 
             if (!Bukkit.getPluginManager().isPluginEnabled("WorldGuard"))

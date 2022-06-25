@@ -54,9 +54,9 @@ public class CustomShopMenu {
         if (ResourcePackDataConfig.isEliteMobsResourcePackEnabled())
             menuName = ChatColor.WHITE + "\uF801\uDB80\uDC8B\uF805          " + menuName;
         Inventory shopInventory = Bukkit.createInventory(player, 54, menuName);
-        CustomShopMenuEvents.menus.put(player, shopInventory);
         populateShop(shopInventory, player);
         player.openInventory(shopInventory);
+        CustomShopMenuEvents.menus.put(player, shopInventory);
 
     }
 

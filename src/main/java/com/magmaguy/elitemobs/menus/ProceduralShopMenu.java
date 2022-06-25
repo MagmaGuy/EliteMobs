@@ -44,11 +44,11 @@ public class ProceduralShopMenu {
     public static void shopConstructor(Player player) {
         String menuName = ProceduralShopMenuConfig.shopName;
         if (ResourcePackDataConfig.isEliteMobsResourcePackEnabled())
-            menuName = ChatColor.WHITE + "\uF801\uDB80\uDC3B\uF805         " + menuName;
+            menuName = ChatColor.WHITE + "\uF801\uDB80\uDC8B\uF805          " + menuName;
         Inventory shopInventory = Bukkit.createInventory(player, 54, menuName);
-        ProceduralShopMenuEvents.menus.put(player, shopInventory);
         populateShop(shopInventory, player);
         player.openInventory(shopInventory);
+        ProceduralShopMenuEvents.menus.put(player, shopInventory);
 
     }
 
