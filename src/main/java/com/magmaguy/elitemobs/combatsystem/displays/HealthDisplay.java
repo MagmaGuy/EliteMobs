@@ -14,7 +14,8 @@ public class HealthDisplay implements Listener {
     Color progression: Dark green - Green - Red - Dark red
      */
     private static ChatColor setHealthColor(int currentHealth, int maxHealth) {
-        double healthPercentage = currentHealth * 100 / maxHealth;
+        if (maxHealth <= 0) return ChatColor.WHITE;
+        double healthPercentage = currentHealth * 100 / (double) maxHealth;
         if (healthPercentage > 75)
             return ChatColor.DARK_GREEN;
         if (healthPercentage > 50)
