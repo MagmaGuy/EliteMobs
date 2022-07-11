@@ -24,14 +24,14 @@ public class BuyOrSellMenu {
 
     public static void constructBuyOrSellMenu(Player player, ItemStack buyItemStack) {
         String inventoryName = BuyOrSellMenuConfig.SHOP_NAME;
-        if (ResourcePackDataConfig.isEliteMobsResourcePackEnabled())
+        if (ResourcePackDataConfig.isDisplayCustomMenuUnicodes())
             inventoryName = ChatColor.WHITE + "\uF801\uDB80\uDC7B\uF805       " + inventoryName;
 
         Inventory shopInventory = Bukkit.createInventory(player, 18, inventoryName);
         menus.put(player, shopInventory);
         //information item
         ItemStack info = BuyOrSellMenuConfig.INFORMATION_ITEM;
-        if (ResourcePackDataConfig.isEliteMobsResourcePackEnabled()) {
+        if (ResourcePackDataConfig.isDisplayCustomMenuUnicodes()) {
             info.setType(Material.PAPER);
             ItemMeta itemMeta = info.getItemMeta();
             itemMeta.setCustomModelData(MetadataHandler.signatureID);
