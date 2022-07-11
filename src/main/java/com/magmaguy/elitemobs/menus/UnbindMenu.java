@@ -51,7 +51,7 @@ public class UnbindMenu extends EliteMenu {
      */
     public void constructUnbinderMenu(Player player) {
         String menuName = UnbinderMenuConfig.getShopName();
-        if (ResourcePackDataConfig.isEliteMobsResourcePackEnabled())
+        if (ResourcePackDataConfig.isDisplayCustomMenuUnicodes())
             menuName = ChatColor.WHITE + "\uF801\uDB80\uDC9B\uF805          " + menuName;
         Inventory UnbinderInventory = Bukkit.createInventory(player, 54, menuName);
 
@@ -59,7 +59,7 @@ public class UnbindMenu extends EliteMenu {
 
             if (i == UnbinderMenuConfig.getInfoSlot()) {
                 ItemStack infoButton = UnbinderMenuConfig.getInfoButton();
-                if (ResourcePackDataConfig.isEliteMobsResourcePackEnabled()) {
+                if (ResourcePackDataConfig.isDisplayCustomMenuUnicodes()) {
                     infoButton.setType(Material.PAPER);
                     ItemMeta itemMeta = infoButton.getItemMeta();
                     itemMeta.setCustomModelData(MetadataHandler.signatureID);

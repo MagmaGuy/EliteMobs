@@ -52,7 +52,7 @@ public class CustomShopMenu {
      */
     public static void customShopConstructor(Player player) {
         String menuName = CustomShopMenuConfig.shopName;
-        if (ResourcePackDataConfig.isEliteMobsResourcePackEnabled())
+        if (ResourcePackDataConfig.isDisplayCustomMenuUnicodes())
             menuName = ChatColor.WHITE + "\uF801\uDB80\uDC8B\uF805          " + menuName;
         Inventory shopInventory = Bukkit.createInventory(player, 54, menuName);
         populateShop(shopInventory, player);
@@ -68,7 +68,7 @@ public class CustomShopMenu {
     private static void populateShop(Inventory shopInventory, Player player) {
 
         ItemStack rerollButton = CustomShopMenuConfig.rerollItem;
-        if (ResourcePackDataConfig.isEliteMobsResourcePackEnabled()) {
+        if (ResourcePackDataConfig.isDisplayCustomMenuUnicodes()) {
             rerollButton.setType(Material.PAPER);
             ItemMeta itemMeta = rerollButton.getItemMeta();
             itemMeta.setCustomModelData(MetadataHandler.signatureID);

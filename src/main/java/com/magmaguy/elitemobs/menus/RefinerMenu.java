@@ -87,7 +87,7 @@ public class RefinerMenu extends EliteMenu {
      */
     public void constructRefinerMenu(Player player) {
         String menuName = RefinerMenuConfig.getShopName();
-        if (ResourcePackDataConfig.isEliteMobsResourcePackEnabled())
+        if (ResourcePackDataConfig.isDisplayCustomMenuUnicodes())
             menuName = ChatColor.WHITE + "\uF801\uDB80\uDC3B\uF805         " + menuName;
         Inventory refinerInventory = Bukkit.createInventory(player, 54, menuName);
 
@@ -95,7 +95,7 @@ public class RefinerMenu extends EliteMenu {
 
             if (i == RefinerMenuConfig.getInfoSlot()) {
                 ItemStack infoButton = RefinerMenuConfig.getInfoButton();
-                if (ResourcePackDataConfig.isEliteMobsResourcePackEnabled()) {
+                if (ResourcePackDataConfig.isDisplayCustomMenuUnicodes()) {
                     infoButton.setType(Material.PAPER);
                     ItemMeta itemMeta = infoButton.getItemMeta();
                     itemMeta.setCustomModelData(MetadataHandler.signatureID);

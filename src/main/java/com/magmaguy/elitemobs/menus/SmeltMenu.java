@@ -76,7 +76,7 @@ public class SmeltMenu extends EliteMenu {
      */
     public void constructSmeltMenu(Player player) {
         String menuName = SmeltMenuConfig.shopName;
-        if (ResourcePackDataConfig.isEliteMobsResourcePackEnabled())
+        if (ResourcePackDataConfig.isDisplayCustomMenuUnicodes())
             menuName = ChatColor.WHITE + "\uF801\uDB80\uDC4B\uF805         " + menuName;
         Inventory smeltInventory = Bukkit.createInventory(player, 54, menuName);
 
@@ -84,7 +84,7 @@ public class SmeltMenu extends EliteMenu {
 
             if (i == ScrapperMenuConfig.infoSlot) {
                 ItemStack infoButton = SmeltMenuConfig.infoButton;
-                if (ResourcePackDataConfig.isEliteMobsResourcePackEnabled()) {
+                if (ResourcePackDataConfig.isDisplayCustomMenuUnicodes()) {
                     infoButton.setType(Material.PAPER);
                     ItemMeta itemMeta = infoButton.getItemMeta();
                     itemMeta.setCustomModelData(MetadataHandler.signatureID);
