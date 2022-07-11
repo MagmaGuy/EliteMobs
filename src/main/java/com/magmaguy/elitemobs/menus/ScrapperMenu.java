@@ -43,7 +43,7 @@ public class ScrapperMenu extends EliteMenu {
     public void constructScrapMenu(Player player) {
 
         String menuName = ScrapperMenuConfig.shopName;
-        if (ResourcePackDataConfig.isEliteMobsResourcePackEnabled())
+        if (ResourcePackDataConfig.isDisplayCustomMenuUnicodes())
             menuName = ChatColor.WHITE +  "\uF801\uDB80\uDC2B\uF805         " + menuName;
 
         Inventory scrapInventory = Bukkit.createInventory(player, 54, menuName);
@@ -52,7 +52,7 @@ public class ScrapperMenu extends EliteMenu {
 
             if (i == ScrapperMenuConfig.infoSlot) {
                 ItemStack infoButton = ScrapperMenuConfig.infoButton;
-                if (ResourcePackDataConfig.isEliteMobsResourcePackEnabled()) {
+                if (ResourcePackDataConfig.isDisplayCustomMenuUnicodes()) {
                     infoButton.setType(Material.PAPER);
                     ItemMeta itemMeta = infoButton.getItemMeta();
                     itemMeta.setCustomModelData(MetadataHandler.signatureID);

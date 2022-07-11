@@ -49,6 +49,8 @@ public class DefaultConfig {
     private static int characterLimitForBookMenuPages;
     @Getter
     private static boolean useGlassToFillMenuEmptySpace;
+    @Getter
+    private static boolean menuUnicodeFormatting;
 
     private static File file = null;
     private static FileConfiguration fileConfiguration = null;
@@ -97,6 +99,7 @@ public class DefaultConfig {
         onlyUseBedrockMenus = ConfigurationEngine.setBoolean(fileConfiguration, "onlyUseBedrockMenus", false);
         characterLimitForBookMenuPages = ConfigurationEngine.setInt(fileConfiguration, "characterLimitForBookMenuPages", 185);
         useGlassToFillMenuEmptySpace = ConfigurationEngine.setBoolean(fileConfiguration, "useGlassToFillMenuEmptySpace", false);
+        menuUnicodeFormatting = ConfigurationEngine.setBoolean(fileConfiguration, "menuUnicodeFormatting", false);
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }

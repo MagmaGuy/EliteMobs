@@ -60,7 +60,7 @@ public class RepairMenu extends EliteMenu {
      * @param player Player for whom the inventory will be created
      */
     public void constructRepairMenu(Player player) {        String menuName = RepairMenuConfig.shopName;
-        if (ResourcePackDataConfig.isEliteMobsResourcePackEnabled())
+        if (ResourcePackDataConfig.isDisplayCustomMenuUnicodes())
             menuName = ChatColor.WHITE + "\uF801\uDB80\uDC2A\uF805           " + menuName;
 
         Inventory repairInventory = Bukkit.createInventory(player, 54, menuName);
@@ -69,7 +69,7 @@ public class RepairMenu extends EliteMenu {
 
             if (i == RepairMenuConfig.infoSlot) {
                 ItemStack infoButton = RepairMenuConfig.infoButton;
-                if (ResourcePackDataConfig.isEliteMobsResourcePackEnabled()) {
+                if (ResourcePackDataConfig.isDisplayCustomMenuUnicodes()) {
                     infoButton.setType(Material.PAPER);
                     ItemMeta itemMeta = infoButton.getItemMeta();
                     itemMeta.setCustomModelData(MetadataHandler.signatureID);

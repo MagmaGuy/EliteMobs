@@ -108,7 +108,7 @@ public class GuildRankMenuHandler implements Listener {
      */
     public static Inventory initializeGuildRankMenu(Player player) {
         String menuName = GuildRankMenuConfig.getMenuName();
-        if (ResourcePackDataConfig.eliteMobsResourcePackEnabled)
+        if (ResourcePackDataConfig.displayCustomMenuUnicodes)
             menuName = ChatColor.WHITE +  "\uF801\uDA90\uDEFA\uF805           " + menuName;
         Inventory difficultyMenu = Bukkit.createInventory(player, 54, menuName);
         difficultyMenu = populateInventory(difficultyMenu, player);

@@ -77,7 +77,7 @@ public class SellMenu extends EliteMenu implements Listener {
     public void constructSellMenu(Player player) {
 
         String menuName = SellMenuConfig.shopName;
-        if (ResourcePackDataConfig.isEliteMobsResourcePackEnabled())
+        if (ResourcePackDataConfig.isDisplayCustomMenuUnicodes())
             menuName = ChatColor.WHITE + "\uF801\uDB80\uDC5B\uF805          " + menuName;
 
         Inventory sellInventory = Bukkit.createInventory(player, 54, menuName);
@@ -121,7 +121,7 @@ public class SellMenu extends EliteMenu implements Listener {
         }
 
         player.openInventory(sellInventory);
-        if (ResourcePackDataConfig.isEliteMobsResourcePackEnabled())
+        if (ResourcePackDataConfig.isDisplayCustomMenuUnicodes())
             menuName = "\uF801\uDB80\uDC5B\uF805            " + menuName;
         createEliteMenu(player, sellInventory, inventories, menuName);
 
