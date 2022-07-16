@@ -466,7 +466,7 @@ public class PlayerData {
     }
 
     public static MatchInstance getMatchInstance(Player player) {
-        if (player == null) return null;
+        if (player == null || playerDataHashMap.get(player.getUniqueId()) == null) return null;
         return playerDataHashMap.get(player.getUniqueId()).matchInstance;
     }
 

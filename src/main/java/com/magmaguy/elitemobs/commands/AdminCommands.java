@@ -23,7 +23,10 @@ import com.magmaguy.elitemobs.events.TimedEvent;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
+import com.magmaguy.elitemobs.menus.CustomShopMenu;
 import com.magmaguy.elitemobs.menus.GetLootMenu;
+import com.magmaguy.elitemobs.menus.ProceduralShopMenu;
+import com.magmaguy.elitemobs.menus.SellMenu;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.transitiveblocks.TransitiveBlockCommand;
@@ -786,6 +789,50 @@ public class AdminCommands {
                 .permission("elitemobs.*")
                 .meta(CommandMeta.DESCRIPTION, "Forces server resource packs to be used in your server.")
                 .handler(commandContext -> SetupMenu.forceResourcePack((Player) commandContext.getSender())));
+
+        // /em opendyamicshop <player>
+        manager.command(builder.literal("opendynamicshop")
+                .argument(onlinePlayers.copy(), ArgumentDescription.of("Player name"))
+                .meta(CommandMeta.DESCRIPTION, "Opens the dynamic shop for a player")
+                .senderType(CommandSender.class)
+                .permission("elitemobs.*")
+                .handler(commandContext -> {
+                    try {
+                        ProceduralShopMenu.shopConstructor(Bukkit.getPlayer((String) commandContext.get("onlinePlayer")));
+                    } catch (Exception ex) {
+                        commandContext.getSender().sendMessage("Failed to get player with that username!");
+                    }
+                }));
+
+
+        // /em opencustomshop <player>
+        manager.command(builder.literal("opencustomshop")
+                .argument(onlinePlayers.copy(), ArgumentDescription.of("Player name"))
+                .meta(CommandMeta.DESCRIPTION, "Opens the custom shop for a player")
+                .senderType(CommandSender.class)
+                .permission("elitemobs.*")
+                .handler(commandContext -> {
+                    try {
+                        CustomShopMenu.customShopConstructor(Bukkit.getPlayer((String) commandContext.get("onlinePlayer")));
+                    } catch (Exception ex) {
+                        commandContext.getSender().sendMessage("Failed to get player with that username!");
+                    }
+                }));
+
+        // /em opensellshop <player>
+        manager.command(builder.literal("opensellshop")
+                .argument(onlinePlayers.copy(), ArgumentDescription.of("Player name"))
+                .meta(CommandMeta.DESCRIPTION, "Opens the dynamic shop for a player")
+                .senderType(CommandSender.class)
+                .permission("elitemobs.*")
+                .handler(commandContext -> {
+                    SellMenu sellMenu = new SellMenu();
+                    try {
+                        sellMenu.constructSellMenu(Bukkit.getPlayer((String) commandContext.get("onlinePlayer")));
+                    } catch (Exception ex) {
+                        commandContext.getSender().sendMessage("Failed to get player with that username!");
+                    }
+                }));
     }
 
     private void testFireball(Player player) {
