@@ -1,35 +1,34 @@
 package com.magmaguy.elitemobs.mobconstructor.custombosses.transitiveblocks;
 
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobRemoveEvent;
 import com.magmaguy.elitemobs.api.EliteMobSpawnEvent;
+import com.magmaguy.elitemobs.dungeons.SchematicPackage;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.utils.WarningMessage;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.util.Vector;
 
 public class TransitiveBossBlock implements Listener {
 
     private static void setBlockData(CustomBossEntity customBossEntity, TransitiveBlock transitiveBlock, Location spawnLocation) {
         Location location;
         double rotation = 0;
-        if (customBossEntity.getMinidungeon() != null)
-            rotation = customBossEntity.getMinidungeon().getDungeonPackagerConfigFields().getRotation();
+        if (customBossEntity.getEmPackage() instanceof SchematicPackage)
+            rotation = customBossEntity.getEmPackage().getDungeonPackagerConfigFields().getCalculatedRotation();
+
         BlockData blockData = transitiveBlock.getBlockData().clone();
 
         if (rotation == 0)
-            location = new Location(spawnLocation.getWorld(),
-                    spawnLocation.getX() + transitiveBlock.getRelativeLocation().getX(),
-                    spawnLocation.getY() + transitiveBlock.getRelativeLocation().getY(),
-                    spawnLocation.getZ() + transitiveBlock.getRelativeLocation().getZ());
+            location = spawnLocation.clone().add(transitiveBlock.getRelativeLocation());
         else {
-            location = customBossEntity.getMinidungeon().getRotatedFinalLocation(spawnLocation.getBlock().getLocation().clone().add(new Vector(0.5, 0.5, 0.5)),
-                    transitiveBlock.getRelativeLocation().clone().add(new Vector(0.5, 0.5, 0.5)));
+            location = spawnLocation.clone().add(transitiveBlock.getRelativeLocation().clone().rotateAroundY(Math.toRadians(rotation)));
             if (blockData instanceof Directional)
                 ((Directional) blockData).setFacing(rotateBlockFace(((Directional) blockData).getFacing(), rotation));
         }
@@ -87,18 +86,18 @@ public class TransitiveBossBlock implements Listener {
     @EventHandler
     public void onBossSpawn(EliteMobSpawnEvent event) {
         if (!(event.getEliteMobEntity() instanceof RegionalBossEntity)) return;
-
         RegionalBossEntity regionalBossEntity = (RegionalBossEntity) event.getEliteMobEntity();
-        if (regionalBossEntity.getOnSpawnTransitiveBlocks() != null)
+        if (regionalBossEntity.getOnSpawnTransitiveBlocks() != null && !regionalBossEntity.getOnSpawnTransitiveBlocks().isEmpty())
             for (TransitiveBlock transitiveBlock : regionalBossEntity.getOnSpawnTransitiveBlocks())
-                setBlockData(regionalBossEntity, transitiveBlock, regionalBossEntity.getSpawnLocation());
+                Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN,
+                        () -> setBlockData(regionalBossEntity, transitiveBlock, regionalBossEntity.getSpawnLocation()), 1L);
     }
 
     @EventHandler
     public void onBossRemove(EliteMobRemoveEvent event) {
         if (!(event.getEliteMobEntity() instanceof RegionalBossEntity)) return;
         RegionalBossEntity regionalBossEntity = (RegionalBossEntity) event.getEliteMobEntity();
-        if (regionalBossEntity.getOnRemoveTransitiveBlocks() != null)
+        if (regionalBossEntity.getOnRemoveTransitiveBlocks() != null && !regionalBossEntity.getOnRemoveTransitiveBlocks().isEmpty())
             for (TransitiveBlock transitiveBlock : regionalBossEntity.getOnRemoveTransitiveBlocks())
                 setBlockData(regionalBossEntity, transitiveBlock, regionalBossEntity.getSpawnLocation());
     }

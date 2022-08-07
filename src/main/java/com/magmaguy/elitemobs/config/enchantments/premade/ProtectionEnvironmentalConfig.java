@@ -7,7 +7,7 @@ public class ProtectionEnvironmentalConfig extends EnchantmentsConfigFields {
         super("protection_environmental",
                 true,
                 "Protection",
-                200,
+                4,
                 13);
     }
 }

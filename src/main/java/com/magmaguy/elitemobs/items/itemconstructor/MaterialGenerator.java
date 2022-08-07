@@ -29,7 +29,7 @@ public class MaterialGenerator {
 
         if (localValidMaterials.isEmpty()) initializeValidProceduralMaterials();
 
-        if (itemTier < CombatSystem.TRIDENT_TIER_LEVEL + ItemSettingsConfig.getMinimumProcedurallyGeneratedDiamondLootLevelPlusSeven())
+        if (itemTier < CombatSystem.DIAMOND_TIER_LEVEL + ItemSettingsConfig.getMinimumProcedurallyGeneratedDiamondLootLevelPlusSeven())
             localValidMaterials.remove(TRIDENT);
 
         if (itemTier < CombatSystem.DIAMOND_TIER_LEVEL + ItemSettingsConfig.getMinimumProcedurallyGeneratedDiamondLootLevelPlusSeven()) {

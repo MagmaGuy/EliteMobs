@@ -9,7 +9,8 @@ import java.util.Arrays;
 public class NovicesChestplateConfig extends CustomItemsConfigFields {
     public NovicesChestplateConfig(){
         super("novices_chestplate", true, Material.LEATHER_CHESTPLATE, "&8Novice's Chestplate", Arrays.asList("&2Awarded to those who challenge the", "&2Wood League Arena!"));
-        setEnchantments(Arrays.asList("PROTECTION_ENVIRONMENTAL,10", "DURABILITY,5"));
+        setEnchantments(Arrays.asList("PROTECTION_ENVIRONMENTAL,5", "DURABILITY,5"));
         setItemType(CustomItem.ItemType.UNIQUE);
+        setLevel(10);
     }
 }

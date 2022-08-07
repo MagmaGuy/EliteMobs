@@ -7,7 +7,6 @@ import com.magmaguy.elitemobs.api.NPCEntitySpawnEvent;
 import com.magmaguy.elitemobs.api.SuperMobSpawnEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
-import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.tagger.PersistentTagger;
@@ -197,7 +196,6 @@ public class EntityTracker implements Listener {
         for (World world : Bukkit.getWorlds())
             for (Entity entity : world.getEntities())
                 unregister(entity, RemovalReason.SHUTDOWN);
-        SimplePersistentEntity.getPersistentEntities().clear();
         CustomBossEntity.getTrackableCustomBosses().clear();
         CrashFix.knownSessionChunks.clear();
     }

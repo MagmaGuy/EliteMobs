@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.commands;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.commands.setup.SetupMenu;
-import com.magmaguy.elitemobs.dungeons.Minidungeon;
+import com.magmaguy.elitemobs.dungeons.EMPackage;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -16,26 +16,19 @@ public class SetupHandler {
     }
 
     public static void setupMinidungeonCommand(Player player, String minidungeonName) {
-        Minidungeon minidungeon = Minidungeon.getMinidungeons().get(minidungeonName);
-        minidungeon.finalizeMinidungeonInstallation(player, true);
-        player.performCommand("/rotate " + minidungeon.getDungeonPackagerConfigFields().getRotation());
-        player.performCommand("/paste");
+        EMPackage emPackage = EMPackage.getEmPackages().get(minidungeonName);
+        emPackage.install(player, true);
     }
 
     public static void setupMinidungeonNoPasteCommand(Player player, String minidungeonName) {
-        Minidungeon minidungeon = Minidungeon.getMinidungeons().get(minidungeonName);
-        minidungeon.finalizeMinidungeonInstallation(player, false);
+        EMPackage emPackage = EMPackage.getEmPackages().get(minidungeonName);
+        emPackage.install(player, false);
     }
 
     public static void setupUnminidungeonCommand(Player player, String minidungeonName) {
-        Minidungeon minidungeon = Minidungeon.getMinidungeons().get(minidungeonName);
-        minidungeon.uninstallSchematicMinidungeon(player);
+        EMPackage minidungeon = EMPackage.getEmPackages().get(minidungeonName);
+        minidungeon.uninstall(player);
         player.performCommand("/undo");
-    }
-
-    public static void setupUnminidungeonNoPasteCommand(Player player, String minidungeonName) {
-        Minidungeon minidungeon = Minidungeon.getMinidungeons().get(minidungeonName);
-        minidungeon.finalizeMinidungeonInstallation(player, false);
     }
 
     public static void setupAreaCommand(Player player, String regionName) {

@@ -3,9 +3,8 @@ package com.magmaguy.elitemobs.config.dungeonpackager;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
-import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestConfigFields;
+import com.magmaguy.elitemobs.dungeons.SchematicPackage;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
-import com.magmaguy.elitemobs.utils.DebugBlockLocation;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,6 +21,8 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
     private String name;
     @Getter
     private DungeonLocationType dungeonLocationType = DungeonLocationType.WORLD;
+    @Getter
+    private ContentType contentType = null;
     @Getter
     private List<String> customInfo = new ArrayList<>();
     @Getter
@@ -46,21 +47,14 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
     @Getter
     private Location anchorPoint;
     @Getter
-    private double rotation;
+    private String defaultSchematicRotationString = null;
+    @Getter
+    private SchematicPackage.SchematicRotation defaultSchematicRotation = null;
+    @Getter
+    @Setter
+    private Integer calculatedRotation = 0;
     @Getter
     private Vector corner1 = new Vector(0, 0, 0), corner2 = new Vector(0, 0, 0);
-    @Getter
-    private Vector teleportPoint = new Vector(0, 0, 0);
-    @Getter
-    private Vector wormholeTeleportPoint = new Vector(0, 0, 0);
-    @Getter
-    private double teleportPointPitch = 0d;
-    @Getter
-    private double wormholeTeleportPointPitch = 0d;
-    @Getter
-    private double teleportPointYaw = 0d;
-    @Getter
-    private double wormholeTeleportPointYaw = 0d;
     @Getter
     private int dungeonVersion = 0;
     @Getter
@@ -77,10 +71,125 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
     private boolean hasCustomModels = false;
     @Getter
     private boolean defaultDungeon = false;
-
+    @Getter
+    private Location teleportLocation = null;
+    @Getter
+    private String teleportLocationString = null;
+    @Getter
+    private String teleportLocationOffsetString = "";
+    @Getter
+    private Location teleportLocationOffset = null;
 
     public DungeonPackagerConfigFields(String fileName, boolean isEnabled) {
         super(fileName, isEnabled);
+    }
+
+    /**
+     * Used by the world-based open dungeons
+     *
+     * @param filename               Filename of the dungeon
+     * @param isEnabled              If the dungeon is enabled
+     * @param name                   Human name of the dungeon
+     * @param customInfo             Info displayed to players in menus
+     * @param downloadLink           Download link for the dungeon
+     * @param dungeonSizeCategory    Size of the dungeon
+     * @param worldName              Name of the world in the Minecraft files
+     * @param environment            World environment, is shared with the wormhole world
+     * @param protect                If the dungeon should be protected with WorldGuard
+     * @param teleportLocationString Location to teleport players to
+     * @param dungeonVersion         Version of the dungeon
+     * @param playerInfo             Additional custom info for players
+     * @param regionEnterMessage     Message upon entering the region
+     * @param regionLeaveMessage     Message upon leaving the region
+     */
+    public DungeonPackagerConfigFields(String filename,
+                                       boolean isEnabled,
+                                       String name,
+                                       List<String> customInfo,
+                                       String downloadLink,
+                                       DungeonSizeCategory dungeonSizeCategory,
+                                       String worldName,
+                                       World.Environment environment,
+                                       Boolean protect,
+                                       String teleportLocationString,
+                                       int dungeonVersion,
+                                       String playerInfo,
+                                       String regionEnterMessage,
+                                       String regionLeaveMessage) {
+        super(filename, isEnabled);
+        this.contentType = ContentType.OPEN_DUNGEON;
+        this.name = name;
+        this.customInfo = customInfo;
+        this.downloadLink = downloadLink;
+        this.dungeonSizeCategory = dungeonSizeCategory;
+        this.worldName = worldName;
+        this.environment = environment;
+        this.protect = protect;
+        this.teleportLocationString = teleportLocationString;
+        this.dungeonVersion = dungeonVersion;
+        this.playerInfo = playerInfo;
+        this.regionEnterMessage = regionEnterMessage;
+        this.regionLeaveMessage = regionLeaveMessage;
+    }
+
+    /**
+     * Used by schematic-based dungeons
+     *
+     * @param filename                       Filename of the dungeon
+     * @param isEnabled                      If the dungeon is enabled
+     * @param name                           Human name of the dungeon
+     * @param customInfo                     Info displayed to players in menus
+     * @param relativeBossLocations          List of relative locations for the bosses
+     * @param relativeTreasureChestLocations List of relative locations for the treasure chests
+     * @param downloadLink                   Download link for the dungeon
+     * @param dungeonSizeCategory            Size of the dungeon
+     * @param schematicName                  Name of the schematic file of the dungeon
+     * @param protect                        If the dungeon should be protected with WorldGuard
+     * @param corner1                        Corner of the dungeon for creating a region
+     * @param corner2                        Other corner of the dungeon for creating a region
+     * @param teleportLocationOffsetString   Point to teleport to offset from the anchor point of the schematic
+     * @param dungeonVersion                 Version of the dungeon
+     * @param playerInfo                     Additional custom info for players
+     * @param regionEnterMessage             Message upon entering the region
+     * @param regionLeaveMessage             Message upon leaving the region
+     */
+    public DungeonPackagerConfigFields(String filename,
+                                       boolean isEnabled,
+                                       String name,
+                                       List<String> customInfo,
+                                       List<String> relativeBossLocations,
+                                       List<String> relativeTreasureChestLocations,
+                                       String downloadLink,
+                                       DungeonSizeCategory dungeonSizeCategory,
+                                       String schematicName,
+                                       Boolean protect,
+                                       Vector corner1,
+                                       Vector corner2,
+                                       String teleportLocationOffsetString,
+                                       int dungeonVersion,
+                                       String playerInfo,
+                                       String regionEnterMessage,
+                                       String regionLeaveMessage,
+                                       String defaultSchematicRotation) {
+        super(filename, isEnabled);
+        this.contentType = ContentType.SCHEMATIC_DUNGEON;
+        this.name = name;
+        this.customInfo = customInfo;
+        this.relativeBossLocations = relativeBossLocations;
+        this.relativeTreasureChestLocations = relativeTreasureChestLocations;
+        this.downloadLink = downloadLink;
+        this.dungeonSizeCategory = dungeonSizeCategory;
+        this.schematicName = schematicName;
+        this.protect = protect;
+        this.corner1 = corner1;
+        this.corner2 = corner2;
+        this.teleportLocationOffsetString = teleportLocationOffsetString;
+        this.dungeonVersion = dungeonVersion;
+        this.playerInfo = playerInfo;
+        this.regionEnterMessage = regionEnterMessage;
+        this.regionLeaveMessage = regionLeaveMessage;
+        this.defaultSchematicRotationString = defaultSchematicRotation;
+
     }
 
     public DungeonPackagerConfigFields(String fileName,
@@ -98,9 +207,8 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
                                        Boolean protect,
                                        Vector corner1,
                                        Vector corner2,
-                                       Vector teleportPoint,
-                                       double teleportPointPitch,
-                                       double teleportPointYaw,
+                                       String teleportLocationString,
+                                       String wormholeLocationString,
                                        int dungeonVersion,
                                        String playerInfo,
                                        String regionEnterMessage,
@@ -119,9 +227,7 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
         this.protect = protect;
         this.corner1 = corner1;
         this.corner2 = corner2;
-        this.teleportPoint = teleportPoint;
-        this.teleportPointPitch = teleportPointPitch;
-        this.teleportPointYaw = teleportPointYaw;
+        this.teleportLocationString = teleportLocationString;
         this.dungeonVersion = dungeonVersion;
         this.playerInfo = playerInfo;
         this.regionEnterMessage = regionEnterMessage;
@@ -155,34 +261,82 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
         this.environment = processEnum("environment", environment, null, World.Environment.class, false);
         this.protect = processBoolean("protect", protect, true, true);
         this.anchorPoint = processLocation("anchorPoint", anchorPoint, null, false);
-        this.rotation = processDouble("rotation", rotation, 0, false);
+        this.defaultSchematicRotationString = processString("defaultSchematicRotation", defaultSchematicRotationString, null, false);
+        if (defaultSchematicRotationString != null)
+            try {
+                this.defaultSchematicRotation = SchematicPackage.SchematicRotation.valueOf(defaultSchematicRotationString);
+            } catch (Exception ex) {
+                new WarningMessage("Bad default schematic rotation for dungeon " + filename);
+            }
+        this.calculatedRotation = processInt("calculatedRotation", calculatedRotation, 0, false);
         this.corner1 = processVector("corner1", corner1, null, false);
         this.corner2 = processVector("corner2", corner2, null, false);
-        this.teleportPoint = processVector("teleportPoint", teleportPoint, null, false);
-        this.teleportPointPitch = processDouble("teleportPointPitch", teleportPointPitch, 0d, false);
-        this.teleportPointYaw = processDouble("teleportPointYaw", teleportPointYaw, 0d, false);
         this.dungeonVersion = processInt("dungeonVersion", dungeonVersion, 0, false);
         this.playerInfo = processString("playerInfo", playerInfo, "", false);
         this.regionEnterMessage = processString("regionEnterMessage", regionEnterMessage, "", false);
         this.regionLeaveMessage = processString("regionLeaveMessage", regionLeaveMessage, "", false);
         this.hasCustomModels = processBoolean("hasCustomModels", hasCustomModels, false, false);
+        this.teleportLocationString = processString("teleportLocation", teleportLocationString, null, false);
+        this.teleportLocationOffsetString = processString("teleportLocationOffset", teleportLocationOffsetString, "", false);
+        if (teleportLocationOffsetString != null && !teleportLocationOffsetString.isEmpty())
+            this.teleportLocationOffset = ConfigurationLocation.serialize(teleportLocationOffsetString);
+        processAdditionalFields();
     }
 
-    @Override
-    public void setEnabled(boolean isEnabled) {
-        this.isEnabled = isEnabled;
-        ConfigurationEngine.writeValue(isEnabled, file, fileConfiguration, "isEnabled");
+    public void processAdditionalFields() {
     }
 
-    public void setEnabled(boolean isEnabled, Location anchorPoint) {
-        setEnabled(isEnabled);
-        if (isEnabled)
-            setAnchorPoint(anchorPoint);
-        else
-            removeAnchorPoint();
+    public void installWorld() {
+        this.isEnabled = true;
+        ConfigurationEngine.writeValue(true, file, fileConfiguration, "isEnabled");
+        this.teleportLocation = processLocation("teleportLocation", teleportLocation, null, false);
+        ConfigurationEngine.fileSaverCustomValues(fileConfiguration, file);
     }
 
-    public boolean addRelativeBossLocation(CustomBossesConfigFields customBossesConfigFields, Location relativeLocation) {
+    public void installSchematic(Location location, int calculatedRotation, SchematicPackage schematicPackage) {
+        this.isEnabled = true;
+        ConfigurationEngine.writeValue(true, file, fileConfiguration, "isEnabled");
+        this.anchorPoint = location;
+        ConfigurationEngine.writeValue(ConfigurationLocation.deserialize(location), file, fileConfiguration, "anchorPoint");
+        this.teleportLocation = schematicPackage.toRealPosition(teleportLocationOffset.toVector());
+        this.teleportLocation.setYaw(location.getYaw() + teleportLocationOffset.getYaw());
+        this.teleportLocation.setPitch(location.getPitch() + teleportLocationOffset.getPitch());
+        ConfigurationEngine.writeValue(ConfigurationLocation.deserialize(teleportLocation), file, fileConfiguration, "teleportLocation");
+        this.calculatedRotation = calculatedRotation;
+        ConfigurationEngine.writeValue(calculatedRotation, file, fileConfiguration, "calculatedRotation");
+        ConfigurationEngine.fileSaverCustomValues(fileConfiguration, file);
+    }
+
+    public void initializeWorld() {
+        this.teleportLocation = processLocation("teleportLocation", teleportLocation, null, false);
+    }
+
+    public void initializeSchematic() {
+
+    }
+
+
+    public void uninstallWorld() {
+        this.isEnabled = false;
+        ConfigurationEngine.writeValue(false, file, fileConfiguration, "isEnabled");
+        this.teleportLocation = null;
+        ConfigurationEngine.fileSaverCustomValues(fileConfiguration, file);
+    }
+
+    public void uninstallSchematic() {
+        this.isEnabled = false;
+        ConfigurationEngine.writeValue(false, file, fileConfiguration, "isEnabled");
+        this.teleportLocation = null;
+        ConfigurationEngine.writeValue(null, file, fileConfiguration, "teleportLocation");
+        this.calculatedRotation = 0;
+        ConfigurationEngine.writeValue(null, file, fileConfiguration, "calculatedRotation");
+        this.anchorPoint = null;
+        ConfigurationEngine.writeValue(null, file, fileConfiguration, "anchorPoint");
+        ConfigurationEngine.fileSaverCustomValues(fileConfiguration, file);
+    }
+
+
+    public boolean addRelativeBossLocation(CustomBossesConfigFields customBossesConfigFields, Vector relativeLocation) {
         String configurationLocation = customBossesConfigFields.getFilename() + ":" + relativeLocation.getX() + "," + relativeLocation.getY() + "," + relativeLocation.getZ();
         relativeBossLocations.add(configurationLocation);
         return ConfigurationEngine.writeValue(relativeBossLocations, file, fileConfiguration, "relativeBossLocations");
@@ -194,52 +348,23 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
         ConfigurationEngine.writeValue(relativeBossLocations, file, fileConfiguration, "relativeBossLocations");
     }
 
-    public boolean addRelativeTreasureChests(CustomTreasureChestConfigFields treasureChestConfigFields, Location relativeLocation) {
-        String configurationLocation = treasureChestConfigFields.getFilename() + ":" + relativeLocation.getX() + "," + relativeLocation.getY() + "," + relativeLocation.getZ();
+    public boolean addRelativeTreasureChests(String treasureChestFilename, Vector relativeLocation) {
+        String configurationLocation = treasureChestFilename + ":" + relativeLocation.getX() + "," + relativeLocation.getY() + "," + relativeLocation.getZ();
         relativeTreasureChestLocations.add(configurationLocation);
         return ConfigurationEngine.writeValue(relativeTreasureChestLocations, file, fileConfiguration, "relativeTreasureChestLocations");
     }
 
-    private void setAnchorPoint(Location location) {
-        Location roundedLocation = location.clone();
-        roundedLocation.setX(roundedLocation.getBlockX() + 0.5);
-        roundedLocation.setY(roundedLocation.getBlockY() + 0.5);
-        roundedLocation.setZ(roundedLocation.getBlockZ() + 0.5);
-        float roundedYaw = roundedLocation.getYaw();
-        while (roundedYaw < -225F) {
-            roundedYaw += 360F;
-        }
-        while (roundedYaw > 225F) {
-            roundedYaw -= 360F;
-        }
-        if (roundedYaw <= 45F && roundedYaw >= -45F)
-            roundedYaw = 0F;
-        else if (roundedYaw >= 45F && roundedYaw <= 135F)
-            roundedYaw = 90F;
-        else if (roundedYaw <= -45F && roundedYaw >= -135F)
-            roundedYaw = -90F;
-        else if (roundedYaw >= 135F || roundedYaw <= -135F)
-            roundedYaw = 180F;
-        roundedLocation.setYaw(roundedYaw);
-        this.anchorPoint = roundedLocation;
-        setRotation(roundedYaw);
-        ConfigurationEngine.writeValue(ConfigurationLocation.deserialize(roundedLocation), file, fileConfiguration, "anchorPoint");
-        new DebugBlockLocation(roundedLocation);
-    }
-
-    private void removeAnchorPoint() {
-        ConfigurationEngine.removeValue(file, fileConfiguration, "anchorPoint");
-        this.anchorPoint = null;
-    }
-
-    public void setRotation(float roundedRotation) {
-        this.rotation = roundedRotation;
-        ConfigurationEngine.writeValue(rotation, file, fileConfiguration, "rotation");
-    }
 
     public enum DungeonLocationType {
         WORLD,
         SCHEMATIC
+    }
+
+    public enum ContentType {
+        OPEN_DUNGEON,
+        INSTANCED_DUNGEON,
+        HUB,
+        SCHEMATIC_DUNGEON
     }
 
     public enum DungeonSizeCategory {
@@ -247,6 +372,7 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
         MINIDUNGEON,
         DUNGEON,
         RAID,
-        ADVENTURE
+        ADVENTURE,
+        OTHER
     }
 }

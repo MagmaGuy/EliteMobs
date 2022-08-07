@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.config.dungeonpackager.premade;
 import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.World;
-import org.bukkit.util.Vector;
 
 import java.util.Arrays;
 
@@ -12,22 +11,14 @@ public class SewersMinidungeon extends DungeonPackagerConfigFields {
         super("sewers_minidungeon",
                 false,
                 "&8The Sewers",
-                DungeonLocationType.WORLD,
                 Arrays.asList("&fThe biggest minidungeon ever made!",
                         "&6Credits: MagmaGuy & 69OzCanOfBepis"),
-                Arrays.asList(""),
-                Arrays.asList(""),
                 DiscordLinks.freeMinidungeons,
                 DungeonSizeCategory.MINIDUNGEON,
                 "em_sewer_maze",
-                null,
                 World.Environment.NORMAL,
                 true,
-                null,
-                null,
-                new Vector(0, 0, 0),
-                90D,
-                0D,
+                "em_sewer_maze,-24,167,175,90,0",
                 0,
                 "Difficulty: &6Medium\n" +
                         "$bossCount bosses, from level $lowestTier to $highestTier\n" +

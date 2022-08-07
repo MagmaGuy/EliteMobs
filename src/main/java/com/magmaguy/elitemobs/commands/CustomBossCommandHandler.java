@@ -2,7 +2,8 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
-import com.magmaguy.elitemobs.dungeons.Minidungeon;
+import com.magmaguy.elitemobs.dungeons.EMPackage;
+import com.magmaguy.elitemobs.dungeons.SchematicDungeonPackage;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.utils.DebugBlockLocation;
 import org.bukkit.Location;
@@ -42,9 +43,13 @@ public class CustomBossCommandHandler {
     }
 
     public static void addRelativeSpawnLocation(Player player, String customBossConfigFieldsString, String minidungeonString) {
-        Minidungeon minidungeon = Minidungeon.getMinidungeons().get(minidungeonString);
-        if (minidungeon == null) {
+        EMPackage emPackage = EMPackage.getEmPackages().get(minidungeonString);
+        if (emPackage == null) {
             player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Failed to add relative location! Minidungeon is not valid!"));
+            return;
+        }
+        if (!(emPackage instanceof SchematicDungeonPackage)) {
+            player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Target EM package was not a schematic dungeon so this command won't work!"));
             return;
         }
         CustomBossesConfigFields customBossesConfigFields = CustomBossesConfigFields.getRegionalElites().get(customBossConfigFieldsString);
@@ -55,7 +60,7 @@ public class CustomBossCommandHandler {
             if (safeSpawnLocation == null)
                 player.sendMessage("[EliteMobs] No safe spawn location found! Make sure the area is passable!");
             else
-                minidungeon.initializeRelativeLocationAddition(customBossesConfigFields, safeSpawnLocation);
+                ((SchematicDungeonPackage) emPackage).addBoss(customBossesConfigFields, safeSpawnLocation);
         }
     }
 

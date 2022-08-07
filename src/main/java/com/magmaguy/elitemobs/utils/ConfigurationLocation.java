@@ -41,23 +41,32 @@ public class ConfigurationLocation {
             String locationOnlyString = locationString.split(":")[0];
             String[] slicedString = locationOnlyString.split(",");
 
-            world = Bukkit.getWorld(slicedString[0]);
-            if (world == null && !notLoadedWorldNames.contains(slicedString[0])) {
-                if (!notLoadedWorldNames.isEmpty())
-                    new WarningMessage("Some NPCs/bosses don't their world installed! If you need help setting things up, you can go to " + DiscordLinks.mainLink + " !");
-                new InfoMessage("World " + slicedString[0] + " is not yet loaded! Entities that should spawn there have been queued.");
-                notLoadedWorldNames.add(slicedString[0]);
-            }
-            x = Double.parseDouble(slicedString[1]);
-            y = Double.parseDouble(slicedString[2]);
-            z = Double.parseDouble(slicedString[3]);
-            if (slicedString.length > 4) {
-                yaw = Float.parseFloat(slicedString[4]);
-                pitch = Float.parseFloat(slicedString[5]);
-            } else {
-                yaw = 0;
-                pitch = 0;
-            }
+            if (slicedString.length == 6 || slicedString.length == 4) {
+
+                world = Bukkit.getWorld(slicedString[0]);
+                if (world == null && !notLoadedWorldNames.contains(slicedString[0])) {
+                    if (!notLoadedWorldNames.isEmpty())
+                        new WarningMessage("Some NPCs/bosses don't their world installed! If you need help setting things up, you can go to " + DiscordLinks.mainLink + " !");
+                    new InfoMessage("World " + slicedString[0] + " is not yet loaded! Entities that should spawn there have been queued.");
+                    notLoadedWorldNames.add(slicedString[0]);
+                }
+                x = Double.parseDouble(slicedString[1]);
+                y = Double.parseDouble(slicedString[2]);
+                z = Double.parseDouble(slicedString[3]);
+                if (slicedString.length > 4) {
+                    yaw = Float.parseFloat(slicedString[4]);
+                    pitch = Float.parseFloat(slicedString[5]);
+                } else {
+                    yaw = 0;
+                    pitch = 0;
+                }
+            } else if (slicedString.length == 5) {
+                x = Double.parseDouble(slicedString[0]);
+                y = Double.parseDouble(slicedString[1]);
+                z = Double.parseDouble(slicedString[2]);
+                yaw = Float.parseFloat(slicedString[3]);
+                pitch = Float.parseFloat(slicedString[4]);
+            } else throw new Exception();
         } catch (Exception ex) {
             if (locationString.equals("null"))
                 return null;
@@ -67,6 +76,12 @@ public class ConfigurationLocation {
             return null;
         }
         return new Location(world, x, y, z, yaw, pitch);
+    }
+
+    public static String worldName(String locationString) {
+        String locationOnlyString = locationString.split(":")[0];
+        String[] slicedString = locationOnlyString.split(",");
+        return slicedString[0];
     }
 
 }

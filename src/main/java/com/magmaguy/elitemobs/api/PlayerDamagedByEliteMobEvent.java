@@ -1,13 +1,25 @@
 package com.magmaguy.elitemobs.api;
 
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
-import com.magmaguy.elitemobs.combatsystem.PlayerDamagedByEliteMobHandler;
+import com.magmaguy.elitemobs.collateralminecraftchanges.PlayerDeathMessageByEliteMob;
+import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
+import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.utils.EventCaller;
+import lombok.Getter;
+import lombok.Setter;
+import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.*;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -70,18 +82,49 @@ public class PlayerDamagedByEliteMobEvent extends Event implements Cancellable {
     }
 
     public static class PlayerDamagedByEliteMobEventFilter implements Listener {
+    @Getter
+    @Setter
+        private static boolean bypass = false;
+
+        private static double eliteToPlayerDamageFormula(Player player, EliteEntity eliteEntity, EntityDamageByEntityEvent event) {
+            double baseDamage = EliteMobProperties.getBaselineDamage(eliteEntity.getLivingEntity().getType(), eliteEntity);
+            double bonusDamage = eliteEntity.getLevel();
+
+            ElitePlayerInventory elitePlayerInventory = ElitePlayerInventory.getPlayer(player);
+            if (elitePlayerInventory == null) return 0;
+
+            double damageReduction = elitePlayerInventory.getEliteDefense(true);
+            if (event.getDamager() instanceof Projectile)
+                damageReduction += elitePlayerInventory.getEliteProjectileProtection(false);
+
+            double customBossDamageMultiplier = eliteEntity.getDamageMultiplier();
+            double potionEffectDamageReduction = 0;
+
+            if (player.hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE))
+                potionEffectDamageReduction = (player.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE).getAmplifier() + 1) * MobCombatSettingsConfig.getResistanceDamageMultiplier();
+
+            double finalDamage = (baseDamage * customBossDamageMultiplier + bonusDamage - damageReduction - potionEffectDamageReduction) *
+                    MobCombatSettingsConfig.getDamageToPlayerMultiplier();
+
+            double playerMaxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+
+            //Prevent 1-shots and players getting healed from hits
+            finalDamage = finalDamage < 1 ? 1 : finalDamage > playerMaxHealth ? playerMaxHealth - 1 : finalDamage;
+
+            return finalDamage;
+        }
 
         @EventHandler
-        public void onEliteMobAttack2(EntityDamageByEntityEvent event) {
+        public void onEliteDamagePlayer(EntityDamageByEntityEvent event) {
             if (event.isCancelled()) {
-                PlayerDamagedByEliteMobHandler.bypass = false;
+                bypass = false;
                 return;
             }
             if (!(event.getEntity() instanceof Player)) return;
             Player player = (Player) event.getEntity();
 
             //citizens
-            if (player.hasMetadata("NPC"))
+            if (player.hasMetadata("NPC") || ElitePlayerInventory.getPlayer(player) == null)
                 return;
 
             Projectile projectile = null;
@@ -105,10 +148,66 @@ public class PlayerDamagedByEliteMobEvent extends Event implements Cancellable {
                 return;
             }
 
+            boolean blocking = false;
+
+            if (player.isBlocking()) {
+                blocking = true;
+                if (player.getInventory().getItemInOffHand().getType().equals(Material.SHIELD)) {
+                    ItemMeta itemMeta = player.getInventory().getItemInOffHand().getItemMeta();
+                    org.bukkit.inventory.meta.Damageable damageable = (Damageable) itemMeta;
+
+                    if (player.getInventory().getItemInOffHand().getItemMeta().hasEnchant(Enchantment.DURABILITY) &&
+                            player.getInventory().getItemInOffHand().getItemMeta().getEnchantLevel(Enchantment.DURABILITY) / 20D > ThreadLocalRandom.current().nextDouble())
+                        damageable.setDamage(damageable.getDamage() + 5);
+                    player.getInventory().getItemInOffHand().setItemMeta(itemMeta);
+                    if (Material.SHIELD.getMaxDurability() < damageable.getDamage())
+                        player.getInventory().setItemInOffHand(null);
+                }
+
+                if (event.getDamager() instanceof Projectile) {
+                    bypass = false;
+                    event.getDamager().remove();
+                    return;
+                }
+            }
+
+            //if the damage source is custom , the damage is final
+            if (bypass) {
+                bypass = false;
+                //Deal with the player getting killed
+                if (player.getHealth() - event.getDamage() <= 0)
+                    PlayerDeathMessageByEliteMob.addDeadPlayer(player, PlayerDeathMessageByEliteMob.initializeDeathMessage(player, eliteEntity.getLivingEntity()));
+                return;
+            }
+
+
             PlayerDamagedByEliteMobEvent playerDamagedByEliteMobEvent = new PlayerDamagedByEliteMobEvent(eliteEntity, player, event, projectile);
             if (!playerDamagedByEliteMobEvent.isCancelled)
                 new EventCaller(playerDamagedByEliteMobEvent);
+
+            if (playerDamagedByEliteMobEvent.isCancelled()) {
+                bypass = false;
+                return;
+            }
+
+            double newDamage = eliteToPlayerDamageFormula(player, eliteEntity, event);
+            //Blocking reduces damage by 80%
+            if (blocking)
+                newDamage = newDamage - newDamage * MobCombatSettingsConfig.getBlockingDamageReduction();
+            //nullify vanilla reductions
+            for (EntityDamageEvent.DamageModifier modifier : EntityDamageByEntityEvent.DamageModifier.values())
+                if (event.isApplicable(modifier))
+                    event.setDamage(modifier, 0);
+
+            //Set the final damage value
+            event.setDamage(EntityDamageEvent.DamageModifier.BASE, newDamage);
+
+            //Deal with the player getting killed todo: this is a bit busted, fix
+            if (player.getHealth() - event.getDamage() <= 0)
+                PlayerDeathMessageByEliteMob.addDeadPlayer(player, PlayerDeathMessageByEliteMob.initializeDeathMessage(player, eliteEntity.getLivingEntity()));
+
         }
+
     }
 
 }

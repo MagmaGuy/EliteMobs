@@ -5,7 +5,6 @@ import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.items.customloottable.CustomLootTable;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
-import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -29,23 +28,25 @@ public class CustomTreasureChestConfigFields extends CustomConfigFields {
     @Getter
     private int restockTimer = 0;
     @Getter
-    private List<String> lootList = new ArrayList<>();
+    private List<String> lootList = null;
     @Getter
     private double mimicChance = 0;
     @Getter
-    private List<String> mimicCustomBossesList = new ArrayList<>();
+    private List<String> mimicCustomBossesList = null;
     @Getter
-    private List<String> restockTimers = new ArrayList<>();
+    private List<String> restockTimers = null;
     @Getter
-    private List<String> effects = new ArrayList<>();
+    private List<String> effects = null;
     @Getter
     private String worldName;
     @Getter
     private Location location;
     @Getter
+    private String locationString;
+    @Getter
     private long restockTime = 0L;
     @Getter
-    private List<String> locations = new ArrayList<>();
+    private List<String> locationsString = new ArrayList<>();
     @Getter
     private CustomLootTable customLootTable = null;
 
@@ -105,80 +106,59 @@ public class CustomTreasureChestConfigFields extends CustomConfigFields {
         this.restockTime = processLong("restockTime", restockTime, 0, false);
         this.restockTimers = processStringList("restockTimers", restockTimers, new ArrayList<>(), false);
         this.effects = processStringList("effects", effects, new ArrayList<>(), false);
-        this.locations = processStringList("locations", locations, new ArrayList<>(), false);
-        this.location = processLocation("location", location, null, false);
-        if (location == null && locations.isEmpty())
-            new InfoMessage("Custom Treasure Chest in file " + filename + " does not have a defined location(s)! It will not spawn.");
-        else
-            new TreasureChest(this, location, restockTime);
-        for (String string : locations) {
-            String[] strings = string.split(":");
-            Location location = ConfigurationLocation.serialize(strings[0]);
-            if (location == null) {
-                new WarningMessage("Bad location entry in locations for " + filename + " . Entry: " + strings[0]);
-                continue;
-            }
-            long timestamp = 0;
-            if (strings.length > 1) {
-                try {
-                    timestamp = Long.parseLong(strings[1]);
-                } catch (Exception exception) {
-                    new WarningMessage("Bad unix timestamp in locations for " + filename + " . Entry: " + strings[0]);
+        this.locationsString = processStringList("locations", locationsString, new ArrayList<>(), false);
+        this.locationString = processString("location", locationString, null, false);
+        if (locationString != null)
+            new TreasureChest(this, locationString, restockTime);
+        else if (locationsString != null)
+            for (String string : locationsString) {
+                String[] strings = string.split(":");
+                long timestamp = 0;
+                if (strings.length > 1) {
+                    try {
+                        timestamp = Long.parseLong(strings[1]);
+                    } catch (Exception exception) {
+                        new WarningMessage("Bad unix timestamp in locations for " + filename + " . Entry: " + strings[0]);
+                    }
                 }
+                new TreasureChest(this, strings[0], timestamp);
             }
-            new TreasureChest(this, location, timestamp);
-        }
+        else new WarningMessage("No locations found for chest " + filename);
     }
 
     /**
      * For the new format of Treasure chests, which have multiple locations per file
+     *
      * @param chestInstanceLocation
      * @param unixTimeStamp
      * @return
      */
-    public TreasureChest updateTreasureChest(Location chestInstanceLocation, long unixTimeStamp) {
+    public TreasureChest addTreasureChest(Location chestInstanceLocation, long unixTimeStamp) {
         int index = -1;
         String deserializedLocation = ConfigurationLocation.deserialize(chestInstanceLocation.getBlock().getLocation());
-        for (String string : locations)
+        for (String string : locationsString)
             if (string.split(":")[0].equals(deserializedLocation)) {
-                index = locations.indexOf(string);
+                index = locationsString.indexOf(string);
                 break;
             }
         String serializedUpdatedLocation = deserializedLocation + ":" + unixTimeStamp;
         TreasureChest treasureChest = null;
         if (index != -1) {
             //case for existing treasure chest getting a cooldown
-            locations.set(index, serializedUpdatedLocation);
+            locationsString.set(index, serializedUpdatedLocation);
         } else {
             //case for a new treasure chest
-            locations.add(serializedUpdatedLocation);
-            treasureChest = new TreasureChest(this, chestInstanceLocation, unixTimeStamp);
+            locationsString.add(serializedUpdatedLocation);
+            treasureChest = new TreasureChest(this, ConfigurationLocation.deserialize(chestInstanceLocation), unixTimeStamp);
         }
-        fileConfiguration.set("locations", locations);
+        fileConfiguration.set("locations", locationsString);
         ConfigurationEngine.fileSaverCustomValues(fileConfiguration, file);
         return treasureChest;
     }
 
-    public void removeTreasureChest(Location chestInstanceLocation) {
-        if (locations.isEmpty()) return;
-        int index = -1;
-        String deserializedLocation = ConfigurationLocation.deserialize(chestInstanceLocation.getBlock().getLocation());
-        for (String string : locations)
-            if (string.split(":")[0].equals(deserializedLocation)) {
-                index = locations.indexOf(string);
-                break;
-            }
-        if (index < 0)
-            return;
-        String location = locations.get(index);
-        locations.remove(location);
-        fileConfiguration.set("locations", locations);
-        ConfigurationEngine.fileSaverCustomValues(fileConfiguration, file);
-    }
-
     public void setRestockTime(Location location, long newRestockTime) {
-        if (!locations.isEmpty()) {
-            updateTreasureChest(location, newRestockTime);
+        if (!locationsString.isEmpty()) {
+            addTreasureChest(location, newRestockTime);
             return;
         }
 
@@ -189,6 +169,13 @@ public class CustomTreasureChestConfigFields extends CustomConfigFields {
         } catch (Exception ex) {
             Bukkit.getLogger().warning("[EliteMobs] Attempted to update restock time for a custom treasure chest and failed, did you delete it during runtime?");
         }
+    }
+
+    public void purgeLocations() {
+        this.locationsString = new ArrayList<>();
+        ConfigurationEngine.writeValue(null, file, fileConfiguration, "locations");
+        this.locationString = null;
+        ConfigurationEngine.writeValue(null, file, fileConfiguration, "location");
     }
 
 }

@@ -37,7 +37,7 @@ public class CustomTreasureChestsConfig extends CustomConfig {
             new WarningMessage("Failed to commit a location for a treasure chest!");
             return null;
         }
-        return customTreasureChestConfigFields.updateTreasureChest(location, 0);
+        return customTreasureChestConfigFields.addTreasureChest(location, 0);
     }
 
     public static void removeTreasureChestEntry(Location location, String customChestFileName) {
@@ -46,7 +46,7 @@ public class CustomTreasureChestsConfig extends CustomConfig {
             new WarningMessage("Failed to remove a location for a treasure chest!");
             return;
         }
-        customTreasureChestConfigFields.removeTreasureChest(location);
+        customTreasureChestConfigFields.purgeLocations();
     }
 
 }

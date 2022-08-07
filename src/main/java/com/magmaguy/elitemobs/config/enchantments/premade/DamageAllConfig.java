@@ -7,7 +7,7 @@ public class DamageAllConfig extends EnchantmentsConfigFields {
         super("damage_all",
                 true,
                 "Sharpness",
-                200,
+                5,
                 13);
     }
 }

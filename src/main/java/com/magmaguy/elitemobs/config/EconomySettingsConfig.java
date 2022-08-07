@@ -62,7 +62,7 @@ public class EconomySettingsConfig {
         FileConfiguration fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
 
         double netheriteLevel = CombatSystem.NETHERITE_TIER_LEVEL + 10D;
-        double tridentLevel = CombatSystem.TRIDENT_TIER_LEVEL + 10D;
+        double tridentLevel = CombatSystem.DIAMOND_TIER_LEVEL + 10D;
         double diamondLevel = CombatSystem.DIAMOND_TIER_LEVEL + 10D;
         double ironLevel = CombatSystem.IRON_TIER_LEVEL + 10D;
         double stoneChainLevel = CombatSystem.STONE_CHAIN_TIER_LEVEL + 10D;

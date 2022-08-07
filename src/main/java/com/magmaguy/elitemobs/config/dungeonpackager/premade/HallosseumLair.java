@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.config.dungeonpackager.premade;
 import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.World;
-import org.bukkit.util.Vector;
 
 import java.util.Arrays;
 
@@ -12,22 +11,14 @@ public class HallosseumLair extends DungeonPackagerConfigFields {
         super("hallosseum_lair",
                 false,
                 "&cHallosseum",
-                DungeonLocationType.WORLD,
                 Arrays.asList("&fThe 2020 spooky halloween encounter!",
                         "&6Credits: MagmaGuy & 69OzCanOfBepis"),
-                Arrays.asList(""),
-                Arrays.asList(""),
                 DiscordLinks.freeMinidungeons,
                 DungeonSizeCategory.LAIR,
                 "em_hallosseum",
-                null,
                 World.Environment.NETHER,
                 true,
-                null,
-                null,
-                new Vector(0, 0, 0),
-                -130D,
-                0D,
+                "em_hallosseum,65,21,80,20,0",
                 0,
                 "Difficulty: &chard\n" +
                         "$bossCount level $lowestTier Big Boss!\n" +

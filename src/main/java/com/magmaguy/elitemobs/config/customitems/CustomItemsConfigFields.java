@@ -41,11 +41,10 @@ public class CustomItemsConfigFields extends CustomConfigFields implements Custo
     private Integer customModelID = -1;
     @Getter
     @Setter
-    //todo: implement
-    private List<String> nbtTags = new ArrayList<>();
+    private String permission = "";
     @Getter
     @Setter
-    private String permission = "";
+    private int level = 0;
 
     public CustomItemsConfigFields(String fileName,
                                    boolean isEnabled,
@@ -79,5 +78,6 @@ public class CustomItemsConfigFields extends CustomConfigFields implements Custo
         this.itemType = processEnum("itemType", itemType, CustomItem.ItemType.CUSTOM, CustomItem.ItemType.class, false);
         this.customModelID = processInt("customModelID", customModelID, -1, false);
         this.permission = processString("permission", permission, "", false);
+        this.level = processInt("level", level, 0, false);
     }
 }

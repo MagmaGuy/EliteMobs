@@ -2,9 +2,9 @@ package com.magmaguy.elitemobs.collateralminecraftchanges;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.api.EliteMobsItemDetector;
+import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.items.ItemTagger;
-import com.magmaguy.elitemobs.items.ItemTierFinder;
 import com.magmaguy.elitemobs.utils.EntityFinder;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
@@ -27,7 +27,7 @@ public class AlternativeDurabilityLoss implements Listener {
 
     //these values are percentual
     private static double durabilityLoss(ItemStack itemStack) {
-        boolean isWeaponMaterial = ItemTierFinder.isWeaponMaterial(itemStack);
+        boolean isWeaponMaterial = EliteItemManager.isWeapon(itemStack);
         int maxDurability = itemStack.getType().getMaxDurability() > (isWeaponMaterial ? 2000 : 1000) ? (isWeaponMaterial ? 2000 : 1000) : itemStack.getType().getMaxDurability();
         double baseModifier = isWeaponMaterial ? 2000 : 1000;
         double durabilityLoss = ((baseModifier - maxDurability) / baseModifier) * ItemSettingsConfig.getEliteDurabilityMultiplier();

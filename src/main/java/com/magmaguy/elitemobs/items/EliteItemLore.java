@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.items;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.api.EliteMobsItemDetector;
+import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
@@ -11,11 +12,13 @@ import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffect;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffectContainer;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.elitemobs.utils.Round;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -57,6 +60,8 @@ public class EliteItemLore {
         this.lore = new ArrayList<>();
         this.showItemWorth = showItemWorth;
 
+        if (ItemSettingsConfig.isHideAttributes()) itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+
         constructVanillaEnchantments();
 
         parseAllEliteEnchantments();
@@ -96,11 +101,13 @@ public class EliteItemLore {
     private void parseAllEliteEnchantments() {
         parseEliteEnchantments(Enchantment.DAMAGE_ALL);
         parseEliteEnchantments(Enchantment.ARROW_DAMAGE);
+        parseEliteEnchantments(Enchantment.PROTECTION_ENVIRONMENTAL);
         parseEliteEnchantments(Enchantment.DAMAGE_ARTHROPODS);
         parseEliteEnchantments(Enchantment.DAMAGE_UNDEAD);
-        parseEliteEnchantments(Enchantment.PROTECTION_ENVIRONMENTAL);
-        parseEliteEnchantments(Enchantment.PROTECTION_PROJECTILE);
         parseEliteEnchantments(Enchantment.PROTECTION_EXPLOSIONS);
+        parseEliteEnchantments(Enchantment.PROTECTION_FIRE);
+        parseEliteEnchantments(Enchantment.PROTECTION_PROJECTILE);
+        parseEliteEnchantments(Enchantment.THORNS);
     }
 
     private void parseEliteEnchantments(Enchantment enchantment) {
@@ -199,11 +206,20 @@ public class EliteItemLore {
     private void writeNewLore() {
         for (String string : ItemSettingsConfig.getLoreStructure()) {
 
-            if (string.contains("$prestigeLevel"))
-                string = string.replace("$prestigeLevel", prestigeLevel + "");
+            if (string.contains("$weaponOrArmorStats")) {
+                if (EliteItemManager.isWeapon(itemStack))
+                    string = ItemSettingsConfig.getWeaponEntry();
+                else if (EliteItemManager.isArmor(itemStack))
+                    string = ItemSettingsConfig.getArmorEntry();
+                else
+                    string = "";
+            }
 
-            if (string.contains("$itemLevel"))
-                string = string.replace("$itemLevel", ItemTierFinder.findBattleTier(itemStack) + "");
+            string = stringReplacer(string, "$EDPS", Round.twoDecimalPlaces(EliteItemManager.getDPS(itemStack)));
+            string = stringReplacer(string, "$EDEF", Round.twoDecimalPlaces(EliteItemManager.getEliteDefense(itemStack) + EliteItemManager.getBonusEliteDefense(itemStack)));
+            string = stringReplacer(string, "$prestigeLevel", prestigeLevel);
+            string = stringReplacer(string, "$itemLevel", EliteItemManager.getRoundedItemLevel(itemStack));
+
 
             if (string.contains("$enchantments")) {
                 for (String entry : vanillaEnchantmentsLore)
@@ -242,8 +258,22 @@ public class EliteItemLore {
                     lore.add(string.replace("$ifCustomEnchantments", ""));
             } else
                 lore.add(ChatColorConverter.convert(string));
-
         }
+    }
+
+    private String stringReplacer(String originalString, String placeholder, int value) {
+        return stringReplacer(originalString, placeholder, value + "");
+    }
+
+    private String stringReplacer(String originalString, String placeholder, double value) {
+        return stringReplacer(originalString, placeholder, value + "");
+    }
+
+    private String stringReplacer(String originalString, String placeholder, String replacement) {
+        String processedString = originalString;
+        if (originalString.contains(placeholder))
+            processedString = originalString.replace(placeholder, replacement);
+        return processedString;
     }
 
 }
