@@ -7,7 +7,7 @@ public class DamageArthropodsConfig extends EnchantmentsConfigFields {
         super("damage_arthropods",
                 true,
                 "Bane of Arthropods",
-                100,
+                4,
                 6);
     }
 }

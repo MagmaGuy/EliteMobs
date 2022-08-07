@@ -30,6 +30,7 @@ public class ScalableItemConstructor {
         if (!customItem.getPermission().isEmpty() && !player.hasPermission(customItem.getPermission())) return null;
         HashMap<Enchantment, Integer> newEnchantmentList = updateDynamicEnchantments(customItem.getEnchantments(), itemTier, false);
         return ItemConstructor.constructItem(
+                itemTier,
                 customItem.getName(),
                 customItem.getMaterial(),
                 newEnchantmentList,
@@ -143,6 +144,7 @@ public class ScalableItemConstructor {
         HashMap<Enchantment, Integer> newEnchantmentList = updateLimitedEnchantments(customItem.getEnchantments(), itemTier);
 
         return ItemConstructor.constructItem(
+                itemTier,
                 customItem.getName(),
                 customItem.getMaterial(),
                 newEnchantmentList,

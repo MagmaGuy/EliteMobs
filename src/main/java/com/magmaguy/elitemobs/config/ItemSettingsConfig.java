@@ -111,6 +111,12 @@ public class ItemSettingsConfig {
     private static String directDropCoinMessage;
     @Getter
     private static String directDropSpecialMessage;
+    @Getter
+    private static boolean hideAttributes;
+    @Getter
+    private static String weaponEntry;
+    @Getter
+    private static String armorEntry;
 
     private ItemSettingsConfig() {
     }
@@ -122,9 +128,10 @@ public class ItemSettingsConfig {
         doEliteMobsLoot = ConfigurationEngine.setBoolean(fileConfiguration, "doEliteMobsLoot", true);
         doMmorpgColors = ConfigurationEngine.setBoolean(fileConfiguration, "doMMORPGColorsForItems", true);
         preventCustomItemPlacement = ConfigurationEngine.setBoolean(fileConfiguration, "preventCustomItemPlacement", true);
-        loreStructure = ConfigurationEngine.setList(fileConfiguration, "itemLoreStructures", Arrays.asList(
+        loreStructure = ConfigurationEngine.setList(fileConfiguration, "itemLoreStructureV2", Arrays.asList(
                 ChatColorConverter.convert("&7&m&l---------&7<&lEquip Info&7>&m&l---------"),
                 ChatColorConverter.convert("&7Item level: &f$itemLevel &7Prestige &6$prestigeLevel"),
+                ChatColorConverter.convert("$weaponOrArmorStats"),
                 ChatColorConverter.convert("$soulbindInfo"),
                 ChatColorConverter.convert("$itemSource"),
                 ChatColorConverter.convert("$ifLore&7&m&l-----------&7< &f&lLore&7 >&m&l-----------"),
@@ -186,6 +193,9 @@ public class ItemSettingsConfig {
         directDropMinecraftLootMessage = ConfigurationEngine.setString(fileConfiguration, "directDropMinecraftLootMessage", "&8[EliteMobs] &aObtained $itemName &a!");
         directDropCoinMessage = ConfigurationEngine.setString(fileConfiguration, "directDropCoinMessage", "&8[EliteMobs] &aObtained &2$amount $currencyName &a!");
         directDropSpecialMessage = ConfigurationEngine.setString(fileConfiguration, "directDropSpecialMessage", "&8[EliteMobs] &aObtained &2$amount $name &a!");
+        hideAttributes = ConfigurationEngine.setBoolean(fileConfiguration, "hideItemAttributes", true);
+        weaponEntry = ConfigurationEngine.setString(fileConfiguration, "weaponEntry", "&7Elite DPS: &2$EDPS");
+        armorEntry = ConfigurationEngine.setString(fileConfiguration, "armorEntry", "&7Elite Armor: &2$EDEF");
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }

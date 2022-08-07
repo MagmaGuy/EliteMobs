@@ -1,10 +1,12 @@
 package com.magmaguy.elitemobs.items;
 
+import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import org.bukkit.enchantments.Enchantment;
 
 public class EliteEnchantments {
 
     public static boolean isPotentialEliteEnchantment(Enchantment enchantment) {
+        if (!ItemSettingsConfig.isUseEliteEnchantments()) return false;
         return enchantment.getKey().equals(Enchantment.DAMAGE_ALL.getKey()) ||
                 enchantment.getKey().equals(Enchantment.ARROW_DAMAGE.getKey()) ||
                 enchantment.getKey().equals(Enchantment.PROTECTION_ENVIRONMENTAL.getKey()) ||

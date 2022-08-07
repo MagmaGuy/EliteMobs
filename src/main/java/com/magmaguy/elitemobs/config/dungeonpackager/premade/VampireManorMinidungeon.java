@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.config.dungeonpackager.premade;
 
 import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
+import com.magmaguy.elitemobs.dungeons.SchematicPackage;
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.util.Vector;
 
@@ -11,7 +12,6 @@ public class VampireManorMinidungeon extends DungeonPackagerConfigFields {
         super("vampire_manor",
                 false,
                 "&cThe Vampire Manor",
-                DungeonLocationType.SCHEMATIC,
                 Arrays.asList("&fPrepare to spill blood!",
                         "&6Credits: MagmaGuy, 69OzCanOfBepis"),
                 Arrays.asList(
@@ -148,21 +148,18 @@ public class VampireManorMinidungeon extends DungeonPackagerConfigFields {
                         "vampire_manor_south.yml:-3.5,-25.5,37.5"),
                 DiscordLinks.premiumMinidungeons,
                 DungeonSizeCategory.MINIDUNGEON,
-                null,
                 "em_vampire_manor.schem",
-                null,
                 true,
                 new Vector(67, -28, 0),
                 new Vector(-57, 112, 97),
-                new Vector(0, 0, 0),
-                0D,
-                0D,
+                "0,0,0,0,0",
                 0,
                 "Difficulty: &6Medium\n" +
                         "$bossCount bosses, from level $lowestTier to $highestTier\n" +
                         "&6A deadly manor full of blood thristy creatures!\n" +
                         "&6Are you ready to face that which haunts the night?",
                 "&8[EM] &cTrespassing on dangerous grounds!!",
-                "&8[EM] &cNow leaving haunted land!");
+                "&8[EM] &cNow leaving haunted land!",
+                SchematicPackage.SchematicRotation.SOUTH.toString());
     }
 }

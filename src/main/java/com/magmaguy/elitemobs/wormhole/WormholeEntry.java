@@ -1,68 +1,156 @@
 package com.magmaguy.elitemobs.wormhole;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.config.WormholesConfig;
+import com.magmaguy.elitemobs.dungeons.EMPackage;
+import com.magmaguy.elitemobs.dungeons.SchematicPackage;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
-import com.magmaguy.elitemobs.utils.ChunkLocationChecker;
-import com.magmaguy.elitemobs.utils.ChunkVectorizer;
+import com.magmaguy.elitemobs.mobconstructor.PersistentObject;
+import com.magmaguy.elitemobs.mobconstructor.PersistentObjectHandler;
+import com.magmaguy.elitemobs.utils.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Consumer;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-public class WormholeEntry {
+public class WormholeEntry implements PersistentObject {
     @Getter
-    private static final HashMap<Integer, List<WormholeEntry>> wormholeEntries = new HashMap<>();
+    private static final Set<WormholeEntry> wormholeEntries = new HashSet<>();
 
     @Getter
-    private final Location location;
+    private Location location;
     @Getter
-    private final Wormhole wormhole;
+    private Wormhole wormhole;
     @Getter
-    private final String locationText;
+    private String locationString;
+    @Getter
+    private String armorStandText;
     @Getter
     @Setter
     private BukkitTask wormholeTask;
     @Getter
     @Setter
     private ArmorStand text;
+    private String worldName;
+    @Getter
+    @Setter
+    private String portalMissingMessage = null;
+    @Getter
+    @Setter
+    private String opMessage = null;
+    private int wormholeNumber;
 
-    public WormholeEntry(Location location, Wormhole wormhole, String locationText) {
-        this.location = location;
+    public WormholeEntry(Wormhole wormhole, String locationString, int wormholeNumber) {
         this.wormhole = wormhole;
-        this.locationText = locationText;
-        if (location == null || location.getWorld() == null) return;
-        int chunkInt = ChunkVectorizer.hash(location.getChunk());
-        if (wormholeEntries.get(chunkInt) == null)
-            wormholeEntries.put(chunkInt, new ArrayList<>(Arrays.asList(this)));
-        else {
-            List<WormholeEntry> wEs = wormholeEntries.get(chunkInt);
-            wEs.add(this);
-            wormholeEntries.put(chunkInt, wEs);
+        if (locationString == null) {
+            new WarningMessage("Wormhole " + wormhole.getWormholeConfigFields().getFilename() + " is missing a wormhole location! Fix this!");
+            return;
         }
+        this.locationString = locationString;
+        setLocationFromConfiguration();
+        this.wormholeNumber = wormholeNumber;
+        if (wormholeNumber == 1)
+            this.armorStandText = wormhole.getWormholeConfigFields().getLocation1Text();
+        else
+            this.armorStandText = wormhole.getWormholeConfigFields().getLocation2Text();
+
+        new PersistentObjectHandler(this);
         if (ChunkLocationChecker.locationIsLoaded(location))
             chunkLoad();
     }
 
+    private Location getDungeonLocation() {
+        EMPackage emPackage = EMPackage.getEmPackages().get(locationString);
+        if (emPackage == null) {
+            new WarningMessage("Dungeon " + locationString + " is not a valid dungeon packager name! Wormhole " + wormhole.getWormholeConfigFields().getFilename() + " will not lead anywhere.");
+            setPortalMissingMessage(WormholesConfig.getDefaultPortalMissingMessage());
+            return null;
+        }
+        if (!emPackage.isDownloaded() || !emPackage.isInstalled()) {
+            new InfoMessage("Wormhole " + wormhole.getWormholeConfigFields().getFilename() + " will not lead anywhere because the dungeon " + locationString + " is not installed!");
+            setPortalMissingMessage(WormholesConfig.getDungeonNotInstalledMessage().replace("$dungeonID", emPackage.getDungeonPackagerConfigFields().getName()));
+
+            this.opMessage = ChatColorConverter.convert(
+                    "&8[EliteMobs - OP-only message] &fDownload links are available on &9https://magmaguy.itch.io/ &f" +
+                            "(free and premium) and &9https://www.patreon.com/magmaguy &f(premium). You can check the difference " +
+                            "between the two and get support here: " + DiscordLinks.mainLink);
+
+            if (emPackage instanceof SchematicPackage)
+                return null;
+        }
+        Location teleportLocation = emPackage.getDungeonPackagerConfigFields().getTeleportLocation();
+        if (teleportLocation == null) return null;
+        Vector offsetVector = teleportLocation.getDirection().clone().setY(0).normalize()
+                .multiply(1.5 * wormhole.getWormholeConfigFields().getSizeMultiplier())
+                .setY(-1 * wormhole.getWormholeConfigFields().getSizeMultiplier());
+
+        worldName = emPackage.getDungeonPackagerConfigFields().getWorldName();
+
+        return teleportLocation.clone().subtract(offsetVector);
+    }
+
+    private void setLocationFromConfiguration() {
+        if (locationString.contains(",")) {
+            this.worldName = ConfigurationLocation.worldName(locationString);
+            this.location = ConfigurationLocation.serialize(locationString);
+        } else {
+            this.location = getDungeonLocation();
+        }
+    }
+
+    public void onDungeonInstall() {
+        this.location = getDungeonLocation();
+        chunkLoad();
+    }
+
+    public void onDungeonUninstall() {
+        stop();
+        location = null;
+        wormholeTask = null;
+    }
+
+    @Override
     public void chunkLoad() {
         initializeTextDisplay();
         if (wormholeTask != null && !wormholeTask.isCancelled()) wormholeTask.cancel();
         wormholeTask = WormholeTask.startWormholeTask(this);
     }
 
+    @Override
     public void chunkUnload() {
         stop();
+        location = null;
+    }
+
+    @Override
+    public void worldLoad(World world) {
+        getDungeonLocation();
+        if (ChunkLocationChecker.locationIsLoaded(location)) {
+            chunkLoad();
+        }
+    }
+
+    @Override
+    public void worldUnload() {
+        location.setWorld(null);
+        stop();
+    }
+
+    @Override
+    public Location getPersistentLocation() {
+        return location;
+    }
+
+    @Override
+    public String getWorldName() {
+        return worldName;
     }
 
     public void stop() {
@@ -72,14 +160,14 @@ public class WormholeEntry {
 
     private void initializeTextDisplay() {
         if (text != null && text.isValid() && !text.isEmpty()) return;
-        if (locationText == null) return;
+        if (armorStandText == null) return;
         if (location == null || location.getWorld() == null) return;
         text = location.getWorld().spawn(
                 location.clone().add(new Vector(0, 1.2, 0).multiply(wormhole.getWormholeConfigFields().getSizeMultiplier())),
                 ArmorStand.class, new Consumer<ArmorStand>() {
                     @Override
                     public void accept(ArmorStand armorStand) {
-                        armorStand.setCustomName(ChatColorConverter.convert(locationText));
+                        armorStand.setCustomName(ChatColorConverter.convert(armorStandText));
                         armorStand.setCustomNameVisible(true);
                         armorStand.setMarker(true);
                         armorStand.setVisible(false);
@@ -88,16 +176,6 @@ public class WormholeEntry {
                     }
                 });
         EntityTracker.registerVisualEffects(text);
-    }
-
-    public static class WormholeEntryEvent implements Listener {
-        @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
-        public void chunkLoadEvent(ChunkLoadEvent event) {
-            int chunk = ChunkVectorizer.hash(event.getChunk());
-            if (!wormholeEntries.containsKey(chunk)) return;
-            for (WormholeEntry wormholeEntry : wormholeEntries.get(chunk))
-                wormholeEntry.chunkLoad();
-        }
     }
 
 }

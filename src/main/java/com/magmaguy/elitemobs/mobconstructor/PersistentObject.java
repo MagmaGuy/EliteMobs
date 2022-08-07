@@ -1,6 +1,9 @@
 package com.magmaguy.elitemobs.mobconstructor;
 
-public interface SimplePersistentEntityInterface {
+import org.bukkit.Location;
+import org.bukkit.World;
+
+public interface PersistentObject {
 
     /**
      * Sets the behavior for chunk loads
@@ -12,8 +15,12 @@ public interface SimplePersistentEntityInterface {
      */
     void chunkUnload();
 
-    void worldLoad();
+    void worldLoad(World world);
 
     void worldUnload();
+
+    Location getPersistentLocation();
+
+    String getWorldName();
 
 }

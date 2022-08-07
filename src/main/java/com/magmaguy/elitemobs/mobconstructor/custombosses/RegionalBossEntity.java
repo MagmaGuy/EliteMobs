@@ -2,13 +2,13 @@ package com.magmaguy.elitemobs.mobconstructor.custombosses;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.api.internal.NewMinidungeonRelativeBossLocationEvent;
+import com.magmaguy.elitemobs.api.internal.NewSchematicPackageRelativeBossLocationEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
-import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntityInterface;
+import com.magmaguy.elitemobs.mobconstructor.PersistentObject;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.transitiveblocks.TransitiveBlock;
 import com.magmaguy.elitemobs.powers.bosspowers.SpiritWalk;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
@@ -30,7 +30,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
-public class RegionalBossEntity extends CustomBossEntity implements SimplePersistentEntityInterface {
+public class RegionalBossEntity extends CustomBossEntity implements PersistentObject {
 
     private static final ArrayListMultimap<CustomBossesConfigFields, RegionalBossEntity> regionalBossesFromConfigFields = ArrayListMultimap.create();
     private final double leashRadius;
@@ -48,7 +48,7 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
     @Getter
     @Setter
     private List<TransitiveBlock> onRemoveTransitiveBlocks;
-    private boolean leashIsRunning = false;
+    private boolean removed = false;
 
 
     public RegionalBossEntity(CustomBossesConfigFields customBossesConfigFields, String rawString) {
@@ -121,7 +121,8 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
             customBossesConfigFields.setFilesOutOfSync(false);
             List<String> spawnLocations = new ArrayList<>();
             for (RegionalBossEntity regionalBossEntity : regionalBossesFromConfigFields.get(customBossesConfigFields))
-                spawnLocations.add(regionalBossEntity.rawString);
+                if (!regionalBossEntity.removed)
+                    spawnLocations.add(regionalBossEntity.rawString);
             customBossesConfigFields.getFileConfiguration().set("spawnLocations", spawnLocations);
             try {
                 customBossesConfigFields.getFileConfiguration().save(customBossesConfigFields.getFile());
@@ -200,8 +201,7 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
         if (leashRadius < 1)
             return;
         RegionalBossEntity regionalBossEntity = this;
-        if (leashIsRunning) return;
-        leashIsRunning = true;
+        if (leashTask != null) leashTask.cancel();
         leashTask = Bukkit.getScheduler().runTaskTimerAsynchronously(MetadataHandler.PLUGIN, () -> {
             try {
                 if (!isValid()) {
@@ -212,6 +212,7 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
                     SpiritWalk.spiritWalkRegionalBossAnimation(regionalBossEntity, getLivingEntity().getLocation(), spawnLocation);
 
             } catch (Exception ex) {
+                ex.printStackTrace();
                 new WarningMessage("Async leash task errored!");
             }
         }, 20L * 3, 20L * 3);
@@ -220,7 +221,7 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
     private void cancelLeash() {
         if (leashTask == null) return;
         leashTask.cancel();
-        leashIsRunning = false;
+        leashTask = null;
     }
 
     public void setLeashRadius(int leashRadius) {
@@ -243,7 +244,6 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
     @Override
     public void remove(RemovalReason removalReason) {
         cancelLeash();
-
         super.remove(removalReason);
 
         switch (removalReason) {
@@ -251,7 +251,8 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
                 if (phaseBossEntity != null)
                     phaseBossEntity.silentReset();
                 EntityTracker.getEliteMobEntities().remove(super.eliteUUID);
-                regionalBossesFromConfigFields.remove(customBossesConfigFields, this);
+                //regionalBossesFromConfigFields.remove(customBossesConfigFields, this);
+                removed = true;
                 getCustomBossesConfigFields().setFilesOutOfSync(true);
                 break;
             case DEATH:
@@ -274,9 +275,9 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
 
     public static class RegionalBossEntityEvents implements Listener {
         @EventHandler(ignoreCancelled = true)
-        public void onNewMinidungeonRelativeBossLocationEvent(NewMinidungeonRelativeBossLocationEvent event) {
-            new RegionalBossEntity(event.getCustomBossConfigFields(), ConfigurationLocation.deserialize(event.getRealLocation()));
-            event.getCustomBossConfigFields().setFilesOutOfSync(true);
+        public void onNewMinidungeonRelativeBossLocationEvent(NewSchematicPackageRelativeBossLocationEvent event) {
+            new RegionalBossEntity(event.getCustomBossesConfigFields(), ConfigurationLocation.deserialize(event.getRealLocation()));
+            event.getCustomBossesConfigFields().setFilesOutOfSync(true);
         }
     }
 

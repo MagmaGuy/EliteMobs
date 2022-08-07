@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.config.dungeonpackager.premade;
 import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.World;
-import org.bukkit.util.Vector;
 
 import java.util.Arrays;
 
@@ -12,22 +11,14 @@ public class FireworksLair extends DungeonPackagerConfigFields {
         super("fireworks_lair",
                 false,
                 "&aFireworks",
-                DungeonLocationType.WORLD,
                 Arrays.asList("&fThe 2021 4th of July map!",
                         "&6Credits: MagmaGuy"),
-                Arrays.asList(""),
-                Arrays.asList(""),
                 DiscordLinks.freeMinidungeons,
                 DungeonSizeCategory.LAIR,
                 "em_fireworks",
-                null,
                 World.Environment.NORMAL,
                 true,
-                null,
-                null,
-                new Vector(0, 0, 0),
-                -130D,
-                0D,
+                "em_fireworks,3,62,-20,17,-5",
                 0,
                 "Difficulty: &cHard\n" +
                         "$bossCount level $lowestTier Big Boss!\n" +

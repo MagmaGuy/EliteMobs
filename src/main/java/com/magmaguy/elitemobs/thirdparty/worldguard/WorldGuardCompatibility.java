@@ -1,6 +1,8 @@
 package com.magmaguy.elitemobs.thirdparty.worldguard;
 
-import com.magmaguy.elitemobs.dungeons.Minidungeon;
+import com.magmaguy.elitemobs.dungeons.EMPackage;
+import com.magmaguy.elitemobs.dungeons.SchematicPackage;
+import com.magmaguy.elitemobs.dungeons.WorldDungeonPackage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -154,7 +156,7 @@ public class WorldGuardCompatibility {
         return ELITEMOBS_EXPLOSION_REGEN;
     }
 
-    public static void protectWorldMinidugeonArea(Location location, Minidungeon minidungeon) {
+    public static void protectWorldMinidugeonArea(Location location, WorldDungeonPackage dungeonWorldPackage) {
         try {
             RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
             RegionManager regions = container.get(BukkitAdapter.adapt(location.getWorld()));
@@ -166,7 +168,7 @@ public class WorldGuardCompatibility {
                 regions.addRegion(global);
             }
 
-            protectMinidungeonArea(global, minidungeon);
+            protectMinidungeonArea(global, dungeonWorldPackage);
             DefaultDomain members = global.getMembers();
             members.addPlayer(UUID.fromString("198c4123-cafc-45df-ba79-02a421eb8ce7"));
             global.setOwners(members);
@@ -196,24 +198,7 @@ public class WorldGuardCompatibility {
         }
     }
 
-    public static boolean protectMinidungeonArea(String regionName, Location location, Minidungeon minidungeon) {
-        try {
-            RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
-            RegionManager regions = container.get(BukkitAdapter.adapt(location.getWorld()));
-            ProtectedRegion protectedRegion = regions.getRegion(regionName);
-            if (protectedRegion == null) {
-                new WarningMessage("The region name picked did not exist!");
-                return false;
-            }
-            protectMinidungeonArea(protectedRegion, minidungeon);
-            return true;
-        } catch (Exception ex) {
-            new WarningMessage("Failed to protect region " + regionName + " !");
-            return false;
-        }
-    }
-
-    public static void protectMinidungeonArea(ProtectedRegion protectedRegion, Minidungeon minidungeon) {
+    public static void protectMinidungeonArea(ProtectedRegion protectedRegion, EMPackage dungeonWorldPackage) {
         //elitemobs events
         protectedRegion.setFlag(ELITEMOBS_DUNGEON, allow);
         protectedRegion.setFlag(ELITEMOBS_ANTIEXPLOIT, deny);
@@ -258,8 +243,8 @@ public class WorldGuardCompatibility {
         protectedRegion.setFlag(Flags.ENDERDRAGON_BLOCK_DAMAGE, deny);
         protectedRegion.setFlag(Flags.LIGHTER, deny);
         protectedRegion.setFlag(Flags.ENDERPEARL, deny);
-        protectedRegion.setFlag(Flags.GREET_MESSAGE, minidungeon.getDungeonPackagerConfigFields().getRegionEnterMessage());
-        protectedRegion.setFlag(Flags.FAREWELL_MESSAGE, minidungeon.getDungeonPackagerConfigFields().getRegionLeaveMessage());
+        protectedRegion.setFlag(Flags.GREET_MESSAGE, dungeonWorldPackage.getDungeonPackagerConfigFields().getRegionEnterMessage());
+        protectedRegion.setFlag(Flags.FAREWELL_MESSAGE, dungeonWorldPackage.getDungeonPackagerConfigFields().getRegionLeaveMessage());
     }
 
     public static boolean protectMinidungeonArea(String regionName, Location location) {
@@ -335,14 +320,14 @@ public class WorldGuardCompatibility {
      * @param corner1
      * @param corner2
      */
-    public static void defineMinidungeon(Location corner1, Location corner2, Location anchorLocation, String schematicName, Minidungeon minidungeon) {
+    public static void defineMinidungeon(Location corner1, Location corner2, Location anchorLocation, String schematicName, SchematicPackage schematicPackage) {
         try {
             RegionContainer regionContainer = WorldGuard.getInstance().getPlatform().getRegionContainer();
             RegionManager regionManager = regionContainer.get(BukkitAdapter.adapt(anchorLocation.getWorld()));
             BlockVector3 min = BlockVector3.at(corner1.getBlockX(), corner1.getBlockY(), corner1.getBlockZ());
             BlockVector3 max = BlockVector3.at(corner2.getBlockX(), corner2.getBlockY(), corner2.getBlockZ());
             ProtectedRegion region = new ProtectedCuboidRegion(schematicName.replace(".schem", ""), min, max);
-            protectMinidungeonArea(region, minidungeon);
+            protectMinidungeonArea(region, schematicPackage);
             regionManager.addRegion(region);
         } catch (Exception ex) {
             new WarningMessage("Failed to add Minidungeon WorldGuard zone!");

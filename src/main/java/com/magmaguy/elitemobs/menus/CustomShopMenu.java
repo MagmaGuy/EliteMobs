@@ -11,7 +11,6 @@ import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.ItemWorthCalculator;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
-import com.magmaguy.elitemobs.utils.Developer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -139,7 +138,6 @@ public class CustomShopMenu {
             //These slots are for buying items
             if (EliteMenu.isTopMenu(event)) {
 
-                Developer.message("6");
                 boolean inventoryHasFreeSlots = false;
                 for (ItemStack iteratedStack : player.getInventory())
                     if (iteratedStack == null) {

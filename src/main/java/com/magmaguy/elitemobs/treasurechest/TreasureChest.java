@@ -1,21 +1,25 @@
 package com.magmaguy.elitemobs.treasurechest;
 
-import com.google.common.collect.ArrayListMultimap;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.TranslationConfig;
 import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestConfigFields;
 import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestsConfig;
+import com.magmaguy.elitemobs.dungeons.EMPackage;
+import com.magmaguy.elitemobs.mobconstructor.PersistentObject;
+import com.magmaguy.elitemobs.mobconstructor.PersistentObjectHandler;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
-import com.magmaguy.elitemobs.utils.InfoMessage;
+import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.Round;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import com.magmaguy.elitemobs.utils.WeightedProbability;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.data.Directional;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -23,64 +27,58 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.world.WorldLoadEvent;
-import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.time.Instant;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class TreasureChest {
+public class TreasureChest implements PersistentObject {
 
-    @Getter
-    private static ArrayListMultimap<String, TreasureChest> unloadedChests = ArrayListMultimap.create();
     private static HashMap<Location, TreasureChest> treasureChestHashMap = new HashMap<>();
     @Getter
     private final CustomTreasureChestConfigFields customTreasureChestConfigFields;
+    private final String locationString;
+    private final String worldName;
     @Getter
-    private final Location location;
+    private Location location;
     private long restockTime;
+    @Getter
+    @Setter
+    private EMPackage emPackage = null;
 
-    public TreasureChest(CustomTreasureChestConfigFields customTreasureChestConfigFields, Location location, long restockTime) {
+    public TreasureChest(CustomTreasureChestConfigFields customTreasureChestConfigFields, String locationString, long restockTime) {
         this.customTreasureChestConfigFields = customTreasureChestConfigFields;
-        this.location = location;
+        this.locationString = locationString;
+        this.worldName = ConfigurationLocation.worldName(locationString);
+        this.location = ConfigurationLocation.serialize(locationString);
         this.restockTime = restockTime;
+        this.emPackage = EMPackage.getContent(customTreasureChestConfigFields.getFilename());
+
         if (!customTreasureChestConfigFields.isEnabled())
             return;
 
         if (customTreasureChestConfigFields.getChestMaterial() == null)
             return;
 
-        if (location == null)
-            return;
+        initializeChest();
 
-        if (location.getWorld() == null) {
-            unloadedChests.put(customTreasureChestConfigFields.getWorldName(), this);
-            return;
-        } else
-            try {
-                location.getChunk().load();
-            } catch (Exception ex) {
-                new InfoMessage("Location for treasure chest " + customTreasureChestConfigFields.getFilename() + " is not loaded, so a treasure chest will not be placed!");
-                new WarningMessage(ex.getMessage());
-                return;
-            }
-
-        long time = (restockTime - Instant.now().getEpochSecond()) * 20L;
-        if (time < 0)
-            generateChest();
-        else
-            Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, this::generateChest, time);
+        new PersistentObjectHandler(this);
 
         treasureChestHashMap.put(location, this);
+    }
 
+    private void initializeChest() {
+        if (location != null && location.getWorld() != null) {
+            long time = (restockTime - Instant.now().getEpochSecond()) * 20L;
+            if (time < 0)
+                generateChest();
+            else
+                Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, this::generateChest, time);
+        }
     }
 
     public static void clearTreasureChests() {
-        unloadedChests.clear();
         treasureChestHashMap.clear();
     }
 
@@ -152,7 +150,7 @@ public class TreasureChest {
             String filename = string.split(":")[0];
             double weight = 1;
             try {
-                weight = Double.valueOf(string.split(":")[1]);
+                weight = Double.parseDouble(string.split(":")[1]);
             } catch (Exception ex) {
                 weight = 1;
             }
@@ -213,8 +211,40 @@ public class TreasureChest {
 
     public void removeTreasureChest() {
         CustomTreasureChestsConfig.removeTreasureChestEntry(location, customTreasureChestConfigFields.getFilename());
-        location.getBlock().setBlockData(Material.AIR.createBlockData());
+        if (location != null && location.getWorld() != null)
+            location.getBlock().setBlockData(Material.AIR.createBlockData());
         treasureChestHashMap.remove(location);
+    }
+
+    @Override
+    public void chunkLoad() {
+    }
+
+    @Override
+    public void chunkUnload() {
+    }
+
+    @Override
+    public void worldLoad(World world) {
+        this.location = ConfigurationLocation.serialize(locationString);
+        initializeChest();
+        treasureChestHashMap.put(location, this);
+    }
+
+    @Override
+    public void worldUnload() {
+        treasureChestHashMap.remove(location);
+        //todo stop restock timer here
+    }
+
+    @Override
+    public Location getPersistentLocation() {
+        return getLocation();
+    }
+
+    @Override
+    public String getWorldName() {
+        return worldName;
     }
 
     public enum DropStyle {
@@ -236,32 +266,11 @@ public class TreasureChest {
         }
 
         @EventHandler
-        public void onWorldLoad(WorldLoadEvent event) {
-            for (TreasureChest treasureChest : getUnloadedChests().get(event.getWorld().getName())) {
-                treasureChest.location.setWorld(event.getWorld());
-                treasureChest.generateChest();
-                treasureChestHashMap.put(treasureChest.location, treasureChest);
-            }
-            getUnloadedChests().removeAll(event.getWorld().getName());
-        }
-
-        @EventHandler
-        public void onWorldUnload(WorldUnloadEvent event) {
-            for (Iterator<Map.Entry<Location, TreasureChest>> iterator = getTreasureChestHashMap().entrySet().iterator(); iterator.hasNext(); ) {
-                Map.Entry<Location, TreasureChest> entry = iterator.next();
-                TreasureChest treasureChest = entry.getValue();
-                getUnloadedChests().put(event.getWorld().getName(), treasureChest);
-                iterator.remove();
-            }
-        }
-
-        @EventHandler
         public void onBreak(BlockBreakEvent event) {
             for (TreasureChest treasureChest : treasureChestHashMap.values())
                 if (event.getBlock().getLocation().equals(treasureChest.location.getBlock().getLocation()))
                     event.setCancelled(true);
         }
-
     }
 
 }

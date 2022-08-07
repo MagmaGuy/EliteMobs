@@ -7,7 +7,7 @@ public class DamageUndeadConfig extends EnchantmentsConfigFields {
         super("damage_undead",
                 true,
                 "Smite",
-                100,
+                4,
                 6);
     }
 }

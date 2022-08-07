@@ -18,6 +18,11 @@ import java.util.UUID;
 public class ElitePlayerInventory {
 
     public static HashMap<UUID, ElitePlayerInventory> playerInventories = new HashMap<>();
+
+    public static ElitePlayerInventory getPlayer(Player player) {
+        return playerInventories.get(player.getUniqueId());
+    }
+
     public final PlayerItem helmet, chestplate, leggings, boots, mainhand, offhand;
     private final Player player;
     private boolean getArmorCooldown = false;
@@ -51,13 +56,29 @@ public class ElitePlayerInventory {
      *
      * @return Average of all armor tiers
      */
-    public double getArmorTier(boolean update) {
+    public double getArmorLevel(boolean update) {
         if (!armorCheck()) update = false;
         return (helmet.getTier(player.getInventory().getHelmet(), update) +
                 chestplate.getTier(player.getInventory().getChestplate(), update) +
                 leggings.getTier(player.getInventory().getLeggings(), update) +
                 boots.getTier(player.getInventory().getBoots(), update))
                 / 4D;
+    }
+
+    public double getEliteDefense(boolean update) {
+        if (!armorCheck()) update = false;
+        return helmet.getEliteDefense(player.getInventory().getHelmet(), update) +
+                chestplate.getEliteDefense(player.getInventory().getChestplate(), update) +
+                leggings.getEliteDefense(player.getInventory().getLeggings(), update) +
+                boots.getEliteDefense(player.getInventory().getBoots(), update);
+    }
+
+    public double getEliteProjectileProtection(boolean update){
+        if (!armorCheck()) update = false;
+        return helmet.getProtectionProjectile(player.getInventory().getHelmet(), update) +
+                chestplate.getProtectionProjectile(player.getInventory().getChestplate(), update) +
+                leggings.getProtectionProjectile(player.getInventory().getLeggings(), update) +
+                boots.getProtectionProjectile(player.getInventory().getBoots(), update);
     }
 
     private boolean armorCheck() {
@@ -184,7 +205,7 @@ public class ElitePlayerInventory {
      * @return Base damage reduction value
      */
     public double baseDamageReduction() {
-        return getArmorTier(true);
+        return getArmorLevel(true);
     }
 
     /**

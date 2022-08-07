@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigurationExporter;
 import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
-import com.magmaguy.elitemobs.dungeons.Minidungeon;
+import com.magmaguy.elitemobs.dungeons.EMPackage;
 import com.magmaguy.elitemobs.utils.*;
 import lombok.Getter;
 import org.apache.commons.io.FileUtils;
@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Scanner;
 
 public class VersionChecker {
-    private static final List<Minidungeon> outdatedDungeons = new ArrayList<>();
+    private static final List<EMPackage> outdatedPackages = new ArrayList<>();
     private static boolean pluginIsUpToDate = true;
 
     private VersionChecker() {
@@ -86,20 +86,20 @@ public class VersionChecker {
 
     private static void checkDungeonVersions() {
         Bukkit.getScheduler().runTaskAsynchronously(MetadataHandler.PLUGIN, () -> {
-            outdatedDungeons.clear();
-            for (Minidungeon minidungeon : Minidungeon.getMinidungeons().values())
-                if (minidungeon.isInstalled()) {
-                    if (!minidungeon.getDungeonPackagerConfigFields().isDefaultDungeon()) continue;
+            outdatedPackages.clear();
+            for (EMPackage emPackage : EMPackage.getEmPackages().values())
+                if (emPackage.isInstalled()) {
+                    if (!emPackage.getDungeonPackagerConfigFields().isDefaultDungeon()) continue;
                     try {
-                        String versionString = readStringFromURL("https://www.magmaguy.com/api/" + minidungeon.getDungeonPackagerConfigFields().getFilename().replace(".yml", ""));
+                        String versionString = readStringFromURL("https://www.magmaguy.com/api/" + emPackage.getDungeonPackagerConfigFields().getFilename().replace(".yml", ""));
                         int releaseVersion = Integer.parseInt(versionString);
-                        if (minidungeon.getDungeonPackagerConfigFields().getDungeonVersion() < releaseVersion) {
-                            minidungeon.setOutOfDate(true);
-                            outdatedDungeons.add(minidungeon);
-                            new WarningMessage("Dungeon " + minidungeon.getDungeonPackagerConfigFields().getName() + " is outdated! You should go download the updated version! Link: " + minidungeon.getDungeonPackagerConfigFields().getDownloadLink());
+                        if (emPackage.getDungeonPackagerConfigFields().getDungeonVersion() < releaseVersion) {
+                            emPackage.setOutOfDate(true);
+                            outdatedPackages.add(emPackage);
+                            new WarningMessage("Dungeon " + emPackage.getDungeonPackagerConfigFields().getName() + " is outdated! You should go download the updated version! Link: " + emPackage.getDungeonPackagerConfigFields().getDownloadLink());
                         }
                     } catch (Exception exception) {
-                        new WarningMessage("Failed to get version for minidungeon " + minidungeon.getDungeonPackagerConfigFields().getFilename() + "! The URL " + "https://www.magmaguy.com/api/" + minidungeon.getDungeonPackagerConfigFields().getFilename().replace(".yml", "") + " could not be reached!");
+                        new WarningMessage("Failed to get version for EliteMobs package " + emPackage.getDungeonPackagerConfigFields().getFilename() + "! The URL " + "https://www.magmaguy.com/api/" + emPackage.getDungeonPackagerConfigFields().getFilename().replace(".yml", "") + " could not be reached!");
                     }
                 }
         });
@@ -187,11 +187,11 @@ public class VersionChecker {
                     if (!pluginIsUpToDate)
                         event.getPlayer().sendMessage(ChatColorConverter.convert("&a[EliteMobs] &cYour version of EliteMobs is outdated." +
                                 " &aYou can download the latest version from &3&n&ohttps://www.spigotmc.org/resources/%E2%9A%94elitemobs%E2%9A%94.40090/"));
-                    if (!outdatedDungeons.isEmpty()) {
+                    if (!outdatedPackages.isEmpty()) {
                         event.getPlayer().sendMessage(ChatColorConverter.convert("&a[EliteMobs] &cThe following dungeons are outdated:"));
-                        for (Minidungeon minidungeon : outdatedDungeons)
+                        for (EMPackage emPackage : outdatedPackages)
                             event.getPlayer().sendMessage(ChatColorConverter.convert(
-                                    "&c- " + minidungeon.getDungeonPackagerConfigFields().getName()));
+                                    "&c- " + emPackage.getDungeonPackagerConfigFields().getName()));
                         event.getPlayer().spigot().sendMessage(
                                 SpigotMessage.simpleMessage("&8[EliteMobs]&f You can download the update on "),
                                 SpigotMessage.hoverLinkMessage(

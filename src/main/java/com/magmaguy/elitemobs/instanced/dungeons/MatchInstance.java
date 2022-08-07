@@ -1,4 +1,4 @@
-package com.magmaguy.elitemobs.instanced;
+package com.magmaguy.elitemobs.instanced.dungeons;
 
 
 import com.magmaguy.elitemobs.ChatColorConverter;
@@ -56,6 +56,15 @@ public class MatchInstance {
     private HashMap<Block, DeathLocation> deathBanners = new HashMap<>();
 
     public MatchInstance(Location corner1, Location corner2, Location startLocation, Location exitLocation, int minPlayers, int maxPlayers, List<String> spawnPoints) {
+        addSpawnPoints(spawnPoints);
+        instantiate(corner1, corner2, startLocation, exitLocation, minPlayers, maxPlayers);
+    }
+
+    public MatchInstance(Location corner1, Location corner2, Location startLocation, Location exitLocation, int minPlayers, int maxPlayers) {
+        instantiate(corner1, corner2, startLocation, exitLocation, minPlayers, maxPlayers);
+    }
+
+    public void instantiate(Location corner1, Location corner2, Location startLocation, Location exitLocation, int minPlayers, int maxPlayers) {
         this.corner1 = corner1;
         this.corner2 = corner2;
         this.startLocation = startLocation;
@@ -90,7 +99,6 @@ public class MatchInstance {
 
         startWatchdogs();
 
-        addSpawnPoints(spawnPoints);
         instanceMessages();
 
         instances.add(this);
@@ -349,6 +357,7 @@ public class MatchInstance {
             if (event.getFinalDamage() < player.getHealth()) return;
             MatchInstance matchInstance = PlayerData.getMatchInstance(player);
             if (matchInstance == null) return;
+            if (matchInstance.state != InstancedRegionState.ONGOING) matchInstance.removePlayer(player);
             event.setCancelled(true);
             matchInstance.playerDeath(player);
         }
@@ -409,11 +418,11 @@ public class MatchInstance {
         }
 
         //This is necessary because physics updates might remove the banner while it should still be on there
-        public void bannerWatchdog(){
+        public void bannerWatchdog() {
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    if (!deathBanners.containsKey(bannerBlock)){
+                    if (!deathBanners.containsKey(bannerBlock)) {
                         cancel();
                         return;
                     }

@@ -6,8 +6,9 @@ import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
-import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntity;
-import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntityInterface;
+import com.magmaguy.elitemobs.mobconstructor.PersistentMovingEntity;
+import com.magmaguy.elitemobs.mobconstructor.PersistentObject;
+import com.magmaguy.elitemobs.mobconstructor.PersistentObjectHandler;
 import com.magmaguy.elitemobs.npcs.chatter.NPCChatBubble;
 import com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity;
 import com.magmaguy.elitemobs.thirdparty.modelengine.CustomModel;
@@ -19,10 +20,14 @@ import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Consumer;
 import org.bukkit.util.Vector;
@@ -31,12 +36,12 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class NPCEntity implements SimplePersistentEntityInterface {
+public class NPCEntity implements PersistentObject, PersistentMovingEntity {
 
     public final NPCsConfigFields npCsConfigFields;
     @Getter
     private final UUID uuid = UUID.randomUUID();
-    public SimplePersistentEntity simplePersistentEntity;
+    private PersistentObjectHandler persistentObjectHandler;
     private Villager villager = null;
     private Location spawnLocation;
     private boolean isTalking = false;
@@ -54,6 +59,7 @@ public class NPCEntity implements SimplePersistentEntityInterface {
             return;
         setSpawnLocation();
         queueSpawn();
+        persistentObjectHandler = new PersistentObjectHandler(this);
     }
 
     /**
@@ -74,11 +80,8 @@ public class NPCEntity implements SimplePersistentEntityInterface {
     }
 
     public void queueSpawn() {
-        if (spawnLocation != null && ChunkLocationChecker.locationIsLoaded(spawnLocation)) {
+        if (spawnLocation != null && ChunkLocationChecker.locationIsLoaded(spawnLocation))
             spawn();
-            return;
-        }
-        simplePersistentEntity = new SimplePersistentEntity(this);
     }
 
     private void spawn() {
@@ -99,7 +102,6 @@ public class NPCEntity implements SimplePersistentEntityInterface {
         EntityTracker.registerNPCEntity(this);
         initializeRole();
         setTimeout();
-        simplePersistentEntity = null;
     }
 
     private void setDisguise(LivingEntity livingEntity) {
@@ -164,16 +166,30 @@ public class NPCEntity implements SimplePersistentEntityInterface {
     }
 
     @Override
-    public void worldLoad() {
+    public void worldLoad(World world) {
         setSpawnLocation();
         queueSpawn();
     }
 
     @Override
     public void worldUnload() {
-        spawnLocation = null;
-        simplePersistentEntity = new SimplePersistentEntity(this);
+        spawnLocation.setWorld(null);
         remove(RemovalReason.WORLD_UNLOAD);
+    }
+
+    @Override
+    public Location getPersistentLocation() {
+        return getSpawnLocation();
+    }
+
+    @Override
+    public String getWorldName() {
+        if (getSpawnLocation() != null && getSpawnLocation().getWorld() != null)
+            return getSpawnLocation().getWorld().getName();
+        String world = null;
+        if (npCsConfigFields.getLocation() != null && !npCsConfigFields.getLocation().isEmpty())
+            world = npCsConfigFields.getLocation().split(",")[0];
+        return world;
     }
 
     //Can't be used after the NPCEntity is done initialising
@@ -207,7 +223,7 @@ public class NPCEntity implements SimplePersistentEntityInterface {
             public void run() {
                 isTalking = false;
             }
-        }.runTaskLater(MetadataHandler.PLUGIN, 20 * 3);
+        }.runTaskLater(MetadataHandler.PLUGIN, 20 * 3L);
     }
 
     public void setTimeout() {
@@ -229,21 +245,12 @@ public class NPCEntity implements SimplePersistentEntityInterface {
             this.villager = null;
         }
 
-        if (removalReason.equals(RemovalReason.CHUNK_UNLOAD)) {
-            simplePersistentEntity = new SimplePersistentEntity(this);
-        }
-
-        boolean permanentRemoval = false;
-
-        if (removalReason.equals(RemovalReason.REMOVE_COMMAND))
+        if (removalReason.equals(RemovalReason.REMOVE_COMMAND)) {
             npCsConfigFields.setEnabled(false);
-
-        if (removalReason.equals(RemovalReason.WORLD_UNLOAD) ||
-                removalReason.equals(RemovalReason.REMOVE_COMMAND))
-            permanentRemoval = true;
-
-        if (permanentRemoval)
             spawnLocation = null;
+            persistentObjectHandler.remove();
+        } else
+            persistentObjectHandler.updatePersistentLocation(getPersistentLocation());
     }
 
     /**
@@ -283,6 +290,18 @@ public class NPCEntity implements SimplePersistentEntityInterface {
         if (strings != null && !strings.isEmpty())
             return strings.get(ThreadLocalRandom.current().nextInt(strings.size()));
         return null;
+    }
+
+
+    public static class NPCEntityEvents implements Listener {
+        @EventHandler
+        public void worldUnloadEvent(WorldUnloadEvent event) {
+            for (NPCEntity npcEntity : EntityTracker.getNpcEntities().values()) {
+                if (npcEntity.getSpawnLocation() != null && npcEntity.getSpawnLocation().getWorld() == event.getWorld()) {
+                    npcEntity.worldUnload();
+                }
+            }
+        }
     }
 
 }

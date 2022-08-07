@@ -39,9 +39,6 @@ public class EliteExplosionEvent extends Event implements Cancellable {
         this.blockStates = blockStates;
     }
 
-    public static HandlerList getHandlerList() {
-        return handlers;
-    }
 
     public EliteEntity getEliteMobEntity() {
         return eliteEntity;

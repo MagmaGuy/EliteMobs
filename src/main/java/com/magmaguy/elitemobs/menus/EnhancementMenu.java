@@ -2,18 +2,16 @@ package com.magmaguy.elitemobs.menus;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobsItemDetector;
+import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
 import com.magmaguy.elitemobs.config.menus.premade.EnhancementMenuConfig;
 import com.magmaguy.elitemobs.items.EliteItemLore;
 import com.magmaguy.elitemobs.items.ItemTagger;
-import com.magmaguy.elitemobs.items.ItemTierFinder;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -43,7 +41,7 @@ public class EnhancementMenu extends EliteMenu {
             return;
         }
         int enhancementScore = ItemTagger.getEnchantment(EnhancementInventory.getItem(EnhancementMenuConfig.eliteUpgradeOrbInputSlot).getItemMeta(), "EliteUpgradeItem");
-        int itemScore = ItemTierFinder.findBattleTier(EnhancementInventory.getItem(EnhancementMenuConfig.eliteItemInputSlot));
+        int itemScore = EliteItemManager.getRoundedItemLevel(EnhancementInventory.getItem(EnhancementMenuConfig.eliteItemInputSlot));
 
         if (enhancementScore <= itemScore) {
             EnhancementInventory.setItem(EnhancementMenuConfig.outputSlot, null);
@@ -51,14 +49,7 @@ public class EnhancementMenu extends EliteMenu {
         }
 
         ItemStack outputItem = EnhancementInventory.getItem(EnhancementMenuConfig.eliteItemInputSlot).clone();
-        Enchantment mainCombatEnchantment = ItemTierFinder.getMainCombatEnchantment(outputItem.getType());
-        NamespacedKey enchantmentKey = mainCombatEnchantment.getKey();
-        ItemMeta itemMeta = outputItem.getItemMeta();
-        int enchantmentLevel = ItemTagger.getEnchantment(outputItem.getItemMeta(), enchantmentKey) + 1;
-        if (outputItem.getEnchantmentLevel(mainCombatEnchantment) + 1 <= mainCombatEnchantment.getMaxLevel())
-            outputItem.addEnchantment(mainCombatEnchantment, enchantmentLevel);
-        ItemTagger.registerEnchantment(itemMeta, enchantmentKey, enchantmentLevel);
-        outputItem.setItemMeta(itemMeta);
+        ItemTagger.setEliteDamageAttribute(outputItem, EliteItemManager.getDamageAtNextItemLevel(outputItem));
 
         new EliteItemLore(outputItem, false);
 
@@ -168,7 +159,7 @@ public class EnhancementMenu extends EliteMenu {
 
                 //Item is elite combat item
                 if (EliteMobsItemDetector.isEliteMobsItem(currentItem))
-                    if (ItemTierFinder.getMainCombatEnchantment(currentItem.getType()) != null)
+                    if (EliteItemManager.isWeapon(currentItem))
                         if (EnhancementInventory.getItem(eliteItemInputSlot) == null) {
                             EnhancementInventory.setItem(eliteItemInputSlot, currentItem);
                             playerInventory.remove(currentItem);

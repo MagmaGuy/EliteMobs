@@ -1,6 +1,6 @@
 package com.magmaguy.elitemobs.events;
 
-import com.magmaguy.elitemobs.combatsystem.PlayerDamagedByEliteMobHandler;
+import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
 import org.bukkit.GameMode;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -17,7 +17,7 @@ public class BossCustomAttackDamage {
             if (!(((Player) damagee).getGameMode().equals(GameMode.SURVIVAL) ||
                     ((Player) damagee).getGameMode().equals(GameMode.ADVENTURE))) return 0;
 
-        PlayerDamagedByEliteMobHandler.bypass = true;
+        PlayerDamagedByEliteMobEvent.PlayerDamagedByEliteMobEventFilter.setBypass(true);
         damagee.damage(damage, damager);
         damagee.setNoDamageTicks(0);
 

@@ -1,8 +1,8 @@
 package com.magmaguy.elitemobs.api;
 
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
-import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
-import com.magmaguy.elitemobs.dungeons.Minidungeon;
+import com.magmaguy.elitemobs.dungeons.EMPackage;
+import com.magmaguy.elitemobs.dungeons.WorldPackage;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import org.bukkit.Location;
@@ -69,11 +69,10 @@ public class PlayerTeleportEvent extends Event implements Cancellable {
 
     public void executeTeleport() {
         player.teleport(destination);
-        for (Minidungeon minidungeon : Minidungeon.getMinidungeons().values())
-            if (minidungeon.isInstalled() &&
-                    minidungeon.getDungeonPackagerConfigFields().getDungeonLocationType().equals(DungeonPackagerConfigFields.DungeonLocationType.WORLD) &&
-                    minidungeon.getWorld() != null &&
-                    minidungeon.getWorld().equals(originalLocation.getWorld()))
+        for (EMPackage emPackage : EMPackage.getEmPackages().values())
+            if (emPackage.isInstalled() &&
+                    emPackage instanceof WorldPackage &&
+                    ((WorldPackage) emPackage).getWorld() == destination.getWorld())
                 return;
 
         if (AdventurersGuildConfig.getGuildWorldLocation() != null &&

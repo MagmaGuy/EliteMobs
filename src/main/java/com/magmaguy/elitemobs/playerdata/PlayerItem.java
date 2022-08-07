@@ -1,9 +1,9 @@
 package com.magmaguy.elitemobs.playerdata;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.items.ItemTagger;
-import com.magmaguy.elitemobs.items.ItemTierFinder;
 import com.magmaguy.elitemobs.items.customenchantments.*;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffect;
 import org.bukkit.Material;
@@ -30,6 +30,9 @@ public class PlayerItem {
     private double hunterChance = 0;
     private double lightningChance = 0;
     private double earthquakeLevel = 0;
+    private double eliteDamageReduction = 0;
+    private double protectionProjectile = 0;
+    private double eliteDamage = 0;
 
     /**
      * Stores an instance of the custom EliteMobs values of what a player is wearing. This is used to reduce the amount
@@ -69,11 +72,14 @@ public class PlayerItem {
 
         //case when the item changed during runtime to another valid ItemStack
         this.itemStack = itemStack;
-        if (equipmentSlot.equals(EquipmentSlot.MAINHAND))
-            this.itemTier = ItemTierFinder.mainHandCombatParser(itemStack);
-        else
-            this.itemTier = ItemTierFinder.findBattleTier(itemStack);
-
+        if (equipmentSlot.equals(EquipmentSlot.MAINHAND)) {
+            this.itemTier = (int) Math.round(EliteItemManager.getWeaponLevel(itemStack));
+            this.eliteDamage = EliteItemManager.getBaseDamage(itemStack) + EliteItemManager.getEliteDamage(itemStack);
+        } else {
+            this.itemTier = (int) Math.round(EliteItemManager.getArmorLevel(itemStack));
+            this.eliteDamageReduction = EliteItemManager.getEliteDefense(itemStack) + EliteItemManager.getBonusEliteDefense(itemStack);
+            this.protectionProjectile = ItemTagger.getEnchantment(itemStack.getItemMeta(), Enchantment.PROTECTION_PROJECTILE.getKey());
+        }
         this.continuousPotionEffects = ItemTagger.getPotionEffects(itemStack.getItemMeta(), ItemTagger.continuousPotionEffectKey);
         this.onHitPotionEffects = ItemTagger.getPotionEffects(itemStack.getItemMeta(), ItemTagger.onHitPotionEffectKey);
 
@@ -124,6 +130,24 @@ public class PlayerItem {
         if (update)
             fullUpdate(itemStack);
         return this.itemTier;
+    }
+
+    public double getEliteDamage(ItemStack itemStack, boolean update) {
+        if (update)
+            fullUpdate(itemStack);
+        return this.eliteDamage;
+    }
+
+    public double getEliteDefense(ItemStack itemStack, boolean update) {
+        if (update)
+            fullUpdate(itemStack);
+        return this.eliteDamageReduction;
+    }
+
+    public double getProtectionProjectile(ItemStack itemStack, boolean update) {
+        if (update)
+            fullUpdate(itemStack);
+        return this.protectionProjectile;
     }
 
     public ArrayList<ElitePotionEffect> getContinuousPotionEffects(ItemStack itemStack, boolean update) {
