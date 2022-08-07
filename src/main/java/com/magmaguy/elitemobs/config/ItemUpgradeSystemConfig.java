@@ -1,6 +1,8 @@
 package com.magmaguy.elitemobs.config;
 
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
@@ -17,6 +19,9 @@ public class ItemUpgradeSystemConfig {
     private static String upgradeItemName;
     @Getter
     private static List<String> upgradeItemLore;
+    @Getter
+    private static Material material;
+
     private ItemUpgradeSystemConfig() {
     }
 
@@ -34,6 +39,13 @@ public class ItemUpgradeSystemConfig {
         upgradeItemLore = ConfigurationEngine.setList(fileConfiguration, "upgradeItemLore", Arrays.asList(
                 "&aUse at at the Enhancer NPC to upgrade",
                 "&aitems up to level $orbLevel!"));
+        String materialString = ConfigurationEngine.setString(fileConfiguration, "material", Material.HEART_OF_THE_SEA.toString());
+        try {
+            material = Material.valueOf(materialString);
+        } catch (Exception ex) {
+            new WarningMessage("Failed to set upgrade item material " + materialString + " as a valid material! This will default to " + Material.HEART_OF_THE_SEA.toString());
+            material = Material.HEART_OF_THE_SEA;
+        }
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }
 

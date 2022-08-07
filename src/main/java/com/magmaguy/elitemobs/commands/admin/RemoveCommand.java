@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.commands.admin;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
+import com.magmaguy.elitemobs.dungeons.SchematicDungeonPackage;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
@@ -45,10 +46,10 @@ public class RemoveCommand {
                         "&8[EliteMobs] &cRemoved a spawn location for boss " +
                                 ((RegionalBossEntity) eliteEntity).getCustomBossesConfigFields().getFilename()));
             if (eliteEntity instanceof RegionalBossEntity &&
-                    ((CustomBossEntity) eliteEntity).getMinidungeon() != null &&
-                    ((CustomBossEntity) eliteEntity).getMinidungeon().getDungeonPackagerConfigFields().getDungeonLocationType()
+                    ((CustomBossEntity) eliteEntity).getEmPackage() != null &&
+                    ((CustomBossEntity) eliteEntity).getEmPackage().getDungeonPackagerConfigFields().getDungeonLocationType()
                             .equals(DungeonPackagerConfigFields.DungeonLocationType.SCHEMATIC))
-                ((CustomBossEntity) eliteEntity).getMinidungeon().removeRelativeLocation((RegionalBossEntity) eliteEntity);
+                ((SchematicDungeonPackage) ((CustomBossEntity) eliteEntity).getEmPackage()).removeBoss((RegionalBossEntity) eliteEntity);
             eliteEntity.remove(RemovalReason.REMOVE_COMMAND);
             event.setCancelled(true);
         }

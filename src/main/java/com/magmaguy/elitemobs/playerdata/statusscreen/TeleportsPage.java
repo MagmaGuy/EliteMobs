@@ -3,7 +3,8 @@ package com.magmaguy.elitemobs.playerdata.statusscreen;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.commands.DungeonCommands;
 import com.magmaguy.elitemobs.config.menus.premade.PlayerStatusMenuConfig;
-import com.magmaguy.elitemobs.dungeons.Minidungeon;
+import com.magmaguy.elitemobs.dungeons.CombatContent;
+import com.magmaguy.elitemobs.dungeons.EMPackage;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -45,17 +46,17 @@ public class TeleportsPage {
         int counter = 0;
         ArrayList<TextComponent> textComponents = new ArrayList<>();
 
-        for (Minidungeon minidungeon : Minidungeon.getMinidungeons().values()) {
-            if (!minidungeon.isInstalled()) continue;
+        for (EMPackage emPackage : EMPackage.getEmPackages().values()) {
+            if (!emPackage.isInstalled() || !(emPackage instanceof CombatContent)) continue;
 
-            TextComponent message = new TextComponent(PlayerStatusScreen.convertLightColorsToBlack(minidungeon.getDungeonPackagerConfigFields().getName() + "\n"));
+            TextComponent message = new TextComponent(PlayerStatusScreen.convertLightColorsToBlack(emPackage.getDungeonPackagerConfigFields().getName() + "\n"));
             String hoverMessage = ChatColorConverter.convert(PlayerStatusMenuConfig.getOnTeleportHover() + "\n" +
-                    minidungeon.getDungeonPackagerConfigFields().getPlayerInfo()
-                            .replace("$bossCount", minidungeon.getRegionalBossCount() + "")
-                            .replace("$lowestTier", minidungeon.getLowestTier() + "")
-                            .replace("$highestTier", minidungeon.getHighestTier() + ""));
+                    emPackage.getDungeonPackagerConfigFields().getPlayerInfo()
+                            .replace("$bossCount", emPackage.getCustomBossEntityList().size() + "")
+                            .replace("$lowestTier", ((CombatContent) emPackage).getLowestLevel() + "")
+                            .replace("$highestTier", ((CombatContent) emPackage).getHighestLevel() + ""));
             message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(hoverMessage).create()));
-            message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/elitemobs dungeontp " + minidungeon.getDungeonPackagerConfigFields().getFilename()));
+            message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/elitemobs dungeontp " + emPackage.getDungeonPackagerConfigFields().getFilename()));
             textComponents.add(message);
 
             counter++;
@@ -84,14 +85,14 @@ public class TeleportsPage {
         Inventory inventory = Bukkit.createInventory(requestingPlayer, 54, PlayerStatusMenuConfig.getTeleportChestMenuName());
         int counter = 0;
         TeleportsPageEvents.orderedDungeons.clear();
-        for (Minidungeon minidungeon : Minidungeon.getMinidungeons().values()) {
-            if (!minidungeon.isInstalled()) continue;
-            TeleportsPageEvents.orderedDungeons.add(minidungeon);
-            inventory.setItem(counter, ItemStackGenerator.generateItemStack(Material.PAPER, minidungeon.getDungeonPackagerConfigFields().getName()
-                    , Collections.singletonList(minidungeon.getDungeonPackagerConfigFields().getPlayerInfo()
-                            .replace("$bossCount", minidungeon.getRegionalBossCount() + "")
-                            .replace("$lowestTier", minidungeon.getLowestTier() + "")
-                            .replace("$highestTier", minidungeon.getHighestTier() + ""))));
+        for (EMPackage emPackage : EMPackage.getEmPackages().values()) {
+            if (!emPackage.isInstalled() || !(emPackage instanceof CombatContent)) continue;
+            TeleportsPageEvents.orderedDungeons.add(emPackage);
+            inventory.setItem(counter, ItemStackGenerator.generateItemStack(Material.PAPER, emPackage.getDungeonPackagerConfigFields().getName()
+                    , Collections.singletonList(emPackage.getDungeonPackagerConfigFields().getPlayerInfo()
+                            .replace("$bossCount", emPackage.getCustomBossEntityList().size() + "")
+                            .replace("$lowestTier", ((CombatContent) emPackage).getLowestLevel() + "")
+                            .replace("$highestTier", ((CombatContent) emPackage).getHighestLevel() + ""))));
             counter++;
         }
         inventory.setItem(53, PlayerStatusMenuConfig.getBackItem());
@@ -101,9 +102,9 @@ public class TeleportsPage {
 
     public static class TeleportsPageEvents implements Listener {
         private static final Map<Player, Inventory> pageInventories = new HashMap<>();
-        private static List<Minidungeon> orderedDungeons = new ArrayList<>();
+        private static List<EMPackage> orderedDungeons = new ArrayList<>();
 
-        @EventHandler (ignoreCancelled = true)
+        @EventHandler(ignoreCancelled = true)
         public void onInventoryInteract(InventoryClickEvent event) {
             Player player = ((Player) event.getWhoClicked()).getPlayer();
             if (!pageInventories.containsKey(player)) return;

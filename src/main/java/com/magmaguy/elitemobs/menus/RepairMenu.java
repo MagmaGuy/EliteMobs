@@ -2,11 +2,11 @@ package com.magmaguy.elitemobs.menus;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobsItemDetector;
+import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
 import com.magmaguy.elitemobs.config.menus.premade.RepairMenuConfig;
 import com.magmaguy.elitemobs.items.ItemTagger;
-import com.magmaguy.elitemobs.items.ItemTierFinder;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -43,7 +43,7 @@ public class RepairMenu extends EliteMenu {
 
         int scrapLevel = ItemTagger.getEnchantment(repairInventory.getItem(RepairMenuConfig.eliteScrapInputSlot).getItemMeta(), "EliteScrap");
         ItemStack outputItem = repairInventory.getItem(RepairMenuConfig.eliteItemInputSlot).clone();
-        int itemLevel = ItemTierFinder.findBattleTier(outputItem);
+        int itemLevel = EliteItemManager.getRoundedItemLevel(outputItem);
         int baselineRepair = 300;
         int levelDifferenceModifier = (scrapLevel - itemLevel) * 10;
         int newDamage = baselineRepair + levelDifferenceModifier;
@@ -59,7 +59,8 @@ public class RepairMenu extends EliteMenu {
      *
      * @param player Player for whom the inventory will be created
      */
-    public void constructRepairMenu(Player player) {        String menuName = RepairMenuConfig.shopName;
+    public void constructRepairMenu(Player player) {
+        String menuName = RepairMenuConfig.shopName;
         if (ResourcePackDataConfig.isDisplayCustomMenuUnicodes())
             menuName = ChatColor.WHITE + "\uF801\uDB80\uDC2A\uF805           " + menuName;
 

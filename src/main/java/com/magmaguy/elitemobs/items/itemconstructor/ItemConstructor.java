@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.items.itemconstructor;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.ItemUpgradeSystemConfig;
 import com.magmaguy.elitemobs.items.EliteItemLore;
 import com.magmaguy.elitemobs.items.ItemTagger;
@@ -21,7 +22,8 @@ import java.util.List;
 
 public class ItemConstructor {
 
-    public static ItemStack constructItem(String rawName,
+    public static ItemStack constructItem(int level,
+                                          String rawName,
                                           Material material,
                                           HashMap<Enchantment, Integer> enchantments,
                                           HashMap<String, Integer> customEnchantments,
@@ -31,15 +33,19 @@ public class ItemConstructor {
                                           Player player,
                                           boolean showItemWorth,
                                           int customModelID) {
-
-        ItemStack itemStack;
-        ItemMeta itemMeta;
-
         /*
         Construct initial item
          */
-        itemStack = ItemStackGenerator.generateItemStack(material);
-        itemMeta = itemStack.getItemMeta();
+        ItemStack itemStack = ItemStackGenerator.generateItemStack(material);
+        /*
+        Set the item level
+         */
+        if (level != -1)
+            EliteItemManager.setEliteLevel(itemStack, level);
+        /*
+        Get meta
+         */
+        ItemMeta itemMeta = itemStack.getItemMeta();
 
         itemMeta.setDisplayName(ChatColorConverter.convert(rawName));
 
@@ -78,19 +84,22 @@ public class ItemConstructor {
      */
     public static ItemStack constructItem(double itemTier, EliteEntity killedMob, Player player, boolean showItemWorth) {
 
-        ItemStack itemStack;
-        ItemMeta itemMeta;
-
         /*
         Generate material
          */
         Material itemMaterial = MaterialGenerator.generateMaterial(itemTier);
-
         /*
         Construct initial item
          */
-        itemStack = ItemStackGenerator.generateItemStack(itemMaterial);
-        itemMeta = itemStack.getItemMeta();
+        ItemStack itemStack = ItemStackGenerator.generateItemStack(itemMaterial);
+        /*
+        Set the item level
+         */
+        EliteItemManager.setEliteLevel(itemStack, (int) Math.round(itemTier));
+        /*
+        Get meta
+         */
+        ItemMeta itemMeta = itemStack.getItemMeta();
 
          /*
         Generate item enchantments
@@ -203,7 +212,7 @@ public class ItemConstructor {
         /*
         Construct initial item
          */
-        itemStack = ItemStackGenerator.generateItemStack(Material.HEART_OF_THE_SEA);
+        itemStack = ItemStackGenerator.generateItemStack(ItemUpgradeSystemConfig.getMaterial());
         itemMeta = itemStack.getItemMeta();
 
         itemMeta.setDisplayName(ChatColorConverter.convert(ItemUpgradeSystemConfig.getUpgradeItemName().replace("$level", upgradeLevel + "")));

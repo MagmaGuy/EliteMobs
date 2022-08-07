@@ -82,6 +82,8 @@ public class MobCombatSettingsConfig {
     private static double strengthAndWeaknessDamageMultipliers;
     @Getter
     private static double resistanceDamageMultiplier;
+    @Getter
+    private static double blockingDamageReduction;
 
     private MobCombatSettingsConfig() {
     }
@@ -130,6 +132,7 @@ public class MobCombatSettingsConfig {
         fullHealMessage = ConfigurationEngine.setString(fileConfiguration, "fullHealMessage", "&2FULL HEAL!");
         strengthAndWeaknessDamageMultipliers = ConfigurationEngine.setDouble(fileConfiguration, "strengthAndWeaknessDamageMultipliers", 2D);
         resistanceDamageMultiplier = ConfigurationEngine.setDouble(fileConfiguration, "resistanceDamageMultiplier", 1);
+        blockingDamageReduction = ConfigurationEngine.setDouble(fileConfiguration, "blockingDamageReduction", 0.8);
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }

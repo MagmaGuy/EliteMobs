@@ -15,6 +15,7 @@ import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.events.CustomEvent;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import com.magmaguy.elitemobs.powers.meta.MajorPower;
@@ -39,7 +40,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class EliteEntity implements SimplePersistentEntityInterface {
+public class EliteEntity {
 
     protected final HashMap<Player, Double> damagers = new HashMap<>();
     protected final UUID eliteUUID = UUID.randomUUID();
@@ -169,7 +170,7 @@ public class EliteEntity implements SimplePersistentEntityInterface {
     /**
      * Elite UUID. This UUID is guaranteed to be final for the Elite Entity, and is not in sync with the {@link LivingEntity} {@link UUID} .
      * <p>
-     * Noteworthy uses: {@link EliteEntity} will survive chunk reloads, and in the case of {@link com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity} will survive deaths for the entirety of runtime.
+     * Noteworthy uses: {@link EliteEntity} will survive chunk reloads, and in the case of {@link RegionalBossEntity} will survive deaths for the entirety of runtime.
      *
      * @return The final UUID value of this {@link EliteEntity}
      */
@@ -649,28 +650,4 @@ public class EliteEntity implements SimplePersistentEntityInterface {
         return this.globalReinforcementEntities.size();
     }
 
-    /**
-     * This method is implemented by the {@link SimplePersistentEntityInterface} to conform to the pattern but is only ever used in overrides by extended classes.
-     */
-    @Override
-    public void chunkLoad() {
-        remove(RemovalReason.CHUNK_UNLOAD);
-    }
-
-    /**
-     * Chunk unloading always removes Elite Entities as if they are Custom Bosses they have their own handler with an override.
-     */
-    @Override
-    public void chunkUnload() {
-        remove(RemovalReason.CHUNK_UNLOAD);
-    }
-
-    @Override
-    public void worldLoad() {
-    }
-
-    @Override
-    public void worldUnload() {
-        remove(RemovalReason.WORLD_UNLOAD);
-    }
 }

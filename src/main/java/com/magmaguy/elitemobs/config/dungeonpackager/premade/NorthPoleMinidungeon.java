@@ -3,9 +3,7 @@ package com.magmaguy.elitemobs.config.dungeonpackager.premade;
 import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.World;
-import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 public class NorthPoleMinidungeon extends DungeonPackagerConfigFields {
@@ -13,22 +11,14 @@ public class NorthPoleMinidungeon extends DungeonPackagerConfigFields {
         super("north_pole_minidungeon",
                 false,
                 "&9The North Pole",
-                DungeonLocationType.WORLD,
                 Arrays.asList("&fThe Christmas minidungeon!",
                         "&6Credits: MagmaGuy & 69OzCanOfBepis"),
-                new ArrayList<>(),
-                new ArrayList<>(),
                 DiscordLinks.freeMinidungeons,
                 DungeonSizeCategory.MINIDUNGEON,
                 "em_north_pole",
-                null,
                 World.Environment.NORMAL,
                 true,
-                null,
-                null,
-                new Vector(0, 0, 0),
-                0D,
-                0D,
+                "em_north_pole,-265,42,-504,44,0",
                 0,
                 "Difficulty: &6Medium\n" +
                         "$bossCount bosses, from level $lowestTier to $highestTier\n" +

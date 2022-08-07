@@ -1,14 +1,13 @@
 package com.magmaguy.elitemobs.items.itemconstructor;
 
+import com.magmaguy.elitemobs.combatsystem.CombatSystem;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.ProceduralItemGenerationSettingsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfigFields;
 import com.magmaguy.elitemobs.items.EliteEnchantments;
-import com.magmaguy.elitemobs.items.ItemTierFinder;
 import com.magmaguy.elitemobs.items.customenchantments.CriticalStrikesEnchantment;
 import com.magmaguy.elitemobs.items.customenchantments.HunterEnchantment;
-import com.magmaguy.elitemobs.utils.VersionChecker;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -24,7 +23,7 @@ public class EnchantmentGenerator {
 
         for (Enchantment enchantment : enchantmentMap.keySet()) {
             if (enchantment != null)
-                if (enchantmentMap.get(enchantment) > enchantment.getMaxLevel() && ItemSettingsConfig.isUseEliteEnchantments()) {
+                if (enchantmentMap.get(enchantment) > enchantment.getMaxLevel()) {
                     if (EliteEnchantments.isPotentialEliteEnchantment(enchantment)) {
                         if (enchantmentMap.get(enchantment) > enchantment.getMaxLevel()) {
                             itemMeta.addEnchant(enchantment, enchantment.getMaxLevel(), true);
@@ -51,7 +50,7 @@ public class EnchantmentGenerator {
 
         HashMap<Enchantment, Integer> enchantmentMap = new HashMap<>();
 
-        itemTier -= ItemTierFinder.getMaterialTier(material);
+        itemTier -= CombatSystem.getMaterialTier(material);
 
         /*
         No enchantments for items too low tier to have one
@@ -77,7 +76,7 @@ public class EnchantmentGenerator {
             case IRON_SWORD:
             case STONE_SWORD:
             case WOODEN_SWORD:
-                enchantmentMap.putAll(validateAndApplyPrimaryEnchantment("DAMAGE_ALL", itemTier));
+                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DAMAGE_ALL"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DAMAGE_ARTHROPODS"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DAMAGE_UNDEAD"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DURABILITY"));
@@ -89,7 +88,7 @@ public class EnchantmentGenerator {
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("VANISHING_CURSE"));
                 break;
             case BOW:
-                enchantmentMap.putAll(validateAndApplyPrimaryEnchantment("ARROW_DAMAGE", itemTier));
+                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("ARROW_DAMAGE"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("ARROW_FIRE"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("ARROW_INFINITE"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("ARROW_KNOCKBACK"));
@@ -98,7 +97,7 @@ public class EnchantmentGenerator {
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("VANISHING_CURSE"));
                 break;
             case CROSSBOW:
-                enchantmentMap.putAll(validateAndApplyPrimaryEnchantment("ARROW_DAMAGE", itemTier));
+                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("ARROW_DAMAGE"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("QUICK_CHARGE"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("MULTISHOT"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("PIERCING"));
@@ -111,7 +110,7 @@ public class EnchantmentGenerator {
             case IRON_PICKAXE:
             case STONE_PICKAXE:
             case WOODEN_PICKAXE:
-                enchantmentMap.putAll(validateAndApplyPrimaryEnchantment("DIG_SPEED", itemTier));
+                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DIG_SPEED"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DURABILITY"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("MENDING"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("VANISHING_CURSE"));
@@ -127,7 +126,7 @@ public class EnchantmentGenerator {
             case IRON_SHOVEL:
             case STONE_SHOVEL:
             case WOODEN_SHOVEL:
-                enchantmentMap.putAll(validateAndApplyPrimaryEnchantment("DIG_SPEED", itemTier));
+                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DIG_SPEED"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DURABILITY"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("MENDING"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("VANISHING_CURSE"));
@@ -143,8 +142,8 @@ public class EnchantmentGenerator {
             case STONE_HOE:
             case WOODEN_HOE:
                 if (ItemSettingsConfig.isUseHoesAsWeapons())
-                    enchantmentMap.putAll(validateAndApplyPrimaryEnchantment("DAMAGE_ALL", itemTier));
-                enchantmentMap.putAll(validateAndApplyPrimaryEnchantment("DIG_SPEED", itemTier));
+                    validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DAMAGE_ALL"));
+                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DIG_SPEED"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DURABILITY"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("MENDING"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("VANISHING_CURSE"));
@@ -155,7 +154,7 @@ public class EnchantmentGenerator {
                 }
                 break;
             case SHIELD:
-                enchantmentMap.putAll(validateAndApplyPrimaryEnchantment("DURABILITY", itemTier));
+                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DURABILITY"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("MENDING"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("VANISHING_CURSE"));
                 break;
@@ -164,7 +163,7 @@ public class EnchantmentGenerator {
             case IRON_AXE:
             case STONE_AXE:
             case WOODEN_AXE:
-                enchantmentMap.putAll(validateAndApplyPrimaryEnchantment("DAMAGE_ALL", itemTier));
+                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DAMAGE_ALL"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DAMAGE_ARTHROPODS"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DAMAGE_UNDEAD"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DURABILITY"));
@@ -179,7 +178,7 @@ public class EnchantmentGenerator {
             case IRON_HELMET:
             case LEATHER_HELMET:
             case TURTLE_HELMET:
-                enchantmentMap.putAll(validateAndApplyPrimaryEnchantment("PROTECTION_ENVIRONMENTAL", itemTier));
+                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("PROTECTION_ENVIRONMENTAL"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("BINDING_CURSE"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DURABILITY"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("MENDING"));
@@ -196,7 +195,7 @@ public class EnchantmentGenerator {
             case GOLDEN_CHESTPLATE:
             case IRON_CHESTPLATE:
             case LEATHER_CHESTPLATE:
-                enchantmentMap.putAll(validateAndApplyPrimaryEnchantment("PROTECTION_ENVIRONMENTAL", itemTier));
+                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("PROTECTION_ENVIRONMENTAL"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DURABILITY"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("MENDING"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("PROTECTION_EXPLOSIONS"));
@@ -210,7 +209,7 @@ public class EnchantmentGenerator {
             case GOLDEN_LEGGINGS:
             case IRON_LEGGINGS:
             case LEATHER_LEGGINGS:
-                enchantmentMap.putAll(validateAndApplyPrimaryEnchantment("PROTECTION_ENVIRONMENTAL", itemTier));
+                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("PROTECTION_ENVIRONMENTAL"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("BINDING_CURSE"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DURABILITY"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("MENDING"));
@@ -225,7 +224,7 @@ public class EnchantmentGenerator {
             case GOLDEN_BOOTS:
             case IRON_BOOTS:
             case LEATHER_BOOTS:
-                enchantmentMap.putAll(validateAndApplyPrimaryEnchantment("PROTECTION_ENVIRONMENTAL", itemTier));
+                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("PROTECTION_ENVIRONMENTAL"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("BINDING_CURSE"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DURABILITY"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("MENDING"));
@@ -239,14 +238,14 @@ public class EnchantmentGenerator {
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("FROST_WALKER"));
                 break;
             case FISHING_ROD:
-                enchantmentMap.putAll(validateAndApplyPrimaryEnchantment("DURABILITY", itemTier));
+                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DURABILITY"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("VANISHING_CURSE"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("MENDING"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("LUCK"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("LURE"));
                 break;
             case SHEARS:
-                enchantmentMap.putAll(validateAndApplyPrimaryEnchantment("DIG_SPEED", itemTier));
+                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DIG_SPEED"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("VANISHING_CURSE"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("MENDING"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DURABILITY"));
@@ -267,7 +266,8 @@ public class EnchantmentGenerator {
 
         HashMap<Enchantment, Integer> validEnchantmentsClone = (HashMap<Enchantment, Integer>) validSecondaryEnchantments.clone();
 
-        while (secondaryEnchantmentCount != 0) {
+        //while (secondaryEnchantmentCount != 0) { todo: this is a temporary solution, this needs a permanent rarity system
+        while (ThreadLocalRandom.current().nextBoolean()) {
 
             if (validSecondaryEnchantments.size() < 1)
                 break;
@@ -407,23 +407,6 @@ public class EnchantmentGenerator {
 
     }
 
-    private static HashMap<Enchantment, Integer> validateAndApplyPrimaryEnchantment(String string, double itemTier) {
-
-        EnchantmentsConfigFields enchantmentsConfigFields = EnchantmentsConfig.getEnchantment(string.toLowerCase() + ".yml");
-
-        HashMap<Enchantment, Integer> enchantmentMap = new HashMap<>();
-
-        if (enchantmentsConfigFields != null && enchantmentsConfigFields.isEnabled()) {
-            Enchantment enchantment = enchantmentsConfigFields.getEnchantment();
-            int enchantmentLevel = Math.min(enchantmentsConfigFields.getMaxLevel(), (int) itemTier);
-            if (enchantmentLevel < 0) enchantmentLevel = 0;
-            enchantmentMap.put(enchantment, enchantmentLevel);
-        }
-
-        return enchantmentMap;
-
-    }
-
     private static HashMap<Enchantment, Integer> validateSecondaryEnchantments(String string) {
 
         EnchantmentsConfigFields enchantmentsConfigFields = EnchantmentsConfig.getEnchantment(string.toLowerCase() + ".yml");
@@ -476,14 +459,6 @@ public class EnchantmentGenerator {
             totalCount += validSecondaryEnchantments.get(enchantment);
 
         return totalCount;
-
-    }
-
-    //Version and subVersion should be set to the update at which the enchantment was introduced
-    private static boolean enchantmentBackwardsCompatibility(int version, int subVersion, String
-            actualEnchantement, String enchantmentToAvoid) {
-
-        return !VersionChecker.serverVersionOlderThan(version, subVersion) && actualEnchantement.equalsIgnoreCase(enchantmentToAvoid);
 
     }
 

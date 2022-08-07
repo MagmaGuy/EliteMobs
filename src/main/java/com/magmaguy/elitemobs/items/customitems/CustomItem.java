@@ -2,10 +2,10 @@ package com.magmaguy.elitemobs.items.customitems;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
+import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.config.customitems.CustomItemsConfig;
 import com.magmaguy.elitemobs.config.customitems.CustomItemsConfigFields;
-import com.magmaguy.elitemobs.items.ItemTierFinder;
 import com.magmaguy.elitemobs.items.LootTables;
 import com.magmaguy.elitemobs.items.ScalableItemConstructor;
 import com.magmaguy.elitemobs.items.customenchantments.*;
@@ -54,6 +54,7 @@ public class CustomItem {
     private double dropWeight = 0;
     private Scalability scalability;
     private ItemType itemType;
+    private int itemLevel = -1;
 
     /**
      * Generates a CustomItem object. This holds values for limited and dynamic items until a tier is determined for them.
@@ -62,6 +63,7 @@ public class CustomItem {
      */
     public CustomItem(CustomItemsConfigFields customItemsConfigFields) {
         this.customItemsConfigFields = customItemsConfigFields;
+        this.itemLevel = customItemsConfigFields.getLevel();
         this.permission = customItemsConfigFields.getPermission();
         parseFileName();
         if (!parseIsEnabled()) return;
@@ -96,14 +98,6 @@ public class CustomItem {
             return null;
         return customItems.get(fileName);
     }
-
-    /*
-    public static Item dropPlayerLoot(Player player, int tier, String customItemFileName, Location location) {
-        CustomItem customItem = getCustomItem(customItemFileName);
-        if (customItem == null) return null;
-        return customItem.dropPlayerLoot(player, tier, location);
-    }
-     */
 
     private static void addCustomItem(String fileName, CustomItem customItem) {
         customItems.put(fileName, customItem);
@@ -223,8 +217,7 @@ public class CustomItem {
                         ScalableItemConstructor.constructScalableItem(itemTier + 1, this, player, eliteEntity));
                 break;
             case FIXED:
-                loot = location.getWorld().dropItem(location,
-                        generateItemStack(itemTier + 1, player, eliteEntity));
+                loot = location.getWorld().dropItem(location, generateItemStack(itemLevel + 1, player, eliteEntity));
             default:
         }
 
@@ -373,13 +366,14 @@ public class CustomItem {
     }
 
     private void parseItemTier() {
-        this.itemTier = ItemTierFinder.findBattleTier(generateDefaultsItemStack(null, false, null));
+        this.itemTier = (int) Math.round(EliteItemManager.getItemLevel(generateDefaultsItemStack(null, false, null)));
     }
 
     public ItemStack generateDefaultsItemStack(Player player, boolean showItemWorth, EliteEntity eliteEntity) {
         if (player != null && !permission.isEmpty() && !player.hasPermission(permission)) return null;
         ItemStack itemStack =
                 ItemConstructor.constructItem(
+                        itemLevel,
                         getName(),
                         getMaterial(),
                         getEnchantments(),

@@ -1,24 +1,33 @@
 package com.magmaguy.elitemobs.api.internal;
 
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
-import com.magmaguy.elitemobs.dungeons.Minidungeon;
+import com.magmaguy.elitemobs.dungeons.SchematicDungeonPackage;
+import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.NotNull;
 
 
-public class NewMinidungeonRelativeBossLocationEvent extends Event implements Cancellable {
+public class NewSchematicPackageRelativeBossLocationEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
-    private final Minidungeon minidungeon;
+    @Getter
+    private final SchematicDungeonPackage schematicDungeonPackage;
+    @Getter
     private final Location relativeLocation;
+    @Getter
     private final Location realLocation;
+    @Getter
     private final CustomBossesConfigFields customBossesConfigFields;
     private boolean isCancelled = false;
 
-    public NewMinidungeonRelativeBossLocationEvent(Minidungeon minidungeon, Location relativeLocation, Location realLocation, CustomBossesConfigFields customBossesConfigFields) {
-        this.minidungeon = minidungeon;
+    public NewSchematicPackageRelativeBossLocationEvent(SchematicDungeonPackage schematicDungeonPackage,
+                                                        Location relativeLocation,
+                                                        Location realLocation,
+                                                        CustomBossesConfigFields customBossesConfigFields) {
+        this.schematicDungeonPackage = schematicDungeonPackage;
         this.relativeLocation = relativeLocation;
         this.realLocation = realLocation;
         this.customBossesConfigFields = customBossesConfigFields;
@@ -27,22 +36,6 @@ public class NewMinidungeonRelativeBossLocationEvent extends Event implements Ca
 
     public static HandlerList getHandlerList() {
         return handlers;
-    }
-
-    public Minidungeon getMinidungeon() {
-        return minidungeon;
-    }
-
-    public Location getRelativeLocation() {
-        return relativeLocation;
-    }
-
-    public Location getRealLocation() {
-        return realLocation;
-    }
-
-    public CustomBossesConfigFields getCustomBossConfigFields() {
-        return customBossesConfigFields;
     }
 
     @Override
@@ -55,9 +48,9 @@ public class NewMinidungeonRelativeBossLocationEvent extends Event implements Ca
         this.isCancelled = b;
     }
 
+    @NotNull
     @Override
     public HandlerList getHandlers() {
-        return handlers;
+        return null;
     }
-
 }

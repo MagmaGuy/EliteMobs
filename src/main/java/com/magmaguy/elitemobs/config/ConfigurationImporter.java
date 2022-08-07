@@ -60,48 +60,45 @@ public class ConfigurationImporter {
                 for (File file : unzippedFile.listFiles()) {
                     switch (file.getName()) {
                         case "custombosses":
-                            moveDirectory(file, Paths.get(configurationsPath.normalize() + "" + File.separatorChar + "custombosses"));
+                            moveDirectory(file, Paths.get(configurationsPath.normalize() + "" + File.separatorChar + "custombosses"), false);
                             break;
                         case "customitems":
-                            moveDirectory(file, Paths.get(configurationsPath.normalize() + "" + File.separatorChar + "customitems"));
+                            moveDirectory(file, Paths.get(configurationsPath.normalize() + "" + File.separatorChar + "customitems"), false);
                             break;
                         case "customtreasurechests":
-                            moveDirectory(file, Paths.get(configurationsPath.normalize() + "" + File.separatorChar + "customtreasurechests"));
+                            moveDirectory(file, Paths.get(configurationsPath.normalize() + "" + File.separatorChar + "customtreasurechests"), false);
                             break;
                         case "dungeonpackages":
-                            moveDirectory(file, Paths.get(configurationsPath.normalize() + "" + File.separatorChar + "dungeonpackages"));
+                            moveDirectory(file, Paths.get(configurationsPath.normalize() + "" + File.separatorChar + "dungeonpackages"), false);
                             break;
                         case "customevents":
-                            moveDirectory(file, Paths.get(configurationsPath.normalize() + "" + File.separatorChar + "customevents"));
+                            moveDirectory(file, Paths.get(configurationsPath.normalize() + "" + File.separatorChar + "customevents"), false);
                             break;
                         case "customspawns":
-                            moveDirectory(file, Paths.get(configurationsPath.normalize() + "" + File.separatorChar + "customspawns"));
+                            moveDirectory(file, Paths.get(configurationsPath.normalize() + "" + File.separatorChar + "customspawns"), false);
                             break;
                         case "customquests":
-                            moveDirectory(file, Paths.get(configurationsPath.normalize() + "" + File.separatorChar + "customquests"));
+                            moveDirectory(file, Paths.get(configurationsPath.normalize() + "" + File.separatorChar + "customquests"), false);
                             break;
                         case "npcs":
-                            moveDirectory(file, Paths.get(configurationsPath.normalize() + "" + File.separatorChar + "npcs"));
+                            moveDirectory(file, Paths.get(configurationsPath.normalize() + "" + File.separatorChar + "npcs"), false);
                             break;
                         case "wormholes":
-                            moveDirectory(file, Paths.get(configurationsPath.normalize() + "" + File.separatorChar + "wormholes"));
+                            moveDirectory(file, Paths.get(configurationsPath.normalize() + "" + File.separatorChar + "wormholes"), false);
                             break;
                         case "worldcontainer":
                             moveWorlds(file);
                             break;
                         case "ModelEngine":
+                            //todo: check if the "force" code is required, check if file is getting saved with modelengine doesn't have a configuration folder
+                            moveDirectory(file, Paths.get(file.getParentFile().getParentFile().getParentFile().getParentFile().toString()
+                                    + File.separatorChar + "ModelEngine" + File.separatorChar + "blueprints"), true);
                             if (Bukkit.getPluginManager().isPluginEnabled("ModelEngine")) {
-                                moveDirectory(file, Paths.get(file.getParentFile().getParentFile().getParentFile().getParentFile().toString() + File.separatorChar + "ModelEngine" + File.separatorChar + "blueprints"));
                                 importedModels = true;
-                            } else new WarningMessage("You need ModelEngine to install custom models!");
+                            } else new WarningMessage("You need ModelEngine to use custom models!");
                             break;
                         case "schematics":
-                            if (Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit")) {
-                                moveDirectory(file, Paths.get(file.getParentFile().getParentFile().getParentFile().getParentFile().toString() + File.separatorChar + "FastAsyncWorldEdit" + File.separatorChar + "schematics"));
-                            } else if (Bukkit.getPluginManager().isPluginEnabled("WorldEdit")) {
-                                moveDirectory(file, Paths.get(file.getParentFile().getParentFile().getParentFile().getParentFile().toString() + File.separatorChar + "WorldEdit" + File.separatorChar + "schematics"));
-                            } else
-                                new WarningMessage("You need WorldGuard or FastAsyncWorldEdit to install schematic-based minidungeons!");
+                            moveDirectory(file, Paths.get(configurationsPath.normalize() + "" + File.separatorChar + "schematics"), false);
                             break;
                         default:
                             new WarningMessage("Directory " + file.getName() + " for zipped file " + zippedFile.getName() + " was not a recognized directory for the file import system! Was the zipped file packaged correctly?");
@@ -165,27 +162,33 @@ public class ConfigurationImporter {
             }
     }
 
-    private static void moveDirectory(File unzippedDirectory, Path targetPath) {
+    private static void moveDirectory(File unzippedDirectory, Path targetPath, boolean force) {
         for (File file : unzippedDirectory.listFiles())
             try {
                 new InfoMessage("Adding " + file.getCanonicalPath());
-                moveFile(file, targetPath);
+                moveFile(file, targetPath, force);
             } catch (Exception exception) {
                 new WarningMessage("Failed to move directories for " + file.getName() + "! Tell the dev!");
                 exception.printStackTrace();
             }
     }
 
-    private static void moveFile(File file, Path targetPath) {
+    private static void moveFile(File file, Path targetPath, boolean force) {
         try {
             if (file.isDirectory()) {
                 if (Paths.get(targetPath + "" + File.separatorChar + file.getName()).toFile().exists())
                     for (File iteratedFile : file.listFiles())
-                        moveFile(iteratedFile, Paths.get(targetPath + "" + File.separatorChar + file.getName()));
+                        moveFile(iteratedFile, Paths.get(targetPath + "" + File.separatorChar + file.getName()), force);
                 else
                     Files.move(file.toPath(), Paths.get(targetPath + "" + File.separatorChar + file.getName()), StandardCopyOption.REPLACE_EXISTING);
-            } else
+            } else if (targetPath.toFile().exists())
                 Files.move(file.toPath(), Paths.get(targetPath + "" + File.separatorChar + file.getName()), StandardCopyOption.REPLACE_EXISTING);
+            else if (!Paths.get(targetPath + "" + File.separatorChar + file.getName()).toFile().exists() && force) {
+                File newFile = Paths.get(targetPath + "" + File.separatorChar + file.getName()).toFile();
+                newFile.mkdirs();
+                newFile.createNewFile();
+                Files.move(file.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            }
         } catch (Exception exception) {
             new WarningMessage("Failed to move directories for " + file.getName() + "! Tell the dev!");
             exception.printStackTrace();

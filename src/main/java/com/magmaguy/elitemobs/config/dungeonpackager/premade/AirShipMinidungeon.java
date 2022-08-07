@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.config.dungeonpackager.premade;
 
 import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
+import com.magmaguy.elitemobs.dungeons.SchematicPackage;
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.util.Vector;
 
@@ -13,7 +14,6 @@ public class AirShipMinidungeon extends DungeonPackagerConfigFields {
                 "airship_minidungeon",
                 false,
                 "&6The Airship",
-                DungeonLocationType.SCHEMATIC,
                 Arrays.asList("&fAn awesome airship full of undead pirates!",
                         "&6Credits: MagmaGuy, 69OzCanOfBepis",
                         "&6and Realm of Lotheridon"),
@@ -88,21 +88,18 @@ public class AirShipMinidungeon extends DungeonPackagerConfigFields {
                 new ArrayList<>(),
                 DiscordLinks.premiumMinidungeons,
                 DungeonSizeCategory.MINIDUNGEON,
-                null,
                 "em_airship.schem",
-                null,
                 true,
                 new Vector(38, -2, 0),
                 new Vector(-40, 70, 146),
-                new Vector(12, 14, 56),
-                0D,
-                0D,
+                "12,14,56,0,0",
                 0,
                 "Difficulty: &6Medium\n" +
                         "$bossCount bosses, from level $lowestTier to $highestTier\n" +
                         "&6An awesome airship full of undead pirates\n" +
                         "&6for experienced players!",
                 "&8[EM] &cEntering hostile air zone!",
-                "&8[EM] &cLeaving hostile air zone!");
+                "&8[EM] &cLeaving hostile air zone!",
+                SchematicPackage.SchematicRotation.SOUTH.toString());
     }
 }

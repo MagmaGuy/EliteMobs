@@ -8,7 +8,6 @@ import com.magmaguy.elitemobs.collateralminecraftchanges.*;
 import com.magmaguy.elitemobs.combatsystem.EliteCreeperExplosionHandler;
 import com.magmaguy.elitemobs.combatsystem.EliteMobDamagedByEliteMobHandler;
 import com.magmaguy.elitemobs.combatsystem.EliteMobGenericDamagedHandler;
-import com.magmaguy.elitemobs.combatsystem.PlayerDamagedByEliteMobHandler;
 import com.magmaguy.elitemobs.combatsystem.antiexploit.*;
 import com.magmaguy.elitemobs.combatsystem.combattag.CombatTag;
 import com.magmaguy.elitemobs.combatsystem.displays.HealthDisplay;
@@ -25,19 +24,20 @@ import com.magmaguy.elitemobs.gamemodes.nightmaremodeworld.DaylightWatchdog;
 import com.magmaguy.elitemobs.gamemodes.zoneworld.ZoneWarner;
 import com.magmaguy.elitemobs.initialsetup.FirstTimeSetup;
 import com.magmaguy.elitemobs.instanced.ArenaInstance;
-import com.magmaguy.elitemobs.instanced.MatchInstance;
+import com.magmaguy.elitemobs.instanced.dungeons.MatchInstance;
 import com.magmaguy.elitemobs.items.*;
 import com.magmaguy.elitemobs.items.customenchantments.*;
 import com.magmaguy.elitemobs.items.potioneffects.PlayerPotionEffects;
 import com.magmaguy.elitemobs.menus.*;
 import com.magmaguy.elitemobs.mobconstructor.MergeHandler;
-import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntity;
+import com.magmaguy.elitemobs.mobconstructor.PersistentObjectHandler;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.*;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.transitiveblocks.TransitiveBlockCommand;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.transitiveblocks.TransitiveBossBlock;
 import com.magmaguy.elitemobs.mobs.passive.*;
 import com.magmaguy.elitemobs.mobspawning.NaturalMobSpawnEventHandler;
 import com.magmaguy.elitemobs.npcs.NPCDamageEvent;
+import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.npcs.NPCInteractions;
 import com.magmaguy.elitemobs.npcs.chatter.NPCProximitySensor;
 import com.magmaguy.elitemobs.ondeathcommands.OnDeathCommands;
@@ -79,7 +79,6 @@ import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardEliteMobOnlySpawnF
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
 import com.magmaguy.elitemobs.utils.VersionChecker;
-import com.magmaguy.elitemobs.wormhole.WormholeEntry;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
@@ -121,7 +120,6 @@ public class EventsRegistrer {
                 register(new PreventUpgradeDiamondToNetherite());
 
         //Mob damage
-        register(new PlayerDamagedByEliteMobHandler());
         register(new EliteCreeperExplosionHandler());
         register(new EliteMobGenericDamagedHandler());
         register(new EliteMobDamagedByEliteMobHandler());
@@ -158,7 +156,7 @@ public class EventsRegistrer {
         register(new EliteExplosionEvent.EliteExplosionEvents());
 
         //Wormholes
-        register(new WormholeEntry.WormholeEntryEvent());
+        //register(new WormholeEntry.WormholeEntryEvent());
 
 
         /*
@@ -234,7 +232,7 @@ public class EventsRegistrer {
         //Custom bosses
         register(new CustomBossEntity.CustomBossEntityEvents());
         register(new CustomBossDeath());
-        register(new SimplePersistentEntity.PersistentEntityEvent());
+        register(new PersistentObjectHandler.PersistentObjectHandlerEvents());
         register(new CustomBossTaunts());
         register(new PhaseBossEntity.PhaseBossEntityListener());
         register(new RegionalBossEntity.RegionalBossEntityEvents());
@@ -373,6 +371,7 @@ public class EventsRegistrer {
         register(new NPCDamageEvent());
         register(new NPCInteractions());
         register(new NPCProximitySensor());
+        register(new NPCEntity.NPCEntityEvents());
         register(new FindNewWorlds());
         register(new WorldGuardSpawnEventBypasser());
         register(new WorldGuardEliteMobOnlySpawnFlag());

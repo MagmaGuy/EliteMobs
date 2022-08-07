@@ -3,13 +3,13 @@ package com.magmaguy.elitemobs.menus;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobsItemDetector;
+import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
 import com.magmaguy.elitemobs.config.TranslationConfig;
 import com.magmaguy.elitemobs.config.menus.premade.ScrapperMenuConfig;
 import com.magmaguy.elitemobs.config.menus.premade.SellMenuConfig;
-import com.magmaguy.elitemobs.items.ItemTierFinder;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
@@ -44,7 +44,7 @@ public class ScrapperMenu extends EliteMenu {
 
         String menuName = ScrapperMenuConfig.shopName;
         if (ResourcePackDataConfig.isDisplayCustomMenuUnicodes())
-            menuName = ChatColor.WHITE +  "\uF801\uDB80\uDC2B\uF805         " + menuName;
+            menuName = ChatColor.WHITE + "\uF801\uDB80\uDC2B\uF805         " + menuName;
 
         Inventory scrapInventory = Bukkit.createInventory(player, 54, menuName);
 
@@ -144,7 +144,7 @@ public class ScrapperMenu extends EliteMenu {
                         ItemStack itemStack = shopInventory.getItem(validSlot);
                         if (itemStack == null)
                             continue;
-                        int tier = ItemTierFinder.findBattleTier(itemStack);
+                        int tier = EliteItemManager.getRoundedItemLevel(itemStack);
                         for (int i = 0; i < itemStack.getAmount(); i++) {
                             if (ThreadLocalRandom.current().nextDouble() > .75) {
                                 player.sendMessage(ChatColorConverter.convert(ItemSettingsConfig.getScrapFailedMessage()));

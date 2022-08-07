@@ -142,18 +142,18 @@ public class LootTables implements Listener {
     /**
      * Used for "fake" drops. Currently this means it's used by the SimLootHandler, reason will default to shop.
      *
-     * @param itemTier
+     * @param itemLevel
      * @param location
      * @param player
      * @return
      */
-    public static ItemStack generateLoot(int itemTier, Location location, Player player) {
+    public static ItemStack generateLoot(int itemLevel, Location location, Player player) {
 
          /*
         Handle the odds of an item dropping
          */
         double baseChance = ItemSettingsConfig.getFlatDropRate();
-        double dropChanceBonus = ItemSettingsConfig.getTierIncreaseDropRate() * itemTier;
+        double dropChanceBonus = ItemSettingsConfig.getTierIncreaseDropRate() * itemLevel;
 
         if (ThreadLocalRandom.current().nextDouble() > baseChance + dropChanceBonus) return null;
 
@@ -161,7 +161,7 @@ public class LootTables implements Listener {
         if (proceduralItemsOn) weightedProbability.put("procedural", ItemSettingsConfig.getProceduralItemWeight());
         if (customItemsOn) {
             if (weighedItemsExist) weightedProbability.put("weighed", ItemSettingsConfig.getWeighedItemWeight());
-            if (fixedItemsExist) if (CustomItem.getFixedItems().containsKey(itemTier))
+            if (fixedItemsExist) if (CustomItem.getFixedItems().containsKey(itemLevel))
                 weightedProbability.put("fixed", ItemSettingsConfig.getFixedItemWeight());
             if (limitedItemsExist) weightedProbability.put("limited", ItemSettingsConfig.getLimitedItemWeight());
             if (scalableItemsExist) weightedProbability.put("scalable", ItemSettingsConfig.getScalableItemWeight());
@@ -171,15 +171,15 @@ public class LootTables implements Listener {
 
         switch (selectedLootSystem) {
             case "procedural":
-                return dropProcedurallyGeneratedItem(itemTier, location, player);
+                return dropProcedurallyGeneratedItem(itemLevel, location, player);
             case "weighed":
                 return dropWeighedFixedItem(location, player);
             case "fixed":
-                return dropFixedItem(location, itemTier, player);
+                return dropFixedItem(location, itemLevel, player);
             case "limited":
-                return dropLimitedItem(location, itemTier, player);
+                return dropLimitedItem(location, itemLevel, player);
             case "scalable":
-                return dropScalableItem(location, itemTier, player);
+                return dropScalableItem(location, itemLevel, player);
         }
 
         return null;
@@ -280,33 +280,33 @@ public class LootTables implements Listener {
         return generatedItemStack;
     }
 
-    private static ItemStack dropProcedurallyGeneratedItem(int tierLevel, EliteEntity eliteEntity, Player player) {
-        ItemStack itemStack = generateProcedurallyGeneratedItem(tierLevel, player, eliteEntity);
+    private static ItemStack dropProcedurallyGeneratedItem(int itemLevel, EliteEntity eliteEntity, Player player) {
+        ItemStack itemStack = generateProcedurallyGeneratedItem(itemLevel, player, eliteEntity);
         if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory()) player.getInventory().addItem(itemStack);
         else processPhysicalItem(eliteEntity.getLocation(), itemStack, player);
         return itemStack;
     }
 
-    private static ItemStack dropProcedurallyGeneratedItem(int tierLevel, Location location, Player player) {
-        ItemStack itemStack = generateProcedurallyGeneratedItem(tierLevel, player, null);
+    private static ItemStack dropProcedurallyGeneratedItem(int itemLevel, Location location, Player player) {
+        ItemStack itemStack = generateProcedurallyGeneratedItem(itemLevel, player, null);
         if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory()) player.getInventory().addItem(itemStack);
         else processPhysicalItem(location, itemStack, player);
         return itemStack;
     }
 
-    private static ItemStack generateProcedurallyGeneratedItem(int tierLevel, Player player, EliteEntity eliteEntity) {
-        return ItemConstructor.constructItem(tierLevel, eliteEntity, player, false);
+    private static ItemStack generateProcedurallyGeneratedItem(int itemLevel, Player player, EliteEntity eliteEntity) {
+        return ItemConstructor.constructItem(itemLevel, eliteEntity, player, false);
     }
 
-    private static ItemStack dropScalableItem(EliteEntity eliteEntity, int itemTier, Player player) {
-        ItemStack itemStack = generateScalableItem(itemTier, player, eliteEntity);
+    private static ItemStack dropScalableItem(EliteEntity eliteEntity, int itemLevel, Player player) {
+        ItemStack itemStack = generateScalableItem(itemLevel, player, eliteEntity);
         if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory()) player.getInventory().addItem(itemStack);
         else processPhysicalItem(eliteEntity.getLocation(), itemStack, player);
         return itemStack;
     }
 
-    private static ItemStack dropScalableItem(Location location, int itemTier, Player player) {
-        ItemStack itemStack = generateScalableItem(itemTier, player, null);
+    private static ItemStack dropScalableItem(Location location, int itemLevel, Player player) {
+        ItemStack itemStack = generateScalableItem(itemLevel, player, null);
         if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory()) player.getInventory().addItem(itemStack);
         else processPhysicalItem(location, itemStack, player);
         return itemStack;
@@ -316,8 +316,8 @@ public class LootTables implements Listener {
         return ScalableItemConstructor.randomizeScalableItem(itemTier, player, eliteEntity);
     }
 
-    private static ItemStack dropLimitedItem(EliteEntity eliteEntity, int itemTier, Player player) {
-        ItemStack itemStack = generateLimitedItem(itemTier, player, eliteEntity);
+    private static ItemStack dropLimitedItem(EliteEntity eliteEntity, int itemLevel, Player player) {
+        ItemStack itemStack = generateLimitedItem(itemLevel, player, eliteEntity);
         if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory()) player.getInventory().addItem(itemStack);
         else processPhysicalItem(eliteEntity.getLocation(), itemStack, player);
         return itemStack;

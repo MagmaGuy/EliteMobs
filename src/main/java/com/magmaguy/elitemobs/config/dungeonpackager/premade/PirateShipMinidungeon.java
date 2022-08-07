@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.config.dungeonpackager.premade;
 
 import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
+import com.magmaguy.elitemobs.dungeons.SchematicPackage;
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.util.Vector;
 
@@ -11,7 +12,6 @@ public class PirateShipMinidungeon extends DungeonPackagerConfigFields {
         super("pirate_ship_minidungeon",
                 false,
                 "&6The Pirate Ship",
-                DungeonLocationType.SCHEMATIC,
                 Arrays.asList("&fA fun, challenging minidungeon full of",
                         "&fbosses made for players starting to get good,",
                         "&fat EliteMobs!",
@@ -48,21 +48,18 @@ public class PirateShipMinidungeon extends DungeonPackagerConfigFields {
                 Arrays.asList(),
                 DiscordLinks.premiumMinidungeons,
                 DungeonSizeCategory.MINIDUNGEON,
-                null,
                 "em_pirate_ship.schem",
-                null,
                 true,
                 new Vector(16, -6, -1),
                 new Vector(-20, 58, 90),
-                new Vector(-17, 1, 49),
-                0,
-                0,
+                "-17,1,49,0,0",
                 0,
                 "Difficulty: &6Medium\n" +
                         "$bossCount bosses, from level $lowestTier to $highestTier\n" +
                         "&6One of the best hunting grounds for" +
                         "&6aspiring adventurers!",
                 "&8[EM] &3Now boarding the Pirate Ship! &bPillage and plunder to yer' hearts content!",
-                "&8[EM] &3Player overboard! &bReturn when you've earned your sea-legs ye' landlubber!");
+                "&8[EM] &3Player overboard! &bReturn when you've earned your sea-legs ye' landlubber!",
+                SchematicPackage.SchematicRotation.SOUTH.toString());
     }
 }

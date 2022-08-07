@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.config.dungeonpackager;
 
 import com.magmaguy.elitemobs.config.CustomConfig;
-import com.magmaguy.elitemobs.dungeons.Minidungeon;
+import com.magmaguy.elitemobs.dungeons.EMPackage;
 import lombok.Getter;
 
 import java.util.HashMap;
@@ -15,9 +15,10 @@ public class DungeonPackagerConfig extends CustomConfig {
     public DungeonPackagerConfig() {
         super("dungeonpackages", "com.magmaguy.elitemobs.config.dungeonpackager.premade", DungeonPackagerConfigFields.class);
         dungeonPackages = new HashMap<>();
-        for (String key : super.getCustomConfigFieldsHashMap().keySet())
+        for (String key : super.getCustomConfigFieldsHashMap().keySet()) {
             dungeonPackages.put(key, (DungeonPackagerConfigFields) super.getCustomConfigFieldsHashMap().get(key));
-        dungeonPackages.values().forEach(Minidungeon::new);
+            EMPackage.initialize((DungeonPackagerConfigFields) super.getCustomConfigFieldsHashMap().get(key));
+        }
     }
 
 }

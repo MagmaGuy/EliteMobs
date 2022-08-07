@@ -7,14 +7,17 @@ import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffect;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffectContainer;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.utils.PersistentVanillaData;
+import lombok.Getter;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.tags.ItemTagType;
 import org.bukkit.persistence.PersistentDataType;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,6 +31,12 @@ public class ItemTagger {
     public static NamespacedKey onHitPotionEffectKey = new NamespacedKey(MetadataHandler.PLUGIN, "onHitPotionEffect");
     public static NamespacedKey continuousPotionEffectKey = new NamespacedKey(MetadataHandler.PLUGIN, "continuousPotionEffect");
     public static NamespacedKey itemSource = new NamespacedKey(MetadataHandler.PLUGIN, "itemSource");
+
+    @Getter
+    private static final NamespacedKey ELITE_DAMAGE = new NamespacedKey(MetadataHandler.PLUGIN, "eliteDamage");
+    @Getter
+    private static final NamespacedKey ELITE_DEFENSE = new NamespacedKey(MetadataHandler.PLUGIN, "eliteDefense");
+
 
     public static void registerEliteItem(ItemMeta itemMeta) {
         itemMeta.getPersistentDataContainer().set(eliteMobsItemNamespacedKey, PersistentDataType.BYTE, (byte) 1);
@@ -206,5 +215,45 @@ public class ItemTagger {
         return PersistentVanillaData.getDouble(itemStack, itemValue);
     }
 
+    public static double getEliteDamageAttribute(@Nullable ItemStack itemStack) {
+        double value = 0;
+        if (itemStack != null &&
+                itemStack.getItemMeta() != null &&
+                itemStack.getItemMeta().getPersistentDataContainer().get(ELITE_DAMAGE, PersistentDataType.DOUBLE) != null)
+            return itemStack.getItemMeta().getPersistentDataContainer().get(ELITE_DAMAGE, PersistentDataType.DOUBLE);
+        return value;
+    }
+
+    public static double getEliteDamageAttribute(@Nullable Projectile projectile) {
+        if (projectile == null) return 0D;
+        return projectile.getPersistentDataContainer().get(ELITE_DAMAGE, PersistentDataType.DOUBLE);
+    }
+
+    public static void setEliteDamageAttribute(ItemStack itemStack, double damageValue) {
+        if (itemStack == null || itemStack.getItemMeta() == null) return;
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        itemMeta.getPersistentDataContainer().set(ELITE_DAMAGE, PersistentDataType.DOUBLE, damageValue);
+        itemStack.setItemMeta(itemMeta);
+    }
+
+    public static void setEliteDamageAttribute(@Nullable Projectile projectile, double damageValue) {
+        if (projectile == null) return;
+        projectile.getPersistentDataContainer().set(ELITE_DAMAGE, PersistentDataType.DOUBLE, damageValue);
+    }
+
+    public static double getEliteDefenseAttribute(@Nullable ItemStack itemStack) {
+        if (itemStack == null) return 0D;
+        if (itemStack.getItemMeta() == null) return 0D;
+        if (itemStack.getItemMeta().getPersistentDataContainer().get(ELITE_DEFENSE, PersistentDataType.DOUBLE) == null)
+            return 0D;
+        return itemStack.getItemMeta().getPersistentDataContainer().get(ELITE_DEFENSE, PersistentDataType.DOUBLE);
+    }
+
+    public static void setEliteDefenseAttribute(@Nullable ItemStack itemStack, double defenseValue) {
+        if (itemStack == null || itemStack.getItemMeta() == null) return;
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        itemMeta.getPersistentDataContainer().set(ELITE_DEFENSE, PersistentDataType.DOUBLE, defenseValue);
+        itemStack.setItemMeta(itemMeta);
+    }
 
 }

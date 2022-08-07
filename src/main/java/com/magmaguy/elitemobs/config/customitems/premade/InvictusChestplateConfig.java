@@ -12,8 +12,9 @@ public class InvictusChestplateConfig extends CustomItemsConfigFields {
         super("invictus_chestplate", true, Material.DIAMOND_CHESTPLATE, "&4Invictus Chestplate", Arrays.asList("&2Awarded to the champions of the", "&2Wood League Arena!"));
         if (!VersionChecker.serverVersionOlderThan(16, 0))
             setMaterial(Material.NETHERITE_CHESTPLATE);
-        setEnchantments(Arrays.asList("PROTECTION_ENVIRONMENTAL,50", "PROTECTION_EXPLOSIONS,25", "PROTECTION_PROJECTILE,25", "MENDING,1", "DURABILITY,5"));
+        setEnchantments(Arrays.asList("PROTECTION_ENVIRONMENTAL,5", "PROTECTION_EXPLOSIONS,4", "PROTECTION_PROJECTILE,4", "MENDING,1", "DURABILITY,5"));
         setPotionEffects(Arrays.asList("HEAL,0,self,onHit"));
         setItemType(CustomItem.ItemType.UNIQUE);
+        setLevel(50);
     }
 }

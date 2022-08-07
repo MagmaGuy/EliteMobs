@@ -86,12 +86,12 @@ public class WormholeTask {
             destination = wormholeEntry.getWormhole().getWormholeEntry2().getLocation();
         else destination = wormholeEntry.getWormhole().getWormholeEntry1().getLocation();
         if (destination == null || destination.getWorld() == null) {
-            if (wormholeEntry.getWormhole().getPortalMissingMessage() == null)
+            if (wormholeEntry.getPortalMissingMessage() == null)
                 player.sendMessage(ChatColorConverter.convert(WormholesConfig.getDefaultPortalMissingMessage()));
             else {
-                player.sendMessage(wormholeEntry.getWormhole().getPortalMissingMessage());
+                player.sendMessage(wormholeEntry.getPortalMissingMessage());
                 if (player.isOp() || player.hasPermission("elitemobs.*"))
-                    player.sendMessage(wormholeEntry.getWormhole().getOpMessage());
+                    player.sendMessage(wormholeEntry.getOpMessage());
             }
             return;
         }

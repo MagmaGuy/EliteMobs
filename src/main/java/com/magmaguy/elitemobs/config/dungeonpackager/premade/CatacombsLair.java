@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.config.dungeonpackager.premade;
 
 import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
+import com.magmaguy.elitemobs.dungeons.SchematicPackage;
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.util.Vector;
 
@@ -12,7 +13,6 @@ public class CatacombsLair extends DungeonPackagerConfigFields {
         super("catacombs_lair",
                 false,
                 "&8The Catacombs",
-                DungeonLocationType.SCHEMATIC,
                 Arrays.asList("&fThe best starter dungeon for players!",
                         "&6Credits: Realm of Lotheridon"),
                 Arrays.asList(
@@ -23,20 +23,17 @@ public class CatacombsLair extends DungeonPackagerConfigFields {
                 Collections.singletonList("catacombs_tier_15_treasure_chest.yml:-1,-14,15"),
                 DiscordLinks.premiumMinidungeons,
                 DungeonSizeCategory.LAIR,
-                null,
                 "em_catacombs.schem",
-                null,
                 true,
                 new Vector(13, -16, 0),
                 new Vector(-18, 17, 52),
-                new Vector(0, 0, 0),
-                0,
-                0,
+                "0,0,0,0,0",
                 0,
                 "Difficulty: &cHard\n" +
                         "$bossCount bosses, from tier $lowestTier to $highestTier\n" +
                         "&2The best Lair challenge for groups of beginners!",
                 "&8[EM] &8Now entering the Catacombs. Be careful with what dwells below...",
-                "&8[EM] &8You have left the Catacombs. Was it worth it?");
+                "&8[EM] &8You have left the Catacombs. Was it worth it?",
+                SchematicPackage.SchematicRotation.SOUTH.toString());
     }
 }

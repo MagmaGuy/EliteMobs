@@ -8,6 +8,7 @@ import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.types.tuples.Triplet;
 import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.commands.admin.*;
 import com.magmaguy.elitemobs.commands.quests.QuestCommand;
 import com.magmaguy.elitemobs.commands.setup.SetupMenu;
@@ -17,7 +18,7 @@ import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestsConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
-import com.magmaguy.elitemobs.dungeons.Minidungeon;
+import com.magmaguy.elitemobs.dungeons.EMPackage;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.events.TimedEvent;
 import com.magmaguy.elitemobs.items.ItemTagger;
@@ -101,15 +102,6 @@ public class AdminCommands {
                 .permission("elitemobs.*")
                 .handler(commandContext -> SetupHandler.setupUnminidungeonCommand((Player) commandContext.getSender(), commandContext.get("minidungeonName"))));
 
-        // /em setup unminidungeonNoPaste <minidungeonName>
-        manager.command(builder.literal("setup")
-                .literal("unminidungeonNoPaste")
-                .argument(StringArgument.newBuilder("minidungeonName"), ArgumentDescription.of("minidungeon name"))
-                .literal("noPaste")
-                .meta(CommandMeta.DESCRIPTION, "Uninstalls a Minidungeon without undoing a WorldEdit paste.")
-                .senderType(Player.class)
-                .permission("elitemobs.*")
-                .handler(commandContext -> SetupHandler.setupUnminidungeonNoPasteCommand((Player) commandContext.getSender(), commandContext.get("minidungeonName"))));
 
         // /em setup area <areaName>
         manager.command(builder.literal("setup")
@@ -268,7 +260,7 @@ public class AdminCommands {
                 .handler(commandContext -> CustomTreasureChestsConfig.addTreasureChestEntry(
                         (Player) commandContext.getSender(), commandContext.get("fileName"))));
 
-        ArrayList<String> minidungeonFileNames = new ArrayList<>(Minidungeon.getMinidungeons().keySet());
+        ArrayList<String> minidungeonFileNames = new ArrayList<>(EMPackage.getEmPackages().keySet());
 
         // /em addRelativeSpawnLocation <customBossFileName> <minidungeonFileName>
         manager.command(builder.literal("addRelativeSpawnLocation", "arsp")
@@ -833,6 +825,27 @@ public class AdminCommands {
                         commandContext.getSender().sendMessage("Failed to get player with that username!");
                     }
                 }));
+
+        manager.command(builder.literal("itemstats")
+                .meta(CommandMeta.DESCRIPTION, "Debug command to check item stats")
+                .senderType(CommandSender.class)
+                .permission("elitemobs.*")
+                .handler(commandContext -> {
+                    Player player = ((Player) commandContext.getSender());
+                    ItemStack item = player.getInventory().getItemInMainHand();
+                    double attackSpeed = EliteItemManager.getAttackSpeed(item);
+                    double damage = EliteItemManager.getBaseDamage(item);
+                    double dps = EliteItemManager.getDPS(item);
+                    double itemLevel = EliteItemManager.getWeaponLevel(item);
+                    double bonusEDPS = EliteItemManager.getTotalDPS(item);
+                    commandContext.getSender().sendMessage("[EliteMobs] Item Stats:");
+                    commandContext.getSender().sendMessage("Item attack speed: " + attackSpeed);
+                    commandContext.getSender().sendMessage("Item damage: " + damage);
+                    commandContext.getSender().sendMessage("Item EDPS: " + dps);
+                    commandContext.getSender().sendMessage("Item level: " + itemLevel);
+                    commandContext.getSender().sendMessage("Item bonus EDPS: " + bonusEDPS);
+                })
+        );
     }
 
     private void testFireball(Player player) {

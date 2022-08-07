@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.combatsystem;
 
+import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
@@ -18,6 +19,12 @@ import java.util.HashSet;
 public class EliteCreeperExplosionHandler implements Listener {
 
     private static final HashSet<Player> explosionPlayers = new HashSet<>();
+
+    public static double getDamageIncreasePercentage(Enchantment enchantment, ItemStack weapon) {
+        double maxEnchantmentLevel = EnchantmentsConfig.getEnchantment(enchantment).getMaxLevel();
+        double currentEnchantmentLevel = weapon.getEnchantmentLevel(enchantment);
+        return currentEnchantmentLevel / maxEnchantmentLevel <= 1 ? currentEnchantmentLevel / maxEnchantmentLevel : 1;
+    }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onEliteCreeperDetonation(ExplosionPrimeEvent event) {
@@ -45,7 +52,7 @@ public class EliteCreeperExplosionHandler implements Listener {
                     if (itemStack == null) continue;
                     for (Enchantment enchantment : itemStack.getEnchantments().keySet())
                         if (enchantment.getName().equals(Enchantment.PROTECTION_EXPLOSIONS.getName()))
-                            damageReduction += PlayerDamagedByEliteMobHandler.getDamageIncreasePercentage(enchantment, itemStack);
+                            damageReduction += getDamageIncreasePercentage(enchantment, itemStack);
                 }
                 damageReduction += elitePlayerInventory.baseDamageReduction();
                 double finalDamage = eliteEntity.getLevel() - damageReduction;

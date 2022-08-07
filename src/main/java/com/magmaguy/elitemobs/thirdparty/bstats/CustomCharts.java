@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.thirdparty.bstats;
 
 import com.magmaguy.elitemobs.EliteMobs;
-import com.magmaguy.elitemobs.dungeons.Minidungeon;
+import com.magmaguy.elitemobs.dungeons.EMPackage;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.AdvancedPie;
 import org.bukkit.ChatColor;
@@ -14,10 +14,10 @@ public class CustomCharts {
         Metrics metrics = EliteMobs.metrics;
         metrics.addCustomChart(new AdvancedPie("minidungeons", () -> {
             Map<String, Integer> valueMap = new HashMap<>();
-            for (Minidungeon minidungeon : Minidungeon.getMinidungeons().values()) {
+            for (EMPackage emPackage : EMPackage.getEmPackages().values()) {
                 valueMap.put(
-                        ChatColor.stripColor(minidungeon.getDungeonPackagerConfigFields().getFilename()),
-                        minidungeon.isInstalled() ? 1 : 0);
+                        ChatColor.stripColor(emPackage.getDungeonPackagerConfigFields().getFilename()),
+                        emPackage.isInstalled() ? 1 : 0);
             }
             return valueMap;
         }));

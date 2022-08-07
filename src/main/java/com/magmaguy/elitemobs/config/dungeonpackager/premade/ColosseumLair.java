@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.config.dungeonpackager.premade;
 
 import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
+import com.magmaguy.elitemobs.dungeons.SchematicPackage;
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.util.Vector;
 
@@ -12,7 +13,6 @@ public class ColosseumLair extends DungeonPackagerConfigFields {
         super("colosseum_lair",
                 false,
                 "&6The Colosseum",
-                DungeonLocationType.SCHEMATIC,
                 Arrays.asList("&fFeaturing the first true World boss, first",
                         "&fmulti-phased battle, first mounted boss,",
                         "&ffirst disguised boss... a truly epic fight!",
@@ -30,20 +30,17 @@ public class ColosseumLair extends DungeonPackagerConfigFields {
                 new ArrayList<>(),
                 DiscordLinks.premiumMinidungeons,
                 DungeonSizeCategory.LAIR,
-                null,
                 "em_colosseum.schem",
-                null,
                 true,
                 new Vector(40, -14, 0),
                 new Vector(-41, 31, 88),
-                new Vector(0, 0, 0),
-                0,
-                0,
+                "0,0,0,0,0",
                 0,
                 "Difficulty: &cHard\n" +
                         "$bossCount bosses, from level $lowestTier to $highestTier\n" +
                         "&cA true challenge for big groups of players!",
                 "&8[EM] &6Champions and challengers prepare! &eProve your worth against the most mighty of foes!",
-                "&8[EM] &6Farewell traveller! &eReturn soon to show your might once more!");
+                "&8[EM] &6Farewell traveller! &eReturn soon to show your might once more!",
+                SchematicPackage.SchematicRotation.SOUTH.toString());
     }
 }

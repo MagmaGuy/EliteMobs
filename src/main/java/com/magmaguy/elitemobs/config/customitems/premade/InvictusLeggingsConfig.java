@@ -12,8 +12,9 @@ public class InvictusLeggingsConfig extends CustomItemsConfigFields {
         super("invictus_leggings", true, Material.DIAMOND_LEGGINGS, "&4Invictus Leggings", Arrays.asList("&2Awarded to the champions of the", "&2Wood League Arena!"));
         if (!VersionChecker.serverVersionOlderThan(16, 0))
             setMaterial(Material.NETHERITE_LEGGINGS);
-        setEnchantments(Arrays.asList("PROTECTION_ENVIRONMENTAL,50", "PROTECTION_EXPLOSIONS,25", "PROTECTION_PROJECTILE,25", "MENDING,1", "DURABILITY,5"));
+        setEnchantments(Arrays.asList("PROTECTION_ENVIRONMENTAL,5", "PROTECTION_EXPLOSIONS,4", "PROTECTION_PROJECTILE,4", "MENDING,1", "DURABILITY,5"));
         setPotionEffects(Arrays.asList("JUMP,0,self,continuous"));
         setItemType(CustomItem.ItemType.UNIQUE);
+        setLevel(50);
     }
 }
