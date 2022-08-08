@@ -91,6 +91,9 @@ public class ConfigurationImporter {
                             break;
                         case "ModelEngine":
                             //todo: check if the "force" code is required, check if file is getting saved with modelengine doesn't have a configuration folder
+                            if (Bukkit.getPluginManager().isPluginEnabled("ModelEngine_Beta"))  //todo: this is just temporary
+                                moveDirectory(file, Paths.get(file.getParentFile().getParentFile().getParentFile().getParentFile().toString()
+                                        + File.separatorChar + "ModelEngine_Beta" + File.separatorChar + "blueprints"), true);
                             moveDirectory(file, Paths.get(file.getParentFile().getParentFile().getParentFile().getParentFile().toString()
                                     + File.separatorChar + "ModelEngine" + File.separatorChar + "blueprints"), true);
                             if (Bukkit.getPluginManager().isPluginEnabled("ModelEngine")) {

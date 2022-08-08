@@ -86,7 +86,8 @@ public class WormholeEntry implements PersistentObject {
                 return null;
         }
         Location teleportLocation = emPackage.getDungeonPackagerConfigFields().getTeleportLocation();
-        if (teleportLocation == null) return null;
+        if (teleportLocation == null)
+            return null;
         Vector offsetVector = teleportLocation.getDirection().clone().setY(0).normalize()
                 .multiply(1.5 * wormhole.getWormholeConfigFields().getSizeMultiplier())
                 .setY(-1 * wormhole.getWormholeConfigFields().getSizeMultiplier());

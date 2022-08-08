@@ -119,7 +119,7 @@ public class CustomBossMegaConsumer {
     }
 
     private void setCustomModel(LivingEntity livingEntity) {
-        if (!Bukkit.getPluginManager().isPluginEnabled("ModelEngine")) return;
+        if (!Bukkit.getPluginManager().isPluginEnabled("ModelEngine") && !Bukkit.getPluginManager().isPluginEnabled("ModelEngine_Beta")) return;
         if (customBossesConfigFields.getCustomModel() == null || customBossesConfigFields.getCustomModel().isEmpty())
             return;
         try {

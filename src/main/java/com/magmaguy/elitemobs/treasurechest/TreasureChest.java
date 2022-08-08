@@ -268,7 +268,9 @@ public class TreasureChest implements PersistentObject {
         @EventHandler
         public void onBreak(BlockBreakEvent event) {
             for (TreasureChest treasureChest : treasureChestHashMap.values())
-                if (event.getBlock().getLocation().equals(treasureChest.location.getBlock().getLocation()))
+                if (treasureChest.getLocation() != null &&
+                        treasureChest.getLocation().getWorld() != null &&
+                        event.getBlock().getLocation().equals(treasureChest.location.getBlock().getLocation()))
                     event.setCancelled(true);
         }
     }

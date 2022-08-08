@@ -312,7 +312,7 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
     }
 
     public void initializeSchematic() {
-
+        this.teleportLocation = ConfigurationLocation.serialize(teleportLocationString);
     }
 
 
