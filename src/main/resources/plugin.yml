@@ -1,9 +1,9 @@
 name: EliteMobs
-version: 8.0.0-SNAPSHOT-1
+version: 8.0.0-SNAPSHOT-2
 author: MagmaGuy
 main: com.magmaguy.elitemobs.EliteMobs
 api-version: 1.14
-softdepend: [ Multiverse-Core, WorldGuard, Vault, PlaceholderAPI, HolographicDisplays, DiscordSRV, LibsDisguises, WorldEdit, ModelEngine, Geyser-Spigot ]
+softdepend: [ Multiverse-Core, WorldGuard, Vault, PlaceholderAPI, HolographicDisplays, DiscordSRV, LibsDisguises, WorldEdit, ModelEngine, Geyser-Spigot, ModelEngine_Beta ]
 
 permissions:
   elitemobs.*:

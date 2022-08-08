@@ -258,7 +258,12 @@ public class EliteMobs extends JavaPlugin {
 
         //Initialize em package content
         for (EMPackage emPackage : EMPackage.getEmPackages().values())
-            if (emPackage.isInstalled()) emPackage.initializeContent();
+            try {
+                if (emPackage.isInstalled()) emPackage.initializeContent();
+            } catch (Exception exception) {
+                new WarningMessage("Failed to load EliteMobs Package " + emPackage.getDungeonPackagerConfigFields().getFilename() + " !");
+                exception.printStackTrace();
+            }
 
 
         //Initialize custom spawn methods, this runs late because it compares loaded worlds against worlds listed in the config

@@ -19,6 +19,7 @@ import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Objects;
 
 public class WormholeTask {
@@ -26,6 +27,7 @@ public class WormholeTask {
     }
 
     public static BukkitTask startWormholeTask(WormholeEntry wormholeEntry) {
+        HashSet<Player> teleportingPlayers = new HashSet<>();
         return new BukkitRunnable() {
             int counter = 0;
 
@@ -38,46 +40,46 @@ public class WormholeTask {
                 }
 
                 for (Player player : Bukkit.getServer().getOnlinePlayers())
-                    checkPoint(wormholeEntry, player.getLocation(), player);
+                    if (checkPoint(wormholeEntry, player.getLocation(), player, teleportingPlayers))
+                        teleportingPlayers.add(player);
+                    else teleportingPlayers.remove(player);
 
-                if (!WormholesConfig.isNoParticlesMode() &&
-                        !wormholeEntry.getWormhole().getWormholeConfigFields().getStyle().equals(Wormhole.WormholeStyle.NONE)) {
-                    if (counter >= wormholeEntry.getWormhole().getCachedRotations().size())
-                        counter = 0;
+                if (!WormholesConfig.isNoParticlesMode() && !wormholeEntry.getWormhole().
+                        getWormholeConfigFields().
+                        getStyle().
+                        equals(Wormhole.WormholeStyle.NONE)) {
+                    if (counter >= wormholeEntry.getWormhole().getCachedRotations().size()) counter = 0;
                     if (WormholesConfig.isReducedParticlesMode()) {
-                        if (counter % 2 == 0)
-                            visualEffect(counter, wormholeEntry);
-                    } else
-                        visualEffect(counter, wormholeEntry);
-                    if (counter + 1 >= Integer.MAX_VALUE)
-                        counter = 0;
+                        if (counter % 2 == 0) visualEffect(counter, wormholeEntry);
+                    } else visualEffect(counter, wormholeEntry);
+                    if (counter + 1 >= Integer.MAX_VALUE) counter = 0;
                     counter++;
                 }
             }
         }.runTaskTimerAsynchronously(MetadataHandler.PLUGIN, 0, 5);
+
     }
 
-    private static void checkPoint(WormholeEntry wormholeEntry, Location playerLocation, Player player) {
-        if (wormholeEntry.getLocation() == null) return;
-        if (Wormhole.getPlayerCooldowns().contains(player)) return;
-        if (wormholeEntry.getWormhole().getWormholeConfigFields().getPermission() != null &&
-                !wormholeEntry.getWormhole().getWormholeConfigFields().getPermission().isEmpty() &&
-                !player.hasPermission(wormholeEntry.getWormhole().getWormholeConfigFields().getPermission()))
-            return;
-        if (!Objects.equals(wormholeEntry.getLocation().getWorld(), playerLocation.getWorld())) return;
+    private static boolean checkPoint(WormholeEntry wormholeEntry, Location playerLocation, Player player, HashSet<Player> teleportingPlayers) {
+        if (wormholeEntry.getLocation() == null) return false;
+        if (Wormhole.getPlayerCooldowns().contains(player)) return false;
+        if (wormholeEntry.getWormhole().getWormholeConfigFields().getPermission() != null && !wormholeEntry.getWormhole().getWormholeConfigFields().getPermission().isEmpty() && !player.hasPermission(wormholeEntry.getWormhole().getWormholeConfigFields().getPermission()))
+            return false;
+        if (!Objects.equals(wormholeEntry.getLocation().getWorld(), playerLocation.getWorld())) return false;
         if (wormholeEntry.getLocation().distance(playerLocation) > 1.5 * wormholeEntry.getWormhole().getWormholeConfigFields().getSizeMultiplier())
-            return;
+            return false;
+        //A player might be standing in the teleporter after getting teleported, avoid teleporting them back
+        if (teleportingPlayers.contains(player)) return true;
         if (wormholeEntry.getWormhole().getWormholeConfigFields().getCoinCost() > 0) {
-            double coinCost = wormholeEntry.getWormhole().getWormholeConfigFields().getCoinCost() +
-                    wormholeEntry.getWormhole().getWormholeConfigFields().getCoinCost() * GuildRank.currencyBonusMultiplier(player.getUniqueId());
+            double coinCost = wormholeEntry.getWormhole().getWormholeConfigFields().getCoinCost() + wormholeEntry.getWormhole().getWormholeConfigFields().getCoinCost() * GuildRank.currencyBonusMultiplier(player.getUniqueId());
             if (EconomyHandler.checkCurrency(player.getUniqueId()) < coinCost) {
                 player.sendMessage(ChatColorConverter.convert(TranslationConfig.getInsufficientCurrencyForWormholeMessage()).replace("$amount", "" + coinCost));
-                return;
-            } else
-                EconomyHandler.subtractCurrency(player.getUniqueId(), coinCost);
+                return false;
+            } else EconomyHandler.subtractCurrency(player.getUniqueId(), coinCost);
         }
 
         teleport(wormholeEntry, player);
+        return true;
     }
 
     private static void teleport(WormholeEntry wormholeEntry, Player player) {
@@ -110,9 +112,7 @@ public class WormholeTask {
     private static void visualEffect(int counter, WormholeEntry wormholeEntry) {
         for (Vector vector : new ArrayList<Vector>(wormholeEntry.getWormhole().getCachedRotations().get(counter))) {
             Location particleLocation = wormholeEntry.getLocation().clone().add(vector);
-            wormholeEntry.getLocation().getWorld().spawnParticle(Particle.REDSTONE, particleLocation.getX(), particleLocation.getY(), particleLocation.getZ(),
-                    1, 0, 0, 0,
-                    1, new Particle.DustOptions(wormholeEntry.getWormhole().getParticleColor(), 1));
+            wormholeEntry.getLocation().getWorld().spawnParticle(Particle.REDSTONE, particleLocation.getX(), particleLocation.getY(), particleLocation.getZ(), 1, 0, 0, 0, 1, new Particle.DustOptions(wormholeEntry.getWormhole().getParticleColor(), 1));
         }
     }
 }

@@ -82,9 +82,13 @@ public class SchematicPackage extends EMPackage {
         Location anchorLocation = player.getLocation().getBlock().getLocation().add(new Vector(0.5, 1, 0.5));
         anchorLocation.setDirection(player.getLocation().getDirection());
         //Places the schematic using the WorldEdit API
-        if (paste)
-            if (!WorldEditUtils.place(dungeonPackagerConfigFields.getSchematicName(), getDungeonPackagerConfigFields().getCalculatedRotation(), anchorLocation.clone().subtract(new Vector(0, 1, 0)), this))
-                return false;
+        if (paste &&
+                !WorldEditUtils.place(
+                        dungeonPackagerConfigFields.getSchematicName(),
+                        getDungeonPackagerConfigFields().getCalculatedRotation(),
+                        anchorLocation.clone().subtract(new Vector(0, 1, 0)),
+                        this))
+            return false;
         dungeonPackagerConfigFields.installSchematic(anchorLocation, getDungeonPackagerConfigFields().getCalculatedRotation(), this);
         WorldGuardCompatibility.defineMinidungeon(
                 toRealPosition(dungeonPackagerConfigFields.getCorner1()),
