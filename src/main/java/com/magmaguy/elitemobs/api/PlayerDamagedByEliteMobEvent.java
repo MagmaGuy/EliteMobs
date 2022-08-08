@@ -82,8 +82,8 @@ public class PlayerDamagedByEliteMobEvent extends Event implements Cancellable {
     }
 
     public static class PlayerDamagedByEliteMobEventFilter implements Listener {
-    @Getter
-    @Setter
+        @Getter
+        @Setter
         private static boolean bypass = false;
 
         private static double eliteToPlayerDamageFormula(Player player, EliteEntity eliteEntity, EntityDamageByEntityEvent event) {
@@ -171,16 +171,6 @@ public class PlayerDamagedByEliteMobEvent extends Event implements Cancellable {
                 }
             }
 
-            //if the damage source is custom , the damage is final
-            if (bypass) {
-                bypass = false;
-                //Deal with the player getting killed
-                if (player.getHealth() - event.getDamage() <= 0)
-                    PlayerDeathMessageByEliteMob.addDeadPlayer(player, PlayerDeathMessageByEliteMob.initializeDeathMessage(player, eliteEntity.getLivingEntity()));
-                return;
-            }
-
-
             PlayerDamagedByEliteMobEvent playerDamagedByEliteMobEvent = new PlayerDamagedByEliteMobEvent(eliteEntity, player, event, projectile);
             if (!playerDamagedByEliteMobEvent.isCancelled)
                 new EventCaller(playerDamagedByEliteMobEvent);
@@ -198,6 +188,11 @@ public class PlayerDamagedByEliteMobEvent extends Event implements Cancellable {
             for (EntityDamageEvent.DamageModifier modifier : EntityDamageByEntityEvent.DamageModifier.values())
                 if (event.isApplicable(modifier))
                     event.setDamage(modifier, 0);
+
+            if (bypass) {
+                //Use raw damage in case of bypass
+                newDamage = event.getDamage();
+            }
 
             //Set the final damage value
             event.setDamage(EntityDamageEvent.DamageModifier.BASE, newDamage);

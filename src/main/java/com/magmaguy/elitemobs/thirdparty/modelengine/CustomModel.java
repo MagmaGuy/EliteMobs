@@ -20,42 +20,58 @@ public class CustomModel {
 
     ActiveModel activeModel;
     ModeledEntity modeledEntity;
+    /*
+    ModelBlueprint modelBlueprint;
+     */
     @Getter
     private boolean success = false;
-
+//todo: code for ModelEngine B3.0.0 is here, not live because of several issues like having to generate a new resource pack and also the code not fully working
 
     private CustomModel(LivingEntity livingEntity, String modelName, String nametagName) {
-
         try {
+            /*
+            if (ModelEngineAPI.api.getModelRegistry().getBlueprint(modelName) == null)
+             */
             if (ModelEngineAPI.api.getModelManager().getModelRegistry().getModelBlueprint(modelName) == null)
                 new InfoMessage("Model " + modelName + " was not found! Make sure you install the model correctly if you have it. This entry will be skipped!");
         } catch (NoSuchMethodError ex) {
-            new WarningMessage("Model Engine API version is not supported. Currently Elitemobs can only support ModelEngine R2.5.0, documentation for other versions doesn't exist.");
+            new WarningMessage("Model Engine API version is not supported. Currently Elitemobs can only support ModelEngine B3.0.0, documentation for other versions doesn't exist.");
         }
 
+        /*
+        modelBlueprint = ModelEngineAPI.api.getModelRegistry().getBlueprint(modelName);
+         */
         activeModel = ModelEngineAPI.api.getModelManager().createActiveModel(modelName);
-
-        if (activeModel == null || activeModel.getModelId() == null) {
+        /*
+        activeModel = ModelEngineAPI.createActiveModel(modelName);
+         */
+        if (activeModel == null) {
             new WarningMessage("Failed to load model from " + modelName + " ! Is the model name correct, and has the model been installed correctly?");
+            success = false;
             return;
         }
 
-        modeledEntity = ModelEngineAPI.api.getModelManager().createModeledEntity(livingEntity);
+        modeledEntity = ModelEngineAPI.createModeledEntity(livingEntity);
 
         if (modeledEntity == null) {
-            new WarningMessage("Failed to create model entity " + modelName + " ! Is the model name correct, and has the model been installed correctly?");
+            new WarningMessage("Failed to create model entity " + modelName + " ! This means the entity that was meant to get disguised has a problem!");
             return;
         }
 
         try {
+            /*
+            modeledEntity.addModel(activeModel, true);
+            modeledEntity.setBaseEntityVisible(false);
+            activeModel.playDefaultAnimation(ModelState.IDLE);
+            setName(nametagName, true);
+            success = true;
+             */
             modeledEntity.addActiveModel(activeModel);
             modeledEntity.detectPlayers();
             modeledEntity.setInvisible(true);
-            setName(nametagName, true);
-            success = true;
         } catch (Exception exception) {
             modeledEntity.removeModel(modelName);
-            new WarningMessage("Failed to make model entity " + modelName + " ! Is the model name correct, and has the model been installed correctly?");
+            new WarningMessage("Failed to make model entity " + modelName + " ! Couldn't assign model or visibility status.");
             exception.printStackTrace();
         }
 
@@ -68,6 +84,9 @@ public class CustomModel {
 
     public static void reloadModels() {
         try {
+            /*
+            ModelEngineAPI.api.getGenerator().importModelsAsync();
+             */
             ModelEngineAPI.api.getModelManager().registerModels();
         } catch (Exception ex) {
             new WarningMessage("Model Engine API version is not supported. Currently Elitemobs can only support ModelEngine R2.5.0, documentation for other versions doesn't exist.");
@@ -76,6 +95,12 @@ public class CustomModel {
 
     public void shoot() {
         if (activeModel == null) return;
+        /*
+        if (modelBlueprint.getAnimations().containsKey("attack_ranged"))
+            activeModel.getAnimationHandler().playAnimation("attack_ranged", 1, 1, 1);
+        else
+            activeModel.getAnimationHandler().playAnimation("attack", 1, 1, 1);
+         */
         if (activeModel.getState("attack_ranged") != null)
             activeModel.addState("attack_ranged", 1, 1, 1);
         else
@@ -83,7 +108,13 @@ public class CustomModel {
     }
 
     public void melee() {
+        /*
         if (activeModel == null) return;
+        if (modelBlueprint.getAnimations().containsKey("attack_melee"))
+            activeModel.getAnimationHandler().playAnimation("attack_melee", 1, 1, 1);
+        else
+            activeModel.getAnimationHandler().playAnimation("attack", 1, 1, 1);
+         */
         if (activeModel.getState("attack_melee") != null)
             activeModel.addState("attack_melee", 1, 1, 1);
         else
@@ -93,20 +124,22 @@ public class CustomModel {
     public void setName(String nametagName, boolean visible) {
         if (modeledEntity == null) return;
         /*
-        modeledEntity.setNametag(nametagName);
-        modeledEntity.setNametagVisible(visible);
-        */
+        activeModel.getNametagHandler().getBones().get("hitbox").setCustomName(nametagName);
+        activeModel.getNametagHandler().getBones().get("hitbox").setCustomNameVisible(visible);
+         */
         modeledEntity.getNametagHandler().setCustomName("hitbox", nametagName);
         modeledEntity.getNametagHandler().setCustomNameVisibility("hitbox", true);
-
     }
 
     public void switchPhase() {
-        activeModel.removeState("death", true);
+        //activeModel.getAnimationHandler().forceStopAllAnimations();
     }
 
     public void setNameVisible(boolean visible) {
-        // modeledEntity.setNametagVisible(visible);
+        /*
+        activeModel.getNametagHandler().getBones().get("hitbox").setCustomNameVisible(visible);
+
+         */
         modeledEntity.getNametagHandler().setCustomNameVisibility("hitbox", visible);
     }
 
