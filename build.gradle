@@ -12,7 +12,7 @@ compileJava.options.encoding = "UTF-8"
 compileTestJava.options.encoding = "UTF-8"
 
 group 'com.magmaguy'
-version '8.0.0-SNAPSHOT-2'
+version '8.0.0-SNAPSHOT-3'
 
 repositories {
     maven {
@@ -75,9 +75,9 @@ dependencies {
     //BStats API
     implementation group: 'org.bstats', name: 'bstats-bukkit', version: '2.2.1'
     //WorldGuard API
-    compileOnly group: 'com.sk89q.worldguard', name: 'worldguard-bukkit', version: '7.0.0'
+    compileOnly group: 'com.sk89q.worldguard', name: 'worldguard-bukkit', version: '7.0.7'
     //WorldGuard API
-    compileOnly group: 'com.sk89q.worldedit', name: 'worldedit-bukkit', version: '7.2.10'
+    compileOnly group: 'com.sk89q.worldedit', name: 'worldedit-bukkit', version: '7.2.12'
     //CloudCommands
     implementation group: 'cloud.commandframework', name: 'cloud-paper', version: '1.7.0'
     //CloudCommands Minecraft Extras module
@@ -108,7 +108,7 @@ dependencies {
 
     //lombok
     compileOnly 'org.projectlombok:lombok:1.18.24'
-    annotationProcessor 'org.projectlombok:lombok:1.18.22'
+    annotationProcessor 'org.projectlombok:lombok:1.18.24'
 
     //Model Engine
     compileOnly "com.ticxo.modelengine:api:R2.5.0"
