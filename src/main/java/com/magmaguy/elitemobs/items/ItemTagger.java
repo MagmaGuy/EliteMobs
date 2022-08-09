@@ -10,8 +10,7 @@ import com.magmaguy.elitemobs.utils.PersistentVanillaData;
 import lombok.Getter;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
+import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.tags.ItemTagType;
@@ -238,7 +237,17 @@ public class ItemTagger {
 
     public static void setEliteDamageAttribute(@Nullable Projectile projectile, double damageValue) {
         if (projectile == null) return;
-        projectile.getPersistentDataContainer().set(ELITE_DAMAGE, PersistentDataType.DOUBLE, damageValue);
+        if (ItemSettingsConfig.isUseEliteEnchantments())
+            projectile.getPersistentDataContainer().set(ELITE_DAMAGE, PersistentDataType.DOUBLE, damageValue);
+        else {
+            if (projectile.getType().equals(EntityType.ARROW)) {
+                Arrow arrow = (Arrow) projectile;
+                arrow.setDamage(arrow.getDamage() + damageValue);
+            } else if (projectile.getType().equals(EntityType.TRIDENT)) {
+                Trident trident = (Trident) projectile;
+                trident.setDamage(trident.getDamage() + damageValue);
+            }
+        }
     }
 
     public static double getEliteDefenseAttribute(@Nullable ItemStack itemStack) {
