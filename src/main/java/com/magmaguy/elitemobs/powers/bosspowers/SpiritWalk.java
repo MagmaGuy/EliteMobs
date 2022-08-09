@@ -74,83 +74,86 @@ public class SpiritWalk extends BossPower implements Listener {
     }
 
     public static void spiritWalkRegionalBossAnimation(EliteEntity eliteEntity, Location entityLocation, Location finalLocation) {
+        Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, bukkitTask -> {
+                    eliteEntity.getLivingEntity().setAI(false);
+                    eliteEntity.getLivingEntity().setInvulnerable(true);
+                    Vector toDestination = finalLocation.clone().subtract(entityLocation.clone()).toVector().normalize().divide(new Vector(2, 2, 2));
 
-        eliteEntity.getLivingEntity().setAI(false);
-        eliteEntity.getLivingEntity().setInvulnerable(true);
-        Vector toDestination = finalLocation.clone().subtract(entityLocation.clone()).toVector().normalize().divide(new Vector(2, 2, 2));
+                    Entity vehicle = null;
 
-        Entity vehicle = null;
+                    if (eliteEntity.getLivingEntity().isInsideVehicle()) {
+                        vehicle = eliteEntity.getLivingEntity().getVehicle();
+                        if (vehicle instanceof LivingEntity)
+                            ((LivingEntity) vehicle).setAI(false);
+                        vehicle.setInvulnerable(true);
+                        if (((CustomBossEntity) eliteEntity).getPhaseBossEntity() != null)
+                            vehicle.remove();
+                    }
 
-        if (eliteEntity.getLivingEntity().isInsideVehicle()) {
-            vehicle = eliteEntity.getLivingEntity().getVehicle();
-            if (vehicle instanceof LivingEntity)
-                ((LivingEntity) vehicle).setAI(false);
-            vehicle.setInvulnerable(true);
-            if (((CustomBossEntity) eliteEntity).getPhaseBossEntity() != null)
-                vehicle.remove();
-        }
+                    new BukkitRunnable() {
+                        final Entity vehicle = eliteEntity.getLivingEntity().getVehicle();
 
-        new BukkitRunnable() {
-            final Entity vehicle = eliteEntity.getLivingEntity().getVehicle();
+                        int counter = 0;
 
-            int counter = 0;
+                        @Override
+                        public void run() {
+                            if (!eliteEntity.isValid()) {
+                                cancel();
+                                return;
+                            }
 
-            @Override
-            public void run() {
-                if (!eliteEntity.isValid()) {
-                    cancel();
-                    return;
-                }
+                            if (eliteEntity.getLivingEntity().isInsideVehicle())
+                                eliteEntity.getLivingEntity().leaveVehicle();
 
-                if (eliteEntity.getLivingEntity().isInsideVehicle())
-                    eliteEntity.getLivingEntity().leaveVehicle();
+                            if (eliteEntity.getLivingEntity().getLocation().clone().distance(finalLocation) < 2 || counter > 20 * 10) {
 
-                if (eliteEntity.getLivingEntity().getLocation().clone().distance(finalLocation) < 2 || counter > 20 * 10) {
+                                eliteEntity.getLivingEntity().setAI(true);
+                                eliteEntity.getLivingEntity().setInvulnerable(false);
 
-                    eliteEntity.getLivingEntity().setAI(true);
-                    eliteEntity.getLivingEntity().setInvulnerable(false);
+                                if (vehicle != null && !vehicle.isDead())
+                                    vehicle.teleport(finalLocation);
+                                eliteEntity.getLivingEntity().teleport(finalLocation);
 
-                    if (vehicle != null && !vehicle.isDead())
-                        vehicle.teleport(finalLocation);
-                    eliteEntity.getLivingEntity().teleport(finalLocation);
+                                if (vehicle != null && !vehicle.isDead()) {
+                                    if (vehicle instanceof LivingEntity) {
+                                        ((LivingEntity) vehicle).setAI(true);
+                                        EliteEntity vehicleBoss = EntityTracker.getEliteMobEntity(vehicle);
+                                        if (vehicleBoss != null)
+                                            Bukkit.getServer().getPluginManager().callEvent(new EliteMobExitCombatEvent(vehicleBoss, EliteMobExitCombatEvent.EliteMobExitCombatReason.SPIRIT_WALK));
 
-                    if (vehicle != null && !vehicle.isDead()) {
-                        if (vehicle instanceof LivingEntity) {
-                            ((LivingEntity) vehicle).setAI(true);
-                            EliteEntity vehicleBoss = EntityTracker.getEliteMobEntity(vehicle);
-                            if (vehicleBoss != null)
-                                Bukkit.getServer().getPluginManager().callEvent(new EliteMobExitCombatEvent(vehicleBoss, EliteMobExitCombatEvent.EliteMobExitCombatReason.SPIRIT_WALK));
+                                    }
+
+                                    vehicle.setInvulnerable(false);
+                                    new BukkitRunnable() {
+                                        @Override
+                                        public void run() {
+                                            PreventMountExploit.bypass = true;
+                                            vehicle.addPassenger(eliteEntity.getLivingEntity());
+                                        }
+                                    }.runTaskLater(MetadataHandler.PLUGIN, 1);
+                                }
+                                cancel();
+
+                                Bukkit.getServer().getPluginManager().callEvent(new EliteMobExitCombatEvent(eliteEntity, EliteMobExitCombatEvent.EliteMobExitCombatReason.SPIRIT_WALK));
+                                if (eliteEntity.getLivingEntity() instanceof Mob)
+                                    if (((Mob) eliteEntity.getLivingEntity()).getTarget() == null)
+                                        eliteEntity.getLivingEntity().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 2));
+
+                            }
+
+                            if (vehicle != null && !vehicle.isDead()) {
+                                vehicle.teleport(eliteEntity.getLivingEntity().getLocation().clone().add(toDestination.clone()));
+                            }
+                            eliteEntity.getLivingEntity().teleport(eliteEntity.getLivingEntity().getLocation().clone().add(toDestination.clone()));
+
+                            counter++;
 
                         }
 
-                        vehicle.setInvulnerable(false);
-                        new BukkitRunnable() {
-                            @Override
-                            public void run() {
-                                PreventMountExploit.bypass = true;
-                                vehicle.addPassenger(eliteEntity.getLivingEntity());
-                            }
-                        }.runTaskLater(MetadataHandler.PLUGIN, 1);
-                    }
-                    cancel();
-
-                    Bukkit.getServer().getPluginManager().callEvent(new EliteMobExitCombatEvent(eliteEntity, EliteMobExitCombatEvent.EliteMobExitCombatReason.SPIRIT_WALK));
-                    if (eliteEntity.getLivingEntity() instanceof Mob)
-                        if (((Mob) eliteEntity.getLivingEntity()).getTarget() == null)
-                            eliteEntity.getLivingEntity().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 2));
-
+                    }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
                 }
 
-                if (vehicle != null && !vehicle.isDead()) {
-                    vehicle.teleport(eliteEntity.getLivingEntity().getLocation().clone().add(toDestination.clone()));
-                }
-                eliteEntity.getLivingEntity().teleport(eliteEntity.getLivingEntity().getLocation().clone().add(toDestination.clone()));
-
-                counter++;
-
-            }
-
-        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
+        );
 
     }
 

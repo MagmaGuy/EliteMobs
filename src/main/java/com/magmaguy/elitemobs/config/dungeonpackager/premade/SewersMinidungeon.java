@@ -18,7 +18,7 @@ public class SewersMinidungeon extends DungeonPackagerConfigFields {
                 "em_sewer_maze",
                 World.Environment.NORMAL,
                 true,
-                "em_sewer_maze,-24,167,175,90,0",
+                "em_sewer_maze,-24,167,-173,90,0",
                 0,
                 "Difficulty: &6Medium\n" +
                         "$bossCount bosses, from level $lowestTier to $highestTier\n" +
