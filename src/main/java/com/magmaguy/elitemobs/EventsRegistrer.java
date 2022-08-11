@@ -5,7 +5,6 @@ import com.magmaguy.elitemobs.adventurersguild.GuildRankMenuHandler;
 import com.magmaguy.elitemobs.adventurersguild.WorldSwitchBehavior;
 import com.magmaguy.elitemobs.api.*;
 import com.magmaguy.elitemobs.collateralminecraftchanges.*;
-import com.magmaguy.elitemobs.combatsystem.EliteCreeperExplosionHandler;
 import com.magmaguy.elitemobs.combatsystem.EliteMobDamagedByEliteMobHandler;
 import com.magmaguy.elitemobs.combatsystem.EliteMobGenericDamagedHandler;
 import com.magmaguy.elitemobs.combatsystem.antiexploit.*;
@@ -120,7 +119,6 @@ public class EventsRegistrer {
                 register(new PreventUpgradeDiamondToNetherite());
 
         //Mob damage
-        register(new EliteCreeperExplosionHandler());
         register(new EliteMobGenericDamagedHandler());
         register(new EliteMobDamagedByEliteMobHandler());
         if (MobCombatSettingsConfig.isEnableDeathMessages())

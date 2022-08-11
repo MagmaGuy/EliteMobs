@@ -39,7 +39,7 @@ public class QuestInventoryMenu {
     public static void generateInventoryQuestDirectory(List<? extends Quest> quests, Player player, NPCEntity npcEntity) {
         String menuTitle = "Quests";
         Inventory questInventory = Bukkit.createInventory(player, 27, menuTitle);
-        List<Integer> questSlots = new ArrayList<>(Arrays.asList(13, 11, 15, 9, 17, 10, 16, 12, 14));
+        List<Integer> questSlots = new ArrayList<>(Arrays.asList(13, 11, 15, 9, 17, 10, 16, 12, 14, 8));
         Material acceptMaterial = Material.GREEN_STAINED_GLASS_PANE;
         Material inProgressMaterial = Material.RED_STAINED_GLASS_PANE;
         Material completeMaterial = Material.ORANGE_STAINED_GLASS_PANE;
