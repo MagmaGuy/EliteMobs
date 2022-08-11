@@ -17,10 +17,14 @@ import org.bukkit.entity.*;
 import org.bukkit.event.*;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class PlayerDamagedByEliteMobEvent extends Event implements Cancellable {
@@ -88,20 +92,40 @@ public class PlayerDamagedByEliteMobEvent extends Event implements Cancellable {
 
         private static double eliteToPlayerDamageFormula(Player player, EliteEntity eliteEntity, EntityDamageByEntityEvent event) {
             double baseDamage = EliteMobProperties.getBaselineDamage(eliteEntity.getLivingEntity().getType(), eliteEntity);
+            //Case for creeper and ghast explosions
+            if (eliteEntity.getLivingEntity() != null && player.isValid() && player.getLocation().getWorld().equals(eliteEntity.getLivingEntity().getWorld()))
+                if (eliteEntity.getLivingEntity().getType().equals(EntityType.CREEPER)) {
+                    Creeper creeper = (Creeper) eliteEntity.getLivingEntity();
+                    double distance = player.getLocation().distance(eliteEntity.getLivingEntity().getLocation());
+                    double distanceAttenuation = 1 - distance / creeper.getExplosionRadius();
+                    distanceAttenuation = distanceAttenuation < 0 ? 0 : distanceAttenuation;
+                    baseDamage *= distanceAttenuation;
+                } else if (eliteEntity.getLivingEntity().getType().equals(EntityType.GHAST) &&
+                        event.getDamager().getType().equals(EntityType.FIREBALL)) {
+                    double distance = player.getLocation().distance(eliteEntity.getLivingEntity().getLocation());
+                    double distanceAttenuation = 1 - distance / ((Fireball) event.getDamager()).getYield();
+                    distanceAttenuation = distanceAttenuation < 0 ? 0 : distanceAttenuation;
+                    baseDamage *= distanceAttenuation;
+                }
             double bonusDamage = eliteEntity.getLevel();
 
             ElitePlayerInventory elitePlayerInventory = ElitePlayerInventory.getPlayer(player);
             if (elitePlayerInventory == null) return 0;
 
             double damageReduction = elitePlayerInventory.getEliteDefense(true);
-            if (event.getDamager() instanceof Projectile)
+            if (event.getDamager() instanceof AbstractArrow)
                 damageReduction += elitePlayerInventory.getEliteProjectileProtection(false);
+            if (event.getDamager() instanceof Fireball || event.getDamager() instanceof Creeper) {
+                damageReduction += elitePlayerInventory.getEliteBlastProtection(true);
+            }
 
             double customBossDamageMultiplier = eliteEntity.getDamageMultiplier();
             double potionEffectDamageReduction = 0;
 
             if (player.hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE))
-                potionEffectDamageReduction = (player.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE).getAmplifier() + 1) * MobCombatSettingsConfig.getResistanceDamageMultiplier();
+                potionEffectDamageReduction = (player.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE).
+
+                        getAmplifier() + 1) * MobCombatSettingsConfig.getResistanceDamageMultiplier();
 
             double finalDamage = (baseDamage * customBossDamageMultiplier + bonusDamage - damageReduction - potionEffectDamageReduction) *
                     MobCombatSettingsConfig.getDamageToPlayerMultiplier();
@@ -112,6 +136,16 @@ public class PlayerDamagedByEliteMobEvent extends Event implements Cancellable {
             finalDamage = finalDamage < 1 ? 1 : finalDamage > playerMaxHealth ? playerMaxHealth - 1 : finalDamage;
 
             return finalDamage;
+        }
+
+        //Remove potion effects of creepers when they blow up because Minecraft passes those effects to players, and they are infinite
+        @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+        private void explosionEvent(EntityExplodeEvent event) {
+            if (event.getEntity().getType().equals(EntityType.CREEPER) && EntityTracker.isEliteMob(event.getEntity())) {
+                //by default minecraft spreads potion effects
+                Set<PotionEffect> potionEffects = new HashSet<>(((Creeper) event.getEntity()).getActivePotionEffects());
+                potionEffects.forEach(potionEffectType -> ((Creeper) event.getEntity()).removePotionEffect(potionEffectType.getType()));
+            }
         }
 
         @EventHandler
@@ -179,7 +213,6 @@ public class PlayerDamagedByEliteMobEvent extends Event implements Cancellable {
                 bypass = false;
                 return;
             }
-
             double newDamage = eliteToPlayerDamageFormula(player, eliteEntity, event);
             //Blocking reduces damage by 80%
             if (blocking)

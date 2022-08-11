@@ -121,21 +121,20 @@ public class WormholeEntry implements PersistentObject {
     public void chunkLoad() {
         initializeTextDisplay();
         if (wormholeTask != null && !wormholeTask.isCancelled()) wormholeTask.cancel();
+        if (location == null) setLocationFromConfiguration();
         wormholeTask = WormholeTask.startWormholeTask(this);
     }
 
     @Override
     public void chunkUnload() {
         stop();
-        location = null;
     }
 
     @Override
     public void worldLoad(World world) {
         getDungeonLocation();
-        if (ChunkLocationChecker.locationIsLoaded(location)) {
+        if (ChunkLocationChecker.locationIsLoaded(location))
             chunkLoad();
-        }
     }
 
     @Override
