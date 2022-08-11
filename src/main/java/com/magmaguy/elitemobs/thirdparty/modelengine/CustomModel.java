@@ -36,6 +36,7 @@ public class CustomModel {
                 new InfoMessage("Model " + modelName + " was not found! Make sure you install the model correctly if you have it. This entry will be skipped!");
         } catch (NoSuchMethodError ex) {
             new WarningMessage("Model Engine API version is not supported. Currently Elitemobs can only support ModelEngine B3.0.0, documentation for other versions doesn't exist.");
+            return;
         }
 
         /*

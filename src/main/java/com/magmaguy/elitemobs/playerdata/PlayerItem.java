@@ -33,6 +33,7 @@ public class PlayerItem {
     private double eliteDamageReduction = 0;
     private double protectionProjectile = 0;
     private double eliteDamage = 0;
+    private double blastProtection = 0;
 
     /**
      * Stores an instance of the custom EliteMobs values of what a player is wearing. This is used to reduce the amount
@@ -79,6 +80,7 @@ public class PlayerItem {
             this.itemTier = (int) Math.round(EliteItemManager.getArmorLevel(itemStack));
             this.eliteDamageReduction = EliteItemManager.getEliteDefense(itemStack) + EliteItemManager.getBonusEliteDefense(itemStack);
             this.protectionProjectile = ItemTagger.getEnchantment(itemStack.getItemMeta(), Enchantment.PROTECTION_PROJECTILE.getKey());
+            this.blastProtection = ItemTagger.getEnchantment(itemStack.getItemMeta(), Enchantment.PROTECTION_EXPLOSIONS.getKey());
         }
         this.continuousPotionEffects = ItemTagger.getPotionEffects(itemStack.getItemMeta(), ItemTagger.continuousPotionEffectKey);
         this.onHitPotionEffects = ItemTagger.getPotionEffects(itemStack.getItemMeta(), ItemTagger.onHitPotionEffectKey);
@@ -148,6 +150,12 @@ public class PlayerItem {
         if (update)
             fullUpdate(itemStack);
         return this.protectionProjectile;
+    }
+
+    public double getBlastProtection(ItemStack itemStack, boolean update) {
+        if (update)
+            fullUpdate(itemStack);
+        return this.blastProtection;
     }
 
     public ArrayList<ElitePotionEffect> getContinuousPotionEffects(ItemStack itemStack, boolean update) {

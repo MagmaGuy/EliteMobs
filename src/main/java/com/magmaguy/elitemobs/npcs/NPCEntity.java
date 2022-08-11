@@ -248,8 +248,9 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
         if (removalReason.equals(RemovalReason.REMOVE_COMMAND)) {
             npCsConfigFields.setEnabled(false);
             spawnLocation = null;
-            persistentObjectHandler.remove();
-        } else
+            if (persistentObjectHandler != null)
+                persistentObjectHandler.remove();
+        } else if (persistentObjectHandler != null)
             persistentObjectHandler.updatePersistentLocation(getPersistentLocation());
     }
 

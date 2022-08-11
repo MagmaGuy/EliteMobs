@@ -36,7 +36,7 @@ public class MobPropertiesConfigFields {
         this.isEnabled = configuration.getBoolean("isEnabled");
         this.name = configuration.getString("name");
         this.deathMessages = configuration.getStringList("deathMessages");
-        this.baseDamage = configuration.getDouble("baseDamage");
+        this.baseDamage = configuration.getDouble("baseDamageV2");
     }
 
     public void generateConfigDefaults(FileConfiguration fileConfiguration) {
@@ -44,7 +44,7 @@ public class MobPropertiesConfigFields {
         fileConfiguration.addDefault("entityType", entityType.toString());
         fileConfiguration.addDefault("name", name);
         fileConfiguration.addDefault("deathMessages", deathMessages);
-        fileConfiguration.addDefault("baseDamage", baseDamage);
+        fileConfiguration.addDefault("baseDamageV2", baseDamage);
     }
 
     public String getFileName() {

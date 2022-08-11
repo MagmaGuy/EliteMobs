@@ -15,6 +15,6 @@ public class EliteGhastConfig extends MobPropertiesConfigFields {
                 Arrays.asList("$player &cdidn't dodge $entity&c &cfireballs!",
                         "$player &cwas blown to bits $entity&c!",
                         "$entity &cgot $player's &cbacon!"),
-                25);
+                22.5);
     }
 }

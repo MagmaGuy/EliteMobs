@@ -81,6 +81,14 @@ public class ElitePlayerInventory {
                 boots.getProtectionProjectile(player.getInventory().getBoots(), update);
     }
 
+    public double getEliteBlastProtection(boolean update){
+        if (!armorCheck()) update = false;
+        return helmet.getBlastProtection(player.getInventory().getHelmet(), update) +
+                chestplate.getBlastProtection(player.getInventory().getChestplate(), update) +
+                leggings.getBlastProtection(player.getInventory().getLeggings(), update) +
+                boots.getBlastProtection(player.getInventory().getBoots(), update);
+    }
+
     private boolean armorCheck() {
         if (getArmorCooldown) return false;
         getArmorCooldown = true;
