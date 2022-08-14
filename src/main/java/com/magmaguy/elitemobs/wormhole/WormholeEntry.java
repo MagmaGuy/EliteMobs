@@ -13,6 +13,7 @@ import lombok.Setter;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Consumer;
 import org.bukkit.util.Vector;
@@ -49,13 +50,13 @@ public class WormholeEntry implements PersistentObject {
 
     public WormholeEntry(Wormhole wormhole, String locationString, int wormholeNumber) {
         this.wormhole = wormhole;
+        this.wormholeNumber = wormholeNumber;
+        this.locationString = locationString;
         if (locationString == null) {
             new WarningMessage("Wormhole " + wormhole.getWormholeConfigFields().getFilename() + " is missing a wormhole location! Fix this!");
             return;
         }
-        this.locationString = locationString;
         setLocationFromConfiguration();
-        this.wormholeNumber = wormholeNumber;
         if (wormholeNumber == 1)
             this.armorStandText = wormhole.getWormholeConfigFields().getLocation1Text();
         else
@@ -156,6 +157,17 @@ public class WormholeEntry implements PersistentObject {
     public void stop() {
         if (wormholeTask != null)
             wormholeTask.cancel();
+    }
+
+    public void updateLocation(Player player) {
+        if (wormholeTask != null) {
+            wormholeTask.cancel();
+            wormholeTask = null;
+        }
+        locationString = ConfigurationLocation.deserialize(player.getLocation());
+        location = player.getLocation().add(new Vector(0,1,0));
+        wormhole.getWormholeConfigFields().setWormholeEntryLocation(location, wormholeNumber);
+        wormholeTask = WormholeTask.startWormholeTask(this);
     }
 
     private void initializeTextDisplay() {

@@ -205,8 +205,12 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
 
             damage = Round.twoDecimalPlaces((damage + eliteDamage) * damageModifier * MobCombatSettingsConfig.getDamageToEliteMultiplier());
 
-            boolean criticalHit = isCriticalHit(player);
-            if (criticalHit) damage *= 1.5;
+            boolean criticalHit = false;
+
+            if (validPlayer) {
+                isCriticalHit(player);
+                if (criticalHit) damage *= 1.5;
+            }
 
             EliteMobDamagedByPlayerEvent eliteMobDamagedByPlayerEvent = new EliteMobDamagedByPlayerEvent(
                     eliteEntity,
@@ -224,8 +228,10 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
                 return;
             }
 
-            //Time to deal custom damage!
-            eliteEntity.addDamager(player, damage);
+            if (validPlayer) {
+                //Time to deal custom damage!
+                eliteEntity.addDamager(player, damage);
+            }
 
             //Dragons need special handling due to their custom deaths
             if (eliteEntity.getLivingEntity() != null &&

@@ -47,19 +47,31 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
     private boolean isTalking = false;
     private ArmorStand roleDisplay;
     private boolean isDisguised = false;
+    private String locationString;
 
     /**
      * Spawns NPC based off of the values in the NPCsConfig config file. Runs at startup and on reload.
      */
-    public NPCEntity(NPCsConfigFields npCsConfigFields) {
+    public NPCEntity(NPCsConfigFields npCsConfigFields, String locationString) {
         this.npCsConfigFields = npCsConfigFields;
+        this.locationString = locationString;
         if (!npCsConfigFields.isEnabled()) return;
         //this is how the wandering trader works
-        if (npCsConfigFields.getLocation() == null || npCsConfigFields.getLocation().equalsIgnoreCase("null"))
+        if (locationString == null ||
+                locationString.equalsIgnoreCase("null"))
             return;
         setSpawnLocation();
         queueSpawn();
         persistentObjectHandler = new PersistentObjectHandler(this);
+    }
+
+    public static void initializeNPCs(NPCsConfigFields npCsConfigFields) {
+        if (npCsConfigFields.getLocations() != null && !npCsConfigFields.getLocations().isEmpty()) {
+            for (String locationString : npCsConfigFields.getLocations())
+                new NPCEntity(npCsConfigFields, locationString);
+        } else if (npCsConfigFields.getLocation() != null && !npCsConfigFields.getLocation().isEmpty()) {
+            new NPCEntity(npCsConfigFields, npCsConfigFields.getLocation());
+        }
     }
 
     /**
@@ -140,7 +152,7 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
     }
 
     public boolean setSpawnLocation() {
-        Location location = ConfigurationLocation.serialize(npCsConfigFields.getLocation());
+        Location location = ConfigurationLocation.serialize(locationString);
         if (location == null) return false;
         this.spawnLocation = location;
         return true;
@@ -187,8 +199,8 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
         if (getSpawnLocation() != null && getSpawnLocation().getWorld() != null)
             return getSpawnLocation().getWorld().getName();
         String world = null;
-        if (npCsConfigFields.getLocation() != null && !npCsConfigFields.getLocation().isEmpty())
-            world = npCsConfigFields.getLocation().split(",")[0];
+        if (locationString != null && !locationString.isEmpty())
+            world = locationString.split(",")[0];
         return world;
     }
 
@@ -246,12 +258,19 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
         }
 
         if (removalReason.equals(RemovalReason.REMOVE_COMMAND)) {
-            npCsConfigFields.setEnabled(false);
-            spawnLocation = null;
+            if (npCsConfigFields.getLocations() != null && !npCsConfigFields.getLocations().isEmpty()) {
+                npCsConfigFields.removeNPC(locationString);
+                locationString = null;
+                spawnLocation = null;
+            } else {
+                npCsConfigFields.setEnabled(false);
+                spawnLocation = null;
+            }
             if (persistentObjectHandler != null)
                 persistentObjectHandler.remove();
         } else if (persistentObjectHandler != null)
-            persistentObjectHandler.updatePersistentLocation(getPersistentLocation());
+            if (!removalReason.equals(RemovalReason.SHUTDOWN))
+                persistentObjectHandler.updatePersistentLocation(getPersistentLocation());
     }
 
     /**
