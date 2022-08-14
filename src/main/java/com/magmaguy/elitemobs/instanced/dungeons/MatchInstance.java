@@ -8,6 +8,7 @@ import com.magmaguy.elitemobs.config.ArenasConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
+import com.magmaguy.elitemobs.utils.Cylinder;
 import com.magmaguy.elitemobs.utils.VisualArmorStand;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
@@ -52,25 +53,41 @@ public class MatchInstance {
     private int minZ;
     private int maxZ;
     private World world;
+    private boolean cylindricalArena;
     @Getter
     private HashMap<Block, DeathLocation> deathBanners = new HashMap<>();
+    private Cylinder cylinder;
 
-    public MatchInstance(Location corner1, Location corner2, Location startLocation, Location exitLocation, int minPlayers, int maxPlayers, List<String> spawnPoints) {
+    public MatchInstance(Location corner1,
+                         Location corner2,
+                         Location startLocation,
+                         Location exitLocation,
+                         int minPlayers,
+                         int maxPlayers,
+                         List<String> spawnPoints,
+                         boolean cylindricalArena) {
         addSpawnPoints(spawnPoints);
-        instantiate(corner1, corner2, startLocation, exitLocation, minPlayers, maxPlayers);
+        instantiate(corner1, corner2, startLocation, exitLocation, minPlayers, maxPlayers, cylindricalArena);
     }
 
-    public MatchInstance(Location corner1, Location corner2, Location startLocation, Location exitLocation, int minPlayers, int maxPlayers) {
-        instantiate(corner1, corner2, startLocation, exitLocation, minPlayers, maxPlayers);
+    public MatchInstance(Location corner1,
+                         Location corner2,
+                         Location startLocation,
+                         Location exitLocation,
+                         int minPlayers,
+                         int maxPlayers,
+                         boolean cylindricalArena) {
+        instantiate(corner1, corner2, startLocation, exitLocation, minPlayers, maxPlayers, cylindricalArena);
     }
 
-    public void instantiate(Location corner1, Location corner2, Location startLocation, Location exitLocation, int minPlayers, int maxPlayers) {
+    public void instantiate(Location corner1, Location corner2, Location startLocation, Location exitLocation, int minPlayers, int maxPlayers, boolean cylindricalArena) {
         this.corner1 = corner1;
         this.corner2 = corner2;
         this.startLocation = startLocation;
         this.exitLocation = exitLocation;
         this.minPlayers = minPlayers;
         this.maxPlayers = maxPlayers;
+        this.cylindricalArena = cylindricalArena;
         if (corner1.getX() < corner2.getX()) {
             minX = (int) corner1.getX();
             maxX = (int) corner2.getX();
@@ -96,6 +113,12 @@ public class MatchInstance {
         }
         this.world = corner1.getWorld();
         this.state = InstancedRegionState.IDLE;
+
+        if (cylindricalArena)
+            cylinder = new Cylinder(
+                    new Vector((maxX - minX) / 2D + minX, minY,
+                            (maxZ - minZ) / 2D + minZ),
+                    (Math.abs(maxX) - Math.abs(minX)) / 2D, maxY - minY);
 
         startWatchdogs();
 
@@ -273,14 +296,19 @@ public class MatchInstance {
         }, 0L, 20 * 60L);
     }
 
+
     private boolean isInRegion(Location location) {
-        return location.getWorld().equals(world) &&
-                minX <= location.getX() &&
-                maxX >= location.getX() &&
-                minY <= location.getY() &&
-                maxY >= location.getY() &&
-                minZ <= location.getZ() &&
-                maxZ >= location.getZ();
+        if (!cylindricalArena)
+            return location.getWorld().equals(world) &&
+                    minX <= location.getX() &&
+                    maxX >= location.getX() &&
+                    minY <= location.getY() &&
+                    maxY >= location.getY() &&
+                    minZ <= location.getZ() &&
+                    maxZ >= location.getZ();
+        else
+            return location.getWorld().equals(world) &&
+                    cylinder.contains(location);
     }
 
     public void countdownMatch() {

@@ -15,7 +15,9 @@ public class NPCsConfig extends CustomConfig {
         for (String key : super.getCustomConfigFieldsHashMap().keySet()) {
             npcEntities.put(key, (NPCsConfigFields) super.getCustomConfigFieldsHashMap().get(key));
             //Initializes NPC entities
-            new NPCEntity((NPCsConfigFields) super.getCustomConfigFieldsHashMap().get(key));
+            NPCsConfigFields npCsConfigFields = (NPCsConfigFields) super.getCustomConfigFieldsHashMap().get(key);
+            if (npCsConfigFields.isEnabled())
+                NPCEntity.initializeNPCs(npCsConfigFields);
         }
     }
 

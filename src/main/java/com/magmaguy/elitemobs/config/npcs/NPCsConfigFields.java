@@ -67,6 +67,9 @@ public class NPCsConfigFields extends CustomConfigFields implements CustomConfig
     @Getter
     @Setter
     private String arenaFilename;
+    @Getter
+    @Setter
+    private List<String> locations = new ArrayList<>();
 
     public NPCsConfigFields(String fileName,
                             boolean isEnabled,
@@ -99,8 +102,8 @@ public class NPCsConfigFields extends CustomConfigFields implements CustomConfig
     }
 
     public void setLocation(String location) {
-        this.location = location;
-        this.fileConfiguration.set("spawnLocation", location);
+        this.locations.add(location);
+        this.fileConfiguration.set("spawnLocations", locations);
         try {
             ConfigurationEngine.fileSaverCustomValues(fileConfiguration, this.file);
         } catch (Exception ex) {
@@ -115,6 +118,7 @@ public class NPCsConfigFields extends CustomConfigFields implements CustomConfig
         this.role = processString("role", role, "", true);
         this.profession = processEnum("profession", profession, Villager.Profession.NITWIT, Villager.Profession.class, true);
         this.location = processString("spawnLocation", location, null, true);
+        this.locations = processStringList("spawnLocations", locations, null, false);
         this.greetings = processStringList("greetings", greetings, new ArrayList<>(), true);
         this.dialog = processStringList("dialog", dialog, new ArrayList<>(), true);
         this.farewell = processStringList("farewell", farewell, new ArrayList<>(), true);
@@ -137,6 +141,17 @@ public class NPCsConfigFields extends CustomConfigFields implements CustomConfig
             ConfigurationEngine.fileSaverCustomValues(this.fileConfiguration, this.file);
         } catch (Exception e) {
             Bukkit.getLogger().warning("[EliteMobs] Attempted to update the enabled status for an NPC with no config file! Did you delete it during runtime?");
+        }
+    }
+
+    public void removeNPC(String locationString) {
+        if (locations == null) return;
+        locations.removeIf(entry -> entry.equals(locationString));
+        this.fileConfiguration.set("spawnLocations", locations);
+        try {
+            ConfigurationEngine.fileSaverCustomValues(fileConfiguration, this.file);
+        } catch (Exception ex) {
+            Bukkit.getLogger().warning("[EliteMobs] Attempted to update the location status for an NPC with no config file! Did you delete it during runtime?");
         }
     }
 

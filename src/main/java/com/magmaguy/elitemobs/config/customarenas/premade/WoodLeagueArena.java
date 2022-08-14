@@ -789,5 +789,6 @@ public class WoodLeagueArena extends CustomArenasConfigFields {
                 "wave=51:message=&8[Gladius the Destitute] &fUnbelievable, Uther has been defeated! We have a new arena champion! I would be incredibly excited if I wasn't so terribly in debt now!"
         )));
         setMaximumPlayerCount(5);
+        setCylindricalArena(true);
     }
 }

@@ -1,10 +1,13 @@
 package com.magmaguy.elitemobs.config.wormholes;
 
+import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.config.CustomConfigFieldsInterface;
+import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.wormhole.Wormhole;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Location;
 
 public class WormholeConfigFields extends CustomConfigFields implements CustomConfigFieldsInterface {
 
@@ -67,6 +70,18 @@ public class WormholeConfigFields extends CustomConfigFields implements CustomCo
         this.particleColor = processInt("particleColor", particleColor, 0x800080, false);
         this.blindPlayer = processBoolean("blindPlayer", blindPlayer, false, false);
         this.sizeMultiplier = processDouble("sizeMultiplier", sizeMultiplier, 1D, false);
+    }
+
+    public void setWormholeEntryLocation(Location location, int wormholeNumber) {
+        if (wormholeNumber == 1) {
+            this.location1 = ConfigurationLocation.deserialize(location);
+            fileConfiguration.set("location1", location1);
+            ConfigurationEngine.fileSaverCustomValues(fileConfiguration, file);
+        } else {
+            this.location2 = ConfigurationLocation.deserialize(location);
+            fileConfiguration.set("location2", location2);
+            ConfigurationEngine.fileSaverCustomValues(fileConfiguration, file);
+        }
     }
 
 }
