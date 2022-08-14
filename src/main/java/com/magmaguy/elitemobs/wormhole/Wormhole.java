@@ -59,17 +59,21 @@ public class Wormhole {
     }
 
     public void onDungeonInstall(String dungeonFilename) {
-        if (getWormholeEntry1().getLocationString().equals(dungeonFilename)) {
+        if (getWormholeEntry1() != null &&
+                getWormholeEntry1().getLocationString() != null &&
+                getWormholeEntry1().getLocationString().equals(dungeonFilename)) {
             getWormholeEntry1().onDungeonInstall();
-        } else if (getWormholeEntry2().getLocationString().equals(dungeonFilename)) {
+        } else if (getWormholeEntry2() != null &&
+                getWormholeEntry2().getLocationString() != null &&
+                getWormholeEntry2().getLocationString().equals(dungeonFilename)) {
             getWormholeEntry2().onDungeonInstall();
         }
     }
 
     public void onDungeonUninstall(String dungeonFilename) {
-        if (getWormholeEntry1().getLocationString().equals(dungeonFilename)) {
+        if (getWormholeEntry1().getWormhole() != null && getWormholeEntry1().getLocationString().equals(dungeonFilename)) {
             getWormholeEntry1().onDungeonUninstall();
-        } else if (getWormholeEntry2().getLocationString().equals(dungeonFilename)) {
+        } else if (getWormholeEntry2().getWormhole() != null && getWormholeEntry2().getLocationString().equals(dungeonFilename)) {
             getWormholeEntry2().onDungeonUninstall();
         }
     }

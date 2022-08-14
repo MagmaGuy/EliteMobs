@@ -40,7 +40,14 @@ public class ArenaInstance extends MatchInstance {
     private HashMap<Integer, String> waveMessage = new HashMap<>();
 
     public ArenaInstance(CustomArenasConfigFields customArenasConfigFields, Location corner1, Location corner2, Location startLocation, Location exitLocation) {
-        super(corner1, corner2, startLocation, exitLocation, customArenasConfigFields.getMinimumPlayerCount(), customArenasConfigFields.getMaximumPlayerCount(), customArenasConfigFields.getSpawnPoints());
+        super(corner1,
+                corner2,
+                startLocation,
+                exitLocation,
+                customArenasConfigFields.getMinimumPlayerCount(),
+                customArenasConfigFields.getMaximumPlayerCount(),
+                customArenasConfigFields.getSpawnPoints(),
+                customArenasConfigFields.isCylindricalArena());
         this.customArenasConfigFields = customArenasConfigFields;
         this.arenaWaves = new ArenaWaves(customArenasConfigFields.getBossList());
         arenaInstances.put(customArenasConfigFields.getFilename(), this);

@@ -12,7 +12,7 @@ compileJava.options.encoding = "UTF-8"
 compileTestJava.options.encoding = "UTF-8"
 
 group 'com.magmaguy'
-version '8.0.0-SNAPSHOT-4'
+version '8.0.0-SNAPSHOT-5'
 
 repositories {
     maven {
@@ -70,7 +70,6 @@ dependencies {
     //Spigot API
     compileOnly "org.spigotmc:spigot-api:1.19-R0.1-SNAPSHOT"
 
-    //compileOnly 'org.spigotmc:spigot:1.17-R0.1-SNAPSHOT'
     // The full CraftBukkit server with no shadowing. Requires mavenLocal.
     //BStats API
     implementation group: 'org.bstats', name: 'bstats-bukkit', version: '2.2.1'

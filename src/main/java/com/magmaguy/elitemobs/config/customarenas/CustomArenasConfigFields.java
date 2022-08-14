@@ -53,6 +53,9 @@ public class CustomArenasConfigFields extends CustomConfigFields implements Cust
     @Getter
     @Setter
     private List<String> arenaMessages = new ArrayList<>();
+    @Getter
+    @Setter
+    private boolean cylindricalArena = false;
 
     public CustomArenasConfigFields(String filename, boolean isEnabled) {
         super(filename, isEnabled);
@@ -75,6 +78,7 @@ public class CustomArenasConfigFields extends CustomConfigFields implements Cust
         this.minimumPlayerCount = processInt("minimumPlayerCount", minimumPlayerCount, 1, false);
         this.maximumPlayerCount = processInt("maximumPlayerCount", maximumPlayerCount, 100, false);
         this.arenaMessages = processStringList("arenaMessages", arenaMessages, new ArrayList<>(), false);
+        this.cylindricalArena = processBoolean("cylindricalArena", cylindricalArena, false, false);
     }
 
 }

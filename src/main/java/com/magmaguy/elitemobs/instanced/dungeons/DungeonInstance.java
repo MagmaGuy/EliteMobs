@@ -14,7 +14,7 @@ public class DungeonInstance extends MatchInstance {
     private List<DungeonObjective> dungeonObjectives = new ArrayList<>();
 
     public DungeonInstance(InstancedDungeonConfig instancedDungeonConfig, Location corner1, Location corner2, Location startLocation, Location exitLocation) {
-        super(corner1, corner2, startLocation, exitLocation, instancedDungeonConfig.getMinPlayers(), instancedDungeonConfig.getMaxPlayers());
+        super(corner1, corner2, startLocation, exitLocation, instancedDungeonConfig.getMinPlayers(), instancedDungeonConfig.getMaxPlayers(), false);
         //todo: add dungeon objectives from the configuration
     }
 

@@ -18,6 +18,7 @@ import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestsConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
+import com.magmaguy.elitemobs.config.wormholes.WormholeConfig;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.events.TimedEvent;
@@ -35,6 +36,7 @@ import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
 import com.magmaguy.elitemobs.utils.DebugMessage;
 import com.magmaguy.elitemobs.utils.DiscordLinks;
+import com.magmaguy.elitemobs.wormhole.Wormhole;
 import io.leangen.geantyref.TypeToken;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -846,6 +848,33 @@ public class AdminCommands {
                     commandContext.getSender().sendMessage("Item bonus EDPS: " + bonusEDPS);
                 })
         );
+
+        List<String> wormholeList = new ArrayList<>(WormholeConfig.getWormholes().keySet());
+        List<String> wormholeOptions = new ArrayList<>(Arrays.asList("1", "2"));
+
+        manager.command(builder.literal("setwormhole")
+                .argument(StringArgument.<CommandSender>newBuilder("wormholeFilename").withSuggestionsProvider(((objectCommandContext, s) -> wormholeList)),
+                        ArgumentDescription.of("Wormhole filename"))
+                .argument(StringArgument.<CommandSender>newBuilder("wormholeOption").withSuggestionsProvider(((objectCommandContext, s) -> wormholeOptions)),
+                        ArgumentDescription.of("Wormhole option"))
+                .senderType(Player.class)
+                .permission("elitemobs.*")
+                .handler(commandContext -> {
+                    for (Wormhole wormhole : Wormhole.getWormholes()) {
+                        if (wormhole.getWormholeConfigFields().getFilename().equals(commandContext.get("wormholeFilename")))
+                            switch ((String) commandContext.get("wormholeOption")) {
+                                case "1":
+                                    wormhole.getWormholeEntry1().updateLocation((Player) commandContext.getSender());
+                                    return;
+                                case "2":
+                                    wormhole.getWormholeEntry2().updateLocation((Player) commandContext.getSender());
+                                    return;
+                                default:
+                                    commandContext.getSender().sendMessage("[EliteMobs] Not a valid wormhole option! Pick 1 or 2 to set either end of the wormhole.");
+                            }
+                    }
+                    commandContext.getSender().sendMessage("[EliteMobs] Failed to set location for this wormhole.");
+                }));
     }
 
     private void testFireball(Player player) {

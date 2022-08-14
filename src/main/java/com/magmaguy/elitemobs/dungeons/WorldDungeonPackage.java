@@ -66,6 +66,8 @@ public class WorldDungeonPackage extends WorldPackage implements Dungeon {
     private void getEntities() {
         for (RegionalBossEntity regionalBossEntity : RegionalBossEntity.getRegionalBossEntitySet())
             if (regionalBossEntity != null &&
+                    regionalBossEntity.getWorldName() != null &&
+                    world != null &&
                     regionalBossEntity.getWorldName().equals(world.getName()) ||
                     wormholeWorld != null && regionalBossEntity.getWorldName().equals(wormholeWorld.getName()))
                 customBossEntityList.add(regionalBossEntity);
@@ -80,7 +82,7 @@ public class WorldDungeonPackage extends WorldPackage implements Dungeon {
 
     private void getChests() {
         for (TreasureChest treasureChest : TreasureChest.getTreasureChestHashMap().values())
-            if (treasureChest.getWorldName().equals(world.getName()) ||
+            if (treasureChest.getWorldName() != null && treasureChest.getWorldName().equals(world.getName()) ||
                     wormholeWorld != null &&
                             treasureChest.getWorldName().equals(wormholeWorld.getName()))
                 treasureChestList.add(treasureChest);

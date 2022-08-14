@@ -10,42 +10,53 @@ import com.magmaguy.elitemobs.dungeons.utility.DungeonUtils;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
 import com.magmaguy.elitemobs.utils.WarningMessage;
+import lombok.Getter;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 public class SchematicDungeonPackage extends SchematicPackage implements Dungeon {
-    private final HashMap<String, Vector> rawSpawnLocations = new HashMap<>();
-    private final HashMap<String, Vector> rawChestLocations = new HashMap<>();
+    private final HashSet<RawContainer> rawSpawnLocations = new HashSet<>();
+    private final HashSet<RawContainer> rawChestLocations = new HashSet<>();
     private int lowestLevel;
     private int highestLevel;
-
     public SchematicDungeonPackage(DungeonPackagerConfigFields dungeonPackagerConfigFields) {
         super(dungeonPackagerConfigFields);
         for (String string : dungeonPackagerConfigFields.getRelativeBossLocations()) {
             try {
                 Vector vector = getVectorFromConfig(string.split(":")[1]);
                 if (vector == null) continue;
-                rawSpawnLocations.put(string.split(":")[0], vector);
+                rawSpawnLocations.add(new RawContainer(string.split(":")[0], vector));
             } catch (Exception ex) {
                 new WarningMessage("Failed to correctly read entry " + string + " in schematic dungeon " + dungeonPackagerConfigFields.getFilename());
-                continue;
             }
         }
         for (String string : dungeonPackagerConfigFields.getRelativeTreasureChestLocations()) {
             try {
                 Vector vector = getVectorFromConfig(string.split(":")[1]);
                 if (vector == null) continue;
-                rawChestLocations.put(string.split(":")[0], vector);
+                rawChestLocations.add(new RawContainer(string.split(":")[0], vector));
             } catch (Exception ex) {
                 new WarningMessage("Failed to correctly read entry " + string + " in schematic dungeon " + dungeonPackagerConfigFields.getFilename());
-                continue;
             }
         }
+    }
+
+    private void getEntities() {
+        //Get the real spawn locations
+        HashMap<String, Location> parsedBossLocations = new HashMap<>();
+        for (RawContainer rawContainer : rawSpawnLocations)
+            parsedBossLocations.put(rawContainer.getFilename(), dungeonPackagerConfigFields.getAnchorPoint().clone().add(rawContainer.getVector()));
+        //A bit dirty but this should get every boss in the dungeon
+        for (RegionalBossEntity regionalBossEntity : RegionalBossEntity.getRegionalBossEntitySet())
+            for (Map.Entry<String, Location> entry : parsedBossLocations.entrySet())
+                if (regionalBossEntity.getCustomBossesConfigFields().getFilename().equals(entry.getKey()))
+                    customBossEntityList.add(regionalBossEntity);
     }
 
     private Vector getVectorFromConfig(String string) {
@@ -89,16 +100,15 @@ public class SchematicDungeonPackage extends SchematicPackage implements Dungeon
         }
     }
 
-    private void getEntities() {
-        //Get the real spawn locations
-        HashMap<String, Location> parsedBossLocations = new HashMap<>();
-        for (Map.Entry<String, Vector> entry : rawSpawnLocations.entrySet())
-            parsedBossLocations.put(entry.getKey(), dungeonPackagerConfigFields.getAnchorPoint().clone().add(entry.getValue()));
-        //A bit dirty but this should get every boss in the dungeon
-        for (RegionalBossEntity regionalBossEntity : RegionalBossEntity.getRegionalBossEntitySet())
-            for (Map.Entry<String, Location> entry : parsedBossLocations.entrySet())
-                if (regionalBossEntity.getCustomBossesConfigFields().getFilename().equals(entry.getKey()))
-                    customBossEntityList.add(regionalBossEntity);
+    private void getChests() {
+        //Get the real chest locations
+        HashMap<String, Location> parsedChestLocations = new HashMap<>();
+        for (RawContainer rawContainer : rawChestLocations)
+            parsedChestLocations.put(rawContainer.getFilename(), dungeonPackagerConfigFields.getAnchorPoint().clone().add(rawContainer.getVector()));
+        for (TreasureChest treasureChest : TreasureChest.getTreasureChestHashMap().values())
+            for (Map.Entry<String, Location> entry : parsedChestLocations.entrySet())
+                if (treasureChest.getCustomTreasureChestConfigFields().getFilename().equals(entry.getKey()))
+                    treasureChestList.add(treasureChest);
     }
 
     private void qualifyEntities() {
@@ -108,15 +118,19 @@ public class SchematicDungeonPackage extends SchematicPackage implements Dungeon
         this.highestLevel = lowestAndHighestValues.getValue();
     }
 
-    private void getChests() {
-        //Get the real chest locations
-        HashMap<String, Location> parsedChestLocations = new HashMap<>();
-        for (Map.Entry<String, Vector> entry : rawChestLocations.entrySet())
-            parsedChestLocations.put(entry.getKey(), dungeonPackagerConfigFields.getAnchorPoint().clone().add(entry.getValue()));
-        for (TreasureChest treasureChest : TreasureChest.getTreasureChestHashMap().values())
-            for (Map.Entry<String, Location> entry : parsedChestLocations.entrySet())
-                if (treasureChest.getCustomTreasureChestConfigFields().getFilename().equals(entry.getKey()))
-                    treasureChestList.add(treasureChest);
+    private void installBosses() {
+        for (RawContainer rawContainer : rawSpawnLocations) {
+            CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(rawContainer.getFilename());
+            if (customBossesConfigFields == null) {
+                new WarningMessage("Failed to get Regional Boss " + rawContainer.getFilename() + " in schematic dungeon " + dungeonPackagerConfigFields.getFilename() + " !");
+                continue;
+            }
+            Location bossLocation = toRealPosition(rawContainer.getVector());
+            RegionalBossEntity regionalBossEntity = RegionalBossEntity.createPermanentRegionalBossEntity(customBossesConfigFields, bossLocation);
+            regionalBossEntity.setEmPackage(this);
+            regionalBossEntity.spawn(false);
+            customBossEntityList.add(regionalBossEntity);
+        }
     }
 
     @Override
@@ -127,33 +141,30 @@ public class SchematicDungeonPackage extends SchematicPackage implements Dungeon
         return true;
     }
 
-    private void installBosses() {
-        for (Map.Entry<String, Vector> entry : rawSpawnLocations.entrySet()) {
-            CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(entry.getKey());
-            if (customBossesConfigFields == null) {
-                new WarningMessage("Failed to get Regional Boss " + entry.getKey() + " in schematic dungeon " + dungeonPackagerConfigFields.getFilename() + " !");
-                continue;
-            }
-            Location bossLocation = toRealPosition(entry.getValue());
-            RegionalBossEntity regionalBossEntity = new RegionalBossEntity(customBossesConfigFields, bossLocation, true);
-            regionalBossEntity.setEmPackage(this);
-            regionalBossEntity.spawn(false);
-            customBossEntityList.add(regionalBossEntity);
-        }
-    }
-
     private void installChests() {
-        for (Map.Entry<String, Vector> entry : rawChestLocations.entrySet()) {
-            CustomTreasureChestConfigFields customTreasureChestConfigFields = CustomTreasureChestsConfig.getCustomTreasureChestConfigFields().get(entry.getKey());
+        for (RawContainer rawContainer : rawChestLocations) {
+            CustomTreasureChestConfigFields customTreasureChestConfigFields = CustomTreasureChestsConfig.getCustomTreasureChestConfigFields().get(rawContainer.getFilename());
             if (customTreasureChestConfigFields == null) {
-                new WarningMessage("Failed to get Treasure Chest " + entry.getKey() + " in schematic dungeon " + dungeonPackagerConfigFields.getFilename() + " !");
+                new WarningMessage("Failed to get Treasure Chest " + rawContainer.getFilename() + " in schematic dungeon " + dungeonPackagerConfigFields.getFilename() + " !");
                 continue;
             }
-            Location chestLocation = toRealPosition(entry.getValue());
+            Location chestLocation = toRealPosition(rawContainer.getVector());
             //todo: this doesn't rotate the treasure chest orientations for now. That will be added later
             TreasureChest treasureChest = customTreasureChestConfigFields.addTreasureChest(chestLocation, 0);
             treasureChest.setEmPackage(this);
             treasureChestList.add(treasureChest);
+        }
+    }
+
+    private class RawContainer {
+        @Getter
+        private final String filename;
+        @Getter
+        private final Vector vector;
+
+        public RawContainer(String filename, Vector vector) {
+            this.filename = filename;
+            this.vector = vector;
         }
     }
 
