@@ -179,8 +179,8 @@ public class ItemSettingsConfig {
         preventEliteItemDiamondToNetheriteUpgrade = ConfigurationEngine.setBoolean(fileConfiguration, "preventEliteItemDiamondToNetheriteUpgrade", true);
         eliteDurability = ConfigurationEngine.setBoolean(fileConfiguration, "eliteItemsDurabilityLossOnlyOnDeath", true);
         eliteDurabilityMultiplier = ConfigurationEngine.setDouble(fileConfiguration, "eliteItemsDurabilityLossMultiplier", 1d);
-        scrapSucceededMessage = ConfigurationEngine.setString(fileConfiguration, "scrapSucceededMessage", "&8[EliteMobs] &2Scrap succeeded!");
-        scrapFailedMessage = ConfigurationEngine.setString(fileConfiguration, "scrapFailedMessage", "&8[EliteMobs] &cScrap failed!");
+        scrapSucceededMessage = ConfigurationEngine.setString(fileConfiguration, "scrapSucceededMessageV2", "&8[EliteMobs] &2Scrapping succeeded $amount times!");
+        scrapFailedMessage = ConfigurationEngine.setString(fileConfiguration, "scrapFailedMessageV2", "&8[EliteMobs] &cScrapping failed $amount times!");
         putLootDirectlyIntoPlayerInventory = ConfigurationEngine.setBoolean(fileConfiguration, "putLootDirectlyIntoPlayerInventory", false);
         lootLevelDifferenceLockout = ConfigurationEngine.setInt(fileConfiguration, "lootLevelDifferenceLockout", 10);
         preventEliteItemsFromBreaking = ConfigurationEngine.setBoolean(fileConfiguration, "preventEliteItemsFromBreaking", true);

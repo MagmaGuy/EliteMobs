@@ -22,7 +22,7 @@ public class AlphaWerewolfP2Boss extends CustomBossesConfigFields {
                 "summonable:summonType=ON_HIT:filename=beta_wolf.yml:amount=5:chance=0.1:inheritAggro=true:spawnNearby=true",
                 "summonable:summonType=ON_HIT:filename=gamma_werewolf.yml:amount=1:chance=0.1:inheritAggro=true:spawnNearby=true",
                 "summonable:summonType=GLOBAL:filename=gamma_werewolf.yml:amount=1:customSpawn=normal_surface_spawn.yml",
-                "summonable:summonType=GLOBAL:filename=omega_wolf.yml:amount=5:customSpawn=normal_surface_spawn.yml"));
+                "summonable:summonType=GLOBAL:filename=omega_wolf.yml:amount=2:customSpawn=normal_surface_spawn.yml"));
         setSpawnMessage("&cThe howls of an Alpha Werewolf are heard!");
         setDeathMessage("&aThe Alpha Werewolf has been stopped by $players!");
         setDeathMessages(Arrays.asList(

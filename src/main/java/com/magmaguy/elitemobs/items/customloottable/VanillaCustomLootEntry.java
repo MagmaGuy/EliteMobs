@@ -9,7 +9,6 @@ import org.bukkit.inventory.ItemStack;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Objects;
 
 public class VanillaCustomLootEntry extends CustomLootEntry implements Serializable {
     @Getter
@@ -70,10 +69,16 @@ public class VanillaCustomLootEntry extends CustomLootEntry implements Serializa
 
     @Override
     public void directDrop(int itemTier, Player player) {
-        for (int i = 0; i < getAmount(); i++){
+        String name = null;
+        for (int i = 0; i < getAmount(); i++) {
             ItemStack itemStack = generateItemStack();
             player.getInventory().addItem(itemStack);
-            player.sendMessage(ItemSettingsConfig.getDirectDropMinecraftLootMessage().replace("$itemName", Objects.requireNonNull(itemStack.getItemMeta()).getDisplayName()));
+            if (name == null && itemStack.getItemMeta() != null) {
+                if (itemStack.getItemMeta().hasDisplayName()) name = itemStack.getItemMeta().getDisplayName();
+                else name = itemStack.getType().toString().replace("_", " ");
+            }
         }
+        if (name != null)
+            player.sendMessage(ItemSettingsConfig.getDirectDropMinecraftLootMessage().replace("$itemName", getAmount() + "x " + name));
     }
 }

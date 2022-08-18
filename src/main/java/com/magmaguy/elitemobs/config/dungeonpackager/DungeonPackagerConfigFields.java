@@ -264,6 +264,8 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
         this.defaultSchematicRotationString = processString("defaultSchematicRotation", defaultSchematicRotationString, null, false);
         if (defaultSchematicRotationString != null)
             try {
+                if (defaultSchematicRotationString == null || defaultSchematicRotationString.isEmpty())
+                    defaultSchematicRotationString = "0";
                 this.defaultSchematicRotation = SchematicPackage.SchematicRotation.valueOf(defaultSchematicRotationString);
             } catch (Exception ex) {
                 new WarningMessage("Bad default schematic rotation for dungeon " + filename);

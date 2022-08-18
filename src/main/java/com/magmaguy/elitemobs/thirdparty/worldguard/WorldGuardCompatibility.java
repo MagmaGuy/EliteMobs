@@ -213,8 +213,6 @@ public class WorldGuardCompatibility {
         protectedRegion.setFlag(Flags.SNOW_MELT, deny);
         protectedRegion.setFlag(Flags.ICE_FORM, deny);
         protectedRegion.setFlag(Flags.ICE_MELT, deny);
-        protectedRegion.setFlag(Flags.FROSTED_ICE_FORM, deny);
-        protectedRegion.setFlag(Flags.FROSTED_ICE_MELT, deny);
         protectedRegion.setFlag(Flags.LEAF_DECAY, deny);
         protectedRegion.setFlag(Flags.GRASS_SPREAD, deny);
         protectedRegion.setFlag(Flags.MYCELIUM_SPREAD, deny);
@@ -279,8 +277,6 @@ public class WorldGuardCompatibility {
         protectedRegion.setFlag(Flags.SNOW_MELT, deny);
         protectedRegion.setFlag(Flags.ICE_FORM, deny);
         protectedRegion.setFlag(Flags.ICE_MELT, deny);
-        protectedRegion.setFlag(Flags.FROSTED_ICE_FORM, deny);
-        protectedRegion.setFlag(Flags.FROSTED_ICE_MELT, deny);
         protectedRegion.setFlag(Flags.LEAF_DECAY, deny);
         protectedRegion.setFlag(Flags.GRASS_SPREAD, deny);
         protectedRegion.setFlag(Flags.MYCELIUM_SPREAD, deny);

@@ -48,7 +48,6 @@ public class CustomModel {
          */
         if (activeModel == null) {
             new WarningMessage("Failed to load model from " + modelName + " ! Is the model name correct, and has the model been installed correctly?");
-            success = false;
             return;
         }
 
@@ -70,6 +69,7 @@ public class CustomModel {
             modeledEntity.addActiveModel(activeModel);
             modeledEntity.detectPlayers();
             modeledEntity.setInvisible(true);
+            success = true;
         } catch (Exception exception) {
             modeledEntity.removeModel(modelName);
             new WarningMessage("Failed to make model entity " + modelName + " ! Couldn't assign model or visibility status.");
@@ -142,6 +142,33 @@ public class CustomModel {
 
          */
         modeledEntity.getNametagHandler().setCustomNameVisibility("hitbox", visible);
+    }
+
+    public static boolean modelIsLoaded(String modelName) {
+        if (modelName == null || modelName.isEmpty()) return false;
+        try {
+            /*
+            if (ModelEngineAPI.api.getModelRegistry().getBlueprint(modelName) == null)
+             */
+            if (ModelEngineAPI.api.getModelManager().getModelRegistry().getModelBlueprint(modelName) == null)
+                new InfoMessage("Model " + modelName + " was not found! Make sure you install the model correctly if you have it. This entry will be skipped!");
+        } catch (NoSuchMethodError ex) {
+            new WarningMessage("Model Engine API version is not supported. Currently Elitemobs can only support ModelEngine B3.0.0, documentation for other versions doesn't exist.");
+            return false;
+        }
+
+        /*
+        modelBlueprint = ModelEngineAPI.api.getModelRegistry().getBlueprint(modelName);
+         */
+        ActiveModel activeModel = ModelEngineAPI.api.getModelManager().createActiveModel(modelName);
+        /*
+        activeModel = ModelEngineAPI.createActiveModel(modelName);
+         */
+        if (activeModel == null) {
+            new WarningMessage("Failed to load model from " + modelName + " ! Is the model name correct, and has the model been installed correctly?");
+            return false;
+        }
+        return true;
     }
 
     public static class ModelEntityEvents implements Listener {

@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.instanced.dungeons;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.api.PlayerTeleportEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.ArenasConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
@@ -180,6 +181,7 @@ public class MatchInstance {
     }
 
     public void addPlayer(Player player) {
+        participants.add(player);
         if (state.equals(InstancedRegionState.ONGOING)) {
             player.sendMessage(ArenasConfig.getArenasOngoingMessage());
             return;
@@ -191,6 +193,7 @@ public class MatchInstance {
         player.sendMessage(ArenasConfig.getArenaJoinPlayerMessage().replace("$count", minPlayers + ""));
         player.sendTitle(ArenasConfig.getJoinPlayerTitle(), ArenasConfig.getJoinPlayerSubtitle(), 60, 60 * 3, 60);
         players.add(player);
+        MatchInstanceEvents.teleportBypass = true;
         player.teleport(startLocation);
         PlayerData.setMatchInstance(player, this);
         playerLives.put(player, 3);
@@ -199,13 +202,16 @@ public class MatchInstance {
     public void removePlayer(Player player) {
         PlayerData.setMatchInstance(player, null);
         players.remove(player);
-        if (player.isOnline()) player.teleport(exitLocation);
-        else if (getDeathLocationByPlayer(player) != null)
+        if (!spectators.contains(player))
+            participants.remove(player);
+        if (player.isOnline()) {
+            MatchInstanceEvents.teleportBypass = true;
+            player.teleport(exitLocation);
+        } else if (getDeathLocationByPlayer(player) != null)
             getDeathLocationByPlayer(player).clear(false);
-        if (players.isEmpty())
+        if (state.equals(InstancedRegionState.ONGOING) && players.isEmpty())
             endMatch();
         playerLives.remove(player);
-
     }
 
     public void playerDeath(Player player) {
@@ -214,6 +220,7 @@ public class MatchInstance {
         players.remove(player);
         if (players.isEmpty()) {
             endMatch();
+            MatchInstanceEvents.teleportBypass = true;
             player.teleport(exitLocation);
             return;
         }
@@ -226,22 +233,28 @@ public class MatchInstance {
         players.add(player);
         player.setGameMode(GameMode.SURVIVAL);
         spectators.remove(player);
+        MatchInstanceEvents.teleportBypass = true;
         player.teleport(deathLocation.bannerBlock.getLocation());
         PlayerData.setMatchInstance(player, this);
     }
 
     public void addSpectator(Player player) {
+        participants.add(player);
         player.sendMessage(ArenasConfig.getArenaJoinSpectatorMessage());
         player.sendTitle(ArenasConfig.getJoinSpectatorTitle(), ArenasConfig.getJoinSpectatorSubtitle(), 60, 60 * 3, 60);
         spectators.add(player);
         player.setGameMode(GameMode.SPECTATOR);
+        MatchInstanceEvents.teleportBypass = true;
         player.teleport(startLocation);
         PlayerData.setMatchInstance(player, this);
     }
 
     public void removeSpectator(Player player) {
         spectators.remove(player);
+        if (!players.contains(player))
+            participants.remove(player);
         player.setGameMode(GameMode.SURVIVAL);
+        MatchInstanceEvents.teleportBypass = true;
         player.teleport(exitLocation);
         PlayerData.setMatchInstance(player, null);
         playerLives.remove(player);
@@ -252,6 +265,7 @@ public class MatchInstance {
     public void removeAnyKind(Player player) {
         if (players.contains(player)) removePlayer(player);
         if (spectators.contains(player)) removeSpectator(player);
+        participants.remove(player);
     }
 
     private void startWatchdogs() {
@@ -268,22 +282,30 @@ public class MatchInstance {
     private void playerWatchdog() {
         ((HashSet<Player>) players.clone()).forEach(player -> {
             if (!player.isOnline()) removePlayer(player);
-            if (!isInRegion(player.getLocation())) player.teleport(startLocation);
+            if (!isInRegion(player.getLocation())) {
+                MatchInstanceEvents.teleportBypass = true;
+                player.teleport(startLocation);
+            }
         });
     }
 
     private void spectatorWatchdog() {
         ((HashSet<Player>) spectators.clone()).forEach(player -> {
             if (!player.isOnline()) removeSpectator(player);
-            if (!isInRegion(player.getLocation())) player.teleport(startLocation);
+            if (!isInRegion(player.getLocation())) {
+                MatchInstanceEvents.teleportBypass = true;
+                player.teleport(startLocation);
+            }
         });
     }
 
     private void intruderWatchdog() {
         if (state != InstancedRegionState.ONGOING) return;
         for (Player player : Bukkit.getOnlinePlayers())
-            if (!players.contains(player) && !spectators.contains(player) && isInRegion(player.getLocation()))
+            if (!players.contains(player) && !spectators.contains(player) && isInRegion(player.getLocation())) {
+                MatchInstanceEvents.teleportBypass = true;
                 player.teleport(exitLocation);
+            }
     }
 
     private void instanceMessages() {
@@ -350,6 +372,9 @@ public class MatchInstance {
 
     protected void resetMatch() {
         state = InstancedRegionState.IDLE;
+        HashSet<Player> copy = new HashSet<>(participants);
+        copy.forEach(this::removeAnyKind);
+        /*
         players.forEach(player -> player.teleport(exitLocation));
         spectators.forEach(player -> {
             player.setGameMode(GameMode.SURVIVAL);
@@ -357,6 +382,7 @@ public class MatchInstance {
         });
         ((HashSet<Player>) players.clone()).forEach(this::removePlayer);
         ((HashSet<Player>) spectators.clone()).forEach(this::removeSpectator);
+         */
         deathBanners.values().forEach(deathLocation -> deathLocation.clear(false));
         deathBanners.clear();
     }
@@ -378,6 +404,21 @@ public class MatchInstance {
             instances.forEach(instance -> instance.removeAnyKind(event.getPlayer()));
         }
 
+        public static boolean teleportBypass = false;
+
+        @EventHandler
+        public void onPlayerBreakBlockEvent(BlockBreakEvent event) {
+            for (MatchInstance matchInstance : instances)
+                if (matchInstance.state.equals(InstancedRegionState.ONGOING))
+                    if (matchInstance.getDeathBanners().get(event.getBlock()) != null)
+                        matchInstance.getDeathBanners().get(event.getBlock()).clear(true);
+        }
+
+        /**
+         * This event scans for damage that would kill the player and cancels it with custom behavior it if would
+         *
+         * @param event Damage event
+         */
         @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
         public void onPlayerDamage(EntityDamageEvent event) {
             if (!event.getEntityType().equals(EntityType.PLAYER)) return;
@@ -391,11 +432,16 @@ public class MatchInstance {
         }
 
         @EventHandler
-        public void onPlayerBreakBlockEvent(BlockBreakEvent event) {
+        public void onPlayerTeleport(PlayerTeleportEvent event) {
+            if (teleportBypass) {
+                teleportBypass = false;
+                return;
+            }
             for (MatchInstance matchInstance : instances)
-                if (matchInstance.state.equals(InstancedRegionState.ONGOING))
-                    if (matchInstance.getDeathBanners().get(event.getBlock()) != null)
-                        matchInstance.getDeathBanners().get(event.getBlock()).clear(true);
+                if (matchInstance.participants.contains(event.getPlayer())) {
+                    event.setCancelled(true);
+                    return;
+                }
         }
     }
 

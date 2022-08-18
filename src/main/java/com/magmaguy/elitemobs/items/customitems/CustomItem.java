@@ -54,7 +54,7 @@ public class CustomItem {
     private double dropWeight = 0;
     private Scalability scalability;
     private ItemType itemType;
-    private int itemLevel = -1;
+    private double itemLevel = -1;
 
     /**
      * Generates a CustomItem object. This holds values for limited and dynamic items until a tier is determined for them.
@@ -64,6 +64,8 @@ public class CustomItem {
     public CustomItem(CustomItemsConfigFields customItemsConfigFields) {
         this.customItemsConfigFields = customItemsConfigFields;
         this.itemLevel = customItemsConfigFields.getLevel();
+        if (itemLevel == 0)
+            itemLevel = EliteItemManager.getItemLevel(new ItemStack(customItemsConfigFields.getMaterial()));
         this.permission = customItemsConfigFields.getPermission();
         parseFileName();
         if (!parseIsEnabled()) return;
@@ -217,7 +219,7 @@ public class CustomItem {
                         ScalableItemConstructor.constructScalableItem(itemTier + 1, this, player, eliteEntity));
                 break;
             case FIXED:
-                loot = location.getWorld().dropItem(location, generateItemStack(itemLevel + 1, player, eliteEntity));
+                loot = location.getWorld().dropItem(location, generateItemStack((int) itemLevel + 1, player, eliteEntity));
             default:
         }
 
@@ -373,7 +375,7 @@ public class CustomItem {
         if (player != null && !permission.isEmpty() && !player.hasPermission(permission)) return null;
         ItemStack itemStack =
                 ItemConstructor.constructItem(
-                        itemLevel,
+                        (int) itemLevel,
                         getName(),
                         getMaterial(),
                         getEnchantments(),

@@ -11,7 +11,6 @@ import org.bukkit.inventory.ItemStack;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 
 public class EliteCustomLootEntry extends CustomLootEntry implements Serializable {
     @Getter
@@ -135,20 +134,32 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
 
     @Override
     public void directDrop(int itemTier, Player player) {
-        for (int i = 0; i < getAmount(); i++){
+        String name = null;
+        for (int i = 0; i < getAmount(); i++) {
             ItemStack itemStack = generateCustomItem().generateItemStack(itemTier, player, null);
             player.getInventory().addItem(itemStack);
-            player.sendMessage(ItemSettingsConfig.getDirectDropCustomLootMessage().replace("$itemName", Objects.requireNonNull(itemStack.getItemMeta()).getDisplayName()));
+            if (name == null && itemStack.getItemMeta() != null) {
+                if (itemStack.getItemMeta().hasDisplayName()) name = itemStack.getItemMeta().getDisplayName();
+                else name = itemStack.getType().toString().replace("_", " ");
+            }
         }
+        if (name != null)
+            player.sendMessage(ItemSettingsConfig.getDirectDropCustomLootMessage().replace("$itemName", getAmount() + "x " + name));
     }
 
     @Override
     public void directDrop(int itemTier, Player player, EliteEntity eliteEntity) {
-        for (int i = 0; i < getAmount(); i++){
+        String name = null;
+        for (int i = 0; i < getAmount(); i++) {
             ItemStack itemStack = generateCustomItem().generateItemStack(itemTier, player, eliteEntity);
             if (itemStack == null) return;
             player.getInventory().addItem(itemStack);
-            player.sendMessage(ItemSettingsConfig.getDirectDropCustomLootMessage().replace("$itemName", Objects.requireNonNull(itemStack.getItemMeta()).getDisplayName()));
+            if (name == null && itemStack.getItemMeta() != null) {
+                if (itemStack.getItemMeta().hasDisplayName()) name = itemStack.getItemMeta().getDisplayName();
+                else name = itemStack.getType().toString().replace("_", " ");
+            }
         }
+        if (name != null)
+            player.sendMessage(ItemSettingsConfig.getDirectDropCustomLootMessage().replace("$itemName", getAmount() + "x " + name));
     }
 }

@@ -23,6 +23,7 @@ import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
 import com.magmaguy.elitemobs.config.potioneffects.PotionEffectsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
+import com.magmaguy.elitemobs.config.translations.TranslationsConfig;
 import com.magmaguy.elitemobs.config.wormholes.WormholeConfig;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
 import com.magmaguy.elitemobs.economy.VaultCompatibility;
@@ -283,6 +284,9 @@ public class EliteMobs extends JavaPlugin {
         Check for new plugin version or for dungeon updates
          */
         VersionChecker.check();
+
+        //Initialized translations
+        new TranslationsConfig();
     }
 
     @Override

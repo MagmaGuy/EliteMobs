@@ -92,8 +92,11 @@ public class QuestInventoryMenu {
 
     public static void fillItemSlotLists(Inventory inventory, List<Integer> entries, TextComponent title, List<TextComponent> textComponents, Material material) {
         List<ItemStack> loreItems = generateItemStackEntry(title, textComponents, material);
-        for (int i = 0; i < loreItems.size(); i++)
-            inventory.setItem(entries.get(i), loreItems.get(i));
+        List<Integer> exactEntriesAmount = new ArrayList<>(entries);
+        exactEntriesAmount = exactEntriesAmount.subList(0, loreItems.size());
+        Collections.sort(exactEntriesAmount);
+        for (int i = 0; i < exactEntriesAmount.size(); i++)
+            inventory.setItem(exactEntriesAmount.get(i), loreItems.get(i));
     }
 
     public static List<ItemStack> generateItemStackEntry(TextComponent title, List<TextComponent> textComponents, Material material) {

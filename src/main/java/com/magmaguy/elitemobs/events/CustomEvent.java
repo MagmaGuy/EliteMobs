@@ -123,8 +123,7 @@ public abstract class CustomEvent {
      */
     public void commonWatchdogBehavior() {
         if (customEventsConfigFields.getEventEndTime() != -1)
-            if (currentDay != dayCalculator() ||
-                    eventStartLocation.getWorld().getTime() > customEventsConfigFields.getEventEndTime()) {
+            if (eventStartLocation.getWorld().getTime() > customEventsConfigFields.getEventEndTime()) {
                 end();
                 return;
             }
