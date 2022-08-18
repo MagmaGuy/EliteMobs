@@ -297,7 +297,7 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         this.disguise = processString("disguise", disguise, null, false);
         this.customDisguiseData = processString("customDisguiseData", customDisguiseData, null, false);
         this.customModel = processString("customModel", customModel, null, false);
-        if (Bukkit.getPluginManager().getPlugin("ModelEngine").isEnabled() && CustomModel.modelIsLoaded(customModel))
+        if (Bukkit.getPluginManager().isPluginEnabled("ModelEngine") && CustomModel.modelIsLoaded(customModel))
             customModelExists = true;
         this.announcementPriority = processInt("announcementPriority", announcementPriority, 0, false);
         this.followDistance = processInt("followDistance", followDistance, 0, false);

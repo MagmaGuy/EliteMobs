@@ -173,7 +173,7 @@ public class PlayerDamagedByEliteMobEvent extends Event implements Cancellable {
                 if (((EvokerFangs) event.getDamager()).getOwner() != null)
                     eliteEntity = EntityTracker.getEliteMobEntity(((EvokerFangs) event.getDamager()).getOwner());
 
-            if (eliteEntity == null) return;
+            if (eliteEntity == null || eliteEntity.getLivingEntity() == null) return;
 
             //dodge chance
             if (ThreadLocalRandom.current().nextDouble() < GuildRank.dodgeBonusValue(GuildRank.getGuildPrestigeRank(player), GuildRank.getActiveGuildRank(player)) / 100) {
