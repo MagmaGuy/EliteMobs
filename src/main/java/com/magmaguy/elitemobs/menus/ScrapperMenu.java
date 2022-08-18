@@ -56,6 +56,9 @@ public class ScrapperMenu extends EliteMenu {
                     infoButton.setType(Material.PAPER);
                     ItemMeta itemMeta = infoButton.getItemMeta();
                     itemMeta.setCustomModelData(MetadataHandler.signatureID);
+                    List<String> parsedLore = new ArrayList<>();
+                    itemMeta.getLore().forEach(entry -> parsedLore.add(entry.replace("$chance", ScrapperMenuConfig.scrapChance * 100 + "")));
+                    itemMeta.setLore(parsedLore);
                     infoButton.setItemMeta(itemMeta);
                 }
                 scrapInventory.setItem(i, infoButton);
@@ -73,7 +76,7 @@ public class ScrapperMenu extends EliteMenu {
 
                 List<String> lore = new ArrayList<>();
                 for (String string : ScrapperMenuConfig.confirmButton.getItemMeta().getLore())
-                    lore.add(string);
+                    lore.add(string.replace("$chance", ScrapperMenuConfig.scrapChance * 100 + ""));
                 ScrapperMenuConfig.confirmButton.getItemMeta().setLore(lore);
                 ItemMeta clonedMeta = clonedConfirmButton.getItemMeta();
                 clonedMeta.setLore(lore);
@@ -139,22 +142,27 @@ public class ScrapperMenu extends EliteMenu {
 
                 //sell items in shop
                 if (event.getSlot() == SellMenuConfig.confirmSlot) {
-
+                    int successes = 0;
+                    int failures = 0;
                     for (Integer validSlot : validSlots) {
                         ItemStack itemStack = shopInventory.getItem(validSlot);
                         if (itemStack == null)
                             continue;
                         int tier = EliteItemManager.getRoundedItemLevel(itemStack);
                         for (int i = 0; i < itemStack.getAmount(); i++) {
-                            if (ThreadLocalRandom.current().nextDouble() > .75) {
-                                player.sendMessage(ChatColorConverter.convert(ItemSettingsConfig.getScrapFailedMessage()));
+                            if (ThreadLocalRandom.current().nextDouble() > ScrapperMenuConfig.scrapChance) {
+                                failures++;
                                 continue;
                             }
                             player.getInventory().addItem(ItemConstructor.constructScrapItem(tier, player, false));
-                            player.sendMessage(ChatColorConverter.convert(ItemSettingsConfig.getScrapSucceededMessage()));
+                            successes++;
                         }
                         itemStack.setAmount(0);
                     }
+                    if (successes > 0)
+                        player.sendMessage(ChatColorConverter.convert(ItemSettingsConfig.getScrapSucceededMessage().replace("$amount", successes + "")));
+                    if (failures > 0)
+                        player.sendMessage(ChatColorConverter.convert(ItemSettingsConfig.getScrapFailedMessage().replace("$amount", failures + "")));
 
                     return;
                 }

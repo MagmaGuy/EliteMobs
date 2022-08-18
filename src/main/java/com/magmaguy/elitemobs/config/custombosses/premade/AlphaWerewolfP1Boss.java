@@ -21,7 +21,7 @@ public class AlphaWerewolfP1Boss extends CustomBossesConfigFields {
         setPhases(Arrays.asList("alpha_werewolf_p2.yml:0.99"));
         setPowers(Arrays.asList("spirit_walk.yml",
                 "summonable:summonType=GLOBAL:filename=gamma_werewolf.yml:amount=1:customSpawn=normal_surface_spawn.yml",
-                "summonable:summonType=GLOBAL:filename=omega_wolf.yml:amount=5:customSpawn=normal_surface_spawn.yml"));
+                "summonable:summonType=GLOBAL:filename=omega_wolf.yml:amount=2:customSpawn=normal_surface_spawn.yml"));
         setSpawnMessage("&cThe howls of an Alpha Werewolf are heard!");
         setDeathMessage("&aThe Alpha Werewolf has been stopped by $players!");
         setDeathMessages(Arrays.asList(

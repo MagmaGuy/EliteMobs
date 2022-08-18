@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.quests.playercooldowns;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.customquests.CustomQuestsConfigFields;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
@@ -8,15 +9,24 @@ import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachment;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 public class PlayerQuestCooldowns implements Serializable {
 
     @Getter
     private final List<QuestCooldown> questCooldowns = new ArrayList<>();
+    private static final HashSet<Player> bypassedPlayers = new HashSet<>();
+
+    public static void toggleBypass(Player player) {
+        if (!bypassedPlayers.contains(player))
+            bypassedPlayers.add(player);
+        else
+            bypassedPlayers.remove(player);
+    }
+
+    public static boolean bypassesQuestRestrictions(Player player){
+        return bypassedPlayers.contains(player);
+    }
 
     /**
      * Initializes cooldowns from scratch, assuming no preexisting player data
@@ -42,6 +52,23 @@ public class PlayerQuestCooldowns implements Serializable {
         playerQuestCooldowns.getQuestCooldowns().clear();
         PlayerData.resetQuests(player.getUniqueId());
         PlayerData.resetPlayerQuestCooldowns(player.getUniqueId());
+    }
+
+    public static void resetPlayerQuestCooldown(Player player, CustomQuestsConfigFields customQuestsConfigFields) {
+        if (PlayerData.getPlayerQuestCooldowns(player.getUniqueId()) == null) return;
+        PermissionAttachment permissionAttachment = Objects.requireNonNull(player).addAttachment(MetadataHandler.PLUGIN);
+        String lockoutPermission = customQuestsConfigFields.getQuestLockoutPermission();
+        if (lockoutPermission == null || lockoutPermission.isEmpty()) return;
+        PlayerQuestCooldowns playerQuestCooldowns = PlayerData.getPlayerQuestCooldowns(player.getUniqueId());
+        for (QuestCooldown questCooldown : playerQuestCooldowns.getQuestCooldowns()) {
+            if (questCooldown.getPermission().equals(lockoutPermission)) {
+                if (questCooldown.getBukkitTask() != null)
+                    questCooldown.getBukkitTask().cancel();
+                permissionAttachment.setPermission(questCooldown.getPermission(), false);
+                player.removeMetadata(questCooldown.getPermission(), MetadataHandler.PLUGIN);
+            }
+            return;
+        }
     }
 
     public static void addCooldown(Player player, String permission, int delayInMinutes) {

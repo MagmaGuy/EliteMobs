@@ -1,5 +1,7 @@
 package com.magmaguy.elitemobs.commands.quests;
 
+import com.magmaguy.elitemobs.config.customquests.CustomQuestsConfig;
+import com.magmaguy.elitemobs.config.customquests.CustomQuestsConfigFields;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.Quest;
@@ -50,11 +52,30 @@ public class QuestCommand {
         commandSender.sendMessage("[EliteMobs] Successfully reset quests for player " + playerString);
     }
 
-    public static void completeQuest(Player player){
-        for (Quest quest : new ArrayList<Quest>(PlayerData.getQuests(player.getUniqueId()))){
+    public static void resetQuest(CommandSender commandSender, String playerString, String questName) {
+        Player player = Bukkit.getPlayer(playerString);
+        if (player == null) {
+            commandSender.sendMessage("[EliteMobs] Error - player name is not valid!");
+            return;
+        }
+        CustomQuestsConfigFields customQuestsConfigFields = CustomQuestsConfig.getCustomQuests().get(questName);
+        if (customQuestsConfigFields == null) {
+            commandSender.sendMessage("[EliteMobs] Error - quest filename " + questName + " is not valid!");
+            return;
+        }
+        PlayerQuestCooldowns.resetPlayerQuestCooldown(player, customQuestsConfigFields);
+        commandSender.sendMessage("[EliteMobs] Successfully quest " + questName + " for player " + playerString);
+    }
+
+    public static void completeQuest(Player player) {
+        for (Quest quest : new ArrayList<Quest>(PlayerData.getQuests(player.getUniqueId()))) {
             quest.getQuestObjectives().setForceOver(true);
             Quest.completeQuest(quest.getQuestID(), player);
         }
+    }
+
+    public static void bypassQuestRequirements(Player player){
+        PlayerQuestCooldowns.toggleBypass(player);
     }
 
 }

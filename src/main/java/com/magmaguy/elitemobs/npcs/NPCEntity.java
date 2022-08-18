@@ -271,6 +271,8 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
         } else if (persistentObjectHandler != null)
             if (!removalReason.equals(RemovalReason.SHUTDOWN))
                 persistentObjectHandler.updatePersistentLocation(getPersistentLocation());
+            else
+                persistentObjectHandler.remove();
     }
 
     /**

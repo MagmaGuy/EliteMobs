@@ -21,6 +21,7 @@ public class ScrapperMenuConfig extends MenusConfigFields {
     public static int cancelSlot;
     public static ItemStack confirmButton;
     public static int confirmSlot;
+    public static double scrapChance;
 
     public ScrapperMenuConfig() {
         super("scrapper_menu", true);
@@ -36,7 +37,7 @@ public class ScrapperMenuConfig extends MenusConfigFields {
                         Arrays.asList("&8Support the plugins you enjoy!",
                                 "&4Warning!",
                                 "&cItems scrapped here are lost!",
-                                "&cThere is a 50% chance to get",
+                                "&cThere is a $chance% chance to get",
                                 "&cscrap when scrapping items!",
                                 "&aUse scrap at the smelter,",
                                 "&arepairman and refiner!"), MetadataHandler.signatureID),
@@ -50,9 +51,10 @@ public class ScrapperMenuConfig extends MenusConfigFields {
         cancelButton = ItemStackSerializer.deserialize("cancelButton", fileConfiguration);
         cancelSlot = ConfigurationEngine.setInt(fileConfiguration, "cancelButtonSlot", 27);
         ItemStackSerializer.serialize("confirmButton", ItemStackGenerator.generateItemStack(Material.EMERALD,
-                "&2Confirm Scrap", Arrays.asList("&aScrap items!", "&a50% chance of success!"), 31174), fileConfiguration);
+                "&2Confirm Scrap", Arrays.asList("&aScrap items!", "&a$chance% chance of success!"), 31174), fileConfiguration);
         confirmButton = ItemStackSerializer.deserialize("confirmButton", fileConfiguration);
         confirmSlot = ConfigurationEngine.setInt(fileConfiguration, "confirmScrapSlot", 35);
+        scrapChance = ConfigurationEngine.setDouble(fileConfiguration, "scrapChance", 0.75);
     }
 
 }

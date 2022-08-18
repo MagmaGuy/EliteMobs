@@ -107,6 +107,7 @@ public class CustomBossMegaConsumer {
     private void setDisguise(LivingEntity livingEntity) {
         if (customBossesConfigFields.getDisguise() == null ||
                 Bukkit.getPluginManager().isPluginEnabled("ModelEngine") &&
+                        customBossesConfigFields.isCustomModelExists() &&
                         customBossesConfigFields.getCustomModel() != null &&
                         !customBossesConfigFields.getCustomModel().isEmpty())
             return;
@@ -119,7 +120,9 @@ public class CustomBossMegaConsumer {
     }
 
     private void setCustomModel(LivingEntity livingEntity) {
-        if (!Bukkit.getPluginManager().isPluginEnabled("ModelEngine") && !Bukkit.getPluginManager().isPluginEnabled("ModelEngine_Beta")) return;
+        if (!Bukkit.getPluginManager().isPluginEnabled("ModelEngine") && !Bukkit.getPluginManager().isPluginEnabled("ModelEngine_Beta"))
+            return;
+        if (!customBossesConfigFields.isCustomModelExists()) return;
         if (customBossesConfigFields.getCustomModel() == null || customBossesConfigFields.getCustomModel().isEmpty())
             return;
         try {

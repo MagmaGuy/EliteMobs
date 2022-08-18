@@ -125,7 +125,7 @@ public class EliteItemManager {
      */
     public static double getWeaponLevel(@Nullable ItemStack itemStack) {
         //The weapon level takes the base stats of the item and the elite damage attribute into account. Elite sharpness
-        //is a part of the rarity so it does not figure into the level math
+        //is a part of the rarity, so it does not figure into the level math
         return Math.max(Math.round(
                 (getDPS(getAttackSpeed(itemStack), getBaseDamage(itemStack)) +
                         getDPS(getAttackSpeed(itemStack), ItemTagger.getEliteDamageAttribute(itemStack)))
@@ -235,10 +235,12 @@ public class EliteItemManager {
         if (itemStack == null) return;
         if (isWeapon(itemStack)) {
             double damage = level * CombatSystem.DPS_PER_LEVEL / 1 / getAttackSpeed(itemStack) - getBaseDamage(itemStack);
-            ItemTagger.setEliteDamageAttribute(itemStack, damage);
+            if (damage > 0)
+                ItemTagger.setEliteDamageAttribute(itemStack, damage);
         } else if (isArmor(itemStack)) {
             double defense = (level - CombatSystem.getMaterialTier(itemStack.getType())) / 4D;
-            ItemTagger.setEliteDefenseAttribute(itemStack, defense);
+            if (defense > 0)
+                ItemTagger.setEliteDefenseAttribute(itemStack, defense);
         }
     }
 

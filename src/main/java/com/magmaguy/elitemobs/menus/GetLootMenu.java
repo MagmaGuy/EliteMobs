@@ -133,6 +133,7 @@ public class GetLootMenu extends EliteMenu implements Listener {
                     break;
                 }
             if (getLootMenu == null) return;
+            if (event.getClickedInventory() == null) return;
             event.setCancelled(true);
 
             Player player = (Player) event.getWhoClicked();
