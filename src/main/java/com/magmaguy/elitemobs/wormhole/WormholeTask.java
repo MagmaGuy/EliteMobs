@@ -103,6 +103,7 @@ public class WormholeTask {
             player.teleport(destination);
             player.playSound(player.getLocation(), Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, 1f, 1f);
             player.setVelocity(destination.getDirection().normalize());
+            player.setFlying(false);
             Wormhole.getPlayerCooldowns().add(player);
             Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, () -> Wormhole.getPlayerCooldowns().remove(player), 20 * 5L);
         });

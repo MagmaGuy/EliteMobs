@@ -11,6 +11,7 @@ import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.items.ItemWorthCalculator;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
+import com.magmaguy.elitemobs.utils.Round;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -194,7 +195,7 @@ public class SellMenu extends EliteMenu implements Listener {
                         player.sendMessage(ChatColorConverter.convert(
                                 TranslationConfig.getShopSellMessage()
                                         .replace("$item_name", itemStack.getItemMeta().getDisplayName())
-                                        .replace("$currency_amount", itemValue + "")
+                                        .replace("$currency_amount", Round.twoDecimalPlaces(itemValue) + "")
                                         .replace("$currency_name", EconomySettingsConfig.getCurrencyName())));
                     shopInventory.clear(validSlot);
                 }

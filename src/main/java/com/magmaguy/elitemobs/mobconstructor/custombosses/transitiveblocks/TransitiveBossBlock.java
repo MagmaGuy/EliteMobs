@@ -33,7 +33,9 @@ public class TransitiveBossBlock implements Listener {
                 ((Directional) blockData).setFacing(rotateBlockFace(((Directional) blockData).getFacing(), rotation));
         }
 
-        location.getBlock().setBlockData(blockData);
+        //Minor optimization, does not replace blocks that are already identical
+        if (!location.getBlock().getBlockData().getMaterial().equals(blockData.getMaterial()))
+            location.getBlock().setBlockData(blockData);
     }
 
     /*

@@ -41,6 +41,14 @@ public class QuestInteractionHandler {
         //This value can be null for NPC entities that have the custom quest interaction but are only used to turn quests in
         if (npcEntity.getNPCsConfigFields().getQuestFilenames() != null)
             for (String questString : npcEntity.getNPCsConfigFields().getQuestFilenames()) {
+                boolean activeQuest = false;
+                for (CustomQuest customQuest : customQuestList)
+                    if (customQuest.getCustomQuestsConfigFields().getFilename().equals(questString)) {
+                        activeQuest = true;
+                        continue;
+                    }
+                if (activeQuest) continue;
+
                 CustomQuest customQuest = CustomQuest.getQuest(questString, player);
                 if (customQuest == null) {
                     player.sendMessage("[EliteMobs] This NPC's quest is not valid! This might be a configuration error on the NPC or on the quest.");

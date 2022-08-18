@@ -6,9 +6,11 @@ import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.config.CustomConfigFieldsInterface;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.items.customloottable.CustomLootTable;
+import com.magmaguy.elitemobs.thirdparty.modelengine.CustomModel;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
@@ -116,6 +118,8 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     @Getter
     @Setter
     private String customModel = null;
+    @Getter
+    private boolean customModelExists = false;
     /**
      * Announcement priority:
      * 0 - no messages
@@ -293,6 +297,8 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         this.disguise = processString("disguise", disguise, null, false);
         this.customDisguiseData = processString("customDisguiseData", customDisguiseData, null, false);
         this.customModel = processString("customModel", customModel, null, false);
+        if (Bukkit.getPluginManager().getPlugin("ModelEngine").isEnabled() && CustomModel.modelIsLoaded(customModel))
+            customModelExists = true;
         this.announcementPriority = processInt("announcementPriority", announcementPriority, 0, false);
         this.followDistance = processInt("followDistance", followDistance, 0, false);
         this.spawnCooldown = processInt("spawnCooldown", spawnCooldown, 0, false);

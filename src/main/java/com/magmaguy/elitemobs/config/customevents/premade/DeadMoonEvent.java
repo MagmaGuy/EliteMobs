@@ -14,7 +14,7 @@ public class DeadMoonEvent extends CustomEventsConfigFields {
         setGlobalCooldown(25D);
         setWeight(50D);
         setCustomSpawn("dead_moon_spawn.yml");
-        setEventDuration(60D);
-        setEventEndTime(23999);
+        setEventDuration(10D);
+        setEventEndTime(23000);
     }
 }

@@ -16,6 +16,7 @@ import com.magmaguy.elitemobs.config.ConfigurationExporter;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
+import com.magmaguy.elitemobs.config.customquests.CustomQuestsConfig;
 import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestsConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
 import com.magmaguy.elitemobs.config.wormholes.WormholeConfig;
@@ -769,6 +770,22 @@ public class AdminCommands {
                 .meta(CommandMeta.DESCRIPTION, "Resets player quest progress.")
                 .handler(commandContext -> QuestCommand.resetQuests(commandContext.getSender(), commandContext.get("player"))));
 
+        List<String> questFilenames = new ArrayList<>(CustomQuestsConfig.getCustomQuests().keySet());
+
+        // /em quest reset player questname
+        manager.command(builder.literal("quest")
+                .literal("reset")
+                .argument(StringArgument.<CommandSender>newBuilder("player").withSuggestionsProvider(((objectCommandContext, s) -> {
+                    ArrayList<String> arrayList = new ArrayList<>();
+                    Bukkit.getOnlinePlayers().forEach(player -> arrayList.add(player.getName()));
+                    return arrayList;
+                })))
+                .argument(StringArgument.<CommandSender>newBuilder("questName").withSuggestionsProvider((objectCommandContext, s) -> questFilenames), ArgumentDescription.of("Quest name"))
+                .senderType(CommandSender.class)
+                .permission("elitemobs.*")
+                .meta(CommandMeta.DESCRIPTION, "Resets a specific quest for a player.")
+                .handler(commandContext -> QuestCommand.resetQuest(commandContext.getSender(), commandContext.get("player"), commandContext.get("questName"))));
+
         // /em quest forcecomplete
         manager.command(builder.literal("quest")
                 .literal("forcecomplete")
@@ -776,6 +793,14 @@ public class AdminCommands {
                 .permission("elitemobs.*")
                 .meta(CommandMeta.DESCRIPTION, "Forces completion of all player quests.")
                 .handler(commandContext -> QuestCommand.completeQuest((Player) commandContext.getSender())));
+
+        // /em quest bypass
+        manager.command(builder.literal("quest")
+                .literal("bypass")
+                .senderType(CommandSender.class)
+                .permission("elitemobs.*")
+                .meta(CommandMeta.DESCRIPTION, "Allows admins to temporarily bypass permission and previous quest requirements for quests.")
+                .handler(commandContext -> QuestCommand.bypassQuestRequirements((Player) commandContext.getSender())));
 
         // /em forceresourcepack
         manager.command(builder.literal("forceresourcepack")

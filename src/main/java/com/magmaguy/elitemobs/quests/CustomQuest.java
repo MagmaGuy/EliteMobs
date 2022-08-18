@@ -101,6 +101,7 @@ public class CustomQuest extends Quest {
     }
 
     public boolean hasPermissionForQuest(Player player) {
+        if (PlayerQuestCooldowns.bypassesQuestRestrictions(player)) return true;
         if (!customQuestsConfigFields.getQuestAcceptPermission().isEmpty() &&
                 !player.hasMetadata(customQuestsConfigFields.getQuestAcceptPermission()))
             return false;
