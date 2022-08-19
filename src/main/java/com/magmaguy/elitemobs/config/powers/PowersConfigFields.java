@@ -49,7 +49,7 @@ public class PowersConfigFields extends CustomConfigFields {
     @Override
     public void processConfigFields() {
         this.isEnabled = processBoolean("isEnabled", isEnabled, true, true);
-        this.name = processString("name", name, null, true);
+        this.name = translatable(filename, "name", processString("name", name, null, true));
         this.effect = processString("effect", effect, null, false);
         this.powerCooldown = processInt("powerCooldown", powerCooldown, 0, false);
         this.globalCooldown = processInt("globalCooldown", globalCooldown, 0, false);

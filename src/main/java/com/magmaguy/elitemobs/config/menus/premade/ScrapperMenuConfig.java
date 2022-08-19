@@ -29,7 +29,7 @@ public class ScrapperMenuConfig extends MenusConfigFields {
 
     @Override
     public void processAdditionalFields() {
-        shopName = ConfigurationEngine.setString(fileConfiguration, "shopName", "[EM] Scrapper");
+        shopName = ConfigurationEngine.setString(file, fileConfiguration, "shopName", "[EM] Scrapper", true);
         ItemStackSerializer.serialize(
                 "infoButton",
                 ItemStackGenerator.generateSkullItemStack("magmaguy",
@@ -44,8 +44,8 @@ public class ScrapperMenuConfig extends MenusConfigFields {
                 fileConfiguration);
         infoButton = ItemStackSerializer.deserialize("infoButton", fileConfiguration);
         infoSlot = ConfigurationEngine.setInt(fileConfiguration, "infoButtonSlot", 4);
-        storeSlots = ConfigurationEngine.setList(fileConfiguration, "scrapSlots", Arrays.asList(19, 20, 21, 22, 23,
-                24, 25, 28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 43));
+        storeSlots = ConfigurationEngine.setList(file, fileConfiguration, "scrapSlots", Arrays.asList(19, 20, 21, 22, 23,
+                24, 25, 28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 43), false);
         ItemStackSerializer.serialize("cancelButton", ItemStackGenerator.generateItemStack(Material.BARRIER,
                 "&4Cancel", Arrays.asList("&cCancel scrap!"), MetadataHandler.signatureID), fileConfiguration);
         cancelButton = ItemStackSerializer.deserialize("cancelButton", fileConfiguration);

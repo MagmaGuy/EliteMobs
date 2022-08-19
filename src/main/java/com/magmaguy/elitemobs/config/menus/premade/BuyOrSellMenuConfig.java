@@ -27,7 +27,7 @@ public class BuyOrSellMenuConfig extends MenusConfigFields {
 
     @Override
     public void processAdditionalFields() {
-        SHOP_NAME = ConfigurationEngine.setString(fileConfiguration, "Shop name", "[EM] Buy or Sell");
+        SHOP_NAME = ConfigurationEngine.setString(file, fileConfiguration, "Shop name", "[EM] Buy or Sell", true);
         ItemStackSerializer.serialize(
                 "Information button",
                 ItemStackGenerator.generateSkullItemStack("magmaguy",

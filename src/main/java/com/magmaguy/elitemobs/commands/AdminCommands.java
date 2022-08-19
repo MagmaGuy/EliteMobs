@@ -19,6 +19,7 @@ import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.config.customquests.CustomQuestsConfig;
 import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestsConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
+import com.magmaguy.elitemobs.config.translations.TranslationsConfig;
 import com.magmaguy.elitemobs.config.wormholes.WormholeConfig;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
@@ -900,6 +901,25 @@ public class AdminCommands {
                     }
                     commandContext.getSender().sendMessage("[EliteMobs] Failed to set location for this wormhole.");
                 }));
+
+        List<String> languages = new ArrayList<>(TranslationsConfig.getTranslationConfigs().keySet());
+        languages.add("english");
+
+        // /em language <language>
+        manager.command(builder.literal("language")
+                .argument(StringArgument.<CommandSender>newBuilder("language").withSuggestionsProvider(((objectCommandContext, s) -> languages)),
+                        ArgumentDescription.of("Filename of the translation file to use"))
+                .meta(CommandMeta.DESCRIPTION, "Sets the language of the plugin!")
+                .senderType(CommandSender.class)
+                .permission("elitemobs.*")
+                .handler(commandContext -> {
+                    if (languages.contains(commandContext.get("language"))) {
+                        DefaultConfig.setLanguage((Player) commandContext.getSender(), commandContext.get("language"));
+                        commandContext.getSender().sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2Language set to " + commandContext.get("language")));
+                    } else
+                        commandContext.getSender().sendMessage(ChatColorConverter.convert("&8[EliteMobs] &cNot a valid language!"));
+                })
+        );
     }
 
     private void testFireball(Player player) {

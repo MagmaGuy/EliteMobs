@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.api.utils;
 
 import com.magmaguy.elitemobs.combatsystem.CombatSystem;
+import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
@@ -52,7 +53,8 @@ public class EliteItemManager {
         double defaultDamage = 1.0;
         if (itemStack == null) return defaultDamage;
         //Ranged damage works differently. 6.0 damage is the best case scenario for the average arrow so that is the value used.
-        if (itemStack.getType() == Material.BOW || itemStack.getType() == Material.CROSSBOW) return 6.0;
+        if (itemStack.getType() == Material.BOW) return 6.0;
+        if (itemStack.getType() == Material.CROSSBOW) return 7.0;
         //Check the default modifiers - these are usually the only modifiers
         for (AttributeModifier attributeModifier : itemStack.getType().getDefaultAttributeModifiers(EquipmentSlot.HAND).get(Attribute.GENERIC_ATTACK_DAMAGE))
             defaultDamage = attributeCrawler(defaultDamage, attributeModifier);
@@ -145,11 +147,14 @@ public class EliteItemManager {
         double eliteDamage = ItemTagger.getEliteDamageAttribute(itemStack);
         //Elite Items may have elite enchantments associated to an item
         int enchantmentLevel = ItemTagger.getEnchantment(itemStack.getItemMeta(), Enchantment.DAMAGE_ALL.getKey());
-        if (enchantmentLevel > 0) {
+        if (enchantmentLevel > 0 && ItemSettingsConfig.isUseEliteEnchantments()) {
             enchantmentLevel -= Enchantment.DAMAGE_ALL.getMaxLevel();
+            if (enchantmentLevel < 0) enchantmentLevel = 0;
         } else {
             enchantmentLevel = ItemTagger.getEnchantment(itemStack.getItemMeta(), Enchantment.ARROW_DAMAGE.getKey());
-            enchantmentLevel -= Enchantment.ARROW_DAMAGE.getMaxLevel();
+            if (enchantmentLevel > 0 && ItemSettingsConfig.isUseEliteEnchantments())
+                enchantmentLevel -= Enchantment.ARROW_DAMAGE.getMaxLevel();
+            if (enchantmentLevel < 0) enchantmentLevel = 0;
         }
 
         if (enchantmentLevel < 1)
@@ -218,6 +223,10 @@ public class EliteItemManager {
     }
 
     public static boolean isWeapon(@Nullable ItemStack itemStack) {
+        if (itemStack == null) return false;
+        //Wooden axe stats are so bad they can't even get detected properly
+        if (itemStack.getType().equals(Material.WOODEN_AXE) || itemStack.getType().equals(Material.CROSSBOW))
+            return true;
         return getWeaponLevel(itemStack) > 3.0;
     }
 

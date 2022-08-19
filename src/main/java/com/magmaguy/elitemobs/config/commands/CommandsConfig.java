@@ -36,7 +36,7 @@ public class CommandsConfig {
 
         File file = ConfigurationEngine.fileCreator("commands", commandsConfigFields.getFileName());
         FileConfiguration fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
-        commandsConfigFields.generateConfigDefaults(fileConfiguration);
+        commandsConfigFields.generateConfigDefaults(file,fileConfiguration);
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
 
         return fileConfiguration;

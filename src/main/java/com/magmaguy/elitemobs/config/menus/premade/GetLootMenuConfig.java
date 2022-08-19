@@ -22,7 +22,7 @@ public class GetLootMenuConfig extends MenusConfigFields {
     @Override
     public void processAdditionalFields() {
 
-        menuName = ConfigurationEngine.setString(fileConfiguration, "Menu name", "[EM] Getloot menu");
+        menuName = ConfigurationEngine.setString(file, fileConfiguration, "Menu name", "[EM] Getloot menu", true);
 
         ItemStackSerializer.serialize(
                 "Info button",
@@ -51,8 +51,8 @@ public class GetLootMenuConfig extends MenusConfigFields {
                 fileConfiguration);
         rightArrowItem = ItemStackSerializer.deserialize("Right button", fileConfiguration);
 
-        tierTranslation = ConfigurationEngine.setString(fileConfiguration, "tierTranslation", "Tier");
-        itemFilterTranslation = ConfigurationEngine.setString(fileConfiguration, "itemFilterTranslation", "Filter by items of this rank.");
+        tierTranslation = ConfigurationEngine.setString(file, fileConfiguration, "tierTranslation", "Level", true);
+        itemFilterTranslation = ConfigurationEngine.setString(file, fileConfiguration, "itemFilterTranslation", "Filter by items of this level.", true);
 
         ItemStackSerializer.serialize(
                 "previousLoot",

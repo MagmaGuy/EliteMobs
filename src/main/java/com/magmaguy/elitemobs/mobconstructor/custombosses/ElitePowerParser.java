@@ -13,6 +13,7 @@ public class ElitePowerParser {
     public static HashSet<ElitePower> parsePowers(List<String> powers) {
         HashSet<ElitePower> elitePowers = new HashSet<>();
         CustomSummonPower customSummonPower = null;
+        if (powers == null) return elitePowers;
         for (String powerName : powers) {
             if (powerName.split(":")[0].equalsIgnoreCase("summon")
                     || powerName.split(":")[0].equalsIgnoreCase("summonable"))

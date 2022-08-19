@@ -37,8 +37,8 @@ public class ValidWorldsConfig {
             if (validWorldsSection.getBoolean(key))
                 validWorlds.add(key);
 
-        zoneBasedWorlds = ConfigurationEngine.setList(fileConfiguration, "zoneBasedWorlds", new ArrayList());
-        nightmareWorlds = ConfigurationEngine.setList(fileConfiguration, "nightmareWorlds", new ArrayList());
+        zoneBasedWorlds = ConfigurationEngine.setList(file, fileConfiguration, "zoneBasedWorlds", new ArrayList(), false);
+        nightmareWorlds = ConfigurationEngine.setList(file, fileConfiguration, "nightmareWorlds", new ArrayList(), false);
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
 

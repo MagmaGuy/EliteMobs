@@ -17,6 +17,6 @@ public class SummonMerchantConfig extends EnchantmentsConfigFields {
 
     @Override
     public void processAdditionalFields() {
-        message = ConfigurationEngine.setString(super.fileConfiguration, "message", "Jeeves!");
+        message = ConfigurationEngine.setString(file, super.fileConfiguration, "message", "Jeeves!", true);
     }
 }

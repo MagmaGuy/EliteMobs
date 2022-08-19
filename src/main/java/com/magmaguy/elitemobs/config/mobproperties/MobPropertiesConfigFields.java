@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.config.mobproperties;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.config.translations.TranslationsConfig;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
 
@@ -34,8 +35,8 @@ public class MobPropertiesConfigFields {
         this.fileName = file.getName();
         this.entityType = EntityType.valueOf(configuration.getString("entityType"));
         this.isEnabled = configuration.getBoolean("isEnabled");
-        this.name = configuration.getString("name");
-        this.deathMessages = configuration.getStringList("deathMessages");
+        this.name = TranslationsConfig.add(fileName, "name", configuration.getString("name"));
+        this.deathMessages = TranslationsConfig.add(fileName, "deathMessages", configuration.getStringList("deathMessages"));
         this.baseDamage = configuration.getDouble("baseDamageV2");
     }
 

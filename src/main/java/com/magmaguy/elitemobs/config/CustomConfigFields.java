@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.config.translations.TranslationsConfig;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import com.magmaguy.elitemobs.utils.WarningMessage;
@@ -68,6 +69,14 @@ public class CustomConfigFields implements CustomConfigFieldsInterface {
 
     protected boolean configHas(String configKey) {
         return fileConfiguration.contains(configKey);
+    }
+
+    protected String translatable(String filename, String key, String value) {
+        return TranslationsConfig.add(filename, key, value);
+    }
+
+    protected List<String> translatable(String filename, String key, List<String> value) {
+        return TranslationsConfig.add(filename, key, value);
     }
 
     protected String processString(String path, String value, String pluginDefault, boolean forceWriteDefault) {

@@ -46,7 +46,7 @@ public class RefinerMenuConfig extends MenusConfigFields {
 
     @Override
     public void processAdditionalFields() {
-        shopName = ConfigurationEngine.setString(fileConfiguration, "shopName", "[EM] Place 10 scrap!");
+        shopName = ConfigurationEngine.setString(file, fileConfiguration, "shopName", "[EM] Place 10 scrap!", true);
         ItemStackSerializer.serialize(
                 "infoButton",
                 ItemStackGenerator.generateSkullItemStack("magmaguy",
@@ -59,7 +59,7 @@ public class RefinerMenuConfig extends MenusConfigFields {
         infoButton = ItemStackSerializer.deserialize("infoButton", fileConfiguration);
         infoSlot = ConfigurationEngine.setInt(fileConfiguration, "infoButtonSlot", 4);
         inputInformationSlot = ConfigurationEngine.setInt(fileConfiguration, "informationInputButtonSlot", 11);
-        inputSlots = ConfigurationEngine.setList(fileConfiguration, "inputSlots", Arrays.asList(19, 20, 21, 28, 29, 30, 37, 38, 39));
+        inputSlots = ConfigurationEngine.setList(file, fileConfiguration, "inputSlots", Arrays.asList(19, 20, 21, 28, 29, 30, 37, 38, 39), false);
         ItemStackSerializer.serialize(
                 "inputInformationButton",
                 ItemStackGenerator.generateItemStack(Material.GREEN_BANNER,
@@ -69,7 +69,7 @@ public class RefinerMenuConfig extends MenusConfigFields {
                 fileConfiguration);
         inputInfoButton = ItemStackSerializer.deserialize("inputInformationButton", fileConfiguration);
         outputInformationSlot = ConfigurationEngine.setInt(fileConfiguration, "informationOutputButtonSlot", 15);
-        outputSlots = ConfigurationEngine.setList(fileConfiguration, "outputSlots", Arrays.asList(23, 24, 25, 32, 33, 34, 41, 42, 43));
+        outputSlots = ConfigurationEngine.setList(file, fileConfiguration, "outputSlots", Arrays.asList(23, 24, 25, 32, 33, 34, 41, 42, 43), false);
         ItemStackSerializer.serialize("cancelButton", ItemStackGenerator.generateItemStack(Material.BARRIER,
                 "&4Cancel", Arrays.asList("&cCancel upgrade!"), MetadataHandler.signatureID), fileConfiguration);
         ItemStackSerializer.serialize(

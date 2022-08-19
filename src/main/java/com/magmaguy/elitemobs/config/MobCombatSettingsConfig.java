@@ -113,23 +113,23 @@ public class MobCombatSettingsConfig {
         damageToEliteMultiplier = ConfigurationEngine.setDouble(fileConfiguration, "damageToEliteMobMultiplier", 1);
         damageToPlayerMultiplier = ConfigurationEngine.setDouble(fileConfiguration, "damageToPlayerMultiplier", 1);
         showCustomBossLocation = ConfigurationEngine.setBoolean(fileConfiguration, "showCustomBossLocation", true);
-        bossLocationMessage = ConfigurationEngine.setString(fileConfiguration, "bossLocationMessage", "&7[EM] &2[Click to track!]");
+        bossLocationMessage = ConfigurationEngine.setString(file, fileConfiguration, "bossLocationMessage", "&7[EM] &2[Click to track!]", true);
         //Accepts placeholders $players, $level and $name
-        commandsOnDeath = ConfigurationEngine.setList(fileConfiguration, "commandsOnEliteMobDeath", Collections.emptyList());
+        commandsOnDeath = ConfigurationEngine.setList(file, fileConfiguration, "commandsOnEliteMobDeath", Collections.emptyList(), false);
         //Accepts placeholder $playerDamage
-        bossKillParticipationMessage = ConfigurationEngine.setString(fileConfiguration, "bossKillParticipationMessage", "&eYour damage: &2$playerDamage");
+        bossKillParticipationMessage = ConfigurationEngine.setString(file, fileConfiguration, "bossKillParticipationMessage", "&eYour damage: &2$playerDamage", true);
         regenerateCustomBossHealthOnCombatEnd = ConfigurationEngine.setBoolean(fileConfiguration, "regenerateCustomBossHealthOnCombatEnd", true);
-        defaultOtherWorldBossLocationMessage = ConfigurationEngine.setString(fileConfiguration, "defaultOtherWorldBossLocationMessage", "$name: In different world!");
-        weakTextColor = ConfigurationEngine.setString(fileConfiguration, "weakTextColor", "&9");
-        resistTextColor = ConfigurationEngine.setString(fileConfiguration, "resistTextColor", "&c");
-        weakText = ConfigurationEngine.setString(fileConfiguration, "weakText", "&9&lWeak!");
-        resistText = ConfigurationEngine.setString(fileConfiguration, "resistText", "&c&lResist!");
+        defaultOtherWorldBossLocationMessage = ConfigurationEngine.setString(file, fileConfiguration, "defaultOtherWorldBossLocationMessage", "$name: In different world!", true);
+        weakTextColor = ConfigurationEngine.setString(file, fileConfiguration, "weakTextColor", "&9", false);
+        resistTextColor = ConfigurationEngine.setString(file, fileConfiguration, "resistTextColor", "&c", false);
+        weakText = ConfigurationEngine.setString(file, fileConfiguration, "weakText", "&9&lWeak!", true);
+        resistText = ConfigurationEngine.setString(file, fileConfiguration, "resistText", "&c&lResist!", true);
         doWeakEffect = ConfigurationEngine.setBoolean(fileConfiguration, "doWeakEffect", true);
         doResistEffect = ConfigurationEngine.setBoolean(fileConfiguration, "doResistEffect", true);
         normalizedBaselineDamage = ConfigurationEngine.setDouble(fileConfiguration, "normalizedRegionalBossBaselineDamage", 5);
         normalizedBaselineHealth = ConfigurationEngine.setDouble(fileConfiguration, "normalizedRegionalBossBaselineHealthV2", 7);
         normalizeRegionalBosses = ConfigurationEngine.setBoolean(fileConfiguration, "normalizeRegionalBosses", true);
-        fullHealMessage = ConfigurationEngine.setString(fileConfiguration, "fullHealMessage", "&2FULL HEAL!");
+        fullHealMessage = ConfigurationEngine.setString(file, fileConfiguration, "fullHealMessage", "&2FULL HEAL!", true);
         strengthAndWeaknessDamageMultipliers = ConfigurationEngine.setDouble(fileConfiguration, "strengthAndWeaknessDamageMultipliers", 2D);
         resistanceDamageMultiplier = ConfigurationEngine.setDouble(fileConfiguration, "resistanceDamageMultiplier", 1);
         blockingDamageReduction = ConfigurationEngine.setDouble(fileConfiguration, "blockingDamageReduction", 0.8);

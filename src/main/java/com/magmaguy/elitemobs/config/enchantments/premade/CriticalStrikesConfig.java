@@ -20,7 +20,7 @@ public class CriticalStrikesConfig extends EnchantmentsConfigFields {
 
     @Override
     public void processAdditionalFields() {
-        criticalHitPopup = ConfigurationEngine.setString(super.fileConfiguration, "criticalHitPopup", "&5Critical Hit!");
-        criticalHitColor = ConfigurationEngine.setString(super.fileConfiguration, "criticalHitColor", "&5");
+        criticalHitPopup = ConfigurationEngine.setString(file, super.fileConfiguration, "criticalHitPopup", "&5Critical Hit!", true);
+        criticalHitColor = ConfigurationEngine.setString(file, super.fileConfiguration, "criticalHitColor", "&5", false);
     }
 }

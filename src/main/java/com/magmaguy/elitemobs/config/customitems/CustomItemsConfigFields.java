@@ -69,8 +69,8 @@ public class CustomItemsConfigFields extends CustomConfigFields implements Custo
     public void processConfigFields() {
         this.isEnabled = processBoolean("isEnabled", isEnabled, true, true);
         this.material = processEnum("material", material, Material.WOODEN_SWORD, Material.class, true);
-        this.name = processString("name", name, "Default name", true);
-        this.lore = processStringList("lore", lore, new ArrayList<>(), true);
+        this.name = translatable(filename, "name",processString("name", name, "Default name", true));
+        this.lore = translatable(filename, "lore",processStringList("lore", lore, new ArrayList<>(), true));
         this.enchantments = processStringList("enchantments", enchantments, new ArrayList<>(), false);
         this.potionEffects = processStringList("potionEffects", potionEffects, new ArrayList<>(), false);
         this.dropWeight = processString("dropWeight", dropWeight, "dynamic", false);
