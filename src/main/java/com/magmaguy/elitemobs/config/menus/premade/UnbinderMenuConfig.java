@@ -52,7 +52,7 @@ public class UnbinderMenuConfig extends MenusConfigFields {
 
     @Override
     public void processAdditionalFields() {
-        shopName = ConfigurationEngine.setString(fileConfiguration, "shopName", "[EM] Unbind menu!");
+        shopName = ConfigurationEngine.setString(file, fileConfiguration, "shopName", "[EM] Unbind menu!", true);
         ItemStackSerializer.serialize(
                 "infoButton",
                 ItemStackGenerator.generateSkullItemStack("magmaguy",

@@ -202,8 +202,10 @@ public class MatchInstance {
     public void removePlayer(Player player) {
         PlayerData.setMatchInstance(player, null);
         players.remove(player);
-        if (!spectators.contains(player))
+        if (!spectators.contains(player)) {
             participants.remove(player);
+            PlayerData.setMatchInstance(player, null);
+        }
         if (player.isOnline()) {
             MatchInstanceEvents.teleportBypass = true;
             player.teleport(exitLocation);
@@ -222,6 +224,8 @@ public class MatchInstance {
             endMatch();
             MatchInstanceEvents.teleportBypass = true;
             player.teleport(exitLocation);
+            PlayerData.setMatchInstance(player, null);
+            participants.remove(player);
             return;
         }
         new DeathLocation(player);
@@ -251,8 +255,10 @@ public class MatchInstance {
 
     public void removeSpectator(Player player) {
         spectators.remove(player);
-        if (!players.contains(player))
+        if (!players.contains(player)) {
+            PlayerData.setMatchInstance(player, null);
             participants.remove(player);
+        }
         player.setGameMode(GameMode.SURVIVAL);
         MatchInstanceEvents.teleportBypass = true;
         player.teleport(exitLocation);
@@ -266,6 +272,7 @@ public class MatchInstance {
         if (players.contains(player)) removePlayer(player);
         if (spectators.contains(player)) removeSpectator(player);
         participants.remove(player);
+        PlayerData.setMatchInstance(player, null);
     }
 
     private void startWatchdogs() {
@@ -383,6 +390,9 @@ public class MatchInstance {
         ((HashSet<Player>) players.clone()).forEach(this::removePlayer);
         ((HashSet<Player>) spectators.clone()).forEach(this::removeSpectator);
          */
+        players.clear();
+        spectators.clear();
+        spectators.clear();
         deathBanners.values().forEach(deathLocation -> deathLocation.clear(false));
         deathBanners.clear();
     }
@@ -437,11 +447,9 @@ public class MatchInstance {
                 teleportBypass = false;
                 return;
             }
-            for (MatchInstance matchInstance : instances)
-                if (matchInstance.participants.contains(event.getPlayer())) {
-                    event.setCancelled(true);
-                    return;
-                }
+            MatchInstance matchInstance = PlayerData.getMatchInstance(event.getPlayer());
+            if (matchInstance == null) return;
+            event.setCancelled(true);
         }
     }
 

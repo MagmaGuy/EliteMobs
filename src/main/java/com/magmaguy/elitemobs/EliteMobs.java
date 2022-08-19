@@ -82,6 +82,8 @@ public class EliteMobs extends JavaPlugin {
     public Object placeholders = null;
 
     public static void initializeConfigs() {
+        //Initialized translations
+        new TranslationsConfig();
         DefaultConfig.initializeConfig();
         SchematicsFolderConfig.initializeConfigs();
         ResourcePackDataConfig.initializeConfig();
@@ -284,9 +286,6 @@ public class EliteMobs extends JavaPlugin {
         Check for new plugin version or for dungeon updates
          */
         VersionChecker.check();
-
-        //Initialized translations
-        new TranslationsConfig();
     }
 
     @Override

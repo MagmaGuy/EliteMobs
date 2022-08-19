@@ -105,7 +105,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
         setCustomBossesConfigFields(customBossesConfigFields);
         super.setPersistent(customBossesConfigFields.isPersistent());
         //Phases are final
-        if (!customBossesConfigFields.getPhases().isEmpty())
+        if (customBossesConfigFields.getPhases() != null)
             this.phaseBossEntity = new PhaseBossEntity(this);
         if (this instanceof RegionalBossEntity)
             super.bypassesProtections = true;

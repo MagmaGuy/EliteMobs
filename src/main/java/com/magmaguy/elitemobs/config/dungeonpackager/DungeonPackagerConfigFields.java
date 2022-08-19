@@ -238,14 +238,14 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
     @Override
     public void processConfigFields() {
         this.isEnabled = processBoolean("isEnabled", isEnabled, false, true);
-        this.name = processString("name", name, "name", true);
+        this.name = translatable(filename, "name", processString("name", name, "name", true));
         this.dungeonLocationType = processEnum("dungeonLocationType", dungeonLocationType, null, DungeonLocationType.class, true);
         if (dungeonLocationType == null) {
             new WarningMessage("File " + filename + " does not have a valid dungeonLocationType!");
             this.fileConfiguration = null;
             return;
         }
-        this.customInfo = processStringList("customInfo", customInfo, customInfo, true);
+        this.customInfo = translatable(filename, "customInfo", processStringList("customInfo", customInfo, customInfo, true));
         this.relativeBossLocations = processStringList("relativeBossLocations", relativeBossLocations, new ArrayList<>(), false);
         this.relativeTreasureChestLocations = processStringList("relativeTreasureChestLocations", relativeTreasureChestLocations, new ArrayList<>(), false);
         this.downloadLink = processString("downloadLink", downloadLink, "", false);
@@ -274,9 +274,9 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
         this.corner1 = processVector("corner1", corner1, null, false);
         this.corner2 = processVector("corner2", corner2, null, false);
         this.dungeonVersion = processInt("dungeonVersion", dungeonVersion, 0, false);
-        this.playerInfo = processString("playerInfo", playerInfo, "", false);
-        this.regionEnterMessage = processString("regionEnterMessage", regionEnterMessage, "", false);
-        this.regionLeaveMessage = processString("regionLeaveMessage", regionLeaveMessage, "", false);
+        this.playerInfo = translatable(filename, "playerInfo", processString("playerInfo", playerInfo, "", false));
+        this.regionEnterMessage = translatable(filename, "regionEnterMessage", processString("regionEnterMessage", regionEnterMessage, "", false));
+        this.regionLeaveMessage = translatable(filename, "regionLeaveMessage", processString("regionLeaveMessage", regionLeaveMessage, "", false));
         this.hasCustomModels = processBoolean("hasCustomModels", hasCustomModels, false, false);
         this.teleportLocationString = processString("teleportLocation", teleportLocationString, null, false);
         this.teleportLocationOffsetString = processString("teleportLocationOffset", teleportLocationOffsetString, "", false);

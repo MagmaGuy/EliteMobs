@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.config.potioneffects;
 
+import com.magmaguy.elitemobs.config.translations.TranslationsConfig;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.potion.PotionEffectType;
 
@@ -33,7 +34,7 @@ public class PotionEffectsConfigFields {
     public PotionEffectsConfigFields(FileConfiguration fileConfiguration, File file) {
         this.fileName = file.getName();
         this.isEnabled = fileConfiguration.getBoolean("isEnabled");
-        this.name = fileConfiguration.getString("name");
+        this.name = TranslationsConfig.add(fileName, "name", fileConfiguration.getString("name"));
         this.onHitDuration = fileConfiguration.getInt("onHitDuration");
         this.value = fileConfiguration.getDouble("value");
         this.potionEffectType = PotionEffectType.getByName(this.fileName.toUpperCase());

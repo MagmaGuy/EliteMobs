@@ -21,19 +21,19 @@ public class ZombieFriendsConfig extends PowersConfigFields {
     @Override
     public void processAdditionalFields() {
 
-        friend1Name = ConfigurationEngine.setString(fileConfiguration, "friend1Name", "BFF #1");
-        friend2Name = ConfigurationEngine.setString(fileConfiguration, "friend2Name", "BFF #2");
+        friend1Name = ConfigurationEngine.setString(file, fileConfiguration, "friend1Name", "BFF #1", true);
+        friend2Name = ConfigurationEngine.setString(file, fileConfiguration, "friend2Name", "BFF #2", true);
 
-        friendDeathMessage = ConfigurationEngine.setList(fileConfiguration, "friendDeathMessage", Arrays.asList(
+        friendDeathMessage = ConfigurationEngine.setList(file, fileConfiguration, "friendDeathMessage", Arrays.asList(
                 "Noooo!",
                 "Mediocre!",
                 "Zacharias!",
                 "He's deader than before!",
                 "Vengeance!",
                 "Revenge!",
-                "I can't believe you've done this."));
+                "I can't believe you've done this."), true);
 
-        originalEntityDialog = ConfigurationEngine.setList(fileConfiguration, "originalEntityDialog", Arrays.asList(
+        originalEntityDialog = ConfigurationEngine.setList(file, fileConfiguration, "originalEntityDialog", Arrays.asList(
                 "Let's play ZombieCraft later!",
                 "Feel the power of friendship!",
                 "El pueblo, unido!",
@@ -41,9 +41,9 @@ public class ZombieFriendsConfig extends PowersConfigFields {
                 "BFF power!",
                 "One for all!",
                 "Get him!",
-                "Screw you guys, I'm going home!"));
+                "Screw you guys, I'm going home!"), true);
 
-        reinforcementDialog = ConfigurationEngine.setList(fileConfiguration, "reinforcementDialog", Arrays.asList(
+        reinforcementDialog = ConfigurationEngine.setList(file, fileConfiguration, "reinforcementDialog", Arrays.asList(
                 "Don't mess with our friends!",
                 "We got your back Zach!",
                 "Backup has arrived!",
@@ -60,6 +60,6 @@ public class ZombieFriendsConfig extends PowersConfigFields {
                 "Together we are better!",
                 "The more the merrier!",
                 "I got you fam!",
-                "All for one!"));
+                "All for one!"), true);
     }
 }

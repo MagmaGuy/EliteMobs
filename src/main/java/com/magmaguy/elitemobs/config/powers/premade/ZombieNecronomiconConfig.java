@@ -16,7 +16,7 @@ public class ZombieNecronomiconConfig extends PowersConfigFields {
 
     @Override
     public void processAdditionalFields() {
-        summoningChant = ConfigurationEngine.setString(fileConfiguration, "summoningChant", "Nor is it to be thought..." +
+        summoningChant = ConfigurationEngine.setString(file, fileConfiguration, "summoningChant", "Nor is it to be thought..." +
                 "that man is either the oldest " +
                 "or the last of earth's masters, or that the common bulk of life and substance walks alone. The Old Ones" +
                 " were, the Old Ones are, and the Old Ones shall be. Not in the spaces we know, but between them, they " +
@@ -37,7 +37,7 @@ public class ZombieNecronomiconConfig extends PowersConfigFields {
                 "yet ye see Them not; and Their habitation is even one with your guarded threshold. Yog-Sothoth is the " +
                 "key to the gate, whereby the spheres meet. Man rules now where They ruled once; They shall soon rule " +
                 "where man rules now. After summer is winter, after winter summer. They wait patient and potent, for " +
-                "here shall They reign again.");
+                "here shall They reign again.", true);
     }
 
 }

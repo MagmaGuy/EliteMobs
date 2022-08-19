@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.translations.TranslationsConfig;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
@@ -74,9 +75,12 @@ public class ConfigurationEngine {
         return fileConfiguration.getBoolean(key);
     }
 
-    public static String setString(FileConfiguration fileConfiguration, String key, String defaultValue) {
+    public static String setString(File file, FileConfiguration fileConfiguration, String key, String defaultValue, boolean translatable) {
         fileConfiguration.addDefault(key, defaultValue);
-        return ChatColorConverter.convert(fileConfiguration.getString(key));
+        if (translatable)
+            return TranslationsConfig.add(file.getName(), key, ChatColorConverter.convert(fileConfiguration.getString(key)));
+        else
+            return ChatColorConverter.convert(fileConfiguration.getString(key));
     }
 
     public static int setInt(FileConfiguration fileConfiguration, String key, int defaultValue) {
@@ -89,9 +93,12 @@ public class ConfigurationEngine {
         return fileConfiguration.getDouble(key);
     }
 
-    public static List setList(FileConfiguration fileConfiguration, String key, List defaultValue) {
+    public static List setList(File file, FileConfiguration fileConfiguration, String key, List defaultValue, boolean translatable) {
         fileConfiguration.addDefault(key, defaultValue);
-        return fileConfiguration.getList(key);
+        if (translatable)
+            return TranslationsConfig.add(file.getName(), key, (List<String>) fileConfiguration.getList(key));
+        else
+            return fileConfiguration.getList(key);
     }
 
     public static ItemStack setItemStack(FileConfiguration fileConfiguration, String key, ItemStack itemStack) {

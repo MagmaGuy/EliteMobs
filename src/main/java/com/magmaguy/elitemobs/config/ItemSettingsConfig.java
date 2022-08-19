@@ -128,7 +128,7 @@ public class ItemSettingsConfig {
         doEliteMobsLoot = ConfigurationEngine.setBoolean(fileConfiguration, "doEliteMobsLoot", true);
         doMmorpgColors = ConfigurationEngine.setBoolean(fileConfiguration, "doMMORPGColorsForItems", true);
         preventCustomItemPlacement = ConfigurationEngine.setBoolean(fileConfiguration, "preventCustomItemPlacement", true);
-        loreStructure = ConfigurationEngine.setList(fileConfiguration, "itemLoreStructureV2", Arrays.asList(
+        loreStructure = ConfigurationEngine.setList(file, fileConfiguration, "itemLoreStructureV2", Arrays.asList(
                 ChatColorConverter.convert("&7&m&l---------&7<&lEquip Info&7>&m&l---------"),
                 ChatColorConverter.convert("&7Item level: &f$itemLevel &7Prestige &6$prestigeLevel"),
                 ChatColorConverter.convert("$weaponOrArmorStats"),
@@ -145,11 +145,11 @@ public class ItemSettingsConfig {
                 ChatColorConverter.convert("$potionEffect"),
                 ChatColorConverter.convert("&7&l&m-----------------------------"),
                 ChatColorConverter.convert("$loreResaleValue")
-        ));
-        shopItemSource = ConfigurationEngine.setString(fileConfiguration, "shopSourceItemLores", "&7Purchased from a store");
-        mobItemSource = ConfigurationEngine.setString(fileConfiguration, "mobSourceItemLores", "&7Looted from $mob");
-        loreWorth = ConfigurationEngine.setString(fileConfiguration, "loreWorths", "&7Worth $worth $currencyName");
-        loreResale = ConfigurationEngine.setString(fileConfiguration, "loreResaleValues", "&7Sells for $resale $currencyName");
+        ), true);
+        shopItemSource = ConfigurationEngine.setString(file, fileConfiguration, "shopSourceItemLores", "&7Purchased from a store", true);
+        mobItemSource = ConfigurationEngine.setString(file, fileConfiguration, "mobSourceItemLores", "&7Looted from $mob", true);
+        loreWorth = ConfigurationEngine.setString(file, fileConfiguration, "loreWorths", "&7Worth $worth $currencyName", true);
+        loreResale = ConfigurationEngine.setString(file, fileConfiguration, "loreResaleValues", "&7Sells for $resale $currencyName", true);
         flatDropRate = ConfigurationEngine.setDouble(fileConfiguration, "flatDropRateV3", 0.20);
         regionalBossNonUniqueDropRate = ConfigurationEngine.setDouble(fileConfiguration, "regionalBossNonUniqueDropRate", 0.05);
         regionalBossesDropVanillaLoot = ConfigurationEngine.setBoolean(fileConfiguration, "regionalBossesDropVanillaLoot", false);
@@ -164,38 +164,38 @@ public class ItemSettingsConfig {
         defaultExperienceMultiplier = ConfigurationEngine.setDouble(fileConfiguration, "defaultExperienceMultiplier", 1);
         maximumLootTier = ConfigurationEngine.setInt(fileConfiguration, "maximumLootTiers", 200);
         useEliteEnchantments = ConfigurationEngine.setBoolean(fileConfiguration, "useEliteEnchantments", true);
-        eliteEnchantLoreString = ChatColorConverter.convert(ConfigurationEngine.setString(fileConfiguration, "eliteEnchantmentLoreStrings", "Elite"));
+        eliteEnchantLoreString = ChatColorConverter.convert(ConfigurationEngine.setString(file, fileConfiguration, "eliteEnchantmentLoreStrings", "Elite", true));
         useHoesAsWeapons = ConfigurationEngine.setBoolean(fileConfiguration, "useHoesAsWeapons", false);
         enableRareItemParticleEffects = ConfigurationEngine.setBoolean(fileConfiguration, "enableRareItemParticleEffects", true);
-        potionEffectOnHitTargetLore = ConfigurationEngine.setString(fileConfiguration, "potionEffectOnHitTargetLore", "&4⚔☠");
-        potionEffectOnHitSelfLore = ConfigurationEngine.setString(fileConfiguration, "potionEffectOnHitSelfLore", "&9⚔🛡");
-        potionEffectContinuousLore = ConfigurationEngine.setString(fileConfiguration, "potionEffectContinuousLore", "&6⟲");
-        eliteEnchantmentColor = ConfigurationEngine.setString(fileConfiguration, "eliteEnchantmentLoreColor", "&9◇");
-        vanillaEnchantmentColor = ConfigurationEngine.setString(fileConfiguration, "vanillaEnchantmentLoreColor", "&7◇");
-        customEnchantmentColor = ConfigurationEngine.setString(fileConfiguration, "customEnchantmentColor", "&3◇");
-        potionEffectColor = ConfigurationEngine.setString(fileConfiguration, "potionEffectLoreColor", "&5◇");
-        noSoulbindLore = ConfigurationEngine.setString(fileConfiguration, "noSoulbindLore", "&7Not Soulbound!");
+        potionEffectOnHitTargetLore = ConfigurationEngine.setString(file, fileConfiguration, "potionEffectOnHitTargetLore", "&4⚔☠", false);
+        potionEffectOnHitSelfLore = ConfigurationEngine.setString(file, fileConfiguration, "potionEffectOnHitSelfLore", "&9⚔🛡", false);
+        potionEffectContinuousLore = ConfigurationEngine.setString(file, fileConfiguration, "potionEffectContinuousLore", "&6⟲", false);
+        eliteEnchantmentColor = ConfigurationEngine.setString(file, fileConfiguration, "eliteEnchantmentLoreColor", "&9◇", false);
+        vanillaEnchantmentColor = ConfigurationEngine.setString(file, fileConfiguration, "vanillaEnchantmentLoreColor", "&7◇", false);
+        customEnchantmentColor = ConfigurationEngine.setString(file, fileConfiguration, "customEnchantmentColor", "&3◇", false);
+        potionEffectColor = ConfigurationEngine.setString(file, fileConfiguration, "potionEffectLoreColor", "&5◇", false);
+        noSoulbindLore = ConfigurationEngine.setString(file, fileConfiguration, "noSoulbindLore", "&7Not Soulbound!", true);
         preventEliteItemEnchantment = ConfigurationEngine.setBoolean(fileConfiguration, "preventEliteItemEnchantment", true);
         preventEliteItemDiamondToNetheriteUpgrade = ConfigurationEngine.setBoolean(fileConfiguration, "preventEliteItemDiamondToNetheriteUpgrade", true);
         eliteDurability = ConfigurationEngine.setBoolean(fileConfiguration, "eliteItemsDurabilityLossOnlyOnDeath", true);
         eliteDurabilityMultiplier = ConfigurationEngine.setDouble(fileConfiguration, "eliteItemsDurabilityLossMultiplier", 1d);
-        scrapSucceededMessage = ConfigurationEngine.setString(fileConfiguration, "scrapSucceededMessageV2", "&8[EliteMobs] &2Scrapping succeeded $amount times!");
-        scrapFailedMessage = ConfigurationEngine.setString(fileConfiguration, "scrapFailedMessageV2", "&8[EliteMobs] &cScrapping failed $amount times!");
+        scrapSucceededMessage = ConfigurationEngine.setString(file, fileConfiguration, "scrapSucceededMessageV2", "&8[EliteMobs] &2Scrapping succeeded $amount times!", true);
+        scrapFailedMessage = ConfigurationEngine.setString(file, fileConfiguration, "scrapFailedMessageV2", "&8[EliteMobs] &cScrapping failed $amount times!", true);
         putLootDirectlyIntoPlayerInventory = ConfigurationEngine.setBoolean(fileConfiguration, "putLootDirectlyIntoPlayerInventory", false);
         lootLevelDifferenceLockout = ConfigurationEngine.setInt(fileConfiguration, "lootLevelDifferenceLockout", 10);
         preventEliteItemsFromBreaking = ConfigurationEngine.setBoolean(fileConfiguration, "preventEliteItemsFromBreaking", true);
-        lowArmorDurabilityItemDropMessage = ConfigurationEngine.setString(fileConfiguration, "lowDurabilityItemDropMessage", "&8[EliteMobs] &cDropped armor due to low durability! &8Repair it at the NPC with scrap to use it!");
-        lowWeaponDurabilityItemDropMessage = ConfigurationEngine.setString(fileConfiguration, "lowWeaponItemDropMessage", "&8[EliteMobs] &cDropped weapon due to low durability! &8Repair it at the NPC with scrap to use it!");
+        lowArmorDurabilityItemDropMessage = ConfigurationEngine.setString(file, fileConfiguration, "lowDurabilityItemDropMessage", "&8[EliteMobs] &cDropped armor due to low durability! &8Repair it at the NPC with scrap to use it!", true);
+        lowWeaponDurabilityItemDropMessage = ConfigurationEngine.setString(file, fileConfiguration, "lowWeaponItemDropMessage", "&8[EliteMobs] &cDropped weapon due to low durability! &8Repair it at the NPC with scrap to use it!", true);
         minimumProcedurallyGeneratedDiamondLootLevelPlusSeven = ConfigurationEngine.setInt(fileConfiguration, "minimumProcedurallyGeneratedDiamondLootLevelPlusSeven", 10);
-        simlootMessageSuccess = ConfigurationEngine.setString(fileConfiguration, "simlootMessageSuccess", "&8[EliteMobs] &2Rolled for loot and got $itemName &2!");
-        simlootMessageFailure = ConfigurationEngine.setString(fileConfiguration, "simlootMessageFailure", "&8[EliteMobs] &cRolled for loot and got nothing!");
-        directDropCustomLootMessage = ConfigurationEngine.setString(fileConfiguration, "directDropCustomLootMessage", "&8[EliteMobs] &2Obtained $itemName &2!");
-        directDropMinecraftLootMessage = ConfigurationEngine.setString(fileConfiguration, "directDropMinecraftLootMessage", "&8[EliteMobs] &aObtained $itemName &a!");
-        directDropCoinMessage = ConfigurationEngine.setString(fileConfiguration, "directDropCoinMessage", "&8[EliteMobs] &aObtained &2$amount $currencyName &a!");
-        directDropSpecialMessage = ConfigurationEngine.setString(fileConfiguration, "directDropSpecialMessage", "&8[EliteMobs] &aObtained &2$amount $name &a!");
+        simlootMessageSuccess = ConfigurationEngine.setString(file, fileConfiguration, "simlootMessageSuccess", "&8[EliteMobs] &2Rolled for loot and got $itemName &2!", true);
+        simlootMessageFailure = ConfigurationEngine.setString(file, fileConfiguration, "simlootMessageFailure", "&8[EliteMobs] &cRolled for loot and got nothing!", true);
+        directDropCustomLootMessage = ConfigurationEngine.setString(file, fileConfiguration, "directDropCustomLootMessage", "&8[EliteMobs] &2Obtained $itemName &2!", true);
+        directDropMinecraftLootMessage = ConfigurationEngine.setString(file, fileConfiguration, "directDropMinecraftLootMessage", "&8[EliteMobs] &aObtained $itemName &a!", true);
+        directDropCoinMessage = ConfigurationEngine.setString(file, fileConfiguration, "directDropCoinMessage", "&8[EliteMobs] &aObtained &2$amount $currencyName &a!", true);
+        directDropSpecialMessage = ConfigurationEngine.setString(file, fileConfiguration, "directDropSpecialMessage", "&8[EliteMobs] &aObtained &2$amount $name &a!", true);
         hideAttributes = ConfigurationEngine.setBoolean(fileConfiguration, "hideItemAttributes", true);
-        weaponEntry = ConfigurationEngine.setString(fileConfiguration, "weaponEntry", "&7Elite DPS: &2$EDPS");
-        armorEntry = ConfigurationEngine.setString(fileConfiguration, "armorEntry", "&7Elite Armor: &2$EDEF");
+        weaponEntry = ConfigurationEngine.setString(file, fileConfiguration, "weaponEntry", "&7Elite DPS: &2$EDPS", true);
+        armorEntry = ConfigurationEngine.setString(file, fileConfiguration, "armorEntry", "&7Elite Armor: &2$EDEF", true);
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }

@@ -125,23 +125,23 @@ public class ProceduralItemGenerationSettingsConfig {
 
         cacheMaterials();
 
-        swordName = ConfigurationEngine.setString(fileConfiguration, "materialNames.swordName", "Sword");
-        bowName = ConfigurationEngine.setString(fileConfiguration, "materialNames.bowName", "Bow");
-        pickaxeName = ConfigurationEngine.setString(fileConfiguration, "materialNames.pickaxe", "Pickaxe");
-        spadeName = ConfigurationEngine.setString(fileConfiguration, "materialNames.spade", "Spade");
-        hoeName = ConfigurationEngine.setString(fileConfiguration, "materialNames.hoe", "Hoe");
-        axeName = ConfigurationEngine.setString(fileConfiguration, "materialNames.axe", "Axe");
-        helmetName = ConfigurationEngine.setString(fileConfiguration, "materialNames.helmet", "Helmet");
-        chestplateName = ConfigurationEngine.setString(fileConfiguration, "materialNames.chestplate", "Chestplate");
-        leggingsName = ConfigurationEngine.setString(fileConfiguration, "materialNames.leggings", "Leggings");
-        bootsName = ConfigurationEngine.setString(fileConfiguration, "materialNames.boots", "Boots");
-        shearsName = ConfigurationEngine.setString(fileConfiguration, "materialNames.shears", "Shears");
-        fishingRodName = ConfigurationEngine.setString(fileConfiguration, "materialNames.fishingRod", "Fishing Rod");
-        shieldName = ConfigurationEngine.setString(fileConfiguration, "materialNames.shield", "Shield");
-        tridentName = ConfigurationEngine.setString(fileConfiguration, "materialNames.trident", "Trident");
-        crossbowName = ConfigurationEngine.setString(fileConfiguration, "materialNames.crossbow", "Crossbow");
+        swordName = ConfigurationEngine.setString(file, fileConfiguration, "materialNames.swordName", "Sword", true);
+        bowName = ConfigurationEngine.setString(file, fileConfiguration, "materialNames.bowName", "Bow", true);
+        pickaxeName = ConfigurationEngine.setString(file, fileConfiguration, "materialNames.pickaxe", "Pickaxe", true);
+        spadeName = ConfigurationEngine.setString(file, fileConfiguration, "materialNames.spade", "Spade", true);
+        hoeName = ConfigurationEngine.setString(file, fileConfiguration, "materialNames.hoe", "Hoe", true);
+        axeName = ConfigurationEngine.setString(file, fileConfiguration, "materialNames.axe", "Axe", true);
+        helmetName = ConfigurationEngine.setString(file, fileConfiguration, "materialNames.helmet", "Helmet", true);
+        chestplateName = ConfigurationEngine.setString(file, fileConfiguration, "materialNames.chestplate", "Chestplate", true);
+        leggingsName = ConfigurationEngine.setString(file, fileConfiguration, "materialNames.leggings", "Leggings", true);
+        bootsName = ConfigurationEngine.setString(file, fileConfiguration, "materialNames.boots", "Boots", true);
+        shearsName = ConfigurationEngine.setString(file, fileConfiguration, "materialNames.shears", "Shears", true);
+        fishingRodName = ConfigurationEngine.setString(file, fileConfiguration, "materialNames.fishingRod", "Fishing Rod", true);
+        shieldName = ConfigurationEngine.setString(file, fileConfiguration, "materialNames.shield", "Shield", true);
+        tridentName = ConfigurationEngine.setString(file, fileConfiguration, "materialNames.trident", "Trident", true);
+        crossbowName = ConfigurationEngine.setString(file, fileConfiguration, "materialNames.crossbow", "Crossbow", true);
 
-        nameFormat = ConfigurationEngine.setList(fileConfiguration, "nameFormats", Arrays.asList(
+        nameFormat = ConfigurationEngine.setList(file, fileConfiguration, "nameFormats", Arrays.asList(
                 "$verb $itemType of the $adjective $noun",
                 "$itemType of the $adjective $noun",
                 "$noun's $adjective $verb $itemType",
@@ -149,9 +149,9 @@ public class ProceduralItemGenerationSettingsConfig {
                 "$adjective $verb $itemType",
                 "The $verb-er",
                 "The $adjective $verb-er"
-        ));
+        ), true);
 
-        nouns = ConfigurationEngine.setList(fileConfiguration, "nouns", Arrays.asList(
+        nouns = ConfigurationEngine.setList(file, fileConfiguration, "nouns", Arrays.asList(
                 "MagmaGuy",
                 "Dawn",
                 "Sunset",
@@ -442,9 +442,9 @@ public class ProceduralItemGenerationSettingsConfig {
                 "Rakshasa",
                 "Revenant",
                 "Cultist"
-        ));
+        ), true);
 
-        adjectives = ConfigurationEngine.setList(fileConfiguration, "adjectives", Arrays.asList(
+        adjectives = ConfigurationEngine.setList(file, fileConfiguration, "adjectives", Arrays.asList(
                 "Adorable",
                 "Beautiful",
                 "Clean",
@@ -971,9 +971,9 @@ public class ProceduralItemGenerationSettingsConfig {
                 "Trusting",
                 "Unassuming",
                 "Threatening"
-        ));
+        ), true);
 
-        verbs = ConfigurationEngine.setList(fileConfiguration, "verbs", Arrays.asList(
+        verbs = ConfigurationEngine.setList(file, fileConfiguration, "verbs", Arrays.asList(
                 "Slashing",
                 "Cutting",
                 "Stabbing",
@@ -1235,9 +1235,9 @@ public class ProceduralItemGenerationSettingsConfig {
                 "Spying",
                 "Avenging",
                 "Storming"
-        ));
+        ), true);
 
-        verbers = ConfigurationEngine.setList(fileConfiguration, "verb-ers (noun)", Arrays.asList(
+        verbers = ConfigurationEngine.setList(file, fileConfiguration, "verb-ers (noun)", Arrays.asList(
                 "World Breaker",
                 "World Shatterer",
                 "Avenger",
@@ -1446,7 +1446,7 @@ public class ProceduralItemGenerationSettingsConfig {
                 "Snorer",
                 "Thruster",
                 "Slapper"
-        ));
+        ), true);
 
         ConfigurationEngine.fileSaverCustomValues(fileConfiguration, file);
 

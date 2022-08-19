@@ -17,7 +17,7 @@ public class SoulbindConfig extends EnchantmentsConfigFields {
 
     @Override
     public void processAdditionalFields() {
-        loreStrings = ConfigurationEngine.setString(super.fileConfiguration, "loreStrings", "&7Soulbound to &f$player");
-        hologramStrings = ConfigurationEngine.setString(super.fileConfiguration, "hologramString", "$player&f's");
+        loreStrings = ConfigurationEngine.setString(file, super.fileConfiguration, "loreStrings", "&7Soulbound to &f$player", true);
+        hologramStrings = ConfigurationEngine.setString(file,super.fileConfiguration, "hologramString", "$player&f's", true);
     }
 }

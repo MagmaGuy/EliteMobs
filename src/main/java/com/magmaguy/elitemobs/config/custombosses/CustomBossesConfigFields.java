@@ -48,34 +48,34 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     private boolean reinforcement = false;
     @Getter
     @Setter
-    private List<String> onDeathCommands = new ArrayList<>();
+    private List<String> onDeathCommands = null;
     @Getter
     @Setter
-    private List<String> onSpawnCommands = new ArrayList<>();
+    private List<String> onSpawnCommands = null;
     @Getter
     @Setter
-    private List<String> onCombatEnterCommands = new ArrayList<>();
+    private List<String> onCombatEnterCommands = null;
     @Getter
     @Setter
-    private List<String> onCombatLeaveCommands = new ArrayList<>();
+    private List<String> onCombatLeaveCommands = null;
     @Getter
     @Setter
-    private List<String> uniqueLootList = new ArrayList<>();
+    private List<String> uniqueLootList = null;
     @Getter
     @Setter
-    private List<String> powers = new ArrayList<>();
+    private List<String> powers = null;
     @Getter
     @Setter
-    private List<String> onDamageMessages = new ArrayList<>();
+    private List<String> onDamageMessages = null;
     @Getter
     @Setter
-    private List<String> onDamagedMessages = new ArrayList<>();
+    private List<String> onDamagedMessages = null;
     @Getter
     @Setter
-    private List<String> trails = new ArrayList<>();
+    private List<String> trails = null;
     @Getter
     @Setter
-    private List<String> phases = new ArrayList<>();
+    private List<String> phases = null;
     @Getter
     @Setter
     private String locationMessage = null;
@@ -90,7 +90,7 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     private String deathMessage = null;
     @Getter
     @Setter
-    private List<String> deathMessages = new ArrayList<>();
+    private List<String> deathMessages = null;
     @Getter
     @Setter
     private String escapeMessage = null;
@@ -263,7 +263,7 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     public void processConfigFields() {
         this.isEnabled = processBoolean("isEnabled", isEnabled, true, true);
         this.entityType = processEnum("entityType", entityType, EntityType.ZOMBIE, EntityType.class, true);
-        this.name = processString("name", name, "Default Name", true);
+        this.name = translatable(filename, "name", processString("name", name, "Default Name", true));
         //Levels are strings because "dynamic" is a valid value
         this.level = processString("level", level, "dynamic", true);
         this.isPersistent = processBoolean("isPersistent", isPersistent, false, false);
@@ -279,21 +279,21 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         this.onSpawnCommands = processStringList("onSpawnCommands", onSpawnCommands, new ArrayList<>(), false);
         this.onCombatEnterCommands = processStringList("onCombatEnterCommands", onCombatEnterCommands, new ArrayList<>(), false);
         this.onCombatLeaveCommands = processStringList("onCombatLeaveCommands", onCombatLeaveCommands, new ArrayList<>(), false);
-        this.deathMessages = processStringList("deathMessages", deathMessages, new ArrayList<>(), false);
+        this.deathMessages = translatable(filename, "deathMessages",processStringList("deathMessages", deathMessages, new ArrayList<>(), false));
         this.uniqueLootList = processStringList("uniqueLootList", uniqueLootList, new ArrayList<>(), false);
         this.customLootTable = new CustomLootTable(this);
 
         //this can't be converted directly to an enum list because there are some special string features in here
         this.powers = processStringList("powers", powers, new ArrayList<>(), false);
-        this.onDamageMessages = processStringList("onDamageMessages", onDamageMessages, new ArrayList<>(), false);
-        this.onDamagedMessages = processStringList("onDamagedMessages", onDamagedMessages, new ArrayList<>(), false);
+        this.onDamageMessages = translatable(filename, "onDamageMessages",processStringList("onDamageMessages", onDamageMessages, new ArrayList<>(), false));
+        this.onDamagedMessages = translatable(filename, "onDamagedMessages",processStringList("onDamagedMessages", onDamagedMessages, new ArrayList<>(), false));
         this.trails = processStringList("trails", trails, new ArrayList<>(), false);
         this.phases = processStringList("phases", phases, new ArrayList<>(), false);
-        this.locationMessage = processString("locationMessage", locationMessage, null, false);
+        this.locationMessage = translatable(filename, "locationMessage",processString("locationMessage", locationMessage, null, false));
         this.mountedEntity = processString("mountedEntity", mountedEntity, null, false);
-        this.spawnMessage = processString("spawnMessage", spawnMessage, null, false);
-        this.deathMessage = processString("deathMessage", deathMessage, null, false);
-        this.escapeMessage = processString("escapeMessage", escapeMessage, null, false);
+        this.spawnMessage = translatable(filename, "spawnMessage",processString("spawnMessage", spawnMessage, null, false));
+        this.deathMessage = translatable(filename, "deathMessage",processString("deathMessage", deathMessage, null, false));
+        this.escapeMessage = translatable(filename, "escapeMessage",processString("escapeMessage", escapeMessage, null, false));
         this.disguise = processString("disguise", disguise, null, false);
         this.customDisguiseData = processString("customDisguiseData", customDisguiseData, null, false);
         this.customModel = processString("customModel", customModel, null, false);

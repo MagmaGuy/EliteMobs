@@ -1,11 +1,13 @@
 package com.magmaguy.elitemobs.config;
 
+import com.magmaguy.elitemobs.commands.admin.ReloadCommand;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 
 import java.io.File;
 
@@ -51,6 +53,8 @@ public class DefaultConfig {
     private static boolean useGlassToFillMenuEmptySpace;
     @Getter
     private static boolean menuUnicodeFormatting;
+    @Getter
+    private static String language;
 
     private static File file = null;
     private static FileConfiguration fileConfiguration = null;
@@ -86,9 +90,8 @@ public class DefaultConfig {
         preventVanillaReinforcementsForEliteEntities = ConfigurationEngine.setBoolean(fileConfiguration, "preventVanillaReinforcementsForEliteEntities", true);
         try {
             defaultSpawnLocation = ConfigurationLocation.serialize(
-                    ConfigurationEngine.setString(
-                            fileConfiguration, "defaultSpawnLocation",
-                            ConfigurationLocation.deserialize(Bukkit.getWorlds().get(0).getSpawnLocation())));
+                    ConfigurationEngine.setString(file, fileConfiguration, "defaultSpawnLocation",
+                            ConfigurationLocation.deserialize(Bukkit.getWorlds().get(0).getSpawnLocation()), false));
         } catch (Exception ex) {
             new WarningMessage("There is an issue with your defaultSpawnLocation in the config.yml configuration file! Fix it!");
         }
@@ -100,8 +103,16 @@ public class DefaultConfig {
         characterLimitForBookMenuPages = ConfigurationEngine.setInt(fileConfiguration, "characterLimitForBookMenuPages", 185);
         useGlassToFillMenuEmptySpace = ConfigurationEngine.setBoolean(fileConfiguration, "useGlassToFillMenuEmptySpace", false);
         menuUnicodeFormatting = ConfigurationEngine.setBoolean(fileConfiguration, "menuUnicodeFormatting", false);
+        language = ConfigurationEngine.setString(file, fileConfiguration, "language", "english", false);
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
+    }
+
+    public static void setLanguage(Player player, String filename) {
+        language = filename;
+        fileConfiguration.set("language", filename);
+        ConfigurationEngine.fileSaverCustomValues(fileConfiguration, file);
+        ReloadCommand.reload(player);
     }
 
 }

@@ -34,7 +34,7 @@ public class EnhancementMenuConfig extends MenusConfigFields {
 
     @Override
     public void processAdditionalFields() {
-        shopName = ConfigurationEngine.setString(fileConfiguration, "shopName", "[EM] Enhancement menu!");
+        shopName = ConfigurationEngine.setString(file, fileConfiguration, "shopName", "[EM] Enhancement menu!", true);
         infoSlot = ConfigurationEngine.setInt(fileConfiguration, "infoButtonSlot", 4);
         eliteItemInputInformationSlot = ConfigurationEngine.setInt(fileConfiguration, "eliteItemInputInformationSlot", 20);
         eliteItemInputSlot = ConfigurationEngine.setInt(fileConfiguration, "eliteItemInputSlot", 29);

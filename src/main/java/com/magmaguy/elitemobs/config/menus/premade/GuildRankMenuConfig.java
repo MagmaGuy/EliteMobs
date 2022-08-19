@@ -62,9 +62,9 @@ public class GuildRankMenuConfig extends MenusConfigFields {
     @Override
     public void processAdditionalFields() {
 
-        menuName = ConfigurationEngine.setString(fileConfiguration, "questTierSelectorMenuTitle", "[EM] Guild Rank Selection");
-        lowTierWarning = ConfigurationEngine.setString(fileConfiguration, "lowTierWarning", "&cElites can't drop better loot!");
-        normalTierWarning = ConfigurationEngine.setString(fileConfiguration, "normalTierWarning", "&aElite can drop better loot!");
+        menuName = ConfigurationEngine.setString(file, fileConfiguration, "questTierSelectorMenuTitle", "[EM] Guild Rank Selection", true);
+        lowTierWarning = ConfigurationEngine.setString(file, fileConfiguration, "lowTierWarning", "&cElites can't drop better loot!", true);
+        normalTierWarning = ConfigurationEngine.setString(file, fileConfiguration, "normalTierWarning", "&aElite can drop better loot!", true);
 
         ItemStackSerializer.serialize(
                 "unlockedButtons",
@@ -156,25 +156,25 @@ public class GuildRankMenuConfig extends MenusConfigFields {
                                 "&f&m-------------------------------"), MetadataHandler.signatureID), fileConfiguration);
         prestigeNextUnlockButton = ItemStackSerializer.deserialize("prestigeNextUnlockButtons", fileConfiguration);
 
-        notEnoughCurrencyMessage = ConfigurationEngine.setString(fileConfiguration, "notEnoughCurrencyMessages",
+        notEnoughCurrencyMessage = ConfigurationEngine.setString(file, fileConfiguration, "notEnoughCurrencyMessages",
                 "&7[EliteMobs] &4You don't have enough Elite Coins ($neededAmount $currencyName)! Sell some Elite Mob loot to [/em shop]! " +
-                        "You have $currentAmount $currencyName.");
+                        "You have $currentAmount $currencyName.", true);
 
-        unlockMessage = ConfigurationEngine.setString(fileConfiguration, "unlockMessages", "&7[EliteMobs] &aYou have unlocked the $rankName &arank for $price $currencyName. \n&6Happy hunting!");
+        unlockMessage = ConfigurationEngine.setString(file, fileConfiguration, "unlockMessages", "&7[EliteMobs] &aYou have unlocked the $rankName &arank for $price $currencyName. \n&6Happy hunting!", true);
 
-        broadcastMessage = ConfigurationEngine.setString(fileConfiguration, "questCompleteBroadcastMessages", "&7[EliteMobs] &a$player &ahas reached the $rankName &aguild rank!");
+        broadcastMessage = ConfigurationEngine.setString(file, fileConfiguration, "questCompleteBroadcastMessages", "&7[EliteMobs] &a$player &ahas reached the $rankName &aguild rank!", true);
 
-        failedMessage = ConfigurationEngine.setString(fileConfiguration, "failedMessages", "&7[EliteMobs] &cYou need to unlock other ranks first!");
+        failedMessage = ConfigurationEngine.setString(file, fileConfiguration, "failedMessages", "&7[EliteMobs] &cYou need to unlock other ranks first!", true);
 
-        spawnRateModifierMessage = ConfigurationEngine.setString(fileConfiguration, "spawnRateModifierMessages", "&fElite Mob spawn rate modifier: &c$modifier%");
-        lootModifierMessage = ConfigurationEngine.setString(fileConfiguration, "lootModifierMessages", "&fElite Mob loot modifier: &a$modifier%");
-        difficultyModifierMessage = ConfigurationEngine.setString(fileConfiguration, "difficultyModifierMessages", "&fElite Mob difficulty modifier: &c$modifier%");
+        spawnRateModifierMessage = ConfigurationEngine.setString(file, fileConfiguration, "spawnRateModifierMessages", "&fElite Mob spawn rate modifier: &c$modifier%", true);
+        lootModifierMessage = ConfigurationEngine.setString(file, fileConfiguration, "lootModifierMessages", "&fElite Mob loot modifier: &a$modifier%", true);
+        difficultyModifierMessage = ConfigurationEngine.setString(file, fileConfiguration, "difficultyModifierMessages", "&fElite Mob difficulty modifier: &c$modifier%", true);
 
-        lootTierMessage = ConfigurationEngine.setString(fileConfiguration, "lootTierMessages", "&2Elites can drop up to tier $tier loot!");
-        currencyBonusMessage = ConfigurationEngine.setString(fileConfiguration, "currencyBonusMessages", "&a$amountx coins from drops and quests!");
-        healthBonusMessage = ConfigurationEngine.setString(fileConfiguration, "healthBonusMessages", "&cAdds $amount ❤ of max health");
-        critBonusMessage = ConfigurationEngine.setString(fileConfiguration, "critBonusMessages", "&eAdds $amount% chance to crit");
-        dodgeBonusMessage = ConfigurationEngine.setString(fileConfiguration, "dodgeBonusMessages", "&8Adds $amount% chance to dodge");
+        lootTierMessage = ConfigurationEngine.setString(file, fileConfiguration, "lootTierMessages", "&2Elites can drop up to tier $tier loot!", true);
+        currencyBonusMessage = ConfigurationEngine.setString(file, fileConfiguration, "currencyBonusMessages", "&a$amountx coins from drops and quests!", true);
+        healthBonusMessage = ConfigurationEngine.setString(file, fileConfiguration, "healthBonusMessages", "&cAdds $amount ❤ of max health", true);
+        critBonusMessage = ConfigurationEngine.setString(file, fileConfiguration, "critBonusMessages", "&eAdds $amount% chance to crit", true);
+        dodgeBonusMessage = ConfigurationEngine.setString(file, fileConfiguration, "dodgeBonusMessages", "&8Adds $amount% chance to dodge", true);
 
     }
 

@@ -16,6 +16,6 @@ public class AttackFreezeConfig extends PowersConfigFields {
 
     @Override
     public void processAdditionalFields() {
-        freezeMessage = ConfigurationEngine.setString(fileConfiguration, "freezeMessage", "&8[EM] &9You've been frozen!");
+        freezeMessage = ConfigurationEngine.setString(file, fileConfiguration, "freezeMessage", "&8[EM] &9You've been frozen!", true);
     }
 }

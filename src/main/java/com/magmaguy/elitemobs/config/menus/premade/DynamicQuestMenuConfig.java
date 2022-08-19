@@ -114,36 +114,36 @@ public class DynamicQuestMenuConfig extends MenusConfigFields {
 
     @Override
     public void processAdditionalFields() {
-        questName = ConfigurationEngine.setString(fileConfiguration, "questName", "Slay $amount $name");
+        questName = ConfigurationEngine.setString(file, fileConfiguration, "questName", "Slay $amount $name", true);
 
-        headerTextLines = ConfigurationEngine.setString(fileConfiguration, "headerTextLines2",
-                ChatColorConverter.convert("&c&lGuild request!\n&0&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯"));
+        headerTextLines = ConfigurationEngine.setString(file, fileConfiguration, "headerTextLines2",
+                ChatColorConverter.convert("&c&lGuild request!\n&0&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯"), true);
 
-        defaultLoreTextLines = ConfigurationEngine.setString(fileConfiguration, "defaultLoreTextLines", "&8Slay $amount $name!");
+        defaultLoreTextLines = ConfigurationEngine.setString(file, fileConfiguration, "defaultLoreTextLines", "&8Slay $amount $name!", true);
 
-        acceptTextLines = ConfigurationEngine.setString(fileConfiguration, "acceptTextLines", "&a&lAccept!");
-        acceptHoverLines = ConfigurationEngine.setString(fileConfiguration, "acceptHoverLines", "&aClick to \n&aaccept quest!");
-        acceptCommandLines = ConfigurationEngine.setString(fileConfiguration, "acceptCommandLines", "/em quest accept $questID");
+        acceptTextLines = ConfigurationEngine.setString(file, fileConfiguration, "acceptTextLines", "&a&lAccept!", true);
+        acceptHoverLines = ConfigurationEngine.setString(file, fileConfiguration, "acceptHoverLines", "&aClick to \n&aaccept quest!", true);
+        acceptCommandLines = ConfigurationEngine.setString(file, fileConfiguration, "acceptCommandLines", "/em quest accept $questID", false);
 
-        acceptedTextLines = ConfigurationEngine.setString(fileConfiguration, "acceptedTextLines", "&2&lAccepted! &4[Abandon]");
-        acceptedHoverLines = ConfigurationEngine.setString(fileConfiguration, "acceptedHoverLines", "&aClick to abandon quest!");
-        acceptedCommandLines = ConfigurationEngine.setString(fileConfiguration, "acceptedCommandLines3", "/em quest leave $questID");
+        acceptedTextLines = ConfigurationEngine.setString(file, fileConfiguration, "acceptedTextLines", "&2&lAccepted! &4[Abandon]", true);
+        acceptedHoverLines = ConfigurationEngine.setString(file, fileConfiguration, "acceptedHoverLines", "&aClick to abandon quest!", true);
+        acceptedCommandLines = ConfigurationEngine.setString(file, fileConfiguration, "acceptedCommandLines3", "/em quest leave $questID", false);
 
-        completedTextLines = ConfigurationEngine.setString(fileConfiguration, "completedTextLines", "&2&l[Turn in!]");
-        completedHoverLines = ConfigurationEngine.setString(fileConfiguration, "completedHoverLines", "&aClick to turn quest in!");
-        completedCommandLines = ConfigurationEngine.setString(fileConfiguration, "completedCommandLines", "/em quest complete $questID");
+        completedTextLines = ConfigurationEngine.setString(file, fileConfiguration, "completedTextLines", "&2&l[Turn in!]", true);
+        completedHoverLines = ConfigurationEngine.setString(file, fileConfiguration, "completedHoverLines", "&aClick to turn quest in!", true);
+        completedCommandLines = ConfigurationEngine.setString(file, fileConfiguration, "completedCommandLines", "/em quest complete $questID", false);
 
-        turnedInTextLines = ConfigurationEngine.setString(fileConfiguration, "turnedInTextLines", "&8[Completed!]");
-        turnedInHoverLines = ConfigurationEngine.setString(fileConfiguration, "turnedInHoverLines", "&8Already turned in!");
+        turnedInTextLines = ConfigurationEngine.setString(file, fileConfiguration, "turnedInTextLines", "&8[Completed!]", true);
+        turnedInHoverLines = ConfigurationEngine.setString(file, fileConfiguration, "turnedInHoverLines", "&8Already turned in!", true);
 
-        objectivesLine = ConfigurationEngine.setString(fileConfiguration, "objectivesLine", "&c&lObjectives:");
-        killQuestDefaultSummaryLine = ConfigurationEngine.setString(fileConfiguration, "killQuestDefaultSummaryLine", "&c➤Kill $name:$color$current&0/$color$target");
+        objectivesLine = ConfigurationEngine.setString(file, fileConfiguration, "objectivesLine", "&c&lObjectives:", true);
+        killQuestDefaultSummaryLine = ConfigurationEngine.setString(file, fileConfiguration, "killQuestDefaultSummaryLine", "&c➤Kill $name:$color$current&0/$color$target", true);
 
-        rewardsLine = ConfigurationEngine.setString(fileConfiguration, "rewardsLine", "&2&lRewards:");
-        rewardsDefaultSummaryLine = ConfigurationEngine.setString(fileConfiguration, "rewardsDefaultSummaryLine", "&2➤$amountx $rewardName &8($chance%)");
+        rewardsLine = ConfigurationEngine.setString(file, fileConfiguration, "rewardsLine", "&2&lRewards:", true);
+        rewardsDefaultSummaryLine = ConfigurationEngine.setString(file, fileConfiguration, "rewardsDefaultSummaryLine", "&2➤$amountx $rewardName &8($chance%)", true);
 
-        ongoingColorCode = ConfigurationEngine.setString(fileConfiguration, "ongoingQuestColorCode", "&c");
-        completedColorCode = ConfigurationEngine.setString(fileConfiguration, "ongoingQuestColorCode", "&2");
+        ongoingColorCode = ConfigurationEngine.setString(file, fileConfiguration, "ongoingQuestColorCode", "&c", false);
+        completedColorCode = ConfigurationEngine.setString(file, fileConfiguration, "ongoingQuestColorCode", "&2", false);
 
     }
 }
