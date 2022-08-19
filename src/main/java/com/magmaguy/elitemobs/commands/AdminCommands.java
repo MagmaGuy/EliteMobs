@@ -915,9 +915,13 @@ public class AdminCommands {
                 .handler(commandContext -> {
                     if (languages.contains(commandContext.get("language"))) {
                         DefaultConfig.setLanguage((Player) commandContext.getSender(), commandContext.get("language"));
-                        commandContext.getSender().sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2Language set to " + commandContext.get("language")));
-                    } else
-                        commandContext.getSender().sendMessage(ChatColorConverter.convert("&8[EliteMobs] &cNot a valid language!"));
+                        commandContext.getSender().sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2Language set to " + commandContext.get("language") + " ! &4Translations are created and manged for free by the community through crowdin ( https://crowdin.com/project/elitemobs ), use at your own discretion!"));
+                    } else {
+                        String files = "";
+                        for (String language : languages)
+                            files += language + " ";
+                        commandContext.getSender().sendMessage(ChatColorConverter.convert("&8[EliteMobs] &cNot a valid language! Valid language files: " + files));
+                    }
                 })
         );
     }

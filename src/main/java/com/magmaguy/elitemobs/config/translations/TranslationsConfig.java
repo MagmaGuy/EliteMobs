@@ -34,7 +34,7 @@ public class TranslationsConfig extends CustomConfig {
             return value;
         TranslationsConfigFields selectedLanguage = translationConfigs.get(DefaultConfig.getLanguage());
         if (selectedLanguage == null) {
-            new WarningMessage("Failed to get valid language from the config.yml, defaulting to English!");
+            new WarningMessage("Failed to get valid language from " + filename + " , defaulting to English!");
             return value;
         }
         return (String) selectedLanguage.get(filename, key);
@@ -47,7 +47,7 @@ public class TranslationsConfig extends CustomConfig {
             return value;
         TranslationsConfigFields selectedLanguage = translationConfigs.get(DefaultConfig.getLanguage());
         if (selectedLanguage == null) {
-            new WarningMessage("Failed to get valid language from the config.yml, defaulting to English!");
+            new WarningMessage("Failed to get valid language from  " + filename + " , defaulting to English!");
             return value;
         }
         return (List<String>) selectedLanguage.get(filename, key);
