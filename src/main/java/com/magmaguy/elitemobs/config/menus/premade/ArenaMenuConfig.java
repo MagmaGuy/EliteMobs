@@ -29,7 +29,7 @@ public class ArenaMenuConfig extends MenusConfigFields {
 
     @Override
     public void processAdditionalFields() {
-        menuName = ConfigurationEngine.setString(fileConfiguration, "menuName", "");
+        menuName = ConfigurationEngine.setString(file, fileConfiguration, "menuName", "", true);
         playerItem = ConfigurationEngine.setItemStack(fileConfiguration, "playerItem",
                 ItemStackGenerator.generateItemStack(Material.DIAMOND_SWORD, "&4Challenge the arena!", Arrays.asList("&2Fight in the arena!")));
         playerItemSlot = ConfigurationEngine.setInt(fileConfiguration, "playerItemSlot", 6);

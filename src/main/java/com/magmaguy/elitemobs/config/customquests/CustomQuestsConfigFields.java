@@ -88,19 +88,20 @@ public class CustomQuestsConfigFields extends CustomConfigFields implements Cust
     @Override
     public void processConfigFields() {
         this.isEnabled = processBoolean("isEnabled", isEnabled, true, true);
-        this.customObjectivesList = processStringList("customObjectives", customObjectivesList, new ArrayList<>(), true);
+        this.customObjectivesList = translatable(filename, "customObjectives", processStringList("customObjectives", customObjectivesList, new ArrayList<>(), true));
         this.customRewardsList = processStringList("customRewards", customRewardsList, new ArrayList<>(), true);
         this.questAcceptPermission = processString("questAcceptPermission", questAcceptPermission, null, false);
         this.questLockoutPermission = processString("questLockoutPermission", questLockoutPermission, null, false);
         this.questLockoutMinutes = processInt("questLockoutMinutes", questLockoutMinutes, -1, false);
-        this.questName = processString("name", questName, filename, true);
-        this.questLore = processStringList("questLore", questLore, new ArrayList<>(), false);
+        this.questName = translatable(filename, "name", processString("name", questName, filename, true));
+        this.questLore = translatable(filename, "questLore", processStringList("questLore", questLore, new ArrayList<>(), false));
         this.temporaryPermissions = processStringList("temporaryPermissions", temporaryPermissions, new ArrayList<>(), false);
-        this.questAcceptDialog = processStringList("questAcceptDialog", questAcceptDialog, new ArrayList<>(), false);
-        this.questCompleteDialog = processStringList("questCompleteMessage", questCompleteDialog, new ArrayList<>(), false);
+        this.questAcceptDialog = translatable(filename, "questAcceptDialog", processStringList("questAcceptDialog", questAcceptDialog, new ArrayList<>(), false));
+        this.questCompleteDialog = translatable(filename, "questCompleteMessage", processStringList("questCompleteMessage", questCompleteDialog, new ArrayList<>(), false));
         this.questCompleteCommands = processStringList("questCompleteCommands", questCompleteCommands, new ArrayList<>(), false);
         this.turnInNPC = processString("turnInNPC", turnInNPC, "", false);
         this.trackable = processBoolean("trackable", trackable, true, false);
+        this.questLevel = processInt("questLevel", questLevel, 0, false);
     }
 
 

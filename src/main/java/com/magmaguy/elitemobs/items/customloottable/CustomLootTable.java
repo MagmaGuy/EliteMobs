@@ -44,6 +44,7 @@ public class CustomLootTable implements Serializable {
     }
 
     private void parseConfig(List<String> lootTable, String filename) {
+        if (lootTable == null) return;
         for (String rawString : lootTable)
             switch (rawString.split(":")[0].toLowerCase()) {
                 case "minecraft":

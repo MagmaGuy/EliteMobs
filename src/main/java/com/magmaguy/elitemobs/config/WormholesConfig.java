@@ -22,8 +22,8 @@ public class WormholesConfig {
         File file = ConfigurationEngine.fileCreator("Wormholes.yml");
         FileConfiguration fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
 
-        dungeonNotInstalledMessage = ConfigurationEngine.setString(fileConfiguration, "dungeonNotInstalledMessage", "&8[EliteMobs] &cDungeon $dungeonID &cis not installed! This teleport will not work.");
-        defaultPortalMissingMessage = ConfigurationEngine.setString(fileConfiguration, "defaultPortalMissingMessage", "&8[EliteMobs] &cThis portal doesn't seem to lead anywhere!");
+        dungeonNotInstalledMessage = ConfigurationEngine.setString(file, fileConfiguration, "dungeonNotInstalledMessage", "&8[EliteMobs] &cDungeon $dungeonID &cis not installed! This teleport will not work.", true);
+        defaultPortalMissingMessage = ConfigurationEngine.setString(file, fileConfiguration, "defaultPortalMissingMessage", "&8[EliteMobs] &cThis portal doesn't seem to lead anywhere!", true);
         reducedParticlesMode = ConfigurationEngine.setBoolean(fileConfiguration, "reducedParticlesMode", false);
         noParticlesMode = ConfigurationEngine.setBoolean(fileConfiguration, "noParticlesMode", false);
 

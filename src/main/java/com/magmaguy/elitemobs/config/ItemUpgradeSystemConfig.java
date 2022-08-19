@@ -28,18 +28,18 @@ public class ItemUpgradeSystemConfig {
     public static void initializeConfig() {
         File file = ConfigurationEngine.fileCreator("ScrapItemSettings.yml");
         FileConfiguration fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
-        scrapItemName = ConfigurationEngine.setString(fileConfiguration, "scrapItemName", "&2Level $level Scrap");
-        scrapItemLore = ConfigurationEngine.setList(fileConfiguration, "scrapItemLore", Arrays.asList(
+        scrapItemName = ConfigurationEngine.setString(file, fileConfiguration, "scrapItemName", "&2Level $level Scrap", true);
+        scrapItemLore = ConfigurationEngine.setList(file, fileConfiguration, "scrapItemLore", Arrays.asList(
                 "&aGather 25 scrap of the same level in",
                 "&aorder to create an item upgrade orb!",
                 "&aYou can also use scrap to repair",
                 "&aitems and craft higher level scrap!",
-                "&2Do this at the Adventurer's Guild Hub!"));
-        upgradeItemName = ConfigurationEngine.setString(fileConfiguration, "upgradeItemName", "&2Level $level Upgrade Orb");
-        upgradeItemLore = ConfigurationEngine.setList(fileConfiguration, "upgradeItemLore", Arrays.asList(
+                "&2Do this at the Adventurer's Guild Hub!"), true);
+        upgradeItemName = ConfigurationEngine.setString(file, fileConfiguration, "upgradeItemName", "&2Level $level Upgrade Orb", true);
+        upgradeItemLore = ConfigurationEngine.setList(file, fileConfiguration, "upgradeItemLore", Arrays.asList(
                 "&aUse at at the Enhancer NPC to upgrade",
-                "&aitems up to level $orbLevel!"));
-        String materialString = ConfigurationEngine.setString(fileConfiguration, "material", Material.HEART_OF_THE_SEA.toString());
+                "&aitems up to level $orbLevel!"), true);
+        String materialString = ConfigurationEngine.setString(file, fileConfiguration, "material", Material.HEART_OF_THE_SEA.toString(), false);
         try {
             material = Material.valueOf(materialString);
         } catch (Exception ex) {

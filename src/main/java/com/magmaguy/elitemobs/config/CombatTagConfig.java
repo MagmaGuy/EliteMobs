@@ -21,7 +21,7 @@ public class CombatTagConfig {
         FileConfiguration fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
 
         enableCombatTag = ConfigurationEngine.setBoolean(fileConfiguration, "Enable combat tag", true);
-        combatTagMessage = ConfigurationEngine.setString(fileConfiguration, "Combat tag message", "&c[EliteMobs] Combat tag activated!");
+        combatTagMessage = ConfigurationEngine.setString(file, fileConfiguration, "Combat tag message", "&c[EliteMobs] Combat tag activated!", true);
         enableTeleportTimer = ConfigurationEngine.setBoolean(fileConfiguration, "Enable adventurers guild teleport timer", true);
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);

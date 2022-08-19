@@ -29,7 +29,7 @@ public class EnchantmentsConfigFields extends CustomConfigFields {
     @Override
     public void processConfigFields() {
         this.isEnabled = processBoolean("isEnabled", isEnabled, true, true);
-        this.name = processString("name", name, "name", true);
+        this.name = translatable(filename, "name", processString("name", name, "name", true));
         this.maxLevel = processInt("maxLevelV2", maxLevel, 1, true);
         String cleanName = this.filename.replace(".yml", "").toUpperCase();
         try {

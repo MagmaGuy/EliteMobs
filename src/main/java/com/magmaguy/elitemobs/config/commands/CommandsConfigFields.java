@@ -2,6 +2,8 @@ package com.magmaguy.elitemobs.config.commands;
 
 import org.bukkit.configuration.file.FileConfiguration;
 
+import java.io.File;
+
 public class CommandsConfigFields {
 
     private String fileName;
@@ -14,7 +16,7 @@ public class CommandsConfigFields {
 
     }
 
-    public void generateConfigDefaults(FileConfiguration fileConfiguration) {
+    public void generateConfigDefaults(File file, FileConfiguration fileConfiguration) {
     }
 
     public String getFileName() {

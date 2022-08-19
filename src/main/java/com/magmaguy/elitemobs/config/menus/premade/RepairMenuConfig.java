@@ -35,7 +35,7 @@ public class RepairMenuConfig extends MenusConfigFields {
 
     @Override
     public void processAdditionalFields() {
-        shopName = ConfigurationEngine.setString(fileConfiguration, "shopName", "[EM] Repair menu!");
+        shopName = ConfigurationEngine.setString(file, fileConfiguration, "shopName", "[EM] Repair menu!", true);
         ItemStackSerializer.serialize(
                 "infoButton",
                 ItemStackGenerator.generateSkullItemStack("magmaguy",

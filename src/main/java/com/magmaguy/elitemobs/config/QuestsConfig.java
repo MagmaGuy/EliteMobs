@@ -104,58 +104,58 @@ public class QuestsConfig {
         FileConfiguration fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
 
         requireQuestTurnIn = ConfigurationEngine.setBoolean(fileConfiguration, "requireQuestTurnIn", true);
-        questJoinMessage = ConfigurationEngine.setString(fileConfiguration, "questJoinMessage", "&aYou have accepted the quest $questName &a!");
-        questLeaveMessage = ConfigurationEngine.setString(fileConfiguration, "questLeaveMessage", "&cYou have abandoned the quest $questName &c!");
-        questCompleteMessage = ConfigurationEngine.setString(fileConfiguration, "questCompleteMessage", "&2You completed the quest $questName &2!");
-        leaveWhenNoActiveQuestsExist = ConfigurationEngine.setString(fileConfiguration, "leaveWhenNoActiveQuestsExist", "&cYou don't currently have an active quest!");
-        questLeaveConfirmationMessage = ConfigurationEngine.setString(fileConfiguration, "questLeaveConfirmationMessage", "&cAre you sure you want to abandon your current quest? Do &a/em confirm &c to confirm your choice!");
+        questJoinMessage = ConfigurationEngine.setString(file, fileConfiguration, "questJoinMessage", "&aYou have accepted the quest $questName &a!", true);
+        questLeaveMessage = ConfigurationEngine.setString(file, fileConfiguration, "questLeaveMessage", "&cYou have abandoned the quest $questName &c!", true);
+        questCompleteMessage = ConfigurationEngine.setString(file, fileConfiguration, "questCompleteMessage", "&2You completed the quest $questName &2!", true);
+        leaveWhenNoActiveQuestsExist = ConfigurationEngine.setString(file, fileConfiguration, "leaveWhenNoActiveQuestsExist", "&cYou don't currently have an active quest!", true);
+        questLeaveConfirmationMessage = ConfigurationEngine.setString(file, fileConfiguration, "questLeaveConfirmationMessage", "&cAre you sure you want to abandon your current quest? Do &a/em confirm &c to confirm your choice!", true);
         useQuestAcceptTitles = ConfigurationEngine.setBoolean(fileConfiguration, "useQuestAcceptTitles", true);
-        questStartTitle = ConfigurationEngine.setString(fileConfiguration, "questStartTitle", "&aQuest Accepted!");
-        questStartSubtitle = ConfigurationEngine.setString(fileConfiguration, "questStartSubtitle", "$questName");
+        questStartTitle = ConfigurationEngine.setString(file, fileConfiguration, "questStartTitle", "&aQuest Accepted!", true);
+        questStartSubtitle = ConfigurationEngine.setString(file, fileConfiguration, "questStartSubtitle", "$questName", false);
         useQuestCompleteTitles = ConfigurationEngine.setBoolean(fileConfiguration, "useQuestCompleteTitles", true);
-        questCompleteTitle = ConfigurationEngine.setString(fileConfiguration, "questCompleteTitle", "&2Quest Completed!");
-        questCompleteSubtitle = ConfigurationEngine.setString(fileConfiguration, "questCompleteSubtitle", "$questName");
+        questCompleteTitle = ConfigurationEngine.setString(file, fileConfiguration, "questCompleteTitle", "&2Quest Completed!", true);
+        questCompleteSubtitle = ConfigurationEngine.setString(file, fileConfiguration, "questCompleteSubtitle", "$questName", false);
         useQuestLeaveTitles = ConfigurationEngine.setBoolean(fileConfiguration, "useQuestLeaveTitles", true);
-        questLeaveTitle = ConfigurationEngine.setString(fileConfiguration, "questLeaveTitle", "&cQuest Abandoned!");
-        questLeaveSubtitle = ConfigurationEngine.setString(fileConfiguration, "questLeaveSubtitle", "$questName");
+        questLeaveTitle = ConfigurationEngine.setString(file, fileConfiguration, "questLeaveTitle", "&cQuest Abandoned!", true);
+        questLeaveSubtitle = ConfigurationEngine.setString(file, fileConfiguration, "questLeaveSubtitle", "$questName", false);
         doQuestChatProgression = ConfigurationEngine.setBoolean(fileConfiguration, "doQuestChatProgression", true);
-        ongoingColorCode = ConfigurationEngine.setString(fileConfiguration, "ongoingQuestColorCode", "&c");
-        completedColorCode = ConfigurationEngine.setString(fileConfiguration, "ongoingQuestColorCode", "&2");
-        killQuestChatProgressionMessage = ConfigurationEngine.setString(fileConfiguration, "killQuestChatProgressionMessage", "&8[EliteMobs]&c➤Kill $name:$color$current&0/$color$target");
-        fetchQuestChatProgressionMessage = ConfigurationEngine.setString(fileConfiguration, "fetchQuestChatProgressionMessage", "&8[EliteMobs]&c➤Get $name:$color$current&0/$color$target");
-        dialogQuestChatProgressionMessage = ConfigurationEngine.setString(fileConfiguration, "dialogQuestChatProgressionMessage", "&8[EliteMobs]&c➤Talk to $name:$color$current&0/$color$target");
+        ongoingColorCode = ConfigurationEngine.setString(file, fileConfiguration, "ongoingQuestColorCode", "&c", false);
+        completedColorCode = ConfigurationEngine.setString(file, fileConfiguration, "ongoingQuestColorCode", "&2", false);
+        killQuestChatProgressionMessage = ConfigurationEngine.setString(file, fileConfiguration, "killQuestChatProgressionMessage", "&8[EliteMobs]&c➤Kill $name:$color$current&0/$color$target", true);
+        fetchQuestChatProgressionMessage = ConfigurationEngine.setString(file, fileConfiguration, "fetchQuestChatProgressionMessage", "&8[EliteMobs]&c➤Get $name:$color$current&0/$color$target", true);
+        dialogQuestChatProgressionMessage = ConfigurationEngine.setString(file, fileConfiguration, "dialogQuestChatProgressionMessage", "&8[EliteMobs]&c➤Talk to $name:$color$current&0/$color$target", true);
         maximumActiveQuests = ConfigurationEngine.setInt(fileConfiguration, "maximumActiveQuests", 10);
-        questCapMessage = ConfigurationEngine.setString(fileConfiguration, "questCapMessage", "&8[EliteMobs] &cYou have reached the maximum amount of active quests (10)! " +
-                "&4Abandon or complete at least one active quest if you want to get more quests!");
+        questCapMessage = ConfigurationEngine.setString(file, fileConfiguration, "questCapMessage", "&8[EliteMobs] &cYou have reached the maximum amount of active quests (10)! " +
+                "&4Abandon or complete at least one active quest if you want to get more quests!", true);
 
         useQuestScoreboards = ConfigurationEngine.setBoolean(fileConfiguration, "useQuestScoreboards", true);
 
-        killQuestScoreboardProgressionLine = ConfigurationEngine.setString(fileConfiguration, "killQuestScoreboardProgressionMessage", "&c➤Kill $name:$color$current&0/$color$target");
-        fetchQuestScoreboardProgressionLine = ConfigurationEngine.setString(fileConfiguration, "fetchQuestScoreboardProgressionMessage", "&c➤Get $name:$color$current&0/$color$target");
-        dialogQuestScoreboardProgressionLine = ConfigurationEngine.setString(fileConfiguration, "dialogQuestScoreboardProgressionMessage", "&c➤Talk to $name:$color$current&0/$color$target");
+        killQuestScoreboardProgressionLine = ConfigurationEngine.setString(file, fileConfiguration, "killQuestScoreboardProgressionMessage", "&c➤Kill $name:$color$current&0/$color$target", true);
+        fetchQuestScoreboardProgressionLine = ConfigurationEngine.setString(file, fileConfiguration, "fetchQuestScoreboardProgressionMessage", "&c➤Get $name:$color$current&0/$color$target", true);
+        dialogQuestScoreboardProgressionLine = ConfigurationEngine.setString(file, fileConfiguration, "dialogQuestScoreboardProgressionMessage", "&c➤Talk to $name:$color$current&0/$color$target", true);
 
-        questEntityTypes = setEntityTypes(fileConfiguration);
+        questEntityTypes = setEntityTypes(fileConfiguration, file);
 
-        chatTrackMessage = ConfigurationEngine.setString(fileConfiguration, "chatTrackMessage", "&8[EliteMobs]&2 Click here to track your quest!");
-        chatTrackHover = ConfigurationEngine.setString(fileConfiguration, "chatTrackHover", "&2Click to track!");
-        chatTrackCommand = ConfigurationEngine.setString(fileConfiguration, "chatTrackCommand", "/elitemobs quest track $questID");
+        chatTrackMessage = ConfigurationEngine.setString(file, fileConfiguration, "chatTrackMessage", "&8[EliteMobs]&2 Click here to track your quest!", true);
+        chatTrackHover = ConfigurationEngine.setString(file, fileConfiguration, "chatTrackHover", "&2Click to track!", true);
+        chatTrackCommand = ConfigurationEngine.setString(file, fileConfiguration, "chatTrackCommand", "/elitemobs quest track $questID", false);
 
-        chatTrackingMessage = ConfigurationEngine.setString(fileConfiguration, "chatTrackingMessage", "&8[EliteMobs]&9 You are now tracking a quest!");
-        chatTrackingHover = ConfigurationEngine.setString(fileConfiguration, "chatTrackingHover", "&2Click to untrack/track! /em -> Quests to track a different quest!");
-        chatTrackingCommand = ConfigurationEngine.setString(fileConfiguration, "chatTrackingCommand", "/elitemobs quest track $questID");
+        chatTrackingMessage = ConfigurationEngine.setString(file, fileConfiguration, "chatTrackingMessage", "&8[EliteMobs]&9 You are now tracking a quest!", true);
+        chatTrackingHover = ConfigurationEngine.setString(file, fileConfiguration, "chatTrackingHover", "&2Click to untrack/track! /em -> Quests to track a different quest!", true);
+        chatTrackingCommand = ConfigurationEngine.setString(file, fileConfiguration, "chatTrackingCommand", "/elitemobs quest track $questID", false);
 
         autoTrackQuestsOnAccept = ConfigurationEngine.setBoolean(fileConfiguration, "autoTrackQuestsOnAccept", true);
 
-        noQuestDestinationFound = ConfigurationEngine.setString(fileConfiguration, "noQuestDestinationFound", "[EM] No quest destination found!");
-        questDestinationInOtherWorld = ConfigurationEngine.setString(fileConfiguration, "questDestinationInOtherWorld", "[EM] Go to world $world!");
+        noQuestDestinationFound = ConfigurationEngine.setString(file, fileConfiguration, "noQuestDestinationFound", "[EM] No quest destination found!", true);
+        questDestinationInOtherWorld = ConfigurationEngine.setString(file, fileConfiguration, "questDestinationInOtherWorld", "[EM] Go to world $world!", true);
 
-        questAlreadyCompletedMessage = ConfigurationEngine.setString(fileConfiguration, "questAlreadyCompletedMessage", "&8[EliteMobs] &cYou already completed this quest!");
-        questPrerequisitesMissingMessage = ConfigurationEngine.setString(fileConfiguration, "questPrerequisitesMissingMessage", "&8[EliteMobs] &cCan't accept this quest yet!");
+        questAlreadyCompletedMessage = ConfigurationEngine.setString(file, fileConfiguration, "questAlreadyCompletedMessage", "&8[EliteMobs] &cYou already completed this quest!", true);
+        questPrerequisitesMissingMessage = ConfigurationEngine.setString(file, fileConfiguration, "questPrerequisitesMissingMessage", "&8[EliteMobs] &cCan't accept this quest yet!", true);
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }
 
-    private static List<EntityType> setEntityTypes(FileConfiguration fileConfiguration) {
+    private static List<EntityType> setEntityTypes(FileConfiguration fileConfiguration, File file) {
         List<String> entityTypes = new ArrayList<>(Arrays.asList(
                 EntityType.BLAZE.toString(),
                 EntityType.CAVE_SPIDER.toString(),
@@ -192,7 +192,7 @@ public class QuestsConfig {
             entityTypes.addAll(laterEntities);
         }
 
-        ConfigurationEngine.setList(fileConfiguration, "questEntityTypes", entityTypes);
+        ConfigurationEngine.setList(file, fileConfiguration, "questEntityTypes", entityTypes, false);
 
         List<EntityType> parsedTypes = new ArrayList<>();
         for (String string : entityTypes)

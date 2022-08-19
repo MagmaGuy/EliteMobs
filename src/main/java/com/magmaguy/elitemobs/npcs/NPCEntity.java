@@ -61,7 +61,7 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
                 locationString.equalsIgnoreCase("null"))
             return;
         setSpawnLocation();
-        queueSpawn();
+        spawn();
         persistentObjectHandler = new PersistentObjectHandler(this);
     }
 
@@ -91,12 +91,10 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
         spawn();
     }
 
-    public void queueSpawn() {
-        if (spawnLocation != null && ChunkLocationChecker.locationIsLoaded(spawnLocation))
-            spawn();
-    }
-
     private void spawn() {
+        if (spawnLocation == null ||
+                spawnLocation.getWorld() == null ||
+                !ChunkLocationChecker.locationIsLoaded(spawnLocation)) return;
         if (villager != null && villager.isValid()) return;
         WorldGuardSpawnEventBypasser.forceSpawn();
         villager = spawnLocation.getWorld().spawn(spawnLocation, Villager.class, villagerInstance -> {
@@ -180,7 +178,7 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
     @Override
     public void worldLoad(World world) {
         setSpawnLocation();
-        queueSpawn();
+        //queueSpawn();
     }
 
     @Override

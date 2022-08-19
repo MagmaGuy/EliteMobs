@@ -18,6 +18,7 @@ import com.magmaguy.elitemobs.utils.Round;
 import com.magmaguy.elitemobs.utils.VersionChecker;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.*;
@@ -109,6 +110,9 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
          * @return Bonus damage applied
          */
         private static double getEliteMeleeDamage(Player player, LivingEntity livingEntity) {
+            if (player.getInventory().getItemInMainHand().getType().equals(Material.BOW) ||
+                    player.getInventory().getItemInMainHand().getType().equals(Material.CROSSBOW))
+                return 1.0;
             double eliteDamage = EliteItemManager.getEliteDamage(player.getInventory().getItemInMainHand());
             double bonusEliteDamage = secondaryEnchantmentDamageIncrease(player, livingEntity);
             return (eliteDamage + bonusEliteDamage) * player.getAttackCooldown();
@@ -117,6 +121,7 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
         private static double getEliteRangedDamage(Projectile arrow) {
             //note: the arrow velocity amplitude at full load is about 2.8
             double arrowSpeedMultiplier = Math.sqrt(Math.pow(arrow.getVelocity().getX(), 2D) + Math.pow(arrow.getVelocity().getY(), 2D) + Math.pow(arrow.getVelocity().getZ(), 2D));
+            arrowSpeedMultiplier /= 4.0D;
             double arrowDamage = EliteItemManager.getArrowEliteDamage(arrow);
             return arrowSpeedMultiplier * arrowDamage;
         }

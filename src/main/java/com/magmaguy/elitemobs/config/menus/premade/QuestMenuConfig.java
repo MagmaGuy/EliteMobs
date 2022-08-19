@@ -24,7 +24,7 @@ public class QuestMenuConfig extends MenusConfigFields {
 
     @Override
     public void processAdditionalFields() {
-        menuName = ConfigurationEngine.setString(fileConfiguration, "menuName", "[EM] Quest Selection");
+        menuName = ConfigurationEngine.setString(file, fileConfiguration, "menuName", "[EM] Quest Selection", true);
 
         ItemStackSerializer.serialize(
                 "validTierButton",
@@ -36,13 +36,13 @@ public class QuestMenuConfig extends MenusConfigFields {
                 fileConfiguration);
         validTierButton = ItemStackSerializer.deserialize("validTierButton", fileConfiguration);
 
-        cancelMessagePart1 = ConfigurationEngine.setString(fileConfiguration, "cancelQuestMessage1",
+        cancelMessagePart1 = ConfigurationEngine.setString(file, fileConfiguration, "cancelQuestMessage1",
                 "&c&l&m&o---------------------------------------------" +
-                        "&cYou can only have one quest at a time! Cancelling your ongoing quest will reset quest progress!");
-        cancelMessagePart2 = ConfigurationEngine.setString(fileConfiguration, "cancelQuestMessage2", "&2[Click here to cancel current quest!]");
-        cancelMessagePart3 = ConfigurationEngine.setString(fileConfiguration, "cancelQuestMessage3",
+                        "&cYou can only have one quest at a time! Cancelling your ongoing quest will reset quest progress!", true);
+        cancelMessagePart2 = ConfigurationEngine.setString(file, fileConfiguration, "cancelQuestMessage2", "&2[Click here to cancel current quest!]", true);
+        cancelMessagePart3 = ConfigurationEngine.setString(file, fileConfiguration, "cancelQuestMessage3",
                 "&7You can see your quest status with the command &a/em quest status" +
-                        "&c&l&m&o---------------------------------------------");
+                        "&c&l&m&o---------------------------------------------", true);
 
         ItemStackSerializer.serialize(
                 "killObjectiveButton",
@@ -55,15 +55,15 @@ public class QuestMenuConfig extends MenusConfigFields {
                 fileConfiguration);
         killObjectiveButton = ItemStackSerializer.deserialize("killObjectiveButton", fileConfiguration);
 
-        questCancelMessage = ConfigurationEngine.setString(fileConfiguration, "questCancelMessage", "&7[EliteMobs] &cYour ongoing quest has been cancelled!");
-        questStartTitle = ConfigurationEngine.setString(fileConfiguration, "questStartTitle", "You have accepted a quest!");
-        questStartSubtitle = ConfigurationEngine.setString(fileConfiguration, "questStartSubtitle", "Slay $objectiveAmount $objectiveName");
-        questCompleteTitle = ConfigurationEngine.setString(fileConfiguration, "questCompleteTitle", "Quest complete!");
-        questCompleteSubtitle = ConfigurationEngine.setString(fileConfiguration, "questCompleteSubtitle", "You have slain $objectiveAmount $objectiveName");
-        objectiveString = ConfigurationEngine.setString(fileConfiguration, "bossBarObjective", "Slay $objectiveAmount $objectiveName");
-        rewardMessage = ConfigurationEngine.setString(fileConfiguration, "questRewardMessage", "&7[EM] &aQuest completed! &6Your reward is &2$reward $currencyName");
-        questCompleteBroadcastMessage = ConfigurationEngine.setString(fileConfiguration, "questCompleteBroadcastMessage", "&7[EM] $player &2has completed a $rank &2quest!");
-        questStartBroadcastMessage = ConfigurationEngine.setString(fileConfiguration, "questStartBroadcastMessage", "&7[EM] $player &2has accepted a $rank &2quest!");
-        questStatusMessage = ConfigurationEngine.setString(fileConfiguration, "questStatusMessage", "&7[EM] &aYou've slain &a$currentAmount &f/ &c$objectiveAmount &a$objectiveName");
+        questCancelMessage = ConfigurationEngine.setString(file, fileConfiguration, "questCancelMessage", "&7[EliteMobs] &cYour ongoing quest has been cancelled!", true);
+        questStartTitle = ConfigurationEngine.setString(file, fileConfiguration, "questStartTitle", "You have accepted a quest!", true);
+        questStartSubtitle = ConfigurationEngine.setString(file, fileConfiguration, "questStartSubtitle", "Slay $objectiveAmount $objectiveName", true);
+        questCompleteTitle = ConfigurationEngine.setString(file, fileConfiguration, "questCompleteTitle", "Quest complete!", true);
+        questCompleteSubtitle = ConfigurationEngine.setString(file, fileConfiguration, "questCompleteSubtitle", "You have slain $objectiveAmount $objectiveName", true);
+        objectiveString = ConfigurationEngine.setString(file, fileConfiguration, "bossBarObjective", "Slay $objectiveAmount $objectiveName", true);
+        rewardMessage = ConfigurationEngine.setString(file, fileConfiguration, "questRewardMessage", "&7[EM] &aQuest completed! &6Your reward is &2$reward $currencyName", true);
+        questCompleteBroadcastMessage = ConfigurationEngine.setString(file, fileConfiguration, "questCompleteBroadcastMessage", "&7[EM] $player &2has completed a $rank &2quest!", true);
+        questStartBroadcastMessage = ConfigurationEngine.setString(file, fileConfiguration, "questStartBroadcastMessage", "&7[EM] $player &2has accepted a $rank &2quest!", true);
+        questStatusMessage = ConfigurationEngine.setString(file, fileConfiguration, "questStatusMessage", "&7[EM] &aYou've slain &a$currentAmount &f/ &c$objectiveAmount &a$objectiveName", true);
     }
 }

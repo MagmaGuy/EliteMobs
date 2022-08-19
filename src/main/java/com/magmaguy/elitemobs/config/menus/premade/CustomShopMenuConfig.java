@@ -24,7 +24,7 @@ public class CustomShopMenuConfig extends MenusConfigFields {
 
     @Override
     public void processAdditionalFields() {
-        shopName = ConfigurationEngine.setString(fileConfiguration, "Shop name", "[EM] Custom Shop");
+        shopName = ConfigurationEngine.setString(file, fileConfiguration, "Shop name", "[EM] Custom Shop", true);
         ItemStackSerializer.serialize("Reroll button",
                 ItemStackGenerator.generateSkullItemStack("magmaguy",
                         "&4&lEliteMobs &r&cby &4&lMagmaGuy",
@@ -33,11 +33,11 @@ public class CustomShopMenuConfig extends MenusConfigFields {
                 fileConfiguration);
         rerollItem = ItemStackSerializer.deserialize("Reroll button", fileConfiguration);
         rerollSlot = ConfigurationEngine.setInt(fileConfiguration, "Reroll button slot", 4);
-        storeSlots = ConfigurationEngine.setList(fileConfiguration, "Store item slots", Arrays.asList(9, 10, 11, 12, 13, 14, 15, 16,
+        storeSlots = ConfigurationEngine.setList(file, fileConfiguration, "Store item slots", Arrays.asList(9, 10, 11, 12, 13, 14, 15, 16,
                 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42,
-                43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53));
-        messageFullInventory = ConfigurationEngine.setString(fileConfiguration, "Full inventory message",
-                "[EliteMobs] &4Your inventory is full! You can't buy items until you get some free space.");
+                43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53), false);
+        messageFullInventory = ConfigurationEngine.setString(file, fileConfiguration, "Full inventory message",
+                "[EliteMobs] &4Your inventory is full! You can't buy items until you get some free space.", true);
     }
 
 }

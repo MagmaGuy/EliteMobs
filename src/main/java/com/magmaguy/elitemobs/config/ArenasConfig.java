@@ -54,26 +54,26 @@ public class ArenasConfig {
         File file = ConfigurationEngine.fileCreator("Arenas.yml");
         FileConfiguration fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
 
-        notEnoughPlayersMessage = ConfigurationEngine.setString(fileConfiguration, "notEnoughPlayersMessage", "&8[EliteMobs] &cYou need at least $amount to start the match!");
-        startingTitle = ConfigurationEngine.setString(fileConfiguration, "startingMessage", "&2Starting!");
-        startingSubtitle = ConfigurationEngine.setString(fileConfiguration, "startingSubtitle", "&2in $count...");
-        arenaFullMessage = ConfigurationEngine.setString(fileConfiguration, "arenaFullMessage", "&4[EliteMobs] &cArena is full! You can spectate instead while you wait for it to finish!");
-        arenasOngoingMessage = ConfigurationEngine.setString(fileConfiguration, "arenasOngoingMessage", "&4[EliteMobs] &cCan't join the arena now - a match is currently happening! You can spectate instead while you wait for it to finish!");
-        arenaStartHintMessage = ConfigurationEngine.setString(fileConfiguration, "arenaStartHintMessage", "&2[EliteMobs] &aYou can start the arena by doing &2/em start");
-        arenaQuitHintMessage = ConfigurationEngine.setString(fileConfiguration, "arenaQuitHintMessage", "&4[EliteMobs] &cYou can leave the arena by doing &4/em quit");
-        arenaJoinPlayerMessage = ConfigurationEngine.setString(fileConfiguration, "arenaJoinPlayerMessage", "&2[EliteMobs] &aYou can start the arena by doing &2/em start &aif there are at least &2$count &aplayers in it! \nYou can leave the arena by doing &c/em quit");
-        arenaJoinSpectatorMessage = ConfigurationEngine.setString(fileConfiguration, "arenaJoinSpectatorMessage", "&2[EliteMobs] &aYou can leave the arena at any time using &2/em quit");
-        waveTitle = ConfigurationEngine.setString(fileConfiguration, "waveTitle", "&aWave &2$wave");
-        waveSubtitle = ConfigurationEngine.setString(fileConfiguration, "waveSubtitle", "");
-        victoryTitle = ConfigurationEngine.setString(fileConfiguration, "victoryTitle", "&2Victory!");
-        victorySubtitle = ConfigurationEngine.setString(fileConfiguration, "victorySubtitle", "&aCompleted &2$wave &awaves!");
-        defeatTitle = ConfigurationEngine.setString(fileConfiguration, "defeatTitle", "&4Defeat!");
-        defeatSubtitle = ConfigurationEngine.setString(fileConfiguration, "defeatSubtitle", "&cReached wave &4$wave&c!");
-        victoryBroadcast = ConfigurationEngine.setString(fileConfiguration, "victoryBroadcast", "Arena $arenaName was conquered by $players!");
-        joinPlayerTitle = ConfigurationEngine.setString(fileConfiguration, "joinPlayerTitle", "&aStart with &2/em start &a!");
-        joinPlayerSubtitle = ConfigurationEngine.setString(fileConfiguration, "joinPlayerSubtitle", "&cLeave with &4/em quit &c!");
-        joinSpectatorTitle = ConfigurationEngine.setString(fileConfiguration, "joinSpectatorTitle", "&aNow spectating!");
-        joinSpectatorSubtitle = ConfigurationEngine.setString(fileConfiguration, "joinSpectatorSubtitle", "&cLeave with &4/em quit &c!");
+        notEnoughPlayersMessage = ConfigurationEngine.setString(file, fileConfiguration, "notEnoughPlayersMessage", "&8[EliteMobs] &cYou need at least $amount to start the match!", true);
+        startingTitle = ConfigurationEngine.setString(file, fileConfiguration, "startingMessage", "&2Starting!", true);
+        startingSubtitle = ConfigurationEngine.setString(file, fileConfiguration, "startingSubtitle", "&2in $count...", true);
+        arenaFullMessage = ConfigurationEngine.setString(file, fileConfiguration, "arenaFullMessage", "&4[EliteMobs] &cArena is full! You can spectate instead while you wait for it to finish!", true);
+        arenasOngoingMessage = ConfigurationEngine.setString(file, fileConfiguration, "arenasOngoingMessage", "&4[EliteMobs] &cCan't join the arena now - a match is currently happening! You can spectate instead while you wait for it to finish!", true);
+        arenaStartHintMessage = ConfigurationEngine.setString(file, fileConfiguration, "arenaStartHintMessage", "&2[EliteMobs] &aYou can start the arena by doing &2/em start", true);
+        arenaQuitHintMessage = ConfigurationEngine.setString(file, fileConfiguration, "arenaQuitHintMessage", "&4[EliteMobs] &cYou can leave the arena by doing &4/em quit", true);
+        arenaJoinPlayerMessage = ConfigurationEngine.setString(file, fileConfiguration, "arenaJoinPlayerMessage", "&2[EliteMobs] &aYou can start the arena by doing &2/em start &aif there are at least &2$count &aplayers in it! \nYou can leave the arena by doing &c/em quit", true);
+        arenaJoinSpectatorMessage = ConfigurationEngine.setString(file, fileConfiguration, "arenaJoinSpectatorMessage", "&2[EliteMobs] &aYou can leave the arena at any time using &2/em quit", true);
+        waveTitle = ConfigurationEngine.setString(file, fileConfiguration, "waveTitle", "&aWave &2$wave", true);
+        waveSubtitle = ConfigurationEngine.setString(file, fileConfiguration, "waveSubtitle", "", true);
+        victoryTitle = ConfigurationEngine.setString(file, fileConfiguration, "victoryTitle", "&2Victory!", true);
+        victorySubtitle = ConfigurationEngine.setString(file, fileConfiguration, "victorySubtitle", "&aCompleted &2$wave &awaves!", true);
+        defeatTitle = ConfigurationEngine.setString(file, fileConfiguration, "defeatTitle", "&4Defeat!", true);
+        defeatSubtitle = ConfigurationEngine.setString(file, fileConfiguration, "defeatSubtitle", "&cReached wave &4$wave&c!", true);
+        victoryBroadcast = ConfigurationEngine.setString(file, fileConfiguration, "victoryBroadcast", "Arena $arenaName was conquered by $players!", true);
+        joinPlayerTitle = ConfigurationEngine.setString(file, fileConfiguration, "joinPlayerTitle", "&aStart with &2/em start &a!", true);
+        joinPlayerSubtitle = ConfigurationEngine.setString(file, fileConfiguration, "joinPlayerSubtitle", "&cLeave with &4/em quit &c!", true);
+        joinSpectatorTitle = ConfigurationEngine.setString(file, fileConfiguration, "joinSpectatorTitle", "&aNow spectating!", true);
+        joinSpectatorSubtitle = ConfigurationEngine.setString(file, fileConfiguration, "joinSpectatorSubtitle", "&cLeave with &4/em quit &c!", true);
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }
 }
