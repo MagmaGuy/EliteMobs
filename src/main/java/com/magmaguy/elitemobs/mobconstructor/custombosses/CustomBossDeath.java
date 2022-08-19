@@ -24,7 +24,8 @@ public class CustomBossDeath implements Listener {
     }
 
     public static void dropLoot(Player player, CustomBossEntity customBossEntity) {
-        if (customBossEntity.customBossesConfigFields.getUniqueLootList().isEmpty()) return;
+        if (customBossEntity.customBossesConfigFields.getUniqueLootList() == null ||
+                customBossEntity.customBossesConfigFields.getUniqueLootList().isEmpty()) return;
         customBossEntity.customBossesConfigFields.getCustomLootTable().bossDrop(player, customBossEntity.getLevel(), customBossEntity.getLocation(), customBossEntity);
     }
 

@@ -38,10 +38,10 @@ public class StatsPage {
                     .replace("$quests", PlayerData.getQuestsCompleted(targetPlayer.getUniqueId()) + "")
                     .replace("$score", PlayerData.getScore(targetPlayer.getUniqueId()) + "") + "\n");
 
-            if (!PlayerStatusMenuConfig.getStatsHoverLines()[i].isEmpty())
+            if (PlayerStatusMenuConfig.getStatsHoverLines() != null && !PlayerStatusMenuConfig.getStatsHoverLines()[i].isEmpty())
                 PlayerStatusScreen.setHoverText(line, PlayerStatusMenuConfig.getStatsHoverLines()[i]);
 
-            if (!PlayerStatusMenuConfig.getStatsCommandLines()[i].isEmpty())
+            if (PlayerStatusMenuConfig.getStatsCommandLines() != null && !PlayerStatusMenuConfig.getStatsCommandLines()[i].isEmpty())
                 line.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, PlayerStatusMenuConfig.getStatsCommandLines()[i]));
 
             textComponent.addExtra(line);
