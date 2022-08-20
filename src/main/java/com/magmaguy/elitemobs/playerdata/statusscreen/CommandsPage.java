@@ -8,7 +8,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 
 import java.util.HashMap;
@@ -57,13 +56,9 @@ public class CommandsPage {
             event.setCancelled(true);
             if (event.getSlot() == 26) {
                 player.closeInventory();
+                pageInventories.remove(player);
                 CoverPage.coverPage(player);
             }
-        }
-
-        @EventHandler
-        public void onInventoryClose(InventoryCloseEvent event) {
-            pageInventories.remove(event.getPlayer());
         }
     }
 }

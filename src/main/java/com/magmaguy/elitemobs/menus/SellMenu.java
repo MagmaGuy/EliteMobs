@@ -19,7 +19,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -218,6 +217,7 @@ public class SellMenu extends EliteMenu implements Listener {
             if (event.getSlot() == SellMenuConfig.cancelSlot) {
                 cancel(playerInventory, shopInventory);
                 event.getWhoClicked().closeInventory();
+                cancel(event.getView().getBottomInventory(), event.getView().getTopInventory());
                 return;
             }
 
@@ -234,11 +234,6 @@ public class SellMenu extends EliteMenu implements Listener {
         }
     }
 
-    @EventHandler
-    public void onInventoryClose(InventoryCloseEvent event) {
-        if (!onInventoryClose(event, inventories)) return;
-        cancel(event.getView().getBottomInventory(), event.getView().getTopInventory());
-    }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {

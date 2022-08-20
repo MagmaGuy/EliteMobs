@@ -11,9 +11,9 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -197,7 +197,7 @@ public class QuestInventoryMenu {
     }
 
     public static class QuestInventoryMenuEvents implements Listener {
-        @EventHandler
+        @EventHandler(priority = EventPriority.HIGHEST)
         public void onInventoryInteract(InventoryClickEvent event) {
             Player player = ((Player) event.getWhoClicked()).getPlayer();
             if (questDirectories.containsKey(player)) {
@@ -211,6 +211,7 @@ public class QuestInventoryMenu {
                 switch (event.getSlot()) {
                     case trackEntry:
                         QuestCommand.trackQuest(questInventories.get(player).quest.getQuestID().toString(), player);
+                        questDirectories.remove(player);
                         player.closeInventory();
                         break;
                     case acceptEntry:
@@ -221,18 +222,13 @@ public class QuestInventoryMenu {
                             QuestCommand.leaveQuest(player, quest.getQuestID().toString());
                         else
                             QuestCommand.completeQuest(quest.getQuestID().toString(), player);
-
+                        questInventories.remove(player);
                         player.closeInventory();
                         break;
                 }
             }
         }
 
-        @EventHandler
-        public void onInventoryClose(InventoryCloseEvent event) {
-            questInventories.remove(event.getPlayer());
-            questDirectories.remove(event.getPlayer());
-        }
     }
 
 }

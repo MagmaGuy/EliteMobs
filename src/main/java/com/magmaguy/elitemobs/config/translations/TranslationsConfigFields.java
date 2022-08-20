@@ -5,7 +5,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.config.CustomConfigFieldsInterface;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.elitemobs.utils.InfoMessage;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 
@@ -34,8 +34,7 @@ public class TranslationsConfigFields extends CustomConfigFields implements Cust
                         MetadataHandler.PLUGIN.getResource("translations/" + filename + ".yml"),
                         new File(MetadataHandler.PLUGIN.getDataFolder().getAbsolutePath() + File.separatorChar + "translations" + File.separatorChar + filename + ".yml"));
             } catch (Exception ex) {
-                new WarningMessage("Default translation file " + filename + " is broken ! Report this to the developer!");
-                ex.printStackTrace();
+                new InfoMessage("Translation filename " + filename + " is not prepackaged. This is fine if it is meant to be a custom translation.");
             }
         }
     }

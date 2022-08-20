@@ -197,7 +197,7 @@ public class QuestTracking {
                 }
                 updateCompassContents();
             }
-        }.runTaskTimer(MetadataHandler.PLUGIN, 0L, 10L);
+        }.runTaskTimer(MetadataHandler.PLUGIN, 0L, 2L);
     }
 
     private void updateCompassContents() {

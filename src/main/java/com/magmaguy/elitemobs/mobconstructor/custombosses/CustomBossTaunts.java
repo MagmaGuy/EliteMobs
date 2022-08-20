@@ -10,7 +10,8 @@ public class CustomBossTaunts implements Listener {
     @EventHandler
     public void onDamagedMessages(EliteMobDamagedEvent eliteMobDamagedEvent) {
         if (!(eliteMobDamagedEvent.getEliteMobEntity() instanceof CustomBossEntity)) return;
-        if (((CustomBossEntity) eliteMobDamagedEvent.getEliteMobEntity()).getCustomBossesConfigFields().getOnDamagedMessages() == null)
+        if (((CustomBossEntity) eliteMobDamagedEvent.getEliteMobEntity()).getCustomBossesConfigFields().getOnDamagedMessages() == null ||
+                ((CustomBossEntity) eliteMobDamagedEvent.getEliteMobEntity()).getCustomBossesConfigFields().getOnDamagedMessages().isEmpty())
             return;
         Taunt.nameTagProcessor(eliteMobDamagedEvent.getEliteMobEntity(), eliteMobDamagedEvent.getEliteMobEntity().getLivingEntity(),
                 ((CustomBossEntity) eliteMobDamagedEvent.getEliteMobEntity()).getCustomBossesConfigFields().getOnDamagedMessages());
@@ -19,7 +20,8 @@ public class CustomBossTaunts implements Listener {
     @EventHandler
     public void onDamageMessages(PlayerDamagedByEliteMobEvent playerDamagedByEliteMobEvent) {
         if (!(playerDamagedByEliteMobEvent.getEliteMobEntity() instanceof CustomBossEntity)) return;
-        if (((CustomBossEntity) playerDamagedByEliteMobEvent.getEliteMobEntity()).getCustomBossesConfigFields().getOnDamageMessages()== null)
+        if (((CustomBossEntity) playerDamagedByEliteMobEvent.getEliteMobEntity()).getCustomBossesConfigFields().getOnDamageMessages() == null ||
+                ((CustomBossEntity) playerDamagedByEliteMobEvent.getEliteMobEntity()).getCustomBossesConfigFields().getOnDamageMessages().isEmpty())
             return;
         Taunt.nameTagProcessor(playerDamagedByEliteMobEvent.getEliteMobEntity(), playerDamagedByEliteMobEvent.getEliteMobEntity().getLivingEntity(),
                 ((CustomBossEntity) playerDamagedByEliteMobEvent.getEliteMobEntity()).getCustomBossesConfigFields().getOnDamageMessages());

@@ -14,7 +14,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 
 import java.util.*;
@@ -102,19 +101,16 @@ public class BossTrackingPage {
             if (!pageInventories.containsKey(player)) return;
             event.setCancelled(true);
             if (bosses.size() - 1 >= event.getSlot()) {
+                pageInventories.remove(player);
                 player.closeInventory();
                 bosses.get(event.getSlot()).getCustomBossBossBar().addTrackingPlayer(player);
                 return;
             }
             if (event.getSlot() == 53) {
+                pageInventories.remove(player);
                 player.closeInventory();
                 CoverPage.coverPage(player);
             }
-        }
-
-        @EventHandler
-        public void onInventoryClose(InventoryCloseEvent event) {
-            pageInventories.remove(event.getPlayer());
         }
     }
 }

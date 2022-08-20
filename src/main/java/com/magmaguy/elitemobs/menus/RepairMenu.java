@@ -15,7 +15,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
@@ -178,6 +177,7 @@ public class RepairMenu extends EliteMenu {
                 //cancel button
                 if (event.getSlot() == RepairMenuConfig.cancelSlot) {
                     player.closeInventory();
+                    EliteMenu.cancel(event.getView().getTopInventory(), event.getView().getBottomInventory(), Arrays.asList(eliteItemInputSlot, scrapItemInputSlot));
                     return;
                 }
 
@@ -194,12 +194,6 @@ public class RepairMenu extends EliteMenu {
 
             }
 
-        }
-
-        @EventHandler
-        public void onInventoryClose(InventoryCloseEvent event) {
-            if (!EliteMenu.onInventoryClose(event, inventories)) return;
-            EliteMenu.cancel(event.getView().getTopInventory(), event.getView().getBottomInventory(), Arrays.asList(eliteItemInputSlot, scrapItemInputSlot));
         }
 
     }
