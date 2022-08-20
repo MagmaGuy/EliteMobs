@@ -115,10 +115,17 @@ public class ArenaInstance extends MatchInstance {
         }
         Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, () -> {
             if (arenaState == ArenaState.IDLE) return;
-            players.forEach(player -> player.sendTitle(ArenasConfig.getWaveTitle().replace("$wave", currentWave + ""),
-                    ArenasConfig.getWaveSubtitle().replace("$wave", currentWave + ""), 0, 20, 0));
-            spectators.forEach(player -> player.sendTitle(ArenasConfig.getWaveTitle().replace("$wave", currentWave + ""),
-                    ArenasConfig.getWaveSubtitle().replace("$wave", currentWave + ""), 0, 20, 0));
+            String title = ArenasConfig.getWaveTitle();
+            String subtitle = ArenasConfig.getWaveSubtitle();
+            if (title == null) title = "";
+            if (subtitle == null) subtitle = "";
+
+            String finalTitle = title;
+            String finalSubtitle = subtitle;
+            players.forEach(player -> player.sendTitle(finalTitle.replace("$wave", currentWave + ""),
+                    finalSubtitle.replace("$wave", currentWave + ""), 0, 20, 0));
+            spectators.forEach(player -> player.sendTitle(finalTitle.replace("$wave", currentWave + ""),
+                    finalSubtitle.replace("$wave", currentWave + ""), 0, 20, 0));
             spawnBosses();
             arenaState = ArenaState.ACTIVE;
         }, 20L * customArenasConfigFields.getDelayBetweenWaves());

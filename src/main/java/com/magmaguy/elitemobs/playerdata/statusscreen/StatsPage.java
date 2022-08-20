@@ -12,7 +12,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -95,14 +94,10 @@ public class StatsPage {
             if (!pageInventories.containsKey(player)) return;
             event.setCancelled(true);
             if (event.getSlot() == 26) {
+                pageInventories.remove(player);
                 player.closeInventory();
                 CoverPage.coverPage(player);
             }
-        }
-
-        @EventHandler
-        public void onInventoryClose(InventoryCloseEvent event) {
-            pageInventories.remove(event.getPlayer());
         }
     }
 }

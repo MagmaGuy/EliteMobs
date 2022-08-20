@@ -10,7 +10,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 
 import java.util.HashMap;
@@ -44,18 +43,15 @@ public class ArenaMenu {
             if (event.getSlot() == ArenaMenuConfig.getPlayerItemSlot()) {
                 menus.get(player).getArenaInstance().addPlayer(player);
                 player.closeInventory();
+                menus.remove(player);
                 return;
             }
             if (event.getSlot() == ArenaMenuConfig.getSpectatorItemSlot()) {
                 menus.get(player).getArenaInstance().addSpectator(player);
                 player.closeInventory();
+                menus.remove(player);
                 return;
             }
-        }
-
-        @EventHandler
-        public void onInventoryClose(InventoryCloseEvent event) {
-            menus.remove((Player) event.getPlayer());
         }
     }
 

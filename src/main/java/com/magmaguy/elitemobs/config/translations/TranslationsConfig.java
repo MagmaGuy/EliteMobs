@@ -19,9 +19,7 @@ public class TranslationsConfig extends CustomConfig {
         super("translations", "com.magmaguy.elitemobs.config.translations.premade", TranslationsConfigFields.class);
         translationConfigs = new HashMap<>();
         for (String key : super.getCustomConfigFieldsHashMap().keySet())
-            if (super.getCustomConfigFieldsHashMap().get(key).isEnabled()) {
-                translationConfigs.put(key, (TranslationsConfigFields) super.getCustomConfigFieldsHashMap().get(key));
-            }
+            translationConfigs.put(key, (TranslationsConfigFields) super.getCustomConfigFieldsHashMap().get(key));
     }
 
     /**

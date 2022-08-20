@@ -7,7 +7,6 @@ import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.menus.QuestMenu;
 import com.magmaguy.elitemobs.quests.objectives.CustomFetchObjective;
 import com.magmaguy.elitemobs.quests.objectives.Objective;
-import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -66,13 +65,10 @@ public class QuestInteractionHandler {
                     questCompleteCount++;
             }
 
-        if (npcEntity.getNPCsConfigFields().getQuestFilenames() == null) {
-            new WarningMessage("NPC" + npcEntity.getNPCsConfigFields().getFilename() + " is listed a quest NPC but has no valid quest filenames associated to it! Check if the quests are valid and if the filenames in the NPC's config are typed correctly!");
-        }
-
-        if (questCompleteCount == npcEntity.getNPCsConfigFields().getQuestFilenames().size())
+        if (npcEntity.getNPCsConfigFields().getQuestFilenames() != null &&
+                questCompleteCount == npcEntity.getNPCsConfigFields().getQuestFilenames().size())
             player.sendMessage(QuestsConfig.getQuestAlreadyCompletedMessage());
-        else if (!anyQuestIsValid)
+        else if (!anyQuestIsValid && npcEntity.getNPCsConfigFields().getQuestFilenames() != null)
             player.sendMessage(QuestsConfig.getQuestPrerequisitesMissingMessage());
 
         if (!customQuestList.isEmpty())

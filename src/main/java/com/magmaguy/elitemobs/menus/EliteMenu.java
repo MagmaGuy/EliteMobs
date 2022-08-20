@@ -4,7 +4,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 
@@ -32,14 +31,6 @@ public class EliteMenu implements Listener {
 
     public static boolean isBottomMenu(InventoryClickEvent event) {
         return !isTopMenu(event);
-    }
-
-    public static boolean onInventoryClose(InventoryCloseEvent event, Map<Player, Inventory> inventories) {
-        Player player = (Player) event.getPlayer();
-        Inventory inventory = inventories.get(player);
-        if (inventory == null) return false;
-        inventories.remove(player);
-        return event.getView().getTopInventory().equals(inventory);
     }
 
     public static void cancel(Inventory eliteInventory, Inventory playerInventory, List<Integer> inputSlots) {

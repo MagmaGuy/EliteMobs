@@ -32,8 +32,10 @@ public class CustomModel {
             /*
             if (ModelEngineAPI.api.getModelRegistry().getBlueprint(modelName) == null)
              */
-            if (ModelEngineAPI.api.getModelManager().getModelRegistry().getModelBlueprint(modelName) == null)
+            if (ModelEngineAPI.api.getModelManager().getModelRegistry().getModelBlueprint(modelName) == null) {
                 new InfoMessage("Model " + modelName + " was not found! Make sure you install the model correctly if you have it. This entry will be skipped!");
+                return;
+            }
         } catch (NoSuchMethodError ex) {
             new WarningMessage("Model Engine API version is not supported. Currently Elitemobs can only support ModelEngine B3.0.0, documentation for other versions doesn't exist.");
             return;
