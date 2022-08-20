@@ -83,6 +83,8 @@ public class NPCProximitySensor implements Listener {
     }
 
     private void findQuestState(NPCEntity npcEntity, Player player) {
+        //Case for NPCs needed for quests but who are not themselves quest givers
+        if (npcEntity.getNPCsConfigFields().getQuestFilenames() == null) return;
         if (npcEntity.getNPCsConfigFields().getInteractionType().equals(NPCInteractions.NPCInteractionType.CUSTOM_QUEST_GIVER)) {
             if (!PlayerData.getQuests(player.getUniqueId()).isEmpty()) {
                 for (String questString : npcEntity.getNPCsConfigFields().getQuestFilenames())

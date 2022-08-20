@@ -29,7 +29,7 @@ public class PhaseBossEntity {
             for (String phaseConfigFile : customBossEntity.getCustomBossesConfigFields().getPhases()) {
                 CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(phaseConfigFile.split(":")[0]);
                 if (customBossesConfigFields == null) {
-                    new WarningMessage("Phase boss " + customBossEntity.getCustomBossesConfigFields() + " has an invalid config entry for phase " + phaseConfigFile + " - this file could not be found. The boss will not be able to do this phase until it is fixed!");
+                    new WarningMessage("Phase boss " + customBossEntity.getCustomBossesConfigFields() + " has an invalid config entry for phase " + phaseConfigFile.split(":")[0] + " - this file could not be found. The boss will not be able to do this phase until it is fixed!");
                 }
                 double healthPercentage = Double.parseDouble(phaseConfigFile.split(":")[1]);
                 unsortedBossPhases.add(new BossPhase(customBossesConfigFields, healthPercentage));

@@ -1,7 +1,5 @@
 package com.magmaguy.elitemobs.items;
 
-import com.magmaguy.elitemobs.config.ItemSettingsConfig;
-import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
@@ -28,7 +26,7 @@ public class ScalableItemConstructor {
 
     public static ItemStack constructScalableItem(int itemTier, CustomItem customItem, Player player, EliteEntity eliteEntity) {
         if (!customItem.getPermission().isEmpty() && !player.hasPermission(customItem.getPermission())) return null;
-        HashMap<Enchantment, Integer> newEnchantmentList = updateDynamicEnchantments(customItem.getEnchantments(), itemTier, false);
+        HashMap<Enchantment, Integer> newEnchantmentList = updateDynamicEnchantments(customItem.getEnchantments());
         return ItemConstructor.constructItem(
                 itemTier,
                 customItem.getName(),
@@ -44,68 +42,23 @@ public class ScalableItemConstructor {
         );
     }
 
-    private static HashMap<Enchantment, Integer> updateDynamicEnchantments(HashMap<Enchantment, Integer> enchantmentsList, int itemTier, boolean isLimited) {
-
-        if (enchantmentsList.containsKey(Enchantment.PROTECTION_ENVIRONMENTAL) &&
-                enchantmentsList.get(Enchantment.PROTECTION_ENVIRONMENTAL) > ItemSettingsConfig.getMaximumLootTier())
-            itemTier = ItemSettingsConfig.getMaximumLootTier();
-
-        if (enchantmentsList.containsKey(Enchantment.DAMAGE_ALL) &&
-                enchantmentsList.get(Enchantment.DAMAGE_ALL) > ItemSettingsConfig.getMaximumLootTier())
-            itemTier = ItemSettingsConfig.getMaximumLootTier();
-
-        if (enchantmentsList.containsKey(Enchantment.ARROW_DAMAGE) &&
-                enchantmentsList.get(Enchantment.ARROW_DAMAGE) > ItemSettingsConfig.getMaximumLootTier())
-            itemTier = ItemSettingsConfig.getMaximumLootTier();
+    private static HashMap<Enchantment, Integer> updateDynamicEnchantments(HashMap<Enchantment, Integer> enchantmentsList) {
+        List<Enchantment> enchantmentsArray = new ArrayList<>();
+        for (Enchantment enchantment : enchantmentsList.keySet())
+            for (int i = 0; i < enchantmentsList.get(enchantment); i++)
+                enchantmentsArray.add(enchantment);
 
         HashMap<Enchantment, Integer> newEnchantmentList = new HashMap<>();
-        HashMap<Enchantment, Integer> secondaryEnchantmentList = new HashMap<>();
 
-        /*
-        Small limitation of this system, it doesn't take into account the material tier and just defaults to assume it's
-        diamond (hence the -1 enchantment).
-        It's such a small thing that I don't feel it's worth the hassle of adjusting it.
-         */
-        for (Enchantment enchantment : enchantmentsList.keySet())
-            if (enchantment.equals(Enchantment.DAMAGE_ALL) ||
-                    enchantment.equals(Enchantment.ARROW_DAMAGE) ||
-                    enchantment.equals(Enchantment.PROTECTION_ENVIRONMENTAL))
-                newEnchantmentList.put(enchantment, itemTier - 1);
-            else
-                secondaryEnchantmentList.put(enchantment, enchantmentsList.get(enchantment));
-
-        if (itemTier < 2) return newEnchantmentList;
-
-
-        int secondaryEnchantmentPool = ThreadLocalRandom.current().nextInt(itemTier);
-
-        for (int i = 0; i < secondaryEnchantmentPool; i++) {
-
-            if (secondaryEnchantmentList.isEmpty()) break;
-
-            int randomIndex = ThreadLocalRandom.current().nextInt(secondaryEnchantmentList.size());
-            Enchantment randomizedEnchantment = (Enchantment) secondaryEnchantmentList.keySet().toArray()[randomIndex];
-
-            int enchantmentLevel = 1;
-
-            if (!newEnchantmentList.isEmpty() && newEnchantmentList.containsKey(randomizedEnchantment)) {
-                enchantmentLevel = newEnchantmentList.get(randomizedEnchantment) + 1;
+        for (int i = 0; i < enchantmentsArray.size(); i++) {
+            int random = ThreadLocalRandom.current().nextInt(0, enchantmentsArray.size());
+            if (!newEnchantmentList.containsKey(enchantmentsArray.get(random)))
+                newEnchantmentList.put(enchantmentsArray.get(random), 1);
+            else {
+                int currentValue = newEnchantmentList.get(enchantmentsArray.get(random)) + 1;
+                newEnchantmentList.put(enchantmentsArray.get(random), currentValue);
             }
-
-            newEnchantmentList.put(randomizedEnchantment, enchantmentLevel);
-
-            if (isLimited) {
-                int leftoverPoolEnchantment = secondaryEnchantmentList.get(randomizedEnchantment) - 1;
-                if (leftoverPoolEnchantment <= 0)
-                    secondaryEnchantmentList.remove(randomizedEnchantment);
-                else
-                    secondaryEnchantmentList.put(randomizedEnchantment, leftoverPoolEnchantment);
-            } else {
-                if (EnchantmentsConfig.getEnchantment(randomizedEnchantment).getMaxLevel() == enchantmentLevel)
-                    secondaryEnchantmentList.remove(randomizedEnchantment);
-
-            }
-
+            enchantmentsArray.remove(random);
         }
 
         return newEnchantmentList;
@@ -141,7 +94,7 @@ public class ScalableItemConstructor {
 
     public static ItemStack constructLimitedItem(int itemTier, CustomItem customItem, Player player, EliteEntity eliteEntity) {
 
-        HashMap<Enchantment, Integer> newEnchantmentList = updateLimitedEnchantments(customItem.getEnchantments(), itemTier);
+        HashMap<Enchantment, Integer> newEnchantmentList = updateDynamicEnchantments(customItem.getEnchantments());
 
         return ItemConstructor.constructItem(
                 itemTier,
@@ -158,25 +111,5 @@ public class ScalableItemConstructor {
         );
 
     }
-
-    private static HashMap<Enchantment, Integer> updateLimitedEnchantments(HashMap<Enchantment, Integer> enchantmentsList,
-                                                                           int itemTier) {
-        if (enchantmentsList.containsKey(Enchantment.PROTECTION_ENVIRONMENTAL) &&
-                enchantmentsList.get(Enchantment.PROTECTION_ENVIRONMENTAL) < itemTier)
-            itemTier = enchantmentsList.get(Enchantment.PROTECTION_ENVIRONMENTAL);
-
-        if (enchantmentsList.containsKey(Enchantment.DAMAGE_ALL) &&
-                enchantmentsList.get(Enchantment.DAMAGE_ALL) > ItemSettingsConfig.getMaximumLootTier())
-            itemTier = enchantmentsList.get(Enchantment.DAMAGE_ALL);
-
-        if (enchantmentsList.containsKey(Enchantment.ARROW_DAMAGE) &&
-                enchantmentsList.get(Enchantment.ARROW_DAMAGE) > ItemSettingsConfig.getMaximumLootTier())
-            itemTier = enchantmentsList.get(Enchantment.ARROW_DAMAGE);
-
-
-        return updateDynamicEnchantments(enchantmentsList, itemTier, true);
-
-    }
-
 
 }

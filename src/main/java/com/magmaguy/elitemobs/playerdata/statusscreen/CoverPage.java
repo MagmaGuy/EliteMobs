@@ -9,7 +9,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 
 import java.util.HashMap;
@@ -87,51 +86,53 @@ public class CoverPage {
             event.setCancelled(true);
 
             if (event.getSlot() == PlayerStatusMenuConfig.getIndexHeaderSlot()) {
+                pageInventories.remove(player);
                 player.closeInventory();
                 AdventurersGuildCommand.adventurersGuildCommand(player);
                 return;
             }
 
             if (event.getSlot() == PlayerStatusMenuConfig.getIndexGearSlot() && PlayerStatusMenuConfig.isDoGearPage()) {
+                pageInventories.remove(player);
                 player.closeInventory();
                 GearPage.gearPage(player, player);
                 return;
             }
 
             if (event.getSlot() == PlayerStatusMenuConfig.getIndexStatsSlot() && PlayerStatusMenuConfig.isDoStatsPage()) {
+                pageInventories.remove(player);
                 player.closeInventory();
                 StatsPage.statsPage(player, player);
                 return;
             }
 
             if (event.getSlot() == PlayerStatusMenuConfig.getIndexCommandsSlot() && PlayerStatusMenuConfig.isDoCommandsPage()) {
+                pageInventories.remove(player);
                 player.closeInventory();
                 CommandsPage.commandsPage(player, player);
                 return;
             }
 
             if (event.getSlot() == PlayerStatusMenuConfig.getIndexTeleportsSlot() && PlayerStatusMenuConfig.isDoTeleportsPage()) {
+                pageInventories.remove(player);
                 player.closeInventory();
                 TeleportsPage.teleportsPage(player, player);
                 return;
             }
 
             if (event.getSlot() == PlayerStatusMenuConfig.getIndexQuestTrackingSlot() && PlayerStatusMenuConfig.isDoQuestTrackingPage()) {
+                pageInventories.remove(player);
                 player.closeInventory();
                 QuestsPage.questsPage(player, player);
                 return;
             }
 
             if (event.getSlot() == PlayerStatusMenuConfig.getIndexBossTrackingSlot() && PlayerStatusMenuConfig.isDoBossTrackingPage()) {
+                pageInventories.remove(player);
                 player.closeInventory();
                 BossTrackingPage.bossTrackingPage(player, player);
                 return;
             }
-        }
-
-        @EventHandler
-        public void onInventoryClose(InventoryCloseEvent event) {
-            pageInventories.remove(event.getPlayer());
         }
     }
 }

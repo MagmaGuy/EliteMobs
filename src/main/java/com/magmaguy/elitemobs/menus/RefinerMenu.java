@@ -15,7 +15,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -209,6 +208,7 @@ public class RefinerMenu extends EliteMenu {
                 //cancel, transfer items back to player inv and exit
                 if (event.getSlot() == SellMenuConfig.cancelSlot) {
                     player.closeInventory();
+                    EliteMenu.cancel(event.getView().getTopInventory(), event.getView().getBottomInventory(), inputSlots);
                     return;
                 }
 
@@ -222,12 +222,6 @@ public class RefinerMenu extends EliteMenu {
 
             }
 
-        }
-
-        @EventHandler
-        public void onInventoryClose(InventoryCloseEvent event) {
-            if (!EliteMenu.onInventoryClose(event, inventories)) return;
-            EliteMenu.cancel(event.getView().getTopInventory(), event.getView().getBottomInventory(), inputSlots);
         }
 
     }

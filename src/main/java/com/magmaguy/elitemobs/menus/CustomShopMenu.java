@@ -18,7 +18,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -149,6 +148,7 @@ public class CustomShopMenu {
 
                     player.sendMessage(CustomShopMenuConfig.messageFullInventory);
                     player.closeInventory();
+                    menus.remove(player);
 
                 } else if (EconomyHandler.checkCurrency(player.getUniqueId()) >= itemValue) {
                     //player has enough money
@@ -162,17 +162,13 @@ public class CustomShopMenu {
                 } else {
 
                     player.closeInventory();
+                    menus.remove(player);
                     SharedShopElements.insufficientFundsMessage(player, itemValue);
 
                 }
 
             }
 
-        }
-
-        @EventHandler
-        public void onInventoryClose(InventoryCloseEvent event) {
-            if (!EliteMenu.onInventoryClose(event, menus)) return;
         }
     }
 
