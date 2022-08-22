@@ -24,6 +24,8 @@ public class CommandsPage {
 
         for (int i = 0; i < 13; i++) {
 
+            if (PlayerStatusMenuConfig.getCommandsHoverLines()[i] == null) continue;
+
             TextComponent line = new TextComponent(PlayerStatusMenuConfig.getCommandsTextLines()[i] + "\n");
 
             if (!PlayerStatusMenuConfig.getCommandsHoverLines()[i].isEmpty())
@@ -49,7 +51,7 @@ public class CommandsPage {
     public static class CommandsPageEvents implements Listener {
         private static final Map<Player, Inventory> pageInventories = new HashMap<>();
 
-        @EventHandler (ignoreCancelled = true)
+        @EventHandler(ignoreCancelled = true)
         public void onInventoryInteract(InventoryClickEvent event) {
             Player player = ((Player) event.getWhoClicked()).getPlayer();
             if (!pageInventories.containsKey(player)) return;

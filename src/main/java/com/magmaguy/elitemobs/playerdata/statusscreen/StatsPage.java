@@ -29,6 +29,7 @@ public class StatsPage {
         TextComponent textComponent = new TextComponent();
 
         for (int i = 0; i < 13; i++) {
+            if (PlayerStatusMenuConfig.getStatsTextLines()[i] == null) continue;
             TextComponent line = new TextComponent(PlayerStatusMenuConfig.getStatsTextLines()[i]
                     .replace("$money", EconomyHandler.checkCurrency(targetPlayer.getUniqueId()) + "")
                     .replace("$guildtier", PlayerStatusScreen.convertLightColorsToBlack(AdventurersGuildConfig.getShortenedRankName(GuildRank.getGuildPrestigeRank(targetPlayer), GuildRank.getActiveGuildRank(targetPlayer))))

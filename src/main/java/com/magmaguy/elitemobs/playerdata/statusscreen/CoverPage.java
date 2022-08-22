@@ -20,6 +20,7 @@ public class CoverPage {
         TextComponent textComponent = new TextComponent();
 
         for (int i = 0; i < 13; i++) {
+            if (PlayerStatusMenuConfig.getIndexTextLines()[i] == null) continue;
             TextComponent line = new TextComponent(
                     PlayerStatusMenuConfig.getIndexTextLines()[i]
                             .replace("$statsPage", statsPage + "")
@@ -29,6 +30,8 @@ public class CoverPage {
                             .replace("$questsPage", questsPage + "")
                             .replace("$bossTrackingPage", bossTrackingPage + "")
                             + "\n");
+
+            if (PlayerStatusMenuConfig.getIndexHoverLines()[i] == null) continue;
 
             if (!PlayerStatusMenuConfig.getIndexHoverLines()[i].isEmpty())
                 PlayerStatusScreen.setHoverText(line, PlayerStatusMenuConfig.getIndexHoverLines()[i]);

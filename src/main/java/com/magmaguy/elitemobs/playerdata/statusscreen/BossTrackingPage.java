@@ -28,6 +28,8 @@ public class BossTrackingPage {
 
         for (int i = 0; i < 3; i++) {
 
+            if (PlayerStatusMenuConfig.getBossTrackerHoverLines()[i] == null) continue;
+
             TextComponent line = new TextComponent(PlayerStatusMenuConfig.getBossTrackerTextLines()[i] + "\n");
 
             if (!PlayerStatusMenuConfig.getBossTrackerHoverLines()[i].isEmpty())

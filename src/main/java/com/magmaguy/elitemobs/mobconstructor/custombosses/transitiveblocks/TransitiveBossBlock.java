@@ -9,6 +9,7 @@ import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
@@ -35,7 +36,11 @@ public class TransitiveBossBlock implements Listener {
 
         //Minor optimization, does not replace blocks that are already identical
         if (!location.getBlock().getBlockData().getMaterial().equals(blockData.getMaterial()))
-            location.getBlock().setBlockData(blockData);
+            if (blockData.getMaterial() == Material.WATER || blockData.getMaterial() == Material.LAVA)
+                location.getBlock().setBlockData(blockData, true);
+            else
+                location.getBlock().setBlockData(blockData, false);
+
     }
 
     /*
