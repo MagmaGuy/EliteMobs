@@ -66,7 +66,8 @@ public class QuestAcceptEvent extends Event implements Cancellable {
 
                 customQuest.applyTemporaryPermissions(event.getPlayer());
 
-                if (!customQuest.getCustomQuestsConfigFields().getQuestAcceptDialog().isEmpty())
+                if (customQuest.getCustomQuestsConfigFields().getQuestAcceptDialog() != null &&
+                        !customQuest.getCustomQuestsConfigFields().getQuestAcceptDialog().isEmpty())
                     for (String dialog : customQuest.getCustomQuestsConfigFields().getQuestAcceptDialog())
                         event.getPlayer().sendMessage(dialog);
             }

@@ -10,12 +10,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 import static com.magmaguy.elitemobs.menus.BuyOrSellMenu.BuyOrSellMenuEvents.menus;
 
@@ -27,7 +28,7 @@ public class BuyOrSellMenu {
             inventoryName = ChatColor.WHITE + "\uF801\uDB80\uDC7B\uF805       " + inventoryName;
 
         Inventory shopInventory = Bukkit.createInventory(player, 18, inventoryName);
-        menus.put(player, shopInventory);
+        menus.add(shopInventory);
         //information item
         ItemStack info = BuyOrSellMenuConfig.INFORMATION_ITEM;
         if (ResourcePackDataConfig.isDisplayCustomMenuUnicodes()) {
@@ -46,13 +47,13 @@ public class BuyOrSellMenu {
     }
 
     public static class BuyOrSellMenuEvents implements Listener {
-        public static final Map<Player, Inventory> menus = new HashMap<>();
+        public static final Set<Inventory> menus = new HashSet<>();
 
         @EventHandler
         public void onInventoryInteraction(InventoryClickEvent event) {
 
             if (!SharedShopElements.sellMenuNullPointPreventer(event)) return;
-            if (!EliteMenu.isEliteMenu(event, menus) || !EliteMenu.isTopMenu(event)) return;
+            if (!EliteMenu.isEliteMenu(event, menus)) return;
             event.setCancelled(true);
 
             //info button
@@ -81,6 +82,11 @@ public class BuyOrSellMenu {
                 menus.remove((Player) event.getWhoClicked());
             }
 
+        }
+
+        @EventHandler
+        public void onClose(InventoryCloseEvent event) {
+            menus.remove(event.getInventory());
         }
 
     }

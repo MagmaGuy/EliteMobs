@@ -29,8 +29,10 @@ public class LootCommand {
         Player player = Bukkit.getPlayer(playerString);
         if (player == null)
             commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &cTried to give item to invalid player!"));
-        else
+        else {
             player.getInventory().addItem(customItem.generateDefaultsItemStack(player, false, null));
+            commandSender.sendMessage("[EliteMobs] Successfully gave " + player.getName() + " item " + customItem.getName());
+        }
     }
 
 }

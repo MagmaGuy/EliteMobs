@@ -47,6 +47,7 @@ public class WormholeEntry implements PersistentObject {
     @Setter
     private String opMessage = null;
     private int wormholeNumber;
+    private PersistentObjectHandler persistentObjectHandler = null;
 
     public WormholeEntry(Wormhole wormhole, String locationString, int wormholeNumber) {
         this.wormhole = wormhole;
@@ -57,14 +58,11 @@ public class WormholeEntry implements PersistentObject {
             return;
         }
         setLocationFromConfiguration();
-        if (wormholeNumber == 1)
-            this.armorStandText = wormhole.getWormholeConfigFields().getLocation1Text();
-        else
-            this.armorStandText = wormhole.getWormholeConfigFields().getLocation2Text();
+        if (wormholeNumber == 1) this.armorStandText = wormhole.getWormholeConfigFields().getLocation1Text();
+        else this.armorStandText = wormhole.getWormholeConfigFields().getLocation2Text();
 
-        new PersistentObjectHandler(this);
-        if (ChunkLocationChecker.locationIsLoaded(location))
-            chunkLoad();
+        persistentObjectHandler = new PersistentObjectHandler(this);
+        if (ChunkLocationChecker.locationIsLoaded(location)) chunkLoad();
     }
 
     private Location getDungeonLocation() {
@@ -78,20 +76,13 @@ public class WormholeEntry implements PersistentObject {
             new InfoMessage("Wormhole " + wormhole.getWormholeConfigFields().getFilename() + " will not lead anywhere because the dungeon " + locationString + " is not installed!");
             setPortalMissingMessage(WormholesConfig.getDungeonNotInstalledMessage().replace("$dungeonID", emPackage.getDungeonPackagerConfigFields().getName()));
 
-            this.opMessage = ChatColorConverter.convert(
-                    "&8[EliteMobs - OP-only message] &fDownload links are available on &9https://magmaguy.itch.io/ &f" +
-                            "(free and premium) and &9https://www.patreon.com/magmaguy &f(premium). You can check the difference " +
-                            "between the two and get support here: " + DiscordLinks.mainLink);
+            this.opMessage = ChatColorConverter.convert("&8[EliteMobs - OP-only message] &fDownload links are available on &9https://magmaguy.itch.io/ &f" + "(free and premium) and &9https://www.patreon.com/magmaguy &f(premium). You can check the difference " + "between the two and get support here: " + DiscordLinks.mainLink);
 
-            if (emPackage instanceof SchematicPackage)
-                return null;
+            if (emPackage instanceof SchematicPackage) return null;
         }
         Location teleportLocation = emPackage.getDungeonPackagerConfigFields().getTeleportLocation();
-        if (teleportLocation == null)
-            return null;
-        Vector offsetVector = teleportLocation.getDirection().clone().setY(0).normalize()
-                .multiply(1.5 * wormhole.getWormholeConfigFields().getSizeMultiplier())
-                .setY(-1 * wormhole.getWormholeConfigFields().getSizeMultiplier());
+        if (teleportLocation == null) return null;
+        Vector offsetVector = teleportLocation.getDirection().clone().setY(0).normalize().multiply(1.5 * wormhole.getWormholeConfigFields().getSizeMultiplier()).setY(-1 * wormhole.getWormholeConfigFields().getSizeMultiplier());
 
         worldName = emPackage.getDungeonPackagerConfigFields().getWorldName();
 
@@ -109,6 +100,8 @@ public class WormholeEntry implements PersistentObject {
 
     public void onDungeonInstall() {
         this.location = getDungeonLocation();
+        if (persistentObjectHandler != null) persistentObjectHandler = new PersistentObjectHandler(this);
+        persistentObjectHandler = new PersistentObjectHandler(this);
         chunkLoad();
     }
 
@@ -134,8 +127,7 @@ public class WormholeEntry implements PersistentObject {
     @Override
     public void worldLoad(World world) {
         getDungeonLocation();
-        if (ChunkLocationChecker.locationIsLoaded(location))
-            chunkLoad();
+        if (ChunkLocationChecker.locationIsLoaded(location)) chunkLoad();
     }
 
     @Override
@@ -155,8 +147,10 @@ public class WormholeEntry implements PersistentObject {
     }
 
     public void stop() {
-        if (wormholeTask != null)
+        if (wormholeTask != null) {
             wormholeTask.cancel();
+        }
+
     }
 
     public void updateLocation(Player player) {
@@ -165,28 +159,29 @@ public class WormholeEntry implements PersistentObject {
             wormholeTask = null;
         }
         locationString = ConfigurationLocation.deserialize(player.getLocation());
-        location = player.getLocation().add(new Vector(0,1,0));
+        location = player.getLocation().add(new Vector(0, 1 * wormhole.getWormholeConfigFields().getSizeMultiplier(), 0));
         wormhole.getWormholeConfigFields().setWormholeEntryLocation(location, wormholeNumber);
         wormholeTask = WormholeTask.startWormholeTask(this);
+        if (persistentObjectHandler != null) persistentObjectHandler = new PersistentObjectHandler(this);
+        persistentObjectHandler = new PersistentObjectHandler(this);
+
     }
 
     private void initializeTextDisplay() {
         if (text != null && text.isValid() && !text.isEmpty()) return;
         if (armorStandText == null) return;
         if (location == null || location.getWorld() == null) return;
-        text = location.getWorld().spawn(
-                location.clone().add(new Vector(0, 1.2, 0).multiply(wormhole.getWormholeConfigFields().getSizeMultiplier())),
-                ArmorStand.class, new Consumer<ArmorStand>() {
-                    @Override
-                    public void accept(ArmorStand armorStand) {
-                        armorStand.setCustomName(ChatColorConverter.convert(armorStandText));
-                        armorStand.setCustomNameVisible(true);
-                        armorStand.setMarker(true);
-                        armorStand.setVisible(false);
-                        armorStand.setGravity(false);
-                        armorStand.setPersistent(false);
-                    }
-                });
+        text = location.getWorld().spawn(location.clone().add(new Vector(0, 1.2, 0).multiply(wormhole.getWormholeConfigFields().getSizeMultiplier())), ArmorStand.class, new Consumer<ArmorStand>() {
+            @Override
+            public void accept(ArmorStand armorStand) {
+                armorStand.setCustomName(ChatColorConverter.convert(armorStandText));
+                armorStand.setCustomNameVisible(true);
+                armorStand.setMarker(true);
+                armorStand.setVisible(false);
+                armorStand.setGravity(false);
+                armorStand.setPersistent(false);
+            }
+        });
         EntityTracker.registerVisualEffects(text);
     }
 

@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -108,7 +109,7 @@ public class GuildRankMenuHandler implements Listener {
     public static Inventory initializeGuildRankMenu(Player player) {
         String menuName = GuildRankMenuConfig.getMenuName();
         if (ResourcePackDataConfig.displayCustomMenuUnicodes)
-            menuName = ChatColor.WHITE +  "\uF801\uDA90\uDEFA\uF805           " + menuName;
+            menuName = ChatColor.WHITE + "\uF801\uDA90\uDEFA\uF805           " + menuName;
         Inventory difficultyMenu = Bukkit.createInventory(player, 54, menuName);
         difficultyMenu = populateInventory(difficultyMenu, player);
         inventories.add(difficultyMenu);
@@ -334,6 +335,11 @@ public class GuildRankMenuHandler implements Listener {
             return;
         }
 
+    }
+
+    @EventHandler
+    public void onInventoryClose(InventoryCloseEvent event) {
+        inventories.remove(event.getInventory());
     }
 
     private enum guildRankStatus {

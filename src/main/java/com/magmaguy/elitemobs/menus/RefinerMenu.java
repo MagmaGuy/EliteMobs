@@ -15,18 +15,16 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class RefinerMenu extends EliteMenu {
 
-    protected static final Map<Player, Inventory> inventories = new HashMap<>();
+    protected static final Set<Inventory> inventories = new HashSet<>();
     private static final List<Integer> inputSlots = RefinerMenuConfig.getInputSlots();
 
     private static ArrayList<ItemStack>[] calculateOutput(Inventory inventory, Player player) {
@@ -145,7 +143,7 @@ public class RefinerMenu extends EliteMenu {
         }
 
         player.openInventory(refinerInventory);
-        createEliteMenu(player, refinerInventory, inventories, menuName);
+        createEliteMenu(refinerInventory, inventories);
     }
 
     public static class RefinerMenuEvents implements Listener {
@@ -222,6 +220,11 @@ public class RefinerMenu extends EliteMenu {
 
             }
 
+        }
+
+        @EventHandler
+        public void onClose(InventoryCloseEvent event) {
+            inventories.remove(event.getInventory());
         }
 
     }

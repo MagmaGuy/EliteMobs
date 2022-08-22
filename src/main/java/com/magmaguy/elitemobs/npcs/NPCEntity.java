@@ -208,7 +208,7 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
         if (!isDisguised)
             offSet = new Vector(0, 1.72, 0);
         else
-            offSet = new Vector(0, 1.70, 0);
+            offSet = new Vector(0, 1.60, 0);
         roleDisplay = this.villager.getWorld().spawn(villager.getLocation().add(offSet), ArmorStand.class, new Consumer<ArmorStand>() {
             @Override
             public void accept(ArmorStand armorStand) {

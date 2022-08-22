@@ -3,6 +3,8 @@ package com.magmaguy.elitemobs.quests.objectives;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.api.QuestObjectivesCompletedEvent;
 import com.magmaguy.elitemobs.config.QuestsConfig;
+import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
+import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
 import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.Quest;
 import com.magmaguy.elitemobs.quests.rewards.QuestReward;
@@ -99,20 +101,26 @@ public class QuestObjectives implements Serializable {
 
     public void displayTemporaryObjectivesScoreboard(Player player) {
         if (!QuestsConfig.isUseQuestScoreboards()) return;
-        List<String> strings = new ArrayList<>();
-        for (Objective objective : objectives)
-            strings.add(QuestsConfig.getQuestScoreboardProgressionLine(objective));
-
-        SimpleScoreboard.temporaryScoreboard(player, ChatColorConverter.convert(getQuest().getQuestName()), strings, 20 * 20);
+        SimpleScoreboard.temporaryScoreboard(player, ChatColorConverter.convert(getQuest().getQuestName()), getScoreboardObjectiveText(), 20 * 20);
     }
 
     public void displayLazyObjectivesScoreboard(Player player) {
         if (!QuestsConfig.isUseQuestScoreboards()) return;
-        List<String> strings = new ArrayList<>();
-        for (Objective objective : objectives)
-            strings.add(QuestsConfig.getQuestScoreboardProgressionLine(objective));
+        SimpleScoreboard.lazyScoreboard(player, ChatColorConverter.convert(getQuest().getQuestName()), getScoreboardObjectiveText());
+    }
 
-        SimpleScoreboard.lazyScoreboard(player, ChatColorConverter.convert(getQuest().getQuestName()), strings);
+    private List<String> getScoreboardObjectiveText() {
+        List<String> strings = new ArrayList<>();
+        if (!isOver())
+            for (Objective objective : objectives)
+                strings.add(QuestsConfig.getQuestScoreboardProgressionLine(objective));
+        else {
+            if (quest.getQuestTaker() == null) return strings;
+            NPCsConfigFields npCsConfigFields = NPCsConfig.getNpcEntities().get(quest.getQuestTaker());
+            if (npCsConfigFields == null) return strings;
+            strings.add(QuestsConfig.getQuestTurnInObjective().replace("$npcName", npCsConfigFields.getName()));
+        }
+        return strings;
     }
 
 

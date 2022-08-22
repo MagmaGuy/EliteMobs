@@ -15,15 +15,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class RepairMenu extends EliteMenu {
     private static final int eliteItemInputSlot = RepairMenuConfig.eliteItemInputSlot;
@@ -32,7 +30,7 @@ public class RepairMenu extends EliteMenu {
     private static final int eliteItemInformationInputSlot = RepairMenuConfig.eliteItemInputInformationSlot;
     private static final int eliteScrapInformationInputSlot = RepairMenuConfig.eliteScrapInputInformationSlot;
     private static final int informationOutputSlot = RepairMenuConfig.outputInformationSlot;
-    public static HashMap<Player, Inventory> inventories = new HashMap<>();
+    public static Set<Inventory> inventories = new HashSet<>();
 
     private static void calculateOutput(Inventory repairInventory) {
         if (repairInventory.getItem(RepairMenuConfig.eliteScrapInputSlot) == null || repairInventory.getItem(RepairMenuConfig.eliteItemInputSlot) == null) {
@@ -126,7 +124,7 @@ public class RepairMenu extends EliteMenu {
         }
 
         player.openInventory(repairInventory);
-        createEliteMenu(player, repairInventory, inventories, menuName);
+        createEliteMenu(repairInventory, inventories);
     }
 
     public static class RepairMenuEvents implements Listener {
@@ -194,6 +192,11 @@ public class RepairMenu extends EliteMenu {
 
             }
 
+        }
+
+        @EventHandler
+        public void onClose(InventoryCloseEvent event) {
+            inventories.remove(event.getInventory());
         }
 
     }

@@ -96,6 +96,13 @@ public class QuestsConfig {
     private static String questAlreadyCompletedMessage;
     @Getter
     private static String questPrerequisitesMissingMessage;
+    @Getter
+    private static int maxCharactersPerBookPage;
+    @Getter
+    private static String lowRankDynamicQuestWarning;
+    @Getter
+    private static String questTurnInObjective;
+
     private QuestsConfig() {
     }
 
@@ -151,6 +158,11 @@ public class QuestsConfig {
 
         questAlreadyCompletedMessage = ConfigurationEngine.setString(file, fileConfiguration, "questAlreadyCompletedMessage", "&8[EliteMobs] &cYou already completed this quest!", true);
         questPrerequisitesMissingMessage = ConfigurationEngine.setString(file, fileConfiguration, "questPrerequisitesMissingMessage", "&8[EliteMobs] &cCan't accept this quest yet!", true);
+
+        maxCharactersPerBookPage = ConfigurationEngine.setInt(fileConfiguration, "maxCharactersPerBookPage", 30);
+        lowRankDynamicQuestWarning = ConfigurationEngine.setString(file, fileConfiguration, "lowRankDynamicQuestWarning", "&8[EliteMobs] &cYou can't take these quests with your current guild rank! Increase your guild rank to accept these quests.", true);
+
+        questTurnInObjective = ConfigurationEngine.setString(file, fileConfiguration, "questTurnInObjective", "&a2Talk to $npcName", true);
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }

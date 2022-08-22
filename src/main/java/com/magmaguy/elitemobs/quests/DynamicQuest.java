@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.quests;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
+import com.magmaguy.elitemobs.config.QuestsConfig;
 import com.magmaguy.elitemobs.config.menus.premade.DynamicQuestMenuConfig;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
@@ -33,6 +34,10 @@ public class DynamicQuest extends Quest {
         List<DynamicQuest> dynamicQuests = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             int questLevel = GuildRank.getActiveGuildRank(player);
+            if (questLevel == 0){
+                player.sendMessage(QuestsConfig.getLowRankDynamicQuestWarning());
+                return new ArrayList<>();
+            }
             QuestObjectives questObjectives = new QuestObjectives(questLevel);
             QuestReward questReward = new QuestReward(questLevel, questObjectives, player);
             questObjectives.setQuestReward(questReward);

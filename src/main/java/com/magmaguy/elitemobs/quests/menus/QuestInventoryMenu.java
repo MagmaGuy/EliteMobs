@@ -14,6 +14,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -23,8 +24,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class QuestInventoryMenu {
     private static final int trackEntry = 8;
     private static final int acceptEntry = 26;
-    private static HashMap<Player, QuestDirectory> questDirectories = new HashMap<>();
-    private static HashMap<Player, QuestInventory> questInventories = new HashMap<>();
+    private static HashMap<Inventory, QuestDirectory> questDirectories = new HashMap<>();
+    private static HashMap<Inventory, QuestInventory> questInventories = new HashMap<>();
 
     private QuestInventoryMenu() {
     }
@@ -177,7 +178,7 @@ public class QuestInventoryMenu {
             this.inventory = inventory;
             this.npcEntity = npcEntity;
             this.player = player;
-            questDirectories.put(player, this);
+            questDirectories.put(inventory, this);
         }
     }
 
@@ -192,7 +193,7 @@ public class QuestInventoryMenu {
             this.inventory = inventory;
             this.npcEntity = npcEntity;
             this.player = player;
-            questInventories.put(player, this);
+            questInventories.put(inventory, this);
         }
     }
 
@@ -200,33 +201,37 @@ public class QuestInventoryMenu {
         @EventHandler(priority = EventPriority.HIGHEST)
         public void onInventoryInteract(InventoryClickEvent event) {
             Player player = ((Player) event.getWhoClicked()).getPlayer();
-            if (questDirectories.containsKey(player)) {
+            if (questDirectories.containsKey(event.getInventory())) {
                 event.setCancelled(true);
-                QuestDirectory questDirectory = questDirectories.get(player);
+                QuestDirectory questDirectory = questDirectories.get(event.getInventory());
                 if (questDirectory.questMap.get(event.getSlot()) == null) return;
                 player.closeInventory();
                 generateInventoryQuestEntry(questDirectory.questMap.get(event.getSlot()), questDirectory.player, questDirectory.npcEntity);
-            } else if (questInventories.containsKey(player)) {
+            } else if (questInventories.containsKey(event.getInventory())) {
                 event.setCancelled(true);
                 switch (event.getSlot()) {
                     case trackEntry:
                         QuestCommand.trackQuest(questInventories.get(player).quest.getQuestID().toString(), player);
-                        questDirectories.remove(player);
                         player.closeInventory();
                         break;
                     case acceptEntry:
-                        Quest quest = questInventories.get(player).quest;
+                        Quest quest = questInventories.get(event.getInventory()).quest;
                         if (!quest.isAccepted())
                             QuestCommand.joinQuest(quest.getQuestID().toString(), player);
                         else if (!quest.getQuestObjectives().isOver())
                             QuestCommand.leaveQuest(player, quest.getQuestID().toString());
                         else
                             QuestCommand.completeQuest(quest.getQuestID().toString(), player);
-                        questInventories.remove(player);
                         player.closeInventory();
                         break;
                 }
             }
+        }
+
+        @EventHandler(priority = EventPriority.HIGHEST)
+        public void onInventoryClose(InventoryCloseEvent event) {
+            questDirectories.remove(event.getInventory());
+            questInventories.remove(event.getInventory());
         }
 
     }

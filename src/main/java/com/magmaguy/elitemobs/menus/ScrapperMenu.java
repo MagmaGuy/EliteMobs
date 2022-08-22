@@ -20,19 +20,21 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class ScrapperMenu extends EliteMenu {
     private static final List<Integer> validSlots = ScrapperMenuConfig.storeSlots;
 
-    public static HashMap<Player, Inventory> inventories = new HashMap<>();
+    public static Set<Inventory> inventories = new HashSet<>();
 
     /**
      * Creates a menu for scrapping elitemobs items. Only special Elite Mob items can be scrapped here.
@@ -94,7 +96,7 @@ public class ScrapperMenu extends EliteMenu {
         }
 
         player.openInventory(scrapInventory);
-        createEliteMenu(player, scrapInventory, inventories, menuName);
+        createEliteMenu(scrapInventory, inventories);
 
     }
 
@@ -183,6 +185,11 @@ public class ScrapperMenu extends EliteMenu {
 
             }
 
+        }
+
+        @EventHandler
+        public void onClose(InventoryCloseEvent event) {
+            inventories.remove(event.getInventory());
         }
 
     }

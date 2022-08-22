@@ -12,12 +12,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 public class StatsPage {
     private StatsPage() {
@@ -37,10 +38,14 @@ public class StatsPage {
                     .replace("$quests", PlayerData.getQuestsCompleted(targetPlayer.getUniqueId()) + "")
                     .replace("$score", PlayerData.getScore(targetPlayer.getUniqueId()) + "") + "\n");
 
-            if (PlayerStatusMenuConfig.getStatsHoverLines() != null && !PlayerStatusMenuConfig.getStatsHoverLines()[i].isEmpty())
+            if (PlayerStatusMenuConfig.getStatsHoverLines() != null &&
+                    PlayerStatusMenuConfig.getStatsHoverLines()[i] != null
+                    && !PlayerStatusMenuConfig.getStatsHoverLines()[i].isEmpty())
                 PlayerStatusScreen.setHoverText(line, PlayerStatusMenuConfig.getStatsHoverLines()[i]);
 
-            if (PlayerStatusMenuConfig.getStatsCommandLines() != null && !PlayerStatusMenuConfig.getStatsCommandLines()[i].isEmpty())
+            if (PlayerStatusMenuConfig.getStatsCommandLines() != null &&
+                    PlayerStatusMenuConfig.getStatsCommandLines()[i] != null &&
+                    !PlayerStatusMenuConfig.getStatsCommandLines()[i].isEmpty())
                 line.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, PlayerStatusMenuConfig.getStatsCommandLines()[i]));
 
             textComponent.addExtra(line);
@@ -75,7 +80,7 @@ public class StatsPage {
                         PlayerData.getScore(targetPlayer.getUniqueId()) + ""));
         inventory.setItem(26, PlayerStatusMenuConfig.getBackItem());
         requestingPlayer.openInventory(inventory);
-        StatsPageEvents.pageInventories.put(requestingPlayer, inventory);
+        StatsPageEvents.pageInventories.add(inventory);
     }
 
     private static ItemStack replaceItemNamePlaceholder(ItemStack itemStack, String placeholder, String replacement) {
@@ -86,18 +91,22 @@ public class StatsPage {
     }
 
     public static class StatsPageEvents implements Listener {
-        private static final Map<Player, Inventory> pageInventories = new HashMap<>();
+        private static final Set<Inventory> pageInventories = new HashSet<>();
 
         @EventHandler
         public void onInventoryInteract(InventoryClickEvent event) {
             Player player = ((Player) event.getWhoClicked()).getPlayer();
-            if (!pageInventories.containsKey(player)) return;
+            if (!pageInventories.contains(event.getInventory())) return;
             event.setCancelled(true);
             if (event.getSlot() == 26) {
-                pageInventories.remove(player);
                 player.closeInventory();
                 CoverPage.coverPage(player);
             }
+        }
+
+        @EventHandler
+        public void onInventoryClose(InventoryCloseEvent event) {
+            pageInventories.remove(event.getInventory());
         }
     }
 }
