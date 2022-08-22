@@ -5,7 +5,6 @@ import com.magmaguy.elitemobs.utils.WarningMessage;
 import me.libraryaddict.disguise.DisguiseAPI;
 import me.libraryaddict.disguise.DisguiseConfig;
 import me.libraryaddict.disguise.disguisetypes.*;
-import me.libraryaddict.disguise.disguisetypes.watchers.PlayerWatcher;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -96,6 +95,12 @@ public class DisguiseEntity {
             disguise.setEntity(entity);
             disguise.setDisguiseName(entity.getCustomName());
             disguise.setDynamicName(true);
+            if ((DefaultConfig.isAlwaysShowNametags() || entity.getType().equals(EntityType.VILLAGER))
+                    && disguise instanceof PlayerDisguise) {
+                ((PlayerDisguise) disguise).setNameVisible(true);
+            } else if (disguise instanceof PlayerDisguise) {
+                ((PlayerDisguise) disguise).setNameVisible(false);
+            }
             disguise.startDisguise();
         } catch (Exception ex) {
             new WarningMessage("Failed to set custom disguise for " + filename + " !");
@@ -103,14 +108,25 @@ public class DisguiseEntity {
         }
     }
 
-    public static void setDisguiseNameVisibility(boolean disguiseNameVisibility, Entity entity) {
+    public static void setDisguiseNameVisibility(boolean disguiseNameVisibility, Entity entity, String name) {
         if (!Bukkit.getPluginManager().isPluginEnabled("LibsDisguises")) return;
         Disguise disguise = DisguiseAPI.getDisguise(entity);
         if (disguise == null) return;
+        if (disguise instanceof PlayerDisguise) {
+            if (disguiseNameVisibility) {
+                entity.setCustomName(name);
+                disguise.setDisguiseName(name);
+                disguise.setDynamicName(true);
+            }
+            ((PlayerDisguise) disguise).setNameVisible(disguiseNameVisibility);
+        }
+        //todo: This doesn't work yes, check with libs later to see if he found a solution
+        /*
         if (!(disguise.getWatcher() instanceof PlayerWatcher)) return;
         PlayerWatcher playerWatcher = (PlayerWatcher) disguise.getWatcher();
         playerWatcher.setNameVisible(disguiseNameVisibility);
         playerWatcher.setCustomNameVisible(disguiseNameVisibility);
+         */
     }
 
 }
