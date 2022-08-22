@@ -211,7 +211,7 @@ public class QuestInventoryMenu {
                 event.setCancelled(true);
                 switch (event.getSlot()) {
                     case trackEntry:
-                        QuestCommand.trackQuest(questInventories.get(player).quest.getQuestID().toString(), player);
+                        QuestCommand.trackQuest(questInventories.get(event.getInventory()).quest.getQuestID().toString(), player);
                         player.closeInventory();
                         break;
                     case acceptEntry:

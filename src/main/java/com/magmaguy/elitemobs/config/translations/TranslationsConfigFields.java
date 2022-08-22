@@ -11,6 +11,7 @@ import org.bukkit.Bukkit;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,13 +29,14 @@ public class TranslationsConfigFields extends CustomConfigFields implements Cust
     public TranslationsConfigFields(String filename, boolean isEnabled) {
         super(filename, isEnabled);
         //If the file doesn't exist, try to load it from the plugin resources to get the prepackaged translations
-        if (!Files.exists(Paths.get(MetadataHandler.PLUGIN.getDataFolder().getAbsolutePath() + File.separatorChar + "translations" + File.separatorChar + filename + ".yml"))) {
+        String parsedFilename = filename;
+        if (!parsedFilename.contains(".yml")) parsedFilename += ".yml";
+        Path realPath = Paths.get(MetadataHandler.PLUGIN.getDataFolder().getAbsolutePath() + File.separatorChar + "translations" + File.separatorChar + parsedFilename);
+        if (!Files.exists(realPath)) {
             try {
-                FileUtils.copyInputStreamToFile(
-                        MetadataHandler.PLUGIN.getResource("translations/" + filename + ".yml"),
-                        new File(MetadataHandler.PLUGIN.getDataFolder().getAbsolutePath() + File.separatorChar + "translations" + File.separatorChar + filename + ".yml"));
+                FileUtils.copyInputStreamToFile(MetadataHandler.PLUGIN.getResource("translations/" + parsedFilename), realPath.toFile());
             } catch (Exception ex) {
-                new InfoMessage("Translation filename " + filename + " is not prepackaged. This is fine if it is meant to be a custom translation.");
+                new InfoMessage("Translation filename " + parsedFilename + " is not prepackaged. This is fine if it is meant to be a custom translation.");
             }
         }
     }

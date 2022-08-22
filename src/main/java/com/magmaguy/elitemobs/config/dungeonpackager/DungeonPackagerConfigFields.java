@@ -48,7 +48,6 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
     private Location anchorPoint;
     @Getter
     private String defaultSchematicRotationString = null;
-    @Getter
     private SchematicPackage.SchematicRotation defaultSchematicRotation = null;
     @Getter
     @Setter
@@ -79,6 +78,11 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
     private String teleportLocationOffsetString = "";
     @Getter
     private Location teleportLocationOffset = null;
+
+    public SchematicPackage.SchematicRotation getDefaultSchematicRotation() {
+        if (defaultSchematicRotation == null) return SchematicPackage.SchematicRotation.SOUTH;
+        return defaultSchematicRotation;
+    }
 
     public DungeonPackagerConfigFields(String fileName, boolean isEnabled) {
         super(fileName, isEnabled);

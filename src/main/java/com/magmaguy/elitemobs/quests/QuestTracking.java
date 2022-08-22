@@ -191,13 +191,13 @@ public class QuestTracking {
         compassTask = new BukkitRunnable() {
             @Override
             public void run() {
-                if (!player.isValid()) {
+                if (!player.isOnline()) {
                     stop();
                     return;
                 }
                 updateCompassContents();
             }
-        }.runTaskTimer(MetadataHandler.PLUGIN, 0L, 2L);
+        }.runTaskTimer(MetadataHandler.PLUGIN, 0L, 1L);
     }
 
     private void updateCompassContents() {

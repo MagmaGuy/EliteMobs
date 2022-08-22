@@ -80,6 +80,8 @@ public class CustomObjectivesParser {
                 return new DialogObjective(filename, name, location, dialog);
         } catch (Exception ex) {
             new WarningMessage("Failed to register objective type for quest " + customQuest.getCustomQuestsConfigFields().getFilename() + " ! This quest will be skipped");
+            new WarningMessage("Invalid entry: " + rawStrings.toString());
+            ex.printStackTrace();
         }
 
         return null;

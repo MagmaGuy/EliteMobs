@@ -119,7 +119,7 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
         if (!Bukkit.getPluginManager().isPluginEnabled("LibsDisguises")) return;
         try {
             DisguiseEntity.disguise(npCsConfigFields.getDisguise(), livingEntity, npCsConfigFields.getCustomDisguiseData(), npCsConfigFields.getFilename());
-            DisguiseEntity.setDisguiseNameVisibility(true, livingEntity);
+            DisguiseEntity.setDisguiseNameVisibility(true, livingEntity, npCsConfigFields.getName());
             livingEntity.setCustomNameVisible(true);
             isDisguised = true;
         } catch (Exception ex) {

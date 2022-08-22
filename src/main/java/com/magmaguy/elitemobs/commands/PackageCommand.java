@@ -47,7 +47,7 @@ public class PackageCommand {
 
         try {
             ZipFile.ZipUtility.zip(new File(MetadataHandler.PLUGIN.getDataFolder().getPath() + File.separatorChar + "exports" + File.separatorChar + dungeonFolderName),
-                    MetadataHandler.PLUGIN.getDataFolder().getPath() + File.separatorChar + "exports" + File.separatorChar + dungeonFolderName + "_packaged");
+                    MetadataHandler.PLUGIN.getDataFolder().getPath() + File.separatorChar + "exports" + File.separatorChar + dungeonFolderName + "_packaged.zip");
         } catch (Exception exception) {
             commandSender.sendMessage(ChatColorConverter.convert("4&[EliteMobs] Failed to zip package!"));
         }
