@@ -1,28 +1,23 @@
 package com.magmaguy.elitemobs.menus;
 
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 public class EliteMenu implements Listener {
 
-    public static void createEliteMenu(Player player, Inventory inventory, Map<Player, Inventory> inventories, String name) {
-        inventories.put(player, inventory);
+    public static void createEliteMenu(Inventory inventory, Set<Inventory> inventories) {
+        inventories.add(inventory);
     }
 
-    public static boolean isEliteMenu(InventoryClickEvent event, Map<Player, Inventory> inventories) {
+    public static boolean isEliteMenu(InventoryClickEvent event, Set<Inventory> inventories) {
         if (event.getCurrentItem() == null) return false;
         if (event.getCurrentItem().getType().equals(Material.AIR)) return false;
-        Player player = (Player) event.getWhoClicked();
-        Inventory inventory = inventories.get(player);
-        if (inventory == null) return false;
-        return inventory.equals(event.getView().getTopInventory());
+        return inventories.contains(event.getInventory());
     }
 
     public static boolean isTopMenu(InventoryClickEvent event) {
@@ -39,10 +34,6 @@ public class EliteMenu implements Listener {
                 playerInventory.addItem(eliteInventory.getItem(slot));
                 eliteInventory.remove(eliteInventory.getItem(slot));
             }
-    }
-
-    public static void onPlayerQuit(PlayerQuitEvent event, Map<Player, Inventory> inventories) {
-        inventories.remove(event.getPlayer());
     }
 
 }

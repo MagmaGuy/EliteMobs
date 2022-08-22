@@ -16,6 +16,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 
 import java.util.*;
@@ -96,30 +97,33 @@ public class TeleportsPage {
         }
         inventory.setItem(53, PlayerStatusMenuConfig.getBackItem());
         requestingPlayer.openInventory(inventory);
-        TeleportsPageEvents.pageInventories.put(requestingPlayer, inventory);
+        TeleportsPageEvents.pageInventories.add(inventory);
     }
 
     public static class TeleportsPageEvents implements Listener {
-        private static final Map<Player, Inventory> pageInventories = new HashMap<>();
+        private static final Set<Inventory> pageInventories = new HashSet<>();
         private static List<EMPackage> orderedDungeons = new ArrayList<>();
 
         @EventHandler(ignoreCancelled = true)
         public void onInventoryInteract(InventoryClickEvent event) {
             Player player = ((Player) event.getWhoClicked()).getPlayer();
-            if (!pageInventories.containsKey(player)) return;
+            if (!pageInventories.contains(event.getInventory())) return;
             event.setCancelled(true);
             if (event.getSlot() < 0) return;
             if (orderedDungeons.size() - 1 >= event.getSlot()) {
-                pageInventories.remove(player);
                 player.closeInventory();
                 DungeonCommands.teleport(player, orderedDungeons.get(event.getSlot()).getDungeonPackagerConfigFields().getFilename());
                 return;
             }
             if (event.getSlot() == 53) {
-                pageInventories.remove(player);
                 player.closeInventory();
                 CoverPage.coverPage(player);
             }
+        }
+
+        @EventHandler
+        public void onInventoryClose(InventoryCloseEvent event) {
+            pageInventories.remove(event.getInventory());
         }
 
     }

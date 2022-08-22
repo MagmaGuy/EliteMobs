@@ -15,13 +15,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class SmeltMenu extends EliteMenu {
 
@@ -29,7 +28,7 @@ public class SmeltMenu extends EliteMenu {
     private static final List<Integer> outputSlots = SmeltMenuConfig.outputSlots;
     private static final int informationInputSlot = SmeltMenuConfig.inputInformationSlot;
     private static final int informationOutputSlot = SmeltMenuConfig.outputInformationSlot;
-    public static HashMap<Player, Inventory> inventories = new HashMap<>();
+    public static Set<Inventory> inventories = new HashSet<>();
 
     private static ArrayList<ItemStack>[] calculateOutput(ArrayList<ItemStack> inputItemStacks, Player player) {
         // itemStack[0] = inputArray , itemStack[1] = outputArray
@@ -135,7 +134,7 @@ public class SmeltMenu extends EliteMenu {
         }
 
         player.openInventory(smeltInventory);
-        createEliteMenu(player, smeltInventory, inventories, menuName);
+        createEliteMenu(smeltInventory, inventories);
     }
 
     public static class SmeltMenuEvents implements Listener {
@@ -222,6 +221,10 @@ public class SmeltMenu extends EliteMenu {
 
         }
 
+        @EventHandler
+        public void onInventoryCloseEvent(InventoryCloseEvent event) {
+            inventories.remove(event.getInventory());
+        }
     }
 
 }

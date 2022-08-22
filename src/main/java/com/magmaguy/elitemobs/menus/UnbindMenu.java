@@ -15,15 +15,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class UnbindMenu extends EliteMenu {
     private static final int eliteItemInputSlot = UnbinderMenuConfig.getEliteItemInputSlot();
@@ -32,7 +30,7 @@ public class UnbindMenu extends EliteMenu {
     private static final int eliteItemInformationInputSlot = UnbinderMenuConfig.getEliteItemInputInformationSlot();
     private static final int eliteScrapInformationInputSlot = UnbinderMenuConfig.getEliteScrapInputInformationSlot();
     private static final int informationOutputSlot = UnbinderMenuConfig.getOutputInformationSlot();
-    public static HashMap<Player, Inventory> inventories = new HashMap<>();
+    public static Set<Inventory> inventories = new HashSet<>();
 
     private static void calculateOutput(Inventory UnbinderInventory) {
         if (UnbinderInventory.getItem(UnbinderMenuConfig.getEliteUnbindInputSlot()) == null || UnbinderInventory.getItem(UnbinderMenuConfig.getEliteItemInputSlot()) == null) {
@@ -114,7 +112,7 @@ public class UnbindMenu extends EliteMenu {
         }
 
         player.openInventory(UnbinderInventory);
-        createEliteMenu(player, UnbinderInventory, inventories, menuName);
+        createEliteMenu(UnbinderInventory, inventories);
     }
 
     public static class UnbinderMenuEvents implements Listener {
@@ -179,6 +177,11 @@ public class UnbindMenu extends EliteMenu {
 
             }
 
+        }
+
+        @EventHandler
+        public void onClose(InventoryCloseEvent event) {
+            inventories.remove(event.getInventory());
         }
 
     }
