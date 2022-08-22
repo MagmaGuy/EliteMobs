@@ -245,6 +245,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
     }
 
     private String getSubstringField(String string) {
+        if (string.split("=").length < 2) return "";
         return string.split("=")[1];
     }
 
