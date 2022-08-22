@@ -273,6 +273,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
     }
 
     private void setPluginName() {
+        if (customBossesConfigFields.getName() == null) return;
         if (this.level == -1)
             setName(ChatColorConverter.convert(customBossesConfigFields.getName().replace("$level", "?" + "")
                             .replace("$normalLevel", ChatColorConverter.convert("&2[&a" + "?" + "&2]&f"))
@@ -310,7 +311,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
         //Check if the boss is already dead
         if (livingEntity == null) return;
         super.setNameVisible(isVisible);
-        DisguiseEntity.setDisguiseNameVisibility(isVisible, livingEntity);
+        DisguiseEntity.setDisguiseNameVisibility(isVisible, livingEntity, name);
         if (customModel != null && isValid())
             customModel.setNameVisible(isVisible);
     }
