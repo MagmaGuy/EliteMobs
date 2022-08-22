@@ -17,14 +17,16 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 /**
  * Created by MagmaGuy on 17/06/2017.
@@ -47,7 +49,7 @@ public class ProceduralShopMenu {
         Inventory shopInventory = Bukkit.createInventory(player, 54, menuName);
         populateShop(shopInventory, player);
         player.openInventory(shopInventory);
-        ProceduralShopMenuEvents.menus.put(player, shopInventory);
+        ProceduralShopMenuEvents.menus.add(shopInventory);
 
     }
 
@@ -88,7 +90,7 @@ public class ProceduralShopMenu {
     }
 
     public static class ProceduralShopMenuEvents implements Listener {
-        public static HashMap<Player, Inventory> menus = new HashMap<>();
+        public static Set<Inventory> menus = new HashSet<>();
 
         @EventHandler
         public void onClick(InventoryClickEvent event) {
@@ -153,6 +155,11 @@ public class ProceduralShopMenu {
 
             }
 
+        }
+
+        @EventHandler
+        public void onClose(InventoryCloseEvent event) {
+            menus.remove(event.getInventory());
         }
 
     }

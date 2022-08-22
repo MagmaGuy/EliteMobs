@@ -19,20 +19,21 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class SellMenu extends EliteMenu implements Listener {
 
     private static final List<Integer> validSlots = SellMenuConfig.storeSlots;
 
-    public static HashMap<Player, Inventory> inventories = new HashMap<>();
+    public static Set<Inventory> inventories = new HashSet<>();
 
     private static double calculateShopValue(Inventory shopInventory, Player player) {
         double itemWorth = 0;
@@ -123,7 +124,7 @@ public class SellMenu extends EliteMenu implements Listener {
         player.openInventory(sellInventory);
         if (ResourcePackDataConfig.isDisplayCustomMenuUnicodes())
             menuName = "\uF801\uDB80\uDC5B\uF805            " + menuName;
-        createEliteMenu(player, sellInventory, inventories, menuName);
+        createEliteMenu(sellInventory, inventories);
 
     }
 
@@ -236,8 +237,8 @@ public class SellMenu extends EliteMenu implements Listener {
 
 
     @EventHandler
-    public void onPlayerQuit(PlayerQuitEvent event) {
-        onPlayerQuit(event, inventories);
+    public void onInventoryClose(InventoryCloseEvent event) {
+        inventories.remove(event.getInventory());
     }
 
 }

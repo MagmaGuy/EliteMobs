@@ -16,14 +16,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class EnhancementMenu extends EliteMenu {
     private static final int eliteItemInputSlot = EnhancementMenuConfig.eliteItemInputSlot;
@@ -32,7 +30,7 @@ public class EnhancementMenu extends EliteMenu {
     private static final int eliteItemInformationInputSlot = EnhancementMenuConfig.eliteItemInputInformationSlot;
     private static final int eliteScrapInformationInputSlot = EnhancementMenuConfig.eliteUpgradeOrbInputInformationSlot;
     private static final int informationOutputSlot = EnhancementMenuConfig.outputInformationSlot;
-    public static HashMap<Player, Inventory> inventories = new HashMap<>();
+    public static Set<Inventory> inventories = new HashSet<>();
 
     private static void calculateOutput(Inventory EnhancementInventory) {
         if (EnhancementInventory.getItem(EnhancementMenuConfig.eliteUpgradeOrbInputSlot) == null || EnhancementInventory.getItem(EnhancementMenuConfig.eliteItemInputSlot) == null) {
@@ -126,7 +124,7 @@ public class EnhancementMenu extends EliteMenu {
         }
 
         player.openInventory(EnhancementInventory);
-        createEliteMenu(player, EnhancementInventory, inventories, menuName);
+        createEliteMenu(EnhancementInventory, inventories);
     }
 
     public static class EnhancementMenuEvents implements Listener {
@@ -195,6 +193,11 @@ public class EnhancementMenu extends EliteMenu {
 
             }
 
+        }
+
+        @EventHandler
+        public void onClose(InventoryCloseEvent event) {
+            inventories.remove(event.getInventory());
         }
 
     }

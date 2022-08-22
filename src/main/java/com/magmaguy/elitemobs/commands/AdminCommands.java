@@ -370,7 +370,7 @@ public class AdminCommands {
                 .permission("elitemobs.*")
                 .handler(commandContext -> LootCommand.get((Player) commandContext.getSender(), commandContext.get("customItem"))));
 
-        // /em giveloot <filename> <player>
+        // /em give <filename> <player>
         manager.command(builder.literal("give")
                 .argument(StringArgument.<CommandSender>newBuilder("customItem").withSuggestionsProvider(((objectCommandContext, s) -> customItems)),
                         ArgumentDescription.of("File name of the custom item"))

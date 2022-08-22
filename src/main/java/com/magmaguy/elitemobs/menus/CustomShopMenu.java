@@ -18,12 +18,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Random;
 
 /**
@@ -55,7 +55,7 @@ public class CustomShopMenu {
         Inventory shopInventory = Bukkit.createInventory(player, 54, menuName);
         populateShop(shopInventory, player);
         player.openInventory(shopInventory);
-        CustomShopMenuEvents.menus.put(player, shopInventory);
+        CustomShopMenuEvents.menus.add(shopInventory);
     }
 
     /**
@@ -103,18 +103,13 @@ public class CustomShopMenu {
     }
 
     public static class CustomShopMenuEvents implements Listener {
-        public static HashMap<Player, Inventory> menus = new HashMap<>();
+        public static HashSet<Inventory> menus = new HashSet<>();
 
         @EventHandler
         public void onClick(InventoryClickEvent event) {
 
             if (!EliteMenu.isEliteMenu(event, menus)) return;
-            if (event.getClickedInventory() == null || !event.getClickedInventory().getType().equals(InventoryType.CHEST)) {
-                event.setCancelled(true);
-                return;
-            }
             event.setCancelled(true);
-            if (!SharedShopElements.inventoryNullPointerPreventer(event)) return;
 
             //reroll loot button
             if (event.getCurrentItem().getItemMeta().getDisplayName().equals(CustomShopMenuConfig.rerollItem.getItemMeta().getDisplayName())) {
@@ -148,7 +143,6 @@ public class CustomShopMenu {
 
                     player.sendMessage(CustomShopMenuConfig.messageFullInventory);
                     player.closeInventory();
-                    menus.remove(player);
 
                 } else if (EconomyHandler.checkCurrency(player.getUniqueId()) >= itemValue) {
                     //player has enough money
@@ -162,13 +156,17 @@ public class CustomShopMenu {
                 } else {
 
                     player.closeInventory();
-                    menus.remove(player);
                     SharedShopElements.insufficientFundsMessage(player, itemValue);
 
                 }
 
             }
 
+        }
+
+        @EventHandler
+        public void onClose(InventoryCloseEvent event) {
+            menus.remove(event.getInventory());
         }
     }
 
