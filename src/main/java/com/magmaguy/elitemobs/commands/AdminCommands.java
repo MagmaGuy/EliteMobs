@@ -878,6 +878,7 @@ public class AdminCommands {
         List<String> wormholeList = new ArrayList<>(WormholeConfig.getWormholes().keySet());
         List<String> wormholeOptions = new ArrayList<>(Arrays.asList("1", "2"));
 
+        // /em setwormhole <wormholeFilename> <1/2>
         manager.command(builder.literal("setwormhole")
                 .argument(StringArgument.<CommandSender>newBuilder("wormholeFilename").withSuggestionsProvider(((objectCommandContext, s) -> wormholeList)),
                         ArgumentDescription.of("Wormhole filename"))
@@ -924,6 +925,19 @@ public class AdminCommands {
                     }
                 })
         );
+
+        // /em package <dungeon> <version>
+        manager.command(builder.literal("package")
+                .argument(StringArgument.<CommandSender>newBuilder("dungeonName"), ArgumentDescription.of("Name of the dungeon to create"))
+                .argument(StringArgument.<CommandSender>newBuilder("dungeonVersion"), ArgumentDescription.of("Version of the dungeon"))
+                .meta(CommandMeta.DESCRIPTION, "Packages a dungeon for distribution!")
+                .senderType(CommandSender.class)
+                .permission("elitemobs.*")
+                .handler(commandContext -> {
+                    new PackageCommand(commandContext.getSender(), commandContext.get("dungeonName"), commandContext.get("dungeonVersion"));
+                })
+        );
+
     }
 
     private void testFireball(Player player) {

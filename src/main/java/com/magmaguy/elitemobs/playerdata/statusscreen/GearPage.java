@@ -29,7 +29,7 @@ public class GearPage {
         for (int i = 0; i < 13; i++) {
 
             TextComponent line;
-
+            if (PlayerStatusMenuConfig.getGearTextLines()[i] == null) continue;
             if (!PlayerStatusMenuConfig.getGearTextLines()[i].contains("{")) {
                 line = new TextComponent(parseGearPlaceholders(PlayerStatusMenuConfig.getGearTextLines()[i], targetPlayer) + "\n");
                 gearMultiComponentLine(textComponent, line, i, targetPlayer, false, 0);
@@ -110,7 +110,7 @@ public class GearPage {
 
     private static void gearMultiComponentLine(TextComponent textComponent, TextComponent line, int i, Player targetPlayer, boolean brackets, int bracketCount) {
 
-        if (!PlayerStatusMenuConfig.getGearHoverLines()[i].isEmpty()) {
+        if (PlayerStatusMenuConfig.getGearHoverLines()[i] != null && !PlayerStatusMenuConfig.getGearHoverLines()[i].isEmpty()) {
             String hoverLines = PlayerStatusMenuConfig.getGearHoverLines()[i];
             if (hoverLines.contains("$helmet"))
                 ShareItem.setItemHoverEvent(line, targetPlayer.getInventory().getHelmet());
