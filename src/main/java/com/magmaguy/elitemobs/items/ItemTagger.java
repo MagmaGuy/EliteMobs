@@ -225,6 +225,7 @@ public class ItemTagger {
 
     public static double getEliteDamageAttribute(@Nullable Projectile projectile) {
         if (projectile == null) return 0D;
+        if (projectile.getPersistentDataContainer().get(ELITE_DAMAGE, PersistentDataType.DOUBLE) == null) return 0D;
         return projectile.getPersistentDataContainer().get(ELITE_DAMAGE, PersistentDataType.DOUBLE);
     }
 
