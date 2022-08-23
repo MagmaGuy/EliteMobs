@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.powers.meta;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
+import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
 import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.utils.WarningMessage;
@@ -109,6 +110,14 @@ public class ElitePower {
 
 
     protected static boolean eventIsValid(EliteMobDamagedByPlayerEvent event, ElitePower elitePower) {
+        if (event.isCancelled()) return false;
+        if (event.getEliteMobEntity().getLivingEntity() == null) return false;
+        if (!event.getEliteMobEntity().getLivingEntity().hasAI()) return false;
+        if (elitePower.isInGlobalCooldown()) return false;
+        return !event.getEliteMobEntity().isInCooldown();
+    }
+
+    protected static boolean eventIsValid(PlayerDamagedByEliteMobEvent event, ElitePower elitePower){
         if (event.isCancelled()) return false;
         if (event.getEliteMobEntity().getLivingEntity() == null) return false;
         if (!event.getEliteMobEntity().getLivingEntity().hasAI()) return false;

@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.items.customloottable;
 
+import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
@@ -72,16 +73,17 @@ public class CurrencyCustomLootEntry extends CustomLootEntry implements Serializ
 
     @Override
     public void locationDrop(int itemTier, Player player, Location location) {
+        currencyAmount = (int) (currencyAmount * GuildRank.currencyBonusMultiplier(player.getUniqueId()));
         for (int i = 0; i < getAmount(); i++)
             new ItemLootShower(location, player, currencyAmount);
     }
 
     @Override
     public void directDrop(int itemTier, Player player) {
-        for (int i = 0; i < getAmount(); i++){
-            EconomyHandler.addCurrency(player.getUniqueId(), currencyAmount);
+        for (int i = 0; i < getAmount(); i++) {
+            EconomyHandler.addCurrency(player.getUniqueId(), currencyAmount * GuildRank.currencyBonusMultiplier(player.getUniqueId()));
             player.sendMessage(ItemSettingsConfig.getDirectDropCoinMessage()
-                    .replace("$amount", currencyAmount+"")
+                    .replace("$amount", currencyAmount + "")
                     .replace("$currencyName", EconomySettingsConfig.getCurrencyName()));
         }
     }
