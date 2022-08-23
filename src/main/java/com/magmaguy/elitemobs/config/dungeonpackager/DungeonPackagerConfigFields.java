@@ -304,6 +304,7 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
         ConfigurationEngine.writeValue(true, file, fileConfiguration, "isEnabled");
         this.anchorPoint = location;
         ConfigurationEngine.writeValue(ConfigurationLocation.deserialize(location), file, fileConfiguration, "anchorPoint");
+        if (teleportLocationOffset == null) teleportLocationOffset = new Location(null, 0, 0, 0, 0, 0);
         this.teleportLocation = schematicPackage.toRealPosition(teleportLocationOffset.toVector());
         this.teleportLocation.setYaw(location.getYaw() + teleportLocationOffset.getYaw());
         this.teleportLocation.setPitch(location.getPitch() + teleportLocationOffset.getPitch());

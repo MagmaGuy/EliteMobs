@@ -56,8 +56,13 @@ public class EliteItemManager {
         if (itemStack.getType() == Material.BOW) return 6.0;
         if (itemStack.getType() == Material.CROSSBOW) return 7.0;
         //Check the default modifiers - these are usually the only modifiers
-        for (AttributeModifier attributeModifier : itemStack.getType().getDefaultAttributeModifiers(EquipmentSlot.HAND).get(Attribute.GENERIC_ATTACK_DAMAGE))
-            defaultDamage = attributeCrawler(defaultDamage, attributeModifier);
+        try {
+            for (AttributeModifier attributeModifier : itemStack.getType().getDefaultAttributeModifiers(EquipmentSlot.HAND).get(Attribute.GENERIC_ATTACK_DAMAGE))
+                defaultDamage = attributeCrawler(defaultDamage, attributeModifier);
+        } catch (NoSuchMethodError e) {
+            //If you're on an ancient version the damage will not work that well for the default materials.
+            return 1.0;
+        }
         //Check custom modifiers - this should only happen when third party plugins step in
         if (itemStack.getItemMeta() != null &&
                 itemStack.getItemMeta().getAttributeModifiers() != null &&
@@ -84,8 +89,13 @@ public class EliteItemManager {
         if (itemStack.getType() == Material.BOW) return 1.0;
         else if (itemStack.getType() == Material.CROSSBOW) return 0.8;
         //Check the default modifiers - these are usually the only modifiers
-        for (AttributeModifier attributeModifier : itemStack.getType().getDefaultAttributeModifiers(EquipmentSlot.HAND).get(Attribute.GENERIC_ATTACK_SPEED))
-            defaultAttackSpeed = attributeCrawler(defaultAttackSpeed, attributeModifier);
+        try {
+            for (AttributeModifier attributeModifier : itemStack.getType().getDefaultAttributeModifiers(EquipmentSlot.HAND).get(Attribute.GENERIC_ATTACK_SPEED))
+                defaultAttackSpeed = attributeCrawler(defaultAttackSpeed, attributeModifier);
+        } catch (NoSuchMethodError e) {
+            //If you're on an ancient version you just get the default sword speed.
+            defaultAttackSpeed = 4.0;
+        }
         //Check custom modifiers - this should only happen when third party plugins step in
         if (itemStack.getItemMeta() != null &&
                 itemStack.getItemMeta().getAttributeModifiers() != null &&

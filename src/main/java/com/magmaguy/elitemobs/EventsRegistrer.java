@@ -192,6 +192,7 @@ public class EventsRegistrer {
         registerPower(new Firestorm(), "firestorm.yml");
         register(new Bombardment.BombardmentEvents());
         registerPower(new ShieldWall.ShieldWallEvents(), "shield_wall.yml");
+        registerPower(new Taze(), "taze.yml");
 
         //Major mob powers
         registerPower(new SkeletonPillar(), "skeleton_pillar.yml");

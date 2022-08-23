@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.quests.rewards;
 
+import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.customquests.CustomQuestsConfigFields;
 import com.magmaguy.elitemobs.items.LootTables;
 import com.magmaguy.elitemobs.items.customloottable.CustomLootTable;
@@ -27,7 +28,7 @@ public class QuestReward implements Serializable {
         this.rewardLevel = questLevel * 10;
         this.playerUUID = player.getUniqueId();
         int killAmount = questObjectives.getObjectives().stream().mapToInt(Objective::getTargetAmount).sum();
-        int baselineReward = (int) (rewardLevel / 2D * killAmount);
+        int baselineReward = (int) (rewardLevel / 2D * killAmount * GuildRank.currencyBonusMultiplier(playerUUID));
         customLootTable = new CustomLootTable();
         customLootTable.generateCurrencyEntry(baselineReward);
         ItemStack itemReward = LootTables.generateItemStack(Math.min(rewardLevel, PlayerData.getMaxGuildLevel(player.getUniqueId()) * 10), player, null);
