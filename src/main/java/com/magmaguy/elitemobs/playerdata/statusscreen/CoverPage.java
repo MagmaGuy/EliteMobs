@@ -9,10 +9,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 public class CoverPage {
     protected static TextComponent coverPage(int statsPage, int gearPage, int teleportsPage, int commandsPage, int questsPage, int bossTrackingPage) {
@@ -75,67 +76,65 @@ public class CoverPage {
             inventory.setItem(PlayerStatusMenuConfig.getIndexQuestTrackingSlot(), PlayerStatusMenuConfig.getIndexQuestTrackingItem());
         if (PlayerStatusMenuConfig.isDoBossTrackingPage())
             inventory.setItem(PlayerStatusMenuConfig.getIndexBossTrackingSlot(), PlayerStatusMenuConfig.getIndexBossTrackingItem());
-        CoverPageEvents.pageInventories.put(requestingPlayer, inventory);
+        CoverPageEvents.pageInventories.add(inventory);
         requestingPlayer.openInventory(inventory);
     }
 
     public static class CoverPageEvents implements Listener {
-        private static final Map<Player, Inventory> pageInventories = new HashMap<>();
+        private static final Set<Inventory> pageInventories = new HashSet<>();
 
         @EventHandler
         public void onInventoryInteract(InventoryClickEvent event) {
             Player player = ((Player) event.getWhoClicked()).getPlayer();
-            if (!pageInventories.containsKey(player)) return;
+            if (!pageInventories.contains(event.getInventory())) return;
             event.setCancelled(true);
 
             if (event.getSlot() == PlayerStatusMenuConfig.getIndexHeaderSlot()) {
-                pageInventories.remove(player);
                 player.closeInventory();
                 AdventurersGuildCommand.adventurersGuildCommand(player);
                 return;
             }
 
             if (event.getSlot() == PlayerStatusMenuConfig.getIndexGearSlot() && PlayerStatusMenuConfig.isDoGearPage()) {
-                pageInventories.remove(player);
                 player.closeInventory();
                 GearPage.gearPage(player, player);
                 return;
             }
 
             if (event.getSlot() == PlayerStatusMenuConfig.getIndexStatsSlot() && PlayerStatusMenuConfig.isDoStatsPage()) {
-                pageInventories.remove(player);
                 player.closeInventory();
                 StatsPage.statsPage(player, player);
                 return;
             }
 
             if (event.getSlot() == PlayerStatusMenuConfig.getIndexCommandsSlot() && PlayerStatusMenuConfig.isDoCommandsPage()) {
-                pageInventories.remove(player);
                 player.closeInventory();
                 CommandsPage.commandsPage(player, player);
                 return;
             }
 
             if (event.getSlot() == PlayerStatusMenuConfig.getIndexTeleportsSlot() && PlayerStatusMenuConfig.isDoTeleportsPage()) {
-                pageInventories.remove(player);
                 player.closeInventory();
                 TeleportsPage.teleportsPage(player, player);
                 return;
             }
 
             if (event.getSlot() == PlayerStatusMenuConfig.getIndexQuestTrackingSlot() && PlayerStatusMenuConfig.isDoQuestTrackingPage()) {
-                pageInventories.remove(player);
                 player.closeInventory();
                 QuestsPage.questsPage(player, player);
                 return;
             }
 
             if (event.getSlot() == PlayerStatusMenuConfig.getIndexBossTrackingSlot() && PlayerStatusMenuConfig.isDoBossTrackingPage()) {
-                pageInventories.remove(player);
                 player.closeInventory();
                 BossTrackingPage.bossTrackingPage(player, player);
                 return;
             }
+        }
+
+        @EventHandler
+        public void onInventoryClose(InventoryCloseEvent event){
+            pageInventories.remove(event.getInventory());
         }
     }
 }
