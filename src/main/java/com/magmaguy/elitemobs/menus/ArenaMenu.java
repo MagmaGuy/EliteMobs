@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 
 import java.util.HashMap;
@@ -22,36 +23,39 @@ public class ArenaMenu {
             player.sendMessage(ChatColorConverter.convert("&4[EliteMobs] &cInvalid arena name!"));
             return;
         }
-        String menuName = ArenaMenuConfig.getMenuName() +arenaInstance.getCustomArenasConfigFields().getArenaName();
+        String menuName = ArenaMenuConfig.getMenuName() + arenaInstance.getCustomArenasConfigFields().getArenaName();
         if (ResourcePackDataConfig.isDisplayCustomMenuUnicodes())
             menuName = "\uF801\uDB80\uDD0B\uF805          " + menuName;
         Inventory shopInventory = Bukkit.createInventory(player, 9, menuName);
         shopInventory.setItem(ArenaMenuConfig.getPlayerItemSlot(), ArenaMenuConfig.getPlayerItem());
         shopInventory.setItem(ArenaMenuConfig.getSpectatorItemSlot(), ArenaMenuConfig.getSpectatorItem());
         player.openInventory(shopInventory);
-        ArenaMenuEvents.menus.put(player, new MenuContainer(shopInventory, arenaInstance));
+        ArenaMenuEvents.menus.put(shopInventory, new MenuContainer(shopInventory, arenaInstance));
     }
 
     public static class ArenaMenuEvents implements Listener {
-        private static final Map<Player, MenuContainer> menus = new HashMap<>();
+        private static final Map<Inventory, MenuContainer> menus = new HashMap<>();
 
         @EventHandler(ignoreCancelled = true)
         public void onInventoryClick(InventoryClickEvent event) {
             Player player = ((Player) event.getWhoClicked()).getPlayer();
-            if (!menus.containsKey(player)) return;
+            if (!menus.containsKey(event.getInventory())) return;
             event.setCancelled(true);
             if (event.getSlot() == ArenaMenuConfig.getPlayerItemSlot()) {
-                menus.get(player).getArenaInstance().addPlayer(player);
+                menus.get(event.getInventory()).getArenaInstance().addPlayer(player);
                 player.closeInventory();
-                menus.remove(player);
                 return;
             }
             if (event.getSlot() == ArenaMenuConfig.getSpectatorItemSlot()) {
-                menus.get(player).getArenaInstance().addSpectator(player);
+                menus.get(event.getInventory()).getArenaInstance().addSpectator(player);
                 player.closeInventory();
-                menus.remove(player);
                 return;
             }
+        }
+
+        @EventHandler
+        public void onInventoryClose(InventoryCloseEvent event) {
+            menus.remove(event.getInventory());
         }
     }
 
