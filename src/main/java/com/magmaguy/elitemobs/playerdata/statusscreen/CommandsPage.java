@@ -45,8 +45,8 @@ public class CommandsPage {
         inventory.setItem(PlayerStatusMenuConfig.getCommandsAGSlot(), PlayerStatusMenuConfig.getCommandsAGItem());
         inventory.setItem(PlayerStatusMenuConfig.getCommandsShareItemSlot(), PlayerStatusMenuConfig.getCommandsShareItemItem());
         inventory.setItem(26, PlayerStatusMenuConfig.getBackItem());
-        requestingPlayer.openInventory(inventory);
         CommandsPageEvents.pageInventories.add(inventory);
+        requestingPlayer.openInventory(inventory);
     }
 
     public static class CommandsPageEvents implements Listener {
@@ -55,7 +55,7 @@ public class CommandsPage {
         @EventHandler(ignoreCancelled = true)
         public void onInventoryInteract(InventoryClickEvent event) {
             Player player = ((Player) event.getWhoClicked()).getPlayer();
-            if (!pageInventories.contains(player)) return;
+            if (!pageInventories.contains(event.getInventory())) return;
             event.setCancelled(true);
             if (event.getSlot() == 26) {
                 player.closeInventory();

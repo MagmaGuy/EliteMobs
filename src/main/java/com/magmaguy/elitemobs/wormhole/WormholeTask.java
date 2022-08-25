@@ -63,7 +63,9 @@ public class WormholeTask {
     private static boolean checkPoint(WormholeEntry wormholeEntry, Location playerLocation, Player player, HashSet<Player> teleportingPlayers) {
         if (wormholeEntry.getLocation() == null) return false;
         if (Wormhole.getPlayerCooldowns().contains(player)) return false;
-        if (wormholeEntry.getWormhole().getWormholeConfigFields().getPermission() != null && !wormholeEntry.getWormhole().getWormholeConfigFields().getPermission().isEmpty() && !player.hasPermission(wormholeEntry.getWormhole().getWormholeConfigFields().getPermission()))
+        if (wormholeEntry.getWormhole().getWormholeConfigFields().getPermission() != null &&
+                !wormholeEntry.getWormhole().getWormholeConfigFields().getPermission().isEmpty() &&
+                !player.hasPermission(wormholeEntry.getWormhole().getWormholeConfigFields().getPermission()))
             return false;
         if (!Objects.equals(wormholeEntry.getLocation().getWorld(), playerLocation.getWorld())) return false;
         if (wormholeEntry.getLocation().distance(playerLocation) > 1.5 * wormholeEntry.getWormhole().getWormholeConfigFields().getSizeMultiplier())
