@@ -101,7 +101,7 @@ public class BossTrackingPage {
         @EventHandler (ignoreCancelled = true)
         public void onInventoryInteract(InventoryClickEvent event) {
             Player player = ((Player) event.getWhoClicked()).getPlayer();
-            if (!pageInventories.contains(player)) return;
+            if (!pageInventories.contains(event.getInventory())) return;
             event.setCancelled(true);
             if (bosses.size() - 1 >= event.getSlot()) {
                 player.closeInventory();
