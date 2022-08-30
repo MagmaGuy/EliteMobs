@@ -30,6 +30,9 @@ public class CustomQuestsConfigFields extends CustomConfigFields implements Cust
     //Required permission to accept quest
     private String questAcceptPermission = "";
     @Getter
+    @Setter
+    private List<String> questAcceptPermissions = null;
+    @Getter
     //Permission which locks players out of a quest
     private String questLockoutPermission = "";
     @Getter
@@ -91,6 +94,7 @@ public class CustomQuestsConfigFields extends CustomConfigFields implements Cust
         this.customObjectivesList = translatable(filename, "customObjectives", processStringList("customObjectives", customObjectivesList, new ArrayList<>(), true));
         this.customRewardsList = processStringList("customRewards", customRewardsList, new ArrayList<>(), true);
         this.questAcceptPermission = processString("questAcceptPermission", questAcceptPermission, null, false);
+        this.questAcceptPermissions = processStringList("questAcceptPermissions", questAcceptPermissions, null, false);
         this.questLockoutPermission = processString("questLockoutPermission", questLockoutPermission, null, false);
         this.questLockoutMinutes = processInt("questLockoutMinutes", questLockoutMinutes, -1, false);
         this.questName = translatable(filename, "name", processString("name", questName, filename, true));

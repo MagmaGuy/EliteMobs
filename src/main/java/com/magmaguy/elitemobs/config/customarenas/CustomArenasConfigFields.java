@@ -56,6 +56,9 @@ public class CustomArenasConfigFields extends CustomConfigFields implements Cust
     @Getter
     @Setter
     private boolean cylindricalArena = false;
+    @Getter
+    @Setter
+    private String permission = null;
 
     public CustomArenasConfigFields(String filename, boolean isEnabled) {
         super(filename, isEnabled);
@@ -64,7 +67,7 @@ public class CustomArenasConfigFields extends CustomConfigFields implements Cust
     @Override
     public void processConfigFields() {
         this.isEnabled = processBoolean("isEnabled", isEnabled, true, true);
-        this.arenaName = translatable(filename, "arenaName",processString("arenaName", arenaName, "Default name", false));
+        this.arenaName = translatable(filename, "arenaName", processString("arenaName", arenaName, "Default name", false));
         this.corner1 = processString("corner1", corner1, null, false);
         this.corner2 = processString("corner2", corner2, null, false);
         this.startLocation = processString("startLocation", startLocation, null, false);
@@ -77,8 +80,9 @@ public class CustomArenasConfigFields extends CustomConfigFields implements Cust
         arenaRewards = new CustomLootTable(this);
         this.minimumPlayerCount = processInt("minimumPlayerCount", minimumPlayerCount, 1, false);
         this.maximumPlayerCount = processInt("maximumPlayerCount", maximumPlayerCount, 100, false);
-        this.arenaMessages = translatable(filename, "arenaMessages",processStringList("arenaMessages", arenaMessages, new ArrayList<>(), false));
+        this.arenaMessages = translatable(filename, "arenaMessages", processStringList("arenaMessages", arenaMessages, new ArrayList<>(), false));
         this.cylindricalArena = processBoolean("cylindricalArena", cylindricalArena, false, false);
+        this.permission = processString("permission", permission, null, false);
     }
 
 }

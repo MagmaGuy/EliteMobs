@@ -50,6 +50,7 @@ public class DungeonUtils {
             return null;
         try {
             WorldCreator worldCreator = new WorldCreator(worldName);
+
             worldCreator.environment(environment);
             World world = Bukkit.createWorld(worldCreator);
             if (world != null)
