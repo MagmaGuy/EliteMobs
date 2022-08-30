@@ -71,7 +71,7 @@ public class WormholeTask {
         if (wormholeEntry.getLocation().distance(playerLocation) > 1.5 * wormholeEntry.getWormhole().getWormholeConfigFields().getSizeMultiplier())
             return false;
         //A player might be standing in the teleporter after getting teleported, avoid teleporting them back
-        if (teleportingPlayers.contains(player)) return true;
+        //if (teleportingPlayers.contains(player)) return true; todo: is this working?
         if (wormholeEntry.getWormhole().getWormholeConfigFields().getCoinCost() > 0) {
             double coinCost = wormholeEntry.getWormhole().getWormholeConfigFields().getCoinCost() + wormholeEntry.getWormhole().getWormholeConfigFields().getCoinCost() * GuildRank.currencyBonusMultiplier(player.getUniqueId());
             if (EconomyHandler.checkCurrency(player.getUniqueId()) < coinCost) {
@@ -107,7 +107,7 @@ public class WormholeTask {
             player.setVelocity(destination.getDirection().normalize());
             player.setFlying(false);
             Wormhole.getPlayerCooldowns().add(player);
-            Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, () -> Wormhole.getPlayerCooldowns().remove(player), 20 * 5L);
+            Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, () -> Wormhole.getPlayerCooldowns().remove(player), 20 * 10L);
         });
 
     }

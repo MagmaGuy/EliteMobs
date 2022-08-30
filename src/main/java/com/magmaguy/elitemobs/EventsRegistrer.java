@@ -349,6 +349,7 @@ public class EventsRegistrer {
         register(new QuestTracking.QuestTrackingEvents());
         register(new CustomQuest.CustomQuestEvents());
         register(new QuestInventoryMenu.QuestInventoryMenuEvents());
+        register(new ArenaCompleteEvent.ArenaCompleteEventHandler());
 
         //Arenas
         register(new ArenaMenu.ArenaMenuEvents());
