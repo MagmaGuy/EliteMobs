@@ -55,6 +55,8 @@ public class DefaultConfig {
     private static boolean menuUnicodeFormatting;
     @Getter
     private static String language;
+    @Getter
+    private static String noArenaPermissionMessage;
 
     private static File file = null;
     private static FileConfiguration fileConfiguration = null;
@@ -104,6 +106,7 @@ public class DefaultConfig {
         useGlassToFillMenuEmptySpace = ConfigurationEngine.setBoolean(fileConfiguration, "useGlassToFillMenuEmptySpace", false);
         menuUnicodeFormatting = ConfigurationEngine.setBoolean(fileConfiguration, "menuUnicodeFormatting", false);
         language = ConfigurationEngine.setString(file, fileConfiguration, "language", "english", false);
+        noArenaPermissionMessage = ConfigurationEngine.setString(file, fileConfiguration, "noArenaPermissionMessage", "[EliteMobs] You don't have the permission to enter this arena!", true);
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }

@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.items.customloottable;
 
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -9,6 +10,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class VanillaCustomLootEntry extends CustomLootEntry implements Serializable {
     @Getter
@@ -68,9 +70,16 @@ public class VanillaCustomLootEntry extends CustomLootEntry implements Serializa
     }
 
     @Override
+    public void locationDrop(int itemTier, Player player, Location location, EliteEntity eliteEntity) {
+        for (int i = 0; i < getAmount(); i++)
+            location.getWorld().dropItem(location, generateItemStack());
+    }
+
+    @Override
     public void directDrop(int itemTier, Player player) {
         String name = null;
         for (int i = 0; i < getAmount(); i++) {
+            if (ThreadLocalRandom.current().nextDouble() > getChance()) return;
             ItemStack itemStack = generateItemStack();
             player.getInventory().addItem(itemStack);
             if (name == null && itemStack.getItemMeta() != null) {

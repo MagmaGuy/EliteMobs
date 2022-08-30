@@ -35,6 +35,7 @@ import java.util.List;
 public class MatchInstance {
 
     private static HashSet<MatchInstance> instances = new HashSet<>();
+    @Getter
     protected HashSet<Player> players = new HashSet<>();
     protected HashMap<Player, Integer> playerLives = new HashMap();
     protected HashSet<Player> participants = new HashSet<>();

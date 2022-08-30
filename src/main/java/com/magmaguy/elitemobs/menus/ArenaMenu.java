@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.menus;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
 import com.magmaguy.elitemobs.config.menus.premade.ArenaMenuConfig;
 import com.magmaguy.elitemobs.instanced.ArenaInstance;
@@ -42,6 +43,14 @@ public class ArenaMenu {
             if (!menus.containsKey(event.getInventory())) return;
             event.setCancelled(true);
             if (event.getSlot() == ArenaMenuConfig.getPlayerItemSlot()) {
+                ArenaInstance arenaInstance = menus.get(event.getInventory()).getArenaInstance();
+                if (arenaInstance.getCustomArenasConfigFields().getPermission() != null &&
+                        !arenaInstance.getCustomArenasConfigFields().getPermission().isEmpty())
+                    if (!player.hasMetadata(arenaInstance.getCustomArenasConfigFields().getPermission())) {
+                        player.sendMessage(DefaultConfig.getNoArenaPermissionMessage());
+                        player.closeInventory();
+                        return;
+                    }
                 menus.get(event.getInventory()).getArenaInstance().addPlayer(player);
                 player.closeInventory();
                 return;

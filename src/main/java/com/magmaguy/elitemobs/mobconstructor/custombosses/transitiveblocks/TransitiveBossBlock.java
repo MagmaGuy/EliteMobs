@@ -1,13 +1,12 @@
 package com.magmaguy.elitemobs.mobconstructor.custombosses.transitiveblocks;
 
-import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobRemoveEvent;
 import com.magmaguy.elitemobs.api.EliteMobSpawnEvent;
 import com.magmaguy.elitemobs.dungeons.SchematicPackage;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
+import com.magmaguy.elitemobs.utils.ChunkLocationChecker;
 import com.magmaguy.elitemobs.utils.WarningMessage;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
@@ -20,6 +19,7 @@ public class TransitiveBossBlock implements Listener {
 
     private static void setBlockData(CustomBossEntity customBossEntity, TransitiveBlock transitiveBlock, Location spawnLocation) {
         Location location;
+        if (!ChunkLocationChecker.locationIsLoaded(spawnLocation)) return;
         double rotation = 0;
         if (customBossEntity.getEmPackage() instanceof SchematicPackage)
             rotation = customBossEntity.getEmPackage().getDungeonPackagerConfigFields().getCalculatedRotation();
@@ -90,17 +90,16 @@ public class TransitiveBossBlock implements Listener {
         return intToBlockFace(result);
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onBossSpawn(EliteMobSpawnEvent event) {
         if (!(event.getEliteMobEntity() instanceof RegionalBossEntity)) return;
         RegionalBossEntity regionalBossEntity = (RegionalBossEntity) event.getEliteMobEntity();
         if (regionalBossEntity.getOnSpawnTransitiveBlocks() != null && !regionalBossEntity.getOnSpawnTransitiveBlocks().isEmpty())
             for (TransitiveBlock transitiveBlock : regionalBossEntity.getOnSpawnTransitiveBlocks())
-                Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN,
-                        () -> setBlockData(regionalBossEntity, transitiveBlock, regionalBossEntity.getSpawnLocation()), 1L);
+                setBlockData(regionalBossEntity, transitiveBlock, regionalBossEntity.getSpawnLocation());
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onBossRemove(EliteMobRemoveEvent event) {
         if (!(event.getEliteMobEntity() instanceof RegionalBossEntity)) return;
         RegionalBossEntity regionalBossEntity = (RegionalBossEntity) event.getEliteMobEntity();

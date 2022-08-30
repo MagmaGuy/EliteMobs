@@ -12,6 +12,7 @@ public class CustomObjectivesParser {
      * Processes the custom objectives as set in the configuration file. These objectives must follow one or more of these formats:
      * KILL_CUSTOM:filename=X.yml:amount=Y
      * FETCH_ITEM:filename=X.yml:amount=Y
+     * ARENA:filename=X.yml
      */
     public static List<Objective> processCustomObjectives(CustomQuest customQuest) {
         List<Objective> objectives = new ArrayList<>();
@@ -27,6 +28,8 @@ public class CustomObjectivesParser {
                 case "DIALOG":
                     objectives.add(processObjectiveType(rawStrings, ObjectiveType.DIALOG, customQuest));
                     break;
+                case "ARENA":
+                    objectives.add(processObjectiveType(rawStrings, ObjectiveType.ARENA, customQuest));
                 default:
                     new WarningMessage("Entry " + string + " for quest " + customQuest.getCustomQuestsConfigFields().getFilename() + " is not valid! Check the documentation on how to create valid quest objectives on the wiki!");
                     return new ArrayList<>();
@@ -91,6 +94,7 @@ public class CustomObjectivesParser {
     private enum ObjectiveType {
         KILL_CUSTOM,
         FETCH_ITEM,
-        DIALOG
+        DIALOG,
+        ARENA
     }
 }
