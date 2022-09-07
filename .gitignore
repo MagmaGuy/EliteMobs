@@ -2,3 +2,4 @@
 /.gradle/
 /testbed/
 /build/
+gradle.properties

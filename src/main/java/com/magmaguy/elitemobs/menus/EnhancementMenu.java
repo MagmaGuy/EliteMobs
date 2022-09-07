@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.menus;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.api.EliteMobsItemDetector;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
@@ -155,7 +154,7 @@ public class EnhancementMenu extends EliteMenu {
                 }
 
                 //Item is elite combat item
-                if (EliteMobsItemDetector.isEliteMobsItem(currentItem))
+                if (EliteItemManager.isEliteMobsItem(currentItem))
                     if (EliteItemManager.isWeapon(currentItem))
                         if (EnhancementInventory.getItem(eliteItemInputSlot) == null) {
                             EnhancementInventory.setItem(eliteItemInputSlot, currentItem);
