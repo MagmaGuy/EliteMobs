@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.items;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
-import com.magmaguy.elitemobs.api.EliteMobsItemDetector;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
@@ -50,7 +49,7 @@ public class EliteItemLore {
 
     public EliteItemLore(ItemStack itemStack, boolean showItemWorth) {
 
-        if (!EliteMobsItemDetector.isEliteMobsItem(itemStack)) {
+        if (!EliteItemManager.isEliteMobsItem(itemStack)) {
             new WarningMessage("Attempted to rewrite the lore of a non-elitemobs item! This is not supposed to happen.");
             return;
         }

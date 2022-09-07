@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.api.utils;
 import com.magmaguy.elitemobs.combatsystem.CombatSystem;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.items.ItemTagger;
+import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
@@ -11,6 +12,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 
@@ -271,6 +274,38 @@ public class EliteItemManager {
 
     public static double getArrowEliteDamage(@Nullable Projectile projectile) {
         return ItemTagger.getEliteDamageAttribute(projectile);
+    }
+
+    /**
+     * Checks if an item is an EliteMobs item
+     *
+     * @param itemStack Item to analyze
+     * @return If the item is an elite item
+     */
+    public static boolean isEliteMobsItem(ItemStack itemStack) {
+        return ItemTagger.isEliteItem(itemStack);
+    }
+
+    /**
+     * Returns whether an item meta has the soulbind enchantment
+     *
+     * @param itemMeta Item meta to be evaluated
+     * @return Whether the item has the soulbind meta
+     */
+    @Nullable
+    public static boolean hasSoulbindEnchantment(@NotNull ItemMeta itemMeta) {
+        return SoulbindEnchantment.itemHasSoulbindEnchantment(itemMeta);
+    }
+
+    /**
+     * Gets the {@link Player} to whom the item meta is linked.
+     *
+     * @param itemMeta Item meta to be evaluated.
+     * @return Player to whom the meta is linked. Returns null if no player is linked, or if the player linked is not online.
+     */
+    @Nullable
+    public static Player getSoulboundPlayer(@NotNull ItemMeta itemMeta) {
+        return SoulbindEnchantment.getSoulboundPlayer(itemMeta);
     }
 
 }

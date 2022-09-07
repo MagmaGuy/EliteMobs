@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.collateralminecraftchanges;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
-import com.magmaguy.elitemobs.api.EliteMobsItemDetector;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.items.ItemTagger;
@@ -49,7 +48,7 @@ public class AlternativeDurabilityLoss implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onDurabilityLoss(PlayerItemDamageEvent event) {
-        if (!EliteMobsItemDetector.isEliteMobsItem(event.getItem())) return;
+        if (!EliteItemManager.isEliteMobsItem(event.getItem())) return;
         event.setCancelled(true);
     }
 
@@ -62,7 +61,7 @@ public class AlternativeDurabilityLoss implements Listener {
         for (ItemStack itemStack : itemsList)
             if (itemStack != null &&
                     itemStack.getType().getMaxDurability() != 0 &&
-                    EliteMobsItemDetector.isEliteMobsItem(itemStack) &&
+                    EliteItemManager.isEliteMobsItem(itemStack) &&
                     itemStack.getItemMeta() instanceof Damageable) {
                 Damageable damageable = (Damageable) itemStack.getItemMeta();
                 int maxDurability = itemStack.getType().getMaxDurability();

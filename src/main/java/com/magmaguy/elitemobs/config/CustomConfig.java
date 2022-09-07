@@ -154,6 +154,8 @@ public class CustomConfig {
     private void initialize(File file) {
         //Load file configuration from file
         try {
+            //Make sure it's a yml configuration file
+            if (!file.getName().endsWith(".yml")) return;
             FileConfiguration fileConfiguration = YamlConfiguration.loadConfiguration(file);
             //Instantiate the correct CustomConfigFields instance
             Constructor<?> constructor = customConfigFields.getConstructor(String.class, boolean.class);

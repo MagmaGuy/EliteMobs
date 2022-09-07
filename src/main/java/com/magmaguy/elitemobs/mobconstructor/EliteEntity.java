@@ -258,7 +258,8 @@ public class EliteEntity {
         }
 
         if (entityType.equals(EntityType.ENDER_DRAGON))
-            Objects.requireNonNull(((EnderDragon) livingEntity).getBossBar()).setTitle(getName());
+            if (((EnderDragon) livingEntity).getBossBar() != null)
+                ((EnderDragon) livingEntity).getBossBar().setTitle(getName());
 
         if (entityType.equals(EntityType.LLAMA)) {
             KeepNeutralsAngry.showMeYouWarFace(this);

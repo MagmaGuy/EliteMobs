@@ -11,7 +11,6 @@ import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
-import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -25,6 +24,7 @@ public class SchematicDungeonPackage extends SchematicPackage implements Dungeon
     private final HashSet<RawContainer> rawChestLocations = new HashSet<>();
     private int lowestLevel;
     private int highestLevel;
+
     public SchematicDungeonPackage(DungeonPackagerConfigFields dungeonPackagerConfigFields) {
         super(dungeonPackagerConfigFields);
         for (String string : dungeonPackagerConfigFields.getRelativeBossLocations()) {
@@ -113,9 +113,9 @@ public class SchematicDungeonPackage extends SchematicPackage implements Dungeon
 
     private void qualifyEntities() {
         //Initialize data related to the highest and lowest levels for informational purposes
-        Pair<Integer, Integer> lowestAndHighestValues = DungeonUtils.getLowestAndHighestLevels(customBossEntityList);
-        this.lowestLevel = lowestAndHighestValues.getKey();
-        this.highestLevel = lowestAndHighestValues.getValue();
+        DungeonUtils.Pair lowestAndHighestValues = DungeonUtils.getLowestAndHighestLevels(customBossEntityList);
+        this.lowestLevel = lowestAndHighestValues.getLowestValue();
+        this.highestLevel = lowestAndHighestValues.getHighestValue();
     }
 
     private void installBosses() {

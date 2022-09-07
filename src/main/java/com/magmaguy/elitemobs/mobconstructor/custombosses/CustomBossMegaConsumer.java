@@ -72,6 +72,7 @@ public class CustomBossMegaConsumer {
         LivingEntity livingEntity = (LivingEntity) spawnLocation.getWorld().spawn(spawnLocation,
                 customBossesConfigFields.getEntityType().getEntityClass(),
                 entity -> applyBossFeatures((LivingEntity) entity));
+        setCustomModel(livingEntity);
         customBossEntity.setLivingEntity(livingEntity, CreatureSpawnEvent.SpawnReason.CUSTOM);
         return livingEntity;
     }
@@ -83,7 +84,7 @@ public class CustomBossMegaConsumer {
         setBaby(livingEntity);
         setFrozen(livingEntity);
         setDisguise(livingEntity);
-        setCustomModel(livingEntity);
+        //setCustomModel(livingEntity);
         setName(livingEntity);
         setFollowRange(livingEntity);
         setMovementSpeed(livingEntity);
@@ -120,7 +121,7 @@ public class CustomBossMegaConsumer {
     }
 
     private void setCustomModel(LivingEntity livingEntity) {
-        if (!Bukkit.getPluginManager().isPluginEnabled("ModelEngine") && !Bukkit.getPluginManager().isPluginEnabled("ModelEngine_Beta"))
+        if (!Bukkit.getPluginManager().isPluginEnabled("ModelEngine"))
             return;
         if (!customBossesConfigFields.isCustomModelExists()) return;
         if (customBossesConfigFields.getCustomModel() == null || customBossesConfigFields.getCustomModel().isEmpty())

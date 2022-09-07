@@ -1,18 +1,18 @@
 ItemSettings:
   itemLoreStructureV2:
-    - '&7&m&l---------&7<&lEquip Info&7>&m&l---------'
-    - '&7Item level: &f$itemLevel &7Prestige &6$prestigeLevel'
+    - '&7§m§l---------§7<§lEquip Info§7>§m§l---------'
+    - '&7Nível do Item: &f$itemLevel &7Prestígio &6$prestigeLevel'
     - '$weaponOrArmorStats'
     - '$soulbindInfo'
     - '$itemSource'
     - '$ifLore&7&m&l-----------&7< &f&lLore&7 >&m&l-----------'
     - '$customLore'
-    - '$ifEnchantments&7&m&l--------&7<&9&lEnchantments&7>&m&l--------'
+    - '$ifEnchantments&7&m&l--------&7<&9&lEncantamentos&7>&m&l--------'
     - '$enchantments,'
     - '$eliteEnchantments'
-    - '$ifCustomEnchantments&7&m&l------&7< &3&lCustom Enchants&7 >&m&l------'
+    - '$ifCustomEnchantments&7&m&l------&7< &3&lEncantamentos Customizados&7 >&m&l------'
     - '$customEnchantments'
-    - '$ifPotionEffects&7&m&l----------&7< &5&lEffects&7 >&m&l----------'
+    - '$ifPotionEffects&7&m&l----------&7< &5&lEfeitos&7 >&m&l----------'
     - '$potionEffect'
     - '&7&l&m-----------------------------'
     - '$loreResaleValue'
@@ -22,18 +22,18 @@ ItemSettings:
   loreResaleValues: '&7Vender por $resale $currencyName'
   eliteEnchantmentLoreStrings: Elite
   noSoulbindLore: '&7não é ligado à alma!'
-  scrapSucceededMessageV2: '&8[EliteMobs] &2Scrapping succeeded $amount times!'
-  scrapFailedMessageV2: '&8[EliteMobs] &cScrapping failed $amount times!'
-  lowDurabilityItemDropMessage: '&8[EliteMobs] &cDropped armor due to low durability! &8Repair it at the NPC with scrap to use it!'
-  lowWeaponItemDropMessage: '&8[EliteMobs] &cDropped weapon due to low durability! &8Repair it at the NPC with scrap to use it!'
-  simlootMessageSuccess: '&8[EliteMobs] &2Rolled for loot and got $itemName &2!'
-  simlootMessageFailure: '&8[EliteMobs] &cRolled for loot and got nothing!'
-  directDropCustomLootMessage: '&8[EliteMobs] &2Obtained $itemName &2!'
-  directDropMinecraftLootMessage: '&8[EliteMobs] &aObtained $itemName &a!'
-  directDropCoinMessage: '&8[EliteMobs] &aObtained &2$amount $currencyName &a!'
-  directDropSpecialMessage: '&8[EliteMobs] &aObtained &2$amount $name &a!'
+  scrapSucceededMessageV2: '&8[EliteMobs] &2Reciclagem deu certo $amount vezes!'
+  scrapFailedMessageV2: '&8[EliteMobs] &cReciclagem falhou $amount vezes!'
+  lowDurabilityItemDropMessage: '&8[EliteMobs] &cEquipamento jogado no chão devido à baixa durabilidade! &8Repare o item no NPC com scrap pra voltar a usa-lo!'
+  lowWeaponItemDropMessage: '&8[EliteMobs] &Arma jogada no chão devido à baixa durabilidade! &8Repare o item no NPC com scrap pra voltar a usa-lo!'
+  simlootMessageSuccess: '&8[EliteMobs] &2Joguei os dados para o loot e consegui $itemName &2!'
+  simlootMessageFailure: '&8[EliteMobs] &cJoguei os dados para o loot e não obtive nada!'
+  directDropCustomLootMessage: '&8[EliteMobs] &Obteve $itemName &2!'
+  directDropMinecraftLootMessage: '&8[EliteMobs] &Obtido $itemName &2!'
+  directDropCoinMessage: '&8[EliteMobs] &aObtido &2$amount $currencyName &a!'
+  directDropSpecialMessage: '&8[EliteMobs] &aObtido &2$amount $name &a!'
   weaponEntry: '&7Elite DPS: &2$EDPS'
-  armorEntry: '&7Elite Armor: &2$EDEF'
+  armorEntry: '&7Armadura de Elite: &2$EDEF'
 ProceduralItemGenerationSettings:
   materialNames:
     swordName: Sword
@@ -1415,7 +1415,7 @@ translation:
   Economy payment insuficient currency: '&cVocê não tem $currency_name suficiente para fazer isso!'
   Wallet command message: Você tem &2$balance $currency_name
   Tax confirmation message: '&cEnviar um pagamento custará $percentage% em impostos. &aUse &9$command &apara continuar!'
-  shopBatchSellItem: '&aYou have sold your items &afor $currency_amount $currency_name!'
+  shopBatchSellItem: '&aVocê vendeu seus itens &apor $currency_amount $currency_name!'
   Shop buy message: '&aVocê comprou $item_name &apor $item_value $currency_name!'
   Shop current balance message: '&aVocê tem $currency_amount $currency_name.'
   Shop insufficient funds message: '&cVocê não tem $currency_name suficiente!'
@@ -1426,12 +1426,12 @@ translation:
   Teleport time left: '&7[EM] Teleportando em &a$time &7segundos...'
   Teleport cancelled: '&7[EM] &cTeleporte interrompido!'
   noPendingCommands: '&cVocê não tem nenhum comando pendente!'
-  trackMessage: Track the $name
-  chestLowRankMessage: '&7[EM] &cYour guild rank needs to be at least $rank &cin order to open this chest!'
-  chestCooldownMessage: '&7[EM] &cYou''ve already opened this chest recently! Wait $time!'
-  insufficientCurrencyForWormholeMessage: '&8[EliteMobs] &cInsufficient currency! You need $amount to use this com.magmaguy.elitemobs.wormhole!'
-  dismissEMMessage: '&8[EliteMobs] &2/elitemobs &fmenu not working for you? Try &2/elitemobs alt &fto see an alternative version of the menu! &cDon''t want to see this message again? &4/em dismiss'
-  switchEMStyleMessage: '&8[EliteMobs] &2/elitemobs &fmenu style changed! Check it out!'
+  trackMessage: Rastrear o $name
+  chestLowRankMessage: '&7[EM] &c Seu rank de guilda necessita ser ao menos $rank &cpara poder abrir este baú!'
+  chestCooldownMessage: '&7[EM] &cVocê já abriu esse baú recentemente! Aguarde $time!'
+  insufficientCurrencyForWormholeMessage: '&8[EliteMobs] &cSaldo insuficiente! Você precisa de $amount para abrir este com.magmaguy.elitemobs.wormhole!'
+  dismissEMMessage: '&8[EliteMobs] &fMenu do &2/elitemobs não está funcionando para você? Tente &2/elitemobs alt &fpara ver uma versão alternativa do menu! &cNão quer ver essa mensagem novamente? &4/em dismiss'
+  switchEMStyleMessage: '&8[EliteMobs] O estilo do &fmenu &2/elitemobs foi atlerado! Verifique!'
 EconomySettings:
   currencyName: Elite Coins
   chatCurrencyShowerMessage: '&7[EM] Você pegou &a$amount $currency_name!'
@@ -1467,9 +1467,9 @@ drilling:
 durability:
   name: Durabilidade
 earthquake:
-  name: Earthquake
-  earthquakeActivationMessage: '&8[EliteMobs] &aEarthquake triggered! &c2 min cooldown!'
-  earthquakeAvailableMessage: '&8[EliteMobs] &2Earthquake cooldown over!'
+  name: Terremoto
+  earthquakeActivationMessage: '&8[EliteMobs] &aTerramoto disparado! &c2 min de cooldown!'
+  earthquakeAvailableMessage: '&8[EliteMobs] Cooldown do &2Earthquake terminou!'
 fire_aspect:
   name: Aspecto flamejante
 flamethrower:
@@ -1477,7 +1477,7 @@ flamethrower:
 frost_walker:
   name: Passos Gelados
 grappling_hook:
-  name: Grappling Hook
+  name: Gancho
 hunter:
   name: Caçador
 ice_breaker:
@@ -1487,7 +1487,7 @@ impaling:
 knockback:
   name: Repulsão
 lightning:
-  name: Lightning
+  name: Relâmpago
 loot_bonus_blocks:
   name: Fortuna
 loot_bonus_mobs:
@@ -1507,7 +1507,7 @@ oxygen:
 piercing:
   name: Perfuração
 plasma_boots:
-  name: Plasma Boots
+  name: Botas de Plasma
 protection_environmental:
   name: Proteção
 protection_explosions:
@@ -1549,7 +1549,7 @@ CombatTag:
   Combat tag message: '&c[EliteMobs] Tag de combate ativada!'
 AdventurersGuild:
   adventurersGuildMenuName: '&6&lAdventurer''s Hub'
-  Prestige 0 rank 0: '&8Commoner - disables elites!'
+  Prestige 0 rank 0: '&8Commoner - desabilita elites!'
   Prestige 0 rank 0 short placeholder: '&6&l✧&e0'
   Prestige 0 rank 1: '&fNovato'
   Prestige 0 rank 1 short placeholder: '&6&l✧&eⅠ'
@@ -1903,57 +1903,57 @@ AdventurersGuild:
   Prestige 10 rank 20 short placeholder: '&5⚜Ⅹ&6&l✧&eⅩⅩ'
   lootLimiterMessage: '&7[EM] Você precisa desbloquear o próximo rank da guilda através do /ag para obter itens melhores!'
   prestigeUnlockMessageTitle: '$player'
-  prestigeUnlockMessageSubtitle: '&2has unlocked $tier&2!'
+  prestigeUnlockMessageSubtitle: '&2desbloqueou $tier&2!'
 buy_or_sell_menu:
   Shop name: '[EM] Comprar ou vender'
 custom_quest_screen:
   headerTextLines2: |
     &a&l『&c&l$questName&a&l』
-  acceptTextLines: '&a&l[Accept!]'
-  acceptHoverLines: "&aClick to \n&aaccept quest!"
-  acceptedTextLines: '&2&lAccepted! &aTurn in with $npcName &4[Abandon]'
-  acceptedHoverLines: '&aClick to abandon quest!'
-  trackTextLines: '&2&l[Track]'
-  trackHoverLines: '&aClick to track quest!'
-  untrackTextLines: '&4&l[Untrack]'
-  untrackHoverLines: '&cClick to untrack quest!'
-  completedTextLines: '&2&l[Turn in!]'
-  completedHoverLines: '&aClick to turn quest in!'
-  turnedInTextLines: '&8[Completed!]'
-  turnedInHoverLines: '&8Already turned in!'
-  objectivesLine: '&c&lObjectives:'
-  killQuestDefaultSummaryLine: '&c➤Kill $name:$color$current&0/$color$target'
-  fetchQuestDefaultSummaryLine: '&c➤Get $name:$color&$current&0/$color$target'
-  dialogQuestDefaultSummaryLine: '&c➤Go talk to $name $location'
-  rewardsLine: '&2&lRewards:'
+  acceptTextLines: '&a&l[Aceitar!]'
+  acceptHoverLines: "&aClique para \n&aaceitar missão!"
+  acceptedTextLines: '&2&Aceita! &aComplete com o $npcName &4[Abandon]'
+  acceptedHoverLines: '&aClique para abandonar a quest!'
+  trackTextLines: '&2&l[Rastrear]'
+  trackHoverLines: '&aClique para rastrear a quest!'
+  untrackTextLines: '&4&l[Desacompanhar]'
+  untrackHoverLines: '&cClique para parar de rastrear a quest!'
+  completedTextLines: '&2&l[Completar!]'
+  completedHoverLines: '&aClique para completar a quest!'
+  turnedInTextLines: '&8[Concluído!]'
+  turnedInHoverLines: '&8Já foi completada!'
+  objectivesLine: '&c&lObjetivos:'
+  killQuestDefaultSummaryLine: '&c➤Elimine $name:$color$current&0/$color$target'
+  fetchQuestDefaultSummaryLine: '&c➤Obtenha $name:$color&$current&0/$color$target'
+  dialogQuestDefaultSummaryLine: '&c➤Vá falar com $name $location'
+  rewardsLine: '&2&lRecompensas:'
   rewardsDefaultSummaryLine: '&2➤$amountx $rewardName &8($chance%)'
 custom_shop_menu:
-  Shop name: '[EM] Custom Shop'
+  Shop name: '[EM] Loja de Itens Personalizados'
   Full inventory message: '[EliteMobs] &4Seu inventário está cheio! Você não pode comprar itens até obter algum espaço livre.'
 dynamic_quest_screen:
   questName: Derrote $amount $name
   headerTextLines2: |-
-    &c&lGuild request!
+    &c&lPedido de Guild!
     &0&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-  defaultLoreTextLines: '&8Slay $amount $name!'
-  acceptTextLines: '&a&lAccept!'
-  acceptHoverLines: "&aClick to \n&aaccept quest!"
-  acceptedTextLines: '&2&lAccepted! &4[Abandon]'
-  acceptedHoverLines: '&aClick to abandon quest!'
-  completedTextLines: '&2&l[Turn in!]'
-  completedHoverLines: '&aClick to turn quest in!'
-  turnedInTextLines: '&8[Completed!]'
-  turnedInHoverLines: '&8Already turned in!'
-  objectivesLine: '&c&lObjectives:'
-  killQuestDefaultSummaryLine: '&c➤Kill $name:$color$current&0/$color$target'
-  rewardsLine: '&2&lRewards:'
+  defaultLoreTextLines: '&8Derrote $amount $name!'
+  acceptTextLines: '&a&lAceitar!'
+  acceptHoverLines: "&aClique para \n&aaceitar missão!"
+  acceptedTextLines: '&2&lAceita! &4[Abandonar]'
+  acceptedHoverLines: '&aClique para abandonar a quest!'
+  completedTextLines: '&2&l[Completar!]'
+  completedHoverLines: '&aClique para completar a quest!'
+  turnedInTextLines: '&8[Concluído!]'
+  turnedInHoverLines: '&8Já foi completada!'
+  objectivesLine: '&c&lObjetivos:'
+  killQuestDefaultSummaryLine: '&c➤Elimine $name:$color$current&0/$color$target'
+  rewardsLine: '&2&lRecompensas:'
   rewardsDefaultSummaryLine: '&2➤$amountx $rewardName &8($chance%)'
 enhancement_menu:
   shopName: '[EM] Menu de Encantamentos!'
 get_loot_menu:
   Menu name: '[EM] Menu do Loot'
-  tierTranslation: Level
-  itemFilterTranslation: Filter by items of this level.
+  tierTranslation: Nível
+  itemFilterTranslation: Filtrar por itens deste nível.
 guild_rank_selector_menu:
   questTierSelectorMenuTitle: '[EM] Seleção de Rank da Guilda'
   lowTierWarning: '&cElites não podem soltar saques melhores!'
@@ -1966,7 +1966,7 @@ guild_rank_selector_menu:
   lootModifierMessages: '&fModificador de saque de Elite Mob: &a$modifier%'
   difficultyModifierMessages: '&fModificador de dificuldade de Elite Mob: &a$modifier%'
   lootTierMessages: '&2Elites podem soltar até o nível $tier de recompensas!'
-  currencyBonusMessages: '&a$amountx coins from drops and quests!'
+  currencyBonusMessages: '&a$amountx moedas de drops e quests!'
   healthBonusMessages: '&cAdiciona $amount ❤ de vida máxima'
   critBonusMessages: '&eAdiciona $amount% de chance de crítico'
   dodgeBonusMessages: '&8Adiciona $amount% de chance de esquivar'
@@ -1997,9 +1997,7 @@ player_status_screen:
   statsText2: '&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯'
   statsText4: '&2Dinheiro: &a$money'
   statsHover4: |-
-    Kill Elite Mobs to loot currency or
-    sell their drops in /em shop or
-    complete quests!
+    Mate Elite Mobs para conseguir moedas, venda drops no /em shop ou complete quests!
   statsText6: '&6Tier da guilda: &3$guildtier'
   statsHover6: |-
     Nivel de Prestigio e Rank de Guilda:
@@ -2018,8 +2016,8 @@ player_status_screen:
   statsHover9: Vezes morto por Elite Mobs.
   statsText10: '&5Missões completadas: &d$quests'
   statsHover10: |-
-    Amount of EliteMobs quests completed.
-    You can accept quests by talking to NPCs!
+    Quantidade de missões EliteMobs completadas.
+    Você pode aceitar quests falando com NPCs!
   statsText12: '&bPontuação: &3$score'
   statsHover12: |-
     Sua pontuação EliteMobs. Ele sobe
@@ -2072,7 +2070,7 @@ player_status_screen:
     no chat!
   questTrackerText0: '&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯'
   questTrackerText1: '&6&lMissões:'
-  questTrackerHover1: Talk to NPCs to accept quests!
+  questTrackerHover1: Fale com NPCs para aceitar quests!
   questTrackerText2: '&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯'
   onQuestTrackHover: Clique para abandonar!
   bossTrackerText0: '&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯'
@@ -2080,12 +2078,12 @@ player_status_screen:
   bossTrackerHover1: Chefões grandes são exibidos aqui!
   bossTrackerText2: '&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯'
   onBossTrackHover: Clique para rastrear/não rastrear!
-  teleportChestMenuName: '&2EliteMobs Teleports'
-  bossTrackerChestMenuName: '&2EliteMobs Boss Tracking'
-  indexChestMenuName: '&2EliteMobs Index'
-  gearChestMenuName: '&2EliteMobs Gear'
-  statsChestMenuName: '&2EliteMobs Stats'
-  commandsChestMenuName: '&2EliteMobs Commands'
+  teleportChestMenuName: '&2Teleports EliteMobs'
+  bossTrackerChestMenuName: '&2Rastreamento de Bosses EliteMobs'
+  indexChestMenuName: '&2Índice EliteMobs'
+  gearChestMenuName: '&2Tier EliteMobs'
+  statsChestMenuName: '&2Status EliteMobs'
+  commandsChestMenuName: '&2Comandos EliteMobs'
 procedural_shop_menu:
   Shop name: '[EM] Loja de Itens Unicos'
   Full inventory message: '&7[EliteMobs] &4Seu inventário está cheio! Você não pode comprar itens até obter algum espaço livre.'
@@ -2105,17 +2103,17 @@ quest_menu:
   questStartBroadcastMessage: '&7[EM] $player &2aceitou um $rank &2quest!'
   questStatusMessage: '&7[EM] &aVocê matou &a$currentAmount &f/ &c$objectiveAmount &a$objectiveName'
 refiner_menu:
-  shopName: '[EM] Place 10 scrap!'
+  shopName: '[EM] Coloque 10 sucatas!'
 repair_menu:
-  shopName: '[EM] Repair menu!'
+  shopName: '[EM] Menu de reparo!'
 scrapper_menu:
-  shopName: '[EM] Scrapper'
+  shopName: '[EM] Sucatedor'
 sell_menu:
   shopName: '[EM] Mercado de vendas'
 smelt_menu:
-  shopName: '[EM] Place 25 scrap!'
+  shopName: '[EM] Coloque 25 sucatas!'
 unbind_menu:
-  shopName: '[EM] Unbind menu!'
+  shopName: '[EM] Menu de desvinculação!'
 arrow_fireworks:
   name: Fecha de fogos de artifício
 arrow_rain:
@@ -2150,13 +2148,13 @@ attack_web:
 attack_wither:
   name: Apodrecimento
 bonus_coins:
-  name: Bonus Coins
+  name: Moedas bônus
 bonus_loot:
   name: Bônus de Saque
 bullet_hell:
   name: Projetil Infernal
 channel_healing:
-  name: Channel Healing
+  name: Cura de Canal
 corpse:
   name: Cadáver
 custom_summon:
@@ -2164,33 +2162,33 @@ custom_summon:
 death_slice:
   name: Fatia da Morte
 ender_dragon_aimed_fireball:
-  name: Aimed Fireballs
+  name: Bolas de Fogo Marcadas
 ender_dragon_arrow_bombardment:
-  name: Arrow Bombardment
+  name: Bombardeio de Flechas
 ender_dragon_disco_fireballs:
-  name: Disco Fireballs
+  name: Bolas de Fogo Disco
 ender_dragon_empowered_lightning:
-  name: Empowered Lightning
+  name: Relâmpago Fortalecido
 ender_dragon_endermite_bombardment:
-  name: Endermite Bombardment
+  name: Bombardeio de Endermite
 ender_dragon_ender_fireball_bombardment:
-  name: Ender Fireball Bombardment
+  name: Bombardeio de Bola de Fogo do Ender
 ender_dragon_fireball_bombardment:
-  name: Fireball Bombardment
+  name: Bombardeio de Bola de Fogo
 ender_dragon_potion_bombardment:
-  name: Potion Bombardment
+  name: Bombardeio de Poção
 ender_dragon_shockwave:
-  name: Shockwave
+  name: Onda de choque
 ender_dragon_tornado:
   name: Tornado
 firestorm:
-  name: Firestorm
+  name: Tempestade de fogo
 fireworks_barrage:
-  name: Fireworks Barrage
+  name: Barragem de Fogos de Artifício
 flame_pyre:
   name: Pira da Chama
 frost_cone:
-  name: Frost Cone
+  name: Cone Gélido
 gold_explosion:
   name: Explosão de Ouro
 gold_shotgun:
@@ -2210,17 +2208,17 @@ invulnerability_fire:
 invulnerability_knockback:
   name: Invulnerabilidade de Repulsão
 lightning_bolts:
-  name: Lightning Bolt
+  name: Relâmpago
 moonwalk:
   name: Caminhada Lunar
 movement_speed:
   name: velocidade_movimento
 photon_ray:
-  name: Photon Ray
+  name: Raio de Fótons
 plasma_blaster:
-  name: Plasma Blaster
+  name: Blaster de Plasma
 shield_wall:
-  name: Shield Wall
+  name: Muralha de Escudo
 skeleton_pillar:
   name: Pilar
 skeleton_tracking_arrow:
@@ -2288,7 +2286,7 @@ taunt:
     - Eu posso sentir o seu medo daqui!
     - Você esqueceu sua espada?
     - Covarde! Arco não é justo!
-    - Bows? That's so 2011...
+    - Arcos? É tão 2011...
     - Arcos são para os fracos de mente!
     - Arcos são para o fraco do espírito!
     - Arcos são para os fracos de coração!
@@ -2344,21 +2342,21 @@ taunt:
     - Acerte me com seu melhor tiro!
   onDamage:
     - Um golpe sólido!
-    - He shoots, and he scores!
-    - You'll feel that in the morning!
+    - Ele atira, ele marca pontos!
+    - Você vai sentir isso de manhã!
     - A vitória se aproxima!
     - A vitória será minha!
     - Isso foi apenas metade do meu poder!
-    - You came to the wrong hood!
+    - Você veio pra favela errada!
     - Cê mexeu com o cara errado!
-    - Get ready to get mobbed on!
+    - Prepare-se para o mob!
     - Este foi seu último erro!
     - Sinta-se Queimar!
     - John Cena
-    - How are you still standing?
-    - Just give up already!
+    - C-Como você ainda está de pé?
+    - Desista de uma vez!
     - Desista!
-    - I have the high ground!
+    - Eu estou com um terreno alto!
     - Vou acabar com você!
     - Espero que você tenha vindo preparado para a dor!
     - O caçador se torna a caça!
@@ -2371,8 +2369,8 @@ taunt:
     - Vocês não estão preparado.
     - Zug zug!
     - Quase não vale a pena!
-    - I thought this was a challenge?
-    - 'Pro tip: don''t get hit'
+    - Pensei que este era um desafio?
+    - 'Dica de profissional: não seja atingido'
     - Ima firin mah lazer bwooooooooo
     - Pelo Imperador!
     - O Herobrine ficará satisfeito!
@@ -2385,7 +2383,7 @@ taunt:
     - Eu estou apenas começando!
     - Isso foi só um aquecimento!
     - Você não é páreo para mim!
-    - RKO out of nowhere!
+    - RKO fora de lugar!
     - Posso fazer isto a noite toda!
     - Um belo saco de pancada!
     - Eu sou a noite!
@@ -2404,15 +2402,15 @@ taunt:
     - 9001 de dano!
     - Continua em pé?
     - Encare sua derrota!
-    - A taste of pain to come!
-    - I'll make you endangered!
+    - Um gosto de dor por vir!
+    - Vou te deixar em perigo!
   onDeath:
     - Infelizmente, pobre Yorick!
     - O resto é silêncio
     - Eu voltarei
     - Imperdoável
     - Eu vivo, eu morro, eu vivo de novo!
-    - WITNESS ME
+    - SEGUIR ME
     - Cavalgarei até valhalla!
     - VALHALLA!
     - VALHALA! LIBERTAÇÃO
@@ -2431,7 +2429,7 @@ taunt:
     - Eu estarei esperando por vocês
     - Vou me vingar!
     - Eu não irei tranquilamente para a noite
-    - Should've gotten life insurance
+    - Deveria ter um seguro de vida..
     - Foi o meu último dia no serviço
     - Foi meu último dia aqui
     - Et tu, Brute?
@@ -2454,7 +2452,7 @@ taunt:
     - Venha aqui!
     - O que eu estou vendo? Um covarde?
     - Senhor, prepare seus punhos!
-    - Let's settle this like cavemen!
+    - Vamos acabar com isso como homens das cavernas!
     - Em guarda!
     - Cuidado! Um creeper, atrás de você!
     - Aren't you a right ugly mug!

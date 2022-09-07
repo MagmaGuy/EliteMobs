@@ -8,7 +8,6 @@ import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
 import lombok.Getter;
-import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -75,9 +74,9 @@ public class WorldDungeonPackage extends WorldPackage implements Dungeon {
 
     private void qualifyEntities() {
         //Initialize data related to the highest and lowest levels for informational purposes
-        Pair<Integer, Integer> lowestAndHighestValues = DungeonUtils.getLowestAndHighestLevels(customBossEntityList);
-        this.lowestLevel = lowestAndHighestValues.getKey();
-        this.highestLevel = lowestAndHighestValues.getValue();
+        DungeonUtils.Pair lowestAndHighestValues = DungeonUtils.getLowestAndHighestLevels(customBossEntityList);
+        this.lowestLevel = lowestAndHighestValues.getLowestValue();
+        this.highestLevel = lowestAndHighestValues.getHighestValue();
     }
 
     private void getChests() {

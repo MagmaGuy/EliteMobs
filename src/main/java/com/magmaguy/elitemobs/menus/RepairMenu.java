@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.menus;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.api.EliteMobsItemDetector;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
@@ -154,7 +153,7 @@ public class RepairMenu extends EliteMenu {
                 }
 
                 //Item is elite item
-                if (EliteMobsItemDetector.isEliteMobsItem(currentItem))
+                if (EliteItemManager.isEliteMobsItem(currentItem))
                     if (currentItem.getItemMeta() instanceof Damageable)
                         if (repairInventory.getItem(eliteItemInputSlot) == null) {
                             repairInventory.setItem(eliteItemInputSlot, currentItem);

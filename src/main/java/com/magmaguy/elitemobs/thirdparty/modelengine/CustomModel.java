@@ -6,8 +6,11 @@ import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import com.ticxo.modelengine.api.ModelEngineAPI;
+import com.ticxo.modelengine.api.animation.state.ModelState;
+import com.ticxo.modelengine.api.generator.model.ModelBlueprint;
 import com.ticxo.modelengine.api.model.ActiveModel;
 import com.ticxo.modelengine.api.model.ModeledEntity;
+import com.ticxo.modelengine.api.model.bone.Nameable;
 import lombok.Getter;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Projectile;
@@ -20,34 +23,27 @@ public class CustomModel {
 
     ActiveModel activeModel;
     ModeledEntity modeledEntity;
-    /*
+
     ModelBlueprint modelBlueprint;
-     */
+
     @Getter
     private boolean success = false;
-//todo: code for ModelEngine B3.0.0 is here, not live because of several issues like having to generate a new resource pack and also the code not fully working
 
     private CustomModel(LivingEntity livingEntity, String modelName, String nametagName) {
         try {
-            /*
-            if (ModelEngineAPI.api.getModelRegistry().getBlueprint(modelName) == null)
-             */
-            if (ModelEngineAPI.api.getModelManager().getModelRegistry().getModelBlueprint(modelName) == null) {
+            if (ModelEngineAPI.api.getModelRegistry().getBlueprint(modelName) == null) {
                 new InfoMessage("Model " + modelName + " was not found! Make sure you install the model correctly if you have it. This entry will be skipped!");
                 return;
             }
         } catch (NoSuchMethodError ex) {
-            new WarningMessage("Model Engine API version is not supported. Currently Elitemobs can only support ModelEngine B3.0.0, documentation for other versions doesn't exist.");
+            new WarningMessage("Model Engine API version is not supported. Currently Elitemobs can only support ModelEngine R3.0.0.");
             return;
         }
 
-        /*
         modelBlueprint = ModelEngineAPI.api.getModelRegistry().getBlueprint(modelName);
-         */
-        activeModel = ModelEngineAPI.api.getModelManager().createActiveModel(modelName);
-        /*
-        activeModel = ModelEngineAPI.createActiveModel(modelName);
-         */
+
+        activeModel = ModelEngineAPI.createActiveModel(modelBlueprint);
+
         if (activeModel == null) {
             new WarningMessage("Failed to load model from " + modelName + " ! Is the model name correct, and has the model been installed correctly?");
             return;
@@ -61,16 +57,9 @@ public class CustomModel {
         }
 
         try {
-            /*
             modeledEntity.addModel(activeModel, true);
-            modeledEntity.setBaseEntityVisible(false);
             activeModel.playDefaultAnimation(ModelState.IDLE);
             setName(nametagName, true);
-            success = true;
-             */
-            modeledEntity.addActiveModel(activeModel);
-            modeledEntity.detectPlayers();
-            modeledEntity.setInvisible(true);
             success = true;
         } catch (Exception exception) {
             modeledEntity.removeModel(modelName);
@@ -87,90 +76,62 @@ public class CustomModel {
 
     public static void reloadModels() {
         try {
-            /*
             ModelEngineAPI.api.getGenerator().importModelsAsync();
-             */
-            ModelEngineAPI.api.getModelManager().registerModels();
         } catch (Exception ex) {
-            new WarningMessage("Model Engine API version is not supported. Currently Elitemobs can only support ModelEngine R2.5.0, documentation for other versions doesn't exist.");
+            new WarningMessage("Model Engine API version is not supported. Currently Elitemobs can only support ModelEngine R3.0.0.");
         }
+    }
+
+    public static boolean modelExists(String modelName) {
+        if (modelName == null || modelName.isEmpty()) return false;
+        try {
+            if (ModelEngineAPI.api.getModelRegistry().getBlueprint(modelName) == null) {
+                new InfoMessage("Model " + modelName + " was not found! Make sure you install the model correctly if you have it. This entry will be skipped!");
+                return false;
+            }
+        } catch (NoSuchMethodError ex) {
+            new WarningMessage("Model Engine API version is not supported. Currently Elitemobs can only support ModelEngine R3.0.0, documentation for other versions doesn't exist.");
+            return false;
+        }
+
+        return true;
     }
 
     public void shoot() {
         if (activeModel == null) return;
-        /*
+
         if (modelBlueprint.getAnimations().containsKey("attack_ranged"))
-            activeModel.getAnimationHandler().playAnimation("attack_ranged", 1, 1, 1);
+            activeModel.getAnimationHandler().playAnimation("attack_ranged", 1, 1, 1, true);
         else
-            activeModel.getAnimationHandler().playAnimation("attack", 1, 1, 1);
-         */
-        if (activeModel.getState("attack_ranged") != null)
-            activeModel.addState("attack_ranged", 1, 1, 1);
-        else
-            activeModel.addState("attack", 1, 1, 1);
+            activeModel.getAnimationHandler().playAnimation("attack", 1, 1, 1, true);
     }
 
     public void melee() {
-        /*
+
         if (activeModel == null) return;
         if (modelBlueprint.getAnimations().containsKey("attack_melee"))
-            activeModel.getAnimationHandler().playAnimation("attack_melee", 1, 1, 1);
+            activeModel.getAnimationHandler().playAnimation("attack_melee", 1, 1, 1, true);
         else
-            activeModel.getAnimationHandler().playAnimation("attack", 1, 1, 1);
-         */
-        if (activeModel.getState("attack_melee") != null)
-            activeModel.addState("attack_melee", 1, 1, 1);
-        else
-            activeModel.addState("attack", 1, 1, 1);
+            activeModel.getAnimationHandler().playAnimation("attack", 1, 1, 1, true);
     }
 
     public void setName(String nametagName, boolean visible) {
         if (modeledEntity == null) return;
-        /*
-        activeModel.getNametagHandler().getBones().get("hitbox").setCustomName(nametagName);
-        activeModel.getNametagHandler().getBones().get("hitbox").setCustomNameVisible(visible);
-         */
-        modeledEntity.getNametagHandler().setCustomName("hitbox", nametagName);
-        modeledEntity.getNametagHandler().setCustomNameVisibility("hitbox", true);
-    }
-
-    public void switchPhase() {
-        //activeModel.getAnimationHandler().forceStopAllAnimations();
+        Nameable nametag = activeModel.getNametagHandler().getBones().get("hitbox");
+        if (nametag == null) {
+            new WarningMessage("Failed to get hitbox nametag for disguise!");
+            return;
+        }
+        nametag.setCustomName(nametagName);
+        nametag.setCustomNameVisible(visible);
     }
 
     public void setNameVisible(boolean visible) {
-        /*
         activeModel.getNametagHandler().getBones().get("hitbox").setCustomNameVisible(visible);
-
-         */
-        modeledEntity.getNametagHandler().setCustomNameVisibility("hitbox", visible);
     }
 
-    public static boolean modelIsLoaded(String modelName) {
-        if (modelName == null || modelName.isEmpty()) return false;
-        try {
-            /*
-            if (ModelEngineAPI.api.getModelRegistry().getBlueprint(modelName) == null)
-             */
-            if (ModelEngineAPI.api.getModelManager().getModelRegistry().getModelBlueprint(modelName) == null)
-                new InfoMessage("Model " + modelName + " was not found! Make sure you install the model correctly if you have it. This entry will be skipped!");
-        } catch (NoSuchMethodError ex) {
-            new WarningMessage("Model Engine API version is not supported. Currently Elitemobs can only support ModelEngine B3.0.0, documentation for other versions doesn't exist.");
-            return false;
-        }
-
-        /*
-        modelBlueprint = ModelEngineAPI.api.getModelRegistry().getBlueprint(modelName);
-         */
-        ActiveModel activeModel = ModelEngineAPI.api.getModelManager().createActiveModel(modelName);
-        /*
-        activeModel = ModelEngineAPI.createActiveModel(modelName);
-         */
-        if (activeModel == null) {
-            new WarningMessage("Failed to load model from " + modelName + " ! Is the model name correct, and has the model been installed correctly?");
-            return false;
-        }
-        return true;
+    public void switchPhase() {
+        activeModel.getAnimationHandler().forceStopAllAnimations();
     }
 
     public static class ModelEntityEvents implements Listener {
