@@ -37,6 +37,13 @@ public class DisguiseEntity {
             return;
         }
 
+
+        boolean baby = false;
+        if (disguiseName.contains(":baby")) {
+            disguiseName = disguiseName.replace(":baby", "");
+            baby = true;
+        }
+
         DisguiseType disguiseType;
 
         try {
@@ -47,7 +54,7 @@ public class DisguiseEntity {
         }
 
         if (disguiseType.isMob())
-            livingEntityDisguise(disguiseType, entity);
+            livingEntityDisguise(disguiseType, entity, baby);
         else if (disguiseType.isMisc())
             miscEntityDisguise(disguiseType, entity);
         else
@@ -66,8 +73,8 @@ public class DisguiseEntity {
         playerDisguise.startDisguise();
     }
 
-    private static void livingEntityDisguise(DisguiseType disguiseType, Entity entity) {
-        MobDisguise mobDisguise = new MobDisguise(disguiseType);
+    private static void livingEntityDisguise(DisguiseType disguiseType, Entity entity, boolean baby) {
+        MobDisguise mobDisguise = new MobDisguise(disguiseType, !baby);
         mobDisguise.setEntity(entity);
         mobDisguise.setDisguiseName(entity.getCustomName());
         mobDisguise.setDynamicName(true);

@@ -200,7 +200,7 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
             else if (validPlayer &&
                     (event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK) ||
                             event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK) &&
-                                    EliteMobsItemDetector.isEliteMobsItem(player.getInventory().getItemInMainHand())))
+                                    EliteItemManager.isEliteMobsItem(player.getInventory().getItemInMainHand())))
                 eliteDamage = getEliteMeleeDamage(player, livingEntity);
             else if (event.getCause().equals(EntityDamageEvent.DamageCause.PROJECTILE))
                 //Scan arrow for arrow damage

@@ -1,6 +1,6 @@
 package com.magmaguy.elitemobs.playerdata.statusscreen;
 
-import com.magmaguy.elitemobs.api.EliteMobsItemDetector;
+import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.menus.premade.PlayerStatusMenuConfig;
 import com.magmaguy.elitemobs.items.ShareItem;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
@@ -212,19 +212,19 @@ public class GearPage {
     protected static void gearPage(Player requestingPlayer, Player targetPlayer) {
         Inventory inventory = Bukkit.createInventory(requestingPlayer, 54, PlayerStatusMenuConfig.getGearChestMenuName());
         //head
-        if (EliteMobsItemDetector.isEliteMobsItem(targetPlayer.getInventory().getArmorContents()[3]))
+        if (EliteItemManager.isEliteMobsItem(targetPlayer.getInventory().getArmorContents()[3]))
             inventory.setItem(11, targetPlayer.getInventory().getArmorContents()[3]);
         //main hand
-        if (EliteMobsItemDetector.isEliteMobsItem(targetPlayer.getInventory().getItemInMainHand()))
+        if (EliteItemManager.isEliteMobsItem(targetPlayer.getInventory().getItemInMainHand()))
             inventory.setItem(19, targetPlayer.getInventory().getItemInMainHand());
         //chestplate
-        if (EliteMobsItemDetector.isEliteMobsItem(targetPlayer.getInventory().getArmorContents()[2]))
+        if (EliteItemManager.isEliteMobsItem(targetPlayer.getInventory().getArmorContents()[2]))
             inventory.setItem(20, targetPlayer.getInventory().getArmorContents()[2]);
         //shield
-        if (EliteMobsItemDetector.isEliteMobsItem(targetPlayer.getInventory().getItemInOffHand()))
+        if (EliteItemManager.isEliteMobsItem(targetPlayer.getInventory().getItemInOffHand()))
             inventory.setItem(21, targetPlayer.getInventory().getItemInOffHand());
         //leggings
-        if (EliteMobsItemDetector.isEliteMobsItem(targetPlayer.getInventory().getArmorContents()[1]))
+        if (EliteItemManager.isEliteMobsItem(targetPlayer.getInventory().getArmorContents()[1]))
             inventory.setItem(29, targetPlayer.getInventory().getArmorContents()[1]);
         //boots
         inventory.setItem(38, targetPlayer.getInventory().getArmorContents()[0]);

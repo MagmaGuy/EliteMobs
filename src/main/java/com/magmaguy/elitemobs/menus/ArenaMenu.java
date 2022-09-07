@@ -20,8 +20,8 @@ import java.util.Map;
 public class ArenaMenu {
     public void constructArenaMenu(Player player, String arenaFilename) {
         ArenaInstance arenaInstance = ArenaInstance.getArenaInstances().get(arenaFilename);
-        if (arenaFilename == null) {
-            player.sendMessage(ChatColorConverter.convert("&4[EliteMobs] &cInvalid arena name!"));
+        if (arenaInstance == null) {
+            player.sendMessage(ChatColorConverter.convert("&4[EliteMobs] &cInvalid arena name! The arena you are trying to join is not correctly setup."));
             return;
         }
         String menuName = ArenaMenuConfig.getMenuName() + arenaInstance.getCustomArenasConfigFields().getArenaName();

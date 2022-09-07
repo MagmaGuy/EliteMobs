@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.dungeons.WorldDungeonPackage;
 import com.magmaguy.elitemobs.dungeons.WorldPackage;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.utils.WarningMessage;
-import org.apache.commons.lang3.tuple.Pair;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
 import org.bukkit.World;
@@ -17,7 +17,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 public class DungeonUtils {
-    public static Pair<Integer, Integer> getLowestAndHighestLevels(List<CustomBossEntity> customBossEntities) {
+    public static Pair getLowestAndHighestLevels(List<CustomBossEntity> customBossEntities) {
         int lowestLevel = 0;
         int highestLevel = 0;
 
@@ -29,7 +29,19 @@ public class DungeonUtils {
             } catch (Exception ex) {
             }
         }
-        return Pair.of(lowestLevel, highestLevel);
+        return new Pair(lowestLevel, highestLevel);
+    }
+
+    public static class Pair {
+        @Getter
+        Integer lowestValue;
+        @Getter
+        Integer highestValue;
+
+        public Pair(Integer lowestValue, Integer highestValue) {
+            this.lowestValue = lowestValue;
+            this.highestValue = highestValue;
+        }
     }
 
 

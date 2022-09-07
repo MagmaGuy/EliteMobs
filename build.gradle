@@ -5,6 +5,7 @@ plugins {
     id 'idea'
     id 'maven-publish'
     id "com.github.johnrengelman.shadow" version "7.0.0"
+    id 'signing'
 }
 
 //Fixes issues related to special characters being used
@@ -12,7 +13,7 @@ compileJava.options.encoding = "UTF-8"
 compileTestJava.options.encoding = "UTF-8"
 
 group 'com.magmaguy'
-version '8.0.3'
+version '8.0.4-SNAPSHOT-1'
 
 repositories {
     maven {
@@ -110,7 +111,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
 
     //Model Engine
-    compileOnly "com.ticxo.modelengine:api:R2.5.0"
+    compileOnly "com.ticxo.modelengine:api:R3.0.0"
 
     testCompileOnly 'org.projectlombok:lombok:1.18.24'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.22'
@@ -157,4 +158,53 @@ ext {
 
 processResources {
     filter ReplaceTokens, tokens: resourceTokens
+}
+
+//sonatype repo
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+ext.isReleaseVersion = !version.contains("SNAPSHOT")
+
+publishing {
+    repositories {
+        maven {
+            def releaseRepo = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            def snapshotRepo = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+            url = isReleaseVersion ? releaseRepo : snapshotRepo
+            credentials {
+                username = project.hasProperty('ossrhUsername') ? ossrhUsername : "Unknown user"
+                password = project.hasProperty('ossrhPassword') ? ossrhPassword : "Unknown password"
+            }
+        }
+    }
+
+    publications {
+        mavenJava(MavenPublication) {
+            pom {
+                groupId = 'com.magmaguy'
+                name = 'elitemobs'
+                description = 'EliteMobs repo'
+                url = 'https://example.com/'
+                from components.java
+                licenses {
+                    license {
+                        name = 'GPLV3'
+                        url = 'https://www.gnu.org/licenses/gpl-3.0.en.html'
+                    }
+                }
+            }
+        }
+    }
 }
