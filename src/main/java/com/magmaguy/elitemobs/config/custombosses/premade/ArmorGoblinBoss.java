@@ -16,7 +16,7 @@ public class ArmorGoblinBoss extends CustomBossesConfigFields {
                 "$eventBossLevel &3Armor Goblin",
                 "dynamic");
         setHealthMultiplier(4);
-        setDamageMultiplier(4);
+        setDamageMultiplier(2);
         setHelmet(new ItemStack(Material.DIAMOND_HELMET));
         setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
         setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));

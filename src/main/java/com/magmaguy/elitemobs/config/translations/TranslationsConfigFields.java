@@ -7,12 +7,13 @@ import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.config.CustomConfigFieldsInterface;
 import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
-import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -45,7 +46,9 @@ public class TranslationsConfigFields extends CustomConfigFields implements Cust
         //This happens the first time the plugin gets installed
         if (!Files.exists(realPath)) {
             try {
-                FileUtils.copyInputStreamToFile(MetadataHandler.PLUGIN.getResource("translations/" + parsedFilename), realPath.toFile());
+                BufferedReader in = new BufferedReader(new InputStreamReader(MetadataHandler.PLUGIN.getResource("translations/" + parsedFilename), StandardCharsets.UTF_8));
+                YamlConfiguration config = YamlConfiguration.loadConfiguration(in);
+                ConfigurationEngine.fileSaverCustomValues(config, realPath.toFile());
             } catch (Exception ex) {
                 new InfoMessage("Translation filename " + parsedFilename + " is not prepackaged. This is fine if it is meant to be a custom translation.");
                 customLanguage = true;
@@ -70,9 +73,14 @@ public class TranslationsConfigFields extends CustomConfigFields implements Cust
                 new InfoMessage("Failed to create language data file for file " + filename + " backup file should've been " + languageDataFilename);
             }
 
-        translationDataFile = dataPath.toFile();
-        translationData = YamlConfiguration.loadConfiguration(translationDataFile);
 
+        translationDataFile = dataPath.toFile();
+        try {
+            translationData = YamlConfiguration.loadConfiguration(new InputStreamReader(new FileInputStream(translationDataFile), StandardCharsets.UTF_8));
+        } catch (Exception ex) {
+            new WarningMessage("Failed to read translation data!");
+            return;
+        }
         /*
         Get the prepackaged translations file
          */
@@ -133,14 +141,6 @@ public class TranslationsConfigFields extends CustomConfigFields implements Cust
         }
     }
 
-    private boolean objectComparer(Object one, Object two) {
-        if (one instanceof String && two instanceof String)
-            return ((String) one).equals((String) two);
-        if (one instanceof List && two instanceof List)
-            return ((List) one).equals((List) two);
-        return false;
-    }
-
     public void add(String filename, String key, Object value) {
         if (value == null) return;
 
@@ -196,7 +196,4 @@ public class TranslationsConfigFields extends CustomConfigFields implements Cust
         return uncoloredList;
     }
 
-    private void updateSourceText() {
-
-    }
 }

@@ -17,7 +17,7 @@ public class WeaponsGoblinBoss extends CustomBossesConfigFields {
                 "$eventBossLevel &cWeapons Goblin",
                 "dynamic");
         setHealthMultiplier(4);
-        setDamageMultiplier(4);
+        setDamageMultiplier(2);
         if (!VersionChecker.serverVersionOlderThan(16, 0)) {
             setHelmet(new ItemStack(Material.NETHERITE_HELMET));
             setChestplate(new ItemStack(Material.NETHERITE_CHESTPLATE));
