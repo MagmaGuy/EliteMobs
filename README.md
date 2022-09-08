@@ -23,7 +23,7 @@ Maven repository:
 <dependency>
   <groupId>com.magmaguy</groupId>
   <artifactId>EliteMobs</artifactId>
-  <version>8.0.4-SNAPSHOT</version>
+  <version><check_version_above>-SNAPSHOT</version>
 </dependency>
 ```
 
