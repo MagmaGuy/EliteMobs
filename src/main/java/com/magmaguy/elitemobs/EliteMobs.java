@@ -108,7 +108,6 @@ public class EliteMobs extends JavaPlugin {
         MobCombatSettingsConfig.initializeConfig();
         CommandsConfig.initializeConfigs();
         DiscordSRVConfig.initializeConfig();
-        ReadMeForTranslationsConfig.initialize();
         ItemUpgradeSystemConfig.initializeConfig();
         new CustomEventsConfig();
         QuestsConfig.initializeConfig();

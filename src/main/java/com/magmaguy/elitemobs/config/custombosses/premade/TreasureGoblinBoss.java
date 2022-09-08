@@ -16,7 +16,7 @@ public class TreasureGoblinBoss extends CustomBossesConfigFields {
                 "$eventBossLevel &eTreasure Goblin",
                 "dynamic");
         setHealthMultiplier(4);
-        setDamageMultiplier(4);
+        setDamageMultiplier(2);
         setHelmet(new ItemStack(Material.GOLDEN_HELMET));
         setChestplate(new ItemStack(Material.GOLDEN_CHESTPLATE));
         setLeggings(new ItemStack(Material.GOLDEN_LEGGINGS));

@@ -12,7 +12,7 @@ public class BeastMasterBoss extends CustomBossesConfigFields {
                 true,
                 "$eventBossLevel &6Beast Master",
                 "dynamic");
-        setHealthMultiplier(2);
+        setHealthMultiplier(4);
         setDamageMultiplier(2);
         setSpawnMessage("&cThe Beast Master has been sighted!");
         setDeathMessage("&aThe Best Master has been slain by $players!");

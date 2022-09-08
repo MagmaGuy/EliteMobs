@@ -12,8 +12,18 @@ plugins {
 compileJava.options.encoding = "UTF-8"
 compileTestJava.options.encoding = "UTF-8"
 
+//Fixes issues with utf-8 in the translations files. Why? Don't know.
+processResources {
+    def props = [version: version]
+    inputs.properties props
+    filteringCharset 'UTF-8'
+    filesMatching('plugin.yml') {
+        expand props
+    }
+}
+
 group 'com.magmaguy'
-version '8.0.4-SNAPSHOT-1'
+version '8.0.4-SNAPSHOT'
 
 repositories {
     maven {
