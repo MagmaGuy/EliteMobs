@@ -16,7 +16,7 @@ public class BlayyzeConfig extends CustomBossesConfigFields {
         setTimeout(30);
         setPersistent(true);
         setHealthMultiplier(4);
-        setDamageMultiplier(0.5);
+        setDamageMultiplier(2);
         setPowers(Arrays.asList("meteor_shower.yml", "summon_embers.yml", "bullet_hell.yml", "spirit_walk.yml"));
         setSpawnMessage("&cSomething came out of the meteorite's crater...");
         setDeathMessage("&6$players completed first contact.");

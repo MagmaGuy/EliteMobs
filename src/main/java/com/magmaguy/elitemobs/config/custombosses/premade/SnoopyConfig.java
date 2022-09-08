@@ -20,7 +20,7 @@ public class SnoopyConfig extends CustomBossesConfigFields {
                 "dynamic");
         setTimeout(3);
         setHealthMultiplier(10);
-        setDamageMultiplier(5);
+        setDamageMultiplier(2);
         setPowers(Collections.singletonList("invulnerability_fire.yml"));
         setDropsVanillaLoot(false);
         setDropsEliteMobsLoot(false);

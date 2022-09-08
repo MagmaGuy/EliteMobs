@@ -9,8 +9,10 @@ public class CombatSystem {
      * This determines how many hits it takes to kill a boss.
      * Unfortunately, since it's flat, at a scale, all bosses tend to end up having the same amount of life.
      * It accomplishes this by adding this flat amount of health to bosses.
+     *
+     * Minus one because bosses start with 7 hp in the normalized combat system. They always have some baseline hp.
      */
-    public static final double TARGET_HITS_TO_KILL = 7D; //affects max health assignment on EliteMobEntity.java
+    public static final double TARGET_HITS_TO_KILL_MINUS_ONE = 6D; //affects max health assignment on EliteMobEntity.java
     //this sets the tier of various materials
     public static final int NETHERITE_TIER_LEVEL = 8;
     public static final int DIAMOND_TIER_LEVEL = 7;

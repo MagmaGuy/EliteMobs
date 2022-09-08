@@ -13,7 +13,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,7 +47,12 @@ public class ConfigurationEngine {
     }
 
     public static FileConfiguration fileConfigurationCreator(File file) {
-        return YamlConfiguration.loadConfiguration(file);
+        try {
+            return YamlConfiguration.loadConfiguration(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
+        } catch (Exception exception) {
+            new WarningMessage("Failed to read configuration from file " + file.getName());
+            return null;
+        }
     }
 
     public static void fileSaverCustomValues(FileConfiguration fileConfiguration, File file) {

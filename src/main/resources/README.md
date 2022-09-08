@@ -23,14 +23,8 @@ Maven repository:
 <dependency>
   <groupId>com.magmaguy</groupId>
   <artifactId>EliteMobs</artifactId>
-  <version>8.0.3</version>
+  <version>8.0.4-SNAPSHOT</version>
 </dependency>
-```
-
-Gradle repository for people with good taste:
-
-```
-compileOnly "com.magmaguy:EliteMobs:8.0.3"
 ```
 
 ---
