@@ -219,7 +219,7 @@ public class MatchInstance {
 
     public void playerDeath(Player player) {
         if (!players.contains(player)) return;
-        player.setHealth(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue());
+        player.setHealth(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
         players.remove(player);
         if (players.isEmpty()) {
             endMatch();

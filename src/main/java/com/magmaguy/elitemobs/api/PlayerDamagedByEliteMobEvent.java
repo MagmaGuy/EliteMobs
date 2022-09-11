@@ -224,7 +224,8 @@ public class PlayerDamagedByEliteMobEvent extends Event implements Cancellable {
 
             if (bypass) {
                 //Use raw damage in case of bypass
-                newDamage = event.getDamage();
+                newDamage = event.getOriginalDamage(EntityDamageEvent.DamageModifier.BASE);
+                bypass = false;
             }
 
             //Set the final damage value

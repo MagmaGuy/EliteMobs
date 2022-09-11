@@ -323,7 +323,7 @@ public class QuestTracking {
 
         @EventHandler(ignoreCancelled = true)
         public void onQuestProgressEvent(QuestProgressionEvent event) {
-            if (!event.getObjective().isObjectiveCompleted()) return;
+            //if (event.getObjective().isObjectiveCompleted()) return;
             if (!isTracking(event.getPlayer())) return;
             if (!getPlayerTrackingQuests().get(event.getPlayer()).getCustomQuest().getQuestID().equals(event.getQuest().getQuestID()))
                 return;

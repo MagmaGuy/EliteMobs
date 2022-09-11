@@ -89,7 +89,7 @@ public class QuestInteractionHandler {
                 npcQuests.add((CustomQuest) quest);
                 for (Objective objective : quest.getQuestObjectives().getObjectives())
                     if (objective instanceof CustomFetchObjective)
-                        objective.progressNonlinearObjective(quest.getQuestObjectives(), player, true);
+                        objective.progressNonlinearObjective(quest.getQuestObjectives(), player, 0);
             }
         }
     }

@@ -107,7 +107,7 @@ public class CustomBossDeath implements Listener {
                     if (string.length() > 0)
                         if (customBossEntity.customBossesConfigFields.getAnnouncementPriority() > 2)
                             new DiscordSRVAnnouncement(ChatColorConverter.convert(string));
-                        else
+                        else if (customBossEntity.customBossesConfigFields.getAnnouncementPriority() < 1)
                             for (Player player : customBossEntity.getDamagers().keySet())
                                 player.sendMessage(ChatColorConverter.convert(string));
                 }
