@@ -43,46 +43,16 @@ public class CustomFetchObjective extends Objective {
         this.key = customItemFilename;
     }
 
-    private static void checkEvent(@NotNull Player player, @NotNull ItemStack itemStack, boolean increment) {
+    private static void checkEvent(@NotNull Player player, @NotNull ItemStack itemStack, int newAmount) {
         for (Quest quest : PlayerData.getQuests(player.getUniqueId()))
             for (Objective objective : quest.getQuestObjectives().getObjectives())
                 if (objective instanceof CustomFetchObjective)
-                    ((CustomFetchObjective) objective).checkItem(player, itemStack, increment, quest.getQuestObjectives());
+                    ((CustomFetchObjective) objective).checkItem(player, itemStack, quest.getQuestObjectives(), newAmount);
     }
 
-    private void checkItem(Player player, @NotNull ItemStack itemStack, boolean increment, QuestObjectives questObjectives) {
+    private void checkItem(Player player, @NotNull ItemStack itemStack, QuestObjectives questObjectives, int newAmount) {
         if (ItemTagger.hasKey(itemStack, this.key))
-            if (increment)
-                incrementCount(player, itemStack.getAmount(), questObjectives);
-            else
-                decrementCount(player, itemStack.getAmount(), questObjectives);
-    }
-
-    private void incrementCount(Player player, int amount, QuestObjectives questObjectives) {
-        super.currentAmount += amount;
-        checkProgress(player, questObjectives, amount);
-    }
-
-    private void decrementCount(Player player, int amount, QuestObjectives questObjectives) {
-        super.currentAmount -= amount;
-        checkProgress(player, questObjectives, -amount);
-    }
-
-    public void checkProgress(Player player, QuestObjectives questObjectives, int pendingAmount) {
-        boolean strictCheck = super.currentAmount < 0 || super.currentAmount >= super.targetAmount;
-        if (strictCheck) {
-            if (pendingAmount > 0) strictCheck(player, pendingAmount);
-            else strictCheck(player, 0);
-        }
-        progressNonlinearObjective(questObjectives, player, false);
-    }
-
-    private void strictCheck(Player player, int pendingAmount) {
-        super.currentAmount = 0;
-        for (ItemStack itemStack : player.getInventory())
-            if (ItemTagger.hasKey(itemStack, this.key))
-                super.currentAmount += itemStack.getAmount();
-        super.currentAmount += pendingAmount;
+            progressNonlinearObjective(questObjectives, player, newAmount);
     }
 
     private void turnItemsIn(Player player) {
@@ -109,18 +79,16 @@ public class CustomFetchObjective extends Objective {
      *
      * @param questObjectives Objectives to update
      * @param player          Player to update
-     * @param fullUpdate      Whether the update should rescan the objectives
      */
     @Override
-    public void progressNonlinearObjective(QuestObjectives questObjectives, Player player, boolean fullUpdate) {
-        if (fullUpdate)
-            fullUpdate(player);
+    public void progressNonlinearObjective(QuestObjectives questObjectives, Player player, int newAmount) {
+        fullUpdate(player, newAmount);
+        objectiveCompleted = currentAmount >= targetAmount;
         QuestProgressionEvent questProgressionEvent = new QuestProgressionEvent(
                 Bukkit.getPlayer(questObjectives.getQuest().getPlayerUUID()),
                 questObjectives.getQuest(),
                 this);
         new EventCaller(questProgressionEvent);
-        objectiveCompleted = currentAmount >= targetAmount;
     }
 
     /**
@@ -128,8 +96,8 @@ public class CustomFetchObjective extends Objective {
      *
      * @param player Player to update
      */
-    private void fullUpdate(Player player) {
-        super.currentAmount = 0;
+    private void fullUpdate(Player player, int newAmount) {
+        super.currentAmount = newAmount;
         for (ItemStack itemStack : player.getInventory())
             if (ItemTagger.hasKey(itemStack, this.key))
                 super.currentAmount += itemStack.getAmount();
@@ -138,27 +106,27 @@ public class CustomFetchObjective extends Objective {
     public static class CustomFetchObjectiveEvents implements Listener {
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onItemDrop(PlayerDropItemEvent event) {
-            checkEvent(event.getPlayer(), event.getItemDrop().getItemStack(), false);
+            checkEvent(event.getPlayer(), event.getItemDrop().getItemStack(), 0);
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onItemPickup(EntityPickupItemEvent event) {
             if (event.getEntity().getType() != EntityType.PLAYER) return;
-            checkEvent((Player) event.getEntity(), event.getItem().getItemStack(), true);
+            checkEvent((Player) event.getEntity(), event.getItem().getItemStack(), event.getItem().getItemStack().getAmount());
         }
 
         @EventHandler(ignoreCancelled = true)
         public void onQuestAcceptEvent(QuestAcceptEvent event) {
             for (Objective objective : event.getQuest().getQuestObjectives().getObjectives())
                 if (objective instanceof CustomFetchObjective)
-                    ((CustomFetchObjective) objective).strictCheck(event.getPlayer(), 0);
+                    ((CustomFetchObjective) objective).progressNonlinearObjective(event.getQuest().getQuestObjectives(), event.getPlayer(), 0);
         }
 
         @EventHandler(ignoreCancelled = true)
         public void onQuestCompleteEvent(QuestCompleteEvent event) {
             for (Objective objective : event.getQuest().getQuestObjectives().getObjectives())
                 if (objective instanceof CustomFetchObjective) {
-                    ((CustomFetchObjective) objective).checkProgress(event.getPlayer(), event.getQuest().getQuestObjectives(), 0);
+                    ((CustomFetchObjective) objective).progressNonlinearObjective(event.getQuest().getQuestObjectives(), event.getPlayer(), 0);
                     if (objective.getCurrentAmount() < objective.getTargetAmount())
                         event.setCancelled(true);
                 }

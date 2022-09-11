@@ -107,6 +107,7 @@ public class PlayerItem {
     }
 
     private boolean fillNullItem() {
+        itemStack = null;
         itemTier = 0;
         continuousPotionEffects = new ArrayList<>();
         onHitPotionEffects = new ArrayList<>();

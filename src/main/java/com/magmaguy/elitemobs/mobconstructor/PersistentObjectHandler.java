@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.mobconstructor;
 import com.google.common.collect.ArrayListMultimap;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.utils.ChunkVectorizer;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -27,8 +28,10 @@ public class PersistentObjectHandler {
     private static final ArrayListMultimap<String, PersistentObjectHandler> persistentObjects = ArrayListMultimap.create();
     private final PersistentObject persistentObject;
     private final String worldName;
+    @Getter
     private Location persistentLocation;
     private String chunk;
+
     /**
      * Used to store the locations of custom bosses that have gone into unloaded chunks.
      *

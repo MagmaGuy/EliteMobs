@@ -10,6 +10,7 @@ import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.items.customenchantments.CriticalStrikesEnchantment;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.utils.DialogArmorStand;
+import com.magmaguy.elitemobs.utils.Round;
 import com.magmaguy.elitemobs.utils.VisualArmorStand;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -63,7 +64,7 @@ public class PopupDisplay implements Listener {
         }
 
         DialogArmorStand.createDialogArmorStand(event.getEliteMobEntity().getUnsyncedLivingEntity(), ChatColor.RED +
-                colorPrefix + "" + ChatColor.BOLD + "" + (int) event.getDamage() + "", offset);
+                colorPrefix + "" + ChatColor.BOLD + "" + Round.twoDecimalPlaces(event.getDamage()) + "", offset);
 
     }
 

@@ -45,7 +45,7 @@ public class QuestInventoryMenu {
         Material inProgressMaterial = Material.RED_STAINED_GLASS_PANE;
         Material completeMaterial = Material.ORANGE_STAINED_GLASS_PANE;
         HashMap<Integer, Quest> questMap = new HashMap<>();
-        for (int i = 0; i < quests.size(); i++) {
+        for (int i = 0; i < quests.size() - 1; i++) {
             questMap.put(questSlots.get(i), quests.get(i));
             QuestMenu.QuestText questText = new QuestMenu.QuestText(quests.get(i), npcEntity, player);
             if (!quests.get(i).isAccepted())
