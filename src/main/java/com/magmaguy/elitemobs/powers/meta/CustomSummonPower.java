@@ -491,6 +491,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
             CustomSummonPower customSummonPower = (CustomSummonPower) event.getEliteMobEntity().getPower("custom_summon.yml");
             if (customSummonPower == null) return;
             if (!eventIsValid(event, customSummonPower)) return;
+            if (event.getDamage() < 3) return;
             customSummonPower.onHitSummonReinforcement(event.getEliteMobEntity());
         }
 

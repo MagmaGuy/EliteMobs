@@ -41,7 +41,7 @@ public abstract class Objective implements Serializable {
         new EventCaller(questProgressionEvent);
     }
 
-    public void progressNonlinearObjective(QuestObjectives questObjectives, Player player, boolean fullUpdate) {
+    public void progressNonlinearObjective(QuestObjectives questObjectives, Player player, int newAmount) {
         //This gets implemented by extended classes, right now it's just fetch quests
     }
 

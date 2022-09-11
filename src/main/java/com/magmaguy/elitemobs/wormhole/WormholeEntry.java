@@ -121,7 +121,7 @@ public class WormholeEntry implements PersistentObject {
 
     @Override
     public void chunkUnload() {
-        stop();
+        //This is handled by the repeating task itself. Also there seems to be some bug with this unload, it seems arbitrary
     }
 
     @Override
@@ -150,7 +150,6 @@ public class WormholeEntry implements PersistentObject {
         if (wormholeTask != null) {
             wormholeTask.cancel();
         }
-
     }
 
     public void updateLocation(Player player) {
@@ -162,9 +161,8 @@ public class WormholeEntry implements PersistentObject {
         location = player.getLocation().add(new Vector(0, 1 * wormhole.getWormholeConfigFields().getSizeMultiplier(), 0));
         wormhole.getWormholeConfigFields().setWormholeEntryLocation(location, wormholeNumber);
         wormholeTask = WormholeTask.startWormholeTask(this);
-        if (persistentObjectHandler != null) persistentObjectHandler = new PersistentObjectHandler(this);
+        if (persistentObjectHandler != null) persistentObjectHandler.remove();
         persistentObjectHandler = new PersistentObjectHandler(this);
-
     }
 
     private void initializeTextDisplay() {

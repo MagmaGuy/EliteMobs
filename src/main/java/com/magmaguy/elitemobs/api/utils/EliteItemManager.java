@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.api.utils;
 
 import com.magmaguy.elitemobs.combatsystem.CombatSystem;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
+import com.magmaguy.elitemobs.items.EliteItemLore;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import org.bukkit.Material;
@@ -255,6 +256,7 @@ public class EliteItemManager {
 
     public static void setEliteLevel(@Nullable ItemStack itemStack, int level) {
         if (itemStack == null) return;
+        registerEliteItem(itemStack);
         if (isWeapon(itemStack)) {
             double damage = level * CombatSystem.DPS_PER_LEVEL / 1 / getAttackSpeed(itemStack) - getBaseDamage(itemStack);
             if (damage > 0)
@@ -264,6 +266,7 @@ public class EliteItemManager {
             if (defense > 0)
                 ItemTagger.setEliteDefenseAttribute(itemStack, defense);
         }
+        new EliteItemLore(itemStack, false);
     }
 
     public static void tagArrow(@Nullable Projectile projectile) {
@@ -284,6 +287,13 @@ public class EliteItemManager {
      */
     public static boolean isEliteMobsItem(ItemStack itemStack) {
         return ItemTagger.isEliteItem(itemStack);
+    }
+
+    public static void registerEliteItem(@Nullable ItemStack itemStack) {
+        if (itemStack == null || itemStack.getItemMeta() == null) return;
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        ItemTagger.registerEliteItem(itemMeta);
+        itemStack.setItemMeta(itemMeta);
     }
 
     /**

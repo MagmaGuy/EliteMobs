@@ -73,7 +73,7 @@ public class ElitePlayerInventory {
                 boots.getEliteDefense(player.getInventory().getBoots(), update);
     }
 
-    public double getEliteProjectileProtection(boolean update){
+    public double getEliteProjectileProtection(boolean update) {
         if (!armorCheck()) update = false;
         return helmet.getProtectionProjectile(player.getInventory().getHelmet(), update) +
                 chestplate.getProtectionProjectile(player.getInventory().getChestplate(), update) +
@@ -81,7 +81,7 @@ public class ElitePlayerInventory {
                 boots.getProtectionProjectile(player.getInventory().getBoots(), update);
     }
 
-    public double getEliteBlastProtection(boolean update){
+    public double getEliteBlastProtection(boolean update) {
         if (!armorCheck()) update = false;
         return helmet.getBlastProtection(player.getInventory().getHelmet(), update) +
                 chestplate.getBlastProtection(player.getInventory().getChestplate(), update) +
@@ -139,14 +139,10 @@ public class ElitePlayerInventory {
      */
     public ArrayList<ElitePotionEffect> getContinuousPotionEffects(boolean update) {
         ArrayList<ElitePotionEffect> elitePotionEffects = new ArrayList<>();
-        if (player.getInventory().getHelmet() != null)
-            elitePotionEffects.addAll(helmet.getContinuousPotionEffects(player.getInventory().getHelmet(), update));
-        if (player.getInventory().getChestplate() != null)
-            elitePotionEffects.addAll(chestplate.getContinuousPotionEffects(player.getInventory().getChestplate(), update));
-        if (player.getInventory().getLeggings() != null)
-            elitePotionEffects.addAll(leggings.getContinuousPotionEffects(player.getInventory().getLeggings(), update));
-        if (player.getInventory().getBoots() != null)
-            elitePotionEffects.addAll(boots.getContinuousPotionEffects(player.getInventory().getBoots(), update));
+        elitePotionEffects.addAll(helmet.getContinuousPotionEffects(player.getInventory().getHelmet(), update));
+        elitePotionEffects.addAll(chestplate.getContinuousPotionEffects(player.getInventory().getChestplate(), update));
+        elitePotionEffects.addAll(leggings.getContinuousPotionEffects(player.getInventory().getLeggings(), update));
+        elitePotionEffects.addAll(boots.getContinuousPotionEffects(player.getInventory().getBoots(), update));
         elitePotionEffects.addAll(mainhand.getContinuousPotionEffects(player.getInventory().getItemInMainHand(), update));
         elitePotionEffects.addAll(offhand.getContinuousPotionEffects(player.getInventory().getItemInOffHand(), update));
         return elitePotionEffects;

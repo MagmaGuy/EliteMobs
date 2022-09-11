@@ -59,6 +59,7 @@ public class CustomModel {
         try {
             modeledEntity.addModel(activeModel, true);
             activeModel.playDefaultAnimation(ModelState.IDLE);
+            modeledEntity.setBaseEntityVisible(false);
             setName(nametagName, true);
             success = true;
         } catch (Exception exception) {
@@ -117,7 +118,7 @@ public class CustomModel {
 
     public void setName(String nametagName, boolean visible) {
         if (modeledEntity == null) return;
-        Nameable nametag = activeModel.getNametagHandler().getBones().get("hitbox");
+        Nameable nametag = getNameableBone();
         if (nametag == null) {
             new WarningMessage("Failed to get hitbox nametag for disguise!");
             return;
@@ -127,7 +128,18 @@ public class CustomModel {
     }
 
     public void setNameVisible(boolean visible) {
-        activeModel.getNametagHandler().getBones().get("hitbox").setCustomNameVisible(visible);
+        Nameable nametag = getNameableBone();
+        if (nametag == null) {
+            return;
+        }
+        nametag.setCustomNameVisible(visible);
+    }
+
+    private Nameable getNameableBone() {
+        //Developer.message("Nameable bones: " + activeModel.getNametagHandler().getBones().size());
+        for (Nameable nameable : activeModel.getNametagHandler().getBones().values())
+            return nameable;
+        return null;
     }
 
     public void switchPhase() {

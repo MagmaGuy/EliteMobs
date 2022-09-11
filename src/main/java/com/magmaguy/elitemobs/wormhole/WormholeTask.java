@@ -35,7 +35,6 @@ public class WormholeTask {
             public void run() {
                 if (!ChunkLocationChecker.locationIsLoaded(wormholeEntry.getLocation())) {
                     cancel();
-                    wormholeEntry.chunkUnload();
                     return;
                 }
 
