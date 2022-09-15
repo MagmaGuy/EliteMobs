@@ -26,12 +26,11 @@ import java.util.Scanner;
 public class VersionChecker {
     private static final List<EMPackage> outdatedPackages = new ArrayList<>();
     private static boolean pluginIsUpToDate = true;
+    @Getter
+    private static boolean SHA1Updated = false;
 
     private VersionChecker() {
     }
-
-    @Getter
-    private static boolean SHA1Updated = false;
 
     private static void checkPluginVersion() {
         new BukkitRunnable() {
@@ -108,7 +107,7 @@ public class VersionChecker {
     private static String readStringFromURL(String url) throws IOException {
 
         try (Scanner scanner = new Scanner(new URL(url).openStream(),
-                StandardCharsets.UTF_8.toString())) {
+                StandardCharsets.UTF_8)) {
             scanner.useDelimiter("\\A");
             return scanner.hasNext() ? scanner.next() : "";
         }

@@ -137,35 +137,30 @@ public class ItemLootShower implements Listener {
                     if (ThreadLocalRandom.current().nextDouble() < 0.65) {
                         dropOneHundred(location);
                         currencyAmount -= 100;
-                        return;
                     }
 
                 } else if (currencyAmount >= 50) {
                     if (ThreadLocalRandom.current().nextDouble() < 0.65) {
                         dropFifty(location);
                         currencyAmount -= 50;
-                        return;
                     }
 
                 } else if (currencyAmount >= 20) {
                     if (ThreadLocalRandom.current().nextDouble() < 0.65) {
                         dropTwenty(location);
                         currencyAmount -= 20;
-                        return;
                     }
 
                 } else if (currencyAmount >= 10) {
                     if (ThreadLocalRandom.current().nextDouble() < 0.65) {
                         dropTen(location);
                         currencyAmount -= 10;
-                        return;
                     }
 
                 } else if (currencyAmount >= 5) {
                     if (ThreadLocalRandom.current().nextDouble() < 0.65) {
                         dropFive(location);
                         currencyAmount -= 5;
-                        return;
                     }
 
                 } else {

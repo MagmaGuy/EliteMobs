@@ -24,8 +24,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class QuestInventoryMenu {
     private static final int trackEntry = 8;
     private static final int acceptEntry = 26;
-    private static HashMap<Inventory, QuestDirectory> questDirectories = new HashMap<>();
-    private static HashMap<Inventory, QuestInventory> questInventories = new HashMap<>();
+    private static final HashMap<Inventory, QuestDirectory> questDirectories = new HashMap<>();
+    private static final HashMap<Inventory, QuestInventory> questInventories = new HashMap<>();
 
     private QuestInventoryMenu() {
     }
@@ -139,20 +139,20 @@ public class QuestInventoryMenu {
                 if (!entry.contains(" ")) {
                     List<String> substrings = new ArrayList<>((entry.length() + size - 1) / size);
                     for (int start = 0; start < entry.length(); start += size)
-                        substrings.add(ChatColor.WHITE.toString() + entry.substring(start, Math.min(entry.length(), start + size)));
+                        substrings.add(ChatColor.WHITE + entry.substring(start, Math.min(entry.length(), start + size)));
                     currentList.addAll(substrings);
                     //for other languages
                 } else {
                     String[] splitBySpaces = entry.split(" ");
                     List<String> substrings = new ArrayList<>();
                     StringBuilder currentString = new StringBuilder();
-                    currentString.append(ChatColor.WHITE.toString());
+                    currentString.append(ChatColor.WHITE);
                     for (String string : splitBySpaces) {
                         string += " ";
                         if (currentString.length() + string.length() > size) {
                             substrings.add(currentString.toString());
                             currentString = new StringBuilder();
-                            currentString.append(ChatColor.WHITE.toString());
+                            currentString.append(ChatColor.WHITE);
                         }
                         currentString.append(string);
                     }

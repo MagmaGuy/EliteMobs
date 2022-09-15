@@ -16,7 +16,7 @@ import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class CustomBossTrail {
@@ -78,7 +78,7 @@ public class CustomBossTrail {
                 //All conditions cleared, do the boss flair effect
                 Location entityCenter = livingEntity.getLocation().clone().add(0, livingEntity.getHeight() / 2, 0);
                 Item item = VisualItemInitializer.initializeItem(ItemStackGenerator.generateItemStack
-                        (material, "visualItem", Arrays.asList(ThreadLocalRandom.current().nextDouble() + "")), entityCenter);
+                        (material, "visualItem", List.of(ThreadLocalRandom.current().nextDouble() + "")), entityCenter);
                 item.setVelocity(new Vector(
                         ThreadLocalRandom.current().nextDouble() / 5 - 0.10,
                         ThreadLocalRandom.current().nextDouble() / 5 - 0.10,

@@ -79,11 +79,6 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
     @Getter
     private Location teleportLocationOffset = null;
 
-    public SchematicPackage.SchematicRotation getDefaultSchematicRotation() {
-        if (defaultSchematicRotation == null) return SchematicPackage.SchematicRotation.SOUTH;
-        return defaultSchematicRotation;
-    }
-
     public DungeonPackagerConfigFields(String fileName, boolean isEnabled) {
         super(fileName, isEnabled);
     }
@@ -237,6 +232,11 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
         this.regionEnterMessage = regionEnterMessage;
         this.regionLeaveMessage = regionLeaveMessage;
         defaultDungeon = true;
+    }
+
+    public SchematicPackage.SchematicRotation getDefaultSchematicRotation() {
+        if (defaultSchematicRotation == null) return SchematicPackage.SchematicRotation.SOUTH;
+        return defaultSchematicRotation;
     }
 
     @Override

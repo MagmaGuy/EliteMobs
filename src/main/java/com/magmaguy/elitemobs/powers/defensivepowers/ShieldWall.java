@@ -243,7 +243,6 @@ public class ShieldWall extends MinorPower {
             if (visualShieldsLeft == 0) {
                 task.cancel();
                 setActive(false);
-                return;
             }
         }, 1, 1);
     }

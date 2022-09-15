@@ -17,7 +17,7 @@ import com.magmaguy.elitemobs.commands.quests.QuestCommand;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.TranslationConfig;
-import com.magmaguy.elitemobs.instanced.dungeons.MatchInstance;
+import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.items.EliteItemLore;
 import com.magmaguy.elitemobs.items.ShareItem;
 import com.magmaguy.elitemobs.menus.*;

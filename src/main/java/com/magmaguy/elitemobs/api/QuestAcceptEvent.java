@@ -61,8 +61,7 @@ public class QuestAcceptEvent extends Event implements Cancellable {
                         ChatColorConverter.convert(QuestsConfig.getQuestStartSubtitle().replace("$questName", event.getQuest().getQuestName())),
                         20, 60, 20);
 
-            if (event.getQuest() instanceof CustomQuest) {
-                CustomQuest customQuest = (CustomQuest) event.getQuest();
+            if (event.getQuest() instanceof CustomQuest customQuest) {
 
                 customQuest.applyTemporaryPermissions(event.getPlayer());
 

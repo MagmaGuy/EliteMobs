@@ -8,7 +8,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Arrays;
 
 public class WoodLeagueWave26Melee extends CustomBossesConfigFields {
-    public WoodLeagueWave26Melee(){
+    public WoodLeagueWave26Melee() {
         super("wood_league_wave_26_melee",
                 EntityType.ZOMBIE,
                 true,

@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.util.Vector;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class PirateShipMinidungeon extends DungeonPackagerConfigFields {
     public PirateShipMinidungeon() {
@@ -45,7 +46,7 @@ public class PirateShipMinidungeon extends DungeonPackagerConfigFields {
                         "pirate_ship_tier_35_miniboss_2.yml:-1.5,8.5,84.5",
                         "pirate_ship_tier_40_miniboss_1.yml:11.5,10.5,78.5",
                         "pirate_ship_tier_45_boss.yml:-13.5,10.5,79.5"),
-                Arrays.asList(),
+                List.of(),
                 DiscordLinks.premiumMinidungeons,
                 DungeonSizeCategory.MINIDUNGEON,
                 "em_pirate_ship.schem",

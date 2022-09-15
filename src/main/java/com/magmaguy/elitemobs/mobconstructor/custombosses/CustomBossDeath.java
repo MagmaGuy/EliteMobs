@@ -162,8 +162,7 @@ public class CustomBossDeath implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onEliteMobDeath(EliteMobDeathEvent event) {
-        if (!(event.getEliteEntity() instanceof CustomBossEntity)) return;
-        CustomBossEntity customBossEntity = (CustomBossEntity) event.getEliteEntity();
+        if (!(event.getEliteEntity() instanceof CustomBossEntity customBossEntity)) return;
 
         doLoot(customBossEntity);
         doDeathMessage(customBossEntity);

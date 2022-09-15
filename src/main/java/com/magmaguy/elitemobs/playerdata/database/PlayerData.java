@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.playerdata.database;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.instanced.dungeons.MatchInstance;
+import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.Quest;
 import com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldowns;
@@ -23,6 +23,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import javax.annotation.Nullable;
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -73,7 +74,7 @@ public class PlayerData {
                 Statement statement = null;
                 try {
                     statement = getConnection().createStatement();
-                    ResultSet resultSet = statement.executeQuery("SELECT * FROM " + PLAYER_DATA_TABLE_NAME + " WHERE PlayerUUID = '" + uuid.toString() + "';");
+                    ResultSet resultSet = statement.executeQuery("SELECT * FROM " + PLAYER_DATA_TABLE_NAME + " WHERE PlayerUUID = '" + uuid + "';");
                     //case for there being data to read
                     if (resultSet.next()) {
                         readExistingData(statement, uuid, resultSet);
@@ -584,7 +585,7 @@ public class PlayerData {
 
         if (resultSet.getBytes("QuestStatus") != null) {
             try {
-                quests = (List<Quest>) ObjectSerializer.fromString(new String(resultSet.getBytes("QuestStatus"), "UTF-8"));
+                quests = (List<Quest>) ObjectSerializer.fromString(new String(resultSet.getBytes("QuestStatus"), StandardCharsets.UTF_8));
                 //Serializes ItemStack which require specific handling, necessary recovering the rewards
                 for (Quest quest : quests)
                     if (quest instanceof CustomQuest)
@@ -602,7 +603,7 @@ public class PlayerData {
 
         if (resultSet.getBytes("PlayerQuestCooldowns") != null) {
             try {
-                playerQuestCooldowns = (PlayerQuestCooldowns) ObjectSerializer.fromString(new String(resultSet.getBytes("PlayerQuestCooldowns"), "UTF-8"));
+                playerQuestCooldowns = (PlayerQuestCooldowns) ObjectSerializer.fromString(new String(resultSet.getBytes("PlayerQuestCooldowns"), StandardCharsets.UTF_8));
                 playerQuestCooldowns.startCooldowns(uuid);
             } catch (Exception exception) {
                 new WarningMessage("Failed to get player quest cooldowns!  ! This player's quest cooldowns will be wiped to prevent future errors.");

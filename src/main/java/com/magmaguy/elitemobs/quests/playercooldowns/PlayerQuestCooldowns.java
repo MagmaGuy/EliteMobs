@@ -13,9 +13,16 @@ import java.util.*;
 
 public class PlayerQuestCooldowns implements Serializable {
 
+    private static final HashSet<Player> bypassedPlayers = new HashSet<>();
     @Getter
     private final List<QuestCooldown> questCooldowns = new ArrayList<>();
-    private static final HashSet<Player> bypassedPlayers = new HashSet<>();
+
+    /**
+     * Initializes cooldowns from scratch, assuming no preexisting player data
+     */
+    public PlayerQuestCooldowns() {
+        //This just initializes the cooldown list
+    }
 
     public static void toggleBypass(Player player) {
         if (!bypassedPlayers.contains(player))
@@ -24,15 +31,8 @@ public class PlayerQuestCooldowns implements Serializable {
             bypassedPlayers.remove(player);
     }
 
-    public static boolean bypassesQuestRestrictions(Player player){
+    public static boolean bypassesQuestRestrictions(Player player) {
         return bypassedPlayers.contains(player);
-    }
-
-    /**
-     * Initializes cooldowns from scratch, assuming no preexisting player data
-     */
-    public PlayerQuestCooldowns() {
-        //This just initializes the cooldown list
     }
 
     public static PlayerQuestCooldowns initializePlayer() {

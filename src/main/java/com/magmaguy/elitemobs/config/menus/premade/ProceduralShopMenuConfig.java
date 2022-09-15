@@ -29,7 +29,7 @@ public class ProceduralShopMenuConfig extends MenusConfigFields {
                 "Reroll button",
                 ItemStackGenerator.generateSkullItemStack("magmaguy",
                         "&4&lEliteMobs &r&cby &4&lMagmaGuy",
-                        Arrays.asList("&8Support the plugins you enjoy!"), MetadataHandler.signatureID),
+                        List.of("&8Support the plugins you enjoy!"), MetadataHandler.signatureID),
                 fileConfiguration);
         rerollItem = ItemStackSerializer.deserialize("Reroll button", fileConfiguration);
         rerollSlot = ConfigurationEngine.setInt(fileConfiguration, "Reroll button slot", 4);

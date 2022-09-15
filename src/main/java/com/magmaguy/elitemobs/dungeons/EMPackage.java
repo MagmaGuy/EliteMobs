@@ -20,7 +20,7 @@ public class EMPackage {
 
     protected static final HashMap<String, EMPackage> content = new HashMap<>();
     @Getter
-    private static Map<String, EMPackage> emPackages = new HashMap<>();
+    private static final Map<String, EMPackage> emPackages = new HashMap<>();
     @Getter
     protected final DungeonPackagerConfigFields dungeonPackagerConfigFields;
     @Getter
@@ -35,6 +35,7 @@ public class EMPackage {
     protected List<CustomBossEntity> customBossEntityList = new ArrayList<>();
     protected List<TreasureChest> treasureChestList = new ArrayList<>();
     protected List<NPCEntity> npcEntities = new ArrayList<>();
+
     public EMPackage(DungeonPackagerConfigFields dungeonPackagerConfigFields) {
         this.dungeonPackagerConfigFields = dungeonPackagerConfigFields;
         emPackages.put(dungeonPackagerConfigFields.getFilename(), this);

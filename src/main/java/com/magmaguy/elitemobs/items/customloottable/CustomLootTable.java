@@ -18,7 +18,7 @@ public class CustomLootTable implements Serializable {
 
     @Getter
     private final List<CustomLootEntry> entries = new ArrayList<>();
-    private Map<Integer, List<CustomLootEntry>> waveRewards = new HashMap();
+    private final Map<Integer, List<CustomLootEntry>> waveRewards = new HashMap();
 
     public CustomLootTable() {
     }
@@ -69,7 +69,7 @@ public class CustomLootTable implements Serializable {
                     rewards.add(customLootEntry);
                     this.waveRewards.put(customLootEntry.getWave(), rewards);
                 } else
-                    waveRewards.put(customLootEntry.getWave(), new ArrayList<>(Arrays.asList(customLootEntry)));
+                    waveRewards.put(customLootEntry.getWave(), new ArrayList<>(List.of(customLootEntry)));
             }
         }
     }
@@ -96,7 +96,7 @@ public class CustomLootTable implements Serializable {
             if (customLootEntry.willDrop(player)) {
                 if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory()) {
                     customLootEntry.directDrop(chestLevel * 10, player);
-                }else{
+                } else {
                     customLootEntry.locationDrop(chestLevel * 10, player, dropLocation);
                 }
             }

@@ -713,7 +713,7 @@ public class AdminCommands {
         // /em trace <uuid>
         manager.command(builder.literal("trace")
                 .senderType(CommandSender.class)
-                .argument(StringArgument.<CommandSender>newBuilder("uuid"),
+                .argument(StringArgument.newBuilder("uuid"),
                         ArgumentDescription.of("EliteMobs UUID of the Custom Boss"))
                 .permission("elitemobs.*")
                 .meta(CommandMeta.DESCRIPTION, "Traces the life of a custom boss entity. Used by the debug menu.")
@@ -729,7 +729,7 @@ public class AdminCommands {
         // /em debugtp <uuid>
         manager.command(builder.literal("debugtp")
                 .senderType(CommandSender.class)
-                .argument(StringArgument.<CommandSender>newBuilder("uuid"),
+                .argument(StringArgument.newBuilder("uuid"),
                         ArgumentDescription.of("EliteMobs UUID of the Custom Boss"))
                 .permission("elitemobs.*")
                 .meta(CommandMeta.DESCRIPTION, "Traces the life of a custom boss entity. Used by the debug menu.")
@@ -928,8 +928,8 @@ public class AdminCommands {
 
         // /em package <dungeon> <version>
         manager.command(builder.literal("package")
-                .argument(StringArgument.<CommandSender>newBuilder("dungeonName"), ArgumentDescription.of("Name of the dungeon to create"))
-                .argument(StringArgument.<CommandSender>newBuilder("dungeonVersion"), ArgumentDescription.of("Version of the dungeon"))
+                .argument(StringArgument.newBuilder("dungeonName"), ArgumentDescription.of("Name of the dungeon to create"))
+                .argument(StringArgument.newBuilder("dungeonVersion"), ArgumentDescription.of("Version of the dungeon"))
                 .meta(CommandMeta.DESCRIPTION, "Packages a dungeon for distribution!")
                 .senderType(CommandSender.class)
                 .permission("elitemobs.*")

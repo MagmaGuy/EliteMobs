@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.util.Vector;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class DarkCathedralLair extends DungeonPackagerConfigFields {
     public DarkCathedralLair() {
@@ -15,8 +16,8 @@ public class DarkCathedralLair extends DungeonPackagerConfigFields {
                 Arrays.asList("&fThe first ever EliteMobs Lair!",
                         "&fA classic that all servers need!",
                         "&6Credits: MagmaGuy & 69OzCanOfBepis"),
-                Arrays.asList("dark_cathedral_tier_75_boss.yml:0.5,0.5,24.5"),
-                Arrays.asList(""),
+                List.of("dark_cathedral_tier_75_boss.yml:0.5,0.5,24.5"),
+                List.of(""),
                 DiscordLinks.freeMinidungeons,
                 DungeonSizeCategory.LAIR,
                 "em_dark_cathedral.schem",

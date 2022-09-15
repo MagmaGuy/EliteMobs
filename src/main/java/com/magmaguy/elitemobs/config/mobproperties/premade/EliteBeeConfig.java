@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.config.mobproperties.premade;
 import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfigFields;
 import org.bukkit.entity.EntityType;
 
-import java.util.Arrays;
+import java.util.List;
 
 public class EliteBeeConfig extends MobPropertiesConfigFields {
     public EliteBeeConfig() {
@@ -11,7 +11,7 @@ public class EliteBeeConfig extends MobPropertiesConfigFields {
                 EntityType.BEE,
                 true,
                 "&fLvl &2$level &fElite &eBee",
-                Arrays.asList("$player &cwas stung by $entity!"),
+                List.of("$player &cwas stung by $entity!"),
                 3);
     }
 }

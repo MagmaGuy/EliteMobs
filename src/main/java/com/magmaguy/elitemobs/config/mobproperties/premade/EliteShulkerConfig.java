@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.config.mobproperties.premade;
 import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfigFields;
 import org.bukkit.entity.EntityType;
 
-import java.util.Arrays;
+import java.util.List;
 
 public class EliteShulkerConfig extends MobPropertiesConfigFields {
     public EliteShulkerConfig() {
@@ -11,7 +11,7 @@ public class EliteShulkerConfig extends MobPropertiesConfigFields {
                 EntityType.SHULKER,
                 true,
                 "&fLvl &2$level &fElite &5Shulker",
-                Arrays.asList("$entity &cshowed $player &cnew heights!"),
+                List.of("$entity &cshowed $player &cnew heights!"),
                 4);
     }
 }

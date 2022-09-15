@@ -1,4 +1,4 @@
-package com.magmaguy.elitemobs.instanced;
+package com.magmaguy.elitemobs.instanced.arena;
 
 import lombok.Getter;
 import lombok.Setter;

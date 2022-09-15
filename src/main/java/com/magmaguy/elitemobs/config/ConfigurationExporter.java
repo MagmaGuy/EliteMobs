@@ -182,7 +182,7 @@ public class ConfigurationExporter {
 
         String sha1 = generateResourcePackSHA1(commandSender);
         if (sha1 == null) return;
-        if (ServerPropertiesModifier.modify((Player) commandSender, "resource-pack-sha1", sha1)) {
+        if (ServerPropertiesModifier.modify(commandSender, "resource-pack-sha1", sha1)) {
 
             commandSender.sendMessage(ChatColor.GREEN + "[EliteMobs] Successfully set the value resource-pack-sha1=" + sha1 + " in server.properties!");
             commandSender.sendMessage(ChatColor.RED + "[EliteMobs] Don't forget to update the downloadable resource pack at your online location of choice!" +

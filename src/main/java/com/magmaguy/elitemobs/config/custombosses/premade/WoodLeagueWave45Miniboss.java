@@ -8,7 +8,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Arrays;
 
 public class WoodLeagueWave45Miniboss extends CustomBossesConfigFields {
-    public WoodLeagueWave45Miniboss(){
+    public WoodLeagueWave45Miniboss() {
         super("wood_league_wave_45_miniboss",
                 EntityType.VINDICATOR,
                 true,

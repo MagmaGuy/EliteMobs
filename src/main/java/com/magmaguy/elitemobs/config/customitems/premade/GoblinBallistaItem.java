@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import org.bukkit.Material;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class GoblinBallistaItem extends CustomItemsConfigFields {
     public GoblinBallistaItem() {
@@ -12,9 +13,9 @@ public class GoblinBallistaItem extends CustomItemsConfigFields {
                 true,
                 Material.CROSSBOW,
                 "&8Goblin Ballista",
-                Arrays.asList("&8A treasure among goblins!"));
+                List.of("&8A treasure among goblins!"));
         setEnchantments(Arrays.asList("ARROW_DAMAGE,1", "DURABILITY,1", "QUICK_CHARGE,3", "MULTISHOT,1"));
-        setPotionEffects(Arrays.asList("HEAL,0,self,onHit"));
+        setPotionEffects(List.of("HEAL,0,self,onHit"));
         setItemType(CustomItem.ItemType.UNIQUE);
     }
 }

@@ -43,7 +43,7 @@ public class ItemUpgradeSystemConfig {
         try {
             material = Material.valueOf(materialString);
         } catch (Exception ex) {
-            new WarningMessage("Failed to set upgrade item material " + materialString + " as a valid material! This will default to " + Material.HEART_OF_THE_SEA.toString());
+            new WarningMessage("Failed to set upgrade item material " + materialString + " as a valid material! This will default to " + Material.HEART_OF_THE_SEA);
             material = Material.HEART_OF_THE_SEA;
         }
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);

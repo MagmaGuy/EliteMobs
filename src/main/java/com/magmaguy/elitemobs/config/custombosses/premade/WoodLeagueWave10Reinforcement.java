@@ -6,7 +6,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
 public class WoodLeagueWave10Reinforcement extends CustomBossesConfigFields {
-    public WoodLeagueWave10Reinforcement(){
+    public WoodLeagueWave10Reinforcement() {
         super("wood_league_wave_10_reinforcement",
                 EntityType.WOLF,
                 true,

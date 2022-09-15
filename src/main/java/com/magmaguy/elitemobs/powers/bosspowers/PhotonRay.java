@@ -23,7 +23,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class PhotonRay extends CombatEnterScanPower {
 
-    private int range = 60;
+    private final int range = 60;
     private List<Location> playerLocations = new ArrayList<>(5);
     private int tickCounter = 0;
 
@@ -88,11 +88,7 @@ public class PhotonRay extends CombatEnterScanPower {
 
                 laserVector = dragTarget(laserVector, sourceEntity.getLocation(), target.getLocation());
 
-                if (counter < 20 / 4d) {
-                    doRaytraceLaser(laserVector, sourceEntity.getLocation(), true, sourceEntity);
-                } else {
-                    doRaytraceLaser(laserVector, sourceEntity.getLocation(), false, sourceEntity);
-                }
+                doRaytraceLaser(laserVector, sourceEntity.getLocation(), counter < 20 / 4d, sourceEntity);
 
                 counter++;
 

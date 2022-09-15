@@ -1,4 +1,4 @@
-package com.magmaguy.elitemobs.instanced.dungeons;
+package com.magmaguy.elitemobs.instanced;
 
 
 import com.magmaguy.elitemobs.ChatColorConverter;
@@ -7,6 +7,7 @@ import com.magmaguy.elitemobs.api.PlayerTeleportEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.ArenasConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
+import com.magmaguy.elitemobs.instanced.dungeons.DungeonInstance;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.Cylinder;
@@ -31,16 +32,19 @@ import org.bukkit.util.Vector;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 public class MatchInstance {
 
-    private static HashSet<MatchInstance> instances = new HashSet<>();
+    private static final HashSet<MatchInstance> instances = new HashSet<>();
+    @Getter
+    private final HashMap<Block, DeathLocation> deathBanners = new HashMap<>();
     @Getter
     protected HashSet<Player> players = new HashSet<>();
     protected HashMap<Player, Integer> playerLives = new HashMap();
     protected HashSet<Player> participants = new HashSet<>();
     protected HashSet<Player> spectators = new HashSet<>();
-    protected InstancedRegionState state;
+    protected InstancedRegionState state = InstancedRegionState.IDLE;
     protected Location startLocation;
     protected Location exitLocation;
     protected HashMap<String, Location> spawnPoints = new HashMap<>();
@@ -56,9 +60,12 @@ public class MatchInstance {
     private int maxZ;
     private World world;
     private boolean cylindricalArena;
-    @Getter
-    private HashMap<Block, DeathLocation> deathBanners = new HashMap<>();
+    private Map<Player, Location> previousPlayerLocations = new HashMap<>();
     private Cylinder cylinder;
+
+    public MatchInstance(Location startLocation, Location exitLocation, int minPlayers, int maxPlayers) {
+        instantiate(startLocation, exitLocation, minPlayers, maxPlayers);
+    }
 
     public MatchInstance(Location corner1,
                          Location corner2,
@@ -80,6 +87,46 @@ public class MatchInstance {
                          int maxPlayers,
                          boolean cylindricalArena) {
         instantiate(corner1, corner2, startLocation, exitLocation, minPlayers, maxPlayers, cylindricalArena);
+    }
+
+    public static void shutdown() {
+        instances.forEach(MatchInstance::resetMatch);
+        instances.clear();
+    }
+
+    public static MatchInstance getPlayerInstance(Player player) {
+        for (MatchInstance matchInstance : instances)
+            for (Player iteratedPlayer : matchInstance.players)
+                if (iteratedPlayer.equals(player)) return matchInstance;
+        return null;
+    }
+
+    public static MatchInstance getSpectatorInstance(Player player) {
+        for (MatchInstance matchInstance : instances)
+            for (Player iteratedPlayer : matchInstance.spectators)
+                if (iteratedPlayer.equals(player)) return matchInstance;
+        return null;
+    }
+
+    public static MatchInstance getAnyPlayerInstance(Player player) {
+        for (MatchInstance matchInstance : instances) {
+            for (Player iteratedPlayer : matchInstance.players)
+                if (iteratedPlayer.equals(player)) return matchInstance;
+            for (Player iteratedPlayer : matchInstance.spectators)
+                if (iteratedPlayer.equals(player)) return matchInstance;
+        }
+        return null;
+    }
+
+    public void instantiate(Location startLocation, Location exitLocation, int minPlayers, int maxPlayers) {
+        this.startLocation = startLocation;
+        this.exitLocation = exitLocation;
+        this.minPlayers = minPlayers;
+        this.maxPlayers = maxPlayers;
+
+        startWatchdogs();
+        instanceMessages();
+        instances.add(this);
     }
 
     public void instantiate(Location corner1, Location corner2, Location startLocation, Location exitLocation, int minPlayers, int maxPlayers, boolean cylindricalArena) {
@@ -129,35 +176,6 @@ public class MatchInstance {
         instances.add(this);
     }
 
-    public static void shutdown() {
-        instances.forEach(MatchInstance::resetMatch);
-        instances.clear();
-    }
-
-    public static MatchInstance getPlayerInstance(Player player) {
-        for (MatchInstance matchInstance : instances)
-            for (Player iteratedPlayer : matchInstance.players)
-                if (iteratedPlayer.equals(player)) return matchInstance;
-        return null;
-    }
-
-    public static MatchInstance getSpectatorInstance(Player player) {
-        for (MatchInstance matchInstance : instances)
-            for (Player iteratedPlayer : matchInstance.spectators)
-                if (iteratedPlayer.equals(player)) return matchInstance;
-        return null;
-    }
-
-    public static MatchInstance getAnyPlayerInstance(Player player) {
-        for (MatchInstance matchInstance : instances) {
-            for (Player iteratedPlayer : matchInstance.players)
-                if (iteratedPlayer.equals(player)) return matchInstance;
-            for (Player iteratedPlayer : matchInstance.spectators)
-                if (iteratedPlayer.equals(player)) return matchInstance;
-        }
-        return null;
-    }
-
     public void addSpawnPoints(List<String> rawSpawnPoints) {
         for (String string : rawSpawnPoints) {
             String[] splitEntry = string.split(":");
@@ -182,6 +200,7 @@ public class MatchInstance {
     }
 
     public void addPlayer(Player player) {
+        if (state.equals(InstancedRegionState.IDLE)) previousPlayerLocations.put(player, player.getLocation());
         participants.add(player);
         if (state.equals(InstancedRegionState.ONGOING)) {
             player.sendMessage(ArenasConfig.getArenasOngoingMessage());
@@ -207,13 +226,20 @@ public class MatchInstance {
             participants.remove(player);
             PlayerData.setMatchInstance(player, null);
         }
-        if (player.isOnline()) {
-            MatchInstanceEvents.teleportBypass = true;
-            player.teleport(exitLocation);
-        } else if (getDeathLocationByPlayer(player) != null)
-            getDeathLocationByPlayer(player).clear(false);
-        if (state.equals(InstancedRegionState.ONGOING) && players.isEmpty())
+
+        if (state.equals(InstancedRegionState.ONGOING) && players.isEmpty()){
+            if (player.isOnline()) {
+                MatchInstanceEvents.teleportBypass = true;
+                if (this instanceof DungeonInstance) {
+                    Location location = previousPlayerLocations.get(player);
+                    if (location != null) player.teleport(location);
+                    else player.teleport(exitLocation);
+                } else
+                    player.teleport(exitLocation);
+            } else if (getDeathLocationByPlayer(player) != null)
+                getDeathLocationByPlayer(player).clear(false);
             endMatch();
+        }
         playerLives.remove(player);
     }
 
@@ -230,7 +256,7 @@ public class MatchInstance {
             return;
         }
         new DeathLocation(player);
-        addSpectator(player);
+        addSpectator(player, true);
     }
 
     public void revivePlayer(Player player, DeathLocation deathLocation) {
@@ -243,14 +269,15 @@ public class MatchInstance {
         PlayerData.setMatchInstance(player, this);
     }
 
-    public void addSpectator(Player player) {
+    public void addSpectator(Player player, boolean wasPlayer) {
+        if (!wasPlayer) previousPlayerLocations.put(player, player.getLocation());
         participants.add(player);
         player.sendMessage(ArenasConfig.getArenaJoinSpectatorMessage());
         player.sendTitle(ArenasConfig.getJoinSpectatorTitle(), ArenasConfig.getJoinSpectatorSubtitle(), 60, 60 * 3, 60);
         spectators.add(player);
         player.setGameMode(GameMode.SPECTATOR);
         MatchInstanceEvents.teleportBypass = true;
-        player.teleport(startLocation);
+        if (!wasPlayer) player.teleport(startLocation);
         PlayerData.setMatchInstance(player, this);
     }
 
@@ -262,7 +289,12 @@ public class MatchInstance {
         }
         player.setGameMode(GameMode.SURVIVAL);
         MatchInstanceEvents.teleportBypass = true;
-        player.teleport(exitLocation);
+        if (this instanceof DungeonInstance) {
+            Location location = previousPlayerLocations.get(player);
+            if (location != null) player.teleport(location);
+            else player.teleport(exitLocation);
+        } else
+            player.teleport(exitLocation);
         PlayerData.setMatchInstance(player, null);
         playerLives.remove(player);
         if (getDeathLocationByPlayer(player) != null)
@@ -318,27 +350,29 @@ public class MatchInstance {
 
     private void instanceMessages() {
         Bukkit.getScheduler().scheduleSyncRepeatingTask(MetadataHandler.PLUGIN, () -> {
-            switch (state) {
-                case IDLE:
-                    players.forEach(player -> player.sendMessage(ArenasConfig.getArenaStartHintMessage().replace("$count", minPlayers + "")));
-                    break;
+            if (state == InstancedRegionState.IDLE) {
+                players.forEach(player -> player.sendMessage(ArenasConfig.getArenaStartHintMessage().replace("$count", minPlayers + "")));
             }
         }, 0L, 20 * 60L);
     }
 
 
     private boolean isInRegion(Location location) {
-        if (!cylindricalArena)
-            return location.getWorld().equals(world) &&
-                    minX <= location.getX() &&
-                    maxX >= location.getX() &&
-                    minY <= location.getY() &&
-                    maxY >= location.getY() &&
-                    minZ <= location.getZ() &&
-                    maxZ >= location.getZ();
-        else
-            return location.getWorld().equals(world) &&
-                    cylinder.contains(location);
+        if (this instanceof DungeonInstance) {
+            return location.getWorld().equals(startLocation.getWorld());
+        } else {
+            if (!cylindricalArena)
+                return location.getWorld().equals(world) &&
+                        minX <= location.getX() &&
+                        maxX >= location.getX() &&
+                        minY <= location.getY() &&
+                        maxY >= location.getY() &&
+                        minZ <= location.getZ() &&
+                        maxZ >= location.getZ();
+            else
+                return location.getWorld().equals(world) &&
+                        cylinder.contains(location);
+        }
     }
 
     public void countdownMatch() {
@@ -376,6 +410,7 @@ public class MatchInstance {
 
     protected void endMatch() {
         state = InstancedRegionState.COMPLETED;
+        instances.remove(this);
     }
 
     protected void resetMatch() {
@@ -398,10 +433,6 @@ public class MatchInstance {
         deathBanners.clear();
     }
 
-    public enum InstancedRegionState {
-        IDLE, STARTING, ONGOING, COMPLETED
-    }
-
     private DeathLocation getDeathLocationByPlayer(Player player) {
         for (DeathLocation deathLocation : deathBanners.values())
             if (deathLocation.deadPlayer.equals(player))
@@ -409,13 +440,17 @@ public class MatchInstance {
         return null;
     }
 
+    public enum InstancedRegionState {
+        IDLE, STARTING, ONGOING, COMPLETED
+    }
+
     public static class MatchInstanceEvents implements Listener {
+        public static boolean teleportBypass = false;
+
         @EventHandler
         public void onPlayerLeave(PlayerQuitEvent event) {
             instances.forEach(instance -> instance.removeAnyKind(event.getPlayer()));
         }
-
-        public static boolean teleportBypass = false;
 
         @EventHandler
         public void onPlayerBreakBlockEvent(BlockBreakEvent event) {

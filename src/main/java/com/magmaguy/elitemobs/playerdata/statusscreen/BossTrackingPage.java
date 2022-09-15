@@ -91,14 +91,14 @@ public class BossTrackingPage {
         }
         inventory.setItem(53, PlayerStatusMenuConfig.getBackItem());
         requestingPlayer.openInventory(inventory);
-        BossTrackingPageEvents.pageInventories.add( inventory);
+        BossTrackingPageEvents.pageInventories.add(inventory);
     }
 
     public static class BossTrackingPageEvents implements Listener {
         private static final Set<Inventory> pageInventories = new HashSet<>();
         private static final List<CustomBossEntity> bosses = new ArrayList<>();
 
-        @EventHandler (ignoreCancelled = true)
+        @EventHandler(ignoreCancelled = true)
         public void onInventoryInteract(InventoryClickEvent event) {
             Player player = ((Player) event.getWhoClicked()).getPlayer();
             if (!pageInventories.contains(event.getInventory())) return;
@@ -115,7 +115,7 @@ public class BossTrackingPage {
         }
 
         @EventHandler
-        public void onInventoryClose(InventoryCloseEvent event){
+        public void onInventoryClose(InventoryCloseEvent event) {
             pageInventories.remove(event.getInventory());
         }
     }

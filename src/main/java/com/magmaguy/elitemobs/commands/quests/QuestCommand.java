@@ -74,7 +74,7 @@ public class QuestCommand {
         }
     }
 
-    public static void bypassQuestRequirements(Player player){
+    public static void bypassQuestRequirements(Player player) {
         PlayerQuestCooldowns.toggleBypass(player);
     }
 

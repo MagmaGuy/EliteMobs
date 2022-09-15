@@ -28,7 +28,7 @@ public class TranslationsConfigFields extends CustomConfigFields implements Cust
     private File translationDataFile;
     private FileConfiguration translationData;
     private FileConfiguration premadeTranslationsConfiguration;
-    private List<String> outdatedCustomKeys = new ArrayList<>();
+    private final List<String> outdatedCustomKeys = new ArrayList<>();
     private boolean customLanguage = false;
 
     /**

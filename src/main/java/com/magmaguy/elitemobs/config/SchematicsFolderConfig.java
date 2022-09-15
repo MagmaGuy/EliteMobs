@@ -21,7 +21,6 @@ public class SchematicsFolderConfig {
                 new WarningMessage("Failed to create schematics directory! Tell the dev!");
                 exception.printStackTrace();
             }
-            return;
         }
     }
 }

@@ -5,7 +5,7 @@ import com.magmaguy.elitemobs.utils.VersionChecker;
 import org.bukkit.entity.EntityType;
 
 public class EliteWarden extends EliteMobProperties {
-    public EliteWarden(){
+    public EliteWarden() {
         if (VersionChecker.serverVersionOlderThan(19, 0)) {
             return;
         }

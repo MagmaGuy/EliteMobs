@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.config.mobproperties.premade;
 import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfigFields;
 import org.bukkit.entity.EntityType;
 
-import java.util.Arrays;
+import java.util.List;
 
 public class EliteEvokerConfig extends MobPropertiesConfigFields {
     public EliteEvokerConfig() {
@@ -11,7 +11,7 @@ public class EliteEvokerConfig extends MobPropertiesConfigFields {
                 EntityType.EVOKER,
                 true,
                 "&fLvl &2$level &fElite &5Evoker",
-                Arrays.asList("$player &cwas enchanted by $entity&c!"),
+                List.of("$player &cwas enchanted by $entity&c!"),
                 9);
     }
 }

@@ -79,8 +79,8 @@ public class CustomEventsConfigFields extends CustomConfigFields implements Cust
         }
         this.bossFilenames = processStringList("bossFilenames", bossFilenames, new ArrayList<>(), true);
         if (bossFilenames == null) return;
-        this.startMessage = translatable(filename, "startMessage",processString("startMessage", startMessage, null, false));
-        this.endMessage = translatable(filename, "endMessage",processString("endMessage", endMessage, null, false));
+        this.startMessage = translatable(filename, "startMessage", processString("startMessage", startMessage, null, false));
+        this.endMessage = translatable(filename, "endMessage", processString("endMessage", endMessage, null, false));
         this.eventStartCommands = processStringList("eventStartCommands", eventStartCommands, new ArrayList<>(), false);
         this.eventEndCommands = processStringList("eventEndCommands", eventEndCommands, new ArrayList<>(), false);
         this.announcementPriority = processInt("announcementPriority", announcementPriority, 0, false);

@@ -29,7 +29,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
 
 import static org.bukkit.Material.CHICKEN;
 import static org.bukkit.Material.FEATHER;
@@ -45,7 +48,7 @@ public class ChickenHandler implements Listener {
     Use events to add and remove loaded chicken and use the scanner to update the list of active chicken
     */
 
-    private final List<String> lore = new ArrayList<>(Arrays.asList("SuperChicken Egg"));
+    private final List<String> lore = new ArrayList<>(List.of("SuperChicken Egg"));
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void superDrops(SuperMobDamageEvent event) {

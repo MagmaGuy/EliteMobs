@@ -194,7 +194,6 @@ public class GetLootMenu extends EliteMenu implements Listener {
                 getLootMenu.filterRank = Integer.parseInt(currentItem.getItemMeta().getDisplayName().split("\\s")[1]);
                 getLootMenu.currentLootPage = 1;
                 new GetLootMenu(player, getLootMenu);
-                return;
             }
         }
 

@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import org.bukkit.Material;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class MeteorShowerScrollConfig extends CustomItemsConfigFields {
     public MeteorShowerScrollConfig() {
@@ -13,7 +14,7 @@ public class MeteorShowerScrollConfig extends CustomItemsConfigFields {
                 Material.PAPER,
                 "&7Meteor Shower Scroll",
                 Arrays.asList("&4Call forth destruction.", "&4Single-use."));
-        setEnchantments(Arrays.asList("METEOR_SHOWER,1"));
+        setEnchantments(List.of("METEOR_SHOWER,1"));
         setItemType(CustomItem.ItemType.UNIQUE);
     }
 }

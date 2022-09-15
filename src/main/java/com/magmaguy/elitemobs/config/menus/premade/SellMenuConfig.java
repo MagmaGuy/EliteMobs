@@ -44,7 +44,7 @@ public class SellMenuConfig extends MenusConfigFields {
         storeSlots = ConfigurationEngine.setList(file, fileConfiguration, "sellSlots", Arrays.asList(19, 20, 21, 22, 23,
                 24, 25, 28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 43), false);
         ItemStackSerializer.serialize("cancelButton", ItemStackGenerator.generateItemStack(Material.BARRIER,
-                "&4Cancel", Arrays.asList("&cCancel purchase!"), MetadataHandler.signatureID), fileConfiguration);
+                "&4Cancel", List.of("&cCancel purchase!"), MetadataHandler.signatureID), fileConfiguration);
         cancelButton = ItemStackSerializer.deserialize("cancelButton", fileConfiguration);
         cancelSlot = ConfigurationEngine.setInt(fileConfiguration, "cancelButtonSlot", 27);
         ItemStackSerializer.serialize("confirmButton", ItemStackGenerator.generateItemStack(Material.EMERALD,

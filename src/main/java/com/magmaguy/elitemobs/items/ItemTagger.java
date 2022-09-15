@@ -17,25 +17,20 @@ import org.bukkit.inventory.meta.tags.ItemTagType;
 import org.bukkit.persistence.PersistentDataType;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class ItemTagger {
 
     public static final NamespacedKey eliteMobsItemNamespacedKey = new NamespacedKey(MetadataHandler.PLUGIN, "EliteMobsItem");
     public static final NamespacedKey customLore = new NamespacedKey(MetadataHandler.PLUGIN, "CustomLore");
-    public static String itemValue = "ItemValue";
-    public static NamespacedKey onHitPotionEffectKey = new NamespacedKey(MetadataHandler.PLUGIN, "onHitPotionEffect");
-    public static NamespacedKey continuousPotionEffectKey = new NamespacedKey(MetadataHandler.PLUGIN, "continuousPotionEffect");
-    public static NamespacedKey itemSource = new NamespacedKey(MetadataHandler.PLUGIN, "itemSource");
-
     @Getter
     private static final NamespacedKey ELITE_DAMAGE = new NamespacedKey(MetadataHandler.PLUGIN, "eliteDamage");
     @Getter
     private static final NamespacedKey ELITE_DEFENSE = new NamespacedKey(MetadataHandler.PLUGIN, "eliteDefense");
-
+    public static String itemValue = "ItemValue";
+    public static NamespacedKey onHitPotionEffectKey = new NamespacedKey(MetadataHandler.PLUGIN, "onHitPotionEffect");
+    public static NamespacedKey continuousPotionEffectKey = new NamespacedKey(MetadataHandler.PLUGIN, "continuousPotionEffect");
+    public static NamespacedKey itemSource = new NamespacedKey(MetadataHandler.PLUGIN, "itemSource");
 
     public static void registerEliteItem(ItemMeta itemMeta) {
         itemMeta.getPersistentDataContainer().set(eliteMobsItemNamespacedKey, PersistentDataType.BYTE, (byte) 1);
@@ -69,8 +64,7 @@ public class ItemTagger {
         if (rawLore == null)
             return new ArrayList<>();
         ArrayList<String> parsedLore = new ArrayList();
-        for (String entry : rawLore.split("\n"))
-            parsedLore.add(entry);
+        Collections.addAll(parsedLore, rawLore.split("\n"));
         return parsedLore;
     }
 

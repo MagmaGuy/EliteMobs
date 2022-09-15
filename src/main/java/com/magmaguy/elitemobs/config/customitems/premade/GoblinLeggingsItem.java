@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.utils.VersionChecker;
 import org.bukkit.Material;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class GoblinLeggingsItem extends CustomItemsConfigFields {
     public GoblinLeggingsItem() {
@@ -13,11 +14,11 @@ public class GoblinLeggingsItem extends CustomItemsConfigFields {
                 true,
                 Material.GOLDEN_LEGGINGS,
                 "&8Goblin Leggings",
-                Arrays.asList("&8A treasure among goblins!"));
+                List.of("&8A treasure among goblins!"));
         if (!VersionChecker.serverVersionOlderThan(16, 0))
             setMaterial(Material.NETHERITE_LEGGINGS);
         setEnchantments(Arrays.asList("PROTECTION_ENVIRONMENTAL,1", "PROTECTION_EXPLOSIONS,1", "PROTECTION_PROJECTILE,1", "DURABILITY,1"));
-        setPotionEffects(Arrays.asList("JUMP,0,self,continuous"));
+        setPotionEffects(List.of("JUMP,0,self,continuous"));
         setItemType(CustomItem.ItemType.UNIQUE);
     }
 }

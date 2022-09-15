@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.config.customitems.premade;
 import com.magmaguy.elitemobs.config.customitems.CustomItemsConfigFields;
 import org.bukkit.Material;
 
-import java.util.Arrays;
+import java.util.List;
 
 public class MagmaguysToothpickConfig extends CustomItemsConfigFields {
     public MagmaguysToothpickConfig() {
@@ -11,8 +11,8 @@ public class MagmaguysToothpickConfig extends CustomItemsConfigFields {
                 true,
                 Material.WOODEN_SWORD,
                 "&4Magmaguy&c's &2Toothpick",
-                Arrays.asList("&aIn nearly mint condition!"));
-        setEnchantments(Arrays.asList("VANISHING_CURSE,1"));
+                List.of("&aIn nearly mint condition!"));
+        setEnchantments(List.of("VANISHING_CURSE,1"));
         setCustomModelID(1);
     }
 }

@@ -24,7 +24,7 @@ import java.util.HashSet;
 
 public class NPCInteractions implements Listener {
 
-    private static HashSet<Player> cooldowns = new HashSet<>();
+    private static final HashSet<Player> cooldowns = new HashSet<>();
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void playerNPCInteract(PlayerInteractAtEntityEvent event) {

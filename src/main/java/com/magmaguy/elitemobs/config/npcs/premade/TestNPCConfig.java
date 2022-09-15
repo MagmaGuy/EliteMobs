@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
 import com.magmaguy.elitemobs.npcs.NPCInteractions;
 import org.bukkit.entity.Villager;
 
-import java.util.Arrays;
+import java.util.List;
 
 public class TestNPCConfig extends NPCsConfigFields {
     public TestNPCConfig() {
@@ -14,12 +14,12 @@ public class TestNPCConfig extends NPCsConfigFields {
                 "Testing!",
                 Villager.Profession.NITWIT,
                 null,
-                Arrays.asList("Test Greeting!"),
-                Arrays.asList("Test Dialog!"),
-                Arrays.asList("Test Farewell!"),
+                List.of("Test Greeting!"),
+                List.of("Test Dialog!"),
+                List.of("Test Farewell!"),
                 true,
                 3,
                 NPCInteractions.NPCInteractionType.CUSTOM_QUEST_GIVER);
-        super.setQuestFilenames(Arrays.asList("test_quest.yml"));
+        super.setQuestFilenames(List.of("test_quest.yml"));
     }
 }

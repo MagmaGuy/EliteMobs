@@ -27,7 +27,7 @@ public class ModelEngineReservedAddresses {
     public static void reserve() {
         //Nothing gets reserved if ModelEngine isn't installed
         if (!Bukkit.getPluginManager().isPluginEnabled("ModelEngine")) return;
-        Path modelEngineBlueprintsPath = Paths.get(MetadataHandler.PLUGIN.getDataFolder().getParentFile().getAbsolutePath().toString() + File.separatorChar + "ModelEngine" + File.separatorChar + "blueprints");
+        Path modelEngineBlueprintsPath = Paths.get(MetadataHandler.PLUGIN.getDataFolder().getParentFile().getAbsolutePath() + File.separatorChar + "ModelEngine" + File.separatorChar + "blueprints");
         //These are hardcoded and kept updated with releases. No two ways about it!
         makeDirectory(modelEngineBlueprintsPath, "em_1_primis");
         makeDirectory(modelEngineBlueprintsPath, "em_2_goblins");

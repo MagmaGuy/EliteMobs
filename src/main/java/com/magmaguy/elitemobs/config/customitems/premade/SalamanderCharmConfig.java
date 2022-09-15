@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.config.customitems.CustomItemsConfigFields;
 import org.bukkit.Material;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class SalamanderCharmConfig extends CustomItemsConfigFields {
     public SalamanderCharmConfig() {
@@ -12,8 +13,8 @@ public class SalamanderCharmConfig extends CustomItemsConfigFields {
                 Material.LEATHER,
                 "&bSalamander Charm",
                 Arrays.asList("&aAlmost as hot as MagmaGuy's", "&anew mixtape!"));
-        setEnchantments(Arrays.asList("VANISHING_CURSE,1"));
-        setPotionEffects(Arrays.asList("FIRE_RESISTANCE,0,self,continuous"));
+        setEnchantments(List.of("VANISHING_CURSE,1"));
+        setPotionEffects(List.of("FIRE_RESISTANCE,0,self,continuous"));
         setDropWeight("1");
     }
 }

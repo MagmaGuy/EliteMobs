@@ -9,7 +9,7 @@ public class CombatSystem {
      * This determines how many hits it takes to kill a boss.
      * Unfortunately, since it's flat, at a scale, all bosses tend to end up having the same amount of life.
      * It accomplishes this by adding this flat amount of health to bosses.
-     *
+     * <p>
      * Minus one because bosses start with 7 hp in the normalized combat system. They always have some baseline hp.
      */
     public static final double TARGET_HITS_TO_KILL_MINUS_ONE = 6D; //affects max health assignment on EliteMobEntity.java
@@ -25,6 +25,9 @@ public class CombatSystem {
     //Target time to kill in seconds
     public static final double TARGET_TIME_TO_KILL = 4.375;
 
+
+    private CombatSystem() {
+    }
 
     public static int getMaterialTier(Material material) {
         switch (material) {
@@ -62,9 +65,6 @@ public class CombatSystem {
                     return CombatSystem.NETHERITE_TIER_LEVEL;
         }
         return 0;
-    }
-
-    private CombatSystem() {
     }
 
 }

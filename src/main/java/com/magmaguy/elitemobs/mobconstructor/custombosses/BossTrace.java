@@ -14,7 +14,7 @@ public class BossTrace {
     private final long creationTimeStamp;
     private final double creationTicksStamp;
     //Welcome to my garden of insanity. This is necessary because Minecraft just refuses to cooperate
-    private List<String> trace = new ArrayList<>();
+    private final List<String> trace = new ArrayList<>();
 
     public BossTrace() {
         creationTimeStamp = System.currentTimeMillis();

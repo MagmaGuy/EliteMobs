@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.config.customarenas;
 
 import com.magmaguy.elitemobs.config.CustomConfig;
-import com.magmaguy.elitemobs.instanced.ArenaInstance;
+import com.magmaguy.elitemobs.instanced.arena.ArenaInstance;
 
 import java.util.HashMap;
 
@@ -17,10 +17,6 @@ public class CustomArenasConfig extends CustomConfig {
                 customArenas.put(key, (CustomArenasConfigFields) super.getCustomConfigFieldsHashMap().get(key));
                 ArenaInstance.initializeArena((CustomArenasConfigFields) super.getCustomConfigFieldsHashMap().get(key));
             }
-    }
-
-    public static HashMap<String, ? extends CustomArenasConfigFields> getCustomArenas() {
-        return customArenas;
     }
 
     public static CustomArenasConfigFields getCustomArena(String string) {

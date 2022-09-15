@@ -14,8 +14,7 @@ public class VisualItemRemover {
     public static void removeItems(Object[][] multiDimensionalTrailTracker) {
         for (Object[] objects : multiDimensionalTrailTracker)
             for (Object object : objects) {
-                if (!(object instanceof Item)) continue;
-                Item item = (Item) object;
+                if (!(object instanceof Item item)) continue;
                 new BukkitRunnable() {
                     @Override
                     public void run() {
