@@ -1,4 +1,4 @@
-package com.magmaguy.elitemobs.instanced;
+package com.magmaguy.elitemobs.instanced.arena;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
@@ -7,7 +7,7 @@ import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.ArenasConfig;
 import com.magmaguy.elitemobs.config.customarenas.CustomArenasConfigFields;
-import com.magmaguy.elitemobs.instanced.dungeons.MatchInstance;
+import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.WarningMessage;
@@ -37,8 +37,8 @@ public class ArenaInstance extends MatchInstance {
     @Getter
     private int currentWave = 0;
     @Getter
-    private HashSet<CustomBossEntity> customBosses = new HashSet<>();
-    private HashMap<Integer, String> waveMessage = new HashMap<>();
+    private final HashSet<CustomBossEntity> customBosses = new HashSet<>();
+    private final HashMap<Integer, String> waveMessage = new HashMap<>();
 
     public ArenaInstance(CustomArenasConfigFields customArenasConfigFields, Location corner1, Location corner2, Location startLocation, Location exitLocation) {
         super(corner1,

@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.config.customitems.CustomItemsConfigFields;
 import org.bukkit.Material;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class LuckyCharmsConfig extends CustomItemsConfigFields {
     public LuckyCharmsConfig() {
@@ -12,8 +13,8 @@ public class LuckyCharmsConfig extends CustomItemsConfigFields {
                 Material.COOKIE,
                 "&bLucky Charms",
                 Arrays.asList("&aPart of a complete breakfast!", "&cNote: Absolutely not a part of", "&ca complete breakfast."));
-        setEnchantments(Arrays.asList("VANISHING_CURSE,1"));
-        setPotionEffects(Arrays.asList("LUCK,0,self,continuous"));
+        setEnchantments(List.of("VANISHING_CURSE,1"));
+        setPotionEffects(List.of("LUCK,0,self,continuous"));
         setDropWeight("1");
     }
 }

@@ -66,8 +66,8 @@ public class EarthquakeEnchantment extends CustomEnchantment {
     }
 
     public static class EarthquakeEnchantmentEvents implements Listener {
-        private static HashSet<UUID> players = new HashSet<>();
-        private static HashSet<UUID> cooldownPlayers = new HashSet<>();
+        private static final HashSet<UUID> players = new HashSet<>();
+        private static final HashSet<UUID> cooldownPlayers = new HashSet<>();
 
         @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
         public void onSneak(PlayerToggleSneakEvent event) {

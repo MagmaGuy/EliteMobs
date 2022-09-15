@@ -7,7 +7,7 @@ import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import com.magmaguy.elitemobs.utils.ItemStackSerializer;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Arrays;
+import java.util.List;
 
 public class GetLootMenuConfig extends MenusConfigFields {
     public static String menuName;
@@ -28,7 +28,7 @@ public class GetLootMenuConfig extends MenusConfigFields {
                 "Info button",
                 ItemStackGenerator.generateSkullItemStack("magmaguy",
                         "&4&lEliteMobs &r&cby &4&lMagmaGuy",
-                        Arrays.asList("&8Support the plugins you enjoy!"),
+                        List.of("&8Support the plugins you enjoy!"),
                         MetadataHandler.signatureID),
                 fileConfiguration);
         infoItem = ItemStackSerializer.deserialize("Info button", fileConfiguration);
@@ -37,7 +37,7 @@ public class GetLootMenuConfig extends MenusConfigFields {
                 "Left button",
                 ItemStackGenerator.generateSkullItemStack("MHF_ArrowLeft",
                         "Previous Item Ranks",
-                        Arrays.asList(""),
+                        List.of(""),
                         MetadataHandler.signatureID),
                 fileConfiguration);
         leftArrowItem = ItemStackSerializer.deserialize("Left button", fileConfiguration);
@@ -46,7 +46,7 @@ public class GetLootMenuConfig extends MenusConfigFields {
                 "Right button",
                 ItemStackGenerator.generateSkullItemStack("MHF_ArrowRight",
                         "Next Item Ranks",
-                        Arrays.asList(""),
+                        List.of(""),
                         MetadataHandler.signatureID),
                 fileConfiguration);
         rightArrowItem = ItemStackSerializer.deserialize("Right button", fileConfiguration);
@@ -58,7 +58,7 @@ public class GetLootMenuConfig extends MenusConfigFields {
                 "previousLoot",
                 ItemStackGenerator.generateSkullItemStack("MHF_ArrowLeft",
                         "Previous Loot Page",
-                        Arrays.asList(""),
+                        List.of(""),
                         MetadataHandler.signatureID),
                 fileConfiguration);
         previousLootItem = ItemStackSerializer.deserialize("previousLoot", fileConfiguration);
@@ -67,7 +67,7 @@ public class GetLootMenuConfig extends MenusConfigFields {
                 "nextLoot",
                 ItemStackGenerator.generateSkullItemStack("MHF_ArrowRight",
                         "Next Loot Page",
-                        Arrays.asList(""), MetadataHandler.signatureID),
+                        List.of(""), MetadataHandler.signatureID),
                 fileConfiguration);
         nextLootItem = ItemStackSerializer.deserialize("nextLoot", fileConfiguration);
 

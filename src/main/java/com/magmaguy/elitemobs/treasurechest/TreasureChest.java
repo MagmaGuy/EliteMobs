@@ -35,7 +35,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class TreasureChest implements PersistentObject {
 
-    private static HashMap<Location, TreasureChest> treasureChestHashMap = new HashMap<>();
+    private static final HashMap<Location, TreasureChest> treasureChestHashMap = new HashMap<>();
     @Getter
     private final CustomTreasureChestConfigFields customTreasureChestConfigFields;
     private final String locationString;
@@ -68,16 +68,6 @@ public class TreasureChest implements PersistentObject {
         treasureChestHashMap.put(location, this);
     }
 
-    private void initializeChest() {
-        if (location != null && location.getWorld() != null) {
-            long time = (restockTime - Instant.now().getEpochSecond()) * 20L;
-            if (time < 0)
-                generateChest();
-            else
-                Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, this::generateChest, time);
-        }
-    }
-
     public static void clearTreasureChests() {
         treasureChestHashMap.clear();
     }
@@ -90,6 +80,16 @@ public class TreasureChest implements PersistentObject {
         return getTreasureChestHashMap().get(location);
     }
 
+    private void initializeChest() {
+        if (location != null && location.getWorld() != null) {
+            long time = (restockTime - Instant.now().getEpochSecond()) * 20L;
+            if (time < 0)
+                generateChest();
+            else
+                Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, this::generateChest, time);
+        }
+    }
+
     private void generateChest() {
         try {
             if (!location.getWorld()
@@ -99,8 +99,7 @@ public class TreasureChest implements PersistentObject {
             new WarningMessage("Custom Treasure Chest " + customTreasureChestConfigFields.getFilename() + " has an invalid location and can not be placed.");
             return;
         }
-        if (location.getBlock().getBlockData() instanceof Directional) {
-            Directional chest = (Directional) location.getBlock().getBlockData();
+        if (location.getBlock().getBlockData() instanceof Directional chest) {
             chest.setFacing(customTreasureChestConfigFields.getFacing());
             location.getBlock().setBlockData(chest);
         } else {

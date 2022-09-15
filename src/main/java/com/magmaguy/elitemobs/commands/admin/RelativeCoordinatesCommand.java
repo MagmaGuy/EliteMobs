@@ -35,8 +35,8 @@ public class RelativeCoordinatesCommand {
         }
 
         Vector relativeVector = player.getLocation().clone().subtract(anchorpoint).toVector();
-        if (((SchematicPackage) emPackage).getDungeonPackagerConfigFields().getCalculatedRotation() != 0)
-            GenericRotationMatrixMath.rotateVectorYAxis(((SchematicPackage) emPackage).getDungeonPackagerConfigFields().getCalculatedRotation(), anchorpoint, relativeVector);
+        if (emPackage.getDungeonPackagerConfigFields().getCalculatedRotation() != 0)
+            GenericRotationMatrixMath.rotateVectorYAxis(emPackage.getDungeonPackagerConfigFields().getCalculatedRotation(), anchorpoint, relativeVector);
 
         String relativePosition = relativeVector.getBlockX() + ", "
                 + relativeVector.getBlockY() + ", "

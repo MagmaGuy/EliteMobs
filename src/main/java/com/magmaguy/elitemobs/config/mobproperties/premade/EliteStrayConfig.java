@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.config.mobproperties.premade;
 import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfigFields;
 import org.bukkit.entity.EntityType;
 
-import java.util.Arrays;
+import java.util.List;
 
 public class EliteStrayConfig extends MobPropertiesConfigFields {
     public EliteStrayConfig() {
@@ -11,7 +11,7 @@ public class EliteStrayConfig extends MobPropertiesConfigFields {
                 EntityType.STRAY,
                 true,
                 "&fLvl &2$level &fElite &bStray",
-                Arrays.asList("$player &cwas led astray by $entity&c!"),
+                List.of("$player &cwas led astray by $entity&c!"),
                 5);
     }
 }

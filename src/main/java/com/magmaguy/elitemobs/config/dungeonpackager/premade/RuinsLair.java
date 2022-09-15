@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.util.Vector;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class RuinsLair extends DungeonPackagerConfigFields {
     public RuinsLair() {
@@ -15,9 +16,9 @@ public class RuinsLair extends DungeonPackagerConfigFields {
                 Arrays.asList("&fA fight against a myth from",
                         "&fNorse mythology, be prepared for a smiting!",
                         "&6Credits: 69OzCanOfBepis, MagmaGuy"),
-                Arrays.asList(
+                List.of(
                         "ruins_boss_p1.yml:0,0,0"),
-                Arrays.asList(),
+                List.of(),
                 DiscordLinks.premiumMinidungeons,
                 DungeonSizeCategory.LAIR,
                 "em_the_ruins.schem",

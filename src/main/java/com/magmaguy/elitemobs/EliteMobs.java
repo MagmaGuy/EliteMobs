@@ -18,6 +18,7 @@ import com.magmaguy.elitemobs.config.customspawns.CustomSpawnConfig;
 import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestsConfig;
 import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
+import com.magmaguy.elitemobs.config.instanceddungeons.InstancedDungeonsConfig;
 import com.magmaguy.elitemobs.config.menus.MenusConfig;
 import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
@@ -33,11 +34,12 @@ import com.magmaguy.elitemobs.events.TimedEvent;
 import com.magmaguy.elitemobs.explosionregen.Explosion;
 import com.magmaguy.elitemobs.gamemodes.nightmaremodeworld.DaylightWatchdog;
 import com.magmaguy.elitemobs.gamemodes.zoneworld.Grid;
-import com.magmaguy.elitemobs.instanced.dungeons.MatchInstance;
+import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.items.LootTables;
 import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantment;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.mobconstructor.PersistentObjectHandler;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.InstancedBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.PluginMobProperties;
 import com.magmaguy.elitemobs.mobs.passive.EggRunnable;
@@ -256,6 +258,8 @@ public class EliteMobs extends JavaPlugin {
         new WormholeConfig();
         //Arenas
         new CustomArenasConfig();
+        //Instanced dungeons
+        new InstancedDungeonsConfig();
 
 
         //Initialize em package content
@@ -320,6 +324,7 @@ public class EliteMobs extends JavaPlugin {
         RegionalBossEntity.save();
         RegionalBossEntity.getTrackableCustomBosses().clear();
         RegionalBossEntity.getRegionalBossEntitySet().clear();
+        InstancedBossEntity.shutdown();
 
         new InfoMessage("Wiping Elite entities clean...");
         PersistentObjectHandler.shutdown();

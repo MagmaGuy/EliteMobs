@@ -140,7 +140,6 @@ public abstract class CustomEvent {
             });
             if (allBossesAreDead.get()) {
                 end();
-                return;
             }
         }
     }

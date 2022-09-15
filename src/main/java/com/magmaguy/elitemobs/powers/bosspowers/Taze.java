@@ -18,7 +18,7 @@ public class Taze extends BossPower implements Listener {
         super(PowersConfig.getPower("taze.yml"));
     }
 
-    @EventHandler (ignoreCancelled = true)
+    @EventHandler(ignoreCancelled = true)
     public void onPlayerDamagedEvent(PlayerDamagedByEliteMobEvent event) {
         Taze taze = (Taze) event.getEliteMobEntity().getPower(this);
         if (taze == null) return;

@@ -29,10 +29,10 @@ import java.util.List;
 public class TransitiveBlockCommand {
 
     public static HashMap<Player, TransitiveBlockCommand> activePlayers = new HashMap<>();
-    private Player player;
-    private CustomBossesConfigFields customBossesConfigFields;
+    private final Player player;
+    private final CustomBossesConfigFields customBossesConfigFields;
     private List<TransitiveBlock> transitiveBlockList = new ArrayList<>();
-    private TransitiveBlockType transitiveBlockType;
+    private final TransitiveBlockType transitiveBlockType;
     private RegionalBossEntity regionalBossEntity;
     @Getter
     @Setter

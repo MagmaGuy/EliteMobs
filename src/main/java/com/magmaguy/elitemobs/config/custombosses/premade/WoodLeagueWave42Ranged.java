@@ -8,7 +8,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Arrays;
 
 public class WoodLeagueWave42Ranged extends CustomBossesConfigFields {
-    public WoodLeagueWave42Ranged(){
+    public WoodLeagueWave42Ranged() {
         super("wood_league_wave_42_ranged",
                 EntityType.PILLAGER,
                 true,

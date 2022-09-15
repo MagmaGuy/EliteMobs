@@ -28,7 +28,7 @@ public class WormholeEntry implements PersistentObject {
     @Getter
     private Location location;
     @Getter
-    private Wormhole wormhole;
+    private final Wormhole wormhole;
     @Getter
     private String locationString;
     @Getter
@@ -46,7 +46,7 @@ public class WormholeEntry implements PersistentObject {
     @Getter
     @Setter
     private String opMessage = null;
-    private int wormholeNumber;
+    private final int wormholeNumber;
     private PersistentObjectHandler persistentObjectHandler = null;
 
     public WormholeEntry(Wormhole wormhole, String locationString, int wormholeNumber) {

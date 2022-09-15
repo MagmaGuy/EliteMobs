@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.config.customitems.CustomItemsConfigFields;
 import org.bukkit.Material;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class ChameleonCharmConfig extends CustomItemsConfigFields {
     public ChameleonCharmConfig() {
@@ -12,7 +13,7 @@ public class ChameleonCharmConfig extends CustomItemsConfigFields {
                 Material.LEATHER,
                 "&bChameleon Charm",
                 Arrays.asList("&aThe colorful Chameleon can", "&ablend in just about anywhere,", "&aslowly creeping around..."));
-        setEnchantments(Arrays.asList("VANISHING_CURSE,1"));
+        setEnchantments(List.of("VANISHING_CURSE,1"));
         setPotionEffects(Arrays.asList("INVISIBILITY,0,self,onHit", "SLOW,0,self,onHit", "BLINDNESS,0,self,onHit"));
         setDropWeight("1");
     }

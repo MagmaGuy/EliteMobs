@@ -28,7 +28,7 @@ public class CustomShopMenuConfig extends MenusConfigFields {
         ItemStackSerializer.serialize("Reroll button",
                 ItemStackGenerator.generateSkullItemStack("magmaguy",
                         "&4&lEliteMobs &r&cby &4&lMagmaGuy",
-                        Arrays.asList("&8Support the plugins you enjoy!"),
+                        List.of("&8Support the plugins you enjoy!"),
                         MetadataHandler.signatureID),
                 fileConfiguration);
         rerollItem = ItemStackSerializer.deserialize("Reroll button", fileConfiguration);

@@ -130,7 +130,7 @@ public class VisualItemProcessor {
 //        }
 
         //this sometimes happens due to other plugins which is really annoying
-        if (newLocation.getWorld() != currentLocation.getWorld()){
+        if (newLocation.getWorld() != currentLocation.getWorld()) {
             hasValidEffect = false;
             return;
         }

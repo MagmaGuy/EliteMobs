@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.config.customitems.CustomItemsConfigFields;
 import org.bukkit.Material;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class ScorpionCharm extends CustomItemsConfigFields {
     public ScorpionCharm() {
@@ -12,8 +13,8 @@ public class ScorpionCharm extends CustomItemsConfigFields {
                 Material.POISONOUS_POTATO,
                 "&bScorpion Charm",
                 Arrays.asList("&aFloat like a butterfly,", "&asting like a bee,", "&apoison like a potato!"));
-        setEnchantments(Arrays.asList("VANISHING_CURSE,1"));
-        setPotionEffects(Arrays.asList("POISON,0,target,onHit"));
+        setEnchantments(List.of("VANISHING_CURSE,1"));
+        setPotionEffects(List.of("POISON,0,target,onHit"));
         setDropWeight("1");
     }
 }

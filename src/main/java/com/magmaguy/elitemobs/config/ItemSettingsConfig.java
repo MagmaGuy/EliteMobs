@@ -80,6 +80,10 @@ public class ItemSettingsConfig {
     @Getter
     private static boolean preventEliteItemEnchantment;
     @Getter
+    private static boolean preventEliteItemDisenchantment;
+    @Getter
+    private static String preventEliteItemDisenchantmentMessage;
+    @Getter
     private static boolean preventEliteItemDiamondToNetheriteUpgrade;
     @Getter
     private static boolean eliteDurability;
@@ -176,6 +180,8 @@ public class ItemSettingsConfig {
         potionEffectColor = ConfigurationEngine.setString(file, fileConfiguration, "potionEffectLoreColor", "&5◇", false);
         noSoulbindLore = ConfigurationEngine.setString(file, fileConfiguration, "noSoulbindLore", "&7Not Soulbound!", true);
         preventEliteItemEnchantment = ConfigurationEngine.setBoolean(fileConfiguration, "preventEliteItemEnchantment", true);
+        preventEliteItemDisenchantment = ConfigurationEngine.setBoolean(fileConfiguration, "preventEliteItemDisenchantment", true);
+        preventEliteItemDisenchantmentMessage = ConfigurationEngine.setString(file, fileConfiguration, "preventEliteItemDisenchantmentMessage", "&c[EliteMobs] Can't disenchant Elite Items!", true);
         preventEliteItemDiamondToNetheriteUpgrade = ConfigurationEngine.setBoolean(fileConfiguration, "preventEliteItemDiamondToNetheriteUpgrade", true);
         eliteDurability = ConfigurationEngine.setBoolean(fileConfiguration, "eliteItemsDurabilityLossOnlyOnDeath", true);
         eliteDurabilityMultiplier = ConfigurationEngine.setDouble(fileConfiguration, "eliteItemsDurabilityLossMultiplier", 1d);

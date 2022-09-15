@@ -33,6 +33,7 @@ public class ActionEvent extends CustomEvent {
     private final double chance;
     private final List<Material> breakableMaterials;
     private Player player;
+
     public ActionEvent(CustomEventsConfigFields customEventsConfigFields) {
         super(customEventsConfigFields);
         this.chance = customEventsConfigFields.getChance();

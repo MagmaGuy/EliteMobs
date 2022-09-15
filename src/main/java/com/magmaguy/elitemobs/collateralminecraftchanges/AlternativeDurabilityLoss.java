@@ -41,9 +41,7 @@ public class AlternativeDurabilityLoss implements Listener {
         if (!ItemTagger.isEliteItem(itemStack)) return false;
         if (!(itemStack.getItemMeta() instanceof Damageable)) return false;
         if (itemStack.getType().getMaxDurability() == 0) return false;
-        if (((Damageable) itemStack.getItemMeta()).getDamage() + 1 < itemStack.getType().getMaxDurability())
-            return false;
-        return true;
+        return ((Damageable) itemStack.getItemMeta()).getDamage() + 1 >= itemStack.getType().getMaxDurability();
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
@@ -62,8 +60,7 @@ public class AlternativeDurabilityLoss implements Listener {
             if (itemStack != null &&
                     itemStack.getType().getMaxDurability() != 0 &&
                     EliteItemManager.isEliteMobsItem(itemStack) &&
-                    itemStack.getItemMeta() instanceof Damageable) {
-                Damageable damageable = (Damageable) itemStack.getItemMeta();
+                    itemStack.getItemMeta() instanceof Damageable damageable) {
                 int maxDurability = itemStack.getType().getMaxDurability();
                 int durabilityLoss = (int) (maxDurability * durabilityLoss(itemStack));
                 int currentDurability = damageable.getDamage();

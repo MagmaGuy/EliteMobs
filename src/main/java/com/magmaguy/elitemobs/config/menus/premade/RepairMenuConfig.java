@@ -9,6 +9,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class RepairMenuConfig extends MenusConfigFields {
 
@@ -51,7 +52,7 @@ public class RepairMenuConfig extends MenusConfigFields {
                 "eliteItemInputInformationButton",
                 ItemStackGenerator.generateItemStack(Material.GREEN_BANNER,
                         "&2 Elite Item Input slots",
-                        Arrays.asList("&aThis slot is for your elite item!"), MetadataHandler.signatureID),
+                        List.of("&aThis slot is for your elite item!"), MetadataHandler.signatureID),
                 fileConfiguration);
         eliteItemInputInfoButton = ItemStackSerializer.deserialize("eliteItemInputInformationButton", fileConfiguration);
         eliteScrapInputInformationSlot = ConfigurationEngine.setInt(fileConfiguration, "eliteScrapInputInformationSlot", 22);
@@ -60,24 +61,24 @@ public class RepairMenuConfig extends MenusConfigFields {
                 "eliteScrapInputInformationButton",
                 ItemStackGenerator.generateItemStack(Material.GREEN_BANNER,
                         "&2Elite Scrap Input slots",
-                        Arrays.asList("&aThis slot is for your elite scrap!"), MetadataHandler.signatureID),
+                        List.of("&aThis slot is for your elite scrap!"), MetadataHandler.signatureID),
                 fileConfiguration);
         eliteScrapInputInfoButton = ItemStackSerializer.deserialize("eliteScrapInputInformationButton", fileConfiguration);
         outputInformationSlot = ConfigurationEngine.setInt(fileConfiguration, "informationOutputButtonSlot", 24);
         outputSlot = ConfigurationEngine.setInt(fileConfiguration, "outputSlot", 33);
         ItemStackSerializer.serialize("cancelButton", ItemStackGenerator.generateItemStack(Material.BARRIER,
-                "&4Cancel", Arrays.asList("&cCancel repair!"), MetadataHandler.signatureID), fileConfiguration);
+                "&4Cancel", List.of("&cCancel repair!"), MetadataHandler.signatureID), fileConfiguration);
         ItemStackSerializer.serialize(
                 "outputInformationButton",
                 ItemStackGenerator.generateItemStack(Material.RED_BANNER,
                         "&2Output slots",
-                        Arrays.asList("&aThis slot previews the result of your repair!"), MetadataHandler.signatureID),
+                        List.of("&aThis slot previews the result of your repair!"), MetadataHandler.signatureID),
                 fileConfiguration);
         outputInfoButton = ItemStackSerializer.deserialize("outputInformationButton", fileConfiguration);
         cancelButton = ItemStackSerializer.deserialize("cancelButton", fileConfiguration);
         cancelSlot = ConfigurationEngine.setInt(fileConfiguration, "cancelButtonSlot", 27);
         ItemStackSerializer.serialize("confirmButton", ItemStackGenerator.generateItemStack(Material.EMERALD,
-                "&2Confirm!", Arrays.asList("&aRepair item!"), 31174), fileConfiguration);
+                "&2Confirm!", List.of("&aRepair item!"), 31174), fileConfiguration);
         confirmButton = ItemStackSerializer.deserialize("confirmButton", fileConfiguration);
         confirmSlot = ConfigurationEngine.setInt(fileConfiguration, "confirmRepairSlot", 35);
     }

@@ -18,16 +18,10 @@ import java.util.UUID;
 public class ElitePlayerInventory {
 
     public static HashMap<UUID, ElitePlayerInventory> playerInventories = new HashMap<>();
-
-    public static ElitePlayerInventory getPlayer(Player player) {
-        return playerInventories.get(player.getUniqueId());
-    }
-
     public final PlayerItem helmet, chestplate, leggings, boots, mainhand, offhand;
     private final Player player;
     private boolean getArmorCooldown = false;
     private boolean getWeaponCooldown = false;
-
     /**
      * Object of the player's inventory for EliteMobs.
      * For performance reasons, values are cached and updated only when strictly necessary.
@@ -44,6 +38,10 @@ public class ElitePlayerInventory {
         this.mainhand = new PlayerItem(player.getInventory().getItemInMainHand(), PlayerItem.EquipmentSlot.MAINHAND, player);
         this.offhand = new PlayerItem(player.getInventory().getItemInOffHand(), PlayerItem.EquipmentSlot.OFFHAND, player);
         playerInventories.put(player.getUniqueId(), this);
+    }
+
+    public static ElitePlayerInventory getPlayer(Player player) {
+        return playerInventories.get(player.getUniqueId());
     }
 
     public static void initialize() {

@@ -9,7 +9,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Arrays;
 
 public class WoodLeagueWave50BossP2 extends CustomBossesConfigFields {
-    public WoodLeagueWave50BossP2(){
+    public WoodLeagueWave50BossP2() {
         super("wood_league_wave_50_boss_p2",
                 EntityType.WITHER_SKELETON,
                 true,

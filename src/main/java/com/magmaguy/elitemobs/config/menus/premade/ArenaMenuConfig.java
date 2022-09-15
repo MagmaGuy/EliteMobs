@@ -9,7 +9,7 @@ import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Arrays;
+import java.util.List;
 
 public class ArenaMenuConfig extends MenusConfigFields {
     @Getter
@@ -31,14 +31,14 @@ public class ArenaMenuConfig extends MenusConfigFields {
     public void processAdditionalFields() {
         menuName = ConfigurationEngine.setString(file, fileConfiguration, "menuName", "", true);
         playerItem = ConfigurationEngine.setItemStack(fileConfiguration, "playerItem",
-                ItemStackGenerator.generateItemStack(Material.DIAMOND_SWORD, "&4Challenge the arena!", Arrays.asList("&2Fight in the arena!")));
+                ItemStackGenerator.generateItemStack(Material.DIAMOND_SWORD, "&4Challenge the arena!", List.of("&2Fight in the arena!")));
         playerItemSlot = ConfigurationEngine.setInt(fileConfiguration, "playerItemSlot", 6);
         if (!VersionChecker.serverVersionOlderThan(17, 0))
             spectatorItem = ConfigurationEngine.setItemStack(fileConfiguration, "spectatorItem",
-                    ItemStackGenerator.generateItemStack(Material.SPYGLASS, "&aSpectate!", Arrays.asList("&2Spectate players in the arena!"), MetadataHandler.signatureID));
+                    ItemStackGenerator.generateItemStack(Material.SPYGLASS, "&aSpectate!", List.of("&2Spectate players in the arena!"), MetadataHandler.signatureID));
         else
             spectatorItem = ConfigurationEngine.setItemStack(fileConfiguration, "spectatorItem",
-                    ItemStackGenerator.generateItemStack(Material.NOTE_BLOCK, "&aSpectate!", Arrays.asList("&2Spectate players in the arena!"), MetadataHandler.signatureID));
+                    ItemStackGenerator.generateItemStack(Material.NOTE_BLOCK, "&aSpectate!", List.of("&2Spectate players in the arena!"), MetadataHandler.signatureID));
         spectatorItemSlot = ConfigurationEngine.setInt(fileConfiguration, "spectatorItemSlot", 2);
     }
 

@@ -7,6 +7,7 @@ import org.bukkit.entity.EntityType;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 public class AlphaWerewolfP1Boss extends CustomBossesConfigFields {
     public AlphaWerewolfP1Boss() {
@@ -18,7 +19,7 @@ public class AlphaWerewolfP1Boss extends CustomBossesConfigFields {
         setPersistent(true);
         setHealthMultiplier(4);
         setDamageMultiplier(2);
-        setPhases(Arrays.asList("alpha_werewolf_p2.yml:0.99"));
+        setPhases(List.of("alpha_werewolf_p2.yml:0.99"));
         setPowers(Arrays.asList("spirit_walk.yml",
                 "summonable:summonType=GLOBAL:filename=gamma_werewolf.yml:amount=1:customSpawn=normal_surface_spawn.yml",
                 "summonable:summonType=GLOBAL:filename=omega_wolf.yml:amount=2:customSpawn=normal_surface_spawn.yml"));

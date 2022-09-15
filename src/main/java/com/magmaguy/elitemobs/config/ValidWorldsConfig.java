@@ -12,7 +12,7 @@ import java.util.List;
 
 public class ValidWorldsConfig {
     @Getter
-    private static List<String> validWorlds = new ArrayList<>();
+    private static final List<String> validWorlds = new ArrayList<>();
     @Getter
     private static List<String> zoneBasedWorlds = new ArrayList<>();
     @Getter

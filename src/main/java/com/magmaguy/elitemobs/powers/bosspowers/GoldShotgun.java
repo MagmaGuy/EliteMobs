@@ -17,7 +17,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -96,7 +95,7 @@ public class GoldShotgun extends BossPower implements Listener {
                     ItemStackGenerator.generateItemStack(
                             Material.GOLD_NUGGET,
                             "visual projectile",
-                            Arrays.asList(ThreadLocalRandom.current().nextDouble() + "")));
+                            List.of(ThreadLocalRandom.current().nextDouble() + "")));
             ProjectileDamage.configureVisualProjectile(visualProjectile);
             visualProjectile.setVelocity(getShotVector(eliteEntity, player).multiply(0.9));
             visualProjectile.setGravity(false);

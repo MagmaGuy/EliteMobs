@@ -4,8 +4,8 @@ import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 public class BetaWolfBoss extends CustomBossesConfigFields {
     public BetaWolfBoss() {
@@ -18,7 +18,7 @@ public class BetaWolfBoss extends CustomBossesConfigFields {
         setDropsVanillaLoot(false);
         setHealthMultiplier(0.5);
         setDamageMultiplier(0.5);
-        setPowers(Arrays.asList("attack_poison.yml"));
+        setPowers(List.of("attack_poison.yml"));
         HashMap<Material, Double> damageModifiers = new HashMap<>();
         damageModifiers.put(Material.IRON_SWORD, 2D);
         damageModifiers.put(Material.IRON_AXE, 2D);

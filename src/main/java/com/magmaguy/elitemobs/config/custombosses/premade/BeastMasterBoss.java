@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import org.bukkit.entity.EntityType;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class BeastMasterBoss extends CustomBossesConfigFields {
     public BeastMasterBoss() {
@@ -30,7 +31,7 @@ public class BeastMasterBoss extends CustomBossesConfigFields {
         setPersistent(true);
         setPowers(Arrays.asList("attack_poison.yml", "ground_pound.yml", "bonus_loot.yml",
                 "summonable:summonType=ON_HIT:filename=wild_wolf.yml:spawnNearby=true:inheritAggro=true:inheritLevel=true:chance=0.2"));
-        setUniqueLootList(Arrays.asList("summon_wolf_scroll.yml:1"));
+        setUniqueLootList(List.of("summon_wolf_scroll.yml:1"));
         setFollowDistance(100);
     }
 }

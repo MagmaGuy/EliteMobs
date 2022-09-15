@@ -32,19 +32,6 @@ public class DungeonUtils {
         return new Pair(lowestLevel, highestLevel);
     }
 
-    public static class Pair {
-        @Getter
-        Integer lowestValue;
-        @Getter
-        Integer highestValue;
-
-        public Pair(Integer lowestValue, Integer highestValue) {
-            this.lowestValue = lowestValue;
-            this.highestValue = highestValue;
-        }
-    }
-
-
     public static World loadWorld(WorldPackage worldPackage) {
         String worldName = worldPackage.getDungeonPackagerConfigFields().getWorldName();
         World.Environment environment = worldPackage.getDungeonPackagerConfigFields().getEnvironment();
@@ -62,7 +49,6 @@ public class DungeonUtils {
             return null;
         try {
             WorldCreator worldCreator = new WorldCreator(worldName);
-
             worldCreator.environment(environment);
             World world = Bukkit.createWorld(worldCreator);
             if (world != null)
@@ -70,7 +56,7 @@ public class DungeonUtils {
             world.setDifficulty(Difficulty.HARD);
             return world;
         } catch (Exception exception) {
-            new WarningMessage("Failed to load packaged world " + worldName + " !");
+            new WarningMessage("Failed to load world " + worldName + " !");
             exception.printStackTrace();
         }
         return null;
@@ -91,5 +77,17 @@ public class DungeonUtils {
         if (worldPackage instanceof WorldDungeonPackage && ((WorldDungeonPackage) worldPackage).getWormholeWorld() != null)
             Bukkit.unloadWorld(((WorldDungeonPackage) worldPackage).getWormholeWorld(), false);
         return true;
+    }
+
+    public static class Pair {
+        @Getter
+        Integer lowestValue;
+        @Getter
+        Integer highestValue;
+
+        public Pair(Integer lowestValue, Integer highestValue) {
+            this.lowestValue = lowestValue;
+            this.highestValue = highestValue;
+        }
     }
 }

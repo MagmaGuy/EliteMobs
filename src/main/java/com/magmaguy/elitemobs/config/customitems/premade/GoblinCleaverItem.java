@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.utils.VersionChecker;
 import org.bukkit.Material;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class GoblinCleaverItem extends CustomItemsConfigFields {
     public GoblinCleaverItem() {
@@ -13,11 +14,11 @@ public class GoblinCleaverItem extends CustomItemsConfigFields {
                 true,
                 Material.GOLDEN_AXE,
                 "&8Goblin Cleaver",
-                Arrays.asList("&8A treasure among goblins!"));
+                List.of("&8A treasure among goblins!"));
         if (!VersionChecker.serverVersionOlderThan(16, 0))
             setMaterial(Material.NETHERITE_AXE);
         setEnchantments(Arrays.asList("DAMAGE_ALL,1", "DAMAGE_UNDEAD,1", "DURABILITY,1", "KNOCKBACK,1", "LOOT_BONUS_MOBS,5"));
-        setPotionEffects(Arrays.asList("POISON,0,target,onHit"));
+        setPotionEffects(List.of("POISON,0,target,onHit"));
         setItemType(CustomItem.ItemType.UNIQUE);
     }
 }

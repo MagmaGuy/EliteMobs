@@ -39,7 +39,7 @@ public class ServerPropertiesModifier {
         return true;
     }
 
-    public static String getValue(String configKey){
+    public static String getValue(String configKey) {
         File serverProperties = null;
         try {
             serverProperties = new File(Paths.get(MetadataHandler.PLUGIN.getDataFolder().getParentFile().getCanonicalFile().getParentFile().toString() + File.separatorChar + "server.properties").toString());

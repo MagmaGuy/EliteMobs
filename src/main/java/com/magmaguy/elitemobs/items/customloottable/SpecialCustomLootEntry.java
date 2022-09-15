@@ -12,8 +12,8 @@ import java.util.List;
 
 public class SpecialCustomLootEntry extends CustomLootEntry implements Serializable {
     @Getter
-    private String rawString;
-    private String configFilename;
+    private final String rawString;
+    private final String configFilename;
 
     public SpecialCustomLootEntry(List<CustomLootEntry> entries, String rawString, String configFilename) {
         this.rawString = rawString;
@@ -21,14 +21,12 @@ public class SpecialCustomLootEntry extends CustomLootEntry implements Serializa
         //todo: Integrate Special Loot in its entirety to this class to make it mesh with how the rest of the loot works
         for (String processedString : rawString.split(":")) {
             String[] strings = processedString.split("=");
-            switch (strings[0].toLowerCase()) {
-                case "wave":
-                    try {
-                        super.setWave(Integer.parseInt(strings[1]));
-                    } catch (Exception ex) {
-                        errorMessage(rawString, configFilename, "wave");
-                    }
-                    break;
+            if ("wave".equals(strings[0].toLowerCase())) {
+                try {
+                    super.setWave(Integer.parseInt(strings[1]));
+                } catch (Exception ex) {
+                    errorMessage(rawString, configFilename, "wave");
+                }
             }
         }
         entries.add(this);

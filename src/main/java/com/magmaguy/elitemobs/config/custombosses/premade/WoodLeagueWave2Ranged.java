@@ -6,7 +6,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
 public class WoodLeagueWave2Ranged extends CustomBossesConfigFields {
-    public WoodLeagueWave2Ranged(){
+    public WoodLeagueWave2Ranged() {
         super("wood_league_wave_2_ranged",
                 EntityType.PILLAGER,
                 true,

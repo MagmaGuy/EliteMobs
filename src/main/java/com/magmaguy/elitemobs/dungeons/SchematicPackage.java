@@ -42,7 +42,6 @@ public class SchematicPackage extends EMPackage {
         if (!Bukkit.getPluginManager().isPluginEnabled("WorldEdit")) {
             this.isDownloaded = false;
             new WarningMessage("Schematic dungeons are downloaded but neither WorldEdit nor FastAsyncWorldEdit are installed! As such, you will not be able to install the dungeons.");
-            return;
         }
 
     }
@@ -121,7 +120,7 @@ public class SchematicPackage extends EMPackage {
 
         public final int value;
 
-        private SchematicRotation(int value) {
+        SchematicRotation(int value) {
             this.value = value;
         }
     }

@@ -198,9 +198,8 @@ public class Explosion {
 
         //Getter for blocks that will break if the block above goes away
         if (y == -1) {
-            switch (blockState.getType()) {
-                case VINE:
-                    return true;
+            if (blockState.getType() == Material.VINE) {
+                return true;
             }
         }
 

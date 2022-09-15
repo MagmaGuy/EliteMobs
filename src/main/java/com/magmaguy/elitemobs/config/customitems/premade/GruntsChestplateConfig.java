@@ -7,7 +7,7 @@ import org.bukkit.Material;
 import java.util.Arrays;
 
 public class GruntsChestplateConfig extends CustomItemsConfigFields {
-    public GruntsChestplateConfig(){
+    public GruntsChestplateConfig() {
         super("grunts_chestplate", true, Material.IRON_CHESTPLATE, "&fGrunt's Chestplate", Arrays.asList("&2Awarded to those who challenge the", "&2Wood League Arena!"));
         setEnchantments(Arrays.asList("PROTECTION_ENVIRONMENTAL,5", "PROTECTION_PROJECTILE,4", "DURABILITY,5"));
         setItemType(CustomItem.ItemType.UNIQUE);

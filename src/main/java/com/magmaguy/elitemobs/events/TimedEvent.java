@@ -32,6 +32,7 @@ public class TimedEvent extends CustomEvent implements Listener {
     private double nextLocalEventTrigger = 0;
     private CustomSpawn customSpawn;
     private boolean silentRetry = false;
+
     public TimedEvent(CustomEventsConfigFields customEventsConfigFields) {
         super(customEventsConfigFields);
         this.localCooldown = customEventsConfigFields.getLocalCooldown();

@@ -25,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
 public class CustomFetchObjective extends Objective {
 
     @Getter
-    private String key;
+    private final String key;
     @Getter
     @Setter
     /**
@@ -119,14 +119,14 @@ public class CustomFetchObjective extends Objective {
         public void onQuestAcceptEvent(QuestAcceptEvent event) {
             for (Objective objective : event.getQuest().getQuestObjectives().getObjectives())
                 if (objective instanceof CustomFetchObjective)
-                    ((CustomFetchObjective) objective).progressNonlinearObjective(event.getQuest().getQuestObjectives(), event.getPlayer(), 0);
+                    objective.progressNonlinearObjective(event.getQuest().getQuestObjectives(), event.getPlayer(), 0);
         }
 
         @EventHandler(ignoreCancelled = true)
         public void onQuestCompleteEvent(QuestCompleteEvent event) {
             for (Objective objective : event.getQuest().getQuestObjectives().getObjectives())
                 if (objective instanceof CustomFetchObjective) {
-                    ((CustomFetchObjective) objective).progressNonlinearObjective(event.getQuest().getQuestObjectives(), event.getPlayer(), 0);
+                    objective.progressNonlinearObjective(event.getQuest().getQuestObjectives(), event.getPlayer(), 0);
                     if (objective.getCurrentAmount() < objective.getTargetAmount())
                         event.setCancelled(true);
                 }

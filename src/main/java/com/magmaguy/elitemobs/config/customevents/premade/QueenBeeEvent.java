@@ -5,17 +5,17 @@ import com.magmaguy.elitemobs.events.CustomEvent;
 import com.magmaguy.elitemobs.utils.VersionChecker;
 import org.bukkit.Material;
 
-import java.util.Arrays;
+import java.util.List;
 
 public class QueenBeeEvent extends CustomEventsConfigFields {
     public QueenBeeEvent() {
         super("queen_bee",
                 true);
         setEventType(CustomEvent.EventType.BREAK_BLOCK);
-        setBossFilenames(Arrays.asList("queen_bee.yml"));
+        setBossFilenames(List.of("queen_bee.yml"));
         setChance(0.001);
         if (!VersionChecker.serverVersionOlderThan(15, 0))
-            setBreakableMaterials(Arrays.asList(Material.BEE_NEST));
+            setBreakableMaterials(List.of(Material.BEE_NEST));
         setEventDuration(20);
     }
 }

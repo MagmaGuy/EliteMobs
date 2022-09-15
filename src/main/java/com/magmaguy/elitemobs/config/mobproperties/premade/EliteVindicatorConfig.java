@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.config.mobproperties.premade;
 import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfigFields;
 import org.bukkit.entity.EntityType;
 
-import java.util.Arrays;
+import java.util.List;
 
 public class EliteVindicatorConfig extends MobPropertiesConfigFields {
     public EliteVindicatorConfig() {
@@ -11,7 +11,7 @@ public class EliteVindicatorConfig extends MobPropertiesConfigFields {
                 EntityType.VINDICATOR,
                 true,
                 "&fLvl &2$level &fElite &8Vindicator",
-                Arrays.asList("$entity &cvindicated his fighting skills over $player&c!"),
+                List.of("$entity &cvindicated his fighting skills over $player&c!"),
                 19.5);
     }
 }

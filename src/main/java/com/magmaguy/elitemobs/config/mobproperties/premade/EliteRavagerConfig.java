@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.config.mobproperties.premade;
 import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfigFields;
 import org.bukkit.entity.EntityType;
 
-import java.util.Arrays;
+import java.util.List;
 
 public class EliteRavagerConfig extends MobPropertiesConfigFields {
     public EliteRavagerConfig() {
@@ -11,7 +11,7 @@ public class EliteRavagerConfig extends MobPropertiesConfigFields {
                 EntityType.RAVAGER,
                 true,
                 "&fLvl &2$level &fElite &6Ravager",
-                Arrays.asList("$entity &cshowed $player &cwho's in charge!"),
+                List.of("$entity &cshowed $player &cwho's in charge!"),
                 18);
     }
 }

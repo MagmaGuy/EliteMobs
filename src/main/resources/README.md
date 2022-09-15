@@ -288,3 +288,7 @@ to be documented
 ## To add new mob types:
 
 to be documented
+
+## Special thanks:
+Special Thanks to Illusion for spending a few hours proselytizing enums that are also have anonymous method implementations on their constructor.
+ 

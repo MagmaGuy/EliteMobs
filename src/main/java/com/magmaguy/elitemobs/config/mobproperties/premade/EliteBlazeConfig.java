@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.config.mobproperties.premade;
 import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfigFields;
 import org.bukkit.entity.EntityType;
 
-import java.util.Arrays;
+import java.util.List;
 
 public class EliteBlazeConfig extends MobPropertiesConfigFields {
     public EliteBlazeConfig() {
@@ -11,7 +11,7 @@ public class EliteBlazeConfig extends MobPropertiesConfigFields {
                 EntityType.BLAZE,
                 true,
                 "&fLvl &2$level &fElite &eBlaze",
-                Arrays.asList("$player &cwas lit ablaze by $entity!"),
+                List.of("$player &cwas lit ablaze by $entity!"),
                 9);
     }
 }

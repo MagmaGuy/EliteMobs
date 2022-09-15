@@ -154,8 +154,7 @@ public class PlayerDamagedByEliteMobEvent extends Event implements Cancellable {
                 bypass = false;
                 return;
             }
-            if (!(event.getEntity() instanceof Player)) return;
-            Player player = (Player) event.getEntity();
+            if (!(event.getEntity() instanceof Player player)) return;
 
             //citizens
             if (player.hasMetadata("NPC") || ElitePlayerInventory.getPlayer(player) == null)

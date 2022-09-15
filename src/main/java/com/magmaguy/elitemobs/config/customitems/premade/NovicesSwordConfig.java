@@ -7,7 +7,7 @@ import org.bukkit.Material;
 import java.util.Arrays;
 
 public class NovicesSwordConfig extends CustomItemsConfigFields {
-    public NovicesSwordConfig(){
+    public NovicesSwordConfig() {
         super("novices_sword", true, Material.STONE_SWORD, "&8Novice's Sword", Arrays.asList("&2Awarded to those who challenge the", "&2Wood League Arena!"));
         setEnchantments(Arrays.asList("DAMAGE_ALL,5", "SWEEPING_EDGE,1", "DURABILITY,5"));
         setItemType(CustomItem.ItemType.UNIQUE);

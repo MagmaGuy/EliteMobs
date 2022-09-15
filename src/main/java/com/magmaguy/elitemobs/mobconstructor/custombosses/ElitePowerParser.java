@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.mobconstructor.custombosses;
 
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.powers.bosspowers.BonusCoins;
 import com.magmaguy.elitemobs.powers.meta.CustomSummonPower;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
@@ -10,9 +11,10 @@ import java.util.List;
 
 public class ElitePowerParser {
 
-    public static HashSet<ElitePower> parsePowers(List<String> powers) {
+    public static HashSet<ElitePower> parsePowers(CustomBossesConfigFields customBossesConfigFields) {
         HashSet<ElitePower> elitePowers = new HashSet<>();
         CustomSummonPower customSummonPower = null;
+        List<String> powers = customBossesConfigFields.getPowers();
         if (powers == null) return elitePowers;
         for (String powerName : powers) {
             if (powerName.split(":")[0].equalsIgnoreCase("summon")
@@ -38,6 +40,8 @@ public class ElitePowerParser {
                     new WarningMessage("Warning: power name " + powerName + " is not registered! Skipping it for custom mob construction...");
             }
         }
+        if (customBossesConfigFields.getEliteScript() != null)
+            elitePowers.addAll(customBossesConfigFields.getEliteScript());
         return elitePowers;
     }
 }

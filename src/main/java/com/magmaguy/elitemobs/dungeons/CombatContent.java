@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.dungeons;
 
 public interface CombatContent {
-    public int getLowestLevel();
+    int getLowestLevel();
 
-    public int getHighestLevel();
+    int getHighestLevel();
 }

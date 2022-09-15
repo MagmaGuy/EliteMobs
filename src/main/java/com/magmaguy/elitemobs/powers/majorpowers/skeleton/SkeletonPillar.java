@@ -56,7 +56,7 @@ public class SkeletonPillar extends MajorPower implements Listener {
                         event.getEliteMobEntity().getLivingEntity().setAI(true);
                     cancel();
 
-                } else if (timer > 20 * 1 && timer < 20 * 7) {
+                } else if (timer > 20 && timer < 20 * 7) {
 
                     pillarEffect(event.getEliteMobEntity().getLivingEntity().getLocation().clone(), timer, 7);
                     pillarEffect(event.getEliteMobEntity().getLivingEntity().getLocation().clone(), timer, -7);
@@ -88,11 +88,9 @@ public class SkeletonPillar extends MajorPower implements Listener {
 
     private void pillarDamage(Location location) {
         for (Entity entity : location.getWorld().getNearbyEntities(location, 2, 5, 2))
-            if (entity instanceof LivingEntity && !(entity instanceof Pig || entity instanceof Cow || entity instanceof Chicken ||
+            if (entity instanceof LivingEntity livingEntity && !(entity instanceof Pig || entity instanceof Cow || entity instanceof Chicken ||
                     entity instanceof Wolf || entity instanceof Llama || entity instanceof Ocelot || entity instanceof Horse ||
                     entity instanceof Sheep || entity instanceof Rabbit || entity instanceof Parrot || entity instanceof Villager)) {
-
-                LivingEntity livingEntity = (LivingEntity) entity;
 
                 if (livingEntity.isValid())
                     livingEntity.damage(1);

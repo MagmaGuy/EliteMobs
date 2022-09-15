@@ -43,7 +43,7 @@ public class QuestTracking {
     private final Player player;
     @Getter
     private final CustomQuest customQuest;
-    private List<Location> turnInNPCs = new ArrayList<>();
+    private final List<Location> turnInNPCs = new ArrayList<>();
     private List<ObjectiveDestinations> objectiveDestinations = new ArrayList<>();
     private BukkitTask locationRefresher;
     private BukkitTask compassTask;

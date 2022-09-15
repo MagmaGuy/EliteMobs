@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.config.custombosses.premade;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import org.bukkit.entity.EntityType;
 
-import java.util.Arrays;
+import java.util.List;
 
 public class PillagerCaravanBeastBoss extends CustomBossesConfigFields {
     public PillagerCaravanBeastBoss() {
@@ -15,6 +15,6 @@ public class PillagerCaravanBeastBoss extends CustomBossesConfigFields {
         setDropsEliteMobsLoot(false);
         setDropsVanillaLoot(false);
         setFollowDistance(100);
-        setPowers(Arrays.asList("attack_confusing.yml"));
+        setPowers(List.of("attack_confusing.yml"));
     }
 }

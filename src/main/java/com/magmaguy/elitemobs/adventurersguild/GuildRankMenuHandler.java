@@ -296,10 +296,9 @@ public class GuildRankMenuHandler implements Listener {
 
     @EventHandler
     public void onRankSelectorClick(InventoryClickEvent event) {
-        if (!(event.getWhoClicked() instanceof Player)) return;
+        if (!(event.getWhoClicked() instanceof Player player)) return;
         if (!inventories.contains(event.getInventory())) return;
         event.setCancelled(true);
-        Player player = (Player) event.getWhoClicked();
 
         if (event.getSlot() == prestigeRankSlot) {
             selectPrestigeUnlock(player);
@@ -332,7 +331,6 @@ public class GuildRankMenuHandler implements Listener {
         if (GuildRank.getMaxGuildRank(player) < selectedRank) {
             selectPrestigeUnlock(player);
             GuildRankMenuHandler.populateInventory(event.getInventory(), player);
-            return;
         }
 
     }

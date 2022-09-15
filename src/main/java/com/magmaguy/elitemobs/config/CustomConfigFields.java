@@ -269,7 +269,7 @@ public class CustomConfigFields implements CustomConfigFieldsInterface {
             return value;
         }
         try {
-            return (T) Enum.valueOf(enumClass, fileConfiguration.getString(path).toUpperCase());
+            return Enum.valueOf(enumClass, fileConfiguration.getString(path).toUpperCase());
         } catch (Exception ex) {
             new WarningMessage("File " + filename + " has an incorrect entry for " + path);
             new WarningMessage("Entry: " + value);

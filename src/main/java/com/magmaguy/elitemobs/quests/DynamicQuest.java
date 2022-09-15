@@ -20,7 +20,7 @@ import java.util.UUID;
 
 public class DynamicQuest extends Quest {
 
-    private static HashMap<UUID, List<DynamicQuest>> dynamicPlayerQuests = new HashMap<>();
+    private static final HashMap<UUID, List<DynamicQuest>> dynamicPlayerQuests = new HashMap<>();
 
     public DynamicQuest(Player player, int questLevel, QuestObjectives questObjectives) {
         super(player, questObjectives, questLevel);
@@ -34,7 +34,7 @@ public class DynamicQuest extends Quest {
         List<DynamicQuest> dynamicQuests = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             int questLevel = GuildRank.getActiveGuildRank(player);
-            if (questLevel == 0){
+            if (questLevel == 0) {
                 player.sendMessage(QuestsConfig.getLowRankDynamicQuestWarning());
                 return new ArrayList<>();
             }

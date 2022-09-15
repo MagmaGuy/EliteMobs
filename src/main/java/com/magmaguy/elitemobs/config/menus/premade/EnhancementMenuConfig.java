@@ -9,6 +9,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class EnhancementMenuConfig extends MenusConfigFields {
     public static String shopName;
@@ -54,23 +55,23 @@ public class EnhancementMenuConfig extends MenusConfigFields {
                 "eliteItemInputInformationButton",
                 ItemStackGenerator.generateItemStack(Material.GREEN_BANNER,
                         "&2Elite Item Input slots",
-                        Arrays.asList("&aThis slot is for your elite item!"),
+                        List.of("&aThis slot is for your elite item!"),
                         MetadataHandler.signatureID),
                 fileConfiguration);
         ItemStackSerializer.serialize(
                 "eliteUpgradeOrbInputInformationButton",
                 ItemStackGenerator.generateItemStack(Material.GREEN_BANNER,
                         "&2Upgrade Orb Input slot",
-                        Arrays.asList("&aThis slot is for your Elite Item Upgrade Orb!"),
+                        List.of("&aThis slot is for your Elite Item Upgrade Orb!"),
                         MetadataHandler.signatureID),
                 fileConfiguration);
         ItemStackSerializer.serialize("cancelButton", ItemStackGenerator.generateItemStack(Material.BARRIER,
-                "&4Cancel", Arrays.asList("&cCancel upgrade!"), MetadataHandler.signatureID), fileConfiguration);
+                "&4Cancel", List.of("&cCancel upgrade!"), MetadataHandler.signatureID), fileConfiguration);
         ItemStackSerializer.serialize(
                 "outputInformationButton",
                 ItemStackGenerator.generateItemStack(Material.RED_BANNER,
                         "&2Output slots",
-                        Arrays.asList("&aThis slot previews the result of your upgrade!"),
+                        List.of("&aThis slot previews the result of your upgrade!"),
                         MetadataHandler.signatureID),
                 fileConfiguration);
         outputInfoButton = ItemStackSerializer.deserialize("outputInformationButton", fileConfiguration);
@@ -80,7 +81,7 @@ public class EnhancementMenuConfig extends MenusConfigFields {
         cancelSlot = ConfigurationEngine.setInt(fileConfiguration, "cancelButtonSlot", 27);
         infoButton = ItemStackSerializer.deserialize("infoButton", fileConfiguration);
         ItemStackSerializer.serialize("confirmButton", ItemStackGenerator.generateItemStack(Material.EMERALD,
-                "&2Confirm!", Arrays.asList("&aUpgrade items!"), 31174), fileConfiguration);
+                "&2Confirm!", List.of("&aUpgrade items!"), 31174), fileConfiguration);
         confirmButton = ItemStackSerializer.deserialize("confirmButton", fileConfiguration);
         confirmSlot = ConfigurationEngine.setInt(fileConfiguration, "confirmRepairSlot", 35);
     }

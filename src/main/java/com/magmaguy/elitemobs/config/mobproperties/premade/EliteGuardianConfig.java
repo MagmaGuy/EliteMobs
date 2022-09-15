@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.config.mobproperties.premade;
 import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfigFields;
 import org.bukkit.entity.EntityType;
 
-import java.util.Arrays;
+import java.util.List;
 
 public class EliteGuardianConfig extends MobPropertiesConfigFields {
     public EliteGuardianConfig() {
@@ -11,7 +11,7 @@ public class EliteGuardianConfig extends MobPropertiesConfigFields {
                 EntityType.GUARDIAN,
                 true,
                 "&fLvl &2$level &fElite &3Guardian",
-                Arrays.asList("$entity &cprevented $player &cfrom exploring the depths!"),
+                List.of("$entity &cprevented $player &cfrom exploring the depths!"),
                 9);
     }
 }

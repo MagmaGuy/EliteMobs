@@ -128,12 +128,11 @@ public class CoverPage {
             if (event.getSlot() == PlayerStatusMenuConfig.getIndexBossTrackingSlot() && PlayerStatusMenuConfig.isDoBossTrackingPage()) {
                 player.closeInventory();
                 BossTrackingPage.bossTrackingPage(player, player);
-                return;
             }
         }
 
         @EventHandler
-        public void onInventoryClose(InventoryCloseEvent event){
+        public void onInventoryClose(InventoryCloseEvent event) {
             pageInventories.remove(event.getInventory());
         }
     }

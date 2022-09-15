@@ -142,7 +142,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
         super.setVanillaLoot(customBossesConfigFields.isDropsVanillaLoot());
         super.setLevel(customBossesConfigFields.getLevel());
         setPluginName();
-        super.elitePowers = ElitePowerParser.parsePowers(customBossesConfigFields.getPowers());
+        super.elitePowers = ElitePowerParser.parsePowers(customBossesConfigFields);
         if (this instanceof RegionalBossEntity) {
             ((RegionalBossEntity) this).setOnSpawnTransitiveBlocks(TransitiveBlock.serializeTransitiveBlocks(customBossesConfigFields.getOnSpawnBlockStates(), customBossesConfigFields.getFilename()));
             ((RegionalBossEntity) this).setOnRemoveTransitiveBlocks(TransitiveBlock.serializeTransitiveBlocks(customBossesConfigFields.getOnRemoveBlockStates(), customBossesConfigFields.getFilename()));

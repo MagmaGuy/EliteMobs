@@ -23,7 +23,7 @@ processResources {
 }
 
 group 'com.magmaguy'
-version '8.0.5-SNAPSHOT'
+version '8.1.0-SNAPSHOT'
 
 repositories {
     maven {
@@ -89,7 +89,7 @@ dependencies {
     //WorldGuard API
     compileOnly group: 'com.sk89q.worldedit', name: 'worldedit-bukkit', version: '7.2.12'
     //CloudCommands
-    implementation group: 'cloud.commandframework', name: 'cloud-paper', version: '1.7.0'
+    implementation group: 'cloud.commandframework', name: 'cloud-paper', version: '1.7.1'
     //CloudCommands Minecraft Extras module
     implementation group: 'cloud.commandframework', name: 'cloud-minecraft-extras', version: '1.7.0'
     //CloudCommands Adventure Platform module

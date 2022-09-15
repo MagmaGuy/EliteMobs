@@ -14,8 +14,10 @@ public class UnusedNodeHandler {
         for (String actual : configuration.getKeys(false)) {
             boolean keyExists = false;
             for (String defaults : configuration.getDefaults().getKeys(true))
-                if (actual.equals(defaults))
+                if (actual.equals(defaults)) {
                     keyExists = true;
+                    break;
+                }
 
             if (!keyExists) {
                 configuration.set(actual, null);

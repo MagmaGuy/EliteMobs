@@ -8,6 +8,7 @@ import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.reflections.Reflections;
@@ -38,9 +39,11 @@ public class ElitePower {
     @Getter
     private final String name;
     @Getter
-    private final int powerCooldownTime;
+    @Setter
+    private int powerCooldownTime;
     @Getter
-    private final int globalCooldownTime;
+    @Setter
+    private int globalCooldownTime;
     @Getter
     private final PowersConfigFields powersConfigFields;
     @Getter
@@ -52,6 +55,17 @@ public class ElitePower {
     @Setter
     private boolean isFiring = false;
 
+    //Constructor for scripts
+    public ElitePower(ConfigurationSection configurationSection, String scriptName) {
+        this.fileName = scriptName;
+        this.trail = null;
+        this.name = scriptName;
+        this.powerCooldownTime = 0;//todo: update
+        this.globalCooldownTime = 0;//todo: update
+        this.powersConfigFields = null; //todo: might want to actually give this a value when reading from the powers folder
+    }
+
+    //Costructor for classic powers
     public ElitePower(PowersConfigFields powersConfigFields) {
         this.powersConfigFields = powersConfigFields;
         this.fileName = powersConfigFields.getFilename();
@@ -117,7 +131,7 @@ public class ElitePower {
         return !event.getEliteMobEntity().isInCooldown();
     }
 
-    protected static boolean eventIsValid(PlayerDamagedByEliteMobEvent event, ElitePower elitePower){
+    protected static boolean eventIsValid(PlayerDamagedByEliteMobEvent event, ElitePower elitePower) {
         if (event.isCancelled()) return false;
         if (event.getEliteMobEntity().getLivingEntity() == null) return false;
         if (!event.getEliteMobEntity().getLivingEntity().hasAI()) return false;

@@ -1,12 +1,15 @@
-package com.magmaguy.elitemobs.instanced;
+package com.magmaguy.elitemobs.instanced.arena;
 
 import com.magmaguy.elitemobs.utils.WarningMessage;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 
 public class ArenaWaves {
 
-    private HashMap<Integer, List<ArenaEntity>> arenaEntities = new HashMap();
+    private final HashMap<Integer, List<ArenaEntity>> arenaEntities = new HashMap();
 
     //wave=X:spawnPoint=Y:boss=Z.yml
     public ArenaWaves(List<String> rawBosses) {
@@ -38,7 +41,7 @@ public class ArenaWaves {
             }
             ArenaEntity arenaEntity = new ArenaEntity(spawnpointString, wave, boss);
             if (arenaEntities.get(wave) == null)
-                arenaEntities.put(wave, new ArrayList<>(Arrays.asList(arenaEntity)));
+                arenaEntities.put(wave, new ArrayList<>(List.of(arenaEntity)));
             else
                 arenaEntities.get(wave).add(arenaEntity);
         }
