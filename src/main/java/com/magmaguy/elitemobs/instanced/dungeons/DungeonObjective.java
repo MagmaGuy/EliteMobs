@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.instanced.dungeons;
 import lombok.Getter;
 
 public class DungeonObjective {
+
     @Getter
     protected boolean completed = false;
     @Getter
@@ -13,20 +14,20 @@ public class DungeonObjective {
     Kill percentage: clearpercentage=X.Y
      */
     public DungeonObjective(String objectiveString) {
+
+    }
+
+    public static DungeonObjective registerObjective(String objectiveString) {
         if (objectiveString.toLowerCase().contains("filename")) {
-            new DungeonKillTargetObjective(objectiveString);
+            return new DungeonKillTargetObjective(objectiveString);
         } else if (objectiveString.toLowerCase().contains("clearpercentage")) {
-            new DungeonKillPercentageObjective(objectiveString);
+            return new DungeonKillPercentageObjective(objectiveString);
         }
+        return null;
     }
 
     protected void initializeObjective(DungeonInstance dungeonInstance) {
         this.dungeonInstance = dungeonInstance;
-    }
-
-    public enum DungeonObjectiveType {
-        KILL_TARGET,
-        KILL_PERCENTAGE
     }
 
 }

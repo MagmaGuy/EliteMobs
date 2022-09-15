@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
 import com.magmaguy.elitemobs.npcs.NPCInteractions;
 import org.bukkit.entity.Villager;
 
-import java.util.Arrays;
+import java.util.List;
 
 public class BackTeleporter extends NPCsConfigFields {
     public BackTeleporter() {
@@ -14,9 +14,9 @@ public class BackTeleporter extends NPCsConfigFields {
                 "<Transporter>",
                 Villager.Profession.FLETCHER,
                 "em_adventurers_guild,213.5,88,232,0,0",
-                Arrays.asList("Welcome to the\\nAdventurer's Guild Hub!"),
-                Arrays.asList("Need to go back?"),
-                Arrays.asList("Safe travels, friend."),
+                List.of("Welcome to the\\nAdventurer's Guild Hub!"),
+                List.of("Need to go back?"),
+                List.of("Safe travels, friend."),
                 true,
                 3,
                 NPCInteractions.NPCInteractionType.TELEPORT_BACK);

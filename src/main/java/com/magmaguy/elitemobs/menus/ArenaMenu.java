@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
 import com.magmaguy.elitemobs.config.menus.premade.ArenaMenuConfig;
-import com.magmaguy.elitemobs.instanced.ArenaInstance;
+import com.magmaguy.elitemobs.instanced.arena.ArenaInstance;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -56,9 +56,8 @@ public class ArenaMenu {
                 return;
             }
             if (event.getSlot() == ArenaMenuConfig.getSpectatorItemSlot()) {
-                menus.get(event.getInventory()).getArenaInstance().addSpectator(player);
+                menus.get(event.getInventory()).getArenaInstance().addSpectator(player, false);
                 player.closeInventory();
-                return;
             }
         }
 
@@ -70,9 +69,9 @@ public class ArenaMenu {
 
     private class MenuContainer {
         @Getter
-        private Inventory inventory;
+        private final Inventory inventory;
         @Getter
-        private ArenaInstance arenaInstance;
+        private final ArenaInstance arenaInstance;
 
         private MenuContainer(Inventory inventory, ArenaInstance arenaInstance) {
             this.inventory = inventory;

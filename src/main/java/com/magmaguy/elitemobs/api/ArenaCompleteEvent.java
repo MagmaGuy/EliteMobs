@@ -1,6 +1,6 @@
 package com.magmaguy.elitemobs.api;
 
-import com.magmaguy.elitemobs.instanced.ArenaInstance;
+import com.magmaguy.elitemobs.instanced.arena.ArenaInstance;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import lombok.Getter;
 import org.bukkit.event.Event;

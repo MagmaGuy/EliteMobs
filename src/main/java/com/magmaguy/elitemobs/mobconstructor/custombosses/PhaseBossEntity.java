@@ -5,8 +5,10 @@ import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
+import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
+import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -60,7 +62,15 @@ public class PhaseBossEntity {
         if (removalReason.equals(RemovalReason.PHASE_BOSS_RESET)) {
             customBossEntity.spawn(true);
         } else {
-            customBossEntity.setRespawnOverrideLocation(customBossEntity.getLocation());
+            if (bossPhase.customBossesConfigFields.getPhaseSpawnLocation() != null) {
+                Location location = ConfigurationLocation.serialize(bossPhase.customBossesConfigFields.getPhaseSpawnLocation());
+                if (location != null) {
+                    customBossEntity.setSpawnLocation(location);
+                    customBossEntity.setRespawnOverrideLocation(location);
+                } else
+                    customBossEntity.setRespawnOverrideLocation(customBossEntity.getLocation());
+            } else
+                customBossEntity.setRespawnOverrideLocation(customBossEntity.getLocation());
             customBossEntity.spawn(true);
         }
         customBossEntity.setHealth(customBossEntity.getMaxHealth() * healthPercentage);
@@ -103,8 +113,7 @@ public class PhaseBossEntity {
 
         @EventHandler(priority = EventPriority.MONITOR)
         public void onEliteDeath(EliteMobDeathEvent event) {
-            if (!(event.getEliteEntity() instanceof CustomBossEntity)) return;
-            CustomBossEntity customBossEntity = (CustomBossEntity) event.getEliteEntity();
+            if (!(event.getEliteEntity() instanceof CustomBossEntity customBossEntity)) return;
             if (customBossEntity.getPhaseBossEntity() != null)
                 customBossEntity.phaseBossEntity.silentReset();
         }

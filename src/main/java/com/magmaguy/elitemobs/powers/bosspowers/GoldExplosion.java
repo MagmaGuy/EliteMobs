@@ -16,7 +16,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -83,7 +82,7 @@ public class GoldExplosion extends BossPower implements Listener {
                     ItemStackGenerator.generateItemStack(
                             Material.GOLD_NUGGET,
                             "visual projectile",
-                            Arrays.asList(ThreadLocalRandom.current().nextDouble() + "")));
+                            List.of(ThreadLocalRandom.current().nextDouble() + "")));
             ProjectileDamage.configureVisualProjectile(visualProjectile);
             visualProjectile.setVelocity(velocityVector);
             visualItemsList.add(visualProjectile);

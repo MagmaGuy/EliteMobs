@@ -14,9 +14,9 @@ import java.util.List;
 public class TransitiveBlock {
 
     @Getter
-    private BlockData blockData;
+    private final BlockData blockData;
     @Getter
-    private Vector relativeLocation;
+    private final Vector relativeLocation;
     @Getter
     @Setter
     private boolean isAir;

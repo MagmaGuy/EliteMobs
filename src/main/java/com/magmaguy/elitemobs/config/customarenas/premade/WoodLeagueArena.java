@@ -618,7 +618,7 @@ public class WoodLeagueArena extends CustomArenasConfigFields {
                 "wave=49:spawnPoint=southwest:boss=wood_league_wave_49_healer.yml",
 
                 "wave=50:spawnPoint=center:boss=wood_league_wave_50_boss.yml"
-                ));
+        ));
         super.setSpawnPoints(Arrays.asList(
                 "name=north:location=em_adventurers_guild,219.5,71,273.5",
                 "name=south:location=em_adventurers_guild,219.5,71,316.5",

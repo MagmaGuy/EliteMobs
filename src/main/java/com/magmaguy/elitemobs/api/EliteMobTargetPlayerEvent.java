@@ -55,8 +55,7 @@ public class EliteMobTargetPlayerEvent extends Event {
     public static class EliteMobTargetPlayerEventFilter implements Listener {
         @EventHandler
         public void onMobTarget(EntityTargetLivingEntityEvent event) {
-            if (!(event.getTarget() instanceof Player)) return;
-            Player player = (Player) event.getTarget();
+            if (!(event.getTarget() instanceof Player player)) return;
             EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(event.getEntity());
             if (eliteEntity == null) return;
 

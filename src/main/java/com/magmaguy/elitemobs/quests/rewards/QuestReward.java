@@ -20,9 +20,9 @@ public class QuestReward implements Serializable {
     @Getter
     private CustomLootTable customLootTable = null;
     @Getter
-    private int rewardLevel;
+    private final int rewardLevel;
     @Getter
-    private UUID playerUUID;
+    private final UUID playerUUID;
 
     public QuestReward(int questLevel, QuestObjectives questObjectives, Player player) {
         this.rewardLevel = questLevel * 10;

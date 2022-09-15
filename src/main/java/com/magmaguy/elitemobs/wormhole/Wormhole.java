@@ -51,13 +51,6 @@ public class Wormhole {
         wormholeEntry2.stop();
     }
 
-    public enum WormholeStyle {
-        NONE,
-        CRYSTAL,
-        ICOSAHEDRON,
-        CUBE
-    }
-
     public void onDungeonInstall(String dungeonFilename) {
         if (getWormholeEntry1() != null &&
                 getWormholeEntry1().getLocationString() != null &&
@@ -76,6 +69,13 @@ public class Wormhole {
         } else if (getWormholeEntry2().getWormhole() != null && getWormholeEntry2().getLocationString().equals(dungeonFilename)) {
             getWormholeEntry2().onDungeonUninstall();
         }
+    }
+
+    public enum WormholeStyle {
+        NONE,
+        CRYSTAL,
+        ICOSAHEDRON,
+        CUBE
     }
 
 }

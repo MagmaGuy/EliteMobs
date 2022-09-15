@@ -56,18 +56,18 @@ public class SmeltMenuConfig extends MenusConfigFields {
         outputInformationSlot = ConfigurationEngine.setInt(fileConfiguration, "informationOutputButtonSlot", 15);
         outputSlots = ConfigurationEngine.setList(file, fileConfiguration, "outputSlots", Arrays.asList(23, 24, 25, 32, 33, 34, 41, 42, 43), false);
         ItemStackSerializer.serialize("cancelButton", ItemStackGenerator.generateItemStack(Material.BARRIER,
-                "&4Cancel", Arrays.asList("&cCancel craft!"), MetadataHandler.signatureID), fileConfiguration);
+                "&4Cancel", List.of("&cCancel craft!"), MetadataHandler.signatureID), fileConfiguration);
         ItemStackSerializer.serialize(
                 "outputInformationButton",
                 ItemStackGenerator.generateItemStack(Material.RED_BANNER,
                         "&2Elite Orb Output slots",
-                        Arrays.asList("&aPreview what you're crafting here!"), MetadataHandler.signatureID),
+                        List.of("&aPreview what you're crafting here!"), MetadataHandler.signatureID),
                 fileConfiguration);
         outputInfoButton = ItemStackSerializer.deserialize("outputInformationButton", fileConfiguration);
         cancelButton = ItemStackSerializer.deserialize("cancelButton", fileConfiguration);
         cancelSlot = ConfigurationEngine.setInt(fileConfiguration, "cancelButtonSlot", 27);
         ItemStackSerializer.serialize("confirmButton", ItemStackGenerator.generateItemStack(Material.EMERALD,
-                "&2Confirm Craft", Arrays.asList("&aCraft Item Upgrade Orbs!"), 31174), fileConfiguration);
+                "&2Confirm Craft", List.of("&aCraft Item Upgrade Orbs!"), 31174), fileConfiguration);
         confirmButton = ItemStackSerializer.deserialize("confirmButton", fileConfiguration);
         confirmSlot = ConfigurationEngine.setInt(fileConfiguration, "confirmScrapSlot", 35);
     }

@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.instanced.dungeons;
 
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
-import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.InstancedBossEntity;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import org.bukkit.event.EventHandler;
@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DungeonKillTargetObjective extends DungeonObjective {
-    private static List<DungeonKillTargetObjective> dungeonKillTargetObjectiveList = new ArrayList<>();
+    private static final List<DungeonKillTargetObjective> dungeonKillTargetObjectiveList = new ArrayList<>();
     @Getter
     private String bossFilename;
     @Getter
@@ -56,10 +56,9 @@ public class DungeonKillTargetObjective extends DungeonObjective {
     public static class DungeonKilLTargetObjectiveListener implements Listener {
         @EventHandler
         public void onEliteDeath(EliteMobDeathEvent event) {
-            if (!(event.getEliteEntity() instanceof CustomBossEntity)) return;
-            CustomBossEntity customBossEntity = (CustomBossEntity) event.getEliteEntity();
+            if (!(event.getEliteEntity() instanceof InstancedBossEntity instancedBossEntity)) return;
             for (DungeonKillTargetObjective dungeonKillTargetObjective : dungeonKillTargetObjectiveList)
-                if (customBossEntity.getCustomBossesConfigFields().getFilename().equals(dungeonKillTargetObjective.getBossFilename()))
+                if (instancedBossEntity.getCustomBossesConfigFields().getFilename().equals(dungeonKillTargetObjective.getBossFilename()))
                     dungeonKillTargetObjective.incrementKills();
         }
     }

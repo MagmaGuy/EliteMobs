@@ -55,7 +55,6 @@ public class ZombieFriends extends MajorPower implements Listener {
                     }
 
                     cancel();
-                    return;
 
                 } else {
 

@@ -3,12 +3,13 @@ package com.magmaguy.elitemobs.config.customquests.premade;
 import com.magmaguy.elitemobs.config.customquests.CustomQuestsConfigFields;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class XmasQuest0Config extends CustomQuestsConfigFields {
     public XmasQuest0Config() {
         super("xmas_quest_0",
                 true,
-                Arrays.asList("FETCH_ITEM:filename=xmas_lost_present.yml:amount=10:itemName=Lost Present"),
+                List.of("FETCH_ITEM:filename=xmas_lost_present.yml:amount=10:itemName=Lost Present"),
                 Arrays.asList(
                         "filename=xmas_treat.yml:amount=10:chance=.3",
                         "filename=xmas_treat_v2.yml:amount=1:chance=.3",
@@ -27,9 +28,9 @@ public class XmasQuest0Config extends CustomQuestsConfigFields {
                 "&2Find the lost gifts!",
                 Arrays.asList("I seem to have lost some Christmas gifts along the way, would you help a poor old man find them again?",
                         "I will let you open one of them in return!"));
-        super.setQuestAcceptDialog(Arrays.asList("&8[&cSaint Nick&8]&f Thank you! I will be waiting here for you!"));
-        super.setQuestCompleteDialog(Arrays.asList("&8[&cSaint Nick&8]&f Thank you for your help! " +
+        super.setQuestAcceptDialog(List.of("&8[&cSaint Nick&8]&f Thank you! I will be waiting here for you!"));
+        super.setQuestCompleteDialog(List.of("&8[&cSaint Nick&8]&f Thank you for your help! " +
                 "There are still some lost gifts out there, talk to me again if you want to help out more!"));
-        super.setTemporaryPermissions(Arrays.asList("elitequest.xmas_quest.yml"));
+        super.setTemporaryPermissions(List.of("elitequest.xmas_quest.yml"));
     }
 }

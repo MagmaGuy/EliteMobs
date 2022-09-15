@@ -32,7 +32,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class CustomSummonPower extends ElitePower implements Listener {
 
-    private List<CustomBossReinforcement> customBossReinforcements = new ArrayList<>();
+    private final List<CustomBossReinforcement> customBossReinforcements = new ArrayList<>();
 
     public CustomSummonPower(String powerString) {
         super(PowersConfig.getPower("custom_summon.yml"));

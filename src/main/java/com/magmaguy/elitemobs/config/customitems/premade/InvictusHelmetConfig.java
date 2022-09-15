@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.utils.VersionChecker;
 import org.bukkit.Material;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class InvictusHelmetConfig extends CustomItemsConfigFields {
     public InvictusHelmetConfig() {
@@ -13,7 +14,7 @@ public class InvictusHelmetConfig extends CustomItemsConfigFields {
         if (!VersionChecker.serverVersionOlderThan(16, 0))
             setMaterial(Material.NETHERITE_HELMET);
         setEnchantments(Arrays.asList("PROTECTION_ENVIRONMENTAL,5", "PROTECTION_EXPLOSIONS,4", "PROTECTION_PROJECTILE,4", "MENDING,1", "DURABILITY,5"));
-        setPotionEffects(Arrays.asList("NIGHT_VISION,0,self,continuous"));
+        setPotionEffects(List.of("NIGHT_VISION,0,self,continuous"));
         setItemType(CustomItem.ItemType.UNIQUE);
         setLevel(50);
     }

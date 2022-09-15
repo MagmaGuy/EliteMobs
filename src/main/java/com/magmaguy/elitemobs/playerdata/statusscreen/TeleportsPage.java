@@ -102,7 +102,7 @@ public class TeleportsPage {
 
     public static class TeleportsPageEvents implements Listener {
         private static final Set<Inventory> pageInventories = new HashSet<>();
-        private static List<EMPackage> orderedDungeons = new ArrayList<>();
+        private static final List<EMPackage> orderedDungeons = new ArrayList<>();
 
         @EventHandler(ignoreCancelled = true)
         public void onInventoryInteract(InventoryClickEvent event) {

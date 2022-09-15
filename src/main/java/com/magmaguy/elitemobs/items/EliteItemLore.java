@@ -30,12 +30,12 @@ public class EliteItemLore {
     @Getter
     private ItemStack itemStack;
     private ItemMeta itemMeta;
-    private List<String> vanillaEnchantmentsLore = new ArrayList<>();
-    private HashMap<Enchantment, Integer> eliteVanillaEnchantments = new HashMap<>();
-    private ArrayList<String> eliteVanillaEnchantmentsLore = new ArrayList<>();
-    private HashMap<CustomEnchantment, Integer> customEnchantments = new HashMap<>();
-    private ArrayList<String> customEnchantmentLore = new ArrayList<>();
-    private List<String> potionListLore = new ArrayList<>();
+    private final List<String> vanillaEnchantmentsLore = new ArrayList<>();
+    private final HashMap<Enchantment, Integer> eliteVanillaEnchantments = new HashMap<>();
+    private final ArrayList<String> eliteVanillaEnchantmentsLore = new ArrayList<>();
+    private final HashMap<CustomEnchantment, Integer> customEnchantments = new HashMap<>();
+    private final ArrayList<String> customEnchantmentLore = new ArrayList<>();
+    private final List<String> potionListLore = new ArrayList<>();
     private List<String> lore;
     private String soulbindInfo = null;
     private boolean showItemWorth;

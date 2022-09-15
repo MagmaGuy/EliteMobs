@@ -7,7 +7,7 @@ import org.bukkit.Material;
 import java.util.Arrays;
 
 public class NovicesLeggingsConfig extends CustomItemsConfigFields {
-    public NovicesLeggingsConfig(){
+    public NovicesLeggingsConfig() {
         super("novices_leggings", true, Material.LEATHER_LEGGINGS, "&8Novice's Leggings", Arrays.asList("&2Awarded to those who challenge the", "&2Wood League Arena!"));
         setEnchantments(Arrays.asList("PROTECTION_ENVIRONMENTAL,5", "DURABILITY,5"));
         setItemType(CustomItem.ItemType.UNIQUE);

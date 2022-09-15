@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.config.mobproperties.premade;
 import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfigFields;
 import org.bukkit.entity.EntityType;
 
-import java.util.Arrays;
+import java.util.List;
 
 public class EliteHuskConfig extends MobPropertiesConfigFields {
     public EliteHuskConfig() {
@@ -11,7 +11,7 @@ public class EliteHuskConfig extends MobPropertiesConfigFields {
                 EntityType.HUSK,
                 true,
                 "&fLvl &2$level &fElite &7Husk",
-                Arrays.asList("$player &cwas hollowed out by $entity&c!"),
+                List.of("$player &cwas hollowed out by $entity&c!"),
                 5);
     }
 }

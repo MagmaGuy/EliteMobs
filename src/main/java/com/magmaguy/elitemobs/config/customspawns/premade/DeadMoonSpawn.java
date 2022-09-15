@@ -6,6 +6,7 @@ import org.bukkit.World;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class DeadMoonSpawn extends CustomSpawnConfigFields {
     public DeadMoonSpawn() {
@@ -15,7 +16,7 @@ public class DeadMoonSpawn extends CustomSpawnConfigFields {
             setValidWorldEnvironments(new ArrayList<>(Arrays.asList(World.Environment.NORMAL, World.Environment.CUSTOM)));
         } catch (NoSuchFieldError err) {
             //So this happens when CUSTOM doesn't exist, which it should but in some bugged releases it doesn't.
-            setValidWorldEnvironments(new ArrayList<>(Arrays.asList(World.Environment.NORMAL)));
+            setValidWorldEnvironments(new ArrayList<>(List.of(World.Environment.NORMAL)));
         }
         setEarliestTime(12000);
         setMoonPhase(MoonPhaseDetector.MoonPhase.NEW_MOON);

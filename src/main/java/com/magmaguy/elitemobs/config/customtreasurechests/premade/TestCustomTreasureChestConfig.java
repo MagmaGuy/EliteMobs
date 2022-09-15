@@ -5,7 +5,7 @@ import com.magmaguy.elitemobs.treasurechest.TreasureChest;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 
-import java.util.Arrays;
+import java.util.List;
 
 public class TestCustomTreasureChestConfig extends CustomTreasureChestConfigFields {
 
@@ -18,12 +18,12 @@ public class TestCustomTreasureChestConfig extends CustomTreasureChestConfigFiel
                 null,
                 TreasureChest.DropStyle.SINGLE,
                 1,
-                Arrays.asList("magmaguys_toothpick.yml:1"),
+                List.of("magmaguys_toothpick.yml:1"),
                 0.5,
-                Arrays.asList("test_boss.yml:1"),
+                List.of("test_boss.yml:1"),
                 0,
                 null,
-                Arrays.asList("BARRIER"));
+                List.of("BARRIER"));
     }
 
 }

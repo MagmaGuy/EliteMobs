@@ -65,15 +65,6 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
         persistentObjectHandler = new PersistentObjectHandler(this);
     }
 
-    public static void initializeNPCs(NPCsConfigFields npCsConfigFields) {
-        if (npCsConfigFields.getLocations() != null && !npCsConfigFields.getLocations().isEmpty()) {
-            for (String locationString : npCsConfigFields.getLocations())
-                new NPCEntity(npCsConfigFields, locationString);
-        } else if (npCsConfigFields.getLocation() != null && !npCsConfigFields.getLocation().isEmpty()) {
-            new NPCEntity(npCsConfigFields, npCsConfigFields.getLocation());
-        }
-    }
-
     /**
      * For the travelling merchant
      *
@@ -89,6 +80,15 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
         else this.spawnLocation = location.clone();
         this.spawnLocation.setDirection(this.spawnLocation.getDirection().multiply(-1));
         spawn();
+    }
+
+    public static void initializeNPCs(NPCsConfigFields npCsConfigFields) {
+        if (npCsConfigFields.getLocations() != null && !npCsConfigFields.getLocations().isEmpty()) {
+            for (String locationString : npCsConfigFields.getLocations())
+                new NPCEntity(npCsConfigFields, locationString);
+        } else if (npCsConfigFields.getLocation() != null && !npCsConfigFields.getLocation().isEmpty()) {
+            new NPCEntity(npCsConfigFields, npCsConfigFields.getLocation());
+        }
     }
 
     private void spawn() {

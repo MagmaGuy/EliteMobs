@@ -8,6 +8,7 @@ import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
+import com.magmaguy.elitemobs.mobconstructor.PersistentMovingEntity;
 import com.magmaguy.elitemobs.mobconstructor.PersistentObject;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.transitiveblocks.TransitiveBlock;
 import com.magmaguy.elitemobs.powers.bosspowers.SpiritWalk;
@@ -30,7 +31,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
-public class RegionalBossEntity extends CustomBossEntity implements PersistentObject {
+public class RegionalBossEntity extends CustomBossEntity implements PersistentObject, PersistentMovingEntity {
 
     private static final ArrayListMultimap<CustomBossesConfigFields, RegionalBossEntity> regionalBossesFromConfigFields = ArrayListMultimap.create();
     private final double leashRadius;
@@ -39,7 +40,7 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
     private String rawLocationString;
     private long ticksBeforeRespawn = 0;
     private long unixRespawnTime;
-    private int respawnCoolDownInMinutes = 0;
+    private int respawnCoolDownInMinutes = -1;
     private boolean isRespawning = false;
     private BukkitTask leashTask;
     @Getter
@@ -75,13 +76,13 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
         super.setPersistent(true);
     }
 
-    public RegionalBossEntity(CustomBossesConfigFields customBossesConfigFields, Location location, boolean permanent) {
+    public RegionalBossEntity(CustomBossesConfigFields customBossesConfigFields, Location location, boolean permanent, boolean persistent) {
         super(customBossesConfigFields);
         this.onSpawnTransitiveBlocks = TransitiveBlock.serializeTransitiveBlocks(customBossesConfigFields.getOnSpawnBlockStates(), customBossesConfigFields.getFilename());
         this.onRemoveTransitiveBlocks = TransitiveBlock.serializeTransitiveBlocks(customBossesConfigFields.getOnRemoveBlockStates(), customBossesConfigFields.getFilename());
         this.onSpawnTransitiveBlocks = TransitiveBlock.serializeTransitiveBlocks(customBossesConfigFields.getOnSpawnBlockStates(), customBossesConfigFields.getFilename());
         this.onRemoveTransitiveBlocks = TransitiveBlock.serializeTransitiveBlocks(customBossesConfigFields.getOnRemoveBlockStates(), customBossesConfigFields.getFilename());
-        super.setPersistent(permanent);
+        super.setPersistent(persistent);
         super.spawnLocation = location;
         this.leashRadius = customBossesConfigFields.getLeashRadius();
         if (permanent) {
@@ -148,11 +149,11 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
         CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(filename);
         if (customBossesConfigFields == null)
             return null;
-        return new RegionalBossEntity(customBossesConfigFields, spawnLocation, false);
+        return new RegionalBossEntity(customBossesConfigFields, spawnLocation, false, false);
     }
 
     public static RegionalBossEntity createPermanentRegionalBossEntity(CustomBossesConfigFields customBossesConfigFields, Location spawnLocation) {
-        RegionalBossEntity regionalBossEntity = new RegionalBossEntity(customBossesConfigFields, spawnLocation, true);
+        RegionalBossEntity regionalBossEntity = new RegionalBossEntity(customBossesConfigFields, spawnLocation, true, true);
         regionalBossEntity.initialize();
         return regionalBossEntity;
     }
@@ -186,6 +187,7 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
     }
 
     public void respawn() {
+        if (respawnCoolDownInMinutes < 0) return;
         this.isRespawning = true;
         unixRespawnTime = (respawnCoolDownInMinutes * 60L * 1000L) + System.currentTimeMillis();
         ticksBeforeRespawn = respawnCoolDownInMinutes * 60L * 20L;

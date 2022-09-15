@@ -49,7 +49,7 @@ public class ItemQualityColorizer {
             return ItemQuality.BLUE;
         else if (enchantPercentage > 100 / 6 * 2)
             return ItemQuality.GREEN;
-        else if (enchantPercentage > 100 / 6 * 1)
+        else if (enchantPercentage > 100 / 6)
             return ItemQuality.WHITE;
         else
             return ItemQuality.GRAY;
@@ -103,7 +103,7 @@ public class ItemQualityColorizer {
 
                 itemMeta = colorizeNameAndLore(ChatColor.GREEN, itemMeta);
 
-            } else if (enchantPercentage > 100 / 6 * 1) {
+            } else if (enchantPercentage > 100 / 6) {
 
                 itemMeta = colorizeNameAndLore(ChatColor.WHITE, itemMeta);
 

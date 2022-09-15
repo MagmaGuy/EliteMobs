@@ -68,7 +68,6 @@ public class CustomConfig {
         } catch (Exception ex) {
             new WarningMessage("Failed to finish generating default plugin files for " + folderName + " ! This is very bad, warn the developer!");
             ex.printStackTrace();
-            return;
         }
 
     }

@@ -101,10 +101,10 @@ public class AdventurersGuildConfig {
         addDodge = ConfigurationEngine.setBoolean(fileConfiguration, "Add dodge chance when unlocking higher guild ranks", true);
         guildWorldIsEnabled = ConfigurationEngine.setBoolean(fileConfiguration, "guildHubIsEnabledv2", false);
         guildWorldName = ConfigurationEngine.setString(file, fileConfiguration, "Adventurer's Guild world name v3", "em_adventurers_guild", false);
-        guildLocationString = ConfigurationEngine.setString(file,fileConfiguration, "Guild world coordinates", "208.5,88,236.5,-80,0", false);
+        guildLocationString = ConfigurationEngine.setString(file, fileConfiguration, "Guild world coordinates", "208.5,88,236.5,-80,0", false);
         guildWorldLocation = null;
         agTeleport = ConfigurationEngine.setBoolean(fileConfiguration, "userCommandsTeleportToAdventurersGuild", true);
-        adventurersGuildMenuName = ConfigurationEngine.setString(file,fileConfiguration, "adventurersGuildMenuName", "&6&lAdventurer's Hub", true);
+        adventurersGuildMenuName = ConfigurationEngine.setString(file, fileConfiguration, "adventurersGuildMenuName", "&6&lAdventurer's Hub", true);
 
         //iterate through all prestige tiers
         for (int prestigeRank = 0; prestigeRank < 11; prestigeRank++)
@@ -114,12 +114,12 @@ public class AdventurersGuildConfig {
                 switch (normalRank) {
                     case 0:
                         if (prestigeRank == 0) {
-                            rankName = ConfigurationEngine.setString(file,fileConfiguration,
+                            rankName = ConfigurationEngine.setString(file, fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank, "&8Commoner - disables elites!", true);
                             shortRankName = ConfigurationEngine.setString(file, fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", "&6&l✧&e" + romanNumerals(normalRank), true);
                         } else {
-                            rankName = ConfigurationEngine.setString(file,fileConfiguration,
+                            rankName = ConfigurationEngine.setString(file, fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &8Commoner", true);
                             shortRankName = ConfigurationEngine.setString(file, fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "⚜" + romanNumerals(prestigeRank) + "&6&l✧&e" + romanNumerals(normalRank), true);
@@ -129,12 +129,12 @@ public class AdventurersGuildConfig {
                         break;
                     case 1:
                         if (prestigeRank == 0) {
-                            rankName = ConfigurationEngine.setString(file,fileConfiguration,
+                            rankName = ConfigurationEngine.setString(file, fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank, "&fRookie", true);
                             shortRankName = ConfigurationEngine.setString(file, fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", "&6&l✧&e" + romanNumerals(normalRank), true);
                         } else {
-                            rankName = ConfigurationEngine.setString(file,fileConfiguration,
+                            rankName = ConfigurationEngine.setString(file, fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &fRookie", true);
                             shortRankName = ConfigurationEngine.setString(file, fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "⚜" + romanNumerals(prestigeRank) + "&6&l✧&e" + romanNumerals(normalRank), true);
@@ -144,14 +144,14 @@ public class AdventurersGuildConfig {
                         break;
                     case 2:
                         if (prestigeRank == 0) {
-                            rankName = ConfigurationEngine.setString(file,fileConfiguration,
+                            rankName = ConfigurationEngine.setString(file, fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank, "&fNovice", true);
-                            shortRankName = ConfigurationEngine.setString(file,fileConfiguration,
+                            shortRankName = ConfigurationEngine.setString(file, fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", "&6&l✧&e" + romanNumerals(normalRank), true);
                         } else {
-                            rankName = ConfigurationEngine.setString(file,fileConfiguration,
+                            rankName = ConfigurationEngine.setString(file, fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &fNovice", true);
-                            shortRankName = ConfigurationEngine.setString(file,fileConfiguration,
+                            shortRankName = ConfigurationEngine.setString(file, fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "⚜" + romanNumerals(prestigeRank) + "&6&l✧&e" + romanNumerals(normalRank), true);
                         }
                         rankNames[prestigeRank][normalRank] = rankName;
@@ -159,14 +159,14 @@ public class AdventurersGuildConfig {
                         break;
                     case 3:
                         if (prestigeRank == 0) {
-                            rankName = ConfigurationEngine.setString(file,fileConfiguration,
+                            rankName = ConfigurationEngine.setString(file, fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank, "&fApprentice", true);
-                            shortRankName = ConfigurationEngine.setString(file,fileConfiguration,
+                            shortRankName = ConfigurationEngine.setString(file, fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", "&6&l✧&e" + romanNumerals(normalRank), true);
                         } else {
-                            rankName = ConfigurationEngine.setString(file,fileConfiguration,
+                            rankName = ConfigurationEngine.setString(file, fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &fApprentice", true);
-                            shortRankName = ConfigurationEngine.setString(file,fileConfiguration,
+                            shortRankName = ConfigurationEngine.setString(file, fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "⚜" + romanNumerals(prestigeRank) + "&6&l✧&e" + romanNumerals(normalRank), true);
                         }
                         rankNames[prestigeRank][normalRank] = rankName;
@@ -174,14 +174,14 @@ public class AdventurersGuildConfig {
                         break;
                     case 4:
                         if (prestigeRank == 0) {
-                            rankName = ConfigurationEngine.setString(file,fileConfiguration,
+                            rankName = ConfigurationEngine.setString(file, fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank, "&2Adventurer", true);
                             shortRankName = ConfigurationEngine.setString(file, fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", "&6&l✧&e" + romanNumerals(normalRank), true);
                         } else {
-                            rankName = ConfigurationEngine.setString(file,fileConfiguration,
+                            rankName = ConfigurationEngine.setString(file, fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &2Adventurer", true);
-                            shortRankName = ConfigurationEngine.setString(file,fileConfiguration,
+                            shortRankName = ConfigurationEngine.setString(file, fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "⚜" + romanNumerals(prestigeRank) + "&6&l✧&e" + romanNumerals(normalRank), true);
                         }
                         rankNames[prestigeRank][normalRank] = rankName;
@@ -189,14 +189,14 @@ public class AdventurersGuildConfig {
                         break;
                     case 5:
                         if (prestigeRank == 0) {
-                            rankName = ConfigurationEngine.setString(file,fileConfiguration,
+                            rankName = ConfigurationEngine.setString(file, fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank, "&2Journeyman", true);
-                            shortRankName = ConfigurationEngine.setString(file,fileConfiguration,
+                            shortRankName = ConfigurationEngine.setString(file, fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", "&6&l✧&e" + romanNumerals(normalRank), true);
                         } else {
-                            rankName = ConfigurationEngine.setString(file,fileConfiguration,
+                            rankName = ConfigurationEngine.setString(file, fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &2Journeyman", true);
-                            shortRankName = ConfigurationEngine.setString(file,fileConfiguration,
+                            shortRankName = ConfigurationEngine.setString(file, fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "⚜" + romanNumerals(prestigeRank) + "&6&l✧&e" + romanNumerals(normalRank), true);
                         }
                         rankNames[prestigeRank][normalRank] = rankName;
@@ -204,14 +204,14 @@ public class AdventurersGuildConfig {
                         break;
                     case 6:
                         if (prestigeRank == 0) {
-                            rankName = ConfigurationEngine.setString(file,fileConfiguration,
+                            rankName = ConfigurationEngine.setString(file, fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank, "&2Adept", true);
                             shortRankName = ConfigurationEngine.setString(file, fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", "&6&l✧&e" + romanNumerals(normalRank), true);
                         } else {
-                            rankName = ConfigurationEngine.setString(file,fileConfiguration,
+                            rankName = ConfigurationEngine.setString(file, fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &2Adept", true);
-                            shortRankName = ConfigurationEngine.setString(file,fileConfiguration,
+                            shortRankName = ConfigurationEngine.setString(file, fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "⚜" + romanNumerals(prestigeRank) + "&6&l✧&e" + romanNumerals(normalRank), true);
                         }
                         rankNames[prestigeRank][normalRank] = rankName;
@@ -365,8 +365,8 @@ public class AdventurersGuildConfig {
 
         guildLootLimiter = ConfigurationEngine.setBoolean(fileConfiguration, "limitLootBasedOnGuildTier", true);
         lootLimiterMessage = ConfigurationEngine.setString(file, fileConfiguration, "lootLimiterMessage", "&7[EM] &cYou must unlock the next guild rank through /ag to loot better items!", true);
-        onRankUpCommand = ConfigurationEngine.setList(file,fileConfiguration, "onRankUpCommand", Collections.emptyList(), false);
-        onPrestigeUpCommand = ConfigurationEngine.setList(file,fileConfiguration, "onPrestigeUpCommand", Collections.emptyList(), false);
+        onRankUpCommand = ConfigurationEngine.setList(file, fileConfiguration, "onRankUpCommand", Collections.emptyList(), false);
+        onPrestigeUpCommand = ConfigurationEngine.setList(file, fileConfiguration, "onPrestigeUpCommand", Collections.emptyList(), false);
         dodge1 = ConfigurationEngine.setDouble(fileConfiguration, "dodgePrestige3Bonus", 3);
         dodge2 = ConfigurationEngine.setDouble(fileConfiguration, "dodgePrestige6Bonus", 6);
         dodge3 = ConfigurationEngine.setDouble(fileConfiguration, "dodgePrestige9Bonus", 10);
@@ -389,7 +389,7 @@ public class AdventurersGuildConfig {
 
         peacefulModeEliteChanceDecrease = ConfigurationEngine.setDouble(fileConfiguration, "peacefulModeEliteChanceDecrease", 0.2);
 
-        worldsWithoutAGBonuses = ConfigurationEngine.setList(file,fileConfiguration, "worldsWithoutAGBonuses", new ArrayList(), false);
+        worldsWithoutAGBonuses = ConfigurationEngine.setList(file, fileConfiguration, "worldsWithoutAGBonuses", new ArrayList(), false);
 
         save();
     }

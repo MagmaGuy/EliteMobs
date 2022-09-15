@@ -36,10 +36,7 @@ public class TransitiveBossBlock implements Listener {
 
         //Minor optimization, does not replace blocks that are already identical
         if (!location.getBlock().getBlockData().getMaterial().equals(blockData.getMaterial()))
-            if (blockData.getMaterial() == Material.WATER || blockData.getMaterial() == Material.LAVA)
-                location.getBlock().setBlockData(blockData, true);
-            else
-                location.getBlock().setBlockData(blockData, false);
+            location.getBlock().setBlockData(blockData, blockData.getMaterial() == Material.WATER || blockData.getMaterial() == Material.LAVA);
 
     }
 
@@ -92,8 +89,7 @@ public class TransitiveBossBlock implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBossSpawn(EliteMobSpawnEvent event) {
-        if (!(event.getEliteMobEntity() instanceof RegionalBossEntity)) return;
-        RegionalBossEntity regionalBossEntity = (RegionalBossEntity) event.getEliteMobEntity();
+        if (!(event.getEliteMobEntity() instanceof RegionalBossEntity regionalBossEntity)) return;
         if (regionalBossEntity.getOnSpawnTransitiveBlocks() != null && !regionalBossEntity.getOnSpawnTransitiveBlocks().isEmpty())
             for (TransitiveBlock transitiveBlock : regionalBossEntity.getOnSpawnTransitiveBlocks())
                 setBlockData(regionalBossEntity, transitiveBlock, regionalBossEntity.getSpawnLocation());
@@ -101,8 +97,7 @@ public class TransitiveBossBlock implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBossRemove(EliteMobRemoveEvent event) {
-        if (!(event.getEliteMobEntity() instanceof RegionalBossEntity)) return;
-        RegionalBossEntity regionalBossEntity = (RegionalBossEntity) event.getEliteMobEntity();
+        if (!(event.getEliteMobEntity() instanceof RegionalBossEntity regionalBossEntity)) return;
         if (regionalBossEntity.getOnRemoveTransitiveBlocks() != null && !regionalBossEntity.getOnRemoveTransitiveBlocks().isEmpty())
             for (TransitiveBlock transitiveBlock : regionalBossEntity.getOnRemoveTransitiveBlocks())
                 setBlockData(regionalBossEntity, transitiveBlock, regionalBossEntity.getSpawnLocation());

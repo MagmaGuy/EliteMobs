@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import org.bukkit.Material;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class GoblinShooterItem extends CustomItemsConfigFields {
     public GoblinShooterItem() {
@@ -12,9 +13,9 @@ public class GoblinShooterItem extends CustomItemsConfigFields {
                 true,
                 Material.BOW,
                 "&8Goblin Shooter",
-                Arrays.asList("&8A treasure among goblins!"));
+                List.of("&8A treasure among goblins!"));
         setEnchantments(Arrays.asList("ARROW_DAMAGE,1", "DURABILITY,1", "ARROW_INFINITE,1", "ARROW_FIRE,1"));
-        setPotionEffects(Arrays.asList("SPEED,2,self,onHit"));
+        setPotionEffects(List.of("SPEED,2,self,onHit"));
         setItemType(CustomItem.ItemType.UNIQUE);
     }
 }

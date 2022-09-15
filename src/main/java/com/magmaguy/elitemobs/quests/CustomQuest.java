@@ -110,17 +110,14 @@ public class CustomQuest extends Quest {
         if (!customQuestsConfigFields.getQuestAcceptPermission().isEmpty() &&
                 !player.hasMetadata(customQuestsConfigFields.getQuestAcceptPermission()))
             return false;
-        if (!customQuestsConfigFields.getQuestLockoutPermission().isEmpty() &&
-                player.hasMetadata(customQuestsConfigFields.getQuestLockoutPermission()))
-            return false;
-        return true;
+        return customQuestsConfigFields.getQuestLockoutPermission().isEmpty() ||
+                !player.hasMetadata(customQuestsConfigFields.getQuestLockoutPermission());
     }
 
     public static class CustomQuestEvents implements Listener {
         @EventHandler
         public void onQuestReward(QuestRewardEvent event) {
-            if (event.getQuest() instanceof CustomQuest) {
-                CustomQuest customQuest = (CustomQuest) event.getQuest();
+            if (event.getQuest() instanceof CustomQuest customQuest) {
                 CustomQuestsConfigFields customQuestsConfigFields = customQuest.getCustomQuestsConfigFields();
                 customQuest.applyEndPermissions(event.getPlayer());
                 if (!customQuest.getCustomQuestsConfigFields().getQuestCompleteDialog().isEmpty())

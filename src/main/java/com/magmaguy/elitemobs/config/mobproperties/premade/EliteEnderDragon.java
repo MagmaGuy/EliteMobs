@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.config.mobproperties.premade;
 import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfigFields;
 import org.bukkit.entity.EntityType;
 
-import java.util.Arrays;
+import java.util.List;
 
 public class EliteEnderDragon extends MobPropertiesConfigFields {
     public EliteEnderDragon() {
@@ -11,7 +11,7 @@ public class EliteEnderDragon extends MobPropertiesConfigFields {
                 EntityType.ENDER_DRAGON,
                 true,
                 "&fLvl &2$level &fElite &5Ender Dragon",
-                Arrays.asList("$entity &chas ended $player!"),
+                List.of("$entity &chas ended $player!"),
                 7);
     }
 }

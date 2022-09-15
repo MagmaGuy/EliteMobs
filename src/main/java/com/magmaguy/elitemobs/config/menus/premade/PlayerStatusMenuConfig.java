@@ -13,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.List;
 
 public class PlayerStatusMenuConfig extends MenusConfigFields {
     @Getter
@@ -30,51 +31,51 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
     @Getter
     private static boolean doBossTrackingPage;
     @Getter
-    private static String[] indexTextLines = new String[13];
+    private static final String[] indexTextLines = new String[13];
     @Getter
-    private static String[] indexHoverLines = new String[13];
+    private static final String[] indexHoverLines = new String[13];
     @Getter
-    private static String[] indexCommandLines = new String[13];
+    private static final String[] indexCommandLines = new String[13];
     @Getter
-    private static String[] statsTextLines = new String[13];
+    private static final String[] statsTextLines = new String[13];
     @Getter
-    private static String[] statsHoverLines = new String[13];
+    private static final String[] statsHoverLines = new String[13];
     @Getter
-    private static String[] statsCommandLines = new String[13];
+    private static final String[] statsCommandLines = new String[13];
     @Getter
-    private static String[] gearTextLines = new String[13];
+    private static final String[] gearTextLines = new String[13];
     @Getter
-    private static String[] gearHoverLines = new String[13];
+    private static final String[] gearHoverLines = new String[13];
     @Getter
-    private static String[] gearCommandLines = new String[13];
+    private static final String[] gearCommandLines = new String[13];
     @Getter
     private static String teleportChestMenuName;
     @Getter
-    private static String[] teleportTextLines = new String[13];
+    private static final String[] teleportTextLines = new String[13];
     @Getter
-    private static String[] teleportHoverLines = new String[13];
+    private static final String[] teleportHoverLines = new String[13];
     @Getter
-    private static String[] teleportCommandLines = new String[13];
+    private static final String[] teleportCommandLines = new String[13];
     @Getter
-    private static String[] commandsTextLines = new String[13];
+    private static final String[] commandsTextLines = new String[13];
     @Getter
-    private static String[] commandsHoverLines = new String[13];
+    private static final String[] commandsHoverLines = new String[13];
     @Getter
-    private static String[] commandsCommandLines = new String[13];
+    private static final String[] commandsCommandLines = new String[13];
     @Getter
     private static String bossTrackerChestMenuName;
     @Getter
-    private static String[] bossTrackerTextLines = new String[13];
+    private static final String[] bossTrackerTextLines = new String[13];
     @Getter
-    private static String[] bossTrackerHoverLines = new String[13];
+    private static final String[] bossTrackerHoverLines = new String[13];
     @Getter
-    private static String[] bossTrackerCommandLines = new String[13];
+    private static final String[] bossTrackerCommandLines = new String[13];
     @Getter
-    private static String[] questTrackerTextLines = new String[13];
+    private static final String[] questTrackerTextLines = new String[13];
     @Getter
-    private static String[] questTrackerHoverLines = new String[13];
+    private static final String[] questTrackerHoverLines = new String[13];
     @Getter
-    private static String[] questTrackerCommandLines = new String[13];
+    private static final String[] questTrackerCommandLines = new String[13];
     @Getter
     private static String onBossTrackHover;
     @Getter
@@ -356,44 +357,44 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
         indexStatsItem = ConfigurationEngine.setItemStack(fileConfiguration, "indexStatsItem",
                 ItemStackGenerator.generateItemStack(Material.MAP,
                         "&6Stats",
-                        Arrays.asList("Click to go!")));
+                        List.of("Click to go!")));
         indexStatsSlot = ConfigurationEngine.setInt(fileConfiguration, "indexStatsSlot", 10);
 
         indexGearItem = ConfigurationEngine.setItemStack(fileConfiguration, "indexGearItem",
                 ItemStackGenerator.generateItemStack(Material.DIAMOND_SWORD,
                         "&6Gear",
-                        Arrays.asList("Click to go!")));
+                        List.of("Click to go!")));
         indexGearSlot = ConfigurationEngine.setInt(fileConfiguration, "indexGearSlot", 12);
 
         indexTeleportsItem = ConfigurationEngine.setItemStack(fileConfiguration, "indexTeleportsItem",
                 ItemStackGenerator.generateItemStack(Material.END_PORTAL_FRAME,
                         "&6Teleports",
-                        Arrays.asList("Click to go!")));
+                        List.of("Click to go!")));
         indexTeleportsSlot = ConfigurationEngine.setInt(fileConfiguration, "indexTeleportsSlot", 14);
 
         indexCommandsItem = ConfigurationEngine.setItemStack(fileConfiguration, "indexCommandsItem",
                 ItemStackGenerator.generateItemStack(Material.JUKEBOX,
                         "&6Commands",
-                        Arrays.asList("Click to go!")));
+                        List.of("Click to go!")));
         indexCommandsSlot = ConfigurationEngine.setInt(fileConfiguration, "indexCommandsSlot", 16);
 
 
         indexQuestTrackingItem = ConfigurationEngine.setItemStack(fileConfiguration, "indexQuestTrackingItem",
                 ItemStackGenerator.generateItemStack(Material.WRITABLE_BOOK,
                         "&6Quest Tracking",
-                        Arrays.asList("Click to go!")));
+                        List.of("Click to go!")));
         indexQuestTrackingSlot = ConfigurationEngine.setInt(fileConfiguration, "indexQuestTrackingSlot", 20);
 
         if (!VersionChecker.serverVersionOlderThan(16, 0))
             indexBossTrackingItem = ConfigurationEngine.setItemStack(fileConfiguration, "indexBossTrackingItem",
                     ItemStackGenerator.generateItemStack(Material.TARGET,
                             "&6Boss Tracking",
-                            Arrays.asList("Click to go!")));
+                            List.of("Click to go!")));
         else
             indexBossTrackingItem = ConfigurationEngine.setItemStack(fileConfiguration, "indexBossTrackingItem",
                     ItemStackGenerator.generateItemStack(Material.DIAMOND,
                             "&6Boss Tracking",
-                            Arrays.asList("Click to go!")));
+                            List.of("Click to go!")));
         indexBossTrackingSlot = ConfigurationEngine.setInt(fileConfiguration, "indexBossTrackingSlot", 24);
 
 
@@ -468,7 +469,7 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
         statsEliteKillsItem = ConfigurationEngine.setItemStack(fileConfiguration, "statsEliteKillsItem",
                 ItemStackGenerator.generateItemStack(Material.DIAMOND_SWORD,
                         "&4Elite Kils: &c$kills",
-                        Arrays.asList("&fAmount of EliteMobs killed.")));
+                        List.of("&fAmount of EliteMobs killed.")));
         statsEliteKillsSlot = ConfigurationEngine.setInt(fileConfiguration, "statsEliteKillsSlot", 12);
 
         statsMaxEliteLevelKilledItem = ConfigurationEngine.setItemStack(fileConfiguration, "statsMaxEliteLevelKilledItem",
@@ -483,7 +484,7 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
         statsEliteDeathsItem = ConfigurationEngine.setItemStack(fileConfiguration, "statsEliteDeathsItem",
                 ItemStackGenerator.generateItemStack(Material.TOTEM_OF_UNDYING,
                         "&4Elite Deaths: $deaths",
-                        Arrays.asList("&fTimes killed by Elite Mobs.")));
+                        List.of("&fTimes killed by Elite Mobs.")));
         statsEliteDeathsSlot = ConfigurationEngine.setInt(fileConfiguration, "statsEliteDeathsSlot", 14);
 
         statsQuestsCompletedItem = ConfigurationEngine.setItemStack(fileConfiguration, "statsQuestsCompletedItem",

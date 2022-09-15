@@ -156,18 +156,6 @@ public class SchematicDungeonPackage extends SchematicPackage implements Dungeon
         }
     }
 
-    private class RawContainer {
-        @Getter
-        private final String filename;
-        @Getter
-        private final Vector vector;
-
-        public RawContainer(String filename, Vector vector) {
-            this.filename = filename;
-            this.vector = vector;
-        }
-    }
-
     @Override
     public boolean uninstall(Player player) {
         if (!super.uninstall(player)) return false;
@@ -199,5 +187,17 @@ public class SchematicDungeonPackage extends SchematicPackage implements Dungeon
 
     public void addChest(String treasureChestFilename, Location location) {
         getDungeonPackagerConfigFields().addRelativeTreasureChests(treasureChestFilename, toRelativePosition(location));
+    }
+
+    private class RawContainer {
+        @Getter
+        private final String filename;
+        @Getter
+        private final Vector vector;
+
+        public RawContainer(String filename, Vector vector) {
+            this.filename = filename;
+            this.vector = vector;
+        }
     }
 }

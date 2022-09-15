@@ -41,11 +41,9 @@ public class MushroomCowHandler implements Listener {
         if (event.getFinalDamage() < 1)
             return;
 
-        if (event.getEntity() instanceof MushroomCow && EntityTracker.isSuperMob(event.getEntity())) {
+        if (event.getEntity() instanceof MushroomCow mushroomCow && EntityTracker.isSuperMob(event.getEntity())) {
 
             Random random = new Random();
-
-            MushroomCow mushroomCow = (MushroomCow) event.getEntity();
 
             double damage = event.getFinalDamage();
             //health is hardcoded here, maybe change it at some point?
@@ -97,9 +95,7 @@ public class MushroomCowHandler implements Listener {
     @EventHandler
     public void onShear(PlayerShearEntityEvent event) {
 
-        if (event.getEntity() instanceof MushroomCow && EntityTracker.isSuperMob(event.getEntity())) {
-
-            MushroomCow mushroomCow = (MushroomCow) event.getEntity();
+        if (event.getEntity() instanceof MushroomCow mushroomCow && EntityTracker.isSuperMob(event.getEntity())) {
 
             ItemStack mushroomStack = new ItemStack(RED_MUSHROOM, 5);
 

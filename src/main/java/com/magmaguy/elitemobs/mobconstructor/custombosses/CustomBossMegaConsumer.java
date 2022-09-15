@@ -62,7 +62,7 @@ public class CustomBossMegaConsumer {
         if (EliteMobs.worldGuardIsEnabled) {
             if (!WorldGuardFlagChecker.checkFlag(spawnLocation, WorldGuardCompatibility.getEliteMobsSpawnFlag())) {
                 new WarningMessage("Attempted to spawn " + customBossesConfigFields.getFilename() + " in location " +
-                        spawnLocation.toString() + " which is protected by WorldGuard with elitemobs-spawning deny! This should not have happened.");
+                        spawnLocation + " which is protected by WorldGuard with elitemobs-spawning deny! This should not have happened.");
                 return null;
             }
             if (bypassesWorldGuardSpawn || customBossEntity instanceof RegionalBossEntity)

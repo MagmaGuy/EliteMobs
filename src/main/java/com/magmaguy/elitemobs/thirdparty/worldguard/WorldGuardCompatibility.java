@@ -20,6 +20,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 
 import java.util.UUID;
 
@@ -177,10 +178,10 @@ public class WorldGuardCompatibility {
         }
     }
 
-    public static void protectWorldMinidugeonArea(Location location) {
+    public static void protectWorldMinidugeonArea(World world) {
         try {
             RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
-            RegionManager regions = container.get(BukkitAdapter.adapt(location.getWorld()));
+            RegionManager regions = container.get(BukkitAdapter.adapt(world));
             ProtectedRegion global = regions.getRegion("__global__");
 
             if (global == null) {
@@ -196,6 +197,10 @@ public class WorldGuardCompatibility {
         } catch (Exception ex) {
             new WarningMessage("Failed to protect minidungeon world area!");
         }
+    }
+
+    public static void protectWorldMinidugeonArea(Location location) {
+        protectWorldMinidugeonArea(location.getWorld());
     }
 
     public static void protectMinidungeonArea(ProtectedRegion protectedRegion, EMPackage dungeonWorldPackage) {

@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.config.mobproperties.premade;
 import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfigFields;
 import org.bukkit.entity.EntityType;
 
-import java.util.Arrays;
+import java.util.List;
 
 public class EliteVexConfig extends MobPropertiesConfigFields {
     public EliteVexConfig() {
@@ -11,7 +11,7 @@ public class EliteVexConfig extends MobPropertiesConfigFields {
                 EntityType.VEX,
                 true,
                 "&fLvl &2$level &fElite &bVex",
-                Arrays.asList("$entity &chas vexed $player&c!"),
+                List.of("$entity &chas vexed $player&c!"),
                 13);
     }
 }

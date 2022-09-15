@@ -5,6 +5,8 @@ import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class BlayyzeConfig extends CustomBossesConfigFields {
     public BlayyzeConfig() {
@@ -30,8 +32,8 @@ public class BlayyzeConfig extends CustomBossesConfigFields {
                 "&e&l---------------------------------------------"));
         setEscapeMessage("&6The ayyliens have been taken to area 51!");
         setLocationMessage("&6????: $distance blocks away");
-        setUniqueLootList(Arrays.asList("meteor_shower_scroll.yml:1"));
-        setTrails(Arrays.asList(Material.FIRE_CHARGE.toString()));
+        setUniqueLootList(List.of("meteor_shower_scroll.yml:1"));
+        setTrails(Collections.singletonList(Material.FIRE_CHARGE.toString()));
         setAnnouncementPriority(2);
     }
 }

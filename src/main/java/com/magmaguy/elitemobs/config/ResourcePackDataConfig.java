@@ -13,6 +13,7 @@ public class ResourcePackDataConfig {
     public static boolean displayCustomMenuUnicodes;
     private static File file;
     private static FileConfiguration fileConfiguration;
+
     private ResourcePackDataConfig() {
     }
 

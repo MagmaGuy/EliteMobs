@@ -6,6 +6,7 @@ import org.bukkit.entity.Villager;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 public class SantaConfig extends NPCsConfigFields {
     public SantaConfig() {
@@ -15,13 +16,13 @@ public class SantaConfig extends NPCsConfigFields {
                 "&c<Santa!>",
                 Villager.Profession.NITWIT,
                 "em_adventurers_guild,212.5,88,236.5,104,0",
-                Arrays.asList(
+                List.of(
                         "Ho ho ho!"),
                 Arrays.asList(
                         "I have lost some presents, \\ncan you help me?",
                         "Dear traveller, I have\\na request for you!",
                         "Can you help an old man\\nin his time of need?"),
-                Arrays.asList(
+                List.of(
                         "Ho ho ho!"),
                 true,
                 5,

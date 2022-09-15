@@ -6,6 +6,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class WoodLeagueWave5Miniboss extends CustomBossesConfigFields {
     public WoodLeagueWave5Miniboss() {
@@ -15,7 +16,7 @@ public class WoodLeagueWave5Miniboss extends CustomBossesConfigFields {
                 "$minibossLevel &cWeird Cow",
                 "5");
         setPowers(Arrays.asList("attack_push.yml", "attack_gravity.yml"));
-        setOnDamagedMessages(Arrays.asList("Woof!"));
+        setOnDamagedMessages(List.of("Woof!"));
         setHealthMultiplier(3D);
         setDamageMultiplier(2D);
         setFollowDistance(60);

@@ -19,7 +19,7 @@ public class ProceduralItemGenerationSettingsConfig {
     @Getter
     private static double customEnchantmentChance;
     @Getter
-    private static List<String> validMaterials = new ArrayList<>();
+    private static final List<String> validMaterials = new ArrayList<>();
     @Getter
     private static String swordName;
     @Getter
@@ -60,6 +60,7 @@ public class ProceduralItemGenerationSettingsConfig {
     private static List<String> verbs;
     @Getter
     private static List<String> verbers;
+
     private ProceduralItemGenerationSettingsConfig() {
     }
 

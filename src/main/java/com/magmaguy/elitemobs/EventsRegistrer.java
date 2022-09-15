@@ -22,8 +22,10 @@ import com.magmaguy.elitemobs.explosionregen.Explosion;
 import com.magmaguy.elitemobs.gamemodes.nightmaremodeworld.DaylightWatchdog;
 import com.magmaguy.elitemobs.gamemodes.zoneworld.ZoneWarner;
 import com.magmaguy.elitemobs.initialsetup.FirstTimeSetup;
-import com.magmaguy.elitemobs.instanced.ArenaInstance;
-import com.magmaguy.elitemobs.instanced.dungeons.MatchInstance;
+import com.magmaguy.elitemobs.instanced.MatchInstance;
+import com.magmaguy.elitemobs.instanced.arena.ArenaInstance;
+import com.magmaguy.elitemobs.instanced.dungeons.DungeonInstance;
+import com.magmaguy.elitemobs.instanced.dungeons.DungeonKillTargetObjective;
 import com.magmaguy.elitemobs.items.*;
 import com.magmaguy.elitemobs.items.customenchantments.*;
 import com.magmaguy.elitemobs.items.potioneffects.PlayerPotionEffects;
@@ -62,6 +64,7 @@ import com.magmaguy.elitemobs.powers.meta.CombatEnterScanPower;
 import com.magmaguy.elitemobs.powers.meta.CustomSummonPower;
 import com.magmaguy.elitemobs.powers.miscellaneouspowers.*;
 import com.magmaguy.elitemobs.powers.offensivepowers.*;
+import com.magmaguy.elitemobs.powers.scripts.ScriptListener;
 import com.magmaguy.elitemobs.powers.specialpowers.EnderCrystalLightningRod;
 import com.magmaguy.elitemobs.powerstances.EffectEventHandlers;
 import com.magmaguy.elitemobs.powerstances.VisualEffectObfuscator;
@@ -98,6 +101,9 @@ public class EventsRegistrer {
 
         register(new FirstTimeSetup());
 
+        register(new DungeonInstance.DungeonInstanceEvents());
+        register(new DungeonKillTargetObjective.DungeonKilLTargetObjectiveListener());
+
         register(new com.magmaguy.elitemobs.versionnotifier.VersionChecker.VersionCheckerEvents());
 
         register(new PlayerData.PlayerDataEvents());
@@ -114,6 +120,9 @@ public class EventsRegistrer {
         register(new FindSuperMobs());
         if (ItemSettingsConfig.isPreventEliteItemEnchantment())
             register(new ItemEnchantmentPrevention());
+        if (ItemSettingsConfig.isPreventEliteItemDisenchantment())
+            register(new ItemDisenchantPrevention());
+
         if (!VersionChecker.serverVersionOlderThan(15, 2))
             if (ItemSettingsConfig.isPreventEliteItemDiamondToNetheriteUpgrade())
                 register(new PreventUpgradeDiamondToNetherite());
@@ -162,6 +171,7 @@ public class EventsRegistrer {
         silent errors without ever noticing, and ultimately the amount of manual input required is pretty minimal
          */
         //Minor mob powers
+        register(new ScriptListener());
         registerPower(new InvulnerabilityArrow(), "invulnerability_arrow.yml");
         registerPower(new InvulnerabilityFallDamage(), "invulnerability_fall_damage.yml");
         registerPower(new InvulnerabilityKnockback(), "invulnerability_knockback.yml");

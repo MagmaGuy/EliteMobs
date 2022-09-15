@@ -13,7 +13,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by MagmaGuy on 11/05/2017.
@@ -81,7 +81,7 @@ public class MajorPowerPowerStance implements Listener {
     }
 
     private ArrayList<Object> addObfuscatedEffects() {
-        return new ArrayList<>(Arrays.asList(Particle.END_ROD));
+        return new ArrayList<>(List.of(Particle.END_ROD));
     }
 
     private ArrayList<Object> addAllEffects() {
