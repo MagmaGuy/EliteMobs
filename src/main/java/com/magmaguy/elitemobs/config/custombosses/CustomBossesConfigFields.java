@@ -196,6 +196,10 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     private ConfigurationSection rawEliteScripts = null;
     @Getter
     private List<EliteScript> eliteScript = null;
+    @Getter
+    @Setter
+    private String song = null;
+
 
     /**
      * Creates a new default pre-made Custom Boss. The boss is further customized through a builder pattern.
@@ -339,6 +343,7 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         rawEliteScripts = fileConfiguration.getConfigurationSection("eliteScript");
         if (rawEliteScripts != null) eliteScript = EliteScript.parseBossScripts(rawEliteScripts);
 
+        this.song = processString("song", song, null, false);
     }
 
     public boolean isCustomModelExists() {

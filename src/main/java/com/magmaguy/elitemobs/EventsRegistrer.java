@@ -102,7 +102,7 @@ public class EventsRegistrer {
         register(new FirstTimeSetup());
 
         register(new DungeonInstance.DungeonInstanceEvents());
-        register(new DungeonKillTargetObjective.DungeonKilLTargetObjectiveListener());
+        register(new DungeonKillTargetObjective.DungeonKillTargetObjectiveListener());
 
         register(new com.magmaguy.elitemobs.versionnotifier.VersionChecker.VersionCheckerEvents());
 

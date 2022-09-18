@@ -10,6 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -20,7 +21,7 @@ import java.util.stream.Collectors;
 
 public class ScriptActions {
     @Getter
-    private List<ScriptAction> scriptActions = new ArrayList();
+    private final List<ScriptAction> scriptActions = new ArrayList();
 
     public ScriptActions(List<Map<?, ?>> values, String scriptName) {
         for (Map<?, ?> entry : values)
@@ -46,7 +47,8 @@ public class ScriptActions {
         NEARBY_PLAYERS,
         WORLD_PLAYERS,
         ALL_PLAYERS,
-        PLAYER
+        PLAYER,
+        SELF
     }
 
     private class ScriptAction {
@@ -149,7 +151,7 @@ public class ScriptActions {
             }.runTaskLater(MetadataHandler.PLUGIN, wait);
         }
 
-        private Collection<? extends Player> getTargets(EliteEntity eliteEntity, Player player) {
+        private Collection<? extends LivingEntity> getTargets(EliteEntity eliteEntity, Player player) {
             Location eliteEntityLocation = eliteEntity.getLocation();
             return switch (target) {
                 case ALL_PLAYERS -> Bukkit.getOnlinePlayers();
@@ -157,6 +159,7 @@ public class ScriptActions {
                 case NEARBY_PLAYERS ->
                         eliteEntityLocation.getWorld().getNearbyEntities(eliteEntityLocation, range, range, range, (entity -> entity.getType() == EntityType.PLAYER)).stream().map(entity -> (Player) entity).collect(Collectors.toSet());
                 case PLAYER -> Collections.singletonList(player);
+                case SELF -> Collections.singletonList(eliteEntity.getLivingEntity());
                 default -> null;
             };
         }

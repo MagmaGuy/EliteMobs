@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
 import com.magmaguy.elitemobs.config.menus.premade.EnhancementMenuConfig;
+import com.magmaguy.elitemobs.config.menus.premade.ProceduralShopMenuConfig;
 import com.magmaguy.elitemobs.items.EliteItemLore;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
@@ -138,6 +139,13 @@ public class EnhancementMenu extends EliteMenu {
             Inventory EnhancementInventory = event.getView().getTopInventory();
             Inventory playerInventory = event.getView().getBottomInventory();
 
+            boolean inventoryHasFreeSlots = false;
+            for (ItemStack iteratedStack : player.getInventory().getStorageContents())
+                if (iteratedStack == null) {
+                    inventoryHasFreeSlots = true;
+                    break;
+                }
+
             if (isBottomMenu(event)) {
 
                 //Item is upgrade orb
@@ -162,7 +170,13 @@ public class EnhancementMenu extends EliteMenu {
                             calculateOutput(EnhancementInventory);
                         }
 
+
             } else if (isTopMenu(event)) {
+
+                if (!inventoryHasFreeSlots) {
+                    player.sendMessage(ProceduralShopMenuConfig.messageFullInventory);
+                    player.closeInventory();
+                }
 
                 //return item to inventory
                 if (event.getSlot() == scrapItemInputSlot || event.getSlot() == eliteItemInputSlot) {
@@ -175,7 +189,6 @@ public class EnhancementMenu extends EliteMenu {
                 //cancel button
                 if (event.getSlot() == EnhancementMenuConfig.cancelSlot) {
                     player.closeInventory();
-                    EliteMenu.cancel(event.getView().getTopInventory(), event.getView().getBottomInventory(), Arrays.asList(eliteItemInputSlot, scrapItemInputSlot));
                     return;
                 }
 
@@ -196,7 +209,10 @@ public class EnhancementMenu extends EliteMenu {
 
         @EventHandler
         public void onClose(InventoryCloseEvent event) {
-            inventories.remove(event.getInventory());
+            if (inventories.contains(event.getInventory())) {
+                inventories.remove(event.getInventory());
+                EliteMenu.cancel(event.getPlayer(), event.getView().getTopInventory(), event.getView().getBottomInventory(), Arrays.asList(eliteItemInputSlot, scrapItemInputSlot));
+            }
         }
 
     }
