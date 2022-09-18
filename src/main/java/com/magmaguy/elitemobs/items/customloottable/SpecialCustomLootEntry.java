@@ -21,7 +21,7 @@ public class SpecialCustomLootEntry extends CustomLootEntry implements Serializa
         //todo: Integrate Special Loot in its entirety to this class to make it mesh with how the rest of the loot works
         for (String processedString : rawString.split(":")) {
             String[] strings = processedString.split("=");
-            if ("wave".equals(strings[0].toLowerCase())) {
+            if ("wave".equalsIgnoreCase(strings[0])) {
                 try {
                     super.setWave(Integer.parseInt(strings[1]));
                 } catch (Exception ex) {

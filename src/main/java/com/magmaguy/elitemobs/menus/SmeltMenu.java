@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.menus;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
+import com.magmaguy.elitemobs.config.menus.premade.ProceduralShopMenuConfig;
 import com.magmaguy.elitemobs.config.menus.premade.ScrapperMenuConfig;
 import com.magmaguy.elitemobs.config.menus.premade.SmeltMenuConfig;
 import com.magmaguy.elitemobs.items.ItemTagger;
@@ -149,6 +150,13 @@ public class SmeltMenu extends EliteMenu {
             Inventory smeltInventory = event.getView().getTopInventory();
             Inventory playerInventory = event.getView().getBottomInventory();
 
+            boolean inventoryHasFreeSlots = false;
+            for (ItemStack iteratedStack : player.getInventory().getStorageContents())
+                if (iteratedStack == null) {
+                    inventoryHasFreeSlots = true;
+                    break;
+                }
+
             if (isBottomMenu(event)) {
                 if (!ItemTagger.hasEnchantment(currentItem.getItemMeta(), "EliteScrap")) return;
                 boolean inputIsFull = true;
@@ -175,9 +183,13 @@ public class SmeltMenu extends EliteMenu {
 
             } else if (isTopMenu(event)) {
 
+                if (!inventoryHasFreeSlots) {
+                    player.sendMessage(ProceduralShopMenuConfig.messageFullInventory);
+                    player.closeInventory();
+                }
+
                 if (event.getSlot() == SmeltMenuConfig.cancelSlot) {
                     player.closeInventory();
-                    EliteMenu.cancel(event.getView().getTopInventory(), event.getView().getBottomInventory(), SmeltMenu.inputSlots);
                     return;
                 }
 
@@ -223,7 +235,10 @@ public class SmeltMenu extends EliteMenu {
 
         @EventHandler
         public void onInventoryCloseEvent(InventoryCloseEvent event) {
-            inventories.remove(event.getInventory());
+            if (inventories.contains(event.getInventory())) {
+                inventories.remove(event.getInventory());
+                EliteMenu.cancel(event.getPlayer(), event.getView().getTopInventory(), event.getView().getBottomInventory(), SmeltMenu.inputSlots);
+            }
         }
     }
 

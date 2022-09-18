@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
+import com.magmaguy.elitemobs.config.menus.premade.ProceduralShopMenuConfig;
 import com.magmaguy.elitemobs.config.menus.premade.UnbinderMenuConfig;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.customenchantments.UnbindEnchantment;
@@ -127,6 +128,13 @@ public class UnbindMenu extends EliteMenu {
             Inventory unbinderInventory = event.getView().getTopInventory();
             Inventory playerInventory = event.getView().getBottomInventory();
 
+            boolean inventoryHasFreeSlots = false;
+            for (ItemStack iteratedStack : player.getInventory().getStorageContents())
+                if (iteratedStack == null) {
+                    inventoryHasFreeSlots = true;
+                    break;
+                }
+
             if (isBottomMenu(event)) {
                 //Item is unbind scroll
                 if (ItemTagger.hasEnchantment(currentItem.getItemMeta(), UnbindEnchantment.key)) {
@@ -149,6 +157,11 @@ public class UnbindMenu extends EliteMenu {
 
             } else if (isTopMenu(event)) {
 
+                if (!inventoryHasFreeSlots) {
+                    player.sendMessage(ProceduralShopMenuConfig.messageFullInventory);
+                    player.closeInventory();
+                }
+
                 //return item to inventory
                 if (event.getSlot() == scrapItemInputSlot || event.getSlot() == eliteItemInputSlot) {
                     playerInventory.addItem(currentItem);
@@ -160,7 +173,6 @@ public class UnbindMenu extends EliteMenu {
                 //cancel button
                 if (event.getSlot() == UnbinderMenuConfig.getCancelSlot()) {
                     player.closeInventory();
-                    EliteMenu.cancel(event.getView().getTopInventory(), event.getView().getBottomInventory(), Arrays.asList(eliteItemInputSlot, scrapItemInputSlot));
                     return;
                 }
 
@@ -181,7 +193,10 @@ public class UnbindMenu extends EliteMenu {
 
         @EventHandler
         public void onClose(InventoryCloseEvent event) {
-            inventories.remove(event.getInventory());
+            if (inventories.contains(event.getInventory())) {
+                inventories.remove(event.getInventory());
+                EliteMenu.cancel(event.getPlayer(), event.getView().getTopInventory(), event.getView().getBottomInventory(), Arrays.asList(eliteItemInputSlot, scrapItemInputSlot));
+            }
         }
 
     }

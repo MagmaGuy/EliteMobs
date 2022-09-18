@@ -36,7 +36,7 @@ import java.util.Map;
 
 public class MatchInstance {
 
-    private static final HashSet<MatchInstance> instances = new HashSet<>();
+    protected static final HashSet<MatchInstance> instances = new HashSet<>();
     @Getter
     private final HashMap<Block, DeathLocation> deathBanners = new HashMap<>();
     @Getter
@@ -60,7 +60,7 @@ public class MatchInstance {
     private int maxZ;
     private World world;
     private boolean cylindricalArena;
-    private Map<Player, Location> previousPlayerLocations = new HashMap<>();
+    private final Map<Player, Location> previousPlayerLocations = new HashMap<>();
     private Cylinder cylinder;
 
     public MatchInstance(Location startLocation, Location exitLocation, int minPlayers, int maxPlayers) {
@@ -90,7 +90,8 @@ public class MatchInstance {
     }
 
     public static void shutdown() {
-        instances.forEach(MatchInstance::resetMatch);
+        HashSet<MatchInstance> cloneInstance = new HashSet<>(instances);
+        cloneInstance.forEach(MatchInstance::resetMatch);
         instances.clear();
     }
 
@@ -227,6 +228,24 @@ public class MatchInstance {
             PlayerData.setMatchInstance(player, null);
         }
 
+
+        if (players.isEmpty() && getDeathLocationByPlayer(player) != null)
+            getDeathLocationByPlayer(player).clear(false);
+
+        if (player.isOnline()) {
+            MatchInstanceEvents.teleportBypass = true;
+            if (this instanceof DungeonInstance) {
+                Location location = previousPlayerLocations.get(player);
+                if (location != null) player.teleport(location);
+                else player.teleport(exitLocation);
+            } else
+                player.teleport(exitLocation);
+        }
+
+        if (players.isEmpty())
+            endMatch();
+
+        /*
         if (state.equals(InstancedRegionState.ONGOING) && players.isEmpty()){
             if (player.isOnline()) {
                 MatchInstanceEvents.teleportBypass = true;
@@ -237,9 +256,10 @@ public class MatchInstance {
                 } else
                     player.teleport(exitLocation);
             } else if (getDeathLocationByPlayer(player) != null)
-                getDeathLocationByPlayer(player).clear(false);
+
             endMatch();
         }
+         */
         playerLives.remove(player);
     }
 
@@ -387,6 +407,11 @@ public class MatchInstance {
 
             @Override
             public void run() {
+                if (players.size() < minPlayers) {
+                    cancel();
+                    endMatch();
+                    return;
+                }
                 counter++;
                 players.forEach(player -> startMessage(counter, player));
                 spectators.forEach(player -> startMessage(counter, player));
@@ -410,7 +435,7 @@ public class MatchInstance {
 
     protected void endMatch() {
         state = InstancedRegionState.COMPLETED;
-        instances.remove(this);
+        //instances.remove(this);
     }
 
     protected void resetMatch() {
@@ -449,7 +474,8 @@ public class MatchInstance {
 
         @EventHandler
         public void onPlayerLeave(PlayerQuitEvent event) {
-            instances.forEach(instance -> instance.removeAnyKind(event.getPlayer()));
+            HashSet<MatchInstance> copy = new HashSet<>(instances);
+            copy.forEach(instance -> instance.removeAnyKind(event.getPlayer()));
         }
 
         @EventHandler

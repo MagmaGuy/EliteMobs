@@ -135,7 +135,6 @@ public class ProceduralShopMenu {
 
                     player.sendMessage(ProceduralShopMenuConfig.messageFullInventory);
                     player.closeInventory();
-                    menus.remove(player);
 
                 } else if (EconomyHandler.checkCurrency(player.getUniqueId()) >= itemValue) {
                     //player has enough money

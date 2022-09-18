@@ -11,13 +11,13 @@ import java.util.Collections;
 import java.util.List;
 
 public class EliteScript extends ElitePower {
-    private String scriptName;
+    private final String scriptName;
 
     //Parse from power file
-    private ScriptEvents scriptEvents;
-    private ScriptConditions scriptConditions;
-    private ScriptActions scriptActions;
-    private ScriptCooldowns scriptCooldowns;
+    private final ScriptEvents scriptEvents;
+    private final ScriptConditions scriptConditions;
+    private final ScriptActions scriptActions;
+    private final ScriptCooldowns scriptCooldowns;
     public EliteScript(ConfigurationSection configurationSection, String scriptName) {
         super(configurationSection, scriptName);
         this.scriptName = scriptName;
@@ -31,7 +31,6 @@ public class EliteScript extends ElitePower {
         }
         if (!scriptActions.isValid()) {
             new WarningMessage("Script does not have valid Actions for entry " + scriptName + "!");
-            return;
         }
     }
 

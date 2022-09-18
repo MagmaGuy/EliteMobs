@@ -60,16 +60,6 @@ public class SellMenu extends EliteMenu implements Listener {
         return clonedConfirmButton;
     }
 
-    private static void cancel(Inventory playerInventory, Inventory shopInventory) {
-        for (Integer validSlot : validSlots) {
-            ItemStack itemStack = shopInventory.getItem(validSlot);
-            if (itemStack != null) {
-                playerInventory.addItem(itemStack);
-                shopInventory.remove(itemStack);
-            }
-        }
-    }
-
     /**
      * Creates a menu for selling elitemobs items. Only special Elite Mob items can be sold here.
      *
@@ -122,8 +112,6 @@ public class SellMenu extends EliteMenu implements Listener {
         }
 
         player.openInventory(sellInventory);
-        if (ResourcePackDataConfig.isDisplayCustomMenuUnicodes())
-            menuName = "\uF801\uDB80\uDC5B\uF805            " + menuName;
         createEliteMenu(sellInventory, inventories);
 
     }
@@ -216,9 +204,7 @@ public class SellMenu extends EliteMenu implements Listener {
 
             //cancel, transfer items back to player inv and exit
             if (event.getSlot() == SellMenuConfig.cancelSlot) {
-                cancel(playerInventory, shopInventory);
                 event.getWhoClicked().closeInventory();
-                cancel(event.getView().getBottomInventory(), event.getView().getTopInventory());
                 return;
             }
 
@@ -238,7 +224,10 @@ public class SellMenu extends EliteMenu implements Listener {
 
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
-        inventories.remove(event.getInventory());
+        if (inventories.contains(event.getInventory())) {
+            inventories.remove(event.getInventory());
+            EliteMenu.cancel(event.getPlayer(), event.getView().getTopInventory(), event.getView().getBottomInventory(), SellMenuConfig.storeSlots);
+        }
     }
 
 }

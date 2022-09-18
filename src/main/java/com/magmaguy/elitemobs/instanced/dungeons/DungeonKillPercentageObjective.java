@@ -11,8 +11,8 @@ public class DungeonKillPercentageObjective extends DungeonObjective {
     private final int currentAmount = 0;
     private double percentage;
 
-    public DungeonKillPercentageObjective(String objectiveString) {
-        super(objectiveString);
+    public DungeonKillPercentageObjective(DungeonInstance dungeonInstance, String objectiveString) {
+        super(dungeonInstance, objectiveString);
         String[] strings = objectiveString.split(":");
         for (String seperatedByColon : strings) {
             String[] separatedByEquals = seperatedByColon.split("=");
