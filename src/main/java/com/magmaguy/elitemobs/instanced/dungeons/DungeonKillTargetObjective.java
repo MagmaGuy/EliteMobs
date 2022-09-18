@@ -20,8 +20,8 @@ public class DungeonKillTargetObjective extends DungeonObjective {
     private int currentAmount = 0;
 
 
-    public DungeonKillTargetObjective(String objectiveString) {
-        super(objectiveString);
+    public DungeonKillTargetObjective(DungeonInstance dungeonInstance, String objectiveString) {
+        super(dungeonInstance, objectiveString);
         String[] strings = objectiveString.split(":");
         for (String seperatedByColon : strings) {
             String[] separatedByEquals = seperatedByColon.split("=");
@@ -37,6 +37,7 @@ public class DungeonKillTargetObjective extends DungeonObjective {
                 new WarningMessage("Invalid entry for objective string! " + objectiveString + " could not be parsed correctly.");
             }
         }
+        initializeObjective(dungeonInstance);
     }
 
     @Override
@@ -53,13 +54,16 @@ public class DungeonKillTargetObjective extends DungeonObjective {
         }
     }
 
-    public static class DungeonKilLTargetObjectiveListener implements Listener {
+    public static class DungeonKillTargetObjectiveListener implements Listener {
         @EventHandler
         public void onEliteDeath(EliteMobDeathEvent event) {
             if (!(event.getEliteEntity() instanceof InstancedBossEntity instancedBossEntity)) return;
-            for (DungeonKillTargetObjective dungeonKillTargetObjective : dungeonKillTargetObjectiveList)
-                if (instancedBossEntity.getCustomBossesConfigFields().getFilename().equals(dungeonKillTargetObjective.getBossFilename()))
+            for (DungeonKillTargetObjective dungeonKillTargetObjective : dungeonKillTargetObjectiveList) {
+                if (instancedBossEntity.getCustomBossesConfigFields().getFilename().equals(dungeonKillTargetObjective.getBossFilename()) ||
+                        instancedBossEntity.getPhaseBossEntity() != null &&
+                                instancedBossEntity.getPhaseBossEntity().getPhase1Config().getFilename().equals(dungeonKillTargetObjective.getBossFilename()))
                     dungeonKillTargetObjective.incrementKills();
+            }
         }
     }
 }

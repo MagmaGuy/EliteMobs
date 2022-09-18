@@ -102,6 +102,10 @@ public class QuestsConfig {
     private static String lowRankDynamicQuestWarning;
     @Getter
     private static String questTurnInObjective;
+    @Getter
+    private static int horizontalCharacterLimitBedrockMenu;
+    @Getter
+    private static int itemEntryCharacterLimitBedrockMenu;
 
     private QuestsConfig() {
     }
@@ -163,6 +167,9 @@ public class QuestsConfig {
         lowRankDynamicQuestWarning = ConfigurationEngine.setString(file, fileConfiguration, "lowRankDynamicQuestWarning", "&8[EliteMobs] &cYou can't take these quests with your current guild rank! Increase your guild rank to accept these quests.", true);
 
         questTurnInObjective = ConfigurationEngine.setString(file, fileConfiguration, "questTurnInObjective", "&a2Talk to $npcName", true);
+
+        horizontalCharacterLimitBedrockMenu = ConfigurationEngine.setInt(fileConfiguration, "horizontalCharacterLimitBedrockMenu", 30);
+        itemEntryCharacterLimitBedrockMenu = ConfigurationEngine.setInt(fileConfiguration, "itemEntryCharacterLimitBedrockMenu", 300);
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }

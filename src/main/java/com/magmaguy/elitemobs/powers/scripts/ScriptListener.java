@@ -59,6 +59,11 @@ public class ScriptListener implements Listener {
         runEvent(event, event.getEliteMobEntity(), event.getPlayer());
     }
 
+    @EventHandler
+    public void onElitePhaseSwitchEvent(ElitePhaseSwitchEvent event){
+        runEvent(event,event.getCustomBossEntity(), null);
+    }
+
     private void runEvent(Event event, EliteEntity eliteEntity, Player player) {
         for (ElitePower elitePower : eliteEntity.getElitePowers()) {
             if (elitePower instanceof EliteScript) {

@@ -129,15 +129,15 @@ public class CustomShopMenu {
 
             double itemValue = ItemWorthCalculator.determineItemWorth(itemStack, player);
 
+            boolean inventoryHasFreeSlots = false;
+            for (ItemStack iteratedStack : player.getInventory().getStorageContents())
+                if (iteratedStack == null) {
+                    inventoryHasFreeSlots = true;
+                    break;
+                }
+
             //These slots are for buying items
             if (EliteMenu.isTopMenu(event)) {
-
-                boolean inventoryHasFreeSlots = false;
-                for (ItemStack iteratedStack : player.getInventory())
-                    if (iteratedStack == null) {
-                        inventoryHasFreeSlots = true;
-                        break;
-                    }
 
                 if (!inventoryHasFreeSlots) {
 

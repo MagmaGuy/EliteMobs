@@ -24,6 +24,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 public class DungeonInstance extends MatchInstance {
@@ -32,7 +33,7 @@ public class DungeonInstance extends MatchInstance {
     private final List<DungeonObjective> dungeonObjectives = new ArrayList<>();
     private final World world;
     List<InstancedBossEntity> instancedBossEntities = new ArrayList<>();
-    private File instancedWorldFile;
+    private final File instancedWorldFile;
 
     public DungeonInstance(InstancedDungeonsConfigFields instancedDungeonsConfigFields, Location startLocation, Location endLocation, World world, File instancedWorldFile) {
         super(startLocation, endLocation,
@@ -40,7 +41,7 @@ public class DungeonInstance extends MatchInstance {
                 instancedDungeonsConfigFields.getMaximumPlayerCount());
         //todo: add dungeon objectives from the configuration
         for (String rawObjective : instancedDungeonsConfigFields.getRawDungeonObjectives())
-            this.dungeonObjectives.add(DungeonObjective.registerObjective(rawObjective));
+            this.dungeonObjectives.add(DungeonObjective.registerObjective(this, rawObjective));
         //todo: check if this causes issues in async
         this.world = world;
         this.instancedWorldFile = instancedWorldFile;
@@ -111,7 +112,7 @@ public class DungeonInstance extends MatchInstance {
     }
 
     public void checkCompletionStatus() {
-        if (!super.state.equals(InstancedRegionState.ONGOING)) return;
+        //if (!super.state.equals(InstancedRegionState.ONGOING)) return;
         for (DungeonObjective dungeonObjective : dungeonObjectives)
             if (!dungeonObjective.isCompleted())
                 return;
@@ -122,7 +123,9 @@ public class DungeonInstance extends MatchInstance {
     @Override
     public void endMatch() {
         super.endMatch();
-        state = InstancedRegionState.COMPLETED;
+        HashSet<Player> participants = new HashSet<>(super.participants);
+        participants.forEach(this::removeAnyKind);
+        instances.remove(this);
         Bukkit.unloadWorld(world, false);
         new BukkitRunnable() {
             @Override

@@ -24,6 +24,7 @@ public class ScriptEvents {
                 case "EliteMobSpawnEvent" -> events.add(EliteMobSpawnEvent.class);
                 case "EliteMobTargetPlayerEvent" -> events.add(EliteMobTargetPlayerEvent.class);
                 case "PlayerDamagedByEliteMobEvent" -> events.add(PlayerDamagedByEliteMobEvent.class);
+                case "ElitePhaseSwitchEvent" -> events.add(ElitePhaseSwitchEvent.class);
                 default ->
                         new WarningMessage("Failed to get valid script event from entry " + entry + " in " + scriptName + " !");
             }

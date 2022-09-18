@@ -12,6 +12,7 @@ public class NormalSurfaceSpawn extends CustomSpawnConfigFields {
         super("normal_surface_spawn",
                 true);
         setSurfaceSpawn(true);
+        setCanSpawnInLight(true);
         try {
             setValidWorldEnvironments(new ArrayList<>(Arrays.asList(World.Environment.NORMAL, World.Environment.CUSTOM)));
         } catch (NoSuchFieldError ex) {

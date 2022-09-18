@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.quests.menus;
 
 import com.magmaguy.elitemobs.commands.quests.QuestCommand;
+import com.magmaguy.elitemobs.config.QuestsConfig;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.Quest;
@@ -114,7 +115,7 @@ public class QuestInventoryMenu {
         title = title.replace(ChatColor.BLACK.toString(), ChatColor.WHITE.toString());
         List<String> lore = new ArrayList<>();
         rawLore.forEach(raw -> lore.add(ChatColor.WHITE + raw.replace(ChatColor.BLACK.toString(), ChatColor.WHITE.toString())));
-        int characterLimit = 300;
+        int characterLimit = QuestsConfig.getItemEntryCharacterLimitBedrockMenu();
         List<ItemStack> itemStacks = new ArrayList<>();
         AtomicInteger counter = new AtomicInteger();
         lore.forEach(entry -> counter.addAndGet(entry.length()));
@@ -123,7 +124,7 @@ public class QuestInventoryMenu {
             return itemStacks;
         }
 
-        int maxCharactersPerLine = 30;
+        int maxCharactersPerLine = QuestsConfig.getHorizontalCharacterLimitBedrockMenu();
         List<String> currentList = new ArrayList<>();
         int currentCharacterCount = 0;
         for (String entry : lore) {

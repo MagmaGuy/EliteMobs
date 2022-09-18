@@ -2,10 +2,12 @@ package com.magmaguy.elitemobs.mobconstructor.custombosses;
 
 import com.magmaguy.elitemobs.api.EliteMobDamagedEvent;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
+import com.magmaguy.elitemobs.api.ElitePhaseSwitchEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
+import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import org.bukkit.Location;
@@ -60,22 +62,38 @@ public class PhaseBossEntity {
         }
         customBossEntity.setCustomBossesConfigFields(bossPhase.customBossesConfigFields);
         if (removalReason.equals(RemovalReason.PHASE_BOSS_RESET)) {
+            customBossEntity.setBossMusic(new BossMusic(bossPhase.customBossesConfigFields.getSong()));
             customBossEntity.spawn(true);
         } else {
             if (bossPhase.customBossesConfigFields.getPhaseSpawnLocation() != null) {
-                Location location = ConfigurationLocation.serialize(bossPhase.customBossesConfigFields.getPhaseSpawnLocation());
+                Location location = ConfigurationLocation.serialize(bossPhase.customBossesConfigFields.getPhaseSpawnLocation(), true);
+                if (bossPhase.customBossesConfigFields.getPhaseSpawnLocation() != null &&
+                        bossPhase.customBossesConfigFields.getPhaseSpawnLocation().split(",")[0].equalsIgnoreCase("same_as_boss"))
+                    location.setWorld(customBossEntity.getLocation().getWorld());
                 if (location != null) {
                     customBossEntity.setSpawnLocation(location);
                     customBossEntity.setRespawnOverrideLocation(location);
-                } else
+                    customBossEntity.setPersistentLocation(location);
+                } else {
                     customBossEntity.setRespawnOverrideLocation(customBossEntity.getLocation());
+                    customBossEntity.setPersistentLocation(location);
+                }
             } else
                 customBossEntity.setRespawnOverrideLocation(customBossEntity.getLocation());
+            //Handle music, soundtrack shouldn't change if the new one is the same
+            if (bossPhase.customBossesConfigFields.getSong() != null
+                    && currentPhase.customBossesConfigFields.getSong() != null &&
+                    !bossPhase.customBossesConfigFields.getSong().equals(currentPhase.customBossesConfigFields.getSong())) {
+                if (customBossEntity.getBossMusic() != null) customBossEntity.getBossMusic().stop();
+                customBossEntity.setBossMusic(new BossMusic(bossPhase.customBossesConfigFields.getSong()));
+            }
             customBossEntity.spawn(true);
         }
         customBossEntity.setHealth(customBossEntity.getMaxHealth() * healthPercentage);
         currentPhase = bossPhase;
         if (customBossEntity.getCustomModel() != null) customBossEntity.getCustomModel().switchPhase();
+        ElitePhaseSwitchEvent elitePhaseSwitchEvent = new ElitePhaseSwitchEvent(customBossEntity, this);
+        new EventCaller(elitePhaseSwitchEvent);
     }
 
     public void resetToFirstPhase() {

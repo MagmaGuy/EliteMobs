@@ -57,6 +57,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
     protected LivingEntity livingEntityMount = null;
     protected CustomBossEntity mount;
     protected PersistentObjectHandler persistentObjectHandler = null;
+    @Setter
     protected Location persistentLocation;
     @Getter
     @Setter
@@ -89,6 +90,9 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
     private CustomModel customModel = null;
     @Getter
     private boolean normalizedCombat;
+    @Getter
+    @Setter
+    private BossMusic bossMusic = null;
 
     /**
      * Uses a builder pattern in order to construct a CustomBossEntity at an arbitrary point in the future. Does not
@@ -101,6 +105,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
     public CustomBossEntity(CustomBossesConfigFields customBossesConfigFields) {
         //This creates a placeholder empty EliteMobEntity to be filled in later
         super();
+        if (customBossesConfigFields.getSong() != null) bossMusic = new BossMusic(customBossesConfigFields.getSong());
         //This stores everything that will need to be initialized for the EliteMobEntity
         setCustomBossesConfigFields(customBossesConfigFields);
         super.setPersistent(customBossesConfigFields.isPersistent());
@@ -237,6 +242,8 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
 
         //It isn't worth initializing things that will notify players or spawn additional entities until we are certain that the boss has actually spawned
         if (livingEntity != null) {
+            if (bossMusic != null)
+                bossMusic.start(this);
             startBossTrails();
             mountEntity();
             //Prevent custom bosses from getting removed when far away, this is important for mounts and reinforcements in large arenas
@@ -417,6 +424,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
 
     @Override
     public void fullHeal() {
+        if (customBossesConfigFields.isInstanced()) return;
         if (phaseBossEntity == null || phaseBossEntity.isInFirstPhase()) {
             super.fullHeal();
             return;
@@ -489,6 +497,8 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
             //when bosses get removed due to chunk unloads and are persistent they should remain stored
             if (persistentObjectHandler != null)
                 persistentObjectHandler.updatePersistentLocation(getPersistentLocation());
+
+        if (!removalReason.equals(RemovalReason.PHASE_BOSS_PHASE_END) && bossMusic != null) bossMusic.stop();
     }
 
     @Override

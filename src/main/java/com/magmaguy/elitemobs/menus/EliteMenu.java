@@ -1,10 +1,13 @@
 package com.magmaguy.elitemobs.menus;
 
 import org.bukkit.Material;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -28,12 +31,15 @@ public class EliteMenu implements Listener {
         return !isTopMenu(event);
     }
 
-    public static void cancel(Inventory eliteInventory, Inventory playerInventory, List<Integer> inputSlots) {
-        for (int slot : inputSlots)
+    public static void cancel(HumanEntity player, Inventory eliteInventory, Inventory playerInventory, List<Integer> inputSlots) {
+        for (int slot : inputSlots) {
             if (eliteInventory.getItem(slot) != null) {
-                playerInventory.addItem(eliteInventory.getItem(slot));
-                eliteInventory.remove(eliteInventory.getItem(slot));
+                HashMap<Integer, ItemStack> leftOvers = playerInventory.addItem(eliteInventory.getItem(slot));
+                eliteInventory.clear(slot);
+                if (!leftOvers.isEmpty())
+                    leftOvers.values().forEach(itemStack -> player.getWorld().dropItem(player.getLocation(), itemStack));
             }
+        }
     }
 
 }

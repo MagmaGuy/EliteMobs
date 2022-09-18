@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.powers.meta;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
+import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.utils.WarningMessage;
@@ -62,7 +63,7 @@ public class ElitePower {
         this.name = scriptName;
         this.powerCooldownTime = 0;//todo: update
         this.globalCooldownTime = 0;//todo: update
-        this.powersConfigFields = null; //todo: might want to actually give this a value when reading from the powers folder
+        this.powersConfigFields = PowersConfig.getPower("elite_script.yml"); //todo: this needs to get removed in the rewrite
     }
 
     //Costructor for classic powers

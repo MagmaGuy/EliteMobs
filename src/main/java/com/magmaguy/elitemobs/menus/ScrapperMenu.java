@@ -7,6 +7,7 @@ import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
 import com.magmaguy.elitemobs.config.TranslationConfig;
+import com.magmaguy.elitemobs.config.menus.premade.ProceduralShopMenuConfig;
 import com.magmaguy.elitemobs.config.menus.premade.ScrapperMenuConfig;
 import com.magmaguy.elitemobs.config.menus.premade.SellMenuConfig;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
@@ -110,6 +111,13 @@ public class ScrapperMenu extends EliteMenu {
             Inventory shopInventory = event.getView().getTopInventory();
             Inventory playerInventory = event.getView().getBottomInventory();
 
+            boolean inventoryHasFreeSlots = false;
+            for (ItemStack iteratedStack : player.getInventory().getStorageContents())
+                if (iteratedStack == null) {
+                    inventoryHasFreeSlots = true;
+                    break;
+                }
+
             if (EliteMenu.isBottomMenu(event)) {
                 //CASE: If the player clicked on something in their inventory to put it on the shop
 
@@ -134,6 +142,11 @@ public class ScrapperMenu extends EliteMenu {
                     }
 
             } else if (EliteMenu.isTopMenu(event)) {
+
+                if (!inventoryHasFreeSlots) {
+                    player.sendMessage(ProceduralShopMenuConfig.messageFullInventory);
+                    player.closeInventory();
+                }
                 //CASE: Player clicked on the shop
 
                 //Signature item, does nothing
@@ -170,7 +183,6 @@ public class ScrapperMenu extends EliteMenu {
                 //cancel, transfer items back to player inv and exit
                 if (event.getSlot() == SellMenuConfig.cancelSlot) {
                     player.closeInventory();
-                    EliteMenu.cancel(event.getView().getTopInventory(), event.getView().getBottomInventory(), validSlots);
                     return;
                 }
 
@@ -188,7 +200,10 @@ public class ScrapperMenu extends EliteMenu {
 
         @EventHandler
         public void onClose(InventoryCloseEvent event) {
-            inventories.remove(event.getInventory());
+            if (inventories.contains(event.getInventory())) {
+                inventories.remove(event.getInventory());
+                EliteMenu.cancel(event.getPlayer(), event.getView().getTopInventory(), event.getView().getBottomInventory(), validSlots);
+            }
         }
 
     }
