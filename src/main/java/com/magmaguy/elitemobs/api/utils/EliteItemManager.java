@@ -29,7 +29,7 @@ public class EliteItemManager {
      * @return The EDPS of the ItemStack. Defaults to 4 as that is the unarmed DPS!
      */
     public static double getDPS(@Nullable ItemStack itemStack) {
-        return getDPS(getAttackSpeed(itemStack), getBaseDamage(itemStack)) + getDPS(getAttackSpeed(itemStack), getEliteDamage(itemStack));
+        return getDPS(getAttackSpeed(itemStack), getBaseDamage(itemStack)) + getDPS(getAttackSpeed(itemStack), getEliteDamageFromEnchantment(itemStack));
     }
 
     /**
@@ -156,7 +156,7 @@ public class EliteItemManager {
      *
      * @return The bonus damage
      */
-    public static double getEliteDamage(@Nullable ItemStack itemStack) {
+    public static double getEliteDamageFromEnchantment(@Nullable ItemStack itemStack) {
         if (itemStack == null) return 0;
         double eliteDamage = ItemTagger.getEliteDamageAttribute(itemStack);
         //Elite Items may have elite enchantments associated to an item
@@ -188,7 +188,7 @@ public class EliteItemManager {
      */
     public static double getTotalDPS(@Nullable ItemStack itemStack) {
         if (itemStack == null) return 0;
-        double bonusDamage = getEliteDamage(itemStack);
+        double bonusDamage = getEliteDamageFromEnchantment(itemStack);
         if (bonusDamage == 0) return 0;
         return getDPS(getAttackSpeed(itemStack), bonusDamage);
     }
@@ -272,7 +272,7 @@ public class EliteItemManager {
     public static void tagArrow(@Nullable Projectile projectile) {
         if (projectile == null) return;
         if (!(projectile.getShooter() instanceof Player)) return;
-        ItemTagger.setEliteDamageAttribute(projectile, getEliteDamage(((Player) projectile.getShooter()).getInventory().getItemInMainHand()));
+        ItemTagger.setEliteDamageAttribute(projectile, getEliteDamageFromEnchantment(((Player) projectile.getShooter()).getInventory().getItemInMainHand()));
     }
 
     public static double getArrowEliteDamage(@Nullable Projectile projectile) {

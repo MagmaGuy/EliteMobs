@@ -1,6 +1,6 @@
 package com.magmaguy.elitemobs.api;
 
-import com.magmaguy.elitemobs.config.instanceddungeons.InstancedDungeonsConfigFields;
+import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
 import lombok.Getter;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -9,7 +9,7 @@ import org.bukkit.event.HandlerList;
 public class WorldInstanceEvent extends Event implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
     @Getter
-    private final InstancedDungeonsConfigFields instancedDungeonsConfigFields;
+    private final DungeonPackagerConfigFields dungeonPackagerConfigFields;
     @Getter
     private final String blueprintWorldName;
     @Getter
@@ -19,10 +19,10 @@ public class WorldInstanceEvent extends Event implements Cancellable {
 
     public WorldInstanceEvent(String blueprintWorldName,
                               String instancedWorldName,
-                              InstancedDungeonsConfigFields instancedDungeonsConfigFields) {
+                              DungeonPackagerConfigFields dungeonPackagerConfigFields) {
         this.blueprintWorldName = blueprintWorldName;
         this.instancedWorldName = instancedWorldName;
-        this.instancedDungeonsConfigFields = instancedDungeonsConfigFields;
+        this.dungeonPackagerConfigFields = dungeonPackagerConfigFields;
     }
 
 

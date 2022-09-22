@@ -25,6 +25,7 @@ public class DarkSpireMinidungeon extends DungeonPackagerConfigFields {
                         "$bossCount bosses, from level $lowestTier to $highestTier\n" +
                         "&cA vast challenge for advanced players!",
                 "&8[EM] &1An invasion is in progress. &9Stop the insurrection!",
-                "&8[EM] &1You managed to hold them back. &9For now...");
+                "&8[EM] &1You managed to hold them back. &9For now...",
+                "the_dark_spire");
     }
 }

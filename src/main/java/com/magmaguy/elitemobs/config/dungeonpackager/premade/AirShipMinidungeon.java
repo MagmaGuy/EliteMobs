@@ -100,6 +100,7 @@ public class AirShipMinidungeon extends DungeonPackagerConfigFields {
                         "&6for experienced players!",
                 "&8[EM] &cEntering hostile air zone!",
                 "&8[EM] &cLeaving hostile air zone!",
-                SchematicPackage.SchematicRotation.SOUTH.toString());
+                SchematicPackage.SchematicRotation.SOUTH.toString(),
+                "the_airship");
     }
 }

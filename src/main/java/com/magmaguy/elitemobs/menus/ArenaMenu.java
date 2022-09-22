@@ -51,7 +51,7 @@ public class ArenaMenu {
                         player.closeInventory();
                         return;
                     }
-                menus.get(event.getInventory()).getArenaInstance().addPlayer(player);
+                menus.get(event.getInventory()).getArenaInstance().addNewPlayer(player);
                 player.closeInventory();
                 return;
             }

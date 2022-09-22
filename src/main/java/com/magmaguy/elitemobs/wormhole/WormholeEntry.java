@@ -24,11 +24,11 @@ import java.util.Set;
 public class WormholeEntry implements PersistentObject {
     @Getter
     private static final Set<WormholeEntry> wormholeEntries = new HashSet<>();
-
-    @Getter
-    private Location location;
     @Getter
     private final Wormhole wormhole;
+    private final int wormholeNumber;
+    @Getter
+    private Location location;
     @Getter
     private String locationString;
     @Getter
@@ -46,7 +46,6 @@ public class WormholeEntry implements PersistentObject {
     @Getter
     @Setter
     private String opMessage = null;
-    private final int wormholeNumber;
     private PersistentObjectHandler persistentObjectHandler = null;
 
     public WormholeEntry(Wormhole wormhole, String locationString, int wormholeNumber) {

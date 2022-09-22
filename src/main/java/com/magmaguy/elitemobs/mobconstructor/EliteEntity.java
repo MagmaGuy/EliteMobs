@@ -17,6 +17,7 @@ import com.magmaguy.elitemobs.events.CustomEvent;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
+import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import com.magmaguy.elitemobs.powers.meta.MajorPower;
 import com.magmaguy.elitemobs.powers.meta.MinorPower;
@@ -122,7 +123,7 @@ public class EliteEntity {
     //currently used to store ender crystals for the dragon boss fight
     protected List<Entity> nonEliteReinforcementEntities = new ArrayList<>();
     protected boolean bypassesProtections = false;
-    private double health;
+    private Double health = null;
     @Getter
     @Setter
     private boolean dying = false;
@@ -183,13 +184,13 @@ public class EliteEntity {
             for (Player iteratedPlayer : damagers.keySet())
                 if (iteratedPlayer.getUniqueId().equals(player.getUniqueId())) {
                     this.damagers.put(iteratedPlayer, this.damagers.get(iteratedPlayer) + damage);
+                    this.aggro.put(iteratedPlayer, this.aggro.get(iteratedPlayer) + damage *
+                            ElitePlayerInventory.getPlayer(player).getLoudStrikesBonusMultipler(false));
                     return;
                 }
         this.damagers.put(player, damage);
-    }
-
-    public void addDamagers(Map<Player, Double> newDamagers) {
-        this.damagers.putAll(newDamagers);
+        this.aggro.put(player, damage *
+                ElitePlayerInventory.getPlayer(player).getLoudStrikesBonusMultipler(false));
     }
 
     public boolean hasDamagers() {
@@ -265,6 +266,10 @@ public class EliteEntity {
             KeepNeutralsAngry.showMeYouWarFace(this);
         }
 
+        //todo: this should become configurable real soon for the primis gladius event
+        if (entityType.equals(EntityType.IRON_GOLEM) && this instanceof CustomBossEntity)
+            KeepNeutralsAngry.showMeYouWarFace(this);
+
         if (!VersionChecker.serverVersionOlderThan(17, 0) && entityType.equals(EntityType.GOAT)) {
             ((Goat) livingEntity).setScreaming(true);
         }
@@ -301,8 +306,12 @@ public class EliteEntity {
         this.defaultMaxHealth = EliteMobProperties.getPluginData(this.getLivingEntity().getType()).getDefaultMaxHealth();
         this.maxHealth = (level * CombatSystem.TARGET_HITS_TO_KILL_MINUS_ONE + this.defaultMaxHealth) * healthMultiplier;
         livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(maxHealth);
-        livingEntity.setHealth(maxHealth);
-        this.health = maxHealth;
+        if (health == null) {
+            livingEntity.setHealth(maxHealth);
+            this.health = maxHealth;
+        }
+        //This is useful for phase boss entities that spawn in unloaded chunks and shouldn't full heal between phases, like in dungeons
+        else livingEntity.setHealth(health);
     }
 
     public void setNormalizedMaxHealth() {

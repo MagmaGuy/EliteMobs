@@ -24,6 +24,7 @@ public class NorthPoleMinidungeon extends DungeonPackagerConfigFields {
                         "$bossCount bosses, from level $lowestTier to $highestTier\n" +
                         "&6Christmas in a snow globe!",
                 "&8[EM] &7You have reached the North Pole! &fHave you been naughty this year?",
-                "&8[EM] &7Come back and visit. &fThere are plenty of sweets and treats for next time!");
+                "&8[EM] &7Come back and visit. &fThere are plenty of sweets and treats for next time!",
+                "the_north_pole");
     }
 }

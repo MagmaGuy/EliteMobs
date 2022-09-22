@@ -22,6 +22,7 @@ public class FrostWalker extends MinorPower {
             public void run() {
                 ItemStack frostWalkerBoots = new ItemStack(Material.LEATHER_BOOTS);
                 frostWalkerBoots.addEnchantment(Enchantment.FROST_WALKER, 2);
+                frostWalkerBoots.addEnchantment(Enchantment.DEPTH_STRIDER, 3);
                 livingEntity.getEquipment().setBoots(frostWalkerBoots);
             }
         }.runTaskLater(MetadataHandler.PLUGIN, 1);

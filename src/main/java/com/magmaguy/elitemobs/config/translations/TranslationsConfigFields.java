@@ -24,11 +24,11 @@ import java.util.List;
 
 public class TranslationsConfigFields extends CustomConfigFields implements CustomConfigFieldsInterface {
 
+    private final List<String> outdatedCustomKeys = new ArrayList<>();
     boolean saving = false;
     private File translationDataFile;
     private FileConfiguration translationData;
     private FileConfiguration premadeTranslationsConfiguration;
-    private final List<String> outdatedCustomKeys = new ArrayList<>();
     private boolean customLanguage = false;
 
     /**

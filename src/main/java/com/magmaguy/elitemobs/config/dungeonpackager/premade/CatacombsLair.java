@@ -34,6 +34,7 @@ public class CatacombsLair extends DungeonPackagerConfigFields {
                         "&2The best Lair challenge for groups of beginners!",
                 "&8[EM] &8Now entering the Catacombs. Be careful with what dwells below...",
                 "&8[EM] &8You have left the Catacombs. Was it worth it?",
-                SchematicPackage.SchematicRotation.SOUTH.toString());
+                SchematicPackage.SchematicRotation.SOUTH.toString(),
+                "the_catacombs");
     }
 }

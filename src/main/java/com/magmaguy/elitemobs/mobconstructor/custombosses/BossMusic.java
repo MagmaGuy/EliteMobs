@@ -65,7 +65,7 @@ public class BossMusic {
         bukkitTask = new BukkitRunnable() {
             @Override
             public void run() {
-                if (!customBossEntity.isValid()) {
+                if (!customBossEntity.exists()) {
                     stop();
                     return;
                 }

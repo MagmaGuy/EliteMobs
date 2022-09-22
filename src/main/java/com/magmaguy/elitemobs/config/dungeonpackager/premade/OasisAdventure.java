@@ -24,6 +24,7 @@ public class OasisAdventure extends DungeonPackagerConfigFields {
                         "$bossCount bosses, from level $lowestTier to $highestTier\n" +
                         "&6A big adventure for people who know the ropes!",
                 "&8[EM] &6You have arrived at the Oasis!",
-                "&8[EM] &6You have left the Oasis!");
+                "&8[EM] &6You have left the Oasis!",
+                "oasis");
     }
 }

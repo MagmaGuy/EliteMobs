@@ -78,6 +78,23 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
     private String teleportLocationOffsetString = "";
     @Getter
     private Location teleportLocationOffset = null;
+    @Getter
+    private String permission = null;
+    @Getter
+    @Setter
+    private int minPlayerCount = 1;
+    @Getter
+    @Setter
+    private int maxPlayerCount = 5;
+    @Getter
+    @Setter
+    private List<String> rawDungeonObjectives = null;
+    @Getter
+    private String startLocationString = null;
+    @Getter
+    private String dungeonConfigFolderName;
+    @Getter
+    private int contentLevel;
 
     public DungeonPackagerConfigFields(String fileName, boolean isEnabled) {
         super(fileName, isEnabled);
@@ -114,7 +131,8 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
                                        int dungeonVersion,
                                        String playerInfo,
                                        String regionEnterMessage,
-                                       String regionLeaveMessage) {
+                                       String regionLeaveMessage,
+                                       String dungeonConfigFolderName) {
         super(filename, isEnabled);
         this.contentType = ContentType.OPEN_DUNGEON;
         this.name = name;
@@ -129,6 +147,46 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
         this.playerInfo = playerInfo;
         this.regionEnterMessage = regionEnterMessage;
         this.regionLeaveMessage = regionLeaveMessage;
+        this.dungeonConfigFolderName = dungeonConfigFolderName;
+    }
+
+    //For instanced dungeons
+    public DungeonPackagerConfigFields(String filename,
+                                       boolean isEnabled,
+                                       String name,
+                                       List<String> customInfo,
+                                       String downloadLink,
+                                       DungeonSizeCategory dungeonSizeCategory,
+                                       String worldName,
+                                       World.Environment environment,
+                                       Boolean protect,
+                                       String teleportLocationString,
+                                       String startLocationString,
+                                       int dungeonVersion,
+                                       String playerInfo,
+                                       String regionEnterMessage,
+                                       String regionLeaveMessage,
+                                       List<String> rawDungeonObjectives,
+                                       String dungeonConfigFolderName,
+                                       int contentLevel) {
+        super(filename, isEnabled);
+        this.contentType = ContentType.INSTANCED_DUNGEON;
+        this.name = name;
+        this.customInfo = customInfo;
+        this.downloadLink = downloadLink;
+        this.dungeonSizeCategory = dungeonSizeCategory;
+        this.worldName = worldName;
+        this.environment = environment;
+        this.protect = protect;
+        this.teleportLocationString = teleportLocationString;
+        this.startLocationString = startLocationString;
+        this.dungeonVersion = dungeonVersion;
+        this.playerInfo = playerInfo;
+        this.regionEnterMessage = regionEnterMessage;
+        this.regionLeaveMessage = regionLeaveMessage;
+        this.rawDungeonObjectives = rawDungeonObjectives;
+        this.dungeonConfigFolderName = dungeonConfigFolderName;
+        this.contentLevel = contentLevel;
     }
 
     /**
@@ -169,7 +227,8 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
                                        String playerInfo,
                                        String regionEnterMessage,
                                        String regionLeaveMessage,
-                                       String defaultSchematicRotation) {
+                                       String defaultSchematicRotation,
+                                       String dungeonConfigFolderName) {
         super(filename, isEnabled);
         this.contentType = ContentType.SCHEMATIC_DUNGEON;
         this.name = name;
@@ -188,7 +247,7 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
         this.regionEnterMessage = regionEnterMessage;
         this.regionLeaveMessage = regionLeaveMessage;
         this.defaultSchematicRotationString = defaultSchematicRotation;
-
+        this.dungeonConfigFolderName = dungeonConfigFolderName;
     }
 
     public DungeonPackagerConfigFields(String fileName,
@@ -211,7 +270,8 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
                                        int dungeonVersion,
                                        String playerInfo,
                                        String regionEnterMessage,
-                                       String regionLeaveMessage) {
+                                       String regionLeaveMessage,
+                                       String dungeonConfigFolderName) {
         super(fileName, isEnabled);
         this.name = name;
         this.dungeonLocationType = dungeonLocationType;
@@ -231,6 +291,7 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
         this.playerInfo = playerInfo;
         this.regionEnterMessage = regionEnterMessage;
         this.regionLeaveMessage = regionLeaveMessage;
+        this.dungeonConfigFolderName = dungeonConfigFolderName;
         defaultDungeon = true;
     }
 
@@ -282,14 +343,29 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
         this.regionEnterMessage = translatable(filename, "regionEnterMessage", processString("regionEnterMessage", regionEnterMessage, "", false));
         this.regionLeaveMessage = translatable(filename, "regionLeaveMessage", processString("regionLeaveMessage", regionLeaveMessage, "", false));
         this.hasCustomModels = processBoolean("hasCustomModels", hasCustomModels, false, false);
+        this.startLocationString = processString("startLocation", startLocationString, null, false);
         this.teleportLocationString = processString("teleportLocation", teleportLocationString, null, false);
         this.teleportLocationOffsetString = processString("teleportLocationOffset", teleportLocationOffsetString, "", false);
         if (teleportLocationOffsetString != null && !teleportLocationOffsetString.isEmpty())
             this.teleportLocationOffset = ConfigurationLocation.serialize(teleportLocationOffsetString);
+        this.permission = processString("permission", permission, null, false);
+        this.minPlayerCount = processInt("minPlayerCount", minPlayerCount, 1, false);
+        this.maxPlayerCount = processInt("maxPlayerCount", maxPlayerCount, 5, false);
+        this.rawDungeonObjectives = processStringList("dungeonObjectives", rawDungeonObjectives, null, false);
+        this.dungeonConfigFolderName = processString("dungeonConfigFolderName", dungeonConfigFolderName, null, false);
+        this.contentLevel = processInt("contentLevel", contentLevel, 0, false);
         processAdditionalFields();
     }
 
     public void processAdditionalFields() {
+    }
+
+    /**
+     * This just sets the installed status to true, doesn't really do anything else
+     */
+    public void simpleInstall() {
+        this.isEnabled = true;
+        ConfigurationEngine.writeValue(true, file, fileConfiguration, "isEnabled");
     }
 
     public void installWorld() {
@@ -322,6 +398,10 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
         this.teleportLocation = ConfigurationLocation.serialize(teleportLocationString);
     }
 
+    public void simpleUninstall() {
+        this.isEnabled = false;
+        ConfigurationEngine.writeValue(false, file, fileConfiguration, "isEnabled");
+    }
 
     public void uninstallWorld() {
         this.isEnabled = false;
@@ -364,7 +444,8 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
 
     public enum DungeonLocationType {
         WORLD,
-        SCHEMATIC
+        SCHEMATIC,
+        INSTANCED
     }
 
     public enum ContentType {
@@ -376,6 +457,7 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
 
     public enum DungeonSizeCategory {
         LAIR,
+        SANCTUM,
         MINIDUNGEON,
         DUNGEON,
         RAID,

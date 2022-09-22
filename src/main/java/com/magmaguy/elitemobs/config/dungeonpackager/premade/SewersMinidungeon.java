@@ -25,6 +25,7 @@ public class SewersMinidungeon extends DungeonPackagerConfigFields {
                         "&6A complex dungeon maze with a challenging sections!",
                 "&8[EM] &5This place looks abandoned... &dYet something lurks in these sewers!",
 
-                "&8[EM] &5You managed to stay above water. &dMaybe next time you'll drown.");
+                "&8[EM] &5You managed to stay above water. &dMaybe next time you'll drown.",
+                "the_sewers");
     }
 }

@@ -61,6 +61,7 @@ public class PirateShipMinidungeon extends DungeonPackagerConfigFields {
                         "&6aspiring adventurers!",
                 "&8[EM] &3Now boarding the Pirate Ship! &bPillage and plunder to yer' hearts content!",
                 "&8[EM] &3Player overboard! &bReturn when you've earned your sea-legs ye' landlubber!",
-                SchematicPackage.SchematicRotation.SOUTH.toString());
+                SchematicPackage.SchematicRotation.SOUTH.toString(),
+                "the_pirate_ship");
     }
 }

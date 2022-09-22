@@ -1,10 +1,11 @@
 package com.magmaguy.elitemobs.instanced.dungeons;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
+import com.magmaguy.elitemobs.api.DungeonCompleteEvent;
+import com.magmaguy.elitemobs.api.DungeonStartEvent;
 import com.magmaguy.elitemobs.api.WorldInstanceEvent;
-import com.magmaguy.elitemobs.config.instanceddungeons.InstancedDungeonsConfig;
-import com.magmaguy.elitemobs.config.instanceddungeons.InstancedDungeonsConfigFields;
+import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfig;
+import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
 import com.magmaguy.elitemobs.dungeons.utility.DungeonUtils;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.InstancedBossEntity;
@@ -17,39 +18,47 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class DungeonInstance extends MatchInstance {
     @Getter
-    private static final HashMap<String, DungeonInstance> dungeonInstances = new HashMap<>();
+    private static final Set<DungeonInstance> dungeonInstances = new HashSet<>();
     private final List<DungeonObjective> dungeonObjectives = new ArrayList<>();
     private final World world;
-    List<InstancedBossEntity> instancedBossEntities = new ArrayList<>();
     private final File instancedWorldFile;
+    @Getter
+    private final DungeonPackagerConfigFields dungeonPackagerConfigFields;
+    List<InstancedBossEntity> instancedBossEntities = new ArrayList<>();
 
-    public DungeonInstance(InstancedDungeonsConfigFields instancedDungeonsConfigFields, Location startLocation, Location endLocation, World world, File instancedWorldFile) {
-        super(startLocation, endLocation,
-                instancedDungeonsConfigFields.getMinimumPlayerCount(),
-                instancedDungeonsConfigFields.getMaximumPlayerCount());
-        //todo: add dungeon objectives from the configuration
-        for (String rawObjective : instancedDungeonsConfigFields.getRawDungeonObjectives())
+    public DungeonInstance(DungeonPackagerConfigFields dungeonPackagerConfigFields,
+                           Location lobbyLocation,
+                           Location startLocation,
+                           World world,
+                           File instancedWorldFile,
+                           Player player) {
+        super(startLocation,
+                null, //todo: the end location is currently not definable
+                dungeonPackagerConfigFields.getMinPlayerCount(),
+                dungeonPackagerConfigFields.getMaxPlayerCount());
+        super.lobbyLocation = lobbyLocation;
+        this.dungeonPackagerConfigFields = dungeonPackagerConfigFields;
+        for (String rawObjective : dungeonPackagerConfigFields.getRawDungeonObjectives())
             this.dungeonObjectives.add(DungeonObjective.registerObjective(this, rawObjective));
-        //todo: check if this causes issues in async
         this.world = world;
         this.instancedWorldFile = instancedWorldFile;
-        instancedBossEntities = InstancedBossEntity.initializeInstancedBosses(instancedDungeonsConfigFields.getWorldName(), world);
+        addNewPlayer(player);
+        instancedBossEntities = InstancedBossEntity.initializeInstancedBosses(dungeonPackagerConfigFields.getWorldName(), world, players.size());
+        dungeonInstances.add(this);
     }
 
     public static boolean setupInstancedDungeon(Player player, String instancedDungeonConfigFieldsString) {
-        InstancedDungeonsConfigFields instancedDungeonsConfigFields = InstancedDungeonsConfig.getInstancedDungeonConfigFields(instancedDungeonConfigFieldsString);
+        DungeonPackagerConfigFields instancedDungeonsConfigFields = DungeonPackagerConfig.getDungeonPackages().get(instancedDungeonConfigFieldsString);
         if (instancedDungeonsConfigFields == null) {
             player.sendMessage("[EliteMobs] Failed to get data for dungeon " + instancedDungeonConfigFieldsString + "! The dungeon will not start.");
             return false;
@@ -75,7 +84,7 @@ public class DungeonInstance extends MatchInstance {
         new BukkitRunnable() {
             @Override
             public void run() {
-                File targetFile = WorldInstantiator.cloneWorld(instancedDungeonsConfigFields.getWorldName(), instancedWordName);
+                File targetFile = WorldInstantiator.cloneWorld(instancedDungeonsConfigFields.getWorldName(), instancedWordName, instancedDungeonsConfigFields.getDungeonConfigFolderName());
                 if (targetFile == null) {
                     player.sendMessage("[EliteMobs] Failed to copy the world! Report this to the dev. The dungeon will not start.");
                     return;
@@ -92,12 +101,17 @@ public class DungeonInstance extends MatchInstance {
                         if (Bukkit.getPluginManager().getPlugin("WorldGuard") != null)
                             WorldGuardCompatibility.protectWorldMinidugeonArea(world);
 
-                        Location startLocation = ConfigurationLocation.serialize(instancedDungeonsConfigFields.getStartLocation()).clone();
+                        //Location where players are teleported to start completing the dungeon
+                        Location startLocation = ConfigurationLocation.serialize(instancedDungeonsConfigFields.getStartLocationString());
                         startLocation.setWorld(world);
-                        Location endLocation = ConfigurationLocation.serialize(instancedDungeonsConfigFields.getEndLocation());
+                        //Lobby location is optional, if null it should be the same as the start location
+                        Location lobbyLocation = ConfigurationLocation.serialize(instancedDungeonsConfigFields.getTeleportLocationString());
+                        if (lobbyLocation != null) lobbyLocation.setWorld(world);
+                        else lobbyLocation = startLocation;
+                        //Location where players are teleported to upon completion, this usually gets overriden with the previous location players were at
+                        //todo: will probably want to define this at some point Location endLocation = ConfigurationLocation.serialize(instancedDungeonsConfigFields.getEndLocation());
                         //endLocation.setWorld(world);
-                        DungeonInstance dungeonInstance = new DungeonInstance(instancedDungeonsConfigFields, startLocation, endLocation, world, targetFile);
-                        dungeonInstance.addPlayer(player);
+                        DungeonInstance dungeonInstance = new DungeonInstance(instancedDungeonsConfigFields, lobbyLocation, startLocation, world, targetFile, player);
                     }
                 }.runTask(MetadataHandler.PLUGIN);
             }
@@ -109,37 +123,51 @@ public class DungeonInstance extends MatchInstance {
     @Override
     protected void startMatch() {
         super.startMatch();
+        new EventCaller(new DungeonStartEvent(this));
     }
 
-    public void checkCompletionStatus() {
+    public boolean checkCompletionStatus() {
         //if (!super.state.equals(InstancedRegionState.ONGOING)) return;
         for (DungeonObjective dungeonObjective : dungeonObjectives)
             if (!dungeonObjective.isCompleted())
-                return;
+                return false;
+        new EventCaller(new DungeonCompleteEvent(this));
         //This means the dungeon just completed
         endMatch();
+        return true;
     }
 
     @Override
     public void endMatch() {
         super.endMatch();
-        HashSet<Player> participants = new HashSet<>(super.participants);
-        participants.forEach(this::removeAnyKind);
-        instances.remove(this);
-        Bukkit.unloadWorld(world, false);
+        announce("[EliteMobs] Completed! Arena will self-destruct in 5 minutes!");
+        announce("MagmaGuy's note: This is still a work in progress, please be patient! Hope you enjoyed your run.");
+        DungeonInstance dungeonInstance = this;
         new BukkitRunnable() {
+            final DungeonInstance laterInstance = dungeonInstance;
+
             @Override
             public void run() {
-                WorldInstantiator.recursivelyDelete(instancedWorldFile);
+                HashSet<Player> participants = new HashSet<>(laterInstance.participants);
+                participants.forEach(laterInstance::removeAnyKind);
+                instances.remove(laterInstance);
+                Bukkit.unloadWorld(world, false);
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        WorldInstantiator.recursivelyDelete(instancedWorldFile);
+                    }
+                }.runTaskAsynchronously(MetadataHandler.PLUGIN);
+                dungeonInstances.remove(laterInstance);
             }
-        }.runTaskAsynchronously(MetadataHandler.PLUGIN);
+        }.runTaskLater(MetadataHandler.PLUGIN, 5 * 60 * 20L);
+
+
     }
 
-    public static class DungeonInstanceEvents implements Listener {
-        @EventHandler
-        public void onEliteMobDeath(EliteMobDeathEvent event) {
-            for (DungeonInstance dungeonInstance : dungeonInstances.values())
-                dungeonInstance.checkCompletionStatus();
-        }
+    @Override
+    protected boolean isInRegion(Location location) {
+        return location.getWorld().equals(startLocation.getWorld());
     }
+
 }

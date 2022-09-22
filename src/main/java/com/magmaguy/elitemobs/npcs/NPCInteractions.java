@@ -8,6 +8,7 @@ import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.menus.*;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.QuestInteractionHandler;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -193,6 +194,18 @@ public class NPCInteractions implements Listener {
             case NONE:
             default:
                 break;
+            case COMMAND:
+                if (npcEntity.getNPCsConfigFields().getCommand() == null) {
+                    new WarningMessage("Failed to run NPC command because none is configured for " + npcEntity.getNPCsConfigFields().getFilename());
+                    return;
+                }
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        event.getPlayer().performCommand(npcEntity.getNPCsConfigFields().getCommand());
+                    }
+                }.runTaskLater(MetadataHandler.PLUGIN, 1);
+                break;
 
         }
 
@@ -229,7 +242,8 @@ public class NPCInteractions implements Listener {
         ENHANCER,
         REFINER,
         UNBINDER,
-        ARENA_MASTER
+        ARENA_MASTER,
+        COMMAND
     }
 
 

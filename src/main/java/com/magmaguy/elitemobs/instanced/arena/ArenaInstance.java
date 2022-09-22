@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.instanced.arena;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.ArenaCompleteEvent;
+import com.magmaguy.elitemobs.api.ArenaStartEvent;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.ArenasConfig;
@@ -10,6 +11,8 @@ import com.magmaguy.elitemobs.config.customarenas.CustomArenasConfigFields;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
+import com.magmaguy.elitemobs.utils.Cylinder;
+import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -18,9 +21,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 
 
@@ -33,24 +38,67 @@ public class ArenaInstance extends MatchInstance {
     @Getter
     private final ArenaWaves arenaWaves;
     @Getter
-    private ArenaState arenaState = ArenaState.IDLE;
-    @Getter
-    private int currentWave = 0;
-    @Getter
     private final HashSet<CustomBossEntity> customBosses = new HashSet<>();
     private final HashMap<Integer, String> waveMessage = new HashMap<>();
+    private final int minX;
+    private final int maxX;
+    @Getter
+    private int currentWave = 0;
+    private final int minY;
+    private final int maxY;
+    private final int minZ;
+    private final int maxZ;
+    private final boolean cylindricalArena;
+    protected HashMap<String, Location> spawnPoints = new HashMap<>();
+    @Getter
+    private ArenaState arenaState = ArenaState.IDLE;
+    private Cylinder cylinder;
 
     public ArenaInstance(CustomArenasConfigFields customArenasConfigFields, Location corner1, Location corner2, Location startLocation, Location exitLocation) {
-        super(corner1,
-                corner2,
-                startLocation,
+        super(startLocation,
                 exitLocation,
                 customArenasConfigFields.getMinimumPlayerCount(),
-                customArenasConfigFields.getMaximumPlayerCount(),
-                customArenasConfigFields.getSpawnPoints(),
-                customArenasConfigFields.isCylindricalArena());
+                customArenasConfigFields.getMaximumPlayerCount());
+        this.cylindricalArena = customArenasConfigFields.isCylindricalArena();
+
+
+        if (corner1.getX() < corner2.getX()) {
+            minX = (int) corner1.getX();
+            maxX = (int) corner2.getX();
+        } else {
+            minX = (int) corner2.getX();
+            maxX = (int) corner1.getX();
+        }
+
+        if (corner1.getY() < corner2.getY()) {
+            minY = (int) corner1.getY();
+            maxY = (int) corner2.getY();
+        } else {
+            minY = (int) corner2.getY();
+            maxY = (int) corner1.getY();
+        }
+
+        if (corner1.getZ() < corner2.getZ()) {
+            minZ = (int) corner1.getZ();
+            maxZ = (int) corner2.getZ();
+        } else {
+            minZ = (int) corner2.getZ();
+            maxZ = (int) corner1.getZ();
+        }
+        this.world = corner1.getWorld();
+        this.state = InstancedRegionState.WAITING;
+
+        if (cylindricalArena)
+            cylinder = new Cylinder(
+                    new Vector((maxX - minX) / 2D + minX, minY,
+                            (maxZ - minZ) / 2D + minZ),
+                    (Math.abs(maxX) - Math.abs(minX)) / 2D, maxY - minY);
+
+        addSpawnPoints(customArenasConfigFields.getSpawnPoints());
         this.customArenasConfigFields = customArenasConfigFields;
         this.arenaWaves = new ArenaWaves(customArenasConfigFields.getBossList());
+
+
         arenaInstances.put(customArenasConfigFields.getFilename(), this);
         arenaWatchdog();
         for (String string : customArenasConfigFields.getArenaMessages()) {
@@ -95,9 +143,48 @@ public class ArenaInstance extends MatchInstance {
         new ArenaInstance(customArenasConfigFields, corner1, corner2, startLocation, exitLocation);
     }
 
+    public void addSpawnPoints(List<String> rawSpawnPoints) {
+        for (String string : rawSpawnPoints) {
+            String[] splitEntry = string.split(":");
+            String name = "";
+            String location = "";
+            for (String subString : splitEntry) {
+                String[] splitSubEntry = subString.split("=");
+                switch (splitSubEntry[0].toLowerCase()) {
+                    case "name":
+                        name = splitSubEntry[1];
+                        break;
+                    case "location":
+                        location = splitSubEntry[1];
+                        break;
+                    default:
+                        new WarningMessage("Invalid entry for the spawn points of instanced content: " + splitSubEntry[0]);
+                        break;
+                }
+            }
+            spawnPoints.put(name, ConfigurationLocation.serialize(location));
+        }
+    }
+
+    @Override
+    protected boolean isInRegion(Location location) {
+        if (!cylindricalArena)
+            return location.getWorld().equals(world) &&
+                    minX <= location.getX() &&
+                    maxX >= location.getX() &&
+                    minY <= location.getY() &&
+                    maxY >= location.getY() &&
+                    minZ <= location.getZ() &&
+                    maxZ >= location.getZ();
+        else
+            return location.getWorld().equals(world) &&
+                    cylinder.contains(location);
+    }
+
     @Override
     protected void startMatch() {
         super.startMatch();
+        new EventCaller(new ArenaStartEvent(this));
         nextWave();
     }
 
@@ -162,7 +249,7 @@ public class ArenaInstance extends MatchInstance {
             customBossEntity.setEliteLoot(false);
             customBossEntity.setVanillaLoot(false);
             customBossEntity.setRandomLoot(false);
-            customBossEntity.spawn(super.spawnPoints.get(arenaEntity.getSpawnPointName()), true);
+            customBossEntity.spawn(spawnPoints.get(arenaEntity.getSpawnPointName()), true);
             if (!customBossEntity.exists()) {
                 new WarningMessage("Arena " + getCustomArenasConfigFields().getArenaName() + " failed to spawn boss " + customBossEntity.getCustomBossesConfigFields().getFilename());
                 continue;

@@ -22,6 +22,7 @@ public class ElitePlayerInventory {
     private final Player player;
     private boolean getArmorCooldown = false;
     private boolean getWeaponCooldown = false;
+
     /**
      * Object of the player's inventory for EliteMobs.
      * For performance reasons, values are cached and updated only when strictly necessary.
@@ -217,6 +218,13 @@ public class ElitePlayerInventory {
      */
     public int getThornsLevel() {
         return helmet.thornsLevel + chestplate.thornsLevel + leggings.thornsLevel + boots.thornsLevel;
+    }
+
+    public double getLoudStrikesBonusMultipler(boolean update) {
+        return helmet.getLoudStrikesBonus(player.getInventory().getHelmet(), update) +
+                chestplate.getEarthquakeLevel(player.getInventory().getChestplate(), update) +
+                leggings.getEarthquakeLevel(player.getInventory().getLeggings(), update) +
+                boots.getEarthquakeLevel(player.getInventory().getBoots(), update);
     }
 
     public static class ElitePlayerInventoryEvents implements Listener {
