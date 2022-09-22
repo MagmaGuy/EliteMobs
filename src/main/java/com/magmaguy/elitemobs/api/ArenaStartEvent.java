@@ -1,18 +1,23 @@
 package com.magmaguy.elitemobs.api;
 
-import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
+import com.magmaguy.elitemobs.instanced.arena.ArenaInstance;
 import lombok.Getter;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class WorldUninstanceEvent extends Event {
+public class ArenaStartEvent extends Event {
     private static final HandlerList handlers = new HandlerList();
 
     @Getter
-    private final DungeonPackagerConfigFields dungeonPackagerConfigFields;
+    private final ArenaInstance arenaInstance;
 
-    public WorldUninstanceEvent(DungeonPackagerConfigFields dungeonPackagerConfigFields) {
-        this.dungeonPackagerConfigFields = dungeonPackagerConfigFields;
+    /**
+     * Called when an arena starts
+     *
+     * @param arenaInstance
+     */
+    public ArenaStartEvent(ArenaInstance arenaInstance) {
+        this.arenaInstance = arenaInstance;
     }
 
     public static HandlerList getHandlerList() {
@@ -23,5 +28,6 @@ public class WorldUninstanceEvent extends Event {
     public HandlerList getHandlers() {
         return handlers;
     }
+
 
 }

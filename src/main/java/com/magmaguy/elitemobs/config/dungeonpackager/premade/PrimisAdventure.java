@@ -24,7 +24,8 @@ public class PrimisAdventure extends DungeonPackagerConfigFields {
                         "$bossCount bosses, from level $lowestTier to $highestTier\n" +
                         "&6A tutorial adventure for new players!",
                 "&8[EM] &6Primis awaits, strike the earth!",
-                "&8[EM] &6You have left Primis!");
+                "&8[EM] &6You have left Primis!",
+                "primis");
         setWormholeWorldName("em_primis_wormhole");
         setHasCustomModels(true);
     }

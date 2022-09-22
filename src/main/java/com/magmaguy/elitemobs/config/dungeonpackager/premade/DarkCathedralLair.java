@@ -32,6 +32,7 @@ public class DarkCathedralLair extends DungeonPackagerConfigFields {
                         "&ca group of players or for veterans!",
                 "&8[EM] &8Welcome to the Dark Cathedral. &4Death awaits inside...",
                 "&8[EM] &8Now leaving the Dark Cathedral. &4It awaits your return...",
-                SchematicPackage.SchematicRotation.SOUTH.toString());
+                SchematicPackage.SchematicRotation.SOUTH.toString(),
+                "the_dark_cathedral");
     }
 }

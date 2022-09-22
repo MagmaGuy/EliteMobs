@@ -18,6 +18,7 @@ public class EliteScript extends ElitePower {
     private final ScriptConditions scriptConditions;
     private final ScriptActions scriptActions;
     private final ScriptCooldowns scriptCooldowns;
+
     public EliteScript(ConfigurationSection configurationSection, String scriptName) {
         super(configurationSection, scriptName);
         this.scriptName = scriptName;

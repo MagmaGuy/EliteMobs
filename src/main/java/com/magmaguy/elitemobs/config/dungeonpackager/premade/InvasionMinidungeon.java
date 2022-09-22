@@ -24,6 +24,7 @@ public class InvasionMinidungeon extends DungeonPackagerConfigFields {
                         "$bossCount aliens, from level $lowestTier to $highestTier\n" +
                         "&6Don't get abducted!",
                 "&8[EM] &7Alien invasion in progress! Defeat the Mothership!",
-                "&8[EM] &7You have escaped the alien abductions! No one will ever believe you.");
+                "&8[EM] &7You have escaped the alien abductions! No one will ever believe you.",
+                "invasion");
     }
 }

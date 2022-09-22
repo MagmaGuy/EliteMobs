@@ -424,7 +424,9 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
 
     @Override
     public void fullHeal() {
-        if (customBossesConfigFields.isInstanced()) return;
+        if (this instanceof InstancedBossEntity) {
+            return;
+        }
         if (phaseBossEntity == null || phaseBossEntity.isInFirstPhase()) {
             super.fullHeal();
             return;
@@ -498,7 +500,9 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
             if (persistentObjectHandler != null)
                 persistentObjectHandler.updatePersistentLocation(getPersistentLocation());
 
-        if (!removalReason.equals(RemovalReason.PHASE_BOSS_PHASE_END) && bossMusic != null) bossMusic.stop();
+        if (!removalReason.equals(RemovalReason.PHASE_BOSS_PHASE_END) && bossMusic != null) {
+            bossMusic.stop();
+        }
     }
 
     @Override

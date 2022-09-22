@@ -50,8 +50,8 @@ public class PlasmaBlaster extends CombatEnterScanPower {
 
     private void createProjectile(Vector shotVector, Location sourceLocation, EliteEntity sourceEntity) {
         new BukkitRunnable() {
-            int counter = 0;
             final Location currentLocation = sourceLocation.clone().add(new Vector(0, 1, 0));
+            int counter = 0;
 
             @Override
             public void run() {

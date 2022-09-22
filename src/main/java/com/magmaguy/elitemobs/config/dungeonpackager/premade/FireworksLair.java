@@ -24,6 +24,7 @@ public class FireworksLair extends DungeonPackagerConfigFields {
                         "$bossCount level $lowestTier Big Boss!\n" +
                         "&6An encounter full of explosions!",
                 "&8[EM] &eWelcome to the fireworks show!",
-                "&8[EM] &eYou've left the party!");
+                "&8[EM] &eYou've left the party!",
+                "the_fireworks");
     }
 }

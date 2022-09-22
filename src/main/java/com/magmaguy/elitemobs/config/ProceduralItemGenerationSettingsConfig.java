@@ -12,14 +12,14 @@ import java.util.List;
 
 public class ProceduralItemGenerationSettingsConfig {
     @Getter
+    private static final List<String> validMaterials = new ArrayList<>();
+    @Getter
     private static FileConfiguration fileConfiguration;
     @Getter
     private
     static boolean doProceduralItemDrops;
     @Getter
     private static double customEnchantmentChance;
-    @Getter
-    private static final List<String> validMaterials = new ArrayList<>();
     @Getter
     private static String swordName;
     @Getter

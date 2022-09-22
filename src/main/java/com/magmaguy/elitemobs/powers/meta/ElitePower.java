@@ -40,13 +40,13 @@ public class ElitePower {
     @Getter
     private final String name;
     @Getter
+    private final PowersConfigFields powersConfigFields;
+    @Getter
     @Setter
     private int powerCooldownTime;
     @Getter
     @Setter
     private int globalCooldownTime;
-    @Getter
-    private final PowersConfigFields powersConfigFields;
     @Getter
     @Setter
     private boolean inGlobalCooldown = false;

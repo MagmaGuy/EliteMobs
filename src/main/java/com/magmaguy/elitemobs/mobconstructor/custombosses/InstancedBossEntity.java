@@ -33,13 +33,15 @@ public class InstancedBossEntity extends RegionalBossEntity implements Persisten
         instancedBossEntities.put(blueprintWorldName, new InstancedBossContainer(ConfigurationLocation.serialize(stringLocation, true), customBossesConfigFields));
     }
 
-    public static List<InstancedBossEntity> initializeInstancedBosses(String blueprintWorldName, World newWorld) {
+    public static List<InstancedBossEntity> initializeInstancedBosses(String blueprintWorldName, World newWorld, int playerCount) {
         List<InstancedBossEntity> newDungeonList = new ArrayList<>();
         List<InstancedBossContainer> rawBosses = instancedBossEntities.get(blueprintWorldName);
         for (InstancedBossContainer containers : rawBosses) {
             Location newLocation = containers.getLocation().clone();
             newLocation.setWorld(newWorld);
             InstancedBossEntity newEntity = new InstancedBossEntity(containers.getCustomBossesConfigFields(), newLocation);
+            //Set the health multipliers
+            newEntity.setHealthMultiplier(newEntity.healthMultiplier * Math.pow(playerCount, 1.2));
             newEntity.spawn(false);
             newDungeonList.add(newEntity);
         }

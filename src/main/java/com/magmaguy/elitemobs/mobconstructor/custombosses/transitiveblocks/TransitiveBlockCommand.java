@@ -31,8 +31,8 @@ public class TransitiveBlockCommand {
     public static HashMap<Player, TransitiveBlockCommand> activePlayers = new HashMap<>();
     private final Player player;
     private final CustomBossesConfigFields customBossesConfigFields;
-    private List<TransitiveBlock> transitiveBlockList = new ArrayList<>();
     private final TransitiveBlockType transitiveBlockType;
+    private List<TransitiveBlock> transitiveBlockList = new ArrayList<>();
     private RegionalBossEntity regionalBossEntity;
     @Getter
     @Setter

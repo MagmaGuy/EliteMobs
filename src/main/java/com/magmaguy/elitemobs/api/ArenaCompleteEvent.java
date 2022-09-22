@@ -13,6 +13,11 @@ public class ArenaCompleteEvent extends Event {
     @Getter
     private final ArenaInstance arenaInstance;
 
+    /**
+     * Called when an arena gets successfully completed by players.
+     *
+     * @param arenaInstance Instance of the arena that got completed
+     */
     public ArenaCompleteEvent(ArenaInstance arenaInstance) {
         this.arenaInstance = arenaInstance;
     }

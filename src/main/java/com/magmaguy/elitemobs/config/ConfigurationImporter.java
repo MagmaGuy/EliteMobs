@@ -89,6 +89,9 @@ public class ConfigurationImporter {
                         case "worldcontainer":
                             moveWorlds(file);
                             break;
+                        case "world_blueprints":
+                            moveDirectory(file, Paths.get(configurationsPath.normalize() + "" + File.separatorChar + "world_blueprints"), false);
+                            break;
                         case "ModelEngine":
                             //todo: check if the "force" code is required, check if file is getting saved with modelengine doesn't have a configuration folder
                             if (Bukkit.getPluginManager().isPluginEnabled("ModelEngine_Beta"))  //todo: this is just temporary

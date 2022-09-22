@@ -24,6 +24,7 @@ public class HallosseumLair extends DungeonPackagerConfigFields {
                         "$bossCount level $lowestTier Big Boss!\n" +
                         "&6A fun Halloween challenge!",
                 "&8[EM] &4Trick or treat! &8Your soul is mine!",
-                "&8[EM] &4You've escaped with your soul intact.");
+                "&8[EM] &4You've escaped with your soul intact.",
+                "the_hallosseum");
     }
 }

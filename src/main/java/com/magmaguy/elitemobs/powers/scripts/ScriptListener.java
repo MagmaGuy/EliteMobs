@@ -60,8 +60,8 @@ public class ScriptListener implements Listener {
     }
 
     @EventHandler
-    public void onElitePhaseSwitchEvent(ElitePhaseSwitchEvent event){
-        runEvent(event,event.getCustomBossEntity(), null);
+    public void onElitePhaseSwitchEvent(ElitePhaseSwitchEvent event) {
+        runEvent(event, event.getCustomBossEntity(), null);
     }
 
     private void runEvent(Event event, EliteEntity eliteEntity, Player player) {
