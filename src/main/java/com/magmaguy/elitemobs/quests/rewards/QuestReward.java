@@ -18,11 +18,11 @@ import java.util.UUID;
 public class QuestReward implements Serializable {
 
     @Getter
-    private CustomLootTable customLootTable = null;
-    @Getter
     private final int rewardLevel;
     @Getter
     private final UUID playerUUID;
+    @Getter
+    private CustomLootTable customLootTable = null;
 
     public QuestReward(int questLevel, QuestObjectives questObjectives, Player player) {
         this.rewardLevel = questLevel * 10;

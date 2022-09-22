@@ -24,7 +24,6 @@ import com.magmaguy.elitemobs.gamemodes.zoneworld.ZoneWarner;
 import com.magmaguy.elitemobs.initialsetup.FirstTimeSetup;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.instanced.arena.ArenaInstance;
-import com.magmaguy.elitemobs.instanced.dungeons.DungeonInstance;
 import com.magmaguy.elitemobs.instanced.dungeons.DungeonKillTargetObjective;
 import com.magmaguy.elitemobs.items.*;
 import com.magmaguy.elitemobs.items.customenchantments.*;
@@ -101,7 +100,6 @@ public class EventsRegistrer {
 
         register(new FirstTimeSetup());
 
-        register(new DungeonInstance.DungeonInstanceEvents());
         register(new DungeonKillTargetObjective.DungeonKillTargetObjectiveListener());
 
         register(new com.magmaguy.elitemobs.versionnotifier.VersionChecker.VersionCheckerEvents());
@@ -282,6 +280,7 @@ public class EventsRegistrer {
         register(new TeleportsPage.TeleportsPageEvents());
         register(new CommandsPage.CommandsPageEvents());
         register(new BossTrackingPage.BossTrackingPageEvents());
+        register(new InstancedDungeonBrowser.InstancedDungeonBrowserEvents());
 
         //Shops
         register(new ProceduralShopMenu.ProceduralShopMenuEvents());

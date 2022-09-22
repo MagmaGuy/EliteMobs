@@ -160,6 +160,7 @@ public class VampireManorMinidungeon extends DungeonPackagerConfigFields {
                         "&6Are you ready to face that which haunts the night?",
                 "&8[EM] &cTrespassing on dangerous grounds!!",
                 "&8[EM] &cNow leaving haunted land!",
-                SchematicPackage.SchematicRotation.SOUTH.toString());
+                SchematicPackage.SchematicRotation.SOUTH.toString(),
+                "vampire_manor");
     }
 }

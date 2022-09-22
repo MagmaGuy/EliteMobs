@@ -41,6 +41,7 @@ public class ColosseumLair extends DungeonPackagerConfigFields {
                         "&cA true challenge for big groups of players!",
                 "&8[EM] &6Champions and challengers prepare! &eProve your worth against the most mighty of foes!",
                 "&8[EM] &6Farewell traveller! &eReturn soon to show your might once more!",
-                SchematicPackage.SchematicRotation.SOUTH.toString());
+                SchematicPackage.SchematicRotation.SOUTH.toString(),
+                "the_colosseum");
     }
 }

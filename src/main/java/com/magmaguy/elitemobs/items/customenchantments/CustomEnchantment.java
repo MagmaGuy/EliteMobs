@@ -45,6 +45,7 @@ public abstract class CustomEnchantment {
         new LightningEnchantment();
         new GrapplingHookEnchantment();
         new EarthquakeEnchantment();
+        new LoudStrikesEnchantment();
     }
 
     /*

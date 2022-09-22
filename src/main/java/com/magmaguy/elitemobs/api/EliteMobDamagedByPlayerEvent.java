@@ -113,7 +113,7 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
             if (player.getInventory().getItemInMainHand().getType().equals(Material.BOW) ||
                     player.getInventory().getItemInMainHand().getType().equals(Material.CROSSBOW))
                 return 1.0;
-            double eliteDamage = EliteItemManager.getEliteDamage(player.getInventory().getItemInMainHand());
+            double eliteDamage = EliteItemManager.getEliteDamageFromEnchantment(player.getInventory().getItemInMainHand());
             double bonusEliteDamage = secondaryEnchantmentDamageIncrease(player, livingEntity);
             return (eliteDamage + bonusEliteDamage) * player.getAttackCooldown();
         }

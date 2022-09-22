@@ -17,20 +17,6 @@ import java.util.List;
 
 public class PlayerStatusMenuConfig extends MenusConfigFields {
     @Getter
-    private static boolean doIndexPage;
-    @Getter
-    private static boolean doStatsPage;
-    @Getter
-    private static boolean doGearPage;
-    @Getter
-    private static boolean doTeleportsPage;
-    @Getter
-    private static boolean doCommandsPage;
-    @Getter
-    private static boolean doQuestTrackingPage;
-    @Getter
-    private static boolean doBossTrackingPage;
-    @Getter
     private static final String[] indexTextLines = new String[13];
     @Getter
     private static final String[] indexHoverLines = new String[13];
@@ -49,8 +35,6 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
     @Getter
     private static final String[] gearCommandLines = new String[13];
     @Getter
-    private static String teleportChestMenuName;
-    @Getter
     private static final String[] teleportTextLines = new String[13];
     @Getter
     private static final String[] teleportHoverLines = new String[13];
@@ -63,8 +47,6 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
     @Getter
     private static final String[] commandsCommandLines = new String[13];
     @Getter
-    private static String bossTrackerChestMenuName;
-    @Getter
     private static final String[] bossTrackerTextLines = new String[13];
     @Getter
     private static final String[] bossTrackerHoverLines = new String[13];
@@ -76,6 +58,24 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
     private static final String[] questTrackerHoverLines = new String[13];
     @Getter
     private static final String[] questTrackerCommandLines = new String[13];
+    @Getter
+    private static boolean doIndexPage;
+    @Getter
+    private static boolean doStatsPage;
+    @Getter
+    private static boolean doGearPage;
+    @Getter
+    private static boolean doTeleportsPage;
+    @Getter
+    private static boolean doCommandsPage;
+    @Getter
+    private static boolean doQuestTrackingPage;
+    @Getter
+    private static boolean doBossTrackingPage;
+    @Getter
+    private static String teleportChestMenuName;
+    @Getter
+    private static String bossTrackerChestMenuName;
     @Getter
     private static String onBossTrackHover;
     @Getter

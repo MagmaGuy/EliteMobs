@@ -14,8 +14,9 @@ import java.util.List;
 
 public class WorldInstantiator {
 
-    public static File cloneWorld(String worldName, String targetWorldName) {
-        File blueprintWorld = new File(MetadataHandler.PLUGIN.getDataFolder().getAbsolutePath() + File.separatorChar + "world_blueprints" + File.separatorChar + worldName);
+    public static File cloneWorld(String worldName, String targetWorldName, String dungeonConfigurationFolderName) {
+        File blueprintWorld = new File(MetadataHandler.PLUGIN.getDataFolder().getAbsolutePath() + File.separatorChar +
+                "world_blueprints" + File.separatorChar + dungeonConfigurationFolderName + File.separatorChar + worldName);
         if (!blueprintWorld.exists()) {
             new WarningMessage("Blueprint world " + worldName + " does not exist! Path: " + blueprintWorld.getAbsolutePath());
             return null;

@@ -24,6 +24,7 @@ public class BinderOfWorldsLair extends DungeonPackagerConfigFields {
                         "$bossCount level $highestTier final boss!\n" +
                         "&5This is the hardest fight in EliteMobs!",
                 "&8[EM] &5Reality unravels around you. You face the final challenge. &4You are not prepared!",
-                "&8[EM] &5You have left the unravelling. Did you find what you sought? Was it worth it?");
+                "&8[EM] &5You have left the unravelling. Did you find what you sought? Was it worth it?",
+                "the_binder_of_worlds");
     }
 }

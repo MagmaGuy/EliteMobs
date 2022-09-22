@@ -32,6 +32,7 @@ public class RuinsLair extends DungeonPackagerConfigFields {
                         "&cA tough fight against a Norse god!",
                 "&8[EM] &3Those who challenge the myths must be prepared for their downfall!",
                 "&8[EM] &3You now know what it takes to make a legend!",
-                SchematicPackage.SchematicRotation.SOUTH.toString());
+                SchematicPackage.SchematicRotation.SOUTH.toString(),
+                "the_ruins");
     }
 }

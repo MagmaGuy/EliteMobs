@@ -2,14 +2,13 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import com.magmaguy.elitemobs.utils.ZipFile;
 import org.bukkit.command.CommandSender;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 public class PackageCommand {
@@ -41,6 +40,7 @@ public class PackageCommand {
         packContents("customspawns");
         packContents("customtreasurechests");
         packContents("wormholes");
+        packContents("world_blueprints");
 
         commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2Done! You can find your package in &9~/plugins/EliteMobs/exports &2. &6If you are making a dungeon, make sure to create your own dungeonpackages file!"));
         commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &6Don't forget to add your world and schematic files to the package if needed!"));
@@ -88,19 +88,21 @@ public class PackageCommand {
                 return;
             }
         }
-        int counter = 0;
-        for (File file : sourceFolder.listFiles()) {
-            try {
-                Path targetPath = Paths.get(targetFolder.getAbsolutePath() + File.separatorChar + file.getName());
-                path.toFile().createNewFile();
-                Files.copy(file.toPath(), targetPath, StandardCopyOption.REPLACE_EXISTING);
-                counter++;
-            } catch (IOException e) {
-                commandSender.sendMessage("[EliteMobs] Failed to package file " + sourceFolder + " ! Check console for more details.");
-                e.printStackTrace();
-                return;
-            }
+        for (File file : sourceFolder.listFiles())
+            recursivelyGetFiles(file, targetFolder);
+    }
+
+    private void recursivelyGetFiles(File scannedFile, File destination) {
+        try {
+            if (scannedFile.isDirectory()) {
+                File newDestination = new File(destination.getAbsolutePath() + File.separatorChar + scannedFile.getName());
+                newDestination.mkdir();
+                for (File file : scannedFile.listFiles())
+                    recursivelyGetFiles(file, newDestination);
+            } else
+                Files.copy(scannedFile.toPath(), Path.of(destination.getAbsolutePath() + File.separatorChar + scannedFile.getName()), StandardCopyOption.REPLACE_EXISTING);
+        } catch (Exception exception) {
+            new WarningMessage("Failed to recursively pack dungeon!");
         }
-        commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2Packaged " + counter + " " + subdirectory + " !"));
     }
 }

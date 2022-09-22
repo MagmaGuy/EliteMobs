@@ -358,8 +358,7 @@ public class UserCommands {
                     MatchInstance matchInstance = MatchInstance.getPlayerInstance(((Player) commandContext.getSender()));
                     if (matchInstance != null) {
                         matchInstance.countdownMatch();
-                    }
-                    else
+                    } else
                         commandContext.getSender().sendMessage("[EliteMobs] You are not queued for instanced content!");
                 }));
 

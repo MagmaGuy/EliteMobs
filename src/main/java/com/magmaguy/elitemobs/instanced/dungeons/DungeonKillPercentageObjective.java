@@ -7,8 +7,8 @@ import java.util.List;
 
 public class DungeonKillPercentageObjective extends DungeonObjective {
     private static final List<DungeonKillPercentageObjective> dungeonKillPercentageObjectiveList = new ArrayList<>();
-    private int targetAmount;
     private final int currentAmount = 0;
+    private int targetAmount;
     private double percentage;
 
     public DungeonKillPercentageObjective(DungeonInstance dungeonInstance, String objectiveString) {

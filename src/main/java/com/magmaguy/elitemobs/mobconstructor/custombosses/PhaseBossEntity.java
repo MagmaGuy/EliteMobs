@@ -76,17 +76,20 @@ public class PhaseBossEntity {
                     customBossEntity.setPersistentLocation(location);
                 } else {
                     customBossEntity.setRespawnOverrideLocation(customBossEntity.getLocation());
-                    customBossEntity.setPersistentLocation(location);
+                    customBossEntity.setPersistentLocation(customBossEntity.getLocation());
                 }
             } else
                 customBossEntity.setRespawnOverrideLocation(customBossEntity.getLocation());
             //Handle music, soundtrack shouldn't change if the new one is the same
             if (bossPhase.customBossesConfigFields.getSong() != null
-                    && currentPhase.customBossesConfigFields.getSong() != null &&
-                    !bossPhase.customBossesConfigFields.getSong().equals(currentPhase.customBossesConfigFields.getSong())) {
-                if (customBossEntity.getBossMusic() != null) customBossEntity.getBossMusic().stop();
-                customBossEntity.setBossMusic(new BossMusic(bossPhase.customBossesConfigFields.getSong()));
+                    && currentPhase.customBossesConfigFields.getSong() != null) {
+                if (!bossPhase.customBossesConfigFields.getSong().equals(currentPhase.customBossesConfigFields.getSong())) {
+                    if (customBossEntity.getBossMusic() != null) customBossEntity.getBossMusic().stop();
+                    customBossEntity.setBossMusic(new BossMusic(bossPhase.customBossesConfigFields.getSong()));
+                }
             }
+
+            //spawn the boss
             customBossEntity.spawn(true);
         }
         customBossEntity.setHealth(customBossEntity.getMaxHealth() * healthPercentage);

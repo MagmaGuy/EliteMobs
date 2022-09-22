@@ -238,7 +238,7 @@ ProceduralItemGenerationSettings:
     - Tauren
     - Pandaren
     - Sasquatch
-    - Forsaken 
+    - Forsaken
     - Yeti
     - Banshee
     - Arachnid
@@ -885,7 +885,7 @@ ProceduralItemGenerationSettings:
     - "Matando\n"
     - Matando
     - Carnicería
-    - Destruyendo 
+    - Destruyendo
     - Cosquillas
     - Abrazando
     - Asesinando
@@ -894,7 +894,7 @@ ProceduralItemGenerationSettings:
     - "Viajando\n"
     - Teletransportándose
     - Parpadeando
-    - Destruyendo 
+    - Destruyendo
     - Demoliendo
     - Parpadeando
     - Materializando

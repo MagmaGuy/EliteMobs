@@ -219,6 +219,8 @@ public class SetupMenu {
                     case SCHEMATIC:
                         addSchematicDungeon(emPackage, counter);
                         break;
+                    case INSTANCED:
+                        break;
                     default:
                         new WarningMessage("Dungeon " + emPackage.getDungeonPackagerConfigFields().getFilename() + " does not have a valid location type and therefore can't be set up automatically!");
                         break;
@@ -241,6 +243,21 @@ public class SetupMenu {
         lore = ChatColorConverter.convert(lore);
         inventory.setItem(validSlots.get(counter), ItemStackGenerator.generateItemStack(getMaterial(emPackage), itemName, lore));
     }
+
+
+    private void addInstancedDungeon(EMPackage emPackage, int counter) {
+
+        String itemName = emPackage.getDungeonPackagerConfigFields().getName();
+        List<String> lore = new ArrayList<>();
+
+        addSize(lore, emPackage);
+        //boss count can't be calculated ahead of time here, unfortunately
+        addInstallationString(lore, emPackage);
+
+        lore = ChatColorConverter.convert(lore);
+        inventory.setItem(validSlots.get(counter), ItemStackGenerator.generateItemStack(getMaterial(emPackage), itemName, lore));
+    }
+
 
     private void addSchematicDungeon(EMPackage emPackage, int counter) {
         if (!Bukkit.getPluginManager().isPluginEnabled("WorldEdit")) {
