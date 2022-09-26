@@ -2,18 +2,17 @@ package com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs;
 
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
+import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.PluginMobProperties;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
-import com.magmaguy.elitemobs.powers.meta.MajorPower;
-import com.magmaguy.elitemobs.powers.meta.MinorPower;
+import lombok.Getter;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 
 import java.util.HashSet;
-import java.util.Iterator;
 
 public abstract class EliteMobProperties extends PluginMobProperties {
 
@@ -22,10 +21,14 @@ public abstract class EliteMobProperties extends PluginMobProperties {
      */
 
     public static HashSet<EliteMobProperties> eliteMobData = new HashSet<>();
-    private final HashSet<MajorPower> validMajorPowers = new HashSet<>();
-    private final HashSet<MinorPower> validDefensivePowers = (HashSet<MinorPower>) ElitePower.getDefensivePowers().clone();
-    private final HashSet<MinorPower> validOffensivePowers = (HashSet<MinorPower>) ElitePower.getOffensivePowers().clone();
-    private final HashSet<MinorPower> validMiscellaneousPowers = (HashSet<MinorPower>) ElitePower.getMiscellaneousPowers().clone();
+    @Getter
+    private final HashSet<PowersConfigFields> validMajorPowers = new HashSet<>();
+    @Getter
+    private final HashSet<PowersConfigFields> validDefensivePowers = (HashSet<PowersConfigFields>) ElitePower.getDefensivePowers().clone();
+    @Getter
+    private final HashSet<PowersConfigFields> validOffensivePowers = (HashSet<PowersConfigFields>) ElitePower.getOffensivePowers().clone();
+    @Getter
+    private final HashSet<PowersConfigFields> validMiscellaneousPowers = (HashSet<PowersConfigFields>) ElitePower.getMiscellaneousPowers().clone();
 
     public static void initializeEliteMobValues() {
         new EliteBlaze();
@@ -114,41 +117,15 @@ public abstract class EliteMobProperties extends PluginMobProperties {
 
     public void addMajorPower(String powerName) {
         if (PowersConfig.getPower(powerName).isEnabled())
-            validMajorPowers.add((MajorPower) ElitePower.getElitePower(powerName));
+            validMajorPowers.add(PowersConfig.getPower(powerName));
     }
 
-    public void removeOffensivePower(MinorPower minorPower) {
-        for (Iterator<MinorPower> iterator = validOffensivePowers.iterator(); iterator.hasNext(); ) {
-            MinorPower minorPower1 = iterator.next();
-            if (minorPower1.getFileName().equalsIgnoreCase(minorPower.getFileName())) {
-                iterator.remove();
-                return;
-            }
-        }
+    public void removeOffensivePower(String filename) {
+        validOffensivePowers.remove(PowersConfig.getPower(filename));
     }
 
-    public void removeDefensivePower(MinorPower minorPower) {
-        for (Iterator<MinorPower> iterator = validDefensivePowers.iterator(); iterator.hasNext(); ) {
-            MinorPower minorPower1 = iterator.next();
-            if (minorPower1.getFileName().equalsIgnoreCase(minorPower.getFileName()))
-                iterator.remove();
-        }
-    }
-
-    public HashSet<MajorPower> getValidMajorPowers() {
-        return validMajorPowers;
-    }
-
-    public HashSet<MinorPower> getValidDefensivePowers() {
-        return validDefensivePowers;
-    }
-
-    public HashSet<MinorPower> getValidOffensivePowers() {
-        return validOffensivePowers;
-    }
-
-    public HashSet<MinorPower> getValidMiscellaneousPowers() {
-        return validMiscellaneousPowers;
+    public void removeDefensivePower(String filename) {
+        validOffensivePowers.remove(PowersConfig.getPower(filename));
     }
 
 }

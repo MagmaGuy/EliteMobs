@@ -3,6 +3,8 @@ package com.magmaguy.elitemobs.commands;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
+import com.magmaguy.elitemobs.config.powers.PowersConfig;
+import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.SuperMobConstructor;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
@@ -28,12 +30,12 @@ public class SpawnCommand {
 
     public static void spawnEliteEntityTypeCommand(Player player, EntityType entityType, Integer level, String[] powers) {
         LivingEntity livingEntity = (LivingEntity) player.getLocation().getWorld().spawnEntity(getLocation(player), entityType);
-        HashSet<ElitePower> mobPowers = getPowers(powers, player);
+        HashSet<PowersConfigFields> mobPowers = getPowers(powers, player);
         EliteEntity eliteEntity = new EliteEntity();
         eliteEntity.setLevel(level);
-        eliteEntity.setLivingEntity(livingEntity, CreatureSpawnEvent.SpawnReason.CUSTOM);
         if (!mobPowers.isEmpty()) eliteEntity.applyPowers(mobPowers);
         else eliteEntity.randomizePowers(EliteMobProperties.getPluginData(livingEntity));
+        eliteEntity.setLivingEntity(livingEntity, CreatureSpawnEvent.SpawnReason.CUSTOM);
     }
 
     public static void spawnEliteEntityTypeCommand(CommandSender commandSender,
@@ -64,9 +66,8 @@ public class SpawnCommand {
             return;
         }
         LivingEntity livingEntity = (LivingEntity) location.getWorld().spawnEntity(location, entityType);
-        HashSet<ElitePower> mobPowers = new HashSet<>();
-        if (powers.isPresent())
-            mobPowers = getPowers(powers.get(), commandSender);
+        HashSet<PowersConfigFields> mobPowers = new HashSet<>();
+        if (powers.isPresent()) mobPowers = getPowers(powers.get(), commandSender);
         EliteEntity eliteEntity = new EliteEntity();
         eliteEntity.setLevel(level);
         eliteEntity.setLivingEntity(livingEntity, CreatureSpawnEvent.SpawnReason.CUSTOM);
@@ -150,23 +151,23 @@ public class SpawnCommand {
         return player.getTargetBlock(null, 30).getLocation().add(0.5, 1, 0.5);
     }
 
-    private static HashSet<ElitePower> getPowers(String[] mobPowers, CommandSender commandSender) {
+    private static HashSet<PowersConfigFields> getPowers(String[] mobPowers, CommandSender commandSender) {
 
-        HashSet<ElitePower> elitePowers = new HashSet<>();
+        HashSet<PowersConfigFields> elitePowers = new HashSet<>();
 
         if (mobPowers.length > 0)
             for (String string : mobPowers) {
-                ElitePower elitePower = ElitePower.getElitePower(string);
-                if (elitePower == null) {
+                PowersConfigFields powersConfigFields = PowersConfig.getPower(string);
+                if (powersConfigFields == null) {
                     commandSender.sendMessage("[EliteMobs] Power " + string + " is not a valid power! Valid powers:");
                     StringBuilder allPowers = new StringBuilder();
-                    for (ElitePower iteratedPower : ElitePower.getElitePowers())
-                        allPowers.append(iteratedPower.getName()).append(", ");
+                    for (PowersConfigFields iteratedField : ElitePower.getElitePowers().values())
+                        allPowers.append(iteratedField.getFilename()).append(", ");
                     allPowers.append("custom");
                     commandSender.sendMessage(allPowers.toString());
                     return new HashSet<>();
                 }
-                elitePowers.add(elitePower);
+                elitePowers.add(powersConfigFields);
             }
         return elitePowers;
     }

@@ -36,6 +36,7 @@ public class ScriptEvents {
     }
 
     public boolean isValid() {
-        return !events.isEmpty();
+        //return !events.isEmpty(); todo: parse failed attempts, empty right now still means they can be called by other scripts
+        return true;
     }
 }

@@ -2,10 +2,9 @@ package com.magmaguy.elitemobs.api;
 
 import com.magmaguy.elitemobs.CrashFix;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
-import com.magmaguy.elitemobs.powers.majorpowers.enderdragon.EnderDragonEmpoweredLightning;
-import com.magmaguy.elitemobs.powers.majorpowers.enderdragon.EnderDragonTornado;
-import com.magmaguy.elitemobs.powers.meta.ElitePower;
+import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.EntityType;
@@ -22,42 +21,30 @@ import java.util.concurrent.ThreadLocalRandom;
 public class EliteExplosionEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
+    @Getter
     public static List<FallingBlock> fallingBlocks = new ArrayList<>();
+    @Getter
     private final EliteEntity eliteEntity;
+    @Getter
     private final List<BlockState> blockStates;
-    private final ElitePower elitePower;
+    @Getter
+    private final PowersConfigFields powersConfigFields;
+    @Getter
     private Location explosionSourceLocation;
     private boolean isCancelled = false;
 
     public EliteExplosionEvent(EliteEntity eliteEntity,
-                               ElitePower elitePower,
+                               PowersConfigFields powersConfigFields,
                                Location explosionSourceLocation,
                                List<BlockState> blockStates) {
         this.eliteEntity = eliteEntity;
         this.explosionSourceLocation = explosionSourceLocation;
-        this.elitePower = elitePower;
+        this.powersConfigFields = powersConfigFields;
         this.blockStates = blockStates;
-    }
-
-
-    public EliteEntity getEliteMobEntity() {
-        return eliteEntity;
-    }
-
-    public Location getExplosionSourceLocation() {
-        return explosionSourceLocation;
     }
 
     public void setExplosionSourceLocation(Location explosionSourceLocation) {
         this.explosionSourceLocation = explosionSourceLocation;
-    }
-
-    public ElitePower getElitePower() {
-        return elitePower;
-    }
-
-    public List<BlockState> getBlockStates() {
-        return blockStates;
     }
 
     @Override
@@ -75,14 +62,14 @@ public class EliteExplosionEvent extends Event implements Cancellable {
         return handlers;
     }
 
-    public void visualExplosionEffect(ElitePower elitePower) {
+    public void visualExplosionEffect(PowersConfigFields powersConfigFields) {
         VisualExplosionEffectType visualExplosionEffectType;
 
-        if (elitePower == null)
+        if (powersConfigFields == null)
             visualExplosionEffectType = VisualExplosionEffectType.NORMAL;
-        else if (elitePower.getFileName().equals(new EnderDragonEmpoweredLightning().getFileName()))
+        else if (powersConfigFields.getFilename().equals("ender_dragon_empowered_lightning.yml"))
             visualExplosionEffectType = VisualExplosionEffectType.ASCEND;
-        else if (elitePower instanceof EnderDragonTornado) {
+        else if (powersConfigFields.getFilename().equalsIgnoreCase("ender_dragon_tornado.yml")) {
             visualExplosionEffectType = VisualExplosionEffectType.HIGH_POWER;
         } else
             visualExplosionEffectType = VisualExplosionEffectType.NORMAL;

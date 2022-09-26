@@ -117,8 +117,8 @@ public class AdminCommands {
                 .handler(commandContext -> SetupHandler.setupAreaCommand((Player) commandContext.getSender(), commandContext.get("areaName"))));
 
         ArrayList<String> powers = new ArrayList<>();
-        for (ElitePower elitePower : ElitePower.getElitePowers())
-            powers.add(elitePower.getFileName());
+        for (String filename : ElitePower.getElitePowers().keySet())
+            powers.add(filename);
         powers.add("custom");
 
         // /em spawnelite <entityType> <level> <power1> <power2> <power3>

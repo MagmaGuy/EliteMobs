@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.*;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -146,7 +147,7 @@ public class CustomConfigFields implements CustomConfigFieldsInterface {
     private List<String> worldListToStringListConverter(List<World> pluginDefault) {
         if (pluginDefault == null) return null;
         List<String> newList = new ArrayList<>();
-        pluginDefault.forEach((element) -> newList.add(element.getName()));
+        pluginDefault.forEach(element -> newList.add(element.getName()));
         return newList;
     }
 
@@ -313,6 +314,17 @@ public class CustomConfigFields implements CustomConfigFieldsInterface {
             new WarningMessage("Entry: " + value);
         }
         return value;
+    }
+
+    public ConfigurationSection processConfigurationSection(String path, Map<String, Object> value) {
+        if (value == null) return null;
+        if (!configHas(path))
+            fileConfiguration.addDefaults(value);
+        ConfigurationSection newValue = fileConfiguration.getConfigurationSection(path);
+        for (String key : newValue.getKeys(true))
+            if (key.equalsIgnoreCase("message"))
+                newValue.set(key, translatable(filename, key, (String) newValue.get(key)));
+        return newValue;
     }
 
     private String itemStackDeserializer(ItemStack itemStack) {

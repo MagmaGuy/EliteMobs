@@ -11,9 +11,9 @@ import com.magmaguy.elitemobs.config.customarenas.CustomArenasConfigFields;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
-import com.magmaguy.elitemobs.utils.Cylinder;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.elitemobs.utils.shapes.Cylinder;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -42,14 +42,14 @@ public class ArenaInstance extends MatchInstance {
     private final HashMap<Integer, String> waveMessage = new HashMap<>();
     private final int minX;
     private final int maxX;
-    @Getter
-    private int currentWave = 0;
     private final int minY;
     private final int maxY;
     private final int minZ;
     private final int maxZ;
     private final boolean cylindricalArena;
     protected HashMap<String, Location> spawnPoints = new HashMap<>();
+    @Getter
+    private int currentWave = 0;
     @Getter
     private ArenaState arenaState = ArenaState.IDLE;
     private Cylinder cylinder;

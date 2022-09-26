@@ -20,8 +20,8 @@ public class ItemWorthCalculator {
         if (itemStack == null || itemStack.getItemMeta() == null || itemStack.getType().equals(Material.AIR)) return 0;
 
         //Check if value's already been written into the item. If it hasn't, the value will be -1
-        double value = ItemTagger.getItemValue(itemStack);
-        if (value != -1) return value;
+        // double value = ItemTagger.getItemValue(itemStack);
+        // if (value != -1) return value;
 
         double prestigeMultiplier;
         if (player == null)
@@ -69,10 +69,12 @@ public class ItemWorthCalculator {
 
     private static double getAllPotionEffectValues(ItemMeta itemMeta) {
         double value = 0;
-        for (ElitePotionEffect elitePotionEffect : ElitePotionEffectContainer.getElitePotionEffects(itemMeta, ElitePotionEffect.ApplicationMethod.CONTINUOUS))
+        for (ElitePotionEffect elitePotionEffect : ElitePotionEffectContainer.getElitePotionEffectContainer(itemMeta, ItemTagger.continuousPotionEffectKey)) {
             value += (elitePotionEffect.getValue() * (elitePotionEffect.getPotionEffect().getAmplifier() + 1));
-        for (ElitePotionEffect elitePotionEffect : ElitePotionEffectContainer.getElitePotionEffects(itemMeta, ElitePotionEffect.ApplicationMethod.ONHIT))
+        }
+        for (ElitePotionEffect elitePotionEffect : ElitePotionEffectContainer.getElitePotionEffectContainer(itemMeta, ItemTagger.onHitPotionEffectKey)) {
             value += (elitePotionEffect.getValue() * (elitePotionEffect.getPotionEffect().getAmplifier() + 1));
+        }
         return value;
     }
 

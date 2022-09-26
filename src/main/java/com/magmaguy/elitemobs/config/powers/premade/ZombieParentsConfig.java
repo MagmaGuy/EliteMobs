@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.config.powers.premade;
 
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
+import com.magmaguy.elitemobs.powers.ZombieParents;
 import lombok.Getter;
 import org.bukkit.Material;
 
@@ -21,8 +22,9 @@ public class ZombieParentsConfig extends PowersConfigFields {
     public ZombieParentsConfig() {
         super("zombie_parents",
                 true,
-                "Parents",
-                Material.SKELETON_SKULL.toString());
+                Material.SKELETON_SKULL.toString(),
+                ZombieParents.class,
+                PowerType.MAJOR_ZOMBIE);
     }
 
     @Override
