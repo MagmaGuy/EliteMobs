@@ -71,12 +71,13 @@ public class EliteItemLore {
 
         constructSoulbindEntry();
         constructSoulboundOwner();
-        constructItemWorth();
         constructItemSource();
         constructCustomLore();
         constructPrestigeLevel();
 
         constructPotionEffects();
+
+        constructItemWorth();
 
         writeNewLore();
 

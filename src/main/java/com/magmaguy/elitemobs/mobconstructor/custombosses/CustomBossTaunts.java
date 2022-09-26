@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.mobconstructor.custombosses;
 
 import com.magmaguy.elitemobs.api.EliteMobDamagedEvent;
 import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
-import com.magmaguy.elitemobs.powers.miscellaneouspowers.Taunt;
+import com.magmaguy.elitemobs.powers.Taunt;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 

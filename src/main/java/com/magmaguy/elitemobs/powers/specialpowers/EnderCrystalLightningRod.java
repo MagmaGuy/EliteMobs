@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.powers.specialpowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
-import com.magmaguy.elitemobs.powers.majorpowers.enderdragon.EnderDragonEmpoweredLightning;
+import com.magmaguy.elitemobs.powers.EnderDragonEmpoweredLightning;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.EnderCrystal;
 import org.bukkit.entity.EntityType;

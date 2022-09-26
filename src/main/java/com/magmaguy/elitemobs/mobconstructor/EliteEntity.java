@@ -10,7 +10,6 @@ import com.magmaguy.elitemobs.combatsystem.antiexploit.AntiExploitMessage;
 import com.magmaguy.elitemobs.config.AntiExploitConfig;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
-import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.events.CustomEvent;
@@ -19,8 +18,6 @@ import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
-import com.magmaguy.elitemobs.powers.meta.MajorPower;
-import com.magmaguy.elitemobs.powers.meta.MinorPower;
 import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import com.magmaguy.elitemobs.tagger.PersistentTagger;
@@ -311,7 +308,7 @@ public class EliteEntity {
             this.health = maxHealth;
         }
         //This is useful for phase boss entities that spawn in unloaded chunks and shouldn't full heal between phases, like in dungeons
-        else livingEntity.setHealth(health);
+        else livingEntity.setHealth(Math.min(health, livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()));
     }
 
     public void setNormalizedMaxHealth() {
@@ -439,44 +436,47 @@ public class EliteEntity {
         if (level >= 80) availableMajorPowers = 2;
 
         //apply defensive powers
-        applyPowers((HashSet<ElitePower>) eliteMobProperties.getValidDefensivePowers().clone(), availableDefensivePowers);
+        applyPowers((HashSet<PowersConfigFields>) eliteMobProperties.getValidDefensivePowers().clone(), availableDefensivePowers);
 
         //apply offensive powers
-        applyPowers((HashSet<ElitePower>) eliteMobProperties.getValidOffensivePowers().clone(), availableOffensivePowers);
+        applyPowers((HashSet<PowersConfigFields>) eliteMobProperties.getValidOffensivePowers().clone(), availableOffensivePowers);
 
         //apply miscellaneous powers
-        applyPowers((HashSet<ElitePower>) eliteMobProperties.getValidMiscellaneousPowers().clone(), availableMiscellaneousPowers);
+        applyPowers((HashSet<PowersConfigFields>) eliteMobProperties.getValidMiscellaneousPowers().clone(), availableMiscellaneousPowers);
 
         //apply major powers
-        applyPowers((HashSet<ElitePower>) eliteMobProperties.getValidMajorPowers().clone(), availableMajorPowers);
+        applyPowers((HashSet<PowersConfigFields>) eliteMobProperties.getValidMajorPowers().clone(), availableMajorPowers);
 
         new MinorPowerPowerStance(this);
         new MajorPowerPowerStance(this);
 
     }
 
-    public void applyPowers(HashSet<ElitePower> elitePowers, int availablePowerAmount) {
-        elitePowers.removeIf(elitePower -> !PowersConfig.getPower(elitePower.getFileName()).isEnabled());
+    public void applyPowers(HashSet<PowersConfigFields> configFields, int availablePowerAmount) {
+        configFields.removeIf(iteratedField -> !iteratedField.isEnabled());
 
         if (availablePowerAmount < 1) return;
 
-        ArrayList<ElitePower> localPowers = new ArrayList<>(elitePowers);
+        ArrayList<PowersConfigFields> localFields = new ArrayList<>(configFields);
 
         for (ElitePower mobPower : this.elitePowers)
-            localPowers.remove(mobPower);
+            localFields.remove(mobPower);
 
         for (int i = 0; i < availablePowerAmount; i++)
-            if (localPowers.size() < 1)
+            if (localFields.size() < 1)
                 break;
             else {
-                ElitePower selectedPower = localPowers.get(ThreadLocalRandom.current().nextInt(localPowers.size()));
+                PowersConfigFields selectedField = localFields.get(ThreadLocalRandom.current().nextInt(localFields.size()));
                 try {
-                    this.elitePowers.add(selectedPower.getClass().newInstance());
-                    selectedPower.applyPowers(this.livingEntity);
-                    localPowers.remove(selectedPower);
-                    if (selectedPower instanceof MajorPower)
+                    ElitePower.addPower(this, selectedField);
+                    localFields.remove(selectedField);
+                    if (selectedField.getPowerType().equals(PowersConfigFields.PowerType.MAJOR_ZOMBIE) ||
+                            selectedField.getPowerType().equals(PowersConfigFields.PowerType.MAJOR_BLAZE) ||
+                            selectedField.getPowerType().equals(PowersConfigFields.PowerType.MAJOR_ENDERMAN) ||
+                            selectedField.getPowerType().equals(PowersConfigFields.PowerType.MAJOR_GHAST) ||
+                            selectedField.getPowerType().equals(PowersConfigFields.PowerType.MAJOR_SKELETON))
                         this.majorPowerCount++;
-                    if (selectedPower instanceof MinorPower)
+                    else
                         this.minorPowerCount++;
                 } catch (Exception ex) {
                     new WarningMessage("Failed to instance new power!");
@@ -485,17 +485,12 @@ public class EliteEntity {
 
     }
 
-    public void applyPowers(HashSet<ElitePower> elitePowers) {
-        this.elitePowers = elitePowers;
-        for (ElitePower elitePower : elitePowers)
-            elitePower.applyPowers(livingEntity);
+    public void applyPowers(HashSet<PowersConfigFields> powersConfigFields) {
+        powersConfigFields.forEach(field -> ElitePower.addPower(this, field));
     }
 
     public boolean hasPower(ElitePower mobPower) {
-        for (ElitePower elitePower : elitePowers)
-            if (elitePower.getClass().equals(mobPower.getClass()))
-                return true;
-        return false;
+        return elitePowers.contains(mobPower);
     }
 
     public boolean hasPower(PowersConfigFields powersConfigFields) {
@@ -503,13 +498,6 @@ public class EliteEntity {
             if (elitePower.getPowersConfigFields().equals(powersConfigFields))
                 return true;
         return false;
-    }
-
-    public ElitePower getPower(PowersConfigFields powersConfigFields) {
-        for (ElitePower elitePower : elitePowers)
-            if (elitePower.getPowersConfigFields().equals(powersConfigFields))
-                return elitePower;
-        return null;
     }
 
     public ElitePower getPower(ElitePower elitePower) {

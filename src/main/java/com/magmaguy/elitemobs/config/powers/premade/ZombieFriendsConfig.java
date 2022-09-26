@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.config.powers.premade;
 
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
+import com.magmaguy.elitemobs.powers.ZombieFriends;
 import org.bukkit.Material;
 
 import java.util.Arrays;
@@ -14,8 +15,9 @@ public class ZombieFriendsConfig extends PowersConfigFields {
     public ZombieFriendsConfig() {
         super("zombie_friends",
                 true,
-                "Friends",
-                Material.ZOMBIE_HEAD.toString());
+                Material.ZOMBIE_HEAD.toString(),
+                ZombieFriends.class,
+                PowerType.MAJOR_ZOMBIE);
     }
 
     @Override

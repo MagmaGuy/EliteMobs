@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.config.powers.premade;
 
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
+import com.magmaguy.elitemobs.powers.TrackingFireball;
 import org.bukkit.Material;
 
 public class TrackingFireballConfig extends PowersConfigFields {
@@ -10,8 +11,9 @@ public class TrackingFireballConfig extends PowersConfigFields {
     public TrackingFireballConfig() {
         super("tracking_fireball",
                 true,
-                "Tracking Fireball",
-                Material.FIRE_CHARGE.toString());
+                Material.FIRE_CHARGE.toString(),
+                TrackingFireball.class,
+                PowerType.MAJOR_GHAST);
     }
 
     @Override

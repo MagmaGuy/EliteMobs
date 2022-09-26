@@ -1,7 +1,9 @@
 package com.magmaguy.elitemobs.mobconstructor.custombosses;
 
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
-import com.magmaguy.elitemobs.powers.bosspowers.BonusCoins;
+import com.magmaguy.elitemobs.config.powers.PowersConfig;
+import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
+import com.magmaguy.elitemobs.powers.BonusCoins;
 import com.magmaguy.elitemobs.powers.meta.CustomSummonPower;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import com.magmaguy.elitemobs.utils.WarningMessage;
@@ -26,10 +28,21 @@ public class ElitePowerParser {
                     customSummonPower.addEntry(powerName);
             else {
                 String[] parsedPowerName = powerName.split(":");
-                if (ElitePower.getElitePower(parsedPowerName[0]) != null) {
-                    ElitePower elitePower = ElitePower.getElitePower(parsedPowerName[0]);
-                    elitePowers.add(elitePower);
-                    if (elitePower instanceof BonusCoins)
+                PowersConfigFields powersConfigFields = PowersConfig.getPower(parsedPowerName[0]);
+                if (powersConfigFields != null) {
+                    if (!powersConfigFields.getEliteScripts().isEmpty()) {
+                        elitePowers.addAll(powersConfigFields.getEliteScripts());
+                        continue;
+                    }
+                    ElitePower elitePower;
+                    try {
+                        elitePower = powersConfigFields.getElitePowerClass().newInstance();
+                        elitePowers.add(elitePower);
+                    } catch (Exception ex) {
+                        new WarningMessage("Could not process power " + powerName);
+                        continue;
+                    }
+                    if (powersConfigFields.getFilename().equals("bonus_coins.yml"))
                         if (parsedPowerName.length > 1)
                             try {
                                 ((BonusCoins) elitePower).setCoinMultiplier(Double.parseDouble(parsedPowerName[1]));

@@ -5,9 +5,10 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteExplosionEvent;
 import com.magmaguy.elitemobs.combatsystem.EliteProjectile;
 import com.magmaguy.elitemobs.config.DefaultConfig;
+import com.magmaguy.elitemobs.config.powers.PowersConfig;
+import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
-import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import com.magmaguy.elitemobs.utils.EntityFinder;
 import org.bukkit.Location;
@@ -54,8 +55,8 @@ public class Explosion {
             explosion.resetAllBlocks();
     }
 
-    public static void generateFakeExplosion(List<Block> blockList, Entity entity, ElitePower elitePower, Location explosionSourceLocation) {
-        generateExplosion(blockList, entity, elitePower, explosionSourceLocation);
+    public static void generateFakeExplosion(List<Block> blockList, Entity entity, PowersConfigFields powersConfigFields, Location explosionSourceLocation) {
+        generateExplosion(blockList, entity, powersConfigFields, explosionSourceLocation);
     }
 
     public static void generateFakeExplosion(List<Block> blockList, Entity entity) {
@@ -66,7 +67,7 @@ public class Explosion {
         generateExplosion(event.blockList(), event.getEntity(), null, event.getEntity().getLocation());
     }
 
-    private static void generateExplosion(List<Block> blockList, Entity entity, ElitePower elitePower, Location explosionSource) {
+    private static void generateExplosion(List<Block> blockList, Entity entity, PowersConfigFields powersConfigFields, Location explosionSource) {
         if (!DefaultConfig.isDoExplosionRegen()) return;
         if (EliteMobs.worldGuardIsEnabled &&
                 explosionSource != null &&
@@ -95,13 +96,13 @@ public class Explosion {
         if (entity instanceof Projectile) {
             eliteExplosionEvent = new EliteExplosionEvent(
                     eliteEntity,
-                    elitePower = ElitePower.getElitePower(EliteProjectile.readExplosivePower((Projectile) entity)),
+                    powersConfigFields = PowersConfig.getPower(EliteProjectile.readExplosivePower((Projectile) entity)),
                     entity.getLocation(),
                     blockStates);
         } else {
             eliteExplosionEvent = new EliteExplosionEvent(
                     eliteEntity,
-                    elitePower,
+                    powersConfigFields,
                     entity.getLocation(),
                     blockStates);
         }
@@ -110,7 +111,7 @@ public class Explosion {
         if (explosionSource != null)
             eliteExplosionEvent.setExplosionSourceLocation(explosionSource);
 
-        eliteExplosionEvent.visualExplosionEffect(elitePower);
+        eliteExplosionEvent.visualExplosionEffect(powersConfigFields);
 
         for (BlockState blockState : blockStates) {
             blockState.getBlock().setType(Material.AIR);
