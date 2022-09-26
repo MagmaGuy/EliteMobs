@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs;
 
 import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfig;
-import com.magmaguy.elitemobs.powers.defensivepowers.Invisibility;
 import org.bukkit.entity.EntityType;
 
 public class EliteCreeper extends EliteMobProperties {
@@ -11,7 +10,7 @@ public class EliteCreeper extends EliteMobProperties {
         this.entityType = EntityType.CREEPER;
         this.defaultMaxHealth = 20;
         this.baseDamage = MobPropertiesConfig.getMobProperties().get(EntityType.CREEPER).getBaseDamage();
-        super.removeDefensivePower(new Invisibility());
+        super.removeDefensivePower("invisibility.yml");
         isEnabled = MobPropertiesConfig.getMobProperties().get(EntityType.CREEPER).isEnabled();
         eliteMobData.add(this);
     }

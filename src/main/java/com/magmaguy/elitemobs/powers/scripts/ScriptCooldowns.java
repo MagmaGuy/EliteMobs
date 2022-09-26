@@ -1,10 +1,11 @@
 package com.magmaguy.elitemobs.powers.scripts;
 
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
+import com.magmaguy.elitemobs.utils.MapListInterpreter;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 
-import java.util.List;
+import java.util.Map;
 
 public class ScriptCooldowns {
     @Getter
@@ -12,27 +13,15 @@ public class ScriptCooldowns {
     @Getter
     private int globalCooldown = 0;
 
-    public ScriptCooldowns(List<String> values, String scriptName, ElitePower elitePower) {
-        for (String entry : values) {
-            String[] subentries = entry.split("=");
-            switch (subentries[0].toLowerCase()) {
-                case "local_cooldown":
-                    try {
-                        localCooldown = Integer.parseInt(subentries[1]);
-                    } catch (Exception exception) {
-                        new WarningMessage("Failed to get valid local_cooldown for entry " + entry + " in " + scriptName + " !");
-                    }
-                    break;
-                case "global_cooldown":
-                    try {
-                        globalCooldown = Integer.parseInt(subentries[1]);
-                    } catch (Exception exception) {
-                        new WarningMessage("Failed to get valid global_cooldown for entry " + entry + " in " + scriptName + " !");
-                    }
-                    break;
-                default:
-                    new WarningMessage("Invalid cooldown entry for value " + entry + " in " + scriptName);
-                    break;
+    public ScriptCooldowns(Map<String, Object> values, String scriptName, ElitePower elitePower) {
+        for (Map.Entry<String, Object> entry : values.entrySet()) {
+            switch (entry.getKey().toLowerCase()) {
+                case "local" ->
+                        localCooldown = MapListInterpreter.parseInteger(entry.getKey(), entry.getValue(), scriptName);
+                case "global" ->
+                        globalCooldown = MapListInterpreter.parseInteger(entry.getKey(), entry.getValue(), scriptName);
+                default ->
+                        new WarningMessage("Failed to parse cooldown entry for script name " + scriptName + " in config file " + elitePower.getPowersConfigFields().getFilename());
             }
         }
         elitePower.setGlobalCooldownTime(globalCooldown);

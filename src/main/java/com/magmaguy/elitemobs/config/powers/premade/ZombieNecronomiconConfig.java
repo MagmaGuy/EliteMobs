@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.config.powers.premade;
 
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
+import com.magmaguy.elitemobs.powers.ZombieNecronomicon;
 import org.bukkit.Material;
 
 public class ZombieNecronomiconConfig extends PowersConfigFields {
@@ -10,8 +11,9 @@ public class ZombieNecronomiconConfig extends PowersConfigFields {
     public ZombieNecronomiconConfig() {
         super("zombie_necronomicon",
                 true,
-                "Necronomicon",
-                Material.ENCHANTED_BOOK.toString());
+                Material.ENCHANTED_BOOK.toString(),
+                ZombieNecronomicon.class,
+                PowerType.MAJOR_ZOMBIE);
     }
 
     @Override

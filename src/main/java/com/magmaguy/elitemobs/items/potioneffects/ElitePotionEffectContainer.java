@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.items.potioneffects;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.tags.ItemTagType;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
@@ -46,17 +45,6 @@ public class ElitePotionEffectContainer {
 
     public static ArrayList<ElitePotionEffect> getElitePotionEffectContainer(ItemMeta itemMeta, NamespacedKey namespacedKey) {
         if (itemMeta == null) return new ArrayList<>();
-        //for legacy items
-        if (itemMeta.getCustomTagContainer().hasCustomTag(namespacedKey, ItemTagType.STRING)) {
-            ArrayList<ElitePotionEffect> elitePotionEffects = new ArrayList<>();
-            for (String string : itemMeta.getCustomTagContainer().getCustomTag(namespacedKey, ItemTagType.STRING).split(":"))
-                if (string.length() > 0)
-                    elitePotionEffects.add(new ElitePotionEffect(string));
-
-            return elitePotionEffects;
-        }
-
-
         if (!itemMeta.getPersistentDataContainer().has(namespacedKey, PersistentDataType.STRING))
             return new ArrayList<>();
         ArrayList<ElitePotionEffect> elitePotionEffects = new ArrayList<>();
@@ -66,31 +54,5 @@ public class ElitePotionEffectContainer {
 
         return elitePotionEffects;
     }
-
-    public static ArrayList<ElitePotionEffect> getElitePotionEffects(ItemMeta itemMeta, ElitePotionEffect.ApplicationMethod applicationMethod) {
-        String elitePotionEfects = "";
-        switch (applicationMethod) {
-            case CONTINUOUS:
-                //do legacy items first, default to current items
-                if (itemMeta.getCustomTagContainer().hasCustomTag(ItemTagger.eliteMobsItemNamespacedKey, ItemTagType.BYTE))
-                    elitePotionEfects = itemMeta.getCustomTagContainer().getCustomTag(ItemTagger.continuousPotionEffectKey, ItemTagType.STRING);
-                else
-                    elitePotionEfects = itemMeta.getPersistentDataContainer().get(ItemTagger.continuousPotionEffectKey, PersistentDataType.STRING);
-                break;
-            case ONHIT:
-                if (itemMeta.getCustomTagContainer().hasCustomTag(ItemTagger.eliteMobsItemNamespacedKey, ItemTagType.BYTE))
-                    elitePotionEfects = itemMeta.getCustomTagContainer().getCustomTag(ItemTagger.onHitPotionEffectKey, ItemTagType.STRING);
-                else
-                    elitePotionEfects = itemMeta.getPersistentDataContainer().get(ItemTagger.onHitPotionEffectKey, PersistentDataType.STRING);
-                break;
-        }
-        ArrayList<ElitePotionEffect> elitePotionEffects = new ArrayList<>();
-        if (elitePotionEfects == null || elitePotionEfects.isEmpty())
-            return elitePotionEffects;
-        for (String subString : elitePotionEfects.split(":"))
-            elitePotionEffects.add(new ElitePotionEffect(subString));
-        return elitePotionEffects;
-    }
-
 
 }

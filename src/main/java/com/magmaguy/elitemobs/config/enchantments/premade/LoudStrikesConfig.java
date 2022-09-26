@@ -1,9 +1,9 @@
 package com.magmaguy.elitemobs.config.enchantments.premade;
 
-import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
+import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfigFields;
 
-public class LoudStrikesConfig extends PowersConfigFields {
+public class LoudStrikesConfig extends EnchantmentsConfigFields {
     public LoudStrikesConfig() {
-        super("loud_strikes", true, "Loud Strikes", null);
+        super("loud_strikes", true, "Loud Strikes", 3, 6);
     }
 }

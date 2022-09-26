@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.config.powers.premade;
 
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
+import com.magmaguy.elitemobs.powers.Taunt;
 import org.bukkit.Material;
 
 import java.util.Arrays;
@@ -13,8 +14,9 @@ public class TauntConfig extends PowersConfigFields {
     public TauntConfig() {
         super("taunt",
                 true,
-                "Taunt",
-                Material.JUKEBOX.toString());
+                Material.JUKEBOX.toString(),
+                Taunt.class,
+                PowerType.MISCELLANEOUS);
     }
 
     @Override
