@@ -220,8 +220,10 @@ public class ScriptActions {
                 case PLACE_BLOCK -> runPlaceBlock(eliteEntity, directTarget);
                 case RUN_COMMAND_AS_PLAYER -> runPlayerCommand(eliteEntity, directTarget);
                 case RUN_COMMAND_AS_CONSOLE -> runConsoleCommand(eliteEntity, directTarget);
-                default ->
+                default -> {
+                    if (!actionType.equals(ActionType.RUN_SCRIPT))
                         new WarningMessage("Failed to determine action type " + actionType + " in script " + scriptName);
+                }
             }
             runAdditionalScripts(eliteEntity, directTarget);
         }
@@ -235,7 +237,7 @@ public class ScriptActions {
                         eliteEntityLocation.getWorld().getNearbyEntities(eliteEntityLocation, range, range, range, (entity -> entity.getType() == EntityType.PLAYER)).stream().map(entity -> (Player) entity).collect(Collectors.toSet());
                 case DIRECT_TARGET -> Collections.singletonList(directTarget);
                 case SELF -> Collections.singletonList(eliteEntity.getLivingEntity());
-                default -> null;
+                default -> new ArrayList<>();
             };
         }
 
@@ -298,7 +300,9 @@ public class ScriptActions {
 
         private List<com.magmaguy.elitemobs.utils.shapes.Shape> getShapes(EliteEntity eliteEntity, LivingEntity directTarget) {
             List<com.magmaguy.elitemobs.utils.shapes.Shape> shapes = new ArrayList<>();
-            getTargets(eliteEntity, directTarget).forEach(instancedTarget -> shapes.add(generateShape(instancedTarget.getLocation())));
+            getTargets(eliteEntity, directTarget).forEach(instancedTarget -> {
+                if (instancedTarget != null) shapes.add(generateShape(instancedTarget.getLocation()));
+            });
             return shapes;
         }
 

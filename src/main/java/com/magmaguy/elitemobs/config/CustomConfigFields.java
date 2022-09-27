@@ -95,6 +95,22 @@ public class CustomConfigFields implements CustomConfigFieldsInterface {
         return value;
     }
 
+
+    public List<Object> processList(String path, List<Object> value, List<Object> pluginDefault, boolean forceWriteDefault) {
+        if (!configHas(path)) {
+            if (forceWriteDefault || value != pluginDefault)
+                fileConfiguration.addDefault(path, value);
+            return value;
+        }
+        try {
+            return new ArrayList<>(Objects.requireNonNull(fileConfiguration.getList(path)));
+        } catch (Exception ex) {
+            new WarningMessage("File " + filename + " has an incorrect entry for " + path);
+            new WarningMessage("Entry: " + value);
+        }
+        return value;
+    }
+
     public List<String> processStringList(String path, List<String> value, List<String> pluginDefault, boolean forceWriteDefault) {
         if (!configHas(path)) {
             if (forceWriteDefault || value != pluginDefault)

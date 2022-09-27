@@ -8,49 +8,61 @@ import com.magmaguy.elitemobs.powers.meta.CustomSummonPower;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 public class ElitePowerParser {
 
     public static HashSet<ElitePower> parsePowers(CustomBossesConfigFields customBossesConfigFields) {
+        if(customBossesConfigFields.getPowers() == null) return new HashSet<>();
         HashSet<ElitePower> elitePowers = new HashSet<>();
         CustomSummonPower customSummonPower = null;
-        List<String> powers = customBossesConfigFields.getPowers();
+        List<Object> powers = new ArrayList<>(customBossesConfigFields.getPowers());
         if (powers == null) return elitePowers;
-        for (String powerName : powers) {
-            if (powerName.split(":")[0].equalsIgnoreCase("summon")
-                    || powerName.split(":")[0].equalsIgnoreCase("summonable"))
+        for (Object powerObject : powers) {
+            if (powerObject instanceof String powerName) {
+                if (powerName.split(":")[0].equalsIgnoreCase("summon")
+                        || powerName.split(":")[0].equalsIgnoreCase("summonable"))
+                    if (customSummonPower == null) {
+                        customSummonPower = new CustomSummonPower(powerName, customBossesConfigFields);
+                        elitePowers.add(customSummonPower);
+                    } else
+                        customSummonPower.addEntry(powerName);
+                else {
+                    String[] parsedPowerName = powerName.split(":");
+                    PowersConfigFields powersConfigFields = PowersConfig.getPower(parsedPowerName[0]);
+                    if (powersConfigFields != null) {
+                        if (!powersConfigFields.getEliteScripts().isEmpty()) {
+                            elitePowers.addAll(powersConfigFields.getEliteScripts());
+                            continue;
+                        }
+                        ElitePower elitePower;
+                        try {
+                            elitePower = powersConfigFields.getElitePowerClass().newInstance();
+                            elitePowers.add(elitePower);
+                        } catch (Exception ex) {
+                            new WarningMessage("Could not process power " + powerName);
+                            continue;
+                        }
+                        if (powersConfigFields.getFilename().equals("bonus_coins.yml"))
+                            if (parsedPowerName.length > 1)
+                                try {
+                                    ((BonusCoins) elitePower).setCoinMultiplier(Double.parseDouble(parsedPowerName[1]));
+                                } catch (Exception ex) {
+                                    new WarningMessage("Multiplier " + parsedPowerName[1] + " for Bonus Coins power is not a valid multiplier!");
+                                }
+                    } else
+                        new WarningMessage("Warning: power name " + powerName + " is not registered! Skipping it for custom mob construction...");
+                }
+            } else if (powerObject instanceof Map<?, ?>) {
+                //For now the alternative format is only used by custom bosses
                 if (customSummonPower == null) {
-                    customSummonPower = new CustomSummonPower(powerName);
+                    customSummonPower = new CustomSummonPower(powerObject, customBossesConfigFields);
                     elitePowers.add(customSummonPower);
                 } else
-                    customSummonPower.addEntry(powerName);
-            else {
-                String[] parsedPowerName = powerName.split(":");
-                PowersConfigFields powersConfigFields = PowersConfig.getPower(parsedPowerName[0]);
-                if (powersConfigFields != null) {
-                    if (!powersConfigFields.getEliteScripts().isEmpty()) {
-                        elitePowers.addAll(powersConfigFields.getEliteScripts());
-                        continue;
-                    }
-                    ElitePower elitePower;
-                    try {
-                        elitePower = powersConfigFields.getElitePowerClass().newInstance();
-                        elitePowers.add(elitePower);
-                    } catch (Exception ex) {
-                        new WarningMessage("Could not process power " + powerName);
-                        continue;
-                    }
-                    if (powersConfigFields.getFilename().equals("bonus_coins.yml"))
-                        if (parsedPowerName.length > 1)
-                            try {
-                                ((BonusCoins) elitePower).setCoinMultiplier(Double.parseDouble(parsedPowerName[1]));
-                            } catch (Exception ex) {
-                                new WarningMessage("Multiplier " + parsedPowerName[1] + " for Bonus Coins power is not a valid multiplier!");
-                            }
-                } else
-                    new WarningMessage("Warning: power name " + powerName + " is not registered! Skipping it for custom mob construction...");
+                    customSummonPower.addEntry(powerObject);
             }
         }
         if (customBossesConfigFields.getEliteScript() != null)

@@ -36,10 +36,12 @@ public class FrostCone extends BossPower implements Listener {
         super(PowersConfig.getPower("frost_cone.yml"));
     }
 
-    public static void startFrostCone(EliteEntity eliteEntity, Location damager) {
+    public static void startFrostCone(EliteEntity eliteEntity, Location damager, FrostCone frostCone) {
+
         if (eliteEntity == null || eliteEntity.getLivingEntity() == null || !eliteEntity.getLivingEntity().isValid())
             return;
         eliteEntity.getLivingEntity().setAI(false);
+
         new BukkitRunnable() {
             int counter = 0;
 
@@ -52,6 +54,7 @@ public class FrostCone extends BossPower implements Listener {
                     cancel();
                     if (eliteEntity.getLivingEntity() != null && !eliteEntity.getLivingEntity().isDead())
                         eliteEntity.getLivingEntity().setAI(true);
+                    frostCone.setFiring(false);
                     return;
                 }
 
@@ -67,6 +70,8 @@ public class FrostCone extends BossPower implements Listener {
 
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
+
+
     }
 
     private static void doSmokeEffect(EliteEntity eliteEntity, Location location) {
@@ -111,12 +116,11 @@ public class FrostCone extends BossPower implements Listener {
     public void onDamagedEvent(EliteMobDamagedByPlayerEvent event) {
         FrostCone frostCone = (FrostCone) event.getEliteMobEntity().getPower(this);
         if (frostCone == null) return;
-        if (frostCone.isInGlobalCooldown()) return;
-
-        frostCone.doGlobalCooldown(20 * 10, event.getEliteMobEntity());
+        if (frostCone.isInCooldown(event.getEliteMobEntity())) return;
+        frostCone.doCooldownTicks(event.getEliteMobEntity());
 
         frostCone.setFiring(true);
-        startFrostCone(event.getEliteMobEntity(), event.getPlayer().getLocation().clone());
+        startFrostCone(event.getEliteMobEntity(), event.getPlayer().getLocation().clone(), frostCone);
     }
 
     @EventHandler(ignoreCancelled = true)
