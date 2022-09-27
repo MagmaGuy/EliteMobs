@@ -27,17 +27,23 @@ import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
+
+import static com.magmaguy.elitemobs.utils.MapListInterpreter.*;
 
 public class CustomSummonPower extends ElitePower implements Listener {
 
     private final List<CustomBossReinforcement> customBossReinforcements = new ArrayList<>();
+    private final CustomBossesConfigFields customBossesConfigFields;
 
-    public CustomSummonPower(String powerString) {
+    public CustomSummonPower(Object powerObject, CustomBossesConfigFields customBossesConfigFields) {
         super(PowersConfig.getPower("custom_summon.yml"));
+        this.customBossesConfigFields = customBossesConfigFields;
         //This allows an arbitrary amount of reinforcements to be added at any point, class initialization just prepares the stage
-        addEntry(powerString);
+        addEntry(powerObject);
     }
 
     public static BukkitTask summonGlobalReinforcement(CustomBossReinforcement customBossReinforcement, CustomBossEntity summoningEntity) {
@@ -73,7 +79,127 @@ public class CustomSummonPower extends ElitePower implements Listener {
         return customBossReinforcements;
     }
 
-    public void addEntry(String powerString) {
+    public void addEntry(Object powerEntry) {
+        String powerString = "";
+        Map<String, ?> map;
+        if (powerEntry instanceof String)
+            processOldFormats((String) powerEntry);
+        else if (powerEntry instanceof Map<?, ?>) {
+            map = (Map<String, ?>) powerEntry;
+            processNewFormat(map);
+        }
+
+
+    }
+
+    private void processNewFormat(Map<String, ?> map) {
+        SummonType summonType = null;
+        String filename = null;
+        Vector location = null;
+        Double chance = 1D;
+        boolean lightningRod = false;
+        boolean inheritAggro = false;
+        boolean inheritLevel = false;
+        String customSpawn = "";
+        int amount = 1;
+        boolean spawnNearby = false;
+        for (Map.Entry<String, ?> entry : map.entrySet()) {
+            switch (entry.getKey().toLowerCase()) {
+                //this just tags it for parsing
+                case "summonable":
+                    break;
+                case "summontype":
+                    summonType = parseEnum(entry.getKey(), entry.getValue(), SummonType.class, customBossesConfigFields.getFilename());
+                    break;
+                case "filename":
+                    filename = parseString(entry.getKey(), entry.getValue(), customBossesConfigFields.getFilename());
+                    break;
+                case "chance":
+                    chance = parseDouble(entry.getKey(), entry.getValue(), customBossesConfigFields.getFilename());
+                    break;
+                case "location":
+                    String locationString = parseString(entry.getKey(), entry.getValue(), customBossesConfigFields.getFilename());
+                    try {
+                        location = new Vector(
+                                Double.parseDouble(locationString.split(",")[0]),
+                                Double.parseDouble(locationString.split(",")[1]),
+                                Double.parseDouble(locationString.split(",")[2]));
+                    } catch (Exception ex) {
+                        new WarningMessage("Failed to get location for string " + locationString + " in " + customBossesConfigFields.getFilename());
+                    }
+                    break;
+                case "lightningrod":
+                    lightningRod = parseBoolean(entry.getKey(), entry.getValue(), customBossesConfigFields.getFilename());
+                    break;
+                case "inheritaggro":
+                    inheritAggro = parseBoolean(entry.getKey(), entry.getValue(), customBossesConfigFields.getFilename());
+                    break;
+                case "amount":
+                    amount = parseInteger(entry.getKey(), entry.getValue(), customBossesConfigFields.getFilename());
+                    break;
+                case "inheritlevel":
+                    inheritLevel = parseBoolean(entry.getKey(), entry.getValue(), customBossesConfigFields.getFilename());
+                    break;
+                case "spawnnearby":
+                    spawnNearby = parseBoolean(entry.getKey(), entry.getValue(), customBossesConfigFields.getFilename());
+                    break;
+                case "customspawn":
+                    if (CustomSpawnConfig.getCustomEvent(parseString(entry.getKey(), entry.getValue(), customBossesConfigFields.getFilename())) == null)
+                        new WarningMessage("Failed to determine Custom Spawn file for filename " + entry.getValue());
+                    else {
+                        customSpawn = parseString(entry.getKey(), entry.getValue(), customBossesConfigFields.getFilename());
+                    }
+                    break;
+                default:
+                    new WarningMessage("Invalid boss reinforcement!");
+                    new WarningMessage("Problematic entry: " + (String) entry.getValue());
+            }
+        }
+
+        if (summonType == null) {
+            new WarningMessage("No summon type detected in " + customBossesConfigFields.getFilename() + " ! This reinforcement will not work.");
+            return;
+        }
+
+        CustomBossReinforcement customBossReinforcement;
+        switch (summonType) {
+            case ONCE:
+                customBossReinforcement = doOnce(filename);
+                break;
+            case ON_HIT:
+                customBossReinforcement = doOnHit(filename, chance);
+                break;
+            case ON_DEATH:
+                customBossReinforcement = doOnDeath(filename);
+                break;
+            case ON_COMBAT_ENTER:
+                customBossReinforcement = doOnCombatEnter(filename);
+                break;
+            case ON_COMBAT_ENTER_PLACE_CRYSTAL:
+                customBossReinforcement = doOnCombatEnterPlaceCrystal(location, lightningRod);
+                break;
+            case GLOBAL:
+                customBossReinforcement = doGlobalSummonReinforcement(filename);
+                break;
+            default:
+                customBossReinforcement = null;
+                new WarningMessage("Failed to determine summon type for reinforcement in " + customBossesConfigFields.getFilename() + " ! Contact the developer with this error!");
+        }
+
+        if (customBossReinforcement == null)
+            return;
+
+        customBossReinforcement.inheritAggro = inheritAggro;
+        customBossReinforcement.amount = amount;
+        customBossReinforcement.inheritLevel = inheritLevel;
+        customBossReinforcement.spawnNearby = spawnNearby;
+        customBossReinforcement.customSpawn = customSpawn;
+        customBossReinforcement.summonChance = chance;
+        customBossReinforcement.setSpawnLocationOffset(location);
+    }
+
+    private void processOldFormats(String powerString) {
+        Map<String, Object> newMap = new HashMap<>();
         /*
         valid formats:
         summonable:
@@ -94,14 +220,21 @@ public class CustomSummonPower extends ElitePower implements Listener {
 
         //this is now considered to be legacy
         if (powerString.split(":")[0].equalsIgnoreCase("summon")) {
-            if (powerString.split(":")[1].equalsIgnoreCase("once"))
+            if (powerString.split(":")[1].equalsIgnoreCase("once")) {
+                newMap.put("summonType", "ONCE");
                 parseOnce(powerString);
-            else if (powerString.split(":")[1].equalsIgnoreCase("onHit"))
+            } else if (powerString.split(":")[1].equalsIgnoreCase("onHit")) {
+                newMap.put("summonType", "ON_HIT");
                 parseOnHit(powerString);
-            else if (powerString.split(":")[1].equalsIgnoreCase("onCombatEnter"))
+            } else if (powerString.split(":")[1].equalsIgnoreCase("onCombatEnter")) {
+                newMap.put("summonType", "ON_COMBAT_ENTER");
                 parseOnCombatEnter(powerString);
-            else if (powerString.split(":")[1].equalsIgnoreCase("onCombatEnterPlaceCrystal"))
+            } else if (powerString.split(":")[1].equalsIgnoreCase("onCombatEnterPlaceCrystal")) {
+                newMap.put("summonType", "ON_COMBAT_ENTER_PLACE_CRYSTAL");
                 parseOnCombatEnterPlaceCrystal(powerString);
+            }
+            replaceOldFormat(powerString, newMap);
+            return;
         }
 
         //this is the new recommended format for reinforcements
@@ -116,6 +249,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
             String customSpawn = "";
             int amount = 1;
             boolean spawnNearby = false;
+
             for (String substring : powerString.split(":")) {
                 switch (substring.split("=")[0].toLowerCase()) {
                     //this just tags it for parsing
@@ -124,6 +258,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
                     case "summontype":
                         try {
                             summonType = SummonType.valueOf(getSubstringField(substring));
+                            newMap.put("summonType", summonType.toString());
                         } catch (Exception ex) {
                             new WarningMessage("Failed to determine summon type from " + getSubstringField(substring));
                         }
@@ -131,6 +266,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
                     case "filename":
                         try {
                             filename = getSubstringField(substring);
+                            newMap.put("filename", filename);
                         } catch (Exception ex) {
                             new WarningMessage("Failed to determine filename from " + getSubstringField(substring));
                         }
@@ -138,6 +274,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
                     case "chance":
                         try {
                             chance = Double.parseDouble(getSubstringField(substring));
+                            newMap.put("chance", chance);
                         } catch (Exception ex) {
                             new WarningMessage("Failed to determine chance from " + getSubstringField(substring));
                         }
@@ -145,6 +282,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
                     case "location":
                         try {
                             String locationString = getSubstringField(substring);
+                            newMap.put("location", locationString);
                             location = new Vector(
                                     Double.parseDouble(locationString.split(",")[0]),
                                     Double.parseDouble(locationString.split(",")[1]),
@@ -156,6 +294,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
                     case "lightningrod":
                         try {
                             lightningRod = Boolean.parseBoolean(getSubstringField(substring));
+                            newMap.put("lightningRod", lightningRod);
                         } catch (Exception ex) {
                             new WarningMessage("Failed to determine lightningRod from " + getSubstringField(substring));
                         }
@@ -163,6 +302,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
                     case "inheritaggro":
                         try {
                             inheritAggro = Boolean.parseBoolean(getSubstringField(substring));
+                            newMap.put("inheritAggro", inheritAggro);
                         } catch (Exception ex) {
                             new WarningMessage("Failed to determine inheritAggro from " + getSubstringField(substring));
                         }
@@ -170,6 +310,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
                     case "amount":
                         try {
                             amount = Integer.parseInt(getSubstringField(substring));
+                            newMap.put("amount", amount);
                         } catch (Exception ex) {
                             new WarningMessage("Failed to determine inheritAggro from " + getSubstringField(substring));
                         }
@@ -177,6 +318,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
                     case "inheritlevel":
                         try {
                             inheritLevel = Boolean.parseBoolean(getSubstringField(substring));
+                            newMap.put("inheritLevel", inheritLevel);
                         } catch (Exception ex) {
                             new WarningMessage("Failed to determine inheritLevel from " + getSubstringField(substring));
                         }
@@ -184,6 +326,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
                     case "spawnnearby":
                         try {
                             spawnNearby = Boolean.parseBoolean(getSubstringField(substring));
+                            newMap.put("spawnNearby", spawnNearby);
                         } catch (Exception ex) {
                             new WarningMessage("Failed to determine spawnNearby from " + getSubstringField(substring));
                         }
@@ -191,14 +334,18 @@ public class CustomSummonPower extends ElitePower implements Listener {
                     case "customspawn":
                         if (CustomSpawnConfig.getCustomEvent(getSubstringField(substring)) == null)
                             new WarningMessage("Failed to determine Custom Spawn file for filename " + substring);
-                        else
+                        else {
                             customSpawn = getSubstringField(substring);
+                            newMap.put("customSpawn", customSpawn);
+                        }
                         break;
                     default:
                         new WarningMessage("Invalid boss reinforcement string for line " + powerString + " !");
                         new WarningMessage("Problematic entry: " + substring);
                 }
             }
+
+            replaceOldFormat(powerString, newMap);
 
             if (summonType == null) {
                 new WarningMessage("No summon type detected in " + powerString + " ! This reinforcement will not work.");
@@ -242,6 +389,13 @@ public class CustomSummonPower extends ElitePower implements Listener {
             customBossReinforcement.setSpawnLocationOffset(location);
 
         }
+    }
+
+    private void replaceOldFormat(String entry, Map<String, Object> replacement) {
+        customBossesConfigFields.getPowers().remove(entry);
+        customBossesConfigFields.getPowers().add(replacement);
+        customBossesConfigFields.getFileConfiguration().set("powers", customBossesConfigFields.getPowers());
+        customBossesConfigFields.saveFile();
     }
 
     private String getSubstringField(String string) {
@@ -406,8 +560,9 @@ public class CustomSummonPower extends ElitePower implements Listener {
             return;
         for (int i = 0; i < customBossReinforcement.amount; i++) {
             Location spawnLocation = eliteEntity.getLocation();
-            if (customBossReinforcement.spawnLocationOffset != null)
+            if (customBossReinforcement.spawnLocationOffset != null) {
                 spawnLocation = getFinalSpawnLocation(eliteEntity, customBossReinforcement.spawnLocationOffset);
+            }
             if (customBossReinforcement.spawnNearby)
                 for (int loc = 0; loc < 30; loc++) {
                     Location randomLocation = spawnLocation.clone().add(new Vector(
@@ -490,7 +645,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
         public void onHit(EliteMobDamagedByPlayerEvent event) {
             CustomSummonPower customSummonPower = (CustomSummonPower) event.getEliteMobEntity().getPower("custom_summon.yml");
             if (customSummonPower == null) return;
-            if (!eventIsValid(event, customSummonPower)) return;
+            if (!eventIsValid(event, customSummonPower, true)) return;
             if (event.getDamage() < 3) return;
             customSummonPower.onHitSummonReinforcement(event.getEliteMobEntity());
         }

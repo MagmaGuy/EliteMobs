@@ -8,6 +8,8 @@ public class FrostConeConfig extends PowersConfigFields {
         super("frost_cone",
                 true,
                 null,
+                15*20,
+                7*20,
                 FrostCone.class,
                 PowerType.UNIQUE
         );

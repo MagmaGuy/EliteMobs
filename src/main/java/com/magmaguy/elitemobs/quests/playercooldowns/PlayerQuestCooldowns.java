@@ -13,6 +13,7 @@ import java.util.*;
 
 public class PlayerQuestCooldowns implements Serializable {
 
+    @Getter
     private static final HashSet<Player> bypassedPlayers = new HashSet<>();
     @Getter
     private final List<QuestCooldown> questCooldowns = new ArrayList<>();

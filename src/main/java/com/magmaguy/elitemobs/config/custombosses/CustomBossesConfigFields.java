@@ -65,7 +65,7 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     private List<String> uniqueLootList = null;
     @Getter
     @Setter
-    private List<String> powers = null;
+    private List<Object> powers = null;
     @Getter
     @Setter
     private List<String> onDamageMessages = null;
@@ -200,7 +200,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     @Setter
     private String song = null;
 
-
     /**
      * Creates a new default pre-made Custom Boss. The boss is further customized through a builder pattern.
      */
@@ -300,7 +299,7 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         this.customLootTable = new CustomLootTable(this);
 
         //this can't be converted directly to an enum list because there are some special string features in here
-        this.powers = processStringList("powers", powers, new ArrayList<>(), false);
+        this.powers = processList("powers", powers, null, false);
         this.onDamageMessages = translatable(filename, "onDamageMessages", processStringList("onDamageMessages", onDamageMessages, new ArrayList<>(), false));
         this.onDamagedMessages = translatable(filename, "onDamagedMessages", processStringList("onDamagedMessages", onDamagedMessages, new ArrayList<>(), false));
         this.trails = processStringList("trails", trails, new ArrayList<>(), false);
@@ -423,6 +422,14 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
                 "&e&l    3rd Damager: $damager3name &ewith $damager3damage damage!",
                 "&aSlayers: $players",
                 "&e&l---------------------------------------------");
+    }
+
+    public void saveFile() {
+        try {
+            fileConfiguration.save(file);
+        } catch (Exception ex) {
+            new WarningMessage("Failed to save boss file " + filename + "!");
+        }
     }
 
 }

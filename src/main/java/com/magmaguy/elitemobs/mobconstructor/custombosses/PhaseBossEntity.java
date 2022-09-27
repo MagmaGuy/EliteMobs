@@ -62,7 +62,8 @@ public class PhaseBossEntity {
         }
         customBossEntity.setCustomBossesConfigFields(bossPhase.customBossesConfigFields);
         if (removalReason.equals(RemovalReason.PHASE_BOSS_RESET)) {
-            customBossEntity.setBossMusic(new BossMusic(bossPhase.customBossesConfigFields.getSong()));
+            if (bossPhase.customBossesConfigFields.getSong() != null)
+                customBossEntity.setBossMusic(new BossMusic(bossPhase.customBossesConfigFields.getSong()));
             customBossEntity.spawn(true);
         } else {
             if (bossPhase.customBossesConfigFields.getPhaseSpawnLocation() != null) {
