@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.config.powers.premade;
 
-import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
 import org.bukkit.Material;
 
@@ -8,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 public class AttackFreezeConfig extends PowersConfigFields {
-    public static String freezeMessage;
 
     public AttackFreezeConfig() {
         super("attack_freeze",
@@ -37,10 +35,5 @@ public class AttackFreezeConfig extends PowersConfigFields {
                         Map.of("local", 300,
                                 "global", 60)),
                 PowerType.OFFENSIVE);
-    }
-
-    @Override
-    public void processAdditionalFields() {
-        freezeMessage = ConfigurationEngine.setString(file, fileConfiguration, "freezeMessage", "&8[EM] &9You've been frozen!", true);
     }
 }

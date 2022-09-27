@@ -112,6 +112,15 @@ public class ElitePower {
         });
     }
 
+    protected static boolean eventIsValid(EliteMobDamagedByPlayerEvent event, ElitePower elitePower, boolean ignoreGlobalCooldown) {
+        if (event.isCancelled()) return false;
+        if (event.getEliteMobEntity().getLivingEntity() == null) return false;
+        if (!event.getEliteMobEntity().getLivingEntity().hasAI()) return false;
+        if (!ignoreGlobalCooldown)
+            if (elitePower.isInGlobalCooldown()) return false;
+        return !event.getEliteMobEntity().isInCooldown();
+    }
+
     protected static boolean eventIsValid(EliteMobDamagedByPlayerEvent event, ElitePower elitePower) {
         if (event.isCancelled()) return false;
         if (event.getEliteMobEntity().getLivingEntity() == null) return false;

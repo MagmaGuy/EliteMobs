@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.TranslationConfig;
 import com.magmaguy.elitemobs.config.WormholesConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
+import com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldowns;
 import com.magmaguy.elitemobs.utils.ChunkLocationChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -62,7 +63,8 @@ public class WormholeTask {
     private static boolean checkPoint(WormholeEntry wormholeEntry, Location playerLocation, Player player, HashSet<Player> teleportingPlayers) {
         if (wormholeEntry.getLocation() == null) return false;
         if (Wormhole.getPlayerCooldowns().contains(player)) return false;
-        if (wormholeEntry.getWormhole().getWormholeConfigFields().getPermission() != null &&
+        if (!PlayerQuestCooldowns.getBypassedPlayers().contains(player) &&
+                wormholeEntry.getWormhole().getWormholeConfigFields().getPermission() != null &&
                 !wormholeEntry.getWormhole().getWormholeConfigFields().getPermission().isEmpty() &&
                 !player.hasPermission(wormholeEntry.getWormhole().getWormholeConfigFields().getPermission()))
             return false;

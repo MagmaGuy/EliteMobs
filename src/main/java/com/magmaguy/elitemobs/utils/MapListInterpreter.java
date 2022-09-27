@@ -46,11 +46,17 @@ public class MapListInterpreter {
 
     public static Double parseDouble(String key, Object value, String scriptName) {
         try {
-            return (Double) value;
+            if (value instanceof Integer integer)
+                return integer + 0D;
+            else if (value instanceof Double dbl)
+                return dbl;
+            else if (value instanceof String string)
+                return Double.parseDouble(string);
         } catch (Exception ex) {
             parsingErrorMessage(key, value, scriptName);
             return null;
         }
+        return null;
     }
 
     public static <T extends Enum<T>> T parseEnum(String key, Object value, Class<T> enumClass, String scriptName) {
