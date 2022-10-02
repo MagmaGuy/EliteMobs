@@ -103,7 +103,6 @@ public class PlayerItem {
 
     private boolean fillNullItem() {
         itemStack = null;
-        itemTier = 0;
         continuousPotionEffects = new ArrayList<>();
         onHitPotionEffects = new ArrayList<>();
         damageArthropodsLevel = 0;
@@ -113,6 +112,12 @@ public class PlayerItem {
         critChance = 0;
         hunterChance = 0;
         lightningChance = 0;
+        earthquakeLevel = 0;
+        eliteDamageReduction = 0;
+        protectionProjectile = 0;
+        eliteDamage = 0;
+        blastProtection = 0;
+        loudStrikesBonus = 0;
         return true;
     }
 

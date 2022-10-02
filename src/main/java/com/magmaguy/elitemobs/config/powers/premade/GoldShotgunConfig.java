@@ -8,6 +8,8 @@ public class GoldShotgunConfig extends PowersConfigFields {
         super("gold_shotgun",
                 true,
                 null,
+                20*20,
+                20*7,
                 GoldShotgun.class,
                 PowerType.UNIQUE);
     }

@@ -2,54 +2,42 @@ package com.magmaguy.elitemobs.powers.scripts;
 
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
-import com.magmaguy.elitemobs.utils.WarningMessage;
-import org.bukkit.configuration.ConfigurationSection;
+import com.magmaguy.elitemobs.powers.scripts.caching.EliteScriptBlueprint;
+import lombok.Getter;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
-public class EliteScript extends ElitePower {
+public class EliteScript extends ElitePower implements Cloneable {
     protected final ScriptActions scriptActions;
-    private final String scriptName;
     //Parse from power file
     private final ScriptEvents scriptEvents;
+    @Getter
+    private final ScriptZone scriptZone;
     private final ScriptCooldowns scriptCooldowns;
-    protected Map<String, EliteScript> eliteScriptMap = new HashMap<>();
-    private ScriptConditions scriptConditions = null;
+    protected Map<String, EliteScript> eliteScriptMap;
+    private ScriptConditions scriptConditions;
 
-    public EliteScript(ConfigurationSection configuration, String scriptName, Map<String, EliteScript> eliteScriptMap) {
-        super(scriptName);
-        this.scriptName = scriptName;
+    public EliteScript(EliteScriptBlueprint scriptBlueprint, Map<String, EliteScript> eliteScriptMap) {
+        super(scriptBlueprint.getCustomConfigFields());
         this.eliteScriptMap = eliteScriptMap;
-        scriptEvents = new ScriptEvents(configuration.getStringList("Events"), scriptName);
-        Map<String, Object> conditionsSection = (Map<String, Object>) configuration.get("Conditions");
-        if (conditionsSection != null)
-            scriptConditions = new ScriptConditions(configuration.getValues(false), scriptName);
-        scriptActions = new ScriptActions(configuration.getMapList("Actions"), scriptName, this);
-        if (configuration.getConfigurationSection("Cooldowns") != null)
-            scriptCooldowns = new ScriptCooldowns(configuration.getConfigurationSection("Cooldowns").getValues(false), scriptName, this);
-        else scriptCooldowns = null;
-        if (!scriptEvents.isValid()) {
-            new WarningMessage("Script does not have valid Events for entry " + scriptName + "!");
-            return;
-        }
-        if (!scriptActions.isValid()) {
-            new WarningMessage("Script does not have valid Actions for entry " + scriptName + "!");
-        }
+        this.scriptEvents = new ScriptEvents(scriptBlueprint.getScriptEventsBlueprint());
+        this.scriptConditions = new ScriptConditions(scriptBlueprint.getScriptConditionsBlueprint());
+        this.scriptZone = new ScriptZone(scriptBlueprint.getScriptZoneBlueprint(), this);
+        this.scriptActions = new ScriptActions(scriptBlueprint.getScriptActionsBlueprint(), eliteScriptMap, this);
+        this.scriptCooldowns = new ScriptCooldowns(scriptBlueprint.getScriptCooldownsBlueprint(), this);
+        eliteScriptMap.put(scriptBlueprint.getScriptName(), this);
     }
 
     //Parse from boss config
-    public static List<EliteScript> parseBossScripts(ConfigurationSection configurationSection) {
-        if (configurationSection == null) return Collections.emptyList();
-        List<EliteScript> eliteScripts = new ArrayList<>();
-        Map<String, EliteScript> permanentMap = new HashMap<>();
-        for (Map.Entry<String, Object> entry : configurationSection.getValues(false).entrySet()) {
-            EliteScript eliteScript = new EliteScript(configurationSection.getConfigurationSection(entry.getKey()), entry.getKey(), permanentMap);
-            eliteScripts.add(eliteScript);
-            permanentMap.put(entry.getKey(), eliteScript);
-        }
-        return eliteScripts;
+    public static List<EliteScript> generateBossScripts(List<EliteScriptBlueprint> blueprints) {
+        //The map is declared here because it needs to be shared inside of all scripts in the same file so they can be referenced.
+        HashMap<String, EliteScript> powerMap = new HashMap();
+        return blueprints.stream().map(eliteScriptBlueprint -> new EliteScript(eliteScriptBlueprint, powerMap)).collect(Collectors.toList());
     }
 
     /**
@@ -61,7 +49,10 @@ public class EliteScript extends ElitePower {
      */
     public void check(Class eventClass, EliteEntity eliteEntity, Player player) {
         //If the script uses the cooldown system then it should respect if the boss is in a global or local cooldown state
-        if (scriptCooldowns != null && super.isInCooldown(eliteEntity)) return;
+        //If the script does not define a local or global cooldown then it is considered to ignore cooldowns. This is an
+        //important bypass for a lot of behavior like teleporting at specific triggers regardless of state
+        if (getPowerCooldownTime() > 0 && getGlobalCooldownTime() > 0 &&
+                scriptCooldowns != null && super.isInCooldown(eliteEntity)) return;
         //Check if the event is relevant to the script
         if (!scriptEvents.isTargetEvent(eventClass)) return;
         //Check if the event conditions are met
@@ -79,8 +70,6 @@ public class EliteScript extends ElitePower {
      * @param directTarget
      */
     public void check(EliteEntity eliteEntity, LivingEntity directTarget) {
-        //If the script uses the cooldown system then it should respect if the boss is in a global or local cooldown state
-        if (scriptCooldowns != null && super.isInCooldown(eliteEntity)) return;
         //Check if the event conditions are met
         if (scriptConditions != null && !scriptConditions.meetsConditions(eliteEntity, directTarget)) return;
         //Let's do some actions

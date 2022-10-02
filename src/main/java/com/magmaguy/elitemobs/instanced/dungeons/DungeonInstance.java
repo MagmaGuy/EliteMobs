@@ -3,15 +3,19 @@ package com.magmaguy.elitemobs.instanced.dungeons;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.DungeonCompleteEvent;
 import com.magmaguy.elitemobs.api.DungeonStartEvent;
+import com.magmaguy.elitemobs.api.InstancedDungeonRemoveEvent;
 import com.magmaguy.elitemobs.api.WorldInstanceEvent;
+import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfig;
 import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
 import com.magmaguy.elitemobs.dungeons.utility.DungeonUtils;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.InstancedBossEntity;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.EventCaller;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import com.magmaguy.elitemobs.utils.WorldInstantiator;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -21,16 +25,16 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class DungeonInstance extends MatchInstance {
     @Getter
     private static final Set<DungeonInstance> dungeonInstances = new HashSet<>();
     private final List<DungeonObjective> dungeonObjectives = new ArrayList<>();
+    @Getter
     private final World world;
+    @Getter
+    private String instancedWorldName;
     private final File instancedWorldFile;
     @Getter
     private final DungeonPackagerConfigFields dungeonPackagerConfigFields;
@@ -51,6 +55,7 @@ public class DungeonInstance extends MatchInstance {
         for (String rawObjective : dungeonPackagerConfigFields.getRawDungeonObjectives())
             this.dungeonObjectives.add(DungeonObjective.registerObjective(this, rawObjective));
         this.world = world;
+        this.instancedWorldName = world.getName();
         this.instancedWorldFile = instancedWorldFile;
         addNewPlayer(player);
         instancedBossEntities = InstancedBossEntity.initializeInstancedBosses(dungeonPackagerConfigFields.getWorldName(), world, players.size());
@@ -140,28 +145,48 @@ public class DungeonInstance extends MatchInstance {
     @Override
     public void endMatch() {
         super.endMatch();
-        announce("[EliteMobs] Completed! Arena will self-destruct in 5 minutes!");
+        if (players.isEmpty()) {
+            removeInstance();
+            return;
+        }
+        announce("[EliteMobs] Completed! Arena will self-destruct in 2 minutes!");
         announce("MagmaGuy's note: This is still a work in progress, please be patient! Hope you enjoyed your run.");
-        DungeonInstance dungeonInstance = this;
         new BukkitRunnable() {
-            final DungeonInstance laterInstance = dungeonInstance;
 
             @Override
             public void run() {
-                HashSet<Player> participants = new HashSet<>(laterInstance.participants);
-                participants.forEach(laterInstance::removeAnyKind);
-                instances.remove(laterInstance);
-                Bukkit.unloadWorld(world, false);
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        WorldInstantiator.recursivelyDelete(instancedWorldFile);
-                    }
-                }.runTaskAsynchronously(MetadataHandler.PLUGIN);
-                dungeonInstances.remove(laterInstance);
+                removeInstance();
             }
-        }.runTaskLater(MetadataHandler.PLUGIN, 5 * 60 * 20L);
+        }.runTaskLater(MetadataHandler.PLUGIN, 2 * 60 * 20L);
+    }
 
+    public void removeInstance() {
+        participants.forEach(player -> player.sendMessage("[EliteMobs] Closing instance!"));
+        HashSet<Player> participants = new HashSet<>(this.participants);
+        participants.forEach(this::removeAnyKind);
+        instances.remove(this);
+        DungeonInstance dungeonInstance = this;
+        Bukkit.getWorld(instancedWorldName).getEntities().forEach(entity->EntityTracker.unregister(entity, RemovalReason.WORLD_UNLOAD));
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                //The world might get removed before this timer
+                if (Bukkit.getWorld(instancedWorldName) != null) {
+                    Arrays.stream(world.getLoadedChunks()).forEach(chunk -> chunk.unload(false));
+                    if (!Bukkit.unloadWorld(instancedWorldName, false)) {
+                        new WarningMessage("Failed to unload world " + instancedWorldName + " ! This is bad, report htis to the developer!");
+                    }
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            WorldInstantiator.recursivelyDelete(instancedWorldFile);
+                        }
+                    }.runTaskAsynchronously(MetadataHandler.PLUGIN);
+                }
+                new EventCaller(new InstancedDungeonRemoveEvent(dungeonInstance));
+                dungeonInstances.remove(dungeonInstance);
+            }
+        }.runTaskLater(MetadataHandler.PLUGIN, 120);
 
     }
 

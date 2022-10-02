@@ -63,7 +63,7 @@ public class PhaseBossEntity {
         customBossEntity.setCustomBossesConfigFields(bossPhase.customBossesConfigFields);
         if (removalReason.equals(RemovalReason.PHASE_BOSS_RESET)) {
             if (bossPhase.customBossesConfigFields.getSong() != null)
-                customBossEntity.setBossMusic(new BossMusic(bossPhase.customBossesConfigFields.getSong()));
+                customBossEntity.setBossMusic(new BossMusic(bossPhase.customBossesConfigFields.getSong(), customBossEntity));
             customBossEntity.spawn(true);
         } else {
             if (bossPhase.customBossesConfigFields.getPhaseSpawnLocation() != null) {
@@ -86,10 +86,9 @@ public class PhaseBossEntity {
                     && currentPhase.customBossesConfigFields.getSong() != null) {
                 if (!bossPhase.customBossesConfigFields.getSong().equals(currentPhase.customBossesConfigFields.getSong())) {
                     if (customBossEntity.getBossMusic() != null) customBossEntity.getBossMusic().stop();
-                    customBossEntity.setBossMusic(new BossMusic(bossPhase.customBossesConfigFields.getSong()));
+                    customBossEntity.setBossMusic(new BossMusic(bossPhase.customBossesConfigFields.getSong(), customBossEntity));
                 }
             }
-
             //spawn the boss
             customBossEntity.spawn(true);
         }
@@ -118,19 +117,21 @@ public class PhaseBossEntity {
         return bossPhases.get(0).customBossesConfigFields;
     }
 
-    public void checkPhaseBossSwitch() {
+    public void checkPhaseBossSwitch(EliteMobDamagedEvent event) {
         if (bossPhases.indexOf(currentPhase) + 1 >= bossPhases.size()) return;
         BossPhase nextBossPhase = bossPhases.get(bossPhases.indexOf(currentPhase) + 1);
-        if (customBossEntity.getHealth() / customBossEntity.getMaxHealth() > nextBossPhase.healthPercentage) return;
-        switchPhase(nextBossPhase, RemovalReason.PHASE_BOSS_PHASE_END, customBossEntity.getHealth() / customBossEntity.getMaxHealth());
+        double newHealth = Math.max((customBossEntity.getHealth() - event.getDamage()) / customBossEntity.getMaxHealth(), 0);
+        if (newHealth > nextBossPhase.healthPercentage) return;
+        event.setCancelled(true);
+        switchPhase(nextBossPhase, RemovalReason.PHASE_BOSS_PHASE_END, nextBossPhase.healthPercentage);
     }
 
     public static class PhaseBossEntityListener implements Listener {
         @EventHandler(ignoreCancelled = true)
         public void onEliteDamaged(EliteMobDamagedEvent event) {
-            if (!(event.getEliteMobEntity() instanceof CustomBossEntity)) return;
-            if (((CustomBossEntity) event.getEliteMobEntity()).getPhaseBossEntity() == null) return;
-            ((CustomBossEntity) event.getEliteMobEntity()).getPhaseBossEntity().checkPhaseBossSwitch();
+            if (!(event.getEliteEntity() instanceof CustomBossEntity)) return;
+            if (((CustomBossEntity) event.getEliteEntity()).getPhaseBossEntity() == null) return;
+            ((CustomBossEntity) event.getEliteEntity()).getPhaseBossEntity().checkPhaseBossSwitch(event);
         }
 
         @EventHandler(priority = EventPriority.MONITOR)

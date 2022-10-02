@@ -308,7 +308,8 @@ public class EliteEntity {
             this.health = maxHealth;
         }
         //This is useful for phase boss entities that spawn in unloaded chunks and shouldn't full heal between phases, like in dungeons
-        else livingEntity.setHealth(Math.min(health, livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()));
+        else
+            livingEntity.setHealth(Math.min(health, livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()));
     }
 
     public void setNormalizedMaxHealth() {
@@ -644,6 +645,7 @@ public class EliteEntity {
 
     public void removeReinforcement(CustomBossEntity customBossEntity) {
         eliteReinforcementEntities.remove(customBossEntity);
+        globalReinforcementEntities.remove(customBossEntity);
     }
 
     public int getGlobalReinforcementsCount() {

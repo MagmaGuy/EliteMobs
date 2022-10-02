@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.powers;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
+import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
 import com.magmaguy.elitemobs.explosionregen.Explosion;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.meta.BossPower;
@@ -114,7 +115,7 @@ public class FireworksBarrage extends BossPower {
                             for (int y = -1; y < 2; y++)
                                 for (int z = -1; z < 2; z++)
                                     blockList.add(firework.getLocation().clone().add(new Vector(x, y, z)).getBlock());
-                        Explosion.generateFakeExplosion(blockList, eliteEntity.getLivingEntity(), getPowersConfigFields(), firework.getLocation());
+                        Explosion.generateFakeExplosion(blockList, eliteEntity.getLivingEntity(), (PowersConfigFields) getPowersConfigFields(), firework.getLocation());
                     }
                 }
             }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);

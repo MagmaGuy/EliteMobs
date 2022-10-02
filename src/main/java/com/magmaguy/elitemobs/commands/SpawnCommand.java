@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
@@ -161,7 +162,7 @@ public class SpawnCommand {
                 if (powersConfigFields == null) {
                     commandSender.sendMessage("[EliteMobs] Power " + string + " is not a valid power! Valid powers:");
                     StringBuilder allPowers = new StringBuilder();
-                    for (PowersConfigFields iteratedField : ElitePower.getElitePowers().values())
+                    for (CustomConfigFields iteratedField : ElitePower.getElitePowers().values())
                         allPowers.append(iteratedField.getFilename()).append(", ");
                     allPowers.append("custom");
                     commandSender.sendMessage(allPowers.toString());

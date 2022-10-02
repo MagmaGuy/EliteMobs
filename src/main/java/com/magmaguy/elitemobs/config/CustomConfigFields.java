@@ -332,11 +332,19 @@ public class CustomConfigFields implements CustomConfigFieldsInterface {
         return value;
     }
 
+    public Map<String, Object> processMap(String path, Map<String, Object> value) {
+        if (!configHas(path) && value != null)
+            fileConfiguration.addDefaults(value);
+        if (fileConfiguration.get(path) == null) return Collections.emptyMap();
+        return fileConfiguration.getConfigurationSection(path).getValues(false);
+    }
+
     public ConfigurationSection processConfigurationSection(String path, Map<String, Object> value) {
-        if (value == null) return null;
-        if (!configHas(path))
+        if (!configHas(path) && value != null)
             fileConfiguration.addDefaults(value);
         ConfigurationSection newValue = fileConfiguration.getConfigurationSection(path);
+        if (newValue == null) return null;
+
         for (String key : newValue.getKeys(true))
             if (key.equalsIgnoreCase("message"))
                 newValue.set(key, translatable(filename, key, (String) newValue.get(key)));
