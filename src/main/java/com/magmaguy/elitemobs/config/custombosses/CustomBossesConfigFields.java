@@ -6,7 +6,7 @@ import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.config.CustomConfigFieldsInterface;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.items.customloottable.CustomLootTable;
-import com.magmaguy.elitemobs.powers.scripts.EliteScript;
+import com.magmaguy.elitemobs.powers.scripts.caching.EliteScriptBlueprint;
 import com.magmaguy.elitemobs.thirdparty.modelengine.CustomModel;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
@@ -195,7 +195,7 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     @Setter
     private ConfigurationSection rawEliteScripts = null;
     @Getter
-    private List<EliteScript> eliteScript = null;
+    private List<EliteScriptBlueprint> eliteScript = new ArrayList<>();
     @Getter
     @Setter
     private String song = null;
@@ -340,7 +340,7 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         this.movementSpeedAttribute = processDouble("movementSpeedAttribute", movementSpeedAttribute, null, false);
 
         rawEliteScripts = fileConfiguration.getConfigurationSection("eliteScript");
-        if (rawEliteScripts != null) eliteScript = EliteScript.parseBossScripts(rawEliteScripts);
+        if (rawEliteScripts != null) eliteScript = EliteScriptBlueprint.parseBossScripts(rawEliteScripts, this);
 
         this.song = processString("song", song, null, false);
     }

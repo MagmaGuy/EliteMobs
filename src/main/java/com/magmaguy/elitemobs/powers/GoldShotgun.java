@@ -32,9 +32,8 @@ public class GoldShotgun extends BossPower implements Listener {
         GoldShotgun goldShotgun = (GoldShotgun) event.getEliteMobEntity().getPower(this);
         if (goldShotgun == null) return;
         if (!eventIsValid(event, goldShotgun)) return;
-        if (ThreadLocalRandom.current().nextDouble() > 0.25) return;
 
-        goldShotgun.doGlobalCooldown(20 * 20, event.getEliteMobEntity());
+        goldShotgun.doCooldownTicks(event.getEliteMobEntity());
         goldShotgun.doGoldShotgun(event.getEliteMobEntity(), event.getPlayer());
 
     }
@@ -105,7 +104,8 @@ public class GoldShotgun extends BossPower implements Listener {
     }
 
     private Vector getShotVector(EliteEntity eliteEntity, Player player) {
-        if (!player.getLocation().getWorld().equals(eliteEntity.getLivingEntity().getLocation())) return null;
+        if (!player.getLocation().getWorld().equals(eliteEntity.getLivingEntity().getLocation().getWorld()))
+            return null;
         return player.getLocation().clone()
                 .add(new Location(player.getWorld(), 0.0, 1.0, 0.0))
                 .add(new Location(player.getWorld(),

@@ -1,44 +1,29 @@
 package com.magmaguy.elitemobs.powers.scripts;
 
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
-import com.magmaguy.elitemobs.utils.MapListInterpreter;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.elitemobs.powers.scripts.caching.ScriptConditionsBlueprint;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.Map;
+import java.util.Collection;
 
 public class ScriptConditions {
-    private final String scriptName;
-    private Boolean bossIsAlive = null;
-    private Boolean locationIsAir = null;
-    public ScriptConditions(Map<?, ?> values, String scriptName) {
-        this.scriptName = scriptName;
-        processMapList(values);
+
+    private ScriptConditionsBlueprint conditionsBlueprint;
+
+    public ScriptConditions(ScriptConditionsBlueprint scriptConditionsBlueprint) {
+        this.conditionsBlueprint = scriptConditionsBlueprint;
     }
 
-    private void processMapList(Map<?, ?> entry) {
-        for (Map.Entry entrySet : entry.entrySet()) {
-            String key = (String) entrySet.getKey();
-            processKeyAndValue(key, entrySet.getValue());
-        }
-    }
-
-    private void processKeyAndValue(String key, Object value) {
-        switch (key.toLowerCase()) {
-            case "bossisalive" -> bossIsAlive = MapListInterpreter.parseBoolean(key, value, scriptName);
-            case "locationisair" -> locationIsAir = MapListInterpreter.parseBoolean(key, value, scriptName);
-            default -> new WarningMessage("Failed to read key " + key + " for script " + scriptName);
-        }
-    }
 
     private boolean bossIsAliveCheck(EliteEntity eliteEntity) {
-        if (bossIsAlive == null) return true;
-        return eliteEntity.exists() == bossIsAlive;
+        if (conditionsBlueprint.getBossIsAlive() == null) return true;
+        return eliteEntity.exists() == conditionsBlueprint.getBossIsAlive();
     }
 
     private boolean isAirCheck(EliteEntity eliteEntity, Location targetLocation) {
-        if (locationIsAir == null) return true;
+        if (conditionsBlueprint.getLocationIsAir() == null) return true;
         return targetLocation.getBlock().getType().isAir();
     }
 
@@ -49,6 +34,22 @@ public class ScriptConditions {
     public boolean meetsConditions(EliteEntity eliteEntity, Location location) {
         if (location == null) return true;
         return isAirCheck(eliteEntity, location);
+    }
+
+
+    //Removes the locations that do not meet the conditions
+    protected Collection<Location> validateLocations(@NotNull EliteEntity eliteEntity,
+                                                     @NotNull Collection<Location> originalLocations) {
+        originalLocations.removeIf(targetLocation -> !meetsConditions(eliteEntity, targetLocation));
+        return originalLocations;
+    }
+
+    //Removes entities that do not meet the conditions
+    protected Collection<? extends LivingEntity> validateEntities(@NotNull EliteEntity eliteEntity,
+                                                                  @NotNull Collection<? extends LivingEntity> originalEntities) {
+
+        originalEntities.removeIf(targetEntity -> !meetsConditions(eliteEntity, targetEntity));
+        return originalEntities;
     }
 
 }

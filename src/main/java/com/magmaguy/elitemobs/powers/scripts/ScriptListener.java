@@ -21,7 +21,7 @@ public class ScriptListener implements Listener {
 
     @EventHandler
     public void onEliteMobDamagedEvent(EliteMobDamagedEvent event) {
-        runEvent(event, event.getEliteMobEntity(), null);
+        runEvent(event, event.getEliteEntity(), null);
     }
 
     @EventHandler
@@ -65,10 +65,8 @@ public class ScriptListener implements Listener {
     }
 
     private void runEvent(Event event, EliteEntity eliteEntity, Player player) {
-        for (ElitePower elitePower : eliteEntity.getElitePowers()) {
-            if (elitePower instanceof EliteScript) {
-                ((EliteScript) elitePower).check(event.getClass(), eliteEntity, player);
-            }
-        }
+        for (ElitePower elitePower : eliteEntity.getElitePowers())
+            if (elitePower instanceof EliteScript eliteScript)
+                eliteScript.check(event.getClass(), eliteEntity, player);
     }
 }

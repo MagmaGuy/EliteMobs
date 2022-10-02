@@ -4,18 +4,27 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class Cylinder extends Shape {
 
     private final Vector center;
     private final double radius;
+    private double borderRadius = 1;
     private final double height;
     private Location centerLocation = null;
+    private List<Vector> locationVectors = null;
+    private List<Vector> edgeVectors = null;
+    private Vector centerVector = new Vector(0, 0, 0);
 
-    public Cylinder(Location centerLocation, double radius, double height) {
+    public Cylinder(Location centerLocation, double radius, double height, double borderRadius) {
         this.centerLocation = centerLocation;
         this.center = centerLocation.toVector();
         this.radius = radius;
         this.height = height;
+        this.borderRadius = borderRadius;
     }
 
     public Cylinder(Vector center, double radius, double height) {
@@ -30,23 +39,56 @@ public class Cylinder extends Shape {
         return dX * dX + dZ * dZ < radius * radius && position.getY() < center.getY() + height;
     }
 
+    public boolean borderContains(Location position) {
+        Cylinder innerCylinder = new Cylinder(centerLocation, borderRadius, height, borderRadius);
+        return contains(position) && !innerCylinder.contains(position);
+    }
+
     public boolean contains(Location position) {
         return contains(position.toVector());
     }
 
     public void visualize(Particle particle, int count, double offsetX, double offsetY, double offsetZ, double speed) {
-        for (int x = (int) -radius; x < (int) radius; x++)
-            for (int z = (int) -radius; z < (int) radius; z++)
-                for (int y = 0; y < height; y++) {
-                    Location newLocation = centerLocation.clone().add(new Vector(x, y, z));
-                    if (contains(newLocation))
-                        newLocation.getWorld().spawnParticle(particle, newLocation, count, offsetX, offsetY, offsetZ, speed);
-                }
+        getLocations().forEach(newLocation -> newLocation.getWorld().spawnParticle(particle, newLocation, count, offsetX, offsetY, offsetZ, speed));
     }
 
     @Override
     public Location getCenter() {
         return centerLocation;
+    }
+
+    @Override
+    public List<Location> getEdgeLocations() {
+        if (edgeVectors != null) return convert(edgeVectors);
+        List<Location> edgeLocations = new ArrayList<>();
+        getLocations().forEach(iteratedLocation -> {
+            if (borderContains(iteratedLocation))
+                edgeLocations.add(iteratedLocation);
+        });
+        return edgeLocations;
+    }
+
+    private List<Vector> getLocationVectors() {
+        if (locationVectors != null) return locationVectors;
+        locationVectors = new ArrayList<>();
+        for (int x = (int) -radius; x < (int) radius; x++)
+            for (int z = (int) -radius; z < (int) radius; z++)
+                for (int y = 0; y < height; y++) {
+                    Vector newVector = new Vector(x, y, z);
+                    Location newLocation = centerLocation.clone().add(newVector);
+                    if (contains(newLocation)) locationVectors.add(newVector);
+                }
+        return locationVectors;
+    }
+
+    @Override
+    public List<Location> getLocations() {
+        if (locationVectors != null) return convert(locationVectors);
+        return convert(getLocationVectors());
+    }
+
+    private List<Location> convert(List<Vector> vectors) {
+        return vectors.stream().map(edge -> centerLocation.clone().add(edge)).collect(Collectors.toList());
     }
 
 }

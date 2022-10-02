@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import org.bukkit.Location;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -24,9 +25,11 @@ public class BossMusic {
     @Getter
     private int durationTicks2 = -1;
     private BukkitTask bukkitTask = null;
+    private CustomBossEntity customBossEntity;
 
     //Format: name=rsp.name:length=durations_ms->name=rsp.name:length=duration_ms
-    public BossMusic(String rawString) {
+    public BossMusic(String rawString, CustomBossEntity customBossEntity) {
+        this.customBossEntity = customBossEntity;
         if (!rawString.contains("->")) {
             parse(rawString, 1);
         } else {
@@ -103,10 +106,14 @@ public class BossMusic {
         BukkitTask songTask = new BukkitRunnable() {
             @Override
             public void run() {
+                if (!customBossEntity.exists()){
+                    cancel();
+                    return;
+                }
                 if (name2 != null)
-                    player.playSound(player.getLocation(), name2, 1f, 1f);
+                    player.playSound(player.getLocation(), name2, SoundCategory.MUSIC, 1f, 1f);
                 else
-                    player.playSound(player.getLocation(), name, 1f, 1f);
+                    player.playSound(player.getLocation(), name, SoundCategory.MUSIC, 1f, 1f);
                 int duration;
                 if (durationTicks2 > 0) duration = durationTicks2;
                 else duration = durationTicks;

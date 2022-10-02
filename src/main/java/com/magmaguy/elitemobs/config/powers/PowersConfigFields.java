@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.config.powers;
 
 import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
-import com.magmaguy.elitemobs.powers.scripts.EliteScript;
+import com.magmaguy.elitemobs.powers.scripts.caching.EliteScriptBlueprint;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.configuration.ConfigurationSection;
@@ -28,10 +28,10 @@ public class PowersConfigFields extends CustomConfigFields {
     private ConfigurationSection scripts = null;
     @Getter
     @Setter
-    private Map<String, Object> rawScripts = null;
+    private Map<String, Object> rawScripts = new HashMap<>();
     @Getter
     @Setter
-    private List<EliteScript> eliteScripts = new ArrayList<>();
+    private List<EliteScriptBlueprint> eliteScriptBlueprints = new ArrayList<>();
     @Getter
     private Class<? extends ElitePower> elitePowerClass = null;
 
@@ -116,14 +116,15 @@ public class PowersConfigFields extends CustomConfigFields {
         this.effect = processString("effect", effect, null, false);
         this.powerCooldown = processInt("powerCooldown", powerCooldown, 0, false);
         this.globalCooldown = processInt("globalCooldown", globalCooldown, 0, false);
+        this.rawScripts = processMap("eliteScript", rawScripts);
         this.scripts = processConfigurationSection("eliteScript", rawScripts);
         this.powerType = processEnum("powerType", powerType, null, PowerType.class, false);
 
         processAdditionalFields();
     }
 
-    public void initializeScripts(){
-        if (scripts != null) eliteScripts = EliteScript.parseBossScripts(scripts);
+    public void initializeScripts() {
+        if (scripts != null) eliteScriptBlueprints = EliteScriptBlueprint.parseBossScripts(scripts, this);
     }
 
     public void processAdditionalFields() {

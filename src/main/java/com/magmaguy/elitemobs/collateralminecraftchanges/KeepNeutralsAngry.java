@@ -43,8 +43,8 @@ public class KeepNeutralsAngry {
                 for (Player player : Bukkit.getOnlinePlayers())
                     if (!player.getGameMode().equals(GameMode.SPECTATOR) && !player.getGameMode().equals(GameMode.CREATIVE) &&
                             Objects.equals(player.getLocation().getWorld(), eliteEntity.getLocation().getWorld()) &&
-                            player.getLocation().distance(eliteEntity.getLocation()) <
-                                    Objects.requireNonNull(eliteEntity.getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE)).getBaseValue()) {
+                            player.getLocation().distanceSquared(eliteEntity.getLocation()) <
+                                    Math.pow(Objects.requireNonNull(eliteEntity.getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE)).getValue(),2)) {
                         ((Mob) eliteEntity.getLivingEntity()).setTarget(player);
                         return;
                     }
