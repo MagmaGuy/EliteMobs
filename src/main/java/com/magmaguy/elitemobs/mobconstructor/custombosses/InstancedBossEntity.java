@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.mobconstructor.custombosses;
 
 import com.google.common.collect.ArrayListMultimap;
+import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.mobconstructor.PersistentMovingEntity;
 import com.magmaguy.elitemobs.mobconstructor.PersistentObject;
@@ -58,5 +59,15 @@ public class InstancedBossEntity extends RegionalBossEntity implements Persisten
             this.location = location;
             this.customBossesConfigFields = customBossesConfigFields;
         }
+    }
+
+    @Override
+    public void remove(RemovalReason removalReason) {
+        super.remove(removalReason);
+        if (removalReason.equals(RemovalReason.WORLD_UNLOAD))
+            if (persistentObjectHandler != null) {
+                persistentObjectHandler.remove();
+                persistentObjectHandler = null;
+            }
     }
 }

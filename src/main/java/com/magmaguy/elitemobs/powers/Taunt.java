@@ -73,11 +73,11 @@ public class Taunt extends MinorPower implements Listener {
      */
     @EventHandler
     public void onDamaged(EliteMobDamagedEvent event) {
-        if (!event.getEliteMobEntity().hasPower(this)) return;
+        if (!event.getEliteEntity().hasPower(this)) return;
 
         if (!(event.getEntity() instanceof LivingEntity) ||
                 ((LivingEntity) event.getEntity()).getHealth() - event.getEntityDamageEvent().getFinalDamage() <= 0 ||
-                !event.getEliteMobEntity().isValid())
+                !event.getEliteEntity().isValid())
             return;
 
         EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(event.getEntity());

@@ -105,7 +105,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
     public CustomBossEntity(CustomBossesConfigFields customBossesConfigFields) {
         //This creates a placeholder empty EliteMobEntity to be filled in later
         super();
-        if (customBossesConfigFields.getSong() != null) bossMusic = new BossMusic(customBossesConfigFields.getSong());
+        if (customBossesConfigFields.getSong() != null) bossMusic = new BossMusic(customBossesConfigFields.getSong(), this);
         //This stores everything that will need to be initialized for the EliteMobEntity
         setCustomBossesConfigFields(customBossesConfigFields);
         super.setPersistent(customBossesConfigFields.isPersistent());
@@ -140,6 +140,10 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
     public void setCustomBossesConfigFields(CustomBossesConfigFields customBossesConfigFields) {
         this.customBossesConfigFields = customBossesConfigFields;
         normalizedCombat = customBossesConfigFields.isNormalizedCombat();
+        if (phaseBossEntity != null)
+            normalizedCombat = phaseBossEntity.getPhase1Config().isNormalizedCombat();
+        if (MobCombatSettingsConfig.isNormalizeRegionalBosses() && this instanceof RegionalBossEntity)
+            normalizedCombat = true;
         super.setDamageMultiplier(customBossesConfigFields.getDamageMultiplier());
         super.setHealthMultiplier(customBossesConfigFields.getHealthMultiplier());
         super.setEliteLoot(customBossesConfigFields.isDropsEliteMobsLoot());
@@ -455,17 +459,19 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
             if (inCombat)
                 new EventCaller(new EliteMobExitCombatEvent(this, EliteMobExitCombatEvent.EliteMobExitCombatReason.PHASE_SWITCH));
 
-        boolean bossInstanceEnd = removalReason.equals(RemovalReason.KILL_COMMAND) ||
-                removalReason.equals(RemovalReason.DEATH) ||
-                removalReason.equals(RemovalReason.BOSS_TIMEOUT) ||
-                removalReason.equals(RemovalReason.SHUTDOWN) ||
-                removalReason.equals(RemovalReason.ARENA_RESET) ||
-                removalReason.equals(RemovalReason.REMOVE_COMMAND);
+        boolean bossInstanceEnd =
+                removalReason.equals(RemovalReason.KILL_COMMAND) ||
+                        removalReason.equals(RemovalReason.DEATH) ||
+                        removalReason.equals(RemovalReason.BOSS_TIMEOUT) ||
+                        removalReason.equals(RemovalReason.SHUTDOWN) ||
+                        removalReason.equals(RemovalReason.ARENA_RESET) ||
+                        removalReason.equals(RemovalReason.REMOVE_COMMAND) ||
+                        removalReason.equals(RemovalReason.WORLD_UNLOAD) && this instanceof InstancedBossEntity;
 
         if (!isPersistent) bossInstanceEnd = true;
 
         if (bossInstanceEnd) {
-            if (!(this instanceof RegionalBossEntity))
+            if (!(this instanceof RegionalBossEntity) || this instanceof InstancedBossEntity)
                 EntityTracker.getEliteMobEntities().remove(super.eliteUUID);
             new EventCaller(new EliteMobRemoveEvent(this, removalReason));
             if (escapeMechanism != null) Bukkit.getScheduler().cancelTask(escapeMechanism);

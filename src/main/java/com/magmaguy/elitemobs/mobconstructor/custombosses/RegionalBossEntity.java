@@ -259,7 +259,8 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
                 break;
             case DEATH:
             case BOSS_TIMEOUT:
-                respawn();
+                if (!(this instanceof InstancedBossEntity))
+                    respawn();
                 break;
             default:
                 break;

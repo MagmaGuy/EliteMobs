@@ -3,9 +3,10 @@ package com.magmaguy.elitemobs.powers.meta;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
-import com.magmaguy.elitemobs.config.powers.PowersConfig;
+import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.elitemobs.powers.scripts.EliteScript;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,32 +20,32 @@ import java.util.HashSet;
 public class ElitePower {
 
     @Getter
-    private static final HashMap<String, PowersConfigFields> elitePowers = new HashMap<>();
+    private static final HashMap<String, CustomConfigFields> elitePowers = new HashMap<>();
     @Getter
-    private static final HashSet<PowersConfigFields> bossPowers = new HashSet<>();
+    private static final HashSet<CustomConfigFields> bossPowers = new HashSet<>();
     @Getter
-    private static final HashSet<PowersConfigFields> majorPowers = new HashSet<>();
+    private static final HashSet<CustomConfigFields> majorPowers = new HashSet<>();
     @Getter
-    private static final HashSet<PowersConfigFields> defensivePowers = new HashSet<>();
+    private static final HashSet<CustomConfigFields> defensivePowers = new HashSet<>();
     @Getter
-    private static final HashSet<PowersConfigFields> miscellaneousPowers = new HashSet<>();
+    private static final HashSet<CustomConfigFields> miscellaneousPowers = new HashSet<>();
     @Getter
-    private static final HashSet<PowersConfigFields> offensivePowers = new HashSet<>();
+    private static final HashSet<CustomConfigFields> offensivePowers = new HashSet<>();
     @Getter
-    private static final HashSet<PowersConfigFields> specialPowers = new HashSet<>();
+    private static final HashSet<CustomConfigFields> specialPowers = new HashSet<>();
 
     @Getter
     private final String fileName;
     @Getter
-    private final String trail;
+    private final CustomConfigFields powersConfigFields;
     @Getter
-    private final PowersConfigFields powersConfigFields;
-    @Getter
-    @Setter
-    private int powerCooldownTime;
+    private String trail = null;
     @Getter
     @Setter
-    private int globalCooldownTime;
+    private int powerCooldownTime = 0;
+    @Getter
+    @Setter
+    private int globalCooldownTime = 0;
     @Getter
     @Setter
     private boolean inGlobalCooldown = false;
@@ -56,12 +57,9 @@ public class ElitePower {
 
 
     //Constructor for scripts
-    public ElitePower(String scriptName) {
-        this.fileName = scriptName;
-        this.trail = null;
-        this.powerCooldownTime = 0;//todo: update
-        this.globalCooldownTime = 0;//todo: update
-        this.powersConfigFields = PowersConfig.getPower("elite_script.yml");
+    public ElitePower(CustomConfigFields customConfigFields) {
+        this.fileName = customConfigFields.getFilename();
+        this.powersConfigFields = customConfigFields;
     }
 
     //Costructor for classic powers
@@ -73,12 +71,8 @@ public class ElitePower {
         this.globalCooldownTime = powersConfigFields.getGlobalCooldown();
     }
 
-    public static void addPower(EliteEntity eliteEntity, String powerName) {
-        addPower(eliteEntity, PowersConfig.getPower(powerName));
-    }
-
     public static void addPower(EliteEntity eliteEntity, PowersConfigFields configFields) {
-        if (configFields.getEliteScripts().isEmpty())
+        if (configFields.getEliteScriptBlueprints().isEmpty())
             try {
                 ElitePower elitePower = configFields.getElitePowerClass().newInstance();
                 eliteEntity.getElitePowers().add(elitePower);
@@ -87,8 +81,7 @@ public class ElitePower {
                 new WarningMessage("Failed to assign power for config field " + configFields.getFilename());
             }
         else
-            eliteEntity.getElitePowers().addAll(configFields.getEliteScripts());
-
+            eliteEntity.getElitePowers().addAll(EliteScript.generateBossScripts(configFields.getEliteScriptBlueprints()));
     }
 
     public static void initializePowers() {
@@ -96,7 +89,7 @@ public class ElitePower {
         reflections.getSubTypesOf(ElitePower.class).forEach(power -> {
             try {
                 ElitePower thisPower = power.newInstance();
-                switch (thisPower.getPowersConfigFields().getPowerType()) {
+                switch (((PowersConfigFields) thisPower.getPowersConfigFields()).getPowerType()) {
                     case DEFENSIVE -> defensivePowers.add(thisPower.getPowersConfigFields());
                     case OFFENSIVE -> offensivePowers.add(thisPower.getPowersConfigFields());
                     case MAJOR_BLAZE, MAJOR_ENDERMAN, MAJOR_SKELETON, MAJOR_GHAST, MAJOR_ZOMBIE ->
@@ -170,14 +163,15 @@ public class ElitePower {
 
     public void doCooldownTicks(EliteEntity eliteEntity) {
         this.powerCooldownActive = true;
-        eliteEntity.doGlobalPowerCooldown(globalCooldownTime);
-
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                powerCooldownActive = false;
-            }
-        }.runTaskLater(MetadataHandler.PLUGIN, powerCooldownTime);
+        if (globalCooldownTime > 0)
+            eliteEntity.doGlobalPowerCooldown(globalCooldownTime);
+        if (powerCooldownTime > 0)
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    powerCooldownActive = false;
+                }
+            }.runTaskLater(MetadataHandler.PLUGIN, powerCooldownTime);
 
     }
 

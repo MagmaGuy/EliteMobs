@@ -78,7 +78,7 @@ public class InstancePlayerManager {
                 player.teleport(matchInstance.exitLocation);
         }
 
-        //End the match if there are no players left
+        //End the match if there are no players left because they all died
         if (matchInstance.players.isEmpty())
             matchInstance.endMatch();
         else
@@ -93,7 +93,11 @@ public class InstancePlayerManager {
         if (matchInstance.players.isEmpty()) {
             matchInstance.endMatch();
             MatchInstance.MatchInstanceEvents.teleportBypass = true;
-            player.teleport(matchInstance.exitLocation);
+            //todo try to check the previous player location first
+            if (matchInstance.previousPlayerLocations.get(player) != null)
+                player.teleport(matchInstance.previousPlayerLocations.get(player));
+            else if (matchInstance.exitLocation != null)
+                player.teleport(matchInstance.exitLocation);
             PlayerData.setMatchInstance(player, null);
             matchInstance.participants.remove(player);
             return;

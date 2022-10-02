@@ -13,6 +13,7 @@ import com.magmaguy.elitemobs.dungeons.SchematicPackage;
 import com.magmaguy.elitemobs.mobconstructor.CustomSpawn;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEscapeMechanism;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.powers.specialpowers.EnderCrystalLightningRod;
 import com.magmaguy.elitemobs.utils.WarningMessage;
@@ -44,6 +45,19 @@ public class CustomSummonPower extends ElitePower implements Listener {
         this.customBossesConfigFields = customBossesConfigFields;
         //This allows an arbitrary amount of reinforcements to be added at any point, class initialization just prepares the stage
         addEntry(powerObject);
+    }
+
+    public static void summonReinforcement(EliteEntity summoningEntity, Location spawnLocation, String reinforcementFilename, int duration) {
+        CustomBossesConfigFields fields = CustomBossesConfig.getCustomBoss(reinforcementFilename);
+        if (fields == null) {
+            new WarningMessage("Attempted to summon reinforcement " + reinforcementFilename + " which is not a valid reinforcement!");
+            return;
+        }
+        CustomBossEntity customBossEntity = new CustomBossEntity(fields);
+        customBossEntity.setSummoningEntity(summoningEntity);
+        summoningEntity.addReinforcement(customBossEntity);
+        if (duration > 0) CustomBossEscapeMechanism.startEscapeTicks(duration, customBossEntity);
+        customBossEntity.spawn(spawnLocation, true);
     }
 
     public static BukkitTask summonGlobalReinforcement(CustomBossReinforcement customBossReinforcement, CustomBossEntity summoningEntity) {
@@ -80,7 +94,6 @@ public class CustomSummonPower extends ElitePower implements Listener {
     }
 
     public void addEntry(Object powerEntry) {
-        String powerString = "";
         Map<String, ?> map;
         if (powerEntry instanceof String)
             processOldFormats((String) powerEntry);
@@ -88,8 +101,6 @@ public class CustomSummonPower extends ElitePower implements Listener {
             map = (Map<String, ?>) powerEntry;
             processNewFormat(map);
         }
-
-
     }
 
     private void processNewFormat(Map<String, ?> map) {
@@ -152,7 +163,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
                     break;
                 default:
                     new WarningMessage("Invalid boss reinforcement!");
-                    new WarningMessage("Problematic entry: " + (String) entry.getValue());
+                    new WarningMessage("Problematic entry: " + entry.getValue());
             }
         }
 

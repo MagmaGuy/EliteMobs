@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.mobconstructor;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.api.InstancedDungeonRemoveEvent;
 import com.magmaguy.elitemobs.utils.ChunkVectorizer;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -145,7 +146,6 @@ public class PersistentObjectHandler {
         //Store world names and serialized locations
         @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
         public void chunkLoadEvent(ChunkLoadEvent event) {
-
             int chunkLocation = chunkLocation(event.getChunk());
             List<PersistentObjectHandler> simplePersistentEntityList = new ArrayList<>(persistentObjects.get(chunkLocation + ""));
             Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, () -> loadChunk(simplePersistentEntityList), 1L);
@@ -167,5 +167,11 @@ public class PersistentObjectHandler {
             List<PersistentObjectHandler> simplePersistentEntityList = new ArrayList<>(persistentObjects.get(chunkLocation + ""));
             unloadChunk(simplePersistentEntityList);
         }
+
+        @EventHandler
+        public void onInstanceRemove(InstancedDungeonRemoveEvent event){
+            persistentObjects.removeAll(event.getDungeonInstance().getInstancedWorldName());
+        }
+
     }
 }

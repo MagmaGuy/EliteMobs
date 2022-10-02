@@ -9,12 +9,12 @@ import org.bukkit.event.Listener;
 public class CustomBossTaunts implements Listener {
     @EventHandler
     public void onDamagedMessages(EliteMobDamagedEvent eliteMobDamagedEvent) {
-        if (!(eliteMobDamagedEvent.getEliteMobEntity() instanceof CustomBossEntity)) return;
-        if (((CustomBossEntity) eliteMobDamagedEvent.getEliteMobEntity()).getCustomBossesConfigFields().getOnDamagedMessages() == null ||
-                ((CustomBossEntity) eliteMobDamagedEvent.getEliteMobEntity()).getCustomBossesConfigFields().getOnDamagedMessages().isEmpty())
+        if (!(eliteMobDamagedEvent.getEliteEntity() instanceof CustomBossEntity)) return;
+        if (((CustomBossEntity) eliteMobDamagedEvent.getEliteEntity()).getCustomBossesConfigFields().getOnDamagedMessages() == null ||
+                ((CustomBossEntity) eliteMobDamagedEvent.getEliteEntity()).getCustomBossesConfigFields().getOnDamagedMessages().isEmpty())
             return;
-        Taunt.nameTagProcessor(eliteMobDamagedEvent.getEliteMobEntity(), eliteMobDamagedEvent.getEliteMobEntity().getLivingEntity(),
-                ((CustomBossEntity) eliteMobDamagedEvent.getEliteMobEntity()).getCustomBossesConfigFields().getOnDamagedMessages());
+        Taunt.nameTagProcessor(eliteMobDamagedEvent.getEliteEntity(), eliteMobDamagedEvent.getEliteEntity().getLivingEntity(),
+                ((CustomBossEntity) eliteMobDamagedEvent.getEliteEntity()).getCustomBossesConfigFields().getOnDamagedMessages());
     }
 
     @EventHandler

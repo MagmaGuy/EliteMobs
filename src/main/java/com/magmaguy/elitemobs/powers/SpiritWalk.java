@@ -172,7 +172,7 @@ public class SpiritWalk extends BossPower implements Listener {
     @EventHandler
     public void onBossMobGotHit(EliteMobDamagedEvent event) {
         if (event.isCancelled()) return;
-        if (!event.getEliteMobEntity().hasPower(this)) return;
+        if (!event.getEliteEntity().hasPower(this)) return;
         switch (event.getEntityDamageEvent().getCause()) {
             case FIRE:
             case FIRE_TICK:
@@ -182,11 +182,11 @@ public class SpiritWalk extends BossPower implements Listener {
             case ENTITY_SWEEP_ATTACK:
                 return;
         }
-        SpiritWalk spiritWalk = (SpiritWalk) event.getEliteMobEntity().getPower(this);
+        SpiritWalk spiritWalk = (SpiritWalk) event.getEliteEntity().getPower(this);
 
         if (event.getEntityDamageEvent().getCause().equals(EntityDamageEvent.DamageCause.DROWNING) ||
                 event.getEntityDamageEvent().getCause().equals(EntityDamageEvent.DamageCause.SUFFOCATION))
-            initializeSpiritWalk(event.getEliteMobEntity());
+            initializeSpiritWalk(event.getEliteEntity());
 
 
         spiritWalk.incrementHitCounter();
@@ -194,7 +194,7 @@ public class SpiritWalk extends BossPower implements Listener {
         if (spiritWalk.getHitsCounter() < 9) return;
 
         spiritWalk.resetHitsCounter();
-        initializeSpiritWalk(event.getEliteMobEntity());
+        initializeSpiritWalk(event.getEliteEntity());
 
     }
 

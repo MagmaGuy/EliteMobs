@@ -8,6 +8,14 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public class CustomBossEscapeMechanism {
+
+    public static Integer startEscapeTicks(int timeout, CustomBossEntity customBossEntity) {
+        if (timeout < 1) return null;
+        return Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, () -> {
+            doEscapeMessage(customBossEntity);
+        }, timeout);
+    }
+
     public static Integer startEscape(int timeout, CustomBossEntity customBossEntity) {
         if (timeout < 1) return null;
         return Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, () -> {

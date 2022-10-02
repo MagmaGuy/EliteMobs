@@ -24,6 +24,7 @@ public class TimedEvent extends CustomEvent implements Listener {
     protected static List<TimedEvent> blueprintEvents = new ArrayList<>();
     protected static List<TimedEvent> timedEvents = new ArrayList<>();
     //stores the time of the last global trigger
+    @Getter
     private static double nextEventTrigger = System.currentTimeMillis() + 5D * 60D * 1000D;
     private final double localCooldown;
     private final double globalCooldown;
@@ -115,9 +116,17 @@ public class TimedEvent extends CustomEvent implements Listener {
         timedEvent.customSpawn.queueSpawn();
 
         //global cooldown - 60 seconds right now
-        nextEventTrigger = System.currentTimeMillis() + globalCooldown * 60 * 1000;
+        setNextEventTrigger();
 
         timedEvents.add(timedEvent);
+    }
+
+    private void setNextEventTrigger() {
+        setNextEventTrigger(globalCooldown);
+    }
+
+    private void setNextEventTrigger(double timeMinutes) {
+        nextEventTrigger = System.currentTimeMillis() + timeMinutes * 60 * 1000;
     }
 
     /**
@@ -146,6 +155,8 @@ public class TimedEvent extends CustomEvent implements Listener {
 
         primaryEliteMobs.forEach(CustomBossEntity::announceSpawn);
 
+        //Hardcoded 5 minute minimum wait time between events before the next event can get queued
+        setNextEventTrigger(5);
         start();
     }
 

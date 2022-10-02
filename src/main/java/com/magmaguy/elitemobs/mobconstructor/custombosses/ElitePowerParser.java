@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
 import com.magmaguy.elitemobs.powers.BonusCoins;
 import com.magmaguy.elitemobs.powers.meta.CustomSummonPower;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
+import com.magmaguy.elitemobs.powers.scripts.EliteScript;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 
 import java.util.ArrayList;
@@ -16,8 +17,8 @@ import java.util.Map;
 public class ElitePowerParser {
 
     public static HashSet<ElitePower> parsePowers(CustomBossesConfigFields customBossesConfigFields) {
-        if(customBossesConfigFields.getPowers() == null) return new HashSet<>();
-        HashSet<ElitePower> elitePowers = new HashSet<>();
+        if (customBossesConfigFields.getPowers() == null) return new HashSet<>();
+        HashSet<ElitePower> elitePowers = new HashSet<>(EliteScript.generateBossScripts(customBossesConfigFields.getEliteScript()));
         CustomSummonPower customSummonPower = null;
         List<Object> powers = new ArrayList<>(customBossesConfigFields.getPowers());
         if (powers == null) return elitePowers;
@@ -34,8 +35,8 @@ public class ElitePowerParser {
                     String[] parsedPowerName = powerName.split(":");
                     PowersConfigFields powersConfigFields = PowersConfig.getPower(parsedPowerName[0]);
                     if (powersConfigFields != null) {
-                        if (!powersConfigFields.getEliteScripts().isEmpty()) {
-                            elitePowers.addAll(powersConfigFields.getEliteScripts());
+                        if (!powersConfigFields.getEliteScriptBlueprints().isEmpty()) {
+                            elitePowers.addAll(EliteScript.generateBossScripts(powersConfigFields.getEliteScriptBlueprints()));
                             continue;
                         }
                         ElitePower elitePower;
@@ -65,8 +66,6 @@ public class ElitePowerParser {
                     customSummonPower.addEntry(powerObject);
             }
         }
-        if (customBossesConfigFields.getEliteScript() != null)
-            elitePowers.addAll(customBossesConfigFields.getEliteScript());
         return elitePowers;
     }
 }

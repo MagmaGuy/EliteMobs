@@ -147,6 +147,12 @@ public class CustomSpawn {
     }
 
     private void generateCustomSpawn() {
+        //If the global cooldown if enforced and this is a timed event wait for the cd to be over
+        if (timedEvent != null && System.currentTimeMillis() < TimedEvent.getNextEventTrigger()) {
+            Bukkit.getScheduler().scheduleAsyncDelayedTask(MetadataHandler.PLUGIN, this::generateCustomSpawn, 20 * 60L);
+            return;
+        }
+
         int maxTries = 100;
         int tries = 0;
         while (tries < maxTries && spawnLocation == null) {

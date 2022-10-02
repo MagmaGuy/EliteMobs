@@ -117,7 +117,7 @@ public class PlayerDamagedByEliteMobEvent extends Event implements Cancellable {
 
             double damageReduction = elitePlayerInventory.getEliteDefense(true);
             if (event.getDamager() instanceof AbstractArrow)
-                damageReduction += elitePlayerInventory.getEliteProjectileProtection(false);
+                damageReduction += elitePlayerInventory.getEliteProjectileProtection(true);
             if (event.getDamager() instanceof Fireball || event.getDamager() instanceof Creeper) {
                 damageReduction += elitePlayerInventory.getEliteBlastProtection(true);
             }
