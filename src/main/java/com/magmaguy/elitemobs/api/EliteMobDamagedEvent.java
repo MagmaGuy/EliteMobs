@@ -5,7 +5,6 @@ import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
-import com.magmaguy.elitemobs.utils.Developer;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -44,7 +43,6 @@ public class EliteMobDamagedEvent extends Event implements Cancellable {
 
     @Override
     public void setCancelled(boolean b) {
-        Developer.message("cancelling 2");
         this.isCancelled = b;
         entityDamageEvent.setCancelled(b);
     }

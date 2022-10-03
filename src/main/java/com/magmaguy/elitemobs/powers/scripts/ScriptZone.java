@@ -2,12 +2,15 @@ package com.magmaguy.elitemobs.powers.scripts;
 
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.elitemobs.powers.scripts.caching.ScriptTargetsBlueprint;
 import com.magmaguy.elitemobs.powers.scripts.caching.ScriptZoneBlueprint;
 import com.magmaguy.elitemobs.powers.scripts.enums.Target;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import com.magmaguy.elitemobs.utils.shapes.Cylinder;
 import com.magmaguy.elitemobs.utils.shapes.Dome;
 import com.magmaguy.elitemobs.utils.shapes.Shape;
 import com.magmaguy.elitemobs.utils.shapes.Sphere;
+import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 
@@ -20,32 +23,50 @@ public class ScriptZone {
 
     private final ScriptZoneBlueprint zoneBlueprint;
     private final ScriptTargets scriptTargets;
+    @Getter
+    private boolean isValid;
 
     public ScriptZone(ScriptZoneBlueprint zoneBlueprint, EliteScript eliteScript) {
         this.zoneBlueprint = zoneBlueprint;
         this.scriptTargets = new ScriptTargets(zoneBlueprint.getScriptTargetsBlueprint(), eliteScript);
+        isValid = zoneBlueprint.getScriptTargetsBlueprint() != null;
     }
 
+    //Used for tracking, allows locations to be picked and set to be consistent throughout
+    public List<Shape> precacheShapes(EliteEntity eliteEntity, LivingEntity directTarget) {
+        return generateShapes(eliteEntity, directTarget);
+    }
 
     //Get living entities in zone
-    protected Collection<? extends LivingEntity> getEffectTargets(EliteEntity eliteEntity, LivingEntity directTarget) {
+    protected Collection<? extends LivingEntity> getEffectTargets(EliteEntity eliteEntity,
+                                                                  LivingEntity directTarget,
+                                                                  ScriptTargetsBlueprint blueprintFromRequestingTarget,
+                                                                  List<Shape> precachedShapes) {
         //Generate shapes for the zone
-        List<Shape> shapes = generateShapes(eliteEntity, directTarget);
+        List<Shape> shapes;
+        if (precachedShapes != null) shapes = precachedShapes;
+        else shapes = generateShapes(eliteEntity, directTarget);
 
         //Get the entities from those zones
-        return switch (scriptTargets.getTargetBlueprint().getTargetType()) {
-            case ZONE_FULL, ZONE_BORDER ->
-                    getEntitiesInArea(shapes, scriptTargets.getTargetBlueprint().getTargetType());
-            default -> new ArrayList<>();
-        };
+        switch (blueprintFromRequestingTarget.getTargetType()) {
+            case ZONE_FULL, ZONE_BORDER:
+                return getEntitiesInArea(shapes, scriptTargets.getTargetBlueprint().getTargetType());
+            default: {
+                new WarningMessage("Couldn't parse target " + scriptTargets.getTargetBlueprint().getTargetType() + " in script ");
+                return new ArrayList<>();
+            }
+        }
     }
 
     //Get locations in zone
     protected Collection<Location> getEffectLocationTargets(EliteEntity eliteEntity,
                                                             LivingEntity directTarget,
-                                                            ScriptTargets actionTarget) {
+                                                            ScriptTargets actionTarget,
+                                                            List<Shape> precachedShapes) {
         //Generate shapes for the zone
-        List<Shape> shapes = generateShapes(eliteEntity, directTarget);
+        List<Shape> shapes;
+        if (precachedShapes != null) shapes = precachedShapes;
+        else shapes = generateShapes(eliteEntity, directTarget);
 
         //Get the locations from those zones
         return switch (actionTarget.getTargetBlueprint().getTargetType()) {

@@ -10,7 +10,7 @@ public abstract class Shape {
 
     public abstract boolean borderContains(Location postion);
 
-    public abstract void visualize(Particle particle, int amount, double offsetX, double offsetY, double offsetZ, double speed);
+    public abstract void visualize(Particle particle);
 
     public abstract Location getCenter();
 

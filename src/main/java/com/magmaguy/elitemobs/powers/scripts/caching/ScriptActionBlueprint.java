@@ -49,8 +49,6 @@ public class ScriptActionBlueprint {
     @Getter
     private double amount = 1;
     @Getter
-    private boolean track = false;
-    @Getter
     private Boolean bValue = null;
     @Getter
     private String sValue = "";
@@ -110,9 +108,7 @@ public class ScriptActionBlueprint {
             case "duration" -> duration = parseInteger(key, value, scriptName);
             case "wait" -> wait = parseInteger(key, value, scriptName);
             case "amplifier" -> amplifier = parseInteger(key, value, scriptName);
-            case "action" -> {
-                actionType = parseEnum(key, value, ActionType.class, scriptName);
-            }
+            case "action" -> actionType = parseEnum(key, value, ActionType.class, scriptName);
             case "potioneffecttype" ->
                     potionEffectType = PotionEffectType.getByKey(NamespacedKey.minecraft(((String) value).toLowerCase()));
             case "scripts" -> scripts = parseStringList(key, value, scriptName);
@@ -125,7 +121,6 @@ public class ScriptActionBlueprint {
             case "multiplier" -> multiplier = parseDouble(key, value, scriptName);
             case "material" -> material = parseEnum(key, value, Material.class, scriptName);
             case "amount" -> amount = parseInteger(key, value, scriptName);
-            case "track" -> track = parseBoolean(key, value, scriptName);
             case "bvalue" -> bValue = parseBoolean(key, value, scriptName);
             case "svalue" -> sValue = parseString(key, value, scriptName);
             case "vvalue" -> vValue = parseVector(key, value, scriptName);
@@ -145,7 +140,7 @@ public class ScriptActionBlueprint {
             case "location" -> location = parseString(key, value, scriptName);
             case "offset" -> offset = parseVector(key, value, scriptName);
             //Managed by ScriptTargets
-            case "target", "locations", "range" -> {
+            case "target", "locations", "range", "track" -> {
             }
             default ->
                     new WarningMessage("Failed to read key " + key + " for script " + scriptName + " in " + scriptFilename);
