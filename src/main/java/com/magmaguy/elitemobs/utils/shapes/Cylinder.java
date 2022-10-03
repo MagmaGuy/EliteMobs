@@ -48,8 +48,8 @@ public class Cylinder extends Shape {
         return contains(position.toVector());
     }
 
-    public void visualize(Particle particle, int count, double offsetX, double offsetY, double offsetZ, double speed) {
-        getLocations().forEach(newLocation -> newLocation.getWorld().spawnParticle(particle, newLocation, count, offsetX, offsetY, offsetZ, speed));
+    public void visualize(Particle particle) {
+        getLocations().forEach(newLocation -> newLocation.getWorld().spawnParticle(particle, newLocation, 1, 0, 0, 0, 0));
     }
 
     @Override

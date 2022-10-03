@@ -49,13 +49,13 @@ public class ScriptAction {
         //Check if the script conditions of action are met
         if (blueprint.getConditionsBlueprint() != null && !scriptConditions.meetsConditions(eliteEntity, directTarget))
             return;
+        //This caches the tracking mostly for zones to start at the wait time. This matters if you are making zones
+        //that go through a warning phase and then a damage phase.
+        scriptTargets.cacheTargets(eliteEntity, directTarget, blueprint.getActionType());
         //First wait for allotted amount of time
         new BukkitRunnable() {
             @Override
             public void run() {
-
-                if (!blueprint.isTrack())
-                    scriptTargets.cacheTargets(eliteEntity, directTarget, blueprint.getActionType());
                 if (blueprint.getRepeatEvery() > 0)
                     //if it's a repeating task, run task repeatedly
                     new BukkitRunnable() {
