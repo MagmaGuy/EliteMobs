@@ -34,8 +34,8 @@ public class Sphere extends Shape {
     }
 
     @Override
-    public void visualize(Particle particle, int amount, double offsetX, double offsetY, double offsetZ, double speed) {
-
+    public void visualize(Particle particle) {
+        getLocations().forEach(newLocation -> newLocation.getWorld().spawnParticle(particle, newLocation, 1, 0, 0, 0, 0));
     }
 
     @Override

@@ -11,7 +11,7 @@ import static com.magmaguy.elitemobs.utils.MapListInterpreter.*;
 
 public class ScriptTargetsBlueprint {
     @Getter
-    protected Target targetType;
+    protected Target targetType = Target.SELF;
     @Getter
     private String scriptName;
     @Getter
@@ -22,6 +22,8 @@ public class ScriptTargetsBlueprint {
     private Vector offset = new Vector(0, 0, 0);
     @Getter
     private double range = 20;
+    @Getter
+    private boolean track = true;
 
     public ScriptTargetsBlueprint(Map<?, ?> entry, String scriptName) {
         this.scriptName = scriptName;
@@ -42,6 +44,7 @@ public class ScriptTargetsBlueprint {
             case "target" -> targetType = parseEnum(key, value, Target.class, scriptName);
             case "range" -> range = parseDouble(key, value, scriptName);
             case "offset" -> offset = parseVector(key, value, scriptName);
+            case "track" -> track = parseBoolean(key, value, scriptName);
         }
     }
 }

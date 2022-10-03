@@ -5,8 +5,8 @@ import com.magmaguy.elitemobs.powers.scripts.caching.ScriptTargetsBlueprint;
 import com.magmaguy.elitemobs.powers.scripts.enums.ActionType;
 import com.magmaguy.elitemobs.powers.scripts.enums.Target;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
-import com.magmaguy.elitemobs.utils.Developer;
 import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.elitemobs.utils.shapes.Shape;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -46,9 +46,18 @@ public class ScriptTargets {
         return parsedLocation;
     }
 
-    protected void cacheTargets(EliteEntity eliteEntity, LivingEntity livingEntity, ActionType actionType) {
-        if (actionType.isRequiresLivingEntity()) livingEntities = getTargets(eliteEntity, livingEntity);
-        else locations = getZoneLocationTargets(eliteEntity, livingEntity);
+    List<Shape> cachedShapes = null;
+
+    protected void cacheTargets(EliteEntity eliteEntity, LivingEntity directTarget, ActionType actionType) {
+        //Only cache if tracking
+        if (!getTargetBlueprint().isTrack()) return;
+        //Only cache locations - caching living entities would probably be very confusing
+        if (!actionType.isRequiresLivingEntity()) {
+            locations = null;
+            locations = getZoneLocationTargets(eliteEntity, directTarget);
+        } else if (eliteScript.getScriptZone().isValid()) {
+            cachedShapes = eliteScript.getScriptZone().precacheShapes(eliteEntity, directTarget);
+        }
     }
 
     //Get living entity targets. New array lists so they are not immutable.
@@ -74,9 +83,10 @@ public class ScriptTargets {
                 return new ArrayList<>(List.of(directTarget));
             case SELF:
                 return new ArrayList<>(List.of(eliteEntity.getUnsyncedLivingEntity()));
+            case ZONE_FULL, ZONE_BORDER:
+                return eliteScript.getScriptZone().getEffectTargets(eliteEntity, directTarget, targetBlueprint, cachedShapes);
             default:
-                if (eliteScript.getScriptZone() != null)
-                    return eliteScript.getScriptZone().getEffectTargets(eliteEntity, directTarget);
+                new WarningMessage("Could not find default target for script in " + eliteScript.getFileName());
                 return new ArrayList<>();
         }
     }
@@ -97,7 +107,6 @@ public class ScriptTargets {
                 targetBlueprint.getTargetType() == Target.DIRECT_TARGET ||
                 targetBlueprint.getTargetType() == Target.SELF)
             return getTargets(eliteEntity, directTarget).stream().map(targetEntity -> targetEntity.getLocation().add(targetBlueprint.getOffset())).collect(Collectors.toSet());
-        Developer.message("Target script name " + targetBlueprint.getScriptName());
         switch (targetBlueprint.getTargetType()) {
             case LOCATION:
                 return List.of(getLocation(eliteEntity));
@@ -106,11 +115,11 @@ public class ScriptTargets {
             case ZONE_FULL, ZONE_BORDER:
                 if (eliteScript.getScriptZone() != null) {
                     if (targetBlueprint.getOffset().equals(new Vector(0, 0, 0)))
-                        return eliteScript.getScriptZone().getEffectLocationTargets(eliteEntity, directTarget, this);
+                        return eliteScript.getScriptZone().getEffectLocationTargets(eliteEntity, directTarget, this, cachedShapes);
                     else
-                        return (new ArrayList<>(eliteScript.getScriptZone().getEffectLocationTargets(eliteEntity, directTarget, this))).stream().map(iteratedLocation -> iteratedLocation.clone().add(targetBlueprint.getOffset())).collect(Collectors.toSet());
+                        return (new ArrayList<>(eliteScript.getScriptZone().getEffectLocationTargets(eliteEntity, directTarget, this, cachedShapes))).stream().map(iteratedLocation -> iteratedLocation.clone().add(targetBlueprint.getOffset())).collect(Collectors.toSet());
                 } else {
-                    new WarningMessage("Your script " + targetBlueprint.getScriptName() + " uses " + targetBlueprint.getTargetType().toString() + " but does not have a valid Effect Zone defined!");
+                    new WarningMessage("Your script " + targetBlueprint.getScriptName() + " uses " + targetBlueprint.getTargetType().toString() + " but does not have a valid Zone defined!");
                     return new ArrayList<>();
                 }
             default:

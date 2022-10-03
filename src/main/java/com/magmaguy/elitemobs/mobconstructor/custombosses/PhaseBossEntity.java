@@ -92,6 +92,7 @@ public class PhaseBossEntity {
             //spawn the boss
             customBossEntity.spawn(true);
         }
+        //todo: this doesn't seem to be working when entities change types?
         customBossEntity.setHealth(customBossEntity.getMaxHealth() * healthPercentage);
         currentPhase = bossPhase;
         if (customBossEntity.getCustomModel() != null) customBossEntity.getCustomModel().switchPhase();
