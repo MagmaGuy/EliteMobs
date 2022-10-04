@@ -30,7 +30,7 @@ public class ElitePowerParser {
                         customSummonPower = new CustomSummonPower(powerName, customBossesConfigFields);
                         elitePowers.add(customSummonPower);
                     } else
-                        customSummonPower.addEntry(powerName);
+                        customSummonPower.addEntry(powerName, customBossesConfigFields.getFilename());
                 else {
                     String[] parsedPowerName = powerName.split(":");
                     PowersConfigFields powersConfigFields = PowersConfig.getPower(parsedPowerName[0]);
@@ -63,7 +63,7 @@ public class ElitePowerParser {
                     customSummonPower = new CustomSummonPower(powerObject, customBossesConfigFields);
                     elitePowers.add(customSummonPower);
                 } else
-                    customSummonPower.addEntry(powerObject);
+                    customSummonPower.addEntry(powerObject, customBossesConfigFields.getFilename());
             }
         }
         return elitePowers;

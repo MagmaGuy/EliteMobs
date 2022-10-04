@@ -44,7 +44,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
         super(PowersConfig.getPower("custom_summon.yml"));
         this.customBossesConfigFields = customBossesConfigFields;
         //This allows an arbitrary amount of reinforcements to be added at any point, class initialization just prepares the stage
-        addEntry(powerObject);
+        addEntry(powerObject, customBossesConfigFields.getFilename());
     }
 
     public static void summonReinforcement(EliteEntity summoningEntity, Location spawnLocation, String reinforcementFilename, int duration) {
@@ -93,17 +93,17 @@ public class CustomSummonPower extends ElitePower implements Listener {
         return customBossReinforcements;
     }
 
-    public void addEntry(Object powerEntry) {
+    public void addEntry(Object powerEntry, String filename) {
         Map<String, ?> map;
         if (powerEntry instanceof String)
-            processOldFormats((String) powerEntry);
+            processOldFormats((String) powerEntry, filename);
         else if (powerEntry instanceof Map<?, ?>) {
             map = (Map<String, ?>) powerEntry;
-            processNewFormat(map);
+            processNewFormat(map, filename);
         }
     }
 
-    private void processNewFormat(Map<String, ?> map) {
+    private void processNewFormat(Map<String, ?> map, String configFilename) {
         SummonType summonType = null;
         String filename = null;
         Vector location = null;
@@ -197,6 +197,13 @@ public class CustomSummonPower extends ElitePower implements Listener {
                 new WarningMessage("Failed to determine summon type for reinforcement in " + customBossesConfigFields.getFilename() + " ! Contact the developer with this error!");
         }
 
+        if (customBossReinforcement == null ||
+                customBossReinforcement.bossFileName == null ||
+                CustomBossesConfig.getCustomBoss(customBossReinforcement.bossFileName) == null){
+            new WarningMessage("Could not get filename for reinforcement in file " + configFilename);
+            return;
+        }
+
         if (customBossReinforcement == null)
             return;
 
@@ -209,7 +216,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
         customBossReinforcement.setSpawnLocationOffset(location);
     }
 
-    private void processOldFormats(String powerString) {
+    private void processOldFormats(String powerString, String configFilename) {
         Map<String, Object> newMap = new HashMap<>();
         /*
         valid formats:
@@ -245,6 +252,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
                 parseOnCombatEnterPlaceCrystal(powerString);
             }
             replaceOldFormat(powerString, newMap);
+
             return;
         }
 
@@ -399,6 +407,12 @@ public class CustomSummonPower extends ElitePower implements Listener {
             customBossReinforcement.summonChance = chance;
             customBossReinforcement.setSpawnLocationOffset(location);
 
+            if (customBossReinforcement == null ||
+                    customBossReinforcement.bossFileName == null ||
+                    CustomBossesConfig.getCustomBoss(customBossReinforcement.bossFileName) == null){
+                new WarningMessage("Could not get filename for reinforcement in file " + configFilename);
+            }
+
         }
     }
 
@@ -423,7 +437,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
     private CustomBossReinforcement doOnce(String filename) {
         CustomBossReinforcement customBossReinforcement = new CustomBossReinforcement(SummonType.ONCE, filename);
         if (CustomBossesConfig.getCustomBoss(customBossReinforcement.bossFileName) == null) {
-            new WarningMessage("Reinforcement mob " + customBossReinforcement.bossFileName + " is not valid!");
+            new WarningMessage("Reinforcement mob " + customBossReinforcement.bossFileName + " is not valid! Filename: " + filename);
             return null;
         }
         customBossReinforcements.add(customBossReinforcement);
@@ -440,7 +454,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
         CustomBossReinforcement customBossReinforcement = new CustomBossReinforcement(SummonType.ON_HIT, filename);
         customBossReinforcement.setSummonChance(chance);
         if (CustomBossesConfig.getCustomBoss(customBossReinforcement.bossFileName) == null) {
-            new WarningMessage("Reinforcement mob " + customBossReinforcement.bossFileName + " is not valid!");
+            new WarningMessage("Reinforcement mob " + customBossReinforcement.bossFileName + " is not valid! Filename: " + filename);
             return customBossReinforcement;
         }
         customBossReinforcements.add(customBossReinforcement);
@@ -450,7 +464,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
     private CustomBossReinforcement doOnDeath(String filename) {
         CustomBossReinforcement customBossReinforcement = new CustomBossReinforcement(SummonType.ON_DEATH, filename);
         if (CustomBossesConfig.getCustomBoss(customBossReinforcement.bossFileName) == null) {
-            new WarningMessage("Reinforcement mob " + customBossReinforcement.bossFileName + " is not valid!");
+            new WarningMessage("Reinforcement mob " + customBossReinforcement.bossFileName + " is not valid! Filename: " + filename);
             return null;
         }
         customBossReinforcements.add(customBossReinforcement);
@@ -477,7 +491,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
         CustomBossReinforcement customBossReinforcement = new CustomBossReinforcement(SummonType.ON_COMBAT_ENTER, filename);
 
         if (CustomBossesConfig.getCustomBoss(customBossReinforcement.bossFileName) == null) {
-            new WarningMessage("Reinforcement mob " + customBossReinforcement.bossFileName + " is not valid!");
+            new WarningMessage("Reinforcement mob " + customBossReinforcement.bossFileName + " is not valid! Filename: " + filename);
             return customBossReinforcement;
         }
         customBossReinforcements.add(customBossReinforcement);
@@ -504,7 +518,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
         CustomBossReinforcement customBossReinforcement = new CustomBossReinforcement(SummonType.GLOBAL, filename);
         CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(customBossReinforcement.bossFileName);
         if (customBossesConfigFields == null) {
-            new WarningMessage("Reinforcement mob " + customBossReinforcement.bossFileName + " is not valid!");
+            new WarningMessage("Reinforcement mob " + customBossReinforcement.bossFileName + " is not valid! Filename: " + filename);
             return null;
         }
         customBossReinforcement.entityType = customBossesConfigFields.getEntityType();

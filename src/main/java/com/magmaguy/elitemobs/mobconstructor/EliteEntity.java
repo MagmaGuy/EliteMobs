@@ -302,13 +302,15 @@ public class EliteEntity {
     private void setMaxHealth() {
         this.defaultMaxHealth = EliteMobProperties.getPluginData(this.getLivingEntity().getType()).getDefaultMaxHealth();
         this.maxHealth = (level * CombatSystem.TARGET_HITS_TO_KILL_MINUS_ONE + this.defaultMaxHealth) * healthMultiplier;
-        livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(maxHealth);
+        if (livingEntity != null)
+            livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(maxHealth);
         if (health == null) {
-            livingEntity.setHealth(maxHealth);
+            if (livingEntity != null)
+                livingEntity.setHealth(maxHealth);
             this.health = maxHealth;
         }
         //This is useful for phase boss entities that spawn in unloaded chunks and shouldn't full heal between phases, like in dungeons
-        else
+        else if (livingEntity != null)
             livingEntity.setHealth(Math.min(health, livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()));
     }
 
@@ -337,8 +339,12 @@ public class EliteEntity {
     public double getHealth() {
         if (livingEntity != null)
             return livingEntity.getHealth();
-        else
+        else if (this.health != null)
             return this.health;
+        else {
+            setMaxHealth();
+            return this.health;
+        }
     }
 
     public void setHealth(double health) {
