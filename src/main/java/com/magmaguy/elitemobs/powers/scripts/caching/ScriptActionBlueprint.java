@@ -109,8 +109,13 @@ public class ScriptActionBlueprint {
             case "wait" -> wait = parseInteger(key, value, scriptName);
             case "amplifier" -> amplifier = parseInteger(key, value, scriptName);
             case "action" -> actionType = parseEnum(key, value, ActionType.class, scriptName);
-            case "potioneffecttype" ->
+            case "potioneffecttype" -> {
+                try {
                     potionEffectType = PotionEffectType.getByKey(NamespacedKey.minecraft(((String) value).toLowerCase()));
+                } catch (Exception ex) {
+                    new WarningMessage("Invalid potion effect type " + value + " in file " + scriptFilename + " for script " + scriptName + " !");
+                }
+            }
             case "scripts" -> scripts = parseStringList(key, value, scriptName);
             case "conditions" ->
                     conditionsBlueprint = new ScriptConditionsBlueprint((Map<?, ?>) value, scriptName, scriptFilename);
