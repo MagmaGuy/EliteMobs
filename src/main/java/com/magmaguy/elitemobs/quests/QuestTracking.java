@@ -210,7 +210,8 @@ public class QuestTracking {
         else {
             World world = null;
             boolean locationsOutOfBounds = false;
-            for (ObjectiveDestinations destinations : objectiveDestinations)
+            List<ObjectiveDestinations> tempDestinations = new ArrayList<>(objectiveDestinations);
+            for (ObjectiveDestinations destinations : tempDestinations)
                 for (Location location : destinations.getDestinations())
                     if (location != null && location.getWorld() != null) {
                         world = location.getWorld();

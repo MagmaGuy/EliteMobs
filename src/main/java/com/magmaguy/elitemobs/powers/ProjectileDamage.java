@@ -7,6 +7,7 @@ import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Iterator;
@@ -37,11 +38,11 @@ public class ProjectileDamage {
                     }
                     boolean removed = false;
                     for (Entity entity : goldNugget.getNearbyEntities(0.1, 0.1, 0.1))
-                        if (entity != eliteEntity.getLivingEntity())
-                            if (entity instanceof LivingEntity) {
-                                BossCustomAttackDamage.dealCustomDamage(eliteEntity.getLivingEntity(), (LivingEntity) entity, 1);
-                                removed = true;
-                            }
+                        if (entity != eliteEntity.getLivingEntity() && entity instanceof LivingEntity livingEntity) {
+                            if (entity instanceof Player player && player.isBlocking()) continue;
+                            BossCustomAttackDamage.dealCustomDamage(eliteEntity.getLivingEntity(), livingEntity, 1);
+                            removed = true;
+                        }
 
                     if (removed) {
                         iterator.remove();

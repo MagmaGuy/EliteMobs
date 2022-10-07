@@ -11,6 +11,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 
+import java.util.List;
+
 public class DialogObjective extends Objective {
 
     @Getter
@@ -18,19 +20,19 @@ public class DialogObjective extends Objective {
     @Getter
     private final String npcFilename;
     @Getter
-    private final String dialog;
+    private final List<String> dialog;
 
-    public DialogObjective(String npcFilename, String npcName, String targetLocation, String dialog) {
+    public DialogObjective(String npcFilename, String npcName, String targetLocation, List<String> dialog) {
         super(1, npcName);
         this.targetLocation = targetLocation;
         this.npcFilename = npcFilename;
-        this.dialog = dialog.replace("\\n", System.lineSeparator());
+        this.dialog = dialog;
     }
 
     public boolean checkProgress(Player player, QuestObjectives questObjectives) {
         if (super.currentAmount >= super.targetAmount) return false;
         progressObjective(questObjectives);
-        player.sendMessage(dialog);
+        dialog.forEach(player::sendMessage);
         return true;
     }
 

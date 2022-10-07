@@ -2,11 +2,13 @@ package com.magmaguy.elitemobs.config.customquests;
 
 import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.config.CustomConfigFieldsInterface;
+import com.magmaguy.elitemobs.utils.InfoMessage;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.configuration.ConfigurationSection;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class CustomQuestsConfigFields extends CustomConfigFields implements CustomConfigFieldsInterface {
 
@@ -19,9 +21,12 @@ public class CustomQuestsConfigFields extends CustomConfigFields implements Cust
     @Getter
     @Setter
     private int questLevel = 0;
+    //@Getter
+    //@Setter
+    //private List<String> customObjectivesList = new ArrayList<>();
     @Getter
     @Setter
-    private List<String> customObjectivesList = new ArrayList<>();
+    protected Map<String, Map<String, Object>> customObjectives = new HashMap();
     @Getter
     @Setter
     private List<String> customRewardsList = new ArrayList<>();
@@ -60,13 +65,13 @@ public class CustomQuestsConfigFields extends CustomConfigFields implements Cust
 
     public CustomQuestsConfigFields(String filename,
                                     boolean isEnabled,
-                                    List<String> customQuestObjective,
+                                    Map<String, Map<String, Object>> customQuestObjective,
                                     List<String> customQuestReward,
                                     int questLevel,
                                     String questName,
                                     List<String> questLore) {
         super(filename, isEnabled);
-        this.customObjectivesList = customQuestObjective;
+        this.customObjectives = customQuestObjective;
         this.customRewardsList = customQuestReward;
         this.questLevel = questLevel;
         this.questName = questName;
@@ -91,7 +96,11 @@ public class CustomQuestsConfigFields extends CustomConfigFields implements Cust
     @Override
     public void processConfigFields() {
         this.isEnabled = processBoolean("isEnabled", isEnabled, true, true);
-        this.customObjectivesList = translatable(filename, "customObjectives", processStringList("customObjectives", customObjectivesList, new ArrayList<>(), true));
+        //this.customObjectivesList = translatable(filename, "customObjectives", processStringList("customObjectives", customObjectivesList, new ArrayList<>(), true));
+        //todo update format
+        if (fileConfiguration.contains("customObjectives") && fileConfiguration.get("customObjectives") instanceof List)
+            updateOldStringFormat(fileConfiguration.getStringList("customObjectives"));
+        this.customObjectives = processQuestObjectives();
         this.customRewardsList = processStringList("customRewards", customRewardsList, new ArrayList<>(), true);
         this.questAcceptPermission = processString("questAcceptPermission", questAcceptPermission, null, false);
         this.questAcceptPermissions = processStringList("questAcceptPermissions", questAcceptPermissions, null, false);
@@ -108,5 +117,84 @@ public class CustomQuestsConfigFields extends CustomConfigFields implements Cust
         this.questLevel = processInt("questLevel", questLevel, 0, false);
     }
 
+    private void updateOldStringFormat(List<String> oldList) {
+        Map<String, Map<String, Object>> parsedObjectives = new HashMap<>();
+        int counter = 0;
+        for (String questObjectiveEntry : oldList) {
+            counter++;
+            Map<String, Object> parsedEntry = new HashMap<>();
+            String[] individualEntries = questObjectiveEntry.split(":");
+            for (String keyAndValue : individualEntries) {
+                String[] keyAndValueArray = keyAndValue.split("=");
+                String key = keyAndValueArray[0];
+                Object value = null;
+                if (keyAndValueArray.length > 1)
+                    value = keyAndValueArray[1];
+                if (value == null)
+                    switch (key.toUpperCase()) {
+                        case "KILL_CUSTOM", "FETCH_ITEM", "DIALOG", "ARENA" -> {
+                            value = key;
+                            key = "objectiveType";
+                        }
+                        default ->
+                                new WarningMessage("Failed to correctly parse key " + key + " in " + filename + " while updating the old quest configuration format!");
+                    }
+                if (key.toLowerCase().equals("dialog")) {
+                    value = Arrays.stream(((String) value).split("\\n")).toList();
+                }
+                parsedEntry.put(key, value);
+                new InfoMessage("Converted quest old entry to " + key + ": " + value);
+            }
+            parsedObjectives.put("Objective" + counter, parsedEntry);
+        }
+        fileConfiguration.set("customObjectives", parsedObjectives);
+        customObjectives = parsedObjectives;
+        try {
+            fileConfiguration.save(file);
+        } catch (Exception ex) {
+            new WarningMessage("Failed to save new custom objective format!");
+        }
+    }
+
+    private Map<String, Map<String, Object>> processQuestObjectives() {
+        Map<String, Object> rawMap;
+
+        //write defaults
+        if (fileConfiguration.getConfigurationSection("customObjectives") == null && !customObjectives.isEmpty()) {
+            fileConfiguration.set("customObjectives", customObjectives);
+            rawMap = new HashMap<>(customObjectives);
+
+            Map<String, Map<String, Object>> parsedObjectives = new HashMap<>();
+            for (Map.Entry<String, Map<String, Object>> maps : customObjectives.entrySet()) {
+                Map<String, Object> parsedMap = new HashMap<>();
+                for (Map.Entry<String, Object> entry : maps.getValue().entrySet())
+                    if (entry.getKey().equals("dialog"))
+                        parsedMap.put(entry.getKey(), translatable(filename, "customObjectives." + maps.getKey() + "." + (String) entry.getKey(), (List<String>) entry.getValue()));
+                    else
+                        parsedMap.put(entry.getKey(), entry.getValue());
+                parsedObjectives.put(maps.getKey(), parsedMap);
+            }
+            return parsedObjectives;
+
+        } else
+            rawMap = fileConfiguration.getConfigurationSection("customObjectives").getValues(false);
+
+        if (rawMap == null) {
+            new WarningMessage("Failed to parse custom objectives for " + filename);
+            return new HashMap<>();
+        }
+        //Parse for the specific translatable elements
+        Map<String, Map<String, Object>> parsedObjectives = new HashMap<>();
+        for (Map.Entry<String, Object> maps : rawMap.entrySet()) {
+            Map<String, Object> parsedMap = new HashMap<>();
+            for (Map.Entry<?, ?> entry : ((ConfigurationSection) maps.getValue()).getValues(false).entrySet())
+                if (entry.getKey().equals("dialog"))
+                    parsedMap.put((String) entry.getKey(), translatable(filename, "customObjectives." + maps.getKey() + "." + (String) entry.getKey(), (List<String>) entry.getValue()));
+                else
+                    parsedMap.put((String) entry.getKey(), entry.getValue());
+            parsedObjectives.put(maps.getKey(), parsedMap);
+        }
+        return parsedObjectives;
+    }
 
 }

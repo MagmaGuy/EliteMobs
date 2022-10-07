@@ -45,8 +45,6 @@ public class ScriptActionBlueprint {
     @Getter
     private Material material = Material.TARGET;
     @Getter
-    private String command = null;
-    @Getter
     private double amount = 1;
     @Getter
     private Boolean bValue = null;

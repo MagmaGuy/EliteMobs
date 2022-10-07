@@ -4,18 +4,20 @@ import com.magmaguy.elitemobs.config.customquests.CustomQuestsConfigFields;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class WelcomeQuest0Config extends CustomQuestsConfigFields {
     public WelcomeQuest0Config() {
         super("ag_welcome_quest_0.yml",
                 true,
-                List.of(
-                        "DIALOG:" +
-                                "filename=guide_1.yml:" +
-                                "npcName=Odigos:" +
-                                "location=at the Adventurer's Guild:" +
-                                "dialog=&8[&aCasus&8]&f Welcome to the Adventurer's Guild Hub, the hub for all things EliteMobs! \nYou can always get back here using &2/ag&f! \nTalk to me again for a quest!"
-                ),
+                Map.of("Objective1", Map.of("objectiveType", "DIALOG",
+                        "filename", "guide_1.yml",
+                        "npcName", "Odigos",
+                        "location", "at the Adventurer's Guild",
+                        "dialog", List.of(
+                                "&8[&aCasus&8]&f Welcome to the Adventurer's Guild Hub, the hub for all things EliteMobs!",
+                                "You can always get back here using &2/ag&f!",
+                                "Talk to me again for a quest!"))),
                 List.of("currencyAmount=50:amount=1:chance=1"),
                 1,
                 "&2Finding the AG!",
