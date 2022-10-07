@@ -22,13 +22,13 @@ import java.util.stream.Collectors;
 public class ScriptZone {
 
     private final ScriptZoneBlueprint zoneBlueprint;
-    private final ScriptTargets scriptTargets;
+    private final ScriptTargets scriptZoneTargets;
     @Getter
     private boolean isValid;
 
     public ScriptZone(ScriptZoneBlueprint zoneBlueprint, EliteScript eliteScript) {
         this.zoneBlueprint = zoneBlueprint;
-        this.scriptTargets = new ScriptTargets(zoneBlueprint.getScriptTargetsBlueprint(), eliteScript);
+        this.scriptZoneTargets = new ScriptTargets(zoneBlueprint.getScriptTargetsBlueprint(), eliteScript);
         isValid = zoneBlueprint.getScriptTargetsBlueprint() != null;
     }
 
@@ -44,15 +44,19 @@ public class ScriptZone {
                                                                   List<Shape> precachedShapes) {
         //Generate shapes for the zone
         List<Shape> shapes;
-        if (precachedShapes != null) shapes = precachedShapes;
-        else shapes = generateShapes(eliteEntity, directTarget);
+        if (precachedShapes != null) {
+            shapes = precachedShapes;
+        }
+        else {
+            shapes = generateShapes(eliteEntity, directTarget);
+        }
 
         //Get the entities from those zones
         switch (blueprintFromRequestingTarget.getTargetType()) {
             case ZONE_FULL, ZONE_BORDER:
-                return getEntitiesInArea(shapes, scriptTargets.getTargetBlueprint().getTargetType());
+                return getEntitiesInArea(shapes, blueprintFromRequestingTarget.getTargetType());
             default: {
-                new WarningMessage("Couldn't parse target " + scriptTargets.getTargetBlueprint().getTargetType() + " in script ");
+                new WarningMessage("Couldn't parse target " + scriptZoneTargets.getTargetBlueprint().getTargetType() + " in script ");
                 return new ArrayList<>();
             }
         }
@@ -65,7 +69,9 @@ public class ScriptZone {
                                                             List<Shape> precachedShapes) {
         //Generate shapes for the zone
         List<Shape> shapes;
-        if (precachedShapes != null) shapes = precachedShapes;
+        if (precachedShapes != null) {
+            shapes = precachedShapes;
+        }
         else shapes = generateShapes(eliteEntity, directTarget);
 
         //Get the locations from those zones
@@ -88,7 +94,7 @@ public class ScriptZone {
     private List<Shape> generateShapes(EliteEntity eliteEntity, LivingEntity directTarget) {
         List<Shape> shapes = new ArrayList<>();
         //Get the shapes from the targets of the zone
-        for (Location shapeTargetLocation : scriptTargets.getZoneLocationTargets(eliteEntity, directTarget)) {
+        for (Location shapeTargetLocation : scriptZoneTargets.getZoneLocationTargets(eliteEntity, directTarget)) {
             switch (zoneBlueprint.getShapeTypeEnum()) {
                 case CYLINDER:
                     shapes.add(new Cylinder(shapeTargetLocation, zoneBlueprint.getRadius(), zoneBlueprint.getHeight(), zoneBlueprint.getBorderRadius()));
@@ -127,10 +133,12 @@ public class ScriptZone {
                     return new ArrayList<>();
             }
 
+
             //Check if entities are in the relevant area
             livingEntities.removeIf(livingEntity -> {
-                if (target.equals(Target.ZONE_FULL))
+                if (target.equals(Target.ZONE_FULL)) {
                     return !shape.contains(livingEntity.getLocation());
+                }
                 else if (target.equals(Target.ZONE_BORDER))
                     return !shape.borderContains(livingEntity.getLocation());
                 return false;

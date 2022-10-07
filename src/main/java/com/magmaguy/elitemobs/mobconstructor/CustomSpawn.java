@@ -20,7 +20,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Zombie;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -123,6 +125,17 @@ public class CustomSpawn {
             @Override
             public void run() {
 
+                //One last check
+                //Last line of defense - spawn a test mob. If some uknown protection system prevents spawning it should prevent this
+                LivingEntity testEntity = spawnLocation.getWorld().spawn(spawnLocation, Zombie.class);
+                if (!testEntity.isValid()) {
+                    spawnLocation = null;
+                    //Run 1 tick later to make sure it doesn't get stuck trying over and over again in the same tick
+                    Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> generateCustomSpawn(), 1);
+                    return;
+                }
+                testEntity.remove();
+
                 if (!keepTrying) cancel();
 
                 if (Objects.requireNonNull(spawnLocation.getWorld()).getTime() < customSpawnConfigFields.getEarliestTime() ||
@@ -185,8 +198,7 @@ public class CustomSpawn {
                 }));
             }
         } else {
-            if (isEvent)
-                new DebugMessage("Spawned bosses for event after " + allTries + " tries");
+            if (isEvent) new DebugMessage("Spawned bosses for event after " + allTries + " tries");
             spawn();
         }
     }

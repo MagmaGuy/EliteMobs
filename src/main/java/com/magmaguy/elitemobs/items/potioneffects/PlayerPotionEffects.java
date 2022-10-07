@@ -116,7 +116,9 @@ public class PlayerPotionEffects implements Listener {
                     Harm.doHarm(player, elitePotionEffect);
                     return;
                 }
-                if (elitePotionEffect.getPotionEffect().getType().equals(PotionEffectType.LEVITATION)) {
+                if (elitePotionEffect.getPotionEffect().getType().equals(PotionEffectType.LEVITATION) ||
+                        elitePotionEffect.getPotionEffect().getType().equals(PotionEffectType.SLOW) ||
+                        elitePotionEffect.getPotionEffect().getType().equals(PotionEffectType.BLINDNESS)) {
                     EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(damagee);
                     if (eliteEntity != null && eliteEntity.getHealthMultiplier() > 1)
                         return;
