@@ -267,12 +267,21 @@ public class ScriptAction {
 
     //Sets mob AI
     private void runSetMobAI(EliteEntity eliteEntity, LivingEntity directTarget) {
-        getTargets(eliteEntity, directTarget).forEach(targetEntity -> targetEntity.setAI(blueprint.getBValue()));
+        getTargets(eliteEntity, directTarget).forEach(targetEntity -> {
+            targetEntity.setAI(blueprint.getBValue());
+            if (blueprint.getDuration() > 0)
+                ((Mob) targetEntity).setAI(!blueprint.getBValue());
+        });
     }
 
     //Sets mob awareness
     private void runSetMobAware(EliteEntity eliteEntity, LivingEntity directTarget) {
-        getTargets(eliteEntity, directTarget).forEach(targetEntity -> ((Mob) targetEntity).setAware(blueprint.getBValue()));
+        getTargets(eliteEntity, directTarget).forEach(targetEntity -> {
+            ((Mob) targetEntity).setAware(blueprint.getBValue());
+            if (blueprint.getDuration() > 0)
+                ((Mob) targetEntity).setAware(!blueprint.getBValue());
+        });
+
     }
 
     //Plays a sound at the target location

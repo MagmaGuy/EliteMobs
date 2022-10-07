@@ -119,6 +119,7 @@ public class ElitePower {
         if (event.getEliteMobEntity().getLivingEntity() == null) return false;
         if (!event.getEliteMobEntity().getLivingEntity().hasAI()) return false;
         if (elitePower.isInGlobalCooldown()) return false;
+        if (elitePower.isInCooldown(event.getEliteMobEntity())) return false;
         return !event.getEliteMobEntity().isInCooldown();
     }
 
@@ -150,6 +151,8 @@ public class ElitePower {
 
     public void doCooldown(EliteEntity eliteEntity) {
         this.powerCooldownActive = true;
+        if (globalCooldownTime < 1) return;
+
         eliteEntity.doGlobalPowerCooldown(globalCooldownTime * 20);
 
         new BukkitRunnable() {

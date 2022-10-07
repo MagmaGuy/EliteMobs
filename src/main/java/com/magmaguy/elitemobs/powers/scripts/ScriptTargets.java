@@ -50,7 +50,7 @@ public class ScriptTargets {
 
     protected void cacheTargets(EliteEntity eliteEntity, LivingEntity directTarget, ActionType actionType) {
         //Only cache if tracking
-        if (!getTargetBlueprint().isTrack()) return;
+        if (getTargetBlueprint().isTrack()) return;
         //Only cache locations - caching living entities would probably be very confusing
         if (!actionType.isRequiresLivingEntity()) {
             locations = null;

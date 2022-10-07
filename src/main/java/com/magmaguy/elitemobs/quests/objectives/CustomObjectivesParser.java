@@ -2,10 +2,12 @@ package com.magmaguy.elitemobs.quests.objectives;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.quests.CustomQuest;
+import com.magmaguy.elitemobs.utils.MapListInterpreter;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class CustomObjectivesParser {
     /**
@@ -16,6 +18,10 @@ public class CustomObjectivesParser {
      */
     public static List<Objective> processCustomObjectives(CustomQuest customQuest) {
         List<Objective> objectives = new ArrayList<>();
+
+        for (Map<String, Object> maps : customQuest.getCustomQuestsConfigFields().getCustomObjectives().values())
+            objectives.add(processObjectiveType(maps, customQuest));
+        /*
         for (String string : customQuest.getCustomQuestsConfigFields().getCustomObjectivesList()) {
             String[] rawStrings = string.split(":");
             switch (rawStrings[0]) {
@@ -35,43 +41,44 @@ public class CustomObjectivesParser {
                     return new ArrayList<>();
             }
         }
+         */
         return objectives;
     }
 
-    private static Objective processObjectiveType(String[] rawStrings, ObjectiveType objectiveType, CustomQuest customQuest) {
+    private static Objective processObjectiveType(Map<String, Object> rawMap, CustomQuest customQuest) {
+        ObjectiveType objectiveType = null;
         String filename = null;
         String location = null;
-        String dialog = null;
+        List<String> dialog = null;
         String name = null;
-        int amount = 1;
-        for (String rawString : rawStrings) {
-            String[] processedStrings = rawString.split("=");
-            switch (processedStrings[0]) {
+        Integer amount = 1;
+        for (Map.Entry<String, Object> entry : rawMap.entrySet()) {
+            switch (entry.getKey()) {
+                case "objectiveType":
+                    objectiveType = MapListInterpreter.parseEnum(entry.getKey(), entry.getValue(), ObjectiveType.class, customQuest.getConfigurationFilename());
+                    break;
                 case "filename":
-                    filename = processedStrings[1];
+                    filename = MapListInterpreter.parseString(entry.getKey(), entry.getValue(), customQuest.getConfigurationFilename());
                     break;
                 case "amount":
-                    try {
-                        amount = Integer.parseInt(processedStrings[1]);
-                    } catch (Exception ex) {
-                        new WarningMessage("Invalid amount " + amount + " in entry " + rawString + " for Custom Quest " + filename + " . Defaulting to 1.");
-                    }
+                    amount = MapListInterpreter.parseInteger(entry.getKey(), entry.getValue(), customQuest.getConfigurationFilename());
+                    if (amount == null) amount = 1;
                     break;
                 case "location":
-                    location = ChatColorConverter.convert(processedStrings[1]);
+                    location = MapListInterpreter.parseString(entry.getKey(), entry.getValue(), customQuest.getConfigurationFilename());
                     break;
                 case "dialog":
-                    dialog = ChatColorConverter.convert(processedStrings[1]);
+                    dialog = ChatColorConverter.convert(MapListInterpreter.parseStringList(entry.getKey(), entry.getValue(), customQuest.getConfigurationFilename()));
                     break;
                 case "npcName":
                 case "itemName":
                 case "name":
-                    name = ChatColorConverter.convert(processedStrings[1]);
+                    name = ChatColorConverter.convert(MapListInterpreter.parseString(entry.getKey(), entry.getValue(), customQuest.getConfigurationFilename()));
                     break;
             }
         }
         if (filename == null) {
-            new WarningMessage("Invalid filename for entry " + rawStrings.toString() + " in Custom Quest " + customQuest.getCustomQuestsConfigFields().getFilename() + " . This objective will not be registered.");
+            new WarningMessage("Invalid filename for entry " + rawMap.toString() + " in Custom Quest " + customQuest.getCustomQuestsConfigFields().getFilename() + " . This objective will not be registered.");
             return null;
         }
         try {
@@ -83,7 +90,7 @@ public class CustomObjectivesParser {
                 return new DialogObjective(filename, name, location, dialog);
         } catch (Exception ex) {
             new WarningMessage("Failed to register objective type for quest " + customQuest.getCustomQuestsConfigFields().getFilename() + " ! This quest will be skipped");
-            new WarningMessage("Invalid entry: " + rawStrings.toString());
+            new WarningMessage("Invalid entry: " + rawMap.toString());
             ex.printStackTrace();
         }
 
