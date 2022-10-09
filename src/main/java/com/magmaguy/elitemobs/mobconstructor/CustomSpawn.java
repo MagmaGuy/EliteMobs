@@ -124,7 +124,11 @@ public class CustomSpawn {
         new BukkitRunnable() {
             @Override
             public void run() {
-
+                if (spawnLocation != null) {
+                    Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> generateCustomSpawn(), 1);
+                    cancel();
+                    return;
+                }
                 //One last check
                 //Last line of defense - spawn a test mob. If some uknown protection system prevents spawning it should prevent this
                 LivingEntity testEntity = spawnLocation.getWorld().spawn(spawnLocation, Zombie.class);
@@ -132,6 +136,7 @@ public class CustomSpawn {
                     spawnLocation = null;
                     //Run 1 tick later to make sure it doesn't get stuck trying over and over again in the same tick
                     Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> generateCustomSpawn(), 1);
+                    cancel();
                     return;
                 }
                 testEntity.remove();

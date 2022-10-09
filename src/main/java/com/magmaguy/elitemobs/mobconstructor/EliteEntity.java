@@ -300,7 +300,7 @@ public class EliteEntity {
     }
 
     private void setMaxHealth() {
-        this.defaultMaxHealth = EliteMobProperties.getPluginData(this.getLivingEntity().getType()).getDefaultMaxHealth();
+        this.defaultMaxHealth = EliteMobProperties.getPluginData(entityType).getDefaultMaxHealth();
         this.maxHealth = (level * CombatSystem.TARGET_HITS_TO_KILL_MINUS_ONE + this.defaultMaxHealth) * healthMultiplier;
         if (livingEntity != null)
             livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(maxHealth);
