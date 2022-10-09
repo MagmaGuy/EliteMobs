@@ -472,7 +472,8 @@ public class PlayerData {
     }
 
     public static void setMatchInstance(Player player, MatchInstance newMatchInstance) {
-        playerDataHashMap.get(player.getUniqueId()).matchInstance = newMatchInstance;
+        if (playerDataHashMap.get(player.getUniqueId()) != null)
+            playerDataHashMap.get(player.getUniqueId()).matchInstance = newMatchInstance;
     }
 
     private static Boolean getDatabaseBoolean(UUID uuid, String value) {
