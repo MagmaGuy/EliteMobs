@@ -55,7 +55,7 @@ public class ScriptZoneBlueprint {
             case "height" -> height = parseDouble(key, value, scriptName);
             case "radius" -> radius = parseDouble(key, value, scriptName);
             case "borderradius" -> borderRadius = parseDouble(key, value, scriptName);
-            case "target" -> {
+            case "target", "locations", "range", "track" -> {
             }
             default -> {
                 new WarningMessage("Failed to read key " + key + " for script " + scriptName + " in file " + filename);

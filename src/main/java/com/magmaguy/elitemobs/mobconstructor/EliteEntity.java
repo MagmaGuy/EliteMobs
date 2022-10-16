@@ -127,6 +127,8 @@ public class EliteEntity {
     @Getter
     @Setter
     private boolean healing = false;
+    //Used for custom arbitrary tags from elite scripts
+    private HashSet<String> customMetadata = new HashSet<>();
 
     /**
      * Functions as a placeholder for {@link CustomBossEntity} that haven't been initialized yet. Uses the builder pattern
@@ -182,12 +184,12 @@ public class EliteEntity {
                 if (iteratedPlayer.getUniqueId().equals(player.getUniqueId())) {
                     this.damagers.put(iteratedPlayer, this.damagers.get(iteratedPlayer) + damage);
                     this.aggro.put(iteratedPlayer, this.aggro.get(iteratedPlayer) + damage *
-                            ElitePlayerInventory.getPlayer(player).getLoudStrikesBonusMultipler(false));
+                            ElitePlayerInventory.getPlayer(player).getLoudStrikesBonusMultiplier(false));
                     return;
                 }
         this.damagers.put(player, damage);
         this.aggro.put(player, damage *
-                ElitePlayerInventory.getPlayer(player).getLoudStrikesBonusMultipler(false));
+                ElitePlayerInventory.getPlayer(player).getLoudStrikesBonusMultiplier(false));
     }
 
     public boolean hasDamagers() {
@@ -656,6 +658,30 @@ public class EliteEntity {
 
     public int getGlobalReinforcementsCount() {
         return this.globalReinforcementEntities.size();
+    }
+
+    public HashSet<String> getTags(){
+        return customMetadata;
+    }
+
+    public boolean hasTag(String tag) {
+        return customMetadata.contains(tag);
+    }
+
+    public void addTag(String tag) {
+        customMetadata.add(tag);
+    }
+
+    public void addTags(List<String> tags) {
+        customMetadata.addAll(tags);
+    }
+
+    public void removeTag(String tag) {
+        customMetadata.remove(tag);
+    }
+
+    public void removeTags(List<String> tags) {
+        customMetadata.removeAll(tags);
     }
 
 }

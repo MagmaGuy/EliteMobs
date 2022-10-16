@@ -45,6 +45,13 @@ public class BossTrackingPage {
         ArrayList<TextComponent> textComponents = new ArrayList<>();
         int counter = 0;
 
+        //Fixes the issue where sometimes trackable bosses stay on the tracking page for no reason
+        HashSet<CustomBossEntity> tempSet = new HashSet<>(CustomBossEntity.getTrackableCustomBosses());
+        tempSet.forEach(customBossEntity -> {
+            if (!customBossEntity.exists())
+                CustomBossEntity.getTrackableCustomBosses().remove(customBossEntity);
+        });
+
         for (CustomBossEntity customBossEntity : CustomBossEntity.getTrackableCustomBosses()) {
             try {
                 textComponents.add(SpigotMessage.commandHoverMessage(
@@ -100,6 +107,7 @@ public class BossTrackingPage {
 
         @EventHandler(ignoreCancelled = true)
         public void onInventoryInteract(InventoryClickEvent event) {
+            if (event.getSlot() < 0) return;
             Player player = ((Player) event.getWhoClicked()).getPlayer();
             if (!pageInventories.contains(event.getInventory())) return;
             event.setCancelled(true);

@@ -307,6 +307,10 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         this.phaseSpawnLocation = processString("phaseSpawnLocation", phaseSpawnLocation, null, false);
         this.locationMessage = translatable(filename, "locationMessage", processString("locationMessage", locationMessage, null, false));
         this.mountedEntity = processString("mountedEntity", mountedEntity, null, false);
+        if (mountedEntity != null && mountedEntity.equals(filename)) {
+            new WarningMessage("Custom Boss " + filename + " has itself for a mount. This makes an infinite loop of the boss mounting itself. The boss mount will not be used for safety reasons.");
+            this.mountedEntity = null;
+        }
         this.spawnMessage = translatable(filename, "spawnMessage", processString("spawnMessage", spawnMessage, null, false));
         this.deathMessage = translatable(filename, "deathMessage", processString("deathMessage", deathMessage, null, false));
         this.escapeMessage = translatable(filename, "escapeMessage", processString("escapeMessage", escapeMessage, null, false));

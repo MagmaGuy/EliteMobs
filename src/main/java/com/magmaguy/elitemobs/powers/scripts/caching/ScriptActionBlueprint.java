@@ -3,9 +3,13 @@ package com.magmaguy.elitemobs.powers.scripts.caching;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.scripts.ScriptTargets;
 import com.magmaguy.elitemobs.powers.scripts.enums.ActionType;
+import com.magmaguy.elitemobs.utils.PotionEffectTypeUtil;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
-import org.bukkit.*;
+import org.bukkit.Color;
+import org.bukkit.FireworkEffect;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.potion.PotionEffectType;
@@ -84,6 +88,10 @@ public class ScriptActionBlueprint {
     private String location = null;
     @Getter
     private Vector offset = new Vector(0, 0, 0);
+    @Getter
+    private List<String> positiveTags;
+    @Getter
+    private List<String> negativeTags;
 
 
     public ScriptActionBlueprint(Map<?, ?> entry, String scriptName, String scriptFilename) {
@@ -109,7 +117,7 @@ public class ScriptActionBlueprint {
             case "action" -> actionType = parseEnum(key, value, ActionType.class, scriptName);
             case "potioneffecttype" -> {
                 try {
-                    potionEffectType = PotionEffectType.getByKey(NamespacedKey.minecraft(((String) value).toLowerCase()));
+                    potionEffectType = PotionEffectTypeUtil.getByKey(((String) value).toLowerCase());
                 } catch (Exception ex) {
                     new WarningMessage("Invalid potion effect type " + value + " in file " + scriptFilename + " for script " + scriptName + " !");
                 }
@@ -142,6 +150,8 @@ public class ScriptActionBlueprint {
             case "invulnerable" -> invulnerable = parseBoolean(key, value, scriptName);
             case "location" -> location = parseString(key, value, scriptName);
             case "offset" -> offset = parseVector(key, value, scriptName);
+            case "positivetag" -> positiveTags = parseStringList(key, value, scriptName);
+            case "negativetag" -> negativeTags = parseStringList(key, value, scriptName);
             //Managed by ScriptTargets
             case "target", "locations", "range", "track" -> {
             }

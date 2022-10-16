@@ -36,15 +36,16 @@ public class SchematicDungeonPackage extends SchematicPackage implements Dungeon
                 new WarningMessage("Failed to correctly read entry " + string + " in schematic dungeon " + dungeonPackagerConfigFields.getFilename());
             }
         }
-        for (String string : dungeonPackagerConfigFields.getRelativeTreasureChestLocations()) {
-            try {
-                Vector vector = getVectorFromConfig(string.split(":")[1]);
-                if (vector == null) continue;
-                rawChestLocations.add(new RawContainer(string.split(":")[0], vector));
-            } catch (Exception ex) {
-                new WarningMessage("Failed to correctly read entry " + string + " in schematic dungeon " + dungeonPackagerConfigFields.getFilename());
+        if (!dungeonPackagerConfigFields.getRelativeTreasureChestLocations().isEmpty())
+            for (String string : dungeonPackagerConfigFields.getRelativeTreasureChestLocations()) {
+                try {
+                    Vector vector = getVectorFromConfig(string.split(":")[1]);
+                    if (vector == null) continue;
+                    rawChestLocations.add(new RawContainer(string.split(":")[0], vector));
+                } catch (Exception ex) {
+                    new WarningMessage("Failed to correctly read entry " + string + " in schematic dungeon " + dungeonPackagerConfigFields.getFilename());
+                }
             }
-        }
     }
 
     private void getEntities() {

@@ -6,6 +6,7 @@ import org.bukkit.World;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class FrostPalaceSanctum extends DungeonPackagerConfigFields {
     public FrostPalaceSanctum() {
@@ -29,5 +30,9 @@ public class FrostPalaceSanctum extends DungeonPackagerConfigFields {
                 List.of("filename=frost_palace_frost_queen_p0.yml"),
                 "frost_palace",
                 50);
+        setDifficulties(List.of(
+                Map.of("name", "normal", "levelSync", 60),
+                Map.of("name", "hard", "levelSync", 50),
+                Map.of("name", "mythic", "levelSync", 40)));
     }
 }

@@ -51,7 +51,7 @@ public class FlamethrowerEnchantment extends CustomEnchantment {
                         continue;
                     if (((LivingEntity) entity).hasPotionEffect(PotionEffectType.FIRE_RESISTANCE)) continue;
                     BossCustomAttackDamage.dealCustomDamage(player,
-                            (LivingEntity) entity, ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getWeaponTier(false));
+                            (LivingEntity) entity, ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getWeaponLevel(false));
                 }
 
     }

@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.dungeons.WorldInstancedDungeonPackage;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.instanced.dungeons.DungeonInstance;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -20,8 +21,11 @@ import java.util.*;
 
 public class InstancedDungeonBrowser extends EliteMenu {
     private static final HashMap<Inventory, InstancedDungeonBrowser> inventories = new HashMap<>();
+
+    private final List<Integer> difficultySlots = List.of(2, 4, 6, 0, 8, 1, 3, 5, 7);
     private final List<Integer> validSlots = new ArrayList<>(List.of(18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
             31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53));
+    @Getter
     private final EMPackage emPackage;
     private List<DungeonInstance> instancesList;
 
@@ -42,11 +46,16 @@ public class InstancedDungeonBrowser extends EliteMenu {
         if (dungeonInstances.isEmpty()) slots = 9;
         else slots = 54;
         Inventory inventory = Bukkit.createInventory(player, slots);
-        inventory.setItem(4, ItemStackGenerator.generateItemStack(Material.GREEN_STAINED_GLASS_PANE,
-                "Create new instance!",
-                List.of("Create a new instance of the dungeon",
-                        emPackage.getDungeonPackagerConfigFields().getName() + " for yourself and maybe ",
-                        "some friends!")));
+        int difficultyCounter = 0;
+        for (Map map : emPackage.getDungeonPackagerConfigFields().getDifficulties()) {
+            inventory.setItem(difficultySlots.get(difficultyCounter), ItemStackGenerator.generateItemStack(Material.GREEN_STAINED_GLASS_PANE,
+                    "&2Start a " + map.get("name") + " difficulty dungeon!",
+                    List.of("Create a new instance of the dungeon",
+                            emPackage.getDungeonPackagerConfigFields().getName() + " for yourself and maybe ",
+                            "some friends!")));
+
+            difficultyCounter++;
+        }
 
         for (int i = 0; i < dungeonInstances.size(); i++) {
             ItemStack itemStack;
@@ -89,9 +98,10 @@ public class InstancedDungeonBrowser extends EliteMenu {
             if (event.getCurrentItem() == null || event.getCurrentItem().getType().equals(Material.AIR)) return;
             InstancedDungeonBrowser instancedDungeonBrowser = inventories.get(event.getInventory());
             //Case for creating a new instance
-            if (event.getSlot() == 4) {
+            if (instancedDungeonBrowser.difficultySlots.contains(event.getSlot())) {
                 DungeonInstance.setupInstancedDungeon((Player) event.getWhoClicked(),
-                        instancedDungeonBrowser.emPackage.getDungeonPackagerConfigFields().getFilename());
+                        instancedDungeonBrowser.getEmPackage().getDungeonPackagerConfigFields().getFilename(),
+                        (String) instancedDungeonBrowser.getEmPackage().getDungeonPackagerConfigFields().getDifficulties().get(instancedDungeonBrowser.difficultySlots.indexOf(event.getSlot())).get("name"));
             } else {
                 DungeonInstance dungeonInstance = instancedDungeonBrowser.instancesList.get(instancedDungeonBrowser.validSlots.indexOf(event.getSlot()));
                 switch (dungeonInstance.getState()) {
