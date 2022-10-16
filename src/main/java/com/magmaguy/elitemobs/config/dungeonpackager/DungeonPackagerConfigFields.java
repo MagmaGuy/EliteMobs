@@ -14,6 +14,7 @@ import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class DungeonPackagerConfigFields extends CustomConfigFields {
 
@@ -95,6 +96,9 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
     private String dungeonConfigFolderName;
     @Getter
     private int contentLevel;
+    @Getter
+    @Setter
+    private List<Map<String, Object>> difficulties;
 
     public DungeonPackagerConfigFields(String fileName, boolean isEnabled) {
         super(fileName, isEnabled);
@@ -354,6 +358,10 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
         this.rawDungeonObjectives = processStringList("dungeonObjectives", rawDungeonObjectives, null, false);
         this.dungeonConfigFolderName = processString("dungeonConfigFolderName", dungeonConfigFolderName, null, false);
         this.contentLevel = processInt("contentLevel", contentLevel, 0, false);
+        if (fileConfiguration.getConfigurationSection("difficulties") != null)
+            this.difficulties = (List<Map<String, Object>>) fileConfiguration.getList("difficulties");
+        else
+            fileConfiguration.addDefault("difficulties", difficulties);
         processAdditionalFields();
     }
 

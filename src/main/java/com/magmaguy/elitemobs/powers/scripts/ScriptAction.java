@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
 import com.magmaguy.elitemobs.collateralminecraftchanges.LightningSpawnBypass;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.powers.meta.CustomSummonPower;
 import com.magmaguy.elitemobs.powers.scripts.caching.ScriptActionBlueprint;
 import com.magmaguy.elitemobs.powers.scripts.enums.ActionType;
@@ -64,6 +65,9 @@ public class ScriptAction {
                         @Override
                         public void run() {
                             counter++;
+                            //Check if the script conditions of action are met, since repeating actions might've stopped being valid
+                            if (blueprint.getConditionsBlueprint() != null && !scriptConditions.meetsConditions(eliteEntity, directTarget))
+                                return;
                             //If it has run for the allotted amount times, stop
                             if (blueprint.getTimes() > 0 && counter > blueprint.getTimes()) {
                                 cancel();
@@ -106,6 +110,8 @@ public class ScriptAction {
             case RUN_SCRIPT -> runAdditionalScripts(eliteEntity, directTarget);
             case SPAWN_FIREWORKS -> runSpawnFireworks(eliteEntity, directTarget);
             case MAKE_INVULNERABLE -> runMakeInvulnerable(eliteEntity, directTarget);
+            case TAG -> runTag(eliteEntity, directTarget);
+            case UNTAG -> runUntag(eliteEntity, directTarget);
             default ->
                     new WarningMessage("Failed to determine action type " + blueprint.getActionType() + " in script " + blueprint.getScriptName() + " for file " + blueprint.getScriptFilename());
         }
@@ -322,6 +328,38 @@ public class ScriptAction {
             targetEntity.setInvulnerable(blueprint.isInvulnerable());
             if (blueprint.getDuration() > 0)
                 Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, () -> targetEntity.setInvulnerable(!blueprint.isInvulnerable()), blueprint.getDuration());
+        });
+    }
+
+    private void runTag(EliteEntity eliteEntity, LivingEntity directTarget) {
+        getTargets(eliteEntity, eliteEntity.getLivingEntity()).forEach(targetEntity -> {
+            EliteEntity bossEntity = EntityTracker.getEliteMobEntity(targetEntity);
+            if (bossEntity != null)
+                bossEntity.addTags(blueprint.getPositiveTags());
+            if (targetEntity instanceof Player player && ElitePlayerInventory.getPlayer(player) != null)
+                ElitePlayerInventory.getPlayer(player).addTags(blueprint.getPositiveTags());
+            if (blueprint.getDuration() > 0) {
+                if (bossEntity != null)
+                    Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, () -> bossEntity.removeTags(blueprint.getPositiveTags()), blueprint.getDuration());
+                if (targetEntity instanceof Player player && ElitePlayerInventory.getPlayer(player) != null)
+                    Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, () -> ElitePlayerInventory.getPlayer(player).removeTags(blueprint.getPositiveTags()), blueprint.getDuration());
+            }
+        });
+    }
+
+    private void runUntag(EliteEntity eliteEntity, LivingEntity directTarget) {
+        getTargets(eliteEntity, eliteEntity.getLivingEntity()).forEach(targetEntity -> {
+            EliteEntity bossEntity = EntityTracker.getEliteMobEntity(targetEntity);
+            if (bossEntity != null)
+                bossEntity.addTags(blueprint.getNegativeTags());
+            if (targetEntity instanceof Player player && ElitePlayerInventory.getPlayer(player) != null)
+                ElitePlayerInventory.getPlayer(player).addTags(blueprint.getNegativeTags());
+            if (blueprint.getDuration() > 0) {
+                if (bossEntity != null)
+                    Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, () -> bossEntity.removeTags(blueprint.getNegativeTags()), blueprint.getDuration());
+                if (targetEntity instanceof Player player && ElitePlayerInventory.getPlayer(player) != null)
+                    Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, () -> ElitePlayerInventory.getPlayer(player).removeTags(blueprint.getNegativeTags()), blueprint.getDuration());
+            }
         });
     }
 }

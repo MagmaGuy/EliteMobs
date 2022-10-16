@@ -269,7 +269,7 @@ public abstract class MatchInstance {
             matchInstance.playerDeath(player);
         }
 
-        @EventHandler
+        @EventHandler (ignoreCancelled = true)
         public void onPlayerTeleport(PlayerTeleportEvent event) {
             if (teleportBypass) {
                 teleportBypass = false;

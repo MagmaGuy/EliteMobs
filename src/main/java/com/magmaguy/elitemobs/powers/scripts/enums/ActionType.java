@@ -24,10 +24,13 @@ public enum ActionType {
     ACTION_BAR_MESSAGE(false),
     TITLE_MESSAGE(false),
     SPAWN_FIREWORKS(false),
-    MAKE_INVULNERABLE(true);
+    MAKE_INVULNERABLE(true),
+    TAG(true),
+    UNTAG(true);
 
     @Getter
     private final boolean requiresLivingEntity;
+
     ActionType(boolean requiresLivingEntity) {
         this.requiresLivingEntity = requiresLivingEntity;
     }

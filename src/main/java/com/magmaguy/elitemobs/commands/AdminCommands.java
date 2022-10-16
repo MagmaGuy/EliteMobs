@@ -33,6 +33,7 @@ import com.magmaguy.elitemobs.menus.ProceduralShopMenu;
 import com.magmaguy.elitemobs.menus.SellMenu;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.transitiveblocks.TransitiveBlockCommand;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
@@ -935,6 +936,18 @@ public class AdminCommands {
                 .permission("elitemobs.*")
                 .handler(commandContext -> {
                     new PackageCommand(commandContext.getSender(), commandContext.get("dungeonName"), commandContext.get("dungeonVersion"));
+                })
+        );
+
+        // /em forcerespawn
+        manager.command(builder.literal("forcerespawn")
+                .meta(CommandMeta.DESCRIPTION, "Resets spawn cooldowns")
+                .senderType(CommandSender.class)
+                .permission("elitemobs.*")
+                .handler(commandContext -> {
+                    RegionalBossEntity.getRegionalBossEntities().forEach(regionalBossEntity -> {
+                        if (regionalBossEntity.isRespawning()) regionalBossEntity.forceRespawn();
+                    });
                 })
         );
 

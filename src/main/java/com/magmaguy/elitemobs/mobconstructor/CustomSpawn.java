@@ -124,7 +124,7 @@ public class CustomSpawn {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (spawnLocation != null) {
+                if (spawnLocation == null) {
                     Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> generateCustomSpawn(), 1);
                     cancel();
                     return;

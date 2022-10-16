@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.dungeons.SchematicPackage;
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -17,7 +18,7 @@ public class DarkCathedralLair extends DungeonPackagerConfigFields {
                         "&fA classic that all servers need!",
                         "&6Credits: MagmaGuy & 69OzCanOfBepis"),
                 List.of("dark_cathedral_tier_75_boss.yml:0.5,0.5,24.5"),
-                List.of(""),
+                new ArrayList<>(),
                 DiscordLinks.freeMinidungeons,
                 DungeonSizeCategory.LAIR,
                 "em_dark_cathedral.schem",

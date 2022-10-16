@@ -13,10 +13,7 @@ import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.InstancedBossEntity;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
-import com.magmaguy.elitemobs.utils.ConfigurationLocation;
-import com.magmaguy.elitemobs.utils.EventCaller;
-import com.magmaguy.elitemobs.utils.WarningMessage;
-import com.magmaguy.elitemobs.utils.WorldInstantiator;
+import com.magmaguy.elitemobs.utils.*;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -38,14 +35,18 @@ public class DungeonInstance extends MatchInstance {
     private final File instancedWorldFile;
     @Getter
     private final DungeonPackagerConfigFields dungeonPackagerConfigFields;
-    List<InstancedBossEntity> instancedBossEntities = new ArrayList<>();
+    private List<InstancedBossEntity> instancedBossEntities = new ArrayList<>();
+    @Getter
+    private int levelSync = -1;
+    private String difficultyName = null;
 
     public DungeonInstance(DungeonPackagerConfigFields dungeonPackagerConfigFields,
                            Location lobbyLocation,
                            Location startLocation,
                            World world,
                            File instancedWorldFile,
-                           Player player) {
+                           Player player,
+                           String difficultyName) {
         super(startLocation,
                 null, //todo: the end location is currently not definable
                 dungeonPackagerConfigFields.getMinPlayerCount(),
@@ -57,12 +58,14 @@ public class DungeonInstance extends MatchInstance {
         this.world = world;
         this.instancedWorldName = world.getName();
         this.instancedWorldFile = instancedWorldFile;
+        this.difficultyName = difficultyName;
+        setDifficulty(difficultyName);
         addNewPlayer(player);
         instancedBossEntities = InstancedBossEntity.initializeInstancedBosses(dungeonPackagerConfigFields.getWorldName(), world, players.size());
         dungeonInstances.add(this);
     }
 
-    public static boolean setupInstancedDungeon(Player player, String instancedDungeonConfigFieldsString) {
+    public static boolean setupInstancedDungeon(Player player, String instancedDungeonConfigFieldsString, String difficultyName) {
         DungeonPackagerConfigFields instancedDungeonsConfigFields = DungeonPackagerConfig.getDungeonPackages().get(instancedDungeonConfigFieldsString);
         if (instancedDungeonsConfigFields == null) {
             player.sendMessage("[EliteMobs] Failed to get data for dungeon " + instancedDungeonConfigFieldsString + "! The dungeon will not start.");
@@ -116,12 +119,19 @@ public class DungeonInstance extends MatchInstance {
                         //Location where players are teleported to upon completion, this usually gets overriden with the previous location players were at
                         //todo: will probably want to define this at some point Location endLocation = ConfigurationLocation.serialize(instancedDungeonsConfigFields.getEndLocation());
                         //endLocation.setWorld(world);
-                        DungeonInstance dungeonInstance = new DungeonInstance(instancedDungeonsConfigFields, lobbyLocation, startLocation, world, targetFile, player);
+                        DungeonInstance dungeonInstance = new DungeonInstance(instancedDungeonsConfigFields, lobbyLocation, startLocation, world, targetFile, player, difficultyName);
                     }
                 }.runTask(MetadataHandler.PLUGIN);
             }
         }.runTaskAsynchronously(MetadataHandler.PLUGIN);
 
+        return true;
+    }
+
+    @Override
+    public boolean addNewPlayer(Player player) {
+        if (!super.addNewPlayer(player)) return false;
+        player.sendMessage("[EliteMobs] Dungeon difficulty is set to " + difficultyName + " ! Level sync caps your item level to " + levelSync + ".");
         return true;
     }
 
@@ -166,7 +176,7 @@ public class DungeonInstance extends MatchInstance {
         participants.forEach(this::removeAnyKind);
         instances.remove(this);
         DungeonInstance dungeonInstance = this;
-        Bukkit.getWorld(instancedWorldName).getEntities().forEach(entity->EntityTracker.unregister(entity, RemovalReason.WORLD_UNLOAD));
+        Bukkit.getWorld(instancedWorldName).getEntities().forEach(entity -> EntityTracker.unregister(entity, RemovalReason.WORLD_UNLOAD));
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -188,6 +198,34 @@ public class DungeonInstance extends MatchInstance {
             }
         }.runTaskLater(MetadataHandler.PLUGIN, 120);
 
+    }
+
+    private void setDifficulty(String difficultyName) {
+        if (difficultyName == null) return;
+        if (dungeonPackagerConfigFields.getDifficulties() == null ||
+                dungeonPackagerConfigFields.getDifficulties().isEmpty())
+            return;
+        Map difficulty = null;
+        for (Map difficultyMap : dungeonPackagerConfigFields.getDifficulties())
+            if (difficultyMap.get("name") != null && difficultyMap.get("name").equals(difficultyName)) {
+                difficulty = difficultyMap;
+                break;
+            }
+        if (difficulty == null) {
+            new WarningMessage("Failed to set difficulty " + difficulty + " for instanced dungeon " + dungeonPackagerConfigFields.getFilename());
+            return;
+        }
+
+        if (difficulty.get("levelSync") == null) {
+            new WarningMessage("No valid level sync setting for " + difficultyName + " in instanced dungeon " + dungeonPackagerConfigFields.getFilename());
+            return;
+        }
+
+        try {
+            this.levelSync = MapListInterpreter.parseInteger("levelSync", difficulty.get("levelSync"), dungeonPackagerConfigFields.getFilename());
+        } catch (Exception exception) {
+            return;
+        }
     }
 
     @Override

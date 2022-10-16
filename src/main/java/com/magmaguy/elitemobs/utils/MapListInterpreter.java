@@ -77,6 +77,7 @@ public class MapListInterpreter {
         return null;
     }
 
+
     public static <T extends Enum<T>> List<List<T>> parseEnumListList(String key, Object value, Class<T> enumClass, String scriptName) {
         List<List<T>> parsedList = new ArrayList<>();
         try {
