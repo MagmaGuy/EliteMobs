@@ -133,11 +133,11 @@ public class ArenaInstance extends MatchInstance {
         Location startLocation = ConfigurationLocation.serialize(customArenasConfigFields.getStartLocation());
         Location exitLocation = ConfigurationLocation.serialize(customArenasConfigFields.getExitLocation());
         if (corner1 == null || corner2 == null || startLocation == null || exitLocation == null) {
-            new WarningMessage("Failed to correctly initialize arena " + customArenasConfigFields.getFilename() + " due to invalid locations for corner1/corner2/startLocation/exitLocation");
+            //new WarningMessage("Failed to correctly initialize arena " + customArenasConfigFields.getFilename() + " due to invalid locations for corner1/corner2/startLocation/exitLocation");
             return;
         }
         if (corner1.getWorld() == null || corner2.getWorld() == null || startLocation.getWorld() == null || exitLocation.getWorld() == null) {
-            new WarningMessage("Failed to correctly initialize arena " + customArenasConfigFields.getFilename() + " due to invalid world for corner1/corner2/startLocation/exitLocation");
+            //new WarningMessage("Failed to correctly initialize arena " + customArenasConfigFields.getFilename() + " due to invalid world for corner1/corner2/startLocation/exitLocation");
             return;
         }
         new ArenaInstance(customArenasConfigFields, corner1, corner2, startLocation, exitLocation);

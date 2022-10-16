@@ -29,7 +29,7 @@ public class EliteItemManager {
      * @return The EDPS of the ItemStack. Defaults to 4 as that is the unarmed DPS!
      */
     public static double getDPS(@Nullable ItemStack itemStack) {
-        return getDPS(getAttackSpeed(itemStack), getBaseDamage(itemStack)) + getDPS(getAttackSpeed(itemStack), getEliteDamageFromEnchantment(itemStack));
+        return getDPS(getAttackSpeed(itemStack), getBaseDamage(itemStack)) + getDPS(getAttackSpeed(itemStack), getEliteMobsSpecificDamage(itemStack));
     }
 
     /**
@@ -149,6 +149,10 @@ public class EliteItemManager {
         ), 0);
     }
 
+    public static double getEliteDamageFromEliteAttributes(@Nullable ItemStack itemStack) {
+        return ItemTagger.getEliteDamageAttribute(itemStack);
+    }
+
     /**
      * Calculates the damage specific to EliteMobs. More specifically, scans for the elite enchantment level of sharpness
      * or power and adds the elite damage stored on the item. Note that this only adds elite enchantments, not vanilla ones.
@@ -156,9 +160,8 @@ public class EliteItemManager {
      *
      * @return The bonus damage
      */
-    public static double getEliteDamageFromEnchantment(@Nullable ItemStack itemStack) {
+    public static double getEliteDamageFromEnchantments(@Nullable ItemStack itemStack) {
         if (itemStack == null) return 0;
-        double eliteDamage = ItemTagger.getEliteDamageAttribute(itemStack);
         //Elite Items may have elite enchantments associated to an item
         int enchantmentLevel = ItemTagger.getEnchantment(itemStack.getItemMeta(), Enchantment.DAMAGE_ALL.getKey());
         if (enchantmentLevel > 0 && ItemSettingsConfig.isUseEliteEnchantments()) {
@@ -174,10 +177,13 @@ public class EliteItemManager {
         if (enchantmentLevel < 1)
             //Note: this means sharpness works on bows and that power works on weapons. By default, this state is not reachable, so it doesn't really matter.
             enchantmentLevel += itemStack.getEnchantmentLevel(Enchantment.ARROW_DAMAGE) + itemStack.getEnchantmentLevel(Enchantment.DAMAGE_ALL);
-        if (enchantmentLevel == 0) return eliteDamage;
+        if (enchantmentLevel == 0) return 0;
         //This is how vanilla sharpness works. Might as well use it for everything.
-        return eliteDamage + 1 + enchantmentLevel * 0.5;
+        return 1 + enchantmentLevel * 0.5;
+    }
 
+    public static double getEliteMobsSpecificDamage(ItemStack itemStack) {
+        return getEliteDamageFromEliteAttributes(itemStack) + getEliteDamageFromEnchantments(itemStack);
     }
 
     /**
@@ -188,7 +194,7 @@ public class EliteItemManager {
      */
     public static double getTotalDPS(@Nullable ItemStack itemStack) {
         if (itemStack == null) return 0;
-        double bonusDamage = getEliteDamageFromEnchantment(itemStack);
+        double bonusDamage = getEliteMobsSpecificDamage(itemStack);
         if (bonusDamage == 0) return 0;
         return getDPS(getAttackSpeed(itemStack), bonusDamage);
     }
@@ -272,7 +278,7 @@ public class EliteItemManager {
     public static void tagArrow(@Nullable Projectile projectile) {
         if (projectile == null) return;
         if (!(projectile.getShooter() instanceof Player)) return;
-        ItemTagger.setEliteDamageAttribute(projectile, getEliteDamageFromEnchantment(((Player) projectile.getShooter()).getInventory().getItemInMainHand()));
+        ItemTagger.setEliteDamageAttribute(projectile, getEliteMobsSpecificDamage(((Player) projectile.getShooter()).getInventory().getItemInMainHand()));
     }
 
     public static double getArrowEliteDamage(@Nullable Projectile projectile) {

@@ -169,7 +169,7 @@ public class EliteMobs extends JavaPlugin {
         ModelEngineReservedAddresses.reserve();
 
         if (worldGuardIsEnabled) Bukkit.getLogger().info("[EliteMobs] WorldGuard compatibility is enabled!");
-        else Bukkit.getLogger().warning("[EliteMobs] WorldGuard compatibility is not enabled!");
+        else Bukkit.getLogger().info("[EliteMobs] WorldGuard compatibility is not enabled!");
 
         //Enable Vault
         try {

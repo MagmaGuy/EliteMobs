@@ -32,7 +32,7 @@ public class LightningEnchantment extends CustomEnchantment {
         location.getWorld().getNearbyEntities(location, 2.5, 2.5, 2.5).forEach((entity -> {
             EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(entity);
             if (eliteEntity == null) return;
-            double damage = ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getWeaponTier(true) * 2.5;
+            double damage = ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getWeaponLevel(true) * 2.5;
             eliteEntity.damage(damage);
         }));
     }

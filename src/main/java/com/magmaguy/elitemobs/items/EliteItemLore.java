@@ -256,7 +256,7 @@ public class EliteItemLore {
             } else if (string.contains("$ifCustomEnchantments")) {
                 if (!customEnchantments.isEmpty())
                     lore.add(string.replace("$ifCustomEnchantments", ""));
-            } else
+            } else if (!string.isEmpty())
                 lore.add(ChatColorConverter.convert(string));
         }
     }

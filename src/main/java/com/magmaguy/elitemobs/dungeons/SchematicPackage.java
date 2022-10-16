@@ -16,6 +16,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class SchematicPackage extends EMPackage {
+    private static boolean warnedAboutWorldEdit = false;
+
     public SchematicPackage(DungeonPackagerConfigFields dungeonPackagerConfigFields) {
         super(dungeonPackagerConfigFields);
     }
@@ -41,7 +43,10 @@ public class SchematicPackage extends EMPackage {
         //If worldedit isn't installed, the checks can't be continued
         if (!Bukkit.getPluginManager().isPluginEnabled("WorldEdit")) {
             this.isDownloaded = false;
-            new WarningMessage("Schematic dungeons are downloaded but neither WorldEdit nor FastAsyncWorldEdit are installed! As such, you will not be able to install the dungeons.");
+            if (!warnedAboutWorldEdit) {
+                warnedAboutWorldEdit = true;
+                new WarningMessage("Schematic dungeons are downloaded but neither WorldEdit nor FastAsyncWorldEdit are installed! As such, you will not be able to install the dungeons.");
+            }
         }
 
     }
