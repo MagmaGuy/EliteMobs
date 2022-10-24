@@ -39,6 +39,8 @@ public class DungeonInstance extends MatchInstance {
     @Getter
     private int levelSync = -1;
     private String difficultyName = null;
+    @Getter
+    private String difficultyID = null;
 
     public DungeonInstance(DungeonPackagerConfigFields dungeonPackagerConfigFields,
                            Location lobbyLocation,
@@ -225,6 +227,11 @@ public class DungeonInstance extends MatchInstance {
             this.levelSync = MapListInterpreter.parseInteger("levelSync", difficulty.get("levelSync"), dungeonPackagerConfigFields.getFilename());
         } catch (Exception exception) {
             return;
+        }
+
+        //Used for loot
+        if (difficulty.get("id") != null) {
+            this.difficultyID = MapListInterpreter.parseString("id", difficulty.get("id"), dungeonPackagerConfigFields.getFilename());
         }
     }
 

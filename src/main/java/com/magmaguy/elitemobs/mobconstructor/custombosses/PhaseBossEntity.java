@@ -89,15 +89,16 @@ public class PhaseBossEntity {
                     customBossEntity.setBossMusic(new BossMusic(bossPhase.customBossesConfigFields.getSong(), customBossEntity));
                 }
             }
+            //Make sure the chunk is loaded so the boss can be initialized properly, or else you'll have some issues with health
+            customBossEntity.getSpawnLocation().getChunk().load();
             //spawn the boss
             customBossEntity.spawn(true);
         }
-        //todo: this doesn't seem to be working when entities change types?
-        customBossEntity.setHealth(customBossEntity.getMaxHealth() * healthPercentage);
         currentPhase = bossPhase;
         if (customBossEntity.getCustomModel() != null) customBossEntity.getCustomModel().switchPhase();
         ElitePhaseSwitchEvent elitePhaseSwitchEvent = new ElitePhaseSwitchEvent(customBossEntity, this);
         new EventCaller(elitePhaseSwitchEvent);
+        customBossEntity.setHealth(customBossEntity.getMaxHealth() * healthPercentage);
     }
 
     public void resetToFirstPhase() {

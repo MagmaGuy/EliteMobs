@@ -381,9 +381,6 @@ public class EliteEntity {
         damagers.clear();
     }
 
-    public void combatEnd() {
-    }
-
     private void setArmor() {
         if (!MobCombatSettingsConfig.isDoEliteArmor()) return;
 
@@ -500,13 +497,6 @@ public class EliteEntity {
 
     public boolean hasPower(ElitePower mobPower) {
         return elitePowers.contains(mobPower);
-    }
-
-    public boolean hasPower(PowersConfigFields powersConfigFields) {
-        for (ElitePower elitePower : elitePowers)
-            if (elitePower.getPowersConfigFields().equals(powersConfigFields))
-                return true;
-        return false;
     }
 
     public ElitePower getPower(ElitePower elitePower) {
@@ -660,7 +650,7 @@ public class EliteEntity {
         return this.globalReinforcementEntities.size();
     }
 
-    public HashSet<String> getTags(){
+    public HashSet<String> getTags() {
         return customMetadata;
     }
 

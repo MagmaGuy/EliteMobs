@@ -49,6 +49,10 @@ public class CustomBossBossBar {
     }
 
     public void addTrackingPlayer(Player player) {
+        if (!customBossEntity.exists()) {
+            remove();
+            return;
+        }
         if (!trackingPlayers.contains(player))
             trackingPlayers.add(player);
         else
@@ -66,6 +70,7 @@ public class CustomBossBossBar {
         bossBars.clear();
         trackingPlayers.clear();
         bossBarUpdater.cancel();
+        CustomBossEntity.trackableCustomBosses.remove(customBossEntity);
     }
 
     /**
@@ -111,6 +116,7 @@ public class CustomBossBossBar {
                 //This can happen on phase changes where boss bars might not be configured on subsequent entities
                 if (!customBossEntity.exists() || customBossEntity.getCustomBossesConfigFields().getLocationMessage() == null) {
                     cancel();
+                    remove();
                     return;
                 }
 

@@ -172,7 +172,9 @@ public class SpiritWalk extends BossPower implements Listener {
     @EventHandler
     public void onBossMobGotHit(EliteMobDamagedEvent event) {
         if (event.isCancelled()) return;
-        if (!event.getEliteEntity().hasPower(this)) return;
+        SpiritWalk spiritWalk = (SpiritWalk) event.getEliteEntity().getPower(this);
+        if (spiritWalk == null) return;
+
         switch (event.getEntityDamageEvent().getCause()) {
             case FIRE:
             case FIRE_TICK:
@@ -182,14 +184,13 @@ public class SpiritWalk extends BossPower implements Listener {
             case ENTITY_SWEEP_ATTACK:
                 return;
         }
-        SpiritWalk spiritWalk = (SpiritWalk) event.getEliteEntity().getPower(this);
 
         if (event.getEntityDamageEvent().getCause().equals(EntityDamageEvent.DamageCause.DROWNING) ||
                 event.getEntityDamageEvent().getCause().equals(EntityDamageEvent.DamageCause.SUFFOCATION))
             initializeSpiritWalk(event.getEliteEntity());
 
-
         spiritWalk.incrementHitCounter();
+
 
         if (spiritWalk.getHitsCounter() < 9) return;
 
@@ -199,7 +200,6 @@ public class SpiritWalk extends BossPower implements Listener {
     }
 
     public void initializeSpiritWalk(EliteEntity eliteEntity) {
-
         new BukkitRunnable() {
 
             int counter = 1;
@@ -212,22 +212,21 @@ public class SpiritWalk extends BossPower implements Listener {
                     return;
                 }
 
-                Location bossLocation = eliteEntity.getLivingEntity().getLocation().clone();
+                Location bossLocation = eliteEntity.getLocation().clone();
 
                 for (int i = 0; i < 20; i++) {
 
                     double randomizedX = (ThreadLocalRandom.current().nextDouble() - 0.5) * 5;
-                    double randomizedY = ThreadLocalRandom.current().nextDouble() - 0.5;
+                    double randomizedY = ThreadLocalRandom.current().nextDouble() * 5;
                     double randomizedZ = (ThreadLocalRandom.current().nextDouble() - 0.5) * 5;
 
                     Vector normalizedVector = new Vector(randomizedX, randomizedY, randomizedZ).normalize().multiply(7).multiply(counter);
 
                     Location newSimulatedLocation = bossLocation.add(normalizedVector).clone();
 
-                    Location newValidLocation = checkLocationValidity(newSimulatedLocation);
+                    Location newValidLocation = scanVertically(newSimulatedLocation);
 
                     if (newValidLocation != null) {
-
                         spiritWalkAnimation(eliteEntity, eliteEntity.getLivingEntity().getLocation(), newValidLocation.add(new Vector(0.5, 1, 0.5)));
                         cancel();
                         break;
@@ -243,30 +242,25 @@ public class SpiritWalk extends BossPower implements Listener {
 
     }
 
-    private Location checkLocationValidity(Location simulatedLocation) {
+    private Location scanVertically(Location simulatedLocation) {
+        int counter = 0;
 
-        if (simulatedLocation.getBlock().getType().equals(Material.AIR)) {
-
-            int counter = 1;
-
-            while (true) {
-
-                if (simulatedLocation.getY() < 1) return null;
-
-                Location blockUnderCurrentBlock = simulatedLocation.clone().subtract(new Vector(0, counter, 0));
-
-                if (blockUnderCurrentBlock.getBlock().getType() != Material.AIR) return blockUnderCurrentBlock;
-
-                if (counter > 10) return null;
-
-                counter++;
-
-            }
-
+        while (true) {
+            Location newLocation = simulatedLocation.clone().subtract(new Vector(0, counter, 0));
+            if (locationValid(newLocation)) return newLocation;
+            counter++;
+            if (counter > 8) return null;
         }
+    }
 
-        return null;
+    private boolean locationValid(Location feetLocation) {
+        Location groundLocation = feetLocation.clone().add(new Vector(0, -1, 0));
+        Location headLocation = feetLocation.clone().add(new Vector(0, 1, 0));
+        return isNonVoidAir(feetLocation.getBlock().getType()) && isNonVoidAir(headLocation.getBlock().getType()) && groundLocation.getBlock().getType().isSolid();
+    }
 
+    private boolean isNonVoidAir(Material material) {
+        return material.equals(Material.AIR) || material.equals(Material.CAVE_AIR);
     }
 
 }
