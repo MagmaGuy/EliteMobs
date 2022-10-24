@@ -371,6 +371,14 @@ public class UserCommands {
                     if (matchInstance != null)
                         matchInstance.removeAnyKind((Player) commandContext.getSender());
                 }));
+
+        // /em loot
+        manager.command(builder.literal("loot")
+                .meta(CommandMeta.DESCRIPTION, "Open the loot menu for group loot.")
+                .senderType(Player.class)
+                .handler(commandContext -> {
+                    LootMenu.openMenu((Player) commandContext.getSender());
+                }));
     }
 
 }

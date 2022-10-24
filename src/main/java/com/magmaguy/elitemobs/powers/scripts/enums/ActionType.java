@@ -26,7 +26,9 @@ public enum ActionType {
     SPAWN_FIREWORKS(false),
     MAKE_INVULNERABLE(true),
     TAG(true),
-    UNTAG(true);
+    UNTAG(true),
+    SET_TIME(false),
+    SET_WEATHER(false);
 
     @Getter
     private final boolean requiresLivingEntity;

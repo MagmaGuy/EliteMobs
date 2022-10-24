@@ -13,7 +13,7 @@ public class MapListInterpreter {
     }
 
     public static String parseString(String key, Object value, String scriptName) {
-        return ChatColorConverter.convert((String) value);
+        return ChatColorConverter.convert(value + "");
     }
 
     public static List<String> parseStringList(String key, Object value, String scriptName) {

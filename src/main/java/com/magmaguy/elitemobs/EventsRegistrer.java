@@ -268,6 +268,9 @@ public class EventsRegistrer {
         register(new EnhancementMenu.EnhancementMenuEvents());
         register(new UnbindMenu.UnbinderMenuEvents());
 
+        //loot menu
+        register(new LootMenu.LootMenuEvents());
+
         //Minecraft behavior canceller
         if (DefaultConfig.isPreventCreeperDamageToPassiveMobs())
             register(new PreventCreeperPassiveEntityDamage());
