@@ -62,7 +62,7 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     private List<String> onCombatLeaveCommands = null;
     @Getter
     @Setter
-    private List<String> uniqueLootList = null;
+    private List<Object> uniqueLootList = null;
     @Getter
     @Setter
     private List<Object> powers = null;
@@ -295,7 +295,7 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         this.onCombatEnterCommands = processStringList("onCombatEnterCommands", onCombatEnterCommands, new ArrayList<>(), false);
         this.onCombatLeaveCommands = processStringList("onCombatLeaveCommands", onCombatLeaveCommands, new ArrayList<>(), false);
         this.deathMessages = translatable(filename, "deathMessages", processStringList("deathMessages", deathMessages, new ArrayList<>(), false));
-        this.uniqueLootList = processStringList("uniqueLootList", uniqueLootList, new ArrayList<>(), false);
+        this.uniqueLootList = processList("uniqueLootList", uniqueLootList, new ArrayList<>(), false);
         this.customLootTable = new CustomLootTable(this);
 
         //this can't be converted directly to an enum list because there are some special string features in here

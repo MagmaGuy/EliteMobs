@@ -36,6 +36,7 @@ public class CustomBossTrail {
         for (String string : customBossEntity.customBossesConfigFields.getTrails()) {
             try {
                 Particle particle = Particle.valueOf(string);
+                if (particle.equals(Particle.BLOCK_DUST)) return;
                 doParticleTrail(particle);
             } catch (Exception ex) {
             }

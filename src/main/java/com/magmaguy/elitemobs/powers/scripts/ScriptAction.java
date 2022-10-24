@@ -112,6 +112,8 @@ public class ScriptAction {
             case MAKE_INVULNERABLE -> runMakeInvulnerable(eliteEntity, directTarget);
             case TAG -> runTag(eliteEntity, directTarget);
             case UNTAG -> runUntag(eliteEntity, directTarget);
+            case SET_TIME -> runSetTime(eliteEntity, directTarget);
+            case SET_WEATHER -> runSetWeather(eliteEntity, directTarget);
             default ->
                     new WarningMessage("Failed to determine action type " + blueprint.getActionType() + " in script " + blueprint.getScriptName() + " for file " + blueprint.getScriptFilename());
         }
@@ -258,7 +260,8 @@ public class ScriptAction {
                 .replace("$bossX", eliteEntity.getLocation().getX() + "")
                 .replace("$bossY", eliteEntity.getLocation().getY() + "")
                 .replace("$bossZ", eliteEntity.getLocation().getZ() + "")
-                .replace("$bossLevel", eliteEntity.getLevel() + "");
+                .replace("$bossLevel", eliteEntity.getLevel() + "")
+                .replace("$bossWorldName", eliteEntity.getLocation().getWorld().getName() + "");
     }
 
     //Strikes visual lightning at the target location
@@ -332,33 +335,63 @@ public class ScriptAction {
     }
 
     private void runTag(EliteEntity eliteEntity, LivingEntity directTarget) {
-        getTargets(eliteEntity, eliteEntity.getLivingEntity()).forEach(targetEntity -> {
+        getTargets(eliteEntity, directTarget).forEach(targetEntity -> {
             EliteEntity bossEntity = EntityTracker.getEliteMobEntity(targetEntity);
             if (bossEntity != null)
-                bossEntity.addTags(blueprint.getPositiveTags());
+                bossEntity.addTags(blueprint.getTags());
             if (targetEntity instanceof Player player && ElitePlayerInventory.getPlayer(player) != null)
-                ElitePlayerInventory.getPlayer(player).addTags(blueprint.getPositiveTags());
+                ElitePlayerInventory.getPlayer(player).addTags(blueprint.getTags());
             if (blueprint.getDuration() > 0) {
                 if (bossEntity != null)
-                    Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, () -> bossEntity.removeTags(blueprint.getPositiveTags()), blueprint.getDuration());
+                    Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, () -> bossEntity.removeTags(blueprint.getTags()), blueprint.getDuration());
                 if (targetEntity instanceof Player player && ElitePlayerInventory.getPlayer(player) != null)
-                    Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, () -> ElitePlayerInventory.getPlayer(player).removeTags(blueprint.getPositiveTags()), blueprint.getDuration());
+                    Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, () -> ElitePlayerInventory.getPlayer(player).removeTags(blueprint.getTags()), blueprint.getDuration());
             }
         });
     }
 
     private void runUntag(EliteEntity eliteEntity, LivingEntity directTarget) {
-        getTargets(eliteEntity, eliteEntity.getLivingEntity()).forEach(targetEntity -> {
+        getTargets(eliteEntity, directTarget).forEach(targetEntity -> {
             EliteEntity bossEntity = EntityTracker.getEliteMobEntity(targetEntity);
             if (bossEntity != null)
-                bossEntity.addTags(blueprint.getNegativeTags());
+                bossEntity.removeTags(blueprint.getTags());
             if (targetEntity instanceof Player player && ElitePlayerInventory.getPlayer(player) != null)
-                ElitePlayerInventory.getPlayer(player).addTags(blueprint.getNegativeTags());
+                ElitePlayerInventory.getPlayer(player).removeTags(blueprint.getTags());
             if (blueprint.getDuration() > 0) {
                 if (bossEntity != null)
-                    Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, () -> bossEntity.removeTags(blueprint.getNegativeTags()), blueprint.getDuration());
+                    Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, () -> bossEntity.addTags(blueprint.getTags()), blueprint.getDuration());
                 if (targetEntity instanceof Player player && ElitePlayerInventory.getPlayer(player) != null)
-                    Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, () -> ElitePlayerInventory.getPlayer(player).removeTags(blueprint.getNegativeTags()), blueprint.getDuration());
+                    Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, () -> ElitePlayerInventory.getPlayer(player).addTags(blueprint.getTags()), blueprint.getDuration());
+            }
+        });
+    }
+
+    private void runSetTime(EliteEntity eliteEntity, LivingEntity directTarget) {
+        getTargets(eliteEntity, directTarget).forEach(targetEntity -> {
+            targetEntity.getWorld().setTime(blueprint.getTime());
+        });
+    }
+
+    private void runSetWeather(EliteEntity eliteEntity, LivingEntity directTarget) {
+        getTargets(eliteEntity, directTarget).forEach(targetEntity -> {
+            if (blueprint.getDuration() > 0) {
+                switch (blueprint.getWeatherType()) {
+                    case CLEAR -> targetEntity.getWorld().setClearWeatherDuration(blueprint.getDuration());
+                    case PRECIPITATION -> {
+                        targetEntity.getWorld().setClearWeatherDuration(0);
+                        targetEntity.getWorld().setWeatherDuration(blueprint.getDuration());
+                    }
+                    case THUNDER -> targetEntity.getWorld().setThunderDuration(blueprint.getDuration());
+                }
+            } else {
+                switch (blueprint.getWeatherType()) {
+                    case CLEAR -> targetEntity.getWorld().setClearWeatherDuration(6000);
+                    case PRECIPITATION -> {
+                        targetEntity.getWorld().setClearWeatherDuration(0);
+                        targetEntity.getWorld().setWeatherDuration(6000);
+                    }
+                    case THUNDER -> targetEntity.getWorld().setThunderDuration(6000);
+                }
             }
         });
     }

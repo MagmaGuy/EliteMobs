@@ -134,7 +134,7 @@ public class SetupMenu {
             }
             if (!emPackage.isInstalled())
                 if (emPackage instanceof SchematicPackage)
-                    emPackage.install(player, true); //todo this needs to differentiate between paste and no paste
+                    emPackage.install(player, true);
                 else emPackage.install(player);
             else if (emPackage instanceof SchematicPackage) emPackage.uninstall(player);
             else if (!emPackage.uninstall(player)) {

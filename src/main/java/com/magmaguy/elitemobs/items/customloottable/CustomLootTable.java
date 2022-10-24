@@ -24,7 +24,7 @@ public class CustomLootTable implements Serializable {
     }
 
     public CustomLootTable(CustomBossesConfigFields customBossesConfigFields) {
-        List<String> rawStrings = customBossesConfigFields.getUniqueLootList();
+        List<Object> rawStrings = customBossesConfigFields.getUniqueLootList();
         parseConfig(rawStrings, customBossesConfigFields.getFilename());
     }
 
@@ -43,25 +43,29 @@ public class CustomLootTable implements Serializable {
         parseConfig(rawStrings, customArenasConfigFields.getFilename());
     }
 
-    private void parseConfig(List<String> lootTable, String filename) {
+    private void parseConfig(List<?> lootTable, String filename) {
         if (lootTable == null) return;
-        for (String rawString : lootTable)
-            switch (rawString.split(":")[0].toLowerCase()) {
-                case "minecraft":
-                    new VanillaCustomLootEntry(entries, rawString, filename);
-                    break;
-                case "scrap":
-                case "upgrade_item":
-                    new SpecialCustomLootEntry(entries, rawString, filename);
-                    break;
-                default:
-                    if (rawString.toLowerCase(Locale.ROOT).contains("currencyamount="))
-                        new CurrencyCustomLootEntry(entries, rawString, filename);
-                    else if (rawString.contains("material="))
+        for (Object object : lootTable)
+            if (object instanceof String rawString)
+                switch (rawString.split(":")[0].toLowerCase()) {
+                    case "minecraft":
                         new VanillaCustomLootEntry(entries, rawString, filename);
-                    else
-                        new EliteCustomLootEntry(entries, rawString, filename);
-            }
+                        break;
+                    case "scrap":
+                    case "upgrade_item":
+                        new SpecialCustomLootEntry(entries, rawString, filename);
+                        break;
+                    default:
+                        if (rawString.toLowerCase(Locale.ROOT).contains("currencyamount="))
+                            new CurrencyCustomLootEntry(entries, rawString, filename);
+                        else if (rawString.contains("material="))
+                            new VanillaCustomLootEntry(entries, rawString, filename);
+                        else
+                            new EliteCustomLootEntry(entries, rawString, filename);
+                }
+            else if (object instanceof Map<?, ?> configMap)
+                //This is used for the instanced loot
+                new EliteCustomLootEntry(entries, configMap, filename);
         for (CustomLootEntry customLootEntry : entries) {
             if (customLootEntry.getWave() > 0) {
                 if (this.waveRewards.get(customLootEntry.getWave()) != null) {

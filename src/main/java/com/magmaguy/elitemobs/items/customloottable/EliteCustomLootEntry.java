@@ -1,8 +1,13 @@
 package com.magmaguy.elitemobs.items.customloottable;
 
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
+import com.magmaguy.elitemobs.instanced.MatchInstance;
+import com.magmaguy.elitemobs.instanced.dungeons.DungeonInstance;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.elitemobs.playerdata.database.PlayerData;
+import com.magmaguy.elitemobs.utils.MapListInterpreter;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -11,10 +16,13 @@ import org.bukkit.inventory.ItemStack;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class EliteCustomLootEntry extends CustomLootEntry implements Serializable {
     @Getter
     private String filename = null;
+    private String difficultyID = null;
+    private String permission = null;
 
     public EliteCustomLootEntry(List<CustomLootEntry> entries, String rawString, String configFilename) {
         super();
@@ -31,6 +39,23 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
         if (customItem == null) {
             errorMessage(rawString, configFilename, "filename");
             return;
+        }
+        entries.add(this);
+    }
+
+    public EliteCustomLootEntry(List<CustomLootEntry> entries, Map<?, ?> configMap, String configFilename) {
+        for (Map.Entry<?, ?> mapEntry : configMap.entrySet()) {
+            String key = (String) mapEntry.getKey();
+            switch (key.toLowerCase()) {
+                case "filename" -> filename = MapListInterpreter.parseString(key, mapEntry.getValue(), configFilename);
+                case "chance" ->
+                        super.setChance(MapListInterpreter.parseDouble(key, mapEntry.getValue(), configFilename));
+                case "difficultyid" ->
+                        difficultyID = MapListInterpreter.parseString(key, mapEntry.getValue(), configFilename);
+                case "permission" ->
+                        super.setPermission(MapListInterpreter.parseString(key, mapEntry.getValue(), configFilename));
+                default -> new WarningMessage("Failed to read custom loot option " + key + " in " + configFilename);
+            }
         }
         entries.add(this);
     }
@@ -126,8 +151,10 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
             generateCustomItem().dropPlayerLoot(player, itemTier, location, null);
     }
 
+    //This is for the boss drop
     @Override
     public void locationDrop(int itemTier, Player player, Location location, EliteEntity eliteEntity) {
+        if (isGroupLoot(itemTier, player, eliteEntity)) return;
         for (int i = 0; i < getAmount(); i++)
             generateCustomItem().dropPlayerLoot(player, itemTier, location, eliteEntity);
     }
@@ -147,8 +174,10 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
             player.sendMessage(ItemSettingsConfig.getDirectDropCustomLootMessage().replace("$itemName", getAmount() + "x " + name));
     }
 
+    //This is the drop for boss loot
     @Override
     public void directDrop(int itemTier, Player player, EliteEntity eliteEntity) {
+        if (isGroupLoot(itemTier, player, eliteEntity)) return;
         String name = null;
         for (int i = 0; i < getAmount(); i++) {
             ItemStack itemStack = generateCustomItem().generateItemStack(itemTier, player, eliteEntity);
@@ -161,5 +190,33 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
         }
         if (name != null)
             player.sendMessage(ItemSettingsConfig.getDirectDropCustomLootMessage().replace("$itemName", getAmount() + "x " + name));
+    }
+
+    private boolean isGroupLoot(int itemTier, Player player, EliteEntity eliteEntity) {
+        if (difficultyID == null) return false;
+        MatchInstance matchInstance = PlayerData.getMatchInstance(player);
+        String dungeonDifficultyID = null;
+        if (matchInstance instanceof DungeonInstance dungeonInstance)
+            dungeonDifficultyID = dungeonInstance.getDifficultyID();
+        if (dungeonDifficultyID == null) return false;
+        //Beyond this point the item is for instanced dungeons
+        if (!dungeonDifficultyID.equals(difficultyID)) return true;
+        addGroupLoot(itemTier, eliteEntity);
+        return true;
+    }
+
+    private void addGroupLoot(int itemTier, EliteEntity eliteEntity) {
+        SharedLootTable sharedLootTable = SharedLootTable.getSharedLootTables().get(eliteEntity);
+        String name = null;
+        for (int i = 0; i < getAmount(); i++) {
+            ItemStack itemStack = generateCustomItem().generateItemStack(itemTier, null, eliteEntity);
+            if (sharedLootTable == null) sharedLootTable = new SharedLootTable(eliteEntity);
+            if (itemStack == null) return;
+            sharedLootTable.addLoot(itemStack);
+            if (name == null && itemStack.getItemMeta() != null) {
+                if (itemStack.getItemMeta().hasDisplayName()) name = itemStack.getItemMeta().getDisplayName();
+                else name = itemStack.getType().toString().replace("_", " ");
+            }
+        }
     }
 }

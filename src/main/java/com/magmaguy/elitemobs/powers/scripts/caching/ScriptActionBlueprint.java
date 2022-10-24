@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.powers.scripts.caching;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.scripts.ScriptTargets;
 import com.magmaguy.elitemobs.powers.scripts.enums.ActionType;
+import com.magmaguy.elitemobs.powers.scripts.enums.WeatherType;
 import com.magmaguy.elitemobs.utils.PotionEffectTypeUtil;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
@@ -89,9 +90,11 @@ public class ScriptActionBlueprint {
     @Getter
     private Vector offset = new Vector(0, 0, 0);
     @Getter
-    private List<String> positiveTags;
+    private List<String> tags;
     @Getter
-    private List<String> negativeTags;
+    private int time = 0;
+    @Getter
+    private WeatherType weatherType = WeatherType.CLEAR;
 
 
     public ScriptActionBlueprint(Map<?, ?> entry, String scriptName, String scriptFilename) {
@@ -150,8 +153,9 @@ public class ScriptActionBlueprint {
             case "invulnerable" -> invulnerable = parseBoolean(key, value, scriptName);
             case "location" -> location = parseString(key, value, scriptName);
             case "offset" -> offset = parseVector(key, value, scriptName);
-            case "positivetag" -> positiveTags = parseStringList(key, value, scriptName);
-            case "negativetag" -> negativeTags = parseStringList(key, value, scriptName);
+            case "tags" -> tags = parseStringList(key, value, scriptName);
+            case "time" -> time = parseInteger(key, value, scriptName);
+            case "weather" -> weatherType = parseEnum(key, value, WeatherType.class, scriptName);
             //Managed by ScriptTargets
             case "target", "locations", "range", "track" -> {
             }
