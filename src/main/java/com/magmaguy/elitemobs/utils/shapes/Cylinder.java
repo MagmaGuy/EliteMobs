@@ -20,7 +20,7 @@ public class Cylinder extends Shape {
     private Vector centerVector = new Vector(0, 0, 0);
 
     public Cylinder(Location centerLocation, double radius, double height, double borderRadius) {
-        this.centerLocation = centerLocation;
+        this.centerLocation = centerLocation.clone();
         this.center = centerLocation.toVector();
         this.radius = radius;
         this.height = height;
@@ -36,7 +36,7 @@ public class Cylinder extends Shape {
     public boolean contains(Vector position) {
         double dX = position.getX() - center.getX();
         double dZ = position.getZ() - center.getZ();
-        return dX * dX + dZ * dZ < radius * radius && position.getY() < center.getY() + height;
+        return dX * dX + dZ * dZ < radius * radius && position.getY() < center.getY() + height && position.getY() >= center.getY();
     }
 
     public boolean borderContains(Location position) {
