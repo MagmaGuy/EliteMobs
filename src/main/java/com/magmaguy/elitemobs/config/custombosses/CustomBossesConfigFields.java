@@ -86,6 +86,9 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     private String mountedEntity = null;
     @Getter
     @Setter
+    private String customModelMountPointID = null;
+    @Getter
+    @Setter
     private String spawnMessage = null;
     @Getter
     @Setter
@@ -311,6 +314,7 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
             new WarningMessage("Custom Boss " + filename + " has itself for a mount. This makes an infinite loop of the boss mounting itself. The boss mount will not be used for safety reasons.");
             this.mountedEntity = null;
         }
+        this.customModelMountPointID = processString("customModelMountPointID", customModelMountPointID, null, false);
         this.spawnMessage = translatable(filename, "spawnMessage", processString("spawnMessage", spawnMessage, null, false));
         this.deathMessage = translatable(filename, "deathMessage", processString("deathMessage", deathMessage, null, false));
         this.escapeMessage = translatable(filename, "escapeMessage", processString("escapeMessage", escapeMessage, null, false));

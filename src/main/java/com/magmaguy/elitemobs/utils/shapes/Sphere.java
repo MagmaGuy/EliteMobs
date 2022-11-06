@@ -18,7 +18,7 @@ public class Sphere extends Shape {
 
     public Sphere(double radius, Location centerLocation, double borderRadius) {
         this.radius = radius;
-        this.centerLocation = centerLocation;
+        this.centerLocation = centerLocation.clone();
         this.borderRadius = borderRadius;
     }
 

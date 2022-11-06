@@ -72,7 +72,7 @@ public class ScriptParticlesBlueprint {
                 case "z" -> z = parseDouble(key, value, scriptName);
                 case "amount" -> amount = parseInteger(key, value, scriptName);
                 case "particle" -> particle = parseEnum(key, value, Particle.class, scriptName);
-                case "speed" -> speed = parseInteger(key, value, scriptName);
+                case "speed" -> speed = parseDouble(key, value, scriptName);
                 case "red" -> red = parseInteger(key, value, scriptName);
                 case "green" -> green = parseInteger(key, value, scriptName);
                 case "blue" -> blue = parseInteger(key, value, scriptName);

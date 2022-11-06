@@ -23,7 +23,6 @@ public class CustomBossMount {
             livingEntity.addPassenger(customBossEntity.getLivingEntity());
             livingEntity.setRemoveWhenFarAway(false);
             customBossEntity.livingEntityMount = livingEntity;
-
         } catch (Exception ex) {
             //This runs when it's not an API entity
             CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(customBossEntity.customBossesConfigFields.getMountedEntity());
@@ -44,8 +43,12 @@ public class CustomBossMount {
                     public void run() {
                         if (!mountEntity.isValid())
                             return;
-                        PreventMountExploit.bypass = true;
-                        mountEntity.getLivingEntity().addPassenger(customBossEntity.getLivingEntity());
+                        if (mountEntity.getCustomModel() != null)
+                            mountEntity.getCustomModel().addPassenger(customBossEntity);
+                        else {
+                            PreventMountExploit.bypass = true;
+                            mountEntity.getLivingEntity().addPassenger(customBossEntity.getLivingEntity());
+                        }
                         customBossEntity.customBossMount = mountEntity;
                     }
                 }.runTaskLater(MetadataHandler.PLUGIN, 5);

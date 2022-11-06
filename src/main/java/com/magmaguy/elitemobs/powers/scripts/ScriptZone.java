@@ -33,22 +33,20 @@ public class ScriptZone {
     }
 
     //Used for tracking, allows locations to be picked and set to be consistent throughout
-    public List<Shape> precacheShapes(EliteEntity eliteEntity, LivingEntity directTarget) {
-        return generateShapes(eliteEntity, directTarget);
+    public List<Shape> precacheShapes(ScriptActionData scriptActionData) {
+        return generateShapes(scriptActionData);
     }
 
     //Get living entities in zone
-    protected Collection<? extends LivingEntity> getEffectTargets(EliteEntity eliteEntity,
-                                                                  LivingEntity directTarget,
+    protected Collection<? extends LivingEntity> getEffectTargets(ScriptActionData scriptActionData,
                                                                   ScriptTargetsBlueprint blueprintFromRequestingTarget,
                                                                   List<Shape> precachedShapes) {
         //Generate shapes for the zone
         List<Shape> shapes;
         if (precachedShapes != null) {
             shapes = precachedShapes;
-        }
-        else {
-            shapes = generateShapes(eliteEntity, directTarget);
+        } else {
+            shapes = generateShapes(scriptActionData);
         }
 
         //Get the entities from those zones
@@ -63,16 +61,10 @@ public class ScriptZone {
     }
 
     //Get locations in zone
-    protected Collection<Location> getEffectLocationTargets(EliteEntity eliteEntity,
-                                                            LivingEntity directTarget,
-                                                            ScriptTargets actionTarget,
-                                                            List<Shape> precachedShapes) {
-        //Generate shapes for the zone
-        List<Shape> shapes;
-        if (precachedShapes != null) {
-            shapes = precachedShapes;
-        }
-        else shapes = generateShapes(eliteEntity, directTarget);
+    protected Collection<Location> getEffectLocationTargets(ScriptActionData scriptActionData,
+                                                            ScriptTargets actionTarget) {
+        //Generate shapes for the zone, precached locations have already been handled by the script target
+        List<Shape> shapes = generateShapes(scriptActionData);
 
         //Get the locations from those zones
         return switch (actionTarget.getTargetBlueprint().getTargetType()) {
@@ -91,10 +83,10 @@ public class ScriptZone {
     }
 
     //Generate shapes that define the zone
-    private List<Shape> generateShapes(EliteEntity eliteEntity, LivingEntity directTarget) {
+    private List<Shape> generateShapes(ScriptActionData scriptActionData) {
         List<Shape> shapes = new ArrayList<>();
         //Get the shapes from the targets of the zone
-        for (Location shapeTargetLocation : scriptZoneTargets.getZoneLocationTargets(eliteEntity, directTarget)) {
+        for (Location shapeTargetLocation : scriptZoneTargets.getZoneLocationTargets(scriptActionData)) {
             switch (zoneBlueprint.getShapeTypeEnum()) {
                 case CYLINDER:
                     shapes.add(new Cylinder(shapeTargetLocation, zoneBlueprint.getRadius(), zoneBlueprint.getHeight(), zoneBlueprint.getBorderRadius()));
@@ -138,8 +130,7 @@ public class ScriptZone {
             livingEntities.removeIf(livingEntity -> {
                 if (target.equals(Target.ZONE_FULL)) {
                     return !shape.contains(livingEntity.getLocation());
-                }
-                else if (target.equals(Target.ZONE_BORDER))
+                } else if (target.equals(Target.ZONE_BORDER))
                     return !shape.borderContains(livingEntity.getLocation());
                 return false;
             });

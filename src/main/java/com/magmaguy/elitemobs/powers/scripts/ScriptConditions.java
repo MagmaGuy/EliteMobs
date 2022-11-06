@@ -31,7 +31,7 @@ public class ScriptConditions {
     }
 
     private boolean doesNotHaveTags(LivingEntity target) {
-        if (conditionsBlueprint.getHasTags() == null) return true;
+        if (conditionsBlueprint.getDoesNotHaveTags() == null) return true;
         return checkTags(target, conditionsBlueprint.getDoesNotHaveTags());
     }
 
@@ -41,7 +41,8 @@ public class ScriptConditions {
             entityTags = ElitePlayerInventory.getPlayer(player).getTags().stream().toList();
         else {
             EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(target);
-            if (eliteEntity != null) entityTags = eliteEntity.getTags().stream().toList();
+            if (eliteEntity != null)
+                entityTags = eliteEntity.getTags().stream().toList();
         }
 
         if (entityTags == null) return false;
@@ -62,6 +63,7 @@ public class ScriptConditions {
             conditionTarget = eliteEntity.getUnsyncedLivingEntity();
         else
             conditionTarget = directTarget;
+        if (conditionTarget == null) return true;
         if (!isAliveCheck(conditionTarget)) return false;
         if (!hasTagsCheck(conditionTarget)) return false;
         if (!doesNotHaveTags(conditionTarget)) return false;
