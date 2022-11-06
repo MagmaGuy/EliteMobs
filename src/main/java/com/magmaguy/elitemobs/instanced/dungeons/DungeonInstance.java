@@ -63,7 +63,7 @@ public class DungeonInstance extends MatchInstance {
         this.difficultyName = difficultyName;
         setDifficulty(difficultyName);
         addNewPlayer(player);
-        instancedBossEntities = InstancedBossEntity.initializeInstancedBosses(dungeonPackagerConfigFields.getWorldName(), world, players.size());
+        instancedBossEntities = InstancedBossEntity.initializeInstancedBosses(dungeonPackagerConfigFields.getWorldName(), world, players.size(), this);
         dungeonInstances.add(this);
     }
 
@@ -139,8 +139,16 @@ public class DungeonInstance extends MatchInstance {
 
     @Override
     protected void startMatch() {
+        updateBossHealth();
         super.startMatch();
         new EventCaller(new DungeonStartEvent(this));
+    }
+
+    //Runs when the instance starts, adjusting boss health to the amount of players in the instance
+    private void updateBossHealth() {
+        instancedBossEntities.forEach(instancedBossEntity -> {
+            instancedBossEntity.setNormalizedMaxHealth();
+        });
     }
 
     public boolean checkCompletionStatus() {

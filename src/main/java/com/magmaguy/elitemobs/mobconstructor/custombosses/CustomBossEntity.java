@@ -105,7 +105,8 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
     public CustomBossEntity(CustomBossesConfigFields customBossesConfigFields) {
         //This creates a placeholder empty EliteMobEntity to be filled in later
         super();
-        if (customBossesConfigFields.getSong() != null) bossMusic = new BossMusic(customBossesConfigFields.getSong(), this);
+        if (customBossesConfigFields.getSong() != null)
+            bossMusic = new BossMusic(customBossesConfigFields.getSong(), this);
         //This stores everything that will need to be initialized for the EliteMobEntity
         setCustomBossesConfigFields(customBossesConfigFields);
         super.setPersistent(customBossesConfigFields.isPersistent());
@@ -151,7 +152,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
         super.setVanillaLoot(customBossesConfigFields.isDropsVanillaLoot());
         super.setLevel(customBossesConfigFields.getLevel());
         setPluginName();
-        super.elitePowers = ElitePowerParser.parsePowers(customBossesConfigFields);
+        super.elitePowers = ElitePowerParser.parsePowers(customBossesConfigFields, this);
         if (this instanceof RegionalBossEntity) {
             ((RegionalBossEntity) this).setOnSpawnTransitiveBlocks(TransitiveBlock.serializeTransitiveBlocks(customBossesConfigFields.getOnSpawnBlockStates(), customBossesConfigFields.getFilename()));
             ((RegionalBossEntity) this).setOnRemoveTransitiveBlocks(TransitiveBlock.serializeTransitiveBlocks(customBossesConfigFields.getOnRemoveBlockStates(), customBossesConfigFields.getFilename()));
@@ -274,7 +275,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
 
     private void setNormalizedHealth() {
         if (normalizedCombat)
-            super.setNormalizedMaxHealth();
+            setNormalizedMaxHealth();
     }
 
     public void setNormalizedCombat() {

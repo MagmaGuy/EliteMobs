@@ -102,18 +102,24 @@ public class CustomModel {
         if (activeModel == null) return;
 
         if (modelBlueprint.getAnimations().containsKey("attack_ranged"))
-            activeModel.getAnimationHandler().playAnimation("attack_ranged", 1, 1, 1, true);
+            activeModel.getAnimationHandler().playAnimation("attack_ranged", .1, .1, 1, true);
         else
-            activeModel.getAnimationHandler().playAnimation("attack", 1, 1, 1, true);
+            activeModel.getAnimationHandler().playAnimation("attack", .1, .1, 1, true);
     }
 
     public void melee() {
 
         if (activeModel == null) return;
         if (modelBlueprint.getAnimations().containsKey("attack_melee"))
-            activeModel.getAnimationHandler().playAnimation("attack_melee", 1, 1, 1, true);
+            activeModel.getAnimationHandler().playAnimation("attack_melee", .1, .1, 1, true);
         else
-            activeModel.getAnimationHandler().playAnimation("attack", 1, 1, 1, true);
+            activeModel.getAnimationHandler().playAnimation("attack", .1, .1, 1, true);
+    }
+
+    public void playAnimationByName(String string) {
+        if (activeModel == null) return;
+        if (!modelBlueprint.getAnimations().containsKey(string)) return;
+        activeModel.getAnimationHandler().playAnimation(string, .1, .1, 1, true);
     }
 
     public void setName(String nametagName, boolean visible) {
@@ -140,6 +146,18 @@ public class CustomModel {
         for (Nameable nameable : activeModel.getNametagHandler().getBones().values())
             return nameable;
         return null;
+    }
+
+    public void addPassenger(CustomBossEntity passenger) {
+        if (passenger.getCustomBossesConfigFields().getCustomModelMountPointID() == null) {
+            new WarningMessage("Attempted to add " + passenger.getCustomBossesConfigFields().getFilename() + " as a mounted entity for a custom model but it does not have customModelMountPointID set! The boss can't guess where it needs to be mounted, and therefore this will not work.");
+            return;
+        }
+        modeledEntity.getMountManager().addPassengerToSeat(
+                modelBlueprint.getModelId(),
+                passenger.getCustomBossesConfigFields().getCustomModelMountPointID(),
+                passenger.getLivingEntity(),
+                modeledEntity.getMountManager().getDriverController());
     }
 
     public void switchPhase() {

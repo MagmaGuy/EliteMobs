@@ -18,10 +18,10 @@ public class ChatColorConverter {
         return ChatColor.translateAlternateColorCodes('&', string);
     }
 
-    public static List<String> convert(List<String> list) {
+    public static List<String> convert(List<?> list) {
         List<String> convertedList = new ArrayList<>();
-        for (String string : list)
-            convertedList.add(convert(string));
+        for (Object value : list)
+            convertedList.add(convert(value + ""));
         return convertedList;
     }
 

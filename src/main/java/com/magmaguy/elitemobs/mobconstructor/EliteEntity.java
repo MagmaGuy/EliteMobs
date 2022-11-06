@@ -120,7 +120,7 @@ public class EliteEntity {
     //currently used to store ender crystals for the dragon boss fight
     protected List<Entity> nonEliteReinforcementEntities = new ArrayList<>();
     protected boolean bypassesProtections = false;
-    private Double health = null;
+    protected Double health = null;
     @Getter
     @Setter
     private boolean dying = false;
@@ -301,14 +301,12 @@ public class EliteEntity {
         livingEntity.setCustomNameVisible(isVisible);
     }
 
-    private void setMaxHealth() {
+    public void setMaxHealth() {
         this.defaultMaxHealth = EliteMobProperties.getPluginData(entityType).getDefaultMaxHealth();
         this.maxHealth = (level * CombatSystem.TARGET_HITS_TO_KILL_MINUS_ONE + this.defaultMaxHealth) * healthMultiplier;
-        if (livingEntity != null)
-            livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(maxHealth);
+        if (livingEntity != null) livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(maxHealth);
         if (health == null) {
-            if (livingEntity != null)
-                livingEntity.setHealth(maxHealth);
+            if (livingEntity != null) livingEntity.setHealth(maxHealth);
             this.health = maxHealth;
         }
         //This is useful for phase boss entities that spawn in unloaded chunks and shouldn't full heal between phases, like in dungeons
