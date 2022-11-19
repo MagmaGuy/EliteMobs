@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.items.customloottable;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.menus.LootMenu;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import lombok.Getter;
@@ -74,6 +75,7 @@ public class SharedLootTable {
 
     private void rollLoot(ItemStack item, List<Player> players) {
         Player player = players.get(ThreadLocalRandom.current().nextInt(players.size()));
+        SoulbindEnchantment.addEnchantment(item, player);
         if (!player.getInventory().addItem(item).isEmpty())
             player.getWorld().dropItemNaturally(player.getLocation(), item);
         players.forEach(thisPlayer -> thisPlayer.sendMessage(

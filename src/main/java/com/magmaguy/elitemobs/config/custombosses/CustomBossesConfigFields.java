@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.config.CustomConfigFieldsInterface;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.items.customloottable.CustomLootTable;
+import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.powers.scripts.caching.EliteScriptBlueprint;
 import com.magmaguy.elitemobs.thirdparty.modelengine.CustomModel;
 import com.magmaguy.elitemobs.utils.WarningMessage;
@@ -202,6 +203,9 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     @Getter
     @Setter
     private String song = null;
+    @Getter
+    @Setter
+    private boolean alert = false;
 
     /**
      * Creates a new default pre-made Custom Boss. The boss is further customized through a builder pattern.
@@ -280,6 +284,11 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     public void processConfigFields() {
         this.isEnabled = processBoolean("isEnabled", isEnabled, true, true);
         this.entityType = processEnum("entityType", entityType, EntityType.ZOMBIE, EntityType.class, true);
+        if (entityType == null) entityType = EntityType.ZOMBIE;
+        if (EliteMobProperties.getPluginData(entityType) == null) {
+            new WarningMessage("Failed to get plugin data for entity type " + entityType.toString() + " in file " + filename + " ! Defaulting to zombie.");
+            entityType = EntityType.ZOMBIE;
+        }
         this.instanced = processBoolean("instanced", instanced, false, false);
         this.name = translatable(filename, "name", processString("name", name, "Default Name", true));
         //Levels are strings because "dynamic" is a valid value
@@ -351,6 +360,7 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         if (rawEliteScripts != null) eliteScript = EliteScriptBlueprint.parseBossScripts(rawEliteScripts, this);
 
         this.song = processString("song", song, null, false);
+        this.alert = processBoolean("alert", alert, false, false);
     }
 
     public boolean isCustomModelExists() {

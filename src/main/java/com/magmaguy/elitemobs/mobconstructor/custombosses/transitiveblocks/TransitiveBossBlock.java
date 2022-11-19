@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.mobconstructor.custombosses.transitiveblocks;
 import com.magmaguy.elitemobs.api.EliteMobRemoveEvent;
 import com.magmaguy.elitemobs.api.EliteMobSpawnEvent;
 import com.magmaguy.elitemobs.dungeons.SchematicPackage;
-import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.utils.ChunkLocationChecker;
 import com.magmaguy.elitemobs.utils.WarningMessage;
@@ -17,12 +16,12 @@ import org.bukkit.event.Listener;
 
 public class TransitiveBossBlock implements Listener {
 
-    private static void setBlockData(CustomBossEntity customBossEntity, TransitiveBlock transitiveBlock, Location spawnLocation) {
+    private static void setBlockData(RegionalBossEntity regionalBossEntity, TransitiveBlock transitiveBlock, Location spawnLocation) {
         Location location;
         if (!ChunkLocationChecker.locationIsLoaded(spawnLocation)) return;
         double rotation = 0;
-        if (customBossEntity.getEmPackage() instanceof SchematicPackage)
-            rotation = customBossEntity.getEmPackage().getDungeonPackagerConfigFields().getCalculatedRotation();
+        if (regionalBossEntity.getEmPackage() instanceof SchematicPackage)
+            rotation = regionalBossEntity.getEmPackage().getDungeonPackagerConfigFields().getCalculatedRotation();
 
         BlockData blockData = transitiveBlock.getBlockData().clone();
 

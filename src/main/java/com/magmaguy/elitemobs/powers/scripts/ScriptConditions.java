@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.powers.scripts.caching.ScriptConditionsBlueprint;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -54,7 +55,14 @@ public class ScriptConditions {
 
     private boolean isAirCheck(Location targetLocation) {
         if (conditionsBlueprint.getLocationIsAir() == null) return true;
-        return targetLocation.getBlock().getType().isAir();
+        return conditionsBlueprint.getLocationIsAir() == targetLocation.getBlock().getType().isAir();
+    }
+
+    private boolean isOnFloor(Location targetLocation) {
+        if (conditionsBlueprint.getIsOnFloor() == null) return true;
+        Block currentBlock = targetLocation.getBlock();
+        Block floorBlock = targetLocation.clone().subtract(0, 1, 0).getBlock();
+        return conditionsBlueprint.getIsOnFloor() == !currentBlock.getType().isSolid() && floorBlock.getType().isSolid();
     }
 
     public boolean meetsConditions(EliteEntity eliteEntity, LivingEntity directTarget) {
@@ -70,21 +78,17 @@ public class ScriptConditions {
         return true;
     }
 
-    public boolean meetsConditions(EliteEntity eliteEntity, Location location) {
-        Location conditionLocation;
-        if (conditionsBlueprint.getConditionTarget() == ScriptConditionsBlueprint.ConditionTarget.SELF)
-            conditionLocation = eliteEntity.getLocation();
-        else
-            conditionLocation = location;
+    public boolean meetsConditions(Location location) {
         if (location == null) return true;
-        return isAirCheck(conditionLocation);
+        return isAirCheck(location) &&
+                isOnFloor(location);
     }
 
 
     //Removes the locations that do not meet the conditions
     protected Collection<Location> validateLocations(@NotNull EliteEntity eliteEntity,
                                                      @NotNull Collection<Location> originalLocations) {
-        originalLocations.removeIf(targetLocation -> !meetsConditions(eliteEntity, targetLocation));
+        originalLocations.removeIf(targetLocation -> !meetsConditions(targetLocation));
         return originalLocations;
     }
 

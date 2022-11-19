@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.instanced;
 
 import com.magmaguy.elitemobs.api.PlayerJoinArenaEvent;
 import com.magmaguy.elitemobs.api.PlayerJoinDungeonEvent;
+import com.magmaguy.elitemobs.collateralminecraftchanges.AlternativeDurabilityLoss;
 import com.magmaguy.elitemobs.config.ArenasConfig;
 import com.magmaguy.elitemobs.instanced.arena.ArenaInstance;
 import com.magmaguy.elitemobs.instanced.dungeons.DungeonInstance;
@@ -88,6 +89,7 @@ public class InstancePlayerManager {
 
     public static void playerDeath(MatchInstance matchInstance, Player player) {
         if (!matchInstance.players.contains(player)) return;
+        AlternativeDurabilityLoss.doDurabilityLoss(player);
         player.setHealth(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
         matchInstance.players.remove(player);
         if (matchInstance.players.isEmpty()) {

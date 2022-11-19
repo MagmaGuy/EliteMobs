@@ -82,12 +82,14 @@ public class CustomBossMegaConsumer {
             elitePower.applyPowers(livingEntity);
         setEquipment(livingEntity);
         setBaby(livingEntity);
-        setFrozen(livingEntity);
         setDisguise(livingEntity);
         //setCustomModel(livingEntity);
         setName(livingEntity);
         setFollowRange(livingEntity);
         setMovementSpeed(livingEntity);
+        setFrozen(livingEntity);
+        customBossEntity.setMovementSpeedAttribute(livingEntity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue());
+        customBossEntity.setFollowDistance(livingEntity.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).getBaseValue());
 
         if (livingEntity.getType().equals(EntityType.ENDER_DRAGON)) {
             ((EnderDragon) livingEntity).setPhase(EnderDragon.Phase.CIRCLING);

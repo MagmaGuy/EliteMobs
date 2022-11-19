@@ -127,6 +127,9 @@ public class EliteEntity {
     @Getter
     @Setter
     private boolean healing = false;
+    @Getter
+    @Setter
+    protected Location spawnLocation;
     //Used for custom arbitrary tags from elite scripts
     private HashSet<String> customMetadata = new HashSet<>();
 
@@ -230,6 +233,8 @@ public class EliteEntity {
 
     public void setLivingEntity(LivingEntity livingEntity, CreatureSpawnEvent.SpawnReason spawnReason) {
         if (livingEntity == null) return;
+        if (!(this instanceof CustomBossEntity))
+            this.spawnLocation = livingEntity.getLocation().clone();
         this.livingEntity = livingEntity;
         this.unsyncedLivingEntity = livingEntity;
         this.entityType = livingEntity.getType();

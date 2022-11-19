@@ -13,6 +13,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
+import org.bukkit.configuration.MemorySection;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
@@ -62,6 +63,8 @@ public class ScriptActionBlueprint {
     @Getter
     private ScriptTargetsBlueprint scriptTargets;
     @Getter
+    private ScriptTargetsBlueprint finalTarget = null;
+    @Getter
     private String title = "";
     @Getter
     private String subtitle = "";
@@ -95,6 +98,8 @@ public class ScriptActionBlueprint {
     private int time = 0;
     @Getter
     private WeatherType weatherType = WeatherType.CLEAR;
+    @Getter
+    private boolean revertBlockPlacement = true;
 
 
     public ScriptActionBlueprint(Map<?, ?> entry, String scriptName, String scriptFilename) {
@@ -102,7 +107,7 @@ public class ScriptActionBlueprint {
         this.scriptFilename = scriptFilename;
         processMapList(entry);
         conditionsBlueprint = new ScriptConditionsBlueprint((Map<String, Object>) entry.get("Conditions"), scriptName, scriptFilename);
-        scriptTargets = new ScriptTargetsBlueprint(entry, scriptName);
+        if (scriptTargets == null) scriptTargets = new ScriptTargetsBlueprint(entry, scriptName, scriptFilename);
     }
 
     private void processMapList(Map<?, ?> entry) {
@@ -156,9 +161,19 @@ public class ScriptActionBlueprint {
             case "tags" -> tags = parseStringList(key, value, scriptName);
             case "time" -> time = parseInteger(key, value, scriptName);
             case "weather" -> weatherType = parseEnum(key, value, WeatherType.class, scriptName);
-            //Managed by ScriptTargets
-            case "target", "locations", "range", "track" -> {
+            case "target" -> {
+                if (value instanceof MemorySection)
+                    scriptTargets = new ScriptTargetsBlueprint(((MemorySection) value).getValues(false), scriptName, scriptFilename);
+                else
+                    scriptTargets = new ScriptTargetsBlueprint((Map) value, scriptName, scriptFilename);
             }
+            case "finaltarget" -> {
+                if (value instanceof MemorySection)
+                    finalTarget = new ScriptTargetsBlueprint(((MemorySection) value).getValues(false), scriptName, scriptFilename);
+                else
+                    finalTarget = new ScriptTargetsBlueprint((Map) value, scriptName, scriptFilename);
+            }
+            case "revertblockplacement" -> revertBlockPlacement = parseBoolean(key,value,scriptName);
             default ->
                     new WarningMessage("Failed to read key " + key + " for script " + scriptName + " in " + scriptFilename);
         }

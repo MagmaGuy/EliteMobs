@@ -41,6 +41,7 @@ public class PackageCommand {
         packContents("customtreasurechests");
         packContents("wormholes");
         packContents("world_blueprints");
+        packContents("powers");
 
         commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2Done! You can find your package in &9~/plugins/EliteMobs/exports &2. &6If you are making a dungeon, make sure to create your own dungeonpackages file!"));
         commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &6Don't forget to add your world and schematic files to the package if needed!"));

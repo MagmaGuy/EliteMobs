@@ -10,6 +10,7 @@ import java.util.Map;
 import static com.magmaguy.elitemobs.utils.MapListInterpreter.*;
 
 public class ScriptTargetsBlueprint {
+    private String filename;
     @Getter
     protected Target targetType = Target.SELF;
     @Getter
@@ -25,8 +26,9 @@ public class ScriptTargetsBlueprint {
     @Getter
     private boolean track = true;
 
-    public ScriptTargetsBlueprint(Map<?, ?> entry, String scriptName) {
+    public ScriptTargetsBlueprint(Map<?, ?> entry, String scriptName, String filename) {
         this.scriptName = scriptName;
+        this.filename = filename;
         processMapList(entry);
     }
 
@@ -41,7 +43,7 @@ public class ScriptTargetsBlueprint {
         switch (key.toLowerCase()) {
             case "location" -> location = parseString(key, value, scriptName);
             case "locations" -> locations = parseStringList(key, value, scriptName);
-            case "target" -> targetType = parseEnum(key, value, Target.class, scriptName);
+            case "targettype" -> targetType = parseEnum(key, value, Target.class, scriptName);
             case "range" -> range = parseDouble(key, value, scriptName);
             case "offset" -> offset = parseVector(key, value, scriptName);
             case "track" -> track = parseBoolean(key, value, scriptName);
