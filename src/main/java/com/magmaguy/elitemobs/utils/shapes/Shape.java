@@ -8,7 +8,7 @@ import java.util.List;
 public abstract class Shape {
     public abstract boolean contains(Location position);
 
-    public abstract boolean borderContains(Location postion);
+    public abstract boolean borderContains(Location position);
 
     public abstract void visualize(Particle particle);
 

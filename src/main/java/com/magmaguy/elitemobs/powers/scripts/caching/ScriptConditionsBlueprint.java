@@ -20,6 +20,8 @@ public class ScriptConditionsBlueprint {
     @Getter
     private Boolean locationIsAir = null;
     @Getter
+    private Boolean isOnFloor = null;
+    @Getter
     private List<String> doesNotHaveTags = null;
     @Getter
     private ConditionTarget conditionTarget = ConditionTarget.SELF;
@@ -37,6 +39,7 @@ public class ScriptConditionsBlueprint {
             case "locationisair" -> locationIsAir = MapListInterpreter.parseBoolean(key, value, scriptName);
             case "hastags" -> hasTags = MapListInterpreter.parseStringList(key, value, scriptName);
             case "doesnothavetags" -> doesNotHaveTags = MapListInterpreter.parseStringList(key, value, scriptName);
+            case "isonfloor" -> isOnFloor = MapListInterpreter.parseBoolean(key,value,scriptName);
             case "conditiontarget" ->
                     conditionTarget = MapListInterpreter.parseEnum(key, value, ConditionTarget.class, scriptName);
             default -> new WarningMessage("Failed to read key " + key + " for script " + scriptName);

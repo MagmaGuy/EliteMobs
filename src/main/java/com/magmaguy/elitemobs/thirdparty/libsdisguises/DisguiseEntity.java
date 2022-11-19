@@ -117,11 +117,14 @@ public class DisguiseEntity {
         Disguise disguise = DisguiseAPI.getDisguise(entity);
         if (disguise == null) return;
         if (disguise instanceof PlayerDisguise) {
+            /*
+            Currently broken, waiting for libs to fix it
             if (disguiseNameVisibility) {
                 entity.setCustomName(name);
                 disguise.setDisguiseName(name);
                 disguise.setDynamicName(true);
             }
+             */
             ((PlayerDisguise) disguise).setNameVisible(disguiseNameVisibility);
         }
         //todo: This doesn't work yes, check with libs later to see if he found a solution

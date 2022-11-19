@@ -8,6 +8,7 @@ import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.powers.meta.BossPower;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -75,6 +76,7 @@ public class SpiritWalk extends BossPower implements Listener {
 
     public static void spiritWalkRegionalBossAnimation(EliteEntity eliteEntity, Location entityLocation, Location finalLocation) {
         Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, bukkitTask -> {
+                    if (eliteEntity.getLivingEntity() == null) return;
                     eliteEntity.getLivingEntity().setAI(false);
                     eliteEntity.getLivingEntity().setInvulnerable(true);
                     Vector toDestination = finalLocation.clone().subtract(entityLocation.clone()).toVector().normalize().divide(new Vector(2, 2, 2));
@@ -136,8 +138,8 @@ public class SpiritWalk extends BossPower implements Listener {
 
                                 Bukkit.getServer().getPluginManager().callEvent(new EliteMobExitCombatEvent(eliteEntity, EliteMobExitCombatEvent.EliteMobExitCombatReason.SPIRIT_WALK));
                                 if (eliteEntity.getLivingEntity() instanceof Mob)
-                                    if (((Mob) eliteEntity.getLivingEntity()).getTarget() == null)
-                                        eliteEntity.getLivingEntity().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 2));
+                                    if (((Mob) eliteEntity.getLivingEntity()).getTarget() == null && eliteEntity instanceof RegionalBossEntity regionalBossEntity)
+                                        CustomBossEntity.CustomBossEntityEvents.slowRegionalBoss(regionalBossEntity);
 
                             }
 

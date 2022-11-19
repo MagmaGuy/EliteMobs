@@ -6,6 +6,7 @@ public enum Target {
     ALL_PLAYERS,
     DIRECT_TARGET,
     SELF,
+    SELF_SPAWN,
     LOCATION,
     LOCATIONS,
     ZONE_FULL,

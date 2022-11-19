@@ -6,10 +6,7 @@ import com.magmaguy.elitemobs.powers.scripts.caching.ScriptTargetsBlueprint;
 import com.magmaguy.elitemobs.powers.scripts.caching.ScriptZoneBlueprint;
 import com.magmaguy.elitemobs.powers.scripts.enums.Target;
 import com.magmaguy.elitemobs.utils.WarningMessage;
-import com.magmaguy.elitemobs.utils.shapes.Cylinder;
-import com.magmaguy.elitemobs.utils.shapes.Dome;
-import com.magmaguy.elitemobs.utils.shapes.Shape;
-import com.magmaguy.elitemobs.utils.shapes.Sphere;
+import com.magmaguy.elitemobs.utils.shapes.*;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
@@ -21,15 +18,25 @@ import java.util.stream.Collectors;
 
 public class ScriptZone {
 
+    @Getter
     private final ScriptZoneBlueprint zoneBlueprint;
-    private final ScriptTargets scriptZoneTargets;
+    private final ScriptTargets targets;
+    private ScriptTargets finalTargets = null;
+    private ScriptTargets targets2 = null;
+    private ScriptTargets finalTargets2 = null;
     @Getter
     private boolean isValid;
 
     public ScriptZone(ScriptZoneBlueprint zoneBlueprint, EliteScript eliteScript) {
         this.zoneBlueprint = zoneBlueprint;
-        this.scriptZoneTargets = new ScriptTargets(zoneBlueprint.getScriptTargetsBlueprint(), eliteScript);
-        isValid = zoneBlueprint.getScriptTargetsBlueprint() != null;
+        this.targets = new ScriptTargets(zoneBlueprint.getTarget(), eliteScript);
+        if (zoneBlueprint.getFinalTarget() != null)
+            finalTargets = new ScriptTargets(zoneBlueprint.getFinalTarget(), eliteScript);
+        if (zoneBlueprint.getTarget2() != null)
+            targets2 = new ScriptTargets(zoneBlueprint.getTarget2(), eliteScript);
+        if (zoneBlueprint.getFinalTarget2() != null)
+            finalTargets2 = new ScriptTargets(zoneBlueprint.getFinalTarget2(), eliteScript);
+        isValid = zoneBlueprint.getTarget() != null;
     }
 
     //Used for tracking, allows locations to be picked and set to be consistent throughout
@@ -39,12 +46,11 @@ public class ScriptZone {
 
     //Get living entities in zone
     protected Collection<? extends LivingEntity> getEffectTargets(ScriptActionData scriptActionData,
-                                                                  ScriptTargetsBlueprint blueprintFromRequestingTarget,
-                                                                  List<Shape> precachedShapes) {
+                                                                  ScriptTargetsBlueprint blueprintFromRequestingTarget) {
         //Generate shapes for the zone
         List<Shape> shapes;
-        if (precachedShapes != null) {
-            shapes = precachedShapes;
+        if (scriptActionData.getCachedShapes() != null) {
+            shapes = scriptActionData.getCachedShapes();
         } else {
             shapes = generateShapes(scriptActionData);
         }
@@ -54,7 +60,7 @@ public class ScriptZone {
             case ZONE_FULL, ZONE_BORDER:
                 return getEntitiesInArea(shapes, blueprintFromRequestingTarget.getTargetType());
             default: {
-                new WarningMessage("Couldn't parse target " + scriptZoneTargets.getTargetBlueprint().getTargetType() + " in script ");
+                new WarningMessage("Couldn't parse target " + targets.getTargetBlueprint().getTargetType() + " in script ");
                 return new ArrayList<>();
             }
         }
@@ -63,8 +69,13 @@ public class ScriptZone {
     //Get locations in zone
     protected Collection<Location> getEffectLocationTargets(ScriptActionData scriptActionData,
                                                             ScriptTargets actionTarget) {
-        //Generate shapes for the zone, precached locations have already been handled by the script target
-        List<Shape> shapes = generateShapes(scriptActionData);
+        //Generate shapes for the zone
+        List<Shape> shapes;
+        if (scriptActionData.getCachedShapes() != null) {
+            shapes = scriptActionData.getCachedShapes();
+        } else {
+            shapes = generateShapes(scriptActionData);
+        }
 
         //Get the locations from those zones
         return switch (actionTarget.getTargetBlueprint().getTargetType()) {
@@ -86,7 +97,7 @@ public class ScriptZone {
     private List<Shape> generateShapes(ScriptActionData scriptActionData) {
         List<Shape> shapes = new ArrayList<>();
         //Get the shapes from the targets of the zone
-        for (Location shapeTargetLocation : scriptZoneTargets.getZoneLocationTargets(scriptActionData)) {
+        for (Location shapeTargetLocation : targets.getTargetLocations(scriptActionData)) {
             switch (zoneBlueprint.getShapeTypeEnum()) {
                 case CYLINDER:
                     shapes.add(new Cylinder(shapeTargetLocation, zoneBlueprint.getRadius(), zoneBlueprint.getHeight(), zoneBlueprint.getBorderRadius()));
@@ -96,6 +107,71 @@ public class ScriptZone {
                     break;
                 case DOME:
                     shapes.add(new Dome(zoneBlueprint.getRadius(), shapeTargetLocation, zoneBlueprint.getBorderRadius()));
+                    break;
+                case STATIC_RAY:
+                    if (targets2 == null) {
+                        new WarningMessage("Script for boss " + scriptActionData.getEliteEntity().getName() + " has a static ray but no set target2 for the ray!");
+                        break;
+                    }
+                    for (Location location : targets2.getTargetLocations(scriptActionData))
+                        shapes.add(
+                                new StaticRay(
+                                        zoneBlueprint.isIgnoresSolidBlocks(),
+                                        zoneBlueprint.getPointRadius(),
+                                        shapeTargetLocation,
+                                        location));
+                    break;
+                case ROTATING_RAY:
+                    if (targets2 == null) {
+                        new WarningMessage("Script for boss " + scriptActionData.getEliteEntity().getName() + " has a static ray but no set target2 for the ray!");
+                        break;
+                    }
+                    Location finalTargetLocation = null;
+                    if (finalTargets != null) {
+                        List<Location> finalTargetsList = finalTargets.getTargetLocations(scriptActionData).stream().toList();
+                        if (!finalTargetsList.isEmpty()) finalTargetLocation = finalTargetsList.get(0);
+                    }
+                    for (Location location : targets2.getTargetLocations(scriptActionData)) {
+                        //Developer.message("adding shape");
+                        shapes.add(
+                                new RotatingRay(
+                                        zoneBlueprint.isIgnoresSolidBlocks(),
+                                        zoneBlueprint.getPointRadius(),
+                                        shapeTargetLocation,
+                                        finalTargetLocation,
+                                        location,
+                                        zoneBlueprint.getPitchPreRotation(),
+                                        zoneBlueprint.getYawPreRotation(),
+                                        zoneBlueprint.getPitchRotation(),
+                                        zoneBlueprint.getYawRotation(),
+                                        zoneBlueprint.getAnimationDuration()));
+                    }
+                    break;
+                case TRANSLATING_RAY:
+                    if (targets2 == null) {
+                        new WarningMessage("Script for boss " + scriptActionData.getEliteEntity().getName() + " has a static ray but no set target2 for the ray!");
+                        break;
+                    }
+                    Location targetLocationEnd = null;
+                    if (finalTargets != null) {
+                        List<Location> finalTargetsList = finalTargets.getTargetLocations(scriptActionData).stream().toList();
+                        if (!finalTargetsList.isEmpty()) targetLocationEnd = finalTargetsList.get(0);
+                    }
+                    Location target2LocationEnd = null;
+                    if (finalTargets2 != null) {
+                        List<Location> finalTargetsList = finalTargets2.getTargetLocations(scriptActionData).stream().toList();
+                        if (!finalTargetsList.isEmpty()) target2LocationEnd = finalTargetsList.get(0);
+                    }
+                    for (Location location : targets2.getTargetLocations(scriptActionData))
+                        shapes.add(
+                                new TranslatingRay(
+                                        zoneBlueprint.isIgnoresSolidBlocks(),
+                                        zoneBlueprint.getPointRadius(),
+                                        shapeTargetLocation,
+                                        targetLocationEnd,
+                                        location,
+                                        target2LocationEnd,
+                                        zoneBlueprint.getAnimationDuration()));
                     break;
                 default:
                     continue;

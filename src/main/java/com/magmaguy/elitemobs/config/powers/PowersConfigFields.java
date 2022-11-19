@@ -128,7 +128,8 @@ public class PowersConfigFields extends CustomConfigFields {
         try {
             if (scripts != null) eliteScriptBlueprints = EliteScriptBlueprint.parseBossScripts(scripts, this);
         } catch (Exception exception) {
-            new WarningMessage("You have a script with invalid data! Script in " + filename + " is not valid. Stacktrace:", true);
+            new WarningMessage("You have a script with invalid data! Script in " + filename + " is not valid.");
+            exception.printStackTrace();
         }
     }
 

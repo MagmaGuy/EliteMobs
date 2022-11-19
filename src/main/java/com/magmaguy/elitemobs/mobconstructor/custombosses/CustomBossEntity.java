@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.api.EliteMobEnterCombatEvent;
 import com.magmaguy.elitemobs.api.EliteMobExitCombatEvent;
 import com.magmaguy.elitemobs.api.EliteMobRemoveEvent;
+import com.magmaguy.elitemobs.api.EliteMobSpawnEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.EventsConfig;
@@ -29,20 +30,19 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 
 public class CustomBossEntity extends EliteEntity implements Listener, PersistentObject, PersistentMovingEntity {
 
@@ -59,9 +59,6 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
     protected PersistentObjectHandler persistentObjectHandler = null;
     @Setter
     protected Location persistentLocation;
-    @Getter
-    @Setter
-    protected Location spawnLocation;
     protected CustomBossTrail customBossTrail;
     @Getter
     protected CustomBossBossBar customBossBossBar;
@@ -93,6 +90,12 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
     @Getter
     @Setter
     private BossMusic bossMusic = null;
+    @Getter
+    @Setter
+    private double followDistance;
+    @Getter
+    @Setter
+    private double movementSpeedAttribute;
 
     /**
      * Uses a builder pattern in order to construct a CustomBossEntity at an arbitrary point in the future. Does not
@@ -116,6 +119,8 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
         if (this instanceof RegionalBossEntity)
             super.bypassesProtections = true;
         this.emPackage = EMPackage.getContent(customBossesConfigFields.getFilename());
+        this.followDistance = customBossesConfigFields.getFollowDistance();
+        this.movementSpeedAttribute = customBossesConfigFields.getMovementSpeedAttribute() == null ? 0 : customBossesConfigFields.getMovementSpeedAttribute();
     }
 
     @Nullable
@@ -162,7 +167,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
     public void spawn(Location spawnLocation, int level, boolean silent) {
         bossTrace.spawnPreprocessor(1);
         super.level = level;
-        this.spawnLocation = spawnLocation;
+        super.spawnLocation = spawnLocation;
         spawn(spawnLocation, silent);
     }
 
@@ -179,7 +184,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
             new WarningMessage("Warning: " + customBossesConfigFields.getFilename() + " attempted to double spawn " + attemptsCounter + " times!", true);
             return;
         }
-        this.spawnLocation = spawnLocation;
+        super.spawnLocation = spawnLocation;
         this.persistentLocation = spawnLocation;
         spawn(silent);
     }
@@ -535,14 +540,33 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
     }
 
     public static class CustomBossEntityEvents implements Listener {
+        public static void slowRegionalBoss(RegionalBossEntity regionalBossEntity) {
+            if (regionalBossEntity.getCustomBossesConfigFields().isAlert()) return;
+            if (regionalBossEntity.getLivingEntity() == null) return;
+            regionalBossEntity.getLivingEntity().getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(.1);
+            regionalBossEntity.getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE)
+                    .setBaseValue(regionalBossEntity.getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE).getBaseValue() / 3D);
+        }
+
+        @EventHandler
+        public void slowAndBlindRegionalBossesOutOfCombat(EliteMobExitCombatEvent event) {
+            if (event.getEliteMobEntity() instanceof RegionalBossEntity regionalBossEntity && regionalBossEntity.exists())
+                slowRegionalBoss(regionalBossEntity);
+        }
+
+        @EventHandler
+        public void slowAndBlindRegionalBossesOnSpawn(EliteMobSpawnEvent event) {
+            if (event.getEliteMobEntity() instanceof RegionalBossEntity regionalBossEntity)
+                slowRegionalBoss(regionalBossEntity);
+        }
+
         @EventHandler(ignoreCancelled = true)
         public void removeSlowEvent(EliteMobEnterCombatEvent eliteMobEnterCombatEvent) {
-            if (!(eliteMobEnterCombatEvent.getEliteMobEntity() instanceof CustomBossEntity)) return;
-            if (eliteMobEnterCombatEvent.getEliteMobEntity().getLivingEntity().getPotionEffect(PotionEffectType.SLOW) == null)
+            if (!(eliteMobEnterCombatEvent.getEliteMobEntity() instanceof RegionalBossEntity regionalBossEntity))
                 return;
-            if (Objects.requireNonNull(eliteMobEnterCombatEvent.getEliteMobEntity().getLivingEntity().getPotionEffect(PotionEffectType.SLOW)).getAmplifier() == 10)
-                return;
-            eliteMobEnterCombatEvent.getEliteMobEntity().getLivingEntity().removePotionEffect(PotionEffectType.SLOW);
+            if (regionalBossEntity.getCustomBossesConfigFields().isAlert()) return;
+            regionalBossEntity.getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(regionalBossEntity.getFollowDistance());
+            regionalBossEntity.getLivingEntity().getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(regionalBossEntity.getMovementSpeedAttribute());
         }
 
         @EventHandler(ignoreCancelled = true)

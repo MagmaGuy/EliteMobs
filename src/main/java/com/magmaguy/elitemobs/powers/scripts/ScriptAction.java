@@ -29,6 +29,7 @@ import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +37,7 @@ import java.util.Map;
 public class ScriptAction {
     private final ScriptActionBlueprint blueprint;
     private ScriptTargets scriptTargets;
+    private ScriptTargets finalScriptTargets = null;
     private ScriptConditions scriptConditions;
     private ScriptParticles scriptParticles;
     private Map<String, EliteScript> eliteScriptMap;
@@ -44,6 +46,8 @@ public class ScriptAction {
     public ScriptAction(ScriptActionBlueprint blueprint, Map<String, EliteScript> eliteScriptMap, EliteScript eliteScript) {
         this.blueprint = blueprint;
         this.scriptTargets = new ScriptTargets(blueprint.getScriptTargets(), eliteScript);
+        if (blueprint.getFinalTarget() != null)
+            finalScriptTargets = new ScriptTargets(blueprint.getFinalTarget(), eliteScript);
         this.scriptConditions = new ScriptConditions(blueprint.getConditionsBlueprint());
         this.scriptParticles = new ScriptParticles(blueprint.getScriptParticlesBlueprint());
         this.eliteScriptMap = eliteScriptMap;
@@ -130,17 +134,25 @@ public class ScriptAction {
     }
 
     protected Collection<? extends LivingEntity> getTargets(ScriptActionData scriptActionData) {
-        return scriptConditions.validateEntities(scriptActionData.getEliteEntity(), scriptTargets.getTargets(scriptActionData));
+        return scriptConditions.validateEntities(scriptActionData.getEliteEntity(), scriptTargets.getTargetEntities(scriptActionData));
     }
 
     //Gets a list of locations
     protected Collection<Location> getLocationTargets(ScriptActionData scriptActionData) {
-        return scriptConditions.validateLocations(scriptActionData.getEliteEntity(), scriptTargets.getZoneLocationTargets(scriptActionData));
+        return scriptConditions.validateLocations(scriptActionData.getEliteEntity(), scriptTargets.getTargetLocations(scriptActionData));
     }
 
     //Teleports the targets
     private void runTeleport(ScriptActionData scriptActionData) {
-        getTargets(scriptActionData).forEach(iteratedPlayer -> iteratedPlayer.teleport(blueprint.getLocation(scriptActionData.getEliteEntity())));
+        getTargets(scriptActionData).forEach(iteratedTarget -> {
+            if (finalScriptTargets == null) {
+                new WarningMessage("Failed to get teleport destination for script " + blueprint.getScriptName() + " because there is no set FinalTarget!");
+                return;
+            }
+            List<Location> destinationLocations = new ArrayList<>(finalScriptTargets.getTargetLocations(scriptActionData));
+            if (destinationLocations.isEmpty()) return;
+            iteratedTarget.teleport(destinationLocations.get(0));
+        });
     }
 
     //Sends a message to the targets
@@ -279,6 +291,7 @@ public class ScriptAction {
 
     //Spawns a particle at the target location
     private void runSpawnParticle(ScriptActionData scriptActionData) {
+        //if (blueprint.getScriptName().equals("RotatingRay"))            Developer.message("running spawn particle");
         getLocationTargets(scriptActionData).forEach(targetLocation -> scriptParticles.visualize(targetLocation));
     }
 

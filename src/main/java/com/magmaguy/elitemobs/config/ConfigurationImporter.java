@@ -86,6 +86,9 @@ public class ConfigurationImporter {
                         case "wormholes":
                             moveDirectory(file, Paths.get(configurationsPath.normalize() + "" + File.separatorChar + "wormholes"), false);
                             break;
+                        case "powers":
+                            moveDirectory(file, Paths.get(configurationsPath.normalize() + "" + File.separatorChar + "powers"), false);
+                            break;
                         case "worldcontainer":
                             moveWorlds(file);
                             break;

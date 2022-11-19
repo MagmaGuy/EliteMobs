@@ -48,15 +48,18 @@ public class ScriptTargets {
         //Only cache if tracking
         if (getTargetBlueprint().isTrack()) return;
         //Only cache locations - caching living entities would probably be very confusing
-        if (!actionType.isRequiresLivingEntity()) {
-            scriptActionData.setLocations(new ArrayList<>(getZoneLocationTargets(scriptActionData)));
-        } else if (eliteScript.getScriptZone().isValid()) {
+        //if (actionType.isRequiresLivingEntity()) return;
+        boolean animatedScriptZone = false;
+        if (eliteScript.getScriptZone().isValid()) {
             scriptActionData.setCachedShapes(eliteScript.getScriptZone().precacheShapes(scriptActionData));
+            if (eliteScript.getScriptZone().getZoneBlueprint().getAnimationDuration() > 0) animatedScriptZone = true;
         }
+        if (!animatedScriptZone)
+            scriptActionData.setLocations(new ArrayList<>(getTargetLocations(scriptActionData)));
     }
 
     //Get living entity targets. New array lists so they are not immutable.
-    protected Collection<? extends LivingEntity> getTargets(ScriptActionData scriptActionData) {
+    protected Collection<? extends LivingEntity> getTargetEntities(ScriptActionData scriptActionData) {
         if (livingEntities != null) return livingEntities;
         //If a script zone exists, it overrides the check entirely to expose zone-based fields
         Location eliteEntityLocation = scriptActionData.getEliteEntity().getLocation();
@@ -79,7 +82,7 @@ public class ScriptTargets {
             case SELF:
                 return new ArrayList<>(List.of(scriptActionData.getEliteEntity().getUnsyncedLivingEntity()));
             case ZONE_FULL, ZONE_BORDER:
-                return eliteScript.getScriptZone().getEffectTargets(scriptActionData, targetBlueprint, scriptActionData.getCachedShapes());
+                return eliteScript.getScriptZone().getEffectTargets(scriptActionData, targetBlueprint);
             default:
                 new WarningMessage("Could not find default target for script in " + eliteScript.getFileName());
                 return new ArrayList<>();
@@ -92,19 +95,21 @@ public class ScriptTargets {
      *
      * @return Validated location for the script behavior
      */
-    protected Collection<Location> getZoneLocationTargets(ScriptActionData scriptActionData) {
+    protected Collection<Location> getTargetLocations(ScriptActionData scriptActionData) {
         if (scriptActionData.getLocations() != null) return scriptActionData.getLocations();
         if (targetBlueprint.getTargetType() == Target.ALL_PLAYERS ||
                 targetBlueprint.getTargetType() == Target.WORLD_PLAYERS ||
                 targetBlueprint.getTargetType() == Target.NEARBY_PLAYERS ||
                 targetBlueprint.getTargetType() == Target.DIRECT_TARGET ||
                 targetBlueprint.getTargetType() == Target.SELF)
-            return getTargets(scriptActionData).stream().map(targetEntity -> targetEntity.getLocation().add(targetBlueprint.getOffset())).collect(Collectors.toSet());
+            return getTargetEntities(scriptActionData).stream().map(targetEntity -> targetEntity.getLocation().add(targetBlueprint.getOffset())).collect(Collectors.toSet());
         switch (targetBlueprint.getTargetType()) {
             case LOCATION:
                 return List.of(getLocation(scriptActionData.getEliteEntity()));
             case LOCATIONS:
                 return getLocations(scriptActionData.getEliteEntity());
+            case SELF_SPAWN:
+                return new ArrayList<>(List.of(scriptActionData.getEliteEntity().getSpawnLocation()));
             case ZONE_FULL, ZONE_BORDER:
                 if (eliteScript.getScriptZone() != null) {
                     if (targetBlueprint.getOffset().equals(new Vector(0, 0, 0)))
