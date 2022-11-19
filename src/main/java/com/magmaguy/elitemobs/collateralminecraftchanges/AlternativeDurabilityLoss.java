@@ -50,11 +50,11 @@ public class AlternativeDurabilityLoss implements Listener {
         event.setCancelled(true);
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onPlayerDeath(PlayerDeathEvent event) {
-        ArrayList<ItemStack> itemsList = new ArrayList<>(Arrays.asList(event.getEntity().getInventory().getArmorContents()));
-        itemsList.add(event.getEntity().getInventory().getItemInMainHand());
-        itemsList.add(event.getEntity().getInventory().getItemInOffHand());
+    public static void doDurabilityLoss(Player player) {
+        if (!ItemSettingsConfig.isEliteDurability()) return;
+        ArrayList<ItemStack> itemsList = new ArrayList<>(Arrays.asList(player.getInventory().getArmorContents()));
+        itemsList.add(player.getInventory().getItemInMainHand());
+        itemsList.add(player.getInventory().getItemInOffHand());
 
         for (ItemStack itemStack : itemsList)
             if (itemStack != null &&
@@ -74,6 +74,11 @@ public class AlternativeDurabilityLoss implements Listener {
                     } else
                         itemStack.setAmount(0);
             }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPlayerDeath(PlayerDeathEvent event) {
+        doDurabilityLoss(event.getEntity());
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)

@@ -131,13 +131,16 @@ public class EntityTracker implements Listener {
 
     //Temporary blocks - blocks in powers
     public static void addTemporaryBlock(Block block, int ticks, Material replacementMaterial) {
+        Material previousMaterial = block.getType();
+        if (temporaryBlocks.contains(block)) previousMaterial = null;
         temporaryBlocks.add(block);
         block.setType(replacementMaterial);
+        Material finalPreviousMaterial = previousMaterial;
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (block.getType().equals(replacementMaterial))
-                    block.setType(Material.AIR);
+                if (block.getType().equals(replacementMaterial) && finalPreviousMaterial != null)
+                    block.setType(finalPreviousMaterial);
                 temporaryBlocks.remove(block);
             }
         }.runTaskLater(MetadataHandler.PLUGIN, ticks);

@@ -28,9 +28,9 @@ public class Sphere extends Shape {
     }
 
     @Override
-    public boolean borderContains(Location location) {
+    public boolean borderContains(Location position) {
         Sphere innerSphere = new Sphere(borderRadius, centerLocation, borderRadius);
-        return contains(location) && !innerSphere.contains(location);
+        return contains(position) && !innerSphere.contains(position);
     }
 
     @Override
