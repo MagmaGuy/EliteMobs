@@ -22,10 +22,18 @@ public class ScriptActionData {
     private EliteEntity eliteEntity;
     @Getter
     @Setter
-    private LivingEntity directTarget;
+    private LivingEntity directTarget = null;
+    @Getter
+    @Setter
+    private Location landingLocation = null;
 
     public ScriptActionData(EliteEntity eliteEntity, LivingEntity directTarget) {
         this.eliteEntity = eliteEntity;
         this.directTarget = directTarget;
+    }
+
+    public ScriptActionData(EliteEntity eliteEntity, Location landingLocation) {
+        this.eliteEntity = eliteEntity;
+        this.landingLocation = landingLocation;
     }
 }

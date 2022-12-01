@@ -25,6 +25,8 @@ public class ScriptTargetsBlueprint {
     private double range = 20;
     @Getter
     private boolean track = true;
+    @Getter
+    private double coverage = 1.0;
 
     public ScriptTargetsBlueprint(Map<?, ?> entry, String scriptName, String filename) {
         this.scriptName = scriptName;
@@ -47,6 +49,7 @@ public class ScriptTargetsBlueprint {
             case "range" -> range = parseDouble(key, value, scriptName);
             case "offset" -> offset = parseVector(key, value, scriptName);
             case "track" -> track = parseBoolean(key, value, scriptName);
+            case "coverage" -> coverage = parseDouble(key,value,scriptName);
         }
     }
 }

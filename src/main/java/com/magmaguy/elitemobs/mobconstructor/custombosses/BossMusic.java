@@ -26,7 +26,7 @@ public class BossMusic {
     private BukkitTask bukkitTask = null;
     private CustomBossEntity customBossEntity;
 
-    //Format: name=rsp.name:length=durations_ms->name=rsp.name:length=duration_ms
+    //Format: name=rsp.name length=durations_ticks->name=rsp.name length=duration_ticks
     public BossMusic(String rawString, CustomBossEntity customBossEntity) {
         this.customBossEntity = customBossEntity;
         if (!rawString.contains("->")) {

@@ -75,8 +75,10 @@ public class EliteScriptBlueprint {
             }
             //Actions are specific because they have "anonymous" keys since they are just in a list
             if (truncatedKey.equalsIgnoreCase("Actions")) {
-                List<Map<?, ?>> mapList = new ArrayList<>(configurationSection.getMapList(key));
-                for (Map<?, ?> map : mapList) {
+                List<Map<?, ?>> immutableMapList = new ArrayList<>(configurationSection.getMapList(key));
+                List<Map<?, ?>> mutableMapList = new ArrayList<>();
+                immutableMapList.forEach(map -> mutableMapList.add(new HashMap<>(map)));
+                for (Map<?, ?> map : mutableMapList) {
                     Map<?, ?> clonedMap = new HashMap<>(map);
                     for (Map.Entry<?, ?> entry : clonedMap.entrySet()) {
                         if (((String) entry.getKey()).equalsIgnoreCase("target") &&
@@ -86,7 +88,7 @@ public class EliteScriptBlueprint {
                         }
                     }
                 }
-                if (updated) configurationSection.set(key, mapList);
+                if (updated) configurationSection.set(key, mutableMapList);
             }
         }
 
