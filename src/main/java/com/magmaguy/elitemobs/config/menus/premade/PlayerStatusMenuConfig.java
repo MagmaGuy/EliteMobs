@@ -417,7 +417,7 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
         if (!VersionChecker.serverVersionOlderThan(16, 0))
             gearThreatItem = ConfigurationEngine.setItemStack(fileConfiguration, "gearThreatItem",
                     ItemStackGenerator.generateItemStack(Material.TARGET,
-                            "&cTreat Level: $threat",
+                            "&cThreat Level: $threat",
                             Arrays.asList("&fThis determines the level of the",
                                     "&fElite Mobs that spawns near you",
                                     "&fTakes armor, weapon in hand, guild",
@@ -425,7 +425,7 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
         else
             gearThreatItem = ConfigurationEngine.setItemStack(fileConfiguration, "gearThreatItem",
                     ItemStackGenerator.generateItemStack(Material.DIAMOND,
-                            "&cTreat Level: $threat",
+                            "&cThreat Level: $threat",
                             Arrays.asList("&fThis determines the level of the",
                                     "&fElite Mobs that spawns near you",
                                     "&fTakes armor, weapon in hand, guild",

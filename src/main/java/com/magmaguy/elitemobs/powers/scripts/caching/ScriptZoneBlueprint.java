@@ -47,6 +47,18 @@ public class ScriptZoneBlueprint {
     @Getter
     private int animationDuration = 0;
     @Getter
+    private double x = 0;
+    @Getter
+    private double y = 0;
+    @Getter
+    private double z = 0;
+    @Getter
+    private double xBorder = 0;
+    @Getter
+    private double yBorder = 0;
+    @Getter
+    private double zBorder = 0;
+    @Getter
     private boolean ignoresSolidBlocks = true;
 
     public ScriptZoneBlueprint(ConfigurationSection configurationSection, String scriptName, String filename) {
@@ -82,11 +94,20 @@ public class ScriptZoneBlueprint {
             case "yawprerotation" -> yawPreRotation = parseDouble(key, value, scriptName);
             case "target" ->
                     target = new ScriptTargetsBlueprint(((MemorySection) value).getValues(false), scriptName, filename);
-            case "finaltarget" -> finalTarget = new ScriptTargetsBlueprint(((MemorySection) value).getValues(false), scriptName, filename);
-            case "target2" -> target2 = new ScriptTargetsBlueprint(((MemorySection) value).getValues(false), scriptName, filename);
-            case "finaltarget2" -> finalTarget2 = new ScriptTargetsBlueprint(((MemorySection) value).getValues(false), scriptName, filename);
+            case "finaltarget" ->
+                    finalTarget = new ScriptTargetsBlueprint(((MemorySection) value).getValues(false), scriptName, filename);
+            case "target2" ->
+                    target2 = new ScriptTargetsBlueprint(((MemorySection) value).getValues(false), scriptName, filename);
+            case "finaltarget2" ->
+                    finalTarget2 = new ScriptTargetsBlueprint(((MemorySection) value).getValues(false), scriptName, filename);
             case "animationduration" -> animationDuration = parseInteger(key, value, scriptName);
             case "ignoressolidblocks" -> ignoresSolidBlocks = parseBoolean(key, value, scriptName);
+            case "x" -> x = parseDouble(key, value, scriptName);
+            case "y" -> y = parseDouble(key, value, scriptName);
+            case "z" -> z = parseDouble(key, value, scriptName);
+            case "xborder" -> xBorder = parseDouble(key, value, scriptName);
+            case "yborder" -> yBorder = parseDouble(key, value, scriptName);
+            case "zborder" -> zBorder = parseDouble(key, value, scriptName);
             default -> {
                 new WarningMessage("Failed to read key " + key + " for script " + scriptName + " in file " + filename);
             }

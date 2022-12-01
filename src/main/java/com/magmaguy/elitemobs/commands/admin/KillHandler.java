@@ -21,7 +21,7 @@ public class KillHandler {
     public static void killAggressiveMobs(CommandSender commandSender) {
         int counter = 0;
         for (EliteEntity eliteEntity : new ArrayList<>(EntityTracker.getEliteMobEntities().values())) {
-            eliteEntity.remove(RemovalReason.REMOVE_COMMAND);
+            eliteEntity.remove(RemovalReason.OTHER);
             counter++;
         }
         commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Killed " + counter + " Elite Mobs."));
@@ -42,7 +42,7 @@ public class KillHandler {
             int counter = 0;
             for (EliteEntity eliteEntity : EntityTracker.getEliteMobEntities().values()) {
                 if (!eliteEntity.getLivingEntity().getType().equals(entityType)) continue;
-                eliteEntity.remove(RemovalReason.REMOVE_COMMAND);
+                eliteEntity.remove(RemovalReason.OTHER);
                 counter++;
             }
             commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Killed " + counter + " Elite " + entityType.toString() + "."));
@@ -63,7 +63,7 @@ public class KillHandler {
         for (Entity entity : player.getNearbyEntities(radius, radius, radius)) {
             EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(entity);
             if (eliteEntity != null)
-                eliteEntity.remove(RemovalReason.REMOVE_COMMAND);
+                eliteEntity.remove(RemovalReason.OTHER);
         }
         player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Killed " + counter + " Elite Mobs."));
     }
@@ -81,11 +81,13 @@ public class KillHandler {
     public static void radiusKillSpecificMobs(Player player, EntityType entityType, int radius) {
         int counter = 0;
         for (Entity entity : player.getNearbyEntities(radius, radius, radius)) {
-            if (entity.getType().equals(entityType) && (EntityTracker.isEliteMob(entity))) {
-                ((EliteEntity) entity).remove(RemovalReason.KILL_COMMAND);
+            if (!entity.getType().equals(entityType)) continue;
+            EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(entity);
+            if (eliteEntity != null) {
+                ((EliteEntity) entity).remove(RemovalReason.OTHER);
                 counter++;
-            } else if (entity.getType().equals(entityType) && EntityTracker.isSuperMob(entity)) {
-                EntityTracker.unregister(entity, RemovalReason.KILL_COMMAND);
+            } else if (EntityTracker.isSuperMob(entity)){
+                EntityTracker.unregister(entity, RemovalReason.OTHER);
                 counter++;
             }
         }

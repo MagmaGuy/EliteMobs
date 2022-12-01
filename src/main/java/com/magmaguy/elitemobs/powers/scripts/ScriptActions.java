@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.powers.scripts;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.scripts.caching.ScriptActionsBlueprint;
 import lombok.Getter;
+import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 
 import java.util.ArrayList;
@@ -20,6 +21,11 @@ public class ScriptActions {
     public void runScripts(EliteEntity eliteEntity, LivingEntity directTarget) {
         for (ScriptAction scriptAction : scriptActionsList)
             scriptAction.runScript(eliteEntity, directTarget);
+    }
+
+    public void runScripts(EliteEntity eliteEntity, Location landingLocation) {
+        for (ScriptAction scriptAction : scriptActionsList)
+            scriptAction.runScript(eliteEntity, landingLocation);
     }
 
     public boolean isValid() {

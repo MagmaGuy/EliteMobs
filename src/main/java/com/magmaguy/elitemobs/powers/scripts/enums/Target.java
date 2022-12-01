@@ -10,5 +10,7 @@ public enum Target {
     LOCATION,
     LOCATIONS,
     ZONE_FULL,
-    ZONE_BORDER
+    ZONE_BORDER,
+    LANDING_LOCATION,
+    ACTION_TARGET
 }
