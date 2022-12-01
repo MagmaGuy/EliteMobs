@@ -29,7 +29,8 @@ public enum ActionType {
     UNTAG(true),
     SET_TIME(false),
     SET_WEATHER(false),
-    PLAY_ANIMATION(true);
+    PLAY_ANIMATION(true),
+    SPAWN_FALLING_BLOCK(false);
 
     @Getter
     private final boolean requiresLivingEntity;

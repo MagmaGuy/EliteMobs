@@ -155,6 +155,8 @@ public class CustomBossBossBar {
                 ", " + (int) customBossEntity.getLocation().getZ();
         BossBar bossBar = Bukkit.createBossBar(bossBarMessage(player, locationString), BarColor.GREEN, BarStyle.SOLID, BarFlag.PLAY_BOSS_MUSIC);
 
+        if (!customBossEntity.exists()) return;
+
         if (customBossEntity.getHealth() / customBossEntity.getMaxHealth() > 1 || customBossEntity.getHealth() / customBossEntity.getMaxHealth() < 0) {
             if (!warned) {
                 new WarningMessage("The following boss had more health than it should: " + customBossEntity.getName());

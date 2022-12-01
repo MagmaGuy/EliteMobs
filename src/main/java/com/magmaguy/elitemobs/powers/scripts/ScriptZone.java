@@ -173,6 +173,16 @@ public class ScriptZone {
                                         target2LocationEnd,
                                         zoneBlueprint.getAnimationDuration()));
                     break;
+                case CUBOID:
+                    shapes.add(new Cuboid(
+                            zoneBlueprint.getX(),
+                            zoneBlueprint.getY(),
+                            zoneBlueprint.getZ(),
+                            zoneBlueprint.getXBorder(),
+                            zoneBlueprint.getYBorder(),
+                            zoneBlueprint.getZBorder(),
+                            shapeTargetLocation));
+                    break;
                 default:
                     continue;
             }

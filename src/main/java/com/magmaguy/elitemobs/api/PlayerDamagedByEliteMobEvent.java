@@ -129,7 +129,7 @@ public class PlayerDamagedByEliteMobEvent extends Event implements Cancellable {
                 potionEffectDamageReduction = (player.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE).
                         getAmplifier() + 1) * MobCombatSettingsConfig.getResistanceDamageMultiplier();
 
-            double finalDamage = (baseDamage * customBossDamageMultiplier * specialMultiplier + bonusDamage - damageReduction - potionEffectDamageReduction) *
+            double finalDamage = ((baseDamage + bonusDamage ) * customBossDamageMultiplier * specialMultiplier - damageReduction - potionEffectDamageReduction ) *
                     MobCombatSettingsConfig.getDamageToPlayerMultiplier();
 
             if (specialMultiplier != 1) specialMultiplier = 1;

@@ -39,6 +39,8 @@ public class ScriptActionBlueprint {
     @Getter
     private List<String> scripts = new ArrayList<>();
     @Getter
+    private List<String> landingScripts = new ArrayList<>();
+    @Getter
     private ScriptConditionsBlueprint conditionsBlueprint;
     @Getter
     private int times = -1;
@@ -131,6 +133,7 @@ public class ScriptActionBlueprint {
                 }
             }
             case "scripts" -> scripts = parseStringList(key, value, scriptName);
+            case "landingscripts" -> landingScripts = parseStringList(key, value, scriptName);
             case "conditions" ->
                     conditionsBlueprint = new ScriptConditionsBlueprint((Map<?, ?>) value, scriptName, scriptFilename);
             case "times" -> times = parseInteger(key, value, scriptName);
@@ -173,7 +176,7 @@ public class ScriptActionBlueprint {
                 else
                     finalTarget = new ScriptTargetsBlueprint((Map) value, scriptName, scriptFilename);
             }
-            case "revertblockplacement" -> revertBlockPlacement = parseBoolean(key,value,scriptName);
+            case "revertblockplacement" -> revertBlockPlacement = parseBoolean(key, value, scriptName);
             default ->
                     new WarningMessage("Failed to read key " + key + " for script " + scriptName + " in " + scriptFilename);
         }

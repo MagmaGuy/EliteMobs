@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import com.magmaguy.elitemobs.powers.scripts.caching.EliteScriptBlueprint;
 import lombok.Getter;
+import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -19,6 +20,7 @@ public class EliteScript extends ElitePower implements Cloneable {
     @Getter
     private final ScriptZone scriptZone;
     private final ScriptCooldowns scriptCooldowns;
+    @Getter
     protected Map<String, EliteScript> eliteScriptMap;
     private ScriptConditions scriptConditions;
 
@@ -26,7 +28,7 @@ public class EliteScript extends ElitePower implements Cloneable {
         super(scriptBlueprint.getCustomConfigFields());
         this.eliteScriptMap = eliteScriptMap;
         this.scriptEvents = new ScriptEvents(scriptBlueprint.getScriptEventsBlueprint());
-        this.scriptConditions = new ScriptConditions(scriptBlueprint.getScriptConditionsBlueprint());
+        this.scriptConditions = new ScriptConditions(scriptBlueprint.getScriptConditionsBlueprint(), this);
         this.scriptZone = new ScriptZone(scriptBlueprint.getScriptZoneBlueprint(), this);
         this.scriptActions = new ScriptActions(scriptBlueprint.getScriptActionsBlueprint(), eliteScriptMap, this);
         this.scriptCooldowns = new ScriptCooldowns(scriptBlueprint.getScriptCooldownsBlueprint(), this);
@@ -56,7 +58,7 @@ public class EliteScript extends ElitePower implements Cloneable {
         //Check if the event is relevant to the script
         if (!scriptEvents.isTargetEvent(eventClass)) return;
         //Check if the event conditions are met
-        if (scriptConditions != null && !scriptConditions.meetsConditions(eliteEntity, player)) return;
+        if (scriptConditions != null && !scriptConditions.meetsConditionsOutsideOfAction(eliteEntity, player)) return;
         //Let's do some actions
         scriptActions.runScripts(eliteEntity, player);
         //Cooldowns time
@@ -71,9 +73,24 @@ public class EliteScript extends ElitePower implements Cloneable {
      */
     public void check(EliteEntity eliteEntity, LivingEntity directTarget) {
         //Check if the event conditions are met
-        if (scriptConditions != null && !scriptConditions.meetsConditions(eliteEntity, directTarget)) return;
+        if (scriptConditions != null && !scriptConditions.meetsConditionsOutsideOfAction(eliteEntity, directTarget)) return;
         //Let's do some actions
         scriptActions.runScripts(eliteEntity, directTarget);
+        //Cooldowns time
+        doCooldownTicks(eliteEntity);
+    }
+
+    /**
+     * Used by scripts that call specific scripts when a projectile or falling block lands
+     *
+     * @param eliteEntity     Boss
+     * @param landingLocation Location where the projectile or block landed
+     */
+    public void check(EliteEntity eliteEntity, Location landingLocation) {
+        //Check if the event conditions are met
+        if (scriptConditions != null && !scriptConditions.meetsConditionsOutsideOfAction(eliteEntity, null)) return;
+        //Let's do some actions
+        scriptActions.runScripts(eliteEntity, landingLocation);
         //Cooldowns time
         doCooldownTicks(eliteEntity);
     }

@@ -12,6 +12,7 @@ public class EliteMobDamagedByEliteMobHandler implements Listener {
     public void onIronGolemDamage(EliteMobDamagedByEliteMobEvent event) {
 
         if (event.isCancelled()) return;
+        if (event.getDamager().getLivingEntity() == null || event.getDamagee().getLivingEntity() == null) return;
 
         if (!(event.getDamager().getLivingEntity().getType().equals(EntityType.IRON_GOLEM) ||
                 event.getDamagee().getLivingEntity().getType().equals(EntityType.IRON_GOLEM))) return;
