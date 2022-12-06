@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.powers.scripts.caching;
 
 import com.magmaguy.elitemobs.powers.scripts.enums.Target;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import org.bukkit.util.Vector;
 
@@ -32,6 +33,11 @@ public class ScriptTargetsBlueprint {
         this.scriptName = scriptName;
         this.filename = filename;
         processMapList(entry);
+        if (!targetType.equals(Target.ZONE_FULL) && !targetType.equals(Target.ZONE_BORDER))
+            if (coverage < 1.0) {
+                new WarningMessage("Coverage for script " + scriptName + " in file " + filename + " was less than 1.0 but the targetType is neither ZONE_FULL nor ZONE_BORDER! Coverage should only be used for ZONE_FULL or ZONE_BORDER");
+                coverage = 1.0;
+            }
     }
 
     private void processMapList(Map<?, ?> entry) {
@@ -49,7 +55,7 @@ public class ScriptTargetsBlueprint {
             case "range" -> range = parseDouble(key, value, scriptName);
             case "offset" -> offset = parseVector(key, value, scriptName);
             case "track" -> track = parseBoolean(key, value, scriptName);
-            case "coverage" -> coverage = parseDouble(key,value,scriptName);
+            case "coverage" -> coverage = parseDouble(key, value, scriptName);
         }
     }
 }

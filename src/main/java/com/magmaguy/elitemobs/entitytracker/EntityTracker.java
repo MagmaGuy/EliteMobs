@@ -17,6 +17,7 @@ import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Projectile;
@@ -133,14 +134,14 @@ public class EntityTracker implements Listener {
     public static void addTemporaryBlock(Block block, int ticks, Material replacementMaterial) {
         Material previousMaterial = block.getType();
         if (temporaryBlocks.contains(block)) previousMaterial = null;
+        BlockData previousBlockData = block.getBlockData().clone();
         temporaryBlocks.add(block);
         block.setType(replacementMaterial);
-        Material finalPreviousMaterial = previousMaterial;
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (block.getType().equals(replacementMaterial) && finalPreviousMaterial != null)
-                    block.setType(finalPreviousMaterial);
+                if (!block.getBlockData().equals(previousBlockData))
+                    block.setBlockData(previousBlockData);
                 temporaryBlocks.remove(block);
             }
         }.runTaskLater(MetadataHandler.PLUGIN, ticks);

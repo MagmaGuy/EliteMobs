@@ -50,7 +50,8 @@ public class MobPropertiesConfig {
             new SuperPigConfig(),
             new SuperSheepConfig(),
             new EliteKillerBunnyConfig(),
-            new EliteLlamaConfig()
+            new EliteLlamaConfig(),
+            new EliteSlimeConfig()
     ));
 
     public static HashMap<EntityType, MobPropertiesConfigFields> getMobProperties() {

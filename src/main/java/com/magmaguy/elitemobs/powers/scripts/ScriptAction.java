@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class ScriptAction {
 
@@ -181,7 +182,7 @@ public class ScriptAction {
 
     //Gets a list of locations
     protected Collection<Location> getLocationTargets(ScriptActionData scriptActionData) {
-        return scriptConditions.validateLocations(scriptActionData,scriptTargets.getTargetLocations(scriptActionData));
+        return scriptConditions.validateLocations(scriptActionData, scriptTargets.getTargetLocations(scriptActionData));
     }
 
     //Teleports the targets
@@ -257,14 +258,23 @@ public class ScriptAction {
         if (blueprint.getActionType().equals(ActionType.RUN_SCRIPT) && blueprint.getScripts().isEmpty())
             new WarningMessage("Did not find any scripts for action RUN_SCRIPT in script " + blueprint.getScriptName() + " in file " + blueprint.getScriptFilename());
         if (blueprint.getScripts() != null)
-            blueprint.getScripts().forEach(iteratedScriptName -> {
-                EliteScript iteratedScript = eliteScriptMap.get(iteratedScriptName);
-                if (iteratedScript == null)
-                    new WarningMessage("Failed to get script " + iteratedScriptName + " for script " + blueprint.getScriptName() + " in file " + blueprint.getScriptFilename());
-                else {
-                    iteratedScript.check(scriptActionData.getEliteEntity(), scriptActionData.getDirectTarget());
-                }
-            });
+            if (!blueprint.isOnlyRunOneScript())
+                blueprint.getScripts().forEach(iteratedScriptName -> {
+                    EliteScript iteratedScript = eliteScriptMap.get(iteratedScriptName);
+                    if (iteratedScript == null)
+                        new WarningMessage("Failed to get script " + iteratedScriptName + " for script " + blueprint.getScriptName() + " in file " + blueprint.getScriptFilename());
+                    else {
+                        iteratedScript.check(scriptActionData.getEliteEntity(), scriptActionData.getDirectTarget());
+                    }
+                });
+            else {
+                String scriptName = blueprint.getScripts().get(ThreadLocalRandom.current().nextInt(blueprint.getScripts().size()));
+                EliteScript randomizedScript = eliteScriptMap.get(scriptName);
+                if (randomizedScript == null)
+                    new WarningMessage("Failed to get script " + scriptName + " for script " + blueprint.getScriptName() + " in file " + blueprint.getScriptFilename());
+                else
+                    randomizedScript.check(scriptActionData.getEliteEntity(), scriptActionData.getDirectTarget());
+            }
     }
 
     //Damages the target living entity
