@@ -26,6 +26,8 @@ public class ScriptConditionsBlueprint {
     private List<String> doesNotHaveTags = null;
     @Getter
     private ScriptTargetsBlueprint scriptTargets = null;
+    @Getter
+    private Double randomChance = null;
 
     public ScriptConditionsBlueprint(ConfigurationSection configurationSection, String scriptName, String filename) {
         this.scriptName = scriptName;
@@ -33,6 +35,13 @@ public class ScriptConditionsBlueprint {
         if (configurationSection.get("Conditions") == null) return;
         Map<?, ?> values = ((ConfigurationSection) configurationSection.get("Conditions")).getValues(false);
         processMapList(values);
+        if (scriptTargets == null) scriptTargets = new ScriptTargetsBlueprint(new HashMap<>(), scriptName, filename);
+    }
+
+    public ScriptConditionsBlueprint(Map<?, ?> values, String scriptName, String filename) {
+        this.scriptName = scriptName;
+        this.filename = filename;
+        if (values != null) processMapList(values);
         if (scriptTargets == null) scriptTargets = new ScriptTargetsBlueprint(new HashMap<>(), scriptName, filename);
     }
 
@@ -44,14 +53,9 @@ public class ScriptConditionsBlueprint {
             case "doesnothavetags" -> doesNotHaveTags = MapListInterpreter.parseStringList(key, value, scriptName);
             case "isonfloor" -> isOnFloor = MapListInterpreter.parseBoolean(key, value, scriptName);
             case "target" -> scriptTargets = new ScriptTargetsBlueprint((Map) value, scriptName, filename);
+            case "randomchance" -> randomChance = MapListInterpreter.parseDouble(key, value, scriptName);
             default -> new WarningMessage("Failed to read key " + key + " for script " + scriptName);
         }
-    }
-
-    public ScriptConditionsBlueprint(Map<?, ?> values, String scriptName, String filename) {
-        this.scriptName = scriptName;
-        this.filename = filename;
-        if (values != null) processMapList(values);
     }
 
     private void processMapList(Map<?, ?> entry) {
@@ -61,8 +65,4 @@ public class ScriptConditionsBlueprint {
         }
     }
 
-    public enum ConditionTarget {
-        SELF,
-        DIRECT_TARGET
-    }
 }

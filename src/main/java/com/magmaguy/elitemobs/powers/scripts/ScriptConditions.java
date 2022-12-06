@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class ScriptConditions {
 
@@ -40,6 +41,11 @@ public class ScriptConditions {
     private boolean doesNotHaveTags(LivingEntity target) {
         if (conditionsBlueprint.getDoesNotHaveTags() == null) return true;
         return checkTags(target, conditionsBlueprint.getDoesNotHaveTags());
+    }
+
+    private boolean checkRandomizer() {
+        if (conditionsBlueprint.getRandomChance() == null) return true;
+        return ThreadLocalRandom.current().nextDouble() < conditionsBlueprint.getRandomChance();
     }
 
     private boolean checkTags(LivingEntity target, List<String> blueprintTags) {
@@ -80,6 +86,8 @@ public class ScriptConditions {
 
         for (Location location : scriptTargets.getTargetLocations(scriptActionData))
             if (!meetsConditions(location)) return false;
+
+        if (!checkRandomizer()) return false;
 
         return true;
     }

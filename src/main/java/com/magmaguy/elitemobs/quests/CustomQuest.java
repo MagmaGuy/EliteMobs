@@ -120,7 +120,8 @@ public class CustomQuest extends Quest {
             if (event.getQuest() instanceof CustomQuest customQuest) {
                 CustomQuestsConfigFields customQuestsConfigFields = customQuest.getCustomQuestsConfigFields();
                 customQuest.applyEndPermissions(event.getPlayer());
-                if (!customQuest.getCustomQuestsConfigFields().getQuestCompleteDialog().isEmpty())
+                if (customQuest.getCustomQuestsConfigFields().getQuestCompleteDialog() != null &&
+                        !customQuest.getCustomQuestsConfigFields().getQuestCompleteDialog().isEmpty())
                     for (String dialog : customQuest.getCustomQuestsConfigFields().getQuestCompleteDialog())
                         event.getPlayer().sendMessage(dialog);
                 for (String command : customQuestsConfigFields.getQuestCompleteCommands())

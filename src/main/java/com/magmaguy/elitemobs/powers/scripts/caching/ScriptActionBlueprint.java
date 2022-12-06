@@ -101,7 +101,7 @@ public class ScriptActionBlueprint {
     @Getter
     private WeatherType weatherType = WeatherType.CLEAR;
     @Getter
-    private boolean revertBlockPlacement = true;
+    private boolean onlyRunOneScript = false;
 
 
     public ScriptActionBlueprint(Map<?, ?> entry, String scriptName, String scriptFilename) {
@@ -176,7 +176,7 @@ public class ScriptActionBlueprint {
                 else
                     finalTarget = new ScriptTargetsBlueprint((Map) value, scriptName, scriptFilename);
             }
-            case "revertblockplacement" -> revertBlockPlacement = parseBoolean(key, value, scriptName);
+            case "onlyrunonescript" -> onlyRunOneScript = parseBoolean(key, value, scriptName);
             default ->
                     new WarningMessage("Failed to read key " + key + " for script " + scriptName + " in " + scriptFilename);
         }
