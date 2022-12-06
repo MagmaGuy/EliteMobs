@@ -146,6 +146,7 @@ public class EliteEntity {
     public EliteEntity() {
     }
 
+
     /**
      * This is the generic constructor used in most instances of natural elite mob generation
      */
@@ -501,7 +502,10 @@ public class EliteEntity {
     }
 
     public boolean hasPower(ElitePower mobPower) {
-        return elitePowers.contains(mobPower);
+        for (ElitePower elitePower : elitePowers)
+            if (elitePower.getPowersConfigFields().equals(mobPower.getPowersConfigFields()))
+                return true;
+        return false;
     }
 
     public ElitePower getPower(ElitePower elitePower) {

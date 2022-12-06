@@ -366,6 +366,7 @@ public class EventsRegistrer {
         register(new EliteBlazeWaterDamagePrevention());
         register(new PreventEliteEquipmentDrop());
         register(new CombustionPrevention());
+        register(new EliteSlimeDeathSplit());
 
         register(new TreasureChest.TreasureChestEvents());
 
