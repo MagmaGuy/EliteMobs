@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.powers.scripts.caching.ScriptActionsBlueprint;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.event.Event;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,9 +19,9 @@ public class ScriptActions {
         scriptActionsBlueprint.getScriptActionsBlueprintList().forEach(scriptActionBlueprint -> scriptActionsList.add(new ScriptAction(scriptActionBlueprint, eliteScriptMap, eliteScript)));
     }
 
-    public void runScripts(EliteEntity eliteEntity, LivingEntity directTarget) {
+    public void runScripts(EliteEntity eliteEntity, LivingEntity directTarget, Event event) {
         for (ScriptAction scriptAction : scriptActionsList)
-            scriptAction.runScript(eliteEntity, directTarget);
+            scriptAction.runScript(eliteEntity, directTarget, event);
     }
 
     public void runScripts(EliteEntity eliteEntity, Location landingLocation) {

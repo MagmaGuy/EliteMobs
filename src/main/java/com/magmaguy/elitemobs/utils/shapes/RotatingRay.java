@@ -64,7 +64,7 @@ public class RotatingRay extends Ray {
     private void startRotating(int totalTickDuration, double pitchRotation, double yawRotation) {
         double singleTickPitchRotation = pitchRotation != 0 ? pitchRotation / totalTickDuration : 0;
         double singleTickYawRotation = yawRotation != 0 ? yawRotation / totalTickDuration : 0;
-        Vector perpendicularVector = raySegment.clone().rotateAroundY(Math.toRadians(90));
+        Vector perpendicularVector = raySegment.clone().setY(0).normalize().rotateAroundY(Math.toRadians(90));
         new BukkitRunnable() {
             private int counter = 1;
 

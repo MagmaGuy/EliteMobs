@@ -19,7 +19,7 @@ public class ScriptParticlesBlueprint {
     }
 
     //Empty constructor to avoid having null values for this
-    public ScriptParticlesBlueprint(){
+    public ScriptParticlesBlueprint() {
 
     }
 
@@ -50,6 +50,8 @@ public class ScriptParticlesBlueprint {
         private Particle particle = Particle.FLAME;
         @Getter
         private double speed = 0.01;
+        @Getter
+        private Boolean moveToTarget = null;
         private String filename;
 
         public ScriptParticleBlueprint(Map<?, ?> entry, String scriptName, String filename) {
@@ -79,6 +81,7 @@ public class ScriptParticlesBlueprint {
                 case "tored" -> toRed = parseInteger(key, value, scriptName);
                 case "togreen" -> toGreen = parseInteger(key, value, scriptName);
                 case "toblue" -> toBlue = parseInteger(key, value, scriptName);
+                case "movetotarget" -> moveToTarget = parseBoolean(key, value, scriptName);
             }
         }
     }

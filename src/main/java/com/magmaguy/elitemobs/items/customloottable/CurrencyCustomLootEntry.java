@@ -41,7 +41,7 @@ public class CurrencyCustomLootEntry extends CustomLootEntry implements Serializ
                     break;
                 case "chance":
                     try {
-                        super.setChance(Integer.parseInt(strings[1]));
+                        super.setChance(Double.parseDouble(strings[1]));
                     } catch (Exception ex) {
                         errorMessage(rawString, configFilename, "chance");
                     }

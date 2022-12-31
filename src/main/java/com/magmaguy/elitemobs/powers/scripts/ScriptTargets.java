@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.scripts.caching.ScriptTargetsBlueprint;
 import com.magmaguy.elitemobs.powers.scripts.enums.Target;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
+import com.magmaguy.elitemobs.utils.Developer;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -129,7 +130,10 @@ public class ScriptTargets {
                                 newLocations = eliteScript.getScriptZone().getEffectLocationTargets(scriptActionData, this);
                                 break;
                             } else {
-                                newLocations = (new ArrayList<>(eliteScript.getScriptZone().getEffectLocationTargets(scriptActionData, this))).stream().map(iteratedLocation -> iteratedLocation.clone().add(targetBlueprint.getOffset())).collect(Collectors.toSet());
+                                //Todo: just removed the clone, check if this messes with repeating tasks and cached shapes
+                                Developer.message("location offset");
+                                newLocations = (new ArrayList<>(eliteScript.getScriptZone().getEffectLocationTargets(scriptActionData, this)))
+                                        .stream().map(iteratedLocation -> iteratedLocation.add(targetBlueprint.getOffset())).collect(Collectors.toSet());
                                 break;
                             }
                         } else {

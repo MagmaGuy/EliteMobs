@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.powers.scripts;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.api.EliteDamageEvent;
 import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
 import com.magmaguy.elitemobs.collateralminecraftchanges.LightningSpawnBypass;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
@@ -23,6 +24,7 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.*;
+import org.bukkit.event.Event;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -57,11 +59,16 @@ public class ScriptAction {
         this.eliteScriptMap = eliteScriptMap;
     }
 
-    public void runScript(EliteEntity eliteEntity, LivingEntity directTarget) {
+    public void runScript(EliteEntity eliteEntity, LivingEntity directTarget, Event event) {
+        if (blueprint.getActionType() == null) {
+            new WarningMessage("Script " + blueprint.getScriptName() + " in file " + blueprint.getScriptFilename() + " does not have a valid action! Every action must define a valid action for the script to work.");
+            return;
+        }
+
         this.eliteEntity = eliteEntity;
         //This caches the tracking mostly for zones to start at the wait time. This matters if you are making zones
         //that go through a warning phase and then a damage phase.
-        ScriptActionData scriptActionData = new ScriptActionData(eliteEntity, directTarget);
+        ScriptActionData scriptActionData = new ScriptActionData(eliteEntity, directTarget, blueprint.getScriptTargets().getTargetType(), event);
         scriptTargets.cacheTargets(scriptActionData);
         //First wait for allotted amount of time
         new BukkitRunnable() {
@@ -76,7 +83,7 @@ public class ScriptAction {
                         public void run() {
                             counter++;
                             //Check if the script conditions of action are met, since repeating actions might've stopped being valid
-                            if (blueprint.getConditionsBlueprint() != null && !scriptConditions.meetsConditionsOutsideOfAction(scriptActionData.getEliteEntity(), (LivingEntity) null)) {
+                            if (blueprint.getConditionsBlueprint() != null && !scriptConditions.meetsConditions(scriptActionData.getEliteEntity(), (LivingEntity) null)) {
                                 cancel();
                                 return;
                             }
@@ -101,7 +108,7 @@ public class ScriptAction {
         this.eliteEntity = eliteEntity;
         //This caches the tracking mostly for zones to start at the wait time. This matters if you are making zones
         //that go through a warning phase and then a damage phase.
-        ScriptActionData scriptActionData = new ScriptActionData(eliteEntity, landingLocation);
+        ScriptActionData scriptActionData = new ScriptActionData(eliteEntity, landingLocation, blueprint.getScriptTargets().getTargetType());
         scriptTargets.cacheTargets(scriptActionData);
         //First wait for allotted amount of time
         new BukkitRunnable() {
@@ -116,7 +123,7 @@ public class ScriptAction {
                         public void run() {
                             counter++;
                             //Check if the script conditions of action are met, since repeating actions might've stopped being valid
-                            if (blueprint.getConditionsBlueprint() != null && !scriptConditions.meetsConditionsOutsideOfAction(scriptActionData.getEliteEntity(), (LivingEntity) null)) {
+                            if (blueprint.getConditionsBlueprint() != null && !scriptConditions.meetsConditions(scriptActionData.getEliteEntity(), (LivingEntity) null)) {
                                 cancel();
                                 return;
                             }
@@ -168,6 +175,7 @@ public class ScriptAction {
             case SET_WEATHER -> runSetWeather(scriptActionData);
             case PLAY_ANIMATION -> runPlayAnimation(scriptActionData);
             case SPAWN_FALLING_BLOCK -> runSpawnFallingBlock(scriptActionData);
+            case MODIFY_DAMAGE -> runModifyDamage(scriptActionData);
             default ->
                     new WarningMessage("Failed to determine action type " + blueprint.getActionType() + " in script " + blueprint.getScriptName() + " for file " + blueprint.getScriptFilename());
         }
@@ -343,8 +351,7 @@ public class ScriptAction {
 
     //Spawns a particle at the target location
     private void runSpawnParticle(ScriptActionData scriptActionData) {
-        //if (blueprint.getScriptName().equals("RotatingRay"))            Developer.message("running spawn particle");
-        getLocationTargets(scriptActionData).forEach(targetLocation -> scriptParticles.visualize(targetLocation));
+        getLocationTargets(scriptActionData).forEach(targetLocation -> scriptParticles.visualize(scriptActionData, targetLocation));
     }
 
     //Sets mob AI
@@ -488,4 +495,8 @@ public class ScriptAction {
         });
     }
 
+    private void runModifyDamage(ScriptActionData scriptActionData) {
+        if (scriptActionData.getEvent() instanceof EliteDamageEvent eliteDamageEvent)
+            eliteDamageEvent.setDamage(eliteDamageEvent.getDamage() * blueprint.getMultiplier());
+    }
 }

@@ -9,6 +9,7 @@ import com.magmaguy.elitemobs.config.QuestsConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.items.customloottable.CustomLootEntry;
 import com.magmaguy.elitemobs.items.customloottable.EliteCustomLootEntry;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.objectives.*;
@@ -128,7 +129,7 @@ public class QuestTracking {
     private List<ObjectiveDestinations> getKillLocations(CustomKillObjective customKillObjective) {
         List<ObjectiveDestinations> destinations = new ArrayList<>();
         List<Location> locations = new ArrayList<>();
-        EntityTracker.getEliteMobEntities().values().forEach(eliteEntity -> {
+        new ArrayList<EliteEntity>(EntityTracker.getEliteMobEntities().values()).forEach(eliteEntity -> {
             if (eliteEntity instanceof CustomBossEntity)
                 if (((CustomBossEntity) eliteEntity).getPhaseBossEntity() != null &&
                         ((CustomBossEntity) eliteEntity).getPhaseBossEntity().getPhase1Config().getFilename().equals(customKillObjective.getCustomBossFilename())) {
