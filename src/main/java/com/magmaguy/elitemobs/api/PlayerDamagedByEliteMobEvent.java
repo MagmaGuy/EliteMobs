@@ -14,7 +14,10 @@ import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
-import org.bukkit.event.*;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
@@ -27,7 +30,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class PlayerDamagedByEliteMobEvent extends Event implements Cancellable {
+public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
 
     private static final HandlerList handlers = new HandlerList();
     private final Entity entity;
@@ -35,9 +38,9 @@ public class PlayerDamagedByEliteMobEvent extends Event implements Cancellable {
     private final Player player;
     private final EntityDamageByEntityEvent entityDamageByEntityEvent;
     private final Projectile projectile;
-    private boolean isCancelled = false;
 
-    public PlayerDamagedByEliteMobEvent(EliteEntity eliteEntity, Player player, EntityDamageByEntityEvent event, Projectile projectile) {
+    public PlayerDamagedByEliteMobEvent(EliteEntity eliteEntity, Player player, EntityDamageByEntityEvent event, Projectile projectile, double damage) {
+        super(damage, event);
         this.entity = event.getEntity();
         this.eliteEntity = eliteEntity;
         this.player = player;
@@ -74,17 +77,7 @@ public class PlayerDamagedByEliteMobEvent extends Event implements Cancellable {
         return handlers;
     }
 
-    @Override
-    public boolean isCancelled() {
-        return this.isCancelled;
-    }
-
-    @Override
-    public void setCancelled(boolean b) {
-        this.isCancelled = b;
-        entityDamageByEntityEvent.setCancelled(b);
-    }
-
+    //Thing that launches the event
     public static class PlayerDamagedByEliteMobEventFilter implements Listener {
         @Getter
         @Setter
@@ -129,7 +122,7 @@ public class PlayerDamagedByEliteMobEvent extends Event implements Cancellable {
                 potionEffectDamageReduction = (player.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE).
                         getAmplifier() + 1) * MobCombatSettingsConfig.getResistanceDamageMultiplier();
 
-            double finalDamage = ((baseDamage + bonusDamage ) * customBossDamageMultiplier * specialMultiplier - damageReduction - potionEffectDamageReduction ) *
+            double finalDamage = ((baseDamage + bonusDamage) * customBossDamageMultiplier * specialMultiplier - damageReduction - potionEffectDamageReduction) *
                     MobCombatSettingsConfig.getDamageToPlayerMultiplier();
 
             if (specialMultiplier != 1) specialMultiplier = 1;
@@ -179,6 +172,8 @@ public class PlayerDamagedByEliteMobEvent extends Event implements Cancellable {
 
             if (eliteEntity == null || eliteEntity.getLivingEntity() == null) return;
 
+            //By this point, it is guaranteed that this kind of damage should have custom EliteMobs behavior
+
             //dodge chance
             if (ThreadLocalRandom.current().nextDouble() < GuildRank.dodgeBonusValue(GuildRank.getGuildPrestigeRank(player), GuildRank.getActiveGuildRank(player)) / 100) {
                 player.sendTitle(" ", "Dodged!");
@@ -188,6 +183,7 @@ public class PlayerDamagedByEliteMobEvent extends Event implements Cancellable {
 
             boolean blocking = false;
 
+            //Blocking reduces melee damage and nullifies most ranged damage at the cost of shield durability
             if (player.isBlocking()) {
                 blocking = true;
                 if (player.getInventory().getItemInOffHand().getType().equals(Material.SHIELD)) {
@@ -209,14 +205,7 @@ public class PlayerDamagedByEliteMobEvent extends Event implements Cancellable {
                 }
             }
 
-            PlayerDamagedByEliteMobEvent playerDamagedByEliteMobEvent = new PlayerDamagedByEliteMobEvent(eliteEntity, player, event, projectile);
-            if (!playerDamagedByEliteMobEvent.isCancelled)
-                new EventCaller(playerDamagedByEliteMobEvent);
-
-            if (playerDamagedByEliteMobEvent.isCancelled()) {
-                bypass = false;
-                return;
-            }
+            //Calculate the damage for the event
             double newDamage = eliteToPlayerDamageFormula(player, eliteEntity, event);
             //Blocking reduces damage by 80%
             if (blocking)
@@ -226,10 +215,25 @@ public class PlayerDamagedByEliteMobEvent extends Event implements Cancellable {
                 if (event.isApplicable(modifier))
                     event.setDamage(modifier, 0);
 
+            //Check if we should be doing raw damage, which some powers have
+
             if (bypass) {
                 //Use raw damage in case of bypass
                 newDamage = event.getOriginalDamage(EntityDamageEvent.DamageModifier.BASE);
                 bypass = false;
+            }
+
+            //Run the event, see if it will get cancelled or suffer further damage modifications
+            PlayerDamagedByEliteMobEvent playerDamagedByEliteMobEvent = new PlayerDamagedByEliteMobEvent(eliteEntity, player, event, projectile, newDamage);
+            if (!playerDamagedByEliteMobEvent.isCancelled())
+                new EventCaller(playerDamagedByEliteMobEvent);
+
+            //In case damage got modified along the way
+            newDamage = playerDamagedByEliteMobEvent.getDamage();
+
+            if (playerDamagedByEliteMobEvent.isCancelled()) {
+                bypass = false;
+                return;
             }
 
             //Set the final damage value

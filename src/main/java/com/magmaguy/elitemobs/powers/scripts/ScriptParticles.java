@@ -1,23 +1,41 @@
 package com.magmaguy.elitemobs.powers.scripts;
 
 import com.magmaguy.elitemobs.powers.scripts.caching.ScriptParticlesBlueprint;
+import com.magmaguy.elitemobs.powers.scripts.enums.Target;
+import com.magmaguy.elitemobs.utils.Developer;
+import com.magmaguy.elitemobs.utils.shapes.Shape;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.util.Vector;
 
 public class ScriptParticles {
 
-    //private final List<ScriptParticle> scriptParticles = new ArrayList<>();
     ScriptParticlesBlueprint particlesBlueprint;
 
     public ScriptParticles(ScriptParticlesBlueprint particlesBlueprint) {
         this.particlesBlueprint = particlesBlueprint;
-        // particlesBlueprint.getParticleBlueprints().forEach(iteratedParticlesBlueprint -> scriptParticles.add(new ScriptParticle(iteratedParticlesBlueprint)));
     }
 
-    public void visualize(Location location) {
-        particlesBlueprint.getParticleBlueprints().forEach(particleBlueprint -> new ScriptParticle(particleBlueprint).visualize(location));
-        //scriptParticles.forEach(scriptParticle -> scriptParticle.visualize(location));
+    public void visualize(ScriptActionData scriptActionData, Location location) {
+        particlesBlueprint.getParticleBlueprints().forEach(particleBlueprint -> new ScriptParticle(particleBlueprint).visualize(scriptActionData, location));
+    }
+
+    private org.bukkit.util.Vector getMovementVector(ScriptActionData scriptActionData, Location location) {
+        Location sourceLocation = null;
+        for (Shape shape : scriptActionData.getCachedShapes())
+            if (scriptActionData.getTarget().equals(Target.ZONE_FULL) && shape.getLocations().contains(location) ||
+                    scriptActionData.getTarget().equals(Target.ZONE_BORDER) && shape.getEdgeLocations().contains(location)) {
+                sourceLocation = shape.getCenter().clone();
+                break;
+            }
+        if (sourceLocation == null) {
+            Developer.message("Cached shapes size:" + scriptActionData.getCachedShapes().size());
+            scriptActionData.getCachedShapes().get(0).getLocations().forEach(iteratedLocation -> Developer.message("location: " + iteratedLocation.toString()));
+            Developer.message("Could not find original shape for location " + location);
+            return new org.bukkit.util.Vector(0, 0, 0);
+        }
+        return sourceLocation.clone().subtract(location).toVector().normalize();
     }
 
     private class ScriptParticle {
@@ -28,14 +46,27 @@ public class ScriptParticles {
             this.particleBlueprint = scriptParticlesBlueprint;
         }
 
-        private void visualize(Location location) {
+        private void visualize(ScriptActionData scriptActionData, Location location) {
+            double x = particleBlueprint.getX();
+            double y = particleBlueprint.getY();
+            double z = particleBlueprint.getZ();
+            int amount = particleBlueprint.getAmount();
+            if (particleBlueprint.getMoveToTarget() != null) {
+                amount = 0;
+                Vector movementVector = getMovementVector(scriptActionData, location);
+                if (!particleBlueprint.getMoveToTarget()) movementVector.multiply(-1);
+                x = movementVector.getX();
+                y = movementVector.getY();
+                z = movementVector.getZ();
+            }
             if (particleBlueprint.getParticle().equals(Particle.REDSTONE))
                 location.getWorld().spawnParticle(
                         particleBlueprint.getParticle(),
-                        location, particleBlueprint.getAmount(),
-                        particleBlueprint.getX(),
-                        particleBlueprint.getY(),
-                        particleBlueprint.getZ(),
+                        location,
+                        amount,
+                        x,
+                        y,
+                        z,
                         particleBlueprint.getSpeed(),
                         new Particle.DustOptions(
                                 Color.fromRGB(
@@ -47,10 +78,10 @@ public class ScriptParticles {
                 location.getWorld().spawnParticle(
                         particleBlueprint.getParticle(),
                         location,
-                        particleBlueprint.getAmount(),
-                        particleBlueprint.getX(),
-                        particleBlueprint.getY(),
-                        particleBlueprint.getZ(),
+                        amount,
+                        x,
+                        y,
+                        z,
                         particleBlueprint.getSpeed(),
                         new Particle.DustTransition(
                                 Color.fromRGB(
@@ -66,10 +97,10 @@ public class ScriptParticles {
                     particleBlueprint.getParticle().equals(Particle.SPELL_MOB_AMBIENT)) {
                 location.getWorld().spawnParticle(
                         particleBlueprint.getParticle(),
-                        location.getX(),
-                        location.getY(),
-                        location.getZ(),
-                        particleBlueprint.getAmount(),
+                        x,
+                        y,
+                        z,
+                        amount,
                         particleBlueprint.getRed(),
                         particleBlueprint.getGreen(),
                         particleBlueprint.getBlue());
@@ -77,10 +108,10 @@ public class ScriptParticles {
                 location.getWorld().spawnParticle(
                         particleBlueprint.getParticle(),
                         location,
-                        particleBlueprint.getAmount(),
-                        particleBlueprint.getX(),
-                        particleBlueprint.getY(),
-                        particleBlueprint.getZ(),
+                        amount,
+                        x,
+                        y,
+                        z,
                         particleBlueprint.getSpeed());
 
         }

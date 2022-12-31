@@ -42,7 +42,6 @@ public class QuestRewardEvent extends Event {
     }
 
     private void doRewards() {
-        //todo: add quest reward text for loot obtained
         quest.getQuestObjectives().getQuestReward().doRewards();
     }
 

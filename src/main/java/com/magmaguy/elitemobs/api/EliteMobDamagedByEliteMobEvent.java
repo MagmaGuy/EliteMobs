@@ -6,23 +6,32 @@ import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProp
 import com.magmaguy.elitemobs.utils.EntityFinder;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.event.*;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
-public class EliteMobDamagedByEliteMobEvent extends Event implements Cancellable {
+public class EliteMobDamagedByEliteMobEvent extends EliteDamageEvent {
 
     private static final HandlerList handlers = new HandlerList();
     private final EliteEntity damager;
     private final EliteEntity damagee;
     private final EntityDamageByEntityEvent entityDamageByEntityEvent;
-    private final double damage;
-    private boolean isCancelled = false;
 
+    /**
+     * Event fired when an elite gets damaged by another elite.
+     *
+     * @param damager Damager in the event.
+     * @param damagee Damaged entity in the event.
+     * @param event   Original Minecraft damage event.
+     * @param damage  Damage in the event. Can be modified!
+     */
     public EliteMobDamagedByEliteMobEvent(EliteEntity damager, EliteEntity damagee, EntityDamageByEntityEvent event, double damage) {
+        super(damage, event);
         this.damager = damager;
         this.damagee = damagee;
         this.entityDamageByEntityEvent = event;
-        this.damage = damage;
     }
 
     public static HandlerList getHandlerList() {
@@ -41,25 +50,12 @@ public class EliteMobDamagedByEliteMobEvent extends Event implements Cancellable
         return entityDamageByEntityEvent;
     }
 
-    public double getDamage() {
-        return damage;
-    }
-
-    @Override
-    public boolean isCancelled() {
-        return this.isCancelled;
-    }
-
-    @Override
-    public void setCancelled(boolean b) {
-        this.isCancelled = b;
-    }
-
     @Override
     public HandlerList getHandlers() {
         return handlers;
     }
 
+    //The thing that calls the event
     public static class EliteMobDamagedByEliteMobFilter implements Listener {
 
         @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -74,7 +70,7 @@ public class EliteMobDamagedByEliteMobEvent extends Event implements Cancellable
             double damage = EliteMobProperties.getBaselineDamage(damager.getLivingEntity().getType(), damager) + damager.getLevel();
             EliteMobDamagedByEliteMobEvent eliteMobDamagedByEliteMobEvent = new EliteMobDamagedByEliteMobEvent(damager, damagee, event, damage);
             new EventCaller(eliteMobDamagedByEliteMobEvent);
-            if (eliteMobDamagedByEliteMobEvent.isCancelled) return;
+            if (eliteMobDamagedByEliteMobEvent.isCancelled()) return;
             event.setDamage(damage);
         }
 

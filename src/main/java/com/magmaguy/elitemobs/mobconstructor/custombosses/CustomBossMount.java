@@ -15,6 +15,10 @@ public class CustomBossMount {
 
     public static CustomBossEntity generateMount(CustomBossEntity customBossEntity) {
         if (customBossEntity.customBossesConfigFields.getMountedEntity() == null) return null;
+        if (customBossEntity.getLivingEntity() == null) {
+            new WarningMessage("Could not spawn mount for boss " + customBossEntity.customBossesConfigFields.getFilename() + " because the boss has no living entity! This probably means some other plugin is preventing this boss from spawning.");
+            return null;
+        }
         try {
             EntityType entityType = EntityType.valueOf(customBossEntity.customBossesConfigFields.getMountedEntity());
             LivingEntity livingEntity = (LivingEntity) customBossEntity.getLivingEntity().getWorld()

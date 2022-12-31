@@ -7,6 +7,7 @@ import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 
 import java.util.HashMap;
 import java.util.List;
@@ -45,22 +46,22 @@ public class EliteScript extends ElitePower implements Cloneable {
     /**
      * Used by events that call scripts
      *
-     * @param eventClass
+     * @param event
      * @param eliteEntity
      * @param player
      */
-    public void check(Class eventClass, EliteEntity eliteEntity, Player player) {
+    public void check(Event event, EliteEntity eliteEntity, Player player) {
         //If the script uses the cooldown system then it should respect if the boss is in a global or local cooldown state
         //If the script does not define a local or global cooldown then it is considered to ignore cooldowns. This is an
         //important bypass for a lot of behavior like teleporting at specific triggers regardless of state
         if (getPowerCooldownTime() > 0 && getGlobalCooldownTime() > 0 &&
                 scriptCooldowns != null && super.isInCooldown(eliteEntity)) return;
         //Check if the event is relevant to the script
-        if (!scriptEvents.isTargetEvent(eventClass)) return;
+        if (!scriptEvents.isTargetEvent(event.getClass())) return;
         //Check if the event conditions are met
-        if (scriptConditions != null && !scriptConditions.meetsConditionsOutsideOfAction(eliteEntity, player)) return;
+        if (scriptConditions != null && !scriptConditions.meetsConditions(eliteEntity, player)) return;
         //Let's do some actions
-        scriptActions.runScripts(eliteEntity, player);
+        scriptActions.runScripts(eliteEntity, player, event);
         //Cooldowns time
         doCooldownTicks(eliteEntity);
     }
@@ -73,9 +74,10 @@ public class EliteScript extends ElitePower implements Cloneable {
      */
     public void check(EliteEntity eliteEntity, LivingEntity directTarget) {
         //Check if the event conditions are met
-        if (scriptConditions != null && !scriptConditions.meetsConditionsOutsideOfAction(eliteEntity, directTarget)) return;
+        if (scriptConditions != null && !scriptConditions.meetsConditions(eliteEntity, directTarget))
+            return;
         //Let's do some actions
-        scriptActions.runScripts(eliteEntity, directTarget);
+        scriptActions.runScripts(eliteEntity, directTarget, null);
         //Cooldowns time
         doCooldownTicks(eliteEntity);
     }
@@ -88,7 +90,7 @@ public class EliteScript extends ElitePower implements Cloneable {
      */
     public void check(EliteEntity eliteEntity, Location landingLocation) {
         //Check if the event conditions are met
-        if (scriptConditions != null && !scriptConditions.meetsConditionsOutsideOfAction(eliteEntity, null)) return;
+        if (scriptConditions != null && !scriptConditions.meetsConditions(eliteEntity, null)) return;
         //Let's do some actions
         scriptActions.runScripts(eliteEntity, landingLocation);
         //Cooldowns time
