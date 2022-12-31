@@ -77,22 +77,23 @@ public class ScriptConditions {
         return conditionsBlueprint.getIsOnFloor() == !currentBlock.getType().isSolid() && floorBlock.getType().isSolid();
     }
 
-    public boolean meetsConditionsOutsideOfAction(EliteEntity eliteEntity, LivingEntity directTarget) {
+
+    public boolean meetsConditions(EliteEntity eliteEntity, LivingEntity directTarget) {
         if (scriptTargets == null) return true;
-        ScriptActionData scriptActionData = new ScriptActionData(eliteEntity, directTarget);
+        ScriptActionData scriptActionData = new ScriptActionData(eliteEntity, directTarget, conditionsBlueprint.getScriptTargets().getTargetType(), null);
 
         for (LivingEntity livingEntity : scriptTargets.getTargetEntities(scriptActionData))
-            if (!meetsConditions(livingEntity)) return false;
+            if (!checkConditions(livingEntity)) return false;
 
         for (Location location : scriptTargets.getTargetLocations(scriptActionData))
-            if (!meetsConditions(location)) return false;
+            if (!checkConditions(location)) return false;
 
         if (!checkRandomizer()) return false;
 
         return true;
     }
 
-    public boolean meetsConditions(LivingEntity livingEntity) {
+    private boolean checkConditions(LivingEntity livingEntity) {
         if (scriptTargets == null) return true;
 
         if (livingEntity == null) return false;
@@ -102,7 +103,7 @@ public class ScriptConditions {
         return true;
     }
 
-    public boolean meetsConditions(Location location) {
+    private boolean checkConditions(Location location) {
         if (scriptTargets == null) return true;
 
         if (location == null) return true;
@@ -119,12 +120,12 @@ public class ScriptConditions {
         if (scriptTargets.getTargetBlueprint().getTargetType().equals(Target.ACTION_TARGET)) {
             //Specific case for when the locations to be validated are the ones from the action target.
             //Note that non-conforming locations are excluded, but the script will still run.
-            originalLocations.removeIf(targetLocation -> !meetsConditions(targetLocation));
+            originalLocations.removeIf(targetLocation -> !checkConditions(targetLocation));
         } else {
             //If the condition has a target other than the one inherited from ACTION_TARGET, it cancels all effects.
             Collection<Location> conditionTargetLocations = scriptTargets.getTargetLocations(scriptActionData);
             for (Location location : conditionTargetLocations)
-                if (!meetsConditions(location)) return new ArrayList<>();
+                if (!checkConditions(location)) return new ArrayList<>();
         }
 
         return originalLocations;
@@ -138,12 +139,12 @@ public class ScriptConditions {
         if (scriptTargets.getTargetBlueprint().getTargetType().equals(Target.ACTION_TARGET)) {
             //Specific case for when the entities to be validated are the ones from the action target.
             //Note that non-conforming entities are excluded, but the script will still run.
-            originalEntities.removeIf(targetEntity -> !meetsConditions(targetEntity));
+            originalEntities.removeIf(targetEntity -> !checkConditions(targetEntity));
         } else {
             //If the condition has a target other than the one inherited from ACTION_TARGET, it cancels all effects.
             Collection<? extends LivingEntity> conditionTargetLocations = scriptTargets.getTargetEntities(scriptActionData);
             for (LivingEntity livingEntity : conditionTargetLocations)
-                if (!meetsConditions(livingEntity)) return new ArrayList<>();
+                if (!checkConditions(livingEntity)) return new ArrayList<>();
         }
 
         return originalEntities;

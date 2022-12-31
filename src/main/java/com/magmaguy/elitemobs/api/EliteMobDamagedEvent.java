@@ -9,10 +9,13 @@ import com.magmaguy.elitemobs.utils.EventCaller;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
-import org.bukkit.event.*;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 
-public class EliteMobDamagedEvent extends Event implements Cancellable {
+public class EliteMobDamagedEvent extends EliteDamageEvent {
 
     private static final HandlerList handlers = new HandlerList();
     @Getter
@@ -21,34 +24,15 @@ public class EliteMobDamagedEvent extends Event implements Cancellable {
     private final EliteEntity eliteEntity;
     @Getter
     private final EntityDamageEvent entityDamageEvent;
-    private boolean isCancelled = false;
-    @Getter
-    private double damage;
 
     public EliteMobDamagedEvent(EliteEntity eliteEntity, EntityDamageEvent event, double damage) {
+        super(damage, event);
         this.entity = eliteEntity.getLivingEntity();
         this.eliteEntity = eliteEntity;
         this.entityDamageEvent = event;
-        this.damage = damage;
     }
 
     public static HandlerList getHandlerList() {
-        return handlers;
-    }
-
-    @Override
-    public boolean isCancelled() {
-        return this.isCancelled;
-    }
-
-    @Override
-    public void setCancelled(boolean b) {
-        this.isCancelled = b;
-        entityDamageEvent.setCancelled(b);
-    }
-
-    @Override
-    public HandlerList getHandlers() {
         return handlers;
     }
 
@@ -63,7 +47,7 @@ public class EliteMobDamagedEvent extends Event implements Cancellable {
 
             EliteMobDamagedEvent eliteMobDamagedEvent = new EliteMobDamagedEvent(eliteEntity, event, event.getDamage());
             new EventCaller(eliteMobDamagedEvent);
-            if (eliteMobDamagedEvent.isCancelled) {
+            if (eliteMobDamagedEvent.isCancelled()) {
                 eliteMobDamagedEvent.setCancelled(true);
                 return;
             }

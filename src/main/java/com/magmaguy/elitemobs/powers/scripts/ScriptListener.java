@@ -85,13 +85,13 @@ public class ScriptListener implements Listener {
     private void runEvent(Event event, EliteEntity eliteEntity) {
         for (ElitePower elitePower : eliteEntity.getElitePowers())
             if (elitePower instanceof EliteScript eliteScript)
-                eliteScript.check(event.getClass(), eliteEntity, null);
+                eliteScript.check(event, eliteEntity, null);
     }
 
     private void runEvent(Event event, EliteEntity eliteEntity, Player player) {
         for (ElitePower elitePower : eliteEntity.getElitePowers())
             if (elitePower instanceof EliteScript eliteScript)
-                eliteScript.check(event.getClass(), eliteEntity, player);
+                eliteScript.check(event, eliteEntity, player);
     }
 
     private void runEvent(ScriptAction scriptAction, Location landingLocation) {

@@ -195,6 +195,7 @@ public class ScriptZone {
     private Collection<? extends LivingEntity> getEntitiesInArea(List<Shape> shapes, Target target) {
         //Get entities in the world
         Collection<? extends LivingEntity> livingEntities = new ArrayList<>();
+        Collection<LivingEntity> validatedEntities = new ArrayList<>();
         for (Shape shape : shapes) {
             if (zoneBlueprint.getFilter() == null) livingEntities = filterByLiving(shape.getCenter());
             else switch (zoneBlueprint.getFilter()) {
@@ -211,17 +212,19 @@ public class ScriptZone {
                     return new ArrayList<>();
             }
 
-
-            //Check if entities are in the relevant area
-            livingEntities.removeIf(livingEntity -> {
+            for (LivingEntity livingEntity : livingEntities) {
                 if (target.equals(Target.ZONE_FULL)) {
-                    return !shape.contains(livingEntity.getLocation());
-                } else if (target.equals(Target.ZONE_BORDER))
-                    return !shape.borderContains(livingEntity.getLocation());
-                return false;
-            });
+                    if (shape.contains(livingEntity.getLocation()))
+                        validatedEntities.add(livingEntity);
+                } else if (target.equals(Target.ZONE_BORDER)) {
+                    if (shape.borderContains(livingEntity.getLocation()))
+                        validatedEntities.add(livingEntity);
+                }
+            }
+
         }
-        return livingEntities;
+
+        return validatedEntities;
     }
 
     //Filter by player

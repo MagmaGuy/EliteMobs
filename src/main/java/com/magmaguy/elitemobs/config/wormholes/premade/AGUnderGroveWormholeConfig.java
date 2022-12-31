@@ -8,7 +8,7 @@ public class AGUnderGroveWormholeConfig extends WormholeConfigFields {
         super("ag_under_grove_wormhole",
                 true,
                 "em_adventurers_guild,284.5,108,296.5,0,0",
-                "beasts_sanctuary_lair.yml",
+                "under_grove_lair.yml",
                 Wormhole.WormholeStyle.CRYSTAL);
         setBlindPlayer(true);
         setLocation1Text("&2『Under Grove Lair』 &cLvl 170");

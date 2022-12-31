@@ -21,14 +21,16 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
-import org.bukkit.event.*;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
+public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
 
     private static final HandlerList handlers = new HandlerList();
     @Getter
@@ -40,8 +42,6 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
     @Getter
     private final EntityDamageByEntityEvent entityDamageByEntityEvent;
     @Getter
-    private final double damage;
-    @Getter
     private final boolean criticalStrike;
     @Getter
     private final boolean isCustomDamage;
@@ -49,9 +49,18 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
     private final double damageModifier;
     @Getter
     public boolean rangedAttack;
-    @Getter
-    private boolean isCancelled = false;
 
+    /**
+     * Event fired when an elite is damaged by a player.
+     *
+     * @param eliteEntity    Elite damaged.
+     * @param player         Player acting as the damged.
+     * @param event          Original Minecraft damage event.
+     * @param damage         Damage. Can be modifed!
+     * @param criticalStrike Whether the strike is a critical strike.
+     * @param isCustomDamage Whether the amount of damage is custom, meaning it should apply with no damage reduction of any kind, including armor!
+     * @param damageModifier Damage modifiers that the boss may have to reduce incoming damage.
+     */
     public EliteMobDamagedByPlayerEvent(EliteEntity eliteEntity,
                                         Player player,
                                         EntityDamageByEntityEvent event,
@@ -59,7 +68,7 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
                                         boolean criticalStrike,
                                         boolean isCustomDamage,
                                         double damageModifier) {
-        this.damage = damage;
+        super(damage, event);
         this.entity = eliteEntity.getLivingEntity();
         this.eliteMobEntity = eliteEntity;
         this.player = player;
@@ -75,16 +84,12 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
     }
 
     @Override
-    public void setCancelled(boolean b) {
-        this.isCancelled = b;
-        entityDamageByEntityEvent.setCancelled(b);
-    }
-
-    @Override
     public HandlerList getHandlers() {
         return handlers;
     }
 
+
+    //The thing that calls the event
     public static class EliteMobDamagedByPlayerEventFilter implements Listener {
         public static boolean bypass = false;
 
@@ -228,10 +233,13 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
 
             new EventCaller(eliteMobDamagedByPlayerEvent);
 
-            if (eliteMobDamagedByPlayerEvent.isCancelled) {
+            if (eliteMobDamagedByPlayerEvent.isCancelled()) {
                 event.setCancelled(true);
                 return;
             }
+
+            //In case things got modified along the way
+            damage = eliteMobDamagedByPlayerEvent.getDamage();
 
             if (validPlayer) {
                 //Time to deal custom damage!
