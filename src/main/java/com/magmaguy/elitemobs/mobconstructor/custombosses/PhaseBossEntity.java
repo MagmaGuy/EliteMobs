@@ -121,9 +121,11 @@ public class PhaseBossEntity {
 
     public void checkPhaseBossSwitch(EliteMobDamagedEvent event) {
         if (bossPhases.indexOf(currentPhase) + 1 >= bossPhases.size()) return;
+
         BossPhase nextBossPhase = bossPhases.get(bossPhases.indexOf(currentPhase) + 1);
         double newHealth = Math.max((customBossEntity.getHealth() - event.getDamage()) / customBossEntity.getMaxHealth(), 0);
         if (newHealth > nextBossPhase.healthPercentage) return;
+
         event.setCancelled(true);
         switchPhase(nextBossPhase, RemovalReason.PHASE_BOSS_PHASE_END, nextBossPhase.healthPercentage);
     }
