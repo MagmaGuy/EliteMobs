@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.powers.scripts;
 
 import com.magmaguy.elitemobs.powers.scripts.caching.ScriptParticlesBlueprint;
 import com.magmaguy.elitemobs.powers.scripts.enums.Target;
-import com.magmaguy.elitemobs.utils.Developer;
 import com.magmaguy.elitemobs.utils.shapes.Shape;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -30,9 +29,6 @@ public class ScriptParticles {
                 break;
             }
         if (sourceLocation == null) {
-            Developer.message("Cached shapes size:" + scriptActionData.getCachedShapes().size());
-            scriptActionData.getCachedShapes().get(0).getLocations().forEach(iteratedLocation -> Developer.message("location: " + iteratedLocation.toString()));
-            Developer.message("Could not find original shape for location " + location);
             return new org.bukkit.util.Vector(0, 0, 0);
         }
         return sourceLocation.clone().subtract(location).toVector().normalize();
