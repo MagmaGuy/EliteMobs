@@ -36,6 +36,11 @@ public class EliteMobDamagedEvent extends EliteDamageEvent {
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlers() {
+        return handlers;
+    }
+
     public static class EliteMobDamageEventFilter implements Listener {
 
         @EventHandler(priority = EventPriority.HIGH)

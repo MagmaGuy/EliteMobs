@@ -194,7 +194,7 @@ public class DungeonInstance extends MatchInstance {
                 if (Bukkit.getWorld(instancedWorldName) != null) {
                     Arrays.stream(world.getLoadedChunks()).forEach(chunk -> chunk.unload(false));
                     if (!Bukkit.unloadWorld(instancedWorldName, false)) {
-                        new WarningMessage("Failed to unload world " + instancedWorldName + " ! This is bad, report htis to the developer!");
+                        new WarningMessage("Failed to unload world " + instancedWorldName + " ! This is bad, report this to the developer!");
                     }
                     new BukkitRunnable() {
                         @Override
