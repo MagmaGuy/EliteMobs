@@ -356,6 +356,7 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
         this.minPlayerCount = processInt("minPlayerCount", minPlayerCount, 1, false);
         this.maxPlayerCount = processInt("maxPlayerCount", maxPlayerCount, 5, false);
         this.rawDungeonObjectives = processStringList("dungeonObjectives", rawDungeonObjectives, null, false);
+        this.contentType = processEnum("contentType", contentType, null, ContentType.class, true);
         this.dungeonConfigFolderName = processString("dungeonConfigFolderName", dungeonConfigFolderName, null, false);
         this.contentLevel = processInt("contentLevel", contentLevel, 0, false);
         if (fileConfiguration.getConfigurationSection("difficulties") != null)
@@ -470,6 +471,7 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
         DUNGEON,
         RAID,
         ADVENTURE,
-        OTHER
+        OTHER,
+        ARENA
     }
 }

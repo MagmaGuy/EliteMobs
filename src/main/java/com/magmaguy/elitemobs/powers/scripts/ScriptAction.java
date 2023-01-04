@@ -12,6 +12,8 @@ import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.powers.meta.CustomSummonPower;
 import com.magmaguy.elitemobs.powers.scripts.caching.ScriptActionBlueprint;
 import com.magmaguy.elitemobs.powers.scripts.enums.ActionType;
+import com.magmaguy.elitemobs.powers.scripts.enums.Target;
+import com.magmaguy.elitemobs.utils.Developer;
 import com.magmaguy.elitemobs.utils.VersionChecker;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
@@ -66,9 +68,11 @@ public class ScriptAction {
         }
 
         this.eliteEntity = eliteEntity;
+
+
+        ScriptActionData scriptActionData = new ScriptActionData(eliteEntity, directTarget, blueprint.getScriptTargets().getTargetType(), event);
         //This caches the tracking mostly for zones to start at the wait time. This matters if you are making zones
         //that go through a warning phase and then a damage phase.
-        ScriptActionData scriptActionData = new ScriptActionData(eliteEntity, directTarget, blueprint.getScriptTargets().getTargetType(), event);
         scriptTargets.cacheTargets(scriptActionData);
         //First wait for allotted amount of time
         new BukkitRunnable() {
@@ -287,9 +291,13 @@ public class ScriptAction {
 
     //Damages the target living entity
     private void runDamage(ScriptActionData scriptActionData) {
+        //Developer.message("Running damage action");
         getTargets(scriptActionData).forEach(targetEntity -> {
-            if (targetEntity instanceof Player)
+            Developer.message("running damage for targets");
+            if (targetEntity instanceof Player) {
                 PlayerDamagedByEliteMobEvent.PlayerDamagedByEliteMobEventFilter.setSpecialMultiplier(blueprint.getMultiplier());
+                Developer.message("running damage for player!!!");
+            }
             if (scriptActionData.getEliteEntity().getLivingEntity() != null)
                 targetEntity.damage(blueprint.getAmount(), scriptActionData.getEliteEntity().getLivingEntity());
             else
