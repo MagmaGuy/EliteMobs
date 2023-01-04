@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.powers.scripts.caching;
 import com.magmaguy.elitemobs.powers.scripts.enums.Target;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.util.Vector;
 
 import java.util.List;
@@ -25,6 +26,7 @@ public class ScriptTargetsBlueprint {
     @Getter
     private double range = 20;
     @Getter
+    @Setter
     private boolean track = true;
     @Getter
     private double coverage = 1.0;
