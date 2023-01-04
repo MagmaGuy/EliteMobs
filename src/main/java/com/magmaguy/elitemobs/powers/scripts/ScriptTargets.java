@@ -50,7 +50,13 @@ public class ScriptTargets {
 
     protected void cacheTargets(ScriptActionData scriptActionData) {
         //Only cache if tracking
-        if (getTargetBlueprint().isTrack()) return;
+        if (getTargetBlueprint().isTrack()) {
+            //Zones that animate independently can not be set to track, as this causes confusion. This is forced to make it easier on scripters.
+            if (eliteScript.getScriptZone().isValid() && eliteScript.getScriptZone().getZoneBlueprint().getAnimationDuration() > 0)
+                getTargetBlueprint().setTrack(false);
+            else
+                return;
+        }
         //Only cache locations - caching living entities would probably be very confusing
         //if (actionType.isRequiresLivingEntity()) return;
         boolean animatedScriptZone = false;

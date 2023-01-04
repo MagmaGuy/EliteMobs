@@ -10,6 +10,7 @@ import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.ObjectSerializer;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -36,22 +37,53 @@ public class PlayerData {
     private static final String DATABASE_NAME = "player_data.db";
     @Getter
     private static final String PLAYER_DATA_TABLE_NAME = "PlayerData";
+    @Getter
     private static final HashMap<UUID, PlayerData> playerDataHashMap = new HashMap<>();
     private static Connection connection = null;
+    @Getter
+    @Setter
     private double currency;
+    @Getter
+    @Setter
     private int guildPrestigeLevel;
+    @Getter
+    @Setter
     private int maxGuildLevel;
+    @Getter
+    @Setter
     private int activeGuildLevel;
+    @Getter
+    @Setter
     private int score;
+    @Getter
+    @Setter
     private int kills;
+    @Getter
+    @Setter
     private int highestLevelKilled;
+    @Getter
+    @Setter
     private int deaths;
+    @Getter
+    @Setter
     private int questsCompleted;
+    @Getter
+    @Setter
     private List<Quest> quests = new ArrayList<>();
+    @Getter
+    @Setter
     private PlayerQuestCooldowns playerQuestCooldowns = null;
+    @Getter
+    @Setter
     private Location backTeleportLocation;
+    @Getter
+    @Setter
     private boolean useBookMenus;
+    @Getter
+    @Setter
     private boolean dismissEMStatusScreenMessage;
+    @Getter
+    @Setter
     //This is currently not stored in the database, time will tell if it is necessary to do so
     private MatchInstance matchInstance = null;
 

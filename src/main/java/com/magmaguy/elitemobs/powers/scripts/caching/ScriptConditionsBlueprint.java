@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.utils.MapListInterpreter;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.MemorySection;
 
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +30,7 @@ public class ScriptConditionsBlueprint {
     @Getter
     private Double randomChance = null;
 
+    //Process from a script
     public ScriptConditionsBlueprint(ConfigurationSection configurationSection, String scriptName, String filename) {
         this.scriptName = scriptName;
         this.filename = filename;
@@ -38,6 +40,7 @@ public class ScriptConditionsBlueprint {
         if (scriptTargets == null) scriptTargets = new ScriptTargetsBlueprint(new HashMap<>(), scriptName, filename);
     }
 
+    //Process from an action
     public ScriptConditionsBlueprint(Map<?, ?> values, String scriptName, String filename) {
         this.scriptName = scriptName;
         this.filename = filename;
@@ -52,7 +55,11 @@ public class ScriptConditionsBlueprint {
             case "hastags" -> hasTags = MapListInterpreter.parseStringList(key, value, scriptName);
             case "doesnothavetags" -> doesNotHaveTags = MapListInterpreter.parseStringList(key, value, scriptName);
             case "isonfloor" -> isOnFloor = MapListInterpreter.parseBoolean(key, value, scriptName);
-            case "target" -> scriptTargets = new ScriptTargetsBlueprint((Map) value, scriptName, filename);
+            case "target" -> {
+                if (value instanceof MemorySection memorySection)
+                    value = memorySection.getValues(false);
+                scriptTargets = new ScriptTargetsBlueprint((Map) value, scriptName, filename);
+            }
             case "randomchance" -> randomChance = MapListInterpreter.parseDouble(key, value, scriptName);
             default -> new WarningMessage("Failed to read key " + key + " for script " + scriptName);
         }
