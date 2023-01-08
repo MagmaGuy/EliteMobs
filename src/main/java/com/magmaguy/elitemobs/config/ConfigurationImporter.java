@@ -80,6 +80,9 @@ public class ConfigurationImporter {
                         case "customquests":
                             moveDirectory(file, Paths.get(configurationsPath.normalize() + "" + File.separatorChar + "customquests"), false);
                             break;
+                        case "customarenas":
+                            moveDirectory(file, Paths.get(configurationsPath.normalize() + "" + File.separatorChar + "customarenas"), false);
+                            break;
                         case "npcs":
                             moveDirectory(file, Paths.get(configurationsPath.normalize() + "" + File.separatorChar + "npcs"), false);
                             break;
