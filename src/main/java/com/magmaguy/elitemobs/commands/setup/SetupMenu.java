@@ -324,7 +324,7 @@ public class SetupMenu {
         boolean resourceState = ResourcePackDataConfig.isEliteMobsResourcePackEnabled();
 
         if (!resourceState) {
-            material = Material.RED_STAINED_GLASS_PANE;
+            material = Material.ORANGE_STAINED_GLASS_PANE;
             lore = ChatColor.RED + "Not enabled! Click to enable!";
         } else {
             material = Material.GREEN_STAINED_GLASS_PANE;

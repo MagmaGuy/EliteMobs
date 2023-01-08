@@ -132,17 +132,22 @@ public class EntityTracker implements Listener {
 
     //Temporary blocks - blocks in powers
     public static void addTemporaryBlock(Block block, int ticks, Material replacementMaterial) {
-        Material previousMaterial = block.getType();
-        if (temporaryBlocks.contains(block)) previousMaterial = null;
         BlockData previousBlockData = block.getBlockData().clone();
+        if (temporaryBlocks.contains(block)) previousBlockData = null;
         temporaryBlocks.add(block);
         block.setType(replacementMaterial);
+        BlockData finalPreviousBlockData = previousBlockData;
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (!block.getBlockData().equals(previousBlockData))
-                    block.setBlockData(previousBlockData);
                 temporaryBlocks.remove(block);
+                if (!block.getBlockData().equals(finalPreviousBlockData))
+                    if (finalPreviousBlockData != null)
+                        //Case if a temp block was placed and now needs to be restored
+                        block.setBlockData(finalPreviousBlockData);
+                    else
+                        //Case if a temp block was placed on a temp block
+                        block.setType(Material.AIR);
             }
         }.runTaskLater(MetadataHandler.PLUGIN, ticks);
     }

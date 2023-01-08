@@ -40,7 +40,7 @@ public class ScriptConditions {
 
     private boolean doesNotHaveTags(LivingEntity target) {
         if (conditionsBlueprint.getDoesNotHaveTags() == null) return true;
-        return checkTags(target, conditionsBlueprint.getDoesNotHaveTags());
+        return !checkTags(target, conditionsBlueprint.getDoesNotHaveTags());
     }
 
     private boolean checkRandomizer() {
