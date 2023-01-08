@@ -359,10 +359,9 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
         this.contentType = processEnum("contentType", contentType, null, ContentType.class, true);
         this.dungeonConfigFolderName = processString("dungeonConfigFolderName", dungeonConfigFolderName, null, false);
         this.contentLevel = processInt("contentLevel", contentLevel, 0, false);
-        if (fileConfiguration.getConfigurationSection("difficulties") != null)
+        if (fileConfiguration.contains("difficulties"))
             this.difficulties = (List<Map<String, Object>>) fileConfiguration.getList("difficulties");
-        else
-            fileConfiguration.addDefault("difficulties", difficulties);
+        else fileConfiguration.addDefault("difficulties", difficulties);
         processAdditionalFields();
     }
 

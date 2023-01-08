@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.dungeons;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
@@ -139,6 +140,9 @@ public class SchematicDungeonPackage extends SchematicPackage implements Dungeon
         if (!super.install(player, paste)) return false;
         installBosses();
         installChests();
+        player.sendMessage(ChatColorConverter.convert("&2Schematic dungeon sucessfully installed! You can uninstall it in the &c/em setup &2menu if you do not like where it got placed."));
+        player.sendMessage("Schematic-based dungeons install where you are, as opposed to world-based dungeons which create a new world!");
+        player.sendMessage("Make sure to uninstall the dungeon as soon as possible if you do not like the location, as it will not be able to remove the build after you restart!");
         return true;
     }
 

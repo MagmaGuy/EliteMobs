@@ -23,7 +23,7 @@ processResources {
 }
 
 group 'com.magmaguy'
-version '8.3.7'
+version '8.3.8'
 
 repositories {
     maven {
@@ -206,7 +206,7 @@ publishing {
                 groupId = 'com.magmaguy'
                 name = 'elitemobs'
                 description = 'EliteMobs repo'
-                url = 'https://example.com/'
+                url = 'https://magmaguy.com/'
                 from components.java
                 licenses {
                     license {

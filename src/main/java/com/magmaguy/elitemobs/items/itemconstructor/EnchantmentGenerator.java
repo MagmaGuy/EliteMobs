@@ -266,7 +266,6 @@ public class EnchantmentGenerator {
 
         HashMap<Enchantment, Integer> validEnchantmentsClone = (HashMap<Enchantment, Integer>) validSecondaryEnchantments.clone();
 
-        //while (secondaryEnchantmentCount != 0) { todo: this is a temporary solution, this needs a permanent rarity system
         while (ThreadLocalRandom.current().nextBoolean()) {
 
             if (validSecondaryEnchantments.size() < 1)

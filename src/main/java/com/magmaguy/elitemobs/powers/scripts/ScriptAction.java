@@ -12,8 +12,6 @@ import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.powers.meta.CustomSummonPower;
 import com.magmaguy.elitemobs.powers.scripts.caching.ScriptActionBlueprint;
 import com.magmaguy.elitemobs.powers.scripts.enums.ActionType;
-import com.magmaguy.elitemobs.powers.scripts.enums.Target;
-import com.magmaguy.elitemobs.utils.Developer;
 import com.magmaguy.elitemobs.utils.VersionChecker;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
@@ -293,10 +291,8 @@ public class ScriptAction {
     private void runDamage(ScriptActionData scriptActionData) {
         //Developer.message("Running damage action");
         getTargets(scriptActionData).forEach(targetEntity -> {
-            Developer.message("running damage for targets");
             if (targetEntity instanceof Player) {
                 PlayerDamagedByEliteMobEvent.PlayerDamagedByEliteMobEventFilter.setSpecialMultiplier(blueprint.getMultiplier());
-                Developer.message("running damage for player!!!");
             }
             if (scriptActionData.getEliteEntity().getLivingEntity() != null)
                 targetEntity.damage(blueprint.getAmount(), scriptActionData.getEliteEntity().getLivingEntity());
