@@ -11,7 +11,7 @@ public class FrostQueenTeleporter extends NPCsConfigFields {
         super("frost_queen_teleporter",
                 true,
                 "Ishard the Frostbitten",
-                "<Frost Palace Teleport>",
+                "<[50] Frost Palace Teleport>",
                 Villager.Profession.ARMORER,
                 "em_adventurers_guild,294.5,91,215.5,0,0",
                 List.of(""),

@@ -17,7 +17,13 @@ public class MapListInterpreter {
     }
 
     public static List<String> parseStringList(String key, Object value, String scriptName) {
-        return ChatColorConverter.convert((List<String>) value);
+        if (value == null) return new ArrayList<>();
+        try {
+            return ChatColorConverter.convert((List) value);
+        } catch (Exception ex) {
+            new WarningMessage("Failed to get string list for key " + key + " with value " + value + " in script " + scriptName);
+            return new ArrayList<>();
+        }
     }
 
     public static Boolean parseBoolean(String key, Object value, String scriptName) {

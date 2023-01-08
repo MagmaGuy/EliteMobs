@@ -24,6 +24,7 @@ public class InstancedBossEntity extends RegionalBossEntity implements Persisten
     public InstancedBossEntity(CustomBossesConfigFields customBossesConfigFields, Location location, DungeonInstance dungeonInstance) {
         super(customBossesConfigFields, location, false, true);
         this.dungeonInstance = dungeonInstance;
+        super.elitePowers = ElitePowerParser.parsePowers(customBossesConfigFields, this);
     }
 
     public static void shutdown() {

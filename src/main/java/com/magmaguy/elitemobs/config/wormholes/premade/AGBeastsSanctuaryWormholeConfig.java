@@ -7,7 +7,7 @@ public class AGBeastsSanctuaryWormholeConfig extends WormholeConfigFields {
     public AGBeastsSanctuaryWormholeConfig(){
         super("ag_beasts_sanctuary_wormhole",
                 true,
-                "em_adventurers_guild,296.5,105,296.5,90,0",
+                "em_adventurers_guild,296.5,106,296.5,90,0",
                 "beasts_sanctuary_lair.yml",
                 Wormhole.WormholeStyle.CRYSTAL);
         setBlindPlayer(true);

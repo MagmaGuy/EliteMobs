@@ -65,7 +65,9 @@ public class ElitePowerParser {
                         }
                     }
                     //If the boss is in an instanced dungeon with difficulties and the difficulty doesn't match, skip assigning that power
-                    if (!difficulties.isEmpty() && !difficulties.contains(instancedBossEntity.getDungeonInstance().getDifficultyID()))
+                    if (!difficulties.isEmpty() &&
+                            instancedBossEntity.getDungeonInstance() != null && //Annoyingly this has to be done in two passes for the instanced bosses due to initialization
+                            !difficulties.contains(instancedBossEntity.getDungeonInstance().getDifficultyID()))
                         continue;
                 }
 

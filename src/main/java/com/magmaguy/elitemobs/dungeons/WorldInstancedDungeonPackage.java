@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.dungeons;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
 import org.bukkit.entity.Player;
@@ -32,6 +33,9 @@ public class WorldInstancedDungeonPackage extends EMPackage implements CombatCon
     public boolean install(Player player) {
         dungeonPackagerConfigFields.simpleInstall();
         this.isInstalled = true;
+        player.sendMessage(ChatColorConverter.convert("&2Dungeon " + dungeonPackagerConfigFields.getFilename() + " installed!"));
+        player.sendMessage(ChatColorConverter.convert("&6Instanced dungeons must be accessed either through the &a/em &6menu or an NPC! NPCs for premade EliteMobs content can be found at the Adventurer's Guild Hub map."));
+        player.sendMessage("Remember that instanced dungeons create a world when you join them and remove that world when you are done playing in them!");
         return true;
     }
 
