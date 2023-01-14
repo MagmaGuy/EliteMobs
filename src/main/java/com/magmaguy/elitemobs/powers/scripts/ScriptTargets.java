@@ -24,7 +24,7 @@ public class ScriptTargets {
     @Getter
     private final ScriptTargetsBlueprint targetBlueprint;
     private final EliteScript eliteScript;
-    private Collection<? extends LivingEntity> livingEntities = null;
+    private Collection<LivingEntity> livingEntities = null;
 
     public ScriptTargets(ScriptTargetsBlueprint targetBlueprint, EliteScript eliteScript) {
         this.targetBlueprint = targetBlueprint;
@@ -69,7 +69,7 @@ public class ScriptTargets {
     }
 
     //Get living entity targets. New array lists so they are not immutable.
-    protected Collection<? extends LivingEntity> getTargetEntities(ScriptActionData scriptActionData) {
+    protected Collection<LivingEntity> getTargetEntities(ScriptActionData scriptActionData) {
         if (livingEntities != null) return livingEntities;
         //If a script zone exists, it overrides the check entirely to expose zone-based fields
         Location eliteEntityLocation = scriptActionData.getEliteEntity().getLocation();
