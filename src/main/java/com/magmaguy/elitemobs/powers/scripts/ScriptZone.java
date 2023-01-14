@@ -45,7 +45,7 @@ public class ScriptZone {
     }
 
     //Get living entities in zone
-    protected Collection<? extends LivingEntity> getEffectTargets(ScriptActionData scriptActionData,
+    protected Collection<LivingEntity> getEffectTargets(ScriptActionData scriptActionData,
                                                                   ScriptTargetsBlueprint blueprintFromRequestingTarget) {
         //Generate shapes for the zone
         List<Shape> shapes;
@@ -192,7 +192,7 @@ public class ScriptZone {
 
 
     //Get entities in an area based on a filter
-    private Collection<? extends LivingEntity> getEntitiesInArea(List<Shape> shapes, Target target) {
+    private Collection<LivingEntity> getEntitiesInArea(List<Shape> shapes, Target target) {
         //Get entities in the world
         Collection<? extends LivingEntity> livingEntities = new ArrayList<>();
         Collection<LivingEntity> validatedEntities = new ArrayList<>();

@@ -12,13 +12,13 @@ public class Dome extends Sphere {
     }
 
     @Override
-    public boolean contains(Location position){
-        return super.contains(position) && position.getY() > centerLocation.getY();
+    public boolean contains(Location position) {
+        return super.contains(position) && position.getY() > centerLocation.getY() - 1;
     }
 
     @Override
-    public boolean borderContains(Location position){
-        return super.borderContains(position) && position.getY() > centerLocation.getY();
+    public boolean borderContains(Location position) {
+        return super.borderContains(position) && position.getY() > centerLocation.getY() - 1;
     }
 
     @Override

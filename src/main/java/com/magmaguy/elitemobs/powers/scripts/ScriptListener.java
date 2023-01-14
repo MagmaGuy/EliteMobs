@@ -80,6 +80,7 @@ public class ScriptListener implements Listener {
         if (scriptAction == null) return;
         event.setCancelled(true);
         runEvent(scriptAction, event.getBlock().getLocation());
+        fallingBlocks.remove(event.getEntity());
     }
 
     private void runEvent(Event event, EliteEntity eliteEntity) {
@@ -101,7 +102,7 @@ public class ScriptListener implements Listener {
                 new WarningMessage("Elite script " + string + " does not exist for landing scripts!");
                 return;
             }
-            iteratedScript.check(scriptAction.getEliteEntity(), landingLocation);
+            iteratedScript.check(scriptAction.getEliteEntity(), landingLocation, scriptAction.getTargets(scriptAction));
         }
     }
 }

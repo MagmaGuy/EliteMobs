@@ -9,6 +9,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,12 +73,12 @@ public class EliteScript extends ElitePower implements Cloneable {
      * @param eliteEntity
      * @param directTarget
      */
-    public void check(EliteEntity eliteEntity, LivingEntity directTarget) {
+    public void check(EliteEntity eliteEntity, LivingEntity directTarget, Collection<LivingEntity> targetEntities, Collection<Location> targetLocations) {
         //Check if the event conditions are met
         if (scriptConditions != null && !scriptConditions.meetsConditions(eliteEntity, directTarget))
             return;
         //Let's do some actions
-        scriptActions.runScripts(eliteEntity, directTarget, null);
+        scriptActions.runScripts(eliteEntity, directTarget, null, targetEntities, targetLocations);
         //Cooldowns time
         doCooldownTicks(eliteEntity);
     }
@@ -88,7 +89,7 @@ public class EliteScript extends ElitePower implements Cloneable {
      * @param eliteEntity     Boss
      * @param landingLocation Location where the projectile or block landed
      */
-    public void check(EliteEntity eliteEntity, Location landingLocation) {
+    public void check(EliteEntity eliteEntity, Location landingLocation, Collection<LivingEntity> targetEntities, Collection<Location> targetLocations) {
         //Check if the event conditions are met
         if (scriptConditions != null && !scriptConditions.meetsConditions(eliteEntity, null)) return;
         //Let's do some actions
