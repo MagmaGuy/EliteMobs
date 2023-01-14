@@ -59,6 +59,21 @@ public class ScriptAction {
         this.eliteScriptMap = eliteScriptMap;
     }
 
+    public void runScript(EliteEntity eliteEntity, LivingEntity directTarget, Collection<Entity> targetEntities, Collection<Location> targetLocations) {
+        if (blueprint.getActionType() == null) {
+            new WarningMessage("Script " + blueprint.getScriptName() + " in file " + blueprint.getScriptFilename() + " does not have a valid action! Every action must define a valid action for the script to work.");
+            return;
+        }
+
+        this.eliteEntity = eliteEntity;
+
+
+        ScriptActionData scriptActionData = new ScriptActionData(eliteEntity, directTarget, blueprint.getScriptTargets().getTargetType(), targetEntities, targetLocations);
+
+
+
+    }
+
     public void runScript(EliteEntity eliteEntity, LivingEntity directTarget, Event event) {
         if (blueprint.getActionType() == null) {
             new WarningMessage("Script " + blueprint.getScriptName() + " in file " + blueprint.getScriptFilename() + " does not have a valid action! Every action must define a valid action for the script to work.");
@@ -186,7 +201,7 @@ public class ScriptAction {
             runAdditionalScripts(scriptActionData);
     }
 
-    protected Collection<? extends LivingEntity> getTargets(ScriptActionData scriptActionData) {
+    protected Collection<LivingEntity> getTargets(ScriptActionData scriptActionData) {
         return scriptConditions.validateEntities(scriptActionData, scriptTargets.getTargetEntities(scriptActionData));
     }
 
@@ -274,7 +289,7 @@ public class ScriptAction {
                     if (iteratedScript == null)
                         new WarningMessage("Failed to get script " + iteratedScriptName + " for script " + blueprint.getScriptName() + " in file " + blueprint.getScriptFilename());
                     else {
-                        iteratedScript.check(scriptActionData.getEliteEntity(), scriptActionData.getDirectTarget());
+                        iteratedScript.check(scriptActionData.getEliteEntity(), scriptActionData.getDirectTarget(), getTargets(scriptActionData), getLocationTargets(scriptActionData));
                     }
                 });
             else {
@@ -283,7 +298,7 @@ public class ScriptAction {
                 if (randomizedScript == null)
                     new WarningMessage("Failed to get script " + scriptName + " for script " + blueprint.getScriptName() + " in file " + blueprint.getScriptFilename());
                 else
-                    randomizedScript.check(scriptActionData.getEliteEntity(), scriptActionData.getDirectTarget());
+                    randomizedScript.check(scriptActionData.getEliteEntity(), scriptActionData.getDirectTarget(), getTargets(scriptActionData), getLocationTargets(scriptActionData));
             }
     }
 
@@ -491,7 +506,8 @@ public class ScriptAction {
     }
 
     private void runSpawnFallingBlock(ScriptActionData scriptActionData) {
-        getLocationTargets(scriptActionData).forEach(targetLocation -> {
+        Collection<Location> locationTargets = getLocationTargets(scriptActionData);
+        locationTargets.forEach(targetLocation -> {
             FallingBlock fallingBlock = targetLocation.getWorld().spawnFallingBlock(targetLocation, blueprint.getMaterial(), (byte) 0);
             fallingBlock.setDropItem(false);
             fallingBlock.setHurtEntities(false);

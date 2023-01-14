@@ -132,8 +132,8 @@ public class ScriptConditions {
     }
 
     //Removes entities that do not meet the conditions
-    protected Collection<? extends LivingEntity> validateEntities(ScriptActionData scriptActionData,
-                                                                  @NotNull Collection<? extends LivingEntity> originalEntities) {
+    protected Collection<LivingEntity> validateEntities(ScriptActionData scriptActionData,
+                                                                  @NotNull Collection<LivingEntity> originalEntities) {
         if (scriptTargets == null) return originalEntities;
 
         if (scriptTargets.getTargetBlueprint().getTargetType().equals(Target.ACTION_TARGET)) {
