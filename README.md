@@ -127,7 +127,7 @@ Used to listening to moments when an elite is killed. Uses:
 Used for listening to moments when an elite enters combat against a player. Note that bosses only enter combat after
 either striking a player or being struck, and not at the moment of targetting. Uses:
 
-- Get the target (player only) of the Elite
+- Get the targetType (player only) of the Elite
 - Get the elite which entered in combat
 
 ### EliteMobExitCombatEvent:

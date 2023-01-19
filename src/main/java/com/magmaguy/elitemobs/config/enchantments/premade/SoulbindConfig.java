@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.config.enchantments.premade;
 
-import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfigFields;
 
 public class SoulbindConfig extends EnchantmentsConfigFields {
@@ -17,7 +16,7 @@ public class SoulbindConfig extends EnchantmentsConfigFields {
 
     @Override
     public void processAdditionalFields() {
-        loreStrings = ConfigurationEngine.setString(file, super.fileConfiguration, "loreStrings", "&7Soulbound to &f$player", true);
-        hologramStrings = ConfigurationEngine.setString(file, super.fileConfiguration, "hologramString", "$player&f's", true);
+        loreStrings = translatable(filename, "name", processString("loreStrings", "&7Soulbound to &f$player", null, true));
+        hologramStrings = translatable(filename, "name", processString("hologramString", "$player&f's", null, true));
     }
 }
