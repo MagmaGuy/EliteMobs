@@ -43,7 +43,8 @@ public class PotionEffectsConfig {
             new UnluckConfig(),
             new WaterBreathingConfig(),
             new WeaknessConfig(),
-            new WitherConfig()
+            new WitherConfig(),
+            new DarknessConfig()
     ));
 
     public static void addPotionEffect(String fileName, PotionEffectsConfigFields powersConfigFields) {

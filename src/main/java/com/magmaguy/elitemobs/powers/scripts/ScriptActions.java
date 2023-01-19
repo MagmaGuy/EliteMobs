@@ -8,7 +8,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Event;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -25,16 +24,17 @@ public class ScriptActions {
             scriptAction.runScript(eliteEntity, directTarget, event);
     }
 
-    public void runScripts(EliteEntity eliteEntity, Location landingLocation) {
-        for (ScriptAction scriptAction : scriptActionsList)
-            scriptAction.runScript(eliteEntity, landingLocation);
-    }
-
 
     //Used by scripts that call scripts
-    public void runScripts(EliteEntity eliteEntity, LivingEntity directTarget, Event event, Collection<LivingEntity> targetEntities, Collection<Location> targetLocations) {
+    public void runScripts(ScriptActionData previousScriptActiondata) {
         for (ScriptAction scriptAction : scriptActionsList)
-            scriptAction.runScript(eliteEntity, directTarget, event);
+            scriptAction.runScript(previousScriptActiondata);
+    }
+
+    //Used by landing blocks and projectiles
+    public void runScripts(ScriptActionData previousActionData, Location landingLocation) {
+        for (ScriptAction scriptAction : scriptActionsList)
+            scriptAction.runScript(previousActionData, landingLocation);
     }
 
     public boolean isValid() {

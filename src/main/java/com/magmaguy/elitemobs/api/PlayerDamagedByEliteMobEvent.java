@@ -122,15 +122,14 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
                 potionEffectDamageReduction = (player.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE).
                         getAmplifier() + 1) * MobCombatSettingsConfig.getResistanceDamageMultiplier();
 
-            double finalDamage = ((baseDamage + bonusDamage) * customBossDamageMultiplier * specialMultiplier - damageReduction - potionEffectDamageReduction) *
-                    MobCombatSettingsConfig.getDamageToPlayerMultiplier();
+            double finalDamage = Math.max(baseDamage + bonusDamage - damageReduction - potionEffectDamageReduction, 1) *
+                    customBossDamageMultiplier * specialMultiplier * MobCombatSettingsConfig.getDamageToPlayerMultiplier();
 
             if (specialMultiplier != 1) specialMultiplier = 1;
 
             double playerMaxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
 
-            //Prevent 1-shots and players getting healed from hits
-            finalDamage = Math.max(finalDamage, 1);
+            //Prevent 1-shots
             finalDamage = Math.min(finalDamage, playerMaxHealth - 1);
 
             return finalDamage;

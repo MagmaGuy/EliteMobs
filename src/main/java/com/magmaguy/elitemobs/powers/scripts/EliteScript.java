@@ -9,7 +9,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,12 +72,12 @@ public class EliteScript extends ElitePower implements Cloneable {
      * @param eliteEntity
      * @param directTarget
      */
-    public void check(EliteEntity eliteEntity, LivingEntity directTarget, Collection<LivingEntity> targetEntities, Collection<Location> targetLocations) {
+    public void check(EliteEntity eliteEntity, LivingEntity directTarget, ScriptActionData previousScriptActionData) {
         //Check if the event conditions are met
         if (scriptConditions != null && !scriptConditions.meetsConditions(eliteEntity, directTarget))
             return;
         //Let's do some actions
-        scriptActions.runScripts(eliteEntity, directTarget, null, targetEntities, targetLocations);
+        scriptActions.runScripts(previousScriptActionData);
         //Cooldowns time
         doCooldownTicks(eliteEntity);
     }
@@ -86,16 +85,15 @@ public class EliteScript extends ElitePower implements Cloneable {
     /**
      * Used by scripts that call specific scripts when a projectile or falling block lands
      *
-     * @param eliteEntity     Boss
      * @param landingLocation Location where the projectile or block landed
      */
-    public void check(EliteEntity eliteEntity, Location landingLocation, Collection<LivingEntity> targetEntities, Collection<Location> targetLocations) {
+    public void check(Location landingLocation, ScriptActionData previousScriptActionData) {
         //Check if the event conditions are met
-        if (scriptConditions != null && !scriptConditions.meetsConditions(eliteEntity, null)) return;
+        if (scriptConditions != null && !scriptConditions.meetsConditions(previousScriptActionData.getEliteEntity(), null)) return;
         //Let's do some actions
-        scriptActions.runScripts(eliteEntity, landingLocation);
+        scriptActions.runScripts(previousScriptActionData, landingLocation);
         //Cooldowns time
-        doCooldownTicks(eliteEntity);
+        doCooldownTicks(previousScriptActionData.getEliteEntity());
     }
 
 }
