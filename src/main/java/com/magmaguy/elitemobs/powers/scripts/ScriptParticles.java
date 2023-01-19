@@ -1,12 +1,9 @@
 package com.magmaguy.elitemobs.powers.scripts;
 
 import com.magmaguy.elitemobs.powers.scripts.caching.ScriptParticlesBlueprint;
-import com.magmaguy.elitemobs.powers.scripts.enums.Target;
-import com.magmaguy.elitemobs.utils.shapes.Shape;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.util.Vector;
 
 public class ScriptParticles {
 
@@ -20,11 +17,13 @@ public class ScriptParticles {
         particlesBlueprint.getParticleBlueprints().forEach(particleBlueprint -> new ScriptParticle(particleBlueprint).visualize(scriptActionData, location));
     }
 
+    /*
+    todo: this needs a completely different implementation with a standalone target (or something like that)
     private org.bukkit.util.Vector getMovementVector(ScriptActionData scriptActionData, Location location) {
         Location sourceLocation = null;
         for (Shape shape : scriptActionData.getCachedShapes())
-            if (scriptActionData.getTarget().equals(Target.ZONE_FULL) && shape.getLocations().contains(location) ||
-                    scriptActionData.getTarget().equals(Target.ZONE_BORDER) && shape.getEdgeLocations().contains(location)) {
+            if (scriptActionData.getTargetType().equals(TargetType.ZONE_FULL) && shape.getLocations().contains(location) ||
+                    scriptActionData.getTargetType().equals(TargetType.ZONE_BORDER) && shape.getEdgeLocations().contains(location)) {
                 sourceLocation = shape.getCenter().clone();
                 break;
             }
@@ -33,6 +32,8 @@ public class ScriptParticles {
         }
         return sourceLocation.clone().subtract(location).toVector().normalize();
     }
+
+     */
 
     private class ScriptParticle {
 
@@ -47,6 +48,7 @@ public class ScriptParticles {
             double y = particleBlueprint.getY();
             double z = particleBlueprint.getZ();
             int amount = particleBlueprint.getAmount();
+            /*
             if (particleBlueprint.getMoveToTarget() != null) {
                 amount = 0;
                 Vector movementVector = getMovementVector(scriptActionData, location);
@@ -55,6 +57,8 @@ public class ScriptParticles {
                 y = movementVector.getY();
                 z = movementVector.getZ();
             }
+
+             */
             if (particleBlueprint.getParticle().equals(Particle.REDSTONE))
                 location.getWorld().spawnParticle(
                         particleBlueprint.getParticle(),

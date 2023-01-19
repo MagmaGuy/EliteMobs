@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.scripts.caching.ScriptTargetsBlueprint;
 import com.magmaguy.elitemobs.powers.scripts.caching.ScriptZoneBlueprint;
-import com.magmaguy.elitemobs.powers.scripts.enums.Target;
+import com.magmaguy.elitemobs.powers.scripts.enums.TargetType;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import com.magmaguy.elitemobs.utils.shapes.*;
 import lombok.Getter;
@@ -32,33 +32,20 @@ public class ScriptZone {
         this.targets = new ScriptTargets(zoneBlueprint.getTarget(), eliteScript);
         if (zoneBlueprint.getFinalTarget() != null)
             finalTargets = new ScriptTargets(zoneBlueprint.getFinalTarget(), eliteScript);
-        if (zoneBlueprint.getTarget2() != null)
-            targets2 = new ScriptTargets(zoneBlueprint.getTarget2(), eliteScript);
+        if (zoneBlueprint.getTarget2() != null) targets2 = new ScriptTargets(zoneBlueprint.getTarget2(), eliteScript);
         if (zoneBlueprint.getFinalTarget2() != null)
             finalTargets2 = new ScriptTargets(zoneBlueprint.getFinalTarget2(), eliteScript);
         isValid = zoneBlueprint.getTarget() != null;
     }
 
-    //Used for tracking, allows locations to be picked and set to be consistent throughout
-    public List<Shape> precacheShapes(ScriptActionData scriptActionData) {
-        return generateShapes(scriptActionData);
-    }
-
     //Get living entities in zone
-    protected Collection<LivingEntity> getEffectTargets(ScriptActionData scriptActionData,
-                                                                  ScriptTargetsBlueprint blueprintFromRequestingTarget) {
-        //Generate shapes for the zone
-        List<Shape> shapes;
-        if (scriptActionData.getCachedShapes() != null) {
-            shapes = scriptActionData.getCachedShapes();
-        } else {
-            shapes = generateShapes(scriptActionData);
-        }
-
+    protected Collection<LivingEntity> getZoneEntities(ScriptActionData scriptActionData, ScriptTargetsBlueprint blueprintFromRequestingTarget) {
         //Get the entities from those zones
         switch (blueprintFromRequestingTarget.getTargetType()) {
             case ZONE_FULL, ZONE_BORDER:
-                return getEntitiesInArea(shapes, blueprintFromRequestingTarget.getTargetType());
+                return getEntitiesInArea(generateShapes(scriptActionData), blueprintFromRequestingTarget.getTargetType());
+            case INHERIT_SCRIPT_ZONE_FULL, INHERIT_SCRIPT_ZONE_BORDER:
+                return getEntitiesInArea(generateShapes(scriptActionData.getInheritedScriptActionData()), blueprintFromRequestingTarget.getTargetType());
             default: {
                 new WarningMessage("Couldn't parse target " + targets.getTargetBlueprint().getTargetType() + " in script ");
                 return new ArrayList<>();
@@ -67,21 +54,17 @@ public class ScriptZone {
     }
 
     //Get locations in zone
-    protected Collection<Location> getEffectLocationTargets(ScriptActionData scriptActionData,
-                                                            ScriptTargets actionTarget) {
-        //Generate shapes for the zone
-        List<Shape> shapes;
-        if (scriptActionData.getCachedShapes() != null) {
-            shapes = scriptActionData.getCachedShapes();
-        } else {
-            shapes = generateShapes(scriptActionData);
-        }
-
+    protected Collection<Location> getZoneLocations(ScriptActionData scriptActionData, ScriptTargets actionTarget) {
         //Get the locations from those zones
         return switch (actionTarget.getTargetBlueprint().getTargetType()) {
-            case ZONE_FULL -> consolidateLists(shapes.stream().map(Shape::getLocations).collect(Collectors.toSet()));
+            case ZONE_FULL ->
+                    consolidateLists(generateShapes(scriptActionData).stream().map(Shape::getLocations).collect(Collectors.toSet()));
             case ZONE_BORDER ->
-                    consolidateLists(shapes.stream().map(Shape::getEdgeLocations).collect(Collectors.toSet()));
+                    consolidateLists(generateShapes(scriptActionData).stream().map(Shape::getEdgeLocations).collect(Collectors.toSet()));
+            case INHERIT_SCRIPT_ZONE_FULL ->
+                    consolidateLists(generateShapes(scriptActionData.getInheritedScriptActionData()).stream().map(Shape::getLocations).collect(Collectors.toSet()));
+            case INHERIT_SCRIPT_ZONE_BORDER ->
+                    consolidateLists(generateShapes(scriptActionData.getInheritedScriptActionData()).stream().map(Shape::getEdgeLocations).collect(Collectors.toSet()));
             default -> new ArrayList<>();
         };
     }
@@ -94,8 +77,20 @@ public class ScriptZone {
     }
 
     //Generate shapes that define the zone
-    private List<Shape> generateShapes(ScriptActionData scriptActionData) {
+    public List<Shape> generateShapes(ScriptActionData scriptActionData) {
+        //for cached shapes
+        if (scriptActionData.getScriptTargets().getShapes() != null) {
+            try {
+                return scriptActionData.getScriptTargets().getShapes();
+            } catch (Exception ex) {
+                new WarningMessage("Failed to get list of shapes!");
+                return new ArrayList<>();
+            }
+        }
+
+        //for non-cached shapes
         List<Shape> shapes = new ArrayList<>();
+
         //Get the shapes from the targets of the zone
         for (Location shapeTargetLocation : targets.getTargetLocations(scriptActionData)) {
             switch (zoneBlueprint.getShapeTypeEnum()) {
@@ -114,12 +109,7 @@ public class ScriptZone {
                         break;
                     }
                     for (Location location : targets2.getTargetLocations(scriptActionData))
-                        shapes.add(
-                                new StaticRay(
-                                        zoneBlueprint.isIgnoresSolidBlocks(),
-                                        zoneBlueprint.getPointRadius(),
-                                        shapeTargetLocation,
-                                        location));
+                        shapes.add(new StaticRay(zoneBlueprint.isIgnoresSolidBlocks(), zoneBlueprint.getPointRadius(), shapeTargetLocation, location));
                     break;
                 case ROTATING_RAY:
                     if (targets2 == null) {
@@ -133,18 +123,7 @@ public class ScriptZone {
                     }
                     for (Location location : targets2.getTargetLocations(scriptActionData)) {
                         //Developer.message("adding shape");
-                        shapes.add(
-                                new RotatingRay(
-                                        zoneBlueprint.isIgnoresSolidBlocks(),
-                                        zoneBlueprint.getPointRadius(),
-                                        shapeTargetLocation,
-                                        finalTargetLocation,
-                                        location,
-                                        zoneBlueprint.getPitchPreRotation(),
-                                        zoneBlueprint.getYawPreRotation(),
-                                        zoneBlueprint.getPitchRotation(),
-                                        zoneBlueprint.getYawRotation(),
-                                        zoneBlueprint.getAnimationDuration()));
+                        shapes.add(new RotatingRay(zoneBlueprint.isIgnoresSolidBlocks(), zoneBlueprint.getPointRadius(), shapeTargetLocation, finalTargetLocation, location, zoneBlueprint.getPitchPreRotation(), zoneBlueprint.getYawPreRotation(), zoneBlueprint.getPitchRotation(), zoneBlueprint.getYawRotation(), zoneBlueprint.getAnimationDuration()));
                     }
                     break;
                 case TRANSLATING_RAY:
@@ -163,25 +142,10 @@ public class ScriptZone {
                         if (!finalTargetsList.isEmpty()) target2LocationEnd = finalTargetsList.get(0);
                     }
                     for (Location location : targets2.getTargetLocations(scriptActionData))
-                        shapes.add(
-                                new TranslatingRay(
-                                        zoneBlueprint.isIgnoresSolidBlocks(),
-                                        zoneBlueprint.getPointRadius(),
-                                        shapeTargetLocation,
-                                        targetLocationEnd,
-                                        location,
-                                        target2LocationEnd,
-                                        zoneBlueprint.getAnimationDuration()));
+                        shapes.add(new TranslatingRay(zoneBlueprint.isIgnoresSolidBlocks(), zoneBlueprint.getPointRadius(), shapeTargetLocation, targetLocationEnd, location, target2LocationEnd, zoneBlueprint.getAnimationDuration()));
                     break;
                 case CUBOID:
-                    shapes.add(new Cuboid(
-                            zoneBlueprint.getX(),
-                            zoneBlueprint.getY(),
-                            zoneBlueprint.getZ(),
-                            zoneBlueprint.getXBorder(),
-                            zoneBlueprint.getYBorder(),
-                            zoneBlueprint.getZBorder(),
-                            shapeTargetLocation));
+                    shapes.add(new Cuboid(zoneBlueprint.getX(), zoneBlueprint.getY(), zoneBlueprint.getZ(), zoneBlueprint.getXBorder(), zoneBlueprint.getYBorder(), zoneBlueprint.getZBorder(), shapeTargetLocation));
                     break;
                 default:
                     continue;
@@ -192,7 +156,7 @@ public class ScriptZone {
 
 
     //Get entities in an area based on a filter
-    private Collection<LivingEntity> getEntitiesInArea(List<Shape> shapes, Target target) {
+    private Collection<LivingEntity> getEntitiesInArea(List<Shape> shapes, TargetType targetType) {
         //Get entities in the world
         Collection<? extends LivingEntity> livingEntities = new ArrayList<>();
         Collection<LivingEntity> validatedEntities = new ArrayList<>();
@@ -213,12 +177,10 @@ public class ScriptZone {
             }
 
             for (LivingEntity livingEntity : livingEntities) {
-                if (target.equals(Target.ZONE_FULL)) {
-                    if (shape.contains(livingEntity.getLocation()))
-                        validatedEntities.add(livingEntity);
-                } else if (target.equals(Target.ZONE_BORDER)) {
-                    if (shape.borderContains(livingEntity.getLocation()))
-                        validatedEntities.add(livingEntity);
+                if (targetType.equals(TargetType.ZONE_FULL)) {
+                    if (shape.contains(livingEntity.getLocation())) validatedEntities.add(livingEntity);
+                } else if (targetType.equals(TargetType.ZONE_BORDER)) {
+                    if (shape.borderContains(livingEntity.getLocation())) validatedEntities.add(livingEntity);
                 }
             }
 

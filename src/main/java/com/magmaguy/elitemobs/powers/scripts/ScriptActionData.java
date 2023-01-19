@@ -1,8 +1,7 @@
 package com.magmaguy.elitemobs.powers.scripts;
 
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
-import com.magmaguy.elitemobs.powers.scripts.enums.Target;
-import com.magmaguy.elitemobs.utils.shapes.Shape;
+import com.magmaguy.elitemobs.powers.scripts.enums.TargetType;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
@@ -11,15 +10,11 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Event;
 
 import java.util.Collection;
-import java.util.List;
 
 public class ScriptActionData {
     @Getter
     @Setter
     private Collection<Location> locations = null;
-    @Getter
-    @Setter
-    private List<Shape> cachedShapes = null;
     @Getter
     @Setter
     private EliteEntity eliteEntity;
@@ -30,7 +25,14 @@ public class ScriptActionData {
     @Setter
     private Location landingLocation = null;
     @Getter
-    private final Target target;
+    private final TargetType targetType;
+    @Getter
+    private ScriptTargets scriptTargets;
+    @Getter
+    private ScriptZone scriptZone = null;
+    @Getter
+    @Setter
+    private ScriptActionData inheritedScriptActionData = null;
     @Getter
     private Event event;
 
@@ -44,25 +46,49 @@ public class ScriptActionData {
     private Collection<Location> previousLocationTargets;
 
 
-    public ScriptActionData(EliteEntity eliteEntity, LivingEntity directTarget, Target target, Event event) {
+    public ScriptActionData(EliteEntity eliteEntity, LivingEntity directTarget, ScriptTargets scriptTargets, Event event) {
         this.eliteEntity = eliteEntity;
         this.directTarget = directTarget;
-        this.target = target;
+        this.scriptTargets = scriptTargets;
+        this.targetType = scriptTargets.getTargetBlueprint().getTargetType();
         this.event = event;
     }
 
-    //For data with landing locations
-    public ScriptActionData(EliteEntity eliteEntity, Location landingLocation, Target target) {
+    public ScriptActionData(EliteEntity eliteEntity, LivingEntity directTarget, ScriptTargets scriptTargets, ScriptZone scriptZone, Event event) {
         this.eliteEntity = eliteEntity;
+        this.directTarget = directTarget;
+        this.scriptTargets = scriptTargets;
+        this.targetType = scriptTargets.getTargetBlueprint().getTargetType();
+        this.scriptZone = scriptZone;
+        this.event = event;
+    }
+
+    public ScriptActionData(ScriptTargets scriptTargets, ScriptZone scriptZone, ScriptActionData inheritedScriptActionData) {
+        this.eliteEntity = inheritedScriptActionData.getEliteEntity();
+        this.directTarget = inheritedScriptActionData.getDirectTarget();
+        this.scriptTargets = scriptTargets;
+        this.targetType = scriptTargets.getTargetBlueprint().getTargetType();
+        this.scriptZone = scriptZone;
+        this.inheritedScriptActionData = inheritedScriptActionData;
+    }
+
+    //For data with landing locations
+    public ScriptActionData(ScriptTargets scriptTargets,  ScriptZone scriptZone, ScriptActionData inheritedScriptActionData,Location landingLocation) {
+        this.eliteEntity = inheritedScriptActionData.getEliteEntity();
+        this.directTarget = inheritedScriptActionData.getDirectTarget();
+        this.scriptTargets = scriptTargets;
+        this.targetType = scriptTargets.getTargetBlueprint().getTargetType();
+        this.scriptZone = scriptZone;
+        this.inheritedScriptActionData = inheritedScriptActionData;
         this.landingLocation = landingLocation;
-        this.target = target;
     }
 
     //For data called by other scripts
-    public ScriptActionData(EliteEntity eliteEntity, LivingEntity directTarget, Target target, Collection<Entity> previousEntityTargets, Collection<Location> previousLocationTargets) {
+    public ScriptActionData(EliteEntity eliteEntity, LivingEntity directTarget, ScriptTargets scriptTargets,  Collection<Entity> previousEntityTargets, Collection<Location> previousLocationTargets) {
         this.eliteEntity = eliteEntity;
         this.directTarget = directTarget;
-        this.target = target;
+        this.scriptTargets = scriptTargets;
+        this.targetType = scriptTargets.getTargetBlueprint().getTargetType();
         this.previousEntityTargets = previousEntityTargets;
         this.previousLocationTargets = previousLocationTargets;
     }

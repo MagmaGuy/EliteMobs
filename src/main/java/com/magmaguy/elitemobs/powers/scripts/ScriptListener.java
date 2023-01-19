@@ -15,7 +15,7 @@ import org.bukkit.event.entity.EntityChangeBlockEvent;
 import java.util.HashMap;
 
 public class ScriptListener implements Listener {
-    public static HashMap<FallingBlock, ScriptAction> fallingBlocks = new HashMap();
+    public static HashMap<FallingBlock, FallingEntityDataPair> fallingBlocks = new HashMap();
 
     @EventHandler
     public void onEliteMobDamagedByPlayerEvent(EliteMobDamagedByPlayerEvent event) {
@@ -76,10 +76,11 @@ public class ScriptListener implements Listener {
     @EventHandler
     public void onEntityChangeBlockEvent(EntityChangeBlockEvent event) {
         if (fallingBlocks.isEmpty()) return;
-        ScriptAction scriptAction = fallingBlocks.get(event.getEntity());
+        FallingEntityDataPair fallingEntityDataPair = fallingBlocks.get(event.getEntity());
+        ScriptAction scriptAction = fallingEntityDataPair.getScriptAction();
         if (scriptAction == null) return;
         event.setCancelled(true);
-        runEvent(scriptAction, event.getBlock().getLocation());
+        runEvent(fallingBlocks.get(event.getEntity()), event.getBlock().getLocation());
         fallingBlocks.remove(event.getEntity());
     }
 
@@ -95,14 +96,14 @@ public class ScriptListener implements Listener {
                 eliteScript.check(event, eliteEntity, player);
     }
 
-    private void runEvent(ScriptAction scriptAction, Location landingLocation) {
-        for (String string : scriptAction.getBlueprint().getLandingScripts()) {
-            EliteScript iteratedScript = scriptAction.getEliteScriptMap().get(string);
+    private void runEvent(FallingEntityDataPair fallingEntityDataPair, Location landingLocation) {
+        for (String string : fallingEntityDataPair.getScriptAction().getBlueprint().getLandingScripts()) {
+            EliteScript iteratedScript = fallingEntityDataPair.getScriptAction().getEliteScriptMap().get(string);
             if (iteratedScript == null) {
                 new WarningMessage("Elite script " + string + " does not exist for landing scripts!");
                 return;
             }
-            iteratedScript.check(scriptAction.getEliteEntity(), landingLocation, scriptAction.getTargets(scriptAction));
+            iteratedScript.check(landingLocation, fallingEntityDataPair.getScriptActionData());
         }
     }
 }

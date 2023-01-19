@@ -157,15 +157,15 @@ public class QuestTracking {
     private List<ObjectiveDestinations> getFetchLocations(CustomFetchObjective customFetchObjective) {
         List<ObjectiveDestinations> destinations = new ArrayList<>();
         List<Location> locations = new ArrayList<>();
-        EntityTracker.getEliteMobEntities().values().forEach(eliteEntity -> {
-            if (eliteEntity instanceof CustomBossEntity)
-                for (CustomLootEntry customLootEntry : ((CustomBossEntity) eliteEntity).getCustomBossesConfigFields().getCustomLootTable().getEntries())
-                    if (customLootEntry instanceof EliteCustomLootEntry && ((EliteCustomLootEntry) customLootEntry).getFilename().equals(customFetchObjective.getKey()))
+        new ArrayList<>(EntityTracker.getEliteMobEntities().values()).forEach(eliteEntity -> {
+            if (eliteEntity instanceof CustomBossEntity customBossEntity)
+                for (CustomLootEntry customLootEntry : customBossEntity.getCustomBossesConfigFields().getCustomLootTable().getEntries())
+                    if (customLootEntry instanceof EliteCustomLootEntry eliteCustomLootEntry && eliteCustomLootEntry.getFilename().equals(customFetchObjective.getKey()))
                         locations.add(eliteEntity.getLocation());
         });
-        TreasureChest.getTreasureChestHashMap().values().forEach((treasureChest -> {
+        new ArrayList<>(TreasureChest.getTreasureChestHashMap().values()).forEach((treasureChest -> {
             for (CustomLootEntry customLootEntry : treasureChest.getCustomTreasureChestConfigFields().getCustomLootTable().getEntries())
-                if (customLootEntry instanceof EliteCustomLootEntry && ((EliteCustomLootEntry) customLootEntry).getFilename().equals(customFetchObjective.getKey()))
+                if (customLootEntry instanceof EliteCustomLootEntry eliteCustomLootEntry && eliteCustomLootEntry.getFilename().equals(customFetchObjective.getKey()))
                     locations.add(treasureChest.getLocation());
         }));
         destinations.add(new ObjectiveDestinations(customFetchObjective, locations));
