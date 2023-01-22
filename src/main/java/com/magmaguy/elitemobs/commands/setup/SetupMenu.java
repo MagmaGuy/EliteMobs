@@ -6,11 +6,13 @@ import com.magmaguy.elitemobs.commands.guild.AdventurersGuildCommand;
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.config.ConfigurationExporter;
 import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
+import com.magmaguy.elitemobs.config.menus.premade.GetLootMenuConfig;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
 import com.magmaguy.elitemobs.dungeons.SchematicPackage;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.utils.*;
 import com.magmaguy.elitemobs.worlds.CustomWorldLoading;
+import lombok.Getter;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -21,6 +23,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,25 +38,24 @@ public class SetupMenu {
 
     Inventory inventory;
     Player player;
+    private static int nextIcon = 35;
+    private static int infoIcon = 4;
+    private static List<EMPackage> emPackages = new ArrayList<>();
     ArrayList<Integer> validSlots = new ArrayList<>(Arrays.asList(10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23,
-            24, 25, 28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 43));
+            24, 25, 28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 43, 46, 47, 48, 49, 50, 51, 52));
+    private int previousIcon = 27;
     HashMap<Integer, EMPackage> minidungeonHashMap = new HashMap<>();
+    @Getter
+    private int currentPage = 1;
     boolean adventurersGuildIsDownloaded = false;
 
     public SetupMenu(Player player) {
         this.inventory = Bukkit.createInventory(player, 54, "Setup menu");
         this.player = player;
-        //reserve resource pack status
-        customResourcePackStatus();
-        //reserve adventurer's guild
-        adventurersGuildWorldStatus();
-        //iterate through dungeons
-        dungeonStatuses();
-        setupMenus.put(inventory, this);
-        player.openInventory(inventory);
+        redrawMenu(1, inventory);
     }
 
-    private static <FileOutputStream> void resourcePackButtonInteraction(Player player, SetupMenu setupMenu) {
+    private static void resourcePackButtonInteraction(Player player, SetupMenu setupMenu) {
         if (!player.hasPermission("elitemobs.*")) {
             player.sendMessage("[EliteMobs] You do not have the required permission (elitemobs.*) to do that!");
             return;
@@ -110,6 +113,53 @@ public class SetupMenu {
             player.spigot().sendMessage(SpigotMessage.simpleMessage("&8[EliteMobs] &2The EliteMobs resource pack has been installed! &cThis requires a server restart to work correctly!"));
             player.spigot().sendMessage(SpigotMessage.commandHoverMessage("&eBefore you go! &fDo you want to force players to use the resource pack? This is necessary if you plan to use &cModelEngine for the custom boss models. &aClick here if you want to force resource packs. &eIgnore this message if you don't!", "Click to force resource packs!", "/elitemobs forceresourcepack"));
         }
+    }
+
+    private void redrawMenu(int page, Inventory inventory) {
+        currentPage = page;
+        setupMenus.remove(inventory);
+        this.inventory = inventory;
+        inventory.clear();
+        //reserve resource pack status
+        customResourcePackStatus();
+        //reserve adventurer's guild
+        adventurersGuildWorldStatus();
+        //iterate through dungeons
+        dungeonStatuses();
+        //Set icons
+        addNavigationElements();
+        player.openInventory(inventory);
+        setupMenus.put(inventory, this);
+    }
+
+    private void addNavigationElements() {
+        ItemStack infoButton = GetLootMenuConfig.infoItem;
+        List<String> lore = ChatColorConverter.convert(List.of("&2To setup optional/recommended content for EliteMobs:",
+                "&61) &fDownload content from &9magmaguy.itch.io &for &9patreon.com/magmaguy",
+                "&62) &fPut content in the &2imports &ffolder of EliteMobs",
+                "&63) &fDo &2/em reload",
+                "&64) &fDo &2/em setup",
+                "&65) &fClick on &eyellow &ficons to install!",
+                "Click to get more info!"));
+        ItemMeta itemMeta = infoButton.getItemMeta();
+        itemMeta.setLore(lore);
+        infoButton.setItemMeta(itemMeta);
+        inventory.setItem(infoIcon, infoButton);
+
+        ItemStack previousButton = GetLootMenuConfig.previousLootItem;
+        ItemMeta previousButtonMeta = previousButton.getItemMeta();
+        previousButtonMeta.setDisplayName("Previous page");
+        previousButton.setItemMeta(previousButtonMeta);
+        if (currentPage > 1)
+            inventory.setItem(previousIcon, previousButton);
+
+        ItemStack nextButton = GetLootMenuConfig.nextLootItem;
+        ItemMeta nextButtonMeta = nextButton.getItemMeta();
+        nextButtonMeta.setDisplayName("Next page");
+        nextButton.setItemMeta( nextButtonMeta);
+        int totalPages = (int) Math.ceil(emPackages.size() / 28d);
+        if (totalPages > 1 && currentPage < totalPages)
+            inventory.setItem(nextIcon, nextButton);
     }
 
     public static void forceResourcePack(Player player) {
@@ -203,21 +253,30 @@ public class SetupMenu {
     }
 
     private void dungeonStatuses() {
-        //continue counting from used inventory slots
-        int counter = 2;
-        for (EMPackage emPackage : EMPackage.getEmPackages().values()) {
+        //Counter has to account for pages
+        int dungeonCounter = 0;
+        int inventoryLocationCounter = 0;
+        if (currentPage != 1)
+            dungeonCounter = validSlots.size() * (currentPage - 1) - 2;
+        else
+            inventoryLocationCounter = 2;
+        emPackages = EMPackage.getEmPackages().values().stream().toList();
+        minidungeonHashMap.clear();
+        for (int i = dungeonCounter; i < emPackages.size(); i++) {
+            if (currentPage == 1 && minidungeonHashMap.size() > validSlots.size() - 3) break;
+            if (inventoryLocationCounter >= validSlots.size()) break;
+            EMPackage emPackage = emPackages.get(i);
 
             if (!Bukkit.getPluginManager().isPluginEnabled("WorldGuard"))
-                inventory.setItem(validSlots.get(counter), ItemStackGenerator.generateItemStack(Material.RED_STAINED_GLASS_PANE,
+                inventory.setItem(validSlots.get(dungeonCounter), ItemStackGenerator.generateItemStack(Material.RED_STAINED_GLASS_PANE,
                         ChatColorConverter.convert("&4You need WorldGuard to install Minidungeons correctly!")));
             else
-
                 switch (emPackage.getDungeonPackagerConfigFields().getDungeonLocationType()) {
                     case WORLD:
-                        addWorldDungeon(emPackage, counter);
+                        addWorldDungeon(emPackage, inventoryLocationCounter);
                         break;
                     case SCHEMATIC:
-                        addSchematicDungeon(emPackage, counter);
+                        addSchematicDungeon(emPackage, inventoryLocationCounter);
                         break;
                     case INSTANCED:
                         break;
@@ -225,14 +284,13 @@ public class SetupMenu {
                         new WarningMessage("Dungeon " + emPackage.getDungeonPackagerConfigFields().getFilename() + " does not have a valid location type and therefore can't be set up automatically!");
                         break;
                 }
-            minidungeonHashMap.put(validSlots.get(counter), emPackage);
-            counter++;
-
+            minidungeonHashMap.put(validSlots.get(inventoryLocationCounter), emPackage);
+            dungeonCounter++;
+            inventoryLocationCounter++;
         }
     }
 
     private void addWorldDungeon(EMPackage emPackage, int counter) {
-
         String itemName = emPackage.getDungeonPackagerConfigFields().getName();
         List<String> lore = new ArrayList<>();
 
@@ -243,21 +301,6 @@ public class SetupMenu {
         lore = ChatColorConverter.convert(lore);
         inventory.setItem(validSlots.get(counter), ItemStackGenerator.generateItemStack(getMaterial(emPackage), itemName, lore));
     }
-
-
-    private void addInstancedDungeon(EMPackage emPackage, int counter) {
-
-        String itemName = emPackage.getDungeonPackagerConfigFields().getName();
-        List<String> lore = new ArrayList<>();
-
-        addSize(lore, emPackage);
-        //boss count can't be calculated ahead of time here, unfortunately
-        addInstallationString(lore, emPackage);
-
-        lore = ChatColorConverter.convert(lore);
-        inventory.setItem(validSlots.get(counter), ItemStackGenerator.generateItemStack(getMaterial(emPackage), itemName, lore));
-    }
-
 
     private void addSchematicDungeon(EMPackage emPackage, int counter) {
         if (!Bukkit.getPluginManager().isPluginEnabled("WorldEdit")) {
@@ -275,7 +318,6 @@ public class SetupMenu {
         addInstallationString(lore, emPackage);
 
         lore = ChatColorConverter.convert(lore);
-
         inventory.setItem(validSlots.get(counter), ItemStackGenerator.generateItemStack(getMaterial(emPackage), itemName, lore));
     }
 
@@ -318,6 +360,7 @@ public class SetupMenu {
     }
 
     private void customResourcePackStatus() {
+        if (currentPage != 1) return;
         String state = "Custom resource pack is";
         String lore;
         Material material;
@@ -335,6 +378,7 @@ public class SetupMenu {
     }
 
     private void adventurersGuildWorldStatus() {
+        if (currentPage != 1) return;
         String state = "Adventurer's Guild world is";
         String lore;
         Material material;
@@ -375,6 +419,25 @@ public class SetupMenu {
                 adventurersGuildButtonInteraction(player, setupMenu);
                 return;
             }
+            if (event.getSlot() == infoIcon) {
+                player.sendMessage(
+                        "EliteMobs installation process:",
+                        "Wiki page: https://github.com/MagmaGuy/EliteMobs/wiki/%5BGuide%5D-Quick-Setup",
+                        "Video version: https://youtu.be/boRg2X4qhw4",
+                        "Download links: free & premium https://magmaguy.itch.io/ | premium-only https://www.patreon.com/magmaguy",
+                        "Discord support: https://discord.gg/9f5QSka");
+                player.closeInventory();
+                return;
+            }
+            if (event.getSlot() == setupMenu.previousIcon && event.getCurrentItem() != null) {
+                setupMenu.redrawMenu(setupMenu.getCurrentPage() - 1, event.getInventory());
+                return;
+            }
+            if (event.getSlot() == setupMenu.nextIcon && event.getCurrentItem() != null) {
+                setupMenu.redrawMenu(setupMenu.getCurrentPage() + 1, event.getInventory());
+                return;
+            }
+
             dungeonButtonInteraction(player, setupMenu, event);
         }
 

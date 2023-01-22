@@ -24,7 +24,7 @@ ItemSettings:
   loreResaleValues: '&7出售可获得$resale $currencyName'
   eliteEnchantmentLoreStrings: 精英
   noSoulbindLore: '&7未绑定灵魂！'
-  preventEliteItemDisenchantmentMessage: '&c[精英怪物] 无法祛除精英怪物附魔！'
+  preventEliteItemDisenchantmentMessage: '&c[精英怪物] 无法祛除精英物品附魔！'
   scrapSucceededMessageV2: '&8[精英怪物] &2成功废弃$amount次！'
   scrapFailedMessageV2: '&8[精英怪物] &2废弃失败$amount次！'
   lowDurabilityItemDropMessage: '&8[精英怪物] &c耐久度低，已卸下盔甲！ &8请在NPC处用废品维修！'
@@ -2777,7 +2777,7 @@ animated_armor_drop_chestplate:
   name: '&4附魔胸甲'
   lore:
     - '&8你真的找到了'
-    - '&8要了你的命。'
+    - '&8这件盔甲。'
 animated_armor_drop_helmet:
   name: '&8附魔头盔'
   lore:
@@ -2882,16 +2882,16 @@ cheetah_charm:
 circus_ringmaster_drop_charm:
   name: '&d马戏团领班的鞭子'
   lore:
-    - '&d用于执行可怕的惩罚。'
+    - '&d用于执行可怕的惩罚。1'
 craftenmine_terror_drop_trident:
-  name: '&c恶魂斩裂者'
+  name: '&c恶魂斩裂者1'
   lore:
-    - '&c非常适合'
-    - '&c斩杀恶魂。'
+    - '&c非常适合1'
+    - '&c斩杀恶魂。1'
 creeperpede_drop_chestplate:
-  name: '&d防爆背心'
+  name: '&d防爆背心1'
   lore:
-    - '&d让你感觉不到'
+    - '&d让你感觉不到1'
     - '&d爆炸的存在。'
 crone_drop_axe:
   name: '&f女巫讨伐者'
@@ -4409,7 +4409,7 @@ primis_terravilla_hog_on_my_porch_reward_helmet:
   lore:
     - '&6使用尖背野猪皮革制成。'
 primis_terravilla_perfect_sample:
-  name: '&e完美样品'
+  name: '&e完美样本'
   lore:
     - '&e它看起来像鱼……'
     - '&e但显然它不是……'
@@ -4429,9 +4429,9 @@ primis_terravilla_two_legged_terror_growth:
   lore:
     - '&e大型成熟体。'
 primis_terravilla_two_legged_terror_sample:
-  name: '&e双足恐怖生物实验体'
+  name: '&e双足恐怖生物样本'
   lore:
-    - '&e简单的实验体。'
+    - '&e简单的样本。'
 primis_wolf_hide_boots:
   name: '&5狼皮拖鞋'
   lore:
@@ -5566,47 +5566,47 @@ craftenmine_terror:
 craftenmine_terror_mount:
   name: '$eventBossLevel &8恶魂运输者'
 creeperpede_1:
-  name: '$eventBossLevel &5Creeperpede Observer'
-  locationMessage: '&cCreeperpede: $distance格！'
+  name: '$eventBossLevel &5嵌合苦力怕观察者'
+  locationMessage: '&c嵌合苦力怕: $distance格！'
   spawnMessage: '&c卡夫特麦博士的实验体在游荡！'
-  deathMessage: '&aThe Creeperpede was stopped in its tracks by $players!.'
+  deathMessage: '&a嵌合苦力怕被$players杀死了'
   escapeMessage: '&c卡夫特麦博士的实验体逃脱了！'
 creeperpede_2:
-  name: '$eventBossLevel &5Creeperpede Rider'
+  name: '$eventBossLevel &5嵌合苦力怕骑士'
 creeperpede_3:
-  name: '$eventBossLevel &5Creeperpede Rider'
+  name: '$eventBossLevel &5嵌合苦力怕骑士'
 creeperpede_4:
-  name: '$eventBossLevel &5Creeperpede Rider'
+  name: '$eventBossLevel &5嵌合苦力怕骑士'
 creeperpede_5:
-  name: '$eventBossLevel &5Creeperpede Carrier'
+  name: '$eventBossLevel &5嵌合苦力怕运输者'
 crone:
-  name: '$eventBossLevel &aOld Crone'
-  locationMessage: '&cOld Crone: $distance格！'
-  spawnMessage: '&cAn Old Crone has wandered into this world!'
-  deathMessage: '&aThe Crone was vanquished by $players!.'
-  escapeMessage: '&4The Old Crone has left this world on her broom!'
+  name: '$eventBossLevel &a老太婆'
+  locationMessage: '&c老太婆: $distance格！'
+  spawnMessage: '&c老太婆踏入了这个世界！'
+  deathMessage: '&a$players赶走了老太婆！'
+  escapeMessage: '&4老太婆骑上她的扫帚飞走了！'
 crone_summon:
   name: '$eventBossLevel &f宠物蜘蛛'
 divine_cinder:
-  name: '$eventBossLevel &cDivine Cinder'
-  locationMessage: '&cDivine Cinder: $distance格！'
-  spawnMessage: '&cA divine blaze has appeared!'
-  deathMessage: '&aThe Divine Cinder was defeated by $players!'
-  escapeMessage: '&4The Divine Cinder has smoked away!'
+  name: '$eventBossLevel &c神圣灰烬'
+  locationMessage: '&c神圣灰烬: $distance格！'
+  spawnMessage: '&c神圣灰烬出现了！'
+  deathMessage: '&a神圣灰烬被$players击败了！'
+  escapeMessage: '&4神圣灰烬消散了！'
 ember:
   name: '$reinforcementLevel &c余烬'
 enders_1:
   name: '$eventBossLevel &d末影人'
   locationMessage: '&c末影军团：$distance格！'
-  spawnMessage: '&cA group of ender troublemakers have appeared.'
-  deathMessage: '&aThe Ender Clique was stopped by $players!'
-  escapeMessage: '&4The Ender Clique have left!'
+  spawnMessage: '&c末影军团出现了！'
+  deathMessage: '&a$players阻止了末影军团！'
+  escapeMessage: '&4末影军团离开了！'
 enders_2:
-  name: '$eventBossLevel &dEnderchap'
-  locationMessage: '&cClique Member: $distance格！'
+  name: '$eventBossLevel &d末影人'
+  locationMessage: '&c军团成员：$distance格！'
 enders_3:
-  name: '$eventBossLevel &dEnderdude'
-  locationMessage: '&cClique Member: $distance格！'
+  name: '$eventBossLevel &d末影人'
+  locationMessage: '&c军团成员：$distance格！'
 ender_lapin:
   name: '$eventBossLevel &a末影兔'
 endless_pursuer:
@@ -5632,201 +5632,201 @@ evil_undead_p2:
   locationMessage: '&c邪恶亡灵：$distance格！'
   spawnMessage: '&c邪恶亡灵出现了！'
   deathMessage: '&a$players终结了邪恶亡灵！'
-  escapeMessage: '&4The Evil Undead has escaped!'
+  escapeMessage: '&4邪恶亡灵逃离了！'
 fallen_knight:
-  name: '$eventBossLevel &7Fallen Knight'
-  locationMessage: '&cFallen Knight: $distance格！'
-  spawnMessage: '&cA Fallen Knight rises from their grave!'
-  deathMessage: '&aA Fallen Knight has fallen to $players!.'
-  escapeMessage: '&4The Fallen Knight goes back to slumber!'
+  name: '$eventBossLevel &7堕落骑士'
+  locationMessage: '&c堕落骑士: $distance格！'
+  spawnMessage: '&c堕落骑士从坟墓中爬起！'
+  deathMessage: '&a堕落骑士折服于$players！'
+  escapeMessage: '&4堕落骑士归于长眠！'
 fine_swine:
-  name: '$eventBossLevel &eFine Swine'
+  name: '$eventBossLevel &e精美的猪'
 fine_swine_summon:
-  name: '$eventBossLevel &eMighty Protector'
+  name: '$eventBossLevel &e强大的守护者'
 firestarter:
-  name: '$eventBossLevel &6Firestarter'
-  locationMessage: '&cFirestarter: $distance格！'
-  spawnMessage: '&cA wicked Firestarter has appeared!'
-  deathMessage: '&aThe Firestarter was slain by $players!'
-  escapeMessage: '&4The Firestarter has left!'
+  name: '$eventBossLevel &6纵火者'
+  locationMessage: '&c纵火者: $distance格！'
+  spawnMessage: '&c邪恶的纵火者出现了！'
+  deathMessage: '&a纵火者被$players杀死了！'
+  escapeMessage: '&4纵火者离开了！'
 firestarter_mount:
-  name: '$eventBossLevel &6Spark'
+  name: '$eventBossLevel &6火花'
 fire_conjurer:
-  name: '$eventBossLevel &eFire Conjurer'
-  locationMessage: '&cFire Conjurer: $distance格！'
-  spawnMessage: '&cA master of fire and flame walks this world!'
-  deathMessage: '&aThe Fire Conjurer was extinguished by $players!'
-  escapeMessage: '&4The Fire Conjurer has vanished!'
+  name: '$eventBossLevel &e火术师'
+  locationMessage: '&c火术师: $distance格！'
+  spawnMessage: '&c火术师踏入了这个世界！'
+  deathMessage: '&a火术师被$players熄灭了！'
+  escapeMessage: '&4火术师消失了！'
 fire_conjurer_summon:
-  name: '$eventBossLevel &6Summoned Flame'
+  name: '$eventBossLevel &6火焰召唤物'
 fire_fae:
   name: '$eventBossLevel &c烈焰恼鬼'
 foreign_visitor:
-  name: '$eventBossLevel &5Foreign Visitor'
-  locationMessage: '&cForeign Visitor: $distance格！'
-  spawnMessage: '&cA visitor from a another dimension has arrived!'
-  deathMessage: '&a$players has made sure to let the visitor know that they are not welcome here.'
-  escapeMessage: '&4The visitor has gone back home!'
+  name: '$eventBossLevel &5外来访客'
+  locationMessage: '&c外来访客：$distance格！'
+  spawnMessage: '&c一名来自其他维度的访客到临了！'
+  deathMessage: '&a$players让访客知道了这里不欢迎他们。'
+  escapeMessage: '&4访客回家了！'
 fox_king_cold:
-  name: '$eventBossLevel &1Fox King Cold'
-  locationMessage: '&cFox King Cold: $distance格！'
-  spawnMessage: '&cA magical creature roams the world.'
-  deathMessage: '&aFox King Cold was defeated by $players!'
-  escapeMessage: '&4Fox King Cold has left this world.'
+  name: '$eventBossLevel &1寒冷狐王'
+  locationMessage: '&c寒冷狐王：$distance格！'
+  spawnMessage: '&c一个魔法生物出现在这个世界。'
+  deathMessage: '&a寒冷狐王被$players击败了！'
+  escapeMessage: '&4寒冷狐王离开了这个世界。'
 frost_palace_frost_queen_p0:
-  name: '$bossLevel &8Frost Queen'
-  locationMessage: '&9Frost Queen'
-  spawnMessage: '&9The wind howls. The Frost Queen rises up to the challenge.'
-  deathMessage: '&aThe Frost queen is no more, slain by $players!'
+  name: '$bossLevel &8冰雪女王'
+  locationMessage: '&9冰雪女王'
+  spawnMessage: '&9狂风怒吼，冰雪女王应对你的挑战。'
+  deathMessage: '&a$players杀死了冰雪女王！'
 frost_palace_frost_queen_p1:
-  name: '$bossLevel &8冰雪女王1阶段'
-  locationMessage: '&9冰雪女王1阶段'
+  name: '$bossLevel &8冰雪女王阶段1'
+  locationMessage: '&9冰雪女王阶段1'
 frost_palace_frost_queen_p2:
-  name: '$bossLevel &8冰雪女王2阶段'
-  locationMessage: '&9冰雪女王2阶段'
+  name: '$bossLevel &8冰雪女王阶段2'
+  locationMessage: '&9冰雪女王阶段2'
 frost_palace_frost_queen_p3:
-  name: '$bossLevel &8Frost Queen phase 3'
-  locationMessage: '&9Frost Queen phase 3'
+  name: '$bossLevel &8冰雪女王阶段3'
+  locationMessage: '&9冰雪女王阶段3'
 frost_palace_frost_queen_p4:
-  name: '$bossLevel &8Frost Queen phase 4'
-  locationMessage: '&9Frost Queen phase 4'
+  name: '$bossLevel &8冰雪女王阶段4'
+  locationMessage: '&9冰雪女王阶段4'
 frost_palace_frost_queen_p5:
-  name: '$bossLevel &8Frost Queen phase 5'
-  locationMessage: '&9Frost Queen phase 5'
+  name: '$bossLevel &8冰雪女王阶段5'
+  locationMessage: '&9冰雪女王阶段5'
 frost_palace_frost_queen_p6:
-  name: '$bossLevel &8Frost Queen phase 6'
-  locationMessage: '&9Frost Queen phase 6'
+  name: '$bossLevel &8冰雪女王阶段6'
+  locationMessage: '&9冰雪女王阶段6'
 frost_palace_frost_queen_p7:
-  name: '$bossLevel &8Frost Queen phase 7'
+  name: '$bossLevel &8冰雪女王阶段7'
   deathMessages:
     - '&e&l---------------------------------------------'
-    - '&eThe Frost Queen was thawed!'
-    - '&c&l    1st Damager: $damager1name &cwith $damager1damage damage!'
-    - '&6&l    2nd Damager: $damager2name &6with $damager2damage damage!'
-    - '&e&l    3rd Damager: $damager3name &ewith $damager3damage damage!'
-    - '&aSlayers: $players'
+    - '&e冰雪女王融化了！'
+    - '&c&l    输出第一名：$damager1name&c造成了$damager1damage点伤害！'
+    - '&6&l    输出第二名：$damager2name&6造成了$damager2damage点伤害'
+    - '&e&l    输出第三名：$damager3name &e造成了$damager3damage点伤害 ！'
+    - '&a终结者：$players'
     - '&e&l---------------------------------------------'
-  locationMessage: '&9Frost Queen phase 7'
+  locationMessage: '&9冰雪女王阶段7'
 frost_palace_reinforcement_1:
-  name: '$reinforcementLevel Spirit of Winter'
+  name: '$reinforcementLevel 冬之魂'
 frost_palace_reinforcement_2:
-  name: '$reinforcementLevel Spirit of Spring'
+  name: '$reinforcementLevel 春之魂'
 frost_palace_reinforcement_3:
-  name: '$reinforcementLevel Spirit of Summer'
+  name: '$reinforcementLevel 夏之魂'
 fulgora:
-  name: '$eventBossLevel &3Fulgora'
-  locationMessage: '&cFulgora: $distance格！'
-  spawnMessage: '&cA mighty thunder goat has come!'
-  deathMessage: '&aFulgora was stopped by $players!'
-  escapeMessage: '&4Fulgora has left this place!'
+  name: '$eventBossLevel &3雷电女神'
+  locationMessage: '&c雷电女神：$distance格！'
+  spawnMessage: '&c强大的雷神出现了！'
+  deathMessage: '&a雷电女神被$players阻止了！'
+  escapeMessage: '&4雷电女神离开了！'
 gamma_werewolf:
   name: '$reinforcementLevel &7γ'
 goblin_invader:
-  name: '$eventBossLevel &2Goblin Leader'
-  locationMessage: '&cGoblin Army: $distance格！'
-  spawnMessage: '&cA Goblin Army has invaded this realm!'
-  deathMessage: '&aThe Goblin Army has been vanquished by $players!'
-  escapeMessage: '&4The Goblin Army is done with this realm!'
+  name: '$eventBossLevel &2哥布林队长'
+  locationMessage: '&c哥布林军团：$distance格！'
+  spawnMessage: '&c哥布林军团入侵了！'
+  deathMessage: '&a哥布林军团被$players消灭了！'
+  escapeMessage: '&4哥布林军团离开了！'
 goblin_invader_summon_1:
-  name: '&2Goblin Warrior'
+  name: '&2哥布林战士'
 goblin_invader_summon_2:
-  name: '&2Goblin Fighter'
+  name: '&2哥布林斗士'
 goblin_invader_summon_3:
-  name: '&2Goblin Trooper'
+  name: '&2哥布林骑兵'
 goblin_invader_summon_4:
-  name: '&2Goblin Reinforcements'
+  name: '&2哥布林援军'
 greedy_dwarf:
-  name: '$eventBossLevel &9Greedy Dwarf'
-  locationMessage: '&cGreedy Dwarf: $distance格！'
-  spawnMessage: '&cCan you find the Greedy Dwarf digging somewhere underground?!'
-  deathMessage: '&aThe Greedy Dwarf was released of their curse by $players!'
-  escapeMessage: '&4The Greedy Dwarf had found their treasure and they left!'
+  name: '$eventBossLevel &9贪婪的矮人'
+  locationMessage: '&c贪婪的矮人: $distance格！'
+  spawnMessage: '&c你能找到在地下挖掘的贪婪矮人吗？！'
+  deathMessage: '&a$players解除了贪婪矮人的诅咒！'
+  escapeMessage: '&4贪婪的矮人找到了财宝离开了！'
 gremlin_1:
-  name: '$eventBossLevel &eGremlin'
-  locationMessage: '&cGremlin: $distance格！'
-  spawnMessage: '&cA Gremlin hoard has invaded this world!'
-  escapeMessage: '&4The Gremlin hoard has disappeared!'
+  name: '$eventBossLevel &e小鬼'
+  locationMessage: '&c小鬼: $distance格！'
+  spawnMessage: '&c小鬼入侵了这个世界！'
+  escapeMessage: '&4小鬼消失了！'
 gremlin_10:
-  name: '$eventBossLevel &eGremlin'
-  locationMessage: '&cGremlin: $distance格！'
-  escapeMessage: '&4The Gremlin hoard has disappeared!'
+  name: '$eventBossLevel &e小鬼'
+  locationMessage: '&c小鬼: $distance格！'
+  escapeMessage: '&4小鬼消失了！'
 gremlin_2:
-  name: '$eventBossLevel &eGremlin'
-  locationMessage: '&cGremlin: $distance格！'
-  escapeMessage: '&4The Gremlin hoard has disappeared!'
+  name: '$eventBossLevel &e小鬼'
+  locationMessage: '&c小鬼: $distance格！'
+  escapeMessage: '&4小鬼消失了！'
 gremlin_3:
-  name: '$eventBossLevel &eGremlin'
-  locationMessage: '&cGremlin: $distance格！'
-  escapeMessage: '&4The Gremlin hoard has disappeared!'
+  name: '$eventBossLevel &e小鬼'
+  locationMessage: '&c小鬼: $distance格！'
+  escapeMessage: '&4小鬼消失了！'
 gremlin_4:
-  name: '$eventBossLevel &eGremlin'
-  locationMessage: '&cGremlin: $distance格！'
-  escapeMessage: '&4The Gremlin hoard has disappeared!'
+  name: '$eventBossLevel &e小鬼'
+  locationMessage: '&c小鬼: $distance格！'
+  escapeMessage: '&4小鬼消失了！'
 gremlin_5:
-  name: '$eventBossLevel &eGremlin'
-  locationMessage: '&cGremlin: $distance格！'
-  escapeMessage: '&4The Gremlin hoard has disappeared!'
+  name: '$eventBossLevel &e小鬼'
+  locationMessage: '&c小鬼: $distance格！'
+  escapeMessage: '&4小鬼消失了！'
 gremlin_6:
-  name: '$eventBossLevel &eGremlin'
-  locationMessage: '&cGremlin: $distance格！'
-  escapeMessage: '&4The Gremlin hoard has disappeared!'
+  name: '$eventBossLevel &e小鬼'
+  locationMessage: '&c小鬼: $distance格！'
+  escapeMessage: '&4小鬼消失了！'
 gremlin_7:
-  name: '$eventBossLevel &eGremlin'
-  locationMessage: '&cGremlin: $distance格！'
-  escapeMessage: '&4The Gremlin hoard has disappeared!'
+  name: '$eventBossLevel &e小鬼'
+  locationMessage: '&c小鬼: $distance格！'
+  escapeMessage: '&4小鬼消失了！'
 gremlin_8:
-  name: '$eventBossLevel &eGremlin'
-  locationMessage: '&cGremlin: $distance格！'
-  escapeMessage: '&4The Gremlin hoard has disappeared!'
+  name: '$eventBossLevel &e小鬼'
+  locationMessage: '&c小鬼: $distance格！'
+  escapeMessage: '&4小鬼消失了！'
 gremlin_9:
-  name: '$eventBossLevel &eGremlin'
-  locationMessage: '&cGremlin: $distance格！'
-  escapeMessage: '&4The Gremlin hoard has disappeared!'
+  name: '$eventBossLevel &e小鬼'
+  locationMessage: '&c小鬼: $distance格！'
+  escapeMessage: '&4小鬼消失了！'
 grunter:
-  name: '$eventBossLevel &aGrunter'
-  locationMessage: '&cGrunter: $distance格！'
-  spawnMessage: '&cA mighty hog roams the lands.'
-  deathMessage: '&aGrunter was stopped by $players!'
-  escapeMessage: '&4Grunter has escaped!'
+  name: '$eventBossLevel &a猪哼者'
+  locationMessage: '&c猪哼者: $distance格！'
+  spawnMessage: '&c一头强大的野猪在地上游荡。'
+  deathMessage: '&a猪哼者被$players阻止了！'
+  escapeMessage: '&4猪哼者逃离了！'
 harmless_chicken:
-  name: '$eventBossLevel &fHarmless Chick'
-  locationMessage: '&cHarmless Chick: $distance格！'
-  spawnMessage: '&cBwok!!! Cluck, Cluck! Bawk!'
-  deathMessage: '&aBaaaawk! Cluck...$players!'
-  escapeMessage: '&4Harmless Chicken has baaaaaawked away.'
+  name: '$eventBossLevel &f无害的小鸡'
+  locationMessage: '&c无害的小鸡: $distance格！'
+  spawnMessage: '&c喔喔喔！！咯咯咯！'
+  deathMessage: '&a咯咯咯！$players!'
+  escapeMessage: '&4无害的小鸡离开了。'
 harmless_chicken_summon:
-  name: '$eventBossLevel &fClucktector'
+  name: '$eventBossLevel &f侦察鸡'
 hog_rider:
-  name: '$eventBossLevel &6Hog Rider'
-  locationMessage: '&cHog Rider: $distance格！'
-  spawnMessage: '&cA mighty Hog Rider has appeared!'
-  deathMessage: '&aThe Hog Rider and their Hog were vanquished by $players!'
-  escapeMessage: '&4The Hog Rider has vanished.'
+  name: '$eventBossLevel &6野猪骑士'
+  locationMessage: '&c野猪骑士: $distance格！'
+  spawnMessage: '&c强大的野猪骑士出现了！'
+  deathMessage: '&a野猪骑士及其野猪被$players消灭了！'
+  escapeMessage: '&4野猪骑士消失了。'
 hog_rider_mount:
-  name: '$eventBossLevel &eLoyal Hog'
+  name: '$eventBossLevel &e皇家野猪'
 hog_rider_p2:
-  name: '$eventBossLevel &6Hog Rider'
-  locationMessage: '&cHog Rider: $distance格！'
-  deathMessage: '&aThe Hog Rider and their Hog were vanquished by $players!'
-  escapeMessage: '&4The Hog Rider has vanished.'
+  name: '$eventBossLevel &6野猪骑士'
+  locationMessage: '&c野猪骑士: $distance格！'
+  deathMessage: '&a野猪骑士及其野猪被$players消灭了！'
+  escapeMessage: '&4野猪骑士消失了。'
 hog_rider_summon:
-  name: '$eventBossLevel &eLoyal Zob-Hog'
+  name: '$eventBossLevel &e皇家野猪'
 horde_champion:
-  name: '$eventBossLevel &cHorde Champion'
-  locationMessage: '&cUndead Horde Champion: $distance格！'
-  spawnMessage: '&cAn undead horde approaches!'
-  deathMessage: '&aThe horde has been stopped by $players!.'
-  escapeMessage: '&4AThe undead horde has left!'
+  name: '$eventBossLevel &c部队冠军'
+  locationMessage: '&c亡灵部队冠军: $distance格！'
+  spawnMessage: '&c亡灵军团接近了！'
+  deathMessage: '&ahorde has been stopped by $players!.'
+  escapeMessage: '&4Aundead horde离开了！'
 horrid_duplicator:
-  name: '$eventBossLevel &dHorrid Duplicator'
+  name: '$eventBossLevel &d恐怖复制者'
   locationMessage: '&cHorrid Duplicator: $distance格！'
-  spawnMessage: '&cAn endless foe has appeared!'
-  deathMessage: '&aThe Horrid Duplicator was slain by $players!'
-  escapeMessage: '&4The Horrid Duplicator has left!'
+  spawnMessage: '&cAn endless foe出现了！'
+  deathMessage: '&aHorrid Duplicator被$players杀死了！'
+  escapeMessage: '&4Horrid Duplicator离开了！'
 horrid_duplicator_summon:
-  name: '$eventBossLevel &dHorrid Duplicator'
+  name: '$eventBossLevel &d恐怖复制者'
 horrid_duplicator_summon_1:
-  name: '$eventBossLevel &dHorrid Duplicator'
+  name: '$eventBossLevel &d恐怖复制者'
 ice_fae:
   name: '$eventBossLevel &b寒冰恼鬼'
 imperial_bee_guard:
@@ -5923,117 +5923,117 @@ killer_rabbit_of_caerbannog:
 kraken:
   name: '$eventBossLevel &3「深海巨妖」克拉肯'
 krampus:
-  name: '$eventBossLevel &1Krampus'
-  locationMessage: '&cKrampus: $distance格！'
-  spawnMessage: '&cKrampus has come to punish the naughty!'
-  deathMessage: '&aKrampus has been sent back to his realm to by $players!.'
-  escapeMessage: '&4There was nobody to punish!'
+  name: '$eventBossLevel &1坎普斯'
+  locationMessage: '&c坎普斯: $distance格！'
+  spawnMessage: '&c坎普斯前来惩罚淘气鬼！'
+  deathMessage: '&a坎普斯被$players送回了自己的领域！'
+  escapeMessage: '&4没人受到惩罚！'
 large_hopper:
-  name: '$eventBossLevel &dLarge Hopper'
-  locationMessage: '&cLarge Hopper: $distance格！'
-  spawnMessage: '&cA large beast is hopping around!'
-  deathMessage: '&aThe Large Hopper was stopped by $players!'
-  escapeMessage: '&4The Large Hopper has jumped out of this world!'
+  name: '$eventBossLevel &d大型跳跃者'
+  locationMessage: '&c大型跳跃者: $distance格！'
+  spawnMessage: '&c一只大型野兽在附近蹦跳！'
+  deathMessage: '&a$players终结了大型跳跃者！'
+  escapeMessage: '&4大型跳跃者跳出了这个世界！'
 large_hopper_mount:
-  name: '$eventBossLevel &aHopper'
+  name: '$eventBossLevel &a跳跃者'
 lightning_fae:
   name: '$eventBossLevel &e雷霆恼鬼'
 living_shadow:
-  name: '$eventBossLevel &7Living Shadow'
-  locationMessage: '&cLiving Shadow: $distance格！'
-  spawnMessage: '&cLiving Shadow has appeared! Do not look it in the yes!'
-  deathMessage: '&aLiving Shadow has been turned into Dead Shadow by $players!.'
-  escapeMessage: '&4The Living Shadow saw nothing so it left!'
+  name: '$eventBossLevel &7暗影'
+  locationMessage: '&c暗影: $distance格！'
+  spawnMessage: '&c暗影出现了！不要直视它！'
+  deathMessage: '&a$players让暗影归于死寂！'
+  escapeMessage: '&4暗影离开了！'
 meme_boss:
-  name: '&2The Maestro'
+  name: '&2大师'
 meme_boss_reinforcement:
-  name: '&cFan'
+  name: '&c追随者'
 merman:
-  name: '$eventBossLevel &1Merman'
-  locationMessage: '&cMerman: $distance格！'
-  spawnMessage: '&cA Merman swims the oceans!'
-  deathMessage: '&aThe Merman was slain by $players!'
-  escapeMessage: '&4The Merman has retreated.'
+  name: '$eventBossLevel &1人鱼'
+  locationMessage: '&c人鱼: $distance格！'
+  spawnMessage: '&c人鱼在海洋里遨游！'
+  deathMessage: '&a$players杀死了人鱼！'
+  escapeMessage: '&4人鱼离开了。'
 monster_of_the_deep:
-  name: '$eventBossLevel &bMonster of the Deep'
-  locationMessage: '&cMonster of the Deep: $distance格！'
-  spawnMessage: '&cSomething terrible swims the oceans!'
-  deathMessage: '&aMonster of the Deep has been slain by $players!'
-  escapeMessage: '&4The oceans are once again safe!'
+  name: '$eventBossLevel &b深海怪物'
+  locationMessage: '&c深海怪物: $distance格！'
+  spawnMessage: '&c恐怖的生物在海洋里遨游！'
+  deathMessage: '&a深海怪物被$players杀死了！'
+  escapeMessage: '&4海洋再次归于平静！'
 moon_spider:
-  name: '$eventBossLevel &fMoon Spider'
-  locationMessage: '&cMoon Spider: $distance格！'
-  spawnMessage: '&cA powerful arachnid has been spotted!'
-  deathMessage: '&aThe Moon Spider was slain by $players!'
-  escapeMessage: '&4The Moon Spider has left!'
+  name: '$eventBossLevel &f月球蜘蛛'
+  locationMessage: '&c月球蜘蛛: $distance格！'
+  spawnMessage: '&c强大的蜘蛛出现了！'
+  deathMessage: '&a月球蜘蛛被$players杀死了！'
+  escapeMessage: '&4月球蜘蛛离开了。'
 moon_spider_summon:
-  name: '&fSilk Mender'
+  name: '&f织丝者'
 necromancer:
-  name: '$eventBossLevel &7Necromancer'
-  locationMessage: '&cNecromancer: $distance格！'
-  spawnMessage: '&cA powerful evil Necromancer has entered this world!'
-  deathMessage: '&aThe Necromancer is no more thanks to $players!'
-  escapeMessage: '&4The Necromancer has disappeared.'
+  name: '$eventBossLevel &7死灵法师'
+  locationMessage: '&c死灵法师: $distance格！'
+  spawnMessage: '&c强大的邪恶死灵法师进入了这个世界！'
+  deathMessage: '&a$players解决了死灵法师！'
+  escapeMessage: '&4死灵法师消失了。'
 necromancer_summon_1:
-  name: '$eventBossLevel &fFiery Bones'
+  name: '$eventBossLevel &f烈焰骷髅'
 necromancer_summon_2:
-  name: '$eventBossLevel &bChilled Bones'
+  name: '$eventBossLevel &b冰冻骷髅'
 necromancer_summon_3:
-  name: '$eventBossLevel &8Charred Bones'
+  name: '$eventBossLevel &8烧焦骷髅'
 necronomicon_skeleton:
   name: '$reinforcementLevel &7唤灵骷髅'
 necronomicon_zombie:
   name: '$reinforcementLevel &7唤灵僵尸'
 netherite_golem:
-  name: '$eventBossLevel &8Netherite Golem'
-  locationMessage: '&cNetherite Golem: $distance格！'
-  spawnMessage: '&cAn ancient golem has entered this world!'
-  deathMessage: '&aThe Netherite Golem was slain by $players!'
-  escapeMessage: '&4The Netherite Golem has left this world!'
+  name: '$eventBossLevel &8下界合金傀儡'
+  locationMessage: '&c下界合金傀儡: $distance格！'
+  spawnMessage: '&c古代傀儡进入了这个世界！'
+  deathMessage: '&a下界合金傀儡被$players杀死了！'
+  escapeMessage: '&4下界合金傀儡离开了这个世界！'
 nether_escapee:
-  name: '$eventBossLevel &6Nether Escapee'
-  locationMessage: '&cNether Escapee: $distance格！'
-  spawnMessage: '&cA terrible foe has escaped the nether!'
-  deathMessage: '&aThe Nether Escapee was sent back to the nether by $players!'
-  escapeMessage: '&4The Nether Escapee has left this place!'
+  name: '$eventBossLevel &6下界逃犯'
+  locationMessage: '&c下界逃犯: $distance格！'
+  spawnMessage: '&c可怕的强敌逃离了下界！'
+  deathMessage: '&a下界逃犯被$players送回了下界！'
+  escapeMessage: '&4下界逃犯离开了这片地方！'
 nether_hag:
-  name: '$eventBossLevel &4Nether Hag'
-  locationMessage: '&cNether Hag: $distance格！'
-  spawnMessage: '&cAn evil hag walks the nether!'
-  deathMessage: '&aThe Nether Hag was slain by $players!'
-  escapeMessage: '&4The Nether Hag has vanished!'
+  name: '$eventBossLevel &4下界巫婆'
+  locationMessage: '&c下界巫婆: $distance格！'
+  spawnMessage: '&c邪恶的巫婆步入了下界！'
+  deathMessage: '&a下界巫婆被被$players杀死了！'
+  escapeMessage: '&4下界巫婆消失了！'
 nether_wasp:
-  name: '$eventBossLevel &6Nether Wasp'
-  locationMessage: '&cNether Wasp: $distance格！'
-  spawnMessage: '&cTry not to get stung, a wasp roams the nether!'
-  deathMessage: '&aThe Nether Wasp was slain by $players!'
-  escapeMessage: '&4The Nether Wasp has decided to buzz off!'
+  name: '$eventBossLevel &6下界黄蜂'
+  locationMessage: '&c下界黄蜂: $distance格！'
+  spawnMessage: '&c黄蜂在下界漫游，小心蜇伤！'
+  deathMessage: '&a下界黄蜂被$players杀死了！'
+  escapeMessage: '&4下界黄蜂飞走了！'
 nether_wasp_summon_1:
-  name: '$eventBossLevel &cHive Summoner'
+  name: '$eventBossLevel &c蜂巢召唤者'
 nether_wasp_summon_2:
-  name: '$eventBossLevel &cHive Wasp'
+  name: '$eventBossLevel &c蜂巢黄蜂'
 nightwing:
-  name: '$eventBossLevel &cNightwing'
-  locationMessage: '&cNightwing: $distance格！'
-  spawnMessage: '&cA bird of the night has appeared!'
-  deathMessage: '&aNightwing was stopped by $players!'
-  escapeMessage: '&4Nightwing has flown home.'
+  name: '$eventBossLevel &c夜翼'
+  locationMessage: '&c夜翼: $distance格！'
+  spawnMessage: '&c黑夜之鸟出现了！'
+  deathMessage: '&a夜翼被$players杀死了！'
+  escapeMessage: '&4夜翼飞回家了。'
 nightwing_summon:
-  name: '$eventBossLevel &cSmart Bomb'
+  name: '$eventBossLevel &c智能炸弹'
 nightwing_summon_1:
-  name: '$eventBossLevel &cSworn Protector'
+  name: '$eventBossLevel &c誓言守护者'
 night_crawler:
-  name: '$eventBossLevel &4Night Crawler'
-  locationMessage: '&cNight Crawler: $distance格！'
-  spawnMessage: '&cSomething awful is crawling about!'
-  deathMessage: '&aThe Night Crawler has been slain by $players!'
-  escapeMessage: '&4The Night Crawler Undead has left!'
+  name: '$eventBossLevel &4黑夜爬虫'
+  locationMessage: '&c黑夜爬虫: $distance格！'
+  spawnMessage: '&c有个可怕的东西在到处爬动！'
+  deathMessage: '&a黑夜爬虫被$players杀死了！'
+  escapeMessage: '&4黑夜爬虫离开了！'
 night_horder:
-  name: '$eventBossLevel &aNight Horder'
-  locationMessage: '&cNight Horder: $distance格！'
-  spawnMessage: '&cA Night Horder has appeared! Slay him to loot his booty!'
-  deathMessage: '&aThe Night Horder has been plundered by $players!'
-  escapeMessage: '&4The Night Horder has escaped!'
+  name: '$eventBossLevel &a夜间藏宝者'
+  locationMessage: '&c夜间藏宝者: $distance格！'
+  spawnMessage: '&c夜间藏宝者出现了！去掠夺它的战利品吧！'
+  deathMessage: '&a夜间藏宝者被$players掠夺了！'
+  escapeMessage: '&4夜间藏宝者逃脱了！'
 oasis_10_old_bones:
   name: '$normalLevel &f老骨头'
 oasis_10_surreptitious_scribe:
@@ -6227,15 +6227,15 @@ oasis_8_tough_thaumaturge:
 oasis_8_troublesome_treasure_hoarder:
   name: '$normalLevel &d恼人的藏宝者'
 okami:
-  name: '$eventBossLevel &cOkami'
-  locationMessage: '&cOkami: $distance格！'
-  spawnMessage: '&cA god has awakened!'
-  deathMessage: '&a$players has fought with a god and won!.'
-  escapeMessage: '&4Okami has left!'
+  name: '$eventBossLevel &c狼神'
+  locationMessage: '&c狼神: $distance格！'
+  spawnMessage: '&c狼神觉醒了！'
+  deathMessage: '&a$players战胜了狼神！'
+  escapeMessage: '&4狼神离开了！'
 okami_p2:
-  name: '$eventBossLevel &cOkami'
+  name: '$eventBossLevel &c狼神'
 okami_p3:
-  name: '$eventBossLevel &cOkami'
+  name: '$eventBossLevel &c狼神'
 omega_wolf:
   name: '$reinforcementLevel &7终焉之狼'
 pillager_caravan_beast:
@@ -6287,17 +6287,17 @@ primis_angry_goat:
 primis_beta_feral_wolf:
   name: '$reinforcementLevel &8β野狼'
 primis_blood_temple_blood_golem:
-  name: '$normalLevel &cBlood Golem'
+  name: '$normalLevel &c血傀儡'
 primis_blood_temple_charred_construct:
-  name: '$normalLevel &cCharred Construct'
+  name: '$normalLevel &3烧焦的构造体'
 primis_blood_temple_conjured_flame:
-  name: '$normalLevel &cConjured Flame'
+  name: '$normalLevel &c魔焰'
 primis_blood_temple_eradicator:
-  name: '$normalLevel &cEradicator'
+  name: '$normalLevel &6灭除者'
 primis_blood_temple_fire_conjurer:
-  name: '$normalLevel &cFire Conjurer'
+  name: '$normalLevel &c火术师'
 primis_blood_temple_flame_elemental:
-  name: '$normalLevel &cFlame Elemental'
+  name: '$normalLevel &c火元素'
 primis_catacomb_nemus_to_redwood_archer:
   name: '$normalLevel &8墓穴弓箭手'
 primis_catacomb_nemus_to_redwood_golem:
@@ -6323,17 +6323,17 @@ primis_catacomb_pontis_to_ice_necromancer_p2:
 primis_catacomb_pontis_to_ice_swordsman:
   name: '$normalLevel &8墓穴剑士'
 primis_catacomb_trio_archer:
-  name: '$normalLevel &8Catacomb Archer'
+  name: '$normalLevel &8墓穴弓箭手'
 primis_catacomb_trio_golem:
-  name: '$normalLevel &bCatacomb Golem'
+  name: '$normalLevel &b墓穴傀儡'
 primis_catacomb_trio_necromancer_p1:
-  name: '$bossLevel &4Catacomb Necromancer'
+  name: '$bossLevel &4Catacomb 死灵法师'
 primis_catacomb_trio_necromancer_p2:
-  name: '$bossLevel &4Catacomb Necromancer'
+  name: '$bossLevel &4Catacomb 死灵法师'
 primis_catacomb_trio_necromancer_summon:
-  name: '$bossLevel &4Catacomb Necromancer'
+  name: '$bossLevel &4Catacomb 死灵法师'
 primis_catacomb_trio_swordsman:
-  name: '$normalLevel &8Catacomb Swordsman'
+  name: '$normalLevel &8墓穴剑士'
 primis_crazed_rabbit:
   name: '$normalLevel &c疯兔'
 primis_crystaline_summoner_p1:
@@ -6462,9 +6462,9 @@ primis_ice_village_fallen_trial_warrior_summon:
 primis_ice_village_frost_fur_ursus:
   name: '$normalLevel &9冰霜毛熊'
 primis_ice_village_frost_simulacrum:
-  name: '$normalLevel &3Frost Simulacrum'
+  name: '$normalLevel &3冰霜幻影'
 primis_ice_village_ice_simulacrum:
-  name: '$reinforcementLevel &3Ice Simulacrum'
+  name: '$reinforcementLevel &3寒冰幻影'
 primis_ice_village_manifested_nightmare:
   name: '&b显形梦魇'
 primis_ice_village_meek_customer:
@@ -6476,13 +6476,13 @@ primis_ice_village_screecher_bomb_summon:
 primis_ice_village_sky_screecher:
   name: '&b天鸣者'
 primis_ice_village_the_ice_aspect:
-  name: '$minibossLevel &9Ice Aspect'
+  name: '$minibossLevel &9寒冰幻象'
 primis_ice_village_the_ice_elemental:
   name: '$bossLevel &9极恶冰元素'
 primis_ice_village_the_ice_elemental_p2:
-  name: '$bossLevel &9Ice Elemental'
+  name: '$bossLevel &9冰元素'
 primis_ice_village_the_ice_elemental_p3:
-  name: '$bossLevel &9Ice Elemental'
+  name: '$bossLevel &9冰元素'
 primis_ice_village_trial_of_ice_minor_ice_elemental:
   name: '&b小冰元素'
 primis_ice_village_wolf_summon:
@@ -6676,9 +6676,9 @@ primis_terravilla_bar_brawler:
   onDamagedMessages:
     - 你就这点能耐？
     - 你太弱了！
-    - Why...you!
+    - 你……为什么？
     - 给你点颜色瞧瞧！
-    - Who the heck are you!
+    - 你谁啊！
     - 尝尝这个！
 primis_terravilla_earth_elemental:
   name: '$bossLevel &f地元素'
@@ -6687,11 +6687,11 @@ primis_terravilla_earth_elemental_p2:
 primis_terravilla_earth_elemental_p3:
   name: '$bossLevel &f地元素'
 primis_terravilla_regular_fish:
-  name: '$normalLevel &bRegular Fish'
+  name: '$normalLevel &b普通的鱼'
 primis_terravilla_robber_gladiator:
-  name: '$normalLevel &bRobber Gladiator'
+  name: '$normalLevel &b强盗角斗士'
 primis_terravilla_robber_slugger:
-  name: '$normalLevel &bSlugger'
+  name: '$normalLevel &b走私者'
 primis_undead_archer:
   name: '$normalLevel &f亡灵弓箭手'
 primis_undead_climber:
@@ -6705,38 +6705,38 @@ primis_undead_swordsman:
 pufferfish:
   name: '$eventBossLevel &3河豚'
   locationMessage: '&c河豚: $distance格！'
-  spawnMessage: '&cA puffed fish is swimming in the oceans!'
-  deathMessage: '&aThe 河豚 reign has been ended by $players!'
+  spawnMessage: '&c一只河豚在海洋里游动！'
+  deathMessage: '&a$players终结了河豚！'
   escapeMessage: '&4河豚游走了！'
 pufferfish_summon_1:
   name: '$eventBossLevel &b河豚'
 pufferfish_summon_2:
-  name: '$eventBossLevel &bPooperfish'
+  name: '$eventBossLevel &b河豚'
 pufferfish_summon_3:
-  name: '$eventBossLevel &bPooderfish'
+  name: '$eventBossLevel &b河豚'
 pufferfish_summon_4:
   name: '$eventBossLevel &b河豚'
 queen_bee:
   name: '$eventBossLevel &6蜂后'
 rabbit_wolf_1:
-  name: '$eventBossLevel &cFlame Wolf'
-  locationMessage: '&cFlame: $distance格！'
-  spawnMessage: '&cA powerful duo has come to this world!'
-  deathMessage: '&aThe Wolf and the Rabbit were stopped by $players!'
-  escapeMessage: '&4The Wolf and the Rabbit have left this place!'
+  name: '$eventBossLevel &c炎狼'
+  locationMessage: '&c炎狼：$distance格！'
+  spawnMessage: '&c一对强大的生物降临这个世界！'
+  deathMessage: '&a$players阻止了狼与兔！'
+  escapeMessage: '&4狼与兔离开了！'
 rabbit_wolf_2:
-  name: '$eventBossLevel &cLightning Rabbit'
-  locationMessage: '&cLightning: $distance格！'
-  deathMessage: '&aThe Wolf and the Rabbit were stopped by $players!'
-  escapeMessage: '&4The Wolf and the Rabbit have left this place!'
+  name: '$eventBossLevel &c雷兔'
+  locationMessage: '&c雷兔：$distance格！'
+  deathMessage: '&a$players阻止了狼与兔！'
+  escapeMessage: '&4狼与兔离开了！'
 raug:
   name: '$reinforcementLevel &4劳格'
 regular_hoglin:
-  name: '$eventBossLevel &4Regular Hoglin'
-  locationMessage: '&cRegular Hoglin: $distance格！'
-  spawnMessage: '&cA Regular Hoglin has arrived! Nothing special about this Hoglin!'
-  deathMessage: '&aRegular Hoglin was slain by $players!.'
-  escapeMessage: '&4The Regular Hoglin has left!'
+  name: '$eventBossLevel &4普通的疣猪兽'
+  locationMessage: '&c普通的疣猪兽: $distance格！'
+  spawnMessage: '&c一只普通的疣猪兽出现了！它没什么特别的！'
+  deathMessage: '&a普通的疣猪兽被$players杀死了！'
+  escapeMessage: '&4普通的疣猪兽离开了！'
 rotting_diver:
   name: '$eventBossLevel &b腐烂潜者'
   locationMessage: '&c腐烂潜者：$distance格！'
@@ -6744,43 +6744,43 @@ rotting_diver:
   deathMessage: '&a腐烂潜者被$players送入了深渊！'
   escapeMessage: '&4腐烂潜者逃跑了！'
 salty_corpse:
-  name: '$eventBossLevel &bSalty Corpse'
-  locationMessage: '&cSalty Corpse: $distance格！'
-  spawnMessage: '&cSomething awful has floated up to the surface!'
-  deathMessage: '&aThe Salty Corpse was sent back to the depths by $players!'
-  escapeMessage: '&4The Salty Corpse has left!'
+  name: '$eventBossLevel &b盐浸尸体'
+  locationMessage: '&c盐浸尸体: $distance格！'
+  spawnMessage: '&c一些可泡生物浮现出水面！'
+  deathMessage: '&a盐浸尸体被$players扔入了深渊！'
+  escapeMessage: '&4盐浸尸体离开了！'
 skeleton_knight:
   name: '$eventBossLevel &f骷髅骑士'
   locationMessage: '&c骷髅骑士: $distance格！'
-  spawnMessage: '&cThe undead have sent a 骷髅骑士 into the night!'
-  deathMessage: '&aThe 骷髅骑士 was slain by $players!'
-  escapeMessage: '&4The 骷髅骑士 had to retreat!'
+  spawnMessage: '&c骷髅骑士生于黑夜！'
+  deathMessage: '&a骷髅骑士被$players杀死了！'
+  escapeMessage: '&4骷髅骑士撤退了！'
 sky_archer:
   name: '$eventBossLevel &a天空弓箭手'
   locationMessage: '&c天空弓箭手: $distance格！'
-  spawnMessage: '&cA 天空弓箭手 has entered this world! Bring your bow!'
-  deathMessage: '&aThe 天空弓箭手 got sniped by $players!'
-  escapeMessage: '&4The 天空弓箭手 has flown away!'
+  spawnMessage: '&c天空弓箭手进入了这个世界！带上你的弓！'
+  deathMessage: '&a天空弓箭手被$players射死了！'
+  escapeMessage: '&4天空弓箭手飞走了！'
 sky_archer_mount:
   name: '$eventBossLevel &a天马'
 smallstack:
-  name: '$eventBossLevel &bSmallstack Top'
-  locationMessage: '&cSmallstack: $distance格！'
-  spawnMessage: '&cA Smallstack is roaming the wilds!'
-  deathMessage: '&aThe Smallstack was unstacked by $players!'
-  escapeMessage: '&4The Smallstack has left!'
+  name: '$eventBossLevel &b小型堆叠体顶部'
+  locationMessage: '&c小型堆叠体: $distance格！'
+  spawnMessage: '&c一个小型堆叠体在荒野游荡！'
+  deathMessage: '&a小型堆叠体被$players拆散了！'
+  escapeMessage: '&4小型堆叠体离开了！'
 smallstack_1:
-  name: '$eventBossLevel &bSmallstack Middle'
+  name: '$eventBossLevel &b小型堆叠体中部'
 smallstack_2:
-  name: '$eventBossLevel &bSmallstack Middle'
+  name: '$eventBossLevel &b小型堆叠体中部'
 smallstack_3:
-  name: '$eventBossLevel &bSmallstack Middle'
+  name: '$eventBossLevel &b小型堆叠体中部'
 smallstack_4:
-  name: '$eventBossLevel &bSmallstack Bottom'
+  name: '$eventBossLevel &b小型堆叠体底部'
 smallstack_5:
-  name: '$eventBossLevel &bSmallstack Bottom'
+  name: '$eventBossLevel &b小型堆叠体底部'
 smallstack_6:
-  name: '$eventBossLevel &bSmallstack Carrier'
+  name: '$eventBossLevel &b小型堆叠体运输者'
 snoopy:
   name: '&6{&4☠&6} &f史努比'
   onDamageMessages:
@@ -6789,19 +6789,19 @@ snoopy:
     - 汪！
   spawnMessage: '&a非常罕见的史努比出现了！'
 sorcerer_supreme:
-  name: '$eventBossLevel &5Sorcerer Supreme'
-  locationMessage: '&cSorcerer Supreme: $distance格！'
-  spawnMessage: '&cAn almighty Sorcerer has phased into this world!'
-  deathMessage: '&aThe Sorcerer Supreme was defeated by $players!'
-  escapeMessage: '&4The Sorcerer Supreme has left this world!'
+  name: '$eventBossLevel &5至尊法师'
+  locationMessage: '&c至尊法师: $distance格！'
+  spawnMessage: '&c一位强大的法师传送到了这个世界！'
+  deathMessage: '&a至尊法师被$players击败了！'
+  escapeMessage: '&4至尊法师离开了这个时节！'
 sorcerer_supreme_summon:
-  name: '$eventBossLevel &5Eternal Servant'
+  name: '$eventBossLevel &5永恒仆从'
 spider_knight:
-  name: '$eventBossLevel &aDwarven Knight'
-  locationMessage: '&cDwarven Knight: $distance格！'
-  spawnMessage: '&cA Knight has come to challenge the heroes of this place!'
-  deathMessage: '&aThe Knight was defeated by $players!'
-  escapeMessage: '&4The Knight has left this place!'
+  name: '$eventBossLevel &a矮人骑士'
+  locationMessage: '&c矮人骑士: $distance格！'
+  spawnMessage: '&c一位骑士前来挑战这片地方的英雄！'
+  deathMessage: '&a骑士被$players击败了！'
+  escapeMessage: '&4骑士离开了！'
 spider_knight_mount:
   name: '$eventBossLevel &a忠马'
 summonable_wolf:
@@ -6811,23 +6811,23 @@ summonable_wolf:
   onDamagedMessages:
     - 汪！
 super_mite:
-  name: '$eventBossLevel &dSuper Mite'
-  locationMessage: '&cSuper Mite: $distance格！'
-  spawnMessage: '&cA trouble maker appears!'
-  deathMessage: '&aThe mite could not handle a fight with $players!.'
-  escapeMessage: '&4The Super Mite left out of boredom!'
+  name: '$eventBossLevel &d超级螨虫'
+  locationMessage: '&c超级螨虫: $distance格！'
+  spawnMessage: '&c一个麻烦的生物出现了！'
+  deathMessage: '&a在$players面前不堪一击！'
+  escapeMessage: '&4超级螨虫离开了！'
 super_mite_summon:
   name: '$eventBossLevel &d螨虫朋友'
 suspicious_phantom:
-  name: '$eventBossLevel &eSuspicious Phantom'
-  locationMessage: '&cSuspicious Phantom: $distance格！'
-  spawnMessage: '&cA Suspicious Phantom was sighted in the skies!'
-  deathMessage: '&a幻翼 was put to bed by $players!'
-  escapeMessage: '&4The Suspicious Phantom has left!'
+  name: '$eventBossLevel &e可疑的幻翼'
+  locationMessage: '&c可疑的幻翼: $distance格！'
+  spawnMessage: '&c天空中出现了可疑的幻翼！'
+  deathMessage: '&a$players让幻翼安眠了！'
+  escapeMessage: '&4可疑的幻翼离开了！'
 suspicious_phantom_summon:
-  name: '$eventBossLevel &cFlamer'
+  name: '$eventBossLevel &c火焰幻翼'
 suspicious_phantom_summon_1:
-  name: '$eventBossLevel &cFireballer'
+  name: '$eventBossLevel &c火球幻翼'
 test_boss:
   name: '$eventBossLevel &e试验品'
   deathMessages:
@@ -7152,13 +7152,13 @@ halloween_event_boss_p2:
 halloween_event_boss_reinforcement:
   name: '$normalLevel 惊悚骷髅'
 the_hunter:
-  name: '$eventBossLevel &4The Hunter'
-  locationMessage: '&cThe Hunter: $distance格！'
-  spawnMessage: '&cA Hunter is on the prowl!'
-  deathMessage: '&aThe Hunter was hunted to extinction by $players!'
-  escapeMessage: '&4The Hunter declares the hunt now over!'
+  name: '$eventBossLevel &4Hunter'
+  locationMessage: '&cHunter: $distance格！'
+  spawnMessage: '&c一个猎人在觅食！'
+  deathMessage: '&aHunter was hunted to extinction by $players!'
+  escapeMessage: '&4Hunter declares the hunt now over!'
 the_hunter_mount:
-  name: '$eventBossLevel &fTamed Beast'
+  name: '$eventBossLevel &f驯服的野兽'
 the_living_dead:
   name: '$reinforcementLevel &6活死人'
 northpole_elf:
@@ -7502,31 +7502,31 @@ treasure_goblin:
   deathMessage: '&a宝藏哥布林被$players杀死了！'
   escapeMessage: '&4宝藏哥布林已逃脱！'
 tree_defender:
-  name: '$eventBossLevel &2Tree Defender'
+  name: '$eventBossLevel &2树木保卫者'
 undead_farmer:
-  name: '$eventBossLevel &aUndead Farmer'
-  locationMessage: '&cUndead Farmer: $distance格！'
-  spawnMessage: '&cAn Undead Farmer walks the earth!'
-  deathMessage: '&aThe Undead Farmer''s career was ended by $players!'
-  escapeMessage: '&4The Undead Farmer has gone back to rest!'
+  name: '$eventBossLevel &a亡灵农民'
+  locationMessage: '&c亡灵农民: $distance格！'
+  spawnMessage: '&c亡灵农民出现了！'
+  deathMessage: '&a亡灵农民被$players终结了！'
+  escapeMessage: '&4亡灵农民安息了！'
 undead_farmer_summon:
-  name: '$eventBossLevel &2Farmers Pride'
+  name: '$eventBossLevel &2农民的骄傲'
 undead_farmer_summon_1:
-  name: '$eventBossLevel &2Failed Hog'
+  name: '$eventBossLevel &2失败的猪'
 undead_horde_summon_1:
-  name: '$reinforcementLevel &aUndead Horde'
+  name: '$reinforcementLevel &a亡灵部队'
 undead_horde_summon_2:
-  name: '$reinforcementLevel &dUndead Horde'
+  name: '$reinforcementLevel &d亡灵部队'
 undead_horde_summon_3:
-  name: '$reinforcementLevel &eUndead Horde'
+  name: '$reinforcementLevel &e亡灵部队'
 unwanted_visitor:
-  name: '$eventBossLevel &9Unwanted Visitor'
+  name: '$eventBossLevel &9不速之客'
   locationMessage: '&cUnwanted Visitor: $distance格！'
-  spawnMessage: '&cAn Unwanted Visitor has come to the nether to warm up!'
-  deathMessage: '&aThe Visitor was slain by $players!'
-  escapeMessage: '&4The Visitor has gone back to his chilly domain!'
+  spawnMessage: '&c一位不速之客来到了下界热身！'
+  deathMessage: '&aVisitor被$players杀死了！'
+  escapeMessage: '&4Visitor has gone back to his chilly domain!'
 unwanted_visitor_summon:
-  name: '$eventBossLevel &bIce Clone'
+  name: '$eventBossLevel &b寒冰克隆体'
 vampire_boneman:
   name: '$reinforcementLevel &7吸血鬼之子'
 vampire_brute:
@@ -7640,39 +7640,39 @@ vampire_wraith_phase_2:
 vampire_zombie:
   name: '$normalLevel &a干枯者尸壳'
 vex_top:
-  name: '$eventBossLevel &eVex Selfish Top'
+  name: '$eventBossLevel &e自私的恼鬼顶部'
   locationMessage: '&cVex Troublemakers: $distance格！'
-  spawnMessage: '&cA gang of Vex Troublemakers have appeared!'
-  deathMessage: '&aThe Vex Troublemakers were slain by $players!'
-  escapeMessage: '&4The Vex Troublemakers have decided to leave.'
+  spawnMessage: '&c一群制造麻烦的恼鬼出现了！'
+  deathMessage: '&aVex Troublemakers were slain by $players!'
+  escapeMessage: '&4Vex Troublemakers have decided to leave.'
 vex_top_mount_1:
-  name: '$eventBossLevel &6Vex Bottom'
+  name: '$eventBossLevel &6Vex底部'
 vex_top_mount_2:
-  name: '$eventBossLevel &6Vex Bottom'
+  name: '$eventBossLevel &6Vex底部'
 vex_top_mount_3:
-  name: '$eventBossLevel &6Vex Bottom'
+  name: '$eventBossLevel &6Vex底部'
 warlock:
-  name: '$eventBossLevel &dWarlock'
+  name: '$eventBossLevel &d术士'
   locationMessage: '&cWarlock: $distance格！'
-  spawnMessage: '&cA demon riding Warlock has appeared!'
-  deathMessage: '&aThe Warlock was slain by $players!'
-  escapeMessage: '&4The Warlock ran away on his demon!'
+  spawnMessage: '&cA demon riding Warlock出现了！'
+  deathMessage: '&aWarlock被$players杀死了！'
+  escapeMessage: '&4Warlock ran away on his demon!'
 warlock_mount:
-  name: '$eventBossLevel &dDemon'
+  name: '$eventBossLevel &d恶魔'
 wasp_queen:
-  name: '$eventBossLevel &aWasp Queen'
-  locationMessage: '&cWasp Queen: $distance格！'
-  spawnMessage: '&cA wasp swarm has been sighted!'
-  deathMessage: '&aThe wasp swarm was eliminated by $players!'
-  escapeMessage: '&4The wasp swarm has flown away.'
+  name: '$eventBossLevel &a黄蜂 Queen'
+  locationMessage: '&c黄蜂 Queen: $distance格！'
+  spawnMessage: '&c黄蜂群飞过！'
+  deathMessage: '&awasp swarm was eliminated by $players!'
+  escapeMessage: '&4wasp swarm has flown away.'
 wasp_queen_summon:
-  name: '$eventBossLevel &aWasp'
+  name: '$eventBossLevel &a黄蜂'
 water_pest:
-  name: '$eventBossLevel &3Water Pest'
+  name: '$eventBossLevel &3水生害虫'
   locationMessage: '&cWater Pest: $distance格！'
-  spawnMessage: '&cAn annoying foe swims the waters!'
-  deathMessage: '&aThe Water Pest was slain by $players!'
-  escapeMessage: '&4The waters are clear of all Pests'
+  spawnMessage: '&c麻烦的敌人在水里游动！'
+  deathMessage: '&aWater Pest被$players杀死了！'
+  escapeMessage: '&4waters are clear of all Pests'
 weapons_goblin:
   name: '$eventBossLevel &c武器哥布林'
   deathMessages:
@@ -7688,13 +7688,13 @@ weapons_goblin:
   deathMessage: '&a武器哥布林被$players杀死了！'
   escapeMessage: '&4武器哥布林逃脱了！'
 wendigo:
-  name: '$eventBossLevel &7Wendigo'
+  name: '$eventBossLevel &7温迪戈'
   locationMessage: '&cWendigo: $distance格！'
-  spawnMessage: '&cSomething awful has appeared!'
-  deathMessage: '&aThe Wendigo has been slain $players!.'
-  escapeMessage: '&4The Wendigo has disappeared!'
+  spawnMessage: '&cSomething awful出现了！'
+  deathMessage: '&aWendigo has been slain $players!.'
+  escapeMessage: '&4Wendigo has disappeared!'
 wendigo_summon:
-  name: '$reinforcementLevel &aWindigo'
+  name: '$reinforcementLevel &a温迪哥'
 werehare:
   name: '$eventBossLevel &5爱丽丝'
   locationMessage: '&c兔人：$distance格！'
@@ -7892,11 +7892,11 @@ wood_league_wave_8_melee:
 wood_league_wave_9_ranged:
   name: '$normalLevel 竞技场弩手'
 yeti:
-  name: '$eventBossLevel &bYeti'
+  name: '$eventBossLevel &b雪人'
   locationMessage: '&cYeti: $distance格！'
-  spawnMessage: '&cA mighty beast has appeared!'
-  deathMessage: '&aThe beast is no more thanks to $players!.'
-  escapeMessage: '&4The beast has escaped!'
+  spawnMessage: '&c强大的beast出现了！'
+  deathMessage: '&abeast is no more thanks to $players!.'
+  escapeMessage: '&4beast has escaped!'
 yezhi_baba:
   name: '$eventBossLevel &c叶芝芭芭'
   locationMessage: '&c叶芝芭芭：$distance格！'
@@ -7968,7 +7968,8 @@ blacksmith:
     - 拥有更多附魔的装备\n更值钱！
     - 高级精英怪\n会掉落更好的物品！
     - 高级精英怪\n有更高的几率掉落战利品！
-    - 精英怪会被更强的装备吸引\n你的装备越好精英怪的等级越高！
+    - 
+      - 
     - 一些物品\n拥有特殊的药水效果！
     - 还有一些物品\n拥有特殊的效果！
     - 狩猎附魔\n会吸引你附近的精英怪！
@@ -8044,8 +8045,8 @@ enhancer_config:
     - 有更多升级球了再来找我！
     - 去找更多升级球吧！
 frost_queen_teleporter:
-  name: Ishard the Frostbitten
-  role: <Frost Palace Teleport>
+  name: 霜冻之伊沙德
+  role: <冰雪宫殿传送点>
   greetings:
     - ''
 guide_0:
@@ -8157,10 +8158,13 @@ primis_caeruleaum_hint_giver:
     - 很高兴能见到你！
     - 你好！
   dialog:
-    - 你看起来蛮结实的嘛。\n如果你想帮助我们，请找村民们聊聊。
-    - 很久以前，东南方有一座美丽的神社，\n可惜那里出了一些事。
+    - 
+      - 
+    - 
+      - 
     - 西南方的废墟十分恐怖！\n没人会去片鬼地方……
-    - 曾经遇到一个强大的法师，\n他能够用法术创造出美丽的冰墙。\n可惜因为他晕倒，冰墙失去支撑被打破了。
+    - 
+      - 
     - 听说狼窝里住进了\n一只邪恶的狼！
   farewell:
     - 再见！
@@ -8635,7 +8639,7 @@ primis_ice_village_jail_master:
   farewell:
     - 稍后见。
 primis_ice_village_leader:
-  name: '&3冰川元老'
+  name: '&3格拉西斯·普林塞普斯'
   role: '&3<村长>'
   greetings:
     - 嘿。
@@ -8646,15 +8650,15 @@ primis_ice_village_leader:
   farewell:
     - 再见。
 primis_ice_village_lighthouse_keeper:
-  name: '&3Severinus Martius'
-  role: '&3<Lighthouse Keeper>'
+  name: '&3塞维利努斯·马提乌斯'
+  role: '&3<灯塔看守人>'
   greetings:
-    - Well met stranger.
+    - 你好，陌生人。
   dialog:
-    - Calm day today.
-    - Watch out for\nthe Ursus!
+    - 今天是个平静的日子。
+    - 小心毛熊！
   farewell:
-    - Take it easy.
+    - 放轻松。
 primis_ice_village_missing_daughter:
   name: '&3科妮莉亚·恩诺迪乌斯'
   role: '&3<迷失的女孩>'
@@ -8676,16 +8680,16 @@ primis_ice_village_prisoner:
   farewell:
     - 带我离开这里！
 primis_ice_village_pubkeeper:
-  name: '&3Grania Cecilius'
-  role: '&3<Pubkeeper>'
+  name: '&3格拉尼娅·塞西利乌斯'
+  role: '&3<酒吧老板>'
   greetings:
-    - Welcome!
+    - 欢迎！
   dialog:
-    - Coming right up!
-    - Try our black ale!
-    - Need a drink?
+    - 马上到！
+    - 试试我们的黑啤酒吧！
+    - 要来一杯吗？
   farewell:
-    - One coming up!
+    - 再来一杯！
 primis_ice_village_tower_squatter:
   name: '&3莫德斯特·尤洛吉乌斯'
   role: '&3<村民>'
@@ -9102,7 +9106,7 @@ primis_pontis_citizen_30:
     - 回头见!
     - 再见了!
 primis_pontis_citizen_31:
-  name: '&7廷达瑞斯·哥伦巴努斯'
+  name: '&7廷达鲁斯·哥伦巴努斯'
   role: '&8千桥居民'
   dialog:
     - 你去过天文台吗？
@@ -9834,13 +9838,13 @@ primis_pontis_mille_arena_master_observatory:
   farewell:
     - 愿星辰保佑你。
 primis_pontis_mille_concerned_shipmate:
-  name: '&3Delphium Calpurnius'
-  role: '&8<Concerned Shipmate>'
+  name: '&3德尔菲姆·卡尔普尼乌斯'
+  role: '&8<担忧的船民>'
   dialog:
-    - Sigh.
-    - So much for my\nshipments...
+    - 哎。
+    - 还有好多货要搬……
   farewell:
-    - Safe travels!
+    - 一路顺风！
 primis_pontis_mille_fields_camp_generic_npc_1:
   name: '&c斯克雷波尼亚·英格维纳斯'
   role: '&c<猎人>'
@@ -10154,7 +10158,7 @@ primis_pontis_mille_slums_npc_1:
   farewell:
     - 明天会有什么呢。
 primis_pontis_mille_slums_npc_2:
-  name: '&7特拉尼奥·弗洛伦斯罗'
+  name: '&7特拉尼奥·弗洛伦斯'
   role: '&7<贫民窟居民>'
   dialog:
     - 今天勉强能过。
@@ -10210,13 +10214,13 @@ primis_pontis_mines_guard_3:
     - 他们走了吗？
     - 让我出去！
 primis_pontis_outpost_officer:
-  name: '&4NAME ME'
-  role: '&8<Outpost Officer>'
+  name: '&4无名'
+  role: '&8<前哨职员>'
   dialog:
-    - I am unfinished!
-    - There is supposed\nto be an outpost\nhere.
+    - 我还有工作要做！
+    - 这里应该有座前哨。
   farewell:
-    - Bye!
+    - 拜！
 primis_pontis_redwoods_injured_lumberjack:
   name: '&6莱科·卢皮奇努斯'
   role: '&6<受伤的伐木工>'
@@ -10434,271 +10438,271 @@ primis_sewer_raphael:
   farewell:
     - 稍后见！
 primis_spa_attendee_1:
-  name: '&fNatsumi'
-  role: '&7<Spa Attendee>'
+  name: '&f夏美'
+  role: '&7<按摩参与者>'
   dialog:
-    - Do you like the hot spring?
-    - Just sit back and relax!
+    - 你喜欢温泉吗？
+    - 坐下放松就好了！
     - Nya!
     - uwu...
     - OwO
   farewell:
-    - Have fun!
+    - 玩的愉快！
 primis_spa_attendee_2:
-  name: '&5Hanako'
-  role: '&7<Spa Attendee>'
+  name: '&5花子'
+  role: '&7<按摩参与者>'
   dialog:
-    - Do you like the hot spring?
-    - Just sit back and relax!
+    - 你喜欢温泉吗？
+    - 坐下放松就好了！
     - Nya!
     - uwu...
     - OwO
   farewell:
-    - Have fun!
+    - 玩的愉快！
 primis_spa_attendee_3:
-  name: '&3Tamika'
-  role: '&7<Spa Attendee>'
+  name: '&3塔米卡'
+  role: '&7<按摩参与者>'
   dialog:
-    - Do you like the hot spring?
-    - Just sit back and relax!
+    - 你喜欢温泉吗？
+    - 坐下放松就好了！
     - Nya!
     - uwu...
     - OwO
   farewell:
-    - Have fun!
+    - 玩的愉快！
 primis_spa_attendee_4:
-  name: '&9Zaphra'
-  role: '&7<Spa Attendee>'
+  name: '&9泽弗拉'
+  role: '&7<按摩参与者>'
   dialog:
-    - Do you like the hot spring?
-    - Just sit back and relax!
+    - 你喜欢温泉吗？
+    - 坐下放松就好了！
     - Nya!
     - uwu...
     - OwO
   farewell:
-    - Have fun!
+    - 玩的愉快！
 primis_spa_attendee_5:
-  name: '&4Chie'
-  role: '&7<Spa Attendee>'
+  name: '&4奇'
+  role: '&7<按摩参与者>'
   dialog:
-    - Do you like the hot spring?
-    - Just sit back and relax!
+    - 你喜欢温泉吗？
+    - 坐下放松就好了！
     - Nya!
     - uwu...
     - OwO
   farewell:
-    - Have fun!
+    - 玩的愉快！
 primis_spa_attendee_6:
-  name: '&fKatashi'
-  role: '&7<Spa Attendee>'
+  name: '&f卡塔希'
+  role: '&7<按摩参与者>'
   dialog:
-    - Do you like the hot spring?
-    - Just sit back and relax!
+    - 你喜欢温泉吗？
+    - 坐下放松就好了！
     - Nya!
     - uwu...
     - OwO
   farewell:
-    - Have fun!
+    - 玩的愉快！
 primis_spa_attendee_7:
-  name: '&dAkihiko'
-  role: '&7<Spa Attendee>'
+  name: '&d明子'
+  role: '&7<按摩参与者>'
   dialog:
-    - Do you like the hot spring?
-    - Just sit back and relax!
+    - 你喜欢温泉吗？
+    - 坐下放松就好了！
     - Nya!
     - uwu...
     - OwO
   farewell:
-    - Have fun!
+    - 玩的愉快！
 primis_spa_attendee_8:
-  name: '&6Sheranee'
-  role: '&7<Spa Attendee>'
+  name: '&6薛兰妮'
+  role: '&7<按摩参与者>'
   dialog:
-    - Do you like the hot spring?
-    - Just sit back and relax!
+    - 你喜欢温泉吗？
+    - 坐下放松就好了！
     - Nya!
     - Rawr...
     - OwO
   farewell:
-    - Have fun!
+    - 玩的愉快！
 primis_spa_staff:
-  name: '&cAozora'
-  role: '&7<Spa Staff>'
+  name: '&c青空'
+  role: '&7<按摩参与者>'
   dialog:
-    - Enjoy the hot spring!
+    - 你喜欢温泉吗？
     - Nya!
     - uwu...
     - OwO
   farewell:
-    - Have fun!
+    - 玩的愉快！
 primis_spa_staff_2:
-  name: '&6Rei'
-  role: '&7<Spa Staff>'
+  name: '&6丽'
+  role: '&7<按摩参与者>'
   dialog:
-    - Enjoy the hot spring!
+    - 你喜欢温泉吗？
     - Nya!
     - uwu...
     - OwO
   farewell:
-    - Have fun!
+    - 玩的愉快！
 primis_terravilla_annoyed_explorer:
-  name: '&6Dorippa Sarimarcus'
-  role: '&6<Annoyed Explorer>'
+  name: '&6多里帕·萨里玛库斯'
+  role: '&6<困扰的探索者>'
   greetings:
-    - How's it going.
+    - 最近怎样。
   dialog:
-    - Not again.
-    - Stuck once more.
+    - 不会吧。
+    - 又卡住了。
   farewell:
-    - Be seeing you.
+    - 下次见。
 primis_terravilla_explorer:
-  name: '&6Telestis Senna'
-  role: '&6<Explorer>'
+  name: '&6泰利斯特·塞纳'
+  role: '&6<探索者>'
   greetings:
-    - How goes it.
+    - 你还好吗？
   dialog:
-    - Always so\nbusy.
-    - Need a bag?
+    - 我一直很忙。
+    - 你需要袋子吗？
   farewell:
-    - Bye.
+    - 拜拜。
 primis_terravilla_generic_npc_1:
-  name: '&6Stephanium Major'
-  role: '&6<Resident>'
+  name: '&6斯蒂文尼亚'
+  role: '&6<居民>'
   greetings:
-    - Welcome to Terravilla!
+    - 欢迎来到特拉维亚！
   dialog:
-    - Watch out for the\nTwo Legged Terrors!
-    - Here to check out the ruins?
+    - 小心两腿恐怖生物！
+    - 你是来查看废墟的？
   farewell:
-    - Bye.
+    - 拜拜。
 primis_terravilla_generic_npc_10:
-  name: '&6Mallia Galvisius'
-  role: '&6<Resident>'
+  name: '&6马利亚·加尔维斯'
+  role: '&6<居民>'
   greetings:
-    - Heyo!
+    - 嘿哟！
   dialog:
-    - I would rather be in\ndown in the ruins...
-    - Hog watching to\npass the time.
+    - 我宁愿在废墟里呆着……
+    - 我在看猪打发时间。
   farewell:
-    - Laters.
+    - 回见。
 primis_terravilla_generic_npc_11:
-  name: '&6Papiria Virginius'
-  role: '&6<Resident>'
+  name: '&6帕皮利亚·维尔吉尼斯'
+  role: '&6<居民>'
   greetings:
-    - Ok then...
+    - 好吧……
   dialog:
-    - Hit him harder!
-    - Woah! Good one!
-    - Yeah! Mess him up!
+    - 用力打他！
+    - 哇！很好！
+    - 没错！干掉他！
   farewell:
-    - Yep...
+    - 嗯……
 primis_terravilla_generic_npc_12:
-  name: '&6Umbria Maccalus'
-  role: '&6<Resident>'
+  name: '&6翁布里亚·马卡洛斯'
+  role: '&6<居民>'
   greetings:
-    - What!
+    - 什么！
   dialog:
-    - Is a girl not\nallowed to be\non a rooftop.
-    - Just try and\nget me down!
+    - 女孩就不可以上屋顶吗？
+    - 试着把我弄下来！
   farewell:
-    - Yeah, whatever...
+    - 是的，不管怎样……
 primis_terravilla_generic_npc_2:
-  name: '&6Delphium Assanius'
-  role: '&6<Resident>'
+  name: '&6德尔菲姆·阿萨尼乌斯'
+  role: '&6<居民>'
   greetings:
-    - Leave me alone!
+    - 别打扰我！
   dialog:
-    - What are you\nlooking at.
+    - 你在看什么？
   farewell:
-    - Scram!
+    - 走开！
 primis_terravilla_generic_npc_3:
-  name: '&6Stephanium Vopiscus'
-  role: '&6<Resident>'
+  name: '&6斯蒂芬尼姆·沃比斯库斯'
+  role: '&6<居民>'
   greetings:
-    - Leave me alone!
+    - 别打扰我！
   dialog:
-    - What are you\nlooking at.
+    - 你在看什么？
   farewell:
-    - Scram!
+    - 走开！
 primis_terravilla_generic_npc_4:
-  name: '&6Simo Clericus'
-  role: '&6<Resident>'
+  name: '&6西莫·克莱里库斯'
+  role: '&6<居民>'
   greetings:
-    - Hey!
+    - 嘿！
   dialog:
-    - Heard the hog is on\nthe lift again.
+    - 听说那头猪又在升降机上了。
   farewell:
-    - Bye.
+    - 拜拜。
 primis_terravilla_generic_npc_5:
-  name: '&6Harpax Colias'
-  role: '&6<Resident>'
+  name: '&6哈帕克斯·科利亚斯'
+  role: '&6<居民>'
   greetings:
-    - Ello.
+    - 您好。
   dialog:
-    - The bo...I mean the\nOverseer is upstairs.
+    - bo...I mean the\nOverseer is upstairs.
   farewell:
-    - Laters.
+    - 回见。
 primis_terravilla_generic_npc_6:
-  name: '&6Sulpicio Epolonius'
-  role: '&6<Resident>'
+  name: '&6苏尔皮西奥·埃波洛尼乌斯'
+  role: '&6<居民>'
   greetings:
-    - Hi there.
+    - 你好。
   dialog:
-    - I hope the ruins\nopen up again soon.
-    - I miss artifact\nhunting.
+    - 希望废墟能再次开放。
+    - 我想念搜寻遗物的日子。
   farewell:
-    - Goodbye.
+    - 再见。
 primis_terravilla_generic_npc_7:
-  name: '&6Baebia Lucan'
-  role: '&6<Resident>'
+  name: '&6巴比亚·卢坎'
+  role: '&6<居民>'
   greetings:
     - '...'
   dialog:
-    - Cringe...
+    - 害怕……
   farewell:
     - '...'
 primis_terravilla_generic_npc_8:
-  name: '&6Novia Longinus'
-  role: '&6<Resident>'
+  name: '&6诺维娅·朗基努斯'
+  role: '&6<居民>'
   greetings:
     - '...'
   dialog:
-    - Are you always\nstaring at people?
-    - How about some\nprivacy?
+    - 你一直喜欢盯着人看吗？
+    - 给点个人隐私行吗？
   farewell:
     - '...'
 primis_terravilla_generic_npc_9:
-  name: '&6Septimia Baro'
-  role: '&6<Resident>'
+  name: '&6塞蒂米亚·巴罗'
+  role: '&6<居民>'
   greetings:
-    - Oh, hey.
+    - 哦，你好。
   dialog:
-    - If it opens up again\nthen I gotta go\nget more of these.
-    - What is this skull\nnfrom hmm...
+    - 如果废墟能再次开放，\n我一定要找更多遗物。
+    - 这个头骨是……
   farewell:
     - '...'
 primis_terravilla_overseer:
-  name: '&6Lutum Princeps'
-  role: '&6<Overseer>'
+  name: '&6卢登·普林塞普斯'
+  role: '&6<工头>'
   greetings:
-    - Yes?
+    - 嗯？
   dialog:
-    - What is it\nnow...
-    - I need to check\nup on them.
-    - At least I\nam not bored.
+    - 现在怎么了
+    - 我需要监督他们。
+    - 至少我不无聊。
   farewell:
-    - Good luck.
+    - 祝您好运。
 primis_terravilla_researcher:
-  name: '&6Plautia Suilius'
-  role: '&6<Researcher>'
+  name: '&6普拉蒂亚·苏里乌斯'
+  role: '&6<研究员>'
   greetings:
-    - Hmm...
+    - 嗯……
   dialog:
-    - Maybe if...
-    - That can't be right
-    - Not sure...
+    - 也许如果……
+    - 那不对
+    - 不确定……
   farewell:
-    - Later...
+    - 稍后见……
 primis_traveler_1:
   name: '&6莱西达姆斯·诺尔斯'
   role: '&6<旅行者>'
@@ -10958,116 +10962,185 @@ wood_league_arena_master:
 wood_league:
   arenaName: 木头联赛
   arenaMessages:
-    - wave=1:message=&8[格拉迪厄斯] &f今日头条！一位传奇战士远道而来，与来自世界各地最凶残的怪物比试！但在此之前，还有一个新手在与僵尸战斗。
-    - wave=2:message=&8[格拉迪厄斯] &f看看他，至少他还会挥动手臂！这只是热身，让我们开始施加压力吧！
-    - wave=3:message=&8[格拉迪厄斯] &f你以为自己很能打？这一波你打不过的！哈哈哈哈！
-    - wave=4:message=&8[格拉迪厄斯] &f好吧，你还是有点实力。女士们先生们，准备好看一出好戏！
-    - wave=5:message=&8[格拉迪厄斯] &f我在外面找到了这只&c奇怪的生物&f，看起来它十分适合竞技场！
-    - wave=6:message=&8[格拉迪厄斯] &f看了你能对付一小群怪物，&c那么更多怪物呢？
-    - wave=7:message=&8[格拉迪厄斯] &f你真以为自己能主宰竞技场？我们拭目以待……
+    - 
+      - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
     - wave=8:message=&8[格拉迪厄斯] &f不错，如果每个敌人都是&c近战&f的如何？
     - wave=9:message=&8[格拉迪厄斯] &f很好，如果都是&c远程&f怪物呢？
-    - wave=10:message=&8[格拉迪厄斯] &f小心了，一只&c恶犬&f踏入了竞技场！它是从哪里来的？
-    - wave=11:message=&8[格拉迪厄斯] &f好了，各位，我们得到了动物管理部门的帮助来处理恶犬，我们重回正轨了！
-    - wave=12:message=&8[格拉迪厄斯] &f看来观众们都很想看更多精彩的节目！让我们继续！
-    - wave=13:message=&8[格拉迪厄斯] &f似乎看守人感到无聊，他给生物加上了&2剧毒&f！让我们看看事态的发展……
-    - wave=14:message=&8[格拉迪厄斯] &f好吧，这……挺无聊的！给这些家伙上毒的人被解雇了！下次要想出更好的办法！
-    - wave=15:message=&8[格拉迪厄斯] &f有请本年度获奖&4猪&f！ 它在丑陋和吝啬上拔得头筹！掌声有请&4Oinkers先生&f！
-    - wave=16:message=&8[格拉迪厄斯] &fOinkers先生现在被烤成培根了！接下来有请&cOinker先生的粉丝&f，他们正蜂拥而入，寻求复仇！
-    - wave=17:message=&8[格拉迪厄斯] &f看来我们的竞技场挑战者十分自信！但他能否处理更&c强大&f的敌人呢？
-    - wave=18:message=&8[格拉迪厄斯] &f&c击剑俱乐部&f和&c射箭俱乐部&f想要较量一番！让我们看看谁更强！
-    - wave=19:message=&8[格拉迪厄斯] &f击剑俱乐部不太行啊，让我们看看&c射箭俱乐部&f有几斤几两！
-    - wave=20:message=&8[格拉迪厄斯] &f看来射箭俱乐部也很逊！我们的挑战者似乎吸引了一些顶级角斗士的注意力！有请&2僵尸的骄傲——佐尔坦&f！
-    - wave=21:message=&8[格拉迪厄斯] &f难以置信！这群菜鸟击败了佐尔坦！难道新的冠军就要诞生了？
-    - wave=22:message=&8[格拉迪厄斯] &f观众们开始下注了！今天的比赛能持续多久呢？
-    - wave=23:message=&8[格拉迪厄斯] &f别错过了，这一波敌人的攻击全都附带&c凋零&f！
-    - wave=24:message=&8[格拉迪厄斯] &f一些竞技场名人正前来阻止这位挑战者！敬请期待！
-    - wave=25:message=&8[格拉迪厄斯] &f北境弓箭手&bAgdluak&f前来挑战！小心他的&b霜冻&f！
-    - wave=26:message=&8[格拉迪厄斯] &f精彩的战斗！我对下一场战斗&c充满期待&f！
-    - wave=27:message=&8[格拉迪厄斯] &f有人告诉我，竞技场会越来越难！&c僵尸免疫弓箭，骷髅能冻结玩家&f。那么之后还会有什么强敌呢？
-    - wave=28:message=&8[格拉迪厄斯] &f是时候展现&c击剑&f技巧了！记住，步伐是关键！
-    - wave=29:message=&8[格拉迪厄斯] &f现在，让我们用&c靶子练习&f吧！挑战者就是靶子！
-    - wave=30:message=&8[格拉迪厄斯] &f一位真正的竞技场冠军来袭！&2南方毒蛇&f寻求着&c毒杀&f目标！
-    - wave=31:message=&8[格拉迪厄斯] &f南方毒蛇倒下了！观众们在欢呼！先生女士们，今天的比赛真是精彩啊！
-    - wave=32:message=&8[格拉迪厄斯] &f我听说竞技场管理员焦头烂额，无可奈何！我们的挑战者能够活过下一波吗？
-    - wave=33:message=&8[格拉迪厄斯] &f看来一些敌人染上了南方毒蛇的&c剧毒&f！女士先生们，你们可不想碰到他们吧！
-    - wave=34:message=&8[格拉迪厄斯] &f鲍比，给这些为我而死的选手下注1000精英币！等等，麦还开着？让我们继续下一波！
-    - wave=35:message=&8[格拉迪厄斯] &f女士们先生们，真是难得的机会！&a群木联盟的小丑&f加入了战斗！他今天会耍什么&2把戏&f呢？
-    - wave=36:message=&8[格拉迪厄斯] &f多么可爱的表演，女士们先生们，掌声送给&a小丑&f！
-    - wave=37:message=&8[格拉迪厄斯] &f鲍比，我下的注怎么样了？你是说10000精英币？我说了是1000！呃，&c强化他们&f！
-    - wave=38:message=&8[格拉迪厄斯] &f鲍比，你快整死我了！在那里加点&c剑士&f，我需要尽快处理一些事……
-    - wave=39:message=&8[格拉迪厄斯] &f你说无法退款？我也没想要退款——呃哼，我是说，一群远道而来的&c弓箭手&f正打算一展身手！
-    - wave=40:message=&8[格拉迪厄斯] &f女士先生们，出于，呃，某种原因，我邀请了能叫到的最强战士！让我们有请&4诅咒背负者——克鲁西奥&f！
-    - wave=41:message=&8[格拉迪厄斯] &f克鲁西奥被打败了！？这世界是怎么了？
-    - wave=42:message=&8[格拉迪厄斯] &f一位有钱的赞助人决定免费治疗竞技场的敌人！有了&2治疗&f后，他们能更强吗？
-    - wave=43:message=&8[格拉迪厄斯] &f&c凋零&f、&c中毒、&c火焰&f！你知道投入这些要花多少钱吗？
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+      - 
+    - 
+      - 
+      - 
+    - 
+      - 
+      - 
+    - 
+      - 
+    - 
+      - 
+      - 
+    - 
+      - 
+    - 
+      - 
+      - 
+    - 
+      - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
     - wave=44:message=&8[格拉迪厄斯] &f这显然行不通，让我想想办法……
-    - wave=45:message=&8[格拉迪厄斯] &f这位是群木联盟的一位顶级角斗士！&c千刃&f再次携带他的&c无数刀刃&f来袭！希望它能赢！
-    - wave=46:message=&8[格拉迪厄斯] &f千刃倒下了！看来今天的角斗士都不太行！不过没关系，&c人多力量大！
-    - wave=47:message=&8[格拉迪厄斯] &f人海战术也不行的话，投入&c更多能力&f！投入全部能力！
-    - wave=48:message=&8[格拉迪厄斯] &f我们的药水用光了！我们就只剩下&c剑士&f了吗？
-    - wave=49:message=&8[格拉迪厄斯] &f好吧，全部一起上！出来吧，&c弓箭手&f！
-    - wave=50:message=&8[格拉迪厄斯] &f看来我已经山穷水尽了……我只能宣布——等等，远处的那位是？&4群木联盟的冠军乌瑟尔&f！女士先生们，比赛结束了！挑战者不可能赢！他会被我们的冠军&c碾压&f！
-    - wave=51:message=&8[格拉迪厄斯（已破产）] &f难以置信，乌瑟尔被打败了！出现了新的竞技场冠军！如果我没有破产的话，我会非常兴奋！
+    - 
+      - 
+      - 
+    - 
+      - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+      - 
+      - 
+    - 
+      - 
+      - 
 ag_welcome_quest_0:
   customObjectives:
     Objective1:
       dialog:
-        - '&8[&aCasus&8]&f Welcome to the Adventurer''s Guild Hub, the hub for all things EliteMobs!'
-        - You can always get back here using &2/ag&f!
-        - Talk to me again for a quest!
+        - '&8[&a卡萨斯&8]&f 欢迎来到冒险者公会，这里有精英怪物的一切！'
+        - 你可以随时输入&2/ag&f回到这里！
+        - 再次和我对话领取任务！
   name: '&2到达冒险者公会大厅！'
   questLore:
-    - 使用命令 &2/ag &0 或 &2/adventurersguild 移动到冒险者公会大厅！
+    - 
+      - 
   questAcceptDialog:
     - '&8[Odigos]&f 好的，请输入 &2/ag &f 或 &2/adventurersguild&f 前往冒险者公会大厅！'
-    - 请您一定要跟 Casus 聊一聊！
+    - 请和卡萨斯聊聊！
 ag_welcome_quest_1:
   customObjectives:
     Objective3:
       dialog:
-        - '&8[&aGreg&8]&f Want to buy or sell something? I''ve got a little of everything!'
+        - '&8[&a格雷格&8]&f 想要买卖东西？找我就对了！'
     Objective4:
       dialog:
-        - '&8[&aCharles&8]&f Want to learn about fighting elites? Just talk to me!'
+        - '&8[&a查尔斯&8]&f 想了解如何对抗精英怪物？和我对话吧！'
     Objective1:
       dialog:
-        - '&8[&aHermes&8]&f I take you back to where you were before! Just talk to me again!'
+        - '&8[&a赫尔墨斯&8]&f 我能把你带回之前所在的地方！和我对话就行了！'
     Objective2:
       dialog:
-        - '&8[&aBartley&8]&f Need a stiff drink? My drinks pack an extra punch!'
+        - '&8[&a巴特利&8]&f 要来一杯烈酒吗? 我的酒味道浓厚！'
     Objective7:
       dialog:
-        - '&8[&aQel''Thuzad&8]&f These Elite monsters, where do they keep coming from?'
-        - Ah, never mind that for now, we are always in need of more people to assist us in slaying quests!
-        - Just talk to me to get one!
+        - '&8[&a基尔·图扎德&8]&f 这些精英怪是从哪里来的？'
+        - 
+          - 
+        - 和我对话接取任务吧！
     Objective12:
       dialog:
-        - '&8[&aGrog&8]&f Want to buy special items? I''ve got just the thing!'
+        - '&8[&a格洛格&8]&f 想要特殊物品？找我就对了！'
     Objective8:
       dialog:
-        - '&8[&aRalph&8]&f Get more out of your scrap by upgrading it! Just talk to me at any time.'
+        - '&8[&a拉尔夫&8]&f 找我可以升级废品！'
     Objective13:
       dialog:
-        - '&8[&aUlfric&8]&f If you bring me a very special and rare item, I can unbind your Elite items.'
-        - You don't yet look prepared to take this challenge on, but you can make killing the Binder of Worlds your ultimate goal, if you dare.
+        - '&8[&a乌尔菲克&8]&f 如果你能带给我非常特殊稀有的物品，我可以为你的精英装备解绑。'
+        - 
+          - 
     Objective5:
       dialog:
-        - '&8[&aTim&8]&f Want to upgrade your Elite Items? Just get an upgrade orb from Sam over there!'
+        - '&8[&a提姆&8]&f 想要升级你的精英物品？从萨姆哪里获得升级球吧！'
     Objective10:
       dialog:
-        - '&8[&aKelly&8]&f Got extra Elite items? Don''t know what to do with them? Give them to me, and I''ll turn them into scrap!'
-        - You can use scrap to do lots of things, like repairing or upgrading Elite items!
+        - '&8[&a凯莉&8]&f 有多余的精英装备？不知道要怎么处理？给我吧，我能将它们分解为废品！'
+        - 
+          - 
     Objective6:
       dialog:
-        - '&8[&aGillian&8]&f Do you seek power? Do you desire to reach new heights? Talk to me to unlock new guild ranks, and reach levels of power you never thought to be possible!'
+        - '&8[&a吉莉安&8]&f 你渴望力量吗？和我对话解锁新的公会等级吧！'
     Objective11:
       dialog:
-        - '&8[&aSam&8]&f Got extra scrap? I can refine that into Upgrade Orbs, which you can give to Tim to upgrade your Elite items with!'
+        - '&8[&a山姆&8]&f 有多余的废品吗？我能把废品精炼成升级球，你可以用升级球来升级精英装备！'
     Objective9:
       dialog:
-        - '&8[&aReggie&8]&f Need your Elite items repaired? Just bring me some scrap, and I''ll make them as good as new!'
-        - Remember, the higher the level of your scrap, the better I can repair you Elite item!
+        - '&8[&a雷吉&8]&f 需要修复精英装备？给我废品，我能让你的装备焕然一新！'
+        - 
+          - 
   name: '&2欢迎来到冒险者公会！'
   questLore:
     - '&a拜访冒险者公会的NPC'
@@ -11075,7 +11148,7 @@ primis_caeruleaum_a_can_of_worms:
   customObjectives:
     Objective1:
       dialog:
-        - '&a[Chief Piscis] &fPlease tell me you''re the one bringing the bait.'
+        - '&a[双鱼村长] &fPlease tell me you''re the one bringing the bait.'
   name: '&2大麻烦'
   questLore:
     - 拿上诱饵走吧。
@@ -11091,8 +11164,10 @@ primis_caeruleaum_fishing:
   name: '&2鱼饵'
   questLore:
     - 我们有大麻烦了！
-    - 我被一个可疑传送门里的&c海怪&f袭击了！
-    - 我的朋友&a皮西斯·涅墨西斯&f还在船上，尝试寻找那个生物或靠近传送门，
+    - 
+      - 
+    - 
+      - 
     - 但没有诱饵他什么也做不了！
     - 我会告诉你去哪里获得&e鱼饵&f，请帮帮我的朋友！
     - 我承诺会给你奖励！
@@ -11145,8 +11220,10 @@ primis_caeruleaum_fletching_2:
     - 用弓射出这些弓箭爬上高塔吧！
   questAcceptDialog:
     - '&a[文特斯·阿迪菲克斯]&f 用你刚获得的箭前往废墟并射击标靶！'
-    - 在废墟里面，有一个古老箱子的传闻。这对任何人都不太有用……除了收藏家！
-    - 拿上那个&e盾牌&f，我会用对你更有用的东西交换它!
+    - 
+      - 
+    - 
+      - 
     - '&7&o我应该去废墟里面拿&e盾牌&7&o，用&e抓钩箭s&7&o射击建筑里面的标靶。'
   questCompleteMessage:
     - '&a[文特斯·阿迪菲克斯]&f 非常好！'
@@ -11171,12 +11248,14 @@ primis_farmstead_lighthouse_keeper_2:
   customObjectives:
     Objective1:
       dialog:
-        - "&a[Jeeves]&f &2Amavit&f sent you? What's this about a lighthouse? My, what a discovery!\n&fThis will revolutionize my job as a traveling merchant! Here, have these &eScrolls&f - just call me and I'll be there in a jiffy!\n&7&oSeems like &aJeeves&7&o has something for me. I should talk to him."
+        - "&a[吉夫斯]&f &2雅玛维特&f派你来的？这是关于灯塔的什么？天大的发现啊！\n&f这将彻底改变我旅行商人的工作！给你，拿着这些&e卷轴&f——我随叫随到！\n&7&o似乎&a吉夫斯&7&o有东西给我。我应该和他谈谈。"
   name: '&2神秘之光'
   questLore:
-    - 在你处理问题时，&d灯塔顶&f发射出奇怪的光线。
+    - 
+      - 
     - 我的父亲&a吉夫斯&f到顶上检查问题，但他还没回来。
-    - 我无法再承受任何痛苦，我们已经欠你很多了——但如果你能前往调查并找到我的父亲，我将不盛感激。
+    - 
+      - 
   questAcceptDialog:
     - '&a[雅玛维特]&f 再次感谢你们，祝你们好运。希望没事。'
     - '&7&o我应该前往&d灯塔顶部&f，调查问题并去找&a雅玛维特&f的父亲&&a吉夫斯&f。'
@@ -11187,7 +11266,8 @@ primis_gladius_assassins:
   questLore:
     - '&d格拉迪厄斯&f的屋顶都是&c刺客&f!'
     - 冒险上街就是自寻死路。我们需要干掉这些狙击手！
-    - 可以使用&e抓钩箭s&f到达一些屋顶，更方便地干掉狙击手！
+    - 
+      - 
   questAcceptDialog:
     - '&a[贝利] 干掉那些&c刺客&f！记得使用&e抓钩箭s&f！'
     - '&7&o我应该杀死那些&c刺客&7&o。'
@@ -11300,9 +11380,9 @@ primis_ice_village_all_out_of_chains:
   customObjectives:
     Objective1:
       dialog:
-        - '&a[Orbis]&f Oh, the Ice Village chain shipment. Yes, it is right in that chest over there.'
-        - Sorry for not sending it over, but we were quite busy and had no time.
-        - It's all paid for so feel free to just grab it.
+        - '&a[奥比斯]&f 哦，寒冰村庄的锁链货物。嗯，就在那边的箱子里。'
+        - 我们很忙，很抱歉没空送货。
+        - 这些货都付过钱了，随便拿吧。
   name: '&2挣脱锁链束缚'
   questLore:
     - 嘿，你从&d千桥&f来的，对吧？
@@ -11329,9 +11409,12 @@ primis_ice_village_catch_me_if_you_can:
   questLore:
     - 你来得正是时候！我正要找人捉住
     - '&c逃犯&f。'
-    - 一名囚犯摇晃囚笼，让生锈的锁链断裂并逃脱了。
-    - 他肯定在逃脱时受了伤，逃不了多远。
-    - 我需要你&9a活捉&f他，但请小心，他逃跑时偷走了一把生锈的剑。
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
   questAcceptDialog:
     - '&a[罗曼努斯·素帕巴斯]&f 他肯定在山里。'
     - '&7&o我需要找到&c&o逃犯&7&o并把他带回监狱。'
@@ -11347,68 +11430,75 @@ primis_ice_village_get_them_off_my_back:
     - 这也不只是控制数量的问题。
     - 它们也能给我们带来珍贵的皮革、獠牙和鱼肉。
     - 不知道没有它们还会不会有这座村庄。
-    - 但这个季节它们的数量猛增。我们一直在努力减少它们的数量。
-    - 我们需要保持平衡，他们数量过多会成为威胁。
-    - 你需要去猎捕它们。别猎捕&9成年&f的鲸鱼。
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
     - 我们只需要捕杀&c幼崽&f和&c幼年尖背野猪&f.
-    - 我还想请你帮个忙。你出去的时候请顺便帮我找一下我的旧&e匕首&f。
-    - 我在几天前捕猎时弄丢了。它扎在一只&c尖背野猪&f身上……
+    - 
+      - 
+    - 
+      - 
     - 如果你能找到我将不胜感激。
   questAcceptDialog:
     - '&a[阿兰努斯·伊萨蒂斯]&f 你肯定在路上看到了&c尖背野猪&f，所以你应该知道它们在那里。'
     - '&7&o我需要控制&c&o尖背野猪&7&o的种群数量并取回&e&o阿兰努斯的匕首&7&o。'
   questCompleteMessage:
     - '&a[阿兰努斯·伊萨蒂斯]&f 干得好，我的朋友！非常感谢你。'
-    - 剩下的我们来处理。你还找到了我的匕首，太谢谢你了。
+    - 
+      - 
     - 这个匕首很普通，但它是我已故父亲手工制造给我的礼物。
     - 下次你口渴的话我请你一杯！
 primis_ice_village_gotta_keep_warm:
   customObjectives:
     Objective1:
       dialog:
-        - '&a[Severinus Martius]&f Ha ha! That should keep me warm for another couple of weeks!'
-        - Hey friend, you heading for &dCaerullium Village&f by any chance?
-  name: '&2Gotta keep warm'
+        - '&a[塞维利努斯·马提乌斯]&f 哈哈！这能让我暖和好几个星期！'
+        - 嘿朋友，你要去&d凯鲁利姆村&f吗？
+  name: '&2得保持暖和'
   questLore:
-    - We deliver the &aLighthouse Keeper&f some
-    - of our strong stuff every couple of weeks.
-    - It keeps him warm during the colder days.
-    - It's a small gesture of thanks for all his
-    - hard work. Any chance you could help out
-    - and bring over the next batch?
+    - 我们每周都会给&a灯塔看守人&f一些
+    - 好东西。
+    - 这些饮品能让人保持暖和。
+    - 这是对他辛勤工作的小小感谢。
+    - 你能帮帮忙，
+    - 把下一批货带过来吗？
   questAcceptDialog:
-    - '&a[Grania Cecilius]&f You can find the lighthouse to the East. Thanks!'
-    - '&7&oI should go to the &d&oLighthouse&7&o and deliver these to the &a&oLighthouse Keeper&7&o.'
+    - '&a[格拉尼娅·塞西利乌斯]&f 灯塔在西边。谢谢！'
+    - '&7&o我应该前往&d&o灯塔&7&o并送货给&a&o灯塔看守人&7&o。'
   questCompleteMessage:
-    - '&a[Severinus Martius]&f If you''re heading over there then I would appreciate if you could deliver some of these to my good friend &aJeeves&f.'
-    - '&7&oSeems like the &a&oLighthouse Keeper&7&o has a quest for me.'
+    - '&a[塞维利努斯·马提乌斯]&f 如果你要去那的话，请帮我把一些货物带给我的好友&a吉夫斯&f，我会十分感激的。'
+    - '&7&o看起来&a&o灯塔看守人&7&o有任务要给我。'
 primis_ice_village_gotta_see_jeeves:
   customObjectives:
     Objective1:
       dialog:
-        - '&a[Jeeves]&f Oh! A gift from my friend Severinus you say.'
-        - Well, thank you for bringing it over. Was nice seeing you again!
-  name: '&2Gotta see Jeeves'
+        - '&a[吉夫斯]&f 哦！我朋友送给我的礼物。'
+        - 谢谢你带过来。很高兴再次见到你！
+  name: '&2拜访吉夫斯'
   questLore:
-    - Now, now it would be really rude of me to keep
-    - all of the good stuff to myself!
-    - If you would bother helping me out friend and
-    - delivering some of the good stuff
-    - to my friend &aJeeves&f at &dCaerullium Village&f.
-    - You can get there quickly by taking the
-    - '&9lighthouse portal&f.'
+    - 这么多好东西
+    - 我可不能独享！
+    - 请帮我
+    - 把这些好东西送
+    - 给我在&d凯鲁利姆村&f的朋友&a吉夫斯&f。
+    - 使用&9灯塔传送门&f，
+    - '你可以很快到达那里。'
   questAcceptDialog:
-    - '&a[Severinus Martius]&f The portal is all the way at the top.'
-    - '&7&oI should go to &d&oCaerullium Village&7&o and deliver some of the good stuff to &a&oJeeves&7&o.'
+    - '&a[塞维利努斯·马提乌斯]&f 传送门就在顶部。'
+    - '&7&o我应该前往&d&o凯鲁利姆村&7&o并把东西交给&a&o吉夫斯&7&o。'
   questCompleteMessage:
-    - '&a[Severinus Martius]&f Thank you for delivering some of the strong stuff to Jeeves. I know he likes a good drink here and there ha ha!'
+    - '&a[塞维利努斯·马提乌斯]&f 感谢你帮我把货物送给吉夫斯。我知道他喜欢各地的优质饮品！'
 primis_ice_village_living_nightmares:
   customObjectives:
     Objective1:
       dialog:
-        - '&a[Cornelia Ennodius]&f Are they gone? I was so scared. My parents sent you? Thank goodness.'
-        - I woke up in the night, but the nightmares, they did not end. They were still there, so I ran and ran...
-        - I couldn't escape. I, I...will be fine, I just need a minute...
+        - '&a[科妮莉亚·恩诺迪乌斯]&f 他们走了吗？我好好怕。是我父母派你来的吗？真谢谢你。'
+        - 
+          - 
+        - 我无法逃脱。我……我很好，只是需要稍微歇会儿……
   name: '&2现世的噩梦'
   questLore:
     - 我一直跟她到这里。
@@ -11440,20 +11530,22 @@ primis_ice_village_make_them_go_ouch:
     - '&7&o我要让&c&o客户&7&o不敢惹&a&o维奥莱特&7&o。我还需要取回&e&o维奥莱特的财产&7&o。'
   questCompleteMessage:
     - '&a[多米娜·维奥莱特]&f 我希望你让他们感受到了痛苦。'
-    - 你的辛勤工作应得此薄礼。我欣赏能把事情做好的人。
+    - 
+      - 
 primis_ice_village_objection!:
   customObjectives:
     Objective3:
       dialog:
-        - '&a[Glacies Princeps]&f What, absolutely not. I don''t know how he convinced you to come here and beg for his release.'
-        - That man you are trying to help was corrupted by the Ice Elemental. He went mad and slaughtered his entire family.
-        - He will never be released. Is that understood.
+        - '&a[格拉西斯·普林塞普斯]&f 什么，当然不行。我不知道他是怎么说服你来这请求我释放他的。'
+        - 
+          - 
+        - 他不可能出狱。明白了吗。
     Objective1:
       dialog:
-        - '&a[Romanus Superbus]&f Release him? Not guilty? Are you mad? You''re lucky I don''t throw you in a cage too for suggesting such nonsense.'
+        - '&a[罗曼努斯·素帕巴斯]&f 放了他？无罪？你疯了吗？你该庆幸我没因为你说这些胡话就把你关进牢笼。'
     Objective2:
       dialog:
-        - '&a[Luxuria Placidus]&f Who? Never heard of him.'
+        - '&a[卢苏里亚·普拉西达斯]&f 谁？我没听说过。'
   name: '&2异议！'
   questLore:
     - 我不是这儿的人！你看得出来吧？
@@ -11473,13 +11565,14 @@ primis_ice_village_objection!:
     - '&7&o我要和这些人谈谈。'
   questCompleteMessage:
     - '&a[阿德里乌斯·卡本尼乌斯]&f 什么？！他们在说谎！！！我从未对我的家人做过这么可怕的事……'
-    - 他们就在这里！你听不到，看不见他们吗？他们就在我身旁，他们也渴望自由！！！放我出去！！！
+    - 
+      - 
     - '&7看来这个可怜的家伙已经失去了残存的理智……'
 primis_ice_village_run_away_daughter:
   customObjectives:
     Objective1:
       dialog:
-        - '&a[Sestia Ennodius]&f I could sense you coming.'
+        - '&a[塞斯提亚·恩诺迪厄斯]&f我能感知到你的到来。'
   name: '&2出走的女儿'
   questLore:
     - 陌生人！你能帮帮我的家庭吗？
@@ -11518,7 +11611,8 @@ primis_ice_village_taking_the_bait:
     - 这些&c鱼&f有什么毛病！
     - 我已经在这里钓了好几天鱼了！
     - 它们一口都不咬。要是我还年轻的话我就要让它们知道我的厉害！
-    - 你能来真是太好了。我们村的大部分食物都来自这些鱼。
+    - 
+      - 
     - 如果我们什么都抓不到，麻烦就很大了。
     - 你得下去揍它们。
   questAcceptDialog:
@@ -11526,20 +11620,23 @@ primis_ice_village_taking_the_bait:
     - '&7&o我得跳进湖里杀死7只&c&o鲑鱼&7&o并收集它们的尸体。'
   questCompleteMessage:
     - '&a[欧普若皮迪·尼禄]&f 哦！看看它们！好大！'
-    - 这应该够我们吃一阵子了！谢谢你的帮助，你是我见到最好的人！
+    - 
+      - 
 primis_ice_village_treats_for_the_punished:
   customObjectives:
     Objective1:
       dialog:
-        - '&a[Eleusium Calenus]&f My wife sent you? Oh, are those treats? My favorite too! She''s such a darling.'
-        - She always takes care of me, even in these dark times, she still has a place for me in her heart.
-        - 'You tell her I am doing just fine and that I love her very much. '
+        - '&a[厄琉斯·卡莱纳斯]&f 我妻子派你来的？哦，这些是点心吗？还是我最喜欢的！她真贴心。'
+        - 
+          - 
+        - '请你去告诉她我很好，我非常爱她。'
   name: '&2给受刑者的点心'
   questLore:
     - 如果你不介意的话，我能请你帮我做件事吗？
     - 我亲爱的&a丈夫&f遭受了监禁，我知道他在牢笼里度日如年。
     - 所以我给他准备了一些点心。
-    - 但我现在很忙，不知道你是否愿意去帮我送点心。
+    - 
+      - 
   questAcceptDialog:
     - '&a[提提亚·卡里努斯]&f 他在中间的牢笼里。'
     - 别忘了告诉他我爱他。
@@ -11561,7 +11658,8 @@ primis_ice_village_wanna_make_a_snowman:
     - 能帮我这个老头哄孩子吗？
   questAcceptDialog:
     - '&a[斯帕拉克斯·恩诺迪厄斯]&f 你能在村庄附近的树林里找到这些&c生物&f。'
-    - 我们需要至少15个&e水晶&f才够造个雪人。
+    - 
+      - 
     - '&7&o我需要击杀&c&o冰霜毛熊&7&o获得15个&e&o寒冰水晶&7&o。'
   questCompleteMessage:
     - '&a[塞斯提亚·恩诺迪厄斯]&f 你收集到足够的水晶了？很好！'
@@ -11587,11 +11685,14 @@ primis_main_quest_1:
   customObjectives:
     Objective1:
       dialog:
-        - '&a[Chief Piscis] &fOh so you were in the ship that beached a few hours ago?'
-        - I apologize, we would've sent help but I am afraid we are drowning in our own issues right now!
-        - A nearby &dBandit Camp &fkeeps raiding our supplies, a mysterious &cSea Creature &fkeeps haunting our shores and a &dWolf Den &fis making foraging impossible!
-        - If you help us out, I will tell you where you might be able to get the supplies you need to repair your ship.
-        - '&7&oI should report to the &aFirst Mate &7&oto see if I should help these people!'
+        - '&a[双鱼村长] &fOh so you were in the ship that beached a few hours ago?'
+        - 
+          - 
+        - 
+          - 
+        - 
+          - 
+        - '&7&o我应该向&a大副&7&o汇报，看看我能否帮助那些人！'
   name: '&2海难！'
   questLore:
     - 你终于醒了？很好！我们需要你的帮助。
@@ -11611,12 +11712,13 @@ primis_main_quest_10:
   customObjectives:
     Objective2:
       dialog:
-        - "&a[Shogun Navita] &f&dGladius&f calls for our aid?\n&7&oSeems like I should talk to the &aShogun&7&o."
+        - "&a[内维塔将军] &f&d格拉迪厄斯&f calls for our aid?\n&7&oSeems like I should talk to the &aShogun&7&o."
   name: '&5缩小差距'
   questLore:
     - 是时候寻求&d千桥&f的帮助了。
     - 让他们知道这里发生的事情，告诉他们我们需要援助。
-    - '&d桥&f上有个&c机器人&f。打败它就能降下桥梁。'
+    - 
+      - 
   questAcceptDialog:
     - '&a[将军哈斯塔] &f一路平安，朋友。记住：杀死&c守门人&f并把我们的请求传达给&a将军内维塔&f。'
     - '&7&o我应该杀死&d桥&7&o上的&c守门人&7&o并找到&d千桥&7&o的&a将军内维塔&7&o。'
@@ -11627,7 +11729,7 @@ primis_main_quest_11:
   customObjectives:
     Objective1:
       dialog:
-        - '&a[Major Fortes Bellator]&f Yes, traveler?'
+        - '&a[福特斯·贝拉特少校]&f 有什么事吗，旅行者？'
   name: '&2传递消息！'
   questLore:
     - 你的旅行故事真让人惊讶。
@@ -11646,7 +11748,7 @@ primis_main_quest_12:
   customObjectives:
     Objective1:
       dialog:
-        - '&a[Centurion]&f Where are our reinforcements?'
+        - '&a[百夫长]&f 我们的援军呢？'
   name: '&2矿井之路'
   questLore:
     - 我不敢相信&d格拉迪厄斯&f发生的事情。
@@ -11700,7 +11802,8 @@ primis_main_quest_14:
     - 这可能很难相信，但风暴本身
     - 变成了我们的对手。
     - 我们甚至都不知道能否战胜风暴。恐怕我们是自寻死路。
-    - 如果你真的打败了&c哥布林国王&f，也许你能平息这场风暴。
+    - 
+      - 
   questAcceptDialog:
     - '&a[布莱法罗]&f 我们削弱了他们的力量，但这仍然不是一件容易的事。'
     - 风暴可不是一般的敌人。别小瞧了它。
@@ -11710,25 +11813,35 @@ primis_main_quest_14:
     - 击败了&c风暴&f？ 有人告诉我那不可能！我的意思是……
     - '……现在逃避也没用了。我知道&c风暴&f。我知道&d格拉迪厄斯&f的入侵——我甚至促成了这次入侵。我这么做是为了我的人民——为了&d千桥&f。'
     - '&c马基雅维利顾问&f说服了我&c风暴&f无法阻挡，&d格拉迪厄斯&f和&d千桥&f终将陨落，我们只能牺牲自我来延缓毁灭。'
-    - 我现在明白了，那个阴险小人毒害了我的心智，腐蚀了我的判断力。我必须立即干掉他。
+    - 
+      - 
     - '&8&o似乎&a将军内维塔&7&o有问题要解决。'
 primis_main_quest_15:
   name: '&2遣散费偿还！'
   questLore:
-    - 从前，&c马基雅维利顾问&f，我们之中最聪明的人预见了&d千桥&f的陨落。
-    - 面对前所未有的生存威胁，他说服我们保持沉默，以免引起恐慌。
-    - 我采取了我认为能采取的唯一行动——牺牲我们最亲密的盟友，以换取几周的时间。
-    - 我与居住在&d鲜血神殿&f的实体进行了交谈。我和魔鬼做了交易。
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
     - 
       - 我为我们争取到了时间。
-    - 他们要求我撤军，我照做了，调集军队去应付附近的冲突。
-    - 我曾经盲从，但现在我看清了。&c马基雅维利顾问&f一直就是和他们一伙的。
+    - 
+      - 
+    - 
+      - 
     - 他引导我们走向厄运，如果不是你出现，他就得逞了。
     - 现在我们有了希望。
     - 请帮我们除掉这个奸诈的&c顾问&f。
-    - 他把自己锁在自己的房间里，周围都是忠于他的……宠物。.
-    - 小心。我不知道他孤立自己的原因，但我现在很清楚，他期待报复。
-    - 把&e远言之石&f带回给我，这东西能与&d鲜血神殿&f沟通。
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
     - 我希望通过他们来传递最后一条信息。
   questAcceptDialog:
     - '&a[将军内维塔]&f &c马基雅维利顾问&f退回了他在低城旁边的住处了。小心点，他积累了一批忠实的追随者，他不会不战而降。'
@@ -11744,79 +11857,93 @@ primis_main_quest_16:
   customObjectives:
     Objective3:
       dialog:
-        - '&a[Demenis Nolus]&f Heading to the village, eh. Just keep going East, follow the road and you should be there in no time!'
+        - '&a[&6迪门斯·诺尔斯]&f 前往村庄只需要往东沿着路走，很快就到了！'
     Objective4:
       dialog:
-        - '&a[Callipho Classicius]&f Directions? Just head down this road that leads to the graveyards.'
+        - '&a[卡利波·卡利奇斯]&f 不知道方向？只需沿着这条道路走就能到墓地。'
     Objective1:
       dialog:
-        - '&a[Glacies]&f Welcome to our village traveler! Please tell me, what brings you here friend.'
+        - '&a[格拉西斯]&f 欢迎来到我们的村庄，旅行者！请告诉我是什么风把你吹到这的。'
     Objective2:
       dialog:
-        - '&a[Bromia Culleolus]&f Oh, the way to the village. Yes, just take  this road that leads to the mountain.'
-        - Happy to help!
+        - '&a[布罗米亚·卡勒鲁斯]&f 通往村庄的路？没错，走这条通往山脉的道路就对了。'
+        - 乐意帮助！
   name: '&2寒冰村庄在等待'
   questLore:
     - 我们必须尽快援助&d格拉迪厄斯&f。
     - 冠军，在遥远的南方有一个骁勇善战的村庄。
     - 你应该去那里告诉他们&d千桥&f
     - 需要他们击退&d鲜血神殿&f的入侵者。
-    - 找到&a冰川元老&f并告诉他是我让你找他的。
+    - 找到&a格拉西斯·普林塞普斯&f并告诉他是我让你找他的。
     - 路上有很多旅行者，你应该停下来找他们问路。
   questAcceptDialog:
     - '&a[将军内维塔]&f 这将是一个漫长的旅程。请一定要做好准备。沿着通往南方的路走。'
     - '&7&o我必须找到南部的&d&o寒冰村庄&7&o。'
   questCompleteMessage:
-    - '&a[冰川元老]&f 将军派你来的，我明白了，很高兴听到&a内维塔&f做回曾经的自己。'
-    - 在我们对&d鲜血神殿&f采取行动前，我们需要先解决一些问题。
+    - '&a[格拉西斯·普林塞普斯]&f 将军派你来的，我明白了，很高兴听到&a内维塔&f做回曾经的自己。'
+    - 
+      - 
     - 让我告诉你……
-    - '&7&o我应该和&a&o冰川元老&7&o对话。'
+    - '&7&o我应该和&a&o格拉西斯·普林塞普斯&7&o对话。'
 primis_main_quest_17:
   customObjectives:
     Objective3:
       dialog:
-        - '&a[Theopropides Nero]&f Help? Yes, please!'
+        - '&a[欧普若皮迪·尼禄]&f 帮助？很好！'
     Objective1:
       dialog:
         - '&a[阿兰努斯·伊萨蒂斯]&f 你是来帮我们解决&c尖背野猪&f的？'
     Objective2:
       dialog:
-        - '&a[Domina Violet]&f I hope you are here to help!'
+        - '&a[多米娜·维奥莱特]&f 希望你是来帮忙的！'
   name: '&2帮助北方居民'
   questLore:
     - 在我们进一步讨论
     - '&d鲜血神殿&f前，'
-    - 我们需要先尽快解决村庄附近出现的问题。
+    - 
+      - 
     - 如果这些问题得不到解决，那么作为村长的我就失职了。
     - 我不可能无视自己的人民请求，把其他事情放在第一位。
-    - 如果你能帮助我们解决这些问题，那么我们就能帮助你。
-    - 我们有逃犯、野生动物的问题，甚至我们自己的村民也在偷窃。
-    - 我将告诉你制造这些问题的人和地点。
-    - 去和他们交谈，确保你帮助他们解决任何问题。
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
     - 他们能更详细地告诉你需要做什么。
   questAcceptDialog:
-    - '&a[冰川元老]&f 你帮助完他们后再回来找我谈谈。'
+    - '&a[格拉西斯·普林塞普斯]&f 你帮助完他们后再回来找我谈谈。'
     - '&7&o我应该去和名单上的村民谈谈，帮助他们解决可能遇到的任何问题。'
   questCompleteMessage:
-    - '&a[罗曼努斯·素帕巴斯]&f &2冰川元老&f派你来的？真不是时候！我们有个囚犯越狱了！'
+    - '&a[罗曼努斯·素帕巴斯]&f &2格拉西斯&f派你来的？真不是时候！我们有个囚犯越狱了！'
     - '&7&o我应该和&a&o罗曼努斯·素帕巴斯&7&o谈谈。'
 primis_main_quest_18:
   name: '&2寒冰试炼'
   questLore:
     - 你确实给我和村里大多数人留下了深刻印象。
-    - 我欠你一个解释，朋友。你看，在很长一段时间里，
+    - 
+      - 
     - 都在汲取&c冰元素s&f的力量。
-    - 他们的力量能保佑我们，而我们中任何想成为战士或猎人的人都必须通过&9寒冰试炼&f。
-    - 你需要爬上黑山东部之巅才能完成试炼。在山巅你将面对
+    - 
+      - 
+    - 
+      - 
     - '&c小冰元素s&f。'
-    - 如果你成功了，那么你拥有了成为一名战士或猎人的权利。
+    - 
+      - 
     - 如果你失败了……你的能量将归于&c冰元素s&f。
-    - 自古以来就是这样。 直至&d鲜血神殿s&f愈加强大。
+    - 
+      - 
     - 自从
-    - '&c冰元素s&f变强后，从它们那里汲取力量更加危险。'
+    - 
+      - 
     - 一些人受到腐蚀，为了我们的安全，我们不得不监禁他们。
-    - 而在山巅完成试炼对村民来说已经成为了不可能。
-    - 试炼失败的人还在那里，他们的灵魂困在了腐朽的躯壳中。
+    - 
+      - 
+    - 
+      - 
     - 成为了
     - '&c冰元素s&f的奴隶。'
     - 显然我们的传统已不复存在。
@@ -11825,13 +11952,13 @@ primis_main_quest_18:
     - 完成&9寒冰试炼&f。爬上山巅并面对
     - '&c小冰元素s&f，解救试炼失败的灵魂。'
   questAcceptDialog:
-    - '&a[冰川元老]&f你可以在&a维奥莱特&f的家里找到通往试炼之路。'
+    - '&a[格拉西斯·普林塞普斯]&f你可以在&a维奥莱特&f的家里找到通往试炼之路。'
     - 跟随&9紫晶&f块，它们会引导你到达山巅。
     - '&7&o我应该跟随&9&o紫晶块&7&o到山巅并杀死&c&o小冰元素s&7&o。'
   questCompleteMessage:
-    - '&a[冰川元老]&f 你做到了？愿他们的灵魂得以安息。'
+    - '&a[格拉西斯·普林塞普斯]&f 你做到了？愿他们的灵魂得以安息。'
     - 让我们再谈谈吧，朋友。还有更多事情要做。
-    - '&7&o我应该和&a&o冰川元老&7&o谈谈'
+    - '&7&o我应该和&a&o格拉西斯·普林塞普斯&7&o谈谈。'
 primis_main_quest_19:
   name: '&2冷静'
   questLore:
@@ -11844,18 +11971,19 @@ primis_main_quest_19:
     - 它才是我们力量……和愚蠢的主要来源。
     - 去杀死&c极恶冰元素&f吧。
   questAcceptDialog:
-    - '&a[冰川元老]&f 有一条路通往神殿。'
+    - '&a[格拉西斯·普林塞普斯]&f 有一条通往神殿的路。'
     - '&7&o我应该前往神殿并杀死&c&o极恶冰元素&7&o。'
   questCompleteMessage:
-    - '&a[冰川元老]&f 我能感觉到能量从这里一路流淌出来。'
-    - 你帮了我们一个大忙，朋友。&d寒冰村庄&f将帮助你和你的盟友。
+    - '&a[格拉西斯·普林塞普斯]&f 我能感觉到能量从这里一路流淌出来。'
+    - 
+      - 
     - 还有一个定居点可能需要你的援助。
-    - '&7&o我听到&a&o冰川元老&7&o有话要说。'
+    - '&a&o格拉西斯·普林塞普斯&7&o有话要说。'
 primis_main_quest_2:
   customObjectives:
     Objective1:
       dialog:
-        - '&a[Chief Piscis]&fYou''ll help us? Thank the seas! This was starting to feel like a sinking ship!'
+        - '&a[双鱼村长]&f你能帮我们？感谢大海！'
   name: '&2S需要帮助的陌生人……'
   questLore:
     - 所以他们不仅不能帮忙，而且还想要我们帮忙？哈！
@@ -11867,143 +11995,151 @@ primis_main_quest_2:
     - '&7&o我应该和&a村长&f谈谈如何帮助当地人。'
   questCompleteMessage:
     - '&a[双鱼村长]&f 村里人人都有难言之隐，我也不例外。 我的要求颇具挑战性，所以也许你需要先热热身，从其他村民那里了解他们的问题。'
-    - 准备好了就和我对话，我会分享我们离开这个山谷的秘密！
+    - 
+      - 
     - '&7&o我应该和当地人谈谈，看看谁需要帮助，等我觉得准备就绪时再找村长。'
 primis_main_quest_20:
   customObjectives:
     Objective1:
       dialog:
-        - '&a[Lutum Princeps]&f This better be important.'
-  name: '&2Terravilla'
+        - '&a[卢登·普林塞普斯]&f 最好是重要的事。'
+  name: '&2泰拉维拉'
   questLore:
-    - Some time ago we received a request for aid from a
-    - a nearby settlement. Years ago a bunch
-    - of explorers settled on top of this ancient ruin.
-    - I think they call their little
-    - settlement &dTerravilla&f. Apparently there is a lot
-    - of treasure to be had there if you don't mind the risk.
-    - But I hear that stuff has gone wrong there and they asked
-    - us if we could spare any help to send their way. To be
-    - honest, you are the strongest warrior I have ever seen.
-    - You are the best help we could send. If you would like
-    - to go of course.
+    - 前段时间，我们收到一份来自
+    - 附近定居点的援助请求。几年前有一群
+    - 探险者定居在这座古代废墟上。
+    - 他们的定居点应该
+    - 叫做&d泰拉维拉&f。如果你不惧危险，
+    - 那里有很多宝藏等待你去探索。
+    - 但我听说那里出了些事，因此他们
+    - 才寻求我们的援助。
+    - 说实话，你是我见过最强的战士。
+    - 你就是我们能派出的最佳援兵。
+    - 希望你能前去援助。
   questAcceptDialog:
-    - '&a[Glacies Princeps]&f You will find &aTerravilla&f straight West of here.'
-    - It is located on top of this ancient elemental ruin, you will know it when you see it.
-    - Oh, I almost forgot. The person you want to talk to is &aOverseer Lutum&f.
-    - '&7&oI should go to &d&oTerravilla&7&o and talk to &a&oOverseer Lutum&7&o.'
+    - '&a[格拉西斯·普林塞普斯]&f &a泰拉维拉&f就在西边。'
+    - 
+      - 
+    - 哦，我差点忘了。你要和&a卢登工头&f谈谈。
+    - '&7&o我应该前往&d&o泰拉维拉&7&o并与&a&o卢登工头&7&o对话。'
   questCompleteMessage:
-    - '&a[Lutum Princeps]&f Came all the way from the &dIce Village&f, eh. Good to see some help arrive.'
-    - When I sent that request for aid I wasn't sure if we were gonna get any. I heard the situation over there wasn't that much better.
-    - We are in quite a pickle over here. We have plenty of work for you if you want it.
-    - '&7&oI should talk to &a&oLutum&7&o.'
+    - '&a[卢登·普林塞普斯]&f 从&d寒冰村庄&f远道而来，嗯。很高兴看到有人来帮忙。 - 我发出援助请求时，我不确定我们是否能得到援助。我听说那边的情况也没好到哪里去。 - 我们在这里陷入了困境。如果你愿意，我们有很多工作给你。 - ''&7&o我应该和&a&o卢登&7&对话。'
+    - 
+      - 
+    - 
+      - 
+    - '&7&o我应该和&a&o卢登&7&对话。'
 primis_main_quest_21:
-  name: '&2Taking out the trash'
+  name: '&2倒垃圾'
   questLore:
-    - Many years ago some explorers came across this ruin and
-    - as they investigated it more closely they discovered a
-    - large underground maze-like structure. In this structure
-    - there were a lot of ancient artifacts and treasures. But
-    - also a lot of danger. Not like that stopped anyone from
-    - going down there. And as the word spread, more and more
-    - people came here to make their fortunes. Before you
-    - know it, it turned into a small settlement. Until lately
-    - everything was fine, but then awful things started
-    - happening. Before I tell you more, we should start by
-    - dealing with the simple problems first. A small band of
-    - '&cRobbers&f has found a foothold in the hills surrounding'
-    - '&dTerravilla&f. We need them gone. Also, feel free to assist'
-    - any villagers in &aTerravilla&f that might need help.
+    - 许多年前，一些探险家发现了这片废墟
+    - 当他们深入调查时，他们发现了一个
+    - 大型地下迷宫状结构。里面有
+    - 很多古代文物和珍宝，
+    - 但也潜藏着很多危险。危险并不能阻止人们趋之若鹜。
+    - 随着消息的传播，越来越多的人
+    - 来这里发财致富。
+    - 那里形成了一个小定居点。
+    - 一切都很好，直到最近发生了可怕的事情。
+    - 在我告诉你更多信息之前，我们应该从
+    - 先处理个小问题。
+    - '一小群&c强盗&f在周围的山上驻足'
+    - '那里是&d泰拉维拉&f。你需要驱逐他们。'
+    - 你也可以帮助那里的村民。
   questAcceptDialog:
-    - '&a[Lutum Princeps]&f I am not sure where the &cRobbers&f are exactly. I just know that people have reported seeing them coming from the hills.'
-    - '&7&oI should deal with the &c&oRobbers&7&o and help any villagers in need if I have the time.'
+    - '&a[卢登·普林塞普斯]&f 我不确定&c强盗&f的具体位置。我只知道人们看见他们从山里出来。'
+    - '&7&o我应该解决&c&o强盗&7&o并帮助村民。'
   questCompleteMessage:
-    - '&a[Lutum Princeps]&f Well that is one issue resolved. Onto the next!'
-    - Before we move on, I want you to have this blade.
-    - It might be old and dull but it's still as good as anything you can get your hands on today.
-    - '&7&oI should hear out what &a&oLutum&7&o has planned next.'
+    - '&a[卢登·普林塞普斯]&f 看来问题解决了。让我们谈谈下一个问题！'
+    - 在此之前，我有把剑要给你。
+    - 
+      - 
+    - '&7&o我应该继续和&a&o卢登&7&o谈谈。'
 primis_main_quest_22:
-  name: '&2Big trouble in little pub'
+  name: '&2小酒吧里大麻烦'
   questLore:
-    - Before we get to the big problem underground, I would
-    - like you to do one last thing here in town. There has
-    - been huge trouble in our little pub. There are certain
-    - characters in town who keep going to the pub and causing
-    - a ruckus. Well I heard that this time all of them managed
-    - to gather at the pub at the same time. And of course now
-    - there is a huge brawl happening over there. This is a great
-    - opportunity for us to arrest all of them at once. Go to the
-    - pub and knock them all out. We will handle the rest.
+    - 在我们谈论地下的大问题之前，
+    - 我希望你能帮我解决镇里最后一件事。
+    - 我们的小酒吧里有大麻烦了。
+    - 镇里一些家伙在酒吧里制造骚动。
+    - 我听说他们所有人都会在同一时间聚集在酒吧。
+    - 当然，现在那里正在发生一场巨大的争吵。
+    - 这是个能逮捕他们所有人的好机会。
+    - 去酒吧打倒他们吧。
+    - 剩下的事情由我们处理。
   questAcceptDialog:
-    - '&a[Lutum Princeps]&f The pub is at the ground level, right across. Don''t let them overwhelm you.'
-    - I will have a nice reward waiting here for you when you're back.
-    - '&7&oI need to go to the pub and deal with the &c&oBar Brawlers&7&o.'
+    - '&a[卢登·普林塞普斯]&f 酒吧在一楼，正对面。去浇灭他们的气焰。'
+    - 完事后我有丰厚的奖励给你。
+    - '&7&o我需要前往酒吧并解决&c&o酒吧斗殴者&7&o。'
   questCompleteMessage:
-    - '&a[Lutum Princeps]&f I hear that the pub is a peaceful place again. Let''s discuss the real issue now.'
-    - '&7&oI need to talk to &a&oLutum&7&o.'
+    - '&a[卢登·普林塞普斯]&f 我听说酒吧再次和平了。现在让我们谈谈真正的问题吧。'
+    - '&7&o我应该和&a&o卢登&7&o谈谈。'
 primis_main_quest_23:
-  name: '&2Strike the earth'
+  name: '&2撼击大地'
   questLore:
-    - You see the real reason we asked for help is because of what happened
-    - at the ruins. There were always dangerous things down there,
-    - but nothing a seasoned adventurer or explorer could not handle. But then
-    - something awakened, these ancient constructs started rising out  of the
-    - ground and the walls. Then these quakes started happening, it was weird,
-    - because you could only feel them if you were down in the ruins. So we shut
-    - everything down, nobody was allowed access to the ruins anymore. A few days
-    - ago I gathered some of my best men and sent them down there to find the source
-    - of it all. They barely made it back. They found an &c地元素&f high
-    - above the pillars, on top some sort of platform. It must have been there
-    - dormant all this time. No clue why it decided to wake up now...
-    - Your job would be to go down there, navigate through the maze and put the
-    - '&c地元素&f into a slumber it will never wake up from.'
+    - 我们请求帮助的真正原因是在废墟发生的事情。
+    - 下面总是有危险的东西。
+    - 但没有什么是经验丰富的冒险者或探险者不能处理的。
+    - 但后来一些东西觉醒了，这些古老的建筑开始从地面和墙壁中升起。
+    - 然后引发了地震。
+    - 因为只有在废墟中才能感觉到，
+    - 所以我们关闭入口，不再允许任何人进入废墟。
+    - 几天前，我召集了一些最好的朋友，让他们去寻找
+    - 这一切的源头。他们差点没能回来。他们发现柱子上有个&c地元素&f
+    - 它一定是一直处于休眠状态。
+    - 不知道为什么它现在醒来了。
+    - 你的任务是到下面去，穿过迷宫，
+    - '让&c地元素&f陷入永远不会醒来的沉睡。'
   questAcceptDialog:
-    - '&a[Lutum Princeps]&f You can get to the maze by walking down the spiral staircase in the middle of the ruins.'
-    - Don't get lost in the maze, also make sure to watch out for the constructs. Good luck!
-    - '&7&oI should enter the &d&oRuins Maze&7&o and slay the &c&o地元素&7&o.'
+    - '&a[卢登·普林塞普斯]&f 沿着废墟中间的螺旋楼梯走下去，你就能到达迷宫。'
+    - 
+      - 
+    - '&7&o我应该进入&d&o废墟迷宫&7&o并杀死&c&o地元素&7&o。'
   questCompleteMessage:
-    - '&a[Lutum Princeps]&f I cannot believe it, you''re back. In one piece too!'
-    - I guess you are tougher than you look. What you have done here is incredible it is clear we are in great debt to you. Is there anything Terravilla might be able to do for you.
-    - '&7&oI need to tell &a&oLutum&7&o about my quest and the &d&oBlood Temple&7&o.'
+    - '&a[卢登·普林塞普斯]&f 难以置信你安然无恙地回来了！'
+    - 
+      - 
+      - 
+    - '&7&o我要和&a&o卢登&7&o谈谈&d&o鲜血神殿&7&o的事。'
 primis_main_quest_24:
   customObjectives:
     Objective1:
       dialog:
-        - '&a[Navita]&f You have returned! I hope you have good tidings.'
-  name: '&2There and back again'
+        - '&a[内维塔]&f 你回来了！希望你有好消息。'
+  name: '&2再度归来'
   questLore:
-    - We had no idea what was going on... Yes,
-    - '&dTerravilla&f will be able to pledge some'
-    - of our forces to your cause. I wonder if the
-    - '&c地元素&f awakening had anything'
-    - to do with the &dBlood Temple&f. We will
-    - prepare our forces and wait for word from
-    - '&dPontis Mille&f.'
+    - 我们不知道发生了什么事……
+    - '&d泰拉维拉&f承诺会给你'
+    - 提供力量。我不知道
+    - '&c地元素&f的觉醒是否'
+    - 和&d鲜血神殿&f有关。
+    - 但我们会为
+    - '&d千桥&f提供援助。'
   questAcceptDialog:
-    - '&a[Lutum Princeps]&f So you are heading off to &dPontis Mille&f, make sure to tell the &aShogun&f that &dTerravilla&f will be ready to assist.'
-    - '&7&oI should head to &d&oPontis Mille&7&o and speak with &a&oShogun Navita&7&o.'
+    - '&a[卢登·普林塞普斯]&f 你要前往&d千桥&f了吗，别忘了告诉&a将军&f&d泰拉维拉&f准备好提供援助了。'
+    - '&7&o我应该前往&d&o千桥&7&o并和&a&o内维塔将军&7&o谈谈。'
   questCompleteMessage:
-    - '&a[Navita]&f It is good to hear that the &dIce Village&f has decided to join our cause! But I did not expect that you would manage to convince &dTerravilla&f to pledge to our cause as well.'
+    - '&a[内维塔]&f 很好，&d寒冰村庄&f决定帮助我们！但我没料到你能说服&d泰拉维拉&f也帮助我们。'
 primis_main_quest_25:
   customObjectives:
     Objective1:
       dialog:
-        - '&a[Outpost Officer]&fFILLER TEXT!'
-  name: '&2To the outpost'
+        - '&a[前哨职员职员]&fFILLER TEXT!'
+  name: '&2前往前哨'
   questLore:
-    - It is so good to see you again friend!
-    - While you were gone we were preparing our
-    - forces. We have made an &dOutpost&f
-    - between the &dBlood Temple&f and &dPontis Mille&f.
-    - You should go there and report to the
-    - '&aOutpost Officer&f. They will let you know'
-    - how we shall proceed with the assault on the
-    - '&dBlood Temple&f.'
+    - 很高兴再次见到你，朋友！
+    - 你离开时，我们整军待战。
+    - 我们在&d鲜血神殿&f和&d千桥&f之间
+    - 建立了一座&d前哨&f。
+    - 你应该去那里和
+    - '&a前哨职员&f汇报。他们会告诉你'
+    - 我们准备好了突击
+    - '&d鲜血神殿&f。'
   questAcceptDialog:
-    - '&a[Navita]&f The outpost is to the South of the city. Not too long now, before the additional forces from &dTerravilla&f and the &dIce Village&f arrive.'
-    - '&7&oI should head to the &d&oOutpost&7&o and speak with the &a&oOutpost Officer&7&o.'
+    - '&a[内维塔]&f 前哨在城市南边。&d泰拉维拉&f和d寒冰村庄&f的援军很快就会到了。'
+    - '&7&o我应该前往&d&o前哨&7&o和&a&o前哨职员&7&o谈话。'
   questCompleteMessage:
-    - '&a[Outpost Officer]&f I GOT NO IDEA WHAT TO SAY CAUSE I AM NOT DONE'
+    - '&a[前哨职员]&f 我不知道该说什么'
 primis_main_quest_3:
   name: '&c强盗营地！'
   questLore:
@@ -12016,20 +12152,23 @@ primis_main_quest_3:
     - 带回我&e祖父的传家宝&f！
   questAcceptDialog:
     - '&a[双鱼村长]&f 如果你跟着道路走的话，&d强盗营地&f离这儿并不远！'
-    - 去的路上小心点，我们不知道他们要干什么，但肯定不是什么好事！
+    - 
+      - 
     - 噢，别忘了带回&e祖父的传家宝&f!
     - '&7&o我应该去扫除附近的&d强盗营地&7&o。'
   questCompleteMessage:
     - '&a[双鱼村长]&f 你回来了！你带来了好消息吗？'
     - '&7&o你告诉了&a双鱼村长&7&o营地的事并交给了他&e传家宝&7&o。'
-    - 这是什么？法师？元素？这是不祥之兆。你马上必须和&a格拉迪厄斯的统治者&f汇报这件事！
-    - 你帮了我们大忙！基于你的努力，我将我&e祖父的剑&f送给你！愿这把剑助你披荆斩棘！
+    - 
+      - 
+    - 
+      - 
     - '&7&o看来&a双鱼村长&f准备好告诉我如何离开这里。'
 primis_main_quest_4:
   customObjectives:
     Objective1:
       dialog:
-        - '&a[Petrae]&f &2Chief Piscis&f sent you? Unfortunately the passage is closed, and the &cElemental&f guards it...'
+        - '&a[佩特拉]&f &2双鱼村长&f派你来的》可惜这条路封锁了，因为&c元素&f拦住了这条路……'
   name: '&9蓝色花径！'
   questLore:
     - 我们必须报告给&d格拉迪厄斯&f
@@ -12043,7 +12182,8 @@ primis_main_quest_4:
     - '&9蓝色花径&f的尽头等着你！'
   questAcceptDialog:
     - '&a[双鱼村长]&f 山口有一个极其危险的&c傀儡&f在把守，你现在可能打不过它！ - 我们知道山里有一条秘密通道。跟随&9蓝色花径&f并和&a登山导游&f对话到达桥港！ - ''&7&o我应该跟随&9&o蓝色花径&7&o找到&a登山导游&7&o！'
-    - '&7&o我要确保在走之前把剩下的事情都做完。'
+    - 
+      - 
     - '&7&o提示：追踪任务以便更容易找到目的地！'
     - '&7&o我要确保在走之前把剩下的事情都做完。'
     - '&7&o提示：追踪任务以便更容易找到目的地！'
@@ -12060,7 +12200,8 @@ primis_main_quest_5:
     - 你得先击败&c元素&f！
   questAcceptDialog:
     - '&a[佩特拉]&f 你击败了&c水晶元素&f？我只能祝你好运了！'
-    - 我将紧随其后。如果你成功了，请在通道的另一边与我会面！
+    - 
+      - 
     - '&7&o似乎我得击败&c水晶元素&7&o。'
   questCompleteMessage:
     - '&a[佩特拉]&f 太棒了！我看到你击败了&c水晶元素&f，你前途无量啊！'
@@ -12069,9 +12210,10 @@ primis_main_quest_6:
   customObjectives:
     Objective1:
       dialog:
-        - '&a[Filius] &fYou made it through the mountain! You don''t see that every day.'
-        - I'm afraid my father is missing, but I can tell you about the path to &dGladius&f. If you want to help us though, talk to my &aMother&f!
-        - '&7&oSeem like &aFilius&7&o can help me find the way to &dGladius&7&o.'
+        - '&a[菲留斯] &f你成功翻越了这座山！这可不容易啊。'
+        - 
+          - 
+        - '&7&oSeem like &a菲留斯&7&o can help me find the way to &d格拉迪厄斯&7&o。'
   name: '&5农场'
   questLore:
     - 去&d格拉迪厄斯&f很简单，
@@ -12084,7 +12226,8 @@ primis_main_quest_6:
     - 祝你一路顺风！
   questAcceptDialog:
     - '&a[佩特拉]&f 告诉&a农场主&f是我派你来的，不过我听说很久都没人看见他。'
-    - 如果他们不在附近，我肯定他们的儿子&a菲留斯&f会乐意提供帮助！
+    - 
+      - 
     - 一路顺风！
     - '&7&o我应该跟随这条路到达&d农场&7&o并和&a农场主&7&o对话。'
   questCompleteMessage:
@@ -12095,9 +12238,9 @@ primis_main_quest_7:
   customObjectives:
     Objective4:
       dialog:
-        - '&a[General Hasta] &fI can''t believe you made it past the enemies.'
-        - You are exactly the kind of help we need right now!
-        - '&7&oSeems like I should talk to &aGeneral Hasta&7&o.'
+        - '&a[将军哈斯塔] &f你尽然能穿过敌军来到这里。'
+        - 你正是我们现在需要的援军！
+        - '&7&o我应该和&a将军哈斯塔&7&o谈谈。'
   name: '&5格拉迪厄斯之路'
   questLore:
     - 最近&d格拉迪厄斯&f堡垒硝烟四起。
@@ -12110,7 +12253,8 @@ primis_main_quest_7:
     - 我肯定它们会给予你奖励，！
   questAcceptDialog:
     - '&a[菲留斯] 路上小心，&d格拉迪厄斯&f肯定出事了。'
-    - 到达&d格拉迪厄斯&f后，堡垒的主人应该在他的宅邸或军营里。!
+    - 
+      - 
     - '&7&o我应该前往&d格拉迪厄斯&7&o并清除路上的&c亡灵水手&7&o。'
   questCompleteMessage:
     - '&a[哈斯塔领主]&f 你就是千桥派来的救兵？其他人呢？你是信使吗？'
@@ -12175,8 +12319,10 @@ primis_ogre_mines_lost_bretheren:
   customObjectives:
     Objective1:
       dialog:
-        - '&a[Fortis Fossores] &fWhat do you want? What, &aFugit&f sent you? What for? The mines were overrun? Hah, I didn''t even notice!'
-        - Let that worrywart brother of mine know that I am fine. Now, begone! I am on the verge of making a big mining discovery. I call it - branch mining! Hehehe, this one will change everything!
+        - '&a[富提斯·福索斯] &f你想要什么？什么，&a福吉特&f派你来的？矿井被占领了？我居然没注意到！'
+        - 
+          - 
+          - 
   name: '&5迷失的兄弟'
   questLore:
     - '&c兽人&7&o占领了矿井！'
@@ -12188,11 +12334,12 @@ primis_ogre_mines_lost_bretheren:
     - 我不会让你白跑一趟的！
   questAcceptDialog:
     - '&a[福吉特] &f请找到我的&a兄弟&f，确认他没事！'
-    - '&7&o我应该在&c兽人&7&o占领的&d矿井Mines&7&o找到&a福吉特的兄弟&7&o。'
+    - '&7&o我应该在&c兽人&7&o占领的&d矿井&7&o找到&a福吉特的兄弟&7&o。'
   questCompleteMessage:
     - '&a[福吉特·福索斯]&f 我的&a兄弟&f说了啥？啊，他就是这样，太过专注于工作，连附近被占领了都不知道！'
     - 下次见到他我得和他好好谈谈！
-    - 感谢你的帮助，送给你我最好的稿子，我称它为LL。照这样下去，我不太可能在短时间内采矿了。
+    - 
+      - 
 primis_ogre_mines_old_miner_quest:
   name: '&2幸运镐'
   questLore:
@@ -12213,7 +12360,7 @@ primis_pontis_groves_acrobatics:
   customObjectives:
     Objective1:
       dialog:
-        - '&a[Idoneitatem Hominem]&f Congratulations!'
+        - '&a[艾东塔特恩·霍米尼恩]&f 恭喜！'
   name: '&2杂技'
   questLore:
     - 所以你认为你有这个能力。
@@ -12224,11 +12371,13 @@ primis_pontis_groves_acrobatics:
     - 造了这片杂技场地。
     - 你的目标是使用&9藤蔓&f和&9杂技&f在平台间穿梭并
     - '并到达终点。'
-    - 如果你能通过这门课程并到达终点，(顺便一说，这是个球体。)
+    - 
+      - 
     - 你能获得非常好的&e物品&f！
   questAcceptDialog:
     - '&a[波苏尔·霍米尼恩]&f 你可以在&d隧道出口&f找到起点。'
-    - 游到第一根藤蔓上，爬到顶部。
+    - 
+      - 
     - 别忘了在最后和我的&a兄弟&f对话领取奖励！
     - '&7&o我应该前往起点。'
   questCompleteMessage:
@@ -12238,7 +12387,8 @@ primis_pontis_groves_caught in the web:
   questLore:
     - 它们在&d树林&f里某处筑造了&d巢穴&f。
     - 所以它们才会这么快繁衍。
-    - 我们习惯了&d树林&f里有&c蜘蛛&f，但这也太多了。
+    - 
+      - 
     - 如果你能找到并清除&d巢穴&f，那就太好了。
     - 我们能给你&e蜘蛛腿靴子&f作为奖励！
   questAcceptDialog:
@@ -12268,7 +12418,7 @@ primis_pontis_groves_into_the_next_hole:
   customObjectives:
     Objective1:
       dialog:
-        - '&a[Phygia Gorgonius]&f Time to kick those &cElves&f out for good!'
+        - '&a[菲吉娅·戈尔戈尼]&f 是时候让那些&cE精灵&f滚蛋了！'
   name: '&2钻入下一个洞里'
   questLore:
     - 如果你有空，这里还有很多工作要做。
@@ -12286,11 +12436,12 @@ primis_pontis_groves_lighthouse_1:
   customObjectives:
     Objective1:
       dialog:
-        - '&a[Alanus Secundas] &fHas the &dGrove&f sent you?'
+        - '&a[阿兰努斯·赛康达斯] &d树林&f派你来的？'
   name: '&2运输食物'
   questLore:
     - 漫游者，我们请你帮个小忙吗？
-    - 附近有座&d灯塔&f。我们通常运输食物给那里的住户。
+    - 
+      - 
     - 但自从麻烦开始后，我们就无法离开&d树林&f。
     - 麻烦你把他们家最新一批食物带来。
     - 如果你能快点就太好了，距离上次发货已经过很久了。
@@ -12305,15 +12456,17 @@ primis_pontis_groves_lighthouse_2:
   customObjectives:
     Objective1:
       dialog:
-        - '&8[Jeeves]&fOh, hello there again!'
-        - '&8[Jeeves]&f They do not need the food anymore? I was just about to go shopping.'
-        - '&8[Jeeves]&f So kind of you to come here and let me know.'
+        - "&8[吉夫斯]&f 哦，我们又见面了！\n"
+        - '&8[吉夫斯]&f They do not need the food anymore? I was just about to go shopping.'
+        - '&8[吉夫斯]&f So kind of you to come here and let me know.'
   name: '&2别问吉夫斯'
   questLore:
     - 呃，在你来之前，旅行商人吉夫斯来过。
     - 我们问他能否施舍给我们一些食物。
-    - 现在已经没有这个必要了，请能爬到灯塔的顶部，
-    - 然后到蔚兰村庄告诉吉夫斯我们不缺食物了。
+    - 
+      - 
+    - 
+      - 
   questAcceptDialog:
     - '&8[阿兰努斯·赛康达斯]&f 离开后灯塔就在你出洞后前面左侧。'
     - '&8&o我应该前往灯塔。'
@@ -12340,22 +12493,27 @@ primis_pontis_groves_population_control:
 primis_pontis_groves_tree_climbing_elf_bandits:
   name: '&2爬树的精灵强盗！'
   questLore:
-    - 我受够了&d树林&f里这些会爬树的&c精灵强盗&f！
+    - 
+      - 
     - 和&c蜘蛛&f不一样，
     - 现在这些喜欢阴影的疯子决定住在我们的树上！
-    - 他们喜欢黑暗，你看，光线它害了他们，让它们一头雾水。
-    - 当然，我们的小&d树林&f里有很多黑暗和阴影。
+    - 
+      - 
+    - 
+      - 
     - 所以它们大量闯入。
     - 好吧，他们得到了一些东西，
     - 看你一眼我就知道你能对付两个石头巨人！
     - 我相信一些精灵对你来说不是什么大问题。
-    - 去告诉它们，这里不欢迎他们！
+    - 
+      - 
   questAcceptDialog:
     - '&a[菲吉娅·戈尔戈尼]&f 我相信，如果你找到一些有树荫的地方，抬头看看，你会发现很多精灵，这样很难错过它们的树屋。'
     - '&7&o我应该在&a菲吉娅&7&o抑制不住怒火前干掉&c精灵&7&o。'
   questCompleteMessage:
     - '&a[菲吉娅·戈尔戈尼]&f 我的朋友！哈哈！很高兴再次见到你！'
-    - 我在远处看着。看到那些傻瓜摔死，真是太爽了！
+    - 
+      - 
     - '&7&o精灵再也不会打扰&a菲吉娅&7&o了。'
 primis_pontis_mille_fields_berry_crazed_wolf:
   name: '&2渴望浆果的狼群'
@@ -12381,7 +12539,7 @@ primis_pontis_mille_fields_camping_hunters:
   customObjectives:
     Objective1:
       dialog:
-        - '&a[Scribonia Ingenvinus]&f Yes?'
+        - '&a[斯克雷波尼亚·英格维纳斯]&f 有事吗？'
   name: '&2野营猎人'
   questLore:
     - 我希望没有打扰到你。你看起来像个会听从恳求的人。
@@ -12411,13 +12569,15 @@ primis_pontis_mille_fields_camp_hunter_three_times_hunter:
     - '&c爬行兽梅格登&f沉睡在阳光下的小树林上。'
     - 在两座西部山峰之间跳舞，你会找到
     - '&c穿刺兽乌拉齐米尔'
-    - 给我带来&e穿刺兽的角&f，&e鳕鱼兽的鳞片&f和&e爬行兽的丝绸&f作为证明。
+    - 
+      - 
   questAcceptDialog:
     - '&a[米洛尼亚·马朱斯]&f 拿上这个设备，它将大致引导你到它们的位置。'
     - '&7&o我应该前往挑战&c&o三只巨兽&7&o。'
   questCompleteMessage:
     - '&a[米洛尼亚·马朱斯]&f 你回来了。你还带来了我要求的三件证明物品。'
-    - 这一定是一次相当丰富的冒险，让我想起了我年轻的时候，那时我更加强大和敏捷。
+    - 
+      - 
     - 好了，关于我的事情就到此为止，这是我承诺的奖励！
     - '&7你交回了野兽追踪装置。'
     - '&a[米洛尼亚·马朱斯]&f我几乎忘了这东西，谢谢你！'
@@ -12437,7 +12597,8 @@ primis_pontis_mille_fields_do_it_yourself:
   questAcceptDialog:
     - '&a[斯克雷波尼亚·英格维纳斯]&f 我就知道你会答应的！我看到你已经全副武装了。'
     - 好了，这就是我要你做的事。
-    - 大型&c野兽&f，即&c大个头&f是我们的首要目标。
+    - 
+      - 
     - 其次你需要杀死5只&c长角牛&f和6只&c短角牛&f。
     - 明白了吗？很好，完事后再来找我。
     - '&7&o我应该杀死&c&o大个头&7&o、5只&c&o长角牛&7&o和6只&c&o短角牛&7&o。'
@@ -12450,19 +12611,19 @@ primis_pontis_mille_fields_feeding_the_hungry:
   customObjectives:
     Objective3:
       dialog:
-        - '&7You hand the over the bread and the flour.'
-        - '&a[Rufia Tertulus]&f I don''t know what to say. My children will be so happy!'
-        - '&7The woman bows to you in deep appreciation.'
+        - '&7你给出了面包和面粉。'
+        - '&a[露菲亚·特图鲁斯]&f 我不知道该说什么好。我的孩子会很开心的！'
+        - '&7女人向你深深地鞠躬。'
     Objective4:
       dialog:
-        - '&a[Fabia Praetextus]&f I guess fantasies do come true sometimes. I am eternally grateful to you kind sir.'
+        - '&a[法比亚·普雷塔斯]&f 梦想有时会成真。我非常感谢你。'
     Objective1:
       dialog:
-        - '&a[Lena Lucan]&f Fresh bread! I cannot thank you enough!'
+        - '&a[列那·卢坎]&f 新鲜的面包！真是谢谢啊！'
     Objective2:
       dialog:
-        - '&a[Tranio Florens]&f Wow! The day just keeps getting better!'
-        - Thank you for the flour kind soul.
+        - '&a[特拉尼奥·弗洛伦斯]&f 哇哦！我的日子好起来了！'
+        - 非常谢谢你。
   name: '&2为饥饿的人提供食物'
   questLore:
     - 我能感觉到你的心脏怦怦跳动。
@@ -12480,7 +12641,8 @@ primis_pontis_mille_fields_feeding_the_hungry:
     - '&7&o我应该前往&d贫民窟&7&o并给有需要的人提供食物。'
   questCompleteMessage:
     - '&a[奥古斯缇娜·维鲁克斯]&f &2迪莫尼斯&f让你来的对吧。'
-    - 他每周都会过来，给我们他能拿出的任何食物，让我们不会挨饿……
+    - 
+      - 
     - 谢谢你陌生人，我的家人不会忘记你的。
 primis_pontis_mille_fields_fruity_hound:
   name: '&2食果猎犬'
@@ -12504,8 +12666,10 @@ primis_pontis_mille_fields_fruity_hound:
     - '&7&o我应该去杀死&c&o食果猎犬&7&o并查看&e&o精品浆果&7&o是否完整。'
   questCompleteMessage:
     - '&a[多达卢斯·纳斯卡]&f 是的！这是我的宝贝！很好，很完整，上面甚至没有任何唾液！'
-    - 作为奖励，你可以拿走我第二大的浆果。小心别把它吃了。
-    - 我知道它可能让你垂涎欲滴，但相信我，如果你把它留在身上，它的作用更大。
+    - 
+      - 
+    - 
+      - 
 primis_pontis_mille_fields_not_on_my_farm:
   name: '&2别进我农场里！'
   questLore:
@@ -12525,13 +12689,13 @@ primis_pontis_mille_fields_surprise_me_with_flour:
   customObjectives:
     Objective3:
       dialog:
-        - '&a[Adulescens Lupis]&f I heard the farm was having &cRat&f problems. Three sacks of flour coming up, no problem!'
+        - '&a[阿杜尔森·卢皮斯]&f 我听说农场里有&c老鼠&f。三袋面粉就快好了，没问题！'
     Objective1:
       dialog:
-        - '&a[Dinia Niraemius]&f Flour? Sure, one sack of flour coming up!'
+        - '&a[迪尼亚·尼拉米乌斯]&f 面粉？没问题，一袋面粉就快好了！'
     Objective2:
       dialog:
-        - '&a[Daemones Maritialis]&f The farm needs more flour eh? Here ya go, two sacks!'
+        - '&a[迪莫尼斯·玛丽提拉斯]&f 农场需要更多面粉？这两袋拿去吧！'
   name: '&2面粉惊喜'
   questLore:
     - 哇，你的手艺真不错。但我还有一项任务。
@@ -12573,8 +12737,8 @@ primis_pontis_mille_field_check:
   customObjectives:
     Objective1:
       dialog:
-        - '&a[Augustina Verrucosis]&f Oh, this is quite important! I will let the residents know.'
-        - Thank you for delivering these important documents.
+        - '&a[奥古斯缇娜·维鲁克斯]&f 哦，这非常重要！我会告知居民的。'
+        - 感谢你带来这些重要文件。
   name: '&2检查田野'
   questLore:
     - 能麻烦你帮个忙吗？
@@ -12598,7 +12762,7 @@ primis_pontis_mille_fresh_rats_coming_up:
   customObjectives:
     Objective1:
       dialog:
-        - '&a[Elite Guard]&f Plenty of rats inside.'
+        - '&a[精英守卫]&f 里面有很多老鼠。'
   name: '&2新鲜的老鼠'
   questLore:
     - 没有猫粮，但我想我能帮你
@@ -12618,20 +12782,20 @@ primis_pontis_mille_hungry_friend:
   customObjectives:
     Objective3:
       dialog:
-        - '&a[Melaenis Gelasius]&f Cat food? Where the heck did you manage to find a cat here...'
-        - No, I don't know where to get any cat food.
+        - '&a[梅莱尼斯·格拉修斯]&f 猫粮？你是怎么在这里找到猫的？'
+        - 我不知道哪里能获取猫粮。
     Objective4:
       dialog:
-        - '&a[Sulpicio Panthera]&f I wish I could help, sorry.'
+        - '&a[苏尔皮西奥·潘瑟拉]&f 真希望我能帮上忙，抱歉。'
     Objective1:
       dialog:
-        - '&a[Royal Guard]&f Do I look like someone who keeps track of cat food?...'
+        - '&a[皇家守卫]&f 我看起来像是能找猫粮的人吗？'
     Objective2:
       dialog:
-        - '&a[Tyndarus Faustinius]&f Sorry, I have no idea.'
+        - '&a[廷达鲁斯·福斯蒂纽斯]&f 抱歉，我不知道。'
     Objective5:
       dialog:
-        - '&a[Tyndarus Columbanus]&f We used to have cat food around here somewhere, but heck knows what happened to it...'
+        - '&a[廷达鲁斯·哥伦巴努斯]&f 附近曾经有猫粮，但现在鬼才知道猫粮在哪……'
   name: '&2饥饿的朋友'
   questLore:
     - '&7&o小家伙，怎么了。'
@@ -12647,35 +12811,35 @@ primis_pontis_mille_hungry_friend:
     - '&a[莫德斯特·阿佩尔]&f 猫粮，我不知道。但是……'
     - '&7&o似乎&a&o莫德斯特&7&o知道什么……'
 primis_pontis_mille_late_delivery:
-  name: '&2Late delivery'
+  name: '&2延迟送货'
   questLore:
-    - I ordered some &eFishing Nets&f from
-    - '&dGladius&f that haven''t arrived yet. I wonder'
-    - if something might have happened to the
-    - shipment. If you are willing, I would pay you
-    - a small fee if you could go see what
-    - happened to the shipment and get the
-    - '&eFishing Nets&f for me.'
+    - 我订购了一些&d格拉迪厄斯&f的&e渔网&f，
+    - '但到现在都还没送到。'
+    - 是不是送货出了什么问题。
+    - 如果你愿意的话，
+    - 我愿意付钱给你
+    - 调查货物状况
+    - '把&e渔网&f带给我。'
   questAcceptDialog:
-    - '&a[Delphium Calpurnius]&f Last I heard my shipment of &eFishing Nets&f was supposed to be heading for &dGladius&f.'
-    - '&7&oI need to go look around &d&oGladius&7&o for &a&oDelphium''s&7&o shipment of &e&oFishing Nets&7&o.'
+    - '&a[德尔菲姆·卡尔普尼乌斯]&f 我的&e渔网&f应该在&d格拉迪厄斯&f。'
+    - '&7&o我需要前往&d&o格拉迪厄斯&7&o找到&a&o德尔菲姆&7&o订购的&e&o渔网&7&o。'
   questCompleteMessage:
-    - '&a[Delphium Calpurnius]&f Those are the &eFishing Nets&f! Thank you so much!'
-    - '&a[Delphium Calpurnius]&f I invested a lot of my savings into these! Not sure what I would have done if you hadn''t found them.'
+    - '&a[德尔菲姆·卡尔普尼乌斯]&f 我的&e渔网&f！非常感谢！'
+    - '&a[德尔菲姆·卡尔普尼乌斯]&f 我花了一大笔订购！要是没你我，我都不知道该怎么办。'
 primis_pontis_mille_let_them_know:
   customObjectives:
     Objective3:
       dialog:
-        - So Fortes sent you? I see.
-        - Your help would be much appreciated, aid me and my forces will be ready.
+        - 福特斯派你来的？我明白了。
+        - 帮助我，我的援兵即刻就到。
     Objective1:
       dialog:
-        - So Fortes has decided to take action.
-        - Help me finish my task, and my forces will be ready.
+        - 福特斯决定采取行动了。
+        - 帮我完成任务，我的援兵准备就绪。
     Objective2:
       dialog:
-        - So Fortes has decided to act.
-        - If you could assist me with this task, then my forces will be ready.
+        - 福特斯决定行动了。
+        - 如果你能帮我完成任务，我的援兵即刻就绪。
   name: '&2Let them know！'
   questLore:
     - 抱歉我无法立刻支援格拉迪厄斯。
@@ -12683,7 +12847,8 @@ primis_pontis_mille_let_them_know:
     - 如果你能去找城市里的将军们
     - 让他们知道格拉迪厄斯需要帮助，也许我们就能做点什么。
     - 但我们必须先解决现存的问题。
-    - 我确认将军会乐意让你帮忙解决他们的问题。
+    - 
+      - 
     - 找他们然后告诉我他们收到了消息。
     - 我会给你奖励。
   questAcceptDialog:
@@ -12698,7 +12863,7 @@ primis_pontis_mille_lighthouse_1:
   customObjectives:
     Objective1:
       dialog:
-        - '&8[Hegio Remus]&f Another letter? Thank you for bringing it to me.'
+        - '&8[禾吉奥·雷姆斯]&f 又一封信？谢谢你把它带给我。'
   name: '&2快速交付'
   questLore:
     - 在你离开前，你能帮我把这封信寄出去吗？
@@ -12714,11 +12879,11 @@ primis_pontis_mille_lighthouse_2:
   customObjectives:
     Objective1:
       dialog:
-        - '&a[Jeeves]&f Oh, we meet again. It''s good to see you.'
-        - You have something for me? Oh, wow...that is quite the shopping list.
-        - I will have the items sent back to &aHegio&f as soon as possible.
-        - Thank you for stopping by. Hope we meet again.
-        - '&7&oI should let &aHegio&7&o know I delivered the note.'
+        - '&a[吉夫斯]&f Oh, we meet again. It''s good to see you.'
+        - "你有东西要给我？哦，哇……这是购物清单。\n"
+        - 我会尽快把物品带给&a禾吉奥&f。
+        - 谢谢你过来。希望我们能再见面。
+        - "&7&o我应该告诉&a禾吉奥&7&o我完成了任务。\n"
   name: '&2询问吉夫斯'
   questLore:
     - 你能拿着传送门给我的好朋友&a吉夫斯&f送张便条吗？
@@ -12732,13 +12897,13 @@ primis_pontis_mille_mines_goblined_up_in_the_maze:
   customObjectives:
     Objective3:
       dialog:
-        - '&a[Hurt Guard]&f Am so I happy to see you!'
+        - '&a[受伤的守卫]&f 很高兴见到你！'
     Objective1:
       dialog:
-        - '&a[Injured Guard]&f Thank the skies!'
+        - '&a[受伤的守卫]&f 感谢上天！'
     Objective2:
       dialog:
-        - '&a[Wounded Guard]&f Finally, the rescue is here!'
+        - '&a[受伤的守卫]&f 援兵终于来了！'
   name: '&2迷宫里的哥布林'
   questLore:
     - 能麻烦你一下吗。
@@ -12763,32 +12928,36 @@ primis_pontis_mille_serious_sewage:
   customObjectives:
     Objective3:
       dialog:
-        - '&a[Michelangelo]&f Tell that old man everything is in order!'
+        - '&a[米开朗基罗]&f 告诉那老头，一切井然有序！'
     Objective4:
       dialog:
-        - '&a[Raphael]&f Tell Rogerius I am alive and doing fine!'
+        - '&a[拉斐尔]&f 告诉罗杰里乌斯我活得很好！'
     Objective1:
       dialog:
-        - '&a[Donatello]&f You can tell the General I am doing just fine!'
+        - '&a[多纳泰罗]&f 你可以和将军说我很好！'
     Objective2:
       dialog:
-        - '&a[Leonardo]&f The General should not worry, I am ok!'
+        - '&a[李奥纳多]&f 让将军别担心我，我很好！'
   name: '&2排污严重'
   questLore:
     - 如果你能胜任这项工作，我需要你的帮助。
-    - 城市的&d下水道&f成为了各种麻烦制造者和小动物的巢穴。
-    - 麻烦制造者自称是&c忍者&f……不过他们远非如此。
+    - 
+      - 
+    - 
+      - 
     - 他们有领袖，我认为他应该叫做&c施莱德&f什么的。
     - 除掉他，无首群龙无首则乱。
     - 如果你能去那里减少生物和麻烦制造者的数量
     - 我就可以把我的部队分配到更重要的任务上去……
     - 我们派了一些&a4特工&f下去，但还没有他们的消息。
-    - 如果你能去看看他们是否安好，那就太好了。
+    - 
+      - 
     - 我好像还拿错了我私人的&e下水道钥匙&f。
     - 如果你能找回来就再好不过了。
   questAcceptDialog:
     - '&a[罗杰里乌斯]&f你可以游下喷泉进入&d下水道&f，然后往东南方向走。'
-    - 当你看到一根大排水管插进墙里时，你就知道来对地方了。
+    - 
+      - 
     - '&7&o我需要找到&d下水道&7&o并完成任务。'
   questCompleteMessage:
     - '&a[罗杰里乌斯]&f 你完成了我要求的所有任务？要是再有10个这样的你就好了……'
@@ -12796,7 +12965,7 @@ primis_pontis_mille_star_gazing:
   customObjectives:
     Objective1:
       dialog:
-        - '&a[Virgo Dexippus]&f Yes, what is it?'
+        - '&a[维尔戈·德西普斯]&f 有什么事吗？'
   name: '&2观星'
   questLore:
     - 你为这座城市和它的人民做了那么多。
@@ -12810,7 +12979,8 @@ primis_pontis_mille_star_gazing:
     - '&d天文台&f位于&d灯塔&f后。这是一座很大的塔，你很难错过。'
   questAcceptDialog:
     - '&7[福特斯·贝拉特]&f 你可以在&d天文台&f找到&a观星者&f。'
-    - '&d天文台&f位于&d灯塔&f后。这是一座很大的塔，你很难错过。'
+    - 
+      - 
     - '&7&o我应该和&d天文台&7&o的&a观星者&7&o谈谈。'
   questCompleteMessage:
     - '&a[维尔戈·德西普斯]&f &a少校&f派你来的？ 那么肯定是很重要的事情。'
@@ -12834,8 +13004,8 @@ primis_pontis_mille_the_groves_call:
   customObjectives:
     Objective1:
       dialog:
-        - '&a[King Nemian]&f &2General Bromia&a sent you?'
-        - Excellent, I knew we could count on him.
+        - '&a[国王尼米安]&f &2布罗米亚将军&a派你来的？'
+        - 很好，我就知道他靠得住。
   name: '&2树林召唤！'
   questLore:
     - 保护&d树林s&f是我们的使命。
@@ -12872,10 +13042,10 @@ primis_pontis_mille_where_is_he_now:
   customObjectives:
     Objective1:
       dialog:
-        - '&a[Gorenus Palis]&f My brother sent you looking for me?'
-        - Oh, I messed up again...I got real lost this time.
-        - I hope he isn't too mad.
-        - When you go back, please tell him I'm safe.
+        - '&a[戈雷诺斯·帕利斯]&f 我兄弟让你来找我的？'
+        - 哦，我又搞砸了……这次是真的迷路了。
+        - 希望他不是很生气。
+        - 回去后告诉他我很安全。
   name: '&2饥饿的朋友'
   questLore:
     - 我和我的&a兄弟&f在
@@ -12899,7 +13069,7 @@ primis_pontis_redwoods_big_brown_logs:
   customObjectives:
     Objective1:
       dialog:
-        - '&a[Magnus]&f Who are you? Oh, you came from &dPontis Mille&f.'
+        - '&a[马格努斯]&f 你是谁？哦，你来自&d千桥&f。'
   name: '&2棕色大原木'
   questLore:
     - 如果你能提供帮助，我愿协助&d格拉迪厄斯
@@ -12923,7 +13093,8 @@ primis_pontis_redwoods_its_reyn_time:
     - 沉重的原木也砸不烂它。
     - 我看到有个&c强盗&f捡走了。
     - 他们应该&9拿着斧头&f。
-    - 请你能去他们的营地帮我拿回来。这对我来说意义重大！
+    - 
+      - 
     - 当你回来后，我也会给你很好的奖励！
   questAcceptDialog:
     - '&8[雷努斯]&f 你可以在河流右侧找到&c强盗&f。'
@@ -12968,97 +13139,100 @@ primis_pontis_redwoods_need_a_smoke:
   questCompleteMessage:
     - '&a[莱科]&f 你找到了！哈哈！我就知道你靠得住！'
 primis_terravilla_bipedal_examination:
-  name: '&2Bipedal examination'
+  name: '&2双足威胁'
   questLore:
-    - I have been studying the &cTwo Legged Terrors&f that roam
-    - around &dTerravilla&f. Did you know that their population
-    - used to be much larger just some years ago. In fact it was
-    - the reason why the first settlers decided to build
-    - '&dTerravilla&f on top of the ruins and not down on the ground.'
-    - For some reason their numbers have really decreased. I was
-    - trying to get some &eSamples&f but trying to kill any of them is
-    - far beyond my skill. But you look like the sort of type who
-    - can handle a &cTwo Legged Terror&f or two. Interested in
-    - helping me out?
+    - 我在研究&d泰拉维拉&f附近的&c双足恐怖生物s&f。
+    - 几年前它们的种群数量比现在多得多。
+    - 其实这就是首批定居者决定
+    - 在废墟上建造
+    - '&d泰拉维拉&f的原因。'
+    - 出于一些原因，它们的数量减少了。
+    - 我打算收集一些&e样本&f，
+    - 但我没能力杀死它们。你看起来像是能
+    - 处理这些&c双足恐怖生物&f的人。
+    - 能帮帮我吗？
   questAcceptDialog:
-    - '&a[Plautia Suilius]&f Six &eSamples&f should do it. Return to me once you have collected the &eSamples&f.'
-    - '&7&oI need to slay 3 &c&oTwo Legged Terrors&7&o and collect their &e&oSamples&7&o.'
+    - '&a[普拉蒂亚·苏里乌斯]&f 6份&e样本&f应该够了。收集完&e样本&f后再来找我。'
+    - '&7&o我需要杀死3只&c&o双足恐怖生物s&7&o并收集其&e&o样本&7&o。'
   questCompleteMessage:
-    - '&a[Plautia Suilius]&f Great! Let''s have a look.'
-    - '&7&oI should hear what &a&oPlautia Suilius&7&o has discovered.'
+    - '&a[普拉蒂亚·苏里乌斯]&f 很好！让我研究一下。'
+    - '&7&o我得瞧瞧&a&o普拉蒂亚·苏里乌斯&7&o有什么发现。'
 primis_terravilla_drowning_terror:
   name: '&2恐怖溺尸'
   questLore:
-    - My theory was correct. I dissected the growth and found
-    - an organism inside. After careful examination I have
-    - determined that the organism is of aquatic origin. And
-    - not only that, they are capable of hijacking the host's
-    - brain. Once ready to hatch they make the host go to the
-    - nearest water source and drown themselves. The organism
-    - can then freely hatch and swim away. Whatever is
-    - infecting the &cTwo Legged Terrors&f must be living in
-    - a nearby river. You should go there and collect a
-    - '&ePerfect Sample&f of whatever organism is causing this.'
-    - I do not know if this is something that can affect humans
-    - but just in case you should kill a few of the organisms
-    - to make sure.
+    - 我的理论是正确的。我解剖了成熟体并发现了里面有个生物。
+    - 经过仔细的检查后，
+    - 我发现里面是水生生物。
+    - 不仅如此，它们还能操控宿主的大脑。
+    - 准备好产卵后，它们会让宿主前往
+    - 附近的水源溺死宿主。
+    - 它们就能自由产卵和游走了。
+    - 感染&c双足恐怖生物&f的生物肯定生活在附近的溪流
+    - 你应该前往收集
+    - '导致感染的&e完美样本&f。'
+    - 我不知道这会不会感染人类
+    - 但以防万一，你应该
+    - 杀死它们。
   questAcceptDialog:
-    - '&a[Plautia Suilius]&f Come back here once you have collected a &ePerfect Sample&f.'
-    - '&7&oI need to go to the nearby river and collect a &e&oPerfect Sample&7&o of whatever is causing the infections.'
+    - '&a[普拉蒂亚·苏里乌斯]&f 收集&e完美样本&f后回来找我。'
+    - '&7&o我需要前往附近的河流收集&e&o完美样本&7&o。'
   questCompleteMessage:
-    - '&a[Plautia Suilius]&f Wow it looks like a fish, but it''s internal organs are different.'
-    - It must infect other creatures by releasing these tiny worm like meat particles...
-    - Let me have a look at you. Hmm, you seem fine, no traces...
-    - So it is not affecting us...yet. This is an emergency, I need to collect my stuff and go present my findings to the researchers at &dPontis Mille&f immediately. I need to get approval for extermination, that organism cannot be allowed to evolve.
-    - Thank you for everything you have done. Here, take this. It's not a lot but at least it's something.
-    - '&7&oI should make sure to stay away from the river...'
+    - '&a[普拉蒂亚·苏里乌斯]&f 它看起来像条鱼，但其器官可不一样。'
+    - 它肯定是通过释放这些像肉粒一样的小虫子来感染其他生物的……
+    - 让我看看你。嗯，你没有感染的迹象……
+    - 
+      - 
+      - 
+    - 
+      - 
+    - '&7&o我应该远离河流……'
 primis_terravilla_hog_on_my_porch:
-  name: '&2Bipedal examination'
+  name: '&2野猪当道'
   questLore:
-    - He is sitting on the darn lift again!
-    - I cannot believe it! You there!
-    - You look like you can handle a large beast.
-    - I will pay you good money if you can get rid
-    - of that &cAnnoying Large Hog&f that keeps sitting
-    - on the lift. How are we supposed to get goods
-    - up and down this way.
+    - 它又坐在那该死的升降机上了！
+    - 难以置信！那边那个，就是你！
+    - 你看起来能处理大型野兽。
+    - 如果你能除掉升降机上的&c大型野猪&f
+    - 我会给予你丰厚的报酬
+    - 我们得用升降机
+    - 搬运货物。
   questAcceptDialog:
-    - '&a[Dorippa Sarimarcus]&f Get rid of that hog right down there, see it?'
+    - '&a[多里帕·萨里玛库斯]&f 除掉那里的野猪了吗？'
     - '&7&o我需要杀死&c&o尖背野猪王&7&o。'
   questCompleteMessage:
-    - '&a[Dorippa Sarimarcus]&f Finally! I can move on with my life now! Thank you!'
+    - '&a[多里帕·萨里玛库斯]&f 我终于能正常工作了！谢谢！'
 primis_terravilla_razorbag:
-  name: '&2Razorbag'
+  name: '&2猎杀野猪'
   questLore:
-    - If you are looking for work I got some for ya.
-    - I design and make heavy duty bags that I sell
-    - here at my little shop. So I am in need of
-    - leather. Thankfully there are plenty of
-    - '&cRazorbacks&f around these parts. If you are'
-    - interested I would like to hire you to go hunt
-    - them for their leather. I would need a considerable
-    - amount of leather. So this won't be a quick job.
+    - 如果你要找工作，我这儿有。
+    - 我设计和制作重型包装袋，
+    - 在我的小店里出售。所以我需要皮革。
+    - 还好附近有很多
+    - '&c尖背野猪&f。如果你感兴趣的话，'
+    - 我希望你能猎杀一些野猪获得皮革。
+    - 我需要很多皮革。
+    - 所以这份工作可不轻松。
   questAcceptDialog:
-    - '&a[Telestis Senna]&f You will mostly find them roaming around here and towards the fields area.'
-    - '&7&oI need to go hunt the &c&oMature Razorback&7&o.'
+    - '&a[泰利斯特·塞纳]&f 他们就在附近。'
+    - '&7&o我得猎杀&c&o成熟尖背野猪&7&o。'
   questCompleteMessage:
-    - '&a[Telestis Senna]&f Yep, that will do it. In pristine condition too! Here is your coin, as promised.'
+    - '&a[泰利斯特·塞纳]&f 够了。这些皮革完好无损！这是你的奖励。'
 primis_terravilla_terrifying:
-  name: '&2Terrifying'
+  name: '&2恐怖寄生虫'
   questLore:
-    - Well that is concerning. The sample you brought shows
-    - that they are slowly being drained of their nutrients.
-    - My hypothesis is that there is most likely a parasite
-    - attached to them that is causing this. You should go
-    - out there again and see if you can find any large
-    - '&eGrowths&f on their bodies, and then cut them off'
-    - and bring them back here.
+    - 这很令人担忧。你带来的样本显示，
+    - 它们的营养正在慢慢流失。
+    - 我认为它们里面长了寄生虫。
+    - 你应该再去那里
+    - 看看能否在它们身体里找到任何大型
+    - '&e成熟体&f'
+    - 并将成熟体待会给我。
   questAcceptDialog:
-    - '&a[Plautia Suilius]&f I would only need two &eGrowths&f no more than that.'
-    - '&7&oI need to slay &c&oTwo Legged Terrors&7&o and collect two &e&oGrowths&7&o.'
+    - '&a[普拉蒂亚·苏里乌斯]&f 我需要两个&e成熟体&f。'
+    - '&7&o我需要杀死&c&o双足恐怖生物s&7&o并收集两个&e&o成熟体&7&o。'
   questCompleteMessage:
-    - '&a[Plautia Suilius]&f Excellent, these should do it.'
-    - '&7&oI should hear what &a&oPlautia Suilius&7&o has managed to find.'
+    - '&a[普拉蒂亚·苏里乌斯]&f 很好。'
+    - '&7&o我应该听听&a&o普拉蒂亚·苏里乌斯&7&o有何发现。'
 test_quest:
   name: 击杀测试Boss
   questLore:
@@ -13066,7 +13240,8 @@ test_quest:
 xmas_quest_0:
   name: '&2找到丢失的礼物'
   questLore:
-    - 我在路上掉了一些圣诞礼物，你能帮我找找吗？
+    - 
+      - 
     - 作为回报，我能给你一件圣诞礼物！
   questAcceptDialog:
     - '&8[&c圣尼克&8]&f 谢谢你！我会在这里等你！'

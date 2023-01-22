@@ -29,7 +29,7 @@ public class EliteScript extends ElitePower implements Cloneable {
         super(scriptBlueprint.getCustomConfigFields());
         this.eliteScriptMap = eliteScriptMap;
         this.scriptEvents = new ScriptEvents(scriptBlueprint.getScriptEventsBlueprint());
-        this.scriptConditions = new ScriptConditions(scriptBlueprint.getScriptConditionsBlueprint(), this);
+        this.scriptConditions = new ScriptConditions(scriptBlueprint.getScriptConditionsBlueprint(), this, false);
         this.scriptZone = new ScriptZone(scriptBlueprint.getScriptZoneBlueprint(), this);
         this.scriptActions = new ScriptActions(scriptBlueprint.getScriptActionsBlueprint(), eliteScriptMap, this);
         this.scriptCooldowns = new ScriptCooldowns(scriptBlueprint.getScriptCooldownsBlueprint(), this);
@@ -59,7 +59,7 @@ public class EliteScript extends ElitePower implements Cloneable {
         //Check if the event is relevant to the script
         if (!scriptEvents.isTargetEvent(event.getClass())) return;
         //Check if the event conditions are met
-        if (scriptConditions != null && !scriptConditions.meetsConditions(eliteEntity, player)) return;
+        if (scriptConditions != null && !scriptConditions.meetsPreActionConditions(eliteEntity, player)) return;
         //Let's do some actions
         scriptActions.runScripts(eliteEntity, player, event);
         //Cooldowns time
@@ -74,7 +74,7 @@ public class EliteScript extends ElitePower implements Cloneable {
      */
     public void check(EliteEntity eliteEntity, LivingEntity directTarget, ScriptActionData previousScriptActionData) {
         //Check if the event conditions are met
-        if (scriptConditions != null && !scriptConditions.meetsConditions(eliteEntity, directTarget))
+        if (scriptConditions != null && !scriptConditions.meetsPreActionConditions(eliteEntity, directTarget))
             return;
         //Let's do some actions
         scriptActions.runScripts(previousScriptActionData);
@@ -89,7 +89,7 @@ public class EliteScript extends ElitePower implements Cloneable {
      */
     public void check(Location landingLocation, ScriptActionData previousScriptActionData) {
         //Check if the event conditions are met
-        if (scriptConditions != null && !scriptConditions.meetsConditions(previousScriptActionData.getEliteEntity(), null)) return;
+        if (scriptConditions != null && !scriptConditions.meetsPreActionConditions(previousScriptActionData.getEliteEntity(), null)) return;
         //Let's do some actions
         scriptActions.runScripts(previousScriptActionData, landingLocation);
         //Cooldowns time

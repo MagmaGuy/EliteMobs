@@ -116,15 +116,8 @@ public class ScriptZone {
                         new WarningMessage("Script for boss " + scriptActionData.getEliteEntity().getName() + " has a static ray but no set target2 for the ray!");
                         break;
                     }
-                    Location finalTargetLocation = null;
-                    if (finalTargets != null) {
-                        List<Location> finalTargetsList = finalTargets.getTargetLocations(scriptActionData).stream().toList();
-                        if (!finalTargetsList.isEmpty()) finalTargetLocation = finalTargetsList.get(0);
-                    }
-                    for (Location location : targets2.getTargetLocations(scriptActionData)) {
-                        //Developer.message("adding shape");
-                        shapes.add(new RotatingRay(zoneBlueprint.isIgnoresSolidBlocks(), zoneBlueprint.getPointRadius(), shapeTargetLocation, finalTargetLocation, location, zoneBlueprint.getPitchPreRotation(), zoneBlueprint.getYawPreRotation(), zoneBlueprint.getPitchRotation(), zoneBlueprint.getYawRotation(), zoneBlueprint.getAnimationDuration()));
-                    }
+                    for (Location target2Location : targets2.getTargetLocations(scriptActionData))
+                        shapes.add(new RotatingRay(zoneBlueprint.isIgnoresSolidBlocks(), zoneBlueprint.getPointRadius(), shapeTargetLocation, target2Location, zoneBlueprint.getPitchPreRotation(), zoneBlueprint.getYawPreRotation(), zoneBlueprint.getPitchRotation(), zoneBlueprint.getYawRotation(), zoneBlueprint.getAnimationDuration()));
                     break;
                 case TRANSLATING_RAY:
                     if (targets2 == null) {

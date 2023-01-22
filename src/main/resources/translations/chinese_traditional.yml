@@ -2811,7 +2811,7 @@ banshee_drop_charm:
 beast_tamer_drop_axe:
   name: '&e巨斧'
   lore:
-    - '&eHeavy enough to cleave any beast in two.'
+    - '&e重量足以將任何野獸劈成兩半。'
 berserker_charm:
   name: '&b狂暴者飾品'
   lore:
@@ -2819,22 +2819,22 @@ berserker_charm:
     - '&a你陷入狂暴之中'
     - '&a同時也開始失去自我...'
 bigfoot_drop_chestplate:
-  name: '&eFur Armor'
+  name: '&e毛皮盔甲'
   lore:
-    - '&eNice and warm.'
+    - '&e暖融融。'
 big_bad_wolf_drop_chestplate:
-  name: '&aBig Bad Wolf Fur'
+  name: '&a大灰狼皮毛'
   lore:
-    - '&aScary!'
+    - '&a害怕！'
 bloated_jeffrey_drop_tear:
   name: '&bSweet Tear'
   lore:
-    - '&bYou made Jeffrey cry...'
+    - '&b你害Jeffrey哭了...'
 bone_fiend_drop_leggings:
-  name: '&aBoney Leggings'
+  name: '骨制護腿'
   lore:
-    - '&aThe sharp bones attached to these'
-    - '&aleggings sure do rattle a lot.'
+    - '&a尖銳的骨頭安裝在這'
+    - '&a綁腿真的很會嘎嘎作響'
 challengers_boots:
   name: '&c挑戰者之靴'
   lore:
@@ -2867,9 +2867,9 @@ chameleon_charm:
     - '&a可以融入環境之中,'
     - '&a並緩慢地移動...'
 changeling_drop_sword:
-  name: '&aCrystalline Sword'
+  name: '&a結晶劍'
   lore:
-    - '&aThe blade shimmers as you gaze upon it.'
+    - '&a眼看劍光閃爍'
 cheetah_charm:
   name: '&b獵豹飾品'
   lore:
@@ -2877,14 +2877,14 @@ cheetah_charm:
     - '&a每小時120公里... 但這個'
     - '&a可以1分鐘就達成這個速度'
 circus_ringmaster_drop_charm:
-  name: '&dRingmasters Whip'
+  name: '&d指揮官的鞭子'
   lore:
-    - '&dThis was used for terrible punishment.'
+    - '&d這是酷刑用具'
 craftenmine_terror_drop_trident:
-  name: '&cGhast Lobotomizer'
+  name: '&c惡靈前額葉切除器'
   lore:
-    - '&cPerfect for making sure that'
-    - '&cthe Ghasts stay grounded.'
+    - '&c確保'
+    - '&c惡靈待在地上'
 creeperpede_drop_chestplate:
   name: '&dExplosion Proof Vest'
   lore:
@@ -7964,7 +7964,8 @@ blacksmith:
     - 物品會帶有許多附魔而更有價值!
     - 越高等級的怪物掉落越好的物品!
     - 高等級怪物越有高機會掉戰利品!
-    - 高等級精英怪會有吸引人的戰利品!
+    - 
+      - 
     - 有些裝備會有特殊效果!
     - 有些裝備會有獨特效果!
     - 帶有獵人的附魔會使\n精英怪發現機率上升!
@@ -8153,10 +8154,13 @@ primis_caeruleaum_hint_giver:
     - 真高興見到你！
     - 你好!
   dialog:
-    - 你看起來強壯有力。和一些人交談 \n ，如果你想幫助我們的村民。
-    - 很久以前有一個美麗的神社 \n，但好像發生了什麼事情。
+    - 
+      - 
+    - 
+      - 
     - 西南的廢墟真是個可怕的地方！\n 誰會去那裡...
-    - 曾經遇到過強大的法師，\n他們能夠召喚出美麗的冰牆。\n但如果他們暈倒了，它就會破裂。
+    - 
+      - 
     - 我聽說這是一種討厭的地方\n狼已經在狼窩裡安頓下來了！
   farewell:
     - 再見。
@@ -10946,57 +10950,121 @@ wood_league_arena_master:
 wood_league:
   arenaName: 木製聯賽
   arenaMessages:
-    - wave=1:message=&8[Gladius] &f今天的重頭戲！一位傳奇的戰士來到了競技場，與來自世界各地的最強悍的怪物測試比拚！但在此之前，這有一個新手正與一些殭屍戰鬥中。
-    - wave=2:message=&8[Gladius] &f你看，他至少知道如何揮動他的武器！目前只是熱身，讓我們開始調高難度！
-    - wave=3:message=&8[Gladius] &f你認為你很強大？那麼這波如何？哈哈哈哈！
-    - wave=4:message=&8[Gladius] &f好吧，我想他們可以離開了！女士們，先生們，係好安全帶，有好戲可看了！
-    - wave=5:message=&8[Gladius] &f我在外面找到這個 &c奇怪的生物&f，我想把它放在競技場裡會很有趣！
-    - wave=6:message=&8[Gladius] &f看起來你可以很好地處理一小群敵人， &c讓我們嘗試投入更多敵人！
-    - wave=7:message=&8[Gladius] &f所以你認為你可以真正挑戰完所有的競技場對手？
+    - 
+      - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
     - wave=8:message=&8[Gladius] &f不錯，但如果每個敵人都是&c近戰&f武器呢？
     - wave=9:message=&8[Gladius] &f很好，很好，但如果他們都是&c遠程&f的話？
-    - wave=10:message=&8[Gladius] &f小心，有隻&c壞狗狗&f好像闖進了競技場！它到底是從哪裡來的？
-    - wave=11:message=&8[Gladius] &f好吧，各位，已經有人來對付那隻壞狗狗了，現在，我們可以繼續！
-    - wave=12:message=&8[Gladius] &f觀眾似乎在喊想看到&c血流成河&f！好吧，讓我們歡迎它！
-    - wave=13:message=&8[Gladius] &f似乎保管人感到無聊並給競技場生物塗上&2劇毒&f！讓我們看看會發生什麼...
-    - wave=14:message=&8[Gladius] &f好吧，真是……無聊！誰給那些傢伙下毒，誰就被解雇了！下次給我出更好的主意！
-    - wave=15:message=&8[Gladius] &f這裡有今年的獲獎作品&4豬&f！因恐怖的外表讓他獲得第一名！大家鼓掌歡迎&4Mr. Oinkers&f！
-    - wave=16:message=&8[Gladius] &fMr. Oinkers已變成熏肉！&cMr. Oinker的粉絲&f，為了報仇雪恨，開始湧入競技場！
-    - wave=17:message=&8[Gladius] &f看起來我們的競技場挑戰者認為他有機會！但他是否能應付更多&c強大的&f敵人?
-    - wave=18:message=&8[Gladius] &f看! &c擊劍俱樂部 &f和 &c射箭俱樂部 &f正在比賽！讓我們看看哪個更好！
-    - wave=19:message=&8[Gladius] &f擊劍俱樂部沒什麼看頭，讓我們看看 &c射箭俱樂部&f 的表現！
-    - wave=20:message=&8[Gladius] &f看來射箭俱樂部也不過如此！看來我們的挑戰者已經開始引起我們一些頂級角斗士的注意了！&2殭屍的驕傲佐爾坦&f參戰！
-    - wave=21:message=&8[Gladius] &f難以置信！這個菜鳥打敗了佐爾坦！難道他有當冠軍的潛力嗎？
-    - wave=22:message=&8[Gladius] &f觀眾們開始下注了！今天的選手能走多遠？
-    - wave=23:message=&8[Gladius] &f別移開視線，這波敵人都手持著&c凋零&f效果的武器！
-    - wave=24:message=&8[Gladius] &f似乎有些強大的競技場選手開始出現，以阻止這個挑戰者！敬請期待！
-    - wave=25:message=&8[Gladius] &f是&bAgdluak&f，來自北方的弓箭手！當心它的 &b冰凍&f！
-    - wave=26:message=&8[Gladius] &f那是一場非常精彩的對決！我們&c耐心等待&f看看接下來會發生什麼！
-    - wave=27:message=&8[Gladius] &f競技場的難度正在提升！&c殭屍對箭免疫，骷髏會凍結他們的對手&f，他會怎麼解決呢！？
-    - wave=28:message=&8[Gladius] &f是時候炫耀這些了&c擊劍&f的技術！
-    - wave=29:message=&8[Gladius] &f現在，讓我們來&c打靶&f！挑戰者就是目標！
-    - wave=30:message=&8[Gladius] &f一個潛在的競技場冠軍登場了！ &2南方毒蛇&f吐出&c毒液&f，往挑戰者奔去。
-    - wave=31:message=&8[Gladius] &f南方毒蛇已經倒下！人群變得瘋狂！女士們，先生們，多麼美好的一天！
-    - wave=32:message=&8[Gladius] &f有人告訴我，競技場管理員已經沒招了！我們的挑戰者能活下來嗎？
-    - wave=33:message=&8[Gladius] &f似乎有些敵人塗上了南方毒蛇的 &c劇毒&f！女士們，先生們，千萬別靠近。
-    - wave=34:message=&8[Gladius] &f鮑比，確保你在這些為我而死的參賽者身上投入 1,000 枚精英幣——不，不，1,000 枚精英幣——等等，我麥克風忘記關了？我的意思是，繼續下一波！
-    - wave=35:message=&8[Gladius] &f女士們先生們，多麼難得的機會！ &a木階聯盟&f的&2小丑&f挺身而出！好開心。
-    - wave=36:message=&8[Gladius] &f多麼可愛的節目，女士們、先生們，叫&a小丑&f放棄吧！
-    - wave=37:message=&8[Gladius] &f鮑比，我的賭注怎麼樣？ 10,000 精英幣是什麼意思，我是告訴你 1,000 ！糟了，不行，&c提升攻擊強度&f！
-    - wave=38:message=&8[Gladius] &f鮑比，你是不是在暗算我！呃，派一些 &c劍客 &f去那裡，我需要快速處理一些事情......
-    - wave=39:message=&8[Gladius] &f不退款是什麼意思？我也不想——咳咳，我的意思是，一大群&c弓箭手&f遠道而來準備大顯身手！
-    - wave=40:message=&8[Gladius] &f女士們先生們，因為...呃...一些小原因，我邀請了最強的戰士來參賽！ &4詛咒的承載者Crucios&f！
-    - wave=41:message=&8[Gladius] &fCrucios被打敗了！？這世界怎麼了？
-    - wave=42:message=&8[Gladius] &f一位富有的贊助人決定向競技場的敵人提供免費醫療保健！他們會獲得更強大的&2力量&f嗎?
-    - wave=43:message=&8[Gladius] &f&c凋零、中毒、火焰&f，把所有的東西都扔進去！你知道成本有多高嗎！？
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+      - 
+    - 
+      - 
+      - 
+    - 
+      - 
+      - 
+    - 
+      - 
+    - 
+      - 
+      - 
+    - 
+      - 
+    - 
+      - 
+      - 
+    - 
+      - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
     - wave=44:message=&8[Gladius] &f這顯然行不通，讓我想想……
-    - wave=45:message=&8[Gladius] &f這是木階聯盟競技場的頂級角斗士之一！ &c千刃 &f，他的&c無數的飛刃&f很強大！肯定會贏的！
-    - wave=46:message=&8[Gladius] &f千刃隕落了！看來這些天的角斗士實力都一般搬！沒關係，你會看到的！你們都會看到的！&c投入一切！
-    - wave=47:message=&8[Gladius] &f如果人多也沒有，那就投入 &c更多力量&f！投入更多、更多、更多的力量！
-    - wave=48:message=&8[Gladius] &f我們這裡的選項開始用完了！這些都是 &c劍客 &f？
-    - wave=49:message=&8[Gladius] &f好吧，把剩下的都發過去，我們別無選擇！前進，&c弓箭手&！
-    - wave=50:message=&8[Gladius] &我想……我別無選擇，只能宣布——等等，遠處的那個是誰？是它，&4Uther，木階聯盟競技場的冠軍&f？女士們先生們，比賽要結束了，挑戰者在這沒有任何獲勝的機會！冠軍將會是&cUther&f的！
-    - wave=51:message=&8[Gladius the Destitute] &f難以置信，Uther被打敗了！我們有一個新的競技場冠軍！如果我現在沒有那麼嚴重的債務，我會非常興奮！
+    - 
+      - 
+      - 
+    - 
+      - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+      - 
+      - 
+    - 
+      - 
+      - 
 ag_welcome_quest_0:
   customObjectives:
     Objective1:
@@ -11006,7 +11074,8 @@ ag_welcome_quest_0:
         - Talk to me again for a quest!
   name: '&2到達冒險者大廳！'
   questLore:
-    - 輸入 &2/ag &0&2可前往冒險者大廳！
+    - 
+      - 
   questAcceptDialog:
     - '&8[Odigos]&f 請輸入 &2/ag &f 前往冒險者大廳！'
     - 當你在到達時，請務必與 Casus 交談！
@@ -11027,7 +11096,8 @@ ag_welcome_quest_1:
     Objective7:
       dialog:
         - '&8[&aQel''Thuzad&8]&f These Elite monsters, where do they keep coming from?'
-        - Ah, never mind that for now, we are always in need of more people to assist us in slaying quests!
+        - 
+          - 
         - Just talk to me to get one!
     Objective12:
       dialog:
@@ -11038,14 +11108,16 @@ ag_welcome_quest_1:
     Objective13:
       dialog:
         - '&8[&aUlfric&8]&f If you bring me a very special and rare item, I can unbind your Elite items.'
-        - You don't yet look prepared to take this challenge on, but you can make killing the Binder of Worlds your ultimate goal, if you dare.
+        - 
+          - 
     Objective5:
       dialog:
         - '&8[&aTim&8]&f Want to upgrade your Elite Items? Just get an upgrade orb from Sam over there!'
     Objective10:
       dialog:
         - '&8[&aKelly&8]&f Got extra Elite items? Don''t know what to do with them? Give them to me, and I''ll turn them into scrap!'
-        - You can use scrap to do lots of things, like repairing or upgrading Elite items!
+        - 
+          - 
     Objective6:
       dialog:
         - '&8[&aGillian&8]&f Do you seek power? Do you desire to reach new heights? Talk to me to unlock new guild ranks, and reach levels of power you never thought to be possible!'
@@ -11055,7 +11127,8 @@ ag_welcome_quest_1:
     Objective9:
       dialog:
         - '&8[&aReggie&8]&f Need your Elite items repaired? Just bring me some scrap, and I''ll make them as good as new!'
-        - Remember, the higher the level of your scrap, the better I can repair you Elite item!
+        - 
+          - 
   name: '&2歡迎來到冒險者大廳！'
   questLore:
     - '&a見見冒險者大廳的 NPC！'
@@ -11079,8 +11152,10 @@ primis_caeruleaum_fishing:
   name: '&2魚餌'
   questLore:
     - 我有個大煩惱！
-    - 我被一個從未知傳送門來的海洋生物打傷了！
-    - 我的朋友 Piscis Nemesis 仍在船上，試圖與生物戰鬥或關閉傳送門，但沒有合適的誘餌，他將無能為力！
+    - 
+      - 
+    - 
+      - 
     - 我會告訴你去哪裡找 &6魚餌 &0，拜託請你幫助我的朋友！
     - 我會告訴你去哪裡得到&e魚餌&f，請去幫助我的朋友！
     - 我保證我會支付酬勞給你！
@@ -11133,8 +11208,10 @@ primis_caeruleaum_fletching_2:
     - 用那些弓箭來爬塔！
   questAcceptDialog:
     - '&8[Ventus Artifex]&f 用你剛剛收到的箭去廢墟和他們一起射擊！'
-    - 遺跡內流傳著古代寶箱的傳聞。對任何人都不是很有用……但對收藏家而言是寶藏！
-    - 去把那個盾牌給我拿過來，我會用它換來更……有用的……對你有用的東西！
+    - 
+      - 
+    - 
+      - 
     - '&8&o我應該前往&e廢墟&7&o內部獲得盾牌，對建築物內的鏢靶射出&e位移箭&7&o。'
   questCompleteMessage:
     - '&8[Ventus Artifex]&f 做得好！'
@@ -11162,9 +11239,11 @@ primis_farmstead_lighthouse_keeper_2:
         - "&a[Jeeves]&f &2Amavit&f sent you? What's this about a lighthouse? My, what a discovery!\n&fThis will revolutionize my job as a traveling merchant! Here, have these &eScrolls&f - just call me and I'll be there in a jiffy!\n&7&oSeems like &aJeeves&7&o has something for me. I should talk to him."
   name: '&2神秘之光'
   questLore:
-    - 當你……處理問題時，燈塔頂部開始發出奇怪的光。
+    - 
+      - 
     - 我父親 Jeeves 去山頂查看，但他還沒有回來。
-    - 我已經無法再承受更多的問題，我們已經欠你太多了——但如果你能協助調查並找到我的父親，我會很感謝你。
+    - 
+      - 
   questAcceptDialog:
     - '&8[Amavit]&f 再次感謝您，祝您好運，希望沒發生什麼...'
     - '&8&o我應該去燈塔的頂部，調查一下問題，然後向第一村的阿馬維特的父親報告。'
@@ -11175,7 +11254,8 @@ primis_gladius_assassins:
   questLore:
     - Gladius 的屋頂上佈滿了刺客！
     - 冒險上街很危險，我們需要對付這些刺客！
-    - 屋頂有標靶的地方，都可以好好利用&e位移箭&f！
+    - 
+      - 
   questAcceptDialog:
     - '&8[Belli] 對付那些刺客！使用&e位移箭&f可能會輕鬆些！'
     - '&8&o我應該擊殺那些刺客。'
@@ -11317,9 +11397,12 @@ primis_ice_village_catch_me_if_you_can:
   questLore:
     - 快！我想找人去捕捉
     - '&c逃犯&f.'
-    - 一名囚犯設法讓籠子擺動，生鏽的鏈條不堪負荷掉落，並破裂了。
-    - 他在逃跑過程中受了重傷，不可能走那麼遠。
-    - 我需要你把他抓回來，不過小心，他在逃跑前拿了一把生鏽的劍。
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
   questAcceptDialog:
     - '&a[Romanus Superbus]&f他一定在山區的某個地方。'
     - '&7&o我需要找到&c&o逃犯&7&o並將他帶回監獄。'
@@ -11335,19 +11418,25 @@ primis_ice_village_get_them_off_my_back:
     - 這也不全是關於數量控制。
     - 它們為我們提供珍貴的皮革、象牙和肉。
     - 如果沒有他們，村莊不會發展得起來。
-    - 但這個季節讓他們數量增加許多。我們一直在努力減少他們的數量。
-    - 這一切都是為了取得平衡，不能讓他們的數量過多，導致他們威脅到我們。
-    - 你需要去那裡狩獵他們。不要狩獵任何&9成熟&f的野豬。
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
     - 我們只需要你消滅&c貝貝&f和&c幼年的野豬&f。
-    - 我還有一個私人的小請求，當你在狩獵時，可幫我留意是否有&e匕首&f在附近。
-    - 幾天前我在打獵時，我的匕首卡在野豬的背上，然後它就跑了……
+    - 
+      - 
+    - 
+      - 
     - 如果你能找回它，對我來說意義重大。
   questAcceptDialog:
     - '&a[Alanus Isatis]&f 你在來這裡的路上應該看到了&c野豬&f，你知道在哪裡可以找到它們。'
     - '&7&o我需要補獵一些&c&o野豬&7&o，並順便取回 &e&oAlanus 匕首&7&o.。'
   questCompleteMessage:
     - '&a[Alanus Isatis]&f 幹得好朋友！這應該有很大幫助。'
-    - 我可以處理剩下的事情。你也找到了我的匕首，我很高興。
+    - 
+      - 
     - 這把匕首沒什麼特別的，但它是我已故父親的手工禮物。
     - 下次你渴了，就讓我請你一杯！
 primis_ice_village_gotta_keep_warm:
@@ -11395,7 +11484,8 @@ primis_ice_village_living_nightmares:
     Objective1:
       dialog:
         - '&a[Cornelia Ennodius]&f Are they gone? I was so scared. My parents sent you? Thank goodness.'
-        - I woke up in the night, but the nightmares, they did not end. They were still there, so I ran and ran...
+        - 
+          - 
         - I couldn't escape. I, I...will be fine, I just need a minute...
   name: '&2做噩夢'
   questLore:
@@ -11428,13 +11518,15 @@ primis_ice_village_make_them_go_ouch:
     - '&7&o我需要確保&c&o客戶&7&o知道不要惹 &a&oViolet&7&o 。我還需要檢索&e&oViolet的財產&7&o。'
   questCompleteMessage:
     - '&a[Domina Violet]&f我希望你教會了他們痛苦的價值。'
-    - 一個小小的獎勵是為了你的辛勤工作。我感謝那些完成它的人。
+    - 
+      - 
 primis_ice_village_objection!:
   customObjectives:
     Objective3:
       dialog:
         - '&a[Glacies Princeps]&f What, absolutely not. I don''t know how he convinced you to come here and beg for his release.'
-        - That man you are trying to help was corrupted by the Ice Elemental. He went mad and slaughtered his entire family.
+        - 
+          - 
         - He will never be released. Is that understood.
     Objective1:
       dialog:
@@ -11461,7 +11553,8 @@ primis_ice_village_objection!:
     - '&7&o我應該去和我名單上的人談談。'
   questCompleteMessage:
     - '&a[Adrius Calpornius]&f 什麼？！謊言！！！我永遠不會對我的家人做出如此可怕的事情......'
-    - 他們就在這裡！你不能看到他們，聽到他們。在我旁邊，他們也想自由！！！放開我們！！！
+    - 
+      - 
     - '&7不管這個可憐的人還剩下什麼理智，現在都沒有了……'
 primis_ice_village_run_away_daughter:
   customObjectives:
@@ -11506,7 +11599,8 @@ primis_ice_village_taking_the_bait:
     - 這些&c魚&f，他們怎麼了！
     - 我已經在這裡釣魚好幾天了！
     - 連一條魚都沒有，想當年，我可是很勇的！
-    - 好吧，你在這肯定很好。我們村都靠&c魚&f維生。
+    - 
+      - 
     - 如果我們抓不到任何一條魚，就會發生食物危機。
     - 你需要去幫助我捕撈。
   questAcceptDialog:
@@ -11514,20 +11608,23 @@ primis_ice_village_taking_the_bait:
     - '&7&o我必須跳入湖中，捕撈 7 條&c&o寒冷鮭魚&7&o。'
   questCompleteMessage:
     - '&a[Theopropides Nero]&f 哦！看他們！真大！'
-    - 這應該可以讓我們吃一段時間！謝謝你！
+    - 
+      - 
 primis_ice_village_treats_for_the_punished:
   customObjectives:
     Objective1:
       dialog:
         - '&a[Eleusium Calenus]&f My wife sent you? Oh, are those treats? My favorite too! She''s such a darling.'
-        - She always takes care of me, even in these dark times, she still has a place for me in her heart.
+        - 
+          - 
         - 'You tell her I am doing just fine and that I love her very much. '
   name: '&2受罰者的款待'
   questLore:
     - 如果你不介意，我可以請你為我做點什麼嗎？
     - 我親愛的丈夫已經入獄，我知道整天住在籠子裡很艱難。
     - 所以我準備了一些我要送給他的零食。
-    - 但我現在很忙，我想知道你是否願意去那裡把它們交給他。
+    - 
+      - 
   questAcceptDialog:
     - '&a[Titia Calenus]&f 他將被關在中間的一個籠子裡。'
     - 別忘了告訴他我愛他。
@@ -11549,7 +11646,8 @@ primis_ice_village_wanna_make_a_snowman:
     - 這個老人讓孩子們高興起來？
   questAcceptDialog:
     - '&a[Sparax Ennodius]&f 你會在村莊附近的任何樹林中找到這些&c生物&f。'
-    - 如果我們想要有足夠的&e水晶&f來堆雪人，我們至少需要 15 個水晶。
+    - 
+      - 
     - '&7&o我應該去殺死足夠的 &c&o霜毛熊&7&o來收集 15 個&e&冰水晶&7&o。'
   questCompleteMessage:
     - '&a[Sestia Ennodius]&f 你收集了足夠多的水晶？精彩的！'
@@ -11576,9 +11674,12 @@ primis_main_quest_1:
     Objective1:
       dialog:
         - '&a[Chief Piscis] &fOh so you were in the ship that beached a few hours ago?'
-        - I apologize, we would've sent help but I am afraid we are drowning in our own issues right now!
-        - A nearby &dBandit Camp &fkeeps raiding our supplies, a mysterious &cSea Creature &fkeeps haunting our shores and a &dWolf Den &fis making foraging impossible!
-        - If you help us out, I will tell you where you might be able to get the supplies you need to repair your ship.
+        - 
+          - 
+        - 
+          - 
+        - 
+          - 
         - '&7&oI should report to the &aFirst Mate &7&oto see if I should help these people!'
   name: '&2船難！'
   questLore:
@@ -11604,7 +11705,8 @@ primis_main_quest_10:
   questLore:
     - 是時候向 Pontis Mille 尋求幫助，
     - 讓他們知道這裡發生了什麼，並讓他們兌現承諾，
-    - 通往那裡的橋附近有個守門人，需要打敗他，橋才會降下來。
+    - 
+      - 
   questAcceptDialog:
     - '&8[General Hasta] &f安全旅行，朋友，記住：打敗守門人，確保我們的請求能傳到 Navita將軍 的耳朵裡。'
     - '&8&o我應該在橋上打敗守門人，然後前往 Pontis Mille 找 Navita將軍。'
@@ -11688,7 +11790,8 @@ primis_main_quest_14:
     - 如果你真的打敗了哥布林王，那麼或許你會想辦法斬殺這場風暴。
     - 本身已經物化為我們的對手。
     - 我們甚至不知道它是否可以被擊敗。我們擔心我們會被送去死。
-    - 如果你真的打敗了&c哥布林王&f，那麼也許你會找到一個辦法來扼殺這場風暴。
+    - 
+      - 
   questAcceptDialog:
     - '&8[Blepharo]&f我們稍微削弱了他們的力量，但這也不是一件容易的事。'
     - '&8[Blepharo]&f風暴不是普通的對手。不要低估它。'
@@ -11698,25 +11801,35 @@ primis_main_quest_14:
     - '&8[Shogun Navita]&f打敗風暴？有人告訴我這是不可能的！我是說...'
     - '&8[Shogun Navita]... 不用隱藏，我知道風暴的存在，也知道 &dGladius&f 的被入侵——都是我計劃的。這樣做是為了我的人民——為了 &dPontis Mille&f。'
     - '&8[Shogun Navita] Machiavelli顧問說服我，風暴與自然本身一樣不可阻擋，&dGladius&f和&dPontis Mille&f的隕落是不可避免的，我們只能通過犧牲來拖延。'
-    - '&8[Shogun Navita] 現在我明白了，那條蛇毒害了我的思想，敗壞了我的判斷。必須盡快處理他。'
+    - 
+      - 
     - '&8&o似乎 Shogun Navita 有一個他想讓我處理的問題。'
 primis_main_quest_15:
   name: '&2遣散費回報!'
   questLore:
-    - 曾幾何時，我們當中最聰明的&cMachiavelli顧問&f預見到&dPontis Mille&f的垮台。
-    - 面對前所未有的生存威脅，他說服我保持安靜，以免引起恐慌。
-    - 我採取了我認為我們已經離開的唯一行動方案——犧牲我們最親密的盟友來換取我們僅僅幾週的時間。
-    - 我與居住在血神殿的實體交談。我和魔鬼做了一個交易。
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
     - 
       - 我為我們爭取了時間。
-    - 他們要求我派軍隊離開，我通過動員它來應對附近的衝突。
-    - 我是瞎子，但現在我明白了。馬基雅維利顧問一直在他們的口袋裡。
+    - 
+      - 
+    - 
+      - 
     - 他把我們引向了我們的厄運，如果你沒有出現，他就會僥倖逃脫。
     - 現在，有希望了。
     - 我問你，請擺脫我們這個奸詐的顧問。
-    - 他把自己鎖在自己的房間裡，被那些忠於他和他的人包圍著…… 寵物。
-    - 當心。我不知道他孤立自己的原因，但現在很明顯他正在等待報復。
-    - 把我們用來和血神殿溝通的遠方語石拿回來。
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
     - 我希望通過他們傳遞最後一條信息。
   questAcceptDialog:
     - '&8[Shogun Navita]&f馬基雅維利顧問已經撤退到他在下城市場附近的住處。要小心，在他的時代已經積累了一批忠實的追隨者，並且不會不戰而敗。'
@@ -11756,7 +11869,8 @@ primis_main_quest_16:
     - '&8&o我必須去最南邊找到冰村。'
   questCompleteMessage:
     - '&8[Glacies Princeps]&f好吧，這就是現在的主要任務。我希望你玩得開心。'
-    - '&8[Glacies Princeps]&f不要忘記通過訪問 patreon 或購買更多插件包來支持 MagmaGuy。'
+    - 
+      - 
     - '&8&o我應該等待更多內容髮布，然後繼續我的旅程。'
     - '&7&o我應該和 &a&oGlacies&7&o 談談。'
 primis_main_quest_17:
@@ -11774,13 +11888,18 @@ primis_main_quest_17:
   questLore:
     - 在我們進一步討論任何關於
     - 這 &d血神殿&f.
-    - 我們村周圍出現了一些問題，需要盡快處理。
+    - 
+      - 
     - 如果這些問題不解決，我就不能履行村長的職責。
     - 我無法無視自己同胞的懇求而將他人放在首位。
-    - 如果您能幫助我們解決這些問題，那麼我們將協助你。
-    - 我們有一個逃犯，野生動物問題，甚至我們自己的村民從村子裡偷東西。
-    - 我會告訴你帶著這些問題來找我的人的名字和位置。
-    - 去和他們談談，確保你幫助他們解決他們遇到的任何投訴和問題。
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
     - 他們將能夠更詳細地告訴您需要做什麼。
   questAcceptDialog:
     - '&a[Glacies Princeps]&f 一旦你完成，可回到我這，這時我們就可以談談你的問題。'
@@ -11792,19 +11911,27 @@ primis_main_quest_18:
   name: '&2冰的試煉'
   questLore:
     - 嗯，你肯定給我和村裡的大部分人留下了深刻的印象。
-    - 我欠你一個解釋。你會看到我們長期獲取力量的來源
+    - 
+      - 
     - '&c冰元素&f.'
-    - 他們會用他們的力量祝福我們，作為回報，我們任何想成為戰士或獵人的人都必須通過&9寒冰試煉&f。
-    - 要通過試煉，你必須爬上黑山一直到它的東峰。而在巔峰時期，你將面臨
+    - 
+      - 
+    - 
+      - 
     - '與&c小冰元素&f戰鬥，'
-    - 如果你成功了，那麼你成為戰士或獵人的權利無疑是你的權利。
+    - 
+      - 
     - 如果你失敗了......那麼......你的一切將被&c冰元素&f吸收。
-    - 這是最長的時間，直到血神殿的影響力越來越大。
+    - 
+      - 
     - 之後
-    - '&c冰元素&f變得更狂妄，從他們身上獲得力量變成是一種風險。'
+    - 
+      - 
     - 有幾個人受到影響，為了我們自己的安全，不得不把他們關進監獄。
-    - 而試煉變得不可能了，巔峰時期所面臨的，是村民無法克服的。
-    - 那些沒有通過試煉的人還在那裡，他們的靈魂被困在腐爛的軀殼中。
+    - 
+      - 
+    - 
+      - 
     - 奴隸
     - '&c冰元素&f.'
     - 很明顯，我們的舊傳統已不復存在。
@@ -11836,7 +11963,8 @@ primis_main_quest_19:
     - '&7&oI should go into the temple and slay the &c&oIce Elemental&7&o.'
   questCompleteMessage:
     - '&a[Glacies Princeps]&f I could feel the energies flowing out, all the way from here.'
-    - You have done us a great favor friend. The &dIce Village&f will provide aid to you and your allies.
+    - 
+      - 
     - There is another settlement that might need your help, let's speak.
     - '&7&o我應該聽聽&a&oGlacies&7&o要說什麼。'
 primis_main_quest_2:
@@ -11855,7 +11983,8 @@ primis_main_quest_2:
     - '&7&o我應該和&a村長&f談談幫助當地人的事情。'
   questCompleteMessage:
     - '&8[Piscis村長]&f 村裡的每個人都有需要處理的問題，我也不例外。我的要求很有挑戰性，也許你應該先解決其他村民的問題。'
-    - 等你準備好再跟我說話，我會和你分享我所知道的一切！
+    - 
+      - 
     - '&8&o我應該和當地人談談，看看誰需要幫助，之後再回到村長那裡。'
 primis_main_quest_20:
   customObjectives:
@@ -11877,13 +12006,16 @@ primis_main_quest_20:
     - to go of course.
   questAcceptDialog:
     - '&a[Glacies Princeps]&f You will find &aTerravilla&f straight West of here.'
-    - It is located on top of this ancient elemental ruin, you will know it when you see it.
+    - 
+      - 
     - Oh, I almost forgot. The person you want to talk to is &aOverseer Lutum&f.
     - '&7&oI should go to &d&oTerravilla&7&o and talk to &a&oOverseer Lutum&7&o.'
   questCompleteMessage:
     - '&a[Lutum Princeps]&f Came all the way from the &dIce Village&f, eh. Good to see some help arrive.'
-    - When I sent that request for aid I wasn't sure if we were gonna get any. I heard the situation over there wasn't that much better.
-    - We are in quite a pickle over here. We have plenty of work for you if you want it.
+    - 
+      - 
+    - 
+      - 
     - '&7&oI should talk to &a&oLutum&7&o.'
 primis_main_quest_21:
   name: '&2Taking out the trash'
@@ -11908,7 +12040,8 @@ primis_main_quest_21:
   questCompleteMessage:
     - '&a[Lutum Princeps]&f Well that is one issue resolved. Onto the next!'
     - Before we move on, I want you to have this blade.
-    - It might be old and dull but it's still as good as anything you can get your hands on today.
+    - 
+      - 
     - '&7&oI should hear out what &a&oLutum&7&o has planned next.'
 primis_main_quest_22:
   name: '&2Big trouble in little pub'
@@ -11947,11 +12080,14 @@ primis_main_quest_23:
     - '&cEarth Elemental&f into a slumber it will never wake up from.'
   questAcceptDialog:
     - '&a[Lutum Princeps]&f You can get to the maze by walking down the spiral staircase in the middle of the ruins.'
-    - Don't get lost in the maze, also make sure to watch out for the constructs. Good luck!
+    - 
+      - 
     - '&7&oI should enter the &d&oRuins Maze&7&o and slay the &c&oEarth Elemental&7&o.'
   questCompleteMessage:
     - '&a[Lutum Princeps]&f I cannot believe it, you''re back. In one piece too!'
-    - I guess you are tougher than you look. What you have done here is incredible it is clear we are in great debt to you. Is there anything Terravilla might be able to do for you.
+    - 
+      - 
+      - 
     - '&7&oI need to tell &a&oLutum&7&o about my quest and the &d&oBlood Temple&7&o.'
 primis_main_quest_24:
   customObjectives:
@@ -12004,14 +12140,17 @@ primis_main_quest_3:
     - 我&e祖父的傳家寶&f!!
   questAcceptDialog:
     - '&8[Piscis村長]&f 跟著路走，就會到達強盜營地！'
-    - 去那裡的路上小心，我們不知道他們在做什麼，但絕對不是什麼好事！
+    - 
+      - 
     - 一定要把我祖父給我的傳家寶帶回來！拜託！
     - '&8&o我應該去附近的強盜營地清除他們。'
   questCompleteMessage:
     - '&8[Piscis村長]&f 我看到你回來了！你帶來好消息了嗎？'
     - '&8&o你把營地的事告訴 Piscis 酋長，然後交出傳家寶。'
-    - 這是什麼？法師？元素？這是一個不祥之兆。您必須立即與 &aGladius領主&f聯繫！
-    - 感謝你對我的幫助，這把是我祖父給我的劍，希望他對你之後的旅程有幫助。
+    - 
+      - 
+    - 
+      - 
     - '&8&o看來酋長已經準備好告訴我如何離開這裡了。'
 primis_main_quest_4:
   customObjectives:
@@ -12031,7 +12170,8 @@ primis_main_quest_4:
     - 跟著&9藍色花朵&f走！
   questAcceptDialog:
     - '&8[Piscis村長]&f 山口被一個極其危險的傀儡守護著，你現在可能無法擊敗它！'
-    - 我們知道山上有一條秘密通道。遵循的路徑 &9藍色的花朵 &f並與 登山嚮導 交談以獲得前往 Pontis Mille 的安全通道！
+    - 
+      - 
     - '&8&o我應該遵循 &9&o藍色的花 &8&o尋找 登山嚮導！'
     - '&8&o提示：跟蹤任務，將幫助您更輕鬆地找到您的目的地！'
     - '&7&o提示：跟蹤任務，將幫助您更輕鬆地找到您的目的地！'
@@ -12048,7 +12188,8 @@ primis_main_quest_5:
     - 你必須先打敗這個&c元素&f！
   questAcceptDialog:
     - '&8[Petrae]&f 你想試圖打敗 &5水晶魔像? &f祝你好運！'
-    - 我會跟著你。如果你成功了，就在通道的另一邊見我！
+    - 
+      - 
     - '&8&o看來我必須打敗 &5水晶魔像&8&o。'
   questCompleteMessage:
     - '&8[Petrae]&f 了不起！我看到你打敗了 &5水晶魔像&8&o，顯然你很有前途'
@@ -12058,7 +12199,8 @@ primis_main_quest_6:
     Objective1:
       dialog:
         - '&a[Filius] &fYou made it through the mountain! You don''t see that every day.'
-        - I'm afraid my father is missing, but I can tell you about the path to &dGladius&f. If you want to help us though, talk to my &aMother&f!
+        - 
+          - 
         - '&7&oSeem like &aFilius&7&o can help me find the way to &dGladius&7&o.'
   name: '&5農莊'
   questLore:
@@ -12072,7 +12214,8 @@ primis_main_quest_6:
     - 祝您旅途愉快，注意安全！
   questAcceptDialog:
     - '&8[Petrae]&f 告訴農莊主是我派你來的，雖然我有一段時間沒見到農莊主了。'
-    - 如果他們在附近，我相信他們的兒子 Filius 會很樂意幫助你！
+    - 
+      - 
     - 旅途平安!
     - '&8&o我應該沿著通往農莊的路去和它的主人談談。'
   questCompleteMessage:
@@ -12098,7 +12241,8 @@ primis_main_quest_7:
     - 如果你幫助減少那艘船上的&c亡靈&f數量，就獎勵你！
   questAcceptDialog:
     - '&8[Filius] 路上要小心，顯然 &dGladius&f 那發生了什麼事情。'
-    - 到達 &dGladius&f 後，要塞的領主可能在他的豪宅，或者軍營！
+    - 
+      - 
     - '&7&o我應該沿著前往 &dGladius&7&o 的小路走，並在路上順便清除一些亡靈水手。'
   questCompleteMessage:
     - '&8[Hasta將軍]&f 你是從 Pontis Mille 派來的增援部隊嗎？其他人在哪裡？你是信使嗎？'
@@ -12164,7 +12308,9 @@ primis_ogre_mines_lost_bretheren:
     Objective1:
       dialog:
         - '&a[Fortis Fossores] &fWhat do you want? What, &aFugit&f sent you? What for? The mines were overrun? Hah, I didn''t even notice!'
-        - Let that worrywart brother of mine know that I am fine. Now, begone! I am on the verge of making a big mining discovery. I call it - branch mining! Hehehe, this one will change everything!
+        - 
+          - 
+          - 
   name: '&5失落的弟兄'
   questLore:
     - 礦井被食人魔佔領了！
@@ -12180,7 +12326,8 @@ primis_ogre_mines_lost_bretheren:
   questCompleteMessage:
     - '&8[Fugit Fossores]&f 我哥說什麼？啊，他就是這樣，太專注於他的工作，沒有注意到整個地方都被佔領了！'
     - 下次見到他我會和他好好談談的！
-    - 謝謝你的幫助，你可以擁有我最好的鎬。
+    - 
+      - 
 primis_ogre_mines_old_miner_quest:
   name: '&2幸運鎬'
   questLore:
@@ -12212,11 +12359,13 @@ primis_pontis_groves_acrobatics:
     - 目標是使用葡萄酒和雜技從一個平台到另一個平台，並完成課程。
     - 如果您完成課程並到達終點。 （順便說一下，這是一個球體。）
     - '您將獲得一件非常漂亮的物品！'
-    - 如果您完成課程並到達終點。 (順便說一句，這是一個球體。)
+    - 
+      - 
     - 您將獲得一個非常好的&e物品&f作為獎勵！
   questAcceptDialog:
     - '&8[Posuere Hominem]&f 您可以在該隧道的盡頭找到課程的起點。'
-    - '&8[Posuere Hominem]&f 只需游到第一杯酒並繼續攀登酒，直到到達頂部。'
+    - 
+      - 
     - '&8[Posuere Hominem]&f 不要忘記在課程結束時與我的兄弟交談以獲得獎勵！'
     - '&8&o我應該去課程的開始。'
   questCompleteMessage:
@@ -12226,7 +12375,8 @@ primis_pontis_groves_caught in the web:
   questLore:
     - 所以他們在格羅夫的某個地方有一個巢穴。
     - 這可以解釋為什麼他們的人口猛增。
-    - 我們已經習慣了一些蜘蛛在樹林裡游盪，但這太過分了。
+    - 
+      - 
     - 如果您能找到巢穴並將其清除，那就太好了。
     - 我們將為您製作一些精美的蜘蛛腿靴作為獎勵！
   questAcceptDialog:
@@ -12278,7 +12428,8 @@ primis_pontis_groves_lighthouse_1:
   name: '&2餵病人'
   questLore:
     - 流浪者，我能幫你一個簡單的忙嗎？
-    - 附近有燈塔。我們通常為住在那裡的家人提供食物。
+    - 
+      - 
     - 但是自從麻煩開始以來，我們就不能離開我們的小樹林。
     - 你能不能給家人帶來他們最新一批的食物。
     - 如果你能快點就好了，距離上次交貨已經有一段時間了。
@@ -12300,8 +12451,10 @@ primis_pontis_groves_lighthouse_2:
   questLore:
     - 嗯，在你來之前。旅商吉維斯路過。
     - 我們問他能不能去給我們弄點吃的。
-    - 好吧，那已經沒有必要了，所以如果你能爬到山頂就好了
-    - 燈塔並前往 Caeruleaum 村並告訴 Jeeves 我們不再需要食物了。
+    - 
+      - 
+    - 
+      - 
   questAcceptDialog:
     - '&8[Alanus Secundas]&f 當你離開住宅時，燈塔是筆直的，向左一點。'
     - '&8&o我應該去燈塔。'
@@ -12328,22 +12481,27 @@ primis_pontis_groves_population_control:
 primis_pontis_groves_tree_climbing_elf_bandits:
   name: '&2爬樹精靈土匪！'
   questLore:
-    - 我在我們的小樹林里和這些該死的爬樹精靈強盜一起受夠了。
+    - 
+      - 
     - 蜘蛛還不夠，
     - 現在這些喜歡陰影的便便堅果決定在我們的樹上定居！
-    - 他們喜歡你看到的黑暗，光會傷害他們，讓他們在頭腦中一片迷霧。
-    - 當然，我們的小樹林裡有很多黑暗和陰影。所以他們直接搬進來了！
+    - 
+      - 
+    - 
+      - 
     - 以優越的人數強行進入。
     - 好吧，他們得到了一些好的結果，
     - 一看你，我就知道你可以對付幾個石巨人！
     - 我相信一些精靈對你來說不是什麼大問題。
-    - 去給他們發信息。信息很明確，他們討厭的屁股在這裡不受歡迎！
+    - 
+      - 
   questAcceptDialog:
     - '&8[Phygia Gorgonius]&f 我敢肯定，如果你找到一個有陰涼的地方，然後抬頭看，很難錯過他們的樹屋，你會發現很多。'
     - '&8&o我應該在菲吉亞大發雷霆之前去照顧這些精靈。'
   questCompleteMessage:
     - '&8[Phygia Gorgonius]&f 我的朋友！哈哈！很高興再次見到你！'
-    - '&8[Phygia Gorgonius]&f 我在遠處看著。眼睜睜的看著那些傻子摔死，沒有比這更好的了！'
+    - 
+      - 
     - '&8&o精靈們再也不會打擾菲吉亞了。'
 primis_pontis_mille_fields_berry_crazed_wolf:
   name: '&2漿果瘋狂的狼'
@@ -12399,13 +12557,15 @@ primis_pontis_mille_fields_camp_hunter_three_times_hunter:
     - '&c野獸爬行者 Megdun&f 在陽光普照的小樹林上沉睡。'
     - 在兩個西部山峰之間跳舞，你會發現
     - '&c野獸穿刺者 Uladzimir'
-    - 作為證據，給我帶來&e穿刺者的角&f、&e鱈魚的鱗片&f和&e爬行者的絲綢&f。
+    - 
+      - 
   questAcceptDialog:
     - '&a[Milonia Majus]&f 拿著這個設備，它會粗略地引導你到他們的位置。'
     - '&7&o我該去挑戰&c&o三大巨獸&7&o了。'
   questCompleteMessage:
     - '&a[Milonia Majus]&f 你已經回來了。而且你帶來了我要求的所有三樣東西作為證據。'
-    - 那一定是一次冒險，讓我想起了我年輕的時候，我有更多的力量和敏捷性。
+    - 
+      - 
     - 好了，關於我，這是你承諾的獎勵！
     - '&7你交還野獸追踪器。'
     - '&a[Milonia Majus]&f我差點忘了那件事，謝謝！'
@@ -12425,7 +12585,8 @@ primis_pontis_mille_fields_do_it_yourself:
   questAcceptDialog:
     - '&a[Scribonia Ingenvinus]&f 我就知道你會說是的！我看你已經裝備精良了。'
     - 好的，這就是我要你做的。
-    - 我們很擔心那頭&c巨大野獸&f ，所以這是第一要務。
+    - 
+      - 
     - 其次，我需要你殺死 5 隻&c長角牛&f和 6 隻&c短角牛&f。
     - 明白了嗎？好的。完成後向我報告。
     - '&7&o我應該殺死 &c&o巨大野獸&7&o 並殺死 5 隻 &c&o長角牛&7&o和 6 隻 &c&o短角牛&7&o。'
@@ -12468,7 +12629,8 @@ primis_pontis_mille_fields_feeding_the_hungry:
     - '&7&o我應該去 &d貧民窟&7&o 並將食物分發給有需要的人。'
   questCompleteMessage:
     - '&a[Augustina Verrucosis]&f &2Daemones&f 是他請你送東西到這裡來的。'
-    - 他每週都會來，分發他剩下的任何食物，以確保我們不會餓死……
+    - 
+      - 
     - 謝謝陌生人，我的家人不會忘記的。
 primis_pontis_mille_fields_fruity_hound:
   name: '&2果味獵犬'
@@ -12492,8 +12654,10 @@ primis_pontis_mille_fields_fruity_hound:
     - '&7&o我應該去殺死&c&o果味獵犬&7&o，看看&e&o特殊漿果&7&o是否被破壞。'
   questCompleteMessage:
     - '&a[Dordalus Nasica]&f 是的！那是我的寶貝！很好，很完整，連口水都沒有！'
-    - 作為工作的獎勵，您可以擁有我的第二大漿果，小心別吃他。
-    - 我知道可能很想吃它，但相信我，如果你把它放在身邊，它會更有用。
+    - 
+      - 
+    - 
+      - 
 primis_pontis_mille_fields_not_on_my_farm:
   name: '&2不在我的農場！'
   questLore:
@@ -12671,7 +12835,8 @@ primis_pontis_mille_let_them_know:
     - If you could reach out to the &aGenerals&f in the city and let them know
     - that &dGladius&f needs help we might be able to to do something about it.
     - 但不是在我們首先處理現有問題之前。
-    - I am sure that the &aGenerals&f will be happy to let you help them out with their issues.
+    - 
+      - 
     - 去和他們談談，然後回來告訴我他們收到了消息。
     - 我會獎勵你的時間。
   questAcceptDialog:
@@ -12764,19 +12929,23 @@ primis_pontis_mille_serious_sewage:
   name: '&2嚴重的污水'
   questLore:
     - 如果您能勝任這項任務，那麼我可以使用您的幫助。
-    - 城市下的下水道已經成為各種麻煩製造者和小動物的巢穴。
-    - 麻煩製造者稱自己為忍者……儘管他們遠非如此。
+    - 
+      - 
+    - 
+      - 
     - 他們有一個領導，我想他稱自己為 Shripper 什麼的。
     - 確保擺脫他，沒有頭的蛇不是威脅。
     - 如果你能去那裡減少小動物和麻煩製造者的數量
     - 那麼這將使我能夠將我的部隊分配給更重要的任務......
     - 我們之前也派了4個代理，我還沒有收到他們的消息。
-    - 如果您可以檢查它們以確保它們正常，那對我來說意義重大。
+    - 
+      - 
     - 我似乎也放錯了我的個人下水道鑰匙
     - 如果你也能找回那些，那就太好了。
   questAcceptDialog:
     - '&8[Rogerius]&f你可以通過 X 到達下水道'
-    - '&8[Rogerius]&f有一條小路穿過山。在地雷下方。'
+    - 
+      - 
     - '&8&o我需要找到進入下水道的路並完成任務。'
   questCompleteMessage:
     - '&8[Rogerius]&f你完成任務了嗎？要是我還有十個像你這樣的男人就好了……'
@@ -12798,7 +12967,8 @@ primis_pontis_mille_star_gazing:
     - 拿這張密封的紙條給他們看。
   questAcceptDialog:
     - '&8[Fortes Bellator]&f 您可以在天文台找到觀星者。'
-    - '&8[Fortes Bellator]&f 天文台位於燈塔後面。這是一座巨大的塔，很難錯過。'
+    - 
+      - 
     - '&8&o我應該和天文台的觀星者談談。'
   questCompleteMessage:
     - '&8[Virgo Dexippus]&f 少校派你來的？那麼它一定很重要。'
@@ -12911,7 +13081,8 @@ primis_pontis_redwoods_its_reyn_time:
     - 完全可以承受掉在上面的沉重原木，是的。
     - 我看到一個討厭的土匪把它舀起來放在口袋裡。
     - 我很確定我看到他拿著斧頭。
-    - 如果你能去他們的營地把它還給我。那對我來說意味著整個世界！
+    - 
+      - 
     - 也給你一個不錯的金錢獎勵！
   questAcceptDialog:
     - '&8[Reynus]&f 你可以在河對面找到土匪。'
@@ -12997,8 +13168,11 @@ primis_terravilla_drowning_terror:
     - '&a[Plautia Suilius]&f Wow it looks like a fish, but it''s internal organs are different.'
     - It must infect other creatures by releasing these tiny worm like meat particles...
     - Let me have a look at you. Hmm, you seem fine, no traces...
-    - So it is not affecting us...yet. This is an emergency, I need to collect my stuff and go present my findings to the researchers at &dPontis Mille&f immediately. I need to get approval for extermination, that organism cannot be allowed to evolve.
-    - Thank you for everything you have done. Here, take this. It's not a lot but at least it's something.
+    - 
+      - 
+      - 
+    - 
+      - 
     - '&7&oI should make sure to stay away from the river...'
 primis_terravilla_hog_on_my_porch:
   name: '&2Bipedal examination'
@@ -13054,7 +13228,8 @@ test_quest:
 xmas_quest_0:
   name: '&2尋找丟失的禮物！'
   questLore:
-    - 我好像在路上丟了一些聖誕禮物，你能幫一個可憐的老人找回來嗎？
+    - 
+      - 
     - 作為回報，我會讓你打開其中一個！
   questAcceptDialog:
     - '&8[&cSaint Nick&8]&f 謝謝！我會在這裡等你！'
