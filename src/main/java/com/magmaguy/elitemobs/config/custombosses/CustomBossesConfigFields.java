@@ -206,6 +206,9 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     @Getter
     @Setter
     private boolean alert = false;
+    @Getter
+    @Setter
+    private boolean removeAfterDeath = false;
 
     /**
      * Creates a new default pre-made Custom Boss. The boss is further customized through a builder pattern.
@@ -361,6 +364,7 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
 
         this.song = processString("song", song, null, false);
         this.alert = processBoolean("alert", alert, false, false);
+        this.removeAfterDeath = processBoolean("removeAfterDeath", removeAfterDeath, false, false);
     }
 
     public boolean isCustomModelExists() {

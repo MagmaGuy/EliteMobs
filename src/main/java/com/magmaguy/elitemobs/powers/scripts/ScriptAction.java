@@ -53,7 +53,7 @@ public class ScriptAction {
         this.scriptTargets = new ScriptTargets(blueprint.getScriptTargets(), eliteScript);
         if (blueprint.getFinalTarget() != null)
             finalScriptTargets = new ScriptTargets(blueprint.getFinalTarget(), eliteScript);
-        this.scriptConditions = new ScriptConditions(blueprint.getConditionsBlueprint(), eliteScript);
+        this.scriptConditions = new ScriptConditions(blueprint.getConditionsBlueprint(), eliteScript, true);
         this.scriptParticles = new ScriptParticles(blueprint.getScriptParticlesBlueprint());
         this.eliteScriptMap = eliteScriptMap;
         this.eliteScript = eliteScript;
@@ -97,6 +97,12 @@ public class ScriptAction {
         scriptTask(scriptActionData);
     }
 
+    /**
+     * Called by scripts that have a landing parameter, i.e. projectiles, fireworks and landing blocks. Only gets called on landing!
+     *
+     * @param previousScriptActionData The script action data from the script before the landing script
+     * @param landingLocation          The "landing" location. Might not necessarily be on a block, more of an end location.
+     */
     public void runScript(ScriptActionData previousScriptActionData, Location landingLocation) {
         //This caches the tracking mostly for zones to start at the wait time. This matters if you are making zones
         //that go through a warning phase and then a damage phase.
@@ -106,6 +112,11 @@ public class ScriptAction {
         scriptTask(scriptActionData);
     }
 
+    /**
+     * The basic script task, used by all scripts
+     *
+     * @param scriptActionData The data for the script action
+     */
     private void scriptTask(ScriptActionData scriptActionData) {
         //This caches the tracking mostly for zones to start at the wait time. This matters if you are making zones
         //that go through a warning phase and then a damage phase.
@@ -123,7 +134,8 @@ public class ScriptAction {
                         public void run() {
                             counter++;
                             //Check if the script conditions of action are met, since repeating actions might've stopped being valid
-                            if (blueprint.getConditionsBlueprint() != null && !scriptConditions.meetsConditions(scriptActionData.getEliteEntity(), (LivingEntity) null)) {
+                            if (blueprint.getConditionsBlueprint() != null &&
+                                    !scriptConditions.meetsActionConditions(scriptActionData)) {
                                 cancel();
                                 return;
                             }
@@ -144,6 +156,11 @@ public class ScriptAction {
         }.runTaskLater(MetadataHandler.PLUGIN, blueprint.getWait());
     }
 
+    /**
+     * Routes the action type to the action behavior.
+     *
+     * @param scriptActionData Data of the current action.
+     */
     private void runActions(ScriptActionData scriptActionData) {
         //Different actions have completely different behavior
         switch (blueprint.getActionType()) {
@@ -392,18 +409,50 @@ public class ScriptAction {
         getLocationTargets(scriptActionData).forEach(targetLocation -> {
             Firework firework = targetLocation.getWorld().spawn(targetLocation, Firework.class);
             FireworkMeta fireworkMeta = firework.getFireworkMeta();
-            for (List<ScriptActionBlueprint.FireworkColor> fireworkColors : blueprint.getFireworkEffects()) {
-                List<Color> colors = fireworkColors.stream().map(ScriptActionBlueprint.FireworkColor::getColor).toList();
+
+            if (blueprint.getFireworkEffects().isEmpty()) {
+                new WarningMessage("Tried to spawn fireworks for script " + eliteScript.getFileName() + " but no color for the fireworks was set! This part of the script will not run.");
+                return;
+            }
+
+            if (blueprint.getFireworkEffectTypes() == null) {
+                List<Color> colors = blueprint.getFireworkEffects().get(0).stream().map(ScriptActionBlueprint.FireworkColor::getColor).toList();
+                //Single effect
                 fireworkMeta.addEffect(FireworkEffect.builder()
                         .with(blueprint.getFireworkEffectType())
                         .withColor(colors)
                         .flicker(blueprint.isFlicker())
                         .trail(blueprint.isWithTrail())
                         .build());
+
+
+            } else {
+                int counter = 0;
+                //Multiple effects
+                for (FireworkEffect.Type fireworkEffectType : blueprint.getFireworkEffectTypes()) {
+                    List<Color> colors;
+                    if (blueprint.getFireworkEffects().size() - 1 >= counter)
+                        colors = blueprint.getFireworkEffects().get(counter)
+                                .stream().map(ScriptActionBlueprint.FireworkColor::getColor).toList();
+                    else
+                        colors = blueprint.getFireworkEffects().get(blueprint.getFireworkEffects().size() - 1)
+                                .stream().map(ScriptActionBlueprint.FireworkColor::getColor).toList();
+
+                    fireworkMeta.addEffect(FireworkEffect.builder()
+                            .with(fireworkEffectType)
+                            .withColor(colors)
+                            .flicker(blueprint.isFlicker())
+                            .trail(blueprint.isWithTrail())
+                            .build());
+                    counter++;
+                }
             }
+
             fireworkMeta.setPower(blueprint.getPower());
-            if (blueprint.getVValue() != null)
+            if (blueprint.getVValue() != null) {
                 firework.setVelocity(blueprint.getVValue());
+                firework.setShotAtAngle(true);
+            }
             firework.setFireworkMeta(fireworkMeta);
         });
     }

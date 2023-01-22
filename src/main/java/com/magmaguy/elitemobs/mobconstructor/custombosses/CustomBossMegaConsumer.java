@@ -80,6 +80,7 @@ public class CustomBossMegaConsumer {
     public void applyBossFeatures(LivingEntity livingEntity) {
         for (ElitePower elitePower : powers)
             elitePower.applyPowers(livingEntity);
+        //EntityTracker.registerEliteMob(customBossEntity);
         setEquipment(livingEntity);
         setBaby(livingEntity);
         setDisguise(livingEntity);

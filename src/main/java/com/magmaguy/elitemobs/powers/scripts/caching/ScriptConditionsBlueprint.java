@@ -1,8 +1,10 @@
 package com.magmaguy.elitemobs.powers.scripts.caching;
 
+import com.magmaguy.elitemobs.powers.scripts.enums.ConditionType;
 import com.magmaguy.elitemobs.utils.MapListInterpreter;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemorySection;
 
@@ -29,6 +31,9 @@ public class ScriptConditionsBlueprint {
     private ScriptTargetsBlueprint scriptTargets = null;
     @Getter
     private Double randomChance = null;
+    @Getter
+    @Setter
+    private ConditionType conditionType = null;
 
     //Process from a script
     public ScriptConditionsBlueprint(ConfigurationSection configurationSection, String scriptName, String filename) {
@@ -61,6 +66,8 @@ public class ScriptConditionsBlueprint {
                 scriptTargets = new ScriptTargetsBlueprint((Map) value, scriptName, filename);
             }
             case "randomchance" -> randomChance = MapListInterpreter.parseDouble(key, value, scriptName);
+            case "conditiontype" ->
+                    conditionType = MapListInterpreter.parseEnum(key, value, ConditionType.class, scriptName);
             default -> new WarningMessage("Failed to read key " + key + " for script " + scriptName);
         }
     }

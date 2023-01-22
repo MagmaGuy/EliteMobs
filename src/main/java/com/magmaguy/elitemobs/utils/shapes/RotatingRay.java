@@ -14,13 +14,13 @@ public class RotatingRay extends Ray {
 
     private final int animationDuration;
     private final Location originalCenterLocation;
-    private Location finalTarget = null;
+    private Location target2;
     private Vector raySegment;
+    private double distanceSquared;
 
     public RotatingRay(boolean ignoresSolidBlocks,
                        double pointRadius,
                        Location target,
-                       Location finalTarget,
                        Location target2,
                        double pitchPreRotation,
                        double yawPreRotation,
@@ -29,10 +29,7 @@ public class RotatingRay extends Ray {
                        int animationDuration) {
         super(ignoresSolidBlocks, pointRadius, target, target2);
         this.originalCenterLocation = target.clone();
-        if (finalTarget == null)
-            this.finalTarget = target;
-        else
-            this.finalTarget = finalTarget.clone();
+        this.target2 = target2;
         this.animationDuration = animationDuration;
         raySegment = target2.clone().subtract(target).toVector().normalize().multiply(pointRadius * 2);
         if (yawPreRotation != 0)
@@ -42,6 +39,7 @@ public class RotatingRay extends Ray {
             raySegment.rotateAroundAxis(perpendicularVector, Math.toRadians(pitchPreRotation));
         }
         locations = drawLine();
+        distanceSquared = target.distanceSquared(target2);
         if (animationDuration > 0) startRotating(animationDuration, pitchRotation, yawRotation);
     }
 
@@ -50,12 +48,10 @@ public class RotatingRay extends Ray {
         Location currentLocation = originalCenterLocation.clone();
         locations.add(originalCenterLocation);
         for (int i = 0; i < maxDistance; i++) {
-            if (currentLocation.distanceSquared(locations.get(locations.size() - 1)) >=
-                    originalCenterLocation.distanceSquared(initialTargetLocation)) break;
             currentLocation.add(raySegment);
+            if (originalCenterLocation.distanceSquared(currentLocation) > distanceSquared) break;
             if (!ignoresSolidBlocks && currentLocation.getBlock().getType().isSolid()) break;
             locations.add(currentLocation.clone());
-            //currentLocation.getWorld().spawnParticle(Particle.FLAME, currentLocation, 1,0,0,0,0);
         }
         return locations;
     }
@@ -76,8 +72,8 @@ public class RotatingRay extends Ray {
                 }
                 counter++;
 
-                if (finalTarget != null)
-                    centerLocation = Lerp.lerpLocation(originalCenterLocation, finalTarget, counter / (double) animationDuration);
+                if (target2 != null)
+                    centerLocation = Lerp.lerpLocation(originalCenterLocation, target2, counter / (double) animationDuration);
 
                 if (singleTickPitchRotation > 0)
                     raySegment.rotateAroundAxis(perpendicularVector, Math.toRadians(singleTickPitchRotation));

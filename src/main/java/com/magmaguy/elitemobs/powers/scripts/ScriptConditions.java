@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.powers.scripts.caching.ScriptConditionsBlueprint;
+import com.magmaguy.elitemobs.powers.scripts.enums.ConditionType;
 import com.magmaguy.elitemobs.powers.scripts.enums.TargetType;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -21,11 +22,16 @@ public class ScriptConditions {
     private ScriptConditionsBlueprint conditionsBlueprint;
     private ScriptTargets scriptTargets = null;
 
-    public ScriptConditions(ScriptConditionsBlueprint scriptConditionsBlueprint, EliteScript eliteScript) {
+    public ScriptConditions(ScriptConditionsBlueprint scriptConditionsBlueprint, EliteScript eliteScript, boolean actionCondition) {
         this.conditionsBlueprint = scriptConditionsBlueprint;
         //This is null if no conditions are set
         if (conditionsBlueprint.getScriptTargets() != null)
             this.scriptTargets = new ScriptTargets(conditionsBlueprint.getScriptTargets(), eliteScript);
+        if (conditionsBlueprint.getConditionType() == null)
+            if (actionCondition)
+                conditionsBlueprint.setConditionType(ConditionType.FILTERING);
+            else
+                conditionsBlueprint.setConditionType(ConditionType.BLOCKING);
     }
 
     private boolean isAliveCheck(LivingEntity livingEntity) {
@@ -78,9 +84,30 @@ public class ScriptConditions {
     }
 
 
-    public boolean meetsConditions(EliteEntity eliteEntity, LivingEntity directTarget) {
+    public boolean meetsPreActionConditions(EliteEntity eliteEntity, LivingEntity directTarget) {
         if (scriptTargets == null) return true;
         ScriptActionData scriptActionData = new ScriptActionData(eliteEntity, directTarget, scriptTargets, null);
+
+        for (LivingEntity livingEntity : scriptTargets.getTargetEntities(scriptActionData))
+            if (!checkConditions(livingEntity)) return false;
+
+        for (Location location : scriptTargets.getTargetLocations(scriptActionData))
+            if (!checkConditions(location)) return false;
+
+        if (!checkRandomizer()) return false;
+
+        return true;
+    }
+
+    public boolean meetsActionConditions(ScriptActionData scriptActionData) {
+        if (scriptTargets == null) return true;
+
+        //if the target is self and the condition is isAlive the condition will always be blocking
+        if (!conditionsBlueprint.getConditionType().equals(ConditionType.BLOCKING)) {
+            if (scriptTargets.getTargetBlueprint().getTargetType().equals(TargetType.SELF))
+                return isAliveCheck(scriptActionData.getEliteEntity().getLivingEntity());
+            return true;
+        }
 
         for (LivingEntity livingEntity : scriptTargets.getTargetEntities(scriptActionData))
             if (!checkConditions(livingEntity)) return false;
@@ -133,7 +160,7 @@ public class ScriptConditions {
 
     //Removes entities that do not meet the conditions
     protected Collection<LivingEntity> validateEntities(ScriptActionData scriptActionData,
-                                                                  @NotNull Collection<LivingEntity> originalEntities) {
+                                                        @NotNull Collection<LivingEntity> originalEntities) {
         if (scriptTargets == null) return originalEntities;
 
         if (scriptTargets.getTargetBlueprint().getTargetType().equals(TargetType.ACTION_TARGET)) {

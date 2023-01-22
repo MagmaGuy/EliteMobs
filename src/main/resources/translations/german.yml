@@ -1496,7 +1496,7 @@ loot_bonus_blocks:
 loot_bonus_mobs:
   name: Plünderung
 loud_strikes:
-  name: Loud Strikes
+  name: Laute Schläge
 loyalty:
   name: Treue
 lure:
@@ -2644,9 +2644,9 @@ elite_llama:
     - '$player &cwurde von $entity angespuckt!'
     - '$player &chat $entity &cwütend gemacht!'
 elite_warden:
-  name: '&fLvl &2$level &fElite &3Warden'
+  name: '&fLvl &2$level &fElite &3Wärter'
   deathMessages:
-    - '$entity &csensed $player &cwas nearby!'
+    - '$entity &chat $player &cin der Nähe gespürt!'
 elite_goat:
   name: '&fLvl &2$level &fElite &5Ziege'
   deathMessages:
@@ -2760,62 +2760,62 @@ Arenas:
   joinSpectatorTitle: '&aJetzt zuschauen!'
   joinSpectatorSubtitle: '&c Verlassen mit &4/em quit&c!'
 ancient_corpse_drop_axe:
-  name: '&eButchers Cleaver'
+  name: '&eSchlächters Hackbeil'
   lore:
-    - '&aRetrived from the'
-    - '&aAncient Corpse''s skull...'
+    - '&aGeborgen von dem'
+    - '&aKopf einer uralten Leiche...'
 animated_armor_drop_axe:
-  name: '&8Enchanted Axe'
+  name: '&8Verzauberte Axt'
   lore:
-    - '&8This axe was almost the'
-    - '&8end of you.'
+    - '&8Diese Axt war beinahe'
+    - '&8Dein Ende.'
 animated_armor_drop_boots:
-  name: '&8Enchanted Boots'
+  name: '&8Verzauberte Stiefel'
   lore:
-    - '&8You literally fought this'
-    - '&8piece of armor.'
+    - '&8Du hast dies buchstäblich bekämpft'
+    - '&8Rüstungsteil.'
 animated_armor_drop_chestplate:
   name: '&8Verzauberte Brustplatte'
   lore:
-    - '&8You literally fought this'
-    - '&8piece of armor.'
+    - '&8Du hast dies buchstäblich bekämpft'
+    - '&8Rüstungsteil.'
 animated_armor_drop_helmet:
-  name: '&8Enchanted Helmet'
+  name: '&8Verzauberter Helm'
   lore:
-    - '&8You literally fought this'
-    - '&8piece of armor.'
+    - '&8Du hast dies buchstäblich bekämpft'
+    - '&8Rüstungsteil.'
 animated_armor_drop_leggings:
-  name: '&8Enchanted Leggings'
+  name: '&8Verzauberte Hose'
   lore:
-    - '&8You literally fought this'
-    - '&8piece of armor.'
+    - '&8Du hast dies buchstäblich bekämpft'
+    - '&8Rüstungsteil.'
 arachnid_matriarch_drop_boots:
-  name: '&bSilk Striders'
+  name: '&bSeidenläufer'
   lore:
-    - '&bMade out of rare spider silk.'
+    - '&bAus seltener Spinnseide hergestellt.'
 baba_rhoga_drop_chest:
-  name: '&aWitches Robes'
+  name: '&aHexen Roben'
   lore:
-    - '&aThe smell should go'
-    - '&aaway eventually.'
+    - '&a Der Geruch sollte'
+    - '&airgendwann weg sein.'
 baba_yaga_drop_helmet:
-  name: '&aWitches Hat'
+  name: '&aHexen Hut'
   lore:
-    - '&aThe smell should go'
-    - '&aaway eventually.'
+    - '&a Der Geruch sollte'
+    - '&airgendwann weg sein.'
 balloon_rider_drop_leggings:
-  name: '&dRoomy Leggings'
+  name: '&dWeite Hose'
   lore:
-    - '&dVery comfortable and spacious leggings.'
+    - '&dSehr bequeme und weite Hose.'
 banshee_drop_charm:
-  name: '&8Manifested Sorrow'
+  name: '&8Manifestierter Kummer'
   lore:
-    - '&8May this hardened sorrow protect'
-    - '&8you from grief.'
+    - '&8Möge dieser gehärtete Kummer'
+    - 'Dich vor Leid schützen.'
 beast_tamer_drop_axe:
-  name: '&eGreat Axe'
+  name: '&eGroßaxt'
   lore:
-    - '&eHeavy enough to cleave any beast in two.'
+    - '&eSchwer genug, um jede Bestie in zwei zu trennen.'
 berserker_charm:
   name: '&bBerserker Talisman'
   lore:
@@ -2823,22 +2823,22 @@ berserker_charm:
     - '&aüberwältigendem wiederstand in mehr'
     - '&aals nur einem Weg...'
 bigfoot_drop_chestplate:
-  name: '&eFur Armor'
+  name: '&eFellrüstung'
   lore:
-    - '&eNice and warm.'
+    - '&eSchön und warm.'
 big_bad_wolf_drop_chestplate:
-  name: '&aBig Bad Wolf Fur'
+  name: '&aGroßer böser Wolf Pelz'
   lore:
-    - '&aScary!'
+    - '&aUnheimlich!'
 bloated_jeffrey_drop_tear:
-  name: '&bSweet Tear'
+  name: '&bSüße Träne'
   lore:
-    - '&bYou made Jeffrey cry...'
+    - '&bDu hast Jeffrey zum Weinen gebracht...'
 bone_fiend_drop_leggings:
-  name: '&aBoney Leggings'
+  name: '&aKnochige Hose'
   lore:
-    - '&aThe sharp bones attached to these'
-    - '&aleggings sure do rattle a lot.'
+    - '&aDie scharfen Knochen befestigt an diesen'
+    - '&aHosen klappern wirklich sehr.'
 challengers_boots:
   name: '&cChallenger''s Stiefel'
   lore:
@@ -2871,9 +2871,9 @@ chameleon_charm:
     - '&asich fast überall verstecken,'
     - '&alangsam herumschleichend...'
 changeling_drop_sword:
-  name: '&aCrystalline Sword'
+  name: '&aKristallines Schwert'
   lore:
-    - '&aThe blade shimmers as you gaze upon it.'
+    - '&aDie Klinge schimmert, wenn du sie betrachtest.'
 cheetah_charm:
   name: '&bGepard Talisman'
   lore:
@@ -2881,23 +2881,23 @@ cheetah_charm:
     - '&a120 km/h erreichen... für ungefähr'
     - '&a60 sekunden. Lass sie zählen!'
 circus_ringmaster_drop_charm:
-  name: '&dRingmasters Whip'
+  name: '&dRingmeisters Peitsche'
   lore:
-    - '&dThis was used for terrible punishment.'
+    - '&dDies wurde für schreckliche Bestrafung verwendet.'
 craftenmine_terror_drop_trident:
-  name: '&cGhast Lobotomizer'
+  name: '&cGhast Lobotomisierer'
   lore:
-    - '&cPerfect for making sure that'
-    - '&cthe Ghasts stay grounded.'
+    - '&cPerfekt um sicherzustellen, dass'
+    - '&cDie Ghasts am Boden bleiben.'
 creeperpede_drop_chestplate:
-  name: '&dExplosion Proof Vest'
+  name: '&dExplosionsfeste Weste'
   lore:
-    - '&dMake ''BOOM!'' feel'
-    - '&dmore like ''boom''.'
+    - '&dFühle den ''BOOM!'''
+    - '&deher ''boom''.'
 crone_drop_axe:
-  name: '&fWitch Feller'
+  name: '&dHexenjäger'
   lore:
-    - '&fA fine axe that demands a fine hunt.'
+    - '&dEine feine Axt, die eine feine Jagd verlangt.'
 depths_seeker:
   name: '&2Tiefen Sucher'
   lore:
@@ -2906,9 +2906,9 @@ depths_seeker:
     - '&9ist es unmöglich zu erahnen'
     - '&9 welche Schrecken diese Rute sah.'
 divine_cinder_drop_charm:
-  name: '&6Divine Fire'
+  name: '&6Göttliches Feuer'
   lore:
-    - '&6Blessed be the fire!'
+    - '&6Gesegnet sei das Feuer!'
 dwarven_greed:
   name: '&4Zwergische Gier'
   lore:
@@ -2923,32 +2923,32 @@ elephant_charm:
     - '&aAnsturms, auf kosten der Geschwindigkeit'
     - '&aeines Elefanten Ansturms!'
 enders_drop_chestplate:
-  name: '&dEnder Shirt'
+  name: '&dEnderhemd'
   lore:
-    - '&dProtective and comfy!'
+    - '&dSchützend und bequem!'
 enders_drop_helmet:
-  name: '&dEnder Cap'
+  name: '&dEnderkappe'
   lore:
-    - '&dComfy but also quite sturdy.'
+    - '&dBequem aber auch ziemlich robust.'
 enders_drop_leggings:
-  name: '&dEnder Pants'
+  name: '&dEnder Hosen'
   lore:
-    - '&dA bit too long but it will do.'
+    - '&dEin bisschen zu lang, aber passt schon.'
 ender_lapin_drop_boots:
-  name: '&cDark Star Boots'
+  name: '&cDunkle Sternstiefel'
   lore:
-    - '&cGives you the courage'
-    - '&cof running when in danger.'
+    - '&cGibt dir den Mut'
+    - '&cdes vor Angst davonlaufens.'
 endless_pursuer_drop_sword:
-  name: '&7Dark Blood Sword'
+  name: '&7Dunkles Blutschwert'
   lore:
-    - '&7The sword seems to'
-    - '&7be weeping blood...'
+    - '&7Das Schwert scheint'
+    - '&7Blut zu weinen...'
 enraged_snowman_drop_sword:
-  name: '&9Snowman''s Nose'
+  name: '&9Schneemann''s Nase'
   lore:
-    - '&9No wonder that the Snowman''s'
-    - '&9nose was so pointy...'
+    - '&9Kein Wunder das des Schneemann''s'
+    - '&9so spitz war...'
 xmas_and_gold:
   name: '&6und Gold!'
   lore:
@@ -2997,68 +2997,68 @@ xmas_treat_v2:
   lore:
     - '&eEin leckerer Snack!'
 evil_undead_drop_sword:
-  name: '&eTransient Blade'
+  name: '&eFlüchtige Klinge'
   lore:
-    - '&eIt will only serve'
-    - '&eyou for song long.'
+    - '&eEs wird nur dienen'
+    - '&eFür so lang...'
 fallen_knight_drop_boots:
-  name: '&e7Ancient Boots'
+  name: '&e7Antike Stiefel'
   lore:
-    - '&7Even though the boots are old they'
-    - '&7still provide plenty of protection.'
+    - '&7Obowhl diese Schuhe alt sind'
+    - '&7bieten Sie einiges an Schutz'
 fallen_knight_drop_chestplate:
-  name: '&e7Ancient Nether-Plate'
+  name: '&e7Antike Netherplatte'
   lore:
-    - '&7This armor might look plain to'
-    - '&7the untrained eye but is clear'
-    - '%7that anything wishing to penetrate'
-    - '&7it''s thick plate will need to be'
-    - '&7swung with considerable force.'
+    - '&7Diese Rüstung mag Ungeübten'
+    - '&7alt erscheinen aber es ist klar'
+    - '&7das was immer seine dicken Platten'
+    - '&7durchdringen will mit kräftigem'
+    - '&7Schwung geschwungen werden muss.'
 fallen_knight_drop_helmet:
-  name: '&e7Ancient Headgear'
+  name: '&7Antiker Kopfschutz'
   lore:
-    - '&7Many swords have left their mark'
-    - '&7aon this helm but none have'
-    - '&7managed to break its defense.'
+    - '&7Viele Schwerter haben auf diesem'
+    - '&7Helm ihre Zeichen hinterlassen'
+    - '&7aber keins hat ihn durchbrochen.'
 fallen_knight_drop_leggings:
-  name: '&e7Ancient Leggings'
+  name: '&7Antiker Beinschutz'
   lore:
-    - '&7You feel sorry for anyone that tries'
-    - '&7to strike these leggings.'
+    - '&7Du fühlst dich schlecht für jeden'
+    - '&7der versucht diese Hose zu durchschlagen.'
 fine_swine_drop_sword:
-  name: '&6Fine Golden Sword'
+  name: '&6Feines goldenes Schwert'
   lore:
-    - '&6A fine master-crafted golden sword.'
-    - '&6The molten gold flowing inside'
-    - '&6the sword makes sure that any damage'
-    - '&6to the blade is repaired swiftly.'
+    - '&6Ein feines Meister-gefertigtes goldenes Schwert.'
+    - '&6Das geschmolzene Gold fließt innerhalb'
+    - '&6Das Schwert stellt sicher, dass jeder Schaden'
+    - '&6an der Klinge schnell repariert wird.'
 firefly_charm:
   name: '&bGlühwürmchen Talisman'
   lore:
     - '&aErleuchte die Nacht!'
 firestarter_drop_helmet:
-  name: '&eFire Stopper'
+  name: '&eFeuer Stopper'
   lore:
-    - '&eOnly half the heat!'
+    - '&eNur die halbe Hitze!'
 fire_conjurer_drop_shield:
-  name: '&eFlame Touched Shield'
+  name: '&eFlammenberührter Schild'
   lore:
-    - '&eProtects against fire and flame.'
+    - '&eSchützt vor Feuer und Flamme.'
 fishy_charm:
   name: '&bFischiger Talisman'
   lore:
     - '&aEtwas stimmt damit'
     - '&aeinfach nicht so ganz...'
 fox_king_cold_drop_charm:
-  name: '&9Magical Snow'
+  name: '&9Magischer Schnee'
   lore:
-    - '&9You sense impossible energies'
-    - '&9coming from this snow.'
+    - '&9Du spürst unmögliche Energien'
+    - '&9aus diesem Schnee.'
 fulgora_drop_boots:
-  name: '&bMountain Boots'
+  name: '&bBergstiefel'
   lore:
-    - '&bShould be useful when'
-    - '&bexploring the mountains.'
+    - '&bSollte nützlich sein, wenn'
+    - '&bdu Berge erkundest.'
 goblin_ballista:
   name: '&8Goblin Ballista'
   lore:
@@ -3080,14 +3080,14 @@ goblin_helmet:
   lore:
     - '&8Ein Schatz unter Kobolden!'
 goblin_invasion_drop_chestplate:
-  name: '&aSmall Chestplate'
+  name: '&aKleine Brustplatte'
   lore:
-    - '&aReally tight...'
+    - '&aWirklich eng...'
 goblin_invasion_drop_leggings:
-  name: '&aSmall Leggings'
+  name: '&aKleiner Beinschutz'
   lore:
-    - '&aWell, at least it really'
-    - '&ashows off your legs.'
+    - '&aNaja, zumindest betont es'
+    - '&awirklich deine Beine.'
 goblin_leggings:
   name: '&8Goblin Hosen'
   lore:
@@ -3109,17 +3109,17 @@ grappling_arrow:
   lore:
     - '&eSchieße auf einen Zielblock um dich daran festzuhalten!'
 greedy_dwarf_drop_pickaxe:
-  name: '&9Dwarven Need'
+  name: '&9Zwergen Bedarf'
   lore:
-    - '&cThose who delve too greedily'
-    - '&cand too deep may wake ancient'
-    - '&chorrors of shadow and flame'
-    - '&cbest left undisturbed.'
+    - '&cWer zu tief und zu gierig'
+    - '&cgräbt, kann uralte Gräuel aus'
+    - '&cAchatten und Flamme erwecken'
+    - '&cdie man besser hätte ruhen lassen.'
 grunter_drop_axe:
-  name: '&cBig Oink'
+  name: '&cGroßer Grunzer'
   lore:
-    - '&cThe axe has a tendency'
-    - '&cto squeal when swung.'
+    - '&cDie Axt hat eine Tendenz'
+    - '&cbeim Schwung zu quieken.'
 grunts_boots:
   name: '&fGrunts Stiefel'
   lore:
@@ -3146,28 +3146,28 @@ grunts_sword:
     - '&2Verliehen an diejenigen, die die'
     - '&2Holzliga-Arena!'
 harmless_chicken_drop_boots:
-  name: '&aUseless Boots'
+  name: '&aNutzlose Stiefel'
   lore:
-    - '&aAt least they''re explosion proof...'
+    - '&aZumindest sind sie explosionssicher...'
 hog_rider_drop_boots:
-  name: '&a3.6 Radioactive Boots'
+  name: '&aRadioaktive Schuhe'
   lore:
-    - '&aNot great, not terrible.'
+    - '&aNicht großartig, nicht schlecht.'
 horde_champion_drop_sword:
-  name: '&dHorde Eviscerator'
+  name: '&8Massen Ausweider'
   lore:
-    - '&dWhen you need to take'
-    - '&dcare of an undead horde.'
+    - '&dWenn du dich um Horden'
+    - '&dvon Untoten kümmern musst.'
 horrid_duplicator_drop_arrow:
-  name: '&aDuped Arrow'
+  name: '&aDuplizierter Pfeil'
   lore:
-    - '&2Looks and feels'
-    - '&2like the real thing...'
+    - '&2Sieht aus und fühlt sich an'
+    - '&2wie das Original...'
 horrid_duplicator_drop_bow:
-  name: '&4Fiery Bone Bow'
+  name: '&4Feuriger Knochenbogen'
   lore:
-    - '&4This bow is made out of'
-    - '&4a single large bone.'
+    - '&4Dieser Bogen besteht aus'
+    - '&4einem einzigen großen Knochen.'
 invasion_alien_treat:
   name: '&6Alien Leckereien'
   lore:
@@ -3258,17 +3258,17 @@ invictus_sword:
     - '&2Verliehen an die Champions der'
     - '&2Holzliga-Arena!'
 krampus_drop_boots:
-  name: '&1Snow Boots'
+  name: '&1Schneestiefel'
   lore:
-    - '&1Made out of actual snow.'
+    - '&1Aus echtem Schnee gemacht.'
 large_hopper_drop_axe:
-  name: '&aHeavy Axe'
+  name: '&aSchwere Axt'
   lore:
-    - '&aPerfect for chopping off heads.'
+    - '&aPerfekt um Köpfe abzuhacken.'
 living_shadow_drop_boots:
-  name: '&5Shadow Boots'
+  name: '&5Schattenstiefel'
   lore:
-    - '&5Falling doesn''t hurt as much.'
+    - '%5Fallen schmerzt nicht mehr ganz so sehr.'
 lucky_charms:
   name: '&bLucky Charms'
   lore:
@@ -3280,60 +3280,60 @@ magmaguys_toothpick:
   lore:
     - '&aIn beinahe neuem Zustand!'
 merman_drop_trident:
-  name: '&1Merman Trident'
+  name: '&1Wassermann Dreizack'
   lore:
-    - '&1A Merman''s favorite weapon.'
+    - '&1Die Lieblingswaffe des Wassermanns.'
 meteor_shower_scroll:
   name: '&7Meteorhagel Schriftrolle'
   lore:
     - '&4Zerstörung auf abruf.'
     - '&4Verbrauchsgegenstand.'
 monster_of_the_deep_drop_trident:
-  name: '&3Bone Trident'
+  name: '&3Knochendreizack'
   lore:
-    - '&3Made out of the bones'
-    - '&3of the Monster of the Deep.'
+    - '&3Aus den Knochen des Monsters'
+    - '&3der Tiefe gefertigt.'
 moon_spider_drop_sword:
-  name: '&fSilk Spun Sword'
+  name: '&fSeidengesponnes Schwert'
   lore:
-    - '&fRazor sharp silk surrounds'
-    - '&fthe iron core of this blade.'
-    - '&fThe blade will serve you,'
-    - '&ffor now...'
+    - '&fRasiermesser scharfe Seide umgibt'
+    - '&fden eisernen Kern der Klinge.'
+    - '&fDie Klinge wird dir dienen,'
+    - '&ffür den Moment...'
 necromancer_drop_helmet:
-  name: '&cDark Omen Helm'
+  name: '&cDunkle Omen Helm'
   lore:
-    - '&cThere is something off'
-    - '&cabout this helmet.'
+    - '&cEtwas an diesem Helm'
+    - '&cwirkt falsch.'
 netherite_golem_drop_helmet:
-  name: '&8Ancient Helmet'
+  name: '&8Antiker Helm'
   lore:
-    - '&8You''re not sure if you'
-    - '&8should put this on your'
-    - '&8head or send it to a museum.'
+    - '&8Du bist dir nicht sicher, ob'
+    - '&8du diesen Helm aufziehen'
+    - '&8oder in ein Museum geben solltest.'
 nether_escapee_drop_charm:
-  name: '&6Fire Amulet'
+  name: '&6Feuer Amulett'
   lore:
-    - '&6May the flames not harm you.'
+    - '&6Mögen die Flammen dir nicht schaden.'
 nether_hag_drop_sword:
-  name: '&7Bewitched Sword'
+  name: '&7Verhextes Schwert'
   lore:
-    - '&7All kinds of curses and'
-    - '&7enchantments flow through'
-    - '&7this sword.'
+    - '&7Alle Arten von Flüchen und'
+    - '&7Verzauberungen fließen durch'
+    - '&7dieses Schwert.'
 nightwing_drop_crossbow:
-  name: '&aSky Watcher'
+  name: '&aHimmelsbeobachter'
   lore:
-    - '&aKeeping the skies safe.'
+    - '&aDen Himmel bewahren.'
 night_crawler_drop_shield:
-  name: '&8Night Shield'
+  name: '&8Nachtschild'
   lore:
-    - '&8Almost unbreakable.'
+    - '&8Fast unzerbrechlich.'
 night_crawler_drop_sword:
-  name: '&8Night Blade'
+  name: '&8Nachtklinge'
   lore:
-    - '&e8The only answer to the'
-    - '&8threats of the night.'
+    - '&8Die einzige Antwort auf die'
+    - '&8Bedrohungen der Nacht.'
 novices_boots:
   name: '&8Anfänger Stiefel'
   lore:
@@ -3722,10 +3722,10 @@ oasis_tohth:
     - '&fMeine Vorgaben sind absolut!'
     - '&fEs ist Schicksal!'
 okami_drop_leggings:
-  name: '&cOkami''s Blessing'
+  name: '&cOkami''s Segen'
   lore:
-    - '&cSpeed of the wolf.'
-    - '&cFire protection of a god.'
+    - '&cSchnelligkeit des Wolf.'
+    - '&cFeuerschutz eines Gottes.'
 owl_charm:
   name: '&bEulen Talisman'
   lore:
@@ -3749,46 +3749,46 @@ primis_catacomb_drop_boots:
     - '&7Seltsame dunkle Knochen'
     - '&7Bedeckte Stiefel.'
 primis_catacomb_drop_boots_2:
-  name: '&7Dark Bone Footgear'
+  name: '&7Düstere Knochenschuhe'
   lore:
-    - '&7Unnaturally dark bones'
-    - '&7cover these boots.'
+    - '&7Unnatürlich dunkle Knochen'
+    - '&7bedecken diese Stiefel.'
 primis_catacomb_drop_chestplate:
   name: '&7Dunkle Knochenplatte'
   lore:
     - '&7Knochen, so dunkel wie der Abgrund'
     - '&7schmücken diese Rüstung.'
-    - '&7The arrows will make quite a'
+    - '&7Die Pfeile werden einen ziemlichen Krach machen,'
     - '&7wenn sie von den Knochen abprallen.'
 primis_catacomb_drop_chestplate_2:
-  name: '&7Dark Bone Armor'
+  name: '&7Dunkle Knochenrüstung'
   lore:
-    - '&7Bones as dark as the abyss'
-    - '&7adorn this armor.'
-    - '&7The arrows will make quite a'
-    - '&7noise as they bounce off the bones.'
+    - '&7Knochen, so dunkel wie der Abgrund'
+    - '&7schmücken diese Rüstung.'
+    - '&7Die Pfeile werden einen ziemlichen Krach machen,'
+    - '&7wenn sie von den Knochen abprallen.'
 primis_catacomb_drop_leggings:
   name: '&7Dunkle Knochenhose'
   lore:
-    - '&7The dark bones covering the'
+    - '&7Die dunklen Knochen bedecken die'
     - '&7diese Leggings umgeben, machen'
     - '&7gefährliche Stürze überlebensfähiger.'
 primis_catacomb_drop_leggings_2:
-  name: '&7Dark Bone Leggings'
+  name: '&7Dunkle Knochenhose'
   lore:
-    - '&7The dark bones covering the'
-    - '&7leggings will make dangerous'
-    - '&7falls more survivable.'
+    - '&7Die dunklen Knochen, die'
+    - '&7diese Hosen umgeben, machen'
+    - '&7gefährliche Stürze überlebbarer.'
 primis_catacomb_necromancer_drop_helmet:
   name: '&5Dunkle Knochenkugel'
   lore:
     - '&5Die Kugel bietet wenig Schutz,'
     - '&5sie sucht nur Blut und Tod.'
 primis_catacomb_necromancer_drop_helmet_2:
-  name: '&5Dark Bone Cowl'
+  name: '&5Dunkle Knochenhaube'
   lore:
-    - '&5The cowl offers little protection,'
-    - '&5it only seeks blood and death.'
+    - '&5Die Haube bietet wenig Schutz,'
+    - '&5sie sucht nur Blut und Tod.'
 primis_catacomb_necromancer_drop_sword:
   name: '&5Dunkle Knochenmarke'
   lore:
@@ -3797,12 +3797,12 @@ primis_catacomb_necromancer_drop_sword:
     - '&5bereit alles zu zerteilen'
     - '&5was ihm in seinem Weg steht.'
 primis_catacomb_necromancer_drop_sword_2:
-  name: '&5Dark Bone Brand'
+  name: '&5Dunkle Knochenmarke'
   lore:
-    - '&5The dark bone-brand howls'
-    - '&5viciously with every swing'
-    - '&5as the air rushes through'
-    - '&5it''s hollow cavity.'
+    - '&5Die dunklen Knochenmarke heult'
+    - '&5bösartig mit jedem Schlag'
+    - '&5während die Luft durch'
+    - '&5durch ihr Inneres strömt.'
 primis_cooked_rabbit:
   name: '&cGekochtes Kaninchen'
   lore:
@@ -4147,9 +4147,9 @@ primis_pontis_mille_fields_stolen_berries:
   lore:
     - '&fEs sind die gestohlenen Beeren'
 primis_pontis_mille_fish_nets:
-  name: '&2Fish Nets'
+  name: '&2Fischnetze'
   lore:
-    - '&aCatching fish made easy!'
+    - '&aFischen einfach gemacht!'
 primis_pontis_mille_fresh_rat:
   name: '&fFrische Ratte'
   lore:
@@ -4346,23 +4346,23 @@ primis_rusty_mail_leggings:
     - '&9Rostig, aber langlebig, schlägt'
     - '&9Leder Schrott!'
 primis_starter_boots:
-  name: '&4Shipwreck''s Boots'
+  name: '&4Schiffswrack Stiefel'
   lore:
     - '&aDieser Lederschrott zählt kaum mehr als Rüstung.'
 primis_starter_chestplate:
-  name: '&4Shipwreck''s Chestplate'
+  name: '&4Schiffswrack Brustplatte'
   lore:
     - '&aDieser Lederschrott zählt kaum mehr als Rüstung.'
 primis_starter_helmet:
-  name: '&4Shipwreck''s Helmet'
+  name: '&4Schiffswrack Helm'
   lore:
     - '&aDieser Lederschrott zählt kaum mehr als Rüstung.'
 primis_starter_leggings:
-  name: '&4Shipwreck''s Leggings'
+  name: '&4Schiffswrack Beinschutz'
   lore:
     - '&aDieser Lederschrott zählt kaum mehr als Rüstung.'
 primis_starter_sword:
-  name: '&4Shipwreck''s Sword'
+  name: '&4Schiffswrack Schwert'
   lore:
     - '&aMöglicherweise improvisiert von den gestrandeten Resten eines Schiffes!'
 primis_storm_temple_drop_axe:
@@ -4394,45 +4394,45 @@ primis_storm_temple_drop_leggings:
     - '&bDer Sturmtempel'
     - '&bKeine Kosten gespart.'
 primis_terravilla_big_trouble_in_little_pub_reward_leggings:
-  name: '&eEarth''s Blessing'
+  name: '&eDer Segen der Erde'
   lore:
-    - '&eLooks heavy but it is'
-    - '&esurprisingly light.'
-    - '&eIt is clear that these'
-    - '&eleggings are at least a'
-    - '&efew centuries old.'
+    - '&eSieht schwer, aber es ist'
+    - '&eüberraschend leicht.'
+    - '&eEs ist klar, dass diese'
+    - '&eHosen bereits ein paar'
+    - '&eJahrhunderte alt sind.'
 primis_terravilla_drowning_terror_reward_charm:
-  name: '&aFish Charm'
+  name: '&bFisch Talisman'
   lore:
-    - '&aFishy.'
+    - '&aFischig.'
 primis_terravilla_hog_on_my_porch_reward_helmet:
-  name: '&6Hog Helmet'
+  name: 'Schweine Helm'
   lore:
-    - '&6Made out of tough Razorback leather.'
+    - '&6Aus dicken Eberleder gemacht.'
 primis_terravilla_perfect_sample:
-  name: '&ePerfect Sample'
+  name: '&ePerfektes Beispiel'
   lore:
-    - '&eIt looks like a fish...'
-    - '&eBut it sure isn''t...'
+    - '&eEs sieht wie ein Fisch aus...'
+    - '&eAber sicher ist es keiner...'
 primis_terravilla_strike_the_earth_reward_sword:
-  name: '&5Earth Splitter'
+  name: '&5Erd Splitter'
   lore:
-    - '&5You pulled this blade out of'
-    - '&5the Earth Elementals corpse.'
-    - '&5Unlike it''s dull twin, this'
-    - '&5blade is in pristine condition.'
+    - '&5Du hast diese Klinge aus'
+    - '&5der Erdelementar Leich gezogen.'
+    - '&5Im Gegensatz zu seinem stumpfen Zwilling, ist diese'
+    - '&5Klinge in einem unberührtem Zustand.'
 primis_terravilla_taking_out_the_trash_reward_sword:
-  name: '&9Earth Splitter'
+  name: '&5Erd Splitter'
   lore:
-    - '&9Looks ancient and dull.'
+    - '&9Sieht alt und stumpf aus.'
 primis_terravilla_two_legged_terror_growth:
-  name: '&eTwo Legged Terror Growth'
+  name: '&eZweibeiniger Terrorwachstum'
   lore:
-    - '&eLarge fleshy growth.'
+    - '&eGroßes fleischiges Wachstum.'
 primis_terravilla_two_legged_terror_sample:
-  name: '&eTwo Legged Terror Sample'
+  name: '&eZweibeinige Terror Probe'
   lore:
-    - '&eIt''s a simple sample.'
+    - '&eEs ist eine einfache Probe.'
 primis_wolf_hide_boots:
   name: '&5Wolfsfell Sandalen'
   lore:
@@ -4454,9 +4454,9 @@ primis_wolf_hide_leggings:
     - '&dAbgetragen und verwittert, schlägt'
     - '&dkeine Rüstung aber um Längen!'
 pufferfish_drop_helmet:
-  name: '&bPuffer Helm'
+  name: '&bPufferhelm'
   lore:
-    - '&bOnce a fish, now a helmet.'
+    - '&bEinst ein Fisch, jetzt ein Helm.'
 rabbit_charm:
   name: '&bHasen Talisman'
   lore:
@@ -4464,26 +4464,26 @@ rabbit_charm:
     - '&aist fast jedes ziel nur'
     - '&aeinen Sprung entfernt!'
 rabbit_wolf_drop_chestplate:
-  name: '&6Electrically Charged Chestplate'
+  name: '&6Elektrisch geladene Brustplatte'
   lore:
-    - '&6As long as you don''t mind a'
-    - '&6casual zap here and there.'
+    - '&6Solange du nichts dagegen hat einen'
+    - '&6gelegentliche Stromschläge hier und dort.'
 rabbit_wolf_drop_leggings:
-  name: '&6Flame Licked Leggings'
+  name: '&6Flambierte Hosen'
   lore:
-    - '&6Just lightly scorched.'
+    - '&6Nur leicht verbrannt.'
 regular_hoglin_drop_boots:
-  name: '&eHog Boots'
+  name: '&eStiefel für Schweine'
   lore:
-    - '&eMade out of durable'
+    - '&eAus haltbarem Material hergestellt'
     - '&etalking-hog leather.'
 regular_hoglin_drop_chestplate:
-  name: '&eHog Armor'
+  name: '&eSchweinerüstung'
   lore:
-    - '&eMade out of durable'
+    - '&eAus haltbarem Material hergestellt'
     - '&etalking-hog leather.'
 regular_hoglin_drop_helmet:
-  name: '&eHog Hood'
+  name: '&eSchweinehelm'
   lore:
     - '&eMade out of durable'
     - '&etalking-hog leather.'
@@ -4530,23 +4530,23 @@ skeleton_knight_drop_helmet:
   lore:
     - '&fA knights helmet. Made to last.'
 sky_archer_drop_bow:
-  name: '&aSky Bow'
+  name: '&aHimmelsbogen'
   lore:
-    - '&aGood for keeping phantoms at bay.'
+    - '&aGut um Phantome in Schach zu halten.'
 slowpoke_charm:
   name: '&bFlegmon Talisman'
   lore:
     - '&aBleibt nur zu hoffen das es sich nicht'
     - '&ain verwirrung selbst verletzt...'
 spider_knight_drop_helmet:
-  name: '&aSmall Helmet'
+  name: '&aKleiner Helm'
   lore:
-    - '&aA decent helmet. Maybe, a bit tight.'
+    - '&aEin anständiger Helm. Aber vielleicht etwas eng.'
 stacked_bones_drop_helmet:
-  name: '&6Skull'
+  name: '&6Schädel'
   lore:
     - '&6Large enough to fit your'
-    - '&6head inside, so why not.'
+    - '&6Kopf drinnen, also warum nicht.'
 summon_merchant_scroll:
   name: '&6Schriftrolle des Händler Beschwörens'
   lore:
@@ -4562,7 +4562,7 @@ summon_wolf_scroll:
 super_mite_drop_charm:
   name: '&dMite Pearl'
   lore:
-    - '&dWas it worth it...'
+    - '&dWar es das wert...'
 air_ship_air_buccaneer_boots:
   name: '&5 Air Bucanneer''s Stiefel'
   lore:
@@ -4744,7 +4744,7 @@ the_feller:
 the_great_weaver_drop_charm:
   name: '&cWeavers Silk'
   lore:
-    - '&cGreat power is imbued into this silk.'
+    - '&cGroßartige Macht ist in dieser Seide eingefangen.'
 hallosseum_amazing_treat:
   name: '&aErstaunlicher Leckerbissen!'
   lore:
@@ -4767,9 +4767,9 @@ hallosseum_treat_v2:
   lore:
     - '&eEin delikater Snack!'
 the_hunter_drop_crossbow:
-  name: '&aHunter''s Friend'
+  name: '&aJägers Freund'
   lore:
-    - '&aLet the hunt begin.'
+    - '&aLasst die Jagd beginnen.'
 northpole_amazing_treat:
   name: '&aErstaunliche Leckerei!'
   lore:
@@ -5012,10 +5012,10 @@ the_stinger:
     - '&aSchwebe wie ein Schmetterling,'
     - '&asteche wie ne Biene!'
 tree_defender_drop_shield:
-  name: '&7Living Wood Shield'
+  name: '&7Lebendes Holzschild'
   lore:
-    - '&7This shield will'
-    - '&7slowly repair itself.'
+    - '&7Dieses Schild wird'
+    - '&7Repariert sich langsam von selbst.'
 unbind_scroll:
   name: '&5Entbindungs Rolle'
   lore:
@@ -5027,9 +5027,9 @@ undead_farmer_drop_shovel:
   lore:
     - '&8Perfect for shoveling pig manure.'
 unwanted_visitor_drop_bow:
-  name: '&1Frost Bow'
+  name: '&1Frostbogen'
   lore:
-    - '&9Makes you wanna chill'
+    - '&9Versucht dich zu entspannen'
     - '&9and snipe from afar.'
 vampire_manor_gargoyle_granulator:
   name: '&8Gargoyle-Granulator'
@@ -5071,32 +5071,32 @@ veterans_sword:
     - '&2Verliehen an diejenigen, die die'
     - '&2Holzliga-Arena herausforderten!'
 vex_top_drop_boots:
-  name: '&bVexed Boots'
+  name: '&bVerärgerte Stiefel'
   lore:
-    - '&bWith mighty boots'
-    - '&bcomes mighty strength.'
+    - '&bMit mächtigen Stiefeln'
+    - '&bkommt mächtige Stärke.'
 warlock_drop_chestplate:
-  name: '&dWarlock Robes'
+  name: '&dHexer-Roben'
   lore:
-    - '&dOffers good protection from spells.'
+    - '&dBietet guten Schutz vor Zaubern.'
 warlock_drop_helmet:
-  name: '&dWarlock Hood'
+  name: '&dHexer-Kapuze'
   lore:
-    - '&dOffers good protection from spells.'
+    - '&dBietet guten Schutz vor Zaubern.'
 water_pest_drop_shield:
-  name: '&bWater Logged Shield'
+  name: '&bWasser getränktes Schild'
   lore:
-    - '&bIt''s pretty sturdy actually.'
+    - '&bEs ist eigentlich ziemlich robust.'
 wendigo_drop_sword:
-  name: '&8Blade of Starving'
+  name: '&8Klinge des Hungers'
   lore:
-    - '&8This blade will always'
-    - '&8hunger for more blood.'
+    - '&8Diese Klinge wird immer'
+    - '&8nach Blut hungern.'
 werehare_drop_charm:
-  name: '&eWerehare Trophy'
+  name: '&eWerhasen Trophäe'
   lore:
-    - '&eLuck and health to'
-    - '&ethose who carry it.'
+    - '&eGlück und Gesundheit für'
+    - '&ediejenigen, die es tragen.'
 werewolf_bone:
   name: '&6Werwolfknochen'
   lore:
@@ -5110,14 +5110,14 @@ wolfsbane:
     - '&aEinem Alpha Werwolf, alle'
     - '&aWölfe erzittern bei seinem Anblick.'
 yeti_drop_leggings:
-  name: '&eFur Leggings'
+  name: '&eFell Beinschutz'
   lore:
-    - '&eNice and warm.'
+    - '&eSchön und warm.'
 yezhi_baba_drop_boots:
-  name: '&aWitches Robes'
+  name: '&aHexen Roben'
   lore:
-    - '&aThe smell should go'
-    - '&aaway eventually.'
+    - '&aDer Geruch sollte'
+    - '&airgendwann verschwinden.'
 zombie_kings_axe:
   name: '&4Axt des Zombie Königs'
   lore:
@@ -5209,14 +5209,14 @@ fireworks_lair:
   regionEnterMessage: '&8[EM] &eWillkommen bei der Feuerwerksshow!'
   regionLeaveMessage: '&8[EM] &eDu hast die Party verlassen!'
 frost_palace_sanctum:
-  name: Frost Palace
+  name: Frost-Palast
   customInfo:
-    - '&fA 7 phase fight against'
-    - the queen of ice!
+    - '&fEin 7-Phasen-Kampf gegen'
+    - die Königin des Eises!
     - '&6Credits: MagmaGuy, Delio'
-  playerInfo: 'Difficulty: &45-man hard content!'
-  regionEnterMessage: '&bYou are stepping into the Frost Palace! Stay frosty!'
-  regionLeaveMessage: '&bYou have left the Frost Palace!'
+  playerInfo: 'Schwierigkeit: &45 Mann schwerer Inhalt!'
+  regionEnterMessage: '&bDu betrittst den Frost-Palast! Bleib eisig!'
+  regionLeaveMessage: '&bDu hast den Frost-Palast verlassen!'
 hallosseum_lair:
   name: '&cHallosseum'
   customInfo:
@@ -5349,21 +5349,21 @@ alpha_werewolf_p2:
   deathMessage: '&aDer Alpha Werwolf wurde von $players gestoppt!'
   escapeMessage: '&4Dämmerung bricht an, der Alpha Wolf verschwindet ohne Spur!'
 ancient_corpse:
-  name: '$eventBossLevel &eAncient Corpse'
+  name: '$eventBossLevel &eUralte Leiche'
 animated_armor:
-  name: '$eventBossLevel &8Animated Armor'
-  locationMessage: '&cAnimated Armor: $distance blocks away!'
-  spawnMessage: '&cOh no! An Animated Armor has escape from it''s armor stand!'
-  deathMessage: '&aThe Animated Armor was stopped by $players!'
-  escapeMessage: '&4The Animated Armor is gone!'
+  name: '$eventBossLevel &8Belebte Rüstung'
+  locationMessage: '&cBelebte Rüstung: $distance Blöcke entfernt!'
+  spawnMessage: '&cOh Nein! Eine belebte Rüstung ist seinen Rüstungsständer entkommen!'
+  deathMessage: '&aDie belebte Rüstung wurde von $players aufgehalten!'
+  escapeMessage: '&4Die belebte Rüstung ist weg!'
 arachnid_matriarch:
-  name: '$eventBossLevel &cArachnid Matriarch'
-  locationMessage: '&cArachnid Matriarch: $distance blocks away!'
-  spawnMessage: '&cA Matriarch has come to spread her brood across the land!'
-  deathMessage: '&aThe Matriarch and her brood were stopped by $players!'
-  escapeMessage: '&4The Matriarch has left!'
+  name: '$eventBossLevel &cSpinnen-Matriarchin'
+  locationMessage: '&cSpinnen-Matriarchin: $distance Blöcke entfernt!'
+  spawnMessage: '&cEine Matriarchin ist gekommen, um ihre Brut über das Land zu verbreiten!'
+  deathMessage: '&aDie Matriarchin und ihre Brut wurden von $players aufgehalten!'
+  escapeMessage: '&4Die Matriachin ist weg!'
 arachnid_matriarch_summon:
-  name: '$eventBossLevel &4Broodling'
+  name: '$eventBossLevel &4Brutling'
 armor_goblin:
   name: '$eventBossLevel &3Rüstungs Goblin'
   deathMessages:
@@ -5380,17 +5380,17 @@ armor_goblin:
   escapeMessage: '&4Ein Rüstungs Goblin ist entkommen!'
 baba_rhoga:
   name: '$eventBossLevel &cBaba Rhoga'
-  locationMessage: '&cBaba Rhoga: $distance blocks away!'
-  spawnMessage: '&cA wicked hag has emerged from her dwelling!'
-  deathMessage: '&a$players! has put the hag to rest, for now.'
-  escapeMessage: '&4AThe hag has left!'
+  locationMessage: '&cBaba Rhoga: $distance Blöcke entfernt!'
+  spawnMessage: '&cEine bösartige Hexe ist aus ihrer Behausung gekrochen!'
+  deathMessage: '&a$players hat die Hexe zur Ruhe gelegt, für den Moment.'
+  escapeMessage: '&4Die Hexe ist entkommen!'
 baba_rhoga_summon:
   name: '$reinforcementLevel &4Baba Rhoga'
 baba_yaga:
   name: '$eventBossLevel &cBaba Yaga'
-  locationMessage: '&cBaba Yaga: $distance blocks away!'
-  spawnMessage: '&cA wicked hag has emerged from her dwelling!'
-  deathMessage: '&a$players! has put the hag to rest, for now.'
+  locationMessage: '&cBaba Yaga: $distance Blöcke entfernt!'
+  spawnMessage: '&cEine bösartige Hexe ist aus ihrer Behausung gekrochen!'
+  deathMessage: '&a$players hat die Hexe zur Ruhe gelegt, für den Moment.'
   escapeMessage: '&4AThe hag has left!'
 baba_yaga_summon:
   name: '$reinforcementLevel &4Baba Yaga'
@@ -5443,9 +5443,9 @@ bigfoot:
   locationMessage: '&cBigfoot: $distance blocks away!'
   spawnMessage: '&cA mighty beast has appeared!'
   deathMessage: '&aThe beast is no more thanks to $players!.'
-  escapeMessage: '&4The beast has escaped!'
+  escapeMessage: '&4Das Biest ist entkommen!'
 big_bad_wolf:
-  name: '$eventBossLevel &fBig Bad Wolf'
+  name: '$eventBossLevel &fGroßer böser Wolf'
   locationMessage: '&cBig Bad Wolf: $distance blocks away!'
   spawnMessage: '&cAnd he huffed and he puffed!'
   deathMessage: '&aThe little piggies are now safe thanks to $players!'
@@ -5495,15 +5495,15 @@ changeling:
 changeling_p2:
   name: '$eventBossLevel &4Changeling'
 changeling_p3:
-  name: '$eventBossLevel &4Changeling'
+  name: '$eventBossLevel &4Veränderlicher'
 changeling_p4:
-  name: '$eventBossLevel &4Changeling'
+  name: '$eventBossLevel &4Veränderlicher'
 changeling_p5:
-  name: '$eventBossLevel &4Changeling'
+  name: '$eventBossLevel &4Veränderlicher'
 changeling_p6:
-  name: '$eventBossLevel &4Changeling'
+  name: '$eventBossLevel &4Veränderlicher'
 changeling_p7:
-  name: '$eventBossLevel &4Changeling'
+  name: '$eventBossLevel &4Veränderlicher'
 charms_goblin:
   name: '$eventBossLevel &2Talisman Goblin'
   deathMessages:
@@ -5519,17 +5519,17 @@ charms_goblin:
   deathMessage: '&aEin Talisman Goblin wurde von $players besiegt!'
   escapeMessage: '&4Ein Talisman Goblin ist entkommen!'
 circus_ringmaster:
-  name: '$eventBossLevel &dRingmaster'
-  locationMessage: '&cCircus Ringmaster: $distance blocks away!'
-  spawnMessage: '&cA terrible circus is in town!'
-  deathMessage: '&a$players has stopped the RIngmasters reign of abuse!'
-  escapeMessage: '&4The circus has left town!'
+  name: '$eventBossLevel &dRingmeister'
+  locationMessage: '&cZirkus Ringmeister: $distance Blöcke entfernt!'
+  spawnMessage: '&cEin schrecklicher Zirkus ist in der Stadt!'
+  deathMessage: '&a$players hat die Herrschaft des Missbrauchs durch den Ringmeister beendet!'
+  escapeMessage: '&4Der Zirkus hat die Stadt verlassen!'
 circus_ringmaster_summon:
-  name: '$eventBossLevel &5Tortured Animal'
+  name: '$eventBossLevel &5Gequältes Tier'
 circus_ringmaster_summon_1:
-  name: '$eventBossLevel &5Abused Clown'
+  name: '$eventBossLevel &5Missbrauchter Clown'
 circus_ringmaster_summon_2:
-  name: '$eventBossLevel &5Mistreated Balloon'
+  name: '$eventBossLevel &5Verwirrter Ballon'
 coins_goblin:
   name: '$eventBossLevel &eMünz Goblin'
   deathMessages:
@@ -5545,33 +5545,33 @@ coins_goblin:
   deathMessage: '&aEin Münz Goblin wurde von $players besiegt!'
   escapeMessage: '&4Ein Münz Goblin ist entkommen!'
 craftenmine_stacked_bones:
-  name: '$eventBossLevel &eArmed Skull'
-  locationMessage: '&cDr. Craftenmine''s Stacked Bones: $distance blocks away!'
-  spawnMessage: '&cA horrible Dr. Craftenmine creation is out in the wild!'
-  deathMessage: '&aThe horrible Stacked-Bones creation was slain by $players!'
-  escapeMessage: '&4Dr. Craftenmines horrible creation has escaped!'
+  name: '$eventBossLevel &eBewaffneter Schädel'
+  locationMessage: '&cDr. Craftenmine''s gestapelte Knochen: $distance Blöcke entfernt!'
+  spawnMessage: '&cEine entsetzliche Dr. Craftenmine Kreation ist in freier Wildbahn!'
+  deathMessage: '&aDie schreckliche Kreation der gestapelten Knochen wurde von $players getötet!'
+  escapeMessage: '&4Dr. Craftenmines Kreation ist entkommen!'
 craftenmine_stacked_bones_ankle:
-  name: '$eventBossLevel &6Armed Ankle'
+  name: '$eventBossLevel &6Bewaffneter Knöchel'
 craftenmine_stacked_bones_backbone:
-  name: '$eventBossLevel &6Armed Backbone'
+  name: '$eventBossLevel &6Bewaffnetes Rückgrat'
 craftenmine_stacked_bones_femur:
-  name: '$eventBossLevel &6Armed Femur'
+  name: '$eventBossLevel &6Bewaffneter Oberschenkel'
 craftenmine_stacked_bones_spine:
-  name: '$eventBossLevel &6Armed Spine'
+  name: '$eventBossLevel &6Bewaffnete Wirbelsäule'
 craftenmine_terror:
-  name: '$eventBossLevel &cLobotimized Ghast'
-  locationMessage: '&cDr. Craftenmine''s Terror: $distance blocks away!'
-  spawnMessage: '&cA Dr. Craftenmine creation is on the loose!'
-  deathMessage: '&aThe Lobotimized Ghast was slain by $players!'
-  escapeMessage: '&4The Lobotimized Ghast has left!'
+  name: '$eventBossLevel &cBetäubter Ghast'
+  locationMessage: '&cDr. Craftenmines Terror: $distance Blöcke entfernt!'
+  spawnMessage: '&cEine Dr. Craftenmine Kreation ist auf der Flucht!'
+  deathMessage: '&aDer betäubte Ghast wurde von $players besiegt!'
+  escapeMessage: '&aDer betäubte Ghast ist weg!'
 craftenmine_terror_mount:
-  name: '$eventBossLevel &dGhast Carrier'
+  name: '$eventBossLevel &dGhast-Träger'
 creeperpede_1:
-  name: '$eventBossLevel &5Creeperpede Observer'
-  locationMessage: '&cCreeperpede: $distance blocks away!'
-  spawnMessage: '&cA Dr. Craftenmine experiment is on the loose!'
-  deathMessage: '&aThe Creeperpede was stopped in its tracks by $players!.'
-  escapeMessage: '&4AThe Dr. Craftenmine experiment has managed to escape!'
+  name: '$eventBossLevel &5Creeperpede-Beobachter'
+  locationMessage: '&cCreeperpede: $distance Blöcke entfernt!'
+  spawnMessage: '&cEin Dr. Craftenmine Experiment ist auf der Flucht!'
+  deathMessage: '&aDer Creeperpede wurde durch $players aufgehalten!'
+  escapeMessage: '&4Dem Dr. Craftenmine Expiriment ist es gelungen zu entkommen!'
 creeperpede_2:
   name: '$eventBossLevel &5Creeperpede Rider'
 creeperpede_3:
@@ -7969,7 +7969,8 @@ blacksmith:
     - Items mit vielen \nVerzauberungen haben mehr Wert!
     - Mobs mit höherem Level \nlassen bessere Items fallen!
     - Mobs mit höherem Level haben eine\n höhere chance Loot fallen zu lassen!
-    - Elite mobs werden von guter\nRüstung angelockt, umso besser\ndie Rüstung, umso höher ihr Level!
+    - 
+      - 
     - Einige Items haben speziell\nTrank Effekte!
     - Einige Items haben\neinzigartige Effekte!
     - Die Jäger verzauberung\nlockt Elite Mobs an!
@@ -8159,10 +8160,13 @@ primis_caeruleaum_hint_giver:
     - Hey, schön dich zu sehen!
     - Grüße!
   dialog:
-    - Du siehst stark und mächtig aus. Sprich mit einigen \nder Bewohner, wenn du uns helfen möchtest.
-    - Vor langer Zeit gab es einen schönen Schrein für\nim Südosten, eine Schande, was mit ihm passierte.
+    - 
+      - 
+    - 
+      - 
     - Die Ruinen im Südwesten sind ein so schrecklicher Ort!\n Wer würde jemals dorthin gehen...
-    - Traf einmal einen mächtigen Magier,\ner konnte eine schöne Eiswand beschwören.\nSchade, das sie zerbrach, sobald er ohnmächtig wurde.
+    - 
+      - 
     - Ich habe gehört, dass sich ein übler Typ\n vojn Wolf in der Wolfshöhle niedergelassen hat!
   farewell:
     - Auf wiedersehen!
@@ -10959,57 +10963,121 @@ wood_league_arena_master:
 wood_league:
   arenaName: Holzliga
   arenaMessages:
-    - welle=1:Nachricht=&8[Gladius] &fDas heutige Hauptereignis! Ein legendärer Kämpfer kam den ganzen Weg in die Arena, um seine Macht gegen die härtesten Monster aus dem ganzen Land zu testen! Aber vorher kämpft hier ein Anfänger mit ein paar Kämpfern.
-    - welle=2:Nachricht=&8[Gladius] &fSiehst du dir das an, sie wissen wenigstens, wie man mit den Armen wedelt! Das war nur das Aufwärmen, fangen wir an, etwas Druck zu machen!
-    - wave=3:message=&8[Gladius] &fSo du denkst, du weißt wie man kämpft? Nun, diese Welle wird den &Cheat &fan machen! Ha ha ha ha!
-    - welle=4:Nachricht=&8[Gladius] &fOkay, ich denke, sie können die Hitze vertragen! Meine Damen und Herren, schnallen Sie sich an, wir könnten eine Show erleben!
-    - welle=5:Nachricht=&8[Gladius] &fIch fand diese &cmerkwürdige Kreatur &fdraußen, und ich dachte, es wäre lustig, sie in die Arena zu stellen!
-    - welle=6:Nachricht=&8[Gladius] &fSieht so aus, als ob Sie mit kleinen Gruppen von Feinden gut umgehen können, &cversuchen wir, das zu vergrößern!
-    - welle=7:Nachricht=&8[Gladius] &fDu denkst also, du kannst die Arena wirklich bezwingen? Wir werden sehen...
+    - 
+      - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
     - welle=8:Nachricht=&8[Gladius] &fNicht schlecht, aber was ist, wenn jeder Feind ein &cNahkämpfer ist?
     - wave=9:message=&8[Gladius] &fNett, nett, aber was ist, wenn sie alle &cFernkämpfer &fsind stattdessen?
-    - welle=10:Nachricht=&8[Gladius] &fVorsicht, ein böses Hündchen scheint sich in die Arena verirrt zu haben! Wo kam es überhaupt her?
-    - welle=11:Nachricht=&8[Gladius] &fIn Ordnung, Leute, wir haben die Tierfänger, um uns um die bösen Hunde zu kümmern, wir sind wieder im Geschäft!
-    - welle=12:Nachricht=&8[Gladius] &fEs scheint, als würde das Publikum nach &cmore&f schreien! Nun, geben wir es ihnen!
-    - welle=13:Nachricht=&8[Gladius] &fScheint, als hätten sich die Wächter gelangweilt und den Kreaturen der Arena &2Gift&f! Mal sehen wo das hinführt...
-    - welle=14:Nachricht=&8[Gladius] &fNun, das war... langweilig! Wer auch immer diesen Typen Gift gegeben hat, wird gefeuert! Lass dir beim nächsten Mal etwas Besseres einfallen!
-    - welle=15:Nachricht=&8[Gladius] &fUnd hier haben wir das diesjährige preisgekrönte &4Schwein&f! Es hat den ersten Platz für Hässlichkeit und Gemeinheit bekommen! Alle applaudieren für &4Mr. Oinkers&f!
-    - welle=16:Nachricht=&8[Gladius] &fMr. Oinkers ist jetzt Speck! Hier kommen &cMr. Oinkers Freunde&f sie strömen in die Arena, um sich zu rächen!
-    - wlle=17:Nachricht=&8[Gladius] &fEs scheint, als ob unser Arena-Herausforderer denkt, dass er eine Chance hat! Aber können sie mit noch &cmächtigeren Feinden fertig werden?
-    - welle=18:Nachricht=&8[Gladius] &fDie &cFechter &fund die &cSchützen &fveranstalten einen Wettbewerb! Mal sehen, wer besser abschneidet!
-    - welle=19:Nachricht=&8[Gladius] &fDie Fechter war nicht so heiß, mal sehen was die &caSchützen &f für uns haben!
-    - 'welle=20:Nachricht=&8[Gladius] &fScheint, als wären die Bogenschützen auch nicht so heiß geworden! Es scheint, als hätte unser Herausforderer begonnen, die Aufmerksamkeit einiger unserer besten Gladiatoren auf sich zu ziehen! Wir stellen vor: &2Zoltan, der Stolz der Untoten&f!'
-    - welle=21:Nachricht=&8[Gladius] &fNicht zu fassen! Scheint, als hätte dieser Neuling Zoltan besiegt! Haben wir einen potenziellen neuen Champion in unseren Händen?
-    - welle=22:Nachricht=&8[Gladius] &fDie Zuschauer fangen an, ihre Wetten zu platzieren! Wie weit kann der Kandidat von heute gehen?
-    - welle=23:Nachricht=&8[Gladius] &fSchau jetzt nicht weg, die Feinde dieser Welle haben alle &cvernichtende Angriffe!
-    - welle=24:Nachricht=&8[Gladius] &fScheint, als würden einige ziemlich große Arenakämpfer eintreffen, um diesen Herausforderer zu stoppen! Bleibt dran!
-    - welle=25:Nachricht=&8[Gladius] &fHier kommt &bAgdluak&f, der Bogenschütze aus dem Großen Norden! Hüten Sie sich vor seinem &bfrost&f!
-    - welle=26:Nachricht=&8[Gladius] &fDas war ein ziemlich cooler Kampf! Ich &cerzittere &fvor Aufregung zu sehen, was als nächstes kommt!
-    - welle=27:Nachricht=&8[Gladius] &fMir wurde gesagt, dass die Arena härter wird! &cUntote, die gegen Pfeile immun sind, Skelette, die ihre Gegner einfrieren &f- was werden sie sich als nächstes einfallen lassen!?
-    - welle=28:Nachricht=&8[Gladius] &fEs ist an der Zeit, &cdiese &fFähigkeiten im Kampf unter Beweis zu stellen! Denken Sie daran, es dreht sich alles um die Beinarbeit!
-    - welle=29:Nachricht=&8[Gladius] &fUnd jetzt lasst uns ein paar &cZielübungen&f machen! Der Herausforderer ist das Ziel!
-    - welle=30:Nachricht=&8[Gladius] &fEin wahrer Arena-Champion nähert sich! Die &2Südliche Viper &fversucht erneut, ihre Feinde mit seinen &ctausend Giften&f zu &cvergiften!
-    - welle=31:message=&8[Gladius] &fDie Südliche Viper ist gefallen! Die Menge tobt! Was für ein Tag, meine Damen und Herren, was für ein Tag!
-    - wave=32:message=&8[Gladius] &fMir wurde erzählt, dass die Arena-Hüter sich herumschlagen und versuchen, sich freizulassen! Kann unser Herausforderer überleben?
-    - wave=33:message=&8[Gladius] &fScheint als hätten einige Feinde gift in die Hände bekommen &cGift &fvon der Südlichen Viper! Sie wollen nicht davon getroffen werden, meine Damen und Herren!
-    - welle=34:Nachricht=&8[Gladius] &fBobby, stellen Sie sicher, dass Sie diesen Kandidaten, die für mich sterben, 1.000 Elite-Münzen geben – nein, nein, 1.000 Elite-Münzen – warten Sie, war das Ding an? Ich meine, auf zur nächsten Welle!
-    - welle=35:Nachricht=&8[Gladius] &fMeine Damen und Herren, was für ein seltener Genuss! Es scheint, als ob genau der &aHolzliga Narr &f zum Kampf aufgestiegen ist! Welche entzückenden &2Tricks &fhat er heute für uns?
-    - welle=36:Nachricht=&8[Gladius] &fWas für eine schöne Show, meine Damen und Herren, geben Sie es für &aDen Narren &f auf!
-    - wlle=37:Nachricht=&8[Gladius] &fBobby, wie läuft meine Wette? Was meinst du mit 10.000 Elite-Münzen, ich habe dir gesagt, du sollst 1.000 darauf setzen! Uh, fahren Sie sie auf, &cfahren Sie die Kräfte hoch&f!
-    - wave=38:message=&8[Gladius] &fBobby, du bringst mich hier um! Äh, wirf ein paar &cSchwertkämpfer &dort ab, ich muss mich schnell um etwas kümmern...
-    - welle=39:Nachricht=&8[Gladius] &fWas meinst du mit keine Rückerstattung? Ich wollte nicht einmal - ähm, ich meine, eine Legion von &cSchützen &fsind von weit her gekommen, um ihr Können zu zeigen!
-    - welle=40:Nachricht=&8[Gladius] &fMeine Damen und Herren, aus zufälligen Gründen habe ich den stärksten Kämpfer eingeladen, den ich beschwören kann! Triff &4Crucios, den Überbringer der Flüche&f!
-    - wave=41:message=&8[Gladius] &fCrucios wurde besiegt!? Wozu ist die Welt geworden?
-    - wave=42:message=&8[Gladius] &fEin vorerst wohlhabender Gönner hat beschlossen, den Gegnern in der Arena kostenlose Gesundheitsversorgung zukommen zu lassen! Werden sie mit &2Heilung&f besser abschneiden?
-    - wave=43:message=&8[Gladius] &f&cZittern&f, &cGift, &cFeuer &fwirf alles ein, was du hast! Wisst Ihr überhaupt, wie viel auf dem Spiel steht!?
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+      - 
+    - 
+      - 
+      - 
+    - 
+      - 
+      - 
+    - 
+      - 
+    - 
+      - 
+      - 
+    - 
+      - 
+    - 
+      - 
+      - 
+    - 
+      - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
     - wave=44:message=&8[Gladius] &fDas funktioniert offensichtlich nicht, lassen Sie sich etwas einfallen...
-    - wave=45:message=&8[Gladius] &fHier ist einer der Top Gladiatoren der Holz Liga Arena &cThousand Blades &fErscheint nun noch einmal mit seinen &cUnzähligen Geschosse&fWäre besser gewinnt auch!
-    - wave=46:message=&8[Gladius] &fTausend Klingen ist gefallen! Es scheint, als hättest du heute keine kompetenten Gladiatoren bekommen! Das ist in Ordnung, du wirst alle sehen! &cLos lassen sie die Schwärme frei!
-    - wave=47:message=&8[Gladius] &fWenn Schwärme nicht funktionieren, wirf &cmehr Kräfte&f! Wirf alle Kräfte!
-    - wave=48:message=&8[Gladius] &fMir beginnen hier die Optionen auszugehen! Sind das alle &cSchwertkämpfer &fdie noch übrig sind?
-    - wave=49:message=&8[Gladius] &fAlles klar sende alle übrigen Kämpfer, wir haben keine anderen Optionen! Nach vorn, &cBogenschützen &f!
-    - wave=50:message=&8[Gladius] &fwenn ich das richtig sehe, ist es das für mich... Ich habe keine andere Wahl, als zu erklären - Moment, wer ist das da in der Ferne? Ist das &4Uther, der Champion der Wood League Arena&f? Meine Damen und Herren, der Kampf ist entschieden und vorbei, unser Kandidat hat keine Chance, hier zu gewinnen! Sie werden von unserem Champion &cZerschmettert &f werden!
-    - wave=51:message=&8[Gladius the Destitute] &fUnglaublich, Uther ist besiegt! Wir haben einen neuen Arena-Meister! Ich wäre unglaublich aufgeregt, wenn ich jetzt nicht so schrecklich verschuldet wäre!
+    - 
+      - 
+      - 
+    - 
+      - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+      - 
+      - 
+    - 
+      - 
+      - 
 ag_welcome_quest_0:
   customObjectives:
     Objective1:
@@ -11019,7 +11087,8 @@ ag_welcome_quest_0:
         - Talk to me again for a quest!
   name: '&2Finde die AG!'
   questLore:
-    - Entdecke die Gilde der Abenteurer mit dem Befehl &2/ag &0oder &2/adventurersguild !
+    - 
+      - 
   questAcceptDialog:
     - '&8[Odigos]&f Also, benutzt &2/ag &f oder &2/adventurersguild&f, um euch zum Hub der Abenteurergilde zu begeben!'
     - Stellen Sie sicher, dass Sie mit Casus sprechen, wenn Sie dort sind!
@@ -11040,7 +11109,8 @@ ag_welcome_quest_1:
     Objective7:
       dialog:
         - '&8[&aQel''Thuzad&8]&f These Elite monsters, where do they keep coming from?'
-        - Ah, never mind that for now, we are always in need of more people to assist us in slaying quests!
+        - 
+          - 
         - Just talk to me to get one!
     Objective12:
       dialog:
@@ -11051,14 +11121,16 @@ ag_welcome_quest_1:
     Objective13:
       dialog:
         - '&8[&aUlfric&8]&f If you bring me a very special and rare item, I can unbind your Elite items.'
-        - You don't yet look prepared to take this challenge on, but you can make killing the Binder of Worlds your ultimate goal, if you dare.
+        - 
+          - 
     Objective5:
       dialog:
         - '&8[&aTim&8]&f Want to upgrade your Elite Items? Just get an upgrade orb from Sam over there!'
     Objective10:
       dialog:
         - '&8[&aKelly&8]&f Got extra Elite items? Don''t know what to do with them? Give them to me, and I''ll turn them into scrap!'
-        - You can use scrap to do lots of things, like repairing or upgrading Elite items!
+        - 
+          - 
     Objective6:
       dialog:
         - '&8[&aGillian&8]&f Do you seek power? Do you desire to reach new heights? Talk to me to unlock new guild ranks, and reach levels of power you never thought to be possible!'
@@ -11068,7 +11140,8 @@ ag_welcome_quest_1:
     Objective9:
       dialog:
         - '&8[&aReggie&8]&f Need your Elite items repaired? Just bring me some scrap, and I''ll make them as good as new!'
-        - Remember, the higher the level of your scrap, the better I can repair you Elite item!
+        - 
+          - 
   name: '&2Willkommen bei der Abenteuergilde!'
   questLore:
     - '&aTreffen Sie die Gilden-NPCs der Abenteuergilde!'
@@ -11092,8 +11165,10 @@ primis_caeruleaum_fishing:
   name: '&2Fischköder'
   questLore:
     - Wir haben ein großes Problem!
-    - Ich wurde von einer monströsen &cMeereskreatur&f verwundet, die aus einem fischigen Portal zu einer anderen Dimension kam!
-    - Mein Freund &aPiscis Nemesis&f ist immer noch auf dem Boot, er versucht entweder die Kreatur zu bekämpfen oder das Portal zu schließen,
+    - 
+      - 
+    - 
+      - 
     - aber er kann nichts ohne den richtigen Köder machen!
     - Ich sage dir, wo du den &eFischköder &f bekommen kannst, bitte geh und hilf meinem Freund!
     - Ich verspreche, dass ich dich belohnen werde!
@@ -11146,8 +11221,10 @@ primis_caeruleaum_fletching_2:
     - Benutze diese Pfeile mit einem Bogen, um den Turm zu besteigen!
   questAcceptDialog:
     - '&8[Ventus Artifex]&f Verwende die Pfeile, die du gerade erhalten hast und gehe mit Ihnen zu den Ruinen um auf die Zielblöcke zu schießen!'
-    - Innerhalb der Ruinen gibt es Gerüchte über eine alte Truhe. Nicht sehr nützlich für niemand... aber Sammler!
-    - Geh und schnappe mir, dass Schild, und ich werde es mit etwas mehr... nützlichen... für dich einhandeln!
+    - 
+      - 
+    - 
+      - 
     - '&7&oIch sollte den Schild innerhalb der Ruinen bekommen, indem ich die Greifpfeile verwende, um die Ziele innerhalb des Gebäudes zu beschießen.'
   questCompleteMessage:
     - '&8[Ventus Artifex]&f Ausgezeichnet!'
@@ -11175,9 +11252,11 @@ primis_farmstead_lighthouse_keeper_2:
         - "&a[Jeeves]&f &2Amavit&f sent you? What's this about a lighthouse? My, what a discovery!\n&fThis will revolutionize my job as a traveling merchant! Here, have these &eScrolls&f - just call me and I'll be there in a jiffy!\n&7&oSeems like &aJeeves&7&o has something for me. I should talk to him."
   name: '&2Die mysteriösen Lichter'
   questLore:
-    - Ein seltsames Licht wurde von der &dTop of the Lighthouse&f ausgestrahlt, als Sie sich mit dem Thema befassten.
+    - 
+      - 
     - Mein Vater &aJeeves&f ging nach oben, um zu überprüfen, aber er ist noch nicht zurückgekehrt.
-    - Mein Herz kann es nicht ertragen, noch mehr Probleme zu ertragen, und wir schulden Ihnen bereits viel - aber wenn Sie der Sache nachgehen und meinen Vater finden könnten, wäre ich Ihnen ewig dankbar.
+    - 
+      - 
   questAcceptDialog:
     - '&8[Amavit]&f Nochmals vielen Dank und viel Glück. Hoffentlich ist es nichts.'
     - '&7&oIch sollte auf die Spitze des Leuchtturms gehen, der Sache nachgehen und dann Amavits Vater im ersten Dorf Bericht erstatten.'
@@ -11188,7 +11267,8 @@ primis_gladius_assassins:
   questLore:
     - Die Dächer von &dGladius&f sind mit &cAttentäter&f bedeckt!
     - Auf die Straße zu gehen ist ein Todesurteil. Wir müssen uns mit den Scharfschützen befassen!
-    - Es gibt einige Punkte, um Haken auf den Dächern zu befestigen, nutze sie weise, um mit diesen Scharfschützen fertig zu werden!
+    - 
+      - 
   questAcceptDialog:
     - '&a[Belli] Kümmere dich um diese &cAttentäter&f! Denken Sie daran, die &eGreifpfeile&f! zu verwenden.'
     - '&7&oIch sollte diese &cAttentäter&7&o töten.'
@@ -11330,9 +11410,12 @@ primis_ice_village_catch_me_if_you_can:
   questLore:
     - Was für einen Zeitpunkt! Ich habe gerade nach jemandem gesucht, der unsere erobert hat
     - '&cFreigegebener Gefangener &f.'
-    - Einer unserer Häftlinge schaffte es, den Darn-Käfig schwingen zu lassen und die rostige Kette, die ihn unter der Last hält.
-    - Er muss während der Flucht ziemlich verletzt worden sein, so dass er nicht so weit gekommen sein kann.
-    - Du musst ihn &9lebendig&f zurückbringen, sei aber vorsichtig, er hat es geschafft, sich eines unserer rostigen Schwerter zu schnappen, bevor er geflohen ist.
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
   questAcceptDialog:
     - '&a[Romanus Superbus]&f Er muss irgendwo in den Bergen sein.'
     - '&7&oIch muss den &c&oEntflohenen Gefangenen&7&o finden und ihn zurück ins Gefängnis bringen.'
@@ -11348,19 +11431,25 @@ primis_ice_village_get_them_off_my_back:
     - Es geht auch nicht nur um Bevölkerungskontrolle.
     - Sie versorgen uns mit wertvollem Leder, Stosszähnen und Fleisch.
     - Bin nicht sicher, ob dieses Dorf ohne sie hier wäre.
-    - Aber in dieser Saison ist ihre Anzahl explodiert, wir haben mit dem Senken ihrer Mengen zu kämpfen.
-    - Es geht nur darum, ein Gleichgewicht zu finden, ihre Anzahl darf nicht so hoch sein, dass sie wieder zu einer Gefahr werden.
-    - Sie müssen da rausgehen und eine beträchtliche Menge von ihnen töten. Machen Sie sich nicht die Mühe, irgendwelche der &9Erwachsenen&f zu jagen.
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
     - Wir brauchen Sie nur, um die &cBabies&f und die &cjugendlichen Razorbacks&f zu jagen.
-    - Ich möchte Sie auch um einen persönlichen Gefallen bitten. Wenn du da draußen bist, könntest du nach meinem alten &eDolch&f Ausschau halten.
-    - Ich habe ihn vor ein paar Tagen bei einer Jagd verloren. Habe es in einen &cRazorback&f gerammt und er ist einfach mit meinem Dolch davongelaufen...
+    - 
+      - 
+    - 
+      - 
     - Es würde mir viel bedeuten, wenn Sie ihn zurückbringen könnten.
   questAcceptDialog:
     - '&a[Alanus Isatis]&f Du musst den &cRazorbacks&f auf deinem Weg hierher gesehen haben, also nehme ich an, du weißt wohin du sie findest.'
     - '&7&oIch muss die &c&oRazorback&7&o Bevölkerung schlachten und &e&oAlanus'' Dagger&7&o abrufen.'
   questCompleteMessage:
     - '&a[Alanus Isatis]&f Gut gemachter Freund! Das hat sehr holfen.'
-    - Wir können den Rest erledigen, und du hast auch meinen Dolch gefunden, gut ihn wieder in die Hand zu halten.
+    - 
+      - 
     - Der Dolch ist nichts Besonderes, aber es war ein handgefertigtes Geschenk von meinem verstorbenen Vater.
     - Das nächste Mal, wenn du Durst bist, zahle ich dir ein Getränk!
 primis_ice_village_gotta_keep_warm:
@@ -11408,7 +11497,8 @@ primis_ice_village_living_nightmares:
     Objective1:
       dialog:
         - '&a[Cornelia Ennodius]&f Are they gone? I was so scared. My parents sent you? Thank goodness.'
-        - I woke up in the night, but the nightmares, they did not end. They were still there, so I ran and ran...
+        - 
+          - 
         - I couldn't escape. I, I...will be fine, I just need a minute...
   name: '&2Lebende Alpträume'
   questLore:
@@ -11441,13 +11531,15 @@ primis_ice_village_make_them_go_ouch:
     - '&7&oIch muss sicherstellen, dass die &c&oKunden &7&o nicht mit &a&oViolet&7&o durcheinander kommen. Ich muss auch &e&oVioletts Property&7&o abrufen.'
   questCompleteMessage:
     - '&a[Domina Violet]&f Ich hoffe, du hast ihnen den Wert des Schmerzes beigebracht.'
-    - Eine kleine Belohnung ist in Ordnung für deine harte Arbeit. Ich schätze Leute, die es erledigen.
+    - 
+      - 
 primis_ice_village_objection!:
   customObjectives:
     Objective3:
       dialog:
         - '&a[Glacies Princeps]&f What, absolutely not. I don''t know how he convinced you to come here and beg for his release.'
-        - That man you are trying to help was corrupted by the Ice Elemental. He went mad and slaughtered his entire family.
+        - 
+          - 
         - He will never be released. Is that understood.
     Objective1:
       dialog:
@@ -11474,7 +11566,8 @@ primis_ice_village_objection!:
     - '&7&oIch sollte mit den Leuten auf meiner Liste sprechen.'
   questCompleteMessage:
     - '&a[Adrius Calpornius]&f WAS?! LÜGEN!!! Ich würde meine Familie nie so schrecklich machen...'
-    - Sie sind hier richtig! Du kannst sie nicht sehen, hörst sie. Hier neben mir wollen sie auch frei sein!!! RELEASE USE!!!
+    - 
+      - 
     - '&7Welche Vernunft dieser arme Mann noch übrig hatte, ist jetzt verschwunden...'
 primis_ice_village_run_away_daughter:
   customObjectives:
@@ -11519,7 +11612,8 @@ primis_ice_village_taking_the_bait:
     - Was ist falsch mit diesen &cFische&f
     - Ich bin schon seit Tagen hier im Fischen!
     - Kein einzigen gefangen. Wenn ich nur jünger wäre, würde ich es ihnen zeigen!
-    - Nun, es ist sicher gut, dass du jetzt hier bist. Unser Dorf bekommt den größten Teil seiner Nahrung aus diesen &cFisch&f.
+    - 
+      - 
     - Und wenn wir keine fangen können, dann ist das ein großes Problem.
     - Sie müssen dort hinuntergehen und sie sinnlos schlagen.
   questAcceptDialog:
@@ -11527,20 +11621,23 @@ primis_ice_village_taking_the_bait:
     - '&7&oIch muss in den See springen und 7 &c&oLachse&7&o töten und sie einsammeln.'
   questCompleteMessage:
     - '&a[Theopropides Nero]&f Oh! Schau sie dir an! Die sind riesig!.'
-    - Dies sollte uns für eine Weile ernähren! Vielen Dank für die Hilfe, du bist eine gute Seele!
+    - 
+      - 
 primis_ice_village_treats_for_the_punished:
   customObjectives:
     Objective1:
       dialog:
         - '&a[Eleusium Calenus]&f My wife sent you? Oh, are those treats? My favorite too! She''s such a darling.'
-        - She always takes care of me, even in these dark times, she still has a place for me in her heart.
+        - 
+          - 
         - 'You tell her I am doing just fine and that I love her very much. '
   name: 'Leckereien für die Bestraften'
   questLore:
     - Wenn es dir nichts ausmacht, könnte ich dich bitten, etwas für mich zu tun?
     - Mein lieber &aEhemann&f wurde eingesperrt und ich weiß, dass es hart ist, den ganzen Tag in einem Käfig zu sitzen.
     - Also bereitete ich ein paar Leckereien vor, die ich ihm bringen wollte.
-    - Aber ich bin gerade ziemlich beschäftigt und habe mich gefragt, ob du vielleicht dorthin gehen könntest und sie ihm bringen kannst.
+    - 
+      - 
   questAcceptDialog:
     - '&a[Titia-Calenus]&f Er wird in einem der mittleren Käfige sein.'
     - Vergessen Sie nicht, ihm zu sagen, ich liebe ihn.
@@ -11562,7 +11659,8 @@ primis_ice_village_wanna_make_a_snowman:
     - Dieser alte Mann muntert ein paar Kinder auf?
   questAcceptDialog:
     - '&a[Sparax Ennodius]&f Du wirst die &cCreatur&f in allen Wäldern in der Nähe des Dorfes finden.'
-    - Wir werden mindestens 15 der &eCrystals&f benötigen, damit wir genug haben wollen, um einen Schneemann zu bauen.
+    - 
+      - 
     - '&7&oIch sollte genug &c&oFrost Fur Ursus&7&o töten, um 15 &e&oEiskristalle zu sammeln&7&o.'
   questCompleteMessage:
     - '&a[Sestia Ennodius]&f Du hast genug Kristalle gesammelt? Wunderbar!'
@@ -11589,9 +11687,12 @@ primis_main_quest_1:
     Objective1:
       dialog:
         - '&a[Chief Piscis] &fOh so you were in the ship that beached a few hours ago?'
-        - I apologize, we would've sent help but I am afraid we are drowning in our own issues right now!
-        - A nearby &dBandit Camp &fkeeps raiding our supplies, a mysterious &cSea Creature &fkeeps haunting our shores and a &dWolf Den &fis making foraging impossible!
-        - If you help us out, I will tell you where you might be able to get the supplies you need to repair your ship.
+        - 
+          - 
+        - 
+          - 
+        - 
+          - 
         - '&7&oI should report to the &aFirst Mate &7&oto see if I should help these people!'
   name: '&2Schiffswrack!'
   questLore:
@@ -11617,7 +11718,8 @@ primis_main_quest_10:
   questLore:
     - Es ist Zeit, &dPontis Mille&f um Hilfe zu bitten.
     - Lassen Sie sie wissen, was hier passiert ist, und sagen Sie ihnen, dass wir zu unseren Gunsten kassieren.
-    - Es gibt einen &cAutomaton&f auf der &dBridge&f, die dorthin führt. Besiege es und die Brücke senkt sich.
+    - 
+      - 
   questAcceptDialog:
     - '&a[General Hasta] &fGute Reise, Freund. Denken Sie daran: Töten Sie den &cTorwächter&f und stellen Sie sicher, dass unsere Bitte die Ohren von &aShogun Navita&f erreicht..'
     - '&7&oIch sollte den &cTorwächter&7&o an der &dBrücke&7&o töten und mich auf den Weg zu &aShogun Navita&7&o in &dPontis Mille&7&o machen.'
@@ -11701,7 +11803,8 @@ primis_main_quest_14:
     - Das mag schwer zu glauben sein, aber es klingt wie der Sturm
     - hat sich als unser Gegner materialisiert.
     - Wir wissen nicht einmal, ob er besiegt werden kann, und wir fürchteten uns, dass wir zu unseren Toten geschickt wurden.
-    - Wenn du den &cGoblin König &f wirklich besiegt hast, wirst du vielleicht einen Weg finden, diesen Sturm zu töten.
+    - 
+      - 
   questAcceptDialog:
     - '&a[Blepharo]&f Wir haben ihre Kräfte ein wenig geschwächt, aber trotzdem ist dies keine leichte Aufgabe.'
     - Der Sturm ist kein gewöhnlicher Gegner. Unterschätze ihn nicht.
@@ -11711,25 +11814,35 @@ primis_main_quest_14:
     - '&cStorm&f? Mir wurde gesagt, das sei unmöglich! Ich meine...'
     - '... es macht jetzt keinen Sinn, sich zu verstecken. Ich wusste von der &cSturm&f. Ich wusste von der &dGladius&f-Invasion - ich habe sie sogar unterstützt. Ich tat es für mein Volk - für &dPontis Mille&f.'
     - '&cCounselor Machiavelli&f überzeugte mich, dass der &cSturm&f so unaufhaltsam war wie die Natur selbst, und dass der Sturz von &dGladius&f und &dPontis Mille&f eine Unausweichlichkeit war, die wir nur durch Opfer hinauszögern konnten.'
-    - Ich sehe jetzt, dass diese Schlange meinen Verstand vergiftet und mein Urteilsvermögen verfälscht hat. Er muss auf die Schnelle behandelt werden.
+    - 
+      - 
     - '&8&oScheint, als hätte &aShogun Navita&7&o ein Problem, um das ich mich kümmern soll.'
 primis_main_quest_15:
   name: '&2Abfindung!'
   questLore:
-    - Einst sah &cCounselor Machiavelli&f, der Weiseste unter uns, den Fall von &dPontis Mille&f voraus.
-    - Angesichts einer beispiellosen existenziellen Bedrohung überzeugte er mich, ruhig zu bleiben, um keine Panik zu schüren.
-    - Ich habe die einzige Maßnahme ergriffen, von der ich dachte, dass sie uns noch bleibt – unseren engsten Verbündeten zu opfern, um uns nur wenige Wochen zu verschaffen.
-    - Ich habe mit dem Wesen gesprochen, das im &dBlut Temple&f lebt. Ich habe einen Deal mit dem Teufel gemacht.
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
     - 
       - Ich habe uns Zeit gekauft.
-    - Es forderte, dass ich die Armee wegschicke, was ich tat, indem ich sie mobilisierte, um Konflikte in der Nähe zu bewältigen.
-    - Ich war blind, aber jetzt sehe ich. &cCounselor Machiavelli&f war die ganze Zeit in ihrer Tasche.
+    - 
+      - 
+    - 
+      - 
     - Er hat uns in unser Verderben geführt und wäre damit davongekommen, wenn du nicht aufgetaucht wären.
     - Jetzt gibt es Hoffnung.
     - Ich bitte dich, befreien uns bitte von dem verräterischen &cCounselor&f.
-    - Er hat sich in seinem Quartier eingeschlossen, umgeben von denen, die ihm und seinen ... Haustieren treu ergeben sind.
-    - Vorsichtig sein. Ich wusste nicht, warum er sich isoliert hat, aber es ist jetzt klar, dass er Vergeltung erwartet.
-    - Bring mir den &eFar Sprachstein&f zurück, mit dem wir mit dem &dBluttempel&f kommuniziert haben.
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
     - Ich möchte eine letzte Botschaft durch dich überbringen.
   questAcceptDialog:
     - '&a[Shogun Navita]&f &cCounselor Machiavelli&f hat sich in sein Quartier in der Unterstadt am Markt zurückgezogen. Seien Sie vorsichtig, hat in seiner Zeit eine treue Anhängerschaft angehäuft und wird nicht kampflos untergehen.'
@@ -11769,7 +11882,8 @@ primis_main_quest_16:
     - '&7&oIch muss gehen und das &d&oEis Dorf&7&o ganz im Süden finden.'
   questCompleteMessage:
     - '&a[Glacies Princeps]&f Der Shogun hat dich geschickt, wie ich sehe, es ist gut zu hören, dass &aNavita&f zu seinem alten Selbst zurückgekehrt ist.'
-    - Bevor wir gegen den &dBlut Tempel&f vorgehen können, gibt es einige Probleme, die ich zuerst behandeln möchte.
+    - 
+      - 
     - Ich will dir etwas sagen.
     - '&7&oIch sollte mit &a&oGlacies&7&o sprechen.'
 primis_main_quest_17:
@@ -11787,13 +11901,18 @@ primis_main_quest_17:
   questLore:
     - Bevor wir weiter diskutieren über
     - den &dBlut Tempel&f.
-    - Es gibt Probleme, die in unserem Dorf aufgetaucht sind und die so schnell wie möglich angegangen werden müssen.
+    - 
+      - 
     - Wenn diese Probleme nicht gelöst werden, würde ich in meinen Pflichten als Dorfvorsteher versagen.
     - Es gibt keine Möglichkeit für mich, die Bitte meiner eigenen Leute zu ignorieren und andere an die erste Stelle zu setzen.
-    - Wenn Sie uns bei der Lösung dieser Probleme helfen könnten, gehört unsere ganze Aufmerksamkeit Ihnen.
-    - Wir haben einen entflohenen Gefangenen, Wildtierprobleme und sogar unsere eigenen Dorfbewohner, die aus dem Dorf stehlen.
-    - Ich werde Ihnen die Namen und Wohnorte der Personen mitteilen, die mit diesen Problemen zu mir kamen.
-    - Sprechen Sie mit ihnen und stellen Sie sicher, dass Sie ihnen bei allen Beschwerden und Problemen helfen, die sie haben.
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
     - Sie können Ihnen genauer sagen, was zu tun ist.
   questAcceptDialog:
     - '&a[Glacies Princeps]&f Wenn du damit fertig bist, ihnen zu helfen. Komm zurück zu mir und wir können reden.'
@@ -11805,19 +11924,27 @@ primis_main_quest_18:
   name: '&2Die Prüfung des Eises'
   questLore:
     - Nun, Sie haben mich und den größten Teil des Dorfes sicherlich beeindruckt.
-    - Ich schulde dir eine Erklärung, Freund. Sehen Sie, die längste Zeit, aus der wir Energie bezogen haben
+    - 
+      - 
     - die &cEiselementare&f.
-    - Sie würden uns mit ihrer Macht segnen und im Gegenzug musste jeder von uns, der Krieger oder Jäger werden wollte, die &9Prüfung des Eises&f bestehen.
-    - Um die Prüfung zu bestehen, musste man den schwarzen Berg bis zu seinem östlichen Gipfel erklimmen. Und am Gipfel würdest du dem gegenüberstehen
+    - 
+      - 
+    - 
+      - 
     - '&cMinor Ice Elementals&f im Kampf.'
-    - Solltest du Erfolg haben, dann war dein Anspruch, Krieger oder Jäger zu werden, zweifellos dein Recht.
+    - 
+      - 
     - Wenn Sie versagt haben ... dann ... gehörten Ihre Energie und Ihr Wesen den &cEiselementaren&f.
-    - So war es die längste Zeit. Bis der Einfluss der &dBlut Tempels&f an Macht zunahm.
+    - 
+      - 
     - Seit damals
-    - die &cIce Elementals&f wurden ermutigt. Macht aus ihnen zu ziehen, war jetzt ein Risiko.
+    - 
+      - 
     - Mehrere unserer Leute wurden korrumpiert und wir mussten sie zu unserer eigenen Sicherheit einsperren.
-    - Und es wurde unmöglich, die Prüfung zu bestehen, was dir auf dem Gipfel gegenüberstand, war etwas, das kein Dorfbewohner überwinden konnte.
-    - Diejenigen, die die Prüfung nicht bestanden haben, sind immer noch da, ihre Seelen in den Hüllen ihrer verwesenden Körper gefangen.
+    - 
+      - 
+    - 
+      - 
     - Sklaven zu den
     - '&cEiselemente&f.'
     - Es ist klar, dass unsere alten Traditionen nicht mehr sind.
@@ -11849,7 +11976,8 @@ primis_main_quest_19:
     - '&7&oI should go into the temple and slay the &c&oIce Elemental&7&o.'
   questCompleteMessage:
     - '&a[Glacies Princeps]&f I could feel the energies flowing out, all the way from here.'
-    - You have done us a great favor friend. The &dIce Village&f will provide aid to you and your allies.
+    - 
+      - 
     - There is another settlement that might need your help, let's speak.
     - '&7&oIch sollte hören, was &a&oGlacies&7&o zu sagen hat.'
 primis_main_quest_2:
@@ -11868,7 +11996,8 @@ primis_main_quest_2:
     - '&7&oIch sollte mit dem &aDorf Chef&f sprechen, um zu sehen, wie man den Einheimischen helfen kann.'
   questCompleteMessage:
     - '&a[Chief Piscis]&f Jeder im Dorf hat ein Problem, mit dem man sich befassen muss, und ich bin da keine Ausnahme. Meine Anfrage ist ziemlich anspruchsvoll, so vielleicht möchten Sie sich erwärmen und die Lagen des Landes mit einigen der Probleme der anderen Dorfbewohner.'
-    - Sprechen Sie mit mir, wenn Sie bereit sind, und ich werde mit Ihnen die Geheimnisse teilen, die wir bewahren, um dieses Tal zu verlassen!
+    - 
+      - 
     - '&7&oIch sollte mit den Einheimischen sprechen und sehen, wer Hilfe braucht, und zurück zum Anführer kommen, wenn ich bereit bin fortzufahren.'
 primis_main_quest_20:
   customObjectives:
@@ -11890,13 +12019,16 @@ primis_main_quest_20:
     - to go of course.
   questAcceptDialog:
     - '&a[Glacies Princeps]&f You will find &aTerravilla&f straight West of here.'
-    - It is located on top of this ancient elemental ruin, you will know it when you see it.
+    - 
+      - 
     - Oh, I almost forgot. The person you want to talk to is &aOverseer Lutum&f.
     - '&7&oI should go to &d&oTerravilla&7&o and talk to &a&oOverseer Lutum&7&o.'
   questCompleteMessage:
     - '&a[Lutum Princeps]&f Came all the way from the &dIce Village&f, eh. Good to see some help arrive.'
-    - When I sent that request for aid I wasn't sure if we were gonna get any. I heard the situation over there wasn't that much better.
-    - We are in quite a pickle over here. We have plenty of work for you if you want it.
+    - 
+      - 
+    - 
+      - 
     - '&7&oI should talk to &a&oLutum&7&o.'
 primis_main_quest_21:
   name: '&2Taking out the trash'
@@ -11921,7 +12053,8 @@ primis_main_quest_21:
   questCompleteMessage:
     - '&a[Lutum Princeps]&f Well that is one issue resolved. Onto the next!'
     - Before we move on, I want you to have this blade.
-    - It might be old and dull but it's still as good as anything you can get your hands on today.
+    - 
+      - 
     - '&7&oI should hear out what &a&oLutum&7&o has planned next.'
 primis_main_quest_22:
   name: '&2Big trouble in little pub'
@@ -11960,11 +12093,14 @@ primis_main_quest_23:
     - '&cEarth Elemental&f into a slumber it will never wake up from.'
   questAcceptDialog:
     - '&a[Lutum Princeps]&f You can get to the maze by walking down the spiral staircase in the middle of the ruins.'
-    - Don't get lost in the maze, also make sure to watch out for the constructs. Good luck!
+    - 
+      - 
     - '&7&oI should enter the &d&oRuins Maze&7&o and slay the &c&oEarth Elemental&7&o.'
   questCompleteMessage:
     - '&a[Lutum Princeps]&f I cannot believe it, you''re back. In one piece too!'
-    - I guess you are tougher than you look. What you have done here is incredible it is clear we are in great debt to you. Is there anything Terravilla might be able to do for you.
+    - 
+      - 
+      - 
     - '&7&oI need to tell &a&oLutum&7&o about my quest and the &d&oBlood Temple&7&o.'
 primis_main_quest_24:
   customObjectives:
@@ -12017,14 +12153,17 @@ primis_main_quest_3:
     - gib mir das Erbstück meines &eGroßvaters&f zurück!
   questAcceptDialog:
     - '&a[Chief Piscis]&f Das &dBanditenlager&f ist nicht weit entfernt, wenn du der Straße folgst!'
-    - Seien Sie vorsichtig auf Ihrem Weg dorthin, wir wissen nicht, was sie vorhaben, aber es kann nichts Gutes sein!
+    - 
+      - 
     - Oh, und bringen Sie unbedingt das &eErbstück meines Großvaters mit&f!
     - '&7&oIch sollte zum nahe gelegenen Banditenlager gehen und es räumen.'
   questCompleteMessage:
     - '&a[Stamm Fische]&f Ich sehe, du bist zurück! Bringst du gute Nachrichten?'
     - '&7&oDu erzählst &aChief Piscis&7&o von dem Lager und gibst das &eErbstück&7&o ab.'
-    - Was ist das? Magier? Elementare? Das ist ein böses Omen. Du musst mit Bürgermeister Pontis in Bridgeport sprechen und den Vorfall sofort melden!
-    - Du hast uns wahrlich gut gedient! Hier, für deine Bemühungen, gebe ich dir das Schwert meines Großvaters! Möge es Euch so gut dienen, wie es unserer Familie gedient hat!
+    - 
+      - 
+    - 
+      - 
     - '&7&Scheint so, als ob der Chief Piscis mir sagen will, wie ich hier rauskomme.'
 primis_main_quest_4:
   customObjectives:
@@ -12044,7 +12183,8 @@ primis_main_quest_4:
     - der &9Blauen Blume &fpfad!
   questAcceptDialog:
     - '&a[Chief Piscis]&f Der Bergpass wird von einem extrem gefährlichen &cGolem&f bewacht, den du wahrscheinlich noch nicht besiegen kannst!'
-    - Wir wissen von einem Geheimgang in den Bergen. Folgen Sie dem Pfad von &9blauen Blumens &fund sprechen Sie mit dem &aBergführer&f, um sicher nach Bridgeport zu gelangen!
+    - 
+      - 
     - '&7&oIch sollte dem &9&Blauen Blumen &7&Pfad zum Bergführer folgen!'
     - '&7&oIch sollte sicherstellen, dass ich alle Geschäfte, die ich noch übrig habe, abschliesse, bevor ich gehe.'
     - '&7&oHinweis: Stellen Sie sicher, dass Sie die Quest verfolgen, um Ihr Ziel einfacher zu finden!'
@@ -12061,7 +12201,8 @@ primis_main_quest_5:
     - ' musst du dies &cElementar&f zuerst besiegen!'
   questAcceptDialog:
     - '&a[Petrae]&f Ihr wollt das &cKristallelementar&f besiegen? Ich kann dir nur Glück bei deinem Vorhaben wünschen!'
-    - Ich werde dir sofort folgen. Wenn du bei deinem Versuch erfolgreich bist, treffen wir uns auf der anderen Seite des Ganges!
+    - 
+      - 
     - '&7&Sieht so aus, als müsste ich den &5Kristallgolem&7&o besiegen.'
   questCompleteMessage:
     - '&a[Petrae]&f Hervorragend! Ich habe gesehen, wie du den &cKristallgolem&f besiegt hast, du hast eindeutig eine große Zukunft vor dir!'
@@ -12071,7 +12212,8 @@ primis_main_quest_6:
     Objective1:
       dialog:
         - '&a[Filius] &fYou made it through the mountain! You don''t see that every day.'
-        - I'm afraid my father is missing, but I can tell you about the path to &dGladius&f. If you want to help us though, talk to my &aMother&f!
+        - 
+          - 
         - '&7&oSeem like &aFilius&7&o can help me find the way to &dGladius&7&o.'
   name: '&5Der Bauernhof'
   questLore:
@@ -12085,7 +12227,8 @@ primis_main_quest_6:
     - Viel Glück auf Ihren Reisen und locker bleiben!
   questAcceptDialog:
     - '&8[Petrae]&f Sagt einfach dem B&aesitzer des Gehöfts&f, dass ich Euch geschickt habe, obwohl ich gehört habe, dass der er schon eine Weile nicht mehr gesehen wurde.'
-    - Wenn sie nicht da sind, bin ich sicher, dass ihr Sohn &aFilius&f Ihnen gerne helfen wird!
+    - 
+      - 
     - Sicheres Reisen!
     - '&7&oIch sollte dem Pfad zu &dFarmstead&7&o folgen und mit &aProprietor&7&o sprechen.'
   questCompleteMessage:
@@ -12111,7 +12254,8 @@ primis_main_quest_7:
     - Belohnen dich, wenn du dabei hilfst, die Zahl der &cUntoten&f auf diesem Schiff zu verringern!
   questAcceptDialog:
     - '&a[Filius] Sei vorsichtig auf der Straße, offensichtlich ist in &dGladius&f etwas schief gelaufen.'
-    - Sobald du &dGladius&f erreicht hast, sollte der Lord der Festung entweder in seinem Herrenhaus oder in der Kaserne sein!
+    - 
+      - 
     - '&7&oIch sollte den Pfad zu &dGladius&7&o gehen und einige &cUntote Seeleute&7&o auf dem Weg dorthin ausschalten.'
   questCompleteMessage:
     - '&a[Lord Hasta]&f Wurde du als Verstärkung von Pontis Mille geschickt? Wo sind die anderen? Bist du ein Boter?'
@@ -12177,7 +12321,9 @@ primis_ogre_mines_lost_bretheren:
     Objective1:
       dialog:
         - '&a[Fortis Fossores] &fWhat do you want? What, &aFugit&f sent you? What for? The mines were overrun? Hah, I didn''t even notice!'
-        - Let that worrywart brother of mine know that I am fine. Now, begone! I am on the verge of making a big mining discovery. I call it - branch mining! Hehehe, this one will change everything!
+        - 
+          - 
+          - 
   name: '&5Verlorene Brüder'
   questLore:
     - Die Mine wurde von &cOger&7&o überrannt!
@@ -12193,7 +12339,8 @@ primis_ogre_mines_lost_bretheren:
   questCompleteMessage:
     - '&a[Fugit Fossores]&f Mein &aBruder&f hat was gesagt? Ah, typisch für ihn, zu sehr auf seine Arbeit konzentriert, um zu bemerken, dass der ganze Ort übernommen wurde!'
     - Wenn ich ihn das nächste Mal sehe, werde ich ein ernstes Gespräch mit ihm führen!
-    - Danke für deine Hilfe, du kannst meine beste Spitzhacke haben, LL nenne ich sie. Es sieht nicht so aus, als ob ich in absehbarer Zeit in der Lage sein werde, bei diesem Tempo Mining zu betreiben.
+    - 
+      - 
 primis_ogre_mines_old_miner_quest:
   name: '&eGlücksspitzhacke'
   questLore:
@@ -12225,11 +12372,13 @@ primis_pontis_groves_acrobatics:
     - hat einen ganzen Kurs für Akrobatik gemacht.
     - Das Ziel ist es, mit &9Wines&f von Plattform zu Plattform zu kommen und
     - '&9Acrobatics&f und erreichen das Ende des Kurses.'
-    - Solltest du den Kurs durchlaufen und das Ende erreichen (was übrigens eine Kugel ist)
+    - 
+      - 
     - Du wirst mit einem sehr schönen &eItem&f belohnt!
   questAcceptDialog:
     - '&a[Posuere Hominem]&f Sie finden den Kursbeginn am &dEnde des Tunnel&f.'
-    - Schwimmen Sie einfach bis zum ersten Wein und steigen Sie weiter auf den Wein, bis Sie die Spitze erreichen.
+    - 
+      - 
     - Vergiss nicht, mit meiner &aBruder&f am Ende des Kurses wegen der Belohnung zu fragen!
     - '&7&oIch sollte zum Anfang des Kurses gehen.'
   questCompleteMessage:
@@ -12239,7 +12388,8 @@ primis_pontis_groves_caught in the web:
   questLore:
     - "Also haben sie irgendwo einen &dNest&f in der &d\n\nHöle&f."
     - Das würde erklären, warum ihre Bevölkerung gewachsen ist.
-    - Wir waren daran gewöhnt, dass einige &cSpinnen&f in &dGrove&f wandern, aber das ist zu viel.
+    - 
+      - 
     - Es wäre großartig, wenn du das &dNest&f finden und ausräumen könntest.
     - Wir werden dir ein paar schöne &eSpinnen Stiefel &f als Belohnung machen!
   questAcceptDialog:
@@ -12291,7 +12441,8 @@ primis_pontis_groves_lighthouse_1:
   name: 'Krankenpflege'
   questLore:
     - Wanderer, könnte ich dich um etwas bitten?
-    - Es gibt eine nahe gelegene &dLeuchtturm&f. Wir liefern normalerweise Nahrung für die Familie, die dort lebt.
+    - 
+      - 
     - Aber seit die Probleme begannen, konnten wir unsere &dWald&f nicht verlassen.
     - Würden Sie so freundlich sein, die Familie mit neuer Nahrung zu versorgen?
     - Es wäre großartig, wenn Sie sich beeilen könnten, es ist schon eine Weile her seit der letzten Lieferung.
@@ -12313,8 +12464,10 @@ primis_pontis_groves_lighthouse_2:
   questLore:
     - Äh, bevor du gekommen bist. Jeeves the Travelling Merchant war da.
     - Wir haben ihn gefragt, ob er etwas Essen für uns hätte.
-    - Nun, das ist nicht mehr notwendig, daher wäre es großartig, wenn du nach oben steigen könntest
-    - auf den Leuchtturm und reisen nach Caeruleaum Village und sagen Jeeves wir brauchen das Essen nicht mehr.
+    - 
+      - 
+    - 
+      - 
   questAcceptDialog:
     - '&8[Alanus Secundas]&f Wenn du die Wohnung verlässt, ist der Leuchtturm geradeaus und ein bisschen nach links.'
     - '&8&oIch sollte zum Leuchtturm gehen.'
@@ -12341,22 +12494,27 @@ primis_pontis_groves_population_control:
 primis_pontis_groves_tree_climbing_elf_bandits:
   name: '&2Baumkletternde Elfenbanditen!'
   questLore:
-    - Ich hatte es hier oben mit diesen verdammten, auf Bäume kletternden &cElf Bandits&f in unserem &dWald&f.
+    - 
+      - 
     - Nicht, dass die &cSpinnen&f genug wären,
     - jetzt haben sich diese schattenliebenden Poop-Nüsse entschieden, sich in unseren Bäumen niederzulassen!
-    - Sie lieben die Dunkelheit, die du siehst, das Licht tut ihnen weh, macht sie alle benebelt im Kopf.
-    - Natürlich viel Dunkelheit und Schatten in unserem kleinen &dWald&f. Also zogen sie direkt ein!
+    - 
+      - 
+    - 
+      - 
     - Mit ihrer Überzahl drangen sie ein.
     - Nun, sie haben etwas in Ordnung,
     - Ein Blick auf dich und ich kann sagen, dass du mit ein paar Steinriesen umgehen kannst!
     - Ich bin sicher, einige Elfen werden kein großes Problem für dich sein.
-    - 'Schicken Sie ihnen eine Nachricht. Die Botschaft ist klar: IHRE ÄRSCHE SIND HIER NICHT WILLKOMMEN!'
+    - 
+      - 
   questAcceptDialog:
     - '&a[Phygia Gorgonius]&f Ich bin sicher, Sie werden viele von ihnen finden, wenn Sie einen schattigen Platz finden und einfach nach oben schauen, ihre Baumhäuser sind kaum zu übersehen.'
     - '&7&oIch sollte mich um diese &cElves&7&o kümmern, bevor &aPhygia&7&o vor Wut Feuer fängt.'
   questCompleteMessage:
     - '&a[Phygia Gorgonius]&f Mein Freund! HAHAHA! So schön, dich wieder zu sehen!'
-    - Ich habe aus der Ferne zugesehen. Diese Narren in den Tod stürzen zu sehen, nichts Besseres!
+    - 
+      - 
     - '&7&oDie Elfen stören nie wieder &aPhygia&7&o.'
 primis_pontis_mille_fields_berry_crazed_wolf:
   name: '&2Beere Wölfe verrückt'
@@ -12412,13 +12570,15 @@ primis_pontis_mille_fields_camp_hunter_three_times_hunter:
     - '&cBeast Crawler Megdun&f that slumbers on top of a sun covered grove.'
     - Tanz zwischen zwei westlichen Gipfeln findet man das
     - '&cBeast Impaler Uladzimir'
-    - Als Beweis bringt mir das &eImpaler's Horn&f, die &eCod's Scale&f und die &eCrawler's Silk&f.
+    - 
+      - 
   questAcceptDialog:
     - '&a[Milonia Majus]&f Hier nehmen Sie dieses Gerät, es wird Sie grob zu ihrem Standort führen.'
     - '&7&oIch sollte gehen und die &c&oDrei großen Bestien herausfordern &7&o.'
   questCompleteMessage:
     - '&a[Milonia Majus]&f Du bist zurückgekehrt. Und du hast alle drei Elemente mitgebracht, die ich als Beweis angefordert habe.'
-    - Das war wohl ein ganz Abenteuer und erinnert mich an meine jüngeren Tage, als ich mehr Kraft und Beweglichkeit hatte.
+    - 
+      - 
     - Nun genug über mich geredet, hier ist deine Belohnung wie versprochen!
     - '&7Du übergibst das Bestienverfolgungsgerät zurück.'
     - '&a[Milonia Majus]&fI hatte diese Sache fast vergessen, danke!'
@@ -12438,7 +12598,8 @@ primis_pontis_mille_fields_do_it_yourself:
   questAcceptDialog:
     - '&a[Scribonia Ingenvinus]&f Ich wusste, dass du ja sagen würdest! Ich sehe, du bist bereits gut ausgerüstet.'
     - OK, das ist, was ich möchte, dass du tust.
-    - Wir machen uns Sorgen um dieses große &cBiest&f aka. &cGrosser alter Bubba&f, das ist Priorität Nummer eins.
+    - 
+      - 
     - Ich brauche dich, um 5 &cLanghörner&f und 6 &cKurzhörner&f zu töten.
     - Verstanden? Gut. Melden mir, wenn Sie fertig sind.
     - '&7&oIch sollte &c&oGrosser alter Bubba&7&o töten und 5 &c&oLanghörner&7&o und 6 &c&oKurzhörner&7&o.'
@@ -12481,7 +12642,8 @@ primis_pontis_mille_fields_feeding_the_hungry:
     - '&7&oIch sollte zum &dSlums&7&o gehen und das Essen an die Bedürftigen verteilen.'
   questCompleteMessage:
     - '&a[Augustina Verrucosis]&f &2Daemones&f hat dich hier nicht gesendet.'
-    - Er kam jede Woche vorbei und verteilte alles, was er entbehren konnte, um sicherzustellen, dass wir nicht verhungerten ...
+    - 
+      - 
     - Vielen Dank an Fremde, meine Familie wird dies nicht vergessen.
 primis_pontis_mille_fields_fruity_hound:
   name: '&2Fruchthund'
@@ -12505,8 +12667,10 @@ primis_pontis_mille_fields_fruity_hound:
     - '&7&oIch sollte den &c&oFruity Hound&7&o erlegen und sehen, ob der &e&oContest Berry&7&o noch in einem Stück ist.'
   questCompleteMessage:
     - '&a[Dordalus Nasica]&f JA! Das ist mein Liebling! Gut und ganz, nicht einmal irgendein Speichel darauf!'
-    - Als Belohnung für deine Arbeit kannst du meine zweitgrößte Beere haben. Achte darauf, sie nicht zu essen.
-    - Ich weiß, vielleicht verführerisch zu essen, aber glauben Sie mir, es ist viel nützlicher, wenn du sie behälst.
+    - 
+      - 
+    - 
+      - 
 primis_pontis_mille_fields_not_on_my_farm:
   name: '&2Nicht auf meinem Bauernhof!'
   questLore:
@@ -12684,7 +12848,8 @@ primis_pontis_mille_let_them_know:
     - If you could reach out to the &aGenerals&f in the city and let them know
     - that &dGladius&f needs help we might be able to to do something about it.
     - Doch erst einmal befassen wir uns mit den bestehenden Fragen.
-    - I am sure that the &aGenerals&f will be happy to let you help them out with their issues.
+    - 
+      - 
     - Sprich mit ihnen und komm dann zurück, um mir mitzuteilen, dass sie die Nachricht erhalten haben.
     - Ich möchte dich, für deine Dienste belohnen.
   questAcceptDialog:
@@ -12777,19 +12942,23 @@ primis_pontis_mille_serious_sewage:
   name: '&2Seriöse Abwasseranlage'
   questLore:
     - Wenn du der Aufgabe gewachsen sind, dann könnte ich deine Hilfe benutzen.
-    - Die &dKanalisation&f unter der Stadt sind zu einem Versteck für alle möglichen Unruhestifter und Viecher geworden.
-    - Die Unruhestifter nennen sich &cNinjas&f...auch wenn sie weit davon entfernt sind.
+    - 
+      - 
+    - 
+      - 
     - Sie haben einen Führer, ich glaube, er nennt sich &cShreepper&f oder so.
     - Achten Sie darauf, ihn loszuwerden, eine Schlange ohne den Kopf ist keine Bedrohung.
     - Wenn Sie da runtergehen und die Zahl der Viecher und der Störenfriede verringern könnten
     - dann würde mir das erlauben, meine Kräfte wichtigeren Aufgaben zuzuweisen ...
     - Wir hatten auch &a4 Agenten&f dort unten geschickt, ich habe noch nicht von ihnen gehört.
-    - Es würde für mich viel bedeuten, wenn du das überprüfen könnten, um sicherzustellen, dass sie in Ordnung sind.
+    - 
+      - 
     - Ich habe auch meine persönlichen &eAbwasserschlüssel &verlegt
     - wenn du dir auch finden könntest, wäre das super.
   questAcceptDialog:
     - '&a[Rogerius]&fSie können zu den &dKanalisationen&f gelangen, indem Sie zum Brunnen gehen und dann ein Stück nach Südosten.'
-    - Sie wissen, dass Sie an der richtigen Stelle sind, wenn Sie ein großes Abwasserrohr sehen, das in die Wand führt.
+    - 
+      - 
     - '&7&oIch muss meinen Weg in die &dKanalisation finden&7&o und die Aufgaben erledigen.'
   questCompleteMessage:
     - '&a[Rogerius]&f Du hast alles erledigt, worum ich gebeten habe? Wenn ich nur noch 10 Männer wie dich hätte...'
@@ -12811,7 +12980,8 @@ primis_pontis_mille_star_gazing:
     - Hier, nimm diese versiegelte Brief und zeige ihn ihnen.
   questAcceptDialog:
     - '&7[Fortes Bellator]&f Du kannst die &aSternengucker&f unter &dObservatorium&f finden.'
-    - Der &dObserfatorium&f befindet sich hinter dem &dLeuchtturm&f. Es ist ein großer Turm, der schwer zu verpassen ist.
+    - 
+      - 
     - '&7&oIch sollte mit den &aSternengucker&7&o unter &dObservatorium&7&o sprechen.'
   questCompleteMessage:
     - '&a[Virgo Dexippus]&f Der &aMajor&f hat dich geschickt? Das muss wichtig sein.'
@@ -12924,7 +13094,8 @@ primis_pontis_redwoods_its_reyn_time:
     - Voll widerstandsfähig gegen schwere Stämme, die auf sie fallen gelassen werden, ja.
     - Ich sah, wie einer dieser fiesen &cBandits&f sie aufhob und in seine Tasche steckte.
     - Ich bin mir ziemlich sicher, dass ich sie &9mit einem Beil gesehen habe&f.
-    - Wenn du in ihr Lager gehen und sie für mich zurückbekommen könntest, dann würde die Welt für mich bedeuten!
+    - 
+      - 
     - Eine nette Belohnung auch für dich, wenn du zurückkommst!
   questAcceptDialog:
     - '&8[Reynus]&f Du findest die &cBandits&f direkt am Fluss.'
@@ -13010,8 +13181,11 @@ primis_terravilla_drowning_terror:
     - '&a[Plautia Suilius]&f Wow it looks like a fish, but it''s internal organs are different.'
     - It must infect other creatures by releasing these tiny worm like meat particles...
     - Let me have a look at you. Hmm, you seem fine, no traces...
-    - So it is not affecting us...yet. This is an emergency, I need to collect my stuff and go present my findings to the researchers at &dPontis Mille&f immediately. I need to get approval for extermination, that organism cannot be allowed to evolve.
-    - Thank you for everything you have done. Here, take this. It's not a lot but at least it's something.
+    - 
+      - 
+      - 
+    - 
+      - 
     - '&7&oI should make sure to stay away from the river...'
 primis_terravilla_hog_on_my_porch:
   name: '&2Bipedal examination'
@@ -13067,7 +13241,8 @@ test_quest:
 xmas_quest_0:
   name: '&2Finde verlorene Geschenke!'
   questLore:
-    - Ich glaube, ich habe unterwegs einige Weihnachtsgeschenke verloren. Würdest du einem armen alten Mann helfen, sie wiederzufinden?
+    - 
+      - 
     - Im Gegenzug darfst du eines davon öffnen!
   questAcceptDialog:
     - '&8[&cSaint Nick&8]&f Vielen Dank! Ich warte hier auf dich!'

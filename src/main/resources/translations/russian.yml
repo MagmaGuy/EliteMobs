@@ -1,20 +1,20 @@
 config:
-  noArenaPermissionMessage: '[EliteMobs] You don''t have the permission to enter this arena!'
+  noArenaPermissionMessage: '[EliteMobs] У вас нет разрешения на вход в эту арену!'
 ItemSettings:
   itemLoreStructureV2:
-    - '&7&m&l---------&7<&lEquip Info&7>&m&l---------'
-    - '&7Item level: &f$itemLevel &7Prestige &6$prestigeLevel'
+    - '&7&m&l---------&7<&lЭпическая информация&7>&m&l---------'
+    - '&7Уровень предмета: &f$itemLevel &7Престиж &6$prestigeLevel'
     - '$weaponOrArmorStats'
     - '$soulbindInfo'
     - '$itemSource'
-    - '$ifLore&7&m&l-----------&7< &f&lLore&7 >&m&l-----------'
+    - '$ifLore§7&m&l-----------§7< &f&lПредание&7 >&m&l-----------'
     - '$customLore'
-    - '$ifEnchantments&7&m&l--------&7<&9&lEnchantments&7>&m&l--------'
+    - '$ifEnchantments§7&m&l--------§7<§9§lЗачарования§7>&m&l--------'
     - '$enchantments'
     - '$eliteEnchantments'
-    - '$ifCustomEnchantments&7&m&l------&7< &3&lCustom Enchants&7 >&m&l------'
+    - '$ifCustomEnchantments§7&m&l------§7< §3§lПользовательские зачарования§7 >&m&l------'
     - '$customEnchantments'
-    - '$ifPotionEffects&7&m&l----------&7< &5&lEffects&7 >&m&l----------'
+    - '$ifPotionEffects§7&m&l----------&7< &5&lЭффекты&7 >&m&l----------'
     - '$potionEffect'
     - '&7&l&m-----------------------------'
     - '$loreResaleValue'
@@ -24,36 +24,36 @@ ItemSettings:
   loreResaleValues: '&7Продается за $resale $currencyName'
   eliteEnchantmentLoreStrings: Элитный
   noSoulbindLore: '&7Не присоединён ни к какой душе!'
-  preventEliteItemDisenchantmentMessage: '&c[EliteMobs] Can''t disenchant Elite Items!'
-  scrapSucceededMessageV2: '&8[EliteMobs] &2Scrapping succeeded $amount times!'
-  scrapFailedMessageV2: '&8[EliteMobs] &cScrapping failed $amount times!'
-  lowDurabilityItemDropMessage: '&8[EliteMobs] &cDropped armor due to low durability! &8Repair it at the NPC with scrap to use it!'
-  lowWeaponItemDropMessage: '&8[EliteMobs] &cDropped weapon due to low durability! &8Repair it at the NPC with scrap to use it!'
-  simlootMessageSuccess: '&8[EliteMobs] &2Rolled for loot and got $itemName &2!'
-  simlootMessageFailure: '&8[EliteMobs] &cRolled for loot and got nothing!'
-  directDropCustomLootMessage: '&8[EliteMobs] &2Obtained $itemName &2!'
-  directDropMinecraftLootMessage: '&8[EliteMobs] &aObtained $itemName &a!'
-  directDropCoinMessage: '&8[EliteMobs] &aObtained &2$amount $currencyName &a!'
-  directDropSpecialMessage: '&8[EliteMobs] &aObtained &2$amount $name &a!'
+  preventEliteItemDisenchantmentMessage: '&c[EliteMobs] Невозможно разобрать Elite предметы!'
+  scrapSucceededMessageV2: '&8[EliteMobs] &2Утилизация успешно выполнена $amount раз!'
+  scrapFailedMessageV2: '&8[EliteMobs] &2Утилизация не выполнена $amount раз!'
+  lowDurabilityItemDropMessage: '&8[EliteMobs] &cБроня сброшена из-за низкой прочности! &8Отремонтируйте её у NPC утилизации, чтобы использовать её снова!'
+  lowWeaponItemDropMessage: '&8[EliteMobs] &cПредмет сброшен из-за низкой прочности! &8Отремонтируйте его у NPC утилизации, чтобы использовать его снова!'
+  simlootMessageSuccess: '&8[EliteMobs] &2Отдано предмет и получено $itemName &2!'
+  simlootMessageFailure: '&8[EliteMobs] &cВы отдали предмет, увы, ничего не получив взамен!'
+  directDropCustomLootMessage: '&8[EliteMobs] &2Получено $itemName &2!'
+  directDropMinecraftLootMessage: '&8[EliteMobs] &aПолучено $itemName &a!'
+  directDropCoinMessage: '&8[EliteMobs] &aПолучено &2$amount $currencyName &a!'
+  directDropSpecialMessage: '&8[EliteMobs] &aПолучено &2$amount $name &a!'
   weaponEntry: '&7Elite DPS: &2$EDPS'
-  armorEntry: '&7Elite Armor: &2$EDEF'
+  armorEntry: '&7Elite броня: &2$EDEF'
 ProceduralItemGenerationSettings:
   materialNames:
-    swordName: Sword
-    bowName: Bow
-    pickaxe: Pickaxe
-    spade: Spade
-    hoe: Hoe
-    axe: Axe
-    helmet: Helmet
-    chestplate: Chestplate
-    leggings: Leggings
-    boots: Boots
-    shears: Shears
-    fishingRod: Fishing Rod
-    shield: Shield
-    trident: Trident
-    crossbow: Crossbow
+    swordName: Меч
+    bowName: Лук
+    pickaxe: Кирка
+    spade: Лопата
+    hoe: Мотыга
+    axe: Топор
+    helmet: Шлем
+    chestplate: Нагрудник
+    leggings: Поножи
+    boots: Ботинки
+    shears: Ножницы
+    fishingRod: Удочка
+    shield: Щит
+    trident: Трезубец
+    crossbow: Арбалет
   nameFormats:
     - '$verb $itemType из $adjective $noun'
     - '$itemType из $adjective $noun'
@@ -423,48 +423,48 @@ ProceduralItemGenerationSettings:
     - Ashamed
     - Стремящийся
     - Удивительный
-    - Auspicious
+    - Знаменательный
     - Средний
     - Отличный
     - Ужасный
     - Плохой
     - Варварский
-    - Bashful
-    - Beffiting
-    - Belligerent
+    - Робкий
+    - Подобающее
+    - Воюющий
     - Эффективный
     - Берсерк
     - Лучший
     - Извилистый
     - Большой
-    - Bitter
-    - Bizarre
+    - Горький
+    - Причудливый
     - Кровавый
     - Кипящий
     - Бескрайний
-    - Brash
+    - Дерзкий
     - Храбрый
-    - Brawny
-    - Breakable
-    - Brief
-    - Bright
-    - Broken
-    - Busy
-    - Calculating
-    - Callous
-    - Calm
-    - Capricious
-    - Careful
-    - Careless
-    - Caring
-    - Cautious
-    - Ceaseless
-    - Certain
-    - Charming
-    - Cheap
-    - Chief
-    - Chilly
-    - Chivalrous
+    - Мускулистый
+    - Разбиваемый
+    - Краткий
+    - Яркий
+    - Сломанный
+    - Занят(-а)
+    - Подсчет
+    - Черствый
+    - Спокойный
+    - Капризный
+    - Осторожный
+    - Беспечный
+    - Заботливый
+    - Осторожный
+    - Непрерывный
+    - Уверенный
+    - Очаровательный
+    - Бюджетные
+    - Глава
+    - Острый
+    - Рыцарский
     - Chunky
     - Clear
     - Clever
@@ -7966,7 +7966,8 @@ blacksmith:
     - Предмет стоит дороже чем больше на нём чар!
     - Чем выше уровень мобов, тем выше\nценность!
     - Мобы более высокого уровня имеют на\nбольший шанс выбрасывать предметы!
-    - Чем лучше моб, тем выше\nуровень предмета выпадающего из него!
+    - 
+      - 
     - Некоторые предметы имеют специальные\nэффекты зелья!
     - Некоторые предметы имеют уникальные\nэффекты!
     - Охотник зачарование\nпривлекает элитных мобов в ваше\nместоположение!
@@ -8158,10 +8159,13 @@ primis_caeruleaum_hint_giver:
     - It is good to see you!
     - Приветствую!
   dialog:
-    - You look strong and mighty. Talk to some \nof the villagers if you want to help us out.
-    - A long time ago there was a beautiful shrine to\nthe southeast, shame what happened to it.
+    - 
+      - 
+    - 
+      - 
     - The ruins in the southwest are such a horrible place!\n Who would ever go there...
-    - Met a powerful mage once,\nthey were able to summon a beautiful ice wall.\nToo bad it would break if they fainted.
+    - 
+      - 
     - I heard that a nasty type of\nwolf has settled in the wolf den!
   farewell:
     - Goodbye!
@@ -10962,57 +10966,121 @@ wood_league_arena_master:
 wood_league:
   arenaName: Wood League
   arenaMessages:
-    - wave=1:message=&8[Gladius] &fToday's main event! A legendary fighter came all the way to the arena to test his might against the toughest monsters from all the land! But before that, here's a rookie fighting some zombies.
-    - wave=2:message=&8[Gladius] &fWould you look at that, they at least know how to wave their arms! That was just the warmup, let's start putting on some pressure!
-    - wave=3:message=&8[Gladius] &fSo you think you know how to fight? Well this wave will put the &cheat &fon! Ha ha ha ha ha!
-    - wave=4:message=&8[Gladius] &fAlright I guess they can take the heat! Ladies and gentlemen, strap on, we might be in for a show!
-    - wave=5:message=&8[Gladius] &fI found this &cweird creature &foutside, and I thought putting it in the arena would be funny!
-    - wave=6:message=&8[Gladius] &fSeems like you can handle small groups of enemies just fine, &clet's try scaling that up!
-    - wave=7:message=&8[Gladius] &fSo you think you can truly challenge the arena? We shall see...
+    - 
+      - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
     - wave=8:message=&8[Gladius] &fNot bad, but what if every enemy is a &cmelee &fenemy?
     - wave=9:message=&8[Gladius] &fNice, nice, but what if they're all &cranged &finstead?
-    - wave=10:message=&8[Gladius] &fCareful now, a &cbad doggo &fseems to have wandered into the arena! Where did it even come from?
-    - wave=11:message=&8[Gladius] &fAlright folks we got animal control to deal with the bad doggos, we're back in business!
-    - wave=12:message=&8[Gladius] &fIt seems like the audience is clamoring for &cmore&f! Well, let's give it to them!
-    - wave=13:message=&8[Gladius] &fSeems like the custodians got bored and gave the arena creatures &2poison&f! Let's see where this goes...
-    - wave=14:message=&8[Gladius] &fWell that was... boring! Whoever gave those guys poison is fired! Come up with something better next time!
-    - wave=15:message=&8[Gladius] &fAnd here we have this year's prize-winning &4hog&f! It got first place for ugliness and meanness! Everyone give a round of applause for &4Mr. Oinkers&f!
-    - wave=16:message=&8[Gladius] &fMr. Oinkers is now bacon! Here comes &cMr. Oinker's fans&f, flooding the arena to get their revenge!
-    - wave=17:message=&8[Gladius] &fIt would seem as though our arena challenger thinks they have a shot! But can they deal with even more &cpowerful &ffoes?
-    - wave=18:message=&8[Gladius] &fThe &cfencing club &fand the &carchery club &fare having a contest! Let's see which one does better!
-    - wave=19:message=&8[Gladius] &fThe fencing club didn't so so hot, let's see what the &carchery club&f has for us!
-    - wave=20:message=&8[Gladius] &fSeems like the archery club didn't do so hot either! It seems like our challenger has begun attracting the attention of some of our top gladiators! Introducing &2Zoltan, the Pride of the Zombies&f!
-    - wave=21:message=&8[Gladius] &fUnbelievable! Seems like this rookie defeated Zoltan! Do we have a potential new champion in our hands?
-    - wave=22:message=&8[Gladius] &fSpectators are starting to place their bets! How far can today's contestant go?
-    - wave=23:message=&8[Gladius] &fDon't look away now, this wave's enemies all have &cwithering &fattacks!
-    - wave=24:message=&8[Gladius] &fSeems like some pretty big arena names are starting to arrive to stop this challenger! Stay tuned!
-    - wave=25:message=&8[Gladius] &fHere comes &bAgdluak&f, the archer from the Great North! Beware of its &bfrost&f!
-    - wave=26:message=&8[Gladius] &fThat was a pretty cool fight! I am &cswarming &fwith excitement to see what's next!
-    - wave=27:message=&8[Gladius] &fI've been told the arena grows harder! &cZombies immune to arrows, skeletons that freeze their opponents &f- what will they think of next!?
-    - wave=28:message=&8[Gladius] &fIt's time to show off those &cfencing &fskills! Remember, it's all about the legwork!
-    - wave=29:message=&8[Gladius] &fAnd now, let's have some &ctarget practice&f! The challenger is the target!
-    - wave=30:message=&8[Gladius] &fA true arena champion approaches! The &2Southern Viper &fonce again seeks to &cpoison &ftheir enemies to death with his &cthousand poisons&f!
-    - wave=31:message=&8[Gladius] &fThe Southern Viper has fallen! The crowd goes wild! What a day, ladies and gentlemen, what a day!
-    - wave=32:message=&8[Gladius] &fI have been told that the arena custodians are done messing around and are staring to let loose! Can our challenger survive this?
-    - wave=33:message=&8[Gladius] &fSeems like some enemies got their hands on some of Southern Viper's &cpoisons&f! You do not want to get hit by those, ladies and gentlemen!
-    - wave=34:message=&8[Gladius] &fBobby, make sure you put 1,000 Elite Coins on these contestants dying for me - no, no, 1,000 Elite Coins - wait was this thing on? I mean, onwards to the next wave!
-    - wave=35:message=&8[Gladius] &fLadies and gentlemen, what a rare treat! It would seems as the very &aWood League Jester &fhas stepped up to fight! What delightful &2tricks &fdoes he have for us today?
-    - wave=36:message=&8[Gladius] &fWhat a lovely show ladies and gentlemen, give it up for &aThe Jester&f!
-    - wave=37:message=&8[Gladius] &fBobby, how is my bet doing? What do you mean 10,000 Elite Coins, I told you to put 1,000 on there! Uh, pump them, &cpump the powers up&f!
-    - wave=38:message=&8[Gladius] &fBobby you're killing me here! Uh, dump some &cswordsmen &fon there, I need to deal with something real quick...
-    - wave=39:message=&8[Gladius] &fWhat do you mean no refunds? I didn't even want to - ahem, I mean, a legion of &carchers &fhave come from far to show off their skills!
-    - wave=40:message=&8[Gladius] &fLadies an gentlemen, for, uh, random reasons, I have invited the strongest fighter I can summon! Meet &4Crucios, the Bearer of Curses&f!
-    - wave=41:message=&8[Gladius] &fCrucios has been defeated!? What has the world come to?
-    - wave=42:message=&8[Gladius] &fA wealthy for now patron has decided to throw in free healthcare to arena enemies! Will they do better with &2healing&f?
-    - wave=43:message=&8[Gladius] &f&cWither&f, &cpoison, &cfire&f throw in everything you have! Do you even know how much is on the line!?
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+      - 
+    - 
+      - 
+      - 
+    - 
+      - 
+      - 
+    - 
+      - 
+    - 
+      - 
+      - 
+    - 
+      - 
+    - 
+      - 
+      - 
+    - 
+      - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
     - wave=44:message=&8[Gladius] &fThis is clearly not working, let me think of something...
-    - wave=45:message=&8[Gladius] &fHere is one of the top gladiators of the Wood League Arena! &cThousand Blades &fapproaches once again with his &cinnumerable projectiles&f! He better win!
-    - wave=46:message=&8[Gladius] &fThousand Blades has fallen! It just seems like you can't get competent gladiators these days! That's fine, you'll see! You'll all see! &cRelease the swarm!
-    - wave=47:message=&8[Gladius] &fIf swarms don't work, throw in &cmore powers&f! Throw in all of the powers!
-    - wave=48:message=&8[Gladius] &fWe are starting to run out of options here! Are these all of the &cswordsmen &fwe have left?
-    - wave=49:message=&8[Gladius] &fAlright send all we have left, we have no other options! Move forth, &carchers&f!
-    - wave=50:message=&8[Gladius] &fI guess this is it for me... I have no option but to declare - wait, who is that in the distance? Is that &4Uther, the Champion of the Wood League Arena&f? Ladies and gentlemen, match set and over, our contestant has no chance of winning here! They shall be &csmitten &fby our champion!
-    - wave=51:message=&8[Gladius the Destitute] &fUnbelievable, Uther has been defeated! We have a new arena champion! I would be incredibly excited if I wasn't so terribly in debt now!
+    - 
+      - 
+      - 
+    - 
+      - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+      - 
+      - 
+    - 
+      - 
+      - 
 ag_welcome_quest_0:
   customObjectives:
     Objective1:
@@ -11022,7 +11090,8 @@ ag_welcome_quest_0:
         - Talk to me again for a quest!
   name: '&2Finding the AG!'
   questLore:
-    - Discover the Adventurer's Guild Hub using the command &2/ag &0or &2/adventurersguild !
+    - 
+      - 
   questAcceptDialog:
     - '&8[Odigos]&f Alright, make sure you use &2/ag &f or &2/adventurersguild&f to head off to the Adventurer''s Guild Hub!'
     - Make sure you talk to Casus when you're there!
@@ -11043,7 +11112,8 @@ ag_welcome_quest_1:
     Objective7:
       dialog:
         - '&8[&aQel''Thuzad&8]&f These Elite monsters, where do they keep coming from?'
-        - Ah, never mind that for now, we are always in need of more people to assist us in slaying quests!
+        - 
+          - 
         - Just talk to me to get one!
     Objective12:
       dialog:
@@ -11054,14 +11124,16 @@ ag_welcome_quest_1:
     Objective13:
       dialog:
         - '&8[&aUlfric&8]&f If you bring me a very special and rare item, I can unbind your Elite items.'
-        - You don't yet look prepared to take this challenge on, but you can make killing the Binder of Worlds your ultimate goal, if you dare.
+        - 
+          - 
     Objective5:
       dialog:
         - '&8[&aTim&8]&f Want to upgrade your Elite Items? Just get an upgrade orb from Sam over there!'
     Objective10:
       dialog:
         - '&8[&aKelly&8]&f Got extra Elite items? Don''t know what to do with them? Give them to me, and I''ll turn them into scrap!'
-        - You can use scrap to do lots of things, like repairing or upgrading Elite items!
+        - 
+          - 
     Objective6:
       dialog:
         - '&8[&aGillian&8]&f Do you seek power? Do you desire to reach new heights? Talk to me to unlock new guild ranks, and reach levels of power you never thought to be possible!'
@@ -11071,7 +11143,8 @@ ag_welcome_quest_1:
     Objective9:
       dialog:
         - '&8[&aReggie&8]&f Need your Elite items repaired? Just bring me some scrap, and I''ll make them as good as new!'
-        - Remember, the higher the level of your scrap, the better I can repair you Elite item!
+        - 
+          - 
   name: '&2Welcome to the AG!'
   questLore:
     - '&aMeet the Adventurer''s Guild NPCs!'
@@ -11095,8 +11168,10 @@ primis_caeruleaum_fishing:
   name: '&2Fish Bait'
   questLore:
     - We have a big problem!
-    - I got wounded by a monstrous &cSea Creature&f that came from a fishy portal to another realm!
-    - My friend &aPiscis Nemesis&f is still out on the boat, trying to either fight the creature or close the portal,
+    - 
+      - 
+    - 
+      - 
     - but he can't do anything without the right bait!
     - I'll tell you where to go get &eFish Bait &f, please go help my friend!
     - I promise I'll reward you!
@@ -11149,8 +11224,10 @@ primis_caeruleaum_fletching_2:
     - Use those arrows with a bow to climb the tower!
   questAcceptDialog:
     - '&a[Ventus Artifex]&f Use the arrows you just received to go to the ruins and shoot the targets with them!'
-    - Inside of the ruins there are rumors of an ancient chest. Not very useful to anyone... but collectors!
-    - Go and grab me that &eShield&f, and I will trade it with something more... useful... to you!
+    - 
+      - 
+    - 
+      - 
     - '&7&oI should go get the &eShield&7&o inside of the ruins, using the &eGrappling Arrows&7&o in order to shoot the targets inside of the building.'
   questCompleteMessage:
     - '&a[Ventus Artifex]&f Outstanding!'
@@ -11178,9 +11255,11 @@ primis_farmstead_lighthouse_keeper_2:
         - "&a[Jeeves]&f &2Amavit&f sent you? What's this about a lighthouse? My, what a discovery!\n&fThis will revolutionize my job as a traveling merchant! Here, have these &eScrolls&f - just call me and I'll be there in a jiffy!\n&7&oSeems like &aJeeves&7&o has something for me. I should talk to him."
   name: '&2The Mysterious Lights'
   questLore:
-    - A strange light started being emitted from the &dTop of the Lighthouse&f when you... dealt with the issue.
+    - 
+      - 
     - My father &aJeeves&f went to the top to check but he has not returned yet.
-    - My heart can not bear to suffer any more, and we already owe you much - but if you could investigate the issue and find my father, I would be eternally grateful.
+    - 
+      - 
   questAcceptDialog:
     - '&a[Amavit]&f Thank you once again, and good luck. Hopefully it''s nothing.'
     - '&7&oI should go to the &dTop of the Lighthouse&f, investigate the issue and then report back to &aAmavit''s&f father &aJeeves&f in the village.'
@@ -11191,7 +11270,8 @@ primis_gladius_assassins:
   questLore:
     - The roofs of &dGladius&f are covered in &cAssassins&f!
     - Venturing out to the streets is a death sentence. We need to deal with these snipers!
-    - There are some spots for &eGrappling Arrows&f on the roofs, make good use of them and deal with those snipers!
+    - 
+      - 
   questAcceptDialog:
     - '&a[Belli] Deal with those &cAssassins&f! Remember to use the &eGrappling Arrows&f!.'
     - '&7&oI should kill those &cAssassins&7&o.'
@@ -11333,9 +11413,12 @@ primis_ice_village_catch_me_if_you_can:
   questLore:
     - What timing! I was just looking for someone to go capture our
     - '&cEscaped Prisoner&f.'
-    - One of our prisoners managed to make the darn cage swing and the rusty chain that holds it cracked under the load.
-    - He must have gotten pretty hurt during the escape so he cannot have gone that far.
-    - I need you to bring him back &9alive&f, be careful though, he managed to snag one of our rusty swords before he fled.
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
   questAcceptDialog:
     - '&a[Romanus Superbus]&f He must be somewhere in the mountains.'
     - '&7&oI need to find the &c&oEscaped Prisoner&7&o and bring him back to the prison.'
@@ -11351,19 +11434,25 @@ primis_ice_village_get_them_off_my_back:
     - It's not all about population control either.
     - They provide us with valuable leather, tusks and meat.
     - Not sure this village would be around without them.
-    - But this season their numbers have just exploded. We have been struggling with culling their numbers.
-    - It's all about striking a balance, can't have their numbers be so high that they start becoming a danger again.
-    - You need to go out there and slay a significant amount of them. Don't bother with hunting any of the &9Mature&f ones.
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
     - We only need you to cull the &cBabe&f and the &cJuvenile Razorbacks&f.
-    - I also have a personal favor to ask of you. When you're out there could you keep an eye out for my old &eDagger&f.
-    - I lost it couple of days ago during a hunt. Stuck it in a &cRazorback&f and it just ran off with my dagger still attached...
+    - 
+      - 
+    - 
+      - 
     - Would mean a lot to me if you could retrieve it.
   questAcceptDialog:
     - '&a[Alanus Isatis]&f You must have seen the &cRazorbacks&f on your way here so I assume you know where to find them.'
     - '&7&oI need to cull the &c&oRazorback&7&o population and retrieve &e&oAlanus'' Dagger&7&o.'
   questCompleteMessage:
     - '&a[Alanus Isatis]&f Well done friend! That should help a lot.'
-    - We can handle the rest. And you found my dagger too, glad to have it in my hands again.
+    - 
+      - 
     - The dagger is nothing special, but it was a handmade gift from my late father.
     - Next time you're thirsty, the drinks are on me!
 primis_ice_village_gotta_keep_warm:
@@ -11411,7 +11500,8 @@ primis_ice_village_living_nightmares:
     Objective1:
       dialog:
         - '&a[Cornelia Ennodius]&f Are they gone? I was so scared. My parents sent you? Thank goodness.'
-        - I woke up in the night, but the nightmares, they did not end. They were still there, so I ran and ran...
+        - 
+          - 
         - I couldn't escape. I, I...will be fine, I just need a minute...
   name: '&2Living nightmares'
   questLore:
@@ -11444,13 +11534,15 @@ primis_ice_village_make_them_go_ouch:
     - '&7&oI need to make sure that the &c&oCustomers&7&o know not to mess with &a&oViolet&7&o. I also need to retrieve &e&oViolet''s Property&7&o.'
   questCompleteMessage:
     - '&a[Domina Violet]&f I hope you taught them the value of pain.'
-    - A small reward is in order for your hard work. I appreciate people that get it done.
+    - 
+      - 
 primis_ice_village_objection!:
   customObjectives:
     Objective3:
       dialog:
         - '&a[Glacies Princeps]&f What, absolutely not. I don''t know how he convinced you to come here and beg for his release.'
-        - That man you are trying to help was corrupted by the Ice Elemental. He went mad and slaughtered his entire family.
+        - 
+          - 
         - He will never be released. Is that understood.
     Objective1:
       dialog:
@@ -11477,7 +11569,8 @@ primis_ice_village_objection!:
     - '&7&oI should go talk to the people on my list.'
   questCompleteMessage:
     - '&a[Adrius Calpornius]&f WHAT?! LIES!!! I never would do such a horrible thing to my family...'
-    - They are right here! Can't you see them, hear them. Here next to me, they want to be free too!!! RELEASE US!!!
+    - 
+      - 
     - '&7Whatever sanity this poor man still had left, is gone now...'
 primis_ice_village_run_away_daughter:
   customObjectives:
@@ -11522,7 +11615,8 @@ primis_ice_village_taking_the_bait:
     - These &cFish&f, what is wrong with them!
     - I have been out here fishing for days now!
     - Not even a single bite. If only I was younger I would show them!
-    - Well it sure is good you're here now. Our village gets most of its food from these &cFish&f.
+    - 
+      - 
     - And if we cannot catch any, well that is a big problem.
     - You will need to go down there and beat them senseless.
   questAcceptDialog:
@@ -11530,20 +11624,23 @@ primis_ice_village_taking_the_bait:
     - '&7&oI must jump into the lake and kill 7 &c&oChilly Salmon&7&o and collect their bodies.'
   questCompleteMessage:
     - '&a[Theopropides Nero]&f Oh! Look at them! Such big ones!.'
-    - This should keep us fed for a while! Thank you for the assistance, you're a good soul in my book!
+    - 
+      - 
 primis_ice_village_treats_for_the_punished:
   customObjectives:
     Objective1:
       dialog:
         - '&a[Eleusium Calenus]&f My wife sent you? Oh, are those treats? My favorite too! She''s such a darling.'
-        - She always takes care of me, even in these dark times, she still has a place for me in her heart.
+        - 
+          - 
         - 'You tell her I am doing just fine and that I love her very much. '
   name: '&2Treats for the punished'
   questLore:
     - If you don't mind, could I ask you to do something for me?
     - My dear &aHusband&f has been jailed and I know it's tough living a cage all day.
     - So I prepared some treats that I was gonna deliver to him.
-    - But I am quite busy right now and I was wondering if maybe you would like to go there and deliver them to him.
+    - 
+      - 
   questAcceptDialog:
     - '&a[Titia Calenus]&f He will be in one of the middle cages.'
     - Do not forget to tell him I love him.
@@ -11565,7 +11662,8 @@ primis_ice_village_wanna_make_a_snowman:
     - this old man cheer up some kids?
   questAcceptDialog:
     - '&a[Sparax Ennodius]&f You will find the &cCreatures&f in any woods near the village.'
-    - We will at least need 15 of the &eCrystals&f if we want to have enough to build a snowman.
+    - 
+      - 
     - '&7&oI should go slay enough &c&oFrost Fur Ursus&7&o to gather 15 &e&oIce Crystals&7&o.'
   questCompleteMessage:
     - '&a[Sestia Ennodius]&f You gathered enough crystals? Wonderful!'
@@ -11592,9 +11690,12 @@ primis_main_quest_1:
     Objective1:
       dialog:
         - '&a[Chief Piscis] &fOh so you were in the ship that beached a few hours ago?'
-        - I apologize, we would've sent help but I am afraid we are drowning in our own issues right now!
-        - A nearby &dBandit Camp &fkeeps raiding our supplies, a mysterious &cSea Creature &fkeeps haunting our shores and a &dWolf Den &fis making foraging impossible!
-        - If you help us out, I will tell you where you might be able to get the supplies you need to repair your ship.
+        - 
+          - 
+        - 
+          - 
+        - 
+          - 
         - '&7&oI should report to the &aFirst Mate &7&oto see if I should help these people!'
   name: '&2Shipwrecked!'
   questLore:
@@ -11620,7 +11721,8 @@ primis_main_quest_10:
   questLore:
     - It is time to call &dPontis Mille&f for aid.
     - Let them know of what happened here and tell them we are cashing in our favor.
-    - There is an &cAutomaton&f on the &dBridge&f that leads there. Defeat it and the bridge will lower.
+    - 
+      - 
   questAcceptDialog:
     - '&a[General Hasta] &fSafe travels, friend. Remember: Kill the &cGate Keeper&f and make sure our plea reaches &aShogun Navita''s&f ears..'
     - '&7&oI should slay the &cGate Keeper&7&o at the &dBridge&7&o and make my way to &aShogun Navita&7&o in &dPontis Mille&7&o.'
@@ -11704,7 +11806,8 @@ primis_main_quest_14:
     - It may be hard to believe, but it sounds like the very storm
     - itself has materialized as our opponent.
     - We do not even know if it can be defeated. We feared we were sent to our deaths.
-    - If you truly defeated the &cGoblin King&f, then perhaps you will find a way to slay this storm.
+    - 
+      - 
   questAcceptDialog:
     - '&a[Blepharo]&f We have weakened their forces a little, but still, this is no easy task.'
     - The Storm is no ordinary opponent. Do not underestimate it.
@@ -11714,25 +11817,35 @@ primis_main_quest_14:
     - Defeated the &cStorm&f? I was told that was impossible! I mean...
     - '... it is no use hiding it now. I knew about the &cStorm&f. I knew about the &dGladius&f invasion - I even facilitated it. I did it for my people - for &dPontis Mille&f.'
     - '&cCounselor Machiavelli&f convinced me that the &cStorm&f was as unstoppable as Nature itself, and that the fall of &dGladius&f and &dPontis Mille&f was an inevitability that we could but delay through sacrifice.'
-    - I see now that that snake poisoned my mind and corrupted my judgment. He must be dealt with posthaste.
+    - 
+      - 
     - '&8&oSeems like &aShogun Navita&7&o has a problem he wants me to deal with.'
 primis_main_quest_15:
   name: '&2Severance payback!'
   questLore:
-    - Once upon a time, &cCounselor Machiavelli&f, the wisest among us, foresaw the fall of &dPontis Mille&f.
-    - Faced with an unprecedented existential threat, he convinced me to keep quiet as to not incite panic.
-    - I took the only course of action I thought we had left - sacrificing our closest ally to buy us mere weeks.
-    - I spoke to the entity which resides in the &dBlood Temple&f. I made a deal with the devil.
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
     - 
       - I bought us time.
-    - They demanded I send the army away, which I did by mobilizing it to face nearby conflicts.
-    - I was blind, but now I see. &cCounselor Machiavelli&f was in their pocket the whole time.
+    - 
+      - 
+    - 
+      - 
     - He guided us to our doom, and would've gotten away with it had you not appeared.
     - Now, there is hope.
     - I ask you, please rid us of the treacherous &cCounselor&f.
-    - He has locked himself in his quarters, surrounded by those loyal to him and his... pets.
-    - Be careful. I knew not the reason why he isolated himself, but it is now clear he is expecting retribution.
-    - Bring me back the &eFar SSpeech Stone&f we used to communicate with the &dBlood Temple&f.
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
     - I wish to deliver one last message through them.
   questAcceptDialog:
     - '&a[Shogun Navita]&f &cCounselor Machiavelli&f has retreated to his quarters in the lower city by the market. Be careful, has has amassed a devoted following in his time, and will not go down without a fight.'
@@ -11772,7 +11885,8 @@ primis_main_quest_16:
     - '&7&oI must go and locate the &d&oIce Village&7&o to the far south.'
   questCompleteMessage:
     - '&a[Glacies Princeps]&f The Shogun sent you, I see, it is good to hear that &aNavita&f is back to his old self.'
-    - Before we can act against the &dBlood Temple&f, there are some issues that I would like dealt with first.
+    - 
+      - 
     - Let me tell you more...
     - '&7&oI should speak to &a&oGlacies&7&o.'
 primis_main_quest_17:
@@ -11790,13 +11904,18 @@ primis_main_quest_17:
   questLore:
     - Before we further discuss anything about
     - the &dBlood Temple&f.
-    - There are issues that have popped around our village that need to be dealt with as soon as possible.
+    - 
+      - 
     - If these issues are not resolved then I would fail in my duties as a village leader.
     - There is no way for me to ignore the plea of my own people and put others first.
-    - If you could aid us in resolving these issues then our attention would be all yours.
-    - We have an escaped prisoner, wildlife problems and even our own villagers stealing from the village.
-    - I will tell you the names and the locations of the people that came with these issues to me.
-    - Go talk to them and make sure you help them with any complaints and issues they have.
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
+    - 
+      - 
     - They will be able to tell you in more detail what needs to be done.
   questAcceptDialog:
     - '&a[Glacies Princeps]&f Once you are done helping them. Come back to me and we can talk.'
@@ -11808,19 +11927,27 @@ primis_main_quest_18:
   name: '&2The trial of ice'
   questLore:
     - Well you have certainly impressed me and most of the village.
-    - I owe you an explanation friend. You see for the longest time we used to draw power from
+    - 
+      - 
     - the &cIce Elementals&f.
-    - They would bless us with their power and in return any of us who would want to become a warrior or a hunter had to pass the &9Trial of Ice&f.
-    - To pass the trial you had to climb the black mountain all the way to its eastern peak. And at the peak you would face the
+    - 
+      - 
+    - 
+      - 
     - '&cMinor Ice Elementals&f in combat.'
-    - Should you succeed then your claim to become a warrior or a hunter was unquestionably your right.
+    - 
+      - 
     - If you failed...then...your energy and your being belonged to the &cIce Elementals&f.
-    - This is how it was for the longest time. Until the &dBlood Temples&f influence grew in power.
+    - 
+      - 
     - Ever since then
-    - the &cIce Elementals&f have been emboldened. Drawing power from them was now a risk.
+    - 
+      - 
     - Several of our people got corrupted and we had to jail them for our own safety.
-    - And doing the trial became impossible, what faced you at the peak was something no villager could overcome.
-    - Those who have failed the trial are still there, their souls trapped in the husks of their decaying bodies.
+    - 
+      - 
+    - 
+      - 
     - Slaves to the
     - '&cIce Elementals&f.'
     - It is clear that our old traditions are no longer.
@@ -11852,7 +11979,8 @@ primis_main_quest_19:
     - '&7&oI should go into the temple and slay the &c&oIce Elemental&7&o.'
   questCompleteMessage:
     - '&a[Glacies Princeps]&f I could feel the energies flowing out, all the way from here.'
-    - You have done us a great favor friend. The &dIce Village&f will provide aid to you and your allies.
+    - 
+      - 
     - There is another settlement that might need your help, let's speak.
     - '&7&oI should hear what &a&oGlacies&7&o has to say.'
 primis_main_quest_2:
@@ -11871,7 +11999,8 @@ primis_main_quest_2:
     - '&7&oI should talk to the &aVillage Leader&f to see about helping the locals.'
   questCompleteMessage:
     - '&a[Chief Piscis]&f Everyone in the village has an issue that needs dealing with, and I am no exception. My request is quite challenging, so maybe you want to get warmed up and get the lay of the land with some of the issues from the other villagers.'
-    - Talk to me when you are ready, and I will share with you the secrets kept by us to leaving this valley!
+    - 
+      - 
     - '&7&oI should talk to the locals and see who needs help, and come back to the leader when I feel ready to continue.'
 primis_main_quest_20:
   customObjectives:
@@ -11893,13 +12022,16 @@ primis_main_quest_20:
     - to go of course.
   questAcceptDialog:
     - '&a[Glacies Princeps]&f You will find &aTerravilla&f straight West of here.'
-    - It is located on top of this ancient elemental ruin, you will know it when you see it.
+    - 
+      - 
     - Oh, I almost forgot. The person you want to talk to is &aOverseer Lutum&f.
     - '&7&oI should go to &d&oTerravilla&7&o and talk to &a&oOverseer Lutum&7&o.'
   questCompleteMessage:
     - '&a[Lutum Princeps]&f Came all the way from the &dIce Village&f, eh. Good to see some help arrive.'
-    - When I sent that request for aid I wasn't sure if we were gonna get any. I heard the situation over there wasn't that much better.
-    - We are in quite a pickle over here. We have plenty of work for you if you want it.
+    - 
+      - 
+    - 
+      - 
     - '&7&oI should talk to &a&oLutum&7&o.'
 primis_main_quest_21:
   name: '&2Taking out the trash'
@@ -11924,7 +12056,8 @@ primis_main_quest_21:
   questCompleteMessage:
     - '&a[Lutum Princeps]&f Well that is one issue resolved. Onto the next!'
     - Before we move on, I want you to have this blade.
-    - It might be old and dull but it's still as good as anything you can get your hands on today.
+    - 
+      - 
     - '&7&oI should hear out what &a&oLutum&7&o has planned next.'
 primis_main_quest_22:
   name: '&2Big trouble in little pub'
@@ -11963,11 +12096,14 @@ primis_main_quest_23:
     - '&cEarth Elemental&f into a slumber it will never wake up from.'
   questAcceptDialog:
     - '&a[Lutum Princeps]&f You can get to the maze by walking down the spiral staircase in the middle of the ruins.'
-    - Don't get lost in the maze, also make sure to watch out for the constructs. Good luck!
+    - 
+      - 
     - '&7&oI should enter the &d&oRuins Maze&7&o and slay the &c&oEarth Elemental&7&o.'
   questCompleteMessage:
     - '&a[Lutum Princeps]&f I cannot believe it, you''re back. In one piece too!'
-    - I guess you are tougher than you look. What you have done here is incredible it is clear we are in great debt to you. Is there anything Terravilla might be able to do for you.
+    - 
+      - 
+      - 
     - '&7&oI need to tell &a&oLutum&7&o about my quest and the &d&oBlood Temple&7&o.'
 primis_main_quest_24:
   customObjectives:
@@ -12020,14 +12156,17 @@ primis_main_quest_3:
     - me back my &eGrandfather's Heirloom&f!
   questAcceptDialog:
     - '&a[Chief Piscis]&f The &dBandit Camp&f isn''t too far away if you follow the road!'
-    - Be careful on your way there, we don't know what they are up to but it can't be anything good!
+    - 
+      - 
     - Oh, and make sure you bring back my &eGrandfather's Heirloom&f!
     - '&7&oI should go to the nearby &dBandit Camp&7&o and clear it out.'
   questCompleteMessage:
     - '&a[Chief Piscis]&f I see you''re back! Do you bring good news?'
     - '&7&oYou tell &aChief Piscis&7&o about the camp and turn the &eHeirloom&7&o in.'
-    - What's this? Mages? Elementals? This is an ill omen. You must talk to the &aRuler of Gladius&f to report this incident at once!
-    - Truly you have served us well! Here, for your efforts, I give you my &eGrandfather's Sword&f! May it serve you as well as it has served our family!
+    - 
+      - 
+    - 
+      - 
     - '&7&oSeems like the &aChief Piscis&f is ready to tell me how to get out of here.'
 primis_main_quest_4:
   customObjectives:
@@ -12047,7 +12186,8 @@ primis_main_quest_4:
     - of the &9Blue Flower &fpath!
   questAcceptDialog:
     - '&a[Chief Piscis]&f The mountain pass is guarded by an extremely dangerous &cGolem&f, which you are probably not able to defeat right now!'
-    - We know of a secret passage in the mountains. Follow the path of &9Blue Flowers &fand talk to the &aMountain Guide&f to get safe passage to Bridgeport!
+    - 
+      - 
     - '&7&oI should follow the &9&oBlue Flower &7&opath to the &aMountain Guide&7&o!'
     - '&7&oI should make sure to finish any business I got left before I leave.'
     - '&7&oHint: Make sure you track the quest to make finding your destination easier!'
@@ -12064,7 +12204,8 @@ primis_main_quest_5:
     - you will have to defeat this &cElemental&f first!
   questAcceptDialog:
     - '&a[Petrae]&f You seek to defeat the &cCrystal Elemental&f? I can but wish you luck in your endeavor!'
-    - I'll follow right after you. If you are successful in your attempt, meet me on the other side of the passage!
+    - 
+      - 
     - '&7&oSeems like I must defeat the &cCrystal Elemental&7&o.'
   questCompleteMessage:
     - '&a[Petrae]&f Outstanding! I saw you defeat the &cCrystal Elemental&f, clearly there''s greatness in your future!'
@@ -12074,7 +12215,8 @@ primis_main_quest_6:
     Objective1:
       dialog:
         - '&a[Filius] &fYou made it through the mountain! You don''t see that every day.'
-        - I'm afraid my father is missing, but I can tell you about the path to &dGladius&f. If you want to help us though, talk to my &aMother&f!
+        - 
+          - 
         - '&7&oSeem like &aFilius&7&o can help me find the way to &dGladius&7&o.'
   name: '&5The Farmstead'
   questLore:
@@ -12088,7 +12230,8 @@ primis_main_quest_6:
     - Good luck in your travels and stay safe!
   questAcceptDialog:
     - '&a[Petrae]&f Just tell the &aProprietor of the Farmstead&f that I sent you, though I have heard that the &aProprietor&f hasn''t been seen in a while.'
-    - If they aren't around I am sure their son &aFilius&f will be glad to help you out!
+    - 
+      - 
     - Безопасные путешествия!
     - '&7&oI should follow the path to the &dFarmstead&7&o and talk to its &aProprietor&7&o.'
   questCompleteMessage:
@@ -12114,7 +12257,8 @@ primis_main_quest_7:
     - reward you if you help thin the number of &cUndead&f on that ship!
   questAcceptDialog:
     - '&a[Filius] Be careful on the road, clearly something has gone wrong in &dGladius&f.'
-    - Once you reach &dGladius&f, the Fortress' lord should either be at his mansion or at the barracks!
+    - 
+      - 
     - '&7&oI should go down the path to &dGladius&7&o and clear out some &cUndead Sailors&7&o on the way there.'
   questCompleteMessage:
     - '&a[Lord Hasta]&f Were you sent as reinforcements from Pontis Mille? Where are the others? Are you a messenger?'
@@ -12180,7 +12324,9 @@ primis_ogre_mines_lost_bretheren:
     Objective1:
       dialog:
         - '&a[Fortis Fossores] &fWhat do you want? What, &aFugit&f sent you? What for? The mines were overrun? Hah, I didn''t even notice!'
-        - Let that worrywart brother of mine know that I am fine. Now, begone! I am on the verge of making a big mining discovery. I call it - branch mining! Hehehe, this one will change everything!
+        - 
+          - 
+          - 
   name: '&5Lost Bretheren'
   questLore:
     - The mine was overrun by &cOgres&7&o!
@@ -12196,7 +12342,8 @@ primis_ogre_mines_lost_bretheren:
   questCompleteMessage:
     - '&a[Fugit Fossores]&f My &aBrother&f said what? Ah, typical of him, too focused on his work to notice the entire place was taken over!'
     - I'll have a serious conversation with him next time I see him!
-    - Thank you for your help, you can have my best pick-axe, LL I call her. It doesn't look like I'll be able to get mining any time soon at this rate.
+    - 
+      - 
 primis_ogre_mines_old_miner_quest:
   name: '&2Lucky Pickaxe'
   questLore:
@@ -12228,11 +12375,13 @@ primis_pontis_groves_acrobatics:
     - made an entire acrobatics course.
     - The goal is to to get from platform to platform using &9Wines&f and
     - '&9Acrobatics&f and reach the end of the course.'
-    - Should you get through the course and reach the end. (Which is a sphere by the way.)
+    - 
+      - 
     - You will be rewarded with a very nice &eItem&f!
   questAcceptDialog:
     - '&a[Posuere Hominem]&f You can find the start of the course at the &dEnd of that Tunnel&f.'
-    - Just swim up to the first wine and keep climbing the wine until you reach the top.
+    - 
+      - 
     - Don't forget to speak to my &aBrother&f at the end of the course for the reward!
     - '&7&oI should head to the start of the course.'
   questCompleteMessage:
@@ -12242,7 +12391,8 @@ primis_pontis_groves_caught in the web:
   questLore:
     - So they have a &dNest&f somewhere in the &dGrove&f.
     - That would explain why their population has skyrocketed.
-    - We were used to some &cSpiders&f wandering into the &dGrove&f, but this is too much.
+    - 
+      - 
     - It would be great if you could locate the &dNest&f and clear it out.
     - We will make you some fine &eSpider Leg Boots&f as a reward!
   questAcceptDialog:
@@ -12294,7 +12444,8 @@ primis_pontis_groves_lighthouse_1:
   name: '&2Feeding the sick'
   questLore:
     - Wanderer, could I ask a simple favor of you?
-    - There is a nearby &dLighthouse&f. We usually deliver food to the family that lives there.
+    - 
+      - 
     - But ever since the troubles began we could not leave our &dGrove&f.
     - Would you be so kind to bring the family their latest batch of food.
     - It would be great if you could hurry, it has been a while since the last delivery.
@@ -12316,8 +12467,10 @@ primis_pontis_groves_lighthouse_2:
   questLore:
     - Uh, before you came. Jeeves the Travelling Merchant stopped by.
     - We asked him if he could go get some food for us.
-    - Well, that is not necessary anymore so it would be great if you could climb to the top of
-    - the lighthouse and travel to Caeruleaum Village and tell Jeeves we do not need the food anymore.
+    - 
+      - 
+    - 
+      - 
   questAcceptDialog:
     - '&8[Alanus Secundas]&f When you exit the dwelling the Lighthouse is straight forward and a bit to the left.'
     - '&8&oI should go to the Lighthouse.'
@@ -12344,22 +12497,27 @@ primis_pontis_groves_population_control:
 primis_pontis_groves_tree_climbing_elf_bandits:
   name: '&2Tree climbing elf bandits!'
   questLore:
-    - I've had it up here with these gosh darn tree climbing &cElf Bandits&f in our &dGrove&f.
+    - 
+      - 
     - Not like the &cSpiders&f were enough,
     - now these shadow loving poop nuts have decided to settle in our trees!
-    - They love the dark you see, the light hurts them, makes them all foggy in the head.
-    - Of course a lot of darkness and shadow in our little &dGrove&f. So they moved right in!
+    - 
+      - 
+    - 
+      - 
     - Forced their way in with their superior numbers.
     - Well they got something coming alright,
     - one look at you and I can tell you can handle a couple of stone giants!
     - I am sure some elves won't be much of an issue for you.
-    - Go send them a message. The message is clear, THEIR NASTY BUTTS AIN'T WELCOME HERE!
+    - 
+      - 
   questAcceptDialog:
     - '&a[Phygia Gorgonius]&f I am sure you will find plenty of them if you find some place with shade and just look up, hard to miss their tree houses.'
     - '&7&oI should go take care of these &cElves&7&o before &aPhygia&7&o catches on fire from rage.'
   questCompleteMessage:
     - '&a[Phygia Gorgonius]&f My friend! HAHA! So good to see you again!'
-    - I was watching from a distance. Seeing those fools fall to their death, nothing better!
+    - 
+      - 
     - '&7&oThe elves wont be bothering &aPhygia&7&o ever again.'
 primis_pontis_mille_fields_berry_crazed_wolf:
   name: '&2Berry crazed wolves'
@@ -12415,13 +12573,15 @@ primis_pontis_mille_fields_camp_hunter_three_times_hunter:
     - '&cBeast Crawler Megdun&f that slumbers on top of a sun covered grove.'
     - Dancing between two western peaks you will find the
     - '&cBeast Impaler Uladzimir'
-    - As proof bring me the &eImpaler's Horn&f, the &eCod's Scale&f and the &eCrawler's Silk&f.
+    - 
+      - 
   questAcceptDialog:
     - '&a[Milonia Majus]&f Here take this device it will roughly guide you to the their location.'
     - '&7&oI should go and challenge the &c&oThree Great Beasts&7&o.'
   questCompleteMessage:
     - '&a[Milonia Majus]&f You have returned. And you have brought all three items I requested as proof.'
-    - That must have been quite an adventure, reminds me of my younger days when I had more strength and agility.
+    - 
+      - 
     - Well enough about me, here is your reward as promised!
     - '&7You hand back the beast tracking device.'
     - '&a[Milonia Majus]&fI had almost forgotten about that thing, thank you!'
@@ -12441,7 +12601,8 @@ primis_pontis_mille_fields_do_it_yourself:
   questAcceptDialog:
     - '&a[Scribonia Ingenvinus]&f I knew you would say yes! I see you are already well equipped.'
     - OK, this is what I want you to do.
-    - We are worried about that large &cBeast&f aka. &cBig ol' Bubba&f so that is priority number one.
+    - 
+      - 
     - Second I need you to slay 5 &cLonghorns&f and 6 &cShorthorns&f.
     - Understood? Good. Report to me when you're done.
     - '&7&oI should slay &c&oBig ol'' Bubba&7&o and kill 5 &c&oLonghorns&7&o and 6 &c&oShorthorns&7&o.'
@@ -12484,7 +12645,8 @@ primis_pontis_mille_fields_feeding_the_hungry:
     - '&7&oI should go to the &dSlums&7&o and hand out the food to those in need.'
   questCompleteMessage:
     - '&a[Augustina Verrucosis]&f &2Daemones&f sent you here didn''t he.'
-    - He has been coming by every week handing out any food he could spare to make sure we didn't starve...
+    - 
+      - 
     - Thank you stranger, my family won't forget this.
 primis_pontis_mille_fields_fruity_hound:
   name: '&2Fruity hound'
@@ -12508,8 +12670,10 @@ primis_pontis_mille_fields_fruity_hound:
     - '&7&oI should go slay the &c&oFruity Hound&7&o and see if the &e&oContest Berry&7&o is still in one piece.'
   questCompleteMessage:
     - '&a[Dordalus Nasica]&f YES! That is my darling! Fine and whole, not even any saliva on it!'
-    - As a reward for your work you can have my second largest berry. Be careful not to eat it.
-    - I know might be tempting to eat it, but believe me it's way more useful if you keep it around.
+    - 
+      - 
+    - 
+      - 
 primis_pontis_mille_fields_not_on_my_farm:
   name: '&2Not on my farm!'
   questLore:
@@ -12687,7 +12851,8 @@ primis_pontis_mille_let_them_know:
     - If you could reach out to the &aGenerals&f in the city and let them know
     - that &dGladius&f needs help we might be able to to do something about it.
     - But not before we deal with the existing issues first.
-    - I am sure that the &aGenerals&f will be happy to let you help them out with their issues.
+    - 
+      - 
     - Go talk to them and then come back to let me know they got the message.
     - I will reward you for your time.
   questAcceptDialog:
@@ -12780,19 +12945,23 @@ primis_pontis_mille_serious_sewage:
   name: '&2Serious sewage'
   questLore:
     - If you are up to the task then I could use your help.
-    - The &dSewers&f under the city have become a lair for all sorts of trouble makers and critters.
-    - The trouble makers call themselves &cNinjas&f...even though they are far from it.
+    - 
+      - 
+    - 
+      - 
     - They have a leader, I think he calls himself &cShreepper&f or something.
     - Make sure to get rid of him, a snake without it's head is not a threat.
     - If you could go down there and thin the numbers of critters and the trouble makers
     - then that would allow me to assign my forces to more important tasks...
     - We had also sent &a4 Agents&f down there, I have not heard from them yet.
-    - It would mean a lot to me if you could check up on them to make sure they are ok.
+    - 
+      - 
     - I also seem to have misplaced my personal &eSewage Keys&f
     - if you could retrieve those too, that would be great.
   questAcceptDialog:
     - '&a[Rogerius]&fYou can get to the &dSewers&f by going to the fountain and then a bit south-east.'
-    - You know you are at the right spot when you see a big sewage pipe going into the wall.
+    - 
+      - 
     - '&7&oI need to find my way into the &dSewers&7&o and complete the tasks.'
   questCompleteMessage:
     - '&a[Rogerius]&f You have completed the all I have asked? If only I had 10 more men like you...'
@@ -12814,7 +12983,8 @@ primis_pontis_mille_star_gazing:
     - Here take this sealed note and show it to them.
   questAcceptDialog:
     - '&7[Fortes Bellator]&f You can find the &aStargazers&f at the &dObservatory&f.'
-    - The &dObservatory&f is located past the &dLighthouse&f. It is a large tower, hard to miss.
+    - 
+      - 
     - '&7&oI should talk to the &aStargazers&7&o at the &dObservatory&7&o.'
   questCompleteMessage:
     - '&a[Virgo Dexippus]&f The &aMajor&f sent you? It must be important then.'
@@ -12927,7 +13097,8 @@ primis_pontis_redwoods_its_reyn_time:
     - Fully resilient to heavy logs being dropped on it, yep.
     - I saw one of those nasty &cBandits&f scoop it up and put it in their pocket.
     - Pretty sure I saw them &9Carrying a Hatchet&f.
-    - If you could go to their camp and get it back for me. That would mean the world to me!
+    - 
+      - 
     - A nice reward for you too when you get back!
   questAcceptDialog:
     - '&8[Reynus]&f You can find the &cBandits&f right across the river.'
@@ -13013,8 +13184,11 @@ primis_terravilla_drowning_terror:
     - '&a[Plautia Suilius]&f Wow it looks like a fish, but it''s internal organs are different.'
     - It must infect other creatures by releasing these tiny worm like meat particles...
     - Let me have a look at you. Hmm, you seem fine, no traces...
-    - So it is not affecting us...yet. This is an emergency, I need to collect my stuff and go present my findings to the researchers at &dPontis Mille&f immediately. I need to get approval for extermination, that organism cannot be allowed to evolve.
-    - Thank you for everything you have done. Here, take this. It's not a lot but at least it's something.
+    - 
+      - 
+      - 
+    - 
+      - 
     - '&7&oI should make sure to stay away from the river...'
 primis_terravilla_hog_on_my_porch:
   name: '&2Bipedal examination'
@@ -13070,7 +13244,8 @@ test_quest:
 xmas_quest_0:
   name: '&2Find the lost gifts!'
   questLore:
-    - I seem to have lost some Christmas gifts along the way, would you help a poor old man find them again?
+    - 
+      - 
     - I will let you open one of them in return!
   questAcceptDialog:
     - '&8[&cSaint Nick&8]&f Thank you! I will be waiting here for you!'

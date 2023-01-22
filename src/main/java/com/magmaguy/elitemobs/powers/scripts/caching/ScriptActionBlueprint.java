@@ -86,6 +86,8 @@ public class ScriptActionBlueprint {
     @Getter
     private FireworkEffect.Type fireworkEffectType = FireworkEffect.Type.BALL_LARGE;
     @Getter
+    private List<FireworkEffect.Type> fireworkEffectTypes = null;
+    @Getter
     private List<List<FireworkColor>> fireworkEffects = new ArrayList<>();
     @Getter
     private int power = 10;
@@ -156,6 +158,8 @@ public class ScriptActionBlueprint {
             case "withtrail" -> withTrail = parseBoolean(key, value, scriptName);
             case "fireworkeffecttype" ->
                     fireworkEffectType = parseEnum(key, value, FireworkEffect.Type.class, scriptName);
+            case "fireworkeffecttypes" ->
+                    fireworkEffectTypes = parseEnumList(key, value, FireworkEffect.Type.class, scriptName);
             case "fireworkeffects" -> fireworkEffects = parseEnumListList(key, value, FireworkColor.class, scriptName);
             case "power" -> power = parseInteger(key, value, scriptName);
             case "invulnerable" -> invulnerable = parseBoolean(key, value, scriptName);
