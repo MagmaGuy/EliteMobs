@@ -259,21 +259,29 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
 
         switch (removalReason) {
             case REMOVE_COMMAND:
-                if (phaseBossEntity != null)
-                    phaseBossEntity.silentReset();
-                EntityTracker.getEliteMobEntities().remove(super.eliteUUID);
-                //regionalBossesFromConfigFields.remove(customBossesConfigFields, this);
-                removed = true;
-                getCustomBossesConfigFields().setFilesOutOfSync(true);
+                permanentlyRemove();
                 break;
             case DEATH:
             case BOSS_TIMEOUT:
+                //this is used for 1-time regional bosses, such as the ones spawned by BetterStructures
+                if (customBossesConfigFields.isRemoveAfterDeath()) {
+                    permanentlyRemove();
+                    break;
+                }
                 if (!(this instanceof InstancedBossEntity))
                     respawn();
                 break;
             default:
                 break;
         }
+    }
+
+    private void permanentlyRemove() {
+        if (phaseBossEntity != null)
+            phaseBossEntity.silentReset();
+        EntityTracker.getEliteMobEntities().remove(super.eliteUUID);
+        removed = true;
+        getCustomBossesConfigFields().setFilesOutOfSync(true);
     }
 
     /**

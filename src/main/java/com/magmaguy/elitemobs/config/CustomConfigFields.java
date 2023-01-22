@@ -315,7 +315,7 @@ public class CustomConfigFields implements CustomConfigFieldsInterface {
                 ItemStack itemStack = ItemStackGenerator.generateItemStack(Material.getMaterial(materialString.split(":")[0]));
                 if (materialString.split(":")[0].contains("leather_") || materialString.split(":")[0].contains("LEATHER_")) {
                     LeatherArmorMeta leatherArmorMeta = (LeatherArmorMeta) itemStack.getItemMeta();
-                    leatherArmorMeta.setColor(Color.fromRGB(Integer.parseInt(materialString.split(":")[1])));
+                    leatherArmorMeta.setColor(Color.fromRGB(Integer.parseInt(materialString.split(":")[1], 16)));
                     itemStack.setItemMeta(leatherArmorMeta);
                 } else {
                     ItemMeta itemMeta = itemStack.getItemMeta();

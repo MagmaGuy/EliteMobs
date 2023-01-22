@@ -155,7 +155,7 @@ public class ScriptTargets {
                 return getTargetLocations(scriptActionData.getInheritedScriptActionData());
         }
 
-        if (targetBlueprint.getCoverage() > 0)
+        if (targetBlueprint.getCoverage() < 1)
             newLocations.removeIf(targetLocation -> ThreadLocalRandom.current().nextDouble() > targetBlueprint.getCoverage());
 
         return newLocations;

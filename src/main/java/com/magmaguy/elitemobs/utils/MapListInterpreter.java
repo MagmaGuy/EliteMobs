@@ -83,6 +83,29 @@ public class MapListInterpreter {
         return null;
     }
 
+    public static <T extends Enum<T>> List<T> parseEnumList(String key, Object value, Class<T> enumClass, String scriptName) {
+        try {
+            if (value instanceof List<?> valueList) {
+                List<T> parsedList = new ArrayList<>();
+                for (Object rawEnum : valueList) {
+                    if (!(rawEnum instanceof String)) {
+                        new WarningMessage("Expected string, got something else!");
+                        parsingErrorMessage(key, value, scriptName);
+                        continue;
+                    }
+                    parsedList.add(Enum.valueOf(enumClass, (String) rawEnum));
+                }
+                return parsedList;
+            } else {
+                parsingErrorMessage(key, value, scriptName);
+                return null;
+            }
+        } catch (Exception ex) {
+            parsingErrorMessage(key, value, scriptName);
+        }
+        return null;
+    }
+
 
     public static <T extends Enum<T>> List<List<T>> parseEnumListList(String key, Object value, Class<T> enumClass, String scriptName) {
         List<List<T>> parsedList = new ArrayList<>();

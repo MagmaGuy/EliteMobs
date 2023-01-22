@@ -155,6 +155,7 @@ public class EventsRegistrer {
         registerPower(new InvulnerabilityArrow(), "invulnerability_arrow.yml");
         registerPower(new InvulnerabilityFallDamage(), "invulnerability_fall_damage.yml");
         registerPower(new InvulnerabilityKnockback(), "invulnerability_knockback.yml");
+        registerPower(new InvulnerabilityFireworks(), "invulnerability_fireworks.yml");
         registerPower(new BonusLoot(), "bonus_loot.yml");
         registerPower(new Taunt(), "taunt.yml");
         registerPower(new Implosion(), "implosion.yml");
