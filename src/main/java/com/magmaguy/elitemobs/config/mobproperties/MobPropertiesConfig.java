@@ -51,7 +51,8 @@ public class MobPropertiesConfig {
             new SuperSheepConfig(),
             new EliteKillerBunnyConfig(),
             new EliteLlamaConfig(),
-            new EliteSlimeConfig()
+            new EliteSlimeConfig(),
+            new EliteMagmaCubeConfig()
     ));
 
     public static HashMap<EntityType, MobPropertiesConfigFields> getMobProperties() {

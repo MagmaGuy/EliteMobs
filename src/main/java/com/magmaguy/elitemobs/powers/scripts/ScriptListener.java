@@ -77,6 +77,7 @@ public class ScriptListener implements Listener {
     public void onEntityChangeBlockEvent(EntityChangeBlockEvent event) {
         if (fallingBlocks.isEmpty()) return;
         FallingEntityDataPair fallingEntityDataPair = fallingBlocks.get(event.getEntity());
+        if (fallingEntityDataPair == null) return;
         ScriptAction scriptAction = fallingEntityDataPair.getScriptAction();
         if (scriptAction == null) return;
         event.setCancelled(true);

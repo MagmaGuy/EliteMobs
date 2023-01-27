@@ -149,9 +149,14 @@ public class ScriptAction {
                             runActions(scriptActionData);
                         }
                     }.runTaskTimer(MetadataHandler.PLUGIN, 0, blueprint.getRepeatEvery());
-                else
+                else {
+                    //Check for blocking conditions
+                    if (blueprint.getConditionsBlueprint() != null &&
+                            !scriptConditions.meetsActionConditions(scriptActionData))
+                        return;
                     //If it's not a repeating task, just run it normally
                     runActions(scriptActionData);
+                }
             }
         }.runTaskLater(MetadataHandler.PLUGIN, blueprint.getWait());
     }
@@ -282,6 +287,9 @@ public class ScriptAction {
     private void runAdditionalScripts(ScriptActionData scriptActionData) {
         if (blueprint.getActionType().equals(ActionType.RUN_SCRIPT) && blueprint.getScripts().isEmpty())
             new WarningMessage("Did not find any scripts for action RUN_SCRIPT in script " + blueprint.getScriptName() + " in file " + blueprint.getScriptFilename());
+        //This is a bit of a dirty hack but if there are no targets and an action called scripts then it is assumed that the script did not meet the conditions required to run and therefore additional scripts will also not run
+        if (!blueprint.getActionType().equals(ActionType.RUN_SCRIPT) && (scriptActionData.getScriptTargets().getAnonymousTargets() == null || scriptActionData.getScriptTargets().getAnonymousTargets().isEmpty()))
+            return;
         if (blueprint.getScripts() != null)
             if (!blueprint.isOnlyRunOneScript())
                 blueprint.getScripts().forEach(iteratedScriptName -> {
@@ -304,11 +312,9 @@ public class ScriptAction {
 
     //Damages the target living entity
     private void runDamage(ScriptActionData scriptActionData) {
-        //Developer.message("Running damage action");
         getTargets(scriptActionData).forEach(targetEntity -> {
-            if (targetEntity instanceof Player) {
+            if (targetEntity instanceof Player)
                 PlayerDamagedByEliteMobEvent.PlayerDamagedByEliteMobEventFilter.setSpecialMultiplier(blueprint.getMultiplier());
-            }
             if (scriptActionData.getEliteEntity().getLivingEntity() != null)
                 targetEntity.damage(blueprint.getAmount(), scriptActionData.getEliteEntity().getLivingEntity());
             else

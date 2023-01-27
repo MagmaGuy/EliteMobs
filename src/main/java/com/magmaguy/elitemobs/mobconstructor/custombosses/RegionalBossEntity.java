@@ -93,6 +93,20 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
         }
     }
 
+    /**
+     * Used by third party plugins to spawn regional bosses (BetterStructures uses this)
+     *
+     * @param configurationFilename Filename of the configuration file as set in the custombosses folder of EliteMobs
+     * @param spawnLocation         Spawn location of the regional boss
+     */
+    @Nullable
+    public static RegionalBossEntity SpawnRegionalBoss(String configurationFilename, Location spawnLocation) {
+        CustomBossesConfigFields thisCustomBossConfigurationField = CustomBossesConfig.getCustomBoss(configurationFilename);
+        if (thisCustomBossConfigurationField == null) return null;
+        if (spawnLocation == null) return null;
+        return new RegionalBossEntity(thisCustomBossConfigurationField, spawnLocation, true, true);
+    }
+
     public static void regionalBossesShutdown() {
         regionalBossesFromConfigFields.clear();
     }

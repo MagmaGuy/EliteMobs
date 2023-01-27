@@ -203,10 +203,6 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
             return;
         }
 
-        if (level == -1 && this instanceof RegionalBossEntity)
-            new WarningMessage("Boss " + getCustomBossesConfigFields().getFilename() + " is regional and has a dynamic level!" +
-                    " This is a terrible idea. Change this as soon as possible!");
-
         //This is a bit dumb but -1 is reserved for dynamic levels
         if (level == -1)
             if (!(this instanceof RegionalBossEntity) || spawnLocation.getWorld() != null)
@@ -364,11 +360,15 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
 
     public void getDynamicLevel(Location bossLocation) {
         int bossLevel = 1;
-        for (Entity entity : bossLocation.getWorld().getNearbyEntities(bossLocation, Math.max(Bukkit.getViewDistance() * 16, 5 * 16), 256, Bukkit.getViewDistance() * 16D))
-            if (entity instanceof Player)
-                if (ElitePlayerInventory.playerInventories.get(entity.getUniqueId()) != null)
-                    if (ElitePlayerInventory.playerInventories.get(entity.getUniqueId()).getNaturalMobSpawnLevel(true) > bossLevel)
-                        bossLevel = ElitePlayerInventory.playerInventories.get(entity.getUniqueId()).getNaturalMobSpawnLevel(false);
+        List<Player> players = bossLocation.getWorld().getPlayers();
+        for (Player player : players)
+            if (player.getLocation().distanceSquared(bossLocation) <= Math.pow(16L * (Bukkit.getViewDistance() + 5D), 2)) {
+                ElitePlayerInventory playerInventory = ElitePlayerInventory.getPlayer(player);
+                if (playerInventory == null) continue;
+                int level = playerInventory.getNaturalMobSpawnLevel(false);
+                if (level < bossLevel) continue;
+                bossLevel = level;
+            }
         super.setLevel(bossLevel);
     }
 

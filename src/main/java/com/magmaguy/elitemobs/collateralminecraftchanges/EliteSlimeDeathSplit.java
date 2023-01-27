@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.MagmaCube;
 import org.bukkit.entity.Slime;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -17,14 +18,19 @@ import java.util.concurrent.ThreadLocalRandom;
 public class EliteSlimeDeathSplit implements Listener {
     @EventHandler
     public void EliteMobDeathEvent(EliteMobDeathEvent event) {
-        if (!event.getEntity().getType().equals(EntityType.SLIME)) return;
+        if (!event.getEntity().getType().equals(EntityType.SLIME) &&
+                !event.getEntity().getType().equals(EntityType.MAGMA_CUBE)) return;
         Slime slime = (Slime) event.getEntity();
         int size = slime.getSize() / 2;
         if (size < 1) return;
         slime.setSize(1);
         for (int i = 0; i < ThreadLocalRandom.current().nextInt(2) + 2; i++) {
             WorldGuardSpawnEventBypasser.forceSpawn();
-            Slime newSlime = (Slime) slime.getLocation().getWorld().spawnEntity(slime.getLocation(), EntityType.SLIME);
+            Slime newSlime;
+            if (event.getEntity().getType() == EntityType.SLIME)
+                newSlime = (Slime) slime.getLocation().getWorld().spawnEntity(slime.getLocation(), EntityType.SLIME);
+            else
+                newSlime = (MagmaCube) slime.getLocation().getWorld().spawnEntity(slime.getLocation(), EntityType.MAGMA_CUBE);
             newSlime.setSize(size);
             EliteEntity eliteEntity = new EliteEntity();
             eliteEntity.setLevel(event.getEliteEntity().getLevel());
