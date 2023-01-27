@@ -43,7 +43,7 @@ public class CombatTag implements Listener {
 
         if (player.getGameMode().equals(GameMode.CREATIVE)) return;
 
-        if (player.isInvulnerable()) player.setInvulnerable(false);
+        //if (player.isInvulnerable()) player.setInvulnerable(false);
         if (player.isFlying()) {
             player.setFlying(false);
             player.spigot().sendMessage(ChatMessageType.ACTION_BAR,

@@ -70,7 +70,7 @@ public class ScriptTargets {
         //if (actionType.isRequiresLivingEntity()) return;
         boolean animatedScriptZone = false;
         if (eliteScript.getScriptZone().isValid()) {
-            shapes = eliteScript.getScriptZone().generateShapes(scriptActionData);
+            shapes = eliteScript.getScriptZone().generateShapes(scriptActionData, true);
             if (eliteScript.getScriptZone().getZoneBlueprint().getAnimationDuration() > 0) animatedScriptZone = true;
         }
         if (!animatedScriptZone)
@@ -119,7 +119,7 @@ public class ScriptTargets {
 
             default:
                 new WarningMessage("Could not find default target for script in " + eliteScript.getFileName());
-                return new ArrayList<>();
+                return null;
         }
     }
 

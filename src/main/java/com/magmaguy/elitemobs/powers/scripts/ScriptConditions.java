@@ -36,6 +36,7 @@ public class ScriptConditions {
 
     private boolean isAliveCheck(LivingEntity livingEntity) {
         if (conditionsBlueprint.getIsAlive() == null) return true;
+        if (livingEntity == null) return false;
         return livingEntity.isValid() == conditionsBlueprint.getIsAlive();
     }
 
@@ -101,6 +102,8 @@ public class ScriptConditions {
 
     public boolean meetsActionConditions(ScriptActionData scriptActionData) {
         if (scriptTargets == null) return true;
+        //Can happen due to configuration mistakes related to setting the targets
+        if (scriptActionData == null) return false;
 
         //if the target is self and the condition is isAlive the condition will always be blocking
         if (!conditionsBlueprint.getConditionType().equals(ConditionType.BLOCKING)) {
