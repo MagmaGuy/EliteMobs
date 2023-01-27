@@ -28,7 +28,7 @@ public class CustomBossesConfig extends CustomConfig {
                 if (customBossesConfigFields.isInstanced()) {
                     //Initialize the regional bosses in the world
                     List<String> locations = customBossesConfigFields.processStringList("spawnLocations", new ArrayList<>(), new ArrayList<>(), false);
-                    if (locations.isEmpty())
+                    if (locations.isEmpty() && !customBossesConfigFields.isRemoveAfterDeath())
                         new InfoMessage(customBossesConfigFields.getFilename() + " does not have a set location yet! It will not spawn. Did you install its minidungeon?");
                     for (String string : locations)
                         InstancedBossEntity.add(string, customBossesConfigFields);
@@ -40,7 +40,7 @@ public class CustomBossesConfig extends CustomConfig {
                 if (!customBossesConfigFields.isReinforcement()) {
                     //Initialize the regional bosses in the world
                     List<String> locations = customBossesConfigFields.processStringList("spawnLocations", new ArrayList<>(), new ArrayList<>(), false);
-                    if (locations.isEmpty())
+                    if (locations.isEmpty() && !customBossesConfigFields.isRemoveAfterDeath())
                         new InfoMessage(customBossesConfigFields.getFilename() + " does not have a set location yet! It will not spawn. Did you install its minidungeon?");
                     for (String string : locations)
                         new RegionalBossEntity(customBossesConfigFields, string).initialize();

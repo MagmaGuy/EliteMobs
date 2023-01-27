@@ -97,6 +97,10 @@ public class CustomBossMegaConsumer {
             if (((EnderDragon) livingEntity).getDragonBattle() != null)
                 ((EnderDragon) livingEntity).getDragonBattle().generateEndPortal(false);
         }
+
+        if (livingEntity instanceof Slime){
+            ((Slime)livingEntity).setSize(customBossEntity.getCustomBossesConfigFields().getSlimeSize());
+        }
     }
 
     private void setBaby(LivingEntity livingEntity) {

@@ -35,7 +35,7 @@ public class ElitePowerParser {
                         customSummonPower.addEntry(powerName, customBossesConfigFields.getFilename());
                 else {
                     String[] parsedPowerName = powerName.split(":");
-                    ElitePower elitePower = addPower(parsedPowerName[0], elitePowers);
+                    ElitePower elitePower = addPower(parsedPowerName[0], elitePowers, customBossesConfigFields);
                     if (elitePower == null) continue;
                     if (elitePower.getPowersConfigFields().getFilename().equals("bonus_coins.yml"))
                         if (parsedPowerName.length > 1)
@@ -86,7 +86,7 @@ public class ElitePowerParser {
                         if (powersConfigFields == null) {
                             new WarningMessage("Invalid power name " + string + " in file " + customBossesConfigFields.getFilename());
                         } else {
-                            addPower(string, elitePowers);
+                            addPower(string, elitePowers, customBossesConfigFields);
                         }
                     } else
                         new WarningMessage("No valid power name in boss config " + customBossesConfigFields.getFilename());
@@ -96,7 +96,7 @@ public class ElitePowerParser {
         return elitePowers;
     }
 
-    private static ElitePower addPower(String powerName, HashSet<ElitePower> elitePowers) {
+    private static ElitePower addPower(String powerName, HashSet<ElitePower> elitePowers, CustomBossesConfigFields customBossesConfigFields) {
         PowersConfigFields powersConfigFields = PowersConfig.getPower(powerName);
         if (powersConfigFields != null) {
             if (!powersConfigFields.getEliteScriptBlueprints().isEmpty()) {
@@ -113,7 +113,7 @@ public class ElitePowerParser {
                 return null;
             }
         } else
-            new WarningMessage("Warning: power name " + powerName + " is not registered! Skipping it for custom mob construction...");
+            new WarningMessage("Warning: power name " + powerName + " for boss " + customBossesConfigFields.getFilename() + " is not registered! Skipping it for custom mob construction...");
         return null;
     }
 }

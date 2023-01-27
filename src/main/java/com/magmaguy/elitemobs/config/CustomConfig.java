@@ -2,12 +2,15 @@ package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.utils.WarningMessage;
+import org.bukkit.Bukkit;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.reflections.Reflections;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -15,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.logging.Level;
 
 public class CustomConfig {
 
@@ -158,7 +162,16 @@ public class CustomConfig {
         try {
             //Make sure it's a yml configuration file
             if (!file.getName().endsWith(".yml")) return;
-            FileConfiguration fileConfiguration = YamlConfiguration.loadConfiguration(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
+            YamlConfiguration fileConfiguration = new YamlConfiguration();
+            try {
+                fileConfiguration.load(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
+            } catch (IOException ex) {
+                Bukkit.getLogger().log(Level.SEVERE, "Cannot load configuration from stream", ex);
+            } catch (InvalidConfigurationException ex) {
+                new WarningMessage("Failed to load file " + file.getName() + " in " + file.getAbsolutePath() + " ! This file is not correctly formatted for a yaml file.");
+                new WarningMessage("You can check the file vality by through YAML linters, such as the one at https://www.yamllint.com/");
+                return;
+            }
             //Instantiate the correct CustomConfigFields instance
             Constructor<?> constructor = customConfigFields.getConstructor(String.class, boolean.class);
             CustomConfigFields instancedCustomConfigFields = (CustomConfigFields) constructor.newInstance(file.getName(), true);
