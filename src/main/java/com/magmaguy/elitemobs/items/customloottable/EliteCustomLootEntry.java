@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.instanced.dungeons.DungeonInstance;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.utils.MapListInterpreter;
 import com.magmaguy.elitemobs.utils.WarningMessage;
@@ -48,12 +49,10 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
             String key = (String) mapEntry.getKey();
             switch (key.toLowerCase()) {
                 case "filename" -> filename = MapListInterpreter.parseString(key, mapEntry.getValue(), configFilename);
-                case "chance" ->
-                        super.setChance(MapListInterpreter.parseDouble(key, mapEntry.getValue(), configFilename));
-                case "difficultyid" ->
-                        difficultyID = MapListInterpreter.parseString(key, mapEntry.getValue(), configFilename);
-                case "permission" ->
-                        super.setPermission(MapListInterpreter.parseString(key, mapEntry.getValue(), configFilename));
+                case "chance" -> super.setChance(MapListInterpreter.parseDouble(key, mapEntry.getValue(), configFilename));
+                case "difficultyid" -> difficultyID = MapListInterpreter.parseString(key, mapEntry.getValue(), configFilename);
+                case "permission" -> super.setPermission(MapListInterpreter.parseString(key, mapEntry.getValue(), configFilename));
+                case "amount" -> setAmount(MapListInterpreter.parseInteger(key, mapEntry.getValue(), configFilename));
                 default -> new WarningMessage("Failed to read custom loot option " + key + " in " + configFilename);
             }
         }
@@ -155,6 +154,12 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
     @Override
     public void locationDrop(int itemTier, Player player, Location location, EliteEntity eliteEntity) {
         if (isGroupLoot(itemTier, player, eliteEntity)) return;
+        if (generateCustomItem() == null) {
+            new WarningMessage("Invalid loot entry for boss " + eliteEntity.getName() + "!");
+            if (eliteEntity instanceof CustomBossEntity customBossEntity)
+                new WarningMessage("Boss filename: " + customBossEntity.getCustomBossesConfigFields().getFilename());
+            return;
+        }
         for (int i = 0; i < getAmount(); i++)
             generateCustomItem().dropPlayerLoot(player, itemTier, location, eliteEntity);
     }

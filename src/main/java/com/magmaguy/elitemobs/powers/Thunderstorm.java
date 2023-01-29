@@ -34,7 +34,8 @@ public class Thunderstorm extends BossPower implements Listener {
                 counter++;
                 if (counter > 20 * 5 || eliteEntity.getLivingEntity() == null || !eliteEntity.getLivingEntity().isValid()) {
                     cancel();
-                    eliteEntity.getLivingEntity().setAI(true);
+                    if (eliteEntity.getLivingEntity() != null)
+                        eliteEntity.getLivingEntity().setAI(true);
                     return;
                 }
 

@@ -236,6 +236,7 @@ public class EnchantmentGenerator {
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("VANISHING_CURSE"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DEPTH_STRIDER"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("FROST_WALKER"));
+                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("SOUL_SPEED"));
                 break;
             case FISHING_ROD:
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DURABILITY"));
