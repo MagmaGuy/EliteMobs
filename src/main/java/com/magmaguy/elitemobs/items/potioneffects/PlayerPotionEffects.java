@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.items.potioneffects.custom.Harm;
 import com.magmaguy.elitemobs.items.potioneffects.custom.Heal;
 import com.magmaguy.elitemobs.items.potioneffects.custom.Saturation;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.utils.EntityFinder;
 import org.bukkit.Bukkit;
@@ -128,6 +129,9 @@ public class PlayerPotionEffects implements Listener {
                         elitePotionEffect.getPotionEffect().getType().equals(PotionEffectType.SLOW) ||
                         elitePotionEffect.getPotionEffect().getType().equals(PotionEffectType.BLINDNESS)) {
                     EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(damagee);
+                    if (eliteEntity instanceof CustomBossEntity customBossEntity &&
+                            customBossEntity.getCustomBossesConfigFields().getHealthMultiplier() > 1)
+                        return;
                     if (eliteEntity != null && eliteEntity.getHealthMultiplier() > 1)
                         return;
                     if (damagee.getType().equals(EntityType.PLAYER))

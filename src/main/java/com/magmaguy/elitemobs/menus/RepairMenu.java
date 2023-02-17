@@ -4,9 +4,8 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
-import com.magmaguy.elitemobs.config.menus.premade.ProceduralShopMenuConfig;
 import com.magmaguy.elitemobs.config.menus.premade.RepairMenuConfig;
-import com.magmaguy.elitemobs.items.ItemTagger;
+import com.magmaguy.elitemobs.items.customenchantments.RepairEnchantment;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -38,12 +37,10 @@ public class RepairMenu extends EliteMenu {
             return;
         }
 
-        int scrapLevel = ItemTagger.getEnchantment(repairInventory.getItem(RepairMenuConfig.eliteScrapInputSlot).getItemMeta(), "EliteScrap");
+        int scrapLevel = RepairEnchantment.getRepairLevel(repairInventory.getItem(RepairMenuConfig.eliteScrapInputSlot));
         ItemStack outputItem = repairInventory.getItem(RepairMenuConfig.eliteItemInputSlot).clone();
-        int itemLevel = EliteItemManager.getRoundedItemLevel(outputItem);
-        int baselineRepair = 300;
-        int levelDifferenceModifier = (scrapLevel - itemLevel) * 10;
-        int newDamage = baselineRepair + levelDifferenceModifier;
+        int baselineRepair = 100;
+        int newDamage = baselineRepair * scrapLevel;
         Damageable damageable = (Damageable) outputItem.getItemMeta();
         int damage = Math.min(damageable.getDamage() - newDamage, damageable.getDamage());
         damageable.setDamage(damage);
@@ -135,28 +132,16 @@ public class RepairMenu extends EliteMenu {
 
             Player player = (Player) event.getWhoClicked();
             ItemStack currentItem = event.getCurrentItem();
-            int clickedSlot = event.getSlot();
             Inventory repairInventory = event.getView().getTopInventory();
             Inventory playerInventory = event.getView().getBottomInventory();
 
-            boolean inventoryHasFreeSlots = false;
-            for (ItemStack iteratedStack : player.getInventory().getStorageContents())
-                if (iteratedStack == null) {
-                    inventoryHasFreeSlots = true;
-                    break;
-                }
-
-
             if (isBottomMenu(event)) {
                 //Item is scrap
-                if (ItemTagger.hasEnchantment(currentItem.getItemMeta(), "EliteScrap")) {
-                    int scrapLevel = ItemTagger.getEnchantment(currentItem.getItemMeta(), "EliteScrap");
+                if (RepairEnchantment.isRepairItem(currentItem) && repairInventory.getItem(scrapItemInputSlot) == null) {
+                    int scrapLevel = RepairEnchantment.getRepairLevel(currentItem);
                     if (scrapLevel >= 0) {
-                        if (repairInventory.getItem(scrapItemInputSlot) == null) {
-                            repairInventory.setItem(scrapItemInputSlot, currentItem);
-                            playerInventory.clear(clickedSlot);
-                            calculateOutput(repairInventory);
-                        }
+                        moveOneItemUp(scrapItemInputSlot, event);
+                        calculateOutput(repairInventory);
                         return;
                     }
                 }
@@ -172,14 +157,11 @@ public class RepairMenu extends EliteMenu {
 
             } else if (isTopMenu(event)) {
 
-                if (!inventoryHasFreeSlots) {
-                    player.sendMessage(ProceduralShopMenuConfig.messageFullInventory);
-                    player.closeInventory();
-                }
+                if (currentItem == null) return;
 
                 //return item to inventory
                 if (event.getSlot() == scrapItemInputSlot || event.getSlot() == eliteItemInputSlot) {
-                    playerInventory.addItem(currentItem);
+                    player.getWorld().dropItem(player.getLocation(), currentItem);
                     repairInventory.remove(currentItem);
                     calculateOutput(repairInventory);
                     return;
@@ -196,8 +178,10 @@ public class RepairMenu extends EliteMenu {
                     if (repairInventory.getItem(outputSlot) != null) {
                         repairInventory.setItem(RepairMenuConfig.eliteItemInputSlot, null);
                         repairInventory.setItem(RepairMenuConfig.eliteScrapInputSlot, null);
-                        playerInventory.addItem(repairInventory.getItem(outputSlot));
-                        repairInventory.remove(repairInventory.getItem(outputSlot));
+                        if (repairInventory.getItem(outputSlot) != null) {
+                            player.getWorld().dropItem(player.getLocation(), repairInventory.getItem(outputSlot));
+                            repairInventory.remove(repairInventory.getItem(outputSlot));
+                        }
                         repairInventory.setItem(outputSlot, null);
                     }
                 }

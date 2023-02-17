@@ -42,4 +42,18 @@ public class EliteMenu implements Listener {
         }
     }
 
+    public static void moveOneItemUp(int targetSlot, InventoryClickEvent event) {
+        if (event.getCurrentItem() == null) return;
+        ItemStack newItemStack = event.getCurrentItem().clone();
+        newItemStack.setAmount(1);
+        event.getView().getTopInventory().setItem(targetSlot, newItemStack);
+        event.getCurrentItem().setAmount(event.getCurrentItem().getAmount() - 1);
+    }
+
+    public static void moveItemDown(Inventory inventoryToClear, int slotToClear, HumanEntity player) {
+        if (inventoryToClear.getItem(slotToClear) == null) return;
+        player.getWorld().dropItem(player.getLocation(), inventoryToClear.getItem(slotToClear));
+        inventoryToClear.setItem(slotToClear, null);
+    }
+
 }

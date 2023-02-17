@@ -50,9 +50,10 @@ public class AttackArrow extends MinorPower implements Listener {
                 }
 
                 for (Entity nearbyEntity : eliteEntity.getLivingEntity().getNearbyEntities(20, 20, 20))
-                    if (nearbyEntity instanceof Player)
-                        if (((Player) nearbyEntity).getGameMode().equals(GameMode.ADVENTURE) ||
-                                ((Player) nearbyEntity).getGameMode().equals(GameMode.SURVIVAL))
+                    if (nearbyEntity instanceof Player player)
+                        if (!player.isDead() &&
+                                (player.getGameMode().equals(GameMode.ADVENTURE) ||
+                                        player.getGameMode().equals(GameMode.SURVIVAL)))
                             shootArrow(eliteEntity.getLivingEntity(), (Player) nearbyEntity);
 
             }

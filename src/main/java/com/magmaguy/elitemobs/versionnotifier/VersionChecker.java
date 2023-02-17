@@ -137,38 +137,36 @@ public class VersionChecker {
                 new WarningMessage("[EliteMobs] Failed to get resource pack from  https://www.magmaguy.com/downloads/elitemobs_resource_pack.zip ! This might mean the server is down, in which case you will have to host the resource pack on your own! (1)");
                 return;
             }
-            File file = new File("elitemobs_resource_pack.zip");
+            File tempFile = new File("elitemobs_resource_pack.zip");
             try {
-                FileUtils.copyURLToFile(fetchWebsite, file);
+                FileUtils.copyURLToFile(fetchWebsite, tempFile);
             } catch (IOException e) {
                 new WarningMessage("[EliteMobs] Failed to get resource pack from  https://www.magmaguy.com/downloads/elitemobs_resource_pack.zip ! This might mean the server is down, in which case you will have to host the resource pack on your own! (2)");
                 return;
             }
             String SHA1 = null;
             try {
-                SHA1 = ConfigurationExporter.sha1Code(file);
+                SHA1 = ConfigurationExporter.sha1Code(tempFile);
             } catch (Exception e) {
                 new WarningMessage("[EliteMobs] Failed to generate your SHA1 key! You will have to do this manually, though this might mean there is a serious problem with the resource pack.");
                 return;
             }
-            if (SHA1 == null) {
-                new WarningMessage("Failed to calculate current resource pack SHA1!");
-                return;
-            }
             String existingSHA1 = ServerPropertiesModifier.getValue("resource-pack-sha1");
             if (existingSHA1 == null) {
-                new WarningMessage("Failed to get SHA1 key from magmaguy.com!");
+                new WarningMessage("Failed to get the current SHA1 key!");
                 return;
             }
+            //todo: this will require testing the next time the resource pack gets updated
             if (!existingSHA1.equals(SHA1)) {
-                new InfoMessage("The EliteMobs resource pack has updated! The SHA1 code will be updated to match the new resource pack!");
                 if (!ServerPropertiesModifier.modify(Bukkit.getConsoleSender(), "resource-pack-sha1", SHA1)) {
                     new WarningMessage("Failed to set new SHA1 which should be " + SHA1 + " ! You will have to do this manually.");
+                    return;
                 } else {
                     new InfoMessage("Successfully set the new SHA1 value!");
                     new WarningMessage("Changing the SHA1 key requires a restart to apply correctly! Restart as soon as possible!");
                     SHA1Updated = true;
                 }
+                new InfoMessage("The EliteMobs resource pack has updated! The SHA1 code will be updated to match the new resource pack!");
             }
         });
     }

@@ -83,6 +83,12 @@ public class ConfigurationEngine {
         return fileConfiguration.getBoolean(key);
     }
 
+    public static Boolean setBoolean(List<String> comments, FileConfiguration fileConfiguration, String key, boolean defaultValue) {
+        boolean value = setBoolean(fileConfiguration, key, defaultValue);
+        fileConfiguration.setComments(key, comments);
+        return value;
+    }
+
     public static String setString(File file, FileConfiguration fileConfiguration, String key, String defaultValue, boolean translatable) {
         fileConfiguration.addDefault(key, defaultValue);
         if (translatable)
@@ -91,14 +97,33 @@ public class ConfigurationEngine {
             return ChatColorConverter.convert(fileConfiguration.getString(key));
     }
 
+    public static String setString(List<String> comments, File file, FileConfiguration fileConfiguration, String key, String defaultValue, boolean translatable) {
+        String value = setString(file, fileConfiguration, key, defaultValue, translatable);
+        fileConfiguration.setComments(key, comments);
+        return value;
+    }
+
+
     public static int setInt(FileConfiguration fileConfiguration, String key, int defaultValue) {
         fileConfiguration.addDefault(key, defaultValue);
         return fileConfiguration.getInt(key);
     }
 
+    public static int setInt(List<String> comments, FileConfiguration fileConfiguration, String key, int defaultValue) {
+        int value = setInt(fileConfiguration, key, defaultValue);
+        fileConfiguration.setComments(key, comments);
+        return value;
+    }
+
     public static double setDouble(FileConfiguration fileConfiguration, String key, double defaultValue) {
         fileConfiguration.addDefault(key, defaultValue);
         return fileConfiguration.getDouble(key);
+    }
+
+    public static double setDouble(List<String> comments, FileConfiguration fileConfiguration, String key, double defaultValue) {
+        double value = setDouble(fileConfiguration, key, defaultValue);
+        fileConfiguration.setComments(key, comments);
+        return value;
     }
 
     public static List setList(File file, FileConfiguration fileConfiguration, String key, List defaultValue, boolean translatable) {
@@ -107,6 +132,12 @@ public class ConfigurationEngine {
             return TranslationsConfig.add(file.getName(), key, (List<String>) fileConfiguration.getList(key));
         else
             return fileConfiguration.getList(key);
+    }
+
+    public static List setList(List<String> comment, File file, FileConfiguration fileConfiguration, String key, List defaultValue, boolean translatable) {
+        List value = setList(file, fileConfiguration, key, defaultValue, translatable);
+        fileConfiguration.setComments(key, comment);
+        return value;
     }
 
     public static ItemStack setItemStack(FileConfiguration fileConfiguration, String key, ItemStack itemStack) {

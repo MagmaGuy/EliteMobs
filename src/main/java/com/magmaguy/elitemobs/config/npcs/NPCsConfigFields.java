@@ -73,6 +73,9 @@ public class NPCsConfigFields extends CustomConfigFields implements CustomConfig
     @Getter
     @Setter
     private String command;
+    @Getter
+    @Setter
+    private boolean instanced = false;
 
     public NPCsConfigFields(String fileName,
                             boolean isEnabled,
@@ -136,6 +139,7 @@ public class NPCsConfigFields extends CustomConfigFields implements CustomConfig
         this.customModel = processString("customModel", customModel, null, false);
         this.arenaFilename = processString("arena", arenaFilename, null, false);
         this.command = processString("command", command, null, false);
+        this.instanced = processBoolean("instanced", instanced, false, false);
     }
 
     public void setEnabled(boolean enabled) {

@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.treasurechest;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
-import com.magmaguy.elitemobs.config.TranslationConfig;
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestConfigFields;
 import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestsConfig;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
@@ -168,11 +168,11 @@ public class TreasureChest implements PersistentObject {
     }
 
     private void lowRankMessage(Player player) {
-        player.sendMessage(ChatColorConverter.convert(TranslationConfig.getChestLowRankMessage().replace("$rank", GuildRank.getRankName(Math.max(0, customTreasureChestConfigFields.getChestTier() - 10), customTreasureChestConfigFields.getChestTier()))));
+        player.sendMessage(ChatColorConverter.convert(DefaultConfig.getChestLowRankMessage().replace("$rank", GuildRank.getRankName(Math.max(0, customTreasureChestConfigFields.getChestTier() - 10), customTreasureChestConfigFields.getChestTier()))));
     }
 
     private void groupTimerCooldownMessage(Player player, long targetTime) {
-        player.sendMessage(ChatColorConverter.convert(TranslationConfig.getChestCooldownMessage().replace("$time", timeConverter(targetTime - Instant.now().getEpochSecond()))));
+        player.sendMessage(ChatColorConverter.convert(DefaultConfig.getChestCooldownMessage().replace("$time", timeConverter(targetTime - Instant.now().getEpochSecond()))));
     }
 
     private boolean playerIsInCooldown(Player player) {

@@ -31,7 +31,7 @@ public class LootCommand {
             commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &cTried to give item to invalid player!"));
         else {
             player.getInventory().addItem(customItem.generateDefaultsItemStack(player, false, null));
-            commandSender.sendMessage("[EliteMobs] Successfully gave " + player.getName() + " item " + customItem.getName());
+            commandSender.sendMessage("[EliteMobs] Successfully gave " + player.getName() + " item " + customItem.getCustomItemsConfigFields().getName());
         }
     }
 

@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.items;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
+import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantment;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffect;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffectContainer;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
@@ -27,10 +28,13 @@ public class ItemTagger {
     private static final NamespacedKey ELITE_DAMAGE = new NamespacedKey(MetadataHandler.PLUGIN, "eliteDamage");
     @Getter
     private static final NamespacedKey ELITE_DEFENSE = new NamespacedKey(MetadataHandler.PLUGIN, "eliteDefense");
+
     public static String itemValue = "ItemValue";
+
     public static NamespacedKey onHitPotionEffectKey = new NamespacedKey(MetadataHandler.PLUGIN, "onHitPotionEffect");
     public static NamespacedKey continuousPotionEffectKey = new NamespacedKey(MetadataHandler.PLUGIN, "continuousPotionEffect");
     public static NamespacedKey itemSource = new NamespacedKey(MetadataHandler.PLUGIN, "itemSource");
+    public static NamespacedKey enchantmentCount = new NamespacedKey(MetadataHandler.PLUGIN, "enchantmentCount");
 
     public static void registerEliteItem(ItemMeta itemMeta) {
         itemMeta.getPersistentDataContainer().set(eliteMobsItemNamespacedKey, PersistentDataType.BYTE, (byte) 1);
@@ -260,4 +264,31 @@ public class ItemTagger {
         itemStack.setItemMeta(itemMeta);
     }
 
+    public static void registerEnchantmentCount(@Nullable ItemMeta itemMeta, int count) {
+        if (itemMeta == null) return;
+        itemMeta.getPersistentDataContainer().set(enchantmentCount, PersistentDataType.INTEGER, count);
+    }
+
+    public static int getEnchantmentCount(@Nullable ItemStack itemStack) {
+        if (itemStack == null || itemStack.getItemMeta() == null) return 0;
+        Integer value = itemStack.getItemMeta().getPersistentDataContainer().get(enchantmentCount, PersistentDataType.INTEGER);
+        return value == null ? 0 : value;
+    }
+
+    public static HashMap<NamespacedKey, Integer> getItemEnchantments(@Nullable ItemStack itemStack) {
+        HashMap<NamespacedKey, Integer> itemEnchantmentFilenames = new HashMap<>();
+        if (itemStack == null || itemStack.getItemMeta() == null) return itemEnchantmentFilenames;
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        for (Enchantment enchantment : Enchantment.values()) {
+            int enchantmentLevel = getEnchantment(itemMeta, enchantment.getKey());
+            if (enchantmentLevel > 0)
+                itemEnchantmentFilenames.put(enchantment.getKey(), enchantmentLevel);
+        }
+        for (CustomEnchantment customEnchantment : CustomEnchantment.getCustomEnchantmentMap().values()) {
+            int enchantmentLevel = getEnchantment(itemMeta, customEnchantment.getKey());
+            if (enchantmentLevel > 0)
+                itemEnchantmentFilenames.put(new NamespacedKey(MetadataHandler.PLUGIN, customEnchantment.getKey()), enchantmentLevel);
+        }
+        return itemEnchantmentFilenames;
+    }
 }

@@ -4,14 +4,13 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.DefaultConfig;
+import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
-import com.magmaguy.elitemobs.config.TranslationConfig;
-import com.magmaguy.elitemobs.config.menus.premade.ProceduralShopMenuConfig;
 import com.magmaguy.elitemobs.config.menus.premade.ScrapperMenuConfig;
 import com.magmaguy.elitemobs.config.menus.premade.SellMenuConfig;
+import com.magmaguy.elitemobs.items.customenchantments.RepairEnchantment;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
-import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -123,13 +122,13 @@ public class ScrapperMenu extends EliteMenu {
 
                 //Check if it's an elitemobs item. The soulbind check only says if the player would be able to pick it up, and vanilla items can be picked up
                 if (!EliteItemManager.isEliteMobsItem(event.getCurrentItem())) {
-                    event.getWhoClicked().sendMessage(ChatColorConverter.convert(TranslationConfig.getShopSaleInstructions()));
+                    event.getWhoClicked().sendMessage(ChatColorConverter.convert(EconomySettingsConfig.getShopSaleInstructions()));
                     return;
                 }
 
                 //If the item isn't soulbound to the player, it can't be sold by that player
                 if (!SoulbindEnchantment.isValidSoulbindUser(currentItem.getItemMeta(), player)) {
-                    player.sendMessage(ChatColorConverter.convert(TranslationConfig.getShopSaleOthersItems()));
+                    player.sendMessage(ChatColorConverter.convert(EconomySettingsConfig.getShopSaleOthersItems()));
                     return;
                 }
 
@@ -143,10 +142,6 @@ public class ScrapperMenu extends EliteMenu {
 
             } else if (EliteMenu.isTopMenu(event)) {
 
-                if (!inventoryHasFreeSlots) {
-                    player.sendMessage(ProceduralShopMenuConfig.messageFullInventory);
-                    player.closeInventory();
-                }
                 //CASE: Player clicked on the shop
 
                 //Signature item, does nothing
@@ -161,13 +156,15 @@ public class ScrapperMenu extends EliteMenu {
                         ItemStack itemStack = shopInventory.getItem(validSlot);
                         if (itemStack == null)
                             continue;
-                        int tier = EliteItemManager.getRoundedItemLevel(itemStack);
+
+                        ItemStack scrapItem = RepairEnchantment.generateScrap(itemStack, player, null);
+
                         for (int i = 0; i < itemStack.getAmount(); i++) {
                             if (ThreadLocalRandom.current().nextDouble() > ScrapperMenuConfig.scrapChance) {
                                 failures++;
                                 continue;
                             }
-                            player.getInventory().addItem(ItemConstructor.constructScrapItem(tier, player, false));
+                            player.getWorld().dropItem(player.getLocation(), scrapItem);
                             successes++;
                         }
                         itemStack.setAmount(0);
@@ -191,9 +188,7 @@ public class ScrapperMenu extends EliteMenu {
 
 
                 //If player clicks on one of the items already in the shop, return to their inventory
-                playerInventory.addItem(event.getCurrentItem());
-                shopInventory.clear(event.getSlot());
-
+                moveItemDown(event.getView().getTopInventory(), event.getSlot(), player);
             }
 
         }

@@ -59,7 +59,7 @@ public class ItemWorthCalculator {
             } else
                 value += EnchantmentsConfig.getEnchantment(enchantment).getValue() * itemStack.getEnchantments().get(enchantment);
         }
-        for (CustomEnchantment customEnchantment : CustomEnchantment.getCustomEnchantments()) {
+        for (CustomEnchantment customEnchantment : CustomEnchantment.getCustomEnchantmentMap().values()) {
             int enchantmentLevel = ItemTagger.getEnchantment(itemStack.getItemMeta(), customEnchantment.key);
             if (enchantmentLevel > 0)
                 value += customEnchantment.getEnchantmentsConfigFields().getValue() * ItemTagger.getEnchantment(itemStack.getItemMeta(), customEnchantment.key);

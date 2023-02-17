@@ -124,17 +124,6 @@ public class NPCInteractions implements Listener {
                     }.runTaskLater(MetadataHandler.PLUGIN, 1);
                 }
                 break;
-            case SMELTER:
-                if (event.getPlayer().hasPermission("elitemobs.smelt.npc")) {
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            SmeltMenu smeltMenu = new SmeltMenu();
-                            smeltMenu.constructSmeltMenu(event.getPlayer());
-                        }
-                    }.runTaskLater(MetadataHandler.PLUGIN, 1);
-                }
-                break;
             case REPAIRMAN:
                 if (event.getPlayer().hasPermission("elitemobs.repair.npc")) {
                     new BukkitRunnable() {
@@ -142,33 +131,6 @@ public class NPCInteractions implements Listener {
                         public void run() {
                             RepairMenu repairMenu = new RepairMenu();
                             repairMenu.constructRepairMenu(event.getPlayer());
-                        }
-                    }.runTaskLater(MetadataHandler.PLUGIN, 1);
-                }
-                break;
-            case ENHANCER:
-                event.getPlayer().sendMessage("[EliteMobs] This feature is coming back soon!");
-                break;
-                /*
-                if (event.getPlayer().hasPermission("elitemobs.enhancer.npc")) {
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            EnhancementMenu enhancementMenu = new EnhancementMenu();
-                            enhancementMenu.constructEnhancementMenu(event.getPlayer());
-                        }
-                    }.runTaskLater(MetadataHandler.PLUGIN, 1);
-                }
-                break;
-
-                 */
-            case REFINER:
-                if (event.getPlayer().hasPermission("elitemobs.refiner.npc")) {
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            RefinerMenu refinerMenu = new RefinerMenu();
-                            refinerMenu.constructRefinerMenu(event.getPlayer());
                         }
                     }.runTaskLater(MetadataHandler.PLUGIN, 1);
                 }
@@ -208,7 +170,23 @@ public class NPCInteractions implements Listener {
                     }
                 }.runTaskLater(MetadataHandler.PLUGIN, 1);
                 break;
-
+            case ENHANCER:
+            case REFINER:
+            case SMELTER:
+                event.getPlayer().sendMessage(ChatColorConverter.convert("&8[EliteMobs] &cThis feature has been replaced! This NPC should be removed by an admin as soon as possible."));
+                if (event.getPlayer().isOp() || event.getPlayer().hasPermission("elitemobs.*")) {
+                    event.getPlayer().sendMessage(ChatColorConverter.convert("&2To remove this NPC, use the command &6/em remove &2and hit the NPC!"));
+                }
+                break;
+            case ENCHANTER:
+                if (event.getPlayer().hasPermission("elitemobs.enchant.npc"))
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            new ItemEnchantmentMenu(event.getPlayer());
+                        }
+                    }.runTaskLater(MetadataHandler.PLUGIN, 1);
+                break;
         }
 
     }
@@ -245,7 +223,8 @@ public class NPCInteractions implements Listener {
         REFINER,
         UNBINDER,
         ARENA_MASTER,
-        COMMAND
+        COMMAND,
+        ENCHANTER
     }
 
 

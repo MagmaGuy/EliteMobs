@@ -93,7 +93,8 @@ public class TrackingFireball extends MajorPower {
                                     !repeatingFireball.isValid() ||
                                     !entity.isValid() ||
                                     player.isDead() ||
-                                    counter > 20 * 60 * 3) {
+                                    counter > 20 * 60 * 3 ||
+                                    repeatingFireball.getLocation().getWorld() != player.getWorld()) {
                                 cancel();
                                 return;
                             }

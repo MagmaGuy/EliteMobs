@@ -1,11 +1,13 @@
 package com.magmaguy.elitemobs.npcs;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
+import com.magmaguy.elitemobs.instanced.dungeons.DungeonInstance;
 import com.magmaguy.elitemobs.mobconstructor.PersistentMovingEntity;
 import com.magmaguy.elitemobs.mobconstructor.PersistentObject;
 import com.magmaguy.elitemobs.mobconstructor.PersistentObjectHandler;
@@ -38,6 +40,44 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class NPCEntity implements PersistentObject, PersistentMovingEntity {
 
+    private static final ArrayListMultimap<String, InstancedNPCContainer> instancedNPCEntities = ArrayListMultimap.create();
+    private boolean isInstancedDuplicate = false;
+
+    /**
+     * Spawns NPC based off of the values in the NPCsConfig config file. Runs at startup and on reload.
+     */
+    public NPCEntity(NPCsConfigFields npCsConfigFields, String locationString) {
+        this.npCsConfigFields = npCsConfigFields;
+        this.locationString = locationString;
+        if (!npCsConfigFields.isEnabled()) return;
+        if (npCsConfigFields.isInstanced()) {
+            Location location = ConfigurationLocation.serialize(locationString);
+            String blueprintWorldName = locationString.split(",")[0];
+            instancedNPCEntities.put(blueprintWorldName, new InstancedNPCContainer(location, this));
+            return;
+        }
+        //this is how the wandering trader works
+        if (locationString == null ||
+                locationString.equalsIgnoreCase("null"))
+            return;
+        setSpawnLocation();
+        spawn();
+        persistentObjectHandler = new PersistentObjectHandler(this);
+    }
+
+    /**
+     * Spawns NPCs for dungeon instancing.
+     */
+    public NPCEntity(NPCsConfigFields npCsConfigFields, Location location) {
+        this.npCsConfigFields = npCsConfigFields;
+        isInstancedDuplicate = true;
+        if (!npCsConfigFields.isEnabled()) return;
+        //this is how the wandering trader works
+        this.spawnLocation = location;
+        spawn();
+        persistentObjectHandler = new PersistentObjectHandler(this);
+    }
+
     public final NPCsConfigFields npCsConfigFields;
     @Getter
     private final UUID uuid = UUID.randomUUID();
@@ -49,20 +89,49 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
     private boolean isDisguised = false;
     private String locationString;
 
-    /**
-     * Spawns NPC based off of the values in the NPCsConfig config file. Runs at startup and on reload.
-     */
-    public NPCEntity(NPCsConfigFields npCsConfigFields, String locationString) {
-        this.npCsConfigFields = npCsConfigFields;
-        this.locationString = locationString;
-        if (!npCsConfigFields.isEnabled()) return;
-        //this is how the wandering trader works
-        if (locationString == null ||
-                locationString.equalsIgnoreCase("null"))
+    public static void shutdown() {
+        instancedNPCEntities.clear();
+    }
+
+    public static void initializeInstancedNPCs(String blueprintWorldName, World newWorld, int playerCount, DungeonInstance dungeonInstance) {
+        List<InstancedNPCContainer> rawNPCs = instancedNPCEntities.get(blueprintWorldName);
+        for (InstancedNPCContainer instancedNPCContainer : rawNPCs) {
+            Location newLocation = instancedNPCContainer.getLocation();
+            newLocation.setWorld(newWorld);
+            new NPCEntity(instancedNPCContainer.getNpcEntity().getNPCsConfigFields(), newLocation);
+        }
+    }
+
+    public void remove(RemovalReason removalReason) {
+        if (roleDisplay != null)
+            roleDisplay.remove();
+        if (villager != null) {
+            villager.remove();
+            EntityTracker.getNpcEntities().remove(villager.getUniqueId());
+            this.villager = null;
+        }
+
+        if (removalReason.equals(RemovalReason.WORLD_UNLOAD) && isInstancedDuplicate) {
+            persistentObjectHandler.remove();
             return;
-        setSpawnLocation();
-        spawn();
-        persistentObjectHandler = new PersistentObjectHandler(this);
+        }
+
+        if (removalReason.equals(RemovalReason.REMOVE_COMMAND)) {
+            if (npCsConfigFields.getLocations() != null && !npCsConfigFields.getLocations().isEmpty()) {
+                npCsConfigFields.removeNPC(locationString);
+                locationString = null;
+                spawnLocation = null;
+            } else {
+                npCsConfigFields.setEnabled(false);
+                spawnLocation = null;
+            }
+            if (persistentObjectHandler != null)
+                persistentObjectHandler.remove();
+        } else if (persistentObjectHandler != null)
+            if (!removalReason.equals(RemovalReason.SHUTDOWN))
+                persistentObjectHandler.updatePersistentLocation(getPersistentLocation());
+            else
+                persistentObjectHandler.remove();
     }
 
     /**
@@ -246,31 +315,16 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
         }.runTaskLater(MetadataHandler.PLUGIN, (long) (npCsConfigFields.getTimeout() * 20 * 60));
     }
 
-    public void remove(RemovalReason removalReason) {
-        if (roleDisplay != null)
-            roleDisplay.remove();
-        if (villager != null) {
-            villager.remove();
-            EntityTracker.getNpcEntities().remove(villager.getUniqueId());
-            this.villager = null;
-        }
+    private class InstancedNPCContainer {
+        @Getter
+        private Location location;
+        @Getter
+        private NPCEntity npcEntity;
 
-        if (removalReason.equals(RemovalReason.REMOVE_COMMAND)) {
-            if (npCsConfigFields.getLocations() != null && !npCsConfigFields.getLocations().isEmpty()) {
-                npCsConfigFields.removeNPC(locationString);
-                locationString = null;
-                spawnLocation = null;
-            } else {
-                npCsConfigFields.setEnabled(false);
-                spawnLocation = null;
-            }
-            if (persistentObjectHandler != null)
-                persistentObjectHandler.remove();
-        } else if (persistentObjectHandler != null)
-            if (!removalReason.equals(RemovalReason.SHUTDOWN))
-                persistentObjectHandler.updatePersistentLocation(getPersistentLocation());
-            else
-                persistentObjectHandler.remove();
+        public InstancedNPCContainer(Location location, NPCEntity npcEntity) {
+            this.location = location;
+            this.npcEntity = npcEntity;
+        }
     }
 
     /**

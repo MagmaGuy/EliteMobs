@@ -78,8 +78,9 @@ public class WorldInstantiator {
             }
         }
         int worldNumber = 0;
-        if (!numberList.isEmpty())
-            worldNumber = numberList.get(numberList.size() - 1);
+        for (int i : numberList)
+            if (i >= worldNumber)
+                worldNumber = i + 1;
         return blueprintWorldName + "_" + worldNumber;
     }
 }

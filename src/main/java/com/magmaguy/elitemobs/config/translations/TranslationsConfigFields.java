@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.config.CustomConfigFieldsInterface;
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
@@ -39,6 +40,9 @@ public class TranslationsConfigFields extends CustomConfigFields implements Cust
      */
     public TranslationsConfigFields(String filename, boolean isEnabled) {
         super(filename, isEnabled);
+        //Only process if the language is selected, translation files are very large and can cause very slow loading
+        if (!DefaultConfig.getLanguage().equals(filename)) return;
+
         //If the file doesn't exist, try to load it from the plugin resources to get the prepackaged translations
         String parsedFilename = filename;
         if (!parsedFilename.contains(".yml")) parsedFilename += ".yml";
@@ -59,6 +63,9 @@ public class TranslationsConfigFields extends CustomConfigFields implements Cust
 
     @Override
     public void processConfigFields() {
+        //Only process if the language is selected, translation files are very large and can cause very slow loading
+        if (!DefaultConfig.getLanguage().equals(filename)) return;
+
         if (MetadataHandler.PLUGIN.getResource("translations/" + filename) == null) return;
         if (customLanguage) return;
         /*
@@ -187,6 +194,7 @@ public class TranslationsConfigFields extends CustomConfigFields implements Cust
     }
 
     private String fixConfigColors(String value) {
+        if (value == null) return null;
         return value.replace("§", "&");
     }
 

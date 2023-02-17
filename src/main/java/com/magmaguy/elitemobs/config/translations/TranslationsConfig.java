@@ -26,8 +26,6 @@ public class TranslationsConfig extends CustomConfig {
      * This saves a translatable element to the configuration files.
      */
     public static String add(String filename, String key, String value) {
-        for (TranslationsConfigFields translationsConfigFields : translationConfigs.values())
-            translationsConfigFields.add(filename, key, value);
         if (DefaultConfig.getLanguage().equals("english"))
             return value;
         TranslationsConfigFields selectedLanguage = translationConfigs.get(DefaultConfig.getLanguage());
@@ -35,12 +33,11 @@ public class TranslationsConfig extends CustomConfig {
             new WarningMessage("Failed to get valid language from " + filename + " , defaulting to English!");
             return value;
         }
+        selectedLanguage.add(filename, key, value);
         return (String) selectedLanguage.get(filename, key);
     }
 
     public static List<String> add(String filename, String key, List<String> value) {
-        for (TranslationsConfigFields translationsConfigFields : translationConfigs.values())
-            translationsConfigFields.add(filename, key, value);
         if (DefaultConfig.getLanguage().equals("english"))
             return value;
         TranslationsConfigFields selectedLanguage = translationConfigs.get(DefaultConfig.getLanguage());
@@ -48,6 +45,7 @@ public class TranslationsConfig extends CustomConfig {
             new WarningMessage("Failed to get valid language from  " + filename + " , defaulting to English!");
             return value;
         }
+        selectedLanguage.add(filename, key, value);
         return (List<String>) selectedLanguage.get(filename, key);
     }
 

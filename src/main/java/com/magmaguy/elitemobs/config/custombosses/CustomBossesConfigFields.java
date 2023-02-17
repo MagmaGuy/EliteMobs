@@ -212,6 +212,9 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     @Getter
     @Setter
     private int slimeSize = 4;
+    @Getter
+    @Setter
+    private boolean neutral = false;
 
     /**
      * Creates a new default pre-made Custom Boss. The boss is further customized through a builder pattern.
@@ -369,6 +372,7 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         this.alert = processBoolean("alert", alert, false, false);
         this.removeAfterDeath = processBoolean("removeAfterDeath", removeAfterDeath, false, false);
         this.slimeSize = processInt("slimeSize", slimeSize, 4, false);
+        this.neutral = processBoolean("neutral", neutral, false, false);
     }
 
     public boolean isCustomModelExists() {
