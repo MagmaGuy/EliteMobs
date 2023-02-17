@@ -1,5 +1,5 @@
 name: EliteMobs
-version: 8.3.13
+version: 8.4.0-SNAPSHOT-1
 author: MagmaGuy
 main: com.magmaguy.elitemobs.EliteMobs
 api-version: 1.14
@@ -127,10 +127,10 @@ permissions:
     description: Allows players to interact with the NPC for upgrading Elite Items
     default: true
   elitemobs.unbind.command:
-    description: Allows players to use the unbind command to open the menu for unbinding Elite Items
+    description: Allows players to use the unbind command to open the menu to unbind Elite Items
     default: true
   elitemobs.unbind.npc:
-    description: Allows players to interact with the unbinder NPC for unbind Elite Items
+    description: Allows players to interact with the unbinder NPC to unbind Elite Items
     default: true
   elitemobs.soulbind.bypass:
     description: Allows users to bypass the soulbind restrictions. Only recommended for admins!
@@ -138,3 +138,9 @@ permissions:
   elitequest.*:
     description: Used for quest-related permissions
     default: not op
+  elitemobs.enchant.npc:
+    description: Allows players to interact with the enchanter NPC to enchant Elite Items
+    default: true
+  elitemobs.enchant.command:
+    description: Allows players to use the enchant command to enchant Elite Items
+    default: true

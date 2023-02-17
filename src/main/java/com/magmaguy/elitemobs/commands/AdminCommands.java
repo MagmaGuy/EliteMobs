@@ -62,6 +62,7 @@ public class AdminCommands {
         manager.command(builder.literal("setup")
                 .meta(CommandMeta.DESCRIPTION, "Opens the main setup menu")
                 .senderType(Player.class)
+                .senderType(Player.class)
                 .permission("elitemobs.*")
                 .handler(commandContext -> SetupHandler.setupMenuCommand((Player) commandContext.getSender())));
 
@@ -395,7 +396,22 @@ public class AdminCommands {
                 .meta(CommandMeta.DESCRIPTION, "Simulates drops from an Elite Mob from the set tier")
                 .senderType(Player.class)
                 .permission("elitemobs.*")
-                .handler(commandContext -> SimLootCommand.run((Player) commandContext.getSender(), commandContext.get("level"))));
+                .handler(commandContext -> SimLootCommand.run((Player) commandContext.getSender(), commandContext.get("level"), true)));
+
+        // /em randomloot <level>
+        manager.command(builder.literal("randomloot")
+                .argument(IntegerArgument.newBuilder("level"),
+                        ArgumentDescription.of("Level of Elite Mob to randomize"))
+                .argument(StringArgument.<CommandSender>newBuilder("player").withSuggestionsProvider(((objectCommandContext, s) -> {
+                            ArrayList<String> arrayList = new ArrayList<>();
+                            Bukkit.getOnlinePlayers().forEach(player -> arrayList.add(player.getName()));
+                            return arrayList;
+                        })),
+                        ArgumentDescription.of("Name of the player that will get the custom item"))
+                .meta(CommandMeta.DESCRIPTION, "Randomizes drops from an Elite Mob from the set level")
+                .senderType(CommandSender.class)
+                .permission("elitemobs.*")
+                .handler(commandContext -> SimLootCommand.forcePositiveLoot(commandContext.getSender(), commandContext.get("player"), commandContext.get("level"))));
 
         // /em simloot <level> <times>
         manager.command(builder.literal("simloot")
@@ -409,6 +425,17 @@ public class AdminCommands {
                 .handler(commandContext -> SimLootCommand.runMultipleTimes(
                         (Player) commandContext.getSender(),
                         commandContext.get("level"),
+                        commandContext.get("times"))));
+
+        // /em simlootspecial <times>
+        manager.command(builder.literal("simlootspecial")
+                .argument(IntegerArgument.newBuilder("times"),
+                        ArgumentDescription.of("Number of times that the simulation will run"))
+                .meta(CommandMeta.DESCRIPTION, "Simulates special drops from an Elite Mob a set amount of times")
+                .senderType(Player.class)
+                .permission("elitemobs.*")
+                .handler(commandContext -> SimLootCommand.simulateSpecialLoot(
+                        (Player) commandContext.getSender(),
                         commandContext.get("times"))));
 
         // /em simlootother <level> <player>

@@ -16,7 +16,6 @@ import com.magmaguy.elitemobs.commands.guild.AdventurersGuildCommand;
 import com.magmaguy.elitemobs.commands.quests.QuestCommand;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
-import com.magmaguy.elitemobs.config.TranslationConfig;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.items.EliteItemLore;
 import com.magmaguy.elitemobs.items.ShareItem;
@@ -84,39 +83,14 @@ public class UserCommands {
                     }
                 }));
 
-        // /em enhance
-        manager.command(builder.literal("enhance")
-                .meta(CommandMeta.DESCRIPTION, "Opens the custom item shop or teleports the player to the Adventurer's Guild Hub")
-                .senderType(Player.class)
-                .permission("elitemobs.enhancer.command")
+        // /em enchant
+        manager.command(builder.literal("enchant")
+                .meta(CommandMeta.DESCRIPTION, "Opens the enchantment menu or teleports the player to the Adventurer's Guild Hub")
+                .senderType(CommandSender.class)
+                .permission("elitemobs.enchant.command")
                 .handler(commandContext -> {
                     if (!AdventurersGuildCommand.adventurersGuildTeleport((Player) commandContext.getSender())) {
-                        EnhancementMenu enhancementMenu = new EnhancementMenu();
-                        enhancementMenu.constructEnhancementMenu((Player) commandContext.getSender());
-                    }
-                }));
-
-        // /em refine
-        manager.command(builder.literal("refine")
-                .meta(CommandMeta.DESCRIPTION, "Opens the custom item shop or teleports the player to the Adventurer's Guild Hub")
-                .senderType(Player.class)
-                .permission("elitemobs.refiner.command")
-                .handler(commandContext -> {
-                    if (!AdventurersGuildCommand.adventurersGuildTeleport((Player) commandContext.getSender())) {
-                        RefinerMenu refinerMenu = new RefinerMenu();
-                        refinerMenu.constructRefinerMenu((Player) commandContext.getSender());
-                    }
-                }));
-
-        // /em smelt
-        manager.command(builder.literal("smelt")
-                .meta(CommandMeta.DESCRIPTION, "Opens the custom item shop or teleports the player to the Adventurer's Guild Hub")
-                .senderType(Player.class)
-                .permission("elitemobs.smelt.command")
-                .handler(commandContext -> {
-                    if (!AdventurersGuildCommand.adventurersGuildTeleport((Player) commandContext.getSender())) {
-                        SmeltMenu smeltMenu = new SmeltMenu();
-                        smeltMenu.constructSmeltMenu((Player) commandContext.getSender());
+                        new ItemEnchantmentMenu((Player) commandContext.getSender());
                     }
                 }));
 
@@ -213,11 +187,11 @@ public class UserCommands {
                 /* Timeout */ 30L,
                 /* Timeout unit */ TimeUnit.SECONDS,
                 /* Action when confirmation is required */ context -> context.getCommandContext().getSender().sendMessage(
-                ChatColorConverter.convert(TranslationConfig.getEconomyTaxMessage()
+                ChatColorConverter.convert(EconomySettingsConfig.getEconomyTaxMessage()
                         .replace("$command", "/em confirm")
                         .replace("$percentage", (EconomySettingsConfig.getPlayerToPlayerTaxes() * 100) + ""))),
                 /* Action when no confirmation is pending */ sender -> sender.sendMessage(
-                ChatColorConverter.convert(TranslationConfig.getNoPendingCommands()))
+                ChatColorConverter.convert(DefaultConfig.getNoPendingCommands()))
         );
 
         // Register the confirmation processor. This will enable confirmations for commands that require it
@@ -330,7 +304,7 @@ public class UserCommands {
                 .senderType(Player.class)
                 .handler(commandContext -> {
                     PlayerData.setUseBookMenus(((Player) commandContext.getSender()), !PlayerData.getUseBookMenus(((Player) commandContext.getSender()).getUniqueId()));
-                    commandContext.getSender().sendMessage(TranslationConfig.getSwitchEMStyleMessage());
+                    commandContext.getSender().sendMessage(DefaultConfig.getSwitchEMStyleMessage());
                 }));
 
         // /em dismiss

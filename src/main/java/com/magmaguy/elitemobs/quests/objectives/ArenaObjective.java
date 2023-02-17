@@ -14,8 +14,9 @@ public class ArenaObjective extends Objective {
     @Getter
     public String arenaFilename;
 
-    protected ArenaObjective(String objectiveName) {
+    protected ArenaObjective(String objectiveName, String arenaFilename) {
         super(1, objectiveName);
+        this.arenaFilename = arenaFilename;
     }
 
     public static class ArenaObjectiveEvents implements Listener {
@@ -25,8 +26,8 @@ public class ArenaObjective extends Objective {
                 for (Quest quest : PlayerData.getQuests(player.getUniqueId()))
                     if (quest instanceof CustomQuest)
                         for (Objective objective : quest.getQuestObjectives().getObjectives())
-                            if (objective instanceof ArenaObjective &&
-                                    ((ArenaObjective) objective).arenaFilename.equals(arenaCompleteEvent.getArenaInstance().getCustomArenasConfigFields().getFilename()))
+                            if (objective instanceof ArenaObjective arenaObjective &&
+                                    arenaObjective.arenaFilename.equals(arenaCompleteEvent.getArenaInstance().getCustomArenasConfigFields().getFilename()))
                                 objective.progressObjective(quest.getQuestObjectives());
         }
     }

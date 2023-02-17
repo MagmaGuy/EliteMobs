@@ -48,6 +48,7 @@ public class InstancedBossEntity extends RegionalBossEntity implements Persisten
             newLocation.setWorld(newWorld);
             InstancedBossEntity newEntity = new InstancedBossEntity(containers.getCustomBossesConfigFields(), newLocation, dungeonInstance);
             //Set the health multipliers
+            //todo: reenable this - critical and check if it currently doesn't add anything
             //newEntity.setHealthMultiplier(calculateHealthMultiplier(newEntity.healthMultiplier, playerCount));
             newEntity.spawn(false);
             newDungeonList.add(newEntity);

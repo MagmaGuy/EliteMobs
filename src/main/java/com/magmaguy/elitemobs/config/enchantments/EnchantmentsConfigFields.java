@@ -12,7 +12,7 @@ public class EnchantmentsConfigFields extends CustomConfigFields {
     @Getter
     private double value = 1;
     @Getter
-    private Enchantment enchantment = Enchantment.DAMAGE_ALL;
+    private Enchantment enchantment = null;
 
     public EnchantmentsConfigFields(String filename,
                                     boolean isEnabled,

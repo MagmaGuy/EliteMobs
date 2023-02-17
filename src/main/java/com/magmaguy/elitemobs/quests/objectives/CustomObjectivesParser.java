@@ -21,27 +21,6 @@ public class CustomObjectivesParser {
 
         for (Map<String, Object> maps : customQuest.getCustomQuestsConfigFields().getCustomObjectives().values())
             objectives.add(processObjectiveType(maps, customQuest));
-        /*
-        for (String string : customQuest.getCustomQuestsConfigFields().getCustomObjectivesList()) {
-            String[] rawStrings = string.split(":");
-            switch (rawStrings[0]) {
-                case "KILL_CUSTOM":
-                    objectives.add(processObjectiveType(rawStrings, ObjectiveType.KILL_CUSTOM, customQuest));
-                    break;
-                case "FETCH_ITEM":
-                    objectives.add(processObjectiveType(rawStrings, ObjectiveType.FETCH_ITEM, customQuest));
-                    break;
-                case "DIALOG":
-                    objectives.add(processObjectiveType(rawStrings, ObjectiveType.DIALOG, customQuest));
-                    break;
-                case "ARENA":
-                    objectives.add(processObjectiveType(rawStrings, ObjectiveType.ARENA, customQuest));
-                default:
-                    new WarningMessage("Entry " + string + " for quest " + customQuest.getCustomQuestsConfigFields().getFilename() + " is not valid! Check the documentation on how to create valid quest objectives on the wiki!");
-                    return new ArrayList<>();
-            }
-        }
-         */
         return objectives;
     }
 
@@ -88,6 +67,8 @@ public class CustomObjectivesParser {
                 return new CustomFetchObjective(amount, name, filename);
             else if (objectiveType.equals(ObjectiveType.DIALOG))
                 return new DialogObjective(filename, name, location, dialog);
+            else if (objectiveType.equals(ObjectiveType.ARENA))
+                return new ArenaObjective(name, filename);
         } catch (Exception ex) {
             new WarningMessage("Failed to register objective type for quest " + customQuest.getCustomQuestsConfigFields().getFilename() + " ! This quest will be skipped");
             new WarningMessage("Invalid entry: " + rawMap.toString());

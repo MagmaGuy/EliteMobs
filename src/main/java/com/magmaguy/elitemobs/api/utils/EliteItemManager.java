@@ -254,12 +254,6 @@ public class EliteItemManager {
         return getArmorLevel(itemStack) > 0;
     }
 
-    public static double getDamageAtNextItemLevel(@Nullable ItemStack itemStack) {
-        double attackDamage = getBaseDamage(itemStack);
-        double attackSpeed = getAttackSpeed(itemStack);
-        return CombatSystem.DPS_PER_LEVEL / 1 / attackSpeed + attackDamage;
-    }
-
     public static void setEliteLevel(@Nullable ItemStack itemStack, int level) {
         if (itemStack == null) return;
         registerEliteItem(itemStack);

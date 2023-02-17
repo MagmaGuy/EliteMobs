@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.items.customenchantments;
 
 import com.magmaguy.elitemobs.items.EliteItemLore;
+import com.magmaguy.elitemobs.utils.Developer;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -18,6 +19,7 @@ public class UnbindEnchantment extends CustomEnchantment {
         itemMeta.getPersistentDataContainer().remove(SoulbindEnchantment.PRESTIGE_KEY);
         newItemStack.setItemMeta(itemMeta);
         new EliteItemLore(newItemStack, false);
+        Developer.message("unbound item!");
         return newItemStack;
     }
 

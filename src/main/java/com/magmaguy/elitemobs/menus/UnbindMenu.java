@@ -4,7 +4,6 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
-import com.magmaguy.elitemobs.config.menus.premade.ProceduralShopMenuConfig;
 import com.magmaguy.elitemobs.config.menus.premade.UnbinderMenuConfig;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.customenchantments.UnbindEnchantment;
@@ -26,15 +25,16 @@ import java.util.*;
 
 public class UnbindMenu extends EliteMenu {
     private static final int eliteItemInputSlot = UnbinderMenuConfig.getEliteItemInputSlot();
-    private static final int scrapItemInputSlot = UnbinderMenuConfig.getEliteUnbindInputSlot();
+    private static final int unbindScrollItemInputSlot = UnbinderMenuConfig.getEliteUnbindInputSlot();
     private static final int outputSlot = UnbinderMenuConfig.getOutputSlot();
     private static final int eliteItemInformationInputSlot = UnbinderMenuConfig.getEliteItemInputInformationSlot();
-    private static final int eliteScrapInformationInputSlot = UnbinderMenuConfig.getEliteScrapInputInformationSlot();
+    private static final int unbindScrollInformationInputSlot = UnbinderMenuConfig.getEliteScrapInputInformationSlot();
     private static final int informationOutputSlot = UnbinderMenuConfig.getOutputInformationSlot();
     public static Set<Inventory> inventories = new HashSet<>();
 
     private static void calculateOutput(Inventory UnbinderInventory) {
-        if (UnbinderInventory.getItem(UnbinderMenuConfig.getEliteUnbindInputSlot()) == null || UnbinderInventory.getItem(UnbinderMenuConfig.getEliteItemInputSlot()) == null) {
+        if (UnbinderInventory.getItem(UnbinderMenuConfig.getEliteUnbindInputSlot()) == null ||
+                UnbinderInventory.getItem(UnbinderMenuConfig.getEliteItemInputSlot()) == null) {
             UnbinderInventory.setItem(UnbinderMenuConfig.getOutputSlot(), null);
             return;
         }
@@ -77,7 +77,7 @@ public class UnbindMenu extends EliteMenu {
                 continue;
             }
 
-            if (i == eliteScrapInformationInputSlot) {
+            if (i == unbindScrollInformationInputSlot) {
                 UnbinderInventory.setItem(i, UnbinderMenuConfig.getEliteUnbindInputInfoButton());
                 continue;
             }
@@ -138,9 +138,8 @@ public class UnbindMenu extends EliteMenu {
             if (isBottomMenu(event)) {
                 //Item is unbind scroll
                 if (ItemTagger.hasEnchantment(currentItem.getItemMeta(), UnbindEnchantment.key)) {
-                    if (unbinderInventory.getItem(scrapItemInputSlot) == null) {
-                        unbinderInventory.setItem(scrapItemInputSlot, currentItem);
-                        playerInventory.clear(clickedSlot);
+                    if (unbinderInventory.getItem(unbindScrollItemInputSlot) == null) {
+                        moveOneItemUp(unbindScrollItemInputSlot, event);
                         calculateOutput(unbinderInventory);
                     }
                     return;
@@ -157,15 +156,11 @@ public class UnbindMenu extends EliteMenu {
 
             } else if (isTopMenu(event)) {
 
-                if (!inventoryHasFreeSlots) {
-                    player.sendMessage(ProceduralShopMenuConfig.messageFullInventory);
-                    player.closeInventory();
-                }
+                if (currentItem == null) return;
 
                 //return item to inventory
-                if (event.getSlot() == scrapItemInputSlot || event.getSlot() == eliteItemInputSlot) {
-                    playerInventory.addItem(currentItem);
-                    unbinderInventory.remove(currentItem);
+                if (event.getSlot() == unbindScrollItemInputSlot || event.getSlot() == eliteItemInputSlot) {
+                    moveItemDown(event.getView().getTopInventory(), clickedSlot, player);
                     calculateOutput(unbinderInventory);
                     return;
                 }
@@ -181,8 +176,10 @@ public class UnbindMenu extends EliteMenu {
                     if (unbinderInventory.getItem(outputSlot) != null) {
                         unbinderInventory.setItem(UnbinderMenuConfig.getEliteItemInputSlot(), null);
                         unbinderInventory.setItem(UnbinderMenuConfig.getEliteUnbindInputSlot(), null);
-                        playerInventory.addItem(unbinderInventory.getItem(outputSlot));
-                        unbinderInventory.remove(unbinderInventory.getItem(outputSlot));
+                        if (unbinderInventory.getItem(outputSlot) != null) {
+                            player.getWorld().dropItem(player.getLocation(), unbinderInventory.getItem(outputSlot));
+                            unbinderInventory.remove(unbinderInventory.getItem(outputSlot));
+                        }
                         unbinderInventory.setItem(outputSlot, null);
                     }
                 }
@@ -195,7 +192,7 @@ public class UnbindMenu extends EliteMenu {
         public void onClose(InventoryCloseEvent event) {
             if (inventories.contains(event.getInventory())) {
                 inventories.remove(event.getInventory());
-                EliteMenu.cancel(event.getPlayer(), event.getView().getTopInventory(), event.getView().getBottomInventory(), Arrays.asList(eliteItemInputSlot, scrapItemInputSlot));
+                EliteMenu.cancel(event.getPlayer(), event.getView().getTopInventory(), event.getView().getBottomInventory(), Arrays.asList(eliteItemInputSlot, unbindScrollItemInputSlot));
             }
         }
 

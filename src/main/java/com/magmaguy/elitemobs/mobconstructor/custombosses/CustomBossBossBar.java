@@ -2,8 +2,8 @@ package com.magmaguy.elitemobs.mobconstructor.custombosses;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
-import com.magmaguy.elitemobs.config.TranslationConfig;
 import com.magmaguy.elitemobs.utils.Round;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -43,7 +43,7 @@ public class CustomBossBossBar {
             if (!player.getWorld().equals(customBossEntity.getLocation().getWorld())) continue;
             TextComponent interactiveMessage = new TextComponent(MobCombatSettingsConfig.getBossLocationMessage());
             interactiveMessage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/elitemobs trackcustomboss " + customBossEntity.getEliteUUID()));
-            interactiveMessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(TranslationConfig.getTrackMessage().replace("$name", customBossEntity.getName())).create()));
+            interactiveMessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(DefaultConfig.getTrackMessage().replace("$name", customBossEntity.getName())).create()));
             player.spigot().sendMessage(interactiveMessage);
         }
     }

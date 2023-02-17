@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
-import com.magmaguy.elitemobs.config.TranslationConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.utils.Round;
 import org.bukkit.Bukkit;
@@ -34,7 +33,7 @@ public class CurrencyCommandsHandler {
         if (senderCurrency - amount < 0) {
             sender.sendMessage(
                     ChatColorConverter.convert(
-                            TranslationConfig.getEconomyPaymentInsufficientCurrency()
+                            EconomySettingsConfig.getEconomyPaymentInsufficientCurrency()
                                     .replace("$currency_name", EconomySettingsConfig.getCurrencyName())));
             return;
         }
@@ -48,7 +47,7 @@ public class CurrencyCommandsHandler {
 
         sender.sendMessage(
                 ChatColorConverter.convert(
-                        TranslationConfig.getEconomyPayMessage()
+                        EconomySettingsConfig.getEconomyPayMessage()
                                 .replace("$amount_sent", amount + "")
                                 .replace("$amount_received", actuallyReceivedAmount + "")
                                 .replace("$taxes", taxes + "")
@@ -57,13 +56,13 @@ public class CurrencyCommandsHandler {
 
         sender.sendMessage(
                 ChatColorConverter.convert(
-                        TranslationConfig.getEconomyCurrencyLeftMessage()
+                        EconomySettingsConfig.getEconomyCurrencyLeftMessage()
                                 .replace("$amount_left", String.valueOf(EconomyHandler.checkCurrency(sender.getUniqueId())))
                                 .replace("$currency_name", EconomySettingsConfig.getCurrencyName())));
 
         recipient.sendMessage(
                 ChatColorConverter.convert(
-                        TranslationConfig.getEconomyPaymentReceivedMessage()
+                        EconomySettingsConfig.getEconomyPaymentReceivedMessage()
                                 .replace("$amount_sent", amount + "")
                                 .replace("$amount_received", actuallyReceivedAmount + "")
                                 .replace("$taxes", taxes + "")
@@ -72,7 +71,7 @@ public class CurrencyCommandsHandler {
 
         recipient.sendMessage(
                 ChatColorConverter.convert(
-                        TranslationConfig.getEconomyCurrencyLeftMessage()
+                        EconomySettingsConfig.getEconomyCurrencyLeftMessage()
                                 .replace("$amount_left", String.valueOf(EconomyHandler.checkCurrency(recipient.getUniqueId())))
                                 .replace("$currency_name", EconomySettingsConfig.getCurrencyName())));
 
@@ -138,7 +137,7 @@ public class CurrencyCommandsHandler {
     public static void walletCommand(Player player) {
         player.sendMessage(
                 ChatColorConverter.convert(
-                        TranslationConfig.getEconomyWalletCommand()
+                        EconomySettingsConfig.getEconomyWalletCommand()
                                 .replace("$balance", String.valueOf(EconomyHandler.checkCurrency(player.getUniqueId())))
                                 .replace("$currency_name", EconomySettingsConfig.getCurrencyName())));
     }

@@ -45,6 +45,7 @@ public class EliteItemLore {
     private Player soulboundPlayer = null;
     private List<String> customLore = new ArrayList<>();
     private int prestigeLevel = 0;
+    private int enchantmentCount = 0;
 
 
     public EliteItemLore(ItemStack itemStack, boolean showItemWorth) {
@@ -82,12 +83,13 @@ public class EliteItemLore {
         writeNewLore();
 
         this.itemMeta.setLore(lore);
+        ItemTagger.registerEnchantmentCount(itemMeta, enchantmentCount);
         this.itemStack.setItemMeta(this.itemMeta);
 
     }
 
     private void constructVanillaEnchantments() {
-        for (Enchantment enchantment : itemMeta.getEnchants().keySet())
+        for (Enchantment enchantment : itemMeta.getEnchants().keySet()) {
             if (enchantment.getName().contains("CURSE"))
                 vanillaEnchantmentsLore.add(ChatColorConverter.convert(
                         "&c" + EnchantmentsConfig.getEnchantment(enchantment).getName() + " "
@@ -96,6 +98,8 @@ public class EliteItemLore {
                 vanillaEnchantmentsLore.add(ChatColorConverter.convert(
                         "&7" + EnchantmentsConfig.getEnchantment(enchantment).getName() + " "
                                 + itemMeta.getEnchants().get(enchantment)));
+            enchantmentCount += itemMeta.getEnchantLevel(enchantment);
+        }
     }
 
     private void parseAllEliteEnchantments() {
@@ -112,8 +116,11 @@ public class EliteItemLore {
 
     private void parseEliteEnchantments(Enchantment enchantment) {
         int enchantmentLevel = ItemTagger.getEnchantment(itemMeta, enchantment.getKey());
-        if (enchantmentLevel > enchantment.getMaxLevel())
-            eliteVanillaEnchantments.put(enchantment, enchantmentLevel - enchantment.getMaxLevel());
+        if (enchantmentLevel > enchantment.getMaxLevel()) {
+            int eliteLevel = enchantmentLevel - enchantment.getMaxLevel();
+            eliteVanillaEnchantments.put(enchantment, eliteLevel);
+            enchantmentCount += eliteLevel;
+        }
     }
 
     private void constructEliteEnchantments() {
@@ -129,10 +136,12 @@ public class EliteItemLore {
      * Note: This excludes the soulbind enchantment as it doesn't store an integer value
      */
     private void parseCustomEnchantments() {
-        for (CustomEnchantment customEnchantment : CustomEnchantment.getCustomEnchantments()) {
+        for (CustomEnchantment customEnchantment : CustomEnchantment.getCustomEnchantmentMap().values()) {
             int enchantmentLevel = ItemTagger.getEnchantment(itemMeta, customEnchantment.getKey());
-            if (enchantmentLevel > 0)
+            if (enchantmentLevel > 0) {
                 customEnchantments.put(customEnchantment, enchantmentLevel);
+                enchantmentCount += enchantmentLevel;
+            }
         }
     }
 
