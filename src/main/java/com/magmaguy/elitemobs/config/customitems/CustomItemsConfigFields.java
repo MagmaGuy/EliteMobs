@@ -45,6 +45,9 @@ public class CustomItemsConfigFields extends CustomConfigFields implements Custo
     @Getter
     @Setter
     private int level = 0;
+    @Getter
+    @Setter
+    private boolean soulbound = true;
 
     public CustomItemsConfigFields(String fileName,
                                    boolean isEnabled,
@@ -71,13 +74,14 @@ public class CustomItemsConfigFields extends CustomConfigFields implements Custo
         this.material = processEnum("material", material, Material.WOODEN_SWORD, Material.class, true);
         this.name = translatable(filename, "name", processString("name", name, "Default name", true));
         this.lore = translatable(filename, "lore", processStringList("lore", lore, new ArrayList<>(), true));
-        this.enchantments = processStringList("enchantments", enchantments, new ArrayList<>(), false);
-        this.potionEffects = processStringList("potionEffects", potionEffects, new ArrayList<>(), false);
+        this.enchantments = processStringList("enchantments", enchantments, null, false);
+        this.potionEffects = processStringList("potionEffects", potionEffects, null, false);
         this.dropWeight = processString("dropWeight", dropWeight, "dynamic", false);
         this.scalability = processEnum("scalability", scalability, CustomItem.Scalability.SCALABLE, CustomItem.Scalability.class, false);
         this.itemType = processEnum("itemType", itemType, CustomItem.ItemType.CUSTOM, CustomItem.ItemType.class, false);
         this.customModelID = processInt("customModelID", customModelID, -1, false);
         this.permission = processString("permission", permission, "", false);
         this.level = processInt("level", level, 0, false);
+        this.soulbound = processBoolean("soulbound", soulbound, true, false);
     }
 }

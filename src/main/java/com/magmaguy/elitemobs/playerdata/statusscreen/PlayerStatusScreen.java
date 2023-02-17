@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.playerdata.statusscreen;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.DefaultConfig;
-import com.magmaguy.elitemobs.config.TranslationConfig;
 import com.magmaguy.elitemobs.config.menus.premade.PlayerStatusMenuConfig;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.thirdparty.geyser.GeyserDetector;
@@ -38,7 +37,7 @@ public class PlayerStatusScreen implements Listener {
             generateBook(player, player);
         }
         if (!PlayerData.getDismissEMStatusScreenMessage(player.getUniqueId()) && !DefaultConfig.isOnlyUseBedrockMenus()) {
-            player.sendMessage(TranslationConfig.getDismissEMMessage());
+            player.sendMessage(DefaultConfig.getDismissEMMessage());
         }
     }
 

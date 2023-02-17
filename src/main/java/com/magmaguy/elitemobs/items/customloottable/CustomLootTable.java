@@ -51,10 +51,6 @@ public class CustomLootTable implements Serializable {
                     case "minecraft":
                         new VanillaCustomLootEntry(entries, rawString, filename);
                         break;
-                    case "scrap":
-                    case "upgrade_item":
-                        new SpecialCustomLootEntry(entries, rawString, filename);
-                        break;
                     default:
                         if (rawString.toLowerCase(Locale.ROOT).contains("currencyamount="))
                             new CurrencyCustomLootEntry(entries, rawString, filename);

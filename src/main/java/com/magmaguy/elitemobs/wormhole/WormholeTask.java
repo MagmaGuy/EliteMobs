@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.wormhole;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
-import com.magmaguy.elitemobs.config.TranslationConfig;
 import com.magmaguy.elitemobs.config.WormholesConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldowns;
@@ -76,7 +75,7 @@ public class WormholeTask {
         if (wormholeEntry.getWormhole().getWormholeConfigFields().getCoinCost() > 0) {
             double coinCost = wormholeEntry.getWormhole().getWormholeConfigFields().getCoinCost() + wormholeEntry.getWormhole().getWormholeConfigFields().getCoinCost() * GuildRank.currencyBonusMultiplier(player.getUniqueId());
             if (EconomyHandler.checkCurrency(player.getUniqueId()) < coinCost) {
-                player.sendMessage(ChatColorConverter.convert(TranslationConfig.getInsufficientCurrencyForWormholeMessage()).replace("$amount", "" + coinCost));
+                player.sendMessage(ChatColorConverter.convert(WormholesConfig.getInsufficientCurrencyForWormholeMessage()).replace("$amount", "" + coinCost));
                 return false;
             } else EconomyHandler.subtractCurrency(player.getUniqueId(), coinCost);
         }

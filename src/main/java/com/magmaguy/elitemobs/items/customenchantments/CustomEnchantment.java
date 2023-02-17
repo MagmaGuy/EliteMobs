@@ -4,17 +4,19 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfigFields;
 import com.magmaguy.elitemobs.items.ItemTagger;
+import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 
 public abstract class CustomEnchantment {
 
-    private static final ArrayList<CustomEnchantment> customEnchantments = new ArrayList<>();
+    @Getter
+    private static final HashMap<String, CustomEnchantment> customEnchantmentMap = new HashMap();
     public final String key;
     private final boolean dynamic;
     private final EnchantmentsConfigFields enchantmentsConfigFields;
@@ -24,11 +26,7 @@ public abstract class CustomEnchantment {
         this.key = key;
         this.dynamic = dynamic;
         this.enchantmentsConfigFields = EnchantmentsConfig.getEnchantment(key + ".yml");
-        customEnchantments.add(this);
-    }
-
-    public static ArrayList<CustomEnchantment> getCustomEnchantments() {
-        return customEnchantments;
+        customEnchantmentMap.put(enchantmentsConfigFields.getFilename(), this);
     }
 
     public static void initializeCustomEnchantments() {
@@ -46,6 +44,16 @@ public abstract class CustomEnchantment {
         new GrapplingHookEnchantment();
         new EarthquakeEnchantment();
         new LoudStrikesEnchantment();
+        new RepairEnchantment();
+        new LuckySourceEnchantment();
+        new EnchantedSourceEnchantment();
+    }
+
+    public static boolean isCustomEnchantment(String enchantmentFilename) {
+        for (CustomEnchantment customEnchantment : customEnchantmentMap.values())
+            if (customEnchantment.getKey().equalsIgnoreCase(enchantmentFilename))
+                return true;
+        return false;
     }
 
     /*

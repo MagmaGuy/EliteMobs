@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.api;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.CombatTagConfig;
-import com.magmaguy.elitemobs.config.TranslationConfig;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -63,13 +62,13 @@ public class PlayerPreTeleportEvent extends Event implements Cancellable {
 
                 if (isCancelled) {
                     player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                            TextComponent.fromLegacyText(ChatColorConverter.convert(TranslationConfig.getTeleportCancelled())));
+                            TextComponent.fromLegacyText(ChatColorConverter.convert(CombatTagConfig.getTeleportCancelled())));
                     cancel();
                     return;
                 }
 
                 player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                        TextComponent.fromLegacyText(ChatColorConverter.convert(TranslationConfig.getTeleportTimeLeft())
+                        TextComponent.fromLegacyText(ChatColorConverter.convert(CombatTagConfig.getTeleportTimeLeft())
                                 .replace("$time", timerLeft + "")));
 
 

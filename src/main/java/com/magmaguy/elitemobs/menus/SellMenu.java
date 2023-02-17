@@ -5,7 +5,6 @@ import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
-import com.magmaguy.elitemobs.config.TranslationConfig;
 import com.magmaguy.elitemobs.config.menus.premade.SellMenuConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.items.ItemWorthCalculator;
@@ -132,13 +131,13 @@ public class SellMenu extends EliteMenu implements Listener {
 
             //Check if it's an elitemobs item. The soulbind check only says if the player would be able to pick it up, and vanilla items can be picked up
             if (!EliteItemManager.isEliteMobsItem(event.getCurrentItem())) {
-                event.getWhoClicked().sendMessage(ChatColorConverter.convert(TranslationConfig.getShopSaleInstructions()));
+                event.getWhoClicked().sendMessage(ChatColorConverter.convert(EconomySettingsConfig.getShopSaleInstructions()));
                 return;
             }
 
             //If the item isn't soulbound to the player, it can't be sold by that player
             if (!SoulbindEnchantment.isValidSoulbindUser(currentItem.getItemMeta(), player)) {
-                player.sendMessage(ChatColorConverter.convert(TranslationConfig.getShopSaleOthersItems()));
+                player.sendMessage(ChatColorConverter.convert(EconomySettingsConfig.getShopSaleOthersItems()));
                 return;
             }
 
@@ -181,7 +180,7 @@ public class SellMenu extends EliteMenu implements Listener {
 
                     if (amount < 4)
                         player.sendMessage(ChatColorConverter.convert(
-                                TranslationConfig.getShopSellMessage()
+                                EconomySettingsConfig.getShopSellMessage()
                                         .replace("$item_name", itemStack.getItemMeta().getDisplayName())
                                         .replace("$currency_amount", Round.twoDecimalPlaces(itemValue) + "")
                                         .replace("$currency_name", EconomySettingsConfig.getCurrencyName())));
@@ -190,12 +189,12 @@ public class SellMenu extends EliteMenu implements Listener {
 
                 if (amount >= 3)
                     player.sendMessage(ChatColorConverter.convert(
-                            TranslationConfig.getShopBatchSellMessage()
+                            EconomySettingsConfig.getShopBatchSellMessage()
                                     .replace("$currency_amount", totalItemValue + "")
                                     .replace("$currency_name", EconomySettingsConfig.getCurrencyName())));
 
                 player.sendMessage(ChatColorConverter.convert(
-                        TranslationConfig.getShopCurrentBalance()
+                        EconomySettingsConfig.getShopCurrentBalance()
                                 .replace("$currency_amount", EconomyHandler.checkCurrency(player.getUniqueId()) + "")
                                 .replace("$currency_name", EconomySettingsConfig.getCurrencyName())));
                 updateConfirmButton(0);

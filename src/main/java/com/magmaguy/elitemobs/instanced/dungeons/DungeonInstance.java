@@ -12,6 +12,7 @@ import com.magmaguy.elitemobs.dungeons.utility.DungeonUtils;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.InstancedBossEntity;
+import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.utils.*;
 import lombok.Getter;
@@ -64,6 +65,7 @@ public class DungeonInstance extends MatchInstance {
         setDifficulty(difficultyName);
         addNewPlayer(player);
         instancedBossEntities = InstancedBossEntity.initializeInstancedBosses(dungeonPackagerConfigFields.getWorldName(), world, players.size(), this);
+        NPCEntity.initializeInstancedNPCs(dungeonPackagerConfigFields.getWorldName(), world, players.size(), this);
         dungeonInstances.add(this);
     }
 

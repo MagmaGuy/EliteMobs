@@ -5,10 +5,7 @@ import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.menus.MenusConfigFields;
 import com.magmaguy.elitemobs.items.customloottable.*;
-import com.magmaguy.elitemobs.quests.objectives.CustomFetchObjective;
-import com.magmaguy.elitemobs.quests.objectives.CustomKillObjective;
-import com.magmaguy.elitemobs.quests.objectives.DialogObjective;
-import com.magmaguy.elitemobs.quests.objectives.Objective;
+import com.magmaguy.elitemobs.quests.objectives.*;
 import com.magmaguy.elitemobs.quests.rewards.QuestReward;
 import lombok.Getter;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -66,6 +63,7 @@ public class CustomQuestMenuConfig extends MenusConfigFields {
     private static String killQuestDefaultSummaryLine;
     private static String fetchQuestDefaultSummaryLine;
     private static String dialogQuestDefaultSummaryLine;
+    private static String arenaQuestDefaultSummaryLine;
     private static String rewardsDefaultSummaryLine;
     @Getter
     private static boolean useQuestTracking;
@@ -83,6 +81,8 @@ public class CustomQuestMenuConfig extends MenusConfigFields {
             newString = dialogQuestDefaultSummaryLine.replace("$location", ((DialogObjective) objective).getTargetLocation());
         else if (objective instanceof CustomFetchObjective)
             newString = fetchQuestDefaultSummaryLine;
+        else if (objective instanceof ArenaObjective)
+            newString = arenaQuestDefaultSummaryLine;
         newString = newString.replace("$name", ChatColor.BLACK + ChatColor.stripColor(objective.getObjectiveName()));
         newString = newString.replace("$current", objective.getCurrentAmount() + "");
         newString = newString.replace("$target", objective.getTargetAmount() + "");
@@ -99,8 +99,6 @@ public class CustomQuestMenuConfig extends MenusConfigFields {
             ItemStack itemStack = null;
             if (customLootEntry instanceof EliteCustomLootEntry)
                 itemStack = ((EliteCustomLootEntry) customLootEntry).generateItemStack(questReward.getRewardLevel(), Bukkit.getPlayer(questReward.getPlayerUUID()), null);
-            else if (customLootEntry instanceof SpecialCustomLootEntry)
-                itemStack = ((SpecialCustomLootEntry) customLootEntry).generateItemStack(Bukkit.getPlayer(questReward.getPlayerUUID()));
             else if (customLootEntry instanceof ItemStackCustomLootEntry)
                 itemStack = ((ItemStackCustomLootEntry) customLootEntry).generateItemStack();
             if (itemStack != null) {
@@ -168,6 +166,7 @@ public class CustomQuestMenuConfig extends MenusConfigFields {
         killQuestDefaultSummaryLine = ConfigurationEngine.setString(file, fileConfiguration, "killQuestDefaultSummaryLine", "&c➤Kill $name:$color$current&0/$color$target", true);
         fetchQuestDefaultSummaryLine = ConfigurationEngine.setString(file, fileConfiguration, "fetchQuestDefaultSummaryLine", "&c➤Get $name:$color&$current&0/$color$target", true);
         dialogQuestDefaultSummaryLine = ConfigurationEngine.setString(file, fileConfiguration, "dialogQuestDefaultSummaryLine", "&c➤Go talk to $name $location", true);
+        arenaQuestDefaultSummaryLine =  ConfigurationEngine.setString(file, fileConfiguration, "arenaQuestDefaultSummaryLine", "&c➤Complete $arenaName", true);
 
         rewardsLine = ConfigurationEngine.setString(file, fileConfiguration, "rewardsLine", "&2&lRewards:", true);
         rewardsDefaultSummaryLine = ConfigurationEngine.setString(file, fileConfiguration, "rewardsDefaultSummaryLine", "&2➤$amountx $rewardName &8($chance%)", true);

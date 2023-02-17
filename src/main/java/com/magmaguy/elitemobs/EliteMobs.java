@@ -43,6 +43,7 @@ import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.PluginMobProperties;
 import com.magmaguy.elitemobs.mobs.passive.EggRunnable;
 import com.magmaguy.elitemobs.mobs.passive.PassiveEliteMobDeathHandler;
+import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.powerstances.MajorPowerStanceMath;
@@ -84,14 +85,13 @@ public class EliteMobs extends JavaPlugin {
 
     public static void initializeConfigs() {
         //Initialized translations
-        new TranslationsConfig();
         DefaultConfig.initializeConfig();
+        new TranslationsConfig();
         SchematicsFolderConfig.initializeConfigs();
         ResourcePackDataConfig.initializeConfig();
         ItemSettingsConfig.initializeConfig();
         ProceduralItemGenerationSettingsConfig.initializeConfig();
         PotionEffectsConfig.initializeConfigs();
-        TranslationConfig.initializeConfig();
         EconomySettingsConfig.initializeConfig();
         EventsConfig.initializeConfig();
         new EnchantmentsConfig();
@@ -114,6 +114,7 @@ public class EliteMobs extends JavaPlugin {
         QuestsConfig.initializeConfig();
         WormholesConfig.initializeConfig();
         ArenasConfig.initializeConfig();
+
     }
 
     public static void worldScanner() {
@@ -272,7 +273,8 @@ public class EliteMobs extends JavaPlugin {
         try {
             new CustomSpawnConfig();
         } catch (Exception ex) {
-            new WarningMessage("You are using a version of Spigot or a branch thereof (Paper, Purpur, so on) that is (probably) HORRIBLY outdated!" + " This issue will probably be fixed if you update your server version to the latest patch of the version you are running.");
+            new WarningMessage("You are using a version of Spigot or a branch thereof (Paper, Purpur, so on) that is (probably) HORRIBLY outdated!" + " This issue will probably be fixed if you update your server version to the latest patch of the version" +
+                    " you are running.");
             new WarningMessage(" This does not mean that you have to update your Minecraft version, but it does mean you must update your server version to the latest patch" + " available for that Minecraft version. Download from trustworthy sources, as if you download Spigot from some random website other than Spigot," + " you are probably not getting the latest version (and also there's a high chance you'll get a virus).");
         }
 
@@ -280,6 +282,8 @@ public class EliteMobs extends JavaPlugin {
 
         //Commands
         new CommandHandler();
+
+        SpecialItemsConfig.initializeConfig();
 
         /*
         Check for new plugin version or for dungeon updates
@@ -321,6 +325,7 @@ public class EliteMobs extends JavaPlugin {
         RegionalBossEntity.getTrackableCustomBosses().clear();
         RegionalBossEntity.getRegionalBossEntitySet().clear();
         InstancedBossEntity.shutdown();
+        NPCEntity.shutdown();
 
         new InfoMessage("Wiping Elite entities clean...");
         PersistentObjectHandler.shutdown();
@@ -337,12 +342,12 @@ public class EliteMobs extends JavaPlugin {
         new InfoMessage("Clearing config regional elites...");
         CustomBossesConfigFields.getRegionalElites().clear();
         new InfoMessage("Clearing custom enchantments...");
-        CustomEnchantment.getCustomEnchantments().clear();
+        CustomEnchantment.getCustomEnchantmentMap().clear();
         new InfoMessage("Clearing custom items...");
         CustomItem.getCustomItems().clear();
         CustomItem.getCustomItemStackList().clear();
         CustomItem.getCustomItemStackShopList().clear();
-        CustomItem.getLimitedItem().clear();
+        CustomItem.getLimitedItems().clear();
         CustomItem.getScalableItems().clear();
         CustomItem.getFixedItems().clear();
         CustomItem.getTieredLoot().clear();

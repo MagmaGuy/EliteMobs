@@ -7,6 +7,7 @@ import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * Created by MagmaGuy on 17/06/2017.
@@ -52,6 +53,35 @@ public class EconomySettingsConfig {
     private static FileConfiguration thisConfiguration;
     @Getter
     private static double playerToPlayerTaxes;
+    @Getter
+    private static String economyPayMessage;
+    @Getter
+    private static String economyCurrencyLeftMessage;
+    @Getter
+    private static String economyPaymentReceivedMessage;
+    @Getter
+    private static String economyPaymentInsufficientCurrency;
+    @Getter
+    private static String economyWalletCommand;
+    @Getter
+    private static String economyTaxMessage;
+    @Getter
+    private static String shopBuyMessage;
+    @Getter
+    private static String shopSellMessage;
+    @Getter
+    private static String shopInsufficientFundsMessage;
+    @Getter
+    private static String shopSaleInstructions;
+    @Getter
+    private static String shopSaleOthersItems;
+    @Getter
+    private static String shopCurrentBalance;
+    @Getter
+    private static String shopItemPrice;
+    @Getter
+    private static String shopBatchSellMessage;
+
 
     private EconomySettingsConfig() {
     }
@@ -68,16 +98,36 @@ public class EconomySettingsConfig {
         double stoneChainLevel = CombatSystem.STONE_CHAIN_TIER_LEVEL + 10D;
         double goldWoodLeatherLevel = CombatSystem.GOLD_WOOD_LEATHER_TIER_LEVEL + 10D;
 
-        enableEconomy = ConfigurationEngine.setBoolean(fileConfiguration, "enableEconomy", true);
-        resaleValue = ConfigurationEngine.setDouble(fileConfiguration, "itemResaleValue", 5);
-        currencyName = ConfigurationEngine.setString(file, fileConfiguration, "currencyName", "Elite Coins", true);
-        useVault = ConfigurationEngine.setBoolean(fileConfiguration, "useVault - not recommended", false);
-        enableCurrencyShower = ConfigurationEngine.setBoolean(fileConfiguration, "enableCurrencyShower", true);
-        currencyShowerMultiplier = ConfigurationEngine.setDouble(fileConfiguration, "currencyShowerTierMultiplier", 1D);
-        chatCurrencyShowerMessage = ConfigurationEngine.setString(file, fileConfiguration, "chatCurrencyShowerMessage", "&7[EM] You've picked up &a$amount $currency_name!", true);
-        actionBarCurrencyShowerMessage = ConfigurationEngine.setString(file, fileConfiguration, "actionbarCurrencyShowerMessage", "&7[EM] You've picked up &a$amount $currency_name!", true);
-        lootShowerMaterial1 = ConfigurationEngine.setString(file, fileConfiguration, "lootShowerMaterial.1", Material.GOLD_NUGGET.name(), false);
-        ConfigurationEngine.setInt(fileConfiguration, "lootShowerData.1", 1);
+        enableEconomy = ConfigurationEngine.setBoolean(
+                List.of("Sets if the EliteMobs economy is enabled. This means elite coins, the ability to buy and sell gear and the ability to upgrade guild ranks", "If disabled, players will not be able to progress in the plugin!"),
+                fileConfiguration, "enableEconomy", true);
+        resaleValue = ConfigurationEngine.setDouble(
+                List.of("Sets the resale item of items, as a % of the original price. 5 is 5%"),
+                fileConfiguration, "itemResaleValue", 5);
+        currencyName = ConfigurationEngine.setString(
+                List.of("Sets the in-game name of the currency used."),
+                file, fileConfiguration, "currencyName", "Elite Coins", true);
+        useVault = ConfigurationEngine.setBoolean(
+                List.of("Sets the plugin to use Vault. THIS IS NOT RECOMMENDED! Read why here: https://github.com/MagmaGuy/EliteMobs/wiki/%5BThird-party-support%5D-Vault"),
+                fileConfiguration, "useVault - not recommended", false);
+        enableCurrencyShower = ConfigurationEngine.setBoolean(
+                List.of("Sets if elites will drop coins based on their level."),
+                fileConfiguration, "enableCurrencyShower", true);
+        currencyShowerMultiplier = ConfigurationEngine.setDouble(
+                List.of("Sets the multiplier for the currency dropped by elites."),
+                fileConfiguration, "currencyShowerTierMultiplier", 1D);
+        chatCurrencyShowerMessage = ConfigurationEngine.setString(
+                List.of("Sets the message sent when players pick up elite currency."),
+                file, fileConfiguration, "chatCurrencyShowerMessage", "&7[EM] You've picked up &a$amount $currency_name!", true);
+        actionBarCurrencyShowerMessage = ConfigurationEngine.setString(
+                List.of("Sets the action bar message sent when players pick up elite currency."),
+                file, fileConfiguration, "actionbarCurrencyShowerMessage", "&7[EM] You've picked up &a$amount $currency_name!", true);
+        lootShowerMaterial1 = ConfigurationEngine.setString(
+                List.of("Sets the material type of 1 dropped elite coin."),
+                file, fileConfiguration, "lootShowerMaterial.1", Material.GOLD_NUGGET.name(), false);
+        ConfigurationEngine.setInt(
+                List.of("Sets the custom model ID for 1 dropped elite coin. Used by the resource pack."),
+                fileConfiguration, "lootShowerData.1", 1);
         lootShowerMaterial5 = ConfigurationEngine.setString(file, fileConfiguration, "lootShowerMaterial.5", Material.GOLD_INGOT.name(), false);
         ConfigurationEngine.setInt(fileConfiguration, "lootShowerData.5", 1);
         lootShowerMaterial10 = ConfigurationEngine.setString(file, fileConfiguration, "lootShowerMaterial.10", Material.GOLD_BLOCK.name(), false);
@@ -92,7 +142,9 @@ public class EconomySettingsConfig {
         ConfigurationEngine.setInt(fileConfiguration, "lootShowerData.500", 1);
         lootShowerMaterial1000 = ConfigurationEngine.setString(file, fileConfiguration, "lootShowerMaterial.1000", Material.NETHER_STAR.name(), false);
         ConfigurationEngine.setInt(fileConfiguration, "lootShowerData.1000", 1);
-        adventurersGuildNotificationMessage = ConfigurationEngine.setString(file, fileConfiguration, "adventurersGuildNotificationMessages", "&7[EM] Extra spending money? Try &a/em !", true);
+        adventurersGuildNotificationMessage = ConfigurationEngine.setString(
+                List.of("Send the message players get after looting currency. Useful for tutorial purposes."),
+                file, fileConfiguration, "adventurersGuildNotificationMessages", "&7[EM] Extra spending money? Try &a/ag !", true);
 
         addMaterial(fileConfiguration, Material.DIAMOND_AXE, diamondLevel);
         addMaterial(fileConfiguration, Material.DIAMOND_BOOTS, diamondLevel);
@@ -165,8 +217,55 @@ public class EconomySettingsConfig {
             addMaterial(fileConfiguration, Material.NETHERITE_BOOTS, netheriteLevel);
         }
 
-        defaultMaterialWorth = ConfigurationEngine.setDouble(fileConfiguration, "materialWorth.defaultMaterialWorth", 1);
-        playerToPlayerTaxes = ConfigurationEngine.setDouble(fileConfiguration, "playerToPlayerPaymentTaxes", 0.2);
+        defaultMaterialWorth = ConfigurationEngine.setDouble(
+                List.of("Sets the default material worth for items not specifically defined."),
+                fileConfiguration, "materialWorth.defaultMaterialWorth", 1);
+        playerToPlayerTaxes = ConfigurationEngine.setDouble(
+                List.of("Sets the tax rate for transactions between players.", "Strongly recommended for balance reasons, as high level players can gain up to 6x more currency and try to use other players to bypass prestige currency resets."),
+                fileConfiguration, "playerToPlayerPaymentTaxes", 0.2);
+
+        economyPayMessage = ConfigurationEngine.setString(
+                List.of("Message sent when sending elite currency to other players."),
+                file, fileConfiguration, "Economy pay message v2", "&2You have paid &2$amount_sent $currency_name &2to $receiver&2, who got $amount_received after taxes!", true);
+        economyCurrencyLeftMessage = ConfigurationEngine.setString(
+                List.of("Message sent after players send currency."),
+                file, fileConfiguration, "Economy currency left message", "You now have &2$amount_left $currency_name", true);
+        economyPaymentReceivedMessage = ConfigurationEngine.setString(
+                List.of("Message received when receiving currency."),
+                file, fileConfiguration, "Economy money from payment message", "You have received &2$amount_received $currency_name &ffrom $sender", true);
+        economyPaymentInsufficientCurrency = ConfigurationEngine.setString(
+                List.of("Message sent when players try to send an amount of coins they do not have."),
+                file, fileConfiguration, "Economy payment insufficient currency", "&cYou don't have enough $currency_name to do that!", true);
+        economyWalletCommand = ConfigurationEngine.setString(
+                List.of("/em balance message"),
+                file, fileConfiguration, "Wallet command message", "You have &2$balance $currency_name", true);
+        economyTaxMessage = ConfigurationEngine.setString(
+                List.of("Confirmation message sent when players try to send currency to another player."),
+                file, fileConfiguration, "Tax confirmation message", "&cSending a payment will cost $percentage% in taxes. &aDo &9$command &ato proceed!", true);
+        shopBuyMessage = ConfigurationEngine.setString(
+                List.of("Message sent when a player buys from a shop."),
+                file, fileConfiguration, "Shop buy message", "&aYou have bought $item_name &afor $item_value $currency_name!", true);
+        shopCurrentBalance = ConfigurationEngine.setString(
+                List.of("Message sent when a player interacts with a shop."),
+                file, fileConfiguration, "Shop current balance message", "&aYou have $currency_amount $currency_name.", true);
+        shopInsufficientFundsMessage = ConfigurationEngine.setString(
+                List.of("Message sent when players don't have enough currency to purchase an item"),
+                file, fileConfiguration, "Shop insufficient funds message", "&cYou don't have enough $currency_name!", true);
+        shopItemPrice = ConfigurationEngine.setString(
+                List.of("Second part of message sent when players try to purchase an item they can not afford."),
+                file, fileConfiguration, "Shop item cost message", "That item costs &c$item_value $currency_name.", true);
+        shopSellMessage = ConfigurationEngine.setString(
+                List.of("Message sent upon selling an item to a shop."),
+                file, fileConfiguration, "Shop sell message", "&aYou have sold $item_name &afor $currency_amount $currency_name!", true);
+        shopSaleOthersItems = ConfigurationEngine.setString(
+                List.of("Message sent upon trying to sell an item that does not belong to that player."),
+                file, fileConfiguration, "Shop sale player items warning", "&cYou can't sell items that are not currently soulbound to you! This includes items from other prestige tiers!", true);
+        shopSaleInstructions = ConfigurationEngine.setString(
+                List.of("Message sent upon trying to sell a non-EliteMobs item"),
+                file, fileConfiguration, "Shop sale instructions", "&cYou can only sell EliteMobs loot here! (Armor / weapons dropped from elites showing a value on their lore)", true);
+        shopBatchSellMessage = ConfigurationEngine.setString(
+                List.of("Message sent upon selling a batch of elite items."),
+                file, fileConfiguration, "shopBatchSellItem", "&aYou have sold your items &afor $currency_amount $currency_name!", true);
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
         thisConfiguration = fileConfiguration;
@@ -174,7 +273,9 @@ public class EconomySettingsConfig {
     }
 
     private static void addMaterial(FileConfiguration fileConfiguration, Material material, double value) {
-        ConfigurationEngine.setDouble(fileConfiguration, "materialWorth." + material.name(), value);
+        ConfigurationEngine.setDouble(
+                List.of("Sets the worth of this material for the elitemobs currency system."),
+                fileConfiguration, "materialWorth." + material.name(), value);
     }
 
     public static double getMaterialWorth(Material material) {

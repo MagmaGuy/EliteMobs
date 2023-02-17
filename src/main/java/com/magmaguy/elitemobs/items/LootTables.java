@@ -6,14 +6,17 @@ import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.ProceduralItemGenerationSettingsConfig;
+import com.magmaguy.elitemobs.config.SpecialItemsConfig;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.elitemobs.utils.WeightedProbability;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Location;
@@ -55,9 +58,9 @@ public class LootTables implements Listener {
             if (!(eliteEntity.isRandomLoot())) continue;
 
             if (AdventurersGuildConfig.isGuildLootLimiter()) {
-                double itemTier = setItemTier(eliteEntity.getLevel());
-                if (itemTier > GuildRank.getActiveGuildRank(player) * 10) {
-                    itemTier = GuildRank.getActiveGuildRank(player) * 10D;
+                double itemLevel = setItemTier(eliteEntity.getLevel());
+                if (itemLevel > GuildRank.getActiveGuildRank(player) * 10) {
+                    itemLevel = GuildRank.getActiveGuildRank(player) * 10D;
                     new BukkitRunnable() {
                         @Override
                         public void run() {
@@ -65,8 +68,18 @@ public class LootTables implements Listener {
                         }
                     }.runTaskLater(MetadataHandler.PLUGIN, 20 * 10L);
                 }
-                generateLoot((int) Math.floor(itemTier), eliteEntity, player);
+                generateLoot((int) Math.floor(itemLevel), eliteEntity, player);
             } else generateLoot(eliteEntity, player);
+
+            if (SpecialItemsConfig.isDropSpecialLoot()) {
+                if (eliteEntity instanceof CustomBossEntity customBossEntity &&
+                        customBossEntity.getCustomBossesConfigFields().getHealthMultiplier() > 1.0 &&
+                        ThreadLocalRandom.current().nextDouble() < SpecialItemsConfig.getBossChanceToDrop())
+                    generateSpecialLoot(player, 0, eliteEntity);
+                else if (eliteEntity instanceof CustomBossEntity &&
+                        ThreadLocalRandom.current().nextDouble() < SpecialItemsConfig.getNonEliteChanceToDrop())
+                    generateSpecialLoot(player, 0, eliteEntity);
+            }
         }
     }
 
@@ -76,7 +89,7 @@ public class LootTables implements Listener {
         customItemsOn = ItemSettingsConfig.isDoEliteMobsLoot() && !CustomItem.getCustomItemStackList().isEmpty();
         weighedItemsExist = CustomItem.getWeighedFixedItems() != null && !CustomItem.getWeighedFixedItems().isEmpty();
         fixedItemsExist = CustomItem.getFixedItems() != null && !CustomItem.getFixedItems().isEmpty();
-        limitedItemsExist = CustomItem.getLimitedItem() != null && !CustomItem.getLimitedItem().isEmpty();
+        limitedItemsExist = CustomItem.getLimitedItems() != null && !CustomItem.getLimitedItems().isEmpty();
         scalableItemsExist = CustomItem.getScalableItems() != null && !CustomItem.getScalableItems().isEmpty();
     }
 
@@ -101,7 +114,7 @@ public class LootTables implements Listener {
         double baseChance = ItemSettingsConfig.getFlatDropRate();
         if (eliteEntity instanceof RegionalBossEntity)
             baseChance = ItemSettingsConfig.getRegionalBossNonUniqueDropRate();
-        double dropChanceBonus = ItemSettingsConfig.getTierIncreaseDropRate() * itemTier;
+        double dropChanceBonus = ItemSettingsConfig.getLevelIncreaseDropRate() * itemTier;
 
         if (ThreadLocalRandom.current().nextDouble() > baseChance + dropChanceBonus) return null;
 
@@ -153,7 +166,7 @@ public class LootTables implements Listener {
         Handle the odds of an item dropping
          */
         double baseChance = ItemSettingsConfig.getFlatDropRate();
-        double dropChanceBonus = ItemSettingsConfig.getTierIncreaseDropRate() * itemLevel;
+        double dropChanceBonus = ItemSettingsConfig.getLevelIncreaseDropRate() * itemLevel;
 
         if (ThreadLocalRandom.current().nextDouble() > baseChance + dropChanceBonus) return null;
 
@@ -219,7 +232,7 @@ public class LootTables implements Listener {
 
     public static double setItemTier(int mobTier) {
 
-        double chanceToUpgradeTier = 10 / (double) mobTier * ItemSettingsConfig.getMaximumLootTier();
+        double chanceToUpgradeTier = 10 / (double) mobTier * ItemSettingsConfig.getMaximumItemLevel();
 
         if (ThreadLocalRandom.current().nextDouble() * 100 < chanceToUpgradeTier) return mobTier + 1D;
 
@@ -362,10 +375,17 @@ public class LootTables implements Listener {
         RareDropEffect.runEffect(item);
     }
 
+    public static void generateSpecialLoot(Player player, int level, EliteEntity eliteEntity) {
+        CustomItem customItem = WeightedProbability.pickWeighedProbabilityFromCustomItems(SpecialItemsConfig.getSpecialValues());
+        if (customItem == null) return;
+        player.getWorld().dropItem(player.getLocation(), customItem.generateItemStack(level, player, eliteEntity));
+    }
+
 
     @EventHandler
     public void onDeath(EliteMobDeathEvent event) {
-        if (!event.getEliteEntity().isVanillaLoot()) event.getEntityDeathEvent().getDrops().clear();
+        if (event.getEntityDeathEvent() != null && !event.getEliteEntity().isVanillaLoot())
+            event.getEntityDeathEvent().getDrops().clear();
         if (!event.getEliteEntity().isEliteLoot()) return;
         if (event.getEliteEntity().getLevel() < 1) return;
         if (event.getEliteEntity().getDamagers().isEmpty()) return;

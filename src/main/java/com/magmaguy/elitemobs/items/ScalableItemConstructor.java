@@ -29,16 +29,17 @@ public class ScalableItemConstructor {
         HashMap<Enchantment, Integer> newEnchantmentList = updateDynamicEnchantments(customItem.getEnchantments());
         return ItemConstructor.constructItem(
                 itemTier,
-                customItem.getName(),
-                customItem.getMaterial(),
+                customItem.getCustomItemsConfigFields().getName(),
+                customItem.getCustomItemsConfigFields().getMaterial(),
                 newEnchantmentList,
                 customItem.getCustomEnchantments(),
                 customItem.getPotionEffects(),
-                customItem.getLore(),
+                customItem.getCustomItemsConfigFields().getLore(),
                 eliteEntity,
                 player,
                 false,
-                customItem.getCustomLootConfigFields().getCustomModelID()
+                customItem.getCustomItemsConfigFields().getCustomModelID(),
+                customItem.getCustomItemsConfigFields().isSoulbound()
         );
     }
 
@@ -75,8 +76,8 @@ public class ScalableItemConstructor {
         List<CustomItem> localLootList = new ArrayList<>();
 
         for (int i = 0; i < itemTier; i++)
-            if (CustomItem.getLimitedItem().containsKey(i))
-                localLootList.addAll(CustomItem.getLimitedItem().get(i));
+            if (CustomItem.getLimitedItems().containsKey(i))
+                localLootList.addAll(CustomItem.getLimitedItems().get(i));
 
             /*
             Currently elitemobs has no way of telling if there will be a limited item available for the specific asked tier
@@ -98,16 +99,17 @@ public class ScalableItemConstructor {
 
         return ItemConstructor.constructItem(
                 itemTier,
-                customItem.getName(),
-                customItem.getMaterial(),
+                customItem.getCustomItemsConfigFields().getName(),
+                customItem.getCustomItemsConfigFields().getMaterial(),
                 newEnchantmentList,
                 customItem.getCustomEnchantments(),
                 customItem.getPotionEffects(),
-                customItem.getLore(),
+                customItem.getCustomItemsConfigFields().getLore(),
                 eliteEntity,
                 player,
                 false,
-                customItem.getCustomLootConfigFields().getCustomModelID()
+                customItem.getCustomItemsConfigFields().getCustomModelID(),
+                customItem.getCustomItemsConfigFields().isSoulbound()
         );
 
     }

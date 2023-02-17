@@ -96,15 +96,33 @@ public class AdventurersGuildConfig {
     public static void initializeConfig() {
         file = ConfigurationEngine.fileCreator("AdventurersGuild.yml");
         fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
-        addMaxHealth = ConfigurationEngine.setBoolean(fileConfiguration, "Add max health when unlocking higher guild ranks", true);
-        addCrit = ConfigurationEngine.setBoolean(fileConfiguration, "Add critical chance when unlocking higher guild ranks", true);
-        addDodge = ConfigurationEngine.setBoolean(fileConfiguration, "Add dodge chance when unlocking higher guild ranks", true);
-        guildWorldIsEnabled = ConfigurationEngine.setBoolean(fileConfiguration, "guildHubIsEnabledv2", false);
-        guildWorldName = ConfigurationEngine.setString(file, fileConfiguration, "Adventurer's Guild world name v3", "em_adventurers_guild", false);
-        guildLocationString = ConfigurationEngine.setString(file, fileConfiguration, "Guild world coordinates", "208.5,88,236.5,-80,0", false);
+        addMaxHealth = ConfigurationEngine.setBoolean(
+                List.of("Sets if EliteMobs will add max health when unlocking guild ranks as a prestige reward"),
+                fileConfiguration, "Add max health when unlocking higher guild ranks", true);
+        addCrit = ConfigurationEngine.setBoolean(
+                List.of("Sets if EliteMobs will add a critical strike chance when unlocking guild ranks as a prestige reward"),
+                fileConfiguration, "Add critical chance when unlocking higher guild ranks", true);
+        addDodge = ConfigurationEngine.setBoolean(
+                List.of("Sets if EliteMobs will add dodge chance when unlocking guild ranks as a prestige reward"),
+                fileConfiguration, "Add dodge chance when unlocking higher guild ranks", true);
+        guildWorldIsEnabled = ConfigurationEngine.setBoolean(
+                List.of("Sets if the adventurer's guild hub is enabled. Don't set this manually! It is meant to be installed through the '/em setup' command"),
+                fileConfiguration, "guildHubIsEnabledv2", false);
+        guildWorldName = ConfigurationEngine.setString(
+                List.of("Sets the adventurer's guild world name. Do NOT change this to the name of your main world.",
+                        "Only change this if you have created your own custom dedicated guild hub world that is meant for nothing else than to be a guild hub.",
+                        "Most normal interaction are disabled in the guild hub world!"),
+                file, fileConfiguration, "Adventurer's Guild world name v3", "em_adventurers_guild", false);
+        guildLocationString = ConfigurationEngine.setString(
+                List.of("Sets the spawn coordinates for the adventurer's guild world.")
+                , file, fileConfiguration, "Guild world coordinates", "208.5,88,236.5,-80,0", false);
         guildWorldLocation = null;
-        agTeleport = ConfigurationEngine.setBoolean(fileConfiguration, "userCommandsTeleportToAdventurersGuild", true);
-        adventurersGuildMenuName = ConfigurationEngine.setString(file, fileConfiguration, "adventurersGuildMenuName", "&6&lAdventurer's Hub", true);
+        agTeleport = ConfigurationEngine.setBoolean(
+                List.of("Sets if user commands get rerouted to the adventurer's guild hub. This is highly recommended for gameplay immersion and tutorial purposes."),
+                fileConfiguration, "userCommandsTeleportToAdventurersGuild", true);
+        adventurersGuildMenuName = ConfigurationEngine.setString(
+                List.of("Sets the in-game display name of the adventurer's guild"),
+                file, fileConfiguration, "adventurersGuildMenuName", "&6&lAdventurer's Hub", true);
 
         //iterate through all prestige tiers
         for (int prestigeRank = 0; prestigeRank < 11; prestigeRank++)
@@ -363,33 +381,77 @@ public class AdventurersGuildConfig {
 
             }
 
-        guildLootLimiter = ConfigurationEngine.setBoolean(fileConfiguration, "limitLootBasedOnGuildTier", true);
-        lootLimiterMessage = ConfigurationEngine.setString(file, fileConfiguration, "lootLimiterMessage", "&7[EM] &cYou must unlock the next guild rank through /ag to loot better items!", true);
-        onRankUpCommand = ConfigurationEngine.setList(file, fileConfiguration, "onRankUpCommand", Collections.emptyList(), false);
-        onPrestigeUpCommand = ConfigurationEngine.setList(file, fileConfiguration, "onPrestigeUpCommand", Collections.emptyList(), false);
-        dodge1 = ConfigurationEngine.setDouble(fileConfiguration, "dodgePrestige3Bonus", 3);
-        dodge2 = ConfigurationEngine.setDouble(fileConfiguration, "dodgePrestige6Bonus", 6);
-        dodge3 = ConfigurationEngine.setDouble(fileConfiguration, "dodgePrestige9Bonus", 10);
-        crit1 = ConfigurationEngine.setDouble(fileConfiguration, "critPrestige2Bonus", 3);
-        crit2 = ConfigurationEngine.setDouble(fileConfiguration, "critPrestige5Bonus", 6);
-        crit3 = ConfigurationEngine.setDouble(fileConfiguration, "critPrestige8Bonus", 10);
-        health1 = ConfigurationEngine.setDouble(fileConfiguration, "healthPrestige1Bonus", 2);
-        health2 = ConfigurationEngine.setDouble(fileConfiguration, "healthPrestige4Bonus", 2.5);
-        health3 = ConfigurationEngine.setDouble(fileConfiguration, "healthPrestige7Bonus", 3);
-        health4 = ConfigurationEngine.setDouble(fileConfiguration, "healthPrestige10Bonus", 4);
+        guildLootLimiter = ConfigurationEngine.setBoolean(
+                List.of("Sets if player loot is limited by their guild level.",
+                        " This is an incredibly important part of EliteMobs and extremely highly recommended."),
+                fileConfiguration, "limitLootBasedOnGuildTier", true);
+        lootLimiterMessage = ConfigurationEngine.setString(
+                List.of("Sets the message sent to players if their loot gets nerfed due to their low guild level."),
+                file, fileConfiguration, "lootLimiterMessage", "&7[EM] &cYou must unlock the next guild rank through /ag to loot better items!", true);
+        onRankUpCommand = ConfigurationEngine.setList(
+                List.of("Sets the commands that run on guild rank up."),
+                file, fileConfiguration, "onRankUpCommand", Collections.emptyList(), false);
+        onPrestigeUpCommand = ConfigurationEngine.setList(
+                List.of("Sets the commands that run on prestige rank up."),
+                file, fileConfiguration, "onPrestigeUpCommand", Collections.emptyList(), false);
+        dodge1 = ConfigurationEngine.setDouble(
+                List.of("Sets the prestige level for the first dodge bonus."),
+                fileConfiguration, "dodgePrestige3Bonus", 3);
+        dodge2 = ConfigurationEngine.setDouble(
+                List.of("Sets the prestige level for the second dodge bonus."),
+                fileConfiguration, "dodgePrestige6Bonus", 6);
+        dodge3 = ConfigurationEngine.setDouble(
+                List.of("Sets the prestige level for the third dodge bonus."),
+                fileConfiguration, "dodgePrestige9Bonus", 10);
+        crit1 = ConfigurationEngine.setDouble(
+                List.of("Sets the prestige level for the first critical hit bonus."),
+                fileConfiguration, "critPrestige2Bonus", 3);
+        crit2 = ConfigurationEngine.setDouble(
+                List.of("Sets the prestige level for the second critical hit bonus."),
+                fileConfiguration, "critPrestige5Bonus", 6);
+        crit3 = ConfigurationEngine.setDouble(
+                List.of("Sets the prestige level for the third critical hit bonus."),
+                fileConfiguration, "critPrestige8Bonus", 10);
+        health1 = ConfigurationEngine.setDouble(
+                List.of("Sets the prestige level for the first max health bonus."),
+                fileConfiguration, "healthPrestige1Bonus", 2);
+        health2 = ConfigurationEngine.setDouble(
+                List.of("Sets the prestige level for the second max health bonus."),
+                fileConfiguration, "healthPrestige4Bonus", 2.5);
+        health3 = ConfigurationEngine.setDouble(
+                List.of("Sets the prestige level for the third max health bonus."),
+                fileConfiguration, "healthPrestige7Bonus", 3);
+        health4 = ConfigurationEngine.setDouble(
+                List.of("Sets the prestige level for the third max health bonus."),
+                fileConfiguration, "healthPrestige10Bonus", 4);
 
-        baseKillsForRankUp = ConfigurationEngine.setInt(fileConfiguration, "baseKillsForRankUp", 100);
-        additionalKillsForRankUpPerTier = ConfigurationEngine.setInt(fileConfiguration, "additionalKillsForRankUpPerTier", 50);
+        baseKillsForRankUp = ConfigurationEngine.setInt(
+                List.of("Sets the estimated base amount of bosses that must be killed to be able to afford a rank up."),
+                fileConfiguration, "baseKillsForRankUp", 100);
+        additionalKillsForRankUpPerTier = ConfigurationEngine.setInt(
+                List.of("Sets the estimated additional amount of bosses that must be killed to be able to rank up, per level.",
+                        "The formula is this amount x the level the player is currently at."),
+                fileConfiguration, "additionalKillsForRankUpPerTier", 50);
 
-        prestigeUnlockMessageTitle = ConfigurationEngine.setString(file, fileConfiguration, "prestigeUnlockMessageTitle", "$player", true);
-        prestigeUnlockMessageSubtitle = ConfigurationEngine.setString(file, fileConfiguration, "prestigeUnlockMessageSubtitle", "&2has unlocked $tier&2!", true);
+        prestigeUnlockMessageTitle = ConfigurationEngine.setString(
+                List.of("Sets title sent to players when someone unlocks a prestige rank.",
+                        "$player is a placeholder that gets replaced with the player's display name."),
+                file, fileConfiguration, "prestigeUnlockMessageTitle", "$player", true);
+        prestigeUnlockMessageSubtitle = ConfigurationEngine.setString(
+                List.of("Sets subtitle sent to players when someone unlocks a prestige rank.",
+                        "$tier is a placeholder that gets replaced with the player's prestige level."),
+                file, fileConfiguration, "prestigeUnlockMessageSubtitle", "&2has unlocked $tier&2!", true);
 
         //initializes the AG location
         AdventurersGuildCommand.defineTeleportLocation();
 
-        peacefulModeEliteChanceDecrease = ConfigurationEngine.setDouble(fileConfiguration, "peacefulModeEliteChanceDecrease", 0.2);
+        peacefulModeEliteChanceDecrease = ConfigurationEngine.setDouble(
+                List.of("Sets the multiplier that will be applied to the spawn chance when players are using the peaceful (commoner) rank."),
+                fileConfiguration, "peacefulModeEliteChanceDecrease", 0.2);
 
-        worldsWithoutAGBonuses = ConfigurationEngine.setList(file, fileConfiguration, "worldsWithoutAGBonuses", new ArrayList(), false);
+        worldsWithoutAGBonuses = ConfigurationEngine.setList(
+                List.of("Sets the list of worlds to which guild rank bonuses will not be applied"),
+                file, fileConfiguration, "worldsWithoutAGBonuses", new ArrayList(), false);
 
         save();
     }

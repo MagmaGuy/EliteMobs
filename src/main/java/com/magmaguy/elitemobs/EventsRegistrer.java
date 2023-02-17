@@ -56,6 +56,7 @@ import com.magmaguy.elitemobs.powerstances.VisualEffectObfuscator;
 import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.QuestTracking;
 import com.magmaguy.elitemobs.quests.menus.QuestInventoryMenu;
+import com.magmaguy.elitemobs.quests.objectives.ArenaObjective;
 import com.magmaguy.elitemobs.quests.objectives.CustomFetchObjective;
 import com.magmaguy.elitemobs.quests.objectives.DialogObjective;
 import com.magmaguy.elitemobs.quests.objectives.KillObjective;
@@ -263,11 +264,9 @@ public class EventsRegistrer {
         register(new SellMenu());
         register(new SetupMenu.SetupMenuListeners());
         register(new ScrapperMenu.ScrapperMenuEvents());
-        register(new SmeltMenu.SmeltMenuEvents());
         register(new RepairMenu.RepairMenuEvents());
-        register(new RefinerMenu.RefinerMenuEvents());
-        register(new EnhancementMenu.EnhancementMenuEvents());
         register(new UnbindMenu.UnbinderMenuEvents());
+        register(new ItemEnchantmentMenu.ItemEnchantMenuEvents());
 
         //loot menu
         register(new LootMenu.LootMenuEvents());
@@ -328,6 +327,7 @@ public class EventsRegistrer {
         register(new KillObjective.KillObjectiveEvents());
         register(new CustomFetchObjective.CustomFetchObjectiveEvents());
         register(new DialogObjective.DialogObjectiveEvents());
+        register(new ArenaObjective.ArenaObjectiveEvents());
         register(new QuestAcceptEvent.QuestAcceptEventHandler());
         register(new QuestCompleteEvent.QuestCompleteEventHandler());
         register(new QuestLeaveEvent.QuestLeaveEventHandler());

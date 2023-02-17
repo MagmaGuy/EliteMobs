@@ -97,8 +97,6 @@ public class QuestsConfig {
     @Getter
     private static String questPrerequisitesMissingMessage;
     @Getter
-    private static int maxCharactersPerBookPage;
-    @Getter
     private static String lowRankDynamicQuestWarning;
     @Getter
     private static String questTurnInObjective;
@@ -114,62 +112,145 @@ public class QuestsConfig {
         File file = ConfigurationEngine.fileCreator("Quests.yml");
         FileConfiguration fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
 
-        requireQuestTurnIn = ConfigurationEngine.setBoolean(fileConfiguration, "requireQuestTurnIn", true);
-        questJoinMessage = ConfigurationEngine.setString(file, fileConfiguration, "questJoinMessage", "&aYou have accepted the quest $questName &a!", true);
-        questLeaveMessage = ConfigurationEngine.setString(file, fileConfiguration, "questLeaveMessage", "&cYou have abandoned the quest $questName &c!", true);
-        questCompleteMessage = ConfigurationEngine.setString(file, fileConfiguration, "questCompleteMessage", "&2You completed the quest $questName &2!", true);
-        leaveWhenNoActiveQuestsExist = ConfigurationEngine.setString(file, fileConfiguration, "leaveWhenNoActiveQuestsExist", "&cYou don't currently have an active quest!", true);
-        questLeaveConfirmationMessage = ConfigurationEngine.setString(file, fileConfiguration, "questLeaveConfirmationMessage", "&cAre you sure you want to abandon your current quest? Do &a/em confirm &c to confirm your choice!", true);
-        useQuestAcceptTitles = ConfigurationEngine.setBoolean(fileConfiguration, "useQuestAcceptTitles", true);
-        questStartTitle = ConfigurationEngine.setString(file, fileConfiguration, "questStartTitle", "&aQuest Accepted!", true);
-        questStartSubtitle = ConfigurationEngine.setString(file, fileConfiguration, "questStartSubtitle", "$questName", false);
-        useQuestCompleteTitles = ConfigurationEngine.setBoolean(fileConfiguration, "useQuestCompleteTitles", true);
-        questCompleteTitle = ConfigurationEngine.setString(file, fileConfiguration, "questCompleteTitle", "&2Quest Completed!", true);
-        questCompleteSubtitle = ConfigurationEngine.setString(file, fileConfiguration, "questCompleteSubtitle", "$questName", false);
-        useQuestLeaveTitles = ConfigurationEngine.setBoolean(fileConfiguration, "useQuestLeaveTitles", true);
-        questLeaveTitle = ConfigurationEngine.setString(file, fileConfiguration, "questLeaveTitle", "&cQuest Abandoned!", true);
-        questLeaveSubtitle = ConfigurationEngine.setString(file, fileConfiguration, "questLeaveSubtitle", "$questName", false);
-        doQuestChatProgression = ConfigurationEngine.setBoolean(fileConfiguration, "doQuestChatProgression", true);
-        ongoingColorCode = ConfigurationEngine.setString(file, fileConfiguration, "ongoingQuestColorCode", "&c", false);
-        completedColorCode = ConfigurationEngine.setString(file, fileConfiguration, "ongoingQuestColorCode", "&2", false);
-        killQuestChatProgressionMessage = ConfigurationEngine.setString(file, fileConfiguration, "killQuestChatProgressionMessage", "&8[EliteMobs]&c➤Kill $name:$color$current&0/$color$target", true);
-        fetchQuestChatProgressionMessage = ConfigurationEngine.setString(file, fileConfiguration, "fetchQuestChatProgressionMessage", "&8[EliteMobs]&c➤Get $name:$color$current&0/$color$target", true);
-        dialogQuestChatProgressionMessage = ConfigurationEngine.setString(file, fileConfiguration, "dialogQuestChatProgressionMessage", "&8[EliteMobs]&c➤Talk to $name:$color$current&0/$color$target", true);
-        maximumActiveQuests = ConfigurationEngine.setInt(fileConfiguration, "maximumActiveQuests", 10);
-        questCapMessage = ConfigurationEngine.setString(file, fileConfiguration, "questCapMessage", "&8[EliteMobs] &cYou have reached the maximum amount of active quests (10)! " +
-                "&4Abandon or complete at least one active quest if you want to get more quests!", true);
+        requireQuestTurnIn = ConfigurationEngine.setBoolean(
+                List.of("Sets if quests have to be returned to quest givers to complete the quest."),
+                fileConfiguration, "requireQuestTurnIn", true);
+        questJoinMessage = ConfigurationEngine.setString(
+                List.of("Sets the message sent when a quest is accepted."),
+                file, fileConfiguration, "questJoinMessage", "&aYou have accepted the quest $questName &a!", true);
+        questLeaveMessage = ConfigurationEngine.setString(
+                List.of("Sets the message sent when a quest is abandoned."),
+                file, fileConfiguration, "questLeaveMessage", "&cYou have abandoned the quest $questName &c!", true);
+        questCompleteMessage = ConfigurationEngine.setString(
+                List.of("Sets message sent when a quest is completed."),
+                file, fileConfiguration, "questCompleteMessage", "&2You completed the quest $questName &2!", true);
+        leaveWhenNoActiveQuestsExist = ConfigurationEngine.setString(
+                List.of("Sets the message sent when a player tried to abandon a quest when none are active."),
+                file, fileConfiguration, "leaveWhenNoActiveQuestsExist", "&cYou don't currently have an active quest!", true);
+        questLeaveConfirmationMessage = ConfigurationEngine.setString(
+                List.of("Sets the confirmation message sent when players try to leave a quest."),
+                file, fileConfiguration, "questLeaveConfirmationMessage", "&cAre you sure you want to abandon your current quest? Do &a/em confirm &c to confirm your choice!", true);
+        useQuestAcceptTitles = ConfigurationEngine.setBoolean(
+                List.of("Sets if some of the messages related to quests will use titles instead of chat messages."),
+                fileConfiguration, "useQuestAcceptTitles", true);
+        questStartTitle = ConfigurationEngine.setString(
+                List.of("Sets the title sent when a players starts a quest."),
+                file, fileConfiguration, "questStartTitle", "&aQuest Accepted!", true);
+        questStartSubtitle = ConfigurationEngine.setString(
+                List.of("Sets the subtitle sent when a players starts a quest."),
+                file, fileConfiguration, "questStartSubtitle", "$questName", false);
+        useQuestCompleteTitles = ConfigurationEngine.setBoolean(
+                List.of("Sets if titles will be sent when players complete a quest."),
+                fileConfiguration, "useQuestCompleteTitles", true);
+        questCompleteTitle = ConfigurationEngine.setString(
+                List.of("Sets the title sent when a player completes a quest."),
+                file, fileConfiguration, "questCompleteTitle", "&2Quest Completed!", true);
+        questCompleteSubtitle = ConfigurationEngine.setString(
+                List.of("Sets the subtitle sent when a player completes a quest."),
+                file, fileConfiguration, "questCompleteSubtitle", "$questName", false);
+        useQuestLeaveTitles = ConfigurationEngine.setBoolean(
+                List.of("Sets if titles are sent when players leave quests.."),
+                fileConfiguration, "useQuestLeaveTitles", true);
+        questLeaveTitle = ConfigurationEngine.setString(
+                List.of("Sets the title sent when a player leaves a quest."),
+                file, fileConfiguration, "questLeaveTitle", "&cQuest Abandoned!", true);
+        questLeaveSubtitle = ConfigurationEngine.setString(
+                List.of("Sets the subtitle sent when a player leaves a quest."),
+                file, fileConfiguration, "questLeaveSubtitle", "$questName", false);
+        doQuestChatProgression = ConfigurationEngine.setBoolean(
+                List.of("Sets if messages are sent on chat reporting quest objective progression."),
+                fileConfiguration, "doQuestChatProgression", true);
+        ongoingColorCode = ConfigurationEngine.setString(
+                List.of("Sets the color codes for ongoing objectives."),
+                file, fileConfiguration, "ongoingQuestColorCode", "&c", false);
+        completedColorCode = ConfigurationEngine.setString(
+                List.of("Sets the color codes for completed objectives."),
+                file, fileConfiguration, "ongoingQuestColorCode", "&2", false);
+        killQuestChatProgressionMessage = ConfigurationEngine.setString(
+                List.of("Sets the formatting for progression messages of kill quests."),
+                file, fileConfiguration, "killQuestChatProgressionMessage", "&8[EliteMobs]&c➤Kill $name:$color$current&0/$color$target", true);
+        fetchQuestChatProgressionMessage = ConfigurationEngine.setString(
+                List.of("Sets the formatting for progression messages of fetch quests."),
+                file, fileConfiguration, "fetchQuestChatProgressionMessage", "&8[EliteMobs]&c➤Get $name:$color$current&0/$color$target", true);
+        dialogQuestChatProgressionMessage = ConfigurationEngine.setString(
+                List.of("Sets the formatting for progression messages of dialog quests."),
+                file, fileConfiguration, "dialogQuestChatProgressionMessage", "&8[EliteMobs]&c➤Talk to $name:$color$current&0/$color$target", true);
+        maximumActiveQuests = ConfigurationEngine.setInt(
+                List.of("Sets the maximum amount of accepted quests a player can have."),
+                fileConfiguration, "maximumActiveQuests", 10);
+        questCapMessage = ConfigurationEngine.setString(
+                List.of("Sets the message sent to players when trying to accept an amount of quests that exceed the active quest cap."),
+                file, fileConfiguration, "questCapMessage", "&8[EliteMobs] &cYou have reached the maximum amount of active quests (10)! " +
+                        "&4Abandon or complete at least one active quest if you want to get more quests!", true);
 
-        useQuestScoreboards = ConfigurationEngine.setBoolean(fileConfiguration, "useQuestScoreboards", true);
+        useQuestScoreboards = ConfigurationEngine.setBoolean(
+                List.of("Sets if scoreboards messages will be used for quests."),
+                fileConfiguration, "useQuestScoreboards", true);
 
-        killQuestScoreboardProgressionLine = ConfigurationEngine.setString(file, fileConfiguration, "killQuestScoreboardProgressionMessage", "&c➤Kill $name:$color$current&0/$color$target", true);
-        fetchQuestScoreboardProgressionLine = ConfigurationEngine.setString(file, fileConfiguration, "fetchQuestScoreboardProgressionMessage", "&c➤Get $name:$color$current&0/$color$target", true);
-        dialogQuestScoreboardProgressionLine = ConfigurationEngine.setString(file, fileConfiguration, "dialogQuestScoreboardProgressionMessage", "&c➤Talk to $name:$color$current&0/$color$target", true);
+        killQuestScoreboardProgressionLine = ConfigurationEngine.setString(
+                List.of("Sets the formatting for scoreboard progression messages of kill quests."),
+                file, fileConfiguration, "killQuestScoreboardProgressionMessage", "&c➤Kill $name:$color$current&0/$color$target", true);
+        fetchQuestScoreboardProgressionLine = ConfigurationEngine.setString(
+                List.of("Sets the formatting for scoreboard progression message of fetch quests."),
+                file, fileConfiguration, "fetchQuestScoreboardProgressionMessage", "&c➤Get $name:$color$current&0/$color$target", true);
+        dialogQuestScoreboardProgressionLine = ConfigurationEngine.setString(
+                List.of("Sets the formatting for scoreboard progression messages of dialog quests."),
+                file, fileConfiguration, "dialogQuestScoreboardProgressionMessage", "&c➤Talk to $name:$color$current&0/$color$target", true);
 
         questEntityTypes = setEntityTypes(fileConfiguration, file);
 
-        chatTrackMessage = ConfigurationEngine.setString(file, fileConfiguration, "chatTrackMessage", "&8[EliteMobs]&2 Click here to track your quest!", true);
-        chatTrackHover = ConfigurationEngine.setString(file, fileConfiguration, "chatTrackHover", "&2Click to track!", true);
-        chatTrackCommand = ConfigurationEngine.setString(file, fileConfiguration, "chatTrackCommand", "/elitemobs quest track $questID", false);
+        chatTrackMessage = ConfigurationEngine.setString(
+                List.of("Sets the message sent to players to activate quest tracking."),
+                file, fileConfiguration, "chatTrackMessage", "&8[EliteMobs]&2 Click here to track your quest!", true);
+        chatTrackHover = ConfigurationEngine.setString(
+                List.of("Sets the hover message of the quest tracking message."),
+                file, fileConfiguration, "chatTrackHover", "&2Click to track!", true);
+        chatTrackCommand = ConfigurationEngine.setString(
+                List.of("Sets the command sent when clicking on the tracking message. You really should not modify this."),
+                file, fileConfiguration, "chatTrackCommand", "/elitemobs quest track $questID", false);
 
-        chatTrackingMessage = ConfigurationEngine.setString(file, fileConfiguration, "chatTrackingMessage", "&8[EliteMobs]&9 You are now tracking a quest!", true);
-        chatTrackingHover = ConfigurationEngine.setString(file, fileConfiguration, "chatTrackingHover", "&2Click to untrack/track! /em -> Quests to track a different quest!", true);
-        chatTrackingCommand = ConfigurationEngine.setString(file, fileConfiguration, "chatTrackingCommand", "/elitemobs quest track $questID", false);
+        chatTrackingMessage = ConfigurationEngine.setString(
+                List.of("Sets the message sent to players when activating quest tracking."),
+                file, fileConfiguration, "chatTrackingMessage", "&8[EliteMobs]&9 You are now tracking a quest!", true);
+        chatTrackingHover = ConfigurationEngine.setString(
+                List.of("Sets the hover message of the quest tracking enabled message."),
+                file, fileConfiguration, "chatTrackingHover", "&2Click to untrack/track! /em -> Quests to track a different quest!", true);
+        chatTrackingCommand = ConfigurationEngine.setString(
+                List.of("Sets the command sent when click on the quest tracking activation message. You really should not modify this."),
+                file, fileConfiguration, "chatTrackingCommand", "/elitemobs quest track $questID", false);
 
-        autoTrackQuestsOnAccept = ConfigurationEngine.setBoolean(fileConfiguration, "autoTrackQuestsOnAccept", true);
+        autoTrackQuestsOnAccept = ConfigurationEngine.setBoolean(
+                List.of("Sets if quests are automatically tracked when accepted."),
+                fileConfiguration, "autoTrackQuestsOnAccept", true);
 
-        noQuestDestinationFound = ConfigurationEngine.setString(file, fileConfiguration, "noQuestDestinationFound", "[EM] No quest destination found!", true);
-        questDestinationInOtherWorld = ConfigurationEngine.setString(file, fileConfiguration, "questDestinationInOtherWorld", "[EM] Go to world $world!", true);
+        noQuestDestinationFound = ConfigurationEngine.setString(
+                List.of("Sets the message that appears when the destination of the quest could not be found."),
+                file, fileConfiguration, "noQuestDestinationFound", "[EM] No quest destination found!", true);
+        questDestinationInOtherWorld = ConfigurationEngine.setString(
+                List.of("Sets the message that appears when the quest target is in a different world."),
+                file, fileConfiguration, "questDestinationInOtherWorld", "[EM] Go to world $world!", true);
 
-        questAlreadyCompletedMessage = ConfigurationEngine.setString(file, fileConfiguration, "questAlreadyCompletedMessage", "&8[EliteMobs] &cYou already completed this quest!", true);
-        questPrerequisitesMissingMessage = ConfigurationEngine.setString(file, fileConfiguration, "questPrerequisitesMissingMessage", "&8[EliteMobs] &cCan't accept this quest yet!", true);
+        questAlreadyCompletedMessage = ConfigurationEngine.setString(
+                List.of("Sets the message sent to players when trying to accept a quest they have already completed."),
+                file, fileConfiguration, "questAlreadyCompletedMessage", "&8[EliteMobs] &cYou already completed this quest!", true);
+        questPrerequisitesMissingMessage = ConfigurationEngine.setString(
+                List.of("Sets the message sent to players when trying to accept a quest they do not have the permission for."),
+                file, fileConfiguration, "questPrerequisitesMissingMessage", "&8[EliteMobs] &cCan't accept this quest yet!", true);
 
-        maxCharactersPerBookPage = ConfigurationEngine.setInt(fileConfiguration, "maxCharactersPerBookPage", 30);
-        lowRankDynamicQuestWarning = ConfigurationEngine.setString(file, fileConfiguration, "lowRankDynamicQuestWarning", "&8[EliteMobs] &cYou can't take these quests with your current guild rank! Increase your guild rank to accept these quests.", true);
+        lowRankDynamicQuestWarning = ConfigurationEngine.setString(
+                List.of("Sets the message sent to players trying to get a quest for which they do not have the correct guild rank activated."),
+                file, fileConfiguration, "lowRankDynamicQuestWarning", "&8[EliteMobs] &cYou can't take these quests with your current guild rank! Increase your guild rank to accept these quests.", true);
 
-        questTurnInObjective = ConfigurationEngine.setString(file, fileConfiguration, "questTurnInObjective", "&a2Talk to $npcName", true);
+        questTurnInObjective = ConfigurationEngine.setString(
+                List.of("Sets the formatting for the quest turn-in message."),
+                file, fileConfiguration, "questTurnInObjective", "&a2Talk to $npcName", true);
 
-        horizontalCharacterLimitBedrockMenu = ConfigurationEngine.setInt(fileConfiguration, "horizontalCharacterLimitBedrockMenu", 30);
-        itemEntryCharacterLimitBedrockMenu = ConfigurationEngine.setInt(fileConfiguration, "itemEntryCharacterLimitBedrockMenu", 300);
+        horizontalCharacterLimitBedrockMenu = ConfigurationEngine.setInt(
+                List.of("Sets the maximum amount of characters inventory-based menus for quests will have before breaking the line."),
+                fileConfiguration, "horizontalCharacterLimitBedrockMenu", 30);
+        itemEntryCharacterLimitBedrockMenu = ConfigurationEngine.setInt(
+                List.of("Sets the maximum amount of characters per item entry in inventory-based menus for quests before creating another item to continue the entry."),
+                fileConfiguration, "itemEntryCharacterLimitBedrockMenu", 300);
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }

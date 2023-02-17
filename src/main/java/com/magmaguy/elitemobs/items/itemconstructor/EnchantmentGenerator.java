@@ -15,31 +15,27 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class EnchantmentGenerator {
 
     public static ItemMeta generateEnchantments(ItemMeta itemMeta, HashMap<Enchantment, Integer> enchantmentMap) {
-
-        for (Enchantment enchantment : enchantmentMap.keySet()) {
-            if (enchantment != null)
-                if (enchantmentMap.get(enchantment) > enchantment.getMaxLevel()) {
-                    if (EliteEnchantments.isPotentialEliteEnchantment(enchantment)) {
-                        if (enchantmentMap.get(enchantment) > enchantment.getMaxLevel()) {
-                            itemMeta.addEnchant(enchantment, enchantment.getMaxLevel(), true);
-                        } else
-                            itemMeta.addEnchant(enchantment, enchantmentMap.get(enchantment), true);
+        for (Map.Entry<Enchantment, Integer> entry : enchantmentMap.entrySet()) {
+            if (entry == null) continue;
+            if (enchantmentMap.get(entry.getKey()) > entry.getKey().getMaxLevel()) {
+                if (EliteEnchantments.isPotentialEliteEnchantment(entry.getKey())) {
+                    if (enchantmentMap.get(entry.getKey()) > entry.getKey().getMaxLevel()) {
+                        itemMeta.addEnchant(entry.getKey(), entry.getKey().getMaxLevel(), true);
                     } else
-                        itemMeta.addEnchant(enchantment, enchantmentMap.get(enchantment), true);
-
-                } else {
-                    itemMeta.addEnchant(enchantment, enchantmentMap.get(enchantment), true);
-                }
-
-
+                        itemMeta.addEnchant(entry.getKey(), enchantmentMap.get(entry.getKey()), true);
+                } else
+                    itemMeta.addEnchant(entry.getKey(), entry.getValue(), true);
+            } else {
+                itemMeta.addEnchant(entry.getKey(), entry.getValue(), true);
+            }
         }
         return itemMeta;
-
     }
 
     /*
