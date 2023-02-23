@@ -142,6 +142,14 @@ public class Placeholders extends PlaceholderExpansion {
                 return "" + PlayerData.getKills(player.getUniqueId());
             case "player_deaths":
                 return "" + PlayerData.getDeaths(player.getUniqueId());
+            case "player_highest_kill":
+                return "" + PlayerData.getHighestLevelKilled(player.getUniqueId());
+            case "player_quests_active":
+                return "" + PlayerData.getQuests(player.getUniqueId());
+            case "player_quests_completed":
+                return "" + PlayerData.getQuestsCompleted(player.getUniqueId());
+            case "player_score":
+                return "" + PlayerData.getScore(player.getUniqueId());
         }
 
         // We return null if an invalid placeholder (f.e. %someplugin_placeholder3%)
