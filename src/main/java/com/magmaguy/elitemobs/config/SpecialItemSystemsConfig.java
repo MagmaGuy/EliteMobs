@@ -9,7 +9,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 
-public class SpecialItemsConfig {
+public class SpecialItemSystemsConfig {
 
     @Getter
     private static HashMap<CustomItem, Double> specialValues = new HashMap<>();
@@ -19,11 +19,23 @@ public class SpecialItemsConfig {
     private static double bossChanceToDrop;
     @Getter
     private static double nonEliteChanceToDrop;
+    @Getter
+    private static double luckyTicketMultiplier;
+    @Getter
+    private static double criticalFailureChance;
+    @Getter
+    private static double challengeChance;
+    @Getter
+    private static double criticalFailureChanceDuringChallengeChance;
+    @Getter
+    private static String insufficientFundsMessage;
+    @Getter
+    private static String newFundsMessage;
 
     public static void initializeConfig() {
         specialValues.clear();
 
-        File file = ConfigurationEngine.fileCreator("SpecialItems.yml");
+        File file = ConfigurationEngine.fileCreator("SpecialItemSystems.yml");
         FileConfiguration fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
 
         dropSpecialLoot = ConfigurationEngine.setBoolean(
@@ -92,11 +104,37 @@ public class SpecialItemsConfig {
                         "The higher the value, the higher the chance of that item getting picked over other items.",
                         "Keep in mind that if values get too high, things with low values will become almost impossible to obtain."));
 
+        luckyTicketMultiplier = ConfigurationEngine.setDouble(
+                List.of("Multiplier for the lucky ticket success chance in enchantments. 2.0 = 2x"),
+                fileConfiguration, "luckyTicketMultiplier", 2.00);
+
+        criticalFailureChance = ConfigurationEngine.setDouble(
+                List.of("Chance of an item being lost if an item enchantment fails. This is a percentage of the base failure chance."),
+                fileConfiguration, "criticalFailureChance", 0.01);
+
+        challengeChance = ConfigurationEngine.setDouble(
+                List.of("Chance of a player being teleported to a challenge arena if an item enchantment fails. This is a percentage of the base failure chance.", "If the player defeats the arena, their item is upgraded correctly. If the lose, either it is not enchanted or, if they're unlucky, they may lose the item."),
+                fileConfiguration, "criticalFailureChance", 0.30);
+
+        criticalFailureChanceDuringChallengeChance = ConfigurationEngine.setDouble(
+                List.of("Chance of an item being lost if a player loses the enchantment challenge. This is a percentage of the base failure chance."),
+                fileConfiguration, "criticalFailureChanceDuringChallengeChance", 0.10);
+
+        insufficientFundsMessage = ConfigurationEngine.setString(
+                List.of("Sets the message sent when players do not have enough elite coins to enchant an item"),
+                file, fileConfiguration, "insufficientFundsMessage", "&8[EliteMobs] &c$price $currencyName is required to enchant $itemName, but you only have $currentAmount!", true);
+
+        newFundsMessage = ConfigurationEngine.setString(
+                List.of("Sets the message sent when players after deducting the funds"),
+                file, fileConfiguration, "newFundsMessage", "&8[EliteMobs] &fYou just spent $price $currencyName! You now have $currentAmount $currencyName.", true);
+
+
+
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }
 
     private static void addDefaultEnchantmentBook(FileConfiguration fileConfiguration, String configFilename, double chance) {
-        String key = "enchantedBookWeightedDropChance."+configFilename;
+        String key = "enchantedBookWeightedDropChance." + configFilename;
         fileConfiguration.addDefault(key, chance);
         CustomItem customItem = CustomItem.getCustomItem(configFilename + ".yml");
         if (customItem == null) {

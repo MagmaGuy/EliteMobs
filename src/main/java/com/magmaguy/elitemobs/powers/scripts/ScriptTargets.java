@@ -130,7 +130,7 @@ public class ScriptTargets {
      * @return Validated location for the script behavior
      */
     protected Collection<Location> getTargetLocations(ScriptActionData scriptActionData) {
-        if (anonymousTargets != null && anonymousTargets.get(0) instanceof Location)
+        if (anonymousTargets != null && !anonymousTargets.isEmpty() && anonymousTargets.get(0) instanceof Location)
             return (List<Location>) anonymousTargets;
         Collection<Location> newLocations = null;
 
@@ -145,10 +145,7 @@ public class ScriptTargets {
                 return getLocations(scriptActionData.getEliteEntity());
             case LANDING_LOCATION:
                 return new ArrayList<>(List.of(scriptActionData.getLandingLocation()));
-            case ZONE_FULL, ZONE_BORDER:
-                newLocations = getLocationFromZone(scriptActionData);
-                break;
-            case INHERIT_SCRIPT_ZONE_FULL, INHERIT_SCRIPT_ZONE_BORDER:
+            case ZONE_FULL, ZONE_BORDER, INHERIT_SCRIPT_ZONE_FULL, INHERIT_SCRIPT_ZONE_BORDER:
                 newLocations = getLocationFromZone(scriptActionData);
                 break;
             case INHERIT_SCRIPT_TARGET:

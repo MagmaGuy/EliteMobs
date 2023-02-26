@@ -80,8 +80,11 @@ public class InstancePlayerManager {
         }
 
         //End the match if there are no players left because they all died
-        if (matchInstance.players.isEmpty())
-            matchInstance.endMatch();
+        if (matchInstance.state != MatchInstance.InstancedRegionState.COMPLETED &&
+                matchInstance.state != MatchInstance.InstancedRegionState.COMPLETED_DEFEAT &&
+                matchInstance.state != MatchInstance.InstancedRegionState.COMPLETED_VICTORY &&
+                matchInstance.players.isEmpty())
+            matchInstance.defeat();
         else
             //Remove lives
             matchInstance.playerLives.remove(player);

@@ -31,7 +31,6 @@ public class WeightedProbability {
         for (CustomItem customItem : weighedValues.keySet()) {
             random -= weighedValues.get(customItem);
             if (random <= 0) {
-                Developer.message("random: " + random + " total size " + totalWeight + " list size " + weighedValues.size());
                 selectedCustomItem = customItem;
                 break;
             }

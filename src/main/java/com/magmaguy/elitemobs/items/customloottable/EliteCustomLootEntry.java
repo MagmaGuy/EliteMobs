@@ -144,18 +144,19 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
         return generateCustomItem().generateItemStack(level, player, eliteEntity);
     }
 
+    //treasure chest
     @Override
     public void locationDrop(int itemTier, Player player, Location location) {
         for (int i = 0; i < getAmount(); i++)
             generateCustomItem().dropPlayerLoot(player, itemTier, location, null);
     }
 
-    //This is for the boss drop
+    //This is for the custom boss drop
     @Override
     public void locationDrop(int itemTier, Player player, Location location, EliteEntity eliteEntity) {
         if (isGroupLoot(itemTier, player, eliteEntity)) return;
         if (generateCustomItem() == null) {
-            new WarningMessage("Invalid loot entry for boss " + eliteEntity.getName() + "!");
+            new WarningMessage("Invalid loot entry for boss " + eliteEntity.getName() + "! Entry: " + filename);
             if (eliteEntity instanceof CustomBossEntity customBossEntity)
                 new WarningMessage("Boss filename: " + customBossEntity.getCustomBossesConfigFields().getFilename());
             return;

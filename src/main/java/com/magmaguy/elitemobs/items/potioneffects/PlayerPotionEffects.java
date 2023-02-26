@@ -8,6 +8,7 @@ import com.magmaguy.elitemobs.items.potioneffects.custom.Saturation;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
+import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.utils.EntityFinder;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.EntityType;
@@ -33,7 +34,8 @@ public class PlayerPotionEffects implements Listener {
             public void run() {
                 //scan through what players are wearing
                 for (Player player : Bukkit.getOnlinePlayers())
-                    if (ElitePlayerInventory.playerInventories.get(player.getUniqueId()) != null)
+                    if (ElitePlayerInventory.playerInventories.get(player.getUniqueId()) != null &&
+                            PlayerData.getPlayerData(player.getUniqueId()) != null)
                         for (ElitePotionEffect elitePotionEffect : ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getContinuousPotionEffects(true))
                             doContinuousPotionEffect(elitePotionEffect, player);
             }
