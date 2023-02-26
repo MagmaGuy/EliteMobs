@@ -2,7 +2,10 @@ package com.magmaguy.elitemobs.menus;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
+import com.magmaguy.elitemobs.config.SpecialItemSystemsConfig;
 import com.magmaguy.elitemobs.config.menus.premade.ItemEnchantmentMenuConfig;
+import com.magmaguy.elitemobs.economy.EconomyHandler;
+import com.magmaguy.elitemobs.instanced.dungeons.EnchantmentDungeonInstance;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.upgradesystem.EliteEnchantmentItems;
 import com.magmaguy.elitemobs.items.upgradesystem.UpgradeSystem;
@@ -40,9 +43,9 @@ public class ItemEnchantmentMenu extends EliteMenu {
     private static final int LUCKY_TICKET_INFO_SLOT = ItemEnchantmentMenuConfig.getLuckyTicketInfoSlot();
     private static final ItemStack luckyTicketInfoButton = ItemEnchantmentMenuConfig.getLuckyTicketInfoButton();
 
-    private static final double LUCKY_TICKET_MULTIPLIER = 2.0;
-    private static final double CRITICAL_FAILURE_CHANCE = .01;
-    private static final double CHALLENGE_CHANCE = 0.15;
+    private static final double LUCKY_TICKET_MULTIPLIER = SpecialItemSystemsConfig.getLuckyTicketMultiplier();
+    private static final double CRITICAL_FAILURE_CHANCE = SpecialItemSystemsConfig.getCriticalFailureChance();
+    private static final double CHALLENGE_CHANCE = SpecialItemSystemsConfig.getChallengeChance();
 
     public ItemEnchantmentMenu(Player player) {
         Inventory inventory = Bukkit.createInventory(player, 54, MENU_NAME);
@@ -69,7 +72,7 @@ public class ItemEnchantmentMenu extends EliteMenu {
             newLore.add(string
                     .replace("$price", price(inventory) + "")
                     .replace("$currencyName", EconomySettingsConfig.getCurrencyName())
-                    .replace("$successChance", (chances.get(Chance.SUCCESS) * 100) + "")
+                    .replace("$successChance", (Round.twoDecimalPlaces(chances.get(Chance.SUCCESS) * 100)) + "")
                     .replace("$criticalFailureChance", (chances.get(Chance.CRITICAL_FAILURE) * 100) + "")
                     .replace("$challengeChance", (chances.get(Chance.CHALLENGE) * 100) + "")
                     .replace("$failureChance", (chances.get(Chance.FAILURE) * 100) + ""));
@@ -181,11 +184,29 @@ public class ItemEnchantmentMenu extends EliteMenu {
         }
 
         private void confirm(InventoryClickEvent event) {
+            double price = price(event.getView().getTopInventory());
+            if (EconomyHandler.checkCurrency(event.getWhoClicked().getUniqueId()) < price) {
+                event.getWhoClicked().sendMessage(SpecialItemSystemsConfig.getInsufficientFundsMessage()
+                        .replace("$price", price + "")
+                        .replace("$currencyName", EconomySettingsConfig.getCurrencyName())
+                        .replace("$currentAmount", EconomyHandler.checkCurrency(event.getWhoClicked().getUniqueId()) + "")
+                        .replace("$itemName", event.getView().getTopInventory().getItem(ITEM_SLOT).getItemMeta().getDisplayName()));
+                event.getWhoClicked().closeInventory();
+                return;
+            }
+
             if (event.getView().getTopInventory().getItem(ITEM_SLOT) == null ||
                     event.getView().getTopInventory().getItem(ENCHANTED_BOOK_SLOT) == null) {
                 event.getWhoClicked().sendMessage(ChatColorConverter.convert("&8[EliteMobs] &cYou must add an elite item and an enchanted book to enchant an item!"));
                 return;
             }
+
+            EconomyHandler.subtractCurrency(event.getWhoClicked().getUniqueId(), price);
+            event.getWhoClicked().sendMessage(SpecialItemSystemsConfig.getNewFundsMessage()
+                    .replace("$price", price + "")
+                    .replace("$currencyName", EconomySettingsConfig.getCurrencyName())
+                    .replace("$currentAmount", EconomyHandler.checkCurrency(event.getWhoClicked().getUniqueId()) + ""));
+
             EnumMap<Chance, Double> chance = getChanceBreakdown(event.getView().getTopInventory());
             double rolledChance = ThreadLocalRandom.current().nextDouble();
             if (rolledChance < chance.get(Chance.CRITICAL_FAILURE))
@@ -206,8 +227,21 @@ public class ItemEnchantmentMenu extends EliteMenu {
         }
 
         private void challenge(InventoryClickEvent event) {
-            event.getWhoClicked().sendMessage(ChatColorConverter.convert("&8[EliteMobs] &6Challenge chance will go here eventually! Success for now."));
-            success(event);
+            ItemStack currentItem = event.getView().getTopInventory().getItem(ITEM_SLOT);
+            if (moveItemDown(event.getView().getTopInventory(), ITEM_SLOT, event.getWhoClicked(), false)) {
+                event.getWhoClicked().sendMessage(ChatColorConverter.convert(
+                        "&8[EliteMobs] &cYour inventory was full so the item you were trying to upgrade has been deleted! It will be restored if your item is not full by the time you leave the instanced dungeon."));
+            }
+            if (!EnchantmentDungeonInstance.setupRandomEnchantedChallengeDungeon((Player) event.getWhoClicked(),
+                    UpgradeSystem.upgrade(currentItem,
+                            event.getView().getTopInventory().getItem(ENCHANTED_BOOK_SLOT)),
+                    currentItem)) {
+                success(event);
+                return;
+            }
+
+            event.getWhoClicked().sendMessage(ChatColorConverter.convert("&8[EliteMobs] &6Challenge! Defeat the boss to get your upgraded item!"));
+            event.getWhoClicked().sendMessage(ChatColorConverter.convert("&cThere's a 10% chance of losing your item if you lose the fight! Leaving the arena counts as losing."));
         }
 
         private void criticalFailure(InventoryClickEvent event) {

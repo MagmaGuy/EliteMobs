@@ -50,10 +50,22 @@ public class EliteMenu implements Listener {
         event.getCurrentItem().setAmount(event.getCurrentItem().getAmount() - 1);
     }
 
-    public static void moveItemDown(Inventory inventoryToClear, int slotToClear, HumanEntity player) {
-        if (inventoryToClear.getItem(slotToClear) == null) return;
-        player.getWorld().dropItem(player.getLocation(), inventoryToClear.getItem(slotToClear));
+    //Returns true if there was an item loss
+    public static boolean moveItemDown(Inventory inventoryToClear, int slotToClear, HumanEntity player, boolean canDrop) {
+        boolean itemLoss = false;
+        if (inventoryToClear.getItem(slotToClear) == null) return itemLoss;
+        HashMap<Integer, ItemStack> leftovers = player.getInventory().addItem(inventoryToClear.getItem(slotToClear));
+        //Item is ultimately lost if the inventory is full and it can't be dropped
+        if (!leftovers.isEmpty() && canDrop)
+            player.getWorld().dropItem(player.getLocation(), inventoryToClear.getItem(slotToClear));
+        else if (!leftovers.isEmpty())
+            itemLoss = true;
         inventoryToClear.setItem(slotToClear, null);
+        return itemLoss;
+    }
+
+    public static void moveItemDown(Inventory inventoryToClear, int slotToClear, HumanEntity player) {
+        moveItemDown(inventoryToClear, slotToClear, player, true);
     }
 
 }

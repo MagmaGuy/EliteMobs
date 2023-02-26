@@ -23,7 +23,7 @@ processResources {
 }
 
 group 'com.magmaguy'
-version '8.4.0-SNAPSHOT-1'
+version '8.4.0-SNAPSHOT-2'
 
 repositories {
     maven {

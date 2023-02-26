@@ -6,7 +6,7 @@ import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.ProceduralItemGenerationSettingsConfig;
-import com.magmaguy.elitemobs.config.SpecialItemsConfig;
+import com.magmaguy.elitemobs.config.SpecialItemSystemsConfig;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
@@ -71,13 +71,13 @@ public class LootTables implements Listener {
                 generateLoot((int) Math.floor(itemLevel), eliteEntity, player);
             } else generateLoot(eliteEntity, player);
 
-            if (SpecialItemsConfig.isDropSpecialLoot()) {
+            if (SpecialItemSystemsConfig.isDropSpecialLoot()) {
                 if (eliteEntity instanceof CustomBossEntity customBossEntity &&
                         customBossEntity.getCustomBossesConfigFields().getHealthMultiplier() > 1.0 &&
-                        ThreadLocalRandom.current().nextDouble() < SpecialItemsConfig.getBossChanceToDrop())
+                        ThreadLocalRandom.current().nextDouble() < SpecialItemSystemsConfig.getBossChanceToDrop())
                     generateSpecialLoot(player, 0, eliteEntity);
                 else if (eliteEntity instanceof CustomBossEntity &&
-                        ThreadLocalRandom.current().nextDouble() < SpecialItemsConfig.getNonEliteChanceToDrop())
+                        ThreadLocalRandom.current().nextDouble() < SpecialItemSystemsConfig.getNonEliteChanceToDrop())
                     generateSpecialLoot(player, 0, eliteEntity);
             }
         }
@@ -376,7 +376,7 @@ public class LootTables implements Listener {
     }
 
     public static void generateSpecialLoot(Player player, int level, EliteEntity eliteEntity) {
-        CustomItem customItem = WeightedProbability.pickWeighedProbabilityFromCustomItems(SpecialItemsConfig.getSpecialValues());
+        CustomItem customItem = WeightedProbability.pickWeighedProbabilityFromCustomItems(SpecialItemSystemsConfig.getSpecialValues());
         if (customItem == null) return;
         player.getWorld().dropItem(player.getLocation(), customItem.generateItemStack(level, player, eliteEntity));
     }

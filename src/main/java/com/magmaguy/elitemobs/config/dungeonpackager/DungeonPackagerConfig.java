@@ -13,12 +13,19 @@ public class DungeonPackagerConfig extends CustomConfig {
 
     @Getter
     private static Map<String, DungeonPackagerConfigFields> dungeonPackages = new HashMap<>();
+    @Getter
+    private static Map<String, DungeonPackagerConfigFields> enchantedChallengeDungeonPackages = new HashMap<>();
+
 
     public DungeonPackagerConfig() {
         super("dungeonpackages", "com.magmaguy.elitemobs.config.dungeonpackager.premade", DungeonPackagerConfigFields.class);
         dungeonPackages = new HashMap<>();
+        enchantedChallengeDungeonPackages = new HashMap<>();
         for (String key : super.getCustomConfigFieldsHashMap().keySet()) {
-            dungeonPackages.put(key, (DungeonPackagerConfigFields) super.getCustomConfigFieldsHashMap().get(key));
+            if (!((DungeonPackagerConfigFields) super.getCustomConfigFieldsHashMap().get(key)).isEnchantmentChallenge())
+                dungeonPackages.put(key, (DungeonPackagerConfigFields) super.getCustomConfigFieldsHashMap().get(key));
+            else
+                enchantedChallengeDungeonPackages.put(key, (DungeonPackagerConfigFields) super.getCustomConfigFieldsHashMap().get(key));
             EMPackage.initialize((DungeonPackagerConfigFields) super.getCustomConfigFieldsHashMap().get(key));
         }
 

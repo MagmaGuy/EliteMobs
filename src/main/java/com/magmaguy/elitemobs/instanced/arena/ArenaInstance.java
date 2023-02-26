@@ -198,7 +198,7 @@ public class ArenaInstance extends MatchInstance {
 
         doRewards();
         if (currentWave > customArenasConfigFields.getWaveCount()) {
-            endMatch();
+            victory();
             return;
         }
         Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, () -> {

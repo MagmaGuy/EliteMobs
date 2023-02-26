@@ -389,10 +389,10 @@ public class AdventurersGuildConfig {
                 List.of("Sets the message sent to players if their loot gets nerfed due to their low guild level."),
                 file, fileConfiguration, "lootLimiterMessage", "&7[EM] &cYou must unlock the next guild rank through /ag to loot better items!", true);
         onRankUpCommand = ConfigurationEngine.setList(
-                List.of("Sets the commands that run on guild rank up."),
+                List.of("Sets the commands that run on guild rank up. Placeholders are:", "$prestigerank - outputs the prestige rank", "$activerank - outputs the currently active rank", "$player - outputs the player name"),
                 file, fileConfiguration, "onRankUpCommand", Collections.emptyList(), false);
         onPrestigeUpCommand = ConfigurationEngine.setList(
-                List.of("Sets the commands that run on prestige rank up."),
+                List.of("Sets the commands that run on prestige rank up.", "$prestigerank - outputs the prestige rank", "$activerank - outputs the currently active rank", "$player - outputs the player name"),
                 file, fileConfiguration, "onPrestigeUpCommand", Collections.emptyList(), false);
         dodge1 = ConfigurationEngine.setDouble(
                 List.of("Sets the prestige level for the first dodge bonus."),

@@ -25,7 +25,8 @@ public class WorldInstantiator {
             new WarningMessage("Blueprint world " + worldName + " is not a directory!");
             return null;
         }
-        File destinationWorld = new File(Bukkit.getWorldContainer().getAbsolutePath() + File.separatorChar + targetWorldName);
+
+        File destinationWorld = new File(Bukkit.getWorldContainer().getAbsolutePath().replace("\\.", "\\") + targetWorldName);
         if (destinationWorld.exists())
             recursivelyDelete(destinationWorld);
 
@@ -40,9 +41,9 @@ public class WorldInstantiator {
     }
 
     private static void copy(File file, Path targetPath) {
-        //new WarningMessage("File: " + file.getAbsolutePath());
-        //new WarningMessage("Target path: " + targetPath);
         try {
+            if (!targetPath.getParent().toFile().exists()) targetPath.getParent().toFile().mkdirs();
+
             if (file.isDirectory()) {
                 if (!targetPath.toFile().exists())
                     targetPath.toFile().mkdirs();
