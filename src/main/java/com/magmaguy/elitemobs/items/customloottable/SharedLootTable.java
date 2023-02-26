@@ -35,7 +35,8 @@ public class SharedLootTable {
         this.damagers = eliteEntity.getDamagers().keySet().stream().toList();
         sharedLootTables.put(eliteEntity, this);
         damagers.forEach(damager -> lootMenus.add(new LootMenu(damager, this, getPlayerTable(damager))));
-        Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, this::messagePlayers, 1);
+        if (damagers.size() > 1)
+            Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, this::messagePlayers, 1);
         endLoot();
     }
 
@@ -52,25 +53,33 @@ public class SharedLootTable {
     }
 
     private void endLoot() {
+        if (damagers.size() < 2) {
+            distribute();
+            return;
+        }
         new BukkitRunnable() {
             @Override
             public void run() {
-                for (ItemStack lootInstance : loot) {
-                    List<Player> needPlayers = new ArrayList<>();
-                    for (PlayerTable playerTable : playerTables.values())
-                        for (ItemStack neededLoot : playerTable.getNeedItems()) {
-                            if (neededLoot.isSimilar(lootInstance)) {
-                                needPlayers.add(playerTable.player);
-                            }
-                        }
-                    if (needPlayers.isEmpty()) {
-                        rollLoot(lootInstance, damagers);
-                    } else rollLoot(lootInstance, needPlayers);
-                }
-                sharedLootTables.remove(eliteEntity);
-                lootMenus.forEach(LootMenu::removeMenu);
+                distribute();
             }
         }.runTaskLater(MetadataHandler.PLUGIN, 20L * durationInSeconds);
+    }
+
+    private void distribute() {
+        for (ItemStack lootInstance : loot) {
+            List<Player> needPlayers = new ArrayList<>();
+            for (PlayerTable playerTable : playerTables.values())
+                for (ItemStack neededLoot : playerTable.getNeedItems()) {
+                    if (neededLoot.isSimilar(lootInstance)) {
+                        needPlayers.add(playerTable.player);
+                    }
+                }
+            if (needPlayers.isEmpty()) {
+                rollLoot(lootInstance, damagers);
+            } else rollLoot(lootInstance, needPlayers);
+        }
+        sharedLootTables.remove(eliteEntity);
+        lootMenus.forEach(LootMenu::removeMenu);
     }
 
     private void rollLoot(ItemStack item, List<Player> players) {

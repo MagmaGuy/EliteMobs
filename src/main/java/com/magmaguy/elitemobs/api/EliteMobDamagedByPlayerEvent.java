@@ -183,6 +183,9 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
             EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(event.getEntity());
             //Living entity is sometimes null when the damage is dealt to an already dead entity - might happen with mcmmo due to DOTs and stuff
             if (eliteEntity == null || !eliteEntity.isValid()) return;
+            //There's at least 1 gun plugin that makes players the projectile themselves.
+            if (event.getCause().equals(EntityDamageEvent.DamageCause.PROJECTILE) && !(event.getDamager() instanceof Projectile))
+                return;
 
             /*
             From this point on, the damage is confirmed to be processed by EliteMobs

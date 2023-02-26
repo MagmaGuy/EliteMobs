@@ -7,6 +7,7 @@ import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
 import com.magmaguy.elitemobs.utils.EventCaller;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.entity.Player;
@@ -78,6 +79,10 @@ public class EMPackage {
             //This is maintained for legacy reasons. Moving forward this should no longer be used
             switch (dungeonPackagerConfigFields.getDungeonLocationType()) {
                 case WORLD:
+                    if (dungeonPackagerConfigFields.getWorldName() == null) {
+                        new WarningMessage("Dungeon world name for dungeon package " + dungeonPackagerConfigFields.getFilename() + " is not set correctly! This dungeon will not work.");
+                        return;
+                    }
                     if (dungeonPackagerConfigFields.getWorldName().equals("em_adventurers_guild"))
                         new WorldDungeonPackage(dungeonPackagerConfigFields);
                     new WorldDungeonPackage(dungeonPackagerConfigFields);

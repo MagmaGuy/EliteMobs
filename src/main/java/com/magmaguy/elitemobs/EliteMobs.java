@@ -283,7 +283,7 @@ public class EliteMobs extends JavaPlugin {
         //Commands
         new CommandHandler();
 
-        SpecialItemsConfig.initializeConfig();
+        SpecialItemSystemsConfig.initializeConfig();
 
         /*
         Check for new plugin version or for dungeon updates

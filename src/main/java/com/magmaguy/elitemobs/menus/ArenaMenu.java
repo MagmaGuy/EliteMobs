@@ -46,7 +46,7 @@ public class ArenaMenu {
                 ArenaInstance arenaInstance = menus.get(event.getInventory()).getArenaInstance();
                 if (arenaInstance.getCustomArenasConfigFields().getPermission() != null &&
                         !arenaInstance.getCustomArenasConfigFields().getPermission().isEmpty())
-                    if (!player.hasMetadata(arenaInstance.getCustomArenasConfigFields().getPermission())) {
+                    if (!player.hasPermission(arenaInstance.getCustomArenasConfigFields().getPermission())) {
                         player.sendMessage(ArenasConfig.getNoArenaPermissionMessage());
                         player.closeInventory();
                         return;

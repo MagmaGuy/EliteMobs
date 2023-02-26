@@ -43,7 +43,7 @@ public class LightningEnchantment extends CustomEnchantment {
         @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
         public void onEntityDamagedByPlayer(EliteMobDamagedByPlayerEvent event) {
             if (event.getPlayer().hasMetadata("NPC") ||
-                    ElitePlayerInventory.playerInventories.containsKey(event.getPlayer().getUniqueId())) return;
+                    !ElitePlayerInventory.playerInventories.containsKey(event.getPlayer().getUniqueId())) return;
             if (playersInCooldown.contains(event.getPlayer())) return;
             double lightningChance = ElitePlayerInventory.playerInventories.get(event.getPlayer().getUniqueId()).getLightningChance(true);
             if (lightningChance <= 0) return;

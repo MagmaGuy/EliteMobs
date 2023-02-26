@@ -25,11 +25,11 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
     @Getter
     private ContentType contentType = null;
     @Getter
-    private List<String> customInfo = new ArrayList<>();
+    private List<String> customInfo = null;
     @Getter
-    private List<String> relativeBossLocations = new ArrayList<>();
+    private List<String> relativeBossLocations = null;
     @Getter
-    private List<String> relativeTreasureChestLocations = new ArrayList<>();
+    private List<String> relativeTreasureChestLocations = null;
     @Getter
     private String downloadLink = "";
     @Getter
@@ -40,7 +40,7 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
     @Setter
     private String wormholeWorldName;
     @Getter
-    private String schematicName = "";
+    private String schematicName = null;
     @Getter
     private World.Environment environment = World.Environment.NORMAL;
     @Getter
@@ -58,14 +58,14 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
     @Getter
     private int dungeonVersion = 0;
     @Getter
-    private String playerInfo = "";
+    private String playerInfo = null;
     @Getter
-    private String regionEnterMessage = "";
+    private String regionEnterMessage = null;
     @Getter
-    private String regionLeaveMessage = "";
+    private String regionLeaveMessage = null;
     @Getter
     @Setter
-    private List<String> worldGuardFlags = new ArrayList<>();
+    private List<String> worldGuardFlags = null;
     @Getter
     @Setter
     private boolean hasCustomModels = false;
@@ -76,7 +76,7 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
     @Getter
     private String teleportLocationString = null;
     @Getter
-    private String teleportLocationOffsetString = "";
+    private String teleportLocationOffsetString = null;
     @Getter
     private Location teleportLocationOffset = null;
     @Getter
@@ -99,6 +99,9 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
     @Getter
     @Setter
     private List<Map<String, Object>> difficulties;
+    @Getter
+    @Setter
+    private boolean enchantmentChallenge = false;
 
     public DungeonPackagerConfigFields(String fileName, boolean isEnabled) {
         super(fileName, isEnabled);
@@ -307,26 +310,26 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
     @Override
     public void processConfigFields() {
         this.isEnabled = processBoolean("isEnabled", isEnabled, false, true);
-        this.name = translatable(filename, "name", processString("name", name, "name", true));
+        this.name = translatable(filename, "name", processString("name", name, null, true));
         this.dungeonLocationType = processEnum("dungeonLocationType", dungeonLocationType, null, DungeonLocationType.class, true);
         if (dungeonLocationType == null) {
             new WarningMessage("File " + filename + " does not have a valid dungeonLocationType!");
             this.fileConfiguration = null;
             return;
         }
-        this.customInfo = translatable(filename, "customInfo", processStringList("customInfo", customInfo, customInfo, true));
-        this.relativeBossLocations = processStringList("relativeBossLocations", relativeBossLocations, new ArrayList<>(), false);
-        this.relativeTreasureChestLocations = processStringList("relativeTreasureChestLocations", relativeTreasureChestLocations, new ArrayList<>(), false);
-        this.downloadLink = processString("downloadLink", downloadLink, "", false);
+        this.customInfo = translatable(filename, "customInfo", processStringList("customInfo", customInfo, null, true));
+        this.relativeBossLocations = processStringList("relativeBossLocations", relativeBossLocations, null, false);
+        this.relativeTreasureChestLocations = processStringList("relativeTreasureChestLocations", relativeTreasureChestLocations, null, false);
+        this.downloadLink = processString("downloadLink", downloadLink, null, false);
         this.dungeonSizeCategory = processEnum("dungeonSizeCategory", dungeonSizeCategory, null, DungeonSizeCategory.class, false);
         if (dungeonSizeCategory == null) {
             new WarningMessage("File " + filename + " does not have a valid dungeonSizeCategory!");
             this.fileConfiguration = null;
             return;
         }
-        this.worldName = processString("worldName", worldName, "", false);
-        this.wormholeWorldName = processString("wormholeWorldName", wormholeWorldName, "", false);
-        this.schematicName = processString("schematicName", schematicName, "", false);
+        this.worldName = processString("worldName", worldName, null, false);
+        this.wormholeWorldName = processString("wormholeWorldName", wormholeWorldName, null, false);
+        this.schematicName = processString("schematicName", schematicName, null, false);
         this.environment = processEnum("environment", environment, null, World.Environment.class, false);
         this.protect = processBoolean("protect", protect, true, true);
         this.anchorPoint = processLocation("anchorPoint", anchorPoint, null, false);
@@ -343,13 +346,13 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
         this.corner1 = processVector("corner1", corner1, null, false);
         this.corner2 = processVector("corner2", corner2, null, false);
         this.dungeonVersion = processInt("dungeonVersion", dungeonVersion, 0, false);
-        this.playerInfo = translatable(filename, "playerInfo", processString("playerInfo", playerInfo, "", false));
-        this.regionEnterMessage = translatable(filename, "regionEnterMessage", processString("regionEnterMessage", regionEnterMessage, "", false));
-        this.regionLeaveMessage = translatable(filename, "regionLeaveMessage", processString("regionLeaveMessage", regionLeaveMessage, "", false));
+        this.playerInfo = translatable(filename, "playerInfo", processString("playerInfo", playerInfo, null, false));
+        this.regionEnterMessage = translatable(filename, "regionEnterMessage", processString("regionEnterMessage", regionEnterMessage, null, false));
+        this.regionLeaveMessage = translatable(filename, "regionLeaveMessage", processString("regionLeaveMessage", regionLeaveMessage, null, false));
         this.hasCustomModels = processBoolean("hasCustomModels", hasCustomModels, false, false);
         this.startLocationString = processString("startLocation", startLocationString, null, false);
         this.teleportLocationString = processString("teleportLocation", teleportLocationString, null, false);
-        this.teleportLocationOffsetString = processString("teleportLocationOffset", teleportLocationOffsetString, "", false);
+        this.teleportLocationOffsetString = processString("teleportLocationOffset", teleportLocationOffsetString, null, false);
         if (teleportLocationOffsetString != null && !teleportLocationOffsetString.isEmpty())
             this.teleportLocationOffset = ConfigurationLocation.serialize(teleportLocationOffsetString);
         this.permission = processString("permission", permission, null, false);
@@ -362,6 +365,7 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
         if (fileConfiguration.contains("difficulties"))
             this.difficulties = (List<Map<String, Object>>) fileConfiguration.getList("difficulties");
         else fileConfiguration.addDefault("difficulties", difficulties);
+        enchantmentChallenge = processBoolean("enchantmentChallenge", enchantmentChallenge, false, false);
         processAdditionalFields();
     }
 

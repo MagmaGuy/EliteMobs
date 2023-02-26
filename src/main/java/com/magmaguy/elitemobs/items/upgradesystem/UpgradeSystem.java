@@ -17,7 +17,8 @@ public class UpgradeSystem {
     private UpgradeSystem() {
     }
 
-    public static ItemStack upgrade(ItemStack itemToUpgrade, ItemStack enchantedBook) {
+    public static ItemStack upgrade(ItemStack originalItemToUpgrade, ItemStack enchantedBook) {
+        ItemStack itemToUpgrade = originalItemToUpgrade.clone();
         ItemMeta itemMeta = itemToUpgrade.getItemMeta();
         Map<NamespacedKey, Integer> currentEnchantments = ItemTagger.getItemEnchantments(itemToUpgrade);
         Map<NamespacedKey, Integer> bookEnchantments = ItemTagger.getItemEnchantments(enchantedBook);

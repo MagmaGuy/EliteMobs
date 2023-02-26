@@ -24,6 +24,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 public class DungeonInstance extends MatchInstance {
     @Getter
@@ -32,7 +33,7 @@ public class DungeonInstance extends MatchInstance {
     @Getter
     private final World world;
     @Getter
-    private String instancedWorldName;
+    private final String instancedWorldName;
     private final File instancedWorldFile;
     @Getter
     private final DungeonPackagerConfigFields dungeonPackagerConfigFields;
@@ -69,21 +70,37 @@ public class DungeonInstance extends MatchInstance {
         dungeonInstances.add(this);
     }
 
-    public static boolean setupInstancedDungeon(Player player, String instancedDungeonConfigFieldsString, String difficultyName) {
+    public static void setupInstancedDungeon(Player player, String instancedDungeonConfigFieldsString, String difficultyName) {
         DungeonPackagerConfigFields instancedDungeonsConfigFields = DungeonPackagerConfig.getDungeonPackages().get(instancedDungeonConfigFieldsString);
         if (instancedDungeonsConfigFields == null) {
             player.sendMessage("[EliteMobs] Failed to get data for dungeon " + instancedDungeonConfigFieldsString + "! The dungeon will not start.");
-            return false;
+            return;
         }
 
         if (instancedDungeonsConfigFields.getPermission() != null && !instancedDungeonsConfigFields.getPermission().isEmpty())
             if (!player.hasPermission(instancedDungeonsConfigFields.getPermission())) {
                 player.sendMessage("[EliteMobs] You don't have the permission to go to this dungeon!");
-                return false;
+                return;
             }
 
         String instancedWordName = WorldInstantiator.getNewWorldName(instancedDungeonsConfigFields.getWorldName());
 
+        if (!launchEvent(instancedDungeonsConfigFields, instancedWordName, player)) return;
+
+        CompletableFuture<File> future = CompletableFuture.supplyAsync(() ->
+                cloneWorldFiles(instancedDungeonsConfigFields, instancedWordName, player));
+        future.thenAccept(file -> {
+            if (file == null) return;
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    initializeInstancedWorld(instancedDungeonsConfigFields, instancedWordName, player, file, difficultyName);
+                }
+            }.runTask(MetadataHandler.PLUGIN);
+        });
+    }
+
+    protected static boolean launchEvent(DungeonPackagerConfigFields instancedDungeonsConfigFields, String instancedWordName, Player player) {
         WorldInstanceEvent worldInstanceEvent = new WorldInstanceEvent(
                 instancedDungeonsConfigFields.getWorldName(),
                 instancedWordName,
@@ -93,49 +110,52 @@ public class DungeonInstance extends MatchInstance {
             player.sendMessage("[EliteMobs] Something cancelled the instancing event! The dungeon will not start.");
             return false;
         }
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                File targetFile = WorldInstantiator.cloneWorld(instancedDungeonsConfigFields.getWorldName(), instancedWordName, instancedDungeonsConfigFields.getDungeonConfigFolderName());
-                if (targetFile == null) {
-                    player.sendMessage("[EliteMobs] Failed to copy the world! Report this to the dev. The dungeon will not start.");
-                    return;
-                }
-
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        World world = DungeonUtils.loadWorld(instancedWordName, instancedDungeonsConfigFields.getEnvironment());
-                        if (world == null) {
-                            player.sendMessage("[EliteMobs] Failed to load the world! Report this to the dev. The dungeon will not start.");
-                            return;
-                        }
-                        if (Bukkit.getPluginManager().getPlugin("WorldGuard") != null)
-                            WorldGuardCompatibility.protectWorldMinidugeonArea(world);
-
-                        //Location where players are teleported to start completing the dungeon
-                        Location startLocation = ConfigurationLocation.serialize(instancedDungeonsConfigFields.getStartLocationString());
-                        startLocation.setWorld(world);
-                        //Lobby location is optional, if null it should be the same as the start location
-                        Location lobbyLocation = ConfigurationLocation.serialize(instancedDungeonsConfigFields.getTeleportLocationString());
-                        if (lobbyLocation != null) lobbyLocation.setWorld(world);
-                        else lobbyLocation = startLocation;
-                        //Location where players are teleported to upon completion, this usually gets overriden with the previous location players were at
-                        //todo: will probably want to define this at some point Location endLocation = ConfigurationLocation.serialize(instancedDungeonsConfigFields.getEndLocation());
-                        //endLocation.setWorld(world);
-                        DungeonInstance dungeonInstance = new DungeonInstance(instancedDungeonsConfigFields, lobbyLocation, startLocation, world, targetFile, player, difficultyName);
-                    }
-                }.runTask(MetadataHandler.PLUGIN);
-            }
-        }.runTaskAsynchronously(MetadataHandler.PLUGIN);
-
         return true;
+    }
+
+    protected static File cloneWorldFiles(DungeonPackagerConfigFields instancedDungeonsConfigFields, String instancedWordName, Player player) {
+        File targetFile = WorldInstantiator.cloneWorld(instancedDungeonsConfigFields.getWorldName(), instancedWordName, instancedDungeonsConfigFields.getDungeonConfigFolderName());
+        if (targetFile == null) {
+            player.sendMessage("[EliteMobs] Failed to copy the world! Report this to the dev. The dungeon will not start.");
+            return null;
+        }
+        return targetFile;
+    }
+
+    protected static DungeonInstance initializeInstancedWorld(DungeonPackagerConfigFields instancedDungeonsConfigFields,
+                                                              String instancedWordName,
+                                                              Player player,
+                                                              File targetFile,
+                                                              String difficultyName) {
+        World world = DungeonUtils.loadWorld(instancedWordName, instancedDungeonsConfigFields.getEnvironment());
+        if (world == null) {
+            player.sendMessage("[EliteMobs] Failed to load the world! Report this to the dev. The dungeon will not start.");
+            return null;
+        }
+        if (Bukkit.getPluginManager().getPlugin("WorldGuard") != null)
+            WorldGuardCompatibility.protectWorldMinidugeonArea(world);
+
+        //Location where players are teleported to start completing the dungeon
+        Location startLocation = ConfigurationLocation.serialize(instancedDungeonsConfigFields.getStartLocationString());
+        startLocation.setWorld(world);
+        //Lobby location is optional, if null it should be the same as the start location
+        Location lobbyLocation = ConfigurationLocation.serialize(instancedDungeonsConfigFields.getTeleportLocationString());
+        if (lobbyLocation != null) lobbyLocation.setWorld(world);
+        else lobbyLocation = startLocation;
+        //Location where players are teleported to upon completion, this usually gets overriden with the previous location players were at
+        //todo: will probably want to define this at some point Location endLocation = ConfigurationLocation.serialize(instancedDungeonsConfigFields.getEndLocation());
+        //endLocation.setWorld(world);
+        if (!instancedDungeonsConfigFields.isEnchantmentChallenge())
+            return new DungeonInstance(instancedDungeonsConfigFields, lobbyLocation, startLocation, world, targetFile, player, difficultyName);
+        else
+            return new EnchantmentDungeonInstance(instancedDungeonsConfigFields, lobbyLocation, startLocation, world, targetFile, player, difficultyName);
     }
 
     @Override
     public boolean addNewPlayer(Player player) {
         if (!super.addNewPlayer(player)) return false;
-        player.sendMessage("[EliteMobs] Dungeon difficulty is set to " + difficultyName + " ! Level sync caps your item level to " + levelSync + ".");
+        if (levelSync > 0)
+            player.sendMessage("[EliteMobs] Dungeon difficulty is set to " + difficultyName + " ! Level sync caps your item level to " + levelSync + ".");
         return true;
     }
 
@@ -160,7 +180,7 @@ public class DungeonInstance extends MatchInstance {
                 return false;
         new EventCaller(new DungeonCompleteEvent(this));
         //This means the dungeon just completed
-        endMatch();
+        victory();
         return true;
     }
 
@@ -228,16 +248,15 @@ public class DungeonInstance extends MatchInstance {
             return;
         }
 
-        if (difficulty.get("levelSync") == null) {
-            new WarningMessage("No valid level sync setting for " + difficultyName + " in instanced dungeon " + dungeonPackagerConfigFields.getFilename());
-            return;
-        }
-
-        try {
-            this.levelSync = MapListInterpreter.parseInteger("levelSync", difficulty.get("levelSync"), dungeonPackagerConfigFields.getFilename());
-        } catch (Exception exception) {
-            return;
-        }
+        if (difficulty.get("levelSync") != null) {
+            try {
+                this.levelSync = MapListInterpreter.parseInteger("levelSync", difficulty.get("levelSync"), dungeonPackagerConfigFields.getFilename());
+            } catch (Exception exception) {
+                new WarningMessage("Incorrect level sync entry for dungeon " + dungeonPackagerConfigFields.getFilename() + " ! Value: " + levelSync + " . No level sync will be applied!");
+                this.levelSync = 0;
+            }
+        } else
+            this.levelSync = 0;
 
         //Used for loot
         if (difficulty.get("id") != null) {

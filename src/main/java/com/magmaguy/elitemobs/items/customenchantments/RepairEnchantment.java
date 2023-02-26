@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -23,13 +24,17 @@ public class RepairEnchantment extends CustomEnchantment {
         else if (tier < 200) scrapLevel = 4;
         else scrapLevel = 5;
         CustomItem scrapItem = switch (scrapLevel) {
-            case 1 -> CustomItem.getCustomItem("tiny_elite_scrap.yml");
-            case 2 -> CustomItem.getCustomItem("small_elite_scrap.yml");
-            case 3 -> CustomItem.getCustomItem("medium_elite_scrap.yml");
-            case 4 -> CustomItem.getCustomItem("large_elite_scrap.yml");
-            case 5 -> CustomItem.getCustomItem("huge_elite_scrap.yml");
-            default -> CustomItem.getCustomItem("tiny_elite_scrap.yml");
+            case 1 -> CustomItem.getCustomItem("elite_scrap_tiny.yml");
+            case 2 -> CustomItem.getCustomItem("elite_scrap_small.yml");
+            case 3 -> CustomItem.getCustomItem("elite_scrap_medium.yml");
+            case 4 -> CustomItem.getCustomItem("elite_scrap_large.yml");
+            case 5 -> CustomItem.getCustomItem("elite_scrap_huge.yml");
+            default -> CustomItem.getCustomItem("elite_scrap_tiny.yml");
         };
+        if (scrapItem == null) {
+            new WarningMessage("Failed to generate scrap! Was the default elite scrap disabled?");
+            return null;
+        }
         return scrapItem.generateItemStack(scrapLevel, player, eliteEntity);
     }
 

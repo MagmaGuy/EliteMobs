@@ -209,8 +209,23 @@ public abstract class MatchInstance {
         participants = (HashSet<Player>) players.clone();
     }
 
+    /*
+    This is useful for extending behavior down the line like the enchanted dungeon loot
+     */
+    protected void victory() {
+        state = InstancedRegionState.COMPLETED_VICTORY;
+        endMatch();
+    }
+
+    protected void defeat() {
+        state = InstancedRegionState.COMPLETED_DEFEAT;
+        endMatch();
+    }
+
     protected void endMatch() {
-        state = InstancedRegionState.COMPLETED;
+        if (state != InstancedRegionState.COMPLETED_VICTORY &&
+                state != InstancedRegionState.COMPLETED_DEFEAT)
+            state = InstancedRegionState.COMPLETED;
     }
 
     protected void resetMatch() {
@@ -232,7 +247,7 @@ public abstract class MatchInstance {
     }
 
     public enum InstancedRegionState {
-        WAITING, STARTING, ONGOING, COMPLETED
+        WAITING, STARTING, ONGOING, COMPLETED, COMPLETED_VICTORY, COMPLETED_DEFEAT
     }
 
     public static class MatchInstanceEvents implements Listener {
@@ -269,7 +284,7 @@ public abstract class MatchInstance {
             matchInstance.playerDeath(player);
         }
 
-        @EventHandler (ignoreCancelled = true)
+        @EventHandler(ignoreCancelled = true)
         public void onPlayerTeleport(PlayerTeleportEvent event) {
             if (teleportBypass) {
                 teleportBypass = false;
