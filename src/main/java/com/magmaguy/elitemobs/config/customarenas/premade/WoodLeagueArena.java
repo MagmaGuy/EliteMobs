@@ -663,7 +663,7 @@ public class WoodLeagueArena extends CustomArenasConfigFields {
                 "filename=enchanted_book_damage_all.yml:wave=50:chance=0.1",
                 "filename=enchanted_book_arrow_damage.yml:wave=50:chance=0.1",
 
-                "filename=elite_scrap.yml:wave=5:chance=1:amount=5",
+                "filename=elite_scrap_tiny.yml:wave=5:chance=1:amount=5",
                 "filename=elite_scrap_tiny.yml:wave=10:chance=1:amount=5",
                 "filename=elite_scrap_small.yml:wave=15:chance=1:amount=5",
                 "filename=elite_scrap_small.yml:wave=20:chance=1:amount=5",

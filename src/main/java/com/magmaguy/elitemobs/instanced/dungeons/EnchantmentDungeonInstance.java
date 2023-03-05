@@ -16,6 +16,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
@@ -95,7 +96,8 @@ public class EnchantmentDungeonInstance extends DungeonInstance {
         super.victory();
         player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2You succeeded your item enchantment challenge! Your item has been successfully enchanted."));
         player.getInventory().remove(currentItem);
-        player.getWorld().dropItem(player.getLocation(), upgradedItem);
+        HashMap<Integer, ItemStack> leftOvers = player.getInventory().addItem(upgradedItem);
+        if (!leftOvers.isEmpty()) player.getWorld().dropItem(player.getLocation(), upgradedItem);
     }
 
     @Override

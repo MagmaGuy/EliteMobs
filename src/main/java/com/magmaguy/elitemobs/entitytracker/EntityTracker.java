@@ -136,10 +136,12 @@ public class EntityTracker implements Listener {
         if (temporaryBlocks.contains(block)) previousBlockData = null;
         temporaryBlocks.add(block);
         block.setType(replacementMaterial);
+        UUID worldUUID = block.getWorld().getUID();
         BlockData finalPreviousBlockData = previousBlockData;
         new BukkitRunnable() {
             @Override
             public void run() {
+                if (Bukkit.getWorld(worldUUID) == null) return;
                 temporaryBlocks.remove(block);
                 if (!block.getBlockData().equals(finalPreviousBlockData))
                     if (finalPreviousBlockData != null)
@@ -219,6 +221,7 @@ public class EntityTracker implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onWorldUnload(WorldUnloadEvent event) {
         EntityTracker.wipeWorld(event.getWorld(), RemovalReason.WORLD_UNLOAD);
+        temporaryBlocks.removeIf(block->block.getWorld().equals(event.getWorld()));
     }
 
     @EventHandler(ignoreCancelled = true)

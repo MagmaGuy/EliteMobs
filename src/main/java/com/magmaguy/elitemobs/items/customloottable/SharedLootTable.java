@@ -54,9 +54,16 @@ public class SharedLootTable {
 
     private void endLoot() {
         if (damagers.size() < 2) {
-            distribute();
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    distribute();
+                    return;
+                }
+            }.runTaskLater(MetadataHandler.PLUGIN, 1);
             return;
         }
+
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -85,8 +92,8 @@ public class SharedLootTable {
     private void rollLoot(ItemStack item, List<Player> players) {
         Player player = players.get(ThreadLocalRandom.current().nextInt(players.size()));
         SoulbindEnchantment.addEnchantment(item, player);
-        if (!player.getInventory().addItem(item).isEmpty())
-            player.getWorld().dropItemNaturally(player.getLocation(), item);
+        HashMap<Integer, ItemStack> pendingItems = player.getInventory().addItem(item);
+        if (!pendingItems.isEmpty()) player.getWorld().dropItemNaturally(player.getLocation(), item);
         players.forEach(thisPlayer -> thisPlayer.sendMessage(
                 player.getDisplayName() + ChatColor.GREEN + " received " + item.getItemMeta().getDisplayName() + " !"));
     }

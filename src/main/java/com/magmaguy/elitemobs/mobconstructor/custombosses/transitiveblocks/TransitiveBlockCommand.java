@@ -86,7 +86,6 @@ public class TransitiveBlockCommand {
                     transitiveBlockList = TransitiveBlock.serializeTransitiveBlocks(customBossesConfigFields.getOnRemoveBlockStates(), customBossesConfigFields.getFilename());
             }
 
-
         activePlayers.put(player, this);
         player.sendMessage(ChatColor.GREEN + "[EliteMobs] Now registering " + transitiveBlockType.toString() + " blocks! " + ChatColor.DARK_GREEN + "Punch blocks to register air at that location, or right click blocks to register the block you right clicked!");
         player.sendMessage(ChatColor.GOLD + "[EliteMobs] Run the same command to stop registering blocks and save!");
