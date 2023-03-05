@@ -191,15 +191,13 @@ public class ConfigurationImporter {
                 if (Paths.get(targetPath + "" + File.separatorChar + file.getName()).toFile().exists())
                     for (File iteratedFile : file.listFiles())
                         moveFile(iteratedFile, Paths.get(targetPath + "" + File.separatorChar + file.getName()), force);
-                else
+                else {
+                    targetPath.toFile().mkdirs();
                     Files.move(file.toPath(), Paths.get(targetPath + "" + File.separatorChar + file.getName()), StandardCopyOption.REPLACE_EXISTING);
-            } else if (targetPath.toFile().exists())
+                }
+            } else if (targetPath.toFile().exists()) {
+                targetPath.toFile().mkdirs();
                 Files.move(file.toPath(), Paths.get(targetPath + "" + File.separatorChar + file.getName()), StandardCopyOption.REPLACE_EXISTING);
-            else if (!Paths.get(targetPath + "" + File.separatorChar + file.getName()).toFile().exists() && force) {
-                File newFile = Paths.get(targetPath + "" + File.separatorChar + file.getName()).toFile();
-                newFile.mkdirs();
-                newFile.createNewFile();
-                Files.move(file.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
             }
         } catch (Exception exception) {
             new WarningMessage("Failed to move directories for " + file.getName() + "! Tell the dev!");
