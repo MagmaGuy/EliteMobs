@@ -170,6 +170,7 @@ public class CustomConfig {
             } catch (InvalidConfigurationException ex) {
                 new WarningMessage("Failed to load file " + file.getName() + " in " + file.getAbsolutePath() + " ! This file is not correctly formatted for a yaml file.");
                 new WarningMessage("You can check the file vality by through YAML linters, such as the one at https://www.yamllint.com/");
+                ex.printStackTrace();
                 return;
             }
             //Instantiate the correct CustomConfigFields instance

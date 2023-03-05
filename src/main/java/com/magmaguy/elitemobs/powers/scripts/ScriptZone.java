@@ -171,7 +171,7 @@ public class ScriptZone {
 
             for (LivingEntity livingEntity : livingEntities) {
                 if (targetType.equals(TargetType.ZONE_FULL)) {
-                    if (shape.contains(livingEntity.getLocation())) validatedEntities.add(livingEntity);
+                    if (shape.contains(livingEntity)) validatedEntities.add(livingEntity);
                 } else if (targetType.equals(TargetType.ZONE_BORDER)) {
                     if (shape.borderContains(livingEntity.getLocation())) validatedEntities.add(livingEntity);
                 }

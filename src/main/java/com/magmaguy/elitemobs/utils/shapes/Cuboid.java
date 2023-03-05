@@ -2,6 +2,8 @@ package com.magmaguy.elitemobs.utils.shapes;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
@@ -33,6 +35,12 @@ public class Cuboid extends Shape {
         if (Math.abs(localVector.getY()) > y) return false;
         if (Math.abs(localVector.getZ()) > z) return false;
         return true;
+    }
+
+    @Override
+    public boolean contains(LivingEntity livingEntity) {
+        BoundingBox boundingBox = new BoundingBox(-x, x, 0, y, -z, z);
+        return livingEntity.getBoundingBox().contains(boundingBox);
     }
 
     @Override

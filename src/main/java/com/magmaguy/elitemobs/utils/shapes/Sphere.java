@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.utils.shapes;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
@@ -25,6 +26,14 @@ public class Sphere extends Shape {
     @Override
     public boolean contains(Location position) {
         return centerLocation.distanceSquared(position) < Math.pow(radius, 2);
+    }
+
+    @Override
+    public boolean contains(LivingEntity livingEntity) {
+        double entityRadius = (livingEntity.getEyeLocation().getY() - livingEntity.getLocation().getY()) / 2D;
+        Location EntityCenterLocation = livingEntity.getLocation().add(new Vector(0, entityRadius, 0));
+        double radiusSum = radius + entityRadius;
+        return EntityCenterLocation.distanceSquared(centerLocation) <= Math.pow(radiusSum, 2);
     }
 
     @Override
@@ -59,7 +68,7 @@ public class Sphere extends Shape {
         locationVectors = new ArrayList<>();
         for (int x = (int) -radius; x < (int) radius; x++)
             for (int z = (int) -radius; z < (int) radius; z++)
-                for (int y = (int)-radius; y < radius; y++) {
+                for (int y = (int) -radius; y < radius; y++) {
                     Vector newVector = new Vector(x, y, z);
                     Location newLocation = centerLocation.clone().add(newVector);
                     if (contains(newLocation)) locationVectors.add(newVector);
