@@ -155,8 +155,10 @@ public class ConfigurationExporter {
                     copyFile(iteratedFile, Paths.get(targetPath + "" + File.separatorChar + file.getName()));
             } else {
                 if (!Paths.get(targetPath + "" + File.separatorChar + file.getName()).toFile().exists() ||
-                        !targetPath.toString().contains("pack.png") && !targetPath.toString().contains("pack.mcmeta"))
+                        !targetPath.toString().contains("pack.png") && !targetPath.toString().contains("pack.mcmeta")) {
+                    if (!targetPath.toFile().exists()) targetPath.toFile().mkdirs();
                     Files.copy(file.toPath(), Paths.get(targetPath + "" + File.separatorChar + file.getName()), StandardCopyOption.REPLACE_EXISTING);
+                }
                 else
                     new InfoMessage("File " + targetPath + "" + File.separatorChar + file.getName() + " already existed and should not be overwritten, skipping!");
             }
