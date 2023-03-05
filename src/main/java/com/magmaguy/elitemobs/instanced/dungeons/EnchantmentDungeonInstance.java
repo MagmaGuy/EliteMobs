@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.SpecialItemSystemsConfig;
 import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfig;
 import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
+import com.magmaguy.elitemobs.utils.Developer;
 import com.magmaguy.elitemobs.utils.WorldInstantiator;
 import lombok.Getter;
 import lombok.Setter;
@@ -82,7 +83,6 @@ public class EnchantmentDungeonInstance extends DungeonInstance {
 
     @Override
     public void endMatch() {
-        player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2Challenge complete! Instance will close in 10 seconds. &6You can leave earlier by doing &9/em quit&6!"));
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -94,6 +94,7 @@ public class EnchantmentDungeonInstance extends DungeonInstance {
     @Override
     protected void victory() {
         super.victory();
+        player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2Challenge complete! Instance will close in 10 seconds. &6You can leave earlier by doing &9/em quit&6!"));
         player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2You succeeded your item enchantment challenge! Your item has been successfully enchanted."));
         player.getInventory().remove(currentItem);
         HashMap<Integer, ItemStack> leftOvers = player.getInventory().addItem(upgradedItem);
@@ -103,6 +104,7 @@ public class EnchantmentDungeonInstance extends DungeonInstance {
     @Override
     protected void defeat() {
         super.defeat();
+        Developer.message("Defeat detected");
         if (ThreadLocalRandom.current().nextDouble() < SpecialItemSystemsConfig.getCriticalFailureChanceDuringChallengeChance()) {
             player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Critical enchantment failure! You have lost " + currentItem.getItemMeta().getDisplayName() + " &c!"));
             player.getInventory().remove(currentItem);
