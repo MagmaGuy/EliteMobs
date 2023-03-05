@@ -268,7 +268,7 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
 
             //No antiexploit checks for dungeons
             if (!(EliteMobs.worldGuardIsEnabled &&
-                    !WorldGuardFlagChecker.checkFlag(eliteEntity.getLivingEntity().getLocation(), WorldGuardCompatibility.getEliteMobsAntiExploitFlag())) &&
+                    !WorldGuardFlagChecker.checkFlag(eliteEntity.getLocation(), WorldGuardCompatibility.getEliteMobsAntiExploitFlag())) &&
                     event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK) &&
                     !eliteEntity.isInAntiExploitCooldown())
                 Bukkit.getServer().getPluginManager().callEvent(new EliteMobDamagedByPlayerAntiExploitEvent(eliteEntity, eliteMobDamagedByPlayerEvent));

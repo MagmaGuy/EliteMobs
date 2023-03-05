@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.menus;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
+import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
 import com.magmaguy.elitemobs.config.SpecialItemSystemsConfig;
 import com.magmaguy.elitemobs.config.menus.premade.ItemEnchantmentMenuConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
@@ -11,6 +12,7 @@ import com.magmaguy.elitemobs.items.upgradesystem.EliteEnchantmentItems;
 import com.magmaguy.elitemobs.items.upgradesystem.UpgradeSystem;
 import com.magmaguy.elitemobs.utils.Round;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -48,7 +50,10 @@ public class ItemEnchantmentMenu extends EliteMenu {
     private static final double CHALLENGE_CHANCE = SpecialItemSystemsConfig.getChallengeChance();
 
     public ItemEnchantmentMenu(Player player) {
-        Inventory inventory = Bukkit.createInventory(player, 54, MENU_NAME);
+        String name = MENU_NAME;
+        if (ResourcePackDataConfig.isDisplayCustomMenuUnicodes())
+            name = ChatColor.WHITE + "\uF801\uDB80\uDC2A\uF805           " + MENU_NAME;
+        Inventory inventory = Bukkit.createInventory(player, 54, name);
         ItemEnchantMenuEvents.menus.add(inventory);
 
         inventory.setItem(INFO_SLOT, infoButton);
@@ -73,9 +78,9 @@ public class ItemEnchantmentMenu extends EliteMenu {
                     .replace("$price", price(inventory) + "")
                     .replace("$currencyName", EconomySettingsConfig.getCurrencyName())
                     .replace("$successChance", (Round.twoDecimalPlaces(chances.get(Chance.SUCCESS) * 100)) + "")
-                    .replace("$criticalFailureChance", (chances.get(Chance.CRITICAL_FAILURE) * 100) + "")
-                    .replace("$challengeChance", (chances.get(Chance.CHALLENGE) * 100) + "")
-                    .replace("$failureChance", (chances.get(Chance.FAILURE) * 100) + ""));
+                    .replace("$criticalFailureChance", (Round.twoDecimalPlaces(chances.get(Chance.CRITICAL_FAILURE) * 100)) + "")
+                    .replace("$challengeChance", (Round.twoDecimalPlaces(chances.get(Chance.CHALLENGE) * 100)) + "")
+                    .replace("$failureChance", (Round.twoDecimalPlaces(chances.get(Chance.FAILURE) * 100)) + ""));
         itemMeta.setLore(newLore);
         newButton.setItemMeta(itemMeta);
         inventory.setItem(CONFIRM_SLOT, newButton);
@@ -169,9 +174,12 @@ public class ItemEnchantmentMenu extends EliteMenu {
         }
 
         private void handleBottomInventory(InventoryClickEvent event) {
-            if (EliteEnchantmentItems.isEliteEnchantmentBook(event.getCurrentItem()) &&
-                    event.getInventory().getItem(ENCHANTED_BOOK_SLOT) == null) {
-                moveOneItemUp(ENCHANTED_BOOK_SLOT, event);
+            if (EliteEnchantmentItems.isEliteEnchantmentBook(event.getCurrentItem())) {
+                if (event.getInventory().getItem(ENCHANTED_BOOK_SLOT) == null)
+                    moveOneItemUp(ENCHANTED_BOOK_SLOT, event);
+                else
+                    //Make sure enchant books themselves can't be enchanted
+                    return;
             } else if (EliteEnchantmentItems.isEliteLuckyTicket(event.getCurrentItem()) &&
                     event.getView().getTopInventory().getItem(LUCKY_TICKET_SLOT) == null) {
                 moveOneItemUp(LUCKY_TICKET_SLOT, event);
@@ -187,7 +195,7 @@ public class ItemEnchantmentMenu extends EliteMenu {
             double price = price(event.getView().getTopInventory());
             if (EconomyHandler.checkCurrency(event.getWhoClicked().getUniqueId()) < price) {
                 event.getWhoClicked().sendMessage(SpecialItemSystemsConfig.getInsufficientFundsMessage()
-                        .replace("$price", price + "")
+                        .replace("$price", Round.twoDecimalPlaces(price) + "")
                         .replace("$currencyName", EconomySettingsConfig.getCurrencyName())
                         .replace("$currentAmount", EconomyHandler.checkCurrency(event.getWhoClicked().getUniqueId()) + "")
                         .replace("$itemName", event.getView().getTopInventory().getItem(ITEM_SLOT).getItemMeta().getDisplayName()));
@@ -207,6 +215,8 @@ public class ItemEnchantmentMenu extends EliteMenu {
                     .replace("$currencyName", EconomySettingsConfig.getCurrencyName())
                     .replace("$currentAmount", EconomyHandler.checkCurrency(event.getWhoClicked().getUniqueId()) + ""));
 
+            //challenge(event); cool for debugging, I'll remove this later
+
             EnumMap<Chance, Double> chance = getChanceBreakdown(event.getView().getTopInventory());
             double rolledChance = ThreadLocalRandom.current().nextDouble();
             if (rolledChance < chance.get(Chance.CRITICAL_FAILURE))
@@ -217,6 +227,7 @@ public class ItemEnchantmentMenu extends EliteMenu {
                 failure(event);
             else
                 success(event);
+
             event.getView().getTopInventory().clear();
             event.getWhoClicked().closeInventory();
         }

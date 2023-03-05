@@ -2,6 +2,8 @@ package com.magmaguy.elitemobs.utils.shapes;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
@@ -45,6 +47,27 @@ public class Cylinder extends Shape {
 
     public boolean contains(Location position) {
         return contains(position.toVector());
+    }
+
+    @Override
+    public boolean contains(LivingEntity livingEntity) {
+        BoundingBox boundingBox = livingEntity.getBoundingBox();
+        if (centerLocation.getY() > boundingBox.getMinZ() || centerLocation.getY() + height < boundingBox.getMaxY())
+            return false;
+
+        double circleDistanceX = Math.abs(centerLocation.getX() - boundingBox.getCenterX());
+        double circleDistanceZ = Math.abs(centerLocation.getZ() - boundingBox.getCenterZ());
+
+        if (circleDistanceX > (boundingBox.getWidthX() / 2d + radius)) return false;
+        if (circleDistanceZ > (boundingBox.getWidthZ() / 2d + radius)) return false;
+
+        if (circleDistanceX <= (boundingBox.getWidthX() / 2d)) return true;
+        if (circleDistanceZ <= (boundingBox.getWidthZ() / 2d)) return true;
+
+        double cornerDistanceSquared = Math.pow((circleDistanceX - boundingBox.getWidthX()) / 2D, 2) +
+                Math.pow((circleDistanceZ - boundingBox.getWidthZ()) / 2D, 2);
+
+        return cornerDistanceSquared <= radius * radius;
     }
 
     public void visualize(Particle particle) {

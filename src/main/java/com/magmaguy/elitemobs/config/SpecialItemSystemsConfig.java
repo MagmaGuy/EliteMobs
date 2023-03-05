@@ -110,11 +110,11 @@ public class SpecialItemSystemsConfig {
 
         criticalFailureChance = ConfigurationEngine.setDouble(
                 List.of("Chance of an item being lost if an item enchantment fails. This is a percentage of the base failure chance."),
-                fileConfiguration, "criticalFailureChance", 0.01);
+                fileConfiguration, "criticalFailureChanceV2", 0.01);
 
         challengeChance = ConfigurationEngine.setDouble(
                 List.of("Chance of a player being teleported to a challenge arena if an item enchantment fails. This is a percentage of the base failure chance.", "If the player defeats the arena, their item is upgraded correctly. If the lose, either it is not enchanted or, if they're unlucky, they may lose the item."),
-                fileConfiguration, "criticalFailureChance", 0.30);
+                fileConfiguration, "challengeChance", 0.30);
 
         criticalFailureChanceDuringChallengeChance = ConfigurationEngine.setDouble(
                 List.of("Chance of an item being lost if a player loses the enchantment challenge. This is a percentage of the base failure chance."),

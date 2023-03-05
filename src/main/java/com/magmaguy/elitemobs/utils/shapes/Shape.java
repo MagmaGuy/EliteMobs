@@ -2,11 +2,14 @@ package com.magmaguy.elitemobs.utils.shapes;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.entity.LivingEntity;
 
 import java.util.List;
 
 public abstract class Shape {
     public abstract boolean contains(Location position);
+
+    public abstract boolean contains(LivingEntity livingEntity);
 
     public abstract boolean borderContains(Location position);
 

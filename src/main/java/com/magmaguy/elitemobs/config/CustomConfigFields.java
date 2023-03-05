@@ -289,8 +289,11 @@ public class CustomConfigFields implements CustomConfigFieldsInterface {
             return Enum.valueOf(enumClass, fileConfiguration.getString(path).toUpperCase());
         } catch (Exception ex) {
             new WarningMessage("File " + filename + " has an incorrect entry for " + path);
-            new WarningMessage("Entry: " + value);
+            new WarningMessage("Entry: " + fileConfiguration.getString(path));
+            value = null;
         }
+        if (value == null)
+            return pluginDefault;
         return value;
     }
 

@@ -217,7 +217,10 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
         for (int i = 0; i < getAmount(); i++) {
             ItemStack itemStack = generateCustomItem().generateItemStack(itemTier, null, eliteEntity);
             if (sharedLootTable == null) sharedLootTable = new SharedLootTable(eliteEntity);
-            if (itemStack == null) return;
+            if (itemStack == null) {
+                new WarningMessage("A custom item for boss "+  eliteEntity.getName() + " was null! This item will be skipped.");
+                return;
+            }
             sharedLootTable.addLoot(itemStack);
             if (name == null && itemStack.getItemMeta() != null) {
                 if (itemStack.getItemMeta().hasDisplayName()) name = itemStack.getItemMeta().getDisplayName();

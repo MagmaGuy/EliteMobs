@@ -83,12 +83,13 @@ public class CustomLootTable implements Serializable {
     }
 
     public void bossDrop(Player player, int level, Location dropLocation, EliteEntity eliteEntity) {
-        for (CustomLootEntry customLootEntry : entries)
+        for (CustomLootEntry customLootEntry : entries) {
             if (customLootEntry.willDrop(player))
                 if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory())
                     customLootEntry.directDrop(level, player, eliteEntity);
                 else
                     customLootEntry.locationDrop(level, player, dropLocation, eliteEntity);
+        }
     }
 
     public void treasureChestDrop(Player player, int chestLevel, Location dropLocation) {
