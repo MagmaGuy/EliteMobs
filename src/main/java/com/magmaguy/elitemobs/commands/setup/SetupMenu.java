@@ -56,6 +56,8 @@ public class SetupMenu {
     }
 
     private static void resourcePackButtonInteraction(Player player, SetupMenu setupMenu) {
+        player.closeInventory();
+        player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2Processing your request, please wait...\n"));
         if (!player.hasPermission("elitemobs.*")) {
             player.sendMessage("[EliteMobs] You do not have the required permission (elitemobs.*) to do that!");
             return;
@@ -408,14 +410,13 @@ public class SetupMenu {
             event.setCancelled(true);
             Player player = (Player) event.getWhoClicked();
             //for resource pack
-            if (event.getSlot() == 10) {
+            if (event.getSlot() == 10 && setupMenu.getCurrentPage() == 1) {
                 resourcePackButtonInteraction(player, setupMenu);
-                player.closeInventory();
                 return;
             }
             //for permissions mode
             //for adventurer's guild world
-            if (event.getSlot() == 11) {
+            if (event.getSlot() == 11 && setupMenu.getCurrentPage() == 1) {
                 adventurersGuildButtonInteraction(player, setupMenu);
                 return;
             }

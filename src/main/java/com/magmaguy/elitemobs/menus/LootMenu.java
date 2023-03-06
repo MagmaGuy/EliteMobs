@@ -87,7 +87,8 @@ public class LootMenu extends EliteMenu {
     public void removeMenu() {
         LootMenu lootMenu = playerLoot.get(player);
         if (lootMenu == this) {
-            if (player.getOpenInventory().equals(lootMenu.getInventory())) player.closeInventory();
+            if (player.getOpenInventory().getTopInventory().equals(lootMenu.getInventory()))
+                player.closeInventory();
             playerLoot.remove(player);
         }
     }
@@ -101,6 +102,7 @@ public class LootMenu extends EliteMenu {
             if (lootMenu == null) return;
             if (!lootMenu.inventory.equals(event.getInventory())) return;
             event.setCancelled(true);
+            if (isBottomMenu(event)) return;
             if (event.getCurrentItem() == null || event.getCurrentItem().getType().equals(Material.AIR)) return;
             lootMenu.renderMenu();
             int slot = event.getSlot();

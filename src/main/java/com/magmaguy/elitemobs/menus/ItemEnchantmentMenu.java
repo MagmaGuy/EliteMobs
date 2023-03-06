@@ -8,9 +8,14 @@ import com.magmaguy.elitemobs.config.menus.premade.ItemEnchantmentMenuConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.instanced.dungeons.EnchantmentDungeonInstance;
 import com.magmaguy.elitemobs.items.ItemTagger;
+import com.magmaguy.elitemobs.items.ShareItem;
 import com.magmaguy.elitemobs.items.upgradesystem.EliteEnchantmentItems;
 import com.magmaguy.elitemobs.items.upgradesystem.UpgradeSystem;
 import com.magmaguy.elitemobs.utils.Round;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -142,6 +147,27 @@ public class ItemEnchantmentMenu extends EliteMenu {
         CRITICAL_FAILURE
     }
 
+    public static void broadcastEnchantmentMessage(ItemStack upgradedItem, Player upgradingPlayer, String message) {
+        if (SpecialItemSystemsConfig.isAnnounceImportantEnchantments() && ItemTagger.getEnchantmentCount(upgradedItem) > 10)
+            if (!message.contains("$itemName"))
+                Bukkit.getOnlinePlayers().forEach(player -> player.spigot().sendMessage(
+                        ChatMessageType.CHAT, TextComponent.fromLegacyText(
+                                ChatColorConverter.convert(message.replace("$player", upgradingPlayer.getDisplayName())))));
+            else {
+                TextComponent itemName = ShareItem.hoverableItemTextComponent(upgradedItem);
+                String[] text = message.replace("$itemName", "itemName").split("itemName");
+                BaseComponent[] baseComponent1 = TextComponent.fromLegacyText(ChatColorConverter.convert(text[0].replace("$player", upgradingPlayer.getDisplayName())));
+                BaseComponent[] baseComponent2 = TextComponent.fromLegacyText(ChatColorConverter.convert(text[1].replace("$player", upgradingPlayer.getDisplayName())));
+
+                ComponentBuilder componentBuilder = new ComponentBuilder();
+                componentBuilder.append(baseComponent1);
+                componentBuilder.append(itemName);
+                componentBuilder.append(baseComponent2);
+
+                Bukkit.getOnlinePlayers().forEach(player -> player.spigot().sendMessage(ChatMessageType.CHAT, componentBuilder.create()));
+            }
+    }
+
     public static class ItemEnchantMenuEvents implements Listener {
         private static final Set<Inventory> menus = new HashSet<>();
 
@@ -239,10 +265,6 @@ public class ItemEnchantmentMenu extends EliteMenu {
 
         private void challenge(InventoryClickEvent event) {
             ItemStack currentItem = event.getView().getTopInventory().getItem(ITEM_SLOT);
-            if (moveItemDown(event.getView().getTopInventory(), ITEM_SLOT, event.getWhoClicked(), false)) {
-                event.getWhoClicked().sendMessage(ChatColorConverter.convert(
-                        "&8[EliteMobs] &cYour inventory was full so the item you were trying to upgrade has been deleted! It will be restored if your item is not full by the time you leave the instanced dungeon."));
-            }
             if (!EnchantmentDungeonInstance.setupRandomEnchantedChallengeDungeon((Player) event.getWhoClicked(),
                     UpgradeSystem.upgrade(currentItem,
                             event.getView().getTopInventory().getItem(ENCHANTED_BOOK_SLOT)),
@@ -250,20 +272,27 @@ public class ItemEnchantmentMenu extends EliteMenu {
                 success(event);
                 return;
             }
+            if (moveItemDown(event.getView().getTopInventory(), ITEM_SLOT, event.getWhoClicked(), false)) {
+                event.getWhoClicked().sendMessage(ChatColorConverter.convert(
+                        "&8[EliteMobs] &cYour inventory was full so the item you were trying to upgrade has been deleted! It will be restored if your item is not full by the time you leave the instanced dungeon."));
+            }
 
             event.getWhoClicked().sendMessage(ChatColorConverter.convert("&8[EliteMobs] &6Challenge! Defeat the boss to get your upgraded item!"));
             event.getWhoClicked().sendMessage(ChatColorConverter.convert("&cThere's a 10% chance of losing your item if you lose the fight! Leaving the arena counts as losing."));
+            broadcastEnchantmentMessage(currentItem, (Player) event.getWhoClicked(), SpecialItemSystemsConfig.getChallengeAnnouncement());
         }
 
         private void criticalFailure(InventoryClickEvent event) {
             event.getWhoClicked().sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Critical failure! You lost the item!"));
+            broadcastEnchantmentMessage(event.getView().getTopInventory().getItem(ITEM_SLOT), (Player) event.getWhoClicked(), SpecialItemSystemsConfig.getCriticalFailureAnnouncement());
         }
 
         private void success(InventoryClickEvent event) {
-            event.getWhoClicked().getWorld().dropItem(event.getWhoClicked().getLocation(),
-                    UpgradeSystem.upgrade(event.getView().getTopInventory().getItem(ITEM_SLOT),
-                            event.getView().getTopInventory().getItem(ENCHANTED_BOOK_SLOT)));
+            ItemStack upgradedItem = UpgradeSystem.upgrade(event.getView().getTopInventory().getItem(ITEM_SLOT),
+                    event.getView().getTopInventory().getItem(ENCHANTED_BOOK_SLOT));
+            event.getWhoClicked().getWorld().dropItem(event.getWhoClicked().getLocation(), upgradedItem);
             event.getWhoClicked().sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2Successful enchantment!"));
+            broadcastEnchantmentMessage(upgradedItem, (Player) event.getWhoClicked(), SpecialItemSystemsConfig.getSuccessAnnouncement());
         }
 
         @EventHandler

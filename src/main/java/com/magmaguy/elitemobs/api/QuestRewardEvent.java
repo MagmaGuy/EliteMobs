@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.api;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.QuestsConfig;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.Quest;
@@ -36,8 +37,8 @@ public class QuestRewardEvent extends Event {
         player.sendMessage(QuestsConfig.getQuestCompleteMessage().replace("$questName", quest.getQuestName()));
         if (QuestsConfig.isUseQuestCompleteTitles())
             player.sendTitle(
-                    QuestsConfig.getQuestCompleteTitle().replace("$questName", quest.getQuestName()),
-                    QuestsConfig.getQuestCompleteSubtitle().replace("$questName", quest.getQuestName()),
+                    ChatColorConverter.convert(QuestsConfig.getQuestCompleteTitle().replace("$questName", quest.getQuestName())),
+                    ChatColorConverter.convert(QuestsConfig.getQuestCompleteSubtitle().replace("$questName", quest.getQuestName())),
                     20, 60, 20);
     }
 
