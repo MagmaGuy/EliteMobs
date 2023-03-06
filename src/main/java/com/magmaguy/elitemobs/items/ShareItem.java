@@ -38,4 +38,15 @@ public class ShareItem {
         textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(stringList).create()));
     }
 
+    public static TextComponent hoverableItemTextComponent(ItemStack itemStack){
+        TextComponent textComponent = new TextComponent();
+        String stringList = "";
+        if (itemStack.getItemMeta().hasLore())
+            for (String loreString : itemStack.getItemMeta().getLore())
+                stringList += "\n" + ChatColor.DARK_PURPLE + ChatColor.ITALIC + loreString;
+        textComponent.setText(itemStack.getItemMeta().getDisplayName());
+        textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(stringList).create()));
+        return textComponent;
+    }
+
 }
