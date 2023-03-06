@@ -7,7 +7,6 @@ import com.magmaguy.elitemobs.config.ArenasConfig;
 import com.magmaguy.elitemobs.instanced.arena.ArenaInstance;
 import com.magmaguy.elitemobs.instanced.dungeons.DungeonInstance;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
-import com.magmaguy.elitemobs.utils.Developer;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -58,7 +57,6 @@ public class InstancePlayerManager {
     }
 
     public static void removePlayer(Player player, MatchInstance matchInstance) {
-        Developer.message("removing player");
         //Remove match instance where needed
         PlayerData.setMatchInstance(player, null);
         matchInstance.players.remove(player);
@@ -80,14 +78,12 @@ public class InstancePlayerManager {
             } else
                 player.teleport(matchInstance.exitLocation);
         }
-Developer.message("Still running removal");
 
         //End the match if there are no players left because they all died
         if (matchInstance.state != MatchInstance.InstancedRegionState.COMPLETED &&
                 matchInstance.state != MatchInstance.InstancedRegionState.COMPLETED_DEFEAT &&
                 matchInstance.state != MatchInstance.InstancedRegionState.COMPLETED_VICTORY &&
                 matchInstance.players.isEmpty()) {
-            Developer.message("running defeat");
             matchInstance.defeat();
         }
         else

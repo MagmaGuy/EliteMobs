@@ -147,7 +147,7 @@ public class QuestsConfig {
                 file, fileConfiguration, "questCompleteTitle", "&2Quest Completed!", true);
         questCompleteSubtitle = ConfigurationEngine.setString(
                 List.of("Sets the subtitle sent when a player completes a quest."),
-                file, fileConfiguration, "questCompleteSubtitle", "$questName", false);
+                file, fileConfiguration, "questCompleteSubtitle", "$questName", true);
         useQuestLeaveTitles = ConfigurationEngine.setBoolean(
                 List.of("Sets if titles are sent when players leave quests.."),
                 fileConfiguration, "useQuestLeaveTitles", true);

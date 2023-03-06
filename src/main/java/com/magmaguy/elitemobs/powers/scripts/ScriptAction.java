@@ -330,7 +330,7 @@ public class ScriptAction {
     //Applies the freeze visual effect from Minecraft. Requires a repeating task to keep reapplying
     private void runVisualFreeze(ScriptActionData scriptActionData) {
         if (VersionChecker.serverVersionOlderThan(17, 0)) return;
-        getTargets(scriptActionData).forEach(iteratedTarget -> iteratedTarget.setFreezeTicks(141));
+        getTargets(scriptActionData).forEach(iteratedTarget -> iteratedTarget.setFreezeTicks((int) (iteratedTarget.getFreezeTicks() + blueprint.getAmount())));
     }
 
     //Places a block, temporarily if the duration is defined

@@ -31,6 +31,14 @@ public class SpecialItemSystemsConfig {
     private static String insufficientFundsMessage;
     @Getter
     private static String newFundsMessage;
+    @Getter
+    private static boolean announceImportantEnchantments;
+    @Getter
+    private static String successAnnouncement;
+    @Getter
+    private static String criticalFailureAnnouncement;
+    @Getter
+    private static String challengeAnnouncement;
 
     public static void initializeConfig() {
         specialValues.clear();
@@ -128,7 +136,21 @@ public class SpecialItemSystemsConfig {
                 List.of("Sets the message sent when players after deducting the funds"),
                 file, fileConfiguration, "newFundsMessage", "&8[EliteMobs] &fYou just spent $price $currencyName! You now have $currentAmount $currencyName.", true);
 
+        announceImportantEnchantments = ConfigurationEngine.setBoolean(
+                List.of("Sets if enchantments of items with more than 10 enchantments in them will be announced"),
+                fileConfiguration, "successAnnouncement", true);
 
+        successAnnouncement = ConfigurationEngine.setString(
+                List.of("Sets the message announced to all players when successfully enchanting an item with more than 10 enchantments"),
+                file, fileConfiguration, "successAnnouncement", "&8[EliteMobs] $player &2has successfully enchanted $itemName&2!", true);
+
+        challengeAnnouncement = ConfigurationEngine.setString(
+                List.of("Sets the message announced to all players when they get a boss fight while trying to enchant an item with more than 10 enchantments"),
+                file, fileConfiguration, "challengeAnnouncement", "&8[EliteMobs] $player &6is challenging a boss to enchant $itemName&6!", true);
+
+        criticalFailureAnnouncement = ConfigurationEngine.setString(
+                List.of("Sets the message announced to all players when losing an item while trying to enchant it if the item has more than 10 enchantments"),
+                file, fileConfiguration, "criticalFailureAnnouncement", "&8[EliteMobs] $player &clost $itemName &cwhile trying to enchant it!", true);
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }
