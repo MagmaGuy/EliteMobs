@@ -10,7 +10,7 @@ public class FireworksLair extends DungeonPackagerConfigFields {
     public FireworksLair() {
         super("fireworks_lair",
                 false,
-                "&aFireworks",
+                "&2[lvl 020] &aThe Fireworks",
                 Arrays.asList("&fThe 2021 4th of July map!",
                         "&6Credits: MagmaGuy"),
                 DiscordLinks.freeMinidungeons,

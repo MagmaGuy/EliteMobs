@@ -10,7 +10,7 @@ public class IronLeagueArena extends DungeonPackagerConfigFields {
     public IronLeagueArena() {
         super("iron_league_arena",
                 false,
-                "&fThe Iron League Arena",
+                "&2[lvl 050-100] &fThe Iron League Arena",
                 Arrays.asList("&fFace the Iron League Arena!"),
                 DiscordLinks.freeMinidungeons,
                 DungeonSizeCategory.ARENA,

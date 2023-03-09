@@ -10,7 +10,7 @@ public class SewersMinidungeon extends DungeonPackagerConfigFields {
     public SewersMinidungeon() {
         super("sewers_minidungeon",
                 false,
-                "&8The Sewers",
+                "&2[lvl 020-035] &8The Sewers",
                 Arrays.asList("&fThe biggest minidungeon ever made!",
                         "&6Credits: MagmaGuy & 69OzCanOfBepis"),
                 DiscordLinks.freeMinidungeons,

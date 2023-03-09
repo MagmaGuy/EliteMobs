@@ -12,6 +12,7 @@ import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.powers.meta.CustomSummonPower;
 import com.magmaguy.elitemobs.powers.scripts.caching.ScriptActionBlueprint;
 import com.magmaguy.elitemobs.powers.scripts.enums.ActionType;
+import com.magmaguy.elitemobs.powers.scripts.enums.TargetType;
 import com.magmaguy.elitemobs.utils.VersionChecker;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
@@ -28,6 +29,7 @@ import org.bukkit.event.Event;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -198,8 +200,8 @@ public class ScriptAction {
             case PLAY_ANIMATION -> runPlayAnimation(scriptActionData);
             case SPAWN_FALLING_BLOCK -> runSpawnFallingBlock(scriptActionData);
             case MODIFY_DAMAGE -> runModifyDamage(scriptActionData);
-            default ->
-                    new WarningMessage("Failed to determine action type " + blueprint.getActionType() + " in script " + blueprint.getScriptName() + " for file " + blueprint.getScriptFilename());
+            case SUMMON_ENTITY -> runSummonEntity(scriptActionData);
+            default -> new WarningMessage("Failed to determine action type " + blueprint.getActionType() + " in script " + blueprint.getScriptName() + " for file " + blueprint.getScriptFilename());
         }
         //Run script will have already run this
         if (!blueprint.getActionType().equals(ActionType.RUN_SCRIPT))
@@ -404,7 +406,12 @@ public class ScriptAction {
     }
 
     private void runPush(ScriptActionData scriptActionData) {
-        getTargets(scriptActionData).forEach(targetEntity -> targetEntity.setVelocity(blueprint.getVValue()));
+        getTargets(scriptActionData).forEach(targetEntity -> {
+            if (blueprint.getScriptRelativeVectorBlueprint() != null)
+                targetEntity.setVelocity(new ScriptRelativeVector(blueprint.getScriptRelativeVectorBlueprint(), eliteScript).getVector(scriptActionData));
+            else if (blueprint.getVValue() != null)
+                targetEntity.setVelocity(blueprint.getVValue());
+        });
     }
 
     private void runSummonReinforcement(ScriptActionData scriptActionData) {
@@ -504,9 +511,7 @@ public class ScriptAction {
     }
 
     private void runSetTime(ScriptActionData scriptActionData) {
-        getTargets(scriptActionData).forEach(targetEntity -> {
-            targetEntity.getWorld().setTime(blueprint.getTime());
-        });
+        getLocationTargets(scriptActionData).forEach(targetEntity -> targetEntity.getWorld().setTime(blueprint.getTime()));
     }
 
     private void runSetWeather(ScriptActionData scriptActionData) {
@@ -549,6 +554,8 @@ public class ScriptAction {
             FallingBlock fallingBlock = targetLocation.getWorld().spawnFallingBlock(targetLocation, blueprint.getMaterial(), (byte) 0);
             fallingBlock.setDropItem(false);
             fallingBlock.setHurtEntities(false);
+            if (blueprint.getScriptRelativeVectorBlueprint() != null)
+                fallingBlock.setVelocity(new ScriptRelativeVector(blueprint.getScriptRelativeVectorBlueprint(), eliteScript).getVector(scriptActionData));
             ScriptListener.fallingBlocks.put(fallingBlock, new FallingEntityDataPair(this, scriptActionData));
         });
     }
@@ -556,5 +563,51 @@ public class ScriptAction {
     private void runModifyDamage(ScriptActionData scriptActionData) {
         if (scriptActionData.getEvent() instanceof EliteDamageEvent eliteDamageEvent)
             eliteDamageEvent.setDamage(eliteDamageEvent.getDamage() * blueprint.getMultiplier());
+    }
+
+    private void runSummonEntity(ScriptActionData scriptActionData) {
+        EntityType entityType;
+        try {
+            entityType = EntityType.valueOf(blueprint.getSValue());
+        } catch (Exception ex) {
+            new WarningMessage("Failed to get entity type for the projectile in the script " + getBlueprint().getScriptName() + " in the file " + blueprint.getScriptFilename());
+            return;
+        }
+
+        getLocationTargets(scriptActionData).forEach(targetLocation -> {
+            if (scriptActionData.getTargetType().equals(TargetType.SELF)) {
+                Vector velocity = new Vector(0, 0, 0);
+                if (blueprint.getScriptRelativeVectorBlueprint() != null)
+                    velocity = new ScriptRelativeVector(blueprint.getScriptRelativeVectorBlueprint(), eliteScript).getVector(scriptActionData);
+                Entity entity;
+                if (scriptActionData.getTargetType().equals(TargetType.SELF) &&
+                        scriptActionData.getEliteEntity().getLivingEntity() != null &&
+                        Projectile.class.isAssignableFrom(entityType.getEntityClass()))
+                    entity = scriptActionData.getEliteEntity().getLivingEntity().launchProjectile(entityType.getEntityClass().asSubclass(Projectile.class), velocity);
+                else {
+                    entity = targetLocation.getWorld().spawn(targetLocation, entityType.getEntityClass());
+                    entity.setVelocity(velocity);
+                }
+
+                if (!blueprint.getLandingScripts().isEmpty()) {
+                    FallingEntityDataPair fallingEntityDataPair = new FallingEntityDataPair(this, scriptActionData);
+                    new BukkitRunnable() {
+                        int counter = 0;
+
+                        @Override
+                        public void run() {
+                            if (!entity.isValid() || entity.isOnGround()) {
+                                ScriptListener.runEvent(fallingEntityDataPair, entity.getLocation());
+                                cancel();
+                                return;
+                            }
+                            counter++;
+                            if (counter > 20 * 60 * 5)
+                                cancel();
+                        }
+                    }.runTaskTimer(MetadataHandler.PLUGIN, 1, 1);
+                }
+            }
+        });
     }
 }

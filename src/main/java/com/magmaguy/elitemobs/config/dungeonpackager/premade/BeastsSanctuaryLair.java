@@ -10,7 +10,7 @@ public class BeastsSanctuaryLair extends DungeonPackagerConfigFields {
     public BeastsSanctuaryLair() {
         super("beasts_sanctuary_lair",
                 false,
-                "&6The Beasts Sanctuary",
+                "&2[lvl 130] &6The Beasts Sanctuary",
                 Arrays.asList("&6Confront the beasts!"),
                 DiscordLinks.premiumMinidungeons,
                 DungeonSizeCategory.LAIR,

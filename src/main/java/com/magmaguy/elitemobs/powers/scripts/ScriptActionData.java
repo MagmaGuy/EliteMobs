@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.powers.scripts;
 
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.scripts.enums.TargetType;
+import com.magmaguy.elitemobs.utils.shapes.Shape;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
@@ -10,6 +11,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Event;
 
 import java.util.Collection;
+import java.util.List;
 
 public class ScriptActionData {
     @Getter
@@ -45,11 +47,17 @@ public class ScriptActionData {
     @Getter
     private Collection<Location> previousLocationTargets;
 
+    //This allows shapes to be cached in a way that is isolated to each script without contaminating scripts
+    @Getter
+    @Setter
+    private List<Shape> shapesChachedByTarget;
+
 
     public ScriptActionData(EliteEntity eliteEntity, LivingEntity directTarget, ScriptTargets scriptTargets, Event event) {
         this.eliteEntity = eliteEntity;
         this.directTarget = directTarget;
         this.scriptTargets = scriptTargets;
+        //This stores the cache shape
         this.targetType = scriptTargets.getTargetBlueprint().getTargetType();
         this.event = event;
     }
@@ -58,6 +66,7 @@ public class ScriptActionData {
         this.eliteEntity = eliteEntity;
         this.directTarget = directTarget;
         this.scriptTargets = scriptTargets;
+        //This stores the cache shape
         this.targetType = scriptTargets.getTargetBlueprint().getTargetType();
         this.scriptZone = scriptZone;
         this.event = event;
@@ -67,6 +76,7 @@ public class ScriptActionData {
         this.eliteEntity = inheritedScriptActionData.getEliteEntity();
         this.directTarget = inheritedScriptActionData.getDirectTarget();
         this.scriptTargets = scriptTargets;
+        //This stores the cache shape
         this.targetType = scriptTargets.getTargetBlueprint().getTargetType();
         this.scriptZone = scriptZone;
         this.inheritedScriptActionData = inheritedScriptActionData;
@@ -77,6 +87,7 @@ public class ScriptActionData {
         this.eliteEntity = inheritedScriptActionData.getEliteEntity();
         this.directTarget = inheritedScriptActionData.getDirectTarget();
         this.scriptTargets = scriptTargets;
+        //This stores the cache shape
         this.targetType = scriptTargets.getTargetBlueprint().getTargetType();
         this.scriptZone = scriptZone;
         this.inheritedScriptActionData = inheritedScriptActionData;
@@ -88,6 +99,7 @@ public class ScriptActionData {
         this.eliteEntity = eliteEntity;
         this.directTarget = directTarget;
         this.scriptTargets = scriptTargets;
+        //This stores the cache shape
         this.targetType = scriptTargets.getTargetBlueprint().getTargetType();
         this.previousEntityTargets = previousEntityTargets;
         this.previousLocationTargets = previousLocationTargets;

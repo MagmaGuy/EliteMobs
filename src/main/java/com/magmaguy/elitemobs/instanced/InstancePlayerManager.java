@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.instanced;
 
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.PlayerJoinArenaEvent;
 import com.magmaguy.elitemobs.api.PlayerJoinDungeonEvent;
 import com.magmaguy.elitemobs.collateralminecraftchanges.AlternativeDurabilityLoss;
@@ -12,6 +13,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class InstancePlayerManager {
 
@@ -42,18 +44,22 @@ public class InstancePlayerManager {
             new EventCaller(new PlayerJoinDungeonEvent(dungeonInstance));
 
 
-        //Teleport the player to the correct location
-        MatchInstance.MatchInstanceEvents.teleportBypass = true;
-        if (matchInstance.state.equals(MatchInstance.InstancedRegionState.WAITING) && matchInstance.lobbyLocation != null)
-            player.teleport(matchInstance.lobbyLocation);
-        else
-            player.teleport(matchInstance.startLocation);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                //Teleport the player to the correct location
+                MatchInstance.MatchInstanceEvents.teleportBypass = true;
+                if (matchInstance.state.equals(MatchInstance.InstancedRegionState.WAITING) && matchInstance.lobbyLocation != null)
+                    player.teleport(matchInstance.lobbyLocation);
+                else
+                    player.teleport(matchInstance.startLocation);
 
-        //Set the lives that the player has //todo: this needs to become configurable and be expanded upon in the future
-        matchInstance.playerLives.put(player, 3);
+                //Set the lives that the player has //todo: this needs to become configurable and be expanded upon in the future
+                matchInstance.playerLives.put(player, 3);
+            }
+        }.runTaskLater(MetadataHandler.PLUGIN, 1);
 
         return true;
-
     }
 
     public static void removePlayer(Player player, MatchInstance matchInstance) {
@@ -99,7 +105,6 @@ public class InstancePlayerManager {
         if (matchInstance.players.isEmpty()) {
             matchInstance.defeat();
             MatchInstance.MatchInstanceEvents.teleportBypass = true;
-            //todo try to check the previous player location first
             if (matchInstance.previousPlayerLocations.get(player) != null)
                 player.teleport(matchInstance.previousPlayerLocations.get(player));
             else if (matchInstance.exitLocation != null)
@@ -129,8 +134,10 @@ public class InstancePlayerManager {
         player.sendTitle(ArenasConfig.getJoinSpectatorTitle(), ArenasConfig.getJoinSpectatorSubtitle(), 60, 60 * 3, 60);
         matchInstance.spectators.add(player);
         player.setGameMode(GameMode.SPECTATOR);
-        MatchInstance.MatchInstanceEvents.teleportBypass = true;
-        if (!wasPlayer) player.teleport(matchInstance.startLocation);
+        if (!wasPlayer) {
+            MatchInstance.MatchInstanceEvents.teleportBypass = true;
+            player.teleport(matchInstance.startLocation);
+        }
         PlayerData.setMatchInstance(player, matchInstance);
     }
 

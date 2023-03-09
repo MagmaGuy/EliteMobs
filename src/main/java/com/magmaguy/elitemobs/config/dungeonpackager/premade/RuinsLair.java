@@ -12,7 +12,7 @@ public class RuinsLair extends DungeonPackagerConfigFields {
     public RuinsLair() {
         super("the_ruins",
                 false,
-                "&6The Ruins",
+                "&2[lvl 150] &6The Ruins",
                 Arrays.asList("&fA fight against a myth from",
                         "&fNorse mythology, be prepared for a smiting!",
                         "&6Credits: 69OzCanOfBepis, MagmaGuy"),

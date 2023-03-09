@@ -79,9 +79,9 @@ public class ScriptZone {
     //Generate shapes that define the zone, force is for caching strategies that require generating fresh (this is due to animated zones)
     public List<Shape> generateShapes(ScriptActionData scriptActionData, boolean force) {
         //for cached shapes
-        if (!force && scriptActionData.getScriptTargets().getShapes() != null) {
+        if (!force && scriptActionData.getShapesChachedByTarget() != null) {
             try {
-                return scriptActionData.getScriptTargets().getShapes();
+                return scriptActionData.getShapesChachedByTarget();
             } catch (Exception ex) {
                 new WarningMessage("Failed to get list of shapes!");
                 return new ArrayList<>();

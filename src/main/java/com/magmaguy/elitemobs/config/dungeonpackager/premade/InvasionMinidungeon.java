@@ -10,7 +10,7 @@ public class InvasionMinidungeon extends DungeonPackagerConfigFields {
     public InvasionMinidungeon() {
         super("invasion_minidungeon",
                 false,
-                "&2The Invasion",
+                "&2[lvl 035-045] &2The Invasion",
                 Arrays.asList("&fThe Halloween Minidungeon!",
                         "&6Credits: MagmaGuy & 69OzCanOfBepis"),
                 DiscordLinks.freeMinidungeons,

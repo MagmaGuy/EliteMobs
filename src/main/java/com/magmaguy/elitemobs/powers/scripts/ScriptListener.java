@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -16,6 +17,7 @@ import java.util.HashMap;
 
 public class ScriptListener implements Listener {
     public static HashMap<FallingBlock, FallingEntityDataPair> fallingBlocks = new HashMap();
+    public static HashMap<Entity, FallingEntityDataPair> fallingEntities = new HashMap<>();
 
     @EventHandler
     public void onEliteMobDamagedByPlayerEvent(EliteMobDamagedByPlayerEvent event) {
@@ -97,7 +99,7 @@ public class ScriptListener implements Listener {
                 eliteScript.check(event, eliteEntity, player);
     }
 
-    private void runEvent(FallingEntityDataPair fallingEntityDataPair, Location landingLocation) {
+    public static void runEvent(FallingEntityDataPair fallingEntityDataPair, Location landingLocation) {
         for (String string : fallingEntityDataPair.getScriptAction().getBlueprint().getLandingScripts()) {
             EliteScript iteratedScript = fallingEntityDataPair.getScriptAction().getEliteScriptMap().get(string);
             if (iteratedScript == null) {

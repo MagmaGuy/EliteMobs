@@ -158,7 +158,7 @@ public class SetupMenu {
         ItemStack nextButton = GetLootMenuConfig.nextLootItem;
         ItemMeta nextButtonMeta = nextButton.getItemMeta();
         nextButtonMeta.setDisplayName("Next page");
-        nextButton.setItemMeta( nextButtonMeta);
+        nextButton.setItemMeta(nextButtonMeta);
         int totalPages = (int) Math.ceil(emPackages.size() / 28d);
         if (totalPages > 1 && currentPage < totalPages)
             inventory.setItem(nextIcon, nextButton);
@@ -262,7 +262,15 @@ public class SetupMenu {
             dungeonCounter = validSlots.size() * (currentPage - 1) - 2;
         else
             inventoryLocationCounter = 2;
-        emPackages = EMPackage.getEmPackages().values().stream().toList();
+        List<EMPackage> rawEmPackages = EMPackage.getEmPackages().values().stream().toList();
+        List<String> alphabeticalSort = new ArrayList<>();
+        rawEmPackages.forEach(iteratedPackage -> alphabeticalSort.add(ChatColor.stripColor(ChatColorConverter.convert(iteratedPackage.getDungeonPackagerConfigFields().getName()))));
+        Collections.sort(alphabeticalSort);
+        emPackages = new ArrayList<>();
+        alphabeticalSort.forEach(entry -> rawEmPackages.forEach(iteratedPackage -> {
+            if (ChatColor.stripColor(ChatColorConverter.convert(iteratedPackage.getDungeonPackagerConfigFields().getName())).equals(entry))
+                emPackages.add(iteratedPackage);
+        }));
         minidungeonHashMap.clear();
         for (int i = dungeonCounter; i < emPackages.size(); i++) {
             if (currentPage == 1 && minidungeonHashMap.size() > validSlots.size() - 3) break;

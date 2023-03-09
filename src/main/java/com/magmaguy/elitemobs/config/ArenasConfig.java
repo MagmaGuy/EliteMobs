@@ -74,10 +74,10 @@ public class ArenasConfig {
                 file, fileConfiguration, "arenasOngoingMessage", "&4[EliteMobs] &cCan't join the arena now - a match is currently happening! You can spectate instead while you wait for it to finish!", true);
         arenaStartHintMessage = ConfigurationEngine.setString(
                 List.of("Message that appears to remind players how to start an arena after joining as a player."),
-                file, fileConfiguration, "arenaStartHintMessage", "&2[EliteMobs] &aYou can start the arena by doing &2/em start", true);
+                file, fileConfiguration, "instanceStartHintMessage", "&2[EliteMobs] &aYou can start the instance by doing &2/em start", true);
         arenaQuitHintMessage = ConfigurationEngine.setString(
                 List.of("Message that appears to remind players how to leave an arena."),
-                file, fileConfiguration, "arenaQuitHintMessage", "&4[EliteMobs] &cYou can leave the arena by doing &4/em quit", true);
+                file, fileConfiguration, "instanceQuitHintMessage", "&4[EliteMobs] &cYou can leave the instance by doing &4/em quit", true);
         arenaJoinPlayerMessage = ConfigurationEngine.setString(
                 List.of("Message that appears when players join an arena."),
                 file, fileConfiguration, "arenaJoinPlayerMessage", "&2[EliteMobs] &aYou can start the arena by doing &2/em start &aif there are at least &2$count &aplayers in it! \nYou can leave the arena by doing &c/em quit", true);
