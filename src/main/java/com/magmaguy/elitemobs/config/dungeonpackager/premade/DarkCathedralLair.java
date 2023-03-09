@@ -13,7 +13,7 @@ public class DarkCathedralLair extends DungeonPackagerConfigFields {
     public DarkCathedralLair() {
         super("dark_cathedral_lair",
                 false,
-                "&8The Dark Cathedral",
+                "&2[lvl 040] &8The Dark Cathedral",
                 Arrays.asList("&fThe first ever EliteMobs Lair!",
                         "&fA classic that all servers need!",
                         "&6Credits: MagmaGuy & 69OzCanOfBepis"),

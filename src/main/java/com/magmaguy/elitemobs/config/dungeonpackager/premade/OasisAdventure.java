@@ -10,7 +10,7 @@ public class OasisAdventure extends DungeonPackagerConfigFields {
     public OasisAdventure() {
         super("oasis_adventure",
                 false,
-                "&6The Oasis",
+                "&2[lvl 020-055] &6The Oasis",
                 Arrays.asList("&fA massive adventure for beginners!",
                         "&6Credits: 69OzCanOfBepis"),
                 DiscordLinks.premiumMinidungeons,

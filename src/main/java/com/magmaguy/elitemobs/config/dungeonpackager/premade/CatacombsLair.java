@@ -12,8 +12,8 @@ public class CatacombsLair extends DungeonPackagerConfigFields {
     public CatacombsLair() {
         super("catacombs_lair",
                 false,
-                "&8The Catacombs",
-                Arrays.asList("&fThe best starter dungeon for players!",
+                "&2[lvl 010] &8The Catacombs",
+                Arrays.asList("&fThe best starter lair for players!",
                         "&6Credits: Realm of Lotheridon"),
                 Arrays.asList(
                         "catacombs_tier_5_evoker_guard_2.yml:2.5,0.5,13.5",

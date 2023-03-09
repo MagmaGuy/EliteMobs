@@ -10,7 +10,7 @@ public class DarkSpireMinidungeon extends DungeonPackagerConfigFields {
     public DarkSpireMinidungeon() {
         super("dark_spire_minidungeon",
                 false,
-                "&8The Dark Spire",
+                "&2[lvl 100-120] &8The Dark Spire",
                 Arrays.asList("&fThe first ever high level content!",
                         "&fMade for those who want a real challenge!",
                         "&6Credits: 69OzCanOfBepis"),

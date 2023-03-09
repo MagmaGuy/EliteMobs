@@ -12,7 +12,7 @@ public class WoodLeagueArena extends CustomArenasConfigFields {
         super.setCorner1("em_adventurers_guild,257,69,333,0,0");
         super.setCorner2("em_adventurers_guild,181,91,257,0,0");
         super.setStartLocation("em_adventurers_guild,219.5,70,295.5,0,0");
-        super.setExitLocation("em_adventurers_guild,245.5,92,274.5,0,0");
+        super.setExitLocation("em_adventurers_guild,242.5,92,269.5,84,0");
         super.setWaveCount(50);
         super.setBossList(Arrays.asList(
                 "wave=1:spawnPoint=north:boss=wood_league_wave_1_melee.yml",

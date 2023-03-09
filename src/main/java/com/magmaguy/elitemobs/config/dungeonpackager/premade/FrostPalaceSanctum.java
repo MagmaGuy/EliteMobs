@@ -12,7 +12,7 @@ public class FrostPalaceSanctum extends DungeonPackagerConfigFields {
     public FrostPalaceSanctum() {
         super("frost_palace_sanctum",
                 false,
-                "Frost Palace",
+                "&2[lvl 050] &3The Frost Palace",
                 Arrays.asList("&fA 7 phase fight against",
                         "the queen of ice!",
                         "&6Credits: MagmaGuy, Delio"),

@@ -12,7 +12,7 @@ public class PrimisGladiusInvasionDungeon extends DungeonPackagerConfigFields {
     public PrimisGladiusInvasionDungeon() {
         super("primis_gladius_invasion_dungeon",
                 false,
-                "&aGladius Invasion Dungeon",
+                "&2[lvl 000-020] &aPrimis - Gladius Invasion",
                 Arrays.asList("&fIt is time to take Gladius back!", "&6Credits: 69OzCanOfBepis, Frostcone, MagmaGuy"),
                 DiscordLinks.premiumMinidungeons,
                 DungeonSizeCategory.DUNGEON,

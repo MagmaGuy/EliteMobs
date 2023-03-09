@@ -10,7 +10,7 @@ public class SteamworksLair extends DungeonPackagerConfigFields {
     public SteamworksLair() {
         super("steamworks_lair",
                 false,
-                "&6The Steamworks",
+                "&2[lvl 140] &6The Steamworks",
                 Arrays.asList("&fA steampunk inspired lair!"),
                 DiscordLinks.freeMinidungeons,
                 DungeonSizeCategory.LAIR,

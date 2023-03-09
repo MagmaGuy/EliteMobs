@@ -6,19 +6,19 @@ import org.bukkit.World;
 
 import java.util.Arrays;
 
-public class BinderOfWorldsLair extends DungeonPackagerConfigFields {
-    public BinderOfWorldsLair() {
-        super("binder_of_worlds_lair",
+public class ShadowOfTheBinderOfWorldsLair extends DungeonPackagerConfigFields {
+    public ShadowOfTheBinderOfWorldsLair() {
+        super("shadow_of_the_binder_of_worlds_lair",
                 false,
-                "&5Binder Of Worlds",
-                Arrays.asList("&5The ultimate challenge. Be prepared!",
-                        "&6Credits: MagmaGuy & 69OzCanOfBepis"),
-                DiscordLinks.premiumMinidungeons,
+                "&2[lvl 200] &5Shadow of the Binder Of Worlds",
+                Arrays.asList("&5The penultimate challenge. Be prepared!",
+                        "&6Credits: MagmaGuy, 69OzCanOfBepis & Frostcone"),
+                DiscordLinks.freeMinidungeons,
                 DungeonSizeCategory.LAIR,
-                "em_binder_of_worlds",
+                "em_shadow_of_the_binder_of_worlds",
                 World.Environment.THE_END,
                 true,
-                "em_binder_of_worlds,-40,62,24,-130,-11",
+                "em_shadow_of_the_binder_of_worlds,-40,62,24,-130,-11",
                 0,
                 "Difficulty: &6Nightmare\n" +
                         "$bossCount level $highestTier final boss!\n" +

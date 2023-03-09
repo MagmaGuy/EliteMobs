@@ -10,7 +10,7 @@ public class PrimisAdventure extends DungeonPackagerConfigFields {
     public PrimisAdventure() {
         super("primis_adventure",
                 false,
-                "&7Primis",
+                "&2[lvl 000-020] &7Primis",
                 Arrays.asList("&fA tutorial adventure for new players!",
                         "&6Credits: 69OzCanOfBepis, MagmaGuy"),
                 DiscordLinks.premiumMinidungeons,

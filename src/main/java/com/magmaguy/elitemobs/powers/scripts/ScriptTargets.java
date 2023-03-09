@@ -4,14 +4,12 @@ import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.scripts.caching.ScriptTargetsBlueprint;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.WarningMessage;
-import com.magmaguy.elitemobs.utils.shapes.Shape;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,7 +30,7 @@ public class ScriptTargets {
     @Getter
     private List<?> anonymousTargets = null;
     @Getter
-    private List<Shape> shapes = null;
+    private ScriptRelativeVector scriptRelativeVector = null;
 
     public ScriptTargets(ScriptTargetsBlueprint targetBlueprint, EliteScript eliteScript) {
         this.targetBlueprint = targetBlueprint;
@@ -41,19 +39,19 @@ public class ScriptTargets {
     }
 
     //Parse all string-based configuration locations
-    public static Location processLocationFromString(EliteEntity eliteEntity,
-                                                     String locationString,
-                                                     String scriptName,
-                                                     String filename,
-                                                     Vector offset) {
+    public Location processLocationFromString(EliteEntity eliteEntity,
+                                              String locationString,
+                                              ScriptActionData scriptActionData) {
         if (locationString == null) {
-            new WarningMessage("Failed to get location target in script " + scriptName + " in " + filename);
+            new WarningMessage("Failed to get location target in script " + targetBlueprint.getScriptName() + " in " + eliteScript.getFileName());
             return null;
         }
         Location parsedLocation = ConfigurationLocation.serialize(locationString);
         if (parsedLocation.getWorld() == null && locationString.split(",")[0].equalsIgnoreCase("same_as_boss"))
             parsedLocation.setWorld(eliteEntity.getLocation().getWorld());
-        parsedLocation.add(offset);
+
+        addOffsets(parsedLocation, scriptActionData);
+
         return parsedLocation;
     }
 
@@ -63,18 +61,21 @@ public class ScriptTargets {
             //Zones that animate independently can not be set to track, as this causes confusion. This is forced to make it easier on scripters.
             if (eliteScript.getScriptZone().isValid() && eliteScript.getScriptZone().getZoneBlueprint().getAnimationDuration() > 0)
                 getTargetBlueprint().setTrack(false);
-            else
-                return;
+            else return;
         }
         //Only cache locations - caching living entities would probably be very confusing
         //if (actionType.isRequiresLivingEntity()) return;
         boolean animatedScriptZone = false;
         if (eliteScript.getScriptZone().isValid()) {
-            shapes = eliteScript.getScriptZone().generateShapes(scriptActionData, true);
+            scriptActionData.setShapesChachedByTarget(eliteScript.getScriptZone().generateShapes(scriptActionData, true));
             if (eliteScript.getScriptZone().getZoneBlueprint().getAnimationDuration() > 0) animatedScriptZone = true;
         }
         if (!animatedScriptZone)
             anonymousTargets = new ArrayList<>(getTargetLocations(scriptActionData));
+        if (!getTargetBlueprint().isTrack() && targetBlueprint.getScriptRelativeVectorBlueprint() != null) {
+            scriptRelativeVector = new ScriptRelativeVector(targetBlueprint.getScriptRelativeVectorBlueprint(), eliteScript);
+            scriptRelativeVector.cacheVector(scriptActionData);
+        }
     }
 
     //Get living entity targets. New array lists so they are not immutable.
@@ -136,15 +137,15 @@ public class ScriptTargets {
 
         switch (targetBlueprint.getTargetType()) {
             case ALL_PLAYERS, WORLD_PLAYERS, NEARBY_PLAYERS, DIRECT_TARGET, SELF:
-                return getTargetEntities(scriptActionData).stream().map(targetEntity -> targetEntity.getLocation().add(targetBlueprint.getOffset())).collect(Collectors.toSet());
+                return getTargetEntities(scriptActionData).stream().map(targetEntity -> addOffsets(targetEntity.getLocation(), scriptActionData)).collect(Collectors.toSet());
             case SELF_SPAWN:
-                return new ArrayList<>(List.of(scriptActionData.getEliteEntity().getSpawnLocation().clone().add(targetBlueprint.getOffset())));
+                return new ArrayList<>(List.of(addOffsets(scriptActionData.getEliteEntity().getSpawnLocation(), scriptActionData)));
             case LOCATION:
-                return new ArrayList<>(List.of(getLocation(scriptActionData.getEliteEntity())));
+                return new ArrayList<>(List.of(getLocation(scriptActionData.getEliteEntity(), scriptActionData)));
             case LOCATIONS:
-                return getLocations(scriptActionData.getEliteEntity());
+                return getLocations(scriptActionData.getEliteEntity(), scriptActionData);
             case LANDING_LOCATION:
-                return new ArrayList<>(List.of(scriptActionData.getLandingLocation()));
+                return new ArrayList<>(List.of(scriptActionData.getLandingLocation().clone()));
             case ZONE_FULL, ZONE_BORDER, INHERIT_SCRIPT_ZONE_FULL, INHERIT_SCRIPT_ZONE_BORDER:
                 newLocations = getLocationFromZone(scriptActionData);
                 break;
@@ -163,31 +164,38 @@ public class ScriptTargets {
             new WarningMessage("Your script " + targetBlueprint.getScriptName() + " uses " + targetBlueprint.getTargetType().toString() + " but does not have a valid Zone defined!");
             return new ArrayList<>();
         }
-        if (targetBlueprint.getOffset().equals(new Vector(0, 0, 0))) {
-            return eliteScript.getScriptZone().getZoneLocations(scriptActionData, this);
-        } else {
-            return new ArrayList<>(eliteScript.getScriptZone().getZoneLocations(scriptActionData, this))
-                    .stream().map(iteratedLocation -> iteratedLocation.add(targetBlueprint.getOffset())).collect(Collectors.toSet());
-        }
+        return addOffsets(eliteScript.getScriptZone().getZoneLocations(scriptActionData, this), scriptActionData);
     }
 
     //Parse the locations key
-    private Collection<Location> getLocations(EliteEntity eliteEntity) {
+    private Collection<Location> getLocations(EliteEntity eliteEntity, ScriptActionData scriptActionData) {
         return targetBlueprint.getLocations().stream().map(rawLocation -> processLocationFromString(
                 eliteEntity,
                 rawLocation,
-                getTargetBlueprint().getScriptName(),
-                eliteScript.getFileName(),
-                targetBlueprint.getOffset())).collect(Collectors.toSet());
+                scriptActionData)).collect(Collectors.toSet());
     }
 
     //Parse the location key
-    private Location getLocation(EliteEntity eliteEntity) {
-        return processLocationFromString(
-                eliteEntity,
-                targetBlueprint.getLocation(),
-                getTargetBlueprint().getScriptName(),
-                eliteScript.getFileName(),
-                getTargetBlueprint().getOffset());
+    private Location getLocation(EliteEntity eliteEntity, ScriptActionData scriptActionData) {
+        return processLocationFromString(eliteEntity, targetBlueprint.getLocation(), scriptActionData);
+    }
+
+    private Location addOffsets(Location location, ScriptActionData scriptActionData) {
+        location.add(targetBlueprint.getOffset());
+        if (scriptRelativeVector == null)
+            if (targetBlueprint.getScriptRelativeVectorBlueprint() != null)
+                scriptRelativeVector = new ScriptRelativeVector(targetBlueprint.getScriptRelativeVectorBlueprint(), eliteScript);
+            else
+                return location;
+
+        location.add(scriptRelativeVector.getVector(scriptActionData));
+
+        return location;
+    }
+
+    private Collection<Location> addOffsets(Collection<Location> locations, ScriptActionData scriptActionData) {
+        if (targetBlueprint.getOffset().length() == 0 && scriptRelativeVector == null) return locations;
+        locations.forEach(entry -> addOffsets(entry, scriptActionData));
+        return locations;
     }
 }

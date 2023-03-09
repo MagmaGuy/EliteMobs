@@ -10,7 +10,7 @@ public class UnderGroveLair extends DungeonPackagerConfigFields {
     public UnderGroveLair() {
         super("under_grove_lair",
                 false,
-                "&6The Under Grove",
+                "&2[lvl 170] &6The Under Grove",
                 Arrays.asList("&6Stop the dryad's ritual!"),
                 DiscordLinks.premiumMinidungeons,
                 DungeonSizeCategory.LAIR,

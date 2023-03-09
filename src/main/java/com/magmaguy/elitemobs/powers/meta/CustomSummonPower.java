@@ -197,12 +197,13 @@ public class CustomSummonPower extends ElitePower implements Listener {
                 new WarningMessage("Failed to determine summon type for reinforcement in " + customBossesConfigFields.getFilename() + " ! Contact the developer with this error!");
         }
 
-        if (customBossReinforcement == null ||
-                customBossReinforcement.bossFileName == null ||
-                CustomBossesConfig.getCustomBoss(customBossReinforcement.bossFileName) == null){
-            new WarningMessage("Could not get filename for reinforcement in file " + configFilename);
-            return;
-        }
+        if (summonType != SummonType.ON_COMBAT_ENTER_PLACE_CRYSTAL)
+            if (customBossReinforcement == null ||
+                    customBossReinforcement.bossFileName == null ||
+                    CustomBossesConfig.getCustomBoss(customBossReinforcement.bossFileName) == null) {
+                new WarningMessage("Could not get filename for reinforcement in file " + configFilename);
+                return;
+            }
 
         if (customBossReinforcement == null)
             return;
@@ -216,6 +217,12 @@ public class CustomSummonPower extends ElitePower implements Listener {
         customBossReinforcement.setSpawnLocationOffset(location);
     }
 
+    /**
+     * Important: All this does is covert bosses to the new format!
+     *
+     * @param powerString
+     * @param configFilename
+     */
     private void processOldFormats(String powerString, String configFilename) {
         Map<String, Object> newMap = new HashMap<>();
         /*
@@ -409,7 +416,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
 
             if (customBossReinforcement == null ||
                     customBossReinforcement.bossFileName == null ||
-                    CustomBossesConfig.getCustomBoss(customBossReinforcement.bossFileName) == null){
+                    CustomBossesConfig.getCustomBoss(customBossReinforcement.bossFileName) == null) {
                 new WarningMessage("Could not get filename for reinforcement in file " + configFilename);
             }
 

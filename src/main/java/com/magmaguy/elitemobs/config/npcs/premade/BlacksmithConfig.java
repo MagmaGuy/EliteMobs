@@ -40,5 +40,7 @@ public class BlacksmithConfig extends NPCsConfigFields {
                 true,
                 3,
                 NPCInteractions.NPCInteractionType.PROCEDURALLY_GENERATED_SHOP);
+        setDisguise("custom:ag_blacksmith");
+        setCustomDisguiseData("player ag_blacksmith setskin {\"id\":\"5fbb022e-b62e-47ef-aeb5-a98fbc7ff936\",\"name\":\"Unknown\",\"properties\":[{\"name\":\"textures\",\"value\":\"ewogICJ0aW1lc3RhbXAiIDogMTY3NjEyMzkyMTU3MCwKICAicHJvZmlsZUlkIiA6ICJhYTA3ZjM2Mjk0NTM0YzYwODQzMjI4NzAzZTBlMjE3OCIsCiAgInByb2ZpbGVOYW1lIiA6ICJfU2FrdXlhX0l6YXlvaV8iLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWM0YTdhYTQyMzVhYjZjOTI2OTU4MTg5YjhiZDUwNTJkODExNmUyZDAzNGJhZGU2OWIyMzBiZTgxN2M3ZjI4MiIKICAgIH0KICB9Cn0=\",\"signature\":\"uZS2bAkz4f07TcXlZtSDK0ZPuUk/+H3PS5dr80WuDyQEN5FKPSEP2rSrVg8LHpVm5Gs2fwtkzUVG+MUloCR/7F/98RyLwzP5xyzt8+DELONi5iPfxLsYLG0VsIQCUH67sZGm4A9/iOyBTAkbr9aKUdwjJvyVnaT+Bj2dslzJqXaw9cO3gRQxlweeq9VL1weMFbldPEi12K4tS6KMYfYjfVXvCxHXpKby/AbXI/huNyK1T4BBIHrzq4TbpRD7xnIUMTLYf4ARnowsvoF9cNzbyTFrkCpH87wdGFbPyyH49h6mKLyTLUPESOHAxtwwhudsyi34zlVgMuzkvY6AqcjCZHnmELBm7/2QVEEZlk6lMFO8dI0pcF3fdQKrlLQBg/gNjUNdzU3rvgNs56P8a8RCRIvx/ExMMFEIUtIDPVZBIToSn7lwkLxwZJKS9Lk2fmVD5Vgs2v4Vn74zhxQYHYziwcpMThu1uDynEA2FNlkS9O9nd0dSSe1e55uMPWYMkgQNTLusRrIU53DpFTRMjMySubteielH9Xbk5PjmTGlBpqeDuA80XNOgGSO84uXDrFrdgnHkiAO9nKyCzOY+95RrPdIoUQkUps3mj5gIrmBF5mGIzF+QWgkpMeSx78WCGEGxPHBHl9ZzpM5iuU+iRGCBWSnJA1Og1JnLooIT6eAEFm4=\"}],\"legacy\":false}");
     }
 }

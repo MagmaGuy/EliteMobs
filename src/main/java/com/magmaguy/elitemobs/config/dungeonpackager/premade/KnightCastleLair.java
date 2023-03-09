@@ -10,7 +10,7 @@ public class KnightCastleLair extends DungeonPackagerConfigFields {
     public KnightCastleLair() {
         super("knights_castle_lair",
                 false,
-                "&fThe Knights Castle",
+                "&2[lvl 095] &fThe Knight's Castle",
                 Arrays.asList("&fChallenge the knights of the castle!"),
                 DiscordLinks.freeMinidungeons,
                 DungeonSizeCategory.LAIR,

@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.powers.scripts.enums.TargetType;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.configuration.MemorySection;
 import org.bukkit.util.Vector;
 
 import java.util.List;
@@ -30,6 +31,8 @@ public class ScriptTargetsBlueprint {
     private boolean track = true;
     @Getter
     private double coverage = 1.0;
+    @Getter
+    private ScriptRelativeVectorBlueprint scriptRelativeVectorBlueprint = null;
 
     public ScriptTargetsBlueprint(Map<?, ?> entry, String scriptName, String filename) {
         this.scriptName = scriptName;
@@ -58,6 +61,7 @@ public class ScriptTargetsBlueprint {
             case "offset" -> offset = parseVector(key, value, scriptName);
             case "track" -> track = parseBoolean(key, value, scriptName);
             case "coverage" -> coverage = parseDouble(key, value, scriptName);
+            case "relativeoffset" -> scriptRelativeVectorBlueprint = new ScriptRelativeVectorBlueprint(scriptName, filename, ((MemorySection) value).getValues(false));
         }
     }
 }
