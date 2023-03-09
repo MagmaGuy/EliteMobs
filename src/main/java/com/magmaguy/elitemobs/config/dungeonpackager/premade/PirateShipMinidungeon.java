@@ -12,7 +12,7 @@ public class PirateShipMinidungeon extends DungeonPackagerConfigFields {
     public PirateShipMinidungeon() {
         super("pirate_ship_minidungeon",
                 false,
-                "&6The Pirate Ship",
+                "&2[lvl 010-020] &6The Pirate Ship",
                 Arrays.asList("&fA fun, challenging minidungeon full of",
                         "&fbosses made for players starting to get good,",
                         "&fat EliteMobs!",

@@ -31,7 +31,8 @@ public enum ActionType {
     SET_WEATHER(false),
     PLAY_ANIMATION(true),
     SPAWN_FALLING_BLOCK(false),
-    MODIFY_DAMAGE(true);
+    MODIFY_DAMAGE(true),
+    SUMMON_ENTITY(false);
 
     @Getter
     private final boolean requiresLivingEntity;

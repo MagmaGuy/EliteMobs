@@ -12,7 +12,7 @@ public class EnchantmentChallenge9 extends DungeonPackagerConfigFields {
     public EnchantmentChallenge9(){
         super("enchantment_challenge_9_sanctum",
                 false,
-                "Enchantment Challenge 9",
+                "&2[lvl 000-200] &fEnchantment Challenge 09",
                 Arrays.asList("&fAn enchantment challenge dungeon!"),
                 DiscordLinks.freeMinidungeons,
                 DungeonSizeCategory.SANCTUM,

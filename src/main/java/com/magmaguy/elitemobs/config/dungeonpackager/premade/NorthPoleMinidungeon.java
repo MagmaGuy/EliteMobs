@@ -10,7 +10,7 @@ public class NorthPoleMinidungeon extends DungeonPackagerConfigFields {
     public NorthPoleMinidungeon() {
         super("north_pole_minidungeon",
                 false,
-                "&9The North Pole",
+                "&2[lvl 055-060] &9The North Pole",
                 Arrays.asList("&fThe Christmas minidungeon!",
                         "&6Credits: MagmaGuy & 69OzCanOfBepis"),
                 DiscordLinks.freeMinidungeons,

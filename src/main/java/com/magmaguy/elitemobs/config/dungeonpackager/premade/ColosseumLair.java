@@ -12,7 +12,7 @@ public class ColosseumLair extends DungeonPackagerConfigFields {
     public ColosseumLair() {
         super("colosseum_lair",
                 false,
-                "&6The Colosseum",
+                "&2[lvl 070] &6The Colosseum",
                 Arrays.asList("&fFeaturing the first true World boss, first",
                         "&fmulti-phased battle, first mounted boss,",
                         "&ffirst disguised boss... a truly epic fight!",

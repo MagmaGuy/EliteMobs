@@ -11,7 +11,7 @@ public class VampireManorMinidungeon extends DungeonPackagerConfigFields {
     public VampireManorMinidungeon() {
         super("vampire_manor",
                 false,
-                "&cThe Vampire Manor",
+                "&2[lvl 170] &cThe Vampire Manor",
                 Arrays.asList("&fPrepare to spill blood!",
                         "&6Credits: MagmaGuy, 69OzCanOfBepis"),
                 Arrays.asList(

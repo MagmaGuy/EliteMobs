@@ -1,7 +1,5 @@
 package com.magmaguy.elitemobs.powers.scripts.caching;
 
-import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
-import com.magmaguy.elitemobs.powers.scripts.ScriptTargets;
 import com.magmaguy.elitemobs.powers.scripts.enums.ActionType;
 import com.magmaguy.elitemobs.powers.scripts.enums.WeatherType;
 import com.magmaguy.elitemobs.utils.PotionEffectTypeUtil;
@@ -9,7 +7,6 @@ import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -104,6 +101,8 @@ public class ScriptActionBlueprint {
     private WeatherType weatherType = WeatherType.CLEAR;
     @Getter
     private boolean onlyRunOneScript = false;
+    @Getter
+    private ScriptRelativeVectorBlueprint scriptRelativeVectorBlueprint = null;
 
 
     public ScriptActionBlueprint(Map<?, ?> entry, String scriptName, String scriptFilename) {
@@ -136,12 +135,10 @@ public class ScriptActionBlueprint {
             }
             case "scripts" -> scripts = parseStringList(key, value, scriptName);
             case "landingscripts" -> landingScripts = parseStringList(key, value, scriptName);
-            case "conditions" ->
-                    conditionsBlueprint = new ScriptConditionsBlueprint((Map<?, ?>) value, scriptName, scriptFilename);
+            case "conditions" -> conditionsBlueprint = new ScriptConditionsBlueprint((Map<?, ?>) value, scriptName, scriptFilename);
             case "times" -> times = parseInteger(key, value, scriptName);
             case "repeatevery" -> repeatEvery = parseInteger(key, value, scriptName);
-            case "particles" ->
-                    scriptParticlesBlueprint = new ScriptParticlesBlueprint((List<Map<?, ?>>) value, scriptName, scriptFilename);
+            case "particles" -> scriptParticlesBlueprint = new ScriptParticlesBlueprint((List<Map<?, ?>>) value, scriptName, scriptFilename);
             case "multiplier" -> multiplier = parseDouble(key, value, scriptName);
             case "material" -> material = parseEnum(key, value, Material.class, scriptName);
             case "amount" -> amount = parseInteger(key, value, scriptName);
@@ -156,10 +153,8 @@ public class ScriptActionBlueprint {
             case "fadeout" -> fadeOut = parseInteger(key, value, scriptName);
             case "flicker" -> flicker = parseBoolean(key, value, scriptName);
             case "withtrail" -> withTrail = parseBoolean(key, value, scriptName);
-            case "fireworkeffecttype" ->
-                    fireworkEffectType = parseEnum(key, value, FireworkEffect.Type.class, scriptName);
-            case "fireworkeffecttypes" ->
-                    fireworkEffectTypes = parseEnumList(key, value, FireworkEffect.Type.class, scriptName);
+            case "fireworkeffecttype" -> fireworkEffectType = parseEnum(key, value, FireworkEffect.Type.class, scriptName);
+            case "fireworkeffecttypes" -> fireworkEffectTypes = parseEnumList(key, value, FireworkEffect.Type.class, scriptName);
             case "fireworkeffects" -> fireworkEffects = parseEnumListList(key, value, FireworkColor.class, scriptName);
             case "power" -> power = parseInteger(key, value, scriptName);
             case "invulnerable" -> invulnerable = parseBoolean(key, value, scriptName);
@@ -181,14 +176,10 @@ public class ScriptActionBlueprint {
                     finalTarget = new ScriptTargetsBlueprint((Map) value, scriptName, scriptFilename);
             }
             case "onlyrunonescript" -> onlyRunOneScript = parseBoolean(key, value, scriptName);
-            default ->
-                    new WarningMessage("Failed to read key " + key + " for script " + scriptName + " in " + scriptFilename);
+            case "relativevector" -> scriptRelativeVectorBlueprint = new ScriptRelativeVectorBlueprint(scriptName, scriptFilename, (Map<String, ?>) value);
+            default -> new WarningMessage("Failed to read key " + key + " for script " + scriptName + " in " + scriptFilename);
         }
 
-    }
-
-    public Location getLocation(EliteEntity eliteEntity) {
-        return ScriptTargets.processLocationFromString(eliteEntity, location, scriptName, scriptFilename, offset);
     }
 
     public enum FireworkColor {

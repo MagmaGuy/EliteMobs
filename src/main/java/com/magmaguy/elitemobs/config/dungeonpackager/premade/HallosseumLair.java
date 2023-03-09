@@ -10,7 +10,7 @@ public class HallosseumLair extends DungeonPackagerConfigFields {
     public HallosseumLair() {
         super("hallosseum_lair",
                 false,
-                "&cHallosseum",
+                "&2[lvl 030] &cThe Hallosseum",
                 Arrays.asList("&fThe 2020 spooky halloween encounter!",
                         "&6Credits: MagmaGuy & 69OzCanOfBepis"),
                 DiscordLinks.freeMinidungeons,

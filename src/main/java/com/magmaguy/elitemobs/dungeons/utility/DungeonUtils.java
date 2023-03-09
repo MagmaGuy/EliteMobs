@@ -45,8 +45,8 @@ public class DungeonUtils {
     public static World loadWorld(String worldName, World.Environment environment) {
         File folder = new File(Bukkit.getWorldContainer().getAbsolutePath());
 
-        if (!Files.exists(Paths.get(folder.getAbsolutePath() + "/" + worldName))) {
-            new WarningMessage("File  " + folder.getAbsolutePath() + "/" + worldName + " does not exist!");
+        if (!Files.exists(Paths.get(folder.getAbsolutePath() + File.separatorChar + worldName))) {
+            new WarningMessage("File  " + folder.getAbsolutePath() + File.separatorChar + worldName + " does not exist!");
             return null;
         }
         try {

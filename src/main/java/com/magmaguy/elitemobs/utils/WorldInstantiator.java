@@ -26,7 +26,7 @@ public class WorldInstantiator {
             return null;
         }
 
-        File destinationWorld = new File(Bukkit.getWorldContainer().getAbsolutePath().replace("\\.", "\\") + targetWorldName);
+        File destinationWorld = new File(Bukkit.getWorldContainer().getAbsolutePath().replace("\\.", "\\") + File.separatorChar + targetWorldName);
         if (destinationWorld.exists())
             recursivelyDelete(destinationWorld);
 

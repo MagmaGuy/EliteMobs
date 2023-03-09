@@ -13,7 +13,7 @@ public class AirShipMinidungeon extends DungeonPackagerConfigFields {
         super(
                 "airship_minidungeon",
                 false,
-                "&6The Airship",
+                "&2[lvl 045-055] &6The Airship",
                 Arrays.asList("&fAn awesome airship full of undead pirates!",
                         "&6Credits: MagmaGuy, 69OzCanOfBepis",
                         "&6and Realm of Lotheridon"),

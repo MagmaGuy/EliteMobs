@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.instanced;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.api.PlayerTeleportEvent;
 import com.magmaguy.elitemobs.config.ArenasConfig;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import lombok.Getter;
@@ -19,6 +18,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
@@ -150,10 +150,11 @@ public abstract class MatchInstance {
 
     private void intruderWatchdog() {
         if (state != InstancedRegionState.ONGOING) return;
+        if (exitLocation == null) return;
         for (Player player : Bukkit.getOnlinePlayers())
             if (!players.contains(player) && !spectators.contains(player) && isInRegion(player.getLocation())) {
                 MatchInstanceEvents.teleportBypass = true;
-                //player.teleport(exitLocation);
+                player.teleport(exitLocation);
             }
     }
 
@@ -205,7 +206,10 @@ public abstract class MatchInstance {
 
     protected void startMatch() {
         state = InstancedRegionState.ONGOING;
-        players.forEach(player -> player.teleport(startLocation));
+        players.forEach(player -> {
+            MatchInstanceEvents.teleportBypass = true;
+            player.teleport(startLocation);
+        });
         participants = (HashSet<Player>) players.clone();
     }
 
@@ -284,14 +288,20 @@ public abstract class MatchInstance {
             matchInstance.playerDeath(player);
         }
 
-        @EventHandler(ignoreCancelled = true)
+        @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
         public void onPlayerTeleport(PlayerTeleportEvent event) {
             if (teleportBypass) {
                 teleportBypass = false;
                 return;
             }
+
             MatchInstance matchInstance = PlayerData.getMatchInstance(event.getPlayer());
             if (matchInstance == null) return;
+
+            if (matchInstance.state == InstancedRegionState.WAITING) {
+                matchInstance.removeAnyKind(event.getPlayer());
+                return;
+            }
             event.setCancelled(true);
         }
     }

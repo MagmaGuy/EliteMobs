@@ -12,7 +12,7 @@ public class BoneMonasteryDungeon extends DungeonPackagerConfigFields {
     public BoneMonasteryDungeon() {
         super("bone_monastery_dungeon",
                 false,
-                "&cThe Bone Monastery",
+                "&2[lvl 085]&cThe Bone Monastery",
                 Arrays.asList("&fSpooky skeletons await.",
                         "&6Credits: MagmaGuy, Matevagyok, Frostcone, 69OzCanOfBepis"),
                 DiscordLinks.premiumMinidungeons,
