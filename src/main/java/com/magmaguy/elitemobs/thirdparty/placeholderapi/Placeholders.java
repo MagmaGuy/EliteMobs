@@ -137,11 +137,13 @@ public class Placeholders extends PlaceholderExpansion {
                 }
                 return highestGuildUser;
             case "player_shortened_guild_rank":
-                return AdventurersGuildConfig.getShortenedRankName(GuildRank.getGuildPrestigeRank(player, false), GuildRank.getActiveGuildRank(player, false));
+                return AdventureMessage.rawString(AdventurersGuildConfig.getShortenedRankName(GuildRank.getGuildPrestigeRank(player, false), GuildRank.getActiveGuildRank(player, false)));
             case "player_kills":
                 return "" + PlayerData.getKills(player.getUniqueId());
             case "player_deaths":
-                return "" + PlayerData.getDeaths(player.getUniqueId());
+                return "" + getDeaths(player.getUniqueId());
+            case "player_kd_ratio":
+                return "" + Round.twoDecimalPlaces(PlayerData.getKills(player.getUniqueId()) / (double) PlayerData.getDeaths(player.getUniqueId()));
             case "player_highest_kill":
                 return "" + PlayerData.getHighestLevelKilled(player.getUniqueId());
             case "player_quests_active":
@@ -150,6 +152,14 @@ public class Placeholders extends PlaceholderExpansion {
                 return "" + PlayerData.getQuestsCompleted(player.getUniqueId());
             case "player_score":
                 return "" + PlayerData.getScore(player.getUniqueId());
+            case "player_next_rank_cost":
+                return "" + GuildRankMenuHandler.tierPriceCalculator(GuildRank.getMaxGuildRank(player) + 1, GuildRank.getGuildPrestigeRank(player));
+            case "player_next_rank_needed":
+                double neededCoins = Round.twoDecimalPlaces(GuildRankMenuHandler.tierPriceCalculator(GuildRank.getMaxGuildRank(player) + 1, GuildRank.getGuildPrestigeRank(player)) - PlayerData.getCurrency(player.getUniqueId()));
+                return neededCoins > 0 ? "" + neededCoins : "§a0§r";
+            case "player_next_prestige_cost":
+                return "" + GuildRankMenuHandler.tierPriceCalculator(GuildRank.getGuildPrestigeRank(player) + 12, GuildRank.getGuildPrestigeRank(player));
+
         }
 
         // We return null if an invalid placeholder (f.e. %someplugin_placeholder3%)
