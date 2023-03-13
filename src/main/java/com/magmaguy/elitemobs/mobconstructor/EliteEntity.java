@@ -127,9 +127,11 @@ public class EliteEntity {
     @Getter
     @Setter
     private boolean healing = false;
-    @Getter
     @Setter
     protected Location spawnLocation;
+    public Location getSpawnLocation(){
+        return spawnLocation.clone();
+    }
     //Used for custom arbitrary tags from elite scripts
     private HashSet<String> customMetadata = new HashSet<>();
 

@@ -235,8 +235,9 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
                     cancelLeash();
                     return;
                 }
-                if (getLivingEntity().getLocation().distanceSquared(spawnLocation) > Math.pow(leashRadius, 2))
-                    SpiritWalk.spiritWalkRegionalBossAnimation(regionalBossEntity, getLivingEntity().getLocation(), spawnLocation);
+                if (getLivingEntity().getLocation().distanceSquared(spawnLocation) > Math.pow(leashRadius, 2)) {
+                    SpiritWalk.spiritWalkRegionalBossAnimation(regionalBossEntity, getLivingEntity().getLocation(), getSpawnLocation());
+                }
 
             } catch (Exception ex) {
                 ex.printStackTrace();

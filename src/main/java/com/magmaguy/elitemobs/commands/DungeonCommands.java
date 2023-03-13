@@ -15,9 +15,11 @@ public class DungeonCommands {
             return;
         } else if (!emPackage.isInstalled()) {
             player.sendMessage("[EliteMobs] That dungeon isn't installed, ask an admin to install it!");
+            return;
         }
         if (MatchInstance.getAnyPlayerInstance(player) != null) {
             player.sendMessage("[EliteMobs] You're already in an instance! You will not be able to switch to another instance before you do /em quit");
+            return;
         }
         if (emPackage instanceof WorldInstancedDungeonPackage)
             new InstancedDungeonBrowser(player, emPackage.getDungeonPackagerConfigFields().getFilename());

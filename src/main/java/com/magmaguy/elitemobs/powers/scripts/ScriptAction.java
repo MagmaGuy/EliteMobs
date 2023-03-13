@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.api.EliteDamageEvent;
 import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
 import com.magmaguy.elitemobs.collateralminecraftchanges.LightningSpawnBypass;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
+import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
@@ -226,6 +227,7 @@ public class ScriptAction {
             }
             List<Location> destinationLocations = new ArrayList<>(finalScriptTargets.getTargetLocations(scriptActionData));
             if (destinationLocations.isEmpty()) return;
+            MatchInstance.MatchInstanceEvents.teleportBypass = true;
             iteratedTarget.teleport(destinationLocations.get(0));
         });
     }

@@ -72,7 +72,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
     //regional boss this causes issues such as reinforcements getting shifted over to the new spawn location
     @Getter
     @Setter
-    private Location respawnOverrideLocation;
+    private Location respawnOverrideLocation = null;
     @Getter
     @Setter
     private EMPackage emPackage = null;

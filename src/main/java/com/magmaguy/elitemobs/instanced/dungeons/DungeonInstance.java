@@ -208,14 +208,18 @@ public class DungeonInstance extends MatchInstance {
         participants.forEach(this::removeAnyKind);
         instances.remove(this);
         DungeonInstance dungeonInstance = this;
-        Bukkit.getWorld(instancedWorldName).getEntities().forEach(entity -> EntityTracker.unregister(entity, RemovalReason.WORLD_UNLOAD));
+        if (world == null) {
+            new WarningMessage("Instanced dungeon's world was already unloaded before removing the entities in it! This shouldn't happen, but doesn't break anything.");
+            return;
+        }
+       world.getEntities().forEach(entity -> EntityTracker.unregister(entity, RemovalReason.WORLD_UNLOAD));
         new BukkitRunnable() {
             @Override
             public void run() {
                 //The world might get removed before this timer
-                if (Bukkit.getWorld(instancedWorldName) != null) {
+                if (world != null) {
                     Arrays.stream(world.getLoadedChunks()).forEach(chunk -> chunk.unload(false));
-                    if (!Bukkit.unloadWorld(instancedWorldName, false)) {
+                    if (!Bukkit.unloadWorld(world, false)) {
                         new WarningMessage("Failed to unload world " + instancedWorldName + " ! This is bad, report this to the developer!");
                     }
                     new BukkitRunnable() {

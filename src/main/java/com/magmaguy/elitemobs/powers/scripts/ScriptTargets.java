@@ -47,8 +47,9 @@ public class ScriptTargets {
             return null;
         }
         Location parsedLocation = ConfigurationLocation.serialize(locationString);
-        if (parsedLocation.getWorld() == null && locationString.split(",")[0].equalsIgnoreCase("same_as_boss"))
+        if (parsedLocation.getWorld() == null && locationString.split(",")[0].equalsIgnoreCase("same_as_boss")) {
             parsedLocation.setWorld(eliteEntity.getLocation().getWorld());
+        }
 
         addOffsets(parsedLocation, scriptActionData);
 

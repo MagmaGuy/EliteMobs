@@ -19,7 +19,6 @@ public class ElitePlayerInventory {
     public final PlayerItem helmet, chestplate, leggings, boots, mainhand, offhand;
     private final Player player;
     private boolean isUpdateLock = false;
-    private boolean getWeaponCooldown = false;
     //Used by elite scripts
     private HashSet<String> customMetadata = new HashSet<>();
 
@@ -57,7 +56,6 @@ public class ElitePlayerInventory {
      */
     public double getArmorLevel(boolean update) {
         if (isUpdateLock) update = false;
-
         double armorLevel = (helmet.getTier(player.getInventory().getHelmet(), update) +
                 chestplate.getTier(player.getInventory().getChestplate(), update) +
                 leggings.getTier(player.getInventory().getLeggings(), update) +
