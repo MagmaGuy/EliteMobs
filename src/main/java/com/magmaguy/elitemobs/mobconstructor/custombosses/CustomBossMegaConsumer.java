@@ -80,11 +80,9 @@ public class CustomBossMegaConsumer {
     public void applyBossFeatures(LivingEntity livingEntity) {
         for (ElitePower elitePower : powers)
             elitePower.applyPowers(livingEntity);
-        //EntityTracker.registerEliteMob(customBossEntity);
         setEquipment(livingEntity);
         setBaby(livingEntity);
         setDisguise(livingEntity);
-        //setCustomModel(livingEntity);
         setName(livingEntity);
         setFollowRange(livingEntity);
         setMovementSpeed(livingEntity);
@@ -146,7 +144,6 @@ public class CustomBossMegaConsumer {
         if (!customBossesConfigFields.isFrozen()) return;
         livingEntity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0);
         livingEntity.setCollidable(false);
-        //livingEntity.setGravity(false);
     }
 
     private void setEquipment(LivingEntity livingEntity) {

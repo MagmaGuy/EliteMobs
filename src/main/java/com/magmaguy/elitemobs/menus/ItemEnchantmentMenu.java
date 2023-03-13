@@ -290,7 +290,10 @@ public class ItemEnchantmentMenu extends EliteMenu {
         private void success(InventoryClickEvent event) {
             ItemStack upgradedItem = UpgradeSystem.upgrade(event.getView().getTopInventory().getItem(ITEM_SLOT),
                     event.getView().getTopInventory().getItem(ENCHANTED_BOOK_SLOT));
-            event.getWhoClicked().getWorld().dropItem(event.getWhoClicked().getLocation(), upgradedItem);
+            Player player = (Player) event.getWhoClicked();
+            HashMap<Integer, ItemStack> leftovers = player.getInventory().addItem(upgradedItem);
+            if (!leftovers.isEmpty())
+                event.getWhoClicked().getWorld().dropItem(event.getWhoClicked().getLocation(), upgradedItem);
             event.getWhoClicked().sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2Successful enchantment!"));
             broadcastEnchantmentMessage(upgradedItem, (Player) event.getWhoClicked(), SpecialItemSystemsConfig.getSuccessAnnouncement());
         }

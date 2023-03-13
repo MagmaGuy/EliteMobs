@@ -97,7 +97,7 @@ public class EnchantmentDungeonInstance extends DungeonInstance {
         player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2Challenge complete! Instance will close in 10 seconds. &6You can leave earlier by doing &9/em quit&6!"));
         player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2You succeeded your item enchantment challenge! Your item has been successfully enchanted."));
         ItemEnchantmentMenu.broadcastEnchantmentMessage(upgradedItem, player, SpecialItemSystemsConfig.getSuccessAnnouncement());
-        player.getInventory().remove(currentItem);
+        scanCurrentItemForRemoval();
         HashMap<Integer, ItemStack> leftOvers = player.getInventory().addItem(upgradedItem);
         if (!leftOvers.isEmpty()) player.getWorld().dropItem(player.getLocation(), upgradedItem);
     }
@@ -108,8 +108,24 @@ public class EnchantmentDungeonInstance extends DungeonInstance {
         if (ThreadLocalRandom.current().nextDouble() < SpecialItemSystemsConfig.getCriticalFailureChanceDuringChallengeChance()) {
             player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Critical enchantment failure! You have lost " + currentItem.getItemMeta().getDisplayName() + " &c!"));
             ItemEnchantmentMenu.broadcastEnchantmentMessage(upgradedItem, player, SpecialItemSystemsConfig.getCriticalFailureAnnouncement());
-            player.getInventory().remove(currentItem);
+            scanCurrentItemForRemoval();
         } else
             player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &cYou have failed the enchantment challenge! Your item " + currentItem.getItemMeta().getDisplayName() + " &cwas not enchanted."));
     }
+
+    private void scanCurrentItemForRemoval() {
+        if (player.getInventory().contains(currentItem))
+            player.getInventory().remove(currentItem);
+        else if (player.getInventory().getHelmet() != null && player.getInventory().getHelmet().equals(currentItem))
+            player.getInventory().setHelmet(null);
+        else if (player.getInventory().getChestplate() != null && player.getInventory().getChestplate().equals(currentItem))
+            player.getInventory().setChestplate(null);
+        else if (player.getInventory().getLeggings() != null && player.getInventory().getLeggings().equals(currentItem))
+            player.getInventory().setLeggings(null);
+        else if (player.getInventory().getBoots() != null && player.getInventory().getBoots().equals(currentItem))
+            player.getInventory().setBoots(null);
+        else if (player.getInventory().getItemInOffHand().equals(currentItem))
+            player.getInventory().setItemInOffHand(null);
+    }
+
 }

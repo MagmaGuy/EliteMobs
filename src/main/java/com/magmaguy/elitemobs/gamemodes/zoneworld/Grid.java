@@ -40,7 +40,7 @@ public class Grid {
     }
 
     public static EliteChunk getEliteChunk(Location location) {
-        Location customSpawnLocation = location.getWorld().getSpawnLocation().clone();
+        Location customSpawnLocation = location.getWorld().getSpawnLocation();
         //Get the 0,0 chunk location
         customSpawnLocation = customSpawnLocation.subtract(new Vector(EliteChunk.getGridSize() / 2, 0, EliteChunk.getGridSize() / 2));
         //Assuming the chunks increment in 100
