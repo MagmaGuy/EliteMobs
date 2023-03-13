@@ -182,7 +182,7 @@ public class SchematicDungeonPackage extends SchematicPackage implements Dungeon
     }
 
     public void removeBoss(RegionalBossEntity regionalBossEntity) {
-        Vector bossVector = regionalBossEntity.getSpawnLocation().clone().subtract(dungeonPackagerConfigFields.getAnchorPoint()).toVector().rotateAroundY(dungeonPackagerConfigFields.getCalculatedRotation());
+        Vector bossVector = regionalBossEntity.getSpawnLocation().subtract(dungeonPackagerConfigFields.getAnchorPoint()).toVector().rotateAroundY(dungeonPackagerConfigFields.getCalculatedRotation());
         getDungeonPackagerConfigFields().removeRelativeBossLocation(regionalBossEntity.getCustomBossesConfigFields(), bossVector);
     }
 

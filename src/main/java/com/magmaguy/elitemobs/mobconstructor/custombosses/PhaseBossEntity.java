@@ -79,8 +79,9 @@ public class PhaseBossEntity {
                     customBossEntity.setRespawnOverrideLocation(customBossEntity.getLocation());
                     customBossEntity.setPersistentLocation(customBossEntity.getLocation());
                 }
-            } else
+            } else {
                 customBossEntity.setRespawnOverrideLocation(customBossEntity.getLocation());
+            }
             //Handle music, soundtrack shouldn't change if the new one is the same
             if (bossPhase.customBossesConfigFields.getSong() != null
                     && currentPhase.customBossesConfigFields.getSong() != null) {

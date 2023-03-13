@@ -49,7 +49,9 @@ public class ConfigurationLocation {
             if (slicedString.length == 6 || slicedString.length == 4) {
 
                 world = Bukkit.getWorld(slicedString[0]);
-                if (world == null && !notLoadedWorldNames.contains(slicedString[0]) && !silent) {
+                if (world == null &&
+                        !slicedString[0].equalsIgnoreCase("same_as_boss") &&
+                        !notLoadedWorldNames.contains(slicedString[0]) && !silent) {
                     if (!notLoadedWorldNames.isEmpty())
                         new WarningMessage("Some NPCs/bosses don't have their world installed! If you need help setting things up, you can go to " + DiscordLinks.mainLink + " !");
                     new InfoMessage("World " + slicedString[0] + " is not yet loaded! Entities that should spawn there have been queued.");

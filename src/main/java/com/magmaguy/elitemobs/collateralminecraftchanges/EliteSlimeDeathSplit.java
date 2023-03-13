@@ -46,7 +46,8 @@ public class EliteSlimeDeathSplit implements Listener {
             eliteEntity.setMaxHealth();
             HashSet<PowersConfigFields> powersConfigFields = new HashSet<>();
             event.getEliteEntity().getElitePowers().forEach(elitePower -> {
-                powersConfigFields.add((PowersConfigFields) elitePower.getPowersConfigFields());
+                if (elitePower.getPowersConfigFields() instanceof PowersConfigFields powersConfigFields1)
+                    powersConfigFields.add(powersConfigFields1);
             });
             eliteEntity.applyPowers(powersConfigFields);
         }
