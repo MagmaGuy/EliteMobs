@@ -4,6 +4,7 @@ package com.magmaguy.elitemobs.instanced;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ArenasConfig;
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -150,11 +151,13 @@ public abstract class MatchInstance {
 
     private void intruderWatchdog() {
         if (state != InstancedRegionState.ONGOING) return;
-        if (exitLocation == null) return;
         for (Player player : Bukkit.getOnlinePlayers())
             if (!players.contains(player) && !spectators.contains(player) && isInRegion(player.getLocation())) {
                 MatchInstanceEvents.teleportBypass = true;
-                player.teleport(exitLocation);
+                if (exitLocation != null) player.teleport(exitLocation);
+                else if (PlayerData.getBackTeleportLocation(player) != null)
+                    player.teleport(PlayerData.getBackTeleportLocation(player));
+                else player.teleport(DefaultConfig.getDefaultSpawnLocation());
             }
     }
 

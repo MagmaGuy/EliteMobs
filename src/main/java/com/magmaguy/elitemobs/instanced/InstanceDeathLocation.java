@@ -52,7 +52,7 @@ public class InstanceDeathLocation {
     private void setBannerBlock(Location location) {
         deathLocation = location;
         bannerBlock = location.getBlock();
-        location.getBlock().setType(Material.RED_BANNER, false);
+        EntityTracker.addTemporaryBlock(location.getBlock(), -1, Material.RED_BANNER);
     }
 
     public void clear(boolean resurrect) {

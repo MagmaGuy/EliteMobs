@@ -134,24 +134,28 @@ public class EntityTracker implements Listener {
     public static void addTemporaryBlock(Block block, int ticks, Material replacementMaterial) {
         BlockData previousBlockData = block.getBlockData().clone();
         if (temporaryBlocks.contains(block)) previousBlockData = null;
+        //Don't override death banners, this causes issues
+        if (temporaryBlocks.contains(block) && block.equals(Material.RED_BANNER)) return;
         temporaryBlocks.add(block);
         block.setType(replacementMaterial);
         UUID worldUUID = block.getWorld().getUID();
         BlockData finalPreviousBlockData = previousBlockData;
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (Bukkit.getWorld(worldUUID) == null) return;
-                temporaryBlocks.remove(block);
-                if (!block.getBlockData().equals(finalPreviousBlockData))
-                    if (finalPreviousBlockData != null)
-                        //Case if a temp block was placed and now needs to be restored
-                        block.setBlockData(finalPreviousBlockData);
-                    else
-                        //Case if a temp block was placed on a temp block
-                        block.setType(Material.AIR);
-            }
-        }.runTaskLater(MetadataHandler.PLUGIN, ticks);
+        //Death banners for instanced content don't timeout
+        if (ticks > 0)
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if (Bukkit.getWorld(worldUUID) == null) return;
+                    temporaryBlocks.remove(block);
+                    if (!block.getBlockData().equals(finalPreviousBlockData))
+                        if (finalPreviousBlockData != null)
+                            //Case if a temp block was placed and now needs to be restored
+                            block.setBlockData(finalPreviousBlockData);
+                        else
+                            //Case if a temp block was placed on a temp block
+                            block.setType(Material.AIR);
+                }
+            }.runTaskLater(MetadataHandler.PLUGIN, ticks);
     }
 
     public static boolean isTemporaryBlock(Block block) {
@@ -221,7 +225,7 @@ public class EntityTracker implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onWorldUnload(WorldUnloadEvent event) {
         EntityTracker.wipeWorld(event.getWorld(), RemovalReason.WORLD_UNLOAD);
-        temporaryBlocks.removeIf(block->block.getWorld().equals(event.getWorld()));
+        temporaryBlocks.removeIf(block -> block.getWorld().equals(event.getWorld()));
     }
 
     @EventHandler(ignoreCancelled = true)
