@@ -12,17 +12,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class SharedShopElements {
 
-    public static boolean inventoryNullPointerPreventer(InventoryClickEvent event) {
-        return sellMenuNullPointPreventer(event);
-    }
-
-    public static boolean sellMenuNullPointPreventer(InventoryClickEvent event) {
-
+    public static boolean itemNullPointerPrevention(InventoryClickEvent event) {
         //Check if current item is valid
         if (event.getCurrentItem() == null) return false;
         if (event.getCurrentItem().getType().equals(Material.AIR)) return false;
         return event.getCurrentItem().getItemMeta() != null;
-
     }
 
     public static void buyMessage(Player player, String itemDisplayName, double itemValue) {

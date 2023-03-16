@@ -52,9 +52,9 @@ public class BuyOrSellMenu {
         @EventHandler
         public void onInventoryInteraction(InventoryClickEvent event) {
 
-            if (!SharedShopElements.sellMenuNullPointPreventer(event)) return;
             if (!EliteMenu.isEliteMenu(event, menus)) return;
             event.setCancelled(true);
+            if (!SharedShopElements.itemNullPointerPrevention(event)) return;
 
             //info button
             if (event.getCurrentItem().equals(BuyOrSellMenuConfig.INFORMATION_ITEM)) {

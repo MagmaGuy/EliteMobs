@@ -7,12 +7,15 @@ import com.magmaguy.elitemobs.config.enchantments.premade.LightningConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
+import com.magmaguy.elitemobs.utils.EventCaller;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -33,7 +36,9 @@ public class LightningEnchantment extends CustomEnchantment {
             EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(entity);
             if (eliteEntity == null) return;
             double damage = ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getWeaponLevel(true) * 2.5;
-            eliteEntity.damage(damage);
+            EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = true;
+            EntityDamageByEntityEvent entityDamageByEntityEvent = new EntityDamageByEntityEvent(player, eliteEntity.getLivingEntity(), EntityDamageEvent.DamageCause.CUSTOM, damage);
+            new EventCaller(entityDamageByEntityEvent);
         }));
     }
 

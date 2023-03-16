@@ -11,6 +11,7 @@ import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.ShareItem;
 import com.magmaguy.elitemobs.items.upgradesystem.EliteEnchantmentItems;
 import com.magmaguy.elitemobs.items.upgradesystem.UpgradeSystem;
+import com.magmaguy.elitemobs.utils.Developer;
 import com.magmaguy.elitemobs.utils.Round;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -173,9 +174,11 @@ public class ItemEnchantmentMenu extends EliteMenu {
 
         @EventHandler(ignoreCancelled = true)
         public void onInventoryInteract(InventoryClickEvent event) {
-            if (!SharedShopElements.sellMenuNullPointPreventer(event)) return;
+            Developer.message("1");
             if (!EliteMenu.isEliteMenu(event, menus)) return;
+            Developer.message("2");
             event.setCancelled(true);
+            if (!SharedShopElements.itemNullPointerPrevention(event)) return;
 
             if (isTopMenu(event)) {
                 handleTopInventory(event);

@@ -69,7 +69,7 @@ public class StatsPage {
                         PlayerData.getKills(targetPlayer.getUniqueId()) + ""));
         inventory.setItem(PlayerStatusMenuConfig.getStatsMaxEliteLevelKilledSlot(),
                 replaceItemNamePlaceholder(PlayerStatusMenuConfig.getStatsMaxEliteLevelKilledItem().clone(), "$maxKill",
-                        PlayerData.getKills(targetPlayer.getUniqueId()) + ""));
+                        PlayerData.getHighestLevelKilled(targetPlayer.getUniqueId()) + ""));
         inventory.setItem(PlayerStatusMenuConfig.getStatsEliteDeathsSlot(),
                 replaceItemNamePlaceholder(PlayerStatusMenuConfig.getStatsEliteDeathsItem().clone(), "$deaths",
                         PlayerData.getDeaths(targetPlayer.getUniqueId()) + ""));
