@@ -12,10 +12,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -50,9 +47,14 @@ public class TranslationsConfigFields extends CustomConfigFields implements Cust
         //This happens the first time the plugin gets installed
         if (!Files.exists(realPath)) {
             try {
-                BufferedReader in = new BufferedReader(new InputStreamReader(MetadataHandler.PLUGIN.getResource("translations/" + parsedFilename), StandardCharsets.UTF_8));
-                YamlConfiguration config = YamlConfiguration.loadConfiguration(in);
+                InputStream inputStream = MetadataHandler.PLUGIN.getResource("translations/" + parsedFilename);
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                YamlConfiguration config = YamlConfiguration.loadConfiguration(bufferedReader);
                 ConfigurationEngine.fileSaverCustomValues(config, realPath.toFile());
+                inputStream.close();
+                inputStreamReader.close();
+                bufferedReader.close();
             } catch (Exception ex) {
                 new InfoMessage("Translation filename " + parsedFilename + " is not prepackaged. This is fine if it is meant to be a custom translation.");
                 customLanguage = true;

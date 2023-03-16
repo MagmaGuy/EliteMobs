@@ -374,12 +374,6 @@ public class EliteEntity {
         setHealth(health + healAmount);
     }
 
-    public double damage(double damage) {
-        health = Math.max(0, livingEntity.getHealth() - damage);
-        livingEntity.setHealth(health);
-        return damage;
-    }
-
     public void fullHeal() {
         EliteMobHealEvent eliteMobHealEvent = new EliteMobHealEvent(this, true);
         new EventCaller(eliteMobHealEvent);

@@ -423,6 +423,7 @@ public class ScriptAction {
     private void runSpawnFireworks(ScriptActionData scriptActionData) {
         getLocationTargets(scriptActionData).forEach(targetLocation -> {
             Firework firework = targetLocation.getWorld().spawn(targetLocation, Firework.class);
+            firework.setPersistent(false);
             FireworkMeta fireworkMeta = firework.getFireworkMeta();
 
             if (blueprint.getFireworkEffects().isEmpty()) {

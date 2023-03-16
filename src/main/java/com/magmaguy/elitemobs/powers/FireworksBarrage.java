@@ -53,6 +53,7 @@ public class FireworksBarrage extends BossPower {
                     firework.setFireworkMeta(fireworkMeta);
                     firework.setVelocity(new Vector(ThreadLocalRandom.current().nextDouble(-0.5, 0.5),
                             ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(-0.5, 0.5)));
+                    firework.setPersistent(false);
                 }
 
                 for (Entity nearbyEntity : eliteEntity.getLivingEntity().getNearbyEntities(20, 20, 20))
@@ -69,6 +70,7 @@ public class FireworksBarrage extends BossPower {
                                             .subtract(firework.getLocation())
                                             .toVector().normalize().multiply(0.5));
                             firework.setShotAtAngle(true);
+                            firework.setPersistent(false);
                             new FireworkTask(firework, nearbyEntity.getLocation().clone(), eliteEntity);
                         }
 

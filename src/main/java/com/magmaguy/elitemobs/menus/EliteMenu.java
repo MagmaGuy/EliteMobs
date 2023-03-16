@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.menus;
 
-import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -18,12 +17,11 @@ public class EliteMenu implements Listener {
     }
 
     public static boolean isEliteMenu(InventoryClickEvent event, Set<Inventory> inventories) {
-        if (event.getCurrentItem() == null) return false;
-        if (event.getCurrentItem().getType().equals(Material.AIR)) return false;
         return inventories.contains(event.getInventory());
     }
 
     public static boolean isTopMenu(InventoryClickEvent event) {
+        if (event.getClickedInventory() == null) return false;
         return event.getClickedInventory().equals(event.getView().getTopInventory());
     }
 

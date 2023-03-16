@@ -101,7 +101,7 @@ public class ProceduralShopMenu {
                 return;
             }
             event.setCancelled(true);
-            if (!SharedShopElements.inventoryNullPointerPreventer(event)) return;
+            if (!SharedShopElements.itemNullPointerPrevention(event)) return;
 
             //reroll loot button
             if (event.getCurrentItem().getItemMeta().getDisplayName().equals(ProceduralShopMenuConfig.rerollItem.getItemMeta().getDisplayName())) {
