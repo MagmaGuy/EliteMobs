@@ -41,7 +41,7 @@ public class WormholeEntry implements PersistentObject {
     private BukkitTask wormholeTask;
     @Getter
     @Setter
-    private ArmorStand text;
+    private ArmorStand text = null;
     private String worldName;
     @Getter
     @Setter
@@ -115,7 +115,7 @@ public class WormholeEntry implements PersistentObject {
 
     @Override
     public void chunkLoad() {
-        initializeTextDisplay();
+        if (text == null || !text.isValid()) initializeTextDisplay();
         if (wormholeTask != null && !wormholeTask.isCancelled()) wormholeTask.cancel();
         if (location == null) setLocationFromConfiguration();
         wormholeTask = WormholeTask.startWormholeTask(this);
@@ -180,6 +180,7 @@ public class WormholeEntry implements PersistentObject {
                 armorStand.setVisible(false);
                 armorStand.setGravity(false);
                 armorStand.setPersistent(false);
+                armorStand.setRemoveWhenFarAway(false);
             }
         });
         EntityTracker.registerVisualEffects(text);

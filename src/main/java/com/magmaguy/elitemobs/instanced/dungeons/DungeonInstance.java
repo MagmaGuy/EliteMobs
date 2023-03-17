@@ -212,23 +212,23 @@ public class DungeonInstance extends MatchInstance {
             new WarningMessage("Instanced dungeon's world was already unloaded before removing the entities in it! This shouldn't happen, but doesn't break anything.");
             return;
         }
-       world.getEntities().forEach(entity -> EntityTracker.unregister(entity, RemovalReason.WORLD_UNLOAD));
+        world.getEntities().forEach(entity -> EntityTracker.unregister(entity, RemovalReason.WORLD_UNLOAD));
         new BukkitRunnable() {
             @Override
             public void run() {
                 //The world might get removed before this timer
-                if (world != null) {
-                    Arrays.stream(world.getLoadedChunks()).forEach(chunk -> chunk.unload(false));
-                    if (!Bukkit.unloadWorld(world, false)) {
-                        new WarningMessage("Failed to unload world " + instancedWorldName + " ! This is bad, report this to the developer!");
-                    }
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            WorldInstantiator.recursivelyDelete(instancedWorldFile);
-                        }
-                    }.runTaskAsynchronously(MetadataHandler.PLUGIN);
+                //if (world != null) {
+                //Arrays.stream(world.getLoadedChunks()).forEach(chunk -> chunk.unload(false));
+                if (!Bukkit.unloadWorld(world, false)) {
+                    new WarningMessage("Failed to unload world " + instancedWorldName + " ! This is bad, report this to the developer!");
                 }
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        WorldInstantiator.recursivelyDelete(instancedWorldFile);
+                    }
+                }.runTaskAsynchronously(MetadataHandler.PLUGIN);
+                //}
                 new EventCaller(new InstancedDungeonRemoveEvent(dungeonInstance));
                 dungeonInstances.remove(dungeonInstance);
             }

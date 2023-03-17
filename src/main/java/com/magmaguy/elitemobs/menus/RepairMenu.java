@@ -135,6 +135,8 @@ public class RepairMenu extends EliteMenu {
             Inventory repairInventory = event.getView().getTopInventory();
             Inventory playerInventory = event.getView().getBottomInventory();
 
+            if (currentItem == null) return;
+
             if (isBottomMenu(event)) {
                 //Item is scrap
                 if (RepairEnchantment.isRepairItem(currentItem) && repairInventory.getItem(scrapItemInputSlot) == null) {

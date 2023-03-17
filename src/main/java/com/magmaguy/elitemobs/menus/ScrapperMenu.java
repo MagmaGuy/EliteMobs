@@ -110,12 +110,7 @@ public class ScrapperMenu extends EliteMenu {
             Inventory shopInventory = event.getView().getTopInventory();
             Inventory playerInventory = event.getView().getBottomInventory();
 
-            boolean inventoryHasFreeSlots = false;
-            for (ItemStack iteratedStack : player.getInventory().getStorageContents())
-                if (iteratedStack == null) {
-                    inventoryHasFreeSlots = true;
-                    break;
-                }
+            if (currentItem == null) return;
 
             if (EliteMenu.isBottomMenu(event)) {
                 //CASE: If the player clicked on something in their inventory to put it on the shop
