@@ -128,12 +128,7 @@ public class UnbindMenu extends EliteMenu {
             Inventory unbinderInventory = event.getView().getTopInventory();
             Inventory playerInventory = event.getView().getBottomInventory();
 
-            boolean inventoryHasFreeSlots = false;
-            for (ItemStack iteratedStack : player.getInventory().getStorageContents())
-                if (iteratedStack == null) {
-                    inventoryHasFreeSlots = true;
-                    break;
-                }
+            if (currentItem == null) return;
 
             if (isBottomMenu(event)) {
                 //Item is unbind scroll

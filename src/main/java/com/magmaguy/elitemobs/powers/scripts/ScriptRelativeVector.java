@@ -18,7 +18,8 @@ public class ScriptRelativeVector {
 
     public Vector getVector(ScriptActionData scriptActionData) {
         if (cachedVector != null) return cachedVector;
-        if (sourceTarget == null || destinationTarget == null) return new Vector(0, 0, 0);
+        if (sourceTarget == null || destinationTarget == null || sourceTarget.getTargetLocations(scriptActionData).isEmpty())
+            return new Vector(0, 0, 0);
         Location sourceLocation = sourceTarget.getTargetLocations(scriptActionData).iterator().next();
         Location destinationLocation = destinationTarget.getTargetLocations(scriptActionData).iterator().next();
         Vector vector = destinationLocation.subtract(sourceLocation).toVector();
