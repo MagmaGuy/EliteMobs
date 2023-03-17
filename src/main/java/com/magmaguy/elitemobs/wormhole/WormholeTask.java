@@ -34,6 +34,13 @@ public class WormholeTask {
             @Override
             public void run() {
                 if (!ChunkLocationChecker.locationIsLoaded(wormholeEntry.getLocation())) {
+                    if (wormholeEntry.getText() != null)
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                wormholeEntry.getText().remove();
+                            }
+                        }.runTask(MetadataHandler.PLUGIN);
                     cancel();
                     return;
                 }
@@ -70,8 +77,6 @@ public class WormholeTask {
         if (!Objects.equals(wormholeEntry.getLocation().getWorld(), playerLocation.getWorld())) return false;
         if (wormholeEntry.getLocation().distance(playerLocation) > 1.5 * wormholeEntry.getWormhole().getWormholeConfigFields().getSizeMultiplier())
             return false;
-        //A player might be standing in the teleporter after getting teleported, avoid teleporting them back
-        //if (teleportingPlayers.contains(player)) return true; todo: is this working?
         if (wormholeEntry.getWormhole().getWormholeConfigFields().getCoinCost() > 0) {
             double coinCost = wormholeEntry.getWormhole().getWormholeConfigFields().getCoinCost() + wormholeEntry.getWormhole().getWormholeConfigFields().getCoinCost() * GuildRank.currencyBonusMultiplier(player.getUniqueId());
             if (EconomyHandler.checkCurrency(player.getUniqueId()) < coinCost) {

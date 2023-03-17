@@ -58,6 +58,10 @@ public class WorldInstantiator {
     }
 
     public static void recursivelyDelete(File file) {
+        if (!file.exists()) {
+            new InfoMessage("Attempted to recursively file " + file.getAbsolutePath() + " which doesn't exist.");
+            return;
+        }
         if (file.isDirectory()) {
             for (File subFile : file.listFiles())
                 recursivelyDelete(subFile);
