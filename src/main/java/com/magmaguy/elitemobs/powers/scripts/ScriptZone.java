@@ -57,14 +57,10 @@ public class ScriptZone {
     protected Collection<Location> getZoneLocations(ScriptActionData scriptActionData, ScriptTargets actionTarget) {
         //Get the locations from those zones
         return switch (actionTarget.getTargetBlueprint().getTargetType()) {
-            case ZONE_FULL ->
-                    consolidateLists(generateShapes(scriptActionData, false).stream().map(Shape::getLocations).collect(Collectors.toSet()));
-            case ZONE_BORDER ->
-                    consolidateLists(generateShapes(scriptActionData, false).stream().map(Shape::getEdgeLocations).collect(Collectors.toSet()));
-            case INHERIT_SCRIPT_ZONE_FULL ->
-                    consolidateLists(generateShapes(scriptActionData.getInheritedScriptActionData(), false).stream().map(Shape::getLocations).collect(Collectors.toSet()));
-            case INHERIT_SCRIPT_ZONE_BORDER ->
-                    consolidateLists(generateShapes(scriptActionData.getInheritedScriptActionData(), false).stream().map(Shape::getEdgeLocations).collect(Collectors.toSet()));
+            case ZONE_FULL -> consolidateLists(generateShapes(scriptActionData, false).stream().map(Shape::getLocations).collect(Collectors.toSet()));
+            case ZONE_BORDER -> consolidateLists(generateShapes(scriptActionData, false).stream().map(Shape::getEdgeLocations).collect(Collectors.toSet()));
+            case INHERIT_SCRIPT_ZONE_FULL -> consolidateLists(generateShapes(scriptActionData.getInheritedScriptActionData(), false).stream().map(Shape::getLocations).collect(Collectors.toSet()));
+            case INHERIT_SCRIPT_ZONE_BORDER -> consolidateLists(generateShapes(scriptActionData.getInheritedScriptActionData(), false).stream().map(Shape::getEdgeLocations).collect(Collectors.toSet()));
             default -> new ArrayList<>();
         };
     }
