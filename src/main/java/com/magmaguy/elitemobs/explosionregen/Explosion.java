@@ -11,6 +11,7 @@ import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import com.magmaguy.elitemobs.utils.EntityFinder;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -35,6 +36,7 @@ public class Explosion {
     private static final HashSet<Explosion> explosions = new HashSet<>();
     public final List<BlockState> detonatedBlocks = new ArrayList<>();
     private final int delayBeforeRegen = 2;
+    private UUID worldUUID;
 
     public Explosion(List<BlockState> detonatedBlocks) {
         if (detonatedBlocks == null || detonatedBlocks.isEmpty()) return;
@@ -45,6 +47,8 @@ public class Explosion {
 
         unsortedBlocks.entrySet().stream().sorted(Map.Entry.comparingByValue())
                 .forEachOrdered(x -> this.detonatedBlocks.add(x.getKey()));
+
+        worldUUID = detonatedBlocks.get(0).getWorld().getUID();
 
         explosions.add(this);
         regenerate();
@@ -266,12 +270,7 @@ public class Explosion {
                     return;
                 }
 
-                BlockState firstBlock = null;
-                for (BlockState block : detonatedBlocks) {
-                    firstBlock = block;
-                    break;
-                }
-
+                BlockState firstBlock = detonatedBlocks.get(0);
                 fullBlockRestore(firstBlock, false);
 
             }
@@ -280,6 +279,9 @@ public class Explosion {
     }
 
     private void fullBlockRestore(BlockState blockState, boolean isShutdown) {
+
+        //Things like instanced dungeons can unload in the meanwhile
+        if (Bukkit.getWorld(worldUUID) == null) return;
 
         for (Entity entity : blockState.getWorld().getNearbyEntities(new BoundingBox(blockState.getX(), blockState.getY(), blockState.getZ(),
                 blockState.getX() + 1, blockState.getY() + 1, blockState.getZ() + 1)))

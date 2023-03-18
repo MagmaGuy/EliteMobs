@@ -31,7 +31,7 @@ public class Wormhole {
         this.wormholeConfigFields = wormholeConfigFields;
         this.particleColor = Color.fromRGB(wormholeConfigFields.getParticleColor());
         if (!wormholeConfigFields.getStyle().equals(WormholeStyle.NONE)) {
-            this.cachedRotations = new VisualEffects(wormholeConfigFields).getCachedRotations();
+            this.cachedRotations = new ArrayList<>(new VisualEffects(wormholeConfigFields).getCachedRotations());
         }
         wormholeEntry1 = new WormholeEntry(this, getWormholeConfigFields().getLocation1(), 1);
         wormholeEntry2 = new WormholeEntry(this, getWormholeConfigFields().getLocation2(), 2);
