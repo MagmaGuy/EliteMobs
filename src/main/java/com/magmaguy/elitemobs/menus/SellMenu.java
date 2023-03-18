@@ -126,6 +126,8 @@ public class SellMenu extends EliteMenu implements Listener {
         Inventory shopInventory = event.getView().getTopInventory();
         Inventory playerInventory = event.getView().getBottomInventory();
 
+        if (!SharedShopElements.itemNullPointerPrevention(event)) return;
+
         if (isBottomMenu(event)) {
             //CASE: If the player clicked on something in their inventory to put it on the shop
 

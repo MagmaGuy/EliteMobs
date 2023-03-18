@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.powers.scripts.caching.ScriptTargetsBlueprint;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
@@ -28,7 +29,8 @@ public class ScriptTargets {
     private ScriptZone scriptZone;
     //collection of targets, can be shapes, entities or locations
     @Getter
-    private List<?> anonymousTargets = null;
+    @Setter
+    private List anonymousTargets = null;
     @Getter
     private ScriptRelativeVector scriptRelativeVector = null;
 
@@ -134,9 +136,10 @@ public class ScriptTargets {
     protected Collection<Location> getTargetLocations(ScriptActionData scriptActionData) {
         if (anonymousTargets != null && !anonymousTargets.isEmpty() && anonymousTargets.get(0) instanceof Location)
             return (List<Location>) anonymousTargets;
+
         Collection<Location> newLocations = null;
 
-        switch (targetBlueprint.getTargetType()) {
+        switch (this.getTargetBlueprint().getTargetType()) {
             case ALL_PLAYERS, WORLD_PLAYERS, NEARBY_PLAYERS, DIRECT_TARGET, SELF:
                 return getTargetEntities(scriptActionData).stream().map(targetEntity -> addOffsets(targetEntity.getLocation(), scriptActionData)).collect(Collectors.toSet());
             case SELF_SPAWN:
@@ -147,11 +150,14 @@ public class ScriptTargets {
                 return getLocations(scriptActionData.getEliteEntity(), scriptActionData);
             case LANDING_LOCATION:
                 return new ArrayList<>(List.of(scriptActionData.getLandingLocation().clone()));
-            case ZONE_FULL, ZONE_BORDER, INHERIT_SCRIPT_ZONE_FULL, INHERIT_SCRIPT_ZONE_BORDER:
+            case ZONE_FULL, ZONE_BORDER:
                 newLocations = getLocationFromZone(scriptActionData);
                 break;
+            case INHERIT_SCRIPT_ZONE_FULL, INHERIT_SCRIPT_ZONE_BORDER:
+                newLocations = getLocationFromZone(scriptActionData.getInheritedScriptActionData());
+                break;
             case INHERIT_SCRIPT_TARGET:
-                return getTargetLocations(scriptActionData.getInheritedScriptActionData());
+                return scriptActionData.getInheritedScriptActionData().getScriptTargets().getAnonymousTargets();
         }
 
         if (targetBlueprint.getCoverage() < 1)

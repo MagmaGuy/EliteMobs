@@ -210,12 +210,16 @@ public class ScriptAction {
     }
 
     protected Collection<LivingEntity> getTargets(ScriptActionData scriptActionData) {
-        return scriptConditions.validateEntities(scriptActionData, scriptTargets.getTargetEntities(scriptActionData));
+        Collection<LivingEntity> livingTargets = scriptConditions.validateEntities(scriptActionData, scriptTargets.getTargetEntities(scriptActionData));
+        scriptTargets.setAnonymousTargets(livingTargets.stream().toList());
+        return livingTargets;
     }
 
     //Gets a list of locations
     protected Collection<Location> getLocationTargets(ScriptActionData scriptActionData) {
-        return scriptConditions.validateLocations(scriptActionData, scriptTargets.getTargetLocations(scriptActionData));
+        Collection<Location> locationTargets = scriptConditions.validateLocations(scriptActionData, scriptTargets.getTargetLocations(scriptActionData));
+        scriptTargets.setAnonymousTargets(locationTargets.stream().toList());
+        return locationTargets;
     }
 
     //Teleports the targets
@@ -292,8 +296,13 @@ public class ScriptAction {
         if (blueprint.getActionType().equals(ActionType.RUN_SCRIPT) && blueprint.getScripts().isEmpty())
             new WarningMessage("Did not find any scripts for action RUN_SCRIPT in script " + blueprint.getScriptName() + " in file " + blueprint.getScriptFilename());
         //This is a bit of a dirty hack but if there are no targets and an action called scripts then it is assumed that the script did not meet the conditions required to run and therefore additional scripts will also not run
-        if (!blueprint.getActionType().equals(ActionType.RUN_SCRIPT) && (scriptActionData.getScriptTargets().getAnonymousTargets() == null || scriptActionData.getScriptTargets().getAnonymousTargets().isEmpty()))
+        /*
+        if (!blueprint.getActionType().equals(ActionType.RUN_SCRIPT) &&
+                (scriptActionData.getScriptTargets().getAnonymousTargets() == null ||
+                        scriptActionData.getScriptTargets().getAnonymousTargets().isEmpty()))
             return;
+
+         */
         if (blueprint.getScripts() != null)
             if (!blueprint.isOnlyRunOneScript())
                 blueprint.getScripts().forEach(iteratedScriptName -> {
