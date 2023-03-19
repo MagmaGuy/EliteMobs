@@ -5,7 +5,6 @@ import com.magmaguy.elitemobs.powers.scripts.caching.ScriptTargetsBlueprint;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
-import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
@@ -28,9 +27,25 @@ public class ScriptTargets {
     @Getter
     private ScriptZone scriptZone;
     //collection of targets, can be shapes, entities or locations
-    @Getter
-    @Setter
     private List anonymousTargets = null;
+
+    public List getAnonymousTargets(boolean locations, ScriptActionData scriptActionData) {
+        if (anonymousTargets != null)
+            return anonymousTargets;
+        else if (locations)
+            return (List) getTargetLocations(scriptActionData);
+        else
+            return (List) getTargetEntities(scriptActionData);
+    }
+
+    public void setAnonymousTargets(List anonymousTargets) {
+        //Animated zones can't be cached!
+        if (getTargetBlueprint().isTrack() ||
+                eliteScript.getScriptZone().getZoneBlueprint().getAnimationDuration() > 1) return;
+        //Non-animated zones must be cached for script inheritance and such
+        this.anonymousTargets = anonymousTargets;
+    }
+
     @Getter
     private ScriptRelativeVector scriptRelativeVector = null;
 
@@ -113,7 +128,7 @@ public class ScriptTargets {
             case INHERIT_SCRIPT_TARGET:
                 if (scriptActionData.getInheritedScriptActionData() != null) {
                     try {
-                        return (List<LivingEntity>) scriptActionData.getInheritedScriptActionData().getScriptTargets().getAnonymousTargets();
+                        return (List<LivingEntity>) scriptActionData.getInheritedScriptActionData().getScriptTargets().getAnonymousTargets(false, scriptActionData.getInheritedScriptActionData());
                     } catch (Exception Ex) {
                         new WarningMessage("Failed to get entity from INHERIT_SCRIPT_TARGET because the script inherits a location, not an entity");
                     }
@@ -158,7 +173,9 @@ public class ScriptTargets {
                 newLocations = getLocationFromZone(scriptActionData.getInheritedScriptActionData());
                 break;
             case INHERIT_SCRIPT_TARGET:
-                return scriptActionData.getInheritedScriptActionData().getScriptTargets().getAnonymousTargets();
+                return scriptActionData.getInheritedScriptActionData().getScriptTargets().getAnonymousTargets(true, scriptActionData.getInheritedScriptActionData());
+            default:
+                new WarningMessage("Failed to get target type in script " + getTargetBlueprint().getScriptName() + " !");
         }
 
         if (targetBlueprint.getCoverage() < 1)
