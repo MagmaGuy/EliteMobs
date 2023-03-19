@@ -135,27 +135,27 @@ public class EntityTracker implements Listener {
         BlockData previousBlockData = block.getBlockData().clone();
         if (temporaryBlocks.contains(block)) previousBlockData = null;
         //Don't override death banners, this causes issues
-        if (temporaryBlocks.contains(block) && block.equals(Material.RED_BANNER)) return;
+        if (temporaryBlocks.contains(block) && block.getType().equals(Material.RED_BANNER)) return;
         temporaryBlocks.add(block);
         block.setType(replacementMaterial);
         UUID worldUUID = block.getWorld().getUID();
         BlockData finalPreviousBlockData = previousBlockData;
         //Death banners for instanced content don't timeout
-        if (ticks > 0)
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    if (Bukkit.getWorld(worldUUID) == null) return;
-                    temporaryBlocks.remove(block);
-                    if (!block.getBlockData().equals(finalPreviousBlockData))
-                        if (finalPreviousBlockData != null)
-                            //Case if a temp block was placed and now needs to be restored
-                            block.setBlockData(finalPreviousBlockData);
-                        else
-                            //Case if a temp block was placed on a temp block
-                            block.setType(Material.AIR);
-                }
-            }.runTaskLater(MetadataHandler.PLUGIN, ticks);
+        if (ticks < 0) return;
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (Bukkit.getWorld(worldUUID) == null) return;
+                temporaryBlocks.remove(block);
+                if (!block.getBlockData().equals(finalPreviousBlockData))
+                    if (finalPreviousBlockData != null)
+                        //Case if a temp block was placed and now needs to be restored
+                        block.setBlockData(finalPreviousBlockData);
+                    else
+                        //Case if a temp block was placed on a temp block
+                        block.setType(Material.AIR);
+            }
+        }.runTaskLater(MetadataHandler.PLUGIN, ticks);
     }
 
     public static boolean isTemporaryBlock(Block block) {
