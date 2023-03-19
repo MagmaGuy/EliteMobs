@@ -83,8 +83,9 @@ public class ScriptTargets {
 
     //Get living entity targets. New array lists so they are not immutable.
     protected Collection<LivingEntity> getTargetEntities(ScriptActionData scriptActionData) {
-        if (anonymousTargets != null && anonymousTargets.get(0) instanceof LivingEntity)
-            return (List<LivingEntity>) anonymousTargets;
+        if (anonymousTargets != null)
+            if (anonymousTargets.isEmpty() || anonymousTargets.get(0) instanceof LivingEntity)
+                return (List<LivingEntity>) anonymousTargets;
 
         //If a script zone exists, it overrides the check entirely to expose zone-based fields
         Location eliteEntityLocation = scriptActionData.getEliteEntity().getLocation();
