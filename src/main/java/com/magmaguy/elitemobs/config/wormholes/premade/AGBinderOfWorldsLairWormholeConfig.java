@@ -11,7 +11,7 @@ public class AGBinderOfWorldsLairWormholeConfig extends WormholeConfigFields {
                 "shadow_of_the_binder_of_worlds_lair.yml",
                 Wormhole.WormholeStyle.CRYSTAL);
         setBlindPlayer(true);
-        setLocation1Text("&5『Binder Of Worlds』 &5Lvl 200");
+        setLocation1Text("&5『Shadow of the Binder Of Worlds』 &5Lvl 200");
         setParticleColor(0x9600FF);
     }
 }

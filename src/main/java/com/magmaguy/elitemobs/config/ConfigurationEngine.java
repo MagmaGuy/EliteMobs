@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.translations.TranslationsConfig;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
+import com.magmaguy.elitemobs.utils.VersionChecker;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -78,6 +79,11 @@ public class ConfigurationEngine {
 
     }
 
+    private static void setComments(FileConfiguration fileConfiguration, String key, List<String> comments) {
+        if (VersionChecker.serverVersionOlderThan(18, 2)) return;
+        fileConfiguration.setComments(key, comments);
+    }
+
     public static Boolean setBoolean(FileConfiguration fileConfiguration, String key, boolean defaultValue) {
         fileConfiguration.addDefault(key, defaultValue);
         return fileConfiguration.getBoolean(key);
@@ -85,7 +91,7 @@ public class ConfigurationEngine {
 
     public static Boolean setBoolean(List<String> comments, FileConfiguration fileConfiguration, String key, boolean defaultValue) {
         boolean value = setBoolean(fileConfiguration, key, defaultValue);
-        fileConfiguration.setComments(key, comments);
+        setComments(fileConfiguration, key, comments);
         return value;
     }
 
@@ -99,7 +105,7 @@ public class ConfigurationEngine {
 
     public static String setString(List<String> comments, File file, FileConfiguration fileConfiguration, String key, String defaultValue, boolean translatable) {
         String value = setString(file, fileConfiguration, key, defaultValue, translatable);
-        fileConfiguration.setComments(key, comments);
+        setComments(fileConfiguration, key, comments);
         return value;
     }
 
@@ -111,7 +117,7 @@ public class ConfigurationEngine {
 
     public static int setInt(List<String> comments, FileConfiguration fileConfiguration, String key, int defaultValue) {
         int value = setInt(fileConfiguration, key, defaultValue);
-        fileConfiguration.setComments(key, comments);
+        setComments(fileConfiguration, key, comments);
         return value;
     }
 
@@ -122,7 +128,7 @@ public class ConfigurationEngine {
 
     public static double setDouble(List<String> comments, FileConfiguration fileConfiguration, String key, double defaultValue) {
         double value = setDouble(fileConfiguration, key, defaultValue);
-        fileConfiguration.setComments(key, comments);
+        setComments(fileConfiguration, key, comments);
         return value;
     }
 
@@ -136,7 +142,7 @@ public class ConfigurationEngine {
 
     public static List setList(List<String> comment, File file, FileConfiguration fileConfiguration, String key, List defaultValue, boolean translatable) {
         List value = setList(file, fileConfiguration, key, defaultValue, translatable);
-        fileConfiguration.setComments(key, comment);
+        setComments(fileConfiguration, key, comment);
         return value;
     }
 
