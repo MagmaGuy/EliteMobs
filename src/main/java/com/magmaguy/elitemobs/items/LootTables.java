@@ -52,13 +52,9 @@ public class LootTables implements Listener {
 
             if (eliteEntity.getDamagers().get(player) / eliteEntity.getMaxHealth() < 0.1) continue;
 
-            if (eliteEntity.getPower("bonus_coins.yml") == null)
-                new ItemLootShower(eliteEntity.getLevel(), eliteEntity.getUnsyncedLivingEntity().getLocation(), player);
-
             if (!(eliteEntity.isRandomLoot())) continue;
-
+            double itemLevel = setItemTier(eliteEntity.getLevel());
             if (AdventurersGuildConfig.isGuildLootLimiter()) {
-                double itemLevel = setItemTier(eliteEntity.getLevel());
                 if (itemLevel > GuildRank.getActiveGuildRank(player) * 10) {
                     itemLevel = GuildRank.getActiveGuildRank(player) * 10D;
                     new BukkitRunnable() {
@@ -70,6 +66,9 @@ public class LootTables implements Listener {
                 }
                 generateLoot((int) Math.floor(itemLevel), eliteEntity, player);
             } else generateLoot(eliteEntity, player);
+
+            if (eliteEntity.getPower("bonus_coins.yml") == null)
+                new ItemLootShower(itemLevel, eliteEntity.getUnsyncedLivingEntity().getLocation(), player);
 
             if (SpecialItemSystemsConfig.isDropSpecialLoot()) {
                 if (eliteEntity instanceof CustomBossEntity customBossEntity &&

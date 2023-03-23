@@ -4,6 +4,7 @@ package com.magmaguy.elitemobs;
  * Created by MagmaGuy on 07/10/2016.
  */
 
+import com.magmaguy.easyminecraftpathfinding.NMSManager;
 import com.magmaguy.elitemobs.commands.CommandHandler;
 import com.magmaguy.elitemobs.commands.guild.AdventurersGuildCommand;
 import com.magmaguy.elitemobs.config.*;
@@ -144,6 +145,8 @@ public class EliteMobs extends JavaPlugin {
         Bukkit.getLogger().info("By MagmaGuy - v. " + MetadataHandler.PLUGIN.getDescription().getVersion());
 
         ServerTime.startTickCounter();
+
+        NMSManager.initializeAdapter(this);
 
         if (Bukkit.getServer().spigot().getConfig().getDouble("settings.attribute.maxHealth.max") < 100000000) {
             Bukkit.getServer().spigot().getConfig().set("settings.attribute.maxHealth.max", 100000000);
