@@ -35,6 +35,7 @@ import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.transitiveblocks.TransitiveBlockCommand;
+import com.magmaguy.elitemobs.pathfinding.Navigation;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
 import com.magmaguy.elitemobs.utils.DebugMessage;
@@ -45,6 +46,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
@@ -975,6 +977,19 @@ public class AdminCommands {
                     RegionalBossEntity.getRegionalBossEntities().forEach(regionalBossEntity -> {
                         if (regionalBossEntity.isRespawning()) regionalBossEntity.forceRespawn();
                     });
+                })
+        );
+
+        // /em pathtest
+        manager.command(builder.literal("pathtest")
+                .meta(CommandMeta.DESCRIPTION, "just testing")
+                .senderType(CommandSender.class)
+                .permission("elitemobs.*")
+                .handler(commandContext -> {
+                    CustomBossEntity customBossEntity = new CustomBossEntity(CustomBossesConfig.getCustomBoss("test_boss.yml"));
+                    customBossEntity.setSpawnLocation(((Player) commandContext.getSender()).getLocation());
+                    customBossEntity.spawn(false);
+                    Navigation.navigate((Mob) customBossEntity.getLivingEntity(), customBossEntity.getLocation().add(new Vector(20, 0, 0)), 1);
                 })
         );
 

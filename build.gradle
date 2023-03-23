@@ -23,7 +23,7 @@ processResources {
 }
 
 group 'com.magmaguy'
-version '8.4.4'
+version '8.4.5-SNAPSHOT-1'
 
 repositories {
     maven {
@@ -80,7 +80,6 @@ repositories {
 dependencies {
     //Spigot API
     compileOnly "org.spigotmc:spigot-api:1.19-R0.1-SNAPSHOT"
-
     // The full CraftBukkit server with no shadowing. Requires mavenLocal.
     //BStats API
     implementation group: 'org.bstats', name: 'bstats-bukkit', version: '2.2.1'
@@ -124,8 +123,10 @@ dependencies {
     //Model Engine
     compileOnly "com.ticxo.modelengine:api:R3.0.0"
 
-    testCompileOnly 'org.projectlombok:lombok:1.18.24'
-    testAnnotationProcessor 'org.projectlombok:lombok:1.18.22'
+    implementation files('C:\\Users\\Tiago\\Documents\\MineCraftProjects\\EasyMinecraftPathfinding\\EasyMinecraftPathfinding\\dist\\output\\EasyMinecraftPathfinding.jar')
+
+    //testCompileOnly 'org.projectlombok:lombok:1.18.24'
+    //testAnnotationProcessor 'org.projectlombok:lombok:1.18.22'
 
     //Geyser for bedrock player detection
     //This needs java 16 to work so you will want to change gradle.properties to match your directory for it
