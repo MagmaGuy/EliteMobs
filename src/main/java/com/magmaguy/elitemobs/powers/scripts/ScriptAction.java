@@ -389,7 +389,7 @@ public class ScriptAction {
 
     //Spawns a particle at the target location
     private void runSpawnParticle(ScriptActionData scriptActionData) {
-        getLocationTargets(scriptActionData).forEach(targetLocation -> scriptParticles.visualize(scriptActionData, targetLocation));
+        getLocationTargets(scriptActionData).forEach(targetLocation -> scriptParticles.visualize(scriptActionData, targetLocation, eliteScript));
     }
 
     //Sets mob AI
@@ -418,10 +418,17 @@ public class ScriptAction {
 
     private void runPush(ScriptActionData scriptActionData) {
         getTargets(scriptActionData).forEach(targetEntity -> {
-            if (blueprint.getScriptRelativeVectorBlueprint() != null)
-                targetEntity.setVelocity(new ScriptRelativeVector(blueprint.getScriptRelativeVectorBlueprint(), eliteScript).getVector(scriptActionData));
-            else if (blueprint.getVValue() != null)
-                targetEntity.setVelocity(blueprint.getVValue());
+            if (blueprint.getScriptRelativeVectorBlueprint() != null) {
+                if (blueprint.getBValue() != null && blueprint.getBValue())
+                    targetEntity.setVelocity(targetEntity.getVelocity().add(new ScriptRelativeVector(blueprint.getScriptRelativeVectorBlueprint(), eliteScript, targetEntity.getLocation()).getVector(scriptActionData)));
+                else
+                    targetEntity.setVelocity(new ScriptRelativeVector(blueprint.getScriptRelativeVectorBlueprint(), eliteScript, targetEntity.getLocation()).getVector(scriptActionData));
+            } else if (blueprint.getVValue() != null) {
+                if (blueprint.getBValue() != null && blueprint.getBValue())
+                    targetEntity.setVelocity(targetEntity.getVelocity().add(blueprint.getVValue()));
+                else
+                    targetEntity.setVelocity(blueprint.getVValue());
+            }
         });
     }
 
@@ -567,7 +574,7 @@ public class ScriptAction {
             fallingBlock.setDropItem(false);
             fallingBlock.setHurtEntities(false);
             if (blueprint.getScriptRelativeVectorBlueprint() != null)
-                fallingBlock.setVelocity(new ScriptRelativeVector(blueprint.getScriptRelativeVectorBlueprint(), eliteScript).getVector(scriptActionData));
+                fallingBlock.setVelocity(new ScriptRelativeVector(blueprint.getScriptRelativeVectorBlueprint(), eliteScript, fallingBlock.getLocation()).getVector(scriptActionData));
             ScriptListener.fallingBlocks.put(fallingBlock, new FallingEntityDataPair(this, scriptActionData));
         });
     }
@@ -590,7 +597,7 @@ public class ScriptAction {
             if (scriptActionData.getTargetType().equals(TargetType.SELF)) {
                 Vector velocity = new Vector(0, 0, 0);
                 if (blueprint.getScriptRelativeVectorBlueprint() != null)
-                    velocity = new ScriptRelativeVector(blueprint.getScriptRelativeVectorBlueprint(), eliteScript).getVector(scriptActionData);
+                    velocity = new ScriptRelativeVector(blueprint.getScriptRelativeVectorBlueprint(), eliteScript,targetLocation).getVector(scriptActionData);
                 Entity entity;
                 if (scriptActionData.getTargetType().equals(TargetType.SELF) &&
                         scriptActionData.getEliteEntity().getLivingEntity() != null &&

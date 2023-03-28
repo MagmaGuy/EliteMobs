@@ -27,7 +27,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 public class PreventCreeperPassiveEntityDamage implements Listener {
 
     //This cancels all creeper and entity-caused explosion damage on passive mobs
-    @EventHandler
+    @EventHandler (ignoreCancelled = true)
     public void superCreeperCollateralDamageAvoider(EntityDamageEvent event) {
 
         if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION) {

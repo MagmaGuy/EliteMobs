@@ -171,9 +171,8 @@ public class SpiritWalk extends BossPower implements Listener {
         return hitCounter;
     }
 
-    @EventHandler
+    @EventHandler (ignoreCancelled = true)
     public void onBossMobGotHit(EliteMobDamagedEvent event) {
-        if (event.isCancelled()) return;
         SpiritWalk spiritWalk = (SpiritWalk) event.getEliteEntity().getPower(this);
         if (spiritWalk == null) return;
 

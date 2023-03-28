@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.powers.scripts.caching.ScriptParticlesBlueprint;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.util.Vector;
 
 public class ScriptParticles {
 
@@ -13,27 +14,9 @@ public class ScriptParticles {
         this.particlesBlueprint = particlesBlueprint;
     }
 
-    public void visualize(ScriptActionData scriptActionData, Location location) {
-        particlesBlueprint.getParticleBlueprints().forEach(particleBlueprint -> new ScriptParticle(particleBlueprint).visualize(scriptActionData, location));
+    public void visualize(ScriptActionData scriptActionData, Location location, EliteScript eliteScript) {
+        particlesBlueprint.getParticleBlueprints().forEach(particleBlueprint -> new ScriptParticle(particleBlueprint).visualize(scriptActionData, location, eliteScript));
     }
-
-    /*
-    todo: this needs a completely different implementation with a standalone target (or something like that)
-    private org.bukkit.util.Vector getMovementVector(ScriptActionData scriptActionData, Location location) {
-        Location sourceLocation = null;
-        for (Shape shape : scriptActionData.getCachedShapes())
-            if (scriptActionData.getTargetType().equals(TargetType.ZONE_FULL) && shape.getLocations().contains(location) ||
-                    scriptActionData.getTargetType().equals(TargetType.ZONE_BORDER) && shape.getEdgeLocations().contains(location)) {
-                sourceLocation = shape.getCenter().clone();
-                break;
-            }
-        if (sourceLocation == null) {
-            return new org.bukkit.util.Vector(0, 0, 0);
-        }
-        return sourceLocation.clone().subtract(location).toVector().normalize();
-    }
-
-     */
 
     private class ScriptParticle {
 
@@ -43,22 +26,24 @@ public class ScriptParticles {
             this.particleBlueprint = scriptParticlesBlueprint;
         }
 
-        private void visualize(ScriptActionData scriptActionData, Location location) {
+        private void visualize(ScriptActionData scriptActionData, Location location, EliteScript eliteScript) {
             double x = particleBlueprint.getX();
             double y = particleBlueprint.getY();
             double z = particleBlueprint.getZ();
             int amount = particleBlueprint.getAmount();
-            /*
-            if (particleBlueprint.getMoveToTarget() != null) {
-                amount = 0;
-                Vector movementVector = getMovementVector(scriptActionData, location);
-                if (!particleBlueprint.getMoveToTarget()) movementVector.multiply(-1);
-                x = movementVector.getX();
-                y = movementVector.getY();
-                z = movementVector.getZ();
+
+            if (particleBlueprint.getRelativeVectorBlueprint() != null) {
+                ScriptRelativeVector scriptRelativeVector = null;
+                scriptRelativeVector = new ScriptRelativeVector(this.particleBlueprint.getRelativeVectorBlueprint(), eliteScript, location);
+
+                    Vector movementVector = scriptRelativeVector.getVector(scriptActionData);
+                    amount = 0;
+                    x = movementVector.getX();
+                    y = movementVector.getY();
+                    z = movementVector.getZ();
             }
 
-             */
+
             if (particleBlueprint.getParticle().equals(Particle.REDSTONE))
                 location.getWorld().spawnParticle(
                         particleBlueprint.getParticle(),

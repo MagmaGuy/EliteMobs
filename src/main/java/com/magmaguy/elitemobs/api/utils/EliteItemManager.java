@@ -247,6 +247,14 @@ public class EliteItemManager {
         //Wooden axe stats are so bad they can't even get detected properly
         if (itemStack.getType().equals(Material.WOODEN_AXE) || itemStack.getType().equals(Material.CROSSBOW))
             return true;
+        if (ItemSettingsConfig.isUseHoesAsWeapons() &&
+                (itemStack.getType().equals(Material.WOODEN_HOE) ||
+                        itemStack.getType().equals(Material.GOLDEN_HOE) ||
+                        itemStack.getType().equals(Material.STONE_HOE) ||
+                        itemStack.getType().equals(Material.IRON_HOE) ||
+                        itemStack.getType().equals(Material.DIAMOND_HOE) ||
+                        itemStack.getType().equals(Material.NETHERITE_HOE) ))
+            return true;
         return getWeaponLevel(itemStack) > 3.0;
     }
 

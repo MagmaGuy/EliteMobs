@@ -8,10 +8,9 @@ import org.bukkit.event.entity.EntityDamageEvent;
 
 public class EliteMobDamagedByEliteMobHandler implements Listener {
 
-    @EventHandler
+    @EventHandler (ignoreCancelled = true)
     public void onIronGolemDamage(EliteMobDamagedByEliteMobEvent event) {
 
-        if (event.isCancelled()) return;
         if (event.getDamager().getLivingEntity() == null || event.getDamagee().getLivingEntity() == null) return;
 
         if (!(event.getDamager().getLivingEntity().getType().equals(EntityType.IRON_GOLEM) ||

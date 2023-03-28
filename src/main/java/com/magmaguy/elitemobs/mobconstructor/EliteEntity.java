@@ -504,6 +504,13 @@ public class EliteEntity {
         return false;
     }
 
+    public boolean hasPower(PowersConfigFields mobPower) {
+        for (ElitePower elitePower : elitePowers)
+            if (elitePower.getPowersConfigFields().equals(mobPower))
+                return true;
+        return false;
+    }
+
     public ElitePower getPower(ElitePower elitePower) {
         for (ElitePower iteratedPower : getElitePowers())
             if (iteratedPower.getClass().equals(elitePower.getClass()))
