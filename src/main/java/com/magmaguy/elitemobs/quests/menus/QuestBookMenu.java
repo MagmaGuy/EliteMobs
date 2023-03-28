@@ -39,6 +39,7 @@ public class QuestBookMenu {
         int characterLimit = DefaultConfig.getCharacterLimitForBookMenuPages();
         for (TextComponent textComponent : elements) {
             characterCount += ChatColor.stripColor(textComponent.getText()).length();
+            textComponent.setText(ChatColor.BLACK + textComponent.getText().replace(ChatColor.WHITE+"", ChatColor.BLACK+""));
             if (pagesList.isEmpty()) {
                 textComponent.addExtra("\n");
                 pagesList.add(textComponent);

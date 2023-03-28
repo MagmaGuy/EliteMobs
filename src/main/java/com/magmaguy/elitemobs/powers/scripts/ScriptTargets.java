@@ -30,18 +30,21 @@ public class ScriptTargets {
     private List anonymousTargets = null;
 
     public List getAnonymousTargets(boolean locations, ScriptActionData scriptActionData) {
-        if (anonymousTargets != null)
+        if (anonymousTargets != null) {
             return anonymousTargets;
-        else if (locations)
-            return (List) getTargetLocations(scriptActionData);
-        else
-            return (List) getTargetEntities(scriptActionData);
+        }
+        else if (locations) {
+            return getTargetLocations(scriptActionData).stream().toList();
+        }
+        else {
+            return getTargetEntities(scriptActionData).stream().toList();
+        }
     }
 
     public void setAnonymousTargets(List anonymousTargets) {
         //Animated zones can't be cached!
-        if (getTargetBlueprint().isTrack() ||
-                eliteScript.getScriptZone().getZoneBlueprint().getAnimationDuration() > 1) return;
+        if (getTargetBlueprint().isTrack() || eliteScript.getScriptZone().getZoneBlueprint().getAnimationDuration() > 1)
+            return;
         //Non-animated zones must be cached for script inheritance and such
         this.anonymousTargets = anonymousTargets;
     }
@@ -87,11 +90,12 @@ public class ScriptTargets {
         if (eliteScript.getScriptZone().isValid()) {
             scriptActionData.setShapesChachedByTarget(eliteScript.getScriptZone().generateShapes(scriptActionData, true));
             if (eliteScript.getScriptZone().getZoneBlueprint().getAnimationDuration() > 0) animatedScriptZone = true;
+            anonymousTargets = null;
         }
         if (!animatedScriptZone)
             anonymousTargets = new ArrayList<>(getTargetLocations(scriptActionData));
         if (!getTargetBlueprint().isTrack() && targetBlueprint.getScriptRelativeVectorBlueprint() != null) {
-            scriptRelativeVector = new ScriptRelativeVector(targetBlueprint.getScriptRelativeVectorBlueprint(), eliteScript);
+            scriptRelativeVector = new ScriptRelativeVector(targetBlueprint.getScriptRelativeVectorBlueprint(), eliteScript, null);
             scriptRelativeVector.cacheVector(scriptActionData);
         }
     }
@@ -150,8 +154,9 @@ public class ScriptTargets {
      * @return Validated location for the script behavior
      */
     protected Collection<Location> getTargetLocations(ScriptActionData scriptActionData) {
-        if (anonymousTargets != null && !anonymousTargets.isEmpty() && anonymousTargets.get(0) instanceof Location)
+        if (anonymousTargets != null && !anonymousTargets.isEmpty() && anonymousTargets.get(0) instanceof Location) {
             return (List<Location>) anonymousTargets;
+        }
 
         Collection<Location> newLocations = null;
 
@@ -173,7 +178,8 @@ public class ScriptTargets {
                 newLocations = getLocationFromZone(scriptActionData.getInheritedScriptActionData());
                 break;
             case INHERIT_SCRIPT_TARGET:
-                return scriptActionData.getInheritedScriptActionData().getScriptTargets().getAnonymousTargets(true, scriptActionData.getInheritedScriptActionData());
+                return scriptActionData.getInheritedScriptActionData().getScriptTargets().getAnonymousTargets(
+                        true, scriptActionData.getInheritedScriptActionData());
             default:
                 new WarningMessage("Failed to get target type in script " + getTargetBlueprint().getScriptName() + " !");
         }
@@ -209,7 +215,7 @@ public class ScriptTargets {
         location.add(targetBlueprint.getOffset());
         if (scriptRelativeVector == null)
             if (targetBlueprint.getScriptRelativeVectorBlueprint() != null)
-                scriptRelativeVector = new ScriptRelativeVector(targetBlueprint.getScriptRelativeVectorBlueprint(), eliteScript);
+                scriptRelativeVector = new ScriptRelativeVector(targetBlueprint.getScriptRelativeVectorBlueprint(), eliteScript, location);
             else
                 return location;
 

@@ -39,7 +39,8 @@ public class ScriptZone {
     }
 
     //Get living entities in zone
-    protected Collection<LivingEntity> getZoneEntities(ScriptActionData scriptActionData, ScriptTargetsBlueprint blueprintFromRequestingTarget) {
+    protected Collection<LivingEntity>
+    getZoneEntities(ScriptActionData scriptActionData, ScriptTargetsBlueprint blueprintFromRequestingTarget) {
         //Get the entities from those zones
         switch (blueprintFromRequestingTarget.getTargetType()) {
             case ZONE_FULL, ZONE_BORDER:

@@ -7,7 +7,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 
 public class NPCDamageEvent implements Listener {
 
-    @EventHandler
+    @EventHandler (ignoreCancelled = true)
     public void onNPCDamage(EntityDamageEvent event) {
         if (!EntityTracker.isNPCEntity(event.getEntity())) return;
         event.setCancelled(true);

@@ -9,9 +9,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 public class EnderCrystalDamageProtectionBypass implements Listener {
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onEntityDamageByEntityEvent(EntityDamageByEntityEvent event) {
-        if (!event.isCancelled()) return;
         if (!event.getEntity().getType().equals(EntityType.ENDER_CRYSTAL)) return;
         LivingEntity entity = EntityFinder.filterRangedDamagers(event.getDamager());
         if (entity == null || !entity.getType().equals(EntityType.PLAYER)) return;

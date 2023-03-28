@@ -52,7 +52,7 @@ public class Cylinder extends Shape {
     @Override
     public boolean contains(LivingEntity livingEntity) {
         BoundingBox boundingBox = livingEntity.getBoundingBox();
-        if (centerLocation.getY() > boundingBox.getMinZ() || centerLocation.getY() + height < boundingBox.getMaxY())
+        if (centerLocation.getY() > boundingBox.getMinY() || centerLocation.getY() + height < boundingBox.getMaxY())
             return false;
 
         double circleDistanceX = Math.abs(centerLocation.getX() - boundingBox.getCenterX());
