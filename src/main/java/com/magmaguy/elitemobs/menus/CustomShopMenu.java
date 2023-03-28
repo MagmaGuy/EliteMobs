@@ -110,6 +110,7 @@ public class CustomShopMenu {
 
             if (!EliteMenu.isEliteMenu(event, menus)) return;
             event.setCancelled(true);
+            if (!SharedShopElements.itemNullPointerPrevention(event)) return;
 
             //reroll loot button
             if (event.getCurrentItem().getItemMeta().getDisplayName().equals(CustomShopMenuConfig.rerollItem.getItemMeta().getDisplayName())) {

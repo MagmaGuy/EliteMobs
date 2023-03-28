@@ -34,7 +34,7 @@ public class CombatTag implements Listener {
 
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onDamage(EntityDamageByEntityEvent event) {
 
         Player player = playerFinder(event);

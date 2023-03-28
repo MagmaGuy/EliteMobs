@@ -368,6 +368,7 @@ public class EventsRegistrer {
         register(new PreventEliteEquipmentDrop());
         register(new CombustionPrevention());
         register(new EliteSlimeDeathSplit());
+        register(new LightningImmunity());
 
         register(new TreasureChest.TreasureChestEvents());
 

@@ -8,10 +8,8 @@ import org.bukkit.event.entity.EntityDamageEvent;
 
 public class EliteMobGenericDamagedHandler implements Listener {
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void eliteMobDamagedGeneric(EliteMobDamagedEvent event) {
-
-        if (event.isCancelled()) return;
         if (event.getEntityDamageEvent().getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK)) return;
         if (!event.getEntityDamageEvent().getCause().equals(EntityDamageEvent.DamageCause.CUSTOM))
             event.getEntityDamageEvent().setDamage(EntityDamageEvent.DamageModifier.BASE, event.getEntityDamageEvent().getDamage());

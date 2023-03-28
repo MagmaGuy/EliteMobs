@@ -165,7 +165,7 @@ public class CustomModel {
     }
 
     public static class ModelEntityEvents implements Listener {
-        @EventHandler
+        @EventHandler (ignoreCancelled = true)
         public void onMeleeHit(EntityDamageByEntityEvent event) {
             EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(event.getDamager());
             if (!(eliteEntity instanceof CustomBossEntity)) return;
@@ -173,7 +173,7 @@ public class CustomModel {
             ((CustomBossEntity) eliteEntity).getCustomModel().melee();
         }
 
-        @EventHandler
+        @EventHandler (ignoreCancelled = true)
         public void onRangedShot(EntitySpawnEvent event) {
             if (!(event.getEntity() instanceof Projectile)) return;
             if (!(((Projectile) event.getEntity()).getShooter() instanceof LivingEntity)) return;

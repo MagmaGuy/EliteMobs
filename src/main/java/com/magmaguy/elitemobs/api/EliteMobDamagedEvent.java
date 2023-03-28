@@ -43,10 +43,9 @@ public class EliteMobDamagedEvent extends EliteDamageEvent {
 
     public static class EliteMobDamageEventFilter implements Listener {
 
-        @EventHandler(priority = EventPriority.HIGH)
+        @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
         public void onEntityDamagedEvent(EntityDamageEvent event) {
 
-            if (event.isCancelled()) return;
             EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(event.getEntity());
             if (eliteEntity == null) return;
 
