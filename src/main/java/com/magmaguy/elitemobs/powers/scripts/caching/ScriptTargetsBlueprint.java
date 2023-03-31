@@ -30,7 +30,10 @@ public class ScriptTargetsBlueprint {
     @Setter
     private boolean track = true;
     @Getter
+    @Setter
     private double coverage = 1.0;
+    @Getter
+    private boolean isCustomCoverage = false;
     @Getter
     private ScriptRelativeVectorBlueprint scriptRelativeVectorBlueprint = null;
 
@@ -38,11 +41,17 @@ public class ScriptTargetsBlueprint {
         this.scriptName = scriptName;
         this.filename = filename;
         processMapList(entry);
-        if (!targetType.equals(TargetType.ZONE_FULL) && !targetType.equals(TargetType.ZONE_BORDER))
-            if (coverage < 1.0) {
+        if (!isZoneTarget() && coverage < 1.0) {
                 new WarningMessage("Coverage for script " + scriptName + " in file " + filename + " was less than 1.0 but the targetType is neither ZONE_FULL nor ZONE_BORDER! Coverage should only be used for ZONE_FULL or ZONE_BORDER");
                 coverage = 1.0;
             }
+    }
+
+    public boolean isZoneTarget(){
+        return targetType == TargetType.ZONE_FULL ||
+                targetType == TargetType.ZONE_BORDER ||
+                targetType == TargetType.INHERIT_SCRIPT_ZONE_FULL ||
+                targetType == TargetType.INHERIT_SCRIPT_ZONE_BORDER;
     }
 
     private void processMapList(Map<?, ?> entry) {
@@ -60,7 +69,10 @@ public class ScriptTargetsBlueprint {
             case "range" -> range = parseDouble(key, value, scriptName);
             case "offset" -> offset = parseVector(key, value, scriptName);
             case "track" -> track = parseBoolean(key, value, scriptName);
-            case "coverage" -> coverage = parseDouble(key, value, scriptName);
+            case "coverage" -> {
+                isCustomCoverage = true;
+                coverage = parseDouble(key, value, scriptName);
+            }
             case "relativeoffset" -> scriptRelativeVectorBlueprint = new ScriptRelativeVectorBlueprint(scriptName, filename, ((MemorySection) value).getValues(false));
         }
     }

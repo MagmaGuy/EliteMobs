@@ -9,11 +9,14 @@ import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
+import com.magmaguy.elitemobs.treasurechest.TreasureChest;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -66,6 +69,18 @@ public class RemoveCommand {
             if (npcEntity == null) return;
             npcEntity.remove(RemovalReason.REMOVE_COMMAND);
             event.setCancelled(true);
+        }
+
+        @EventHandler(priority = EventPriority.LOWEST)
+        public void removeTreasureChest(PlayerInteractEvent event) {
+            if (!removingPlayers.contains(event.getPlayer().getUniqueId())) return;
+            if (event.getClickedBlock() == null) return;
+            TreasureChest treasureChest = TreasureChest.getTreasureChest(event.getClickedBlock().getLocation());
+            if (treasureChest == null) return;
+            treasureChest.removeTreasureChest();
+            event.getPlayer().sendMessage("[EliteMobs] Removed treasure chest!");
+            event.setCancelled(true);
+            event.getClickedBlock().setType(Material.AIR);
         }
     }
 

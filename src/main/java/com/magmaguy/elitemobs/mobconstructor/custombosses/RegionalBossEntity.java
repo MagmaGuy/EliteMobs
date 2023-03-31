@@ -19,8 +19,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.entity.Mob;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -227,8 +225,6 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
         queueSpawn(false);
     }
 
-    BukkitTask walkToSpawnTask = null;
-
     public void checkLeash() {
         if (leashRadius < 1)
             return;
@@ -240,17 +236,8 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
                     cancelLeash();
                     return;
                 }
-                if (getLivingEntity().getLocation().distanceSquared(spawnLocation) > Math.pow(leashRadius, 2)) {
+                if (getLivingEntity().getLocation().distanceSquared(spawnLocation) > Math.pow(leashRadius, 2))
                     SpiritWalk.spiritWalkRegionalBossAnimation(regionalBossEntity, getLivingEntity().getLocation(), getSpawnLocation());
-                }
-
-                //todo: testing!
-                if ((walkToSpawnTask == null || walkToSpawnTask.isCancelled()) &&
-                        getLivingEntity() instanceof Mob mob && !(mob.getTarget() instanceof Player) &&
-                        getLivingEntity().getLocation().distanceSquared(spawnLocation) > Math.pow(leashRadius / 3d, 2)) {
-                    walkToSpawnTask = Navigation.backToSpawn(this);
-                }
-
             } catch (Exception ex) {
                 ex.printStackTrace();
                 new WarningMessage("Async leash task errored!");
@@ -275,8 +262,12 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
         this.isRespawning = false;
         if (!ItemSettingsConfig.isRegionalBossesDropVanillaLoot())
             super.vanillaLoot = false;
-        if (livingEntity != null)
-            checkLeash();
+        //if (livingEntity != null)
+        //    checkLeash();
+        if (livingEntity != null && leashRadius > 0) {
+            Navigation.addSoftLeashAI(this);
+            Navigation.addHardLeashAI(this);
+        }
     }
 
     @Override
@@ -317,7 +308,7 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
     @Override
     public void chunkLoad() {
         super.chunkLoad();
-        checkLeash();
+        //checkLeash();
     }
 
     public static class RegionalBossEntityEvents implements Listener {
