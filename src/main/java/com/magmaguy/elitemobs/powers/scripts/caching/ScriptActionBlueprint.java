@@ -111,6 +111,11 @@ public class ScriptActionBlueprint {
         processMapList(entry);
         conditionsBlueprint = new ScriptConditionsBlueprint((Map<String, Object>) entry.get("Conditions"), scriptName, scriptFilename);
         if (scriptTargets == null) scriptTargets = new ScriptTargetsBlueprint(entry, scriptName, scriptFilename);
+        if (actionType == ActionType.SPAWN_PARTICLE &&
+                scriptTargets.isZoneTarget() &&
+                scriptTargets.getCoverage() == 1D &&
+                !scriptTargets.isCustomCoverage())
+            scriptTargets.setCoverage(.3);
     }
 
     private void processMapList(Map<?, ?> entry) {

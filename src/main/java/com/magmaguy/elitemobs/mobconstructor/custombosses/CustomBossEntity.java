@@ -543,8 +543,8 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
         public static void slowRegionalBoss(RegionalBossEntity regionalBossEntity) {
             if (regionalBossEntity.getCustomBossesConfigFields().isAlert()) return;
             if (regionalBossEntity.getLivingEntity() == null) return;
-            if (regionalBossEntity.getMovementSpeedAttribute() > .1)
-                regionalBossEntity.getLivingEntity().getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(.1);
+            if (regionalBossEntity.getMovementSpeedAttribute() > .12)
+                regionalBossEntity.getLivingEntity().getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(.12);
             regionalBossEntity.getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE)
                     .setBaseValue(regionalBossEntity.getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE).getBaseValue() / 3D);
         }
