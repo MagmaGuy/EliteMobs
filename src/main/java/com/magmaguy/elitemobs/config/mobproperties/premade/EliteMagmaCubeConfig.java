@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 public class EliteMagmaCubeConfig extends MobPropertiesConfigFields {
     public EliteMagmaCubeConfig() {
-        super("elite_magma_cub",
+        super("elite_magma_cube",
                 EntityType.MAGMA_CUBE,
                 true,
                 "&2Lvl &2$level &fElite &6Magma Cube",

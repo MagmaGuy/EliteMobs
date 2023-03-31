@@ -41,6 +41,7 @@ import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.npcs.NPCInteractions;
 import com.magmaguy.elitemobs.npcs.chatter.NPCProximitySensor;
 import com.magmaguy.elitemobs.ondeathcommands.OnDeathCommands;
+import com.magmaguy.elitemobs.pathfinding.Navigation;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.playerdata.PlayerStatsTracker;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
@@ -86,6 +87,8 @@ public class EventsRegistrer {
         plugin = MetadataHandler.PLUGIN;
 
         register(new FirstTimeSetup());
+
+        register(new Navigation());
 
         register(new DungeonKillTargetObjective.DungeonKillTargetObjectiveListener());
 
