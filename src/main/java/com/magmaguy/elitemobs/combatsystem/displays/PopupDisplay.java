@@ -77,7 +77,7 @@ public class PopupDisplay implements Listener {
 
         if (event.isFullHeal()) {
             DialogArmorStand.createDialogArmorStand(event.getEliteEntity().getUnsyncedLivingEntity(),
-                    ChatColor.GREEN + "FULL HEAL!", offset.clone().subtract(new Vector(0, 0.2, 0)));
+                    MobCombatSettingsConfig.getFullHealMessage(), offset.clone().subtract(new Vector(0, 0.2, 0)));
         } else {
             DialogArmorStand.createDialogArmorStand(event.getEliteEntity().getUnsyncedLivingEntity(),
                     ChatColor.GREEN + "" + event.getHealAmount() + " HP HEAL!", offset.clone().subtract(new Vector(0, 0.2, 0)));
