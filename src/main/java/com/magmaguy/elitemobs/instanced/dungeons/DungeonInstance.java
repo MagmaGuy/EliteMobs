@@ -68,6 +68,7 @@ public class DungeonInstance extends MatchInstance {
         instancedBossEntities = InstancedBossEntity.initializeInstancedBosses(dungeonPackagerConfigFields.getWorldName(), world, players.size(), this);
         NPCEntity.initializeInstancedNPCs(dungeonPackagerConfigFields.getWorldName(), world, players.size(), this);
         dungeonInstances.add(this);
+        super.permission = dungeonPackagerConfigFields.getPermission();
     }
 
     public static void setupInstancedDungeon(Player player, String instancedDungeonConfigFieldsString, String difficultyName) {

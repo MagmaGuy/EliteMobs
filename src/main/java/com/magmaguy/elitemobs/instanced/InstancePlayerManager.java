@@ -28,6 +28,9 @@ public class InstancePlayerManager {
             player.sendMessage(ArenasConfig.getArenaFullMessage());
             return false;
         }
+        //Check permissions
+        if (matchInstance.getPermission() != null && !player.hasPermission(matchInstance.getPermission()))
+            return false;
 
         //Add the player to the relevant fields
         matchInstance.participants.add(player);

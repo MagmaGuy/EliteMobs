@@ -29,13 +29,17 @@ import java.util.Optional;
  */
 public class SpawnCommand {
 
-    public static void spawnEliteEntityTypeCommand(Player player, EntityType entityType, Integer level, String[] powers) {
+    public static void spawnEliteEntityTypeCommand(Player player, EntityType entityType, Integer level, Optional<String[]> powers) {
         LivingEntity livingEntity = (LivingEntity) player.getLocation().getWorld().spawnEntity(getLocation(player), entityType);
-        HashSet<PowersConfigFields> mobPowers = getPowers(powers, player);
         EliteEntity eliteEntity = new EliteEntity();
         eliteEntity.setLevel(level);
-        if (!mobPowers.isEmpty()) eliteEntity.applyPowers(mobPowers);
-        else eliteEntity.randomizePowers(EliteMobProperties.getPluginData(livingEntity));
+
+        if (powers.isPresent()){
+            HashSet<PowersConfigFields> mobPowers = getPowers(powers.get(), player);
+            eliteEntity.applyPowers(mobPowers);
+        } else {
+            eliteEntity.randomizePowers(EliteMobProperties.getPluginData(livingEntity));
+        }
         eliteEntity.setLivingEntity(livingEntity, CreatureSpawnEvent.SpawnReason.CUSTOM);
     }
 

@@ -125,6 +125,8 @@ public class ArenaInstance extends MatchInstance {
             if (!message.isEmpty() && wave > 0)
                 waveMessage.put(wave, ChatColorConverter.convert(message));
         }
+
+        super.permission = customArenasConfigFields.getPermission();
     }
 
     public static void initializeArena(CustomArenasConfigFields customArenasConfigFields) {
