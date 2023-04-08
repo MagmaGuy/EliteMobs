@@ -118,10 +118,8 @@ public class TreasureChest implements PersistentObject {
                 return;
             }
 
-        if (ThreadLocalRandom.current().nextDouble() < customTreasureChestConfigFields.getMimicChance())
-            doMimic();
-        else
-            doTreasure(player);
+        if (ThreadLocalRandom.current().nextDouble() < customTreasureChestConfigFields.getMimicChance()) doMimic();
+        else doTreasure(player);
 
         if (customTreasureChestConfigFields.getDropStyle().equals(DropStyle.GROUP)) {
             customTreasureChestConfigFields.getRestockTimers().add(cooldownStringConstructor(player));

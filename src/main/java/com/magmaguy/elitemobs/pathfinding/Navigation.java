@@ -24,29 +24,33 @@ public class Navigation implements Listener {
 
     public static void addSoftLeashAI(RegionalBossEntity regionalBossEntity) {
         if (regionalBossEntity.getLivingEntity() instanceof Creature)
-            NMSManager.getAdapter().returnToPointWhenOutOfCombatBehavior(
-                    regionalBossEntity.getLivingEntity(),
-                    1.2f,
-                    regionalBossEntity.getSpawnLocation(),
-                    regionalBossEntity.getCustomBossesConfigFields().getLeashRadius() / 2D,
-                    1,
-                    20 * 5,
-                    20 * 3,
-                    false,
-                    true);
+            NMSManager.getAdapter().wanderBackToPoint(
+                            regionalBossEntity.getLivingEntity(),
+                            regionalBossEntity.getSpawnLocation(),
+                            regionalBossEntity.getLeashRadius() / 2D,
+                            20 * 5)
+                    .setSpeed(1.2f)
+                    .setStopReturnDistance(1)
+                    .setGoalRefreshCooldownTicks(20 * 3)
+                    .setHardObjective(false)
+                    .setTeleportOnFail(true)
+                    .setStartWithCooldown(true)
+                    .register();
     }
 
     public static void addHardLeashAI(RegionalBossEntity regionalBossEntity) {
-            NMSManager.getAdapter().returnToPointWhenOutOfCombatBehavior(
-                regionalBossEntity.getLivingEntity(),
-                2f,
-                regionalBossEntity.getSpawnLocation(),
-                regionalBossEntity.getCustomBossesConfigFields().getLeashRadius(),
-                0,
-                20 * 5,
-                20 * 3,
-                true,
-                true);
+        NMSManager.getAdapter().wanderBackToPoint(
+                        regionalBossEntity.getLivingEntity(),
+                        regionalBossEntity.getSpawnLocation(),
+                        regionalBossEntity.getLeashRadius(),
+                        20 * 5)
+                .setSpeed(2f)
+                .setStopReturnDistance(0)
+                .setGoalRefreshCooldownTicks(20 * 3)
+                .setHardObjective(true)
+                .setTeleportOnFail(true)
+                .setStartWithCooldown(true)
+                .register();
     }
 
     private static void getThere(Mob livingEntity, Location location, boolean force) {
@@ -55,7 +59,7 @@ public class Navigation implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void makeReturningBossesInvulnerable(WanderBackToPointStartEvent event) {
-        //if (!event.isHardObjective()) return;
+        if (!event.isHardObjective()) return;
         EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(event.getLivingEntity());
         if (!(eliteEntity instanceof RegionalBossEntity regionalBossEntity)) return;
         event.getLivingEntity().setInvulnerable(true);
@@ -64,7 +68,7 @@ public class Navigation implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void makeReturnedBossesVulnerable(WanderBackToPointEndEvent event) {
-        //if (!event.isHardObjective()) return;
+        if (!event.isHardObjective()) return;
         EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(event.getLivingEntity());
         if (!(eliteEntity instanceof RegionalBossEntity regionalBossEntity)) return;
         event.getLivingEntity().setInvulnerable(false);

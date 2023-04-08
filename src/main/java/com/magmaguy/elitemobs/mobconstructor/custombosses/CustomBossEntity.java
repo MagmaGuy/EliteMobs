@@ -204,11 +204,8 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
         }
 
         //This is a bit dumb but -1 is reserved for dynamic levels
-        if (level == -1)
-            if (!(this instanceof RegionalBossEntity) || spawnLocation.getWorld() != null)
-                getDynamicLevel(spawnLocation);
-            else
-                level = 1;
+        if (customBossesConfigFields.getLevel() == -1)
+            getDynamicLevel(spawnLocation);
 
         if (ChunkLocationChecker.locationIsLoaded(spawnLocation) || isMount) {
             super.livingEntity = new CustomBossMegaConsumer(this).spawn();

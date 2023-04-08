@@ -23,7 +23,7 @@ processResources {
 }
 
 group 'com.magmaguy'
-version '8.4.5-SNAPSHOT-4'
+version '8.4.5-SNAPSHOT-5'
 
 repositories {
     maven {
@@ -49,8 +49,6 @@ repositories {
 
     //Bstats API
     maven { url = 'https://repo.codemc.org/repository/maven-public' }
-    //CloudCommands
-    maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
     //Vault
     maven { url = 'https://jitpack.io' }
     //DiscordSRV
@@ -72,8 +70,8 @@ repositories {
         }
     }
 
-    //Geyser
-    maven { url = 'https://repo.opencollab.dev/main/' }
+    //EasyMinecraftGoals
+    maven { url = 'https://s01.oss.sonatype.org/content/repositories/releases/' }
 
 }
 
@@ -123,15 +121,9 @@ dependencies {
     //Model Engine
     compileOnly "com.ticxo.modelengine:api:R3.0.0"
 
-    implementation files('C:\\Users\\Tiago\\Documents\\MineCraftProjects\\EasyMinecraftGoals\\EasyMinecraftGoals\\dist\\target\\EasyMinecraftGoals-dist-1.0.0-shaded.jar')
+    implementation group: 'com.magmaguy', name: 'EasyMinecraftGoals-dist', version: '1.1.0';
 
-    //testCompileOnly 'org.projectlombok:lombok:1.18.24'
-    //testAnnotationProcessor 'org.projectlombok:lombok:1.18.22'
-
-    //Geyser for bedrock player detection
-    //This needs java 16 to work so you will want to change gradle.properties to match your directory for it
-    //compileOnly("org.geysermc:geyser-api:2.0.2-SNAPSHOT") disabled because I couldn't find an easy way to see if a player is using geyser through their api due to the bungeecord / waterfall specific implementations
-
+    //implementation files('C:\\Users\\Tiago\\Documents\\MineCraftProjects\\EasyMinecraftGoals\\EasyMinecraftGoals\\dist\\target\\EasyMinecraftGoals-dist-1.0.0-shaded.jar')
 }
 
 artifacts { // task 'build' runs generates uberjar

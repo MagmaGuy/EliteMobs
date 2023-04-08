@@ -48,7 +48,7 @@ public class QuestCommand {
             commandSender.sendMessage("[EliteMobs] Error - player name not valid!");
             return;
         }
-        PlayerQuestCooldowns.resetPlayerQuestCooldowns(player);
+        PlayerQuestCooldowns.resetPlayerQuests(player);
         commandSender.sendMessage("[EliteMobs] Successfully reset quests for player " + playerString);
     }
 

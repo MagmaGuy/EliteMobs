@@ -1,5 +1,7 @@
 package com.magmaguy.elitemobs.items.customloottable;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.customarenas.CustomArenasConfigFields;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
@@ -93,14 +95,17 @@ public class CustomLootTable implements Serializable {
     }
 
     public void treasureChestDrop(Player player, int chestLevel, Location dropLocation) {
+        boolean anythingDropped = false;
         for (CustomLootEntry customLootEntry : entries)
             if (customLootEntry.willDrop(player)) {
+                anythingDropped = true;
                 if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory()) {
                     customLootEntry.directDrop(chestLevel * 10, player);
                 } else {
                     customLootEntry.locationDrop(chestLevel * 10, player, dropLocation);
                 }
             }
+        if (!anythingDropped) player.sendMessage(ChatColorConverter.convert(DefaultConfig.getTreasureChestNoDropMessage()));
     }
 
     public void questDrop(Player player, int questRewardLevel) {
