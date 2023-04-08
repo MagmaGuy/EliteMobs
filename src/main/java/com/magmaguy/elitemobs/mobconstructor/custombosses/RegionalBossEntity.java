@@ -33,6 +33,7 @@ import java.util.Objects;
 public class RegionalBossEntity extends CustomBossEntity implements PersistentObject, PersistentMovingEntity {
 
     private static final ArrayListMultimap<CustomBossesConfigFields, RegionalBossEntity> regionalBossesFromConfigFields = ArrayListMultimap.create();
+    @Getter
     private final double leashRadius;
     //Format: worldName,x,y,z,pitch,yaw:unixTimeForRespawn
     private String rawString;

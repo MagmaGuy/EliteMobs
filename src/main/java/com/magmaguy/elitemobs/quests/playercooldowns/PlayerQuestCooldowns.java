@@ -40,7 +40,7 @@ public class PlayerQuestCooldowns implements Serializable {
         return new PlayerQuestCooldowns();
     }
 
-    public static void resetPlayerQuestCooldowns(Player player) {
+    public static void resetPlayerQuests(Player player) {
         if (PlayerData.getPlayerQuestCooldowns(player.getUniqueId()) == null) return;
         PermissionAttachment permissionAttachment = Objects.requireNonNull(player).addAttachment(MetadataHandler.PLUGIN);
         PlayerQuestCooldowns playerQuestCooldowns = PlayerData.getPlayerQuestCooldowns(player.getUniqueId());

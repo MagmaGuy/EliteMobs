@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
 import com.magmaguy.elitemobs.config.menus.premade.GuildRankMenuConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
+import com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldowns;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -76,6 +77,7 @@ public class GuildRankMenuHandler implements Listener {
         GuildRank.setMaxGuildRank(player, 1);
         GuildRank.setActiveGuildRank(player, 1);
         GuildRank.setGuildPrestigeRank(player, GuildRank.getGuildPrestigeRank(player) + 1);
+        PlayerQuestCooldowns.resetPlayerQuests(player);
 
         for (Player iteratedPlayer : Bukkit.getOnlinePlayers()) {
             iteratedPlayer.sendTitle(

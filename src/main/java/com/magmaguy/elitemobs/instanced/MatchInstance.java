@@ -47,6 +47,8 @@ public abstract class MatchInstance {
     protected int minPlayers;
     protected int maxPlayers;
     protected World world;
+    @Getter
+    protected String permission = null;
 
 
     public MatchInstance(Location startLocation, Location exitLocation, int minPlayers, int maxPlayers) {

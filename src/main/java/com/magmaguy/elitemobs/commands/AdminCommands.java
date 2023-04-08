@@ -139,7 +139,7 @@ public class AdminCommands {
                         (Player) commandContext.getSender(),
                         commandContext.get("entityType"),
                         commandContext.get("eliteLevel"),
-                        commandContext.getOrDefault("powers", new String[0]))));
+                        commandContext.getOptional("powers"))));
 
         // /em spawnlocationelite <entityType> <worldName> <x> <y> <z> <level> <power1> <power2> <power3>
         manager.command(builder.literal("spawnlocationelite")
@@ -164,7 +164,7 @@ public class AdminCommands {
                         commandContext.get("worldName"),
                         commandContext.get("coords"),
                         commandContext.get("eliteLevel"),
-                        commandContext.get("powers"))));
+                        commandContext.getOptional("powers"))));
 
         ArrayList<String> customBosses = new ArrayList<>(CustomBossesConfig.getCustomBosses().keySet());
         ArrayList<String> regionalBosses = new ArrayList<>(CustomBossesConfigFields.getRegionalElites().keySet());

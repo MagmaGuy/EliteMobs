@@ -69,6 +69,8 @@ public class DefaultConfig {
     private static String dismissEMMessage;
     @Getter
     private static String switchEMStyleMessage;
+    @Getter
+    private static String treasureChestNoDropMessage;
 
 
     private static File file = null;
@@ -184,6 +186,9 @@ public class DefaultConfig {
         switchEMStyleMessage = ConfigurationEngine.setString(
                 List.of("Sets the message that appears when players run the /em alt command."),
                 file, fileConfiguration, "switchEMStyleMessage", "&8[EliteMobs] &2/elitemobs &fmenu style changed! Check it out!", true);
+        treasureChestNoDropMessage = ConfigurationEngine.setString(
+                List.of("Sets the message that appears when a player opens a treasure chest but gets nothing"),
+                file, fileConfiguration, "treasureChestNoDropMessage", "&8[EliteMobs] &cYou didn't get anything! Better luck next time!", true);
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }
