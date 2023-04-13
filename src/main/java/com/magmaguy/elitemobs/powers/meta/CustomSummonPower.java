@@ -644,7 +644,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
     private Location getFinalSpawnLocation(EliteEntity summoningEntity, Vector spawnLocationOffset) {
         Location finalSpawnLocation;
         if (summoningEntity instanceof RegionalBossEntity)
-            finalSpawnLocation = ((RegionalBossEntity) summoningEntity).getSpawnLocation().add(spawnLocationOffset);
+            finalSpawnLocation = summoningEntity.getSpawnLocation().add(spawnLocationOffset);
         else if (summoningEntity == null)
             finalSpawnLocation = null;
         else
@@ -654,7 +654,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
                 ((CustomBossEntity) summoningEntity).getEmPackage() instanceof SchematicPackage)
             if (summoningEntity instanceof RegionalBossEntity) {
                 SchematicPackage schematicPackage = (SchematicPackage) ((CustomBossEntity) summoningEntity).getEmPackage();
-                return ((RegionalBossEntity) summoningEntity).getSpawnLocation().add(spawnLocationOffset.rotateAroundY(schematicPackage.getDungeonPackagerConfigFields().getCalculatedRotation()));
+                return summoningEntity.getSpawnLocation().add(spawnLocationOffset.rotateAroundY(schematicPackage.getDungeonPackagerConfigFields().getCalculatedRotation()));
             } else {
                 SchematicPackage schematicPackage = (SchematicPackage) ((CustomBossEntity) summoningEntity).getEmPackage();
                 return summoningEntity.getLocation().clone().add(spawnLocationOffset.rotateAroundY(schematicPackage.getDungeonPackagerConfigFields().getCalculatedRotation()));

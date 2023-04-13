@@ -58,7 +58,7 @@ public class ScriptActionBlueprint {
     @Getter
     private Vector vValue = null;
     @Getter
-    private String scriptFilename;
+    private final String scriptFilename;
     @Getter
     private ScriptTargetsBlueprint scriptTargets;
     @Getter

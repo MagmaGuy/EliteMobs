@@ -24,7 +24,7 @@ public class BossMusic {
     @Getter
     private int durationTicks2 = -1;
     private BukkitTask bukkitTask = null;
-    private CustomBossEntity customBossEntity;
+    private final CustomBossEntity customBossEntity;
 
     //Format: name=rsp.name length=durations_ticks->name=rsp.name length=duration_ticks
     public BossMusic(String rawString, CustomBossEntity customBossEntity) {

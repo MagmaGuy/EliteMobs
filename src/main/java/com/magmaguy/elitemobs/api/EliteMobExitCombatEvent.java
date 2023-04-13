@@ -29,8 +29,9 @@ public class EliteMobExitCombatEvent extends Event {
         if (eliteEntity.isValid() &&
                 MobCombatSettingsConfig.isRegenerateCustomBossHealthOnCombatEnd() &&
                 !reason.equals(EliteMobExitCombatReason.PHASE_SWITCH) &&
-                !eliteEntity.getUnsyncedLivingEntity().getType().equals(EntityType.PHANTOM))
+                !eliteEntity.getUnsyncedLivingEntity().getType().equals(EntityType.PHANTOM)) {
             eliteEntity.fullHeal();
+        }
         if (!DefaultConfig.isAlwaysShowNametags())
             eliteEntity.setNameVisible(false);
     }

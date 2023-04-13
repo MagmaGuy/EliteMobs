@@ -42,13 +42,13 @@ public class ScriptAction {
 
     @Getter
     private final ScriptActionBlueprint blueprint;
-    private ScriptTargets scriptTargets;
+    private final ScriptTargets scriptTargets;
     private ScriptTargets finalScriptTargets = null;
-    private ScriptConditions scriptConditions;
-    private ScriptParticles scriptParticles;
+    private final ScriptConditions scriptConditions;
+    private final ScriptParticles scriptParticles;
     @Getter
-    private Map<String, EliteScript> eliteScriptMap;
-    private EliteScript eliteScript;
+    private final Map<String, EliteScript> eliteScriptMap;
+    private final EliteScript eliteScript;
 
 
     public ScriptAction(ScriptActionBlueprint blueprint, Map<String, EliteScript> eliteScriptMap, EliteScript eliteScript) {

@@ -12,7 +12,7 @@ public class EliteDamageEvent extends Event implements Cancellable {
     @Getter
     private double damage;
 
-    private Event event;
+    private final Event event;
 
     /**
      * Classes that deal with damage in EliteMobs extend this class in order to inherit modifiable and cancellable behavior.

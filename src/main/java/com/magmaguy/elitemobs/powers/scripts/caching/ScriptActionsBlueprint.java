@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class ScriptActionsBlueprint {
     @Getter
-    private List<ScriptActionBlueprint> scriptActionsBlueprintList = new ArrayList<>();
+    private final List<ScriptActionBlueprint> scriptActionsBlueprintList = new ArrayList<>();
 
     public ScriptActionsBlueprint(ConfigurationSection configurationSection, String scriptName, String filename) {
         List<Map<?, ?>> values = configurationSection.getMapList("Actions");

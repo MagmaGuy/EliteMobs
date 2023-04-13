@@ -23,7 +23,7 @@ public class EliteScript extends ElitePower implements Cloneable {
     private final ScriptCooldowns scriptCooldowns;
     @Getter
     protected Map<String, EliteScript> eliteScriptMap;
-    private ScriptConditions scriptConditions;
+    private final ScriptConditions scriptConditions;
 
     public EliteScript(EliteScriptBlueprint scriptBlueprint, Map<String, EliteScript> eliteScriptMap) {
         super(scriptBlueprint.getCustomConfigFields());
