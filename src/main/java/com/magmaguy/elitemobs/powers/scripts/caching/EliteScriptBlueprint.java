@@ -11,7 +11,7 @@ import static com.magmaguy.elitemobs.utils.MapListInterpreter.*;
 
 public class EliteScriptBlueprint {
     @Getter
-    private static HashMap<CustomConfigFields, EliteScriptBlueprint> blueprints = new HashMap();
+    private static final HashMap<CustomConfigFields, EliteScriptBlueprint> blueprints = new HashMap();
 
     @Getter
     private final CustomConfigFields customConfigFields;

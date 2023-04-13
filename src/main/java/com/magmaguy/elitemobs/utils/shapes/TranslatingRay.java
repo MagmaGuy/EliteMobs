@@ -6,7 +6,7 @@ import org.bukkit.Location;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class TranslatingRay extends Ray {
-    private Location finalCenterLocation;
+    private final Location finalCenterLocation;
 
     public TranslatingRay(boolean ignoresSolidBlocks,
                           double pointRadius,

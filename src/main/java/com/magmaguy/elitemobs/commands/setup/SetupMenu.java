@@ -38,12 +38,12 @@ public class SetupMenu {
 
     Inventory inventory;
     Player player;
-    private static int nextIcon = 35;
-    private static int infoIcon = 4;
+    private static final int nextIcon = 35;
+    private static final int infoIcon = 4;
     private static List<EMPackage> emPackages = new ArrayList<>();
     ArrayList<Integer> validSlots = new ArrayList<>(Arrays.asList(10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23,
             24, 25, 28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 43, 46, 47, 48, 49, 50, 51, 52));
-    private int previousIcon = 27;
+    private final int previousIcon = 27;
     HashMap<Integer, EMPackage> minidungeonHashMap = new HashMap<>();
     @Getter
     private int currentPage = 1;
@@ -442,7 +442,7 @@ public class SetupMenu {
                 setupMenu.redrawMenu(setupMenu.getCurrentPage() - 1, event.getInventory());
                 return;
             }
-            if (event.getSlot() == setupMenu.nextIcon && event.getCurrentItem() != null) {
+            if (event.getSlot() == nextIcon && event.getCurrentItem() != null) {
                 setupMenu.redrawMenu(setupMenu.getCurrentPage() + 1, event.getInventory());
                 return;
             }

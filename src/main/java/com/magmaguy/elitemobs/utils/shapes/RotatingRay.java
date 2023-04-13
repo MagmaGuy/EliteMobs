@@ -14,9 +14,9 @@ public class RotatingRay extends Ray {
 
     private final int animationDuration;
     private final Location originalCenterLocation;
-    private Location target2;
-    private Vector raySegment;
-    private double distanceSquared;
+    private final Location target2;
+    private final Vector raySegment;
+    private final double distanceSquared;
 
     public RotatingRay(boolean ignoresSolidBlocks,
                        double pointRadius,

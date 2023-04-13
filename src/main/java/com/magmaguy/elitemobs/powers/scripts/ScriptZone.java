@@ -25,7 +25,7 @@ public class ScriptZone {
     private ScriptTargets targets2 = null;
     private ScriptTargets finalTargets2 = null;
     @Getter
-    private boolean isValid;
+    private final boolean isValid;
 
     public ScriptZone(ScriptZoneBlueprint zoneBlueprint, EliteScript eliteScript) {
         this.zoneBlueprint = zoneBlueprint;

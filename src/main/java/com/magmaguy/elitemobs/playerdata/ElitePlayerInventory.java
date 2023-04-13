@@ -20,7 +20,7 @@ public class ElitePlayerInventory {
     private final Player player;
     private boolean isUpdateLock = false;
     //Used by elite scripts
-    private HashSet<String> customMetadata = new HashSet<>();
+    private final HashSet<String> customMetadata = new HashSet<>();
 
     /**
      * Object of the player's inventory for EliteMobs.

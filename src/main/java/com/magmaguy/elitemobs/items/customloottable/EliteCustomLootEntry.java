@@ -23,7 +23,7 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
     @Getter
     private String filename = null;
     private String difficultyID = null;
-    private String permission = null;
+    private final String permission = null;
 
     public EliteCustomLootEntry(List<CustomLootEntry> entries, String rawString, String configFilename) {
         super();

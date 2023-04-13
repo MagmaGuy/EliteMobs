@@ -6,7 +6,7 @@ import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
 public class ScriptRelativeVector {
-    private ScriptRelativeVectorBlueprint scriptRelativeVectorBlueprint;
+    private final ScriptRelativeVectorBlueprint scriptRelativeVectorBlueprint;
     private ScriptTargets sourceTarget = null;
     private ScriptTargets destinationTarget = null;
     private Vector cachedVector = null;

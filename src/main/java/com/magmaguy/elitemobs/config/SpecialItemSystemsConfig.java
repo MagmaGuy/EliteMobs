@@ -13,7 +13,7 @@ import java.util.List;
 public class SpecialItemSystemsConfig {
 
     @Getter
-    private static HashMap<CustomItem, Double> specialValues = new HashMap<>();
+    private static final HashMap<CustomItem, Double> specialValues = new HashMap<>();
     @Getter
     private static boolean dropSpecialLoot;
     @Getter

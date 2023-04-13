@@ -55,7 +55,7 @@ public class ScriptParticlesBlueprint {
         private Boolean moveToTarget = null;
         @Getter
         private ScriptRelativeVectorBlueprint relativeVectorBlueprint = null;
-        private String filename;
+        private final String filename;
 
         public ScriptParticleBlueprint(Map<?, ?> entry, String scriptName, String filename) {
             this.filename = filename;

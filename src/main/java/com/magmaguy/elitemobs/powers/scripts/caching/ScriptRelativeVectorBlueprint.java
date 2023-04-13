@@ -11,8 +11,8 @@ import java.util.Map;
 public class ScriptRelativeVectorBlueprint {
 
 
-    private String scriptName;
-    private String scriptFilename;
+    private final String scriptName;
+    private final String scriptFilename;
 
     @Getter
     private ScriptTargetsBlueprint sourceTarget = null;

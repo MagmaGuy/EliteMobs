@@ -317,9 +317,9 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
 
     private class InstancedNPCContainer {
         @Getter
-        private Location location;
+        private final Location location;
         @Getter
-        private NPCEntity npcEntity;
+        private final NPCEntity npcEntity;
 
         public InstancedNPCContainer(Location location, NPCEntity npcEntity) {
             this.location = location;
