@@ -190,10 +190,10 @@ public class ItemEnchantmentMenu extends EliteMenu {
             if (clickedSlot == CANCEL_SLOT) event.getWhoClicked().closeInventory();
             else if (clickedSlot == CONFIRM_SLOT) confirm(event);
             else if (clickedSlot == ITEM_SLOT || clickedSlot == ENCHANTED_BOOK_SLOT || clickedSlot == LUCKY_TICKET_SLOT) {
-                moveItemDown(event.getView().getTopInventory(), clickedSlot, (Player) event.getWhoClicked());
+                moveItemDown(event.getView().getTopInventory(), clickedSlot, event.getWhoClicked());
                 event.getClickedInventory().clear(clickedSlot);
                 if (clickedSlot == ITEM_SLOT && event.getView().getTopInventory().getItem(ENCHANTED_BOOK_SLOT) != null)
-                    moveItemDown(event.getView().getTopInventory(), ENCHANTED_BOOK_SLOT, (Player) event.getWhoClicked());
+                    moveItemDown(event.getView().getTopInventory(), ENCHANTED_BOOK_SLOT, event.getWhoClicked());
                 updateConfirmButton(event.getInventory());
             }
 

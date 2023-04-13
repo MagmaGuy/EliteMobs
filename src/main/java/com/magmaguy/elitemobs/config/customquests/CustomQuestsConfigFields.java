@@ -139,7 +139,7 @@ public class CustomQuestsConfigFields extends CustomConfigFields implements Cust
                         default ->
                                 new WarningMessage("Failed to correctly parse key " + key + " in " + filename + " while updating the old quest configuration format!");
                     }
-                if (key.toLowerCase().equals("dialog")) {
+                if (key.equalsIgnoreCase("dialog")) {
                     value = Arrays.stream(((String) value).split("\\n")).toList();
                 }
                 parsedEntry.put(key, value);
@@ -169,7 +169,7 @@ public class CustomQuestsConfigFields extends CustomConfigFields implements Cust
                 Map<String, Object> parsedMap = new HashMap<>();
                 for (Map.Entry<String, Object> entry : maps.getValue().entrySet())
                     if (entry.getKey().equals("dialog"))
-                        parsedMap.put(entry.getKey(), translatable(filename, "customObjectives." + maps.getKey() + "." + (String) entry.getKey(), (List<String>) entry.getValue()));
+                        parsedMap.put(entry.getKey(), translatable(filename, "customObjectives." + maps.getKey() + "." + entry.getKey(), (List<String>) entry.getValue()));
                     else
                         parsedMap.put(entry.getKey(), entry.getValue());
                 parsedObjectives.put(maps.getKey(), parsedMap);
@@ -189,7 +189,7 @@ public class CustomQuestsConfigFields extends CustomConfigFields implements Cust
             Map<String, Object> parsedMap = new HashMap<>();
             for (Map.Entry<?, ?> entry : ((ConfigurationSection) maps.getValue()).getValues(false).entrySet())
                 if (entry.getKey().equals("dialog"))
-                    parsedMap.put((String) entry.getKey(), translatable(filename, "customObjectives." + maps.getKey() + "." + (String) entry.getKey(), (List<String>) entry.getValue()));
+                    parsedMap.put((String) entry.getKey(), translatable(filename, "customObjectives." + maps.getKey() + "." + entry.getKey(), (List<String>) entry.getValue()));
                 else
                     parsedMap.put((String) entry.getKey(), entry.getValue());
             parsedObjectives.put(maps.getKey(), parsedMap);

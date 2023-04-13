@@ -13,11 +13,11 @@ import java.util.Map;
 import static com.magmaguy.elitemobs.utils.MapListInterpreter.*;
 
 public class ScriptTargetsBlueprint {
-    private String filename;
+    private final String filename;
     @Getter
     protected TargetType targetType = TargetType.SELF;
     @Getter
-    private String scriptName;
+    private final String scriptName;
     @Getter
     private List<String> locations;
     @Getter

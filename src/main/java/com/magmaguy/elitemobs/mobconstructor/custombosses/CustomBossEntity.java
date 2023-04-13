@@ -357,15 +357,17 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
 
     public void getDynamicLevel(Location bossLocation) {
         int bossLevel = 1;
-        List<Player> players = bossLocation.getWorld().getPlayers();
-        for (Player player : players)
-            if (player.getLocation().distanceSquared(bossLocation) <= Math.pow(16L * (Bukkit.getViewDistance() + 5D), 2)) {
-                ElitePlayerInventory playerInventory = ElitePlayerInventory.getPlayer(player);
-                if (playerInventory == null) continue;
-                int level = playerInventory.getNaturalMobSpawnLevel(false);
-                if (level < bossLevel) continue;
-                bossLevel = level;
-            }
+        if (bossLocation.getWorld() != null) {
+            List<Player> players = bossLocation.getWorld().getPlayers();
+            for (Player player : players)
+                if (player.getLocation().distanceSquared(bossLocation) <= Math.pow(16L * (Bukkit.getViewDistance() + 5D), 2)) {
+                    ElitePlayerInventory playerInventory = ElitePlayerInventory.getPlayer(player);
+                    if (playerInventory == null) continue;
+                    int level = playerInventory.getNaturalMobSpawnLevel(false);
+                    if (level < bossLevel) continue;
+                    bossLevel = level;
+                }
+        }
         super.setLevel(bossLevel);
     }
 

@@ -133,7 +133,7 @@ public class EliteEntity {
         return spawnLocation.clone();
     }
     //Used for custom arbitrary tags from elite scripts
-    private HashSet<String> customMetadata = new HashSet<>();
+    private final HashSet<String> customMetadata = new HashSet<>();
 
     /**
      * Functions as a placeholder for {@link CustomBossEntity} that haven't been initialized yet. Uses the builder pattern

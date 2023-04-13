@@ -29,7 +29,7 @@ public class ScriptActionData {
     @Getter
     private final TargetType targetType;
     @Getter
-    private ScriptTargets scriptTargets;
+    private final ScriptTargets scriptTargets;
     @Getter
     private ScriptZone scriptZone = null;
     @Getter

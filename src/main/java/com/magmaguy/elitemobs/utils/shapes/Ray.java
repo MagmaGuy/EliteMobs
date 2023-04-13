@@ -61,10 +61,7 @@ public class Ray extends Shape {
     @Override
     public boolean contains(LivingEntity livingEntity) {
         RayCuboid rayCuboid = new RayCuboid(thickness, currentSource, currentTarget);
-        if (rayCuboid.AABBCheck(livingEntity)) {
-            return true;
-        }
-        return false;
+        return rayCuboid.AABBCheck(livingEntity);
     }
 
     //Children override this
@@ -99,14 +96,19 @@ public class Ray extends Shape {
 
     private class RayCuboid {
         @Getter
-        private double width;
+        private final double width;
         @Getter
-        private double height;
+        private final double height;
         @Getter
-        private Location centerLocation;
+        private final Location centerLocation;
         @Getter
         private Quaternion rotation;
-        private double maxX, minX, maxY, minY, maxZ, minZ;
+        private final double maxX;
+        private final double minX;
+        private final double maxY;
+        private final double minY;
+        private final double maxZ;
+        private final double minZ;
 
         public RayCuboid(double width, Location sourceLocation, Location destinationLocation) {
             this.width = width;

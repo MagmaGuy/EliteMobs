@@ -211,7 +211,7 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
                 newDamage = newDamage - newDamage * MobCombatSettingsConfig.getBlockingDamageReduction();
             //nullify vanilla reductions
             for (EntityDamageEvent.DamageModifier modifier : EntityDamageByEntityEvent.DamageModifier.values())
-                if (event.isApplicable(modifier))
+                if (event.isApplicable(modifier) && modifier != EntityDamageEvent.DamageModifier.ABSORPTION)
                     event.setDamage(modifier, 0);
 
             //Check if we should be doing raw damage, which some powers have

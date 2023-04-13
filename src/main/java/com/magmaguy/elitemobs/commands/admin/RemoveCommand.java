@@ -44,8 +44,8 @@ public class RemoveCommand {
             if (!removingPlayers.contains(event.getDamager().getUniqueId())) return;
             EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(event.getEntity());
             if (eliteEntity == null){
-                ((Player)event.getDamager()).sendMessage(ChatColorConverter.convert("&8[EliteMobs] The entity you just removed was not an EliteMobs entity. EliteMobs will still attempt to remove it though."));
-                ((Player)event.getDamager()).sendMessage(ChatColorConverter.convert("&8[EliteMobs] If the entity is supposed to be an EliteMobs entity, it is highly likely some other plugin hijacked the entity and changed it in a way that made EliteMobs unable to recognize it anymore."));
+                event.getDamager().sendMessage(ChatColorConverter.convert("&8[EliteMobs] The entity you just removed was not an EliteMobs entity. EliteMobs will still attempt to remove it though."));
+                event.getDamager().sendMessage(ChatColorConverter.convert("&8[EliteMobs] If the entity is supposed to be an EliteMobs entity, it is highly likely some other plugin hijacked the entity and changed it in a way that made EliteMobs unable to recognize it anymore."));
                 event.getEntity().remove();
                 return;
             }

@@ -25,7 +25,7 @@ public class ScriptTargets {
     private final EliteScript eliteScript;
     //raw zone from the elite script
     @Getter
-    private ScriptZone scriptZone;
+    private final ScriptZone scriptZone;
     //collection of targets, can be shapes, entities or locations
     private List anonymousTargets = null;
 

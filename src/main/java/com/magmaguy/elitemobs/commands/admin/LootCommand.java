@@ -17,7 +17,7 @@ public class LootCommand {
             player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &cFile name " + args1 + " &cis not a valid custom item file name!"));
             return;
         }
-        player.getInventory().addItem(customItem.generateDefaultsItemStack(player, false, null));
+        player.getInventory().addItem(customItem.generateDefaultsItemStack(player, false, null, true));
     }
 
     public static void give(CommandSender commandSender, String playerString, String args1) {

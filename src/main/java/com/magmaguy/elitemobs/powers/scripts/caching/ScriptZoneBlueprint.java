@@ -14,8 +14,8 @@ import static com.magmaguy.elitemobs.utils.MapListInterpreter.*;
 
 public class ScriptZoneBlueprint {
 
-    private String scriptName;
-    private String filename;
+    private final String scriptName;
+    private final String filename;
     @Getter
     private ScriptTargetsBlueprint target = null;
     @Getter

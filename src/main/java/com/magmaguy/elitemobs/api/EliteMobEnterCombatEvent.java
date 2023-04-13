@@ -29,33 +29,30 @@ public class EliteMobEnterCombatEvent extends Event {
     public EliteMobEnterCombatEvent(EliteEntity eliteEntity, Player targetEntity) {
         this.targetEntity = targetEntity;
         this.eliteEntity = eliteEntity;
-        eliteEntity.setInCombat(true);
+
         if (!DefaultConfig.isAlwaysShowNametags())
             eliteEntity.setNameVisible(true);
-        if (eliteEntity instanceof CustomBossEntity)
-            CommandRunner.runCommandFromList(((CustomBossEntity) eliteEntity).getCustomBossesConfigFields().getOnCombatEnterCommands(), new ArrayList<>());
-        Bukkit.getScheduler().runTaskTimer(MetadataHandler.PLUGIN, (task) -> {
-            if (!eliteEntity.isValid()) {
-                task.cancel();
-                new EventCaller(new EliteMobExitCombatEvent(eliteEntity, EliteMobExitCombatEvent.EliteMobExitCombatReason.ELITE_NOT_VALID));
-                return;
-            }
-            if (!eliteEntity.isInCombatGracePeriod())
-                if (((Mob) eliteEntity.getLivingEntity()).getTarget() == null) {
+        if (eliteEntity instanceof CustomBossEntity customBossEntity )
+            CommandRunner.runCommandFromList(customBossEntity.getCustomBossesConfigFields().getOnCombatEnterCommands(), new ArrayList<>());
+        //Phase bosses can launch this event through phase switches
+        if (!eliteEntity.isInCombat())
+            Bukkit.getScheduler().runTaskTimer(MetadataHandler.PLUGIN, task -> {
+                if (!eliteEntity.isValid()) {
+                    task.cancel();
+                    new EventCaller(new EliteMobExitCombatEvent(eliteEntity, EliteMobExitCombatEvent.EliteMobExitCombatReason.ELITE_NOT_VALID));
+                    return;
+                }
+                if (!eliteEntity.isInCombatGracePeriod()) {
                     double followRange = eliteEntity.getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE).getValue();
                     if (eliteEntity.getLivingEntity().getType().equals(EntityType.ENDER_DRAGON))
                         followRange = 200;
-                    for (Entity entity : eliteEntity.getLivingEntity().getNearbyEntities(followRange, followRange, followRange)) {
-                        if (entity instanceof Player) {
-                            if (((Player) entity).getGameMode().equals(GameMode.SPECTATOR))
-                                continue;
-                            return;
-                        }
-                    }
+                    for (Entity entity : eliteEntity.getLivingEntity().getNearbyEntities(followRange, followRange, followRange))
+                        if (entity instanceof Player player && !player.getGameMode().equals(GameMode.SPECTATOR)) return;
                     task.cancel();
                     new EventCaller(new EliteMobExitCombatEvent(eliteEntity, EliteMobExitCombatEvent.EliteMobExitCombatReason.NO_NEARBY_PLAYERS));
                 }
-        }, 20L, 20L);
+            }, 20L, 20L);
+        eliteEntity.setInCombat(true);
     }
 
     public static HandlerList getHandlerList() {

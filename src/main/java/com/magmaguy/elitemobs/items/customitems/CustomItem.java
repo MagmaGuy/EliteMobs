@@ -184,7 +184,7 @@ public class CustomItem {
                         ScalableItemConstructor.constructScalableItem(itemTier + 1, this, player, eliteEntity));
                 break;
             case FIXED:
-                loot = location.getWorld().dropItem(location, generateItemStack((int) itemLevel + 1, player, eliteEntity));
+                loot = location.getWorld().dropItem(location, generateItemStack(itemLevel + 1, player, eliteEntity));
             default:
         }
 
@@ -294,10 +294,14 @@ public class CustomItem {
     }
 
     public ItemStack generateDefaultsItemStack(Player player, boolean showItemWorth, EliteEntity eliteEntity) {
-        if (player != null && !permission.isEmpty() && !player.hasPermission(permission)) return null;
+        return generateDefaultsItemStack(player, showItemWorth, eliteEntity, false);
+    }
+
+    public ItemStack generateDefaultsItemStack(Player player, boolean showItemWorth, EliteEntity eliteEntity, boolean bypass) {
+        if (!bypass && player != null && !permission.isEmpty() && !player.hasPermission(permission)) return null;
         ItemStack itemStack =
                 ItemConstructor.constructItem(
-                        (int) itemLevel,
+                        itemLevel,
                         customItemsConfigFields.getName(),
                         customItemsConfigFields.getMaterial(),
                         getEnchantments(),

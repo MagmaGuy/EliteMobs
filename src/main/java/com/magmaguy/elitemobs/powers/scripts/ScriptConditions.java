@@ -19,7 +19,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class ScriptConditions {
 
-    private ScriptConditionsBlueprint conditionsBlueprint;
+    private final ScriptConditionsBlueprint conditionsBlueprint;
     private ScriptTargets scriptTargets = null;
 
     public ScriptConditions(ScriptConditionsBlueprint scriptConditionsBlueprint, EliteScript eliteScript, boolean actionCondition) {
@@ -95,9 +95,7 @@ public class ScriptConditions {
         for (Location location : scriptTargets.getTargetLocations(scriptActionData))
             if (!checkConditions(location)) return false;
 
-        if (!checkRandomizer()) return false;
-
-        return true;
+        return checkRandomizer();
     }
 
     public boolean meetsActionConditions(ScriptActionData scriptActionData) {
@@ -118,9 +116,7 @@ public class ScriptConditions {
         for (Location location : scriptTargets.getTargetLocations(scriptActionData))
             if (!checkConditions(location)) return false;
 
-        if (!checkRandomizer()) return false;
-
-        return true;
+        return checkRandomizer();
     }
 
     private boolean checkConditions(LivingEntity livingEntity) {
@@ -129,8 +125,7 @@ public class ScriptConditions {
         if (livingEntity == null) return false;
         if (!isAliveCheck(livingEntity)) return false;
         if (!hasTagsCheck(livingEntity)) return false;
-        if (!doesNotHaveTags(livingEntity)) return false;
-        return true;
+        return doesNotHaveTags(livingEntity);
     }
 
     private boolean checkConditions(Location location) {

@@ -14,7 +14,12 @@ public class Cuboid extends Shape {
     private Location centerLocation = null;
     private List<Vector> locationVectors = null;
     private List<Vector> edgeVectors = null;
-    private double x, y, z, xBorder, yBorder, zBorder;
+    private final double x;
+    private final double y;
+    private final double xBorder;
+    private final double yBorder;
+    private double z;
+    private double zBorder;
 
     public Cuboid(Double x, Double y, Double z, Double xBorder, Double yBorder, Double zBorder, Location centerLocation) {
         this.x = x;
@@ -33,8 +38,7 @@ public class Cuboid extends Shape {
         Vector localVector = position.clone().subtract(centerLocation).toVector();
         if (Math.abs(localVector.getX()) > x) return false;
         if (Math.abs(localVector.getY()) > y) return false;
-        if (Math.abs(localVector.getZ()) > z) return false;
-        return true;
+        return !(Math.abs(localVector.getZ()) > z);
     }
 
     @Override
@@ -50,8 +54,7 @@ public class Cuboid extends Shape {
         Vector localVector = position.clone().subtract(centerLocation).toVector();
         if (!(Math.abs(localVector.getX()) <= x / 2D && Math.abs(localVector.getX()) >= xBorder / 2D ||
                 Math.abs(localVector.getZ()) <= z / 2D && Math.abs(localVector.getZ()) >= zBorder / 2D)) return false;
-        if (y > 0 && Math.abs(localVector.getY()) <= y && Math.abs(localVector.getY()) >= yBorder) return false;
-        return true;
+        return !(y > 0) || !(Math.abs(localVector.getY()) <= y) || !(Math.abs(localVector.getY()) >= yBorder);
     }
 
     @Override

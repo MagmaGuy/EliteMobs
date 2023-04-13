@@ -21,13 +21,13 @@ public class SharedLootTable {
     @Getter
     private static final HashMap<EliteEntity, SharedLootTable> sharedLootTables = new HashMap<>();
 
-    private int durationInSeconds = 60;
+    private final int durationInSeconds = 60;
     @Getter
-    private List<ItemStack> loot = new ArrayList<>();
-    private EliteEntity eliteEntity;
-    private List<Player> damagers;
-    private List<LootMenu> lootMenus = new ArrayList<>();
-    private HashMap<Player, PlayerTable> playerTables = new HashMap<>();
+    private final List<ItemStack> loot = new ArrayList<>();
+    private final EliteEntity eliteEntity;
+    private final List<Player> damagers;
+    private final List<LootMenu> lootMenus = new ArrayList<>();
+    private final HashMap<Player, PlayerTable> playerTables = new HashMap<>();
 
     public SharedLootTable(EliteEntity eliteEntity) {
         this.eliteEntity = eliteEntity;

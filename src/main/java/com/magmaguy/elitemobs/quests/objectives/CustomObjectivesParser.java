@@ -57,7 +57,7 @@ public class CustomObjectivesParser {
             }
         }
         if (filename == null) {
-            new WarningMessage("Invalid filename for entry " + rawMap.toString() + " in Custom Quest " + customQuest.getCustomQuestsConfigFields().getFilename() + " . This objective will not be registered.");
+            new WarningMessage("Invalid filename for entry " + rawMap + " in Custom Quest " + customQuest.getCustomQuestsConfigFields().getFilename() + " . This objective will not be registered.");
             return null;
         }
         try {
@@ -71,7 +71,7 @@ public class CustomObjectivesParser {
                 return new ArenaObjective(name, filename);
         } catch (Exception ex) {
             new WarningMessage("Failed to register objective type for quest " + customQuest.getCustomQuestsConfigFields().getFilename() + " ! This quest will be skipped");
-            new WarningMessage("Invalid entry: " + rawMap.toString());
+            new WarningMessage("Invalid entry: " + rawMap);
             ex.printStackTrace();
         }
 

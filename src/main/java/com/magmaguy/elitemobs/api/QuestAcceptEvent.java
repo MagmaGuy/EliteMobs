@@ -70,7 +70,8 @@ public class QuestAcceptEvent extends Event implements Cancellable {
                     for (String dialog : customQuest.getCustomQuestsConfigFields().getQuestAcceptDialog())
                         event.getPlayer().sendMessage(dialog);
             }
-            event.getQuest().getQuestObjectives().displayTemporaryObjectivesScoreboard(event.getPlayer());
+            if (!QuestsConfig.isAutoTrackQuestsOnAccept())
+                event.getQuest().getQuestObjectives().displayTemporaryObjectivesScoreboard(event.getPlayer());
             PlayerData.addQuest(event.getPlayer().getUniqueId(), event.getQuest());
         }
     }

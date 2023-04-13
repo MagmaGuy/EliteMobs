@@ -6,7 +6,7 @@ import lombok.Getter;
 
 public class ScriptCooldowns {
     @Getter
-    private ScriptCooldownsBlueprint scriptCooldownsBlueprint;
+    private final ScriptCooldownsBlueprint scriptCooldownsBlueprint;
 
     public ScriptCooldowns(ScriptCooldownsBlueprint scriptCooldownsBlueprint, ElitePower elitePower) {
         this.scriptCooldownsBlueprint = scriptCooldownsBlueprint;

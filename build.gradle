@@ -103,7 +103,7 @@ dependencies {
     //SQLite
     compileOnly group: 'org.xerial', name: 'sqlite-jdbc', version: '3.32.3'
     //LibsDisguises
-    compileOnly group: 'com.comphenix.protocol', name: 'ProtocolLib', version: '4.7.0';
+    compileOnly group: 'com.comphenix.protocol', name: 'ProtocolLib', version: '4.7.0'
     compileOnly group: 'LibsDisguises', name: 'LibsDisguises', version: '10.0.26'
     //PlaceholderAPI
     compileOnly group: 'me.clip', name: 'placeholderapi', version: '2.10.9'
@@ -119,9 +119,9 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
 
     //Model Engine
-    compileOnly "com.ticxo.modelengine:api:R3.0.0"
+    compileOnly "com.ticxo.modelengine:api:R3.1.7"
 
-    implementation group: 'com.magmaguy', name: 'EasyMinecraftGoals-dist', version: '1.1.0';
+    implementation group: 'com.magmaguy', name: 'EasyMinecraftGoals-dist', version: '1.1.0'
 
     //implementation files('C:\\Users\\Tiago\\Documents\\MineCraftProjects\\EasyMinecraftGoals\\EasyMinecraftGoals\\dist\\target\\EasyMinecraftGoals-dist-1.0.0-shaded.jar')
 }
