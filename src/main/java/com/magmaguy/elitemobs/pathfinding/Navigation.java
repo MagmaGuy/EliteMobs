@@ -14,43 +14,38 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
 public class Navigation implements Listener {
-    public static void navigate(Mob mob, Location destination, int speed) {
-        NMSManager.getAdapter().move(mob, speed, destination);
-    }
-
-    public static void backToSpawn(RegionalBossEntity regionalBossEntity) {
-        getThere((Mob) regionalBossEntity.getLivingEntity(), regionalBossEntity.getSpawnLocation().clone(), false);
-    }
 
     public static void addSoftLeashAI(RegionalBossEntity regionalBossEntity) {
-        if (regionalBossEntity.getLivingEntity() instanceof Creature)
-            NMSManager.getAdapter().wanderBackToPoint(
-                            regionalBossEntity.getLivingEntity(),
-                            regionalBossEntity.getSpawnLocation(),
-                            regionalBossEntity.getLeashRadius() / 2D,
-                            20 * 5)
-                    .setSpeed(1.2f)
-                    .setStopReturnDistance(1)
-                    .setGoalRefreshCooldownTicks(20 * 3)
-                    .setHardObjective(false)
-                    .setTeleportOnFail(true)
-                    .setStartWithCooldown(true)
-                    .register();
+        if (NMSManager.getAdapter() != null)
+            if (regionalBossEntity.getLivingEntity() instanceof Creature)
+                NMSManager.getAdapter().wanderBackToPoint(
+                                regionalBossEntity.getLivingEntity(),
+                                regionalBossEntity.getSpawnLocation(),
+                                regionalBossEntity.getLeashRadius() / 2D,
+                                20 * 5)
+                        .setSpeed(1.2f)
+                        .setStopReturnDistance(1)
+                        .setGoalRefreshCooldownTicks(20 * 3)
+                        .setHardObjective(false)
+                        .setTeleportOnFail(true)
+                        .setStartWithCooldown(true)
+                        .register();
     }
 
     public static void addHardLeashAI(RegionalBossEntity regionalBossEntity) {
-        NMSManager.getAdapter().wanderBackToPoint(
-                        regionalBossEntity.getLivingEntity(),
-                        regionalBossEntity.getSpawnLocation(),
-                        regionalBossEntity.getLeashRadius(),
-                        20 * 5)
-                .setSpeed(2f)
-                .setStopReturnDistance(0)
-                .setGoalRefreshCooldownTicks(20 * 3)
-                .setHardObjective(true)
-                .setTeleportOnFail(true)
-                .setStartWithCooldown(true)
-                .register();
+        if (NMSManager.getAdapter() != null)
+            NMSManager.getAdapter().wanderBackToPoint(
+                            regionalBossEntity.getLivingEntity(),
+                            regionalBossEntity.getSpawnLocation(),
+                            regionalBossEntity.getLeashRadius(),
+                            20 * 5)
+                    .setSpeed(2f)
+                    .setStopReturnDistance(0)
+                    .setGoalRefreshCooldownTicks(20 * 3)
+                    .setHardObjective(true)
+                    .setTeleportOnFail(true)
+                    .setStartWithCooldown(true)
+                    .register();
     }
 
     private static void getThere(Mob livingEntity, Location location, boolean force) {
