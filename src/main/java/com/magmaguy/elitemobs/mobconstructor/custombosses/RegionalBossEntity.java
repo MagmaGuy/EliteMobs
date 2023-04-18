@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.mobconstructor.custombosses;
 
 import com.google.common.collect.ArrayListMultimap;
+import com.magmaguy.easyminecraftgoals.NMSManager;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.internal.NewSchematicPackageRelativeBossLocationEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
@@ -50,7 +51,7 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
     @Setter
     private List<TransitiveBlock> onRemoveTransitiveBlocks;
     private boolean removed = false;
-
+    private BukkitTask respawnTask = null;
 
     public RegionalBossEntity(CustomBossesConfigFields customBossesConfigFields, String rawString) {
         super(customBossesConfigFields);
@@ -188,8 +189,6 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
         queueSpawn(false);
     }
 
-    private BukkitTask respawnTask = null;
-
     public void queueSpawn(boolean silent) {
         RegionalBossEntity regionalBossEntity = this;
         this.isRespawning = true;
@@ -263,12 +262,13 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
         this.isRespawning = false;
         if (!ItemSettingsConfig.isRegionalBossesDropVanillaLoot())
             super.vanillaLoot = false;
-        //if (livingEntity != null)
-        //    checkLeash();
-        if (livingEntity != null && leashRadius > 0) {
-            Navigation.addSoftLeashAI(this);
-            Navigation.addHardLeashAI(this);
-        }
+        if (NMSManager.isEnabled()) {
+            if (livingEntity != null && leashRadius > 0) {
+                Navigation.addSoftLeashAI(this);
+                Navigation.addHardLeashAI(this);
+            }
+        } else if (livingEntity != null)
+            checkLeash();
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.thirdparty.modelengine;
 
+import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
@@ -100,7 +101,6 @@ public class CustomModel {
 
     public void shoot() {
         if (activeModel == null) return;
-
         if (modelBlueprint.getAnimations().containsKey("attack_ranged"))
             activeModel.getAnimationHandler().playAnimation("attack_ranged", .1, .1, 1, true);
         else
@@ -108,7 +108,6 @@ public class CustomModel {
     }
 
     public void melee() {
-
         if (activeModel == null) return;
         if (modelBlueprint.getAnimations().containsKey("attack_melee"))
             activeModel.getAnimationHandler().playAnimation("attack_melee", .1, .1, 1, true);
@@ -142,9 +141,7 @@ public class CustomModel {
     }
 
     private Nameable getNameableBone() {
-        //Developer.message("Nameable bones: " + activeModel.getNametagHandler().getBones().size());
-        for (Nameable nameable : activeModel.getNametagHandler().getBones().values())
-            return nameable;
+        for (Nameable nameable : activeModel.getNametagHandler().getBones().values()) return nameable;
         return null;
     }
 
@@ -165,7 +162,7 @@ public class CustomModel {
     }
 
     public static class ModelEntityEvents implements Listener {
-        @EventHandler (ignoreCancelled = true)
+        @EventHandler(ignoreCancelled = true)
         public void onMeleeHit(EntityDamageByEntityEvent event) {
             EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(event.getDamager());
             if (!(eliteEntity instanceof CustomBossEntity)) return;
@@ -173,7 +170,7 @@ public class CustomModel {
             ((CustomBossEntity) eliteEntity).getCustomModel().melee();
         }
 
-        @EventHandler (ignoreCancelled = true)
+        @EventHandler(ignoreCancelled = true)
         public void onRangedShot(EntitySpawnEvent event) {
             if (!(event.getEntity() instanceof Projectile)) return;
             if (!(((Projectile) event.getEntity()).getShooter() instanceof LivingEntity)) return;
@@ -181,6 +178,13 @@ public class CustomModel {
             if (!(eliteEntity instanceof CustomBossEntity)) return;
             if (((CustomBossEntity) eliteEntity).getCustomModel() == null) return;
             ((CustomBossEntity) eliteEntity).getCustomModel().shoot();
+        }
+
+        @EventHandler
+        public void onDeathEvent(EliteMobDeathEvent event){
+            if (event.getEliteEntity() instanceof CustomBossEntity customBossEntity &&
+                    customBossEntity.getCustomModel() != null)
+                customBossEntity.getCustomModel().playAnimationByName("death");
         }
     }
 }

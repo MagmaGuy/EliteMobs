@@ -56,6 +56,7 @@ public class PhaseBossEntity {
             return;
         }
         customBossEntity.remove(removalReason);
+        if (customBossEntity.getCustomModel() != null) customBossEntity.getCustomModel().switchPhase();
         if (bossPhase.customBossesConfigFields == null) {
             new WarningMessage("A phase for phase boss " + bossPhases.get(0).customBossesConfigFields.getFilename() + " was not valid! The boss will not be able to switch phases until it is fixed.");
             return;
@@ -96,7 +97,6 @@ public class PhaseBossEntity {
             customBossEntity.spawn(true);
         }
         currentPhase = bossPhase;
-        if (customBossEntity.getCustomModel() != null) customBossEntity.getCustomModel().switchPhase();
         ElitePhaseSwitchEvent elitePhaseSwitchEvent = new ElitePhaseSwitchEvent(customBossEntity, this);
         new EventCaller(elitePhaseSwitchEvent);
         customBossEntity.setHealth(customBossEntity.getMaxHealth() * healthPercentage);
