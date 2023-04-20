@@ -90,9 +90,11 @@ public class ArenaInstance extends MatchInstance {
 
         if (cylindricalArena)
             cylinder = new Cylinder(
-                    new Vector((maxX - minX) / 2D + minX, minY,
+                    new Vector((maxX - minX) / 2D + minX,
+                            minY,
                             (maxZ - minZ) / 2D + minZ),
-                    (Math.abs(maxX) - Math.abs(minX)) / 2D, maxY - minY);
+                    (Math.abs(maxX - minX)) / 2D,
+                    maxY - minY);
 
         addSpawnPoints(customArenasConfigFields.getSpawnPoints());
         this.customArenasConfigFields = customArenasConfigFields;

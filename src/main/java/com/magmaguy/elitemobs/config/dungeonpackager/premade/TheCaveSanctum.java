@@ -26,7 +26,7 @@ public class TheCaveSanctum extends DungeonPackagerConfigFields {
                 "Difficulty: &45-man hard content!",
                 "&bYou've been asked to clear the path to the underground. Deal with the thing in the cave!",
                 "&bYou have left The Cave!",
-                List.of("filename=the_cave_thing_in_the_cave_p1.yml"),
+                List.of("filename=the_cave_boiler_p1.yml"),
                 "em_id_the_cave",
                 10);
         setDifficulties(List.of(
