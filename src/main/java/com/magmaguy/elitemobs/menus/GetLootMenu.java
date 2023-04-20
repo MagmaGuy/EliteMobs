@@ -173,6 +173,7 @@ public class GetLootMenu extends EliteMenu implements Listener {
             }
 
             if (event.getSlot() == 27) {
+                if (getLootMenu.currentLootPage - 1 < 1) return;
                 getLootMenu.currentLootPage--;
                 new GetLootMenu(player, getLootMenu);
                 return;
