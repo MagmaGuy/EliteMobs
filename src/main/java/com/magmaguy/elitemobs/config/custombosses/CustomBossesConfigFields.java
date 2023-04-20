@@ -238,12 +238,15 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
 
     //This method unifies all level placeholders down to $level and applies a custom level for quest display purposes
     public String getCleanName(int level) {
-        return ChatColorConverter.convert(getName().replace("$level", level + "")
-                .replace("$normalLevel", ChatColorConverter.convert("&2[&a" + level + "&2]&f"))
-                .replace("$minibossLevel", ChatColorConverter.convert("&6〖&e" + level + "&6〗&f"))
-                .replace("$bossLevel", ChatColorConverter.convert("&4『&c" + level + "&4』&f"))
-                .replace("$reinforcementLevel", ChatColorConverter.convert("&8〔&7") + level + "&8〕&f")
-                .replace("$eventBossLevel", ChatColorConverter.convert("&4「&c" + level + "&4」&f")));
+        String cleanNameLevel;
+        if (level != 0) cleanNameLevel = level + "";
+        else cleanNameLevel = this.level;
+        return ChatColorConverter.convert(getName().replace("$level", cleanNameLevel)
+                .replace("$normalLevel", ChatColorConverter.convert("&2[&a" + cleanNameLevel + "&2]&f"))
+                .replace("$minibossLevel", ChatColorConverter.convert("&6〖&e" + cleanNameLevel + "&6〗&f"))
+                .replace("$bossLevel", ChatColorConverter.convert("&4『&c" + cleanNameLevel + "&4』&f"))
+                .replace("$reinforcementLevel", ChatColorConverter.convert("&8〔&7") + cleanNameLevel + "&8〕&f")
+                .replace("$eventBossLevel", ChatColorConverter.convert("&4「&c" + cleanNameLevel + "&4」&f")));
     }
 
     public void runtimeSetLeashRadius(double leashRadius) {
