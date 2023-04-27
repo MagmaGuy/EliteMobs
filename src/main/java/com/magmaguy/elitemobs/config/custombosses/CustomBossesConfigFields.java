@@ -29,7 +29,7 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     @Getter
     @Setter
     private EntityType entityType = EntityType.ZOMBIE;
-    @Getter
+
     @Setter
     private String name = "Default Name";
     @Setter
@@ -182,7 +182,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     @Getter
     @Setter
     private Double movementSpeedAttribute = null;
-
     //this saves files for regional boss respawn cooldowns
     @Getter
     @Setter
@@ -215,7 +214,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     @Getter
     @Setter
     private boolean neutral = false;
-
     /**
      * Creates a new default pre-made Custom Boss. The boss is further customized through a builder pattern.
      */
@@ -235,6 +233,9 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         super(fileName, isEnabled);
     }
 
+    public String getName() {
+        return name == null ? "Default Name" : name;
+    }
 
     //This method unifies all level placeholders down to $level and applies a custom level for quest display purposes
     public String getCleanName(int level) {

@@ -62,6 +62,11 @@ public class EliteExplosionEvent extends Event implements Cancellable {
         return handlers;
     }
 
+
+    public static HandlerList getHandlerList() {
+        return handlers;
+    }
+
     public void visualExplosionEffect(PowersConfigFields powersConfigFields) {
         VisualExplosionEffectType visualExplosionEffectType;
 

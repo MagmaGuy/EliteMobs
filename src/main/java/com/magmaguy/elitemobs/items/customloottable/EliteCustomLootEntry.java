@@ -215,7 +215,12 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
         SharedLootTable sharedLootTable = SharedLootTable.getSharedLootTables().get(eliteEntity);
         String name = null;
         for (int i = 0; i < getAmount(); i++) {
-            ItemStack itemStack = generateCustomItem().generateItemStack(itemTier, null, eliteEntity);
+            CustomItem customItem =generateCustomItem();
+            if (customItem == null){
+                new WarningMessage("Failed to generate a custom item for the boss " + eliteEntity.getName() + "! The configuration file for one of its loot items is not correctly configured.");
+                return;
+            }
+            ItemStack itemStack = customItem.generateItemStack(itemTier, null, eliteEntity);
             if (sharedLootTable == null) sharedLootTable = new SharedLootTable(eliteEntity);
             if (itemStack == null) {
                 new WarningMessage("A custom item for boss "+  eliteEntity.getName() + " was null! This item will be skipped.");

@@ -31,8 +31,8 @@ public class CraftenminesLabSanctum extends DungeonPackagerConfigFields {
                 "em_id_craftenmines_lab",
                 30);
         setDifficulties(List.of(
-                Map.of("name", "normal", "levelSync", 210, "id", 0),
-                Map.of("name", "hard", "levelSync", 200, "id", 1),
-                Map.of("name", "mythic", "levelSync", 190, "id", 2)));
+                Map.of("name", "normal", "levelSync", 20, "id", 0),
+                Map.of("name", "hard", "levelSync", 30, "id", 1),
+                Map.of("name", "mythic", "levelSync", 40, "id", 2)));
     }
 }
