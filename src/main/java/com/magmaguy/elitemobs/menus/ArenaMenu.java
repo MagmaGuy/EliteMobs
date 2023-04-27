@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.menus;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.ArenasConfig;
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
 import com.magmaguy.elitemobs.config.menus.premade.ArenaMenuConfig;
 import com.magmaguy.elitemobs.instanced.arena.ArenaInstance;
@@ -29,7 +30,8 @@ public class ArenaMenu {
             menuName = "\uF801\uDB80\uDD0B\uF805          " + menuName;
         Inventory shopInventory = Bukkit.createInventory(player, 9, menuName);
         shopInventory.setItem(ArenaMenuConfig.getPlayerItemSlot(), ArenaMenuConfig.getPlayerItem());
-        shopInventory.setItem(ArenaMenuConfig.getSpectatorItemSlot(), ArenaMenuConfig.getSpectatorItem());
+        if (DefaultConfig.isAllowSpectatorsInInstancedContent())
+            shopInventory.setItem(ArenaMenuConfig.getSpectatorItemSlot(), ArenaMenuConfig.getSpectatorItem());
         player.openInventory(shopInventory);
         ArenaMenuEvents.menus.put(shopInventory, new MenuContainer(shopInventory, arenaInstance));
     }
@@ -55,7 +57,7 @@ public class ArenaMenu {
                 player.closeInventory();
                 return;
             }
-            if (event.getSlot() == ArenaMenuConfig.getSpectatorItemSlot()) {
+            if (event.getSlot() == ArenaMenuConfig.getSpectatorItemSlot() & DefaultConfig.isAllowSpectatorsInInstancedContent()) {
                 menus.get(event.getInventory()).getArenaInstance().addSpectator(player, false);
                 player.closeInventory();
             }

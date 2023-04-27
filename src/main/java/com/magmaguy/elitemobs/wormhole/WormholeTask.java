@@ -18,7 +18,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Objects;
 
@@ -118,7 +117,7 @@ public class WormholeTask {
     }
 
     private static void visualEffect(int counter, WormholeEntry wormholeEntry) {
-        for (Vector vector : new ArrayList<Vector>(wormholeEntry.getWormhole().getCachedRotations().get(counter))) {
+        for (Vector vector : wormholeEntry.getWormhole().getCachedRotations().get(counter)) {
             Location particleLocation = wormholeEntry.getLocation().clone().add(vector);
             wormholeEntry.getLocation().getWorld().spawnParticle(Particle.REDSTONE, particleLocation.getX(), particleLocation.getY(), particleLocation.getZ(), 1, 0, 0, 0, 1, new Particle.DustOptions(wormholeEntry.getWormhole().getParticleColor(), 1));
         }

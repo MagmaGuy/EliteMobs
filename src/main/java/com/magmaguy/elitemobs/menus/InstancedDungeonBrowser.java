@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.menus;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
 import com.magmaguy.elitemobs.dungeons.WorldInstancedDungeonPackage;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
@@ -58,12 +59,13 @@ public class InstancedDungeonBrowser extends EliteMenu {
         }
 
         for (int i = 0; i < dungeonInstances.size(); i++) {
-            ItemStack itemStack;
+            ItemStack itemStack = null;
             if (instancesList.get(i).getState().equals(MatchInstance.InstancedRegionState.WAITING))
                 itemStack = playerItem(instancesList.get(i));
-            else
+            else if (DefaultConfig.isAllowSpectatorsInInstancedContent())
                 itemStack = spectatorItem(instancesList.get(i));
-            inventory.setItem(validSlots.get(i), itemStack);
+            if (itemStack != null)
+                inventory.setItem(validSlots.get(i), itemStack);
         }
         player.openInventory(inventory);
         inventories.put(inventory, this);
@@ -105,10 +107,12 @@ public class InstancedDungeonBrowser extends EliteMenu {
             } else {
                 DungeonInstance dungeonInstance = instancedDungeonBrowser.instancesList.get(instancedDungeonBrowser.validSlots.indexOf(event.getSlot()));
                 switch (dungeonInstance.getState()) {
-                    case ONGOING, STARTING -> dungeonInstance.addSpectator((Player) event.getWhoClicked(), false);
+                    case ONGOING, STARTING -> {
+                        if (DefaultConfig.isAllowSpectatorsInInstancedContent())
+                            dungeonInstance.addSpectator((Player) event.getWhoClicked(), false);
+                    }
                     case WAITING -> dungeonInstance.addNewPlayer((Player) event.getWhoClicked());
-                    case COMPLETED ->
-                            event.getWhoClicked().sendMessage("[EliteMobs] This match already ended! Can't join it!");
+                    case COMPLETED -> event.getWhoClicked().sendMessage("[EliteMobs] This match already ended! Can't join it!");
                 }
                 event.getWhoClicked().closeInventory();
             }

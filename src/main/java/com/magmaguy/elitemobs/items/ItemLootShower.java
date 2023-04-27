@@ -56,7 +56,7 @@ public class ItemLootShower implements Listener {
             return;
         }
         if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory())
-            addDirectly(eliteMobTier);
+            addDirectly(getCurrencyAmount(eliteMobTier));
         else
             addIndirectly(location, getCurrencyAmount(eliteMobTier));
     }
