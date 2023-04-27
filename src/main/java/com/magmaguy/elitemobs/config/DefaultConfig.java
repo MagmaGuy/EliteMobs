@@ -71,6 +71,8 @@ public class DefaultConfig {
     private static String switchEMStyleMessage;
     @Getter
     private static String treasureChestNoDropMessage;
+    @Getter
+    private static boolean allowSpectatorsInInstancedContent;
 
 
     private static File file = null;
@@ -189,6 +191,9 @@ public class DefaultConfig {
         treasureChestNoDropMessage = ConfigurationEngine.setString(
                 List.of("Sets the message that appears when a player opens a treasure chest but gets nothing"),
                 file, fileConfiguration, "treasureChestNoDropMessage", "&8[EliteMobs] &cYou didn't get anything! Better luck next time!", true);
+        allowSpectatorsInInstancedContent = ConfigurationEngine.setBoolean(
+                List.of("Sets is spectating instanced content will be available."),
+                fileConfiguration,"allowSpectatorsInInstancedContent", true);
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }

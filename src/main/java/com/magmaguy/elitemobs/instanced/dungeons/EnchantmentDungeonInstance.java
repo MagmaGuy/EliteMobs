@@ -48,6 +48,9 @@ public class EnchantmentDungeonInstance extends DungeonInstance {
                 player,
                 difficultyName);
         this.player = player;
+        ItemStack itemClone = currentItem.clone();
+        currentItem.setAmount(currentItem.getAmount()-1);
+        currentItem = itemClone;
     }
 
     public static boolean setupRandomEnchantedChallengeDungeon(Player player, ItemStack upgradedItem, ItemStack currentItem) {
@@ -97,7 +100,7 @@ public class EnchantmentDungeonInstance extends DungeonInstance {
         player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2Challenge complete! Instance will close in 10 seconds. &6You can leave earlier by doing &9/em quit&6!"));
         player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2You succeeded your item enchantment challenge! Your item has been successfully enchanted."));
         ItemEnchantmentMenu.broadcastEnchantmentMessage(upgradedItem, player, SpecialItemSystemsConfig.getSuccessAnnouncement());
-        scanCurrentItemForRemoval();
+        //scanCurrentItemForRemoval();
         HashMap<Integer, ItemStack> leftOvers = player.getInventory().addItem(upgradedItem);
         if (!leftOvers.isEmpty()) player.getWorld().dropItem(player.getLocation(), upgradedItem);
     }
@@ -108,11 +111,12 @@ public class EnchantmentDungeonInstance extends DungeonInstance {
         if (ThreadLocalRandom.current().nextDouble() < SpecialItemSystemsConfig.getCriticalFailureChanceDuringChallengeChance()) {
             player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Critical enchantment failure! You have lost " + currentItem.getItemMeta().getDisplayName() + " &c!"));
             ItemEnchantmentMenu.broadcastEnchantmentMessage(upgradedItem, player, SpecialItemSystemsConfig.getCriticalFailureAnnouncement());
-            scanCurrentItemForRemoval();
+            //scanCurrentItemForRemoval();
         } else
             player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &cYou have failed the enchantment challenge! Your item " + currentItem.getItemMeta().getDisplayName() + " &cwas not enchanted."));
     }
 
+    /*
     private void scanCurrentItemForRemoval() {
         if (player.getInventory().contains(currentItem))
             player.getInventory().remove(currentItem);
@@ -127,5 +131,6 @@ public class EnchantmentDungeonInstance extends DungeonInstance {
         else if (player.getInventory().getItemInOffHand().equals(currentItem))
             player.getInventory().setItemInOffHand(null);
     }
+     */
 
 }

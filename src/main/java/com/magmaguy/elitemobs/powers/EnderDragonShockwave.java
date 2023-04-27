@@ -159,6 +159,7 @@ public class EnderDragonShockwave extends CombatEnterScanPower {
         List<Block> blockList = new ArrayList<>();
         Iterator<PieBlock> pieBlockIterator = realBlocks.iterator();
         while (pieBlockIterator.hasNext()) {
+            if (eliteEntity.getLivingEntity() == null) return;
             PieBlock pieBlock = pieBlockIterator.next();
 
             if (pieBlock.distance < damagePhaseCounter) {
