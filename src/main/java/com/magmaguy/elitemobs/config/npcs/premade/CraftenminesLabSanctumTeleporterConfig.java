@@ -10,7 +10,7 @@ public class CraftenminesLabSanctumTeleporterConfig  extends NPCsConfigFields {
     public CraftenminesLabSanctumTeleporterConfig() {
         super("craftenmines_lab_sanctum_teleporter",
                 true,
-                "Sonia the Speedy",
+                "Sonio the Speedy",
                 "<[30] Craftenmine's Laboratory Teleport>",
                 Villager.Profession.ARMORER,
                 "em_adventurers_guild,296.5,91,217.5,90,0",
