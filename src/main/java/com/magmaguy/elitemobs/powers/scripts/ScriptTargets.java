@@ -28,15 +28,21 @@ public class ScriptTargets {
     private final ScriptZone scriptZone;
     //collection of targets, can be shapes, entities or locations
     private List anonymousTargets = null;
+    @Getter
+    private ScriptRelativeVector scriptRelativeVector = null;
+
+    public ScriptTargets(ScriptTargetsBlueprint targetBlueprint, EliteScript eliteScript) {
+        this.targetBlueprint = targetBlueprint;
+        this.eliteScript = eliteScript;
+        this.scriptZone = eliteScript.getScriptZone();
+    }
 
     public List getAnonymousTargets(boolean locations, ScriptActionData scriptActionData) {
         if (anonymousTargets != null) {
             return anonymousTargets;
-        }
-        else if (locations) {
+        } else if (locations) {
             return getTargetLocations(scriptActionData).stream().toList();
-        }
-        else {
+        } else {
             return getTargetEntities(scriptActionData).stream().toList();
         }
     }
@@ -47,15 +53,6 @@ public class ScriptTargets {
             return;
         //Non-animated zones must be cached for script inheritance and such
         this.anonymousTargets = anonymousTargets;
-    }
-
-    @Getter
-    private ScriptRelativeVector scriptRelativeVector = null;
-
-    public ScriptTargets(ScriptTargetsBlueprint targetBlueprint, EliteScript eliteScript) {
-        this.targetBlueprint = targetBlueprint;
-        this.eliteScript = eliteScript;
-        this.scriptZone = eliteScript.getScriptZone();
     }
 
     //Parse all string-based configuration locations
@@ -102,9 +99,10 @@ public class ScriptTargets {
 
     //Get living entity targets. New array lists so they are not immutable.
     protected Collection<LivingEntity> getTargetEntities(ScriptActionData scriptActionData) {
-        if (anonymousTargets != null)
-            if (anonymousTargets.isEmpty() || anonymousTargets.get(0) instanceof LivingEntity)
-                return (List<LivingEntity>) anonymousTargets;
+        if (getTargetBlueprint().isTrack() && anonymousTargets != null &&
+                (anonymousTargets.isEmpty() || anonymousTargets.get(0) instanceof LivingEntity)) {
+            return (List<LivingEntity>) anonymousTargets;
+        }
 
         //If a script zone exists, it overrides the check entirely to expose zone-based fields
         Location eliteEntityLocation = scriptActionData.getEliteEntity().getLocation();

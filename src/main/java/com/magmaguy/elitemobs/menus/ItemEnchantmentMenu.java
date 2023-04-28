@@ -140,13 +140,6 @@ public class ItemEnchantmentMenu extends EliteMenu {
         return Round.twoDecimalPlaces(Math.min(1, chance / 100));
     }
 
-    private enum Chance {
-        SUCCESS,
-        CHALLENGE,
-        FAILURE,
-        CRITICAL_FAILURE
-    }
-
     public static void broadcastEnchantmentMessage(ItemStack upgradedItem, Player upgradingPlayer, String message) {
         if (SpecialItemSystemsConfig.isAnnounceImportantEnchantments() && ItemTagger.getEnchantmentCount(upgradedItem) > 10)
             if (!message.contains("$itemName"))
@@ -166,6 +159,13 @@ public class ItemEnchantmentMenu extends EliteMenu {
 
                 Bukkit.getOnlinePlayers().forEach(player -> player.spigot().sendMessage(ChatMessageType.CHAT, componentBuilder.create()));
             }
+    }
+
+    private enum Chance {
+        SUCCESS,
+        CHALLENGE,
+        FAILURE,
+        CRITICAL_FAILURE
     }
 
     public static class ItemEnchantMenuEvents implements Listener {
@@ -266,16 +266,17 @@ public class ItemEnchantmentMenu extends EliteMenu {
         private void challenge(InventoryClickEvent event) {
             ItemStack currentItem = event.getView().getTopInventory().getItem(ITEM_SLOT);
             if (!EnchantmentDungeonInstance.setupRandomEnchantedChallengeDungeon((Player) event.getWhoClicked(),
-                    UpgradeSystem.upgrade(currentItem,
-                            event.getView().getTopInventory().getItem(ENCHANTED_BOOK_SLOT)),
-                    currentItem)) {
+                    UpgradeSystem.upgrade(currentItem.clone(), event.getView().getTopInventory().getItem(ENCHANTED_BOOK_SLOT)),
+                    currentItem.clone())) {
                 success(event);
                 return;
             }
-            if (moveItemDown(event.getView().getTopInventory(), ITEM_SLOT, event.getWhoClicked(), false)) {
-                event.getWhoClicked().sendMessage(ChatColorConverter.convert(
-                        "&8[EliteMobs] &cYour inventory was full so the item you were trying to upgrade has been deleted! It will be restored if your item is not full by the time you leave the instanced dungeon."));
-            }
+            currentItem.setAmount(currentItem.getAmount() - 1);
+            if (currentItem.getAmount() > 0)
+                if (moveItemDown(event.getView().getTopInventory(), ITEM_SLOT, event.getWhoClicked(), false)) {
+                    event.getWhoClicked().sendMessage(ChatColorConverter.convert(
+                            "&8[EliteMobs] &cYour inventory was full so the item you were trying to upgrade has been deleted! It will be restored if your item is not full by the time you leave the instanced dungeon."));
+                }
 
             event.getWhoClicked().sendMessage(ChatColorConverter.convert("&8[EliteMobs] &6Challenge! Defeat the boss to get your upgraded item!"));
             event.getWhoClicked().sendMessage(ChatColorConverter.convert("&cThere's a 10% chance of losing your item if you lose the fight! Leaving the arena counts as losing."));

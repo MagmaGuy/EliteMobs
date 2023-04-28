@@ -56,7 +56,11 @@ public class EarthquakeEnchantment extends CustomEnchantment {
                 if (entity.getType().equals(EntityType.PLAYER)) continue;
                 EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(entity);
                 if (eliteEntity == null) {
-                    entity.setVelocity(entity.getLocation().subtract(player.getLocation()).toVector().normalize().setY(.3).multiply(distance / 2d));
+                    try {
+                        entity.setVelocity(entity.getLocation().subtract(player.getLocation()).toVector().normalize().setY(.3).multiply(distance / 2d));
+                    } catch (Exception e) {
+                       //non finite values, doesn't really matter
+                    }
                 } else {
                     entity.setVelocity(entity.getLocation().subtract(player.getLocation()).toVector().normalize().setY(.3)
                             .multiply((distance / 2d) / (eliteEntity.getLevel() * eliteEntity.getHealthMultiplier())));

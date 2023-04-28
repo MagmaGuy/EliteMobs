@@ -48,12 +48,9 @@ public class EnchantmentDungeonInstance extends DungeonInstance {
                 player,
                 difficultyName);
         this.player = player;
-        ItemStack itemClone = currentItem.clone();
-        currentItem.setAmount(currentItem.getAmount()-1);
-        currentItem = itemClone;
     }
 
-    public static boolean setupRandomEnchantedChallengeDungeon(Player player, ItemStack upgradedItem, ItemStack currentItem) {
+    public static boolean setupRandomEnchantedChallengeDungeon(Player player, ItemStack upgradedItem, ItemStack itemFromInventory) {
         List<DungeonPackagerConfigFields> dungeonPackagerConfigFieldsList = new ArrayList<>(DungeonPackagerConfig.getEnchantedChallengeDungeonPackages().values().stream().toList());
         dungeonPackagerConfigFieldsList.removeIf(dungeonPackagerConfigFields -> !dungeonPackagerConfigFields.isEnabled());
         if (dungeonPackagerConfigFieldsList.isEmpty()) {
@@ -74,8 +71,8 @@ public class EnchantmentDungeonInstance extends DungeonInstance {
                 public void run() {
                     DungeonInstance dungeonInstance = initializeInstancedWorld(dungeonPackagerConfigFields, instancedWordName, player, file, (String) dungeonPackagerConfigFields.getDifficulties().get(0).get("name"));
                     if (dungeonInstance instanceof EnchantmentDungeonInstance enchantmentDungeonInstance) {
-                        enchantmentDungeonInstance.setUpgradedItem(upgradedItem);
-                        enchantmentDungeonInstance.setCurrentItem(currentItem);
+                        enchantmentDungeonInstance.setUpgradedItem(upgradedItem.clone());
+                        enchantmentDungeonInstance.setCurrentItem(itemFromInventory.clone());
                     }
                 }
             }.runTask(MetadataHandler.PLUGIN);
@@ -112,8 +109,11 @@ public class EnchantmentDungeonInstance extends DungeonInstance {
             player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Critical enchantment failure! You have lost " + currentItem.getItemMeta().getDisplayName() + " &c!"));
             ItemEnchantmentMenu.broadcastEnchantmentMessage(upgradedItem, player, SpecialItemSystemsConfig.getCriticalFailureAnnouncement());
             //scanCurrentItemForRemoval();
-        } else
+        } else {
             player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &cYou have failed the enchantment challenge! Your item " + currentItem.getItemMeta().getDisplayName() + " &cwas not enchanted."));
+            HashMap<Integer, ItemStack> leftOvers = player.getInventory().addItem(currentItem);
+            if (!leftOvers.isEmpty()) player.getWorld().dropItem(player.getLocation(), currentItem);
+        }
     }
 
     /*
