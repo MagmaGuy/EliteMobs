@@ -51,7 +51,8 @@ public class CustomBossMount {
                             mountEntity.getCustomModel().addPassenger(customBossEntity);
                         else {
                             PreventMountExploit.bypass = true;
-                            mountEntity.getLivingEntity().addPassenger(customBossEntity.getLivingEntity());
+                            if (mountEntity.getLivingEntity() != null)
+                                mountEntity.getLivingEntity().addPassenger(customBossEntity.getLivingEntity());
                         }
                         customBossEntity.customBossMount = mountEntity;
                     }
