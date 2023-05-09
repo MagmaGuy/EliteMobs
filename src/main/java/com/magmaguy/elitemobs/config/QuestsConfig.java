@@ -235,7 +235,7 @@ public class QuestsConfig {
                 file, fileConfiguration, "questAlreadyCompletedMessage", "&8[EliteMobs] &cYou already completed this quest!", true);
         questPrerequisitesMissingMessage = ConfigurationEngine.setString(
                 List.of("Sets the message sent to players when trying to accept a quest they do not have the permission for."),
-                file, fileConfiguration, "questPrerequisitesMissingMessage", "&8[EliteMobs] &cCan't accept this quest yet!", true);
+                file, fileConfiguration, "questPrerequisitesMissingMessage", "&8[EliteMobs] &cThis NPC has some quest(s) you can't accept yet!", true);
 
         lowRankDynamicQuestWarning = ConfigurationEngine.setString(
                 List.of("Sets the message sent to players trying to get a quest for which they do not have the correct guild rank activated."),

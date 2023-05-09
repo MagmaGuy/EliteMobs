@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
 import com.magmaguy.elitemobs.config.menus.premade.UnbinderMenuConfig;
 import com.magmaguy.elitemobs.items.ItemTagger;
+import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.customenchantments.UnbindEnchantment;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import org.bukkit.Bukkit;
@@ -132,7 +133,7 @@ public class UnbindMenu extends EliteMenu {
 
             if (isBottomMenu(event)) {
                 //Item is unbind scroll
-                if (ItemTagger.hasEnchantment(currentItem.getItemMeta(), UnbindEnchantment.key)) {
+                if (ItemTagger.hasEnchantment(currentItem.getItemMeta(), UnbindEnchantment.key) && SoulbindEnchantment.isValidSoulbindUser(currentItem.getItemMeta(), player)) {
                     if (unbinderInventory.getItem(unbindScrollItemInputSlot) == null) {
                         moveOneItemUp(unbindScrollItemInputSlot, event);
                         calculateOutput(unbinderInventory);
@@ -172,7 +173,11 @@ public class UnbindMenu extends EliteMenu {
                         unbinderInventory.setItem(UnbinderMenuConfig.getEliteItemInputSlot(), null);
                         unbinderInventory.setItem(UnbinderMenuConfig.getEliteUnbindInputSlot(), null);
                         if (unbinderInventory.getItem(outputSlot) != null) {
-                            player.getWorld().dropItem(player.getLocation(), unbinderInventory.getItem(outputSlot));
+                            HashMap<Integer,ItemStack>map =player.getInventory().addItem(unbinderInventory.getItem(outputSlot));
+                            if (!map.isEmpty()) map.forEach((key, itemStack) -> {
+                                itemStack.setAmount(key);
+                                player.getWorld().dropItem(player.getLocation(), itemStack);
+                            });
                             unbinderInventory.remove(unbinderInventory.getItem(outputSlot));
                         }
                         unbinderInventory.setItem(outputSlot, null);

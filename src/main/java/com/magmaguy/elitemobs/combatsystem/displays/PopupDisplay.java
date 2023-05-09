@@ -104,7 +104,11 @@ public class PopupDisplay implements Listener {
                     cancel();
                     return;
                 }
-                armorStand.teleport(getResistLocation(player, eliteEntity));
+                try {
+                    armorStand.teleport(getResistLocation(player, eliteEntity));
+                } catch (Exception e) {
+                    //Sometimes, very rarely, x is not finite. Doesn't really matter.
+                }
                 counter++;
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 1, 1);
