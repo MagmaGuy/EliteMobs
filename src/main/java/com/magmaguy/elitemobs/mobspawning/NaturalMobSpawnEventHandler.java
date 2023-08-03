@@ -170,6 +170,7 @@ public class NaturalMobSpawnEventHandler implements Listener {
             eliteMobLevel = MobCombatSettingsConfig.getNaturalEliteMobLevelCap();
 
         EliteEntity eliteEntity = new EliteEntity(livingEntity, eliteMobLevel, event.getSpawnReason());
+        EntityTracker.registerEliteMob(eliteEntity);
 
         if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.SPAWNER))
             eliteEntity.setEliteLoot(false);

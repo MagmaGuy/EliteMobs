@@ -24,6 +24,7 @@ public class PhaseBossEntity {
     @Getter
     private List<BossPhase> bossPhases = new ArrayList();
     private BossPhase currentPhase = null;
+    private Location originalSpawnLocation;
 
     public PhaseBossEntity(CustomBossEntity customBossEntity) {
         this.customBossEntity = customBossEntity;
@@ -51,6 +52,7 @@ public class PhaseBossEntity {
     }
 
     private void switchPhase(BossPhase bossPhase, RemovalReason removalReason, double healthPercentage) {
+        if (isInFirstPhase()) originalSpawnLocation = customBossEntity.getSpawnLocation().clone();
         if (bossPhase.equals(currentPhase)) {
             new WarningMessage("Attempted to change the boss phase to what it already was.", true);
             return;
@@ -65,6 +67,9 @@ public class PhaseBossEntity {
         if (removalReason.equals(RemovalReason.PHASE_BOSS_RESET)) {
             if (bossPhase.customBossesConfigFields.getSong() != null)
                 customBossEntity.setBossMusic(new BossMusic(bossPhase.customBossesConfigFields.getSong(), customBossEntity));
+            //Necessary to reset phase bosses which move their spawn point via teleportation
+            customBossEntity.setSpawnLocation(originalSpawnLocation);
+            customBossEntity.setRespawnOverrideLocation(originalSpawnLocation);
             customBossEntity.spawn(true);
         } else {
             if (bossPhase.customBossesConfigFields.getPhaseSpawnLocation() != null) {
@@ -100,6 +105,7 @@ public class PhaseBossEntity {
         ElitePhaseSwitchEvent elitePhaseSwitchEvent = new ElitePhaseSwitchEvent(customBossEntity, this);
         new EventCaller(elitePhaseSwitchEvent);
         customBossEntity.setHealth(customBossEntity.getMaxHealth() * healthPercentage);
+        customBossEntity.setCombatGracePeriod(20);
     }
 
     public void resetToFirstPhase() {

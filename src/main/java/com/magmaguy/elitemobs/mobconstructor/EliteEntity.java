@@ -42,6 +42,8 @@ public class EliteEntity {
 
     protected final HashMap<Player, Double> damagers = new HashMap<>();
     protected final UUID eliteUUID = UUID.randomUUID();
+    //Used for custom arbitrary tags from elite scripts
+    private final HashSet<String> customMetadata = new HashSet<>();
     /*
     Store all powers in one set, makes no sense to access it in individual sets.
     The reason they are split up in the first place is to add them in a certain ratio
@@ -121,19 +123,14 @@ public class EliteEntity {
     protected List<Entity> nonEliteReinforcementEntities = new ArrayList<>();
     protected boolean bypassesProtections = false;
     protected Double health = null;
+    @Setter
+    protected Location spawnLocation;
     @Getter
     @Setter
     private boolean dying = false;
     @Getter
     @Setter
     private boolean healing = false;
-    @Setter
-    protected Location spawnLocation;
-    public Location getSpawnLocation(){
-        return spawnLocation.clone();
-    }
-    //Used for custom arbitrary tags from elite scripts
-    private final HashSet<String> customMetadata = new HashSet<>();
 
     /**
      * Functions as a placeholder for {@link CustomBossEntity} that haven't been initialized yet. Uses the builder pattern
@@ -147,7 +144,6 @@ public class EliteEntity {
      */
     public EliteEntity() {
     }
-
 
     /**
      * This is the generic constructor used in most instances of natural elite mob generation
@@ -163,6 +159,10 @@ public class EliteEntity {
         setArmor();
         setMaxHealth();
         randomizePowers(eliteMobProperties);
+    }
+
+    public Location getSpawnLocation() {
+        return spawnLocation.clone();
     }
 
     public boolean getBypassesProtections() {
@@ -359,7 +359,7 @@ public class EliteEntity {
 
     public void setHealth(double health) {
         if (livingEntity == null) return;
-        this.health = Math.min(health, this.maxHealth);
+        this.health = Math.min(health, Math.min(this.maxHealth, livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()));
         livingEntity.setHealth(this.health);
     }
 
@@ -646,9 +646,10 @@ public class EliteEntity {
             EntityTracker.getEliteMobEntities().remove(eliteUUID);
         if (livingEntity != null && !removalReason.equals(RemovalReason.DEATH))
             livingEntity.remove();
-        if (livingEntity instanceof EnderDragon && removalReason.equals(RemovalReason.DEATH)) {
-            ((EnderDragon) livingEntity).setPhase(EnderDragon.Phase.DYING);
-            Objects.requireNonNull(((EnderDragon) livingEntity).getDragonBattle()).generateEndPortal(false);
+        if (livingEntity instanceof EnderDragon enderDragon && removalReason.equals(RemovalReason.DEATH)) {
+            enderDragon.setPhase(EnderDragon.Phase.DYING);
+            if (enderDragon.getDragonBattle() != null)
+                enderDragon.getDragonBattle().generateEndPortal(false);
         }
         this.livingEntity = null;
     }

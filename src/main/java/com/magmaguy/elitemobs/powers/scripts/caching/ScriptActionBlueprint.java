@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.powers.scripts.caching;
 
 import com.magmaguy.elitemobs.powers.scripts.enums.ActionType;
 import com.magmaguy.elitemobs.powers.scripts.enums.WeatherType;
+import com.magmaguy.elitemobs.utils.Developer;
 import com.magmaguy.elitemobs.utils.PotionEffectTypeUtil;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
@@ -181,7 +182,10 @@ public class ScriptActionBlueprint {
                     finalTarget = new ScriptTargetsBlueprint((Map) value, scriptName, scriptFilename);
             }
             case "onlyrunonescript" -> onlyRunOneScript = parseBoolean(key, value, scriptName);
-            case "relativevector" -> scriptRelativeVectorBlueprint = new ScriptRelativeVectorBlueprint(scriptName, scriptFilename, (Map<String, ?>) value);
+            case "relativevector" -> {
+                scriptRelativeVectorBlueprint = new ScriptRelativeVectorBlueprint(scriptName, scriptFilename, (Map<String, ?>) value);
+                Developer.message("Initialized vector inside of action and it's null " + (scriptRelativeVectorBlueprint == null) + " " + scriptFilename);
+            }
             default -> new WarningMessage("Failed to read key " + key + " for script " + scriptName + " in " + scriptFilename);
         }
 

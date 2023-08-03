@@ -209,8 +209,8 @@ public class ScriptTargets {
         return processLocationFromString(eliteEntity, targetBlueprint.getLocation(), scriptActionData);
     }
 
-    private Location addOffsets(Location location, ScriptActionData scriptActionData) {
-        location.add(targetBlueprint.getOffset());
+    private Location addOffsets(Location originalLocation, ScriptActionData scriptActionData) {
+        Location location = originalLocation.clone().add(targetBlueprint.getOffset());
         if (scriptRelativeVector == null)
             if (targetBlueprint.getScriptRelativeVectorBlueprint() != null)
                 scriptRelativeVector = new ScriptRelativeVector(targetBlueprint.getScriptRelativeVectorBlueprint(), eliteScript, location);

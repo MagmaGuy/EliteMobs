@@ -66,7 +66,6 @@ public class OnDeathCommands implements Listener {
                     for (Player player : event.getEliteEntity().getDamagers().keySet())
                         if (chance == 1 || ThreadLocalRandom.current().nextDouble() < chance)
                             runConsoleCommand(string.replace("$players", player.getName()));
-                        else return;
             } else if (chance == 1 || ThreadLocalRandom.current().nextDouble() < chance) runConsoleCommand(string);
         }
     }
