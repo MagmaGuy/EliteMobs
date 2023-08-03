@@ -146,9 +146,9 @@ public class Ray extends Shape {
 
                 // Create a quaternion from an angle and an axis
                 // The angle is in radians
-                double angle = FastMath.PI / 4;
+                double angle = FastMath.PI / 4D;
                 // Set the quaternion using the formula
-                quaternion = new Quaternion(Math.cos(angle / 2), axis.getX() * Math.sin(angle / 2), axis.getY() * Math.sin(angle / 2), axis.getZ() * Math.sin(angle / 2));
+                quaternion = new Quaternion(Math.cos(angle / 2D), axis.getX() * Math.sin(angle / 2D), axis.getY() * Math.sin(angle / 2D), axis.getZ() * Math.sin(angle / 2D));
                 quaternion.normalize();
             } else {
                 double s = FastMath.sqrt((1 + d) * 2);

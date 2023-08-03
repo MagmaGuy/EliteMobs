@@ -39,7 +39,7 @@ public class KeepNeutralsAngry {
                     return;
                 }
 
-                if (!eliteEntity.getLivingEntity().getType().equals(EntityType.LLAMA) &&
+                if (!eliteEntity.getLivingEntity().getType().equals(EntityType.LLAMA) && !eliteEntity.getLivingEntity().getType().equals(EntityType.RABBIT) &&
                         ((Mob) eliteEntity.getLivingEntity()).getTarget() != null)
                     return;
 

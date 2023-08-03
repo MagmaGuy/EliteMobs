@@ -126,7 +126,8 @@ public class DisguiseEntity {
                 disguise.setDynamicName(true);
             }
              */
-            ((PlayerDisguise) disguise).setNameVisible(disguiseNameVisibility);
+            //((PlayerDisguise) disguise).setNameVisible(disguiseNameVisibility);
+            ((PlayerDisguise) disguise).setNameVisible(true);
         }
         //todo: This doesn't work yes, check with libs later to see if he found a solution
         /*

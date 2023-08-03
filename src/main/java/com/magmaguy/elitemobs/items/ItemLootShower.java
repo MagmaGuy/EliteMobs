@@ -52,7 +52,7 @@ public class ItemLootShower implements Listener {
 
         if (eliteMobTier - ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getFullPlayerTier(false) < -ItemSettingsConfig.getLootLevelDifferenceLockout()) {
             player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(
-                    ChatColorConverter.convert("&8EM] &4You are too well equipped to get coins for killing this Elite!")));
+                    ChatColorConverter.convert(ItemSettingsConfig.getTooWellEquippedMessage())));
             return;
         }
         if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory())
@@ -196,6 +196,7 @@ public class ItemLootShower implements Listener {
         setCoinModel(currencyItemStack, model);
         Item currencyItem = location.getWorld().dropItem(location.clone().add(new Vector(0, 1, 0)), currencyItemStack);
         EntityTracker.registerVisualEffects(currencyItem);
+        currencyItem.setInvulnerable(true);
 
         currencyItem.setVelocity(new Vector(
                 (ThreadLocalRandom.current().nextDouble() - 0.5) / 2,

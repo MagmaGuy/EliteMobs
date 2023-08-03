@@ -32,41 +32,32 @@ public class NPCProximitySensor implements Listener {
     private final HashSet<Player> nearbyPlayers = new HashSet<>();
 
     public NPCProximitySensor() {
-
         new BukkitRunnable() {
 
             @Override
             public void run() {
-
                 HashSet<Player> seenPlayerList = (HashSet<Player>) nearbyPlayers.clone();
-
-                for (NPCEntity npcEntity : EntityTracker.getNpcEntities().values())
-                    if (npcEntity.isValid()) {
-                        boolean alreadySpoke = false;
-                        for (Entity entity : npcEntity.getVillager().getNearbyEntities(npcEntity.getNPCsConfigFields().getActivationRadius(),
-                                npcEntity.getNPCsConfigFields().getActivationRadius(), npcEntity.getNPCsConfigFields().getActivationRadius()))
-                            if (entity.getType().equals(EntityType.PLAYER)) {
-                                Player player = (Player) entity;
-                                Location rotatedLocation = npcEntity.getVillager().getLocation().setDirection(entity.getLocation().subtract(npcEntity.getVillager().getLocation()).toVector());
-                                npcEntity.getVillager().teleport(rotatedLocation);
-                                if (nearbyPlayers.contains(player)) {
-                                    if (!alreadySpoke)
-                                        if (!npcEntity.getNPCsConfigFields().getInteractionType().equals(NPCInteractions.NPCInteractionType.CHAT))
-                                            npcEntity.sayDialog(player);
-                                    seenPlayerList.remove(player);
-                                    alreadySpoke = true;
-                                } else {
-                                    if (!alreadySpoke)
-                                        npcEntity.sayGreeting(player);
-                                    nearbyPlayers.add(player);
-                                    startQuestIndicator(npcEntity, player);
-                                    alreadySpoke = true;
-                                }
-                            }
+                for (NPCEntity npcEntity : EntityTracker.getNpcEntities().values()) {
+                    if (!npcEntity.isValid()) continue;
+                    for (Entity entity : npcEntity.getVillager().getNearbyEntities(npcEntity.getNPCsConfigFields().getActivationRadius(),
+                            npcEntity.getNPCsConfigFields().getActivationRadius(), npcEntity.getNPCsConfigFields().getActivationRadius())) {
+                        if (!entity.getType().equals(EntityType.PLAYER)) continue;
+                        Player player = (Player) entity;
+                        Location rotatedLocation = npcEntity.getVillager().getLocation().setDirection(entity.getLocation().subtract(npcEntity.getVillager().getLocation()).toVector());
+                        npcEntity.getVillager().teleport(rotatedLocation);
+                        if (seenPlayerList.contains(player)) {
+                            if (!npcEntity.getNPCsConfigFields().getInteractionType().equals(NPCInteractions.NPCInteractionType.CHAT))
+                                npcEntity.sayDialog(player);
+                            seenPlayerList.remove(player);
+                        } else {
+                            npcEntity.sayGreeting(player);
+                            nearbyPlayers.add(player);
+                            startQuestIndicator(npcEntity, player);
+                        }
                     }
+                }
 
-                for (Player player : seenPlayerList)
-                    nearbyPlayers.remove(player);
+                nearbyPlayers.removeIf(seenPlayerList::contains);
 
             }
 

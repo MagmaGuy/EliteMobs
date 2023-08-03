@@ -48,6 +48,14 @@ public class EntityTracker implements Listener {
         eliteMobEntities.put(eliteEntity.getEliteUUID(), eliteEntity);
     }
 
+    public static void registerEliteMob(EliteEntity eliteEntity, LivingEntity livingEntity) {
+        EliteMobSpawnEvent eliteMobSpawnEvent = new EliteMobSpawnEvent(eliteEntity);
+        new EventCaller(eliteMobSpawnEvent);
+        if (eliteMobSpawnEvent.isCancelled()) return;
+        PersistentTagger.tagElite(livingEntity, eliteEntity.getEliteUUID());
+        eliteMobEntities.put(eliteEntity.getEliteUUID(), eliteEntity);
+    }
+
     public static boolean isEliteMob(Entity entity) {
         return PersistentTagger.isEliteEntity(entity);
     }
