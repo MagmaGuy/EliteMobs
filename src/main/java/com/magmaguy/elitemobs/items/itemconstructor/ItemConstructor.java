@@ -61,7 +61,7 @@ public class ItemConstructor {
         /*
         Generate item lore
          */
-        if (!lore.isEmpty())
+        if (lore != null && !lore.isEmpty())
             ItemTagger.registerCustomLore(itemMeta, lore);
 
         //Tag the potion effects

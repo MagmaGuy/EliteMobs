@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.powers.scripts;
 
 import com.magmaguy.elitemobs.powers.scripts.caching.ScriptRelativeVectorBlueprint;
 import com.magmaguy.elitemobs.powers.scripts.enums.TargetType;
+import com.magmaguy.elitemobs.utils.Developer;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
@@ -16,6 +17,7 @@ public class ScriptRelativeVector {
 
     public ScriptRelativeVector(ScriptRelativeVectorBlueprint scriptRelativeVectorBlueprint, EliteScript eliteScript, Location actionLocation) {
         this.scriptRelativeVectorBlueprint = scriptRelativeVectorBlueprint;
+        Developer.message("relative vector initialized for " + eliteScript.getFileName());
         this.actionLocation = actionLocation;
         if (!scriptRelativeVectorBlueprint.getSourceTarget().getTargetType().equals(TargetType.ACTION_TARGET)) {
             sourceTarget = new ScriptTargets(scriptRelativeVectorBlueprint.getSourceTarget(), eliteScript);
@@ -30,7 +32,9 @@ public class ScriptRelativeVector {
     }
 
     public Vector getVector(ScriptActionData scriptActionData) {
+        Developer.message("1");
         if (cachedVector != null) return cachedVector;
+        Developer.message("2");
         Location sourceLocation = null;
         if (sourceIsAction) {
             sourceLocation = actionLocation.clone();
@@ -39,6 +43,7 @@ public class ScriptRelativeVector {
             sourceLocation = sourceTarget.getTargetLocations(scriptActionData).iterator().next();
         else
             return new Vector(0, 0, 0);
+        Developer.message("3");
 
         Location destinationLocation = null;
 
@@ -48,6 +53,8 @@ public class ScriptRelativeVector {
             destinationLocation = destinationTarget.getTargetLocations(scriptActionData).iterator().next().clone();
         else
             return new Vector(0, 0, 0);
+        Developer.message("4");
+        Developer.message("Source: "+sourceLocation + " destination " + destinationLocation);
 
         Vector vector = destinationLocation.clone().subtract(sourceLocation).toVector();
         if (scriptRelativeVectorBlueprint.isNormalize()) vector.normalize();

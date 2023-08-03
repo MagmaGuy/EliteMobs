@@ -119,6 +119,8 @@ public class ItemSettingsConfig {
     private static String weaponEntry;
     @Getter
     private static String armorEntry;
+    @Getter
+    private static String tooWellEquippedMessage;
 
     private ItemSettingsConfig() {
     }
@@ -342,6 +344,9 @@ public class ItemSettingsConfig {
         armorEntry = ConfigurationEngine.setString(
                 List.of("Sets the armor-specific lore entry on an elite item. The $EDEF placeholder gets replaced with the elite DEF (defense) of the weapon."),
                 file, fileConfiguration, "armorEntry", "&7Elite Armor: &2$EDEF", true);
+        tooWellEquippedMessage = ConfigurationEngine.setString(
+                List.of("Sets the message sent when a played kills a boss but has too high level gear to get loot"),
+                file, fileConfiguration, "tooWellEquipped", "&8EM] &4You are too well equipped to get coins for killing this Elite!", true);
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }

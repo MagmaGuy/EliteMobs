@@ -14,6 +14,7 @@ import com.magmaguy.elitemobs.powers.meta.CustomSummonPower;
 import com.magmaguy.elitemobs.powers.scripts.caching.ScriptActionBlueprint;
 import com.magmaguy.elitemobs.powers.scripts.enums.ActionType;
 import com.magmaguy.elitemobs.powers.scripts.enums.TargetType;
+import com.magmaguy.elitemobs.utils.Developer;
 import com.magmaguy.elitemobs.utils.VersionChecker;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
@@ -43,12 +44,12 @@ public class ScriptAction {
     @Getter
     private final ScriptActionBlueprint blueprint;
     private final ScriptTargets scriptTargets;
-    private ScriptTargets finalScriptTargets = null;
     private final ScriptConditions scriptConditions;
     private final ScriptParticles scriptParticles;
     @Getter
     private final Map<String, EliteScript> eliteScriptMap;
     private final EliteScript eliteScript;
+    private ScriptTargets finalScriptTargets = null;
 
 
     public ScriptAction(ScriptActionBlueprint blueprint, Map<String, EliteScript> eliteScriptMap, EliteScript eliteScript) {
@@ -594,39 +595,45 @@ public class ScriptAction {
         }
 
         getLocationTargets(scriptActionData).forEach(targetLocation -> {
-            if (scriptActionData.getTargetType().equals(TargetType.SELF)) {
-                Vector velocity = new Vector(0, 0, 0);
-                if (blueprint.getScriptRelativeVectorBlueprint() != null)
-                    velocity = new ScriptRelativeVector(blueprint.getScriptRelativeVectorBlueprint(), eliteScript,targetLocation).getVector(scriptActionData);
-                Entity entity;
-                if (scriptActionData.getTargetType().equals(TargetType.SELF) &&
-                        scriptActionData.getEliteEntity().getLivingEntity() != null &&
-                        Projectile.class.isAssignableFrom(entityType.getEntityClass()))
-                    entity = scriptActionData.getEliteEntity().getLivingEntity().launchProjectile(entityType.getEntityClass().asSubclass(Projectile.class), velocity);
-                else {
-                    entity = targetLocation.getWorld().spawn(targetLocation, entityType.getEntityClass());
-                    entity.setVelocity(velocity);
-                }
-
-                if (!blueprint.getLandingScripts().isEmpty()) {
-                    FallingEntityDataPair fallingEntityDataPair = new FallingEntityDataPair(this, scriptActionData);
-                    new BukkitRunnable() {
-                        int counter = 0;
-
-                        @Override
-                        public void run() {
-                            if (!entity.isValid() || entity.isOnGround()) {
-                                ScriptListener.runEvent(fallingEntityDataPair, entity.getLocation());
-                                cancel();
-                                return;
-                            }
-                            counter++;
-                            if (counter > 20 * 60 * 5)
-                                cancel();
-                        }
-                    }.runTaskTimer(MetadataHandler.PLUGIN, 1, 1);
-                }
+            //if (scriptActionData.getTargetType().equals(TargetType.SELF)) {
+            Vector velocity = new Vector(0, 0, 0);
+            Developer.message("running inside of summon entity");
+            if (blueprint.getScriptRelativeVectorBlueprint() != null) {
+                Developer.message("Running relative vector from action");
+                ScriptRelativeVector scriptRelativeVector = new ScriptRelativeVector(blueprint.getScriptRelativeVectorBlueprint(), eliteScript, targetLocation);
+                velocity = scriptRelativeVector.getVector(scriptActionData);
+                Developer.message("Velocity: " + velocity);
             }
+            Developer.message("Sanity test");
+            Entity entity;
+            if (scriptActionData.getTargetType().equals(TargetType.SELF) &&
+                    scriptActionData.getEliteEntity().getLivingEntity() != null &&
+                    Projectile.class.isAssignableFrom(entityType.getEntityClass()))
+                entity = scriptActionData.getEliteEntity().getLivingEntity().launchProjectile(entityType.getEntityClass().asSubclass(Projectile.class), velocity);
+            else {
+                entity = targetLocation.getWorld().spawn(targetLocation, entityType.getEntityClass());
+                entity.setVelocity(velocity);
+            }
+
+            if (!blueprint.getLandingScripts().isEmpty()) {
+                FallingEntityDataPair fallingEntityDataPair = new FallingEntityDataPair(this, scriptActionData);
+                new BukkitRunnable() {
+                    int counter = 0;
+
+                    @Override
+                    public void run() {
+                        if (!entity.isValid() || entity.isOnGround()) {
+                            ScriptListener.runEvent(fallingEntityDataPair, entity.getLocation());
+                            cancel();
+                            return;
+                        }
+                        counter++;
+                        if (counter > 20 * 60 * 5)
+                            cancel();
+                    }
+                }.runTaskTimer(MetadataHandler.PLUGIN, 1, 1);
+            }
+            //}
         });
     }
 }

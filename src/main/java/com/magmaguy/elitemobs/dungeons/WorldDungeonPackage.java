@@ -81,7 +81,7 @@ public class WorldDungeonPackage extends WorldPackage implements Dungeon {
 
     private void getChests() {
         for (TreasureChest treasureChest : TreasureChest.getTreasureChestHashMap().values())
-            if (treasureChest.getWorldName() != null && treasureChest.getWorldName().equals(world.getName()) ||
+            if (treasureChest.getWorldName() != null && world != null && treasureChest.getWorldName().equals(world.getName()) ||
                     wormholeWorld != null &&
                             treasureChest.getWorldName().equals(wormholeWorld.getName()))
                 treasureChestList.add(treasureChest);

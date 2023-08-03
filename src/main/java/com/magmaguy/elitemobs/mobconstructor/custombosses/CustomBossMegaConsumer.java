@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity;
 import com.magmaguy.elitemobs.thirdparty.modelengine.CustomModel;
@@ -99,6 +100,7 @@ public class CustomBossMegaConsumer {
         if (livingEntity instanceof Slime){
             ((Slime)livingEntity).setSize(customBossEntity.getCustomBossesConfigFields().getSlimeSize());
         }
+        EntityTracker.registerEliteMob(customBossEntity, livingEntity);
     }
 
     private void setBaby(LivingEntity livingEntity) {

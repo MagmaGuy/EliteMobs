@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.powers.scripts.caching;
 
+import com.magmaguy.elitemobs.utils.Developer;
 import com.magmaguy.elitemobs.utils.MapListInterpreter;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
@@ -9,7 +10,6 @@ import org.bukkit.util.Vector;
 import java.util.Map;
 
 public class ScriptRelativeVectorBlueprint {
-
 
     private final String scriptName;
     private final String scriptFilename;
@@ -26,9 +26,11 @@ public class ScriptRelativeVectorBlueprint {
     private Vector offset = new Vector(0, 0, 0);
 
     public ScriptRelativeVectorBlueprint(String scriptName, String scriptFilename, Map<String, ?> configurationValues) {
+        Developer.message("vector blueprint initialized for " + scriptFilename);
         this.scriptName = scriptName;
         this.scriptFilename = scriptFilename;
         configurationValues.entrySet().forEach(entry -> processKeyAndValue(entry.getKey(), entry.getValue()));
+        Developer.message("initialization completed " + scriptFilename);
     }
 
     protected void processKeyAndValue(String key, Object value) {

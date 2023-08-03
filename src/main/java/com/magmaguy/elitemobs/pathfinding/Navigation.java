@@ -55,7 +55,7 @@ public class Navigation implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void makeReturningBossesInvulnerable(WanderBackToPointStartEvent event) {
         if (!event.isHardObjective()) return;
-        if (event.getLivingEntity() == null)return;
+        if (event.getLivingEntity() == null) return;
         EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(event.getLivingEntity());
         if (!(eliteEntity instanceof RegionalBossEntity regionalBossEntity)) return;
         event.getLivingEntity().setInvulnerable(true);
@@ -65,8 +65,9 @@ public class Navigation implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void makeReturnedBossesVulnerable(WanderBackToPointEndEvent event) {
         if (!event.isHardObjective()) return;
-        if (event.getLivingEntity() == null)return;
+        if (event.getLivingEntity() == null) return;
         EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(event.getLivingEntity());
+        if (eliteEntity == null || eliteEntity.getLivingEntity() == null) return;
         if (!(eliteEntity instanceof RegionalBossEntity regionalBossEntity)) return;
         event.getLivingEntity().setInvulnerable(false);
 
