@@ -4,12 +4,14 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.ArenaCompleteEvent;
 import com.magmaguy.elitemobs.api.ArenaStartEvent;
+import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.ArenasConfig;
 import com.magmaguy.elitemobs.config.customarenas.CustomArenasConfigFields;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.elitemobs.utils.WarningMessage;
@@ -19,14 +21,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 
 public class ArenaInstance extends MatchInstance {
@@ -47,6 +47,8 @@ public class ArenaInstance extends MatchInstance {
     private final int minZ;
     private final int maxZ;
     private final boolean cylindricalArena;
+    @Getter
+    private final HashMap<Player, Double> roundDamage = new HashMap<>();
     protected HashMap<String, Location> spawnPoints = new HashMap<>();
     @Getter
     private int currentWave = 0;
@@ -55,10 +57,7 @@ public class ArenaInstance extends MatchInstance {
     private Cylinder cylinder;
 
     public ArenaInstance(CustomArenasConfigFields customArenasConfigFields, Location corner1, Location corner2, Location startLocation, Location exitLocation) {
-        super(startLocation,
-                exitLocation,
-                customArenasConfigFields.getMinimumPlayerCount(),
-                customArenasConfigFields.getMaximumPlayerCount());
+        super(startLocation, exitLocation, customArenasConfigFields.getMinimumPlayerCount(), customArenasConfigFields.getMaximumPlayerCount());
         this.cylindricalArena = customArenasConfigFields.isCylindricalArena();
 
 
@@ -89,12 +88,7 @@ public class ArenaInstance extends MatchInstance {
         this.state = InstancedRegionState.WAITING;
 
         if (cylindricalArena)
-            cylinder = new Cylinder(
-                    new Vector((maxX - minX) / 2D + minX,
-                            minY,
-                            (maxZ - minZ) / 2D + minZ),
-                    (Math.abs(maxX - minX)) / 2D,
-                    maxY - minY);
+            cylinder = new Cylinder(new Vector((maxX - minX) / 2D + minX, minY, (maxZ - minZ) / 2D + minZ), (Math.abs(maxX - minX)) / 2D, maxY - minY);
 
         addSpawnPoints(customArenasConfigFields.getSpawnPoints());
         this.customArenasConfigFields = customArenasConfigFields;
@@ -124,8 +118,7 @@ public class ArenaInstance extends MatchInstance {
                         new WarningMessage("Failed to parse arena message entry " + subString + " for arena" + customArenasConfigFields.getFilename());
                 }
             }
-            if (!message.isEmpty() && wave > 0)
-                waveMessage.put(wave, ChatColorConverter.convert(message));
+            if (!message.isEmpty() && wave > 0) waveMessage.put(wave, ChatColorConverter.convert(message));
         }
 
         super.permission = customArenasConfigFields.getPermission();
@@ -173,16 +166,8 @@ public class ArenaInstance extends MatchInstance {
     @Override
     protected boolean isInRegion(Location location) {
         if (!cylindricalArena)
-            return location.getWorld().equals(world) &&
-                    minX <= location.getX() &&
-                    maxX >= location.getX() &&
-                    minY <= location.getY() &&
-                    maxY >= location.getY() &&
-                    minZ <= location.getZ() &&
-                    maxZ >= location.getZ();
-        else
-            return location.getWorld().equals(world) &&
-                    cylinder.contains(location);
+            return location.getWorld().equals(world) && minX <= location.getX() && maxX >= location.getX() && minY <= location.getY() && maxY >= location.getY() && minZ <= location.getZ() && maxZ >= location.getZ();
+        else return location.getWorld().equals(world) && cylinder.contains(location);
     }
 
     @Override
@@ -214,12 +199,11 @@ public class ArenaInstance extends MatchInstance {
 
             String finalTitle = title;
             String finalSubtitle = subtitle;
-            players.forEach(player -> player.sendTitle(finalTitle.replace("$wave", currentWave + ""),
-                    finalSubtitle.replace("$wave", currentWave + ""), 0, 20, 0));
-            spectators.forEach(player -> player.sendTitle(finalTitle.replace("$wave", currentWave + ""),
-                    finalSubtitle.replace("$wave", currentWave + ""), 0, 20, 0));
+            players.forEach(player -> player.sendTitle(finalTitle.replace("$wave", currentWave + ""), finalSubtitle.replace("$wave", currentWave + ""), 0, 20, 0));
+            spectators.forEach(player -> player.sendTitle(finalTitle.replace("$wave", currentWave + ""), finalSubtitle.replace("$wave", currentWave + ""), 0, 20, 0));
             spawnBosses();
             arenaState = ArenaState.ACTIVE;
+            roundDamage.clear();
         }, 20L * customArenasConfigFields.getDelayBetweenWaves());
     }
 
@@ -264,6 +248,15 @@ public class ArenaInstance extends MatchInstance {
     private void doRewards() {
         //Note: here current wave is decreased by 1 because the reward runs at the top of the next wave method.
         //So basically it runs at the start of the wave, hence it should reward whatever the previous wave had.
+        ArrayList<Player> validPlayers = new ArrayList<>();
+        double minimumDamageThreshold = 0;
+        double totalDamage = 0;
+        for (Map.Entry<Player, Double> entry : roundDamage.entrySet())
+            totalDamage += entry.getValue();
+
+        minimumDamageThreshold = totalDamage * .1;
+        for (Map.Entry<Player, Double> entry : roundDamage.entrySet())
+            if (entry.getValue() >= minimumDamageThreshold) validPlayers.add(entry.getKey());
         super.players.forEach(player -> customArenasConfigFields.getArenaRewards().arenaReward(player, currentWave - 1));
     }
 
@@ -273,16 +266,14 @@ public class ArenaInstance extends MatchInstance {
         arenaState = ArenaState.IDLE;
         //victory state
         if (currentWave > getCustomArenasConfigFields().getWaveCount()) {
-            participants.forEach(player -> player.sendTitle(ArenasConfig.getVictoryTitle().replace("$wave", customArenasConfigFields.getWaveCount() + ""),
-                    ArenasConfig.getVictorySubtitle().replace("$wave", customArenasConfigFields.getWaveCount() + ""), 20, 20 * 10, 20));
+            participants.forEach(player -> player.sendTitle(ArenasConfig.getVictoryTitle().replace("$wave", customArenasConfigFields.getWaveCount() + ""), ArenasConfig.getVictorySubtitle().replace("$wave", customArenasConfigFields.getWaveCount() + ""), 20, 20 * 10, 20));
             StringBuilder playerNames = new StringBuilder();
             for (Player player : participants)
                 playerNames.append(player.getName()).append(" ");
             Bukkit.getServer().broadcastMessage(ArenasConfig.getVictoryBroadcast().replace("$players", playerNames.toString()).replace("$arenaName", customArenasConfigFields.getArenaName()));
             ArenaCompleteEvent.ArenaCompleteEventHandler.call(this);
         } else
-            participants.forEach(player -> player.sendTitle(ArenasConfig.getDefeatTitle().replace("$wave", currentWave + ""),
-                    ArenasConfig.getDefeatSubtitle().replace("$wave", currentWave + ""), 20, 20 * 10, 20));
+            participants.forEach(player -> player.sendTitle(ArenasConfig.getDefeatTitle().replace("$wave", currentWave + ""), ArenasConfig.getDefeatSubtitle().replace("$wave", currentWave + ""), 20, 20 * 10, 20));
 
         Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, this::resetMatch, customArenasConfigFields.getDelayBetweenWaves());
     }
@@ -309,6 +300,13 @@ public class ArenaInstance extends MatchInstance {
                     arenaInstance.removeBoss((CustomBossEntity) event.getEliteEntity());
                     return;
                 }
+        }
+
+        @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+        public void onEliteDamages(EliteMobDamagedByPlayerEvent event) {
+            if (PlayerData.getMatchInstance(event.getPlayer()) == null) return;
+            if (!(PlayerData.getMatchInstance(event.getPlayer()) instanceof ArenaInstance arenaInstance)) return;
+            arenaInstance.getRoundDamage().merge(event.getPlayer(), event.getDamage(), Double::sum);
         }
     }
 }
