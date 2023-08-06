@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.events.BossCustomAttackDamage;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.utils.CooldownHandler;
+import org.apache.commons.math3.exception.NotFiniteNumberException;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
@@ -45,14 +46,16 @@ public class FlamethrowerEnchantment extends CustomEnchantment {
 
     private static void doDamage(List<Location> locations, Player player) {
         for (Location location : locations)
-            for (Entity entity : location.getWorld().getNearbyEntities(location, 0.5, 0.5, 0.5))
-                if (entity instanceof LivingEntity) {
-                    if (entity.getType().equals(EntityType.PLAYER))
-                        continue;
-                    if (((LivingEntity) entity).hasPotionEffect(PotionEffectType.FIRE_RESISTANCE)) continue;
-                    BossCustomAttackDamage.dealCustomDamage(player,
-                            (LivingEntity) entity, ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getWeaponLevel(false));
-                }
+            try {
+                for (Entity entity : location.getWorld().getNearbyEntities(location, 0.5, 0.5, 0.5))
+                    if (entity instanceof LivingEntity) {
+                        if (entity.getType().equals(EntityType.PLAYER)) continue;
+                        if (((LivingEntity) entity).hasPotionEffect(PotionEffectType.FIRE_RESISTANCE)) continue;
+                        BossCustomAttackDamage.dealCustomDamage(player, (LivingEntity) entity, ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getWeaponLevel(false));
+                    }
+            } catch (NotFiniteNumberException e) {
+                //don't really know why this happens, also doesn't really seem to matter. Seems like an internal MC or API issue.s
+            }
 
     }
 
@@ -118,14 +121,7 @@ public class FlamethrowerEnchantment extends CustomEnchantment {
             if (!player.getWorld().equals(target.getWorld())) return;
             Vector directionVector = target.clone().subtract(player.getLocation()).toVector().normalize();
             for (int i = 0; i < 5; i++) {
-                player.getWorld().spawnParticle(
-                        particle,
-                        player.getEyeLocation().clone().add(directionVector.getX(), -0.5, directionVector.getZ()),
-                        0,
-                        (ThreadLocalRandom.current().nextDouble() - 0.5) * 0.1 + directionVector.getX(),
-                        (ThreadLocalRandom.current().nextDouble() - 0.5) * 0.1 + directionVector.getY(),
-                        (ThreadLocalRandom.current().nextDouble() - 0.5) * 0.1 + directionVector.getZ(),
-                        ThreadLocalRandom.current().nextDouble() + 0.05);
+                player.getWorld().spawnParticle(particle, player.getEyeLocation().clone().add(directionVector.getX(), -0.5, directionVector.getZ()), 0, (ThreadLocalRandom.current().nextDouble() - 0.5) * 0.1 + directionVector.getX(), (ThreadLocalRandom.current().nextDouble() - 0.5) * 0.1 + directionVector.getY(), (ThreadLocalRandom.current().nextDouble() - 0.5) * 0.1 + directionVector.getZ(), ThreadLocalRandom.current().nextDouble() + 0.05);
             }
         }
 
@@ -146,8 +142,7 @@ public class FlamethrowerEnchantment extends CustomEnchantment {
                         return;
                     }
                     doParticleEffect(player, target, Particle.FLAME);
-                    if (timer % 10 == 0)
-                        doDamage(damagePoints, player);
+                    if (timer % 10 == 0) doDamage(damagePoints, player);
                     timer++;
                     if (timer < 20 * 3) return;
                     doFlamethrowerPhase3(player, target);
