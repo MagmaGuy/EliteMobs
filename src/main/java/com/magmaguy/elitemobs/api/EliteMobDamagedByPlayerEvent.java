@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
+import com.magmaguy.elitemobs.entitytracker.CustomProjectileData;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
@@ -61,13 +62,7 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
      * @param isCustomDamage Whether the amount of damage is custom, meaning it should apply with no damage reduction of any kind, including armor!
      * @param damageModifier Damage modifiers that the boss may have to reduce incoming damage.
      */
-    public EliteMobDamagedByPlayerEvent(EliteEntity eliteEntity,
-                                        Player player,
-                                        EntityDamageByEntityEvent event,
-                                        double damage,
-                                        boolean criticalStrike,
-                                        boolean isCustomDamage,
-                                        double damageModifier) {
+    public EliteMobDamagedByPlayerEvent(EliteEntity eliteEntity, Player player, EntityDamageByEntityEvent event, double damage, boolean criticalStrike, boolean isCustomDamage, double damageModifier) {
         super(damage, event);
         this.entity = eliteEntity.getLivingEntity();
         this.eliteMobEntity = eliteEntity;
@@ -115,8 +110,7 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
          * @return Bonus damage applied
          */
         private static double getEliteMeleeDamage(Player player, LivingEntity livingEntity) {
-            if (player.getInventory().getItemInMainHand().getType().equals(Material.BOW) ||
-                    player.getInventory().getItemInMainHand().getType().equals(Material.CROSSBOW))
+            if (player.getInventory().getItemInMainHand().getType().equals(Material.BOW) || player.getInventory().getItemInMainHand().getType().equals(Material.CROSSBOW))
                 return 0.0;
             double eliteDamage = ElitePlayerInventory.getPlayer(player).getEliteDamage(true);
             double bonusEliteDamage = secondaryEnchantmentDamageIncrease(player, livingEntity);
@@ -131,10 +125,10 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
             return arrowSpeedMultiplier * arrowDamage;
         }
 
-        private static double getCustomDamageModifier(EliteEntity eliteEntity, Player player) {
+        private static double getCustomDamageModifier(EliteEntity eliteEntity, Material itemStackType) {
             if (!(eliteEntity instanceof CustomBossEntity)) return 1;
             //This doesn't really take into account people switching their weapon out on ranged attacks. That's probably fine.
-            return ((CustomBossEntity) eliteEntity).getDamageModifier(player.getInventory().getItemInMainHand().getType());
+            return ((CustomBossEntity) eliteEntity).getDamageModifier(itemStackType);
         }
 
         private static double secondaryEnchantmentDamageIncrease(Player player, LivingEntity livingEntity) {
@@ -145,13 +139,7 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
                 if (level < 1) return 0D;
                 return level * 2.5D;
             }
-            if (livingEntity instanceof Zombie ||
-                    livingEntity instanceof Skeleton ||
-                    livingEntity instanceof Wither ||
-                    livingEntity instanceof SkeletonHorse ||
-                    livingEntity instanceof ZombieHorse ||
-                    !VersionChecker.serverVersionOlderThan(16, 0)
-                            && livingEntity.getType().equals(EntityType.ZOMBIFIED_PIGLIN)) {
+            if (livingEntity instanceof Zombie || livingEntity instanceof Skeleton || livingEntity instanceof Wither || livingEntity instanceof SkeletonHorse || livingEntity instanceof ZombieHorse || !VersionChecker.serverVersionOlderThan(16, 0) && livingEntity.getType().equals(EntityType.ZOMBIFIED_PIGLIN)) {
                 int level = ElitePlayerInventory.playerInventories.get(player.getUniqueId()).mainhand.getDamageUndeadLevel(player.getInventory().getItemInMainHand(), false);
                 level -= Enchantment.DAMAGE_UNDEAD.getMaxLevel();
                 if (level < 1) return 0D;
@@ -173,7 +161,7 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
         }
 
         @EventHandler(ignoreCancelled = true)
-        public void onEliteMobAttack(EntityDamageByEntityEvent event) {
+        public void onEliteMobAttacked(EntityDamageByEntityEvent event) {
             if (event.getEntity().getType().equals(EntityType.ENDER_DRAGON) && ((EnderDragon) event.getEntity()).getPhase().equals(EnderDragon.Phase.DYING))
                 return;
             LivingEntity livingEntity = EntityFinder.filterRangedDamagers(event.getDamager());
@@ -205,34 +193,30 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
             if (validPlayer && event.getCause().equals(EntityDamageEvent.DamageCause.THORNS))
                 //Thorns are their own kind of damage
                 eliteDamage = getThornsDamage(player);
-            else if (validPlayer &&
-                    (event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK) ||
-                            event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK) &&
-                                    EliteItemManager.isEliteMobsItem(player.getInventory().getItemInMainHand())))
+            else if (validPlayer && (event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK) || event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK) && EliteItemManager.isEliteMobsItem(player.getInventory().getItemInMainHand())))
                 eliteDamage = getEliteMeleeDamage(player, livingEntity);
             else if (event.getCause().equals(EntityDamageEvent.DamageCause.PROJECTILE))
                 //Scan arrow for arrow damage
                 eliteDamage = getEliteRangedDamage((Projectile) event.getDamager());
 
-            double damageModifier = getCustomDamageModifier(eliteEntity, player);
+            double damageModifier = 1;
+            if (event.getCause().equals(EntityDamageEvent.DamageCause.PROJECTILE))
+                if (CustomProjectileData.getCustomProjectileDataHashMap().get((Projectile) event.getDamager()) == null)
+                    damageModifier = getCustomDamageModifier(eliteEntity, null);
+                else
+                    damageModifier = getCustomDamageModifier(eliteEntity, CustomProjectileData.getCustomProjectileDataHashMap().get(event.getDamager()).getProjectileShooterMaterial());
+            else getCustomDamageModifier(eliteEntity, player.getInventory().getItemInMainHand().getType());
 
             damage = Round.twoDecimalPlaces((damage + eliteDamage) * damageModifier * MobCombatSettingsConfig.getDamageToEliteMultiplier());
 
             boolean criticalHit = false;
 
             if (validPlayer) {
-                isCriticalHit(player);
+                criticalHit = isCriticalHit(player);
                 if (criticalHit) damage *= 1.5;
             }
 
-            EliteMobDamagedByPlayerEvent eliteMobDamagedByPlayerEvent = new EliteMobDamagedByPlayerEvent(
-                    eliteEntity,
-                    player,
-                    event,
-                    damage,
-                    criticalHit,
-                    bypass,
-                    damageModifier);
+            EliteMobDamagedByPlayerEvent eliteMobDamagedByPlayerEvent = new EliteMobDamagedByPlayerEvent(eliteEntity, player, event, damage, criticalHit, bypass, damageModifier);
 
             new EventCaller(eliteMobDamagedByPlayerEvent);
 
@@ -250,9 +234,7 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
             }
 
             //Dragons need special handling due to their custom deaths
-            if (eliteEntity.getLivingEntity() != null &&
-                    eliteEntity.getLivingEntity().getType().equals(EntityType.ENDER_DRAGON) &&
-                    eliteEntity.getLivingEntity().getHealth() - damage < 1) {
+            if (eliteEntity.getLivingEntity() != null && eliteEntity.getLivingEntity().getType().equals(EntityType.ENDER_DRAGON) && eliteEntity.getLivingEntity().getHealth() - damage < 1) {
                 if (eliteEntity.isDying()) return;
                 damage = 0;
                 event.setCancelled(true);
@@ -267,11 +249,7 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
             eliteEntity.syncPluginHealth(((LivingEntity) event.getEntity()).getHealth());
 
             //No antiexploit checks for dungeons
-            if (!(EliteMobs.worldGuardIsEnabled &&
-                    !WorldGuardFlagChecker.checkFlag(eliteEntity.getLocation(), WorldGuardCompatibility.getEliteMobsAntiExploitFlag())) &&
-                    event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK) &&
-                    !eliteEntity.isInAntiExploitCooldown() &&
-                    eliteEntity.getLivingEntity() != null)
+            if (!(EliteMobs.worldGuardIsEnabled && !WorldGuardFlagChecker.checkFlag(eliteEntity.getLocation(), WorldGuardCompatibility.getEliteMobsAntiExploitFlag())) && event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK) && !eliteEntity.isInAntiExploitCooldown() && eliteEntity.getLivingEntity() != null)
                 Bukkit.getServer().getPluginManager().callEvent(new EliteMobDamagedByPlayerAntiExploitEvent(eliteEntity, eliteMobDamagedByPlayerEvent));
         }
 
