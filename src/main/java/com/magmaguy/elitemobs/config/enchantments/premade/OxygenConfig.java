@@ -8,6 +8,8 @@ public class OxygenConfig extends EnchantmentsConfigFields {
                 true,
                 "Respiration",
                 3,
-                6);
+                6,
+                true,
+                3);
     }
 }

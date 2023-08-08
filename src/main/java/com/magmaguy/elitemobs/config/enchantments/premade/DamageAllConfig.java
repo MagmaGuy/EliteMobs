@@ -8,6 +8,8 @@ public class DamageAllConfig extends EnchantmentsConfigFields {
                 true,
                 "Sharpness",
                 5,
-                13);
+                13,
+                true,
+                100);
     }
 }

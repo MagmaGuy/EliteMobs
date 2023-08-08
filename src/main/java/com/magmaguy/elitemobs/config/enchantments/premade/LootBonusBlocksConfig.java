@@ -8,6 +8,8 @@ public class LootBonusBlocksConfig extends EnchantmentsConfigFields {
                 true,
                 "Fortune",
                 3,
-                13);
+                13,
+                false,
+                3);
     }
 }

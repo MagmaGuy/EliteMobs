@@ -8,6 +8,8 @@ public class IceBreakerConfig extends EnchantmentsConfigFields {
                 true,
                 "Ice Breaker",
                 2,
-                10);
+                10,
+                false,
+                2);
     }
 }

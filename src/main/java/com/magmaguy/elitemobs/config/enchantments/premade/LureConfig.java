@@ -8,6 +8,8 @@ public class LureConfig extends EnchantmentsConfigFields {
                 true,
                 "Lure",
                 3,
-                6);
+                6,
+                true,
+                3);
     }
 }

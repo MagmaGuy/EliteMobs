@@ -8,6 +8,8 @@ public class RiptideConfig extends EnchantmentsConfigFields {
                 true,
                 "Riptide",
                 3,
-                6);
+                6,
+                true,
+                3);
     }
 }

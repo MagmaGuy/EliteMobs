@@ -8,6 +8,8 @@ public class FrostWalkerConfig extends EnchantmentsConfigFields {
                 true,
                 "Frost Walker",
                 2,
-                6);
+                6,
+                true,
+                2);
     }
 }

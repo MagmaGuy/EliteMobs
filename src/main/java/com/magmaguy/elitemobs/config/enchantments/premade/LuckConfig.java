@@ -8,6 +8,8 @@ public class LuckConfig extends EnchantmentsConfigFields {
                 true,
                 "Luck of the Sea",
                 3,
-                6);
+                6,
+                true,
+                3);
     }
 }

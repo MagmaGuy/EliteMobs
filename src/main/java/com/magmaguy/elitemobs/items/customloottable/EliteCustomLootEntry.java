@@ -20,10 +20,10 @@ import java.util.Locale;
 import java.util.Map;
 
 public class EliteCustomLootEntry extends CustomLootEntry implements Serializable {
+    private final String permission = null;
     @Getter
     private String filename = null;
     private String difficultyID = null;
-    private final String permission = null;
 
     public EliteCustomLootEntry(List<CustomLootEntry> entries, String rawString, String configFilename) {
         super();
@@ -215,15 +215,15 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
         SharedLootTable sharedLootTable = SharedLootTable.getSharedLootTables().get(eliteEntity);
         String name = null;
         for (int i = 0; i < getAmount(); i++) {
-            CustomItem customItem =generateCustomItem();
-            if (customItem == null){
+            CustomItem customItem = generateCustomItem();
+            if (customItem == null) {
                 new WarningMessage("Failed to generate a custom item for the boss " + eliteEntity.getName() + "! The configuration file for one of its loot items is not correctly configured.");
                 return;
             }
             ItemStack itemStack = customItem.generateItemStack(itemTier, null, eliteEntity);
             if (sharedLootTable == null) sharedLootTable = new SharedLootTable(eliteEntity);
             if (itemStack == null) {
-                new WarningMessage("A custom item for boss "+  eliteEntity.getName() + " was null! This item will be skipped.");
+                new WarningMessage("A custom item for boss " + eliteEntity.getName() + " was null! This item will be skipped.");
                 return;
             }
             sharedLootTable.addLoot(itemStack);

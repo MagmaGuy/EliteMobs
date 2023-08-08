@@ -8,6 +8,8 @@ public class QuickChargeConfig extends EnchantmentsConfigFields {
                 true,
                 "Quick Charge",
                 3,
-                6);
+                6,
+                true,
+                3);
     }
 }

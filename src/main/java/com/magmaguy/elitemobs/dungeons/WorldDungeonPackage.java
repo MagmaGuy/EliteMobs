@@ -88,6 +88,7 @@ public class WorldDungeonPackage extends WorldPackage implements Dungeon {
     }
 
     private void getNPCs() {
+        if (world == null) return;
         for (NPCEntity npcEntity : EntityTracker.getNpcEntities().values())
             if (npcEntity.getWorldName().equals(world.getName()) ||
                     wormholeWorld != null &&

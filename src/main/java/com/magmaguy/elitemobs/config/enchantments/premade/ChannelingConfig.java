@@ -8,6 +8,8 @@ public class ChannelingConfig extends EnchantmentsConfigFields {
                 true,
                 "Channeling",
                 1,
-                6);
+                6,
+                true,
+                1);
     }
 }

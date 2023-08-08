@@ -8,6 +8,8 @@ public class ProtectionEnvironmentalConfig extends EnchantmentsConfigFields {
                 true,
                 "Protection",
                 4,
-                13);
+                13,
+                true,
+                100);
     }
 }

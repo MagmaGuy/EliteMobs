@@ -3,11 +3,14 @@ package com.magmaguy.elitemobs.items;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
+import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
+import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfigFields;
 import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantment;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffect;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffectContainer;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.utils.PersistentVanillaData;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
@@ -288,6 +291,29 @@ public class ItemTagger {
             int enchantmentLevel = getEnchantment(itemMeta, customEnchantment.getKey());
             if (enchantmentLevel > 0)
                 itemEnchantmentFilenames.put(new NamespacedKey(MetadataHandler.PLUGIN, customEnchantment.getKey()), enchantmentLevel);
+        }
+        return itemEnchantmentFilenames;
+    }
+
+    public static HashMap<EnchantmentsConfigFields, Integer> getItemEnchantmentConfigFields(@Nullable ItemStack itemStack) {
+        HashMap<EnchantmentsConfigFields, Integer> itemEnchantmentFilenames = new HashMap<>();
+        if (itemStack == null || itemStack.getItemMeta() == null) return itemEnchantmentFilenames;
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        for (Enchantment enchantment : Enchantment.values()) {
+            int enchantmentLevel = getEnchantment(itemMeta, enchantment.getKey());
+            if (enchantmentLevel > 0) {
+                EnchantmentsConfigFields enchantmentsConfigFields = EnchantmentsConfig.getEnchantment(enchantment.getName().toLowerCase(Locale.ROOT) + ".yml");
+                if (enchantmentsConfigFields == null) {
+                    new WarningMessage("Failed to get configuration file for enchantment called " + enchantment.getName().toLowerCase(Locale.ROOT) + ".yml");
+                    continue;
+                }
+                itemEnchantmentFilenames.put(enchantmentsConfigFields, enchantmentLevel);
+            }
+        }
+        for (CustomEnchantment customEnchantment : CustomEnchantment.getCustomEnchantmentMap().values()) {
+            int enchantmentLevel = getEnchantment(itemMeta, customEnchantment.getKey());
+            if (enchantmentLevel > 0)
+                itemEnchantmentFilenames.put(customEnchantment.getEnchantmentsConfigFields(), enchantmentLevel);
         }
         return itemEnchantmentFilenames;
     }

@@ -13,17 +13,25 @@ public class EnchantmentsConfigFields extends CustomConfigFields {
     private double value = 1;
     @Getter
     private Enchantment enchantment = null;
+    @Getter
+    private boolean isEnabledForProcedurallyGeneratedItems = false;
+    @Getter
+    private int maxEnchantmentLevel;
 
     public EnchantmentsConfigFields(String filename,
                                     boolean isEnabled,
                                     String name,
                                     int maxLevel,
-                                    double value) {
+                                    double value,
+                                    boolean isEnabledForProcedurallyGeneratedItems,
+                                    int maxEnchantmentLevel){
         super(filename, isEnabled);
         this.isEnabled = isEnabled;
         this.name = name;
         this.maxLevel = maxLevel;
         this.value = value;
+        this.isEnabledForProcedurallyGeneratedItems = isEnabledForProcedurallyGeneratedItems;
+        this.maxEnchantmentLevel = maxEnchantmentLevel;
     }
 
     @Override
@@ -38,6 +46,8 @@ public class EnchantmentsConfigFields extends CustomConfigFields {
             this.enchantment = null;
         }
         this.value = processDouble("value", value, 1, true);
+        this.isEnabledForProcedurallyGeneratedItems = processBoolean("isEnabledForProcedurallyGeneratedItems", isEnabledForProcedurallyGeneratedItems, false, true);
+        this.maxEnchantmentLevel = processInt("maxEnchantmentLevel", maxEnchantmentLevel, 1, false);
         processAdditionalFields();
     }
 

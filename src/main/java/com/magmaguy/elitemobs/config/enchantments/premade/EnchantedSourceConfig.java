@@ -8,6 +8,8 @@ public class EnchantedSourceConfig extends EnchantmentsConfigFields {
                 true,
                 "Enchanted Source",
                 1,
-                10);
+                10,
+                true,
+                1);
     }
 }

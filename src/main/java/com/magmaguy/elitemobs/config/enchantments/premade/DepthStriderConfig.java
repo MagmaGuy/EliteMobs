@@ -8,6 +8,8 @@ public class DepthStriderConfig extends EnchantmentsConfigFields {
                 true,
                 "Depth Strider",
                 3,
-                6);
+                6,
+                true,
+                3);
     }
 }

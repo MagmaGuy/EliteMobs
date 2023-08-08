@@ -8,6 +8,8 @@ public class SummonWolfConfig extends EnchantmentsConfigFields {
                 true,
                 "Summon Wolf",
                 1,
-                20);
+                20,
+                false,
+                1);
     }
 }

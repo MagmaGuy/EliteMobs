@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.items.upgradesystem;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfigFields;
 import com.magmaguy.elitemobs.items.EliteItemLore;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.customenchantments.EnchantedSourceEnchantment;
@@ -59,6 +60,14 @@ public class UpgradeSystem {
         itemToUpgrade.setItemMeta(itemMeta);
         new EliteItemLore(itemToUpgrade, false);
         return itemToUpgrade;
+    }
+
+    public static boolean isValidUpgrade(ItemStack originalItemToUpgrade, ItemStack enchantedBook) {
+        ItemStack finalItemStack = upgrade(originalItemToUpgrade, enchantedBook);
+        Map<EnchantmentsConfigFields, Integer> currentEnchantments = ItemTagger.getItemEnchantmentConfigFields(finalItemStack);
+        for (Map.Entry<EnchantmentsConfigFields, Integer> entry : currentEnchantments.entrySet())
+            if (entry.getValue() > entry.getKey().getMaxEnchantmentLevel()) return false;
+        return true;
     }
 
 }
