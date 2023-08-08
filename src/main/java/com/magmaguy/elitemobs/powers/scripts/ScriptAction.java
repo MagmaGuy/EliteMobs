@@ -14,7 +14,6 @@ import com.magmaguy.elitemobs.powers.meta.CustomSummonPower;
 import com.magmaguy.elitemobs.powers.scripts.caching.ScriptActionBlueprint;
 import com.magmaguy.elitemobs.powers.scripts.enums.ActionType;
 import com.magmaguy.elitemobs.powers.scripts.enums.TargetType;
-import com.magmaguy.elitemobs.utils.Developer;
 import com.magmaguy.elitemobs.utils.VersionChecker;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
@@ -597,14 +596,10 @@ public class ScriptAction {
         getLocationTargets(scriptActionData).forEach(targetLocation -> {
             //if (scriptActionData.getTargetType().equals(TargetType.SELF)) {
             Vector velocity = new Vector(0, 0, 0);
-            Developer.message("running inside of summon entity");
             if (blueprint.getScriptRelativeVectorBlueprint() != null) {
-                Developer.message("Running relative vector from action");
                 ScriptRelativeVector scriptRelativeVector = new ScriptRelativeVector(blueprint.getScriptRelativeVectorBlueprint(), eliteScript, targetLocation);
                 velocity = scriptRelativeVector.getVector(scriptActionData);
-                Developer.message("Velocity: " + velocity);
             }
-            Developer.message("Sanity test");
             Entity entity;
             if (scriptActionData.getTargetType().equals(TargetType.SELF) &&
                     scriptActionData.getEliteEntity().getLivingEntity() != null &&
