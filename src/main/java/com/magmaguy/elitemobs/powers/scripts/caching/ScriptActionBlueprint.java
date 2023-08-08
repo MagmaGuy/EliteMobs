@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.powers.scripts.caching;
 
 import com.magmaguy.elitemobs.powers.scripts.enums.ActionType;
 import com.magmaguy.elitemobs.powers.scripts.enums.WeatherType;
-import com.magmaguy.elitemobs.utils.Developer;
 import com.magmaguy.elitemobs.utils.PotionEffectTypeUtil;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
@@ -24,6 +23,8 @@ import static com.magmaguy.elitemobs.utils.MapListInterpreter.*;
 public class ScriptActionBlueprint {
     @Getter
     private final String scriptName;
+    @Getter
+    private final String scriptFilename;
     @Getter
     private ActionType actionType = null;
     @Getter
@@ -59,8 +60,6 @@ public class ScriptActionBlueprint {
     @Getter
     private Vector vValue = null;
     @Getter
-    private final String scriptFilename;
-    @Getter
     private ScriptTargetsBlueprint scriptTargets;
     @Getter
     private ScriptTargetsBlueprint finalTarget = null;
@@ -91,7 +90,6 @@ public class ScriptActionBlueprint {
     private int power = 10;
     @Getter
     private boolean invulnerable = true;
-    private String location = null;
     @Getter
     private Vector offset = new Vector(0, 0, 0);
     @Getter
@@ -164,7 +162,6 @@ public class ScriptActionBlueprint {
             case "fireworkeffects" -> fireworkEffects = parseEnumListList(key, value, FireworkColor.class, scriptName);
             case "power" -> power = parseInteger(key, value, scriptName);
             case "invulnerable" -> invulnerable = parseBoolean(key, value, scriptName);
-            case "location" -> location = parseString(key, value, scriptName);
             case "offset" -> offset = parseVector(key, value, scriptName);
             case "tags" -> tags = parseStringList(key, value, scriptName);
             case "time" -> time = parseInteger(key, value, scriptName);
@@ -182,10 +179,7 @@ public class ScriptActionBlueprint {
                     finalTarget = new ScriptTargetsBlueprint((Map) value, scriptName, scriptFilename);
             }
             case "onlyrunonescript" -> onlyRunOneScript = parseBoolean(key, value, scriptName);
-            case "relativevector" -> {
-                scriptRelativeVectorBlueprint = new ScriptRelativeVectorBlueprint(scriptName, scriptFilename, (Map<String, ?>) value);
-                Developer.message("Initialized vector inside of action and it's null " + (scriptRelativeVectorBlueprint == null) + " " + scriptFilename);
-            }
+            case "relativevector" -> scriptRelativeVectorBlueprint = new ScriptRelativeVectorBlueprint(scriptName, scriptFilename, (Map<String, ?>) value);
             default -> new WarningMessage("Failed to read key " + key + " for script " + scriptName + " in " + scriptFilename);
         }
 
