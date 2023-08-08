@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.items;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
-import com.magmaguy.elitemobs.utils.Developer;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -96,9 +95,6 @@ public class ScalableItemConstructor {
 
     public static ItemStack constructLimitedItem(int itemTier, CustomItem customItem, Player player, EliteEntity eliteEntity) {
         int adjustedItemLevel = Math.min(itemTier, customItem.getItemLevel());
-        Developer.message("level: " + adjustedItemLevel);
-        Developer.message("custom item level: " + customItem.getItemLevel());
-        Developer.message("passed level: " +itemTier);
 
         HashMap<Enchantment, Integer> newEnchantmentList = updateDynamicEnchantments(customItem.getEnchantments());
 
