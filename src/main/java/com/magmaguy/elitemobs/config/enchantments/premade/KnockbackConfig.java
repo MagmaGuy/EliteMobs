@@ -8,6 +8,8 @@ public class KnockbackConfig extends EnchantmentsConfigFields {
                 true,
                 "Knockback",
                 2,
-                6);
+                6,
+                true,
+                10);
     }
 }

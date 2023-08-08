@@ -8,6 +8,8 @@ public class ArrowInfiniteConfig extends EnchantmentsConfigFields {
                 true,
                 "Infinity",
                 1,
-                6);
+                6,
+                true,
+                1);
     }
 }

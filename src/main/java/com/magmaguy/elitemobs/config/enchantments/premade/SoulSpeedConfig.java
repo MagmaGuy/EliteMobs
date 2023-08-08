@@ -7,6 +7,8 @@ public class SoulSpeedConfig extends EnchantmentsConfigFields {
         super("soul_speed",
                 true, "Soul Speed",
                 3,
-                6);
+                6,
+                true,
+                3);
     }
 }

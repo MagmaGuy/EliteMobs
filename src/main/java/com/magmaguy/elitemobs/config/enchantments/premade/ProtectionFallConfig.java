@@ -8,6 +8,8 @@ public class ProtectionFallConfig extends EnchantmentsConfigFields {
                 true,
                 "Feather Falling",
                 4,
-                6);
+                6,
+                true,
+                100);
     }
 }

@@ -8,6 +8,8 @@ public class SweepingEdgeConfig extends EnchantmentsConfigFields {
                 true,
                 "Sweeping Edge",
                 3,
-                6);
+                6,
+                true,
+                3);
     }
 }

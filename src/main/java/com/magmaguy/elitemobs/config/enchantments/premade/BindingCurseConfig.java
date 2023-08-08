@@ -8,6 +8,8 @@ public class BindingCurseConfig extends EnchantmentsConfigFields {
                 true,
                 "Curse of Binding",
                 1,
-                -6);
+                -6,
+                true,
+                1);
     }
 }

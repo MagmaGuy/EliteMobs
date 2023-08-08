@@ -8,6 +8,8 @@ public class ProtectionExplosionsConfig extends EnchantmentsConfigFields {
                 true,
                 "Blast Protection",
                 4,
-                6);
+                6,
+                true,
+                100);
     }
 }

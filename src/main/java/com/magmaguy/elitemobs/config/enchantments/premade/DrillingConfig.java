@@ -8,6 +8,8 @@ public class DrillingConfig extends EnchantmentsConfigFields {
                 true,
                 "Drilling",
                 4,
-                15);
+                15,
+                false,
+                4);
     }
 }

@@ -8,6 +8,8 @@ public class PiercingConfig extends EnchantmentsConfigFields {
                 true,
                 "Piercing",
                 4,
-                6);
+                6,
+                true,
+                4);
     }
 }

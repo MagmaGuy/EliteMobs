@@ -333,7 +333,7 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
      * @param player Player to send the greeting to
      */
     public void sayGreeting(Player player) {
-        new NPCChatBubble(selectString(npCsConfigFields.getDialog()), this, player);
+        new NPCChatBubble(selectString(npCsConfigFields.getGreetings()), this, player);
     }
 
     /**

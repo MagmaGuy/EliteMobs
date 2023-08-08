@@ -8,6 +8,8 @@ public class UnbindConfig extends EnchantmentsConfigFields {
                 true,
                 "Unbind",
                 1,
-                10000);
+                10000,
+                false,
+                1);
     }
 }

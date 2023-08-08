@@ -8,6 +8,8 @@ public class LoyaltyConfig extends EnchantmentsConfigFields {
                 true,
                 "Loyalty",
                 3,
-                6);
+                6,
+                true,
+                3);
     }
 }

@@ -8,6 +8,8 @@ public class FlamethrowerConfig extends EnchantmentsConfigFields {
                 true,
                 "Flamethrower",
                 1,
-                20);
+                20,
+                false,
+                1);
     }
 }

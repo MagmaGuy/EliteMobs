@@ -46,6 +46,8 @@ public class ItemEnchantmentMenuConfig extends MenusConfigFields {
     private static int luckyTicketInfoSlot;
     @Getter
     private static ItemStack luckyTicketInfoButton;
+    @Getter
+    private static String enchantmentLimitMessage;
 
 
     public ItemEnchantmentMenuConfig() {
@@ -132,5 +134,12 @@ public class ItemEnchantmentMenuConfig extends MenusConfigFields {
                                 "&2by adding an elite lucky ticket!"), MetadataHandler.signatureID),
                 fileConfiguration);
         luckyTicketInfoButton = ItemStackSerializer.deserialize("luckyTicketInfoButton", fileConfiguration);
+        enchantmentLimitMessage = ConfigurationEngine.setString(
+                List.of("Sets the message that appears when a player attempts to enchant an item beyond the configured maximum enchantment level of any enchantment."),
+                file,
+                fileConfiguration,
+                "enchantmentLimitMessage",
+                "&c[EliteMobs] Can't enchant item beyond enchantment limit!",
+                true);
     }
 }

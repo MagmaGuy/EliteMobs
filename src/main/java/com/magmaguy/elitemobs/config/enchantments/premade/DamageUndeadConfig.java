@@ -8,6 +8,8 @@ public class DamageUndeadConfig extends EnchantmentsConfigFields {
                 true,
                 "Smite",
                 4,
-                6);
+                6,
+                true,
+                100);
     }
 }

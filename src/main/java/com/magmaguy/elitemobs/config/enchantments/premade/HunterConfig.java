@@ -11,7 +11,9 @@ public class HunterConfig extends EnchantmentsConfigFields {
                 true,
                 "Hunter",
                 3,
-                10);
+                10,
+                true,
+                3);
     }
 
     @Override

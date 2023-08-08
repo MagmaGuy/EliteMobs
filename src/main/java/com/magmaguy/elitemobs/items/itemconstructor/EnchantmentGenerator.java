@@ -23,6 +23,8 @@ public class EnchantmentGenerator {
     public static ItemMeta generateEnchantments(ItemMeta itemMeta, HashMap<Enchantment, Integer> enchantmentMap) {
         for (Map.Entry<Enchantment, Integer> entry : enchantmentMap.entrySet()) {
             if (entry == null) continue;
+            EnchantmentsConfigFields enchantmentsConfigFields = EnchantmentsConfig.getEnchantment(entry.getKey().getName().toLowerCase() + ".yml");
+            if (enchantmentsConfigFields == null || !enchantmentsConfigFields.isEnabled()) continue;
             if (enchantmentMap.get(entry.getKey()) > entry.getKey().getMaxLevel()) {
                 if (EliteEnchantments.isPotentialEliteEnchantment(entry.getKey())) {
                     if (enchantmentMap.get(entry.getKey()) > entry.getKey().getMaxLevel()) {
@@ -53,7 +55,7 @@ public class EnchantmentGenerator {
          */
         if (itemTier < 1) return enchantmentMap;
 
-        HashMap<Enchantment, Integer> validSecondaryEnchantments = new HashMap();
+        HashMap<Enchantment, Integer> validEnchantments = new HashMap();
 
         /*
         Primary enchantments get instantly validated and applies since there is only one per item type
@@ -62,59 +64,59 @@ public class EnchantmentGenerator {
         switch (material) {
             case TRIDENT:
                 if (ThreadLocalRandom.current().nextDouble() < 0.5)
-                    validSecondaryEnchantments.putAll(validateSecondaryEnchantments("LOYALTY"));
+                    validEnchantments.putAll(validateEnchantments("LOYALTY"));
                 else
-                    validSecondaryEnchantments.putAll(validateSecondaryEnchantments("CHANNELING"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("RIPTIDE"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("IMPALING"));
+                    validEnchantments.putAll(validateEnchantments("CHANNELING"));
+                validEnchantments.putAll(validateEnchantments("RIPTIDE"));
+                validEnchantments.putAll(validateEnchantments("IMPALING"));
             case DIAMOND_SWORD:
             case GOLDEN_SWORD:
             case IRON_SWORD:
             case STONE_SWORD:
             case WOODEN_SWORD:
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DAMAGE_ALL"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DAMAGE_ARTHROPODS"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DAMAGE_UNDEAD"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DURABILITY"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("FIRE_ASPECT"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("KNOCKBACK"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("LOOT_BONUS_MOBS"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("MENDING"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("SWEEPING_EDGE"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("VANISHING_CURSE"));
+                validEnchantments.putAll(validateEnchantments("DAMAGE_ALL"));
+                validEnchantments.putAll(validateEnchantments("DAMAGE_ARTHROPODS"));
+                validEnchantments.putAll(validateEnchantments("DAMAGE_UNDEAD"));
+                validEnchantments.putAll(validateEnchantments("DURABILITY"));
+                validEnchantments.putAll(validateEnchantments("FIRE_ASPECT"));
+                validEnchantments.putAll(validateEnchantments("KNOCKBACK"));
+                validEnchantments.putAll(validateEnchantments("LOOT_BONUS_MOBS"));
+                validEnchantments.putAll(validateEnchantments("MENDING"));
+                validEnchantments.putAll(validateEnchantments("SWEEPING_EDGE"));
+                validEnchantments.putAll(validateEnchantments("VANISHING_CURSE"));
                 break;
             case BOW:
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("ARROW_DAMAGE"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("ARROW_FIRE"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("ARROW_INFINITE"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("ARROW_KNOCKBACK"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DURABILITY"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("MENDING"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("VANISHING_CURSE"));
+                validEnchantments.putAll(validateEnchantments("ARROW_DAMAGE"));
+                validEnchantments.putAll(validateEnchantments("ARROW_FIRE"));
+                validEnchantments.putAll(validateEnchantments("ARROW_INFINITE"));
+                validEnchantments.putAll(validateEnchantments("ARROW_KNOCKBACK"));
+                validEnchantments.putAll(validateEnchantments("DURABILITY"));
+                validEnchantments.putAll(validateEnchantments("MENDING"));
+                validEnchantments.putAll(validateEnchantments("VANISHING_CURSE"));
                 break;
             case CROSSBOW:
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("ARROW_DAMAGE"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("QUICK_CHARGE"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("MULTISHOT"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("PIERCING"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DURABILITY"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("MENDING"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("VANISHING_CURSE"));
+                validEnchantments.putAll(validateEnchantments("ARROW_DAMAGE"));
+                validEnchantments.putAll(validateEnchantments("QUICK_CHARGE"));
+                validEnchantments.putAll(validateEnchantments("MULTISHOT"));
+                validEnchantments.putAll(validateEnchantments("PIERCING"));
+                validEnchantments.putAll(validateEnchantments("DURABILITY"));
+                validEnchantments.putAll(validateEnchantments("MENDING"));
+                validEnchantments.putAll(validateEnchantments("VANISHING_CURSE"));
                 break;
             case DIAMOND_PICKAXE:
             case GOLDEN_PICKAXE:
             case IRON_PICKAXE:
             case STONE_PICKAXE:
             case WOODEN_PICKAXE:
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DIG_SPEED"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DURABILITY"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("MENDING"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("VANISHING_CURSE"));
+                validEnchantments.putAll(validateEnchantments("DIG_SPEED"));
+                validEnchantments.putAll(validateEnchantments("DURABILITY"));
+                validEnchantments.putAll(validateEnchantments("MENDING"));
+                validEnchantments.putAll(validateEnchantments("VANISHING_CURSE"));
                 //TODO: this doesn't take config into account
                 if (ThreadLocalRandom.current().nextDouble() < 0.5) {
-                    validSecondaryEnchantments.putAll(validateSecondaryEnchantments("LOOT_BONUS_BLOCKS"));
+                    validEnchantments.putAll(validateEnchantments("LOOT_BONUS_BLOCKS"));
                 } else {
-                    validSecondaryEnchantments.putAll(validateSecondaryEnchantments("SILK_TOUCH"));
+                    validEnchantments.putAll(validateEnchantments("SILK_TOUCH"));
                 }
                 break;
             case DIAMOND_SHOVEL:
@@ -122,14 +124,14 @@ public class EnchantmentGenerator {
             case IRON_SHOVEL:
             case STONE_SHOVEL:
             case WOODEN_SHOVEL:
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DIG_SPEED"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DURABILITY"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("MENDING"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("VANISHING_CURSE"));
+                validEnchantments.putAll(validateEnchantments("DIG_SPEED"));
+                validEnchantments.putAll(validateEnchantments("DURABILITY"));
+                validEnchantments.putAll(validateEnchantments("MENDING"));
+                validEnchantments.putAll(validateEnchantments("VANISHING_CURSE"));
                 if (ThreadLocalRandom.current().nextDouble() < 0.5) {
-                    validSecondaryEnchantments.putAll(validateSecondaryEnchantments("LOOT_BONUS_BLOCKS"));
+                    validEnchantments.putAll(validateEnchantments("LOOT_BONUS_BLOCKS"));
                 } else {
-                    validSecondaryEnchantments.putAll(validateSecondaryEnchantments("SILK_TOUCH"));
+                    validEnchantments.putAll(validateEnchantments("SILK_TOUCH"));
                 }
                 break;
             case DIAMOND_HOE:
@@ -138,35 +140,35 @@ public class EnchantmentGenerator {
             case STONE_HOE:
             case WOODEN_HOE:
                 if (ItemSettingsConfig.isUseHoesAsWeapons())
-                    validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DAMAGE_ALL"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DIG_SPEED"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DURABILITY"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("MENDING"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("VANISHING_CURSE"));
+                    validEnchantments.putAll(validateEnchantments("DAMAGE_ALL"));
+                validEnchantments.putAll(validateEnchantments("DIG_SPEED"));
+                validEnchantments.putAll(validateEnchantments("DURABILITY"));
+                validEnchantments.putAll(validateEnchantments("MENDING"));
+                validEnchantments.putAll(validateEnchantments("VANISHING_CURSE"));
                 if (ThreadLocalRandom.current().nextDouble() < 0.5) {
-                    validSecondaryEnchantments.putAll(validateSecondaryEnchantments("LOOT_BONUS_BLOCKS"));
+                    validEnchantments.putAll(validateEnchantments("LOOT_BONUS_BLOCKS"));
                 } else {
-                    validSecondaryEnchantments.putAll(validateSecondaryEnchantments("SILK_TOUCH"));
+                    validEnchantments.putAll(validateEnchantments("SILK_TOUCH"));
                 }
                 break;
             case SHIELD:
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DURABILITY"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("MENDING"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("VANISHING_CURSE"));
+                validEnchantments.putAll(validateEnchantments("DURABILITY"));
+                validEnchantments.putAll(validateEnchantments("MENDING"));
+                validEnchantments.putAll(validateEnchantments("VANISHING_CURSE"));
                 break;
             case DIAMOND_AXE:
             case GOLDEN_AXE:
             case IRON_AXE:
             case STONE_AXE:
             case WOODEN_AXE:
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DAMAGE_ALL"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DAMAGE_ARTHROPODS"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DAMAGE_UNDEAD"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DURABILITY"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("MENDING"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("VANISHING_CURSE"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DIG_SPEED"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("LOOT_BONUS_BLOCKS"));
+                validEnchantments.putAll(validateEnchantments("DAMAGE_ALL"));
+                validEnchantments.putAll(validateEnchantments("DAMAGE_ARTHROPODS"));
+                validEnchantments.putAll(validateEnchantments("DAMAGE_UNDEAD"));
+                validEnchantments.putAll(validateEnchantments("DURABILITY"));
+                validEnchantments.putAll(validateEnchantments("MENDING"));
+                validEnchantments.putAll(validateEnchantments("VANISHING_CURSE"));
+                validEnchantments.putAll(validateEnchantments("DIG_SPEED"));
+                validEnchantments.putAll(validateEnchantments("LOOT_BONUS_BLOCKS"));
                 break;
             case CHAINMAIL_HELMET:
             case DIAMOND_HELMET:
@@ -174,117 +176,117 @@ public class EnchantmentGenerator {
             case IRON_HELMET:
             case LEATHER_HELMET:
             case TURTLE_HELMET:
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("PROTECTION_ENVIRONMENTAL"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("BINDING_CURSE"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DURABILITY"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("MENDING"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("OXYGEN"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("PROTECTION_EXPLOSIONS"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("PROTECTION_FIRE"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("PROTECTION_PROJECTILE"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("THORNS"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("VANISHING_CURSE"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("WATER_WORKER"));
+                validEnchantments.putAll(validateEnchantments("PROTECTION_ENVIRONMENTAL"));
+                validEnchantments.putAll(validateEnchantments("BINDING_CURSE"));
+                validEnchantments.putAll(validateEnchantments("DURABILITY"));
+                validEnchantments.putAll(validateEnchantments("MENDING"));
+                validEnchantments.putAll(validateEnchantments("OXYGEN"));
+                validEnchantments.putAll(validateEnchantments("PROTECTION_EXPLOSIONS"));
+                validEnchantments.putAll(validateEnchantments("PROTECTION_FIRE"));
+                validEnchantments.putAll(validateEnchantments("PROTECTION_PROJECTILE"));
+                validEnchantments.putAll(validateEnchantments("THORNS"));
+                validEnchantments.putAll(validateEnchantments("VANISHING_CURSE"));
+                validEnchantments.putAll(validateEnchantments("WATER_WORKER"));
                 break;
             case CHAINMAIL_CHESTPLATE:
             case DIAMOND_CHESTPLATE:
             case GOLDEN_CHESTPLATE:
             case IRON_CHESTPLATE:
             case LEATHER_CHESTPLATE:
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("PROTECTION_ENVIRONMENTAL"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DURABILITY"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("MENDING"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("PROTECTION_EXPLOSIONS"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("PROTECTION_FIRE"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("PROTECTION_PROJECTILE"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("THORNS"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("VANISHING_CURSE"));
+                validEnchantments.putAll(validateEnchantments("PROTECTION_ENVIRONMENTAL"));
+                validEnchantments.putAll(validateEnchantments("DURABILITY"));
+                validEnchantments.putAll(validateEnchantments("MENDING"));
+                validEnchantments.putAll(validateEnchantments("PROTECTION_EXPLOSIONS"));
+                validEnchantments.putAll(validateEnchantments("PROTECTION_FIRE"));
+                validEnchantments.putAll(validateEnchantments("PROTECTION_PROJECTILE"));
+                validEnchantments.putAll(validateEnchantments("THORNS"));
+                validEnchantments.putAll(validateEnchantments("VANISHING_CURSE"));
                 break;
             case CHAINMAIL_LEGGINGS:
             case DIAMOND_LEGGINGS:
             case GOLDEN_LEGGINGS:
             case IRON_LEGGINGS:
             case LEATHER_LEGGINGS:
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("PROTECTION_ENVIRONMENTAL"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("BINDING_CURSE"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DURABILITY"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("MENDING"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("PROTECTION_EXPLOSIONS"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("PROTECTION_FIRE"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("PROTECTION_PROJECTILE"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("THORNS"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("VANISHING_CURSE"));
+                validEnchantments.putAll(validateEnchantments("PROTECTION_ENVIRONMENTAL"));
+                validEnchantments.putAll(validateEnchantments("BINDING_CURSE"));
+                validEnchantments.putAll(validateEnchantments("DURABILITY"));
+                validEnchantments.putAll(validateEnchantments("MENDING"));
+                validEnchantments.putAll(validateEnchantments("PROTECTION_EXPLOSIONS"));
+                validEnchantments.putAll(validateEnchantments("PROTECTION_FIRE"));
+                validEnchantments.putAll(validateEnchantments("PROTECTION_PROJECTILE"));
+                validEnchantments.putAll(validateEnchantments("THORNS"));
+                validEnchantments.putAll(validateEnchantments("VANISHING_CURSE"));
                 break;
             case CHAINMAIL_BOOTS:
             case DIAMOND_BOOTS:
             case GOLDEN_BOOTS:
             case IRON_BOOTS:
             case LEATHER_BOOTS:
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("PROTECTION_ENVIRONMENTAL"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("BINDING_CURSE"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DURABILITY"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("MENDING"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("PROTECTION_EXPLOSIONS"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("PROTECTION_FALL"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("PROTECTION_FIRE"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("PROTECTION_PROJECTILE"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("THORNS"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("VANISHING_CURSE"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DEPTH_STRIDER"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("FROST_WALKER"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("SOUL_SPEED"));
+                validEnchantments.putAll(validateEnchantments("PROTECTION_ENVIRONMENTAL"));
+                validEnchantments.putAll(validateEnchantments("BINDING_CURSE"));
+                validEnchantments.putAll(validateEnchantments("DURABILITY"));
+                validEnchantments.putAll(validateEnchantments("MENDING"));
+                validEnchantments.putAll(validateEnchantments("PROTECTION_EXPLOSIONS"));
+                validEnchantments.putAll(validateEnchantments("PROTECTION_FALL"));
+                validEnchantments.putAll(validateEnchantments("PROTECTION_FIRE"));
+                validEnchantments.putAll(validateEnchantments("PROTECTION_PROJECTILE"));
+                validEnchantments.putAll(validateEnchantments("THORNS"));
+                validEnchantments.putAll(validateEnchantments("VANISHING_CURSE"));
+                validEnchantments.putAll(validateEnchantments("DEPTH_STRIDER"));
+                validEnchantments.putAll(validateEnchantments("FROST_WALKER"));
+                validEnchantments.putAll(validateEnchantments("SOUL_SPEED"));
                 break;
             case FISHING_ROD:
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DURABILITY"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("VANISHING_CURSE"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("MENDING"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("LUCK"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("LURE"));
+                validEnchantments.putAll(validateEnchantments("DURABILITY"));
+                validEnchantments.putAll(validateEnchantments("VANISHING_CURSE"));
+                validEnchantments.putAll(validateEnchantments("MENDING"));
+                validEnchantments.putAll(validateEnchantments("LUCK"));
+                validEnchantments.putAll(validateEnchantments("LURE"));
                 break;
             case SHEARS:
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DIG_SPEED"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("VANISHING_CURSE"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("MENDING"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DURABILITY"));
+                validEnchantments.putAll(validateEnchantments("DIG_SPEED"));
+                validEnchantments.putAll(validateEnchantments("VANISHING_CURSE"));
+                validEnchantments.putAll(validateEnchantments("MENDING"));
+                validEnchantments.putAll(validateEnchantments("DURABILITY"));
                 break;
         }
 
         /*
         Now that the primary enchantments are applied and the secondary enchantments are parsed, apply secondary enchants
          */
-        int secondaryEnchantmentTotalParsedLevel = totalSecondaryEnchantmentCount(validSecondaryEnchantments);
+        int secondaryEnchantmentTotalParsedLevel = totalSecondaryEnchantmentCount(validEnchantments);
         int maxSecondaryEnchantmentLevel = (secondaryEnchantmentTotalParsedLevel < itemTier - 2) ? secondaryEnchantmentTotalParsedLevel : (int) itemTier;
         int secondaryEnchantmentCount = ThreadLocalRandom.current().nextInt(maxSecondaryEnchantmentLevel + 1);
 
-        if (itemTier < 2 || secondaryEnchantmentCount < 1 || validSecondaryEnchantments.size() == 0) {
+        if (itemTier < 2 || secondaryEnchantmentCount < 1 || validEnchantments.size() == 0) {
             generateEnchantments(itemMeta, enchantmentMap);
             return enchantmentMap;
         }
 
-        HashMap<Enchantment, Integer> validEnchantmentsClone = (HashMap<Enchantment, Integer>) validSecondaryEnchantments.clone();
+        HashMap<Enchantment, Integer> validEnchantmentsClone = (HashMap<Enchantment, Integer>) validEnchantments.clone();
 
         while (ThreadLocalRandom.current().nextBoolean()) {
 
-            if (validSecondaryEnchantments.size() < 1)
+            if (validEnchantments.size() < 1)
                 break;
 
-            int randomIndex = ThreadLocalRandom.current().nextInt(validSecondaryEnchantments.size());
+            int randomIndex = ThreadLocalRandom.current().nextInt(validEnchantments.size());
 
             List<Enchantment> enchantmentList = new ArrayList();
 
-            for (Enchantment enchantment : validSecondaryEnchantments.keySet())
+            for (Enchantment enchantment : validEnchantments.keySet())
                 enchantmentList.add(enchantment);
 
             Enchantment enchantment = enchantmentList.get(randomIndex);
 
-            validSecondaryEnchantments.put(enchantment, validSecondaryEnchantments.get(enchantment) - 1);
+            validEnchantments.put(enchantment, validEnchantments.get(enchantment) - 1);
 
-            int finalEnchantLevel = validEnchantmentsClone.get(enchantment) - validSecondaryEnchantments.get(enchantment);
+            int finalEnchantLevel = validEnchantmentsClone.get(enchantment) - validEnchantments.get(enchantment);
             enchantmentMap.put(enchantment, finalEnchantLevel);
 
-            int newEnchantInt = validSecondaryEnchantments.get(enchantment);
+            int newEnchantInt = validEnchantments.get(enchantment);
 
-            if (newEnchantInt == 0) validSecondaryEnchantments.remove(enchantment);
+            if (newEnchantInt == 0) validEnchantments.remove(enchantment);
 
             secondaryEnchantmentCount--;
 
@@ -388,7 +390,7 @@ public class EnchantmentGenerator {
         /*
         Now that the primary enchantments are applied and the secondary enchantments are parsed, apply secondary enchants
          */
-        int secondaryEnchantmentTotalParsedLevel = totalSecondaryCustomEnchantmentCount(validSecondaryEnchantments);
+        int secondaryEnchantmentTotalParsedLevel = totalEnchantmentCount(validSecondaryEnchantments);
 
         if (itemTier < 2 || secondaryEnchantmentTotalParsedLevel < 1 || validSecondaryEnchantments.size() == 0)
             return enchantmentMap;
@@ -403,9 +405,14 @@ public class EnchantmentGenerator {
 
     }
 
-    private static HashMap<Enchantment, Integer> validateSecondaryEnchantments(String string) {
+    private static HashMap<Enchantment, Integer> validateEnchantments(String string) {
 
         EnchantmentsConfigFields enchantmentsConfigFields = EnchantmentsConfig.getEnchantment(string.toLowerCase() + ".yml");
+
+        if (enchantmentsConfigFields == null ||
+                !enchantmentsConfigFields.isEnabled() ||
+                !enchantmentsConfigFields.isEnabledForProcedurallyGeneratedItems())
+            return new HashMap<>();
 
         HashMap<Enchantment, Integer> enchantmentMap = new HashMap<>();
 
@@ -427,6 +434,11 @@ public class EnchantmentGenerator {
 
         EnchantmentsConfigFields enchantmentsConfigFields = EnchantmentsConfig.getEnchantment(string.toLowerCase() + ".yml");
 
+        if (enchantmentsConfigFields == null ||
+                !enchantmentsConfigFields.isEnabled() ||
+                !enchantmentsConfigFields.isEnabledForProcedurallyGeneratedItems())
+            return new HashMap<>();
+
         HashMap<String, Integer> enchantmentMap = new HashMap<>();
 
         if (enchantmentsConfigFields != null && enchantmentsConfigFields.isEnabled())
@@ -436,23 +448,23 @@ public class EnchantmentGenerator {
 
     }
 
-    private static int totalSecondaryEnchantmentCount(HashMap<Enchantment, Integer> validSecondaryEnchantments) {
+    private static int totalSecondaryEnchantmentCount(HashMap<Enchantment, Integer> validEnchantments) {
 
         int totalCount = 0;
 
-        for (Enchantment enchantment : validSecondaryEnchantments.keySet())
-            totalCount += validSecondaryEnchantments.get(enchantment);
+        for (Enchantment enchantment : validEnchantments.keySet())
+            totalCount += validEnchantments.get(enchantment);
 
         return totalCount;
 
     }
 
-    private static int totalSecondaryCustomEnchantmentCount(HashMap<String, Integer> validSecondaryEnchantments) {
+    private static int totalEnchantmentCount(HashMap<String, Integer> validEnchantments) {
 
         int totalCount = 0;
 
-        for (String enchantment : validSecondaryEnchantments.keySet())
-            totalCount += validSecondaryEnchantments.get(enchantment);
+        for (String enchantment : validEnchantments.keySet())
+            totalCount += validEnchantments.get(enchantment);
 
         return totalCount;
 

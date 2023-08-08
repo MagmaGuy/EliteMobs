@@ -8,6 +8,8 @@ public class ArrowDamageConfig extends EnchantmentsConfigFields {
                 true,
                 "Power",
                 5,
-                13);
+                13,
+                true,
+                100);
     }
 }

@@ -8,6 +8,8 @@ public class FireAspectConfig extends EnchantmentsConfigFields {
                 true,
                 "Fire Aspect",
                 2,
-                6);
+                6,
+                true,
+                2);
     }
 }

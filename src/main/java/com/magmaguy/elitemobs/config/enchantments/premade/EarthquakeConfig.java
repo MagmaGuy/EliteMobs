@@ -15,7 +15,9 @@ public class EarthquakeConfig extends EnchantmentsConfigFields {
                 true,
                 "Earthquake",
                 5,
-                50);
+                50,
+                false,
+                5);
     }
 
     @Override

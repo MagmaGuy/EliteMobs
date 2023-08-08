@@ -8,6 +8,8 @@ public class ImpalingConfig extends EnchantmentsConfigFields {
                 true,
                 "Impaling",
                 5,
-                6);
+                6,
+                true,
+                5);
     }
 }

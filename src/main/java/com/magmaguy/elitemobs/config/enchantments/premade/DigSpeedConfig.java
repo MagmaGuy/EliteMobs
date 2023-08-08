@@ -8,6 +8,8 @@ public class DigSpeedConfig extends EnchantmentsConfigFields {
                 true,
                 "Efficiency",
                 5,
-                13);
+                13,
+                false,
+                5);
     }
 }

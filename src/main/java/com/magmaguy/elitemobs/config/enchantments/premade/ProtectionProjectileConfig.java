@@ -8,6 +8,8 @@ public class ProtectionProjectileConfig extends EnchantmentsConfigFields {
                 true,
                 "Projectile Protection",
                 4,
-                6);
+                6,
+                true,
+                100);
     }
 }

@@ -8,6 +8,8 @@ public class DurabilityConfig extends EnchantmentsConfigFields {
                 true,
                 "Unbreaking",
                 3,
-                13);
+                13,
+                true,
+                10);
     }
 }

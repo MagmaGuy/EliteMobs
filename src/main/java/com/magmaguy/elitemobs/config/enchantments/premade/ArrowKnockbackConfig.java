@@ -8,6 +8,8 @@ public class ArrowKnockbackConfig extends EnchantmentsConfigFields {
                 true,
                 "Punch",
                 2,
-                6);
+                6,
+                true,
+                10);
     }
 }

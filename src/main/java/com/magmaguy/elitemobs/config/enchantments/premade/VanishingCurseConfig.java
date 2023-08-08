@@ -8,6 +8,8 @@ public class VanishingCurseConfig extends EnchantmentsConfigFields {
                 true,
                 "Curse of Vanishing",
                 1,
-                -1);
+                -1,
+                true,
+                1);
     }
 }

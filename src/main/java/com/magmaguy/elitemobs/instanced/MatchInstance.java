@@ -154,7 +154,10 @@ public abstract class MatchInstance {
     private void intruderWatchdog() {
         if (state != InstancedRegionState.ONGOING) return;
         for (Player player : Bukkit.getOnlinePlayers())
-            if (!players.contains(player) && !spectators.contains(player) && isInRegion(player.getLocation())) {
+            if (!players.contains(player) &&
+                    !spectators.contains(player) &&
+                    !player.hasPermission("elitemobs.*") &&
+                    isInRegion(player.getLocation())) {
                 MatchInstanceEvents.teleportBypass = true;
                 if (exitLocation != null) player.teleport(exitLocation);
                 else if (PlayerData.getBackTeleportLocation(player) != null)

@@ -11,7 +11,9 @@ public class LightningConfig extends EnchantmentsConfigFields {
                 true,
                 "Lightning",
                 5,
-                15);
+                15,
+                true,
+                5);
     }
 
     @Override

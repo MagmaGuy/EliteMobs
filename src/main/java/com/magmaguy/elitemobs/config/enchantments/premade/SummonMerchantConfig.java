@@ -11,7 +11,9 @@ public class SummonMerchantConfig extends EnchantmentsConfigFields {
                 true,
                 "Summon Merchant",
                 1,
-                10);
+                10,
+                false,
+                1);
 
     }
 

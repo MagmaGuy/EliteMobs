@@ -8,6 +8,8 @@ public class DamageArthropodsConfig extends EnchantmentsConfigFields {
                 true,
                 "Bane of Arthropods",
                 4,
-                6);
+                6,
+                true,
+                100);
     }
 }
