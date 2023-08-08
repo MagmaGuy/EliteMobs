@@ -8,6 +8,8 @@ public class LuckySourceConfig extends EnchantmentsConfigFields {
                 true,
                 "Lucky Source",
                 1,
-                20);
+                20,
+                false,
+                1);
     }
 }

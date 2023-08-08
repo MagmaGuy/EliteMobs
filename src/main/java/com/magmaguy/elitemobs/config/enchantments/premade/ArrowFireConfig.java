@@ -8,6 +8,8 @@ public class ArrowFireConfig extends EnchantmentsConfigFields {
                 true,
                 "Flame",
                 1,
-                6);
+                6,
+                true,
+                1);
     }
 }

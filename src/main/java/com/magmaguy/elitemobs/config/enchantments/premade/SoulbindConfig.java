@@ -11,7 +11,9 @@ public class SoulbindConfig extends EnchantmentsConfigFields {
                 true,
                 "Soulbind",
                 1,
-                10);
+                10,
+                true,
+                1);
     }
 
     @Override

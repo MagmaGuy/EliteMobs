@@ -142,7 +142,7 @@ public class FlamethrowerEnchantment extends CustomEnchantment {
                         return;
                     }
                     doParticleEffect(player, target, Particle.FLAME);
-                    if (timer % 10 == 0) doDamage(damagePoints, player);
+                    if (timer % 20 == 0) doDamage(damagePoints, player);
                     timer++;
                     if (timer < 20 * 3) return;
                     doFlamethrowerPhase3(player, target);

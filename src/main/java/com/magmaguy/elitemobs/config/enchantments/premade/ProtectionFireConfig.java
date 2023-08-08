@@ -8,6 +8,8 @@ public class ProtectionFireConfig extends EnchantmentsConfigFields {
                 true,
                 "Fire Protection",
                 4,
-                6);
+                6,
+                true,
+                4);
     }
 }

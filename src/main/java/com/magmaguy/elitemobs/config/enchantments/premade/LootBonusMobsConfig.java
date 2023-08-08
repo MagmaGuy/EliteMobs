@@ -8,6 +8,8 @@ public class LootBonusMobsConfig extends EnchantmentsConfigFields {
                 true,
                 "Looting",
                 3,
-                6);
+                6,
+                true,
+                3);
     }
 }

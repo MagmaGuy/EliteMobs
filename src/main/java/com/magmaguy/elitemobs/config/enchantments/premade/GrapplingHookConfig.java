@@ -8,6 +8,8 @@ public class GrapplingHookConfig extends EnchantmentsConfigFields {
                 true,
                 "Grappling Hook",
                 1,
-                10);
+                10,
+                false,
+                1);
     }
 }

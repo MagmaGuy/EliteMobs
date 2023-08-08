@@ -15,7 +15,9 @@ public class CriticalStrikesConfig extends EnchantmentsConfigFields {
                 true,
                 "Critical Strikes",
                 2,
-                13);
+                13,
+                true,
+                3);
     }
 
     @Override

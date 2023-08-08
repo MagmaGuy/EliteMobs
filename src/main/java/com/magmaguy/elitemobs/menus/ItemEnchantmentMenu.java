@@ -182,6 +182,14 @@ public class ItemEnchantmentMenu extends EliteMenu {
             } else {
                 handleBottomInventory(event);
             }
+
+            if (event.getInventory().getItem(ENCHANTED_BOOK_SLOT) != null &&
+                    event.getInventory().getItem(ITEM_SLOT) != null &&
+                    !UpgradeSystem.isValidUpgrade(event.getView().getTopInventory().getItem(ITEM_SLOT),
+                            event.getView().getTopInventory().getItem(ENCHANTED_BOOK_SLOT))) {
+                event.getWhoClicked().sendMessage(ItemEnchantmentMenuConfig.getEnchantmentLimitMessage());
+                event.getWhoClicked().closeInventory();
+            }
         }
 
         private void handleTopInventory(InventoryClickEvent event) {

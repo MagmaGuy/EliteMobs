@@ -8,6 +8,8 @@ public class SilkTouchConfig extends EnchantmentsConfigFields {
                 true,
                 "Silk Touch",
                 1,
-                13);
+                13,
+                true,
+                1);
     }
 }

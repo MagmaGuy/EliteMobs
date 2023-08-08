@@ -8,6 +8,8 @@ public class MendingConfig extends EnchantmentsConfigFields {
                 false,
                 "Mending",
                 1,
-                13);
+                13,
+                false,
+                1);
     }
 }

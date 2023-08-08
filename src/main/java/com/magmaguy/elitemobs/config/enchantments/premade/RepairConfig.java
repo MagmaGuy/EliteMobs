@@ -8,6 +8,8 @@ public class RepairConfig extends EnchantmentsConfigFields {
                 true,
                 "Repair",
                 5,
-                15);
+                15,
+                false,
+                5);
     }
 }

@@ -8,6 +8,8 @@ public class WaterWorkerConfig extends EnchantmentsConfigFields {
                 true,
                 "Aqua Affinity",
                 1,
-                6);
+                6,
+                true,
+                1);
     }
 }

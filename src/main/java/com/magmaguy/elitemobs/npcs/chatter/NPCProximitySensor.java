@@ -29,14 +29,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class NPCProximitySensor implements Listener {
 
-    private final HashSet<Player> nearbyPlayers = new HashSet<>();
+    private static final HashSet<Player> nearbyPlayers = new HashSet<>();
 
     public NPCProximitySensor() {
         new BukkitRunnable() {
 
             @Override
             public void run() {
-                HashSet<Player> seenPlayerList = (HashSet<Player>) nearbyPlayers.clone();
+                HashSet<Player> unseenPlayerList = (HashSet<Player>) nearbyPlayers.clone();
                 for (NPCEntity npcEntity : EntityTracker.getNpcEntities().values()) {
                     if (!npcEntity.isValid()) continue;
                     for (Entity entity : npcEntity.getVillager().getNearbyEntities(npcEntity.getNPCsConfigFields().getActivationRadius(),
@@ -45,10 +45,10 @@ public class NPCProximitySensor implements Listener {
                         Player player = (Player) entity;
                         Location rotatedLocation = npcEntity.getVillager().getLocation().setDirection(entity.getLocation().subtract(npcEntity.getVillager().getLocation()).toVector());
                         npcEntity.getVillager().teleport(rotatedLocation);
-                        if (seenPlayerList.contains(player)) {
+                        if (unseenPlayerList.contains(player)) {
                             if (!npcEntity.getNPCsConfigFields().getInteractionType().equals(NPCInteractions.NPCInteractionType.CHAT))
                                 npcEntity.sayDialog(player);
-                            seenPlayerList.remove(player);
+                            unseenPlayerList.remove(player);
                         } else {
                             npcEntity.sayGreeting(player);
                             nearbyPlayers.add(player);
@@ -57,7 +57,7 @@ public class NPCProximitySensor implements Listener {
                     }
                 }
 
-                nearbyPlayers.removeIf(seenPlayerList::contains);
+                nearbyPlayers.removeIf(unseenPlayerList::contains);
 
             }
 

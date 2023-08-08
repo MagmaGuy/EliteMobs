@@ -8,6 +8,8 @@ public class MeteorShowerConfig extends EnchantmentsConfigFields {
                 true,
                 "Meteor Shower",
                 1,
-                130);
+                130,
+                false,
+                1);
     }
 }

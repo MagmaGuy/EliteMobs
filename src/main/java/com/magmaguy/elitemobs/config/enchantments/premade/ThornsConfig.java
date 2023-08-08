@@ -8,6 +8,8 @@ public class ThornsConfig extends EnchantmentsConfigFields {
                 true,
                 "Thorns",
                 3,
-                6);
+                6,
+                true,
+                10);
     }
 }

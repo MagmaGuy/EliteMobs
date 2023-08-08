@@ -8,6 +8,8 @@ public class MultishotConfig extends EnchantmentsConfigFields {
                 true,
                 "Multishot",
                 1,
-                6);
+                6,
+                true,
+                1);
     }
 }

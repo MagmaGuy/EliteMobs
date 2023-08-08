@@ -8,6 +8,8 @@ public class PlasmaBootsConfig extends EnchantmentsConfigFields {
                 true,
                 "Plasma Boots",
                 3,
-                20);
+                20,
+                false,
+                3);
     }
 }
