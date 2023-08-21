@@ -13,6 +13,7 @@ public class CustomBossMount {
     private CustomBossMount() {
     }
 
+    //todo: Now that the boss megaconsumer exists, it's possible that delaying the mount by 5 ticks is no longer necessary and that we can just put it in the consumer... maybe
     public static CustomBossEntity generateMount(CustomBossEntity customBossEntity) {
         if (customBossEntity.customBossesConfigFields.getMountedEntity() == null) return null;
         if (customBossEntity.getLivingEntity() == null) {
@@ -45,8 +46,8 @@ public class CustomBossMount {
                 new BukkitRunnable() {
                     @Override
                     public void run() {
-                        if (!mountEntity.isValid())
-                            return;
+                        if (!mountEntity.isValid()) return;
+                        if (customBossEntity.getLivingEntity() == null) return;
                         if (mountEntity.getCustomModel() != null)
                             mountEntity.getCustomModel().addPassenger(customBossEntity);
                         else {

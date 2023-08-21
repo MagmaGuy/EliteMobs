@@ -84,6 +84,11 @@ public class ScriptConditions {
         return conditionsBlueprint.getIsOnFloor() == !currentBlock.getType().isSolid() && floorBlock.getType().isSolid();
     }
 
+    private boolean isStandingOn(Location targetLocation) {
+        if (conditionsBlueprint.getIsStandingOnMaterial() == null) return true;
+        Block floorBlock = targetLocation.clone().subtract(0, 1, 0).getBlock();
+        return floorBlock.getType() == conditionsBlueprint.getIsStandingOnMaterial();
+    }
 
     public boolean meetsPreActionConditions(EliteEntity eliteEntity, LivingEntity directTarget) {
         if (scriptTargets == null) return true;
@@ -125,6 +130,7 @@ public class ScriptConditions {
         if (livingEntity == null) return false;
         if (!isAliveCheck(livingEntity)) return false;
         if (!hasTagsCheck(livingEntity)) return false;
+        if (!checkConditions(livingEntity.getLocation())) return false;
         return doesNotHaveTags(livingEntity);
     }
 
@@ -133,7 +139,8 @@ public class ScriptConditions {
 
         if (location == null) return true;
         return isAirCheck(location) &&
-                isOnFloor(location);
+                isOnFloor(location) &&
+                isStandingOn(location);
     }
 
 

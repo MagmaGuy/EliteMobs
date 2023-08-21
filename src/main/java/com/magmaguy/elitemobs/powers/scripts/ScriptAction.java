@@ -14,8 +14,8 @@ import com.magmaguy.elitemobs.powers.meta.CustomSummonPower;
 import com.magmaguy.elitemobs.powers.scripts.caching.ScriptActionBlueprint;
 import com.magmaguy.elitemobs.powers.scripts.enums.ActionType;
 import com.magmaguy.elitemobs.powers.scripts.enums.TargetType;
-import com.magmaguy.elitemobs.utils.VersionChecker;
 import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -603,8 +603,10 @@ public class ScriptAction {
             Entity entity;
             if (scriptActionData.getTargetType().equals(TargetType.SELF) &&
                     scriptActionData.getEliteEntity().getLivingEntity() != null &&
-                    Projectile.class.isAssignableFrom(entityType.getEntityClass()))
+                    Projectile.class.isAssignableFrom(entityType.getEntityClass())) {
                 entity = scriptActionData.getEliteEntity().getLivingEntity().launchProjectile(entityType.getEntityClass().asSubclass(Projectile.class), velocity);
+                ((Projectile) entity).setShooter(scriptActionData.getEliteEntity().getLivingEntity());
+            }
             else {
                 entity = targetLocation.getWorld().spawn(targetLocation, entityType.getEntityClass());
                 entity.setVelocity(velocity);

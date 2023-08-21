@@ -75,6 +75,9 @@ public class PlayerItem {
                 itemStack = new ItemStack(Material.AIR);
             }
 
+        //Neither offhand nor armor contribute to baseline damage outside of the enchants, so we reset the damage before anything
+        this.eliteDamage = 0;
+
         //case when the item changed during runtime to another valid ItemStack
         this.itemStack = itemStack;
         if (equipmentSlot.equals(EquipmentSlot.MAINHAND)) {

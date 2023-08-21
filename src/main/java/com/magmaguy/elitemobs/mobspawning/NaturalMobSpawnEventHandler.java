@@ -19,7 +19,7 @@ import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser;
 import com.magmaguy.elitemobs.utils.PlayerScanner;
-import com.magmaguy.elitemobs.utils.VersionChecker;
+import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -170,7 +170,6 @@ public class NaturalMobSpawnEventHandler implements Listener {
             eliteMobLevel = MobCombatSettingsConfig.getNaturalEliteMobLevelCap();
 
         EliteEntity eliteEntity = new EliteEntity(livingEntity, eliteMobLevel, event.getSpawnReason());
-        EntityTracker.registerEliteMob(eliteEntity);
 
         if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.SPAWNER))
             eliteEntity.setEliteLoot(false);

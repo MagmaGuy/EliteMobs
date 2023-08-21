@@ -1,6 +1,6 @@
 package com.magmaguy.elitemobs.combatsystem;
 
-import com.magmaguy.elitemobs.utils.VersionChecker;
+import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import org.bukkit.Material;
 
 public class CombatSystem {

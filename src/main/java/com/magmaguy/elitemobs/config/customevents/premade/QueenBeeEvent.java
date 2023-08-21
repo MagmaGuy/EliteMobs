@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.config.customevents.premade;
 
 import com.magmaguy.elitemobs.config.customevents.CustomEventsConfigFields;
 import com.magmaguy.elitemobs.events.CustomEvent;
-import com.magmaguy.elitemobs.utils.VersionChecker;
+import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import org.bukkit.Material;
 
 import java.util.List;

@@ -49,24 +49,6 @@ public class ElitePlayerInventory {
             playerInventories.put(player.getUniqueId(), new ElitePlayerInventory(player));
     }
 
-    /**
-     * An average of all equipped armor tiers!
-     *
-     * @return Average of all armor tiers
-     */
-    public double getArmorLevel(boolean update) {
-        if (isUpdateLock) update = false;
-        double armorLevel = (helmet.getTier(player.getInventory().getHelmet(), update) +
-                chestplate.getTier(player.getInventory().getChestplate(), update) +
-                leggings.getTier(player.getInventory().getLeggings(), update) +
-                boots.getTier(player.getInventory().getBoots(), update) +
-                mainhand.getTier(player.getInventory().getItemInMainHand(), update) +
-                offhand.getTier(player.getInventory().getItemInOffHand(), update))
-                / 4D;
-        updateLock();
-        return armorLevel;
-    }
-
     public double getEliteDamage(boolean update) {
         if (isUpdateLock) update = false;
         double eliteDamage = helmet.getEliteDamage(player.getInventory().getHelmet(), update) +
@@ -86,7 +68,7 @@ public class ElitePlayerInventory {
                 leggings.getEliteDefense(player.getInventory().getLeggings(), update) +
                 boots.getEliteDefense(player.getInventory().getBoots(), update) +
                 mainhand.getEliteDefense(player.getInventory().getItemInMainHand(), update) +
-                mainhand.getEliteDefense(player.getInventory().getItemInOffHand(), update);
+                offhand.getEliteDefense(player.getInventory().getItemInOffHand(), update);
         updateLock();
         return defense;
     }
@@ -100,7 +82,7 @@ public class ElitePlayerInventory {
                 boots.getProtectionProjectile(player.getInventory().getBoots(), update) +
                 mainhand.getProtectionProjectile(player.getInventory().getItemInMainHand(), update) +
                 offhand.getProtectionProjectile(player.getInventory().getItemInOffHand(), update))
-                / 4d;
+                / 6d;
         updateLock();
         return eliteProjectileProtection;
     }
@@ -113,7 +95,7 @@ public class ElitePlayerInventory {
                 boots.getBlastProtection(player.getInventory().getBoots(), update) +
                 mainhand.getBlastProtection(player.getInventory().getItemInMainHand(), update) +
                 offhand.getBlastProtection(player.getInventory().getItemInOffHand(), update))
-                / 4d;
+                / 6d;
         updateLock();
         return eliteBlastProtection;
     }
@@ -249,16 +231,6 @@ public class ElitePlayerInventory {
         if (getWeaponLevel(true) == 0)
             return 1;
         return getWeaponLevel(false);
-    }
-
-    /**
-     * Outputs the base damage reduction given the current gear. Does not take secondary enchantments into accounts,
-     * such as Blast Protection
-     *
-     * @return Base damage reduction value
-     */
-    public double baseDamageReduction() {
-        return getArmorLevel(true);
     }
 
     public double getLoudStrikesBonusMultiplier(boolean update) {

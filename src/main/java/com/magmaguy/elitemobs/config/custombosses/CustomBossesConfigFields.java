@@ -387,7 +387,7 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
 
     private HashMap<Material, Double> processDamageModifiers(String path, HashMap<Material, Double> pluginDefaults) {
         HashMap<Material, Double> hashMap = new HashMap<>();
-        if (!fileConfiguration.contains(path))
+        if (!fileConfiguration.contains(path) && damageModifiers.isEmpty())
             return pluginDefaults;
 
         for (String rawDamageModifier : fileConfiguration.getStringList(path)) {

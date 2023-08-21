@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.utils.MapListInterpreter;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemorySection;
 
@@ -34,6 +35,9 @@ public class ScriptConditionsBlueprint {
     @Getter
     @Setter
     private ConditionType conditionType = null;
+    @Getter
+    @Setter
+    private Material isStandingOnMaterial = null;
 
     //Process from a script
     public ScriptConditionsBlueprint(ConfigurationSection configurationSection, String scriptName, String filename) {
@@ -60,6 +64,7 @@ public class ScriptConditionsBlueprint {
             case "hastags" -> hasTags = MapListInterpreter.parseStringList(key, value, scriptName);
             case "doesnothavetags" -> doesNotHaveTags = MapListInterpreter.parseStringList(key, value, scriptName);
             case "isonfloor" -> isOnFloor = MapListInterpreter.parseBoolean(key, value, scriptName);
+            case "isstandingonmaterial" -> isStandingOnMaterial = MapListInterpreter.parseEnum(key, value, Material.class, scriptName);
             case "target" -> {
                 if (value instanceof MemorySection memorySection)
                     value = memorySection.getValues(false);
