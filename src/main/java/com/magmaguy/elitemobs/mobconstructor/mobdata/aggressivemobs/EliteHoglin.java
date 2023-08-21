@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs;
 
 import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfig;
-import com.magmaguy.elitemobs.utils.VersionChecker;
+import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import org.bukkit.entity.EntityType;
 
 public class EliteHoglin extends EliteMobProperties {

@@ -318,10 +318,10 @@ public class UserCommands {
         // /em arena <arenaFilename>
         manager.command(builder.literal("arena")
                 .meta(CommandMeta.DESCRIPTION, "Opens the arena menu.")
-                .argument(StringArgument.newBuilder("dungeonid"), ArgumentDescription.of("Name of the arena to go to."))
+                .argument(StringArgument.newBuilder("arenaid"), ArgumentDescription.of("Name of the arena to go to."))
                 .senderType(Player.class)
                 .handler(commandContext -> {
-                    ArenaCommands.openArenaMenu(((Player) commandContext.getSender()), commandContext.get("arena"));
+                    ArenaCommands.openArenaMenu(((Player) commandContext.getSender()), commandContext.get("arenaid"));
                 }));
 
         // /em start - this is for instanced content

@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.collateralminecraftchanges;
 
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
-import com.magmaguy.elitemobs.utils.VersionChecker;
+import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

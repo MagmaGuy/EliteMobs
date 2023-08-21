@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.config.custombosses.premade;
 
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
-import com.magmaguy.elitemobs.utils.VersionChecker;
+import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.EntityType;

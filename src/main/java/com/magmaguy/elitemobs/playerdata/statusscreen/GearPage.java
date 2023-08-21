@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.menus.premade.PlayerStatusMenuConfig;
 import com.magmaguy.elitemobs.items.ShareItem;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
-import com.magmaguy.elitemobs.utils.VersionChecker;
+import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -100,7 +100,7 @@ public class GearPage {
         if (string.contains("$damage"))
             return string.replace("$damage", ElitePlayerInventory.playerInventories.get(targetPlayer.getUniqueId()).baseDamage() + "");
         if (string.contains("$armor"))
-            return string.replace("$armor", ElitePlayerInventory.playerInventories.get(targetPlayer.getUniqueId()).baseDamageReduction() + "");
+            return string.replace("$armor", ElitePlayerInventory.playerInventories.get(targetPlayer.getUniqueId()).getEliteDefense(false) + "");
         if (string.contains("$threat"))
             return string.replace("$threat", ElitePlayerInventory.playerInventories.get(targetPlayer.getUniqueId()).getNaturalMobSpawnLevel(true) + "");
 
@@ -233,7 +233,7 @@ public class GearPage {
                         ElitePlayerInventory.playerInventories.get(targetPlayer.getUniqueId()).baseDamage() + ""));
         inventory.setItem(PlayerStatusMenuConfig.getGearArmorSlot(),
                 replaceItemNamePlaceholder(PlayerStatusMenuConfig.getGearArmorItem().clone(), "$defense",
-                        ElitePlayerInventory.playerInventories.get(targetPlayer.getUniqueId()).baseDamageReduction() + ""));
+                        ElitePlayerInventory.playerInventories.get(targetPlayer.getUniqueId()).getEliteDefense(false) + ""));
         inventory.setItem(PlayerStatusMenuConfig.getGearThreatSlot(),
                 replaceItemNamePlaceholder(PlayerStatusMenuConfig.getGearThreatItem().clone(), "$threat",
                         ElitePlayerInventory.playerInventories.get(targetPlayer.getUniqueId()).getNaturalMobSpawnLevel(true) + ""));

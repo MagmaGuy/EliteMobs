@@ -32,6 +32,33 @@ public class VersionChecker {
     private VersionChecker() {
     }
 
+    /**
+     * Compares a Minecraft version with the current version on the server. Returns true if the version on the server is older.
+     *
+     * @param majorVersion Target major version to compare (i.e. 1.>>>17<<<.0)
+     * @param minorVersion Target minor version to compare (i.e. 1.17.>>>0<<<)
+     * @return Whether the version is under the value to be compared
+     */
+    public static boolean serverVersionOlderThan(int majorVersion, int minorVersion) {
+
+        String[] splitVersion = Bukkit.getBukkitVersion().split("[.]");
+
+        int actualMajorVersion = Integer.parseInt(splitVersion[1].split("-")[0]);
+
+        int actualMinorVersion = 0;
+        if (splitVersion.length > 2)
+            actualMinorVersion = Integer.parseInt(splitVersion[2].split("-")[0]);
+
+        if (actualMajorVersion < majorVersion)
+            return true;
+
+        if (splitVersion.length > 2)
+            return actualMajorVersion == majorVersion && actualMinorVersion < minorVersion;
+
+        return false;
+
+    }
+
     private static void checkPluginVersion() {
         new BukkitRunnable() {
             @Override
@@ -86,9 +113,12 @@ public class VersionChecker {
     private static void checkDungeonVersions() {
         Bukkit.getScheduler().runTaskAsynchronously(MetadataHandler.PLUGIN, () -> {
             outdatedPackages.clear();
-            for (EMPackage emPackage : EMPackage.getEmPackages().values())
+            for (EMPackage emPackage : EMPackage.getEmPackages().values()) {
+                Developer.message("iterating");
                 if (emPackage.isInstalled()) {
+                    Developer.message("Checking installed");
                     if (!emPackage.getDungeonPackagerConfigFields().isDefaultDungeon()) continue;
+                    Developer.message("Checking default dungeon");
                     try {
                         String versionString = readStringFromURL("https://www.magmaguy.com/api/" + emPackage.getDungeonPackagerConfigFields().getFilename().replace(".yml", ""));
                         int releaseVersion = Integer.parseInt(versionString);
@@ -101,6 +131,7 @@ public class VersionChecker {
                         new WarningMessage("Failed to get version for EliteMobs package " + emPackage.getDungeonPackagerConfigFields().getFilename() + "! The URL " + "https://www.magmaguy.com/api/" + emPackage.getDungeonPackagerConfigFields().getFilename().replace(".yml", "") + " could not be reached!");
                     }
                 }
+            }
         });
     }
 
