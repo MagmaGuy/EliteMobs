@@ -7,7 +7,6 @@ import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
-import com.magmaguy.elitemobs.utils.Developer;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import lombok.Getter;
 import lombok.Setter;
@@ -166,14 +165,11 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
             else if (event.getDamager() instanceof Projectile && ((Projectile) event.getDamager()).getShooter() instanceof LivingEntity) {
                 eliteEntity = EntityTracker.getEliteMobEntity((LivingEntity) ((Projectile) event.getDamager()).getShooter());
                 projectile = (Projectile) event.getDamager();
-                Developer.message("You just got hit with a projectile");
             } else if (event.getDamager().getType().equals(EntityType.EVOKER_FANGS))
                 if (((EvokerFangs) event.getDamager()).getOwner() != null)
                     eliteEntity = EntityTracker.getEliteMobEntity(((EvokerFangs) event.getDamager()).getOwner());
 
             if (eliteEntity == null || eliteEntity.getLivingEntity() == null) return;
-
-            if (projectile != null) Developer.message("correctly assigned ranged damage to the boss");
 
             //By this point, it is guaranteed that this kind of damage should have custom EliteMobs behavior
 

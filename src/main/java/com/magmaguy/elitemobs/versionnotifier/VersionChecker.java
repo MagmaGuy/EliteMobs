@@ -114,11 +114,8 @@ public class VersionChecker {
         Bukkit.getScheduler().runTaskAsynchronously(MetadataHandler.PLUGIN, () -> {
             outdatedPackages.clear();
             for (EMPackage emPackage : EMPackage.getEmPackages().values()) {
-                Developer.message("iterating");
                 if (emPackage.isInstalled()) {
-                    Developer.message("Checking installed");
                     if (!emPackage.getDungeonPackagerConfigFields().isDefaultDungeon()) continue;
-                    Developer.message("Checking default dungeon");
                     try {
                         String versionString = readStringFromURL("https://www.magmaguy.com/api/" + emPackage.getDungeonPackagerConfigFields().getFilename().replace(".yml", ""));
                         int releaseVersion = Integer.parseInt(versionString);
