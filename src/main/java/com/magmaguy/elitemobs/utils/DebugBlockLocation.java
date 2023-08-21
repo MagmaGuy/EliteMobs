@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.utils;
 
+import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.util.Vector;

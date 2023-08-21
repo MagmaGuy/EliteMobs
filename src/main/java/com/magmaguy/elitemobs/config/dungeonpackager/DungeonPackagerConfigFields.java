@@ -155,6 +155,7 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
         this.regionEnterMessage = regionEnterMessage;
         this.regionLeaveMessage = regionLeaveMessage;
         this.dungeonConfigFolderName = dungeonConfigFolderName;
+        defaultDungeon = true;
     }
 
     //For instanced dungeons
@@ -194,6 +195,7 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
         this.rawDungeonObjectives = rawDungeonObjectives;
         this.dungeonConfigFolderName = dungeonConfigFolderName;
         this.contentLevel = contentLevel;
+        defaultDungeon = true;
     }
 
     /**
@@ -255,6 +257,7 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
         this.regionLeaveMessage = regionLeaveMessage;
         this.defaultSchematicRotationString = defaultSchematicRotation;
         this.dungeonConfigFolderName = dungeonConfigFolderName;
+        defaultDungeon = true;
     }
 
     public DungeonPackagerConfigFields(String fileName,

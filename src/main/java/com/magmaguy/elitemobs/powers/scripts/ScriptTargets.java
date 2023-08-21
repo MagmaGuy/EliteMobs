@@ -120,6 +120,16 @@ public class ScriptTargets {
                                 targetBlueprint.getRange(),
                                 (entity -> entity.getType() == EntityType.PLAYER))
                         .stream().map(Player.class::cast).collect(Collectors.toSet());
+            case NEARBY_MOBS:
+                return eliteEntityLocation.getWorld()
+                        .getNearbyEntities(
+                                eliteEntityLocation,
+                                targetBlueprint.getRange(),
+                                targetBlueprint.getRange(),
+                                targetBlueprint.getRange(),
+                                (entity -> entity.getType() != EntityType.PLAYER && entity instanceof LivingEntity &&
+                                        !entity.getUniqueId().equals(scriptActionData.getEliteEntity().getUnsyncedLivingEntity().getUniqueId())))
+                        .stream().map(LivingEntity.class::cast).collect(Collectors.toSet());
             case DIRECT_TARGET:
                 return new ArrayList<>(List.of(scriptActionData.getDirectTarget()));
             case SELF:

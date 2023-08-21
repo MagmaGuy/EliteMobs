@@ -5,7 +5,7 @@ import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import com.magmaguy.elitemobs.powers.meta.MinorPower;
-import com.magmaguy.elitemobs.utils.VersionChecker;
+import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.Item;

@@ -67,7 +67,7 @@ import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardDungeonFlag;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardEliteMobOnlySpawnFlag;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
-import com.magmaguy.elitemobs.utils.VersionChecker;
+import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;

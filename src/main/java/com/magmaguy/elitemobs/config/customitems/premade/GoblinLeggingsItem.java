@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.config.customitems.premade;
 
 import com.magmaguy.elitemobs.config.customitems.CustomItemsConfigFields;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
-import com.magmaguy.elitemobs.utils.VersionChecker;
+import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import org.bukkit.Material;
 
 import java.util.Arrays;

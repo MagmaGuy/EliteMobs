@@ -1,8 +1,8 @@
 package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
-import com.magmaguy.elitemobs.utils.VersionChecker;
 import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import lombok.Getter;
 import org.bukkit.configuration.file.FileConfiguration;
 
