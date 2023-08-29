@@ -67,9 +67,7 @@ public class ScriptConditions {
 
         if (entityTags == null) return false;
 
-        for (String tag : blueprintTags)
-            if (!entityTags.contains(tag)) return false;
-        return true;
+        return entityTags.containsAll(blueprintTags);
     }
 
     private boolean isAirCheck(Location targetLocation) {
@@ -103,17 +101,21 @@ public class ScriptConditions {
         return checkRandomizer();
     }
 
+    /**
+     * Action conditions only care about blocking conditions
+     *
+     * @param scriptActionData
+     * @return
+     */
     public boolean meetsActionConditions(ScriptActionData scriptActionData) {
         if (scriptTargets == null) return true;
         //Can happen due to configuration mistakes related to setting the targets
         if (scriptActionData == null) return false;
-
         //if the target is self and the condition is isAlive the condition will always be blocking
-        if (!conditionsBlueprint.getConditionType().equals(ConditionType.BLOCKING)) {
-            if (scriptTargets.getTargetBlueprint().getTargetType().equals(TargetType.SELF))
-                return isAliveCheck(scriptActionData.getEliteEntity().getLivingEntity());
-            return true;
-        }
+        if (scriptTargets.getTargetBlueprint().getTargetType().equals(TargetType.SELF) &&
+                !isAliveCheck(scriptActionData.getEliteEntity().getLivingEntity())) return false;
+        //This method only cares about blocking conditions, the action either is entirely valid or not at all
+        if (!conditionsBlueprint.getConditionType().equals(ConditionType.BLOCKING)) return true;
 
         for (LivingEntity livingEntity : scriptTargets.getTargetEntities(scriptActionData))
             if (!checkConditions(livingEntity)) return false;

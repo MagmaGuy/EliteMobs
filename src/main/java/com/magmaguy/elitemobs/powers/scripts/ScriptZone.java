@@ -21,11 +21,11 @@ public class ScriptZone {
     @Getter
     private final ScriptZoneBlueprint zoneBlueprint;
     private final ScriptTargets targets;
+    @Getter
+    private final boolean isValid;
     private ScriptTargets finalTargets = null;
     private ScriptTargets targets2 = null;
     private ScriptTargets finalTargets2 = null;
-    @Getter
-    private final boolean isValid;
 
     public ScriptZone(ScriptZoneBlueprint zoneBlueprint, EliteScript eliteScript) {
         this.zoneBlueprint = zoneBlueprint;
@@ -106,7 +106,8 @@ public class ScriptZone {
                         break;
                     }
                     for (Location location : targets2.getTargetLocations(scriptActionData))
-                        shapes.add(new StaticRay(zoneBlueprint.isIgnoresSolidBlocks(), zoneBlueprint.getPointRadius(), shapeTargetLocation, location));
+                        if (rayLocationValidator(shapeTargetLocation, location))
+                            shapes.add(new StaticRay(zoneBlueprint.isIgnoresSolidBlocks(), zoneBlueprint.getPointRadius(), shapeTargetLocation, location));
                     break;
                 case ROTATING_RAY:
                     if (targets2 == null) {
@@ -114,7 +115,8 @@ public class ScriptZone {
                         break;
                     }
                     for (Location target2Location : targets2.getTargetLocations(scriptActionData))
-                        shapes.add(new RotatingRay(zoneBlueprint.isIgnoresSolidBlocks(), zoneBlueprint.getPointRadius(), shapeTargetLocation, target2Location, zoneBlueprint.getPitchPreRotation(), zoneBlueprint.getYawPreRotation(), zoneBlueprint.getPitchRotation(), zoneBlueprint.getYawRotation(), zoneBlueprint.getAnimationDuration()));
+                        if (rayLocationValidator(shapeTargetLocation, target2Location))
+                            shapes.add(new RotatingRay(zoneBlueprint.isIgnoresSolidBlocks(), zoneBlueprint.getPointRadius(), shapeTargetLocation, target2Location, zoneBlueprint.getPitchPreRotation(), zoneBlueprint.getYawPreRotation(), zoneBlueprint.getPitchRotation(), zoneBlueprint.getYawRotation(), zoneBlueprint.getAnimationDuration()));
                     break;
                 case TRANSLATING_RAY:
                     if (targets2 == null) {
@@ -132,7 +134,8 @@ public class ScriptZone {
                         if (!finalTargetsList.isEmpty()) target2LocationEnd = finalTargetsList.get(0);
                     }
                     for (Location location : targets2.getTargetLocations(scriptActionData))
-                        shapes.add(new TranslatingRay(zoneBlueprint.isIgnoresSolidBlocks(), zoneBlueprint.getPointRadius(), shapeTargetLocation, targetLocationEnd, location, target2LocationEnd, zoneBlueprint.getAnimationDuration()));
+                        if (rayLocationValidator(shapeTargetLocation, location))
+                            shapes.add(new TranslatingRay(zoneBlueprint.isIgnoresSolidBlocks(), zoneBlueprint.getPointRadius(), shapeTargetLocation, targetLocationEnd, location, target2LocationEnd, zoneBlueprint.getAnimationDuration()));
                     break;
                 case CUBOID:
                     shapes.add(new Cuboid(zoneBlueprint.getX(), zoneBlueprint.getY(), zoneBlueprint.getZ(), zoneBlueprint.getXBorder(), zoneBlueprint.getYBorder(), zoneBlueprint.getZBorder(), shapeTargetLocation));
@@ -142,6 +145,10 @@ public class ScriptZone {
             }
         }
         return shapes;
+    }
+
+    private boolean rayLocationValidator(Location location1, Location location2) {
+        return location1 != null && location2 != null && location1.getWorld().equals(location2.getWorld());
     }
 
 

@@ -22,10 +22,6 @@ public class QuestInteractionHandler {
         DynamicQuest.getQuests(player).forEach(quest -> {
             if (!quest.getQuestObjectives().isTurnedIn()) dynamicQuests.add(quest);
         });
-        if (PlayerData.getQuests(player.getUniqueId()) != null)
-            for (Quest quest : PlayerData.getQuests(player.getUniqueId()))
-                if (quest instanceof DynamicQuest && !dynamicQuests.contains(quest))
-                    dynamicQuests.add((DynamicQuest) quest);
 
         if (!dynamicQuests.isEmpty())
             QuestMenu.generateDynamicQuestMenu(dynamicQuests, player, npcEntity);

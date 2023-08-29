@@ -22,7 +22,7 @@ public class BonusCoins extends BossPower {
     }
 
     public void doCoinDrop(EliteEntity eliteEntity, Player player) {
-        new ItemLootShower(eliteEntity.getLevel() * coinMultiplier, eliteEntity.getUnsyncedLivingEntity().getLocation(), player);
+        new ItemLootShower(eliteEntity.getLevel() * coinMultiplier, eliteEntity.getLevel(), eliteEntity.getUnsyncedLivingEntity().getLocation(), player);
     }
 
     public static class BonusCoinsEvents implements Listener {

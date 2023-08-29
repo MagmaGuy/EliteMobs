@@ -108,14 +108,14 @@ public class ArenaInstance extends MatchInstance {
                         try {
                             wave = Integer.parseInt(finalString[1]);
                         } catch (Exception ex) {
-                            new WarningMessage("Failed to parse wave for entry " + subString + " for arena" + customArenasConfigFields.getFilename());
+                            new WarningMessage("Failed to parse wave for entry " + subString + " for arena " + customArenasConfigFields.getFilename());
                         }
                         break;
                     case "message":
                         message = finalString[1];
                         break;
                     default:
-                        new WarningMessage("Failed to parse arena message entry " + subString + " for arena" + customArenasConfigFields.getFilename());
+                        new WarningMessage("Failed to parse arena message entry " + subString + " for arena " + customArenasConfigFields.getFilename());
                 }
             }
             if (!message.isEmpty() && wave > 0) waveMessage.put(wave, ChatColorConverter.convert(message));

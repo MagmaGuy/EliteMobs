@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.events;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.api.CustomEventStartEvent;
 import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.config.customevents.CustomEventsConfig;
@@ -11,6 +12,7 @@ import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.WeightedProbability;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -60,6 +62,13 @@ public class TimedEvent extends CustomEvent implements Listener {
             @Override
             public void run() {
                 if (Bukkit.getServer().getOnlinePlayers().isEmpty()) return;
+                boolean validPlayer = false;
+                for (Player onlinePlayer : Bukkit.getServer().getOnlinePlayers())
+                    if (!GuildRank.isWithinActiveGuildRank(onlinePlayer, 0, 0)) {
+                        validPlayer = true;
+                        break;
+                    }
+                if (!validPlayer) return;
                 if (System.currentTimeMillis() < nextEventTrigger) return;
                 pickEvent();
             }

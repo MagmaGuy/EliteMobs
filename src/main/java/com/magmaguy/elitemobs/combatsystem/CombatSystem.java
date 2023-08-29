@@ -12,7 +12,7 @@ public class CombatSystem {
      * <p>
      * Minus one because bosses start with 7 hp in the normalized combat system. They always have some baseline hp.
      */
-    public static final double TARGET_HITS_TO_KILL_MINUS_ONE = 6D; //affects max health assignment on EliteMobEntity.java
+    public static final double TARGET_HITS_TO_KILL_MINUS_ONE = 3D; //affects max health assignment on EliteMobEntity.java
     //this sets the tier of various materials
     public static final int NETHERITE_TIER_LEVEL = 8;
     public static final int DIAMOND_TIER_LEVEL = 7;
@@ -22,8 +22,6 @@ public class CombatSystem {
 
     //DPS increase per tier
     public static final double DPS_PER_LEVEL = 1.6;
-    //Target time to kill in seconds
-    public static final double TARGET_TIME_TO_KILL = 4.375;
 
 
     private CombatSystem() {
