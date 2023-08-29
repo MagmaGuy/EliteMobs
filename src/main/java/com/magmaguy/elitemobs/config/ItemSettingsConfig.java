@@ -120,7 +120,7 @@ public class ItemSettingsConfig {
     @Getter
     private static String armorEntry;
     @Getter
-    private static String tooWellEquippedMessage;
+    private static String levelRangeTooDifferent;
 
     private ItemSettingsConfig() {
     }
@@ -344,9 +344,9 @@ public class ItemSettingsConfig {
         armorEntry = ConfigurationEngine.setString(
                 List.of("Sets the armor-specific lore entry on an elite item. The $EDEF placeholder gets replaced with the elite DEF (defense) of the weapon."),
                 file, fileConfiguration, "armorEntry", "&7Elite Armor: &2$EDEF", true);
-        tooWellEquippedMessage = ConfigurationEngine.setString(
-                List.of("Sets the message sent when a played kills a boss but has too high level gear to get loot"),
-                file, fileConfiguration, "tooWellEquipped", "&8EM] &4You are too well equipped to get coins for killing this Elite!", true);
+        levelRangeTooDifferent = ConfigurationEngine.setString(
+                List.of("Sets the message sent when a played kills a boss but the gear level is too different from the boss level to get coins"),
+                file, fileConfiguration, "levelRangeTooDifferent", "&8EM] &4Your gear is level $playerLevel and the boss is level $bossLevel, level difference is too high to get coins!", true);
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }

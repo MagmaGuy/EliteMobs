@@ -15,11 +15,10 @@ import java.util.Map;
 
 public class ScriptConditionsBlueprint {
 
-    @Getter
-    private Boolean isAlive = null;
-
     private final String scriptName;
     private final String filename;
+    @Getter
+    private Boolean isAlive = null;
     @Getter
     private List<String> hasTags = null;
     @Getter
@@ -65,14 +64,13 @@ public class ScriptConditionsBlueprint {
             case "doesnothavetags" -> doesNotHaveTags = MapListInterpreter.parseStringList(key, value, scriptName);
             case "isonfloor" -> isOnFloor = MapListInterpreter.parseBoolean(key, value, scriptName);
             case "isstandingonmaterial" -> isStandingOnMaterial = MapListInterpreter.parseEnum(key, value, Material.class, scriptName);
+            case "randomchance" -> randomChance = MapListInterpreter.parseDouble(key, value, scriptName);
+            case "conditiontype" -> conditionType = MapListInterpreter.parseEnum(key, value, ConditionType.class, scriptName);
             case "target" -> {
                 if (value instanceof MemorySection memorySection)
                     value = memorySection.getValues(false);
                 scriptTargets = new ScriptTargetsBlueprint((Map) value, scriptName, filename);
             }
-            case "randomchance" -> randomChance = MapListInterpreter.parseDouble(key, value, scriptName);
-            case "conditiontype" ->
-                    conditionType = MapListInterpreter.parseEnum(key, value, ConditionType.class, scriptName);
             default -> new WarningMessage("Failed to read key " + key + " for script " + scriptName);
         }
     }

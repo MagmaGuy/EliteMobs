@@ -44,12 +44,6 @@ public class AlternativeDurabilityLoss implements Listener {
         return ((Damageable) itemStack.getItemMeta()).getDamage() + 1 >= itemStack.getType().getMaxDurability();
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
-    public void onDurabilityLoss(PlayerItemDamageEvent event) {
-        if (!EliteItemManager.isEliteMobsItem(event.getItem())) return;
-        event.setCancelled(true);
-    }
-
     public static void doDurabilityLoss(Player player) {
         if (!ItemSettingsConfig.isEliteDurability()) return;
         ArrayList<ItemStack> itemsList = new ArrayList<>(Arrays.asList(player.getInventory().getArmorContents()));
@@ -74,6 +68,13 @@ public class AlternativeDurabilityLoss implements Listener {
                     } else
                         itemStack.setAmount(0);
             }
+    }
+
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    public void onDurabilityLoss(PlayerItemDamageEvent event) {
+        if (!EliteItemManager.isEliteMobsItem(event.getItem())) return;
+        if (!EliteItemManager.isArmor(event.getItem()) && !EliteItemManager.isWeapon(event.getItem())) return;
+        event.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)

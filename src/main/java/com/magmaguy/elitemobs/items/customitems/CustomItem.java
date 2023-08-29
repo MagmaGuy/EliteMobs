@@ -162,17 +162,21 @@ public class CustomItem {
             }
     }
 
+    public static int limitItemLevel(Player player, int originalLevel) {
+        int itemLevel;
+        if (AdventurersGuildConfig.isGuildLootLimiter()) {
+            itemLevel = (int) LootTables.setItemTier(originalLevel);
+            if (itemLevel > GuildRank.getActiveGuildRank(player) * 10)
+                itemLevel = GuildRank.getActiveGuildRank(player) * 10;
+        } else
+            itemLevel = originalLevel + 1;
+        return itemLevel;
+    }
+
     public Item dropPlayerLoot(Player player, int tier, Location location, EliteEntity eliteEntity) {
         if (!permission.isEmpty() && !player.hasPermission(permission)) return null;
         Item loot = null;
-        int itemTier = 0;
-
-        if (AdventurersGuildConfig.isGuildLootLimiter()) {
-            itemTier = (int) LootTables.setItemTier(tier);
-            if (itemTier > GuildRank.getActiveGuildRank(player) * 10)
-                itemTier = GuildRank.getActiveGuildRank(player) * 10;
-        } else
-            itemTier = tier + 1;
+        int itemTier = limitItemLevel(player, tier);
 
         switch (getScalability()) {
             case LIMITED:

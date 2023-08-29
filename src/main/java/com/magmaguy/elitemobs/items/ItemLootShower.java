@@ -41,7 +41,7 @@ public class ItemLootShower implements Listener {
     public static HashMap<UUID, Coin> coinValues = new HashMap<>();
     private final Player player;
 
-    public ItemLootShower(double eliteMobTier, Location location, Player player) {
+    public ItemLootShower(double itemLevel, double mobLevel, Location location, Player player) {
 
         this.player = player;
 
@@ -50,15 +50,29 @@ public class ItemLootShower implements Listener {
         if (!EconomySettingsConfig.isEnableCurrencyShower() || !SoulbindEnchantment.isEnabled)
             return;
 
-        if (eliteMobTier - ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getFullPlayerTier(false) < -ItemSettingsConfig.getLootLevelDifferenceLockout()) {
-            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(
-                    ChatColorConverter.convert(ItemSettingsConfig.getTooWellEquippedMessage())));
+        if (Math.abs(mobLevel - ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getFullPlayerTier(false))
+                > ItemSettingsConfig.getLootLevelDifferenceLockout()) {
+            new BukkitRunnable() {
+                int counter = 0;
+                @Override
+                public void run() {
+                    counter++;
+                    if (!player.isValid() || counter > 20 * 5){
+                        cancel();
+                        return;
+                    }
+                    player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(
+                            ChatColorConverter.convert(ItemSettingsConfig.getLevelRangeTooDifferent())
+                                    .replace("$playerLevel", ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getFullPlayerTier(false) + "")
+                                    .replace("$bossLevel", mobLevel + "")));
+                }
+            }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
             return;
         }
         if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory())
-            addDirectly(getCurrencyAmount(eliteMobTier));
+            addDirectly(getCurrencyAmount(itemLevel));
         else
-            addIndirectly(location, getCurrencyAmount(eliteMobTier));
+            addIndirectly(location, getCurrencyAmount(itemLevel));
     }
 
     public ItemLootShower(Location location, Player player, int amount) {
