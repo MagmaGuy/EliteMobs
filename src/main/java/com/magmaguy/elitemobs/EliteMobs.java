@@ -50,6 +50,7 @@ import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.powerstances.MajorPowerStanceMath;
 import com.magmaguy.elitemobs.powerstances.MinorPowerStanceMath;
+import com.magmaguy.elitemobs.quests.DynamicQuest;
 import com.magmaguy.elitemobs.quests.QuestTracking;
 import com.magmaguy.elitemobs.thirdparty.bstats.CustomCharts;
 import com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity;
@@ -293,6 +294,8 @@ public class EliteMobs extends JavaPlugin {
         Check for new plugin version or for dungeon updates
          */
         VersionChecker.check();
+
+        DynamicQuest.startRandomizingQuests();
     }
 
     @Override
@@ -375,6 +378,8 @@ public class EliteMobs extends JavaPlugin {
         MatchInstance.shutdown();
 
         CustomProjectileData.shutdown();
+
+        DynamicQuest.shutdown();
 
         //save cached data
         Bukkit.getLogger().info("[EliteMobs] Saving EliteMobs databases...");

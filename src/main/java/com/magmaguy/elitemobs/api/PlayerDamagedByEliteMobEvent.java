@@ -103,12 +103,13 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
                     distanceAttenuation = distanceAttenuation < 0 ? 0 : distanceAttenuation;
                     baseDamage *= distanceAttenuation;
                 }
-            double bonusDamage = eliteEntity.getLevel();
+            double bonusDamage = eliteEntity.getLevel() * .5; //A .5 increase in damage for every level the mob has
 
             ElitePlayerInventory elitePlayerInventory = ElitePlayerInventory.getPlayer(player);
             if (elitePlayerInventory == null) return 0;
 
-            double damageReduction = elitePlayerInventory.getEliteDefense(true);
+            //Bosses now gain .5 damage per level instead of 1 damage per level to make fight against high level and low level mobs more lenient
+            double damageReduction = elitePlayerInventory.getEliteDefense(true) * 0.5;
             if (event.getDamager() instanceof AbstractArrow)
                 damageReduction += elitePlayerInventory.getEliteProjectileProtection(true);
             if (event.getDamager() instanceof Fireball || event.getDamager() instanceof Creeper) {

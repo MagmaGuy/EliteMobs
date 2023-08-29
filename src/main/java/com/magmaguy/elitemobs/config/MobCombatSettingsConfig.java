@@ -192,10 +192,10 @@ public class MobCombatSettingsConfig {
                 fileConfiguration, "doResistEffect", true);
         normalizedBaselineDamage = ConfigurationEngine.setDouble(
                 List.of("Sets the baseline damage for custom bosses using the normalized damage (usually regional bosses)."),
-                fileConfiguration, "normalizedRegionalBossBaselineDamage", 5);
+                fileConfiguration, "normalizedRegionalBossBaselineDamageV2", 3);
         normalizedBaselineHealth = ConfigurationEngine.setDouble(
                 List.of("Sets the baseline health for custom bosses using the normalized health (usually regional bosses)."),
-                fileConfiguration, "normalizedRegionalBossBaselineHealthV2", 7);
+                fileConfiguration, "normalizedRegionalBossBaselineHealthV3", 4);
         normalizeRegionalBosses = ConfigurationEngine.setBoolean(
                 List.of("Sets if regional bosses will used the normalized combat system.", "This is very strongly recommended, and premade content will not be balanced properly if modified."),
                 fileConfiguration, "normalizeRegionalBosses", true);

@@ -48,19 +48,16 @@ public class CustomLootTable implements Serializable {
     private void parseConfig(List<?> lootTable, String filename) {
         if (lootTable == null) return;
         for (Object object : lootTable)
-            if (object instanceof String rawString)
-                switch (rawString.split(":")[0].toLowerCase()) {
-                    case "minecraft":
-                        new VanillaCustomLootEntry(entries, rawString, filename);
-                        break;
-                    default:
-                        if (rawString.toLowerCase(Locale.ROOT).contains("currencyamount="))
-                            new CurrencyCustomLootEntry(entries, rawString, filename);
-                        else if (rawString.contains("material="))
-                            new VanillaCustomLootEntry(entries, rawString, filename);
-                        else
-                            new EliteCustomLootEntry(entries, rawString, filename);
-                }
+            if (object instanceof String rawString) switch (rawString.split(":")[0].toLowerCase()) {
+                case "minecraft":
+                    new VanillaCustomLootEntry(entries, rawString, filename);
+                    break;
+                default:
+                    if (rawString.toLowerCase(Locale.ROOT).contains("currencyamount="))
+                        new CurrencyCustomLootEntry(entries, rawString, filename);
+                    else if (rawString.contains("material=")) new VanillaCustomLootEntry(entries, rawString, filename);
+                    else new EliteCustomLootEntry(entries, rawString, filename);
+            }
             else if (object instanceof Map<?, ?> configMap)
                 //This is used for the instanced loot
                 new EliteCustomLootEntry(entries, configMap, filename);
@@ -70,8 +67,7 @@ public class CustomLootTable implements Serializable {
                     List<CustomLootEntry> rewards = this.waveRewards.get(customLootEntry.getWave());
                     rewards.add(customLootEntry);
                     this.waveRewards.put(customLootEntry.getWave(), rewards);
-                } else
-                    waveRewards.put(customLootEntry.getWave(), new ArrayList<>(List.of(customLootEntry)));
+                } else waveRewards.put(customLootEntry.getWave(), new ArrayList<>(List.of(customLootEntry)));
             }
         }
     }
@@ -86,12 +82,14 @@ public class CustomLootTable implements Serializable {
 
     public void bossDrop(Player player, int level, Location dropLocation, EliteEntity eliteEntity) {
         for (CustomLootEntry customLootEntry : entries) {
-            if (customLootEntry.willDrop(player))
-                if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory())
-                    customLootEntry.directDrop(level, player, eliteEntity);
-                else
-                    customLootEntry.locationDrop(level, player, dropLocation, eliteEntity);
-        }
+                if (customLootEntry.willDrop(player)) {
+                    if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory())
+                        customLootEntry.directDrop(level, player, eliteEntity);
+                    else {
+                        customLootEntry.locationDrop(level, player, dropLocation, eliteEntity);
+                    }
+                }
+            }
     }
 
     public void treasureChestDrop(Player player, int chestLevel, Location dropLocation) {
@@ -105,20 +103,19 @@ public class CustomLootTable implements Serializable {
                     customLootEntry.locationDrop(chestLevel * 10, player, dropLocation);
                 }
             }
-        if (!anythingDropped) player.sendMessage(ChatColorConverter.convert(DefaultConfig.getTreasureChestNoDropMessage()));
+        if (!anythingDropped)
+            player.sendMessage(ChatColorConverter.convert(DefaultConfig.getTreasureChestNoDropMessage()));
     }
 
     public void questDrop(Player player, int questRewardLevel) {
         for (CustomLootEntry customLootEntry : entries)
-            if (customLootEntry.willDrop(player))
-                customLootEntry.directDrop(questRewardLevel, player);
+            if (customLootEntry.willDrop(player)) customLootEntry.directDrop(questRewardLevel, player);
     }
 
     public void arenaReward(Player player, int wave) {
         if (waveRewards.get(wave) == null) return;
         waveRewards.get(wave).forEach(reward -> {
-            if (reward.willDrop(player))
-                reward.directDrop(reward.getItemLevel(), player);
+            if (reward.willDrop(player)) reward.directDrop(reward.getItemLevel(), player);
         });
     }
 }

@@ -6,7 +6,6 @@ import com.magmaguy.elitemobs.items.potioneffects.custom.Harm;
 import com.magmaguy.elitemobs.items.potioneffects.custom.Heal;
 import com.magmaguy.elitemobs.items.potioneffects.custom.Saturation;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
-import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.utils.EntityFinder;
@@ -112,7 +111,6 @@ public class PlayerPotionEffects implements Listener {
         if (elitePotionEffect.getPotionEffect().getType().equals(PotionEffectType.HEALTH_BOOST)) return;
         switch (elitePotionEffect.getTarget()) {
             case SELF:
-
                 if (elitePotionEffect.getPotionEffect().getType().equals(PotionEffectType.HEAL)) {
                     Heal.doHeal(player, elitePotionEffect);
                     break;
@@ -127,22 +125,16 @@ public class PlayerPotionEffects implements Listener {
                     Harm.doHarm(player, elitePotionEffect);
                     return;
                 }
+                player.addPotionEffect(elitePotionEffect.getPotionEffect());
+                break;
+            case TARGET:
                 if (elitePotionEffect.getPotionEffect().getType().equals(PotionEffectType.LEVITATION) ||
                         elitePotionEffect.getPotionEffect().getType().equals(PotionEffectType.SLOW) ||
                         elitePotionEffect.getPotionEffect().getType().equals(PotionEffectType.BLINDNESS)) {
                     EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(damagee);
-                    if (eliteEntity instanceof CustomBossEntity customBossEntity &&
-                            customBossEntity.getCustomBossesConfigFields().getHealthMultiplier() > 1)
-                        return;
                     if (eliteEntity != null && eliteEntity.getHealthMultiplier() > 1)
                         return;
-                    if (damagee.getType().equals(EntityType.PLAYER))
-                        return;
                 }
-
-                player.addPotionEffect(elitePotionEffect.getPotionEffect());
-                break;
-            case TARGET:
                 damagee.addPotionEffect(elitePotionEffect.getPotionEffect());
                 break;
         }

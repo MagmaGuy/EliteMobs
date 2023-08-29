@@ -40,6 +40,8 @@ public class QuestObjectives implements Serializable {
     private boolean turnedIn = false;
     @Setter
     private boolean forceOver = false;
+    @Getter
+    private final UUID uuid = UUID.randomUUID();
 
     /**
      * Used for dynamic quests

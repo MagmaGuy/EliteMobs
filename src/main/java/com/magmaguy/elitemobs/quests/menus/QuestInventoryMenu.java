@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.quests.menus;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.commands.quests.QuestCommand;
 import com.magmaguy.elitemobs.config.QuestsConfig;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
@@ -104,7 +105,21 @@ public class QuestInventoryMenu {
 
     public static List<ItemStack> generateItemStackEntry(TextComponent title, List<TextComponent> textComponents, Material material) {
         List<String> list = new ArrayList<>();
-        textComponents.forEach(component -> list.add(ChatColor.WHITE + component.getText().replace(ChatColor.BLACK + "", ChatColor.WHITE + "")));
+        textComponents.forEach(component -> {
+            if (component.getText().length() < 27)
+                list.add(ChatColor.WHITE + component.getText().replace(ChatColor.BLACK + "", ChatColor.WHITE + ""));
+            else {
+                ChatColor currentColor = ChatColor.WHITE;
+                for (int i = 0; i < component.getText().length() / 26D; i++) {
+                    String string = currentColor + ChatColorConverter.convert(component.getText().substring(i * 26, Math.min((i + 1) * 26, component.getText().length())).replace(ChatColor.BLACK + "", ChatColor.WHITE + ""));
+                    list.add(string);
+                    String lastColor = ChatColor.getLastColors(string);
+                    if (!lastColor.isEmpty())
+                        currentColor = ChatColor.getByChar(lastColor);
+                    if (currentColor == null) currentColor = ChatColor.WHITE;
+                }
+            }
+        });
         return generateParsedItemStackEntry(title.getText(), list, material);
     }
 
