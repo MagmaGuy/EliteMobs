@@ -64,7 +64,7 @@ public class ItemLootShower implements Listener {
                     player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(
                             ChatColorConverter.convert(ItemSettingsConfig.getLevelRangeTooDifferent())
                                     .replace("$playerLevel", ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getFullPlayerTier(false) + "")
-                                    .replace("$bossLevel", mobLevel + "")));
+                                    .replace("$bossLevel", (int) mobLevel + "")));
                 }
             }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
             return;

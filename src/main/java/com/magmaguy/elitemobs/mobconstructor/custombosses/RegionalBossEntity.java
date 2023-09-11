@@ -20,6 +20,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -318,6 +319,12 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
             new RegionalBossEntity(event.getCustomBossesConfigFields(), ConfigurationLocation.deserialize(event.getRealLocation()));
             event.getCustomBossesConfigFields().setFilesOutOfSync(true);
         }
+    }
+
+    public void removeSlow() {
+        if (getCustomBossesConfigFields().isAlert()) return;
+       getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(getFollowDistance());
+       getLivingEntity().getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(getMovementSpeedAttribute());
     }
 
 }

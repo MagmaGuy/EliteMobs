@@ -75,6 +75,10 @@ public class MobCombatSettingsConfig {
     @Getter
     private static double normalizedBaselineHealth;
     @Getter
+    private static double normalizedDamageToEliteMultiplier;
+    @Getter
+    private static double normalizedDamageToPlayerMultiplier;
+    @Getter
     private static boolean normalizeRegionalBosses;
     @Getter
     private static String fullHealMessage;
@@ -147,11 +151,11 @@ public class MobCombatSettingsConfig {
                 List.of("Sets if the powers of elites will be hidden until they enter combat. This is recommended for performance reasons."),
                 fileConfiguration, "hideEliteMobPowersUntilAggro", true);
         damageToEliteMultiplier = ConfigurationEngine.setDouble(
-                List.of("Sets the multiplier for the damage dealt to all bosses spawned by EliteMobs. Higher values increase the damage dealt, making bosses easier to kill.", "2.0 = 200%, 0.5 = 50%"),
-                fileConfiguration, "damageToEliteMobMultiplier", 1);
+                List.of("Sets the multiplier for the damage dealt to all bosses spawned by EliteMobs, except those using the normalized damage system (regional dungeon bosses). Higher values increase the damage dealt, making bosses easier to kill.", "2.0 = 200%, 0.5 = 50%"),
+                fileConfiguration, "damageToEliteMobMultiplierV2", 1);
         damageToPlayerMultiplier = ConfigurationEngine.setDouble(
-                List.of("Sets the multiplier for the damage dealt to players by elites. Higher values increase the amount of damage dealt by bosses, making bosses hit harder.", "2.0 = 200%, 0.5 = 50%"),
-                fileConfiguration, "damageToPlayerMultiplier", 1);
+                List.of("Sets the multiplier for the damage dealt to players by elites. Higher values increase the amount of damage dealt by bosses, except those using the normalized damage system (regional dungeon bosses), making bosses hit harder.", "2.0 = 200%, 0.5 = 50%"),
+                fileConfiguration, "damageToPlayerMultiplierV2", 1);
         showCustomBossLocation = ConfigurationEngine.setBoolean(
                 List.of("Sets if special bosses can be tracked."),
                 fileConfiguration, "showCustomBossLocation", true);
@@ -190,6 +194,12 @@ public class MobCombatSettingsConfig {
         doResistEffect = ConfigurationEngine.setBoolean(
                 List.of("Sets if visuals will be used to show that a boss is strong against an attack."),
                 fileConfiguration, "doResistEffect", true);
+        normalizedDamageToEliteMultiplier = ConfigurationEngine.setDouble(
+                List.of("Sets the multiplier for the damage dealt to bosses using the normalized damage system (regional dungeon bosses). Higher values increase the damage dealt, making bosses easier to kill.", "2.0 = 200%, 0.5 = 50%"),
+                fileConfiguration, "damageToEliteMobMultiplier", 1);
+        normalizedDamageToPlayerMultiplier = ConfigurationEngine.setDouble(
+                List.of("Sets the multiplier for the damage dealt to players by bosses using the normalized damage system (regional dungeon bosses). Higher values increase the amount of damage dealt by bosses, making bosses hit harder.", "2.0 = 200%, 0.5 = 50%"),
+                fileConfiguration, "damageToPlayerMultiplier", 1);
         normalizedBaselineDamage = ConfigurationEngine.setDouble(
                 List.of("Sets the baseline damage for custom bosses using the normalized damage (usually regional bosses)."),
                 fileConfiguration, "normalizedRegionalBossBaselineDamageV2", 3);

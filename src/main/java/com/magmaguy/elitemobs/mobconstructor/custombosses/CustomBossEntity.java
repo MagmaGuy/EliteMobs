@@ -564,9 +564,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
         public void removeSlowEvent(EliteMobEnterCombatEvent eliteMobEnterCombatEvent) {
             if (!(eliteMobEnterCombatEvent.getEliteMobEntity() instanceof RegionalBossEntity regionalBossEntity))
                 return;
-            if (regionalBossEntity.getCustomBossesConfigFields().isAlert()) return;
-            regionalBossEntity.getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(regionalBossEntity.getFollowDistance());
-            regionalBossEntity.getLivingEntity().getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(regionalBossEntity.getMovementSpeedAttribute());
+            regionalBossEntity.removeSlow();
         }
 
         @EventHandler(ignoreCancelled = true)
