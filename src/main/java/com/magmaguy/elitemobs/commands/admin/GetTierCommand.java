@@ -15,13 +15,21 @@ public class GetTierCommand {
     public static void get(Player player, int tierLevel) {
 
         ItemStack helmet = new ItemStack(Material.IRON_HELMET);
+        addDurability(helmet);
         ItemStack chestplate = new ItemStack(Material.IRON_CHESTPLATE);
+        addDurability(chestplate);
         ItemStack leggings = new ItemStack(Material.IRON_LEGGINGS);
+        addDurability(leggings);
         ItemStack boots = new ItemStack(Material.IRON_BOOTS);
+        addDurability(boots);
         ItemStack sword = new ItemStack(Material.IRON_SWORD);
+        addDurability(sword);
         ItemStack axe = new ItemStack(Material.IRON_AXE);
+        addDurability(axe);
         ItemStack bow = new ItemStack(Material.BOW);
+        addDurability(boots);
         ItemStack cheatSword = new ItemStack(Material.NETHERITE_SWORD);
+        addDurability(cheatSword);
 
         EliteItemManager.setEliteLevel(helmet, tierLevel);
         EliteItemManager.setEliteLevel(chestplate, tierLevel);
@@ -44,6 +52,12 @@ public class GetTierCommand {
         player.getInventory().addItem(bow);
         player.getInventory().addItem(cheatSword);
 
+    }
+
+    private static void addDurability(ItemStack itemStack){
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        itemMeta.addEnchant(Enchantment.DURABILITY, 5, false);
+        itemStack.setItemMeta(itemMeta);
     }
 
 }
