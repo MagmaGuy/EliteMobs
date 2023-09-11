@@ -83,7 +83,7 @@ public class ActionEvent extends CustomEvent {
     public void instantiateEvent(Location location, Player player) {
         this.player = player;
         //Peaceful mode players should not count
-        if (GuildRank.isWithinActiveGuildRank(player, 0, 0)) return;
+        if (GuildRank.isAtOrAboveGuildRank(player, 0, 0)) return;
         ActionEvent actionEvent = new ActionEvent(customEventsConfigFields);
         actionEvent.setEventStartLocation(location);
         CustomEventStartEvent customEventStartEvent = new CustomEventStartEvent(actionEvent);

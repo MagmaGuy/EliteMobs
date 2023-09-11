@@ -10,6 +10,7 @@ import com.magmaguy.elitemobs.entitytracker.CustomProjectileData;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
@@ -208,6 +209,8 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
             else getCustomDamageModifier(eliteEntity, player.getInventory().getItemInMainHand().getType());
 
             damage = Round.twoDecimalPlaces((damage + eliteDamage) * damageModifier * MobCombatSettingsConfig.getDamageToEliteMultiplier());
+            if (eliteEntity instanceof RegionalBossEntity regionalBossEntity && regionalBossEntity.isNormalizedCombat())
+                damage = Round.twoDecimalPlaces((damage + eliteDamage) * damageModifier * MobCombatSettingsConfig.getNormalizedDamageToEliteMultiplier());
 
             boolean criticalHit = false;
 

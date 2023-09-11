@@ -85,12 +85,12 @@ public class GuildRank {
      * @param activeGuildLevel Target rank to check
      * @return Whether the target rank is equal to or higher than the player's active guild rank
      */
-    public static boolean isWithinActiveGuildRank(Player player, int prestigeLevel, int activeGuildLevel) {
-        return getGuildPrestigeRank(player) >= prestigeLevel &&
-                getActiveGuildRank(player) >= activeGuildLevel;
+    public static boolean isAtOrAboveGuildRank(Player player, int prestigeLevel, int activeGuildLevel) {
+        return getGuildPrestigeRank(player) <= prestigeLevel &&
+                getActiveGuildRank(player) <= activeGuildLevel;
     }
 
-    public static boolean isWithinActiveGuildRankIgnorePrestige(Player player, int activeGuildLevel) {
+    public static boolean isAtOrAboveGuildRank(Player player, int activeGuildLevel) {
         return getActiveGuildRank(player) >= activeGuildLevel;
     }
 

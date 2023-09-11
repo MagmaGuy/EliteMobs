@@ -123,7 +123,7 @@ public class GuildRankMenuHandler implements Listener {
     public static Inventory populateInventory(Inventory difficultyMenu, Player player) {
         for (int i = 0; i < 11 + GuildRank.getGuildPrestigeRank(player); i++) {
             ItemStack itemStack = null;
-            if (GuildRank.isWithinActiveGuildRankIgnorePrestige(player, i)) {
+            if (GuildRank.isAtOrAboveGuildRank(player, i)) {
                 itemStack = difficultyItemStackConstructor(guildRankStatus.UNLOCKED, i, player, false);
             }
             if (GuildRank.getActiveGuildRank(player) < i && GuildRank.getMaxGuildRank(player) >= i) {

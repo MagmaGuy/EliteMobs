@@ -64,7 +64,7 @@ public class TimedEvent extends CustomEvent implements Listener {
                 if (Bukkit.getServer().getOnlinePlayers().isEmpty()) return;
                 boolean validPlayer = false;
                 for (Player onlinePlayer : Bukkit.getServer().getOnlinePlayers())
-                    if (!GuildRank.isWithinActiveGuildRank(onlinePlayer, 0, 0)) {
+                    if (!GuildRank.isAtOrAboveGuildRank(onlinePlayer, 0, 0)) {
                         validPlayer = true;
                         break;
                     }
