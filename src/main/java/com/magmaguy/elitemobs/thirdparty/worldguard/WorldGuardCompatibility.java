@@ -246,6 +246,8 @@ public class WorldGuardCompatibility {
         protectedRegion.setFlag(Flags.ENDERDRAGON_BLOCK_DAMAGE, deny);
         protectedRegion.setFlag(Flags.LIGHTER, deny);
         protectedRegion.setFlag(Flags.ENDERPEARL, deny);
+        //Bypass for redstone and doors
+        protectedRegion.setFlag(Flags.USE, allow);
         protectedRegion.setFlag(Flags.GREET_MESSAGE, dungeonWorldPackage.getDungeonPackagerConfigFields().getRegionEnterMessage());
         protectedRegion.setFlag(Flags.FAREWELL_MESSAGE, dungeonWorldPackage.getDungeonPackagerConfigFields().getRegionLeaveMessage());
     }
@@ -312,6 +314,8 @@ public class WorldGuardCompatibility {
         protectedRegion.setFlag(Flags.ENDERPEARL, deny);
         protectedRegion.setFlag(Flags.BLOCK_PLACE, deny);
         protectedRegion.setFlag(Flags.BLOCK_BREAK, deny);
+        //Bypass for redstone and doors
+        protectedRegion.setFlag(Flags.USE, allow);
     }
 
     /**

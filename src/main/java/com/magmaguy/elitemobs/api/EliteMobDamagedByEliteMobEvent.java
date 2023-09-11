@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.api;
 
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.utils.EntityFinder;
 import com.magmaguy.elitemobs.utils.EventCaller;
@@ -72,8 +73,8 @@ public class EliteMobDamagedByEliteMobEvent extends EliteDamageEvent {
             new EventCaller(eliteMobDamagedByEliteMobEvent);
             if (eliteMobDamagedByEliteMobEvent.isCancelled()) return;
             event.setDamage(damage);
+            if (damagee instanceof RegionalBossEntity regionalBossEntity) regionalBossEntity.removeSlow();
         }
-
     }
 
 

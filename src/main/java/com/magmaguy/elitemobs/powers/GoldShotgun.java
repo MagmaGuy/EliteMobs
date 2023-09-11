@@ -6,7 +6,6 @@ import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.meta.BossPower;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.Item;
@@ -41,6 +40,7 @@ public class GoldShotgun extends BossPower implements Listener {
     private void doGoldShotgun(EliteEntity eliteEntity, Player player) {
 
         eliteEntity.getLivingEntity().setAI(false);
+        Vector shotVector = player.getLocation().add(new Vector(0, 1, 0)).toVector().subtract(eliteEntity.getLivingEntity().getLocation().toVector());
 
         new BukkitRunnable() {
             int counter = 0;
@@ -53,14 +53,14 @@ public class GoldShotgun extends BossPower implements Listener {
                     return;
                 }
 
-                doSmokeEffect(eliteEntity, player);
+                doSmokeEffect(eliteEntity, shotVector);
                 counter++;
 
                 if (counter < 20 * 3) return;
 
                 cancel();
                 eliteEntity.getLivingEntity().setAI(true);
-                List<Item> nuggetList = generateVisualItems(eliteEntity, player);
+                List<Item> nuggetList = generateVisualItems(eliteEntity, shotVector);
                 if (nuggetList == null) return;
                 ProjectileDamage.doGoldNuggetDamage(nuggetList, eliteEntity);
 
@@ -70,24 +70,22 @@ public class GoldShotgun extends BossPower implements Listener {
 
     }
 
-    private void doSmokeEffect(EliteEntity eliteEntity, Player player) {
+    private void doSmokeEffect(EliteEntity eliteEntity, Vector shotVector) {
         for (int i = 0; i < 200; i++) {
-            Vector shotVector = getShotVector(eliteEntity, player);
-            if (shotVector == null) return;
+            Vector visualShotVector = getShotVector(shotVector);
             eliteEntity.getLivingEntity().getWorld().spawnParticle(
                     Particle.SMOKE_NORMAL,
                     eliteEntity.getLivingEntity().getLocation().clone().add(new Vector(0, 0.5, 0)),
                     0,
-                    shotVector.getX(),
-                    shotVector.getY(),
-                    shotVector.getZ(),
+                    visualShotVector.getX(),
+                    visualShotVector.getY(),
+                    visualShotVector.getZ(),
                     0.75);
         }
     }
 
-    private List<Item> generateVisualItems(EliteEntity eliteEntity, Player player) {
+    private List<Item> generateVisualItems(EliteEntity eliteEntity, Vector shotVector) {
         List<Item> nuggetList = new ArrayList<>();
-        if (getShotVector(eliteEntity, player) == null) return null;
         for (int i = 0; i < 200; i++) {
             Item visualProjectile = eliteEntity.getLivingEntity().getWorld().dropItem(
                     eliteEntity.getLivingEntity().getLocation(),
@@ -96,23 +94,15 @@ public class GoldShotgun extends BossPower implements Listener {
                             "visual projectile",
                             List.of(ThreadLocalRandom.current().nextDouble() + "")));
             ProjectileDamage.configureVisualProjectile(visualProjectile);
-            visualProjectile.setVelocity(getShotVector(eliteEntity, player).multiply(0.9));
+            visualProjectile.setVelocity(getShotVector(shotVector).multiply(0.9));
             visualProjectile.setGravity(false);
             nuggetList.add(visualProjectile);
         }
         return nuggetList;
     }
 
-    private Vector getShotVector(EliteEntity eliteEntity, Player player) {
-        if (!player.getLocation().getWorld().equals(eliteEntity.getLivingEntity().getLocation().getWorld()))
-            return null;
-        return player.getLocation().clone()
-                .add(new Location(player.getWorld(), 0.0, 1.0, 0.0))
-                .add(new Location(player.getWorld(),
-                        ThreadLocalRandom.current().nextDouble() * 2 - 1,
-                        ThreadLocalRandom.current().nextDouble() * 2 - 1,
-                        ThreadLocalRandom.current().nextDouble() * 2 - 1))
-                .subtract(eliteEntity.getLivingEntity().getLocation()).toVector().normalize();
+    private Vector getShotVector(Vector originalShotVector) {
+        return originalShotVector.add(new Vector(ThreadLocalRandom.current().nextDouble(-1, 1), ThreadLocalRandom.current().nextDouble(-1, 1), ThreadLocalRandom.current().nextDouble(-1, 1)).normalize().multiply(0.1));
     }
 
 }

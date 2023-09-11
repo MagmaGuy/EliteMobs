@@ -237,7 +237,7 @@ public class CustomSpawn {
         if (world == null)
             for (Player player : Bukkit.getOnlinePlayers()) {
                 if (!PlayerData.isInMemory(player.getUniqueId())) continue;
-                if (GuildRank.isWithinActiveGuildRank(player, 0, 0)) continue;
+                if (GuildRank.isAtOrAboveGuildRank(player, 0, 0)) continue;
                 Location playerLocation = player.getLocation();
                 if (!ValidWorldsConfig.getValidWorlds().contains(playerLocation.getWorld().getName()))
                     continue;
