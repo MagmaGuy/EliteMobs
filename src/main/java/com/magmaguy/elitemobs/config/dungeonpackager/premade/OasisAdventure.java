@@ -26,5 +26,6 @@ public class OasisAdventure extends DungeonPackagerConfigFields {
                 "&8[EM] &6You have arrived at the Oasis!",
                 "&8[EM] &6You have left the Oasis!",
                 "oasis");
+        setWormholeWorldName("em_oasis_wormhole");
     }
 }

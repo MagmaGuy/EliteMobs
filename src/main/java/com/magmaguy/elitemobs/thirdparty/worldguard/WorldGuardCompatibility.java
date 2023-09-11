@@ -209,6 +209,7 @@ public class WorldGuardCompatibility {
         protectedRegion.setFlag(ELITEMOBS_ANTIEXPLOIT, deny);
         protectedRegion.setFlag(ELITEMOBS_EVENTS, deny);
         //WG events
+        protectedRegion.setFlag(Flags.PASSTHROUGH, deny);
         protectedRegion.setFlag(Flags.INTERACT, deny);
         protectedRegion.setFlag(Flags.CREEPER_EXPLOSION, deny);
         protectedRegion.setFlag(Flags.FIRE_SPREAD, deny);
@@ -275,6 +276,7 @@ public class WorldGuardCompatibility {
         protectedRegion.setFlag(ELITEMOBS_ANTIEXPLOIT, deny);
         protectedRegion.setFlag(ELITEMOBS_EVENTS, deny);
         //WG events
+        protectedRegion.setFlag(Flags.PASSTHROUGH, deny);
         protectedRegion.setFlag(Flags.INTERACT, deny);
         protectedRegion.setFlag(Flags.CREEPER_EXPLOSION, deny);
         protectedRegion.setFlag(Flags.FIRE_SPREAD, deny);
@@ -312,8 +314,6 @@ public class WorldGuardCompatibility {
         protectedRegion.setFlag(Flags.ENDERDRAGON_BLOCK_DAMAGE, deny);
         protectedRegion.setFlag(Flags.LIGHTER, deny);
         protectedRegion.setFlag(Flags.ENDERPEARL, deny);
-        protectedRegion.setFlag(Flags.BLOCK_PLACE, deny);
-        protectedRegion.setFlag(Flags.BLOCK_BREAK, deny);
         //Bypass for redstone and doors
         protectedRegion.setFlag(Flags.USE, allow);
     }

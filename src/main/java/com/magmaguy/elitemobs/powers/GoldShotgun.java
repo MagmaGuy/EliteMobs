@@ -40,7 +40,7 @@ public class GoldShotgun extends BossPower implements Listener {
     private void doGoldShotgun(EliteEntity eliteEntity, Player player) {
 
         eliteEntity.getLivingEntity().setAI(false);
-        Vector shotVector = player.getLocation().add(new Vector(0, 1, 0)).toVector().subtract(eliteEntity.getLivingEntity().getLocation().toVector());
+        Vector shotVector = player.getLocation().add(new Vector(0, 1, 0)).toVector().subtract(eliteEntity.getLivingEntity().getLocation().toVector()).normalize().multiply(.5);
 
         new BukkitRunnable() {
             int counter = 0;
@@ -53,7 +53,8 @@ public class GoldShotgun extends BossPower implements Listener {
                     return;
                 }
 
-                doSmokeEffect(eliteEntity, shotVector);
+                if (counter % 10 == 0)
+                    doSmokeEffect(eliteEntity, shotVector);
                 counter++;
 
                 if (counter < 20 * 3) return;
@@ -94,7 +95,7 @@ public class GoldShotgun extends BossPower implements Listener {
                             "visual projectile",
                             List.of(ThreadLocalRandom.current().nextDouble() + "")));
             ProjectileDamage.configureVisualProjectile(visualProjectile);
-            visualProjectile.setVelocity(getShotVector(shotVector).multiply(0.9));
+            visualProjectile.setVelocity(getShotVector(shotVector));
             visualProjectile.setGravity(false);
             nuggetList.add(visualProjectile);
         }
@@ -102,7 +103,7 @@ public class GoldShotgun extends BossPower implements Listener {
     }
 
     private Vector getShotVector(Vector originalShotVector) {
-        return originalShotVector.add(new Vector(ThreadLocalRandom.current().nextDouble(-1, 1), ThreadLocalRandom.current().nextDouble(-1, 1), ThreadLocalRandom.current().nextDouble(-1, 1)).normalize().multiply(0.1));
+        return originalShotVector.clone().add(new Vector(ThreadLocalRandom.current().nextDouble(-.1, .1), ThreadLocalRandom.current().nextDouble(-.1, .1), ThreadLocalRandom.current().nextDouble(-.1, .1)).normalize().multiply(0.1));
     }
 
 }
