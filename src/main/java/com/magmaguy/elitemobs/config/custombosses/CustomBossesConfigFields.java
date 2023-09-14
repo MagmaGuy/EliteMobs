@@ -362,7 +362,7 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         cullReinforcements = processBoolean("cullReinforcements", cullReinforcements, true, false);
         damageModifiers = processDamageModifiers("damageModifiers", damageModifiers);
 
-        if (MobCombatSettingsConfig.isNormalizeRegionalBosses() && isRegionalBoss())
+        if (MobCombatSettingsConfig.isNormalizeRegionalBosses() && (isRegionalBoss() || isInstanced()))
             this.normalizedCombat = true;
         else
             this.normalizedCombat = processBoolean("normalizedCombat", normalizedCombat, false, false);
