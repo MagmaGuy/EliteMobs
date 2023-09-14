@@ -1,12 +1,15 @@
 package com.magmaguy.elitemobs.commands.admin;
 
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
+import com.magmaguy.elitemobs.items.EliteItemLore;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.HashMap;
 
 public class GetTierCommand {
     private GetTierCommand() {
@@ -40,8 +43,20 @@ public class GetTierCommand {
         EliteItemManager.setEliteLevel(bow, tierLevel);
         EliteItemManager.setEliteLevel(cheatSword, tierLevel);
         ItemMeta cheatItemMeta = cheatSword.getItemMeta();
+        cheatItemMeta.setDisplayName("CHEAT SWORD");
         ItemTagger.registerEnchantment(cheatItemMeta, Enchantment.DAMAGE_ALL.getKey(), 100);
         cheatSword.setItemMeta(cheatItemMeta);
+
+        new EliteItemLore(helmet, false);
+        new EliteItemLore(leggings, false);
+        new EliteItemLore(boots, false);
+        new EliteItemLore(sword, false);
+        new EliteItemLore(axe, false);
+        new EliteItemLore(cheatSword, false);
+        new EliteItemLore(chestplate, false);
+        new EliteItemLore(bow, false);
+
+
 
         player.getInventory().addItem(helmet);
         player.getInventory().addItem(chestplate);
@@ -56,7 +71,9 @@ public class GetTierCommand {
 
     private static void addDurability(ItemStack itemStack){
         ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.addEnchant(Enchantment.DURABILITY, 5, false);
+        HashMap<Enchantment, Integer> enchantmentIntegerHashMap = new HashMap<>();
+        enchantmentIntegerHashMap.put(Enchantment.DURABILITY, 5);
+        ItemTagger.registerEnchantments(itemMeta, enchantmentIntegerHashMap);
         itemStack.setItemMeta(itemMeta);
     }
 

@@ -55,6 +55,8 @@ public class CustomSummonPower extends ElitePower implements Listener {
         }
         CustomBossEntity customBossEntity = new CustomBossEntity(fields);
         customBossEntity.setSummoningEntity(summoningEntity);
+        if (summoningEntity instanceof CustomBossEntity summoner && summoner.isNormalizedCombat())
+            customBossEntity.setNormalizedCombat();
         summoningEntity.addReinforcement(customBossEntity);
         if (duration > 0) CustomBossEscapeMechanism.startEscapeTicks(duration, customBossEntity);
         customBossEntity.spawn(spawnLocation, true);
@@ -76,6 +78,8 @@ public class CustomSummonPower extends ElitePower implements Listener {
                         new WarningMessage("Failed to spawn reinforcement because boss " + customBossReinforcement.bossFileName + " was invalid! Does the file exist? Is it configured correctly?");
                         return;
                     }
+                    if (summoningEntity.isNormalizedCombat())
+                        customBossEntity.setNormalizedCombat();
                     CustomSpawn customSpawn = new CustomSpawn(customBossReinforcement.customSpawn, customBossEntity);
                     //Case if the spawn fails
                     if (customSpawn.getCustomSpawnConfigFields() == null) continue;
@@ -613,6 +617,8 @@ public class CustomSummonPower extends ElitePower implements Listener {
                     new WarningMessage("Failed to spawn reinforcement for " + eliteEntity.getName() + " because boss " + customBossReinforcement.bossFileName + " was invalid! Does the file exist? Is it configured correctly?");
                     return;
                 }
+                if (eliteEntity instanceof CustomBossEntity summoner && summoner.isNormalizedCombat())
+                    regionalBossEntity.setNormalizedCombat();
                 if (customBossReinforcement.inheritLevel)
                     regionalBossEntity.setLevel(eliteEntity.getLevel());
                 if (!customBossReinforcement.summonType.equals(SummonType.ON_DEATH))
@@ -626,6 +632,8 @@ public class CustomSummonPower extends ElitePower implements Listener {
                     new WarningMessage("Failed to spawn reinforcement for " + eliteEntity.getName() + " because boss " + customBossReinforcement.bossFileName + " was invalid! Does the file exist? Is it configured correctly?");
                     return;
                 }
+                if (eliteEntity instanceof CustomBossEntity summoner && summoner.isNormalizedCombat())
+                    customBossEntity.setNormalizedCombat();
                 customBossEntity.setSpawnLocation(spawnLocation);
                 customBossEntity.setBypassesProtections(eliteEntity.getBypassesProtections());
                 if (customBossReinforcement.inheritLevel)

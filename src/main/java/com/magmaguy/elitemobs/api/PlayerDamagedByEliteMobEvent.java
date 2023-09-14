@@ -124,11 +124,13 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
                 potionEffectDamageReduction = (player.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE).
                         getAmplifier() + 1) * MobCombatSettingsConfig.getResistanceDamageMultiplier();
 
-            double finalDamage = Math.max(baseDamage + bonusDamage - damageReduction - potionEffectDamageReduction, 1) *
-                    customBossDamageMultiplier * specialMultiplier * MobCombatSettingsConfig.getDamageToPlayerMultiplier();
+            double finalDamage;
             if (eliteEntity instanceof CustomBossEntity customBossEntity && customBossEntity.isNormalizedCombat())
                 finalDamage = Math.max(baseDamage + bonusDamage - damageReduction - potionEffectDamageReduction, 1) *
                         customBossDamageMultiplier * specialMultiplier * MobCombatSettingsConfig.getNormalizedDamageToPlayerMultiplier();
+            else
+                finalDamage= Math.max(baseDamage + bonusDamage - damageReduction - potionEffectDamageReduction, 1) *
+                        customBossDamageMultiplier * specialMultiplier * MobCombatSettingsConfig.getDamageToPlayerMultiplier();
 
             if (specialMultiplier != 1) specialMultiplier = 1;
 
