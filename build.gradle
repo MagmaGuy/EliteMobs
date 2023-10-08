@@ -23,7 +23,7 @@ processResources {
 }
 
 group 'com.magmaguy'
-version '8.6.1-SNAPSHOT'
+version '8.6.2-SNAPSHOT'
 
 repositories {
     maven {
@@ -120,10 +120,10 @@ dependencies {
     //Model Engine
     compileOnly "com.ticxo.modelengine:api:R3.1.7"
 
-    implementation group: 'com.magmaguy', name: 'EasyMinecraftGoals-dist', version: '1.5.0'
+    implementation group: 'com.magmaguy', name: 'EasyMinecraftGoals-dist', version: '1.6.1'
 
     //Local test, you can ignore this
-    //implementation files('C:\\Users\\Tiago\\Documents\\MineCraftProjects\\EasyMinecraftGoals\\EasyMinecraftGoals\\dist\\target\\EasyMinecraftGoals-dist-1.0.0-shaded.jar')
+    //implementation files('C:\\Users\\Tiago\\Documents\\MineCraftProjects\\EasyMinecraftGoals\\EasyMinecraftGoals\\dist\\target\\EasyMinecraftGoals-dist-1.6.0-shaded.jar')
 }
 
 artifacts { // task 'build' runs generates uberjar

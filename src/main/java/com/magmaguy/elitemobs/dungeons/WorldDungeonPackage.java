@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.dungeons;
 
+import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
 import com.magmaguy.elitemobs.dungeons.utility.DungeonUtils;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
@@ -38,7 +39,7 @@ public class WorldDungeonPackage extends WorldPackage implements Dungeon {
                 !dungeonPackagerConfigFields.getWormholeWorldName().isEmpty() &&
                 Bukkit.getWorld(dungeonPackagerConfigFields.getWormholeWorldName()) == null) {
             wormholeWorld = DungeonUtils.loadWorld(this.getDungeonPackagerConfigFields().getWormholeWorldName(), this.getDungeonPackagerConfigFields().getEnvironment());
-            if (wormholeWorld != null)
+            if (wormholeWorld != null && EliteMobs.worldGuardIsEnabled)
                 WorldGuardCompatibility.protectWorldMinidugeonArea(Objects.requireNonNull(wormholeWorld).getSpawnLocation(), this);
         }
     }
