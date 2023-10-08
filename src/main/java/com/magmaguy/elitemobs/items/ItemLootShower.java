@@ -209,6 +209,7 @@ public class ItemLootShower implements Listener {
         }
         setCoinModel(currencyItemStack, model);
         Item currencyItem = location.getWorld().dropItem(location.clone().add(new Vector(0, 1, 0)), currencyItemStack);
+        currencyItem.setPickupDelay(Integer.MAX_VALUE);
         EntityTracker.registerVisualEffects(currencyItem);
         currencyItem.setInvulnerable(true);
 

@@ -72,10 +72,8 @@ public class ProjectileDamage {
     }
 
     public static void configureVisualProjectile(Item goldNugget) {
-
         EntityTracker.registerVisualEffects(goldNugget);
         goldNugget.setPickupDelay(Integer.MAX_VALUE);
-
     }
 
 }
