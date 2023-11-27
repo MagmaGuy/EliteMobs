@@ -20,9 +20,9 @@ import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProp
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.powers.meta.CustomSummonPower;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
+import com.magmaguy.elitemobs.thirdparty.custommodels.CustomModel;
 import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
 import com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity;
-import com.magmaguy.elitemobs.thirdparty.modelengine.CustomModel;
 import com.magmaguy.elitemobs.utils.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -203,8 +203,8 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
             return;
         }
 
-        //This is a bit dumb but -1 is reserved for dynamic levels
-        if (customBossesConfigFields.getLevel() == -1)
+        //This is a bit dumb but -1 is reserved for dynamic levels, commands can force a dynamic to spawn with a level so check that
+        if (customBossesConfigFields.getLevel() == -1 && level == -1)
             getDynamicLevel(spawnLocation);
 
         if (ChunkLocationChecker.locationIsLoaded(spawnLocation) || isMount) {
@@ -218,7 +218,11 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
             //this may seem odd but not setting it to null can cause double spawn attempts as the plugin catches itself
             //correctly as not have a valid living entity but the checks are set up in such a way that if a living entity
             //object is referenced then trying to spawn it again is a double spawn of the same entity
-            super.livingEntity = null;
+            if (super.livingEntity != null) {
+                //Under very specific chunk loading conditions mobs can double spawn. It's never incorrect to remove the living entity silently when it spawns
+                super.livingEntity.remove();
+                super.livingEntity = null;
+            }
             if (existsFailureCount > 10) {
                 if (existsFailureCount == 11) {
                     new WarningMessage("EliteMobs tried and failed to spawn " + customBossesConfigFields.getFilename() + " " + existsFailureCount + "times, probably due to regional protections or third party plugin incompatibilities.");

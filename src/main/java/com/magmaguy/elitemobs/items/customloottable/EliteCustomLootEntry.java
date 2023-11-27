@@ -20,7 +20,6 @@ import java.util.Locale;
 import java.util.Map;
 
 public class EliteCustomLootEntry extends CustomLootEntry implements Serializable {
-    private final String permission = null;
     @Getter
     private String filename = null;
     private String difficultyID = null;

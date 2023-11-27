@@ -12,6 +12,7 @@ import com.magmaguy.elitemobs.config.customarenas.CustomArenasConfigFields;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
+import com.magmaguy.elitemobs.thirdparty.mythicmobs.MythicMobsInterface;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.elitemobs.utils.WarningMessage;
@@ -19,6 +20,7 @@ import com.magmaguy.elitemobs.utils.shapes.Cylinder;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -39,6 +41,7 @@ public class ArenaInstance extends MatchInstance {
     private final ArenaWaves arenaWaves;
     @Getter
     private final HashSet<CustomBossEntity> customBosses = new HashSet<>();
+    private final HashSet<Entity> nonEliteMobsEntities = new HashSet<>();
     private final HashMap<Integer, String> waveMessage = new HashMap<>();
     private final int minX;
     private final int maxX;
@@ -60,6 +63,7 @@ public class ArenaInstance extends MatchInstance {
         super(startLocation, exitLocation, customArenasConfigFields.getMinimumPlayerCount(), customArenasConfigFields.getMaximumPlayerCount());
         this.cylindricalArena = customArenasConfigFields.isCylindricalArena();
 
+        super.lobbyLocation = customArenasConfigFields.getTeleportLocation();
 
         if (corner1.getX() < corner2.getX()) {
             minX = (int) corner1.getX();
@@ -215,33 +219,48 @@ public class ArenaInstance extends MatchInstance {
                 if (arenaState != ArenaState.ACTIVE) return;
                 for (CustomBossEntity customBossEntity : (HashSet<CustomBossEntity>) customBosses.clone())
                     if (!customBossEntity.exists()) removeBoss(customBossEntity);
+                if (!nonEliteMobsEntities.isEmpty())
+                for (Entity entity : (HashSet<Entity>) nonEliteMobsEntities.clone())
+                    if (!entity.isValid()) removeBoss(entity);
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0L, 20L);
     }
 
     public void removeBoss(CustomBossEntity customBossEntity) {
         customBosses.remove(customBossEntity);
-        if (customBosses.isEmpty()) nextWave();
+        if (customBosses.isEmpty() && nonEliteMobsEntities.isEmpty()) nextWave();
+    }
+
+    public void removeBoss(Entity nonEliteEntity) {
+        nonEliteMobsEntities.remove(nonEliteEntity);
+        if (customBosses.isEmpty() && nonEliteMobsEntities.isEmpty()) nextWave();
     }
 
     private void spawnBosses() {
 
         if (arenaWaves.getWaveEntities(currentWave) == null) return;
         for (ArenaEntity arenaEntity : arenaWaves.getWaveEntities(currentWave)) {
-            CustomBossEntity customBossEntity = CustomBossEntity.createCustomBossEntity(arenaEntity.getBossfile());
-            if (customBossEntity == null) {
-                new WarningMessage("Failed to generate custom boss " + arenaEntity.getBossfile() + " because the filename was not valid!");
-                continue;
+            if (!arenaEntity.isMythicMob()) {
+                CustomBossEntity customBossEntity = CustomBossEntity.createCustomBossEntity(arenaEntity.getBossfile());
+                if (customBossEntity == null) {
+                    new WarningMessage("Failed to generate custom boss " + arenaEntity.getBossfile() + " because the filename was not valid!");
+                    continue;
+                }
+                customBossEntity.setNormalizedCombat();
+                customBossEntity.setEliteLoot(false);
+                customBossEntity.setVanillaLoot(false);
+                customBossEntity.setRandomLoot(false);
+                customBossEntity.spawn(spawnPoints.get(arenaEntity.getSpawnPointName()), true);
+                if (!customBossEntity.exists()) {
+                    new WarningMessage("Arena " + getCustomArenasConfigFields().getArenaName() + " failed to spawn boss " + customBossEntity.getCustomBossesConfigFields().getFilename());
+                    continue;
+                } else customBosses.add(customBossEntity);
+
+            } else {
+                //MythicMobs integration
+                Entity mythicMob = MythicMobsInterface.spawn(spawnPoints.get(arenaEntity.getSpawnPointName()),arenaEntity.getBossfile(), arenaEntity.getLevel());
+                if (mythicMob != null)                nonEliteMobsEntities.add(mythicMob);
             }
-            customBossEntity.setNormalizedCombat();
-            customBossEntity.setEliteLoot(false);
-            customBossEntity.setVanillaLoot(false);
-            customBossEntity.setRandomLoot(false);
-            customBossEntity.spawn(spawnPoints.get(arenaEntity.getSpawnPointName()), true);
-            if (!customBossEntity.exists()) {
-                new WarningMessage("Arena " + getCustomArenasConfigFields().getArenaName() + " failed to spawn boss " + customBossEntity.getCustomBossesConfigFields().getFilename());
-                continue;
-            } else customBosses.add(customBossEntity);
         }
     }
 

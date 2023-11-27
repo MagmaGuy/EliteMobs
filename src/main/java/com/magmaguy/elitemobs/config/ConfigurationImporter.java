@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.thirdparty.modelengine.CustomModel;
+import com.magmaguy.elitemobs.thirdparty.custommodels.CustomModel;
 import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.SpigotMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
@@ -41,15 +41,13 @@ public class ConfigurationImporter {
             return;
         }
 
-        if (importsFile.listFiles().length == 0)
-            return;
+        if (importsFile.listFiles().length == 0) return;
         boolean importedModels = false;
 
         for (File zippedFile : importsFile.listFiles()) {
             File unzippedFile;
             try {
-                if (zippedFile.getName().contains(".zip"))
-                    unzippedFile = ZipFile.unzip(zippedFile.getName());
+                if (zippedFile.getName().contains(".zip")) unzippedFile = ZipFile.unzip(zippedFile.getName());
                 else unzippedFile = zippedFile;
             } catch (Exception e) {
                 new WarningMessage("Failed to unzip config file " + zippedFile.getName() + " ! Tell the dev!");
@@ -100,14 +98,14 @@ public class ConfigurationImporter {
                             break;
                         case "ModelEngine":
                             //todo: check if the "force" code is required, check if file is getting saved with modelengine doesn't have a configuration folder
-                            if (Bukkit.getPluginManager().isPluginEnabled("ModelEngine_Beta"))  //todo: this is just temporary
-                                moveDirectory(file, Paths.get(file.getParentFile().getParentFile().getParentFile().getParentFile().toString()
-                                        + File.separatorChar + "ModelEngine_Beta" + File.separatorChar + "blueprints"), true);
-                            moveDirectory(file, Paths.get(file.getParentFile().getParentFile().getParentFile().getParentFile().toString()
-                                    + File.separatorChar + "ModelEngine" + File.separatorChar + "blueprints"), true);
-                            if (Bukkit.getPluginManager().isPluginEnabled("ModelEngine")) {
+                            if (CustomModel.getModelPlugin() == CustomModel.ModelPlugin.MODEL_ENGINE)
+                                moveDirectory(file, Paths.get(file.getParentFile().getParentFile().getParentFile().getParentFile().toString() + File.separatorChar + "ModelEngine" + File.separatorChar + "blueprints"), true);
+                            else
+                                moveDirectory(file, Paths.get(file.getParentFile().getParentFile().getParentFile().getParentFile().toString() + File.separatorChar + "FreeMinecraftModels" + File.separatorChar + "imports"), true);
+                            if (CustomModel.customModelsEnabled()) {
                                 importedModels = true;
-                            } else new WarningMessage("You need ModelEngine to use custom models!");
+                            } else
+                                new WarningMessage("You need FreeMinecraftModels or ModelEngine (ModelEngine R3 specifically, R4+ won't work) to use custom models!");
                             break;
                         case "schematics":
                             moveDirectory(file, Paths.get(configurationsPath.normalize() + "" + File.separatorChar + "schematics"), false);
@@ -135,22 +133,15 @@ public class ConfigurationImporter {
             CustomModel.reloadModels();
             for (Player player : Bukkit.getOnlinePlayers())
                 if (player.hasPermission("elitemobs.*"))
-                    player.spigot().sendMessage(SpigotMessage.commandHoverMessage(
-                            ChatColorConverter.convert("&8[EliteMobs] &fEliteMobs just detected that recently imported files had Custom Models in them! " +
-                                    "&2Click here to generate the EliteMobs resource pack for those models!"),
-                            "Clicking will run the command /em generateresourcepack",
-                            "/em generateresourcepack"));
+                    player.spigot().sendMessage(SpigotMessage.commandHoverMessage(ChatColorConverter.convert("&8[EliteMobs] &fEliteMobs just detected that recently imported files had Custom Models in them! " + "&2Click here to generate the EliteMobs resource pack for those models!"), "Clicking will run the command /em generateresourcepack", "/em generateresourcepack"));
         }
 
     }
 
     private static void deleteDirectory(File file) {
-        if (file == null)
-            return;
-        if (file.isDirectory())
-            for (File iteratedFile : file.listFiles())
-                if (iteratedFile != null)
-                    deleteDirectory(iteratedFile);
+        if (file == null) return;
+        if (file.isDirectory()) for (File iteratedFile : file.listFiles())
+            if (iteratedFile != null) deleteDirectory(iteratedFile);
         new InfoMessage("Cleaning up " + file.getPath());
         file.delete();
     }

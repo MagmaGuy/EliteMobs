@@ -37,12 +37,12 @@ public class WorldGuardFlagChecker {
 
     @Nullable
     public static Integer getRegionMinimumLevel(Location location) {
-        return WorldGuardFlagChecker.getIntegerFlagValue(location, WorldGuardCompatibility.getEliteMobsMinimumLevel());
+        return WorldGuardFlagChecker.getIntegerFlagValue(location, WorldGuardCompatibility.getELITEMOBS_MINIMUM_LEVEL());
     }
 
     @Nullable
     public static Integer getRegionMaximumLevel(Location location) {
-        return WorldGuardFlagChecker.getIntegerFlagValue(location, WorldGuardCompatibility.getEliteMobsMaximumLevel());
+        return WorldGuardFlagChecker.getIntegerFlagValue(location, WorldGuardCompatibility.getELITEMOBS_MAXIMUM_LEVEL());
     }
 
     public static boolean doExplosionRegenFlag(Location location) {
@@ -50,7 +50,7 @@ public class WorldGuardFlagChecker {
         RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
         RegionQuery query = container.createQuery();
         ApplicableRegionSet set = query.getApplicableRegions(wgLocation);
-        return set.testState(null, WorldGuardCompatibility.getEliteMobsExplosionRegen());
+        return set.testState(null, WorldGuardCompatibility.getELITEMOBS_EXPLOSION_REGEN());
     }
 
     public static boolean doEventFlag(Location location) {
@@ -58,7 +58,7 @@ public class WorldGuardFlagChecker {
         RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
         RegionQuery query = container.createQuery();
         ApplicableRegionSet set = query.getApplicableRegions(wgLocation);
-        return set.testState(null, WorldGuardCompatibility.getEliteMobsEventsFlag());
+        return set.testState(null, WorldGuardCompatibility.getELITEMOBS_EVENTS());
     }
 
     public static boolean doEliteMobsSpawnFlag(Location location) {
@@ -66,7 +66,7 @@ public class WorldGuardFlagChecker {
         RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
         RegionQuery query = container.createQuery();
         ApplicableRegionSet set = query.getApplicableRegions(wgLocation);
-        return set.testState(null, WorldGuardCompatibility.getEliteMobsSpawnFlag());
+        return set.testState(null, WorldGuardCompatibility.getELITEMOBS_SPAWN_FLAG());
     }
 
     public static boolean doMobSpawnFlag(Location location) {

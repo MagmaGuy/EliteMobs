@@ -18,6 +18,7 @@ import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -26,16 +27,28 @@ import java.util.UUID;
 
 public class WorldGuardCompatibility {
 
-    private static final StateFlag.State allow = StateFlag.State.ALLOW;
-    private static final StateFlag.State deny = StateFlag.State.DENY;
-    private static StateFlag ELITEMOBS_SPAWN_FLAG;
-    private static StateFlag ELITEMOBS_ONLY_SPAWN_FLAG;
-    private static StateFlag ELITEMOBS_ANTIEXPLOIT;
-    private static StateFlag ELITEMOBS_DUNGEON;
-    private static StateFlag ELITEMOBS_EVENTS;
-    private static IntegerFlag ELITEMOBS_MINIMUM_LEVEL;
-    private static IntegerFlag ELITEMOBS_MAXIMUM_LEVEL;
-    private static StateFlag ELITEMOBS_EXPLOSION_REGEN;
+   @Getter
+   private static final StateFlag.State allow = StateFlag.State.ALLOW;
+   @Getter
+   private static final StateFlag.State deny = StateFlag.State.DENY;
+   @Getter
+   private static StateFlag ELITEMOBS_SPAWN_FLAG;
+   @Getter
+   private static StateFlag ELITEMOBS_ONLY_SPAWN_FLAG;
+   @Getter
+   private static StateFlag ELITEMOBS_ANTIEXPLOIT;
+   @Getter
+   private static StateFlag ELITEMOBS_DUNGEON;
+   @Getter
+   private static StateFlag ELITEMOBS_EVENTS;
+   @Getter
+   private static IntegerFlag ELITEMOBS_MINIMUM_LEVEL;
+   @Getter
+   private static IntegerFlag ELITEMOBS_MAXIMUM_LEVEL;
+   @Getter
+   private static StateFlag ELITEMOBS_EXPLOSION_REGEN;
+   @Getter
+   private static StateFlag ELITEMOBS_EXPLOSION_BLOCK_DAMAGE;
 
     public static boolean initialize() {
 
@@ -121,40 +134,17 @@ public class WorldGuardCompatibility {
             ELITEMOBS_EXPLOSION_REGEN = (StateFlag) registry.get("elitemobs-explosion-regen");
         }
 
+        try {
+            ELITEMOBS_EXPLOSION_BLOCK_DAMAGE = new StateFlag("elitemobs-explosion-block-damage", true);
+            registry.register(ELITEMOBS_EXPLOSION_BLOCK_DAMAGE);
+            Bukkit.getLogger().info("[EliteMobs] - elitemobs-explosion-block-damage");
+        } catch (FlagConflictException | IllegalStateException e) {
+            Bukkit.getLogger().warning("[EliteMobs] Warning: flag elitemobs-explosion-block-damage already exists! This is normal if you've just now reloaded EliteMobs.");
+            ELITEMOBS_EXPLOSION_REGEN = (StateFlag) registry.get("elitemobs-explosion-block-damage");
+        }
+
         return true;
 
-    }
-
-    public static final StateFlag getEliteMobsSpawnFlag() {
-        return ELITEMOBS_SPAWN_FLAG;
-    }
-
-    public static final StateFlag getEliteMobsOnlySpawnFlag() {
-        return ELITEMOBS_ONLY_SPAWN_FLAG;
-    }
-
-    public static final StateFlag getEliteMobsAntiExploitFlag() {
-        return ELITEMOBS_ANTIEXPLOIT;
-    }
-
-    public static final StateFlag getEliteMobsDungeonFlag() {
-        return ELITEMOBS_DUNGEON;
-    }
-
-    public static final StateFlag getEliteMobsEventsFlag() {
-        return ELITEMOBS_EVENTS;
-    }
-
-    public static final IntegerFlag getEliteMobsMinimumLevel() {
-        return ELITEMOBS_MINIMUM_LEVEL;
-    }
-
-    public static final IntegerFlag getEliteMobsMaximumLevel() {
-        return ELITEMOBS_MAXIMUM_LEVEL;
-    }
-
-    public static final StateFlag getEliteMobsExplosionRegen() {
-        return ELITEMOBS_EXPLOSION_REGEN;
     }
 
     public static void protectWorldMinidugeonArea(Location location, WorldDungeonPackage dungeonWorldPackage) {
@@ -293,7 +283,8 @@ public class WorldGuardCompatibility {
         protectedRegion.setFlag(Flags.SOIL_DRY, deny);
         //missing coral-fade
         //missing ravager-grief
-        protectedRegion.setFlag(Flags.GHAST_FIREBALL, deny);
+        //protectedRegion.setFlag(Flags.GHAST_FIREBALL, deny); - this completely stops fireballs from working
+        protectedRegion.setFlag(ELITEMOBS_EXPLOSION_BLOCK_DAMAGE, deny);
         protectedRegion.setFlag(Flags.WITHER_DAMAGE, deny);
         protectedRegion.setFlag(Flags.ENDER_BUILD, deny);
         protectedRegion.setFlag(Flags.ITEM_FRAME_ROTATE, deny);

@@ -322,7 +322,7 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
     }
 
     public void removeSlow() {
-        if (getCustomBossesConfigFields().isAlert()) return;
+        if (getCustomBossesConfigFields().isAlert() || getLivingEntity() == null) return;
        getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(getFollowDistance());
        getLivingEntity().getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(getMovementSpeedAttribute());
     }

@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.config.CustomConfigFieldsInterface;
 import com.magmaguy.elitemobs.items.customloottable.CustomLootTable;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Location;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,6 +60,8 @@ public class CustomArenasConfigFields extends CustomConfigFields implements Cust
     @Getter
     @Setter
     private String permission = null;
+    @Getter
+    private Location teleportLocation = null;
 
     public CustomArenasConfigFields(String filename, boolean isEnabled) {
         super(filename, isEnabled);
@@ -83,6 +86,7 @@ public class CustomArenasConfigFields extends CustomConfigFields implements Cust
         this.arenaMessages = translatable(filename, "arenaMessages", processStringList("arenaMessages", arenaMessages, new ArrayList<>(), false));
         this.cylindricalArena = processBoolean("cylindricalArena", cylindricalArena, false, false);
         this.permission = processString("permission", permission, null, false);
+        this.teleportLocation = processLocation("teleportLocation", teleportLocation, null, false);
     }
 
 }

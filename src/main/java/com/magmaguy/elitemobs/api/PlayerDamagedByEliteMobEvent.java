@@ -129,7 +129,7 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
                 finalDamage = Math.max(baseDamage + bonusDamage - damageReduction - potionEffectDamageReduction, 1) *
                         customBossDamageMultiplier * specialMultiplier * MobCombatSettingsConfig.getNormalizedDamageToPlayerMultiplier();
             else
-                finalDamage= Math.max(baseDamage + bonusDamage - damageReduction - potionEffectDamageReduction, 1) *
+                finalDamage = Math.max(baseDamage + bonusDamage - damageReduction - potionEffectDamageReduction, 1) *
                         customBossDamageMultiplier * specialMultiplier * MobCombatSettingsConfig.getDamageToPlayerMultiplier();
 
             if (specialMultiplier != 1) specialMultiplier = 1;
@@ -156,7 +156,8 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
         public void onEliteDamagePlayer(EntityDamageByEntityEvent event) {
             if (event.isCancelled()) {
                 bypass = false;
-                return;
+                if (!(event.getDamager() instanceof Explosive))
+                    return;
             }
             if (!(event.getEntity() instanceof Player player)) return;
 
