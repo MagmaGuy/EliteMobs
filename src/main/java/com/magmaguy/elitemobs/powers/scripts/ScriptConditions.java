@@ -21,9 +21,11 @@ public class ScriptConditions {
 
     private final ScriptConditionsBlueprint conditionsBlueprint;
     private ScriptTargets scriptTargets = null;
+    private EliteScript eliteScript;
 
     public ScriptConditions(ScriptConditionsBlueprint scriptConditionsBlueprint, EliteScript eliteScript, boolean actionCondition) {
         this.conditionsBlueprint = scriptConditionsBlueprint;
+        this.eliteScript = eliteScript;
         //This is null if no conditions are set
         if (conditionsBlueprint.getScriptTargets() != null)
             this.scriptTargets = new ScriptTargets(conditionsBlueprint.getScriptTargets(), eliteScript);
@@ -79,6 +81,7 @@ public class ScriptConditions {
         if (conditionsBlueprint.getIsOnFloor() == null) return true;
         Block currentBlock = targetLocation.getBlock();
         Block floorBlock = targetLocation.clone().subtract(0, 1, 0).getBlock();
+        //Developer.message("Running isOnFloor" + eliteScript.getFileName());
         return conditionsBlueprint.getIsOnFloor() == !currentBlock.getType().isSolid() && floorBlock.getType().isSolid();
     }
 

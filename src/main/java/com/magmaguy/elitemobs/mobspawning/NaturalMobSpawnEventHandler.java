@@ -96,7 +96,7 @@ public class NaturalMobSpawnEventHandler implements Listener {
             return;
 
         if (EliteMobs.worldGuardIsEnabled)
-            if (!WorldGuardFlagChecker.checkFlag(event.getLocation(), WorldGuardCompatibility.getEliteMobsSpawnFlag()))
+            if (!WorldGuardFlagChecker.checkFlag(event.getLocation(), WorldGuardCompatibility.getELITEMOBS_SPAWN_FLAG()))
                 return;
 
         //This fires for custom bosses, so don't override those spawns

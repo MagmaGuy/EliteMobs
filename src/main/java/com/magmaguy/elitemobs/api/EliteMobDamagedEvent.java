@@ -60,7 +60,7 @@ public class EliteMobDamagedEvent extends EliteDamageEvent {
             if (!eliteEntity.isValid()) return;
 
             if (EliteMobs.worldGuardIsEnabled && !WorldGuardFlagChecker.checkFlag(eliteEntity.getLivingEntity().getLocation(),
-                    WorldGuardCompatibility.getEliteMobsAntiExploitFlag()))
+                    WorldGuardCompatibility.getELITEMOBS_ANTIEXPLOIT()))
                 return;
 
             Bukkit.getServer().getPluginManager().callEvent(new GenericAntiExploitEvent(eliteEntity, event));

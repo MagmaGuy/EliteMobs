@@ -90,7 +90,6 @@ public class EliteMobEnterCombatEvent extends Event {
         @EventHandler(ignoreCancelled = true)
         public void onEliteMobTarget(EliteMobTargetPlayerEvent event) {
             if (event.getEliteMobEntity().isInCombat()) return;
-            if (!(event.getEliteMobEntity().getLivingEntity() instanceof Mob)) return;
             Bukkit.getServer().getPluginManager().callEvent(new EliteMobEnterCombatEvent(event.getEliteMobEntity(), event.getPlayer()));
         }
     }

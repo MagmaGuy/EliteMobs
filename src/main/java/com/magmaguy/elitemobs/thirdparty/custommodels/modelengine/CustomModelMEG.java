@@ -1,9 +1,7 @@
-package com.magmaguy.elitemobs.thirdparty.modelengine;
+package com.magmaguy.elitemobs.thirdparty.custommodels.modelengine;
 
-import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
-import com.magmaguy.elitemobs.entitytracker.EntityTracker;
-import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.thirdparty.custommodels.CustomModelInterface;
 import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import com.ticxo.modelengine.api.ModelEngineAPI;
@@ -14,13 +12,8 @@ import com.ticxo.modelengine.api.model.ModeledEntity;
 import com.ticxo.modelengine.api.model.bone.Nameable;
 import lombok.Getter;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Projectile;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntitySpawnEvent;
 
-public class CustomModel {
+public class CustomModelMEG implements CustomModelInterface {
 
     ActiveModel activeModel;
     ModeledEntity modeledEntity;
@@ -30,7 +23,7 @@ public class CustomModel {
     @Getter
     private boolean success = false;
 
-    private CustomModel(LivingEntity livingEntity, String modelName, String nametagName) {
+    public CustomModelMEG(LivingEntity livingEntity, String modelName, String nametagName) {
         try {
             if (ModelEngineAPI.api.getModelRegistry().getBlueprint(modelName) == null) {
                 new InfoMessage("Model " + modelName + " was not found! Make sure you install the model correctly if you have it. This entry will be skipped!");
@@ -71,8 +64,8 @@ public class CustomModel {
 
     }
 
-    public static CustomModel generateCustomModel(LivingEntity livingEntity, String modelName, String nametagName) {
-        CustomModel customModel = new CustomModel(livingEntity, modelName, nametagName);
+    public static CustomModelMEG generateCustomModel(LivingEntity livingEntity, String modelName, String nametagName) {
+        CustomModelMEG customModel = new CustomModelMEG(livingEntity, modelName, nametagName);
         return customModel.isSuccess() ? customModel : null;
     }
 
@@ -121,6 +114,7 @@ public class CustomModel {
         activeModel.getAnimationHandler().playAnimation(string, .1, .1, 1, true);
     }
 
+    @Override
     public void setName(String nametagName, boolean visible) {
         if (modeledEntity == null) return;
         Nameable nametag = getNameableBone();
@@ -161,30 +155,4 @@ public class CustomModel {
         activeModel.getAnimationHandler().forceStopAllAnimations();
     }
 
-    public static class ModelEntityEvents implements Listener {
-        @EventHandler(ignoreCancelled = true)
-        public void onMeleeHit(EntityDamageByEntityEvent event) {
-            EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(event.getDamager());
-            if (!(eliteEntity instanceof CustomBossEntity)) return;
-            if (((CustomBossEntity) eliteEntity).getCustomModel() == null) return;
-            ((CustomBossEntity) eliteEntity).getCustomModel().melee();
-        }
-
-        @EventHandler(ignoreCancelled = true)
-        public void onRangedShot(EntitySpawnEvent event) {
-            if (!(event.getEntity() instanceof Projectile)) return;
-            if (!(((Projectile) event.getEntity()).getShooter() instanceof LivingEntity)) return;
-            EliteEntity eliteEntity = EntityTracker.getEliteMobEntity((LivingEntity) ((Projectile) event.getEntity()).getShooter());
-            if (!(eliteEntity instanceof CustomBossEntity)) return;
-            if (((CustomBossEntity) eliteEntity).getCustomModel() == null) return;
-            ((CustomBossEntity) eliteEntity).getCustomModel().shoot();
-        }
-
-        @EventHandler
-        public void onDeathEvent(EliteMobDeathEvent event){
-            if (event.getEliteEntity() instanceof CustomBossEntity customBossEntity &&
-                    customBossEntity.getCustomModel() != null)
-                customBossEntity.getCustomModel().playAnimationByName("death");
-        }
-    }
 }

@@ -10,7 +10,6 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -43,12 +42,12 @@ public class PlasmaBlaster extends CombatEnterScanPower {
             if (entity.getType().equals(EntityType.PLAYER)) {
                 if (((Player) entity).getGameMode().equals(GameMode.SPECTATOR)) continue;
                 Vector shotVector = entity.getLocation().subtract(eliteEntity.getLivingEntity().getLocation()).toVector().normalize().multiply(0.5);
-                createProjectile(shotVector, eliteEntity.getLocation(), eliteEntity);
+                createProjectile(shotVector, eliteEntity.getLocation(), eliteEntity, (Player) entity);
                 break;
             }
     }
 
-    private void createProjectile(Vector shotVector, Location sourceLocation, EliteEntity sourceEntity) {
+    private void createProjectile(Vector shotVector, Location sourceLocation, EliteEntity sourceEntity, Player player) {
         new BukkitRunnable() {
             final Location currentLocation = sourceLocation.clone().add(new Vector(0, 1, 0));
             int counter = 0;
@@ -60,15 +59,11 @@ public class PlasmaBlaster extends CombatEnterScanPower {
                     return;
                 }
                 counter++;
-                for (Entity entity : currentLocation.getWorld().getNearbyEntities(currentLocation, 0.1 * counter / 12d, 0.1 * counter / 12d, 0.1 * counter / 12d)) {
-                    if (entity.equals(sourceEntity.getLivingEntity())) continue;
-                    if (!(entity instanceof LivingEntity)) continue;
-                    cancel();
-                    if (entity.getType() == EntityType.PLAYER) doDamage((Player) entity, sourceEntity);
-                    break;
-                }
 
-                doVisualEffect(currentLocation, counter);
+                if (player.getBoundingBox().overlaps(new Vector(currentLocation.getX() - .5, currentLocation.getY() - .5, currentLocation.getZ() - .5), new Vector(currentLocation.getX() + .5, currentLocation.getY() + .5, currentLocation.getZ() + .5)))
+                    doDamage(player, sourceEntity);
+                if (counter % 5 == 0)
+                    doVisualEffect(currentLocation, counter);
 
                 currentLocation.add(shotVector);
                 if (!currentLocation.getBlock().isPassable()) cancel();
@@ -95,7 +90,7 @@ public class PlasmaBlaster extends CombatEnterScanPower {
 
     private void doVisualEffect(Location location, int counter) {
         location.getWorld().spawnParticle(Particle.REDSTONE, location.getX(), location.getY(), location.getZ(),
-                20, 0.1 * counter / 12d, 0.1 * counter / 12d, 0.1 * counter / 12d, 1, new Particle.DustOptions(Color.fromRGB(
+                10, 0.1 * counter / 12d, 0.1 * counter / 12d, 0.1 * counter / 12d, 1, new Particle.DustOptions(Color.fromRGB(
                         ThreadLocalRandom.current().nextInt(0, 100),
                         ThreadLocalRandom.current().nextInt(122, 255),
                         ThreadLocalRandom.current().nextInt(0, 100)

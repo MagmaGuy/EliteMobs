@@ -62,9 +62,10 @@ import com.magmaguy.elitemobs.quests.objectives.CustomFetchObjective;
 import com.magmaguy.elitemobs.quests.objectives.DialogObjective;
 import com.magmaguy.elitemobs.quests.objectives.KillObjective;
 import com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldownsLogout;
-import com.magmaguy.elitemobs.thirdparty.modelengine.CustomModel;
+import com.magmaguy.elitemobs.thirdparty.custommodels.CustomModel;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardDungeonFlag;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardEliteMobOnlySpawnFlag;
+import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardExplosionBlockDamageFlag;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
 import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
@@ -362,9 +363,12 @@ public class EventsRegistrer {
         register(new NPCProximitySensor());
         register(new NPCEntity.NPCEntityEvents());
         register(new FindNewWorlds());
-        register(new WorldGuardSpawnEventBypasser());
-        register(new WorldGuardEliteMobOnlySpawnFlag());
-        register(new WorldGuardDungeonFlag());
+        if (EliteMobs.worldGuardIsEnabled) {
+            register(new WorldGuardSpawnEventBypasser());
+            register(new WorldGuardEliteMobOnlySpawnFlag());
+            register(new WorldGuardDungeonFlag());
+            register(new WorldGuardExplosionBlockDamageFlag());
+        }
 
         register(new EntityTransformHandler());
         register(new EliteBlazeWaterDamagePrevention());

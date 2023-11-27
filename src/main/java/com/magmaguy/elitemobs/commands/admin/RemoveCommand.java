@@ -17,6 +17,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -39,6 +40,11 @@ public class RemoveCommand {
     }
 
     public static class RemoveCommandEvents implements Listener {
+        @EventHandler (ignoreCancelled = true)
+        public void quitEvent(PlayerQuitEvent event) {
+            removingPlayers.remove(event.getPlayer().getUniqueId());
+        }
+
         @EventHandler(priority = EventPriority.LOWEST)
         public void removeEliteEntity(EntityDamageByEntityEvent event) {
             if (!removingPlayers.contains(event.getDamager().getUniqueId())) return;

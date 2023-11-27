@@ -8,11 +8,10 @@ import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.items.customloottable.CustomLootTable;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.powers.scripts.caching.EliteScriptBlueprint;
-import com.magmaguy.elitemobs.thirdparty.modelengine.CustomModel;
+import com.magmaguy.elitemobs.thirdparty.custommodels.CustomModel;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.EntityType;
@@ -380,7 +379,7 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     }
 
     public boolean isCustomModelExists() {
-        if (Bukkit.getPluginManager().isPluginEnabled("ModelEngine") && CustomModel.modelExists(customModel))
+        if (CustomModel.customModelsEnabled() && CustomModel.modelExists(customModel))
             return customModelExists = true;
         return false;
     }

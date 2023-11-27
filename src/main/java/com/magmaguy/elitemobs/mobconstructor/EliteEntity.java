@@ -61,7 +61,7 @@ public class EliteEntity {
     protected LivingEntity unsyncedLivingEntity;
     @Getter
     @Setter
-    protected int level;
+    protected int level = -1;
     @Getter
     protected double maxHealth;
     @Getter

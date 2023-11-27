@@ -59,7 +59,7 @@ public abstract class CustomEvent {
         if (!ValidWorldsConfig.getValidWorlds().contains(Objects.requireNonNull(location.getWorld()).getName()))
             return false;
         return !(EliteMobs.worldGuardIsEnabled &&
-                !WorldGuardFlagChecker.checkFlag(location, WorldGuardCompatibility.getEliteMobsEventsFlag()));
+                !WorldGuardFlagChecker.checkFlag(location, WorldGuardCompatibility.getELITEMOBS_EVENTS()));
     }
 
     public CustomEventsConfigFields getCustomEventsConfigFields() {
