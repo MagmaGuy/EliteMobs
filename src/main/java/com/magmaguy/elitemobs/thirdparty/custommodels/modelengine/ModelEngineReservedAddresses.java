@@ -1,4 +1,4 @@
-package com.magmaguy.elitemobs.thirdparty.modelengine;
+package com.magmaguy.elitemobs.thirdparty.custommodels.modelengine;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import org.bukkit.Bukkit;

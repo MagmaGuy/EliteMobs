@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.items.customenchantments;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import org.bukkit.Location;
@@ -36,13 +37,13 @@ public class DrillingEnchantment extends CustomEnchantment {
         @EventHandler(priority = EventPriority.HIGHEST)
         public void onDig(BlockBreakEvent event) {
             if (event.isCancelled()) return;
-            if (event.getPlayer().isSneaking()) return;
-            if (activePlayers.contains(event.getPlayer())) return;
             if (!event.getPlayer().getInventory().getItemInMainHand().hasItemMeta() ||
                     event.getPlayer().getInventory().getItemInMainHand().getItemMeta() == null) return;
             if (!ItemTagger.hasEnchantment(event.getPlayer().getInventory().getItemInMainHand().getItemMeta(), new NamespacedKey(MetadataHandler.PLUGIN, key)))
                 return;
-
+            if (event.getPlayer().isSneaking()) return;
+            if (!EnchantmentsConfig.getEnchantment("drilling.yml").isEnabled()) return;
+            if (activePlayers.contains(event.getPlayer())) return;
 
             drillBlocks(event.getBlock(),
                     ItemTagger.getEnchantment(event.getPlayer().getInventory().getItemInMainHand().getItemMeta(), new NamespacedKey(MetadataHandler.PLUGIN, key)),

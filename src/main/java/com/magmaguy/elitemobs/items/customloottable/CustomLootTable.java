@@ -56,6 +56,7 @@ public class CustomLootTable implements Serializable {
                     if (rawString.toLowerCase(Locale.ROOT).contains("currencyamount="))
                         new CurrencyCustomLootEntry(entries, rawString, filename);
                     else if (rawString.contains("material=")) new VanillaCustomLootEntry(entries, rawString, filename);
+                    else if (rawString.contains("command=")) new CommandLootTable(entries, rawString, filename);
                     else new EliteCustomLootEntry(entries, rawString, filename);
             }
             else if (object instanceof Map<?, ?> configMap)

@@ -6,8 +6,8 @@ import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
+import com.magmaguy.elitemobs.thirdparty.custommodels.CustomModel;
 import com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity;
-import com.magmaguy.elitemobs.thirdparty.modelengine.CustomModel;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser;
@@ -61,7 +61,7 @@ public class CustomBossMegaConsumer {
             return null;
         }
         if (EliteMobs.worldGuardIsEnabled) {
-            if (!WorldGuardFlagChecker.checkFlag(spawnLocation, WorldGuardCompatibility.getEliteMobsSpawnFlag())) {
+            if (!WorldGuardFlagChecker.checkFlag(spawnLocation, WorldGuardCompatibility.getELITEMOBS_SPAWN_FLAG())) {
                 new WarningMessage("Attempted to spawn " + customBossesConfigFields.getFilename() + " in location " +
                         spawnLocation + " which is protected by WorldGuard with elitemobs-spawning deny! This should not have happened.");
                 return null;
@@ -114,7 +114,7 @@ public class CustomBossMegaConsumer {
 
     private void setDisguise(LivingEntity livingEntity) {
         if (customBossesConfigFields.getDisguise() == null ||
-                Bukkit.getPluginManager().isPluginEnabled("ModelEngine") &&
+                CustomModel.customModelsEnabled() &&
                         customBossesConfigFields.isCustomModelExists() &&
                         customBossesConfigFields.getCustomModel() != null &&
                         !customBossesConfigFields.getCustomModel().isEmpty())
@@ -128,8 +128,6 @@ public class CustomBossMegaConsumer {
     }
 
     private void setCustomModel(LivingEntity livingEntity) {
-        if (!Bukkit.getPluginManager().isPluginEnabled("ModelEngine"))
-            return;
         if (!customBossesConfigFields.isCustomModelExists()) return;
         if (customBossesConfigFields.getCustomModel() == null || customBossesConfigFields.getCustomModel().isEmpty())
             return;

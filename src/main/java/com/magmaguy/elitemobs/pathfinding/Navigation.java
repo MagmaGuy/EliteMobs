@@ -59,7 +59,7 @@ public class Navigation implements Listener {
         EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(event.getLivingEntity());
         if (!(eliteEntity instanceof RegionalBossEntity regionalBossEntity)) return;
         event.getLivingEntity().setInvulnerable(true);
-        eliteEntity.getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(regionalBossEntity.getCustomBossesConfigFields().getLeashRadius() * 1.5);
+        event.getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(regionalBossEntity.getCustomBossesConfigFields().getLeashRadius() * 1.5);
     }
 
     @EventHandler(ignoreCancelled = true)

@@ -18,6 +18,12 @@ public class ArenaEntity {
     @Getter
     @Setter
     private String bossfile;
+    @Getter
+    @Setter
+    private boolean mythicMob = false;
+    @Getter
+    @Setter
+    private int level = -1;
 
     public ArenaEntity(String spawnPointName, int wave, String bossfile) {
         this.spawnPointName = spawnPointName;
