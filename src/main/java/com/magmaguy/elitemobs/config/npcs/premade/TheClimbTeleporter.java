@@ -10,10 +10,10 @@ public class TheClimbTeleporter extends NPCsConfigFields {
     public TheClimbTeleporter(){
         super("the_climb_teleporter",
                 true,
-                "Villager Voltar",
+                "Miner Regulus",
                 "<[10] The Climb Teleporter>",
                 Villager.Profession.ARMORER,
-                "em_adventurers_guild,303.5,78,208.5,90,0",
+                "em_adventurers_guild,303.5,78.18,208.5,90,0",
                 List.of(""),
                 List.of(),
                 List.of(),

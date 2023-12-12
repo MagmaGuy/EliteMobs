@@ -26,12 +26,15 @@ public class TheClimbDungeon extends DungeonPackagerConfigFields {
                 "Difficulty: &45-man hard content!",
                 "&bYou've been asked to investigate the path to the caves. Climb your way to the top!",
                 "&bYou have left The Climb!",
-                List.of("filename=the_climb_undead_beastmaster.yml"),
+                List.of("filename=the_climb_undead_beastmaster.yml",
+                        "filename=the_climb_skeletal_shadow.yml",
+                        "filename=the_climb_bone_champion.yml",
+                        "filename=the_climb_undead_guardian.yml"),
                 "em_id_the_climb",
                 10);
         setDifficulties(List.of(
-                Map.of("name", "normal", "levelSync", 12, "id", 0),
+                Map.of("name", "normal", "levelSync", 15, "id", 0),
                 Map.of("name", "hard", "levelSync", 10, "id", 1),
-                Map.of("name", "mythic", "levelSync", 8, "id", 2)));
+                Map.of("name", "mythic", "levelSync", 5, "id", 2)));
     }
 }

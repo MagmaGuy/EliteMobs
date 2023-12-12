@@ -266,15 +266,32 @@ public class EliteItemManager {
         if (itemStack == null) return;
         registerEliteItem(itemStack);
         if (isWeapon(itemStack)) {
-            double damage = level * CombatSystem.DPS_PER_LEVEL / 1 / getAttackSpeed(itemStack) - getBaseDamage(itemStack);
+            double damage = calculateEliteBonus(itemStack,level);
             if (damage > 0)
                 ItemTagger.setEliteDamageAttribute(itemStack, damage);
         } else if (isArmor(itemStack)) {
-            double defense = (level - CombatSystem.getMaterialTier(itemStack.getType())) / 4D;
+            double defense = calculateEliteBonus(itemStack,level);
             if (defense > 0)
                 ItemTagger.setEliteDefenseAttribute(itemStack, defense);
         }
         new EliteItemLore(itemStack, false);
+    }
+
+    /**
+     * This returns how much elite damage an item would give, based on a level. This should be used when a level wants to
+     * be calculated instead of read, which should only be true when you're doing something tricky like temporarily limiting
+     * the level of items for instanced dungeons
+     * @param itemStack ItemStack to check the level of
+     * @param level Level to calculate
+     * @return Amount of damage an elite weapon of that level would deal
+     */
+    public static double calculateEliteBonus(ItemStack itemStack, int level){
+        if (isWeapon(itemStack)) {
+            return level * CombatSystem.DPS_PER_LEVEL / 1 / getAttackSpeed(itemStack) - getBaseDamage(itemStack);
+        } else if (isArmor(itemStack)) {
+            return  (level - CombatSystem.getMaterialTier(itemStack.getType())) / 4D;
+        }
+        return 0;
     }
 
     public static void tagArrow(@Nullable Projectile projectile) {

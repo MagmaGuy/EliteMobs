@@ -26,7 +26,7 @@ public class InstancedBossEntity extends RegionalBossEntity implements Persisten
         super(customBossesConfigFields, location, false, true);
         this.dungeonInstance = dungeonInstance;
         super.elitePowers = ElitePowerParser.parsePowers(customBossesConfigFields, this);
-        if (level == -1){
+        if (level == -1) {
             if (dungeonInstance.getPlayers().isEmpty())
                 new WarningMessage("Failed to get players for new instance when assigning dynamic level! The bosses will default to level 1.");
             else
@@ -54,25 +54,32 @@ public class InstancedBossEntity extends RegionalBossEntity implements Persisten
             Location newLocation = containers.getLocation().clone();
             newLocation.setWorld(newWorld);
             InstancedBossEntity newEntity = new InstancedBossEntity(containers.getCustomBossesConfigFields(), newLocation, dungeonInstance);
-            //Set the health multipliers
-            //todo: reenable this - critical and check if it currently doesn't add anything
-            newEntity.setHealthMultiplier(newEntity.healthMultiplier * Math.pow(playerCount, 1.2));
             newEntity.spawn(false);
             newDungeonList.add(newEntity);
         }
         return newDungeonList;
     }
 
-    @Override
-    public void setNormalizedMaxHealth() {
+    public void setNormalizedMaxHealth(int playerCount) {
         super.setNormalizedMaxHealth();
-        double normalizedDungeonMaxHealth = super.getMaxHealth() * Math.pow(dungeonInstance.getPlayers().size(), 1.2);
+        if (playerCount < 2) return;
+        double normalizedDungeonMaxHealth = super.getMaxHealth() * .75 * playerCount;
         super.maxHealth = normalizedDungeonMaxHealth;
         super.health = maxHealth;
-        if (livingEntity != null){
+        if (livingEntity != null) {
             livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(maxHealth);
             livingEntity.setHealth(maxHealth);
         }
+    }
+
+    @Override
+    public void remove(RemovalReason removalReason) {
+        super.remove(removalReason);
+        if (removalReason.equals(RemovalReason.WORLD_UNLOAD))
+            if (persistentObjectHandler != null) {
+                persistentObjectHandler.remove();
+                persistentObjectHandler = null;
+            }
     }
 
     private static class InstancedBossContainer {
@@ -85,15 +92,5 @@ public class InstancedBossEntity extends RegionalBossEntity implements Persisten
             this.location = location;
             this.customBossesConfigFields = customBossesConfigFields;
         }
-    }
-
-    @Override
-    public void remove(RemovalReason removalReason) {
-        super.remove(removalReason);
-        if (removalReason.equals(RemovalReason.WORLD_UNLOAD))
-            if (persistentObjectHandler != null) {
-                persistentObjectHandler.remove();
-                persistentObjectHandler = null;
-            }
     }
 }

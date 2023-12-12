@@ -170,7 +170,7 @@ public class DungeonInstance extends MatchInstance {
     //Runs when the instance starts, adjusting boss health to the amount of players in the instance
     private void updateBossHealth() {
         instancedBossEntities.forEach(instancedBossEntity -> {
-            instancedBossEntity.setNormalizedMaxHealth();
+            instancedBossEntity.setNormalizedMaxHealth(players.size());
         });
     }
 
