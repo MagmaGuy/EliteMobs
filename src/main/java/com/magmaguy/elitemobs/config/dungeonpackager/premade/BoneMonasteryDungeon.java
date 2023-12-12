@@ -30,8 +30,8 @@ public class BoneMonasteryDungeon extends DungeonPackagerConfigFields {
                 "the_bone_monastery",
                 85);
         setDifficulties(List.of(
-                Map.of("name", "normal", "levelSync", 95, "id", 0),
+                Map.of("name", "normal", "levelSync", 90, "id", 0),
                 Map.of("name", "hard", "levelSync", 85, "id", 1),
-                Map.of("name", "mythic", "levelSync", 75, "id", 2)));
+                Map.of("name", "mythic", "levelSync", 80, "id", 2)));
     }
 }

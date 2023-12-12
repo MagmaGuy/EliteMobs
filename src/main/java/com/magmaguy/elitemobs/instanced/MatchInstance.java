@@ -17,6 +17,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -273,6 +274,14 @@ public abstract class MatchInstance {
 
         @EventHandler
         public void onPlayerBreakBlockEvent(BlockBreakEvent event) {
+            for (MatchInstance matchInstance : instances)
+                if (matchInstance.state.equals(InstancedRegionState.ONGOING))
+                    if (matchInstance.getDeathBanners().get(event.getBlock()) != null)
+                        matchInstance.getDeathBanners().get(event.getBlock()).clear(true);
+        }
+
+        @EventHandler
+        public void onPlayerHitFlagEvent(BlockDamageEvent event) {
             for (MatchInstance matchInstance : instances)
                 if (matchInstance.state.equals(InstancedRegionState.ONGOING))
                     if (matchInstance.getDeathBanners().get(event.getBlock()) != null)

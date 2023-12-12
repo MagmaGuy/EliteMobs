@@ -31,8 +31,8 @@ public class FrostPalaceSanctum extends DungeonPackagerConfigFields {
                 "frost_palace",
                 50);
         setDifficulties(List.of(
-                Map.of("name", "normal", "levelSync", 60, "id", 0),
+                Map.of("name", "normal", "levelSync", 55, "id", 0),
                 Map.of("name", "hard", "levelSync", 50, "id", 1),
-                Map.of("name", "mythic", "levelSync", 40, "id", 2)));
+                Map.of("name", "mythic", "levelSync", 45, "id", 2)));
     }
 }

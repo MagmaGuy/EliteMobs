@@ -28,10 +28,10 @@ public class TheCaveSanctum extends DungeonPackagerConfigFields {
                 "&bYou have left The Cave!",
                 List.of("filename=the_cave_boiler_p1.yml"),
                 "em_id_the_cave",
-                10);
+                15);
         setDifficulties(List.of(
-                Map.of("name", "normal", "levelSync", 12, "id", 0),
-                Map.of("name", "hard", "levelSync", 10, "id", 1),
-                Map.of("name", "mythic", "levelSync", 8, "id", 2)));
+                Map.of("name", "normal", "levelSync", 20, "id", 0),
+                Map.of("name", "hard", "levelSync", 15, "id", 1),
+                Map.of("name", "mythic", "levelSync", 10, "id", 2)));
     }
 }

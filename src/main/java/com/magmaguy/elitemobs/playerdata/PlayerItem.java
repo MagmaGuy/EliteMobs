@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.playerdata;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
-import com.magmaguy.elitemobs.combatsystem.CombatSystem;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.instanced.dungeons.DungeonInstance;
 import com.magmaguy.elitemobs.items.ItemTagger;
@@ -85,6 +84,18 @@ public class PlayerItem {
             this.eliteDamage = EliteItemManager.getEliteDamageFromEliteAttributes(itemStack);
         } else
             this.itemTier = (int) Math.round(EliteItemManager.getArmorLevel(itemStack));
+
+        //Level sync for instanced dungeons - limits the max level of the item
+        if (PlayerData.getMatchInstance(player) != null &&
+                PlayerData.getMatchInstance(player) instanceof DungeonInstance dungeonInstance &&
+                dungeonInstance.getLevelSync() > 0) {
+            if (itemTier > dungeonInstance.getLevelSync()) {
+                itemTier = dungeonInstance.getLevelSync();
+                if (equipmentSlot.equals(EquipmentSlot.MAINHAND))
+                    this.eliteDamage = EliteItemManager.calculateEliteBonus(itemStack, itemTier);
+            }
+        }
+
         this.continuousPotionEffects = ItemTagger.getPotionEffects(itemStack.getItemMeta(), ItemTagger.continuousPotionEffectKey);
         this.onHitPotionEffects = ItemTagger.getPotionEffects(itemStack.getItemMeta(), ItemTagger.onHitPotionEffectKey);
 
@@ -102,21 +113,6 @@ public class PlayerItem {
         this.thornsLevel = ItemTagger.getEnchantment(itemStack.getItemMeta(), Enchantment.THORNS.getKey());
         this.loudStrikesBonus = ItemTagger.getEnchantment(itemStack.getItemMeta(), new NamespacedKey(MetadataHandler.PLUGIN, LoudStrikesEnchantment.key)) / 3d;
         eliteDamage += EliteItemManager.getEliteDamageFromEnchantments(itemStack);
-
-        //Level sync for instanced dungeons - limits the max level of the item
-        if (PlayerData.getMatchInstance(player) != null &&
-                PlayerData.getMatchInstance(player) instanceof DungeonInstance dungeonInstance &&
-                dungeonInstance.getLevelSync() > 0) {
-            //Recalculate damage
-            if (equipmentSlot.equals(EquipmentSlot.MAINHAND)) {
-                double syncedDPS = CombatSystem.DPS_PER_LEVEL * dungeonInstance.getLevelSync();
-                double currentDPS = EliteItemManager.getDPS(EliteItemManager.getBaseDamage(itemStack) + EliteItemManager.getEliteDamageFromEliteAttributes(itemStack), EliteItemManager.getAttackSpeed(itemStack));
-                if (currentDPS > syncedDPS)
-                    this.eliteDamage = syncedDPS * (1 / EliteItemManager.getAttackSpeed(itemStack)) + EliteItemManager.getEliteDamageFromEnchantments(itemStack) - EliteItemManager.getBaseDamage(itemStack);
-            }
-            this.eliteDamageReduction = Math.min(dungeonInstance.getLevelSync(), EliteItemManager.getEliteDefense(itemStack)) / 4d +
-                    EliteItemManager.getBonusEliteDefense(itemStack);
-        }
 
         return true;
 

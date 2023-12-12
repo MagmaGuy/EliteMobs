@@ -29,9 +29,9 @@ public class PrimisGladiusInvasionDungeon extends DungeonPackagerConfigFields {
                 "em_id_primis_gladius",
                 1);
         setDifficulties(List.of(
-                Map.of("name", "normal", "id", 0, "levelSync", "18"),
-                Map.of("name", "hard", "id", 1, "levelSync", "15"),
-                Map.of("name", "mythic", "id", 2, "levelSync", "12")
+                Map.of("name", "normal", "id", 0, "levelSync", 18),
+                Map.of("name", "hard", "id", 1, "levelSync", 15),
+                Map.of("name", "mythic", "id", 2, "levelSync", 12)
         ));
         setMaxPlayerCount(5);
     }

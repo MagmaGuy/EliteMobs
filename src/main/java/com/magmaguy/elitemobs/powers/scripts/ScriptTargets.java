@@ -169,7 +169,7 @@ public class ScriptTargets {
         Collection<Location> newLocations = null;
 
         switch (this.getTargetBlueprint().getTargetType()) {
-            case ALL_PLAYERS, WORLD_PLAYERS, NEARBY_PLAYERS, DIRECT_TARGET, SELF:
+            case ALL_PLAYERS, WORLD_PLAYERS, NEARBY_PLAYERS, DIRECT_TARGET, SELF, NEARBY_MOBS:
                 return getTargetEntities(scriptActionData).stream().map(targetEntity -> addOffsets(targetEntity.getLocation(), scriptActionData)).collect(Collectors.toSet());
             case SELF_SPAWN:
                 return new ArrayList<>(List.of(addOffsets(scriptActionData.getEliteEntity().getSpawnLocation(), scriptActionData)));
