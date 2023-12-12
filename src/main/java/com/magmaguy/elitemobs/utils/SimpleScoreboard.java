@@ -4,10 +4,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.Objective;
-import org.bukkit.scoreboard.Score;
-import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.*;
 
 import java.util.List;
 
@@ -17,7 +14,7 @@ public class SimpleScoreboard {
         Scoreboard scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
         int lineCount = Math.min(scoreboardContents.size(), 15);
 
-        Objective objective = scoreboard.registerNewObjective("test", "dummy", displayName);
+        Objective objective = scoreboard.registerNewObjective("test", Criteria.DUMMY, displayName);
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
         for (int i = 0; i < lineCount; i++) {
             String scoreString = scoreboardContents.get(i);

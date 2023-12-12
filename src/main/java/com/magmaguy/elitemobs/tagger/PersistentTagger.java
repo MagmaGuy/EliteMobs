@@ -30,6 +30,7 @@ public class PersistentTagger {
     }
 
     public static void tag(@NotNull Entity entity, String key, String value) {
+        if (entity == null) return;
         entity.getPersistentDataContainer().set(new NamespacedKey(MetadataHandler.PLUGIN, key), PersistentDataType.STRING, value);
     }
 

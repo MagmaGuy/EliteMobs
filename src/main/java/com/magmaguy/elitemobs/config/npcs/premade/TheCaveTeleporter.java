@@ -10,10 +10,10 @@ public class TheCaveTeleporter extends NPCsConfigFields {
     public TheCaveTeleporter(){
         super("the_cave_teleporter",
                 true,
-                "Miner Regulus",
-                "<[10] The Cave Teleporter>",
+                "Village Mother Diane",
+                "<[15] The Cave Teleporter>",
                 Villager.Profession.ARMORER,
-                "em_adventurers_guild,303.5,78,204.5,90,0",
+                "em_adventurers_guild,303.5,78.18,206.5,90,0",
                 List.of(""),
                 List.of(),
                 List.of(),
