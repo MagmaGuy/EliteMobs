@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.bukkit.configuration.MemorySection;
 import org.bukkit.util.Vector;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -15,9 +16,9 @@ import static com.magmaguy.elitemobs.utils.MapListInterpreter.*;
 public class ScriptTargetsBlueprint {
     private final String filename;
     @Getter
-    protected TargetType targetType = TargetType.SELF;
-    @Getter
     private final String scriptName;
+    @Getter
+    protected TargetType targetType = TargetType.SELF;
     @Getter
     private List<String> locations;
     @Getter
@@ -42,12 +43,12 @@ public class ScriptTargetsBlueprint {
         this.filename = filename;
         processMapList(entry);
         if (!isZoneTarget() && coverage < 1.0) {
-                new WarningMessage("Coverage for script " + scriptName + " in file " + filename + " was less than 1.0 but the targetType is neither ZONE_FULL nor ZONE_BORDER! Coverage should only be used for ZONE_FULL or ZONE_BORDER");
-                coverage = 1.0;
-            }
+            new WarningMessage("Coverage for script " + scriptName + " in file " + filename + " was less than 1.0 but the targetType is neither ZONE_FULL nor ZONE_BORDER! Coverage should only be used for ZONE_FULL or ZONE_BORDER");
+            coverage = 1.0;
+        }
     }
 
-    public boolean isZoneTarget(){
+    public boolean isZoneTarget() {
         return targetType == TargetType.ZONE_FULL ||
                 targetType == TargetType.ZONE_BORDER ||
                 targetType == TargetType.INHERIT_SCRIPT_ZONE_FULL ||
@@ -73,7 +74,14 @@ public class ScriptTargetsBlueprint {
                 isCustomCoverage = true;
                 coverage = parseDouble(key, value, scriptName);
             }
-            case "relativeoffset" -> scriptRelativeVectorBlueprint = new ScriptRelativeVectorBlueprint(scriptName, filename, ((MemorySection) value).getValues(false));
+            case "relativeoffset" -> {
+                if (value instanceof MemorySection)
+                    new ScriptRelativeVectorBlueprint(scriptName, filename, ((MemorySection) value).getValues(false));
+                else if (value instanceof LinkedHashMap<?, ?>)
+                    scriptRelativeVectorBlueprint = new ScriptRelativeVectorBlueprint(scriptName, filename, ((LinkedHashMap) value));
+                else
+                    new WarningMessage("Failed to get valid format for relative offset in " + scriptName + " for file " + filename);
+            }
         }
     }
 }

@@ -6,6 +6,7 @@ import lombok.Getter;
 import org.bukkit.configuration.MemorySection;
 import org.bukkit.util.Vector;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class ScriptRelativeVectorBlueprint {
@@ -25,6 +26,12 @@ public class ScriptRelativeVectorBlueprint {
     private Vector offset = new Vector(0, 0, 0);
 
     public ScriptRelativeVectorBlueprint(String scriptName, String scriptFilename, Map<String, ?> configurationValues) {
+        this.scriptName = scriptName;
+        this.scriptFilename = scriptFilename;
+        configurationValues.entrySet().forEach(entry -> processKeyAndValue(entry.getKey(), entry.getValue()));
+    }
+
+    public ScriptRelativeVectorBlueprint(String scriptName, String scriptFilename, LinkedHashMap<String, ?> configurationValues) {
         this.scriptName = scriptName;
         this.scriptFilename = scriptFilename;
         configurationValues.entrySet().forEach(entry -> processKeyAndValue(entry.getKey(), entry.getValue()));
