@@ -23,7 +23,7 @@ processResources {
 }
 
 group 'com.magmaguy'
-version '8.7.1-SNAPSHOT'
+version '8.7.2-SNAPSHOT'
 
 repositories {
     maven {
@@ -124,7 +124,7 @@ dependencies {
     implementation group: 'com.magmaguy', name: 'EasyMinecraftGoals-dist', version: '1.7.0'
 
     //Free Minecraft Models
-    compileOnly group: 'com.magmaguy', name: 'FreeMinecraftModels', version: '1.1.0-SNAPSHOT'
+    compileOnly group: 'com.magmaguy', name: 'FreeMinecraftModels', version: '1.1.2-SNAPSHOT'
 
     // Mythic Mobs integration
     compileOnly group: 'io.lumine', name: 'Mythic-Dist', version: '5.3.5'
