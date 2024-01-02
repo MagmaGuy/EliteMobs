@@ -11,6 +11,8 @@ Discord support channel: https://discord.gg/QSA2wgh
 
 Webapp where you can create content: https://magmaguy.com/webapp/webapp.html
 
+The official EliteMobs resource pack is provided under the CC0 license - no rights reserved, free to use and modify, even without attribution (though attribution is appreciated even if it is not forced).
+
 # Dev notes:
 
 ## Repository

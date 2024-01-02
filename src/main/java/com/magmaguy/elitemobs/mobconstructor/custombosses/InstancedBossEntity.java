@@ -73,6 +73,21 @@ public class InstancedBossEntity extends RegionalBossEntity implements Persisten
     }
 
     @Override
+    public void setMaxHealth() {
+        super.setNormalizedMaxHealth();
+        if (dungeonInstance.getPlayers().size() < 2) return;
+        double normalizedDungeonMaxHealth = super.getMaxHealth() * .75 * dungeonInstance.getPlayers().size();
+        super.maxHealth = normalizedDungeonMaxHealth;
+        if (health == null) {
+            if (livingEntity != null) livingEntity.setHealth(maxHealth);
+            this.health = maxHealth;
+        }
+        //This is useful for phase boss entities that spawn in unloaded chunks and shouldn't full heal between phases, like in dungeons
+        else if (livingEntity != null)
+            livingEntity.setHealth(Math.min(health, livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()));
+    }
+
+    @Override
     public void remove(RemovalReason removalReason) {
         super.remove(removalReason);
         if (removalReason.equals(RemovalReason.WORLD_UNLOAD))

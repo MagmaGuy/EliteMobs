@@ -6,7 +6,6 @@ import com.magmaguy.elitemobs.utils.shapes.Shape;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Event;
 
@@ -42,7 +41,7 @@ public class ScriptActionData {
     //in which case the targets are inherited by this script so they can be reused
     @Setter
     @Getter
-    private Collection<Entity> previousEntityTargets;
+    private Collection<LivingEntity> previousEntityTargets;
     @Setter
     @Getter
     private Collection<Location> previousLocationTargets;
@@ -95,7 +94,7 @@ public class ScriptActionData {
     }
 
     //For data called by other scripts
-    public ScriptActionData(EliteEntity eliteEntity, LivingEntity directTarget, ScriptTargets scriptTargets,  Collection<Entity> previousEntityTargets, Collection<Location> previousLocationTargets) {
+    public ScriptActionData(EliteEntity eliteEntity, LivingEntity directTarget, ScriptTargets scriptTargets,  Collection<LivingEntity> previousEntityTargets, Collection<Location> previousLocationTargets) {
         this.eliteEntity = eliteEntity;
         this.directTarget = directTarget;
         this.scriptTargets = scriptTargets;
