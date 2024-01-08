@@ -943,7 +943,7 @@ public class AdminCommands {
                 .permission("elitemobs.*")
                 .handler(commandContext -> {
                     if (languages.contains(commandContext.get("language"))) {
-                        DefaultConfig.setLanguage((Player) commandContext.getSender(), commandContext.get("language"));
+                        DefaultConfig.setLanguage(commandContext.getSender(), commandContext.get("language"));
                         commandContext.getSender().sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2Language set to " + commandContext.get("language") + " ! &4Translations are created and manged for free by the community through crowdin ( https://crowdin.com/project/elitemobs ), use at your own discretion!"));
                     } else {
                         String files = "";

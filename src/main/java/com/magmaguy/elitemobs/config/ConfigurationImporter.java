@@ -96,7 +96,7 @@ public class ConfigurationImporter {
                         case "world_blueprints":
                             moveDirectory(file, Paths.get(configurationsPath.normalize() + "" + File.separatorChar + "world_blueprints"), false);
                             break;
-                        case "ModelEngine":
+                        case "ModelEngine", "models":
                             //todo: check if the "force" code is required, check if file is getting saved with modelengine doesn't have a configuration folder
                             if (CustomModel.getModelPlugin() == CustomModel.ModelPlugin.MODEL_ENGINE)
                                 moveDirectory(file, Paths.get(file.getParentFile().getParentFile().getParentFile().getParentFile().toString() + File.separatorChar + "ModelEngine" + File.separatorChar + "blueprints"), true);

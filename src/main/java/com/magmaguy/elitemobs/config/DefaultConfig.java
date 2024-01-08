@@ -7,8 +7,8 @@ import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.util.List;
@@ -73,6 +73,10 @@ public class DefaultConfig {
     private static String treasureChestNoDropMessage;
     @Getter
     private static boolean allowSpectatorsInInstancedContent;
+    @Getter
+    private static String instancedDungeonTitle;
+    @Getter
+    private static List<String> instancedDungeonDescription;
 
 
     private static File file = null;
@@ -193,16 +197,30 @@ public class DefaultConfig {
                 file, fileConfiguration, "treasureChestNoDropMessage", "&8[EliteMobs] &cYou didn't get anything! Better luck next time!", true);
         allowSpectatorsInInstancedContent = ConfigurationEngine.setBoolean(
                 List.of("Sets is spectating instanced content will be available."),
-                fileConfiguration,"allowSpectatorsInInstancedContent", true);
+                fileConfiguration, "allowSpectatorsInInstancedContent", true);
+        instancedDungeonTitle = ConfigurationEngine.setString(
+                List.of(
+                        "Sets the title that will show up in the item description of instanced dungeon menus",
+                        "$difficulty is the placeholder for the difficulty name in the configuration file of the dungeon"),
+                file, fileConfiguration, "instancedDungeonTitle", "Start $difficulty difficulty dungeon!",
+                true);
+        instancedDungeonDescription = ConfigurationEngine.setList(
+                List.of("Sets the description that will show up in the item description of instanced dungeon menus",
+                        "$dungeonName is the placeholder for the dungeon name in the configuration file of the dungeon"),
+                file,
+                fileConfiguration,
+                "instancedDungeonDescription",
+                List.of("&fCreate a new instance of the dungeon", "$dungeonName &ffor youreself and maybe", "&fsome friends!"),
+                true);
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }
 
-    public static void setLanguage(Player player, String filename) {
+    public static void setLanguage(CommandSender commandSender, String filename) {
         language = filename;
         fileConfiguration.set("language", filename);
         ConfigurationEngine.fileSaverCustomValues(fileConfiguration, file);
-        ReloadCommand.reload(player);
+        ReloadCommand.reload(commandSender);
     }
 
 }

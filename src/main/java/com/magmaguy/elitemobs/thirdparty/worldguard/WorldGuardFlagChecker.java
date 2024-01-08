@@ -17,7 +17,17 @@ public class WorldGuardFlagChecker {
     private WorldGuardFlagChecker() {
     }
 
-    public static boolean checkFlag(Location location, StateFlag stateFlag) {
+    public static Boolean checkNullableFlag(Location location, StateFlag stateFlag) {
+        com.sk89q.worldedit.util.Location wgLocation = BukkitAdapter.adapt(location);
+        RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
+        RegionQuery query = container.createQuery();
+        ApplicableRegionSet set = query.getApplicableRegions(wgLocation);
+        StateFlag.State state = set.queryState(null, stateFlag);
+        if (state == null) return null;
+        return state == StateFlag.State.ALLOW;
+    }
+
+    public static Boolean checkFlag(Location location, StateFlag stateFlag) {
         com.sk89q.worldedit.util.Location wgLocation = BukkitAdapter.adapt(location);
         RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
         RegionQuery query = container.createQuery();

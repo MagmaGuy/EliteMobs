@@ -251,11 +251,24 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
 
             eliteEntity.syncPluginHealth(((LivingEntity) event.getEntity()).getHealth());
 
-            //No antiexploit checks for dungeons
-            if (!(EliteMobs.worldGuardIsEnabled && !WorldGuardFlagChecker.checkFlag(eliteEntity.getLocation(), WorldGuardCompatibility.getELITEMOBS_ANTIEXPLOIT())) && event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK) && !eliteEntity.isInAntiExploitCooldown() && eliteEntity.getLivingEntity() != null)
-                Bukkit.getServer().getPluginManager().callEvent(new EliteMobDamagedByPlayerAntiExploitEvent(eliteEntity, eliteMobDamagedByPlayerEvent));
+
+            runAntiexploit(eliteEntity, event, eliteMobDamagedByPlayerEvent);
         }
 
+        private void runAntiexploit(EliteEntity eliteEntity, EntityDamageByEntityEvent event, EliteMobDamagedByPlayerEvent eliteMobDamagedByPlayerEvent) {
+            if (EliteMobs.worldGuardIsEnabled) {
+                Boolean regionQuery = WorldGuardFlagChecker.checkNullableFlag(eliteEntity.getLocation(), WorldGuardCompatibility.getELITEMOBS_ANTIEXPLOIT());
+                if (regionQuery != null && regionQuery == false) return;
+            }
+            if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK &&
+                    event.getCause() != EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK &&
+                    event.getCause() != EntityDamageEvent.DamageCause.PROJECTILE)
+                return;
+
+            if (eliteEntity.isInAntiExploitCooldown() ||
+                    eliteEntity.getLivingEntity() == null) return;
+            Bukkit.getServer().getPluginManager().callEvent(new EliteMobDamagedByPlayerAntiExploitEvent(eliteEntity, eliteMobDamagedByPlayerEvent));
+        }
     }
 
 }
