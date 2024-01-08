@@ -49,11 +49,12 @@ public class InstancedDungeonBrowser extends EliteMenu {
         Inventory inventory = Bukkit.createInventory(player, slots);
         int difficultyCounter = 0;
         for (Map map : emPackage.getDungeonPackagerConfigFields().getDifficulties()) {
+            List<String> description = new ArrayList<>();
+            for (String string : DefaultConfig.getInstancedDungeonDescription())
+                description.add(string.replace("$dungeonName", emPackage.getDungeonPackagerConfigFields().getName()));
             inventory.setItem(difficultySlots.get(difficultyCounter), ItemStackGenerator.generateItemStack(Material.GREEN_STAINED_GLASS_PANE,
-                    "&2Start a " + map.get("name") + " difficulty dungeon!",
-                    List.of("Create a new instance of the dungeon",
-                            emPackage.getDungeonPackagerConfigFields().getName() + " for yourself and maybe ",
-                            "some friends!")));
+                    DefaultConfig.getInstancedDungeonTitle().replace("$difficulty", map.get("name") + ""),
+                    description));
 
             difficultyCounter++;
         }
