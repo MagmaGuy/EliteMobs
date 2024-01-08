@@ -294,7 +294,6 @@ public class EventsRegistrer {
         register(new PreventMountExploit());
         register(new PreventDarkroomExploit());
         register(new PreventLargeDarkroomExploit());
-        register(new PreventTowerExploit());
         register(new PreventEndermanHeightExploit());
         if (AntiExploitConfig.isNoItemPickup())
             register(new PreventItemPickupByMobs());
@@ -304,6 +303,7 @@ public class EventsRegistrer {
             register(new HoneyBlockJumpExploit());
         }
         register(new EliteMobDamagedByPlayerAntiExploitListener());
+        register(new PreventPathfindingExploit());
 
         register(new ActionEvent.ActionEventEvents());
 
