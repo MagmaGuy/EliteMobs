@@ -19,12 +19,33 @@ Webapp where you can create content: https://magmaguy.com/webapp/webapp.html
 
 Maven repository:
 
+Maven:
 ```
+<repository>
+  <id>elitemobs-repo/id>
+  <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+</repository>
+
 <dependency>
   <groupId>com.magmaguy</groupId>
   <artifactId>EliteMobs</artifactId>
-  <version>8.0.4-SNAPSHOT</version>
+  <version>8.7.4-SNAPSHOT</version>
+  <scope>provided</scope>
 </dependency>
+```
+
+Gradle:
+```kotlin
+repositories {
+    //EliteMobs
+    maven { url = 'https://s01.oss.sonatype.org/content/repositories/snapshots' }
+}
+
+dependencies{
+    //EliteMobs
+    compileOnly group: 'com.magmaguy', name: 'EliteMobs', version: '8.7.4-SNAPSHOT'
+}
+
 ```
 
 ---

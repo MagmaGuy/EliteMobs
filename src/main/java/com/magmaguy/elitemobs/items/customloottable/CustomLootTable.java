@@ -48,17 +48,19 @@ public class CustomLootTable implements Serializable {
     private void parseConfig(List<?> lootTable, String filename) {
         if (lootTable == null) return;
         for (Object object : lootTable)
-            if (object instanceof String rawString) switch (rawString.split(":")[0].toLowerCase()) {
-                case "minecraft":
-                    new VanillaCustomLootEntry(entries, rawString, filename);
-                    break;
-                default:
-                    if (rawString.toLowerCase(Locale.ROOT).contains("currencyamount="))
-                        new CurrencyCustomLootEntry(entries, rawString, filename);
-                    else if (rawString.contains("material=")) new VanillaCustomLootEntry(entries, rawString, filename);
-                    else if (rawString.contains("command=")) new CommandLootTable(entries, rawString, filename);
-                    else new EliteCustomLootEntry(entries, rawString, filename);
-            }
+            if (object instanceof String rawString)
+                switch (rawString.split(":")[0].toLowerCase()) {
+                    case "minecraft":
+                        new VanillaCustomLootEntry(entries, rawString, filename);
+                        break;
+                    default:
+                        if (rawString.toLowerCase(Locale.ROOT).contains("currencyamount="))
+                            new CurrencyCustomLootEntry(entries, rawString, filename);
+                        else if (rawString.contains("material="))
+                            new VanillaCustomLootEntry(entries, rawString, filename);
+                        else if (rawString.contains("command=")) new CommandLootTable(entries, rawString, filename);
+                        else new EliteCustomLootEntry(entries, rawString, filename);
+                }
             else if (object instanceof Map<?, ?> configMap)
                 //This is used for the instanced loot
                 new EliteCustomLootEntry(entries, configMap, filename);
@@ -83,14 +85,14 @@ public class CustomLootTable implements Serializable {
 
     public void bossDrop(Player player, int level, Location dropLocation, EliteEntity eliteEntity) {
         for (CustomLootEntry customLootEntry : entries) {
-                if (customLootEntry.willDrop(player)) {
-                    if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory())
-                        customLootEntry.directDrop(level, player, eliteEntity);
-                    else {
-                        customLootEntry.locationDrop(level, player, dropLocation, eliteEntity);
-                    }
+            if (customLootEntry.willDrop(player)) {
+                if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory())
+                    customLootEntry.directDrop(level, player, eliteEntity);
+                else {
+                    customLootEntry.locationDrop(level, player, dropLocation, eliteEntity);
                 }
             }
+        }
     }
 
     public void treasureChestDrop(Player player, int chestLevel, Location dropLocation) {
