@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.quests.objectives;
 
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.QuestAcceptEvent;
 import com.magmaguy.elitemobs.api.QuestCompleteEvent;
 import com.magmaguy.elitemobs.api.QuestProgressionEvent;
@@ -20,6 +21,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
 public class CustomFetchObjective extends Objective {
@@ -43,16 +45,16 @@ public class CustomFetchObjective extends Objective {
         this.key = customItemFilename;
     }
 
-    private static void checkEvent(@NotNull Player player, @NotNull ItemStack itemStack, int newAmount) {
+    private static void checkEvent(@NotNull Player player, @NotNull ItemStack itemStack) {
         for (Quest quest : PlayerData.getQuests(player.getUniqueId()))
             for (Objective objective : quest.getQuestObjectives().getObjectives())
                 if (objective instanceof CustomFetchObjective)
-                    ((CustomFetchObjective) objective).checkItem(player, itemStack, quest.getQuestObjectives(), newAmount);
+                    ((CustomFetchObjective) objective).checkItem(player, itemStack, quest.getQuestObjectives());
     }
 
-    private void checkItem(Player player, @NotNull ItemStack itemStack, QuestObjectives questObjectives, int newAmount) {
-        if (ItemTagger.hasKey(itemStack, this.key))
-            progressNonlinearObjective(questObjectives, player, newAmount);
+    private void checkItem(Player player, @NotNull ItemStack itemStack, QuestObjectives questObjectives) {
+        if (!ItemTagger.hasKey(itemStack, this.key)) return;
+        progressNonlinearObjective(questObjectives, player);
     }
 
     private void turnItemsIn(Player player) {
@@ -81,14 +83,21 @@ public class CustomFetchObjective extends Objective {
      * @param player          Player to update
      */
     @Override
-    public void progressNonlinearObjective(QuestObjectives questObjectives, Player player, int newAmount) {
-        fullUpdate(player, newAmount);
-        objectiveCompleted = currentAmount >= targetAmount;
-        QuestProgressionEvent questProgressionEvent = new QuestProgressionEvent(
-                Bukkit.getPlayer(questObjectives.getQuest().getPlayerUUID()),
-                questObjectives.getQuest(),
-                this);
-        new EventCaller(questProgressionEvent);
+    public void progressNonlinearObjective(QuestObjectives questObjectives, Player player) {
+        CustomFetchObjective customFetchObjective = this;
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                fullUpdate(player);
+                if (questObjectives.isTurnedIn()) return;
+                objectiveCompleted = currentAmount >= targetAmount;
+                QuestProgressionEvent questProgressionEvent = new QuestProgressionEvent(
+                        Bukkit.getPlayer(questObjectives.getQuest().getPlayerUUID()),
+                        questObjectives.getQuest(),
+                        customFetchObjective);
+                new EventCaller(questProgressionEvent);
+            }
+        }.runTaskLater(MetadataHandler.PLUGIN, 1);
     }
 
     /**
@@ -96,8 +105,8 @@ public class CustomFetchObjective extends Objective {
      *
      * @param player Player to update
      */
-    private void fullUpdate(Player player, int newAmount) {
-        super.currentAmount = newAmount;
+    private void fullUpdate(Player player) {
+        super.currentAmount = 0;
         for (ItemStack itemStack : player.getInventory())
             if (ItemTagger.hasKey(itemStack, this.key))
                 super.currentAmount += itemStack.getAmount();
@@ -106,27 +115,27 @@ public class CustomFetchObjective extends Objective {
     public static class CustomFetchObjectiveEvents implements Listener {
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onItemDrop(PlayerDropItemEvent event) {
-            checkEvent(event.getPlayer(), event.getItemDrop().getItemStack(), 0);
+            checkEvent(event.getPlayer(), event.getItemDrop().getItemStack());
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onItemPickup(EntityPickupItemEvent event) {
             if (event.getEntity().getType() != EntityType.PLAYER) return;
-            checkEvent((Player) event.getEntity(), event.getItem().getItemStack(), event.getItem().getItemStack().getAmount());
+            checkEvent((Player) event.getEntity(), event.getItem().getItemStack());
         }
 
         @EventHandler(ignoreCancelled = true)
         public void onQuestAcceptEvent(QuestAcceptEvent event) {
             for (Objective objective : event.getQuest().getQuestObjectives().getObjectives())
                 if (objective instanceof CustomFetchObjective)
-                    objective.progressNonlinearObjective(event.getQuest().getQuestObjectives(), event.getPlayer(), 0);
+                    objective.progressNonlinearObjective(event.getQuest().getQuestObjectives(), event.getPlayer());
         }
 
         @EventHandler(ignoreCancelled = true)
         public void onQuestCompleteEvent(QuestCompleteEvent event) {
             for (Objective objective : event.getQuest().getQuestObjectives().getObjectives())
                 if (objective instanceof CustomFetchObjective) {
-                    objective.progressNonlinearObjective(event.getQuest().getQuestObjectives(), event.getPlayer(), 0);
+                    objective.progressNonlinearObjective(event.getQuest().getQuestObjectives(), event.getPlayer());
                     if (objective.getCurrentAmount() < objective.getTargetAmount())
                         event.setCancelled(true);
                 }
