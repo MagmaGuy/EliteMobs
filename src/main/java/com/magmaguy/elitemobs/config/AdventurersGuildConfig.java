@@ -76,6 +76,8 @@ public class AdventurersGuildConfig {
     private static List<String> worldsWithoutAGBonuses;
     @Getter
     private static double peacefulModeEliteChanceDecrease;
+    @Getter
+    private static boolean disableCommonerRank;
 
     private static File file;
     private static FileConfiguration fileConfiguration;
@@ -452,6 +454,10 @@ public class AdventurersGuildConfig {
         worldsWithoutAGBonuses = ConfigurationEngine.setList(
                 List.of("Sets the list of worlds to which guild rank bonuses will not be applied"),
                 file, fileConfiguration, "worldsWithoutAGBonuses", new ArrayList(), false);
+
+        disableCommonerRank = ConfigurationEngine.setBoolean(
+                List.of("Disables users' ability to switch to peaceful mode for EliteMobs. Peaceful mode lowers level and spawn rates of mobs around that player specifically"),
+                fileConfiguration, "disableCommonerRank", false);
 
         save();
     }

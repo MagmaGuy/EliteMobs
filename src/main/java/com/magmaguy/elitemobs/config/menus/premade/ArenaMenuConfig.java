@@ -30,15 +30,15 @@ public class ArenaMenuConfig extends MenusConfigFields {
     @Override
     public void processAdditionalFields() {
         menuName = ConfigurationEngine.setString(file, fileConfiguration, "menuName", "", true);
-        playerItem = ConfigurationEngine.setItemStack(fileConfiguration, "playerItem",
-                ItemStackGenerator.generateItemStack(Material.DIAMOND_SWORD, "&4Challenge the arena!", List.of("&2Fight in the arena!")));
+        playerItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "playerItem",
+                ItemStackGenerator.generateItemStack(Material.DIAMOND_SWORD, "&4Challenge the arena!", List.of("&2Fight in the arena!")), true);
         playerItemSlot = ConfigurationEngine.setInt(fileConfiguration, "playerItemSlot", 6);
         if (!VersionChecker.serverVersionOlderThan(17, 0))
-            spectatorItem = ConfigurationEngine.setItemStack(fileConfiguration, "spectatorItem",
-                    ItemStackGenerator.generateItemStack(Material.SPYGLASS, "&aSpectate!", List.of("&2Spectate players in the arena!"), MetadataHandler.signatureID));
+            spectatorItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "spectatorItem",
+                    ItemStackGenerator.generateItemStack(Material.SPYGLASS, "&aSpectate!", List.of("&2Spectate players in the arena!"), MetadataHandler.signatureID), true);
         else
-            spectatorItem = ConfigurationEngine.setItemStack(fileConfiguration, "spectatorItem",
-                    ItemStackGenerator.generateItemStack(Material.NOTE_BLOCK, "&aSpectate!", List.of("&2Spectate players in the arena!"), MetadataHandler.signatureID));
+            spectatorItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "spectatorItem",
+                    ItemStackGenerator.generateItemStack(Material.NOTE_BLOCK, "&aSpectate!", List.of("&2Spectate players in the arena!"), MetadataHandler.signatureID), true);
         spectatorItemSlot = ConfigurationEngine.setInt(fileConfiguration, "spectatorItemSlot", 2);
     }
 

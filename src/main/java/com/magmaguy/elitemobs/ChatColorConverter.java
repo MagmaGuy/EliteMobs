@@ -19,6 +19,7 @@ public class ChatColorConverter {
     }
 
     public static List<String> convert(List<?> list) {
+        if (list == null)return new ArrayList<>();
         List<String> convertedList = new ArrayList<>();
         for (Object value : list)
             convertedList.add(convert(value + ""));

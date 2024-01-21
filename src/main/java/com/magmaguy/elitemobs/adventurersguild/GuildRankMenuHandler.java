@@ -122,6 +122,7 @@ public class GuildRankMenuHandler implements Listener {
 
     public static Inventory populateInventory(Inventory difficultyMenu, Player player) {
         for (int i = 0; i < 11 + GuildRank.getGuildPrestigeRank(player); i++) {
+            if (AdventurersGuildConfig.isDisableCommonerRank() && i == 0) continue;
             ItemStack itemStack = null;
             if (GuildRank.isAtOrAboveGuildRank(player, i)) {
                 itemStack = difficultyItemStackConstructor(guildRankStatus.UNLOCKED, i, player, false);
@@ -232,7 +233,7 @@ public class GuildRankMenuHandler implements Listener {
                 default:
                     if (string.contains("$previousRank")) {
                         newLore.add(string.replace("$previousRank",
-                                (GuildRank.getRankName(GuildRank.getGuildPrestigeRank(player), GuildRank.getMaxGuildRank(player) + 1) + "")));
+                                (GuildRank.getRankName(GuildRank.getGuildPrestigeRank(player), GuildRank.getMaxGuildRank(player) + 1))));
                         continue;
                     }
                     if (string.contains("$price")) {
@@ -312,6 +313,7 @@ public class GuildRankMenuHandler implements Listener {
 
         for (int i = 0; i < rankSlots.size(); i++) {
             if (rankSlots.get(i) == event.getSlot()) {
+                if (AdventurersGuildConfig.isDisableCommonerRank() && i == 4) continue;
                 selectedRank = i;
                 break;
             }

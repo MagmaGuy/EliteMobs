@@ -84,18 +84,18 @@ public class DungeonInstance extends MatchInstance {
                 return;
             }
 
-        String instancedWordName = WorldInstantiator.getNewWorldName(instancedDungeonsConfigFields.getWorldName());
+        String instancedWorldName = WorldInstantiator.getNewWorldName(instancedDungeonsConfigFields.getWorldName());
 
-        if (!launchEvent(instancedDungeonsConfigFields, instancedWordName, player)) return;
+        if (!launchEvent(instancedDungeonsConfigFields, instancedWorldName, player)) return;
 
         CompletableFuture<File> future = CompletableFuture.supplyAsync(() ->
-                cloneWorldFiles(instancedDungeonsConfigFields, instancedWordName, player));
+                cloneWorldFiles(instancedDungeonsConfigFields, instancedWorldName, player));
         future.thenAccept(file -> {
             if (file == null) return;
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    initializeInstancedWorld(instancedDungeonsConfigFields, instancedWordName, player, file, difficultyName);
+                    initializeInstancedWorld(instancedDungeonsConfigFields, instancedWorldName, player, file, difficultyName);
                 }
             }.runTask(MetadataHandler.PLUGIN);
         });
