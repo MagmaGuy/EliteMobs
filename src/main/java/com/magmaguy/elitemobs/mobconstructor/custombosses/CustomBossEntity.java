@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.mobconstructor.custombosses;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobEnterCombatEvent;
 import com.magmaguy.elitemobs.api.EliteMobExitCombatEvent;
 import com.magmaguy.elitemobs.api.EliteMobRemoveEvent;
@@ -37,6 +38,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import javax.annotation.Nullable;
@@ -96,6 +98,10 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
     @Getter
     @Setter
     private double movementSpeedAttribute;
+    @Getter
+    @Setter
+    private boolean dynamicLevel = false;
+    private BukkitTask dynamicLevelUpdater = null;
 
     /**
      * Uses a builder pattern in order to construct a CustomBossEntity at an arbitrary point in the future. Does not
@@ -204,8 +210,10 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
         }
 
         //This is a bit dumb but -1 is reserved for dynamic levels, commands can force a dynamic to spawn with a level so check that
-        if (customBossesConfigFields.getLevel() == -1 && level == -1)
+        if (customBossesConfigFields.getLevel() == -1 && level == -1) {
+            dynamicLevel = true;
             getDynamicLevel(spawnLocation);
+        }
 
         if (ChunkLocationChecker.locationIsLoaded(spawnLocation) || isMount) {
             super.livingEntity = new CustomBossMegaConsumer(this).spawn();
@@ -289,7 +297,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
     private void setPluginName() {
         if (customBossesConfigFields.getName() == null) return;
         if (this.level == -1)
-            setName(ChatColorConverter.convert(customBossesConfigFields.getName().replace("$level", "?" + "")
+            setName(ChatColorConverter.convert(customBossesConfigFields.getName().replace("$level", "?")
                             .replace("$normalLevel", ChatColorConverter.convert("&2[&a" + "?" + "&2]&f"))
                             .replace("$minibossLevel", ChatColorConverter.convert("&6〖&e" + "?" + "&6〗&f"))
                             .replace("$bossLevel", ChatColorConverter.convert("&4『&c" + "?" + "&4』&f"))
@@ -364,7 +372,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
         if (bossLocation.getWorld() != null) {
             List<Player> players = bossLocation.getWorld().getPlayers();
             for (Player player : players)
-                if (player.getLocation().distanceSquared(bossLocation) <= Math.pow(16L * (Bukkit.getViewDistance() + 5D), 2)) {
+                if (player.getLocation().distanceSquared(bossLocation) <= Math.pow(16L * (Bukkit.getViewDistance() + 2D), 2)) {
                     ElitePlayerInventory playerInventory = ElitePlayerInventory.getPlayer(player);
                     if (playerInventory == null) continue;
                     int level = playerInventory.getNaturalMobSpawnLevel(false);
@@ -372,7 +380,39 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
                     bossLevel = level;
                 }
         }
+        updateDynamicLevel();
         super.setLevel(bossLevel);
+    }
+
+    /**
+     * Upsettingly due to how chunk generation works regional bosses in general don't play along well with dynamic bosses
+     */
+    private void updateDynamicLevel() {
+        if (dynamicLevelUpdater != null) return;
+        CustomBossEntity customBossEntity = this;
+        dynamicLevelUpdater = new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (customBossEntity.isInCombat()) return;
+                if (!customBossEntity.isValid() && !customBossEntity.isPersistent) {
+                    cancel();
+                    return;
+                }
+                //for unloaded but persistent bosses
+                if (customBossEntity.getLivingEntity() == null || !customBossEntity.isValid()) {
+                    return;
+                }
+                int currentLevel = customBossEntity.getLevel();
+                customBossEntity.getDynamicLevel(customBossEntity.getLocation());
+                int newLevel = customBossEntity.getLevel();
+                if (currentLevel == newLevel) return;
+                //In theory the damage should update automatically, the only thing that needs updating should be the health
+                customBossEntity.setMaxHealth();
+                setNormalizedHealth();
+                CustomBossMegaConsumer.setName(getLivingEntity(), customBossEntity, level);
+
+            }
+        }.runTaskTimer(MetadataHandler.PLUGIN, 20 * 5L, 20 * 5L);
     }
 
     private void startBossTrails() {
@@ -451,6 +491,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
     @Override
     public void remove(RemovalReason removalReason) {
         bossTrace.setRemove(removalReason);
+        if (dynamicLevelUpdater != null) dynamicLevelUpdater.cancel();
         if (DebugMessage.isDebugMode())
             if (this instanceof RegionalBossEntity && this.phaseBossEntity != null)
                 new DebugMessage("Regional + Phase boss removal. Reason: " + removalReason);

@@ -146,7 +146,7 @@ public class ConfigurationEngine {
         return value;
     }
 
-    public static ItemStack setItemStack(FileConfiguration fileConfiguration, String key, ItemStack itemStack) {
+    private static ItemStack setItemStack(FileConfiguration fileConfiguration, String key, ItemStack itemStack) {
         fileConfiguration.addDefault(key + ".material", itemStack.getType().toString());
         if (itemStack.hasItemMeta() && itemStack.getItemMeta().hasDisplayName())
             fileConfiguration.addDefault(key + ".name", itemStack.getItemMeta().getDisplayName());
@@ -170,6 +170,39 @@ public class ConfigurationEngine {
         List<String> lore = new ArrayList<>();
         try {
             lore = fileConfiguration.getStringList(key + ".lore");
+        } catch (Exception ex) {
+            new WarningMessage("Item lore " + fileConfiguration.getString(key + ".lore") + " is not valid! Correct it to make a valid item.");
+        }
+        ItemStack fileItemStack = ItemStackGenerator.generateItemStack(material, name, lore);
+        if (material == Material.PLAYER_HEAD)
+            ((SkullMeta) itemStack.getItemMeta()).setOwningPlayer(Bukkit.getOfflinePlayer(fileConfiguration.getString(key + ".owner")));
+        return fileItemStack;
+    }
+
+    public static ItemStack setItemStack(File file, FileConfiguration fileConfiguration, String key, ItemStack itemStack, boolean translatable) {
+        fileConfiguration.addDefault(key + ".material", itemStack.getType().toString());
+        if (itemStack.hasItemMeta() && itemStack.getItemMeta().hasDisplayName())
+            fileConfiguration.addDefault(key + ".name", itemStack.getItemMeta().getDisplayName());
+        if (itemStack.hasItemMeta() && itemStack.getItemMeta().hasLore())
+            fileConfiguration.addDefault(key + ".lore", itemStack.getItemMeta().getLore());
+        if (itemStack.getType().equals(Material.PLAYER_HEAD))
+            fileConfiguration.addDefault(key + ".owner", ((SkullMeta) itemStack.getItemMeta()).getOwner());
+        Material material;
+        try {
+            material = Material.valueOf(fileConfiguration.getString(key + ".material"));
+        } catch (Exception ex) {
+            new WarningMessage("Material type " + fileConfiguration.getString(key + ".material") + " is not valid! Correct it to make a valid item.");
+            return null;
+        }
+        String name = "";
+        try {
+            name = setString(file, fileConfiguration, key+".name", null, true);
+        } catch (Exception ex) {
+            new WarningMessage("Item name " + fileConfiguration.getString(key + ".name") + " is not valid! Correct it to make a valid item.");
+        }
+        List<String> lore = new ArrayList<>();
+        try {
+            lore = setList(file, fileConfiguration, key+".lore", null, true);
         } catch (Exception ex) {
             new WarningMessage("Item lore " + fileConfiguration.getString(key + ".lore") + " is not valid! Correct it to make a valid item.");
         }
