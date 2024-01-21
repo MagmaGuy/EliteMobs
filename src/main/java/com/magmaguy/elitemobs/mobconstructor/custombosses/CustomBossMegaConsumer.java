@@ -78,29 +78,17 @@ public class CustomBossMegaConsumer {
         return livingEntity;
     }
 
-    public void applyBossFeatures(LivingEntity livingEntity) {
-        for (ElitePower elitePower : powers)
-            elitePower.applyPowers(livingEntity);
-        setEquipment(livingEntity);
-        setBaby(livingEntity);
-        setDisguise(livingEntity);
-        setName(livingEntity);
-        setFollowRange(livingEntity);
-        setMovementSpeed(livingEntity);
-        setFrozen(livingEntity);
-        customBossEntity.setMovementSpeedAttribute(livingEntity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue());
-        customBossEntity.setFollowDistance(livingEntity.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).getBaseValue());
-
-        if (livingEntity.getType().equals(EntityType.ENDER_DRAGON)) {
-            ((EnderDragon) livingEntity).setPhase(EnderDragon.Phase.CIRCLING);
-            if (((EnderDragon) livingEntity).getDragonBattle() != null)
-                ((EnderDragon) livingEntity).getDragonBattle().generateEndPortal(false);
-        }
-
-        if (livingEntity instanceof Slime){
-            ((Slime)livingEntity).setSize(customBossEntity.getCustomBossesConfigFields().getSlimeSize());
-        }
-        EntityTracker.registerEliteMob(customBossEntity, livingEntity);
+    protected static void setName(LivingEntity livingEntity, CustomBossEntity customBossEntity, int level) {
+        String parsedName = ChatColorConverter.convert(customBossEntity.customBossesConfigFields.getName().replace("$level", level + "")
+                .replace("$normalLevel", ChatColorConverter.convert("&2[&a" + level + "&2]&f"))
+                .replace("$minibossLevel", ChatColorConverter.convert("&6〖&e" + level + "&6〗&f"))
+                .replace("$bossLevel", ChatColorConverter.convert("&4『&c" + level + "&4』&f"))
+                .replace("$reinforcementLevel", ChatColorConverter.convert("&8〔&7") + level + "&8〕&f")
+                .replace("$eventBossLevel", ChatColorConverter.convert("&4「&c" + level + "&4」&f")));
+        livingEntity.setCustomName(parsedName);
+        livingEntity.setCustomNameVisible(DefaultConfig.isAlwaysShowNametags());
+        DisguiseEntity.setDisguiseNameVisibility(DefaultConfig.isAlwaysShowNametags(), livingEntity, parsedName);
+        customBossEntity.setName(parsedName, false);
     }
 
     private void setBaby(LivingEntity livingEntity) {
@@ -166,17 +154,29 @@ public class CustomBossMegaConsumer {
         }
     }
 
-    private void setName(LivingEntity livingEntity) {
-        String parsedName = ChatColorConverter.convert(customBossesConfigFields.getName().replace("$level", this.level + "")
-                .replace("$normalLevel", ChatColorConverter.convert("&2[&a" + this.level + "&2]&f"))
-                .replace("$minibossLevel", ChatColorConverter.convert("&6〖&e" + this.level + "&6〗&f"))
-                .replace("$bossLevel", ChatColorConverter.convert("&4『&c" + this.level + "&4』&f"))
-                .replace("$reinforcementLevel", ChatColorConverter.convert("&8〔&7") + this.level + "&8〕&f")
-                .replace("$eventBossLevel", ChatColorConverter.convert("&4「&c" + this.level + "&4」&f")));
-        livingEntity.setCustomName(parsedName);
-        livingEntity.setCustomNameVisible(DefaultConfig.isAlwaysShowNametags());
-        DisguiseEntity.setDisguiseNameVisibility(DefaultConfig.isAlwaysShowNametags(), livingEntity, parsedName);
-        customBossEntity.setName(parsedName, false);
+    public void applyBossFeatures(LivingEntity livingEntity) {
+        for (ElitePower elitePower : powers)
+            elitePower.applyPowers(livingEntity);
+        setEquipment(livingEntity);
+        setBaby(livingEntity);
+        setDisguise(livingEntity);
+        setName(livingEntity, customBossEntity, level);
+        setFollowRange(livingEntity);
+        setMovementSpeed(livingEntity);
+        setFrozen(livingEntity);
+        customBossEntity.setMovementSpeedAttribute(livingEntity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue());
+        customBossEntity.setFollowDistance(livingEntity.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).getBaseValue());
+
+        if (livingEntity.getType().equals(EntityType.ENDER_DRAGON)) {
+            ((EnderDragon) livingEntity).setPhase(EnderDragon.Phase.CIRCLING);
+            if (((EnderDragon) livingEntity).getDragonBattle() != null)
+                ((EnderDragon) livingEntity).getDragonBattle().generateEndPortal(false);
+        }
+
+        if (livingEntity instanceof Slime){
+            ((Slime)livingEntity).setSize(customBossEntity.getCustomBossesConfigFields().getSlimeSize());
+        }
+        EntityTracker.registerEliteMob(customBossEntity, livingEntity);
     }
 
     private void setFollowRange(LivingEntity livingEntity) {

@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.utils;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import org.bukkit.Bukkit;
-import org.bukkit.World;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -70,22 +69,21 @@ public class WorldInstantiator {
     }
 
     public static String getNewWorldName(String blueprintWorldName) {
-        List<Integer> numberList = new ArrayList();
-        for (World world : Bukkit.getWorlds()) {
-            if (world.getName().contains(blueprintWorldName)) {
+        List<String>worldNames = new ArrayList<>();
+        Bukkit.getWorlds().forEach(world -> worldNames.add(world.getName()));
+        for (File file : Bukkit.getWorldContainer().listFiles()) worldNames.add(file.getName());
+        int highestNumber = 0;
+
+        for (String worldName : worldNames) {
+            if (worldName.contains(blueprintWorldName)) {
                 try {
-                    String[] strings = world.getName().replace(blueprintWorldName, "").split("_");
+                    String[] strings = worldName.replace(blueprintWorldName, "").split("_");
                     int worldNumber = Integer.parseInt(strings[strings.length - 1]);
-                    numberList.add(worldNumber, worldNumber);
+                    if (worldNumber > highestNumber) highestNumber = worldNumber;
                 } catch (Exception exception) {
-                    continue;
                 }
             }
         }
-        int worldNumber = 0;
-        for (int i : numberList)
-            if (i >= worldNumber)
-                worldNumber = i + 1;
-        return blueprintWorldName + "_" + worldNumber;
+        return blueprintWorldName + "_" + highestNumber;
     }
 }

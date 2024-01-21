@@ -345,105 +345,105 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
 
         //inventory-based menus for bedrock
         indexChestMenuName = ConfigurationEngine.setString(file, fileConfiguration, "indexChestMenuName", "&2EliteMobs Index", true);
-        indexHeaderItem = ConfigurationEngine.setItemStack(fileConfiguration, "indexHeaderItem",
+        indexHeaderItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "indexHeaderItem",
                 ItemStackGenerator.generateItemStack(Material.PAPER,
                         "&5&l/ag &7- &6EliteMobs Hub",
                         Arrays.asList("CLICK TO USE",
                                 "The place where you can find",
                                 "NPCs that give quests, buy and",
-                                "sell items, give advice and more!")));
+                                "sell items, give advice and more!")), true);
         indexHeaderSlot = ConfigurationEngine.setInt(fileConfiguration, "indexHeaderSlot", 4);
 
-        indexStatsItem = ConfigurationEngine.setItemStack(fileConfiguration, "indexStatsItem",
+        indexStatsItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "indexStatsItem",
                 ItemStackGenerator.generateItemStack(Material.MAP,
                         "&6Stats",
-                        List.of("Click to go!")));
+                        List.of("Click to go!")), true);
         indexStatsSlot = ConfigurationEngine.setInt(fileConfiguration, "indexStatsSlot", 10);
 
-        indexGearItem = ConfigurationEngine.setItemStack(fileConfiguration, "indexGearItem",
+        indexGearItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "indexGearItem",
                 ItemStackGenerator.generateItemStack(Material.DIAMOND_SWORD,
                         "&6Gear",
-                        List.of("Click to go!")));
+                        List.of("Click to go!")), true);
         indexGearSlot = ConfigurationEngine.setInt(fileConfiguration, "indexGearSlot", 12);
 
-        indexTeleportsItem = ConfigurationEngine.setItemStack(fileConfiguration, "indexTeleportsItem",
+        indexTeleportsItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "indexTeleportsItem",
                 ItemStackGenerator.generateItemStack(Material.END_PORTAL_FRAME,
                         "&6Teleports",
-                        List.of("Click to go!")));
+                        List.of("Click to go!")), true);
         indexTeleportsSlot = ConfigurationEngine.setInt(fileConfiguration, "indexTeleportsSlot", 14);
 
-        indexCommandsItem = ConfigurationEngine.setItemStack(fileConfiguration, "indexCommandsItem",
+        indexCommandsItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "indexCommandsItem",
                 ItemStackGenerator.generateItemStack(Material.JUKEBOX,
                         "&6Commands",
-                        List.of("Click to go!")));
+                        List.of("Click to go!")), true);
         indexCommandsSlot = ConfigurationEngine.setInt(fileConfiguration, "indexCommandsSlot", 16);
 
 
-        indexQuestTrackingItem = ConfigurationEngine.setItemStack(fileConfiguration, "indexQuestTrackingItem",
+        indexQuestTrackingItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "indexQuestTrackingItem",
                 ItemStackGenerator.generateItemStack(Material.WRITABLE_BOOK,
                         "&6Quest Tracking",
-                        List.of("Click to go!")));
+                        List.of("Click to go!")) ,true);
         indexQuestTrackingSlot = ConfigurationEngine.setInt(fileConfiguration, "indexQuestTrackingSlot", 20);
 
         if (!VersionChecker.serverVersionOlderThan(16, 0))
-            indexBossTrackingItem = ConfigurationEngine.setItemStack(fileConfiguration, "indexBossTrackingItem",
+            indexBossTrackingItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "indexBossTrackingItem",
                     ItemStackGenerator.generateItemStack(Material.TARGET,
                             "&6Boss Tracking",
-                            List.of("Click to go!")));
+                            List.of("Click to go!")), true);
         else
-            indexBossTrackingItem = ConfigurationEngine.setItemStack(fileConfiguration, "indexBossTrackingItem",
+            indexBossTrackingItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "indexBossTrackingItem",
                     ItemStackGenerator.generateItemStack(Material.DIAMOND,
                             "&6Boss Tracking",
-                            List.of("Click to go!")));
+                            List.of("Click to go!")), true);
         indexBossTrackingSlot = ConfigurationEngine.setInt(fileConfiguration, "indexBossTrackingSlot", 24);
 
 
-        backItem = ConfigurationEngine.setItemStack(fileConfiguration, "backItem",
-                ItemStackGenerator.generateItemStack(Material.BARRIER, "&cBack"));
+        backItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "backItem",
+                ItemStackGenerator.generateItemStack(Material.BARRIER, "&cBack"), true);
 
         gearChestMenuName = ConfigurationEngine.setString(file, fileConfiguration, "gearChestMenuName", "&2EliteMobs Gear", true);
-        gearDamageItem = ConfigurationEngine.setItemStack(fileConfiguration, "gearDamageItem",
+        gearDamageItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "gearDamageItem",
                 ItemStackGenerator.generateItemStack(Material.DIAMOND_SWORD,
                         "&4Damage: $damage",
                         Arrays.asList("&fBase damage dealt to Elites.",
-                                "&fBased on the level of your weapon!")));
+                                "&fBased on the level of your weapon!")),true);
         gearDamageSlot = ConfigurationEngine.setInt(fileConfiguration, "gearDamageSlot", 23);
-        gearArmorItem = ConfigurationEngine.setItemStack(fileConfiguration, "gearArmorItem",
+        gearArmorItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "gearArmorItem",
                 ItemStackGenerator.generateItemStack(Material.SHIELD,
                         "&2Defense: $defense",
                         Arrays.asList("&fBase damage reduction from Elites.",
-                                "&fBased on the average level of your armor!")));
+                                "&fBased on the average level of your armor!")),true);
         gearArmorSlot = ConfigurationEngine.setInt(fileConfiguration, "gearArmorSlot", 24);
         if (!VersionChecker.serverVersionOlderThan(16, 0))
-            gearThreatItem = ConfigurationEngine.setItemStack(fileConfiguration, "gearThreatItem",
+            gearThreatItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "gearThreatItem",
                     ItemStackGenerator.generateItemStack(Material.TARGET,
                             "&cThreat Level: $threat",
                             Arrays.asList("&fThis determines the level of the",
                                     "&fElite Mobs that spawns near you",
                                     "&fTakes armor, weapon in hand, guild",
-                                    "&ftier into account.")));
+                                    "&ftier into account.")), true);
         else
-            gearThreatItem = ConfigurationEngine.setItemStack(fileConfiguration, "gearThreatItem",
+            gearThreatItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "gearThreatItem",
                     ItemStackGenerator.generateItemStack(Material.DIAMOND,
                             "&cThreat Level: $threat",
                             Arrays.asList("&fThis determines the level of the",
                                     "&fElite Mobs that spawns near you",
                                     "&fTakes armor, weapon in hand, guild",
-                                    "&ftier into account.")));
+                                    "&ftier into account.")), true);
         gearThreatSlot = ConfigurationEngine.setInt(fileConfiguration, "gearThreatSlot", 25);
 
         statsChestMenuName = ConfigurationEngine.setString(file, fileConfiguration, "statsChestMenuName", "&2EliteMobs Stats", true);
 
-        statsMoneyItem = ConfigurationEngine.setItemStack(fileConfiguration, "statsMoneyItem",
+        statsMoneyItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "statsMoneyItem",
                 ItemStackGenerator.generateItemStack(Material.GOLD_INGOT,
                         "&2Elite Coins: $money",
                         Arrays.asList("&fKill Elite Mobs to loot currency,",
                                 "&fsell their drops in /em shop or",
-                                "&fcomplete quests!")));
+                                "&fcomplete quests!")), true);
         statsMoneySlot = ConfigurationEngine.setInt(fileConfiguration, "statsMoneySlot", 10);
 
         if (!VersionChecker.serverVersionOlderThan(16, 0))
-            statsGuildTierItem = ConfigurationEngine.setItemStack(fileConfiguration, "statsGuildTierItem",
+            statsGuildTierItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "statsGuildTierItem",
                     ItemStackGenerator.generateItemStack(Material.TARGET,
                             "&6Guild Tier: $tier",
                             Arrays.asList("&fGuild Rank determines how good your loot can ",
@@ -452,9 +452,9 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
                                     "&fpowerful rewards, like increased max health, chance ",
                                     "&fto dodge/crit, increased currency rewards and more! ",
                                     "&fYou can unlock Guild Ranks and Prestige Tiers at /ag!",
-                                    "&f⚜ = prestige rank, ✧ = guild rank!")));
+                                    "&f⚜ = prestige rank, ✧ = guild rank!")), true);
         else
-            statsGuildTierItem = ConfigurationEngine.setItemStack(fileConfiguration, "statsGuildTierItem",
+            statsGuildTierItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "statsGuildTierItem",
                     ItemStackGenerator.generateItemStack(Material.DIAMOND,
                             "&6Guild Tier: $tier",
                             Arrays.asList("&fGuild Rank determines how good your loot can ",
@@ -463,64 +463,64 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
                                     "&fpowerful rewards, like increased max health, chance ",
                                     "&fto dodge/crit, increased currency rewards and more! ",
                                     "&fYou can unlock Guild Ranks and Prestige Tiers at /ag!",
-                                    "&f⚜ = prestige rank, ✧ = guild rank!")));
+                                    "&f⚜ = prestige rank, ✧ = guild rank!")), true);
         statsGuildTierSlot = ConfigurationEngine.setInt(fileConfiguration, "statsGuildTierSlot", 11);
 
-        statsEliteKillsItem = ConfigurationEngine.setItemStack(fileConfiguration, "statsEliteKillsItem",
+        statsEliteKillsItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "statsEliteKillsItem",
                 ItemStackGenerator.generateItemStack(Material.DIAMOND_SWORD,
                         "&4Elite Kils: &c$kills",
-                        List.of("&fAmount of EliteMobs killed.")));
+                        List.of("&fAmount of EliteMobs killed.")),true);
         statsEliteKillsSlot = ConfigurationEngine.setInt(fileConfiguration, "statsEliteKillsSlot", 12);
 
-        statsMaxEliteLevelKilledItem = ConfigurationEngine.setItemStack(fileConfiguration, "statsMaxEliteLevelKilledItem",
+        statsMaxEliteLevelKilledItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "statsMaxEliteLevelKilledItem",
                 ItemStackGenerator.generateItemStack(Material.GOLDEN_SWORD,
                         "&4Max Lvl Killed: &c$maxKill",
                         Arrays.asList("&fElite Mob levels are based on the tier",
                                 "&fof your gear! Higher tiers, higher",
                                 "&fElite Mob levels!\n",
-                                "&eNote: only non-exploity kills get counted!")));
+                                "&eNote: only non-exploity kills get counted!")),true);
         statsMaxEliteLevelKilledSlot = ConfigurationEngine.setInt(fileConfiguration, "statsMaxEliteLevelKilledSlot", 13);
 
-        statsEliteDeathsItem = ConfigurationEngine.setItemStack(fileConfiguration, "statsEliteDeathsItem",
+        statsEliteDeathsItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "statsEliteDeathsItem",
                 ItemStackGenerator.generateItemStack(Material.TOTEM_OF_UNDYING,
                         "&4Elite Deaths: $deaths",
-                        List.of("&fTimes killed by Elite Mobs.")));
+                        List.of("&fTimes killed by Elite Mobs.")), true);
         statsEliteDeathsSlot = ConfigurationEngine.setInt(fileConfiguration, "statsEliteDeathsSlot", 14);
 
-        statsQuestsCompletedItem = ConfigurationEngine.setItemStack(fileConfiguration, "statsQuestsCompletedItem",
+        statsQuestsCompletedItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "statsQuestsCompletedItem",
                 ItemStackGenerator.generateItemStack(Material.LECTERN,
                         "&5Quests Completed: &d$questsCompleted",
                         Arrays.asList("&fAmount of EliteMobs quests completed.",
-                                "&fYou can accept quests by talking to NPCs!")));
+                                "&fYou can accept quests by talking to NPCs!")), true);
         statsQuestsCompletedSlot = ConfigurationEngine.setInt(fileConfiguration, "statsQuestsCompletedSlot", 15);
 
-        statsScoreItem = ConfigurationEngine.setItemStack(fileConfiguration, "statsScoreItem",
+        statsScoreItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "statsScoreItem",
                 ItemStackGenerator.generateItemStack(Material.ITEM_FRAME,
                         "&3Score: &b$score",
                         Arrays.asList("&fYour EliteMobs score. It goes up",
                                 "&fwhen you kill and elite mob,",
                                 "&fand it goes down when you die",
                                 "&fto an elite. Higher level",
-                                "&felites give more score.")));
+                                "&felites give more score.")), true);
         statsScoreSlot = ConfigurationEngine.setInt(fileConfiguration, "statsScoreSlot", 16);
 
         commandsChestMenuName = ConfigurationEngine.setString(file, fileConfiguration, "commandsChestMenuName", "&2EliteMobs Commands", true);
 
-        commandsAGItem = ConfigurationEngine.setItemStack(fileConfiguration, "commandsAGItem",
+        commandsAGItem = ConfigurationEngine.setItemStack(file ,fileConfiguration, "commandsAGItem",
                 ItemStackGenerator.generateItemStack(Material.END_PORTAL_FRAME,
                         "&5/ag",
                         Arrays.asList("&fClick to use!",
                                 "&fThe place where you can find",
                                 "&fNPCs that give quests, buy and",
-                                "&fsell items, give advice and more!")));
+                                "&fsell items, give advice and more!")), true);
         commandsAGSlot = ConfigurationEngine.setInt(fileConfiguration, "commandsAGSlot", 11);
 
-        commandsShareItemItem = ConfigurationEngine.setItemStack(fileConfiguration, "commandsShareItemItem",
+        commandsShareItemItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "commandsShareItemItem",
                 ItemStackGenerator.generateItemStack(Material.PAPER,
                         "&5/shareitem",
                         Arrays.asList("&fClick to use!",
                                 "&fShares the Elite Item you're holding",
-                                "&fon chat!")));
+                                "&fon chat!")), true);
         commandsShareItemSlot = ConfigurationEngine.setInt(fileConfiguration, "commandsShareItemSlot", 15);
     }
 
