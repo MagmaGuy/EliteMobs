@@ -11,8 +11,6 @@ Discord support channel: https://discord.gg/QSA2wgh
 
 Webapp where you can create content: https://magmaguy.com/webapp/webapp.html
 
-The official EliteMobs resource pack is provided under the CC0 license - no rights reserved, free to use and modify, even without attribution (though attribution is appreciated even if it is not forced).
-
 # Dev notes:
 
 ## Repository
@@ -21,12 +19,33 @@ The official EliteMobs resource pack is provided under the CC0 license - no righ
 
 Maven repository:
 
+Maven:
 ```
+<repository>
+  <id>elitemobs-repo/id>
+  <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+</repository>
+
 <dependency>
   <groupId>com.magmaguy</groupId>
   <artifactId>EliteMobs</artifactId>
-  <version><check_version_above>-SNAPSHOT</version>
+  <version>8.7.4-SNAPSHOT</version>
+  <scope>provided</scope>
 </dependency>
+```
+
+Gradle:
+```kotlin
+repositories {
+    //EliteMobs
+    maven { url = 'https://s01.oss.sonatype.org/content/repositories/snapshots' }
+}
+
+dependencies{
+    //EliteMobs
+    compileOnly group: 'com.magmaguy', name: 'EliteMobs', version: '8.7.4-SNAPSHOT'
+}
+
 ```
 
 ---
@@ -129,7 +148,7 @@ Used to listening to moments when an elite is killed. Uses:
 Used for listening to moments when an elite enters combat against a player. Note that bosses only enter combat after
 either striking a player or being struck, and not at the moment of targetting. Uses:
 
-- Get the targetType (player only) of the Elite
+- Get the target (player only) of the Elite
 - Get the elite which entered in combat
 
 ### EliteMobExitCombatEvent:
@@ -290,3 +309,9 @@ to be documented
 ## To add new mob types:
 
 to be documented
+
+## Special thanks:
+
+Special Thanks to Illusion for spending a few hours proselytizing enums that are also have anonymous method
+implementations on their constructor.
+ 

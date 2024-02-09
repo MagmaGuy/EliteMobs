@@ -110,7 +110,7 @@ public class TimedEvent extends CustomEvent implements Listener {
         CustomEventStartEvent customEventStartEvent = new CustomEventStartEvent(timedEvent);
         if (customEventStartEvent.isCancelled()) return;
 
-        timedEvent.customSpawn = new CustomSpawn(customEventsConfigFields.getCustomSpawn(),
+        timedEvent.customSpawn = new CustomSpawn(customEventsConfigFields.getSpawnType(),
                 customEventsConfigFields.getBossFilenames(),
                 timedEvent);
 

@@ -89,6 +89,7 @@ public class MobCombatSettingsConfig {
     @Getter
     private static double blockingDamageReduction;
 
+
     private MobCombatSettingsConfig() {
     }
 

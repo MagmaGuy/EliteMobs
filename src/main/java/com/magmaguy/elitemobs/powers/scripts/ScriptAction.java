@@ -413,7 +413,7 @@ public class ScriptAction {
 
     //Plays a sound at the target location
     private void runPlaySound(ScriptActionData scriptActionData) {
-        getLocationTargets(scriptActionData).forEach(targetLocation -> targetLocation.getWorld().playSound(targetLocation, blueprint.getSValue(), 1f, 1f));
+        getLocationTargets(scriptActionData).forEach(targetLocation -> targetLocation.getWorld().playSound(targetLocation, blueprint.getSValue(), blueprint.getVolume(), blueprint.getPitch()));
     }
 
     private void runPush(ScriptActionData scriptActionData) {
