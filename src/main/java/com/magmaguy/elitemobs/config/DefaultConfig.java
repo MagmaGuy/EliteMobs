@@ -77,6 +77,14 @@ public class DefaultConfig {
     private static String instancedDungeonTitle;
     @Getter
     private static List<String> instancedDungeonDescription;
+    @Getter
+    private static String dungeonRezInstructions;
+    @Getter
+    private static String dungeonLivesLeftText;
+    @Getter
+    private static String dungeonJoinAsPlayerText;
+    @Getter
+    private static String dungeonJoinAsSpectatorText;
 
 
     private static File file = null;
@@ -210,8 +218,20 @@ public class DefaultConfig {
                 file,
                 fileConfiguration,
                 "instancedDungeonDescription",
-                List.of("&fCreate a new instance of the dungeon", "$dungeonName &ffor youreself and maybe", "&fsome friends!"),
+                List.of("&fCreate a new instance of the dungeon", "$dungeonName &ffor yourself and maybe", "&fsome friends!"),
                 true);
+        dungeonRezInstructions = ConfigurationEngine.setString(
+                List.of("Sets the text that appears over resurrection banners in dungeons"),
+                file, fileConfiguration, "dungeonRezInstructions", "&aPunch to rez!", true);
+        dungeonLivesLeftText = ConfigurationEngine.setString(
+                List.of("Sets the text that shows how many lives players have left in a dungeon! Placeholders:", "$amount - the amount of lives left"),
+                file, fileConfiguration, "dungeonLivesLeftText", "&c$amount lives left!", true);
+        dungeonJoinAsPlayerText = ConfigurationEngine.setString(
+                List.of("Sets the text for joining a dungeon as a player! Placeholders:", "$dungeonName - the name of the dungeon"),
+                file, fileConfiguration, "joinDungeonAsPlayerText", "&fJoin $dungeonName as a player!", true);
+        dungeonJoinAsSpectatorText = ConfigurationEngine.setString(
+                List.of("Sets the text for joining a dungeon as a spectator! Placeholders:", "$dungeonName - the name of the dungeon"),
+                file, fileConfiguration, "joinDungeonAsSpectatorText", "&fJoin $dungeonName as a spectator!", true);
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }

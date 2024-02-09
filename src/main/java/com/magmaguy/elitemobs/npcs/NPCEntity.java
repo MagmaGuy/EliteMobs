@@ -155,8 +155,8 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
         if (npCsConfigFields.getLocations() != null && !npCsConfigFields.getLocations().isEmpty()) {
             for (String locationString : npCsConfigFields.getLocations())
                 new NPCEntity(npCsConfigFields, locationString);
-        } else if (npCsConfigFields.getLocation() != null && !npCsConfigFields.getLocation().isEmpty()) {
-            new NPCEntity(npCsConfigFields, npCsConfigFields.getLocation());
+        } else if (npCsConfigFields.getSpawnLocation() != null && !npCsConfigFields.getSpawnLocation().isEmpty()) {
+            new NPCEntity(npCsConfigFields, npCsConfigFields.getSpawnLocation());
         }
     }
 

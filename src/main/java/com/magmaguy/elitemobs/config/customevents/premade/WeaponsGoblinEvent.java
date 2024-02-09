@@ -13,7 +13,7 @@ public class WeaponsGoblinEvent extends CustomEventsConfigFields {
         setLocalCooldown(120D);
         setGlobalCooldown(25D);
         setWeight(100D);
-        setCustomSpawn("normal_surface_spawn.yml");
+        setSpawnType("normal_surface_spawn.yml");
         setEventDuration(30);
     }
 }

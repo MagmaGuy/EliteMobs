@@ -60,7 +60,7 @@ public class CustomEventsConfigFields extends CustomConfigFields implements Cust
     private boolean endEventWithBossDeath = true;
     @Getter
     @Setter
-    private String customSpawn = "";
+    private String spawnType = "";
     @Getter
     @Setter
     private int minimumPlayerCount = 1;
@@ -92,7 +92,7 @@ public class CustomEventsConfigFields extends CustomConfigFields implements Cust
         this.eventDuration = processDouble("eventDuration", eventDuration, 0, false);
         this.eventEndTime = processInt("eventEndTime", eventEndTime, -1, false);
         this.endEventWithBossDeath = processBoolean("endEventWithBossDeath", endEventWithBossDeath, true, false);
-        this.customSpawn = processString("spawnType", customSpawn, "", false);
+        this.spawnType = processString("spawnType", spawnType, "", false);
         this.minimumPlayerCount = processInt("minimumPlayerCount", minimumPlayerCount, 1, false);
     }
 

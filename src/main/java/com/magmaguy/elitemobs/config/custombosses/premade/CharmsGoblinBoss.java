@@ -54,5 +54,6 @@ public class CharmsGoblinBoss extends CustomBossesConfigFields {
                 "slowpoke_charm.yml:0.2",
                 "vampiric_charm.yml:0.2"));
         setFollowDistance(100);
+        setCustomModel("em_goblin_charms");
     }
 }

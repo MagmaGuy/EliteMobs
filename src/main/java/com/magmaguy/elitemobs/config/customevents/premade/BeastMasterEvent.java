@@ -13,7 +13,7 @@ public class BeastMasterEvent extends CustomEventsConfigFields {
         setLocalCooldown(120D);
         setGlobalCooldown(25D);
         setWeight(80);
-        setCustomSpawn("normal_surface_spawn.yml");
+        setSpawnType("normal_surface_spawn.yml");
         setEventDuration(30);
     }
 }

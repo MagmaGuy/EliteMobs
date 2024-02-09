@@ -248,7 +248,7 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
 
             //Deal with the player getting killed todo: this is a bit busted, fix
             if (player.getHealth() - event.getDamage() <= 0)
-                PlayerDeathMessageByEliteMob.addDeadPlayer(player, PlayerDeathMessageByEliteMob.initializeDeathMessage(player, eliteEntity.getLivingEntity()));
+                PlayerDeathMessageByEliteMob.addDeadPlayer(player, PlayerDeathMessageByEliteMob.initializeDeathMessage(player, eliteEntity));
 
         }
 

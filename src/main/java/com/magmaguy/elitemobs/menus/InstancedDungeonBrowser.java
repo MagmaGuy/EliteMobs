@@ -78,7 +78,7 @@ public class InstancedDungeonBrowser extends EliteMenu {
         dungeonInstance.getPlayers().forEach(player -> players.add(player.getDisplayName()));
         return ItemStackGenerator.generateItemStack(
                 Material.ORANGE_STAINED_GLASS_PANE,
-                "Join " + dungeonInstance.getDungeonPackagerConfigFields().getName() + " as a spectator!",
+                DefaultConfig.getDungeonJoinAsSpectatorText().replace("$dungeonName", dungeonInstance.getDungeonPackagerConfigFields().getName()),
                 players);
     }
 
@@ -88,7 +88,7 @@ public class InstancedDungeonBrowser extends EliteMenu {
         dungeonInstance.getPlayers().forEach(player -> players.add(player.getDisplayName()));
         return ItemStackGenerator.generateItemStack(
                 Material.GREEN_STAINED_GLASS_PANE,
-                "Join " + dungeonInstance.getDungeonPackagerConfigFields().getName() + " as a player!",
+                DefaultConfig.getDungeonJoinAsPlayerText().replace("$dungeonName", dungeonInstance.getDungeonPackagerConfigFields().getName()),
                 players);
     }
 
