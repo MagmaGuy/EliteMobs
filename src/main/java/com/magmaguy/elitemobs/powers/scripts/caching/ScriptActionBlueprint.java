@@ -102,6 +102,10 @@ public class ScriptActionBlueprint {
     private boolean onlyRunOneScript = false;
     @Getter
     private ScriptRelativeVectorBlueprint scriptRelativeVectorBlueprint = null;
+    @Getter
+    private float volume = 1f;
+    @Getter
+    private float pitch = 1f;
 
 
     public ScriptActionBlueprint(Map<?, ?> entry, String scriptName, String scriptFilename) {
@@ -180,6 +184,8 @@ public class ScriptActionBlueprint {
             }
             case "onlyrunonescript" -> onlyRunOneScript = parseBoolean(key, value, scriptName);
             case "relativevector" -> scriptRelativeVectorBlueprint = new ScriptRelativeVectorBlueprint(scriptName, scriptFilename, (Map<String, ?>) value);
+            case "pitch" -> pitch = parseFloat(key, value, scriptName);
+            case "volume" -> volume = parseFloat(key, value, scriptName);
             default -> new WarningMessage("Failed to read key " + key + " for script " + scriptName + " in " + scriptFilename);
         }
 

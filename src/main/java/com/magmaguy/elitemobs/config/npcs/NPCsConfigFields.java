@@ -27,7 +27,7 @@ public class NPCsConfigFields extends CustomConfigFields implements CustomConfig
     @Setter
     private Villager.Profession profession = Villager.Profession.NITWIT;
     @Getter
-    private String location;
+    private String spawnLocation;
     @Getter
     @Setter
     private List<String> greetings = new ArrayList<>();
@@ -93,7 +93,7 @@ public class NPCsConfigFields extends CustomConfigFields implements CustomConfig
         this.name = name;
         this.role = role;
         this.profession = profession;
-        this.location = location;
+        this.spawnLocation = location;
         this.greetings = greetings;
         this.dialog = dialog;
         this.farewell = farewell;
@@ -107,8 +107,8 @@ public class NPCsConfigFields extends CustomConfigFields implements CustomConfig
         super(filename, isEnabled);
     }
 
-    public void setLocation(String location) {
-        this.locations.add(location);
+    public void setSpawnLocation(String spawnLocation) {
+        this.locations.add(spawnLocation);
         this.fileConfiguration.set("spawnLocations", locations);
         try {
             ConfigurationEngine.fileSaverCustomValues(fileConfiguration, this.file);
@@ -123,7 +123,7 @@ public class NPCsConfigFields extends CustomConfigFields implements CustomConfig
         this.name = translatable(filename, "name", processString("name", name, "", true));
         this.role = translatable(filename, "role", processString("role", role, "", true));
         this.profession = processEnum("profession", profession, Villager.Profession.NITWIT, Villager.Profession.class, true);
-        this.location = processString("spawnLocation", location, null, true);
+        this.spawnLocation = processString("spawnLocation", spawnLocation, null, true);
         this.locations = processStringList("spawnLocations", locations, null, false);
         this.greetings = translatable(filename, "greetings", processStringList("greetings", greetings, new ArrayList<>(), true));
         this.dialog = translatable(filename, "dialog", processStringList("dialog", dialog, new ArrayList<>(), true));

@@ -27,7 +27,7 @@ public class NPCCommands {
                 + Round.twoDecimalPlaces(playerLocation.getPitch());
 
         npCsConfigFields.setEnabled(true);
-        npCsConfigFields.setLocation(location);
+        npCsConfigFields.setSpawnLocation(location);
         new NPCEntity(npCsConfigFields, location);
 
     }

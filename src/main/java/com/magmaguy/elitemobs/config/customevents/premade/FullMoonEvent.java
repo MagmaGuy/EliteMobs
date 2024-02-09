@@ -13,7 +13,7 @@ public class FullMoonEvent extends CustomEventsConfigFields {
         setLocalCooldown(240D);
         setGlobalCooldown(25D);
         setWeight(50D);
-        setCustomSpawn("full_moon_spawn.yml");
+        setSpawnType("full_moon_spawn.yml");
         setEventDuration(10D);
         setEventEndTime(23000);
     }

@@ -28,7 +28,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     @Getter
     @Setter
     private EntityType entityType = EntityType.ZOMBIE;
-
     @Setter
     private String name = "Default Name";
     @Setter
@@ -213,6 +212,9 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     @Getter
     @Setter
     private boolean neutral = false;
+    @Getter
+    private String onKillMessage;
+
     /**
      * Creates a new default pre-made Custom Boss. The boss is further customized through a builder pattern.
      */
@@ -376,6 +378,10 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         this.removeAfterDeath = processBoolean("removeAfterDeath", removeAfterDeath, false, false);
         this.slimeSize = processInt("slimeSize", slimeSize, 4, false);
         this.neutral = processBoolean("neutral", neutral, false, false);
+
+        this.onKillMessage = ConfigurationEngine.setString(
+                List.of("Sets the message that is shown when a boss is killed", "Placeholders:", "$player - username of the player the boss killed"),
+                file, fileConfiguration, "onKillMessage", null, true);
     }
 
     public boolean isCustomModelExists() {

@@ -62,11 +62,26 @@ public class MapListInterpreter {
     public static Double parseDouble(String key, Object value, String scriptName) {
         try {
             if (value instanceof Integer integer)
-                return integer + 0D;
+                return integer.doubleValue();
             else if (value instanceof Double dbl)
                 return dbl;
             else if (value instanceof String string)
                 return Double.parseDouble(string);
+        } catch (Exception ex) {
+            parsingErrorMessage(key, value, scriptName);
+            return null;
+        }
+        return null;
+    }
+
+    public static Float parseFloat(String key, Object value, String scriptName) {
+        try {
+            if (value instanceof Integer integer)
+                return integer.floatValue();
+            else if (value instanceof Double dbl)
+                return dbl.floatValue();
+            else if (value instanceof String string)
+                return Float.parseFloat(string);
         } catch (Exception ex) {
             parsingErrorMessage(key, value, scriptName);
             return null;
