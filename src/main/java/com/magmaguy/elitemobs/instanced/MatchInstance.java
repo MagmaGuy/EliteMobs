@@ -3,6 +3,10 @@ package com.magmaguy.elitemobs.instanced;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.api.instanced.MatchDestroyEvent;
+import com.magmaguy.elitemobs.api.instanced.MatchInstantiateEvent;
+import com.magmaguy.elitemobs.api.instanced.MatchJoinEvent;
+import com.magmaguy.elitemobs.api.instanced.MatchLeaveEvent;
 import com.magmaguy.elitemobs.config.ArenasConfig;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
@@ -61,6 +65,7 @@ public abstract class MatchInstance {
         startWatchdogs();
         instanceMessages();
         instances.add(this);
+        new MatchInstantiateEvent(this);
     }
 
     public static void shutdown() {
@@ -94,10 +99,12 @@ public abstract class MatchInstance {
     }
 
     public boolean addNewPlayer(Player player) {
+        new MatchJoinEvent(this, player);
         return InstancePlayerManager.addNewPlayer(player, this);
     }
 
     public void removePlayer(Player player) {
+        new MatchLeaveEvent(this, player);
         InstancePlayerManager.removePlayer(player, this);
     }
 
@@ -114,10 +121,12 @@ public abstract class MatchInstance {
     }
 
     public void removeSpectator(Player player) {
+        new MatchLeaveEvent(this, player);
         InstancePlayerManager.removeSpectator(this, player);
     }
 
     public void removeAnyKind(Player player) {
+        new MatchLeaveEvent(this, player);
         InstancePlayerManager.removeAnyKind(this, player);
     }
 
@@ -239,6 +248,8 @@ public abstract class MatchInstance {
         if (state != InstancedRegionState.COMPLETED_VICTORY &&
                 state != InstancedRegionState.COMPLETED_DEFEAT)
             state = InstancedRegionState.COMPLETED;
+        //todo this should probable call resetMatch() and resetMatch() should probably be renamed because that's not what it does
+        new MatchDestroyEvent(this);
     }
 
     protected void resetMatch() {
@@ -250,6 +261,7 @@ public abstract class MatchInstance {
         spectators.clear();
         deathBanners.values().forEach(deathLocation -> deathLocation.clear(false));
         deathBanners.clear();
+        new MatchDestroyEvent(this);
     }
 
     protected InstanceDeathLocation getDeathLocationByPlayer(Player player) {
