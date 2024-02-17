@@ -54,9 +54,17 @@ public abstract class MatchInstance {
     protected World world;
     @Getter
     protected String permission = null;
+    @Getter
+    protected boolean cancelled = false;
 
 
     public MatchInstance(Location startLocation, Location exitLocation, int minPlayers, int maxPlayers) {
+        MatchInstantiateEvent matchInstantiateEvent = new MatchInstantiateEvent(this);
+        if (matchInstantiateEvent.isCancelled()) {
+            cancelled = true;
+            return;
+        }
+
         this.startLocation = startLocation;
         this.exitLocation = exitLocation;
         this.minPlayers = minPlayers;
@@ -65,12 +73,11 @@ public abstract class MatchInstance {
         startWatchdogs();
         instanceMessages();
         instances.add(this);
-        new MatchInstantiateEvent(this);
     }
 
     public static void shutdown() {
         HashSet<MatchInstance> cloneInstance = new HashSet<>(instances);
-        cloneInstance.forEach(MatchInstance::resetMatch);
+        cloneInstance.forEach(MatchInstance::destroyMatch);
         instances.clear();
     }
 
@@ -252,12 +259,11 @@ public abstract class MatchInstance {
         new MatchDestroyEvent(this);
     }
 
-    protected void resetMatch() {
+    protected void destroyMatch() {
         state = InstancedRegionState.WAITING;
         HashSet<Player> copy = new HashSet<>(participants);
         copy.forEach(this::removeAnyKind);
         players.clear();
-        spectators.clear();
         spectators.clear();
         deathBanners.values().forEach(deathLocation -> deathLocation.clear(false));
         deathBanners.clear();

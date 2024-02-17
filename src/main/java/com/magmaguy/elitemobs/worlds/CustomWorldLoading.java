@@ -8,6 +8,7 @@ import org.bukkit.WorldCreator;
 
 import java.io.File;
 import java.util.Objects;
+import java.util.logging.Filter;
 
 public class CustomWorldLoading {
 
@@ -22,6 +23,9 @@ public class CustomWorldLoading {
         for (File listOfFile : listOfFiles) {
             if (listOfFile.isDirectory() && listOfFile.getName().equals(AdventurersGuildConfig.getGuildWorldName())) {
                 new InfoMessage("[EliteMobs] World " + AdventurersGuildConfig.getGuildWorldName() + " found! Loading it in...");
+                Filter filter = newFilter -> false;
+                Filter previousFilter = Bukkit.getLogger().getFilter();
+                Bukkit.getLogger().setFilter(filter);
                 try {
                     WorldCreator worldCreator = new WorldCreator(AdventurersGuildConfig.getGuildWorldName());
                     Objects.requireNonNull(Bukkit.createWorld(worldCreator)).setKeepSpawnInMemory(false);
@@ -31,6 +35,7 @@ public class CustomWorldLoading {
                     new WarningMessage("Failed to generate Adventurer's Guild World!");
                     ex.printStackTrace();
                 }
+                Bukkit.getLogger().setFilter(previousFilter);
                 break;
             }
         }

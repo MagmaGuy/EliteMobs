@@ -303,7 +303,8 @@ public class EventsRegistrer {
             register(new HoneyBlockJumpExploit());
         }
         register(new EliteMobDamagedByPlayerAntiExploitListener());
-        register(new PreventPathfindingExploit());
+        if (AntiExploitConfig.isNoPathExploit())
+            register(new PreventPathfindingExploit());
 
         register(new ActionEvent.ActionEventEvents());
 

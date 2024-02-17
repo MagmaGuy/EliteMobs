@@ -36,20 +36,20 @@ public class ArenaInstance extends MatchInstance {
     @Getter
     private static final HashMap<String, ArenaInstance> arenaInstances = new HashMap<>();
     @Getter
-    private final CustomArenasConfigFields customArenasConfigFields;
+    private CustomArenasConfigFields customArenasConfigFields;
     @Getter
-    private final ArenaWaves arenaWaves;
+    private ArenaWaves arenaWaves;
     @Getter
     private final HashSet<CustomBossEntity> customBosses = new HashSet<>();
     private final HashSet<Entity> nonEliteMobsEntities = new HashSet<>();
     private final HashMap<Integer, String> waveMessage = new HashMap<>();
-    private final int minX;
-    private final int maxX;
-    private final int minY;
-    private final int maxY;
-    private final int minZ;
-    private final int maxZ;
-    private final boolean cylindricalArena;
+    private int minX;
+    private int maxX;
+    private int minY;
+    private int maxY;
+    private int minZ;
+    private int maxZ;
+    private boolean cylindricalArena;
     @Getter
     private final HashMap<Player, Double> roundDamage = new HashMap<>();
     protected HashMap<String, Location> spawnPoints = new HashMap<>();
@@ -61,6 +61,7 @@ public class ArenaInstance extends MatchInstance {
 
     public ArenaInstance(CustomArenasConfigFields customArenasConfigFields, Location corner1, Location corner2, Location startLocation, Location exitLocation) {
         super(startLocation, exitLocation, customArenasConfigFields.getMinimumPlayerCount(), customArenasConfigFields.getMaximumPlayerCount());
+        if (cancelled) return;
         this.cylindricalArena = customArenasConfigFields.isCylindricalArena();
 
         super.lobbyLocation = customArenasConfigFields.getTeleportLocation();
@@ -294,12 +295,12 @@ public class ArenaInstance extends MatchInstance {
         } else
             participants.forEach(player -> player.sendTitle(ArenasConfig.getDefeatTitle().replace("$wave", currentWave + ""), ArenasConfig.getDefeatSubtitle().replace("$wave", currentWave + ""), 20, 20 * 10, 20));
 
-        Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, this::resetMatch, customArenasConfigFields.getDelayBetweenWaves());
+        Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, this::destroyMatch, customArenasConfigFields.getDelayBetweenWaves());
     }
 
     @Override
-    protected void resetMatch() {
-        super.resetMatch();
+    protected void destroyMatch() {
+        super.destroyMatch();
         arenaState = ArenaState.IDLE;
         currentWave = 0;
         customBosses.forEach(customBoss -> customBoss.remove(RemovalReason.ARENA_RESET));

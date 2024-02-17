@@ -265,10 +265,10 @@ public class UserCommands {
                                 customBossEntity.getCustomBossBossBar().addTrackingPlayer((Player) commandContext.getSender());
                                 return;
                             }
-                        commandContext.getSender().sendMessage("[EliteMobs] Sorry, this boss is already gone!");
+                        commandContext.getSender().sendMessage(DefaultConfig.getBossAlreadyGoneMessage());
                     } catch (Exception ex) {
                         //happens when players try to track an entity that has despawned for any reason
-                        commandContext.getSender().sendMessage("[EliteMobs] Sorry, this boss is already gone!");
+                        commandContext.getSender().sendMessage(DefaultConfig.getBossAlreadyGoneMessage());
                     }
                 }));
 

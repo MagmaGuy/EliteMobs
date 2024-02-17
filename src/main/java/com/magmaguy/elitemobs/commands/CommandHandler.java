@@ -87,7 +87,7 @@ public class CommandHandler {
                 .withDecorator(
                         component -> text()
                                 .append(text("[", NamedTextColor.DARK_GRAY))
-                                .append(text("Example", NamedTextColor.GOLD))
+                                .append(text("EliteMobs", NamedTextColor.GOLD))
                                 .append(text("] ", NamedTextColor.DARK_GRAY))
                                 .append(component).build()
                 ).apply(manager, bukkitAudiences::sender);
