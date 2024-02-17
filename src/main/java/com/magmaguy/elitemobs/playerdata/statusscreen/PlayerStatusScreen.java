@@ -58,7 +58,7 @@ public class PlayerStatusScreen implements Listener {
     }
 
     private ItemStack generateBook(Player requestingPlayer, Player targetPlayer) {
-        TextComponent[] pages = new TextComponent[50];
+        TextComponent[] pages = new TextComponent[100];
         int pageCounter = 1;
         pageCounter++;
         int statsPage = -1;

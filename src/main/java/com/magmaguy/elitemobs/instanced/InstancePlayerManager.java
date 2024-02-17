@@ -3,6 +3,8 @@ package com.magmaguy.elitemobs.instanced;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.PlayerJoinArenaEvent;
 import com.magmaguy.elitemobs.api.PlayerJoinDungeonEvent;
+import com.magmaguy.elitemobs.api.instanced.MatchJoinEvent;
+import com.magmaguy.elitemobs.api.instanced.MatchLeaveEvent;
 import com.magmaguy.elitemobs.collateralminecraftchanges.AlternativeDurabilityLoss;
 import com.magmaguy.elitemobs.config.ArenasConfig;
 import com.magmaguy.elitemobs.instanced.arena.ArenaInstance;
@@ -18,6 +20,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class InstancePlayerManager {
 
     public static boolean addNewPlayer(Player player, MatchInstance matchInstance) {
+        MatchJoinEvent event = new MatchJoinEvent(matchInstance, player);
+        if (event.isCancelled()) return false;
+
         //Right now new players can't join ongoing instances
         if (!matchInstance.state.equals(MatchInstance.InstancedRegionState.WAITING)) {
             player.sendMessage(ArenasConfig.getArenasOngoingMessage());
@@ -66,6 +71,8 @@ public class InstancePlayerManager {
     }
 
     public static void removePlayer(Player player, MatchInstance matchInstance) {
+        new MatchLeaveEvent(matchInstance, player);
+
         //Remove match instance where needed
         PlayerData.setMatchInstance(player, null);
         matchInstance.players.remove(player);
@@ -131,6 +138,8 @@ public class InstancePlayerManager {
     }
 
     public static void addSpectator(MatchInstance matchInstance, Player player, boolean wasPlayer) {
+        new MatchJoinEvent(matchInstance, player);
+
         if (!wasPlayer) matchInstance.previousPlayerLocations.put(player, player.getLocation());
         matchInstance.participants.add(player);
         player.sendMessage(ArenasConfig.getArenaJoinSpectatorMessage());

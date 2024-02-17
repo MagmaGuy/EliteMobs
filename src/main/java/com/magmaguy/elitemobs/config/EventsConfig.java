@@ -8,8 +8,7 @@ import java.util.List;
 
 public class EventsConfig {
     @Getter
-    private
-    static boolean announcementBroadcastWorldOnly;
+    private static boolean announcementBroadcastWorldOnly;
     @Getter
     private static int actionEventMinimumCooldown;
     @Getter
