@@ -24,7 +24,6 @@ import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
 import com.magmaguy.elitemobs.config.potioneffects.PotionEffectsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
-import com.magmaguy.elitemobs.config.translations.TranslationsConfig;
 import com.magmaguy.elitemobs.config.wormholes.WormholeConfig;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
 import com.magmaguy.elitemobs.economy.VaultCompatibility;
@@ -90,7 +89,6 @@ public class EliteMobs extends JavaPlugin {
     public static void initializeConfigs() {
         //Initialized translations
         DefaultConfig.initializeConfig();
-        new TranslationsConfig();
         SchematicsFolderConfig.initializeConfigs();
         ResourcePackDataConfig.initializeConfig();
         ItemSettingsConfig.initializeConfig();
@@ -118,7 +116,7 @@ public class EliteMobs extends JavaPlugin {
         QuestsConfig.initializeConfig();
         WormholesConfig.initializeConfig();
         ArenasConfig.initializeConfig();
-
+        DungeonsConfig.initializeConfig();
     }
 
     public static void worldScanner() {

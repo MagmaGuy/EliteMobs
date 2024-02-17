@@ -30,7 +30,7 @@ public class TranslationsConfig extends CustomConfig {
             return value;
         TranslationsConfigFields selectedLanguage = translationConfigs.get(DefaultConfig.getLanguage());
         if (selectedLanguage == null) {
-            new WarningMessage("Failed to get valid language from " + filename + " , defaulting to English!");
+            new WarningMessage("Failed to get valid language from " + filename + " , defaulting to English! (String)");
             return value;
         }
         selectedLanguage.add(filename, key, value);
@@ -42,7 +42,7 @@ public class TranslationsConfig extends CustomConfig {
             return value;
         TranslationsConfigFields selectedLanguage = translationConfigs.get(DefaultConfig.getLanguage());
         if (selectedLanguage == null) {
-            new WarningMessage("Failed to get valid language from  " + filename + " , defaulting to English!");
+            new WarningMessage("Failed to get valid language from " + filename + " , defaulting to English! (List)");
             return value;
         }
         selectedLanguage.add(filename, key, value);

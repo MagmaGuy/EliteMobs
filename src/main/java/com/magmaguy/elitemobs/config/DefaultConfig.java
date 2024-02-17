@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.elitemobs.commands.admin.ReloadCommand;
+import com.magmaguy.elitemobs.config.translations.TranslationsConfig;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
@@ -72,20 +73,7 @@ public class DefaultConfig {
     @Getter
     private static String treasureChestNoDropMessage;
     @Getter
-    private static boolean allowSpectatorsInInstancedContent;
-    @Getter
-    private static String instancedDungeonTitle;
-    @Getter
-    private static List<String> instancedDungeonDescription;
-    @Getter
-    private static String dungeonRezInstructions;
-    @Getter
-    private static String dungeonLivesLeftText;
-    @Getter
-    private static String dungeonJoinAsPlayerText;
-    @Getter
-    private static String dungeonJoinAsSpectatorText;
-
+    private static String bossAlreadyGoneMessage;
 
     private static File file = null;
     private static FileConfiguration fileConfiguration = null;
@@ -108,6 +96,13 @@ public class DefaultConfig {
 
         file = ConfigurationEngine.fileCreator("config.yml");
         fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
+        //The language changes what data is loaded downstream
+        language = ConfigurationEngine.setString(
+                List.of("Sets the language file used by EliteMobs", "Do NOT change this manually! It is meant to be installed with the command '/em language <languagefile>'"),
+                file, fileConfiguration, "language", "english", false);
+        //This needs to be initialized as soon as the language is figured out
+        new TranslationsConfig();
+
         alwaysShowNametags = ConfigurationEngine.setBoolean(
                 List.of("Sets whether elites and bosses spawned by elitemobs will always show their nametags.", "Not recommended!"),
                 fileConfiguration, "alwaysShowEliteMobNameTags", false);
@@ -168,7 +163,7 @@ public class DefaultConfig {
                 fileConfiguration, "onlyUseBedrockMenus", false);
         characterLimitForBookMenuPages = ConfigurationEngine.setInt(
                 List.of("Sets the character limit per line for book menu pages.", "Lower this amount if text is getting cut off in book menus such as for quests"),
-                fileConfiguration, "characterLimitForBookMenuPages", 185);
+                fileConfiguration, "characterLimitForBookMenuPagesV2", 170);
         useGlassToFillMenuEmptySpace = ConfigurationEngine.setBoolean(
                 List.of("Sets if empty menu space will be filled with glass panes.", "Not recommended if you are using the EliteMobs resource pack."),
                 fileConfiguration, "useGlassToFillMenuEmptySpace", false);
@@ -177,11 +172,6 @@ public class DefaultConfig {
                         "Do not set this manually, it is set automatically upon installation of the resource pack.",
                         "Only set it manually if you had to merge the EliteMobs resource pack, and expect that the spacing might not work if you do that."),
                 fileConfiguration, "menuUnicodeFormatting", false);
-        language = ConfigurationEngine.setString(
-                List.of("Sets the language file used by EliteMobs", "Do NOT change this manually! It is meant to be installed with the command '/em language <languagefile>'"),
-                file, fileConfiguration, "language", "english", false);
-
-
         noPendingCommands = ConfigurationEngine.setString(
                 List.of("Sets the message sent to players if they run '/em confirm' with no pending commands."),
                 file, fileConfiguration, "noPendingCommands", "&cYou don't currently have any pending commands!", true);
@@ -203,35 +193,11 @@ public class DefaultConfig {
         treasureChestNoDropMessage = ConfigurationEngine.setString(
                 List.of("Sets the message that appears when a player opens a treasure chest but gets nothing"),
                 file, fileConfiguration, "treasureChestNoDropMessage", "&8[EliteMobs] &cYou didn't get anything! Better luck next time!", true);
-        allowSpectatorsInInstancedContent = ConfigurationEngine.setBoolean(
-                List.of("Sets is spectating instanced content will be available."),
-                fileConfiguration, "allowSpectatorsInInstancedContent", true);
-        instancedDungeonTitle = ConfigurationEngine.setString(
-                List.of(
-                        "Sets the title that will show up in the item description of instanced dungeon menus",
-                        "$difficulty is the placeholder for the difficulty name in the configuration file of the dungeon"),
-                file, fileConfiguration, "instancedDungeonTitle", "Start $difficulty difficulty dungeon!",
-                true);
-        instancedDungeonDescription = ConfigurationEngine.setList(
-                List.of("Sets the description that will show up in the item description of instanced dungeon menus",
-                        "$dungeonName is the placeholder for the dungeon name in the configuration file of the dungeon"),
-                file,
-                fileConfiguration,
-                "instancedDungeonDescription",
-                List.of("&fCreate a new instance of the dungeon", "$dungeonName &ffor yourself and maybe", "&fsome friends!"),
-                true);
-        dungeonRezInstructions = ConfigurationEngine.setString(
-                List.of("Sets the text that appears over resurrection banners in dungeons"),
-                file, fileConfiguration, "dungeonRezInstructions", "&aPunch to rez!", true);
-        dungeonLivesLeftText = ConfigurationEngine.setString(
-                List.of("Sets the text that shows how many lives players have left in a dungeon! Placeholders:", "$amount - the amount of lives left"),
-                file, fileConfiguration, "dungeonLivesLeftText", "&c$amount lives left!", true);
-        dungeonJoinAsPlayerText = ConfigurationEngine.setString(
-                List.of("Sets the text for joining a dungeon as a player! Placeholders:", "$dungeonName - the name of the dungeon"),
-                file, fileConfiguration, "joinDungeonAsPlayerText", "&fJoin $dungeonName as a player!", true);
-        dungeonJoinAsSpectatorText = ConfigurationEngine.setString(
-                List.of("Sets the text for joining a dungeon as a spectator! Placeholders:", "$dungeonName - the name of the dungeon"),
-                file, fileConfiguration, "joinDungeonAsSpectatorText", "&fJoin $dungeonName as a spectator!", true);
+        bossAlreadyGoneMessage= ConfigurationEngine.setString(
+                List.of("Sets the message that appears when a player tries to track a boss that is no longer valid"),
+                file, fileConfiguration, "bossAlreadyGoneMessage", "&c[EliteMobs] Sorry, this boss is already gone!", true);
+
+
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }

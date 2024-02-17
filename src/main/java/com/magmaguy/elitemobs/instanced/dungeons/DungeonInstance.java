@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.api.DungeonStartEvent;
 import com.magmaguy.elitemobs.api.InstancedDungeonRemoveEvent;
 import com.magmaguy.elitemobs.api.WorldInstanceEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
+import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfig;
 import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
 import com.magmaguy.elitemobs.dungeons.utility.DungeonUtils;
@@ -31,12 +32,12 @@ public class DungeonInstance extends MatchInstance {
     private static final Set<DungeonInstance> dungeonInstances = new HashSet<>();
     private final List<DungeonObjective> dungeonObjectives = new ArrayList<>();
     @Getter
-    private final World world;
+    private World world;
     @Getter
-    private final String instancedWorldName;
-    private final File instancedWorldFile;
+    private String instancedWorldName;
+    private File instancedWorldFile;
     @Getter
-    private final DungeonPackagerConfigFields dungeonPackagerConfigFields;
+    private DungeonPackagerConfigFields dungeonPackagerConfigFields;
     private List<InstancedBossEntity> instancedBossEntities = new ArrayList<>();
     @Getter
     private int levelSync = -1;
@@ -55,6 +56,7 @@ public class DungeonInstance extends MatchInstance {
                 null, //todo: the end location is currently not definable
                 dungeonPackagerConfigFields.getMinPlayerCount(),
                 dungeonPackagerConfigFields.getMaxPlayerCount());
+        if (cancelled) return;
         super.lobbyLocation = lobbyLocation;
         this.dungeonPackagerConfigFields = dungeonPackagerConfigFields;
         for (String rawObjective : dungeonPackagerConfigFields.getRawDungeonObjectives())
@@ -192,19 +194,25 @@ public class DungeonInstance extends MatchInstance {
             removeInstance();
             return;
         }
-        announce("[EliteMobs] Completed! Arena will self-destruct in 2 minutes!");
+        announce(DungeonsConfig.getInstancedDungeonCompleteMessage());
         announce("MagmaGuy's note: This is still a work in progress, please be patient! Hope you enjoyed your run.");
         new BukkitRunnable() {
 
             @Override
             public void run() {
-                removeInstance();
+                destroyMatch();
             }
         }.runTaskLater(MetadataHandler.PLUGIN, 2 * 60 * 20L);
     }
 
+    @Override
+    public void destroyMatch() {
+        super.destroyMatch();
+        removeInstance();
+    }
+
     public void removeInstance() {
-        participants.forEach(player -> player.sendMessage("[EliteMobs] Closing instance!"));
+        participants.forEach(player -> player.sendMessage(DungeonsConfig.getInstancedDungeonClosingInstanceMessage()));
         HashSet<Player> participants = new HashSet<>(this.participants);
         participants.forEach(this::removeAnyKind);
         instances.remove(this);

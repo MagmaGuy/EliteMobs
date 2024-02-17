@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.menus;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
-import com.magmaguy.elitemobs.config.DefaultConfig;
+import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
 import com.magmaguy.elitemobs.dungeons.WorldInstancedDungeonPackage;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
@@ -50,10 +50,10 @@ public class InstancedDungeonBrowser extends EliteMenu {
         int difficultyCounter = 0;
         for (Map map : emPackage.getDungeonPackagerConfigFields().getDifficulties()) {
             List<String> description = new ArrayList<>();
-            for (String string : DefaultConfig.getInstancedDungeonDescription())
+            for (String string : DungeonsConfig.getInstancedDungeonDescription())
                 description.add(string.replace("$dungeonName", emPackage.getDungeonPackagerConfigFields().getName()));
             inventory.setItem(difficultySlots.get(difficultyCounter), ItemStackGenerator.generateItemStack(Material.GREEN_STAINED_GLASS_PANE,
-                    DefaultConfig.getInstancedDungeonTitle().replace("$difficulty", map.get("name") + ""),
+                    DungeonsConfig.getInstancedDungeonTitle().replace("$difficulty", map.get("name") + ""),
                     description));
 
             difficultyCounter++;
@@ -63,7 +63,7 @@ public class InstancedDungeonBrowser extends EliteMenu {
             ItemStack itemStack = null;
             if (instancesList.get(i).getState().equals(MatchInstance.InstancedRegionState.WAITING))
                 itemStack = playerItem(instancesList.get(i));
-            else if (DefaultConfig.isAllowSpectatorsInInstancedContent())
+            else if (DungeonsConfig.isAllowSpectatorsInInstancedContent())
                 itemStack = spectatorItem(instancesList.get(i));
             if (itemStack != null)
                 inventory.setItem(validSlots.get(i), itemStack);
@@ -78,7 +78,7 @@ public class InstancedDungeonBrowser extends EliteMenu {
         dungeonInstance.getPlayers().forEach(player -> players.add(player.getDisplayName()));
         return ItemStackGenerator.generateItemStack(
                 Material.ORANGE_STAINED_GLASS_PANE,
-                DefaultConfig.getDungeonJoinAsSpectatorText().replace("$dungeonName", dungeonInstance.getDungeonPackagerConfigFields().getName()),
+                DungeonsConfig.getDungeonJoinAsSpectatorText().replace("$dungeonName", dungeonInstance.getDungeonPackagerConfigFields().getName()),
                 players);
     }
 
@@ -88,7 +88,7 @@ public class InstancedDungeonBrowser extends EliteMenu {
         dungeonInstance.getPlayers().forEach(player -> players.add(player.getDisplayName()));
         return ItemStackGenerator.generateItemStack(
                 Material.GREEN_STAINED_GLASS_PANE,
-                DefaultConfig.getDungeonJoinAsPlayerText().replace("$dungeonName", dungeonInstance.getDungeonPackagerConfigFields().getName()),
+                DungeonsConfig.getDungeonJoinAsPlayerText().replace("$dungeonName", dungeonInstance.getDungeonPackagerConfigFields().getName()),
                 players);
     }
 
@@ -109,7 +109,7 @@ public class InstancedDungeonBrowser extends EliteMenu {
                 DungeonInstance dungeonInstance = instancedDungeonBrowser.instancesList.get(instancedDungeonBrowser.validSlots.indexOf(event.getSlot()));
                 switch (dungeonInstance.getState()) {
                     case ONGOING, STARTING -> {
-                        if (DefaultConfig.isAllowSpectatorsInInstancedContent())
+                        if (DungeonsConfig.isAllowSpectatorsInInstancedContent())
                             dungeonInstance.addSpectator((Player) event.getWhoClicked(), false);
                     }
                     case WAITING -> dungeonInstance.addNewPlayer((Player) event.getWhoClicked());

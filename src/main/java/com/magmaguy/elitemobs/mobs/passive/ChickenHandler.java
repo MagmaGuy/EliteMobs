@@ -144,7 +144,8 @@ public class ChickenHandler implements Listener {
     @EventHandler
     public void onHopperSuperEggPickup(InventoryPickupItemEvent event) {
 
-        if (event.getItem().getItemStack().hasItemMeta() && event.getItem().getItemStack().getItemMeta().hasLore() &&
+        if (event.getItem().getItemStack().getType() == Material.EGG &&
+                event.getItem().getItemStack().hasItemMeta() && event.getItem().getItemStack().getItemMeta().hasLore() &&
                 event.getItem().getItemStack().getItemMeta().getLore().equals(lore)) {
 
             event.setCancelled(true);

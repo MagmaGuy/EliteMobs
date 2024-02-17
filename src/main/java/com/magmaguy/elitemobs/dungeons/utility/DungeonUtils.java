@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.dungeons.utility;
 import com.magmaguy.elitemobs.dungeons.WorldDungeonPackage;
 import com.magmaguy.elitemobs.dungeons.WorldPackage;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -15,6 +16,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.logging.Filter;
 
 public class DungeonUtils {
     public static Pair getLowestAndHighestLevels(List<CustomBossEntity> customBossEntities) {
@@ -49,6 +51,15 @@ public class DungeonUtils {
             new WarningMessage("File  " + folder.getAbsolutePath() + File.separatorChar + worldName + " does not exist!");
             return null;
         }
+
+        new InfoMessage("Loading world " + worldName + " !");
+
+        Filter filter = newFilter -> false;
+
+        Filter previousFilter = Bukkit.getLogger().getFilter();
+
+        Bukkit.getLogger().setFilter(filter);
+
         try {
             WorldCreator worldCreator = new WorldCreator(worldName);
             worldCreator.environment(environment);
@@ -56,8 +67,10 @@ public class DungeonUtils {
             if (world != null)
                 world.setKeepSpawnInMemory(false);
             world.setDifficulty(Difficulty.HARD);
+            Bukkit.getLogger().setFilter(previousFilter);
             return world;
         } catch (Exception exception) {
+            Bukkit.getLogger().setFilter(previousFilter);
             new WarningMessage("Failed to load world " + worldName + " !");
             exception.printStackTrace();
         }
