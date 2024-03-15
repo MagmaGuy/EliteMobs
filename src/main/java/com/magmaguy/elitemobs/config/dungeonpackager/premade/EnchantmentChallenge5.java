@@ -9,11 +9,11 @@ import java.util.List;
 import java.util.Map;
 
 public class EnchantmentChallenge5 extends DungeonPackagerConfigFields {
-    public EnchantmentChallenge5(){
+    public EnchantmentChallenge5() {
         super("enchantment_challenge_5_sanctum",
                 false,
                 "&2[lvl 000-200] &fEnchantment Challenge 05",
-                Arrays.asList("&fAn enchantment challenge dungeon!"),
+                List.of("&fAn enchantment challenge dungeon!"),
                 DiscordLinks.freeMinidungeons,
                 DungeonSizeCategory.SANCTUM,
                 "em_id_enchantment_challenge_5",

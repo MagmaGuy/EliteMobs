@@ -36,11 +36,11 @@ public class ScriptParticles {
                 ScriptRelativeVector scriptRelativeVector = null;
                 scriptRelativeVector = new ScriptRelativeVector(this.particleBlueprint.getRelativeVectorBlueprint(), eliteScript, location);
 
-                    Vector movementVector = scriptRelativeVector.getVector(scriptActionData);
-                    amount = 0;
-                    x = movementVector.getX();
-                    y = movementVector.getY();
-                    z = movementVector.getZ();
+                Vector movementVector = scriptRelativeVector.getVector(scriptActionData);
+                amount = 0;
+                x = movementVector.getX();
+                y = movementVector.getY();
+                z = movementVector.getZ();
             }
 
 

@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EnchantedBookWaterWorkerConfig extends CustomItemsConfigFields {
-    public EnchantedBookWaterWorkerConfig(){
+    public EnchantedBookWaterWorkerConfig() {
         super("enchanted_book_water_worker",
                 true,
                 Material.BOOK,

@@ -43,6 +43,10 @@ public class EliteExplosionEvent extends Event implements Cancellable {
         this.blockStates = blockStates;
     }
 
+    public static HandlerList getHandlerList() {
+        return handlers;
+    }
+
     public void setExplosionSourceLocation(Location explosionSourceLocation) {
         this.explosionSourceLocation = explosionSourceLocation;
     }
@@ -59,11 +63,6 @@ public class EliteExplosionEvent extends Event implements Cancellable {
 
     @Override
     public HandlerList getHandlers() {
-        return handlers;
-    }
-
-
-    public static HandlerList getHandlerList() {
         return handlers;
     }
 

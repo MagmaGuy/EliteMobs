@@ -34,20 +34,19 @@ import java.util.*;
 
 public class SetupMenu {
 
-    public static Map<Inventory, SetupMenu> setupMenus = new HashMap<>();
-
-    Inventory inventory;
-    Player player;
     private static final int nextIcon = 35;
     private static final int infoIcon = 4;
+    public static Map<Inventory, SetupMenu> setupMenus = new HashMap<>();
     private static List<EMPackage> emPackages = new ArrayList<>();
+    private final int previousIcon = 27;
+    Inventory inventory;
+    Player player;
     ArrayList<Integer> validSlots = new ArrayList<>(Arrays.asList(10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23,
             24, 25, 28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 43, 46, 47, 48, 49, 50, 51, 52));
-    private final int previousIcon = 27;
     HashMap<Integer, EMPackage> minidungeonHashMap = new HashMap<>();
+    boolean adventurersGuildIsDownloaded = false;
     @Getter
     private int currentPage = 1;
-    boolean adventurersGuildIsDownloaded = false;
 
     public SetupMenu(Player player) {
         this.inventory = Bukkit.createInventory(player, 54, "Setup menu");
@@ -115,53 +114,6 @@ public class SetupMenu {
             player.spigot().sendMessage(SpigotMessage.simpleMessage("&8[EliteMobs] &2The EliteMobs resource pack has been installed! &cThis requires a server restart to work correctly!"));
             player.spigot().sendMessage(SpigotMessage.commandHoverMessage("&eBefore you go! &fDo you want to force players to use the resource pack? This is necessary if you plan to use &cModelEngine for the custom boss models. &aClick here if you want to force resource packs. &eIgnore this message if you don't!", "Click to force resource packs!", "/elitemobs forceresourcepack"));
         }
-    }
-
-    private void redrawMenu(int page, Inventory inventory) {
-        currentPage = page;
-        setupMenus.remove(inventory);
-        this.inventory = inventory;
-        inventory.clear();
-        //reserve resource pack status
-        customResourcePackStatus();
-        //reserve adventurer's guild
-        adventurersGuildWorldStatus();
-        //iterate through dungeons
-        dungeonStatuses();
-        //Set icons
-        addNavigationElements();
-        player.openInventory(inventory);
-        setupMenus.put(inventory, this);
-    }
-
-    private void addNavigationElements() {
-        ItemStack infoButton = GetLootMenuConfig.infoItem;
-        List<String> lore = ChatColorConverter.convert(List.of("&2To setup optional/recommended content for EliteMobs:",
-                "&61) &fDownload content from &9magmaguy.itch.io &for &9patreon.com/magmaguy",
-                "&62) &fPut content in the &2imports &ffolder of EliteMobs",
-                "&63) &fDo &2/em reload",
-                "&64) &fDo &2/em setup",
-                "&65) &fClick on &eyellow &ficons to install!",
-                "Click to get more info!"));
-        ItemMeta itemMeta = infoButton.getItemMeta();
-        itemMeta.setLore(lore);
-        infoButton.setItemMeta(itemMeta);
-        inventory.setItem(infoIcon, infoButton);
-
-        ItemStack previousButton = GetLootMenuConfig.previousLootItem;
-        ItemMeta previousButtonMeta = previousButton.getItemMeta();
-        previousButtonMeta.setDisplayName("Previous page");
-        previousButton.setItemMeta(previousButtonMeta);
-        if (currentPage > 1)
-            inventory.setItem(previousIcon, previousButton);
-
-        ItemStack nextButton = GetLootMenuConfig.nextLootItem;
-        ItemMeta nextButtonMeta = nextButton.getItemMeta();
-        nextButtonMeta.setDisplayName("Next page");
-        nextButton.setItemMeta(nextButtonMeta);
-        int totalPages = (int) Math.ceil(emPackages.size() / 28d);
-        if (totalPages > 1 && currentPage < totalPages)
-            inventory.setItem(nextIcon, nextButton);
     }
 
     public static void forceResourcePack(Player player) {
@@ -252,6 +204,53 @@ public class SetupMenu {
                 }
             }
         }
+    }
+
+    private void redrawMenu(int page, Inventory inventory) {
+        currentPage = page;
+        setupMenus.remove(inventory);
+        this.inventory = inventory;
+        inventory.clear();
+        //reserve resource pack status
+        customResourcePackStatus();
+        //reserve adventurer's guild
+        adventurersGuildWorldStatus();
+        //iterate through dungeons
+        dungeonStatuses();
+        //Set icons
+        addNavigationElements();
+        player.openInventory(inventory);
+        setupMenus.put(inventory, this);
+    }
+
+    private void addNavigationElements() {
+        ItemStack infoButton = GetLootMenuConfig.infoItem;
+        List<String> lore = ChatColorConverter.convert(List.of("&2To setup optional/recommended content for EliteMobs:",
+                "&61) &fDownload content from &9magmaguy.itch.io &for &9patreon.com/magmaguy",
+                "&62) &fPut content in the &2imports &ffolder of EliteMobs",
+                "&63) &fDo &2/em reload",
+                "&64) &fDo &2/em setup",
+                "&65) &fClick on &eyellow &ficons to install!",
+                "Click to get more info!"));
+        ItemMeta itemMeta = infoButton.getItemMeta();
+        itemMeta.setLore(lore);
+        infoButton.setItemMeta(itemMeta);
+        inventory.setItem(infoIcon, infoButton);
+
+        ItemStack previousButton = GetLootMenuConfig.previousLootItem;
+        ItemMeta previousButtonMeta = previousButton.getItemMeta();
+        previousButtonMeta.setDisplayName("Previous page");
+        previousButton.setItemMeta(previousButtonMeta);
+        if (currentPage > 1)
+            inventory.setItem(previousIcon, previousButton);
+
+        ItemStack nextButton = GetLootMenuConfig.nextLootItem;
+        ItemMeta nextButtonMeta = nextButton.getItemMeta();
+        nextButtonMeta.setDisplayName("Next page");
+        nextButton.setItemMeta(nextButtonMeta);
+        int totalPages = (int) Math.ceil(emPackages.size() / 28d);
+        if (totalPages > 1 && currentPage < totalPages)
+            inventory.setItem(nextIcon, nextButton);
     }
 
     private void dungeonStatuses() {

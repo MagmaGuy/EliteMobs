@@ -7,7 +7,7 @@ import org.bukkit.World;
 import java.util.Arrays;
 
 public class DiamondLeagueArena extends DungeonPackagerConfigFields {
-    public DiamondLeagueArena(){
+    public DiamondLeagueArena() {
         super("diamond_league_arena",
                 false,
                 "&5[lvl 100-150] &fThe Diamond League Arena",

@@ -1,14 +1,12 @@
 package com.magmaguy.elitemobs.menus;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
-import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
 import com.magmaguy.elitemobs.config.menus.premade.ScrapperMenuConfig;
-import com.magmaguy.elitemobs.config.menus.premade.SellMenuConfig;
 import com.magmaguy.elitemobs.items.customenchantments.RepairEnchantment;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
@@ -49,28 +47,12 @@ public class ScrapperMenu extends EliteMenu {
         Inventory scrapInventory = Bukkit.createInventory(player, 54, menuName);
 
         for (int i = 0; i < 54; i++) {
-
-            if (i == ScrapperMenuConfig.infoSlot) {
-                ItemStack infoButton = ScrapperMenuConfig.infoButton;
-                if (ResourcePackDataConfig.isDisplayCustomMenuUnicodes()) {
-                    infoButton.setType(Material.PAPER);
-                    ItemMeta itemMeta = infoButton.getItemMeta();
-                    itemMeta.setCustomModelData(MetadataHandler.signatureID);
-                    List<String> parsedLore = new ArrayList<>();
-                    itemMeta.getLore().forEach(entry -> parsedLore.add(entry.replace("$chance", ScrapperMenuConfig.scrapChance * 100 + "")));
-                    itemMeta.setLore(parsedLore);
-                    infoButton.setItemMeta(itemMeta);
-                }
-                scrapInventory.setItem(i, infoButton);
-                continue;
-            }
-
-            if (i == ScrapperMenuConfig.cancelSlot) {
+            if (ScrapperMenuConfig.cancelSlots.contains(i)) {
                 scrapInventory.setItem(i, ScrapperMenuConfig.cancelButton);
                 continue;
             }
 
-            if (i == ScrapperMenuConfig.confirmSlot) {
+            if (ScrapperMenuConfig.confirmSlots.contains(i)) {
 
                 ItemStack clonedConfirmButton = ScrapperMenuConfig.confirmButton.clone();
 
@@ -139,12 +121,9 @@ public class ScrapperMenu extends EliteMenu {
 
                 //CASE: Player clicked on the shop
 
-                //Signature item, does nothing
-                if (currentItem.equals(SellMenuConfig.infoButton))
-                    return;
 
                 //sell items in shop
-                if (event.getSlot() == SellMenuConfig.confirmSlot) {
+                if (ScrapperMenuConfig.confirmSlots.contains(event.getSlot())) {
                     int successes = 0;
                     int failures = 0;
                     for (Integer validSlot : validSlots) {
@@ -173,7 +152,7 @@ public class ScrapperMenu extends EliteMenu {
                 }
 
                 //cancel, transfer items back to player inv and exit
-                if (event.getSlot() == SellMenuConfig.cancelSlot) {
+                if (ScrapperMenuConfig.cancelSlots.contains(event.getSlot())) {
                     player.closeInventory();
                     return;
                 }

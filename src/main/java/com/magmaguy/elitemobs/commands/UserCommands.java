@@ -9,10 +9,10 @@ import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
 import cloud.commandframework.meta.CommandMeta;
 import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.adventurersguild.GuildRankMenuHandler;
 import com.magmaguy.elitemobs.api.PlayerPreTeleportEvent;
 import com.magmaguy.elitemobs.commands.admin.CheckTierOthersCommand;
 import com.magmaguy.elitemobs.commands.combat.CheckTierCommand;
-import com.magmaguy.elitemobs.commands.guild.AdventurersGuildCommand;
 import com.magmaguy.elitemobs.commands.quests.QuestCommand;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
@@ -41,7 +41,8 @@ public class UserCommands {
                 .permission("elitemobs.adventurersguild.command")
                 //permission is dealt inside of the command
                 .handler(commandContext -> {
-                    AdventurersGuildCommand.adventurersGuildCommand((Player) commandContext.getSender());
+//                    AdventurersGuildCommand.adventurersGuildCommand((Player) commandContext.getSender());
+                    GuildRankMenuHandler.initializeGuildRankMenu((Player) commandContext.getSender());
                 }));
 
         // /em shareitem
@@ -57,19 +58,21 @@ public class UserCommands {
                 .senderType(Player.class)
                 .permission("elitemobs.shop.command")
                 .handler(commandContext -> {
-                    if (!AdventurersGuildCommand.adventurersGuildTeleport((Player) commandContext.getSender()))
-                        ProceduralShopMenu.shopInitializer((Player) commandContext.getSender());
+//                    if (!AdventurersGuildCommand.adventurersGuildTeleport((Player) commandContext.getSender()))
+//                        ProceduralShopMenu.shopInitializer((Player) commandContext.getSender());
+                    SellMenu sellMenu = new SellMenu();
+                    sellMenu.constructSellMenu((Player) commandContext.getSender());
                 }));
 
         // /em customshop
-        manager.command(builder.literal("customshop")
-                .meta(CommandMeta.DESCRIPTION, "Opens the custom item shop or teleports the player to the Adventurer's Guild Hub")
-                .senderType(Player.class)
-                .permission("elitemobs.customshop.command")
-                .handler(commandContext -> {
-                    if (!AdventurersGuildCommand.adventurersGuildTeleport((Player) commandContext.getSender()))
-                        CustomShopMenu.customShopInitializer((Player) commandContext.getSender());
-                }));
+//        manager.command(builder.literal("customshop")
+//                .meta(CommandMeta.DESCRIPTION, "Opens the custom item shop or teleports the player to the Adventurer's Guild Hub")
+//                .senderType(Player.class)
+//                .permission("elitemobs.customshop.command")
+//                .handler(commandContext -> {
+//                    if (!AdventurersGuildCommand.adventurersGuildTeleport((Player) commandContext.getSender()))
+//                        CustomShopMenu.customShopInitializer((Player) commandContext.getSender());
+//                }));
 
         // /em repair
         manager.command(builder.literal("repair")
@@ -77,10 +80,10 @@ public class UserCommands {
                 .senderType(Player.class)
                 .permission("elitemobs.repair.command")
                 .handler(commandContext -> {
-                    if (!AdventurersGuildCommand.adventurersGuildTeleport((Player) commandContext.getSender())) {
-                        RepairMenu repairMenu = new RepairMenu();
-                        repairMenu.constructRepairMenu((Player) commandContext.getSender());
-                    }
+//                    if (!AdventurersGuildCommand.adventurersGuildTeleport((Player) commandContext.getSender())) {
+                    RepairMenu repairMenu = new RepairMenu();
+                    repairMenu.constructRepairMenu((Player) commandContext.getSender());
+//                    }
                 }));
 
         // /em enchant
@@ -89,9 +92,9 @@ public class UserCommands {
                 .senderType(CommandSender.class)
                 .permission("elitemobs.enchant.command")
                 .handler(commandContext -> {
-                    if (!AdventurersGuildCommand.adventurersGuildTeleport((Player) commandContext.getSender())) {
-                        new ItemEnchantmentMenu((Player) commandContext.getSender());
-                    }
+//                    if (!AdventurersGuildCommand.adventurersGuildTeleport((Player) commandContext.getSender())) {
+                    new ItemEnchantmentMenu((Player) commandContext.getSender());
+//                    }
                 }));
 
         // /em scrap
@@ -100,10 +103,10 @@ public class UserCommands {
                 .senderType(Player.class)
                 .permission("elitemobs.scrap.command")
                 .handler(commandContext -> {
-                    if (!AdventurersGuildCommand.adventurersGuildTeleport((Player) commandContext.getSender())) {
-                        ScrapperMenu scrapperMenu = new ScrapperMenu();
-                        scrapperMenu.constructScrapMenu((Player) commandContext.getSender());
-                    }
+//                    if (!AdventurersGuildCommand.adventurersGuildTeleport((Player) commandContext.getSender())) {
+                    ScrapperMenu scrapperMenu = new ScrapperMenu();
+                    scrapperMenu.constructScrapMenu((Player) commandContext.getSender());
+//                    }
                 }));
 
         // /em unbind
@@ -112,10 +115,10 @@ public class UserCommands {
                 .senderType(Player.class)
                 .permission("elitemobs.unbind.command")
                 .handler(commandContext -> {
-                    if (!AdventurersGuildCommand.adventurersGuildTeleport((Player) commandContext.getSender())) {
-                        UnbindMenu unbindMenu = new UnbindMenu();
-                        unbindMenu.constructUnbinderMenu((Player) commandContext.getSender());
-                    }
+//                    if (!AdventurersGuildCommand.adventurersGuildTeleport((Player) commandContext.getSender())) {
+                    UnbindMenu unbindMenu = new UnbindMenu();
+                    unbindMenu.constructUnbinderMenu((Player) commandContext.getSender());
+//                    }
                 }));
 
         // /em wallet
@@ -225,14 +228,16 @@ public class UserCommands {
                 .senderType(Player.class)
                 .permission("elitemobs.rank.command")
                 .handler(commandContext -> {
-                    if (!AdventurersGuildCommand.adventurersGuildTeleport((Player) commandContext.getSender()))
-                        AdventurersGuildCommand.adventurersGuildCommand((Player) commandContext.getSender());
+//                    if (!AdventurersGuildCommand.adventurersGuildTeleport((Player) commandContext.getSender()))
+//                        AdventurersGuildCommand.adventurersGuildCommand((Player) commandContext.getSender());
+                    GuildRankMenuHandler.initializeGuildRankMenu((Player) commandContext.getSender());
                 }));
 
         // /em menu
         manager.command(builder.literal("menu")
                 .meta(CommandMeta.DESCRIPTION, "Opens the EliteMobs status screen.")
                 .senderType(Player.class)
+                .permission("elitemobs.menu.command")
                 .handler(commandContext -> new PlayerStatusScreen((Player) commandContext.getSender())));
 
         // /em rank
@@ -276,9 +281,7 @@ public class UserCommands {
         manager.command(builder.literal("updateitem")
                 .meta(CommandMeta.DESCRIPTION, "Manually updates the lore of an item. Used for debugging purposes.")
                 .senderType(Player.class)
-                .handler(commandContext -> {
-                    new EliteItemLore(((Player) commandContext.getSender()).getItemInHand(), false);
-                }));
+                .handler(commandContext -> new EliteItemLore(((Player) commandContext.getSender()).getItemInHand(), false)));
 
         // /em dungeontp <dungeonid>
         manager.command(builder.literal("dungeontp")
@@ -333,7 +336,7 @@ public class UserCommands {
                     if (matchInstance != null) {
                         matchInstance.countdownMatch();
                     } else
-                        commandContext.getSender().sendMessage("[EliteMobs] You are not queued for instanced content!");
+                        commandContext.getSender().sendMessage("[EliteRabbit] You are not queued for instanced content!");
                 }));
 
         // /em quit - this is for instanced content

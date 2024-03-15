@@ -55,7 +55,7 @@ public class QuestMenuConfig extends MenusConfigFields {
                 fileConfiguration);
         killObjectiveButton = ItemStackSerializer.deserialize("killObjectiveButton", fileConfiguration);
 
-        questCancelMessage = ConfigurationEngine.setString(file, fileConfiguration, "questCancelMessage", "&7[EliteMobs] &cYour ongoing quest has been cancelled!", true);
+        questCancelMessage = ConfigurationEngine.setString(file, fileConfiguration, "questCancelMessage", "&7[EliteRabbit] &cYour ongoing quest has been cancelled!", true);
         questStartTitle = ConfigurationEngine.setString(file, fileConfiguration, "questStartTitle", "You have accepted a quest!", true);
         questStartSubtitle = ConfigurationEngine.setString(file, fileConfiguration, "questStartSubtitle", "Slay $objectiveAmount $objectiveName", true);
         questCompleteTitle = ConfigurationEngine.setString(file, fileConfiguration, "questCompleteTitle", "Quest complete!", true);

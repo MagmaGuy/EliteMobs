@@ -86,7 +86,7 @@ public class KillHandler {
             if (eliteEntity != null) {
                 ((EliteEntity) entity).remove(RemovalReason.OTHER);
                 counter++;
-            } else if (EntityTracker.isSuperMob(entity)){
+            } else if (EntityTracker.isSuperMob(entity)) {
                 EntityTracker.unregister(entity, RemovalReason.OTHER);
                 counter++;
             }

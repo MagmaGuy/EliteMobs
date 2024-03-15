@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EnchantedBookDepthStriderConfig extends CustomItemsConfigFields {
-    public EnchantedBookDepthStriderConfig(){
+    public EnchantedBookDepthStriderConfig() {
         super("enchanted_book_depth_strider",
                 true,
                 Material.BOOK,

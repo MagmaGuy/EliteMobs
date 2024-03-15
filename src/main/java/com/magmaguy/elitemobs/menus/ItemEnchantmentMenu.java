@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.menus;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
-import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
 import com.magmaguy.elitemobs.config.SpecialItemSystemsConfig;
 import com.magmaguy.elitemobs.config.menus.premade.ItemEnchantmentMenuConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
@@ -17,7 +16,6 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -33,40 +31,24 @@ import java.util.concurrent.ThreadLocalRandom;
 public class ItemEnchantmentMenu extends EliteMenu {
 
     private static final String MENU_NAME = ItemEnchantmentMenuConfig.getMenuName();
-    private static final int CANCEL_SLOT = ItemEnchantmentMenuConfig.getCancelSlot();
+    private static final List<Integer> CANCEL_SLOT = ItemEnchantmentMenuConfig.getCancelSlots();
     private static final ItemStack cancelButton = ItemEnchantmentMenuConfig.getCancelButton();
-    private static final int CONFIRM_SLOT = ItemEnchantmentMenuConfig.getConfirmSlot();
+    private static final List<Integer> CONFIRM_SLOT = ItemEnchantmentMenuConfig.getConfirmSlots();
     private static final ItemStack confirmButton = ItemEnchantmentMenuConfig.getConfirmButton();
-    private static final int INFO_SLOT = ItemEnchantmentMenuConfig.getInfoSlot();
-    private static final ItemStack infoButton = ItemEnchantmentMenuConfig.getInfoButton();
     private static final int ITEM_SLOT = ItemEnchantmentMenuConfig.getItemSlot();
     private static final int ENCHANTED_BOOK_SLOT = ItemEnchantmentMenuConfig.getEnchantedBookSlot();
-    private static final int ITEM_INFO_SLOT = ItemEnchantmentMenuConfig.getItemInfoSlot();
-    private static final ItemStack itemInfoItemButton = ItemEnchantmentMenuConfig.getItemInfoButton();
-    private static final int ENCHANTED_BOOK_INFO_SLOT = ItemEnchantmentMenuConfig.getEnchantedBookInfoSlot();
-    private static final ItemStack enchantedBookInfoButton = ItemEnchantmentMenuConfig.getEnchantedBookInfoButton();
     private static final List<String> confirmButtonLore = confirmButton.getItemMeta().getLore();
     private static final int LUCKY_TICKET_SLOT = ItemEnchantmentMenuConfig.getLuckyTicketSlot();
-    private static final int LUCKY_TICKET_INFO_SLOT = ItemEnchantmentMenuConfig.getLuckyTicketInfoSlot();
-    private static final ItemStack luckyTicketInfoButton = ItemEnchantmentMenuConfig.getLuckyTicketInfoButton();
-
     private static final double LUCKY_TICKET_MULTIPLIER = SpecialItemSystemsConfig.getLuckyTicketMultiplier();
     private static final double CRITICAL_FAILURE_CHANCE = SpecialItemSystemsConfig.getCriticalFailureChance();
     private static final double CHALLENGE_CHANCE = SpecialItemSystemsConfig.getChallengeChance();
 
     public ItemEnchantmentMenu(Player player) {
-        String name = MENU_NAME;
-        if (ResourcePackDataConfig.isDisplayCustomMenuUnicodes())
-            name = ChatColor.WHITE + "\uF801\uDB80\uDC2A\uF805           " + MENU_NAME;
-        Inventory inventory = Bukkit.createInventory(player, 54, name);
+        Inventory inventory = Bukkit.createInventory(player, 45, MENU_NAME);
         ItemEnchantMenuEvents.menus.add(inventory);
 
-        inventory.setItem(INFO_SLOT, infoButton);
-        inventory.setItem(ENCHANTED_BOOK_INFO_SLOT, enchantedBookInfoButton);
-        inventory.setItem(ITEM_INFO_SLOT, itemInfoItemButton);
-        inventory.setItem(CANCEL_SLOT, cancelButton);
-        inventory.setItem(CONFIRM_SLOT, confirmButton);
-        inventory.setItem(LUCKY_TICKET_INFO_SLOT, luckyTicketInfoButton);
+        CANCEL_SLOT.forEach(slot -> inventory.setItem(slot, cancelButton));
+        CONFIRM_SLOT.forEach(slot -> inventory.setItem(slot, confirmButton));
 
         updateConfirmButton(inventory);
 
@@ -88,7 +70,7 @@ public class ItemEnchantmentMenu extends EliteMenu {
                     .replace("$failureChance", (Round.twoDecimalPlaces(chances.get(Chance.FAILURE) * 100)) + ""));
         itemMeta.setLore(newLore);
         newButton.setItemMeta(itemMeta);
-        inventory.setItem(CONFIRM_SLOT, newButton);
+        CONFIRM_SLOT.forEach(slot -> inventory.setItem(slot, newButton));
     }
 
     //Order goes  SUCCESS -> CRITICAL_FAILURE -> CHALLENGE -> FAILURE
@@ -195,8 +177,8 @@ public class ItemEnchantmentMenu extends EliteMenu {
         private void handleTopInventory(InventoryClickEvent event) {
             int clickedSlot = event.getSlot();
 
-            if (clickedSlot == CANCEL_SLOT) event.getWhoClicked().closeInventory();
-            else if (clickedSlot == CONFIRM_SLOT) confirm(event);
+            if (CANCEL_SLOT.contains(clickedSlot)) event.getWhoClicked().closeInventory();
+            else if (CONFIRM_SLOT.contains(clickedSlot)) confirm(event);
             else if (clickedSlot == ITEM_SLOT || clickedSlot == ENCHANTED_BOOK_SLOT || clickedSlot == LUCKY_TICKET_SLOT) {
                 moveItemDown(event.getView().getTopInventory(), clickedSlot, event.getWhoClicked());
                 event.getClickedInventory().clear(clickedSlot);
@@ -213,7 +195,8 @@ public class ItemEnchantmentMenu extends EliteMenu {
                     moveOneItemUp(ENCHANTED_BOOK_SLOT, event);
                 else
                     //Make sure enchant books themselves can't be enchanted
-                    return;
+                {
+                }
             } else if (EliteEnchantmentItems.isEliteLuckyTicket(event.getCurrentItem()) &&
                     event.getView().getTopInventory().getItem(LUCKY_TICKET_SLOT) == null) {
                 moveOneItemUp(LUCKY_TICKET_SLOT, event);
@@ -239,7 +222,7 @@ public class ItemEnchantmentMenu extends EliteMenu {
 
             if (event.getView().getTopInventory().getItem(ITEM_SLOT) == null ||
                     event.getView().getTopInventory().getItem(ENCHANTED_BOOK_SLOT) == null) {
-                event.getWhoClicked().sendMessage(ChatColorConverter.convert("&8[EliteMobs] &cYou must add an elite item and an enchanted book to enchant an item!"));
+                event.getWhoClicked().sendMessage(ChatColorConverter.convert("&8[EliteRabbit] &cYou must add an elite item and an enchanted book to enchant an item!"));
                 return;
             }
 
@@ -267,7 +250,7 @@ public class ItemEnchantmentMenu extends EliteMenu {
         }
 
         private void failure(InventoryClickEvent event) {
-            event.getWhoClicked().sendMessage(ChatColorConverter.convert("&8[EliteMobs] &cFailed enchantment! The enchantment did not bind to the item."));
+            event.getWhoClicked().sendMessage(ChatColorConverter.convert("&8[EliteRabbit] &cFailed enchantment! The enchantment did not bind to the item."));
             moveItemDown(event.getView().getTopInventory(), ITEM_SLOT, event.getWhoClicked());
         }
 
@@ -283,16 +266,16 @@ public class ItemEnchantmentMenu extends EliteMenu {
             if (currentItem.getAmount() > 0)
                 if (moveItemDown(event.getView().getTopInventory(), ITEM_SLOT, event.getWhoClicked(), false)) {
                     event.getWhoClicked().sendMessage(ChatColorConverter.convert(
-                            "&8[EliteMobs] &cYour inventory was full so the item you were trying to upgrade has been deleted! It will be restored if your item is not full by the time you leave the instanced dungeon."));
+                            "&8[EliteRabbit] &cYour inventory was full so the item you were trying to upgrade has been deleted! It will be restored if your item is not full by the time you leave the instanced dungeon."));
                 }
 
-            event.getWhoClicked().sendMessage(ChatColorConverter.convert("&8[EliteMobs] &6Challenge! Defeat the boss to get your upgraded item!"));
+            event.getWhoClicked().sendMessage(ChatColorConverter.convert("&8[EliteRabbit] &6Challenge! Defeat the boss to get your upgraded item!"));
             event.getWhoClicked().sendMessage(ChatColorConverter.convert("&cThere's a 10% chance of losing your item if you lose the fight! Leaving the arena counts as losing."));
             broadcastEnchantmentMessage(currentItem, (Player) event.getWhoClicked(), SpecialItemSystemsConfig.getChallengeAnnouncement());
         }
 
         private void criticalFailure(InventoryClickEvent event) {
-            event.getWhoClicked().sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Critical failure! You lost the item!"));
+            event.getWhoClicked().sendMessage(ChatColorConverter.convert("&8[EliteRabbit] &4Critical failure! You lost the item!"));
             broadcastEnchantmentMessage(event.getView().getTopInventory().getItem(ITEM_SLOT), (Player) event.getWhoClicked(), SpecialItemSystemsConfig.getCriticalFailureAnnouncement());
         }
 
@@ -303,7 +286,7 @@ public class ItemEnchantmentMenu extends EliteMenu {
             HashMap<Integer, ItemStack> leftovers = player.getInventory().addItem(upgradedItem);
             if (!leftovers.isEmpty())
                 event.getWhoClicked().getWorld().dropItem(event.getWhoClicked().getLocation(), upgradedItem);
-            event.getWhoClicked().sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2Successful enchantment!"));
+            event.getWhoClicked().sendMessage(ChatColorConverter.convert("&8[EliteRabbit] &2Successful enchantment!"));
             broadcastEnchantmentMessage(upgradedItem, (Player) event.getWhoClicked(), SpecialItemSystemsConfig.getSuccessAnnouncement());
         }
 

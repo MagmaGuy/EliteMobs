@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EnchantedBookProtectionFallConfig extends CustomItemsConfigFields {
-    public EnchantedBookProtectionFallConfig(){
+    public EnchantedBookProtectionFallConfig() {
         super("enchanted_book_protection_fall",
                 true,
                 Material.BOOK,

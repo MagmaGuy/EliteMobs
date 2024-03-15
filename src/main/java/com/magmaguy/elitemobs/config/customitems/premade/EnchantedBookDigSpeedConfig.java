@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EnchantedBookDigSpeedConfig extends CustomItemsConfigFields {
-    public EnchantedBookDigSpeedConfig(){
+    public EnchantedBookDigSpeedConfig() {
         super("enchanted_book_dig_speed",
                 true,
                 Material.BOOK,

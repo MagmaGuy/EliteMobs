@@ -32,7 +32,7 @@ public class EliteMobEnterCombatEvent extends Event {
 
         if (!DefaultConfig.isAlwaysShowNametags())
             eliteEntity.setNameVisible(true);
-        if (eliteEntity instanceof CustomBossEntity customBossEntity )
+        if (eliteEntity instanceof CustomBossEntity customBossEntity)
             CommandRunner.runCommandFromList(customBossEntity.getCustomBossesConfigFields().getOnCombatEnterCommands(), new ArrayList<>());
         //Phase bosses can launch this event through phase switches
         if (!eliteEntity.isInCombat())

@@ -19,6 +19,17 @@ public class ScriptListener implements Listener {
     public static HashMap<FallingBlock, FallingEntityDataPair> fallingBlocks = new HashMap();
     public static HashMap<Entity, FallingEntityDataPair> fallingEntities = new HashMap<>();
 
+    public static void runEvent(FallingEntityDataPair fallingEntityDataPair, Location landingLocation) {
+        for (String string : fallingEntityDataPair.getScriptAction().getBlueprint().getLandingScripts()) {
+            EliteScript iteratedScript = fallingEntityDataPair.getScriptAction().getEliteScriptMap().get(string);
+            if (iteratedScript == null) {
+                new WarningMessage("Elite script " + string + " does not exist for landing scripts!");
+                return;
+            }
+            iteratedScript.check(landingLocation, fallingEntityDataPair.getScriptActionData());
+        }
+    }
+
     @EventHandler
     public void onEliteMobDamagedByPlayerEvent(EliteMobDamagedByPlayerEvent event) {
         runEvent(event, event.getEliteMobEntity(), event.getPlayer());
@@ -97,16 +108,5 @@ public class ScriptListener implements Listener {
         for (ElitePower elitePower : eliteEntity.getElitePowers())
             if (elitePower instanceof EliteScript eliteScript)
                 eliteScript.check(event, eliteEntity, player);
-    }
-
-    public static void runEvent(FallingEntityDataPair fallingEntityDataPair, Location landingLocation) {
-        for (String string : fallingEntityDataPair.getScriptAction().getBlueprint().getLandingScripts()) {
-            EliteScript iteratedScript = fallingEntityDataPair.getScriptAction().getEliteScriptMap().get(string);
-            if (iteratedScript == null) {
-                new WarningMessage("Elite script " + string + " does not exist for landing scripts!");
-                return;
-            }
-            iteratedScript.check(landingLocation, fallingEntityDataPair.getScriptActionData());
-        }
     }
 }

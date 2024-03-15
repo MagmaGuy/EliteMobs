@@ -14,13 +14,11 @@ import java.util.List;
 public class ScrapperMenuConfig extends MenusConfigFields {
 
     public static String shopName;
-    public static ItemStack infoButton;
-    public static int infoSlot;
     public static List<Integer> storeSlots;
     public static ItemStack cancelButton;
-    public static int cancelSlot;
+    public static List<Integer> cancelSlots;
     public static ItemStack confirmButton;
-    public static int confirmSlot;
+    public static List<Integer> confirmSlots;
     public static double scrapChance;
 
     public ScrapperMenuConfig() {
@@ -29,31 +27,17 @@ public class ScrapperMenuConfig extends MenusConfigFields {
 
     @Override
     public void processAdditionalFields() {
-        shopName = ConfigurationEngine.setString(file, fileConfiguration, "shopName", "[EM] Scrapper", true);
-        ItemStackSerializer.serialize(
-                "infoButton",
-                ItemStackGenerator.generateSkullItemStack("magmaguy",
-                        "&4&lEliteMobs &r&cby &4&lMagmaGuy",
-                        Arrays.asList("&8Support the plugins you enjoy!",
-                                "&4Warning!",
-                                "&cItems scrapped here are lost!",
-                                "&cThere is a $chance% chance to get",
-                                "&cscrap when scrapping items!",
-                                "&aUse scrap at the smelter,",
-                                "&arepairman and refiner!"), MetadataHandler.signatureID),
-                fileConfiguration);
-        infoButton = ItemStackSerializer.deserialize("infoButton", fileConfiguration);
-        infoSlot = ConfigurationEngine.setInt(fileConfiguration, "infoButtonSlot", 4);
-        storeSlots = ConfigurationEngine.setList(file, fileConfiguration, "scrapSlots", Arrays.asList(19, 20, 21, 22, 23,
-                24, 25, 28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 43), false);
+        shopName = ConfigurationEngine.setString(file, fileConfiguration, "menuTitle", ":offset_-8::elitemob_scarp:", true);
+        storeSlots = ConfigurationEngine.setList(file, fileConfiguration, "scrapSlots", Arrays.asList(1, 2, 3, 4, 5, 6, 7, 10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23,
+                24, 25), false);
         ItemStackSerializer.serialize("cancelButton", ItemStackGenerator.generateItemStack(Material.BARRIER,
                 "&4Cancel", List.of("&cCancel scrap!"), MetadataHandler.signatureID), fileConfiguration);
         cancelButton = ItemStackSerializer.deserialize("cancelButton", fileConfiguration);
-        cancelSlot = ConfigurationEngine.setInt(fileConfiguration, "cancelButtonSlot", 27);
+        cancelSlots = ConfigurationEngine.setInt(fileConfiguration, "cancelButtonSlots", Arrays.asList(38, 39, 47, 48));
         ItemStackSerializer.serialize("confirmButton", ItemStackGenerator.generateItemStack(Material.EMERALD,
                 "&2Confirm Scrap", Arrays.asList("&aScrap items!", "&a$chance% chance of success!"), 31174), fileConfiguration);
         confirmButton = ItemStackSerializer.deserialize("confirmButton", fileConfiguration);
-        confirmSlot = ConfigurationEngine.setInt(fileConfiguration, "confirmScrapSlot", 35);
+        confirmSlots = ConfigurationEngine.setInt(fileConfiguration, "confirmScrapSlots", Arrays.asList(41, 42, 50, 51));
         scrapChance = ConfigurationEngine.setDouble(fileConfiguration, "scrapChance", 0.75);
     }
 

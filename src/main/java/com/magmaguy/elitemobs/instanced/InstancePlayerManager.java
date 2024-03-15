@@ -101,8 +101,7 @@ public class InstancePlayerManager {
                 matchInstance.state != MatchInstance.InstancedRegionState.COMPLETED_VICTORY &&
                 matchInstance.players.isEmpty()) {
             matchInstance.defeat();
-        }
-        else
+        } else
             //Remove lives
             matchInstance.playerLives.remove(player);
     }

@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EnchantedBookProtectionEnvironmentalConfig extends CustomItemsConfigFields {
-    public EnchantedBookProtectionEnvironmentalConfig(){
+    public EnchantedBookProtectionEnvironmentalConfig() {
         super("enchanted_book_protection_environmental",
                 true,
                 Material.BOOK,

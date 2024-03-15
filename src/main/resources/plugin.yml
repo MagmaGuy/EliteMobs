@@ -19,6 +19,7 @@ softdepend:
 - InfernalMobs
 - FreeMinecraftModels
 
+
 permissions:
   elitemobs.*:
     description: Gives access to all elitemobs commands
@@ -40,6 +41,9 @@ permissions:
   elitemobs.shop.command:
     description: Allows players to open the dynamic shop menu through commands
     default: true
+  elitemobs.menu.command:
+    description: Allows players to open the main menu through commands
+    default: op
   elitemobs.customshop.npc:
     description: Allows players to interact with NPCs for dynamic shops
     default: true
@@ -75,7 +79,7 @@ permissions:
     default: true
   elitemobs.rank.command:
     description: Allows players to open the rank menu through /em rank
-    default: true
+    default: op
   elitemobs.rank.npc:
     description: Allows players to access the /em rank menu through NPCs
     default: true
@@ -102,7 +106,7 @@ permissions:
     default: true
   elitemobs.scrap.command:
     description: Allows players to scrap items using a command
-    default: true
+    default: op
   elitemobs.smelt.command:
     description: Allows players to smelt items using a command
     default: true
@@ -111,7 +115,7 @@ permissions:
     default: true
   elitemobs.repair.command:
     description: Allows players to use the repair command to open the menu for repairing elite items
-    default: true
+    default: op
   elitemobs.repair.npc:
     description: Allows players to interact with the NPC for repairing items
     default: true
@@ -129,13 +133,13 @@ permissions:
     default: true
   elitemobs.unbind.command:
     description: Allows players to use the unbind command to open the menu to unbind Elite Items
-    default: true
+    default: op
   elitemobs.unbind.npc:
     description: Allows players to interact with the unbinder NPC to unbind Elite Items
     default: true
   elitemobs.soulbind.bypass:
     description: Allows users to bypass the soulbind restrictions. Only recommended for admins!
-    default: false
+    default: op
   elitequest.*:
     description: Used for quest-related permissions
     default: not op
@@ -144,4 +148,4 @@ permissions:
     default: true
   elitemobs.enchant.command:
     description: Allows players to use the enchant command to enchant Elite Items
-    default: true
+    default: op

@@ -313,18 +313,18 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
         //checkLeash();
     }
 
+    public void removeSlow() {
+        if (getCustomBossesConfigFields().isAlert() || getLivingEntity() == null) return;
+        getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(getFollowDistance());
+        getLivingEntity().getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(getMovementSpeedAttribute());
+    }
+
     public static class RegionalBossEntityEvents implements Listener {
         @EventHandler(ignoreCancelled = true)
         public void onNewMinidungeonRelativeBossLocationEvent(NewSchematicPackageRelativeBossLocationEvent event) {
             new RegionalBossEntity(event.getCustomBossesConfigFields(), ConfigurationLocation.deserialize(event.getRealLocation()));
             event.getCustomBossesConfigFields().setFilesOutOfSync(true);
         }
-    }
-
-    public void removeSlow() {
-        if (getCustomBossesConfigFields().isAlert() || getLivingEntity() == null) return;
-       getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(getFollowDistance());
-       getLivingEntity().getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(getMovementSpeedAttribute());
     }
 
 }

@@ -4,14 +4,15 @@ import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfigFields;
 import org.bukkit.entity.EntityType;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class EliteSlimeConfig extends MobPropertiesConfigFields {
-    public EliteSlimeConfig(){
+    public EliteSlimeConfig() {
         super("elite_slime",
                 EntityType.SLIME,
                 true,
                 "&2Lvl &2$level &fElite &2Slime",
-                Arrays.asList("$player was squished by $entity&f!"),
+                List.of("$player was squished by $entity&f!"),
                 6);
     }
 }

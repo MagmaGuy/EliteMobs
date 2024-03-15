@@ -7,7 +7,7 @@ import org.bukkit.entity.Villager;
 import java.util.List;
 
 public class TheCityTeleporter extends NPCsConfigFields {
-    public TheCityTeleporter(){
+    public TheCityTeleporter() {
         super("the_city_teleporter",
                 true,
                 "Dwarf Olav",

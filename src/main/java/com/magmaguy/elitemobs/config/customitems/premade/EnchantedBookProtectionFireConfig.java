@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EnchantedBookProtectionFireConfig extends CustomItemsConfigFields {
-    public EnchantedBookProtectionFireConfig(){
+    public EnchantedBookProtectionFireConfig() {
         super("enchanted_book_protection_fire",
                 true,
                 Material.BOOK,

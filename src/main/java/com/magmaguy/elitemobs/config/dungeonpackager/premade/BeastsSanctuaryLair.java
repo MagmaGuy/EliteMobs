@@ -5,13 +5,14 @@ import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.World;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class BeastsSanctuaryLair extends DungeonPackagerConfigFields {
     public BeastsSanctuaryLair() {
         super("beasts_sanctuary_lair",
                 false,
                 "&2[lvl 130] &6The Beasts Sanctuary",
-                Arrays.asList("&6Confront the beasts!"),
+                List.of("&6Confront the beasts!"),
                 DiscordLinks.premiumMinidungeons,
                 DungeonSizeCategory.LAIR,
                 "em_beasts_sanctuary",

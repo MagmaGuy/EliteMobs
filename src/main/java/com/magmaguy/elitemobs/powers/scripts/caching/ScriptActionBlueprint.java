@@ -143,10 +143,12 @@ public class ScriptActionBlueprint {
             }
             case "scripts" -> scripts = parseStringList(key, value, scriptName);
             case "landingscripts" -> landingScripts = parseStringList(key, value, scriptName);
-            case "conditions" -> conditionsBlueprint = new ScriptConditionsBlueprint((Map<?, ?>) value, scriptName, scriptFilename);
+            case "conditions" ->
+                    conditionsBlueprint = new ScriptConditionsBlueprint((Map<?, ?>) value, scriptName, scriptFilename);
             case "times" -> times = parseInteger(key, value, scriptName);
             case "repeatevery" -> repeatEvery = parseInteger(key, value, scriptName);
-            case "particles" -> scriptParticlesBlueprint = new ScriptParticlesBlueprint((List<Map<?, ?>>) value, scriptName, scriptFilename);
+            case "particles" ->
+                    scriptParticlesBlueprint = new ScriptParticlesBlueprint((List<Map<?, ?>>) value, scriptName, scriptFilename);
             case "multiplier" -> multiplier = parseDouble(key, value, scriptName);
             case "material" -> material = parseEnum(key, value, Material.class, scriptName);
             case "amount" -> amount = parseInteger(key, value, scriptName);
@@ -161,8 +163,10 @@ public class ScriptActionBlueprint {
             case "fadeout" -> fadeOut = parseInteger(key, value, scriptName);
             case "flicker" -> flicker = parseBoolean(key, value, scriptName);
             case "withtrail" -> withTrail = parseBoolean(key, value, scriptName);
-            case "fireworkeffecttype" -> fireworkEffectType = parseEnum(key, value, FireworkEffect.Type.class, scriptName);
-            case "fireworkeffecttypes" -> fireworkEffectTypes = parseEnumList(key, value, FireworkEffect.Type.class, scriptName);
+            case "fireworkeffecttype" ->
+                    fireworkEffectType = parseEnum(key, value, FireworkEffect.Type.class, scriptName);
+            case "fireworkeffecttypes" ->
+                    fireworkEffectTypes = parseEnumList(key, value, FireworkEffect.Type.class, scriptName);
             case "fireworkeffects" -> fireworkEffects = parseEnumListList(key, value, FireworkColor.class, scriptName);
             case "power" -> power = parseInteger(key, value, scriptName);
             case "invulnerable" -> invulnerable = parseBoolean(key, value, scriptName);
@@ -183,10 +187,12 @@ public class ScriptActionBlueprint {
                     finalTarget = new ScriptTargetsBlueprint((Map) value, scriptName, scriptFilename);
             }
             case "onlyrunonescript" -> onlyRunOneScript = parseBoolean(key, value, scriptName);
-            case "relativevector" -> scriptRelativeVectorBlueprint = new ScriptRelativeVectorBlueprint(scriptName, scriptFilename, (Map<String, ?>) value);
+            case "relativevector" ->
+                    scriptRelativeVectorBlueprint = new ScriptRelativeVectorBlueprint(scriptName, scriptFilename, (Map<String, ?>) value);
             case "pitch" -> pitch = parseFloat(key, value, scriptName);
             case "volume" -> volume = parseFloat(key, value, scriptName);
-            default -> new WarningMessage("Failed to read key " + key + " for script " + scriptName + " in " + scriptFilename);
+            default ->
+                    new WarningMessage("Failed to read key " + key + " for script " + scriptName + " in " + scriptFilename);
         }
 
     }

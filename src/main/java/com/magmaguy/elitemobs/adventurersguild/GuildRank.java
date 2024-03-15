@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.utils.Round;
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -100,7 +101,7 @@ public class GuildRank {
      * @return Name of the rank
      */
     public static String getRankName(int prestige, int rank) {
-        return AdventurersGuildConfig.getRankName(prestige, rank);
+        return PlaceholderAPI.setPlaceholders(null, AdventurersGuildConfig.getRankName(prestige, rank));
     }
 
     public static void setMaxHealth(Player player, int activeGuildRank, int prestigeRank) {

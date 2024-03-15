@@ -9,9 +9,9 @@ import org.jetbrains.annotations.NotNull;
 
 public class MatchJoinEvent extends Event implements MatchEvent, MatchPlayerEvent, Cancellable {
     private static final HandlerList handlers = new HandlerList();
-    private boolean cancelled = false;
     private final MatchInstance matchInstance;
     private final Player player;
+    private boolean cancelled = false;
 
     public MatchJoinEvent(MatchInstance matchInstance, Player player) {
         this.matchInstance = matchInstance;

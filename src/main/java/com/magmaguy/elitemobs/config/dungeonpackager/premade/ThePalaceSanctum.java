@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ThePalaceSanctum extends DungeonPackagerConfigFields {
-    public ThePalaceSanctum(){
+    public ThePalaceSanctum() {
         super("the_palace_sanctum",
                 false,
                 "&2[lvl 030] &3The Palace Sanctum",

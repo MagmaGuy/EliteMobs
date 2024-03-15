@@ -27,6 +27,7 @@ public class ScriptParticlesBlueprint {
     public class ScriptParticleBlueprint {
         @Getter
         private final String scriptName;
+        private final String filename;
         @Getter
         private double x = 0.01;
         @Getter
@@ -55,7 +56,6 @@ public class ScriptParticlesBlueprint {
         private Boolean moveToTarget = null;
         @Getter
         private ScriptRelativeVectorBlueprint relativeVectorBlueprint = null;
-        private final String filename;
 
         public ScriptParticleBlueprint(Map<?, ?> entry, String scriptName, String filename) {
             this.filename = filename;
@@ -85,8 +85,10 @@ public class ScriptParticlesBlueprint {
                 case "togreen" -> toGreen = parseInteger(key, value, scriptName);
                 case "toblue" -> toBlue = parseInteger(key, value, scriptName);
                 case "movetotarget" -> moveToTarget = parseBoolean(key, value, scriptName);
-                case "relativevector" -> relativeVectorBlueprint = new ScriptRelativeVectorBlueprint(scriptName, filename, (Map<String, ?>) value);
-                default -> new WarningMessage("Key " + key + " in script " + scriptName + " in file " + filename + " for script particles is not a valid key!");
+                case "relativevector" ->
+                        relativeVectorBlueprint = new ScriptRelativeVectorBlueprint(scriptName, filename, (Map<String, ?>) value);
+                default ->
+                        new WarningMessage("Key " + key + " in script " + scriptName + " in file " + filename + " for script particles is not a valid key!");
             }
         }
     }

@@ -12,6 +12,12 @@ import java.util.*;
 
 public class CustomQuestsConfigFields extends CustomConfigFields implements CustomConfigFieldsInterface {
 
+    //@Getter
+    //@Setter
+    //private List<String> customObjectivesList = new ArrayList<>();
+    @Getter
+    @Setter
+    protected Map<String, Map<String, Object>> customObjectives = new HashMap();
     @Getter
     @Setter
     List<String> temporaryPermissions = new ArrayList<>();
@@ -21,12 +27,6 @@ public class CustomQuestsConfigFields extends CustomConfigFields implements Cust
     @Getter
     @Setter
     private int questLevel = 0;
-    //@Getter
-    //@Setter
-    //private List<String> customObjectivesList = new ArrayList<>();
-    @Getter
-    @Setter
-    protected Map<String, Map<String, Object>> customObjectives = new HashMap();
     @Getter
     @Setter
     private List<String> customRewardsList = new ArrayList<>();

@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EnchantedBookMultishotConfig extends CustomItemsConfigFields {
-    public EnchantedBookMultishotConfig(){
+    public EnchantedBookMultishotConfig() {
         super("enchanted_book_multishot",
                 true,
                 Material.BOOK,

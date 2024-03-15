@@ -202,7 +202,8 @@ public class ScriptAction {
             case SPAWN_FALLING_BLOCK -> runSpawnFallingBlock(scriptActionData);
             case MODIFY_DAMAGE -> runModifyDamage(scriptActionData);
             case SUMMON_ENTITY -> runSummonEntity(scriptActionData);
-            default -> new WarningMessage("Failed to determine action type " + blueprint.getActionType() + " in script " + blueprint.getScriptName() + " for file " + blueprint.getScriptFilename());
+            default ->
+                    new WarningMessage("Failed to determine action type " + blueprint.getActionType() + " in script " + blueprint.getScriptName() + " for file " + blueprint.getScriptFilename());
         }
         //Run script will have already run this
         if (!blueprint.getActionType().equals(ActionType.RUN_SCRIPT))
@@ -379,7 +380,7 @@ public class ScriptAction {
                 .replace("$bossY", eliteEntity.getLocation().getY() + "")
                 .replace("$bossZ", eliteEntity.getLocation().getZ() + "")
                 .replace("$bossLevel", eliteEntity.getLevel() + "")
-                .replace("$bossWorldName", eliteEntity.getLocation().getWorld().getName() + "");
+                .replace("$bossWorldName", eliteEntity.getLocation().getWorld().getName());
     }
 
     //Strikes visual lightning at the target location
@@ -606,8 +607,7 @@ public class ScriptAction {
                     Projectile.class.isAssignableFrom(entityType.getEntityClass())) {
                 entity = scriptActionData.getEliteEntity().getLivingEntity().launchProjectile(entityType.getEntityClass().asSubclass(Projectile.class), velocity);
                 ((Projectile) entity).setShooter(scriptActionData.getEliteEntity().getLivingEntity());
-            }
-            else {
+            } else {
                 entity = targetLocation.getWorld().spawn(targetLocation, entityType.getEntityClass());
                 entity.setVelocity(velocity);
             }

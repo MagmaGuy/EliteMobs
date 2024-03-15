@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EnchantedBookDamageUndeadConfig extends CustomItemsConfigFields {
-    public EnchantedBookDamageUndeadConfig(){
+    public EnchantedBookDamageUndeadConfig() {
         super("enchanted_book_damage_undead",
                 true,
                 Material.BOOK,

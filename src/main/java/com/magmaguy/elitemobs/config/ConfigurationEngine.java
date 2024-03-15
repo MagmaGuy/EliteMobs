@@ -40,7 +40,7 @@ public class ConfigurationEngine {
                 file.getParentFile().mkdirs();
                 file.createNewFile();
             } catch (IOException ex) {
-                Bukkit.getLogger().warning("[EliteMobs] Error generating the plugin file: " + file.getName());
+                Bukkit.getLogger().warning("[EliteRabbit] Error generating the plugin file: " + file.getName());
             }
 
         return file;
@@ -109,6 +109,17 @@ public class ConfigurationEngine {
         return value;
     }
 
+    public static List<Integer> setInt(List<String> comments, FileConfiguration fileConfiguration, String key, List<Integer> defaultValue) {
+        fileConfiguration.addDefault(key, defaultValue);
+        List<Integer> value = fileConfiguration.getIntegerList(key);
+        setComments(fileConfiguration, key, comments);
+        return value;
+    }
+
+    public static List<Integer> setInt(FileConfiguration fileConfiguration, String key, List<Integer> defaultValue) {
+        fileConfiguration.addDefault(key, defaultValue);
+        return fileConfiguration.getIntegerList(key);
+    }
 
     public static int setInt(FileConfiguration fileConfiguration, String key, int defaultValue) {
         fileConfiguration.addDefault(key, defaultValue);
@@ -146,7 +157,7 @@ public class ConfigurationEngine {
         return value;
     }
 
-    private static ItemStack setItemStack(FileConfiguration fileConfiguration, String key, ItemStack itemStack) {
+    public static ItemStack setItemStack(FileConfiguration fileConfiguration, String key, ItemStack itemStack) {
         fileConfiguration.addDefault(key + ".material", itemStack.getType().toString());
         if (itemStack.hasItemMeta() && itemStack.getItemMeta().hasDisplayName())
             fileConfiguration.addDefault(key + ".name", itemStack.getItemMeta().getDisplayName());
@@ -196,13 +207,13 @@ public class ConfigurationEngine {
         }
         String name = "";
         try {
-            name = setString(file, fileConfiguration, key+".name", null, true);
+            name = setString(file, fileConfiguration, key + ".name", null, true);
         } catch (Exception ex) {
             new WarningMessage("Item name " + fileConfiguration.getString(key + ".name") + " is not valid! Correct it to make a valid item.");
         }
         List<String> lore = new ArrayList<>();
         try {
-            lore = setList(file, fileConfiguration, key+".lore", null, true);
+            lore = setList(file, fileConfiguration, key + ".lore", null, true);
         } catch (Exception ex) {
             new WarningMessage("Item lore " + fileConfiguration.getString(key + ".lore") + " is not valid! Correct it to make a valid item.");
         }

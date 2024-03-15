@@ -15,7 +15,7 @@ import org.bukkit.event.entity.EntitySpawnEvent;
  */
 public class MergeHandler implements Listener {
 
-    @EventHandler (ignoreCancelled = true)
+    @EventHandler(ignoreCancelled = true)
     public void onDamageMerge(EntityDamageEvent event) {
 
         if (!ValidWorldsConfig.getFileConfiguration().getBoolean("Valid worlds." + event.getEntity().getWorld().getName()))
@@ -24,7 +24,7 @@ public class MergeHandler implements Listener {
 
     }
 
-    @EventHandler (ignoreCancelled = true)
+    @EventHandler(ignoreCancelled = true)
     public void onSpawnMerge(EntitySpawnEvent event) {
 
         if (!ValidWorldsConfig.getFileConfiguration().getBoolean("Valid worlds." + event.getEntity().getWorld().getName()))

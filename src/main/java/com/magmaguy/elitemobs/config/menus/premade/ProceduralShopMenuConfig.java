@@ -39,7 +39,7 @@ public class ProceduralShopMenuConfig extends MenusConfigFields {
         minTier = ConfigurationEngine.setInt(fileConfiguration, "Minimum store item tier", 0);
         maxTier = ConfigurationEngine.setInt(fileConfiguration, "Maximum store item tier", 5);
         messageFullInventory = ConfigurationEngine.setString(file, fileConfiguration, "Full inventory message",
-                "&7[EliteMobs] &4Your inventory is full! You can't buy items until you get some free space.", true);
+                "&7[EliteRabbit] &4Your inventory is full! You can't buy items until you get some free space.", true);
     }
 
 }

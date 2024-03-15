@@ -1,11 +1,9 @@
 package com.magmaguy.elitemobs.menus;
 
-import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
 import com.magmaguy.elitemobs.config.menus.premade.BuyOrSellMenuConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -13,7 +11,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -30,15 +27,15 @@ public class BuyOrSellMenu {
         Inventory shopInventory = Bukkit.createInventory(player, 18, inventoryName);
         menus.add(shopInventory);
         //information item
-        ItemStack info = BuyOrSellMenuConfig.INFORMATION_ITEM;
-        if (ResourcePackDataConfig.isDisplayCustomMenuUnicodes()) {
-            info.setType(Material.PAPER);
-            ItemMeta itemMeta = info.getItemMeta();
-            itemMeta.setCustomModelData(MetadataHandler.signatureID);
-            info.setItemMeta(itemMeta);
-        }
+//        ItemStack info = BuyOrSellMenuConfig.INFORMATION_ITEM;
+//        if (ResourcePackDataConfig.isDisplayCustomMenuUnicodes()) {
+//            info.setType(Material.PAPER);
+//            ItemMeta itemMeta = info.getItemMeta();
+//            itemMeta.setCustomModelData(MetadataHandler.signatureID);
+//            info.setItemMeta(itemMeta);
+//        }
 
-        shopInventory.setItem(BuyOrSellMenuConfig.INFORMATION_SLOT, info);
+//        shopInventory.setItem(BuyOrSellMenuConfig.INFORMATION_SLOT, info);
         //sell item
         shopInventory.setItem(BuyOrSellMenuConfig.SELL_SLOT, BuyOrSellMenuConfig.SELL_ITEM);
         //buy item
@@ -57,9 +54,9 @@ public class BuyOrSellMenu {
             if (!SharedShopElements.itemNullPointerPrevention(event)) return;
 
             //info button
-            if (event.getCurrentItem().equals(BuyOrSellMenuConfig.INFORMATION_ITEM)) {
-                return;
-            }
+//            if (event.getCurrentItem().equals(BuyOrSellMenuConfig.INFORMATION_ITEM)) {
+//                return;
+//            }
 
             //buy custom items button
             if (event.getCurrentItem().getItemMeta().getDisplayName().equals(BuyOrSellMenuConfig.BUY_CUSTOM_ITEM.getItemMeta().getDisplayName())) {
