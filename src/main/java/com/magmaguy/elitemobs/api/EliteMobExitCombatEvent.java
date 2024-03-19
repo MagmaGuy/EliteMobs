@@ -21,6 +21,7 @@ public class EliteMobExitCombatEvent extends Event {
     public EliteMobExitCombatEvent(EliteEntity eliteEntity, EliteMobExitCombatReason reason) {
         this.eliteEntity = eliteEntity;
         this.eliteMobExitCombatReason = reason;
+//        if (!eliteEntity.isInCombat()) return; todo: this might be necessary
         eliteEntity.setInCombat(false);
         if (eliteEntity.getUnsyncedLivingEntity().isDead()) return;
         //only run commands if the reason for leaving combat isn't death, onDeath commands exist for that case

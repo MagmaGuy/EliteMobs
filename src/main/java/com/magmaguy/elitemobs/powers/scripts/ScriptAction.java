@@ -13,7 +13,6 @@ import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.powers.meta.CustomSummonPower;
 import com.magmaguy.elitemobs.powers.scripts.caching.ScriptActionBlueprint;
 import com.magmaguy.elitemobs.powers.scripts.enums.ActionType;
-import com.magmaguy.elitemobs.powers.scripts.enums.TargetType;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import lombok.Getter;
@@ -144,6 +143,12 @@ public class ScriptAction {
                             }
                             //If it has run for the allotted amount times, stop
                             if (blueprint.getTimes() > 0 && counter > blueprint.getTimes()) {
+                                cancel();
+                                return;
+                            }
+
+                            //If a boss is dead and a script is set to repeat "forever", then the script should end when the boss dies
+                            if (blueprint.getTimes() < 0 && !scriptActionData.getEliteEntity().isValid()){
                                 cancel();
                                 return;
                             }
@@ -576,6 +581,8 @@ public class ScriptAction {
             fallingBlock.setHurtEntities(false);
             if (blueprint.getScriptRelativeVectorBlueprint() != null)
                 fallingBlock.setVelocity(new ScriptRelativeVector(blueprint.getScriptRelativeVectorBlueprint(), eliteScript, fallingBlock.getLocation()).getVector(scriptActionData));
+            else if (blueprint.getVValue() != null)
+                fallingBlock.setVelocity(blueprint.getVValue());
             ScriptListener.fallingBlocks.put(fallingBlock, new FallingEntityDataPair(this, scriptActionData));
         });
     }
@@ -595,19 +602,21 @@ public class ScriptAction {
         }
 
         getLocationTargets(scriptActionData).forEach(targetLocation -> {
-            //if (scriptActionData.getTargetType().equals(TargetType.SELF)) {
             Vector velocity = new Vector(0, 0, 0);
             if (blueprint.getScriptRelativeVectorBlueprint() != null) {
                 ScriptRelativeVector scriptRelativeVector = new ScriptRelativeVector(blueprint.getScriptRelativeVectorBlueprint(), eliteScript, targetLocation);
                 velocity = scriptRelativeVector.getVector(scriptActionData);
+            } else if (!blueprint.getVValue().isZero()){
+                velocity = blueprint.getVValue();
             }
             Entity entity;
-            if (scriptActionData.getTargetType().equals(TargetType.SELF) &&
-                    scriptActionData.getEliteEntity().getLivingEntity() != null &&
+            if (scriptActionData.getEliteEntity().getLivingEntity() != null &&
                     Projectile.class.isAssignableFrom(entityType.getEntityClass())) {
                 entity = scriptActionData.getEliteEntity().getLivingEntity().launchProjectile(entityType.getEntityClass().asSubclass(Projectile.class), velocity);
                 ((Projectile) entity).setShooter(scriptActionData.getEliteEntity().getLivingEntity());
-            } else {
+                if (entity instanceof Fireball fireball) fireball.setDirection(velocity);
+            }
+            else {
                 entity = targetLocation.getWorld().spawn(targetLocation, entityType.getEntityClass());
                 entity.setVelocity(velocity);
             }
@@ -630,7 +639,6 @@ public class ScriptAction {
                     }
                 }.runTaskTimer(MetadataHandler.PLUGIN, 1, 1);
             }
-            //}
         });
     }
 }
