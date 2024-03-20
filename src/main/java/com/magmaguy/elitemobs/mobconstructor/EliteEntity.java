@@ -243,12 +243,14 @@ public class EliteEntity {
         this.entityType = livingEntity.getType();
 
         this.livingEntity.setCanPickupItems(false);
-        livingEntity.getEquipment().setItemInMainHandDropChance(0);
-        livingEntity.getEquipment().setItemInOffHandDropChance(0);
-        livingEntity.getEquipment().setHelmetDropChance(0);
-        livingEntity.getEquipment().setChestplateDropChance(0);
-        livingEntity.getEquipment().setLeggingsDropChance(0);
-        livingEntity.getEquipment().setBootsDropChance(0);
+        if (livingEntity.getEquipment() != null){
+            livingEntity.getEquipment().setItemInMainHandDropChance(0);
+            livingEntity.getEquipment().setItemInOffHandDropChance(0);
+            livingEntity.getEquipment().setHelmetDropChance(0);
+            livingEntity.getEquipment().setChestplateDropChance(0);
+            livingEntity.getEquipment().setLeggingsDropChance(0);
+            livingEntity.getEquipment().setBootsDropChance(0);
+        }
 
         if (livingEntity.getType().equals(EntityType.RABBIT)) {
             ((Rabbit) livingEntity).setRabbitType(Rabbit.Type.THE_KILLER_BUNNY);
@@ -385,6 +387,7 @@ public class EliteEntity {
 
     private void setArmor() {
         if (!MobCombatSettingsConfig.isDoEliteArmor()) return;
+        if (livingEntity.getEquipment() == null) return;
 
         if (!(livingEntity instanceof Zombie || livingEntity instanceof PigZombie ||
                 livingEntity instanceof Skeleton || livingEntity instanceof WitherSkeleton)) return;
