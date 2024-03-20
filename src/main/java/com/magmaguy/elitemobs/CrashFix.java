@@ -18,14 +18,23 @@ public class CrashFix implements Listener {
 
     private static final HashSet<Integer> temporarilyCachedChunks = new HashSet<>();
     public static String key = "EliteMobsCullable";
+    public static String fallingBlocksKey = "VisualFallingBlocks";
     public static HashSet<Integer> knownSessionChunks = new HashSet<>();
 
     public static void persistentTracker(Entity entity) {
         PersistentVanillaData.write(entity, key, "delete_me");
     }
 
+    public static void registerVisualFallingBlock(Entity entity) {
+        PersistentVanillaData.write(entity, fallingBlocksKey, "delete_me");
+    }
+
     public static boolean isPersistentEntity(Entity entity) {
         return PersistentVanillaData.hasString(entity, key);
+    }
+
+    public static boolean isVisualFallingBlock(Entity entity) {
+        return PersistentVanillaData.hasString(entity, fallingBlocksKey);
     }
 
     public static void startupCheck() {
