@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.playerdata.database;
 
+import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 
@@ -8,13 +9,13 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 
 public class GenerateDatabase {
-    private GenerateDatabase() {
-    }
-
     public static void generate() throws Exception {
         Statement statement = PlayerData.getConnection().createStatement();
-        String sql = "CREATE TABLE IF NOT EXISTS " + PlayerData.getPLAYER_DATA_TABLE_NAME() +
-                "(PlayerUUID             TEXT PRIMARY KEY    NOT NULL);";
+        String sql;
+        if (EconomySettingsConfig.isEnableMYSQL())
+            sql = "CREATE TABLE IF NOT EXISTS " + PlayerData.getPLAYER_DATA_TABLE_NAME() + "(PlayerUUID VARCHAR(36) PRIMARY KEY NOT NULL);";
+        else
+            sql = "CREATE TABLE IF NOT EXISTS " + PlayerData.getPLAYER_DATA_TABLE_NAME() + "(PlayerUUID TEXT PRIMARY KEY NOT NULL);";
         statement.executeUpdate(sql);
         statement.close();
         addEntryIfEmpty("DisplayName", ColumnValues.TEXT);
@@ -64,11 +65,7 @@ public class GenerateDatabase {
     }
 
     private enum ColumnValues {
-        BLOB,
-        INT,
-        TEXT,
-        REAL,
-        BOOLEAN
+        BLOB, INT, TEXT, REAL, BOOLEAN
     }
 
 }

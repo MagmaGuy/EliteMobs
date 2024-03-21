@@ -18,7 +18,8 @@ softdepend:
 - LevelledMobs
 - InfernalMobs
 - FreeMinecraftModels
-
+libraries:
+  - 'com.zaxxer:HikariCP:5.1.0'
 
 permissions:
   elitemobs.*:

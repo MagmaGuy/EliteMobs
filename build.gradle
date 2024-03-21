@@ -115,6 +115,10 @@ dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.24'
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
 
+    implementation 'com.mysql:mysql-connector-j:8.3.0'
+    // HikariCP
+    implementation 'com.zaxxer:HikariCP:5.1.0'
+
     //Model Engine - R4
     compileOnly 'com.ticxo.modelengine:ModelEngine:R4.0.4'
 
@@ -151,7 +155,7 @@ shadowJar {
     }
     archiveClassifier.set(null)
     archiveFileName.set(project.name + ".jar")
-    destinationDirectory.set(new File("plugins"))
+    destinationDirectory.set(new File("E:\\Minecraft\\Debug\\plugins"))
 }
 
 tasks.withType(JavaCompile).configureEach {
