@@ -207,7 +207,7 @@ public class ConfigurationEngine {
         }
         String name = "";
         try {
-            name = setString(file, fileConfiguration, key + ".name", null, true);
+            name = setString(file, fileConfiguration, key+".name", itemStack.getItemMeta().getDisplayName(), true);
         } catch (Exception ex) {
             new WarningMessage("Item name " + fileConfiguration.getString(key + ".name") + " is not valid! Correct it to make a valid item.");
         }

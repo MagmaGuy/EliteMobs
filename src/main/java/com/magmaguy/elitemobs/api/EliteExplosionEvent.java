@@ -14,15 +14,12 @@ import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class EliteExplosionEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
-    @Getter
-    public static List<FallingBlock> fallingBlocks = new ArrayList<>();
     @Getter
     private final EliteEntity eliteEntity;
     @Getter
@@ -106,8 +103,7 @@ public class EliteExplosionEvent extends Event implements Cancellable {
                 }
             }.runTaskLater(MetadataHandler.PLUGIN, 20 * 4);
 
-            CrashFix.persistentTracker(fallingBlock);
-            fallingBlocks.add(fallingBlock);
+            CrashFix.registerVisualFallingBlock(fallingBlock);
         }
     }
 
@@ -120,21 +116,10 @@ public class EliteExplosionEvent extends Event implements Cancellable {
     public static class EliteExplosionEvents implements Listener {
         @EventHandler(ignoreCancelled = true)
         public void onBlockDrop(EntityChangeBlockEvent event) {
-
-            if (fallingBlocks.isEmpty()) return;
             if (!event.getEntity().getType().equals(EntityType.FALLING_BLOCK)) return;
-
-            boolean wasFallingBlock = false;
-            for (FallingBlock fallingBlock : fallingBlocks)
-                if (fallingBlock.equals(event.getEntity())) {
-                    event.setCancelled(true);
-                    wasFallingBlock = true;
-                    break;
-                }
-
-            if (!wasFallingBlock) return;
+            if (!CrashFix.isVisualFallingBlock(event.getEntity())) return;
+            event.setCancelled(true);
             event.getEntity().remove();
-            fallingBlocks.remove((FallingBlock) event.getEntity());
         }
     }
 

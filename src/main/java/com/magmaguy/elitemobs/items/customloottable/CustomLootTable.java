@@ -61,9 +61,14 @@ public class CustomLootTable implements Serializable {
                         else if (rawString.contains("command=")) new CommandLootTable(entries, rawString, filename);
                         else new EliteCustomLootEntry(entries, rawString, filename);
                 }
-            else if (object instanceof Map<?, ?> configMap)
+            else if (object instanceof Map<?, ?> configMap) {
                 //This is used for the instanced loot
+                if (((Map<?, ?>) object).containsKey("currencyAmount") ||
+                        ((Map<?, ?>) object).containsKey("currencyamount")){
+                    new CurrencyCustomLootEntry(entries, configMap, filename);
+                }
                 new EliteCustomLootEntry(entries, configMap, filename);
+            }
         for (CustomLootEntry customLootEntry : entries) {
             if (customLootEntry.getWave() > 0) {
                 if (this.waveRewards.get(customLootEntry.getWave()) != null) {
