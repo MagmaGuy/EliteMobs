@@ -488,6 +488,20 @@ public class AdminCommands {
                 .permission("elitemobs.*")
                 .handler(commandContext -> ReloadCommand.reload(commandContext.getSender())));
 
+        // /em sqlitetomysql
+        manager.command(builder.literal("sqlitetomysql")
+                .meta(CommandMeta.DESCRIPTION, "Converts the SQLite database to MySQL")
+                .senderType(CommandSender.class)
+                .permission("elitemobs.*")
+                .handler(commandContext -> SQLLiteToMySQL.convert(commandContext.getSender())));
+
+        // em mysqltosqlite
+        manager.command(builder.literal("mysqltosqlite")
+                .meta(CommandMeta.DESCRIPTION, "Converts the MySQL database to SQLite")
+                .senderType(CommandSender.class)
+                .permission("elitemobs.*")
+                .handler(commandContext -> MySQLToSQLLite.convert(commandContext.getSender())));
+
         // /em killaggressive
         manager.command(builder.literal("killaggressive")
                 .meta(CommandMeta.DESCRIPTION, "Kills all aggressive Elite Mobs.")

@@ -10,7 +10,6 @@ import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.ObjectSerializer;
 import com.magmaguy.elitemobs.utils.WarningMessage;
-import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,7 +28,10 @@ import javax.annotation.Nullable;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
 
 @Setter
 public class PlayerData {
@@ -525,15 +527,18 @@ public class PlayerData {
 
     public static Connection getConnection() throws Exception {
         if (connection != null && !connection.isClosed()) return connection;
-        if (EconomySettingsConfig.isEnableMYSQL()) {
-            try {
-                HikariDataSource hikari = getHikariDataSource();
-                connection = hikari.getConnection();
-                return connection;
-            } catch (Exception ex) {
-                new WarningMessage("Failed to connect to MySQL database! Falling back to SQLite.");
-            }
-        }
+        if (EconomySettingsConfig.isEnableMYSQL()) return getMySQLConnect();
+        return getSQLiteConnect();
+    }
+
+    public static Connection getMySQLConnect() throws SQLException {
+        if (hikari != null) return hikari.getConnection();
+        HikariDataSource hikari = getHikariDataSource();
+        connection = hikari.getConnection();
+        return connection;
+    }
+
+    public static Connection getSQLiteConnect() throws SQLException, ClassNotFoundException {
         File dataFolder = new File(MetadataHandler.PLUGIN.getDataFolder(), "data/" + DATABASE_NAME);
         Class.forName("org.sqlite.JDBC");
         connection = DriverManager.getConnection("jdbc:sqlite:" + dataFolder);
@@ -575,6 +580,35 @@ public class PlayerData {
             connection.close();
         } catch (Exception ex) {
             new WarningMessage("Could not correctly close database connection.");
+        }
+    }
+
+    public static void convertDatabase(Connection fromConnection, Connection toConnection) {
+        try {
+            Statement sqliteStatement = fromConnection.createStatement();
+            Statement mysqlStatement = toConnection.createStatement();
+            ResultSet sqliteResultSet = sqliteStatement.executeQuery("SELECT * FROM " + PLAYER_DATA_TABLE_NAME + ";");
+            while (sqliteResultSet.next()) {
+                String sql = "INSERT INTO " + PLAYER_DATA_TABLE_NAME + " (PlayerUUID," + " DisplayName," + " Currency," + " GuildPrestigeLevel," + " GuildMaxLevel," + " GuildActiveLevel," + " Score," + " Kills," + " HighestLevelKilled," + " Deaths," + " QuestsCompleted) " +
+                        "VALUES ('" + sqliteResultSet.getString("PlayerUUID") + "'," +
+                        " '" + sqliteResultSet.getString("DisplayName") + "'," +
+                        " " + sqliteResultSet.getDouble("Currency") + "," +
+                        " " + sqliteResultSet.getInt("GuildPrestigeLevel") + "," +
+                        " " + sqliteResultSet.getInt("GuildMaxLevel") + "," +
+                        " " + sqliteResultSet.getInt("GuildActiveLevel") + "," +
+                        " " + sqliteResultSet.getInt("Score") + "," +
+                        " " + sqliteResultSet.getInt("Kills") + "," +
+                        " " + sqliteResultSet.getInt("HighestLevelKilled") + "," +
+                        " " + sqliteResultSet.getInt("Deaths") + "," +
+                        " " + sqliteResultSet.getInt("QuestsCompleted") + ");";
+                mysqlStatement.executeUpdate(sql);
+            }
+            sqliteResultSet.close();
+            sqliteStatement.close();
+            mysqlStatement.close();
+        } catch (Exception e) {
+            new WarningMessage("Failed to convert databases");
+            new WarningMessage(e.getClass().getName() + ": " + e.getMessage());
         }
     }
 
