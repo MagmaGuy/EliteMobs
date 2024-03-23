@@ -31,7 +31,10 @@ public abstract class CombatEnterScanPower extends MajorPower implements Listene
     protected abstract void finishActivation(EliteEntity eliteEntity);
 
     public void deactivate(EliteEntity eliteEntity) {
-        if (bukkitTask != null) bukkitTask.cancel();
+        if (bukkitTask != null) {
+            bukkitTask.cancel();
+            bukkitTask = null;
+        }
         isActive = false;
         finishDeactivation(eliteEntity);
     }
