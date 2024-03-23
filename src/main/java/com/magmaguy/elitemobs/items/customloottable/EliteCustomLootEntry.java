@@ -48,9 +48,12 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
             String key = (String) mapEntry.getKey();
             switch (key.toLowerCase()) {
                 case "filename" -> filename = MapListInterpreter.parseString(key, mapEntry.getValue(), configFilename);
-                case "chance" -> super.setChance(MapListInterpreter.parseDouble(key, mapEntry.getValue(), configFilename));
-                case "difficultyid" -> difficultyID = MapListInterpreter.parseString(key, mapEntry.getValue(), configFilename);
-                case "permission" -> super.setPermission(MapListInterpreter.parseString(key, mapEntry.getValue(), configFilename));
+                case "chance" ->
+                        super.setChance(MapListInterpreter.parseDouble(key, mapEntry.getValue(), configFilename));
+                case "difficultyid" ->
+                        difficultyID = MapListInterpreter.parseString(key, mapEntry.getValue(), configFilename);
+                case "permission" ->
+                        super.setPermission(MapListInterpreter.parseString(key, mapEntry.getValue(), configFilename));
                 case "amount" -> setAmount(MapListInterpreter.parseInteger(key, mapEntry.getValue(), configFilename));
                 default -> new WarningMessage("Failed to read custom loot option " + key + " in " + configFilename);
             }

@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EnchantedBookThornsConfig extends CustomItemsConfigFields {
-    public EnchantedBookThornsConfig(){
+    public EnchantedBookThornsConfig() {
         super("enchanted_book_thorns",
                 true,
                 Material.BOOK,

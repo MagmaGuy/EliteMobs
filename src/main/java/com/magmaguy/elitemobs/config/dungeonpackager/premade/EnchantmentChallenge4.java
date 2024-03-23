@@ -9,11 +9,11 @@ import java.util.List;
 import java.util.Map;
 
 public class EnchantmentChallenge4 extends DungeonPackagerConfigFields {
-    public EnchantmentChallenge4(){
+    public EnchantmentChallenge4() {
         super("enchantment_challenge_4_sanctum",
                 false,
                 "&2[lvl 000-200] &fEnchantment Challenge 04",
-                Arrays.asList("&fAn enchantment challenge dungeon!"),
+                List.of("&fAn enchantment challenge dungeon!"),
                 DiscordLinks.freeMinidungeons,
                 DungeonSizeCategory.SANCTUM,
                 "em_id_enchantment_challenge_4",
@@ -29,7 +29,7 @@ public class EnchantmentChallenge4 extends DungeonPackagerConfigFields {
                 "em_id_enchantment_challenge_4",
                 1);
         setDifficulties(List.of(
-                Map.of("name", "normal",  "id", 0)));
+                Map.of("name", "normal", "id", 0)));
         setEnchantmentChallenge(true);
         setMaxPlayerCount(1);
     }

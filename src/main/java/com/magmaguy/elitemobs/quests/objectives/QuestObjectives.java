@@ -26,6 +26,8 @@ import java.util.concurrent.ThreadLocalRandom;
 public class QuestObjectives implements Serializable {
 
     @Getter
+    private final UUID uuid = UUID.randomUUID();
+    @Getter
     @Setter
     protected QuestReward questReward;
     @Getter
@@ -40,8 +42,6 @@ public class QuestObjectives implements Serializable {
     private boolean turnedIn = false;
     @Setter
     private boolean forceOver = false;
-    @Getter
-    private final UUID uuid = UUID.randomUUID();
 
     /**
      * Used for dynamic quests

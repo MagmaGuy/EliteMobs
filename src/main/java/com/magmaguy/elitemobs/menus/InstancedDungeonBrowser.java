@@ -34,7 +34,7 @@ public class InstancedDungeonBrowser extends EliteMenu {
         EMPackage emPackage = EMPackage.getEmPackages().get(instancedDungeonName);
         this.emPackage = emPackage;
         if (!(emPackage instanceof WorldInstancedDungeonPackage)) {
-            player.sendMessage("[EliteMobs] Not a valid instanced dungeon!");
+            player.sendMessage("[EliteRabbit] Not a valid instanced dungeon!");
             return;
         }
         Set<DungeonInstance> dungeonInstances = new HashSet<>();
@@ -113,7 +113,8 @@ public class InstancedDungeonBrowser extends EliteMenu {
                             dungeonInstance.addSpectator((Player) event.getWhoClicked(), false);
                     }
                     case WAITING -> dungeonInstance.addNewPlayer((Player) event.getWhoClicked());
-                    case COMPLETED -> event.getWhoClicked().sendMessage("[EliteMobs] This match already ended! Can't join it!");
+                    case COMPLETED ->
+                            event.getWhoClicked().sendMessage("[EliteRabbit] This match already ended! Can't join it!");
                 }
                 event.getWhoClicked().closeInventory();
             }

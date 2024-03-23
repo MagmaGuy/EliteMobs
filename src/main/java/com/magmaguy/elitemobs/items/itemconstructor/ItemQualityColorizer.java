@@ -152,7 +152,7 @@ public class ItemQualityColorizer {
         Cancel colorization in case item already has a color (for custom and unique items)
          */
         if (itemMeta.getDisplayName().equals(ChatColor.stripColor(itemMeta.getDisplayName())))
-            itemMeta.setDisplayName(chatColor + "" + ChatColor.BOLD + "" + itemMeta.getDisplayName());
+            itemMeta.setDisplayName(chatColor + "" + ChatColor.BOLD + itemMeta.getDisplayName());
 
         List list = new ArrayList();
 
@@ -162,7 +162,7 @@ public class ItemQualityColorizer {
 
                 if (!string.isEmpty()) {
 
-                    String colorizedString = chatColor + "" + ChatColor.BOLD + "" + ChatColor.ITALIC + string;
+                    String colorizedString = chatColor + "" + ChatColor.BOLD + ChatColor.ITALIC + string;
                     list.add(colorizedString);
 
                 }

@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EnchantedBookImpalingConfig extends CustomItemsConfigFields {
-    public EnchantedBookImpalingConfig(){
+    public EnchantedBookImpalingConfig() {
         super("enchanted_book_impaling",
                 true,
                 Material.BOOK,

@@ -28,8 +28,8 @@ public class StoryDungeonsQuestGiver extends NPCsConfigFields {
                 "story_dungeons_quest_3_the_soulweaver.yml",
                 "story_dungeons_quest_4_bridged.yml",
                 "story_dungeons_quest_5_the_underground.yml"
-                , "story_dungeons_quest_6_the_monarch.yml"
-                , "story_dungeons_quest_7_down_below.yml"
+                ,"story_dungeons_quest_6_the_monarch.yml"
+                ,"story_dungeons_quest_7_down_below.yml"
                 //,"story_dungeons_quest_8_deep_down.yml"
                 //,"story_dungeons_quest_9_nether_vacation.yml"
                 //,"story_dungeons_quest_10_the_void_bell.yml"

@@ -5,27 +5,28 @@ import com.magmaguy.elitemobs.thirdparty.custommodels.CustomModelInterface;
 import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import com.ticxo.modelengine.api.ModelEngineAPI;
-import com.ticxo.modelengine.api.animation.state.ModelState;
-import com.ticxo.modelengine.api.generator.model.ModelBlueprint;
+import com.ticxo.modelengine.api.generator.blueprint.ModelBlueprint;
 import com.ticxo.modelengine.api.model.ActiveModel;
 import com.ticxo.modelengine.api.model.ModeledEntity;
-import com.ticxo.modelengine.api.model.bone.Nameable;
+import com.ticxo.modelengine.api.model.bone.BoneBehaviorTypes;
+import com.ticxo.modelengine.api.model.bone.ModelBone;
+import com.ticxo.modelengine.api.model.bone.manager.MountManager;
+import com.ticxo.modelengine.api.model.bone.type.NameTag;
+import com.ticxo.modelengine.api.mount.controller.MountControllerType;
 import lombok.Getter;
 import org.bukkit.entity.LivingEntity;
 
-public class CustomModelMEG implements CustomModelInterface {
-
+public class CustomModelMEG4 implements CustomModelInterface {
     ActiveModel activeModel;
     ModeledEntity modeledEntity;
-
     ModelBlueprint modelBlueprint;
 
     @Getter
     private boolean success = false;
 
-    public CustomModelMEG(LivingEntity livingEntity, String modelName, String nametagName) {
+    public CustomModelMEG4(LivingEntity livingEntity, String modelName, String nametagName) {
         try {
-            if (ModelEngineAPI.api.getModelRegistry().getBlueprint(modelName) == null) {
+            if (ModelEngineAPI.getAPI().getModelRegistry().get(modelName) == null) {
                 new InfoMessage("Model " + modelName + " was not found! Make sure you install the model correctly if you have it. This entry will be skipped!");
                 return;
             }
@@ -34,7 +35,7 @@ public class CustomModelMEG implements CustomModelInterface {
             return;
         }
 
-        modelBlueprint = ModelEngineAPI.api.getModelRegistry().getBlueprint(modelName);
+        modelBlueprint = ModelEngineAPI.getAPI().getModelRegistry().get(modelName);
 
         activeModel = ModelEngineAPI.createActiveModel(modelBlueprint);
 
@@ -52,7 +53,7 @@ public class CustomModelMEG implements CustomModelInterface {
 
         try {
             modeledEntity.addModel(activeModel, true);
-            activeModel.playDefaultAnimation(ModelState.IDLE);
+            activeModel.getAnimationHandler().playAnimation("idle", .1, .1, 1, true);
             modeledEntity.setBaseEntityVisible(false);
             setName(nametagName, true);
             success = true;
@@ -64,14 +65,9 @@ public class CustomModelMEG implements CustomModelInterface {
 
     }
 
-    public static CustomModelMEG generateCustomModel(LivingEntity livingEntity, String modelName, String nametagName) {
-        CustomModelMEG customModel = new CustomModelMEG(livingEntity, modelName, nametagName);
-        return customModel.isSuccess() ? customModel : null;
-    }
-
     public static void reloadModels() {
         try {
-            ModelEngineAPI.api.getGenerator().importModelsAsync();
+            ModelEngineAPI.getAPI().getModelGenerator().importModels();
         } catch (Exception ex) {
             new WarningMessage("Model Engine API version is not supported. Currently Elitemobs can only support ModelEngine R3.0.0.");
         }
@@ -80,7 +76,7 @@ public class CustomModelMEG implements CustomModelInterface {
     public static boolean modelExists(String modelName) {
         if (modelName == null || modelName.isEmpty()) return false;
         try {
-            if (ModelEngineAPI.api.getModelRegistry().getBlueprint(modelName) == null) {
+            if (ModelEngineAPI.getAPI().getModelRegistry().get(modelName) == null) {
                 new InfoMessage("Model " + modelName + " was not found! Make sure you install the model correctly if you have it. This entry will be skipped!");
                 return false;
             }
@@ -96,16 +92,14 @@ public class CustomModelMEG implements CustomModelInterface {
         if (activeModel == null) return;
         if (modelBlueprint.getAnimations().containsKey("attack_ranged"))
             activeModel.getAnimationHandler().playAnimation("attack_ranged", .1, .1, 1, true);
-        else
-            activeModel.getAnimationHandler().playAnimation("attack", .1, .1, 1, true);
+        else activeModel.getAnimationHandler().playAnimation("attack", .1, .1, 1, true);
     }
 
     public void melee() {
         if (activeModel == null) return;
         if (modelBlueprint.getAnimations().containsKey("attack_melee"))
             activeModel.getAnimationHandler().playAnimation("attack_melee", .1, .1, 1, true);
-        else
-            activeModel.getAnimationHandler().playAnimation("attack", .1, .1, 1, true);
+        else activeModel.getAnimationHandler().playAnimation("attack", .1, .1, 1, true);
     }
 
     public void playAnimationByName(String string) {
@@ -115,28 +109,27 @@ public class CustomModelMEG implements CustomModelInterface {
     }
 
     @Override
-    public void setName(String nametagName, boolean visible) {
+    public void setName(String nameTagName, boolean visible) {
         if (modeledEntity == null) return;
-        Nameable nametag = getNameableBone();
+        NameTag nametag = getNameTagBone();
         if (nametag == null) {
-            new WarningMessage("Failed to get hitbox nametag for disguise!");
+            new WarningMessage("Failed to get position for name tag: " + activeModel.getBlueprint().getName());
             return;
         }
-        nametag.setCustomName(nametagName);
-        nametag.setCustomNameVisible(visible);
+        nametag.setString(nameTagName);
+        nametag.setVisible(visible);
     }
 
     public void setNameVisible(boolean visible) {
-        Nameable nametag = getNameableBone();
-        if (nametag == null) {
-            return;
-        }
-        nametag.setCustomNameVisible(visible);
+        NameTag nameTagBone = getNameTagBone();
+        if (nameTagBone == null) return;
+        nameTagBone.setVisible(visible);
     }
 
-    private Nameable getNameableBone() {
-        for (Nameable nameable : activeModel.getNametagHandler().getBones().values()) return nameable;
-        return null;
+    private NameTag getNameTagBone() {
+        ModelBone bone = activeModel.getBone("name").stream().filter(modelBone -> modelBone.getBoneBehavior(BoneBehaviorTypes.NAMETAG).orElse(null) != null).findFirst().orElse(null);
+        if (bone == null) return null;
+        return bone.getBoneBehavior(BoneBehaviorTypes.NAMETAG).orElse(null);
     }
 
     public void addPassenger(CustomBossEntity passenger) {
@@ -144,15 +137,21 @@ public class CustomModelMEG implements CustomModelInterface {
             new WarningMessage("Attempted to add " + passenger.getCustomBossesConfigFields().getFilename() + " as a mounted entity for a custom model but it does not have customModelMountPointID set! The boss can't guess where it needs to be mounted, and therefore this will not work.");
             return;
         }
-        modeledEntity.getMountManager().addPassengerToSeat(
-                modelBlueprint.getModelId(),
-                passenger.getCustomBossesConfigFields().getCustomModelMountPointID(),
-                passenger.getLivingEntity(),
-                modeledEntity.getMountManager().getDriverController());
+        MountManager mountManager = modeledEntity.getMountData().getMainMountManager();
+        if (mountManager == null) return;
+        MountControllerType controllerType = ModelEngineAPI.getMountControllerTypeRegistry().get("walking");
+        try {
+            mountManager.mountDriver(passenger.getLivingEntity(), controllerType);
+            mountManager.mountDriver(passenger.getLivingEntity(), controllerType, mountController -> {
+                mountController.setCanDamageMount(true);
+//                mountController.setCanInteractMount(false);
+            });
+        } catch (Exception ignored) {
+        }
+
     }
 
     public void switchPhase() {
         activeModel.getAnimationHandler().forceStopAllAnimations();
     }
-
 }

@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EnchantedBookSweepingEdgeConfig extends CustomItemsConfigFields {
-    public EnchantedBookSweepingEdgeConfig(){
+    public EnchantedBookSweepingEdgeConfig() {
         super("enchanted_book_sweeping_edge",
                 true,
                 Material.BOOK,

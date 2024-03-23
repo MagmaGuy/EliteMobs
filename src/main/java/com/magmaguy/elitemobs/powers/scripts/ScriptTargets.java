@@ -222,10 +222,10 @@ public class ScriptTargets {
     private Location addOffsets(Location originalLocation, ScriptActionData scriptActionData) {
         Location location = originalLocation.clone().add(targetBlueprint.getOffset());
         //if (scriptRelativeVector == null)
-            if (targetBlueprint.getScriptRelativeVectorBlueprint() != null)
-                scriptRelativeVector = new ScriptRelativeVector(targetBlueprint.getScriptRelativeVectorBlueprint(), eliteScript, location);
-            else
-                return location;
+        if (targetBlueprint.getScriptRelativeVectorBlueprint() != null)
+            scriptRelativeVector = new ScriptRelativeVector(targetBlueprint.getScriptRelativeVectorBlueprint(), eliteScript, location);
+        else
+            return location;
 
         location.add(scriptRelativeVector.getVector(scriptActionData));
 

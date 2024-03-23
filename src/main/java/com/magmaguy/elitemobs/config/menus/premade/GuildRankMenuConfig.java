@@ -157,14 +157,14 @@ public class GuildRankMenuConfig extends MenusConfigFields {
         prestigeNextUnlockButton = ItemStackSerializer.deserialize("prestigeNextUnlockButtons", fileConfiguration);
 
         notEnoughCurrencyMessage = ConfigurationEngine.setString(file, fileConfiguration, "notEnoughCurrencyMessages",
-                "&7[EliteMobs] &4You don't have enough Elite Coins ($neededAmount $currencyName)! Sell some Elite Mob loot to [/em shop]! " +
+                "&7[EliteRabbit] &4You don't have enough Elite Coins ($neededAmount $currencyName)! Sell some Elite Mob loot to [/em shop]! " +
                         "You have $currentAmount $currencyName.", true);
 
-        unlockMessage = ConfigurationEngine.setString(file, fileConfiguration, "unlockMessages", "&7[EliteMobs] &aYou have unlocked the $rankName &arank for $price $currencyName. \n&6Happy hunting!", true);
+        unlockMessage = ConfigurationEngine.setString(file, fileConfiguration, "unlockMessages", "&7[EliteRabbit] &aYou have unlocked the $rankName &arank for $price $currencyName. \n&6Happy hunting!", true);
 
-        broadcastMessage = ConfigurationEngine.setString(file, fileConfiguration, "questCompleteBroadcastMessages", "&7[EliteMobs] &a$player &ahas reached the $rankName &aguild rank!", true);
+        broadcastMessage = ConfigurationEngine.setString(file, fileConfiguration, "questCompleteBroadcastMessages", "&7[EliteRabbit] &a$player &ahas reached the $rankName &aguild rank!", true);
 
-        failedMessage = ConfigurationEngine.setString(file, fileConfiguration, "failedMessages", "&7[EliteMobs] &cYou need to unlock other ranks first!", true);
+        failedMessage = ConfigurationEngine.setString(file, fileConfiguration, "failedMessages", "&7[EliteRabbit] &cYou need to unlock other ranks first!", true);
 
         spawnRateModifierMessage = ConfigurationEngine.setString(file, fileConfiguration, "spawnRateModifierMessages", "&fElite Mob spawn rate modifier: &c$modifier%", true);
         lootModifierMessage = ConfigurationEngine.setString(file, fileConfiguration, "lootModifierMessages", "&fElite Mob loot modifier: &a$modifier%", true);

@@ -5,7 +5,7 @@ import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.thirdparty.custommodels.freeminecraftmodels.CustomModelFMM;
-import com.magmaguy.elitemobs.thirdparty.custommodels.modelengine.CustomModelMEG;
+import com.magmaguy.elitemobs.thirdparty.custommodels.modelengine.CustomModelMEG4;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
@@ -21,7 +21,7 @@ public class CustomModel implements CustomModelInterface {
     private static final boolean usingModels = false;
     @Getter
     private static ModelPlugin modelPlugin;
-    private CustomModelMEG customModelMEG;
+    private CustomModelMEG4 customModelMEG;
     private CustomModelFMM customModelFMM;
     private boolean initialized = false;
 
@@ -32,7 +32,7 @@ public class CustomModel implements CustomModelInterface {
                 initialized = true;
                 break;
             case MODEL_ENGINE:
-                customModelMEG = new CustomModelMEG(livingEntity, modelName, nametagName);
+                customModelMEG = new CustomModelMEG4(livingEntity, modelName, nametagName);
                 initialized = true;
                 break;
         }
@@ -49,7 +49,7 @@ public class CustomModel implements CustomModelInterface {
     public static void reloadModels() {
         switch (modelPlugin) {
             case FREE_MINECRAFT_MODELS -> CustomModelFMM.reloadModels();
-            case MODEL_ENGINE -> CustomModelMEG.reloadModels();
+            case MODEL_ENGINE -> CustomModelMEG4.reloadModels();
         }
     }
 
@@ -58,7 +58,7 @@ public class CustomModel implements CustomModelInterface {
             case FREE_MINECRAFT_MODELS:
                 return CustomModelFMM.modelExists(modelName);
             case MODEL_ENGINE:
-                return CustomModelMEG.modelExists(modelName);
+                return CustomModelMEG4.modelExists(modelName);
         }
         return false;
     }

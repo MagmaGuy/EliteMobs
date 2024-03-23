@@ -11,7 +11,7 @@ import org.bukkit.entity.Entity;
 public class MythicMobs {
     public static Entity spawn(Location location, String name, int level) {
         MythicMob mythicMob = MythicBukkit.inst().getMobManager().getMythicMob(name).orElse(null);
-        if (mythicMob != null){
+        if (mythicMob != null) {
             ActiveMob activeMob = mythicMob.spawn(BukkitAdapter.adapt(location), level);
             return activeMob.getEntity().getBukkitEntity();
         }

@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EnchantedBookEarthquakeConfig extends CustomItemsConfigFields {
-    public EnchantedBookEarthquakeConfig(){
+    public EnchantedBookEarthquakeConfig() {
         super("enchanted_book_earthquake",
                 true,
                 Material.BOOK,

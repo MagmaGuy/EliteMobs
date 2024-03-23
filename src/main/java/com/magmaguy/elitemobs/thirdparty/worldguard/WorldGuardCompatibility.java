@@ -27,28 +27,28 @@ import java.util.UUID;
 
 public class WorldGuardCompatibility {
 
-   @Getter
-   private static final StateFlag.State allow = StateFlag.State.ALLOW;
-   @Getter
-   private static final StateFlag.State deny = StateFlag.State.DENY;
-   @Getter
-   private static StateFlag ELITEMOBS_SPAWN_FLAG;
-   @Getter
-   private static StateFlag ELITEMOBS_ONLY_SPAWN_FLAG;
-   @Getter
-   private static StateFlag ELITEMOBS_ANTIEXPLOIT;
-   @Getter
-   private static StateFlag ELITEMOBS_DUNGEON;
-   @Getter
-   private static StateFlag ELITEMOBS_EVENTS;
-   @Getter
-   private static IntegerFlag ELITEMOBS_MINIMUM_LEVEL;
-   @Getter
-   private static IntegerFlag ELITEMOBS_MAXIMUM_LEVEL;
-   @Getter
-   private static StateFlag ELITEMOBS_EXPLOSION_REGEN;
-   @Getter
-   private static StateFlag ELITEMOBS_EXPLOSION_BLOCK_DAMAGE;
+    @Getter
+    private static final StateFlag.State allow = StateFlag.State.ALLOW;
+    @Getter
+    private static final StateFlag.State deny = StateFlag.State.DENY;
+    @Getter
+    private static StateFlag ELITEMOBS_SPAWN_FLAG;
+    @Getter
+    private static StateFlag ELITEMOBS_ONLY_SPAWN_FLAG;
+    @Getter
+    private static StateFlag ELITEMOBS_ANTIEXPLOIT;
+    @Getter
+    private static StateFlag ELITEMOBS_DUNGEON;
+    @Getter
+    private static StateFlag ELITEMOBS_EVENTS;
+    @Getter
+    private static IntegerFlag ELITEMOBS_MINIMUM_LEVEL;
+    @Getter
+    private static IntegerFlag ELITEMOBS_MAXIMUM_LEVEL;
+    @Getter
+    private static StateFlag ELITEMOBS_EXPLOSION_REGEN;
+    @Getter
+    private static StateFlag ELITEMOBS_EXPLOSION_BLOCK_DAMAGE;
 
     public static boolean initialize() {
 

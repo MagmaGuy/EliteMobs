@@ -393,6 +393,10 @@ public class EventsRegistrer {
         //Commands
         register(new RemoveCommand.RemoveCommandEvents());
 
+        // Other
+        register(new PlayerDeathEvent());
+        register(new MythicMobDamegedEvent());
+
     }
 
     private static void registerPower(Listener listener, String config) {

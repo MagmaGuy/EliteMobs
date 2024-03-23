@@ -43,7 +43,8 @@ repositories {
 
     //Spigot API & CloudCommands
     maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
-    //maven { url = 'https://oss.sonatype.org/content/repositories/central' }
+    maven { url = 'https://s01.oss.sonatype.org/content/repositories/snapshots' }
+    maven { url = 'https://oss.sonatype.org/content/repositories/central' }
 
     maven { url "https://hub.spigotmc.org/nexus/content/repositories/snapshots" }
 
@@ -114,13 +115,19 @@ dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.24'
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
 
-    //Model Engine - legacy
-    compileOnly "com.ticxo.modelengine:api:R3.1.7"
+    implementation 'com.mysql:mysql-connector-j:8.3.0'
+    // HikariCP
+    implementation 'com.zaxxer:HikariCP:5.1.0'
+
+    //Model Engine - R4
+    compileOnly 'com.ticxo.modelengine:ModelEngine:R4.0.4'
 
     //Free Minecraft Models
-    compileOnly group: 'com.magmaguy', name: 'FreeMinecraftModels', version: '1.1.3-SNAPSHOT'
+    compileOnly 'com.magmaguy:FreeMinecraftModels:1.1.3-SNAPSHOT'
+//    compileOnly files('./libs/FreeMinecraftModels-1.1.3-SNAPSHOT.jar')
 
     //Advanced AI goals
+//    implementation group: 'com.magmaguy', name: 'EasyMinecraftGoals-dist', version: '1.7.4-SNAPSHOT'
     implementation group: 'com.magmaguy', name: 'EasyMinecraftGoals-dist', version: '1.7.4-SNAPSHOT'
 
     // Mythic Mobs integration - currently only for arenas
@@ -148,10 +155,10 @@ shadowJar {
     }
     archiveClassifier.set(null)
     archiveFileName.set(project.name + ".jar")
-    destinationDirectory.set(new File("testbed/plugins"))
+    destinationDirectory.set(new File("E:\\Minecraft\\Debug\\plugins"))
 }
 
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
 
@@ -163,53 +170,4 @@ ext {
 
 processResources {
     filter ReplaceTokens, tokens: resourceTokens
-}
-
-//sonatype repo
-task javadocJar(type: Jar) {
-    classifier = 'javadoc'
-    from javadoc
-}
-
-task sourcesJar(type: Jar) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
-
-artifacts {
-    archives javadocJar, sourcesJar
-}
-
-ext.isReleaseVersion = !version.contains("SNAPSHOT")
-
-publishing {
-    repositories {
-        maven {
-            def releaseRepo = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
-            def snapshotRepo = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-            url = isReleaseVersion ? releaseRepo : snapshotRepo
-            credentials {
-                username = project.hasProperty('ossrhUsername') ? ossrhUsername : "Unknown user"
-                password = project.hasProperty('ossrhPassword') ? ossrhPassword : "Unknown password"
-            }
-        }
-    }
-
-    publications {
-        mavenJava(MavenPublication) {
-            pom {
-                groupId = 'com.magmaguy'
-                name = 'elitemobs'
-                description = 'EliteMobs repo'
-                url = 'https://magmaguy.com/'
-                from components.java
-                licenses {
-                    license {
-                        name = 'GPLV3'
-                        url = 'https://www.gnu.org/licenses/gpl-3.0.en.html'
-                    }
-                }
-            }
-        }
-    }
 }

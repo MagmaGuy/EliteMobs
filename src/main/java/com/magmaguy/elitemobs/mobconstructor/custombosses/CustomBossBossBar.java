@@ -31,6 +31,7 @@ public class CustomBossBossBar {
     private final Map<Player, BossBar> bossBars = new HashMap<>();
     private final HashSet<Player> trackingPlayers = new HashSet<>();
     private BukkitTask bossBarUpdater;
+    private boolean warned = false;
 
     public CustomBossBossBar(CustomBossEntity customBossEntity) {
         this.customBossEntity = customBossEntity;
@@ -146,8 +147,6 @@ public class CustomBossBossBar {
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 5);
     }
-
-    private boolean warned = false;
 
     private void createBossBar(Player player) {
         String locationString = (int) customBossEntity.getLocation().getX() +

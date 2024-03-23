@@ -19,8 +19,7 @@ public class ScriptRelativeVector {
         this.actionLocation = actionLocation;
         if (!scriptRelativeVectorBlueprint.getSourceTarget().getTargetType().equals(TargetType.ACTION_TARGET)) {
             sourceTarget = new ScriptTargets(scriptRelativeVectorBlueprint.getSourceTarget(), eliteScript);
-        }
-        else {
+        } else {
             sourceIsAction = true;
         }
         if (!scriptRelativeVectorBlueprint.getDestinationTarget().getTargetType().equals(TargetType.ACTION_TARGET))
@@ -34,8 +33,7 @@ public class ScriptRelativeVector {
         Location sourceLocation = null;
         if (sourceIsAction) {
             sourceLocation = actionLocation.clone();
-        }
-        else if (sourceTarget != null && !sourceTarget.getTargetLocations(scriptActionData).isEmpty())
+        } else if (sourceTarget != null && !sourceTarget.getTargetLocations(scriptActionData).isEmpty())
             sourceLocation = sourceTarget.getTargetLocations(scriptActionData).iterator().next();
         else
             return new Vector(0, 0, 0);

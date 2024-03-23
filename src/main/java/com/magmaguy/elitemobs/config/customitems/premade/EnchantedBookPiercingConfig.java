@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EnchantedBookPiercingConfig extends CustomItemsConfigFields {
-    public EnchantedBookPiercingConfig(){
+    public EnchantedBookPiercingConfig() {
         super("enchanted_book_piercing",
                 true,
                 Material.BOOK,

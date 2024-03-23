@@ -9,12 +9,11 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class BuyOrSellMenuConfig extends MenusConfigFields {
     public static String SHOP_NAME;
-    public static ItemStack INFORMATION_ITEM;
-    public static int INFORMATION_SLOT;
+    //    public static ItemStack INFORMATION_ITEM;
+//    public static int INFORMATION_SLOT;
     public static ItemStack BUY_PROCEDURAL_ITEM;
     public static ItemStack BUY_CUSTOM_ITEM;
     public static int BUY_SLOT;
@@ -28,16 +27,16 @@ public class BuyOrSellMenuConfig extends MenusConfigFields {
     @Override
     public void processAdditionalFields() {
         SHOP_NAME = ConfigurationEngine.setString(file, fileConfiguration, "Shop name", "[EM] Buy or Sell", true);
-        ItemStackSerializer.serialize(
-                "Information button",
-                ItemStackGenerator.generateSkullItemStack("magmaguy",
-                        "&4&lEliteMobs &r&cby &4&lMagmaGuy",
-                        Arrays.asList("&8Support the plugins you enjoy!",
-                                "&aClick on the emerald to buy items!",
-                                "&cClick on the redstone to sell items!"), MetadataHandler.signatureID),
-                fileConfiguration);
-        INFORMATION_ITEM = ItemStackSerializer.deserialize("Information button", fileConfiguration);
-        INFORMATION_SLOT = ConfigurationEngine.setInt(fileConfiguration, "Information button slot", 4);
+//        ItemStackSerializer.serialize(
+//                "Information button",
+//                ItemStackGenerator.generateSkullItemStack("magmaguy",
+//                        "&4&lEliteMobs &r&cby &4&lMagmaGuy",
+//                        Arrays.asList("&8Support the plugins you enjoy!",
+//                                "&aClick on the emerald to buy items!",
+//                                "&cClick on the redstone to sell items!"), MetadataHandler.signatureID),
+//                fileConfiguration);
+//        INFORMATION_ITEM = ItemStackSerializer.deserialize("Information button", fileConfiguration);
+//        INFORMATION_SLOT = ConfigurationEngine.setInt(fileConfiguration, "Information button slot", 4);
         ItemStackSerializer.serialize("Buy procedurally generated items",
                 ItemStackGenerator.generateItemStack(Material.EMERALD, "Buy items", new ArrayList<>(), MetadataHandler.signatureID), fileConfiguration);
         BUY_PROCEDURAL_ITEM = ItemStackSerializer.deserialize("Buy procedurally generated items", fileConfiguration);

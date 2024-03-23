@@ -18,9 +18,9 @@ public class ElitePlayerInventory {
     public static HashMap<UUID, ElitePlayerInventory> playerInventories = new HashMap<>();
     public final PlayerItem helmet, chestplate, leggings, boots, mainhand, offhand;
     private final Player player;
-    private boolean isUpdateLock = false;
     //Used by elite scripts
     private final HashSet<String> customMetadata = new HashSet<>();
+    private boolean isUpdateLock = false;
 
     /**
      * Object of the player's inventory for EliteMobs.

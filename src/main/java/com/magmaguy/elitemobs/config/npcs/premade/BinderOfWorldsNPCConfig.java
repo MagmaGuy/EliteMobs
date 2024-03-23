@@ -6,6 +6,7 @@ import org.bukkit.entity.Villager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class BinderOfWorldsNPCConfig extends NPCsConfigFields {
     public BinderOfWorldsNPCConfig() {
@@ -15,7 +16,7 @@ public class BinderOfWorldsNPCConfig extends NPCsConfigFields {
                 "<[200] Binder of Worlds Teleport>",
                 Villager.Profession.ARMORER,
                 "em_adventurers_guild,294.5,91,223.5,180,0",
-                Arrays.asList(
+                List.of(
                         "You are not prepared."),
                 Arrays.asList(
                         "The things I've seen...\\nYou wouldn't believe it.",

@@ -21,9 +21,9 @@ public class EliteScript extends ElitePower implements Cloneable {
     @Getter
     private final ScriptZone scriptZone;
     private final ScriptCooldowns scriptCooldowns;
+    private final ScriptConditions scriptConditions;
     @Getter
     protected Map<String, EliteScript> eliteScriptMap;
-    private final ScriptConditions scriptConditions;
 
     public EliteScript(EliteScriptBlueprint scriptBlueprint, Map<String, EliteScript> eliteScriptMap) {
         super(scriptBlueprint.getCustomConfigFields());
@@ -89,7 +89,8 @@ public class EliteScript extends ElitePower implements Cloneable {
      */
     public void check(Location landingLocation, ScriptActionData previousScriptActionData) {
         //Check if the event conditions are met
-        if (scriptConditions != null && !scriptConditions.meetsPreActionConditions(previousScriptActionData.getEliteEntity(), null)) return;
+        if (scriptConditions != null && !scriptConditions.meetsPreActionConditions(previousScriptActionData.getEliteEntity(), null))
+            return;
         //Let's do some actions
         scriptActions.runScripts(previousScriptActionData, landingLocation);
         //Cooldowns time

@@ -37,18 +37,18 @@ public class Navigation implements Listener {
         if (NMSManager.getAdapter() == null) return;
         if (regionalBossEntity.getUnsyncedLivingEntity() != null &&
                 regionalBossEntity.getUnsyncedLivingEntity().getType() == EntityType.ENDER_DRAGON) return;
-            NMSManager.getAdapter().wanderBackToPoint(
-                            regionalBossEntity.getLivingEntity(),
-                            regionalBossEntity.getSpawnLocation(),
-                            regionalBossEntity.getLeashRadius(),
-                            20 * 5)
-                    .setSpeed(2f)
-                    .setStopReturnDistance(0)
-                    .setGoalRefreshCooldownTicks(20 * 3)
-                    .setHardObjective(true)
-                    .setTeleportOnFail(true)
-                    .setStartWithCooldown(true)
-                    .register();
+        NMSManager.getAdapter().wanderBackToPoint(
+                        regionalBossEntity.getLivingEntity(),
+                        regionalBossEntity.getSpawnLocation(),
+                        regionalBossEntity.getLeashRadius(),
+                        20 * 5)
+                .setSpeed(2f)
+                .setStopReturnDistance(0)
+                .setGoalRefreshCooldownTicks(20 * 3)
+                .setHardObjective(true)
+                .setTeleportOnFail(true)
+                .setStartWithCooldown(true)
+                .register();
     }
 
     @EventHandler(ignoreCancelled = true)

@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EnchantedBookPlasmaBootsConfig extends CustomItemsConfigFields {
-    public EnchantedBookPlasmaBootsConfig(){
+    public EnchantedBookPlasmaBootsConfig() {
         super("enchanted_book_plasma_boots",
                 true,
                 Material.BOOK,

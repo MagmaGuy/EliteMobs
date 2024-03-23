@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.menus;
 
-import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
@@ -52,23 +51,23 @@ public class UnbindMenu extends EliteMenu {
         String menuName = UnbinderMenuConfig.getShopName();
         if (ResourcePackDataConfig.isDisplayCustomMenuUnicodes())
             menuName = ChatColor.WHITE + "\uF801\uDB80\uDC9B\uF805          " + menuName;
-        Inventory UnbinderInventory = Bukkit.createInventory(player, 54, menuName);
+        Inventory UnbinderInventory = Bukkit.createInventory(player, 45, menuName);
 
         for (int i = 0; i < UnbinderInventory.getSize(); i++) {
 
-            if (i == UnbinderMenuConfig.getInfoSlot()) {
-                ItemStack infoButton = UnbinderMenuConfig.getInfoButton();
-                if (ResourcePackDataConfig.isDisplayCustomMenuUnicodes()) {
-                    infoButton.setType(Material.PAPER);
-                    ItemMeta itemMeta = infoButton.getItemMeta();
-                    itemMeta.setCustomModelData(MetadataHandler.signatureID);
-                    infoButton.setItemMeta(itemMeta);
-                }
-                UnbinderInventory.setItem(i, infoButton);
-                continue;
-            }
+//            if (i == UnbinderMenuConfig.getInfoSlot()) {
+//                ItemStack infoButton = UnbinderMenuConfig.getInfoButton();
+//                if (ResourcePackDataConfig.isDisplayCustomMenuUnicodes()) {
+//                    infoButton.setType(Material.PAPER);
+//                    ItemMeta itemMeta = infoButton.getItemMeta();
+//                    itemMeta.setCustomModelData(MetadataHandler.signatureID);
+//                    infoButton.setItemMeta(itemMeta);
+//                }
+//                UnbinderInventory.setItem(i, infoButton);
+//                continue;
+//            }
 
-            if (i == UnbinderMenuConfig.getCancelSlot()) {
+            if (UnbinderMenuConfig.getCancelSlots().contains(i)) {
                 UnbinderInventory.setItem(i, UnbinderMenuConfig.getCancelButton());
                 continue;
             }
@@ -89,7 +88,7 @@ public class UnbindMenu extends EliteMenu {
             }
 
 
-            if (i == UnbinderMenuConfig.getConfirmSlot()) {
+            if (UnbinderMenuConfig.getConfirmSlots().contains(i)) {
 
                 ItemStack clonedConfirmButton = UnbinderMenuConfig.getConfirmButton().clone();
 
@@ -162,18 +161,18 @@ public class UnbindMenu extends EliteMenu {
                 }
 
                 //cancel button
-                if (event.getSlot() == UnbinderMenuConfig.getCancelSlot()) {
+                if (UnbinderMenuConfig.getCancelSlots().contains(event.getSlot())) {
                     player.closeInventory();
                     return;
                 }
 
                 //confirm button
-                if (event.getSlot() == UnbinderMenuConfig.getConfirmSlot()) {
+                if (UnbinderMenuConfig.getConfirmSlots().contains(event.getSlot())) {
                     if (unbinderInventory.getItem(outputSlot) != null) {
                         unbinderInventory.setItem(UnbinderMenuConfig.getEliteItemInputSlot(), null);
                         unbinderInventory.setItem(UnbinderMenuConfig.getEliteUnbindInputSlot(), null);
                         if (unbinderInventory.getItem(outputSlot) != null) {
-                            HashMap<Integer,ItemStack>map =player.getInventory().addItem(unbinderInventory.getItem(outputSlot));
+                            HashMap<Integer, ItemStack> map = player.getInventory().addItem(unbinderInventory.getItem(outputSlot));
                             if (!map.isEmpty()) map.forEach((key, itemStack) -> {
                                 itemStack.setAmount(key);
                                 player.getWorld().dropItem(player.getLocation(), itemStack);

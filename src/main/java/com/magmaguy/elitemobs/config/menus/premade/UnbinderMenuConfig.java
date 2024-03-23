@@ -16,16 +16,16 @@ public class UnbinderMenuConfig extends MenusConfigFields {
 
     @Getter
     private static String shopName;
-    @Getter
-    private static ItemStack infoButton;
+    //    @Getter
+//    private static ItemStack infoButton;
     @Getter
     private static ItemStack eliteItemInputInfoButton;
     @Getter
     private static ItemStack eliteUnbindInputInfoButton;
     @Getter
     private static ItemStack outputInfoButton;
-    @Getter
-    private static int infoSlot;
+    //    @Getter
+//    private static int infoSlot;
     @Getter
     private static int eliteItemInputInformationSlot;
     @Getter
@@ -41,11 +41,11 @@ public class UnbinderMenuConfig extends MenusConfigFields {
     @Getter
     private static ItemStack cancelButton;
     @Getter
-    private static int cancelSlot;
+    private static List<Integer> cancelSlots;
     @Getter
     private static ItemStack confirmButton;
     @Getter
-    private static int confirmSlot;
+    private static List<Integer> confirmSlots;
 
     public UnbinderMenuConfig() {
         super("unbind_menu", true);
@@ -53,18 +53,9 @@ public class UnbinderMenuConfig extends MenusConfigFields {
 
     @Override
     public void processAdditionalFields() {
-        shopName = ConfigurationEngine.setString(file, fileConfiguration, "shopName", "[EM] Unbind menu!", true);
-        ItemStackSerializer.serialize(
-                "infoButton",
-                ItemStackGenerator.generateSkullItemStack("magmaguy",
-                        "&4&lEliteMobs &r&cby &4&lMagmaGuy",
-                        Arrays.asList("&8Support the plugins you enjoy!",
-                                "&aUse an &5Unbind Scroll &ato remove Soulbind from an item!"), MetadataHandler.signatureID),
-                fileConfiguration);
-        infoButton = ItemStackSerializer.deserialize("infoButton", fileConfiguration);
-        infoSlot = ConfigurationEngine.setInt(fileConfiguration, "infoButtonSlot", 4);
-        eliteItemInputInformationSlot = ConfigurationEngine.setInt(fileConfiguration, "eliteItemInputInformationSlot", 20);
-        eliteItemInputSlot = ConfigurationEngine.setInt(fileConfiguration, "eliteItemInputSlot", 29);
+        shopName = ConfigurationEngine.setString(file, fileConfiguration, "menuTitle", ":offset_-8::elitemob_unbind:", true);
+        eliteItemInputInformationSlot = ConfigurationEngine.setInt(fileConfiguration, "eliteItemInputInformationSlot", 2);
+        eliteItemInputSlot = ConfigurationEngine.setInt(fileConfiguration, "eliteItemInputSlot", 11);
         ItemStackSerializer.serialize(
                 "eliteItemInputInformationButton",
                 ItemStackGenerator.generateItemStack(Material.GREEN_BANNER,
@@ -72,8 +63,8 @@ public class UnbinderMenuConfig extends MenusConfigFields {
                         List.of("&aThis slot is for your elite item!"), MetadataHandler.signatureID),
                 fileConfiguration);
         eliteItemInputInfoButton = ItemStackSerializer.deserialize("eliteItemInputInformationButton", fileConfiguration);
-        eliteScrapInputInformationSlot = ConfigurationEngine.setInt(fileConfiguration, "unbindScrollInputInformationSlot", 22);
-        eliteUnbindInputSlot = ConfigurationEngine.setInt(fileConfiguration, "unbindScrollInputSlot", 31);
+        eliteScrapInputInformationSlot = ConfigurationEngine.setInt(fileConfiguration, "unbindScrollInputInformationSlot", 4);
+        eliteUnbindInputSlot = ConfigurationEngine.setInt(fileConfiguration, "unbindScrollInputSlot", 13);
         ItemStackSerializer.serialize(
                 "unbindScrollInputInformationButton",
                 ItemStackGenerator.generateItemStack(Material.GREEN_BANNER,
@@ -81,8 +72,8 @@ public class UnbinderMenuConfig extends MenusConfigFields {
                         List.of("&aThis slot is for your &9Unbind Scroll&a!"), MetadataHandler.signatureID),
                 fileConfiguration);
         eliteUnbindInputInfoButton = ItemStackSerializer.deserialize("unbindScrollInputInformationButton", fileConfiguration);
-        outputInformationSlot = ConfigurationEngine.setInt(fileConfiguration, "informationOutputButtonSlot", 24);
-        outputSlot = ConfigurationEngine.setInt(fileConfiguration, "outputSlot", 33);
+        outputInformationSlot = ConfigurationEngine.setInt(fileConfiguration, "informationOutputButtonSlot", 6);
+        outputSlot = ConfigurationEngine.setInt(fileConfiguration, "outputSlot", 15);
         ItemStackSerializer.serialize("cancelButton", ItemStackGenerator.generateItemStack(Material.BARRIER,
                 "&4Cancel", List.of("&cCancel unbind!"), MetadataHandler.signatureID), fileConfiguration);
         ItemStackSerializer.serialize(
@@ -93,10 +84,10 @@ public class UnbinderMenuConfig extends MenusConfigFields {
                 fileConfiguration);
         outputInfoButton = ItemStackSerializer.deserialize("outputInformationButton", fileConfiguration);
         cancelButton = ItemStackSerializer.deserialize("cancelButton", fileConfiguration);
-        cancelSlot = ConfigurationEngine.setInt(fileConfiguration, "cancelButtonSlot", 27);
+        cancelSlots = ConfigurationEngine.setInt(fileConfiguration, "cancelButtonSlots", Arrays.asList(29, 30, 38, 39));
         ItemStackSerializer.serialize("confirmButton", ItemStackGenerator.generateItemStack(Material.EMERALD,
                 "&2Confirm!", List.of("&aUnbind item!"), 31175), fileConfiguration);
         confirmButton = ItemStackSerializer.deserialize("confirmButton", fileConfiguration);
-        confirmSlot = ConfigurationEngine.setInt(fileConfiguration, "confirmUnbindSlot", 35);
+        confirmSlots = ConfigurationEngine.setInt(fileConfiguration, "confirmUnbindSlots", Arrays.asList(32, 33, 41, 42));
     }
 }

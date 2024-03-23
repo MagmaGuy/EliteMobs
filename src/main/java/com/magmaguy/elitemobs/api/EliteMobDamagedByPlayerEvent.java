@@ -31,24 +31,17 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 
 import java.util.concurrent.ThreadLocalRandom;
 
+@Getter
 public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
 
     private static final HandlerList handlers = new HandlerList();
-    @Getter
     private final Entity entity;
-    @Getter
     private final EliteEntity eliteMobEntity;
-    @Getter
     private final Player player;
-    @Getter
     private final EntityDamageByEntityEvent entityDamageByEntityEvent;
-    @Getter
     private final boolean criticalStrike;
-    @Getter
     private final boolean isCustomDamage;
-    @Getter
     private final double damageModifier;
-    @Getter
     public boolean rangedAttack;
 
     /**
@@ -88,7 +81,7 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
     public static class EliteMobDamagedByPlayerEventFilter implements Listener {
         public static boolean bypass = false;
 
-        private static double getThornsDamage(Player player) {
+        static double getThornsDamage(Player player) {
             if (!ItemSettingsConfig.isUseEliteEnchantments()) return 0D;
             ElitePlayerInventory elitePlayerInventory = ElitePlayerInventory.getPlayer(player);
             int thornsLevel = 0;
@@ -109,7 +102,7 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
          * @param player Damager
          * @return Bonus damage applied
          */
-        private static double getEliteMeleeDamage(Player player, LivingEntity livingEntity) {
+        static double getEliteMeleeDamage(Player player, LivingEntity livingEntity) {
             if (player.getInventory().getItemInMainHand().getType().equals(Material.BOW) || player.getInventory().getItemInMainHand().getType().equals(Material.CROSSBOW))
                 return 0.0;
             double eliteDamage = ElitePlayerInventory.getPlayer(player).getEliteDamage(true);
@@ -117,7 +110,7 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
             return (eliteDamage + bonusEliteDamage) * player.getAttackCooldown();
         }
 
-        private static double getEliteRangedDamage(Projectile arrow) {
+        static double getEliteRangedDamage(Projectile arrow) {
             //note: the arrow velocity amplitude at full load is about 2.8
             double arrowSpeedMultiplier = Math.sqrt(Math.pow(arrow.getVelocity().getX(), 2D) + Math.pow(arrow.getVelocity().getY(), 2D) + Math.pow(arrow.getVelocity().getZ(), 2D));
             arrowSpeedMultiplier /= 4.0D;
@@ -148,7 +141,7 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
             return 0;
         }
 
-        private static boolean isCriticalHit(Player player) {
+        static boolean isCriticalHit(Player player) {
             double criticalStrike = ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getCritChance(false);
             criticalStrike += (GuildRank.critBonusValue(GuildRank.getGuildPrestigeRank(player), GuildRank.getActiveGuildRank(player)) / 100);
             return ThreadLocalRandom.current().nextDouble() < criticalStrike;
@@ -258,7 +251,7 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
         private void runAntiexploit(EliteEntity eliteEntity, EntityDamageByEntityEvent event, EliteMobDamagedByPlayerEvent eliteMobDamagedByPlayerEvent) {
             if (EliteMobs.worldGuardIsEnabled) {
                 Boolean regionQuery = WorldGuardFlagChecker.checkNullableFlag(eliteEntity.getLocation(), WorldGuardCompatibility.getELITEMOBS_ANTIEXPLOIT());
-                if (regionQuery != null && regionQuery == false) return;
+                if (regionQuery != null && !regionQuery) return;
             }
             if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK &&
                     event.getCause() != EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK &&

@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.playerdata.database;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.Quest;
@@ -9,6 +10,7 @@ import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.ObjectSerializer;
 import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.zaxxer.hikari.HikariDataSource;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -31,59 +33,46 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
+@Setter
 public class PlayerData {
-
     @Getter
     private static final String DATABASE_NAME = "player_data.db";
     @Getter
     private static final String PLAYER_DATA_TABLE_NAME = "PlayerData";
     @Getter
     private static final HashMap<UUID, PlayerData> playerDataHashMap = new HashMap<>();
+    @Getter
+    private static HikariDataSource hikari = null;
     private static Connection connection = null;
     @Getter
-    @Setter
     private double currency;
     @Getter
-    @Setter
     private int guildPrestigeLevel;
     @Getter
-    @Setter
     private int maxGuildLevel;
     @Getter
-    @Setter
     private int activeGuildLevel;
     @Getter
-    @Setter
     private int score;
     @Getter
-    @Setter
     private int kills;
     @Getter
-    @Setter
     private int highestLevelKilled;
     @Getter
-    @Setter
     private int deaths;
     @Getter
-    @Setter
     private int questsCompleted;
     @Getter
-    @Setter
     private List<Quest> quests = new ArrayList<>();
     @Getter
-    @Setter
     private PlayerQuestCooldowns playerQuestCooldowns = null;
     @Getter
-    @Setter
     private Location backTeleportLocation;
     @Getter
-    @Setter
     private boolean useBookMenus;
     @Getter
-    @Setter
     private boolean dismissEMStatusScreenMessage;
     @Getter
-    @Setter
     //This is currently not stored in the database, time will tell if it is necessary to do so
     private MatchInstance matchInstance = null;
 
@@ -141,8 +130,7 @@ public class PlayerData {
         List<Quest> playerQuests = getQuests(uuid);
         try {
             setDatabaseValue(uuid, "QuestStatus", ObjectSerializer.toString((ArrayList) playerQuests));
-            if (playerDataHashMap.containsKey(uuid))
-                playerDataHashMap.get(uuid).quests = playerQuests;
+            if (playerDataHashMap.containsKey(uuid)) playerDataHashMap.get(uuid).quests = playerQuests;
         } catch (Exception ex) {
             new WarningMessage("Failed to serialize player quest data!");
             ex.printStackTrace();
@@ -162,8 +150,7 @@ public class PlayerData {
     }
 
     public static String getDisplayName(UUID uuid) {
-        if (!isInMemory(uuid))
-            return getDatabaseString(uuid, "DisplayName");
+        if (!isInMemory(uuid)) return getDatabaseString(uuid, "DisplayName");
 
         return Bukkit.getPlayer(uuid).getCustomName();
     }
@@ -173,63 +160,52 @@ public class PlayerData {
     }
 
     public static double getCurrency(UUID uuid) {
-        if (!isInMemory(uuid))
-            return getDatabaseDouble(uuid, "Currency");
+        if (!isInMemory(uuid)) return getDatabaseDouble(uuid, "Currency");
         return playerDataHashMap.get(uuid).currency;
     }
 
     public static double getCurrency(UUID uuid, boolean databaseAccess) {
-        if (!isInMemory(uuid))
-            if (databaseAccess)
-                return getDatabaseDouble(uuid, "Currency");
-            else
-                //default fallback value for when PAPI suddenly decides to start querying the database thousands of times per second
-                return 0;
+        if (!isInMemory(uuid)) if (databaseAccess) return getDatabaseDouble(uuid, "Currency");
+        else
+            //default fallback value for when PAPI suddenly decides to start querying the database thousands of times per second
+            return 0;
         return playerDataHashMap.get(uuid).currency;
     }
 
     public static void setCurrency(UUID uuid, double currency) {
         setDatabaseValue(uuid, "Currency", currency);
-        if (playerDataHashMap.containsKey(uuid))
-            playerDataHashMap.get(uuid).currency = currency;
+        if (playerDataHashMap.containsKey(uuid)) playerDataHashMap.get(uuid).currency = currency;
     }
 
     public static int getGuildPrestigeLevel(UUID uuid) {
-        if (!isInMemory(uuid))
-            return getDatabaseInteger(uuid, "GuildPrestigeLevel");
+        if (!isInMemory(uuid)) return getDatabaseInteger(uuid, "GuildPrestigeLevel");
         return playerDataHashMap.get(uuid).guildPrestigeLevel;
     }
 
     public static int getGuildPrestigeLevel(UUID uuid, boolean databaseAccess) {
-        if (!isInMemory(uuid))
-            if (databaseAccess)
-                return getDatabaseInteger(uuid, "GuildPrestigeLevel");
-            else
-                //default fallback value for when PAPI suddenly decides to start querying the database thousands of times per second
-                return 0;
+        if (!isInMemory(uuid)) if (databaseAccess) return getDatabaseInteger(uuid, "GuildPrestigeLevel");
+        else
+            //default fallback value for when PAPI suddenly decides to start querying the database thousands of times per second
+            return 0;
         return playerDataHashMap.get(uuid).guildPrestigeLevel;
     }
 
     public static void setGuildPrestigeLevel(UUID uuid, int newPrestigeLevel) {
         setDatabaseValue(uuid, "GuildPrestigeLevel", newPrestigeLevel);
-        if (playerDataHashMap.containsKey(uuid))
-            playerDataHashMap.get(uuid).guildPrestigeLevel = newPrestigeLevel;
+        if (playerDataHashMap.containsKey(uuid)) playerDataHashMap.get(uuid).guildPrestigeLevel = newPrestigeLevel;
     }
 
     public static int getMaxGuildLevel(UUID uuid) {
-        if (!isInMemory(uuid))
-            return getDatabaseInteger(uuid, "GuildMaxLevel");
+        if (!isInMemory(uuid)) return getDatabaseInteger(uuid, "GuildMaxLevel");
 
         return playerDataHashMap.get(uuid).maxGuildLevel;
     }
 
     public static int getMaxGuildLevel(UUID uuid, boolean databaseAccess) {
-        if (!isInMemory(uuid))
-            if (databaseAccess)
-                return getDatabaseInteger(uuid, "GuildMaxLevel");
-            else
-                //default fallback value for when PAPI suddenly decides to start querying the database thousands of times per second
-                return 0;
+        if (!isInMemory(uuid)) if (databaseAccess) return getDatabaseInteger(uuid, "GuildMaxLevel");
+        else
+            //default fallback value for when PAPI suddenly decides to start querying the database thousands of times per second
+            return 0;
 
         return playerDataHashMap.get(uuid).maxGuildLevel;
     }
@@ -237,24 +213,20 @@ public class PlayerData {
     public static void setMaxGuildLevel(UUID uuid, int maxGuildLevel) {
         setDatabaseValue(uuid, "GuildMaxLevel", maxGuildLevel);
 
-        if (playerDataHashMap.containsKey(uuid))
-            playerDataHashMap.get(uuid).maxGuildLevel = maxGuildLevel;
+        if (playerDataHashMap.containsKey(uuid)) playerDataHashMap.get(uuid).maxGuildLevel = maxGuildLevel;
     }
 
     public static int getActiveGuildLevel(UUID uuid) {
-        if (!isInMemory(uuid))
-            return getDatabaseInteger(uuid, "GuildActiveLevel");
+        if (!isInMemory(uuid)) return getDatabaseInteger(uuid, "GuildActiveLevel");
 
         return playerDataHashMap.get(uuid).activeGuildLevel;
     }
 
     public static int getActiveGuildLevel(UUID uuid, boolean databaseAccess) {
-        if (!isInMemory(uuid))
-            if (databaseAccess)
-                return getDatabaseInteger(uuid, "GuildActiveLevel");
-            else
-                //default fallback value for when PAPI suddenly decides to start querying the database thousands of times per second
-                return 0;
+        if (!isInMemory(uuid)) if (databaseAccess) return getDatabaseInteger(uuid, "GuildActiveLevel");
+        else
+            //default fallback value for when PAPI suddenly decides to start querying the database thousands of times per second
+            return 0;
 
         return playerDataHashMap.get(uuid).activeGuildLevel;
     }
@@ -262,8 +234,7 @@ public class PlayerData {
     public static void setActiveGuildLevel(UUID uuid, int activeGuildLevel) {
         setDatabaseValue(uuid, "GuildActiveLevel", activeGuildLevel);
 
-        if (playerDataHashMap.containsKey(uuid))
-            playerDataHashMap.get(uuid).activeGuildLevel = activeGuildLevel;
+        if (playerDataHashMap.containsKey(uuid)) playerDataHashMap.get(uuid).activeGuildLevel = activeGuildLevel;
     }
 
     public static List<Quest> getQuests(UUID uuid) {
@@ -292,14 +263,12 @@ public class PlayerData {
         try {
             if (!isInMemory(uuid))
                 questList = (List<Quest>) ObjectSerializer.fromString((String) getDatabaseBlob(uuid, "QuestStatus"));
-            else
-                questList = playerDataHashMap.get(uuid).quests;
+            else questList = playerDataHashMap.get(uuid).quests;
         } catch (Exception ex) {
             return null;
         }
         for (Quest iteratedQuest : questList)
-            if (iteratedQuest.getQuestID().equals(questUUID))
-                return iteratedQuest;
+            if (iteratedQuest.getQuestID().equals(questUUID)) return iteratedQuest;
         return null;
     }
 
@@ -392,39 +361,33 @@ public class PlayerData {
     }
 
     public static int getScore(UUID uuid) {
-        if (!isInMemory(uuid))
-            return getDatabaseInteger(uuid, "Score");
+        if (!isInMemory(uuid)) return getDatabaseInteger(uuid, "Score");
         return playerDataHashMap.get(uuid).score;
     }
 
     public static void incrementScore(UUID uuid, int levelToIncrement) {
         setDatabaseValue(uuid, "Score", getScore(uuid) + levelToIncrement * 2);
 
-        if (playerDataHashMap.containsKey(uuid))
-            playerDataHashMap.get(uuid).score += (levelToIncrement * 2);
+        if (playerDataHashMap.containsKey(uuid)) playerDataHashMap.get(uuid).score += (levelToIncrement * 2);
     }
 
     public static void decrementScore(UUID uuid) {
         setDatabaseValue(uuid, "Score", getScore(uuid) - 100);
-        if (playerDataHashMap.containsKey(uuid))
-            playerDataHashMap.get(uuid).score -= 100;
+        if (playerDataHashMap.containsKey(uuid)) playerDataHashMap.get(uuid).score -= 100;
     }
 
     public static int getKills(UUID uuid) {
-        if (!isInMemory(uuid))
-            return getDatabaseInteger(uuid, "Kills");
+        if (!isInMemory(uuid)) return getDatabaseInteger(uuid, "Kills");
         return playerDataHashMap.get(uuid).kills;
     }
 
     public static void incrementKills(UUID uuid) {
         setDatabaseValue(uuid, "Kills", getKills(uuid) + 1);
-        if (playerDataHashMap.containsKey(uuid))
-            playerDataHashMap.get(uuid).kills += 1;
+        if (playerDataHashMap.containsKey(uuid)) playerDataHashMap.get(uuid).kills += 1;
     }
 
     public static int getHighestLevelKilled(UUID uuid) {
-        if (!isInMemory(uuid))
-            return getDatabaseInteger(uuid, "HighestLevelKilled");
+        if (!isInMemory(uuid)) return getDatabaseInteger(uuid, "HighestLevelKilled");
         return playerDataHashMap.get(uuid).highestLevelKilled;
     }
 
@@ -432,13 +395,11 @@ public class PlayerData {
         if (tentativeNewLevel < getHighestLevelKilled(uuid)) return;
         setDatabaseValue(uuid, "HighestLevelKilled", tentativeNewLevel);
 
-        if (playerDataHashMap.containsKey(uuid))
-            playerDataHashMap.get(uuid).highestLevelKilled = tentativeNewLevel;
+        if (playerDataHashMap.containsKey(uuid)) playerDataHashMap.get(uuid).highestLevelKilled = tentativeNewLevel;
     }
 
     public static int getDeaths(UUID uuid) {
-        if (!isInMemory(uuid))
-            return getDatabaseInteger(uuid, "Deaths");
+        if (!isInMemory(uuid)) return getDatabaseInteger(uuid, "Deaths");
 
         return playerDataHashMap.get(uuid).deaths;
     }
@@ -446,13 +407,11 @@ public class PlayerData {
     public static void incrementDeaths(UUID uuid) {
         setDatabaseValue(uuid, "Deaths", getDeaths(uuid) + 1);
 
-        if (playerDataHashMap.containsKey(uuid))
-            playerDataHashMap.get(uuid).deaths += 1;
+        if (playerDataHashMap.containsKey(uuid)) playerDataHashMap.get(uuid).deaths += 1;
     }
 
     public static int getQuestsCompleted(UUID uuid) {
-        if (!isInMemory(uuid))
-            return getDatabaseInteger(uuid, "QuestsCompleted");
+        if (!isInMemory(uuid)) return getDatabaseInteger(uuid, "QuestsCompleted");
 
         return playerDataHashMap.get(uuid).questsCompleted;
     }
@@ -460,8 +419,7 @@ public class PlayerData {
     public static void incrementQuestsCompleted(UUID uuid) {
         setDatabaseValue(uuid, "QuestsCompleted", getQuestsCompleted(uuid) + 1);
 
-        if (playerDataHashMap.containsKey(uuid))
-            playerDataHashMap.get(uuid).questsCompleted += 1;
+        if (playerDataHashMap.containsKey(uuid)) playerDataHashMap.get(uuid).questsCompleted += 1;
     }
 
     public static Location getBackTeleportLocation(Player player) {
@@ -477,8 +435,7 @@ public class PlayerData {
     }
 
     public static boolean getUseBookMenus(UUID uuid) {
-        if (!isInMemory(uuid))
-            return getDatabaseBoolean(uuid, "UseBookMenus");
+        if (!isInMemory(uuid)) return getDatabaseBoolean(uuid, "UseBookMenus");
         return playerDataHashMap.get(uuid).useBookMenus;
     }
 
@@ -488,8 +445,7 @@ public class PlayerData {
     }
 
     public static boolean getDismissEMStatusScreenMessage(UUID uuid) {
-        if (!isInMemory(uuid))
-            return getDatabaseBoolean(uuid, "DismissEMStatusScreenMessage");
+        if (!isInMemory(uuid)) return getDatabaseBoolean(uuid, "DismissEMStatusScreenMessage");
         return playerDataHashMap.get(uuid).dismissEMStatusScreenMessage;
     }
 
@@ -570,13 +526,37 @@ public class PlayerData {
     }
 
     public static Connection getConnection() throws Exception {
-        File dataFolder = new File(MetadataHandler.PLUGIN.getDataFolder(), "data/" + DATABASE_NAME);
-        if (connection == null || connection.isClosed()) {
-            Class.forName("org.sqlite.JDBC");
-            connection = DriverManager.getConnection("jdbc:sqlite:" + dataFolder);
-            connection.setAutoCommit(true);
-        }
+        if (connection != null && !connection.isClosed()) return connection;
+        if (EconomySettingsConfig.isEnableMYSQL()) return getMySQLConnect();
+        return getSQLiteConnect();
+    }
+
+    public static Connection getMySQLConnect() throws SQLException {
+        if (hikari != null) return hikari.getConnection();
+        HikariDataSource hikari = getHikariDataSource();
+        connection = hikari.getConnection();
         return connection;
+    }
+
+    public static Connection getSQLiteConnect() throws SQLException, ClassNotFoundException {
+        File dataFolder = new File(MetadataHandler.PLUGIN.getDataFolder(), "data/" + DATABASE_NAME);
+        Class.forName("org.sqlite.JDBC");
+        connection = DriverManager.getConnection("jdbc:sqlite:" + dataFolder);
+        connection.setAutoCommit(true);
+        return connection;
+    }
+
+    private static HikariDataSource getHikariDataSource() {
+        if (hikari == null) hikari = new HikariDataSource();
+        hikari.setJdbcUrl("jdbc:mysql://" + EconomySettingsConfig.getMYSQLHost() + ":" + EconomySettingsConfig.getMYSQLPort() + "/" + EconomySettingsConfig.getMYSQLDatabase() + "?useSSL=" + EconomySettingsConfig.isMYSQLUseSSL());
+        hikari.setUsername(EconomySettingsConfig.getMYSQLUsername());
+        hikari.setPassword(EconomySettingsConfig.getMYSQLPassword());
+        hikari.setMaximumPoolSize(10);
+        hikari.setConnectionTimeout(10000);
+        hikari.setIdleTimeout(600000);
+        hikari.setMaxLifetime(1800000);
+
+        return hikari;
     }
 
     public static void initializeDatabaseConnection() {
@@ -600,6 +580,35 @@ public class PlayerData {
             connection.close();
         } catch (Exception ex) {
             new WarningMessage("Could not correctly close database connection.");
+        }
+    }
+
+    public static void convertDatabase(Connection fromConnection, Connection toConnection) {
+        try {
+            Statement sqliteStatement = fromConnection.createStatement();
+            Statement mysqlStatement = toConnection.createStatement();
+            ResultSet sqliteResultSet = sqliteStatement.executeQuery("SELECT * FROM " + PLAYER_DATA_TABLE_NAME + ";");
+            while (sqliteResultSet.next()) {
+                String sql = "INSERT INTO " + PLAYER_DATA_TABLE_NAME + " (PlayerUUID," + " DisplayName," + " Currency," + " GuildPrestigeLevel," + " GuildMaxLevel," + " GuildActiveLevel," + " Score," + " Kills," + " HighestLevelKilled," + " Deaths," + " QuestsCompleted) " +
+                        "VALUES ('" + sqliteResultSet.getString("PlayerUUID") + "'," +
+                        " '" + sqliteResultSet.getString("DisplayName") + "'," +
+                        " " + sqliteResultSet.getDouble("Currency") + "," +
+                        " " + sqliteResultSet.getInt("GuildPrestigeLevel") + "," +
+                        " " + sqliteResultSet.getInt("GuildMaxLevel") + "," +
+                        " " + sqliteResultSet.getInt("GuildActiveLevel") + "," +
+                        " " + sqliteResultSet.getInt("Score") + "," +
+                        " " + sqliteResultSet.getInt("Kills") + "," +
+                        " " + sqliteResultSet.getInt("HighestLevelKilled") + "," +
+                        " " + sqliteResultSet.getInt("Deaths") + "," +
+                        " " + sqliteResultSet.getInt("QuestsCompleted") + ");";
+                mysqlStatement.executeUpdate(sql);
+            }
+            sqliteResultSet.close();
+            sqliteStatement.close();
+            mysqlStatement.close();
+        } catch (Exception e) {
+            new WarningMessage("Failed to convert databases");
+            new WarningMessage(e.getClass().getName() + ": " + e.getMessage());
         }
     }
 
@@ -677,18 +686,7 @@ public class PlayerData {
         deaths = 0;
         questsCompleted = 0;
         statement = getConnection().createStatement();
-        String sql = "INSERT INTO " + PLAYER_DATA_TABLE_NAME +
-                " (PlayerUUID," +
-                " DisplayName," +
-                " Currency," +
-                " GuildPrestigeLevel," +
-                " GuildMaxLevel," +
-                " GuildActiveLevel," +
-                " Score," +
-                " Kills," +
-                " HighestLevelKilled," +
-                " Deaths," +
-                " QuestsCompleted) " +
+        String sql = "INSERT INTO " + PLAYER_DATA_TABLE_NAME + " (PlayerUUID," + " DisplayName," + " Currency," + " GuildPrestigeLevel," + " GuildMaxLevel," + " GuildActiveLevel," + " Score," + " Kills," + " HighestLevelKilled," + " Deaths," + " QuestsCompleted) " +
                 //identifier
                 "VALUES ('" + uuid + "'," +
                 //display name

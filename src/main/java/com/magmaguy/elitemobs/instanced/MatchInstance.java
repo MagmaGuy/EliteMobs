@@ -40,7 +40,7 @@ public abstract class MatchInstance {
     protected final Map<Player, Location> previousPlayerLocations = new HashMap<>();
     @Getter
     protected HashSet<Player> players = new HashSet<>();
-    protected HashMap<Player, Integer> playerLives = new HashMap();
+    protected HashMap<Player, Integer> playerLives = new HashMap<>();
     @Getter
     protected HashSet<Player> participants = new HashSet<>();
     protected HashSet<Player> spectators = new HashSet<>();

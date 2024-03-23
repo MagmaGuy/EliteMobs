@@ -58,7 +58,7 @@ public class LootMenu extends EliteMenu {
     public static void openMenu(Player player) {
         LootMenu lootMenu = playerLoot.get(player);
         if (lootMenu == null) {
-            player.sendMessage(ChatColorConverter.convert("&4[EliteMobs] &6You don't currently have any group loot to vote on!"));
+            player.sendMessage(ChatColorConverter.convert("&4[EliteRabbit] &6You don't currently have any group loot to vote on!"));
             return;
         }
         player.openInventory(lootMenu.renderMenu());

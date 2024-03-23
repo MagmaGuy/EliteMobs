@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.menus;
 
-import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
@@ -58,23 +57,10 @@ public class RepairMenu extends EliteMenu {
         if (ResourcePackDataConfig.isDisplayCustomMenuUnicodes())
             menuName = ChatColor.WHITE + "\uF801\uDB80\uDC2A\uF805           " + menuName;
 
-        Inventory repairInventory = Bukkit.createInventory(player, 54, menuName);
+        Inventory repairInventory = Bukkit.createInventory(player, 45, menuName);
 
         for (int i = 0; i < repairInventory.getSize(); i++) {
-
-            if (i == RepairMenuConfig.infoSlot) {
-                ItemStack infoButton = RepairMenuConfig.infoButton;
-                if (ResourcePackDataConfig.isDisplayCustomMenuUnicodes()) {
-                    infoButton.setType(Material.PAPER);
-                    ItemMeta itemMeta = infoButton.getItemMeta();
-                    itemMeta.setCustomModelData(MetadataHandler.signatureID);
-                    infoButton.setItemMeta(itemMeta);
-                }
-                repairInventory.setItem(i, infoButton);
-                continue;
-            }
-
-            if (i == RepairMenuConfig.cancelSlot) {
+            if (RepairMenuConfig.cancelSlots.contains(i)) {
                 repairInventory.setItem(i, RepairMenuConfig.cancelButton);
                 continue;
             }
@@ -95,7 +81,7 @@ public class RepairMenu extends EliteMenu {
             }
 
 
-            if (i == RepairMenuConfig.confirmSlot) {
+            if (RepairMenuConfig.confirmSlots.contains(i)) {
 
                 ItemStack clonedConfirmButton = RepairMenuConfig.confirmButton.clone();
 
@@ -170,13 +156,13 @@ public class RepairMenu extends EliteMenu {
                 }
 
                 //cancel button
-                if (event.getSlot() == RepairMenuConfig.cancelSlot) {
+                if (RepairMenuConfig.cancelSlots.contains(event.getSlot())) {
                     player.closeInventory();
                     return;
                 }
 
                 //confirm button
-                if (event.getSlot() == RepairMenuConfig.confirmSlot) {
+                if (RepairMenuConfig.confirmSlots.contains(event.getSlot())) {
                     if (repairInventory.getItem(outputSlot) != null) {
                         repairInventory.setItem(RepairMenuConfig.eliteItemInputSlot, null);
                         repairInventory.setItem(RepairMenuConfig.eliteScrapInputSlot, null);

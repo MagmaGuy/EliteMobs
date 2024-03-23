@@ -11,13 +11,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Cuboid extends Shape {
-    private Location centerLocation = null;
-    private List<Vector> locationVectors = null;
-    private List<Vector> edgeVectors = null;
     private final double x;
     private final double y;
     private final double xBorder;
     private final double yBorder;
+    private Location centerLocation = null;
+    private List<Vector> locationVectors = null;
+    private List<Vector> edgeVectors = null;
     private double z;
     private double zBorder;
 
@@ -44,8 +44,8 @@ public class Cuboid extends Shape {
     @Override
     public boolean contains(LivingEntity livingEntity) {
         BoundingBox boundingBox = new BoundingBox(
-                x / 2D + centerLocation.getBlockX(), y / 2D + centerLocation.getBlockY(), z/ 2D + centerLocation.getBlockZ() ,
-                -x / 2D + centerLocation.getBlockX(), centerLocation.getBlockY(), -z/ 2D + centerLocation.getBlockZ());
+                x / 2D + centerLocation.getBlockX(), y / 2D + centerLocation.getBlockY(), z / 2D + centerLocation.getBlockZ(),
+                -x / 2D + centerLocation.getBlockX(), centerLocation.getBlockY(), -z / 2D + centerLocation.getBlockZ());
         return livingEntity.getBoundingBox().overlaps(boundingBox);
     }
 

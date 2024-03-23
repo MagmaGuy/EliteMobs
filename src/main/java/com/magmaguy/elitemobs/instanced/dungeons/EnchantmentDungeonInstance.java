@@ -22,15 +22,11 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 
+@Setter
+@Getter
 public class EnchantmentDungeonInstance extends DungeonInstance {
-    @Getter
-    @Setter
     Player player;
-    @Getter
-    @Setter
     private ItemStack upgradedItem;
-    @Getter
-    @Setter
     private ItemStack currentItem;
 
     public EnchantmentDungeonInstance(DungeonPackagerConfigFields dungeonPackagerConfigFields,

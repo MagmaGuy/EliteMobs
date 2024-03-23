@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EnchantedBookOxygenConfig extends CustomItemsConfigFields {
-    public EnchantedBookOxygenConfig(){
+    public EnchantedBookOxygenConfig() {
         super("enchanted_book_oxygen",
                 true,
                 Material.BOOK,

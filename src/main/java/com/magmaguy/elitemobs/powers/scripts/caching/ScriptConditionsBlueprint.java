@@ -63,9 +63,11 @@ public class ScriptConditionsBlueprint {
             case "hastags" -> hasTags = MapListInterpreter.parseStringList(key, value, scriptName);
             case "doesnothavetags" -> doesNotHaveTags = MapListInterpreter.parseStringList(key, value, scriptName);
             case "isonfloor" -> isOnFloor = MapListInterpreter.parseBoolean(key, value, scriptName);
-            case "isstandingonmaterial" -> isStandingOnMaterial = MapListInterpreter.parseEnum(key, value, Material.class, scriptName);
+            case "isstandingonmaterial" ->
+                    isStandingOnMaterial = MapListInterpreter.parseEnum(key, value, Material.class, scriptName);
             case "randomchance" -> randomChance = MapListInterpreter.parseDouble(key, value, scriptName);
-            case "conditiontype" -> conditionType = MapListInterpreter.parseEnum(key, value, ConditionType.class, scriptName);
+            case "conditiontype" ->
+                    conditionType = MapListInterpreter.parseEnum(key, value, ConditionType.class, scriptName);
             case "target" -> {
                 if (value instanceof MemorySection memorySection)
                     value = memorySection.getValues(false);

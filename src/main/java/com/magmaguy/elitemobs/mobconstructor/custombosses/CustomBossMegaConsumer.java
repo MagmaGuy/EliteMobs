@@ -50,6 +50,19 @@ public class CustomBossMegaConsumer {
         this.bypassesWorldGuardSpawn = customBossEntity.getBypassesProtections();
     }
 
+    protected static void setName(LivingEntity livingEntity, CustomBossEntity customBossEntity, int level) {
+        String parsedName = ChatColorConverter.convert(customBossEntity.customBossesConfigFields.getName().replace("$level", level + "")
+                .replace("$normalLevel", ChatColorConverter.convert("&2[&a" + level + "&2]&f"))
+                .replace("$minibossLevel", ChatColorConverter.convert("&6〖&e" + level + "&6〗&f"))
+                .replace("$bossLevel", ChatColorConverter.convert("&4『&c" + level + "&4』&f"))
+                .replace("$reinforcementLevel", ChatColorConverter.convert("&8〔&7") + level + "&8〕&f")
+                .replace("$eventBossLevel", ChatColorConverter.convert("&4「&c" + level + "&4」&f")));
+        livingEntity.setCustomName(parsedName);
+        livingEntity.setCustomNameVisible(DefaultConfig.isAlwaysShowNametags());
+        DisguiseEntity.setDisguiseNameVisibility(DefaultConfig.isAlwaysShowNametags(), livingEntity, parsedName);
+        customBossEntity.setName(parsedName, false);
+    }
+
     /**
      * Attempts to spawn a {@link CustomBossEntity} whose spawn location has already been set.
      *
@@ -76,19 +89,6 @@ public class CustomBossMegaConsumer {
         setCustomModel(livingEntity);
         customBossEntity.setLivingEntity(livingEntity, CreatureSpawnEvent.SpawnReason.CUSTOM);
         return livingEntity;
-    }
-
-    protected static void setName(LivingEntity livingEntity, CustomBossEntity customBossEntity, int level) {
-        String parsedName = ChatColorConverter.convert(customBossEntity.customBossesConfigFields.getName().replace("$level", level + "")
-                .replace("$normalLevel", ChatColorConverter.convert("&2[&a" + level + "&2]&f"))
-                .replace("$minibossLevel", ChatColorConverter.convert("&6〖&e" + level + "&6〗&f"))
-                .replace("$bossLevel", ChatColorConverter.convert("&4『&c" + level + "&4』&f"))
-                .replace("$reinforcementLevel", ChatColorConverter.convert("&8〔&7") + level + "&8〕&f")
-                .replace("$eventBossLevel", ChatColorConverter.convert("&4「&c" + level + "&4」&f")));
-        livingEntity.setCustomName(parsedName);
-        livingEntity.setCustomNameVisible(DefaultConfig.isAlwaysShowNametags());
-        DisguiseEntity.setDisguiseNameVisibility(DefaultConfig.isAlwaysShowNametags(), livingEntity, parsedName);
-        customBossEntity.setName(parsedName, false);
     }
 
     private void setBaby(LivingEntity livingEntity) {
@@ -173,8 +173,8 @@ public class CustomBossMegaConsumer {
                 ((EnderDragon) livingEntity).getDragonBattle().generateEndPortal(false);
         }
 
-        if (livingEntity instanceof Slime){
-            ((Slime)livingEntity).setSize(customBossEntity.getCustomBossesConfigFields().getSlimeSize());
+        if (livingEntity instanceof Slime) {
+            ((Slime) livingEntity).setSize(customBossEntity.getCustomBossesConfigFields().getSlimeSize());
         }
         EntityTracker.registerEliteMob(customBossEntity, livingEntity);
     }

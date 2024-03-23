@@ -34,7 +34,7 @@ public class SpawnCommand {
         EliteEntity eliteEntity = new EliteEntity();
         eliteEntity.setLevel(level);
 
-        if (powers.isPresent()){
+        if (powers.isPresent()) {
             HashSet<PowersConfigFields> mobPowers = getPowers(powers.get(), player);
             eliteEntity.applyPowers(mobPowers);
         } else {
@@ -160,20 +160,19 @@ public class SpawnCommand {
 
         HashSet<PowersConfigFields> elitePowers = new HashSet<>();
 
-        if (mobPowers.length > 0)
-            for (String string : mobPowers) {
-                PowersConfigFields powersConfigFields = PowersConfig.getPower(string);
-                if (powersConfigFields == null) {
-                    commandSender.sendMessage("[EliteMobs] Power " + string + " is not a valid power! Valid powers:");
-                    StringBuilder allPowers = new StringBuilder();
-                    for (CustomConfigFields iteratedField : ElitePower.getElitePowers().values())
-                        allPowers.append(iteratedField.getFilename()).append(", ");
-                    allPowers.append("custom");
-                    commandSender.sendMessage(allPowers.toString());
-                    return new HashSet<>();
-                }
-                elitePowers.add(powersConfigFields);
+        for (String string : mobPowers) {
+            PowersConfigFields powersConfigFields = PowersConfig.getPower(string);
+            if (powersConfigFields == null) {
+                commandSender.sendMessage("[EliteMobs] Power " + string + " is not a valid power! Valid powers:");
+                StringBuilder allPowers = new StringBuilder();
+                for (CustomConfigFields iteratedField : ElitePower.getElitePowers().values())
+                    allPowers.append(iteratedField.getFilename()).append(", ");
+                allPowers.append("custom");
+                commandSender.sendMessage(allPowers.toString());
+                return new HashSet<>();
             }
+            elitePowers.add(powersConfigFields);
+        }
         return elitePowers;
     }
 

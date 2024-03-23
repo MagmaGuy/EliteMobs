@@ -79,7 +79,7 @@ import java.util.List;
 
 public class EliteMobs extends JavaPlugin {
 
-    public static List<World> validWorldList = new ArrayList();
+    public static List<World> validWorldList = new ArrayList<>();
     public static boolean worldGuardIsEnabled = false;
     public static List<World> zoneBasedSpawningWorlds = new ArrayList<>();
     public static List<World> nightmareWorlds = new ArrayList<>();
@@ -279,8 +279,7 @@ public class EliteMobs extends JavaPlugin {
         try {
             new CustomSpawnConfig();
         } catch (Exception ex) {
-            new WarningMessage("You are using a version of Spigot or a branch thereof (Paper, Purpur, so on) that is (probably) HORRIBLY outdated!" + " This issue will probably be fixed if you update your server version to the latest patch of the version" +
-                    " you are running.");
+            new WarningMessage("You are using a version of Spigot or a branch thereof (Paper, Purpur, so on) that is (probably) HORRIBLY outdated!" + " This issue will probably be fixed if you update your server version to the latest patch of the version" + " you are running.");
             new WarningMessage(" This does not mean that you have to update your Minecraft version, but it does mean you must update your server version to the latest patch" + " available for that Minecraft version. Download from trustworthy sources, as if you download Spigot from some random website other than Spigot," + " you are probably not getting the latest version (and also there's a high chance you'll get a virus).");
         }
 
@@ -386,7 +385,7 @@ public class EliteMobs extends JavaPlugin {
         Bukkit.getLogger().info("[EliteMobs] Saving EliteMobs databases...");
         PlayerData.closeConnection();
         Bukkit.getLogger().info("[EliteMobs] All done! Good night.");
-
+        if (PlayerData.getHikari() != null) PlayerData.getHikari().close();
     }
 
     /*

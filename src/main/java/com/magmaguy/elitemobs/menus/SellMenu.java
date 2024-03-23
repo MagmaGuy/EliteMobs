@@ -74,17 +74,12 @@ public class SellMenu extends EliteMenu implements Listener {
 
         for (int i = 0; i < 54; i++) {
 
-            if (i == SellMenuConfig.infoSlot) {
-                sellInventory.setItem(i, SellMenuConfig.infoButton);
-                continue;
-            }
-
-            if (i == SellMenuConfig.cancelSlot) {
+            if (SellMenuConfig.cancelSlots.contains(i)) {
                 sellInventory.setItem(i, SellMenuConfig.cancelButton);
                 continue;
             }
 
-            if (i == SellMenuConfig.confirmSlot) {
+            if (SellMenuConfig.confirmSlots.contains(i)) {
 
                 ItemStack clonedConfirmButton = SellMenuConfig.confirmButton.clone();
 
@@ -157,17 +152,18 @@ public class SellMenu extends EliteMenu implements Listener {
             playerInventory.clear(event.getSlot());
 
             //Update worth of things to be sold, now using cached prices
-            event.getInventory().setItem(SellMenuConfig.confirmSlot, updateConfirmButton(calculateShopValue(shopInventory, player)));
-
+            //event.getInventory().setItem(SellMenuConfig.confirmSlots, updateConfirmButton(calculateShopValue(shopInventory, player)));
+            for (int i : SellMenuConfig.confirmSlots)
+                event.getInventory().setItem(i, updateConfirmButton(calculateShopValue(shopInventory, player)));
         } else {
             //CASE: Player clicked on the shop
 
             //Signature item, does nothing
-            if (currentItem.equals(SellMenuConfig.infoButton))
-                return;
+//            if (currentItem.equals(SellMenuConfig.infoButton))
+//                return;
 
             //sell items in shop
-            if (event.getSlot() == SellMenuConfig.confirmSlot) {
+            if (SellMenuConfig.confirmSlots.contains(event.getSlot())) {
 
                 int amount = (int) validSlots.stream().filter(validSlot -> shopInventory.getItem(validSlot) != null).count();
                 double totalItemValue = 0;
@@ -204,7 +200,7 @@ public class SellMenu extends EliteMenu implements Listener {
             }
 
             //cancel, transfer items back to player inv and exit
-            if (event.getSlot() == SellMenuConfig.cancelSlot) {
+            if (SellMenuConfig.cancelSlots.contains(event.getSlot())) {
                 event.getWhoClicked().closeInventory();
                 return;
             }
@@ -217,8 +213,9 @@ public class SellMenu extends EliteMenu implements Listener {
             playerInventory.addItem(event.getCurrentItem());
             shopInventory.clear(event.getSlot());
 
-            event.getInventory().setItem(SellMenuConfig.confirmSlot, updateConfirmButton(calculateShopValue(shopInventory, player)));
-
+            //event.getInventory().setItem(SellMenuConfig.confirmSlot, updateConfirmButton(calculateShopValue(shopInventory, player)));
+            for (int i : SellMenuConfig.confirmSlots)
+                event.getInventory().setItem(i, updateConfirmButton(calculateShopValue(shopInventory, player)));
         }
     }
 
