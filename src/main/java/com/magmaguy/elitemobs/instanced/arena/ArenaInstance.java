@@ -36,13 +36,16 @@ public class ArenaInstance extends MatchInstance {
     @Getter
     private static final HashMap<String, ArenaInstance> arenaInstances = new HashMap<>();
     @Getter
-    private CustomArenasConfigFields customArenasConfigFields;
-    @Getter
-    private ArenaWaves arenaWaves;
-    @Getter
     private final HashSet<CustomBossEntity> customBosses = new HashSet<>();
     private final HashSet<Entity> nonEliteMobsEntities = new HashSet<>();
     private final HashMap<Integer, String> waveMessage = new HashMap<>();
+    @Getter
+    private final HashMap<Player, Double> roundDamage = new HashMap<>();
+    protected HashMap<String, Location> spawnPoints = new HashMap<>();
+    @Getter
+    private CustomArenasConfigFields customArenasConfigFields;
+    @Getter
+    private ArenaWaves arenaWaves;
     private int minX;
     private int maxX;
     private int minY;
@@ -50,9 +53,6 @@ public class ArenaInstance extends MatchInstance {
     private int minZ;
     private int maxZ;
     private boolean cylindricalArena;
-    @Getter
-    private final HashMap<Player, Double> roundDamage = new HashMap<>();
-    protected HashMap<String, Location> spawnPoints = new HashMap<>();
     @Getter
     private int currentWave = 0;
     @Getter
@@ -221,8 +221,8 @@ public class ArenaInstance extends MatchInstance {
                 for (CustomBossEntity customBossEntity : (HashSet<CustomBossEntity>) customBosses.clone())
                     if (!customBossEntity.exists()) removeBoss(customBossEntity);
                 if (!nonEliteMobsEntities.isEmpty())
-                for (Entity entity : (HashSet<Entity>) nonEliteMobsEntities.clone())
-                    if (!entity.isValid()) removeBoss(entity);
+                    for (Entity entity : (HashSet<Entity>) nonEliteMobsEntities.clone())
+                        if (!entity.isValid()) removeBoss(entity);
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0L, 20L);
     }
@@ -259,8 +259,13 @@ public class ArenaInstance extends MatchInstance {
 
             } else {
                 //MythicMobs integration
-                Entity mythicMob = MythicMobsInterface.spawn(spawnPoints.get(arenaEntity.getSpawnPointName()),arenaEntity.getBossfile(), arenaEntity.getLevel());
-                if (mythicMob != null)                nonEliteMobsEntities.add(mythicMob);
+                try {
+                    Entity mythicMob = MythicMobsInterface.spawn(spawnPoints.get(arenaEntity.getSpawnPointName()), arenaEntity.getBossfile(), arenaEntity.getLevel());
+                    if (mythicMob != null) nonEliteMobsEntities.add(mythicMob);
+                    else new WarningMessage("Failed to spawn MythicMobs entity '"+ arenaEntity.getBossfile() +"' at spawn point " + arenaEntity.getSpawnPointName() + " with level " + arenaEntity.getLevel() + " because MythicMobs did not recognize the name of the entity!");
+                } catch (Exception e){
+                    new WarningMessage("Failed to spawn MythicMobs entity '"+ arenaEntity.getBossfile() +"' at spawn point " + arenaEntity.getSpawnPointName() + " with level " + arenaEntity.getLevel() + " due to a MythicMobs error - there is a high chance mob spawning is being prevented in this area!");
+                }
             }
         }
     }

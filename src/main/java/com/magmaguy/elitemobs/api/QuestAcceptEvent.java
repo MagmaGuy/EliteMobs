@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.Quest;
 import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
 
@@ -69,6 +70,12 @@ public class QuestAcceptEvent extends Event implements Cancellable {
                         !customQuest.getCustomQuestsConfigFields().getQuestAcceptDialog().isEmpty())
                     for (String dialog : customQuest.getCustomQuestsConfigFields().getQuestAcceptDialog())
                         event.getPlayer().sendMessage(dialog);
+
+                if (customQuest.getCustomQuestsConfigFields().getQuestAcceptSound() != null)
+                    Bukkit.getPlayer(customQuest.getPlayerUUID()).playSound(
+                            Bukkit.getPlayer(customQuest.getPlayerUUID()),
+                            customQuest.getCustomQuestsConfigFields().getQuestAcceptSound(),
+                            1f, 1f);
             }
             if (!QuestsConfig.isAutoTrackQuestsOnAccept())
                 event.getQuest().getQuestObjectives().displayTemporaryObjectivesScoreboard(event.getPlayer());
