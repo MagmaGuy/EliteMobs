@@ -62,6 +62,13 @@ public class CustomQuestsConfigFields extends CustomConfigFields implements Cust
     @Getter
     @Setter
     private boolean trackable = true;
+    @Getter
+    @Setter
+    private String questAcceptSound;
+    @Getter
+    @Setter
+    private String questCompleteSound;
+
 
     public CustomQuestsConfigFields(String filename,
                                     boolean isEnabled,
@@ -115,6 +122,9 @@ public class CustomQuestsConfigFields extends CustomConfigFields implements Cust
         this.turnInNPC = processString("turnInNPC", turnInNPC, "", false);
         this.trackable = processBoolean("trackable", trackable, true, false);
         this.questLevel = processInt("questLevel", questLevel, 0, false);
+//        this.questMenuOpenSound = processString("questMenuOpenSound", questMenuOpenSound, "", false);
+        this.questAcceptSound = processString("questAcceptSound", questAcceptSound, "", false);
+        this.questCompleteSound = processString("questCompleteSound", questCompleteSound, "", false);
     }
 
     private void updateOldStringFormat(List<String> oldList) {
