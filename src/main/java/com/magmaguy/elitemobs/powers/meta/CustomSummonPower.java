@@ -47,11 +47,11 @@ public class CustomSummonPower extends ElitePower implements Listener {
         addEntry(powerObject, customBossesConfigFields.getFilename());
     }
 
-    public static void summonReinforcement(EliteEntity summoningEntity, Location spawnLocation, String reinforcementFilename, int duration) {
+    public static CustomBossEntity summonReinforcement(EliteEntity summoningEntity, Location spawnLocation, String reinforcementFilename, int duration) {
         CustomBossesConfigFields fields = CustomBossesConfig.getCustomBoss(reinforcementFilename);
         if (fields == null) {
             new WarningMessage("Attempted to summon reinforcement " + reinforcementFilename + " which is not a valid reinforcement!");
-            return;
+            return null;
         }
         CustomBossEntity customBossEntity = new CustomBossEntity(fields);
         customBossEntity.setSummoningEntity(summoningEntity);
@@ -60,6 +60,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
         summoningEntity.addReinforcement(customBossEntity);
         if (duration > 0) CustomBossEscapeMechanism.startEscapeTicks(duration, customBossEntity);
         customBossEntity.spawn(spawnLocation, true);
+        return customBossEntity;
     }
 
     public static BukkitTask summonGlobalReinforcement(CustomBossReinforcement customBossReinforcement, CustomBossEntity summoningEntity) {
