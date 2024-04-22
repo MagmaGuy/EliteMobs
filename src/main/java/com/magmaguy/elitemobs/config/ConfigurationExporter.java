@@ -3,8 +3,10 @@ package com.magmaguy.elitemobs.config;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.thirdparty.custommodels.CustomModel;
-import com.magmaguy.elitemobs.utils.*;
-import org.bukkit.ChatColor;
+import com.magmaguy.elitemobs.utils.InfoMessage;
+import com.magmaguy.elitemobs.utils.SpigotMessage;
+import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.elitemobs.utils.ZipFile;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -101,7 +103,7 @@ public class ConfigurationExporter {
         }
         String sha1 = null;
         try {
-            sha1 = sha1Code(zippedResourcePack);
+            sha1 = sha1CodeString(zippedResourcePack);
         } catch (Exception ex) {
             commandSender.sendMessage("[EliteMobs] Failed to generate SHA-1 code! Report this to the dev!");
             ex.printStackTrace();
@@ -114,7 +116,7 @@ public class ConfigurationExporter {
         return sha1;
     }
 
-    public static String sha1Code(File file) throws IOException, NoSuchAlgorithmException {
+    public static String sha1CodeString(File file) throws IOException, NoSuchAlgorithmException {
         FileInputStream fileInputStream = new FileInputStream(file);
         MessageDigest digest = MessageDigest.getInstance("SHA-1");
         DigestInputStream digestInputStream = new DigestInputStream(fileInputStream, digest);
@@ -123,6 +125,16 @@ public class ConfigurationExporter {
         while (digestInputStream.read(bytes) > 0) digest = digestInputStream.getMessageDigest();
         byte[] resultByteArry = digest.digest();
         return bytesToHexString(resultByteArry);
+    }
+
+    public static byte[] sha1CodeByteArray(File file) throws IOException, NoSuchAlgorithmException {
+        FileInputStream fileInputStream = new FileInputStream(file);
+        MessageDigest digest = MessageDigest.getInstance("SHA-1");
+        DigestInputStream digestInputStream = new DigestInputStream(fileInputStream, digest);
+        byte[] bytes = new byte[1024];
+        // read all file content
+        while (digestInputStream.read(bytes) > 0) digest = digestInputStream.getMessageDigest();
+        return digest.digest();
     }
 
     public static String bytesToHexString(byte[] bytes) {
@@ -168,32 +180,5 @@ public class ConfigurationExporter {
             new WarningMessage("Failed to copy directories for " + file.getName() + "! Tell the dev!");
             exception.printStackTrace();
         }
-    }
-
-    public static void overwriteSHA1(CommandSender commandSender) {
-        File serverProperties = null;
-        try {
-            serverProperties = new File(Paths.get(MetadataHandler.PLUGIN.getDataFolder().getParentFile().getCanonicalFile().getParentFile().toString() + File.separatorChar + "server.properties").toString());
-            if (!serverProperties.exists()) {
-                commandSender.sendMessage("[EliteMobs] Could not find server.properties file correctly! You will have to set the SHA-1 value manually!");
-                return;
-            }
-        } catch (Exception exception) {
-            new WarningMessage("[EliteMobs] Could not find server.properties file correctly! You will have to set the SHA-1 value manually.");
-            exception.printStackTrace();
-            return;
-        }
-
-        String sha1 = generateResourcePackSHA1(commandSender);
-        if (sha1 == null) return;
-        if (ServerPropertiesModifier.modify(commandSender, "resource-pack-sha1", sha1)) {
-
-            commandSender.sendMessage(ChatColor.GREEN + "[EliteMobs] Successfully set the value resource-pack-sha1=" + sha1 + " in server.properties!");
-            commandSender.sendMessage(ChatColor.RED + "[EliteMobs] Don't forget to update the downloadable resource pack at your online location of choice!" + " If you don't update the version people download things won't work correctly!");
-            commandSender.sendMessage(ChatColor.GREEN + "[EliteMobs] The server.properties modification will work starting with the next restart!");
-        } else {
-            commandSender.sendMessage(ChatColor.RED + "[EliteMobs] Failed to write SHA1 value! You will have to add this manually. For reference, you SHA1 value is " + sha1);
-        }
-
     }
 }

@@ -64,8 +64,7 @@ public class DungeonUtils {
             WorldCreator worldCreator = new WorldCreator(worldName);
             worldCreator.environment(environment);
             World world = Bukkit.createWorld(worldCreator);
-            if (world != null)
-                world.setKeepSpawnInMemory(false);
+            if (world != null) world.setKeepSpawnInMemory(false);
             world.setDifficulty(Difficulty.HARD);
             Bukkit.getLogger().setFilter(previousFilter);
             return world;

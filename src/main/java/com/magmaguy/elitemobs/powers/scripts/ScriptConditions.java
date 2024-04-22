@@ -81,7 +81,6 @@ public class ScriptConditions {
         if (conditionsBlueprint.getIsOnFloor() == null) return true;
         Block currentBlock = targetLocation.getBlock();
         Block floorBlock = targetLocation.clone().subtract(0, 1, 0).getBlock();
-        //Developer.message("Running isOnFloor" + eliteScript.getFileName());
         return conditionsBlueprint.getIsOnFloor() == !currentBlock.getType().isSolid() && floorBlock.getType().isSolid();
     }
 

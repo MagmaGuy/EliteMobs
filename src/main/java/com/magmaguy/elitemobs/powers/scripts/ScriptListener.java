@@ -10,6 +10,7 @@ import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 
@@ -21,61 +22,67 @@ public class ScriptListener implements Listener {
 
     @EventHandler
     public void onEliteMobDamagedByPlayerEvent(EliteMobDamagedByPlayerEvent event) {
+        if (event.isCancelled()) return;
         runEvent(event, event.getEliteMobEntity(), event.getPlayer());
     }
 
     @EventHandler
     public void onEliteMobDamagedByEliteMobEvent(EliteMobDamagedByEliteMobEvent event) {
+        if (event.isCancelled()) return;
         runEvent(event, event.getDamager());
     }
 
     @EventHandler
     public void onEliteMobDamagedEvent(EliteMobDamagedEvent event) {
+        if (event.isCancelled()) return;
         runEvent(event, event.getEliteEntity());
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onEliteMobsEnterCombatEvent(EliteMobEnterCombatEvent event) {
         runEvent(event, event.getEliteMobEntity(), event.getTargetEntity());
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onEliteMobDeathEvent(EliteMobDeathEvent event) {
         runEvent(event, event.getEliteEntity());
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onEliteMobExitCombatEvent(EliteMobExitCombatEvent event) {
         runEvent(event, event.getEliteMobEntity());
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onEliteMobHealEvent(EliteMobHealEvent event) {
+        if (event.isCancelled()) return;
         runEvent(event, event.getEliteEntity());
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onEliteMobTargetPlayerEvent(EliteMobTargetPlayerEvent event) {
         runEvent(event, event.getEliteMobEntity(), event.getPlayer());
     }
 
     @EventHandler
     public void onPlayerDamagedByEliteMobEvent(PlayerDamagedByEliteMobEvent event) {
+        if (event.isCancelled()) return;
         runEvent(event, event.getEliteMobEntity(), event.getPlayer());
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onEliteMobSpawnEvent(EliteMobSpawnEvent event) {
+        if (event.isCancelled()) return;
         runEvent(event, event.getEliteMobEntity());
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onElitePhaseSwitchEvent(ElitePhaseSwitchEvent event) {
         runEvent(event, event.getCustomBossEntity());
     }
 
     //This is use to track falling blocks
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onEntityChangeBlockEvent(EntityChangeBlockEvent event) {
         if (fallingBlocks.isEmpty()) return;
         FallingEntityDataPair fallingEntityDataPair = fallingBlocks.get(event.getEntity());

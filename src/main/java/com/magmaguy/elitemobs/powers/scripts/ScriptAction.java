@@ -123,50 +123,56 @@ public class ScriptAction {
         //This caches the tracking mostly for zones to start at the wait time. This matters if you are making zones
         //that go through a warning phase and then a damage phase.
         scriptTargets.cacheTargets(scriptActionData);
-        //First wait for allotted amount of time
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (blueprint.getRepeatEvery() > 0)
-                    //if it's a repeating task, run task repeatedly
-                    new BukkitRunnable() {
-                        int counter = 0;
+        if (blueprint.getWait() > 0) {
+            //First wait for allotted amount of time
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    runScriptTask(scriptActionData);
+                }
+            }.runTaskLater(MetadataHandler.PLUGIN, blueprint.getWait());
+        } else runScriptTask(scriptActionData);
+    }
 
-                        @Override
-                        public void run() {
-                            counter++;
-                            //Check if the script conditions of action are met, since repeating actions might've stopped being valid
-                            if (blueprint.getConditionsBlueprint() != null &&
-                                    !scriptConditions.meetsActionConditions(scriptActionData)) {
-                                cancel();
-                                return;
-                            }
-                            //If it has run for the allotted amount times, stop
-                            if (blueprint.getTimes() > 0 && counter > blueprint.getTimes()) {
-                                cancel();
-                                return;
-                            }
+    private void runScriptTask(ScriptActionData scriptActionData) {
+        if (blueprint.getRepeatEvery() > 0)
+            //if it's a repeating task, run task repeatedly
+            new BukkitRunnable() {
+                int counter = 0;
 
-                            //If a boss is dead and a script is set to repeat "forever", then the script should end when the boss dies
-                            if (blueprint.getTimes() < 0 && !scriptActionData.getEliteEntity().isValid()) {
-                                cancel();
-                                return;
-                            }
-
-                            //Otherwise, run the condition
-                            runActions(scriptActionData);
-                        }
-                    }.runTaskTimer(MetadataHandler.PLUGIN, 0, blueprint.getRepeatEvery());
-                else {
-                    //Check for blocking conditions
+                @Override
+                public void run() {
+                    counter++;
+                    //Check if the script conditions of action are met, since repeating actions might've stopped being valid
                     if (blueprint.getConditionsBlueprint() != null &&
-                            !scriptConditions.meetsActionConditions(scriptActionData))
+                            !scriptConditions.meetsActionConditions(scriptActionData)) {
+                        cancel();
                         return;
-                    //If it's not a repeating task, just run it normally
+                    }
+                    //If it has run for the allotted amount times, stop
+                    if (blueprint.getTimes() > 0 && counter > blueprint.getTimes()) {
+                        cancel();
+                        return;
+                    }
+
+                    //If a boss is dead and a script is set to repeat "forever", then the script should end when the boss dies
+                    if (blueprint.getTimes() < 0 && !scriptActionData.getEliteEntity().isValid()) {
+                        cancel();
+                        return;
+                    }
+
+                    //Otherwise, run the condition
                     runActions(scriptActionData);
                 }
-            }
-        }.runTaskLater(MetadataHandler.PLUGIN, blueprint.getWait());
+            }.runTaskTimer(MetadataHandler.PLUGIN, 0, blueprint.getRepeatEvery());
+        else {
+            //Check for blocking conditions
+            if (blueprint.getConditionsBlueprint() != null &&
+                    !scriptConditions.meetsActionConditions(scriptActionData))
+                return;
+            //If it's not a repeating task, just run it normally
+            runActions(scriptActionData);
+        }
     }
 
     /**
@@ -597,8 +603,10 @@ public class ScriptAction {
     }
 
     private void runModifyDamage(ScriptActionData scriptActionData) {
-        if (scriptActionData.getEvent() instanceof EliteDamageEvent eliteDamageEvent)
+
+        if (scriptActionData.getEvent() instanceof EliteDamageEvent eliteDamageEvent) {
             eliteDamageEvent.setDamage(eliteDamageEvent.getDamage() * blueprint.getMultiplier());
+        }
     }
 
     private void runSummonEntity(ScriptActionData scriptActionData) {

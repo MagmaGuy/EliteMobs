@@ -67,8 +67,14 @@ public class DungeonInstance extends MatchInstance {
         this.difficultyName = difficultyName;
         setDifficulty(difficultyName);
         addNewPlayer(player);
-        instancedBossEntities = InstancedBossEntity.initializeInstancedBosses(dungeonPackagerConfigFields.getWorldName(), world, players.size(), this);
-        NPCEntity.initializeInstancedNPCs(dungeonPackagerConfigFields.getWorldName(), world, players.size(), this);
+        DungeonInstance dungeonInstance = this;
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                instancedBossEntities = InstancedBossEntity.initializeInstancedBosses(dungeonPackagerConfigFields.getWorldName(), world, players.size(), dungeonInstance);
+                NPCEntity.initializeInstancedNPCs(dungeonPackagerConfigFields.getWorldName(), world, players.size(), dungeonInstance);
+            }
+        }.runTaskLater(MetadataHandler.PLUGIN, 20*3L);
         dungeonInstances.add(this);
         super.permission = dungeonPackagerConfigFields.getPermission();
     }

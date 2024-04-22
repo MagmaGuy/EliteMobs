@@ -63,16 +63,17 @@ public class PlayerItem {
         if (itemStack == null)
             return fillNullItem();
 
-        //case when it's the same item as before - best performance
-        if (itemStack.isSimilar(this.itemStack))
-            return false;
+//        //case when it's the same item as before - best performance todo: causes issues with the prestige system
+//        if (itemStack.isSimilar(this.itemStack))
+//            return false;
 
-        if (EnchantmentsConfig.getEnchantment(SoulbindEnchantment.key + ".yml").isEnabled())
+        if (EnchantmentsConfig.getEnchantment(SoulbindEnchantment.key + ".yml").isEnabled()) {
             if (!SoulbindEnchantment.isValidSoulbindUser(itemStack.getItemMeta(), player)) {
                 player.getWorld().dropItem(player.getLocation(), itemStack);
                 itemStack.setAmount(0);
                 itemStack = new ItemStack(Material.AIR);
             }
+        }
 
         //Neither offhand nor armor contribute to baseline damage outside of the enchants, so we reset the damage before anything
         this.eliteDamage = 0;
