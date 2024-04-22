@@ -176,6 +176,7 @@ public class CustomBossMegaConsumer {
         if (livingEntity instanceof Slime){
             ((Slime)livingEntity).setSize(customBossEntity.getCustomBossesConfigFields().getSlimeSize());
         }
+        customBossEntity.setUnsyncedLivingEntity(livingEntity);
         EntityTracker.registerEliteMob(customBossEntity, livingEntity);
     }
 

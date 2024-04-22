@@ -778,14 +778,6 @@ public class AdminCommands {
                 .meta(CommandMeta.DESCRIPTION, "Generates a resource pack for EliteMobs using ModelEngine")
                 .handler(commandContext -> ConfigurationExporter.createResourcePack(commandContext.getSender())));
 
-        // /em updateresourcepack
-        manager.command(builder.literal("updateresourcepack")
-                .senderType(CommandSender.class)
-                .permission("elitemobs.*")
-                .meta(CommandMeta.DESCRIPTION, "Updates the SHA1 texture pack code based on the zipped resource pack in the exports.")
-                .handler(commandContext -> ConfigurationExporter.overwriteSHA1(commandContext.getSender())));
-
-
         // /em quest reset player
         manager.command(builder.literal("quest")
                 .literal("reset")

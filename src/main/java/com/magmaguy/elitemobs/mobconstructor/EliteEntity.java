@@ -234,6 +234,10 @@ public class EliteEntity {
         return unsyncedLivingEntity;
     }
 
+    public void setUnsyncedLivingEntity(LivingEntity newEntity) {
+        unsyncedLivingEntity = newEntity;
+    }
+
     public void setLivingEntity(LivingEntity livingEntity, CreatureSpawnEvent.SpawnReason spawnReason) {
         if (livingEntity == null) return;
         if (!(this instanceof CustomBossEntity))

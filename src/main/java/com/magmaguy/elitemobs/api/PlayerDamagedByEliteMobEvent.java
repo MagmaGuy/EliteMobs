@@ -232,8 +232,7 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
 
             //Run the event, see if it will get cancelled or suffer further damage modifications
             PlayerDamagedByEliteMobEvent playerDamagedByEliteMobEvent = new PlayerDamagedByEliteMobEvent(eliteEntity, player, event, projectile, newDamage);
-            if (!playerDamagedByEliteMobEvent.isCancelled())
-                new EventCaller(playerDamagedByEliteMobEvent);
+            new EventCaller(playerDamagedByEliteMobEvent);
 
             //In case damage got modified along the way
             newDamage = playerDamagedByEliteMobEvent.getDamage();

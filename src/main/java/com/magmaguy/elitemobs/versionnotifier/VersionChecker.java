@@ -2,21 +2,19 @@ package com.magmaguy.elitemobs.versionnotifier;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.config.ConfigurationExporter;
-import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
-import com.magmaguy.elitemobs.utils.*;
+import com.magmaguy.elitemobs.utils.DiscordLinks;
+import com.magmaguy.elitemobs.utils.InfoMessage;
+import com.magmaguy.elitemobs.utils.SpigotMessage;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
-import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -152,51 +150,6 @@ public class VersionChecker {
     public static void check() {
         checkPluginVersion();
         checkDungeonVersions();
-        checkForEliteMobsResourcePackUpdate();
-    }
-
-    public static void checkForEliteMobsResourcePackUpdate() {
-        if (!ResourcePackDataConfig.isEliteMobsResourcePackEnabled()) return;
-        Bukkit.getScheduler().runTaskAsynchronously(MetadataHandler.PLUGIN, task -> {
-            URL fetchWebsite = null;
-            try {
-                fetchWebsite = new URL("https://www.magmaguy.com/downloads/elitemobs_resource_pack.zip");
-            } catch (MalformedURLException e) {
-                new WarningMessage("[EliteMobs] Failed to get resource pack from  https://www.magmaguy.com/downloads/elitemobs_resource_pack.zip ! This might mean the server is down, in which case you will have to host the resource pack on your own! (1)");
-                return;
-            }
-            File tempFile = new File("elitemobs_resource_pack.zip");
-            try {
-                FileUtils.copyURLToFile(fetchWebsite, tempFile);
-            } catch (IOException e) {
-                new WarningMessage("[EliteMobs] Failed to get resource pack from  https://www.magmaguy.com/downloads/elitemobs_resource_pack.zip ! This might mean the server is down, in which case you will have to host the resource pack on your own! (2)");
-                return;
-            }
-            String SHA1 = null;
-            try {
-                SHA1 = ConfigurationExporter.sha1Code(tempFile);
-            } catch (Exception e) {
-                new WarningMessage("[EliteMobs] Failed to generate your SHA1 key! You will have to do this manually, though this might mean there is a serious problem with the resource pack.");
-                return;
-            }
-            String existingSHA1 = ServerPropertiesModifier.getValue("resource-pack-sha1");
-            if (existingSHA1 == null) {
-                new WarningMessage("Failed to get the current SHA1 key!");
-                return;
-            }
-            //todo: this will require testing the next time the resource pack gets updated
-            if (!existingSHA1.equals(SHA1)) {
-                if (!ServerPropertiesModifier.modify(Bukkit.getConsoleSender(), "resource-pack-sha1", SHA1)) {
-                    new WarningMessage("Failed to set new SHA1 which should be " + SHA1 + " ! You will have to do this manually.");
-                    return;
-                } else {
-                    new InfoMessage("Successfully set the new SHA1 value!");
-                    new WarningMessage("Changing the SHA1 key requires a restart to apply correctly! Restart as soon as possible!");
-                    SHA1Updated = true;
-                }
-                new InfoMessage("The EliteMobs resource pack has updated! The SHA1 code will be updated to match the new resource pack!");
-            }
-        });
     }
 
     public static class VersionCheckerEvents implements Listener {

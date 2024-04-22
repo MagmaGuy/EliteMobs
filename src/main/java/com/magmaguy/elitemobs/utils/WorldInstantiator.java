@@ -84,6 +84,7 @@ public class WorldInstantiator {
                 }
             }
         }
+        highestNumber++;
         return blueprintWorldName + "_" + highestNumber;
     }
 }
