@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.items.itemconstructor;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.items.EliteItemLore;
 import com.magmaguy.elitemobs.items.ItemTagger;
@@ -9,14 +10,17 @@ import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffectContainer;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 public class ItemConstructor {
 
@@ -31,7 +35,8 @@ public class ItemConstructor {
                                           Player player,
                                           boolean showItemWorth,
                                           int customModelID,
-                                          boolean soulbound) {
+                                          boolean soulbound,
+                                          String filename) {
         /*
         Construct initial item
          */
@@ -74,6 +79,11 @@ public class ItemConstructor {
             itemMeta.setCustomModelData(customModelID);
             itemStack.setItemMeta(itemMeta);
         }
+
+
+        //Register filename of the custom item into the persistent metadata
+        Objects.requireNonNull(itemMeta).getPersistentDataContainer().set(new NamespacedKey(MetadataHandler.PLUGIN, filename), PersistentDataType.STRING, filename);
+        itemStack.setItemMeta(itemMeta);
 
         return commonFeatures(itemStack, eliteEntity, player, enchantments, customEnchantments, showItemWorth, soulbound);
     }
