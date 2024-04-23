@@ -100,6 +100,8 @@ public class InstancedDungeonBrowser extends EliteMenu {
             if (!isTopMenu(event)) return;
             if (event.getCurrentItem() == null || event.getCurrentItem().getType().equals(Material.AIR)) return;
             InstancedDungeonBrowser instancedDungeonBrowser = inventories.get(event.getInventory());
+            event.getWhoClicked().closeInventory();
+
             //Case for creating a new instance
             if (instancedDungeonBrowser.difficultySlots.contains(event.getSlot())) {
                 DungeonInstance.setupInstancedDungeon((Player) event.getWhoClicked(),
@@ -115,7 +117,6 @@ public class InstancedDungeonBrowser extends EliteMenu {
                     case WAITING -> dungeonInstance.addNewPlayer((Player) event.getWhoClicked());
                     case COMPLETED -> event.getWhoClicked().sendMessage("[EliteMobs] This match already ended! Can't join it!");
                 }
-                event.getWhoClicked().closeInventory();
             }
         }
 

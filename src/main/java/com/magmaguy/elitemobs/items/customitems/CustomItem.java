@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.items.customitems;
 
-import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
@@ -16,15 +15,16 @@ import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataType;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 
 public class CustomItem {
 
@@ -316,11 +316,12 @@ public class CustomItem {
                         player,
                         showItemWorth,
                         customItemsConfigFields.getCustomModelID(),
-                        customItemsConfigFields.isSoulbound()
+                        customItemsConfigFields.isSoulbound(),
+                        getCustomItemsConfigFields().getFilename()
                 );
         ItemMeta itemMeta = itemStack.getItemMeta();
         //Adds the filename to the persistent data container, useful for several things but mostly used for tracking quest keys
-        Objects.requireNonNull(itemMeta).getPersistentDataContainer().set(new NamespacedKey(MetadataHandler.PLUGIN, customItemsConfigFields.getFilename()), PersistentDataType.STRING, customItemsConfigFields.getFilename());
+//        Objects.requireNonNull(itemMeta).getPersistentDataContainer().set(new NamespacedKey(MetadataHandler.PLUGIN, customItemsConfigFields.getFilename()), PersistentDataType.STRING, customItemsConfigFields.getFilename());
         itemStack.setItemMeta(itemMeta);
         return itemStack;
     }

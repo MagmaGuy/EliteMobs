@@ -91,9 +91,11 @@ public class EventsRegistrer {
 
         register(new Navigation());
 
+        register(new ResourcePackDataConfig.ResourcePackDataConfigEvents());
+
         register(new DungeonKillTargetObjective.DungeonKillTargetObjectiveListener());
 
-        register(new com.magmaguy.elitemobs.versionnotifier.VersionChecker.VersionCheckerEvents());
+        register(new VersionChecker.VersionCheckerEvents());
 
         register(new PlayerData.PlayerDataEvents());
         register(new ElitePlayerInventory.ElitePlayerInventoryEvents());
