@@ -8,7 +8,6 @@ import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
 import com.magmaguy.elitemobs.config.menus.premade.ScrapperMenuConfig;
-import com.magmaguy.elitemobs.config.menus.premade.SellMenuConfig;
 import com.magmaguy.elitemobs.items.customenchantments.RepairEnchantment;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
@@ -140,11 +139,11 @@ public class ScrapperMenu extends EliteMenu {
                 //CASE: Player clicked on the shop
 
                 //Signature item, does nothing
-                if (currentItem.equals(SellMenuConfig.infoButton))
+                if (currentItem.equals(ScrapperMenuConfig.infoButton))
                     return;
 
                 //sell items in shop
-                if (event.getSlot() == SellMenuConfig.confirmSlot) {
+                if (event.getSlot() == ScrapperMenuConfig.confirmSlot) {
                     int successes = 0;
                     int failures = 0;
                     for (Integer validSlot : validSlots) {
@@ -173,7 +172,7 @@ public class ScrapperMenu extends EliteMenu {
                 }
 
                 //cancel, transfer items back to player inv and exit
-                if (event.getSlot() == SellMenuConfig.cancelSlot) {
+                if (event.getSlot() == ScrapperMenuConfig.cancelSlot) {
                     player.closeInventory();
                     return;
                 }

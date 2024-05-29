@@ -144,7 +144,7 @@ public class DefaultConfig {
         try {
             defaultSpawnLocation = ConfigurationLocation.serialize(
                     ConfigurationEngine.setString(
-                            List.of("Sets the default spawn location of the server for EliteMobs. /em spawn will lead to this location."),
+                            List.of("Sets the default spawn location of the server for EliteMobs. /em spawntp will lead to this location."),
                             file, fileConfiguration, "defaultSpawnLocation",
                             ConfigurationLocation.deserialize(Bukkit.getWorlds().get(0).getSpawnLocation()), false));
         } catch (Exception ex) {

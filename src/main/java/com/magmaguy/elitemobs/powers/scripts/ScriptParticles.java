@@ -78,8 +78,9 @@ public class ScriptParticles {
                                         particleBlueprint.getToGreen(),
                                         particleBlueprint.getToBlue()),
                                 1));
-            else if (particleBlueprint.getParticle().equals(Particle.SPELL_MOB) ||
-                    particleBlueprint.getParticle().equals(Particle.SPELL_MOB_AMBIENT)) {
+            else if (particleBlueprint.getParticle().equals(Particle.SPELL_MOB)
+                    //|| particleBlueprint.getParticle().equals(Particle.SPELL_MOB_AMBIENT) todo: 1.20.6 changed this name
+            ) {
                 location.getWorld().spawnParticle(
                         particleBlueprint.getParticle(),
                         x,
