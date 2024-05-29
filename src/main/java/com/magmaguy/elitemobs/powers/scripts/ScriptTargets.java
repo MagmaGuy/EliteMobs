@@ -106,6 +106,12 @@ public class ScriptTargets {
 
         //If a script zone exists, it overrides the check entirely to expose zone-based fields
         Location eliteEntityLocation = scriptActionData.getEliteEntity().getLocation();
+
+        if (targetBlueprint == null) {
+            new WarningMessage("An action tried to run with an invalid target! Check which on it is by reading the startup logs and fix it! No target will be acquired for now.");
+            return new ArrayList<>();
+        }
+
         switch (targetBlueprint.getTargetType()) {
             case ALL_PLAYERS:
                 return new ArrayList<>(Bukkit.getOnlinePlayers());
@@ -222,10 +228,10 @@ public class ScriptTargets {
     private Location addOffsets(Location originalLocation, ScriptActionData scriptActionData) {
         Location location = originalLocation.clone().add(targetBlueprint.getOffset());
         //if (scriptRelativeVector == null)
-            if (targetBlueprint.getScriptRelativeVectorBlueprint() != null)
-                scriptRelativeVector = new ScriptRelativeVector(targetBlueprint.getScriptRelativeVectorBlueprint(), eliteScript, location);
-            else
-                return location;
+        if (targetBlueprint.getScriptRelativeVectorBlueprint() != null)
+            scriptRelativeVector = new ScriptRelativeVector(targetBlueprint.getScriptRelativeVectorBlueprint(), eliteScript, location);
+        else
+            return location;
 
         location.add(scriptRelativeVector.getVector(scriptActionData));
 
