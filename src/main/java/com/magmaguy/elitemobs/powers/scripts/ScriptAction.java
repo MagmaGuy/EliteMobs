@@ -123,50 +123,56 @@ public class ScriptAction {
         //This caches the tracking mostly for zones to start at the wait time. This matters if you are making zones
         //that go through a warning phase and then a damage phase.
         scriptTargets.cacheTargets(scriptActionData);
-        //First wait for allotted amount of time
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (blueprint.getRepeatEvery() > 0)
-                    //if it's a repeating task, run task repeatedly
-                    new BukkitRunnable() {
-                        int counter = 0;
+        if (blueprint.getWait() > 0) {
+            //First wait for allotted amount of time
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    runScriptTask(scriptActionData);
+                }
+            }.runTaskLater(MetadataHandler.PLUGIN, blueprint.getWait());
+        } else runScriptTask(scriptActionData);
+    }
 
-                        @Override
-                        public void run() {
-                            counter++;
-                            //Check if the script conditions of action are met, since repeating actions might've stopped being valid
-                            if (blueprint.getConditionsBlueprint() != null &&
-                                    !scriptConditions.meetsActionConditions(scriptActionData)) {
-                                cancel();
-                                return;
-                            }
-                            //If it has run for the allotted amount times, stop
-                            if (blueprint.getTimes() > 0 && counter > blueprint.getTimes()) {
-                                cancel();
-                                return;
-                            }
+    private void runScriptTask(ScriptActionData scriptActionData) {
+        if (blueprint.getRepeatEvery() > 0)
+            //if it's a repeating task, run task repeatedly
+            new BukkitRunnable() {
+                int counter = 0;
 
-                            //If a boss is dead and a script is set to repeat "forever", then the script should end when the boss dies
-                            if (blueprint.getTimes() < 0 && !scriptActionData.getEliteEntity().isValid()){
-                                cancel();
-                                return;
-                            }
-
-                            //Otherwise, run the condition
-                            runActions(scriptActionData);
-                        }
-                    }.runTaskTimer(MetadataHandler.PLUGIN, 0, blueprint.getRepeatEvery());
-                else {
-                    //Check for blocking conditions
+                @Override
+                public void run() {
+                    counter++;
+                    //Check if the script conditions of action are met, since repeating actions might've stopped being valid
                     if (blueprint.getConditionsBlueprint() != null &&
-                            !scriptConditions.meetsActionConditions(scriptActionData))
+                            !scriptConditions.meetsActionConditions(scriptActionData)) {
+                        cancel();
                         return;
-                    //If it's not a repeating task, just run it normally
+                    }
+                    //If it has run for the allotted amount times, stop
+                    if (blueprint.getTimes() > 0 && counter > blueprint.getTimes()) {
+                        cancel();
+                        return;
+                    }
+
+                    //If a boss is dead and a script is set to repeat "forever", then the script should end when the boss dies
+                    if (blueprint.getTimes() < 0 && !scriptActionData.getEliteEntity().isValid()) {
+                        cancel();
+                        return;
+                    }
+
+                    //Otherwise, run the condition
                     runActions(scriptActionData);
                 }
-            }
-        }.runTaskLater(MetadataHandler.PLUGIN, blueprint.getWait());
+            }.runTaskTimer(MetadataHandler.PLUGIN, 0, blueprint.getRepeatEvery());
+        else {
+            //Check for blocking conditions
+            if (blueprint.getConditionsBlueprint() != null &&
+                    !scriptConditions.meetsActionConditions(scriptActionData))
+                return;
+            //If it's not a repeating task, just run it normally
+            runActions(scriptActionData);
+        }
     }
 
     /**
@@ -207,7 +213,8 @@ public class ScriptAction {
             case SPAWN_FALLING_BLOCK -> runSpawnFallingBlock(scriptActionData);
             case MODIFY_DAMAGE -> runModifyDamage(scriptActionData);
             case SUMMON_ENTITY -> runSummonEntity(scriptActionData);
-            default -> new WarningMessage("Failed to determine action type " + blueprint.getActionType() + " in script " + blueprint.getScriptName() + " for file " + blueprint.getScriptFilename());
+            default ->
+                    new WarningMessage("Failed to determine action type " + blueprint.getActionType() + " in script " + blueprint.getScriptName() + " for file " + blueprint.getScriptFilename());
         }
         //Run script will have already run this
         if (!blueprint.getActionType().equals(ActionType.RUN_SCRIPT))
@@ -384,7 +391,7 @@ public class ScriptAction {
                 .replace("$bossY", eliteEntity.getLocation().getY() + "")
                 .replace("$bossZ", eliteEntity.getLocation().getZ() + "")
                 .replace("$bossLevel", eliteEntity.getLevel() + "")
-                .replace("$bossWorldName", eliteEntity.getLocation().getWorld().getName() + "");
+                .replace("$bossWorldName", eliteEntity.getLocation().getWorld().getName());
     }
 
     //Strikes visual lightning at the target location
@@ -438,7 +445,16 @@ public class ScriptAction {
     }
 
     private void runSummonReinforcement(ScriptActionData scriptActionData) {
-        getLocationTargets(scriptActionData).forEach(targetLocation -> CustomSummonPower.summonReinforcement(scriptActionData.getEliteEntity(), targetLocation, blueprint.getSValue(), blueprint.getDuration()));
+        getLocationTargets(scriptActionData).forEach(targetLocation -> {
+            CustomBossEntity customBossEntity = CustomSummonPower.summonReinforcement(scriptActionData.getEliteEntity(), targetLocation, blueprint.getSValue(), blueprint.getDuration());
+            if (customBossEntity != null &&
+                    customBossEntity.getLivingEntity() != null) {
+                if (blueprint.getScriptRelativeVectorBlueprint() != null)
+                    customBossEntity.getLivingEntity().setVelocity(new ScriptRelativeVector(blueprint.getScriptRelativeVectorBlueprint(), eliteScript, customBossEntity.getLivingEntity().getLocation()).getVector(scriptActionData));
+                else if (blueprint.getVValue() != null)
+                    customBossEntity.getLivingEntity().setVelocity(blueprint.getVValue());
+            }
+        });
     }
 
     private void runSpawnFireworks(ScriptActionData scriptActionData) {
@@ -587,8 +603,10 @@ public class ScriptAction {
     }
 
     private void runModifyDamage(ScriptActionData scriptActionData) {
-        if (scriptActionData.getEvent() instanceof EliteDamageEvent eliteDamageEvent)
+
+        if (scriptActionData.getEvent() instanceof EliteDamageEvent eliteDamageEvent) {
             eliteDamageEvent.setDamage(eliteDamageEvent.getDamage() * blueprint.getMultiplier());
+        }
     }
 
     private void runSummonEntity(ScriptActionData scriptActionData) {
@@ -605,7 +623,7 @@ public class ScriptAction {
             if (blueprint.getScriptRelativeVectorBlueprint() != null) {
                 ScriptRelativeVector scriptRelativeVector = new ScriptRelativeVector(blueprint.getScriptRelativeVectorBlueprint(), eliteScript, targetLocation);
                 velocity = scriptRelativeVector.getVector(scriptActionData);
-            } else if (!blueprint.getVValue().isZero()){
+            } else if (!blueprint.getVValue().isZero()) {
                 velocity = blueprint.getVValue();
             }
             Entity entity;
@@ -614,8 +632,7 @@ public class ScriptAction {
                 entity = scriptActionData.getEliteEntity().getLivingEntity().launchProjectile(entityType.getEntityClass().asSubclass(Projectile.class), velocity);
                 ((Projectile) entity).setShooter(scriptActionData.getEliteEntity().getLivingEntity());
                 if (entity instanceof Fireball fireball) fireball.setDirection(velocity);
-            }
-            else {
+            } else {
                 entity = targetLocation.getWorld().spawn(targetLocation, entityType.getEntityClass());
                 entity.setVelocity(velocity);
             }

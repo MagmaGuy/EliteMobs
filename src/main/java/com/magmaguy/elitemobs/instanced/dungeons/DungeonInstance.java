@@ -67,8 +67,14 @@ public class DungeonInstance extends MatchInstance {
         this.difficultyName = difficultyName;
         setDifficulty(difficultyName);
         addNewPlayer(player);
-        instancedBossEntities = InstancedBossEntity.initializeInstancedBosses(dungeonPackagerConfigFields.getWorldName(), world, players.size(), this);
-        NPCEntity.initializeInstancedNPCs(dungeonPackagerConfigFields.getWorldName(), world, players.size(), this);
+        DungeonInstance dungeonInstance = this;
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                instancedBossEntities = InstancedBossEntity.initializeInstancedBosses(dungeonPackagerConfigFields.getWorldName(), world, players.size(), dungeonInstance);
+                NPCEntity.initializeInstancedNPCs(dungeonPackagerConfigFields.getWorldName(), world, players.size(), dungeonInstance);
+            }
+        }.runTaskLater(MetadataHandler.PLUGIN, 20*3L);
         dungeonInstances.add(this);
         super.permission = dungeonPackagerConfigFields.getPermission();
     }
@@ -228,21 +234,23 @@ public class DungeonInstance extends MatchInstance {
                 //The world might get removed before this timer
                 //if (world != null) {
                 //Arrays.stream(world.getLoadedChunks()).forEach(chunk -> chunk.unload(false));
+
+                new EventCaller(new InstancedDungeonRemoveEvent(dungeonInstance));
+                dungeonInstances.remove(dungeonInstance);
+
                 if (!Bukkit.unloadWorld(world, false)) {
                     new WarningMessage("Failed to unload world " + instancedWorldName + " ! This is bad, report this to the developer!");
+                    return;
                 }
                 new BukkitRunnable() {
                     @Override
                     public void run() {
                         WorldInstantiator.recursivelyDelete(instancedWorldFile);
                     }
-                }.runTaskAsynchronously(MetadataHandler.PLUGIN);
+                }.runTaskLaterAsynchronously(MetadataHandler.PLUGIN, 20L * 60 * 2); //wait 2 minutes after unloading world before removing files
                 //}
-                new EventCaller(new InstancedDungeonRemoveEvent(dungeonInstance));
-                dungeonInstances.remove(dungeonInstance);
             }
-        }.runTaskLater(MetadataHandler.PLUGIN, 120);
-
+        }.runTaskLater(MetadataHandler.PLUGIN, 20*30L); //wait 30 seconds before unloading world
     }
 
     private void setDifficulty(String difficultyName) {

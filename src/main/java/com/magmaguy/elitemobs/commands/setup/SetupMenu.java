@@ -4,7 +4,6 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.api.PlayerTeleportEvent;
 import com.magmaguy.elitemobs.commands.guild.AdventurersGuildCommand;
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
-import com.magmaguy.elitemobs.config.ConfigurationExporter;
 import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
 import com.magmaguy.elitemobs.config.menus.premade.GetLootMenuConfig;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
@@ -13,7 +12,6 @@ import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.utils.*;
 import com.magmaguy.elitemobs.worlds.CustomWorldLoading;
 import lombok.Getter;
-import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -26,10 +24,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.*;
 
 public class SetupMenu {
@@ -65,54 +59,10 @@ public class SetupMenu {
 
         if (ResourcePackDataConfig.isEliteMobsResourcePackEnabled()) {
             //Case for if it is downloaded
-            if (ServerPropertiesModifier.modify(player, "resource-pack", "") &&
-                    ServerPropertiesModifier.modify(player, "resource-pack-sha1", "") &&
-                    ServerPropertiesModifier.modify(player, "require-resource-pack", "")) {
-                player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2Reverted the following server.properties" +
-                        " configuration settings to default: &aresource-pack, resource-pack-sha1 and require-resource-pack." +
-                        " &fYou have successfully removed the EliteMobs resource pack!"));
-                player.sendMessage(ChatColorConverter.convert("If you are doing this to remove the " +
-                        "require-resource-pack setting, you can now do &a/em setup &fand install the resource pack again!"));
-            } else {
-                player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &cFailed to set the following settings" +
-                        " to default values: &eresource-pack, resource-pack-sha1 and require-resource-pack. &cYou will need to" +
-                        " set these manually back to nothing in server.properties."));
-            }
             ResourcePackDataConfig.toggleEliteMobsResourcePackStatus(false);
         } else {
-            URL fetchWebsite = null;
-            try {
-                fetchWebsite = new URL("https://www.magmaguy.com/downloads/elitemobs_resource_pack.zip");
-            } catch (MalformedURLException e) {
-                player.sendMessage("[EliteMobs] Failed to get resource pack from  https://www.magmaguy.com/downloads/elitemobs_resource_pack.zip ! This might mean the server is down, in which case you will have to host the resource pack on your own! (1)");
-                return;
-            }
-            File file = new File("elitemobs_resource_pack.zip");
-            try {
-                FileUtils.copyURLToFile(fetchWebsite, file);
-            } catch (IOException e) {
-                player.sendMessage("[EliteMobs] Failed to get resource pack from  https://www.magmaguy.com/downloads/elitemobs_resource_pack.zip ! This might mean the server is down, in which case you will have to host the resource pack on your own! (2)");
-                return;
-            }
-            String SHA1 = null;
-            try {
-                SHA1 = ConfigurationExporter.sha1Code(file);
-            } catch (Exception e) {
-                player.sendMessage("[EliteMobs] Failed to generate your SHA1 key! You will have to do this manually, though this might mean there is a serious problem with the resource pack.");
-                return;
-            }
-
-            if (!ServerPropertiesModifier.modify(player, "resource-pack-sha1", SHA1)) {
-                player.sendMessage("[EliteMobs] Failed to modify your server.properties SHA1 key which should be " + SHA1 + "  ! You will have to set this and the link to the resource pack manually.");
-                return;
-            }
-
-            if (!ServerPropertiesModifier.modify(player, "resource-pack", "https://www.magmaguy.com/downloads/elitemobs_resource_pack.zip")) {
-                player.sendMessage("[EliteMobs] Failed to set the link to the resource pack correctly! You will have to set this manually.");
-                return;
-            }
             ResourcePackDataConfig.toggleEliteMobsResourcePackStatus(true);
-            player.spigot().sendMessage(SpigotMessage.simpleMessage("&8[EliteMobs] &2The EliteMobs resource pack has been installed! &cThis requires a server restart to work correctly!"));
+            player.spigot().sendMessage(SpigotMessage.simpleMessage("&8[EliteMobs] &2The EliteMobs resource pack has been installed!"));
             player.spigot().sendMessage(SpigotMessage.commandHoverMessage("&eBefore you go! &fDo you want to force players to use the resource pack? This is necessary if you plan to use &cModelEngine for the custom boss models. &aClick here if you want to force resource packs. &eIgnore this message if you don't!", "Click to force resource packs!", "/elitemobs forceresourcepack"));
         }
     }
@@ -165,11 +115,8 @@ public class SetupMenu {
     }
 
     public static void forceResourcePack(Player player) {
-        if (!ServerPropertiesModifier.modify(player, "require-resource-pack", "true")) {
-            player.sendMessage("[EliteMobs] Failed to set the resource pack requirement! You will have to do this manually on server.properties !");
-            return;
-        }
-        player.sendMessage("[EliteMobs] Using the resource pack is now mandatory! This requires a server restart to work correctly.");
+        ResourcePackDataConfig.toggleForceResourcePack(true);
+        player.sendMessage("[EliteMobs] Using the resource pack is now mandatory!");
     }
 
     private static void dungeonButtonInteraction(Player player, SetupMenu setupMenu, InventoryClickEvent event) {
