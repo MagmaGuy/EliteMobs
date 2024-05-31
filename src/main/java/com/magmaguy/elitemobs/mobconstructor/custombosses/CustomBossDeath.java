@@ -18,14 +18,14 @@ import java.util.*;
 public class CustomBossDeath implements Listener {
 
     private static void doLoot(CustomBossEntity customBossEntity) {
+        if (customBossEntity.isTriggeredAntiExploit()) return;
+        if (customBossEntity.customBossesConfigFields.getUniqueLootList() == null ||
+                customBossEntity.customBossesConfigFields.getUniqueLootList().isEmpty()) return;
         for (Player player : customBossEntity.getDamagers().keySet())
-            if (!customBossEntity.isTriggeredAntiExploit())
-                dropLoot(player, customBossEntity);
+            dropLoot(player, customBossEntity);
     }
 
     public static void dropLoot(Player player, CustomBossEntity customBossEntity) {
-        if (customBossEntity.customBossesConfigFields.getUniqueLootList() == null ||
-                customBossEntity.customBossesConfigFields.getUniqueLootList().isEmpty()) return;
         customBossEntity.customBossesConfigFields.getCustomLootTable().bossDrop(player, customBossEntity.getLevel(), customBossEntity.getLocation(), customBossEntity);
     }
 
