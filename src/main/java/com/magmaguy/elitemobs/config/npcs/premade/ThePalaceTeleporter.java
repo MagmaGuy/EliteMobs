@@ -8,7 +8,7 @@ import java.util.List;
 
 public class ThePalaceTeleporter extends NPCsConfigFields {
     public ThePalaceTeleporter(){
-        super("the_city_teleporter",
+        super("the_palace_teleporter",
                 true,
                 "Royal Guard Sven",
                 "<[35] The Palace Teleporter>",
