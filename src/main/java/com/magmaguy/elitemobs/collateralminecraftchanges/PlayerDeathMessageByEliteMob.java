@@ -35,7 +35,7 @@ public class PlayerDeathMessageByEliteMob implements Listener {
 
         String deathMessage = "";
 
-        if (eliteEntity instanceof CustomBossEntity customBossEntity && customBossEntity.getCustomBossesConfigFields().getOnKillMessage() != null)
+        if (eliteEntity instanceof CustomBossEntity customBossEntity && customBossEntity.getCustomBossesConfigFields().getOnKillMessage() != null && !customBossEntity.getCustomBossesConfigFields().getOnKillMessage().isEmpty())
             return deathMessageSender(customBossEntity.getCustomBossesConfigFields().getOnKillMessage().replace("$player", player.getDisplayName()), player, customBossEntity.getLivingEntity());
 
         if (MobPropertiesConfig.getMobProperties().containsKey(eliteEntity.getLivingEntity().getType()))
