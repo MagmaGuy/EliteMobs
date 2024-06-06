@@ -27,10 +27,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static com.magmaguy.elitemobs.utils.MapListInterpreter.*;
@@ -120,7 +117,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
         int amount = 1;
         boolean spawnNearby = false;
         for (Map.Entry<String, ?> entry : map.entrySet()) {
-            switch (entry.getKey().toLowerCase()) {
+            switch (entry.getKey().toLowerCase(Locale.ROOT)) {
                 //this just tags it for parsing
                 case "summonable":
                     break;
@@ -282,7 +279,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
             boolean spawnNearby = false;
 
             for (String substring : powerString.split(":")) {
-                switch (substring.split("=")[0].toLowerCase()) {
+                switch (substring.split("=")[0].toLowerCase(Locale.ROOT)) {
                     //this just tags it for parsing
                     case "summonable":
                         break;

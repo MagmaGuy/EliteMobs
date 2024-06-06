@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import org.bukkit.configuration.ConfigurationSection;
 
+import java.util.Locale;
 import java.util.Map;
 
 public class ScriptCooldownsBlueprint {
@@ -18,7 +19,7 @@ public class ScriptCooldownsBlueprint {
         if (subSection == null) return;
         Map<String, Object> values = subSection.getValues(false);
         for (Map.Entry<String, Object> entry : values.entrySet()) {
-            switch (entry.getKey().toLowerCase()) {
+            switch (entry.getKey().toLowerCase(Locale.ROOT)) {
                 case "local" ->
                         localCooldown = MapListInterpreter.parseInteger(entry.getKey(), entry.getValue(), scriptName);
                 case "global" ->

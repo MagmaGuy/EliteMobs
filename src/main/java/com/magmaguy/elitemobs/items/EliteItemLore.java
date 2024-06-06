@@ -24,6 +24,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 public class EliteItemLore {
 
@@ -199,16 +200,16 @@ public class EliteItemLore {
     private void constructPotionEffects() {
         for (ElitePotionEffect elitePotionEffect : ElitePotionEffectContainer.getElitePotionEffectContainer(itemMeta, ItemTagger.continuousPotionEffectKey))
             potionListLore.add(ChatColorConverter.convert(PotionEffectsConfig.getPotionEffect(
-                    elitePotionEffect.getPotionEffect().getType().getName().toLowerCase() + ".yml").getName()
+                    elitePotionEffect.getPotionEffect().getType().getName().toLowerCase(Locale.ROOT) + ".yml").getName()
                     + ItemSettingsConfig.getPotionEffectContinuousLore() + " " + (elitePotionEffect.getPotionEffect().getAmplifier() + 1)));
         for (ElitePotionEffect elitePotionEffect : ElitePotionEffectContainer.getElitePotionEffectContainer(itemMeta, ItemTagger.onHitPotionEffectKey))
             if (elitePotionEffect.getTarget().equals(ElitePotionEffect.Target.SELF))
                 potionListLore.add(ChatColorConverter.convert(PotionEffectsConfig.getPotionEffect(
-                        elitePotionEffect.getPotionEffect().getType().getName().toLowerCase() + ".yml").getName()
+                        elitePotionEffect.getPotionEffect().getType().getName().toLowerCase(Locale.ROOT) + ".yml").getName()
                         + ItemSettingsConfig.getPotionEffectOnHitSelfLore() + " " + (elitePotionEffect.getPotionEffect().getAmplifier() + 1)));
             else
                 potionListLore.add(ChatColorConverter.convert(PotionEffectsConfig.getPotionEffect(
-                        elitePotionEffect.getPotionEffect().getType().getName().toLowerCase() + ".yml").getName()
+                        elitePotionEffect.getPotionEffect().getType().getName().toLowerCase(Locale.ROOT) + ".yml").getName()
                         + ItemSettingsConfig.getPotionEffectOnHitTargetLore() + " " + (elitePotionEffect.getPotionEffect().getAmplifier() + 1)));
     }
 

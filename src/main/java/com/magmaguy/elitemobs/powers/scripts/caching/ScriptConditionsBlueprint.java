@@ -11,6 +11,7 @@ import org.bukkit.configuration.MemorySection;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class ScriptConditionsBlueprint {
@@ -57,7 +58,7 @@ public class ScriptConditionsBlueprint {
     }
 
     private void processKeyAndValue(String key, Object value) {
-        switch (key.toLowerCase()) {
+        switch (key.toLowerCase(Locale.ROOT)) {
             case "isalive" -> isAlive = MapListInterpreter.parseBoolean(key, value, scriptName);
             case "locationisair" -> locationIsAir = MapListInterpreter.parseBoolean(key, value, scriptName);
             case "hastags" -> hasTags = MapListInterpreter.parseStringList(key, value, scriptName);

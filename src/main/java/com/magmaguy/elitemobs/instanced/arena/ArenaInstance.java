@@ -152,7 +152,7 @@ public class ArenaInstance extends MatchInstance {
             String location = "";
             for (String subString : splitEntry) {
                 String[] splitSubEntry = subString.split("=");
-                switch (splitSubEntry[0].toLowerCase()) {
+                switch (splitSubEntry[0].toLowerCase(Locale.ROOT)) {
                     case "name":
                         name = splitSubEntry[1];
                         break;

@@ -179,7 +179,7 @@ public class CustomConfigFields implements CustomConfigFieldsInterface {
             List<String> stringList = processStringList(path, enumListToStringListConverter(value), enumListToStringListConverter(pluginDefault), forceWriteDefault);
             stringList.forEach(string -> {
                 try {
-                    newList.add(Enum.valueOf(enumClass, string.toUpperCase()));
+                    newList.add(Enum.valueOf(enumClass, string.toUpperCase(Locale.ROOT)));
                 } catch (Exception ex) {
                     new WarningMessage(filename + " : " + "Value " + string + " is not a valid for " + path + " ! This may be due to your server version, or due to an invalid value!");
                 }
@@ -277,16 +277,16 @@ public class CustomConfigFields implements CustomConfigFieldsInterface {
             if (forceWriteDefault || value != pluginDefault) {
                 String valueString = null;
                 if (value != null)
-                    valueString = value.toString().toUpperCase();
+                    valueString = value.toString().toUpperCase(Locale.ROOT);
                 String pluginDefaultString = null;
                 if (pluginDefault != null)
-                    pluginDefaultString = pluginDefault.toString().toUpperCase();
+                    pluginDefaultString = pluginDefault.toString().toUpperCase(Locale.ROOT);
                 processString(path, valueString, pluginDefaultString, forceWriteDefault);
             }
             return value;
         }
         try {
-            return Enum.valueOf(enumClass, fileConfiguration.getString(path).toUpperCase());
+            return Enum.valueOf(enumClass, fileConfiguration.getString(path).toUpperCase(Locale.ROOT));
         } catch (Exception ex) {
             new WarningMessage("File " + filename + " has an incorrect entry for " + path);
             new WarningMessage("Entry: " + fileConfiguration.getString(path));

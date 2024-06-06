@@ -22,14 +22,24 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * Created by MagmaGuy on 20/06/2017.
  */
 public class CustomShopMenu {
+
+    public static Set<UUID> cooldownPlayers = new HashSet<>();
+
+    public static void shutdown() {
+        cooldownPlayers.clear();
+        CustomShopMenu.CustomShopMenuEvents.menus.clear();
+    }
 
     /**
      * Creates a new instance of a BuyOrSellMenu
@@ -114,6 +124,20 @@ public class CustomShopMenu {
 
             //reroll loot button
             if (event.getCurrentItem().getItemMeta().getDisplayName().equals(CustomShopMenuConfig.rerollItem.getItemMeta().getDisplayName())) {
+
+                if (cooldownPlayers.contains(event.getWhoClicked().getUniqueId())) {
+                    event.setCancelled(true);
+                    return;
+                }
+
+                cooldownPlayers.add(event.getWhoClicked().getUniqueId());
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        cooldownPlayers.remove(event.getWhoClicked().getUniqueId());
+                    }
+                }.runTaskLater(MetadataHandler.PLUGIN, 20 * 2L);
+
                 populateShop(event.getInventory(), Bukkit.getPlayer(event.getWhoClicked().getUniqueId()));
                 event.setCancelled(true);
                 return;
