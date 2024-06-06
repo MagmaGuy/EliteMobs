@@ -22,11 +22,9 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by MagmaGuy on 17/06/2017.
@@ -34,6 +32,12 @@ import java.util.Set;
 public class ProceduralShopMenu {
 
     private static final List<Integer> validSlots = ProceduralShopMenuConfig.storeSlots;
+    public static Set<UUID> cooldownPlayers = new HashSet<>();
+
+    public static void shutdown() {
+        cooldownPlayers.clear();
+        ProceduralShopMenuEvents.menus.clear();
+    }
 
     public static void shopInitializer(Player player) {
 
@@ -105,6 +109,19 @@ public class ProceduralShopMenu {
 
             //reroll loot button
             if (event.getCurrentItem().getItemMeta().getDisplayName().equals(ProceduralShopMenuConfig.rerollItem.getItemMeta().getDisplayName())) {
+                if (cooldownPlayers.contains(event.getWhoClicked().getUniqueId())) {
+                    event.setCancelled(true);
+                    return;
+                }
+
+                cooldownPlayers.add(event.getWhoClicked().getUniqueId());
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        cooldownPlayers.remove(event.getWhoClicked().getUniqueId());
+                    }
+                }.runTaskLater(MetadataHandler.PLUGIN, 20 * 2L);
+
                 populateShop(event.getInventory(), Bukkit.getPlayer(event.getWhoClicked().getUniqueId()));
                 event.setCancelled(true);
                 return;

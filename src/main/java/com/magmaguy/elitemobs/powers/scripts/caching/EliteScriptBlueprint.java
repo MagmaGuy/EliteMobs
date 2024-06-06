@@ -156,7 +156,7 @@ public class EliteScriptBlueprint {
 
 
         protected void processKeyAndValue(String key, Object value) {
-            switch (key.toLowerCase()) {
+            switch (key.toLowerCase(Locale.ROOT)) {
                 case "location" -> location = parseString(key, value, scriptName);
                 case "locations" -> locations = parseStringList(key, value, scriptName);
                 case "target" -> targetType = parseString(key, value, scriptName);

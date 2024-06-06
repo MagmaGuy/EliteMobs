@@ -21,10 +21,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class CustomItem {
 
@@ -215,7 +212,7 @@ public class CustomItem {
                 }
 
                 if (CustomEnchantment.isCustomEnchantment(name)) {
-                    customEnchantments.put(name.toLowerCase(), level);
+                    customEnchantments.put(name.toLowerCase(Locale.ROOT), level);
                     continue;
                 }
 

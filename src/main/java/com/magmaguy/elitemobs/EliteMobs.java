@@ -38,6 +38,7 @@ import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.items.LootTables;
 import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantment;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
+import com.magmaguy.elitemobs.menus.ProceduralShopMenu;
 import com.magmaguy.elitemobs.mobconstructor.PersistentObjectHandler;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.InstancedBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
@@ -190,6 +191,7 @@ public class EliteMobs extends JavaPlugin {
         EventsRegistrer.registerEvents();
 
         //Launch the local data cache
+        DatabaseConfig.initializeConfig();
         PlayerData.initializeDatabaseConnection();
         ElitePlayerInventory.initialize();
 
@@ -381,6 +383,8 @@ public class EliteMobs extends JavaPlugin {
         CustomProjectileData.shutdown();
 
         DynamicQuest.shutdown();
+
+        ProceduralShopMenu.shutdown();
 
         //save cached data
         Bukkit.getLogger().info("[EliteMobs] Saving EliteMobs databases...");

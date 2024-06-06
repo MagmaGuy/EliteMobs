@@ -6,6 +6,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class PotionEffectsConfigFields {
@@ -37,7 +38,7 @@ public class PotionEffectsConfigFields {
         this.name = TranslationsConfig.add(fileName, "name", fileConfiguration.getString("name"));
         this.onHitDuration = fileConfiguration.getInt("onHitDuration");
         this.value = fileConfiguration.getDouble("value");
-        this.potionEffectType = PotionEffectType.getByName(this.fileName.toUpperCase());
+        this.potionEffectType = PotionEffectType.getByName(this.fileName.toUpperCase(Locale.ROOT));
         this.configuration = fileConfiguration;
     }
 
