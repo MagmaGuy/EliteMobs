@@ -16,6 +16,7 @@ import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import static com.magmaguy.elitemobs.utils.MapListInterpreter.*;
@@ -129,14 +130,14 @@ public class ScriptActionBlueprint {
     }
 
     protected void processKeyAndValue(String key, Object value) {
-        switch (key.toLowerCase()) {
+        switch (key.toLowerCase(Locale.ROOT)) {
             case "duration" -> duration = parseInteger(key, value, scriptName);
             case "wait" -> wait = parseInteger(key, value, scriptName);
             case "amplifier" -> amplifier = parseInteger(key, value, scriptName);
             case "action" -> actionType = parseEnum(key, value, ActionType.class, scriptName);
             case "potioneffecttype" -> {
                 try {
-                    potionEffectType = PotionEffectTypeUtil.getByKey(((String) value).toLowerCase());
+                    potionEffectType = PotionEffectTypeUtil.getByKey(((String) value).toLowerCase(Locale.ROOT));
                 } catch (Exception ex) {
                     new WarningMessage("Invalid potion effect type " + value + " in file " + scriptFilename + " for script " + scriptName + " !");
                 }

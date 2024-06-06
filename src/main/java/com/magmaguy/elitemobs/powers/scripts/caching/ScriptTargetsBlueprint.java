@@ -9,6 +9,7 @@ import org.bukkit.util.Vector;
 
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import static com.magmaguy.elitemobs.utils.MapListInterpreter.*;
@@ -63,7 +64,7 @@ public class ScriptTargetsBlueprint {
     }
 
     protected void processKeyAndValue(String key, Object value) {
-        switch (key.toLowerCase()) {
+        switch (key.toLowerCase(Locale.ROOT)) {
             case "location" -> location = parseString(key, value, scriptName);
             case "locations" -> locations = parseStringList(key, value, scriptName);
             case "targettype" -> targetType = parseEnum(key, value, TargetType.class, scriptName);

@@ -141,7 +141,7 @@ public class CustomQuestsConfigFields extends CustomConfigFields implements Cust
                 if (keyAndValueArray.length > 1)
                     value = keyAndValueArray[1];
                 if (value == null)
-                    switch (key.toUpperCase()) {
+                    switch (key.toUpperCase(Locale.ROOT)) {
                         case "KILL_CUSTOM", "FETCH_ITEM", "DIALOG", "ARENA" -> {
                             value = key;
                             key = "objectiveType";

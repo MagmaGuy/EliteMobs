@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class CurrencyCustomLootEntry extends CustomLootEntry implements Serializable {
@@ -27,7 +28,7 @@ public class CurrencyCustomLootEntry extends CustomLootEntry implements Serializ
     public CurrencyCustomLootEntry(List<CustomLootEntry> entries, String rawString, String configFilename) {
         for (String string : rawString.split(":")) {
             String[] strings = string.split("=");
-            switch (strings[0].toLowerCase()) {
+            switch (strings[0].toLowerCase(Locale.ROOT)) {
                 case "currencyamount":
                     try {
                         this.currencyAmount = Integer.parseInt(strings[1]);
@@ -76,7 +77,7 @@ public class CurrencyCustomLootEntry extends CustomLootEntry implements Serializ
     public CurrencyCustomLootEntry(List<CustomLootEntry> entries, Map<?,?> configMap, String configFilename) {
         for (Map.Entry<?, ?> mapEntry : configMap.entrySet()) {
             String key = (String) mapEntry.getKey();
-            switch (key.toLowerCase()) {
+            switch (key.toLowerCase(Locale.ROOT)) {
                 case "chance" -> super.setChance(MapListInterpreter.parseDouble(key, mapEntry.getValue(), configFilename));
                 case "permission" -> super.setPermission(MapListInterpreter.parseString(key, mapEntry.getValue(), configFilename));
                 case "amount" -> setAmount(MapListInterpreter.parseInteger(key, mapEntry.getValue(), configFilename));

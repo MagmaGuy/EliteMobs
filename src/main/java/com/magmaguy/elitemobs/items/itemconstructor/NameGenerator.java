@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class NameGenerator {
@@ -107,12 +108,12 @@ public class NameGenerator {
                 return ProceduralItemGenerationSettingsConfig.getCrossbowName();
         }
 
-        if (ProceduralItemGenerationSettingsConfig.getFileConfiguration().getString("materialNames." + material.toString().toLowerCase()) != null)
-            return ProceduralItemGenerationSettingsConfig.getFileConfiguration().getString("materialNames." + material.toString().toLowerCase());
+        if (ProceduralItemGenerationSettingsConfig.getFileConfiguration().getString("materialNames." + material.toString().toLowerCase(Locale.ROOT)) != null)
+            return ProceduralItemGenerationSettingsConfig.getFileConfiguration().getString("materialNames." + material.toString().toLowerCase(Locale.ROOT));
 
         Bukkit.getLogger().warning("[EliteMobs] Found unexpected material type in procedurally generated loot. Can't generate item type name.");
         Bukkit.getLogger().warning("[EliteMobs] Material name: " + material);
-        new WarningMessage("If you're trying to set a non-default item type, you need to add the name format like this under materialNames: " + material.toString().toLowerCase() + ": Name");
+        new WarningMessage("If you're trying to set a non-default item type, you need to add the name format like this under materialNames: " + material.toString().toLowerCase(Locale.ROOT) + ": Name");
         return "";
 
     }

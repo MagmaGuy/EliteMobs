@@ -10,6 +10,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class VanillaCustomLootEntry extends CustomLootEntry implements Serializable {
@@ -25,7 +26,7 @@ public class VanillaCustomLootEntry extends CustomLootEntry implements Serializa
     private void parseAllFormats(String rawString, String configFilename) {
         for (String processedString : rawString.split(":")) {
             String[] strings = processedString.split("=");
-            switch (strings[0].toLowerCase()) {
+            switch (strings[0].toLowerCase(Locale.ROOT)) {
                 case "type":
                 case "material":
                     try {

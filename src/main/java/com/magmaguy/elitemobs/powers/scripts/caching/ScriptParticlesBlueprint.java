@@ -6,6 +6,7 @@ import org.bukkit.Particle;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import static com.magmaguy.elitemobs.utils.MapListInterpreter.*;
@@ -71,7 +72,7 @@ public class ScriptParticlesBlueprint {
         }
 
         private void processKeyAndValue(String key, Object value) {
-            switch (key.toLowerCase()) {
+            switch (key.toLowerCase(Locale.ROOT)) {
                 case "x" -> x = parseDouble(key, value, scriptName);
                 case "y" -> y = parseDouble(key, value, scriptName);
                 case "z" -> z = parseDouble(key, value, scriptName);

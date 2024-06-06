@@ -7,6 +7,7 @@ import org.bukkit.configuration.MemorySection;
 import org.bukkit.util.Vector;
 
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class ScriptRelativeVectorBlueprint {
@@ -38,7 +39,7 @@ public class ScriptRelativeVectorBlueprint {
     }
 
     protected void processKeyAndValue(String key, Object value) {
-        switch (key.toLowerCase()) {
+        switch (key.toLowerCase(Locale.ROOT)) {
             case "sourcetarget" -> {
                 if (value instanceof MemorySection)
                     sourceTarget = new ScriptTargetsBlueprint(((MemorySection) value).getValues(false), scriptName, scriptFilename);

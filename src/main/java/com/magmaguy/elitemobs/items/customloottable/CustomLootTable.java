@@ -49,7 +49,7 @@ public class CustomLootTable implements Serializable {
         if (lootTable == null) return;
         for (Object object : lootTable)
             if (object instanceof String rawString)
-                switch (rawString.split(":")[0].toLowerCase()) {
+                switch (rawString.split(":")[0].toLowerCase(Locale.ROOT)) {
                     case "minecraft":
                         new VanillaCustomLootEntry(entries, rawString, filename);
                         break;

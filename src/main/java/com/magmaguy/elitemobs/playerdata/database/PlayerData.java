@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.playerdata.database;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.DatabaseConfig;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.Quest;
@@ -572,9 +573,22 @@ public class PlayerData {
     public static Connection getConnection() throws Exception {
         File dataFolder = new File(MetadataHandler.PLUGIN.getDataFolder(), "data/" + DATABASE_NAME);
         if (connection == null || connection.isClosed()) {
-            Class.forName("org.sqlite.JDBC");
-            connection = DriverManager.getConnection("jdbc:sqlite:" + dataFolder);
-            connection.setAutoCommit(true);
+
+            if (!DatabaseConfig.isUseMySQL()) {
+                Class.forName("org.sqlite.JDBC");
+                connection = DriverManager.getConnection("jdbc:sqlite:" + dataFolder);
+                connection.setAutoCommit(true);
+            } else {
+                Class.forName("com.mysql.jdbc.Driver");
+                String URL = "jdbc:mysql://" + DatabaseConfig.getMysqlHost() + ":"
+                        + DatabaseConfig.getMysqlPort() + "/" + DatabaseConfig.mysqlDatabaseName
+                        + "?useSSL=" + DatabaseConfig.useSSL
+                        + "&createDatabaseIfNotExist=true";
+                String USER = DatabaseConfig.getMysqlUsername();
+                String PASS = DatabaseConfig.getMysqlPassword();
+                connection = DriverManager.getConnection(URL, USER, PASS);
+                connection.setAutoCommit(true);
+            }
         }
         return connection;
     }
@@ -588,7 +602,7 @@ public class PlayerData {
                 new PlayerData(player.getUniqueId());
         } catch (Exception e) {
             new WarningMessage(e.getClass().getName() + ": " + e.getMessage());
-            new WarningMessage("Failed to establish a connection to the SQLite database. This is not good.");
+            new WarningMessage("Failed to establish a connection to the SQLite database. Player data will not be saved! Is you MySQL configuration valid and is your MySQL server running?");
         }
 
         new PortOldData();

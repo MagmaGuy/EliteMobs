@@ -46,7 +46,7 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
     public EliteCustomLootEntry(List<CustomLootEntry> entries, Map<?, ?> configMap, String configFilename) {
         for (Map.Entry<?, ?> mapEntry : configMap.entrySet()) {
             String key = (String) mapEntry.getKey();
-            switch (key.toLowerCase()) {
+            switch (key.toLowerCase(Locale.ROOT)) {
                 case "filename" -> filename = MapListInterpreter.parseString(key, mapEntry.getValue(), configFilename);
                 case "chance" -> super.setChance(MapListInterpreter.parseDouble(key, mapEntry.getValue(), configFilename));
                 case "difficultyid" -> difficultyID = MapListInterpreter.parseString(key, mapEntry.getValue(), configFilename);

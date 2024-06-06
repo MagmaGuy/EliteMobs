@@ -12,10 +12,7 @@ import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class EnchantmentGenerator {
@@ -23,7 +20,7 @@ public class EnchantmentGenerator {
     public static ItemMeta generateEnchantments(ItemMeta itemMeta, HashMap<Enchantment, Integer> enchantmentMap) {
         for (Map.Entry<Enchantment, Integer> entry : enchantmentMap.entrySet()) {
             if (entry == null) continue;
-            EnchantmentsConfigFields enchantmentsConfigFields = EnchantmentsConfig.getEnchantment(entry.getKey().getName().toLowerCase() + ".yml");
+            EnchantmentsConfigFields enchantmentsConfigFields = EnchantmentsConfig.getEnchantment(entry.getKey().getName().toLowerCase(Locale.ROOT) + ".yml");
             if (enchantmentsConfigFields == null || !enchantmentsConfigFields.isEnabled()) continue;
             if (enchantmentMap.get(entry.getKey()) > entry.getKey().getMaxLevel()) {
                 if (EliteEnchantments.isPotentialEliteEnchantment(entry.getKey())) {
@@ -407,7 +404,7 @@ public class EnchantmentGenerator {
 
     private static HashMap<Enchantment, Integer> validateEnchantments(String string) {
 
-        EnchantmentsConfigFields enchantmentsConfigFields = EnchantmentsConfig.getEnchantment(string.toLowerCase() + ".yml");
+        EnchantmentsConfigFields enchantmentsConfigFields = EnchantmentsConfig.getEnchantment(string.toLowerCase(Locale.ROOT) + ".yml");
 
         if (enchantmentsConfigFields == null ||
                 !enchantmentsConfigFields.isEnabled() ||
@@ -432,7 +429,7 @@ public class EnchantmentGenerator {
 
     private static HashMap<String, Integer> validateSecondaryCustomEnchantments(String string) {
 
-        EnchantmentsConfigFields enchantmentsConfigFields = EnchantmentsConfig.getEnchantment(string.toLowerCase() + ".yml");
+        EnchantmentsConfigFields enchantmentsConfigFields = EnchantmentsConfig.getEnchantment(string.toLowerCase(Locale.ROOT) + ".yml");
 
         if (enchantmentsConfigFields == null ||
                 !enchantmentsConfigFields.isEnabled() ||

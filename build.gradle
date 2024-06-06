@@ -23,7 +23,7 @@ processResources {
 }
 
 group 'com.magmaguy'
-version '8.7.14-SNAPSHOT'
+version '8.7.15-SNAPSHOT'
 
 repositories {
     maven {
@@ -101,6 +101,8 @@ dependencies {
     compileOnly 'com.discordsrv:discordsrv:1.24.0'
     //SQLite
     compileOnly group: 'org.xerial', name: 'sqlite-jdbc', version: '3.32.3'
+    //MySQL
+    implementation 'mysql:mysql-connector-java:8.0.33'
     //LibsDisguises
     compileOnly group: 'com.comphenix.protocol', name: 'ProtocolLib', version: '4.7.0'
     compileOnly group: 'LibsDisguises', name: 'LibsDisguises', version: '10.0.26'

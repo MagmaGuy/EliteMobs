@@ -13,6 +13,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
+import java.util.Locale;
+
 public class DebugScreen {
 
     public static void open(Player player, String argument) {
@@ -48,7 +50,7 @@ public class DebugScreen {
 
     private static TextComponent generateEntry(CustomBossEntity customBossEntity, String argument, Player player) {
         if (!customBossEntity.getCustomBossesConfigFields().getFilename().contains(argument) &&
-                !customBossEntity.getCustomBossesConfigFields().getName().toLowerCase().contains(argument.toLowerCase()))
+                !customBossEntity.getCustomBossesConfigFields().getName().toLowerCase(Locale.ROOT).contains(argument.toLowerCase(Locale.ROOT)))
             return null;
         TextComponent page = new TextComponent();
         page.addExtra(customBossEntity.getCustomBossesConfigFields().getFilename() + "\n");

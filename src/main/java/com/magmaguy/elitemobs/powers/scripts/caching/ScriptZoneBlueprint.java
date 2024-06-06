@@ -8,6 +8,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemorySection;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import static com.magmaguy.elitemobs.utils.MapListInterpreter.*;
@@ -81,7 +82,7 @@ public class ScriptZoneBlueprint {
 
     //Process entries
     protected void processKeyAndValue(String key, Object value) {
-        switch (key.toLowerCase()) {
+        switch (key.toLowerCase(Locale.ROOT)) {
             case "shape" -> shapeTypeEnum = parseEnum(key, value, ShapeType.class, scriptName);
             case "filter" -> filter = parseEnum(key, value, Filter.class, scriptName);
             case "height" -> height = parseDouble(key, value, scriptName);

@@ -20,6 +20,7 @@ import java.nio.file.StandardCopyOption;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Locale;
 
 public class ConfigurationExporter {
     private ConfigurationExporter() {
@@ -146,7 +147,7 @@ public class ConfigurationExporter {
                 // one character, so we need to append a character of '0'
                 sb.append("0");
             }
-            sb.append(Integer.toHexString(value).toUpperCase());
+            sb.append(Integer.toHexString(value).toUpperCase(Locale.ROOT));
         }
         return sb.toString();
     }

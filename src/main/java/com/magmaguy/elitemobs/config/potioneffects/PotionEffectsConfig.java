@@ -5,10 +5,7 @@ import com.magmaguy.elitemobs.config.potioneffects.premade.*;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class PotionEffectsConfig {
 
@@ -52,7 +49,7 @@ public class PotionEffectsConfig {
     }
 
     public static PotionEffectsConfigFields getPotionEffect(String fileName) {
-        fileName = fileName.toLowerCase();
+        fileName = fileName.toLowerCase(Locale.ROOT);
         if (!fileName.contains(".yml"))
             fileName += ".yml";
         return potionEffects.get(fileName);

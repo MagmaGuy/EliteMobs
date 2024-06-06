@@ -2,6 +2,8 @@ package com.magmaguy.elitemobs.instanced.dungeons;
 
 import lombok.Getter;
 
+import java.util.Locale;
+
 public class DungeonObjective {
 
     @Getter
@@ -19,9 +21,9 @@ public class DungeonObjective {
     }
 
     public static DungeonObjective registerObjective(DungeonInstance dungeonInstance, String objectiveString) {
-        if (objectiveString.toLowerCase().contains("filename")) {
+        if (objectiveString.toLowerCase(Locale.ROOT).contains("filename")) {
             return new DungeonKillTargetObjective(dungeonInstance, objectiveString);
-        } else if (objectiveString.toLowerCase().contains("clearpercentage")) {
+        } else if (objectiveString.toLowerCase(Locale.ROOT).contains("clearpercentage")) {
             return new DungeonKillPercentageObjective(dungeonInstance, objectiveString);
         }
         return null;

@@ -5,6 +5,7 @@ import lombok.Getter;
 import org.bukkit.enchantments.Enchantment;
 
 import java.util.HashMap;
+import java.util.Locale;
 
 public class EnchantmentsConfig extends CustomConfig {
 
@@ -23,6 +24,6 @@ public class EnchantmentsConfig extends CustomConfig {
     }
 
     public static EnchantmentsConfigFields getEnchantment(Enchantment enchantment) {
-        return getEnchantment(enchantment.getName().toLowerCase() + ".yml");
+        return getEnchantment(enchantment.getName().toLowerCase(Locale.ROOT) + ".yml");
     }
 }
