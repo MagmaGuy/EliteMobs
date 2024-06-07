@@ -13,10 +13,29 @@ public class GenerateDatabase {
 
     public static void generate() throws Exception {
         Statement statement = PlayerData.getConnection().createStatement();
-        String sql = "CREATE TABLE IF NOT EXISTS " + PlayerData.getPLAYER_DATA_TABLE_NAME() +
-                "(PlayerUUID             TEXT PRIMARY KEY    NOT NULL);";
+        // Create table with all columns defined
+        String sql = "CREATE TABLE IF NOT EXISTS " + PlayerData.getPLAYER_DATA_TABLE_NAME() + " (" +
+                "PlayerUUID VARCHAR(36) PRIMARY KEY NOT NULL, " +
+                "DisplayName TEXT, " +
+                "Currency DOUBLE, " +
+                "GuildPrestigeLevel INT, " +
+                "GuildMaxLevel INT, " +
+                "GuildActiveLevel INT, " +
+                "QuestStatus BLOB, " +
+                "Score INT, " +
+                "Kills INT, " +
+                "HighestLevelKilled INT, " +
+                "Deaths INT, " +
+                "QuestsCompleted INT, " +
+                "PlayerQuestCooldowns BLOB, " +
+                "BackTeleportLocation TEXT, " +
+                "UseBookMenus TINYINT(1), " +
+                "DismissEMStatusScreenMessage TINYINT(1)" +
+                ");";
         statement.executeUpdate(sql);
         statement.close();
+
+        // Check and add missing columns if any
         addEntryIfEmpty("DisplayName", ColumnValues.TEXT);
         addEntryIfEmpty("Currency", ColumnValues.REAL);
         addEntryIfEmpty("GuildPrestigeLevel", ColumnValues.INT);
