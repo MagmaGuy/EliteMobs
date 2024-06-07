@@ -126,7 +126,7 @@ dependencies {
     compileOnly group: 'com.magmaguy', name: 'FreeMinecraftModels', version: '1.3.0-SNAPSHOT'
 
     //Advanced AI goals
-    implementation group: 'com.magmaguy', name: 'EasyMinecraftGoals-dist', version: '1.11.0-SNAPSHOT'
+    implementation group: 'com.magmaguy', name: 'EasyMinecraftGoals-dist', version: '1.11.1-SNAPSHOT'
 
     // Mythic Mobs integration - currently only for arenas
     compileOnly group: 'io.lumine', name: 'Mythic-Dist', version: '5.3.5'
