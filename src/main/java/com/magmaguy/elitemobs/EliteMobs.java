@@ -117,6 +117,8 @@ public class EliteMobs extends JavaPlugin {
         QuestsConfig.initializeConfig();
         WormholesConfig.initializeConfig();
         ArenasConfig.initializeConfig();
+        //SoundsConfig.initializeConfig();
+        //ModelsConfig.initializeConfig();
         DungeonsConfig.initializeConfig();
     }
 
