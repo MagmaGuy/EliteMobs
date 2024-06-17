@@ -325,7 +325,9 @@ public class CustomItem {
 
     public ItemStack generateItemStack(int itemTier, Player player, EliteEntity eliteEntity) {
         ItemStack itemStack = null;
-        itemTier = limitItemLevel(player, itemTier);
+        //This can happen when doing drop tables, the loot is not yet assigned to anyone
+        if (player != null)
+            itemTier = limitItemLevel(player, itemTier);
         switch (this.scalability) {
             case FIXED:
                 itemStack = generateDefaultsItemStack(player, false, eliteEntity);
