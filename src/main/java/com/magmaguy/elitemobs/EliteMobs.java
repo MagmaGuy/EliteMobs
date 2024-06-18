@@ -6,6 +6,7 @@ package com.magmaguy.elitemobs;
 
 import com.magmaguy.easyminecraftgoals.NMSManager;
 import com.magmaguy.elitemobs.commands.CommandHandler;
+import com.magmaguy.elitemobs.commands.guild.AdventurersGuildCommand;
 import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.config.commands.CommandsConfig;
 import com.magmaguy.elitemobs.config.customarenas.CustomArenasConfig;
@@ -25,28 +26,26 @@ import com.magmaguy.elitemobs.config.potioneffects.PotionEffectsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.config.wormholes.WormholeConfig;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
-import com.magmaguy.elitemobs.dungeons.EliteMobsWorld;
 import com.magmaguy.elitemobs.economy.VaultCompatibility;
 import com.magmaguy.elitemobs.entitytracker.CustomProjectileData;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.events.ActionEvent;
 import com.magmaguy.elitemobs.events.TimedEvent;
 import com.magmaguy.elitemobs.explosionregen.Explosion;
+import com.magmaguy.elitemobs.gamemodes.nightmaremodeworld.DaylightWatchdog;
+import com.magmaguy.elitemobs.gamemodes.zoneworld.Grid;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.items.LootTables;
 import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantment;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.menus.ProceduralShopMenu;
 import com.magmaguy.elitemobs.mobconstructor.PersistentObjectHandler;
-import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomMusic;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.InstancedBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.PluginMobProperties;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
-import com.magmaguy.elitemobs.pathfinding.Navigation;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
-import com.magmaguy.elitemobs.powers.scripts.ScriptAction;
 import com.magmaguy.elitemobs.powerstances.MajorPowerStanceMath;
 import com.magmaguy.elitemobs.powerstances.MinorPowerStanceMath;
 import com.magmaguy.elitemobs.quests.DynamicQuest;
@@ -58,12 +57,12 @@ import com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity;
 import com.magmaguy.elitemobs.thirdparty.placeholderapi.Placeholders;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
-import com.magmaguy.elitemobs.utils.BossBarUtil;
+import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.ServerTime;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
+import com.magmaguy.elitemobs.worlds.CustomWorldLoading;
 import com.magmaguy.elitemobs.wormhole.Wormhole;
-import com.magmaguy.magmacore.MagmaCore;
-import com.magmaguy.magmacore.util.Logger;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -80,64 +79,71 @@ public class EliteMobs extends JavaPlugin {
 
     public static List<World> validWorldList = new ArrayList();
     public static boolean worldGuardIsEnabled = false;
+    public static List<World> zoneBasedSpawningWorlds = new ArrayList<>();
+    public static List<World> nightmareWorlds = new ArrayList<>();
     public static Metrics metrics;
     public Object placeholders = null;
 
     public static void initializeConfigs() {
         //Initialized translations
-        new DefaultConfig();
-        new ItemSettingsConfig();
-        new ProceduralItemGenerationSettingsConfig();
+        DefaultConfig.initializeConfig();
+        SchematicsFolderConfig.initializeConfigs();
+        ResourcePackDataConfig.initializeConfig();
+        ItemSettingsConfig.initializeConfig();
+        ProceduralItemGenerationSettingsConfig.initializeConfig();
         PotionEffectsConfig.initializeConfigs();
-        new EconomySettingsConfig();
-        new EventsConfig();
+        EconomySettingsConfig.initializeConfig();
+        EventsConfig.initializeConfig();
         new EnchantmentsConfig();
-        new AntiExploitConfig();
-        new CombatTagConfig();
-        new AntiExploitConfig();
-        new AdventurersGuildConfig();
-        new ValidWorldsConfig();
+        AntiExploitConfig.initializeConfig();
+        CombatTagConfig.initializeConfig();
+        AntiExploitConfig.initializeConfig();
+        AdventurersGuildConfig.initializeConfig();
+        ValidWorldsConfig.initializeConfig();
 
         new MenusConfig();
         new PowersConfig();
         MobPropertiesConfig.initializeConfigs();
         CustomEnchantment.initializeCustomEnchantments();
 
-        new MobCombatSettingsConfig();
+        MobCombatSettingsConfig.initializeConfig();
         CommandsConfig.initializeConfigs();
-        new DiscordSRVConfig();
+        DiscordSRVConfig.initializeConfig();
+        ItemUpgradeSystemConfig.initializeConfig();
         new CustomEventsConfig();
-        new QuestsConfig();
-        new WormholesConfig();
-        new ArenasConfig();
+        QuestsConfig.initializeConfig();
+        WormholesConfig.initializeConfig();
+        ArenasConfig.initializeConfig();
+        //SoundsConfig.initializeConfig();
         //ModelsConfig.initializeConfig();
-        new DungeonsConfig();
-        new SoundsConfig();
+        DungeonsConfig.initializeConfig();
     }
 
     public static void worldScanner() {
         for (World world : Bukkit.getWorlds())
-            if (ValidWorldsConfig.getInstance().getFileConfiguration().getBoolean("Valid worlds." + world.getName())) {
+            if (ValidWorldsConfig.getFileConfiguration().getBoolean("Valid worlds." + world.getName())) {
                 validWorldList.add(world);
+                if (ValidWorldsConfig.getZoneBasedWorlds().contains(world.getName()))
+                    zoneBasedSpawningWorlds.add(world);
+                if (ValidWorldsConfig.getNightmareWorlds().contains(world.getName())) {
+                    nightmareWorlds.add(world);
+                    DaylightWatchdog.preventDaylight(world);
+                }
             }
 
     }
 
     @Override
     public void onEnable() {
+
         Bukkit.getLogger().info(" _____ _     _____ _____ ________  ______________  _____");
         Bukkit.getLogger().info("|  ___| |   |_   _|_   _|  ___|  \\/  |  _  | ___ \\/  ___|");
         Bukkit.getLogger().info("| |__ | |     | |   | | | |__ | .  . | | | | |_/ /\\ `--.");
         Bukkit.getLogger().info("|  __|| |     | |   | | |  __|| |\\/| | | | | ___ \\ `--. \\");
         Bukkit.getLogger().info("| |___| |_____| |_  | | | |___| |  | \\ \\_/ / |_/ //\\__/ /");
         Bukkit.getLogger().info("\\____/\\_____/\\___/  \\_/ \\____/\\_|  |_/\\___/\\____/ \\____/");
+        MetadataHandler.PLUGIN = this;
         Bukkit.getLogger().info("By MagmaGuy - v. " + MetadataHandler.PLUGIN.getDescription().getVersion());
-
-        if (VersionChecker.serverVersionOlderThan(21, 0)) {
-            Logger.warn("You are running a Minecraft version older than 1.21.0! EliteMobs 9.0 and later are only compatible with Minecraft 1.21.0 or later, if you are running an older Minecraft version you will need to use a pre-9.0 version of EliteMobs.");
-            Bukkit.getPluginManager().disablePlugin(this);
-            return;
-        }
 
         ServerTime.startTickCounter();
 
@@ -148,9 +154,9 @@ public class EliteMobs extends JavaPlugin {
             try {
                 File spigotConfigContainer = new File(Paths.get(MetadataHandler.PLUGIN.getDataFolder().getParentFile().getCanonicalFile().getParentFile().toString() + "/spigot.yml").toString());
                 Bukkit.getServer().spigot().getConfig().save(spigotConfigContainer);
-                Logger.info("New default max health set correctly!");
+                new InfoMessage("New default max health set correctly!");
             } catch (IOException e) {
-                Logger.warn("Failed to save max health value! For the plugin to work correctly, you should increase your max health on the spigot.yml config file to " + 100000000);
+                new WarningMessage("Failed to save max health value! For the plugin to work correctly, you should increase your max health on the spigot.yml config file to " + 100000000);
             }
         }
 
@@ -169,14 +175,14 @@ public class EliteMobs extends JavaPlugin {
         //Reserves ModelEngine addresses if present
         ModelEngineReservedAddresses.reserve();
 
-        if (worldGuardIsEnabled) Logger.info("WorldGuard compatibility is enabled!");
-        else Logger.info("WorldGuard compatibility is not enabled!");
+        if (worldGuardIsEnabled) Bukkit.getLogger().info("[EliteMobs] WorldGuard compatibility is enabled!");
+        else Bukkit.getLogger().info("[EliteMobs] WorldGuard compatibility is not enabled!");
 
         //Enable Vault
         try {
             VaultCompatibility.vaultSetup();
         } catch (Exception e) {
-            Logger.warn("Something went wrong with the vault configuration - your Vault " + "version is probably not compatible with this EliteMobs version. Please contact the dev about this error.");
+            Bukkit.getLogger().warning("[EliteMobs] Something went wrong with the vault configuration - your Vault " + "version is probably not compatible with this EliteMobs version. Please contact the dev about this error.");
             VaultCompatibility.VAULT_ENABLED = false;
         }
 
@@ -184,7 +190,7 @@ public class EliteMobs extends JavaPlugin {
         EventsRegistrer.registerEvents();
 
         //Launch the local data cache
-        new DatabaseConfig();
+        DatabaseConfig.initializeConfig();
         PlayerData.initializeDatabaseConnection();
         ElitePlayerInventory.initialize();
 
@@ -222,8 +228,7 @@ public class EliteMobs extends JavaPlugin {
         new CustomCharts();
 
         //Imports custom configurations and mindungeons from the import folder
-//        ConfigurationImporter.initializeConfigs();
-        MagmaCore.initializeImporter();
+        ConfigurationImporter.initializeConfigs();
         ConfigurationExporter.initializeConfigs();
 
         //Import custom items after potentially importing new items
@@ -233,6 +238,17 @@ public class EliteMobs extends JavaPlugin {
 
         //Initialize em package content, such as world loading
         new DungeonPackagerConfig();
+        //Load Adventurer's Guild
+        if (AdventurersGuildConfig.isGuildWorldIsEnabled()) {
+            try {
+                CustomWorldLoading.startupWorldInitialization();
+                AdventurersGuildCommand.defineTeleportLocation();
+                if (AdventurersGuildConfig.getGuildWorldLocation() == null) AdventurersGuildConfig.toggleGuildInstall();
+            } catch (Exception e) {
+                AdventurersGuildConfig.toggleGuildInstall();
+                new WarningMessage("Failed to initialize the Adventurer's Guild Hub! It is now disabled. You can try to" + "reenable it in /em setup");
+            }
+        }
 
         //Initialize custom & regional bosses
         new CustomBossesConfig();
@@ -250,7 +266,7 @@ public class EliteMobs extends JavaPlugin {
             try {
                 if (emPackage.isInstalled()) emPackage.initializeContent();
             } catch (Exception exception) {
-                Logger.warn("Failed to load EliteMobs Package " + emPackage.getDungeonPackagerConfigFields().getFilename() + " !");
+                new WarningMessage("Failed to load EliteMobs Package " + emPackage.getDungeonPackagerConfigFields().getFilename() + " !");
                 exception.printStackTrace();
             }
 
@@ -259,18 +275,17 @@ public class EliteMobs extends JavaPlugin {
         try {
             new CustomSpawnConfig();
         } catch (Exception ex) {
-            Logger.warn("You are using a version of Spigot or a branch thereof (Paper, Purpur, so on) that is (probably) HORRIBLY outdated!" + " This issue will probably be fixed if you update your server version to the latest patch of the version" +
+            new WarningMessage("You are using a version of Spigot or a branch thereof (Paper, Purpur, so on) that is (probably) HORRIBLY outdated!" + " This issue will probably be fixed if you update your server version to the latest patch of the version" +
                     " you are running.");
-            Logger.warn(" This does not mean that you have to update your Minecraft version, but it does mean you must update your server version to the latest patch" + " available for that Minecraft version. Download from trustworthy sources, as if you download Spigot from some random website other than Spigot," + " you are probably not getting the latest version (and also there's a high chance you'll get a virus).");
+            new WarningMessage(" This does not mean that you have to update your Minecraft version, but it does mean you must update your server version to the latest patch" + " available for that Minecraft version. Download from trustworthy sources, as if you download Spigot from some random website other than Spigot," + " you are probably not getting the latest version (and also there's a high chance you'll get a virus).");
         }
 
         new CustomQuestsConfig();
 
         //Commands
-//        new CommandHandler();
-        CommandHandler.registerCommands();
+        new CommandHandler();
 
-        new SpecialItemSystemsConfig();
+        SpecialItemSystemsConfig.initializeConfig();
 
         /*
         Check for new plugin version or for dungeon updates
@@ -282,15 +297,11 @@ public class EliteMobs extends JavaPlugin {
 
     @Override
     public void onLoad() {
-        //Initializes some core utilities that are shared across MagmaGuy's plugins
-        MetadataHandler.PLUGIN = this;
-        MagmaCore.createInstance(this);
-
         //WorldGuard hook
         try {
             worldGuardIsEnabled = WorldGuardCompatibility.initialize();
         } catch (NoClassDefFoundError | IllegalStateException ex) {
-            Logger.warn("Error loading WorldGuard. EliteMob-specific flags will not work." + " Except if you just reloaded the plugin, in which case they will totally work.");
+            Bukkit.getLogger().warning("[EliteMobs] Error loading WorldGuard. EliteMob-specific flags will not work." + " Except if you just reloaded the plugin, in which case they will totally work.");
             worldGuardIsEnabled = false;
         }
         if (!worldGuardIsEnabled)
@@ -300,22 +311,43 @@ public class EliteMobs extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        Logger.info("Starting EliteMobs shutdown sequence...");
+
+        new InfoMessage("Starting EliteMobs shutdown sequence...");
+
+        new InfoMessage("Regenerating exploded blocks...");
         Explosion.regenerateAllPendingBlocks();
+
+        new InfoMessage("Cancelling tasks...");
         Bukkit.getServer().getScheduler().cancelTasks(MetadataHandler.PLUGIN);
+
+        new InfoMessage("Closing wormholes...");
         Wormhole.shutdown();
+
+        new InfoMessage("Spinning Regional Bosses down...");
+        //save all pending respawns
         RegionalBossEntity.save();
         RegionalBossEntity.getTrackableCustomBosses().clear();
         RegionalBossEntity.getRegionalBossEntitySet().clear();
         InstancedBossEntity.shutdown();
         NPCEntity.shutdown();
+
+        new InfoMessage("Wiping Elite entities clean...");
         PersistentObjectHandler.shutdown();
         EntityTracker.wipeShutdown();
+
+        new InfoMessage("Clearing events...");
         TimedEvent.shutdown();
         ActionEvent.shutdown();
+
+        new InfoMessage("Clearing valid worlds...");
         validWorldList.clear();
+        new InfoMessage("Clearing zone based worlds...");
+        zoneBasedSpawningWorlds.clear();
+        new InfoMessage("Clearing config regional elites...");
         CustomBossesConfigFields.getRegionalElites().clear();
+        new InfoMessage("Clearing custom enchantments...");
         CustomEnchantment.getCustomEnchantmentMap().clear();
+        new InfoMessage("Clearing custom items...");
         CustomItem.getCustomItems().clear();
         CustomItem.getCustomItemStackList().clear();
         CustomItem.getCustomItemStackShopList().clear();
@@ -324,31 +356,42 @@ public class EliteMobs extends JavaPlugin {
         CustomItem.getFixedItems().clear();
         CustomItem.getTieredLoot().clear();
         CustomItem.getWeighedFixedItems().clear();
+        new InfoMessage("Clearing Minidungeons...");
         EMPackage.shutdown();
         RegionalBossEntity.regionalBossesShutdown();
+
+        new InfoMessage("Unregistering placeholders...");
         if (this.placeholders != null) ((Placeholders) placeholders).unregister();
+
+        new InfoMessage("Unregistering handlers...");
         HandlerList.unregisterAll(MetadataHandler.PLUGIN);
+
+        new InfoMessage("Clearing Treasure Chests...");
         TreasureChest.clearTreasureChests();
+
+        new InfoMessage("Untracking quests...");
         QuestTracking.clear();
+
         MatchInstance.shutdown();
+
         CustomProjectileData.shutdown();
+
         DynamicQuest.shutdown();
+
         ProceduralShopMenu.shutdown();
-        EliteMobsWorld.shutdown();
-        Navigation.shutdown();
-        BossBarUtil.shutdown();
-        ScriptAction.shutdown();
-        CustomMusic.shutdown();
-        Logger.info("Saving EliteMobs databases...");
+
+        //save cached data
+        Bukkit.getLogger().info("[EliteMobs] Saving EliteMobs databases...");
         PlayerData.closeConnection();
-        MagmaCore.shutdown();
-        Logger.info("All done! Good night.");
+        Bukkit.getLogger().info("[EliteMobs] All done! Good night.");
+
     }
 
     /*
     Repeating tasks that run as long as the server is on
      */
     private void launchRunnables() {
+        if (!zoneBasedSpawningWorlds.isEmpty()) Grid.initializeGrid();
         //save regional bosses when the files update
         RegionalBossEntity.regionalDataSaver();
     }

@@ -9,7 +9,7 @@ import java.util.Arrays;
 public class ChallengersBootsConfig extends CustomItemsConfigFields {
     public ChallengersBootsConfig() {
         super("challengers_boots", true, Material.DIAMOND_BOOTS, "&cChallenger's Boots", Arrays.asList("&2Awarded to those who challenge the", "&2Wood League Arena!"));
-        setEnchantments(Arrays.asList("PROTECTION,5", "BLAST_PROTECTION,4", "PROJECTILE_PROTECTION,4", "MENDING,1", "UNBREAKING,5"));
+        setEnchantments(Arrays.asList("PROTECTION,5", "PROTECTION_EXPLOSIONS,4", "PROTECTION_PROJECTILE,4", "MENDING,1", "UNBREAKING,5"));
         setItemType(CustomItem.ItemType.UNIQUE);
         setLevel(40);
     }

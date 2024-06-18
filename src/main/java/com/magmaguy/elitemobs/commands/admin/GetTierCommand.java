@@ -9,6 +9,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.HashMap;
+
 public class GetTierCommand {
     private GetTierCommand() {
     }
@@ -55,24 +57,23 @@ public class GetTierCommand {
         new EliteItemLore(bow, false);
 
 
-        player.getInventory().setHelmet(helmet);
-        player.getInventory().setChestplate(chestplate);
-        player.getInventory().setLeggings(leggings);
-        player.getInventory().setBoots(boots);
+
+        player.getInventory().addItem(helmet);
+        player.getInventory().addItem(chestplate);
+        player.getInventory().addItem(leggings);
+        player.getInventory().addItem(boots);
         player.getInventory().addItem(sword);
         player.getInventory().addItem(axe);
         player.getInventory().addItem(bow);
         player.getInventory().addItem(cheatSword);
-        player.getInventory().addItem(new ItemStack(Material.COOKED_BEEF, 64));
-        player.getInventory().addItem(new ItemStack(Material.ARROW, 64));
-        player.getInventory().addItem(new ItemStack(Material.ARROW, 64));
-        player.getInventory().addItem(new ItemStack(Material.SHIELD));
 
     }
 
-    private static void addDurability(ItemStack itemStack) {
+    private static void addDurability(ItemStack itemStack){
         ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.addEnchant(Enchantment.UNBREAKING, 5, true);
+        HashMap<Enchantment, Integer> enchantmentIntegerHashMap = new HashMap<>();
+        enchantmentIntegerHashMap.put(Enchantment.UNBREAKING, 5);
+        ItemTagger.registerEnchantments(itemMeta, enchantmentIntegerHashMap);
         itemStack.setItemMeta(itemMeta);
     }
 
