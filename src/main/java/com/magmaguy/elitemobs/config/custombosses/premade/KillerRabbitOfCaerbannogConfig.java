@@ -15,10 +15,10 @@ public class KillerRabbitOfCaerbannogConfig extends CustomBossesConfigFields {
                 "$eventBossLevel &cKiller Rabbit of Caerbannog",
                 "dynamic");
         setUniqueLootList(Collections.singletonList("rabbit_charm.yml:1"));
-        setTrails(Arrays.asList(Particle.SMOKE_LARGE.toString(),
-                Particle.SMOKE_LARGE.toString(),
-                Particle.SMOKE_LARGE.toString(),
-                Particle.SMOKE_LARGE.toString(),
+        setTrails(Arrays.asList(Particle.LARGE_SMOKE.toString(),
+                Particle.LARGE_SMOKE.toString(),
+                Particle.LARGE_SMOKE.toString(),
+                Particle.LARGE_SMOKE.toString(),
                 Particle.FLAME.toString(),
                 Particle.FLAME.toString()));
     }

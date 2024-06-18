@@ -56,7 +56,7 @@ public class CombatTag implements Listener {
                         cancel();
                     if (player.isOnGround()) {
                         cancel();
-                        player.removePotionEffect(PotionEffectType.SLOW);
+                        player.removePotionEffect(PotionEffectType.SLOWNESS);
                     }
                 }
             }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);

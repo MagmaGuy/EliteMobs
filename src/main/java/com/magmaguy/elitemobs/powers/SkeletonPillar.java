@@ -78,12 +78,12 @@ public class SkeletonPillar extends MajorPower implements Listener {
 
     private void pillarEffect(Location location, int timer, int offset) {
         location.add(locationMover(location, timer, offset));
-        location.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, location, 15, 0.1, 5, 0.1, 0.05);
+        location.getWorld().spawnParticle(Particle.EXPLOSION, location, 15, 0.1, 5, 0.1, 0.05);
         pillarDamage(location);
     }
 
     private void pillarWarningEffect(Location location) {
-        location.getWorld().spawnParticle(Particle.SMOKE_LARGE, location, 5, 0.1, 5, 0.1, 0.05);
+        location.getWorld().spawnParticle(Particle.LARGE_SMOKE, location, 5, 0.1, 5, 0.1, 0.05);
     }
 
     private void pillarDamage(Location location) {

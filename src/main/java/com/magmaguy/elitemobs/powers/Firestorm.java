@@ -62,7 +62,7 @@ public class Firestorm extends BossPower implements Listener {
             @Override
             public void run() {
                 counter++;
-                spawnPhase1Particle(location, Particle.SMOKE_NORMAL);
+                spawnPhase1Particle(location, Particle.SMOKE);
                 if (counter < 20 * 2) return;
                 cancel();
                 doFlamePyrePhase2(location, eliteEntity);
@@ -93,7 +93,7 @@ public class Firestorm extends BossPower implements Listener {
                 counter++;
                 spawnPhase1Particle(location, Particle.FLAME);
                 doDamage(location, eliteEntity, 0.5, 50, 0.5);
-                spawnPhase2Particle(location, Particle.SMOKE_NORMAL);
+                spawnPhase2Particle(location, Particle.SMOKE);
                 if (counter < 20 * 2) return;
                 cancel();
                 doFlamePyrePhase3(location, eliteEntity);
@@ -130,7 +130,7 @@ public class Firestorm extends BossPower implements Listener {
                 counter++;
                 spawnPhase2Particle(location, Particle.FLAME);
                 doDamage(location, eliteEntity, 3, 50, 3);
-                spawnPhase3Particle(location, Particle.SMOKE_NORMAL);
+                spawnPhase3Particle(location, Particle.SMOKE);
                 if (counter < 20 * 2) return;
                 cancel();
                 doFlamePyrePhase4(location, eliteEntity);

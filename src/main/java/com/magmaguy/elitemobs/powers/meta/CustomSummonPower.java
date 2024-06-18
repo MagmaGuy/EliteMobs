@@ -517,7 +517,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
     }
 
     private CustomBossReinforcement doOnCombatEnterPlaceCrystal(Vector location, boolean lightningRod) {
-        CustomBossReinforcement customBossReinforcement = new CustomBossReinforcement(SummonType.ON_COMBAT_ENTER, EntityType.ENDER_CRYSTAL, lightningRod);
+        CustomBossReinforcement customBossReinforcement = new CustomBossReinforcement(SummonType.ON_COMBAT_ENTER, EntityType.END_CRYSTAL, lightningRod);
         customBossReinforcement.setSpawnLocationOffset(location);
         customBossReinforcements.add(customBossReinforcement);
         return customBossReinforcement;

@@ -38,7 +38,7 @@ public class PlasmaBootsEnchantment extends CustomEnchantment {
                 doLanding(level, player);
                 return;
             }
-            player.getWorld().spawnParticle(Particle.REDSTONE, player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(),
+            player.getWorld().spawnParticle(Particle.DUST, player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(),
                     20, 0.1, 0.1, 0.1, 1, new Particle.DustOptions(Color.fromRGB(
                             ThreadLocalRandom.current().nextInt(0, 100),
                             ThreadLocalRandom.current().nextInt(122, 255),
@@ -100,7 +100,7 @@ public class PlasmaBootsEnchantment extends CustomEnchantment {
 
     private static void doVisualEffect(Location currentLocation) {
         Objects.requireNonNull(currentLocation.getWorld())
-                .spawnParticle(Particle.REDSTONE, currentLocation.getX(), currentLocation.getY(), currentLocation.getZ(),
+                .spawnParticle(Particle.DUST, currentLocation.getX(), currentLocation.getY(), currentLocation.getZ(),
                         5, 0.1, 0.1, 0.1, 1, new Particle.DustOptions(Color.fromRGB(
                                 ThreadLocalRandom.current().nextInt(0, 100),
                                 ThreadLocalRandom.current().nextInt(122, 255),

@@ -71,7 +71,7 @@ public class DeathSlice extends BossPower implements Listener {
 
     private static void doWarningParticle(Location location) {
         if (ThreadLocalRandom.current().nextDouble() < 0.3)
-            location.getWorld().spawnParticle(Particle.SMOKE_LARGE, location, 1, 0.05, 0.05, 0.05, 0.05);
+            location.getWorld().spawnParticle(Particle.LARGE_SMOKE, location, 1, 0.05, 0.05, 0.05, 0.05);
     }
 
     private static void doDamagePhase(Location location, EliteEntity eliteEntity) {
