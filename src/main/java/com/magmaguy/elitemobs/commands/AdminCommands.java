@@ -233,17 +233,6 @@ public class AdminCommands {
                         commandContext.get("coords"),
                         commandContext.get("eliteLevel"))));
 
-        // /em spawnsuper <EntityType>
-        manager.command(builder.literal("spawnsuper", "spawnsupermob")
-                .argument(EnumArgument.newBuilder(EntityType.class, "entityType"),
-                        ArgumentDescription.of("Minecraft Entity Type, must be a valid type for a Super Mob"))
-                .meta(CommandMeta.DESCRIPTION, "Spawns a Super Mob based on the entity type.")
-                .senderType(Player.class)
-                .permission("elitemobs.*")
-                .handler(commandContext -> SpawnCommand.spawnSuperMobCommand(
-                        (Player) commandContext.getSender(),
-                        commandContext.get("entityType"))));
-
         // /em addSpawnLocation <fileName>
         manager.command(builder.literal("addSpawnLocation", "asp")
                 .argument(StringArgument.<CommandSender>newBuilder("fileName").withSuggestionsProvider(((objectCommandContext, s) -> regionalBosses)),
@@ -503,22 +492,6 @@ public class AdminCommands {
                 .senderType(Player.class)
                 .permission("elitemobs.*")
                 .handler(commandContext -> KillHandler.radiusKillAggressiveMobs((Player) commandContext.getSender(), commandContext.get("radius"))));
-
-        // /em killpassive
-        manager.command(builder.literal("killpassive")
-                .meta(CommandMeta.DESCRIPTION, "Kills all passive Super Mobs")
-                .senderType(CommandSender.class)
-                .permission("elitemobs.*")
-                .handler(commandContext -> KillHandler.killPassiveMobs(commandContext.getSender())));
-
-        // /em killpassive <radius>
-        manager.command(builder.literal("killpassive")
-                .argument(IntegerArgument.newBuilder("radius"),
-                        ArgumentDescription.of("Distance to kill aggressive elite mobs in"))
-                .meta(CommandMeta.DESCRIPTION, "Kills all passive Super Mobs in a radius")
-                .senderType(Player.class)
-                .permission("elitemobs.*")
-                .handler(commandContext -> KillHandler.radiusKillPassiveMobs((Player) commandContext.getSender(), commandContext.get("radius"))));
 
 
         // /em killtype <entityType>

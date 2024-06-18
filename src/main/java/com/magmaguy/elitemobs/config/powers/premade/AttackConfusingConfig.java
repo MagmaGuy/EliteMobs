@@ -10,7 +10,7 @@ public class AttackConfusingConfig extends PowersConfigFields {
     public AttackConfusingConfig() {
         super("attack_confusing",
                 true,
-                Particle.SPELL_MOB.toString(),
+                Particle.WITCH.toString(),
                 addScriptEntry("ConfusePlayer",
                         List.of("PlayerDamagedByEliteMobEvent"),
                         null,

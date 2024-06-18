@@ -157,7 +157,7 @@ public class EnderDragonDiscoFireballs extends CombatEnterScanPower {
         for (int i = 0; i < 200; i++) {
             particleLocation.add(downwardsVector.clone().multiply(0.3));
             if (!particleLocation.getBlock().isPassable()) break;
-            fireball.getWorld().spawnParticle(Particle.SMOKE_NORMAL, particleLocation, 1, 1, 0, 0, 0);
+            fireball.getWorld().spawnParticle(Particle.SMOKE, particleLocation, 1, 1, 0, 0, 0);
         }
     }
 

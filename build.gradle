@@ -23,7 +23,7 @@ processResources {
 }
 
 group 'com.magmaguy'
-version '8.7.16-SNAPSHOT'
+version '9.0.0-SNAPSHOT'
 
 repositories {
     maven {
@@ -77,8 +77,7 @@ repositories {
 
 dependencies {
     //Spigot API
-    compileOnly "org.spigotmc:spigot-api:1.20-R0.1-SNAPSHOT"
-    // The full CraftBukkit server with no shadowing. Requires mavenLocal.
+    compileOnly "org.spigotmc:spigot-api:1.21-R0.1-SNAPSHOT"
     //BStats API
     implementation group: 'org.bstats', name: 'bstats-bukkit', version: '2.2.1'
     //WorldGuard API

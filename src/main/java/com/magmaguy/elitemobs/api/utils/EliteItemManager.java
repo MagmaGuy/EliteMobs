@@ -163,20 +163,20 @@ public class EliteItemManager {
     public static double getEliteDamageFromEnchantments(@Nullable ItemStack itemStack) {
         if (itemStack == null) return 0;
         //Elite Items may have elite enchantments associated to an item
-        int enchantmentLevel = ItemTagger.getEnchantment(itemStack.getItemMeta(), Enchantment.DAMAGE_ALL.getKey());
+        int enchantmentLevel = ItemTagger.getEnchantment(itemStack.getItemMeta(), Enchantment.SHARPNESS.getKey());
         if (enchantmentLevel > 0 && ItemSettingsConfig.isUseEliteEnchantments()) {
-            enchantmentLevel -= Enchantment.DAMAGE_ALL.getMaxLevel();
+            enchantmentLevel -= Enchantment.SHARPNESS.getMaxLevel();
             if (enchantmentLevel < 0) enchantmentLevel = 0;
         } else {
-            enchantmentLevel = ItemTagger.getEnchantment(itemStack.getItemMeta(), Enchantment.ARROW_DAMAGE.getKey());
+            enchantmentLevel = ItemTagger.getEnchantment(itemStack.getItemMeta(), Enchantment.POWER.getKey());
             if (enchantmentLevel > 0 && ItemSettingsConfig.isUseEliteEnchantments())
-                enchantmentLevel -= Enchantment.ARROW_DAMAGE.getMaxLevel();
+                enchantmentLevel -= Enchantment.POWER.getMaxLevel();
             if (enchantmentLevel < 0) enchantmentLevel = 0;
         }
 
         if (enchantmentLevel < 1)
             //Note: this means sharpness works on bows and that power works on weapons. By default, this state is not reachable, so it doesn't really matter.
-            enchantmentLevel += itemStack.getEnchantmentLevel(Enchantment.ARROW_DAMAGE) + itemStack.getEnchantmentLevel(Enchantment.DAMAGE_ALL);
+            enchantmentLevel += itemStack.getEnchantmentLevel(Enchantment.POWER) + itemStack.getEnchantmentLevel(Enchantment.SHARPNESS);
         if (enchantmentLevel == 0) return 0;
         //This is how vanilla sharpness works. Might as well use it for everything.
         return 1 + enchantmentLevel * 0.5;
@@ -222,7 +222,7 @@ public class EliteItemManager {
     public static double getBonusEliteDefense(@Nullable ItemStack itemStack) {
         if (itemStack == null || itemStack.getItemMeta() == null) return 0D;
         int enchantmentLevel = 0;
-        enchantmentLevel = ItemTagger.getEnchantment(itemStack.getItemMeta(), Enchantment.PROTECTION_ENVIRONMENTAL.getKey());
+        enchantmentLevel = ItemTagger.getEnchantment(itemStack.getItemMeta(), Enchantment.PROTECTION.getKey());
         return enchantmentLevel * .25;
     }
 

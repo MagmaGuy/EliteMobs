@@ -17,7 +17,7 @@ public class GoblinChestplateItem extends CustomItemsConfigFields {
                 List.of("&8A treasure among goblins!"));
         if (!VersionChecker.serverVersionOlderThan(16, 0))
             setMaterial(Material.NETHERITE_CHESTPLATE);
-        setEnchantments(Arrays.asList("PROTECTION_ENVIRONMENTAL,1", "PROTECTION_EXPLOSIONS,1", "PROTECTION_PROJECTILE,1", "DURABILITY,1"));
+        setEnchantments(Arrays.asList("PROTECTION,1", "PROTECTION_EXPLOSIONS,1", "PROTECTION_PROJECTILE,1", "UNBREAKING,1"));
         setPotionEffects(List.of("SATURATION,0,self,continuous"));
         setItemType(CustomItem.ItemType.UNIQUE);
     }

@@ -102,7 +102,7 @@ public class EnderDragonTornado extends CombatEnterScanPower {
                         .rotateAroundY(ThreadLocalRandom.current().nextDouble(2 * Math.PI)));
                 randomParticleLocation.setDirection(randomParticleLocation.toVector().rotateAroundY(0.5 * Math.PI));
                 if (ThreadLocalRandom.current().nextDouble() < 0.7)
-                    tornadoEye.getWorld().spawnParticle(Particle.SMOKE_LARGE, randomParticleLocation, 1, 0, 0, 0, 0.05);
+                    tornadoEye.getWorld().spawnParticle(Particle.LARGE_SMOKE, randomParticleLocation, 1, 0, 0, 0, 0.05);
                 else
                     tornadoEye.getWorld().spawnParticle(Particle.SOUL_FIRE_FLAME, randomParticleLocation, 1, 0, 0, 0, 0.05);
             }

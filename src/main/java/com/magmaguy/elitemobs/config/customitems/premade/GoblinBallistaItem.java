@@ -14,7 +14,7 @@ public class GoblinBallistaItem extends CustomItemsConfigFields {
                 Material.CROSSBOW,
                 "&8Goblin Ballista",
                 List.of("&8A treasure among goblins!"));
-        setEnchantments(Arrays.asList("ARROW_DAMAGE,1", "DURABILITY,1", "QUICK_CHARGE,3", "MULTISHOT,1"));
+        setEnchantments(Arrays.asList("ARROW_DAMAGE,1", "UNBREAKING,1", "QUICK_CHARGE,3", "MULTISHOT,1"));
         setPotionEffects(List.of("HEAL,0,self,onHit"));
         setItemType(CustomItem.ItemType.UNIQUE);
     }

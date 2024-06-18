@@ -78,7 +78,7 @@ public class FrostCone extends BossPower implements Listener {
         for (int i = 0; i < 100; i++) {
             Vector shotVector = getShotVector(eliteEntity, location);
             eliteEntity.getLivingEntity().getWorld().spawnParticle(
-                    Particle.SMOKE_NORMAL,
+                    Particle.SMOKE,
                     eliteEntity.getLivingEntity().getLocation().clone().add(new Vector(0, 1, 0)),
                     0,
                     shotVector.getX(),
@@ -132,7 +132,7 @@ public class FrostCone extends BossPower implements Listener {
             frostconePlayer.put(event.getPlayer(), 1);
         else
             frostconePlayer.put(event.getPlayer(), frostconePlayer.get(event.getPlayer()) + 1);
-        event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 7, frostconePlayer.get(event.getPlayer())));
+        event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 20 * 7, frostconePlayer.get(event.getPlayer())));
         new BukkitRunnable() {
             final int amount = frostconePlayer.get(event.getPlayer());
 

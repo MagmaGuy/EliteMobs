@@ -7,14 +7,14 @@ public class EliteEnchantments {
 
     public static boolean isPotentialEliteEnchantment(Enchantment enchantment) {
         if (!ItemSettingsConfig.isUseEliteEnchantments()) return false;
-        return enchantment.getKey().equals(Enchantment.DAMAGE_ALL.getKey()) ||
-                enchantment.getKey().equals(Enchantment.ARROW_DAMAGE.getKey()) ||
-                enchantment.getKey().equals(Enchantment.PROTECTION_ENVIRONMENTAL.getKey()) ||
-                enchantment.getKey().equals(Enchantment.DAMAGE_ARTHROPODS.getKey()) ||
-                enchantment.getKey().equals(Enchantment.DAMAGE_UNDEAD.getKey()) ||
-                enchantment.getKey().equals(Enchantment.PROTECTION_EXPLOSIONS.getKey()) ||
-                enchantment.getKey().equals(Enchantment.PROTECTION_FIRE.getKey()) ||
-                enchantment.getKey().equals(Enchantment.PROTECTION_PROJECTILE.getKey()) ||
+        return enchantment.getKey().equals(Enchantment.SHARPNESS.getKey()) ||
+                enchantment.getKey().equals(Enchantment.POWER.getKey()) ||
+                enchantment.getKey().equals(Enchantment.PROTECTION.getKey()) ||
+                enchantment.getKey().equals(Enchantment.BANE_OF_ARTHROPODS.getKey()) ||
+                enchantment.getKey().equals(Enchantment.SMITE.getKey()) ||
+                enchantment.getKey().equals(Enchantment.BLAST_PROTECTION.getKey()) ||
+                enchantment.getKey().equals(Enchantment.FIRE_PROTECTION.getKey()) ||
+                enchantment.getKey().equals(Enchantment.PROJECTILE_PROTECTION.getKey()) ||
                 enchantment.getKey().equals(Enchantment.THORNS.getKey());
     }
 

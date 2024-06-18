@@ -16,6 +16,6 @@ public class EmberConfig extends CustomBossesConfigFields {
         setHealthMultiplier(0.3);
         setDamageMultiplier(0.3);
         setDropsEliteMobsLoot(false);
-        setTrails(Collections.singletonList(Particle.SPELL_WITCH.toString()));
+        setTrails(Collections.singletonList(Particle.WITCH.toString()));
     }
 }

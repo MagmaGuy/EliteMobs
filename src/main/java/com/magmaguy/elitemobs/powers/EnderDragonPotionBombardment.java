@@ -28,8 +28,8 @@ public class EnderDragonPotionBombardment extends Bombardment {
             ItemStack itemStack = new ItemStack(Material.SPLASH_POTION);
             PotionMeta potionMeta = (PotionMeta) itemStack.getItemMeta();
             if (ThreadLocalRandom.current().nextBoolean())
-                potionMeta.addCustomEffect(new PotionEffect(PotionEffectType.HARM, 0, 1), true);
-            else potionMeta.addCustomEffect(new PotionEffect(PotionEffectType.SLOW, 0, 1), true);
+                potionMeta.addCustomEffect(new PotionEffect(PotionEffectType.STRENGTH, 0, 1), true);
+            else potionMeta.addCustomEffect(new PotionEffect(PotionEffectType.SLOWNESS, 0, 1), true);
 
             itemStack.setItemMeta(potionMeta);
 
@@ -39,7 +39,7 @@ public class EnderDragonPotionBombardment extends Bombardment {
                             new Vector(ThreadLocalRandom.current().nextInt(-1, 1),
                                     1,
                                     ThreadLocalRandom.current().nextInt(-1, 1)))
-                    , EntityType.SPLASH_POTION);
+                    , EntityType.POTION);
 
             thrownPotion.setItem(itemStack);
 

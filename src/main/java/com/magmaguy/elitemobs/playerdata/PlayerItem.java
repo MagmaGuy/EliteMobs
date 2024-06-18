@@ -102,10 +102,10 @@ public class PlayerItem {
 
         //Enchantments are global, any inventory slot will add to the total of any enchantment
         this.eliteDamageReduction = EliteItemManager.getEliteDefense(itemStack) + EliteItemManager.getBonusEliteDefense(itemStack);
-        this.protectionProjectile = ItemTagger.getEnchantment(itemStack.getItemMeta(), Enchantment.PROTECTION_PROJECTILE.getKey());
-        this.blastProtection = ItemTagger.getEnchantment(itemStack.getItemMeta(), Enchantment.PROTECTION_EXPLOSIONS.getKey());
-        this.damageArthropodsLevel = ItemTagger.getEnchantment(itemStack.getItemMeta(), Enchantment.DAMAGE_ARTHROPODS.getKey());
-        this.damageUndeadLevel = ItemTagger.getEnchantment(itemStack.getItemMeta(), Enchantment.DAMAGE_UNDEAD.getKey());
+        this.protectionProjectile = ItemTagger.getEnchantment(itemStack.getItemMeta(), Enchantment.PROJECTILE_PROTECTION.getKey());
+        this.blastProtection = ItemTagger.getEnchantment(itemStack.getItemMeta(), Enchantment.BLAST_PROTECTION.getKey());
+        this.damageArthropodsLevel = ItemTagger.getEnchantment(itemStack.getItemMeta(), Enchantment.BANE_OF_ARTHROPODS.getKey());
+        this.damageUndeadLevel = ItemTagger.getEnchantment(itemStack.getItemMeta(), Enchantment.SMITE.getKey());
         this.critChance = ItemTagger.getEnchantment(itemStack.getItemMeta(), new NamespacedKey(MetadataHandler.PLUGIN, CriticalStrikesEnchantment.key)) / 10D;
         this.lightningChance = Math.pow(ItemTagger.getEnchantment(itemStack.getItemMeta(), new NamespacedKey(MetadataHandler.PLUGIN, LightningEnchantment.key)), 2) / 1000D;
         this.plasmaBootsLevel = ItemTagger.getEnchantment(itemStack.getItemMeta(), new NamespacedKey(MetadataHandler.PLUGIN, PlasmaBootsEnchantment.key));
