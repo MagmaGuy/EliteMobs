@@ -120,8 +120,8 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
             double customBossDamageMultiplier = eliteEntity.getDamageMultiplier();
             double potionEffectDamageReduction = 0;
 
-            if (player.hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE))
-                potionEffectDamageReduction = (player.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE).
+            if (player.hasPotionEffect(PotionEffectType.RESISTANCE))
+                potionEffectDamageReduction = (player.getPotionEffect(PotionEffectType.RESISTANCE).
                         getAmplifier() + 1) * MobCombatSettingsConfig.getResistanceDamageMultiplier();
 
             double finalDamage;
@@ -197,8 +197,8 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
                     ItemMeta itemMeta = player.getInventory().getItemInOffHand().getItemMeta();
                     org.bukkit.inventory.meta.Damageable damageable = (Damageable) itemMeta;
 
-                    if (player.getInventory().getItemInOffHand().getItemMeta().hasEnchant(Enchantment.DURABILITY) &&
-                            player.getInventory().getItemInOffHand().getItemMeta().getEnchantLevel(Enchantment.DURABILITY) / 20D > ThreadLocalRandom.current().nextDouble())
+                    if (player.getInventory().getItemInOffHand().getItemMeta().hasEnchant(Enchantment.UNBREAKING) &&
+                            player.getInventory().getItemInOffHand().getItemMeta().getEnchantLevel(Enchantment.UNBREAKING) / 20D > ThreadLocalRandom.current().nextDouble())
                         damageable.setDamage(damageable.getDamage() + 5);
                     player.getInventory().getItemInOffHand().setItemMeta(itemMeta);
                     if (Material.SHIELD.getMaxDurability() < damageable.getDamage())

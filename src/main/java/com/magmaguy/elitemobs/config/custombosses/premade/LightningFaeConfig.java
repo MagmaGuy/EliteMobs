@@ -17,6 +17,6 @@ public class LightningFaeConfig extends CustomBossesConfigFields {
         setDamageMultiplier(0.3);
         setPowers(Collections.singletonList("attack_lightning.yml"));
         setUniqueLootList(Collections.singletonList("the_feller.yml:0.3"));
-        setTrails(Collections.singletonList(Particle.SPELL.toString()));
+        setTrails(Collections.singletonList(Particle.WITCH.toString()));
     }
 }

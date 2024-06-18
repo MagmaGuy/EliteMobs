@@ -8,7 +8,7 @@ public class ArrowRainConfig extends PowersConfigFields {
     public ArrowRainConfig() {
         super("arrow_rain",
                 true,
-                Particle.DRIP_WATER.toString(),
+                Particle.DRIPPING_WATER.toString(),
                 ArrowRain.class,
                 PowerType.OFFENSIVE);
     }

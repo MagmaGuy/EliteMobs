@@ -7,10 +7,8 @@ import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
-import com.magmaguy.elitemobs.mobconstructor.SuperMobConstructor;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
-import com.magmaguy.elitemobs.mobconstructor.mobdata.passivemobs.SuperMobProperties;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -145,12 +143,6 @@ public class SpawnCommand {
         customBossEntity.spawn(false);
     }
 
-    public static void spawnSuperMobCommand(Player player, EntityType entityType) {
-        if (SuperMobProperties.isValidSuperMobType(entityType))
-            spawnSuperMob(entityType, getLocation(player));
-        else
-            player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Entity type " + entityType.toString() + " can't be a Super Mob!"));
-    }
 
     private static Location getLocation(Player player) {
         return player.getTargetBlock(null, 30).getLocation().add(0.5, 1, 0.5);
@@ -175,10 +167,6 @@ public class SpawnCommand {
                 elitePowers.add(powersConfigFields);
             }
         return elitePowers;
-    }
-
-    private static void spawnSuperMob(EntityType entityType, Location location) {
-        SuperMobConstructor.constructSuperMob((LivingEntity) location.getWorld().spawnEntity(location, entityType));
     }
 
 }

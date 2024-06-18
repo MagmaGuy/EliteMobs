@@ -24,7 +24,7 @@ public class LightningSpawnBypass implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onLightningSpawn(EntitySpawnEvent event) {
         if (!bypass) return;
-        if (!event.getEntity().getType().equals(EntityType.LIGHTNING)) return;
+        if (!event.getEntity().getType().equals(EntityType.LIGHTNING_BOLT)) return;
         bypass = true;
         event.setCancelled(false);
     }

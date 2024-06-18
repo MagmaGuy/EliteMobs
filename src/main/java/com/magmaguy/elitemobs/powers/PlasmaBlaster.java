@@ -78,7 +78,7 @@ public class PlasmaBlaster extends CombatEnterScanPower {
 
     private void doDamageFireworks(Location endLocation) {
         for (int i = 0; i < 200; i++) {
-            endLocation.getWorld().spawnParticle(Particle.REDSTONE, endLocation.getX(), endLocation.getY(), endLocation.getZ(),
+            endLocation.getWorld().spawnParticle(Particle.DUST, endLocation.getX(), endLocation.getY(), endLocation.getZ(),
                     1, 3, 3, 3,
                     1, new Particle.DustOptions(Color.fromRGB(
                             ThreadLocalRandom.current().nextInt(122, 255),
@@ -89,7 +89,7 @@ public class PlasmaBlaster extends CombatEnterScanPower {
     }
 
     private void doVisualEffect(Location location, int counter) {
-        location.getWorld().spawnParticle(Particle.REDSTONE, location.getX(), location.getY(), location.getZ(),
+        location.getWorld().spawnParticle(Particle.DUST, location.getX(), location.getY(), location.getZ(),
                 10, 0.1 * counter / 12d, 0.1 * counter / 12d, 0.1 * counter / 12d, 1, new Particle.DustOptions(Color.fromRGB(
                         ThreadLocalRandom.current().nextInt(0, 100),
                         ThreadLocalRandom.current().nextInt(122, 255),

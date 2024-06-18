@@ -119,7 +119,7 @@ public class WormholeTask {
     private static void visualEffect(int counter, WormholeEntry wormholeEntry) {
         for (Vector vector : wormholeEntry.getWormhole().getCachedRotations().get(counter)) {
             Location particleLocation = wormholeEntry.getLocation().clone().add(vector);
-            wormholeEntry.getLocation().getWorld().spawnParticle(Particle.REDSTONE, particleLocation.getX(), particleLocation.getY(), particleLocation.getZ(), 1, 0, 0, 0, 1, new Particle.DustOptions(wormholeEntry.getWormhole().getParticleColor(), 1));
+            wormholeEntry.getLocation().getWorld().spawnParticle(Particle.DUST, particleLocation.getX(), particleLocation.getY(), particleLocation.getZ(), 1, 0, 0, 0, 1, new Particle.DustOptions(wormholeEntry.getWormhole().getParticleColor(), 1));
         }
     }
 }

@@ -189,23 +189,23 @@ public class ItemQualityColorizer {
             case IRON_SWORD:
             case STONE_SWORD:
             case WOODEN_SWORD:
-                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.DAMAGE_ARTHROPODS).getMaxLevel();
+                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.BANE_OF_ARTHROPODS).getMaxLevel();
                 maxRank += EnchantmentsConfig.getEnchantment(Enchantment.FIRE_ASPECT).getMaxLevel();
                 maxRank += EnchantmentsConfig.getEnchantment(Enchantment.KNOCKBACK).getMaxLevel();
-                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.LOOT_BONUS_BLOCKS).getMaxLevel();
+                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.FORTUNE).getMaxLevel();
                 maxRank += EnchantmentsConfig.getEnchantment(Enchantment.MENDING).getMaxLevel();
-                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.DAMAGE_ALL).getMaxLevel();
-                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.DAMAGE_UNDEAD).getMaxLevel();
+                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.SHARPNESS).getMaxLevel();
+                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.SMITE).getMaxLevel();
                 maxRank += EnchantmentsConfig.getEnchantment(Enchantment.SWEEPING_EDGE).getMaxLevel();
-                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.DURABILITY).getMaxLevel();
+                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.UNBREAKING).getMaxLevel();
                 break;
             case BOW:
-                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.ARROW_FIRE).getMaxLevel();
-                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.ARROW_INFINITE).getMaxLevel();
+                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.FLAME).getMaxLevel();
+                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.INFINITY).getMaxLevel();
                 maxRank += EnchantmentsConfig.getEnchantment(Enchantment.MENDING).getMaxLevel();
-                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.ARROW_DAMAGE).getMaxLevel();
-                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.ARROW_KNOCKBACK).getMaxLevel();
-                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.DURABILITY).getMaxLevel();
+                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.POWER).getMaxLevel();
+                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.PUNCH).getMaxLevel();
+                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.UNBREAKING).getMaxLevel();
                 break;
             case DIAMOND_PICKAXE:
             case GOLDEN_PICKAXE:
@@ -217,11 +217,11 @@ public class ItemQualityColorizer {
             case IRON_SHOVEL:
             case STONE_SHOVEL:
             case WOODEN_SHOVEL:
-                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.DIG_SPEED).getMaxLevel();
-                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.LOOT_BONUS_BLOCKS).getMaxLevel();
+                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.EFFICIENCY).getMaxLevel();
+                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.FORTUNE).getMaxLevel();
                 maxRank += EnchantmentsConfig.getEnchantment(Enchantment.MENDING).getMaxLevel();
                 maxRank += EnchantmentsConfig.getEnchantment(Enchantment.SILK_TOUCH).getMaxLevel();
-                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.DURABILITY).getMaxLevel();
+                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.UNBREAKING).getMaxLevel();
                 break;
             case DIAMOND_HOE:
             case GOLDEN_HOE:
@@ -229,48 +229,48 @@ public class ItemQualityColorizer {
             case STONE_HOE:
             case WOODEN_HOE:
                 maxRank += EnchantmentsConfig.getEnchantment(Enchantment.MENDING).getMaxLevel();
-                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.DURABILITY).getMaxLevel();
+                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.UNBREAKING).getMaxLevel();
                 break;
             case DIAMOND_AXE:
             case GOLDEN_AXE:
             case IRON_AXE:
             case STONE_AXE:
             case WOODEN_AXE:
-                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.DAMAGE_ARTHROPODS).getMaxLevel();
-                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.DIG_SPEED).getMaxLevel();
-                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.LOOT_BONUS_BLOCKS).getMaxLevel();
+                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.BANE_OF_ARTHROPODS).getMaxLevel();
+                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.EFFICIENCY).getMaxLevel();
+                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.FORTUNE).getMaxLevel();
                 maxRank += EnchantmentsConfig.getEnchantment(Enchantment.MENDING).getMaxLevel();
-                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.DAMAGE_ALL).getMaxLevel();
+                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.SHARPNESS).getMaxLevel();
                 maxRank += EnchantmentsConfig.getEnchantment(Enchantment.SILK_TOUCH).getMaxLevel();
-                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.DAMAGE_UNDEAD).getMaxLevel();
-                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.DURABILITY).getMaxLevel();
+                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.SMITE).getMaxLevel();
+                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.UNBREAKING).getMaxLevel();
                 break;
             case CHAINMAIL_HELMET:
             case DIAMOND_HELMET:
             case GOLDEN_HELMET:
             case IRON_HELMET:
             case LEATHER_HELMET:
-                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.DURABILITY).getMaxLevel();
+                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.UNBREAKING).getMaxLevel();
                 maxRank += EnchantmentsConfig.getEnchantment(Enchantment.MENDING).getMaxLevel();
-                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.OXYGEN).getMaxLevel();
-                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL).getMaxLevel();
-                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.PROTECTION_EXPLOSIONS).getMaxLevel();
-                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.PROTECTION_FIRE).getMaxLevel();
-                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.PROTECTION_PROJECTILE).getMaxLevel();
+                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.RESPIRATION).getMaxLevel();
+                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.PROTECTION).getMaxLevel();
+                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.BLAST_PROTECTION).getMaxLevel();
+                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.FIRE_PROTECTION).getMaxLevel();
+                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.PROJECTILE_PROTECTION).getMaxLevel();
                 maxRank += EnchantmentsConfig.getEnchantment(Enchantment.THORNS).getMaxLevel();
-                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.WATER_WORKER).getMaxLevel();
+                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.AQUA_AFFINITY).getMaxLevel();
                 break;
             case CHAINMAIL_CHESTPLATE:
             case DIAMOND_CHESTPLATE:
             case GOLDEN_CHESTPLATE:
             case IRON_CHESTPLATE:
             case LEATHER_CHESTPLATE:
-                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.DURABILITY).getMaxLevel();
+                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.UNBREAKING).getMaxLevel();
                 maxRank += EnchantmentsConfig.getEnchantment(Enchantment.MENDING).getMaxLevel();
-                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL).getMaxLevel();
-                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.PROTECTION_EXPLOSIONS).getMaxLevel();
-                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.PROTECTION_FIRE).getMaxLevel();
-                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.PROTECTION_PROJECTILE).getMaxLevel();
+                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.PROTECTION).getMaxLevel();
+                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.BLAST_PROTECTION).getMaxLevel();
+                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.FIRE_PROTECTION).getMaxLevel();
+                maxRank += EnchantmentsConfig.getEnchantment(Enchantment.PROJECTILE_PROTECTION).getMaxLevel();
                 maxRank += EnchantmentsConfig.getEnchantment(Enchantment.THORNS).getMaxLevel();
                 break;
 
@@ -281,45 +281,45 @@ public class ItemQualityColorizer {
                 material.equals(Material.GOLDEN_LEGGINGS) || material.equals(Material.IRON_LEGGINGS) ||
                 material.equals(Material.LEATHER_LEGGINGS)) {
 
-            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.DURABILITY).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.UNBREAKING).getMaxLevel();
             maxRank += EnchantmentsConfig.getEnchantment(Enchantment.MENDING).getMaxLevel();
-            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL).getMaxLevel();
-            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.PROTECTION_EXPLOSIONS).getMaxLevel();
-            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.PROTECTION_FIRE).getMaxLevel();
-            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.PROTECTION_PROJECTILE).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.PROTECTION).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.BLAST_PROTECTION).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.FIRE_PROTECTION).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.PROJECTILE_PROTECTION).getMaxLevel();
             maxRank += EnchantmentsConfig.getEnchantment(Enchantment.THORNS).getMaxLevel();
 
         } else if (material.equals(Material.CHAINMAIL_BOOTS) || material.equals(Material.DIAMOND_BOOTS) ||
                 material.equals(Material.GOLDEN_BOOTS) || material.equals(Material.IRON_BOOTS) ||
                 material.equals(Material.LEATHER_BOOTS)) {
 
-            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.DURABILITY).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.UNBREAKING).getMaxLevel();
             maxRank += EnchantmentsConfig.getEnchantment(Enchantment.MENDING).getMaxLevel();
-            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL).getMaxLevel();
-            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.PROTECTION_EXPLOSIONS).getMaxLevel();
-            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.PROTECTION_FALL).getMaxLevel();
-            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.PROTECTION_FIRE).getMaxLevel();
-            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.PROTECTION_PROJECTILE).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.PROTECTION).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.BLAST_PROTECTION).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.FEATHER_FALLING).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.FIRE_PROTECTION).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.PROJECTILE_PROTECTION).getMaxLevel();
             maxRank += EnchantmentsConfig.getEnchantment(Enchantment.THORNS).getMaxLevel();
             maxRank += EnchantmentsConfig.getEnchantment(Enchantment.DEPTH_STRIDER).getMaxLevel();
             maxRank += EnchantmentsConfig.getEnchantment(Enchantment.FROST_WALKER).getMaxLevel();
 
         } else if (material.equals(Material.SHEARS)) {
 
-            EnchantmentsConfig.getEnchantment(Enchantment.DIG_SPEED).getMaxLevel();
+            EnchantmentsConfig.getEnchantment(Enchantment.EFFICIENCY).getMaxLevel();
             EnchantmentsConfig.getEnchantment(Enchantment.MENDING).getMaxLevel();
-            EnchantmentsConfig.getEnchantment(Enchantment.DURABILITY).getMaxLevel();
+            EnchantmentsConfig.getEnchantment(Enchantment.UNBREAKING).getMaxLevel();
 
         } else if (material.equals(Material.FISHING_ROD)) {
 
-            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.DURABILITY).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.UNBREAKING).getMaxLevel();
             maxRank += EnchantmentsConfig.getEnchantment(Enchantment.MENDING).getMaxLevel();
-            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.LUCK).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.LUCK_OF_THE_SEA).getMaxLevel();
             maxRank += EnchantmentsConfig.getEnchantment(Enchantment.LURE).getMaxLevel();
 
         } else if (material.equals(Material.SHIELD)) {
 
-            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.DURABILITY).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.UNBREAKING).getMaxLevel();
             maxRank += EnchantmentsConfig.getEnchantment(Enchantment.MENDING).getMaxLevel();
 
         }

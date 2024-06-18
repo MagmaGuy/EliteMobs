@@ -17,6 +17,6 @@ public class IceFaeConfig extends CustomBossesConfigFields {
         setDamageMultiplier(0.3);
         setPowers(Collections.singletonList("attack_freeze.yml"));
         setUniqueLootList(Collections.singletonList("the_feller.yml:0.3"));
-        setTrails(Collections.singletonList(Particle.WATER_DROP.toString()));
+        setTrails(Collections.singletonList(Particle.DRIPPING_WATER.toString()));
     }
 }

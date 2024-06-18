@@ -8,7 +8,7 @@ public class ZombieBloatConfig extends PowersConfigFields {
     public ZombieBloatConfig() {
         super("zombie_bloat",
                 true,
-                Particle.TOTEM.toString(),
+                Particle.TOTEM_OF_UNDYING.toString(),
                 ZombieBloat.class,
                 PowerType.MAJOR_ZOMBIE);
     }

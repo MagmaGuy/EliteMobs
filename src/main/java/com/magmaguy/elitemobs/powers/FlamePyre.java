@@ -50,7 +50,7 @@ public class FlamePyre extends BossPower implements Listener {
                     cancel();
                     return;
                 }
-                spawnPhase1Particle(eliteEntity.getLivingEntity().getLocation().clone(), Particle.SMOKE_NORMAL);
+                spawnPhase1Particle(eliteEntity.getLivingEntity().getLocation().clone(), Particle.SMOKE);
                 if (counter < 20 * 2) return;
                 cancel();
                 doFlamePyrePhase2(eliteEntity);
@@ -85,7 +85,7 @@ public class FlamePyre extends BossPower implements Listener {
                 counter++;
                 spawnPhase1Particle(eliteEntity.getLivingEntity().getLocation().clone(), Particle.FLAME);
                 doDamage(eliteEntity, 0.5, 50, 0.5);
-                spawnPhase2Particle(eliteEntity.getLivingEntity().getLocation().clone(), Particle.SMOKE_NORMAL);
+                spawnPhase2Particle(eliteEntity.getLivingEntity().getLocation().clone(), Particle.SMOKE);
                 if (counter < 20 * 2) return;
                 cancel();
                 doFlamePyrePhase3(eliteEntity);
@@ -128,7 +128,7 @@ public class FlamePyre extends BossPower implements Listener {
                 counter++;
                 spawnPhase2Particle(eliteEntity.getLivingEntity().getLocation().clone(), Particle.FLAME);
                 doDamage(eliteEntity, 3, 50, 3);
-                spawnPhase3Particle(eliteEntity.getLivingEntity().getLocation().clone(), Particle.SMOKE_NORMAL);
+                spawnPhase3Particle(eliteEntity.getLivingEntity().getLocation().clone(), Particle.SMOKE);
                 if (counter < 20 * 2) return;
                 cancel();
                 doFlamePyrePhase4(eliteEntity);

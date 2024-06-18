@@ -17,7 +17,7 @@ public class GoblinCleaverItem extends CustomItemsConfigFields {
                 List.of("&8A treasure among goblins!"));
         if (!VersionChecker.serverVersionOlderThan(16, 0))
             setMaterial(Material.NETHERITE_AXE);
-        setEnchantments(Arrays.asList("DAMAGE_ALL,1", "DAMAGE_UNDEAD,1", "DURABILITY,1", "KNOCKBACK,1", "LOOT_BONUS_MOBS,5"));
+        setEnchantments(Arrays.asList("DAMAGE_ALL,1", "DAMAGE_UNDEAD,1", "UNBREAKING,1", "KNOCKBACK,1", "LOOT_BONUS_MOBS,5"));
         setPotionEffects(List.of("POISON,0,target,onHit"));
         setItemType(CustomItem.ItemType.UNIQUE);
     }

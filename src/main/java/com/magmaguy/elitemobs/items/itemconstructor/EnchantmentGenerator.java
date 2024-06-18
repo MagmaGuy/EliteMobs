@@ -74,7 +74,7 @@ public class EnchantmentGenerator {
                 validEnchantments.putAll(validateEnchantments("DAMAGE_ALL"));
                 validEnchantments.putAll(validateEnchantments("DAMAGE_ARTHROPODS"));
                 validEnchantments.putAll(validateEnchantments("DAMAGE_UNDEAD"));
-                validEnchantments.putAll(validateEnchantments("DURABILITY"));
+                validEnchantments.putAll(validateEnchantments("UNBREAKING"));
                 validEnchantments.putAll(validateEnchantments("FIRE_ASPECT"));
                 validEnchantments.putAll(validateEnchantments("KNOCKBACK"));
                 validEnchantments.putAll(validateEnchantments("LOOT_BONUS_MOBS"));
@@ -87,7 +87,7 @@ public class EnchantmentGenerator {
                 validEnchantments.putAll(validateEnchantments("ARROW_FIRE"));
                 validEnchantments.putAll(validateEnchantments("ARROW_INFINITE"));
                 validEnchantments.putAll(validateEnchantments("ARROW_KNOCKBACK"));
-                validEnchantments.putAll(validateEnchantments("DURABILITY"));
+                validEnchantments.putAll(validateEnchantments("UNBREAKING"));
                 validEnchantments.putAll(validateEnchantments("MENDING"));
                 validEnchantments.putAll(validateEnchantments("VANISHING_CURSE"));
                 break;
@@ -96,7 +96,7 @@ public class EnchantmentGenerator {
                 validEnchantments.putAll(validateEnchantments("QUICK_CHARGE"));
                 validEnchantments.putAll(validateEnchantments("MULTISHOT"));
                 validEnchantments.putAll(validateEnchantments("PIERCING"));
-                validEnchantments.putAll(validateEnchantments("DURABILITY"));
+                validEnchantments.putAll(validateEnchantments("UNBREAKING"));
                 validEnchantments.putAll(validateEnchantments("MENDING"));
                 validEnchantments.putAll(validateEnchantments("VANISHING_CURSE"));
                 break;
@@ -106,7 +106,7 @@ public class EnchantmentGenerator {
             case STONE_PICKAXE:
             case WOODEN_PICKAXE:
                 validEnchantments.putAll(validateEnchantments("DIG_SPEED"));
-                validEnchantments.putAll(validateEnchantments("DURABILITY"));
+                validEnchantments.putAll(validateEnchantments("UNBREAKING"));
                 validEnchantments.putAll(validateEnchantments("MENDING"));
                 validEnchantments.putAll(validateEnchantments("VANISHING_CURSE"));
                 //TODO: this doesn't take config into account
@@ -122,7 +122,7 @@ public class EnchantmentGenerator {
             case STONE_SHOVEL:
             case WOODEN_SHOVEL:
                 validEnchantments.putAll(validateEnchantments("DIG_SPEED"));
-                validEnchantments.putAll(validateEnchantments("DURABILITY"));
+                validEnchantments.putAll(validateEnchantments("UNBREAKING"));
                 validEnchantments.putAll(validateEnchantments("MENDING"));
                 validEnchantments.putAll(validateEnchantments("VANISHING_CURSE"));
                 if (ThreadLocalRandom.current().nextDouble() < 0.5) {
@@ -139,7 +139,7 @@ public class EnchantmentGenerator {
                 if (ItemSettingsConfig.isUseHoesAsWeapons())
                     validEnchantments.putAll(validateEnchantments("DAMAGE_ALL"));
                 validEnchantments.putAll(validateEnchantments("DIG_SPEED"));
-                validEnchantments.putAll(validateEnchantments("DURABILITY"));
+                validEnchantments.putAll(validateEnchantments("UNBREAKING"));
                 validEnchantments.putAll(validateEnchantments("MENDING"));
                 validEnchantments.putAll(validateEnchantments("VANISHING_CURSE"));
                 if (ThreadLocalRandom.current().nextDouble() < 0.5) {
@@ -149,7 +149,7 @@ public class EnchantmentGenerator {
                 }
                 break;
             case SHIELD:
-                validEnchantments.putAll(validateEnchantments("DURABILITY"));
+                validEnchantments.putAll(validateEnchantments("UNBREAKING"));
                 validEnchantments.putAll(validateEnchantments("MENDING"));
                 validEnchantments.putAll(validateEnchantments("VANISHING_CURSE"));
                 break;
@@ -161,7 +161,7 @@ public class EnchantmentGenerator {
                 validEnchantments.putAll(validateEnchantments("DAMAGE_ALL"));
                 validEnchantments.putAll(validateEnchantments("DAMAGE_ARTHROPODS"));
                 validEnchantments.putAll(validateEnchantments("DAMAGE_UNDEAD"));
-                validEnchantments.putAll(validateEnchantments("DURABILITY"));
+                validEnchantments.putAll(validateEnchantments("UNBREAKING"));
                 validEnchantments.putAll(validateEnchantments("MENDING"));
                 validEnchantments.putAll(validateEnchantments("VANISHING_CURSE"));
                 validEnchantments.putAll(validateEnchantments("DIG_SPEED"));
@@ -173,9 +173,9 @@ public class EnchantmentGenerator {
             case IRON_HELMET:
             case LEATHER_HELMET:
             case TURTLE_HELMET:
-                validEnchantments.putAll(validateEnchantments("PROTECTION_ENVIRONMENTAL"));
+                validEnchantments.putAll(validateEnchantments("PROTECTION"));
                 validEnchantments.putAll(validateEnchantments("BINDING_CURSE"));
-                validEnchantments.putAll(validateEnchantments("DURABILITY"));
+                validEnchantments.putAll(validateEnchantments("UNBREAKING"));
                 validEnchantments.putAll(validateEnchantments("MENDING"));
                 validEnchantments.putAll(validateEnchantments("OXYGEN"));
                 validEnchantments.putAll(validateEnchantments("PROTECTION_EXPLOSIONS"));
@@ -190,8 +190,8 @@ public class EnchantmentGenerator {
             case GOLDEN_CHESTPLATE:
             case IRON_CHESTPLATE:
             case LEATHER_CHESTPLATE:
-                validEnchantments.putAll(validateEnchantments("PROTECTION_ENVIRONMENTAL"));
-                validEnchantments.putAll(validateEnchantments("DURABILITY"));
+                validEnchantments.putAll(validateEnchantments("PROTECTION"));
+                validEnchantments.putAll(validateEnchantments("UNBREAKING"));
                 validEnchantments.putAll(validateEnchantments("MENDING"));
                 validEnchantments.putAll(validateEnchantments("PROTECTION_EXPLOSIONS"));
                 validEnchantments.putAll(validateEnchantments("PROTECTION_FIRE"));
@@ -204,9 +204,9 @@ public class EnchantmentGenerator {
             case GOLDEN_LEGGINGS:
             case IRON_LEGGINGS:
             case LEATHER_LEGGINGS:
-                validEnchantments.putAll(validateEnchantments("PROTECTION_ENVIRONMENTAL"));
+                validEnchantments.putAll(validateEnchantments("PROTECTION"));
                 validEnchantments.putAll(validateEnchantments("BINDING_CURSE"));
-                validEnchantments.putAll(validateEnchantments("DURABILITY"));
+                validEnchantments.putAll(validateEnchantments("UNBREAKING"));
                 validEnchantments.putAll(validateEnchantments("MENDING"));
                 validEnchantments.putAll(validateEnchantments("PROTECTION_EXPLOSIONS"));
                 validEnchantments.putAll(validateEnchantments("PROTECTION_FIRE"));
@@ -219,9 +219,9 @@ public class EnchantmentGenerator {
             case GOLDEN_BOOTS:
             case IRON_BOOTS:
             case LEATHER_BOOTS:
-                validEnchantments.putAll(validateEnchantments("PROTECTION_ENVIRONMENTAL"));
+                validEnchantments.putAll(validateEnchantments("PROTECTION"));
                 validEnchantments.putAll(validateEnchantments("BINDING_CURSE"));
-                validEnchantments.putAll(validateEnchantments("DURABILITY"));
+                validEnchantments.putAll(validateEnchantments("UNBREAKING"));
                 validEnchantments.putAll(validateEnchantments("MENDING"));
                 validEnchantments.putAll(validateEnchantments("PROTECTION_EXPLOSIONS"));
                 validEnchantments.putAll(validateEnchantments("PROTECTION_FALL"));
@@ -234,7 +234,7 @@ public class EnchantmentGenerator {
                 validEnchantments.putAll(validateEnchantments("SOUL_SPEED"));
                 break;
             case FISHING_ROD:
-                validEnchantments.putAll(validateEnchantments("DURABILITY"));
+                validEnchantments.putAll(validateEnchantments("UNBREAKING"));
                 validEnchantments.putAll(validateEnchantments("VANISHING_CURSE"));
                 validEnchantments.putAll(validateEnchantments("MENDING"));
                 validEnchantments.putAll(validateEnchantments("LUCK"));
@@ -244,7 +244,7 @@ public class EnchantmentGenerator {
                 validEnchantments.putAll(validateEnchantments("DIG_SPEED"));
                 validEnchantments.putAll(validateEnchantments("VANISHING_CURSE"));
                 validEnchantments.putAll(validateEnchantments("MENDING"));
-                validEnchantments.putAll(validateEnchantments("DURABILITY"));
+                validEnchantments.putAll(validateEnchantments("UNBREAKING"));
                 break;
         }
 
