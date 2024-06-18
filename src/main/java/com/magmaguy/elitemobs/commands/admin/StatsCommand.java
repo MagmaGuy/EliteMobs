@@ -37,12 +37,6 @@ public class StatsCommand {
                         entitiesCounted.put(livingEntity.getType(), 1);
                     else
                         entitiesCounted.put(livingEntity.getType(), entitiesCounted.get(livingEntity.getType()) + 1);
-                } else if (EntityTracker.isSuperMob(livingEntity)) {
-                    passiveCount++;
-                    if (!entitiesCounted.containsKey(livingEntity.getType()))
-                        entitiesCounted.put(livingEntity.getType(), 1);
-                    else
-                        entitiesCounted.put(livingEntity.getType(), entitiesCounted.get(livingEntity.getType()) + 1);
                 }
 
         StringBuilder breakdownString = new StringBuilder("&2Breakdown: &a");
@@ -97,7 +91,6 @@ public class StatsCommand {
                 "§5§m-----------------------------------------------------"));
         commandSender.sendMessage("Tracked boss count: " + EntityTracker.getEliteMobEntities().size());
         commandSender.sendMessage("Tracked NPC count: " + EntityTracker.getNpcEntities().size());
-        commandSender.sendMessage("Tracked visual item count: " + EntityTracker.getItemVisualEffects().size());
         int loadedCounter = 0;
         for (RegionalBossEntity regionalBossEntity : RegionalBossEntity.getRegionalBossEntities())
             if (regionalBossEntity.isValid())

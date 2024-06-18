@@ -63,7 +63,7 @@ public class PlayerPotionEffects implements Listener {
                 player.getPotionEffect(elitePotionEffect.getPotionEffect().getType()).getAmplifier() > elitePotionEffect.getPotionEffect().getAmplifier())
             return;
 
-        if (elitePotionEffect.getPotionEffect().getType().equals(PotionEffectType.HEAL)) {
+        if (elitePotionEffect.getPotionEffect().getType().equals(PotionEffectType.INSTANT_HEALTH)) {
             Heal.doHeal(player, elitePotionEffect);
             return;
         }
@@ -73,7 +73,7 @@ public class PlayerPotionEffects implements Listener {
             return;
         }
 
-        if (elitePotionEffect.getPotionEffect().getType().equals(PotionEffectType.HARM)) {
+        if (elitePotionEffect.getPotionEffect().getType().equals(PotionEffectType.INSTANT_DAMAGE)) {
             Harm.doHarm(player, elitePotionEffect);
             return;
         }
@@ -111,7 +111,7 @@ public class PlayerPotionEffects implements Listener {
         if (elitePotionEffect.getPotionEffect().getType().equals(PotionEffectType.HEALTH_BOOST)) return;
         switch (elitePotionEffect.getTarget()) {
             case SELF:
-                if (elitePotionEffect.getPotionEffect().getType().equals(PotionEffectType.HEAL)) {
+                if (elitePotionEffect.getPotionEffect().getType().equals(PotionEffectType.INSTANT_HEALTH)) {
                     Heal.doHeal(player, elitePotionEffect);
                     break;
                 }
@@ -121,7 +121,7 @@ public class PlayerPotionEffects implements Listener {
                     break;
                 }
 
-                if (elitePotionEffect.getPotionEffect().getType().equals(PotionEffectType.HARM)) {
+                if (elitePotionEffect.getPotionEffect().getType().equals(PotionEffectType.INSTANT_DAMAGE)) {
                     Harm.doHarm(player, elitePotionEffect);
                     return;
                 }
@@ -129,7 +129,7 @@ public class PlayerPotionEffects implements Listener {
                 break;
             case TARGET:
                 if (elitePotionEffect.getPotionEffect().getType().equals(PotionEffectType.LEVITATION) ||
-                        elitePotionEffect.getPotionEffect().getType().equals(PotionEffectType.SLOW) ||
+                        elitePotionEffect.getPotionEffect().getType().equals(PotionEffectType.SLOWNESS) ||
                         elitePotionEffect.getPotionEffect().getType().equals(PotionEffectType.BLINDNESS)) {
                     EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(damagee);
                     if (eliteEntity != null && eliteEntity.getHealthMultiplier() > 1)

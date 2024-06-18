@@ -43,8 +43,6 @@ import com.magmaguy.elitemobs.mobconstructor.PersistentObjectHandler;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.InstancedBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.PluginMobProperties;
-import com.magmaguy.elitemobs.mobs.passive.EggRunnable;
-import com.magmaguy.elitemobs.mobs.passive.PassiveEliteMobDeathHandler;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
@@ -68,7 +66,6 @@ import com.magmaguy.elitemobs.wormhole.Wormhole;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
-import org.bukkit.entity.EntityType;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -217,11 +214,6 @@ public class EliteMobs extends JavaPlugin {
          */
         MinorPowerStanceMath.initializeVectorCache();
         MajorPowerStanceMath.initializeVectorCache();
-
-        /*
-        Scan for loaded SuperMobs
-         */
-        PassiveEliteMobDeathHandler.SuperMobScanner.scanSuperMobs();
 
         // Small check to make sure that PlaceholderAPI is installed
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
@@ -400,10 +392,6 @@ public class EliteMobs extends JavaPlugin {
      */
     private void launchRunnables() {
         if (!zoneBasedSpawningWorlds.isEmpty()) Grid.initializeGrid();
-        int eggTimerInterval = 20 * 60 * 10 / DefaultConfig.getSuperMobStackAmount();
-        if (MobPropertiesConfig.getMobProperties().get(EntityType.CHICKEN).isEnabled() && DefaultConfig.getSuperMobStackAmount() > 0) {
-            new EggRunnable().runTaskTimer(this, eggTimerInterval, eggTimerInterval);
-        }
         //save regional bosses when the files update
         RegionalBossEntity.regionalDataSaver();
     }

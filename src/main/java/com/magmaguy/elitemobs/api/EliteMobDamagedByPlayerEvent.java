@@ -135,13 +135,13 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
             if (ItemSettingsConfig.isUseEliteEnchantments()) return 0D;
             if (livingEntity instanceof Spider || livingEntity instanceof Silverfish) {
                 int level = ElitePlayerInventory.playerInventories.get(player.getUniqueId()).mainhand.getDamageArthropodsLevel(player.getInventory().getItemInMainHand(), false);
-                level -= Enchantment.DAMAGE_ARTHROPODS.getMaxLevel();
+                level -= Enchantment.BANE_OF_ARTHROPODS.getMaxLevel();
                 if (level < 1) return 0D;
                 return level * 2.5D;
             }
             if (livingEntity instanceof Zombie || livingEntity instanceof Skeleton || livingEntity instanceof Wither || livingEntity instanceof SkeletonHorse || livingEntity instanceof ZombieHorse || !VersionChecker.serverVersionOlderThan(16, 0) && livingEntity.getType().equals(EntityType.ZOMBIFIED_PIGLIN)) {
                 int level = ElitePlayerInventory.playerInventories.get(player.getUniqueId()).mainhand.getDamageUndeadLevel(player.getInventory().getItemInMainHand(), false);
-                level -= Enchantment.DAMAGE_UNDEAD.getMaxLevel();
+                level -= Enchantment.SMITE.getMaxLevel();
                 if (level < 1) return 0D;
                 return level * 2.5D;
             }

@@ -68,7 +68,7 @@ public class ChannelHealing extends CombatEnterScanPower {
                 if (timer % 10 == 0 && timer > 0) {
                     double healAmount = healer.getLevel() / 2d;
                     damagedEntity.heal(healAmount);
-                    damagedEntity.getLocation().getWorld().spawnParticle(Particle.TOTEM, damagedEntity.getLocation().add(new Vector(0, 1, 0)), 20, 0.1, 0.1, 0.1);
+                    damagedEntity.getLocation().getWorld().spawnParticle(Particle.TOTEM_OF_UNDYING, damagedEntity.getLocation().add(new Vector(0, 1, 0)), 20, 0.1, 0.1, 0.1);
                 }
 
                 Vector toDamaged = damagedEntity.getLocation().add(new Vector(0, 1, 0))
@@ -78,7 +78,7 @@ public class ChannelHealing extends CombatEnterScanPower {
                 Location rayLocation = healer.getLocation().add(new Vector(0, 1, 0)).add(toDamaged);
 
                 for (int i = 0; i < 55; i++) {
-                    rayLocation.getWorld().spawnParticle(Particle.TOTEM, rayLocation, 1, toDamaged.getX(), toDamaged.getY(), toDamaged.getZ(), .2D);
+                    rayLocation.getWorld().spawnParticle(Particle.TOTEM_OF_UNDYING, rayLocation, 1, toDamaged.getX(), toDamaged.getY(), toDamaged.getZ(), .2D);
                     rayLocation.add(toDamaged);
                     if (rayLocation.distance(damagedEntity.getLocation()) < 2)
                         break;

@@ -64,7 +64,7 @@ public class Flamethrower extends BossPower implements Listener {
                     return;
                 }
 
-                doParticleEffect(eliteEntity, fixedPlayerLocation, Particle.SMOKE_NORMAL);
+                doParticleEffect(eliteEntity, fixedPlayerLocation, Particle.SMOKE);
                 counter++;
 
                 if (counter < 20 * 2) return;
@@ -147,7 +147,7 @@ public class Flamethrower extends BossPower implements Listener {
                     return;
                 }
                 timer++;
-                doParticleEffect(eliteEntity, fixedPlayerLocation, Particle.SMOKE_NORMAL);
+                doParticleEffect(eliteEntity, fixedPlayerLocation, Particle.SMOKE);
                 if (timer < 20) return;
                 cancel();
                 eliteEntity.getLivingEntity().setAI(true);

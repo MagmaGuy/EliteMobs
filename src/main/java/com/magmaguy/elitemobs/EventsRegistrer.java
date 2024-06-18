@@ -29,12 +29,10 @@ import com.magmaguy.elitemobs.items.*;
 import com.magmaguy.elitemobs.items.customenchantments.*;
 import com.magmaguy.elitemobs.items.potioneffects.PlayerPotionEffects;
 import com.magmaguy.elitemobs.menus.*;
-import com.magmaguy.elitemobs.mobconstructor.MergeHandler;
 import com.magmaguy.elitemobs.mobconstructor.PersistentObjectHandler;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.*;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.transitiveblocks.TransitiveBlockCommand;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.transitiveblocks.TransitiveBossBlock;
-import com.magmaguy.elitemobs.mobs.passive.*;
 import com.magmaguy.elitemobs.mobspawning.NaturalMobSpawnEventHandler;
 import com.magmaguy.elitemobs.npcs.NPCDamageEvent;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
@@ -102,13 +100,6 @@ public class EventsRegistrer {
         register(new PlayerStatsTracker());
         register(new PlayerQuestCooldownsLogout());
 
-        register(new ChickenHandler());
-        register(new CowHandler());
-        register(new MushroomCowHandler());
-        register(new PassiveEliteMobDeathHandler());
-        register(new PigHandler());
-        register(new SheepHandler());
-        register(new FindSuperMobs());
         if (ItemSettingsConfig.isPreventEliteItemEnchantment())
             register(new ItemEnchantmentPrevention());
         if (ItemSettingsConfig.isPreventEliteItemDisenchantment())
@@ -149,7 +140,6 @@ public class EventsRegistrer {
         register(new EliteMobEnterCombatEvent.EliteMobEnterCombatEventFilter());
         register(new PlayerPreTeleportEvent.PlayerPreTeleportEventEvents());
         register(new PlayerTeleportEvent.PlayerTeleportEventExecutor());
-        register(new SuperMobDamageEvent.SuperMobDamageEventFilter());
         register(new EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter());
         register(new EliteExplosionEvent.EliteExplosionEvents());
 
@@ -232,9 +222,6 @@ public class EventsRegistrer {
         //Metadata (player purger)
         register(new MetadataHandler());
 
-        //Mob merger
-        register(new MergeHandler());
-
         //Natural EliteMobs Spawning
         register(new EntityTracker());
         //Fix lingering entity after crashes
@@ -278,8 +265,6 @@ public class EventsRegistrer {
         register(new LootMenu.LootMenuEvents());
 
         //Minecraft behavior canceller
-        if (DefaultConfig.isPreventCreeperDamageToPassiveMobs())
-            register(new PreventCreeperPassiveEntityDamage());
         if (!VersionChecker.serverVersionOlderThan(16, 0))
             register(new PreventEliteBeeHiveEnter());
         register(new EnderDragonUnstuck());

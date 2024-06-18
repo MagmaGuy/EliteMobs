@@ -44,7 +44,7 @@ public class GetTierCommand {
         EliteItemManager.setEliteLevel(cheatSword, tierLevel);
         ItemMeta cheatItemMeta = cheatSword.getItemMeta();
         cheatItemMeta.setDisplayName("CHEAT SWORD");
-        ItemTagger.registerEnchantment(cheatItemMeta, Enchantment.DAMAGE_ALL.getKey(), 100);
+        ItemTagger.registerEnchantment(cheatItemMeta, Enchantment.SHARPNESS.getKey(), 100);
         cheatSword.setItemMeta(cheatItemMeta);
 
         new EliteItemLore(helmet, false);
@@ -72,7 +72,7 @@ public class GetTierCommand {
     private static void addDurability(ItemStack itemStack){
         ItemMeta itemMeta = itemStack.getItemMeta();
         HashMap<Enchantment, Integer> enchantmentIntegerHashMap = new HashMap<>();
-        enchantmentIntegerHashMap.put(Enchantment.DURABILITY, 5);
+        enchantmentIntegerHashMap.put(Enchantment.UNBREAKING, 5);
         ItemTagger.registerEnchantments(itemMeta, enchantmentIntegerHashMap);
         itemStack.setItemMeta(itemMeta);
     }

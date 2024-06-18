@@ -146,13 +146,13 @@ public class PhotonRay extends CombatEnterScanPower {
     }
 
     private void doWarningParticle(Location location) {
-        location.getWorld().spawnParticle(Particle.REDSTONE, location.getX(), location.getY(), location.getZ(),
+        location.getWorld().spawnParticle(Particle.DUST, location.getX(), location.getY(), location.getZ(),
                 5, 0.2, 0.2, 0.2,
                 1, new Particle.DustOptions(Color.BLACK, 1));
     }
 
     private void doDamageParticles(EliteEntity eliteEntity, Location location) {
-        location.getWorld().spawnParticle(Particle.REDSTONE, location.getX(), location.getY(), location.getZ(),
+        location.getWorld().spawnParticle(Particle.DUST, location.getX(), location.getY(), location.getZ(),
                 5, 0.2, 0.2, 0.2,
                 1, new Particle.DustOptions(Color.fromRGB(
                         ThreadLocalRandom.current().nextInt(0, 100),

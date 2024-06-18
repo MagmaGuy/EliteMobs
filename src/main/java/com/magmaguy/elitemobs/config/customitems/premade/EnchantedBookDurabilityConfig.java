@@ -14,7 +14,7 @@ public class EnchantedBookDurabilityConfig extends CustomItemsConfigFields {
                 Material.BOOK,
                 "&5Elite Unbreaking Enchanted Book",
                 new ArrayList<>(List.of("&2Used to enchant items at the enchanter!")));
-        setEnchantments(new ArrayList<>(List.of("DURABILITY,1", "ENCHANTED_SOURCE,1")));
+        setEnchantments(new ArrayList<>(List.of("UNBREAKING,1", "ENCHANTED_SOURCE,1")));
         setItemType(CustomItem.ItemType.UNIQUE);
         setScalability(CustomItem.Scalability.FIXED);
         setSoulbound(false);
