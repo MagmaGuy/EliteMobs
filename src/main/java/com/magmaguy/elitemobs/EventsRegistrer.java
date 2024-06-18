@@ -16,10 +16,11 @@ import com.magmaguy.elitemobs.commands.setup.SetupMenu;
 import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
-import com.magmaguy.elitemobs.dungeons.DungeonProtector;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.events.ActionEvent;
 import com.magmaguy.elitemobs.explosionregen.Explosion;
+import com.magmaguy.elitemobs.gamemodes.nightmaremodeworld.DaylightWatchdog;
+import com.magmaguy.elitemobs.gamemodes.zoneworld.ZoneWarner;
 import com.magmaguy.elitemobs.initialsetup.FirstTimeSetup;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.instanced.arena.ArenaInstance;
@@ -88,6 +89,8 @@ public class EventsRegistrer {
 
         register(new Navigation());
 
+        register(new ResourcePackDataConfig.ResourcePackDataConfigEvents());
+
         register(new DungeonKillTargetObjective.DungeonKillTargetObjectiveListener());
 
         register(new VersionChecker.VersionCheckerEvents());
@@ -102,12 +105,9 @@ public class EventsRegistrer {
         if (ItemSettingsConfig.isPreventEliteItemDisenchantment())
             register(new ItemDisenchantPrevention());
 
-        if (ItemSettingsConfig.isPreventEliteItemDiamondToNetheriteUpgrade())
-            register(new PreventUpgradeDiamondToNetherite());
-
-        register(new FixPlayerOnLoginOrRespawn());
-        register(new EnvironmentalDungeonDamage());
-        register(new PlayerQuitCleanup());
+        if (!VersionChecker.serverVersionOlderThan(15, 2))
+            if (ItemSettingsConfig.isPreventEliteItemDiamondToNetheriteUpgrade())
+                register(new PreventUpgradeDiamondToNetherite());
 
         //Mob damage
         register(new EliteMobGenericDamagedHandler());
@@ -213,6 +213,7 @@ public class EventsRegistrer {
         register(new PersistentObjectHandler.PersistentObjectHandlerEvents());
         register(new CustomBossTaunts());
         register(new PhaseBossEntity.PhaseBossEntityListener());
+        register(new RegionalBossEntity.RegionalBossEntityEvents());
         register(new AdvancedAggroManager());
         register(new TransitiveBossBlock());
         register(new TransitiveBlockCommand.TemporaryBossBlockCommandEvents());
@@ -264,7 +265,8 @@ public class EventsRegistrer {
         register(new LootMenu.LootMenuEvents());
 
         //Minecraft behavior canceller
-        register(new PreventEliteBeeHiveEnter());
+        if (!VersionChecker.serverVersionOlderThan(16, 0))
+            register(new PreventEliteBeeHiveEnter());
         register(new EnderDragonUnstuck());
         if (DefaultConfig.isPreventVanillaReinforcementsForEliteEntities())
             register(new VanillaReinforcementsCanceller());
@@ -284,7 +286,9 @@ public class EventsRegistrer {
             register(new PreventItemPickupByMobs());
         if (AntiExploitConfig.isAmbientDamageExploit())
             register(new AmbientDamageExploit());
-        register(new HoneyBlockJumpExploit());
+        if (!VersionChecker.serverVersionOlderThan(14, 0)) {
+            register(new HoneyBlockJumpExploit());
+        }
         register(new EliteMobDamagedByPlayerAntiExploitListener());
         if (AntiExploitConfig.isNoPathExploit())
             register(new PreventPathfindingExploit());
@@ -325,9 +329,6 @@ public class EventsRegistrer {
         register(new QuestInventoryMenu.QuestInventoryMenuEvents());
         register(new ArenaCompleteEvent.ArenaCompleteEventHandler());
 
-        //Songs
-        register(new CustomMusic.CustomMusicEvents());
-
         //Arenas
         register(new ArenaMenu.ArenaMenuEvents());
         register(new ArenaInstance.ArenaInstanceEvents());
@@ -356,7 +357,6 @@ public class EventsRegistrer {
             register(new WorldGuardDungeonFlag());
             register(new WorldGuardExplosionBlockDamageFlag());
         }
-        register(new DungeonProtector());
 
         register(new EntityTransformHandler());
         register(new EliteBlazeWaterDamagePrevention());
@@ -366,6 +366,10 @@ public class EventsRegistrer {
         register(new LightningImmunity());
 
         register(new TreasureChest.TreasureChestEvents());
+
+        //Zone based spawning
+        register(new ZoneWarner());
+        register(new DaylightWatchdog());
 
         //On death commands
         register(new OnDeathCommands());

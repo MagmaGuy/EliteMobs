@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.config.customitems.premade;
 
 import com.magmaguy.elitemobs.config.customitems.CustomItemsConfigFields;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
+import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import org.bukkit.Material;
 
 import java.util.Arrays;
@@ -11,10 +12,12 @@ public class GoblinHelmetItem extends CustomItemsConfigFields {
     public GoblinHelmetItem() {
         super("goblin_helmet",
                 true,
-                Material.NETHERITE_HELMET,
+                Material.GOLDEN_HELMET,
                 "&8Goblin Helmet",
                 List.of("&8A treasure among goblins!"));
-        setEnchantments(Arrays.asList("PROTECTION,1", "BLAST_PROTECTION,1", "PROJECTILE_PROTECTION,1", "UNBREAKING,1"));
+        if (!VersionChecker.serverVersionOlderThan(16, 0))
+            setMaterial(Material.NETHERITE_HELMET);
+        setEnchantments(Arrays.asList("PROTECTION,1", "PROTECTION_EXPLOSIONS,1", "PROTECTION_PROJECTILE,1", "UNBREAKING,1"));
         setPotionEffects(List.of("NIGHT_VISION,0,self,continuous"));
         setItemType(CustomItem.ItemType.UNIQUE);
     }

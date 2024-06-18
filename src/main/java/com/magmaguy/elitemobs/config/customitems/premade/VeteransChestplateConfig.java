@@ -9,7 +9,7 @@ import java.util.Arrays;
 public class VeteransChestplateConfig extends CustomItemsConfigFields {
     public VeteransChestplateConfig() {
         super("veterans_chestplate", true, Material.GOLDEN_CHESTPLATE, "&6Veteran's Chestplate", Arrays.asList("&2Awarded to those who challenge the", "&2Wood League Arena!"));
-        setEnchantments(Arrays.asList("PROTECTION,5", "PROJECTILE_PROTECTION,4", "MENDING,1", "UNBREAKING,5"));
+        setEnchantments(Arrays.asList("PROTECTION,5", "PROTECTION_PROJECTILE,4", "MENDING,1", "UNBREAKING,5"));
         setItemType(CustomItem.ItemType.UNIQUE);
         setLevel(30);
     }
