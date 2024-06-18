@@ -429,19 +429,26 @@ public class ScriptAction {
     }
 
     private void runPush(ScriptActionData scriptActionData) {
-        getTargets(scriptActionData).forEach(targetEntity -> {
-            if (blueprint.getScriptRelativeVectorBlueprint() != null) {
-                if (blueprint.getBValue() != null && blueprint.getBValue())
-                    targetEntity.setVelocity(targetEntity.getVelocity().add(new ScriptRelativeVector(blueprint.getScriptRelativeVectorBlueprint(), eliteScript, targetEntity.getLocation()).getVector(scriptActionData)));
-                else
-                    targetEntity.setVelocity(new ScriptRelativeVector(blueprint.getScriptRelativeVectorBlueprint(), eliteScript, targetEntity.getLocation()).getVector(scriptActionData));
-            } else if (blueprint.getVValue() != null) {
-                if (blueprint.getBValue() != null && blueprint.getBValue())
-                    targetEntity.setVelocity(targetEntity.getVelocity().add(blueprint.getVValue()));
-                else
-                    targetEntity.setVelocity(blueprint.getVValue());
+        //When players get hit that resets their velocity (by Minecraft) and since this runs before the damage is applied
+        //any velocity set here would be cancelled if used in a damage event. To bypass it we just run it a tick later.
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                getTargets(scriptActionData).forEach(targetEntity -> {
+                    if (blueprint.getScriptRelativeVectorBlueprint() != null) {
+                        if (blueprint.getBValue() != null && blueprint.getBValue())
+                            targetEntity.setVelocity(targetEntity.getVelocity().add(new ScriptRelativeVector(blueprint.getScriptRelativeVectorBlueprint(), eliteScript, targetEntity.getLocation()).getVector(scriptActionData)));
+                        else
+                            targetEntity.setVelocity(new ScriptRelativeVector(blueprint.getScriptRelativeVectorBlueprint(), eliteScript, targetEntity.getLocation()).getVector(scriptActionData));
+                    } else if (blueprint.getVValue() != null) {
+                        if (blueprint.getBValue() != null && blueprint.getBValue())
+                            targetEntity.setVelocity(targetEntity.getVelocity().add(blueprint.getVValue()));
+                        else
+                            targetEntity.setVelocity(blueprint.getVValue());
+                    }
+                });
             }
-        });
+        }.runTaskLater(MetadataHandler.PLUGIN, 1);
     }
 
     private void runSummonReinforcement(ScriptActionData scriptActionData) {
