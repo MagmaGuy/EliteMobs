@@ -13,7 +13,7 @@ public class InvictusPickaxeConfig extends CustomItemsConfigFields {
         super("invictus_pickaxe", true, Material.DIAMOND_PICKAXE, "&4Invictus Pickaxe", Arrays.asList("&2Awarded to the champions of the", "&2Wood League Arena!"));
         if (!VersionChecker.serverVersionOlderThan(16, 0))
             setMaterial(Material.NETHERITE_PICKAXE);
-        setEnchantments(Arrays.asList("DIG_SPEED,6", "DRILLING,3", "DURABILITY,5"));
+        setEnchantments(Arrays.asList("DIG_SPEED,6", "DRILLING,3", "UNBREAKING,5"));
         setPotionEffects(List.of("FAST_DIGGING,0,self,continuous"));
         setItemType(CustomItem.ItemType.UNIQUE);
     }

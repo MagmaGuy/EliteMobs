@@ -104,14 +104,14 @@ public class EliteItemLore {
     }
 
     private void parseAllEliteEnchantments() {
-        parseEliteEnchantments(Enchantment.DAMAGE_ALL);
-        parseEliteEnchantments(Enchantment.ARROW_DAMAGE);
-        parseEliteEnchantments(Enchantment.PROTECTION_ENVIRONMENTAL);
-        parseEliteEnchantments(Enchantment.DAMAGE_ARTHROPODS);
-        parseEliteEnchantments(Enchantment.DAMAGE_UNDEAD);
-        parseEliteEnchantments(Enchantment.PROTECTION_EXPLOSIONS);
-        parseEliteEnchantments(Enchantment.PROTECTION_FIRE);
-        parseEliteEnchantments(Enchantment.PROTECTION_PROJECTILE);
+        parseEliteEnchantments(Enchantment.SHARPNESS);
+        parseEliteEnchantments(Enchantment.POWER);
+        parseEliteEnchantments(Enchantment.PROTECTION);
+        parseEliteEnchantments(Enchantment.BANE_OF_ARTHROPODS);
+        parseEliteEnchantments(Enchantment.SMITE);
+        parseEliteEnchantments(Enchantment.BLAST_PROTECTION);
+        parseEliteEnchantments(Enchantment.FIRE_PROTECTION);
+        parseEliteEnchantments(Enchantment.PROJECTILE_PROTECTION);
         parseEliteEnchantments(Enchantment.THORNS);
     }
 

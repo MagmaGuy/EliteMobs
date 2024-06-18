@@ -40,7 +40,7 @@ public class EarthquakeEnchantment extends CustomEnchantment {
                 doLanding(earthquakeLevel, player);
                 return;
             }
-            player.getWorld().spawnParticle(Particle.REDSTONE, player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(),
+            player.getWorld().spawnParticle(Particle.DUST, player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(),
                     20, 0.1, 0.1, 0.1, 1, new Particle.DustOptions(Color.fromRGB(
                             ThreadLocalRandom.current().nextInt(80, 100),
                             ThreadLocalRandom.current().nextInt(20, 40),

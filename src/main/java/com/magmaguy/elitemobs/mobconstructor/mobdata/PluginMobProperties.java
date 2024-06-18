@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.mobconstructor.mobdata;
 
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
-import com.magmaguy.elitemobs.mobconstructor.mobdata.passivemobs.SuperMobProperties;
 import org.bukkit.entity.EntityType;
 
 public abstract class PluginMobProperties {
@@ -14,7 +13,6 @@ public abstract class PluginMobProperties {
     public double baseDamage;
 
     public static void initializePluginMobValues() {
-        SuperMobProperties.initializeSuperMobValues();
         EliteMobProperties.initializeEliteMobValues();
     }
 

@@ -75,7 +75,7 @@ public class GoldShotgun extends BossPower implements Listener {
         for (int i = 0; i < 200; i++) {
             Vector visualShotVector = getShotVector(shotVector);
             eliteEntity.getLivingEntity().getWorld().spawnParticle(
-                    Particle.SMOKE_NORMAL,
+                    Particle.SMOKE,
                     eliteEntity.getLivingEntity().getLocation().clone().add(new Vector(0, 0.5, 0)),
                     0,
                     visualShotVector.getX(),

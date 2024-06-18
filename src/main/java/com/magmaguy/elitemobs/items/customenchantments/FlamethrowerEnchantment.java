@@ -85,7 +85,7 @@ public class FlamethrowerEnchantment extends CustomEnchantment {
 
                 doFlamethrowerPhase1(player, player.getTargetBlock(null, 30).getLocation().clone().add(0.5, 1, 0.5));
                 CooldownHandler.initialize(playersUsingFlamethrower, player, 3 * 60);
-                player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 5 * 20, 20));
+                player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 5 * 20, 20));
 
             }
 
@@ -104,7 +104,7 @@ public class FlamethrowerEnchantment extends CustomEnchantment {
                         return;
                     }
 
-                    doParticleEffect(player, targetLocation, Particle.SMOKE_NORMAL);
+                    doParticleEffect(player, targetLocation, Particle.SMOKE);
                     counter++;
 
                     if (counter < 20) return;
@@ -168,7 +168,7 @@ public class FlamethrowerEnchantment extends CustomEnchantment {
                         return;
                     }
                     timer++;
-                    doParticleEffect(player, fixedPlayerLocation, Particle.SMOKE_NORMAL);
+                    doParticleEffect(player, fixedPlayerLocation, Particle.SMOKE);
                     if (timer < 20) return;
                     cancel();
                 }

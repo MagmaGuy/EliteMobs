@@ -44,7 +44,7 @@ public class ScriptParticles {
             }
 
 
-            if (particleBlueprint.getParticle().equals(Particle.REDSTONE))
+            if (particleBlueprint.getParticle().equals(Particle.DUST))
                 location.getWorld().spawnParticle(
                         particleBlueprint.getParticle(),
                         location,
@@ -78,8 +78,8 @@ public class ScriptParticles {
                                         particleBlueprint.getToGreen(),
                                         particleBlueprint.getToBlue()),
                                 1));
-            else if (particleBlueprint.getParticle().equals(Particle.SPELL_MOB)
-                    //|| particleBlueprint.getParticle().equals(Particle.SPELL_MOB_AMBIENT) todo: 1.20.6 changed this name
+            else if (particleBlueprint.getParticle().equals(Particle.WITCH)
+                    //|| particleBlueprint.getParticle().equals(Particle.WITCH_AMBIENT) todo: 1.20.6 changed this name
             ) {
                 location.getWorld().spawnParticle(
                         particleBlueprint.getParticle(),

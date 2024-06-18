@@ -31,7 +31,7 @@ public class Taze extends BossPower implements Listener {
         if (counter > 2) return;
         player.setVelocity(player.getLocation().subtract(entityLocation.toVector()).toVector().normalize());
         player.sendTitle("", "Shocked!", 1, 30, 1);
-        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 30, 5));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 30, 5));
         new BukkitRunnable() {
             @Override
             public void run() {

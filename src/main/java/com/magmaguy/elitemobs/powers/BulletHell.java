@@ -86,7 +86,7 @@ public class BulletHell extends BossPower implements Listener {
                     return;
                 }
 
-                eliteEntity.getLivingEntity().getWorld().spawnParticle(Particle.DRIP_WATER, eliteEntity.getLivingEntity().getLocation(), 10, 1, 1, 1);
+                eliteEntity.getLivingEntity().getWorld().spawnParticle(Particle.DRIPPING_WATER, eliteEntity.getLivingEntity().getLocation(), 10, 1, 1, 1);
 
                 for (Entity nearbyEntity : eliteEntity.getLivingEntity().getNearbyEntities(20, 20, 20))
                     if (nearbyEntity instanceof Player &&

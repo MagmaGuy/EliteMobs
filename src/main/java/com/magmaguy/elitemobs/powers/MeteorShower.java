@@ -62,7 +62,7 @@ public class MeteorShower extends BossPower implements Listener {
             int randY = ThreadLocalRandom.current().nextInt(2);
             int randZ = ThreadLocalRandom.current().nextInt(30) - 15;
             Location newLocation = location.clone().add(new Vector(randX, randY, randZ));
-            location.getWorld().spawnParticle(Particle.EXPLOSION_HUGE, newLocation, 1, 0, 0, 0, 0);
+            location.getWorld().spawnParticle(Particle.EXPLOSION, newLocation, 1, 0, 0, 0, 0);
         }
     }
 
