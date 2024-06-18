@@ -15,6 +15,6 @@ public class RaugConfig extends CustomBossesConfigFields {
                 "dynamic");
         setHealthMultiplier(0.1);
         setDamageMultiplier(0.1);
-        setTrails(Collections.singletonList(Particle.SMOKE_LARGE.toString()));
+        setTrails(Collections.singletonList(Particle.LARGE_SMOKE.toString()));
     }
 }

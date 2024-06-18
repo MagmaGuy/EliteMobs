@@ -4,7 +4,6 @@ import com.magmaguy.elitemobs.CrashFix;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobSpawnEvent;
 import com.magmaguy.elitemobs.api.NPCEntitySpawnEvent;
-import com.magmaguy.elitemobs.api.SuperMobSpawnEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
@@ -29,7 +28,9 @@ import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.UUID;
 
 public class EntityTracker implements Listener {
 
@@ -70,37 +71,6 @@ public class EntityTracker implements Listener {
         if (eliteEntity == null) return;
         //Removal from the hashmap is not guaranteed here as some forms of removal don't completely wipe the elite entity out
         eliteEntity.remove(removalReason);
-    }
-
-    //Super Mobs
-    public static void registerSuperMob(LivingEntity livingEntity) {
-        SuperMobSpawnEvent superMobSpawnEvent = new SuperMobSpawnEvent(livingEntity);
-        new EventCaller(superMobSpawnEvent);
-        if (superMobSpawnEvent.isCancelled()) return;
-        PersistentTagger.tagSuperMob(livingEntity);
-    }
-
-    public static boolean isSuperMob(Entity entity) {
-        return PersistentTagger.isSuperMob(entity);
-    }
-
-    public static List<LivingEntity> getSuperMobs() {
-        List<LivingEntity> superMobs = new ArrayList<>();
-        for (World world : Bukkit.getWorlds())
-            for (Entity entity : world.getEntities())
-                if (isSuperMob(entity))
-                    superMobs.add((LivingEntity) entity);
-        return superMobs;
-    }
-
-    //Visual effects - usually trails around elites
-    public static List<Entity> getItemVisualEffects() {
-        List<Entity> visualEffects = new ArrayList<>();
-        for (World world : Bukkit.getWorlds())
-            for (Entity entity : world.getEntities())
-                if (isSuperMob(entity))
-                    visualEffects.add(entity);
-        return visualEffects;
     }
 
     public static void registerVisualEffects(Entity entity) {

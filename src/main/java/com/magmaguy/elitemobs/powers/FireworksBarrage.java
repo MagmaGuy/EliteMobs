@@ -46,7 +46,7 @@ public class FireworksBarrage extends BossPower {
                 }
 
                 for (int i = 0; i < 2; i++) {
-                    Firework firework = (Firework) eliteEntity.getLivingEntity().getWorld().spawnEntity(eliteEntity.getLivingEntity().getLocation(), EntityType.FIREWORK);
+                    Firework firework = (Firework) eliteEntity.getLivingEntity().getWorld().spawnEntity(eliteEntity.getLivingEntity().getLocation(), EntityType.FIREWORK_ROCKET);
                     FireworkMeta fireworkMeta = firework.getFireworkMeta();
                     fireworkMeta.setPower(10);
                     fireworkMeta.addEffect(FireworkEffect.builder().withColor(Color.RED, Color.WHITE, Color.BLUE).flicker(true).build());
@@ -60,7 +60,7 @@ public class FireworksBarrage extends BossPower {
                     if (nearbyEntity instanceof Player)
                         if (((Player) nearbyEntity).getGameMode().equals(GameMode.ADVENTURE) ||
                                 ((Player) nearbyEntity).getGameMode().equals(GameMode.SURVIVAL)) {
-                            Firework firework = (Firework) eliteEntity.getLivingEntity().getWorld().spawnEntity(eliteEntity.getLivingEntity().getLocation(), EntityType.FIREWORK);
+                            Firework firework = (Firework) eliteEntity.getLivingEntity().getWorld().spawnEntity(eliteEntity.getLivingEntity().getLocation(), EntityType.FIREWORK_ROCKET);
                             FireworkMeta fireworkMeta = firework.getFireworkMeta();
                             fireworkMeta.setPower(10);
                             fireworkMeta.addEffect(FireworkEffect.builder().withColor(Color.RED, Color.WHITE, Color.BLUE).flicker(true).build());

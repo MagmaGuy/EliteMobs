@@ -10,7 +10,7 @@ public class AttackBlindingConfig extends PowersConfigFields {
     public AttackBlindingConfig() {
         super("attack_blinding",
                 true,
-                Particle.SPELL_MOB.toString(),
+                Particle.WITCH.toString(),
                 addScriptEntry("BlindPlayer",
                         List.of("PlayerDamagedByEliteMobEvent"),
                         null,
