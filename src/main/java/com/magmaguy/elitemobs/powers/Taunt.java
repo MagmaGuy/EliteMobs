@@ -71,7 +71,7 @@ public class Taunt extends MinorPower implements Listener {
      *
      * @param event
      */
-    @EventHandler (ignoreCancelled = true)
+    @EventHandler(ignoreCancelled = true)
     public void onDamaged(EliteMobDamagedEvent event) {
         if (!event.getEliteEntity().hasPower(this)) return;
 

@@ -1,14 +1,10 @@
 package com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs;
 
 import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfig;
-import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import org.bukkit.entity.EntityType;
 
 public class EliteZombifiedPiglin extends EliteMobProperties {
     public EliteZombifiedPiglin() {
-        if (VersionChecker.serverVersionOlderThan(16, 0)) {
-            return;
-        }
         this.name = MobPropertiesConfig.getMobProperties().get(EntityType.ZOMBIFIED_PIGLIN).getName();
         this.entityType = EntityType.ZOMBIFIED_PIGLIN;
         this.baseDamage = MobPropertiesConfig.getMobProperties().get(EntityType.ZOMBIFIED_PIGLIN).getBaseDamage();

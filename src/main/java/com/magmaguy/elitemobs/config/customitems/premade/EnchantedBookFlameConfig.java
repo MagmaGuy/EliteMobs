@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EnchantedBookFlameConfig extends CustomItemsConfigFields {
-    public EnchantedBookFlameConfig(){
+    public EnchantedBookFlameConfig() {
         super("enchanted_book_arrow_fire",
                 true,
                 Material.BOOK,

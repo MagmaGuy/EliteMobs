@@ -6,7 +6,7 @@ import org.bukkit.entity.Villager;
 
 import java.util.List;
 
-public class CraftenminesLabSanctumTeleporterConfig  extends NPCsConfigFields {
+public class CraftenminesLabSanctumTeleporterConfig extends NPCsConfigFields {
     public CraftenminesLabSanctumTeleporterConfig() {
         super("craftenmines_lab_sanctum_teleporter",
                 true,

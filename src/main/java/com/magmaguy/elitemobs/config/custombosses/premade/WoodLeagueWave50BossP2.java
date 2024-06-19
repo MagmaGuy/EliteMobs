@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.config.custombosses.premade;
 
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
-import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
@@ -16,8 +15,7 @@ public class WoodLeagueWave50BossP2 extends CustomBossesConfigFields {
                 "$bossLevel &6Uther the Champion",
                 "50");
         setFollowDistance(60);
-        if (!VersionChecker.serverVersionOlderThan(16, 0))
-            setMainHand(new ItemStack(Material.NETHERITE_AXE));
+        setMainHand(new ItemStack(Material.NETHERITE_AXE));
         setOffHand(new ItemStack(Material.SHIELD));
         setPowers(Arrays.asList("firestorm.yml",
                 "flame_pyre.yml",

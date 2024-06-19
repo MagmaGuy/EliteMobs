@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EnchantedBookQuickChargeConfig extends CustomItemsConfigFields {
-    public EnchantedBookQuickChargeConfig(){
+    public EnchantedBookQuickChargeConfig() {
         super("enchanted_book_quick_charge",
                 true,
                 Material.BOOK,

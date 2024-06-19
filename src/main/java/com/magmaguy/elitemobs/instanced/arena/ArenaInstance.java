@@ -262,9 +262,10 @@ public class ArenaInstance extends MatchInstance {
                 try {
                     Entity mythicMob = MythicMobsInterface.spawn(spawnPoints.get(arenaEntity.getSpawnPointName()), arenaEntity.getBossfile(), arenaEntity.getLevel());
                     if (mythicMob != null) nonEliteMobsEntities.add(mythicMob);
-                    else new WarningMessage("Failed to spawn MythicMobs entity '"+ arenaEntity.getBossfile() +"' at spawn point " + arenaEntity.getSpawnPointName() + " with level " + arenaEntity.getLevel() + " because MythicMobs did not recognize the name of the entity!");
-                } catch (Exception e){
-                    new WarningMessage("Failed to spawn MythicMobs entity '"+ arenaEntity.getBossfile() +"' at spawn point " + arenaEntity.getSpawnPointName() + " with level " + arenaEntity.getLevel() + " due to a MythicMobs error - there is a high chance mob spawning is being prevented in this area!");
+                    else
+                        new WarningMessage("Failed to spawn MythicMobs entity '" + arenaEntity.getBossfile() + "' at spawn point " + arenaEntity.getSpawnPointName() + " with level " + arenaEntity.getLevel() + " because MythicMobs did not recognize the name of the entity!");
+                } catch (Exception e) {
+                    new WarningMessage("Failed to spawn MythicMobs entity '" + arenaEntity.getBossfile() + "' at spawn point " + arenaEntity.getSpawnPointName() + " with level " + arenaEntity.getLevel() + " due to a MythicMobs error - there is a high chance mob spawning is being prevented in this area!");
                 }
             }
         }

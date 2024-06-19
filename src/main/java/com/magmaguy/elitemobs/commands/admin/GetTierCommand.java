@@ -57,7 +57,6 @@ public class GetTierCommand {
         new EliteItemLore(bow, false);
 
 
-
         player.getInventory().addItem(helmet);
         player.getInventory().addItem(chestplate);
         player.getInventory().addItem(leggings);
@@ -69,7 +68,7 @@ public class GetTierCommand {
 
     }
 
-    private static void addDurability(ItemStack itemStack){
+    private static void addDurability(ItemStack itemStack) {
         ItemMeta itemMeta = itemStack.getItemMeta();
         HashMap<Enchantment, Integer> enchantmentIntegerHashMap = new HashMap<>();
         enchantmentIntegerHashMap.put(Enchantment.UNBREAKING, 5);

@@ -2,7 +2,9 @@ package com.magmaguy.elitemobs.config.customitems;
 
 import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.config.CustomConfigFieldsInterface;
+import com.magmaguy.elitemobs.config.LegacyValueConverter;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Material;
@@ -83,5 +85,46 @@ public class CustomItemsConfigFields extends CustomConfigFields implements Custo
         this.permission = processString("permission", permission, "", false);
         this.level = processInt("level", level, 0, false);
         this.soulbound = processBoolean("soulbound", soulbound, true, false);
+        updatePostProcessor();
+    }
+
+    private void updatePostProcessor() {
+        List<String> newEnchantments = new ArrayList<>();
+        for (String enchantment : enchantments) {
+            if (!enchantment.contains(",")) {
+                new WarningMessage("Invalid format for enchantment in file " + filename + " for enchantment " + enchantment + " : missing ',' for valid level after the enchantment name");
+                continue;
+            }
+            String[] split = enchantment.split(",");
+            String result = LegacyValueConverter.parseEnchantment(split[0]);
+            if (result.equals(split[0])) newEnchantments.add(enchantment);
+            else {
+                newEnchantments.add(result + "," + split[1]);
+            }
+        }
+        enchantments = newEnchantments;
+
+        List<String> newPotionEffects = new ArrayList<>();
+        for (String potionEffect : potionEffects) {
+            if (!potionEffect.contains(",")) {
+                new WarningMessage("Invalid format for potion effect in file " + filename + " for potion effect " + potionEffect + " : missing ',' for valid level after the potion effect name");
+                continue;
+            }
+            String[] split = potionEffect.split(",");
+            String result = LegacyValueConverter.parsePotionEffect(split[0]);
+            if (result.equals(split[0])) newPotionEffects.add(potionEffect);
+            else {
+                StringBuilder newString = new StringBuilder();
+                newString.append(result + ",");
+
+                for (int i = 1; i < split.length; i++) {
+                    newString.append(split[i]);
+                    if (i != split.length - 1)
+                        newString.append(",");
+                }
+                newPotionEffects.add(newString.toString());
+            }
+        }
+        potionEffects = newPotionEffects;
     }
 }

@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 public class TheNetherWastes extends DungeonPackagerConfigFields {
-    public TheNetherWastes(){
+    public TheNetherWastes() {
         super("the_nether_wastes_dungeon",
                 false,
                 "&2[lvl 050] &3The Nether Wastes Dungeon",

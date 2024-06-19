@@ -120,7 +120,7 @@ public class EnderDragonTornado extends CombatEnterScanPower {
             if (block.getLocation().getY() != -1)
                 blockList.add(block);
         }
-        Explosion.generateFakeExplosion(blockList, eliteEntity.getLivingEntity(), (PowersConfigFields)getPowersConfigFields(), tornadoEye.clone());
+        Explosion.generateFakeExplosion(blockList, eliteEntity.getLivingEntity(), (PowersConfigFields) getPowersConfigFields(), tornadoEye.clone());
     }
 
     private void doEntityDisplacement(LivingEntity sourceEntity) {

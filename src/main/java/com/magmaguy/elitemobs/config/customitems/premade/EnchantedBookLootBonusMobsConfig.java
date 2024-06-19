@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EnchantedBookLootBonusMobsConfig extends CustomItemsConfigFields {
-    public EnchantedBookLootBonusMobsConfig(){
+    public EnchantedBookLootBonusMobsConfig() {
         super("enchanted_book_loot_bonus_mobs",
                 true,
                 Material.BOOK,

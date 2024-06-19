@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.mobconstructor.custombosses;
 import com.google.common.collect.ArrayListMultimap;
 import com.magmaguy.easyminecraftgoals.NMSManager;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.api.internal.NewSchematicPackageRelativeBossLocationEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
@@ -21,8 +20,6 @@ import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -310,21 +307,12 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
     @Override
     public void chunkLoad() {
         super.chunkLoad();
-        //checkLeash();
-    }
-
-    public static class RegionalBossEntityEvents implements Listener {
-        @EventHandler(ignoreCancelled = true)
-        public void onNewMinidungeonRelativeBossLocationEvent(NewSchematicPackageRelativeBossLocationEvent event) {
-            new RegionalBossEntity(event.getCustomBossesConfigFields(), ConfigurationLocation.deserialize(event.getRealLocation()));
-            event.getCustomBossesConfigFields().setFilesOutOfSync(true);
-        }
     }
 
     public void removeSlow() {
         if (getCustomBossesConfigFields().isAlert() || getLivingEntity() == null) return;
-       getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(getFollowDistance());
-       getLivingEntity().getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(getMovementSpeedAttribute());
+        getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(getFollowDistance());
+        getLivingEntity().getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(getMovementSpeedAttribute());
     }
 
 }

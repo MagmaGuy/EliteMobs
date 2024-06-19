@@ -10,8 +10,8 @@ public class LightningBoltsConfig extends PowersConfigFields {
         super("lightning_bolts",
                 true,
                 null,
-                20*20,
-                20*5,
+                20 * 20,
+                20 * 5,
                 LightningBolts.class,
                 PowerType.OFFENSIVE);
     }

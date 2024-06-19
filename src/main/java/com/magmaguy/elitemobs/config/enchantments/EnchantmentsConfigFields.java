@@ -26,7 +26,7 @@ public class EnchantmentsConfigFields extends CustomConfigFields {
                                     int maxLevel,
                                     double value,
                                     boolean isEnabledForProcedurallyGeneratedItems,
-                                    int maxEnchantmentLevel){
+                                    int maxEnchantmentLevel) {
         super(filename, isEnabled);
         this.isEnabled = isEnabled;
         this.name = name;

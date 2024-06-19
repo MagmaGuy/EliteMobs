@@ -4,7 +4,6 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.menus.MenusConfigFields;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
-import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -33,12 +32,8 @@ public class ArenaMenuConfig extends MenusConfigFields {
         playerItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "playerItem",
                 ItemStackGenerator.generateItemStack(Material.DIAMOND_SWORD, "&4Challenge the arena!", List.of("&2Fight in the arena!")), true);
         playerItemSlot = ConfigurationEngine.setInt(fileConfiguration, "playerItemSlot", 6);
-        if (!VersionChecker.serverVersionOlderThan(17, 0))
-            spectatorItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "spectatorItem",
-                    ItemStackGenerator.generateItemStack(Material.SPYGLASS, "&aSpectate!", List.of("&2Spectate players in the arena!"), MetadataHandler.signatureID), true);
-        else
-            spectatorItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "spectatorItem",
-                    ItemStackGenerator.generateItemStack(Material.NOTE_BLOCK, "&aSpectate!", List.of("&2Spectate players in the arena!"), MetadataHandler.signatureID), true);
+        spectatorItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "spectatorItem",
+                ItemStackGenerator.generateItemStack(Material.SPYGLASS, "&aSpectate!", List.of("&2Spectate players in the arena!"), MetadataHandler.signatureID), true);
         spectatorItemSlot = ConfigurationEngine.setInt(fileConfiguration, "spectatorItemSlot", 2);
     }
 

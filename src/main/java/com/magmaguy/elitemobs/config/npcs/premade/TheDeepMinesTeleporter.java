@@ -6,8 +6,8 @@ import org.bukkit.entity.Villager;
 
 import java.util.List;
 
-public class TheDeepMinesTeleporter  extends NPCsConfigFields {
-    public TheDeepMinesTeleporter(){
+public class TheDeepMinesTeleporter extends NPCsConfigFields {
+    public TheDeepMinesTeleporter() {
         super("the_deep_mines",
                 true,
                 "Nether Lurk",

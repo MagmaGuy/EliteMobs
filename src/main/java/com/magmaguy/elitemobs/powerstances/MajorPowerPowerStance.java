@@ -5,7 +5,6 @@ import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import com.magmaguy.elitemobs.powers.meta.MajorPower;
-import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.Item;
@@ -116,8 +115,7 @@ public class MajorPowerPowerStance implements Listener {
         Item item = eliteEntity.getLivingEntity().getWorld().dropItem(eliteEntity.getLivingEntity().getLocation(),
                 new ItemStack(material));
         item.setPickupDelay(Integer.MAX_VALUE);
-        if (!VersionChecker.serverVersionOlderThan(1, 11))
-            item.setGravity(false);
+        item.setGravity(false);
         item.setInvulnerable(true);
         EntityTracker.registerVisualEffects(item);
         return item;

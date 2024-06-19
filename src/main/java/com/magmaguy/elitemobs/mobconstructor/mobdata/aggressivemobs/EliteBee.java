@@ -1,15 +1,11 @@
 package com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs;
 
 import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfig;
-import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import org.bukkit.entity.EntityType;
 
 public class EliteBee extends EliteMobProperties {
 
     public EliteBee() {
-        if (VersionChecker.serverVersionOlderThan(15, 0)) {
-            return;
-        }
         this.name = MobPropertiesConfig.getMobProperties().get(EntityType.BEE).getName();
         this.entityType = EntityType.BEE;
         this.defaultMaxHealth = 10;

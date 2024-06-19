@@ -4,7 +4,6 @@ import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.World;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -13,7 +12,7 @@ public class EnchantmentChallenge8 extends DungeonPackagerConfigFields {
         super("enchantment_challenge_8_sanctum",
                 false,
                 "&2[lvl 000-200] &fEnchantment Challenge 08",
-                Arrays.asList("&fAn enchantment challenge dungeon!"),
+                List.of("&fAn enchantment challenge dungeon!"),
                 DiscordLinks.freeMinidungeons,
                 DungeonSizeCategory.SANCTUM,
                 "em_id_enchantment_challenge_8",
