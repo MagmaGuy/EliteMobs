@@ -193,10 +193,9 @@ public class DefaultConfig {
         treasureChestNoDropMessage = ConfigurationEngine.setString(
                 List.of("Sets the message that appears when a player opens a treasure chest but gets nothing"),
                 file, fileConfiguration, "treasureChestNoDropMessage", "&8[EliteMobs] &cYou didn't get anything! Better luck next time!", true);
-        bossAlreadyGoneMessage= ConfigurationEngine.setString(
+        bossAlreadyGoneMessage = ConfigurationEngine.setString(
                 List.of("Sets the message that appears when a player tries to track a boss that is no longer valid"),
                 file, fileConfiguration, "bossAlreadyGoneMessage", "&c[EliteMobs] Sorry, this boss is already gone!", true);
-
 
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);

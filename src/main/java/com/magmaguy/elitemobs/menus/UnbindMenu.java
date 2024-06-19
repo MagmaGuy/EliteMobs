@@ -173,7 +173,7 @@ public class UnbindMenu extends EliteMenu {
                         unbinderInventory.setItem(UnbinderMenuConfig.getEliteItemInputSlot(), null);
                         unbinderInventory.setItem(UnbinderMenuConfig.getEliteUnbindInputSlot(), null);
                         if (unbinderInventory.getItem(outputSlot) != null) {
-                            HashMap<Integer,ItemStack>map =player.getInventory().addItem(unbinderInventory.getItem(outputSlot));
+                            HashMap<Integer, ItemStack> map = player.getInventory().addItem(unbinderInventory.getItem(outputSlot));
                             if (!map.isEmpty()) map.forEach((key, itemStack) -> {
                                 itemStack.setAmount(key);
                                 player.getWorld().dropItem(player.getLocation(), itemStack);

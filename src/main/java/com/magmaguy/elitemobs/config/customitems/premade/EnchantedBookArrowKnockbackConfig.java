@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EnchantedBookArrowKnockbackConfig extends CustomItemsConfigFields {
-    public EnchantedBookArrowKnockbackConfig(){
+    public EnchantedBookArrowKnockbackConfig() {
         super("enchanted_book_arrow_knockback",
                 true,
                 Material.BOOK,

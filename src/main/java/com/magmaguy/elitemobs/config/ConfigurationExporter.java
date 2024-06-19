@@ -54,14 +54,14 @@ public class ConfigurationExporter {
 
         if (CustomModel.getModelPlugin() == CustomModel.ModelPlugin.FREE_MINECRAFT_MODELS) {
             copyResourcePack(commandSender, "FreeMinecraftModels", "output");
-            commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs]&f Copied all files from Free Minecraft Models to " + MetadataHandler.PLUGIN.getDataFolder() + "" + File.separatorChar + "exports" + File.separatorChar + "elitemobs_resource_pack"));
+            commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs]&f Copied all files from Free Minecraft Models to " + MetadataHandler.PLUGIN.getDataFolder() + File.separatorChar + "exports" + File.separatorChar + "elitemobs_resource_pack"));
         } else {
             copyResourcePack(commandSender, "ModelEngine", "resource pack");
-            commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs]&f Copied all files from Model Engine to " + MetadataHandler.PLUGIN.getDataFolder() + "" + File.separatorChar + "exports" + File.separatorChar + "elitemobs_resource_pack"));
+            commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs]&f Copied all files from Model Engine to " + MetadataHandler.PLUGIN.getDataFolder() + File.separatorChar + "exports" + File.separatorChar + "elitemobs_resource_pack"));
         }
 
         if (ZipFile.zip(new File(MetadataHandler.PLUGIN.getDataFolder() + "" + File.separatorChar + "exports" + File.separatorChar + "elitemobs_resource_pack"), MetadataHandler.PLUGIN.getDataFolder() + "" + File.separatorChar + "exports" + File.separatorChar + "elitemobs_resource_pack.zip"))
-            commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs]&f Packaged texture pack into " + MetadataHandler.PLUGIN.getDataFolder() + "" + File.separatorChar + "exports" + File.separatorChar + "elitemobs_resource_pack.zip") + " , ready to distribute!");
+            commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs]&f Packaged texture pack into " + MetadataHandler.PLUGIN.getDataFolder() + File.separatorChar + "exports" + File.separatorChar + "elitemobs_resource_pack.zip") + " , ready to distribute!");
         else {
             commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs]&c Failed to package the resource pack into a zipped file! Report this to the dev!"));
             return;
@@ -175,7 +175,7 @@ public class ConfigurationExporter {
                     if (!targetPath.toFile().exists()) targetPath.toFile().mkdirs();
                     Files.copy(file.toPath(), Paths.get(targetPath + "" + File.separatorChar + file.getName()), StandardCopyOption.REPLACE_EXISTING);
                 } else
-                    new InfoMessage("File " + targetPath + "" + File.separatorChar + file.getName() + " already existed and should not be overwritten, skipping!");
+                    new InfoMessage("File " + targetPath + File.separatorChar + file.getName() + " already existed and should not be overwritten, skipping!");
             }
         } catch (Exception exception) {
             new WarningMessage("Failed to copy directories for " + file.getName() + "! Tell the dev!");

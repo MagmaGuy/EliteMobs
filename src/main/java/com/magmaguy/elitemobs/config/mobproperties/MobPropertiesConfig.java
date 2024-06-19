@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.config.mobproperties;
 
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.mobproperties.premade.*;
-import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
 
@@ -47,7 +46,18 @@ public class MobPropertiesConfig {
             new EliteKillerBunnyConfig(),
             new EliteLlamaConfig(),
             new EliteSlimeConfig(),
-            new EliteMagmaCubeConfig()
+            new EliteMagmaCubeConfig(),
+            new EliteBoggedConfig(),
+            new EliteWardenConfig(),
+            new EliteGoatConfig(),
+            new EliteZombiefiedPiglin(),
+            new EliteZoglinConfig(),
+            new ElitePiglinConfig(),
+            new EliteHoglinConfig(),
+            new ElitePiglinBruteConfig(),
+            new EliteBeeConfig(),
+            new EliteBreeze()
+
     ));
 
     public static HashMap<EntityType, MobPropertiesConfigFields> getMobProperties() {
@@ -59,30 +69,13 @@ public class MobPropertiesConfig {
     }
 
     public static void initializeConfigs() {
-        if (!VersionChecker.serverVersionOlderThan(19, 0)) {
-            mobPropertiesConfigFieldsList.add(new EliteWardenConfig());
-        }
 
-        if (!VersionChecker.serverVersionOlderThan(17, 0)) {
-            mobPropertiesConfigFieldsList.add(new EliteGoatConfig());
-        }
-
-        if (!VersionChecker.serverVersionOlderThan(16, 0)) {
-            mobPropertiesConfigFieldsList.add(new EliteZombiefiedPiglin());
-            mobPropertiesConfigFieldsList.add(new EliteZoglinConfig());
-            mobPropertiesConfigFieldsList.add(new ElitePiglinConfig());
-            mobPropertiesConfigFieldsList.add(new EliteHoglinConfig());
-        }
-
-        if (!VersionChecker.serverVersionOlderThan(16, 2))
-            mobPropertiesConfigFieldsList.add(new ElitePiglinBruteConfig());
-
-        if (!VersionChecker.serverVersionOlderThan(15, 0))
-            mobPropertiesConfigFieldsList.add(new EliteBeeConfig());
+        //Version checking goes here, only leaving this as an easy reference for post 1.21 versions
+//        if (!VersionChecker.serverVersionOlderThan(16, 2))
+//            mobPropertiesConfigFieldsList.add(new ElitePiglinBruteConfig());
 
         for (MobPropertiesConfigFields mobPropertiesConfigFields : mobPropertiesConfigFieldsList)
             initializeConfiguration(mobPropertiesConfigFields);
-
     }
 
     /**

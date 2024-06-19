@@ -7,7 +7,7 @@ import org.bukkit.entity.Villager;
 import java.util.List;
 
 public class ThePalaceTeleporter extends NPCsConfigFields {
-    public ThePalaceTeleporter(){
+    public ThePalaceTeleporter() {
         super("the_palace_teleporter",
                 true,
                 "Royal Guard Sven",

@@ -10,8 +10,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 public class LightningImmunity implements Listener {
-    @EventHandler (priority = EventPriority.LOWEST, ignoreCancelled = true)
-    public void onLightningStrike(EntityDamageByEntityEvent event){
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void onLightningStrike(EntityDamageByEntityEvent event) {
         if (!event.getDamager().getType().equals(EntityType.LIGHTNING_BOLT)) return;
         EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(event.getEntity());
         if (eliteEntity == null) return;

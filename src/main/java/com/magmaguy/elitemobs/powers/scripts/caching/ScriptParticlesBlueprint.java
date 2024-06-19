@@ -86,8 +86,10 @@ public class ScriptParticlesBlueprint {
                 case "togreen" -> toGreen = parseInteger(key, value, scriptName);
                 case "toblue" -> toBlue = parseInteger(key, value, scriptName);
                 case "movetotarget" -> moveToTarget = parseBoolean(key, value, scriptName);
-                case "relativevector" -> relativeVectorBlueprint = new ScriptRelativeVectorBlueprint(scriptName, filename, (Map<String, ?>) value);
-                default -> new WarningMessage("Key " + key + " in script " + scriptName + " in file " + filename + " for script particles is not a valid key!");
+                case "relativevector" ->
+                        relativeVectorBlueprint = new ScriptRelativeVectorBlueprint(scriptName, filename, (Map<String, ?>) value);
+                default ->
+                        new WarningMessage("Key " + key + " in script " + scriptName + " in file " + filename + " for script particles is not a valid key!");
             }
         }
     }

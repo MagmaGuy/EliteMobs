@@ -4,14 +4,14 @@ import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.World;
 
-import java.util.Arrays;
+import java.util.List;
 
 public class IronLeagueArena extends DungeonPackagerConfigFields {
     public IronLeagueArena() {
         super("iron_league_arena",
                 false,
                 "&2[lvl 050-100] &fThe Iron League Arena",
-                Arrays.asList("&fFace the Iron League Arena!"),
+                List.of("&fFace the Iron League Arena!"),
                 DiscordLinks.freeMinidungeons,
                 DungeonSizeCategory.ARENA,
                 "em_iron_league_arena",

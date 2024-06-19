@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.elitemobs.combatsystem.CombatSystem;
-import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -205,17 +204,15 @@ public class EconomySettingsConfig {
         addMaterial(fileConfiguration, Material.ELYTRA, diamondLevel);
         addMaterial(fileConfiguration, Material.TURTLE_HELMET, goldWoodLeatherLevel);
 
-        if (!VersionChecker.serverVersionOlderThan(16, 0)) {
-            addMaterial(fileConfiguration, Material.NETHERITE_AXE, netheriteLevel);
-            addMaterial(fileConfiguration, Material.NETHERITE_PICKAXE, netheriteLevel);
-            addMaterial(fileConfiguration, Material.NETHERITE_SHOVEL, netheriteLevel);
-            addMaterial(fileConfiguration, Material.NETHERITE_HOE, netheriteLevel);
-            addMaterial(fileConfiguration, Material.NETHERITE_SWORD, netheriteLevel);
-            addMaterial(fileConfiguration, Material.NETHERITE_HELMET, netheriteLevel);
-            addMaterial(fileConfiguration, Material.NETHERITE_CHESTPLATE, netheriteLevel);
-            addMaterial(fileConfiguration, Material.NETHERITE_LEGGINGS, netheriteLevel);
-            addMaterial(fileConfiguration, Material.NETHERITE_BOOTS, netheriteLevel);
-        }
+        addMaterial(fileConfiguration, Material.NETHERITE_AXE, netheriteLevel);
+        addMaterial(fileConfiguration, Material.NETHERITE_PICKAXE, netheriteLevel);
+        addMaterial(fileConfiguration, Material.NETHERITE_SHOVEL, netheriteLevel);
+        addMaterial(fileConfiguration, Material.NETHERITE_HOE, netheriteLevel);
+        addMaterial(fileConfiguration, Material.NETHERITE_SWORD, netheriteLevel);
+        addMaterial(fileConfiguration, Material.NETHERITE_HELMET, netheriteLevel);
+        addMaterial(fileConfiguration, Material.NETHERITE_CHESTPLATE, netheriteLevel);
+        addMaterial(fileConfiguration, Material.NETHERITE_LEGGINGS, netheriteLevel);
+        addMaterial(fileConfiguration, Material.NETHERITE_BOOTS, netheriteLevel);
 
         defaultMaterialWorth = ConfigurationEngine.setDouble(
                 List.of("Sets the default material worth for items not specifically defined."),

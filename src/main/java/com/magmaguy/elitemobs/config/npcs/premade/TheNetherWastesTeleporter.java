@@ -7,7 +7,7 @@ import org.bukkit.entity.Villager;
 import java.util.List;
 
 public class TheNetherWastesTeleporter extends NPCsConfigFields {
-    public TheNetherWastesTeleporter(){
+    public TheNetherWastesTeleporter() {
         super("the_nether_wastes_teleporter",
                 true,
                 "Nether Shroom",

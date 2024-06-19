@@ -38,7 +38,7 @@ public class ShareItem {
         textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(stringList).create()));
     }
 
-    public static TextComponent hoverableItemTextComponent(ItemStack itemStack){
+    public static TextComponent hoverableItemTextComponent(ItemStack itemStack) {
         TextComponent textComponent = new TextComponent();
         String stringList = "";
         if (itemStack.getItemMeta().hasLore())

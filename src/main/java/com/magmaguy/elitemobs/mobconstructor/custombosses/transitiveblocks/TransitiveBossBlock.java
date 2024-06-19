@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.mobconstructor.custombosses.transitiveblocks;
 
 import com.magmaguy.elitemobs.api.EliteMobRemoveEvent;
 import com.magmaguy.elitemobs.api.EliteMobSpawnEvent;
-import com.magmaguy.elitemobs.dungeons.SchematicPackage;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.utils.ChunkLocationChecker;
 import com.magmaguy.elitemobs.utils.WarningMessage;
@@ -20,8 +19,6 @@ public class TransitiveBossBlock implements Listener {
         Location location;
         if (!ChunkLocationChecker.locationIsLoaded(spawnLocation)) return;
         double rotation = 0;
-        if (regionalBossEntity.getEmPackage() instanceof SchematicPackage)
-            rotation = regionalBossEntity.getEmPackage().getDungeonPackagerConfigFields().getCalculatedRotation();
 
         BlockData blockData = transitiveBlock.getBlockData().clone();
 

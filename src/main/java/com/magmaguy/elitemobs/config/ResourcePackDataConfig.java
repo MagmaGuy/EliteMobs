@@ -82,7 +82,7 @@ public class ResourcePackDataConfig {
         }
     }
 
-    public static void toggleForceResourcePack(boolean status){
+    public static void toggleForceResourcePack(boolean status) {
         fileConfiguration.set("forceResourcePack", status);
         forceResourcePack = status;
     }
