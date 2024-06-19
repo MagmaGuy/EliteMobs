@@ -5,7 +5,6 @@ import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.menus.MenusConfigFields;
 import com.magmaguy.elitemobs.playerdata.statusscreen.PlayerStatusScreen;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
-import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -382,19 +381,14 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
         indexQuestTrackingItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "indexQuestTrackingItem",
                 ItemStackGenerator.generateItemStack(Material.WRITABLE_BOOK,
                         "&6Quest Tracking",
-                        List.of("Click to go!")) ,true);
+                        List.of("Click to go!")), true);
         indexQuestTrackingSlot = ConfigurationEngine.setInt(fileConfiguration, "indexQuestTrackingSlot", 20);
 
-        if (!VersionChecker.serverVersionOlderThan(16, 0))
-            indexBossTrackingItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "indexBossTrackingItem",
-                    ItemStackGenerator.generateItemStack(Material.TARGET,
-                            "&6Boss Tracking",
-                            List.of("Click to go!")), true);
-        else
-            indexBossTrackingItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "indexBossTrackingItem",
-                    ItemStackGenerator.generateItemStack(Material.DIAMOND,
-                            "&6Boss Tracking",
-                            List.of("Click to go!")), true);
+        indexBossTrackingItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "indexBossTrackingItem",
+                ItemStackGenerator.generateItemStack(Material.TARGET,
+                        "&6Boss Tracking",
+                        List.of("Click to go!")), true);
+
         indexBossTrackingSlot = ConfigurationEngine.setInt(fileConfiguration, "indexBossTrackingSlot", 24);
 
 
@@ -406,30 +400,21 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
                 ItemStackGenerator.generateItemStack(Material.DIAMOND_SWORD,
                         "&4Damage: $damage",
                         Arrays.asList("&fBase damage dealt to Elites.",
-                                "&fBased on the level of your weapon!")),true);
+                                "&fBased on the level of your weapon!")), true);
         gearDamageSlot = ConfigurationEngine.setInt(fileConfiguration, "gearDamageSlot", 23);
         gearArmorItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "gearArmorItem",
                 ItemStackGenerator.generateItemStack(Material.SHIELD,
                         "&2Defense: $defense",
                         Arrays.asList("&fBase damage reduction from Elites.",
-                                "&fBased on the average level of your armor!")),true);
+                                "&fBased on the average level of your armor!")), true);
         gearArmorSlot = ConfigurationEngine.setInt(fileConfiguration, "gearArmorSlot", 24);
-        if (!VersionChecker.serverVersionOlderThan(16, 0))
-            gearThreatItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "gearThreatItem",
-                    ItemStackGenerator.generateItemStack(Material.TARGET,
-                            "&cThreat Level: $threat",
-                            Arrays.asList("&fThis determines the level of the",
-                                    "&fElite Mobs that spawns near you",
-                                    "&fTakes armor, weapon in hand, guild",
-                                    "&ftier into account.")), true);
-        else
-            gearThreatItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "gearThreatItem",
-                    ItemStackGenerator.generateItemStack(Material.DIAMOND,
-                            "&cThreat Level: $threat",
-                            Arrays.asList("&fThis determines the level of the",
-                                    "&fElite Mobs that spawns near you",
-                                    "&fTakes armor, weapon in hand, guild",
-                                    "&ftier into account.")), true);
+        gearThreatItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "gearThreatItem",
+                ItemStackGenerator.generateItemStack(Material.TARGET,
+                        "&cThreat Level: $threat",
+                        Arrays.asList("&fThis determines the level of the",
+                                "&fElite Mobs that spawns near you",
+                                "&fTakes armor, weapon in hand, guild",
+                                "&ftier into account.")), true);
         gearThreatSlot = ConfigurationEngine.setInt(fileConfiguration, "gearThreatSlot", 25);
 
         statsChestMenuName = ConfigurationEngine.setString(file, fileConfiguration, "statsChestMenuName", "&2EliteMobs Stats", true);
@@ -442,34 +427,22 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
                                 "&fcomplete quests!")), true);
         statsMoneySlot = ConfigurationEngine.setInt(fileConfiguration, "statsMoneySlot", 10);
 
-        if (!VersionChecker.serverVersionOlderThan(16, 0))
-            statsGuildTierItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "statsGuildTierItem",
-                    ItemStackGenerator.generateItemStack(Material.TARGET,
-                            "&6Guild Tier: $tier",
-                            Arrays.asList("&fGuild Rank determines how good your loot can ",
-                                    "&fbe, sets your bonus from the Prestige Tier, among ",
-                                    "&fother things. The Prestige Tier unlocks extremely ",
-                                    "&fpowerful rewards, like increased max health, chance ",
-                                    "&fto dodge/crit, increased currency rewards and more! ",
-                                    "&fYou can unlock Guild Ranks and Prestige Tiers at /ag!",
-                                    "&f⚜ = prestige rank, ✧ = guild rank!")), true);
-        else
-            statsGuildTierItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "statsGuildTierItem",
-                    ItemStackGenerator.generateItemStack(Material.DIAMOND,
-                            "&6Guild Tier: $tier",
-                            Arrays.asList("&fGuild Rank determines how good your loot can ",
-                                    "&fbe, sets your bonus from the Prestige Tier, among ",
-                                    "&fother things. The Prestige Tier unlocks extremely ",
-                                    "&fpowerful rewards, like increased max health, chance ",
-                                    "&fto dodge/crit, increased currency rewards and more! ",
-                                    "&fYou can unlock Guild Ranks and Prestige Tiers at /ag!",
-                                    "&f⚜ = prestige rank, ✧ = guild rank!")), true);
+        statsGuildTierItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "statsGuildTierItem",
+                ItemStackGenerator.generateItemStack(Material.TARGET,
+                        "&6Guild Tier: $tier",
+                        Arrays.asList("&fGuild Rank determines how good your loot can ",
+                                "&fbe, sets your bonus from the Prestige Tier, among ",
+                                "&fother things. The Prestige Tier unlocks extremely ",
+                                "&fpowerful rewards, like increased max health, chance ",
+                                "&fto dodge/crit, increased currency rewards and more! ",
+                                "&fYou can unlock Guild Ranks and Prestige Tiers at /ag!",
+                                "&f⚜ = prestige rank, ✧ = guild rank!")), true);
         statsGuildTierSlot = ConfigurationEngine.setInt(fileConfiguration, "statsGuildTierSlot", 11);
 
         statsEliteKillsItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "statsEliteKillsItem",
                 ItemStackGenerator.generateItemStack(Material.DIAMOND_SWORD,
-                        "&4Elite Kils: &c$kills",
-                        List.of("&fAmount of EliteMobs killed.")),true);
+                        "&4Elite Kills: &c$kills",
+                        List.of("&fAmount of EliteMobs killed.")), true);
         statsEliteKillsSlot = ConfigurationEngine.setInt(fileConfiguration, "statsEliteKillsSlot", 12);
 
         statsMaxEliteLevelKilledItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "statsMaxEliteLevelKilledItem",
@@ -478,7 +451,7 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
                         Arrays.asList("&fElite Mob levels are based on the tier",
                                 "&fof your gear! Higher tiers, higher",
                                 "&fElite Mob levels!\n",
-                                "&eNote: only non-exploity kills get counted!")),true);
+                                "&eNote: only non-exploity kills get counted!")), true);
         statsMaxEliteLevelKilledSlot = ConfigurationEngine.setInt(fileConfiguration, "statsMaxEliteLevelKilledSlot", 13);
 
         statsEliteDeathsItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "statsEliteDeathsItem",
@@ -506,7 +479,7 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
 
         commandsChestMenuName = ConfigurationEngine.setString(file, fileConfiguration, "commandsChestMenuName", "&2EliteMobs Commands", true);
 
-        commandsAGItem = ConfigurationEngine.setItemStack(file ,fileConfiguration, "commandsAGItem",
+        commandsAGItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "commandsAGItem",
                 ItemStackGenerator.generateItemStack(Material.END_PORTAL_FRAME,
                         "&5/ag",
                         Arrays.asList("&fClick to use!",

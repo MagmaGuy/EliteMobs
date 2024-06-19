@@ -82,7 +82,7 @@ public class ScriptActionData {
     }
 
     //For data with landing locations
-    public ScriptActionData(ScriptTargets scriptTargets,  ScriptZone scriptZone, ScriptActionData inheritedScriptActionData,Location landingLocation) {
+    public ScriptActionData(ScriptTargets scriptTargets, ScriptZone scriptZone, ScriptActionData inheritedScriptActionData, Location landingLocation) {
         this.eliteEntity = inheritedScriptActionData.getEliteEntity();
         this.directTarget = inheritedScriptActionData.getDirectTarget();
         this.scriptTargets = scriptTargets;
@@ -94,7 +94,7 @@ public class ScriptActionData {
     }
 
     //For data called by other scripts
-    public ScriptActionData(EliteEntity eliteEntity, LivingEntity directTarget, ScriptTargets scriptTargets,  Collection<LivingEntity> previousEntityTargets, Collection<Location> previousLocationTargets) {
+    public ScriptActionData(EliteEntity eliteEntity, LivingEntity directTarget, ScriptTargets scriptTargets, Collection<LivingEntity> previousEntityTargets, Collection<Location> previousLocationTargets) {
         this.eliteEntity = eliteEntity;
         this.directTarget = directTarget;
         this.scriptTargets = scriptTargets;

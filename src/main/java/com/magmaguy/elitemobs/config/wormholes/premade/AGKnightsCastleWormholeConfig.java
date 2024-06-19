@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.config.wormholes.WormholeConfigFields;
 import com.magmaguy.elitemobs.wormhole.Wormhole;
 
 public class AGKnightsCastleWormholeConfig extends WormholeConfigFields {
-    public AGKnightsCastleWormholeConfig(){
+    public AGKnightsCastleWormholeConfig() {
         super("ag_knights_castle_lair_wormhole",
                 true,
                 "em_adventurers_guild,281.5,104.5,302.5,-45,0",

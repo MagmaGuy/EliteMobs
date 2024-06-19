@@ -9,7 +9,7 @@ import org.bukkit.entity.LivingEntity;
 
 public class CustomModelFMM implements CustomModelInterface {
     @Getter
-    private DynamicEntity dynamicEntity;
+    private final DynamicEntity dynamicEntity;
 
     public CustomModelFMM(LivingEntity livingEntity, String modelName, String nametagName) {
         dynamicEntity = DynamicEntity.create(modelName, livingEntity);

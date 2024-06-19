@@ -25,7 +25,7 @@ public class VersionChecker {
     private static final List<EMPackage> outdatedPackages = new ArrayList<>();
     private static boolean pluginIsUpToDate = true;
     @Getter
-    private static boolean SHA1Updated = false;
+    private static final boolean SHA1Updated = false;
 
     private VersionChecker() {
     }

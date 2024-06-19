@@ -61,7 +61,6 @@ public class SharedLootTable {
                 @Override
                 public void run() {
                     distribute();
-                    return;
                 }
             }.runTaskLater(MetadataHandler.PLUGIN, 1);
             return;

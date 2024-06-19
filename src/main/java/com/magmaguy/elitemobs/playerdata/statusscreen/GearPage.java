@@ -4,7 +4,6 @@ import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.menus.premade.PlayerStatusMenuConfig;
 import com.magmaguy.elitemobs.items.ShareItem;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
-import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -194,17 +193,15 @@ public class GearPage {
             case TURTLE_HELMET:
                 return ChatColor.GREEN;
             default:
-                if (!VersionChecker.serverVersionOlderThan(16, 0)) {
-                    if (material.equals(Material.NETHERITE_HELMET) ||
-                            material.equals(Material.NETHERITE_CHESTPLATE) ||
-                            material.equals(Material.NETHERITE_LEGGINGS) ||
-                            material.equals(Material.NETHERITE_BOOTS) ||
-                            material.equals(Material.NETHERITE_SWORD) ||
-                            material.equals(Material.NETHERITE_AXE) ||
-                            material.equals(Material.NETHERITE_HOE) ||
-                            material.equals(Material.NETHERITE_PICKAXE))
-                        return ChatColor.BLACK;
-                }
+                if (material.equals(Material.NETHERITE_HELMET) ||
+                        material.equals(Material.NETHERITE_CHESTPLATE) ||
+                        material.equals(Material.NETHERITE_LEGGINGS) ||
+                        material.equals(Material.NETHERITE_BOOTS) ||
+                        material.equals(Material.NETHERITE_SWORD) ||
+                        material.equals(Material.NETHERITE_AXE) ||
+                        material.equals(Material.NETHERITE_HOE) ||
+                        material.equals(Material.NETHERITE_PICKAXE))
+                    return ChatColor.BLACK;
                 return ChatColor.DARK_GRAY;
         }
     }

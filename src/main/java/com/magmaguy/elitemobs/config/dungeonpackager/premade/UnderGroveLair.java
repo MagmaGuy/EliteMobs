@@ -4,14 +4,14 @@ import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.World;
 
-import java.util.Arrays;
+import java.util.List;
 
 public class UnderGroveLair extends DungeonPackagerConfigFields {
     public UnderGroveLair() {
         super("under_grove_lair",
                 false,
                 "&2[lvl 170] &6The Under Grove",
-                Arrays.asList("&6Stop the dryad's ritual!"),
+                List.of("&6Stop the dryad's ritual!"),
                 DiscordLinks.premiumMinidungeons,
                 DungeonSizeCategory.LAIR,
                 "em_under_grove",

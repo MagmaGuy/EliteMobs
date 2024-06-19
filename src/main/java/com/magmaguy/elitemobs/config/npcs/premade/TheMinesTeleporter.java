@@ -7,7 +7,7 @@ import org.bukkit.entity.Villager;
 import java.util.List;
 
 public class TheMinesTeleporter extends NPCsConfigFields {
-    public TheMinesTeleporter(){
+    public TheMinesTeleporter() {
         super(
                 "the_mines_teleporter",
                 true,

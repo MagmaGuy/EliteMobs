@@ -1,14 +1,10 @@
 package com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs;
 
 import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfig;
-import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import org.bukkit.entity.EntityType;
 
 public class EliteWarden extends EliteMobProperties {
     public EliteWarden() {
-        if (VersionChecker.serverVersionOlderThan(19, 0)) {
-            return;
-        }
         this.name = MobPropertiesConfig.getMobProperties().get(EntityType.WARDEN).getName();
         this.entityType = EntityType.WARDEN;
         this.defaultMaxHealth = 500;

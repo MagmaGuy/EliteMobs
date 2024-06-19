@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 public class TheBridgeSanctum extends DungeonPackagerConfigFields {
-    public TheBridgeSanctum(){
+    public TheBridgeSanctum() {
         super("the_bridge_sanctum",
                 false,
                 "&2[lvl 025] &3The Bridge Sanctum",

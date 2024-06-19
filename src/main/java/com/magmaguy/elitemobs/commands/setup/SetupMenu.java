@@ -7,7 +7,6 @@ import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
 import com.magmaguy.elitemobs.config.menus.premade.GetLootMenuConfig;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
-import com.magmaguy.elitemobs.dungeons.SchematicPackage;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.utils.*;
 import com.magmaguy.elitemobs.worlds.CustomWorldLoading;
@@ -132,10 +131,7 @@ public class SetupMenu {
                 return;
             }
             if (!emPackage.isInstalled())
-                if (emPackage instanceof SchematicPackage)
-                    emPackage.install(player, true);
-                else emPackage.install(player);
-            else if (emPackage instanceof SchematicPackage) emPackage.uninstall(player);
+                emPackage.install(player);
             else if (!emPackage.uninstall(player)) {
                 player.sendMessage("[EliteMobs] Failed to unload package because players were present in the worlds you were trying to unload! Remove the players from the dungeon before uninstalling it!");
             }

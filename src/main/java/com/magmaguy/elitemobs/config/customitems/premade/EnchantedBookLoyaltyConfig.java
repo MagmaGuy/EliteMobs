@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EnchantedBookLoyaltyConfig extends CustomItemsConfigFields {
-    public EnchantedBookLoyaltyConfig(){
+    public EnchantedBookLoyaltyConfig() {
         super("enchanted_book_loyalty",
                 true,
                 Material.BOOK,

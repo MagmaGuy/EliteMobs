@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EnchantedBookLightningConfig extends CustomItemsConfigFields {
-    public EnchantedBookLightningConfig(){
+    public EnchantedBookLightningConfig() {
         super("enchanted_book_lightning",
                 true,
                 Material.BOOK,

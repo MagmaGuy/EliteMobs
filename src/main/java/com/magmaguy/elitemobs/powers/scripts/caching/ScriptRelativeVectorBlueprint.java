@@ -55,7 +55,8 @@ public class ScriptRelativeVectorBlueprint {
             case "multiplier" -> multiplier = MapListInterpreter.parseDouble(key, value, scriptName);
             case "normalize" -> normalize = MapListInterpreter.parseBoolean(key, value, scriptName);
             case "offset" -> offset = MapListInterpreter.parseVector(key, value, scriptName);
-            default -> new WarningMessage("Failed to read key " + key + " for script " + scriptName + " in " + scriptFilename);
+            default ->
+                    new WarningMessage("Failed to read key " + key + " for script " + scriptName + " in " + scriptFilename);
         }
     }
 }

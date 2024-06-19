@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EnchantedBookIceBreakerConfig extends CustomItemsConfigFields {
-    public EnchantedBookIceBreakerConfig(){
+    public EnchantedBookIceBreakerConfig() {
         super("enchanted_book_ice_breaker",
                 true,
                 Material.BOOK,

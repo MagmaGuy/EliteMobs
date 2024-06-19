@@ -1,14 +1,10 @@
 package com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs;
 
 import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfig;
-import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import org.bukkit.entity.EntityType;
 
 public class ElitePiglinBrute extends EliteMobProperties {
     public ElitePiglinBrute() {
-        if (VersionChecker.serverVersionOlderThan(16, 2)) {
-            return;
-        }
         this.name = MobPropertiesConfig.getMobProperties().get(EntityType.PIGLIN_BRUTE).getName();
         this.entityType = EntityType.PIGLIN_BRUTE;
         this.baseDamage = MobPropertiesConfig.getMobProperties().get(EntityType.PIGLIN_BRUTE).getBaseDamage();
