@@ -32,8 +32,6 @@ import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.events.ActionEvent;
 import com.magmaguy.elitemobs.events.TimedEvent;
 import com.magmaguy.elitemobs.explosionregen.Explosion;
-import com.magmaguy.elitemobs.gamemodes.nightmaremodeworld.DaylightWatchdog;
-import com.magmaguy.elitemobs.gamemodes.zoneworld.Grid;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.items.LootTables;
 import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantment;
@@ -79,8 +77,6 @@ public class EliteMobs extends JavaPlugin {
 
     public static List<World> validWorldList = new ArrayList();
     public static boolean worldGuardIsEnabled = false;
-    public static List<World> zoneBasedSpawningWorlds = new ArrayList<>();
-    public static List<World> nightmareWorlds = new ArrayList<>();
     public static Metrics metrics;
     public Object placeholders = null;
 
@@ -123,12 +119,6 @@ public class EliteMobs extends JavaPlugin {
         for (World world : Bukkit.getWorlds())
             if (ValidWorldsConfig.getFileConfiguration().getBoolean("Valid worlds." + world.getName())) {
                 validWorldList.add(world);
-                if (ValidWorldsConfig.getZoneBasedWorlds().contains(world.getName()))
-                    zoneBasedSpawningWorlds.add(world);
-                if (ValidWorldsConfig.getNightmareWorlds().contains(world.getName())) {
-                    nightmareWorlds.add(world);
-                    DaylightWatchdog.preventDaylight(world);
-                }
             }
 
     }
@@ -341,8 +331,6 @@ public class EliteMobs extends JavaPlugin {
 
         new InfoMessage("Clearing valid worlds...");
         validWorldList.clear();
-        new InfoMessage("Clearing zone based worlds...");
-        zoneBasedSpawningWorlds.clear();
         new InfoMessage("Clearing config regional elites...");
         CustomBossesConfigFields.getRegionalElites().clear();
         new InfoMessage("Clearing custom enchantments...");
@@ -391,7 +379,6 @@ public class EliteMobs extends JavaPlugin {
     Repeating tasks that run as long as the server is on
      */
     private void launchRunnables() {
-        if (!zoneBasedSpawningWorlds.isEmpty()) Grid.initializeGrid();
         //save regional bosses when the files update
         RegionalBossEntity.regionalDataSaver();
     }

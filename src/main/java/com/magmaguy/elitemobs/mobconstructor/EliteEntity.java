@@ -23,7 +23,6 @@ import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import com.magmaguy.elitemobs.tagger.PersistentTagger;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.elitemobs.utils.WarningMessage;
-import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
@@ -247,7 +246,7 @@ public class EliteEntity {
         this.entityType = livingEntity.getType();
 
         this.livingEntity.setCanPickupItems(false);
-        if (livingEntity.getEquipment() != null){
+        if (livingEntity.getEquipment() != null) {
             livingEntity.getEquipment().setItemInMainHandDropChance(0);
             livingEntity.getEquipment().setItemInOffHandDropChance(0);
             livingEntity.getEquipment().setHelmetDropChance(0);
@@ -283,11 +282,11 @@ public class EliteEntity {
         if (entityType.equals(EntityType.IRON_GOLEM) && this instanceof CustomBossEntity)
             KeepNeutralsAngry.showMeYouWarFace(this);
 
-        if (!VersionChecker.serverVersionOlderThan(17, 0) && entityType.equals(EntityType.GOAT)) {
+        if (entityType.equals(EntityType.GOAT)) {
             ((Goat) livingEntity).setScreaming(true);
         }
 
-        if (!VersionChecker.serverVersionOlderThan(15, 0) && livingEntity instanceof Bee) {
+        if (livingEntity instanceof Bee) {
             KeepNeutralsAngry.showMeYouWarFace(this);
             ((Bee) livingEntity).setCannotEnterHiveTicks(Integer.MAX_VALUE);
         }

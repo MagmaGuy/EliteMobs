@@ -13,6 +13,7 @@ public class ItemUpgradeSystemConfig {
     private static double enchantedBookChance;
     @Getter
     private static double scrapChance;
+
     private ItemUpgradeSystemConfig() {
     }
 

@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EnchantedBookFrostWalkerConfig extends CustomItemsConfigFields {
-    public EnchantedBookFrostWalkerConfig(){
+    public EnchantedBookFrostWalkerConfig() {
         super("enchanted_book_frost_walker",
                 true,
                 Material.BOOK,

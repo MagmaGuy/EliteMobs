@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EnchantedBookMendingConfig extends CustomItemsConfigFields {
-    public EnchantedBookMendingConfig(){
+    public EnchantedBookMendingConfig() {
         super("enchanted_book_mending",
                 true,
                 Material.BOOK,

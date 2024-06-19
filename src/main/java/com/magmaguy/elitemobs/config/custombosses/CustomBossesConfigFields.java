@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.config.CustomConfigFieldsInterface;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.items.customloottable.CustomLootTable;
+import com.magmaguy.elitemobs.mobconstructor.BossType;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.powers.scripts.caching.EliteScriptBlueprint;
 import com.magmaguy.elitemobs.thirdparty.custommodels.CustomModel;
@@ -214,6 +215,8 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     private boolean neutral = false;
     @Getter
     private String onKillMessage;
+    @Getter
+    private BossType bossType = BossType.NORMAL;
 
     /**
      * Creates a new default pre-made Custom Boss. The boss is further customized through a builder pattern.
@@ -382,6 +385,13 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         this.onKillMessage = ConfigurationEngine.setString(
                 List.of("Sets the message that is shown when a boss is killed", "Placeholders:", "$player - username of the player the boss killed"),
                 file, fileConfiguration, "onKillMessage", null, true);
+
+        String bossTypeString = ConfigurationEngine.setString(file, fileConfiguration, "bossType", "NORMAL", false);
+        try {
+            this.bossType = BossType.valueOf(bossTypeString.toUpperCase(Locale.ROOT));
+        } catch (Exception e) {
+            new WarningMessage("Boss type for boss " + filename + " is not a valid boss type!");
+        }
     }
 
     public boolean isCustomModelExists() {

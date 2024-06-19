@@ -69,7 +69,7 @@ public class WorldInstantiator {
     }
 
     public static String getNewWorldName(String blueprintWorldName) {
-        List<String>worldNames = new ArrayList<>();
+        List<String> worldNames = new ArrayList<>();
         Bukkit.getWorlds().forEach(world -> worldNames.add(world.getName()));
         for (File file : Bukkit.getWorldContainer().listFiles()) worldNames.add(file.getName());
         int highestNumber = 0;

@@ -4,16 +4,15 @@ import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.World;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 public class EnchantmentChallenge2 extends DungeonPackagerConfigFields {
-    public EnchantmentChallenge2(){
+    public EnchantmentChallenge2() {
         super("enchantment_challenge_2_sanctum",
                 false,
                 "&2[lvl 000-200] &fEnchantment Challenge 02",
-                Arrays.asList("&fAn enchantment challenge dungeon!"),
+                List.of("&fAn enchantment challenge dungeon!"),
                 DiscordLinks.freeMinidungeons,
                 DungeonSizeCategory.SANCTUM,
                 "em_id_enchantment_challenge_2",

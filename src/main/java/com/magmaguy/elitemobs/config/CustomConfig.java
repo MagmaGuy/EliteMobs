@@ -169,7 +169,7 @@ public class CustomConfig {
                 Bukkit.getLogger().log(Level.SEVERE, "Cannot load configuration from stream", ex);
             } catch (InvalidConfigurationException ex) {
                 new WarningMessage("Failed to load file " + file.getName() + " in " + file.getAbsolutePath() + " ! This file is not correctly formatted for a yaml file.");
-                new WarningMessage("You can check the file vality by through YAML linters, such as the one at https://www.yamllint.com/");
+                new WarningMessage("You can check the file validity by through YAML linters, such as the one at https://www.yamllint.com/");
                 ex.printStackTrace();
                 return;
             }
@@ -184,8 +184,8 @@ public class CustomConfig {
             //Store for use by the plugin
             addCustomConfigFields(file.getName(), instancedCustomConfigFields);
         } catch (Exception ex) {
-            new WarningMessage("Bad constructor for file " + file.getName());
-            ex.printStackTrace();
+            new WarningMessage("Bad constructor for file " + file.getName() + " ! You should probably delete that file.");
+//            ex.printStackTrace();
         }
 
     }

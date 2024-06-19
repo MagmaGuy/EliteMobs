@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.commands.admin;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
-import com.magmaguy.elitemobs.dungeons.SchematicPackage;
 import com.magmaguy.elitemobs.powerstances.GenericRotationMatrixMath;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -19,11 +18,6 @@ public class RelativeCoordinatesCommand {
 
         if (!emPackage.isInstalled()) {
             player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Minidungeon isn't installed! Can't get the relative location for uninstalled Minidungeons!"));
-            return;
-        }
-
-        if (!(emPackage instanceof SchematicPackage)) {
-            player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Content is not a schematic minidungeon! Run this command for schematic minidungeons only!"));
             return;
         }
 

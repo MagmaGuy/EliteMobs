@@ -7,7 +7,7 @@ import org.bukkit.entity.Villager;
 import java.util.List;
 
 public class TheQuarryTeleporter extends NPCsConfigFields {
-    public TheQuarryTeleporter(){
+    public TheQuarryTeleporter() {
         super("the_quarry_teleporter",
                 true,
                 "Dwarf Berge",

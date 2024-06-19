@@ -2,6 +2,8 @@ package com.magmaguy.elitemobs.items.potioneffects;
 
 import com.magmaguy.elitemobs.config.potioneffects.PotionEffectsConfig;
 import com.magmaguy.elitemobs.utils.WarningMessage;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -18,10 +20,15 @@ public class ElitePotionEffect {
         try {
             String[] stringObject = string.split(",");
             int duration = 2 * 20;
-            if (PotionEffectType.getByName(stringObject[0].toLowerCase(Locale.ROOT)).equals(PotionEffectType.NIGHT_VISION))
+            PotionEffectType potionEffectType = Registry.EFFECT.get(new NamespacedKey("minecraft", stringObject[0].toLowerCase(Locale.ROOT)));
+            if (potionEffectType == null) {
+                new WarningMessage("Failed to get valid potion effect for " + stringObject[0].toLowerCase(Locale.ROOT));
+                return;
+            }
+            if (potionEffectType.equals(PotionEffectType.NIGHT_VISION))
                 duration = 15 * 20;
-            this.potionEffect = new PotionEffect(PotionEffectType.getByName(stringObject[0].toLowerCase(Locale.ROOT)), duration, Integer.parseInt(stringObject[1]));
-            this.value = PotionEffectsConfig.getPotionEffect(potionEffect.getType().getName()).getValue();
+            this.potionEffect = new PotionEffect(potionEffectType, duration, Integer.parseInt(stringObject[1]));
+            this.value = PotionEffectsConfig.getPotionEffect(potionEffectType.getKey().getKey()).getValue();
             if (stringObject.length < 3) {
                 this.target = Target.SELF;
                 this.applicationMethod = ApplicationMethod.CONTINUOUS;
@@ -38,8 +45,8 @@ public class ElitePotionEffect {
             this.applicationMethod = ApplicationMethod.valueOf(stringObject[3].toUpperCase(Locale.ROOT));
 
             if (this.applicationMethod.equals(ApplicationMethod.ONHIT))
-                this.potionEffect = new PotionEffect(PotionEffectType.getByName(stringObject[0].toLowerCase(Locale.ROOT)),
-                        PotionEffectsConfig.getPotionEffect(potionEffect.getType().getName()).getOnHitDuration() * 20,
+                this.potionEffect = new PotionEffect(potionEffectType,
+                        PotionEffectsConfig.getPotionEffect(potionEffect.getType().getKey().getKey()).getOnHitDuration() * 20,
                         Integer.parseInt(stringObject[1]));
 
         } catch (Exception ex) {

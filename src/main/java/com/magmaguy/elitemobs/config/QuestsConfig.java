@@ -5,7 +5,6 @@ import com.magmaguy.elitemobs.quests.objectives.DialogObjective;
 import com.magmaguy.elitemobs.quests.objectives.KillObjective;
 import com.magmaguy.elitemobs.quests.objectives.Objective;
 import com.magmaguy.elitemobs.utils.WarningMessage;
-import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -282,15 +281,13 @@ public class QuestsConfig {
                 EntityType.ZOMBIE.toString()
         ));
 
-        if (!VersionChecker.serverVersionOlderThan(16, 0)) {
-            List<String> laterEntities = Arrays.asList(
-                    EntityType.HOGLIN.toString(),
-                    EntityType.ZOGLIN.toString(),
-                    EntityType.PIGLIN_BRUTE.toString(),
-                    EntityType.PIGLIN.toString(),
-                    EntityType.ZOMBIFIED_PIGLIN.toString());
-            entityTypes.addAll(laterEntities);
-        }
+        List<String> laterEntities = Arrays.asList(
+                EntityType.HOGLIN.toString(),
+                EntityType.ZOGLIN.toString(),
+                EntityType.PIGLIN_BRUTE.toString(),
+                EntityType.PIGLIN.toString(),
+                EntityType.ZOMBIFIED_PIGLIN.toString());
+        entityTypes.addAll(laterEntities);
 
         ConfigurationEngine.setList(file, fileConfiguration, "questEntityTypes", entityTypes, false);
 

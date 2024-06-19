@@ -50,7 +50,7 @@ public class DynamicQuest extends Quest {
     public static void shutdown() {
         threeRandomDynamicObjectives.clear();
         if (randomizerTask != null)
-        randomizerTask.cancel();
+            randomizerTask.cancel();
     }
 
     public static List<DynamicQuest> generateQuests(Player player) {

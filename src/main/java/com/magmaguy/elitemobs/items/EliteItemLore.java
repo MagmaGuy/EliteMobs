@@ -200,16 +200,16 @@ public class EliteItemLore {
     private void constructPotionEffects() {
         for (ElitePotionEffect elitePotionEffect : ElitePotionEffectContainer.getElitePotionEffectContainer(itemMeta, ItemTagger.continuousPotionEffectKey))
             potionListLore.add(ChatColorConverter.convert(PotionEffectsConfig.getPotionEffect(
-                    elitePotionEffect.getPotionEffect().getType().getName().toLowerCase(Locale.ROOT) + ".yml").getName()
+                    elitePotionEffect.getPotionEffect().getType().getKey().getKey().toLowerCase(Locale.ROOT) + ".yml").getName()
                     + ItemSettingsConfig.getPotionEffectContinuousLore() + " " + (elitePotionEffect.getPotionEffect().getAmplifier() + 1)));
         for (ElitePotionEffect elitePotionEffect : ElitePotionEffectContainer.getElitePotionEffectContainer(itemMeta, ItemTagger.onHitPotionEffectKey))
             if (elitePotionEffect.getTarget().equals(ElitePotionEffect.Target.SELF))
                 potionListLore.add(ChatColorConverter.convert(PotionEffectsConfig.getPotionEffect(
-                        elitePotionEffect.getPotionEffect().getType().getName().toLowerCase(Locale.ROOT) + ".yml").getName()
+                        elitePotionEffect.getPotionEffect().getType().getKey().getKey().toLowerCase(Locale.ROOT) + ".yml").getName()
                         + ItemSettingsConfig.getPotionEffectOnHitSelfLore() + " " + (elitePotionEffect.getPotionEffect().getAmplifier() + 1)));
             else
                 potionListLore.add(ChatColorConverter.convert(PotionEffectsConfig.getPotionEffect(
-                        elitePotionEffect.getPotionEffect().getType().getName().toLowerCase(Locale.ROOT) + ".yml").getName()
+                        elitePotionEffect.getPotionEffect().getType().getKey().getKey().toLowerCase(Locale.ROOT) + ".yml").getName()
                         + ItemSettingsConfig.getPotionEffectOnHitTargetLore() + " " + (elitePotionEffect.getPotionEffect().getAmplifier() + 1)));
     }
 

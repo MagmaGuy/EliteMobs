@@ -4,14 +4,14 @@ import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.World;
 
-import java.util.Arrays;
+import java.util.List;
 
 public class SteamworksLair extends DungeonPackagerConfigFields {
     public SteamworksLair() {
         super("steamworks_lair",
                 false,
                 "&2[lvl 140] &6The Steamworks",
-                Arrays.asList("&fA steampunk inspired lair!"),
+                List.of("&fA steampunk inspired lair!"),
                 DiscordLinks.freeMinidungeons,
                 DungeonSizeCategory.LAIR,
                 "em_steamworks_lair",

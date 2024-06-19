@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.config.wormholes.WormholeConfigFields;
 import com.magmaguy.elitemobs.wormhole.Wormhole;
 
 public class AGBeastsSanctuaryWormholeConfig extends WormholeConfigFields {
-    public AGBeastsSanctuaryWormholeConfig(){
+    public AGBeastsSanctuaryWormholeConfig() {
         super("ag_beasts_sanctuary_wormhole",
                 true,
                 "em_adventurers_guild,296.5,106,296.5,90,0",

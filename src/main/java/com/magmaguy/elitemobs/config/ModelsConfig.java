@@ -6,7 +6,8 @@ import java.io.File;
 import java.util.List;
 
 public class ModelsConfig {
-    private ModelsConfig(){}
+    private ModelsConfig() {
+    }
 
     public static String treasureChest;
 

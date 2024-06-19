@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EnchantedBookSilkTouchConfig extends CustomItemsConfigFields {
-    public EnchantedBookSilkTouchConfig(){
+    public EnchantedBookSilkTouchConfig() {
         super("enchanted_book_silk_touch",
                 true,
                 Material.BOOK,
