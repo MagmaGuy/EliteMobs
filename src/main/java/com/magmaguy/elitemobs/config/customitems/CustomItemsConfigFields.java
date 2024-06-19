@@ -1,9 +1,10 @@
 package com.magmaguy.elitemobs.config.customitems;
 
 import com.magmaguy.elitemobs.config.CustomConfigFields;
+import com.magmaguy.elitemobs.config.CustomConfigFieldsInterface;
 import com.magmaguy.elitemobs.config.LegacyValueConverter;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
-import com.magmaguy.magmacore.util.Logger;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Material;
@@ -11,7 +12,7 @@ import org.bukkit.Material;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CustomItemsConfigFields extends CustomConfigFields {
+public class CustomItemsConfigFields extends CustomConfigFields implements CustomConfigFieldsInterface {
 
     @Getter
     @Setter
@@ -91,20 +92,22 @@ public class CustomItemsConfigFields extends CustomConfigFields {
         List<String> newEnchantments = new ArrayList<>();
         for (String enchantment : enchantments) {
             if (!enchantment.contains(",")) {
-                Logger.warn("Invalid format for enchantment in file " + filename + " for enchantment " + enchantment + " : missing ',' for valid level after the enchantment name");
+                new WarningMessage("Invalid format for enchantment in file " + filename + " for enchantment " + enchantment + " : missing ',' for valid level after the enchantment name");
                 continue;
             }
             String[] split = enchantment.split(",");
             String result = LegacyValueConverter.parseEnchantment(split[0]);
             if (result.equals(split[0])) newEnchantments.add(enchantment);
-            else newEnchantments.add(result + "," + split[1]);
+            else {
+                newEnchantments.add(result + "," + split[1]);
+            }
         }
         enchantments = newEnchantments;
 
         List<String> newPotionEffects = new ArrayList<>();
         for (String potionEffect : potionEffects) {
             if (!potionEffect.contains(",")) {
-                Logger.warn("Invalid format for potion effect in file " + filename + " for potion effect " + potionEffect + " : missing ',' for valid level after the potion effect name");
+                new WarningMessage("Invalid format for potion effect in file " + filename + " for potion effect " + potionEffect + " : missing ',' for valid level after the potion effect name");
                 continue;
             }
             String[] split = potionEffect.split(",");
@@ -123,10 +126,5 @@ public class CustomItemsConfigFields extends CustomConfigFields {
             }
         }
         potionEffects = newPotionEffects;
-
-        potionEffects.forEach(potionEffect -> {
-            if (potionEffect.contains("INSTANT_DAMAGE"))
-                Logger.warn("Item " + filename + " contains HARM/INSTANT_DAMAGE potion effect, which heals undead mobs (Minecraft vanilla mechanic) and often times confuses players and admins. It is recommended you switch this potion effect with something else, like STRENGTH if you want more damage.");
-        });
     }
 }

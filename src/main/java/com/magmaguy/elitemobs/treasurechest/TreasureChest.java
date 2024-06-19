@@ -1,10 +1,9 @@
 package com.magmaguy.elitemobs.treasurechest;
 
-import com.google.common.collect.ArrayListMultimap;
+import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.DefaultConfig;
-import com.magmaguy.elitemobs.config.SoundsConfig;
 import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestConfigFields;
 import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestsConfig;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
@@ -12,10 +11,9 @@ import com.magmaguy.elitemobs.mobconstructor.PersistentObject;
 import com.magmaguy.elitemobs.mobconstructor.PersistentObjectHandler;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
+import com.magmaguy.elitemobs.utils.Round;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import com.magmaguy.elitemobs.utils.WeightedProbability;
-import com.magmaguy.magmacore.util.ChatColorConverter;
-import com.magmaguy.magmacore.util.Logger;
-import com.magmaguy.magmacore.util.Round;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -33,21 +31,15 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.time.Instant;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class TreasureChest implements PersistentObject {
 
-    @Getter
     private static final HashMap<Location, TreasureChest> treasureChestHashMap = new HashMap<>();
-    private static final ArrayListMultimap<String, TreasureChest> instancedTreasureChests = ArrayListMultimap.create();
     @Getter
     private final CustomTreasureChestConfigFields customTreasureChestConfigFields;
     private final String locationString;
     private final String worldName;
-    private final HashSet<UUID> blacklistedPlayersInstance = new HashSet<>();
     @Getter
     private Location location;
     private long restockTime;
@@ -69,27 +61,19 @@ public class TreasureChest implements PersistentObject {
         if (customTreasureChestConfigFields.getChestMaterial() == null)
             return;
 
-        if (!customTreasureChestConfigFields.isInstanced()) {
-            initializeChest();
-            new PersistentObjectHandler(this);
-            treasureChestHashMap.put(location, this);
-        } else
-            instancedTreasureChests.put(worldName, this);
-    }
+        initializeChest();
 
-    public static void initializeInstancedTreasureChests(String instanceWorldName, World instancedWorld) {
-        List<TreasureChest> chests = instancedTreasureChests.get(instanceWorldName);
-        chests.forEach(treasureChest -> {
-            treasureChest.location = ConfigurationLocation.serializeWithInstance(instancedWorld, treasureChest.locationString);
-            treasureChest.restockTime = 0;
-            new PersistentObjectHandler(treasureChest);
-            treasureChest.generateChest();
-            treasureChestHashMap.put(treasureChest.location, treasureChest);
-        });
+        new PersistentObjectHandler(this);
+
+        treasureChestHashMap.put(location, this);
     }
 
     public static void clearTreasureChests() {
         treasureChestHashMap.clear();
+    }
+
+    public static HashMap<Location, TreasureChest> getTreasureChestHashMap() {
+        return treasureChestHashMap;
     }
 
     public static TreasureChest getTreasureChest(Location location) {
@@ -97,7 +81,6 @@ public class TreasureChest implements PersistentObject {
     }
 
     private void initializeChest() {
-        if (customTreasureChestConfigFields.isInstanced()) return;
         if (location != null && location.getWorld() != null) {
             long time = (restockTime - Instant.now().getEpochSecond()) * 20L;
             if (time < 0)
@@ -113,14 +96,14 @@ public class TreasureChest implements PersistentObject {
                     .getBlockAt(location).getType().equals(customTreasureChestConfigFields.getChestMaterial()))
                 location.getWorld().getBlockAt(location).setType(customTreasureChestConfigFields.getChestMaterial());
         } catch (Exception ex) {
-            Logger.warn("Custom Treasure Chest " + customTreasureChestConfigFields.getFilename() + " has an invalid location and can not be placed.");
+            new WarningMessage("Custom Treasure Chest " + customTreasureChestConfigFields.getFilename() + " has an invalid location and can not be placed.");
             return;
         }
         if (location.getBlock().getBlockData() instanceof Directional chest) {
             chest.setFacing(customTreasureChestConfigFields.getFacing());
             location.getBlock().setBlockData(chest);
         } else {
-            Logger.warn("Treasure chest " + customTreasureChestConfigFields.getFilename() +
+            new WarningMessage("Treasure chest " + customTreasureChestConfigFields.getFilename() +
                     " does not have a directional block for the Treasure Chest material " +
                     customTreasureChestConfigFields.getChestMaterial() + " ! Chest materials are directional, is your chest a chest?");
         }
@@ -131,8 +114,7 @@ public class TreasureChest implements PersistentObject {
 
         if (customTreasureChestConfigFields.getDropStyle().equals(DropStyle.GROUP))
             if (playerIsInCooldown(player)) {
-                if (!customTreasureChestConfigFields.isInstanced())
-                    groupTimerCooldownMessage(player, getPlayerCooldown(player));
+                groupTimerCooldownMessage(player, getPlayerCooldown(player));
                 return;
             } else if (restockTime > Instant.now().getEpochSecond())
                 return;
@@ -140,20 +122,14 @@ public class TreasureChest implements PersistentObject {
         if (ThreadLocalRandom.current().nextDouble() < customTreasureChestConfigFields.getMimicChance()) doMimic();
         else doTreasure(player);
 
-        player.playSound(player.getLocation(), SoundsConfig.treasureChestOpenSound, 1, 1);
-
         if (customTreasureChestConfigFields.getDropStyle().equals(DropStyle.GROUP)) {
-            if (customTreasureChestConfigFields.isInstanced()) {
-                blacklistedPlayersInstance.add(player.getUniqueId());
-            } else if (customTreasureChestConfigFields.getRestockTimers() != null) {
-                customTreasureChestConfigFields.getRestockTimers().add(cooldownStringConstructor(player));
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        customTreasureChestConfigFields.getRestockTimers().removeIf(restockTime -> restockTime.split(":")[0].equals(player.getUniqueId().toString()));
-                    }
-                }.runTaskLater(MetadataHandler.PLUGIN, 20L * 60 * customTreasureChestConfigFields.getRestockTimer());
-            }
+            customTreasureChestConfigFields.getRestockTimers().add(cooldownStringConstructor(player));
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    customTreasureChestConfigFields.getRestockTimers().removeIf(restockTime -> restockTime.split(":")[0].equals(player.getUniqueId().toString()));
+                }
+            }.runTaskLater(MetadataHandler.PLUGIN, 20L * 60 * customTreasureChestConfigFields.getRestockTimer());
             return;
         }
 
@@ -162,8 +138,7 @@ public class TreasureChest implements PersistentObject {
         restockTime = cooldownTime();
         customTreasureChestConfigFields.setRestockTime(location, restockTime);
 
-        if (!customTreasureChestConfigFields.isInstanced())
-            Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, this::generateChest, 20L * 60 * customTreasureChestConfigFields.getRestockTimer());
+        Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, this::generateChest, 20L * 60 * customTreasureChestConfigFields.getRestockTimer());
 
     }
 
@@ -200,9 +175,6 @@ public class TreasureChest implements PersistentObject {
     }
 
     private boolean playerIsInCooldown(Player player) {
-        if (customTreasureChestConfigFields.isInstanced())
-            return blacklistedPlayersInstance.contains(player.getUniqueId());
-        if (customTreasureChestConfigFields.getRestockTimers() == null) return false;
         for (String string : customTreasureChestConfigFields.getRestockTimers())
             if (string.split(":")[0].equals(player.getUniqueId().toString()))
                 return true;

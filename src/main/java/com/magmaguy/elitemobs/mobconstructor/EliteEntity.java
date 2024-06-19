@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.mobconstructor;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobHealEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
@@ -21,8 +22,7 @@ import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import com.magmaguy.elitemobs.tagger.PersistentTagger;
 import com.magmaguy.elitemobs.utils.EventCaller;
-import com.magmaguy.magmacore.util.ChatColorConverter;
-import com.magmaguy.magmacore.util.Logger;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
@@ -278,6 +278,7 @@ public class EliteEntity {
             KeepNeutralsAngry.showMeYouWarFace(this);
         }
 
+        //todo: this should become configurable real soon for the primis gladius event
         if (entityType.equals(EntityType.IRON_GOLEM) && this instanceof CustomBossEntity)
             KeepNeutralsAngry.showMeYouWarFace(this);
 
@@ -289,10 +290,6 @@ public class EliteEntity {
             KeepNeutralsAngry.showMeYouWarFace(this);
             ((Bee) livingEntity).setCannotEnterHiveTicks(Integer.MAX_VALUE);
         }
-
-        if (livingEntity instanceof Wither wither)
-            wither.getBossBar().setVisible(false);
-
         this.spawnReason = spawnReason;
 
         //This sets whether the entity gets despawned when beyond a certain distance from the player, should only happen
@@ -496,7 +493,7 @@ public class EliteEntity {
                     else
                         this.minorPowerCount++;
                 } catch (Exception ex) {
-                    Logger.warn("Failed to instance new power!");
+                    new WarningMessage("Failed to instance new power!");
                 }
             }
 

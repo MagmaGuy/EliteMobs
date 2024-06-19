@@ -257,30 +257,6 @@ public class AdminCommands {
 
         ArrayList<String> minidungeonFileNames = new ArrayList<>(EMPackage.getEmPackages().keySet());
 
-        // /em addRelativeSpawnLocation <customBossFileName> <minidungeonFileName>
-        manager.command(builder.literal("addRelativeSpawnLocation", "arsp")
-                .argument(StringArgument.<CommandSender>newBuilder("bossFileName").withSuggestionsProvider(((objectCommandContext, s) -> regionalBosses)),
-                        ArgumentDescription.of("Custom Boss configuration file name"))
-                .argument(StringArgument.<CommandSender>newBuilder("minidungeonFileName").withSuggestionsProvider(((objectCommandContext, s) -> minidungeonFileNames)),
-                        ArgumentDescription.of("Minidungeon configuration file name"))
-                .meta(CommandMeta.DESCRIPTION, "Adds a spawn location to a Regional Boss.")
-                .senderType(Player.class)
-                .permission("elitemobs.*")
-                .handler(commandContext -> CustomBossCommandHandler.addRelativeSpawnLocation(
-                        (Player) commandContext.getSender(), commandContext.get("bossFileName"), commandContext.get("minidungeonFileName"))));
-
-        // /em addRelativeTreasureChest <treasureChestName> <minidungeonFileName>
-        manager.command(builder.literal("addRelativeTreasureChest", "artc")
-                .argument(StringArgument.<CommandSender>newBuilder("treasureChestFilename").withSuggestionsProvider(((objectCommandContext, s) -> treasureChestFilenames)),
-                        ArgumentDescription.of("Treasure Chest configuration file name"))
-                .argument(StringArgument.<CommandSender>newBuilder("minidungeonFileName").withSuggestionsProvider(((objectCommandContext, s) -> minidungeonFileNames)),
-                        ArgumentDescription.of("Minidungeon configuration file name"))
-                .meta(CommandMeta.DESCRIPTION, "Adds a spawn location to a Regional Boss.")
-                .senderType(Player.class)
-                .permission("elitemobs.*")
-                .handler(commandContext -> TreasureChestCommands.addRelativeTreasureChest(
-                        (Player) commandContext.getSender(), commandContext.get("treasureChestFilename"), commandContext.get("minidungeonFileName"))));
-
         // /em setLeashRadius <fileName> <radius>
         manager.command(builder.literal("setLeashRadius")
                 .argument(StringArgument.<CommandSender>newBuilder("fileName").withSuggestionsProvider(((objectCommandContext, s) -> regionalBosses)),

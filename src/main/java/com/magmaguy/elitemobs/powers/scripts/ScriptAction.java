@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.powers.scripts;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteDamageEvent;
 import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
@@ -8,13 +9,11 @@ import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
-import com.magmaguy.elitemobs.pathfinding.Navigation;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.powers.meta.CustomSummonPower;
 import com.magmaguy.elitemobs.powers.scripts.caching.ScriptActionBlueprint;
 import com.magmaguy.elitemobs.powers.scripts.enums.ActionType;
-import com.magmaguy.magmacore.util.ChatColorConverter;
-import com.magmaguy.magmacore.util.Logger;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -22,7 +21,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Location;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.*;
@@ -32,13 +30,14 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class ScriptAction {
 
-    @Getter
-    private static final HashSet<Player> invulnerablePlayers = new HashSet<>();
     @Getter
     private final ScriptActionBlueprint blueprint;
     private final ScriptTargets scriptTargets;
@@ -48,6 +47,7 @@ public class ScriptAction {
     private final Map<String, EliteScript> eliteScriptMap;
     private final EliteScript eliteScript;
     private ScriptTargets finalScriptTargets = null;
+
 
     public ScriptAction(ScriptActionBlueprint blueprint, Map<String, EliteScript> eliteScriptMap, EliteScript eliteScript) {
         this.blueprint = blueprint;
@@ -60,9 +60,6 @@ public class ScriptAction {
         this.eliteScript = eliteScript;
     }
 
-    public static void shutdown() {
-        invulnerablePlayers.forEach(player -> player.setInvulnerable(false));
-    }
 
     /**
      * Base case, runs based on actions, not called by other scripts
@@ -73,7 +70,7 @@ public class ScriptAction {
      */
     public void runScript(EliteEntity eliteEntity, LivingEntity directTarget, Event event) {
         if (blueprint.getActionType() == null) {
-            Logger.warn("Script " + blueprint.getScriptName() + " in file " + blueprint.getScriptFilename() + " does not have a valid action! Every action must define a valid action for the script to work.");
+            new WarningMessage("Script " + blueprint.getScriptName() + " in file " + blueprint.getScriptFilename() + " does not have a valid action! Every action must define a valid action for the script to work.");
             return;
         }
 
@@ -91,7 +88,7 @@ public class ScriptAction {
      */
     public void runScript(ScriptActionData previousScriptActionData) {
         if (blueprint.getActionType() == null) {
-            Logger.warn("Script " + blueprint.getScriptName() + " in file " + blueprint.getScriptFilename() + " does not have a valid action! Every action must define a valid action for the script to work.");
+            new WarningMessage("Script " + blueprint.getScriptName() + " in file " + blueprint.getScriptFilename() + " does not have a valid action! Every action must define a valid action for the script to work.");
             return;
         }
 
@@ -215,10 +212,8 @@ public class ScriptAction {
             case SPAWN_FALLING_BLOCK -> runSpawnFallingBlock(scriptActionData);
             case MODIFY_DAMAGE -> runModifyDamage(scriptActionData);
             case SUMMON_ENTITY -> runSummonEntity(scriptActionData);
-            case NAVIGATE -> runNavigate(scriptActionData);
-            case SCALE -> runScale(scriptActionData);
             default ->
-                    Logger.warn("Failed to determine action type " + blueprint.getActionType() + " in script " + blueprint.getScriptName() + " for file " + blueprint.getScriptFilename());
+                    new WarningMessage("Failed to determine action type " + blueprint.getActionType() + " in script " + blueprint.getScriptName() + " for file " + blueprint.getScriptFilename());
         }
         //Run script will have already run this
         if (!blueprint.getActionType().equals(ActionType.RUN_SCRIPT))
@@ -242,7 +237,7 @@ public class ScriptAction {
     private void runTeleport(ScriptActionData scriptActionData) {
         getTargets(scriptActionData).forEach(iteratedTarget -> {
             if (finalScriptTargets == null) {
-                Logger.warn("Failed to get teleport destination for script " + blueprint.getScriptName() + " because there is no set FinalTarget!");
+                new WarningMessage("Failed to get teleport destination for script " + blueprint.getScriptName() + " because there is no set FinalTarget!");
                 return;
             }
             List<Location> destinationLocations = new ArrayList<>(finalScriptTargets.getTargetLocations(scriptActionData));
@@ -259,12 +254,12 @@ public class ScriptAction {
 
     private void runTitleMessage(ScriptActionData scriptActionData) {
         if (blueprint.getTitle().isEmpty() && blueprint.getSubtitle().isEmpty()) {
-            Logger.warn("TITLE_MESSAGE action does not have any titles or subtitles for script " + blueprint.getScriptName() + " in file " + blueprint.getScriptFilename());
+            new WarningMessage("TITLE_MESSAGE action does not have any titles or subtitles for script " + blueprint.getScriptName() + " in file " + blueprint.getScriptFilename());
             return;
         }
         getTargets(scriptActionData).forEach(iteratedTarget -> {
             if (!(iteratedTarget instanceof Player)) {
-                Logger.warn("TITLE_MESSAGE actions must target players! Problematic script: " + blueprint.getScriptFilename() + " in " + blueprint.getScriptFilename());
+                new WarningMessage("TITLE_MESSAGE actions must target players! Problematic script: " + blueprint.getScriptFilename() + " in " + blueprint.getScriptFilename());
                 return;
             }
             ((Player) iteratedTarget).sendTitle(blueprint.getTitle(), blueprint.getSubtitle(), blueprint.getFadeIn(), blueprint.getDuration(), blueprint.getFadeOut());
@@ -273,12 +268,12 @@ public class ScriptAction {
 
     private void runActionBarMessage(ScriptActionData scriptActionData) {
         if (blueprint.getSValue().isEmpty()) {
-            Logger.warn("ACTION_BAR_MESSAGE action does not have a sValue for script " + blueprint.getScriptName() + " in file " + blueprint.getScriptFilename());
+            new WarningMessage("ACTION_BAR_MESSAGE action does not have a sValue for script " + blueprint.getScriptName() + " in file " + blueprint.getScriptFilename());
             return;
         }
         getTargets(scriptActionData).forEach(iteratedTarget -> {
             if (!(iteratedTarget instanceof Player)) {
-                Logger.warn("ACTION_BAR_MESSAGE actions must target players! Problematic script: " + blueprint.getScriptFilename() + " in " + blueprint.getScriptFilename());
+                new WarningMessage("ACTION_BAR_MESSAGE actions must target players! Problematic script: " + blueprint.getScriptFilename() + " in " + blueprint.getScriptFilename());
                 return;
             }
             ((Player) iteratedTarget).spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(blueprint.getSValue()));
@@ -287,13 +282,13 @@ public class ScriptAction {
 
     private void runBossBarMessage(ScriptActionData scriptActionData) {
         if (blueprint.getSValue().isEmpty()) {
-            Logger.warn("BOSS_BAR_MESSAGE action does not have a valid sValue for script " + blueprint.getScriptFilename() + " in file " + blueprint.getScriptFilename());
+            new WarningMessage("BOSS_BAR_MESSAGE action does not have a valid sValue for script " + blueprint.getScriptFilename() + " in file " + blueprint.getScriptFilename());
             return;
         }
         BossBar bossBar = Bukkit.createBossBar(blueprint.getSValue(), blueprint.getBarColor(), blueprint.getBarStyle());
         getTargets(scriptActionData).forEach(iteratedTarget -> {
             if (!(iteratedTarget instanceof Player)) {
-                Logger.warn("BOSS_BAR_MESSAGE actions must target players! Problematic script: " + blueprint.getScriptFilename() + " in " + blueprint.getScriptFilename());
+                new WarningMessage("BOSS_BAR_MESSAGE actions must target players! Problematic script: " + blueprint.getScriptFilename() + " in " + blueprint.getScriptFilename());
                 return;
             }
             bossBar.addPlayer((Player) iteratedTarget);
@@ -304,16 +299,13 @@ public class ScriptAction {
 
     //Applies a potion effect to the target living entity
     private void runPotionEffect(ScriptActionData scriptActionData) {
-        getTargets(scriptActionData).forEach(iteratedTarget -> {
-            if (!(iteratedTarget.isValid())) return;
-            iteratedTarget.addPotionEffect(new PotionEffect(blueprint.getPotionEffectType(), blueprint.getDuration(), blueprint.getAmplifier()));
-        });
+        getTargets(scriptActionData).forEach(iteratedTarget -> iteratedTarget.addPotionEffect(new PotionEffect(blueprint.getPotionEffectType(), blueprint.getDuration(), blueprint.getAmplifier())));
     }
 
     //Runs any scripts in the scripts field. Respects wait time and repeating tasks
     private void runAdditionalScripts(ScriptActionData scriptActionData) {
         if (blueprint.getActionType().equals(ActionType.RUN_SCRIPT) && blueprint.getScripts().isEmpty())
-            Logger.warn("Did not find any scripts for action RUN_SCRIPT in script " + blueprint.getScriptName() + " in file " + blueprint.getScriptFilename());
+            new WarningMessage("Did not find any scripts for action RUN_SCRIPT in script " + blueprint.getScriptName() + " in file " + blueprint.getScriptFilename());
         //This is a bit of a dirty hack but if there are no targets and an action called scripts then it is assumed that the script did not meet the conditions required to run and therefore additional scripts will also not run
         /*
         if (!blueprint.getActionType().equals(ActionType.RUN_SCRIPT) &&
@@ -327,7 +319,7 @@ public class ScriptAction {
                 blueprint.getScripts().forEach(iteratedScriptName -> {
                     EliteScript iteratedScript = eliteScriptMap.get(iteratedScriptName);
                     if (iteratedScript == null)
-                        Logger.warn("Failed to get script " + iteratedScriptName + " for script " + blueprint.getScriptName() + " in file " + blueprint.getScriptFilename());
+                        new WarningMessage("Failed to get script " + iteratedScriptName + " for script " + blueprint.getScriptName() + " in file " + blueprint.getScriptFilename());
                     else {
                         iteratedScript.check(scriptActionData.getEliteEntity(), scriptActionData.getDirectTarget(), scriptActionData);
                     }
@@ -336,7 +328,7 @@ public class ScriptAction {
                 String scriptName = blueprint.getScripts().get(ThreadLocalRandom.current().nextInt(blueprint.getScripts().size()));
                 EliteScript randomizedScript = eliteScriptMap.get(scriptName);
                 if (randomizedScript == null)
-                    Logger.warn("Failed to get script " + scriptName + " for script " + blueprint.getScriptName() + " in file " + blueprint.getScriptFilename());
+                    new WarningMessage("Failed to get script " + scriptName + " for script " + blueprint.getScriptName() + " in file " + blueprint.getScriptFilename());
                 else
                     randomizedScript.check(scriptActionData.getEliteEntity(), scriptActionData.getDirectTarget(), scriptActionData);
             }
@@ -407,14 +399,7 @@ public class ScriptAction {
 
     //Spawns a particle at the target location
     private void runSpawnParticle(ScriptActionData scriptActionData) {
-        boolean needsCentering = false;
-        switch (scriptActionData.getTargetType()) {
-            case ZONE_FULL, ZONE_BORDER, INHERIT_SCRIPT_ZONE_FULL, INHERIT_SCRIPT_ZONE_BORDER, LOCATION, LOCATIONS,
-                 LANDING_LOCATION:
-                needsCentering = true;
-        }
-        boolean finalNeedsCentering = needsCentering;
-        getLocationTargets(scriptActionData).forEach(targetLocation -> scriptParticles.visualize(scriptActionData, !finalNeedsCentering ? targetLocation : targetLocation.clone().add(new Vector(.5, 0, .5)), eliteScript));
+        getLocationTargets(scriptActionData).forEach(targetLocation -> scriptParticles.visualize(scriptActionData, targetLocation, eliteScript));
     }
 
     //Sets mob AI
@@ -484,7 +469,7 @@ public class ScriptAction {
             FireworkMeta fireworkMeta = firework.getFireworkMeta();
 
             if (blueprint.getFireworkEffects().isEmpty()) {
-                Logger.warn("Tried to spawn fireworks for script " + eliteScript.getFileName() + " but no color for the fireworks was set! This part of the script will not run.");
+                new WarningMessage("Tried to spawn fireworks for script " + eliteScript.getFileName() + " but no color for the fireworks was set! This part of the script will not run.");
                 return;
             }
 
@@ -533,12 +518,6 @@ public class ScriptAction {
     private void runMakeInvulnerable(ScriptActionData scriptActionData) {
         getTargets(scriptActionData).forEach(targetEntity -> {
             targetEntity.setInvulnerable(blueprint.isInvulnerable());
-            if (targetEntity instanceof Player player) {
-                if (blueprint.isInvulnerable())
-                    invulnerablePlayers.add(player);
-                else
-                    invulnerablePlayers.remove(player);
-            }
             if (blueprint.getDuration() > 0)
                 Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, () -> targetEntity.setInvulnerable(!blueprint.isInvulnerable()), blueprint.getDuration());
         });
@@ -629,6 +608,7 @@ public class ScriptAction {
     }
 
     private void runModifyDamage(ScriptActionData scriptActionData) {
+
         if (scriptActionData.getEvent() instanceof EliteDamageEvent eliteDamageEvent) {
             eliteDamageEvent.setDamage(eliteDamageEvent.getDamage() * blueprint.getMultiplier());
         }
@@ -639,7 +619,7 @@ public class ScriptAction {
         try {
             entityType = EntityType.valueOf(blueprint.getSValue());
         } catch (Exception ex) {
-            Logger.warn("Failed to get entity type for the projectile in the script " + getBlueprint().getScriptName() + " in the file " + blueprint.getScriptFilename());
+            new WarningMessage("Failed to get entity type for the projectile in the script " + getBlueprint().getScriptName() + " in the file " + blueprint.getScriptFilename());
             return;
         }
 
@@ -680,35 +660,6 @@ public class ScriptAction {
                     }
                 }.runTaskTimer(MetadataHandler.PLUGIN, 1, 1);
             }
-        });
-    }
-
-    private void runNavigate(ScriptActionData scriptActionData) {
-        getTargets(scriptActionData).forEach(targetEntity -> {
-            EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(targetEntity);
-            if (!(eliteEntity instanceof CustomBossEntity customBossEntity)) return;
-
-            if (finalScriptTargets == null) {
-                Logger.warn("Failed to get teleport destination for script " + blueprint.getScriptName() + " because there is no set FinalTarget!");
-                return;
-            }
-
-            List<Location> destinationLocations = new ArrayList<>(finalScriptTargets.getTargetLocations(scriptActionData));
-            if (destinationLocations.isEmpty()) return;
-            Navigation.navigateTo(customBossEntity, (double) blueprint.getVelocity(), destinationLocations.get(0), blueprint.getBValue(), blueprint.getDuration());
-        });
-    }
-
-    private void runScale(ScriptActionData scriptActionData) {
-        getTargets(scriptActionData).forEach(targetEntity -> {
-            targetEntity.getAttribute(Attribute.GENERIC_SCALE).setBaseValue(blueprint.getScale());
-            if (blueprint.getDuration() > 0)
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        targetEntity.getAttribute(Attribute.GENERIC_SCALE).setBaseValue(1f);
-                    }
-                }.runTaskLater(MetadataHandler.PLUGIN, blueprint.getDuration());
         });
     }
 }

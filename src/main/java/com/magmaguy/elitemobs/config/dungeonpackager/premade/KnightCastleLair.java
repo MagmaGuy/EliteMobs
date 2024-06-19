@@ -9,7 +9,7 @@ import java.util.List;
 public class KnightCastleLair extends DungeonPackagerConfigFields {
     public KnightCastleLair() {
         super("knights_castle_lair",
-                true,
+                false,
                 "&2[lvl 095] &fThe Knight's Castle",
                 List.of("&fChallenge the knights of the castle!"),
                 DiscordLinks.freeMinidungeons,
@@ -24,7 +24,7 @@ public class KnightCastleLair extends DungeonPackagerConfigFields {
                         "&6Face an honorable duel!",
                 "&fAssault the castle!",
                 "&fNow leaving the castle!",
-                "the_knight_castle",
-                false);
+                "the_knight_castle"
+        );
     }
 }
