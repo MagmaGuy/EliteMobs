@@ -1,11 +1,9 @@
 package com.magmaguy.elitemobs.thirdparty.worldguard;
 
 import com.magmaguy.elitemobs.dungeons.EMPackage;
-import com.magmaguy.elitemobs.dungeons.SchematicPackage;
 import com.magmaguy.elitemobs.dungeons.WorldDungeonPackage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.flags.Flags;
@@ -15,7 +13,6 @@ import com.sk89q.worldguard.protection.flags.registry.FlagConflictException;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
-import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import lombok.Getter;
@@ -27,28 +24,28 @@ import java.util.UUID;
 
 public class WorldGuardCompatibility {
 
-   @Getter
-   private static final StateFlag.State allow = StateFlag.State.ALLOW;
-   @Getter
-   private static final StateFlag.State deny = StateFlag.State.DENY;
-   @Getter
-   private static StateFlag ELITEMOBS_SPAWN_FLAG;
-   @Getter
-   private static StateFlag ELITEMOBS_ONLY_SPAWN_FLAG;
-   @Getter
-   private static StateFlag ELITEMOBS_ANTIEXPLOIT;
-   @Getter
-   private static StateFlag ELITEMOBS_DUNGEON;
-   @Getter
-   private static StateFlag ELITEMOBS_EVENTS;
-   @Getter
-   private static IntegerFlag ELITEMOBS_MINIMUM_LEVEL;
-   @Getter
-   private static IntegerFlag ELITEMOBS_MAXIMUM_LEVEL;
-   @Getter
-   private static StateFlag ELITEMOBS_EXPLOSION_REGEN;
-   @Getter
-   private static StateFlag ELITEMOBS_EXPLOSION_BLOCK_DAMAGE;
+    @Getter
+    private static final StateFlag.State allow = StateFlag.State.ALLOW;
+    @Getter
+    private static final StateFlag.State deny = StateFlag.State.DENY;
+    @Getter
+    private static StateFlag ELITEMOBS_SPAWN_FLAG;
+    @Getter
+    private static StateFlag ELITEMOBS_ONLY_SPAWN_FLAG;
+    @Getter
+    private static StateFlag ELITEMOBS_ANTIEXPLOIT;
+    @Getter
+    private static StateFlag ELITEMOBS_DUNGEON;
+    @Getter
+    private static StateFlag ELITEMOBS_EVENTS;
+    @Getter
+    private static IntegerFlag ELITEMOBS_MINIMUM_LEVEL;
+    @Getter
+    private static IntegerFlag ELITEMOBS_MAXIMUM_LEVEL;
+    @Getter
+    private static StateFlag ELITEMOBS_EXPLOSION_REGEN;
+    @Getter
+    private static StateFlag ELITEMOBS_EXPLOSION_BLOCK_DAMAGE;
 
     public static boolean initialize() {
 
@@ -307,37 +304,6 @@ public class WorldGuardCompatibility {
         protectedRegion.setFlag(Flags.ENDERPEARL, deny);
         //Bypass for redstone and doors
         protectedRegion.setFlag(Flags.USE, allow);
-    }
-
-    /**
-     * Automatically creates a worldguard region protected as an EliteMobs minidungeon using two x y z vectors for the
-     * locations of the diagonally opposed locations
-     *
-     * @param corner1
-     * @param corner2
-     */
-    public static void defineMinidungeon(Location corner1, Location corner2, Location anchorLocation, String schematicName, SchematicPackage schematicPackage) {
-        try {
-            RegionContainer regionContainer = WorldGuard.getInstance().getPlatform().getRegionContainer();
-            RegionManager regionManager = regionContainer.get(BukkitAdapter.adapt(anchorLocation.getWorld()));
-            BlockVector3 min = BlockVector3.at(corner1.getBlockX(), corner1.getBlockY(), corner1.getBlockZ());
-            BlockVector3 max = BlockVector3.at(corner2.getBlockX(), corner2.getBlockY(), corner2.getBlockZ());
-            ProtectedRegion region = new ProtectedCuboidRegion(schematicName.replace(".schem", ""), min, max);
-            protectMinidungeonArea(region, schematicPackage);
-            regionManager.addRegion(region);
-        } catch (Exception ex) {
-            new WarningMessage("Failed to add Minidungeon WorldGuard zone!");
-        }
-    }
-
-    public static void removeMinidungeon(String schematicName, Location anchorLocation) {
-        try {
-            RegionContainer regionContainer = WorldGuard.getInstance().getPlatform().getRegionContainer();
-            RegionManager regionManager = regionContainer.get(BukkitAdapter.adapt(anchorLocation.getWorld()));
-            regionManager.removeRegion(schematicName.replace(".schem", ""));
-        } catch (Exception ex) {
-            new WarningMessage("Failed to remove Minidungeon WorldGuard zone!");
-        }
     }
 
 }

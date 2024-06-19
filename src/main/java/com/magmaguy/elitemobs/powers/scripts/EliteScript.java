@@ -89,7 +89,8 @@ public class EliteScript extends ElitePower implements Cloneable {
      */
     public void check(Location landingLocation, ScriptActionData previousScriptActionData) {
         //Check if the event conditions are met
-        if (scriptConditions != null && !scriptConditions.meetsPreActionConditions(previousScriptActionData.getEliteEntity(), null)) return;
+        if (scriptConditions != null && !scriptConditions.meetsPreActionConditions(previousScriptActionData.getEliteEntity(), null))
+            return;
         //Let's do some actions
         scriptActions.runScripts(previousScriptActionData, landingLocation);
         //Cooldowns time

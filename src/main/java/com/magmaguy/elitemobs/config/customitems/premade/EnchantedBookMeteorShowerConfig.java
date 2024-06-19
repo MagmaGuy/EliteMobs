@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EnchantedBookMeteorShowerConfig extends CustomItemsConfigFields {
-    public EnchantedBookMeteorShowerConfig(){
+    public EnchantedBookMeteorShowerConfig() {
         super("enchanted_book_meteor_shower",
                 true,
                 Material.BOOK,

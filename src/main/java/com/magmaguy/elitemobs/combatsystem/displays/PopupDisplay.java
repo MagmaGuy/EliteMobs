@@ -64,7 +64,7 @@ public class PopupDisplay implements Listener {
         }
 
         DialogArmorStand.createDialogArmorStand(event.getEliteMobEntity().getUnsyncedLivingEntity(), ChatColor.RED +
-                colorPrefix + "" + ChatColor.BOLD + "" + Round.twoDecimalPlaces(event.getDamage()) + "", offset);
+                colorPrefix + ChatColor.BOLD + Round.twoDecimalPlaces(event.getDamage()), offset);
 
     }
 

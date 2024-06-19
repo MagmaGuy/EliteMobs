@@ -14,7 +14,7 @@ public class GoblinPokerItem extends CustomItemsConfigFields {
                 Material.TRIDENT,
                 "&8Goblin Poker",
                 List.of("&8A treasure among goblins!"));
-        setEnchantments(Arrays.asList("DAMAGE_ALL,1", "DAMAGE_UNDEAD,1", "UNBREAKING,1", "KNOCKBACK,1", "LOOT_BONUS_MOBS,5"));
+        setEnchantments(Arrays.asList("SHARPNESS,1", "SMITE,1", "UNBREAKING,1", "KNOCKBACK,1", "LOOT_BONUS_MOBS,5"));
         setPotionEffects(List.of("WITHER,0,target,onHit"));
         setItemType(CustomItem.ItemType.UNIQUE);
     }

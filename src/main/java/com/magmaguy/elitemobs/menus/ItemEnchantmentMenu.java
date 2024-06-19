@@ -213,7 +213,8 @@ public class ItemEnchantmentMenu extends EliteMenu {
                     moveOneItemUp(ENCHANTED_BOOK_SLOT, event);
                 else
                     //Make sure enchant books themselves can't be enchanted
-                    return;
+                {
+                }
             } else if (EliteEnchantmentItems.isEliteLuckyTicket(event.getCurrentItem()) &&
                     event.getView().getTopInventory().getItem(LUCKY_TICKET_SLOT) == null) {
                 moveOneItemUp(LUCKY_TICKET_SLOT, event);

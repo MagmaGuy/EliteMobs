@@ -36,11 +36,11 @@ public class ScriptParticles {
                 ScriptRelativeVector scriptRelativeVector = null;
                 scriptRelativeVector = new ScriptRelativeVector(this.particleBlueprint.getRelativeVectorBlueprint(), eliteScript, location);
 
-                    Vector movementVector = scriptRelativeVector.getVector(scriptActionData);
-                    amount = 0;
-                    x = movementVector.getX();
-                    y = movementVector.getY();
-                    z = movementVector.getZ();
+                Vector movementVector = scriptRelativeVector.getVector(scriptActionData);
+                amount = 0;
+                x = movementVector.getX();
+                y = movementVector.getY();
+                z = movementVector.getZ();
             }
 
 
@@ -79,7 +79,7 @@ public class ScriptParticles {
                                         particleBlueprint.getToBlue()),
                                 1));
             else if (particleBlueprint.getParticle().equals(Particle.WITCH)
-                    //|| particleBlueprint.getParticle().equals(Particle.WITCH_AMBIENT) todo: 1.20.6 changed this name
+                //|| particleBlueprint.getParticle().equals(Particle.WITCH_AMBIENT) todo: 1.20.6 changed this name
             ) {
                 location.getWorld().spawnParticle(
                         particleBlueprint.getParticle(),

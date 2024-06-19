@@ -15,7 +15,7 @@ public class Saturation {
         PlayerPotionEffects.addOnHitCooldown(saturationCooldown, player, 20 * 5);
         double foodRestoredAmount = (elitePotionEffect.getPotionEffect().getAmplifier() + 1);
         foodRestoredAmount = foodRestoredAmount + player.getFoodLevel() > 20 ?
-                20-player.getFoodLevel()  : foodRestoredAmount;
+                20 - player.getFoodLevel() : foodRestoredAmount;
         player.setFoodLevel((int) (player.getFoodLevel() + foodRestoredAmount));
     }
 

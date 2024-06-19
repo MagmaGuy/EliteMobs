@@ -80,8 +80,7 @@ public class QuestTracking {
     public static void toggleTracking(Player player, CustomQuest quest) {
         if (playerTrackingQuests.containsKey(player)) {
             playerTrackingQuests.get(player).stop();
-        }
-        else {
+        } else {
             if (quest == null) {
                 player.sendMessage("[EliteMobs] Failed to get a valid quest with that quest ID!");
                 return;

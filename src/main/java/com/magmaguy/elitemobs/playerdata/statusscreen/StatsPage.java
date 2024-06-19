@@ -63,7 +63,7 @@ public class StatsPage {
                         EconomyHandler.checkCurrency(targetPlayer.getUniqueId()) + ""));
         inventory.setItem(PlayerStatusMenuConfig.getStatsGuildTierSlot(),
                 replaceItemNamePlaceholder(PlayerStatusMenuConfig.getStatsGuildTierItem().clone(), "$tier",
-                        AdventurersGuildConfig.getShortenedRankName(GuildRank.getGuildPrestigeRank(targetPlayer), GuildRank.getActiveGuildRank(targetPlayer)) + ""));
+                        AdventurersGuildConfig.getShortenedRankName(GuildRank.getGuildPrestigeRank(targetPlayer), GuildRank.getActiveGuildRank(targetPlayer))));
         inventory.setItem(PlayerStatusMenuConfig.getStatsEliteKillsSlot(),
                 replaceItemNamePlaceholder(PlayerStatusMenuConfig.getStatsEliteKillsItem().clone(), "$kills",
                         PlayerData.getKills(targetPlayer.getUniqueId()) + ""));

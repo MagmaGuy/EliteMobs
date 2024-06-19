@@ -20,7 +20,7 @@ public class VisualEffectObfuscator implements Listener {
         eliteEntity.setVisualEffectObfuscated(false);
     }
 
-    @EventHandler (ignoreCancelled = true)
+    @EventHandler(ignoreCancelled = true)
     public void onDamageByPlayer(EntityDamageByEntityEvent event) {
         if (!(EntityFinder.getRealDamager(event) instanceof Player)) return;
         EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(event.getEntity());

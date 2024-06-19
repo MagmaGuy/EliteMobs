@@ -9,7 +9,6 @@ import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.config.customspawns.CustomSpawnConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
-import com.magmaguy.elitemobs.dungeons.SchematicPackage;
 import com.magmaguy.elitemobs.mobconstructor.CustomSpawn;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
@@ -655,18 +654,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
             finalSpawnLocation = null;
         else
             finalSpawnLocation = summoningEntity.getLocation().add(spawnLocationOffset);
-        if (summoningEntity instanceof CustomBossEntity &&
-                ((CustomBossEntity) summoningEntity).getEmPackage() != null &&
-                ((CustomBossEntity) summoningEntity).getEmPackage() instanceof SchematicPackage)
-            if (summoningEntity instanceof RegionalBossEntity) {
-                SchematicPackage schematicPackage = (SchematicPackage) ((CustomBossEntity) summoningEntity).getEmPackage();
-                return summoningEntity.getSpawnLocation().add(spawnLocationOffset.rotateAroundY(schematicPackage.getDungeonPackagerConfigFields().getCalculatedRotation()));
-            } else {
-                SchematicPackage schematicPackage = (SchematicPackage) ((CustomBossEntity) summoningEntity).getEmPackage();
-                return summoningEntity.getLocation().clone().add(spawnLocationOffset.rotateAroundY(schematicPackage.getDungeonPackagerConfigFields().getCalculatedRotation()));
-            }
-
-        else return finalSpawnLocation;
+        return finalSpawnLocation;
     }
 
     public enum SummonType {

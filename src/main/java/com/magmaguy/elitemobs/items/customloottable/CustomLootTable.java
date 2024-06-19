@@ -64,7 +64,7 @@ public class CustomLootTable implements Serializable {
             else if (object instanceof Map<?, ?> configMap) {
                 //This is used for the instanced loot
                 if (((Map<?, ?>) object).containsKey("currencyAmount") ||
-                        ((Map<?, ?>) object).containsKey("currencyamount")){
+                        ((Map<?, ?>) object).containsKey("currencyamount")) {
                     new CurrencyCustomLootEntry(entries, configMap, filename);
                 }
                 new EliteCustomLootEntry(entries, configMap, filename);

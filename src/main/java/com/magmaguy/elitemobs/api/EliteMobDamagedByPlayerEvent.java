@@ -16,7 +16,6 @@ import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import com.magmaguy.elitemobs.utils.EntityFinder;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.elitemobs.utils.Round;
-import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -139,7 +138,7 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
                 if (level < 1) return 0D;
                 return level * 2.5D;
             }
-            if (livingEntity instanceof Zombie || livingEntity instanceof Skeleton || livingEntity instanceof Wither || livingEntity instanceof SkeletonHorse || livingEntity instanceof ZombieHorse || !VersionChecker.serverVersionOlderThan(16, 0) && livingEntity.getType().equals(EntityType.ZOMBIFIED_PIGLIN)) {
+            if (livingEntity instanceof Zombie || livingEntity instanceof Skeleton || livingEntity instanceof Wither || livingEntity instanceof SkeletonHorse || livingEntity instanceof ZombieHorse || livingEntity.getType().equals(EntityType.ZOMBIFIED_PIGLIN)) {
                 int level = ElitePlayerInventory.playerInventories.get(player.getUniqueId()).mainhand.getDamageUndeadLevel(player.getInventory().getItemInMainHand(), false);
                 level -= Enchantment.SMITE.getMaxLevel();
                 if (level < 1) return 0D;
@@ -258,7 +257,7 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
         private void runAntiexploit(EliteEntity eliteEntity, EntityDamageByEntityEvent event, EliteMobDamagedByPlayerEvent eliteMobDamagedByPlayerEvent) {
             if (EliteMobs.worldGuardIsEnabled) {
                 Boolean regionQuery = WorldGuardFlagChecker.checkNullableFlag(eliteEntity.getLocation(), WorldGuardCompatibility.getELITEMOBS_ANTIEXPLOIT());
-                if (regionQuery != null && regionQuery == false) return;
+                if (regionQuery != null && !regionQuery) return;
             }
             if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK &&
                     event.getCause() != EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK &&

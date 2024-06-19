@@ -116,9 +116,8 @@ public class TreasureChest implements PersistentObject {
             if (playerIsInCooldown(player)) {
                 groupTimerCooldownMessage(player, getPlayerCooldown(player));
                 return;
-            }
-        else if (restockTime > Instant.now().getEpochSecond())
-            return;
+            } else if (restockTime > Instant.now().getEpochSecond())
+                return;
 
         if (ThreadLocalRandom.current().nextDouble() < customTreasureChestConfigFields.getMimicChance()) doMimic();
         else doTreasure(player);

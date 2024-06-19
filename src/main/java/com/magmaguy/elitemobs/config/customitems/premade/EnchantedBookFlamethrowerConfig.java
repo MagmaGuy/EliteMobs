@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EnchantedBookFlamethrowerConfig extends CustomItemsConfigFields {
-    public EnchantedBookFlamethrowerConfig(){
+    public EnchantedBookFlamethrowerConfig() {
         super("enchanted_book_flamethrower",
                 true,
                 Material.BOOK,

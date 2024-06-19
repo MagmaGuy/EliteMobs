@@ -14,10 +14,6 @@ public class ValidWorldsConfig {
     @Getter
     private static final List<String> validWorlds = new ArrayList<>();
     @Getter
-    private static List<String> zoneBasedWorlds = new ArrayList<>();
-    @Getter
-    private static List<String> nightmareWorlds = new ArrayList<>();
-    @Getter
     private static FileConfiguration fileConfiguration;
     private static File file;
 
@@ -36,17 +32,6 @@ public class ValidWorldsConfig {
         for (String key : validWorldsSection.getKeys(false))
             if (validWorldsSection.getBoolean(key))
                 validWorlds.add(key);
-
-        zoneBasedWorlds = ConfigurationEngine.setList(
-                List.of("Sets the list of zone-based worlds.",
-                        "THE ZONE-BASED GAME MODE IS OUTDATED AND WILL SOON BE REMOVED!"),
-                file, fileConfiguration, "zoneBasedWorlds", new ArrayList(), false);
-        nightmareWorlds = ConfigurationEngine.setList(
-                List.of("Sets the list of nightmare mode worlds.",
-                        "Nightmare mode worlds are a game mode where days are shorter and players can not sleep.",
-                        "Nightmare worlds also have higher amounts of elite spawns.",
-                        "https://github.com/MagmaGuy/EliteMobs/wiki/%5BGame-Mode%5D-Nightmare-mode"),
-                file, fileConfiguration, "nightmareWorlds", new ArrayList(), false);
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
 

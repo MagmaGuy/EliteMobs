@@ -14,7 +14,6 @@ import com.magmaguy.elitemobs.powers.meta.CustomSummonPower;
 import com.magmaguy.elitemobs.powers.scripts.caching.ScriptActionBlueprint;
 import com.magmaguy.elitemobs.powers.scripts.enums.ActionType;
 import com.magmaguy.elitemobs.utils.WarningMessage;
-import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -354,7 +353,6 @@ public class ScriptAction {
 
     //Applies the freeze visual effect from Minecraft. Requires a repeating task to keep reapplying
     private void runVisualFreeze(ScriptActionData scriptActionData) {
-        if (VersionChecker.serverVersionOlderThan(17, 0)) return;
         getTargets(scriptActionData).forEach(iteratedTarget -> iteratedTarget.setFreezeTicks((int) (iteratedTarget.getFreezeTicks() + blueprint.getAmount())));
     }
 

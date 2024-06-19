@@ -4,14 +4,14 @@ import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.World;
 
-import java.util.Arrays;
+import java.util.List;
 
 public class DiamondLeagueArena extends DungeonPackagerConfigFields {
-    public DiamondLeagueArena(){
+    public DiamondLeagueArena() {
         super("diamond_league_arena",
                 false,
                 "&5[lvl 100-150] &fThe Diamond League Arena",
-                Arrays.asList("&fFace the Diamond League Arena!"),
+                List.of("&fFace the Diamond League Arena!"),
                 DiscordLinks.freeMinidungeons,
                 DungeonSizeCategory.ARENA,
                 "em_diamond_arena",

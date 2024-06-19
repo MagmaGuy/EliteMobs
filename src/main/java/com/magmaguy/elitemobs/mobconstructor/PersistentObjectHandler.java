@@ -169,7 +169,7 @@ public class PersistentObjectHandler {
         }
 
         @EventHandler
-        public void onInstanceRemove(InstancedDungeonRemoveEvent event){
+        public void onInstanceRemove(InstancedDungeonRemoveEvent event) {
             persistentObjects.removeAll(event.getDungeonInstance().getInstancedWorldName());
         }
 

@@ -59,7 +59,7 @@ public class EarthquakeEnchantment extends CustomEnchantment {
                     try {
                         entity.setVelocity(entity.getLocation().subtract(player.getLocation()).toVector().normalize().setY(.3).multiply(distance / 2d));
                     } catch (Exception e) {
-                       //non finite values, doesn't really matter
+                        //non finite values, doesn't really matter
                     }
                 } else {
                     entity.setVelocity(entity.getLocation().subtract(player.getLocation()).toVector().normalize().setY(.3)
