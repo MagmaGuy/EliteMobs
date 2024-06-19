@@ -1,7 +1,5 @@
 package com.magmaguy.elitemobs.config;
 
-import org.bukkit.Particle;
-
 import java.util.Locale;
 
 public class LegacyValueConverter {
@@ -10,7 +8,7 @@ public class LegacyValueConverter {
 
     public static String parseEnchantment(String materialName) {
         switch (materialName.toUpperCase(Locale.ROOT)) {
-            case "ARROW_DAMAGE":
+            case "POWER":
                 return "POWER";
             case "ARROW_FIRE":
                 return "FLAME";
@@ -18,15 +16,15 @@ public class LegacyValueConverter {
                 return "INFINITY";
             case "ARROW_KNOCKBACK":
                 return "PUNCH";
-            case "DAMAGE_ARTHROPODS":
+            case "BANE_OF_ARTHROPODS":
                 return "BANE_OF_ARTHROPODS";
-            case "DAMAGE_UNDEAD":
+            case "SMITE":
                 return "SMITE";
-            case "DIG_SPEED":
+            case "EFFICIENCY":
                 return "EFFICIENCY";
             case "DURABILITY":
                 return "UNBREAKING";
-            case "LOOT_BONUS_BLOCKS":
+            case "FORTUNE":
                 return "FORTUNE";
             case "LOOT_BONUS_MOBS":
                 return "LOOTING";
@@ -38,13 +36,13 @@ public class LegacyValueConverter {
                 return "PROTECTION";
             case "BLAST_PROTECTION":
                 return "BLAST_PROTECTION";
-            case "PROTECTION_FALL":
+            case "FEATHER_FALLING":
                 return "FEATHER_FALLING";
-            case "PROTECTION_FIRE":
+            case "FIRE_PROTECTION":
                 return "FIRE_PROTECTION";
-            case "PROTECTION_PROJECTILE":
+            case "PROJECTILE_PROTECTION":
                 return "PROJECTILE_PROTECTION";
-            case "WATER_WORKER":
+            case "AQUA_AFFINITY":
                 return "AQUA_AFFINITY";
             default:
                 return materialName;
@@ -74,48 +72,5 @@ public class LegacyValueConverter {
             default:
                 return potionEffectName;
         }
-    }
-
-    public static String parseParticle(String potionEffectName) {
-        switch (potionEffectName.toUpperCase(Locale.ROOT)) {
-            case "EXPLOSION_NORMAL", "EXPLOSION_LARGE":
-                return Particle.EXPLOSION.toString();
-            case "SMOKE_NORMAL":
-                return Particle.SMOKE.toString();
-            case "SMOKE_LARGE":
-                return Particle.LARGE_SMOKE.toString();
-            case "REDSTONE":
-                return Particle.DUST.toString();
-            case "SLIME":
-                return Particle.ITEM_SLIME.toString();
-            case "DRIP_LAVA":
-                return Particle.DRIPPING_WATER.toString();
-            case "EXPLOSION_HUGE":
-                return Particle.EXPLOSION.toString();
-            case "SNOWBALL":
-                return Particle.SNOWFLAKE.toString();
-            case "SPELL":
-                return Particle.WITCH.toString();
-            case "DRIP_WATER":
-                return Particle.DRIPPING_WATER.toString();
-            case "SPELL_MOB":
-                return Particle.WITCH.toString();
-            case "VILLAGER_ANGRY":
-                return Particle.ANGRY_VILLAGER.toString();
-            case "WATER_BUBBLE":
-                return Particle.UNDERWATER.toString();
-            case "VILLAGER_HAPPY":
-                return Particle.HAPPY_VILLAGER.toString();
-            case "WATER_SPLASH":
-                return Particle.SPLASH.toString();
-            default:
-                return potionEffectName;
-        }
-    }
-
-    public static String parseDeserializedBlocks(String originalDeserializedBlock) {
-        if (originalDeserializedBlock.endsWith("grass"))
-            return originalDeserializedBlock.replace("grass", "grass_block[snowy=false]");
-        return originalDeserializedBlock;
     }
 }

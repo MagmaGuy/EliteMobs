@@ -8,13 +8,13 @@ import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.config.customspawns.CustomSpawnConfig;
 import com.magmaguy.elitemobs.config.customspawns.CustomSpawnConfigFields;
-import com.magmaguy.elitemobs.dungeons.EliteMobsWorld;
 import com.magmaguy.elitemobs.events.MoonPhaseDetector;
 import com.magmaguy.elitemobs.events.TimedEvent;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
-import com.magmaguy.magmacore.util.Logger;
+import com.magmaguy.elitemobs.utils.DebugMessage;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.*;
@@ -58,14 +58,14 @@ public class CustomSpawn {
         this.timedEvent = timedEvent;
 
         if (customSpawnConfigFields == null) {
-            Logger.warn("Invalid custom spawn detected for file " + customSpawnConfig + " in event " + timedEvent.getCustomEventsConfigFields().getFilename());
+            new WarningMessage("Invalid custom spawn detected for file " + customSpawnConfig + " in event " + timedEvent.getCustomEventsConfigFields().getFilename());
             return;
         }
 
         customBossesFilenames.forEach(bossString -> {
             CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(bossString);
             if (customBossesConfigFields == null) {
-                Logger.warn("Attempted to pass invalid boss into CustomSpawn: " + bossString);
+                new WarningMessage("Attempted to pass invalid boss into CustomSpawn: " + bossString);
                 return;
             }
             CustomBossEntity customBossEntity = new CustomBossEntity(customBossesConfigFields);
@@ -77,7 +77,7 @@ public class CustomSpawn {
     public CustomSpawn(String customSpawnConfig, CustomBossEntity customBossEntity) {
         this.customSpawnConfigFields = CustomSpawnConfig.getCustomEvent(customSpawnConfig);
         if (customSpawnConfigFields == null) {
-            Logger.warn("Invalid custom spawn detected for file " + customSpawnConfig);
+            new WarningMessage("Invalid custom spawn detected for file " + customSpawnConfig);
             return;
         }
         customBossEntities.add(customBossEntity);
@@ -115,6 +115,7 @@ public class CustomSpawn {
             }.runTaskAsynchronously(MetadataHandler.PLUGIN);
         else
             spawn();
+
     }
 
     private void spawn() {
@@ -128,7 +129,7 @@ public class CustomSpawn {
                     return;
                 }
                 //One last check
-                //Last line of defense - spawn a test mob. If some unknown protection system prevents spawning it should prevent this
+                //Last line of defense - spawn a test mob. If some uknown protection system prevents spawning it should prevent this
                 LivingEntity testEntity = spawnLocation.getWorld().spawn(spawnLocation, Zombie.class);
                 if (!testEntity.isValid()) {
                     spawnLocation = null;
@@ -164,12 +165,13 @@ public class CustomSpawn {
 
     private void generateCustomSpawn() {
         //If the global cooldown if enforced and this is a timed event wait for the cd to be over
-
-        if (timedEvent != null && System.currentTimeMillis() < TimedEvent.getNextEventStartMinimum()) {
+        /*
+        if (timedEvent != null && System.currentTimeMillis() < TimedEvent.getNextEventTrigger()) {
             Bukkit.getScheduler().scheduleAsyncDelayedTask(MetadataHandler.PLUGIN, this::generateCustomSpawn, 20 * 60L);
             return;
         }
 
+         */
 
         int maxTries = 100;
         int tries = 0;
@@ -189,6 +191,8 @@ public class CustomSpawn {
                     @Override
                     public void run() {
                         generateCustomSpawn();
+                        if (timedEvent != null)
+                            new DebugMessage("Failed to spawn " + timedEvent.getCustomEventsConfigFields().getFilename() + " after " + allTries + " tries. Will try again in 1 minute.");
                     }
                 }.runTaskLaterAsynchronously(MetadataHandler.PLUGIN, 20 * 60);
             } else {
@@ -198,21 +202,22 @@ public class CustomSpawn {
                 }));
             }
         } else {
+            if (isEvent) new DebugMessage("Spawned bosses for event after " + allTries + " tries");
             spawn();
         }
     }
 
     public Location generateRandomSpawnLocation() {
         if (customSpawnConfigFields == null) {
-            Logger.warn("Something tried to spawn but has invalid custom spawn config fields! This isn't good.", true);
-            Logger.warn("Bosses: ");
+            new WarningMessage("Something tried to spawn but has invalid custom spawn config fields! This isn't good.", true);
+            new WarningMessage("Bosses: ");
             getCustomBossEntities().forEach((customBossEntity) -> {
                 if (customBossEntity != null)
                     if (customBossEntity.getName() != null)
-                        Logger.warn(customBossEntity.getCustomBossesConfigFields().getName());
+                        new WarningMessage(customBossEntity.getCustomBossesConfigFields().getName());
             });
             if (timedEvent != null) {
-                Logger.warn("Event: " + timedEvent.getCustomEventsConfigFields().getFilename());
+                new WarningMessage("Event: " + timedEvent.getCustomEventsConfigFields().getFilename());
                 timedEvent.end();
             }
             return null;
@@ -235,7 +240,6 @@ public class CustomSpawn {
                 Location playerLocation = player.getLocation();
                 if (!ValidWorldsConfig.getValidWorlds().contains(playerLocation.getWorld().getName()))
                     continue;
-                if (timedEvent != null && EliteMobsWorld.isEliteMobsWorld(player.getWorld().getUID())) continue;
                 if (Boolean.FALSE.equals(playerLocation.getWorld().getGameRuleValue(GameRule.DO_MOB_SPAWNING)))
                     continue;
                 if (!customSpawnConfigFields.getValidWorlds().isEmpty())

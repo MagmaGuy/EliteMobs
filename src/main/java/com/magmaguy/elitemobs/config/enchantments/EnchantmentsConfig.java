@@ -1,8 +1,7 @@
 package com.magmaguy.elitemobs.config.enchantments;
 
-import com.magmaguy.elitemobs.config.LegacyValueConverter;
-import com.magmaguy.magmacore.config.CustomConfig;
-import com.magmaguy.magmacore.util.Logger;
+import com.magmaguy.elitemobs.config.CustomConfig;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import org.bukkit.enchantments.Enchantment;
 
@@ -22,14 +21,12 @@ public class EnchantmentsConfig extends CustomConfig {
     }
 
     public static EnchantmentsConfigFields getEnchantment(String string) {
-        String newString = LegacyValueConverter.parseEnchantment(string.replace(".yml", "")) + ".yml";
-        newString = newString.toLowerCase(Locale.ROOT);
-        EnchantmentsConfigFields test = enchantments.get(newString);
+        EnchantmentsConfigFields test = enchantments.get(string);
         if (test == null) {
-            Logger.warn("Failed to find enchant file " + newString);
+            new WarningMessage("Failed to find enchant file " + string);
             new Exception().printStackTrace();
         }
-        return enchantments.get(newString);
+        return enchantments.get(string);
     }
 
     public static EnchantmentsConfigFields getEnchantment(Enchantment enchantment) {
