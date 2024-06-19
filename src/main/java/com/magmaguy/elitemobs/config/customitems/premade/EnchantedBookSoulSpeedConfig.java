@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EnchantedBookSoulSpeedConfig extends CustomItemsConfigFields {
-    public EnchantedBookSoulSpeedConfig(){
+    public EnchantedBookSoulSpeedConfig() {
         super("enchanted_book_soul_speed",
                 true,
                 Material.BOOK,

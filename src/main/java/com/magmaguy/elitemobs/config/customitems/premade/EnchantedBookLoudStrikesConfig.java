@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EnchantedBookLoudStrikesConfig extends CustomItemsConfigFields {
-    public EnchantedBookLoudStrikesConfig(){
+    public EnchantedBookLoudStrikesConfig() {
         super("enchanted_book_loud_strikes",
                 true,
                 Material.BOOK,

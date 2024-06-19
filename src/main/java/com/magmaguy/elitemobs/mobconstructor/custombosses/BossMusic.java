@@ -115,13 +115,13 @@ public class BossMusic {
                         cancel();
                         return;
                     }
-                    player.playSound(player.getLocation(), name,  1f, 1f);
+                    player.playSound(player.getLocation(), name, 1f, 1f);
                 }
             }.runTaskTimer(MetadataHandler.PLUGIN, 0, durationTicks);
         }
         //case for a song with a transition
         else {
-            player.playSound(player.getLocation(), name,  1f, 1f);
+            player.playSound(player.getLocation(), name, 1f, 1f);
             songTask = new BukkitRunnable() {
                 @Override
                 public void run() {

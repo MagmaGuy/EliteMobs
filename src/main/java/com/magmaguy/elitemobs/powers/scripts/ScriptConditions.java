@@ -21,7 +21,7 @@ public class ScriptConditions {
 
     private final ScriptConditionsBlueprint conditionsBlueprint;
     private ScriptTargets scriptTargets = null;
-    private EliteScript eliteScript;
+    private final EliteScript eliteScript;
 
     public ScriptConditions(ScriptConditionsBlueprint scriptConditionsBlueprint, EliteScript eliteScript, boolean actionCondition) {
         this.conditionsBlueprint = scriptConditionsBlueprint;

@@ -7,7 +7,7 @@ import org.bukkit.entity.Villager;
 import java.util.List;
 
 public class BoneMonasteryTeleporter extends NPCsConfigFields {
-    public BoneMonasteryTeleporter(){
+    public BoneMonasteryTeleporter() {
         super("bone_monastery_teleporter",
                 true,
                 "Sister Frieda",

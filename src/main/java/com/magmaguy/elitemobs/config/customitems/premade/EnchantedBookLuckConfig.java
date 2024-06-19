@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EnchantedBookLuckConfig extends CustomItemsConfigFields {
-    public EnchantedBookLuckConfig(){
+    public EnchantedBookLuckConfig() {
         super("enchanted_book_luck",
                 true,
                 Material.BOOK,

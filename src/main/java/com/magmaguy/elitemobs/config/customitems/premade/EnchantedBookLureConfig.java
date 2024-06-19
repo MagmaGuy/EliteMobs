@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EnchantedBookLureConfig extends CustomItemsConfigFields {
-    public EnchantedBookLureConfig(){
+    public EnchantedBookLureConfig() {
         super("enchanted_book_lure",
                 true,
                 Material.BOOK,

@@ -173,8 +173,8 @@ public class CustomBossMegaConsumer {
                 ((EnderDragon) livingEntity).getDragonBattle().generateEndPortal(false);
         }
 
-        if (livingEntity instanceof Slime){
-            ((Slime)livingEntity).setSize(customBossEntity.getCustomBossesConfigFields().getSlimeSize());
+        if (livingEntity instanceof Slime) {
+            ((Slime) livingEntity).setSize(customBossEntity.getCustomBossesConfigFields().getSlimeSize());
         }
         customBossEntity.setUnsyncedLivingEntity(livingEntity);
         EntityTracker.registerEliteMob(customBossEntity, livingEntity);

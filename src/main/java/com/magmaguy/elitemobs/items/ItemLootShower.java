@@ -54,10 +54,11 @@ public class ItemLootShower implements Listener {
                 > ItemSettingsConfig.getLootLevelDifferenceLockout()) {
             new BukkitRunnable() {
                 int counter = 0;
+
                 @Override
                 public void run() {
                     counter++;
-                    if (!player.isValid() || counter > 20 * 5){
+                    if (!player.isValid() || counter > 20 * 5) {
                         cancel();
                         return;
                     }

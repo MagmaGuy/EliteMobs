@@ -15,7 +15,6 @@ import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import com.magmaguy.elitemobs.utils.DebugMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
-import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.*;
@@ -241,7 +240,8 @@ public class CustomSpawn {
                 Location playerLocation = player.getLocation();
                 if (!ValidWorldsConfig.getValidWorlds().contains(playerLocation.getWorld().getName()))
                     continue;
-                if (Boolean.FALSE.equals(playerLocation.getWorld().getGameRuleValue(GameRule.DO_MOB_SPAWNING))) continue;
+                if (Boolean.FALSE.equals(playerLocation.getWorld().getGameRuleValue(GameRule.DO_MOB_SPAWNING)))
+                    continue;
                 if (!customSpawnConfigFields.getValidWorlds().isEmpty())
                     if (!customSpawnConfigFields.getValidWorlds().contains(playerLocation.getWorld()))
                         continue;
@@ -275,10 +275,7 @@ public class CustomSpawn {
         //Temp location - do not run checks on it yet
         Location location = selectedPlayer.getLocation().clone().add(randomizedVector);
         //This doesn't matter too much since it will be parsed later, also these values are already tweaked for 1.18.
-        if (VersionChecker.serverVersionOlderThan(18, 1))
-            location.setY(ThreadLocalRandom.current().nextInt(-0, 256));
-        else
-            location.setY(ThreadLocalRandom.current().nextInt(-64, 256));
+        location.setY(ThreadLocalRandom.current().nextInt(-0, 256));
         World world = location.getWorld();
 
         if (!customSpawnConfigFields.getValidBiomes().isEmpty() && !customSpawnConfigFields.getValidBiomes().contains(location.getBlock().getBiome()))

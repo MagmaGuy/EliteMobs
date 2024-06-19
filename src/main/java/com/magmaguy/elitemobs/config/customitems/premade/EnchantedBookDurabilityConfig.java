@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EnchantedBookDurabilityConfig extends CustomItemsConfigFields {
-    public EnchantedBookDurabilityConfig(){
+    public EnchantedBookDurabilityConfig() {
         super("enchanted_book_durability",
                 true,
                 Material.BOOK,

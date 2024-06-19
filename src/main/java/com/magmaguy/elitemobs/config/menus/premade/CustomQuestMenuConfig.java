@@ -166,7 +166,7 @@ public class CustomQuestMenuConfig extends MenusConfigFields {
         killQuestDefaultSummaryLine = ConfigurationEngine.setString(file, fileConfiguration, "killQuestDefaultSummaryLine", "&c➤Kill $name:$color$current&0/$color$target", true);
         fetchQuestDefaultSummaryLine = ConfigurationEngine.setString(file, fileConfiguration, "fetchQuestDefaultSummaryLine", "&c➤Get $name:$color&$current&0/$color$target", true);
         dialogQuestDefaultSummaryLine = ConfigurationEngine.setString(file, fileConfiguration, "dialogQuestDefaultSummaryLine", "&c➤Go talk to $name $location", true);
-        arenaQuestDefaultSummaryLine =  ConfigurationEngine.setString(file, fileConfiguration, "arenaQuestDefaultSummaryLine", "&c➤Complete $arenaName", true);
+        arenaQuestDefaultSummaryLine = ConfigurationEngine.setString(file, fileConfiguration, "arenaQuestDefaultSummaryLine", "&c➤Complete $arenaName", true);
 
         rewardsLine = ConfigurationEngine.setString(file, fileConfiguration, "rewardsLine", "&2&lRewards:", true);
         rewardsDefaultSummaryLine = ConfigurationEngine.setString(file, fileConfiguration, "rewardsDefaultSummaryLine", "&2➤$amountx $rewardName &8($chance%)", true);

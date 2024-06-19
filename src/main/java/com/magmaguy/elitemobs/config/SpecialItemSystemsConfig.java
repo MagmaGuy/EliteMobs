@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.utils.WarningMessage;
-import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import lombok.Getter;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -108,11 +107,10 @@ public class SpecialItemSystemsConfig {
 
         addDefaultEnchantmentBook(fileConfiguration, "elite_scrap_huge", 100);
 
-        if (!VersionChecker.serverVersionOlderThan(18, 2))
-            fileConfiguration.setComments("enchantedBookWeightedDropChance",
-                    List.of("Sets the chance of a special item dropping over another special item.",
-                            "The higher the value, the higher the chance of that item getting picked over other items.",
-                            "Keep in mind that if values get too high, things with low values will become almost impossible to obtain."));
+        fileConfiguration.setComments("enchantedBookWeightedDropChance",
+                List.of("Sets the chance of a special item dropping over another special item.",
+                        "The higher the value, the higher the chance of that item getting picked over other items.",
+                        "Keep in mind that if values get too high, things with low values will become almost impossible to obtain."));
 
         luckyTicketMultiplier = ConfigurationEngine.setDouble(
                 List.of("Multiplier for the lucky ticket success chance in enchantments. 2.0 = 2x"),

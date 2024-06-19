@@ -5,7 +5,6 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.translations.TranslationsConfig;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import com.magmaguy.elitemobs.utils.WarningMessage;
-import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -80,7 +79,6 @@ public class ConfigurationEngine {
     }
 
     private static void setComments(FileConfiguration fileConfiguration, String key, List<String> comments) {
-        if (VersionChecker.serverVersionOlderThan(18, 2)) return;
         fileConfiguration.setComments(key, comments);
     }
 
@@ -196,13 +194,13 @@ public class ConfigurationEngine {
         }
         String name = "";
         try {
-            name = setString(file, fileConfiguration, key+".name", itemStack.getItemMeta().getDisplayName(), true);
+            name = setString(file, fileConfiguration, key + ".name", itemStack.getItemMeta().getDisplayName(), true);
         } catch (Exception ex) {
             new WarningMessage("Item name " + fileConfiguration.getString(key + ".name") + " is not valid! Correct it to make a valid item.");
         }
         List<String> lore = new ArrayList<>();
         try {
-            lore = setList(file, fileConfiguration, key+".lore", null, true);
+            lore = setList(file, fileConfiguration, key + ".lore", null, true);
         } catch (Exception ex) {
             new WarningMessage("Item lore " + fileConfiguration.getString(key + ".lore") + " is not valid! Correct it to make a valid item.");
         }

@@ -74,14 +74,17 @@ public class CurrencyCustomLootEntry extends CustomLootEntry implements Serializ
         entries.add(this);
     }
 
-    public CurrencyCustomLootEntry(List<CustomLootEntry> entries, Map<?,?> configMap, String configFilename) {
+    public CurrencyCustomLootEntry(List<CustomLootEntry> entries, Map<?, ?> configMap, String configFilename) {
         for (Map.Entry<?, ?> mapEntry : configMap.entrySet()) {
             String key = (String) mapEntry.getKey();
             switch (key.toLowerCase(Locale.ROOT)) {
-                case "chance" -> super.setChance(MapListInterpreter.parseDouble(key, mapEntry.getValue(), configFilename));
-                case "permission" -> super.setPermission(MapListInterpreter.parseString(key, mapEntry.getValue(), configFilename));
+                case "chance" ->
+                        super.setChance(MapListInterpreter.parseDouble(key, mapEntry.getValue(), configFilename));
+                case "permission" ->
+                        super.setPermission(MapListInterpreter.parseString(key, mapEntry.getValue(), configFilename));
                 case "amount" -> setAmount(MapListInterpreter.parseInteger(key, mapEntry.getValue(), configFilename));
-                case "currencyamount" -> currencyAmount = MapListInterpreter.parseInteger(key, mapEntry.getValue(), configFilename);
+                case "currencyamount" ->
+                        currencyAmount = MapListInterpreter.parseInteger(key, mapEntry.getValue(), configFilename);
                 default -> new WarningMessage("Failed to read custom loot option " + key + " in " + configFilename);
             }
         }

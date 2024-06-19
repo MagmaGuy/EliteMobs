@@ -99,7 +99,7 @@ public class Placeholders extends PlaceholderExpansion {
         databases for safety purposes. All of the queries should be in memory regardless.
          */
 
-        if (!PlayerData.isInMemory(player.getUniqueId())|| PlayerData.getPlayerData(player.getUniqueId()) == null)
+        if (!PlayerData.isInMemory(player.getUniqueId()) || PlayerData.getPlayerData(player.getUniqueId()) == null)
             return "Uninitialized player data!";
 
         switch (identifier) {

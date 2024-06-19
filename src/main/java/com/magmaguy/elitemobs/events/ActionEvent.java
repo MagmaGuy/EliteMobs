@@ -8,7 +8,6 @@ import com.magmaguy.elitemobs.config.customevents.CustomEventsConfig;
 import com.magmaguy.elitemobs.config.customevents.CustomEventsConfigFields;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.utils.WarningMessage;
-import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -153,8 +152,7 @@ public class ActionEvent extends CustomEvent {
                     event.getPlayer().getInventory().getItemInMainHand().getType().equals(Material.GOLDEN_HOE) ||
                     event.getPlayer().getInventory().getItemInMainHand().getType().equals(Material.STONE_HOE) ||
                     event.getPlayer().getInventory().getItemInMainHand().getType().equals(Material.WOODEN_HOE) ||
-                    !VersionChecker.serverVersionOlderThan(16, 0) &&
-                            event.getPlayer().getInventory().getItemInMainHand().getType().equals(Material.NETHERITE_HOE)))
+                    event.getPlayer().getInventory().getItemInMainHand().getType().equals(Material.NETHERITE_HOE)))
                 return;
             if (!(event.getClickedBlock().getType().equals(Material.DIRT) ||
                     event.getClickedBlock().getType().equals(Material.GRASS_BLOCK))) return;

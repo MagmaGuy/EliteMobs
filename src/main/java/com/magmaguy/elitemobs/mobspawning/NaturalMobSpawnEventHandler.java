@@ -8,7 +8,6 @@ import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.ValidWorldsConfig;
 import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
-import com.magmaguy.elitemobs.gamemodes.zoneworld.Grid;
 import com.magmaguy.elitemobs.items.MobTierCalculator;
 import com.magmaguy.elitemobs.items.customenchantments.HunterEnchantment;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
@@ -19,7 +18,6 @@ import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser;
 import com.magmaguy.elitemobs.utils.PlayerScanner;
-import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -86,9 +84,8 @@ public class NaturalMobSpawnEventHandler implements Listener {
 
         if (event.getSpawnReason().equals(DROWNED) || event.getSpawnReason().equals(BREEDING)) return;
 
-        if (!VersionChecker.serverVersionOlderThan(15, 0))
-            if (event.getEntity().getType().equals(EntityType.BEE))
-                return;
+        if (event.getEntity().getType().equals(EntityType.BEE))
+            return;
 
 
         if (MobPropertiesConfig.getMobProperties().get(event.getEntityType()) == null ||
@@ -131,9 +128,6 @@ public class NaturalMobSpawnEventHandler implements Listener {
         double huntingGearChanceAdder = HunterEnchantment.getHuntingGearBonus(nearbyPlayers);
         validChance += huntingGearChanceAdder;
 
-        if (ValidWorldsConfig.getNightmareWorlds().contains(event.getEntity().getWorld().getName()))
-            validChance += DefaultConfig.getNightmareWorldSpawnBonus();
-
         AtomicInteger peacefulModeDebuffs = new AtomicInteger();
         nearbyPlayers.forEach(player -> {
             //Handles situations where fake players got caught in the detection
@@ -144,14 +138,6 @@ public class NaturalMobSpawnEventHandler implements Listener {
         validChance -= peacefulModeDebuffs.get() * AdventurersGuildConfig.getPeacefulModeEliteChanceDecrease();
 
         if (ThreadLocalRandom.current().nextDouble() >= validChance) return;
-
-        if (ValidWorldsConfig.getZoneBasedWorlds().contains(livingEntity.getWorld().getName())) {
-            int eliteMobLevel = (int) (Grid.getMobTierFromLocation(livingEntity.getLocation()));
-            EliteEntity eliteEntity = new EliteEntity(livingEntity, eliteMobLevel, event.getSpawnReason());
-            if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.SPAWNER))
-                eliteEntity.setEliteLoot(false);
-            return;
-        }
 
         int eliteMobLevel = getNaturalMobLevel(livingEntity.getLocation(), nearbyPlayers);
 

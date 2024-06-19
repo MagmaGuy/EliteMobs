@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EnchantedBookRiptideConfig extends CustomItemsConfigFields {
-    public EnchantedBookRiptideConfig(){
+    public EnchantedBookRiptideConfig() {
         super("enchanted_book_riptide",
                 true,
                 Material.BOOK,

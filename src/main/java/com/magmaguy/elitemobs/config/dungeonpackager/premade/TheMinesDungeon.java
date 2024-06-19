@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 public class TheMinesDungeon extends DungeonPackagerConfigFields {
-    public TheMinesDungeon(){
+    public TheMinesDungeon() {
         super("the_mines_dungeon",
                 false,
                 "&2[lvl 020] &3The Mines Dungeon",

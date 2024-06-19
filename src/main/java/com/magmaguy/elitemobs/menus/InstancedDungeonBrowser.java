@@ -115,7 +115,8 @@ public class InstancedDungeonBrowser extends EliteMenu {
                             dungeonInstance.addSpectator((Player) event.getWhoClicked(), false);
                     }
                     case WAITING -> dungeonInstance.addNewPlayer((Player) event.getWhoClicked());
-                    case COMPLETED -> event.getWhoClicked().sendMessage("[EliteMobs] This match already ended! Can't join it!");
+                    case COMPLETED ->
+                            event.getWhoClicked().sendMessage("[EliteMobs] This match already ended! Can't join it!");
                 }
             }
         }

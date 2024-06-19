@@ -2,8 +2,6 @@ package com.magmaguy.elitemobs.config.dungeonpackager;
 
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.CustomConfigFields;
-import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
-import com.magmaguy.elitemobs.dungeons.SchematicPackage;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
@@ -49,7 +47,6 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
     private Location anchorPoint;
     @Getter
     private String defaultSchematicRotationString = null;
-    private SchematicPackage.SchematicRotation defaultSchematicRotation = null;
     @Getter
     @Setter
     private Integer calculatedRotation = 0;
@@ -305,11 +302,6 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
         defaultDungeon = true;
     }
 
-    public SchematicPackage.SchematicRotation getDefaultSchematicRotation() {
-        if (defaultSchematicRotation == null) return SchematicPackage.SchematicRotation.SOUTH;
-        return defaultSchematicRotation;
-    }
-
     @Override
     public void processConfigFields() {
         this.isEnabled = processBoolean("isEnabled", isEnabled, false, true);
@@ -337,14 +329,6 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
         this.protect = processBoolean("protect", protect, true, true);
         this.anchorPoint = processLocation("anchorPoint", anchorPoint, null, false);
         this.defaultSchematicRotationString = processString("defaultSchematicRotation", defaultSchematicRotationString, null, false);
-        if (defaultSchematicRotationString != null)
-            try {
-                if (defaultSchematicRotationString == null || defaultSchematicRotationString.isEmpty())
-                    defaultSchematicRotationString = "0";
-                this.defaultSchematicRotation = SchematicPackage.SchematicRotation.valueOf(defaultSchematicRotationString);
-            } catch (Exception ex) {
-                new WarningMessage("Bad default schematic rotation for dungeon " + filename);
-            }
         this.calculatedRotation = processInt("calculatedRotation", calculatedRotation, 0, false);
         this.corner1 = processVector("corner1", corner1, null, false);
         this.corner2 = processVector("corner2", corner2, null, false);
@@ -390,27 +374,8 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
         ConfigurationEngine.fileSaverCustomValues(fileConfiguration, file);
     }
 
-    public void installSchematic(Location location, int calculatedRotation, SchematicPackage schematicPackage) {
-        this.isEnabled = true;
-        ConfigurationEngine.writeValue(true, file, fileConfiguration, "isEnabled");
-        this.anchorPoint = location;
-        ConfigurationEngine.writeValue(ConfigurationLocation.deserialize(location), file, fileConfiguration, "anchorPoint");
-        if (teleportLocationOffset == null) teleportLocationOffset = new Location(null, 0, 0, 0, 0, 0);
-        this.teleportLocation = schematicPackage.toRealPosition(teleportLocationOffset.toVector());
-        this.teleportLocation.setYaw(location.getYaw() + teleportLocationOffset.getYaw());
-        this.teleportLocation.setPitch(location.getPitch() + teleportLocationOffset.getPitch());
-        ConfigurationEngine.writeValue(ConfigurationLocation.deserialize(teleportLocation), file, fileConfiguration, "teleportLocation");
-        this.calculatedRotation = calculatedRotation;
-        ConfigurationEngine.writeValue(calculatedRotation, file, fileConfiguration, "calculatedRotation");
-        ConfigurationEngine.fileSaverCustomValues(fileConfiguration, file);
-    }
-
     public void initializeWorld() {
         this.teleportLocation = processLocation("teleportLocation", teleportLocation, null, false);
-    }
-
-    public void initializeSchematic() {
-        this.teleportLocation = ConfigurationLocation.serialize(teleportLocationString);
     }
 
     public void simpleUninstall() {
@@ -424,38 +389,6 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
         this.teleportLocation = null;
         ConfigurationEngine.fileSaverCustomValues(fileConfiguration, file);
     }
-
-    public void uninstallSchematic() {
-        this.isEnabled = false;
-        ConfigurationEngine.writeValue(false, file, fileConfiguration, "isEnabled");
-        this.teleportLocation = null;
-        ConfigurationEngine.writeValue(null, file, fileConfiguration, "teleportLocation");
-        this.calculatedRotation = 0;
-        ConfigurationEngine.writeValue(null, file, fileConfiguration, "calculatedRotation");
-        this.anchorPoint = null;
-        ConfigurationEngine.writeValue(null, file, fileConfiguration, "anchorPoint");
-        ConfigurationEngine.fileSaverCustomValues(fileConfiguration, file);
-    }
-
-
-    public boolean addRelativeBossLocation(CustomBossesConfigFields customBossesConfigFields, Vector relativeLocation) {
-        String configurationLocation = customBossesConfigFields.getFilename() + ":" + relativeLocation.getX() + "," + relativeLocation.getY() + "," + relativeLocation.getZ();
-        relativeBossLocations.add(configurationLocation);
-        return ConfigurationEngine.writeValue(relativeBossLocations, file, fileConfiguration, "relativeBossLocations");
-    }
-
-    public void removeRelativeBossLocation(CustomBossesConfigFields customBossesConfigFields, Vector relativeLocation) {
-        String configurationLocation = customBossesConfigFields.getFilename() + ":" + relativeLocation.getX() + "," + relativeLocation.getY() + "," + relativeLocation.getZ();
-        relativeBossLocations.remove(configurationLocation);
-        ConfigurationEngine.writeValue(relativeBossLocations, file, fileConfiguration, "relativeBossLocations");
-    }
-
-    public boolean addRelativeTreasureChests(String treasureChestFilename, Vector relativeLocation) {
-        String configurationLocation = treasureChestFilename + ":" + relativeLocation.getX() + "," + relativeLocation.getY() + "," + relativeLocation.getZ();
-        relativeTreasureChestLocations.add(configurationLocation);
-        return ConfigurationEngine.writeValue(relativeTreasureChestLocations, file, fileConfiguration, "relativeTreasureChestLocations");
-    }
-
 
     public enum DungeonLocationType {
         WORLD,

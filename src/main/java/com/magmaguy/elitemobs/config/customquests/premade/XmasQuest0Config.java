@@ -10,7 +10,7 @@ public class XmasQuest0Config extends CustomQuestsConfigFields {
     public XmasQuest0Config() {
         super("xmas_quest_0",
                 true,
-                Map.of("Objective1",Map.of("objectiveType", "FETCH_ITEM", "filename", "xmas_lost_present.yml", "amount", 10, "itemName", "Lost Present")),
+                Map.of("Objective1", Map.of("objectiveType", "FETCH_ITEM", "filename", "xmas_lost_present.yml", "amount", 10, "itemName", "Lost Present")),
                 Arrays.asList(
                         "filename=xmas_treat.yml:amount=10:chance=.3",
                         "filename=xmas_treat_v2.yml:amount=1:chance=.3",

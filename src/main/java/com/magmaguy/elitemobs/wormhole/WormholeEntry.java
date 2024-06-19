@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.wormhole;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.WormholesConfig;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
-import com.magmaguy.elitemobs.dungeons.SchematicPackage;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.PersistentObject;
 import com.magmaguy.elitemobs.mobconstructor.PersistentObjectHandler;
@@ -79,8 +78,6 @@ public class WormholeEntry implements PersistentObject {
             setPortalMissingMessage(WormholesConfig.getDungeonNotInstalledMessage().replace("$dungeonID", emPackage.getDungeonPackagerConfigFields().getName()));
 
             this.opMessage = ChatColorConverter.convert("&8[EliteMobs - OP-only message] &fDownload links are available on &9https://magmaguy.itch.io/ &f" + "(free and premium) and &9https://www.patreon.com/magmaguy &f(premium). You can check the difference " + "between the two and get support here: " + DiscordLinks.mainLink);
-
-            if (emPackage instanceof SchematicPackage) return null;
         }
         Location teleportLocation = emPackage.getDungeonPackagerConfigFields().getTeleportLocation();
         if (teleportLocation == null) return null;

@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EnchantedBookChannelingConfig extends CustomItemsConfigFields {
-    public EnchantedBookChannelingConfig(){
+    public EnchantedBookChannelingConfig() {
         super("enchanted_book_channeling",
                 true,
                 Material.BOOK,
