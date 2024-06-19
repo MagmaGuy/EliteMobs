@@ -4,8 +4,7 @@ import com.magmaguy.elitemobs.quests.objectives.CustomFetchObjective;
 import com.magmaguy.elitemobs.quests.objectives.DialogObjective;
 import com.magmaguy.elitemobs.quests.objectives.KillObjective;
 import com.magmaguy.elitemobs.quests.objectives.Objective;
-import com.magmaguy.magmacore.config.ConfigurationFile;
-import com.magmaguy.magmacore.util.Logger;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -16,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class QuestsConfig extends ConfigurationFile {
+public class QuestsConfig {
 
     @Getter
     private static boolean requireQuestTurnIn;
@@ -105,93 +104,12 @@ public class QuestsConfig extends ConfigurationFile {
     @Getter
     private static int itemEntryCharacterLimitBedrockMenu;
 
-    public QuestsConfig() {
-        super("Quests.yml");
+    private QuestsConfig() {
     }
 
-    private static List<EntityType> setEntityTypes(FileConfiguration fileConfiguration, File file) {
-        List<String> entityTypes = new ArrayList<>(Arrays.asList(
-                EntityType.BLAZE.toString(),
-                EntityType.CAVE_SPIDER.toString(),
-                EntityType.DROWNED.toString(),
-                EntityType.ELDER_GUARDIAN.toString(),
-                EntityType.ENDERMAN.toString(),
-                EntityType.ENDERMITE.toString(),
-                EntityType.EVOKER.toString(),
-                EntityType.GHAST.toString(),
-                EntityType.GUARDIAN.toString(),
-                EntityType.HUSK.toString(),
-                EntityType.ILLUSIONER.toString(),
-                EntityType.IRON_GOLEM.toString(),
-                EntityType.PILLAGER.toString(),
-                EntityType.RAVAGER.toString(),
-                EntityType.SILVERFISH.toString(),
-                EntityType.SKELETON.toString(),
-                EntityType.SPIDER.toString(),
-                EntityType.STRAY.toString(),
-                EntityType.VINDICATOR.toString(),
-                EntityType.WITCH.toString(),
-                EntityType.WITHER_SKELETON.toString(),
-                EntityType.WOLF.toString(),
-                EntityType.ZOMBIE.toString()
-        ));
-
-        List<String> laterEntities = Arrays.asList(
-                EntityType.HOGLIN.toString(),
-                EntityType.ZOGLIN.toString(),
-                EntityType.PIGLIN_BRUTE.toString(),
-                EntityType.PIGLIN.toString(),
-                EntityType.ZOMBIFIED_PIGLIN.toString());
-        entityTypes.addAll(laterEntities);
-
-        ConfigurationEngine.setList(file, fileConfiguration, "questEntityTypes", entityTypes, false);
-
-        List<EntityType> parsedTypes = new ArrayList<>();
-        for (String string : entityTypes)
-            try {
-                parsedTypes.add(EntityType.valueOf(string));
-            } catch (Exception ex) {
-                Logger.warn("Entity type " + string + " is not a valid entity type from the Spigot API!");
-            }
-        return parsedTypes;
-    }
-
-    public static String getQuestChatProgressionMessage(Objective objective) {
-        String newString = "";
-        if (objective instanceof KillObjective)
-            newString = killQuestChatProgressionMessage;
-        else if (objective instanceof CustomFetchObjective)
-            newString = fetchQuestChatProgressionMessage;
-        else if (objective instanceof DialogObjective)
-            newString = dialogQuestChatProgressionMessage;
-        newString = newString.replace("$name", ChatColor.WHITE + ChatColor.stripColor(objective.getObjectiveName()));
-        newString = newString.replace("$current", objective.getCurrentAmount() + "");
-        newString = newString.replace("$target", objective.getTargetAmount() + "");
-        if (!objective.isObjectiveCompleted())
-            return newString.replace("$color", ongoingColorCode);
-        else
-            return newString.replace("$color", completedColorCode);
-    }
-
-    public static String getQuestScoreboardProgressionLine(Objective objective) {
-        String newString = "";
-        if (objective instanceof KillObjective)
-            newString = killQuestScoreboardProgressionLine;
-        else if (objective instanceof CustomFetchObjective)
-            newString = fetchQuestScoreboardProgressionLine;
-        else if (objective instanceof DialogObjective)
-            newString = dialogQuestScoreboardProgressionLine;
-        newString = newString.replace("$name", ChatColor.WHITE + ChatColor.stripColor(objective.getObjectiveName()));
-        newString = newString.replace("$current", objective.getCurrentAmount() + "");
-        newString = newString.replace("$target", objective.getTargetAmount() + "");
-        if (!objective.isObjectiveCompleted())
-            return newString.replace("$color", ongoingColorCode);
-        else
-            return newString.replace("$color", completedColorCode);
-    }
-
-    @Override
-    public void initializeValues() {
+    public static void initializeConfig() {
+        File file = ConfigurationEngine.fileCreator("Quests.yml");
+        FileConfiguration fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
 
         requireQuestTurnIn = ConfigurationEngine.setBoolean(
                 List.of("Sets if quests have to be returned to quest givers to complete the quest."),
@@ -333,5 +251,87 @@ public class QuestsConfig extends ConfigurationFile {
                 List.of("Sets the maximum amount of characters per item entry in inventory-based menus for quests before creating another item to continue the entry."),
                 fileConfiguration, "itemEntryCharacterLimitBedrockMenu", 300);
 
+        ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
+    }
+
+    private static List<EntityType> setEntityTypes(FileConfiguration fileConfiguration, File file) {
+        List<String> entityTypes = new ArrayList<>(Arrays.asList(
+                EntityType.BLAZE.toString(),
+                EntityType.CAVE_SPIDER.toString(),
+                EntityType.DROWNED.toString(),
+                EntityType.ELDER_GUARDIAN.toString(),
+                EntityType.ENDERMAN.toString(),
+                EntityType.ENDERMITE.toString(),
+                EntityType.EVOKER.toString(),
+                EntityType.GHAST.toString(),
+                EntityType.GUARDIAN.toString(),
+                EntityType.HUSK.toString(),
+                EntityType.ILLUSIONER.toString(),
+                EntityType.IRON_GOLEM.toString(),
+                EntityType.PILLAGER.toString(),
+                EntityType.RAVAGER.toString(),
+                EntityType.SILVERFISH.toString(),
+                EntityType.SKELETON.toString(),
+                EntityType.SPIDER.toString(),
+                EntityType.STRAY.toString(),
+                EntityType.VINDICATOR.toString(),
+                EntityType.WITCH.toString(),
+                EntityType.WITHER_SKELETON.toString(),
+                EntityType.WOLF.toString(),
+                EntityType.ZOMBIE.toString()
+        ));
+
+        List<String> laterEntities = Arrays.asList(
+                EntityType.HOGLIN.toString(),
+                EntityType.ZOGLIN.toString(),
+                EntityType.PIGLIN_BRUTE.toString(),
+                EntityType.PIGLIN.toString(),
+                EntityType.ZOMBIFIED_PIGLIN.toString());
+        entityTypes.addAll(laterEntities);
+
+        ConfigurationEngine.setList(file, fileConfiguration, "questEntityTypes", entityTypes, false);
+
+        List<EntityType> parsedTypes = new ArrayList<>();
+        for (String string : entityTypes)
+            try {
+                parsedTypes.add(EntityType.valueOf(string));
+            } catch (Exception ex) {
+                new WarningMessage("Entity type " + string + " is not a valid entity type from the Spigot API!");
+            }
+        return parsedTypes;
+    }
+
+    public static String getQuestChatProgressionMessage(Objective objective) {
+        String newString = "";
+        if (objective instanceof KillObjective)
+            newString = killQuestChatProgressionMessage;
+        else if (objective instanceof CustomFetchObjective)
+            newString = fetchQuestChatProgressionMessage;
+        else if (objective instanceof DialogObjective)
+            newString = dialogQuestChatProgressionMessage;
+        newString = newString.replace("$name", ChatColor.WHITE + ChatColor.stripColor(objective.getObjectiveName()));
+        newString = newString.replace("$current", objective.getCurrentAmount() + "");
+        newString = newString.replace("$target", objective.getTargetAmount() + "");
+        if (!objective.isObjectiveCompleted())
+            return newString.replace("$color", ongoingColorCode);
+        else
+            return newString.replace("$color", completedColorCode);
+    }
+
+    public static String getQuestScoreboardProgressionLine(Objective objective) {
+        String newString = "";
+        if (objective instanceof KillObjective)
+            newString = killQuestScoreboardProgressionLine;
+        else if (objective instanceof CustomFetchObjective)
+            newString = fetchQuestScoreboardProgressionLine;
+        else if (objective instanceof DialogObjective)
+            newString = dialogQuestScoreboardProgressionLine;
+        newString = newString.replace("$name", ChatColor.WHITE + ChatColor.stripColor(objective.getObjectiveName()));
+        newString = newString.replace("$current", objective.getCurrentAmount() + "");
+        newString = newString.replace("$target", objective.getTargetAmount() + "");
+        if (!objective.isObjectiveCompleted())
+            return newString.replace("$color", ongoingColorCode);
+        else
+            return newString.replace("$color", completedColorCode);
     }
 }

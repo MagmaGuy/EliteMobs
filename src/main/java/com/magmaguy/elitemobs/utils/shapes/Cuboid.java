@@ -11,13 +11,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Cuboid extends Shape {
+    private Location centerLocation = null;
+    private List<Vector> locationVectors = null;
+    private List<Vector> edgeVectors = null;
     private final double x;
     private final double y;
     private final double xBorder;
     private final double yBorder;
-    private Location centerLocation = null;
-    private List<Vector> locationVectors = null;
-    private List<Vector> edgeVectors = null;
     private double z;
     private double zBorder;
 
@@ -44,8 +44,8 @@ public class Cuboid extends Shape {
     @Override
     public boolean contains(LivingEntity livingEntity) {
         BoundingBox boundingBox = new BoundingBox(
-                Math.floor(x / 2D + centerLocation.getBlockX()), y / 2D + centerLocation.getBlockY(), Math.floor(z / 2D + centerLocation.getBlockZ()),
-                Math.floor(-x / 2D + centerLocation.getBlockX()), centerLocation.getBlockY(), Math.floor(-z / 2D + centerLocation.getBlockZ()));
+                x / 2D + centerLocation.getBlockX(), y / 2D + centerLocation.getBlockY(), z / 2D + centerLocation.getBlockZ(),
+                -x / 2D + centerLocation.getBlockX(), centerLocation.getBlockY(), -z / 2D + centerLocation.getBlockZ());
         return livingEntity.getBoundingBox().overlaps(boundingBox);
     }
 
@@ -77,7 +77,7 @@ public class Cuboid extends Shape {
         edgeVectors = new ArrayList<>();
         for (Vector vector : getLocationVectors())
             if (vector.getY() <= yBorder &&
-                    (Math.abs(vector.getX()) >= Math.floor(xBorder / 2d) || Math.abs(vector.getZ()) >= Math.floor(zBorder / 2d)))
+                    (Math.abs(vector.getX()) >= xBorder / 2d || Math.abs(vector.getZ()) >= zBorder / 2d))
                 edgeVectors.add(vector);
         return edgeVectors;
     }
@@ -85,8 +85,8 @@ public class Cuboid extends Shape {
     private List<Vector> getLocationVectors() {
         if (locationVectors != null) return locationVectors;
         locationVectors = new ArrayList<>();
-        double xHalf = Math.floor(x / 2d);
-        double zHalf = Math.floor(z / 2d);
+        double xHalf = x / 2d;
+        double zHalf = z / 2d;
         for (int localX = 0; localX < x; localX++)
             for (int localZ = 0; localZ < z; localZ++)
                 for (int localY = 0; localY < y; localY++)

@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.powerstances.VisualItemInitializer;
-import com.magmaguy.magmacore.util.ItemStackGenerator;
+import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -48,13 +48,7 @@ public class CustomBossTrail {
     }
 
     private void doParticleTrail(Particle particle) {
-        if (particle.equals(Particle.BLOCK_MARKER) ||
-                particle.equals(Particle.ENTITY_EFFECT) ||
-                particle.equals(Particle.DUST_PILLAR) ||
-                particle.equals(Particle.FALLING_DUST) ||
-                particle.equals(Particle.BLOCK) ||
-                particle.equals(Particle.ITEM) ||
-                particle.equals(Particle.DUST))
+        if (particle.equals(Particle.BLOCK_MARKER))
             return;
         bukkitTasks.add(new BukkitRunnable() {
             @Override

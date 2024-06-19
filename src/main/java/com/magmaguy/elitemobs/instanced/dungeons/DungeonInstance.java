@@ -14,14 +14,9 @@ import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.InstancedBossEntity;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
-import com.magmaguy.elitemobs.treasurechest.TreasureChest;
-import com.magmaguy.elitemobs.utils.ConfigurationLocation;
-import com.magmaguy.elitemobs.utils.EventCaller;
-import com.magmaguy.elitemobs.utils.MapListInterpreter;
-import com.magmaguy.elitemobs.utils.WorldInstantiator;
-import com.magmaguy.magmacore.util.Logger;
+import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
+import com.magmaguy.elitemobs.utils.*;
 import lombok.Getter;
-import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -72,7 +67,14 @@ public class DungeonInstance extends MatchInstance {
         this.difficultyName = difficultyName;
         setDifficulty(difficultyName);
         addNewPlayer(player);
-        new InitializeEntitiesTask(this, dungeonPackagerConfigFields, world).runTaskLater(MetadataHandler.PLUGIN, 20 * 3L);
+        DungeonInstance dungeonInstance = this;
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                instancedBossEntities = InstancedBossEntity.initializeInstancedBosses(dungeonPackagerConfigFields.getWorldName(), world, players.size(), dungeonInstance);
+                NPCEntity.initializeInstancedNPCs(dungeonPackagerConfigFields.getWorldName(), world, players.size(), dungeonInstance);
+            }
+        }.runTaskLater(MetadataHandler.PLUGIN, 20 * 3L);
         dungeonInstances.add(this);
         super.permission = dungeonPackagerConfigFields.getPermission();
     }
@@ -98,7 +100,12 @@ public class DungeonInstance extends MatchInstance {
                 cloneWorldFiles(instancedDungeonsConfigFields, instancedWorldName, player));
         future.thenAccept(file -> {
             if (file == null) return;
-            new InitializeInstancedWorldTask(instancedDungeonsConfigFields, instancedWorldName, player, file, difficultyName).runTask(MetadataHandler.PLUGIN);
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    initializeInstancedWorld(instancedDungeonsConfigFields, instancedWorldName, player, file, difficultyName);
+                }
+            }.runTask(MetadataHandler.PLUGIN);
         });
     }
 
@@ -129,11 +136,13 @@ public class DungeonInstance extends MatchInstance {
                                                               Player player,
                                                               File targetFile,
                                                               String difficultyName) {
-        World world = DungeonUtils.loadWorld(instancedWordName, instancedDungeonsConfigFields.getEnvironment(), instancedDungeonsConfigFields);
+        World world = DungeonUtils.loadWorld(instancedWordName, instancedDungeonsConfigFields.getEnvironment());
         if (world == null) {
             player.sendMessage("[EliteMobs] Failed to load the world! Report this to the dev. The dungeon will not start.");
             return null;
         }
+        if (Bukkit.getPluginManager().getPlugin("WorldGuard") != null)
+            WorldGuardCompatibility.protectWorldMinidugeonArea(world);
 
         //Location where players are teleported to start completing the dungeon
         Location startLocation = ConfigurationLocation.serialize(instancedDungeonsConfigFields.getStartLocationString());
@@ -192,7 +201,14 @@ public class DungeonInstance extends MatchInstance {
             return;
         }
         announce(DungeonsConfig.getInstancedDungeonCompleteMessage());
-        new DestroyMatchTask().runTaskLater(MetadataHandler.PLUGIN, 2 * 60 * 20L);
+        announce("MagmaGuy's note: This is still a work in progress, please be patient! Hope you enjoyed your run.");
+        new BukkitRunnable() {
+
+            @Override
+            public void run() {
+                destroyMatch();
+            }
+        }.runTaskLater(MetadataHandler.PLUGIN, 2 * 60 * 20L);
     }
 
     @Override
@@ -208,11 +224,33 @@ public class DungeonInstance extends MatchInstance {
         instances.remove(this);
         DungeonInstance dungeonInstance = this;
         if (world == null) {
-            Logger.warn("Instanced dungeon's world was already unloaded before removing the entities in it! This shouldn't happen, but doesn't break anything.");
+            new WarningMessage("Instanced dungeon's world was already unloaded before removing the entities in it! This shouldn't happen, but doesn't break anything.");
             return;
         }
         world.getEntities().forEach(entity -> EntityTracker.unregister(entity, RemovalReason.WORLD_UNLOAD));
-        new RemoveInstanceTask(dungeonInstance, instancedWorldFile).runTaskLater(MetadataHandler.PLUGIN, 20 * 30L);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                //The world might get removed before this timer
+                //if (world != null) {
+                //Arrays.stream(world.getLoadedChunks()).forEach(chunk -> chunk.unload(false));
+
+                new EventCaller(new InstancedDungeonRemoveEvent(dungeonInstance));
+                dungeonInstances.remove(dungeonInstance);
+
+                if (!Bukkit.unloadWorld(world, false)) {
+                    new WarningMessage("Failed to unload world " + instancedWorldName + " ! This is bad, report this to the developer!");
+                    return;
+                }
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        WorldInstantiator.recursivelyDelete(instancedWorldFile);
+                    }
+                }.runTaskLaterAsynchronously(MetadataHandler.PLUGIN, 20L * 60 * 2); //wait 2 minutes after unloading world before removing files
+                //}
+            }
+        }.runTaskLater(MetadataHandler.PLUGIN, 20 * 30L); //wait 30 seconds before unloading world
     }
 
     private void setDifficulty(String difficultyName) {
@@ -227,7 +265,7 @@ public class DungeonInstance extends MatchInstance {
                 break;
             }
         if (difficulty == null) {
-            Logger.warn("Failed to set difficulty " + difficulty + " for instanced dungeon " + dungeonPackagerConfigFields.getFilename());
+            new WarningMessage("Failed to set difficulty " + difficulty + " for instanced dungeon " + dungeonPackagerConfigFields.getFilename());
             return;
         }
 
@@ -235,7 +273,7 @@ public class DungeonInstance extends MatchInstance {
             try {
                 this.levelSync = MapListInterpreter.parseInteger("levelSync", difficulty.get("levelSync"), dungeonPackagerConfigFields.getFilename());
             } catch (Exception exception) {
-                Logger.warn("Incorrect level sync entry for dungeon " + dungeonPackagerConfigFields.getFilename() + " ! Value: " + levelSync + " . No level sync will be applied!");
+                new WarningMessage("Incorrect level sync entry for dungeon " + dungeonPackagerConfigFields.getFilename() + " ! Value: " + levelSync + " . No level sync will be applied!");
                 this.levelSync = 0;
             }
         } else
@@ -252,83 +290,4 @@ public class DungeonInstance extends MatchInstance {
         return location.getWorld().equals(startLocation.getWorld());
     }
 
-    private static class InitializeInstancedWorldTask extends BukkitRunnable {
-        private final DungeonPackagerConfigFields instancedDungeonsConfigFields;
-        private final String instancedWorldName;
-        private final Player player;
-        private final File file;
-        private final String difficultyName;
-
-        public InitializeInstancedWorldTask(DungeonPackagerConfigFields instancedDungeonsConfigFields,
-                                            String instancedWorldName,
-                                            Player player,
-                                            File file,
-                                            String difficultyName) {
-            this.instancedDungeonsConfigFields = instancedDungeonsConfigFields;
-            this.instancedWorldName = instancedWorldName;
-            this.player = player;
-            this.file = file;
-            this.difficultyName = difficultyName;
-        }
-
-        @Override
-        public void run() {
-            initializeInstancedWorld(instancedDungeonsConfigFields, instancedWorldName, player, file, difficultyName);
-        }
-    }
-
-    private class InitializeEntitiesTask extends BukkitRunnable {
-        private final DungeonInstance dungeonInstance;
-        private final DungeonPackagerConfigFields dungeonPackagerConfigFields;
-        private final World world;
-
-        public InitializeEntitiesTask(DungeonInstance dungeonInstance, DungeonPackagerConfigFields dungeonPackagerConfigFields, World world) {
-            this.dungeonInstance = dungeonInstance;
-            this.dungeonPackagerConfigFields = dungeonPackagerConfigFields;
-            this.world = world;
-        }
-
-        @Override
-        public void run() {
-            instancedBossEntities = InstancedBossEntity.initializeInstancedBosses(dungeonPackagerConfigFields.getWorldName(), world, players.size(), dungeonInstance);
-            NPCEntity.initializeInstancedNPCs(dungeonPackagerConfigFields.getWorldName(), world, players.size(), dungeonInstance);
-            TreasureChest.initializeInstancedTreasureChests(dungeonPackagerConfigFields.getWorldName(), world);
-        }
-    }
-
-    private class DestroyMatchTask extends BukkitRunnable {
-        @Override
-        public void run() {
-            destroyMatch();
-        }
-    }
-
-    private class RemoveInstanceTask extends BukkitRunnable {
-        private final DungeonInstance dungeonInstance;
-        private final File instancedWorldFile;
-
-        public RemoveInstanceTask(DungeonInstance dungeonInstance, File instancedWorldFile) {
-            this.dungeonInstance = dungeonInstance;
-            this.instancedWorldFile = instancedWorldFile;
-        }
-
-        @Override
-        public void run() {
-            new EventCaller(new InstancedDungeonRemoveEvent(dungeonInstance));
-            dungeonInstances.remove(dungeonInstance);
-
-            if (!Bukkit.unloadWorld(world, false)) {
-                Logger.warn("Failed to unload world " + instancedWorldName + " ! This is bad, report this to the developer!");
-                return;
-            }
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    try{FileUtils.deleteDirectory(instancedWorldFile);} catch (Exception e){
-                        Logger.warn("Failed to delete " + instancedWorldFile + " ! This is bad, report this to the developer!");
-                    }
-                }
-            }.runTaskLaterAsynchronously(MetadataHandler.PLUGIN, 20L * 60 * 2); //wait 2 minutes after unloading world before removing files
-        }
-    }
 }

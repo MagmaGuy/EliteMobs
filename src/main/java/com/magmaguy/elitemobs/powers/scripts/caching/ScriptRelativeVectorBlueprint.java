@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.powers.scripts.caching;
 
 import com.magmaguy.elitemobs.utils.MapListInterpreter;
-import com.magmaguy.magmacore.util.Logger;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import org.bukkit.configuration.MemorySection;
 import org.bukkit.util.Vector;
@@ -55,7 +55,8 @@ public class ScriptRelativeVectorBlueprint {
             case "multiplier" -> multiplier = MapListInterpreter.parseDouble(key, value, scriptName);
             case "normalize" -> normalize = MapListInterpreter.parseBoolean(key, value, scriptName);
             case "offset" -> offset = MapListInterpreter.parseVector(key, value, scriptName);
-            default -> Logger.warn("Failed to read key " + key + " for script " + scriptName + " in " + scriptFilename);
+            default ->
+                    new WarningMessage("Failed to read key " + key + " for script " + scriptName + " in " + scriptFilename);
         }
     }
 }

@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.powers.scripts.caching;
 import com.magmaguy.elitemobs.powers.scripts.enums.ActionType;
 import com.magmaguy.elitemobs.powers.scripts.enums.WeatherType;
 import com.magmaguy.elitemobs.utils.PotionEffectTypeUtil;
-import com.magmaguy.magmacore.util.Logger;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
@@ -107,10 +107,6 @@ public class ScriptActionBlueprint {
     private float volume = 1f;
     @Getter
     private float pitch = 1f;
-    @Getter
-    private float velocity = 1f;
-    @Getter
-    private double scale = 1f;
 
 
     public ScriptActionBlueprint(Map<?, ?> entry, String scriptName, String scriptFilename) {
@@ -143,7 +139,7 @@ public class ScriptActionBlueprint {
                 try {
                     potionEffectType = PotionEffectTypeUtil.getByKey(((String) value).toLowerCase(Locale.ROOT));
                 } catch (Exception ex) {
-                    Logger.warn("Invalid potion effect type " + value + " in file " + scriptFilename + " for script " + scriptName + " !");
+                    new WarningMessage("Invalid potion effect type " + value + " in file " + scriptFilename + " for script " + scriptName + " !");
                 }
             }
             case "scripts" -> scripts = parseStringList(key, value, scriptName);
@@ -196,9 +192,8 @@ public class ScriptActionBlueprint {
                     scriptRelativeVectorBlueprint = new ScriptRelativeVectorBlueprint(scriptName, scriptFilename, (Map<String, ?>) value);
             case "pitch" -> pitch = parseFloat(key, value, scriptName);
             case "volume" -> volume = parseFloat(key, value, scriptName);
-            case "velocity" -> velocity = parseFloat(key, value, scriptName);
-            case "scale" -> scale = parseFloat(key, value, scriptName);
-            default -> Logger.warn("Failed to read key " + key + " for script " + scriptName + " in " + scriptFilename);
+            default ->
+                    new WarningMessage("Failed to read key " + key + " for script " + scriptName + " in " + scriptFilename);
         }
 
     }

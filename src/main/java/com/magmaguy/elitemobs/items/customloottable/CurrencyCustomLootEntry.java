@@ -6,7 +6,7 @@ import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.items.ItemLootShower;
 import com.magmaguy.elitemobs.utils.MapListInterpreter;
-import com.magmaguy.magmacore.util.Logger;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -85,7 +85,7 @@ public class CurrencyCustomLootEntry extends CustomLootEntry implements Serializ
                 case "amount" -> setAmount(MapListInterpreter.parseInteger(key, mapEntry.getValue(), configFilename));
                 case "currencyamount" ->
                         currencyAmount = MapListInterpreter.parseInteger(key, mapEntry.getValue(), configFilename);
-                default -> Logger.warn("Failed to read custom loot option " + key + " in " + configFilename);
+                default -> new WarningMessage("Failed to read custom loot option " + key + " in " + configFilename);
             }
         }
         entries.add(this);

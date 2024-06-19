@@ -1,7 +1,8 @@
 package com.magmaguy.elitemobs.menus;
 
-import com.magmaguy.elitemobs.config.DefaultConfig;
+import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
+import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
 import com.magmaguy.elitemobs.config.SpecialItemSystemsConfig;
 import com.magmaguy.elitemobs.config.menus.premade.ItemEnchantmentMenuConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
@@ -10,8 +11,7 @@ import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.ShareItem;
 import com.magmaguy.elitemobs.items.upgradesystem.EliteEnchantmentItems;
 import com.magmaguy.elitemobs.items.upgradesystem.UpgradeSystem;
-import com.magmaguy.magmacore.util.ChatColorConverter;
-import com.magmaguy.magmacore.util.Round;
+import com.magmaguy.elitemobs.utils.Round;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -56,7 +56,7 @@ public class ItemEnchantmentMenu extends EliteMenu {
 
     public ItemEnchantmentMenu(Player player) {
         String name = MENU_NAME;
-        if (DefaultConfig.isForceMenuUnicode() || Bukkit.getPluginManager().isPluginEnabled("ResourcePackManager"))
+        if (ResourcePackDataConfig.isDisplayCustomMenuUnicodes())
             name = ChatColor.WHITE + "\uF801\uDB80\uDC2A\uF805           " + MENU_NAME;
         Inventory inventory = Bukkit.createInventory(player, 54, name);
         ItemEnchantMenuEvents.menus.add(inventory);
@@ -212,7 +212,7 @@ public class ItemEnchantmentMenu extends EliteMenu {
                 if (event.getInventory().getItem(ENCHANTED_BOOK_SLOT) == null)
                     moveOneItemUp(ENCHANTED_BOOK_SLOT, event);
                 else
-                //Make sure enchant books themselves can't be enchanted
+                    //Make sure enchant books themselves can't be enchanted
                 {
                 }
             } else if (EliteEnchantmentItems.isEliteLuckyTicket(event.getCurrentItem()) &&

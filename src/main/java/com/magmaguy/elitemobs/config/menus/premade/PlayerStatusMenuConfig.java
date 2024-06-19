@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.menus.MenusConfigFields;
 import com.magmaguy.elitemobs.playerdata.statusscreen.PlayerStatusScreen;
-import com.magmaguy.magmacore.util.ItemStackGenerator;
+import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
