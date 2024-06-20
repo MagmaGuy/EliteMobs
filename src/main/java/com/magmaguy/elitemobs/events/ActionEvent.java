@@ -55,9 +55,7 @@ public class ActionEvent extends CustomEvent {
         for (CustomEventsConfigFields customEventsConfigFields : CustomEventsConfig.getCustomEvents().values()) {
             if (customEventsConfigFields.isEnabled())
                 switch (customEventsConfigFields.getEventType()) {
-                    case BREAK_BLOCK:
-                    case FISH:
-                    case TILL_SOIL:
+                    case BREAK_BLOCK, FISH, TILL_SOIL:
                         blueprintEvents.add(new ActionEvent(customEventsConfigFields));
                         break;
                     default:

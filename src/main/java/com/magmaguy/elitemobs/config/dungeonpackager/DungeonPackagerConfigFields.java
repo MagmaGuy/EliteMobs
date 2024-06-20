@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.config.dungeonpackager;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
-import com.magmaguy.magmacore.util.Logger;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
@@ -99,15 +99,6 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
     @Getter
     @Setter
     private boolean allowExplosions;
-    @Getter
-    @Setter
-    private boolean listedInTeleports = true;
-    @Getter
-    @Setter
-    private String song = null;
-    @Getter
-    @Setter
-    private boolean allowLiquidFlow = true;
 
     public DungeonPackagerConfigFields(String fileName, boolean isEnabled) {
         super(fileName, isEnabled);
@@ -208,40 +199,6 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
         defaultDungeon = true;
     }
 
-    //For the adventurer's guild hub
-    public DungeonPackagerConfigFields(String filename,
-                                       boolean isEnabled,
-                                       String name,
-                                       List<String> customInfo,
-                                       String downloadLink,
-                                       String worldName,
-                                       World.Environment environment,
-                                       Boolean protect,
-                                       String teleportLocationString,
-                                       int dungeonVersion,
-                                       String playerInfo,
-                                       String regionEnterMessage,
-                                       String regionLeaveMessage,
-                                       String dungeonConfigFolderName,
-                                       boolean allowExplosions) {
-        super(filename, isEnabled);
-        this.contentType = ContentType.HUB;
-        this.name = name;
-        this.customInfo = customInfo;
-        this.downloadLink = downloadLink;
-        this.worldName = worldName;
-        this.environment = environment;
-        this.protect = protect;
-        this.teleportLocationString = teleportLocationString;
-        this.dungeonVersion = dungeonVersion;
-        this.playerInfo = playerInfo;
-        this.regionEnterMessage = regionEnterMessage;
-        this.regionLeaveMessage = regionLeaveMessage;
-        this.dungeonConfigFolderName = dungeonConfigFolderName;
-        this.allowExplosions = allowExplosions;
-        defaultDungeon = true;
-    }
-
     @Override
     public void processConfigFields() {
         this.isEnabled = processBoolean("isEnabled", isEnabled, false, true);
@@ -252,7 +209,7 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
         this.downloadLink = processString("downloadLink", downloadLink, null, false);
         this.dungeonSizeCategory = processEnum("dungeonSizeCategory", dungeonSizeCategory, null, DungeonSizeCategory.class, false);
         if (dungeonSizeCategory == null) {
-            Logger.warn("File " + filename + " does not have a valid dungeonSizeCategory!");
+            new WarningMessage("File " + filename + " does not have a valid dungeonSizeCategory!");
             this.fileConfiguration = null;
             return;
         }
@@ -288,9 +245,6 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
         else fileConfiguration.addDefault("difficulties", difficulties);
         enchantmentChallenge = processBoolean("enchantmentChallenge", enchantmentChallenge, false, false);
         this.allowExplosions = processBoolean("allowExplosionBlockDamage", allowExplosions, false, false);
-        this.listedInTeleports = processBoolean("listedInTeleports", listedInTeleports, true, false);
-        this.song = processString("song", song, null, false);
-        this.allowLiquidFlow = processBoolean("allowLiquidFlow", allowLiquidFlow, allowLiquidFlow, false);
         processAdditionalFields();
     }
 

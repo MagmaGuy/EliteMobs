@@ -90,34 +90,6 @@ public class AdminCommands {
                 .permission("elitemobs.*")
                 .handler(commandContext -> SetupHandler.setupMinidungeonCommand((Player) commandContext.getSender(), commandContext.get("minidungeonName"))));
 
-        // /em setup minidungeonNoPaste <minidungeonName>
-        manager.command(builder.literal("setup")
-                .literal("minidungeonNoPaste")
-                .argument(StringArgument.newBuilder("minidungeonName"), ArgumentDescription.of("minidungeon name"))
-                .meta(CommandMeta.DESCRIPTION, "Installs a Minidungeon without pasting the WorldEdit schematic")
-                .senderType(Player.class)
-                .permission("elitemobs.*")
-                .handler(commandContext -> SetupHandler.setupMinidungeonNoPasteCommand((Player) commandContext.getSender(), commandContext.get("minidungeonName"))));
-
-        // /em setup unminidungeon <minidungeonName>
-        manager.command(builder.literal("setup")
-                .literal("unminidungeon")
-                .argument(StringArgument.newBuilder("minidungeonName"), ArgumentDescription.of("minidungeon name"))
-                .meta(CommandMeta.DESCRIPTION, "Uninstalls a Minidungeon")
-                .senderType(Player.class)
-                .permission("elitemobs.*")
-                .handler(commandContext -> SetupHandler.setupUnminidungeonCommand((Player) commandContext.getSender(), commandContext.get("minidungeonName"))));
-
-
-        // /em setup area <areaName>
-        manager.command(builder.literal("setup")
-                .literal("area")
-                .argument(StringArgument.newBuilder("areaName"), ArgumentDescription.of("WorldGuard region name"))
-                .meta(CommandMeta.DESCRIPTION, "Protects an area using WorldGuard, used for Minidungeons and the Adventurer's World Hub")
-                .senderType(Player.class)
-                .permission("elitemobs.*")
-                .handler(commandContext -> SetupHandler.setupAreaCommand((Player) commandContext.getSender(), commandContext.get("areaName"))));
-
         ArrayList<String> powers = new ArrayList<>();
         for (String filename : ElitePower.getElitePowers().keySet())
             powers.add(filename);
@@ -697,8 +669,8 @@ public class AdminCommands {
                 .handler(commandContext -> {
                     for (EliteEntity eliteEntity : EntityTracker.getEliteMobEntities().values())
                         if (eliteEntity.getEliteUUID().toString().equals(commandContext.get("uuid")))
-                            if (eliteEntity instanceof CustomBossEntity) {
-                                ((CustomBossEntity) eliteEntity).getBossTrace().postLog((Player) commandContext.getSender());
+                            if (eliteEntity instanceof CustomBossEntity customBossEntity) {
+                                customBossEntity.getBossTrace().postLog((Player) commandContext.getSender());
                                 return;
                             }
                 }));

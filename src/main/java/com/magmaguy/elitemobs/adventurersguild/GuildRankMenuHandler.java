@@ -1,13 +1,13 @@
 package com.magmaguy.elitemobs.adventurersguild;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
-import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
+import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
 import com.magmaguy.elitemobs.config.SoundsConfig;
 import com.magmaguy.elitemobs.config.menus.premade.GuildRankMenuConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldowns;
-import com.magmaguy.magmacore.util.ChatColorConverter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -114,7 +114,7 @@ public class GuildRankMenuHandler implements Listener {
      */
     public static Inventory initializeGuildRankMenu(Player player) {
         String menuName = GuildRankMenuConfig.getMenuName();
-        if (DefaultConfig.isForceMenuUnicode() || Bukkit.getPluginManager().isPluginEnabled("ResourcePackManager"))
+        if (ResourcePackDataConfig.displayCustomMenuUnicodes)
             menuName = ChatColor.WHITE + "\uF801\uDA90\uDEFA\uF805           " + menuName;
         Inventory difficultyMenu = Bukkit.createInventory(player, 54, menuName);
         difficultyMenu = populateInventory(difficultyMenu, player);
@@ -279,14 +279,14 @@ public class GuildRankMenuHandler implements Listener {
 
     private static String critBonusString(int prestigeLevel, int guildRank) {
         if (!AdventurersGuildConfig.isAddMaxHealth()) return null;
-        if (prestigeLevel < 2)
+        if (prestigeLevel < 3)
             return null;
         return GuildRankMenuConfig.getCritBonusMessage().replace("$amount", GuildRank.critBonusValue(prestigeLevel, guildRank) + "");
     }
 
     private static String dodgeBonusString(int prestigeLevel, int guildRank) {
         if (!AdventurersGuildConfig.isAddMaxHealth()) return null;
-        if (prestigeLevel < 3)
+        if (prestigeLevel < 4)
             return null;
         return GuildRankMenuConfig.getDodgeBonusMessage().replace("$amount", GuildRank.dodgeBonusValue(prestigeLevel, guildRank) + "");
     }

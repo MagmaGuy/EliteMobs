@@ -5,13 +5,20 @@ import com.magmaguy.elitemobs.dungeons.EliteMobsWorld;
 import com.magmaguy.elitemobs.dungeons.WorldDungeonPackage;
 import com.magmaguy.elitemobs.dungeons.WorldPackage;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
-import com.magmaguy.magmacore.util.WorldLoader;
+import com.magmaguy.elitemobs.utils.InfoMessage;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.Difficulty;
 import org.bukkit.World;
+import org.bukkit.WorldCreator;
 import org.bukkit.entity.Player;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.logging.Filter;
 
 public class DungeonUtils {
     public static Pair getLowestAndHighestLevels(List<CustomBossEntity> customBossEntities) {
@@ -40,9 +47,38 @@ public class DungeonUtils {
     }
 
     public static World loadWorld(String worldName, World.Environment environment, DungeonPackagerConfigFields dungeonPackagerConfigFields) {
-        World world = WorldLoader.loadVoidTemporaryWorld(worldName, environment);
-        if (world != null) EliteMobsWorld.create(world.getUID(), dungeonPackagerConfigFields);
-        return world;
+        File folder = new File(Bukkit.getWorldContainer().getAbsolutePath());
+
+        if (!Files.exists(Paths.get(folder.getAbsolutePath() + File.separatorChar + worldName))) {
+            new WarningMessage("File  " + folder.getAbsolutePath() + File.separatorChar + worldName + " does not exist!");
+            return null;
+        }
+
+        new InfoMessage("Loading world " + worldName + " !");
+
+        Filter filter = newFilter -> false;
+
+        Filter previousFilter = Bukkit.getLogger().getFilter();
+
+        Bukkit.getLogger().setFilter(filter);
+
+        try {
+            WorldCreator worldCreator = new WorldCreator(worldName);
+            worldCreator.environment(environment);
+            World world = Bukkit.createWorld(worldCreator);
+            if (world != null) world.setKeepSpawnInMemory(false);
+            world.setDifficulty(Difficulty.HARD);
+            Bukkit.getLogger().setFilter(previousFilter);
+
+            EliteMobsWorld.create(world.getUID(), dungeonPackagerConfigFields);
+
+            return world;
+        } catch (Exception exception) {
+            Bukkit.getLogger().setFilter(previousFilter);
+            new WarningMessage("Failed to load world " + worldName + " !");
+            exception.printStackTrace();
+        }
+        return null;
     }
 
     public static boolean unloadWorld(WorldPackage worldPackage) {
