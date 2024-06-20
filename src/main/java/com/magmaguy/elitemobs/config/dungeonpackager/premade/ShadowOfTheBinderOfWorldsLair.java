@@ -9,7 +9,7 @@ import java.util.Arrays;
 public class ShadowOfTheBinderOfWorldsLair extends DungeonPackagerConfigFields {
     public ShadowOfTheBinderOfWorldsLair() {
         super("shadow_of_the_binder_of_worlds_lair",
-                false,
+                true,
                 "&2[lvl 200] &5Shadow of the Binder Of Worlds",
                 Arrays.asList("&5The penultimate challenge. Be prepared!",
                         "&6Credits: MagmaGuy, 69OzCanOfBepis & Frostcone"),
@@ -25,6 +25,7 @@ public class ShadowOfTheBinderOfWorldsLair extends DungeonPackagerConfigFields {
                         "&5This is the hardest fight in EliteMobs!",
                 "&8[EM] &5Reality unravels around you. You face the final challenge. &4You are not prepared!",
                 "&8[EM] &5You have left the unravelling. Did you find what you sought? Was it worth it?",
-                "the_binder_of_worlds");
+                "the_binder_of_worlds",
+                true);
     }
 }

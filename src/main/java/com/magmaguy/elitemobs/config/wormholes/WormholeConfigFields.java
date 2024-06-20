@@ -28,7 +28,7 @@ public class WormholeConfigFields extends CustomConfigFields implements CustomCo
     private String permission;
     @Getter
     @Setter
-    private Wormhole.WormholeStyle style;
+    private Wormhole.WormholeStyle style = Wormhole.WormholeStyle.CUBE;
     @Getter
     @Setter
     private int particleColor;

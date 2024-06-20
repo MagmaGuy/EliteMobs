@@ -11,7 +11,7 @@ import java.util.Map;
 public class TheDeepMinesDungeon extends DungeonPackagerConfigFields {
     public TheDeepMinesDungeon() {
         super("the_deep_mines_dungeon",
-                false,
+                true,
                 "&2[lvl 045] &3The Deep Mines Dungeon",
                 Arrays.asList("&fBelow lies the deepest mine ever dug.",
                         "&6Credits: Dali, MagmaGuy, FrostCone"),
@@ -29,7 +29,8 @@ public class TheDeepMinesDungeon extends DungeonPackagerConfigFields {
                 List.of("filename=em_id_the_deep_mines_tnt_box.yml",
                         "filename=em_id_the_deep_mines_boss_the_pursuer_p1.yml"),
                 "em_id_the_deep_mines",
-                45);
+                45,
+                false);
         setDifficulties(List.of(
                 Map.of("name", "normal", "levelSync", 47, "id", 0),
                 Map.of("name", "hard", "levelSync", 45, "id", 1),

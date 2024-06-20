@@ -11,7 +11,7 @@ import java.util.Map;
 public class TheMinesDungeon extends DungeonPackagerConfigFields {
     public TheMinesDungeon() {
         super("the_mines_dungeon",
-                false,
+                true,
                 "&2[lvl 020] &3The Mines Dungeon",
                 Arrays.asList("&fReady to step up your dungeon game?",
                         "&6Credits: MagmaGuy, Frostcone, 69OzCanOfBepis, Realm of Lotheridon, Dali_"),
@@ -32,7 +32,8 @@ public class TheMinesDungeon extends DungeonPackagerConfigFields {
                         "filename=the_mines_mini_boss_forger.yml",
                         "filename=the_mines_mini_boss_tusk.yml"),
                 "em_id_the_mines",
-                20);
+                20,
+                false);
         setDifficulties(List.of(
                 Map.of("name", "normal", "levelSync", 25, "id", 0),
                 Map.of("name", "hard", "levelSync", 20, "id", 1),

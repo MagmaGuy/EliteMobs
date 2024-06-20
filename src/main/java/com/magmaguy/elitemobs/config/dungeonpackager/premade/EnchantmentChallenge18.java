@@ -10,7 +10,7 @@ import java.util.Map;
 public class EnchantmentChallenge18 extends DungeonPackagerConfigFields {
     public EnchantmentChallenge18() {
         super("enchantment_challenge_18_sanctum",
-                false,
+                true,
                 "&2[lvl 000-200] &6Enchantment Challenge 18",
                 List.of("&fAn enchantment challenge dungeon!"),
                 DiscordLinks.premiumMinidungeons,
@@ -26,7 +26,8 @@ public class EnchantmentChallenge18 extends DungeonPackagerConfigFields {
                 "&bYou have left the enchantment challenge!",
                 List.of("filename=enchantment_boss_grisly_grim.yml"),
                 "em_id_enchantment_challenge_18",
-                1);
+                1,
+                false);
         setDifficulties(List.of(
                 Map.of("name", "normal", "id", 0)));
         setEnchantmentChallenge(true);

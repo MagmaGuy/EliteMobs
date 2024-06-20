@@ -75,22 +75,6 @@ public class EMPackage {
                     new WarningMessage("Tried to load schematic dungeon " + dungeonPackagerConfigFields.getFilename() + "! This will not work because schematic dungeons have been removed as of EliteMobs 9.0 and replaced with world dungeons. If you want the schematic dungeon experience, I recommend you use BetterStructures with the elite shrines packages, which work better than schematics ever could. Fix this by deleting it from the dungeonpackager file.");
                     break;
             }
-        } else {
-            //This is maintained for legacy reasons. Moving forward this should no longer be used
-            switch (dungeonPackagerConfigFields.getDungeonLocationType()) {
-                case WORLD:
-                    if (dungeonPackagerConfigFields.getWorldName() == null) {
-                        new WarningMessage("Dungeon world name for dungeon package " + dungeonPackagerConfigFields.getFilename() + " is not set correctly! This dungeon will not work.");
-                        return;
-                    }
-                    if (dungeonPackagerConfigFields.getWorldName().equals("em_adventurers_guild"))
-                        new WorldDungeonPackage(dungeonPackagerConfigFields);
-                    new WorldDungeonPackage(dungeonPackagerConfigFields);
-                    break;
-                case SCHEMATIC:
-                    new WarningMessage("Tried to load schematic dungeon " + dungeonPackagerConfigFields.getFilename() + "! This will not work because schematic dungeons have been removed as of EliteMobs 9.0 and replaced with world dungeons. If you want the schematic dungeon experience, I recommend you use BetterStructures with the elite shrines packages, which work better than schematics ever could. Fix this by deleting it from the dungeonpackager file.");
-                    break;
-            }
         }
     }
 

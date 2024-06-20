@@ -9,7 +9,7 @@ import java.util.List;
 public class IronLeagueArena extends DungeonPackagerConfigFields {
     public IronLeagueArena() {
         super("iron_league_arena",
-                false,
+                true,
                 "&2[lvl 050-100] &fThe Iron League Arena",
                 List.of("&fFace the Iron League Arena!"),
                 DiscordLinks.freeMinidungeons,
@@ -24,6 +24,7 @@ public class IronLeagueArena extends DungeonPackagerConfigFields {
                         "level 50 to level 100!",
                 "&fAre you prepared to face the arena?",
                 "&fNow leaving the iron league arena!",
-                "iron_league_arena");
+                "iron_league_arena",
+                false);
     }
 }

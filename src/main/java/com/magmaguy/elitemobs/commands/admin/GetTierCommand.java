@@ -9,8 +9,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.HashMap;
-
 public class GetTierCommand {
     private GetTierCommand() {
     }
@@ -70,9 +68,7 @@ public class GetTierCommand {
 
     private static void addDurability(ItemStack itemStack) {
         ItemMeta itemMeta = itemStack.getItemMeta();
-        HashMap<Enchantment, Integer> enchantmentIntegerHashMap = new HashMap<>();
-        enchantmentIntegerHashMap.put(Enchantment.UNBREAKING, 5);
-        ItemTagger.registerEnchantments(itemMeta, enchantmentIntegerHashMap);
+        itemMeta.addEnchant(Enchantment.UNBREAKING, 5, true);
         itemStack.setItemMeta(itemMeta);
     }
 

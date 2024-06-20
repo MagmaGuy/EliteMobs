@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.api;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.QuestsConfig;
+import com.magmaguy.elitemobs.config.SoundsConfig;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.Quest;
@@ -62,6 +63,8 @@ public class QuestAcceptEvent extends Event implements Cancellable {
                         ChatColorConverter.convert(QuestsConfig.getQuestStartSubtitle().replace("$questName", event.getQuest().getQuestName())),
                         20, 60, 20);
 
+            boolean playedCustomSound = false;
+
             if (event.getQuest() instanceof CustomQuest customQuest) {
 
                 customQuest.applyTemporaryPermissions(event.getPlayer());
@@ -71,15 +74,19 @@ public class QuestAcceptEvent extends Event implements Cancellable {
                     for (String dialog : customQuest.getCustomQuestsConfigFields().getQuestAcceptDialog())
                         event.getPlayer().sendMessage(dialog);
 
-                if (customQuest.getCustomQuestsConfigFields().getQuestAcceptSound() != null)
+                if (customQuest.getCustomQuestsConfigFields().getQuestAcceptSound() != null) {
                     Bukkit.getPlayer(customQuest.getPlayerUUID()).playSound(
                             Bukkit.getPlayer(customQuest.getPlayerUUID()),
                             customQuest.getCustomQuestsConfigFields().getQuestAcceptSound(),
                             1f, 1f);
+                    playedCustomSound = true;
+                }
             }
             if (!QuestsConfig.isAutoTrackQuestsOnAccept())
                 event.getQuest().getQuestObjectives().displayTemporaryObjectivesScoreboard(event.getPlayer());
             PlayerData.addQuest(event.getPlayer().getUniqueId(), event.getQuest());
+            if (!playedCustomSound)
+                event.getPlayer().playSound(event.getPlayer().getLocation(), SoundsConfig.questAcceptSound, 1, 1);
         }
     }
 }

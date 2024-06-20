@@ -26,6 +26,7 @@ import com.magmaguy.elitemobs.config.potioneffects.PotionEffectsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.config.wormholes.WormholeConfig;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
+import com.magmaguy.elitemobs.dungeons.EliteMobsWorld;
 import com.magmaguy.elitemobs.economy.VaultCompatibility;
 import com.magmaguy.elitemobs.entitytracker.CustomProjectileData;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
@@ -113,6 +114,7 @@ public class EliteMobs extends JavaPlugin {
         //SoundsConfig.initializeConfig();
         //ModelsConfig.initializeConfig();
         DungeonsConfig.initializeConfig();
+        SoundsConfig.initializeConfig();
     }
 
     public static void worldScanner() {
@@ -367,6 +369,8 @@ public class EliteMobs extends JavaPlugin {
         DynamicQuest.shutdown();
 
         ProceduralShopMenu.shutdown();
+
+        EliteMobsWorld.shutdown();
 
         //save cached data
         Bukkit.getLogger().info("[EliteMobs] Saving EliteMobs databases...");
