@@ -11,7 +11,7 @@ import java.util.Map;
 public class TheNetherWastes extends DungeonPackagerConfigFields {
     public TheNetherWastes() {
         super("the_nether_wastes_dungeon",
-                false,
+                true,
                 "&2[lvl 050] &3The Nether Wastes Dungeon",
                 Arrays.asList("&fAn unexplored part of the Nether.",
                         "&6Credits: MagmaGuy, Frostcone, Dali_"),
@@ -28,7 +28,8 @@ public class TheNetherWastes extends DungeonPackagerConfigFields {
                 "&bYou have left The Nether Wastes!",
                 List.of("filename=em_id_the_nether_wastes_miniboss_5_shroud_p1.yml"),
                 "em_id_the_nether_wastes",
-                50);
+                50,
+                false);
         setDifficulties(List.of(
                 Map.of("name", "normal", "levelSync", 52, "id", 0),
                 Map.of("name", "hard", "levelSync", 50, "id", 1),

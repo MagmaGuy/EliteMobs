@@ -11,7 +11,7 @@ import java.util.Map;
 public class TheCityDungeon extends DungeonPackagerConfigFields {
     public TheCityDungeon() {
         super("the_city_dungeon",
-                false,
+                true,
                 "&2[lvl 030] &3The City Dungeon",
                 Arrays.asList("&fThe perfect intermediate instanced sanctum!",
                         "&6Credits: Dali_, MagmaGuy, Frostcone"),
@@ -31,7 +31,8 @@ public class TheCityDungeon extends DungeonPackagerConfigFields {
                         "filename=em_id_the_city_mini_boss_three.yml",
                         "filename=em_id_the_city_royal_guard_p1.yml"),
                 "em_id_the_city",
-                30);
+                30,
+                false);
         setDifficulties(List.of(
                 Map.of("name", "normal", "levelSync", 35, "id", 0),
                 Map.of("name", "hard", "levelSync", 30, "id", 1),

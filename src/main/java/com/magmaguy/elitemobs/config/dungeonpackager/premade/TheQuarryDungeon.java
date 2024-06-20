@@ -11,7 +11,7 @@ import java.util.Map;
 public class TheQuarryDungeon extends DungeonPackagerConfigFields {
     public TheQuarryDungeon() {
         super("the_quarry_dungeon",
-                false,
+                true,
                 "&2[lvl 040] &3The Quarry Dungeon",
                 Arrays.asList("&fAn ancient dwarven quarry deep underground.",
                         "&6Credits: Dali_, MagmaGuy, Frostcone"),
@@ -30,7 +30,8 @@ public class TheQuarryDungeon extends DungeonPackagerConfigFields {
                         "filename=em_id_the_quarry_royal_wizard_three.yml",
                         "filename=LiftStateFinishDungeon.yml"),
                 "em_id_the_quarry",
-                40);
+                40,
+                false);
         setDifficulties(List.of(
                 Map.of("name", "normal", "levelSync", 42, "id", 0),
                 Map.of("name", "hard", "levelSync", 40, "id", 1),

@@ -10,7 +10,7 @@ import java.util.Collections;
 public class CatacombsLair extends DungeonPackagerConfigFields {
     public CatacombsLair() {
         super("catacombs_lair",
-                false,
+                true,
                 "&2[lvl 010] &8The Catacombs",
                 Arrays.asList("&fThe best starter lair for players!",
                         "&6Credits: Realm of Lotheridon"),

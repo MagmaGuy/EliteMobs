@@ -9,7 +9,7 @@ import java.util.Arrays;
 public class FireworksLair extends DungeonPackagerConfigFields {
     public FireworksLair() {
         super("fireworks_lair",
-                false,
+                true,
                 "&2[lvl 020] &aThe Fireworks",
                 Arrays.asList("&fThe 2021 4th of July map!",
                         "&6Credits: MagmaGuy"),
@@ -25,6 +25,7 @@ public class FireworksLair extends DungeonPackagerConfigFields {
                         "&6An encounter full of explosions!",
                 "&8[EM] &eWelcome to the fireworks show!",
                 "&8[EM] &eYou've left the party!",
-                "the_fireworks");
+                "the_fireworks",
+                true);
     }
 }

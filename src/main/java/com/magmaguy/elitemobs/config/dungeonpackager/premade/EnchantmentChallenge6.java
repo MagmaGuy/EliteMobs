@@ -10,7 +10,7 @@ import java.util.Map;
 public class EnchantmentChallenge6 extends DungeonPackagerConfigFields {
     public EnchantmentChallenge6() {
         super("enchantment_challenge_6_sanctum",
-                false,
+                true,
                 "&2[lvl 000-200] &fEnchantment Challenge 06",
                 List.of("&fAn enchantment challenge dungeon!"),
                 DiscordLinks.freeMinidungeons,
@@ -26,7 +26,8 @@ public class EnchantmentChallenge6 extends DungeonPackagerConfigFields {
                 "&bYou have left the enchantment challenge!",
                 List.of("filename=enchantment_boss_ravegarer.yml"),
                 "em_id_enchantment_challenge_6",
-                1);
+                1,
+                false);
         setDifficulties(List.of(
                 Map.of("name", "normal", "id", 0)));
         setEnchantmentChallenge(true);

@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.dungeons;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
 import com.magmaguy.elitemobs.dungeons.utility.DungeonUtils;
-import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import com.magmaguy.elitemobs.wormhole.Wormhole;
 import lombok.Getter;
@@ -66,7 +65,7 @@ public class WorldPackage extends EMPackage {
         dungeonPackagerConfigFields.installWorld();
         player.teleport(dungeonPackagerConfigFields.getTeleportLocation());
         world = dungeonPackagerConfigFields.getTeleportLocation().getWorld();
-        WorldGuardCompatibility.protectWorldMinidugeonArea(dungeonPackagerConfigFields.getTeleportLocation());
+//        WorldGuardCompatibility.protectWorldMinidugeonArea(dungeonPackagerConfigFields.getTeleportLocation());
         for (Wormhole wormhole : Wormhole.getWormholes())
             wormhole.onDungeonInstall(dungeonPackagerConfigFields.getFilename());
         player.sendMessage(ChatColorConverter.convert("[EliteMobs] Successfully installed " + dungeonPackagerConfigFields.getName() + "! To uninstall, do /em setup again and click on this content again."));

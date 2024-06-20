@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.api;
 
 import com.magmaguy.elitemobs.config.QuestsConfig;
+import com.magmaguy.elitemobs.config.SoundsConfig;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.Quest;
 import com.magmaguy.elitemobs.quests.QuestTracking;
@@ -42,6 +43,7 @@ public class QuestProgressionEvent extends Event {
             if (!QuestTracking.isTracking(event.player))
                 event.getQuest().getQuestObjectives().displayTemporaryObjectivesScoreboard(event.getPlayer());
             PlayerData.updateQuestStatus(event.getPlayer().getUniqueId(), event.getQuest());
+            event.getPlayer().playSound(event.getPlayer().getLocation(), SoundsConfig.questProgressionSound, 1, 1);
         }
     }
 }

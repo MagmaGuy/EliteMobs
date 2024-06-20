@@ -11,7 +11,7 @@ import java.util.Map;
 public class FrostPalaceSanctum extends DungeonPackagerConfigFields {
     public FrostPalaceSanctum() {
         super("frost_palace_sanctum",
-                false,
+                true,
                 "&2[lvl 050] &3The Frost Palace",
                 Arrays.asList("&fA 7 phase fight against",
                         "the queen of ice!",
@@ -29,7 +29,8 @@ public class FrostPalaceSanctum extends DungeonPackagerConfigFields {
                 "&bYou have left the Frost Palace!",
                 List.of("filename=frost_palace_frost_queen_p0.yml"),
                 "frost_palace",
-                50);
+                50,
+                true);
         setDifficulties(List.of(
                 Map.of("name", "normal", "levelSync", 55, "id", 0),
                 Map.of("name", "hard", "levelSync", 50, "id", 1),
