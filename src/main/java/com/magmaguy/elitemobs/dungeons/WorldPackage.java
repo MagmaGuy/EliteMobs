@@ -1,11 +1,10 @@
 package com.magmaguy.elitemobs.dungeons;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
 import com.magmaguy.elitemobs.dungeons.utility.DungeonUtils;
-import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomMusic;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import com.magmaguy.elitemobs.wormhole.Wormhole;
-import com.magmaguy.magmacore.util.ChatColorConverter;
-import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -29,7 +28,7 @@ public class WorldPackage extends EMPackage {
         super.baseInitialization();
         if (dungeonPackagerConfigFields.getWorldName() == null || dungeonPackagerConfigFields.getWorldName().isEmpty()) {
             this.isDownloaded = this.isInstalled = false;
-            Logger.warn("Packaged content " + dungeonPackagerConfigFields.getFilename() + " does not have a valid world name in the dungeon packager!");
+            new WarningMessage("Packaged content " + dungeonPackagerConfigFields.getFilename() + " does not have a valid world name in the dungeon packager!");
             return;
         }
 
@@ -42,7 +41,6 @@ public class WorldPackage extends EMPackage {
         if (Bukkit.getWorld(dungeonPackagerConfigFields.getWorldName()) != null) {
             this.isDownloaded = this.isInstalled = true;
             world = Bukkit.getWorld(dungeonPackagerConfigFields.getWorldName());
-            EliteMobsWorld.create(world.getUID(), dungeonPackagerConfigFields);
             dungeonPackagerConfigFields.initializeWorld();
             return;
         }
@@ -55,10 +53,8 @@ public class WorldPackage extends EMPackage {
 
         if (isDownloaded && isInstalled) {
             world = DungeonUtils.loadWorld(this);
-            if (dungeonPackagerConfigFields.getSong() != null)
-                new CustomMusic(dungeonPackagerConfigFields.getSong(), dungeonPackagerConfigFields, world);
             dungeonPackagerConfigFields.initializeWorld();
-        } else isInstalled = false;
+        }
     }
 
 
@@ -69,8 +65,6 @@ public class WorldPackage extends EMPackage {
         dungeonPackagerConfigFields.installWorld();
         player.teleport(dungeonPackagerConfigFields.getTeleportLocation());
         world = dungeonPackagerConfigFields.getTeleportLocation().getWorld();
-        if (dungeonPackagerConfigFields.getSong() != null)
-            new CustomMusic(dungeonPackagerConfigFields.getSong(), dungeonPackagerConfigFields, world);
 //        WorldGuardCompatibility.protectWorldMinidugeonArea(dungeonPackagerConfigFields.getTeleportLocation());
         for (Wormhole wormhole : Wormhole.getWormholes())
             wormhole.onDungeonInstall(dungeonPackagerConfigFields.getFilename());
@@ -91,5 +85,4 @@ public class WorldPackage extends EMPackage {
         world = null;
         return true;
     }
-
 }

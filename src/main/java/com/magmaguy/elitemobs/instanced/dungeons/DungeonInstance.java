@@ -14,7 +14,6 @@ import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.InstancedBossEntity;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
-import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.utils.*;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -136,13 +135,13 @@ public class DungeonInstance extends MatchInstance {
                                                               Player player,
                                                               File targetFile,
                                                               String difficultyName) {
-        World world = DungeonUtils.loadWorld(instancedWordName, instancedDungeonsConfigFields.getEnvironment());
+        World world = DungeonUtils.loadWorld(instancedWordName, instancedDungeonsConfigFields.getEnvironment(), instancedDungeonsConfigFields);
         if (world == null) {
             player.sendMessage("[EliteMobs] Failed to load the world! Report this to the dev. The dungeon will not start.");
             return null;
         }
-        if (Bukkit.getPluginManager().getPlugin("WorldGuard") != null)
-            WorldGuardCompatibility.protectWorldMinidugeonArea(world);
+//        if (Bukkit.getPluginManager().getPlugin("WorldGuard") != null)
+//            WorldGuardCompatibility.protectWorldMinidugeonArea(world);
 
         //Location where players are teleported to start completing the dungeon
         Location startLocation = ConfigurationLocation.serialize(instancedDungeonsConfigFields.getStartLocationString());
