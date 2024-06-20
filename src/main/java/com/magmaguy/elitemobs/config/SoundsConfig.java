@@ -1,10 +1,14 @@
 package com.magmaguy.elitemobs.config;
 
-import com.magmaguy.magmacore.config.ConfigurationFile;
+import org.bukkit.configuration.file.FileConfiguration;
 
+import java.io.File;
 import java.util.List;
 
-public class SoundsConfig extends ConfigurationFile {
+public class SoundsConfig {
+    private SoundsConfig() {
+    }
+
     public static String treasureChestOpenSound;
     public static String guildRankUpSound;
     public static String guildPrestigeSound;
@@ -13,12 +17,10 @@ public class SoundsConfig extends ConfigurationFile {
     public static String questAbandonSound;
     public static String questAcceptSound;
 
-    public SoundsConfig() {
-        super("Sounds.yml");
-    }
+    public static void initializeConfig() {
+        File file = ConfigurationEngine.fileCreator("Sounds.yml");
+        FileConfiguration fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
 
-    @Override
-    public void initializeValues() {
         treasureChestOpenSound = ConfigurationEngine.setString(
                 List.of("Sets the sound that will play when a treasure chest opens"),
                 file, fileConfiguration, "treasureChestOpenSound", "elitemobs:treasure_chest.open", false);
@@ -46,5 +48,8 @@ public class SoundsConfig extends ConfigurationFile {
         questAcceptSound = ConfigurationEngine.setString(
                 List.of("Sets the sound that will play when a player accepts a quest"),
                 file, fileConfiguration, "questAcceptSound", "elitemobs:quest.accept", false);
+
+        ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }
+
 }

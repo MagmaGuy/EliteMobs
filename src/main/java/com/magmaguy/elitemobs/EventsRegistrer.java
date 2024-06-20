@@ -16,6 +16,7 @@ import com.magmaguy.elitemobs.commands.setup.SetupMenu;
 import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
+import com.magmaguy.elitemobs.dungeons.DungeonProtector;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.events.ActionEvent;
 import com.magmaguy.elitemobs.explosionregen.Explosion;
@@ -350,6 +351,7 @@ public class EventsRegistrer {
             register(new WorldGuardDungeonFlag());
             register(new WorldGuardExplosionBlockDamageFlag());
         }
+        register(new DungeonProtector());
 
         register(new EntityTransformHandler());
         register(new EliteBlazeWaterDamagePrevention());

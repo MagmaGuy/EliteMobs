@@ -73,4 +73,10 @@ public class LegacyValueConverter {
                 return potionEffectName;
         }
     }
+
+    public static String parseDeserializedBlocks(String originalDeserializedBlock) {
+        if (originalDeserializedBlock.endsWith("grass"))
+            return originalDeserializedBlock.replace("grass", "grass_block[snowy=false]");
+        return originalDeserializedBlock;
+    }
 }
