@@ -9,7 +9,7 @@ import java.util.List;
 public class SteamworksLair extends DungeonPackagerConfigFields {
     public SteamworksLair() {
         super("steamworks_lair",
-                false,
+                true,
                 "&2[lvl 140] &6The Steamworks",
                 List.of("&fA steampunk inspired lair!"),
                 DiscordLinks.freeMinidungeons,
@@ -24,6 +24,7 @@ public class SteamworksLair extends DungeonPackagerConfigFields {
                         "&6Get ready for a robot rumble!",
                 "&6Reach the top and mind your step!",
                 "&6Now leaving the clockwork dominion!",
-                "the_steamworks");
+                "the_steamworks",
+                false);
     }
 }

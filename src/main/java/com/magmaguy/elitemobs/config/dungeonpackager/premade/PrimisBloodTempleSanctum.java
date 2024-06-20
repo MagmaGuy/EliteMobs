@@ -11,7 +11,7 @@ import java.util.Map;
 public class PrimisBloodTempleSanctum extends DungeonPackagerConfigFields {
     public PrimisBloodTempleSanctum() {
         super("primis_blood_temple_sanctum",
-                false,
+                true,
                 "&2[lvl 020] &aPrimis - Blood Temple'",
                 Arrays.asList("&fThe Fire Elemental awaits!",
                         "&6Credits: Dali_, Frostcone, MagmaGuy"),
@@ -28,7 +28,8 @@ public class PrimisBloodTempleSanctum extends DungeonPackagerConfigFields {
                 "&bYou have left the Blood Temple!",
                 List.of("filename=primis_final_elemental_p1.yml"),
                 "em_id_bloodtemple",
-                20);
+                20,
+                true);
         setDifficulties(List.of(
                 Map.of("name", "normal", "id", 0)));
     }

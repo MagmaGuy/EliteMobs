@@ -65,8 +65,9 @@ public class AlternativeDurabilityLoss implements Listener {
                     if (ItemSettingsConfig.isPreventEliteItemsFromBreaking()) {
                         damageable.setDamage(maxDurability - 1);
                         itemStack.setItemMeta(damageable);
-                    } else
+                    } else {
                         itemStack.setAmount(0);
+                    }
             }
     }
 

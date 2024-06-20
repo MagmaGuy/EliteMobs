@@ -11,7 +11,7 @@ import java.util.Map;
 public class BinderOfWorldsSanctum extends DungeonPackagerConfigFields {
     public BinderOfWorldsSanctum() {
         super("binder_of_worlds_sanctum",
-                false,
+                true,
                 "&2[lvl 200] &5The Binder Of Worlds",
                 Arrays.asList("&5The ultimate challenge. Be prepared!",
                         "&6Credits: MagmaGuy, 69OzCanOfBepis & Frostcone"),
@@ -30,7 +30,8 @@ public class BinderOfWorldsSanctum extends DungeonPackagerConfigFields {
                 "&8[EM] &5You have left the unravelling. Did you find what you sought? Was it worth it?",
                 List.of("filename=em_id_binder_of_worlds_phase_1.yml"),
                 "the_binder_of_worlds",
-                50);
+                50,
+                true);
         setDifficulties(List.of(
                 Map.of("name", "normal", "levelSync", 205, "id", 0),
                 Map.of("name", "hard", "levelSync", 200, "id", 1),

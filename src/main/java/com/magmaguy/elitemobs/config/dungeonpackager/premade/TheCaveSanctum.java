@@ -11,7 +11,7 @@ import java.util.Map;
 public class TheCaveSanctum extends DungeonPackagerConfigFields {
     public TheCaveSanctum() {
         super("the_cave_sanctum",
-                false,
+                true,
                 "&2[lvl 010] &3The Cave Sanctum",
                 Arrays.asList("&fThe perfect starter instanced sanctum!",
                         "&6Credits: MagmaGuy, Frostcone, 69OzCanOfBepis, Realm of Lotheridon"),
@@ -28,7 +28,8 @@ public class TheCaveSanctum extends DungeonPackagerConfigFields {
                 "&bYou have left The Cave!",
                 List.of("filename=the_cave_boiler_p1.yml"),
                 "em_id_the_cave",
-                15);
+                15,
+                false);
         setDifficulties(List.of(
                 Map.of("name", "normal", "levelSync", 20, "id", 0),
                 Map.of("name", "hard", "levelSync", 15, "id", 1),

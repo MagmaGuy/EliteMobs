@@ -23,31 +23,31 @@ public class SoundsConfig {
 
         treasureChestOpenSound = ConfigurationEngine.setString(
                 List.of("Sets the sound that will play when a treasure chest opens"),
-                file, fileConfiguration, "treasureChestOpenSound", "elitemobs_treasure_chest_open", false);
+                file, fileConfiguration, "treasureChestOpenSound", "elitemobs:treasure_chest.open", false);
 
         guildRankUpSound = ConfigurationEngine.setString(
                 List.of("Sets the sound that will play when a player ranks up at the guild"),
-                file, fileConfiguration, "guildRankUpSound", "elitemobs_guild_rankup", false);
+                file, fileConfiguration, "guildRankUpSound", "elitemobs:guild.rankup", false);
 
         guildPrestigeSound = ConfigurationEngine.setString(
                 List.of("Sets the sound that will play when a player prestiges at the guild"),
-                file, fileConfiguration, "guildPrestigeSound", "elitemobs_guild_prestige", false);
+                file, fileConfiguration, "guildPrestigeSound", "elitemobs:guild.prestige", false);
 
         questProgressionSound = ConfigurationEngine.setString(
                 List.of("Sets the sound that will play when a player progresses a quest"),
-                file, fileConfiguration, "questProgressionSound", "elitemobs_quest_progression", false);
+                file, fileConfiguration, "questProgressionSound", "elitemobs:quest.progression", false);
 
         questCompleteSound = ConfigurationEngine.setString(
                 List.of("Sets the sound that will play when a player completes a quest"),
-                file, fileConfiguration, "questCompleteSound", "elitemobs_quest_completion", false);
+                file, fileConfiguration, "questCompleteSound", "elitemobs:quest.completion", false);
 
         questAbandonSound = ConfigurationEngine.setString(
                 List.of("Sets the sound that will play when a player abandons a quest"),
-                file, fileConfiguration, "questAbandonSound", "elitemobs_quest_abandon", false);
+                file, fileConfiguration, "questAbandonSound", "elitemobs:quest.abandon", false);
 
         questAcceptSound = ConfigurationEngine.setString(
                 List.of("Sets the sound that will play when a player accepts a quest"),
-                file, fileConfiguration, "questAcceptSound", "elitemobs_quest_accept", false);
+                file, fileConfiguration, "questAcceptSound", "elitemobs:quest.accept", false);
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }

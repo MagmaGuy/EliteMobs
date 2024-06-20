@@ -9,7 +9,7 @@ import java.util.Arrays;
 public class HallosseumLair extends DungeonPackagerConfigFields {
     public HallosseumLair() {
         super("hallosseum_lair",
-                false,
+                true,
                 "&2[lvl 030] &cThe Hallosseum",
                 Arrays.asList("&fThe 2020 spooky halloween encounter!",
                         "&6Credits: MagmaGuy & 69OzCanOfBepis"),
@@ -25,6 +25,7 @@ public class HallosseumLair extends DungeonPackagerConfigFields {
                         "&6A fun Halloween challenge!",
                 "&8[EM] &4Trick or treat! &8Your soul is mine!",
                 "&8[EM] &4You've escaped with your soul intact.",
-                "the_hallosseum");
+                "the_hallosseum",
+                false);
     }
 }

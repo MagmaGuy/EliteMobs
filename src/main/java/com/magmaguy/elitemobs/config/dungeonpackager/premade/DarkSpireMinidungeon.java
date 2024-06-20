@@ -9,7 +9,7 @@ import java.util.Arrays;
 public class DarkSpireMinidungeon extends DungeonPackagerConfigFields {
     public DarkSpireMinidungeon() {
         super("dark_spire_minidungeon",
-                false,
+                true,
                 "&2[lvl 100-120] &8The Dark Spire",
                 Arrays.asList("&fThe first ever high level content!",
                         "&fMade for those who want a real challenge!",
@@ -26,6 +26,7 @@ public class DarkSpireMinidungeon extends DungeonPackagerConfigFields {
                         "&cA vast challenge for advanced players!",
                 "&8[EM] &1An invasion is in progress. &9Stop the insurrection!",
                 "&8[EM] &1You managed to hold them back. &9For now...",
-                "the_dark_spire");
+                "the_dark_spire",
+                false);
     }
 }
