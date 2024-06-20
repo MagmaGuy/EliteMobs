@@ -11,7 +11,7 @@ import java.util.List;
 public class DarkCathedralLair extends DungeonPackagerConfigFields {
     public DarkCathedralLair() {
         super("dark_cathedral_lair",
-                false,
+                true,
                 "&2[lvl 040] &8The Dark Cathedral",
                 Arrays.asList("&fThe first ever EliteMobs Lair!",
                         "&fA classic that all servers need!",

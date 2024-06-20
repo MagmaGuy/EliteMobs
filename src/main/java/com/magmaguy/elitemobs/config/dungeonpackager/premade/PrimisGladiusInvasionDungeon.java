@@ -11,7 +11,7 @@ import java.util.Map;
 public class PrimisGladiusInvasionDungeon extends DungeonPackagerConfigFields {
     public PrimisGladiusInvasionDungeon() {
         super("primis_gladius_invasion_dungeon",
-                false,
+                true,
                 "&2[lvl 000-020] &aPrimis - Gladius Invasion",
                 Arrays.asList("&fIt is time to take Gladius back!", "&6Credits: 69OzCanOfBepis, Frostcone, MagmaGuy"),
                 DiscordLinks.premiumMinidungeons,
@@ -27,7 +27,8 @@ public class PrimisGladiusInvasionDungeon extends DungeonPackagerConfigFields {
                 "2&bYou have left the Gladius Invasion!",
                 List.of("filename=primis_gladius_bell_id.yml"),
                 "em_id_primis_gladius",
-                1);
+                1,
+                false);
         setDifficulties(List.of(
                 Map.of("name", "normal", "id", 0, "levelSync", 18),
                 Map.of("name", "hard", "id", 1, "levelSync", 15),

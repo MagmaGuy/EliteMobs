@@ -11,7 +11,7 @@ import java.util.Map;
 public class BoneMonasteryDungeon extends DungeonPackagerConfigFields {
     public BoneMonasteryDungeon() {
         super("bone_monastery_dungeon",
-                false,
+                true,
                 "&2[lvl 085]&cThe Bone Monastery",
                 Arrays.asList("&fSpooky skeletons await.",
                         "&6Credits: MagmaGuy, Matevagyok, Frostcone, 69OzCanOfBepis"),
@@ -28,7 +28,8 @@ public class BoneMonasteryDungeon extends DungeonPackagerConfigFields {
                 "&bYou have left the bone monastery!",
                 List.of("filename=bone_monastery_bone_saint_himiko_p1.yml"),
                 "the_bone_monastery",
-                85);
+                85,
+                false);
         setDifficulties(List.of(
                 Map.of("name", "normal", "levelSync", 90, "id", 0),
                 Map.of("name", "hard", "levelSync", 85, "id", 1),

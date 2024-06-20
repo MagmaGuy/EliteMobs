@@ -9,7 +9,7 @@ import java.util.Arrays;
 public class OasisAdventure extends DungeonPackagerConfigFields {
     public OasisAdventure() {
         super("oasis_adventure",
-                false,
+                true,
                 "&2[lvl 020-055] &6The Oasis",
                 Arrays.asList("&fA massive adventure for beginners!",
                         "&6Credits: 69OzCanOfBepis"),
@@ -25,7 +25,8 @@ public class OasisAdventure extends DungeonPackagerConfigFields {
                         "&6A big adventure for people who know the ropes!",
                 "&8[EM] &6You have arrived at the Oasis!",
                 "&8[EM] &6You have left the Oasis!",
-                "oasis");
+                "oasis",
+                false);
         setWormholeWorldName("em_oasis_wormhole");
     }
 }
