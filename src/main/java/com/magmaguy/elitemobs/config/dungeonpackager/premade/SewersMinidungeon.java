@@ -9,7 +9,7 @@ import java.util.Arrays;
 public class SewersMinidungeon extends DungeonPackagerConfigFields {
     public SewersMinidungeon() {
         super("sewers_minidungeon",
-                false,
+                true,
                 "&2[lvl 020-035] &8The Sewers",
                 Arrays.asList("&fThe biggest minidungeon ever made!",
                         "&6Credits: MagmaGuy & 69OzCanOfBepis"),
@@ -26,6 +26,7 @@ public class SewersMinidungeon extends DungeonPackagerConfigFields {
                 "&8[EM] &5This place looks abandoned... &dYet something lurks in these sewers!",
 
                 "&8[EM] &5You managed to stay above water. &dMaybe next time you'll drown.",
-                "the_sewers");
+                "the_sewers",
+                false);
     }
 }

@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.menus.ArenaMenu;
 import org.bukkit.entity.Player;
 
 public class ArenaCommands {
+    private ArenaCommands(){}
     public static void openArenaMenu(Player player, String arenaFilename) {
         ArenaMenu arenaMenu = new ArenaMenu();
         arenaMenu.constructArenaMenu(player, arenaFilename);

@@ -11,7 +11,7 @@ import java.util.Map;
 public class OasisPyramidSanctum extends DungeonPackagerConfigFields {
     public OasisPyramidSanctum() {
         super("oasis_pyramid_sanctum",
-                false,
+                true,
                 "&2[lvl 055] &6The Oasis Pyramid",
                 Arrays.asList("&fThe final dungeon of the Oasis adventure!",
                         "&6Credits: 69OzCanOfBepis, Frostcone, MagmaGuy"),
@@ -28,7 +28,8 @@ public class OasisPyramidSanctum extends DungeonPackagerConfigFields {
                 "&bYou have left the Pyramid!",
                 List.of("filename=oasis_pharaoh_p1.yml"),
                 "em_id_oasis_pyramid",
-                55);
+                55,
+                false);
         setDifficulties(List.of(
                 Map.of("name", "normal", "id", 0)));
     }

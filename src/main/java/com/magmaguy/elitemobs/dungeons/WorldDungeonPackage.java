@@ -1,19 +1,15 @@
 package com.magmaguy.elitemobs.dungeons;
 
-import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
 import com.magmaguy.elitemobs.dungeons.utility.DungeonUtils;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
-import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-
-import java.util.Objects;
 
 /**
  * This class is specifically for world-based dungeons
@@ -38,9 +34,7 @@ public class WorldDungeonPackage extends WorldPackage implements Dungeon {
         if (dungeonPackagerConfigFields.getWormholeWorldName() != null &&
                 !dungeonPackagerConfigFields.getWormholeWorldName().isEmpty() &&
                 Bukkit.getWorld(dungeonPackagerConfigFields.getWormholeWorldName()) == null) {
-            wormholeWorld = DungeonUtils.loadWorld(this.getDungeonPackagerConfigFields().getWormholeWorldName(), this.getDungeonPackagerConfigFields().getEnvironment());
-            if (wormholeWorld != null && EliteMobs.worldGuardIsEnabled)
-                WorldGuardCompatibility.protectWorldMinidugeonArea(Objects.requireNonNull(wormholeWorld).getSpawnLocation(), this);
+            wormholeWorld = DungeonUtils.loadWorld(this.getDungeonPackagerConfigFields().getWormholeWorldName(), this.getDungeonPackagerConfigFields().getEnvironment(), dungeonPackagerConfigFields);
         }
     }
 

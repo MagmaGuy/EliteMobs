@@ -9,7 +9,7 @@ import java.util.List;
 public class UnderGroveLair extends DungeonPackagerConfigFields {
     public UnderGroveLair() {
         super("under_grove_lair",
-                false,
+                true,
                 "&2[lvl 170] &6The Under Grove",
                 List.of("&6Stop the dryad's ritual!"),
                 DiscordLinks.premiumMinidungeons,
@@ -24,6 +24,7 @@ public class UnderGroveLair extends DungeonPackagerConfigFields {
                         "&6The dryads are up to no good, stop them!",
                 "&8[EM] &aYou are now trespassing the sacred grove!",
                 "&8[EM] &aYou have left the sacred grove!",
-                "the_under_grove");
+                "the_under_grove",
+                false);
     }
 }

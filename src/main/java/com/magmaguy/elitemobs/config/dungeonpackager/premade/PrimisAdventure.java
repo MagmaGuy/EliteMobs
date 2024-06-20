@@ -9,7 +9,7 @@ import java.util.Arrays;
 public class PrimisAdventure extends DungeonPackagerConfigFields {
     public PrimisAdventure() {
         super("primis_adventure",
-                false,
+                true,
                 "&2[lvl 000-020] &7Primis",
                 Arrays.asList("&fA tutorial adventure for new players!",
                         "&6Credits: 69OzCanOfBepis, MagmaGuy"),
@@ -25,7 +25,8 @@ public class PrimisAdventure extends DungeonPackagerConfigFields {
                         "&6A tutorial adventure for new players!",
                 "&8[EM] &6Primis awaits, strike the earth!",
                 "&8[EM] &6You have left Primis!",
-                "primis");
+                "primis",
+                false);
         setWormholeWorldName("em_primis_wormhole");
         setHasCustomModels(true);
     }

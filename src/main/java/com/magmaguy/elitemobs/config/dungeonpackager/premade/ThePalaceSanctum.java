@@ -11,7 +11,7 @@ import java.util.Map;
 public class ThePalaceSanctum extends DungeonPackagerConfigFields {
     public ThePalaceSanctum() {
         super("the_palace_sanctum",
-                false,
+                true,
                 "&2[lvl 030] &3The Palace Sanctum",
                 Arrays.asList("&fThe perfect intermediate instanced sanctum!",
                         "&6Credits: Dali_, MagmaGuy, Frostcone"),
@@ -28,7 +28,8 @@ public class ThePalaceSanctum extends DungeonPackagerConfigFields {
                 "&bYou have left The Palace!",
                 List.of("the_palace_old_stone_king_p1.yml"),
                 "em_id_the_palace",
-                35);
+                35,
+                false);
         setDifficulties(List.of(
                 Map.of("name", "normal", "levelSync", 40, "id", 0),
                 Map.of("name", "hard", "levelSync", 35, "id", 1),
