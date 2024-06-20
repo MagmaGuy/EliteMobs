@@ -21,9 +21,6 @@ public class CustomQuestsConfigFields extends CustomConfigFields implements Cust
     @Getter
     @Setter
     private int questLevel = 0;
-    //@Getter
-    //@Setter
-    //private List<String> customObjectivesList = new ArrayList<>();
     @Getter
     @Setter
     protected Map<String, Map<String, Object>> customObjectives = new HashMap();
@@ -103,8 +100,6 @@ public class CustomQuestsConfigFields extends CustomConfigFields implements Cust
     @Override
     public void processConfigFields() {
         this.isEnabled = processBoolean("isEnabled", isEnabled, true, true);
-        //this.customObjectivesList = translatable(filename, "customObjectives", processStringList("customObjectives", customObjectivesList, new ArrayList<>(), true));
-        //todo update format
         if (fileConfiguration.contains("customObjectives") && fileConfiguration.get("customObjectives") instanceof List)
             updateOldStringFormat(fileConfiguration.getStringList("customObjectives"));
         this.customObjectives = processQuestObjectives();
@@ -122,7 +117,6 @@ public class CustomQuestsConfigFields extends CustomConfigFields implements Cust
         this.turnInNPC = processString("turnInNPC", turnInNPC, "", false);
         this.trackable = processBoolean("trackable", trackable, true, false);
         this.questLevel = processInt("questLevel", questLevel, 0, false);
-//        this.questMenuOpenSound = processString("questMenuOpenSound", questMenuOpenSound, "", false);
         this.questAcceptSound = processString("questAcceptSound", questAcceptSound, "", false);
         this.questCompleteSound = processString("questCompleteSound", questCompleteSound, "", false);
     }

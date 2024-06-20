@@ -10,7 +10,6 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,8 +17,6 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
 
     @Getter
     private String name;
-    @Getter
-    private DungeonLocationType dungeonLocationType = DungeonLocationType.WORLD;
     @Getter
     private ContentType contentType = null;
     @Getter
@@ -99,6 +96,9 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
     @Getter
     @Setter
     private boolean enchantmentChallenge = false;
+    @Getter
+    @Setter
+    private boolean allowExplosions;
 
     public DungeonPackagerConfigFields(String fileName, boolean isEnabled) {
         super(fileName, isEnabled);
@@ -136,7 +136,8 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
                                        String playerInfo,
                                        String regionEnterMessage,
                                        String regionLeaveMessage,
-                                       String dungeonConfigFolderName) {
+                                       String dungeonConfigFolderName,
+                                       boolean allowExplosions) {
         super(filename, isEnabled);
         this.contentType = ContentType.OPEN_DUNGEON;
         this.name = name;
@@ -152,6 +153,7 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
         this.regionEnterMessage = regionEnterMessage;
         this.regionLeaveMessage = regionLeaveMessage;
         this.dungeonConfigFolderName = dungeonConfigFolderName;
+        this.allowExplosions = allowExplosions;
         defaultDungeon = true;
     }
 
@@ -173,7 +175,8 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
                                        String regionLeaveMessage,
                                        List<String> rawDungeonObjectives,
                                        String dungeonConfigFolderName,
-                                       int contentLevel) {
+                                       int contentLevel,
+                                       boolean allowExplosions) {
         super(filename, isEnabled);
         this.contentType = ContentType.INSTANCED_DUNGEON;
         this.name = name;
@@ -192,113 +195,7 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
         this.rawDungeonObjectives = rawDungeonObjectives;
         this.dungeonConfigFolderName = dungeonConfigFolderName;
         this.contentLevel = contentLevel;
-        defaultDungeon = true;
-    }
-
-    /**
-     * Used by schematic-based dungeons
-     *
-     * @param filename                       Filename of the dungeon
-     * @param isEnabled                      If the dungeon is enabled
-     * @param name                           Human name of the dungeon
-     * @param customInfo                     Info displayed to players in menus
-     * @param relativeBossLocations          List of relative locations for the bosses
-     * @param relativeTreasureChestLocations List of relative locations for the treasure chests
-     * @param downloadLink                   Download link for the dungeon
-     * @param dungeonSizeCategory            Size of the dungeon
-     * @param schematicName                  Name of the schematic file of the dungeon
-     * @param protect                        If the dungeon should be protected with WorldGuard
-     * @param corner1                        Corner of the dungeon for creating a region
-     * @param corner2                        Other corner of the dungeon for creating a region
-     * @param teleportLocationOffsetString   Point to teleport to offset from the anchor point of the schematic
-     * @param dungeonVersion                 Version of the dungeon
-     * @param playerInfo                     Additional custom info for players
-     * @param regionEnterMessage             Message upon entering the region
-     * @param regionLeaveMessage             Message upon leaving the region
-     */
-    public DungeonPackagerConfigFields(String filename,
-                                       boolean isEnabled,
-                                       String name,
-                                       List<String> customInfo,
-                                       List<String> relativeBossLocations,
-                                       List<String> relativeTreasureChestLocations,
-                                       String downloadLink,
-                                       DungeonSizeCategory dungeonSizeCategory,
-                                       String schematicName,
-                                       Boolean protect,
-                                       Vector corner1,
-                                       Vector corner2,
-                                       String teleportLocationOffsetString,
-                                       int dungeonVersion,
-                                       String playerInfo,
-                                       String regionEnterMessage,
-                                       String regionLeaveMessage,
-                                       String defaultSchematicRotation,
-                                       String dungeonConfigFolderName) {
-        super(filename, isEnabled);
-        this.contentType = ContentType.SCHEMATIC_DUNGEON;
-        this.name = name;
-        this.customInfo = customInfo;
-        this.relativeBossLocations = relativeBossLocations;
-        this.relativeTreasureChestLocations = relativeTreasureChestLocations;
-        this.downloadLink = downloadLink;
-        this.dungeonSizeCategory = dungeonSizeCategory;
-        this.schematicName = schematicName;
-        this.protect = protect;
-        this.corner1 = corner1;
-        this.corner2 = corner2;
-        this.teleportLocationOffsetString = teleportLocationOffsetString;
-        this.dungeonVersion = dungeonVersion;
-        this.playerInfo = playerInfo;
-        this.regionEnterMessage = regionEnterMessage;
-        this.regionLeaveMessage = regionLeaveMessage;
-        this.defaultSchematicRotationString = defaultSchematicRotation;
-        this.dungeonConfigFolderName = dungeonConfigFolderName;
-        defaultDungeon = true;
-    }
-
-    public DungeonPackagerConfigFields(String fileName,
-                                       boolean isEnabled,
-                                       String name,
-                                       DungeonLocationType dungeonLocationType,
-                                       List<String> customInfo,
-                                       List<String> relativeBossLocations,
-                                       List<String> relativeTreasureChestLocations,
-                                       String downloadLink,
-                                       DungeonSizeCategory dungeonSizeCategory,
-                                       String worldName,
-                                       String schematicName,
-                                       World.Environment environment,
-                                       Boolean protect,
-                                       Vector corner1,
-                                       Vector corner2,
-                                       String teleportLocationString,
-                                       String wormholeLocationString,
-                                       int dungeonVersion,
-                                       String playerInfo,
-                                       String regionEnterMessage,
-                                       String regionLeaveMessage,
-                                       String dungeonConfigFolderName) {
-        super(fileName, isEnabled);
-        this.name = name;
-        this.dungeonLocationType = dungeonLocationType;
-        this.customInfo = customInfo;
-        this.relativeBossLocations = new ArrayList<>(relativeBossLocations);
-        this.relativeTreasureChestLocations = new ArrayList<>(relativeTreasureChestLocations);
-        this.downloadLink = downloadLink;
-        this.dungeonSizeCategory = dungeonSizeCategory;
-        this.worldName = worldName;
-        this.schematicName = schematicName;
-        this.environment = environment;
-        this.protect = protect;
-        this.corner1 = corner1;
-        this.corner2 = corner2;
-        this.teleportLocationString = teleportLocationString;
-        this.dungeonVersion = dungeonVersion;
-        this.playerInfo = playerInfo;
-        this.regionEnterMessage = regionEnterMessage;
-        this.regionLeaveMessage = regionLeaveMessage;
-        this.dungeonConfigFolderName = dungeonConfigFolderName;
+        this.allowExplosions = allowExplosions;
         defaultDungeon = true;
     }
 
@@ -306,12 +203,6 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
     public void processConfigFields() {
         this.isEnabled = processBoolean("isEnabled", isEnabled, false, true);
         this.name = translatable(filename, "name", processString("name", name, null, true));
-        this.dungeonLocationType = processEnum("dungeonLocationType", dungeonLocationType, null, DungeonLocationType.class, true);
-        if (dungeonLocationType == null) {
-            new WarningMessage("File " + filename + " does not have a valid dungeonLocationType!");
-            this.fileConfiguration = null;
-            return;
-        }
         this.customInfo = translatable(filename, "customInfo", processStringList("customInfo", customInfo, null, true));
         this.relativeBossLocations = processStringList("relativeBossLocations", relativeBossLocations, null, false);
         this.relativeTreasureChestLocations = processStringList("relativeTreasureChestLocations", relativeTreasureChestLocations, null, false);
@@ -353,6 +244,7 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
             this.difficulties = (List<Map<String, Object>>) fileConfiguration.getList("difficulties");
         else fileConfiguration.addDefault("difficulties", difficulties);
         enchantmentChallenge = processBoolean("enchantmentChallenge", enchantmentChallenge, false, false);
+        this.allowExplosions = processBoolean("allowExplosionBlockDamage", allowExplosions, false, false);
         processAdditionalFields();
     }
 

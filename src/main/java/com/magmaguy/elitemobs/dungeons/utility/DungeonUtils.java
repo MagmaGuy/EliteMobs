@@ -1,5 +1,7 @@
 package com.magmaguy.elitemobs.dungeons.utility;
 
+import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
+import com.magmaguy.elitemobs.dungeons.EliteMobsWorld;
 import com.magmaguy.elitemobs.dungeons.WorldDungeonPackage;
 import com.magmaguy.elitemobs.dungeons.WorldPackage;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
@@ -37,14 +39,14 @@ public class DungeonUtils {
     public static World loadWorld(WorldPackage worldPackage) {
         String worldName = worldPackage.getDungeonPackagerConfigFields().getWorldName();
         World.Environment environment = worldPackage.getDungeonPackagerConfigFields().getEnvironment();
-        World world = loadWorld(worldName, environment);
+        World world = loadWorld(worldName, environment, worldPackage.getDungeonPackagerConfigFields());
         if (worldPackage.getDungeonPackagerConfigFields().getWormholeWorldName() != null)
-            loadWorld(worldPackage.getDungeonPackagerConfigFields().getWormholeWorldName(), environment);
+            loadWorld(worldPackage.getDungeonPackagerConfigFields().getWormholeWorldName(), environment, worldPackage.getDungeonPackagerConfigFields());
         if (world != null) worldPackage.setInstalled(true);
         return world;
     }
 
-    public static World loadWorld(String worldName, World.Environment environment) {
+    public static World loadWorld(String worldName, World.Environment environment, DungeonPackagerConfigFields dungeonPackagerConfigFields) {
         File folder = new File(Bukkit.getWorldContainer().getAbsolutePath());
 
         if (!Files.exists(Paths.get(folder.getAbsolutePath() + File.separatorChar + worldName))) {
@@ -67,6 +69,9 @@ public class DungeonUtils {
             if (world != null) world.setKeepSpawnInMemory(false);
             world.setDifficulty(Difficulty.HARD);
             Bukkit.getLogger().setFilter(previousFilter);
+
+            EliteMobsWorld.create(world.getUID(), dungeonPackagerConfigFields);
+
             return world;
         } catch (Exception exception) {
             Bukkit.getLogger().setFilter(previousFilter);
@@ -90,6 +95,9 @@ public class DungeonUtils {
         Bukkit.unloadWorld(worldPackage.getWorld(), false);
         if (worldPackage instanceof WorldDungeonPackage && ((WorldDungeonPackage) worldPackage).getWormholeWorld() != null)
             Bukkit.unloadWorld(((WorldDungeonPackage) worldPackage).getWormholeWorld(), false);
+
+        EliteMobsWorld.destroy(worldPackage.getWorld().getUID());
+
         return true;
     }
 

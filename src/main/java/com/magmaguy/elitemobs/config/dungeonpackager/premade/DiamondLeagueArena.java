@@ -9,7 +9,7 @@ import java.util.List;
 public class DiamondLeagueArena extends DungeonPackagerConfigFields {
     public DiamondLeagueArena() {
         super("diamond_league_arena",
-                false,
+                true,
                 "&5[lvl 100-150] &fThe Diamond League Arena",
                 List.of("&fFace the Diamond League Arena!"),
                 DiscordLinks.freeMinidungeons,
@@ -24,6 +24,7 @@ public class DiamondLeagueArena extends DungeonPackagerConfigFields {
                         "level 100 to level 150!",
                 "&fAre you prepared to face the arena?",
                 "&fNow leaving the diamond league arena!",
-                "diamond_league_arena");
+                "diamond_league_arena",
+                false);
     }
 }

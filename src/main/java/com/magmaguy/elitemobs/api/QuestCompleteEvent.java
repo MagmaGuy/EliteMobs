@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.api;
 
+import com.magmaguy.elitemobs.config.SoundsConfig;
 import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.Quest;
 import com.magmaguy.elitemobs.utils.EventCaller;
@@ -50,6 +51,8 @@ public class QuestCompleteEvent extends Event implements Cancellable {
                         Bukkit.getPlayer(customQuest.getPlayerUUID()),
                         customQuest.getCustomQuestsConfigFields().getQuestCompleteSound(),
                         1f, 1f);
+            else
+                event.getPlayer().playSound(event.getPlayer().getLocation(), SoundsConfig.questCompleteSound, 1, 1);
         }
     }
 }

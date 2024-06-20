@@ -11,7 +11,7 @@ import java.util.Map;
 public class CraftenminesLabSanctum extends DungeonPackagerConfigFields {
     public CraftenminesLabSanctum() {
         super("craftenmines_lab_sanctum",
-                false,
+                true,
                 "&2[lvl 030] &aCraftenmines Sanctum",
                 Arrays.asList("&aFace the creator of the devious creations!",
                         "&6Credits: MagmaGuy, 69OzCanOfBepis"),
@@ -29,7 +29,8 @@ public class CraftenminesLabSanctum extends DungeonPackagerConfigFields {
                 "&8[EM] &5You have left Dr. Craftenmine's laboratory!",
                 List.of("filename=dr_craftenmine_p1.yml"),
                 "em_id_craftenmines_lab",
-                30);
+                30,
+                false);
         setDifficulties(List.of(
                 Map.of("name", "normal", "levelSync", 25, "id", 0),
                 Map.of("name", "hard", "levelSync", 30, "id", 1),

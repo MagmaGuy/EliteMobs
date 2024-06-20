@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.mobconstructor.custombosses.transitiveblocks;
 
+import com.magmaguy.elitemobs.config.LegacyValueConverter;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import lombok.Setter;
@@ -35,7 +36,7 @@ public class TransitiveBlock {
                 double x = Double.parseDouble(vector[0]);
                 double y = Double.parseDouble(vector[1]);
                 double z = Double.parseDouble(vector[2]);
-                BlockData blockData = Bukkit.getServer().createBlockData(elements[1]);
+                BlockData blockData = Bukkit.getServer().createBlockData(LegacyValueConverter.parseDeserializedBlocks(elements[1]));
                 transitiveBlocks.add(new TransitiveBlock(blockData, new Vector(x, y, z)));
             } catch (Exception ex) {
                 new WarningMessage("Failed to serialize Transitive Block! Issue with entry " + deserializedString + " in file " + filename);

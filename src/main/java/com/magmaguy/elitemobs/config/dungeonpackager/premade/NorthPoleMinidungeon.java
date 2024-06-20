@@ -9,7 +9,7 @@ import java.util.Arrays;
 public class NorthPoleMinidungeon extends DungeonPackagerConfigFields {
     public NorthPoleMinidungeon() {
         super("north_pole_minidungeon",
-                false,
+                true,
                 "&2[lvl 055-060] &9The North Pole",
                 Arrays.asList("&fThe Christmas minidungeon!",
                         "&6Credits: MagmaGuy & 69OzCanOfBepis"),
@@ -25,6 +25,7 @@ public class NorthPoleMinidungeon extends DungeonPackagerConfigFields {
                         "&6Christmas in a snow globe!",
                 "&8[EM] &7You have reached the North Pole! &fHave you been naughty this year?",
                 "&8[EM] &7Come back and visit. &fThere are plenty of sweets and treats for next time!",
-                "the_north_pole");
+                "the_north_pole",
+                false);
     }
 }

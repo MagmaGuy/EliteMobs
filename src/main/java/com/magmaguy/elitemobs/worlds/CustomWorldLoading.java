@@ -1,6 +1,8 @@
 package com.magmaguy.elitemobs.worlds;
 
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
+import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfig;
+import com.magmaguy.elitemobs.dungeons.EliteMobsWorld;
 import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
@@ -31,6 +33,7 @@ public class CustomWorldLoading {
                     Objects.requireNonNull(Bukkit.createWorld(worldCreator)).setKeepSpawnInMemory(false);
                     new InfoMessage("[EliteMobs] World " + AdventurersGuildConfig.getGuildWorldName() +
                             " has been successfully loaded! It can be accessed through the '/ag' command, unless you changed that config option!");
+                    EliteMobsWorld.create(worldCreator.createWorld().getUID(), DungeonPackagerConfig.getDungeonPackages().get("adventurers_guild.yml"));
                 } catch (Exception ex) {
                     new WarningMessage("Failed to generate Adventurer's Guild World!");
                     ex.printStackTrace();

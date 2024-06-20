@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.api;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.QuestsConfig;
+import com.magmaguy.elitemobs.config.SoundsConfig;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.Quest;
@@ -55,6 +56,8 @@ public class QuestLeaveEvent extends Event {
                         questTracking.stop();
                 }
             }
+
+            event.getPlayer().playSound(event.getPlayer().getLocation(), SoundsConfig.questAbandonSound, 1, 1);
         }
     }
 }

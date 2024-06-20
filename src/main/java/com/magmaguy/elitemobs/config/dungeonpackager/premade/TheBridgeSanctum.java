@@ -11,7 +11,7 @@ import java.util.Map;
 public class TheBridgeSanctum extends DungeonPackagerConfigFields {
     public TheBridgeSanctum() {
         super("the_bridge_sanctum",
-                false,
+                true,
                 "&2[lvl 025] &3The Bridge Sanctum",
                 Arrays.asList("&fThe perfect intermediate instanced sanctum!",
                         "&6Credits: Dali_, MagmaGuy, Frostcone"),
@@ -28,7 +28,8 @@ public class TheBridgeSanctum extends DungeonPackagerConfigFields {
                 "&bYou have left The Bridge!",
                 List.of("filename=the_bridge_ancient_guardian_p1.yml"),
                 "em_id_the_bridge",
-                25);
+                25,
+                false);
         setDifficulties(List.of(
                 Map.of("name", "normal", "levelSync", 30, "id", 0),
                 Map.of("name", "hard", "levelSync", 25, "id", 1),
