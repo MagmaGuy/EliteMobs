@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.utils;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
-import com.magmaguy.magmacore.util.ChatColorConverter;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Display;

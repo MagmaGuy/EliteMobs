@@ -321,8 +321,7 @@ public class Explosion {
         @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
         public void entityExplodeEvent(EntityExplodeEvent event) {
             Entity entity = event.getEntity();
-            if (entity instanceof Projectile projectile && projectile.getShooter() instanceof LivingEntity shooter)
-                entity = shooter;
+            if (entity instanceof  Projectile projectile && projectile.getShooter() instanceof LivingEntity shooter) entity = shooter;
             EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(entity);
             if (eliteEntity != null) {
                 generateExplosion(event);

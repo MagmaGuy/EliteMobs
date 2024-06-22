@@ -1,14 +1,15 @@
 package com.magmaguy.elitemobs.config;
 
-import com.magmaguy.magmacore.config.ConfigurationFile;
-import com.magmaguy.magmacore.util.ChatColorConverter;
+import com.magmaguy.elitemobs.ChatColorConverter;
 import lombok.Getter;
+import org.bukkit.configuration.file.FileConfiguration;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class AdventurersGuildConfig extends ConfigurationFile {
+public class AdventurersGuildConfig {
     @Getter
     private static final String[][] rankNames = new String[11][21];
     @Getter
@@ -66,96 +67,19 @@ public class AdventurersGuildConfig extends ConfigurationFile {
     @Getter
     private static boolean disableCommonerRank;
 
-    public AdventurersGuildConfig() {
-        super("AdventurersGuild.yml");
+    private static File file;
+    private static FileConfiguration fileConfiguration;
+
+    private AdventurersGuildConfig() {
     }
 
-    public static String getRankName(int prestigeTier, int rankTier) {
-        return ChatColorConverter.convert(rankNames[prestigeTier][rankTier]);
+    public static void save() {
+        ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }
 
-    public static String getShortenedRankName(int prestigeTier, int rankTier) {
-        return ChatColorConverter.convert(shortRankNames[prestigeTier][rankTier]);
-    }
-
-    private static String prestigeColors(int prestigeTier) {
-        switch (prestigeTier) {
-            case 1:
-                return "&e";
-            case 2:
-                return "&2";
-            case 3:
-                return "&a";
-            case 4:
-                return "&3";
-            case 5:
-                return "&b";
-            case 6:
-                return "&4";
-            case 7:
-                return "&c";
-            case 8:
-                return "&9";
-            case 9:
-                return "&d";
-            case 10:
-                return "&5";
-            default:
-                return "error";
-        }
-    }
-
-    private static String romanNumerals(int prestigeTier) {
-        switch (prestigeTier) {
-            case 1:
-                return "Ⅰ";
-            case 2:
-                return "ⅠⅠ";
-            case 3:
-                return "ⅠⅠⅠ";
-            case 4:
-                return "ⅠⅤ";
-            case 5:
-                return "Ⅴ";
-            case 6:
-                return "ⅤⅠ";
-            case 7:
-                return "ⅤⅠⅠ";
-            case 8:
-                return "ⅤⅠⅠⅠ";
-            case 9:
-                return "ⅠⅩ";
-            case 10:
-                return "Ⅹ";
-            case 11:
-                return "ⅩⅠ";
-            case 12:
-                return "ⅩⅠⅠ";
-            case 13:
-                return "ⅩⅠⅠⅠ";
-            case 14:
-                return "ⅩⅠⅤ";
-            case 15:
-                return "ⅩⅤ";
-            case 16:
-                return "ⅩⅤⅠ";
-            case 17:
-                return "ⅩⅤⅠⅠ";
-            case 18:
-                return "ⅩⅤⅠⅠⅠ";
-            case 19:
-                return "ⅩⅠⅩ";
-            case 20:
-                return "ⅩⅩ";
-            case 0:
-                return "0";
-            default:
-                return "error";
-        }
-    }
-
-    @Override
-    public void initializeValues() {
+    public static void initializeConfig() {
+        file = ConfigurationEngine.fileCreator("AdventurersGuild.yml");
+        fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
         addMaxHealth = ConfigurationEngine.setBoolean(
                 List.of("Sets if EliteMobs will add max health when unlocking guild ranks as a prestige reward"),
                 fileConfiguration, "Add max health when unlocking higher guild ranks", true);
@@ -476,7 +400,7 @@ public class AdventurersGuildConfig extends ConfigurationFile {
         baseKillsForRankUp = ConfigurationEngine.setInt(
                 List.of("Sets the estimated base amount of bosses that must be killed to be able to afford a rank up."),
                 fileConfiguration, "baseKillsForRankUp", 100);
-        baseKillsForRankUp = ConfigurationEngine.setInt(
+        additionalKillsForRankUpPerTier = ConfigurationEngine.setInt(
                 List.of("Sets the estimated additional amount of bosses that must be killed to be able to rank up, per level.",
                         "The formula is this amount x the level the player is currently at."),
                 fileConfiguration, "additionalKillsForRankUpPerTier", 50);
@@ -501,5 +425,92 @@ public class AdventurersGuildConfig extends ConfigurationFile {
         disableCommonerRank = ConfigurationEngine.setBoolean(
                 List.of("Disables users' ability to switch to peaceful mode for EliteMobs. Peaceful mode lowers level and spawn rates of mobs around that player specifically"),
                 fileConfiguration, "disableCommonerRank", false);
+
+        save();
     }
+
+    public static String getRankName(int prestigeTier, int rankTier) {
+        return ChatColorConverter.convert(rankNames[prestigeTier][rankTier]);
+    }
+
+    public static String getShortenedRankName(int prestigeTier, int rankTier) {
+        return ChatColorConverter.convert(shortRankNames[prestigeTier][rankTier]);
+    }
+
+    private static String prestigeColors(int prestigeTier) {
+        switch (prestigeTier) {
+            case 1:
+                return "&e";
+            case 2:
+                return "&2";
+            case 3:
+                return "&a";
+            case 4:
+                return "&3";
+            case 5:
+                return "&b";
+            case 6:
+                return "&4";
+            case 7:
+                return "&c";
+            case 8:
+                return "&9";
+            case 9:
+                return "&d";
+            case 10:
+                return "&5";
+            default:
+                return "error";
+        }
+    }
+
+    private static String romanNumerals(int prestigeTier) {
+        switch (prestigeTier) {
+            case 1:
+                return "Ⅰ";
+            case 2:
+                return "ⅠⅠ";
+            case 3:
+                return "ⅠⅠⅠ";
+            case 4:
+                return "ⅠⅤ";
+            case 5:
+                return "Ⅴ";
+            case 6:
+                return "ⅤⅠ";
+            case 7:
+                return "ⅤⅠⅠ";
+            case 8:
+                return "ⅤⅠⅠⅠ";
+            case 9:
+                return "ⅠⅩ";
+            case 10:
+                return "Ⅹ";
+            case 11:
+                return "ⅩⅠ";
+            case 12:
+                return "ⅩⅠⅠ";
+            case 13:
+                return "ⅩⅠⅠⅠ";
+            case 14:
+                return "ⅩⅠⅤ";
+            case 15:
+                return "ⅩⅤ";
+            case 16:
+                return "ⅩⅤⅠ";
+            case 17:
+                return "ⅩⅤⅠⅠ";
+            case 18:
+                return "ⅩⅤⅠⅠⅠ";
+            case 19:
+                return "ⅩⅠⅩ";
+            case 20:
+                return "ⅩⅩ";
+            case 0:
+                return "0";
+            default:
+                return "error";
+        }
+    }
+
 }
