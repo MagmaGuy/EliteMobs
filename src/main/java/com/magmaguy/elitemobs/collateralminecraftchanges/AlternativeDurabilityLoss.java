@@ -1,19 +1,14 @@
 package com.magmaguy.elitemobs.collateralminecraftchanges;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.items.ItemTagger;
-import com.magmaguy.elitemobs.utils.EntityFinder;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.inventory.ItemStack;
@@ -83,32 +78,10 @@ public class AlternativeDurabilityLoss implements Listener {
         doDurabilityLoss(event.getEntity());
     }
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    public void onPlayerDamaged(EntityDamageEvent event) {
-        if (!event.getEntity().getType().equals(EntityType.PLAYER)) return;
-        //citizens spams this really hard for some reason
-        if (event.getEntity().hasMetadata("NPC")) return;
-        Player player = (Player) event.getEntity();
-        for (ItemStack itemStack : player.getInventory().getArmorContents())
-            if (isOnLastDamage(itemStack)) {
-                player.getWorld().dropItem(player.getLocation(), itemStack.clone());
-                itemStack.setAmount(0);
-                player.sendMessage(ChatColorConverter.convert(ItemSettingsConfig.getLowArmorDurabilityItemDropMessage()));
-            }
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPlayerShoot(EntityShootBowEvent event){
+        if (!EliteItemManager.isEliteMobsItem(event.getBow())) return;
+        if (isOnLastDamage(event.getBow())) event.setCancelled(true);
     }
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    public void onPlayerDamage(EntityDamageByEntityEvent event) {
-        LivingEntity livingEntity = EntityFinder.filterRangedDamagers(event.getDamager());
-        if (livingEntity == null) return;
-        if (!livingEntity.getType().equals(EntityType.PLAYER)) return;
-        Player player = (Player) livingEntity;
-        ItemStack itemStack = player.getInventory().getItemInMainHand();
-        if (isOnLastDamage(itemStack)) {
-            player.getWorld().dropItem(player.getLocation(), itemStack.clone());
-            itemStack.setAmount(0);
-            player.sendMessage(ChatColorConverter.convert(ItemSettingsConfig.getLowWeaponDurabilityItemDropMessage()));
-            event.setCancelled(true);
-        }
-    }
 }

@@ -1,7 +1,9 @@
 package com.magmaguy.elitemobs.playerdata;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
+import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.instanced.dungeons.DungeonInstance;
 import com.magmaguy.elitemobs.items.ItemTagger;
@@ -13,6 +15,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
 
 import java.util.ArrayList;
 
@@ -53,6 +56,14 @@ public class PlayerItem {
         fullUpdate(itemStack);
     }
 
+    private boolean isOnLastDamage(ItemStack itemStack) {
+        if (!itemStack.hasItemMeta()) return false;
+        if (!ItemTagger.isEliteItem(itemStack)) return false;
+        if (!(itemStack.getItemMeta() instanceof Damageable)) return false;
+        if (itemStack.getType().getMaxDurability() == 0) return false;
+        return ((Damageable) itemStack.getItemMeta()).getDamage() + 1 >= itemStack.getType().getMaxDurability();
+    }
+
     private boolean fullUpdate(ItemStack itemStack) {
 
         //case when both are null
@@ -62,6 +73,12 @@ public class PlayerItem {
         //case when it became null
         if (itemStack == null)
             return fillNullItem();
+
+        if (isOnLastDamage(itemStack)) {
+            player.sendMessage(ChatColorConverter.convert(ItemSettingsConfig.getNoItemDurabilityMessage().replace(
+                    "$item", !itemStack.getItemMeta().hasDisplayName() ? itemStack.getType().toString() : itemStack.getItemMeta().getDisplayName())));
+            return fillNullItem();
+        }
 
 //        //case when it's the same item as before - best performance todo: causes issues with the prestige system
 //        if (itemStack.isSimilar(this.itemStack))
