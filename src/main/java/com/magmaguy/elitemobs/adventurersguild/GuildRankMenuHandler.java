@@ -279,14 +279,14 @@ public class GuildRankMenuHandler implements Listener {
 
     private static String critBonusString(int prestigeLevel, int guildRank) {
         if (!AdventurersGuildConfig.isAddMaxHealth()) return null;
-        if (prestigeLevel < 3)
+        if (prestigeLevel < 2)
             return null;
         return GuildRankMenuConfig.getCritBonusMessage().replace("$amount", GuildRank.critBonusValue(prestigeLevel, guildRank) + "");
     }
 
     private static String dodgeBonusString(int prestigeLevel, int guildRank) {
         if (!AdventurersGuildConfig.isAddMaxHealth()) return null;
-        if (prestigeLevel < 4)
+        if (prestigeLevel < 3)
             return null;
         return GuildRankMenuConfig.getDodgeBonusMessage().replace("$amount", GuildRank.dodgeBonusValue(prestigeLevel, guildRank) + "");
     }

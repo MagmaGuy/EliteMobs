@@ -13,7 +13,7 @@ public class DebugBlockLocation {
                 location.getBlock().getY() + .5,
                 location.getBlock().getZ() + .5,
                 1,
-                Bukkit.createBlockData(Material.LIGHT));
+                Bukkit.createBlockData(Material.BARRIER));
     }
 
 }

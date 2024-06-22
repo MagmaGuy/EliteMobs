@@ -4,13 +4,13 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
-import com.magmaguy.elitemobs.utils.VisualArmorStand;
+import com.magmaguy.elitemobs.utils.VisualDisplay;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.TextDisplay;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -21,9 +21,9 @@ public class InstanceDeathLocation {
     @Getter
     private Player deadPlayer;
     private Location deathLocation = null;
-    private ArmorStand nameTag;
-    private ArmorStand livesLeft;
-    private ArmorStand instructions;
+    private TextDisplay nameTag;
+    private TextDisplay livesLeft;
+    private TextDisplay instructions;
 
 
     protected InstanceDeathLocation(Player player, MatchInstance matchInstance) {
@@ -33,9 +33,9 @@ public class InstanceDeathLocation {
         this.deadPlayer = player;
         this.bannerBlock = player.getLocation().getBlock();
         findBannerLocation(player.getLocation());
-        instructions = VisualArmorStand.VisualArmorStand(deathLocation.clone().add(new Vector(0, 2.2, 0)), ChatColorConverter.convert("&2Punch to rez!"));
-        nameTag = VisualArmorStand.VisualArmorStand(deathLocation.clone().add(new Vector(0, 2, 0)), player.getDisplayName());
-        livesLeft = VisualArmorStand.VisualArmorStand(deathLocation.clone().add(new Vector(0, 1.8, 0)), matchInstance.playerLives.get(deadPlayer) + " lives left!");
+        instructions = VisualDisplay.generateTemporaryTextDisplay(deathLocation.clone().add(new Vector(0, 2.2, 0)), ChatColorConverter.convert("&2Punch to rez!"));
+        nameTag = VisualDisplay.generateTemporaryTextDisplay(deathLocation.clone().add(new Vector(0, 2, 0)), player.getDisplayName());
+        livesLeft = VisualDisplay.generateTemporaryTextDisplay(deathLocation.clone().add(new Vector(0, 1.8, 0)), matchInstance.playerLives.get(deadPlayer) + " lives left!");
         if (deathLocation != null)
             matchInstance.deathBanners.put(bannerBlock, this);
 
