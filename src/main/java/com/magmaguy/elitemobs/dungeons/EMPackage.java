@@ -37,6 +37,11 @@ public class EMPackage {
     protected List<TreasureChest> treasureChestList = new ArrayList<>();
     protected List<NPCEntity> npcEntities = new ArrayList<>();
 
+    public boolean isOutOfDate() {
+        if (!isInstalled) return false;
+        return outOfDate;
+    }
+
     public EMPackage(DungeonPackagerConfigFields dungeonPackagerConfigFields) {
         this.dungeonPackagerConfigFields = dungeonPackagerConfigFields;
         emPackages.put(dungeonPackagerConfigFields.getFilename(), this);

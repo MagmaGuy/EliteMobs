@@ -8,13 +8,13 @@ import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.config.enchantments.premade.SoulbindConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.items.EliteItemLore;
-import com.magmaguy.elitemobs.utils.VisualArmorStand;
+import com.magmaguy.elitemobs.utils.VisualDisplay;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
-import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.TextDisplay;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -64,7 +64,7 @@ public class SoulbindEnchantment extends CustomEnchantment {
             public void run() {
                 if (item == null)
                     return;
-                ArmorStand soulboundPlayer = VisualArmorStand.VisualArmorStand(item.getLocation().clone().add(new Vector(0, -50, 0)), ChatColorConverter.convert(
+                TextDisplay soulboundPlayer = VisualDisplay.generateTemporaryTextDisplay(item.getLocation().clone().add(new Vector(0, -50, 0)), ChatColorConverter.convert(
                         SoulbindConfig.hologramStrings.replace("$player", player.getDisplayName())));
                 new BukkitRunnable() {
                     final Location lastLocation = item.getLocation().clone();

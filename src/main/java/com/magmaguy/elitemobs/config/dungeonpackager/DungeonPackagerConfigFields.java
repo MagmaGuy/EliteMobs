@@ -199,6 +199,40 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
         defaultDungeon = true;
     }
 
+    //For the adventurer's guild hub
+    public DungeonPackagerConfigFields(String filename,
+                                       boolean isEnabled,
+                                       String name,
+                                       List<String> customInfo,
+                                       String downloadLink,
+                                       String worldName,
+                                       World.Environment environment,
+                                       Boolean protect,
+                                       String teleportLocationString,
+                                       int dungeonVersion,
+                                       String playerInfo,
+                                       String regionEnterMessage,
+                                       String regionLeaveMessage,
+                                       String dungeonConfigFolderName,
+                                       boolean allowExplosions) {
+        super(filename, isEnabled);
+        this.contentType = ContentType.HUB;
+        this.name = name;
+        this.customInfo = customInfo;
+        this.downloadLink = downloadLink;
+        this.worldName = worldName;
+        this.environment = environment;
+        this.protect = protect;
+        this.teleportLocationString = teleportLocationString;
+        this.dungeonVersion = dungeonVersion;
+        this.playerInfo = playerInfo;
+        this.regionEnterMessage = regionEnterMessage;
+        this.regionLeaveMessage = regionLeaveMessage;
+        this.dungeonConfigFolderName = dungeonConfigFolderName;
+        this.allowExplosions = allowExplosions;
+        defaultDungeon = true;
+    }
+
     @Override
     public void processConfigFields() {
         this.isEnabled = processBoolean("isEnabled", isEnabled, false, true);

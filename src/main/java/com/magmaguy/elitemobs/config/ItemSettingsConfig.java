@@ -98,9 +98,7 @@ public class ItemSettingsConfig {
     @Getter
     private static boolean preventEliteItemsFromBreaking;
     @Getter
-    private static String lowArmorDurabilityItemDropMessage;
-    @Getter
-    private static String lowWeaponDurabilityItemDropMessage;
+    private static String noItemDurabilityMessage;
     @Getter
     private static int minimumProcedurallyGeneratedDiamondLootLevelPlusSeven;
     @Getter
@@ -310,12 +308,9 @@ public class ItemSettingsConfig {
                 List.of("Sets if EliteMobs will prevent Elite Items from breaking when using the durability loss on death system.",
                         "Players will not be able to use items with no durability left anyway, this is simply to prevent the accidental loss of high level but low durability items."),
                 fileConfiguration, "preventEliteItemsFromBreaking", true);
-        lowArmorDurabilityItemDropMessage = ConfigurationEngine.setString(
-                List.of("Sets the message that will be sent to players if the durability left on an item is too low to be used in combat."),
-                file, fileConfiguration, "lowDurabilityItemDropMessage", "&8[EliteMobs] &cDropped armor due to low durability! &8Repair it at the NPC with scrap to use it!", true);
-        lowWeaponDurabilityItemDropMessage = ConfigurationEngine.setString(
+        noItemDurabilityMessage = ConfigurationEngine.setString(
                 List.of("Sets the characters prefixed to vanilla enchantments in item lore."),
-                file, fileConfiguration, "lowWeaponItemDropMessage", "&8[EliteMobs] &cDropped weapon due to low durability! &8Repair it at the NPC with scrap to use it!", true);
+                file, fileConfiguration, "noItemDurabilityMessage", "&8[EliteMobs] $item &4is broken! It won't work until repaired!", true);
         minimumProcedurallyGeneratedDiamondLootLevelPlusSeven = ConfigurationEngine.setInt(
                 List.of("Sets the minimum level, +7, of bosses that can procedurally generated drop diamond gear in EliteMobs.",
                         "There is no procedurally generated netherite gear in EliteMobs, only custom loot."),
