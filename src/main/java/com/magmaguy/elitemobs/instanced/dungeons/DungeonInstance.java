@@ -200,7 +200,7 @@ public class DungeonInstance extends MatchInstance {
             return;
         }
         announce(DungeonsConfig.getInstancedDungeonCompleteMessage());
-        announce("MagmaGuy's note: This is still a work in progress, please be patient! Hope you enjoyed your run.");
+//        announce("MagmaGuy's note: This is still a work in progress, please be patient! Hope you enjoyed your run.");
         new BukkitRunnable() {
 
             @Override

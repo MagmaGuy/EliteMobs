@@ -4,6 +4,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 
 public class DungeonProtector implements Listener {
@@ -92,5 +93,11 @@ public class DungeonProtector implements Listener {
         event.setCancelled(true);
     }
 
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventVanillaMobSpawning(CreatureSpawnEvent event){
+        if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.CUSTOM)) return;
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getLocation().getWorld().getUID())) return;
+        event.setCancelled(true);
+    }
 
 }

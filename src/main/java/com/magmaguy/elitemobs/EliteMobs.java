@@ -6,7 +6,6 @@ package com.magmaguy.elitemobs;
 
 import com.magmaguy.easyminecraftgoals.NMSManager;
 import com.magmaguy.elitemobs.commands.CommandHandler;
-import com.magmaguy.elitemobs.commands.guild.AdventurersGuildCommand;
 import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.config.commands.CommandsConfig;
 import com.magmaguy.elitemobs.config.customarenas.CustomArenasConfig;
@@ -60,7 +59,6 @@ import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.ServerTime;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
-import com.magmaguy.elitemobs.worlds.CustomWorldLoading;
 import com.magmaguy.elitemobs.wormhole.Wormhole;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
@@ -84,7 +82,6 @@ public class EliteMobs extends JavaPlugin {
     public static void initializeConfigs() {
         //Initialized translations
         DefaultConfig.initializeConfig();
-        SchematicsFolderConfig.initializeConfigs();
         ResourcePackDataConfig.initializeConfig();
         ItemSettingsConfig.initializeConfig();
         ProceduralItemGenerationSettingsConfig.initializeConfig();
@@ -230,17 +227,6 @@ public class EliteMobs extends JavaPlugin {
 
         //Initialize em package content, such as world loading
         new DungeonPackagerConfig();
-        //Load Adventurer's Guild
-        if (AdventurersGuildConfig.isGuildWorldIsEnabled()) {
-            try {
-                CustomWorldLoading.startupWorldInitialization();
-                AdventurersGuildCommand.defineTeleportLocation();
-                if (AdventurersGuildConfig.getGuildWorldLocation() == null) AdventurersGuildConfig.toggleGuildInstall();
-            } catch (Exception e) {
-                AdventurersGuildConfig.toggleGuildInstall();
-                new WarningMessage("Failed to initialize the Adventurer's Guild Hub! It is now disabled. You can try to" + "reenable it in /em setup");
-            }
-        }
 
         //Initialize custom & regional bosses
         new CustomBossesConfig();

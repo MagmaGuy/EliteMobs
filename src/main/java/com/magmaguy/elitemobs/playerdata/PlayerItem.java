@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.playerdata;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
@@ -9,8 +10,6 @@ import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.customenchantments.*;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffect;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
-import com.magmaguy.elitemobs.utils.BossBarUtil;
-import com.magmaguy.magmacore.util.ChatColorConverter;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
@@ -41,8 +40,6 @@ public class PlayerItem {
     private double eliteDamage = 0;
     private double blastProtection = 0;
     private double loudStrikesBonus = 0;
-
-    private boolean displayingAsBroken = false;
 
     /**
      * Stores an instance of the custom EliteMobs values of what a player is wearing. This is used to reduce the amount
@@ -78,18 +75,9 @@ public class PlayerItem {
             return fillNullItem();
 
         if (isOnLastDamage(itemStack)) {
-            if (!displayingAsBroken) {
-                BossBarUtil.DisplayBrokenItemBossBar(equipmentSlot, player, ChatColorConverter.convert(ItemSettingsConfig.getNoItemDurabilityMessage().replace("$item", !itemStack.getItemMeta().hasDisplayName() ? itemStack.getType().toString() : itemStack.getItemMeta().getDisplayName())));
-                displayingAsBroken = true;
-            }
-//            player.sendMessage(ChatColorConverter.convert(ItemSettingsConfig.getNoItemDurabilityMessage().replace(
-//                    "$item", !itemStack.getItemMeta().hasDisplayName() ? itemStack.getType().toString() : itemStack.getItemMeta().getDisplayName())));
+            player.sendMessage(ChatColorConverter.convert(ItemSettingsConfig.getNoItemDurabilityMessage().replace(
+                    "$item", !itemStack.getItemMeta().hasDisplayName() ? itemStack.getType().toString() : itemStack.getItemMeta().getDisplayName())));
             return fillNullItem();
-        }
-
-        if (displayingAsBroken) {
-            BossBarUtil.HideBrokenItemBossBar(equipmentSlot, player);
-            displayingAsBroken = false;
         }
 
 //        //case when it's the same item as before - best performance todo: causes issues with the prestige system
