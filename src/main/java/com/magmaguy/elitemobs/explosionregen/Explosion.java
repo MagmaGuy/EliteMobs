@@ -17,6 +17,7 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.*;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -319,7 +320,9 @@ public class Explosion {
     public static class ExplosionEvent implements Listener {
         @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
         public void entityExplodeEvent(EntityExplodeEvent event) {
-            EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(event.getEntity());
+            Entity entity = event.getEntity();
+            if (entity instanceof  Projectile projectile && projectile.getShooter() instanceof LivingEntity shooter) entity = shooter;
+            EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(entity);
             if (eliteEntity != null) {
                 generateExplosion(event);
                 return;
