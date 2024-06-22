@@ -2,10 +2,10 @@ package com.magmaguy.elitemobs.npcs.chatter;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
-import com.magmaguy.elitemobs.utils.VisualArmorStand;
+import com.magmaguy.elitemobs.utils.VisualDisplay;
 import org.bukkit.Location;
-import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.TextDisplay;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -30,9 +30,9 @@ public class NPCChatBubble {
 
             Location newLocation = npcEntity.getVillager().getEyeLocation().clone()
                     .add(player.getLocation().clone().subtract(npcEntity.getVillager().getLocation()).toVector().normalize().multiply(0.5))
-                    .add(new Vector(0, -0.8 - (0.2 * lineCounter), 0));
+                    .add(new Vector(0, -0.4 - (0.2 * lineCounter), 0));
 
-            ArmorStand visualArmorStand = VisualArmorStand.VisualArmorStand(newLocation, substring);
+            TextDisplay visualArmorStand = VisualDisplay.generateTemporaryTextDisplay(newLocation, substring);
 
             new BukkitRunnable() {
                 int counter = 0;

@@ -85,4 +85,5 @@ public class WorldPackage extends EMPackage {
         world = null;
         return true;
     }
+
 }

@@ -1,10 +1,7 @@
 package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
-import com.magmaguy.elitemobs.commands.guild.AdventurersGuildCommand;
 import lombok.Getter;
-import lombok.Setter;
-import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
@@ -23,15 +20,6 @@ public class AdventurersGuildConfig {
     private static boolean addCrit;
     @Getter
     private static boolean addDodge;
-    @Getter
-    private static boolean guildWorldIsEnabled;
-    @Getter
-    private static String guildWorldName;
-    @Getter
-    private static String guildLocationString;
-    @Getter
-    @Setter
-    private static Location guildWorldLocation;
     @Getter
     private static boolean agTeleport;
     @Getter
@@ -85,12 +73,6 @@ public class AdventurersGuildConfig {
     private AdventurersGuildConfig() {
     }
 
-    public static void toggleGuildInstall() {
-        guildWorldIsEnabled = !guildWorldIsEnabled;
-        fileConfiguration.set("guildHubIsEnabledv2", guildWorldIsEnabled);
-        save();
-    }
-
     public static void save() {
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }
@@ -107,18 +89,6 @@ public class AdventurersGuildConfig {
         addDodge = ConfigurationEngine.setBoolean(
                 List.of("Sets if EliteMobs will add dodge chance when unlocking guild ranks as a prestige reward"),
                 fileConfiguration, "Add dodge chance when unlocking higher guild ranks", true);
-        guildWorldIsEnabled = ConfigurationEngine.setBoolean(
-                List.of("Sets if the adventurer's guild hub is enabled. Don't set this manually! It is meant to be installed through the '/em setup' command"),
-                fileConfiguration, "guildHubIsEnabledv2", false);
-        guildWorldName = ConfigurationEngine.setString(
-                List.of("Sets the adventurer's guild world name. Do NOT change this to the name of your main world.",
-                        "Only change this if you have created your own custom dedicated guild hub world that is meant for nothing else than to be a guild hub.",
-                        "Most normal interaction are disabled in the guild hub world!"),
-                file, fileConfiguration, "Adventurer's Guild world name v3", "em_adventurers_guild", false);
-        guildLocationString = ConfigurationEngine.setString(
-                List.of("Sets the spawn coordinates for the adventurer's guild world.")
-                , file, fileConfiguration, "Guild world coordinates", "208.5,88,236.5,-80,0", false);
-        guildWorldLocation = null;
         agTeleport = ConfigurationEngine.setBoolean(
                 List.of("Sets if user commands get rerouted to the adventurer's guild hub. This is highly recommended for gameplay immersion and tutorial purposes."),
                 fileConfiguration, "userCommandsTeleportToAdventurersGuild", true);
@@ -443,9 +413,6 @@ public class AdventurersGuildConfig {
                 List.of("Sets subtitle sent to players when someone unlocks a prestige rank.",
                         "$tier is a placeholder that gets replaced with the player's prestige level."),
                 file, fileConfiguration, "prestigeUnlockMessageSubtitle", "&2has unlocked $tier&2!", true);
-
-        //initializes the AG location
-        AdventurersGuildCommand.defineTeleportLocation();
 
         peacefulModeEliteChanceDecrease = ConfigurationEngine.setDouble(
                 List.of("Sets the multiplier that will be applied to the spawn chance when players are using the peaceful (commoner) rank."),

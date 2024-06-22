@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.announcements.AnnouncementPriority;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.ValidWorldsConfig;
 import com.magmaguy.elitemobs.config.customevents.CustomEventsConfigFields;
+import com.magmaguy.elitemobs.dungeons.EliteMobsWorld;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
@@ -57,6 +58,8 @@ public abstract class CustomEvent {
 
     public static boolean isLocationValid(Location location) {
         if (!ValidWorldsConfig.getValidWorlds().contains(Objects.requireNonNull(location.getWorld()).getName()))
+            return false;
+        if (EliteMobsWorld.isEliteMobsWorld(location.getWorld().getUID()))
             return false;
         return !(EliteMobs.worldGuardIsEnabled &&
                 !WorldGuardFlagChecker.checkFlag(location, WorldGuardCompatibility.getELITEMOBS_EVENTS()));
