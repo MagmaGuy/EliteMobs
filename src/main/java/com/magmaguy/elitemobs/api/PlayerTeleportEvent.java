@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.api;
 
-import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
 import com.magmaguy.elitemobs.dungeons.WorldPackage;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
@@ -75,9 +74,12 @@ public class PlayerTeleportEvent extends Event implements Cancellable {
                     ((WorldPackage) emPackage).getWorld() == destination.getWorld())
                 return;
 
-        if (AdventurersGuildConfig.getGuildWorldLocation() != null &&
-                Objects.equals(AdventurersGuildConfig.getGuildWorldLocation().getWorld(), originalLocation.getWorld()))
+        EMPackage adventurersGuildPackage = EMPackage.getContent("adventurers_guild_hub");
+        if (adventurersGuildPackage == null || !adventurersGuildPackage.isInstalled() ||
+                adventurersGuildPackage.getDungeonPackagerConfigFields().getTeleportLocation() == null ||
+                Objects.equals(adventurersGuildPackage.getDungeonPackagerConfigFields().getTeleportLocation().getWorld(), originalLocation.getWorld()))
             return;
+
         PlayerData.setBackTeleportLocation(player, originalLocation);
     }
 

@@ -9,7 +9,7 @@ import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import com.magmaguy.elitemobs.powers.meta.MinorPower;
-import com.magmaguy.elitemobs.utils.VisualArmorStand;
+import com.magmaguy.elitemobs.utils.VisualDisplay;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -189,7 +189,7 @@ public class ShieldWall extends MinorPower {
     private List<ArmorStand> armorStandCreator(Direction direction, EliteEntity eliteEntity) {
         List<ArmorStand> armorStands = new ArrayList<>();
         for (int i = -1; i < 2; i++) {
-            ArmorStand armorStand = VisualArmorStand.VisualArmorStand(getRealLocation(direction, eliteEntity.getLivingEntity().getLocation(), i), "Barrier");
+            ArmorStand armorStand = VisualDisplay.generateTemporaryArmorStand(getRealLocation(direction, eliteEntity.getLivingEntity().getLocation(), i), "Barrier");
             armorStands.add(armorStand);
             armorStand.getEquipment().setItemInMainHand(new ItemStack(Material.SHIELD));
             armorStand.addEquipmentLock(EquipmentSlot.HAND, ArmorStand.LockType.REMOVING_OR_CHANGING);

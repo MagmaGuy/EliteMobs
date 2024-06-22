@@ -108,7 +108,7 @@ public class ConfigurationImporter {
                                 new WarningMessage("You need FreeMinecraftModels or ModelEngine (ModelEngine R3 specifically, R4+ won't work) to use custom models!");
                             break;
                         case "schematics":
-                            moveDirectory(file, Paths.get(configurationsPath.normalize() + "" + File.separatorChar + "schematics"), false);
+                            new WarningMessage("You just tried to import legacy content! Schematic dungeons no longer exist as of EliteMobs 9.0, use BetterStructures shrines instead!");
                             break;
                         default:
                             new WarningMessage("Directory " + file.getName() + " for zipped file " + zippedFile.getName() + " was not a recognized directory for the file import system! Was the zipped file packaged correctly?");

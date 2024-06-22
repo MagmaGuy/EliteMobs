@@ -9,14 +9,14 @@ import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.DynamicQuest;
 import com.magmaguy.elitemobs.quests.Quest;
-import com.magmaguy.elitemobs.utils.VisualArmorStand;
+import com.magmaguy.elitemobs.utils.VisualDisplay;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.TextDisplay;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -138,7 +138,7 @@ public class NPCProximitySensor implements Listener {
         Location newLocation = npcEntity.getVillager().getEyeLocation().clone()
                 .add(player.getLocation().clone().subtract(npcEntity.getVillager().getLocation()).toVector().normalize().multiply(0.5))
                 .add(new Vector(0, -0.1, 0));
-        ArmorStand visualArmorStand = VisualArmorStand.VisualArmorStand(newLocation, messageUp);
+        TextDisplay visualArmorStand = VisualDisplay.generateTemporaryTextDisplay(newLocation, messageUp);
         AtomicInteger counter = new AtomicInteger();
         AtomicBoolean up = new AtomicBoolean(true);
         Bukkit.getScheduler().runTaskTimer(MetadataHandler.PLUGIN, task -> {

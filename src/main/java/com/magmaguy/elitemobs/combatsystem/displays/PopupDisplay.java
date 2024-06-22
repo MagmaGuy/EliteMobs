@@ -11,13 +11,14 @@ import com.magmaguy.elitemobs.items.customenchantments.CriticalStrikesEnchantmen
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.utils.DialogArmorStand;
 import com.magmaguy.elitemobs.utils.Round;
-import com.magmaguy.elitemobs.utils.VisualArmorStand;
+import com.magmaguy.elitemobs.utils.VisualDisplay;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.TextDisplay;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -89,7 +90,7 @@ public class PopupDisplay implements Listener {
         if (!eliteEntity.isValid() || !player.isValid() || !eliteEntity.getLocation().getWorld().equals(player.getWorld()))
             return;
 
-        ArmorStand armorStand = VisualArmorStand.VisualArmorStand(getResistLocation(player, eliteEntity), "Resist");
+        ArmorStand armorStand = VisualDisplay.generateTemporaryArmorStand(getResistLocation(player, eliteEntity), "Resist");
         armorStand.getEquipment().setItemInMainHand(new ItemStack(material));
         armorStand.addEquipmentLock(EquipmentSlot.HAND, ArmorStand.LockType.REMOVING_OR_CHANGING);
         armorStand.setRightArmPose(new EulerAngle(Math.PI / 2d, Math.PI + Math.PI / 2d, Math.PI));
@@ -125,9 +126,9 @@ public class PopupDisplay implements Listener {
         if (!eliteEntity.isValid() || !player.isValid() || !eliteEntity.getLocation().getWorld().equals(player.getWorld()))
             return;
 
-        ArmorStand[] armorStands = new ArmorStand[2];
-        armorStands[0] = generateWeakArmorStand(player, eliteEntity, material, -1);
-        armorStands[1] = generateWeakArmorStand(player, eliteEntity, material, 1);
+        TextDisplay[] textDisplays = new TextDisplay[2];
+        textDisplays[0] = generateWeakArmorStand(player, eliteEntity, material, -1);
+        textDisplays[1] = generateWeakArmorStand(player, eliteEntity, material, 1);
 
         new BukkitRunnable() {
             int counter = 0;
@@ -135,12 +136,12 @@ public class PopupDisplay implements Listener {
             @Override
             public void run() {
                 if (counter > 10 || !eliteEntity.isValid() || !player.isValid() || !eliteEntity.getLocation().getWorld().equals(player.getWorld())) {
-                    EntityTracker.unregister(armorStands[0], RemovalReason.EFFECT_TIMEOUT);
-                    EntityTracker.unregister(armorStands[1], RemovalReason.EFFECT_TIMEOUT);
+                    EntityTracker.unregister(textDisplays[0], RemovalReason.EFFECT_TIMEOUT);
+                    EntityTracker.unregister(textDisplays[1], RemovalReason.EFFECT_TIMEOUT);
                     cancel();
                     return;
                 }
-                for (ArmorStand armorStand : armorStands)
+                for (TextDisplay armorStand : textDisplays)
                     armorStand.teleport(armorStand.getLocation().add(eliteEntity.getLocation().add(new Vector(0, 0, 0))
                             .subtract(armorStand.getLocation()).toVector().normalize().multiply(.4)));
                 counter++;
@@ -148,15 +149,11 @@ public class PopupDisplay implements Listener {
         }.runTaskTimer(MetadataHandler.PLUGIN, 1, 1);
     }
 
-    private ArmorStand generateWeakArmorStand(Player player, EliteEntity eliteEntity, Material material, int offset) {
+    private TextDisplay generateWeakArmorStand(Player player, EliteEntity eliteEntity, Material material, int offset) {
         Vector armorsStandVector = player.getLocation().clone().add(new Vector(0, 2, 0)).subtract(eliteEntity.getLocation()).toVector().normalize().multiply(3.0).rotateAroundY(Math.PI / 8 * offset);
         Location armorStandLocation = eliteEntity.getLocation().add(armorsStandVector);
         armorStandLocation.setDirection(armorsStandVector.multiply(-1));
-        ArmorStand armorStand = VisualArmorStand.VisualArmorStand(armorStandLocation, "Weak");
-        armorStand.getEquipment().setHelmet(new ItemStack(material));
-        armorStand.addEquipmentLock(EquipmentSlot.HAND, ArmorStand.LockType.REMOVING_OR_CHANGING);
-        armorStand.setHeadPose(new EulerAngle(-Math.PI - Math.PI / 4D, Math.PI / 4D, 0));
-        return armorStand;
+        return VisualDisplay.generateTemporaryTextDisplay(armorStandLocation, "Weak");
     }
 
 }
