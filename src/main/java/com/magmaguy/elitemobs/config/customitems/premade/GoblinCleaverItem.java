@@ -14,7 +14,7 @@ public class GoblinCleaverItem extends CustomItemsConfigFields {
                 Material.NETHERITE_AXE,
                 "&8Goblin Cleaver",
                 List.of("&8A treasure among goblins!"));
-        setEnchantments(Arrays.asList("SHARPNESS,1", "SMITE,1", "UNBREAKING,1", "KNOCKBACK,1", "LOOT_BONUS_MOBS,5"));
+        setEnchantments(Arrays.asList("SHARPNESS,1", "SMITE,1", "UNBREAKING,1", "KNOCKBACK,1", "LOOTING,5"));
         setPotionEffects(List.of("POISON,0,target,onHit"));
         setItemType(CustomItem.ItemType.UNIQUE);
     }

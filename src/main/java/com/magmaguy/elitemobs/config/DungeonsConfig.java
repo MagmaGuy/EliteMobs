@@ -26,6 +26,8 @@ public class DungeonsConfig {
     private static String instancedDungeonCompleteMessage;
     @Getter
     private static String instancedDungeonClosingInstanceMessage;
+    @Getter
+    private static boolean friendlyFireInDungeons;
 
     private DungeonsConfig() {
     }
@@ -71,6 +73,11 @@ public class DungeonsConfig {
                 List.of("Sets the message that appears when an instanced dungeon closing"),
                 file, fileConfiguration, "instancedDungeonClosingInstanceMessage", "[EliteMobs] Closing instance!",
                 true);
+
+        friendlyFireInDungeons = ConfigurationEngine.setBoolean(
+                List.of("Sets if PvP will be allowed in dungeons"),
+                fileConfiguration, "friendlyFireInDungeons", false
+        );
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }

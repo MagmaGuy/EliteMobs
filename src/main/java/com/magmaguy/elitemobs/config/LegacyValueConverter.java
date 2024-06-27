@@ -8,7 +8,7 @@ public class LegacyValueConverter {
 
     public static String parseEnchantment(String materialName) {
         switch (materialName.toUpperCase(Locale.ROOT)) {
-            case "POWER":
+            case "ARROW_DAMAGE":
                 return "POWER";
             case "ARROW_FIRE":
                 return "FLAME";
@@ -16,15 +16,15 @@ public class LegacyValueConverter {
                 return "INFINITY";
             case "ARROW_KNOCKBACK":
                 return "PUNCH";
-            case "BANE_OF_ARTHROPODS":
+            case "DAMAGE_ARTHROPODS":
                 return "BANE_OF_ARTHROPODS";
-            case "SMITE":
+            case "DAMAGE_UNDEAD":
                 return "SMITE";
-            case "EFFICIENCY":
+            case "DIG_SPEED":
                 return "EFFICIENCY";
             case "DURABILITY":
                 return "UNBREAKING";
-            case "FORTUNE":
+            case "LOOT_BONUS_BLOCKS":
                 return "FORTUNE";
             case "LOOT_BONUS_MOBS":
                 return "LOOTING";
@@ -36,13 +36,13 @@ public class LegacyValueConverter {
                 return "PROTECTION";
             case "BLAST_PROTECTION":
                 return "BLAST_PROTECTION";
-            case "FEATHER_FALLING":
+            case "PROTECTION_FALL":
                 return "FEATHER_FALLING";
-            case "FIRE_PROTECTION":
+            case "PROTECTION_FIRE":
                 return "FIRE_PROTECTION";
-            case "PROJECTILE_PROTECTION":
+            case "PROTECTION_PROJECTILE":
                 return "PROJECTILE_PROTECTION";
-            case "AQUA_AFFINITY":
+            case "WATER_WORKER":
                 return "AQUA_AFFINITY";
             default:
                 return materialName;
