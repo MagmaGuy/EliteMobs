@@ -48,7 +48,13 @@ public class CustomBossTrail {
     }
 
     private void doParticleTrail(Particle particle) {
-        if (particle.equals(Particle.BLOCK_MARKER))
+        if (particle.equals(Particle.BLOCK_MARKER) ||
+                particle.equals(Particle.ENTITY_EFFECT) ||
+                particle.equals(Particle.DUST_PILLAR) ||
+                particle.equals(Particle.FALLING_DUST) ||
+                particle.equals(Particle.BLOCK) ||
+                particle.equals(Particle.ITEM) ||
+                particle.equals(Particle.DUST))
             return;
         bukkitTasks.add(new BukkitRunnable() {
             @Override
