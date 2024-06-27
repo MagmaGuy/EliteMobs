@@ -14,7 +14,7 @@ public class EnchantedBookArrowInfiniteConfig extends CustomItemsConfigFields {
                 Material.BOOK,
                 "&5Elite Infinity Enchanted Book",
                 new ArrayList<>(List.of("&2Used to enchant items at the enchanter!")));
-        setEnchantments(new ArrayList<>(List.of("ARROW_INFINITE,1", "ENCHANTED_SOURCE,1")));
+        setEnchantments(new ArrayList<>(List.of("INFINITY,1", "ENCHANTED_SOURCE,1")));
         setItemType(CustomItem.ItemType.UNIQUE);
         setScalability(CustomItem.Scalability.FIXED);
         setSoulbound(false);
