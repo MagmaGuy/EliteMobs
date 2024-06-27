@@ -14,7 +14,7 @@ public class GoblinShooterItem extends CustomItemsConfigFields {
                 Material.BOW,
                 "&8Goblin Shooter",
                 List.of("&8A treasure among goblins!"));
-        setEnchantments(Arrays.asList("POWER,1", "UNBREAKING,1", "ARROW_INFINITE,1", "ARROW_FIRE,1"));
+        setEnchantments(Arrays.asList("POWER,1", "UNBREAKING,1", "INFINITY,1", "FLAME,1"));
         setPotionEffects(List.of("SPEED,2,self,onHit"));
         setItemType(CustomItem.ItemType.UNIQUE);
     }

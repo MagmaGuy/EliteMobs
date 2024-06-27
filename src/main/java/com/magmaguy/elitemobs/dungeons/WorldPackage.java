@@ -41,6 +41,7 @@ public class WorldPackage extends EMPackage {
         if (Bukkit.getWorld(dungeonPackagerConfigFields.getWorldName()) != null) {
             this.isDownloaded = this.isInstalled = true;
             world = Bukkit.getWorld(dungeonPackagerConfigFields.getWorldName());
+            EliteMobsWorld.create(world.getUID(), dungeonPackagerConfigFields);
             dungeonPackagerConfigFields.initializeWorld();
             return;
         }
