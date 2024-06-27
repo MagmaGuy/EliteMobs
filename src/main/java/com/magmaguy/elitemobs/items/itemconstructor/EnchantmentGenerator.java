@@ -77,16 +77,16 @@ public class EnchantmentGenerator {
                 validEnchantments.putAll(validateEnchantments("UNBREAKING"));
                 validEnchantments.putAll(validateEnchantments("FIRE_ASPECT"));
                 validEnchantments.putAll(validateEnchantments("KNOCKBACK"));
-                validEnchantments.putAll(validateEnchantments("LOOT_BONUS_MOBS"));
+                validEnchantments.putAll(validateEnchantments("LOOTING"));
                 validEnchantments.putAll(validateEnchantments("MENDING"));
                 validEnchantments.putAll(validateEnchantments("SWEEPING_EDGE"));
                 validEnchantments.putAll(validateEnchantments("VANISHING_CURSE"));
                 break;
             case BOW:
                 validEnchantments.putAll(validateEnchantments("POWER"));
-                validEnchantments.putAll(validateEnchantments("ARROW_FIRE"));
-                validEnchantments.putAll(validateEnchantments("ARROW_INFINITE"));
-                validEnchantments.putAll(validateEnchantments("ARROW_KNOCKBACK"));
+                validEnchantments.putAll(validateEnchantments("FLAME"));
+                validEnchantments.putAll(validateEnchantments("INFINITY"));
+                validEnchantments.putAll(validateEnchantments("PUNCH"));
                 validEnchantments.putAll(validateEnchantments("UNBREAKING"));
                 validEnchantments.putAll(validateEnchantments("MENDING"));
                 validEnchantments.putAll(validateEnchantments("VANISHING_CURSE"));
@@ -237,7 +237,7 @@ public class EnchantmentGenerator {
                 validEnchantments.putAll(validateEnchantments("UNBREAKING"));
                 validEnchantments.putAll(validateEnchantments("VANISHING_CURSE"));
                 validEnchantments.putAll(validateEnchantments("MENDING"));
-                validEnchantments.putAll(validateEnchantments("LUCK"));
+                validEnchantments.putAll(validateEnchantments("LUCK_OF_THE_SEA"));
                 validEnchantments.putAll(validateEnchantments("LURE"));
                 break;
             case SHEARS:
