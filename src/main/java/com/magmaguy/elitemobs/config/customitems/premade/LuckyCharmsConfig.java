@@ -14,7 +14,7 @@ public class LuckyCharmsConfig extends CustomItemsConfigFields {
                 "&bLucky Charms",
                 Arrays.asList("&aPart of a complete breakfast!", "&cNote: Absolutely not a part of", "&ca complete breakfast."));
         setEnchantments(List.of("VANISHING_CURSE,1"));
-        setPotionEffects(List.of("LUCK,0,self,continuous"));
+        setPotionEffects(List.of("LUCK_OF_THE_SEA,0,self,continuous"));
         setDropWeight("1");
     }
 }

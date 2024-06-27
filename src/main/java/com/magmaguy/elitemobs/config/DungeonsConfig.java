@@ -1,11 +1,12 @@
 package com.magmaguy.elitemobs.config;
 
-import com.magmaguy.magmacore.config.ConfigurationFile;
 import lombok.Getter;
+import org.bukkit.configuration.file.FileConfiguration;
 
+import java.io.File;
 import java.util.List;
 
-public class DungeonsConfig extends ConfigurationFile {
+public class DungeonsConfig {
 
     @Getter
     private static String instancedDungeonTitle;
@@ -27,19 +28,13 @@ public class DungeonsConfig extends ConfigurationFile {
     private static String instancedDungeonClosingInstanceMessage;
     @Getter
     private static boolean friendlyFireInDungeons;
-    @Getter
-    private static double fireDamageMultiplier;
-    @Getter
-    private static double poisonDamageMultiplier;
-    @Getter
-    private static double witherDamageMultiplier;
 
-    public DungeonsConfig() {
-        super("dungeons.yml");
+    private DungeonsConfig() {
     }
 
-    @Override
-    public void initializeValues() {
+    public static void initializeConfig() {
+        File file = ConfigurationEngine.fileCreator("dungeons.yml");
+        FileConfiguration fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
 
         dungeonRezInstructions = ConfigurationEngine.setString(
                 List.of("Sets the text that appears over resurrection banners in dungeons"),
@@ -78,20 +73,13 @@ public class DungeonsConfig extends ConfigurationFile {
                 List.of("Sets the message that appears when an instanced dungeon closing"),
                 file, fileConfiguration, "instancedDungeonClosingInstanceMessage", "[EliteMobs] Closing instance!",
                 true);
+
         friendlyFireInDungeons = ConfigurationEngine.setBoolean(
                 List.of("Sets if PvP will be allowed in dungeons"),
-                fileConfiguration, "friendlyFireInDungeons", false);
-        fireDamageMultiplier = ConfigurationEngine.setDouble(
-                List.of("Sets the damage multiplier for fire damage in dungeons",
-                        "This is important for balance as by default the damage is a bit too high for the dungeons as we design them"),
-                fileConfiguration, "fireDamageMultiplier", 0.5);
-        witherDamageMultiplier = ConfigurationEngine.setDouble(
-                List.of("Sets the damage multiplier for wither damage in dungeons",
-                        "This is important for balance as by default the damage is a bit too high for the dungeons as we design them"),
-                fileConfiguration, "witherDamageMultiplier", 0.5);
-        poisonDamageMultiplier = ConfigurationEngine.setDouble(
-                List.of("Sets the damage multiplier for fire damage in dungeons",
-                        "This is important for balance as by default the damage is a bit too high for the dungeons as we design them"),
-                fileConfiguration, "poisonDamageMultiplier", 0.5);
+                fileConfiguration, "friendlyFireInDungeons", false
+        );
+
+        ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }
+
 }
