@@ -47,6 +47,11 @@ public class DungeonUtils {
     }
 
     public static World loadWorld(String worldName, World.Environment environment, DungeonPackagerConfigFields dungeonPackagerConfigFields) {
+        if (Bukkit.getWorld(worldName) != null) {
+            EliteMobsWorld.create(Bukkit.getWorld(worldName).getUID(), dungeonPackagerConfigFields);
+            return Bukkit.getWorld(worldName);
+        }
+
         File folder = new File(Bukkit.getWorldContainer().getAbsolutePath());
 
         if (!Files.exists(Paths.get(folder.getAbsolutePath() + File.separatorChar + worldName))) {
