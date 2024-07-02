@@ -9,6 +9,7 @@ import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.pathfinding.Navigation;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.powers.meta.CustomSummonPower;
 import com.magmaguy.elitemobs.powers.scripts.caching.ScriptActionBlueprint;
@@ -30,14 +31,13 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class ScriptAction {
 
+    @Getter
+    private static final HashSet<Player> invulnerablePlayers = new HashSet<>();
     @Getter
     private final ScriptActionBlueprint blueprint;
     private final ScriptTargets scriptTargets;
@@ -47,6 +47,10 @@ public class ScriptAction {
     private final Map<String, EliteScript> eliteScriptMap;
     private final EliteScript eliteScript;
     private ScriptTargets finalScriptTargets = null;
+
+    public static void shutdown(){
+        invulnerablePlayers.forEach(player -> player.setInvulnerable(false));
+    }
 
 
     public ScriptAction(ScriptActionBlueprint blueprint, Map<String, EliteScript> eliteScriptMap, EliteScript eliteScript) {
@@ -212,6 +216,7 @@ public class ScriptAction {
             case SPAWN_FALLING_BLOCK -> runSpawnFallingBlock(scriptActionData);
             case MODIFY_DAMAGE -> runModifyDamage(scriptActionData);
             case SUMMON_ENTITY -> runSummonEntity(scriptActionData);
+            case NAVIGATE -> runNavigate(scriptActionData);
             default ->
                     new WarningMessage("Failed to determine action type " + blueprint.getActionType() + " in script " + blueprint.getScriptName() + " for file " + blueprint.getScriptFilename());
         }
@@ -299,7 +304,10 @@ public class ScriptAction {
 
     //Applies a potion effect to the target living entity
     private void runPotionEffect(ScriptActionData scriptActionData) {
-        getTargets(scriptActionData).forEach(iteratedTarget -> iteratedTarget.addPotionEffect(new PotionEffect(blueprint.getPotionEffectType(), blueprint.getDuration(), blueprint.getAmplifier())));
+        getTargets(scriptActionData).forEach(iteratedTarget -> {
+            if (!(iteratedTarget.isValid())) return;
+            iteratedTarget.addPotionEffect(new PotionEffect(blueprint.getPotionEffectType(), blueprint.getDuration(), blueprint.getAmplifier()));
+        });
     }
 
     //Runs any scripts in the scripts field. Respects wait time and repeating tasks
@@ -518,6 +526,12 @@ public class ScriptAction {
     private void runMakeInvulnerable(ScriptActionData scriptActionData) {
         getTargets(scriptActionData).forEach(targetEntity -> {
             targetEntity.setInvulnerable(blueprint.isInvulnerable());
+            if (targetEntity instanceof Player player) {
+                if (blueprint.isInvulnerable())
+                    invulnerablePlayers.add(player);
+                else
+                    invulnerablePlayers.remove(player);
+            }
             if (blueprint.getDuration() > 0)
                 Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, () -> targetEntity.setInvulnerable(!blueprint.isInvulnerable()), blueprint.getDuration());
         });
@@ -660,6 +674,22 @@ public class ScriptAction {
                     }
                 }.runTaskTimer(MetadataHandler.PLUGIN, 1, 1);
             }
+        });
+    }
+
+    private void runNavigate(ScriptActionData scriptActionData) {
+        getTargets(scriptActionData).forEach(targetEntity -> {
+            EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(targetEntity);
+            if (!(eliteEntity instanceof CustomBossEntity customBossEntity)) return;
+
+            if (finalScriptTargets == null) {
+                new WarningMessage("Failed to get teleport destination for script " + blueprint.getScriptName() + " because there is no set FinalTarget!");
+                return;
+            }
+
+            List<Location> destinationLocations = new ArrayList<>(finalScriptTargets.getTargetLocations(scriptActionData));
+            if (destinationLocations.isEmpty()) return;
+            Navigation.navigateTo(customBossEntity, (double) blueprint.getVelocity(), destinationLocations.get(0), blueprint.getBValue(), blueprint.getDuration());
         });
     }
 }

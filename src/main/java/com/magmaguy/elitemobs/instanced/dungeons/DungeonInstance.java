@@ -14,6 +14,7 @@ import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.InstancedBossEntity;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
+import com.magmaguy.elitemobs.treasurechest.TreasureChest;
 import com.magmaguy.elitemobs.utils.*;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -72,6 +73,7 @@ public class DungeonInstance extends MatchInstance {
             public void run() {
                 instancedBossEntities = InstancedBossEntity.initializeInstancedBosses(dungeonPackagerConfigFields.getWorldName(), world, players.size(), dungeonInstance);
                 NPCEntity.initializeInstancedNPCs(dungeonPackagerConfigFields.getWorldName(), world, players.size(), dungeonInstance);
+                TreasureChest.initializeInstancedTreasureChests(dungeonPackagerConfigFields.getWorldName(), world);
             }
         }.runTaskLater(MetadataHandler.PLUGIN, 20 * 3L);
         dungeonInstances.add(this);

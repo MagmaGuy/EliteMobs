@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.mobconstructor.custombosses;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.BonusCoins;
 import com.magmaguy.elitemobs.powers.meta.CustomSummonPower;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
@@ -18,7 +19,7 @@ import java.util.Map;
 public class ElitePowerParser {
 
     public static HashSet<ElitePower> parsePowers(CustomBossesConfigFields customBossesConfigFields, CustomBossEntity customBossEntity) {
-        HashSet<ElitePower> elitePowers = new HashSet<>(EliteScript.generateBossScripts(customBossesConfigFields.getEliteScript()));
+        HashSet<ElitePower> elitePowers = new HashSet<>(EliteScript.generateBossScripts(customBossesConfigFields.getEliteScript(), customBossEntity));
         if (customBossesConfigFields.getPowers() == null) return elitePowers;
         CustomSummonPower customSummonPower = null;
         List<Object> powers = new ArrayList<>(customBossesConfigFields.getPowers());
@@ -35,7 +36,7 @@ public class ElitePowerParser {
                         customSummonPower.addEntry(powerName, customBossesConfigFields.getFilename());
                 else {
                     String[] parsedPowerName = powerName.split(":");
-                    ElitePower elitePower = addPower(parsedPowerName[0], elitePowers, customBossesConfigFields);
+                    ElitePower elitePower = addPower(parsedPowerName[0], elitePowers, customBossesConfigFields, customBossEntity);
                     if (elitePower == null) continue;
                     if (elitePower.getPowersConfigFields().getFilename().equals("bonus_coins.yml"))
                         if (parsedPowerName.length > 1)
@@ -86,7 +87,7 @@ public class ElitePowerParser {
                         if (powersConfigFields == null) {
                             new WarningMessage("Invalid power name " + string + " in file " + customBossesConfigFields.getFilename());
                         } else {
-                            addPower(string, elitePowers, customBossesConfigFields);
+                            addPower(string, elitePowers, customBossesConfigFields, customBossEntity);
                         }
                     } else
                         new WarningMessage("No valid power name in boss config " + customBossesConfigFields.getFilename());
@@ -96,11 +97,11 @@ public class ElitePowerParser {
         return elitePowers;
     }
 
-    private static ElitePower addPower(String powerName, HashSet<ElitePower> elitePowers, CustomBossesConfigFields customBossesConfigFields) {
+    private static ElitePower addPower(String powerName, HashSet<ElitePower> elitePowers, CustomBossesConfigFields customBossesConfigFields, EliteEntity eliteEntity) {
         PowersConfigFields powersConfigFields = PowersConfig.getPower(powerName);
         if (powersConfigFields != null) {
             if (!powersConfigFields.getEliteScriptBlueprints().isEmpty()) {
-                elitePowers.addAll(EliteScript.generateBossScripts(powersConfigFields.getEliteScriptBlueprints()));
+                elitePowers.addAll(EliteScript.generateBossScripts(powersConfigFields.getEliteScriptBlueprints(), eliteEntity));
                 return null;
             }
             ElitePower elitePower;

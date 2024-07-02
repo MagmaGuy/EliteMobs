@@ -81,6 +81,15 @@ public class ScriptActionData {
         this.inheritedScriptActionData = inheritedScriptActionData;
     }
 
+    //Used for the zone enter and leave, can't use direct targets
+    public ScriptActionData(EliteEntity eliteEntity, ScriptTargets scriptTargets, ScriptZone scriptZone) {
+        this.eliteEntity = eliteEntity;
+        this.scriptTargets = scriptTargets;
+        //This stores the cache shape
+        this.targetType = scriptTargets.getTargetBlueprint().getTargetType();
+        this.scriptZone = scriptZone;
+    }
+
     //For data with landing locations
     public ScriptActionData(ScriptTargets scriptTargets, ScriptZone scriptZone, ScriptActionData inheritedScriptActionData, Location landingLocation) {
         this.eliteEntity = inheritedScriptActionData.getEliteEntity();
