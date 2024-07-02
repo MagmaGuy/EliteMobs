@@ -8,6 +8,7 @@ import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.config.customspawns.CustomSpawnConfig;
 import com.magmaguy.elitemobs.config.customspawns.CustomSpawnConfigFields;
+import com.magmaguy.elitemobs.dungeons.EliteMobsWorld;
 import com.magmaguy.elitemobs.events.MoonPhaseDetector;
 import com.magmaguy.elitemobs.events.TimedEvent;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
@@ -115,7 +116,6 @@ public class CustomSpawn {
             }.runTaskAsynchronously(MetadataHandler.PLUGIN);
         else
             spawn();
-
     }
 
     private void spawn() {
@@ -129,7 +129,7 @@ public class CustomSpawn {
                     return;
                 }
                 //One last check
-                //Last line of defense - spawn a test mob. If some uknown protection system prevents spawning it should prevent this
+                //Last line of defense - spawn a test mob. If some unknown protection system prevents spawning it should prevent this
                 LivingEntity testEntity = spawnLocation.getWorld().spawn(spawnLocation, Zombie.class);
                 if (!testEntity.isValid()) {
                     spawnLocation = null;
@@ -165,13 +165,12 @@ public class CustomSpawn {
 
     private void generateCustomSpawn() {
         //If the global cooldown if enforced and this is a timed event wait for the cd to be over
-        /*
-        if (timedEvent != null && System.currentTimeMillis() < TimedEvent.getNextEventTrigger()) {
+
+        if (timedEvent != null && System.currentTimeMillis() < TimedEvent.getNextEventStartMinimum()) {
             Bukkit.getScheduler().scheduleAsyncDelayedTask(MetadataHandler.PLUGIN, this::generateCustomSpawn, 20 * 60L);
             return;
         }
 
-         */
 
         int maxTries = 100;
         int tries = 0;
@@ -240,6 +239,7 @@ public class CustomSpawn {
                 Location playerLocation = player.getLocation();
                 if (!ValidWorldsConfig.getValidWorlds().contains(playerLocation.getWorld().getName()))
                     continue;
+                if (timedEvent != null && EliteMobsWorld.isEliteMobsWorld(player.getWorld().getUID())) continue;
                 if (Boolean.FALSE.equals(playerLocation.getWorld().getGameRuleValue(GameRule.DO_MOB_SPAWNING)))
                     continue;
                 if (!customSpawnConfigFields.getValidWorlds().isEmpty())

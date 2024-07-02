@@ -48,6 +48,7 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
     @Getter
     @Setter
     private List<TransitiveBlock> onRemoveTransitiveBlocks;
+    @Getter
     private boolean removed = false;
     private BukkitTask respawnTask = null;
 

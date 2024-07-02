@@ -81,7 +81,7 @@ public class ElitePower {
                 new WarningMessage("Failed to assign power for config field " + configFields.getFilename());
             }
         else
-            eliteEntity.getElitePowers().addAll(EliteScript.generateBossScripts(configFields.getEliteScriptBlueprints()));
+            eliteEntity.getElitePowers().addAll(EliteScript.generateBossScripts(configFields.getEliteScriptBlueprints(), eliteEntity));
     }
 
     public static void initializePowers() {

@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.powers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
+import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
@@ -35,7 +36,7 @@ import static com.magmaguy.elitemobs.ChatColorConverter.convert;
 public class ZombieNecronomicon extends MajorPower implements Listener {
 
     private int chantIndex = 0;
-    //todo: Shouldn't this be static?
+    private ArrayList<CustomBossEntity> entityList = new ArrayList<>();
 
     public ZombieNecronomicon() {
         super(PowersConfig.getPower("zombie_necronomicon.yml"));
@@ -46,7 +47,8 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
         ZombieNecronomicon zombieNecronomicon = (ZombieNecronomicon) event.getEliteMobEntity().getPower(this);
         if (zombieNecronomicon == null) return;
         if (zombieNecronomicon.isFiring()) return;
-
+        zombieNecronomicon.entityList.removeIf(entity -> !entity.exists());
+        if (zombieNecronomicon.entityList.size() > 9) return;
         zombieNecronomicon.setFiring(true);
         necronomiconVisualEffect(event.getEliteMobEntity(), zombieNecronomicon);
         spawnReinforcements(event.getEliteMobEntity(), event.getPlayer(), zombieNecronomicon);
@@ -175,17 +177,15 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
 
         new BukkitRunnable() {
 
-            final ArrayList<Entity> entityList = new ArrayList<>();
-
             @Override
             public void run() {
 
                 if (!eliteEntity.isValid() || !targetted.isValid() || !targetter.isValid() || targetted.getWorld() != targetter.getWorld()
                         || targetted.getLocation().distance(targetter.getLocation()) > 30) {
 
-                    for (Entity entity : entityList)
+                    for (CustomBossEntity entity : entityList)
                         if (entity.isValid())
-                            entity.remove();
+                            entity.remove(RemovalReason.REINFORCEMENT_CULL);
 
                     if (eliteEntity.isValid())
                         targetter.setAI(true);
@@ -196,7 +196,7 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
 
                 int randomizedNumber = ThreadLocalRandom.current().nextInt(5) + 1;
 
-                entityList.removeIf(currentEntity -> !currentEntity.isValid());
+                entityList.removeIf(currentEntity -> !currentEntity.exists());
 
                 if (entityList.size() < 11) {
 
@@ -227,7 +227,7 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
 
                         eliteEntity.addReinforcement(customBossEntity);
 
-                        entityList.add(customBossEntity.getLivingEntity());
+                        entityList.add(customBossEntity);
 
                     } else {
 
@@ -251,7 +251,7 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
 
                         eliteEntity.addReinforcement(customBossEntity);
 
-                        entityList.add(customBossEntity.getLivingEntity());
+                        entityList.add(customBossEntity);
 
                     }
 

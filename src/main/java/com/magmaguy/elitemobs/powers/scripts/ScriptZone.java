@@ -1,18 +1,27 @@
 package com.magmaguy.elitemobs.powers.scripts;
 
+import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.api.ScriptZoneEnterEvent;
+import com.magmaguy.elitemobs.api.ScriptZoneLeaveEvent;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.InstancedBossEntity;
 import com.magmaguy.elitemobs.powers.scripts.caching.ScriptTargetsBlueprint;
 import com.magmaguy.elitemobs.powers.scripts.caching.ScriptZoneBlueprint;
 import com.magmaguy.elitemobs.powers.scripts.enums.TargetType;
+import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import com.magmaguy.elitemobs.utils.shapes.*;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,6 +35,10 @@ public class ScriptZone {
     private ScriptTargets finalTargets = null;
     private ScriptTargets targets2 = null;
     private ScriptTargets finalTargets2 = null;
+    @Setter
+    private boolean zoneListener = false;
+    //Used to do zone enter and leave events
+    private Collection<LivingEntity> entitiesInZone;
 
     public ScriptZone(ScriptZoneBlueprint zoneBlueprint, EliteScript eliteScript) {
         this.zoneBlueprint = zoneBlueprint;
@@ -38,9 +51,49 @@ public class ScriptZone {
         isValid = zoneBlueprint.getTarget() != null;
     }
 
+    //todo: urgent: at a scale this will cause problems because it does not unschedule the task when a custom boss gets unloaded. Should be cancelling correctly though
+    public void startZoneListener(EliteEntity eliteEntity) {
+        if (!zoneListener) return;
+        entitiesInZone = new HashSet<>();
+        ScriptActionData scriptActionData = new ScriptActionData(eliteEntity, targets, this);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (eliteEntity.getLivingEntity() == null || !eliteEntity.getLivingEntity().isValid()) {
+                    if (eliteEntity instanceof CustomBossEntity customBossEntity) {
+                        if (customBossEntity.getHealth() <= 0)
+                            cancel();
+                        if (customBossEntity instanceof InstancedBossEntity instancedBossEntity)
+                            if (instancedBossEntity.isRemoved())
+                                //todo: check if this covers all cases
+                                cancel();
+                    } else
+                        //If it's not a custom entity there's no scenario where it should be able to survive an unload here
+                        cancel();
+                    return;
+                }
+                Collection<LivingEntity> newEntities = getEntitiesInArea(generateShapes(scriptActionData, false), TargetType.ZONE_FULL);
+                newEntities.forEach(livingEntity -> {
+                    if (!entitiesInZone.contains(livingEntity)) ZoneEnterEvent(eliteEntity, livingEntity);
+                });
+                entitiesInZone.forEach(livingEntity -> {
+                    if (!newEntities.contains(livingEntity)) ZoneLeaveEvent(eliteEntity, livingEntity);
+                });
+                entitiesInZone = newEntities;
+            }
+        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
+    }
+
+    public void ZoneEnterEvent(EliteEntity eliteEntity, LivingEntity livingEntity) {
+        new EventCaller(new ScriptZoneEnterEvent(eliteEntity, livingEntity));
+    }
+
+    public void ZoneLeaveEvent(EliteEntity eliteEntity, LivingEntity livingEntity) {
+        new EventCaller(new ScriptZoneLeaveEvent(eliteEntity, livingEntity));
+    }
+
     //Get living entities in zone
-    protected Collection<LivingEntity>
-    getZoneEntities(ScriptActionData scriptActionData, ScriptTargetsBlueprint blueprintFromRequestingTarget) {
+    protected Collection<LivingEntity> getZoneEntities(ScriptActionData scriptActionData, ScriptTargetsBlueprint blueprintFromRequestingTarget) {
         //Get the entities from those zones
         switch (blueprintFromRequestingTarget.getTargetType()) {
             case ZONE_FULL, ZONE_BORDER:
