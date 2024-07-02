@@ -11,7 +11,7 @@ import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.powers.meta.MajorPower;
 import com.magmaguy.elitemobs.powerstances.GenericRotationMatrixMath;
 import com.magmaguy.elitemobs.powerstances.VisualItemInitializer;
-import com.magmaguy.magmacore.util.Logger;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static com.magmaguy.magmacore.util.ChatColorConverter.convert;
+import static com.magmaguy.elitemobs.ChatColorConverter.convert;
 
 /**
  * Created by MagmaGuy on 18/05/2017.
@@ -36,7 +36,7 @@ import static com.magmaguy.magmacore.util.ChatColorConverter.convert;
 public class ZombieNecronomicon extends MajorPower implements Listener {
 
     private int chantIndex = 0;
-    private final ArrayList<CustomBossEntity> entityList = new ArrayList<>();
+    private ArrayList<CustomBossEntity> entityList = new ArrayList<>();
 
     public ZombieNecronomicon() {
         super(PowersConfig.getPower("zombie_necronomicon.yml"));
@@ -209,7 +209,7 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
 
                         CustomBossEntity customBossEntity = CustomBossEntity.createCustomBossEntity("necronomicon_zombie.yml");
                         if (customBossEntity == null) {
-                            Logger.warn("necronomicon_zombie.yml is not valid!");
+                            new WarningMessage("necronomicon_zombie.yml is not valid!");
                             return;
                         }
                         customBossEntity.spawn(targetter.getLocation(), eliteEntity.getLevel(), false);
@@ -233,7 +233,7 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
 
                         CustomBossEntity customBossEntity = CustomBossEntity.createCustomBossEntity("necronomicon_skeleton.yml");
                         if (customBossEntity == null) {
-                            Logger.warn("necronomicon_skeleton.yml is not valid!");
+                            new WarningMessage("necronomicon_skeleton.yml is not valid!");
                             targetter.setAI(true);
                             cancel();
                             return;

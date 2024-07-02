@@ -1,11 +1,12 @@
 package com.magmaguy.elitemobs.config;
 
-import com.magmaguy.magmacore.config.ConfigurationFile;
 import lombok.Getter;
+import org.bukkit.configuration.file.FileConfiguration;
 
+import java.io.File;
 import java.util.List;
 
-public class EventsConfig extends ConfigurationFile {
+public class EventsConfig {
     @Getter
     private static boolean announcementBroadcastWorldOnly;
     @Getter
@@ -17,12 +18,13 @@ public class EventsConfig extends ConfigurationFile {
     @Getter
     private static boolean timedEventsEnabled;
 
-    public EventsConfig() {
-        super("events.yml");
+    private EventsConfig() {
     }
 
-    @Override
-    public void initializeValues() {
+    public static void initializeConfig() {
+        File file = ConfigurationEngine.fileCreator("events.yml");
+        FileConfiguration fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
+
         announcementBroadcastWorldOnly = ConfigurationEngine.setBoolean(
                 List.of("Sets if events will only broadcasted in the world the events happens in."),
                 fileConfiguration, "Only broadcast event message in event worlds", false);
@@ -31,7 +33,7 @@ public class EventsConfig extends ConfigurationFile {
                 fileConfiguration, "actionEventMinimumCooldownMinutes", 4);
         timedEventMinimumCooldown = ConfigurationEngine.setInt(
                 List.of("Sets the minimum cooldown, in minutes, between timed events"),
-                fileConfiguration, "actionEventMinimumCooldownMinutes", 4);
+                fileConfiguration, "actionEventMinimumCooldownMinutes",  4);
         actionEventsEnabled = ConfigurationEngine.setBoolean(
                 List.of("Sets if action events will happen.",
                         "https://github.com/MagmaGuy/EliteMobs/wiki/Creating-Custom-Events#action-events"),
@@ -41,5 +43,7 @@ public class EventsConfig extends ConfigurationFile {
                         "https://github.com/MagmaGuy/EliteMobs/wiki/Creating-Custom-Events#timed-events"),
                 fileConfiguration, "timedEventsEnabled", true);
 
+        ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }
+
 }

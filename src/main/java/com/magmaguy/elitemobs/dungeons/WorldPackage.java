@@ -55,7 +55,7 @@ public class WorldPackage extends EMPackage {
         if (isDownloaded && isInstalled) {
             world = DungeonUtils.loadWorld(this);
             dungeonPackagerConfigFields.initializeWorld();
-        }
+        } else isInstalled = false;
     }
 
 

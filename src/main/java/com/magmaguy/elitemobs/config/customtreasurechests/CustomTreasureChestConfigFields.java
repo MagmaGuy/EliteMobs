@@ -5,9 +5,10 @@ import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.items.customloottable.CustomLootTable;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
-import com.magmaguy.magmacore.util.Logger;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
@@ -122,12 +123,12 @@ public class CustomTreasureChestConfigFields extends CustomConfigFields {
                     try {
                         timestamp = Long.parseLong(strings[1]);
                     } catch (Exception exception) {
-                        Logger.warn("Bad unix timestamp in locations for " + filename + " . Entry: " + strings[0]);
+                        new WarningMessage("Bad unix timestamp in locations for " + filename + " . Entry: " + strings[0]);
                     }
                 }
                 new TreasureChest(this, strings[0], timestamp);
             }
-        else Logger.warn("No locations found for chest " + filename);
+        else new WarningMessage("No locations found for chest " + filename);
     }
 
     /**
@@ -172,7 +173,7 @@ public class CustomTreasureChestConfigFields extends CustomConfigFields {
         try {
             fileConfiguration.save(file);
         } catch (Exception ex) {
-            Logger.warn("Attempted to update restock time for a custom treasure chest and failed, did you delete it during runtime?");
+            Bukkit.getLogger().warning("[EliteMobs] Attempted to update restock time for a custom treasure chest and failed, did you delete it during runtime?");
         }
     }
 

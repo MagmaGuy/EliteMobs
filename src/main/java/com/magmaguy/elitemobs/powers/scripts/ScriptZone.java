@@ -11,8 +11,8 @@ import com.magmaguy.elitemobs.powers.scripts.caching.ScriptTargetsBlueprint;
 import com.magmaguy.elitemobs.powers.scripts.caching.ScriptZoneBlueprint;
 import com.magmaguy.elitemobs.powers.scripts.enums.TargetType;
 import com.magmaguy.elitemobs.utils.EventCaller;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import com.magmaguy.elitemobs.utils.shapes.*;
-import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
@@ -56,7 +56,32 @@ public class ScriptZone {
         if (!zoneListener) return;
         entitiesInZone = new HashSet<>();
         ScriptActionData scriptActionData = new ScriptActionData(eliteEntity, targets, this);
-        new ZoneListenerTask(eliteEntity, scriptActionData).runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (eliteEntity.getLivingEntity() == null || !eliteEntity.getLivingEntity().isValid()) {
+                    if (eliteEntity instanceof CustomBossEntity customBossEntity) {
+                        if (customBossEntity.getHealth() <= 0)
+                            cancel();
+                        if (customBossEntity instanceof InstancedBossEntity instancedBossEntity)
+                            if (instancedBossEntity.isRemoved())
+                                //todo: check if this covers all cases
+                                cancel();
+                    } else
+                        //If it's not a custom entity there's no scenario where it should be able to survive an unload here
+                        cancel();
+                    return;
+                }
+                Collection<LivingEntity> newEntities = getEntitiesInArea(generateShapes(scriptActionData, false), TargetType.ZONE_FULL);
+                newEntities.forEach(livingEntity -> {
+                    if (!entitiesInZone.contains(livingEntity)) ZoneEnterEvent(eliteEntity, livingEntity);
+                });
+                entitiesInZone.forEach(livingEntity -> {
+                    if (!newEntities.contains(livingEntity)) ZoneLeaveEvent(eliteEntity, livingEntity);
+                });
+                entitiesInZone = newEntities;
+            }
+        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
     }
 
     public void ZoneEnterEvent(EliteEntity eliteEntity, LivingEntity livingEntity) {
@@ -76,7 +101,7 @@ public class ScriptZone {
             case INHERIT_SCRIPT_ZONE_FULL, INHERIT_SCRIPT_ZONE_BORDER:
                 return getEntitiesInArea(generateShapes(scriptActionData.getInheritedScriptActionData(), false), blueprintFromRequestingTarget.getTargetType());
             default: {
-                Logger.warn("Couldn't parse target " + targets.getTargetBlueprint().getTargetType() + " in script ");
+                new WarningMessage("Couldn't parse target " + targets.getTargetBlueprint().getTargetType() + " in script ");
                 return new ArrayList<>();
             }
         }
@@ -112,7 +137,7 @@ public class ScriptZone {
             try {
                 return scriptActionData.getShapesChachedByTarget();
             } catch (Exception ex) {
-                Logger.warn("Failed to get list of shapes!");
+                new WarningMessage("Failed to get list of shapes!");
                 return new ArrayList<>();
             }
         }
@@ -134,7 +159,7 @@ public class ScriptZone {
                     break;
                 case STATIC_RAY:
                     if (targets2 == null) {
-                        Logger.warn("Script for boss " + scriptActionData.getEliteEntity().getName() + " has a static ray but no set target2 for the ray!");
+                        new WarningMessage("Script for boss " + scriptActionData.getEliteEntity().getName() + " has a static ray but no set target2 for the ray!");
                         break;
                     }
                     for (Location location : targets2.getTargetLocations(scriptActionData))
@@ -143,7 +168,7 @@ public class ScriptZone {
                     break;
                 case ROTATING_RAY:
                     if (targets2 == null) {
-                        Logger.warn("Script for boss " + scriptActionData.getEliteEntity().getName() + " has a static ray but no set target2 for the ray!");
+                        new WarningMessage("Script for boss " + scriptActionData.getEliteEntity().getName() + " has a static ray but no set target2 for the ray!");
                         break;
                     }
                     for (Location target2Location : targets2.getTargetLocations(scriptActionData))
@@ -152,7 +177,7 @@ public class ScriptZone {
                     break;
                 case TRANSLATING_RAY:
                     if (targets2 == null) {
-                        Logger.warn("Script for boss " + scriptActionData.getEliteEntity().getName() + " has a static ray but no set target2 for the ray!");
+                        new WarningMessage("Script for boss " + scriptActionData.getEliteEntity().getName() + " has a static ray but no set target2 for the ray!");
                         break;
                     }
                     Location targetLocationEnd = null;
@@ -182,6 +207,7 @@ public class ScriptZone {
     private boolean rayLocationValidator(Location location1, Location location2) {
         return location1 != null && location2 != null && location1.getWorld().equals(location2.getWorld());
     }
+
 
     //Get entities in an area based on a filter
     private Collection<LivingEntity> getEntitiesInArea(List<Shape> shapes, TargetType targetType) {
@@ -239,41 +265,6 @@ public class ScriptZone {
             if (entity instanceof LivingEntity livingEntity) entities.add(livingEntity);
         });
         return entities;
-    }
-
-    private class ZoneListenerTask extends BukkitRunnable {
-        private final EliteEntity eliteEntity;
-        private final ScriptActionData scriptActionData;
-
-        public ZoneListenerTask(EliteEntity eliteEntity, ScriptActionData scriptActionData) {
-            this.eliteEntity = eliteEntity;
-            this.scriptActionData = scriptActionData;
-        }
-
-        @Override
-        public void run() {
-            if (eliteEntity.getLivingEntity() == null || !eliteEntity.getLivingEntity().isValid()) {
-                if (eliteEntity instanceof CustomBossEntity customBossEntity) {
-                    if (customBossEntity.getHealth() <= 0)
-                        cancel();
-                    if (customBossEntity instanceof InstancedBossEntity instancedBossEntity)
-                        if (instancedBossEntity.isRemoved())
-                            //todo: check if this covers all cases
-                            cancel();
-                } else
-                    //If it's not a custom entity there's no scenario where it should be able to survive an unload here
-                    cancel();
-                return;
-            }
-            Collection<LivingEntity> newEntities = getEntitiesInArea(generateShapes(scriptActionData, false), TargetType.ZONE_FULL);
-            newEntities.forEach(livingEntity -> {
-                if (!entitiesInZone.contains(livingEntity)) ZoneEnterEvent(eliteEntity, livingEntity);
-            });
-            entitiesInZone.forEach(livingEntity -> {
-                if (!newEntities.contains(livingEntity)) ZoneLeaveEvent(eliteEntity, livingEntity);
-            });
-            entitiesInZone = newEntities;
-        }
     }
 
 }

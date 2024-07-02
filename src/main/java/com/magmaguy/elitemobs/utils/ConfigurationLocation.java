@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.utils;
 
-import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -75,9 +74,9 @@ public class ConfigurationLocation {
         } catch (Exception ex) {
             if (locationString.equals("null"))
                 return null;
-            Logger.warn("Attempted to deserialize an invalid location!");
-            Logger.warn("Expected location format: worldname,x,y,z,pitch,yaw");
-            Logger.warn("Actual location format: " + locationString);
+            new WarningMessage("Attempted to deserialize an invalid location!");
+            new WarningMessage("Expected location format: worldname,x,y,z,pitch,yaw");
+            new WarningMessage("Actual location format: " + locationString);
             return null;
         }
         return new Location(world, x, y, z, yaw, pitch);
@@ -125,9 +124,9 @@ public class ConfigurationLocation {
         } catch (Exception ex) {
             if (locationString.equals("null"))
                 return null;
-            Logger.warn("Attempted to deserialize an invalid location!");
-            Logger.warn("Expected location format: worldname,x,y,z,pitch,yaw");
-            Logger.warn("Actual location format: " + locationString);
+            new WarningMessage("Attempted to deserialize an invalid location!");
+            new WarningMessage("Expected location format: worldname,x,y,z,pitch,yaw");
+            new WarningMessage("Actual location format: " + locationString);
             return null;
         }
         return new Location(instancedWorld, x, y, z, yaw, pitch);
