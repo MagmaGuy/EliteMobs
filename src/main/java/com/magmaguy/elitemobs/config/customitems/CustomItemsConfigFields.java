@@ -98,9 +98,7 @@ public class CustomItemsConfigFields extends CustomConfigFields implements Custo
             String[] split = enchantment.split(",");
             String result = LegacyValueConverter.parseEnchantment(split[0]);
             if (result.equals(split[0])) newEnchantments.add(enchantment);
-            else {
-                newEnchantments.add(result + "," + split[1]);
-            }
+            else newEnchantments.add(result + "," + split[1]);
         }
         enchantments = newEnchantments;
 
@@ -126,5 +124,10 @@ public class CustomItemsConfigFields extends CustomConfigFields implements Custo
             }
         }
         potionEffects = newPotionEffects;
+
+        potionEffects.forEach(potionEffect->{
+            if (potionEffect.contains("INSTANT_DAMAGE"))
+                new WarningMessage("Item " + filename + " contains HARM/INSTANT_DAMAGE potion effect, which heals undead mobs (Minecraft vanilla mechanic) and often times confuses players and admins. It is recommended you switch this potion effect with something else, like STRENGTH if you want more damage.");
+        });
     }
 }

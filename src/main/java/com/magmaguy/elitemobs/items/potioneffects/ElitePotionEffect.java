@@ -21,7 +21,7 @@ public class ElitePotionEffect {
         try {
             String[] stringObject = string.split(",");
             int duration = 2 * 20;
-            PotionEffectType potionEffectType = Registry.EFFECT.get(new NamespacedKey("minecraft", LegacyValueConverter.parsePotionEffect(stringObject[0].toLowerCase(Locale.ROOT))));
+            PotionEffectType potionEffectType = Registry.EFFECT.get(new NamespacedKey("minecraft", LegacyValueConverter.parsePotionEffect(stringObject[0]).toLowerCase(Locale.ROOT)));
             if (potionEffectType == null) {
                 new WarningMessage("Failed to get valid potion effect for " + stringObject[0].toLowerCase(Locale.ROOT));
                 return;
