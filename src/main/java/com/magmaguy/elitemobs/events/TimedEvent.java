@@ -28,6 +28,8 @@ public class TimedEvent extends CustomEvent implements Listener {
     //stores the time of the last global trigger
     @Getter
     private static double nextEventTrigger = System.currentTimeMillis() + 5D * 60D * 1000D;
+    @Getter
+    private static double nextEventStartMinimum = System.currentTimeMillis();
     private final double localCooldown;
     private final double globalCooldown;
     private final double weight;
@@ -166,6 +168,7 @@ public class TimedEvent extends CustomEvent implements Listener {
 
         //Hardcoded 5 minute minimum wait time between events before the next event can get queued
         setNextEventTrigger(5);
+        nextEventStartMinimum = System.currentTimeMillis() + (EventsConfig.getTimedEventMinimumCooldown() * 60 * 1000D);
         start();
     }
 

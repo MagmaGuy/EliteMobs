@@ -25,22 +25,26 @@ public class EliteScript extends ElitePower implements Cloneable {
     protected Map<String, EliteScript> eliteScriptMap;
     private final ScriptConditions scriptConditions;
 
-    public EliteScript(EliteScriptBlueprint scriptBlueprint, Map<String, EliteScript> eliteScriptMap) {
+    public EliteScript(EliteScriptBlueprint scriptBlueprint, Map<String, EliteScript> eliteScriptMap, EliteEntity eliteEntity) {
         super(scriptBlueprint.getCustomConfigFields());
         this.eliteScriptMap = eliteScriptMap;
         this.scriptEvents = new ScriptEvents(scriptBlueprint.getScriptEventsBlueprint());
         this.scriptConditions = new ScriptConditions(scriptBlueprint.getScriptConditionsBlueprint(), this, false);
         this.scriptZone = new ScriptZone(scriptBlueprint.getScriptZoneBlueprint(), this);
+        if (scriptEvents.getScriptEventsBlueprint().isZoneListener()) {
+            scriptZone.setZoneListener(true);
+            scriptZone.startZoneListener(eliteEntity);
+        }
         this.scriptActions = new ScriptActions(scriptBlueprint.getScriptActionsBlueprint(), eliteScriptMap, this);
         this.scriptCooldowns = new ScriptCooldowns(scriptBlueprint.getScriptCooldownsBlueprint(), this);
         eliteScriptMap.put(scriptBlueprint.getScriptName(), this);
     }
 
     //Parse from boss config
-    public static List<EliteScript> generateBossScripts(List<EliteScriptBlueprint> blueprints) {
+    public static List<EliteScript> generateBossScripts(List<EliteScriptBlueprint> blueprints, EliteEntity eliteEntity) {
         //The map is declared here because it needs to be shared inside of all scripts in the same file so they can be referenced.
         HashMap<String, EliteScript> powerMap = new HashMap();
-        return blueprints.stream().map(eliteScriptBlueprint -> new EliteScript(eliteScriptBlueprint, powerMap)).collect(Collectors.toList());
+        return blueprints.stream().map(eliteScriptBlueprint -> new EliteScript(eliteScriptBlueprint, powerMap, eliteEntity)).collect(Collectors.toList());
     }
 
     /**
@@ -62,6 +66,29 @@ public class EliteScript extends ElitePower implements Cloneable {
         if (scriptConditions != null && !scriptConditions.meetsPreActionConditions(eliteEntity, player)) return;
         //Let's do some actions
         scriptActions.runScripts(eliteEntity, player, event);
+        //Cooldowns time
+        doCooldownTicks(eliteEntity);
+    }
+
+    /**
+     * Used by elite damaged by elite event
+     *
+     * @param event
+     * @param eliteEntity
+     * @param damager
+     */
+    public void check(Event event, EliteEntity eliteEntity, LivingEntity damager) {
+        //If the script uses the cooldown system then it should respect if the boss is in a global or local cooldown state
+        //If the script does not define a local or global cooldown then it is considered to ignore cooldowns. This is an
+        //important bypass for a lot of behavior like teleporting at specific triggers regardless of state
+        if (getPowerCooldownTime() > 0 && getGlobalCooldownTime() > 0 &&
+                scriptCooldowns != null && super.isInCooldown(eliteEntity)) return;
+        //Check if the event is relevant to the script
+        if (!scriptEvents.isTargetEvent(event.getClass())) return;
+        //Check if the event conditions are met
+        if (scriptConditions != null && !scriptConditions.meetsPreActionConditions(eliteEntity, damager)) return;
+        //Let's do some actions
+        scriptActions.runScripts(eliteEntity, damager, event);
         //Cooldowns time
         doCooldownTicks(eliteEntity);
     }

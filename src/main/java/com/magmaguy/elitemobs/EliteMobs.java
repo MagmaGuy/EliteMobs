@@ -42,8 +42,10 @@ import com.magmaguy.elitemobs.mobconstructor.custombosses.InstancedBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.PluginMobProperties;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
+import com.magmaguy.elitemobs.pathfinding.Navigation;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
+import com.magmaguy.elitemobs.powers.scripts.ScriptAction;
 import com.magmaguy.elitemobs.powerstances.MajorPowerStanceMath;
 import com.magmaguy.elitemobs.powerstances.MinorPowerStanceMath;
 import com.magmaguy.elitemobs.quests.DynamicQuest;
@@ -55,6 +57,7 @@ import com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity;
 import com.magmaguy.elitemobs.thirdparty.placeholderapi.Placeholders;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
+import com.magmaguy.elitemobs.utils.BossBarUtil;
 import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.ServerTime;
 import com.magmaguy.elitemobs.utils.WarningMessage;
@@ -363,6 +366,9 @@ public class EliteMobs extends JavaPlugin {
         ProceduralShopMenu.shutdown();
 
         EliteMobsWorld.shutdown();
+        Navigation.shutdown();
+        BossBarUtil.shutdown();
+        ScriptAction.shutdown();
 
         //save cached data
         Bukkit.getLogger().info("[EliteMobs] Saving EliteMobs databases...");
