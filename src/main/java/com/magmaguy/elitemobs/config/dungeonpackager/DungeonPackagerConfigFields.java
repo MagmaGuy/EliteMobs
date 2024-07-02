@@ -99,6 +99,9 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
     @Getter
     @Setter
     private boolean allowExplosions;
+    @Getter
+    @Setter
+    private boolean listedInTeleports = true;
 
     public DungeonPackagerConfigFields(String fileName, boolean isEnabled) {
         super(fileName, isEnabled);
@@ -279,6 +282,7 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
         else fileConfiguration.addDefault("difficulties", difficulties);
         enchantmentChallenge = processBoolean("enchantmentChallenge", enchantmentChallenge, false, false);
         this.allowExplosions = processBoolean("allowExplosionBlockDamage", allowExplosions, false, false);
+        this.listedInTeleports = processBoolean("listedInTeleports", listedInTeleports, true, false);
         processAdditionalFields();
     }
 

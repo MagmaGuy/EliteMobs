@@ -50,6 +50,7 @@ public class TeleportsPage {
             if (!emPackage.isInstalled() ||
                     !(emPackage instanceof CombatContent) ||
                     emPackage.getDungeonPackagerConfigFields().isEnchantmentChallenge()) continue;
+            if (!emPackage.getDungeonPackagerConfigFields().isListedInTeleports()) continue;
 
             TextComponent message = new TextComponent(PlayerStatusScreen.convertLightColorsToBlack(emPackage.getDungeonPackagerConfigFields().getName() + "\n"));
             String hoverMessage = ChatColorConverter.convert(PlayerStatusMenuConfig.getOnTeleportHover() + "\n" +
@@ -91,6 +92,8 @@ public class TeleportsPage {
             if (!emPackage.isInstalled() ||
                     !(emPackage instanceof CombatContent) ||
                     emPackage.getDungeonPackagerConfigFields().isEnchantmentChallenge()) continue;
+            if (!emPackage.getDungeonPackagerConfigFields().isListedInTeleports()) continue;
+
             TeleportsPageEvents.orderedDungeons.add(emPackage);
             inventory.setItem(counter, ItemStackGenerator.generateItemStack(Material.PAPER, emPackage.getDungeonPackagerConfigFields().getName()
                     , Collections.singletonList(emPackage.getDungeonPackagerConfigFields().getPlayerInfo()

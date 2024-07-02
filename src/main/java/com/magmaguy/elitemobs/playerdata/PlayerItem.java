@@ -10,6 +10,7 @@ import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.customenchantments.*;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffect;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
+import com.magmaguy.elitemobs.utils.BossBarUtil;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
@@ -40,6 +41,8 @@ public class PlayerItem {
     private double eliteDamage = 0;
     private double blastProtection = 0;
     private double loudStrikesBonus = 0;
+
+    private boolean displayingAsBroken = false;
 
     /**
      * Stores an instance of the custom EliteMobs values of what a player is wearing. This is used to reduce the amount
@@ -75,22 +78,31 @@ public class PlayerItem {
             return fillNullItem();
 
         if (isOnLastDamage(itemStack)) {
-            player.sendMessage(ChatColorConverter.convert(ItemSettingsConfig.getNoItemDurabilityMessage().replace(
-                    "$item", !itemStack.getItemMeta().hasDisplayName() ? itemStack.getType().toString() : itemStack.getItemMeta().getDisplayName())));
+            if (!displayingAsBroken) {
+                BossBarUtil.DisplayBrokenItemBossBar(equipmentSlot, player, ChatColorConverter.convert(ItemSettingsConfig.getNoItemDurabilityMessage().replace("$item", !itemStack.getItemMeta().hasDisplayName() ? itemStack.getType().toString() : itemStack.getItemMeta().getDisplayName())));
+                displayingAsBroken = true;
+            }
+//            player.sendMessage(ChatColorConverter.convert(ItemSettingsConfig.getNoItemDurabilityMessage().replace(
+//                    "$item", !itemStack.getItemMeta().hasDisplayName() ? itemStack.getType().toString() : itemStack.getItemMeta().getDisplayName())));
             return fillNullItem();
+        }
+
+        if (displayingAsBroken){
+            BossBarUtil.HideBrokenItemBossBar(equipmentSlot, player);
+            displayingAsBroken = false;
         }
 
 //        //case when it's the same item as before - best performance todo: causes issues with the prestige system
 //        if (itemStack.isSimilar(this.itemStack))
 //            return false;
 
-        if (EnchantmentsConfig.getEnchantment(SoulbindEnchantment.key + ".yml").isEnabled()) {
-            if (!SoulbindEnchantment.isValidSoulbindUser(itemStack.getItemMeta(), player)) {
-                player.getWorld().dropItem(player.getLocation(), itemStack);
-                itemStack.setAmount(0);
-                itemStack = new ItemStack(Material.AIR);
+            if (EnchantmentsConfig.getEnchantment(SoulbindEnchantment.key + ".yml").isEnabled()) {
+                if (!SoulbindEnchantment.isValidSoulbindUser(itemStack.getItemMeta(), player)) {
+                    player.getWorld().dropItem(player.getLocation(), itemStack);
+                    itemStack.setAmount(0);
+                    itemStack = new ItemStack(Material.AIR);
+                }
             }
-        }
 
         //Neither offhand nor armor contribute to baseline damage outside of the enchants, so we reset the damage before anything
         this.eliteDamage = 0;

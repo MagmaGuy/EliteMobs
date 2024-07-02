@@ -12,6 +12,8 @@ import java.util.Set;
 public class ScriptEventsBlueprint {
     @Getter
     private final Set<Class> events = new HashSet<>();
+    @Getter
+    private boolean zoneListener = false;
 
     public ScriptEventsBlueprint(ConfigurationSection configurationSection, String scriptName, String filename) {
         List<String> values = configurationSection.getStringList("Events");
@@ -28,6 +30,14 @@ public class ScriptEventsBlueprint {
                 case "EliteMobTargetPlayerEvent" -> events.add(EliteMobTargetPlayerEvent.class);
                 case "PlayerDamagedByEliteMobEvent" -> events.add(PlayerDamagedByEliteMobEvent.class);
                 case "ElitePhaseSwitchEvent" -> events.add(ElitePhaseSwitchEvent.class);
+                case "ZoneEnterEvent" -> {
+                    events.add(ScriptZoneEnterEvent.class);
+                    zoneListener = true;
+                }
+                case "ZoneLeaveEvent" -> {
+                    events.add(ScriptZoneLeaveEvent.class);
+                    zoneListener = true;
+                }
                 default ->
                         new WarningMessage("Failed to get valid script event from entry " + entry + " in " + scriptName + " for file " + filename + " !");
             }

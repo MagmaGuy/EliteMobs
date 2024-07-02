@@ -107,6 +107,10 @@ public class EventsRegistrer {
         if (ItemSettingsConfig.isPreventEliteItemDiamondToNetheriteUpgrade())
             register(new PreventUpgradeDiamondToNetherite());
 
+        register(new FixPlayerSpeedOnRespawn());
+        register(new EnvironmentalDungeonDamage());
+        register(new PlayerQuitCleanup());
+
         //Mob damage
         register(new EliteMobGenericDamagedHandler());
         register(new EliteMobDamagedByEliteMobHandler());
