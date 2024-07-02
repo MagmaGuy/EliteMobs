@@ -22,14 +22,14 @@ Maven repository:
 Maven:
 ```
 <repository>
-  <id>elitemobs-repo/id>
+  <id>elitemobs-repo</id>
   <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
 </repository>
 
 <dependency>
   <groupId>com.magmaguy</groupId>
   <artifactId>EliteMobs</artifactId>
-  <version>8.7.4-SNAPSHOT</version>
+  <version>9.0.2-SNAPSHOT</version>
   <scope>provided</scope>
 </dependency>
 ```
@@ -43,7 +43,7 @@ repositories {
 
 dependencies{
     //EliteMobs
-    compileOnly group: 'com.magmaguy', name: 'EliteMobs', version: '8.7.4-SNAPSHOT'
+    compileOnly group: 'com.magmaguy', name: 'EliteMobs', version: '9.0.2-SNAPSHOT'
 }
 
 ```

@@ -1,9 +1,11 @@
 package com.magmaguy.elitemobs.powers.scripts;
 
 import com.magmaguy.elitemobs.powers.scripts.caching.ScriptEventsBlueprint;
+import lombok.Getter;
 
 
 public class ScriptEvents {
+    @Getter
     private final ScriptEventsBlueprint scriptEventsBlueprint;
 
     public ScriptEvents(ScriptEventsBlueprint eventsBlueprint) {
