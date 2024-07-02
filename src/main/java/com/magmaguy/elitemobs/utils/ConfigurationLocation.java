@@ -52,9 +52,6 @@ public class ConfigurationLocation {
                 if (world == null &&
                         !slicedString[0].equalsIgnoreCase("same_as_boss") &&
                         !notLoadedWorldNames.contains(slicedString[0]) && !silent) {
-//                    if (!notLoadedWorldNames.isEmpty())
-//                        new WarningMessage("Some NPCs/bosses don't have their world installed! If you need help setting things up, you can go to " + DiscordLinks.mainLink + " !");
-//                    new InfoMessage("World " + slicedString[0] + " is not yet loaded! Entities that should spawn there have been queued.");
                     notLoadedWorldNames.add(slicedString[0]);
                 }
                 x = Double.parseDouble(slicedString[1]);
@@ -89,6 +86,50 @@ public class ConfigurationLocation {
         String locationOnlyString = locationString.split(":")[0];
         String[] slicedString = locationOnlyString.split(",");
         return slicedString[0];
+    }
+
+    public static Location serializeWithInstance(World instancedWorld, String locationString) {
+
+        if (locationString == null)
+            return null;
+
+        double x = 0;
+        double y = 0;
+        double z = 0;
+        float yaw = 0;
+        float pitch = 0;
+
+        try {
+            String locationOnlyString = locationString.split(":")[0];
+            String[] slicedString = locationOnlyString.split(",");
+
+            if (slicedString.length == 6 || slicedString.length == 4) {
+                x = Double.parseDouble(slicedString[1]);
+                y = Double.parseDouble(slicedString[2]);
+                z = Double.parseDouble(slicedString[3]);
+                if (slicedString.length > 4) {
+                    yaw = Float.parseFloat(slicedString[4]);
+                    pitch = Float.parseFloat(slicedString[5]);
+                } else {
+                    yaw = 0;
+                    pitch = 0;
+                }
+            } else if (slicedString.length == 5) {
+                x = Double.parseDouble(slicedString[0]);
+                y = Double.parseDouble(slicedString[1]);
+                z = Double.parseDouble(slicedString[2]);
+                yaw = Float.parseFloat(slicedString[3]);
+                pitch = Float.parseFloat(slicedString[4]);
+            } else throw new Exception();
+        } catch (Exception ex) {
+            if (locationString.equals("null"))
+                return null;
+            new WarningMessage("Attempted to deserialize an invalid location!");
+            new WarningMessage("Expected location format: worldname,x,y,z,pitch,yaw");
+            new WarningMessage("Actual location format: " + locationString);
+            return null;
+        }
+        return new Location(instancedWorld, x, y, z, yaw, pitch);
     }
 
 }

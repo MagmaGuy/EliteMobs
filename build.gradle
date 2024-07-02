@@ -23,7 +23,7 @@ processResources {
 }
 
 group 'com.magmaguy'
-version '9.0.1-SNAPSHOT'
+version '9.0.2-SNAPSHOT'
 
 repositories {
     maven {
@@ -182,14 +182,16 @@ artifacts {
     archives javadocJar, sourcesJar
 }
 
-ext.isReleaseVersion = !version.contains("SNAPSHOT")
+//ext.isReleaseVersion = !version.contains("SNAPSHOT")
 
 publishing {
     repositories {
         maven {
-            def releaseRepo = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
-            def snapshotRepo = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-            url = isReleaseVersion ? releaseRepo : snapshotRepo
+//            def releaseRepo = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+//            def snapshotRepo = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+//            url = isReleaseVersion ? releaseRepo : snapshotRepo
+            name = "EliteMobs"
+            url = "https://s01.oss.sonatype.org/content/repositories/snapshots/";
             credentials {
                 username = project.hasProperty('ossrhUsername') ? ossrhUsername : "Unknown user"
                 password = project.hasProperty('ossrhPassword') ? ossrhPassword : "Unknown password"

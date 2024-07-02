@@ -7,6 +7,7 @@ import com.magmaguy.elitemobs.treasurechest.TreasureChest;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -49,6 +50,9 @@ public class CustomTreasureChestConfigFields extends CustomConfigFields {
     private List<String> locationsString = new ArrayList<>();
     @Getter
     private CustomLootTable customLootTable = null;
+    @Getter
+    @Setter
+    private boolean instanced = false;
 
 
     public CustomTreasureChestConfigFields(String filename, boolean isEnabled) {
@@ -108,6 +112,7 @@ public class CustomTreasureChestConfigFields extends CustomConfigFields {
         this.effects = processStringList("effects", effects, new ArrayList<>(), false);
         this.locationsString = processStringList("locations", locationsString, new ArrayList<>(), false);
         this.locationString = processString("location", locationString, null, false);
+        this.instanced = processBoolean("instanced", instanced, false, false);
         if (locationString != null)
             new TreasureChest(this, locationString, restockTime);
         else if (locationsString != null)
@@ -157,6 +162,7 @@ public class CustomTreasureChestConfigFields extends CustomConfigFields {
     }
 
     public void setRestockTime(Location location, long newRestockTime) {
+        if (isInstanced()) return;
         if (!locationsString.isEmpty()) {
             addTreasureChest(location, newRestockTime);
             return;
