@@ -72,6 +72,9 @@ public abstract class EliteMobProperties extends PluginMobProperties {
         new EliteWarden();
         new EliteSlime();
         new EliteMagmaCube();
+        new EliteBogged();
+        new EliteBreeze();
+        new EliteWither();
     }
 
     public static boolean isValidEliteMobType(Entity entity) {
