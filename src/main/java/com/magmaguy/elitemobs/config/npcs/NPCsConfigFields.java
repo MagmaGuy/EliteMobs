@@ -122,7 +122,11 @@ public class NPCsConfigFields extends CustomConfigFields implements CustomConfig
         this.isEnabled = processBoolean("isEnabled", isEnabled, true, true);
         this.name = translatable(filename, "name", processString("name", name, "", true));
         this.role = translatable(filename, "role", processString("role", role, "", true));
-        this.profession = processEnum("profession", profession, Villager.Profession.NITWIT, Villager.Profession.class, true);
+        try {
+            this.profession = Villager.Profession.valueOf(processString("profession", profession.toString(), Villager.Profession.NITWIT.toString(), false));
+        } catch (IncompatibleClassChangeError e) {
+            //The early 1.21 API still used the profession enum, which was later dropped. This works for later releases, but not the early ones.
+        }
         this.spawnLocation = processString("spawnLocation", spawnLocation, null, true);
         this.locations = processStringList("spawnLocations", locations, null, false);
         this.greetings = translatable(filename, "greetings", processStringList("greetings", greetings, new ArrayList<>(), true));

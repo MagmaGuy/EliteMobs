@@ -10,5 +10,6 @@ public class FixPlayerSpeedOnRespawn implements Listener {
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 0, 0));
+        event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 0, 0));
     }
 }
