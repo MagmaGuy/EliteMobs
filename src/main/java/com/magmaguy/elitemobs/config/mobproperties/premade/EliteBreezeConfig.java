@@ -5,10 +5,10 @@ import org.bukkit.entity.EntityType;
 
 import java.util.List;
 
-public class EliteBreeze extends MobPropertiesConfigFields {
-    public EliteBreeze() {
+public class EliteBreezeConfig extends MobPropertiesConfigFields {
+    public EliteBreezeConfig() {
         super("elite_breeze",
-                EntityType.BOGGED,
+                EntityType.BREEZE,
                 true,
                 "&2Lvl &2$level &2Elite &eBreeze",
                 List.of("$player &cwas blown away by $entity!"),
