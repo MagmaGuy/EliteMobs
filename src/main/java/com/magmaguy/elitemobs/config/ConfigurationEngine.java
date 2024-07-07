@@ -83,7 +83,12 @@ public class ConfigurationEngine {
     }
 
     public static Boolean setBoolean(FileConfiguration fileConfiguration, String key, boolean defaultValue) {
-        fileConfiguration.addDefault(key, defaultValue);
+        try {
+            fileConfiguration.addDefault(key, defaultValue);
+        } catch (Exception e) {
+            new WarningMessage("Attempted to write key " + key + " with value " + defaultValue + " to " + fileConfiguration.getName() + " and that contained an illegal argument!");
+            e.printStackTrace();
+        }
         return fileConfiguration.getBoolean(key);
     }
 

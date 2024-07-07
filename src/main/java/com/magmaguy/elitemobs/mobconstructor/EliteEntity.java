@@ -278,7 +278,6 @@ public class EliteEntity {
             KeepNeutralsAngry.showMeYouWarFace(this);
         }
 
-        //todo: this should become configurable real soon for the primis gladius event
         if (entityType.equals(EntityType.IRON_GOLEM) && this instanceof CustomBossEntity)
             KeepNeutralsAngry.showMeYouWarFace(this);
 
@@ -290,6 +289,10 @@ public class EliteEntity {
             KeepNeutralsAngry.showMeYouWarFace(this);
             ((Bee) livingEntity).setCannotEnterHiveTicks(Integer.MAX_VALUE);
         }
+
+        if (livingEntity instanceof Wither wither)
+            wither.getBossBar().setVisible(false);
+
         this.spawnReason = spawnReason;
 
         //This sets whether the entity gets despawned when beyond a certain distance from the player, should only happen

@@ -12,7 +12,10 @@ import com.magmaguy.elitemobs.dungeons.EMPackage;
 import com.magmaguy.elitemobs.mobconstructor.PersistentObject;
 import com.magmaguy.elitemobs.mobconstructor.PersistentObjectHandler;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
-import com.magmaguy.elitemobs.utils.*;
+import com.magmaguy.elitemobs.utils.ConfigurationLocation;
+import com.magmaguy.elitemobs.utils.Round;
+import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.elitemobs.utils.WeightedProbability;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -278,13 +281,9 @@ public class TreasureChest implements PersistentObject {
     public static class TreasureChestEvents implements Listener {
         @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
         public void onPlayerInteract(PlayerInteractEvent event) {
-            Developer.message("0");
             if (event.getClickedBlock() == null) return;
-            Developer.message("1");
             TreasureChest treasureChest = getTreasureChest(event.getClickedBlock().getLocation());
-            Developer.message("2");
             if (treasureChest == null) return;
-            Developer.message("3");
             event.setCancelled(true);
             if (GuildRank.getMaxGuildRank(event.getPlayer()) < treasureChest.customTreasureChestConfigFields.getChestTier())
                 treasureChest.lowRankMessage(event.getPlayer());
