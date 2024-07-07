@@ -10,6 +10,8 @@ import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -37,7 +39,7 @@ public class LightningEnchantment extends CustomEnchantment {
             if (eliteEntity == null) return;
             double damage = ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getWeaponLevel(true) * 2.5;
             EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = true;
-            EntityDamageByEntityEvent entityDamageByEntityEvent = new EntityDamageByEntityEvent(player, eliteEntity.getLivingEntity(), EntityDamageEvent.DamageCause.CUSTOM, damage);
+            EntityDamageByEntityEvent entityDamageByEntityEvent = new EntityDamageByEntityEvent(player, eliteEntity.getLivingEntity(), EntityDamageEvent.DamageCause.CUSTOM, DamageSource.builder(DamageType.MOB_ATTACK).build(), damage);
             new EventCaller(entityDamageByEntityEvent);
         }));
     }
