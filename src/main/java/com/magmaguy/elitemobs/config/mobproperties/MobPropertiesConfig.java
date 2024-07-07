@@ -56,8 +56,8 @@ public class MobPropertiesConfig {
             new EliteHoglinConfig(),
             new ElitePiglinBruteConfig(),
             new EliteBeeConfig(),
-            new EliteBreeze()
-
+            new EliteBreezeConfig(),
+            new EliteWitherConfig()
     ));
 
     public static HashMap<EntityType, MobPropertiesConfigFields> getMobProperties() {
