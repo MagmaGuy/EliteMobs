@@ -217,6 +217,8 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     private String onKillMessage;
     @Getter
     private BossType bossType = BossType.NORMAL;
+    @Getter
+    private double scale = 1D;
 
     /**
      * Creates a new default pre-made Custom Boss. The boss is further customized through a builder pattern.
@@ -392,6 +394,8 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         } catch (Exception e) {
             new WarningMessage("Boss type for boss " + filename + " is not a valid boss type!");
         }
+
+        this.scale = processDouble("scale", scale, 1, false);
     }
 
     public boolean isCustomModelExists() {
