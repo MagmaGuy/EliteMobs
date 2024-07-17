@@ -1,14 +1,11 @@
 package com.magmaguy.elitemobs.api;
 
-import com.magmaguy.elitemobs.dungeons.EMPackage;
-import com.magmaguy.elitemobs.dungeons.WorldPackage;
+import com.magmaguy.elitemobs.dungeons.EliteMobsWorld;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
-
-import java.util.Objects;
 
 public class PlayerTeleportEvent extends Event implements Cancellable {
 
@@ -67,20 +64,10 @@ public class PlayerTeleportEvent extends Event implements Cancellable {
     }
 
     public void executeTeleport() {
+        if (!EliteMobsWorld.isEliteMobsWorld(player.getLocation().getWorld().getUID()))
+            PlayerData.setBackTeleportLocation(player, originalLocation);
+
         player.teleport(destination);
-        for (EMPackage emPackage : EMPackage.getEmPackages().values())
-            if (emPackage.isInstalled() &&
-                    emPackage instanceof WorldPackage &&
-                    ((WorldPackage) emPackage).getWorld() == destination.getWorld())
-                return;
-
-        EMPackage adventurersGuildPackage = EMPackage.getContent("adventurers_guild_hub");
-        if (adventurersGuildPackage == null || !adventurersGuildPackage.isInstalled() ||
-                adventurersGuildPackage.getDungeonPackagerConfigFields().getTeleportLocation() == null ||
-                Objects.equals(adventurersGuildPackage.getDungeonPackagerConfigFields().getTeleportLocation().getWorld(), originalLocation.getWorld()))
-            return;
-
-        PlayerData.setBackTeleportLocation(player, originalLocation);
     }
 
     public static class PlayerTeleportEventExecutor implements Listener {
