@@ -12,7 +12,6 @@ import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.commands.admin.*;
 import com.magmaguy.elitemobs.commands.quests.QuestCommand;
 import com.magmaguy.elitemobs.commands.setup.SetupMenu;
-import com.magmaguy.elitemobs.config.ConfigurationExporter;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
@@ -691,13 +690,6 @@ public class AdminCommands {
                                 return;
                             }
                 }));
-
-        // /em generateresourcepack
-        manager.command(builder.literal("generateresourcepack")
-                .senderType(CommandSender.class)
-                .permission("elitemobs.*")
-                .meta(CommandMeta.DESCRIPTION, "Generates a resource pack for EliteMobs using ModelEngine")
-                .handler(commandContext -> ConfigurationExporter.createResourcePack(commandContext.getSender())));
 
         // /em quest reset player
         manager.command(builder.literal("quest")
