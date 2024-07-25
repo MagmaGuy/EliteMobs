@@ -14,9 +14,9 @@ public class MoneyAddAllCommand extends AdvancedCommand {
         addLiteral("all");
         addArgument("amount", new ArrayList<>(CustomItemsConfig.getCustomItems().keySet()));
         setUsage("/em money add all <amount>");
-        setPermission("elitemobs.*");
+        setPermission("elitemobs.money.add.all");
         setSenderType(SenderType.PLAYER);
-        setDescription("Simulates loot drops for the specified amount of times for the specified level and player.");
+        setDescription("Gives every player on the server the specified amount of money.");
     }
 
     @Override

@@ -11,7 +11,7 @@ public class QuestCompleteCommand extends AdvancedCommand {
         super(List.of("quest"));
         addLiteral("complete");
         setUsage("/em quest complete");
-        setPermission("elitemobs.*");
+        setPermission("elitemobs.quest.complete");
         setSenderType(SenderType.PLAYER);
         setDescription("Forces all of your currently active elite quests to be completed. For debugging use only.");
     }
