@@ -11,7 +11,7 @@ public class PackageDungeonCommand extends AdvancedCommand {
         addArgument("dungeonName", new ArrayList<>());
         addArgument("version", new ArrayList<>());
         setUsage("/em package <dungeonName> <version>");
-        setPermission("elitemobs.*");
+        setPermission("elitemobs.package");
         setDescription("Packages an EliteMobs dungeon for distribution.");
     }
 

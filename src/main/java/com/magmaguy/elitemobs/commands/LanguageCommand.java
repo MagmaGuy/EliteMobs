@@ -12,7 +12,7 @@ public class LanguageCommand extends AdvancedCommand {
         super(List.of("language"));
         addArgument("language", TranslationsConfig.getTranslationConfigs().keySet().stream().toList());
         setUsage("/em language <filename>");
-        setPermission("elitemobs.*");
+        setPermission("elitemobs.language");
         setDescription("Sets the language that the server will use for EliteMobs, based on a translation file in the translation files.");
     }
 

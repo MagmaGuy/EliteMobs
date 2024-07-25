@@ -13,7 +13,7 @@ public class PlaceTreasureChestCommand extends AdvancedCommand {
         addLiteral("treasureChest");
         addArgument("filename", new ArrayList<>(CustomTreasureChestsConfig.getCustomTreasureChestConfigFields().keySet()));
         setUsage("/em place treasureChest <filename>");
-        setPermission("elitemobs.*");
+        setPermission("elitemobs.place.treasure");
         setSenderType(SenderType.PLAYER);
         setDescription("Permanently adds a treasure chest to the location the user is standing on.");
     }
