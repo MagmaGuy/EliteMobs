@@ -1,13 +1,11 @@
 package com.magmaguy.elitemobs.config.translations;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.CustomConfigFields;
-import com.magmaguy.elitemobs.config.CustomConfigFieldsInterface;
 import com.magmaguy.elitemobs.config.DefaultConfig;
-import com.magmaguy.elitemobs.utils.InfoMessage;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.ChatColorConverter;
+import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -20,7 +18,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TranslationsConfigFields extends CustomConfigFields implements CustomConfigFieldsInterface {
+public class TranslationsConfigFields extends CustomConfigFields {
 
     private final List<String> outdatedCustomKeys = new ArrayList<>();
     boolean saving = false;
@@ -56,7 +54,7 @@ public class TranslationsConfigFields extends CustomConfigFields implements Cust
                 inputStreamReader.close();
                 bufferedReader.close();
             } catch (Exception ex) {
-                new InfoMessage("Translation filename " + parsedFilename + " is not prepackaged. This is fine if it is meant to be a custom translation.");
+                Logger.info("Translation filename " + parsedFilename + " is not prepackaged. This is fine if it is meant to be a custom translation.");
                 customLanguage = true;
             }
         }
@@ -79,7 +77,7 @@ public class TranslationsConfigFields extends CustomConfigFields implements Cust
             try {
                 dataPath.toFile().createNewFile();
             } catch (Exception ex) {
-                new InfoMessage("Failed to create language data file for file " + filename + " backup file should've been " + languageDataFilename);
+                Logger.info("Failed to create language data file for file " + filename + " backup file should've been " + languageDataFilename);
             }
 
 
@@ -87,7 +85,7 @@ public class TranslationsConfigFields extends CustomConfigFields implements Cust
         try {
             translationData = YamlConfiguration.loadConfiguration(new InputStreamReader(new FileInputStream(translationDataFile), StandardCharsets.UTF_8));
         } catch (Exception ex) {
-            new WarningMessage("Failed to read translation data!");
+            Logger.warn("Failed to read translation data!");
             return;
         }
         /*
@@ -107,7 +105,7 @@ public class TranslationsConfigFields extends CustomConfigFields implements Cust
             Object liveValue = fileConfiguration.get(path);
 
             if (premadeValue == null) {
-                new WarningMessage("Something went wrong updating the translations, report this to the developer!");
+                Logger.warn("Something went wrong updating the translations, report this to the developer!");
                 continue;
             }
 
@@ -117,7 +115,7 @@ public class TranslationsConfigFields extends CustomConfigFields implements Cust
                 if (liveValue != null) {
                     //If that is the case, the value is custom and the admin should be notified that it didn't update
                     outdatedCustomKeys.add(path);
-                    new InfoMessage("Did not modify " + path + " because the value was custom");
+                    Logger.info("Did not modify " + path + " because the value was custom");
                 } else
                     //If there is no value set yet, set the default value
                     fileConfiguration.set(path, premadeValue);
@@ -128,11 +126,11 @@ public class TranslationsConfigFields extends CustomConfigFields implements Cust
                 if (!dataValue.equals(liveValue)) {
                     //The value is custom
                     outdatedCustomKeys.add(path);
-                    new InfoMessage("Did not modify " + path + " because the value was custom");
+                    Logger.info("Did not modify " + path + " because the value was custom");
                 } else {
                     //The value is not custom, can safely be autoupdated
                     fileConfiguration.set(path, premadeValue);
-                    new InfoMessage("Updated translation entry " + path + " for language " + filename);
+                    Logger.info("Updated translation entry " + path + " for language " + filename);
                 }
             }
 
@@ -146,7 +144,7 @@ public class TranslationsConfigFields extends CustomConfigFields implements Cust
             translationData.save(translationDataFile);
             fileConfiguration.save(file);
         } catch (Exception exception) {
-            new WarningMessage("Failed to save language files, report this to the developer!");
+            Logger.warn("Failed to save language files, report this to the developer!");
         }
     }
 

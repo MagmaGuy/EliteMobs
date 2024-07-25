@@ -1,6 +1,6 @@
 package com.magmaguy.elitemobs.powers.scripts.caching;
 
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.configuration.ConfigurationSection;
 
@@ -15,7 +15,7 @@ public class ScriptActionsBlueprint {
     public ScriptActionsBlueprint(ConfigurationSection configurationSection, String scriptName, String filename) {
         List<Map<?, ?>> values = configurationSection.getMapList("Actions");
         if (values.isEmpty()) {
-            new WarningMessage("Script " + scriptName + " in file " + filename + " does not have any actions! You should probably fix this.");
+            Logger.warn("Script " + scriptName + " in file " + filename + " does not have any actions! You should probably fix this.");
             return;
         }
         values.forEach(entry -> scriptActionsBlueprintList.add(new ScriptActionBlueprint(entry, scriptName, filename)));

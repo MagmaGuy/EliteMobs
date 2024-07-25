@@ -7,7 +7,7 @@ import com.magmaguy.elitemobs.config.powers.premade.ZombieParentsConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.powers.meta.MajorPower;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -96,14 +96,14 @@ public class ZombieParents extends MajorPower implements Listener {
         try {
             reinforcementMom.spawn(event.getEntity().getLocation(), event.getEliteMobEntity().getLevel(), false);
         } catch (Exception ex) {
-            new WarningMessage("Failed to spawn Zombie Parents Mom reinforcement!");
+            Logger.warn("Failed to spawn Zombie Parents Mom reinforcement!");
             return;
         }
         CustomBossEntity reinforcementDad = CustomBossEntity.createCustomBossEntity("zombie_parents_dad.yml");
         try {
             reinforcementDad.spawn(event.getEntity().getLocation(), event.getEliteMobEntity().getLevel(), false);
         } catch (Exception ex) {
-            new WarningMessage("Failed to spawn Zombie Parents Dad reinforcement!");
+            Logger.warn("Failed to spawn Zombie Parents Dad reinforcement!");
             return;
         }
 

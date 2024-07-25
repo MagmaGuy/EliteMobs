@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.items;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
@@ -10,7 +9,8 @@ import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffect;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffectContainer;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.utils.PersistentVanillaData;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.ChatColorConverter;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
@@ -304,7 +304,7 @@ public class ItemTagger {
             if (enchantmentLevel > 0) {
                 EnchantmentsConfigFields enchantmentsConfigFields = EnchantmentsConfig.getEnchantment(enchantment.getName().toLowerCase(Locale.ROOT) + ".yml");
                 if (enchantmentsConfigFields == null) {
-                    new WarningMessage("Failed to get configuration file for enchantment called " + enchantment.getName().toLowerCase(Locale.ROOT) + ".yml");
+                    Logger.warn("Failed to get configuration file for enchantment called " + enchantment.getName().toLowerCase(Locale.ROOT) + ".yml");
                     continue;
                 }
                 itemEnchantmentFilenames.put(enchantmentsConfigFields, enchantmentLevel);

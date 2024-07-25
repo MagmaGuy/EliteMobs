@@ -1,10 +1,10 @@
 package com.magmaguy.elitemobs.commands.admin;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.items.EliteItemLore;
 import com.magmaguy.elitemobs.items.LootTables;
-import com.magmaguy.elitemobs.utils.InfoMessage;
+import com.magmaguy.magmacore.util.ChatColorConverter;
+import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -27,7 +27,7 @@ public class SimLootCommand {
             counter++;
             if (run(player, level, false)) break;
             if (counter > 1000) {
-                new InfoMessage("Failed to generate loot within 1000 attempts! This is almost certainly an issue with the way the loot is configured in your server.");
+                Logger.info("Failed to generate loot within 1000 attempts! This is almost certainly an issue with the way the loot is configured in your server.");
                 break;
             }
         }

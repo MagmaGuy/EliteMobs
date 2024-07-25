@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.config.customspawns;
 
 import com.magmaguy.elitemobs.config.CustomConfigFields;
-import com.magmaguy.elitemobs.config.CustomConfigFieldsInterface;
 import com.magmaguy.elitemobs.events.MoonPhaseDetector;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,7 +10,7 @@ import org.bukkit.block.Biome;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CustomSpawnConfigFields extends CustomConfigFields implements CustomConfigFieldsInterface {
+public class CustomSpawnConfigFields extends CustomConfigFields {
 
     @Getter
     @Setter

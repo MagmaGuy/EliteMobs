@@ -1,12 +1,12 @@
 package com.magmaguy.elitemobs.quests.menus;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.commands.quests.QuestCommand;
 import com.magmaguy.elitemobs.config.QuestsConfig;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.Quest;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
+import com.magmaguy.magmacore.util.ChatColorConverter;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;

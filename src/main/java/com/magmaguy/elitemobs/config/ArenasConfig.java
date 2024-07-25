@@ -1,12 +1,11 @@
 package com.magmaguy.elitemobs.config;
 
+import com.magmaguy.magmacore.config.ConfigurationFile;
 import lombok.Getter;
-import org.bukkit.configuration.file.FileConfiguration;
 
-import java.io.File;
 import java.util.List;
 
-public class ArenasConfig {
+public class ArenasConfig extends ConfigurationFile {
     @Getter
     private static String notEnoughPlayersMessage;
     @Getter
@@ -50,13 +49,12 @@ public class ArenasConfig {
     @Getter
     private static String noArenaPermissionMessage;
 
-    private ArenasConfig() {
+    public ArenasConfig() {
+        super("Arenas.yml");
     }
 
-    public static void initializeConfig() {
-        File file = ConfigurationEngine.fileCreator("Arenas.yml");
-        FileConfiguration fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
-
+    @Override
+    public void initializeValues() {
         notEnoughPlayersMessage = ConfigurationEngine.setString(
                 List.of("Message that appears when not enough players are present to start an arena."),
                 file, fileConfiguration, "notEnoughPlayersMessage", "&8[EliteMobs] &cYou need at least $amount to start the match!", true);
@@ -120,6 +118,5 @@ public class ArenasConfig {
         noArenaPermissionMessage = ConfigurationEngine.setString(
                 List.of("Sets the message sent to players if they do not have permission to enter an arena."),
                 file, fileConfiguration, "noArenaPermissionMessage", "[EliteMobs] You don't have the permission to enter this arena!", true);
-        ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }
 }

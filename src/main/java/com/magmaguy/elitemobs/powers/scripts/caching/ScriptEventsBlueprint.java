@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.powers.scripts.caching;
 
 import com.magmaguy.elitemobs.api.*;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.configuration.ConfigurationSection;
 
@@ -39,7 +39,7 @@ public class ScriptEventsBlueprint {
                     zoneListener = true;
                 }
                 default ->
-                        new WarningMessage("Failed to get valid script event from entry " + entry + " in " + scriptName + " for file " + filename + " !");
+                        Logger.warn("Failed to get valid script event from entry " + entry + " in " + scriptName + " for file " + filename + " !");
             }
         }
     }

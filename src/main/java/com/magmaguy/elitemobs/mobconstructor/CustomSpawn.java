@@ -14,8 +14,7 @@ import com.magmaguy.elitemobs.events.TimedEvent;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
-import com.magmaguy.elitemobs.utils.DebugMessage;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.*;
@@ -59,14 +58,14 @@ public class CustomSpawn {
         this.timedEvent = timedEvent;
 
         if (customSpawnConfigFields == null) {
-            new WarningMessage("Invalid custom spawn detected for file " + customSpawnConfig + " in event " + timedEvent.getCustomEventsConfigFields().getFilename());
+            Logger.warn("Invalid custom spawn detected for file " + customSpawnConfig + " in event " + timedEvent.getCustomEventsConfigFields().getFilename());
             return;
         }
 
         customBossesFilenames.forEach(bossString -> {
             CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(bossString);
             if (customBossesConfigFields == null) {
-                new WarningMessage("Attempted to pass invalid boss into CustomSpawn: " + bossString);
+                Logger.warn("Attempted to pass invalid boss into CustomSpawn: " + bossString);
                 return;
             }
             CustomBossEntity customBossEntity = new CustomBossEntity(customBossesConfigFields);
@@ -78,7 +77,7 @@ public class CustomSpawn {
     public CustomSpawn(String customSpawnConfig, CustomBossEntity customBossEntity) {
         this.customSpawnConfigFields = CustomSpawnConfig.getCustomEvent(customSpawnConfig);
         if (customSpawnConfigFields == null) {
-            new WarningMessage("Invalid custom spawn detected for file " + customSpawnConfig);
+            Logger.warn("Invalid custom spawn detected for file " + customSpawnConfig);
             return;
         }
         customBossEntities.add(customBossEntity);
@@ -190,8 +189,6 @@ public class CustomSpawn {
                     @Override
                     public void run() {
                         generateCustomSpawn();
-                        if (timedEvent != null)
-                            new DebugMessage("Failed to spawn " + timedEvent.getCustomEventsConfigFields().getFilename() + " after " + allTries + " tries. Will try again in 1 minute.");
                     }
                 }.runTaskLaterAsynchronously(MetadataHandler.PLUGIN, 20 * 60);
             } else {
@@ -201,22 +198,21 @@ public class CustomSpawn {
                 }));
             }
         } else {
-            if (isEvent) new DebugMessage("Spawned bosses for event after " + allTries + " tries");
             spawn();
         }
     }
 
     public Location generateRandomSpawnLocation() {
         if (customSpawnConfigFields == null) {
-            new WarningMessage("Something tried to spawn but has invalid custom spawn config fields! This isn't good.", true);
-            new WarningMessage("Bosses: ");
+            Logger.warn("Something tried to spawn but has invalid custom spawn config fields! This isn't good.", true);
+            Logger.warn("Bosses: ");
             getCustomBossEntities().forEach((customBossEntity) -> {
                 if (customBossEntity != null)
                     if (customBossEntity.getName() != null)
-                        new WarningMessage(customBossEntity.getCustomBossesConfigFields().getName());
+                        Logger.warn(customBossEntity.getCustomBossesConfigFields().getName());
             });
             if (timedEvent != null) {
-                new WarningMessage("Event: " + timedEvent.getCustomEventsConfigFields().getFilename());
+                Logger.warn("Event: " + timedEvent.getCustomEventsConfigFields().getFilename());
                 timedEvent.end();
             }
             return null;

@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.items.potioneffects;
 
 import com.magmaguy.elitemobs.config.LegacyValueConverter;
 import com.magmaguy.elitemobs.config.potioneffects.PotionEffectsConfig;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
 import org.bukkit.potion.PotionEffect;
@@ -23,7 +23,7 @@ public class ElitePotionEffect {
             int duration = 2 * 20;
             PotionEffectType potionEffectType = Registry.EFFECT.get(new NamespacedKey("minecraft", LegacyValueConverter.parsePotionEffect(stringObject[0]).toLowerCase(Locale.ROOT)));
             if (potionEffectType == null) {
-                new WarningMessage("Failed to get valid potion effect for " + stringObject[0].toLowerCase(Locale.ROOT));
+                Logger.warn("Failed to get valid potion effect for " + stringObject[0].toLowerCase(Locale.ROOT));
                 return;
             }
             if (potionEffectType.equals(PotionEffectType.NIGHT_VISION))
@@ -51,7 +51,7 @@ public class ElitePotionEffect {
                         Integer.parseInt(stringObject[1]));
 
         } catch (Exception ex) {
-            new WarningMessage("Detected invalid potion effect entry: " + string);
+            Logger.warn("Detected invalid potion effect entry: " + string);
             ex.printStackTrace();
         }
     }

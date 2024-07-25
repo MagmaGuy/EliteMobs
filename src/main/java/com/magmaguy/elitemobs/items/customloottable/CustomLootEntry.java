@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.items.customloottable;
 
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
@@ -31,7 +31,7 @@ public class CustomLootEntry implements Serializable {
     }
 
     public static void errorMessage(String rawString, String configFilename, String reason) {
-        new WarningMessage("Failed to parse entry " + rawString + " for file " + configFilename + " due to invalid: " + reason);
+        Logger.warn("Failed to parse entry " + rawString + " for file " + configFilename + " due to invalid: " + reason);
     }
 
     public boolean willDrop(Player player) {

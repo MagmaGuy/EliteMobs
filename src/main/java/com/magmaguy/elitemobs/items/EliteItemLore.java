@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.items;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
@@ -12,7 +11,8 @@ import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffect;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffectContainer;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.utils.Round;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.ChatColorConverter;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.bukkit.enchantments.Enchantment;
@@ -52,7 +52,7 @@ public class EliteItemLore {
     public EliteItemLore(ItemStack itemStack, boolean showItemWorth) {
 
         if (!EliteItemManager.isEliteMobsItem(itemStack)) {
-            new WarningMessage("Attempted to rewrite the lore of a non-elitemobs item! This is not supposed to happen.");
+            Logger.warn("Attempted to rewrite the lore of a non-elitemobs item! This is not supposed to happen.");
             return;
         }
 

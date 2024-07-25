@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.quests;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.QuestAcceptEvent;
 import com.magmaguy.elitemobs.api.QuestRewardEvent;
@@ -11,7 +10,8 @@ import com.magmaguy.elitemobs.quests.objectives.QuestObjectives;
 import com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldowns;
 import com.magmaguy.elitemobs.quests.rewards.QuestReward;
 import com.magmaguy.elitemobs.utils.EventCaller;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.ChatColorConverter;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -71,7 +71,7 @@ public class CustomQuest extends Quest {
         if (customQuestsConfigFields == null)
             this.customQuestsConfigFields = CustomQuestsConfig.getCustomQuests().get(configurationFilename);
         if (customQuestsConfigFields == null) {
-            new WarningMessage("Detected that Custom Quest " + configurationFilename + " got removed even though player "
+            Logger.warn("Detected that Custom Quest " + configurationFilename + " got removed even though player "
                     + Bukkit.getPlayer(getPlayerUUID()).getName() + " is still trying to complete it. This player's quest will now be wiped.");
             PlayerData.removeQuest(getPlayerUUID(), this);
             return null;

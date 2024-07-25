@@ -1,9 +1,9 @@
 package com.magmaguy.elitemobs.mobconstructor.custombosses;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
+import com.magmaguy.magmacore.util.ChatColorConverter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 

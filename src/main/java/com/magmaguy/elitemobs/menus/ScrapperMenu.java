@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.menus;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.DefaultConfig;
@@ -11,6 +10,7 @@ import com.magmaguy.elitemobs.config.menus.premade.ScrapperMenuConfig;
 import com.magmaguy.elitemobs.items.customenchantments.RepairEnchantment;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
+import com.magmaguy.magmacore.util.ChatColorConverter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;

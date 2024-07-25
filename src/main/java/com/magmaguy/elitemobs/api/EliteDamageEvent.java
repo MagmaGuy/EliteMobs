@@ -8,11 +8,10 @@ import org.bukkit.event.HandlerList;
 
 public class EliteDamageEvent extends Event implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
+    private final Event event;
     private boolean isCancelled = false;
     @Getter
     private double damage;
-
-    private final Event event;
 
     /**
      * Classes that deal with damage in EliteMobs extend this class in order to inherit modifiable and cancellable behavior.

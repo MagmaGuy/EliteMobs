@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.config.customarenas;
 
 import com.magmaguy.elitemobs.config.CustomConfigFields;
-import com.magmaguy.elitemobs.config.CustomConfigFieldsInterface;
 import com.magmaguy.elitemobs.items.customloottable.CustomLootTable;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,7 +9,7 @@ import org.bukkit.Location;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CustomArenasConfigFields extends CustomConfigFields implements CustomConfigFieldsInterface {
+public class CustomArenasConfigFields extends CustomConfigFields {
 
     @Getter
     @Setter

@@ -7,7 +7,7 @@ import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.scripts.EliteScript;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.entity.LivingEntity;
@@ -78,7 +78,7 @@ public class ElitePower {
                 eliteEntity.getElitePowers().add(elitePower);
                 elitePower.applyPowers(eliteEntity.getLivingEntity());
             } catch (Exception ex) {
-                new WarningMessage("Failed to assign power for config field " + configFields.getFilename());
+                Logger.warn("Failed to assign power for config field " + configFields.getFilename());
             }
         else
             eliteEntity.getElitePowers().addAll(EliteScript.generateBossScripts(configFields.getEliteScriptBlueprints(), eliteEntity));
@@ -100,7 +100,7 @@ public class ElitePower {
             } catch (Exception ex) {
                 //Not sure why stuff in the meta package is getting scanned, seems like the package scan isn't working as intended
                 //todo: figure out why package scanning is getting more than what is in the packages here
-                //new WarningMessage("Failed to initialize power " + power.getName());
+                //Logger.warn("Failed to initialize power " + power.getName());
             }
         });
     }

@@ -32,5 +32,6 @@ public class OasisPyramidSanctum extends DungeonPackagerConfigFields {
                 false);
         setDifficulties(List.of(
                 Map.of("name", "normal", "id", 0)));
+        setListedInTeleports(false);
     }
 }

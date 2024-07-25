@@ -4,7 +4,6 @@ import com.magmaguy.elitemobs.api.EliteMobEnterCombatEvent;
 import com.magmaguy.elitemobs.api.EliteMobExitCombatEvent;
 import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
-import com.magmaguy.elitemobs.utils.DebugMessage;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitTask;
@@ -62,7 +61,6 @@ public abstract class CombatEnterScanPower extends MajorPower implements Listene
 
         @EventHandler
         public void onCombatExit(EliteMobExitCombatEvent event) {
-            new DebugMessage("Exiting combat for " + event.getEliteMobEntity().getName());
             for (CombatEnterScanPower combatEnterScanPower : combatEnterScanPowers) {
                 ElitePower elitePowerInstance = event.getEliteMobEntity().getPower(combatEnterScanPower);
                 if (elitePowerInstance == null)

@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -32,7 +32,7 @@ public class RepairEnchantment extends CustomEnchantment {
             default -> CustomItem.getCustomItem("elite_scrap_tiny.yml");
         };
         if (scrapItem == null) {
-            new WarningMessage("Failed to generate scrap! Was the default elite scrap disabled?");
+            Logger.warn("Failed to generate scrap! Was the default elite scrap disabled?");
             return null;
         }
         return scrapItem.generateItemStack(scrapLevel, player, eliteEntity);

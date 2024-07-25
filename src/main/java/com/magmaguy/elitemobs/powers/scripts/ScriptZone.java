@@ -11,8 +11,8 @@ import com.magmaguy.elitemobs.powers.scripts.caching.ScriptTargetsBlueprint;
 import com.magmaguy.elitemobs.powers.scripts.caching.ScriptZoneBlueprint;
 import com.magmaguy.elitemobs.powers.scripts.enums.TargetType;
 import com.magmaguy.elitemobs.utils.EventCaller;
-import com.magmaguy.elitemobs.utils.WarningMessage;
 import com.magmaguy.elitemobs.utils.shapes.*;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
@@ -101,7 +101,7 @@ public class ScriptZone {
             case INHERIT_SCRIPT_ZONE_FULL, INHERIT_SCRIPT_ZONE_BORDER:
                 return getEntitiesInArea(generateShapes(scriptActionData.getInheritedScriptActionData(), false), blueprintFromRequestingTarget.getTargetType());
             default: {
-                new WarningMessage("Couldn't parse target " + targets.getTargetBlueprint().getTargetType() + " in script ");
+                Logger.warn("Couldn't parse target " + targets.getTargetBlueprint().getTargetType() + " in script ");
                 return new ArrayList<>();
             }
         }
@@ -137,7 +137,7 @@ public class ScriptZone {
             try {
                 return scriptActionData.getShapesChachedByTarget();
             } catch (Exception ex) {
-                new WarningMessage("Failed to get list of shapes!");
+                Logger.warn("Failed to get list of shapes!");
                 return new ArrayList<>();
             }
         }
@@ -159,7 +159,7 @@ public class ScriptZone {
                     break;
                 case STATIC_RAY:
                     if (targets2 == null) {
-                        new WarningMessage("Script for boss " + scriptActionData.getEliteEntity().getName() + " has a static ray but no set target2 for the ray!");
+                        Logger.warn("Script for boss " + scriptActionData.getEliteEntity().getName() + " has a static ray but no set target2 for the ray!");
                         break;
                     }
                     for (Location location : targets2.getTargetLocations(scriptActionData))
@@ -168,7 +168,7 @@ public class ScriptZone {
                     break;
                 case ROTATING_RAY:
                     if (targets2 == null) {
-                        new WarningMessage("Script for boss " + scriptActionData.getEliteEntity().getName() + " has a static ray but no set target2 for the ray!");
+                        Logger.warn("Script for boss " + scriptActionData.getEliteEntity().getName() + " has a static ray but no set target2 for the ray!");
                         break;
                     }
                     for (Location target2Location : targets2.getTargetLocations(scriptActionData))
@@ -177,7 +177,7 @@ public class ScriptZone {
                     break;
                 case TRANSLATING_RAY:
                     if (targets2 == null) {
-                        new WarningMessage("Script for boss " + scriptActionData.getEliteEntity().getName() + " has a static ray but no set target2 for the ray!");
+                        Logger.warn("Script for boss " + scriptActionData.getEliteEntity().getName() + " has a static ray but no set target2 for the ray!");
                         break;
                     }
                     Location targetLocationEnd = null;

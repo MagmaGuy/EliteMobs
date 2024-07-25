@@ -1,12 +1,12 @@
 package com.magmaguy.elitemobs.instanced.dungeons;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.SpecialItemSystemsConfig;
 import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfig;
 import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
 import com.magmaguy.elitemobs.menus.ItemEnchantmentMenu;
 import com.magmaguy.elitemobs.utils.WorldInstantiator;
+import com.magmaguy.magmacore.util.ChatColorConverter;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;

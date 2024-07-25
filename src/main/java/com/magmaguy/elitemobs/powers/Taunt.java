@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.powers;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedEvent;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
@@ -11,6 +10,7 @@ import com.magmaguy.elitemobs.config.powers.premade.TauntConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.meta.MinorPower;
+import com.magmaguy.magmacore.util.ChatColorConverter;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;

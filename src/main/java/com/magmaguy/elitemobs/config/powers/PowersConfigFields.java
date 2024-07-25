@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.config.powers;
 import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import com.magmaguy.elitemobs.powers.scripts.caching.EliteScriptBlueprint;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.configuration.ConfigurationSection;
@@ -128,7 +128,7 @@ public class PowersConfigFields extends CustomConfigFields {
         try {
             if (scripts != null) eliteScriptBlueprints = EliteScriptBlueprint.parseBossScripts(scripts, this);
         } catch (Exception exception) {
-            new WarningMessage("You have a script with invalid data! Script in " + filename + " is not valid.");
+            Logger.warn("You have a script with invalid data! Script in " + filename + " is not valid.");
             exception.printStackTrace();
         }
     }

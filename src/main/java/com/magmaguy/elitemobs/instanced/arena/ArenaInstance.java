@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.instanced.arena;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.ArenaCompleteEvent;
 import com.magmaguy.elitemobs.api.ArenaStartEvent;
@@ -15,8 +14,9 @@ import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.thirdparty.mythicmobs.MythicMobsInterface;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.EventCaller;
-import com.magmaguy.elitemobs.utils.WarningMessage;
 import com.magmaguy.elitemobs.utils.shapes.Cylinder;
+import com.magmaguy.magmacore.util.ChatColorConverter;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -113,14 +113,14 @@ public class ArenaInstance extends MatchInstance {
                         try {
                             wave = Integer.parseInt(finalString[1]);
                         } catch (Exception ex) {
-                            new WarningMessage("Failed to parse wave for entry " + subString + " for arena " + customArenasConfigFields.getFilename());
+                            Logger.warn("Failed to parse wave for entry " + subString + " for arena " + customArenasConfigFields.getFilename());
                         }
                         break;
                     case "message":
                         message = finalString[1];
                         break;
                     default:
-                        new WarningMessage("Failed to parse arena message entry " + subString + " for arena " + customArenasConfigFields.getFilename());
+                        Logger.warn("Failed to parse arena message entry " + subString + " for arena " + customArenasConfigFields.getFilename());
                 }
             }
             if (!message.isEmpty() && wave > 0) waveMessage.put(wave, ChatColorConverter.convert(message));
@@ -135,11 +135,11 @@ public class ArenaInstance extends MatchInstance {
         Location startLocation = ConfigurationLocation.serialize(customArenasConfigFields.getStartLocation());
         Location exitLocation = ConfigurationLocation.serialize(customArenasConfigFields.getExitLocation());
         if (corner1 == null || corner2 == null || startLocation == null || exitLocation == null) {
-            //new WarningMessage("Failed to correctly initialize arena " + customArenasConfigFields.getFilename() + " due to invalid locations for corner1/corner2/startLocation/exitLocation");
+            //Logger.warn("Failed to correctly initialize arena " + customArenasConfigFields.getFilename() + " due to invalid locations for corner1/corner2/startLocation/exitLocation");
             return;
         }
         if (corner1.getWorld() == null || corner2.getWorld() == null || startLocation.getWorld() == null || exitLocation.getWorld() == null) {
-            //new WarningMessage("Failed to correctly initialize arena " + customArenasConfigFields.getFilename() + " due to invalid world for corner1/corner2/startLocation/exitLocation");
+            //Logger.warn("Failed to correctly initialize arena " + customArenasConfigFields.getFilename() + " due to invalid world for corner1/corner2/startLocation/exitLocation");
             return;
         }
         new ArenaInstance(customArenasConfigFields, corner1, corner2, startLocation, exitLocation);
@@ -160,7 +160,7 @@ public class ArenaInstance extends MatchInstance {
                         location = splitSubEntry[1];
                         break;
                     default:
-                        new WarningMessage("Invalid entry for the spawn points of instanced content: " + splitSubEntry[0]);
+                        Logger.warn("Invalid entry for the spawn points of instanced content: " + splitSubEntry[0]);
                         break;
                 }
             }
@@ -244,7 +244,7 @@ public class ArenaInstance extends MatchInstance {
             if (!arenaEntity.isMythicMob()) {
                 CustomBossEntity customBossEntity = CustomBossEntity.createCustomBossEntity(arenaEntity.getBossfile());
                 if (customBossEntity == null) {
-                    new WarningMessage("Failed to generate custom boss " + arenaEntity.getBossfile() + " because the filename was not valid!");
+                    Logger.warn("Failed to generate custom boss " + arenaEntity.getBossfile() + " because the filename was not valid!");
                     continue;
                 }
                 customBossEntity.setNormalizedCombat();
@@ -253,7 +253,7 @@ public class ArenaInstance extends MatchInstance {
                 customBossEntity.setRandomLoot(false);
                 customBossEntity.spawn(spawnPoints.get(arenaEntity.getSpawnPointName()), true);
                 if (!customBossEntity.exists()) {
-                    new WarningMessage("Arena " + getCustomArenasConfigFields().getArenaName() + " failed to spawn boss " + customBossEntity.getCustomBossesConfigFields().getFilename());
+                    Logger.warn("Arena " + getCustomArenasConfigFields().getArenaName() + " failed to spawn boss " + customBossEntity.getCustomBossesConfigFields().getFilename());
                     continue;
                 } else customBosses.add(customBossEntity);
 
@@ -263,9 +263,9 @@ public class ArenaInstance extends MatchInstance {
                     Entity mythicMob = MythicMobsInterface.spawn(spawnPoints.get(arenaEntity.getSpawnPointName()), arenaEntity.getBossfile(), arenaEntity.getLevel());
                     if (mythicMob != null) nonEliteMobsEntities.add(mythicMob);
                     else
-                        new WarningMessage("Failed to spawn MythicMobs entity '" + arenaEntity.getBossfile() + "' at spawn point " + arenaEntity.getSpawnPointName() + " with level " + arenaEntity.getLevel() + " because MythicMobs did not recognize the name of the entity!");
+                        Logger.warn("Failed to spawn MythicMobs entity '" + arenaEntity.getBossfile() + "' at spawn point " + arenaEntity.getSpawnPointName() + " with level " + arenaEntity.getLevel() + " because MythicMobs did not recognize the name of the entity!");
                 } catch (Exception e) {
-                    new WarningMessage("Failed to spawn MythicMobs entity '" + arenaEntity.getBossfile() + "' at spawn point " + arenaEntity.getSpawnPointName() + " with level " + arenaEntity.getLevel() + " due to a MythicMobs error - there is a high chance mob spawning is being prevented in this area!");
+                    Logger.warn("Failed to spawn MythicMobs entity '" + arenaEntity.getBossfile() + "' at spawn point " + arenaEntity.getSpawnPointName() + " with level " + arenaEntity.getLevel() + " due to a MythicMobs error - there is a high chance mob spawning is being prevented in this area!");
                 }
             }
         }

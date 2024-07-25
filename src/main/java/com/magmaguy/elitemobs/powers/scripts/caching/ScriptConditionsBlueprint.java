@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.powers.scripts.caching;
 
 import com.magmaguy.elitemobs.powers.scripts.enums.ConditionType;
 import com.magmaguy.elitemobs.utils.MapListInterpreter;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Material;
@@ -74,7 +74,7 @@ public class ScriptConditionsBlueprint {
                     value = memorySection.getValues(false);
                 scriptTargets = new ScriptTargetsBlueprint((Map) value, scriptName, filename);
             }
-            default -> new WarningMessage("Failed to read key " + key + " for script " + scriptName);
+            default -> Logger.warn("Failed to read key " + key + " for script " + scriptName);
         }
     }
 

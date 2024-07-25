@@ -1,8 +1,8 @@
 package com.magmaguy.elitemobs.config.dungeonpackager;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.config.CustomConfig;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
+import com.magmaguy.magmacore.config.CustomConfig;
 import lombok.Getter;
 
 import java.io.File;

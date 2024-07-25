@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.powers.scripts.caching;
 
 import com.magmaguy.elitemobs.utils.MapListInterpreter;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.configuration.ConfigurationSection;
 
@@ -25,7 +25,7 @@ public class ScriptCooldownsBlueprint {
                 case "global" ->
                         globalCooldown = MapListInterpreter.parseInteger(entry.getKey(), entry.getValue(), scriptName);
                 default ->
-                        new WarningMessage("Failed to parse cooldown entry for script name " + scriptName + " in config file " + filename);
+                        Logger.warn("Failed to parse cooldown entry for script name " + scriptName + " in config file " + filename);
             }
         }
     }
