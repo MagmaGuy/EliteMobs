@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.commands.quests.QuestCommand;
 import com.magmaguy.magmacore.command.AdvancedCommand;
-import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
 
 import java.util.ArrayList;
@@ -14,13 +13,13 @@ public class QuestAcceptCommand extends AdvancedCommand {
         addLiteral("accept");
         addArgument("questID", new ArrayList<>());
         setUsage("/em quest accept <questID>");
-        setPermission("elitemobs.quest.accept");
+        setPermission("elitemobs.quest.command");
         setSenderType(SenderType.PLAYER);
         setDescription("Accepts a quest. Used via menu, can't be directly used.");
     }
 
     @Override
-    public void execute(CommandData commandData) {
-        QuestCommand.joinQuest(commandData.getStringArgument("questID"), commandData.getPlayerSender());
+    public void execute() {
+        QuestCommand.joinQuest(getStringArgument("questID"), getCurrentPlayerSender());
     }
 }

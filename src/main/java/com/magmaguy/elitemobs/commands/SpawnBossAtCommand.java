@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.magmacore.command.AdvancedCommand;
-import com.magmaguy.magmacore.command.CommandData;
+import com.magmaguy.magmacore.command.SenderType;
 import org.bukkit.Bukkit;
 import org.bukkit.generator.WorldInfo;
 import org.bukkit.util.Vector;
@@ -20,20 +20,21 @@ public class SpawnBossAtCommand extends AdvancedCommand {
         addArgument("x", new ArrayList<>());
         addArgument("y", new ArrayList<>());
         addArgument("z", new ArrayList<>());
-        setUsage("/em spawn bossAt <filename> <worldName> <x> <y> <z>");
-        setPermission("elitemobs.place.admin");
-        setDescription("Spawns a custom boss at the specified location.");
+        setUsage("/setup spawnAt boss <filename> <worldName> <x> <y> <z>");
+        setPermission("elitemobs.*");
+        setSenderType(SenderType.PLAYER);
+        setDescription("Spawns a custom boss at the location the user is looking at.");
     }
 
     @Override
-    public void execute(CommandData commandData) {
+    public void execute() {
         SpawnCommand.spawnCustomBossCommand(
-                commandData.getCommandSender(),
-                commandData.getStringArgument("filename"),
-                commandData.getStringArgument("worldName"),
+                getCurrentPlayerSender(),
+                getStringArgument("filename"),
+                getStringArgument("worldName"),
                 new Vector(
-                        commandData.getDoubleArgument("x"),
-                        commandData.getDoubleArgument("y"),
-                        commandData.getDoubleArgument("z")));
+                        getDoubleArgument("x"),
+                        getDoubleArgument("y"),
+                        getDoubleArgument("z")));
     }
 }

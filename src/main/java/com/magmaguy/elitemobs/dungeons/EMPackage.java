@@ -7,7 +7,7 @@ import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
 import com.magmaguy.elitemobs.utils.EventCaller;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.entity.Player;
@@ -36,11 +36,6 @@ public class EMPackage {
     protected List<CustomBossEntity> customBossEntityList = new ArrayList<>();
     protected List<TreasureChest> treasureChestList = new ArrayList<>();
     protected List<NPCEntity> npcEntities = new ArrayList<>();
-
-    public boolean isOutOfDate() {
-        if (!isInstalled) return false;
-        return outOfDate;
-    }
 
     public EMPackage(DungeonPackagerConfigFields dungeonPackagerConfigFields) {
         this.dungeonPackagerConfigFields = dungeonPackagerConfigFields;
@@ -77,10 +72,15 @@ public class EMPackage {
                     new WorldPackage(dungeonPackagerConfigFields);
                     break;
                 case SCHEMATIC_DUNGEON:
-                    new WarningMessage("Tried to load schematic dungeon " + dungeonPackagerConfigFields.getFilename() + "! This will not work because schematic dungeons have been removed as of EliteMobs 9.0 and replaced with world dungeons. If you want the schematic dungeon experience, I recommend you use BetterStructures with the elite shrines packages, which work better than schematics ever could. Fix this by deleting it from the dungeonpackager file.");
+                    Logger.warn("Tried to load schematic dungeon " + dungeonPackagerConfigFields.getFilename() + "! This will not work because schematic dungeons have been removed as of EliteMobs 9.0 and replaced with world dungeons. If you want the schematic dungeon experience, I recommend you use BetterStructures with the elite shrines packages, which work better than schematics ever could. Fix this by deleting it from the dungeonpackager file.");
                     break;
             }
         }
+    }
+
+    public boolean isOutOfDate() {
+        if (!isInstalled) return false;
+        return outOfDate;
     }
 
     /**
@@ -115,7 +115,7 @@ public class EMPackage {
      * @param player Player installing the content
      * @return Whether the content was installed correctly
      */
-    public boolean install(Player player, boolean paste) {
+    public boolean install() {
         DungeonInstallEvent event = new DungeonInstallEvent(dungeonPackagerConfigFields);
         new EventCaller(event);
         if (!event.isCancelled()) isInstalled = true;

@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.magmacore.command.AdvancedCommand;
-import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.command.CommandSender;
 
@@ -12,7 +11,7 @@ public class ReloadCommand extends AdvancedCommand {
     public ReloadCommand() {
         super(List.of("reload"));
         setUsage("/em reload");
-        setPermission("elitemobs.reload");
+        setPermission("elitemobs.*");
         setDescription("Reloads EliteMobs.");
     }
 
@@ -24,7 +23,7 @@ public class ReloadCommand extends AdvancedCommand {
     }
 
     @Override
-    public void execute(CommandData commandData) {
-        reload(commandData.getCommandSender());
+    public void execute() {
+        reload(getCurrentCommandSender());
     }
 }

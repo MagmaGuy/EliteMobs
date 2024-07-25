@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.menus.ProceduralShopMenu;
 import com.magmaguy.magmacore.command.AdvancedCommand;
-import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Bukkit;
 
@@ -20,11 +19,11 @@ public class ShopProceduralOtherCommand extends AdvancedCommand {
     }
 
     @Override
-    public void execute(CommandData commandData) {
+    public void execute() {
         try {
-            ProceduralShopMenu.shopConstructor(Bukkit.getPlayer(commandData.getStringArgument("player")));
+            ProceduralShopMenu.shopConstructor(Bukkit.getPlayer(getStringArgument("player")));
         } catch (Exception ex) {
-            Logger.sendMessage(commandData.getCommandSender(), "Failed to get player with that username!");
+            Logger.sendMessage(getCurrentCommandSender(), "Failed to get player with that username!");
         }
     }
 }

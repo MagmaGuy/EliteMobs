@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.commands.admin.KillHandler;
 import com.magmaguy.magmacore.command.AdvancedCommand;
-import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
 import org.bukkit.entity.EntityType;
 
@@ -15,16 +14,16 @@ public class KillTypeRadiusCommand extends AdvancedCommand {
         addLiteral("type");
         addArgument("type", new ArrayList<>());
         addArgument("range", new ArrayList<>());
-        setUsage("/em kill type <entityType> <radius>");
-        setPermission("elitemobs.kill.command");
+        setUsage("/em kill type <radius>");
+        setPermission("elitemobs.*");
         setSenderType(SenderType.PLAYER);
-        setDescription("Kills all elites of the specified type within the specified radius.");
+        setDescription("Kills all elites of the specified type.");
     }
 
     @Override
-    public void execute(CommandData commandData) {
-        KillHandler.radiusKillSpecificMobs(commandData.getPlayerSender(),
-                EntityType.valueOf(commandData.getStringArgument("type")),
-                commandData.getIntegerArgument("range"));
+    public void execute() {
+        KillHandler.radiusKillSpecificMobs(getCurrentPlayerSender(),
+                EntityType.valueOf(getStringArgument("type")),
+                getIntegerArgument("range"));
     }
 }

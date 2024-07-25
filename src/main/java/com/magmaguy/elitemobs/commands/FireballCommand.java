@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.magmacore.command.AdvancedCommand;
-import com.magmaguy.magmacore.command.CommandData;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
 
@@ -12,15 +11,15 @@ public class FireballCommand extends AdvancedCommand {
     public FireballCommand() {
         super(List.of("fireball"));
         setUsage("/em fireball");
-        setPermission("elitemobs.fireball");
+        setPermission("elitemobs.*");
         setDescription("Shoots a fireball, to test terrain protections and explosion regeneration.");
     }
 
     @Override
-    public void execute(CommandData commandData) {
-        Fireball fireball = (Fireball) commandData.getPlayerSender().getWorld().spawnEntity(commandData.getPlayerSender().getLocation(), EntityType.FIREBALL);
-        fireball.setDirection(commandData.getPlayerSender().getLocation().getDirection().normalize());
-        fireball.setShooter(commandData.getPlayerSender());
+    public void execute() {
+        Fireball fireball = (Fireball) getCurrentPlayerSender().getWorld().spawnEntity(getCurrentPlayerSender().getLocation(), EntityType.FIREBALL);
+        fireball.setDirection(getCurrentPlayerSender().getLocation().getDirection().normalize());
+        fireball.setShooter(getCurrentPlayerSender());
         fireball.setYield(3F);
         EntityTracker.registerProjectileEntity(fireball);
     }

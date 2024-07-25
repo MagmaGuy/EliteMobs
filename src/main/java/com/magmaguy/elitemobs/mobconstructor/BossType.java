@@ -4,5 +4,6 @@ public enum BossType {
     NORMAL,
     MINIBOSS,
     BOSS,
+    REINFORCEMENT,
     EVENT
 }

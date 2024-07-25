@@ -20,8 +20,8 @@ import java.util.concurrent.ThreadLocalRandom;
 public class ScriptConditions {
 
     private final ScriptConditionsBlueprint conditionsBlueprint;
-    private ScriptTargets scriptTargets = null;
     private final EliteScript eliteScript;
+    private ScriptTargets scriptTargets = null;
 
     public ScriptConditions(ScriptConditionsBlueprint scriptConditionsBlueprint, EliteScript eliteScript, boolean actionCondition) {
         this.conditionsBlueprint = scriptConditionsBlueprint;

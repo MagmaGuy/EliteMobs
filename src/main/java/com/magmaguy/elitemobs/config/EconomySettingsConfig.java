@@ -1,17 +1,17 @@
 package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.elitemobs.combatsystem.CombatSystem;
+import com.magmaguy.magmacore.config.ConfigurationFile;
 import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 
-import java.io.File;
 import java.util.List;
 
 /**
  * Created by MagmaGuy on 17/06/2017.
  */
-public class EconomySettingsConfig {
+public class EconomySettingsConfig extends ConfigurationFile {
     @Getter
     private static boolean enableEconomy;
     @Getter
@@ -82,14 +82,26 @@ public class EconomySettingsConfig {
     private static String shopBatchSellMessage;
 
 
-    private EconomySettingsConfig() {
+    public EconomySettingsConfig() {
+        super("EconomySettings.yml");
     }
 
-    public static void initializeConfig() {
+    private static void addMaterial(FileConfiguration fileConfiguration, Material material, double value) {
+        ConfigurationEngine.setDouble(
+                List.of("Sets the worth of this material for the elitemobs currency system."),
+                fileConfiguration, "materialWorth." + material.name(), value);
+    }
 
-        File file = ConfigurationEngine.fileCreator("EconomySettings.yml");
-        FileConfiguration fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
+    public static double getMaterialWorth(Material material) {
+        try {
+            return thisConfiguration.getDouble("materialWorth." + material.name());
+        } catch (Exception ex) {
+            return defaultMaterialWorth;
+        }
+    }
 
+    @Override
+    public void initializeValues() {
         double netheriteLevel = CombatSystem.NETHERITE_TIER_LEVEL + 10D;
         double tridentLevel = CombatSystem.DIAMOND_TIER_LEVEL + 10D;
         double diamondLevel = CombatSystem.DIAMOND_TIER_LEVEL + 10D;
@@ -264,23 +276,5 @@ public class EconomySettingsConfig {
                 List.of("Message sent upon selling a batch of elite items."),
                 file, fileConfiguration, "shopBatchSellItem", "&aYou have sold your items &afor $currency_amount $currency_name!", true);
 
-        ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
-        thisConfiguration = fileConfiguration;
-
     }
-
-    private static void addMaterial(FileConfiguration fileConfiguration, Material material, double value) {
-        ConfigurationEngine.setDouble(
-                List.of("Sets the worth of this material for the elitemobs currency system."),
-                fileConfiguration, "materialWorth." + material.name(), value);
-    }
-
-    public static double getMaterialWorth(Material material) {
-        try {
-            return thisConfiguration.getDouble("materialWorth." + material.name());
-        } catch (Exception ex) {
-            return defaultMaterialWorth;
-        }
-    }
-
 }

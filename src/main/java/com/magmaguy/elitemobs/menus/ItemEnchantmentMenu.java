@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.menus;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
 import com.magmaguy.elitemobs.config.SpecialItemSystemsConfig;
@@ -12,6 +11,7 @@ import com.magmaguy.elitemobs.items.ShareItem;
 import com.magmaguy.elitemobs.items.upgradesystem.EliteEnchantmentItems;
 import com.magmaguy.elitemobs.items.upgradesystem.UpgradeSystem;
 import com.magmaguy.elitemobs.utils.Round;
+import com.magmaguy.magmacore.util.ChatColorConverter;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -212,7 +212,7 @@ public class ItemEnchantmentMenu extends EliteMenu {
                 if (event.getInventory().getItem(ENCHANTED_BOOK_SLOT) == null)
                     moveOneItemUp(ENCHANTED_BOOK_SLOT, event);
                 else
-                    //Make sure enchant books themselves can't be enchanted
+                //Make sure enchant books themselves can't be enchanted
                 {
                 }
             } else if (EliteEnchantmentItems.isEliteLuckyTicket(event.getCurrentItem()) &&

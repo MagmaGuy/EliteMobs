@@ -1,8 +1,6 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.magmacore.command.AdvancedCommand;
-import com.magmaguy.magmacore.command.CommandData;
-import com.magmaguy.magmacore.command.CommandManager;
 import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.entity.Player;
 
@@ -12,22 +10,20 @@ public class HelpCommand extends AdvancedCommand {
     public HelpCommand() {
         super(List.of("help"));
         setUsage("/em help");
-        setPermission("elitemobs.help");
+        setPermission("elitemobs.*");
         setDescription("Lists all commands.");
     }
 
     @Override
-    public void execute(CommandData commandData) {
-        Logger.sendMessage(commandData.getCommandSender(), "Commands:");
-        for (CommandManager commandManager : CommandManager.getCommandManagers()) {
-            commandManager.commands.forEach(command -> {
-                if (commandData.getCommandSender() instanceof Player player) {
-                    player.spigot().sendMessage(Logger.hoverMessage(command.getUsage(), command.getDescription()));
-                } else {
-                    Logger.sendSimpleMessage(commandData.getCommandSender(), command.getUsage());
-                    Logger.sendSimpleMessage(commandData.getCommandSender(), command.getDescription());
-                }
-            });
-        }
+    public void execute() {
+        Logger.sendMessage(getCurrentCommandSender(), "Commands:");
+        CommandManager.getInstance().commands.forEach(command -> {
+            if (getCurrentCommandSender() instanceof Player player) {
+                player.spigot().sendMessage(Logger.hoverMessage(command.usage, command.description));
+            } else {
+                Logger.sendSimpleMessage(getCurrentCommandSender(), command.usage);
+                Logger.sendSimpleMessage(getCurrentCommandSender(), command.description);
+            }
+        });
     }
 }

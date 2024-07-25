@@ -62,6 +62,7 @@ public class ProceduralItemGenerationSettingsConfig extends ConfigurationFile {
 
     public ProceduralItemGenerationSettingsConfig() {
         super("ProceduralItemGenerationSettings.yml");
+        instance = this;
     }
 
     private void addMaterial(Material material) {
@@ -78,8 +79,6 @@ public class ProceduralItemGenerationSettingsConfig extends ConfigurationFile {
 
     @Override
     public void initializeValues() {
-        instance = this;
-
         doProceduralItemDrops = ConfigurationEngine.setBoolean(fileConfiguration, "dropProcedurallyGeneratedItems", true);
         customEnchantmentChance = ConfigurationEngine.setDouble(fileConfiguration, "customEnchantmentsChance", 0.5);
 
