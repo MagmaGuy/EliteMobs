@@ -13,10 +13,10 @@ public class LootDebugCommand extends AdvancedCommand {
         super(List.of("loot"));
         addLiteral("debug");
         addArgument("level", new ArrayList<>(CustomItemsConfig.getCustomItems().keySet()));
-        setUsage("/em loot test <level>");
-        setPermission("elitemobs.*");
+        setUsage("/em loot debug <level>");
+        setPermission("elitemobs.loot.debug");
         setSenderType(SenderType.PLAYER);
-        setDescription("Simulates loot drops for the specified amount of times for the specified level and player.");
+        setDescription("Equips players with a complete armor set, weapons set of the specified level, and food for testing purposes.");
     }
 
     @Override

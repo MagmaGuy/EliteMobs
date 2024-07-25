@@ -10,7 +10,7 @@ public class QuestBypassCommand extends AdvancedCommand {
         super(List.of("quest"));
         addLiteral("bypass");
         setUsage("/em quest bypass");
-        setPermission("elitemobs.*");
+        setPermission("elitemobs.quest.bypass");
         setDescription("Bypasses permission restrictions for elite quests.");
     }
 

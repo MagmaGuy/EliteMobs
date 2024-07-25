@@ -14,7 +14,7 @@ public class MoneyRemoveCommand extends AdvancedCommand {
         addArgument("player", new ArrayList<>(CustomItemsConfig.getCustomItems().keySet()));
         addArgument("amount", new ArrayList<>(CustomItemsConfig.getCustomItems().keySet()));
         setUsage("/em money remove <player> <amount>");
-        setPermission("elitemobs.*");
+        setPermission("elitemobs.money.remove");
         setSenderType(SenderType.PLAYER);
         setDescription("Deducts the specified amount of currency from a player.");
     }
