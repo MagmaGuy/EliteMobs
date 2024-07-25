@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.items;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
@@ -11,7 +10,8 @@ import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import com.magmaguy.elitemobs.utils.Round;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.ChatColorConverter;
+import com.magmaguy.magmacore.util.Logger;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
@@ -206,7 +206,7 @@ public class ItemLootShower implements Listener {
         try {
             model = EconomySettingsConfig.getThisConfiguration().getInt("lootShowerData." + (int) value);
         } catch (Exception ex) {
-            new WarningMessage("Failed to get coin model for value " + value + " !");
+            Logger.warn("Failed to get coin model for value " + value + " !");
         }
         setCoinModel(currencyItemStack, model);
         Item currencyItem = location.getWorld().dropItem(location.clone().add(new Vector(0, 1, 0)), currencyItemStack);
@@ -232,7 +232,7 @@ public class ItemLootShower implements Listener {
         try {
             currencyItem = generateCurrencyItem(Material.getMaterial(EconomySettingsConfig.getLootShowerMaterial1()), location, 1);
         } catch (Exception ex) {
-            new WarningMessage("Material for EliteMob shower 1 is invalid. Defaulting to gold nugget.");
+            Logger.warn("Material for EliteMob shower 1 is invalid. Defaulting to gold nugget.");
             currencyItem = generateCurrencyItem(Material.GOLD_NUGGET, location, 1);
         }
 
@@ -247,7 +247,7 @@ public class ItemLootShower implements Listener {
         try {
             currencyItem = generateCurrencyItem(Material.getMaterial(EconomySettingsConfig.getLootShowerMaterial5()), location, 5);
         } catch (Exception ex) {
-            new WarningMessage("Material for EliteMob shower 5 is invalid. Defaulting to gold ingot.");
+            Logger.warn("Material for EliteMob shower 5 is invalid. Defaulting to gold ingot.");
             currencyItem = generateCurrencyItem(Material.GOLD_INGOT, location, 5);
         }
 
@@ -261,7 +261,7 @@ public class ItemLootShower implements Listener {
         try {
             currencyItem = generateCurrencyItem(Material.getMaterial(EconomySettingsConfig.getLootShowerMaterial10()), location, 10);
         } catch (Exception ex) {
-            new WarningMessage("Material for EliteMob shower 10 is invalid. Defaulting to Gold block.");
+            Logger.warn("Material for EliteMob shower 10 is invalid. Defaulting to Gold block.");
             currencyItem = generateCurrencyItem(Material.GOLD_BLOCK, location, 10);
         }
 
@@ -275,7 +275,7 @@ public class ItemLootShower implements Listener {
         try {
             currencyItem = generateCurrencyItem(Material.getMaterial(EconomySettingsConfig.getLootShowerMaterial20()), location, 20);
         } catch (Exception ex) {
-            new WarningMessage("Material for EliteMob shower 20 is invalid. Defaulting to emerald.");
+            Logger.warn("Material for EliteMob shower 20 is invalid. Defaulting to emerald.");
             currencyItem = generateCurrencyItem(Material.EMERALD, location, 20);
         }
 
@@ -289,7 +289,7 @@ public class ItemLootShower implements Listener {
         try {
             currencyItem = generateCurrencyItem(Material.getMaterial(EconomySettingsConfig.getLootShowerMaterial50()), location, 50);
         } catch (Exception ex) {
-            new WarningMessage("Material for EliteMob shower 50 is invalid. Defaulting to emerald block.");
+            Logger.warn("Material for EliteMob shower 50 is invalid. Defaulting to emerald block.");
             currencyItem = generateCurrencyItem(Material.EMERALD_BLOCK, location, 50);
         }
 
@@ -302,7 +302,7 @@ public class ItemLootShower implements Listener {
         try {
             currencyItem = generateCurrencyItem(Material.getMaterial(EconomySettingsConfig.getLootShowerMaterial100()), location, 100);
         } catch (Exception ex) {
-            new WarningMessage("Material for EliteMob shower 100 is invalid. Defaulting to diamond.");
+            Logger.warn("Material for EliteMob shower 100 is invalid. Defaulting to diamond.");
             currencyItem = generateCurrencyItem(Material.DIAMOND, location, 100);
         }
 
@@ -315,7 +315,7 @@ public class ItemLootShower implements Listener {
         try {
             currencyItem = generateCurrencyItem(Material.getMaterial(EconomySettingsConfig.getLootShowerMaterial500()), location, 500);
         } catch (Exception ex) {
-            new WarningMessage("Material for EliteMob shower 500 is invalid. Defaulting to diamond block.");
+            Logger.warn("Material for EliteMob shower 500 is invalid. Defaulting to diamond block.");
             currencyItem = generateCurrencyItem(Material.DIAMOND_BLOCK, location, 500);
         }
 
@@ -328,7 +328,7 @@ public class ItemLootShower implements Listener {
         try {
             currencyItem = generateCurrencyItem(Material.getMaterial(EconomySettingsConfig.getLootShowerMaterial1000()), location, 1000);
         } catch (Exception ex) {
-            new WarningMessage("Material for EliteMob shower 1000 is invalid. Defaulting to nether star.");
+            Logger.warn("Material for EliteMob shower 1000 is invalid. Defaulting to nether star.");
             currencyItem = generateCurrencyItem(Material.NETHER_STAR, location, 1000);
         }
 

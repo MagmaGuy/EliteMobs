@@ -2,17 +2,16 @@ package com.magmaguy.elitemobs.config.npcs;
 
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.CustomConfigFields;
-import com.magmaguy.elitemobs.config.CustomConfigFieldsInterface;
 import com.magmaguy.elitemobs.npcs.NPCInteractions;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Villager;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class NPCsConfigFields extends CustomConfigFields implements CustomConfigFieldsInterface {
+public class NPCsConfigFields extends CustomConfigFields {
 
     @Getter
     @Setter
@@ -113,7 +112,7 @@ public class NPCsConfigFields extends CustomConfigFields implements CustomConfig
         try {
             ConfigurationEngine.fileSaverCustomValues(fileConfiguration, this.file);
         } catch (Exception ex) {
-            Bukkit.getLogger().warning("[EliteMobs] Attempted to update the location status for an NPC with no config file! Did you delete it during runtime?");
+            Logger.warn("Attempted to update the location status for an NPC with no config file! Did you delete it during runtime?");
         }
     }
 
@@ -152,7 +151,7 @@ public class NPCsConfigFields extends CustomConfigFields implements CustomConfig
         try {
             ConfigurationEngine.fileSaverCustomValues(this.fileConfiguration, this.file);
         } catch (Exception e) {
-            Bukkit.getLogger().warning("[EliteMobs] Attempted to update the enabled status for an NPC with no config file! Did you delete it during runtime?");
+            Logger.warn("Attempted to update the enabled status for an NPC with no config file! Did you delete it during runtime?");
         }
     }
 
@@ -163,7 +162,7 @@ public class NPCsConfigFields extends CustomConfigFields implements CustomConfig
         try {
             ConfigurationEngine.fileSaverCustomValues(fileConfiguration, this.file);
         } catch (Exception ex) {
-            Bukkit.getLogger().warning("[EliteMobs] Attempted to update the location status for an NPC with no config file! Did you delete it during runtime?");
+            Logger.warn("Attempted to update the location status for an NPC with no config file! Did you delete it during runtime?");
         }
     }
 

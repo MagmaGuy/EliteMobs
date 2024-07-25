@@ -1,12 +1,12 @@
 package com.magmaguy.elitemobs.wormhole;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.WormholesConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldowns;
 import com.magmaguy.elitemobs.utils.ChunkLocationChecker;
+import com.magmaguy.magmacore.util.ChatColorConverter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;

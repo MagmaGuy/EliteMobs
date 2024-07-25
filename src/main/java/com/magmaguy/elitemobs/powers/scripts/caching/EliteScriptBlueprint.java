@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.powers.scripts.caching;
 
 import com.magmaguy.elitemobs.config.CustomConfigFields;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.configuration.ConfigurationSection;
 
@@ -97,7 +97,7 @@ public class EliteScriptBlueprint {
             customConfigFields.getFileConfiguration().set("eliteScript", configurationSection.getValues(false));
             customConfigFields.getFileConfiguration().save(customConfigFields.getFile());
         } catch (Exception exception) {
-            new WarningMessage("Failed to update old script targets! Report this to the dev.");
+            Logger.warn("Failed to update old script targets! Report this to the dev.");
         }
     }
 

@@ -1,14 +1,13 @@
 package com.magmaguy.elitemobs.config;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.magmacore.config.ConfigurationFile;
+import com.magmaguy.magmacore.util.ChatColorConverter;
 import lombok.Getter;
-import org.bukkit.configuration.file.FileConfiguration;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-public class ItemSettingsConfig {
+public class ItemSettingsConfig extends ConfigurationFile {
     @Getter
     private static String shopItemSource;
     @Getter
@@ -120,12 +119,12 @@ public class ItemSettingsConfig {
     @Getter
     private static String levelRangeTooDifferent;
 
-    private ItemSettingsConfig() {
+    public ItemSettingsConfig() {
+        super("ItemSettings.yml");
     }
 
-    public static void initializeConfig() {
-        File file = ConfigurationEngine.fileCreator("ItemSettings.yml");
-        FileConfiguration fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
+    @Override
+    public void initializeValues() {
 
         doEliteMobsLoot = ConfigurationEngine.setBoolean(
                 List.of("Sets if any EliteMobs loot will drop.",
@@ -343,6 +342,5 @@ public class ItemSettingsConfig {
                 List.of("Sets the message sent when a played kills a boss but the gear level is too different from the boss level to get coins"),
                 file, fileConfiguration, "levelRangeTooDifferent", "&8EM] &4Your gear is level $playerLevel and the boss is level $bossLevel, level difference is too high to get coins!", true);
 
-        ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }
 }

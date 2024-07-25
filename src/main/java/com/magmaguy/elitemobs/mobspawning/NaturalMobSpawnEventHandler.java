@@ -106,7 +106,7 @@ public class NaturalMobSpawnEventHandler implements Listener {
 
         if (!MobCombatSettingsConfig.isDoNaturalMobSpawning())
             return;
-        if (!ValidWorldsConfig.getFileConfiguration().getBoolean("Valid worlds." + event.getEntity().getWorld().getName()))
+        if (!ValidWorldsConfig.getInstance().getFileConfiguration().getBoolean("Valid worlds." + event.getEntity().getWorld().getName()))
             return;
         if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.SPAWNER) &&
                 !MobCombatSettingsConfig.isDoSpawnersSpawnEliteMobs() ||

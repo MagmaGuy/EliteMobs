@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.powers.scripts;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.scripts.caching.ScriptTargetsBlueprint;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -60,7 +60,7 @@ public class ScriptTargets {
                                               String locationString,
                                               ScriptActionData scriptActionData) {
         if (locationString == null) {
-            new WarningMessage("Failed to get location target in script " + targetBlueprint.getScriptName() + " in " + eliteScript.getFileName());
+            Logger.warn("Failed to get location target in script " + targetBlueprint.getScriptName() + " in " + eliteScript.getFileName());
             return null;
         }
         Location parsedLocation = ConfigurationLocation.serialize(locationString);
@@ -108,7 +108,7 @@ public class ScriptTargets {
         Location eliteEntityLocation = scriptActionData.getEliteEntity().getLocation();
 
         if (targetBlueprint == null) {
-            new WarningMessage("An action tried to run with an invalid target! Check which on it is by reading the startup logs and fix it! No target will be acquired for now.");
+            Logger.warn("An action tried to run with an invalid target! Check which on it is by reading the startup logs and fix it! No target will be acquired for now.");
             return new ArrayList<>();
         }
 
@@ -148,15 +148,15 @@ public class ScriptTargets {
                     try {
                         return (List<LivingEntity>) scriptActionData.getInheritedScriptActionData().getScriptTargets().getAnonymousTargets(false, scriptActionData.getInheritedScriptActionData());
                     } catch (Exception Ex) {
-                        new WarningMessage("Failed to get entity from INHERIT_SCRIPT_TARGET because the script inherits a location, not an entity");
+                        Logger.warn("Failed to get entity from INHERIT_SCRIPT_TARGET because the script inherits a location, not an entity");
                     }
                 } else {
-                    new WarningMessage("Failed to get INHERIT_SCRIPT_TARGET because the script is not called by another script!");
+                    Logger.warn("Failed to get INHERIT_SCRIPT_TARGET because the script is not called by another script!");
                     return new ArrayList<>();
                 }
 
             default:
-                new WarningMessage("Could not find default target for script in " + eliteScript.getFileName());
+                Logger.warn("Could not find default target for script in " + eliteScript.getFileName());
                 return null;
         }
     }
@@ -195,7 +195,7 @@ public class ScriptTargets {
                 return scriptActionData.getInheritedScriptActionData().getScriptTargets().getAnonymousTargets(
                         true, scriptActionData.getInheritedScriptActionData());
             default:
-                new WarningMessage("Failed to get target type in script " + getTargetBlueprint().getScriptName() + " !");
+                Logger.warn("Failed to get target type in script " + getTargetBlueprint().getScriptName() + " !");
         }
 
         if (targetBlueprint.getCoverage() < 1)
@@ -206,7 +206,7 @@ public class ScriptTargets {
 
     private Collection<Location> getLocationFromZone(ScriptActionData scriptActionData) {
         if (scriptActionData.getScriptZone() == null) {
-            new WarningMessage("Your script " + targetBlueprint.getScriptName() + " uses " + targetBlueprint.getTargetType().toString() + " but does not have a valid Zone defined!");
+            Logger.warn("Your script " + targetBlueprint.getScriptName() + " uses " + targetBlueprint.getTargetType().toString() + " but does not have a valid Zone defined!");
             return new ArrayList<>();
         }
         return addOffsets(eliteScript.getScriptZone().getZoneLocations(scriptActionData, this), scriptActionData);

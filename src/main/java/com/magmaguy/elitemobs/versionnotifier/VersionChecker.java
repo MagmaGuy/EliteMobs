@@ -1,12 +1,11 @@
 package com.magmaguy.elitemobs.versionnotifier;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
 import com.magmaguy.elitemobs.utils.DiscordLinks;
-import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.SpigotMessage;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.ChatColorConverter;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
@@ -23,9 +22,9 @@ import java.util.Scanner;
 
 public class VersionChecker {
     private static final List<EMPackage> outdatedPackages = new ArrayList<>();
-    private static boolean pluginIsUpToDate = true;
     @Getter
     private static final boolean SHA1Updated = false;
+    private static boolean pluginIsUpToDate = true;
 
     private VersionChecker() {
     }
@@ -70,11 +69,11 @@ public class VersionChecker {
                 String publicVersion = "";
 
                 try {
-                    Bukkit.getLogger().info("[EliteMobs] Latest public release is " + VersionChecker.readStringFromURL("https://api.spigotmc.org/legacy/update.php?resource=40090"));
-                    Bukkit.getLogger().info("[EliteMobs] Your version is " + MetadataHandler.PLUGIN.getDescription().getVersion());
+                    Logger.info("Latest public release is " + VersionChecker.readStringFromURL("https://api.spigotmc.org/legacy/update.php?resource=40090"));
+                    Logger.info("Your version is " + MetadataHandler.PLUGIN.getDescription().getVersion());
                     publicVersion = VersionChecker.readStringFromURL("https://api.spigotmc.org/legacy/update.php?resource=40090");
                 } catch (IOException e) {
-                    Bukkit.getLogger().warning("[EliteMobs] Couldn't check latest version");
+                    Logger.warn("Couldn't check latest version");
                     return;
                 }
 
@@ -99,9 +98,9 @@ public class VersionChecker {
                 }
 
                 if (!snapshot)
-                    Bukkit.getLogger().info("[EliteMobs] You are running the latest version!");
+                    Logger.info("You are running the latest version!");
                 else
-                    new InfoMessage("You are running a snapshot version! You can check for updates in the #releases channel on the EliteMobs Discord!");
+                    Logger.info("You are running a snapshot version! You can check for updates in the #releases channel on the EliteMobs Discord!");
 
                 pluginIsUpToDate = true;
             }
@@ -120,10 +119,10 @@ public class VersionChecker {
                         if (emPackage.getDungeonPackagerConfigFields().getDungeonVersion() < releaseVersion) {
                             emPackage.setOutOfDate(true);
                             outdatedPackages.add(emPackage);
-                            new WarningMessage("Dungeon " + emPackage.getDungeonPackagerConfigFields().getName() + " is outdated! You should go download the updated version! Link: " + emPackage.getDungeonPackagerConfigFields().getDownloadLink());
+                            Logger.warn("Dungeon " + emPackage.getDungeonPackagerConfigFields().getName() + " is outdated! You should go download the updated version! Link: " + emPackage.getDungeonPackagerConfigFields().getDownloadLink());
                         }
                     } catch (Exception exception) {
-                        new WarningMessage("Failed to get version for EliteMobs package " + emPackage.getDungeonPackagerConfigFields().getFilename() + "! The URL " + "https://www.magmaguy.com/api/" + emPackage.getDungeonPackagerConfigFields().getFilename().replace(".yml", "") + " could not be reached!");
+                        Logger.warn("Failed to get version for EliteMobs package " + emPackage.getDungeonPackagerConfigFields().getFilename() + "! The URL " + "https://www.magmaguy.com/api/" + emPackage.getDungeonPackagerConfigFields().getFilename().replace(".yml", "") + " could not be reached!");
                     }
                 }
             }
@@ -142,7 +141,7 @@ public class VersionChecker {
 
     private static void outOfDateHandler() {
 
-        new WarningMessage("[EliteMobs] A newer version of this plugin is available for download!");
+        Logger.warn("[EliteMobs] A newer version of this plugin is available for download!");
         pluginIsUpToDate = false;
 
     }
@@ -163,10 +162,10 @@ public class VersionChecker {
                 public void run() {
                     if (!event.getPlayer().isOnline()) return;
                     if (!pluginIsUpToDate)
-                        event.getPlayer().sendMessage(ChatColorConverter.convert("&a[EliteMobs] &cYour version of EliteMobs is outdated." +
+                        event.getPlayer().sendMessage(ChatColorConverter.convert("&cYour version of EliteMobs is outdated." +
                                 " &aYou can download the latest version from &3&n&ohttps://www.spigotmc.org/resources/%E2%9A%94elitemobs%E2%9A%94.40090/"));
                     if (!outdatedPackages.isEmpty()) {
-                        event.getPlayer().sendMessage(ChatColorConverter.convert("&a[EliteMobs] &cThe following dungeons are outdated:"));
+                        event.getPlayer().sendMessage(ChatColorConverter.convert("&cThe following dungeons are outdated:"));
                         for (EMPackage emPackage : outdatedPackages)
                             event.getPlayer().sendMessage(ChatColorConverter.convert(
                                     "&c- " + emPackage.getDungeonPackagerConfigFields().getName()));

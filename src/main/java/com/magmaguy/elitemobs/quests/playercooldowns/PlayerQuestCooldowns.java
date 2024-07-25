@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.quests.playercooldowns;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.customquests.CustomQuestsConfigFields;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachment;
@@ -76,7 +76,7 @@ public class PlayerQuestCooldowns implements Serializable {
         PlayerQuestCooldowns playerQuestCooldowns = PlayerData.getPlayerQuestCooldowns(player.getUniqueId());
         if (playerQuestCooldowns == null) {
             playerQuestCooldowns = new PlayerQuestCooldowns();
-            new WarningMessage("For some reason the player cooldowns failed to read, warn the dev!", true);
+            Logger.warn("For some reason the player cooldowns failed to read, warn the dev!", true);
         }
         playerQuestCooldowns.questCooldowns.add(new QuestCooldown(delayInMinutes, permission, player.getUniqueId()));
         PlayerData.updatePlayerQuestCooldowns(player.getUniqueId(), playerQuestCooldowns);

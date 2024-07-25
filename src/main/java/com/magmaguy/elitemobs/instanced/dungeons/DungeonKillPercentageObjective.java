@@ -1,6 +1,6 @@
 package com.magmaguy.elitemobs.instanced.dungeons;
 
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,10 +20,10 @@ public class DungeonKillPercentageObjective extends DungeonObjective {
                 try {
                     this.percentage = Double.parseDouble(separatedByEquals[1]);
                 } catch (Exception ex) {
-                    new WarningMessage("Value " + separatedByEquals[1] + " is not a valid integer amount!");
+                    Logger.warn("Value " + separatedByEquals[1] + " is not a valid integer amount!");
                 }
             } else {
-                new WarningMessage("Invalid entry for objective string! " + objectiveString + " could not be parsed correctly.");
+                Logger.warn("Invalid entry for objective string! " + objectiveString + " could not be parsed correctly.");
             }
         }
     }

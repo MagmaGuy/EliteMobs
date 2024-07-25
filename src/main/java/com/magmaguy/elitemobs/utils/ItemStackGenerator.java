@@ -1,6 +1,6 @@
 package com.magmaguy.elitemobs.utils;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.magmacore.util.ChatColorConverter;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;

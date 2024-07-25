@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.powers;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
@@ -8,6 +7,7 @@ import com.magmaguy.elitemobs.config.powers.premade.ZombieFriendsConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.powers.meta.MajorPower;
+import com.magmaguy.magmacore.util.ChatColorConverter;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;

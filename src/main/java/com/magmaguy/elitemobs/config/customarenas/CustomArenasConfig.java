@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.config.customarenas;
 
-import com.magmaguy.elitemobs.config.CustomConfig;
 import com.magmaguy.elitemobs.instanced.arena.ArenaInstance;
+import com.magmaguy.magmacore.config.CustomConfig;
 
 import java.util.HashMap;
 

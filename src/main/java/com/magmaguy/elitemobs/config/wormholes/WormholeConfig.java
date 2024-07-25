@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.config.wormholes;
 
-import com.magmaguy.elitemobs.config.CustomConfig;
 import com.magmaguy.elitemobs.wormhole.Wormhole;
+import com.magmaguy.magmacore.config.CustomConfig;
 import lombok.Getter;
 
 import java.util.HashMap;

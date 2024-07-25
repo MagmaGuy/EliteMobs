@@ -1,9 +1,8 @@
 package com.magmaguy.elitemobs.config.menus;
 
 import com.magmaguy.elitemobs.config.CustomConfigFields;
-import com.magmaguy.elitemobs.config.CustomConfigFieldsInterface;
 
-public class MenusConfigFields extends CustomConfigFields implements CustomConfigFieldsInterface {
+public class MenusConfigFields extends CustomConfigFields {
 
     public MenusConfigFields(String fileName, boolean isEnabled) {
         super(fileName, isEnabled);

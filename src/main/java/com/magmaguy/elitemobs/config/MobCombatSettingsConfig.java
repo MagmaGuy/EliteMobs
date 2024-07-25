@@ -1,13 +1,12 @@
 package com.magmaguy.elitemobs.config;
 
+import com.magmaguy.magmacore.config.ConfigurationFile;
 import lombok.Getter;
-import org.bukkit.configuration.file.FileConfiguration;
 
-import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
-public class MobCombatSettingsConfig {
+public class MobCombatSettingsConfig extends ConfigurationFile {
     @Getter
     private static boolean doNaturalMobSpawning;
     @Getter
@@ -89,15 +88,12 @@ public class MobCombatSettingsConfig {
     @Getter
     private static double blockingDamageReduction;
 
-
-    private MobCombatSettingsConfig() {
+    public MobCombatSettingsConfig() {
+        super("MobCombatSettings.yml");
     }
 
-    public static void initializeConfig() {
-
-        File file = ConfigurationEngine.fileCreator("MobCombatSettings.yml");
-        FileConfiguration fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
-
+    @Override
+    public void initializeValues() {
         doNaturalMobSpawning = ConfigurationEngine.setBoolean(
                 List.of("Sets if naturally spawned elites will spawn. Note: event mobs like the zombie king are not naturally spawned elites! You will have to disable events if you want to disable event bosses."),
                 fileConfiguration, "doNaturalEliteMobSpawning", true);
@@ -222,7 +218,5 @@ public class MobCombatSettingsConfig {
         blockingDamageReduction = ConfigurationEngine.setDouble(
                 List.of("Sets the multiplier applied to damage reduction when a player is holding up a shield for melee attacks (powers excluded)."),
                 fileConfiguration, "blockingDamageReduction", 0.8);
-
-        ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }
 }

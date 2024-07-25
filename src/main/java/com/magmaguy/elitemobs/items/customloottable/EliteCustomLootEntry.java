@@ -8,7 +8,7 @@ import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.utils.MapListInterpreter;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -55,7 +55,7 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
                 case "permission" ->
                         super.setPermission(MapListInterpreter.parseString(key, mapEntry.getValue(), configFilename));
                 case "amount" -> setAmount(MapListInterpreter.parseInteger(key, mapEntry.getValue(), configFilename));
-                default -> new WarningMessage("Failed to read custom loot option " + key + " in " + configFilename);
+                default -> Logger.warn("Failed to read custom loot option " + key + " in " + configFilename);
             }
         }
         entries.add(this);
@@ -158,9 +158,9 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
     public void locationDrop(int itemTier, Player player, Location location, EliteEntity eliteEntity) {
         if (isGroupLoot(itemTier, player, eliteEntity)) return;
         if (generateCustomItem() == null) {
-            new WarningMessage("Invalid loot entry for boss " + eliteEntity.getName() + "! Entry: " + filename);
+            Logger.warn("Invalid loot entry for boss " + eliteEntity.getName() + "! Entry: " + filename);
             if (eliteEntity instanceof CustomBossEntity customBossEntity)
-                new WarningMessage("Boss filename: " + customBossEntity.getCustomBossesConfigFields().getFilename());
+                Logger.warn("Boss filename: " + customBossEntity.getCustomBossesConfigFields().getFilename());
             return;
         }
         for (int i = 0; i < getAmount(); i++)
@@ -219,13 +219,13 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
         for (int i = 0; i < getAmount(); i++) {
             CustomItem customItem = generateCustomItem();
             if (customItem == null) {
-                new WarningMessage("Failed to generate a custom item for the boss " + eliteEntity.getName() + "! The configuration file for one of its loot items is not correctly configured.");
+                Logger.warn("Failed to generate a custom item for the boss " + eliteEntity.getName() + "! The configuration file for one of its loot items is not correctly configured.");
                 return;
             }
             ItemStack itemStack = customItem.generateItemStack(itemTier, null, eliteEntity);
             if (sharedLootTable == null) sharedLootTable = new SharedLootTable(eliteEntity);
             if (itemStack == null) {
-                new WarningMessage("A custom item for boss " + eliteEntity.getName() + " was null! This item will be skipped.");
+                Logger.warn("A custom item for boss " + eliteEntity.getName() + " was null! This item will be skipped.");
                 return;
             }
             sharedLootTable.addLoot(itemStack);

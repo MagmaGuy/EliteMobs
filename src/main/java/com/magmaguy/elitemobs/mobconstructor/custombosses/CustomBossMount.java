@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.combatsystem.antiexploit.PreventMountExploit;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -17,7 +17,7 @@ public class CustomBossMount {
     public static CustomBossEntity generateMount(CustomBossEntity customBossEntity) {
         if (customBossEntity.customBossesConfigFields.getMountedEntity() == null) return null;
         if (customBossEntity.getLivingEntity() == null) {
-            new WarningMessage("Could not spawn mount for boss " + customBossEntity.customBossesConfigFields.getFilename() + " because the boss has no living entity! This probably means some other plugin is preventing this boss from spawning.");
+            Logger.warn("Could not spawn mount for boss " + customBossEntity.customBossesConfigFields.getFilename() + " because the boss has no living entity! This probably means some other plugin is preventing this boss from spawning.");
             return null;
         }
         try {
@@ -34,7 +34,7 @@ public class CustomBossMount {
             if (customBossesConfigFields != null) {
                 CustomBossEntity mountEntity = CustomBossEntity.createCustomBossEntity(customBossEntity.customBossesConfigFields.getMountedEntity());
                 if (mountEntity == null) {
-                    new WarningMessage("Mount for boss " + customBossEntity.getCustomBossesConfigFields().getFilename() + " is not valid!");
+                    Logger.warn("Mount for boss " + customBossEntity.getCustomBossesConfigFields().getFilename() + " is not valid!");
                     return null;
                 }
                 mountEntity.setSpawnLocation(customBossEntity.getLivingEntity().getLocation());
@@ -61,7 +61,7 @@ public class CustomBossMount {
                 return mountEntity;
             }
 
-            new WarningMessage("Attempted to make Custom Boss " + customBossEntity.customBossesConfigFields.getFilename() + " mount invalid" +
+            Logger.warn("Attempted to make Custom Boss " + customBossEntity.customBossesConfigFields.getFilename() + " mount invalid" +
                     " entity or boss " + customBossEntity.customBossesConfigFields.getMountedEntity() + " . Fix this in the configuration file.");
         }
         return null;

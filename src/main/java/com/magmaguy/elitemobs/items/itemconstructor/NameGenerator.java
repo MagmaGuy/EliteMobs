@@ -1,9 +1,8 @@
 package com.magmaguy.elitemobs.items.itemconstructor;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.ProceduralItemGenerationSettingsConfig;
-import com.magmaguy.elitemobs.utils.WarningMessage;
-import org.bukkit.Bukkit;
+import com.magmaguy.magmacore.util.ChatColorConverter;
+import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Material;
 
 import java.util.List;
@@ -108,12 +107,12 @@ public class NameGenerator {
                 return ProceduralItemGenerationSettingsConfig.getCrossbowName();
         }
 
-        if (ProceduralItemGenerationSettingsConfig.getFileConfiguration().getString("materialNames." + material.toString().toLowerCase(Locale.ROOT)) != null)
-            return ProceduralItemGenerationSettingsConfig.getFileConfiguration().getString("materialNames." + material.toString().toLowerCase(Locale.ROOT));
+        if (ProceduralItemGenerationSettingsConfig.getInstance().getFileConfiguration().getString("materialNames." + material.toString().toLowerCase(Locale.ROOT)) != null)
+            return ProceduralItemGenerationSettingsConfig.getInstance().getFileConfiguration().getString("materialNames." + material.toString().toLowerCase(Locale.ROOT));
 
-        Bukkit.getLogger().warning("[EliteMobs] Found unexpected material type in procedurally generated loot. Can't generate item type name.");
-        Bukkit.getLogger().warning("[EliteMobs] Material name: " + material);
-        new WarningMessage("If you're trying to set a non-default item type, you need to add the name format like this under materialNames: " + material.toString().toLowerCase(Locale.ROOT) + ": Name");
+        Logger.warn("Found unexpected material type in procedurally generated loot. Can't generate item type name.");
+        Logger.warn("Material name: " + material);
+        Logger.warn("If you're trying to set a non-default item type, you need to add the name format like this under materialNames: " + material.toString().toLowerCase(Locale.ROOT) + ": Name");
         return "";
 
     }

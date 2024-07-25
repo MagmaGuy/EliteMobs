@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.instanced;
 
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.instanced.MatchDestroyEvent;
 import com.magmaguy.elitemobs.api.instanced.MatchInstantiateEvent;
@@ -10,6 +9,7 @@ import com.magmaguy.elitemobs.api.instanced.MatchLeaveEvent;
 import com.magmaguy.elitemobs.config.ArenasConfig;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
+import com.magmaguy.magmacore.util.ChatColorConverter;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;

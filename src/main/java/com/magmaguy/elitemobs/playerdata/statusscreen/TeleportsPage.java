@@ -1,11 +1,11 @@
 package com.magmaguy.elitemobs.playerdata.statusscreen;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.commands.DungeonCommands;
 import com.magmaguy.elitemobs.config.menus.premade.PlayerStatusMenuConfig;
 import com.magmaguy.elitemobs.dungeons.CombatContent;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
+import com.magmaguy.magmacore.util.ChatColorConverter;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -70,11 +70,12 @@ public class TeleportsPage {
             textComponent[0] = configTextComponent;
             return textComponent;
         } else {
-            TextComponent[] textComponent = new TextComponent[(int) Math.floor(counter / 9D) + 1];
-            int internalCounter = 0;
+            double elementsPerPage = 5D;
+            TextComponent[] textComponent = new TextComponent[(int) Math.floor(counter + 2 / elementsPerPage) + 1];
+            int internalCounter = 2;
             textComponent[0] = configTextComponent;
             for (TextComponent text : textComponents) {
-                int currentPage = (int) Math.floor(internalCounter / 9D);
+                int currentPage = (int) Math.floor(internalCounter / elementsPerPage);
                 if (textComponent[currentPage] == null)
                     textComponent[currentPage] = new TextComponent();
                 textComponent[currentPage].addExtra(text);

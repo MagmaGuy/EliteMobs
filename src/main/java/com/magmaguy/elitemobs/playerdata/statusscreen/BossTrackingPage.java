@@ -5,7 +5,7 @@ import com.magmaguy.elitemobs.config.menus.premade.PlayerStatusMenuConfig;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import com.magmaguy.elitemobs.utils.SpigotMessage;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
@@ -57,11 +57,11 @@ public class BossTrackingPage {
                 textComponents.add(SpigotMessage.commandHoverMessage(
                         customBossEntity.getCustomBossBossBar().bossBarMessage(player, customBossEntity.getCustomBossesConfigFields().getLocationMessage()) + "\n",
                         PlayerStatusMenuConfig.getOnBossTrackHover(),
-                        "/elitemobs trackcustomboss " + customBossEntity.getEliteUUID()));
+                        "/elitemobs track boss " + customBossEntity.getEliteUUID()));
 
                 counter++;
             } catch (Exception ex) {
-                new WarningMessage("Failed to correctly get elements for boss tracking page!");
+                Logger.warn("Failed to correctly get elements for boss tracking page!");
                 ex.printStackTrace();
             }
         }

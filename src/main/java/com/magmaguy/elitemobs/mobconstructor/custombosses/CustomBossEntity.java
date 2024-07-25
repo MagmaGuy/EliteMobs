@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.mobconstructor.custombosses;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobEnterCombatEvent;
 import com.magmaguy.elitemobs.api.EliteMobExitCombatEvent;
@@ -24,7 +23,11 @@ import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import com.magmaguy.elitemobs.thirdparty.custommodels.CustomModel;
 import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
 import com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity;
-import com.magmaguy.elitemobs.utils.*;
+import com.magmaguy.elitemobs.utils.ChunkLocationChecker;
+import com.magmaguy.elitemobs.utils.CommandRunner;
+import com.magmaguy.elitemobs.utils.EventCaller;
+import com.magmaguy.magmacore.util.ChatColorConverter;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -51,8 +54,6 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
     @Getter
     protected static HashSet<CustomBossEntity> trackableCustomBosses = new HashSet<>();
     private final List<BukkitTask> globalReinforcements = new ArrayList<>();
-    @Getter
-    private final BossTrace bossTrace = new BossTrace();
     @Getter
     protected CustomBossesConfigFields customBossesConfigFields;
     protected CustomBossEntity customBossMount = null;
@@ -171,14 +172,12 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
     }
 
     public void spawn(Location spawnLocation, int level, boolean silent) {
-        bossTrace.spawnPreprocessor(1);
         super.level = level;
         super.spawnLocation = spawnLocation;
         spawn(spawnLocation, silent);
     }
 
     public void spawn(Location spawnLocation, boolean silent) {
-        bossTrace.spawnPreprocessor(2);
         if (spawnLocation != null && spawnLocation.getWorld() != null && lastTick == spawnLocation.getWorld().getFullTime())
             attemptsCounter++;
         else
@@ -187,7 +186,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
             lastTick = spawnLocation.getWorld().getFullTime();
         //Use exists() here as the persistent entities will not try to respawn through this method
         if (exists()) {
-            new WarningMessage("Warning: " + customBossesConfigFields.getFilename() + " attempted to double spawn " + attemptsCounter + " times!", true);
+            Logger.warn("Warning: " + customBossesConfigFields.getFilename() + " attempted to double spawn " + attemptsCounter + " times!", true);
             return;
         }
         super.spawnLocation = spawnLocation;
@@ -196,7 +195,6 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
     }
 
     public void spawn(boolean silent) {
-        bossTrace.setSpawn();
         if (livingEntity != null && livingEntity.isValid())
             return;
 
@@ -205,7 +203,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
         else if (isPersistent) persistentObjectHandler.updatePersistentLocation(spawnLocation);
 
         if (spawnLocation == null) {
-            new WarningMessage("Boss " + customBossesConfigFields.getFilename() + " has a null location! This is probably due to an incorrectly configured regional location!");
+            Logger.warn("Boss " + customBossesConfigFields.getFilename() + " has a null location! This is probably due to an incorrectly configured regional location!");
             return;
         }
 
@@ -219,7 +217,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
             super.livingEntity = new CustomBossMegaConsumer(this).spawn();
             setNormalizedHealth();
             if (super.livingEntity == null)
-                new WarningMessage("Something just prevented EliteMobs from spawning a Custom Boss! More info up next.");
+                Logger.warn("Something just prevented EliteMobs from spawning a Custom Boss! More info up next.");
         }
         if (!exists()) {
             existsFailureCount++;
@@ -233,25 +231,25 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
             }
             if (existsFailureCount > 10) {
                 if (existsFailureCount == 11) {
-                    new WarningMessage("EliteMobs tried and failed to spawn " + customBossesConfigFields.getFilename() + " " + existsFailureCount + "times, probably due to regional protections or third party plugin incompatibilities.");
-                    new WarningMessage("To avoid cluttering up console, these warnings will now only appear once 6000 attempts for this boss. ");
+                    Logger.warn("EliteMobs tried and failed to spawn " + customBossesConfigFields.getFilename() + " " + existsFailureCount + "times, probably due to regional protections or third party plugin incompatibilities.");
+                    Logger.warn("To avoid cluttering up console, these warnings will now only appear once 6000 attempts for this boss. ");
                 }
                 if (existsFailureCount % 6000 == 0) {
-                    new WarningMessage("EliteMobs tried and failed to spawn " + customBossesConfigFields.getFilename() + " " + existsFailureCount + "times, probably due to regional protections or third party plugin incompatibilities.");
-                    new WarningMessage("To avoid cluttering up console, these warnings will now only appear once 6000 attempts for this boss. ");
+                    Logger.warn("EliteMobs tried and failed to spawn " + customBossesConfigFields.getFilename() + " " + existsFailureCount + "times, probably due to regional protections or third party plugin incompatibilities.");
+                    Logger.warn("To avoid cluttering up console, these warnings will now only appear once 6000 attempts for this boss. ");
                 }
                 return;
             }
             if (existsFailureCount > 1) {
-                new WarningMessage("EliteMobs tried and failed to spawn " + customBossesConfigFields.getFilename() + " " + existsFailureCount + "times, probably due to regional protections.");
+                Logger.warn("EliteMobs tried and failed to spawn " + customBossesConfigFields.getFilename() + " " + existsFailureCount + "times, probably due to regional protections.");
                 return;
             }
-            new WarningMessage("EliteMobs tried and failed to spawn " + customBossesConfigFields.getFilename() + " . Possible reasons for this:");
-            new WarningMessage("- The region was protected by a plugin (most likely)");
-            new WarningMessage("- The spawn was interfered with by some incompatible third party plugin");
-            new WarningMessage("Debug data: ");
-            new WarningMessage("Chunk is loaded: " + ChunkLocationChecker.locationIsLoaded(spawnLocation));
-            new WarningMessage("Attempted spawn location: " + spawnLocation.toString(), true);
+            Logger.warn("EliteMobs tried and failed to spawn " + customBossesConfigFields.getFilename() + " . Possible reasons for this:");
+            Logger.warn("- The region was protected by a plugin (most likely)");
+            Logger.warn("- The spawn was interfered with by some incompatible third party plugin");
+            Logger.warn("Debug data: ");
+            Logger.warn("Chunk is loaded: " + ChunkLocationChecker.locationIsLoaded(spawnLocation));
+            Logger.warn("Attempted spawn location: " + spawnLocation.toString(), true);
             return;
         }
 
@@ -490,11 +488,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
 
     @Override
     public void remove(RemovalReason removalReason) {
-        bossTrace.setRemove(removalReason);
         if (dynamicLevelUpdater != null) dynamicLevelUpdater.cancel();
-        if (DebugMessage.isDebugMode())
-            if (this instanceof RegionalBossEntity && this.phaseBossEntity != null)
-                new DebugMessage("Regional + Phase boss removal. Reason: " + removalReason);
         if (livingEntity != null) persistentLocation = livingEntity.getLocation();
         //Remove the living entity
         super.remove(removalReason);

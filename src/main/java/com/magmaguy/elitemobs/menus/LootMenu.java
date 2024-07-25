@@ -1,8 +1,8 @@
 package com.magmaguy.elitemobs.menus;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.items.customloottable.SharedLootTable;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
+import com.magmaguy.magmacore.util.ChatColorConverter;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;

@@ -1,11 +1,11 @@
 package com.magmaguy.elitemobs.menus;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.ArenasConfig;
 import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
 import com.magmaguy.elitemobs.config.menus.premade.ArenaMenuConfig;
 import com.magmaguy.elitemobs.instanced.arena.ArenaInstance;
+import com.magmaguy.magmacore.util.ChatColorConverter;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

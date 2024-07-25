@@ -1,9 +1,8 @@
 package com.magmaguy.elitemobs.config.customevents;
 
 import com.magmaguy.elitemobs.config.CustomConfigFields;
-import com.magmaguy.elitemobs.config.CustomConfigFieldsInterface;
 import com.magmaguy.elitemobs.events.CustomEvent;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Material;
@@ -11,7 +10,7 @@ import org.bukkit.Material;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CustomEventsConfigFields extends CustomConfigFields implements CustomConfigFieldsInterface {
+public class CustomEventsConfigFields extends CustomConfigFields {
 
     @Getter
     @Setter
@@ -74,7 +73,7 @@ public class CustomEventsConfigFields extends CustomConfigFields implements Cust
         this.isEnabled = processBoolean("isEnabled", isEnabled, true, true);
         this.eventType = processEnum("eventType", eventType, CustomEvent.EventType.DEFAULT, CustomEvent.EventType.class, true);
         if (eventType == CustomEvent.EventType.DEFAULT) {
-            new WarningMessage("Failed to determine a valid event type for " + filename + " ! This event will not be registered.");
+            Logger.warn("Failed to determine a valid event type for " + filename + " ! This event will not be registered.");
             return;
         }
         this.bossFilenames = processStringList("bossFilenames", bossFilenames, new ArrayList<>(), true);

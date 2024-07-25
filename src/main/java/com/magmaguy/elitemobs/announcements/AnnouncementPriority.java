@@ -1,8 +1,8 @@
 package com.magmaguy.elitemobs.announcements;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
+import com.magmaguy.magmacore.util.ChatColorConverter;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;

@@ -5,7 +5,7 @@ import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.events.BossCustomAttackDamage;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.meta.CombatEnterScanPower;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -110,7 +110,7 @@ public class PhotonRay extends CombatEnterScanPower {
                     y *= -1;
                 else if (zAbs > yAbs && zAbs > xAbs)
                     z *= -1;
-                else new WarningMessage("MagmaGuy is bad at math!");
+                else Logger.warn("MagmaGuy is bad at math!");
                 laserVector.setX(x);
                 laserVector.setY(y);
                 laserVector.setZ(z);

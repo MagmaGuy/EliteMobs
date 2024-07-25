@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.npcs;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.GuildRankMenuHandler;
 import com.magmaguy.elitemobs.api.PlayerPreTeleportEvent;
@@ -8,7 +7,8 @@ import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.menus.*;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.QuestInteractionHandler;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.ChatColorConverter;
+import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -160,7 +160,7 @@ public class NPCInteractions implements Listener {
                 break;
             case COMMAND:
                 if (npcEntity.getNPCsConfigFields().getCommand() == null) {
-                    new WarningMessage("Failed to run NPC command because none is configured for " + npcEntity.getNPCsConfigFields().getFilename());
+                    Logger.warn("Failed to run NPC command because none is configured for " + npcEntity.getNPCsConfigFields().getFilename());
                     return;
                 }
                 new BukkitRunnable() {
