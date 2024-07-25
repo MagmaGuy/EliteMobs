@@ -79,7 +79,7 @@ public class AlternativeDurabilityLoss implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onPlayerShoot(EntityShootBowEvent event){
+    public void onPlayerShoot(EntityShootBowEvent event) {
         if (!EliteItemManager.isEliteMobsItem(event.getBow())) return;
         if (isOnLastDamage(event.getBow())) event.setCancelled(true);
     }

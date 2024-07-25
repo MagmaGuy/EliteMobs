@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.commands;
 import com.magmaguy.elitemobs.commands.guild.AdventurersGuildCommand;
 import com.magmaguy.elitemobs.menus.UnbindMenu;
 import com.magmaguy.magmacore.command.AdvancedCommand;
-import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
 
 import java.util.List;
@@ -14,14 +13,14 @@ public class UnbindCommand extends AdvancedCommand {
         setUsage("/em unbind");
         setPermission("elitemobs.unbind.command");
         setSenderType(SenderType.PLAYER);
-        setDescription("Opens the unbind menu or teleports the player to the Adventurer's Guild Hub.");
+        setDescription("Opens the unbind menu or teleports the player to the Adventurer's Guild Hub");
     }
 
     @Override
-    public void execute(CommandData commandData) {
-        if (!AdventurersGuildCommand.adventurersGuildTeleport(commandData.getPlayerSender())) {
+    public void execute() {
+        if (!AdventurersGuildCommand.adventurersGuildTeleport(getCurrentPlayerSender())) {
             UnbindMenu unbindMenu = new UnbindMenu();
-            unbindMenu.constructUnbinderMenu(commandData.getPlayerSender());
+            unbindMenu.constructUnbinderMenu(getCurrentPlayerSender());
         }
     }
 }

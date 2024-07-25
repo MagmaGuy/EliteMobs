@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.magmacore.command.AdvancedCommand;
-import com.magmaguy.magmacore.command.CommandData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,15 +10,15 @@ public class MoneyCheckPlayerCommand extends AdvancedCommand {
         super(List.of("money"));
         addLiteral("check");
         addArgument("player", new ArrayList<>());
-        setUsage("/em money check <player>");
-        setPermission("elitemobs.money.check.others");
-        setDescription("Checks the currency of the specified player.");
+        setUsage("/em check <player>");
+        setPermission("elitemobs.*");
+        setDescription("Checks how much currency you have.");
     }
 
     @Override
-    public void execute(CommandData commandData) {
+    public void execute() {
         CurrencyCommandsHandler.checkCommand(
-                commandData.getCommandSender(),
-                commandData.getStringArgument("player"));
+                getCurrentCommandSender(),
+                getStringArgument("player"));
     }
 }

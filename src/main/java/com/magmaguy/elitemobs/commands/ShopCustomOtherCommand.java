@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.menus.CustomShopMenu;
 import com.magmaguy.magmacore.command.AdvancedCommand;
-import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Bukkit;
 
@@ -15,16 +14,16 @@ public class ShopCustomOtherCommand extends AdvancedCommand {
         addLiteral("custom");
         addArgument("player", new ArrayList<>());
         setUsage("/em shop custom <player>");
-        setPermission("elitemobs.shop.custom.other");
-        setDescription("Opens the EliteMobs shop for custom items for the specified player.");
+        setPermission("elitemobs.*");
+        setDescription("Opens the EliteMobs shop for custom items.");
     }
 
     @Override
-    public void execute(CommandData commandData) {
+    public void execute() {
         try {
-            CustomShopMenu.customShopConstructor(Bukkit.getPlayer(commandData.getStringArgument("player")));
+            CustomShopMenu.customShopConstructor(Bukkit.getPlayer(getStringArgument("player")));
         } catch (Exception ex) {
-            Logger.sendMessage(commandData.getCommandSender(), "Failed to get player with that username!");
+            Logger.sendMessage(getCurrentCommandSender(), "Failed to get player with that username!");
         }
     }
 }

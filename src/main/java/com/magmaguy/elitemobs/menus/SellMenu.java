@@ -3,13 +3,14 @@ package com.magmaguy.elitemobs.menus;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
+import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
 import com.magmaguy.elitemobs.config.menus.premade.SellMenuConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.items.ItemWorthCalculator;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
+import com.magmaguy.elitemobs.utils.ItemStackGenerator;
+import com.magmaguy.elitemobs.utils.Round;
 import com.magmaguy.magmacore.util.ChatColorConverter;
-import com.magmaguy.magmacore.util.ItemStackGenerator;
-import com.magmaguy.magmacore.util.Round;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -66,7 +67,7 @@ public class SellMenu extends EliteMenu implements Listener {
     public void constructSellMenu(Player player) {
 
         String menuName = SellMenuConfig.shopName;
-        if (DefaultConfig.isForceMenuUnicode() || Bukkit.getPluginManager().isPluginEnabled("ResourcePackManager"))
+        if (ResourcePackDataConfig.isDisplayCustomMenuUnicodes())
             menuName = ChatColor.WHITE + "\uF801\uDB80\uDC5B\uF805          " + menuName;
 
         Inventory sellInventory = Bukkit.createInventory(player, 54, menuName);

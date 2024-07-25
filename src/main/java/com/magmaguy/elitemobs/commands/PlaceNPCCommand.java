@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.commands;
 import com.magmaguy.elitemobs.commands.admin.NPCCommands;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
 import com.magmaguy.magmacore.command.AdvancedCommand;
-import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
 
 import java.util.ArrayList;
@@ -15,13 +14,13 @@ public class PlaceNPCCommand extends AdvancedCommand {
         addLiteral("npc");
         addArgument("filename", new ArrayList<>(NPCsConfig.npcEntities.keySet()));
         setUsage("/em place npc <filename>");
-        setPermission("elitemobs.place.npc");
+        setPermission("elitemobs.*");
         setSenderType(SenderType.PLAYER);
         setDescription("Permanently adds an npc to the location the user is standing on.");
     }
 
     @Override
-    public void execute(CommandData commandData) {
-        NPCCommands.set(commandData.getPlayerSender(), commandData.getStringArgument("filename"));
+    public void execute() {
+        NPCCommands.set(getCurrentPlayerSender(), getStringArgument("filename"));
     }
 }

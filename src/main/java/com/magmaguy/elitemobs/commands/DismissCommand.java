@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.magmacore.command.AdvancedCommand;
-import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
 
 import java.util.List;
@@ -12,12 +11,11 @@ public class DismissCommand extends AdvancedCommand {
         super(List.of("dismiss"));
         setDescription("Dismisses /em menu message.");
         setUsage("/em dismiss");
-        setPermission("elitemobs.dismiss");
         setSenderType(SenderType.PLAYER);
     }
 
     @Override
-    public void execute(CommandData commandData) {
-        PlayerData.setDismissEMStatusScreenMessage(commandData.getPlayerSender(), !PlayerData.getDismissEMStatusScreenMessage(commandData.getPlayerSender().getUniqueId()));
+    public void execute() {
+        PlayerData.setDismissEMStatusScreenMessage(getCurrentPlayerSender(), !PlayerData.getDismissEMStatusScreenMessage(getCurrentPlayerSender().getUniqueId()));
     }
 }
