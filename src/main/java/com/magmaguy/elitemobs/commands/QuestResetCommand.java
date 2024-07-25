@@ -14,7 +14,7 @@ public class QuestResetCommand extends AdvancedCommand {
         addArgument("player", new ArrayList<>());
         addArgument("questName", new ArrayList<>(CustomQuestsConfig.getCustomQuests().keySet()));
         setUsage("/em quest reset <player> <quest filename>");
-        setPermission("elitemobs.*");
+        setPermission("elitemobs.quest.reset.quest");
         setDescription("Resets a specific quest for a specific player.");
     }
 

@@ -15,9 +15,9 @@ public class LootRandomCommand extends AdvancedCommand {
         addArgument("level", new ArrayList<>(CustomItemsConfig.getCustomItems().keySet()));
         addArgument("playerName", new ArrayList<>());
         setUsage("/em loot random <level> <player>");
-        setPermission("elitemobs.*");
+        setPermission("elitemobs.loot.random");
         setSenderType(SenderType.PLAYER);
-        setDescription("Gives loot to a player.");
+        setDescription("Gives the player random loot of the specified level.");
     }
 
     @Override

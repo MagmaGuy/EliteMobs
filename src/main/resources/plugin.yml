@@ -150,3 +150,120 @@ permissions:
   elitemobs.enchant.command:
     description: Allows players to use the enchant command to enchant Elite Items
     default: true
+  elitemobs.arena.menu:
+    description: Allows players to open the Arena menu and join an Arena.
+    default: true
+  elitemobs.debug:
+    description: Allows players to have access to the player/bosses debug command.
+    default: true
+  elitemobs.discord.link:
+    description: Allows players to have access to the Discord link command.
+    default: true
+  elitemobs.discord.message:
+    description: Allows players to have access to the DiscordSRV message debug command.
+    default: op
+  elitemobs.event.start:
+    description: Allows players to start specific events.
+    default: op
+  elitemobs.fireball:
+    description: Allows players to shoot a fireball at the pointer's location.
+    default: op
+  elitemobs.help:
+    description: Allows players to see all available EliteMobs commands.
+    default: op
+  elitemobs.kill.kill:
+    description: Allows players to kill all elites.
+    default: op
+  elitemobs.kill.radius:
+    description: Allows players to kill all elites in the specified radius.
+    default: op
+  elitemobs.kill.type:
+    description: Allows players to kill all elites of the specified type.
+    default: op
+  elitemobs.kill.type.radius:
+    description: Allows players to kill all elites of the specified type within the given radius.
+    default: op
+  elitemobs.language:
+    description: Allows players to set the language that the server will use for EliteMobs.
+    default: op
+  elitemobs.loot.debug:
+    description: Allows players to equip themselves with a complete armor set, weapons set of the specified level, and food for testing purposes.
+    default: op
+  elitemobs.loot.give:
+    description: Allows players to give the specified loot to a specific player.
+    default: op
+  elitemobs.loot.menu:
+    description: Allows players to open the loot menu and select any loot they want.
+    default: op
+  elitemobs.loot.random:
+    description: Allows players to get random loot of the specified level.
+    default: op
+  elitemobs.loot.simulate:
+    description: Allows players to get simulated loot drops for the specified level and player.
+    default: op
+  elitemobs.loot.simulate.times:
+    description: Allows players to get simulated loot drops for a specified number of times for the given level and player.
+    default: op
+  elitemobs.loot.stats:
+    description: Allows players to see EliteMobs stats for the currently held item.
+    default: true
+  elitemobs.loot.stats:
+    description: Allows players to see EliteMobs stats for the currently held item.
+    default: op
+  elitemobs.money.add.all:
+    description: Allows players to give every player on the server the specified amount of money.
+    default: op
+  elitemobs.money.add.player:
+    description: Allows players to give the specified amount of money to the designated player.
+    default: op
+  elitemobs.money.check.self:
+    description: Allows players to check their EliteMobs currency.
+    default: true
+  elitemobs.money.check.player:
+    description: Allows players to check the currency of the specified player.
+    default: op
+  elitemobs.money.remove:
+    description: Allows players to deduct the specified amount of currency from a player.
+    default: op
+  elitemobs.money.set:
+    description: Allows players to set the specified amount of currency for the specified player.
+    default: op
+  elitemobs.package:
+    description: Allows players to package an EliteMobs dungeon for distribution.
+    default: op
+  elitemobs.place.boss:
+    description: Allows players to add a spawn location for the specified boss at their current location.
+    default: op
+  elitemobs.place.npc:
+    description: Allows players to permanently add an NPC to the location the user is standing on.
+    default: op
+  elitemobs.place.treasure:
+    description: Allows players to permanently add a treasure chest to the location the user is standing on.
+    default: op
+  elitemobs.place.wormhole:
+    description: Allows players to permanently add a wormhole teleport at their current location.
+    default: op
+  elitemobs.quest.bypass:
+    description: Allows players to bypass permission restrictions for elite quests.
+    default: op
+  elitemobs.quest.complete:
+    description: Allows players to force complete all of their currently active elite quests. For debugging use only.
+    default: op
+  elitemobs.quest.leave:
+    description: Allows players to leave a quest. Used via menu, can't be directly used.
+    default: op
+  elitemobs.quest.reset.all:
+    description: Allows players to reset all quests for a specific player.
+    default: op
+  elitemobs.quest.reset.quest:
+    description: Allows players to reset a specific quest for a specific player.
+    default: op
+  elitemobs.rank.set:
+    description: Allows players to manually set a player's guild rank to a the prestige level and guild level specified.
+    default: op
+  elitemobs.reload:
+    description: Allows players to reload EliteMobs.
+    default: op
+  elitemobs.remove:
+    description: Allows players to toggle removal mode for EliteMobs, which can permanently remove any EliteMobs-related content.
+    default: op

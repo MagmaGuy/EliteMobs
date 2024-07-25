@@ -13,8 +13,8 @@ public class MoneySetCommand extends AdvancedCommand {
         addArgument("player", new ArrayList<>(CustomItemsConfig.getCustomItems().keySet()));
         addArgument("amount", new ArrayList<>(CustomItemsConfig.getCustomItems().keySet()));
         setUsage("/em money set <player> <amount>");
-        setPermission("elitemobs.*");
-        setDescription("Sets the specified amount of currency to a player.");
+        setPermission("elitemobs.money.set");
+        setDescription("Sets the specified amount of currency for the specified player.");
     }
 
     @Override
