@@ -11,7 +11,7 @@ public class EventCommand extends AdvancedCommand {
         super(List.of("event"));
         addArgument("filename", TimedEvent.getBlueprintEvents().stream().map(timedEvent -> timedEvent.getCustomEventsConfigFields().getFilename()).toList());
         setUsage("/em event <event filename>");
-        setPermission("elitemobs.*");
+        setPermission("elitemobs.event.start");
         setSenderType(SenderType.PLAYER);
         setDescription("Triggers a timed event to start at the next available time and place.");
     }

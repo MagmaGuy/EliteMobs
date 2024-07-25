@@ -15,9 +15,9 @@ public class LootGiveCommand extends AdvancedCommand {
         addArgument("filename", new ArrayList<>(CustomItemsConfig.getCustomItems().keySet()));
         addArgument("playerName", new ArrayList<>());
         setUsage("/em loot give <filename> <player>");
-        setPermission("elitemobs.*");
+        setPermission("elitemobs.loot.give");
         setSenderType(SenderType.PLAYER);
-        setDescription("Gives loot to a player.");
+        setDescription("Gives the specified loot to a specific player.");
     }
 
     @Override
