@@ -9,8 +9,8 @@ import java.util.List;
 public class DiscordCommand extends AdvancedCommand {
     public DiscordCommand() {
         super(List.of("discord"));
-        setUsage("/em discord <message>");
-        setPermission("elitemobs.*");
+        setUsage("/em discord");
+        setPermission("elitemobs.discord.link");
         setDescription("Links to the EliteMobs discord.");
     }
 
