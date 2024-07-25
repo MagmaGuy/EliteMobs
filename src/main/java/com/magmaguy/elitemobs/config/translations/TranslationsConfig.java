@@ -1,8 +1,8 @@
 package com.magmaguy.elitemobs.config.translations;
 
-import com.magmaguy.elitemobs.config.CustomConfig;
 import com.magmaguy.elitemobs.config.DefaultConfig;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.config.CustomConfig;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 
 import java.util.HashMap;
@@ -30,7 +30,7 @@ public class TranslationsConfig extends CustomConfig {
             return value;
         TranslationsConfigFields selectedLanguage = translationConfigs.get(DefaultConfig.getLanguage());
         if (selectedLanguage == null) {
-            new WarningMessage("Failed to get valid language from " + filename + " , defaulting to English! (String)");
+            Logger.warn("Failed to get valid language from " + filename + " , defaulting to English! (String)");
             return value;
         }
         selectedLanguage.add(filename, key, value);
@@ -42,7 +42,7 @@ public class TranslationsConfig extends CustomConfig {
             return value;
         TranslationsConfigFields selectedLanguage = translationConfigs.get(DefaultConfig.getLanguage());
         if (selectedLanguage == null) {
-            new WarningMessage("Failed to get valid language from " + filename + " , defaulting to English! (List)");
+            Logger.warn("Failed to get valid language from " + filename + " , defaulting to English! (List)");
             return value;
         }
         selectedLanguage.add(filename, key, value);

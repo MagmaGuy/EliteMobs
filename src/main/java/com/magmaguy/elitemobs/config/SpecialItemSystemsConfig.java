@@ -1,15 +1,15 @@
 package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.config.ConfigurationFile;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.configuration.file.FileConfiguration;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 
-public class SpecialItemSystemsConfig {
+public class SpecialItemSystemsConfig extends ConfigurationFile {
 
     @Getter
     private static final HashMap<CustomItem, Double> specialValues = new HashMap<>();
@@ -40,11 +40,24 @@ public class SpecialItemSystemsConfig {
     @Getter
     private static String challengeAnnouncement;
 
-    public static void initializeConfig() {
-        specialValues.clear();
+    public SpecialItemSystemsConfig() {
+        super("SpecialItemSystems.yml");
+    }
 
-        File file = ConfigurationEngine.fileCreator("SpecialItemSystems.yml");
-        FileConfiguration fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
+    private static void addDefaultEnchantmentBook(FileConfiguration fileConfiguration, String configFilename, double chance) {
+        String key = "enchantedBookWeightedDropChance." + configFilename;
+        fileConfiguration.addDefault(key, chance);
+        CustomItem customItem = CustomItem.getCustomItem(configFilename + ".yml");
+        if (customItem == null) {
+            Logger.warn("Failed to get custom item " + configFilename + ".yml for the special loot list!");
+            return;
+        }
+        specialValues.put(customItem, fileConfiguration.getDouble(key));
+    }
+
+    @Override
+    public void initializeValues() {
+        specialValues.clear();
 
         dropSpecialLoot = ConfigurationEngine.setBoolean(
                 List.of("Sets if special loot will drop."),
@@ -152,17 +165,5 @@ public class SpecialItemSystemsConfig {
                 List.of("Sets the message announced to all players when losing an item while trying to enchant it if the item has more than 10 enchantments"),
                 file, fileConfiguration, "criticalFailureAnnouncement", "&8[EliteMobs] $player &clost $itemName &cwhile trying to enchant it!", true);
 
-        ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
-    }
-
-    private static void addDefaultEnchantmentBook(FileConfiguration fileConfiguration, String configFilename, double chance) {
-        String key = "enchantedBookWeightedDropChance." + configFilename;
-        fileConfiguration.addDefault(key, chance);
-        CustomItem customItem = CustomItem.getCustomItem(configFilename + ".yml");
-        if (customItem == null) {
-            new WarningMessage("Failed to get custom item " + configFilename + ".yml for the special loot list!");
-            return;
-        }
-        specialValues.put(customItem, fileConfiguration.getDouble(key));
     }
 }

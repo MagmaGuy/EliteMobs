@@ -9,7 +9,7 @@ import com.magmaguy.elitemobs.powers.meta.CustomSummonPower;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import com.magmaguy.elitemobs.powers.scripts.EliteScript;
 import com.magmaguy.elitemobs.utils.MapListInterpreter;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -43,7 +43,7 @@ public class ElitePowerParser {
                             try {
                                 ((BonusCoins) elitePower).setCoinMultiplier(Double.parseDouble(parsedPowerName[1]));
                             } catch (Exception ex) {
-                                new WarningMessage("Multiplier " + parsedPowerName[1] + " for Bonus Coins power is not a valid multiplier!");
+                                Logger.warn("Multiplier " + parsedPowerName[1] + " for Bonus Coins power is not a valid multiplier!");
                             }
                 }
                 //Parses more advanced powers, like reinforcements and powers with difficulty settings
@@ -85,12 +85,12 @@ public class ElitePowerParser {
                     if (string != null && !string.isEmpty()) {
                         PowersConfigFields powersConfigFields = PowersConfig.getPower(string);
                         if (powersConfigFields == null) {
-                            new WarningMessage("Invalid power name " + string + " in file " + customBossesConfigFields.getFilename());
+                            Logger.warn("Invalid power name " + string + " in file " + customBossesConfigFields.getFilename());
                         } else {
                             addPower(string, elitePowers, customBossesConfigFields, customBossEntity);
                         }
                     } else
-                        new WarningMessage("No valid power name in boss config " + customBossesConfigFields.getFilename());
+                        Logger.warn("No valid power name in boss config " + customBossesConfigFields.getFilename());
                 }
             }
         }
@@ -110,11 +110,11 @@ public class ElitePowerParser {
                 elitePowers.add(elitePower);
                 return elitePower;
             } catch (Exception ex) {
-                new WarningMessage("Could not process power " + powerName);
+                Logger.warn("Could not process power " + powerName);
                 return null;
             }
         } else
-            new WarningMessage("Warning: power name " + powerName + " for boss " + customBossesConfigFields.getFilename() + " is not registered! Skipping it for custom mob construction...");
+            Logger.warn("Warning: power name " + powerName + " for boss " + customBossesConfigFields.getFilename() + " is not registered! Skipping it for custom mob construction...");
         return null;
     }
 }

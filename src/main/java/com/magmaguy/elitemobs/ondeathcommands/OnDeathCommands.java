@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.ondeathcommands;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -134,7 +134,7 @@ public class OnDeathCommands implements Listener {
                     String fullString = "$chance=" + chanceString + "$";
                     string = string.replace(fullString, "");
                 } catch (Exception ex) {
-                    new WarningMessage("Failed to get the chance value of the command " + string + " . The correct format should be $chance=X.Y$", true);
+                    Logger.warn("Failed to get the chance value of the command " + string + " . The correct format should be $chance=X.Y$", true);
                 }
             }
         }

@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.commands.admin;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.events.TimedEvent;
+import com.magmaguy.magmacore.util.ChatColorConverter;
 import org.bukkit.command.CommandSender;
 
 public class EventCommand {

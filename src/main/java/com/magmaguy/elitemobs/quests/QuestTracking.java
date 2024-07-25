@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.quests;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.QuestAcceptEvent;
 import com.magmaguy.elitemobs.api.QuestCompleteEvent;
@@ -16,6 +15,7 @@ import com.magmaguy.elitemobs.quests.objectives.*;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
 import com.magmaguy.elitemobs.utils.SpigotMessage;
 import com.magmaguy.elitemobs.wormhole.Wormhole;
+import com.magmaguy.magmacore.util.ChatColorConverter;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;

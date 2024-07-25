@@ -1,12 +1,11 @@
 package com.magmaguy.elitemobs.config;
 
+import com.magmaguy.magmacore.config.ConfigurationFile;
 import lombok.Getter;
-import org.bukkit.configuration.file.FileConfiguration;
 
-import java.io.File;
 import java.util.List;
 
-public class CombatTagConfig {
+public class CombatTagConfig extends ConfigurationFile {
     @Getter
     private static boolean enableCombatTag;
     @Getter
@@ -18,13 +17,12 @@ public class CombatTagConfig {
     @Getter
     private static String teleportCancelled;
 
-    private CombatTagConfig() {
+    public CombatTagConfig() {
+        super("CombatTag.yml");
     }
 
-    public static void initializeConfig() {
-        File file = ConfigurationEngine.fileCreator("CombatTag.yml");
-        FileConfiguration fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
-
+    @Override
+    public void initializeValues() {
         enableCombatTag = ConfigurationEngine.setBoolean(
                 List.of("Sets if the combat tag is enabled.", "When enabled, flying players that engage in combat are set to stop flying."),
                 fileConfiguration, "Enable combat tag", true);
@@ -40,8 +38,5 @@ public class CombatTagConfig {
         teleportCancelled = ConfigurationEngine.setString(
                 List.of("Sets the message sent when players move while waiting for teleportation."),
                 file, fileConfiguration, "Teleport cancelled", "&7[EM] &cTeleport interrupted!", true);
-
-        ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }
-
 }

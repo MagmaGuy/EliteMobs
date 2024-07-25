@@ -1,8 +1,7 @@
 package com.magmaguy.elitemobs;
 
-import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
-import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 
 /**
  * Created by MagmaGuy on 26/04/2017.
@@ -20,8 +19,7 @@ public class MetadataHandler implements Listener {
     //third party compatibility
     public final static String BETTERDROPS_COMPATIBILITY_MD = "betterdrops_ignore";
     //plugin getter
-    public static Plugin PLUGIN = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
-
+    public static JavaPlugin PLUGIN;
 
     public static int signatureID = 31173;
 

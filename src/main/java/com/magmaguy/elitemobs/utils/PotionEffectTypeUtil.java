@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.utils;
 
+import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.NamespacedKey;
 import org.bukkit.potion.PotionEffectType;
 
@@ -23,7 +24,7 @@ public class PotionEffectTypeUtil {
         if (potionEffectType != null)
             return potionEffectType;
         else {
-            new WarningMessage("Failed to get potion effect type in script for key " + name + "!");
+            Logger.warn("Failed to get potion effect type in script for key " + name + "!");
             return null;
         }
     }

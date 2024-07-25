@@ -1,9 +1,9 @@
 package com.magmaguy.elitemobs.commands;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.utils.WarningMessage;
-import com.magmaguy.elitemobs.utils.ZipFile;
+import com.magmaguy.magmacore.util.ChatColorConverter;
+import com.magmaguy.magmacore.util.Logger;
+import com.magmaguy.magmacore.util.ZipFile;
 import org.bukkit.command.CommandSender;
 
 import java.io.File;
@@ -103,7 +103,7 @@ public class PackageCommand {
             } else
                 Files.copy(scannedFile.toPath(), Path.of(destination.getAbsolutePath() + File.separatorChar + scannedFile.getName()), StandardCopyOption.REPLACE_EXISTING);
         } catch (Exception exception) {
-            new WarningMessage("Failed to recursively pack dungeon!");
+            Logger.warn("Failed to recursively pack dungeon!");
         }
     }
 }

@@ -2,8 +2,7 @@ package com.magmaguy.elitemobs.thirdparty.custommodels.modelengine;
 
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.thirdparty.custommodels.CustomModelInterface;
-import com.magmaguy.elitemobs.utils.InfoMessage;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import com.ticxo.modelengine.api.ModelEngineAPI;
 import com.ticxo.modelengine.api.animation.state.ModelState;
 import com.ticxo.modelengine.api.generator.model.ModelBlueprint;
@@ -26,11 +25,11 @@ public class CustomModelMEG implements CustomModelInterface {
     public CustomModelMEG(LivingEntity livingEntity, String modelName, String nametagName) {
         try {
             if (ModelEngineAPI.api.getModelRegistry().getBlueprint(modelName) == null) {
-                new InfoMessage("Model " + modelName + " was not found! Make sure you install the model correctly if you have it. This entry will be skipped!");
+                Logger.info("Model " + modelName + " was not found! Make sure you install the model correctly if you have it. This entry will be skipped!");
                 return;
             }
         } catch (NoSuchMethodError ex) {
-            new WarningMessage("Model Engine API version is not supported. Currently Elitemobs can only support ModelEngine R3.0.0.");
+            Logger.warn("Model Engine API version is not supported. Currently Elitemobs can only support ModelEngine R3.0.0.");
             return;
         }
 
@@ -39,14 +38,14 @@ public class CustomModelMEG implements CustomModelInterface {
         activeModel = ModelEngineAPI.createActiveModel(modelBlueprint);
 
         if (activeModel == null) {
-            new WarningMessage("Failed to load model from " + modelName + " ! Is the model name correct, and has the model been installed correctly?");
+            Logger.warn("Failed to load model from " + modelName + " ! Is the model name correct, and has the model been installed correctly?");
             return;
         }
 
         modeledEntity = ModelEngineAPI.createModeledEntity(livingEntity);
 
         if (modeledEntity == null) {
-            new WarningMessage("Failed to create model entity " + modelName + " ! This means the entity that was meant to get disguised has a problem!");
+            Logger.warn("Failed to create model entity " + modelName + " ! This means the entity that was meant to get disguised has a problem!");
             return;
         }
 
@@ -58,7 +57,7 @@ public class CustomModelMEG implements CustomModelInterface {
             success = true;
         } catch (Exception exception) {
             modeledEntity.removeModel(modelName);
-            new WarningMessage("Failed to make model entity " + modelName + " ! Couldn't assign model or visibility status.");
+            Logger.warn("Failed to make model entity " + modelName + " ! Couldn't assign model or visibility status.");
             exception.printStackTrace();
         }
 
@@ -73,7 +72,7 @@ public class CustomModelMEG implements CustomModelInterface {
         try {
             ModelEngineAPI.api.getGenerator().importModelsAsync();
         } catch (Exception ex) {
-            new WarningMessage("Model Engine API version is not supported. Currently Elitemobs can only support ModelEngine R3.0.0.");
+            Logger.warn("Model Engine API version is not supported. Currently Elitemobs can only support ModelEngine R3.0.0.");
         }
     }
 
@@ -81,11 +80,11 @@ public class CustomModelMEG implements CustomModelInterface {
         if (modelName == null || modelName.isEmpty()) return false;
         try {
             if (ModelEngineAPI.api.getModelRegistry().getBlueprint(modelName) == null) {
-                new InfoMessage("Model " + modelName + " was not found! Make sure you install the model correctly if you have it. This entry will be skipped!");
+                Logger.info("Model " + modelName + " was not found! Make sure you install the model correctly if you have it. This entry will be skipped!");
                 return false;
             }
         } catch (NoSuchMethodError ex) {
-            new WarningMessage("Model Engine API version is not supported. Currently Elitemobs can only support ModelEngine R3.0.0, documentation for other versions doesn't exist.");
+            Logger.warn("Model Engine API version is not supported. Currently Elitemobs can only support ModelEngine R3.0.0, documentation for other versions doesn't exist.");
             return false;
         }
 
@@ -119,7 +118,7 @@ public class CustomModelMEG implements CustomModelInterface {
         if (modeledEntity == null) return;
         Nameable nametag = getNameableBone();
         if (nametag == null) {
-            new WarningMessage("Failed to get hitbox nametag for disguise!");
+            Logger.warn("Failed to get hitbox nametag for disguise!");
             return;
         }
         nametag.setCustomName(nametagName);
@@ -141,7 +140,7 @@ public class CustomModelMEG implements CustomModelInterface {
 
     public void addPassenger(CustomBossEntity passenger) {
         if (passenger.getCustomBossesConfigFields().getCustomModelMountPointID() == null) {
-            new WarningMessage("Attempted to add " + passenger.getCustomBossesConfigFields().getFilename() + " as a mounted entity for a custom model but it does not have customModelMountPointID set! The boss can't guess where it needs to be mounted, and therefore this will not work.");
+            Logger.warn("Attempted to add " + passenger.getCustomBossesConfigFields().getFilename() + " as a mounted entity for a custom model but it does not have customModelMountPointID set! The boss can't guess where it needs to be mounted, and therefore this will not work.");
             return;
         }
         modeledEntity.getMountManager().addPassengerToSeat(

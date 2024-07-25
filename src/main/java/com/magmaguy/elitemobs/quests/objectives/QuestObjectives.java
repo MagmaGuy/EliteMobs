@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.quests.objectives;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.api.QuestObjectivesCompletedEvent;
 import com.magmaguy.elitemobs.config.QuestsConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
@@ -10,6 +9,7 @@ import com.magmaguy.elitemobs.quests.Quest;
 import com.magmaguy.elitemobs.quests.rewards.QuestReward;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.elitemobs.utils.SimpleScoreboard;
+import com.magmaguy.magmacore.util.ChatColorConverter;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -26,6 +26,8 @@ import java.util.concurrent.ThreadLocalRandom;
 public class QuestObjectives implements Serializable {
 
     @Getter
+    private final UUID uuid = UUID.randomUUID();
+    @Getter
     @Setter
     protected QuestReward questReward;
     @Getter
@@ -40,8 +42,6 @@ public class QuestObjectives implements Serializable {
     private boolean turnedIn = false;
     @Setter
     private boolean forceOver = false;
-    @Getter
-    private final UUID uuid = UUID.randomUUID();
 
     /**
      * Used for dynamic quests

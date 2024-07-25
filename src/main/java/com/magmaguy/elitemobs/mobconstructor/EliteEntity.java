@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.mobconstructor;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobHealEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
@@ -22,7 +21,8 @@ import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import com.magmaguy.elitemobs.tagger.PersistentTagger;
 import com.magmaguy.elitemobs.utils.EventCaller;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.ChatColorConverter;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
@@ -496,7 +496,7 @@ public class EliteEntity {
                     else
                         this.minorPowerCount++;
                 } catch (Exception ex) {
-                    new WarningMessage("Failed to instance new power!");
+                    Logger.warn("Failed to instance new power!");
                 }
             }
 

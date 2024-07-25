@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.items.customloottable;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.customarenas.CustomArenasConfigFields;
@@ -8,6 +7,7 @@ import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.config.customquests.CustomQuestsConfigFields;
 import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestConfigFields;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.magmacore.util.ChatColorConverter;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;

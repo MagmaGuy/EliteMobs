@@ -1,6 +1,6 @@
 package com.magmaguy.elitemobs.config.customspawns;
 
-import com.magmaguy.elitemobs.config.CustomConfig;
+import com.magmaguy.magmacore.config.CustomConfig;
 
 import java.util.HashMap;
 

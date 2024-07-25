@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Wolf;
@@ -47,7 +47,7 @@ public class SummonWolfEnchantment extends CustomEnchantment {
         customBossEntity.setLevel(ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getFullPlayerTier(true));
         customBossEntity.spawn(false);
         if (customBossEntity.getCustomBossesConfigFields().getEntityType() != EntityType.WOLF) {
-            new WarningMessage("snoopy.yml boss file was not set to a wolf entity type! It must be a wolf for the summon mechanic to work correctly!");
+            Logger.warn("snoopy.yml boss file was not set to a wolf entity type! It must be a wolf for the summon mechanic to work correctly!");
             return null;
         }
         return (Wolf) customBossEntity.getLivingEntity();
@@ -58,7 +58,7 @@ public class SummonWolfEnchantment extends CustomEnchantment {
         customBossEntity.setSpawnLocation(player.getLocation());
         customBossEntity.setLevel(ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getFullPlayerTier(true));
         if (customBossEntity.getLivingEntity().getType() != EntityType.WOLF) {
-            new WarningMessage("snoopy.yml boss file was not set to a wolf entity type! It must be a wolf for the summon mechanic to work correctly!");
+            Logger.warn("snoopy.yml boss file was not set to a wolf entity type! It must be a wolf for the summon mechanic to work correctly!");
             return null;
         }
         return (Wolf) customBossEntity.getLivingEntity();

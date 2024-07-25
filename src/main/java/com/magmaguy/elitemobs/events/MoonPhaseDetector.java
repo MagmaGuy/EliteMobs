@@ -1,6 +1,6 @@
 package com.magmaguy.elitemobs.events;
 
-import org.bukkit.Bukkit;
+import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.World;
 
 public class MoonPhaseDetector {
@@ -29,7 +29,7 @@ public class MoonPhaseDetector {
             case 7:
                 return MoonPhase.WAXING_GIBBOUS;
             default:
-                Bukkit.getLogger().info("Unhandled moon phase. Phase " + phase + " was " + days + ". Defaulting to full moon...");
+                Logger.info("Unhandled moon phase. Phase " + phase + " was " + days + ". Defaulting to full moon...");
                 return MoonPhase.FULL_MOON;
 
         }

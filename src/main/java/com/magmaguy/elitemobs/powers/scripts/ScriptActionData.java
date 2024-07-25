@@ -14,6 +14,10 @@ import java.util.List;
 
 public class ScriptActionData {
     @Getter
+    private final TargetType targetType;
+    @Getter
+    private final ScriptTargets scriptTargets;
+    @Getter
     @Setter
     private Collection<Location> locations = null;
     @Getter
@@ -25,10 +29,6 @@ public class ScriptActionData {
     @Getter
     @Setter
     private Location landingLocation = null;
-    @Getter
-    private final TargetType targetType;
-    @Getter
-    private final ScriptTargets scriptTargets;
     @Getter
     private ScriptZone scriptZone = null;
     @Getter

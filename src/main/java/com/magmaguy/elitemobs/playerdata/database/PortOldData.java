@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.playerdata.database;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -128,7 +128,7 @@ public class PortOldData {
                 PlayerData.getConnection().commit();
                 PlayerData.getConnection().close();
             } catch (Exception e) {
-                new WarningMessage("Warning: Failed to write values from old config files to new database system. Tell the dev!");
+                Logger.warn("Warning: Failed to write values from old config files to new database system. Tell the dev!");
                 System.err.println(e.getClass().getName() + ": " + e.getMessage());
                 errored = true;
             }
@@ -151,7 +151,7 @@ public class PortOldData {
         try {
             if (file.exists() && file.isFile()) {
                 file.delete();
-                new WarningMessage("Deleted data file " + file.getName() + " - was no longer in use, moved to SQLite");
+                Logger.warn("Deleted data file " + file.getName() + " - was no longer in use, moved to SQLite");
             }
         } catch (Exception ex) {
 

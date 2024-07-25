@@ -1,0 +1,29 @@
+package com.magmaguy.elitemobs.commands;
+
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
+import com.magmaguy.magmacore.command.AdvancedCommand;
+import com.magmaguy.magmacore.command.SenderType;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class SpawnBossLevelCommand extends AdvancedCommand {
+    public SpawnBossLevelCommand() {
+        super(List.of("spawn"));
+        addLiteral("boss");
+        addArgument("filename", new ArrayList<>(CustomBossesConfig.getCustomBosses().keySet()));
+        addArgument("level", List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19));
+        setUsage("/setup spawn boss <filename> <level>");
+        setPermission("elitemobs.*");
+        setSenderType(SenderType.PLAYER);
+        setDescription("Spawns a custom boss at the location the user is looking at.");
+    }
+
+    @Override
+    public void execute() {
+        SpawnCommand.spawnCustomBossCommand(
+                getCurrentPlayerSender(),
+                getStringArgument("filename"),
+                getIntegerArgument("level"));
+    }
+}

@@ -14,7 +14,7 @@ import com.magmaguy.elitemobs.mobconstructor.custombosses.transitiveblocks.Trans
 import com.magmaguy.elitemobs.pathfinding.Navigation;
 import com.magmaguy.elitemobs.powers.SpiritWalk;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -142,7 +142,7 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
             try {
                 customBossesConfigFields.getFileConfiguration().save(customBossesConfigFields.getFile());
             } catch (Exception ex) {
-                new WarningMessage("Failed to save respawn timer for " + customBossesConfigFields.getFileConfiguration().getName() + " !");
+                Logger.warn("Failed to save respawn timer for " + customBossesConfigFields.getFileConfiguration().getName() + " !");
             }
         }
     }
@@ -178,7 +178,7 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
 
     public void saveNewLocation() {
         if (spawnLocation == null) {
-            new WarningMessage("Failed to save regional boss because it failed to spawn correctly!");
+            Logger.warn("Failed to save regional boss because it failed to spawn correctly!");
         }
         customBossesConfigFields.setFilesOutOfSync(true);
         rawString = ConfigurationLocation.deserialize(spawnLocation);
@@ -239,7 +239,7 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
                     SpiritWalk.spiritWalkRegionalBossAnimation(regionalBossEntity, getLivingEntity().getLocation(), getSpawnLocation());
             } catch (Exception ex) {
                 ex.printStackTrace();
-                new WarningMessage("Async leash task errored!");
+                Logger.warn("Async leash task errored!");
             }
         }, 20L * 3, 20L * 3);
     }

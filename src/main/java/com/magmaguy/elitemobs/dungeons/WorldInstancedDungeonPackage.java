@@ -1,9 +1,9 @@
 package com.magmaguy.elitemobs.dungeons;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfig;
 import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
+import com.magmaguy.magmacore.util.ChatColorConverter;
 import org.bukkit.entity.Player;
 
 import java.io.File;
