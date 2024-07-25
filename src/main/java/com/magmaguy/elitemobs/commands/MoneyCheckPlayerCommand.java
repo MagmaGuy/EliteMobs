@@ -11,8 +11,8 @@ public class MoneyCheckPlayerCommand extends AdvancedCommand {
         addLiteral("check");
         addArgument("player", new ArrayList<>());
         setUsage("/em check <player>");
-        setPermission("elitemobs.*");
-        setDescription("Checks how much currency you have.");
+        setPermission("elitemobs.money.check.player");
+        setDescription("Checks the currency of the specified player.");
     }
 
     @Override

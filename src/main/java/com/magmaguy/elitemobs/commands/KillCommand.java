@@ -9,7 +9,7 @@ public class KillCommand extends AdvancedCommand {
     public KillCommand() {
         super(List.of("kill"));
         setUsage("/em kill");
-        setPermission("elitemobs.*");
+        setPermission("elitemobs.kill.kill");
         setDescription("Kills all elites.");
     }
 

@@ -12,7 +12,7 @@ public class KillRadiusCommand extends AdvancedCommand {
         super(List.of("kill"));
         addArgument("radius", new ArrayList<>());
         setUsage("/em kill <radius>");
-        setPermission("elitemobs.*");
+        setPermission("elitemobs.kill.radius");
         setSenderType(SenderType.PLAYER);
         setDescription("Kills all elites in the specified radius.");
     }

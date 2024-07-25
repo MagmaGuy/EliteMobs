@@ -11,7 +11,7 @@ public class FireballCommand extends AdvancedCommand {
     public FireballCommand() {
         super(List.of("fireball"));
         setUsage("/em fireball");
-        setPermission("elitemobs.*");
+        setPermission("elitemobs.fireball");
         setDescription("Shoots a fireball, to test terrain protections and explosion regeneration.");
     }
 

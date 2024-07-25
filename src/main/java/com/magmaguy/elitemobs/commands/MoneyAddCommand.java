@@ -14,9 +14,9 @@ public class MoneyAddCommand extends AdvancedCommand {
         addArgument("player", new ArrayList<>(CustomItemsConfig.getCustomItems().keySet()));
         addArgument("amount", new ArrayList<>(CustomItemsConfig.getCustomItems().keySet()));
         setUsage("/em money add <player> <amount>");
-        setPermission("elitemobs.*");
+        setPermission("elitemobs.money.add.player");
         setSenderType(SenderType.PLAYER);
-        setDescription("Simulates loot drops for the specified amount of times for the specified level and player.");
+        setDescription("Gives the specified amount of money to the designated player.");
     }
 
     @Override
