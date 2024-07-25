@@ -14,7 +14,7 @@ public class PlaceNPCCommand extends AdvancedCommand {
         addLiteral("npc");
         addArgument("filename", new ArrayList<>(NPCsConfig.npcEntities.keySet()));
         setUsage("/em place npc <filename>");
-        setPermission("elitemobs.*");
+        setPermission("elitemobs.place.npc");
         setSenderType(SenderType.PLAYER);
         setDescription("Permanently adds an npc to the location the user is standing on.");
     }

@@ -10,7 +10,7 @@ public class HelpCommand extends AdvancedCommand {
     public HelpCommand() {
         super(List.of("help"));
         setUsage("/em help");
-        setPermission("elitemobs.*");
+        setPermission("elitemobs.help");
         setDescription("Lists all commands.");
     }
 

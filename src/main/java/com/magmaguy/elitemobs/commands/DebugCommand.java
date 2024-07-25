@@ -13,9 +13,9 @@ public class DebugCommand extends AdvancedCommand {
         super(List.of("debug"));
         addArgument("filename", new ArrayList<>(CustomBossesConfig.getCustomBosses().keySet()));
         setUsage("/em debug <player name/boss filename>");
-        setPermission("elitemobs.*");
+        setPermission("elitemobs.debug");
         setSenderType(SenderType.PLAYER);
-        setDescription("Toggles whether the setup message will show up.");
+        setDescription("Debug bosses or players.");
     }
 
     @Override
