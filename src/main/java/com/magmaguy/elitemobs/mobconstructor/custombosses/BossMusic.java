@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.mobconstructor.custombosses;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
@@ -15,6 +15,7 @@ import java.util.Map;
 
 public class BossMusic {
     private final HashMap<Player, BukkitTask> players = new HashMap<>();
+    private final CustomBossEntity customBossEntity;
     @Getter
     private String name;
     @Getter
@@ -24,7 +25,6 @@ public class BossMusic {
     @Getter
     private int durationTicks2 = -1;
     private BukkitTask bukkitTask = null;
-    private final CustomBossEntity customBossEntity;
 
     //Format: name=rsp.name length=durations_ticks->name=rsp.name length=duration_ticks
     public BossMusic(String rawString, CustomBossEntity customBossEntity) {
@@ -55,7 +55,7 @@ public class BossMusic {
                     }
                     break;
                 default:
-                    new WarningMessage("Failed to get value for boss music!");
+                    Logger.warn("Failed to get value for boss music!");
             }
         }
     }

@@ -1,8 +1,8 @@
 package com.magmaguy.elitemobs.commands.admin;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
 import com.magmaguy.elitemobs.powerstances.GenericRotationMatrixMath;
+import com.magmaguy.magmacore.util.ChatColorConverter;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;

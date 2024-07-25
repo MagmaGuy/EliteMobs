@@ -1,8 +1,8 @@
 package com.magmaguy.elitemobs.config.custombosses;
 
-import com.magmaguy.elitemobs.config.CustomConfig;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.InstancedBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
+import com.magmaguy.magmacore.config.CustomConfig;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,7 +28,7 @@ public class CustomBossesConfig extends CustomConfig {
                     //Initialize the regional bosses in the world
                     List<String> locations = customBossesConfigFields.processStringList("spawnLocations", new ArrayList<>(), new ArrayList<>(), false);
 //                    if (locations.isEmpty() && !customBossesConfigFields.isRemoveAfterDeath())
-//                        new InfoMessage(customBossesConfigFields.getFilename() + " does not have a set location yet! It will not spawn. Did you install its minidungeon?");
+//                        Logger.info(customBossesConfigFields.getFilename() + " does not have a set location yet! It will not spawn. Did you install its minidungeon?");
                     for (String string : locations)
                         InstancedBossEntity.add(string, customBossesConfigFields);
                     continue;
@@ -40,7 +40,7 @@ public class CustomBossesConfig extends CustomConfig {
                     //Initialize the regional bosses in the world
                     List<String> locations = customBossesConfigFields.processStringList("spawnLocations", new ArrayList<>(), new ArrayList<>(), false);
 //                    if (locations.isEmpty() && !customBossesConfigFields.isRemoveAfterDeath())
-//                        new InfoMessage(customBossesConfigFields.getFilename() + " does not have a set location yet! It will not spawn. Did you install its minidungeon?");
+//                        Logger.info(customBossesConfigFields.getFilename() + " does not have a set location yet! It will not spawn. Did you install its minidungeon?");
                     for (String string : locations)
                         new RegionalBossEntity(customBossesConfigFields, string).initialize();
                 }

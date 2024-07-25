@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.playerdata;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
@@ -11,6 +10,7 @@ import com.magmaguy.elitemobs.items.customenchantments.*;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffect;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.utils.BossBarUtil;
+import com.magmaguy.magmacore.util.ChatColorConverter;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
@@ -87,7 +87,7 @@ public class PlayerItem {
             return fillNullItem();
         }
 
-        if (displayingAsBroken){
+        if (displayingAsBroken) {
             BossBarUtil.HideBrokenItemBossBar(equipmentSlot, player);
             displayingAsBroken = false;
         }
@@ -96,13 +96,13 @@ public class PlayerItem {
 //        if (itemStack.isSimilar(this.itemStack))
 //            return false;
 
-            if (EnchantmentsConfig.getEnchantment(SoulbindEnchantment.key + ".yml").isEnabled()) {
-                if (!SoulbindEnchantment.isValidSoulbindUser(itemStack.getItemMeta(), player)) {
-                    player.getWorld().dropItem(player.getLocation(), itemStack);
-                    itemStack.setAmount(0);
-                    itemStack = new ItemStack(Material.AIR);
-                }
+        if (EnchantmentsConfig.getEnchantment(SoulbindEnchantment.key + ".yml").isEnabled()) {
+            if (!SoulbindEnchantment.isValidSoulbindUser(itemStack.getItemMeta(), player)) {
+                player.getWorld().dropItem(player.getLocation(), itemStack);
+                itemStack.setAmount(0);
+                itemStack = new ItemStack(Material.AIR);
             }
+        }
 
         //Neither offhand nor armor contribute to baseline damage outside of the enchants, so we reset the damage before anything
         this.eliteDamage = 0;

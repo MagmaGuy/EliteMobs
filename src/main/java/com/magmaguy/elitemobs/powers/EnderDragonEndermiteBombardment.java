@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.powers.meta.Bombardment;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
@@ -40,7 +40,7 @@ public class EnderDragonEndermiteBombardment extends Bombardment {
             eliteEntity.addReinforcement(customBossEntity2);
 
         } catch (Exception ex) {
-            new WarningMessage("Failed to spawn binder of world's reinforcement endermite!");
+            Logger.warn("Failed to spawn binder of world's reinforcement endermite!");
         }
     }
 

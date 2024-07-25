@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.playerdata.database;
 
-import com.magmaguy.elitemobs.utils.InfoMessage;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -60,12 +59,12 @@ public class GenerateDatabase {
             if (resultSet.next()) {
                 //Developer.message("Database already had " + columnName);
             } else {
-                new InfoMessage("Adding new database column " + columnName);
+                Logger.info("Adding new database column " + columnName);
                 addColumn(columnName, columnValues);
             }
             resultSet.close();
         } catch (Exception ex) {
-            new WarningMessage("Could not process column " + columnName);
+            Logger.warn("Could not process column " + columnName);
             ex.printStackTrace();
         }
     }
@@ -77,7 +76,7 @@ public class GenerateDatabase {
             statement.executeUpdate(sql);
             statement.close();
         } catch (Exception ex) {
-            new WarningMessage("Failed to insert new column " + columnName);
+            Logger.warn("Failed to insert new column " + columnName);
             ex.printStackTrace();
         }
     }

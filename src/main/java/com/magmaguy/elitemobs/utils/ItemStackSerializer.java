@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.utils;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.magmacore.util.ChatColorConverter;
+import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
@@ -33,7 +34,7 @@ public class ItemStackSerializer {
         try {
             material = Material.valueOf(fileConfiguration.getString(identifier + "material"));
         } catch (Exception ex) {
-            new WarningMessage("Attempted to add material name " + fileConfiguration.getString("material") + " to a menu. This is not a valid material. Item will default to glass.");
+            Logger.warn("Attempted to add material name " + fileConfiguration.getString("material") + " to a menu. This is not a valid material. Item will default to glass.");
             material = Material.RED_STAINED_GLASS_PANE;
         }
 

@@ -1,12 +1,12 @@
 package com.magmaguy.elitemobs.config.menus.premade;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.menus.MenusConfigFields;
 import com.magmaguy.elitemobs.items.customloottable.*;
 import com.magmaguy.elitemobs.quests.objectives.*;
 import com.magmaguy.elitemobs.quests.rewards.QuestReward;
+import com.magmaguy.magmacore.util.ChatColorConverter;
 import lombok.Getter;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;

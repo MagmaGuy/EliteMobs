@@ -1,8 +1,8 @@
 package com.magmaguy.elitemobs.config.customtreasurechests;
 
-import com.magmaguy.elitemobs.config.CustomConfig;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.config.CustomConfig;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -34,7 +34,7 @@ public class CustomTreasureChestsConfig extends CustomConfig {
     public static TreasureChest addTreasureChestEntry(Location location, String customChestFileName) {
         CustomTreasureChestConfigFields customTreasureChestConfigFields = getCustomTreasureChestConfigFields().get(customChestFileName);
         if (location == null) {
-            new WarningMessage("Failed to commit a location for a treasure chest!");
+            Logger.warn("Failed to commit a location for a treasure chest!");
             return null;
         }
         return customTreasureChestConfigFields.addTreasureChest(location, 0);
@@ -43,7 +43,7 @@ public class CustomTreasureChestsConfig extends CustomConfig {
     public static void removeTreasureChestEntry(Location location, String customChestFileName) {
         CustomTreasureChestConfigFields customTreasureChestConfigFields = getCustomTreasureChestConfigFields().get(customChestFileName);
         if (location == null || customTreasureChestConfigFields == null) {
-            new WarningMessage("Failed to remove a location for a treasure chest!");
+            Logger.warn("Failed to remove a location for a treasure chest!");
             return;
         }
         customTreasureChestConfigFields.purgeLocations();

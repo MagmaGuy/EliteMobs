@@ -1,20 +1,17 @@
 package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.elitemobs.items.itemconstructor.MaterialGenerator;
+import com.magmaguy.magmacore.config.ConfigurationFile;
 import lombok.Getter;
 import org.bukkit.Material;
-import org.bukkit.configuration.file.FileConfiguration;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ProceduralItemGenerationSettingsConfig {
+public class ProceduralItemGenerationSettingsConfig extends ConfigurationFile {
     @Getter
     private static final List<String> validMaterials = new ArrayList<>();
-    @Getter
-    private static FileConfiguration fileConfiguration;
     @Getter
     private
     static boolean doProceduralItemDrops;
@@ -60,14 +57,28 @@ public class ProceduralItemGenerationSettingsConfig {
     private static List<String> verbs;
     @Getter
     private static List<String> verbers;
+    @Getter
+    private static ProceduralItemGenerationSettingsConfig instance;
 
-    private ProceduralItemGenerationSettingsConfig() {
+    public ProceduralItemGenerationSettingsConfig() {
+        super("ProceduralItemGenerationSettings.yml");
+        instance = this;
     }
 
-    public static void initializeConfig() {
-        File file = ConfigurationEngine.fileCreator("ProceduralItemGenerationSettings.yml");
-        fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
+    private void addMaterial(Material material) {
+        ConfigurationEngine.setBoolean(fileConfiguration, "validMaterials." + material.name(), true);
+    }
 
+    public void cacheMaterials() {
+        validMaterials.clear();
+        for (String material : fileConfiguration.getConfigurationSection("validMaterials").getKeys(false))
+            if (fileConfiguration.getConfigurationSection("validMaterials").getBoolean(material))
+                validMaterials.add(material);
+    }
+
+
+    @Override
+    public void initializeValues() {
         doProceduralItemDrops = ConfigurationEngine.setBoolean(fileConfiguration, "dropProcedurallyGeneratedItems", true);
         customEnchantmentChance = ConfigurationEngine.setDouble(fileConfiguration, "customEnchantmentsChance", 0.5);
 
@@ -1449,21 +1460,6 @@ public class ProceduralItemGenerationSettingsConfig {
                 "Slapper"
         ), true);
 
-        ConfigurationEngine.fileSaverCustomValues(fileConfiguration, file);
-
         MaterialGenerator.initializeValidProceduralMaterials();
     }
-
-    private static void addMaterial(Material material) {
-        ConfigurationEngine.setBoolean(fileConfiguration, "validMaterials." + material.name(), true);
-    }
-
-    public static void cacheMaterials() {
-        validMaterials.clear();
-        for (String material : fileConfiguration.getConfigurationSection("validMaterials").getKeys(false))
-            if (fileConfiguration.getConfigurationSection("validMaterials").getBoolean(material))
-                validMaterials.add(material);
-    }
-
-
 }

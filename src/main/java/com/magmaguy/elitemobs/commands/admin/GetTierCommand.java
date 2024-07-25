@@ -55,14 +55,18 @@ public class GetTierCommand {
         new EliteItemLore(bow, false);
 
 
-        player.getInventory().addItem(helmet);
-        player.getInventory().addItem(chestplate);
-        player.getInventory().addItem(leggings);
-        player.getInventory().addItem(boots);
+        player.getInventory().setHelmet(helmet);
+        player.getInventory().setChestplate(chestplate);
+        player.getInventory().setLeggings(leggings);
+        player.getInventory().setBoots(boots);
         player.getInventory().addItem(sword);
         player.getInventory().addItem(axe);
         player.getInventory().addItem(bow);
         player.getInventory().addItem(cheatSword);
+        player.getInventory().addItem(new ItemStack(Material.COOKED_BEEF, 64));
+        player.getInventory().addItem(new ItemStack(Material.ARROW, 64));
+        player.getInventory().addItem(new ItemStack(Material.ARROW, 64));
+        player.getInventory().addItem(new ItemStack(Material.SHIELD));
 
     }
 

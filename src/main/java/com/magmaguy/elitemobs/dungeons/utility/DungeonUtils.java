@@ -5,8 +5,7 @@ import com.magmaguy.elitemobs.dungeons.EliteMobsWorld;
 import com.magmaguy.elitemobs.dungeons.WorldDungeonPackage;
 import com.magmaguy.elitemobs.dungeons.WorldPackage;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
-import com.magmaguy.elitemobs.utils.InfoMessage;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
@@ -55,11 +54,11 @@ public class DungeonUtils {
         File folder = new File(Bukkit.getWorldContainer().getAbsolutePath());
 
         if (!Files.exists(Paths.get(folder.getAbsolutePath() + File.separatorChar + worldName))) {
-            new WarningMessage("File  " + folder.getAbsolutePath() + File.separatorChar + worldName + " does not exist!");
+            Logger.warn("File  " + folder.getAbsolutePath() + File.separatorChar + worldName + " does not exist!");
             return null;
         }
 
-        new InfoMessage("Loading world " + worldName + " !");
+        Logger.info("Loading world " + worldName + " !");
 
         Filter filter = newFilter -> false;
 
@@ -80,7 +79,7 @@ public class DungeonUtils {
             return world;
         } catch (Exception exception) {
             Bukkit.getLogger().setFilter(previousFilter);
-            new WarningMessage("Failed to load world " + worldName + " !");
+            Logger.warn("Failed to load world " + worldName + " !");
             exception.printStackTrace();
         }
         return null;

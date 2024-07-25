@@ -101,14 +101,14 @@ public class Ray extends Shape {
         private final double height;
         @Getter
         private final Location centerLocation;
-        @Getter
-        private Quaternion rotation;
         private final double maxX;
         private final double minX;
         private final double maxY;
         private final double minY;
         private final double maxZ;
         private final double minZ;
+        @Getter
+        private Quaternion rotation;
 
         public RayCuboid(double width, Location sourceLocation, Location destinationLocation) {
             this.width = width;

@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.items.customloottable;
 
 import com.magmaguy.elitemobs.utils.ObjectSerializer;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -21,7 +21,7 @@ public class ItemStackCustomLootEntry extends CustomLootEntry implements Seriali
         try {
             return ObjectSerializer.itemStackArrayFromBase64(serializedItemStack);
         } catch (Exception ex) {
-            new WarningMessage("Failed to serialize item stack from Custom Loot Table");
+            Logger.warn("Failed to serialize item stack from Custom Loot Table");
             return null;
         }
     }

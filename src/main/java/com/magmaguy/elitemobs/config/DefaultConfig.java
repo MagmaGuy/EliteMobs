@@ -1,23 +1,23 @@
 package com.magmaguy.elitemobs.config;
 
-import com.magmaguy.elitemobs.commands.admin.ReloadCommand;
+import com.magmaguy.elitemobs.commands.ReloadCommand;
 import com.magmaguy.elitemobs.config.translations.TranslationsConfig;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
-import com.magmaguy.elitemobs.utils.InfoMessage;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.config.ConfigurationFile;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.file.FileConfiguration;
 
-import java.io.File;
 import java.util.List;
 
 /**
  * Created by MagmaGuy on 08/06/2017.
  */
-public class DefaultConfig {
+public class DefaultConfig extends ConfigurationFile {
+    @Getter
+    public static DefaultConfig instance;
     @Getter
     private static boolean alwaysShowNametags;
     @Getter
@@ -74,28 +74,33 @@ public class DefaultConfig {
     private static String treasureChestNoDropMessage;
     @Getter
     private static String bossAlreadyGoneMessage;
+    @Getter
+    private static boolean resetPlayerScaleOnLogin;
 
-    private static File file = null;
-    private static FileConfiguration fileConfiguration = null;
-
-    private DefaultConfig() {
+    public DefaultConfig() {
+        super("config.yml");
+        instance = this;
     }
 
     public static void toggleSetupDone() {
         setupDone = !setupDone;
-        fileConfiguration.set("setupDoneV3", setupDone);
+        instance.fileConfiguration.set("setupDoneV3", setupDone);
         save();
     }
 
     public static void save() {
-        ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
+        ConfigurationEngine.fileSaverOnlyDefaults(instance.fileConfiguration, instance.file);
     }
 
+    public static void setLanguage(CommandSender commandSender, String filename) {
+        language = filename;
+        instance.fileConfiguration.set("language", filename);
+        ConfigurationEngine.fileSaverCustomValues(instance.fileConfiguration, instance.file);
+        ReloadCommand.reload(commandSender);
+    }
 
-    public static void initializeConfig() {
-
-        file = ConfigurationEngine.fileCreator("config.yml");
-        fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
+    @Override
+    public void initializeValues() {
         //The language changes what data is loaded downstream
         language = ConfigurationEngine.setString(
                 List.of("Sets the language file used by EliteMobs", "Do NOT change this manually! It is meant to be installed with the command '/em language <languagefile>'"),
@@ -123,7 +128,7 @@ public class DefaultConfig {
                 fileConfiguration, "enableHighCompatibilityMode", false);
         if (Bukkit.getPluginManager().isPluginEnabled("MythicMobs") ||
                 Bukkit.getPluginManager().isPluginEnabled("LevelledMobs")) {
-            new InfoMessage("Other boss mob plugins have been detected, high compatibility mode will be used!");
+            Logger.info("Other boss mob plugins have been detected, high compatibility mode will be used!");
             doStrictSpawningRules = true;
         }
         nightmareWorldSpawnBonus = ConfigurationEngine.setDouble(
@@ -148,7 +153,7 @@ public class DefaultConfig {
                             file, fileConfiguration, "defaultSpawnLocation",
                             ConfigurationLocation.deserialize(Bukkit.getWorlds().get(0).getSpawnLocation()), false));
         } catch (Exception ex) {
-            new WarningMessage("There is an issue with your defaultSpawnLocation in the config.yml configuration file! Fix it!");
+            Logger.warn("There is an issue with your defaultSpawnLocation in the config.yml configuration file! Fix it!");
         }
 
         doExplosionRegen = ConfigurationEngine.setBoolean(
@@ -196,16 +201,7 @@ public class DefaultConfig {
         bossAlreadyGoneMessage = ConfigurationEngine.setString(
                 List.of("Sets the message that appears when a player tries to track a boss that is no longer valid"),
                 file, fileConfiguration, "bossAlreadyGoneMessage", "&c[EliteMobs] Sorry, this boss is already gone!", true);
+        resetPlayerScaleOnLogin = ConfigurationEngine.setBoolean(List.of("Sets whether to reset player scale (literally, the player size on login).", "This is important because some elite powers can modify it and if the server crashes players will be stuck to whatever scale was set when the server crashed, unless this option is set to true."), fileConfiguration, "resetPlayerScale", true);
 
-
-        ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }
-
-    public static void setLanguage(CommandSender commandSender, String filename) {
-        language = filename;
-        fileConfiguration.set("language", filename);
-        ConfigurationEngine.fileSaverCustomValues(fileConfiguration, file);
-        ReloadCommand.reload(commandSender);
-    }
-
 }

@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.wormhole;
 
 import com.magmaguy.elitemobs.config.WormholesConfig;
 import com.magmaguy.elitemobs.config.wormholes.WormholeConfigFields;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.util.Vector;
 
@@ -32,7 +32,7 @@ public class VisualEffects {
                 generateIcosahedron();
                 break;
             default:
-                new WarningMessage("Missing com.magmaguy.elitemobs.wormhole style for " + wormholeConfigFields.getStyle());
+                Logger.warn("Missing com.magmaguy.elitemobs.wormhole style for " + wormholeConfigFields.getStyle());
         }
     }
 

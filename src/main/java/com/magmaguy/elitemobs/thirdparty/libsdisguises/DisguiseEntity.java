@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.thirdparty.libsdisguises;
 
 import com.magmaguy.elitemobs.config.DefaultConfig;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import me.libraryaddict.disguise.DisguiseAPI;
 import me.libraryaddict.disguise.DisguiseConfig;
 import me.libraryaddict.disguise.disguisetypes.*;
@@ -32,7 +32,7 @@ public class DisguiseEntity {
             try {
                 customDisguise(disguiseName.replace("custom:", ""), entity, customDisguiseData, filename);
             } catch (Exception ex) {
-                new WarningMessage("Failed to assign custom disguise " + disguiseName + "! Did you configure the disguise correctly?");
+                Logger.warn("Failed to assign custom disguise " + disguiseName + "! Did you configure the disguise correctly?");
             }
             return;
         }
@@ -49,7 +49,7 @@ public class DisguiseEntity {
         try {
             disguiseType = DisguiseType.valueOf(disguiseName);
         } catch (Exception ex) {
-            new WarningMessage("Disguise " + disguiseName + " is not a valid disguise name! Entity " + entity.getCustomName() + " will not have a disguise.");
+            Logger.warn("Disguise " + disguiseName + " is not a valid disguise name! Entity " + entity.getCustomName() + " will not have a disguise.");
             return;
         }
 
@@ -58,7 +58,7 @@ public class DisguiseEntity {
         else if (disguiseType.isMisc())
             miscEntityDisguise(disguiseType, entity);
         else
-            new WarningMessage("Disguise " + disguiseName + " is not a valid disguise name! Entity " + entity.getCustomName() + " will not have a disguise.");
+            Logger.warn("Disguise " + disguiseName + " is not a valid disguise name! Entity " + entity.getCustomName() + " will not have a disguise.");
     }
 
     private static void playerDisguise(String playerName, Entity entity) {
@@ -108,8 +108,8 @@ public class DisguiseEntity {
             }
             disguise.startDisguise();
         } catch (Exception ex) {
-            new WarningMessage("Failed to set custom disguise for " + filename + " !");
-            new WarningMessage("Does the disguise exist? Is LibsDisguises up-to-date?");
+            Logger.warn("Failed to set custom disguise for " + filename + " !");
+            Logger.warn("Does the disguise exist? Is LibsDisguises up-to-date?");
         }
     }
 

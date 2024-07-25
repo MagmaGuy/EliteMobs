@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.commands;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
@@ -10,6 +9,7 @@ import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
+import com.magmaguy.magmacore.util.ChatColorConverter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -27,13 +27,14 @@ import java.util.Optional;
  */
 public class SpawnCommand {
 
-    public static void spawnEliteEntityTypeCommand(Player player, EntityType entityType, Integer level, Optional<String[]> powers) {
+    public static void spawnEliteEntityTypeCommand(Player player, EntityType entityType, Integer level, Optional<String> powers) {
         LivingEntity livingEntity = (LivingEntity) player.getLocation().getWorld().spawnEntity(getLocation(player), entityType);
         EliteEntity eliteEntity = new EliteEntity();
         eliteEntity.setLevel(level);
 
         if (powers.isPresent()) {
-            HashSet<PowersConfigFields> mobPowers = getPowers(powers.get(), player);
+            String[] powersArray = powers.get().split(" ");
+            HashSet<PowersConfigFields> mobPowers = getPowers(powersArray, player);
             eliteEntity.applyPowers(mobPowers);
         } else {
             eliteEntity.randomizePowers(EliteMobProperties.getPluginData(livingEntity));
@@ -46,7 +47,7 @@ public class SpawnCommand {
                                                    String world,
                                                    Vector coords,
                                                    Integer level,
-                                                   Optional<String[]> powers) {
+                                                   Optional<String> powers) {
         try {
             Location location = new Location(Bukkit.getWorld(world), coords.getX(), coords.getY(), coords.getZ());
             spawnEliteEntityTypeCommand(commandSender,
@@ -63,14 +64,17 @@ public class SpawnCommand {
                                                    Location location,
                                                    EntityType entityType,
                                                    Integer level,
-                                                   Optional<String[]> powers) {
+                                                   Optional<String> powers) {
         if (!EliteMobProperties.getValidMobTypes().contains(entityType)) {
             commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Entity type " + entityType.toString() + " can't be an Elite!"));
             return;
         }
         LivingEntity livingEntity = (LivingEntity) location.getWorld().spawnEntity(location, entityType);
         HashSet<PowersConfigFields> mobPowers = new HashSet<>();
-        if (powers.isPresent()) mobPowers = getPowers(powers.get(), commandSender);
+        if (powers.isPresent()) {
+            String[] powersArray = powers.get().split(" ");
+            mobPowers = getPowers(powersArray, commandSender);
+        }
         EliteEntity eliteEntity = new EliteEntity();
         eliteEntity.setLevel(level);
         eliteEntity.setLivingEntity(livingEntity, CreatureSpawnEvent.SpawnReason.CUSTOM);

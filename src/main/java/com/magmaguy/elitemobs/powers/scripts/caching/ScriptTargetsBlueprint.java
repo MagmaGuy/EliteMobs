@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.powers.scripts.caching;
 
 import com.magmaguy.elitemobs.powers.scripts.enums.TargetType;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.configuration.MemorySection;
@@ -44,7 +44,7 @@ public class ScriptTargetsBlueprint {
         this.filename = filename;
         processMapList(entry);
         if (!isZoneTarget() && coverage < 1.0) {
-            new WarningMessage("Coverage for script " + scriptName + " in file " + filename + " was less than 1.0 but the targetType is neither ZONE_FULL nor ZONE_BORDER! Coverage should only be used for ZONE_FULL or ZONE_BORDER");
+            Logger.warn("Coverage for script " + scriptName + " in file " + filename + " was less than 1.0 but the targetType is neither ZONE_FULL nor ZONE_BORDER! Coverage should only be used for ZONE_FULL or ZONE_BORDER");
             coverage = 1.0;
         }
     }
@@ -81,7 +81,7 @@ public class ScriptTargetsBlueprint {
                 else if (value instanceof LinkedHashMap<?, ?>)
                     scriptRelativeVectorBlueprint = new ScriptRelativeVectorBlueprint(scriptName, filename, ((LinkedHashMap) value));
                 else
-                    new WarningMessage("Failed to get valid format for relative offset in " + scriptName + " for file " + filename);
+                    Logger.warn("Failed to get valid format for relative offset in " + scriptName + " for file " + filename);
             }
         }
     }

@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.thirdparty.discordsrv;
 
 import com.magmaguy.elitemobs.config.DiscordSRVConfig;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 import github.scarsz.discordsrv.util.DiscordUtil;
@@ -38,10 +38,10 @@ public class DiscordSRVAnnouncement {
             if (textChannel != null)
                 textChannel.sendMessage(ChatColor.stripColor(announcement)).queue();
             else
-                new WarningMessage("Channel room " + DiscordSRVConfig.getAnnouncementRoomName() + " is not valid!");
+                Logger.warn("Channel room " + DiscordSRVConfig.getAnnouncementRoomName() + " is not valid!");
 
         } catch (Exception ex) {
-            new WarningMessage("Failed to send announcement via DiscordsSRV! Is it configured correctly?");
+            Logger.warn("Failed to send announcement via DiscordsSRV! Is it configured correctly?");
         }
 
     }

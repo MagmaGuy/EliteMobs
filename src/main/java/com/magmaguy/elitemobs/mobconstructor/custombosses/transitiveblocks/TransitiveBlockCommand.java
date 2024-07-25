@@ -5,7 +5,7 @@ import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.PhaseBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.ChatColor;
@@ -51,7 +51,7 @@ public class TransitiveBlockCommand {
                     for (PhaseBossEntity.BossPhase bossPhase : iteratedRegionalBossEntity.getPhaseBossEntity().getBossPhases()) {
                         if (bossPhase.customBossesConfigFields == null) {
                             String message = "Could not find valid custom boss config fields for phase boss! This is probably a configuration issue. Check why your phase boss isn't valid on console logs on /em reload and make sure to test the phases in-game!";
-                            new WarningMessage(message);
+                            Logger.warn(message);
                             player.sendMessage(message);
                         }
                         if (bossPhase.customBossesConfigFields.equals(customBossesConfigFields)) {
