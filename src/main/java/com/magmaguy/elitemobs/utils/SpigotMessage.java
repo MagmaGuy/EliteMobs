@@ -1,6 +1,6 @@
 package com.magmaguy.elitemobs.utils;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.magmacore.util.ChatColorConverter;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;

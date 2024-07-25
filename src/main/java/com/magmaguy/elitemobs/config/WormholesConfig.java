@@ -1,12 +1,11 @@
 package com.magmaguy.elitemobs.config;
 
+import com.magmaguy.magmacore.config.ConfigurationFile;
 import lombok.Getter;
-import org.bukkit.configuration.file.FileConfiguration;
 
-import java.io.File;
 import java.util.List;
 
-public class WormholesConfig {
+public class WormholesConfig extends ConfigurationFile {
     @Getter
     private static String dungeonNotInstalledMessage;
     @Getter
@@ -18,13 +17,12 @@ public class WormholesConfig {
     @Getter
     private static String insufficientCurrencyForWormholeMessage;
 
-    private WormholesConfig() {
+    public WormholesConfig() {
+        super("Wormholes.yml");
     }
 
-    public static void initializeConfig() {
-        File file = ConfigurationEngine.fileCreator("Wormholes.yml");
-        FileConfiguration fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
-
+    @Override
+    public void initializeValues() {
         dungeonNotInstalledMessage = ConfigurationEngine.setString(
                 List.of("Sets the message that appears when a teleport is used for a dungeon that is not installed."),
                 file, fileConfiguration, "dungeonNotInstalledMessage", "&8[EliteMobs] &cDungeon $dungeonID &cis not installed! This teleport will not work.", true);
@@ -40,7 +38,5 @@ public class WormholesConfig {
         insufficientCurrencyForWormholeMessage = ConfigurationEngine.setString(
                 List.of("Sets the message that is sent when a player tries to use a wormhole but does not have enough currency to use it."),
                 file, fileConfiguration, "insufficientCurrencyForWormholeMessage", "&8[EliteMobs] &cInsufficient currency! You need $amount to use this wormhole!", true);
-
-        ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }
 }

@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.*;
@@ -27,7 +27,7 @@ public class ConfigurationExporter {
                     try {
                         Files.createDirectory(Paths.get(configurationsPath.normalize() + "" + File.separatorChar + "exports"));
                     } catch (Exception exception) {
-                        new WarningMessage("Failed to create exports directory! Tell the dev!");
+                        Logger.warn("Failed to create exports directory! Tell the dev!");
                         exception.printStackTrace();
                     }
                 }
@@ -36,7 +36,7 @@ public class ConfigurationExporter {
                     if (rspFile.exists()) rspFile.delete();
                     downloadFile("https://magmaguy.com/downloads/elitemobs_resource_pack.zip", Paths.get(configurationsPath.normalize() + "" + File.separatorChar + "exports").toAbsolutePath().toString());
                 } catch (Exception e) {
-                    new WarningMessage("Failed to download official resource pack! Tell the dev!");
+                    Logger.warn("Failed to download official resource pack! Tell the dev!");
                     e.printStackTrace();
                 }
             }
@@ -66,7 +66,7 @@ public class ConfigurationExporter {
 
             // Opens input stream from the HTTP connection
             InputStream inputStream = httpConn.getInputStream();
-            String saveFilePathWithName = saveFilePath + File.separatorChar+ fileName;
+            String saveFilePathWithName = saveFilePath + File.separatorChar + fileName;
 
             // Opens an output stream to save into file
             FileOutputStream outputStream = new FileOutputStream(saveFilePathWithName);
@@ -81,7 +81,7 @@ public class ConfigurationExporter {
             inputStream.close();
 
         } else {
-            new WarningMessage("No file to download. Server replied HTTP code: " + responseCode);
+            Logger.warn("No file to download. Server replied HTTP code: " + responseCode);
         }
         httpConn.disconnect();
     }

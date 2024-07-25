@@ -1,6 +1,10 @@
 package com.magmaguy.elitemobs.utils;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.config.LegacyValueConverter;
+import com.magmaguy.magmacore.util.ChatColorConverter;
+import com.magmaguy.magmacore.util.Logger;
+import org.bukkit.Particle;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
@@ -9,7 +13,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class MapListInterpreter {
     private static void parsingErrorMessage(String key, Object value, String scriptName) {
-        new WarningMessage("Failed to read value " + value + " for key " + key + " in script " + scriptName);
+        Logger.warn("Failed to read value " + value + " for key " + key + " in script " + scriptName);
     }
 
     public static String parseString(String key, Object value, String scriptName) {
@@ -21,7 +25,7 @@ public class MapListInterpreter {
         try {
             return ChatColorConverter.convert((List) value);
         } catch (Exception ex) {
-            new WarningMessage("Failed to get string list for key " + key + " with value " + value + " in script " + scriptName);
+            Logger.warn("Failed to get string list for key " + key + " with value " + value + " in script " + scriptName);
             return new ArrayList<>();
         }
     }
@@ -49,7 +53,7 @@ public class MapListInterpreter {
                 }
                 return Integer.parseInt(stringValue);
             } else {
-                new WarningMessage("Failed to get integer value from " + value + " in script " + scriptName);
+                Logger.warn("Failed to get integer value from " + value + " in script " + scriptName);
                 return null;
             }
         } catch (Exception ex) {
@@ -90,6 +94,10 @@ public class MapListInterpreter {
     }
 
     public static <T extends Enum<T>> T parseEnum(String key, Object value, Class<T> enumClass, String scriptName) {
+        if (enumClass.isAssignableFrom(Particle.class))
+            value = LegacyValueConverter.parseParticle((String) value);
+        else if (enumClass.isAssignableFrom(PotionEffectType.class))
+            value = LegacyValueConverter.parsePotionEffect((String) value);
         try {
             return Enum.valueOf(enumClass, (String) value);
         } catch (Exception ex) {
@@ -104,7 +112,7 @@ public class MapListInterpreter {
                 List<T> parsedList = new ArrayList<>();
                 for (Object rawEnum : valueList) {
                     if (!(rawEnum instanceof String)) {
-                        new WarningMessage("Expected string, got something else!");
+                        Logger.warn("Expected string, got something else!");
                         parsingErrorMessage(key, value, scriptName);
                         continue;
                     }
@@ -128,14 +136,14 @@ public class MapListInterpreter {
             if (value instanceof List<?> valueList) {
                 for (Object rawLastList : valueList) {
                     if (!(rawLastList instanceof List<?>)) {
-                        new WarningMessage("Expected list of list, got something else!");
+                        Logger.warn("Expected list of list, got something else!");
                         parsingErrorMessage(key, value, scriptName);
                         return parsedList;
                     }
                     List<T> lastList = new ArrayList<>();
                     for (Object rawEnum : (List) rawLastList) {
                         if (!(rawEnum instanceof String)) {
-                            new WarningMessage("Expected string, got something else!");
+                            Logger.warn("Expected string, got something else!");
                             parsingErrorMessage(key, value, scriptName);
                             continue;
                         }
@@ -145,7 +153,7 @@ public class MapListInterpreter {
                 }
 
             } else {
-                new WarningMessage("Expected list, got something else!");
+                Logger.warn("Expected list, got something else!");
                 parsingErrorMessage(key, value, scriptName);
                 return parsedList;
             }

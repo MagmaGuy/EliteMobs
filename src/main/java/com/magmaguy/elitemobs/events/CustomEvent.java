@@ -11,8 +11,7 @@ import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import com.magmaguy.elitemobs.utils.CommandRunner;
-import com.magmaguy.elitemobs.utils.InfoMessage;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -91,10 +90,10 @@ public abstract class CustomEvent {
     public void start() {
         startModifiers();
         if (primaryEliteMobs.isEmpty()) {
-            new WarningMessage("Event " + customEventsConfigFields.getFilename() + " has failed to start because the bosses failed to spawn correctly!" +
+            Logger.warn("Event " + customEventsConfigFields.getFilename() + " has failed to start because the bosses failed to spawn correctly!" +
                     "This could be due to an issue with the configuration of the bosses in the event, with the configuration" +
                     " of the event or due to a protection in the target location!");
-            new WarningMessage("Target location: " + getEventStartLocation().toString());
+            Logger.warn("Target location: " + getEventStartLocation().toString());
         }
         if (this.startMessage != null)
             AnnouncementPriority.announce(this.startMessage, eventStartLocation.getWorld(), this.announcementPriority);
@@ -156,7 +155,7 @@ public abstract class CustomEvent {
      * Starts the end of the event, deletes all EliteMobEntities spawned by the event and queues further event completion requirements
      */
     public void end() {
-        new InfoMessage("Event " + customEventsConfigFields.getFilename() + " ended!");
+        Logger.info("Event " + customEventsConfigFields.getFilename() + " ended!");
         if (eventWatchdog != null)
             eventWatchdog.cancel();
         primaryEliteMobs.forEach(eliteMobEntity -> {

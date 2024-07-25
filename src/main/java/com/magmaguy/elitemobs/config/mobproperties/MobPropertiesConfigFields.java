@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.config.mobproperties;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.translations.TranslationsConfig;
+import com.magmaguy.magmacore.util.ChatColorConverter;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
 

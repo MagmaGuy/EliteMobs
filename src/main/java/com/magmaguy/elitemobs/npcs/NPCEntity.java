@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.npcs;
 
 import com.google.common.collect.ArrayListMultimap;
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
@@ -18,7 +17,8 @@ import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser
 import com.magmaguy.elitemobs.utils.ChunkLocationChecker;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.NonSolidBlockTypes;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.ChatColorConverter;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -41,8 +41,17 @@ import java.util.concurrent.ThreadLocalRandom;
 public class NPCEntity implements PersistentObject, PersistentMovingEntity {
 
     private static final ArrayListMultimap<String, InstancedNPCContainer> instancedNPCEntities = ArrayListMultimap.create();
+    public final NPCsConfigFields npCsConfigFields;
+    @Getter
+    private final UUID uuid = UUID.randomUUID();
     private boolean isInstancedDuplicate = false;
-
+    private PersistentObjectHandler persistentObjectHandler;
+    private Villager villager = null;
+    private Location spawnLocation;
+    private boolean isTalking = false;
+    private ArmorStand roleDisplay;
+    private boolean isDisguised = false;
+    private String locationString;
     /**
      * Spawns NPC based off of the values in the NPCsConfig config file. Runs at startup and on reload.
      */
@@ -64,7 +73,6 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
         spawn();
         persistentObjectHandler = new PersistentObjectHandler(this);
     }
-
     /**
      * Spawns NPCs for dungeon instancing.
      */
@@ -78,16 +86,22 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
         persistentObjectHandler = new PersistentObjectHandler(this);
     }
 
-    public final NPCsConfigFields npCsConfigFields;
-    @Getter
-    private final UUID uuid = UUID.randomUUID();
-    private PersistentObjectHandler persistentObjectHandler;
-    private Villager villager = null;
-    private Location spawnLocation;
-    private boolean isTalking = false;
-    private ArmorStand roleDisplay;
-    private boolean isDisguised = false;
-    private String locationString;
+    /**
+     * For the travelling merchant
+     *
+     * @param location
+     */
+    public NPCEntity(Location location) {
+        this.npCsConfigFields = NPCsConfig.getNpcEntities().get("travelling_merchant.yml");
+        if (!npCsConfigFields.isEnabled()) return;
+        Location potentialLocation = location.clone();
+        potentialLocation.add(potentialLocation.getDirection().normalize()).setY(location.getY());
+        if (NonSolidBlockTypes.isPassthrough(potentialLocation.getBlock().getType()))
+            this.spawnLocation = potentialLocation;
+        else this.spawnLocation = location.clone();
+        this.spawnLocation.setDirection(this.spawnLocation.getDirection().multiply(-1));
+        spawn();
+    }
 
     public static void shutdown() {
         instancedNPCEntities.clear();
@@ -99,6 +113,15 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
             Location newLocation = instancedNPCContainer.getLocation();
             newLocation.setWorld(newWorld);
             new NPCEntity(instancedNPCContainer.getNpcEntity().getNPCsConfigFields(), newLocation);
+        }
+    }
+
+    public static void initializeNPCs(NPCsConfigFields npCsConfigFields) {
+        if (npCsConfigFields.getLocations() != null && !npCsConfigFields.getLocations().isEmpty()) {
+            for (String locationString : npCsConfigFields.getLocations())
+                new NPCEntity(npCsConfigFields, locationString);
+        } else if (npCsConfigFields.getSpawnLocation() != null && !npCsConfigFields.getSpawnLocation().isEmpty()) {
+            new NPCEntity(npCsConfigFields, npCsConfigFields.getSpawnLocation());
         }
     }
 
@@ -134,32 +157,6 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
                 persistentObjectHandler.remove();
     }
 
-    /**
-     * For the travelling merchant
-     *
-     * @param location
-     */
-    public NPCEntity(Location location) {
-        this.npCsConfigFields = NPCsConfig.getNpcEntities().get("travelling_merchant.yml");
-        if (!npCsConfigFields.isEnabled()) return;
-        Location potentialLocation = location.clone();
-        potentialLocation.add(potentialLocation.getDirection().normalize()).setY(location.getY());
-        if (NonSolidBlockTypes.isPassthrough(potentialLocation.getBlock().getType()))
-            this.spawnLocation = potentialLocation;
-        else this.spawnLocation = location.clone();
-        this.spawnLocation.setDirection(this.spawnLocation.getDirection().multiply(-1));
-        spawn();
-    }
-
-    public static void initializeNPCs(NPCsConfigFields npCsConfigFields) {
-        if (npCsConfigFields.getLocations() != null && !npCsConfigFields.getLocations().isEmpty()) {
-            for (String locationString : npCsConfigFields.getLocations())
-                new NPCEntity(npCsConfigFields, locationString);
-        } else if (npCsConfigFields.getSpawnLocation() != null && !npCsConfigFields.getSpawnLocation().isEmpty()) {
-            new NPCEntity(npCsConfigFields, npCsConfigFields.getSpawnLocation());
-        }
-    }
-
     private void spawn() {
         if (spawnLocation == null ||
                 spawnLocation.getWorld() == null ||
@@ -192,7 +189,7 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
             livingEntity.setCustomNameVisible(true);
             isDisguised = true;
         } catch (Exception ex) {
-            new WarningMessage("Failed to load LibsDisguises disguise correctly!");
+            Logger.warn("Failed to load LibsDisguises disguise correctly!");
             ex.printStackTrace();
         }
     }
@@ -315,18 +312,6 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
         }.runTaskLater(MetadataHandler.PLUGIN, (long) (npCsConfigFields.getTimeout() * 20 * 60));
     }
 
-    private class InstancedNPCContainer {
-        @Getter
-        private final Location location;
-        @Getter
-        private final NPCEntity npcEntity;
-
-        public InstancedNPCContainer(Location location, NPCEntity npcEntity) {
-            this.location = location;
-            this.npcEntity = npcEntity;
-        }
-    }
-
     /**
      * Sends a greeting to a player from the list of greetings the NPCEntity has
      *
@@ -366,7 +351,6 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
         return null;
     }
 
-
     public static class NPCEntityEvents implements Listener {
         @EventHandler
         public void worldUnloadEvent(WorldUnloadEvent event) {
@@ -375,6 +359,18 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
                     npcEntity.worldUnload();
                 }
             }
+        }
+    }
+
+    private class InstancedNPCContainer {
+        @Getter
+        private final Location location;
+        @Getter
+        private final NPCEntity npcEntity;
+
+        public InstancedNPCContainer(Location location, NPCEntity npcEntity) {
+            this.location = location;
+            this.npcEntity = npcEntity;
         }
     }
 

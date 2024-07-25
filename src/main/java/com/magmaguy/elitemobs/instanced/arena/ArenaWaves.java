@@ -1,6 +1,6 @@
 package com.magmaguy.elitemobs.instanced.arena;
 
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,7 +44,7 @@ public class ArenaWaves {
             try {
                 wave = Integer.valueOf(waveString);
             } catch (Exception exception) {
-                new WarningMessage("Invalid value for wave in arena wave: " + waveString);
+                Logger.warn("Invalid value for wave in arena wave: " + waveString);
                 continue;
             }
             boolean mythicMob;
@@ -53,14 +53,14 @@ public class ArenaWaves {
                 try {
                     mythicMob = Boolean.valueOf(mythicMobString);
                 } catch (Exception exception) {
-                    new WarningMessage("Invalid value for mythic mob in arena wave: " + waveString);
+                    Logger.warn("Invalid value for mythic mob in arena wave: " + waveString);
                     continue;
                 }
             int level = -1;
             if (!levelString.isEmpty()) try {
                 level = Integer.valueOf(levelString);
             } catch (Exception exception) {
-                new WarningMessage("Invalid value for level in: " + levelString);
+                Logger.warn("Invalid value for level in: " + levelString);
                 continue;
             }
             ArenaEntity arenaEntity = new ArenaEntity(spawnpointString, wave, boss);

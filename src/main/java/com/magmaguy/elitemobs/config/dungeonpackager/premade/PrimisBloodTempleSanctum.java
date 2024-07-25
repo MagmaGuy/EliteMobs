@@ -32,5 +32,6 @@ public class PrimisBloodTempleSanctum extends DungeonPackagerConfigFields {
                 true);
         setDifficulties(List.of(
                 Map.of("name", "normal", "id", 0)));
+        setListedInTeleports(false);
     }
 }

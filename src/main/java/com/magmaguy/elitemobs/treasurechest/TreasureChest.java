@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.treasurechest;
 
 import com.google.common.collect.ArrayListMultimap;
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.DefaultConfig;
@@ -14,8 +13,9 @@ import com.magmaguy.elitemobs.mobconstructor.PersistentObjectHandler;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.Round;
-import com.magmaguy.elitemobs.utils.WarningMessage;
 import com.magmaguy.elitemobs.utils.WeightedProbability;
+import com.magmaguy.magmacore.util.ChatColorConverter;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -113,14 +113,14 @@ public class TreasureChest implements PersistentObject {
                     .getBlockAt(location).getType().equals(customTreasureChestConfigFields.getChestMaterial()))
                 location.getWorld().getBlockAt(location).setType(customTreasureChestConfigFields.getChestMaterial());
         } catch (Exception ex) {
-            new WarningMessage("Custom Treasure Chest " + customTreasureChestConfigFields.getFilename() + " has an invalid location and can not be placed.");
+            Logger.warn("Custom Treasure Chest " + customTreasureChestConfigFields.getFilename() + " has an invalid location and can not be placed.");
             return;
         }
         if (location.getBlock().getBlockData() instanceof Directional chest) {
             chest.setFacing(customTreasureChestConfigFields.getFacing());
             location.getBlock().setBlockData(chest);
         } else {
-            new WarningMessage("Treasure chest " + customTreasureChestConfigFields.getFilename() +
+            Logger.warn("Treasure chest " + customTreasureChestConfigFields.getFilename() +
                     " does not have a directional block for the Treasure Chest material " +
                     customTreasureChestConfigFields.getChestMaterial() + " ! Chest materials are directional, is your chest a chest?");
         }

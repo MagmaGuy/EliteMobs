@@ -15,7 +15,11 @@ import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.InstancedBossEntity;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
-import com.magmaguy.elitemobs.utils.*;
+import com.magmaguy.elitemobs.utils.ConfigurationLocation;
+import com.magmaguy.elitemobs.utils.EventCaller;
+import com.magmaguy.elitemobs.utils.MapListInterpreter;
+import com.magmaguy.elitemobs.utils.WorldInstantiator;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -225,7 +229,7 @@ public class DungeonInstance extends MatchInstance {
         instances.remove(this);
         DungeonInstance dungeonInstance = this;
         if (world == null) {
-            new WarningMessage("Instanced dungeon's world was already unloaded before removing the entities in it! This shouldn't happen, but doesn't break anything.");
+            Logger.warn("Instanced dungeon's world was already unloaded before removing the entities in it! This shouldn't happen, but doesn't break anything.");
             return;
         }
         world.getEntities().forEach(entity -> EntityTracker.unregister(entity, RemovalReason.WORLD_UNLOAD));
@@ -240,7 +244,7 @@ public class DungeonInstance extends MatchInstance {
                 dungeonInstances.remove(dungeonInstance);
 
                 if (!Bukkit.unloadWorld(world, false)) {
-                    new WarningMessage("Failed to unload world " + instancedWorldName + " ! This is bad, report this to the developer!");
+                    Logger.warn("Failed to unload world " + instancedWorldName + " ! This is bad, report this to the developer!");
                     return;
                 }
                 new BukkitRunnable() {
@@ -266,7 +270,7 @@ public class DungeonInstance extends MatchInstance {
                 break;
             }
         if (difficulty == null) {
-            new WarningMessage("Failed to set difficulty " + difficulty + " for instanced dungeon " + dungeonPackagerConfigFields.getFilename());
+            Logger.warn("Failed to set difficulty " + difficulty + " for instanced dungeon " + dungeonPackagerConfigFields.getFilename());
             return;
         }
 
@@ -274,7 +278,7 @@ public class DungeonInstance extends MatchInstance {
             try {
                 this.levelSync = MapListInterpreter.parseInteger("levelSync", difficulty.get("levelSync"), dungeonPackagerConfigFields.getFilename());
             } catch (Exception exception) {
-                new WarningMessage("Incorrect level sync entry for dungeon " + dungeonPackagerConfigFields.getFilename() + " ! Value: " + levelSync + " . No level sync will be applied!");
+                Logger.warn("Incorrect level sync entry for dungeon " + dungeonPackagerConfigFields.getFilename() + " ! Value: " + levelSync + " . No level sync will be applied!");
                 this.levelSync = 0;
             }
         } else

@@ -14,11 +14,11 @@ public class Cylinder extends Shape {
 
     private final Vector center;
     private final double radius;
-    private double borderRadius = 1;
     private final double height;
+    private final List<Vector> edgeVectors = null;
+    private double borderRadius = 1;
     private Location centerLocation = null;
     private List<Vector> locationVectors = null;
-    private final List<Vector> edgeVectors = null;
 
     public Cylinder(Location centerLocation, double radius, double height, double borderRadius) {
         this.centerLocation = centerLocation.clone();

@@ -8,7 +8,7 @@ import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.EventCaller;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
@@ -34,7 +34,7 @@ public class PhaseBossEntity {
             for (String phaseConfigFile : customBossEntity.getCustomBossesConfigFields().getPhases()) {
                 CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(phaseConfigFile.split(":")[0]);
                 if (customBossesConfigFields == null) {
-                    new WarningMessage("Phase boss " + customBossEntity.getCustomBossesConfigFields() + " has an invalid config entry for phase " + phaseConfigFile.split(":")[0] + " - this file could not be found. The boss will not be able to do this phase until it is fixed!");
+                    Logger.warn("Phase boss " + customBossEntity.getCustomBossesConfigFields() + " has an invalid config entry for phase " + phaseConfigFile.split(":")[0] + " - this file could not be found. The boss will not be able to do this phase until it is fixed!");
                 }
                 double healthPercentage = Double.parseDouble(phaseConfigFile.split(":")[1]);
                 unsortedBossPhases.add(new BossPhase(customBossesConfigFields, healthPercentage));
@@ -43,7 +43,7 @@ public class PhaseBossEntity {
             this.bossPhases = unsortedBossPhases;
             currentPhase = bossPhases.get(0);
         } catch (Exception ex) {
-            new WarningMessage("Your phase boss " + customBossEntity.customBossesConfigFields.getFilename() + " does not have a valid phases setup. Its phases will not work.");
+            Logger.warn("Your phase boss " + customBossEntity.customBossesConfigFields.getFilename() + " does not have a valid phases setup. Its phases will not work.");
         }
     }
 
@@ -54,13 +54,13 @@ public class PhaseBossEntity {
     private void switchPhase(BossPhase bossPhase, RemovalReason removalReason, double healthPercentage) {
         if (isInFirstPhase()) originalSpawnLocation = customBossEntity.getSpawnLocation().clone();
         if (bossPhase.equals(currentPhase)) {
-            new WarningMessage("Attempted to change the boss phase to what it already was.", true);
+            Logger.warn("Attempted to change the boss phase to what it already was.", true);
             return;
         }
         customBossEntity.remove(removalReason);
         if (customBossEntity.getCustomModel() != null) customBossEntity.getCustomModel().switchPhase();
         if (bossPhase.customBossesConfigFields == null) {
-            new WarningMessage("A phase for phase boss " + bossPhases.get(0).customBossesConfigFields.getFilename() + " was not valid! The boss will not be able to switch phases until it is fixed.");
+            Logger.warn("A phase for phase boss " + bossPhases.get(0).customBossesConfigFields.getFilename() + " was not valid! The boss will not be able to switch phases until it is fixed.");
             return;
         }
         customBossEntity.setCustomBossesConfigFields(bossPhase.customBossesConfigFields);

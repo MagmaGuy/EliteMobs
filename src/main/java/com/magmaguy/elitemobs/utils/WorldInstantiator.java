@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.utils;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Bukkit;
 
 import java.io.File;
@@ -17,11 +18,11 @@ public class WorldInstantiator {
         File blueprintWorld = new File(MetadataHandler.PLUGIN.getDataFolder().getAbsolutePath() + File.separatorChar +
                 "world_blueprints" + File.separatorChar + dungeonConfigurationFolderName + File.separatorChar + worldName);
         if (!blueprintWorld.exists()) {
-            new WarningMessage("Blueprint world " + worldName + " does not exist! Path: " + blueprintWorld.getAbsolutePath());
+            Logger.warn("Blueprint world " + worldName + " does not exist! Path: " + blueprintWorld.getAbsolutePath());
             return null;
         }
         if (!blueprintWorld.isDirectory()) {
-            new WarningMessage("Blueprint world " + worldName + " is not a directory!");
+            Logger.warn("Blueprint world " + worldName + " is not a directory!");
             return null;
         }
 
@@ -51,14 +52,14 @@ public class WorldInstantiator {
             } else
                 Files.copy(file.toPath(), targetPath, StandardCopyOption.REPLACE_EXISTING);
         } catch (Exception ex) {
-            new WarningMessage("Failed to copy file " + file.toString() + " to " + targetPath.toString());
+            Logger.warn("Failed to copy file " + file.toString() + " to " + targetPath.toString());
             ex.printStackTrace();
         }
     }
 
     public static void recursivelyDelete(File file) {
         if (!file.exists()) {
-            new InfoMessage("Attempted to recursively file " + file.getAbsolutePath() + " which doesn't exist.");
+            Logger.info("Attempted to recursively file " + file.getAbsolutePath() + " which doesn't exist.");
             return;
         }
         if (file.isDirectory()) {

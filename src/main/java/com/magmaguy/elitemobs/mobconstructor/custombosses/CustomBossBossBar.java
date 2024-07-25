@@ -1,11 +1,11 @@
 package com.magmaguy.elitemobs.mobconstructor.custombosses;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.utils.Round;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.ChatColorConverter;
+import com.magmaguy.magmacore.util.Logger;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -31,6 +31,7 @@ public class CustomBossBossBar {
     private final Map<Player, BossBar> bossBars = new HashMap<>();
     private final HashSet<Player> trackingPlayers = new HashSet<>();
     private BukkitTask bossBarUpdater;
+    private boolean warned = false;
 
     public CustomBossBossBar(CustomBossEntity customBossEntity) {
         this.customBossEntity = customBossEntity;
@@ -147,8 +148,6 @@ public class CustomBossBossBar {
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 5);
     }
 
-    private boolean warned = false;
-
     private void createBossBar(Player player) {
         String locationString = (int) customBossEntity.getLocation().getX() +
                 ", " + (int) customBossEntity.getLocation().getY() +
@@ -159,8 +158,8 @@ public class CustomBossBossBar {
 
         if (customBossEntity.getHealth() / customBossEntity.getMaxHealth() > 1 || customBossEntity.getHealth() / customBossEntity.getMaxHealth() < 0) {
             if (!warned) {
-                new WarningMessage("The following boss had more health than it should: " + customBossEntity.getName());
-                new WarningMessage("This is a problem usually caused by running more than one plugin that modifies mob health!" +
+                Logger.warn("The following boss had more health than it should: " + customBossEntity.getName());
+                Logger.warn("This is a problem usually caused by running more than one plugin that modifies mob health!" +
                         " EliteMobs can't fix this issue because it is being caused by another plugin." +
                         " If you want EliteMobs to work correctly, find a way to fix this issue with whatever other plugin is causing it.");
                 warned = true;

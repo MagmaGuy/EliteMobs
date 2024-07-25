@@ -15,7 +15,7 @@ import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEscapeMechanism;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.powers.specialpowers.EnderCrystalLightningRod;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.*;
@@ -46,7 +46,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
     public static CustomBossEntity summonReinforcement(EliteEntity summoningEntity, Location spawnLocation, String reinforcementFilename, int duration) {
         CustomBossesConfigFields fields = CustomBossesConfig.getCustomBoss(reinforcementFilename);
         if (fields == null) {
-            new WarningMessage("Attempted to summon reinforcement " + reinforcementFilename + " which is not a valid reinforcement!");
+            Logger.warn("Attempted to summon reinforcement " + reinforcementFilename + " which is not a valid reinforcement!");
             return null;
         }
         CustomBossEntity customBossEntity = new CustomBossEntity(fields);
@@ -61,7 +61,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
 
     public static BukkitTask summonGlobalReinforcement(CustomBossReinforcement customBossReinforcement, CustomBossEntity summoningEntity) {
         if (customBossReinforcement.customSpawn == null || customBossReinforcement.customSpawn.isEmpty()) {
-            new WarningMessage("Reinforcement for boss " + summoningEntity.getCustomBossesConfigFields().getFilename() + " has an incorrectly configured global reinforcement for " + customBossReinforcement.bossFileName);
+            Logger.warn("Reinforcement for boss " + summoningEntity.getCustomBossesConfigFields().getFilename() + " has an incorrectly configured global reinforcement for " + customBossReinforcement.bossFileName);
             return null;
         }
         return new BukkitRunnable() {
@@ -72,7 +72,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
                 for (int i = 0; i < customBossReinforcement.amount; i++) {
                     CustomBossEntity customBossEntity = CustomBossEntity.createCustomBossEntity(customBossReinforcement.bossFileName);
                     if (customBossEntity == null) {
-                        new WarningMessage("Failed to spawn reinforcement because boss " + customBossReinforcement.bossFileName + " was invalid! Does the file exist? Is it configured correctly?");
+                        Logger.warn("Failed to spawn reinforcement because boss " + customBossReinforcement.bossFileName + " was invalid! Does the file exist? Is it configured correctly?");
                         return;
                     }
                     if (summoningEntity.isNormalizedCombat())
@@ -137,7 +137,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
                                 Double.parseDouble(locationString.split(",")[1]),
                                 Double.parseDouble(locationString.split(",")[2]));
                     } catch (Exception ex) {
-                        new WarningMessage("Failed to get location for string " + locationString + " in " + customBossesConfigFields.getFilename());
+                        Logger.warn("Failed to get location for string " + locationString + " in " + customBossesConfigFields.getFilename());
                     }
                     break;
                 case "lightningrod":
@@ -157,19 +157,19 @@ public class CustomSummonPower extends ElitePower implements Listener {
                     break;
                 case "customspawn":
                     if (CustomSpawnConfig.getCustomEvent(parseString(entry.getKey(), entry.getValue(), customBossesConfigFields.getFilename())) == null)
-                        new WarningMessage("Failed to determine Custom Spawn file for filename " + entry.getValue());
+                        Logger.warn("Failed to determine Custom Spawn file for filename " + entry.getValue());
                     else {
                         customSpawn = parseString(entry.getKey(), entry.getValue(), customBossesConfigFields.getFilename());
                     }
                     break;
                 default:
-                    new WarningMessage("Invalid boss reinforcement!");
-                    new WarningMessage("Problematic entry: " + entry.getValue());
+                    Logger.warn("Invalid boss reinforcement!");
+                    Logger.warn("Problematic entry: " + entry.getValue());
             }
         }
 
         if (summonType == null) {
-            new WarningMessage("No summon type detected in " + customBossesConfigFields.getFilename() + " ! This reinforcement will not work.");
+            Logger.warn("No summon type detected in " + customBossesConfigFields.getFilename() + " ! This reinforcement will not work.");
             return;
         }
 
@@ -195,14 +195,14 @@ public class CustomSummonPower extends ElitePower implements Listener {
                 break;
             default:
                 customBossReinforcement = null;
-                new WarningMessage("Failed to determine summon type for reinforcement in " + customBossesConfigFields.getFilename() + " ! Contact the developer with this error!");
+                Logger.warn("Failed to determine summon type for reinforcement in " + customBossesConfigFields.getFilename() + " ! Contact the developer with this error!");
         }
 
         if (summonType != SummonType.ON_COMBAT_ENTER_PLACE_CRYSTAL)
             if (customBossReinforcement == null ||
                     customBossReinforcement.bossFileName == null ||
                     CustomBossesConfig.getCustomBoss(customBossReinforcement.bossFileName) == null) {
-                new WarningMessage("Could not get filename for reinforcement in file " + configFilename);
+                Logger.warn("Could not get filename for reinforcement in file " + configFilename);
                 return;
             }
 
@@ -287,7 +287,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
                             summonType = SummonType.valueOf(getSubstringField(substring));
                             newMap.put("summonType", summonType.toString());
                         } catch (Exception ex) {
-                            new WarningMessage("Failed to determine summon type from " + getSubstringField(substring));
+                            Logger.warn("Failed to determine summon type from " + getSubstringField(substring));
                         }
                         break;
                     case "filename":
@@ -295,7 +295,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
                             filename = getSubstringField(substring);
                             newMap.put("filename", filename);
                         } catch (Exception ex) {
-                            new WarningMessage("Failed to determine filename from " + getSubstringField(substring));
+                            Logger.warn("Failed to determine filename from " + getSubstringField(substring));
                         }
                         break;
                     case "chance":
@@ -303,7 +303,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
                             chance = Double.parseDouble(getSubstringField(substring));
                             newMap.put("chance", chance);
                         } catch (Exception ex) {
-                            new WarningMessage("Failed to determine chance from " + getSubstringField(substring));
+                            Logger.warn("Failed to determine chance from " + getSubstringField(substring));
                         }
                         break;
                     case "location":
@@ -315,7 +315,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
                                     Double.parseDouble(locationString.split(",")[1]),
                                     Double.parseDouble(locationString.split(",")[2]));
                         } catch (Exception ex) {
-                            new WarningMessage("Failed to determine location from " + getSubstringField(substring));
+                            Logger.warn("Failed to determine location from " + getSubstringField(substring));
                         }
                         break;
                     case "lightningrod":
@@ -323,7 +323,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
                             lightningRod = Boolean.parseBoolean(getSubstringField(substring));
                             newMap.put("lightningRod", lightningRod);
                         } catch (Exception ex) {
-                            new WarningMessage("Failed to determine lightningRod from " + getSubstringField(substring));
+                            Logger.warn("Failed to determine lightningRod from " + getSubstringField(substring));
                         }
                         break;
                     case "inheritaggro":
@@ -331,7 +331,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
                             inheritAggro = Boolean.parseBoolean(getSubstringField(substring));
                             newMap.put("inheritAggro", inheritAggro);
                         } catch (Exception ex) {
-                            new WarningMessage("Failed to determine inheritAggro from " + getSubstringField(substring));
+                            Logger.warn("Failed to determine inheritAggro from " + getSubstringField(substring));
                         }
                         break;
                     case "amount":
@@ -339,7 +339,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
                             amount = Integer.parseInt(getSubstringField(substring));
                             newMap.put("amount", amount);
                         } catch (Exception ex) {
-                            new WarningMessage("Failed to determine inheritAggro from " + getSubstringField(substring));
+                            Logger.warn("Failed to determine inheritAggro from " + getSubstringField(substring));
                         }
                         break;
                     case "inheritlevel":
@@ -347,7 +347,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
                             inheritLevel = Boolean.parseBoolean(getSubstringField(substring));
                             newMap.put("inheritLevel", inheritLevel);
                         } catch (Exception ex) {
-                            new WarningMessage("Failed to determine inheritLevel from " + getSubstringField(substring));
+                            Logger.warn("Failed to determine inheritLevel from " + getSubstringField(substring));
                         }
                         break;
                     case "spawnnearby":
@@ -355,27 +355,27 @@ public class CustomSummonPower extends ElitePower implements Listener {
                             spawnNearby = Boolean.parseBoolean(getSubstringField(substring));
                             newMap.put("spawnNearby", spawnNearby);
                         } catch (Exception ex) {
-                            new WarningMessage("Failed to determine spawnNearby from " + getSubstringField(substring));
+                            Logger.warn("Failed to determine spawnNearby from " + getSubstringField(substring));
                         }
                         break;
                     case "customspawn":
                         if (CustomSpawnConfig.getCustomEvent(getSubstringField(substring)) == null)
-                            new WarningMessage("Failed to determine Custom Spawn file for filename " + substring);
+                            Logger.warn("Failed to determine Custom Spawn file for filename " + substring);
                         else {
                             customSpawn = getSubstringField(substring);
                             newMap.put("customSpawn", customSpawn);
                         }
                         break;
                     default:
-                        new WarningMessage("Invalid boss reinforcement string for line " + powerString + " !");
-                        new WarningMessage("Problematic entry: " + substring);
+                        Logger.warn("Invalid boss reinforcement string for line " + powerString + " !");
+                        Logger.warn("Problematic entry: " + substring);
                 }
             }
 
             replaceOldFormat(powerString, newMap);
 
             if (summonType == null) {
-                new WarningMessage("No summon type detected in " + powerString + " ! This reinforcement will not work.");
+                Logger.warn("No summon type detected in " + powerString + " ! This reinforcement will not work.");
                 return;
             }
 
@@ -401,7 +401,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
                     break;
                 default:
                     customBossReinforcement = null;
-                    new WarningMessage("Failed to determine summon type for reinforcement " + powerString + " ! Contact the developer with this error!");
+                    Logger.warn("Failed to determine summon type for reinforcement " + powerString + " ! Contact the developer with this error!");
             }
 
             if (customBossReinforcement == null)
@@ -418,7 +418,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
             if (customBossReinforcement == null ||
                     customBossReinforcement.bossFileName == null ||
                     CustomBossesConfig.getCustomBoss(customBossReinforcement.bossFileName) == null) {
-                new WarningMessage("Could not get filename for reinforcement in file " + configFilename);
+                Logger.warn("Could not get filename for reinforcement in file " + configFilename);
             }
 
         }
@@ -445,7 +445,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
     private CustomBossReinforcement doOnce(String filename) {
         CustomBossReinforcement customBossReinforcement = new CustomBossReinforcement(SummonType.ONCE, filename);
         if (CustomBossesConfig.getCustomBoss(customBossReinforcement.bossFileName) == null) {
-            new WarningMessage("Reinforcement mob " + customBossReinforcement.bossFileName + " is not valid! Filename: " + filename);
+            Logger.warn("Reinforcement mob " + customBossReinforcement.bossFileName + " is not valid! Filename: " + filename);
             return null;
         }
         customBossReinforcements.add(customBossReinforcement);
@@ -462,7 +462,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
         CustomBossReinforcement customBossReinforcement = new CustomBossReinforcement(SummonType.ON_HIT, filename);
         customBossReinforcement.setSummonChance(chance);
         if (CustomBossesConfig.getCustomBoss(customBossReinforcement.bossFileName) == null) {
-            new WarningMessage("Reinforcement mob " + customBossReinforcement.bossFileName + " is not valid! Filename: " + filename);
+            Logger.warn("Reinforcement mob " + customBossReinforcement.bossFileName + " is not valid! Filename: " + filename);
             return customBossReinforcement;
         }
         customBossReinforcements.add(customBossReinforcement);
@@ -472,7 +472,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
     private CustomBossReinforcement doOnDeath(String filename) {
         CustomBossReinforcement customBossReinforcement = new CustomBossReinforcement(SummonType.ON_DEATH, filename);
         if (CustomBossesConfig.getCustomBoss(customBossReinforcement.bossFileName) == null) {
-            new WarningMessage("Reinforcement mob " + customBossReinforcement.bossFileName + " is not valid! Filename: " + filename);
+            Logger.warn("Reinforcement mob " + customBossReinforcement.bossFileName + " is not valid! Filename: " + filename);
             return null;
         }
         customBossReinforcements.add(customBossReinforcement);
@@ -499,7 +499,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
         CustomBossReinforcement customBossReinforcement = new CustomBossReinforcement(SummonType.ON_COMBAT_ENTER, filename);
 
         if (CustomBossesConfig.getCustomBoss(customBossReinforcement.bossFileName) == null) {
-            new WarningMessage("Reinforcement mob " + customBossReinforcement.bossFileName + " is not valid! Filename: " + filename);
+            Logger.warn("Reinforcement mob " + customBossReinforcement.bossFileName + " is not valid! Filename: " + filename);
             return customBossReinforcement;
         }
         customBossReinforcements.add(customBossReinforcement);
@@ -526,7 +526,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
         CustomBossReinforcement customBossReinforcement = new CustomBossReinforcement(SummonType.GLOBAL, filename);
         CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(customBossReinforcement.bossFileName);
         if (customBossesConfigFields == null) {
-            new WarningMessage("Reinforcement mob " + customBossReinforcement.bossFileName + " is not valid! Filename: " + filename);
+            Logger.warn("Reinforcement mob " + customBossReinforcement.bossFileName + " is not valid! Filename: " + filename);
             return null;
         }
         customBossReinforcement.entityType = customBossesConfigFields.getEntityType();
@@ -611,7 +611,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
             if (CustomBossesConfig.getCustomBoss(customBossReinforcement.bossFileName).isRegionalBoss()) {
                 RegionalBossEntity regionalBossEntity = RegionalBossEntity.createTemporaryRegionalBossEntity(customBossReinforcement.bossFileName, spawnLocation);
                 if (regionalBossEntity == null) {
-                    new WarningMessage("Failed to spawn reinforcement for " + eliteEntity.getName() + " because boss " + customBossReinforcement.bossFileName + " was invalid! Does the file exist? Is it configured correctly?");
+                    Logger.warn("Failed to spawn reinforcement for " + eliteEntity.getName() + " because boss " + customBossReinforcement.bossFileName + " was invalid! Does the file exist? Is it configured correctly?");
                     return;
                 }
                 if (eliteEntity instanceof CustomBossEntity summoner && summoner.isNormalizedCombat())
@@ -626,7 +626,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
             } else {
                 CustomBossEntity customBossEntity = CustomBossEntity.createCustomBossEntity(customBossReinforcement.bossFileName);
                 if (customBossEntity == null) {
-                    new WarningMessage("Failed to spawn reinforcement for " + eliteEntity.getName() + " because boss " + customBossReinforcement.bossFileName + " was invalid! Does the file exist? Is it configured correctly?");
+                    Logger.warn("Failed to spawn reinforcement for " + eliteEntity.getName() + " because boss " + customBossReinforcement.bossFileName + " was invalid! Does the file exist? Is it configured correctly?");
                     return;
                 }
                 if (eliteEntity instanceof CustomBossEntity summoner && summoner.isNormalizedCombat())

@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.instanced.dungeons;
 
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.InstancedBossEntity;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -31,10 +31,10 @@ public class DungeonKillTargetObjective extends DungeonObjective {
                 try {
                     this.targetAmount = Integer.parseInt(separatedByEquals[1]);
                 } catch (Exception ex) {
-                    new WarningMessage("Value " + separatedByEquals[1] + " is not a valid integer amount!");
+                    Logger.warn("Value " + separatedByEquals[1] + " is not a valid integer amount!");
                 }
             } else {
-                new WarningMessage("Invalid entry for objective string! " + objectiveString + " could not be parsed correctly.");
+                Logger.warn("Invalid entry for objective string! " + objectiveString + " could not be parsed correctly.");
             }
         }
         initializeObjective(dungeonInstance);

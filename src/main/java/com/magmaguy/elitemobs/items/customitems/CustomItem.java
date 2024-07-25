@@ -11,9 +11,8 @@ import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantment;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
@@ -154,7 +153,7 @@ public class CustomItem {
             try {
                 new CustomItem(configFields);
             } catch (Exception ex) {
-                new WarningMessage("Failed to generate custom item in file " + configFields.getFilename() + " !");
+                Logger.warn("Failed to generate custom item in file " + configFields.getFilename() + " !");
                 ex.printStackTrace();
             }
     }
@@ -204,11 +203,11 @@ public class CustomItem {
                 try {
                     level = Integer.parseInt(string.split(",")[1]);
                 } catch (Exception ex) {
-                    Bukkit.getLogger().warning("[EliteMobs] Custom Item Entry " + customItemsConfigFields.getFilename() + " has an invalid enchantment entry.");
-                    Bukkit.getLogger().warning("[EliteMobs} Enchantment " + name + " is missing a level.");
-                    Bukkit.getLogger().warning("[EliteMobs] Reminder - The correct format for these is [enchantmentName],[level]");
-                    Bukkit.getLogger().warning("[EliteMobs] The name should follow the API names and the level should be above 0.");
-                    Bukkit.getLogger().warning("[EliteMobs] Defaulting " + name + " to level 1.");
+                    Logger.warn("Custom Item Entry " + customItemsConfigFields.getFilename() + " has an invalid enchantment entry.");
+                    Logger.warn("Enchantment " + name + " is missing a level.");
+                    Logger.warn("Reminder - The correct format for these is [enchantmentName],[level]");
+                    Logger.warn("The name should follow the API names and the level should be above 0.");
+                    Logger.warn("Defaulting " + name + " to level 1.");
                 }
 
                 if (CustomEnchantment.isCustomEnchantment(name)) {
@@ -222,19 +221,19 @@ public class CustomItem {
                     if (enchantment == null)
                         throw new Exception("Null enchantment");
                 } catch (Exception ex) {
-                    Bukkit.getLogger().warning("[EliteMobs] Custom Item Entry " + customItemsConfigFields.getFilename() + " has an invalid enchantment entry.");
-                    Bukkit.getLogger().warning("[EliteMobs] Enchantment " + name + " is not a valid enchantment. Check the Spigot API for the correct names!");
-                    Bukkit.getLogger().warning("[EliteMobs] The invalid entry will be skipped.");
+                    Logger.warn("Custom Item Entry " + customItemsConfigFields.getFilename() + " has an invalid enchantment entry.");
+                    Logger.warn("Enchantment " + name + " is not a valid enchantment. Check the Spigot API for the correct names!");
+                    Logger.warn("The invalid entry will be skipped.");
                     continue;
                 }
 
                 enchantments.put(enchantment, level);
 
             } catch (Exception ex) {
-                Bukkit.getLogger().warning("[EliteMobs] Invalid enchantment entry for item " + customItemsConfigFields.getFilename());
-                Bukkit.getLogger().warning("[EliteMobs] [" + string + "] is not a valid entry and will be ignored.");
-                Bukkit.getLogger().warning("[EliteMobs] Reminder - The correct format for these is [enchantmentName],[level]");
-                Bukkit.getLogger().warning("[EliteMobs] The name should follow the API names and the level should be above 0.");
+                Logger.warn("Invalid enchantment entry for item " + customItemsConfigFields.getFilename());
+                Logger.warn("[" + string + "] is not a valid entry and will be ignored.");
+                Logger.warn("Reminder - The correct format for these is [enchantmentName],[level]");
+                Logger.warn("The name should follow the API names and the level should be above 0.");
             }
     }
 
@@ -257,7 +256,7 @@ public class CustomItem {
             this.dropWeight = Double.parseDouble(this.customItemsConfigFields.getDropWeight());
             return true;
         } catch (Exception e) {
-            Bukkit.getLogger().warning("[EliteMobs] Item " + customItemsConfigFields.getFilename() + " does not have a valid itemWeight.");
+            Logger.warn("Item " + customItemsConfigFields.getFilename() + " does not have a valid itemWeight.");
         }
         return false;
     }
@@ -285,7 +284,7 @@ public class CustomItem {
                 this.scalability = Scalability.SCALABLE;
                 if (!itemType.equals(ItemType.UNIQUE))
                     scalableItems.add(this);
-                Bukkit.getLogger().warning("Item " + customItemsConfigFields.getFilename() + " does not have a valid scalability type! Defaulting to scalable.");
+                Logger.warn("Item " + customItemsConfigFields.getFilename() + " does not have a valid scalability type! Defaulting to scalable.");
 
         }
     }

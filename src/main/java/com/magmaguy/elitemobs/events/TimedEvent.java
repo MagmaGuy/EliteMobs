@@ -8,8 +8,8 @@ import com.magmaguy.elitemobs.config.customevents.CustomEventsConfig;
 import com.magmaguy.elitemobs.config.customevents.CustomEventsConfigFields;
 import com.magmaguy.elitemobs.mobconstructor.CustomSpawn;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
-import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.WeightedProbability;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -107,7 +107,7 @@ public class TimedEvent extends CustomEvent implements Listener {
      * on a delay.
      */
     public void instantiateEvent() {
-        new InfoMessage("Event " + getCustomEventsConfigFields().getFilename() + " has been queued!");
+        Logger.info("Event " + getCustomEventsConfigFields().getFilename() + " has been queued!");
         TimedEvent timedEvent = new TimedEvent(customEventsConfigFields);
         CustomEventStartEvent customEventStartEvent = new CustomEventStartEvent(timedEvent);
         if (customEventStartEvent.isCancelled()) return;
@@ -150,9 +150,9 @@ public class TimedEvent extends CustomEvent implements Listener {
         for (CustomBossEntity customBossEntity : primaryEliteMobs)
             if (!customBossEntity.exists()) {
                 if (!silentRetry) {
-                    new InfoMessage("Boss " + customBossEntity.getCustomBossesConfigFields().getFilename() + " for event " +
+                    Logger.info("Boss " + customBossEntity.getCustomBossesConfigFields().getFilename() + " for event " +
                             getCustomEventsConfigFields().getFilename() + " wasn't considered to be valid. Trying spawn again .");
-                    new InfoMessage("Note: further failures will be silent. EliteMobs can only predict WorldGuard protections," +
+                    Logger.info("Note: further failures will be silent. EliteMobs can only predict WorldGuard protections," +
                             " so it will keep trying to spawn things until plugins preventing spawning allow it to do so. This might take a while.");
                     silentRetry = true;
                 }

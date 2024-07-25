@@ -21,7 +21,7 @@ import java.util.HashMap;
 
 public class Navigation implements Listener {
 
-    private static HashMap<CustomBossEntity, BukkitTask> currentlyNavigating = new HashMap();
+    private static final HashMap<CustomBossEntity, BukkitTask> currentlyNavigating = new HashMap();
 
     public static void addSoftLeashAI(RegionalBossEntity regionalBossEntity) {
         if (NMSManager.getAdapter() == null) return;
@@ -60,7 +60,7 @@ public class Navigation implements Listener {
                 .register();
     }
 
-    public static void shutdown(){
+    public static void shutdown() {
         currentlyNavigating.values().forEach(BukkitTask::cancel);
         currentlyNavigating.clear();
     }

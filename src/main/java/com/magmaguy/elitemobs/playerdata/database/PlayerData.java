@@ -7,9 +7,8 @@ import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.Quest;
 import com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldowns;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
-import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.ObjectSerializer;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -90,7 +89,7 @@ public class PlayerData {
     public PlayerData(UUID uuid) {
         Player player = Bukkit.getPlayer(uuid);
         if (player == null) {
-            new WarningMessage("EliteMobs did not initialize player data for uuid " + uuid + " because Minecraft does not recognize this as a valid player!");
+            Logger.warn("EliteMobs did not initialize player data for uuid " + uuid + " because Minecraft does not recognize this as a valid player!");
             return;
         }
         PermissionAttachment permissionAttachment = player.addAttachment(MetadataHandler.PLUGIN);
@@ -114,12 +113,12 @@ public class PlayerData {
                         try {
                             statement.close();
                         } catch (SQLException throwables) {
-                            new WarningMessage("Failed to close statement after failing player data creation!");
+                            Logger.warn("Failed to close statement after failing player data creation!");
                             throwables.printStackTrace();
                         }
                     }
-                    new WarningMessage("Something went wrong while generating a new player entry. This is bad! Tell the dev.");
-                    new WarningMessage(e.getClass().getName() + ": " + e.getMessage());
+                    Logger.warn("Something went wrong while generating a new player entry. This is bad! Tell the dev.");
+                    Logger.warn(e.getClass().getName() + ": " + e.getMessage());
                 }
             }
         }.runTaskAsynchronously(MetadataHandler.PLUGIN);
@@ -136,7 +135,7 @@ public class PlayerData {
             if (playerDataHashMap.containsKey(uuid))
                 playerDataHashMap.get(uuid).quests = playerQuests;
         } catch (Exception ex) {
-            new WarningMessage("Failed to serialize player quest data!");
+            Logger.warn("Failed to serialize player quest data!");
             ex.printStackTrace();
         }
     }
@@ -263,7 +262,7 @@ public class PlayerData {
             UUID questUUID = UUID.fromString(questID);
             return getQuest(uuid, questUUID);
         } catch (Exception ex) {
-            new WarningMessage("Failed to convert quest ID from command into a valid UUID format!");
+            Logger.warn("Failed to convert quest ID from command into a valid UUID format!");
             return null;
         }
     }
@@ -324,7 +323,7 @@ public class PlayerData {
         try {
             setDatabaseValue(uuid, "PlayerQuestCooldowns", ObjectSerializer.toString(playerQuestCooldowns));
         } catch (Exception ex) {
-            new WarningMessage("Failed to register player quest cooldowns!");
+            Logger.warn("Failed to register player quest cooldowns!");
             ex.printStackTrace();
         }
     }
@@ -347,7 +346,7 @@ public class PlayerData {
                     statement.executeUpdate(sql);
                     statement.close();
                 } catch (Exception e) {
-                    new WarningMessage("Failed to update database value.");
+                    Logger.warn("Failed to update database value.");
                     e.printStackTrace();
                 }
             }
@@ -364,8 +363,8 @@ public class PlayerData {
             if (bytes == null) return null;
             return new String(bytes);
         } catch (Exception e) {
-            new WarningMessage("Failed to get blob value from database!");
-            new WarningMessage("UUID: " + uuid + " | Value: " + value);
+            Logger.warn("Failed to get blob value from database!");
+            Logger.warn("UUID: " + uuid + " | Value: " + value);
             e.printStackTrace();
             return null;
         }
@@ -490,7 +489,7 @@ public class PlayerData {
             statement.close();
             return reply;
         } catch (Exception e) {
-            new WarningMessage("Failed to get boolean value from database!");
+            Logger.warn("Failed to get boolean value from database!");
             e.printStackTrace();
             return null;
         }
@@ -505,7 +504,7 @@ public class PlayerData {
             statement.close();
             return reply;
         } catch (Exception e) {
-            new WarningMessage("Failed to get string value from database!");
+            Logger.warn("Failed to get string value from database!");
             e.printStackTrace();
             return null;
         }
@@ -520,7 +519,7 @@ public class PlayerData {
             statement.close();
             return reply;
         } catch (Exception e) {
-            new WarningMessage("Failed to get double value from database!");
+            Logger.warn("Failed to get double value from database!");
             e.printStackTrace();
             return null;
         }
@@ -535,7 +534,7 @@ public class PlayerData {
             statement.close();
             return reply;
         } catch (Exception e) {
-            new WarningMessage("Failed to get integer value from database!");
+            Logger.warn("Failed to get integer value from database!");
             e.printStackTrace();
             return null;
         }
@@ -566,13 +565,13 @@ public class PlayerData {
     public static void initializeDatabaseConnection() {
         new File(MetadataHandler.PLUGIN.getDataFolder().getPath() + "/data").mkdirs();
         try {
-            new InfoMessage("Opened database successfully");
+            Logger.info("Opened database successfully");
             GenerateDatabase.generate();
             for (Player player : Bukkit.getOnlinePlayers())
                 new PlayerData(player.getUniqueId());
         } catch (Exception e) {
-            new WarningMessage(e.getClass().getName() + ": " + e.getMessage());
-            new WarningMessage("Failed to establish a connection to the SQLite database. Player data will not be saved! Is your MySQL configuration valid and is your MySQL server running?");
+            Logger.warn(e.getClass().getName() + ": " + e.getMessage());
+            Logger.warn("Failed to establish a connection to the SQLite database. Player data will not be saved! Is your MySQL configuration valid and is your MySQL server running?");
             e.printStackTrace();
         }
 
@@ -584,7 +583,7 @@ public class PlayerData {
             if (connection == null) return;
             connection.close();
         } catch (Exception ex) {
-            new WarningMessage("Could not correctly close database connection.");
+            Logger.warn("Could not correctly close database connection.");
         }
     }
 
@@ -609,11 +608,11 @@ public class PlayerData {
                     if (quest instanceof CustomQuest)
                         ((CustomQuest) quest).applyTemporaryPermissions(Bukkit.getPlayer(uuid));
             } catch (Exception ex) {
-                new WarningMessage("Failed to serialize quest data for player " + Bukkit.getPlayer(uuid) + " ! This player's quest data will be wiped to prevent future errors.");
+                Logger.warn("Failed to serialize quest data for player " + Bukkit.getPlayer(uuid) + " ! This player's quest data will be wiped to prevent future errors.");
                 try {
                     resetQuests(uuid);
                 } catch (Exception ex2) {
-                    new WarningMessage("Failed to reset quest data! Ironic.");
+                    Logger.warn("Failed to reset quest data! Ironic.");
                     ex2.printStackTrace();
                 }
             }
@@ -624,11 +623,11 @@ public class PlayerData {
                 playerQuestCooldowns = (PlayerQuestCooldowns) ObjectSerializer.fromString(new String(resultSet.getBytes("PlayerQuestCooldowns"), StandardCharsets.UTF_8));
                 playerQuestCooldowns.startCooldowns(uuid);
             } catch (Exception exception) {
-                new WarningMessage("Failed to get player quest cooldowns!  ! This player's quest cooldowns will be wiped to prevent future errors.");
+                Logger.warn("Failed to get player quest cooldowns!  ! This player's quest cooldowns will be wiped to prevent future errors.");
                 try {
                     resetPlayerQuestCooldowns(uuid);
                 } catch (Exception ex2) {
-                    new WarningMessage("Failed to reset quest cooldowns! Ironic.");
+                    Logger.warn("Failed to reset quest cooldowns! Ironic.");
                     ex2.printStackTrace();
                 }
             }
@@ -646,7 +645,7 @@ public class PlayerData {
             setDismissEMStatusScreenMessage(Bukkit.getPlayer(uuid), false);
         }
 
-        new InfoMessage("User " + uuid + " data successfully read!");
+        Logger.info("User " + uuid + " data successfully read!");
     }
 
     private void writeNewData(Statement statement, UUID uuid) throws Exception {
@@ -697,7 +696,7 @@ public class PlayerData {
                 "0);";
         statement.executeUpdate(sql);
         statement.close();
-        new InfoMessage("No player entry detected, generating new entry!");
+        Logger.info("No player entry detected, generating new entry!");
     }
 
     public static class PlayerDataEvents implements Listener {
