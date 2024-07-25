@@ -11,7 +11,7 @@ public class QuestLeaveCommand extends AdvancedCommand {
         super(List.of("quest"));
         addLiteral("leave");
         setUsage("/em quest leave");
-        setPermission("elitemobs.*");
+        setPermission("elitemobs.quest.leave");
         setSenderType(SenderType.PLAYER);
         setDescription("Leaves a quest. Used via menu, can't be directly used.");
     }

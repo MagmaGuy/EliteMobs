@@ -12,9 +12,9 @@ public class MoneyCheckCommand extends AdvancedCommand {
         super(List.of("money"));
         addLiteral("check");
         setUsage("/em money check");
-        setPermission("elitemobs.money.check");
+        setPermission("elitemobs.money.check.self");
         setSenderType(SenderType.PLAYER);
-        setDescription("Checks the EliteMobs currency");
+        setDescription("Checks your EliteMobs currency.");
     }
 
     @Override

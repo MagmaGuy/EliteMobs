@@ -11,7 +11,7 @@ public class ReloadCommand extends AdvancedCommand {
     public ReloadCommand() {
         super(List.of("reload"));
         setUsage("/em reload");
-        setPermission("elitemobs.*");
+        setPermission("elitemobs.reload");
         setDescription("Reloads EliteMobs.");
     }
 
