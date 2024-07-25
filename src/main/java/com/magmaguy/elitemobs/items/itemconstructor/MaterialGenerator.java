@@ -3,8 +3,7 @@ package com.magmaguy.elitemobs.items.itemconstructor;
 import com.magmaguy.elitemobs.combatsystem.CombatSystem;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.ProceduralItemGenerationSettingsConfig;
-import com.magmaguy.elitemobs.utils.WarningMessage;
-import org.bukkit.Bukkit;
+import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Material;
 
 import java.util.ArrayList;
@@ -97,9 +96,9 @@ public class MaterialGenerator {
         validProceduralMaterials.clear();
 
         if (ProceduralItemGenerationSettingsConfig.getValidMaterials().isEmpty()) {
-            ProceduralItemGenerationSettingsConfig.cacheMaterials();
+            ProceduralItemGenerationSettingsConfig.getInstance().cacheMaterials();
             if (ProceduralItemGenerationSettingsConfig.getValidMaterials().isEmpty()) {
-                new WarningMessage("No valid materials detected for the procedural item settings. If you are trying to disable" +
+                Logger.warn("No valid materials detected for the procedural item settings. If you are trying to disable" +
                         " them, use the 'dropProcedurallyGeneratedItems' option instead. Warn the developer.");
                 return;
             }
@@ -109,7 +108,7 @@ public class MaterialGenerator {
             try {
                 validProceduralMaterials.add(getMaterial(string));
             } catch (Exception e) {
-                Bukkit.getLogger().info("Invalid material type detected: " + string);
+                Logger.info("Invalid material type detected: " + string);
             }
         }
 

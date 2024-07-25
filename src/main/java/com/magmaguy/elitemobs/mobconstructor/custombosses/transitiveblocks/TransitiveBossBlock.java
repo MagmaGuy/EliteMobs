@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.api.EliteMobRemoveEvent;
 import com.magmaguy.elitemobs.api.EliteMobSpawnEvent;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.utils.ChunkLocationChecker;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
@@ -53,7 +53,7 @@ public class TransitiveBossBlock implements Listener {
             case WEST:
                 return 4;
             default:
-                new WarningMessage("Attempted to rotate a block through the transitive block system that does not have a north / south / east / west face. This is not currently supported.");
+                Logger.warn("Attempted to rotate a block through the transitive block system that does not have a north / south / east / west face. This is not currently supported.");
                 return 1;
         }
     }
@@ -69,7 +69,7 @@ public class TransitiveBossBlock implements Listener {
             case 4:
                 return BlockFace.WEST;
             default:
-                new WarningMessage("Attempted to rotate a block through the transitive block system that does not have a north / south / east / west face. This is not currently supported.");
+                Logger.warn("Attempted to rotate a block through the transitive block system that does not have a north / south / east / west face. This is not currently supported.");
                 return BlockFace.NORTH;
         }
     }

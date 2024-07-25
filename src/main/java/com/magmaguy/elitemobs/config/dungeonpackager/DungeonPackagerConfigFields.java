@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.config.dungeonpackager;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
@@ -246,7 +246,7 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
         this.downloadLink = processString("downloadLink", downloadLink, null, false);
         this.dungeonSizeCategory = processEnum("dungeonSizeCategory", dungeonSizeCategory, null, DungeonSizeCategory.class, false);
         if (dungeonSizeCategory == null) {
-            new WarningMessage("File " + filename + " does not have a valid dungeonSizeCategory!");
+            Logger.warn("File " + filename + " does not have a valid dungeonSizeCategory!");
             this.fileConfiguration = null;
             return;
         }

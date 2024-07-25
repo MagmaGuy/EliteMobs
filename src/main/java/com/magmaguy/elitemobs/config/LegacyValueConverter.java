@@ -1,5 +1,7 @@
 package com.magmaguy.elitemobs.config;
 
+import org.bukkit.Particle;
+
 import java.util.Locale;
 
 public class LegacyValueConverter {
@@ -69,6 +71,25 @@ public class LegacyValueConverter {
                 return "SLOWNESS";
             case "SLOW_DIGGING":
                 return "MINING_FATIGUE";
+            default:
+                return potionEffectName;
+        }
+    }
+
+    public static String parseParticle(String potionEffectName) {
+        switch (potionEffectName.toUpperCase(Locale.ROOT)) {
+            case "EXPLOSION_NORMAL", "EXPLOSION_LARGE":
+                return Particle.EXPLOSION.toString();
+            case "SMOKE_NORMAL":
+                return Particle.SMOKE.toString();
+            case "SMOKE_LARGE":
+                return Particle.LARGE_SMOKE.toString();
+            case "REDSTONE":
+                return Particle.DUST.toString();
+            case "SLIME":
+                return Particle.ITEM_SLIME.toString();
+            case "DRIP_LAVA":
+                return Particle.DRIPPING_WATER.toString();
             default:
                 return potionEffectName;
         }

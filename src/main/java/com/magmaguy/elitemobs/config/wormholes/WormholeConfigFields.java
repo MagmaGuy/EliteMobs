@@ -2,14 +2,13 @@ package com.magmaguy.elitemobs.config.wormholes;
 
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.CustomConfigFields;
-import com.magmaguy.elitemobs.config.CustomConfigFieldsInterface;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.wormhole.Wormhole;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
 
-public class WormholeConfigFields extends CustomConfigFields implements CustomConfigFieldsInterface {
+public class WormholeConfigFields extends CustomConfigFields {
 
     @Getter
     @Setter

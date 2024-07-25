@@ -1,9 +1,9 @@
 package com.magmaguy.elitemobs.commands;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.utils.Round;
+import com.magmaguy.magmacore.util.ChatColorConverter;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -81,7 +81,7 @@ public class CurrencyCommandsHandler {
         EconomyHandler.addCurrency(player.getUniqueId(), amount);
     }
 
-    public static void addCommand(CommandSender commandSender, String onlinePlayer, int amount) {
+    public static void addCommand(CommandSender commandSender, String onlinePlayer, double amount) {
         Player player = Bukkit.getPlayer(onlinePlayer);
         if (player == null) {
             commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Player " + onlinePlayer + " &4is not valid!"));
@@ -92,7 +92,7 @@ public class CurrencyCommandsHandler {
         commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2They now have " + EconomyHandler.checkCurrency(player.getUniqueId())));
     }
 
-    public static void addAllCommand(CommandSender commandSender, int amount) {
+    public static void addAllCommand(CommandSender commandSender, double amount) {
         for (Player player : Bukkit.getOnlinePlayers())
             addCommand(player, amount);
         commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2You have added " + amount + " to all online players."));

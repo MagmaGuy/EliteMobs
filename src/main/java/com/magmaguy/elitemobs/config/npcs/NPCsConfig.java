@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.config.npcs;
 
-import com.magmaguy.elitemobs.config.CustomConfig;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
+import com.magmaguy.magmacore.config.CustomConfig;
 
 import java.util.HashMap;
 

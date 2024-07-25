@@ -1,6 +1,6 @@
 package com.magmaguy.elitemobs.powers.scripts.caching;
 
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.Particle;
 
@@ -28,6 +28,7 @@ public class ScriptParticlesBlueprint {
     public class ScriptParticleBlueprint {
         @Getter
         private final String scriptName;
+        private final String filename;
         @Getter
         private double x = 0.01;
         @Getter
@@ -56,7 +57,6 @@ public class ScriptParticlesBlueprint {
         private Boolean moveToTarget = null;
         @Getter
         private ScriptRelativeVectorBlueprint relativeVectorBlueprint = null;
-        private final String filename;
 
         public ScriptParticleBlueprint(Map<?, ?> entry, String scriptName, String filename) {
             this.filename = filename;
@@ -89,7 +89,7 @@ public class ScriptParticlesBlueprint {
                 case "relativevector" ->
                         relativeVectorBlueprint = new ScriptRelativeVectorBlueprint(scriptName, filename, (Map<String, ?>) value);
                 default ->
-                        new WarningMessage("Key " + key + " in script " + scriptName + " in file " + filename + " for script particles is not a valid key!");
+                        Logger.warn("Key " + key + " in script " + scriptName + " in file " + filename + " for script particles is not a valid key!");
             }
         }
     }

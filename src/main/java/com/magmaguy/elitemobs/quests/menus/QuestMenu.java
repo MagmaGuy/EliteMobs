@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.quests.menus;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.menus.premade.CustomQuestMenuConfig;
 import com.magmaguy.elitemobs.config.menus.premade.DynamicQuestMenuConfig;
@@ -18,6 +17,7 @@ import com.magmaguy.elitemobs.quests.objectives.Objective;
 import com.magmaguy.elitemobs.thirdparty.geyser.GeyserDetector;
 import com.magmaguy.elitemobs.utils.BookMaker;
 import com.magmaguy.elitemobs.utils.SpigotMessage;
+import com.magmaguy.magmacore.util.ChatColorConverter;
 import lombok.Getter;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.Player;

@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.mobconstructor.custombosses;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
@@ -11,7 +10,8 @@ import com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.ChatColorConverter;
+import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
@@ -50,6 +50,19 @@ public class CustomBossMegaConsumer {
         this.bypassesWorldGuardSpawn = customBossEntity.getBypassesProtections();
     }
 
+    protected static void setName(LivingEntity livingEntity, CustomBossEntity customBossEntity, int level) {
+        String parsedName = ChatColorConverter.convert(customBossEntity.customBossesConfigFields.getName().replace("$level", level + "")
+                .replace("$normalLevel", ChatColorConverter.convert("&2[&a" + level + "&2]&f"))
+                .replace("$minibossLevel", ChatColorConverter.convert("&6〖&e" + level + "&6〗&f"))
+                .replace("$bossLevel", ChatColorConverter.convert("&4『&c" + level + "&4』&f"))
+                .replace("$reinforcementLevel", ChatColorConverter.convert("&8〔&7") + level + "&8〕&f")
+                .replace("$eventBossLevel", ChatColorConverter.convert("&4「&c" + level + "&4」&f")));
+        livingEntity.setCustomName(parsedName);
+        livingEntity.setCustomNameVisible(DefaultConfig.isAlwaysShowNametags());
+        DisguiseEntity.setDisguiseNameVisibility(DefaultConfig.isAlwaysShowNametags(), livingEntity, parsedName);
+        customBossEntity.setName(parsedName, false);
+    }
+
     /**
      * Attempts to spawn a {@link CustomBossEntity} whose spawn location has already been set.
      *
@@ -57,12 +70,12 @@ public class CustomBossMegaConsumer {
      */
     public LivingEntity spawn() {
         if (spawnLocation == null) {
-            new WarningMessage("Custom Boss Entity " + customBossesConfigFields.getFilename() + " tried to spawn without a valid spawn location getting assigned! Report this to the developer!");
+            Logger.warn("Custom Boss Entity " + customBossesConfigFields.getFilename() + " tried to spawn without a valid spawn location getting assigned! Report this to the developer!");
             return null;
         }
         if (EliteMobs.worldGuardIsEnabled) {
             if (!WorldGuardFlagChecker.checkFlag(spawnLocation, WorldGuardCompatibility.getELITEMOBS_SPAWN_FLAG())) {
-                new WarningMessage("Attempted to spawn " + customBossesConfigFields.getFilename() + " in location " +
+                Logger.warn("Attempted to spawn " + customBossesConfigFields.getFilename() + " in location " +
                         spawnLocation + " which is protected by WorldGuard with elitemobs-spawning deny! This should not have happened.");
                 return null;
             }
@@ -76,19 +89,6 @@ public class CustomBossMegaConsumer {
         setCustomModel(livingEntity);
         customBossEntity.setLivingEntity(livingEntity, CreatureSpawnEvent.SpawnReason.CUSTOM);
         return livingEntity;
-    }
-
-    protected static void setName(LivingEntity livingEntity, CustomBossEntity customBossEntity, int level) {
-        String parsedName = ChatColorConverter.convert(customBossEntity.customBossesConfigFields.getName().replace("$level", level + "")
-                .replace("$normalLevel", ChatColorConverter.convert("&2[&a" + level + "&2]&f"))
-                .replace("$minibossLevel", ChatColorConverter.convert("&6〖&e" + level + "&6〗&f"))
-                .replace("$bossLevel", ChatColorConverter.convert("&4『&c" + level + "&4』&f"))
-                .replace("$reinforcementLevel", ChatColorConverter.convert("&8〔&7") + level + "&8〕&f")
-                .replace("$eventBossLevel", ChatColorConverter.convert("&4「&c" + level + "&4」&f")));
-        livingEntity.setCustomName(parsedName);
-        livingEntity.setCustomNameVisible(DefaultConfig.isAlwaysShowNametags());
-        DisguiseEntity.setDisguiseNameVisibility(DefaultConfig.isAlwaysShowNametags(), livingEntity, parsedName);
-        customBossEntity.setName(parsedName, false);
     }
 
     private void setBaby(LivingEntity livingEntity) {
@@ -111,7 +111,7 @@ public class CustomBossMegaConsumer {
         try {
             DisguiseEntity.disguise(customBossesConfigFields.getDisguise(), livingEntity, customBossesConfigFields.getCustomDisguiseData(), customBossesConfigFields.getFilename());
         } catch (Exception ex) {
-            new WarningMessage("Failed to load LibsDisguises disguise correctly!");
+            Logger.warn("Failed to load LibsDisguises disguise correctly!");
         }
     }
 
@@ -123,7 +123,7 @@ public class CustomBossMegaConsumer {
             customBossEntity.setCustomModel(CustomModel.generateCustomModel(livingEntity, customBossesConfigFields.getCustomModel(), customBossEntity.getName()));
         } catch (Exception exception) {
             customBossEntity.setCustomModel(null);
-            new WarningMessage("Failed to initialize Custom Model for Custom Boss " + customBossesConfigFields.getFilename());
+            Logger.warn("Failed to initialize Custom Model for Custom Boss " + customBossesConfigFields.getFilename());
             exception.printStackTrace();
         }
     }
@@ -150,7 +150,7 @@ public class CustomBossMegaConsumer {
                 }
             }
         } catch (Exception ex) {
-            new WarningMessage("Tried to assign a material slot to an invalid entity! Boss is from file" + customBossesConfigFields.getFilename());
+            Logger.warn("Tried to assign a material slot to an invalid entity! Boss is from file" + customBossesConfigFields.getFilename());
         }
     }
 

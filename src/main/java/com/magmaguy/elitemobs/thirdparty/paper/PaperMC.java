@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.thirdparty.paper;
 
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public class PaperMC {
@@ -12,7 +12,7 @@ public class PaperMC {
         try {
             paperMC = Class.forName("com.destroystokyo.paper.VersionHistoryManager$VersionData") != null;
         } catch (ClassNotFoundException e) {
-            Bukkit.getLogger().info("Not paper");
+            Logger.info("Not paper");
         }
     }
 

@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.powers.scripts;
 import com.magmaguy.elitemobs.api.*;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
@@ -25,7 +25,7 @@ public class ScriptListener implements Listener {
         for (String string : fallingEntityDataPair.getScriptAction().getBlueprint().getLandingScripts()) {
             EliteScript iteratedScript = fallingEntityDataPair.getScriptAction().getEliteScriptMap().get(string);
             if (iteratedScript == null) {
-                new WarningMessage("Elite script " + string + " does not exist for landing scripts!");
+                Logger.warn("Elite script " + string + " does not exist for landing scripts!");
                 return;
             }
             iteratedScript.check(landingLocation, fallingEntityDataPair.getScriptActionData());

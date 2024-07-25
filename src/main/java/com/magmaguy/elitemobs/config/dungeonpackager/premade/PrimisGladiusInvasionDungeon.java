@@ -35,5 +35,6 @@ public class PrimisGladiusInvasionDungeon extends DungeonPackagerConfigFields {
                 Map.of("name", "mythic", "id", 2, "levelSync", 12)
         ));
         setMaxPlayerCount(5);
+        setListedInTeleports(false);
     }
 }

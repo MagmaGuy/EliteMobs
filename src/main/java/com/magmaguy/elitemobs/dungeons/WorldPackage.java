@@ -1,10 +1,10 @@
 package com.magmaguy.elitemobs.dungeons;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
 import com.magmaguy.elitemobs.dungeons.utility.DungeonUtils;
-import com.magmaguy.elitemobs.utils.WarningMessage;
 import com.magmaguy.elitemobs.wormhole.Wormhole;
+import com.magmaguy.magmacore.util.ChatColorConverter;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -28,7 +28,7 @@ public class WorldPackage extends EMPackage {
         super.baseInitialization();
         if (dungeonPackagerConfigFields.getWorldName() == null || dungeonPackagerConfigFields.getWorldName().isEmpty()) {
             this.isDownloaded = this.isInstalled = false;
-            new WarningMessage("Packaged content " + dungeonPackagerConfigFields.getFilename() + " does not have a valid world name in the dungeon packager!");
+            Logger.warn("Packaged content " + dungeonPackagerConfigFields.getFilename() + " does not have a valid world name in the dungeon packager!");
             return;
         }
 

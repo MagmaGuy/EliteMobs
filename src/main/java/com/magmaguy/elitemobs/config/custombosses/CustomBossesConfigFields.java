@@ -1,16 +1,15 @@
 package com.magmaguy.elitemobs.config.custombosses;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.CustomConfigFields;
-import com.magmaguy.elitemobs.config.CustomConfigFieldsInterface;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.items.customloottable.CustomLootTable;
 import com.magmaguy.elitemobs.mobconstructor.BossType;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.powers.scripts.caching.EliteScriptBlueprint;
 import com.magmaguy.elitemobs.thirdparty.custommodels.CustomModel;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.ChatColorConverter;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Material;
@@ -20,7 +19,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
-public class CustomBossesConfigFields extends CustomConfigFields implements CustomConfigFieldsInterface {
+public class CustomBossesConfigFields extends CustomConfigFields {
 
     @Getter
     private static final Map<String, CustomBossesConfigFields> regionalElites = new HashMap<>();
@@ -273,7 +272,7 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
             try {
                 return Integer.valueOf(level);
             } catch (Exception ex) {
-                new WarningMessage("Regional Elite Mob level for " + getFilename() + " is neither numeric nor dynamic. Fix the configuration for it.");
+                Logger.warn("Regional Elite Mob level for " + getFilename() + " is neither numeric nor dynamic. Fix the configuration for it.");
                 return 1;
             }
         }
@@ -285,7 +284,7 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         try {
             fileConfiguration.save(file);
         } catch (Exception ex) {
-            new WarningMessage("Failed to save on spawn block states!", true);
+            Logger.warn("Failed to save on spawn block states!", true);
         }
     }
 
@@ -295,7 +294,7 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         try {
             fileConfiguration.save(file);
         } catch (Exception ex) {
-            new WarningMessage("Failed to save on remove block states!", true);
+            Logger.warn("Failed to save on remove block states!", true);
         }
     }
 
@@ -305,7 +304,7 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         this.entityType = processEnum("entityType", entityType, EntityType.ZOMBIE, EntityType.class, true);
         if (entityType == null) entityType = EntityType.ZOMBIE;
         if (EliteMobProperties.getPluginData(entityType) == null) {
-            new WarningMessage("Failed to get plugin data for entity type " + entityType.toString() + " in file " + filename + " ! Defaulting to zombie.");
+            Logger.warn("Failed to get plugin data for entity type " + entityType.toString() + " in file " + filename + " ! Defaulting to zombie.");
             entityType = EntityType.ZOMBIE;
         }
         this.instanced = processBoolean("instanced", instanced, false, false);
@@ -339,7 +338,7 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         this.locationMessage = translatable(filename, "locationMessage", processString("locationMessage", locationMessage, null, false));
         this.mountedEntity = processString("mountedEntity", mountedEntity, null, false);
         if (mountedEntity != null && mountedEntity.equals(filename)) {
-            new WarningMessage("Custom Boss " + filename + " has itself for a mount. This makes an infinite loop of the boss mounting itself. The boss mount will not be used for safety reasons.");
+            Logger.warn("Custom Boss " + filename + " has itself for a mount. This makes an infinite loop of the boss mounting itself. The boss mount will not be used for safety reasons.");
             this.mountedEntity = null;
         }
         this.customModelMountPointID = processString("customModelMountPointID", customModelMountPointID, null, false);
@@ -392,7 +391,7 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         try {
             this.bossType = BossType.valueOf(bossTypeString.toUpperCase(Locale.ROOT));
         } catch (Exception e) {
-            new WarningMessage("Boss type for boss " + filename + " is not a valid boss type!");
+            Logger.warn("Boss type for boss " + filename + " is not a valid boss type!");
         }
 
         this.scale = processDouble("scale", scale, 1, false);
@@ -420,16 +419,16 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
                         try {
                             material = Material.getMaterial(parsedDamageModifier.replace("material:", ""));
                         } catch (Exception ex) {
-                            new WarningMessage("Boss " + getFilename() + " has invalid entry " + parsedDamageModifier + " !");
+                            Logger.warn("Boss " + getFilename() + " has invalid entry " + parsedDamageModifier + " !");
                         }
                     else if (parsedDamageModifier.contains("multiplier:"))
                         try {
                             multiplier = Double.parseDouble(parsedDamageModifier.replace("multiplier:", ""));
                         } catch (Exception ex) {
-                            new WarningMessage("Boss " + getFilename() + " has invalid entry " + parsedDamageModifier + " !");
+                            Logger.warn("Boss " + getFilename() + " has invalid entry " + parsedDamageModifier + " !");
                         }
                     else
-                        new WarningMessage("Entry " + parsedDamageModifier + " is invalid for boss file " + getFilename() + " !");
+                        Logger.warn("Entry " + parsedDamageModifier + " is invalid for boss file " + getFilename() + " !");
                 }
 
             } else {
@@ -439,16 +438,16 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
                         try {
                             material = Material.getMaterial(parsedDamageModifier.replace("material=", ""));
                         } catch (Exception ex) {
-                            new WarningMessage("Boss " + getFilename() + " has invalid entry " + parsedDamageModifier + " !");
+                            Logger.warn("Boss " + getFilename() + " has invalid entry " + parsedDamageModifier + " !");
                         }
                     else if (parsedDamageModifier.contains("multiplier="))
                         try {
                             multiplier = Double.parseDouble(parsedDamageModifier.replace("multiplier=", ""));
                         } catch (Exception ex) {
-                            new WarningMessage("Boss " + getFilename() + " has invalid entry " + parsedDamageModifier + " !");
+                            Logger.warn("Boss " + getFilename() + " has invalid entry " + parsedDamageModifier + " !");
                         }
                     else
-                        new WarningMessage("Entry " + parsedDamageModifier + " is invalid for boss file " + getFilename() + " !");
+                        Logger.warn("Entry " + parsedDamageModifier + " is invalid for boss file " + getFilename() + " !");
                 }
 
             }
@@ -481,7 +480,7 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         try {
             fileConfiguration.save(file);
         } catch (Exception ex) {
-            new WarningMessage("Failed to save boss file " + filename + "!");
+            Logger.warn("Failed to save boss file " + filename + "!");
         }
     }
 

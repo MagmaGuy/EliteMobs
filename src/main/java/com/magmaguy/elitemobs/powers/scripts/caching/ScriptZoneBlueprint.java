@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.powers.scripts.caching;
 
 import com.magmaguy.elitemobs.powers.scripts.enums.Filter;
 import com.magmaguy.elitemobs.powers.scripts.enums.ShapeType;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemorySection;
@@ -110,7 +110,7 @@ public class ScriptZoneBlueprint {
             case "yborder" -> yBorder = parseDouble(key, value, scriptName);
             case "zborder" -> zBorder = parseDouble(key, value, scriptName);
             default -> {
-                new WarningMessage("Failed to read key " + key + " for script " + scriptName + " in file " + filename);
+                Logger.warn("Failed to read key " + key + " for script " + scriptName + " in file " + filename);
             }
         }
     }

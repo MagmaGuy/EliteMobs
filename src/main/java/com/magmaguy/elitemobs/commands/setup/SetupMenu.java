@@ -1,11 +1,11 @@
 package com.magmaguy.elitemobs.commands.setup;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
 import com.magmaguy.elitemobs.config.menus.premade.GetLootMenuConfig;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import com.magmaguy.elitemobs.utils.SpigotMessage;
+import com.magmaguy.magmacore.util.ChatColorConverter;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -60,10 +60,10 @@ public class SetupMenu {
         }
     }
 
-    public static void forceResourcePack(Player player) {
-        ResourcePackDataConfig.toggleForceResourcePack(true);
-        player.sendMessage("[EliteMobs] Using the resource pack is now mandatory!");
-    }
+//    public static void forceResourcePack(Player player) {
+//        ResourcePackDataConfig.toggleForceResourcePack(true);
+//        player.sendMessage("[EliteMobs] Using the resource pack is now mandatory!");
+//    }
 
     private static void dungeonButtonInteraction(Player player, SetupMenu setupMenu, InventoryClickEvent event) {
         //for minidungeons

@@ -8,7 +8,7 @@ import com.magmaguy.elitemobs.mobconstructor.PersistentMovingEntity;
 import com.magmaguy.elitemobs.mobconstructor.PersistentObject;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -28,7 +28,7 @@ public class InstancedBossEntity extends RegionalBossEntity implements Persisten
         super.elitePowers = ElitePowerParser.parsePowers(customBossesConfigFields, this);
         if (level == -1) {
             if (dungeonInstance.getPlayers().isEmpty())
-                new WarningMessage("Failed to get players for new instance when assigning dynamic level! The bosses will default to level 1.");
+                Logger.warn("Failed to get players for new instance when assigning dynamic level! The bosses will default to level 1.");
             else
                 level = ElitePlayerInventory.getPlayer(dungeonInstance.getPlayers().stream().findFirst().get()).getNaturalMobSpawnLevel(true);
         }
@@ -41,7 +41,7 @@ public class InstancedBossEntity extends RegionalBossEntity implements Persisten
     public static void add(String stringLocation, CustomBossesConfigFields customBossesConfigFields) {
         String blueprintWorldName = stringLocation.split(",")[0];
         if (blueprintWorldName == null || blueprintWorldName.isEmpty()) {
-            new WarningMessage("Failed to get blueprint world location for custom boss " + customBossesConfigFields.getFilename() + " !");
+            Logger.warn("Failed to get blueprint world location for custom boss " + customBossesConfigFields.getFilename() + " !");
             return;
         }
         instancedBossEntities.put(blueprintWorldName, new InstancedBossContainer(ConfigurationLocation.serialize(stringLocation, true), customBossesConfigFields));

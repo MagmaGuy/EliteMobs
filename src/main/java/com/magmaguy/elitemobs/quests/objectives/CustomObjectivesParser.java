@@ -1,9 +1,9 @@
 package com.magmaguy.elitemobs.quests.objectives;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.utils.MapListInterpreter;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.ChatColorConverter;
+import com.magmaguy.magmacore.util.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +57,7 @@ public class CustomObjectivesParser {
             }
         }
         if (filename == null) {
-            new WarningMessage("Invalid filename for entry " + rawMap + " in Custom Quest " + customQuest.getCustomQuestsConfigFields().getFilename() + " . This objective will not be registered.");
+            Logger.warn("Invalid filename for entry " + rawMap + " in Custom Quest " + customQuest.getCustomQuestsConfigFields().getFilename() + " . This objective will not be registered.");
             return null;
         }
         try {
@@ -70,8 +70,8 @@ public class CustomObjectivesParser {
             else if (objectiveType.equals(ObjectiveType.ARENA))
                 return new ArenaObjective(name, filename);
         } catch (Exception ex) {
-            new WarningMessage("Failed to register objective type for quest " + customQuest.getCustomQuestsConfigFields().getFilename() + " ! This quest will be skipped");
-            new WarningMessage("Invalid entry: " + rawMap);
+            Logger.warn("Failed to register objective type for quest " + customQuest.getCustomQuestsConfigFields().getFilename() + " ! This quest will be skipped");
+            Logger.warn("Invalid entry: " + rawMap);
             ex.printStackTrace();
         }
 

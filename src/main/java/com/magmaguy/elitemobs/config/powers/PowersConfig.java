@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.config.powers;
 
-import com.magmaguy.elitemobs.config.CustomConfig;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
+import com.magmaguy.magmacore.config.CustomConfig;
 
 import java.util.HashMap;
 import java.util.Map;

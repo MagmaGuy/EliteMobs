@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.quests.rewards;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.utils.ObjectSerializer;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -58,7 +58,7 @@ public class RewardEntry implements Serializable {
             try {
                 this.itemStack = ObjectSerializer.itemStackArrayFromBase64(deserializedItemStack);
             } catch (Exception ex) {
-                new WarningMessage("Failed to serialize item stack");
+                Logger.warn("Failed to serialize item stack");
                 ex.printStackTrace();
             }
     }
@@ -75,6 +75,6 @@ public class RewardEntry implements Serializable {
                 else if (currencyAmount != 0)
                     EconomyHandler.addCurrency(playerUUID, currencyAmount);
                 else
-                    new WarningMessage("Quest failed to dispatch reward! Report this to the dev!", true);
+                    Logger.warn("Quest failed to dispatch reward! Report this to the dev!", true);
     }
 }

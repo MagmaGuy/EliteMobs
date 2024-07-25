@@ -14,9 +14,8 @@ import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
-import com.magmaguy.elitemobs.utils.InfoMessage;
-import com.magmaguy.elitemobs.utils.WarningMessage;
 import com.magmaguy.elitemobs.utils.WeightedProbability;
+import com.magmaguy.magmacore.util.Logger;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Location;
@@ -138,7 +137,7 @@ public class LootTables implements Listener {
         String selectedLootSystem = pickWeighedProbability(weightedProbability);
 
         if (selectedLootSystem == null) {
-            new InfoMessage("Your EliteMobs loot configuration resulted in no loot getting dropped. This is not a bug. " + "If you want! players to be able to progress at all in the EliteMobs plugin, review your configuration settings.");
+            Logger.info("Your EliteMobs loot configuration resulted in no loot getting dropped. This is not a bug. " + "If you want! players to be able to progress at all in the EliteMobs plugin, review your configuration settings.");
             return null;
         }
 
@@ -282,7 +281,7 @@ public class LootTables implements Listener {
         for (ItemStack itemStack : CustomItem.getWeighedFixedItems().keySet()) {
             Double shouldntBeNull = CustomItem.getWeighedFixedItems().get(itemStack);
             if (shouldntBeNull != null) totalWeight += CustomItem.getWeighedFixedItems().get(itemStack);
-            else new WarningMessage("Item " + itemStack.getItemMeta().getDisplayName() + " reported a null weight!");
+            else Logger.warn("Item " + itemStack.getItemMeta().getDisplayName() + " reported a null weight!");
         }
 
         ItemStack generatedItemStack = null;
