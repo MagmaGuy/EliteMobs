@@ -12,10 +12,10 @@ public class PlaceBossCommand extends AdvancedCommand {
         super(List.of("place"));
         addLiteral("boss");
         addArgument("filename", new ArrayList<>(CustomBossesConfig.getCustomBosses().keySet()));
-        setUsage("/em addSpawn boss <filename>");
-        setPermission("elitemobs.*");
+        setUsage("/em place boss <filename>");
+        setPermission("elitemobs.place.boss");
         setSenderType(SenderType.PLAYER);
-        setDescription("Toggles whether the setup message will show up.");
+        setDescription("Add a spawn location for the specified boss at your current location.");
     }
 
     @Override

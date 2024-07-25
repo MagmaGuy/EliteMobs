@@ -16,9 +16,9 @@ public class PlaceWormholeCommand extends AdvancedCommand {
         addArgument("filename", new ArrayList<>(WormholeConfig.getWormholes().keySet()));
         addArgument("wormholeOption", List.of(1, 2));
         setUsage("/em wormhole <filename> <1/2>");
-        setPermission("elitemobs.*");
+        setPermission("elitemobs.place.wormhole");
         setSenderType(SenderType.PLAYER);
-        setDescription("Sets the language that the server will use for EliteMobs, based on a translation file in the translation files.");
+        setDescription("Place a wormhole teleport at your current location.");
     }
 
     @Override
