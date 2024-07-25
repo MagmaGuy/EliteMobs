@@ -12,7 +12,7 @@ public class DiscordMessageCommand extends AdvancedCommand {
         super(List.of("discord"));
         addArgument("message", new ArrayList<>());
         setUsage("/em discord <message>");
-        setPermission("elitemobs.*");
+        setPermission("elitemobs.discord.message");
         setDescription("Sends a message to the Discord via DiscordSRV, for debugging purposes");
     }
 
