@@ -13,8 +13,8 @@ public class KillTypeCommand extends AdvancedCommand {
         super(List.of("kill"));
         addLiteral("type");
         addArgument("type", new ArrayList<>());
-        setUsage("/em kill type <radius>");
-        setPermission("elitemobs.*");
+        setUsage("/em kill type <entityType>");
+        setPermission("elitemobs.kill.type");
         setSenderType(SenderType.PLAYER);
         setDescription("Kills all elites of the specified type.");
     }

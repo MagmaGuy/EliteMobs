@@ -13,7 +13,7 @@ public class LootStats extends AdvancedCommand {
         super(List.of("loot"));
         addLiteral("stats");
         setUsage("/em loot stats");
-        setPermission("elitemobs.*");
+        setPermission("elitemobs.loot.stats");
         setSenderType(SenderType.PLAYER);
         setDescription("Provides EliteMobs stats for the currently held item.");
     }

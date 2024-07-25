@@ -12,7 +12,7 @@ public class RankSetCommand extends AdvancedCommand {
         addArgument("prestigeLevel", new ArrayList<>());
         addArgument("guildLevel", new ArrayList<>());
         setUsage("/em rank <player> <prestigeLevel> <guildLevel>");
-        setPermission("elitemobs.*");
+        setPermission("elitemobs.rank.set");
         setDescription("Manually sets a player's guild rank to a the prestige level and guild level specified.");
     }
 
