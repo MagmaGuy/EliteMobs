@@ -7,7 +7,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 public class PlayerQuitCleanup implements Listener {
     @EventHandler
-    public void onPlayerQuit(PlayerQuitEvent event){
+    public void onPlayerQuit(PlayerQuitEvent event) {
         if (ScriptAction.getInvulnerablePlayers().contains(event.getPlayer()))
             event.getPlayer().setInvulnerable(false);
     }

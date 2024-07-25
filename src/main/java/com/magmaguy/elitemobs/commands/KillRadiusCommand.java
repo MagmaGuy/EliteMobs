@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.commands.admin.KillHandler;
 import com.magmaguy.magmacore.command.AdvancedCommand;
-import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
 
 import java.util.ArrayList;
@@ -13,13 +12,13 @@ public class KillRadiusCommand extends AdvancedCommand {
         super(List.of("kill"));
         addArgument("radius", new ArrayList<>());
         setUsage("/em kill <radius>");
-        setPermission("elitemobs.kill.command");
+        setPermission("elitemobs.*");
         setSenderType(SenderType.PLAYER);
         setDescription("Kills all elites in the specified radius.");
     }
 
     @Override
-    public void execute(CommandData commandData) {
-        KillHandler.radiusKillAggressiveMobs(commandData.getPlayerSender(), commandData.getIntegerArgument("radius"));
+    public void execute() {
+        KillHandler.radiusKillAggressiveMobs(getCurrentPlayerSender(), getIntegerArgument("radius"));
     }
 }

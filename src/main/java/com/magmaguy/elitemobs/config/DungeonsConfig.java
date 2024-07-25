@@ -1,12 +1,11 @@
 package com.magmaguy.elitemobs.config;
 
+import com.magmaguy.magmacore.config.ConfigurationFile;
 import lombok.Getter;
-import org.bukkit.configuration.file.FileConfiguration;
 
-import java.io.File;
 import java.util.List;
 
-public class DungeonsConfig {
+public class DungeonsConfig extends ConfigurationFile {
 
     @Getter
     private static String instancedDungeonTitle;
@@ -35,12 +34,12 @@ public class DungeonsConfig {
     @Getter
     private static double witherDamageMultiplier;
 
-    private DungeonsConfig() {
+    public DungeonsConfig() {
+        super("dungeons.yml");
     }
 
-    public static void initializeConfig() {
-        File file = ConfigurationEngine.fileCreator("dungeons.yml");
-        FileConfiguration fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
+    @Override
+    public void initializeValues() {
 
         dungeonRezInstructions = ConfigurationEngine.setString(
                 List.of("Sets the text that appears over resurrection banners in dungeons"),
@@ -94,8 +93,5 @@ public class DungeonsConfig {
                 List.of("Sets the damage multiplier for fire damage in dungeons",
                         "This is important for balance as by default the damage is a bit too high for the dungeons as we design them"),
                 fileConfiguration, "poisonDamageMultiplier", 0.5);
-
-        ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }
-
 }

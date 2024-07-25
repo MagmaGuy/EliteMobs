@@ -2,8 +2,6 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.mobconstructor.custombosses.transitiveblocks.TransitiveBlockCommand;
 import com.magmaguy.magmacore.command.AdvancedCommand;
-import com.magmaguy.magmacore.command.CommandData;
-import com.magmaguy.magmacore.command.SenderType;
 
 import java.util.List;
 
@@ -12,13 +10,12 @@ public class TransitiveBlocksCancelCommand extends AdvancedCommand {
         super(List.of("transitiveBlocks"));
         addLiteral("cancel");
         setUsage("/em transitiveBlocks cancel");
+        setPermission("elitemobs.*");
         setDescription("Cancels transitive block registration.");
-        setSenderType(SenderType.PLAYER);
-        setPermission("elitemobs.transitiveblocks");
     }
 
     @Override
-    public void execute(CommandData commandData) {
-        TransitiveBlockCommand.processCommand(commandData.getPlayerSender());
+    public void execute() {
+        TransitiveBlockCommand.processCommand(getCurrentPlayerSender());
     }
 }

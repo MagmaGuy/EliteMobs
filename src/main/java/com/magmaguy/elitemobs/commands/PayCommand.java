@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.magmacore.command.AdvancedCommand;
-import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
 
 import java.util.ArrayList;
@@ -14,15 +13,14 @@ public class PayCommand extends AdvancedCommand {
         addArgument("amount", new ArrayList<>());
         setDescription("Send money to a player, minus tax.");
         setUsage("/em pay <player> <amount>");
-        setPermission("elitemobs.money.pay");
         setSenderType(SenderType.PLAYER);
     }
 
     @Override
-    public void execute(CommandData commandData) {
+    public void execute() {
         CurrencyCommandsHandler.payCommand(
-               commandData.getPlayerSender(),
-                commandData.getStringArgument("player"),
-                commandData.getDoubleArgument("amount"));
+                getCurrentPlayerSender(),
+                getStringArgument("player"),
+                getDoubleArgument("amount"));
     }
 }

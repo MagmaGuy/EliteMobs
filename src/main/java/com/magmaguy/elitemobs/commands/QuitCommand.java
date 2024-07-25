@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.magmacore.command.AdvancedCommand;
-import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
 
 import java.util.List;
@@ -16,9 +15,9 @@ public class QuitCommand extends AdvancedCommand {
     }
 
     @Override
-    public void execute(CommandData commandData) {
-        MatchInstance matchInstance = MatchInstance.getAnyPlayerInstance(commandData.getPlayerSender());
+    public void execute() {
+        MatchInstance matchInstance = MatchInstance.getAnyPlayerInstance(getCurrentPlayerSender());
         if (matchInstance != null)
-            matchInstance.removeAnyKind(commandData.getPlayerSender());
+            matchInstance.removeAnyKind(getCurrentPlayerSender());
     }
 }

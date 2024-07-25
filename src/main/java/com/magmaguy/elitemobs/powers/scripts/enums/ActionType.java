@@ -33,7 +33,8 @@ public enum ActionType {
     SPAWN_FALLING_BLOCK(false),
     MODIFY_DAMAGE(true),
     SUMMON_ENTITY(false),
-    NAVIGATE(false);
+    NAVIGATE(false),
+    SCALE(false);
 
     @Getter
     private final boolean requiresLivingEntity;

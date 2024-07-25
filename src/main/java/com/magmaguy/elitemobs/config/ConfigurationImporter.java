@@ -1,12 +1,11 @@
 package com.magmaguy.elitemobs.config;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.thirdparty.custommodels.CustomModel;
-import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.SpigotMessage;
-import com.magmaguy.elitemobs.utils.WarningMessage;
-import com.magmaguy.elitemobs.utils.ZipFile;
+import com.magmaguy.magmacore.util.ChatColorConverter;
+import com.magmaguy.magmacore.util.Logger;
+import com.magmaguy.magmacore.util.ZipFile;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -27,7 +26,7 @@ public class ConfigurationImporter {
             try {
                 Files.createDirectory(Paths.get(configurationsPath.normalize() + "" + File.separatorChar + "imports"));
             } catch (Exception exception) {
-                new WarningMessage("Failed to create import directory! Tell the dev!");
+                Logger.warn("Failed to create import directory! Tell the dev!");
                 exception.printStackTrace();
             }
             return;
@@ -37,7 +36,7 @@ public class ConfigurationImporter {
         try {
             importsFile = new File(Paths.get(MetadataHandler.PLUGIN.getDataFolder().getCanonicalPath() + File.separatorChar + "imports").toString());
         } catch (Exception ex) {
-            new WarningMessage("Failed to get imports folder! Report this to the dev!");
+            Logger.warn("Failed to get imports folder! Report this to the dev!");
             return;
         }
 
@@ -47,10 +46,11 @@ public class ConfigurationImporter {
         for (File zippedFile : importsFile.listFiles()) {
             File unzippedFile;
             try {
-                if (zippedFile.getName().contains(".zip")) unzippedFile = ZipFile.unzip(zippedFile.getName());
+                if (zippedFile.getName().contains(".zip"))
+                    unzippedFile = ZipFile.unzip(zippedFile, new File(zippedFile.getAbsolutePath().replace(".zip", "")));
                 else unzippedFile = zippedFile;
             } catch (Exception e) {
-                new WarningMessage("Failed to unzip config file " + zippedFile.getName() + " ! Tell the dev!");
+                Logger.warn("Failed to unzip config file " + zippedFile.getName() + " ! Tell the dev!");
                 e.printStackTrace();
                 continue;
             }
@@ -105,18 +105,18 @@ public class ConfigurationImporter {
                             if (CustomModel.customModelsEnabled()) {
                                 importedModels = true;
                             } else
-                                new WarningMessage("You need FreeMinecraftModels or ModelEngine (ModelEngine R3 specifically, R4+ won't work) to use custom models!");
+                                Logger.warn("You need FreeMinecraftModels or ModelEngine (ModelEngine R3 specifically, R4+ won't work) to use custom models!");
                             break;
                         case "schematics":
-                            new WarningMessage("You just tried to import legacy content! Schematic dungeons no longer exist as of EliteMobs 9.0, use BetterStructures shrines instead!");
+                            Logger.warn("You just tried to import legacy content! Schematic dungeons no longer exist as of EliteMobs 9.0, use BetterStructures shrines instead!");
                             break;
                         default:
-                            new WarningMessage("Directory " + file.getName() + " for zipped file " + zippedFile.getName() + " was not a recognized directory for the file import system! Was the zipped file packaged correctly?");
+                            Logger.warn("Directory " + file.getName() + " for zipped file " + zippedFile.getName() + " was not a recognized directory for the file import system! Was the zipped file packaged correctly?");
                     }
                     deleteDirectory(file);
                 }
             } catch (Exception e) {
-                new WarningMessage("Failed to move files from " + zippedFile.getName() + " ! Tell the dev!");
+                Logger.warn("Failed to move files from " + zippedFile.getName() + " ! Tell the dev!");
                 e.printStackTrace();
                 continue;
             }
@@ -124,7 +124,7 @@ public class ConfigurationImporter {
                 unzippedFile.delete();
                 zippedFile.delete();
             } catch (Exception ex) {
-                new WarningMessage("Failed to delete zipped file " + zippedFile.getName() + "! Tell the dev!");
+                Logger.warn("Failed to delete zipped file " + zippedFile.getName() + "! Tell the dev!");
                 ex.printStackTrace();
             }
         }
@@ -142,7 +142,7 @@ public class ConfigurationImporter {
         if (file == null) return;
         if (file.isDirectory()) for (File iteratedFile : file.listFiles())
             if (iteratedFile != null) deleteDirectory(iteratedFile);
-        new InfoMessage("Cleaning up " + file.getPath());
+        Logger.info("Cleaning up " + file.getPath());
         file.delete();
     }
 
@@ -151,16 +151,16 @@ public class ConfigurationImporter {
             try {
                 File destinationFile = new File(Paths.get(Bukkit.getWorldContainer().getCanonicalPath() + File.separatorChar + file.getName()).normalize().toString());
                 if (destinationFile.exists()) {
-                    new InfoMessage("Overriding existing directory " + destinationFile.getPath());
+                    Logger.info("Overriding existing directory " + destinationFile.getPath());
                     if (Bukkit.getWorld(file.getName()) != null) {
                         Bukkit.unloadWorld(file.getName(), false);
-                        new WarningMessage("Unloaded world " + file.getName() + " for safe replacement!");
+                        Logger.warn("Unloaded world " + file.getName() + " for safe replacement!");
                     }
                     deleteDirectory(destinationFile);
                 }
                 FileUtils.moveDirectory(file, destinationFile);
             } catch (Exception exception) {
-                new WarningMessage("Failed to move worlds for " + file.getName() + "! Tell the dev!");
+                Logger.warn("Failed to move worlds for " + file.getName() + "! Tell the dev!");
                 exception.printStackTrace();
             }
     }
@@ -168,10 +168,10 @@ public class ConfigurationImporter {
     private static void moveDirectory(File unzippedDirectory, Path targetPath, boolean force) {
         for (File file : unzippedDirectory.listFiles())
             try {
-                new InfoMessage("Adding " + file.getCanonicalPath());
+                Logger.info("Adding " + file.getCanonicalPath());
                 moveFile(file, targetPath, force);
             } catch (Exception exception) {
-                new WarningMessage("Failed to move directories for " + file.getName() + "! Tell the dev!");
+                Logger.warn("Failed to move directories for " + file.getName() + "! Tell the dev!");
                 exception.printStackTrace();
             }
     }
@@ -191,7 +191,7 @@ public class ConfigurationImporter {
                 Files.move(file.toPath(), Paths.get(targetPath + "" + File.separatorChar + file.getName()), StandardCopyOption.REPLACE_EXISTING);
             }
         } catch (Exception exception) {
-            new WarningMessage("Failed to move directories for " + file.getName() + "! Tell the dev!");
+            Logger.warn("Failed to move directories for " + file.getName() + "! Tell the dev!");
             exception.printStackTrace();
         }
     }

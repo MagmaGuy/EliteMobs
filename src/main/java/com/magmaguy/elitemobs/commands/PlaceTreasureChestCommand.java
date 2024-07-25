@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestsConfig;
 import com.magmaguy.magmacore.command.AdvancedCommand;
-import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
 
 import java.util.ArrayList;
@@ -14,13 +13,13 @@ public class PlaceTreasureChestCommand extends AdvancedCommand {
         addLiteral("treasureChest");
         addArgument("filename", new ArrayList<>(CustomTreasureChestsConfig.getCustomTreasureChestConfigFields().keySet()));
         setUsage("/em place treasureChest <filename>");
-        setPermission("elitemobs.place.admin");
+        setPermission("elitemobs.*");
         setSenderType(SenderType.PLAYER);
         setDescription("Permanently adds a treasure chest to the location the user is standing on.");
     }
 
     @Override
-    public void execute(CommandData commandData) {
-        CustomTreasureChestsConfig.addTreasureChestEntry(commandData.getPlayerSender(), commandData.getStringArgument("filename"));
+    public void execute() {
+        CustomBossCommandHandler.addSpawnLocation(getStringArgument("filename"), getCurrentPlayerSender());
     }
 }

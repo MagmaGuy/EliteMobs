@@ -1,17 +1,18 @@
 package com.magmaguy.elitemobs.config.customquests;
 
 import com.magmaguy.elitemobs.config.CustomConfigFields;
-import com.magmaguy.elitemobs.config.CustomConfigFieldsInterface;
-import com.magmaguy.elitemobs.utils.InfoMessage;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.*;
 
-public class CustomQuestsConfigFields extends CustomConfigFields implements CustomConfigFieldsInterface {
+public class CustomQuestsConfigFields extends CustomConfigFields {
 
+    @Getter
+    @Setter
+    protected Map<String, Map<String, Object>> customObjectives = new HashMap();
     @Getter
     @Setter
     List<String> temporaryPermissions = new ArrayList<>();
@@ -21,9 +22,6 @@ public class CustomQuestsConfigFields extends CustomConfigFields implements Cust
     @Getter
     @Setter
     private int questLevel = 0;
-    @Getter
-    @Setter
-    protected Map<String, Map<String, Object>> customObjectives = new HashMap();
     @Getter
     @Setter
     private List<String> customRewardsList = new ArrayList<>();
@@ -141,13 +139,13 @@ public class CustomQuestsConfigFields extends CustomConfigFields implements Cust
                             key = "objectiveType";
                         }
                         default ->
-                                new WarningMessage("Failed to correctly parse key " + key + " in " + filename + " while updating the old quest configuration format!");
+                                Logger.warn("Failed to correctly parse key " + key + " in " + filename + " while updating the old quest configuration format!");
                     }
                 if (key.equalsIgnoreCase("dialog")) {
                     value = Arrays.stream(((String) value).split("\\n")).toList();
                 }
                 parsedEntry.put(key, value);
-                new InfoMessage("Converted quest old entry to " + key + ": " + value);
+                Logger.info("Converted quest old entry to " + key + ": " + value);
             }
             parsedObjectives.put("Objective" + counter, parsedEntry);
         }
@@ -156,7 +154,7 @@ public class CustomQuestsConfigFields extends CustomConfigFields implements Cust
         try {
             fileConfiguration.save(file);
         } catch (Exception ex) {
-            new WarningMessage("Failed to save new custom objective format!");
+            Logger.warn("Failed to save new custom objective format!");
         }
     }
 
@@ -184,7 +182,7 @@ public class CustomQuestsConfigFields extends CustomConfigFields implements Cust
             rawMap = fileConfiguration.getConfigurationSection("customObjectives").getValues(false);
 
         if (rawMap == null) {
-            new WarningMessage("Failed to parse custom objectives for " + filename);
+            Logger.warn("Failed to parse custom objectives for " + filename);
             return new HashMap<>();
         }
         //Parse for the specific translatable elements

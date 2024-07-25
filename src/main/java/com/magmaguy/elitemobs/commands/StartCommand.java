@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.magmacore.command.AdvancedCommand;
-import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
 import com.magmaguy.magmacore.util.Logger;
 
@@ -14,15 +13,14 @@ public class StartCommand extends AdvancedCommand {
         setUsage("/em start");
         setDescription("When in instanced content, makes the player start the instance.");
         setSenderType(SenderType.PLAYER);
-        setPermission("elitemobs.instance.start");
     }
 
     @Override
-    public void execute(CommandData commandData) {
-        MatchInstance matchInstance = MatchInstance.getPlayerInstance(commandData.getPlayerSender());
+    public void execute() {
+        MatchInstance matchInstance = MatchInstance.getPlayerInstance(getCurrentPlayerSender());
         if (matchInstance != null) {
             matchInstance.countdownMatch();
         } else
-            Logger.sendMessage(commandData.getCommandSender(), "You are not queued for instanced content!");
+            Logger.sendMessage(getCurrentCommandSender(), "You are not queued for instanced content!");
     }
 }

@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import com.magmaguy.magmacore.command.AdvancedCommand;
-import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
 import org.bukkit.entity.EntityType;
 
@@ -18,17 +17,17 @@ public class SpawnElite extends AdvancedCommand {
         addArgument("level", new ArrayList<>());
         addArgument("powers", ElitePower.getElitePowers().keySet().stream().toList());
         setUsage("/em spawn elite <entityType> <level> <power1> <power2> <power3> <...>");
-        setPermission("elitemobs.place.admin");
+        setPermission("elitemobs.*");
         setSenderType(SenderType.PLAYER);
         setDescription("Spawns an elite of the specified type and level, and optionally with the specified powers.");
     }
 
     @Override
-    public void execute(CommandData commandData) {
+    public void execute() {
         SpawnCommand.spawnEliteEntityTypeCommand(
-                commandData.getPlayerSender(),
-                EntityType.valueOf(commandData.getStringArgument("entityType")),
-                commandData.getIntegerArgument("level"),
-                Optional.of(commandData.getStringSequenceArgument("powers")));
+                getCurrentPlayerSender(),
+                EntityType.valueOf(getStringArgument("entityType")),
+                getIntegerArgument("level"),
+                Optional.of(getStringSequenceArgument("powers")));
     }
 }

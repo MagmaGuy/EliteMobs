@@ -1,14 +1,13 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.magmacore.command.AdvancedCommand;
-import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class AdventurersGuildCommand extends AdvancedCommand {
     public AdventurersGuildCommand() {
-        super(new ArrayList<>());
+        super(List.of("adventurersguild", "ag"));
         setUsage("/em adventurersguild");
         setPermission("elitemobs.adventurersguild.command");
         setSenderType(SenderType.PLAYER);
@@ -16,7 +15,7 @@ public class AdventurersGuildCommand extends AdvancedCommand {
     }
 
     @Override
-    public void execute(CommandData commandData) {
-        com.magmaguy.elitemobs.commands.guild.AdventurersGuildCommand.adventurersGuildCommand(commandData.getPlayerSender());
+    public void execute() {
+        com.magmaguy.elitemobs.commands.guild.AdventurersGuildCommand.adventurersGuildCommand(getCurrentPlayerSender());
     }
 }

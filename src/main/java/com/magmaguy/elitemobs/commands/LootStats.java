@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.magmacore.command.AdvancedCommand;
-import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -14,14 +13,14 @@ public class LootStats extends AdvancedCommand {
         super(List.of("loot"));
         addLiteral("stats");
         setUsage("/em loot stats");
-        setPermission("elitemobs.loot.stats");
+        setPermission("elitemobs.*");
         setSenderType(SenderType.PLAYER);
         setDescription("Provides EliteMobs stats for the currently held item.");
     }
 
     @Override
-    public void execute(CommandData commandData) {
-        Player player = commandData.getPlayerSender();
+    public void execute() {
+        Player player = getCurrentPlayerSender();
         ItemStack item = player.getInventory().getItemInMainHand();
         double attackSpeed = EliteItemManager.getAttackSpeed(item);
         double damage = EliteItemManager.getBaseDamage(item);

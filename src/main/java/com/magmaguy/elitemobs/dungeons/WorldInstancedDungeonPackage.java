@@ -4,9 +4,6 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfig;
 import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
 import com.magmaguy.magmacore.util.ChatColorConverter;
-import com.magmaguy.magmacore.util.Logger;
-import org.apache.commons.io.FileUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.io.File;
@@ -28,17 +25,6 @@ public class WorldInstancedDungeonPackage extends EMPackage implements CombatCon
             this.isDownloaded = false;
             this.isInstalled = false;
             return;
-        } else {
-            //This removes all instanced worlds not previously correctly removed
-            for (File worldFile : Bukkit.getWorldContainer().listFiles()){
-                if (worldFile.getName().contains(file.getName()) && worldFile.getName().matches(".*_\\d{1,2}$")) {
-                    try{
-                    FileUtils.deleteDirectory(worldFile);
-                    Logger.info("Removing previously instanced world " + worldFile.getName());}catch (Exception e){
-                        Logger.warn("Failed to remove previously instanced world " + worldFile.getName());
-                    }
-                }
-            }
         }
         this.isDownloaded = true;
         this.isInstalled = dungeonPackagerConfigFields.isEnabled();
