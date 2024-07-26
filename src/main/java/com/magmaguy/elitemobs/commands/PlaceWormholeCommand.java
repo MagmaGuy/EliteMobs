@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.commands;
 import com.magmaguy.elitemobs.config.wormholes.WormholeConfig;
 import com.magmaguy.elitemobs.wormhole.Wormhole;
 import com.magmaguy.magmacore.command.AdvancedCommand;
+import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
 import com.magmaguy.magmacore.util.Logger;
 
@@ -22,20 +23,20 @@ public class PlaceWormholeCommand extends AdvancedCommand {
     }
 
     @Override
-    public void execute() {
+    public void execute(CommandData commandData) {
         for (Wormhole wormhole : Wormhole.getWormholes()) {
-            if (wormhole.getWormholeConfigFields().getFilename().equals(getStringArgument("wormholeFilename")))
-                switch (getStringArgument("wormholeOption")) {
+            if (wormhole.getWormholeConfigFields().getFilename().equals(commandData.getStringArgument("wormholeFilename")))
+                switch (commandData.getStringArgument("wormholeOption")) {
                     case "1":
-                        wormhole.getWormholeEntry1().updateLocation(getCurrentPlayerSender());
+                        wormhole.getWormholeEntry1().updateLocation(commandData.getPlayerSender());
                         return;
                     case "2":
-                        wormhole.getWormholeEntry2().updateLocation(getCurrentPlayerSender());
+                        wormhole.getWormholeEntry2().updateLocation(commandData.getPlayerSender());
                         return;
                     default:
-                        Logger.sendMessage(getCurrentCommandSender(), "Not a valid wormhole option! Pick 1 or 2 to set either end of the wormhole.");
+                        Logger.sendMessage(commandData.getCommandSender(), "Not a valid wormhole option! Pick 1 or 2 to set either end of the wormhole.");
                 }
         }
-        Logger.sendMessage(getCurrentCommandSender(), "Failed to set location for this wormhole.");
+        Logger.sendMessage(commandData.getCommandSender(), "Failed to set location for this wormhole.");
     }
 }
