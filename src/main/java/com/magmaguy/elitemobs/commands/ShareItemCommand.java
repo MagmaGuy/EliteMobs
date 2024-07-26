@@ -13,7 +13,7 @@ public class ShareItemCommand extends AdvancedCommand {
         setUsage("/em shareItem");
         setPermission("elitemobs.shareitem");
         setSenderType(SenderType.PLAYER);
-        setDescription("Teleports players to the Adventurer's Guild Hub or opens the Adventurer's Guild menu.");
+        setDescription("Shares the stats of the currently held EliteMobs item in chat.");
     }
 
     @Override

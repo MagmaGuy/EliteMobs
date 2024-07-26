@@ -14,7 +14,7 @@ public class UnbindCommand extends AdvancedCommand {
         setUsage("/em unbind");
         setPermission("elitemobs.unbind.command");
         setSenderType(SenderType.PLAYER);
-        setDescription("Opens the unbind menu or teleports the player to the Adventurer's Guild Hub");
+        setDescription("Opens the unbind menu or teleports the player to the Adventurer's Guild Hub.");
     }
 
     @Override

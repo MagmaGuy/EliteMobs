@@ -14,7 +14,7 @@ public class RepairCommand extends AdvancedCommand {
         setUsage("/em repair");
         setPermission("elitemobs.repair.command");
         setSenderType(SenderType.PLAYER);
-        setDescription("Opens the repair item menu or teleports the player to the Adventurer's Guild Hub");
+        setDescription("Opens the repair item menu or teleports the player to the Adventurer's Guild Hub.");
     }
 
     @Override
