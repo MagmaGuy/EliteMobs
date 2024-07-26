@@ -20,9 +20,9 @@ public class SpawnBossAtCommand extends AdvancedCommand {
         addArgument("x", new ArrayList<>());
         addArgument("y", new ArrayList<>());
         addArgument("z", new ArrayList<>());
-        setUsage("/setup spawnAt boss <filename> <worldName> <x> <y> <z>");
-        setPermission("elitemobs.*");
-        setDescription("Spawns a custom boss at the location the user is looking at.");
+        setUsage("/em spawn bossAt <filename> <worldName> <x> <y> <z>");
+        setPermission("elitemobs.spawn.boss.at");
+        setDescription("Spawns a custom boss at the specified location.");
     }
 
     @Override

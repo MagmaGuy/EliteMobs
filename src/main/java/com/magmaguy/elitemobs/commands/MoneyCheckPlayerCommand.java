@@ -11,7 +11,7 @@ public class MoneyCheckPlayerCommand extends AdvancedCommand {
         super(List.of("money"));
         addLiteral("check");
         addArgument("player", new ArrayList<>());
-        setUsage("/em check <player>");
+        setUsage("/em money check <player>");
         setPermission("elitemobs.money.check.player");
         setDescription("Checks the currency of the specified player.");
     }
