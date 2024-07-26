@@ -16,7 +16,7 @@ public class PlaceWormholeCommand extends AdvancedCommand {
         addLiteral("wormhole");
         addArgument("filename", new ArrayList<>(WormholeConfig.getWormholes().keySet()));
         addArgument("wormholeOption", List.of(1, 2));
-        setUsage("/em wormhole <filename> <1/2>");
+        setUsage("/em place wormhole <filename> <1/2>");
         setPermission("elitemobs.place.wormhole");
         setSenderType(SenderType.PLAYER);
         setDescription("Place a wormhole teleport at your current location.");
