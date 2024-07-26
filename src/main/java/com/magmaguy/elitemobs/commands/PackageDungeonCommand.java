@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.magmacore.command.AdvancedCommand;
+import com.magmaguy.magmacore.command.CommandData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +17,9 @@ public class PackageDungeonCommand extends AdvancedCommand {
     }
 
     @Override
-    public void execute() {
-        new PackageCommand(getCurrentCommandSender(), getStringArgument("dungeonName"), getStringArgument("version"));
+    public void execute(CommandData commandData) {
+        new PackageCommand(commandData.getCommandSender(),
+                commandData.getStringArgument("dungeonName"),
+                commandData.getStringArgument("version"));
     }
 }

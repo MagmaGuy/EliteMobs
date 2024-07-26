@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.magmacore.command.AdvancedCommand;
+import com.magmaguy.magmacore.command.CommandData;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
 
@@ -16,10 +17,10 @@ public class FireballCommand extends AdvancedCommand {
     }
 
     @Override
-    public void execute() {
-        Fireball fireball = (Fireball) getCurrentPlayerSender().getWorld().spawnEntity(getCurrentPlayerSender().getLocation(), EntityType.FIREBALL);
-        fireball.setDirection(getCurrentPlayerSender().getLocation().getDirection().normalize());
-        fireball.setShooter(getCurrentPlayerSender());
+    public void execute(CommandData commandData) {
+        Fireball fireball = (Fireball) commandData.getPlayerSender().getWorld().spawnEntity(commandData.getPlayerSender().getLocation(), EntityType.FIREBALL);
+        fireball.setDirection(commandData.getPlayerSender().getLocation().getDirection().normalize());
+        fireball.setShooter(commandData.getPlayerSender());
         fireball.setYield(3F);
         EntityTracker.registerProjectileEntity(fireball);
     }

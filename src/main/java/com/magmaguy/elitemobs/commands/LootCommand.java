@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.menus.LootMenu;
 import com.magmaguy.magmacore.command.AdvancedCommand;
+import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
 
 import java.util.List;
@@ -15,7 +16,7 @@ public class LootCommand extends AdvancedCommand {
     }
 
     @Override
-    public void execute() {
-        LootMenu.openMenu(getCurrentPlayerSender());
+    public void execute(CommandData commandData) {
+        LootMenu.openMenu(commandData.getPlayerSender());
     }
 }
