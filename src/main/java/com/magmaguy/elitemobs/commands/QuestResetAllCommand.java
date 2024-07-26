@@ -1,8 +1,8 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.commands.quests.QuestCommand;
-import com.magmaguy.elitemobs.config.customquests.CustomQuestsConfig;
 import com.magmaguy.magmacore.command.AdvancedCommand;
+import com.magmaguy.magmacore.command.CommandData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +19,7 @@ public class QuestResetAllCommand extends AdvancedCommand {
     }
 
     @Override
-    public void execute() {
-        QuestCommand.resetQuests(getCurrentCommandSender(), getStringArgument("player"));
+    public void execute(CommandData commandData) {
+        QuestCommand.resetQuests(commandData.getCommandSender(), commandData.getStringArgument("player"));
     }
 }

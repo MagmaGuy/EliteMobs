@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.magmacore.command.AdvancedCommand;
+import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.entity.Player;
 
@@ -15,14 +16,14 @@ public class HelpCommand extends AdvancedCommand {
     }
 
     @Override
-    public void execute() {
-        Logger.sendMessage(getCurrentCommandSender(), "Commands:");
+    public void execute(CommandData commandData) {
+        Logger.sendMessage(commandData.getCommandSender(), "Commands:");
         CommandManager.getInstance().commands.forEach(command -> {
-            if (getCurrentCommandSender() instanceof Player player) {
-                player.spigot().sendMessage(Logger.hoverMessage(command.usage, command.description));
+            if (commandData.getCommandSender() instanceof Player player) {
+                player.spigot().sendMessage(Logger.hoverMessage(command.getUsage(), command.getDescription()));
             } else {
-                Logger.sendSimpleMessage(getCurrentCommandSender(), command.usage);
-                Logger.sendSimpleMessage(getCurrentCommandSender(), command.description);
+                Logger.sendSimpleMessage(commandData.getCommandSender(), command.getUsage());
+                Logger.sendSimpleMessage(commandData.getCommandSender(), command.getDescription());
             }
         });
     }

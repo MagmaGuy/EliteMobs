@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.magmacore.command.AdvancedCommand;
+import com.magmaguy.magmacore.command.CommandData;
 
 import java.util.List;
 
@@ -15,7 +16,7 @@ public class RespawnAllCommand extends AdvancedCommand {
     }
 
     @Override
-    public void execute() {
+    public void execute(CommandData commandData) {
         RegionalBossEntity.getRegionalBossEntities().forEach(regionalBossEntity -> {
             if (regionalBossEntity.isRespawning()) regionalBossEntity.forceRespawn();
         });

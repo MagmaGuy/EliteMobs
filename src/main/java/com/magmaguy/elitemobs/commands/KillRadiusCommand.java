@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.commands.admin.KillHandler;
 import com.magmaguy.magmacore.command.AdvancedCommand;
+import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
 
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ public class KillRadiusCommand extends AdvancedCommand {
     }
 
     @Override
-    public void execute() {
-        KillHandler.radiusKillAggressiveMobs(getCurrentPlayerSender(), getIntegerArgument("radius"));
+    public void execute(CommandData commandData) {
+        KillHandler.radiusKillAggressiveMobs(commandData.getPlayerSender(), commandData.getIntegerArgument("radius"));
     }
 }

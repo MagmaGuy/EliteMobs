@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.magmacore.command.AdvancedCommand;
+import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
 
 import java.util.ArrayList;
@@ -17,7 +18,7 @@ public class DungeonTeleportCommand extends AdvancedCommand {
     }
 
     @Override
-    public void execute() {
-        DungeonCommands.teleport(getCurrentPlayerSender(), getStringArgument("dungeonID"));
+    public void execute(CommandData commandData) {
+        DungeonCommands.teleport(commandData.getPlayerSender(), commandData.getStringArgument("dungeonID"));
     }
 }

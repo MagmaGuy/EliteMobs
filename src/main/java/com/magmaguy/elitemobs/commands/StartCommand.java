@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.magmacore.command.AdvancedCommand;
+import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
 import com.magmaguy.magmacore.util.Logger;
 
@@ -16,11 +17,11 @@ public class StartCommand extends AdvancedCommand {
     }
 
     @Override
-    public void execute() {
-        MatchInstance matchInstance = MatchInstance.getPlayerInstance(getCurrentPlayerSender());
+    public void execute(CommandData commandData) {
+        MatchInstance matchInstance = MatchInstance.getPlayerInstance(commandData.getPlayerSender());
         if (matchInstance != null) {
             matchInstance.countdownMatch();
         } else
-            Logger.sendMessage(getCurrentCommandSender(), "You are not queued for instanced content!");
+            Logger.sendMessage(commandData.getCommandSender(), "You are not queued for instanced content!");
     }
 }
