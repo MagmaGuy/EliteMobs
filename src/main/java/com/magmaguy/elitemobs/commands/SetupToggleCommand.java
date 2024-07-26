@@ -11,11 +11,11 @@ import java.util.stream.Collectors;
 public class SetupToggleCommand extends AdvancedCommand {
     public SetupToggleCommand() {
         super(List.of("setup"));
-        setPermission("elitemobs.*");
-        setDescription("Sets up EliteMobs content!");
-        setUsage("/em setup toggle");
         addLiteral("toggle");
         addArgument("empackages", EMPackage.getEmPackages().values().stream().map(emPackage -> emPackage.getDungeonPackagerConfigFields().getFilename()).collect(Collectors.toUnmodifiableList()));
+        setUsage("/em setup toggle <dungeonConfig>");
+        setPermission("elitemobs.setup.toggle");
+        setDescription("Allows you to toggle the installation of specified EliteMobs content.");
     }
 
     @Override

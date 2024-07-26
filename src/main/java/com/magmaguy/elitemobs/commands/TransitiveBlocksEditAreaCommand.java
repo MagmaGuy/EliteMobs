@@ -14,8 +14,8 @@ public class TransitiveBlocksEditAreaCommand extends AdvancedCommand {
         addLiteral("editArea");
         addArgument("filename", CustomBossesConfig.getCustomBosses().keySet().stream().toList());
         addArgument("type", List.of("ON_SPAWN", "ON_REMOVE"));
-        setUsage("/em transitiveBlocks cancel");
-        setPermission("elitemobs.*");
+        setUsage("/em transitiveBlocks editArea <filename> <ON_SPAWN/ON_REMOVE>");
+        setPermission("elitemobs.transitiveblocks.edit.area");
         setDescription("Edits large transitive blocks areas for use by regional bosses.");
         setSenderType(SenderType.PLAYER);
     }
