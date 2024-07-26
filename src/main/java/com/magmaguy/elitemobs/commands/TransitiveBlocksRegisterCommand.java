@@ -14,9 +14,9 @@ public class TransitiveBlocksRegisterCommand extends AdvancedCommand {
         addLiteral("register");
         addArgument("filename", CustomBossesConfig.getCustomBosses().keySet().stream().toList());
         addArgument("type", List.of("ON_SPAWN", "ON_REMOVE"));
-        setUsage("/em transitiveBlocks cancel");
-        setPermission("elitemobs.*");
-        setDescription("Cancels transitive block registration.");
+        setUsage("/em transitiveBlocks register <filename> <ON_SPAWN/ON_REMOVE>");
+        setPermission("elitemobs.transitiveblocks.register.register");
+        setDescription("Registers transitive blocks for use by regional bosses.");
         setSenderType(SenderType.PLAYER);
     }
 

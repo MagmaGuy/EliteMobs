@@ -12,7 +12,7 @@ public class TransitiveBlocksCancelCommand extends AdvancedCommand {
         super(List.of("transitiveBlocks"));
         addLiteral("cancel");
         setUsage("/em transitiveBlocks cancel");
-        setPermission("elitemobs.*");
+        setPermission("elitemobs.transitiveblocks.cancel");
         setDescription("Cancels transitive block registration.");
         setSenderType(SenderType.PLAYER);
     }
