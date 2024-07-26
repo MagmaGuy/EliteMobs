@@ -15,7 +15,7 @@ public class UnbindForceCommand extends AdvancedCommand {
         addLiteral("force");
         setUsage("/em unbind force");
         setSenderType(SenderType.PLAYER);
-        setPermission("elitemobs.*");
+        setPermission("elitemobs.unbind.force");
         setDescription("Forcefully unbinds a held item.");
     }
 

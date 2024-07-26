@@ -13,8 +13,8 @@ public class VersionCommand extends AdvancedCommand {
     public VersionCommand() {
         super(List.of("version"));
         setUsage("/em version");
-        setPermission("elitemobs.*");
-        setDescription("Checks the server's plugin version.");
+        setPermission("elitemobs.version");
+        setDescription("Checks the server's EliteMobs plugin version.");
     }
 
     @Override
