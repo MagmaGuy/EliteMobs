@@ -14,7 +14,7 @@ public class ScrapCommand extends AdvancedCommand {
         setUsage("/em scrap");
         setPermission("elitemobs.scrap.command");
         setSenderType(SenderType.PLAYER);
-        setDescription("Opens the scrap menu or teleports the player to the Adventurer's Guild Hub");
+        setDescription("Opens the scrap menu or teleports the player to the Adventurer's Guild Hub.");
     }
 
     @Override
