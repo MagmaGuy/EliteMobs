@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.config.customitems.CustomItemsConfig;
 import com.magmaguy.magmacore.command.AdvancedCommand;
+import com.magmaguy.magmacore.command.CommandData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,10 +19,10 @@ public class MoneySetCommand extends AdvancedCommand {
     }
 
     @Override
-    public void execute() {
+    public void execute(CommandData commandData) {
         CurrencyCommandsHandler.setCommand(
-                getCurrentCommandSender(),
-                getStringArgument("player"),
-                getDoubleArgument("amount"));
+                commandData.getCommandSender(),
+                commandData.getStringArgument("player"),
+                commandData.getDoubleArgument("amount"));
     }
 }

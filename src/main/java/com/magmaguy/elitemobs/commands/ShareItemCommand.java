@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.items.ShareItem;
 import com.magmaguy.magmacore.command.AdvancedCommand;
+import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
 
 import java.util.List;
@@ -16,7 +17,7 @@ public class ShareItemCommand extends AdvancedCommand {
     }
 
     @Override
-    public void execute() {
-        ShareItem.showOnChat(getCurrentPlayerSender());
+    public void execute(CommandData commandData) {
+        ShareItem.showOnChat(commandData.getPlayerSender());
     }
 }

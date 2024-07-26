@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.commands;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.magmacore.command.AdvancedCommand;
+import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
 import com.magmaguy.magmacore.util.Logger;
 
@@ -21,17 +22,17 @@ public class TrackBossCommand extends AdvancedCommand {
     }
 
     @Override
-    public void execute() {
+    public void execute(CommandData commandData) {
         try {
             for (CustomBossEntity customBossEntity : CustomBossEntity.getTrackableCustomBosses())
-                if (customBossEntity.getEliteUUID().equals(UUID.fromString(getStringArgument("id")))) {
-                    customBossEntity.getCustomBossBossBar().addTrackingPlayer(getCurrentPlayerSender());
+                if (customBossEntity.getEliteUUID().equals(UUID.fromString(commandData.getStringArgument("id")))) {
+                    customBossEntity.getCustomBossBossBar().addTrackingPlayer(commandData.getPlayerSender());
                     return;
                 }
-            Logger.sendMessage(getCurrentCommandSender(), DefaultConfig.getBossAlreadyGoneMessage());
+            Logger.sendMessage(commandData.getCommandSender(), DefaultConfig.getBossAlreadyGoneMessage());
         } catch (Exception ex) {
             //happens when players try to track an entity that has despawned for any reason
-            Logger.sendMessage(getCurrentCommandSender(), DefaultConfig.getBossAlreadyGoneMessage());
+            Logger.sendMessage(commandData.getCommandSender(), DefaultConfig.getBossAlreadyGoneMessage());
         }
     }
 }

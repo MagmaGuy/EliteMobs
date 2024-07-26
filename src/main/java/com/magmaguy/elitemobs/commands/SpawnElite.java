@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import com.magmaguy.magmacore.command.AdvancedCommand;
+import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
 import org.bukkit.entity.EntityType;
 
@@ -23,11 +24,11 @@ public class SpawnElite extends AdvancedCommand {
     }
 
     @Override
-    public void execute() {
+    public void execute(CommandData commandData) {
         SpawnCommand.spawnEliteEntityTypeCommand(
-                getCurrentPlayerSender(),
-                EntityType.valueOf(getStringArgument("entityType")),
-                getIntegerArgument("level"),
-                Optional.of(getStringSequenceArgument("powers")));
+                commandData.getPlayerSender(),
+                EntityType.valueOf(commandData.getStringArgument("entityType")),
+                commandData.getIntegerArgument("level"),
+                Optional.of(commandData.getStringSequenceArgument("powers")));
     }
 }
