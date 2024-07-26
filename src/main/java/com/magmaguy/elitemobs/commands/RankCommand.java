@@ -11,7 +11,7 @@ public class RankCommand extends AdvancedCommand {
     public RankCommand() {
         super(List.of("rank"));
         setUsage("/em rank");
-        setDescription("Opens the EliteMobs rank menu.");
+        setDescription("Opens the EliteMobs rank menu or teleports you to the Adventurer's Guild.");
         setSenderType(SenderType.PLAYER);
     }
 
