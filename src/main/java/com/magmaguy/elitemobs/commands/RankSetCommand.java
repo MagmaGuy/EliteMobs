@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.magmacore.command.AdvancedCommand;
+import com.magmaguy.magmacore.command.CommandData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,10 +18,10 @@ public class RankSetCommand extends AdvancedCommand {
     }
 
     @Override
-    public void execute() {
-        GuildRankCommands.setGuildRank(getCurrentCommandSender(),
-                getStringArgument("player"),
-                getIntegerArgument("prestigeLevel"),
-                getIntegerArgument("guildLevel"));
+    public void execute(CommandData commandData) {
+        GuildRankCommands.setGuildRank(commandData.getCommandSender(),
+                commandData.getStringArgument("player"),
+                commandData.getIntegerArgument("prestigeLevel"),
+                commandData.getIntegerArgument("guildLevel"));
     }
 }

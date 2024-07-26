@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.commands;
 import com.magmaguy.elitemobs.commands.guild.AdventurersGuildCommand;
 import com.magmaguy.elitemobs.menus.ProceduralShopMenu;
 import com.magmaguy.magmacore.command.AdvancedCommand;
+import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
 
 import java.util.List;
@@ -18,8 +19,8 @@ public class ShopDynamicCommand extends AdvancedCommand {
     }
 
     @Override
-    public void execute() {
-        if (!AdventurersGuildCommand.adventurersGuildTeleport(getCurrentPlayerSender()))
-            ProceduralShopMenu.shopInitializer(getCurrentPlayerSender());
+    public void execute(CommandData commandData) {
+        if (!AdventurersGuildCommand.adventurersGuildTeleport(commandData.getPlayerSender()))
+            ProceduralShopMenu.shopInitializer(commandData.getPlayerSender());
     }
 }
