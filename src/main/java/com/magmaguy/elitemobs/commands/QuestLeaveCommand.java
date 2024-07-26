@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.commands.quests.QuestCommand;
 import com.magmaguy.magmacore.command.AdvancedCommand;
+import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
 
 import java.util.List;
@@ -17,7 +18,7 @@ public class QuestLeaveCommand extends AdvancedCommand {
     }
 
     @Override
-    public void execute() {
-        QuestCommand.leaveQuest(getCurrentPlayerSender(), getStringArgument("questID"));
+    public void execute(CommandData commandData) {
+        QuestCommand.leaveQuest(commandData.getPlayerSender(), commandData.getStringArgument("questID"));
     }
 }

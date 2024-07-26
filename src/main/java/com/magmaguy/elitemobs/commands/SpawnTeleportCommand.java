@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.commands;
 import com.magmaguy.elitemobs.api.PlayerPreTeleportEvent;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.magmacore.command.AdvancedCommand;
+import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
 
 import java.util.List;
@@ -17,8 +18,8 @@ public class SpawnTeleportCommand extends AdvancedCommand {
     }
 
     @Override
-    public void execute() {
+    public void execute(CommandData commandData) {
         if (DefaultConfig.getDefaultSpawnLocation() != null)
-            PlayerPreTeleportEvent.teleportPlayer(getCurrentPlayerSender(), DefaultConfig.getDefaultSpawnLocation());
+            PlayerPreTeleportEvent.teleportPlayer(commandData.getPlayerSender(), DefaultConfig.getDefaultSpawnLocation());
     }
 }
