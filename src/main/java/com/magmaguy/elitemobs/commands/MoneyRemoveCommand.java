@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.config.customitems.CustomItemsConfig;
 import com.magmaguy.magmacore.command.AdvancedCommand;
-import com.magmaguy.magmacore.command.SenderType;
+import com.magmaguy.magmacore.command.CommandData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,14 +15,13 @@ public class MoneyRemoveCommand extends AdvancedCommand {
         addArgument("amount", new ArrayList<>(CustomItemsConfig.getCustomItems().keySet()));
         setUsage("/em money remove <player> <amount>");
         setPermission("elitemobs.money.remove");
-        setSenderType(SenderType.PLAYER);
         setDescription("Deducts the specified amount of currency from a player.");
     }
 
     @Override
-    public void execute() {
+    public void execute(CommandData commandData) {
         CurrencyCommandsHandler.subtractCommand(
-                getStringArgument("player"),
-                getDoubleArgument("amount"));
+                commandData.getStringArgument("player"),
+                commandData.getDoubleArgument("amount"));
     }
 }

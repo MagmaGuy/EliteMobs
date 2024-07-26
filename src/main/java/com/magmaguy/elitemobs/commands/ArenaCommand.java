@@ -1,6 +1,8 @@
 package com.magmaguy.elitemobs.commands;
 
+import com.magmaguy.elitemobs.menus.ArenaMenu;
 import com.magmaguy.magmacore.command.AdvancedCommand;
+import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
 
 import java.util.ArrayList;
@@ -17,7 +19,7 @@ public class ArenaCommand extends AdvancedCommand {
     }
 
     @Override
-    public void execute() {
-        ArenaCommands.openArenaMenu(getCurrentPlayerSender(), getStringArgument("arenaID"));
+    public void execute(CommandData commandData) {
+        new ArenaMenu().constructArenaMenu(commandData.getPlayerSender(), commandData.getStringArgument("arenaID"));
     }
 }

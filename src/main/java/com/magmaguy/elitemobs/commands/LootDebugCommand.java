@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.commands;
 import com.magmaguy.elitemobs.commands.admin.GetTierCommand;
 import com.magmaguy.elitemobs.config.customitems.CustomItemsConfig;
 import com.magmaguy.magmacore.command.AdvancedCommand;
+import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
 
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ public class LootDebugCommand extends AdvancedCommand {
     }
 
     @Override
-    public void execute() {
-        GetTierCommand.get(getCurrentPlayerSender(), getIntegerArgument("level"));
+    public void execute(CommandData commandData) {
+        GetTierCommand.get(commandData.getPlayerSender(), commandData.getIntegerArgument("level"));
     }
 }

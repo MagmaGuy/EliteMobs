@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.menus.SellMenu;
 import com.magmaguy.magmacore.command.AdvancedCommand;
+import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Bukkit;
 
@@ -19,12 +20,12 @@ public class ShopSellOtherCommand extends AdvancedCommand {
     }
 
     @Override
-    public void execute() {
+    public void execute(CommandData commandData) {
         SellMenu sellMenu = new SellMenu();
         try {
-            sellMenu.constructSellMenu(Bukkit.getPlayer(getStringArgument("player")));
+            sellMenu.constructSellMenu(Bukkit.getPlayer(commandData.getStringArgument("player")));
         } catch (Exception ex) {
-            Logger.sendMessage(getCurrentCommandSender(), "Failed to get player with that username!");
+            Logger.sendMessage(commandData.getCommandSender(), "Failed to get player with that username!");
         }
     }
 }

@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.magmacore.command.AdvancedCommand;
+import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.command.CommandSender;
 
@@ -23,7 +24,7 @@ public class ReloadCommand extends AdvancedCommand {
     }
 
     @Override
-    public void execute() {
-        reload(getCurrentCommandSender());
+    public void execute(CommandData commandData) {
+        reload(commandData.getCommandSender());
     }
 }
