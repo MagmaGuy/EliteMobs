@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.commands.admin.KillHandler;
 import com.magmaguy.magmacore.command.AdvancedCommand;
+import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
 import org.bukkit.entity.EntityType;
 
@@ -21,9 +22,9 @@ public class KillTypeRadiusCommand extends AdvancedCommand {
     }
 
     @Override
-    public void execute() {
-        KillHandler.radiusKillSpecificMobs(getCurrentPlayerSender(),
-                EntityType.valueOf(getStringArgument("type")),
-                getIntegerArgument("range"));
+    public void execute(CommandData commandData) {
+        KillHandler.radiusKillSpecificMobs(commandData.getPlayerSender(),
+                EntityType.valueOf(commandData.getStringArgument("type")),
+                commandData.getIntegerArgument("range"));
     }
 }

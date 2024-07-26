@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.magmacore.command.AdvancedCommand;
-import com.magmaguy.magmacore.command.SenderType;
+import com.magmaguy.magmacore.command.CommandData;
 import org.bukkit.Bukkit;
 import org.bukkit.generator.WorldInfo;
 import org.bukkit.util.Vector;
@@ -22,19 +22,18 @@ public class SpawnBossAtCommand extends AdvancedCommand {
         addArgument("z", new ArrayList<>());
         setUsage("/setup spawnAt boss <filename> <worldName> <x> <y> <z>");
         setPermission("elitemobs.*");
-        setSenderType(SenderType.PLAYER);
         setDescription("Spawns a custom boss at the location the user is looking at.");
     }
 
     @Override
-    public void execute() {
+    public void execute(CommandData commandData) {
         SpawnCommand.spawnCustomBossCommand(
-                getCurrentPlayerSender(),
-                getStringArgument("filename"),
-                getStringArgument("worldName"),
+                commandData.getCommandSender(),
+                commandData.getStringArgument("filename"),
+                commandData.getStringArgument("worldName"),
                 new Vector(
-                        getDoubleArgument("x"),
-                        getDoubleArgument("y"),
-                        getDoubleArgument("z")));
+                        commandData.getDoubleArgument("x"),
+                        commandData.getDoubleArgument("y"),
+                        commandData.getDoubleArgument("z")));
     }
 }

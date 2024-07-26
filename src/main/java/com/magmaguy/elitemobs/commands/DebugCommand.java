@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.commands;
 import com.magmaguy.elitemobs.commands.admin.DebugScreen;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.magmacore.command.AdvancedCommand;
+import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
 
 import java.util.ArrayList;
@@ -19,7 +20,7 @@ public class DebugCommand extends AdvancedCommand {
     }
 
     @Override
-    public void execute() {
-        DebugScreen.open(getCurrentPlayerSender(), getStringArgument("filename"));
+    public void execute(CommandData commandData) {
+        DebugScreen.open(commandData.getPlayerSender(), commandData.getStringArgument("filename"));
     }
 }
