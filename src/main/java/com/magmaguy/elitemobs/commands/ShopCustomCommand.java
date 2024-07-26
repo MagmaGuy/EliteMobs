@@ -15,7 +15,7 @@ public class ShopCustomCommand extends AdvancedCommand {
         setUsage("/em shop custom");
         setPermission("elitemobs.shop.command");
         setSenderType(SenderType.PLAYER);
-        setDescription("Opens the procedurally generated item shop or teleports the player to the Adventurer's Guild Hub");
+        setDescription("Opens the procedurally generated item shop or teleports the player to the Adventurer's Guild Hub.");
     }
 
     @Override
