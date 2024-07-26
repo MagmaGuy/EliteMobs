@@ -267,3 +267,60 @@ permissions:
   elitemobs.remove:
     description: Allows players to toggle removal mode for EliteMobs, which can permanently remove any EliteMobs-related content.
     default: op
+  elitemobs.respawn:
+    description: Allows players to force respawn all regional bosses.
+    default: op
+  elitemobs.setup.main:
+    description: Allows players to have access to the main command for setting up EliteMobs.
+    default: op
+  elitemobs.setup.done:
+    description: Allows players to toggle whether the setup message will show up in the server chat.
+    default: op
+  elitemobs.setup.toggle:
+    description: Allows players to toggle the installation of specified EliteMobs content.
+    default: op
+  elitemobs.shop.custom:
+    description: Allows players to open the EliteMobs shop for custom items for the specified player.
+    default: op
+  elitemobs.shop.sell.player:
+    description: Allows players to open the EliteMobs shop for custom items for the specified player.
+    default: op
+  elitemobs.spawn.boss.at:
+    description: Allows players to spawn a custom boss at the specified location.
+    default: op
+  elitemobs.spawn.boss:
+    description: Allows players to spawn a custom boss at the location the player is looking at.
+    default: op
+  elitemobs.spawn.boss.at.level:
+    description: Allows players to spawn a custom boss at the specified location with the specified level.
+    default: op
+  elitemobs.spawn.boss.level:
+    description: Allows players to spawn a custom boss at the location the user is looking at with the specified level.
+    default: op
+  elitemobs.spawn.elite:
+    description: Allows players to spawn an elite of a specified type and level, optionally with specific powers, at the targeted location.
+    default: op
+  elitemobs.spawn.elite.at:
+    description: Allows players to spawn an elite of the specified type and level, optionally with specified powers, at the chosen location.
+    default: op
+  elitemobs.transitiveblocks.cancel:
+    description: Allows players to cancel transitive block registration.
+    default: op
+  elitemobs.transitiveblocks.edit.area:
+    description: Allows players to edit large transitive blocks areas for use by regional bosses.
+    default: op
+  elitemobs.transitiveblocks.edit.edit:
+    description: Allows players to edit transitive blocks for use by regional bosses.
+    default: op
+  elitemobs.transitiveblocks.register.area:
+    description: Allows players to register large transitive blocks areas for use by regional bosses.
+    default: op
+  elitemobs.transitiveblocks.register.register:
+    description: Allows players to register transitive blocks for use by regional bosses.
+    default: op
+  elitemobs.unbind.force:
+    description: Allows players to forcefully unbind a held item.
+    default: op
+  elitemobs.version:
+    description: Allows players to check the server's EliteMobs plugin version.
+    default: op
