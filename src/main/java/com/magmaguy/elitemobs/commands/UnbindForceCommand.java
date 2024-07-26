@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.commands;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.magmacore.command.AdvancedCommand;
+import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
 import org.bukkit.inventory.ItemStack;
 
@@ -19,8 +20,8 @@ public class UnbindForceCommand extends AdvancedCommand {
     }
 
     @Override
-    public void execute() {
-        ItemStack itemStack = getCurrentPlayerSender().getInventory().getItemInMainHand();
+    public void execute(CommandData commandData) {
+        ItemStack itemStack = commandData.getPlayerSender().getInventory().getItemInMainHand();
         if (ItemTagger.isEliteItem(itemStack))
             SoulbindEnchantment.removeEnchantment(itemStack);
     }

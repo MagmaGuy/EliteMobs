@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestsConfig;
 import com.magmaguy.magmacore.command.AdvancedCommand;
+import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
 
 import java.util.ArrayList;
@@ -19,7 +20,7 @@ public class PlaceTreasureChestCommand extends AdvancedCommand {
     }
 
     @Override
-    public void execute() {
-        CustomBossCommandHandler.addSpawnLocation(getStringArgument("filename"), getCurrentPlayerSender());
+    public void execute(CommandData commandData) {
+        CustomBossCommandHandler.addSpawnLocation(commandData.getStringArgument("filename"), commandData.getPlayerSender());
     }
 }

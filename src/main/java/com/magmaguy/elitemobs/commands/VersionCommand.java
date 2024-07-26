@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.magmacore.command.AdvancedCommand;
+import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -17,9 +18,9 @@ public class VersionCommand extends AdvancedCommand {
     }
 
     @Override
-    public void execute() {
+    public void execute(CommandData commandData) {
         Logger.sendMessage(
-                getCurrentCommandSender(),
+                commandData.getCommandSender(),
                 ChatColor.WHITE + " version " + ChatColor.GREEN + Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getDescription().getVersion());
     }
 }
