@@ -12,7 +12,7 @@ public class SetupDoneCommand extends AdvancedCommand {
         super(List.of("setup"));
         addLiteral("done");
         setUsage("/setup done");
-        setPermission("elitemobs.*");
+        setPermission("elitemobs.setup.done");
         setDescription("Toggles whether the setup message will show up.");
     }
 
