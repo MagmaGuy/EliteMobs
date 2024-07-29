@@ -3,8 +3,8 @@ package com.magmaguy.elitemobs.config.menus.premade;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.menus.MenusConfigFields;
-import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import com.magmaguy.elitemobs.utils.ItemStackSerializer;
+import com.magmaguy.magmacore.util.ItemStackGenerator;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;

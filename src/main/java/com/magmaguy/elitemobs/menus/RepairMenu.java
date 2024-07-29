@@ -6,7 +6,7 @@ import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
 import com.magmaguy.elitemobs.config.menus.premade.RepairMenuConfig;
 import com.magmaguy.elitemobs.items.customenchantments.RepairEnchantment;
-import com.magmaguy.elitemobs.utils.ItemStackGenerator;
+import com.magmaguy.magmacore.util.ItemStackGenerator;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
