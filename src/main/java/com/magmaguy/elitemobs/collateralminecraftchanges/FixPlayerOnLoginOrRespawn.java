@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.config.DefaultConfig;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -19,7 +19,7 @@ public class FixPlayerOnLoginOrRespawn implements Listener {
     }
 
     @EventHandler
-    public void onPlayerRespawn(PlayerLoginEvent event) {
+    public void onPlayerJoin(PlayerJoinEvent event) {
         event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 0, 0));
         event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 0, 0));
         if (DefaultConfig.isResetPlayerScaleOnLogin())
