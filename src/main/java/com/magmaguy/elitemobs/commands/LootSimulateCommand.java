@@ -13,8 +13,8 @@ public class LootSimulateCommand extends AdvancedCommand {
     public LootSimulateCommand() {
         super(List.of("loot"));
         addLiteral("simulate");
-        addArgument("level", new ArrayList<>(CustomItemsConfig.getCustomItems().keySet()));
-        addArgument("playerName", new ArrayList<>());
+        addArgument("level", new ArrayList<>());
+        addArgument("playerName", new ArrayList<>(CustomItemsConfig.getCustomItems().keySet()));
         setUsage("/em loot simulate <level> <playerName>");
         setPermission("elitemobs.loot.simulate");
         setSenderType(SenderType.PLAYER);

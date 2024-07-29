@@ -25,7 +25,7 @@ public class PlaceWormholeCommand extends AdvancedCommand {
     @Override
     public void execute(CommandData commandData) {
         for (Wormhole wormhole : Wormhole.getWormholes()) {
-            if (wormhole.getWormholeConfigFields().getFilename().equals(commandData.getStringArgument("wormholeFilename")))
+            if (wormhole.getWormholeConfigFields().getFilename().equals(commandData.getStringArgument("filename")))
                 switch (commandData.getStringArgument("wormholeOption")) {
                     case "1":
                         wormhole.getWormholeEntry1().updateLocation(commandData.getPlayerSender());
