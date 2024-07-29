@@ -15,7 +15,7 @@ import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import com.magmaguy.elitemobs.utils.EntityFinder;
 import com.magmaguy.elitemobs.utils.EventCaller;
-import com.magmaguy.elitemobs.utils.Round;
+import com.magmaguy.magmacore.util.Round;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;

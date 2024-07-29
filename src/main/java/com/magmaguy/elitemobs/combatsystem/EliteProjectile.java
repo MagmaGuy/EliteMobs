@@ -22,6 +22,7 @@ public class EliteProjectile {
         projectile.setShooter((ProjectileSource) shooter);
         projectile.setVelocity(shotVector);
         projectile.setGravity(gravity);
+        projectile.setPersistent(false);
         EntityTracker.registerProjectileEntity(projectile);
         return projectile;
     }
@@ -37,6 +38,7 @@ public class EliteProjectile {
         projectile.setShooter((ProjectileSource) shooter);
         projectile.setVelocity(targetterToTargetted);
         projectile.setGravity(gravity);
+        projectile.setPersistent(false);
         EntityTracker.registerProjectileEntity(projectile);
         return projectile;
     }

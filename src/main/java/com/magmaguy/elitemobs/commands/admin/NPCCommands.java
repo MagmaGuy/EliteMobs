@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.commands.admin;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
-import com.magmaguy.elitemobs.utils.Round;
+import com.magmaguy.magmacore.util.Round;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
