@@ -17,7 +17,7 @@ public class PirateShipMinidungeon extends DungeonPackagerConfigFields {
                         "&6Credits: MagmaGuy & Realm of Lotheridon"),
                 DiscordLinks.freeMinidungeons,
                 DungeonSizeCategory.MINIDUNGEON,
-                "em_the_pirate_ship",
+                "em_pirate_ship",
                 World.Environment.NORMAL,
                 true,
                 "em_the_pirate_ship,-85,63,243.5,-150,0",
