@@ -1,5 +1,5 @@
 name: EliteMobs
-version: 9.0.5
+version: 9.1.0-SNAPSHOT
 author: MagmaGuy
 main: com.magmaguy.elitemobs.EliteMobs
 api-version: 1.14
@@ -23,6 +23,10 @@ commands:
     description: Main command
     aliases:
       - em
+  adventurersguild:
+    description: Main command
+    aliases:
+      - ag
 
 permissions:
   elitemobs.*:

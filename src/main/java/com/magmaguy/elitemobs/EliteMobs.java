@@ -5,7 +5,7 @@ package com.magmaguy.elitemobs;
  */
 
 import com.magmaguy.easyminecraftgoals.NMSManager;
-import com.magmaguy.elitemobs.commands.CommandManager;
+import com.magmaguy.elitemobs.commands.CommandHandler;
 import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.config.commands.CommandsConfig;
 import com.magmaguy.elitemobs.config.customarenas.CustomArenasConfig;
@@ -222,7 +222,8 @@ public class EliteMobs extends JavaPlugin {
         new CustomCharts();
 
         //Imports custom configurations and mindungeons from the import folder
-        ConfigurationImporter.initializeConfigs();
+//        ConfigurationImporter.initializeConfigs();
+        MagmaCore.initializeImporter();
         ConfigurationExporter.initializeConfigs();
 
         //Import custom items after potentially importing new items
@@ -267,7 +268,7 @@ public class EliteMobs extends JavaPlugin {
 
         //Commands
 //        new CommandHandler();
-        new CommandManager();
+        CommandHandler.registerCommands();
 
         new SpecialItemSystemsConfig();
 

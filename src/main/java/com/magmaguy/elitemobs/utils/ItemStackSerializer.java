@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.utils;
 
 import com.magmaguy.magmacore.util.ChatColorConverter;
+import com.magmaguy.magmacore.util.ItemStackGenerator;
 import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;

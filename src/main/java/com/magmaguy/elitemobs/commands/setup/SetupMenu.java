@@ -3,9 +3,9 @@ package com.magmaguy.elitemobs.commands.setup;
 import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
 import com.magmaguy.elitemobs.config.menus.premade.GetLootMenuConfig;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
-import com.magmaguy.elitemobs.utils.ItemStackGenerator;
-import com.magmaguy.elitemobs.utils.SpigotMessage;
 import com.magmaguy.magmacore.util.ChatColorConverter;
+import com.magmaguy.magmacore.util.ItemStackGenerator;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -50,14 +50,17 @@ public class SetupMenu {
             return;
         }
 
-        if (ResourcePackDataConfig.isEliteMobsResourcePackEnabled()) {
-            //Case for if it is downloaded
-            ResourcePackDataConfig.toggleEliteMobsResourcePackStatus(false);
-        } else {
-            ResourcePackDataConfig.toggleEliteMobsResourcePackStatus(true);
-            player.spigot().sendMessage(SpigotMessage.simpleMessage("&8[EliteMobs] &2The EliteMobs resource pack has been installed!"));
-            player.spigot().sendMessage(SpigotMessage.commandHoverMessage("&eBefore you go! &fDo you want to force players to use the resource pack? This is necessary if you plan to use &cModelEngine for the custom boss models. &aClick here if you want to force resource packs. &eIgnore this message if you don't!", "Click to force resource packs!", "/elitemobs forceresourcepack"));
-        }
+        Logger.sendMessage(player, "This setting is now no longer in use! Use my ResourcePackManager plugin to easily and automatically merge & host the EliteMobs resource pack, and much more!");
+        return;
+//
+//        if (ResourcePackDataConfig.isEliteMobsResourcePackEnabled()) {
+//            //Case for if it is downloaded
+//            ResourcePackDataConfig.toggleEliteMobsResourcePackStatus(false);
+//        } else {
+//            ResourcePackDataConfig.toggleEliteMobsResourcePackStatus(true);
+//            player.spigot().sendMessage(SpigotMessage.simpleMessage("&8[EliteMobs] &2The EliteMobs resource pack has been installed!"));
+//            player.spigot().sendMessage(SpigotMessage.commandHoverMessage("&eBefore you go! &fDo you want to force players to use the resource pack? This is necessary if you plan to use &cModelEngine for the custom boss models. &aClick here if you want to force resource packs. &eIgnore this message if you don't!", "Click to force resource packs!", "/elitemobs forceresourcepack"));
+//        }
     }
 
 //    public static void forceResourcePack(Player player) {
