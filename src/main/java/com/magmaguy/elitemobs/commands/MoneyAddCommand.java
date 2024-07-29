@@ -11,7 +11,7 @@ public class MoneyAddCommand extends AdvancedCommand {
     public MoneyAddCommand() {
         super(List.of("money"));
         addLiteral("add");
-        addArgument("player", new ArrayList<>(CustomItemsConfig.getCustomItems().keySet()));
+        addArgument("player", new ArrayList<>());
         addArgument("amount", new ArrayList<>(CustomItemsConfig.getCustomItems().keySet()));
         setUsage("/em money add <player> <amount>");
         setPermission("elitemobs.money.add.player");
