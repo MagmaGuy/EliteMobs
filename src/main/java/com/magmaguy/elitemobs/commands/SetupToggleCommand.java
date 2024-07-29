@@ -24,7 +24,12 @@ public class SetupToggleCommand extends AdvancedCommand {
         if (dungeon.isEmpty() || EMPackage.getEmPackages().get(dungeon) == null)
             Logger.sendMessage(commandData.getCommandSender(), "Not a valid em package!");
         EMPackage emPackage = EMPackage.getEmPackages().get(dungeon);
-        if (emPackage.install())
-            Logger.sendMessage(commandData.getCommandSender(), "Successfully installed content!");
+        if (emPackage.install()) {
+            if (emPackage.isInstalled())
+                Logger.sendMessage(commandData.getCommandSender(), "Successfully installed content!");
+            else
+                Logger.sendMessage(commandData.getCommandSender(), "Successfully uninstalled content!");
+
+        }
     }
 }

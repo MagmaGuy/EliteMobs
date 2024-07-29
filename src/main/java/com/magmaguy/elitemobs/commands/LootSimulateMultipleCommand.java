@@ -13,7 +13,7 @@ public class LootSimulateMultipleCommand extends AdvancedCommand {
     public LootSimulateMultipleCommand() {
         super(List.of("loot"));
         addLiteral("simulate");
-        addArgument("level", new ArrayList<>(CustomItemsConfig.getCustomItems().keySet()));
+        addArgument("level", new ArrayList<>());
         addArgument("times", new ArrayList<>(CustomItemsConfig.getCustomItems().keySet()));
         addArgument("playerName", new ArrayList<>());
         setUsage("/em loot simulate <level> <times> <playerName>");
