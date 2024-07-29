@@ -90,6 +90,14 @@ public class LegacyValueConverter {
                 return Particle.ITEM_SLIME.toString();
             case "DRIP_LAVA":
                 return Particle.DRIPPING_WATER.toString();
+            case "EXPLOSION_HUGE":
+                return Particle.EXPLOSION.toString();
+            case "SNOWBALL":
+                return Particle.SNOWFLAKE.toString();
+            case "SPELL":
+                return Particle.WITCH.toString();
+            case "DRIP_WATER":
+                return Particle.DRIPPING_WATER.toString();
             default:
                 return potionEffectName;
         }

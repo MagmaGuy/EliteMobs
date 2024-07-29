@@ -21,6 +21,6 @@ public class PlaceTreasureChestCommand extends AdvancedCommand {
 
     @Override
     public void execute(CommandData commandData) {
-        CustomBossCommandHandler.addSpawnLocation(commandData.getStringArgument("filename"), commandData.getPlayerSender());
+        CustomTreasureChestsConfig.addTreasureChestEntry(commandData.getPlayerSender(), commandData.getStringArgument("filename"));
     }
 }
