@@ -98,6 +98,16 @@ public class LegacyValueConverter {
                 return Particle.WITCH.toString();
             case "DRIP_WATER":
                 return Particle.DRIPPING_WATER.toString();
+            case "SPELL_MOB":
+                return Particle.WITCH.toString();
+            case "VILLAGER_ANGRY":
+                return Particle.ANGRY_VILLAGER.toString();
+            case "WATER_BUBBLE":
+                return Particle.UNDERWATER.toString();
+            case "VILLAGER_HAPPY":
+                return Particle.HAPPY_VILLAGER.toString();
+            case "WATER_SPLASH":
+                return Particle.SPLASH.toString();
             default:
                 return potionEffectName;
         }

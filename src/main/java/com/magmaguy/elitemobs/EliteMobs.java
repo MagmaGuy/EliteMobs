@@ -85,7 +85,6 @@ public class EliteMobs extends JavaPlugin {
     public static void initializeConfigs() {
         //Initialized translations
         new DefaultConfig();
-        new ResourcePackDataConfig();
         new ItemSettingsConfig();
         new ProceduralItemGenerationSettingsConfig();
         PotionEffectsConfig.initializeConfigs();

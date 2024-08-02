@@ -1,8 +1,8 @@
 package com.magmaguy.elitemobs.menus;
 
 import com.magmaguy.elitemobs.config.ArenasConfig;
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.DungeonsConfig;
-import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
 import com.magmaguy.elitemobs.config.menus.premade.ArenaMenuConfig;
 import com.magmaguy.elitemobs.instanced.arena.ArenaInstance;
 import com.magmaguy.magmacore.util.ChatColorConverter;
@@ -26,7 +26,7 @@ public class ArenaMenu {
             return;
         }
         String menuName = ArenaMenuConfig.getMenuName() + arenaInstance.getCustomArenasConfigFields().getArenaName();
-        if (ResourcePackDataConfig.isDisplayCustomMenuUnicodes())
+        if (DefaultConfig.isForceMenuUnicode() || Bukkit.getPluginManager().isPluginEnabled("ResourcePackManager"))
             menuName = "\uF801\uDB80\uDD0B\uF805          " + menuName;
         Inventory shopInventory = Bukkit.createInventory(player, 9, menuName);
         shopInventory.setItem(ArenaMenuConfig.getPlayerItemSlot(), ArenaMenuConfig.getPlayerItem());

@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.menus;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
-import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
 import com.magmaguy.elitemobs.config.menus.premade.SellMenuConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.items.ItemWorthCalculator;
@@ -67,7 +66,7 @@ public class SellMenu extends EliteMenu implements Listener {
     public void constructSellMenu(Player player) {
 
         String menuName = SellMenuConfig.shopName;
-        if (ResourcePackDataConfig.isDisplayCustomMenuUnicodes())
+        if (DefaultConfig.isForceMenuUnicode() || Bukkit.getPluginManager().isPluginEnabled("ResourcePackManager"))
             menuName = ChatColor.WHITE + "\uF801\uDB80\uDC5B\uF805          " + menuName;
 
         Inventory sellInventory = Bukkit.createInventory(player, 54, menuName);

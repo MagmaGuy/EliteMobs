@@ -1,8 +1,8 @@
 package com.magmaguy.elitemobs.adventurersguild;
 
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
-import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
 import com.magmaguy.elitemobs.config.SoundsConfig;
 import com.magmaguy.elitemobs.config.menus.premade.GuildRankMenuConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
@@ -114,7 +114,7 @@ public class GuildRankMenuHandler implements Listener {
      */
     public static Inventory initializeGuildRankMenu(Player player) {
         String menuName = GuildRankMenuConfig.getMenuName();
-        if (ResourcePackDataConfig.displayCustomMenuUnicodes)
+        if (DefaultConfig.isForceMenuUnicode() || Bukkit.getPluginManager().isPluginEnabled("ResourcePackManager"))
             menuName = ChatColor.WHITE + "\uF801\uDA90\uDEFA\uF805           " + menuName;
         Inventory difficultyMenu = Bukkit.createInventory(player, 54, menuName);
         difficultyMenu = populateInventory(difficultyMenu, player);
