@@ -76,6 +76,8 @@ public class DefaultConfig extends ConfigurationFile {
     private static String bossAlreadyGoneMessage;
     @Getter
     private static boolean resetPlayerScaleOnLogin;
+    @Getter
+    private static boolean forceMenuUnicode;
 
     public DefaultConfig() {
         super("config.yml");
@@ -202,6 +204,6 @@ public class DefaultConfig extends ConfigurationFile {
                 List.of("Sets the message that appears when a player tries to track a boss that is no longer valid"),
                 file, fileConfiguration, "bossAlreadyGoneMessage", "&c[EliteMobs] Sorry, this boss is already gone!", true);
         resetPlayerScaleOnLogin = ConfigurationEngine.setBoolean(List.of("Sets whether to reset player scale (literally, the player size on login).", "This is important because some elite powers can modify it and if the server crashes players will be stuck to whatever scale was set when the server crashed, unless this option is set to true."), fileConfiguration, "resetPlayerScale", true);
-
+        forceMenuUnicode = ConfigurationEngine.setBoolean(List.of("Sets whether the menu unicodes for the resource pack should be forced even if the pack is not being hosted through the recommended methods (which is using ResourcePackManager)"), fileConfiguration, "forceMenuUnicode", false);
     }
 }
