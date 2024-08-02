@@ -407,7 +407,14 @@ public class ScriptAction {
 
     //Spawns a particle at the target location
     private void runSpawnParticle(ScriptActionData scriptActionData) {
-        getLocationTargets(scriptActionData).forEach(targetLocation -> scriptParticles.visualize(scriptActionData, targetLocation, eliteScript));
+        boolean needsCentering = false;
+        switch (scriptActionData.getTargetType()) {
+            case ZONE_FULL, ZONE_BORDER, INHERIT_SCRIPT_ZONE_FULL, INHERIT_SCRIPT_ZONE_BORDER, LOCATION, LOCATIONS,
+                 LANDING_LOCATION:
+                needsCentering = true;
+        }
+        boolean finalNeedsCentering = needsCentering;
+        getLocationTargets(scriptActionData).forEach(targetLocation -> scriptParticles.visualize(scriptActionData, !finalNeedsCentering ? targetLocation : targetLocation.clone().add(new Vector(.5, 0, .5)), eliteScript));
     }
 
     //Sets mob AI

@@ -69,7 +69,7 @@ public class CommandHandler {
         emCommand.registerCommand(new DiscordCommand());
 
         //User commands
-        emCommand.registerCommand(new AdventurersGuildCommand());
+//        emCommand.registerCommand(new AdventurersGuildCommand());
         emCommand.registerCommand(new ShareItemCommand());
         emCommand.registerCommand(new ShopDynamicCommand());
         emCommand.registerCommand(new ShopCustomCommand());
