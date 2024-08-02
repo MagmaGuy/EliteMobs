@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.menus;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.DefaultConfig;
-import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
 import com.magmaguy.elitemobs.config.menus.premade.RepairMenuConfig;
 import com.magmaguy.elitemobs.items.customenchantments.RepairEnchantment;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
@@ -55,7 +54,7 @@ public class RepairMenu extends EliteMenu {
      */
     public void constructRepairMenu(Player player) {
         String menuName = RepairMenuConfig.shopName;
-        if (ResourcePackDataConfig.isDisplayCustomMenuUnicodes())
+        if (DefaultConfig.isForceMenuUnicode() || Bukkit.getPluginManager().isPluginEnabled("ResourcePackManager"))
             menuName = ChatColor.WHITE + "\uF801\uDB80\uDC2A\uF805           " + menuName;
 
         Inventory repairInventory = Bukkit.createInventory(player, 54, menuName);
@@ -64,7 +63,7 @@ public class RepairMenu extends EliteMenu {
 
             if (i == RepairMenuConfig.infoSlot) {
                 ItemStack infoButton = RepairMenuConfig.infoButton;
-                if (ResourcePackDataConfig.isDisplayCustomMenuUnicodes()) {
+                if (DefaultConfig.isForceMenuUnicode() || Bukkit.getPluginManager().isPluginEnabled("ResourcePackManager")) {
                     infoButton.setType(Material.PAPER);
                     ItemMeta itemMeta = infoButton.getItemMeta();
                     itemMeta.setCustomModelData(MetadataHandler.signatureID);
