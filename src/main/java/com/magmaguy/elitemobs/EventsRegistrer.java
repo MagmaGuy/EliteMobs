@@ -88,8 +88,6 @@ public class EventsRegistrer {
 
         register(new Navigation());
 
-        register(new ResourcePackDataConfig.ResourcePackDataConfigEvents());
-
         register(new DungeonKillTargetObjective.DungeonKillTargetObjectiveListener());
 
         register(new VersionChecker.VersionCheckerEvents());
