@@ -5,7 +5,6 @@ import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
-import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
 import com.magmaguy.elitemobs.config.menus.premade.ScrapperMenuConfig;
 import com.magmaguy.elitemobs.items.customenchantments.RepairEnchantment;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
@@ -42,7 +41,7 @@ public class ScrapperMenu extends EliteMenu {
     public void constructScrapMenu(Player player) {
 
         String menuName = ScrapperMenuConfig.shopName;
-        if (ResourcePackDataConfig.isDisplayCustomMenuUnicodes())
+        if (DefaultConfig.isForceMenuUnicode() || Bukkit.getPluginManager().isPluginEnabled("ResourcePackManager"))
             menuName = ChatColor.WHITE + "\uF801\uDB80\uDC2B\uF805         " + menuName;
 
         Inventory scrapInventory = Bukkit.createInventory(player, 54, menuName);
@@ -51,7 +50,7 @@ public class ScrapperMenu extends EliteMenu {
 
             if (i == ScrapperMenuConfig.infoSlot) {
                 ItemStack infoButton = ScrapperMenuConfig.infoButton;
-                if (ResourcePackDataConfig.isDisplayCustomMenuUnicodes()) {
+                if (DefaultConfig.isForceMenuUnicode() || Bukkit.getPluginManager().isPluginEnabled("ResourcePackManager")) {
                     infoButton.setType(Material.PAPER);
                     ItemMeta itemMeta = infoButton.getItemMeta();
                     itemMeta.setCustomModelData(MetadataHandler.signatureID);

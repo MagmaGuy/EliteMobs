@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.menus;
 
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
-import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
 import com.magmaguy.elitemobs.config.SpecialItemSystemsConfig;
 import com.magmaguy.elitemobs.config.menus.premade.ItemEnchantmentMenuConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
@@ -56,7 +56,7 @@ public class ItemEnchantmentMenu extends EliteMenu {
 
     public ItemEnchantmentMenu(Player player) {
         String name = MENU_NAME;
-        if (ResourcePackDataConfig.isDisplayCustomMenuUnicodes())
+        if (DefaultConfig.isForceMenuUnicode() || Bukkit.getPluginManager().isPluginEnabled("ResourcePackManager"))
             name = ChatColor.WHITE + "\uF801\uDB80\uDC2A\uF805           " + MENU_NAME;
         Inventory inventory = Bukkit.createInventory(player, 54, name);
         ItemEnchantMenuEvents.menus.add(inventory);
