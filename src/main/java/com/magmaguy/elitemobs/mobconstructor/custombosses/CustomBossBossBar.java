@@ -43,7 +43,7 @@ public class CustomBossBossBar {
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (!player.getWorld().equals(customBossEntity.getLocation().getWorld())) continue;
             TextComponent interactiveMessage = new TextComponent(MobCombatSettingsConfig.getBossLocationMessage());
-            interactiveMessage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/elitemobs trackcustomboss " + customBossEntity.getEliteUUID()));
+            interactiveMessage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/elitemobs track boss " + customBossEntity.getEliteUUID()));
             interactiveMessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(DefaultConfig.getTrackMessage().replace("$name", customBossEntity.getName())).create()));
             player.spigot().sendMessage(interactiveMessage);
         }

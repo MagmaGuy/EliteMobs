@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.commands.setup;
 
-import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
 import com.magmaguy.elitemobs.config.menus.premade.GetLootMenuConfig;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
 import com.magmaguy.magmacore.util.ChatColorConverter;
@@ -221,7 +220,7 @@ public class SetupMenu {
         String state = "Custom resource pack is";
         String lore;
         Material material;
-        boolean resourceState = ResourcePackDataConfig.isEliteMobsResourcePackEnabled();
+        boolean resourceState = Bukkit.getPluginManager().isPluginEnabled("ResourcePackManager");
 
         if (!resourceState) {
             material = Material.YELLOW_STAINED_GLASS_PANE;

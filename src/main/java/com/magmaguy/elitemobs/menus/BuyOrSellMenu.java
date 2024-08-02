@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.menus;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.menus.premade.BuyOrSellMenuConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -24,14 +24,14 @@ public class BuyOrSellMenu {
 
     public static void constructBuyOrSellMenu(Player player, ItemStack buyItemStack) {
         String inventoryName = BuyOrSellMenuConfig.SHOP_NAME;
-        if (ResourcePackDataConfig.isDisplayCustomMenuUnicodes())
+        if (DefaultConfig.isForceMenuUnicode() || Bukkit.getPluginManager().isPluginEnabled("ResourcePackManager"))
             inventoryName = ChatColor.WHITE + "\uF801\uDB80\uDC7B\uF805       " + inventoryName;
 
         Inventory shopInventory = Bukkit.createInventory(player, 18, inventoryName);
         menus.add(shopInventory);
         //information item
         ItemStack info = BuyOrSellMenuConfig.INFORMATION_ITEM;
-        if (ResourcePackDataConfig.isDisplayCustomMenuUnicodes()) {
+        if (DefaultConfig.isForceMenuUnicode() || Bukkit.getPluginManager().isPluginEnabled("ResourcePackManager")) {
             info.setType(Material.PAPER);
             ItemMeta itemMeta = info.getItemMeta();
             itemMeta.setCustomModelData(MetadataHandler.signatureID);
