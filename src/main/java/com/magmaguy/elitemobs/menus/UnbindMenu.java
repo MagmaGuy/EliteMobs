@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.menus;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.DefaultConfig;
-import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
 import com.magmaguy.elitemobs.config.menus.premade.UnbinderMenuConfig;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
@@ -50,7 +49,7 @@ public class UnbindMenu extends EliteMenu {
      */
     public void constructUnbinderMenu(Player player) {
         String menuName = UnbinderMenuConfig.getShopName();
-        if (ResourcePackDataConfig.isDisplayCustomMenuUnicodes())
+        if (DefaultConfig.isForceMenuUnicode() || Bukkit.getPluginManager().isPluginEnabled("ResourcePackManager"))
             menuName = ChatColor.WHITE + "\uF801\uDB80\uDC9B\uF805          " + menuName;
         Inventory UnbinderInventory = Bukkit.createInventory(player, 54, menuName);
 
@@ -58,7 +57,7 @@ public class UnbindMenu extends EliteMenu {
 
             if (i == UnbinderMenuConfig.getInfoSlot()) {
                 ItemStack infoButton = UnbinderMenuConfig.getInfoButton();
-                if (ResourcePackDataConfig.isDisplayCustomMenuUnicodes()) {
+                if (DefaultConfig.isForceMenuUnicode() || Bukkit.getPluginManager().isPluginEnabled("ResourcePackManager")) {
                     infoButton.setType(Material.PAPER);
                     ItemMeta itemMeta = infoButton.getItemMeta();
                     itemMeta.setCustomModelData(MetadataHandler.signatureID);

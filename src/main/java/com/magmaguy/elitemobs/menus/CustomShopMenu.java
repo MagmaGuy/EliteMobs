@@ -1,8 +1,8 @@
 package com.magmaguy.elitemobs.menus;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
-import com.magmaguy.elitemobs.config.ResourcePackDataConfig;
 import com.magmaguy.elitemobs.config.menus.premade.BuyOrSellMenuConfig;
 import com.magmaguy.elitemobs.config.menus.premade.CustomShopMenuConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
@@ -60,7 +60,7 @@ public class CustomShopMenu {
      */
     public static void customShopConstructor(Player player) {
         String menuName = CustomShopMenuConfig.shopName;
-        if (ResourcePackDataConfig.isDisplayCustomMenuUnicodes())
+        if (DefaultConfig.isForceMenuUnicode() || Bukkit.getPluginManager().isPluginEnabled("ResourcePackManager"))
             menuName = ChatColor.WHITE + "\uF801\uDB80\uDC8B\uF805          " + menuName;
         Inventory shopInventory = Bukkit.createInventory(player, 54, menuName);
         populateShop(shopInventory, player);
@@ -76,7 +76,7 @@ public class CustomShopMenu {
     private static void populateShop(Inventory shopInventory, Player player) {
 
         ItemStack rerollButton = CustomShopMenuConfig.rerollItem;
-        if (ResourcePackDataConfig.isDisplayCustomMenuUnicodes()) {
+        if (DefaultConfig.isForceMenuUnicode() || Bukkit.getPluginManager().isPluginEnabled("ResourcePackManager")) {
             rerollButton.setType(Material.PAPER);
             ItemMeta itemMeta = rerollButton.getItemMeta();
             itemMeta.setCustomModelData(MetadataHandler.signatureID);

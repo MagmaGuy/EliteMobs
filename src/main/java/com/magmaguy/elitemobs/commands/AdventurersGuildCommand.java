@@ -4,11 +4,11 @@ import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class AdventurersGuildCommand extends AdvancedCommand {
     public AdventurersGuildCommand() {
-        super(List.of("adventurersguild", "ag"));
+        super(new ArrayList<>());
         setUsage("/em adventurersguild");
         setPermission("elitemobs.adventurersguild.command");
         setSenderType(SenderType.PLAYER);
