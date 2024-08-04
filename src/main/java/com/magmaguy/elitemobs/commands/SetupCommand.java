@@ -10,7 +10,7 @@ import java.util.List;
 public class SetupCommand extends AdvancedCommand {
     public SetupCommand() {
         super(List.of("setup"));
-        setPermission("elitemobs.setup.main");
+        setPermission("elitemobs.setup");
         setSenderType(SenderType.PLAYER);
         setDescription("The main command for setting up EliteMobs!");
         setUsage("/em setup");

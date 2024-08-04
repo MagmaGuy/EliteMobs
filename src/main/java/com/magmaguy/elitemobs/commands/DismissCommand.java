@@ -12,6 +12,7 @@ public class DismissCommand extends AdvancedCommand {
         super(List.of("dismiss"));
         setDescription("Dismisses /em menu message.");
         setUsage("/em dismiss");
+        setPermission("elitemobs.dismiss");
         setSenderType(SenderType.PLAYER);
     }
 

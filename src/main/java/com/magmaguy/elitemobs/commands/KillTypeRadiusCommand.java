@@ -16,7 +16,7 @@ public class KillTypeRadiusCommand extends AdvancedCommand {
         addArgument("type", new ArrayList<>());
         addArgument("range", new ArrayList<>());
         setUsage("/em kill type <entityType> <radius>");
-        setPermission("elitemobs.kill.type.radius");
+        setPermission("elitemobs.kill.command");
         setSenderType(SenderType.PLAYER);
         setDescription("Kills all elites of the specified type within the specified radius.");
     }
