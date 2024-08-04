@@ -55,6 +55,7 @@ public class CommandHandler {
         emCommand.registerCommand(new ShopSellOtherCommand());
         emCommand.registerCommand(new QuestBypassCommand());
         emCommand.registerCommand(new QuestCompleteCommand());
+        emCommand.registerCommand(new QuestCompleteQuestCommand());
         emCommand.registerCommand(new QuestResetCommand());
         emCommand.registerCommand(new QuestResetAllCommand());
         emCommand.registerCommand(new TransitiveBlocksCancelCommand());
@@ -92,6 +93,7 @@ public class CommandHandler {
         emCommand.registerCommand(new DungeonTeleportCommand());
         emCommand.registerCommand(new TrackBossCommand());
         emCommand.registerCommand(new PayCommand());
+        emCommand.registerCommand(new AdventurersGuildArgCommand());
 
         emCommand.registerCommand(new EliteMobsCommand());
         emCommand.registerCommand(new HelpCommand());

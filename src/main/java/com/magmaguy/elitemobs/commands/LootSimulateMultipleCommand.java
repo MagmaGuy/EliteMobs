@@ -17,7 +17,7 @@ public class LootSimulateMultipleCommand extends AdvancedCommand {
         addArgument("times", new ArrayList<>(CustomItemsConfig.getCustomItems().keySet()));
         addArgument("playerName", new ArrayList<>());
         setUsage("/em loot simulate <level> <times> <playerName>");
-        setPermission("elitemobs.loot.simulate.times");
+        setPermission("elitemobs.loot.admin");
         setSenderType(SenderType.PLAYER);
         setDescription("Simulates loot drops for the specified amount of times for the specified level and player.");
     }

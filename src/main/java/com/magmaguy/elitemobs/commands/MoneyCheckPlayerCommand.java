@@ -12,7 +12,7 @@ public class MoneyCheckPlayerCommand extends AdvancedCommand {
         addLiteral("check");
         addArgument("player", new ArrayList<>());
         setUsage("/em money check <player>");
-        setPermission("elitemobs.money.check.player");
+        setPermission("elitemobs.money.check.others");
         setDescription("Checks the currency of the specified player.");
     }
 

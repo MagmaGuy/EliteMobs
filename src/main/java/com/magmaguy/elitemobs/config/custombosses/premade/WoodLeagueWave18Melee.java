@@ -16,7 +16,7 @@ public class WoodLeagueWave18Melee extends CustomBossesConfigFields {
                 "18");
         setFollowDistance(60);
         setPowers(Arrays.asList("corpse.yml", "attack_fire.yml"));
-        setHelmet(new ItemStack(Material.STICK));
+
         setMainHand(new ItemStack(Material.DIAMOND_SWORD));
     }
 }

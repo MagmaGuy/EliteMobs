@@ -14,7 +14,7 @@ public class SpawnBossCommand extends AdvancedCommand {
         addLiteral("boss");
         addArgument("filename", new ArrayList<>(CustomBossesConfig.getCustomBosses().keySet()));
         setUsage("/em spawn boss <filename>");
-        setPermission("elitemobs.spawn.boss");
+        setPermission("elitemobs.place.admin");
         setSenderType(SenderType.PLAYER);
         setDescription("Spawns a custom boss at the location the user is looking at.");
     }

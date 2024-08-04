@@ -11,7 +11,7 @@ public class RespawnAllCommand extends AdvancedCommand {
         super(List.of("respawn"));
         addLiteral("all");
         setUsage("/em respawn all");
-        setPermission("elitemobs.respawn");
+        setPermission("elitemobs.respawn.force");
         setDescription("Forces all regional bosses to respawn.");
     }
 

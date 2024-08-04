@@ -15,7 +15,7 @@ public class ShopSellOtherCommand extends AdvancedCommand {
         addLiteral("sell");
         addArgument("player", new ArrayList<>());
         setUsage("/em shop sell <player>");
-        setPermission("elitemobs.shop.sell.player");
+        setPermission("elitemobs.shop.sell.other");
         setDescription("Opens the EliteMobs shop sell menu for the specified player.");
     }
 
