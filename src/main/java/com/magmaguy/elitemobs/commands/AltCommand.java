@@ -14,6 +14,7 @@ public class AltCommand extends AdvancedCommand {
         super(List.of("alt"));
         setUsage("/em alt");
         setDescription("Changes the style of the /em menu.");
+        setPermission("elitemobs.alt");
         setSenderType(SenderType.PLAYER);
     }
 

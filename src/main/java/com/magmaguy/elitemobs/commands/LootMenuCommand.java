@@ -12,7 +12,7 @@ public class LootMenuCommand extends AdvancedCommand {
         super(List.of("loot"));
         addLiteral("menu");
         setUsage("/em loot menu");
-        setPermission("elitemobs.loot.menu");
+        setPermission("elitemobs.loot.admin");
         setSenderType(SenderType.PLAYER);
         setDescription("Opens the loot menu.");
     }

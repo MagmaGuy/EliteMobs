@@ -18,7 +18,7 @@ public class SpawnElite extends AdvancedCommand {
         addArgument("level", new ArrayList<>());
         addArgument("powers", ElitePower.getElitePowers().keySet().stream().toList());
         setUsage("/em spawn elite <entityType> <level> <power1> <power2> <power3> <...>");
-        setPermission("elitemobs.spawn.elite");
+        setPermission("elitemobs.place.admin");
         setSenderType(SenderType.PLAYER);
         setDescription("Spawns an elite of the specified type and level, and optionally with the specified powers.");
     }

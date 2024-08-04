@@ -14,6 +14,7 @@ public class PayCommand extends AdvancedCommand {
         addArgument("amount", new ArrayList<>());
         setDescription("Send money to a player, minus tax.");
         setUsage("/em pay <player> <amount>");
+        setPermission("elitemobs.money.pay");
         setSenderType(SenderType.PLAYER);
     }
 

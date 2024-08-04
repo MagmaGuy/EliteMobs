@@ -476,7 +476,7 @@ public class AdventurersGuildConfig extends ConfigurationFile {
         baseKillsForRankUp = ConfigurationEngine.setInt(
                 List.of("Sets the estimated base amount of bosses that must be killed to be able to afford a rank up."),
                 fileConfiguration, "baseKillsForRankUp", 100);
-        additionalKillsForRankUpPerTier = ConfigurationEngine.setInt(
+        baseKillsForRankUp = ConfigurationEngine.setInt(
                 List.of("Sets the estimated additional amount of bosses that must be killed to be able to rank up, per level.",
                         "The formula is this amount x the level the player is currently at."),
                 fileConfiguration, "additionalKillsForRankUpPerTier", 50);

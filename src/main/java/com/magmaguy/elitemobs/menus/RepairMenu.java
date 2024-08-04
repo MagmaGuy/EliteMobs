@@ -41,7 +41,7 @@ public class RepairMenu extends EliteMenu {
         int baselineRepair = 100;
         int newDamage = baselineRepair * scrapLevel;
         Damageable damageable = (Damageable) outputItem.getItemMeta();
-        int damage = Math.min(damageable.getDamage() - newDamage, damageable.getDamage());
+        int damage = Math.min(Math.max((damageable.getDamage() - newDamage), 0), damageable.getDamage());
         damageable.setDamage(damage);
         outputItem.setItemMeta(damageable);
         repairInventory.setItem(outputSlot, outputItem);
