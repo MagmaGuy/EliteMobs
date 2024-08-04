@@ -20,7 +20,7 @@ public class PlaceBossCommand extends AdvancedCommand {
                 regionalBosses.add(entry.getKey());
         addArgument("filename", regionalBosses);
         setUsage("/em place boss <filename>");
-        setPermission("elitemobs.place.boss");
+        setPermission("elitemobs.place.admin");
         setSenderType(SenderType.PLAYER);
         setDescription("Add a spawn location for the specified boss at your current location.");
     }

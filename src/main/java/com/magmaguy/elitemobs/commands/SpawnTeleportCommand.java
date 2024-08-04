@@ -11,7 +11,7 @@ import java.util.List;
 public class SpawnTeleportCommand extends AdvancedCommand {
     public SpawnTeleportCommand() {
         super(List.of("spawntp"));
-        setPermission("elitemobs.spawntp");
+        setPermission("elitemobs.teleport.spawn");
         setUsage("/em spawntp");
         setDescription("Teleports players to the server spawn.");
         setSenderType(SenderType.PLAYER);

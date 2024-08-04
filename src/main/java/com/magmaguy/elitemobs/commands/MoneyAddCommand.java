@@ -14,7 +14,7 @@ public class MoneyAddCommand extends AdvancedCommand {
         addArgument("player", new ArrayList<>());
         addArgument("amount", new ArrayList<>(CustomItemsConfig.getCustomItems().keySet()));
         setUsage("/em money add <player> <amount>");
-        setPermission("elitemobs.money.add.player");
+        setPermission("elitemobs.money.admin");
         setDescription("Gives the specified amount of money to the designated player.");
     }
 
