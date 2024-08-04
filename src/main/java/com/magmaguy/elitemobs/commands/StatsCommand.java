@@ -10,7 +10,7 @@ public class StatsCommand extends AdvancedCommand {
     public StatsCommand() {
         super(List.of("stats"));
         setUsage("/em stats");
-        setPermission("elitemobs.*");
+        setPermission("elitemobs.stats");
         setSenderType(SenderType.PLAYER);
         setDescription("Displays EliteMobs server stats.");
     }

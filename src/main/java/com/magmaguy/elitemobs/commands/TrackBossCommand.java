@@ -19,6 +19,7 @@ public class TrackBossCommand extends AdvancedCommand {
         setDescription("Tracks a Custom Boss.");
         setUsage("/em track boss <id>");
         setSenderType(SenderType.PLAYER);
+        setPermission("elitemobs.boss.track");
     }
 
     @Override

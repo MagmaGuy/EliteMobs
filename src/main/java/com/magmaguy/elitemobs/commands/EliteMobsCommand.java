@@ -13,6 +13,7 @@ public class EliteMobsCommand extends AdvancedCommand {
         super(new ArrayList<>());
         setDescription("The main command for EliteMobs, opens the main menu.");
         setUsage("/em");
+        setPermission("elitemobs.command");
         setSenderType(SenderType.PLAYER);
     }
 

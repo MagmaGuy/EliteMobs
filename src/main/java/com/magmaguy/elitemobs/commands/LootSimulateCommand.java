@@ -16,7 +16,7 @@ public class LootSimulateCommand extends AdvancedCommand {
         addArgument("level", new ArrayList<>());
         addArgument("playerName", new ArrayList<>(CustomItemsConfig.getCustomItems().keySet()));
         setUsage("/em loot simulate <level> <playerName>");
-        setPermission("elitemobs.loot.simulate");
+        setPermission("elitemobs.loot.admin");
         setSenderType(SenderType.PLAYER);
         setDescription("Simulates loot drops for the specified level and player.");
     }
