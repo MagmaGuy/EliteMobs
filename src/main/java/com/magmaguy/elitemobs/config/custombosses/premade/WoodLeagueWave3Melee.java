@@ -1,9 +1,7 @@
 package com.magmaguy.elitemobs.config.custombosses.premade;
 
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
-import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
@@ -16,6 +14,6 @@ public class WoodLeagueWave3Melee extends CustomBossesConfigFields {
                 "3");
         setPowers(List.of("attack_fire.yml"));
         setFollowDistance(60);
-        setHelmet(new ItemStack(Material.STICK));
+
     }
 }

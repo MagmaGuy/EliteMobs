@@ -14,7 +14,7 @@ public class KillTypeCommand extends AdvancedCommand {
         addLiteral("type");
         addArgument("type", new ArrayList<>());
         setUsage("/em kill type <entityType>");
-        setPermission("elitemobs.kill.type");
+        setPermission("elitemobs.kill.command");
         setDescription("Kills all elites of the specified type.");
     }
 

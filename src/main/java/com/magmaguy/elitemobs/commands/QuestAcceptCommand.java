@@ -14,7 +14,7 @@ public class QuestAcceptCommand extends AdvancedCommand {
         addLiteral("accept");
         addArgument("questID", new ArrayList<>());
         setUsage("/em quest accept <questID>");
-        setPermission("elitemobs.quest.command");
+        setPermission("elitemobs.quest.accept");
         setSenderType(SenderType.PLAYER);
         setDescription("Accepts a quest. Used via menu, can't be directly used.");
     }
