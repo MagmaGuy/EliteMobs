@@ -60,7 +60,7 @@ public class NPCInteractions implements Listener {
                 npcEntity.sayDialog(event.getPlayer());
                 break;
             case CUSTOM_SHOP:
-                if (event.getPlayer().hasPermission("elitemobs.customshop.npc"))
+                if (event.getPlayer().hasPermission("elitemobs.shop.custom.npc"))
                     new BukkitRunnable() {
                         @Override
                         public void run() {
@@ -70,7 +70,7 @@ public class NPCInteractions implements Listener {
 
                 break;
             case PROCEDURALLY_GENERATED_SHOP:
-                if (event.getPlayer().hasPermission("elitemobs.shop.npc"))
+                if (event.getPlayer().hasPermission("elitemobs.shop.dynamic.npc"))
                     new BukkitRunnable() {
                         @Override
                         public void run() {
@@ -94,7 +94,7 @@ public class NPCInteractions implements Listener {
                 event.getPlayer().sendMessage("[EliteMobs] This feature is coming soon!");
                 break;
             case SELL:
-                if (event.getPlayer().hasPermission("elitemobs.shop.npc"))
+                if (event.getPlayer().hasPermission("elitemobs.shop.sell.npc"))
                     new BukkitRunnable() {
                         @Override
                         public void run() {
