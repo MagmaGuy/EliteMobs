@@ -15,7 +15,7 @@ public class WoodLeagueWave7Ranged extends CustomBossesConfigFields {
                 "$normalLevel Arena Crossbowman",
                 "7");
         setFollowDistance(60);
-        setHelmet(new ItemStack(Material.STICK));
+
         setMainHand(new ItemStack(Material.CROSSBOW));
         setPowers(List.of("attack_vacuum.yml"));
     }
