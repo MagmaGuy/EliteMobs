@@ -12,7 +12,7 @@ public class MoneyAddAllCommand extends AdvancedCommand {
         addLiteral("addAll");
         addArgument("amount", new ArrayList<>());
         setUsage("/em money addAll <amount>");
-        setPermission("elitemobs.money.add.all");
+        setPermission("elitemobs.money.admin");
         setDescription("Gives every player on the server the specified amount of money.");
     }
 

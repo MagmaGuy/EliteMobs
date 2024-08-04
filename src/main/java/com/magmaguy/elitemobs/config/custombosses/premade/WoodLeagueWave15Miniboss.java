@@ -1,9 +1,7 @@
 package com.magmaguy.elitemobs.config.custombosses.premade;
 
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
-import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
 import java.util.List;
@@ -16,7 +14,7 @@ public class WoodLeagueWave15Miniboss extends CustomBossesConfigFields {
                 "$bossLevel &4Mr. Oinkers",
                 "15");
         setFollowDistance(60);
-        setHelmet(new ItemStack(Material.STICK));
+
         setPowers(Arrays.asList("gold_explosion.yml", "gold_shotgun.yml"));
         setMovementSpeedAttribute(0.6D);
         setHealthMultiplier(3D);

@@ -22,7 +22,7 @@ public class SpawnBossLevelAtCommand extends AdvancedCommand {
         addArgument("z", new ArrayList<>());
         addArgument("level", new ArrayList<>());
         setUsage("/em spawn bossAt <filename> <worldName> <x> <y> <z> <level>");
-        setPermission("elitemobs.spawn.boss.at.level");
+        setPermission("elitemobs.place.admin");
         setDescription("Spawns a custom boss at the specified location with the specified level.");
     }
 

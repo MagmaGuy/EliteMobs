@@ -15,7 +15,7 @@ public class WoodLeagueWave16Ranged extends CustomBossesConfigFields {
                 "$normalLevel Mr. Oinkers Fan",
                 "16");
         setFollowDistance(60);
-        setHelmet(new ItemStack(Material.STICK));
+
         setMainHand(new ItemStack(Material.CROSSBOW));
         setPowers(List.of("attack_vacuum.yml"));
         setDamageMultiplier(0.5D);

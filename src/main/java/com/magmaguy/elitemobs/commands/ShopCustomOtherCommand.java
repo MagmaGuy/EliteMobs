@@ -15,7 +15,7 @@ public class ShopCustomOtherCommand extends AdvancedCommand {
         addLiteral("custom");
         addArgument("player", new ArrayList<>());
         setUsage("/em shop custom <player>");
-        setPermission("elitemobs.shop.custom.player");
+        setPermission("elitemobs.shop.custom.other");
         setDescription("Opens the EliteMobs shop for custom items for the specified player.");
     }
 

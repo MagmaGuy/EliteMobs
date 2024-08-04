@@ -1,5 +1,5 @@
 name: EliteMobs
-version: 9.1.0
+version: 9.1.1
 author: MagmaGuy
 main: com.magmaguy.elitemobs.EliteMobs
 api-version: 1.14
@@ -31,300 +31,172 @@ commands:
 permissions:
   elitemobs.*:
     description: Gives access to all elitemobs commands
-    children:
-      elitemobs.stats: true
-      elitemobs.checktier.others: true
-      elitemobs.versionnotification: true
-      elitemobs.currency.check.others: true
     default: op
-  elitemobs.stats:
-    description: Allows players to run /elitemobs stats
-    default: op
-  elitemobs.version:
-    description: Allows players to run /elitemobs version
-    default: true
-  elitemobs.shop.npc:
-    description: Allows players to interact with NPCs for dynamic shops
-    default: true
-  elitemobs.shop.command:
-    description: Allows players to open the dynamic shop menu through commands
-    default: true
-  elitemobs.customshop.npc:
-    description: Allows players to interact with NPCs for dynamic shops
-    default: true
-  elitemobs.customshop.command:
-    description: Allows players to open the dynamic shop menu through commands
-    default: true
-  elitemobs.currency.pay:
-    description: Allows players to run /elitemobs pay [username] [amount]
-    default: true
-  elitemobs.currency.check:
-    description: Allows players to run /elitemobs wallet
-    default: true
-  elitemobs.currency.check.others:
-    description: Allows players to run /elitemobs check [username]
-    default: op
-  elitemobs.events:
-    description: Allows players to launch all events
-    default: true
-  elitemobs.checktier.others:
-    description: Allows players to run /elitemobs checktier [player]
-    default: op
-  elitemobs.gettier:
-    description: Allows players to run /elitemobs gettier [tier]
-    default: op
-  elitemobs.versionnotification:
-    description: Allows players to get notified about plugin updates
-    default: op
-  elitemobs.adventurersguild.teleport:
-    description: Allows players to teleport to the adventurer's guild hub using /ag
-    default: true
   elitemobs.adventurersguild.command:
-    description: Allows players to rank menu using the /em adventurersguild command
+    description: Allows players to either teleport to the Adventurer's Guild or open the Adventurer's Guild menu
     default: true
-  elitemobs.rank.command:
-    description: Allows players to open the rank menu through /em rank
+  elitemobs.alt:
+    description: Allows players to switch menu styles
     default: true
-  elitemobs.rank.npc:
-    description: Allows players to access the /em rank menu through NPCs
-    default: true
-  elitemobs.quest.command:
-    description: Allows players to take on quests via command
-    default: true
-  elitemobs.quest.npc:
-    description: Allows players to take on quests via EliteMobs NPC
-    default: true
-  elitemobs.dungeontp:
-    description: Allows players to teleport to an elitemobs-set location
-    default: true
-  elitemobs.spawntp:
-    description: Allows players to teleport to the default spawn location of the server.
-    default: true
-  elitemobs.back.npc:
-    description: Allows players to interact with an npc to go back to a previous location.
-    default: true
-  elitemobs.shareitem:
-    description: Shares a held Elite Item on chat.
-    default: true
-  elitemobs.scrap.npc:
-    description: Allows players to scrap items at an npc
-    default: true
-  elitemobs.scrap.command:
-    description: Allows players to scrap items using a command
-    default: true
-  elitemobs.smelt.command:
-    description: Allows players to smelt items using a command
-    default: true
-  elitemobs.smelt.npc:
-    description: Allows players to smelt items using an npc
-    default: true
-  elitemobs.repair.command:
-    description: Allows players to use the repair command to open the menu for repairing elite items
-    default: true
-  elitemobs.repair.npc:
-    description: Allows players to interact with the NPC for repairing items
-    default: true
-  elitemobs.refiner.command:
-    description: Allows players to use the refiner command to open the menu for upgrading Elite Scrap
-    default: true
-  elitemobs.refiner.npc:
-    description: Allows players to interact with the NPC for upgrading Elite Scrap
-    default: true
-  elitemobs.enhancer.command:
-    description: Allows players to use the enhancer command to open the menu for upgrading Elite Items
-    default: true
-  elitemobs.enhancer.npc:
-    description: Allows players to interact with the NPC for upgrading Elite Items
-    default: true
-  elitemobs.unbind.command:
-    description: Allows players to use the unbind command to open the menu to unbind Elite Items
-    default: true
-  elitemobs.unbind.npc:
-    description: Allows players to interact with the unbinder NPC to unbind Elite Items
-    default: true
-  elitemobs.soulbind.bypass:
-    description: Allows users to bypass the soulbind restrictions. Only recommended for admins!
-    default: false
-  elitequest.*:
-    description: Used for quest-related permissions
-    default: not op
-  elitemobs.enchant.npc:
-    description: Allows players to interact with the enchanter NPC to enchant Elite Items
-    default: true
-  elitemobs.enchant.command:
-    description: Allows players to use the enchant command to enchant Elite Items
-    default: true
-  elitemobs.arena.menu:
-    description: Allows players to open the Arena menu and join an Arena.
+  elitemobs.arena.start:
+    description: Allows players to start an arena
     default: true
   elitemobs.debug:
-    description: Allows players to have access to the player/bosses debug command.
-    default: true
+    description: Gives access to the debug command
+    default: op
   elitemobs.discord.link:
-    description: Allows players to have access to the Discord link command.
+    description: Gives the link to EliteMobs' discord server
     default: true
   elitemobs.discord.message:
-    description: Allows players to have access to the DiscordSRV message debug command.
+    description: Allows sending debug messages to discord via DiscordSRV for testing purposes
     default: op
+  elitemobs.dismiss:
+    description: Allows admins to dismiss the initial setup message
+    default: op
+  elitemobs.dungeon.tp:
+    description: Allows players to teleport to a dungeon
+    default: true
+  elitemobs.command:
+    description: Allows players to use the main command of the plugin
+    default: true
+  elitemobs.enchant.command:
+    description: Allows players to use the enchant command
+    default: true
   elitemobs.event.start:
-    description: Allows players to start specific events.
+    description: Allows admins to manually launch an event
     default: op
   elitemobs.fireball:
-    description: Allows players to shoot a fireball at the pointer's location.
+    description: Allows admins to fire an elite fireball for terrain destruction testing purposes
     default: op
   elitemobs.help:
-    description: Allows players to see all available EliteMobs commands.
-    default: op
-  elitemobs.kill.kill:
-    description: Allows players to kill all elites.
-    default: op
-  elitemobs.kill.radius:
-    description: Allows players to kill all elites in the specified radius.
-    default: op
-  elitemobs.kill.type:
-    description: Allows players to kill all elites of the specified type.
-    default: op
-  elitemobs.kill.type.radius:
-    description: Allows players to kill all elites of the specified type within the given radius.
+    description: Allows players to run the help command
+    default: true
+  elitemobs.kill.command:
+    description: Allows admins to run the kill commands to kill elites
     default: op
   elitemobs.language:
-    description: Allows players to set the language that the server will use for EliteMobs.
+    description: Allows admins to set the translation used server-wide for EliteMobs
     default: op
-  elitemobs.loot.debug:
-    description: Allows players to equip themselves with a complete armor set, weapons set of the specified level, and food for testing purposes.
-    default: op
-  elitemobs.loot.give:
-    description: Allows players to give the specified loot to a specific player.
-    default: op
-  elitemobs.loot.menu:
-    description: Allows players to open the loot menu and select any loot they want.
-    default: op
-  elitemobs.loot.random:
-    description: Allows players to get random loot of the specified level.
-    default: op
-  elitemobs.loot.simulate:
-    description: Allows players to get simulated loot drops for the specified level and player.
-    default: op
-  elitemobs.loot.simulate.times:
-    description: Allows players to get simulated loot drops for a specified number of times for the given level and player.
-    default: op
-  elitemobs.loot.stats:
-    description: Allows players to see EliteMobs stats for the currently held item.
+  elitemobs.loot.command:
+    description: Opens the loot menu for EliteMobs group looting
     default: true
+  elitemobs.loot.debug:
+    description: Gives admins a set of gear of a specific level for testing purposes
+    default: op
+  elitemobs.loot.admin:
+    description: Lets admins give or obtain EliteMobs loot via command
+    default: op
   elitemobs.loot.stats:
-    description: Allows players to see EliteMobs stats for the currently held item.
+    description: Gives the elite stats of gear, for debugging purposes
     default: op
-  elitemobs.money.add.all:
-    description: Allows players to give every player on the server the specified amount of money.
-    default: op
-  elitemobs.money.add.player:
-    description: Allows players to give the specified amount of money to the designated player.
+  elitemobs.money.admin:
+    description: Allows admins to manually manipulate player elite currency
     default: op
   elitemobs.money.check.self:
-    description: Allows players to check their EliteMobs currency.
+    description: Allows users to check their balance
     default: true
-  elitemobs.money.check.player:
-    description: Allows players to check the currency of the specified player.
+  elitemobs.money.check.others:
+    description: Allows users to check their balance
     default: op
-  elitemobs.money.remove:
-    description: Allows players to deduct the specified amount of currency from a player.
+  elitemobs.dungeon.package:
+    description: Allows admins to package EliteMobs content for distribution
     default: op
-  elitemobs.money.set:
-    description: Allows players to set the specified amount of currency for the specified player.
+  elitemobs.money.pay:
+    description: Allows users to check their balance
+    default: true
+  elitemobs.place.admin:
+    description: Allows admins to run all commands related to placing and spawning npcs, bosses, treasure chests and more
     default: op
-  elitemobs.package:
-    description: Allows players to package an EliteMobs dungeon for distribution.
-    default: op
-  elitemobs.place.boss:
-    description: Allows players to add a spawn location for the specified boss at their current location.
-    default: op
-  elitemobs.place.npc:
-    description: Allows players to permanently add an NPC to the location the user is standing on.
-    default: op
-  elitemobs.place.treasure:
-    description: Allows players to permanently add a treasure chest to the location the user is standing on.
-    default: op
-  elitemobs.place.wormhole:
-    description: Allows players to permanently add a wormhole teleport at their current location.
-    default: op
+  elitemobs.quest.accept:
+    description: Allows users to accept a quest
+    default: true
   elitemobs.quest.bypass:
-    description: Allows players to bypass permission restrictions for elite quests.
+    description: Allows users to accept a quest
+    default: op
+  elitemobs.quest.complete.force:
+    description: Allows admins to force complete all pending quests
     default: op
   elitemobs.quest.complete:
-    description: Allows players to force complete all of their currently active elite quests. For debugging use only.
-    default: op
+    description: Allows players to complete quests
+    default: true
   elitemobs.quest.leave:
-    description: Allows players to leave a quest. Used via menu, can't be directly used.
-    default: op
+    description: Allows users to leave a quest
+    default: true
   elitemobs.quest.reset.all:
-    description: Allows players to reset all quests for a specific player.
+    description: Allows admins to reset all quests for a specific player
     default: op
-  elitemobs.quest.reset.quest:
-    description: Allows players to reset a specific quest for a specific player.
+  elitemobs.quest.reset:
+    description: Allows admins to reset a quest for a specific player
     default: op
+  elitemobs.quest.track:
+    description: Allows players to track the objectives of a quest
+    default: true
+  elitemobs.quit:
+    description: Allows players to quit instanced content
+    default: true
+  elitemobs.rank.command:
+    description: Allows players to join open the rank menu of EliteMobs
+    default: true
   elitemobs.rank.set:
-    description: Allows players to manually set a player's guild rank to a the prestige level and guild level specified.
+    description: Allows admins to set a specific EliteMobs rank for a specific player
     default: op
   elitemobs.reload:
-    description: Allows players to reload EliteMobs.
+    description: Allows admins to reload EliteMobs
     default: op
   elitemobs.remove:
-    description: Allows players to toggle removal mode for EliteMobs, which can permanently remove any EliteMobs-related content.
+    description: Allows admins to use the remove command
     default: op
-  elitemobs.respawn:
-    description: Allows players to force respawn all regional bosses.
+  elitemobs.repair.command:
+    description: Allows users to use the repair command
+    default: true
+  elitemobs.respawn.force:
+    description: Allows admins to force respawn all regional bosses
     default: op
-  elitemobs.setup.main:
-    description: Allows players to have access to the main command for setting up EliteMobs.
+  elitemobs.scrap.command:
+    description: Allows players to use the scrap command
+    default: true
+  elitemobs.setup:
+    description: Allows admins to use the setup commands
     default: op
-  elitemobs.setup.done:
-    description: Allows players to toggle whether the setup message will show up in the server chat.
-    default: op
-  elitemobs.setup.toggle:
-    description: Allows players to toggle the installation of specified EliteMobs content.
-    default: op
+  elitemobs.shareitem:
+    description: Allows players to use the share item command
+    default: true
   elitemobs.shop.custom:
-    description: Allows players to open the EliteMobs shop for custom items for the specified player.
+    description: Allows players to use custom shop command
+    default: true
+  elitemobs.shop.custom.other:
+    description: Allows admins to open the custom shop for other people
     default: op
-  elitemobs.shop.sell.player:
-    description: Allows players to open the EliteMobs shop for custom items for the specified player.
+  elitemobs.shop.dynamic:
+    description: Allows players to use dynamic shop command
+    default: true
+  elitemobs.shop.dynamic.other:
+    description: Allows admins to open the dynamic shop for other people
     default: op
-  elitemobs.spawn.boss.at:
-    description: Allows players to spawn a custom boss at the specified location.
+  elitemobs.shop.sell.other:
+    description: Allows admins to open the sell shop for other people
     default: op
-  elitemobs.spawn.boss:
-    description: Allows players to spawn a custom boss at the location the player is looking at.
+  elitemobs.teleport.spawn:
+    description: Allows players to use the spawn teleport command
+    default: true
+  elitemobs.instance.start:
+    description: Allows players to use the start command in instances
+    default: true
+  elitemobs.stats:
+    description: Allows admins to get stats related to EliteMobs
     default: op
-  elitemobs.spawn.boss.at.level:
-    description: Allows players to spawn a custom boss at the specified location with the specified level.
+  elitemobs.boss.track:
+    description: Allows players to track trackable bosses
+    default: true
+  elitemobs.transitiveblocks:
+    description: Allows admins to run commands related to setting up transitive blocks
     default: op
-  elitemobs.spawn.boss.level:
-    description: Allows players to spawn a custom boss at the location the user is looking at with the specified level.
-    default: op
-  elitemobs.spawn.elite:
-    description: Allows players to spawn an elite of a specified type and level, optionally with specific powers, at the targeted location.
-    default: op
-  elitemobs.spawn.elite.at:
-    description: Allows players to spawn an elite of the specified type and level, optionally with specified powers, at the chosen location.
-    default: op
-  elitemobs.transitiveblocks.cancel:
-    description: Allows players to cancel transitive block registration.
-    default: op
-  elitemobs.transitiveblocks.edit.area:
-    description: Allows players to edit large transitive blocks areas for use by regional bosses.
-    default: op
-  elitemobs.transitiveblocks.edit.edit:
-    description: Allows players to edit transitive blocks for use by regional bosses.
-    default: op
-  elitemobs.transitiveblocks.register.area:
-    description: Allows players to register large transitive blocks areas for use by regional bosses.
-    default: op
-  elitemobs.transitiveblocks.register.register:
-    description: Allows players to register transitive blocks for use by regional bosses.
-    default: op
+  elitemobs.unbind.command:
+    description: Allows players to run the unbind command (which opens the menu to unbind with a scroll)
+    default: true
   elitemobs.unbind.force:
-    description: Allows players to forcefully unbind a held item.
+    description: Allows admins to force unbind a held item via command
     default: op
   elitemobs.version:
-    description: Allows players to check the server's EliteMobs plugin version.
+    description: Allows admins to check the plugin version of EliteMobs
     default: op
