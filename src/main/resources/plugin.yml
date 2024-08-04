@@ -1,5 +1,5 @@
 name: EliteMobs
-version: 9.1.1
+version: 9.1.2
 author: MagmaGuy
 main: com.magmaguy.elitemobs.EliteMobs
 api-version: 1.14
@@ -33,7 +33,10 @@ permissions:
     description: Gives access to all elitemobs commands
     default: op
   elitemobs.adventurersguild.command:
-    description: Allows players to either teleport to the Adventurer's Guild or open the Adventurer's Guild menu
+    description: Allows players to open the Adventurer's Guild menu
+    default: true
+  elitemobs.adventurersguild.teleport:
+    description: Allows players to teleport to the Adventurer's Guild
     default: true
   elitemobs.alt:
     description: Allows players to switch menu styles
@@ -131,6 +134,9 @@ permissions:
   elitemobs.quest.track:
     description: Allows players to track the objectives of a quest
     default: true
+  elitemobs.quest.npc:
+    description: Allows players to talk to quest npcs
+    default: true
   elitemobs.quit:
     description: Allows players to quit instanced content
     default: true
@@ -200,3 +206,30 @@ permissions:
   elitemobs.version:
     description: Allows admins to check the plugin version of EliteMobs
     default: op
+  elitemobs.rank.npc:
+    description: Allows players to talk to the rank npc
+    default: true
+  elitemobs.shop.dynamic.npc:
+    description: Allows players to talk to the dynamic shop npc
+    default: true
+  elitemobs.shop.custom.npc:
+    description: Allows players to talk to the custom shop npc
+    default: true
+  elitemobs.shop.sell.npc:
+    description: Allows players to talk to the sell shop npc
+    default: true
+  elitemobs.back.npc:
+    description: Allows players to talk to the back teleport npc
+    default: true
+  elitemobs.scrap.npc:
+    description: Allows players to talk to the scrap npc
+    default: true
+  elitemobs.repair.npc:
+    description: Allows players to talk to the repair npc
+    default: true
+  elitemobs.unbind.npc:
+    description: Allows players to talk to the unbind npc
+    default: true
+  elitemobs.enchant.npc:
+    description: Allows players to talk to the enchant npc
+    default: true
