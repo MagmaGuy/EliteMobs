@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.dungeons;
 
 import com.magmaguy.elitemobs.config.DungeonsConfig;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
@@ -10,6 +11,9 @@ import org.bukkit.event.block.*;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+
+import java.util.Locale;
 
 public class DungeonProtector implements Listener {
 
@@ -64,6 +68,7 @@ public class DungeonProtector implements Listener {
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void preventBlockFadeEvent(BlockFadeEvent event) {
         if (!EliteMobsWorld.isEliteMobsWorld(event.getBlock().getWorld().getUID())) return;
+        if (event.getBlock().getType().equals(Material.FROSTED_ICE)) return;
         event.setCancelled(true);
     }
 
@@ -113,5 +118,14 @@ public class DungeonProtector implements Listener {
             event.setCancelled(true);
     }
 
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventVanillaMobSpawning(PlayerInteractEvent event) {
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getPlayer().getWorld().getUID())) return;
+        if (event.getClickedBlock() == null) return;
+        Material material = event.getClickedBlock().getType();
+        if (material.toString().toLowerCase(Locale.ROOT).endsWith("_door") ||
+                material.toString().toLowerCase(Locale.ROOT).endsWith("_trapdoor"))
+            event.setCancelled(true);
+    }
 
 }
