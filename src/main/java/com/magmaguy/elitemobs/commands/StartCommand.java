@@ -14,6 +14,7 @@ public class StartCommand extends AdvancedCommand {
         setUsage("/em start");
         setDescription("When in instanced content, makes the player start the instance.");
         setSenderType(SenderType.PLAYER);
+        setPermission("elitemobs.instance.start");
     }
 
     @Override

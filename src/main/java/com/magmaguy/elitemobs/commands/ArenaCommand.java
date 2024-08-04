@@ -13,7 +13,7 @@ public class ArenaCommand extends AdvancedCommand {
         super(List.of("arena"));
         addArgument("arenaID", new ArrayList<>());
         setUsage("/em arena <arenaID>");
-        setPermission("elitemobs.event.start");
+        setPermission("elitemobs.arena.start");
         setDescription("Open the Arena menu.");
         setSenderType(SenderType.PLAYER);
     }

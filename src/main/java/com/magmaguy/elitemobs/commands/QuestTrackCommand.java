@@ -14,7 +14,7 @@ public class QuestTrackCommand extends AdvancedCommand {
         addLiteral("track");
         addArgument("questID", new ArrayList<>());
         setUsage("/em quest track <questID>");
-        setPermission("elitemobs.quest.command");
+        setPermission("elitemobs.quest.track");
         setSenderType(SenderType.PLAYER);
         setDescription("Tracks a quest. Used via menu, can't be directly used.");
     }

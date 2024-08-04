@@ -13,7 +13,7 @@ public class ShopDynamicCommand extends AdvancedCommand {
         super(List.of("shop"));
         addLiteral("dynamic");
         setUsage("/em shop dynamic");
-        setPermission("elitemobs.shop.command");
+        setPermission("elitemobs.shop.dynamic");
         setSenderType(SenderType.PLAYER);
         setDescription("Opens the procedurally generated item shop or teleports the player to the Adventurer's Guild Hub.");
     }
