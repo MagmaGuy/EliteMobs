@@ -425,11 +425,19 @@ public class CustomSummonPower extends ElitePower implements Listener {
     }
 
     private void replaceOldFormat(String entry, Map<String, Object> replacement) {
-        customBossesConfigFields.getPowers().remove(entry);
+        Iterator<Object> iterator = customBossesConfigFields.getPowers().iterator();
+        while (iterator.hasNext()) {
+            Object power = iterator.next();
+            if (power.equals(entry)) {
+                iterator.remove();
+                break;
+            }
+        }
         customBossesConfigFields.getPowers().add(replacement);
         customBossesConfigFields.getFileConfiguration().set("powers", customBossesConfigFields.getPowers());
         customBossesConfigFields.saveFile();
     }
+
 
     private String getSubstringField(String string) {
         if (string.split("=").length < 2) return "";
