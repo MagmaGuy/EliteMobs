@@ -17,7 +17,7 @@ public class DarkCathedralLair extends DungeonPackagerConfigFields {
                 DiscordLinks.freeMinidungeons,
                 DungeonSizeCategory.LAIR,
                 "em_the_dark_cathedral",
-                World.Environment.NETHER,
+                World.Environment.NORMAL,
                 true,
                 "em_the_dark_cathedral,47.5,85.2,199.5,163,0",
                 0,
@@ -29,6 +29,5 @@ public class DarkCathedralLair extends DungeonPackagerConfigFields {
                 "&8[EM] &1You managed to hold them back. &9For now...",
                 "the_dark_cathedral",
                 false);
-        setSong("name=elitemobs:dark_cathedral.ambient length=93830");
     }
 }
