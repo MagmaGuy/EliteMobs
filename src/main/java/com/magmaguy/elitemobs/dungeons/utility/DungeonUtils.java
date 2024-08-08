@@ -69,9 +69,11 @@ public class DungeonUtils {
         try {
             WorldCreator worldCreator = new WorldCreator(worldName);
             worldCreator.environment(environment);
+            worldCreator.keepSpawnInMemory(false);
             World world = Bukkit.createWorld(worldCreator);
             if (world != null) world.setKeepSpawnInMemory(false);
             world.setDifficulty(Difficulty.HARD);
+            world.setAutoSave(false);
             Bukkit.getLogger().setFilter(previousFilter);
 
             EliteMobsWorld.create(world.getUID(), dungeonPackagerConfigFields);
