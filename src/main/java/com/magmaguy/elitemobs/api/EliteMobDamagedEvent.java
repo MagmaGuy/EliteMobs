@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.api;
 
 import com.magmaguy.elitemobs.EliteMobs;
+import com.magmaguy.elitemobs.dungeons.EliteMobsWorld;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
@@ -58,6 +59,8 @@ public class EliteMobDamagedEvent extends EliteDamageEvent {
 
             //happens if it dies
             if (!eliteEntity.isValid()) return;
+
+            if (EliteMobsWorld.isEliteMobsWorld(event.getEntity().getWorld().getUID())) return;
 
             if (EliteMobs.worldGuardIsEnabled && !WorldGuardFlagChecker.checkFlag(eliteEntity.getLivingEntity().getLocation(),
                     WorldGuardCompatibility.getELITEMOBS_ANTIEXPLOIT()))

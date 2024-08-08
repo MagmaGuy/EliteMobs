@@ -27,7 +27,7 @@ processResources {
 }
 
 group 'com.magmaguy'
-version '9.1.2'
+version '9.1.3'
 
 repositories {
     maven {
@@ -50,7 +50,7 @@ repositories {
 
     //MagmaCore
     maven {
-        url = 'http://magmaguy.com:50001/releases'
+        url = 'https://repo.magmaguy.com/releases'
         allowInsecureProtocol = true
     }
 
