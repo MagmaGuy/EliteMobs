@@ -21,6 +21,7 @@ import com.magmaguy.elitemobs.utils.MapListInterpreter;
 import com.magmaguy.elitemobs.utils.WorldInstantiator;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
+import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -71,7 +72,6 @@ public class DungeonInstance extends MatchInstance {
         this.difficultyName = difficultyName;
         setDifficulty(difficultyName);
         addNewPlayer(player);
-        DungeonInstance dungeonInstance = this;
         new InitializeEntitiesTask(this, dungeonPackagerConfigFields, world).runTaskLater(MetadataHandler.PLUGIN, 20 * 3L);
         dungeonInstances.add(this);
         super.permission = dungeonPackagerConfigFields.getPermission();
@@ -98,12 +98,7 @@ public class DungeonInstance extends MatchInstance {
                 cloneWorldFiles(instancedDungeonsConfigFields, instancedWorldName, player));
         future.thenAccept(file -> {
             if (file == null) return;
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    new InitializeInstancedWorldTask(instancedDungeonsConfigFields, instancedWorldName, player, file, difficultyName).runTask(MetadataHandler.PLUGIN);
-                }
-            }.runTask(MetadataHandler.PLUGIN);
+            new InitializeInstancedWorldTask(instancedDungeonsConfigFields, instancedWorldName, player, file, difficultyName).runTask(MetadataHandler.PLUGIN);
         });
     }
 
@@ -217,19 +212,7 @@ public class DungeonInstance extends MatchInstance {
             return;
         }
         world.getEntities().forEach(entity -> EntityTracker.unregister(entity, RemovalReason.WORLD_UNLOAD));
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                new EventCaller(new InstancedDungeonRemoveEvent(dungeonInstance));
-                dungeonInstances.remove(dungeonInstance);
-
-                if (!Bukkit.unloadWorld(world, false)) {
-                    Logger.warn("Failed to unload world " + instancedWorldName + " ! This is bad, report this to the developer!");
-                    return;
-                }
-                new RemoveInstanceTask(dungeonInstance, instancedWorldFile).runTaskLater(MetadataHandler.PLUGIN, 20 * 30L); //wait 30 seconds before unloading world
-            }
-        }.runTaskLater(MetadataHandler.PLUGIN, 20 * 30L); //wait 30 seconds before unloading world
+        new RemoveInstanceTask(dungeonInstance, instancedWorldFile).runTaskLater(MetadataHandler.PLUGIN, 20 * 30L);
     }
 
     private void setDifficulty(String difficultyName) {
@@ -276,7 +259,11 @@ public class DungeonInstance extends MatchInstance {
         private final File file;
         private final String difficultyName;
 
-        public InitializeInstancedWorldTask(DungeonPackagerConfigFields instancedDungeonsConfigFields, String instancedWorldName, Player player, File file, String difficultyName) {
+        public InitializeInstancedWorldTask(DungeonPackagerConfigFields instancedDungeonsConfigFields,
+                                            String instancedWorldName,
+                                            Player player,
+                                            File file,
+                                            String difficultyName) {
             this.instancedDungeonsConfigFields = instancedDungeonsConfigFields;
             this.instancedWorldName = instancedWorldName;
             this.player = player;
@@ -337,7 +324,9 @@ public class DungeonInstance extends MatchInstance {
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    WorldInstantiator.recursivelyDelete(instancedWorldFile);
+                    try{FileUtils.deleteDirectory(instancedWorldFile);} catch (Exception e){
+                        Logger.warn("Failed to delete " + instancedWorldFile + " ! This is bad, report this to the developer!");
+                    }
                 }
             }.runTaskLaterAsynchronously(MetadataHandler.PLUGIN, 20L * 60 * 2); //wait 2 minutes after unloading world before removing files
         }

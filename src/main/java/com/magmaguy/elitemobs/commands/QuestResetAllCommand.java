@@ -10,10 +10,9 @@ import java.util.List;
 public class QuestResetAllCommand extends AdvancedCommand {
     public QuestResetAllCommand() {
         super(List.of("quest"));
-        addLiteral("reset");
-        addLiteral("all");
+        addLiteral("resetAll");
         addArgument("player", new ArrayList<>());
-        setUsage("/em quest reset all <player>");
+        setUsage("/em quest resetAll <player>");
         setPermission("elitemobs.quest.reset.all");
         setDescription("Resets all quests for a specific player.");
     }
