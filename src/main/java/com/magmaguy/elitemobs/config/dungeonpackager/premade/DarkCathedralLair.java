@@ -2,11 +2,9 @@ package com.magmaguy.elitemobs.config.dungeonpackager.premade;
 
 import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
 import com.magmaguy.elitemobs.utils.DiscordLinks;
-import org.bukkit.util.Vector;
+import org.bukkit.World;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 public class DarkCathedralLair extends DungeonPackagerConfigFields {
     public DarkCathedralLair() {
@@ -15,24 +13,21 @@ public class DarkCathedralLair extends DungeonPackagerConfigFields {
                 "&2[lvl 040] &8The Dark Cathedral",
                 Arrays.asList("&fThe first ever EliteMobs Lair!",
                         "&fA classic that all servers need!",
-                        "&6Credits: MagmaGuy & 69OzCanOfBepis"),
-                List.of("dark_cathedral_tier_75_boss.yml:0.5,0.5,24.5"),
-                new ArrayList<>(),
+                        "&6Credits: MagmaGuy, 69OzCanOfBepis, Frost, Dali"),
                 DiscordLinks.freeMinidungeons,
                 DungeonSizeCategory.LAIR,
-                "em_dark_cathedral.schem",
+                "em_the_dark_cathedral",
+                World.Environment.NORMAL,
                 true,
-                new Vector(17, -27, 0),
-                new Vector(-19, 54, 32),
-                "0,0,0,0,0",
+                "em_the_dark_cathedral,47.5,85.2,199.5,163,0",
                 0,
                 "Difficulty: &cHard\n" +
                         "$bossCount level $highestTier Big Boss!\n" +
                         "&cThe original minidungeon, a challenge for\n" +
                         "&ca group of players or for veterans!",
-                "&8[EM] &8Welcome to the Dark Cathedral. &4Death awaits inside...",
-                "&8[EM] &8Now leaving the Dark Cathedral. &4It awaits your return...",
-                SchematicPackage.SchematicRotation.SOUTH.toString(),
-                "the_dark_cathedral");
+                "&8[EM] &1An invasion is in progress. &9Stop the insurrection!",
+                "&8[EM] &1You managed to hold them back. &9For now...",
+                "the_dark_cathedral",
+                false);
     }
 }
