@@ -23,6 +23,7 @@ import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -170,6 +171,7 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
             villagerInstance.setCustomName(ChatColorConverter.convert(npCsConfigFields.getName()));
             villagerInstance.setCustomNameVisible(true);
             villagerInstance.setProfession(npCsConfigFields.getProfession());
+            villagerInstance.getAttribute(Attribute.GENERIC_SCALE).setBaseValue(npCsConfigFields.getScale());
             if (getNPCsConfigFields().getCustomModel() != null && !getNPCsConfigFields().getCustomModel().isEmpty())
                 setCustomModel(villagerInstance);
             else
