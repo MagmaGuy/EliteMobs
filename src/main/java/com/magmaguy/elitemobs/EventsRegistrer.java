@@ -325,6 +325,9 @@ public class EventsRegistrer {
         register(new QuestInventoryMenu.QuestInventoryMenuEvents());
         register(new ArenaCompleteEvent.ArenaCompleteEventHandler());
 
+        //Songs
+        register(new CustomMusic.CustomMusicEvents());
+
         //Arenas
         register(new ArenaMenu.ArenaMenuEvents());
         register(new ArenaInstance.ArenaInstanceEvents());
