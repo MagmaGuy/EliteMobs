@@ -65,7 +65,7 @@ public class DisguiseEntity {
         PlayerDisguise playerDisguise = new PlayerDisguise(playerName);
         playerDisguise.setEntity(entity);
         playerDisguise.setName(entity.getCustomName());
-        playerDisguise.setNameVisible(true); //libs really doesn't like dinamic name displays
+        playerDisguise.setNameVisible(true); //libs really doesn't like dynamic name displays
         //playerDisguise.setNameVisible(DefaultConfig.isAlwaysShowNametags() || entity.getType().equals(EntityType.VILLAGER));
         playerDisguise.setDynamicName(true);
         playerDisguise.startDisguise();

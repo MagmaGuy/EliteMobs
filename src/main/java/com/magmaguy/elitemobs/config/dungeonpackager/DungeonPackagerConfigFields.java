@@ -102,6 +102,12 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
     @Getter
     @Setter
     private boolean listedInTeleports = true;
+    @Getter
+    @Setter
+    private String song = null;
+    @Getter
+    @Setter
+    private boolean allowLiquidFlow = true;
 
     public DungeonPackagerConfigFields(String fileName, boolean isEnabled) {
         super(fileName, isEnabled);
@@ -283,6 +289,8 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
         enchantmentChallenge = processBoolean("enchantmentChallenge", enchantmentChallenge, false, false);
         this.allowExplosions = processBoolean("allowExplosionBlockDamage", allowExplosions, false, false);
         this.listedInTeleports = processBoolean("listedInTeleports", listedInTeleports, true, false);
+        this.song = processString("song", song, null, false);
+        this.allowLiquidFlow = processBoolean("allowLiquidFlow", allowLiquidFlow, allowLiquidFlow, false);
         processAdditionalFields();
     }
 
