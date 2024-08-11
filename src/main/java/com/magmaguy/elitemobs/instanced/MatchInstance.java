@@ -138,14 +138,17 @@ public abstract class MatchInstance {
     }
 
     private void startWatchdogs() {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                playerWatchdog();
-                spectatorWatchdog();
-                intruderWatchdog();
-            }
-        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
+        new WatchdogTask().runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
+    }
+
+    public void countdownMatch() {
+        if (state != InstancedRegionState.WAITING) return;
+        if (players.size() < minPlayers) {
+            announce(ArenasConfig.getNotEnoughPlayersMessage().replace("$amount", minPlayers + ""));
+            return;
+        }
+        state = InstancedRegionState.STARTING;
+        new CountdownTask().runTaskTimer(MetadataHandler.PLUGIN, 0L, 20L);
     }
 
     private void playerWatchdog() {
@@ -194,32 +197,33 @@ public abstract class MatchInstance {
         participants.forEach(player -> player.sendMessage(ChatColorConverter.convert(message)));
     }
 
-    public void countdownMatch() {
-        if (state != InstancedRegionState.WAITING) return;
-        if (players.size() < minPlayers) {
-            announce(ArenasConfig.getNotEnoughPlayersMessage().replace("$amount", minPlayers + ""));
-            return;
+    private class WatchdogTask extends BukkitRunnable {
+        @Override
+        public void run() {
+            playerWatchdog();
+            spectatorWatchdog();
+            intruderWatchdog();
         }
-        state = InstancedRegionState.STARTING;
-        new BukkitRunnable() {
-            int counter = 0;
+    }
 
-            @Override
-            public void run() {
-                if (players.size() < minPlayers) {
-                    cancel();
-                    endMatch();
-                    return;
-                }
-                counter++;
-                players.forEach(player -> startMessage(counter, player));
-                spectators.forEach(player -> startMessage(counter, player));
-                if (counter >= 3) {
-                    startMatch();
-                    cancel();
-                }
+    private class CountdownTask extends BukkitRunnable {
+        int counter = 0;
+
+        @Override
+        public void run() {
+            if (players.size() < minPlayers) {
+                cancel();
+                endMatch();
+                return;
             }
-        }.runTaskTimer(MetadataHandler.PLUGIN, 0L, 20L);
+            counter++;
+            players.forEach(player -> startMessage(counter, player));
+            spectators.forEach(player -> startMessage(counter, player));
+            if (counter >= 3) {
+                startMatch();
+                cancel();
+            }
+        }
     }
 
     private void startMessage(int counter, Player player) {
