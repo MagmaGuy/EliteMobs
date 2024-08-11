@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.dungeons;
 
 import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
 import com.magmaguy.elitemobs.dungeons.utility.DungeonUtils;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomMusic;
 import com.magmaguy.elitemobs.wormhole.Wormhole;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.Logger;
@@ -54,6 +55,8 @@ public class WorldPackage extends EMPackage {
 
         if (isDownloaded && isInstalled) {
             world = DungeonUtils.loadWorld(this);
+            if (dungeonPackagerConfigFields.getSong() != null)
+                new CustomMusic(dungeonPackagerConfigFields.getSong(), dungeonPackagerConfigFields, world);
             dungeonPackagerConfigFields.initializeWorld();
         } else isInstalled = false;
     }
@@ -66,6 +69,8 @@ public class WorldPackage extends EMPackage {
         dungeonPackagerConfigFields.installWorld();
         player.teleport(dungeonPackagerConfigFields.getTeleportLocation());
         world = dungeonPackagerConfigFields.getTeleportLocation().getWorld();
+        if (dungeonPackagerConfigFields.getSong() != null)
+            new CustomMusic(dungeonPackagerConfigFields.getSong(), dungeonPackagerConfigFields, world);
 //        WorldGuardCompatibility.protectWorldMinidugeonArea(dungeonPackagerConfigFields.getTeleportLocation());
         for (Wormhole wormhole : Wormhole.getWormholes())
             wormhole.onDungeonInstall(dungeonPackagerConfigFields.getFilename());

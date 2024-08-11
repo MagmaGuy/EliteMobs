@@ -9,6 +9,7 @@ import java.util.UUID;
 
 public class EliteMobsWorld {
     private static final HashMap<UUID, EliteMobsWorld> eliteMobsWorlds = new HashMap<>();
+    @Getter
     private final DungeonPackagerConfigFields dungeonPackagerConfigFields;
     @Getter
     private final boolean allowExplosions;

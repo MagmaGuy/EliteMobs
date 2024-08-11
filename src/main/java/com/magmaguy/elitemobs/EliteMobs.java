@@ -38,6 +38,7 @@ import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantment;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.menus.ProceduralShopMenu;
 import com.magmaguy.elitemobs.mobconstructor.PersistentObjectHandler;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomMusic;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.InstancedBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.PluginMobProperties;
@@ -337,6 +338,7 @@ public class EliteMobs extends JavaPlugin {
         Navigation.shutdown();
         BossBarUtil.shutdown();
         ScriptAction.shutdown();
+        CustomMusic.shutdown();
         Logger.info("Saving EliteMobs databases...");
         PlayerData.closeConnection();
         MagmaCore.shutdown();
