@@ -233,3 +233,6 @@ permissions:
   elitemobs.enchant.npc:
     description: Allows players to talk to the enchant npc
     default: true
+  elitemobs.protection.bypass:
+    description: Allows players to run the bypass command to toggle bypassing dungeon protections
+    default: op

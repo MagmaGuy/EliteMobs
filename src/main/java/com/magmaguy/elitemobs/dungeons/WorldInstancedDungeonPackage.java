@@ -31,8 +31,6 @@ public class WorldInstancedDungeonPackage extends EMPackage implements CombatCon
         } else {
             //This removes all instanced worlds not previously correctly removed
             for (File worldFile : Bukkit.getWorldContainer().listFiles()){
-                Logger.debug("world name: " + worldFile.getName());
-                Logger.debug("current name: " + file.getName());
                 if (worldFile.getName().contains(file.getName()) && worldFile.getName().matches(".*_\\d{1,2}$")) {
                     try{
                     FileUtils.deleteDirectory(worldFile);

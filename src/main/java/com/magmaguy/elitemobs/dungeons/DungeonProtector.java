@@ -11,21 +11,40 @@ import org.bukkit.event.block.*;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.UUID;
 
 public class DungeonProtector implements Listener {
+    private static final HashSet<UUID> bypassingPlayers = new HashSet<>();
+
+    public static boolean toggleBypass (UUID playerUUID){
+        if (bypassingPlayers.contains(playerUUID)){
+            bypassingPlayers.remove(playerUUID);
+            return false;
+        }
+        bypassingPlayers.add(playerUUID);
+        return true;
+    }
+
+    private boolean shouldBypass(Player player) {
+        return bypassingPlayers.contains(player.getUniqueId());
+    }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void preventPlayerBlockDamage(BlockDamageEvent event) {
         if (!EliteMobsWorld.isEliteMobsWorld(event.getBlock().getWorld().getUID())) return;
+        if (shouldBypass(event.getPlayer())) return;
         event.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void preventPlayerBlockBreak(BlockBreakEvent event) {
         if (!EliteMobsWorld.isEliteMobsWorld(event.getBlock().getWorld().getUID())) return;
+        if (shouldBypass(event.getPlayer())) return;
         event.setCancelled(true);
     }
 
@@ -38,6 +57,7 @@ public class DungeonProtector implements Listener {
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void preventPlayerBlockPlace(BlockCanBuildEvent event) {
         if (!EliteMobsWorld.isEliteMobsWorld(event.getBlock().getWorld().getUID())) return;
+        if (event.getPlayer() != null && shouldBypass(event.getPlayer())) return;
         event.setBuildable(false);
     }
 
@@ -75,12 +95,15 @@ public class DungeonProtector implements Listener {
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void preventBonemeal(BlockFertilizeEvent event) {
         if (!EliteMobsWorld.isEliteMobsWorld(event.getBlock().getWorld().getUID())) return;
+        if (event.getPlayer() != null && shouldBypass(event.getPlayer())) return;
         event.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void preventLiquidFlow(BlockFromToEvent event) {
         if (!EliteMobsWorld.isEliteMobsWorld(event.getBlock().getWorld().getUID())) return;
+        if (EliteMobsWorld.getEliteMobsWorld(event.getBlock().getWorld().getUID()).getDungeonPackagerConfigFields().isAllowLiquidFlow())
+            return;
         event.setCancelled(true);
     }
 
@@ -93,6 +116,15 @@ public class DungeonProtector implements Listener {
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void preventBlockPlace(BlockPlaceEvent event) {
         if (!EliteMobsWorld.isEliteMobsWorld(event.getBlock().getWorld().getUID())) return;
+        if (shouldBypass(event.getPlayer())) return;
+        event.setCancelled(true);
+    }
+
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventLiquidPlace(PlayerBucketEmptyEvent event) {
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getBlock().getWorld().getUID())) return;
+        if (shouldBypass(event.getPlayer())) return;
         event.setCancelled(true);
     }
 
@@ -119,9 +151,10 @@ public class DungeonProtector implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    public void preventVanillaMobSpawning(PlayerInteractEvent event) {
+    public void preventDoorOpeningSpawning(PlayerInteractEvent event) {
         if (!EliteMobsWorld.isEliteMobsWorld(event.getPlayer().getWorld().getUID())) return;
         if (event.getClickedBlock() == null) return;
+        if (shouldBypass(event.getPlayer())) return;
         Material material = event.getClickedBlock().getType();
         if (material.toString().toLowerCase(Locale.ROOT).endsWith("_door") ||
                 material.toString().toLowerCase(Locale.ROOT).endsWith("_trapdoor"))

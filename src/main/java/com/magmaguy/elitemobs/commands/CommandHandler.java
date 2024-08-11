@@ -69,6 +69,7 @@ public class CommandHandler {
         emCommand.registerCommand(new DiscordMessageCommand());
         emCommand.registerCommand(new DiscordCommand());
         emCommand.registerCommand(new MoneyRemoveCommand());
+        emCommand.registerCommand(new ProtectionBypassCommand());
 
         //User commands
 //        emCommand.registerCommand(new AdventurersGuildCommand());
