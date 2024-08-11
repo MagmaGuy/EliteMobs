@@ -92,7 +92,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
     private boolean normalizedCombat;
     @Getter
     @Setter
-    private BossMusic bossMusic = null;
+    private CustomMusic bossMusic = null;
     @Getter
     @Setter
     private double followDistance;
@@ -116,7 +116,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
         //This creates a placeholder empty EliteMobEntity to be filled in later
         super();
         if (customBossesConfigFields.getSong() != null)
-            bossMusic = new BossMusic(customBossesConfigFields.getSong(), this);
+            bossMusic = new CustomMusic(customBossesConfigFields.getSong(), this);
         //This stores everything that will need to be initialized for the EliteMobEntity
         setCustomBossesConfigFields(customBossesConfigFields);
         super.setPersistent(customBossesConfigFields.isPersistent());

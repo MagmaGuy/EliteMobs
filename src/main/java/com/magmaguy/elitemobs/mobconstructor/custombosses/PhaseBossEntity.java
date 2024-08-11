@@ -66,7 +66,7 @@ public class PhaseBossEntity {
         customBossEntity.setCustomBossesConfigFields(bossPhase.customBossesConfigFields);
         if (removalReason.equals(RemovalReason.PHASE_BOSS_RESET)) {
             if (bossPhase.customBossesConfigFields.getSong() != null)
-                customBossEntity.setBossMusic(new BossMusic(bossPhase.customBossesConfigFields.getSong(), customBossEntity));
+                customBossEntity.setBossMusic(new CustomMusic(bossPhase.customBossesConfigFields.getSong(), customBossEntity));
             //Necessary to reset phase bosses which move their spawn point via teleportation
             customBossEntity.setSpawnLocation(originalSpawnLocation);
             customBossEntity.setRespawnOverrideLocation(originalSpawnLocation);
@@ -89,11 +89,14 @@ public class PhaseBossEntity {
                 customBossEntity.setRespawnOverrideLocation(customBossEntity.getLocation());
             }
             //Handle music, soundtrack shouldn't change if the new one is the same
-            if (bossPhase.customBossesConfigFields.getSong() != null
-                    && currentPhase.customBossesConfigFields.getSong() != null) {
+            if (bossPhase.customBossesConfigFields.getSong() != null) {
+                if (currentPhase.customBossesConfigFields.getSong() == null){
+                    customBossEntity.setBossMusic(new CustomMusic(bossPhase.customBossesConfigFields.getSong(), customBossEntity));
+                    customBossEntity.getBossMusic().start(customBossEntity);
+                }
                 if (!bossPhase.customBossesConfigFields.getSong().equals(currentPhase.customBossesConfigFields.getSong())) {
                     if (customBossEntity.getBossMusic() != null) customBossEntity.getBossMusic().stop();
-                    customBossEntity.setBossMusic(new BossMusic(bossPhase.customBossesConfigFields.getSong(), customBossEntity));
+                    customBossEntity.setBossMusic(new CustomMusic(bossPhase.customBossesConfigFields.getSong(), customBossEntity));
                 }
             }
             //Make sure the chunk is loaded so the boss can be initialized properly, or else you'll have some issues with health
