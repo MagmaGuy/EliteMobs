@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.config.customevents.CustomEventsConfigFields;
 import com.magmaguy.elitemobs.events.CustomEvent;
 import org.bukkit.Material;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 public class BalrogEvent extends CustomEventsConfigFields {
@@ -14,8 +14,8 @@ public class BalrogEvent extends CustomEventsConfigFields {
         setEventType(CustomEvent.EventType.BREAK_BLOCK);
         setBossFilenames(List.of("balrog.yml"));
         setChance(0.001);
-        setBreakableMaterials(Arrays.asList(Material.COAL_ORE, Material.IRON_ORE, Material.GOLD_ORE, Material.LAPIS_ORE,
-                Material.DIAMOND_ORE, Material.EMERALD_ORE, Material.REDSTONE_ORE));
+        setBreakableMaterials(new ArrayList<>(List.of(Material.COAL_ORE, Material.IRON_ORE, Material.GOLD_ORE, Material.LAPIS_ORE,
+                Material.DIAMOND_ORE, Material.EMERALD_ORE, Material.REDSTONE_ORE)));
         setEventDuration(20);
     }
 }

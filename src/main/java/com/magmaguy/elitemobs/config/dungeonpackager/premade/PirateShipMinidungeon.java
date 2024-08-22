@@ -4,23 +4,24 @@ import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.World;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PirateShipMinidungeon extends DungeonPackagerConfigFields {
     public PirateShipMinidungeon() {
         super("pirate_ship_minidungeon",
                 true,
                 "&2[lvl 010-020] &6The Pirate Ship",
-                Arrays.asList("&fA fun, challenging minidungeon full of",
+                new ArrayList<>(List.of("&fA fun, challenging minidungeon full of",
                         "&fbosses made for players starting to get good,",
                         "&fat EliteMobs!",
-                        "&6Credits: MagmaGuy & Realm of Lotheridon"),
+                        "&6Credits: MagmaGuy & Realm of Lotheridon")),
                 DiscordLinks.freeMinidungeons,
                 DungeonSizeCategory.MINIDUNGEON,
                 "em_the_pirate_ship",
                 World.Environment.NORMAL,
                 true,
-                "em_the_pirate_ship,-85,63,243.5,-150,0",
+                "em_the_pirate_ship,-85.5,64.0,236.5,180,0",
                 0,
                 "Difficulty: &6Medium\n" +
                         "$bossCount bosses, from level $lowestTier to $highestTier\n" +

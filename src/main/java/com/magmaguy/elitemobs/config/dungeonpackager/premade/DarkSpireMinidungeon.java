@@ -4,22 +4,23 @@ import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.World;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DarkSpireMinidungeon extends DungeonPackagerConfigFields {
     public DarkSpireMinidungeon() {
         super("dark_spire_minidungeon",
                 true,
                 "&2[lvl 100-120] &8The Dark Spire",
-                Arrays.asList("&fThe first ever high level content!",
+                new ArrayList<>(List.of("&fThe first ever high level content!",
                         "&fMade for those who want a real challenge!",
-                        "&6Credits: 69OzCanOfBepis"),
+                        "&6Credits: 69OzCanOfBepis")),
                 DiscordLinks.premiumMinidungeons,
                 DungeonSizeCategory.MINIDUNGEON,
                 "em_dark_spire",
                 World.Environment.NETHER,
                 true,
-                "em_dark_spire,61,96,96,153,0",
+                "em_dark_spire,60,97.5,97,110,0",
                 0,
                 "Difficulty: &6Medium\n" +
                         "$bossCount bosses, from level $lowestTier to $highestTier\n" +

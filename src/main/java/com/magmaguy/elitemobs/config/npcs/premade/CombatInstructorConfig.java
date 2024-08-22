@@ -4,7 +4,8 @@ import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
 import com.magmaguy.elitemobs.npcs.NPCInteractions;
 import org.bukkit.entity.Villager;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CombatInstructorConfig extends NPCsConfigFields {
     public CombatInstructorConfig() {
@@ -14,12 +15,12 @@ public class CombatInstructorConfig extends NPCsConfigFields {
                 "<Combat Instructor>",
                 Villager.Profession.NITWIT,
                 "em_adventurers_guild,277.41,90.0,286.23,-214.85,-1.95",
-                Arrays.asList(
+                new ArrayList<>(List.of(
                         "Want to learn about combat?",
                         "Need a combat lesson?",
                         "Want to know more about combat?",
-                        "Ready to fight Elite Mobs?"),
-                Arrays.asList(
+                        "Ready to fight Elite Mobs?")),
+                new ArrayList<>(List.of(
                         "The items around Elite Mobs\\nshow what powers they have.",
                         "The higher the level of\\nthe Elite Mob, the\\nmore powers they can have",
                         "The higher the level of\\nthe Elite Mob, the\\nbetter the loot they can drop",
@@ -54,7 +55,7 @@ public class CombatInstructorConfig extends NPCsConfigFields {
                         "Elite Mobs with floating\\nskulls summon reinforcements\\nwhen hit",
                         "Elite Mobs with floating\\nbooks summon reinforcements\\nuntil you kill the summoner",
                         "Elite Mobs with floating\\neggs summon reinforcements\\nwhen hit",
-                        "Elite Mobs with floating\\nfireworks summon Team Rocket\\nwhen hit"),
+                        "Elite Mobs with floating\\nfireworks summon Team Rocket\\nwhen hit")),
                 null,
                 true,
                 3,

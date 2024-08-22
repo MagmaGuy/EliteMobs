@@ -9,10 +9,10 @@ public class WelcomeQuest1Config extends CustomQuestsConfigFields {
         super("ag_welcome_quest_1.yml",
                 true,
                 new HashMap<>(),
-                Arrays.asList(
+                new ArrayList<>(List.of(
                         "filename=magmaguys_toothpick.yml:amount=1:chance=1",
                         "currencyAmount=750:amount=1:chance=1"
-                ),
+                )),
                 1,
                 "&2Welcome to the AG!",
                 Collections.singletonList("&aMeet the Adventurer's Guild NPCs!")

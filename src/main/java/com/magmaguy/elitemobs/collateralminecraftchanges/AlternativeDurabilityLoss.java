@@ -15,7 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 
 public class AlternativeDurabilityLoss implements Listener {
 
@@ -41,7 +41,7 @@ public class AlternativeDurabilityLoss implements Listener {
 
     public static void doDurabilityLoss(Player player) {
         if (!ItemSettingsConfig.isEliteDurability()) return;
-        ArrayList<ItemStack> itemsList = new ArrayList<>(Arrays.asList(player.getInventory().getArmorContents()));
+        ArrayList<ItemStack> itemsList = new ArrayList<>(new ArrayList<>(List.of(player.getInventory().getArmorContents())));
         itemsList.add(player.getInventory().getItemInMainHand());
         itemsList.add(player.getInventory().getItemInOffHand());
 

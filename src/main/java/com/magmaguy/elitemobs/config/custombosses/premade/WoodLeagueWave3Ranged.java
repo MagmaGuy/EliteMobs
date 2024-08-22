@@ -5,6 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class WoodLeagueWave3Ranged extends CustomBossesConfigFields {
@@ -16,6 +17,6 @@ public class WoodLeagueWave3Ranged extends CustomBossesConfigFields {
                 "3");
         setMainHand(new ItemStack(Material.CROSSBOW));
         setFollowDistance(60);
-        setPowers(List.of("attack_fire.yml"));
+        setPowers(new ArrayList<>(List.of("attack_fire.yml")));
     }
 }

@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.config.custombosses.premade;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import org.bukkit.entity.EntityType;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 public class WoodLeagueWave15Miniboss extends CustomBossesConfigFields {
@@ -15,7 +15,7 @@ public class WoodLeagueWave15Miniboss extends CustomBossesConfigFields {
                 "15");
         setFollowDistance(60);
 
-        setPowers(Arrays.asList("gold_explosion.yml", "gold_shotgun.yml"));
+        setPowers(new ArrayList<>(List.of("gold_explosion.yml", "gold_shotgun.yml")));
         setMovementSpeedAttribute(0.6D);
         setHealthMultiplier(3D);
         setDamageMultiplier(2D);

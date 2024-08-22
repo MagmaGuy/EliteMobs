@@ -5,7 +5,9 @@ import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class WoodLeagueWave40Boss extends CustomBossesConfigFields {
     public WoodLeagueWave40Boss() {
@@ -21,7 +23,7 @@ public class WoodLeagueWave40Boss extends CustomBossesConfigFields {
         setBoots(new ItemStack(Material.DIAMOND_BOOTS));
         setMainHand(new ItemStack(Material.DIAMOND_SWORD));
         setOffHand(new ItemStack(Material.SHIELD));
-        setPowers(Arrays.asList("attack_wither.yml", "attack_poison.yml", "shield_wall.yml", "bullet_hell.yml", "skeleton_tracking_arrow.yml", "flame_pyre.yml"));
+        setPowers(new ArrayList<>(List.of("attack_wither.yml", "attack_poison.yml", "shield_wall.yml", "bullet_hell.yml", "skeleton_tracking_arrow.yml", "flame_pyre.yml")));
         setMovementSpeedAttribute(0.6D);
         setHealthMultiplier(5D);
         setDamageMultiplier(2D);

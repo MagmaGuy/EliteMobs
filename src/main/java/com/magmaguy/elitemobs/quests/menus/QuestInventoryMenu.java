@@ -20,7 +20,10 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class QuestInventoryMenu {
@@ -42,7 +45,7 @@ public class QuestInventoryMenu {
     public static void generateInventoryQuestDirectory(List<? extends Quest> quests, Player player, NPCEntity npcEntity) {
         String menuTitle = "Quests";
         Inventory questInventory = Bukkit.createInventory(player, 27, menuTitle);
-        List<Integer> questSlots = new ArrayList<>(Arrays.asList(13, 11, 15, 9, 17, 10, 16, 12, 14, 8));
+        List<Integer> questSlots = new ArrayList<>(new ArrayList<>(List.of(13, 11, 15, 9, 17, 10, 16, 12, 14, 8)));
         Material acceptMaterial = Material.GREEN_STAINED_GLASS_PANE;
         Material inProgressMaterial = Material.RED_STAINED_GLASS_PANE;
         Material completeMaterial = Material.ORANGE_STAINED_GLASS_PANE;
@@ -70,9 +73,9 @@ public class QuestInventoryMenu {
             title = questText.getHeader().getText();
         Inventory questInventory = Bukkit.createInventory(player, 27, title);
         int titleEntry = 4;
-        List<Integer> loreEntries = new ArrayList<>(Arrays.asList(13, 14, 12, 15, 11, 16, 10, 17, 9));
-        List<Integer> objectivesEntries = new ArrayList<>(Arrays.asList(21, 20, 19, 18));
-        List<Integer> rewardEntries = new ArrayList<>(Arrays.asList(23, 24, 25));
+        List<Integer> loreEntries = new ArrayList<>(new ArrayList<>(List.of(13, 14, 12, 15, 11, 16, 10, 17, 9)));
+        List<Integer> objectivesEntries = new ArrayList<>(new ArrayList<>(List.of(21, 20, 19, 18)));
+        List<Integer> rewardEntries = new ArrayList<>(new ArrayList<>(List.of(23, 24, 25)));
 
         Material titleMaterial = Material.PAINTING;
         Material trackingMaterial = Material.TARGET;

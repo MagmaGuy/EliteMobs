@@ -4,8 +4,9 @@ import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
 import com.magmaguy.elitemobs.npcs.NPCInteractions;
 import org.bukkit.entity.Villager;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 public class Guide1Config extends NPCsConfigFields {
     public Guide1Config() {
@@ -15,20 +16,20 @@ public class Guide1Config extends NPCsConfigFields {
                 "<Guide>",
                 Villager.Profession.NITWIT,
                 "em_adventurers_guild,215.5,87,239.5,131,0",
-                Arrays.asList(
+                new ArrayList<>(List.of(
                         "Need guidance?",
                         "Need a hint",
                         "Are you lost?",
-                        "Need help?"),
-                Arrays.asList(
+                        "Need help?")),
+                new ArrayList<>(List.of(
                         "I know everything about\\nthis place!",
                         "Want to meet the other members\\nof the Adventurer's Guild?",
-                        "Need to learn your way around\\nthis place?"),
-                Arrays.asList(
+                        "Need to learn your way around\\nthis place?")),
+                new ArrayList<>(List.of(
                         "Come back anytime",
                         "I'll be here if you need me!",
                         "I'll be around!",
-                        "See you later!"),
+                        "See you later!")),
                 true,
                 5,
                 NPCInteractions.NPCInteractionType.CUSTOM_QUEST_GIVER);

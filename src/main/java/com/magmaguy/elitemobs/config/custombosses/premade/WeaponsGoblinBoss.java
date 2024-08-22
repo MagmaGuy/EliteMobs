@@ -5,8 +5,9 @@ import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 public class WeaponsGoblinBoss extends CustomBossesConfigFields {
     public WeaponsGoblinBoss() {
@@ -24,28 +25,28 @@ public class WeaponsGoblinBoss extends CustomBossesConfigFields {
         setMainHand(new ItemStack(Material.NETHERITE_SWORD));
         setOffHand(new ItemStack(Material.NETHERITE_AXE));
         setBaby(true);
-        setPowers(Arrays.asList("gold_explosion.yml", "gold_shotgun.yml", "spirit_walk.yml"));
+        setPowers(new ArrayList<>(List.of("gold_explosion.yml", "gold_shotgun.yml", "spirit_walk.yml")));
         setSpawnMessage("&cA Weapons Goblin has been sighted!");
         setDeathMessage("&aA Weapons Goblin has been slain by $players!");
-        setDeathMessages(Arrays.asList(
+        setDeathMessages(new ArrayList<>(List.of(
                 "&e&l---------------------------------------------",
                 "&eThe Weapons Goblin has been pillaged!",
                 "&c&l    1st Damager: $damager1name &cwith $damager1damage damage!",
                 "&6&l    2nd Damager: $damager2name &6with $damager2damage damage!",
                 "&e&l    3rd Damager: $damager3name &ewith $damager3damage damage!",
                 "&aSlayers: $players",
-                "&e&l---------------------------------------------"));
+                "&e&l---------------------------------------------")));
         setEscapeMessage("&4A Weapons Goblin has escaped!");
         setLocationMessage("&cWeapons Goblin: $distance blocks away!");
         setTrails(Collections.singletonList(Material.GOLD_NUGGET.toString()));
         setAnnouncementPriority(2);
         setPersistent(true);
-        setUniqueLootList(Arrays.asList(
+        setUniqueLootList(new ArrayList<>(List.of(
                 "goblin_slasher.yml:0.2",
                 "goblin_cleaver.yml:0.2",
                 "goblin_poker.yml:0.2",
                 "goblin_shooter.yml:0.2",
-                "goblin_ballista.yml:0.2"));
+                "goblin_ballista.yml:0.2")));
         setFollowDistance(100);
         setCustomModel("em_goblin_weapon");
     }

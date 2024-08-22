@@ -7,13 +7,13 @@ import org.bukkit.entity.EntityType;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 public class MobPropertiesConfig {
 
     private static final HashMap<EntityType, MobPropertiesConfigFields> mobProperties = new HashMap<>();
-    private static final ArrayList<MobPropertiesConfigFields> mobPropertiesConfigFieldsList = new ArrayList<MobPropertiesConfigFields>(Arrays.asList(
+    private static final ArrayList<MobPropertiesConfigFields> mobPropertiesConfigFieldsList = new ArrayList<MobPropertiesConfigFields>(new ArrayList<>(List.of(
             new EliteBlazeConfig(),
             new EliteCaveSpiderConfig(),
             new EliteCreeperConfig(),
@@ -58,7 +58,7 @@ public class MobPropertiesConfig {
             new EliteBeeConfig(),
             new EliteBreezeConfig(),
             new EliteWitherConfig()
-    ));
+    )));
 
     public static HashMap<EntityType, MobPropertiesConfigFields> getMobProperties() {
         return mobProperties;

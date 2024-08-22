@@ -6,7 +6,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 
 public class WoodLeagueWave50Boss extends CustomBossesConfigFields {
     public WoodLeagueWave50Boss() {
@@ -18,17 +18,17 @@ public class WoodLeagueWave50Boss extends CustomBossesConfigFields {
         setFollowDistance(60);
         setMainHand(new ItemStack(Material.NETHERITE_AXE));
         setOffHand(new ItemStack(Material.SHIELD));
-        setPowers(Arrays.asList("ground_pound.yml",
+        setPowers(new ArrayList<>(List.of("ground_pound.yml",
                 "shield_wall.yml",
                 "bullet_hell.yml",
                 "arrow_fireworks.yml",
                 "fireworks_barrage.yml",
-                "summonable:summonType=ON_COMBAT_ENTER:filename=wood_league_wave_50_reinforcement.yml:amount=2"));
+                "summonable:summonType=ON_COMBAT_ENTER:filename=wood_league_wave_50_reinforcement.yml:amount=2")));
         setMovementSpeedAttribute(0.4D);
         setHealthMultiplier(10D);
         setDamageMultiplier(1D);
-        setPhases(new ArrayList<>(Arrays.asList(
+        setPhases(new ArrayList<>(new ArrayList<>(List.of(
                 "wood_league_wave_50_boss_p2.yml:0.66",
-                "wood_league_wave_50_boss_p3.yml:0.33")));
+                "wood_league_wave_50_boss_p3.yml:0.33"))));
     }
 }

@@ -3,7 +3,8 @@ package com.magmaguy.elitemobs.config.custombosses.premade;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import org.bukkit.entity.EntityType;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 public class WoodLeagueWave17Melee extends CustomBossesConfigFields {
     public WoodLeagueWave17Melee() {
@@ -13,7 +14,7 @@ public class WoodLeagueWave17Melee extends CustomBossesConfigFields {
                 "$normalLevel &4Arena Zombie",
                 "17");
         setFollowDistance(60);
-        setPowers(Arrays.asList("corpse.yml", "attack_fire.yml"));
+        setPowers(new ArrayList<>(List.of("corpse.yml", "attack_fire.yml")));
 
     }
 }

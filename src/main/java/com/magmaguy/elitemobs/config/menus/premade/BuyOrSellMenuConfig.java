@@ -9,7 +9,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 
 public class BuyOrSellMenuConfig extends MenusConfigFields {
     public static String SHOP_NAME;
@@ -32,9 +32,9 @@ public class BuyOrSellMenuConfig extends MenusConfigFields {
                 "Information button",
                 ItemStackGenerator.generateSkullItemStack("magmaguy",
                         "&4&lEliteMobs &r&cby &4&lMagmaGuy",
-                        Arrays.asList("&8Support the plugins you enjoy!",
+                        new ArrayList<>(List.of("&8Support the plugins you enjoy!",
                                 "&aClick on the emerald to buy items!",
-                                "&cClick on the redstone to sell items!"), MetadataHandler.signatureID),
+                                "&cClick on the redstone to sell items!")), MetadataHandler.signatureID),
                 fileConfiguration);
         INFORMATION_ITEM = ItemStackSerializer.deserialize("Information button", fileConfiguration);
         INFORMATION_SLOT = ConfigurationEngine.setInt(fileConfiguration, "Information button slot", 4);

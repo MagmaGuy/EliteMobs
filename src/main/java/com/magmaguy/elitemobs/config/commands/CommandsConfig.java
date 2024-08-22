@@ -7,14 +7,14 @@ import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 
 public class CommandsConfig {
 
-    private static final ArrayList<CommandsConfigFields> commandsConfigFields = new ArrayList<>(Arrays.asList(
+    private static final ArrayList<CommandsConfigFields> commandsConfigFields = new ArrayList<>(new ArrayList<>(List.of(
             new CheckTierConfig(),
             new CheckTierOthersConfig()
-    ));
+    )));
 
     private CommandsConfig() {
 

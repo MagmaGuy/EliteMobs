@@ -4,16 +4,17 @@ import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.World;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DarkCathedralLair extends DungeonPackagerConfigFields {
     public DarkCathedralLair() {
         super("dark_cathedral_lair",
                 true,
                 "&2[lvl 040] &8The Dark Cathedral",
-                Arrays.asList("&fThe first ever EliteMobs Lair!",
+                new ArrayList<>(List.of("&fThe first ever EliteMobs Lair!",
                         "&fA classic that all servers need!",
-                        "&6Credits: MagmaGuy, 69OzCanOfBepis, Frost, Dali"),
+                        "&6Credits: MagmaGuy, 69OzCanOfBepis, Frost, Dali")),
                 DiscordLinks.freeMinidungeons,
                 DungeonSizeCategory.LAIR,
                 "em_the_dark_cathedral",

@@ -4,21 +4,22 @@ import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.World;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PrimisAdventure extends DungeonPackagerConfigFields {
     public PrimisAdventure() {
         super("primis_adventure",
                 true,
                 "&2[lvl 000-020] &7Primis",
-                Arrays.asList("&fA tutorial adventure for new players!",
-                        "&6Credits: 69OzCanOfBepis, MagmaGuy"),
+                new ArrayList<>(List.of("&fA tutorial adventure for new players!",
+                        "&6Credits: 69OzCanOfBepis, MagmaGuy")),
                 DiscordLinks.premiumMinidungeons,
                 DungeonPackagerConfigFields.DungeonSizeCategory.ADVENTURE,
                 "em_primis",
                 World.Environment.NORMAL,
                 true,
-                "em_primis,1406,20,362,33,0",
+                "em_primis,1406.5,21.5,357.5,33,0",
                 0,
                 "Difficulty: &2Easy\n" +
                         "$bossCount bosses, from level $lowestTier to $highestTier\n" +

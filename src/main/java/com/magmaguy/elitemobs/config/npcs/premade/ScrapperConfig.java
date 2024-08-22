@@ -4,7 +4,8 @@ import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
 import com.magmaguy.elitemobs.npcs.NPCInteractions;
 import org.bukkit.entity.Villager;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ScrapperConfig extends NPCsConfigFields {
     public ScrapperConfig() {
@@ -14,22 +15,22 @@ public class ScrapperConfig extends NPCsConfigFields {
                 "<Scrapper>",
                 Villager.Profession.WEAPONSMITH,
                 "em_adventurers_guild,292.5,81,263.5,90,0",
-                Arrays.asList(
+                new ArrayList<>(List.of(
                         "Want to get rid of items?",
                         "Need to recycle items?",
                         "Looking to scrap?",
                         "It's scrap 'o clock!",
-                        "Scrap time!"),
-                Arrays.asList(
+                        "Scrap time!")),
+                new ArrayList<>(List.of(
                         "Scrappy deals!",
                         "Get your scrap here!",
                         "75% chance to work!",
                         "There are no refunds.",
-                        "Recycle, reuse, reduce!"),
-                Arrays.asList(
+                        "Recycle, reuse, reduce!")),
+                new ArrayList<>(List.of(
                         "Come back when you have\\nmore to scrap",
                         "Don't forget to make that\\nscrap useful!",
-                        "Happy scrapping!"),
+                        "Happy scrapping!")),
                 true,
                 3,
                 NPCInteractions.NPCInteractionType.SCRAPPER);

@@ -3,7 +3,8 @@ package com.magmaguy.elitemobs.config.mobproperties.premade;
 import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfigFields;
 import org.bukkit.entity.EntityType;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 public class EliteMagmaCubeConfig extends MobPropertiesConfigFields {
     public EliteMagmaCubeConfig() {
@@ -11,7 +12,7 @@ public class EliteMagmaCubeConfig extends MobPropertiesConfigFields {
                 EntityType.MAGMA_CUBE,
                 true,
                 "&2Lvl &2$level &fElite &6Magma Cube",
-                Arrays.asList("$player was incinerated by $entity&f!", "$player got too close to $entity&f!"),
+                new ArrayList<>(List.of("$player was incinerated by $entity&f!", "$player got too close to $entity&f!")),
                 6);
     }
 }

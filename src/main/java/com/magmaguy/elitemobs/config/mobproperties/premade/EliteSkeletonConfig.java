@@ -3,7 +3,8 @@ package com.magmaguy.elitemobs.config.mobproperties.premade;
 import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfigFields;
 import org.bukkit.entity.EntityType;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 public class EliteSkeletonConfig extends MobPropertiesConfigFields {
     public EliteSkeletonConfig() {
@@ -11,8 +12,8 @@ public class EliteSkeletonConfig extends MobPropertiesConfigFields {
                 EntityType.SKELETON,
                 true,
                 "&fLvl &2$level &fElite &fSkeleton",
-                Arrays.asList("$player &cbecame $entity's &cpin cushion!",
-                        "$entity &cwanted to see $player's &cbones!"),
+                new ArrayList<>(List.of("$player &cbecame $entity's &cpin cushion!",
+                        "$entity &cwanted to see $player's &cbones!")),
                 5);
     }
 }

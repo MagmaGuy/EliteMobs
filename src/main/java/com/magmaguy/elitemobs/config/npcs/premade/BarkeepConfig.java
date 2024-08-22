@@ -4,7 +4,8 @@ import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
 import com.magmaguy.elitemobs.npcs.NPCInteractions;
 import org.bukkit.entity.Villager;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 public class BarkeepConfig extends NPCsConfigFields {
     public BarkeepConfig() {
@@ -14,16 +15,16 @@ public class BarkeepConfig extends NPCsConfigFields {
                 "<Barkeep>",
                 Villager.Profession.BUTCHER,
                 "em_adventurers_guild,285.5,91,209.5,0,0",
-                Arrays.asList(
+                new ArrayList<>(List.of(
                         "Need a drink?",
                         "Want a drink",
                         "Thirsty?",
-                        "Howdy, partner."),
-                Arrays.asList(
+                        "Howdy, partner.")),
+                new ArrayList<>(List.of(
                         "Have one of our house specialties.",
                         "Special drinks won't find them\\nanywhere else.",
-                        "One taste and will keep you\\ncoming back from more."),
-                Arrays.asList(
+                        "One taste and will keep you\\ncoming back from more.")),
+                new ArrayList<>(List.of(
                         "Come back anytime",
                         "Bottoms up!",
                         "Kampai!",
@@ -36,7 +37,7 @@ public class BarkeepConfig extends NPCsConfigFields {
                         "Salute!",
                         "Saúde!",
                         "Cheers!",
-                        "乾杯!"),
+                        "乾杯!")),
                 true,
                 3,
                 NPCInteractions.NPCInteractionType.BAR);

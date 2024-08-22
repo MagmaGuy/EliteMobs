@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.config.customitems.CustomItemsConfigFields;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import org.bukkit.Material;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 public class UnbindScrollConfig extends CustomItemsConfigFields {
@@ -13,9 +13,9 @@ public class UnbindScrollConfig extends CustomItemsConfigFields {
                 true,
                 Material.PAPER,
                 "&5Unbind Scroll",
-                Arrays.asList("&5Allows users to unbind one",
+                new ArrayList<>(List.of("&5Allows users to unbind one",
                         "&5soulbound item at an anvil!",
-                        "&5Use wisely!"));
+                        "&5Use wisely!")));
         setEnchantments(List.of("UNBIND,1"));
         setItemType(CustomItem.ItemType.UNIQUE);
     }

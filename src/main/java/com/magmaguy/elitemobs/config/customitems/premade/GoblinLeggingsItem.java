@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.config.customitems.CustomItemsConfigFields;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import org.bukkit.Material;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 public class GoblinLeggingsItem extends CustomItemsConfigFields {
@@ -14,7 +14,7 @@ public class GoblinLeggingsItem extends CustomItemsConfigFields {
                 Material.NETHERITE_LEGGINGS,
                 "&8Goblin Leggings",
                 List.of("&8A treasure among goblins!"));
-        setEnchantments(Arrays.asList("PROTECTION,1", "BLAST_PROTECTION,1", "PROJECTILE_PROTECTION,1", "UNBREAKING,1"));
+        setEnchantments(new ArrayList<>(List.of("PROTECTION,1", "BLAST_PROTECTION,1", "PROJECTILE_PROTECTION,1", "UNBREAKING,1")));
         setPotionEffects(List.of("JUMP,0,self,continuous"));
         setItemType(CustomItem.ItemType.UNIQUE);
     }

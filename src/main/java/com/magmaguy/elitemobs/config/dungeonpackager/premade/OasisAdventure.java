@@ -4,21 +4,22 @@ import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.World;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 public class OasisAdventure extends DungeonPackagerConfigFields {
     public OasisAdventure() {
         super("oasis_adventure",
                 true,
                 "&2[lvl 020-055] &6The Oasis",
-                Arrays.asList("&fA massive adventure for beginners!",
-                        "&6Credits: 69OzCanOfBepis"),
+                new ArrayList<>(List.of("&fA massive adventure for beginners!",
+                        "&6Credits: 69OzCanOfBepis")),
                 DiscordLinks.premiumMinidungeons,
                 DungeonSizeCategory.ADVENTURE,
                 "em_oasis",
                 World.Environment.NORMAL,
                 true,
-                "em_oasis,261,20,284,-65,0",
+                "em_oasis,260.5,22,280.5,0,0",
                 2,
                 "Difficulty: &2Solo-able\n" +
                         "$bossCount bosses, from level $lowestTier to $highestTier\n" +

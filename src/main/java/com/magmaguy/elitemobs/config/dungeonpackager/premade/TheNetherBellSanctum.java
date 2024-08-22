@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.World;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -13,8 +13,8 @@ public class TheNetherBellSanctum extends DungeonPackagerConfigFields {
         super("the_nether_bell_sanctum",
                 true,
                 "&2[lvl 055] &3The Nether Bell Sanctum",
-                Arrays.asList("&fVenture into the deepest part of the Nether!",
-                        "&6Credits: Dali_, MagmaGuy, Frostcone"),
+                new ArrayList<>(List.of("&fVenture into the deepest part of the Nether!",
+                        "&6Credits: Dali_, MagmaGuy, Frostcone")),
                 DiscordLinks.freeMinidungeons,
                 DungeonSizeCategory.SANCTUM,
                 "em_id_the_nether_bell",

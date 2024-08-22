@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.config.customitems.CustomItemsConfigFields;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import org.bukkit.Material;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 public class GoblinSlasherItem extends CustomItemsConfigFields {
@@ -14,7 +14,7 @@ public class GoblinSlasherItem extends CustomItemsConfigFields {
                 Material.NETHERITE_SWORD,
                 "&8Goblin Slasher",
                 List.of("&8A treasure among goblins!"));
-        setEnchantments(Arrays.asList("SHARPNESS,1", "SMITE,1", "UNBREAKING,1", "KNOCKBACK,1", "LOOTING,5"));
+        setEnchantments(new ArrayList<>(List.of("SHARPNESS,1", "SMITE,1", "UNBREAKING,1", "KNOCKBACK,1", "LOOTING,5")));
         setPotionEffects(List.of("FAST_DIGGING,0,self,onHit"));
         setItemType(CustomItem.ItemType.UNIQUE);
     }

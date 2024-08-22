@@ -4,7 +4,9 @@ import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * In the loving memory of Snoopy, the best boy
@@ -21,7 +23,7 @@ public class SnoopyConfig extends CustomBossesConfigFields {
         setTimeout(3);
         setHealthMultiplier(10);
         setDamageMultiplier(2);
-        setPowers(Collections.singletonList("invulnerability_fire.yml"));
+        setPowers(new ArrayList<>(List.of("invulnerability_fire.yml")));
         setDropsVanillaLoot(false);
         setDropsEliteMobsLoot(false);
         setTrails(Collections.singletonList(Material.BONE.toString()));

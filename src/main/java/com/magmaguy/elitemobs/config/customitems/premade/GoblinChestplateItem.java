@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.config.customitems.CustomItemsConfigFields;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import org.bukkit.Material;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 public class GoblinChestplateItem extends CustomItemsConfigFields {
@@ -14,7 +14,7 @@ public class GoblinChestplateItem extends CustomItemsConfigFields {
                 Material.NETHERITE_CHESTPLATE,
                 "&8Goblin Chestplate",
                 List.of("&8A treasure among goblins!"));
-        setEnchantments(Arrays.asList("PROTECTION,1", "BLAST_PROTECTION,1", "PROJECTILE_PROTECTION,1", "UNBREAKING,1"));
+        setEnchantments(new ArrayList<>(List.of("PROTECTION,1", "BLAST_PROTECTION,1", "PROJECTILE_PROTECTION,1", "UNBREAKING,1")));
         setPotionEffects(List.of("SATURATION,0,self,continuous"));
         setItemType(CustomItem.ItemType.UNIQUE);
     }

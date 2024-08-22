@@ -9,6 +9,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
@@ -159,6 +160,12 @@ public class DungeonProtector implements Listener {
         if (material.toString().toLowerCase(Locale.ROOT).endsWith("_door") ||
                 material.toString().toLowerCase(Locale.ROOT).endsWith("_trapdoor"))
             event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventDoorOpeningSpawning(EntityChangeBlockEvent event) {
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getEntity().getWorld().getUID())) return;
+        event.setCancelled(true);
     }
 
 }

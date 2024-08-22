@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.config.customitems.premade;
 import com.magmaguy.elitemobs.config.customitems.CustomItemsConfigFields;
 import org.bukkit.Material;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 public class LuckyCharmsConfig extends CustomItemsConfigFields {
@@ -12,7 +12,7 @@ public class LuckyCharmsConfig extends CustomItemsConfigFields {
                 true,
                 Material.COOKIE,
                 "&bLucky Charms",
-                Arrays.asList("&aPart of a complete breakfast!", "&cNote: Absolutely not a part of", "&ca complete breakfast."));
+                new ArrayList<>(List.of("&aPart of a complete breakfast!", "&cNote: Absolutely not a part of", "&ca complete breakfast.")));
         setEnchantments(List.of("VANISHING_CURSE,1"));
         setPotionEffects(List.of("LUCK,0,self,continuous"));
         setDropWeight("1");
