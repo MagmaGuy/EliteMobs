@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.World;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -13,8 +13,8 @@ public class PrimisBloodTempleSanctum extends DungeonPackagerConfigFields {
         super("primis_blood_temple_sanctum",
                 true,
                 "&2[lvl 020] &aPrimis - Blood Temple'",
-                Arrays.asList("&fThe Fire Elemental awaits!",
-                        "&6Credits: Dali_, Frostcone, MagmaGuy"),
+                new ArrayList<>(List.of("&fThe Fire Elemental awaits!",
+                        "&6Credits: Dali_, Frostcone, MagmaGuy")),
                 DiscordLinks.premiumMinidungeons,
                 DungeonPackagerConfigFields.DungeonSizeCategory.SANCTUM,
                 "em_id_bloodtemple",

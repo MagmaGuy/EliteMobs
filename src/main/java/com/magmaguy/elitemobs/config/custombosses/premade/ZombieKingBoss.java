@@ -6,8 +6,9 @@ import org.bukkit.Particle;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 public class ZombieKingBoss extends CustomBossesConfigFields {
     public ZombieKingBoss() {
@@ -24,8 +25,8 @@ public class ZombieKingBoss extends CustomBossesConfigFields {
         setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
         setBoots(new ItemStack(Material.DIAMOND_BOOTS));
         setMainHand(new ItemStack(Material.GOLDEN_AXE));
-        setPowers(Arrays.asList("flame_pyre.yml", "flamethrower.yml", "summon_the_returned.yml", "spirit_walk.yml",
-                "summonable:summonType=GLOBAL:filename=the_living_dead.yml:amount=5:customSpawn=normal_surface_spawn.yml"));
+        setPowers(new ArrayList<>(List.of("flame_pyre.yml", "flamethrower.yml", "summon_the_returned.yml", "spirit_walk.yml",
+                "summonable:summonType=GLOBAL:filename=the_living_dead.yml:amount=5:customSpawn=normal_surface_spawn.yml")));
         setSpawnMessage("&cThe Zombie King has been sighted!");
         setDeathMessage("&aThe Zombie King has been slain by $players!");
         majorBossDeathString("The Zombie King has been slain!");

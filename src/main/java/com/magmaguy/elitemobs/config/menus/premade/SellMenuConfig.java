@@ -8,7 +8,7 @@ import com.magmaguy.magmacore.util.ItemStackGenerator;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 public class SellMenuConfig extends MenusConfigFields {
@@ -32,23 +32,23 @@ public class SellMenuConfig extends MenusConfigFields {
                 "infoButton",
                 ItemStackGenerator.generateSkullItemStack("magmaguy",
                         "&4&lEliteMobs &r&cby &4&lMagmaGuy",
-                        Arrays.asList("&8Support the plugins you enjoy!",
+                        new ArrayList<>(List.of("&8Support the plugins you enjoy!",
                                 "&4Warning!",
                                 "&cYou can only sell special",
                                 "&cElite Mobs drops in this",
                                 "&cshop! These should have",
-                                "&ca value on their lore."), MetadataHandler.signatureID),
+                                "&ca value on their lore.")), MetadataHandler.signatureID),
                 fileConfiguration);
         infoButton = ItemStackSerializer.deserialize("infoButton", fileConfiguration);
         infoSlot = ConfigurationEngine.setInt(fileConfiguration, "infoButtonSlot", 4);
-        storeSlots = ConfigurationEngine.setList(file, fileConfiguration, "sellSlots", Arrays.asList(19, 20, 21, 22, 23,
-                24, 25, 28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 43), false);
+        storeSlots = ConfigurationEngine.setList(file, fileConfiguration, "sellSlots", new ArrayList<>(List.of(19, 20, 21, 22, 23,
+                24, 25, 28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 43)), false);
         ItemStackSerializer.serialize("cancelButton", ItemStackGenerator.generateItemStack(Material.BARRIER,
                 "&4Cancel", List.of("&cCancel purchase!"), MetadataHandler.signatureID), fileConfiguration);
         cancelButton = ItemStackSerializer.deserialize("cancelButton", fileConfiguration);
         cancelSlot = ConfigurationEngine.setInt(fileConfiguration, "cancelButtonSlot", 27);
         ItemStackSerializer.serialize("confirmButton", ItemStackGenerator.generateItemStack(Material.EMERALD,
-                "&2Confirm Sale", Arrays.asList("&aSell item for", "&a$currency_amount $currency_name"), MetadataHandler.signatureID), fileConfiguration);
+                "&2Confirm Sale", new ArrayList<>(List.of("&aSell item for", "&a$currency_amount $currency_name")), MetadataHandler.signatureID), fileConfiguration);
         confirmButton = ItemStackSerializer.deserialize("confirmButton", fileConfiguration);
         confirmSlot = ConfigurationEngine.setInt(fileConfiguration, "confirmSaleSlot", 35);
     }

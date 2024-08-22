@@ -273,6 +273,7 @@ public class EventsRegistrer {
             register(new AlternativeDurabilityLoss());
         register(new EnderCrystalDamageProtectionBypass());
         register(new NPCsBecomeWitches());
+        register(new PreventEliteSilverfishBlockEnter());
 
 
         //Antiexploits

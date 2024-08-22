@@ -74,7 +74,6 @@ public class ScriptTargets {
     }
 
     protected void cacheTargets(ScriptActionData scriptActionData) {
-        //Only cache if tracking
         if (getTargetBlueprint().isTrack()) {
             //Zones that animate independently can not be set to track, as this causes confusion. This is forced to make it easier on scripters.
             if (eliteScript.getScriptZone().isValid() && eliteScript.getScriptZone().getZoneBlueprint().getAnimationDuration() > 0)
@@ -89,8 +88,9 @@ public class ScriptTargets {
             if (eliteScript.getScriptZone().getZoneBlueprint().getAnimationDuration() > 0) animatedScriptZone = true;
             anonymousTargets = null;
         }
-        if (!animatedScriptZone)
+        if (!animatedScriptZone) {
             anonymousTargets = new ArrayList<>(getTargetLocations(scriptActionData));
+        }
         if (!getTargetBlueprint().isTrack() && targetBlueprint.getScriptRelativeVectorBlueprint() != null) {
             scriptRelativeVector = new ScriptRelativeVector(targetBlueprint.getScriptRelativeVectorBlueprint(), eliteScript, null);
             scriptRelativeVector.cacheVector(scriptActionData);
@@ -168,7 +168,7 @@ public class ScriptTargets {
      * @return Validated location for the script behavior
      */
     protected Collection<Location> getTargetLocations(ScriptActionData scriptActionData) {
-        if (anonymousTargets != null && !anonymousTargets.isEmpty() && anonymousTargets.get(0) instanceof Location) {
+        if (anonymousTargets != null && !anonymousTargets.isEmpty() && anonymousTargets.get(0) instanceof Location location) {
             return (List<Location>) anonymousTargets;
         }
 

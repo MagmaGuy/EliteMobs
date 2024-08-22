@@ -11,7 +11,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 public class PlayerStatusMenuConfig extends MenusConfigFields {
@@ -347,10 +347,10 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
         indexHeaderItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "indexHeaderItem",
                 ItemStackGenerator.generateItemStack(Material.PAPER,
                         "&5&l/ag &7- &6EliteMobs Hub",
-                        Arrays.asList("CLICK TO USE",
+                        new ArrayList<>(List.of("CLICK TO USE",
                                 "The place where you can find",
                                 "NPCs that give quests, buy and",
-                                "sell items, give advice and more!")), true);
+                                "sell items, give advice and more!"))), true);
         indexHeaderSlot = ConfigurationEngine.setInt(fileConfiguration, "indexHeaderSlot", 4);
 
         indexStatsItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "indexStatsItem",
@@ -399,22 +399,22 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
         gearDamageItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "gearDamageItem",
                 ItemStackGenerator.generateItemStack(Material.DIAMOND_SWORD,
                         "&4Damage: $damage",
-                        Arrays.asList("&fBase damage dealt to Elites.",
-                                "&fBased on the level of your weapon!")), true);
+                        new ArrayList<>(List.of("&fBase damage dealt to Elites.",
+                                "&fBased on the level of your weapon!"))), true);
         gearDamageSlot = ConfigurationEngine.setInt(fileConfiguration, "gearDamageSlot", 23);
         gearArmorItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "gearArmorItem",
                 ItemStackGenerator.generateItemStack(Material.SHIELD,
                         "&2Defense: $defense",
-                        Arrays.asList("&fBase damage reduction from Elites.",
-                                "&fBased on the average level of your armor!")), true);
+                        new ArrayList<>(List.of("&fBase damage reduction from Elites.",
+                                "&fBased on the average level of your armor!"))), true);
         gearArmorSlot = ConfigurationEngine.setInt(fileConfiguration, "gearArmorSlot", 24);
         gearThreatItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "gearThreatItem",
                 ItemStackGenerator.generateItemStack(Material.TARGET,
                         "&cThreat Level: $threat",
-                        Arrays.asList("&fThis determines the level of the",
+                        new ArrayList<>(List.of("&fThis determines the level of the",
                                 "&fElite Mobs that spawns near you",
                                 "&fTakes armor, weapon in hand, guild",
-                                "&ftier into account.")), true);
+                                "&ftier into account."))), true);
         gearThreatSlot = ConfigurationEngine.setInt(fileConfiguration, "gearThreatSlot", 25);
 
         statsChestMenuName = ConfigurationEngine.setString(file, fileConfiguration, "statsChestMenuName", "&2EliteMobs Stats", true);
@@ -422,21 +422,21 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
         statsMoneyItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "statsMoneyItem",
                 ItemStackGenerator.generateItemStack(Material.GOLD_INGOT,
                         "&2Elite Coins: $money",
-                        Arrays.asList("&fKill Elite Mobs to loot currency,",
+                        new ArrayList<>(List.of("&fKill Elite Mobs to loot currency,",
                                 "&fsell their drops in /em shop or",
-                                "&fcomplete quests!")), true);
+                                "&fcomplete quests!"))), true);
         statsMoneySlot = ConfigurationEngine.setInt(fileConfiguration, "statsMoneySlot", 10);
 
         statsGuildTierItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "statsGuildTierItem",
                 ItemStackGenerator.generateItemStack(Material.TARGET,
                         "&6Guild Tier: $tier",
-                        Arrays.asList("&fGuild Rank determines how good your loot can ",
+                        new ArrayList<>(List.of("&fGuild Rank determines how good your loot can ",
                                 "&fbe, sets your bonus from the Prestige Tier, among ",
                                 "&fother things. The Prestige Tier unlocks extremely ",
                                 "&fpowerful rewards, like increased max health, chance ",
                                 "&fto dodge/crit, increased currency rewards and more! ",
                                 "&fYou can unlock Guild Ranks and Prestige Tiers at /ag!",
-                                "&f⚜ = prestige rank, ✧ = guild rank!")), true);
+                                "&f⚜ = prestige rank, ✧ = guild rank!"))), true);
         statsGuildTierSlot = ConfigurationEngine.setInt(fileConfiguration, "statsGuildTierSlot", 11);
 
         statsEliteKillsItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "statsEliteKillsItem",
@@ -448,10 +448,10 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
         statsMaxEliteLevelKilledItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "statsMaxEliteLevelKilledItem",
                 ItemStackGenerator.generateItemStack(Material.GOLDEN_SWORD,
                         "&4Max Lvl Killed: &c$maxKill",
-                        Arrays.asList("&fElite Mob levels are based on the tier",
+                        new ArrayList<>(List.of("&fElite Mob levels are based on the tier",
                                 "&fof your gear! Higher tiers, higher",
                                 "&fElite Mob levels!\n",
-                                "&eNote: only non-exploity kills get counted!")), true);
+                                "&eNote: only non-exploity kills get counted!"))), true);
         statsMaxEliteLevelKilledSlot = ConfigurationEngine.setInt(fileConfiguration, "statsMaxEliteLevelKilledSlot", 13);
 
         statsEliteDeathsItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "statsEliteDeathsItem",
@@ -463,18 +463,18 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
         statsQuestsCompletedItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "statsQuestsCompletedItem",
                 ItemStackGenerator.generateItemStack(Material.LECTERN,
                         "&5Quests Completed: &d$questsCompleted",
-                        Arrays.asList("&fAmount of EliteMobs quests completed.",
-                                "&fYou can accept quests by talking to NPCs!")), true);
+                        new ArrayList<>(List.of("&fAmount of EliteMobs quests completed.",
+                                "&fYou can accept quests by talking to NPCs!"))), true);
         statsQuestsCompletedSlot = ConfigurationEngine.setInt(fileConfiguration, "statsQuestsCompletedSlot", 15);
 
         statsScoreItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "statsScoreItem",
                 ItemStackGenerator.generateItemStack(Material.ITEM_FRAME,
                         "&3Score: &b$score",
-                        Arrays.asList("&fYour EliteMobs score. It goes up",
+                        new ArrayList<>(List.of("&fYour EliteMobs score. It goes up",
                                 "&fwhen you kill and elite mob,",
                                 "&fand it goes down when you die",
                                 "&fto an elite. Higher level",
-                                "&felites give more score.")), true);
+                                "&felites give more score."))), true);
         statsScoreSlot = ConfigurationEngine.setInt(fileConfiguration, "statsScoreSlot", 16);
 
         commandsChestMenuName = ConfigurationEngine.setString(file, fileConfiguration, "commandsChestMenuName", "&2EliteMobs Commands", true);
@@ -482,18 +482,18 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
         commandsAGItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "commandsAGItem",
                 ItemStackGenerator.generateItemStack(Material.END_PORTAL_FRAME,
                         "&5/ag",
-                        Arrays.asList("&fClick to use!",
+                        new ArrayList<>(List.of("&fClick to use!",
                                 "&fThe place where you can find",
                                 "&fNPCs that give quests, buy and",
-                                "&fsell items, give advice and more!")), true);
+                                "&fsell items, give advice and more!"))), true);
         commandsAGSlot = ConfigurationEngine.setInt(fileConfiguration, "commandsAGSlot", 11);
 
         commandsShareItemItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "commandsShareItemItem",
                 ItemStackGenerator.generateItemStack(Material.PAPER,
                         "&5/shareitem",
-                        Arrays.asList("&fClick to use!",
+                        new ArrayList<>(List.of("&fClick to use!",
                                 "&fShares the Elite Item you're holding",
-                                "&fon chat!")), true);
+                                "&fon chat!"))), true);
         commandsShareItemSlot = ConfigurationEngine.setInt(fileConfiguration, "commandsShareItemSlot", 15);
     }
 

@@ -57,7 +57,7 @@ public class GenerateDatabase {
             DatabaseMetaData metaData = PlayerData.getConnection().getMetaData();
             ResultSet resultSet = metaData.getColumns(null, null, PlayerData.getPLAYER_DATA_TABLE_NAME(), columnName);
             if (resultSet.next()) {
-                //Developer.message("Database already had " + columnName);
+                //Logger.message("Database already had " + columnName);
             } else {
                 Logger.info("Adding new database column " + columnName);
                 addColumn(columnName, columnValues);

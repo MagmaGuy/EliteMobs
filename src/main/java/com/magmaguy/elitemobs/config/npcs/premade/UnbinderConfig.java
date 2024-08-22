@@ -4,7 +4,8 @@ import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
 import com.magmaguy.elitemobs.npcs.NPCInteractions;
 import org.bukkit.entity.Villager;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UnbinderConfig extends NPCsConfigFields {
     public UnbinderConfig() {
@@ -14,19 +15,19 @@ public class UnbinderConfig extends NPCsConfigFields {
                 "<Unbinder>",
                 Villager.Profession.WEAPONSMITH,
                 "em_adventurers_guild,296.5,81,253.5,90,0",
-                Arrays.asList(
+                new ArrayList<>(List.of(
                         "Greetings.",
                         "Well met.",
                         "Hail, friend.",
                         "Yes?",
-                        "May I help you?"),
-                Arrays.asList(
+                        "May I help you?")),
+                new ArrayList<>(List.of(
                         "I will unbind your items\\nfor an extremely rare unbind scroll.",
                         "I am the only one qualified\\nto unbind your goods.",
-                        "Have an unbind scroll?"),
-                Arrays.asList(
+                        "Have an unbind scroll?")),
+                new ArrayList<>(List.of(
                         "Remember: Use unbind\\nscrolls wisely.",
-                        "Safe travels, friend."),
+                        "Safe travels, friend.")),
                 true,
 
                 3,

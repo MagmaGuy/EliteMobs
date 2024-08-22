@@ -4,7 +4,8 @@ import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
 import com.magmaguy.elitemobs.npcs.NPCInteractions;
 import org.bukkit.entity.Villager;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 public class RepairmanConfig extends NPCsConfigFields {
     public RepairmanConfig() {
@@ -14,22 +15,22 @@ public class RepairmanConfig extends NPCsConfigFields {
                 "<Repairman>",
                 Villager.Profession.WEAPONSMITH,
                 "em_adventurers_guild,278.5,81,263.5,-90,0",
-                Arrays.asList(
+                new ArrayList<>(List.of(
                         "Get your items repaired!",
                         "Repairing items for scrap!",
                         "Turn that scrap into durability!",
                         "Need a repair?",
-                        "Got damaged items?"),
-                Arrays.asList(
+                        "Got damaged items?")),
+                new ArrayList<>(List.of(
                         "Best repairs in town!",
                         "I got your fix!",
                         "Need a fix?",
                         "I'll repair your items!",
-                        "Need elite items repaired?"),
-                Arrays.asList(
+                        "Need elite items repaired?")),
+                new ArrayList<>(List.of(
                         "Don't forget to do maintenance!",
                         "I'll be here if you need me!",
-                        "Call me beep me if you wanna reach me,\\nif you wanna page me that's ok"),
+                        "Call me beep me if you wanna reach me,\\nif you wanna page me that's ok")),
                 true,
                 3,
                 NPCInteractions.NPCInteractionType.REPAIRMAN);

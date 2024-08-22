@@ -30,8 +30,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -201,7 +202,7 @@ public class ItemLootShower implements Listener {
     private Item generateCurrencyItem(Material material, Location location, double value) {
 
         ItemStack currencyItemStack = SoulbindEnchantment.addEnchantment(ItemStackGenerator.generateItemStack(material, "",
-                Arrays.asList("EliteMobsCurrencyItem", value + "", ThreadLocalRandom.current().nextDouble() + "")), player);
+                new ArrayList<>(List.of("EliteMobsCurrencyItem", value + "", ThreadLocalRandom.current().nextDouble() + ""))), player);
         int model = 1;
         try {
             model = EconomySettingsConfig.getThisConfiguration().getInt("lootShowerData." + (int) value);

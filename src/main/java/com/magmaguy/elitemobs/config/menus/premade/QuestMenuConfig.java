@@ -8,7 +8,8 @@ import com.magmaguy.magmacore.util.ItemStackGenerator;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 public class QuestMenuConfig extends MenusConfigFields {
     public static String menuName, questSelectorMenuTitle;
@@ -30,9 +31,9 @@ public class QuestMenuConfig extends MenusConfigFields {
                 "validTierButton",
                 ItemStackGenerator.generateItemStack(Material.GREEN_STAINED_GLASS_PANE,
                         "&2Take on a $rank &2quest!",
-                        Arrays.asList(
+                        new ArrayList<>(List.of(
                                 "&aAccept a $rank &aquest and",
-                                "&aget special rewards!"), MetadataHandler.signatureID),
+                                "&aget special rewards!")), MetadataHandler.signatureID),
                 fileConfiguration);
         validTierButton = ItemStackSerializer.deserialize("validTierButton", fileConfiguration);
 
@@ -48,10 +49,10 @@ public class QuestMenuConfig extends MenusConfigFields {
                 "killObjectiveButton",
                 ItemStackGenerator.generateItemStack(Material.YELLOW_STAINED_GLASS_PANE,
                         "&2Kill $objectiveAmount $objectiveName",
-                        Arrays.asList(
+                        new ArrayList<>(List.of(
                                 "&aKill $objectiveAmount $objectiveName &amobs.",
                                 "&fProgress: &a$currentAmount &f/&c $objectiveAmount",
-                                "&aReward: &e $rewardAmount"), MetadataHandler.signatureID),
+                                "&aReward: &e $rewardAmount")), MetadataHandler.signatureID),
                 fileConfiguration);
         killObjectiveButton = ItemStackSerializer.deserialize("killObjectiveButton", fileConfiguration);
 

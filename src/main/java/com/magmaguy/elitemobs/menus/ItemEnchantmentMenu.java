@@ -313,7 +313,7 @@ public class ItemEnchantmentMenu extends EliteMenu {
             if (menus.contains(event.getInventory())) {
                 menus.remove(event.getInventory());
                 EliteMenu.cancel(event.getPlayer(), event.getView().getTopInventory(), event.getView().getBottomInventory(),
-                        Arrays.asList(ITEM_SLOT, ENCHANTED_BOOK_SLOT, LUCKY_TICKET_SLOT));
+                        new ArrayList<>(List.of(ITEM_SLOT, ENCHANTED_BOOK_SLOT, LUCKY_TICKET_SLOT)));
             }
         }
 

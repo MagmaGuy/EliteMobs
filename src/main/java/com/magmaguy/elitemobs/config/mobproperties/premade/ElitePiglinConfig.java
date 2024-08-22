@@ -3,7 +3,8 @@ package com.magmaguy.elitemobs.config.mobproperties.premade;
 import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfigFields;
 import org.bukkit.entity.EntityType;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ElitePiglinConfig extends MobPropertiesConfigFields {
     public ElitePiglinConfig() {
@@ -11,8 +12,8 @@ public class ElitePiglinConfig extends MobPropertiesConfigFields {
                 EntityType.PIGLIN,
                 true,
                 "&fLvl &2$level &fElite &ePiglin",
-                Arrays.asList("$entity &cwill fetch a good price for $player's remains!",
-                        "$entity &ctaught $player &cthe value of gold!"),
+                new ArrayList<>(List.of("$entity &cwill fetch a good price for $player's remains!",
+                        "$entity &ctaught $player &cthe value of gold!")),
                 13);
     }
 }

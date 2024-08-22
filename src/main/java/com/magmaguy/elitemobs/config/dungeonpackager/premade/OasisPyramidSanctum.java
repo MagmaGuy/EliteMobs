@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.World;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -13,8 +13,8 @@ public class OasisPyramidSanctum extends DungeonPackagerConfigFields {
         super("oasis_pyramid_sanctum",
                 true,
                 "&2[lvl 055] &6The Oasis Pyramid",
-                Arrays.asList("&fThe final dungeon of the Oasis adventure!",
-                        "&6Credits: 69OzCanOfBepis, Frostcone, MagmaGuy"),
+                new ArrayList<>(List.of("&fThe final dungeon of the Oasis adventure!",
+                        "&6Credits: 69OzCanOfBepis, Frostcone, MagmaGuy")),
                 DiscordLinks.premiumMinidungeons,
                 DungeonPackagerConfigFields.DungeonSizeCategory.SANCTUM,
                 "em_id_oasis_pyramid",

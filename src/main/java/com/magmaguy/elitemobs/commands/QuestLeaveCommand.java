@@ -5,12 +5,14 @@ import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class QuestLeaveCommand extends AdvancedCommand {
     public QuestLeaveCommand() {
         super(List.of("quest"));
         addLiteral("leave");
+        addArgument("questID", new ArrayList<>());
         setUsage("/em quest leave");
         setPermission("elitemobs.quest.leave");
         setSenderType(SenderType.PLAYER);

@@ -21,15 +21,14 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
 public class GuildRankMenuHandler implements Listener {
 
     private static final HashSet<Inventory> inventories = new HashSet<>();
-    private static final ArrayList<Integer> rankSlots = new ArrayList<>(Arrays.asList(
-            4, 11, 12, 13, 14, 15, 20, 21, 22, 23, 24, 29, 30, 31, 32, 33, 38, 39, 40, 41, 42));
+    private static final ArrayList<Integer> rankSlots = new ArrayList<>(new ArrayList<>(List.of(
+            4, 11, 12, 13, 14, 15, 20, 21, 22, 23, 24, 29, 30, 31, 32, 33, 38, 39, 40, 41, 42)));
     private static final int prestigeRankSlot = 49;
 
     private static void selectUnlockedRank(Player player, int guildRank) {

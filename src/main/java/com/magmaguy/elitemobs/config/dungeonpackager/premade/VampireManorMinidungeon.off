@@ -11,9 +11,9 @@ public class VampireManorMinidungeon extends DungeonPackagerConfigFields {
         super("vampire_manor",
                 true,
                 "&2[lvl 170] &cThe Vampire Manor",
-                Arrays.asList("&fPrepare to spill blood!",
+                new ArrayList<>(List.of("&fPrepare to spill blood!",
                         "&6Credits: MagmaGuy, 69OzCanOfBepis"),
-                Arrays.asList(
+                new ArrayList<>(List.of(
                         "vampire_grunt.yml:5.0,0.0,20.0",
                         "vampire_grunt.yml:-5.0,0.0,20.0",
                         "vampire_brute.yml:17.0,0.0,29.0",
@@ -125,7 +125,7 @@ public class VampireManorMinidungeon extends DungeonPackagerConfigFields {
                         "vampire_brute.yml:17.0,26.0,87.0",
                         "vampire_brute.yml:39.0,26.0,65.0",
                         "vampire_brute.yml:39.0,26.0,31.0"),
-                Arrays.asList(
+                new ArrayList<>(List.of(
                         "vampire_manor_south.yml:16.5,11.5,13.5",
                         "vampire_manor_west.yml:-17.5,11.5,20.5",
                         "vampire_manor_east.yml:-28.5,-0.5,44.5",

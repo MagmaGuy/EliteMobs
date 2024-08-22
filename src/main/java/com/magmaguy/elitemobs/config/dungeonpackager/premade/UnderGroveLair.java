@@ -17,7 +17,7 @@ public class UnderGroveLair extends DungeonPackagerConfigFields {
                 "em_under_grove",
                 World.Environment.NORMAL,
                 true,
-                "em_under_grove,-2.5,-40.5,35,90,0",
+                "em_under_grove,-2.5,-38.8,35.5,90,0",
                 0,
                 "Difficulty: &cHard\n" +
                         "$bossCount level $lowestTier Big Boss!\n" +

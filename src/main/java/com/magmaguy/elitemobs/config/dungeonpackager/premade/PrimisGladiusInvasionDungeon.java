@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.World;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -13,7 +13,7 @@ public class PrimisGladiusInvasionDungeon extends DungeonPackagerConfigFields {
         super("primis_gladius_invasion_dungeon",
                 true,
                 "&2[lvl 000-020] &aPrimis - Gladius Invasion",
-                Arrays.asList("&fIt is time to take Gladius back!", "&6Credits: 69OzCanOfBepis, Frostcone, MagmaGuy"),
+                new ArrayList<>(List.of("&fIt is time to take Gladius back!", "&6Credits: 69OzCanOfBepis, Frostcone, MagmaGuy")),
                 DiscordLinks.premiumMinidungeons,
                 DungeonSizeCategory.DUNGEON,
                 "em_id_primis_gladius",

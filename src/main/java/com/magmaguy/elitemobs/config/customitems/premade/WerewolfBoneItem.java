@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.config.customitems.CustomItemsConfigFields;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import org.bukkit.Material;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 public class WerewolfBoneItem extends CustomItemsConfigFields {
@@ -13,7 +13,7 @@ public class WerewolfBoneItem extends CustomItemsConfigFields {
                 true,
                 Material.BONE,
                 "&6Werewolf Bone",
-                Arrays.asList("&aHaving killed the alpha,", "&athis temporarily makes you!", "&athe wolves' new leader"));
+                new ArrayList<>(List.of("&aHaving killed the alpha,", "&athis temporarily makes you!", "&athe wolves' new leader")));
         setEnchantments(List.of("SUMMON_WOLF,1"));
         setItemType(CustomItem.ItemType.UNIQUE);
     }

@@ -4,7 +4,8 @@ import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
 import com.magmaguy.elitemobs.npcs.NPCInteractions;
 import org.bukkit.entity.Villager;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 public class BlacksmithConfig extends NPCsConfigFields {
     public BlacksmithConfig() {
@@ -14,14 +15,14 @@ public class BlacksmithConfig extends NPCsConfigFields {
                 "<Blacksmith>",
                 Villager.Profession.TOOLSMITH,
                 "em_adventurers_guild,285.5,93,261.5,179,0",
-                Arrays.asList(
+                new ArrayList<>(List.of(
                         "Welcome to our shop!",
                         "Sell your goods here!",
                         "Fresh goods, just for you!",
                         "Got something to sell?",
                         "Want to buy something good?",
-                        "Fresh goods every time!"),
-                Arrays.asList(
+                        "Fresh goods every time!")),
+                new ArrayList<>(List.of(
                         "Higher level mobs drop\\nhigher value items!",
                         "Items with lots of \\nenchantments are worth more!",
                         "Higher level mobs drop\\nbetter items!",
@@ -31,12 +32,12 @@ public class BlacksmithConfig extends NPCsConfigFields {
                         "Some items have unique\\neffects!",
                         "The hunter enchantment\\nattracts elite mobs to your\\nlocation!",
                         "Special weapons and armor\\ndropped by elite mobs can\\nbe sold here!",
-                        "Higher guild ranks will\\nincrease the quality of the\\nloot from elite mobs!"),
-                Arrays.asList(
+                        "Higher guild ranks will\\nincrease the quality of the\\nloot from elite mobs!")),
+                new ArrayList<>(List.of(
                         "Thank you for your business!",
                         "Come back soon!",
                         "Come back any time!",
-                        "Recommend this shop to your\\nfriends!"),
+                        "Recommend this shop to your\\nfriends!")),
                 true,
                 3,
                 NPCInteractions.NPCInteractionType.PROCEDURALLY_GENERATED_SHOP);

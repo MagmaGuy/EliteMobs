@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.World;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -13,8 +13,8 @@ public class BinderOfWorldsSanctum extends DungeonPackagerConfigFields {
         super("binder_of_worlds_sanctum",
                 true,
                 "&2[lvl 200] &5The Binder Of Worlds",
-                Arrays.asList("&5The ultimate challenge. Be prepared!",
-                        "&6Credits: MagmaGuy, 69OzCanOfBepis & Frostcone"),
+                new ArrayList<>(List.of("&5The ultimate challenge. Be prepared!",
+                        "&6Credits: MagmaGuy, 69OzCanOfBepis & Frostcone")),
                 DiscordLinks.freeMinidungeons,
                 DungeonSizeCategory.SANCTUM,
                 "em_id_binder_of_worlds",

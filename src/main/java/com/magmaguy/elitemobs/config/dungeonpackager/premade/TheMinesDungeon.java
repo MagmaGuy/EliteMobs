@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.World;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -13,8 +13,8 @@ public class TheMinesDungeon extends DungeonPackagerConfigFields {
         super("the_mines_dungeon",
                 true,
                 "&2[lvl 020] &3The Mines Dungeon",
-                Arrays.asList("&fReady to step up your dungeon game?",
-                        "&6Credits: MagmaGuy, Frostcone, 69OzCanOfBepis, Realm of Lotheridon, Dali_"),
+                new ArrayList<>(List.of("&fReady to step up your dungeon game?",
+                        "&6Credits: MagmaGuy, Frostcone, 69OzCanOfBepis, Realm of Lotheridon, Dali_")),
                 DiscordLinks.freeMinidungeons,
                 DungeonSizeCategory.DUNGEON,
                 "em_id_the_mines",

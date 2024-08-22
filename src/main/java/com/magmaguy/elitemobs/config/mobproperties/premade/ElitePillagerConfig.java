@@ -3,7 +3,8 @@ package com.magmaguy.elitemobs.config.mobproperties.premade;
 import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfigFields;
 import org.bukkit.entity.EntityType;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ElitePillagerConfig extends MobPropertiesConfigFields {
     public ElitePillagerConfig() {
@@ -11,8 +12,8 @@ public class ElitePillagerConfig extends MobPropertiesConfigFields {
                 EntityType.PILLAGER,
                 true,
                 "&fLvl &2$level &fElite &8Pillager",
-                Arrays.asList("$entity &cplundered $player&c!",
-                        "$entity &cpillaged $player&c!"),
+                new ArrayList<>(List.of("$entity &cplundered $player&c!",
+                        "$entity &cpillaged $player&c!")),
                 5);
     }
 }

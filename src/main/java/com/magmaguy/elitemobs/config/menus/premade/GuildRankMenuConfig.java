@@ -9,7 +9,8 @@ import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GuildRankMenuConfig extends MenusConfigFields {
     @Getter
@@ -70,7 +71,7 @@ public class GuildRankMenuConfig extends MenusConfigFields {
                 "unlockedButtons",
                 ItemStackGenerator.generateItemStack(Material.GRAY_STAINED_GLASS_PANE,
                         "$rankName",
-                        Arrays.asList("&f&m-------------------------------",
+                        new ArrayList<>(List.of("&f&m-------------------------------",
                                 "&aThis rank is unlocked!",
                                 "&fYou can select it.",
                                 "&f&m-------------------------------",
@@ -78,14 +79,14 @@ public class GuildRankMenuConfig extends MenusConfigFields {
                                 "$currencyBonusMessage",
                                 "$maxHealthIncrease",
                                 "$chanceToCrit",
-                                "$chanceToDodge"), MetadataHandler.signatureID), fileConfiguration);
+                                "$chanceToDodge")), MetadataHandler.signatureID), fileConfiguration);
         unlockedButton = ItemStackSerializer.deserialize("unlockedButtons", fileConfiguration);
 
         ItemStackSerializer.serialize(
                 "lockedButtons",
                 ItemStackGenerator.generateItemStack(Material.RED_STAINED_GLASS_PANE,
                         "$rankName",
-                        Arrays.asList("&f&m-------------------------------",
+                        new ArrayList<>(List.of("&f&m-------------------------------",
                                 "&aThis rank is locked!",
                                 "&cYou need the $previousRank rank first!",
                                 "&f&m-------------------------------",
@@ -93,28 +94,28 @@ public class GuildRankMenuConfig extends MenusConfigFields {
                                 "$currencyBonusMessage",
                                 "$maxHealthIncrease",
                                 "$chanceToCrit",
-                                "$chanceToDodge"), MetadataHandler.signatureID), fileConfiguration);
+                                "$chanceToDodge")), MetadataHandler.signatureID), fileConfiguration);
         lockedButton = ItemStackSerializer.deserialize("lockedButtons", fileConfiguration);
 
         ItemStackSerializer.serialize(
                 "currentButtons",
                 ItemStackGenerator.generateItemStack(Material.GREEN_STAINED_GLASS_PANE,
                         "$rankName",
-                        Arrays.asList("&f&m-------------------------------",
+                        new ArrayList<>(List.of("&f&m-------------------------------",
                                 "&aThis is your current rank!",
                                 "&f&m-------------------------------",
                                 "$lootTier",
                                 "$currencyBonusMessage",
                                 "$maxHealthIncrease",
                                 "$chanceToCrit",
-                                "$chanceToDodge"), MetadataHandler.signatureID), fileConfiguration);
+                                "$chanceToDodge")), MetadataHandler.signatureID), fileConfiguration);
         currentButton = ItemStackSerializer.deserialize("currentButtons", fileConfiguration);
 
         ItemStackSerializer.serialize(
                 "nextButtons",
                 ItemStackGenerator.generateItemStack(Material.YELLOW_STAINED_GLASS_PANE,
                         "Prestige $prestigeNumber",
-                        Arrays.asList(
+                        new ArrayList<>(List.of(
                                 "&6This is the next rank you can unlock",
                                 "&aSelect it when you're ready!",
                                 "&6Costs $price &6$currencyName",
@@ -124,23 +125,23 @@ public class GuildRankMenuConfig extends MenusConfigFields {
                                 "$currencyBonusMessage",
                                 "$maxHealthIncrease",
                                 "$chanceToCrit",
-                                "$chanceToDodge"), MetadataHandler.signatureID), fileConfiguration);
+                                "$chanceToDodge")), MetadataHandler.signatureID), fileConfiguration);
         nextButton = ItemStackSerializer.deserialize("nextButtons", fileConfiguration);
 
         ItemStackSerializer.serialize(
                 "prestigeLockedButtons",
                 ItemStackGenerator.generateItemStack(Material.RED_STAINED_GLASS,
                         "Prestige $rank",
-                        Arrays.asList("&f&m-------------------------------",
+                        new ArrayList<>(List.of("&f&m-------------------------------",
                                 "&4You must unlock all guild ranks first!",
-                                "&f&m-------------------------------"), MetadataHandler.signatureID), fileConfiguration);
+                                "&f&m-------------------------------")), MetadataHandler.signatureID), fileConfiguration);
         prestigeLockedButton = ItemStackSerializer.deserialize("prestigeLockedButtons", fileConfiguration);
 
         ItemStackSerializer.serialize(
                 "prestigeNextUnlockButtons",
                 ItemStackGenerator.generateItemStack(Material.GOLD_BLOCK,
                         "Prestige $rank",
-                        Arrays.asList("&f&m-------------------------------",
+                        new ArrayList<>(List.of("&f&m-------------------------------",
                                 "&2Prestige unlock is ready!",
                                 "&6Costs $price &6$currencyName",
                                 "&cBuying prestige will reset guild ranks",
@@ -153,7 +154,7 @@ public class GuildRankMenuConfig extends MenusConfigFields {
                                 "&a- Base chance to dodge",
                                 "&4Warning: this resets you current",
                                 "&4EliteMobs ITEMS AND CURRENCY!",
-                                "&f&m-------------------------------"), MetadataHandler.signatureID), fileConfiguration);
+                                "&f&m-------------------------------")), MetadataHandler.signatureID), fileConfiguration);
         prestigeNextUnlockButton = ItemStackSerializer.deserialize("prestigeNextUnlockButtons", fileConfiguration);
 
         notEnoughCurrencyMessage = ConfigurationEngine.setString(file, fileConfiguration, "notEnoughCurrencyMessages",

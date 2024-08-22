@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.World;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -13,8 +13,8 @@ public class TheClimbDungeon extends DungeonPackagerConfigFields {
         super("the_climb_dungeon",
                 true,
                 "&2[lvl 010] &3The Climb Dungeon",
-                Arrays.asList("&fThe perfect starter instanced dungeon!",
-                        "&6Credits: MagmaGuy, Frostcone, 69OzCanOfBepis, Realm of Lotheridon"),
+                new ArrayList<>(List.of("&fThe perfect starter instanced dungeon!",
+                        "&6Credits: MagmaGuy, Frostcone, 69OzCanOfBepis, Realm of Lotheridon")),
                 DiscordLinks.freeMinidungeons,
                 DungeonSizeCategory.DUNGEON,
                 "em_id_the_climb",

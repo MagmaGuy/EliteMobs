@@ -5,8 +5,9 @@ import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 public class ArmorGoblinBoss extends CustomBossesConfigFields {
     public ArmorGoblinBoss() {
@@ -24,28 +25,28 @@ public class ArmorGoblinBoss extends CustomBossesConfigFields {
         setMainHand(new ItemStack(Material.SHIELD));
         setOffHand(new ItemStack(Material.SHIELD));
         setBaby(true);
-        setPowers(Arrays.asList("gold_explosion.yml", "gold_shotgun.yml", "spirit_walk.yml"));
+        setPowers(new ArrayList<>(List.of("gold_explosion.yml", "gold_shotgun.yml", "spirit_walk.yml")));
         setSpawnMessage("&cAn Armor Goblin has been sighted!");
         setDeathMessage("&aAn Armor Goblin has been slain by $players!");
-        setDeathMessages(Arrays.asList(
+        setDeathMessages(new ArrayList<>(List.of(
                 "&e&l---------------------------------------------",
                 "&eThe Armor Goblin has been pillaged!",
                 "&c&l    1st Damager: $damager1name &cwith $damager1damage damage!",
                 "&6&l    2nd Damager: $damager2name &6with $damager2damage damage!",
                 "&e&l    3rd Damager: $damager3name &ewith $damager3damage damage!",
                 "&aSlayers: $players",
-                "&e&l---------------------------------------------"));
+                "&e&l---------------------------------------------")));
         setEscapeMessage("&4An Armor Goblin has escaped!");
         setLocationMessage("&cArmor Goblin: $distance blocks away!");
         setTrails(Collections.singletonList(Material.GOLD_NUGGET.toString()));
         setAnnouncementPriority(2);
         setPersistent(true);
-        setUniqueLootList(Arrays.asList(
+        setUniqueLootList(new ArrayList<>(List.of(
                 "goblin_helmet.yml:0.2",
                 "goblin_chestplate.yml:0.2",
                 "goblin_leggings.yml:0.2",
                 "goblin_boots.yml:0.2"
-        ));
+        )));
         setFollowDistance(100);
         setCustomModel("em_goblin_armor");
     }

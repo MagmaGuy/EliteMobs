@@ -19,7 +19,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class RepairMenu extends EliteMenu {
     private static final int eliteItemInputSlot = RepairMenuConfig.eliteItemInputSlot;
@@ -195,7 +198,7 @@ public class RepairMenu extends EliteMenu {
         public void onClose(InventoryCloseEvent event) {
             if (inventories.contains(event.getInventory())) {
                 inventories.remove(event.getInventory());
-                EliteMenu.cancel(event.getPlayer(), event.getView().getTopInventory(), event.getView().getBottomInventory(), Arrays.asList(eliteItemInputSlot, scrapItemInputSlot));
+                EliteMenu.cancel(event.getPlayer(), event.getView().getTopInventory(), event.getView().getBottomInventory(), new ArrayList<>(List.of(eliteItemInputSlot, scrapItemInputSlot)));
             }
         }
 

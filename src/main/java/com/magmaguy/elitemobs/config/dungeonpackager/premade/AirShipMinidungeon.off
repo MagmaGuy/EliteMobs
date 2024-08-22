@@ -13,10 +13,10 @@ public class AirShipMinidungeon extends DungeonPackagerConfigFields {
                 "airship_minidungeon",
                 true,
                 "&2[lvl 045-055] &6The Airship",
-                Arrays.asList("&fAn awesome airship full of undead pirates!",
+                new ArrayList<>(List.of("&fAn awesome airship full of undead pirates!",
                         "&6Credits: MagmaGuy, 69OzCanOfBepis",
                         "&6and Realm of Lotheridon"),
-                Arrays.asList(
+                new ArrayList<>(List.of(
                         "airship_tier_75_boss.yml:0.0,31.5,112.0",
                         "airship_tier_65_silverfish.yml:-8.0,21.5,102.0",
                         "airship_tier_65_silverfish.yml:-10.0,21.5,97.0",

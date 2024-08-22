@@ -5,7 +5,9 @@ import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class WoodLeagueWave25Miniboss extends CustomBossesConfigFields {
     public WoodLeagueWave25Miniboss() {
@@ -14,7 +16,7 @@ public class WoodLeagueWave25Miniboss extends CustomBossesConfigFields {
                 true,
                 "$minibossLevel &bAgdluak",
                 "25");
-        setPowers(Arrays.asList("frost_cone.yml", "attack_freeze.yml", "arrow_rain.yml"));
+        setPowers(new ArrayList<>(List.of("frost_cone.yml", "attack_freeze.yml", "arrow_rain.yml")));
         setHealthMultiplier(3D);
         setDamageMultiplier(2D);
         setFollowDistance(60);

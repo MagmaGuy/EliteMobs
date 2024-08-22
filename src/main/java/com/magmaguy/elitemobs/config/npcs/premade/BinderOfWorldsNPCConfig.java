@@ -5,7 +5,6 @@ import com.magmaguy.elitemobs.npcs.NPCInteractions;
 import org.bukkit.entity.Villager;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class BinderOfWorldsNPCConfig extends NPCsConfigFields {
@@ -18,10 +17,10 @@ public class BinderOfWorldsNPCConfig extends NPCsConfigFields {
                 "em_adventurers_guild,294.5,91,223.5,180,0",
                 List.of(
                         "You are not prepared."),
-                Arrays.asList(
+                new ArrayList<>(List.of(
                         "The things I've seen...\\nYou wouldn't believe it.",
                         "The End is near...\\nYou are not prepared.",
-                        "I give the greatest challenge of them all.\\nExpect death."),
+                        "I give the greatest challenge of them all.\\nExpect death.")),
                 new ArrayList<>(),
                 true,
                 3,

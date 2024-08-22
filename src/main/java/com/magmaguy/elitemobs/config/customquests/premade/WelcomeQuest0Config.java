@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.config.customquests.premade;
 
 import com.magmaguy.elitemobs.config.customquests.CustomQuestsConfigFields;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +25,7 @@ public class WelcomeQuest0Config extends CustomQuestsConfigFields {
         );
         setQuestLockoutPermission();
         setTurnInNPC("guide_1.yml");
-        setQuestAcceptDialog(Arrays.asList("&8[Odigos]&f Alright, make sure you use &2/ag &f or &2/adventurersguild&f to head off to the Adventurer's Guild Hub!",
-                "Make sure you talk to Casus when you're there!"));
+        setQuestAcceptDialog(new ArrayList<>(List.of("&8[Odigos]&f Alright, make sure you use &2/ag &f or &2/adventurersguild&f to head off to the Adventurer's Guild Hub!",
+                "Make sure you talk to Casus when you're there!")));
     }
 }

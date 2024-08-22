@@ -125,6 +125,8 @@ public class ScriptAction {
         //This caches the tracking mostly for zones to start at the wait time. This matters if you are making zones
         //that go through a warning phase and then a damage phase.
         scriptTargets.cacheTargets(scriptActionData);
+        if (finalScriptTargets != null)
+            finalScriptTargets.cacheTargets(scriptActionData);
         if (blueprint.getWait() > 0) {
             //First wait for allotted amount of time
             new BukkitRunnable() {
@@ -228,6 +230,8 @@ public class ScriptAction {
     protected Collection<LivingEntity> getTargets(ScriptActionData scriptActionData) {
         Collection<LivingEntity> livingTargets = scriptConditions.validateEntities(scriptActionData, scriptTargets.getTargetEntities(scriptActionData));
         scriptTargets.setAnonymousTargets(livingTargets.stream().toList());
+        if (blueprint.isDebug())
+            livingTargets.forEach(livingTarget -> Logger.showLocation(livingTarget.getLocation()));
         return livingTargets;
     }
 
@@ -235,6 +239,18 @@ public class ScriptAction {
     protected Collection<Location> getLocationTargets(ScriptActionData scriptActionData) {
         Collection<Location> locationTargets = scriptConditions.validateLocations(scriptActionData, scriptTargets.getTargetLocations(scriptActionData));
         scriptTargets.setAnonymousTargets(locationTargets.stream().toList());
+        if (blueprint.isDebug())
+            locationTargets.forEach(Logger::showLocation);
+        return locationTargets;
+    }
+
+    //Gets a list of locations
+    protected Collection<Location> getFinalLocationTargets(ScriptActionData scriptActionData) {
+        Collection<Location> locationTargets = scriptConditions.validateLocations(scriptActionData, finalScriptTargets.getTargetLocations(scriptActionData));
+        finalScriptTargets.setAnonymousTargets(locationTargets.stream().toList());
+        if (blueprint.isDebug()) {
+            locationTargets.forEach(Logger::showLocation);
+        }
         return locationTargets;
     }
 
@@ -245,7 +261,8 @@ public class ScriptAction {
                 Logger.warn("Failed to get teleport destination for script " + blueprint.getScriptName() + " because there is no set FinalTarget!");
                 return;
             }
-            List<Location> destinationLocations = new ArrayList<>(finalScriptTargets.getTargetLocations(scriptActionData));
+//            List<Location> destinationLocations = new ArrayList<>(finalScriptTargets.getTargetLocations(scriptActionData));
+            List<Location> destinationLocations = getFinalLocationTargets(scriptActionData).stream().toList();
             if (destinationLocations.isEmpty()) return;
             MatchInstance.MatchInstanceEvents.teleportBypass = true;
             iteratedTarget.teleport(destinationLocations.get(0));

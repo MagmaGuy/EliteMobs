@@ -3,7 +3,8 @@ package com.magmaguy.elitemobs.config.mobproperties.premade;
 import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfigFields;
 import org.bukkit.entity.EntityType;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 public class EliteZombieConfig extends MobPropertiesConfigFields {
     public EliteZombieConfig() {
@@ -11,8 +12,8 @@ public class EliteZombieConfig extends MobPropertiesConfigFields {
                 EntityType.ZOMBIE,
                 true,
                 "&fLvl &2$level &fElite &2Zombie",
-                Arrays.asList("$player &cwas devoured by $entity&c!",
-                        "$entity &cgot to $player's &cbrains!"),
+                new ArrayList<>(List.of("$player &cwas devoured by $entity&c!",
+                        "$entity &cgot to $player's &cbrains!")),
                 5);
     }
 }

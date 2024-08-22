@@ -17,7 +17,7 @@ public class SteamworksLair extends DungeonPackagerConfigFields {
                 "em_steamworks_lair",
                 World.Environment.NORMAL,
                 true,
-                "em_steamworks_lair,-48,-49,-108,0,0",
+                "em_steamworks_lair,-48.5,-47.8,-102.5,40,0",
                 0,
                 "Difficulty: &chard\n" +
                         "$bossCount level $lowestTier Big Boss!\n" +

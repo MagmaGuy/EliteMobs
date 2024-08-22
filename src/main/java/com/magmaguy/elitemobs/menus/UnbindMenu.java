@@ -191,7 +191,7 @@ public class UnbindMenu extends EliteMenu {
         public void onClose(InventoryCloseEvent event) {
             if (inventories.contains(event.getInventory())) {
                 inventories.remove(event.getInventory());
-                EliteMenu.cancel(event.getPlayer(), event.getView().getTopInventory(), event.getView().getBottomInventory(), Arrays.asList(eliteItemInputSlot, unbindScrollItemInputSlot));
+                EliteMenu.cancel(event.getPlayer(), event.getView().getTopInventory(), event.getView().getBottomInventory(), new ArrayList<>(List.of(eliteItemInputSlot, unbindScrollItemInputSlot)));
             }
         }
 

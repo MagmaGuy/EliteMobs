@@ -71,6 +71,7 @@ public class ScriptActionData {
         this.event = event;
     }
 
+    //Used by actions that call scripts
     public ScriptActionData(ScriptTargets scriptTargets, ScriptZone scriptZone, ScriptActionData inheritedScriptActionData) {
         this.eliteEntity = inheritedScriptActionData.getEliteEntity();
         this.directTarget = inheritedScriptActionData.getDirectTarget();
@@ -79,6 +80,7 @@ public class ScriptActionData {
         this.targetType = scriptTargets.getTargetBlueprint().getTargetType();
         this.scriptZone = scriptZone;
         this.inheritedScriptActionData = inheritedScriptActionData;
+        this.landingLocation = inheritedScriptActionData.getLandingLocation();
     }
 
     //Used for the zone enter and leave, can't use direct targets

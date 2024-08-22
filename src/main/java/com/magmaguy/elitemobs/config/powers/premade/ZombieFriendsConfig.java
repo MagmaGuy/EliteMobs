@@ -5,7 +5,7 @@ import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
 import com.magmaguy.elitemobs.powers.ZombieFriends;
 import org.bukkit.Material;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ZombieFriendsConfig extends PowersConfigFields {
@@ -26,16 +26,16 @@ public class ZombieFriendsConfig extends PowersConfigFields {
         friend1Name = ConfigurationEngine.setString(file, fileConfiguration, "friend1Name", "BFF #1", true);
         friend2Name = ConfigurationEngine.setString(file, fileConfiguration, "friend2Name", "BFF #2", true);
 
-        friendDeathMessage = ConfigurationEngine.setList(file, fileConfiguration, "friendDeathMessage", Arrays.asList(
+        friendDeathMessage = ConfigurationEngine.setList(file, fileConfiguration, "friendDeathMessage", new ArrayList<>(List.of(
                 "Noooo!",
                 "Mediocre!",
                 "Zacharias!",
                 "He's deader than before!",
                 "Vengeance!",
                 "Revenge!",
-                "I can't believe you've done this."), true);
+                "I can't believe you've done this.")), true);
 
-        originalEntityDialog = ConfigurationEngine.setList(file, fileConfiguration, "originalEntityDialog", Arrays.asList(
+        originalEntityDialog = ConfigurationEngine.setList(file, fileConfiguration, "originalEntityDialog", new ArrayList<>(List.of(
                 "Let's play ZombieCraft later!",
                 "Feel the power of friendship!",
                 "El pueblo, unido!",
@@ -43,9 +43,9 @@ public class ZombieFriendsConfig extends PowersConfigFields {
                 "BFF power!",
                 "One for all!",
                 "Get him!",
-                "Screw you guys, I'm going home!"), true);
+                "Screw you guys, I'm going home!")), true);
 
-        reinforcementDialog = ConfigurationEngine.setList(file, fileConfiguration, "reinforcementDialog", Arrays.asList(
+        reinforcementDialog = ConfigurationEngine.setList(file, fileConfiguration, "reinforcementDialog", new ArrayList<>(List.of(
                 "Don't mess with our friends!",
                 "We got your back Zach!",
                 "Backup has arrived!",
@@ -62,6 +62,6 @@ public class ZombieFriendsConfig extends PowersConfigFields {
                 "Together we are better!",
                 "The more the merrier!",
                 "I got you fam!",
-                "All for one!"), true);
+                "All for one!")), true);
     }
 }

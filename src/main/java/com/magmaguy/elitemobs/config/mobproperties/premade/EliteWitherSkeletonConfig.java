@@ -3,7 +3,8 @@ package com.magmaguy.elitemobs.config.mobproperties.premade;
 import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfigFields;
 import org.bukkit.entity.EntityType;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 public class EliteWitherSkeletonConfig extends MobPropertiesConfigFields {
     public EliteWitherSkeletonConfig() {
@@ -11,8 +12,8 @@ public class EliteWitherSkeletonConfig extends MobPropertiesConfigFields {
                 EntityType.WITHER_SKELETON,
                 true,
                 "&fLvl &2$level &fElite &8Wither Skeleton",
-                Arrays.asList("$entity's &carrows withered away $player&c!",
-                        "$entity's &chas withered $player &caway!"),
+                new ArrayList<>(List.of("$entity's &carrows withered away $player&c!",
+                        "$entity's &chas withered $player &caway!")),
                 12);
     }
 }

@@ -4,7 +4,7 @@ import com.magmaguy.magmacore.config.ConfigurationFile;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import lombok.Getter;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ItemSettingsConfig extends ConfigurationFile {
@@ -156,7 +156,7 @@ public class ItemSettingsConfig extends ConfigurationFile {
                         "$potionEffects - shows the potion effects on the item",
                         "$loreResaleValue - shows the value of the item. Might show the purchase or sell price depending on where it is viewed",
                         "Important: Several of the placeholders can be further customized by the configuration settings further below"),
-                file, fileConfiguration, "itemLoreStructureV2", Arrays.asList(
+                file, fileConfiguration, "itemLoreStructureV2", new ArrayList<>(List.of(
                         ChatColorConverter.convert("&7&m&l---------&7<&lEquip Info&7>&m&l---------"),
                         ChatColorConverter.convert("&7Item level: &f$itemLevel &7Prestige &6$prestigeLevel"),
                         ChatColorConverter.convert("$weaponOrArmorStats"),
@@ -173,7 +173,7 @@ public class ItemSettingsConfig extends ConfigurationFile {
                         ChatColorConverter.convert("$potionEffect"),
                         ChatColorConverter.convert("&7&l&m-----------------------------"),
                         ChatColorConverter.convert("$loreResaleValue")
-                ), true);
+                )), true);
         shopItemSource = ConfigurationEngine.setString(
                 List.of("Sets the shop source lore for store purchased"),
                 file, fileConfiguration, "shopSourceItemLores", "&7Purchased from a store", true);

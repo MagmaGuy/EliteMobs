@@ -4,8 +4,9 @@ import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import org.bukkit.Particle;
 import org.bukkit.entity.EntityType;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 public class BalrogConfig extends CustomBossesConfigFields {
     public BalrogConfig() {
@@ -14,13 +15,13 @@ public class BalrogConfig extends CustomBossesConfigFields {
                 true,
                 "$eventBossLevel &4Balrog",
                 "dynamic");
-        setPowers(Collections.singletonList("summonable:summonType=ON_HIT:chance=0.5:filename=raug.yml"));
+        setPowers(new ArrayList<>(List.of("summonable:summonType=ON_HIT:chance=0.5:filename=raug.yml")));
         setUniqueLootList(Collections.singletonList("dwarven_greed.yml:1"));
-        setTrails(Arrays.asList(Particle.LARGE_SMOKE.toString(),
+        setTrails(new ArrayList<>(List.of(Particle.LARGE_SMOKE.toString(),
                 Particle.LARGE_SMOKE.toString(),
                 Particle.LARGE_SMOKE.toString(),
                 Particle.LARGE_SMOKE.toString(),
                 Particle.FLAME.toString(),
-                Particle.FLAME.toString()));
+                Particle.FLAME.toString())));
     }
 }
