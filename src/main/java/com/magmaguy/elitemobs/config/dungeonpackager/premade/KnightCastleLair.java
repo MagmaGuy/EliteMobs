@@ -17,7 +17,7 @@ public class KnightCastleLair extends DungeonPackagerConfigFields {
                 "em_knight_castle",
                 World.Environment.NORMAL,
                 true,
-                "em_knight_castle,-24.5,5.0,54.5,-117,0",
+                "em_knight_castle,-20.5,6.2,55.5,-120,0",
                 0,
                 "Difficulty: &chard\n" +
                         "$bossCount level $lowestTier Big Boss!\n" +

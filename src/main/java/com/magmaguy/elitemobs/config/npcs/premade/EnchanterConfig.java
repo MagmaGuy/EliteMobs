@@ -4,7 +4,8 @@ import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
 import com.magmaguy.elitemobs.npcs.NPCInteractions;
 import org.bukkit.entity.Villager;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 public class EnchanterConfig extends NPCsConfigFields {
     public EnchanterConfig() {
@@ -14,20 +15,20 @@ public class EnchanterConfig extends NPCsConfigFields {
                 "<Enchanter>",
                 Villager.Profession.TOOLSMITH,
                 "em_adventurers_guild,278.5,77,243.5,0,0",
-                Arrays.asList(
+                new ArrayList<>(List.of(
                         "Need something enchanted?",
                         "Feeling lucky?",
                         "Got an item to improve?",
-                        "Got enchanted books?"),
-                Arrays.asList(
+                        "Got enchanted books?")),
+                new ArrayList<>(List.of(
                         "Enchantment results are\\nnot guaranteed!",
                         "Don't complain if it fails!",
                         "Got an enchanted book?",
-                        "Higher quality items are\\nriskier to enchant!"),
-                Arrays.asList(
+                        "Higher quality items are\\nriskier to enchant!")),
+                new ArrayList<>(List.of(
                         "Got what you wanted!",
                         "How's your karma?",
-                        "If at first you fail,\\ntry and try again!"),
+                        "If at first you fail,\\ntry and try again!")),
                 true,
                 3,
                 NPCInteractions.NPCInteractionType.ENCHANTER);

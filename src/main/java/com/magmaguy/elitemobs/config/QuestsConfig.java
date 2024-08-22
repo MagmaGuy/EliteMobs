@@ -13,7 +13,6 @@ import org.bukkit.entity.EntityType;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class QuestsConfig extends ConfigurationFile {
@@ -110,7 +109,7 @@ public class QuestsConfig extends ConfigurationFile {
     }
 
     private static List<EntityType> setEntityTypes(FileConfiguration fileConfiguration, File file) {
-        List<String> entityTypes = new ArrayList<>(Arrays.asList(
+        List<String> entityTypes = new ArrayList<>(new ArrayList<>(List.of(
                 EntityType.BLAZE.toString(),
                 EntityType.CAVE_SPIDER.toString(),
                 EntityType.DROWNED.toString(),
@@ -134,14 +133,14 @@ public class QuestsConfig extends ConfigurationFile {
                 EntityType.WITHER_SKELETON.toString(),
                 EntityType.WOLF.toString(),
                 EntityType.ZOMBIE.toString()
-        ));
+        )));
 
-        List<String> laterEntities = Arrays.asList(
+        List<String> laterEntities = new ArrayList<>(List.of(
                 EntityType.HOGLIN.toString(),
                 EntityType.ZOGLIN.toString(),
                 EntityType.PIGLIN_BRUTE.toString(),
                 EntityType.PIGLIN.toString(),
-                EntityType.ZOMBIFIED_PIGLIN.toString());
+                EntityType.ZOMBIFIED_PIGLIN.toString()));
         entityTypes.addAll(laterEntities);
 
         ConfigurationEngine.setList(file, fileConfiguration, "questEntityTypes", entityTypes, false);

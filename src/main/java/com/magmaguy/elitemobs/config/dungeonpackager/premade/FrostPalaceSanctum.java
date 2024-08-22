@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.World;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -13,9 +13,9 @@ public class FrostPalaceSanctum extends DungeonPackagerConfigFields {
         super("frost_palace_sanctum",
                 true,
                 "&2[lvl 050] &3The Frost Palace",
-                Arrays.asList("&fA 7 phase fight against",
+                new ArrayList<>(List.of("&fA 7 phase fight against",
                         "the queen of ice!",
-                        "&6Credits: MagmaGuy, Delio"),
+                        "&6Credits: MagmaGuy, Delio")),
                 DiscordLinks.premiumMinidungeons,
                 DungeonSizeCategory.SANCTUM,
                 "em_id_frost_palace",

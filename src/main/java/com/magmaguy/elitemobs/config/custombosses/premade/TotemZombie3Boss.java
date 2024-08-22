@@ -5,13 +5,14 @@ import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TotemZombie3Boss extends CustomBossesConfigFields {
     public TotemZombie3Boss() {
         super("totem_zombie_3", EntityType.ZOMBIE, true, "$eventBossLevel Totem Zombie", "dynamic");
         setMountedEntity("totem_zombie_4.yml");
-        setPowers(Arrays.asList("attack_lightning.yml", "attack_web.yml", "bonus_loot.yml"));
+        setPowers(new ArrayList<>(List.of("attack_lightning.yml", "attack_web.yml", "bonus_loot.yml")));
         setCullReinforcements(false);
         setFollowDistance(100);
         setHelmet(new ItemStack(Material.IRON_HELMET));

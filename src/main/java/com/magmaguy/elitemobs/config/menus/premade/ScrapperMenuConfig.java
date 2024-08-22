@@ -8,7 +8,7 @@ import com.magmaguy.magmacore.util.ItemStackGenerator;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ScrapperMenuConfig extends MenusConfigFields {
@@ -34,24 +34,24 @@ public class ScrapperMenuConfig extends MenusConfigFields {
                 "infoButton",
                 ItemStackGenerator.generateSkullItemStack("magmaguy",
                         "&4&lEliteMobs &r&cby &4&lMagmaGuy",
-                        Arrays.asList("&8Support the plugins you enjoy!",
+                        new ArrayList<>(List.of("&8Support the plugins you enjoy!",
                                 "&4Warning!",
                                 "&cItems scrapped here are lost!",
                                 "&cThere is a $chance% chance to get",
                                 "&cscrap when scrapping items!",
                                 "&aUse scrap at the smelter,",
-                                "&arepairman and refiner!"), MetadataHandler.signatureID),
+                                "&arepairman and refiner!")), MetadataHandler.signatureID),
                 fileConfiguration);
         infoButton = ItemStackSerializer.deserialize("infoButton", fileConfiguration);
         infoSlot = ConfigurationEngine.setInt(fileConfiguration, "infoButtonSlot", 4);
-        storeSlots = ConfigurationEngine.setList(file, fileConfiguration, "scrapSlots", Arrays.asList(19, 20, 21, 22, 23,
-                24, 25, 28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 43), false);
+        storeSlots = ConfigurationEngine.setList(file, fileConfiguration, "scrapSlots", new ArrayList<>(List.of(19, 20, 21, 22, 23,
+                24, 25, 28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 43)), false);
         ItemStackSerializer.serialize("cancelButton", ItemStackGenerator.generateItemStack(Material.BARRIER,
                 "&4Cancel", List.of("&cCancel scrap!"), MetadataHandler.signatureID), fileConfiguration);
         cancelButton = ItemStackSerializer.deserialize("cancelButton", fileConfiguration);
         cancelSlot = ConfigurationEngine.setInt(fileConfiguration, "cancelButtonSlot", 27);
         ItemStackSerializer.serialize("confirmButton", ItemStackGenerator.generateItemStack(Material.EMERALD,
-                "&2Confirm Scrap", Arrays.asList("&aScrap items!", "&a$chance% chance of success!"), 31174), fileConfiguration);
+                "&2Confirm Scrap", new ArrayList<>(List.of("&aScrap items!", "&a$chance% chance of success!")), 31174), fileConfiguration);
         confirmButton = ItemStackSerializer.deserialize("confirmButton", fileConfiguration);
         confirmSlot = ConfigurationEngine.setInt(fileConfiguration, "confirmScrapSlot", 35);
         scrapChance = ConfigurationEngine.setDouble(fileConfiguration, "scrapChance", 0.75);

@@ -6,8 +6,9 @@ import org.bukkit.Particle;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 public class TestCustomBossesConfig extends CustomBossesConfigFields {
     public TestCustomBossesConfig() {
@@ -25,17 +26,17 @@ public class TestCustomBossesConfig extends CustomBossesConfigFields {
         setBoots(new ItemStack(Material.CHAINMAIL_BOOTS));
         setMainHand(new ItemStack(Material.GOLDEN_AXE));
         setOffHand(new ItemStack(Material.SHIELD));
-        setPowers(Collections.singletonList("invulnerability_knockback.yml"));
+        setPowers(new ArrayList<>(List.of("invulnerability_knockback.yml")));
         setSpawnMessage("A test boss has been spawned!");
         setDeathMessage("A test boss has been slain by $players!");
-        setDeathMessages(Arrays.asList(
+        setDeathMessages(new ArrayList<>(List.of(
                 "&e&l---------------------------------------------",
                 "&eThe Test Boss has been debugged!",
                 "&c&l    1st Damager: $damager1name &cwith $damager1damage damage!",
                 "&6&l    2nd Damager: $damager2name &6with $damager2damage damage!",
                 "&e&l    3rd Damager: $damager3name &ewith $damager3damage damage!",
                 "&aSlayers: $players",
-                "&e&l---------------------------------------------"));
+                "&e&l---------------------------------------------")));
         setEscapeMessage("A test boss entity has escaped!");
         setLocationMessage("Test entity: $distance");
         setUniqueLootList(Collections.singletonList("magmaguys_toothpick.yml:1"));

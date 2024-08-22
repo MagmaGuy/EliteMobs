@@ -9,7 +9,7 @@ import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ItemEnchantmentMenuConfig extends MenusConfigFields {
@@ -66,7 +66,7 @@ public class ItemEnchantmentMenuConfig extends MenusConfigFields {
                 "infoButton",
                 ItemStackGenerator.generateSkullItemStack("magmaguy",
                         "&2Enchantment info:",
-                        Arrays.asList(
+                        new ArrayList<>(List.of(
                                 "&2This menu can add enchants to your elite items!",
                                 "&aIn order to enchant your elite item, add your",
                                 "&aelite item and your elite enchanted books!",
@@ -74,7 +74,7 @@ public class ItemEnchantmentMenuConfig extends MenusConfigFields {
                                 "&6(high quality items) have a high chance of failing!",
                                 "&8Normal failure makes you fail to enchant the item.",
                                 "&8Challenge makes you fight a boss for the enchant.",
-                                "&8Critical failures make you lose the item!"), MetadataHandler.signatureID),
+                                "&8Critical failures make you lose the item!")), MetadataHandler.signatureID),
                 fileConfiguration);
         infoButton = ItemStackSerializer.deserialize("infoButton", fileConfiguration);
         cancelSlot = ConfigurationEngine.setInt(

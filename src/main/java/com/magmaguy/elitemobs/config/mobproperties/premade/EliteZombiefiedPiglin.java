@@ -3,7 +3,8 @@ package com.magmaguy.elitemobs.config.mobproperties.premade;
 import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfigFields;
 import org.bukkit.entity.EntityType;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 public class EliteZombiefiedPiglin extends MobPropertiesConfigFields {
     public EliteZombiefiedPiglin() {
@@ -11,8 +12,8 @@ public class EliteZombiefiedPiglin extends MobPropertiesConfigFields {
                 EntityType.ZOMBIFIED_PIGLIN,
                 true,
                 "&fLvl &2$level &fElite &6Zombified Piglin",
-                Arrays.asList("$player &cwas mobbed to death by $entity&c!",
-                        "$entity &cgot $player's &cbacon!"),
+                new ArrayList<>(List.of("$player &cwas mobbed to death by $entity&c!",
+                        "$entity &cgot $player's &cbacon!")),
                 12);
     }
 }

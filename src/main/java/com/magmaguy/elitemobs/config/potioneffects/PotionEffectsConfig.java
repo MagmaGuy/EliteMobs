@@ -5,12 +5,15 @@ import com.magmaguy.elitemobs.config.potioneffects.premade.*;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 
 public class PotionEffectsConfig {
 
     private static final HashMap<String, PotionEffectsConfigFields> potionEffects = new HashMap();
-    private static final List<PotionEffectsConfigFields> potionEffectsConfigFields = new ArrayList<>(Arrays.asList(
+    private static final List<PotionEffectsConfigFields> potionEffectsConfigFields = new ArrayList<>(new ArrayList<>(List.of(
             new AbsorptionConfig(),
             new BlindnessConfig(),
             new ConduitPowerConfig(),
@@ -48,7 +51,7 @@ public class PotionEffectsConfig {
             new TrialOmenConfig(),
             new WeavingConfig(),
             new WindChargedConfig()
-    ));
+    )));
 
     public static void addPotionEffect(String fileName, PotionEffectsConfigFields powersConfigFields) {
         potionEffects.put(fileName, powersConfigFields);

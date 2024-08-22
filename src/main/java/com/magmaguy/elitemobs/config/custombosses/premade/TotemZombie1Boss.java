@@ -5,14 +5,15 @@ import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TotemZombie1Boss extends CustomBossesConfigFields {
     public TotemZombie1Boss() {
         super("totem_zombie_1", EntityType.ZOMBIE, true, "$eventBossLevel Head Zombie", "dynamic");
         setPersistent(true);
         setMountedEntity("totem_zombie_2.yml");
-        setPowers(Arrays.asList("skeleton_tracking_arrow.yml", "attack_fireball.yml", "hyper_loot.yml"));
+        setPowers(new ArrayList<>(List.of("skeleton_tracking_arrow.yml", "attack_fireball.yml", "hyper_loot.yml")));
         setCullReinforcements(false);
         setFollowDistance(100);
         setHelmet(new ItemStack(Material.NETHERITE_HELMET));

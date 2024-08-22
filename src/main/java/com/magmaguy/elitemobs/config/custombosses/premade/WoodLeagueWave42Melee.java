@@ -5,7 +5,8 @@ import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 public class WoodLeagueWave42Melee extends CustomBossesConfigFields {
     public WoodLeagueWave42Melee() {
@@ -15,7 +16,7 @@ public class WoodLeagueWave42Melee extends CustomBossesConfigFields {
                 "$normalLevel &4Arena Zombie",
                 "42");
         setFollowDistance(60);
-        setPowers(Arrays.asList("corpse.yml", "attack_fire.yml", "invulnerability_arrow.yml"));
+        setPowers(new ArrayList<>(List.of("corpse.yml", "attack_fire.yml", "invulnerability_arrow.yml")));
         setHelmet(new ItemStack(Material.DIAMOND_HELMET));
         setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
         setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));

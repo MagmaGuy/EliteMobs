@@ -5,6 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class WoodLeagueWave50Reinforcement extends CustomBossesConfigFields {
@@ -16,7 +17,7 @@ public class WoodLeagueWave50Reinforcement extends CustomBossesConfigFields {
                 "50");
         setFollowDistance(60);
         setMainHand(new ItemStack(Material.CROSSBOW));
-        setPowers(List.of("channel_healing.yml"));
+        setPowers(new ArrayList<>(List.of("channel_healing.yml")));
         setMovementSpeedAttribute(0.6D);
         setHealthMultiplier(0.25D);
         setDamageMultiplier(0.8D);

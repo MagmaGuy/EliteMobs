@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.config.customitems.CustomItemsConfigFields;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import org.bukkit.Material;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 public class SummonWolfScrollConfig extends CustomItemsConfigFields {
@@ -13,7 +13,7 @@ public class SummonWolfScrollConfig extends CustomItemsConfigFields {
                 true,
                 Material.PAPER,
                 "&6Summon Wolf Scroll",
-                Arrays.asList("&aSummons a good boy", "&ato help you bite Elites!", "&aMake sure you pet it!"));
+                new ArrayList<>(List.of("&aSummons a good boy", "&ato help you bite Elites!", "&aMake sure you pet it!")));
         setEnchantments(List.of("SUMMON_WOLF,1"));
         setItemType(CustomItem.ItemType.UNIQUE);
     }

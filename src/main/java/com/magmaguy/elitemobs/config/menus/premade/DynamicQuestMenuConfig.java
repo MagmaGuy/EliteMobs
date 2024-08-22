@@ -115,7 +115,7 @@ public class DynamicQuestMenuConfig extends MenusConfigFields {
         questName = ConfigurationEngine.setString(file, fileConfiguration, "questName", "Slay $amount $name", true);
 
         headerTextLines = ConfigurationEngine.setString(file, fileConfiguration, "headerTextLines2",
-                ChatColorConverter.convert("&c&lGuild request!\n&0&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯"), true);
+                ChatColorConverter.convert("&c&lGuild request!\n"), true);
 
         defaultLoreTextLines = ConfigurationEngine.setString(file, fileConfiguration, "defaultLoreTextLines", "&8Slay $amount $name!", true);
 

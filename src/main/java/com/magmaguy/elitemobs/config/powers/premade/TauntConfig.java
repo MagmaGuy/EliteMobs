@@ -5,7 +5,7 @@ import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
 import com.magmaguy.elitemobs.powers.Taunt;
 import org.bukkit.Material;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 public class TauntConfig extends PowersConfigFields {
@@ -21,7 +21,7 @@ public class TauntConfig extends PowersConfigFields {
 
     @Override
     public void processAdditionalFields() {
-        onDamaged = ConfigurationEngine.setList(file, fileConfiguration, "onDamaged", Arrays.asList(
+        onDamaged = ConfigurationEngine.setList(file, fileConfiguration, "onDamaged", new ArrayList<>(List.of(
                 "Ow!",
                 "Oi!",
                 "Stop that!",
@@ -69,9 +69,9 @@ public class TauntConfig extends PowersConfigFields {
                 "Valhalla!",
                 "Notch save me!",
                 "No retreat!",
-                "Hit me with your best shot!"), true);
+                "Hit me with your best shot!")), true);
 
-        onDamagedByBow = ConfigurationEngine.setList(file, fileConfiguration, "onDamagedByBow", Arrays.asList(
+        onDamagedByBow = ConfigurationEngine.setList(file, fileConfiguration, "onDamagedByBow", new ArrayList<>(List.of(
                 "Fight me like a Player!",
                 "Afraid to come up-close?",
                 "I can smell your fear from here!",
@@ -132,9 +132,9 @@ public class TauntConfig extends PowersConfigFields {
                 "Valhalla!",
                 "Notch save me!",
                 "No retreat!",
-                "Hit me with your best shot!"), true);
+                "Hit me with your best shot!")), true);
 
-        onDamage = ConfigurationEngine.setList(file, fileConfiguration, "onDamage", Arrays.asList(
+        onDamage = ConfigurationEngine.setList(file, fileConfiguration, "onDamage", new ArrayList<>(List.of(
                 "A solid hit!",
                 "He shoots, and he scores!",
                 "You'll feel that in the morning!",
@@ -197,9 +197,9 @@ public class TauntConfig extends PowersConfigFields {
                 "Still standing?",
                 "Face your defeat!",
                 "A taste of pain to come!",
-                "I'll make you endangered!"), true);
+                "I'll make you endangered!")), true);
 
-        onDeath = ConfigurationEngine.setList(file, fileConfiguration, "onDeath", Arrays.asList(
+        onDeath = ConfigurationEngine.setList(file, fileConfiguration, "onDeath", new ArrayList<>(List.of(
                 "Alas, poor Yorick!",
                 "The rest is silence",
                 "I shall return",
@@ -242,9 +242,9 @@ public class TauntConfig extends PowersConfigFields {
                 "Not fair I was lagging",
                 "You win, this time",
                 "You monster...",
-                "Mediocre..."), true);
+                "Mediocre...")), true);
 
-        onTarget = ConfigurationEngine.setList(file, fileConfiguration, "onTarget", Arrays.asList(
+        onTarget = ConfigurationEngine.setList(file, fileConfiguration, "onTarget", new ArrayList<>(List.of(
                 "OI! Get over here!",
                 "What's that I see? A coward?",
                 "Sir, prepare your fisticuffs!",
@@ -307,7 +307,7 @@ public class TauntConfig extends PowersConfigFields {
                 "Hit me with your best shot!",
                 "Witness me!",
                 "Witness me blood bag!",
-                "I go all shiny and chrome!"), true);
+                "I go all shiny and chrome!")), true);
 
     }
 

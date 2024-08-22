@@ -4,21 +4,22 @@ import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.World;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ShadowOfTheBinderOfWorldsLair extends DungeonPackagerConfigFields {
     public ShadowOfTheBinderOfWorldsLair() {
         super("shadow_of_the_binder_of_worlds_lair",
                 true,
                 "&2[lvl 200] &5Shadow of the Binder Of Worlds",
-                Arrays.asList("&5The penultimate challenge. Be prepared!",
-                        "&6Credits: MagmaGuy, 69OzCanOfBepis & Frostcone"),
+                new ArrayList<>(List.of("&5The penultimate challenge. Be prepared!",
+                        "&6Credits: MagmaGuy, 69OzCanOfBepis & Frostcone")),
                 DiscordLinks.freeMinidungeons,
                 DungeonSizeCategory.LAIR,
                 "em_shadow_of_the_binder_of_worlds",
                 World.Environment.THE_END,
                 true,
-                "em_shadow_of_the_binder_of_worlds,-40,62,24,-130,-11",
+                "em_shadow_of_the_binder_of_worlds,-42.5,63.2,-19.5,-65,0",
                 0,
                 "Difficulty: &6Nightmare\n" +
                         "$bossCount level $highestTier final boss!\n" +

@@ -111,7 +111,7 @@ public class WormholeTask {
             player.setVelocity(destination.getDirection().normalize());
             player.setFlying(false);
             Wormhole.getPlayerCooldowns().add(player);
-            Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, () -> Wormhole.getPlayerCooldowns().remove(player), 20 * 10L);
+            Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, () -> Wormhole.getPlayerCooldowns().remove(player), 20 * 5L);
         });
 
     }

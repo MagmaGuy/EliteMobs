@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
 import com.magmaguy.elitemobs.npcs.NPCInteractions;
 import org.bukkit.entity.Villager;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -18,10 +18,10 @@ public class SantaConfig extends NPCsConfigFields {
                 "em_adventurers_guild,212.5,88,236.5,104,0",
                 List.of(
                         "Ho ho ho!"),
-                Arrays.asList(
+                new ArrayList<>(List.of(
                         "I have lost some presents, \\ncan you help me?",
                         "Dear traveller, I have\\na request for you!",
-                        "Can you help an old man\\nin his time of need?"),
+                        "Can you help an old man\\nin his time of need?")),
                 List.of(
                         "Ho ho ho!"),
                 true,

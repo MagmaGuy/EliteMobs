@@ -8,7 +8,7 @@ import com.magmaguy.magmacore.util.ItemStackGenerator;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 public class RepairMenuConfig extends MenusConfigFields {
@@ -41,8 +41,8 @@ public class RepairMenuConfig extends MenusConfigFields {
                 "infoButton",
                 ItemStackGenerator.generateSkullItemStack("magmaguy",
                         "&4&lEliteMobs &r&cby &4&lMagmaGuy",
-                        Arrays.asList("&8Support the plugins you enjoy!",
-                                "&aUse scrap to repair elite items!"), MetadataHandler.signatureID),
+                        new ArrayList<>(List.of("&8Support the plugins you enjoy!",
+                                "&aUse scrap to repair elite items!")), MetadataHandler.signatureID),
                 fileConfiguration);
         infoButton = ItemStackSerializer.deserialize("infoButton", fileConfiguration);
         infoSlot = ConfigurationEngine.setInt(fileConfiguration, "infoButtonSlot", 4);

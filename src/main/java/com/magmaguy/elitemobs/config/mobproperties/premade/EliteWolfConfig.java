@@ -3,7 +3,8 @@ package com.magmaguy.elitemobs.config.mobproperties.premade;
 import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfigFields;
 import org.bukkit.entity.EntityType;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 public class EliteWolfConfig extends MobPropertiesConfigFields {
     public EliteWolfConfig() {
@@ -11,8 +12,8 @@ public class EliteWolfConfig extends MobPropertiesConfigFields {
                 EntityType.WOLF,
                 true,
                 "[$level] Elite Wolf",
-                Arrays.asList("$entity tore $player apart!",
-                        "$player was torn to shreds by $entity!"),
+                new ArrayList<>(List.of("$entity tore $player apart!",
+                        "$player was torn to shreds by $entity!")),
                 6);
     }
 }

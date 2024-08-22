@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.World;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -13,8 +13,8 @@ public class TheDeepMinesDungeon extends DungeonPackagerConfigFields {
         super("the_deep_mines_dungeon",
                 true,
                 "&2[lvl 045] &3The Deep Mines Dungeon",
-                Arrays.asList("&fBelow lies the deepest mine ever dug.",
-                        "&6Credits: Dali, MagmaGuy, FrostCone"),
+                new ArrayList<>(List.of("&fBelow lies the deepest mine ever dug.",
+                        "&6Credits: Dali, MagmaGuy, FrostCone")),
                 DiscordLinks.freeMinidungeons,
                 DungeonSizeCategory.SANCTUM,
                 "em_id_the_deep_mines",

@@ -6,10 +6,13 @@ import com.magmaguy.elitemobs.api.ArenaStartEvent;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
+import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.config.ArenasConfig;
+import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.customarenas.CustomArenasConfigFields;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.thirdparty.mythicmobs.MythicMobsInterface;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
@@ -58,6 +61,7 @@ public class ArenaInstance extends MatchInstance {
     @Getter
     private ArenaState arenaState = ArenaState.IDLE;
     private Cylinder cylinder;
+    private int highestArenaMobLevel = -1;
 
     public ArenaInstance(CustomArenasConfigFields customArenasConfigFields, Location corner1, Location corner2, Location startLocation, Location exitLocation) {
         super(startLocation, exitLocation, customArenasConfigFields.getMinimumPlayerCount(), customArenasConfigFields.getMaximumPlayerCount());
@@ -212,7 +216,6 @@ public class ArenaInstance extends MatchInstance {
         }, 20L * customArenasConfigFields.getDelayBetweenWaves());
     }
 
-
     private void arenaWatchdog() {
         new BukkitRunnable() {
             @Override
@@ -238,8 +241,8 @@ public class ArenaInstance extends MatchInstance {
     }
 
     private void spawnBosses() {
-
         if (arenaWaves.getWaveEntities(currentWave) == null) return;
+        highestArenaMobLevel = -1;
         for (ArenaEntity arenaEntity : arenaWaves.getWaveEntities(currentWave)) {
             if (!arenaEntity.isMythicMob()) {
                 CustomBossEntity customBossEntity = CustomBossEntity.createCustomBossEntity(arenaEntity.getBossfile());
@@ -252,6 +255,8 @@ public class ArenaInstance extends MatchInstance {
                 customBossEntity.setVanillaLoot(false);
                 customBossEntity.setRandomLoot(false);
                 customBossEntity.spawn(spawnPoints.get(arenaEntity.getSpawnPointName()), true);
+                if (customBossEntity.getLevel() > highestArenaMobLevel)
+                    highestArenaMobLevel = customBossEntity.getLevel();
                 if (!customBossEntity.exists()) {
                     Logger.warn("Arena " + getCustomArenasConfigFields().getArenaName() + " failed to spawn boss " + customBossEntity.getCustomBossesConfigFields().getFilename());
                     continue;
@@ -283,7 +288,23 @@ public class ArenaInstance extends MatchInstance {
         minimumDamageThreshold = totalDamage * .1;
         for (Map.Entry<Player, Double> entry : roundDamage.entrySet())
             if (entry.getValue() >= minimumDamageThreshold) validPlayers.add(entry.getKey());
-        super.players.forEach(player -> customArenasConfigFields.getArenaRewards().arenaReward(player, currentWave - 1));
+
+
+        super.players.forEach(player -> {
+            if (highestArenaMobLevel > 0) {
+                if (AdventurersGuildConfig.isGuildLootLimiter() &&
+                        PlayerData.getMaxGuildLevel(player.getUniqueId()) < highestArenaMobLevel / 10) {
+                    Logger.sendSimpleMessage(player, AdventurersGuildConfig.getLootLimiterMessage());
+                    return;
+                } else if (Math.abs(ElitePlayerInventory.getPlayer(player).getFullPlayerTier(true) - highestArenaMobLevel) > ItemSettingsConfig.getLootLevelDifferenceLockout()) {
+                    Logger.sendSimpleMessage(player, ItemSettingsConfig.getLevelRangeTooDifferent()
+                            .replace("$playerLevel", ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getFullPlayerTier(false) + "")
+                            .replace("$bossLevel", highestArenaMobLevel + ""));
+                    return;
+                }
+            }
+            customArenasConfigFields.getArenaRewards().arenaReward(player, currentWave - 1);
+        });
     }
 
     @Override

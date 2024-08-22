@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.config.customarenas.premade;
 import com.magmaguy.elitemobs.config.customarenas.CustomArenasConfigFields;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 
 public class WoodLeagueArena extends CustomArenasConfigFields {
     public WoodLeagueArena() {
@@ -14,7 +14,7 @@ public class WoodLeagueArena extends CustomArenasConfigFields {
         super.setStartLocation("em_adventurers_guild,219.5,70,295.5,0,0");
         super.setExitLocation("em_adventurers_guild,242.5,92,269.5,84,0");
         super.setWaveCount(50);
-        super.setBossList(Arrays.asList(
+        super.setBossList(new ArrayList<>(List.of(
                 "wave=1:spawnPoint=north:boss=wood_league_wave_1_melee.yml",
                 "wave=1:spawnPoint=north:boss=wood_league_wave_1_melee.yml",
                 "wave=1:spawnPoint=north:boss=wood_league_wave_1_ranged.yml",
@@ -613,8 +613,8 @@ public class WoodLeagueArena extends CustomArenasConfigFields {
                 "wave=49:spawnPoint=southwest:boss=wood_league_wave_49_healer.yml",
 
                 "wave=50:spawnPoint=center:boss=wood_league_wave_50_boss.yml"
-        ));
-        super.setSpawnPoints(Arrays.asList(
+        )));
+        super.setSpawnPoints(new ArrayList<>(List.of(
                 "name=north:location=em_adventurers_guild,219.5,71,273.5",
                 "name=south:location=em_adventurers_guild,219.5,71,316.5",
                 "name=west:location=em_adventurers_guild,197.5,71,295.5",
@@ -623,10 +623,10 @@ public class WoodLeagueArena extends CustomArenasConfigFields {
                 "name=northeast:location=em_adventurers_guild,233.5,71,281.5",
                 "name=southeast:location=em_adventurers_guild,233.5,71,309.5",
                 "name=northwest:location=em_adventurers_guild,205.5,71,281.5",
-                "name=southwest:location=em_adventurers_guild,205.5,71,309.5"));
+                "name=southwest:location=em_adventurers_guild,205.5,71,309.5")));
 
         super.setDelayBetweenWaves(5);
-        super.setRawArenaRewards(Arrays.asList(
+        super.setRawArenaRewards(new ArrayList<>(List.of(
                 "filename=enchanted_book_protection_environmental.yml:wave=10:chance=0.01",
                 "filename=enchanted_book_protection_environmental.yml:wave=10:chance=0.01",
                 "filename=enchanted_book_protection_environmental.yml:wave=10:chance=0.01",
@@ -669,56 +669,56 @@ public class WoodLeagueArena extends CustomArenasConfigFields {
                 "filename=elite_scrap_large.yml:wave=45:chance=1:amount=5",
                 "filename=elite_scrap_huge.yml:wave=50:chance=1:amount=5",
 
-                "currencyAmount=3:wave=1",
-                "currencyAmount=10:wave=2",
-                "currencyAmount=20:wave=3",
-                "currencyAmount=30:wave=4",
-                "currencyAmount=40:wave=5",
-                "currencyAmount=50:wave=6",
-                "currencyAmount=60:wave=7",
-                "currencyAmount=70:wave=8",
-                "currencyAmount=80:wave=9",
-                "currencyAmount=90:wave=10",
-                "currencyAmount=100:wave=11",
-                "currencyAmount=110:wave=12",
-                "currencyAmount=120:wave=13",
-                "currencyAmount=130:wave=14",
-                "currencyAmount=140:wave=15",
-                "currencyAmount=150:wave=16",
-                "currencyAmount=160:wave=17",
-                "currencyAmount=170:wave=18",
-                "currencyAmount=180:wave=19",
-                "currencyAmount=190:wave=20",
-                "currencyAmount=200:wave=21",
-                "currencyAmount=210:wave=22",
-                "currencyAmount=220:wave=23",
-                "currencyAmount=230:wave=24",
-                "currencyAmount=240:wave=25",
-                "currencyAmount=250:wave=26",
-                "currencyAmount=260:wave=27",
-                "currencyAmount=270:wave=28",
-                "currencyAmount=280:wave=29",
-                "currencyAmount=290:wave=30",
-                "currencyAmount=300:wave=31",
-                "currencyAmount=310:wave=32",
-                "currencyAmount=320:wave=33",
-                "currencyAmount=330:wave=34",
-                "currencyAmount=340:wave=35",
-                "currencyAmount=350:wave=36",
-                "currencyAmount=360:wave=37",
-                "currencyAmount=370:wave=38",
-                "currencyAmount=380:wave=39",
-                "currencyAmount=390:wave=40",
-                "currencyAmount=400:wave=41",
-                "currencyAmount=410:wave=42",
-                "currencyAmount=420:wave=43",
-                "currencyAmount=430:wave=44",
-                "currencyAmount=450:wave=45",
-                "currencyAmount=460:wave=46",
-                "currencyAmount=470:wave=47",
-                "currencyAmount=480:wave=48",
-                "currencyAmount=490:wave=49",
-                "currencyAmount=500:wave=50",
+                "currencyAmount=2:wave=1",
+                "currencyAmount=5:wave=2",
+                "currencyAmount=10:wave=3",
+                "currencyAmount=15:wave=4",
+                "currencyAmount=20:wave=5",
+                "currencyAmount=25:wave=6",
+                "currencyAmount=30:wave=7",
+                "currencyAmount=35:wave=8",
+                "currencyAmount=40:wave=9",
+                "currencyAmount=45:wave=10",
+                "currencyAmount=50:wave=11",
+                "currencyAmount=55:wave=12",
+                "currencyAmount=60:wave=13",
+                "currencyAmount=65:wave=14",
+                "currencyAmount=70:wave=15",
+                "currencyAmount=75:wave=16",
+                "currencyAmount=80:wave=17",
+                "currencyAmount=85:wave=18",
+                "currencyAmount=90:wave=19",
+                "currencyAmount=95:wave=20",
+                "currencyAmount=100:wave=21",
+                "currencyAmount=105:wave=22",
+                "currencyAmount=110:wave=23",
+                "currencyAmount=115:wave=24",
+                "currencyAmount=120:wave=25",
+                "currencyAmount=125:wave=26",
+                "currencyAmount=130:wave=27",
+                "currencyAmount=135:wave=28",
+                "currencyAmount=140:wave=29",
+                "currencyAmount=145:wave=30",
+                "currencyAmount=150:wave=31",
+                "currencyAmount=155:wave=32",
+                "currencyAmount=160:wave=33",
+                "currencyAmount=165:wave=34",
+                "currencyAmount=170:wave=35",
+                "currencyAmount=175:wave=36",
+                "currencyAmount=180:wave=37",
+                "currencyAmount=185:wave=38",
+                "currencyAmount=190:wave=39",
+                "currencyAmount=195:wave=40",
+                "currencyAmount=200:wave=41",
+                "currencyAmount=205:wave=42",
+                "currencyAmount=210:wave=43",
+                "currencyAmount=215:wave=44",
+                "currencyAmount=220:wave=45",
+                "currencyAmount=225:wave=46",
+                "currencyAmount=230:wave=47",
+                "currencyAmount=235:wave=48",
+                "currencyAmount=240:wave=49",
+                "currencyAmount=250:wave=50",
 
                 "level=10:filename=summon_merchant_scroll.yml:wave=10",
 
@@ -754,8 +754,8 @@ public class WoodLeagueArena extends CustomArenasConfigFields {
                 "filename=novices_leggings.yml:itemlevel=10:wave=10:chance=0.2",
                 "filename=novices_boots.yml:itemlevel=10:wave=10:chance=0.2"
 
-        ));
-        super.setArenaMessages(new ArrayList<>(Arrays.asList(
+        )));
+        super.setArenaMessages(new ArrayList<>(new ArrayList<>(List.of(
                 "wave=1:message=&8[Gladius] &fToday's main event! A legendary fighter came all the way to the arena to test his might against the toughest monsters from all the land! But before that, here's a rookie fighting some zombies.",
                 "wave=2:message=&8[Gladius] &fWould you look at that, they at least know how to wave their arms! That was just the warmup, let's start putting on some pressure!",
                 "wave=3:message=&8[Gladius] &fSo you think you know how to fight? Well this wave will put the &cheat &fon! Ha ha ha ha ha!",
@@ -807,7 +807,7 @@ public class WoodLeagueArena extends CustomArenasConfigFields {
                 "wave=49:message=&8[Gladius] &fAlright send all we have left, we have no other options! Move forth, &carchers&f!",
                 "wave=50:message=&8[Gladius] &fI guess this is it for me... I have no option but to declare - wait, who is that in the distance? Is that &4Uther, the Champion of the Wood League Arena&f? Ladies and gentlemen, match set and over, our contestant has no chance of winning here! They shall be &csmitten &fby our champion!",
                 "wave=51:message=&8[Gladius the Destitute] &fUnbelievable, Uther has been defeated! We have a new arena champion! I would be incredibly excited if I wasn't so terribly in debt now!"
-        )));
+        ))));
         setMaximumPlayerCount(5);
         setCylindricalArena(true);
     }

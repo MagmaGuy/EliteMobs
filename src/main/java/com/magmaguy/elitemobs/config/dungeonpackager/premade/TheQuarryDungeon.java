@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.World;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -13,8 +13,8 @@ public class TheQuarryDungeon extends DungeonPackagerConfigFields {
         super("the_quarry_dungeon",
                 true,
                 "&2[lvl 040] &3The Quarry Dungeon",
-                Arrays.asList("&fAn ancient dwarven quarry deep underground.",
-                        "&6Credits: Dali_, MagmaGuy, Frostcone"),
+                new ArrayList<>(List.of("&fAn ancient dwarven quarry deep underground.",
+                        "&6Credits: Dali_, MagmaGuy, Frostcone")),
                 DiscordLinks.freeMinidungeons,
                 DungeonSizeCategory.DUNGEON,
                 "em_id_the_quarry",

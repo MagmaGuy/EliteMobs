@@ -17,7 +17,7 @@ public class BeastsSanctuaryLair extends DungeonPackagerConfigFields {
                 "em_beasts_sanctuary",
                 World.Environment.NORMAL,
                 true,
-                "em_beasts_sanctuary,32.5,86.5,40.5,0,0",
+                "em_beasts_sanctuary,32.5,88.2,36.5,0,0",
                 0,
                 "Difficulty: &cHard\n" +
                         "$bossCount level $lowestTier Big Boss!\n" +

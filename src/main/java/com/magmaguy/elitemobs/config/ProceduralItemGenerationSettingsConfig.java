@@ -6,7 +6,6 @@ import lombok.Getter;
 import org.bukkit.Material;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class ProceduralItemGenerationSettingsConfig extends ConfigurationFile {
@@ -154,7 +153,7 @@ public class ProceduralItemGenerationSettingsConfig extends ConfigurationFile {
         tridentName = ConfigurationEngine.setString(file, fileConfiguration, "materialNames.trident", "Trident", true);
         crossbowName = ConfigurationEngine.setString(file, fileConfiguration, "materialNames.crossbow", "Crossbow", true);
 
-        nameFormat = ConfigurationEngine.setList(file, fileConfiguration, "nameFormats", Arrays.asList(
+        nameFormat = ConfigurationEngine.setList(file, fileConfiguration, "nameFormats", new ArrayList<>(List.of(
                 "$verb $itemType of the $adjective $noun",
                 "$itemType of the $adjective $noun",
                 "$noun's $adjective $verb $itemType",
@@ -162,9 +161,9 @@ public class ProceduralItemGenerationSettingsConfig extends ConfigurationFile {
                 "$adjective $verb $itemType",
                 "The $verb-er",
                 "The $adjective $verb-er"
-        ), true);
+        )), true);
 
-        nouns = ConfigurationEngine.setList(file, fileConfiguration, "nouns", Arrays.asList(
+        nouns = ConfigurationEngine.setList(file, fileConfiguration, "nouns", new ArrayList<>(List.of(
                 "MagmaGuy",
                 "Dawn",
                 "Sunset",
@@ -455,9 +454,9 @@ public class ProceduralItemGenerationSettingsConfig extends ConfigurationFile {
                 "Rakshasa",
                 "Revenant",
                 "Cultist"
-        ), true);
+        )), true);
 
-        adjectives = ConfigurationEngine.setList(file, fileConfiguration, "adjectives", Arrays.asList(
+        adjectives = ConfigurationEngine.setList(file, fileConfiguration, "adjectives", new ArrayList<>(List.of(
                 "Adorable",
                 "Beautiful",
                 "Clean",
@@ -984,9 +983,9 @@ public class ProceduralItemGenerationSettingsConfig extends ConfigurationFile {
                 "Trusting",
                 "Unassuming",
                 "Threatening"
-        ), true);
+        )), true);
 
-        verbs = ConfigurationEngine.setList(file, fileConfiguration, "verbs", Arrays.asList(
+        verbs = ConfigurationEngine.setList(file, fileConfiguration, "verbs", new ArrayList<>(List.of(
                 "Slashing",
                 "Cutting",
                 "Stabbing",
@@ -1248,9 +1247,9 @@ public class ProceduralItemGenerationSettingsConfig extends ConfigurationFile {
                 "Spying",
                 "Avenging",
                 "Storming"
-        ), true);
+        )), true);
 
-        verbers = ConfigurationEngine.setList(file, fileConfiguration, "verb-ers (noun)", Arrays.asList(
+        verbers = ConfigurationEngine.setList(file, fileConfiguration, "verb-ers (noun)", new ArrayList<>(List.of(
                 "World Breaker",
                 "World Shatterer",
                 "Avenger",
@@ -1459,7 +1458,7 @@ public class ProceduralItemGenerationSettingsConfig extends ConfigurationFile {
                 "Snorer",
                 "Thruster",
                 "Slapper"
-        ), true);
+        )), true);
 
         MaterialGenerator.initializeValidProceduralMaterials();
     }

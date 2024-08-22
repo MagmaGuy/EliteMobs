@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.World;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -13,8 +13,8 @@ public class CraftenminesLabSanctum extends DungeonPackagerConfigFields {
         super("craftenmines_lab_sanctum",
                 true,
                 "&2[lvl 030] &aCraftenmines Sanctum",
-                Arrays.asList("&aFace the creator of the devious creations!",
-                        "&6Credits: MagmaGuy, 69OzCanOfBepis"),
+                new ArrayList<>(List.of("&aFace the creator of the devious creations!",
+                        "&6Credits: MagmaGuy, 69OzCanOfBepis")),
                 DiscordLinks.freeMinidungeons,
                 DungeonSizeCategory.SANCTUM,
                 "em_id_craftenmines_lab",

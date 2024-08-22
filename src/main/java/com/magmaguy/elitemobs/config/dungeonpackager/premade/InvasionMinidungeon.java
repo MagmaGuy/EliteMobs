@@ -4,21 +4,22 @@ import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.World;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 public class InvasionMinidungeon extends DungeonPackagerConfigFields {
     public InvasionMinidungeon() {
         super("invasion_minidungeon",
                 true,
                 "&2[lvl 035-045] &2The Invasion",
-                Arrays.asList("&fThe Halloween Minidungeon!",
-                        "&6Credits: MagmaGuy & 69OzCanOfBepis"),
+                new ArrayList<>(List.of("&fThe Halloween Minidungeon!",
+                        "&6Credits: MagmaGuy & 69OzCanOfBepis")),
                 DiscordLinks.freeMinidungeons,
                 DungeonSizeCategory.MINIDUNGEON,
                 "em_invasion",
                 World.Environment.NORMAL,
                 true,
-                "em_invasion,-10,12,20,80,0",
+                "em_invasion,-8.5,13.2,19.5,80,0",
                 0,
                 "Difficulty: &6Medium\n" +
                         "$bossCount aliens, from level $lowestTier to $highestTier\n" +

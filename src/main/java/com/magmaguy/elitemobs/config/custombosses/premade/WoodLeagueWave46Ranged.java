@@ -5,7 +5,8 @@ import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 public class WoodLeagueWave46Ranged extends CustomBossesConfigFields {
     public WoodLeagueWave46Ranged() {
@@ -20,7 +21,7 @@ public class WoodLeagueWave46Ranged extends CustomBossesConfigFields {
         setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
         setBoots(new ItemStack(Material.DIAMOND_BOOTS));
         setMainHand(new ItemStack(Material.CROSSBOW));
-        setPowers(Arrays.asList("attack_freeze.yml", "skeleton_tracking_arrow.yml", "shield_wall.yml"));
+        setPowers(new ArrayList<>(List.of("attack_freeze.yml", "skeleton_tracking_arrow.yml", "shield_wall.yml")));
         setDamageMultiplier(0.5D);
         setHealthMultiplier(0.75D);
     }

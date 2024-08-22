@@ -4,7 +4,8 @@ import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
 import com.magmaguy.elitemobs.npcs.NPCInteractions;
 import org.bukkit.entity.Villager;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TravellingMerchantConfig extends NPCsConfigFields {
     public TravellingMerchantConfig() {
@@ -14,20 +15,20 @@ public class TravellingMerchantConfig extends NPCsConfigFields {
                 "<Travelling Merchant>",
                 Villager.Profession.LIBRARIAN,
                 null,
-                Arrays.asList(
+                new ArrayList<>(List.of(
                         "Got something to sell?",
                         "You called?",
-                        "Huh?"),
-                Arrays.asList(
+                        "Huh?")),
+                new ArrayList<>(List.of(
                         "I'll buy it on the cheap!",
                         "Got something for me?",
-                        "Time is money!"),
-                Arrays.asList(
+                        "Time is money!")),
+                new ArrayList<>(List.of(
                         "Call me again anytime!",
                         "Was that all?",
                         "Safe travels!",
                         "Don't get yourself killed!",
-                        "Good hunting!"),
+                        "Good hunting!")),
                 true,
                 3,
                 NPCInteractions.NPCInteractionType.SELL);

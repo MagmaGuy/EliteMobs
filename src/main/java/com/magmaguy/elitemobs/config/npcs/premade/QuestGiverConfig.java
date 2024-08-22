@@ -4,7 +4,8 @@ import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
 import com.magmaguy.elitemobs.npcs.NPCInteractions;
 import org.bukkit.entity.Villager;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 public class QuestGiverConfig extends NPCsConfigFields {
     public QuestGiverConfig() {
@@ -14,24 +15,24 @@ public class QuestGiverConfig extends NPCsConfigFields {
                 "<Quest Giver>",
                 Villager.Profession.FLETCHER,
                 "em_adventurers_guild,278.5,91,215.5,0,0",
-                Arrays.asList(
+                new ArrayList<>(List.of(
                         "Greetings, adventurer!\\nFancy a quest?",
                         "You! I've got a quest!",
-                        "Feeling... adventurous?"),
-                Arrays.asList(
+                        "Feeling... adventurous?")),
+                new ArrayList<>(List.of(
                         "Complete guild quests\\nfor cool rewards!",
                         "Higher tier quests have\\nbetter rewards!",
                         "Higher tier quests make\\nyou hunt higher level mobs!",
                         "Want a harder challenge?\\nIncrease your guild rank!",
-                        "Make sure you're well equipped\\nfor these quests!"),
-                Arrays.asList(
+                        "Make sure you're well equipped\\nfor these quests!")),
+                new ArrayList<>(List.of(
                         "Safe travels, friend.",
                         "Happy hunting!",
                         "Live long and prosper!",
                         "Come back with your shield,\\n or on it.",
                         "Life before death!",
                         "Strength before weakness!",
-                        "Journey before destination!"),
+                        "Journey before destination!")),
                 true,
                 3,
                 NPCInteractions.NPCInteractionType.QUEST_GIVER);

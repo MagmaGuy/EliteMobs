@@ -5,7 +5,6 @@ import com.magmaguy.elitemobs.events.MoonPhaseDetector;
 import org.bukkit.World;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class FullMoonSpawn extends CustomSpawnConfigFields {
@@ -13,7 +12,7 @@ public class FullMoonSpawn extends CustomSpawnConfigFields {
         super("full_moon_spawn", true);
         setSurfaceSpawn(true);
         try {
-            setValidWorldEnvironments(new ArrayList<>(Arrays.asList(World.Environment.NORMAL, World.Environment.CUSTOM)));
+            setValidWorldEnvironments(new ArrayList<>(new ArrayList<>(List.of(World.Environment.NORMAL, World.Environment.CUSTOM))));
         } catch (NoSuchFieldError ex) {
             //So this happens when CUSTOM doesn't exist, which it should but in some bugged releases it doesn't.
             setValidWorldEnvironments(new ArrayList<>(List.of(World.Environment.NORMAL)));

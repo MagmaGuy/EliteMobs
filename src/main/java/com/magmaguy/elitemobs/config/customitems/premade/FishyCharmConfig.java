@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.config.customitems.premade;
 import com.magmaguy.elitemobs.config.customitems.CustomItemsConfigFields;
 import org.bukkit.Material;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 public class FishyCharmConfig extends CustomItemsConfigFields {
@@ -12,7 +12,7 @@ public class FishyCharmConfig extends CustomItemsConfigFields {
                 true,
                 Material.COD,
                 "&bFishy Charm",
-                Arrays.asList("&aThere's just something not", "&aquite right with this one..."));
+                new ArrayList<>(List.of("&aThere's just something not", "&aquite right with this one...")));
         setEnchantments(List.of("VANISHING_CURSE,1"));
         setPotionEffects(List.of("WATER_BREATHING,0,self,continuous"));
         setDropWeight("1");

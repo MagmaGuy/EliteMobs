@@ -111,6 +111,8 @@ public class ScriptActionBlueprint {
     private float velocity = 1f;
     @Getter
     private double scale = 1f;
+    @Getter
+    private boolean debug = false;
 
 
     public ScriptActionBlueprint(Map<?, ?> entry, String scriptName, String scriptFilename) {
@@ -198,6 +200,7 @@ public class ScriptActionBlueprint {
             case "volume" -> volume = parseFloat(key, value, scriptName);
             case "velocity" -> velocity = parseFloat(key, value, scriptName);
             case "scale" -> scale = parseFloat(key, value, scriptName);
+            case "debug" -> debug = parseBoolean(key, value, scriptName);
             default -> Logger.warn("Failed to read key " + key + " for script " + scriptName + " in " + scriptFilename);
         }
 

@@ -128,6 +128,8 @@ public class NPCsConfigFields extends CustomConfigFields {
             this.profession = Villager.Profession.valueOf(processString("profession", profession.toString(), Villager.Profession.NITWIT.toString(), false));
         } catch (IncompatibleClassChangeError e) {
             //The early 1.21 API still used the profession enum, which was later dropped. This works for later releases, but not the early ones.
+        } catch (Exception e){
+            Logger.warn("NPC in configuration file " + filename + " has an invalid profession!");
         }
         this.spawnLocation = processString("spawnLocation", spawnLocation, null, true);
         this.locations = processStringList("spawnLocations", locations, null, false);

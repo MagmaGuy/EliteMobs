@@ -5,7 +5,6 @@ import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import org.bukkit.Material;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class ScrapEliteMediumConfig extends CustomItemsConfigFields {
@@ -14,7 +13,7 @@ public class ScrapEliteMediumConfig extends CustomItemsConfigFields {
                 true,
                 Material.ORANGE_DYE,
                 "&9Medium Elite Scrap",
-                Arrays.asList("&fUsed to repair Elite items!", "&fRepairs a large amount!"));
+                new ArrayList<>(List.of("&fUsed to repair Elite items!", "&fRepairs a large amount!")));
         setItemType(CustomItem.ItemType.UNIQUE);
         setEnchantments(new ArrayList<>(List.of("repair,3")));
         setScalability(CustomItem.Scalability.FIXED);

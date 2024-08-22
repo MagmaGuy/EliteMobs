@@ -4,8 +4,9 @@ import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class OmegaWolfBoss extends CustomBossesConfigFields {
     public OmegaWolfBoss() {
@@ -14,7 +15,7 @@ public class OmegaWolfBoss extends CustomBossesConfigFields {
                 true,
                 "$reinforcementLevel &7Omega Wolf",
                 "dynamic");
-        setPowers(Arrays.asList("attack_poison.yml", "moonwalk.yml"));
+        setPowers(new ArrayList<>(List.of("attack_poison.yml", "moonwalk.yml")));
         HashMap<Material, Double> damageModifiers = new HashMap<>();
         damageModifiers.put(Material.IRON_SWORD, 2D);
         damageModifiers.put(Material.IRON_AXE, 2D);

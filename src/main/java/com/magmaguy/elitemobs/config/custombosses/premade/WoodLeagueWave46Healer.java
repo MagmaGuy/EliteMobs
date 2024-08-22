@@ -5,6 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class WoodLeagueWave46Healer extends CustomBossesConfigFields {
@@ -16,7 +17,7 @@ public class WoodLeagueWave46Healer extends CustomBossesConfigFields {
                 "46");
         setFollowDistance(60);
         setMainHand(new ItemStack(Material.CROSSBOW));
-        setPowers(List.of("channel_healing.yml"));
+        setPowers(new ArrayList<>(List.of("channel_healing.yml")));
         setDamageMultiplier(0.5D);
         setHealthMultiplier(0.75D);
         setHealthMultiplier(.5D);

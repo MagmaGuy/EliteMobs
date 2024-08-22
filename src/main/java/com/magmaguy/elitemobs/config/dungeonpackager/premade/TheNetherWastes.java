@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.World;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -13,8 +13,8 @@ public class TheNetherWastes extends DungeonPackagerConfigFields {
         super("the_nether_wastes_dungeon",
                 true,
                 "&2[lvl 050] &3The Nether Wastes Dungeon",
-                Arrays.asList("&fAn unexplored part of the Nether.",
-                        "&6Credits: MagmaGuy, Frostcone, Dali_"),
+                new ArrayList<>(List.of("&fAn unexplored part of the Nether.",
+                        "&6Credits: MagmaGuy, Frostcone, Dali_")),
                 DiscordLinks.freeMinidungeons,
                 DungeonSizeCategory.DUNGEON,
                 "em_id_the_nether_wastes",

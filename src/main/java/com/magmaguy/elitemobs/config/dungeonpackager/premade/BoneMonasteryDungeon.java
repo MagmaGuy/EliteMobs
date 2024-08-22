@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.World;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -13,8 +13,8 @@ public class BoneMonasteryDungeon extends DungeonPackagerConfigFields {
         super("bone_monastery_dungeon",
                 true,
                 "&2[lvl 085]&cThe Bone Monastery",
-                Arrays.asList("&fSpooky skeletons await.",
-                        "&6Credits: MagmaGuy, Matevagyok, Frostcone, 69OzCanOfBepis"),
+                new ArrayList<>(List.of("&fSpooky skeletons await.",
+                        "&6Credits: MagmaGuy, Matevagyok, Frostcone, 69OzCanOfBepis")),
                 DiscordLinks.premiumMinidungeons,
                 DungeonSizeCategory.DUNGEON,
                 "em_id_bone_monastery",
