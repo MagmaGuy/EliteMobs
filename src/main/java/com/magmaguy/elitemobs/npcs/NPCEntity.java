@@ -280,7 +280,7 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
         roleDisplay = this.villager.getWorld().spawn(villager.getLocation().add(offSet), ArmorStand.class, new Consumer<ArmorStand>() {
             @Override
             public void accept(ArmorStand armorStand) {
-                armorStand.setCustomName(npCsConfigFields.getRole());
+                armorStand.setCustomName(ChatColorConverter.convert(npCsConfigFields.getRole()));
                 armorStand.setCustomNameVisible(true);
                 armorStand.setMarker(true);
                 armorStand.setVisible(false);
