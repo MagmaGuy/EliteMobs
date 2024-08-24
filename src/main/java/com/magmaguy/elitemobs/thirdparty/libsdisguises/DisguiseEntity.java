@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.thirdparty.libsdisguises;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.magmacore.util.Logger;
 import me.libraryaddict.disguise.DisguiseAPI;
-import me.libraryaddict.disguise.DisguiseConfig;
 import me.libraryaddict.disguise.disguisetypes.*;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
@@ -12,7 +11,7 @@ import org.bukkit.entity.EntityType;
 public class DisguiseEntity {
 
     public static void initialize() {
-        DisguiseConfig.setPlayerNameType(DisguiseConfig.PlayerNameType.ARMORSTANDS);
+//        DisguiseConfig.setPlayerNameType(DisguiseConfig.PlayerNameType.ARMORSTANDS);
     }
 
     /**
