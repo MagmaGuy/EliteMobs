@@ -38,6 +38,7 @@ import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantment;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.menus.ProceduralShopMenu;
 import com.magmaguy.elitemobs.mobconstructor.PersistentObjectHandler;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomMusic;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.InstancedBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
@@ -278,6 +279,7 @@ public class EliteMobs extends JavaPlugin {
         VersionChecker.check();
 
         DynamicQuest.startRandomizingQuests();
+        CustomBossEntity.startUpdatingDynamicLevels();
     }
 
     @Override
@@ -339,6 +341,7 @@ public class EliteMobs extends JavaPlugin {
         BossBarUtil.shutdown();
         ScriptAction.shutdown();
         CustomMusic.shutdown();
+        CustomBossEntity.shutdown();
         Logger.info("Saving EliteMobs databases...");
         PlayerData.closeConnection();
         MagmaCore.shutdown();

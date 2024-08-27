@@ -8,12 +8,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
-import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.event.entity.EntityChangeBlockEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.HashSet;
 import java.util.Locale;
@@ -22,8 +20,8 @@ import java.util.UUID;
 public class DungeonProtector implements Listener {
     private static final HashSet<UUID> bypassingPlayers = new HashSet<>();
 
-    public static boolean toggleBypass (UUID playerUUID){
-        if (bypassingPlayers.contains(playerUUID)){
+    public static boolean toggleBypass(UUID playerUUID) {
+        if (bypassingPlayers.contains(playerUUID)) {
             bypassingPlayers.remove(playerUUID);
             return false;
         }
@@ -166,6 +164,26 @@ public class DungeonProtector implements Listener {
     public void preventDoorOpeningSpawning(EntityChangeBlockEvent event) {
         if (!EliteMobsWorld.isEliteMobsWorld(event.getEntity().getWorld().getUID())) return;
         event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventCobwebPotions(LingeringPotionSplashEvent event) {
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getEntity().getWorld().getUID())) return;
+        if (event.getEntity().getShooter() == null) return;
+        if (!(event.getEntity().getShooter() instanceof Player)) return;
+        event.getEntity().getEffects().forEach(potionEffect -> {
+            if (potionEffect.getType().equals(PotionEffectType.WEAVING)) event.setCancelled(true);
+        });
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventCobwebPotions(PotionSplashEvent event) {
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getEntity().getWorld().getUID())) return;
+        if (event.getEntity().getShooter() == null) return;
+        if (!(event.getEntity().getShooter() instanceof Player)) return;
+        event.getEntity().getEffects().forEach(potionEffect -> {
+            if (potionEffect.getType().equals(PotionEffectType.WEAVING)) event.setCancelled(true);
+        });
     }
 
 }
