@@ -10,6 +10,7 @@ import com.magmaguy.elitemobs.quests.rewards.QuestReward;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.elitemobs.utils.SimpleScoreboard;
 import com.magmaguy.magmacore.util.ChatColorConverter;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -81,11 +82,16 @@ public class QuestObjectives implements Serializable {
         //used by the force bypass
         if (forceOver) return true;
         boolean checkOver = true;
-        for (Objective objective : objectives)
+        for (Objective objective : objectives) {
+            if (objective == null) {
+                Logger.warn("Found a null objective for quest " + quest.getQuestName());
+                continue;
+            }
             if (!objective.isObjectiveCompleted()) {
                 checkOver = false;
                 break;
             }
+        }
         return checkOver;
     }
 
