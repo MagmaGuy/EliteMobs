@@ -74,7 +74,7 @@ public class ItemEnchantmentMenuConfig extends MenusConfigFields {
                                 "&6(high quality items) have a high chance of failing!",
                                 "&8Normal failure makes you fail to enchant the item.",
                                 "&8Challenge makes you fight a boss for the enchant.",
-                                "&8Critical failures make you lose the item!")), MetadataHandler.signatureID),
+                                "&8Critical failures make you lose the item!"))),
                 fileConfiguration);
         infoButton = ItemStackSerializer.deserialize("infoButton", fileConfiguration);
         cancelSlot = ConfigurationEngine.setInt(

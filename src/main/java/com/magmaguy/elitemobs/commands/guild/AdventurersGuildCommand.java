@@ -27,9 +27,9 @@ public class AdventurersGuildCommand {
         if (!emPackage.isInstalled()) return false;
 
         if (CombatTagConfig.isEnableCombatTag())
-            new EventCaller(new PlayerPreTeleportEvent(player, emPackage.getDungeonPackagerConfigFields().getTeleportLocation()));
+            new EventCaller(new PlayerPreTeleportEvent(player, emPackage.getContentPackagesConfigFields().getTeleportLocation()));
         else
-            new EventCaller(new PlayerTeleportEvent(player, emPackage.getDungeonPackagerConfigFields().getTeleportLocation()));
+            new EventCaller(new PlayerTeleportEvent(player, emPackage.getContentPackagesConfigFields().getTeleportLocation()));
 
         return true;
     }

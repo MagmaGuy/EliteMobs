@@ -1,6 +1,6 @@
 package com.magmaguy.elitemobs.api;
 
-import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
+import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
 import lombok.Getter;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -9,10 +9,10 @@ public class WorldUninstanceEvent extends Event {
     private static final HandlerList handlers = new HandlerList();
 
     @Getter
-    private final DungeonPackagerConfigFields dungeonPackagerConfigFields;
+    private final ContentPackagesConfigFields contentPackagesConfigFields;
 
-    public WorldUninstanceEvent(DungeonPackagerConfigFields dungeonPackagerConfigFields) {
-        this.dungeonPackagerConfigFields = dungeonPackagerConfigFields;
+    public WorldUninstanceEvent(ContentPackagesConfigFields contentPackagesConfigFields) {
+        this.contentPackagesConfigFields = contentPackagesConfigFields;
     }
 
     public static HandlerList getHandlerList() {

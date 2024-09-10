@@ -56,6 +56,7 @@ public class VersionChecker {
 
     }
 
+
     private static void checkPluginVersion() {
         new BukkitRunnable() {
             @Override
@@ -107,24 +108,49 @@ public class VersionChecker {
         }.runTaskAsynchronously(MetadataHandler.PLUGIN);
     }
 
-    private static void checkDungeonVersions() {
+    private static void checkContentVersion() {
         Bukkit.getScheduler().runTaskAsynchronously(MetadataHandler.PLUGIN, () -> {
-            outdatedPackages.clear();
-            for (EMPackage emPackage : EMPackage.getEmPackages().values()) {
-                if (emPackage.isInstalled()) {
-                    if (!emPackage.getDungeonPackagerConfigFields().isDefaultDungeon()) continue;
-                    try {
-                        String versionString = readStringFromURL("https://www.magmaguy.com/api/" + emPackage.getDungeonPackagerConfigFields().getFilename().replace(".yml", ""));
-                        int releaseVersion = Integer.parseInt(versionString);
-                        if (emPackage.getDungeonPackagerConfigFields().getDungeonVersion() < releaseVersion) {
-                            emPackage.setOutOfDate(true);
-                            outdatedPackages.add(emPackage);
-                            Logger.warn("Dungeon " + emPackage.getDungeonPackagerConfigFields().getName() + " is outdated! You should go download the updated version! Link: " + emPackage.getDungeonPackagerConfigFields().getDownloadLink());
+            try {
+                String remoteVersions = readStringFromURL("https://www.magmaguy.com/api/elitemobs_content");
+                String[] lines = remoteVersions.split("\n");
+                for (EMPackage emPackage : EMPackage.getEmPackages().values()) {
+                    if (!emPackage.isInstalled()) continue;
+                    if (!emPackage.getContentPackagesConfigFields().isDefaultDungeon()) continue;
+                    boolean containedInMetaPackage = false;
+                    for (EMPackage metaPackage : EMPackage.getEmPackages().values())
+                        if (metaPackage.getContentPackagesConfigFields().getContainedPackages() != null &&
+                                !metaPackage.getContentPackagesConfigFields().getContainedPackages().isEmpty() &&
+                                metaPackage.getContentPackagesConfigFields().getContainedPackages().contains(emPackage.getContentPackagesConfigFields().getFilename())) {
+                            containedInMetaPackage = true;
+                            break;
                         }
-                    } catch (Exception exception) {
-                        Logger.warn("Failed to get version for EliteMobs package " + emPackage.getDungeonPackagerConfigFields().getFilename() + "! The URL " + "https://www.magmaguy.com/api/" + emPackage.getDungeonPackagerConfigFields().getFilename().replace(".yml", "") + " could not be reached!");
+
+                    if (containedInMetaPackage) continue;
+                    boolean checked = false;
+                    for (String line : lines) {
+                        if (line.startsWith(emPackage.getContentPackagesConfigFields().getFilename().replace(".yml", ""))) {
+                            String[] split = line.split(":");
+                            int remoteVersion = 0;
+                            try {
+                                remoteVersion = Integer.parseInt(split[1].trim());
+                            } catch (Exception e) {
+                                Logger.warn("Remote version substring: " + split[1].trim());
+                                e.printStackTrace();
+                            }
+                            if (remoteVersion > emPackage.getContentPackagesConfigFields().getDungeonVersion()) {
+                                emPackage.setOutOfDate(true);
+                                outdatedPackages.add(emPackage);
+                                Logger.warn("Content " + emPackage.getContentPackagesConfigFields().getName() + " is outdated! You should go download the updated version! Link: " + emPackage.getContentPackagesConfigFields().getDownloadLink());
+                            }
+                            checked = true;
+                            break;
+                        }
                     }
+                    if (!checked)
+                        Logger.warn("Failed to check content " + emPackage.getContentPackagesConfigFields().getFilename() + " ! The remote server doesn't have a version listed for it, report it to the developer!");
                 }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         });
     }
@@ -148,7 +174,8 @@ public class VersionChecker {
 
     public static void check() {
         checkPluginVersion();
-        checkDungeonVersions();
+        checkContentVersion();
+//        checkDungeonVersions();
     }
 
     public static class VersionCheckerEvents implements Listener {
@@ -165,25 +192,28 @@ public class VersionChecker {
                         event.getPlayer().sendMessage(ChatColorConverter.convert("&cYour version of EliteMobs is outdated." +
                                 " &aYou can download the latest version from &3&n&ohttps://www.spigotmc.org/resources/%E2%9A%94elitemobs%E2%9A%94.40090/"));
                     if (!outdatedPackages.isEmpty()) {
-                        event.getPlayer().sendMessage(ChatColorConverter.convert("&cThe following dungeons are outdated:"));
-                        for (EMPackage emPackage : outdatedPackages)
-                            event.getPlayer().sendMessage(ChatColorConverter.convert(
-                                    "&c- " + emPackage.getDungeonPackagerConfigFields().getName()));
+                        Logger.sendSimpleMessage(event.getPlayer(), "&8&m-----------------------------------------------------");
+                        Logger.sendMessage(event.getPlayer(), "&cThe following dungeons are outdated:");
+                        for (EMPackage emPackage : outdatedPackages) {
+                            event.getPlayer().spigot().sendMessage(
+                                    SpigotMessage.hoverLinkMessage("&c- " + emPackage.getContentPackagesConfigFields().getName(),
+                                            ChatColorConverter.convert("&9Click to go to download link!"),
+                                            emPackage.getContentPackagesConfigFields().getDownloadLink()));
+                        }
                         event.getPlayer().spigot().sendMessage(
-                                SpigotMessage.simpleMessage("&8[EliteMobs]&f You can download the update on "),
+                                SpigotMessage.simpleMessage("&8[EliteMobs]&f You can download the update at "),
                                 SpigotMessage.hoverLinkMessage(
-                                        "&9&npatreon.com/magmaguy", "Click for Patreon link", "https://www.patreon.com/magmaguy"
+                                        "&9&nhttps://nightbreak.io/plugin/elitemobs/#content", "Click for Nightbreak link", "https://nightbreak.io/plugin/elitemobs/#content"
                                 ),
-                                SpigotMessage.simpleMessage(" &for "),
-                                SpigotMessage.hoverLinkMessage("&9&nmagmaguy.itch.io", "Click for itch.io link", "https://magmaguy.itch.io/"),
                                 SpigotMessage.simpleMessage(" !"));
                         event.getPlayer().spigot().sendMessage(
                                 SpigotMessage.simpleMessage("&2Updating is quick & easy! "),
-                                SpigotMessage.hoverLinkMessage("&9&nClick here", "Click for wiki link", "https://github.com/MagmaGuy/EliteMobs/wiki/%5BGuide%5D-Quick-Setup#updating-dungeon-content"),
+                                SpigotMessage.hoverLinkMessage("&9&nClick here", "Click for wiki link", "https://nightbreak.io/plugin/elitemobs/#setup"),
                                 SpigotMessage.simpleMessage(" &2for info on how to install updates and "),
                                 SpigotMessage.hoverLinkMessage("&9&nhere", "Discord support link", DiscordLinks.mainLink),
                                 SpigotMessage.simpleMessage(" &2for the support room.")
                         );
+                        Logger.sendSimpleMessage(event.getPlayer(), "&8&m-----------------------------------------------------");
                     }
                     if (SHA1Updated) {
                         event.getPlayer().sendMessage(ChatColorConverter.convert("&8[EliteMobs] &cThe EliteMobs resource pack has updated! This means that the current resource pack will not fully work until you restart your server. You only need to restart once!"));

@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.mobconstructor.custombosses;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.PlayerTeleportEvent;
-import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
+import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
 import com.magmaguy.elitemobs.dungeons.EliteMobsWorld;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
@@ -27,7 +27,7 @@ public class CustomMusic {
     private final HashMap<Player, CustomMusic> players = new HashMap<>();
     private final ContentType contentType;
     private CustomBossEntity customBossEntity = null;
-    private DungeonPackagerConfigFields dungeonPackagerConfigFields = null;
+    private ContentPackagesConfigFields contentPackagesConfigFields = null;
     @Getter
     private String name;
     @Getter
@@ -53,9 +53,9 @@ public class CustomMusic {
         }
     }
 
-    public CustomMusic(String rawString, DungeonPackagerConfigFields dungeonPackagerConfigFields, World world) {
+    public CustomMusic(String rawString, ContentPackagesConfigFields contentPackagesConfigFields, World world) {
         this.world = world;
-        this.dungeonPackagerConfigFields = dungeonPackagerConfigFields;
+        this.contentPackagesConfigFields = contentPackagesConfigFields;
         contentType = ContentType.DUNGEON;
         if (!rawString.contains("->")) {
             parse(rawString, 1);
@@ -207,7 +207,7 @@ public class CustomMusic {
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onTeleport(PlayerTeleportEvent event) {
             EliteMobsWorld eliteMobsWorld = EliteMobsWorld.getEliteMobsWorld(event.getDestination().getWorld().getUID());
-            if (eliteMobsWorld == null || eliteMobsWorld.getDungeonPackagerConfigFields().getSong() == null) return;
+            if (eliteMobsWorld == null || eliteMobsWorld.getContentPackagesConfigFields().getSong() == null) return;
             CustomMusic customMusic = dungeonMusic.get(event.getDestination().getWorld());
             if (customMusic == null) {
                 Logger.warn("aFailed to get custom music for " + event.getDestination().getWorld().getName());
@@ -225,7 +225,7 @@ public class CustomMusic {
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onLogin(PlayerJoinEvent event) {
             EliteMobsWorld eliteMobsWorld = EliteMobsWorld.getEliteMobsWorld(event.getPlayer().getWorld().getUID());
-            if (eliteMobsWorld == null || eliteMobsWorld.getDungeonPackagerConfigFields().getSong() == null) return;
+            if (eliteMobsWorld == null || eliteMobsWorld.getContentPackagesConfigFields().getSong() == null) return;
             CustomMusic customMusic = dungeonMusic.get(event.getPlayer().getWorld());
             if (customMusic == null) {
                 Logger.warn("Failed to get custom music for " + event.getPlayer().getWorld().getName());

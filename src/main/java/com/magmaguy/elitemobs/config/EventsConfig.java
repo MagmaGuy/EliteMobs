@@ -21,8 +21,18 @@ public class EventsConfig extends ConfigurationFile {
         super("events.yml");
     }
 
+    private static EventsConfig instance;
+
+    public static void setEventsEnabled(boolean enabled){
+        ConfigurationEngine.writeValue(enabled, instance.file,instance.fileConfiguration, "actionEventsEnabled");
+        ConfigurationEngine.writeValue(enabled, instance.file,instance.fileConfiguration, "timedEventsEnabled");
+        timedEventsEnabled = enabled;
+        actionEventsEnabled = enabled;
+    }
+
     @Override
     public void initializeValues() {
+        instance = this;
         announcementBroadcastWorldOnly = ConfigurationEngine.setBoolean(
                 List.of("Sets if events will only broadcasted in the world the events happens in."),
                 fileConfiguration, "Only broadcast event message in event worlds", false);

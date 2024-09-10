@@ -37,7 +37,7 @@ public class SellMenuConfig extends MenusConfigFields {
                                 "&cYou can only sell special",
                                 "&cElite Mobs drops in this",
                                 "&cshop! These should have",
-                                "&ca value on their lore.")), MetadataHandler.signatureID),
+                                "&ca value on their lore."))),
                 fileConfiguration);
         infoButton = ItemStackSerializer.deserialize("infoButton", fileConfiguration);
         infoSlot = ConfigurationEngine.setInt(fileConfiguration, "infoButtonSlot", 4);

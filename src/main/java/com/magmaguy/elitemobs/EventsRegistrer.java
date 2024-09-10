@@ -12,7 +12,6 @@ import com.magmaguy.elitemobs.combatsystem.combattag.CombatTag;
 import com.magmaguy.elitemobs.combatsystem.displays.HealthDisplay;
 import com.magmaguy.elitemobs.combatsystem.displays.PopupDisplay;
 import com.magmaguy.elitemobs.commands.admin.RemoveCommand;
-import com.magmaguy.elitemobs.commands.setup.SetupMenu;
 import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
@@ -254,7 +253,7 @@ public class EventsRegistrer {
         register(new CustomShopMenu.CustomShopMenuEvents());
         register(new BuyOrSellMenu.BuyOrSellMenuEvents());
         register(new SellMenu());
-        register(new SetupMenu.SetupMenuListeners());
+//        register(new SetupMenu.SetupMenuListeners());
         register(new ScrapperMenu.ScrapperMenuEvents());
         register(new RepairMenu.RepairMenuEvents());
         register(new UnbindMenu.UnbinderMenuEvents());

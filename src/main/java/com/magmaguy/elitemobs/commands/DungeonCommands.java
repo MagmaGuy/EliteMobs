@@ -23,10 +23,10 @@ public class DungeonCommands {
             return;
         }
         if (emPackage instanceof WorldInstancedDungeonPackage)
-            new InstancedDungeonBrowser(player, emPackage.getDungeonPackagerConfigFields().getFilename());
+            new InstancedDungeonBrowser(player, emPackage.getContentPackagesConfigFields().getFilename());
         else {
-            if (emPackage.getDungeonPackagerConfigFields().getTeleportLocation() != null) {
-                PlayerPreTeleportEvent.teleportPlayer(player, emPackage.getDungeonPackagerConfigFields().getTeleportLocation());
+            if (emPackage.getContentPackagesConfigFields().getTeleportLocation() != null) {
+                PlayerPreTeleportEvent.teleportPlayer(player, emPackage.getContentPackagesConfigFields().getTeleportLocation());
                 Wormhole.addPlayerToCooldowns(player);
             }
             else

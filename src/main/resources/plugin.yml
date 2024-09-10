@@ -1,5 +1,5 @@
 name: EliteMobs
-version: 9.1.8
+version: 9.1.9
 author: MagmaGuy
 main: com.magmaguy.elitemobs.EliteMobs
 api-version: 1.14
@@ -236,3 +236,46 @@ permissions:
   elitemobs.protection.bypass:
     description: Allows players to run the bypass command to toggle bypassing dungeon protections
     default: op
+  elitemobs.initialize:
+    description: Allows players to run first time setup command
+    default: op
+  elitemobs.user:
+    description: All recommended permissions
+    children:
+      elitemobs.adventurersguild.command: true
+      elitemobs.adventurersguild.teleport: true
+      elitemobs.alt: true
+      elitemobs.discord.link: true
+      elitemobs.dungeon.tp: true
+      elitemobs.command: true
+      elitemobs.enchant.command: true
+      elitemobs.help: true
+      elitemobs.loot.command: true
+      elitemobs.money.check.self: true
+      elitemobs.money.pay: true
+      elitemobs.quest.accept: true
+      elitemobs.quest.complete: true
+      elitemobs.quest.leave: true
+      elitemobs.quest.track: true
+      elitemobs.quest.npc: true
+      elitemobs.quit: true
+      elitemobs.rank.command: true
+      elitemobs.repair.command: true
+      elitemobs.scrap.command: true
+      elitemobs.shareitem: true
+      elitemobs.shop.custom: true
+      elitemobs.shop.dynamic: true
+      elitemobs.teleport.spawn: true
+      elitemobs.instance.start: true
+      elitemobs.boss.track: true
+      elitemobs.unbind.command: true
+      elitemobs.rank.npc: true
+      elitemobs.shop.dynamic.npc: true
+      elitemobs.shop.custom.npc: true
+      elitemobs.shop.sell.npc: true
+      elitemobs.back.npc: true
+      elitemobs.scrap.npc: true
+      elitemobs.repair.npc: true
+      elitemobs.unbind.npc: true
+      elitemobs.enchant.npc: true
+    default: true

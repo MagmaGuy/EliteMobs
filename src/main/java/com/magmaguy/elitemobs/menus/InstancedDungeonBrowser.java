@@ -39,7 +39,7 @@ public class InstancedDungeonBrowser extends EliteMenu {
         }
         Set<DungeonInstance> dungeonInstances = new HashSet<>();
         DungeonInstance.getDungeonInstances().forEach(instance -> {
-            if (instance.getDungeonPackagerConfigFields().getFilename().equals(instancedDungeonName))
+            if (instance.getContentPackagesConfigFields().getFilename().equals(instancedDungeonName))
                 dungeonInstances.add(instance);
         });
         instancesList = new ArrayList<>(dungeonInstances);
@@ -48,10 +48,10 @@ public class InstancedDungeonBrowser extends EliteMenu {
         else slots = 54;
         Inventory inventory = Bukkit.createInventory(player, slots);
         int difficultyCounter = 0;
-        for (Map map : emPackage.getDungeonPackagerConfigFields().getDifficulties()) {
+        for (Map map : emPackage.getContentPackagesConfigFields().getDifficulties()) {
             List<String> description = new ArrayList<>();
             for (String string : DungeonsConfig.getInstancedDungeonDescription())
-                description.add(string.replace("$dungeonName", emPackage.getDungeonPackagerConfigFields().getName()));
+                description.add(string.replace("$dungeonName", emPackage.getContentPackagesConfigFields().getName()));
             inventory.setItem(difficultySlots.get(difficultyCounter), ItemStackGenerator.generateItemStack(Material.GREEN_STAINED_GLASS_PANE,
                     DungeonsConfig.getInstancedDungeonTitle().replace("$difficulty", map.get("name") + ""),
                     description));
@@ -78,7 +78,7 @@ public class InstancedDungeonBrowser extends EliteMenu {
         dungeonInstance.getPlayers().forEach(player -> players.add(player.getDisplayName()));
         return ItemStackGenerator.generateItemStack(
                 Material.ORANGE_STAINED_GLASS_PANE,
-                DungeonsConfig.getDungeonJoinAsSpectatorText().replace("$dungeonName", dungeonInstance.getDungeonPackagerConfigFields().getName()),
+                DungeonsConfig.getDungeonJoinAsSpectatorText().replace("$dungeonName", dungeonInstance.getContentPackagesConfigFields().getName()),
                 players);
     }
 
@@ -88,7 +88,7 @@ public class InstancedDungeonBrowser extends EliteMenu {
         dungeonInstance.getPlayers().forEach(player -> players.add(player.getDisplayName()));
         return ItemStackGenerator.generateItemStack(
                 Material.GREEN_STAINED_GLASS_PANE,
-                DungeonsConfig.getDungeonJoinAsPlayerText().replace("$dungeonName", dungeonInstance.getDungeonPackagerConfigFields().getName()),
+                DungeonsConfig.getDungeonJoinAsPlayerText().replace("$dungeonName", dungeonInstance.getContentPackagesConfigFields().getName()),
                 players);
     }
 
@@ -105,8 +105,8 @@ public class InstancedDungeonBrowser extends EliteMenu {
             //Case for creating a new instance
             if (instancedDungeonBrowser.difficultySlots.contains(event.getSlot())) {
                 DungeonInstance.setupInstancedDungeon((Player) event.getWhoClicked(),
-                        instancedDungeonBrowser.getEmPackage().getDungeonPackagerConfigFields().getFilename(),
-                        (String) instancedDungeonBrowser.getEmPackage().getDungeonPackagerConfigFields().getDifficulties().get(instancedDungeonBrowser.difficultySlots.indexOf(event.getSlot())).get("name"));
+                        instancedDungeonBrowser.getEmPackage().getContentPackagesConfigFields().getFilename(),
+                        (String) instancedDungeonBrowser.getEmPackage().getContentPackagesConfigFields().getDifficulties().get(instancedDungeonBrowser.difficultySlots.indexOf(event.getSlot())).get("name"));
             } else {
                 DungeonInstance dungeonInstance = instancedDungeonBrowser.instancesList.get(instancedDungeonBrowser.validSlots.indexOf(event.getSlot()));
                 switch (dungeonInstance.getState()) {

@@ -102,6 +102,7 @@ public class EconomySettingsConfig extends ConfigurationFile {
 
     @Override
     public void initializeValues() {
+        thisConfiguration = fileConfiguration;
         double netheriteLevel = CombatSystem.NETHERITE_TIER_LEVEL + 10D;
         double tridentLevel = CombatSystem.DIAMOND_TIER_LEVEL + 10D;
         double diamondLevel = CombatSystem.DIAMOND_TIER_LEVEL + 10D;
