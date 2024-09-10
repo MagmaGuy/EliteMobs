@@ -101,7 +101,7 @@ public class DungeonProtector implements Listener {
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void preventLiquidFlow(BlockFromToEvent event) {
         if (!EliteMobsWorld.isEliteMobsWorld(event.getBlock().getWorld().getUID())) return;
-        if (EliteMobsWorld.getEliteMobsWorld(event.getBlock().getWorld().getUID()).getDungeonPackagerConfigFields().isAllowLiquidFlow())
+        if (EliteMobsWorld.getEliteMobsWorld(event.getBlock().getWorld().getUID()).getContentPackagesConfigFields().isAllowLiquidFlow())
             return;
         event.setCancelled(true);
     }

@@ -75,15 +75,15 @@ public class WormholeEntry implements PersistentObject {
         }
         if (!emPackage.isDownloaded() || !emPackage.isInstalled()) {
             //Logger.info("Wormhole " + wormhole.getWormholeConfigFields().getFilename() + " will not lead anywhere because the dungeon " + locationString + " is not installed!");
-            setPortalMissingMessage(WormholesConfig.getDungeonNotInstalledMessage().replace("$dungeonID", emPackage.getDungeonPackagerConfigFields().getName()));
+            setPortalMissingMessage(WormholesConfig.getDungeonNotInstalledMessage().replace("$dungeonID", emPackage.getContentPackagesConfigFields().getName()));
 
             this.opMessage = ChatColorConverter.convert("&8[EliteMobs - OP-only message] &fDownload links are available on &9https://magmaguy.itch.io/ &f" + "(free and premium) and &9https://www.patreon.com/magmaguy &f(premium). You can check the difference " + "between the two and get support here: " + DiscordLinks.mainLink);
         }
-        Location teleportLocation = emPackage.getDungeonPackagerConfigFields().getTeleportLocation();
+        Location teleportLocation = emPackage.getContentPackagesConfigFields().getTeleportLocation();
         if (teleportLocation == null) return null;
 //        Vector offsetVector = teleportLocation.getDirection().clone().setY(0).normalize().multiply(1.5 * wormhole.getWormholeConfigFields().getSizeMultiplier()).setY(-1 * wormhole.getWormholeConfigFields().getSizeMultiplier());
 
-        worldName = emPackage.getDungeonPackagerConfigFields().getWorldName();
+        worldName = emPackage.getContentPackagesConfigFields().getWorldName();
 
 //        return teleportLocation.clone().subtract(offsetVector);
         return teleportLocation.clone();

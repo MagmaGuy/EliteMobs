@@ -1,8 +1,11 @@
 package com.magmaguy.elitemobs.dungeons;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfig;
-import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
+import com.magmaguy.elitemobs.api.DungeonInstallEvent;
+import com.magmaguy.elitemobs.api.DungeonUninstallEvent;
+import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfig;
+import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
+import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.Logger;
 import org.apache.commons.io.FileUtils;
@@ -14,56 +17,62 @@ import java.io.File;
 public class WorldInstancedDungeonPackage extends EMPackage implements CombatContent {
     private int level;
 
-    public WorldInstancedDungeonPackage(DungeonPackagerConfigFields dungeonPackagerConfigFields) {
-        super(dungeonPackagerConfigFields);
+    public WorldInstancedDungeonPackage(ContentPackagesConfigFields contentPackagesConfigFields) {
+        super(contentPackagesConfigFields);
+    }
+
+    @Override
+    public void doInstall(Player player) {
+        DungeonInstallEvent event = new DungeonInstallEvent(contentPackagesConfigFields);
+        new EventCaller(event);
+        contentPackagesConfigFields.simpleInstall();
+        player.sendMessage(ChatColorConverter.convert("&2Dungeon " + contentPackagesConfigFields.getFilename() + " installed!"));
+        if (!contentPackagesConfigFields.isEnchantmentChallenge()) {
+            player.sendMessage(ChatColorConverter.convert("&6Instanced dungeons must be accessed either through the &a/em &6menu or an NPC! NPCs for premade EliteMobs content can be found at the Adventurer's Guild Hub map."));
+            player.sendMessage("Remember that instanced dungeons create a world when you join them and remove that world when you are done playing in them!");
+        } else {
+            player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2Enchantment instanced dungeon installed! This dungeon can only be accessed when attempting to enchant items and getting a challenge as a result!"));
+            ContentPackagesConfig.getEnchantedChallengeDungeonPackages().put(contentPackagesConfigFields.getFilename(), contentPackagesConfigFields);
+        }
+        this.isInstalled = true;
+    }
+
+    @Override
+    public void doUninstall(Player player) {
+        DungeonUninstallEvent event = new DungeonUninstallEvent(contentPackagesConfigFields);
+        new EventCaller(event);
+        contentPackagesConfigFields.simpleUninstall();
+        isInstalled = false;
     }
 
     @Override
     public void baseInitialization() {
-        super.baseInitialization();
-        this.level = dungeonPackagerConfigFields.getContentLevel();
+        this.level = contentPackagesConfigFields.getContentLevel();
         File file = new File(MetadataHandler.PLUGIN.getDataFolder().getAbsolutePath() +
-                File.separatorChar + "world_blueprints" + File.separatorChar + dungeonPackagerConfigFields.getDungeonConfigFolderName());
+                File.separatorChar + "world_blueprints" + File.separatorChar + contentPackagesConfigFields.getDungeonConfigFolderName());
         if (!file.exists()) {
             this.isDownloaded = false;
             this.isInstalled = false;
             return;
         } else {
             //This removes all instanced worlds not previously correctly removed
-            for (File worldFile : Bukkit.getWorldContainer().listFiles()){
+            for (File worldFile : Bukkit.getWorldContainer().listFiles()) {
                 if (worldFile.getName().contains(file.getName()) && worldFile.getName().matches(".*_\\d{1,2}$")) {
-                    try{
-                    FileUtils.deleteDirectory(worldFile);
-                    Logger.info("Removing previously instanced world " + worldFile.getName());}catch (Exception e){
+                    try {
+                        FileUtils.deleteDirectory(worldFile);
+                        Logger.info("Removing previously instanced world " + worldFile.getName());
+                    } catch (Exception e) {
                         Logger.warn("Failed to remove previously instanced world " + worldFile.getName());
                     }
                 }
             }
         }
         this.isDownloaded = true;
-        this.isInstalled = dungeonPackagerConfigFields.isEnabled();
+        this.isInstalled = contentPackagesConfigFields.isEnabled();
     }
 
     @Override
-    public boolean install(Player player) {
-        dungeonPackagerConfigFields.simpleInstall();
-        this.isInstalled = true;
-        player.sendMessage(ChatColorConverter.convert("&2Dungeon " + dungeonPackagerConfigFields.getFilename() + " installed!"));
-        if (!dungeonPackagerConfigFields.isEnchantmentChallenge()) {
-            player.sendMessage(ChatColorConverter.convert("&6Instanced dungeons must be accessed either through the &a/em &6menu or an NPC! NPCs for premade EliteMobs content can be found at the Adventurer's Guild Hub map."));
-            player.sendMessage("Remember that instanced dungeons create a world when you join them and remove that world when you are done playing in them!");
-        } else {
-            player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2Enchantment instanced dungeon installed! This dungeon can only be accessed when attempting to enchant items and getting a challenge as a result!"));
-            DungeonPackagerConfig.getEnchantedChallengeDungeonPackages().put(dungeonPackagerConfigFields.getFilename(), dungeonPackagerConfigFields);
-        }
-        return true;
-    }
-
-    @Override
-    public boolean uninstall(Player player) {
-        dungeonPackagerConfigFields.simpleUninstall();
-        this.isInstalled = false;
-        return true;
+    public void initializeContent() {
     }
 
     @Override

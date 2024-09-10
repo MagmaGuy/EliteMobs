@@ -59,7 +59,7 @@ public class UnbinderMenuConfig extends MenusConfigFields {
                 ItemStackGenerator.generateSkullItemStack("magmaguy",
                         "&4&lEliteMobs &r&cby &4&lMagmaGuy",
                         new ArrayList<>(List.of("&8Support the plugins you enjoy!",
-                                "&aUse an &5Unbind Scroll &ato remove Soulbind from an item!")), MetadataHandler.signatureID),
+                                "&aUse an &5Unbind Scroll &ato remove Soulbind from an item!"))),
                 fileConfiguration);
         infoButton = ItemStackSerializer.deserialize("infoButton", fileConfiguration);
         infoSlot = ConfigurationEngine.setInt(fileConfiguration, "infoButtonSlot", 4);

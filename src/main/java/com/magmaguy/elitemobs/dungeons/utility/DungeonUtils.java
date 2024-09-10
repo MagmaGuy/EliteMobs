@@ -1,6 +1,6 @@
 package com.magmaguy.elitemobs.dungeons.utility;
 
-import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
+import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
 import com.magmaguy.elitemobs.dungeons.EliteMobsWorld;
 import com.magmaguy.elitemobs.dungeons.WorldDungeonPackage;
 import com.magmaguy.elitemobs.dungeons.WorldPackage;
@@ -30,18 +30,18 @@ public class DungeonUtils {
     }
 
     public static World loadWorld(WorldPackage worldPackage) {
-        String worldName = worldPackage.getDungeonPackagerConfigFields().getWorldName();
-        World.Environment environment = worldPackage.getDungeonPackagerConfigFields().getEnvironment();
-        World world = loadWorld(worldName, environment, worldPackage.getDungeonPackagerConfigFields());
-        if (worldPackage.getDungeonPackagerConfigFields().getWormholeWorldName() != null)
-            loadWorld(worldPackage.getDungeonPackagerConfigFields().getWormholeWorldName(), environment, worldPackage.getDungeonPackagerConfigFields());
+        String worldName = worldPackage.getContentPackagesConfigFields().getWorldName();
+        World.Environment environment = worldPackage.getContentPackagesConfigFields().getEnvironment();
+        World world = loadWorld(worldName, environment, worldPackage.getContentPackagesConfigFields());
+        if (worldPackage.getContentPackagesConfigFields().getWormholeWorldName() != null)
+            loadWorld(worldPackage.getContentPackagesConfigFields().getWormholeWorldName(), environment, worldPackage.getContentPackagesConfigFields());
         if (world != null) worldPackage.setInstalled(true);
         return world;
     }
 
-    public static World loadWorld(String worldName, World.Environment environment, DungeonPackagerConfigFields dungeonPackagerConfigFields) {
+    public static World loadWorld(String worldName, World.Environment environment, ContentPackagesConfigFields contentPackagesConfigFields) {
         World world = WorldLoader.loadVoidTemporaryWorld(worldName, environment);
-        if (world != null) EliteMobsWorld.create(world.getUID(), dungeonPackagerConfigFields);
+        if (world != null) EliteMobsWorld.create(world.getUID(), contentPackagesConfigFields);
         return world;
     }
 

@@ -22,15 +22,15 @@ Maven repository:
 Maven:
 ```
 <repository>
-  <id>elitemobs-repo</id>
-  <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+  <id>magmaguy-repo-releases</id>
+  <name>MagmaGuy's Repository</name>
+  <url>https://repo.magmaguy.com/releases</url>
 </repository>
 
 <dependency>
   <groupId>com.magmaguy</groupId>
   <artifactId>EliteMobs</artifactId>
-  <version>9.0.2-SNAPSHOT</version>
-  <scope>provided</scope>
+  <version>9.1.9</version>
 </dependency>
 ```
 
@@ -38,12 +38,14 @@ Gradle:
 ```kotlin
 repositories {
     //EliteMobs
-    maven { url = 'https://s01.oss.sonatype.org/content/repositories/snapshots' }
+    maven {
+        url = uri("https://repo.magmaguy.com/releases")
+    }
 }
 
 dependencies{
     //EliteMobs
-    compileOnly group: 'com.magmaguy', name: 'EliteMobs', version: '9.0.2-SNAPSHOT'
+    compileOnly("com.magmaguy:EliteMobs:9.1.9")
 }
 
 ```

@@ -10,10 +10,6 @@ import org.bukkit.entity.EntityType;
 
 public class DisguiseEntity {
 
-    public static void initialize() {
-//        DisguiseConfig.setPlayerNameType(DisguiseConfig.PlayerNameType.ARMORSTANDS);
-    }
-
     /**
      * This method disguises the entity based on a config entry. It should be invoked after checking if libsdisguises
      * is in the server.

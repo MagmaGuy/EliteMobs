@@ -1,11 +1,13 @@
 package com.magmaguy.elitemobs.dungeons;
 
-import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
+import com.magmaguy.elitemobs.api.DungeonUninstallEvent;
+import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
 import com.magmaguy.elitemobs.dungeons.utility.DungeonUtils;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
+import com.magmaguy.elitemobs.utils.EventCaller;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -20,8 +22,8 @@ public class WorldDungeonPackage extends WorldPackage implements Dungeon {
     @Getter
     private World wormholeWorld = null;
 
-    public WorldDungeonPackage(DungeonPackagerConfigFields dungeonPackagerConfigFields) {
-        super(dungeonPackagerConfigFields);
+    public WorldDungeonPackage(ContentPackagesConfigFields contentPackagesConfigFields) {
+        super(contentPackagesConfigFields);
     }
 
     @Override
@@ -31,16 +33,15 @@ public class WorldDungeonPackage extends WorldPackage implements Dungeon {
     }
 
     private void initializeWormholeWorld() {
-        if (dungeonPackagerConfigFields.getWormholeWorldName() != null &&
-                !dungeonPackagerConfigFields.getWormholeWorldName().isEmpty() &&
-                Bukkit.getWorld(dungeonPackagerConfigFields.getWormholeWorldName()) == null) {
-            wormholeWorld = DungeonUtils.loadWorld(this.getDungeonPackagerConfigFields().getWormholeWorldName(), this.getDungeonPackagerConfigFields().getEnvironment(), dungeonPackagerConfigFields);
+        if (contentPackagesConfigFields.getWormholeWorldName() != null &&
+                !contentPackagesConfigFields.getWormholeWorldName().isEmpty() &&
+                Bukkit.getWorld(contentPackagesConfigFields.getWormholeWorldName()) == null) {
+            wormholeWorld = DungeonUtils.loadWorld(this.getContentPackagesConfigFields().getWormholeWorldName(), this.getContentPackagesConfigFields().getEnvironment(), contentPackagesConfigFields);
         }
     }
 
     @Override
     public void initializeContent() {
-        super.initializeContent();
         if (isInstalled) {
             getEntities();
             qualifyEntities();
@@ -50,11 +51,12 @@ public class WorldDungeonPackage extends WorldPackage implements Dungeon {
     }
 
     @Override
-    public boolean uninstall(Player player) {
-        if (!super.uninstall(player)) return false;
+    public void doUninstall(Player player) {
+        DungeonUninstallEvent event = new DungeonUninstallEvent(contentPackagesConfigFields);
+        new EventCaller(event);
+        isInstalled = false;
         customBossEntityList.clear();
         treasureChestList.clear();
-        return true;
     }
 
     private void getEntities() {

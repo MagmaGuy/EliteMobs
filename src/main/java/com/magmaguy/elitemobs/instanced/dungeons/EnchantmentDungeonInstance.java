@@ -2,8 +2,8 @@ package com.magmaguy.elitemobs.instanced.dungeons;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.SpecialItemSystemsConfig;
-import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfig;
-import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
+import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfig;
+import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
 import com.magmaguy.elitemobs.menus.ItemEnchantmentMenu;
 import com.magmaguy.elitemobs.utils.WorldInstantiator;
 import com.magmaguy.magmacore.util.ChatColorConverter;
@@ -33,14 +33,14 @@ public class EnchantmentDungeonInstance extends DungeonInstance {
     @Setter
     private ItemStack currentItem;
 
-    public EnchantmentDungeonInstance(DungeonPackagerConfigFields dungeonPackagerConfigFields,
+    public EnchantmentDungeonInstance(ContentPackagesConfigFields contentPackagesConfigFields,
                                       Location lobbyLocation,
                                       Location startLocation,
                                       World world,
                                       File instancedWorldFile,
                                       Player player,
                                       String difficultyName) {
-        super(dungeonPackagerConfigFields,
+        super(contentPackagesConfigFields,
                 lobbyLocation,
                 startLocation,
                 world,
@@ -51,25 +51,25 @@ public class EnchantmentDungeonInstance extends DungeonInstance {
     }
 
     public static boolean setupRandomEnchantedChallengeDungeon(Player player, ItemStack upgradedItem, ItemStack itemFromInventory) {
-        List<DungeonPackagerConfigFields> dungeonPackagerConfigFieldsList = new ArrayList<>(DungeonPackagerConfig.getEnchantedChallengeDungeonPackages().values().stream().toList());
-        dungeonPackagerConfigFieldsList.removeIf(dungeonPackagerConfigFields -> !dungeonPackagerConfigFields.isEnabled());
-        if (dungeonPackagerConfigFieldsList.isEmpty()) {
+        List<ContentPackagesConfigFields> contentPackagesConfigFieldsList = new ArrayList<>(ContentPackagesConfig.getEnchantedChallengeDungeonPackages().values().stream().toList());
+        contentPackagesConfigFieldsList.removeIf(dungeonPackagerConfigFields -> !dungeonPackagerConfigFields.isEnabled());
+        if (contentPackagesConfigFieldsList.isEmpty()) {
             player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &cYou rolled challenge but your server has not installed any challenge dungeons! &2This will count as an automatic enchantment success."));
             return false;
         }
-        DungeonPackagerConfigFields dungeonPackagerConfigFields = dungeonPackagerConfigFieldsList.get(ThreadLocalRandom.current().nextInt(0, dungeonPackagerConfigFieldsList.size()));
-        String instancedWordName = WorldInstantiator.getNewWorldName(dungeonPackagerConfigFields.getWorldName());
+        ContentPackagesConfigFields contentPackagesConfigFields = contentPackagesConfigFieldsList.get(ThreadLocalRandom.current().nextInt(0, contentPackagesConfigFieldsList.size()));
+        String instancedWordName = WorldInstantiator.getNewWorldName(contentPackagesConfigFields.getWorldName());
 
-        if (!launchEvent(dungeonPackagerConfigFields, instancedWordName, player)) return false;
+        if (!launchEvent(contentPackagesConfigFields, instancedWordName, player)) return false;
 
         CompletableFuture<File> future = CompletableFuture.supplyAsync(() ->
-                cloneWorldFiles(dungeonPackagerConfigFields, instancedWordName, player));
+                cloneWorldFiles(contentPackagesConfigFields, instancedWordName, player));
         future.thenAccept(file -> {
             if (file == null) return;
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    DungeonInstance dungeonInstance = initializeInstancedWorld(dungeonPackagerConfigFields, instancedWordName, player, file, (String) dungeonPackagerConfigFields.getDifficulties().get(0).get("name"));
+                    DungeonInstance dungeonInstance = initializeInstancedWorld(contentPackagesConfigFields, instancedWordName, player, file, (String) contentPackagesConfigFields.getDifficulties().get(0).get("name"));
                     if (dungeonInstance instanceof EnchantmentDungeonInstance enchantmentDungeonInstance) {
                         enchantmentDungeonInstance.setUpgradedItem(upgradedItem.clone());
                         enchantmentDungeonInstance.setCurrentItem(itemFromInventory.clone());

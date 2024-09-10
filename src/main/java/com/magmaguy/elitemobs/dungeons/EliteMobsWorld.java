@@ -1,6 +1,6 @@
 package com.magmaguy.elitemobs.dungeons;
 
-import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
+import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
 import lombok.Getter;
 
 import javax.annotation.Nullable;
@@ -10,13 +10,13 @@ import java.util.UUID;
 public class EliteMobsWorld {
     private static final HashMap<UUID, EliteMobsWorld> eliteMobsWorlds = new HashMap<>();
     @Getter
-    private final DungeonPackagerConfigFields dungeonPackagerConfigFields;
+    private final ContentPackagesConfigFields contentPackagesConfigFields;
     @Getter
     private final boolean allowExplosions;
 
-    private EliteMobsWorld(UUID worldUUID, DungeonPackagerConfigFields dungeonPackagerConfigFields) {
-        this.dungeonPackagerConfigFields = dungeonPackagerConfigFields;
-        this.allowExplosions = dungeonPackagerConfigFields.isAllowExplosions();
+    private EliteMobsWorld(UUID worldUUID, ContentPackagesConfigFields contentPackagesConfigFields) {
+        this.contentPackagesConfigFields = contentPackagesConfigFields;
+        this.allowExplosions = contentPackagesConfigFields.isAllowExplosions();
         eliteMobsWorlds.put(worldUUID, this);
     }
 
@@ -33,8 +33,8 @@ public class EliteMobsWorld {
         return eliteMobsWorlds.containsKey(worldUUID);
     }
 
-    public static void create(UUID woldUUID, DungeonPackagerConfigFields dungeonPackagerConfigFields) {
-        new EliteMobsWorld(woldUUID, dungeonPackagerConfigFields);
+    public static void create(UUID woldUUID, ContentPackagesConfigFields contentPackagesConfigFields) {
+        new EliteMobsWorld(woldUUID, contentPackagesConfigFields);
     }
 
     public static void destroy(UUID worldUUID) {

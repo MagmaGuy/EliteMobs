@@ -42,7 +42,7 @@ public class RepairMenuConfig extends MenusConfigFields {
                 ItemStackGenerator.generateSkullItemStack("magmaguy",
                         "&4&lEliteMobs &r&cby &4&lMagmaGuy",
                         new ArrayList<>(List.of("&8Support the plugins you enjoy!",
-                                "&aUse scrap to repair elite items!")), MetadataHandler.signatureID),
+                                "&aUse scrap to repair elite items!"))),
                 fileConfiguration);
         infoButton = ItemStackSerializer.deserialize("infoButton", fileConfiguration);
         infoSlot = ConfigurationEngine.setInt(fileConfiguration, "infoButtonSlot", 4);

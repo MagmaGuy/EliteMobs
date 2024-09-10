@@ -40,7 +40,7 @@ public class ScrapperMenuConfig extends MenusConfigFields {
                                 "&cThere is a $chance% chance to get",
                                 "&cscrap when scrapping items!",
                                 "&aUse scrap at the smelter,",
-                                "&arepairman and refiner!")), MetadataHandler.signatureID),
+                                "&arepairman and refiner!"))),
                 fileConfiguration);
         infoButton = ItemStackSerializer.deserialize("infoButton", fileConfiguration);
         infoSlot = ConfigurationEngine.setInt(fileConfiguration, "infoButtonSlot", 4);
