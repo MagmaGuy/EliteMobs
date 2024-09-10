@@ -49,17 +49,17 @@ public class TeleportsPage {
         for (EMPackage emPackage : EMPackage.getEmPackages().values()) {
             if (!emPackage.isInstalled() ||
                     !(emPackage instanceof CombatContent) ||
-                    emPackage.getDungeonPackagerConfigFields().isEnchantmentChallenge()) continue;
-            if (!emPackage.getDungeonPackagerConfigFields().isListedInTeleports()) continue;
+                    emPackage.getContentPackagesConfigFields().isEnchantmentChallenge()) continue;
+            if (!emPackage.getContentPackagesConfigFields().isListedInTeleports()) continue;
 
-            TextComponent message = new TextComponent(PlayerStatusScreen.convertLightColorsToBlack(emPackage.getDungeonPackagerConfigFields().getName() + "\n"));
+            TextComponent message = new TextComponent(PlayerStatusScreen.convertLightColorsToBlack(emPackage.getContentPackagesConfigFields().getName() + "\n"));
             String hoverMessage = ChatColorConverter.convert(PlayerStatusMenuConfig.getOnTeleportHover() + "\n" +
-                    emPackage.getDungeonPackagerConfigFields().getPlayerInfo()
+                    emPackage.getContentPackagesConfigFields().getPlayerInfo()
                             .replace("$bossCount", emPackage.getCustomBossEntityList().size() + "")
                             .replace("$lowestTier", ((CombatContent) emPackage).getLowestLevel() + "")
                             .replace("$highestTier", ((CombatContent) emPackage).getHighestLevel() + ""));
             message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(hoverMessage).create()));
-            message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/elitemobs dungeontp " + emPackage.getDungeonPackagerConfigFields().getFilename()));
+            message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/elitemobs dungeontp " + emPackage.getContentPackagesConfigFields().getFilename()));
             textComponents.add(message);
 
             counter++;
@@ -92,12 +92,12 @@ public class TeleportsPage {
         for (EMPackage emPackage : EMPackage.getEmPackages().values()) {
             if (!emPackage.isInstalled() ||
                     !(emPackage instanceof CombatContent) ||
-                    emPackage.getDungeonPackagerConfigFields().isEnchantmentChallenge()) continue;
-            if (!emPackage.getDungeonPackagerConfigFields().isListedInTeleports()) continue;
+                    emPackage.getContentPackagesConfigFields().isEnchantmentChallenge()) continue;
+            if (!emPackage.getContentPackagesConfigFields().isListedInTeleports()) continue;
 
             TeleportsPageEvents.orderedDungeons.add(emPackage);
-            inventory.setItem(counter, ItemStackGenerator.generateItemStack(Material.PAPER, emPackage.getDungeonPackagerConfigFields().getName()
-                    , Collections.singletonList(emPackage.getDungeonPackagerConfigFields().getPlayerInfo()
+            inventory.setItem(counter, ItemStackGenerator.generateItemStack(Material.PAPER, emPackage.getContentPackagesConfigFields().getName()
+                    , Collections.singletonList(emPackage.getContentPackagesConfigFields().getPlayerInfo()
                             .replace("$bossCount", emPackage.getCustomBossEntityList().size() + "")
                             .replace("$lowestTier", ((CombatContent) emPackage).getLowestLevel() + "")
                             .replace("$highestTier", ((CombatContent) emPackage).getHighestLevel() + ""))));
@@ -120,7 +120,7 @@ public class TeleportsPage {
             if (event.getSlot() < 0) return;
             if (orderedDungeons.size() - 1 >= event.getSlot()) {
                 player.closeInventory();
-                DungeonCommands.teleport(player, orderedDungeons.get(event.getSlot()).getDungeonPackagerConfigFields().getFilename());
+                DungeonCommands.teleport(player, orderedDungeons.get(event.getSlot()).getContentPackagesConfigFields().getFilename());
                 return;
             }
             if (event.getSlot() == 53) {

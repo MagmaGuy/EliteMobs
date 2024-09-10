@@ -34,7 +34,7 @@ public class BuyOrSellMenuConfig extends MenusConfigFields {
                         "&4&lEliteMobs &r&cby &4&lMagmaGuy",
                         new ArrayList<>(List.of("&8Support the plugins you enjoy!",
                                 "&aClick on the emerald to buy items!",
-                                "&cClick on the redstone to sell items!")), MetadataHandler.signatureID),
+                                "&cClick on the redstone to sell items!"))),
                 fileConfiguration);
         INFORMATION_ITEM = ItemStackSerializer.deserialize("Information button", fileConfiguration);
         INFORMATION_SLOT = ConfigurationEngine.setInt(fileConfiguration, "Information button slot", 4);

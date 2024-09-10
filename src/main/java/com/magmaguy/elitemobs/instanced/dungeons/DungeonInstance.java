@@ -7,8 +7,8 @@ import com.magmaguy.elitemobs.api.InstancedDungeonRemoveEvent;
 import com.magmaguy.elitemobs.api.WorldInstanceEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.DungeonsConfig;
-import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfig;
-import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
+import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfig;
+import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
 import com.magmaguy.elitemobs.dungeons.utility.DungeonUtils;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
@@ -42,7 +42,7 @@ public class DungeonInstance extends MatchInstance {
     private String instancedWorldName;
     private File instancedWorldFile;
     @Getter
-    private DungeonPackagerConfigFields dungeonPackagerConfigFields;
+    private ContentPackagesConfigFields contentPackagesConfigFields;
     private List<InstancedBossEntity> instancedBossEntities = new ArrayList<>();
     @Getter
     private int levelSync = -1;
@@ -50,7 +50,7 @@ public class DungeonInstance extends MatchInstance {
     @Getter
     private String difficultyID = null;
 
-    public DungeonInstance(DungeonPackagerConfigFields dungeonPackagerConfigFields,
+    public DungeonInstance(ContentPackagesConfigFields contentPackagesConfigFields,
                            Location lobbyLocation,
                            Location startLocation,
                            World world,
@@ -59,12 +59,12 @@ public class DungeonInstance extends MatchInstance {
                            String difficultyName) {
         super(startLocation,
                 null, //todo: the end location is currently not definable
-                dungeonPackagerConfigFields.getMinPlayerCount(),
-                dungeonPackagerConfigFields.getMaxPlayerCount());
+                contentPackagesConfigFields.getMinPlayerCount(),
+                contentPackagesConfigFields.getMaxPlayerCount());
         if (cancelled) return;
         super.lobbyLocation = lobbyLocation;
-        this.dungeonPackagerConfigFields = dungeonPackagerConfigFields;
-        for (String rawObjective : dungeonPackagerConfigFields.getRawDungeonObjectives())
+        this.contentPackagesConfigFields = contentPackagesConfigFields;
+        for (String rawObjective : contentPackagesConfigFields.getRawDungeonObjectives())
             this.dungeonObjectives.add(DungeonObjective.registerObjective(this, rawObjective));
         this.world = world;
         this.instancedWorldName = world.getName();
@@ -72,13 +72,13 @@ public class DungeonInstance extends MatchInstance {
         this.difficultyName = difficultyName;
         setDifficulty(difficultyName);
         addNewPlayer(player);
-        new InitializeEntitiesTask(this, dungeonPackagerConfigFields, world).runTaskLater(MetadataHandler.PLUGIN, 20 * 3L);
+        new InitializeEntitiesTask(this, contentPackagesConfigFields, world).runTaskLater(MetadataHandler.PLUGIN, 20 * 3L);
         dungeonInstances.add(this);
-        super.permission = dungeonPackagerConfigFields.getPermission();
+        super.permission = contentPackagesConfigFields.getPermission();
     }
 
     public static void setupInstancedDungeon(Player player, String instancedDungeonConfigFieldsString, String difficultyName) {
-        DungeonPackagerConfigFields instancedDungeonsConfigFields = DungeonPackagerConfig.getDungeonPackages().get(instancedDungeonConfigFieldsString);
+        ContentPackagesConfigFields instancedDungeonsConfigFields = ContentPackagesConfig.getDungeonPackages().get(instancedDungeonConfigFieldsString);
         if (instancedDungeonsConfigFields == null) {
             player.sendMessage("[EliteMobs] Failed to get data for dungeon " + instancedDungeonConfigFieldsString + "! The dungeon will not start.");
             return;
@@ -102,7 +102,7 @@ public class DungeonInstance extends MatchInstance {
         });
     }
 
-    protected static boolean launchEvent(DungeonPackagerConfigFields instancedDungeonsConfigFields, String instancedWordName, Player player) {
+    protected static boolean launchEvent(ContentPackagesConfigFields instancedDungeonsConfigFields, String instancedWordName, Player player) {
         WorldInstanceEvent worldInstanceEvent = new WorldInstanceEvent(
                 instancedDungeonsConfigFields.getWorldName(),
                 instancedWordName,
@@ -115,7 +115,7 @@ public class DungeonInstance extends MatchInstance {
         return true;
     }
 
-    protected static File cloneWorldFiles(DungeonPackagerConfigFields instancedDungeonsConfigFields, String instancedWordName, Player player) {
+    protected static File cloneWorldFiles(ContentPackagesConfigFields instancedDungeonsConfigFields, String instancedWordName, Player player) {
         File targetFile = WorldInstantiator.cloneWorld(instancedDungeonsConfigFields.getWorldName(), instancedWordName, instancedDungeonsConfigFields.getDungeonConfigFolderName());
         if (targetFile == null) {
             player.sendMessage("[EliteMobs] Failed to copy the world! Report this to the dev. The dungeon will not start.");
@@ -124,7 +124,7 @@ public class DungeonInstance extends MatchInstance {
         return targetFile;
     }
 
-    protected static DungeonInstance initializeInstancedWorld(DungeonPackagerConfigFields instancedDungeonsConfigFields,
+    protected static DungeonInstance initializeInstancedWorld(ContentPackagesConfigFields instancedDungeonsConfigFields,
                                                               String instancedWordName,
                                                               Player player,
                                                               File targetFile,
@@ -217,25 +217,25 @@ public class DungeonInstance extends MatchInstance {
 
     private void setDifficulty(String difficultyName) {
         if (difficultyName == null) return;
-        if (dungeonPackagerConfigFields.getDifficulties() == null ||
-                dungeonPackagerConfigFields.getDifficulties().isEmpty())
+        if (contentPackagesConfigFields.getDifficulties() == null ||
+                contentPackagesConfigFields.getDifficulties().isEmpty())
             return;
         Map difficulty = null;
-        for (Map difficultyMap : dungeonPackagerConfigFields.getDifficulties())
+        for (Map difficultyMap : contentPackagesConfigFields.getDifficulties())
             if (difficultyMap.get("name") != null && difficultyMap.get("name").equals(difficultyName)) {
                 difficulty = difficultyMap;
                 break;
             }
         if (difficulty == null) {
-            Logger.warn("Failed to set difficulty " + difficulty + " for instanced dungeon " + dungeonPackagerConfigFields.getFilename());
+            Logger.warn("Failed to set difficulty " + difficulty + " for instanced dungeon " + contentPackagesConfigFields.getFilename());
             return;
         }
 
         if (difficulty.get("levelSync") != null) {
             try {
-                this.levelSync = MapListInterpreter.parseInteger("levelSync", difficulty.get("levelSync"), dungeonPackagerConfigFields.getFilename());
+                this.levelSync = MapListInterpreter.parseInteger("levelSync", difficulty.get("levelSync"), contentPackagesConfigFields.getFilename());
             } catch (Exception exception) {
-                Logger.warn("Incorrect level sync entry for dungeon " + dungeonPackagerConfigFields.getFilename() + " ! Value: " + levelSync + " . No level sync will be applied!");
+                Logger.warn("Incorrect level sync entry for dungeon " + contentPackagesConfigFields.getFilename() + " ! Value: " + levelSync + " . No level sync will be applied!");
                 this.levelSync = 0;
             }
         } else
@@ -243,7 +243,7 @@ public class DungeonInstance extends MatchInstance {
 
         //Used for loot
         if (difficulty.get("id") != null) {
-            this.difficultyID = MapListInterpreter.parseString("id", difficulty.get("id"), dungeonPackagerConfigFields.getFilename());
+            this.difficultyID = MapListInterpreter.parseString("id", difficulty.get("id"), contentPackagesConfigFields.getFilename());
         }
     }
 
@@ -253,13 +253,13 @@ public class DungeonInstance extends MatchInstance {
     }
 
     private static class InitializeInstancedWorldTask extends BukkitRunnable {
-        private final DungeonPackagerConfigFields instancedDungeonsConfigFields;
+        private final ContentPackagesConfigFields instancedDungeonsConfigFields;
         private final String instancedWorldName;
         private final Player player;
         private final File file;
         private final String difficultyName;
 
-        public InitializeInstancedWorldTask(DungeonPackagerConfigFields instancedDungeonsConfigFields,
+        public InitializeInstancedWorldTask(ContentPackagesConfigFields instancedDungeonsConfigFields,
                                             String instancedWorldName,
                                             Player player,
                                             File file,
@@ -279,20 +279,20 @@ public class DungeonInstance extends MatchInstance {
 
     private class InitializeEntitiesTask extends BukkitRunnable {
         private final DungeonInstance dungeonInstance;
-        private final DungeonPackagerConfigFields dungeonPackagerConfigFields;
+        private final ContentPackagesConfigFields contentPackagesConfigFields;
         private final World world;
 
-        public InitializeEntitiesTask(DungeonInstance dungeonInstance, DungeonPackagerConfigFields dungeonPackagerConfigFields, World world) {
+        public InitializeEntitiesTask(DungeonInstance dungeonInstance, ContentPackagesConfigFields contentPackagesConfigFields, World world) {
             this.dungeonInstance = dungeonInstance;
-            this.dungeonPackagerConfigFields = dungeonPackagerConfigFields;
+            this.contentPackagesConfigFields = contentPackagesConfigFields;
             this.world = world;
         }
 
         @Override
         public void run() {
-            instancedBossEntities = InstancedBossEntity.initializeInstancedBosses(dungeonPackagerConfigFields.getWorldName(), world, players.size(), dungeonInstance);
-            NPCEntity.initializeInstancedNPCs(dungeonPackagerConfigFields.getWorldName(), world, players.size(), dungeonInstance);
-            TreasureChest.initializeInstancedTreasureChests(dungeonPackagerConfigFields.getWorldName(), world);
+            instancedBossEntities = InstancedBossEntity.initializeInstancedBosses(contentPackagesConfigFields.getWorldName(), world, players.size(), dungeonInstance);
+            NPCEntity.initializeInstancedNPCs(contentPackagesConfigFields.getWorldName(), world, players.size(), dungeonInstance);
+            TreasureChest.initializeInstancedTreasureChests(contentPackagesConfigFields.getWorldName(), world);
         }
     }
 

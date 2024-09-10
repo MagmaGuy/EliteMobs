@@ -8,6 +8,7 @@ import com.magmaguy.easyminecraftgoals.NMSManager;
 import com.magmaguy.elitemobs.commands.CommandHandler;
 import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.config.commands.CommandsConfig;
+import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfig;
 import com.magmaguy.elitemobs.config.customarenas.CustomArenasConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
@@ -16,7 +17,6 @@ import com.magmaguy.elitemobs.config.customitems.CustomItemsConfig;
 import com.magmaguy.elitemobs.config.customquests.CustomQuestsConfig;
 import com.magmaguy.elitemobs.config.customspawns.CustomSpawnConfig;
 import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestsConfig;
-import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.config.menus.MenusConfig;
 import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfig;
@@ -55,7 +55,6 @@ import com.magmaguy.elitemobs.quests.QuestTracking;
 import com.magmaguy.elitemobs.thirdparty.bstats.CustomCharts;
 import com.magmaguy.elitemobs.thirdparty.custommodels.CustomModel;
 import com.magmaguy.elitemobs.thirdparty.custommodels.modelengine.ModelEngineReservedAddresses;
-import com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity;
 import com.magmaguy.elitemobs.thirdparty.placeholderapi.Placeholders;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
@@ -134,6 +133,8 @@ public class EliteMobs extends JavaPlugin {
         Bukkit.getLogger().info("\\____/\\_____/\\___/  \\_/ \\____/\\_|  |_/\\___/\\____/ \\____/");
         Bukkit.getLogger().info("By MagmaGuy - v. " + MetadataHandler.PLUGIN.getDescription().getVersion());
 
+        MagmaCore.onEnable();
+
         if (VersionChecker.serverVersionOlderThan(21, 0)) {
             Logger.warn("You are running a Minecraft version older than 1.21.0! EliteMobs 9.0 and later are only compatible with Minecraft 1.21.0 or later, if you are running an older Minecraft version you will need to use a pre-9.0 version of EliteMobs.");
             Bukkit.getPluginManager().disablePlugin(this);
@@ -162,8 +163,6 @@ public class EliteMobs extends JavaPlugin {
         New config loading
          */
         initializeConfigs();
-
-        if (Bukkit.getPluginManager().isPluginEnabled("LibsDisguises")) DisguiseEntity.initialize();
 
         //Initializes custom models
         CustomModel.initialize();
@@ -222,8 +221,6 @@ public class EliteMobs extends JavaPlugin {
         //Initialize custom charts
         new CustomCharts();
 
-        //Imports custom configurations and mindungeons from the import folder
-//        ConfigurationImporter.initializeConfigs();
         MagmaCore.initializeImporter();
         ConfigurationExporter.initializeConfigs();
 
@@ -233,7 +230,7 @@ public class EliteMobs extends JavaPlugin {
         LootTables.initialize();
 
         //Initialize em package content, such as world loading
-        new DungeonPackagerConfig();
+        new ContentPackagesConfig();
 
         //Initialize custom & regional bosses
         new CustomBossesConfig();
@@ -251,7 +248,7 @@ public class EliteMobs extends JavaPlugin {
             try {
                 if (emPackage.isInstalled()) emPackage.initializeContent();
             } catch (Exception exception) {
-                Logger.warn("Failed to load EliteMobs Package " + emPackage.getDungeonPackagerConfigFields().getFilename() + " !");
+                Logger.warn("Failed to load EliteMobs Package " + emPackage.getContentPackagesConfigFields().getFilename() + " !");
                 exception.printStackTrace();
             }
 
@@ -268,7 +265,6 @@ public class EliteMobs extends JavaPlugin {
         new CustomQuestsConfig();
 
         //Commands
-//        new CommandHandler();
         CommandHandler.registerCommands();
 
         new SpecialItemSystemsConfig();

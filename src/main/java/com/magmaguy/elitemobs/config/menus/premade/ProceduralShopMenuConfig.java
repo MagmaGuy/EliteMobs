@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.config.menus.premade;
 
-import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.menus.MenusConfigFields;
 import com.magmaguy.elitemobs.utils.ItemStackSerializer;
@@ -29,7 +28,7 @@ public class ProceduralShopMenuConfig extends MenusConfigFields {
                 "Reroll button",
                 ItemStackGenerator.generateSkullItemStack("magmaguy",
                         "&4&lEliteMobs &r&cby &4&lMagmaGuy",
-                        List.of("&8Support the plugins you enjoy!"), MetadataHandler.signatureID),
+                        List.of("&8Support the plugins you enjoy!")),
                 fileConfiguration);
         rerollItem = ItemStackSerializer.deserialize("Reroll button", fileConfiguration);
         rerollSlot = ConfigurationEngine.setInt(fileConfiguration, "Reroll button slot", 4);

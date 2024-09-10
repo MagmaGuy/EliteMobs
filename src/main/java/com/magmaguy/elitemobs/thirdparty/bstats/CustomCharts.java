@@ -16,7 +16,7 @@ public class CustomCharts {
             Map<String, Integer> valueMap = new HashMap<>();
             for (EMPackage emPackage : EMPackage.getEmPackages().values()) {
                 valueMap.put(
-                        ChatColor.stripColor(emPackage.getDungeonPackagerConfigFields().getFilename()),
+                        ChatColor.stripColor(emPackage.getContentPackagesConfigFields().getFilename()),
                         emPackage.isInstalled() ? 1 : 0);
             }
             return valueMap;

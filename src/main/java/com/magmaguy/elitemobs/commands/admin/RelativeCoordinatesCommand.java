@@ -21,7 +21,7 @@ public class RelativeCoordinatesCommand {
             return;
         }
 
-        Location anchorpoint = emPackage.getDungeonPackagerConfigFields().getAnchorPoint();
+        Location anchorpoint = emPackage.getContentPackagesConfigFields().getAnchorPoint();
 
         if (anchorpoint == null) {
             player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Something went wrong and made the anchor point not valid!"));
@@ -29,15 +29,15 @@ public class RelativeCoordinatesCommand {
         }
 
         Vector relativeVector = player.getLocation().clone().subtract(anchorpoint).toVector();
-        if (emPackage.getDungeonPackagerConfigFields().getCalculatedRotation() != 0)
-            GenericRotationMatrixMath.rotateVectorYAxis(emPackage.getDungeonPackagerConfigFields().getCalculatedRotation(), anchorpoint, relativeVector);
+        if (emPackage.getContentPackagesConfigFields().getCalculatedRotation() != 0)
+            GenericRotationMatrixMath.rotateVectorYAxis(emPackage.getContentPackagesConfigFields().getCalculatedRotation(), anchorpoint, relativeVector);
 
         String relativePosition = relativeVector.getBlockX() + ", "
                 + relativeVector.getBlockY() + ", "
                 + relativeVector.getBlockZ();
 
         player.sendMessage(ChatColorConverter.convert(
-                "[EliteMobs] Relative position to anchor point of " + emPackage.getDungeonPackagerConfigFields().getName() + ": " + relativePosition));
+                "[EliteMobs] Relative position to anchor point of " + emPackage.getContentPackagesConfigFields().getName() + ": " + relativePosition));
 
     }
 

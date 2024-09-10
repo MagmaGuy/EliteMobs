@@ -49,8 +49,10 @@ import java.util.*;
 
 public class CustomBossEntity extends EliteEntity implements Listener, PersistentObject, PersistentMovingEntity {
 
+    public static Set<CustomBossEntity> dynamicLevelBossEntities = new HashSet<>();
     @Getter
     protected static HashSet<CustomBossEntity> trackableCustomBosses = new HashSet<>();
+    private static BukkitTask dynamicLevelUpdater = null;
     private final List<BukkitTask> globalReinforcements = new ArrayList<>();
     @Getter
     protected CustomBossesConfigFields customBossesConfigFields;
@@ -100,7 +102,6 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
     @Getter
     @Setter
     private boolean dynamicLevel = false;
-    public static Set<CustomBossEntity> dynamicLevelBossEntities = new HashSet<>();
 
     /**
      * Uses a builder pattern in order to construct a CustomBossEntity at an arbitrary point in the future. Does not
@@ -134,6 +135,45 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
         if (customBossesConfigFields == null)
             return null;
         return new CustomBossEntity(customBossesConfigFields);
+    }
+
+    public static void addToUpdatingDynamicLevels(CustomBossEntity customBossEntity) {
+        if (!customBossEntity.dynamicLevel) return;
+        dynamicLevelBossEntities.add(customBossEntity);
+    }
+
+    public static void startUpdatingDynamicLevels() {
+        dynamicLevelUpdater = new BukkitRunnable() {
+            @Override
+            public void run() {
+                Iterator<CustomBossEntity> iterator = dynamicLevelBossEntities.iterator();
+                while (iterator.hasNext()) {
+                    CustomBossEntity customBossEntity = iterator.next();
+                    if (!customBossEntity.isValid()) {
+                        iterator.remove(); // Remove from the list instead of canceling
+                        continue; // Skip to the next iteration
+                    }
+                    int currentLevel = customBossEntity.getLevel();
+                    customBossEntity.getDynamicLevel(customBossEntity.getLocation());
+                    int newLevel = customBossEntity.getLevel();
+
+                    if (currentLevel == newLevel) {
+                        continue; // Skip to the next iteration if the level hasn't changed
+                    }
+
+                    // In theory, the damage should update automatically; the only thing that needs updating should be the health
+                    customBossEntity.setMaxHealth();
+                    customBossEntity.setNormalizedHealth();
+                    CustomBossMegaConsumer.setName(customBossEntity.getLivingEntity(), customBossEntity, customBossEntity.level);
+                }
+            }
+        }.runTaskTimer(MetadataHandler.PLUGIN, 20 * 5L, 20 * 5L);
+    }
+
+    public static void shutdown() {
+        if (dynamicLevelUpdater != null)
+            dynamicLevelUpdater.cancel();
+        dynamicLevelBossEntities.clear();
     }
 
     @Override
@@ -361,45 +401,6 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
                 player.sendMessage(ChatColorConverter.convert(customBossesConfigFields.getSpawnMessage()));
         if (customBossesConfigFields.getAnnouncementPriority() < 3) return;
         new DiscordSRVAnnouncement(ChatColorConverter.convert(customBossesConfigFields.getSpawnMessage()));
-    }
-    private static BukkitTask dynamicLevelUpdater = null;
-
-    public static void addToUpdatingDynamicLevels(CustomBossEntity customBossEntity){
-        if (!customBossEntity.dynamicLevel) return;
-        dynamicLevelBossEntities.add(customBossEntity);
-    }
-
-    public static void startUpdatingDynamicLevels(){
-        dynamicLevelUpdater = new BukkitRunnable() {
-            @Override
-            public void run() {
-                Iterator<CustomBossEntity> iterator = dynamicLevelBossEntities.iterator();
-                while (iterator.hasNext()) {
-                    CustomBossEntity customBossEntity = iterator.next();
-                    if (!customBossEntity.isValid()) {
-                        iterator.remove(); // Remove from the list instead of canceling
-                        continue; // Skip to the next iteration
-                    }
-                    int currentLevel = customBossEntity.getLevel();
-                    customBossEntity.getDynamicLevel(customBossEntity.getLocation());
-                    int newLevel = customBossEntity.getLevel();
-
-                    if (currentLevel == newLevel) {
-                        continue; // Skip to the next iteration if the level hasn't changed
-                    }
-
-                    // In theory, the damage should update automatically; the only thing that needs updating should be the health
-                    customBossEntity.setMaxHealth();
-                    customBossEntity.setNormalizedHealth();
-                    CustomBossMegaConsumer.setName(customBossEntity.getLivingEntity(), customBossEntity, customBossEntity.level);
-                }
-            }
-        }.runTaskTimer(MetadataHandler.PLUGIN, 20 * 5L, 20 * 5L);
-    }
-
-    public static void shutdown(){
-        dynamicLevelUpdater.cancel();
-        dynamicLevelBossEntities.clear();
     }
 
     public void getDynamicLevel(Location bossLocation) {
@@ -629,7 +630,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
         }
 
         @EventHandler
-        public void onEliteSpawnEvent(EliteMobSpawnEvent event){
+        public void onEliteSpawnEvent(EliteMobSpawnEvent event) {
             if (event.getEliteMobEntity() instanceof CustomBossEntity customBossEntity)
                 addToUpdatingDynamicLevels(customBossEntity);
         }

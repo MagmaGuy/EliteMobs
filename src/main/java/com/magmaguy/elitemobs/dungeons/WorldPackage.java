@@ -1,8 +1,10 @@
 package com.magmaguy.elitemobs.dungeons;
 
-import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
+import com.magmaguy.elitemobs.api.DungeonUninstallEvent;
+import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
 import com.magmaguy.elitemobs.dungeons.utility.DungeonUtils;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomMusic;
+import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.elitemobs.wormhole.Wormhole;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.Logger;
@@ -20,76 +22,76 @@ public class WorldPackage extends EMPackage {
     @Getter
     protected World world;
 
-    public WorldPackage(DungeonPackagerConfigFields dungeonPackagerConfigFields) {
-        super(dungeonPackagerConfigFields);
+    public WorldPackage(ContentPackagesConfigFields contentPackagesConfigFields) {
+        super(contentPackagesConfigFields);
+    }
+
+    @Override
+    public void doInstall(Player player) {
+        DungeonUtils.loadWorld(this);
+        contentPackagesConfigFields.installWorld();
+        player.teleport(contentPackagesConfigFields.getTeleportLocation());
+        world = contentPackagesConfigFields.getTeleportLocation().getWorld();
+        if (contentPackagesConfigFields.getSong() != null)
+            new CustomMusic(contentPackagesConfigFields.getSong(), contentPackagesConfigFields, world);
+        for (Wormhole wormhole : Wormhole.getWormholes())
+            wormhole.onDungeonInstall(contentPackagesConfigFields.getFilename());
+        player.sendMessage(ChatColorConverter.convert("[EliteMobs] Successfully installed " + contentPackagesConfigFields.getName() + "! To uninstall, do /em setup again and click on this content again."));
+    }
+
+    @Override
+    public void doUninstall(Player player) {
+        DungeonUninstallEvent event = new DungeonUninstallEvent(contentPackagesConfigFields);
+        new EventCaller(event);
+        isInstalled = false;
+        if (!DungeonUtils.unloadWorld(this)) {
+            isInstalled = true;
+            return;
+        }
+        for (Wormhole wormhole : Wormhole.getWormholes())
+            wormhole.onDungeonUninstall(contentPackagesConfigFields.getFilename());
+        contentPackagesConfigFields.uninstallWorld();
+        world = null;
     }
 
     @Override
     public void baseInitialization() {
-        super.baseInitialization();
-        if (dungeonPackagerConfigFields.getWorldName() == null || dungeonPackagerConfigFields.getWorldName().isEmpty()) {
+        if (contentPackagesConfigFields.getWorldName() == null || contentPackagesConfigFields.getWorldName().isEmpty()) {
             this.isDownloaded = this.isInstalled = false;
-            Logger.warn("Packaged content " + dungeonPackagerConfigFields.getFilename() + " does not have a valid world name in the dungeon packager!");
+            Logger.warn("Packaged content " + contentPackagesConfigFields.getFilename() + " does not have a valid world name in the dungeon packager!");
             return;
         }
 
-        content.put(dungeonPackagerConfigFields.getWorldName(), this);
-        if (dungeonPackagerConfigFields.getWormholeWorldName() != null &&
-                !dungeonPackagerConfigFields.getWormholeWorldName().isEmpty())
-            content.put(dungeonPackagerConfigFields.getWormholeWorldName(), this);
+        content.put(contentPackagesConfigFields.getWorldName(), this);
+        if (contentPackagesConfigFields.getWormholeWorldName() != null &&
+                !contentPackagesConfigFields.getWormholeWorldName().isEmpty())
+            content.put(contentPackagesConfigFields.getWormholeWorldName(), this);
 
         //Check if the world's been loaded
-        if (Bukkit.getWorld(dungeonPackagerConfigFields.getWorldName()) != null) {
+        if (Bukkit.getWorld(contentPackagesConfigFields.getWorldName()) != null) {
             this.isDownloaded = this.isInstalled = true;
-            world = Bukkit.getWorld(dungeonPackagerConfigFields.getWorldName());
-            EliteMobsWorld.create(world.getUID(), dungeonPackagerConfigFields);
-            dungeonPackagerConfigFields.initializeWorld();
+            world = Bukkit.getWorld(contentPackagesConfigFields.getWorldName());
+            EliteMobsWorld.create(world.getUID(), contentPackagesConfigFields);
+            contentPackagesConfigFields.initializeWorld();
             return;
         }
 
         //Since the world isn't loaded, check if it should be
-        this.isInstalled = dungeonPackagerConfigFields.isEnabled();
+        this.isInstalled = contentPackagesConfigFields.isEnabled();
 
         //Check if the world's been downloaded
-        isDownloaded = Files.exists(Paths.get(Bukkit.getWorldContainer() + File.separator + dungeonPackagerConfigFields.getWorldName()));
+        isDownloaded = Files.exists(Paths.get(Bukkit.getWorldContainer() + File.separator + contentPackagesConfigFields.getWorldName()));
 
         if (isDownloaded && isInstalled) {
             world = DungeonUtils.loadWorld(this);
-            if (dungeonPackagerConfigFields.getSong() != null)
-                new CustomMusic(dungeonPackagerConfigFields.getSong(), dungeonPackagerConfigFields, world);
-            dungeonPackagerConfigFields.initializeWorld();
+            if (contentPackagesConfigFields.getSong() != null)
+                new CustomMusic(contentPackagesConfigFields.getSong(), contentPackagesConfigFields, world);
+            contentPackagesConfigFields.initializeWorld();
         } else isInstalled = false;
     }
 
-
     @Override
-    public boolean install(Player player) {
-        if (!super.install(player)) return false;
-        DungeonUtils.loadWorld(this);
-        dungeonPackagerConfigFields.installWorld();
-        player.teleport(dungeonPackagerConfigFields.getTeleportLocation());
-        world = dungeonPackagerConfigFields.getTeleportLocation().getWorld();
-        if (dungeonPackagerConfigFields.getSong() != null)
-            new CustomMusic(dungeonPackagerConfigFields.getSong(), dungeonPackagerConfigFields, world);
-//        WorldGuardCompatibility.protectWorldMinidugeonArea(dungeonPackagerConfigFields.getTeleportLocation());
-        for (Wormhole wormhole : Wormhole.getWormholes())
-            wormhole.onDungeonInstall(dungeonPackagerConfigFields.getFilename());
-        player.sendMessage(ChatColorConverter.convert("[EliteMobs] Successfully installed " + dungeonPackagerConfigFields.getName() + "! To uninstall, do /em setup again and click on this content again."));
-        return true;
-    }
-
-    @Override
-    public boolean uninstall(Player player) {
-        if (!super.uninstall(player)) return false;
-        if (!DungeonUtils.unloadWorld(this)) {
-            isInstalled = true;
-            return false;
-        }
-        for (Wormhole wormhole : Wormhole.getWormholes())
-            wormhole.onDungeonUninstall(dungeonPackagerConfigFields.getFilename());
-        dungeonPackagerConfigFields.uninstallWorld();
-        world = null;
-        return true;
+    public void initializeContent() {
     }
 
 }

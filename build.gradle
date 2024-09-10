@@ -27,7 +27,7 @@ processResources {
 }
 
 group 'com.magmaguy'
-version '9.1.8'
+version '9.1.9'
 
 repositories {
     maven {
@@ -131,7 +131,10 @@ String packagePath = 'com.magmaguy.shaded'
 // Relocating a Package
 shadowJar {
     dependencies {
+        // Relocate bStats
         relocate('org.bstats', packagePath + '.bstats')
+        // Relocate MagmaCore
+        relocate('com.magmaguy.magmacore', 'com.magmaguy.elitemobs.magmacore')
     }
     archiveClassifier.set(null)
     archiveFileName.set(project.name + ".jar")
@@ -142,7 +145,7 @@ publishing {
     repositories {
         maven {
             name = "EliteMobs"
-            url = "http://magmaguy.com:50001/releases"
+            url = "https://repo.magmaguy.com/releases"
             credentials {
                 username = project.hasProperty('ossrhUsername') ? ossrhUsername : "Unknown user"
                 password = project.hasProperty('ossrhPassword') ? ossrhPassword : "Unknown password"

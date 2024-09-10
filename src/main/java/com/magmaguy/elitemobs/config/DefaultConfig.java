@@ -86,9 +86,14 @@ public class DefaultConfig extends ConfigurationFile {
 
     public static void toggleSetupDone() {
         setupDone = !setupDone;
-        instance.fileConfiguration.set("setupDoneV3", setupDone);
-        save();
+        ConfigurationEngine.writeValue(setupDone, instance.file, instance.getFileConfiguration(), "setupDoneV4");
     }
+
+    public static void toggleSetupDone(boolean value) {
+        setupDone = value;
+        ConfigurationEngine.writeValue(setupDone, instance.file, instance.getFileConfiguration(), "setupDoneV4");
+    }
+
 
     public static void save() {
         ConfigurationEngine.fileSaverOnlyDefaults(instance.fileConfiguration, instance.file);
@@ -144,7 +149,7 @@ public class DefaultConfig extends ConfigurationFile {
                 fileConfiguration, "otherCommandsLeadToEMStatusMenu", true);
         setupDone = ConfigurationEngine.setBoolean(
                 List.of("Sets if the setup is complete.", "Do not set this value manually, it is meant to be modified through in-game commands."),
-                fileConfiguration, "setupDoneV3", false);
+                fileConfiguration, "setupDoneV4", false);
         preventVanillaReinforcementsForEliteEntities = ConfigurationEngine.setBoolean(
                 List.of("Sets if elites will prevent spawning vanilla reinforcements, such as for the Zombie reinforcement feature."),
                 fileConfiguration, "preventVanillaReinforcementsForEliteEntities", true);

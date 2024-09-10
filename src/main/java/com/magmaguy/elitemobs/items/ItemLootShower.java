@@ -208,6 +208,7 @@ public class ItemLootShower implements Listener {
             model = EconomySettingsConfig.getThisConfiguration().getInt("lootShowerData." + (int) value);
         } catch (Exception ex) {
             Logger.warn("Failed to get coin model for value " + value + " !");
+            ex.printStackTrace();
         }
         setCoinModel(currencyItemStack, model);
         Item currencyItem = location.getWorld().dropItem(location.clone().add(new Vector(0, 1, 0)), currencyItemStack);
