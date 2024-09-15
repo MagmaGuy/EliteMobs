@@ -12,6 +12,7 @@ import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -20,6 +21,10 @@ import org.bukkit.scheduler.BukkitTask;
 import java.util.HashMap;
 
 public class Navigation implements Listener {
+
+    public static void stopMoving(LivingEntity livingEntity){
+        NMSManager.getAdapter().doNotMove(livingEntity);
+    }
 
     private static final HashMap<CustomBossEntity, BukkitTask> currentlyNavigating = new HashMap();
 

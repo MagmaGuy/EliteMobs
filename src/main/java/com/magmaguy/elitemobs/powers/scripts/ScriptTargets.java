@@ -84,7 +84,7 @@ public class ScriptTargets {
         //if (actionType.isRequiresLivingEntity()) return;
         boolean animatedScriptZone = false;
         if (eliteScript.getScriptZone().isValid()) {
-            scriptActionData.setShapesChachedByTarget(eliteScript.getScriptZone().generateShapes(scriptActionData, true));
+            scriptActionData.setShapesCachedByTarget(eliteScript.getScriptZone().generateShapes(scriptActionData, true));
             if (eliteScript.getScriptZone().getZoneBlueprint().getAnimationDuration() > 0) animatedScriptZone = true;
             anonymousTargets = null;
         }

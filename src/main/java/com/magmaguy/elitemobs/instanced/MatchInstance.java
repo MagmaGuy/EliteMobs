@@ -187,10 +187,13 @@ public abstract class MatchInstance {
     }
 
     private void instanceMessages() {
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(MetadataHandler.PLUGIN, () -> {
-            if (state == InstancedRegionState.WAITING)
-                announce(ArenasConfig.getArenaStartHintMessage().replace("$count", minPlayers + ""));
-        }, 0L, 20 * 60L);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (state == InstancedRegionState.WAITING)
+                    announce(ArenasConfig.getArenaStartHintMessage().replace("$count", minPlayers + ""));
+            }
+        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 20*60L);
     }
 
     protected void announce(String message) {

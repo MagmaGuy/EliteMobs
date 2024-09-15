@@ -140,7 +140,10 @@ public class VersionChecker {
                             if (remoteVersion > emPackage.getContentPackagesConfigFields().getDungeonVersion()) {
                                 emPackage.setOutOfDate(true);
                                 outdatedPackages.add(emPackage);
-                                Logger.warn("Content " + emPackage.getContentPackagesConfigFields().getName() + " is outdated! You should go download the updated version! Link: " + emPackage.getContentPackagesConfigFields().getDownloadLink());
+                                Logger.warn("Content " + emPackage.getContentPackagesConfigFields().getName() +
+                                        " is outdated! You should go download the updated version! Your version: " +
+                                        emPackage.getContentPackagesConfigFields().getDungeonVersion() + " / remote version: " +
+                                        remoteVersion + " / Link: " + emPackage.getContentPackagesConfigFields().getDownloadLink());
                             }
                             checked = true;
                             break;
@@ -175,7 +178,6 @@ public class VersionChecker {
     public static void check() {
         checkPluginVersion();
         checkContentVersion();
-//        checkDungeonVersions();
     }
 
     public static class VersionCheckerEvents implements Listener {

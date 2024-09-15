@@ -59,7 +59,6 @@ import com.magmaguy.elitemobs.thirdparty.placeholderapi.Placeholders;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
 import com.magmaguy.elitemobs.utils.BossBarUtil;
-import com.magmaguy.elitemobs.utils.ServerTime;
 import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import com.magmaguy.elitemobs.wormhole.Wormhole;
 import com.magmaguy.magmacore.MagmaCore;
@@ -140,8 +139,6 @@ public class EliteMobs extends JavaPlugin {
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
-
-        ServerTime.startTickCounter();
 
         NMSManager.initializeAdapter(this);
 
