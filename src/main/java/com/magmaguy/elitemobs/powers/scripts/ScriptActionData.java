@@ -49,7 +49,7 @@ public class ScriptActionData {
     //This allows shapes to be cached in a way that is isolated to each script without contaminating scripts
     @Getter
     @Setter
-    private List<Shape> shapesChachedByTarget;
+    private List<Shape> shapesCachedByTarget;
 
 
     public ScriptActionData(EliteEntity eliteEntity, LivingEntity directTarget, ScriptTargets scriptTargets, Event event) {

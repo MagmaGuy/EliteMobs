@@ -38,12 +38,15 @@ public class RotatingRay extends Ray {
             Vector perpendicularVector = raySegment.clone().rotateAroundY(Math.toRadians(90));
             raySegment.rotateAroundAxis(perpendicularVector, Math.toRadians(pitchPreRotation));
         }
-        locations = drawLine();
+        locations = drawLine(originalCenterLocation, target2);
         distanceSquared = target.distanceSquared(target2);
         if (animationDuration > 0) startRotating(animationDuration, pitchRotation, yawRotation);
     }
 
-    protected List<Location> drawLine() {
+    @Override
+    protected List<Location> drawLine(Location location1, Location location2) {
+        currentSource = location1;
+        currentTarget = location2;
         List<Location> locations = new ArrayList<>();
         Location currentLocation = originalCenterLocation.clone();
         locations.add(originalCenterLocation);
@@ -79,7 +82,7 @@ public class RotatingRay extends Ray {
                     raySegment.rotateAroundAxis(perpendicularVector, Math.toRadians(singleTickPitchRotation));
                 if (singleTickYawRotation > 0)
                     raySegment.rotateAroundY(Math.toRadians(singleTickYawRotation));
-                locations = drawLine();
+                locations = drawLine(centerLocation,target2);
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 1L, 1L);
     }

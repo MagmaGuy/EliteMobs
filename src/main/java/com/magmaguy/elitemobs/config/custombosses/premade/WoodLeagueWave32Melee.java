@@ -6,7 +6,6 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class WoodLeagueWave32Melee extends CustomBossesConfigFields {
