@@ -10,7 +10,7 @@ import org.bukkit.event.entity.EntitySpawnEvent;
 public class LightningSpawnBypass implements Listener {
     private static boolean bypass = false;
 
-    public static void strikeLightingIgnoreProtections(Location location) {
+    public static void strikeLightningIgnoreProtections(Location location) {
         if (location == null || location.getWorld() == null) return;
         bypass = true;
         location.getWorld().strikeLightningEffect(location);
