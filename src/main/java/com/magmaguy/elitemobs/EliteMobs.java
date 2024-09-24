@@ -77,7 +77,7 @@ import java.util.List;
 
 public class EliteMobs extends JavaPlugin {
 
-    public static List<World> validWorldList = new ArrayList();
+    public static List<World> validWorldList = new ArrayList<>();
     public static boolean worldGuardIsEnabled = false;
     public static Metrics metrics;
     public Object placeholders = null;

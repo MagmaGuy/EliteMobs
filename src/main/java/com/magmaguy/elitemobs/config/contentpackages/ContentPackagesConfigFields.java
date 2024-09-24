@@ -299,7 +299,6 @@ public class ContentPackagesConfigFields extends CustomConfigFields {
         this.customInfo = translatable(filename, "customInfo", processStringList("customInfo", customInfo, null, true));
         this.relativeBossLocations = processStringList("relativeBossLocations", relativeBossLocations, null, false);
         this.relativeTreasureChestLocations = processStringList("relativeTreasureChestLocations", relativeTreasureChestLocations, null, false);
-        this.downloadLink = processString("downloadLinkV2", downloadLink, null, false);
         this.dungeonSizeCategory = processEnum("dungeonSizeCategory", dungeonSizeCategory, null, DungeonSizeCategory.class, false);
         if (dungeonSizeCategory == null) {
             Logger.warn("File " + filename + " does not have a valid dungeonSizeCategory!");
