@@ -1,9 +1,11 @@
 package com.magmaguy.elitemobs.commands.setup;
 
 import com.magmaguy.elitemobs.dungeons.*;
+import com.magmaguy.magmacore.menus.MenuButton;
 import com.magmaguy.magmacore.menus.SetupMenu;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
+import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -27,14 +29,29 @@ public class EliteSetupMenu {
                 .filter(MetaPackage.class::isInstance)
                 .forEach(rawEmPackage -> ((MetaPackage) rawEmPackage).getPackages().forEach(emPackages::remove));
 
-        new SetupMenu(player, ChatColorConverter.convert(List.of(
-                "&2To setup the optional/recommended content for EliteMobs:",
-                "&61) &fDownload content from &9magmaguy.itch.io &for &9patreon.com/magmaguy",
-                "&62) &fPut the content in the &2imports &ffolder of EliteMobs",
-                "&63) &fDo &2/em reload",
-                "&2That's it!",
-                "Click to get more info!")),
-                emPackages,
+        MenuButton infoButton = new MenuButton(ItemStackGenerator.generateSkullItemStack("magmaguy",
+                "&2Installation instructions:",
+                List.of(
+                        "&2To setup the optional/recommended content for EliteMobs:",
+                        "&61) &fDownload content from &9https://nightbreak.io/plugin/elitemobs",
+                        "&62) &fPut the content in the &2imports &ffolder of EliteMobs",
+                        "&63) &fDo &2/em reload",
+                        "&2That's it!",
+                        "&6Click for more info and links!"))) {
+            @Override
+            public void onClick(Player p) {
+                p.closeInventory();
+                Logger.sendSimpleMessage(p, "&8&l&m&o---------------------------------------------");
+                Logger.sendSimpleMessage(p, "&6&lEliteMobs installation resources:");
+                Logger.sendSimpleMessage(p, "&2&lWiki page: &9&nhttps://magmaguy.com/wiki.html");
+                Logger.sendSimpleMessage(p, "&2&lVideo setup guide: &9&nhttps://youtu.be/boRg2X4qhw4");
+                Logger.sendSimpleMessage(p, "&2&lContent download links: &9&nhttps://nightbreak.io/plugin/elitemobs/");
+                Logger.sendSimpleMessage(p, "&2&lDiscord support: &9&nhttps://discord.gg/9f5QSka");
+                Logger.sendSimpleMessage(p, "&8&l&m&o---------------------------------------------");
+            }
+        };
+
+        new SetupMenu(player, infoButton, emPackages,
                 List.of(createFilter(emPackages, Material.GRASS_BLOCK, "Filter By Open Dungeons", EliteSetupMenu::filterOpenDungeon),
                         createFilter(emPackages, Material.CRYING_OBSIDIAN, "Filter By Instanced Dungeons", EliteSetupMenu::filterInstancedDungeon),
                         createFilter(emPackages, Material.SKULL_BANNER_PATTERN, "Filter By Events", EliteSetupMenu::filterEvents),

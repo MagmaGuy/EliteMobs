@@ -27,7 +27,7 @@ processResources {
 }
 
 group 'com.magmaguy'
-version '9.1.10'
+version '9.1.11'
 
 repositories {
     maven {
@@ -114,7 +114,7 @@ dependencies {
     implementation group: 'commons-io', name: 'commons-io', version: '2.7'
     implementation group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
     implementation group: 'com.magmaguy', name: 'EasyMinecraftGoals-dist', version: '1.13.4'
-    implementation group: 'com.magmaguy', name: 'MagmaCore', version: '1.0-SNAPSHOT'
+    implementation group: 'com.magmaguy', name: 'MagmaCore', version: '1.4'
 
 }
 
@@ -151,7 +151,6 @@ publishing {
                 username = project.hasProperty('ossrhUsername') ? ossrhUsername : "Unknown user"
                 password = project.hasProperty('ossrhPassword') ? ossrhPassword : "Unknown password"
             }
-            allowInsecureProtocol = true
         }
     }
 
