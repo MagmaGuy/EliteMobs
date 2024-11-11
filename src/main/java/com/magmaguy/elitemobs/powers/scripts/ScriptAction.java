@@ -238,6 +238,7 @@ public class ScriptAction {
             case SUMMON_ENTITY -> runSummonEntity(scriptActionData);
             case NAVIGATE -> runNavigate(scriptActionData);
             case SCALE -> runScale(scriptActionData);
+            case SET_FACING -> setFacing(scriptActionData);
             default -> Logger.warn("Unknown action type '"
                     + blueprint.getActionType() + "' in script '"
                     + blueprint.getScriptName() + "' for file '" + blueprint.getScriptFilename() + "'");
@@ -1046,6 +1047,23 @@ public class ScriptAction {
                     Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> attribute.setBaseValue(1.0), duration);
                 }
             }
+        });
+    }
+
+    private void setFacing(ScriptActionData scriptActionData) {
+        Vector direction = blueprint.getScriptRelativeVectorBlueprint() != null
+                ? new ScriptRelativeVector(blueprint.getScriptRelativeVectorBlueprint(), eliteScript, scriptActionData.getEliteEntity().getLocation()).getVector(scriptActionData)
+                : blueprint.getVValue();
+
+        if (direction == null) {
+            Logger.warn("Tried to set direction in "+ getBlueprint().getScriptFilename() + " but no configuration for vvalue or relative vector are set in " + blueprint.getScriptName() +" !");
+            return;
+        }
+
+        getTargets(scriptActionData).forEach(target -> {
+            Location location = target.getLocation();
+            location.setDirection(direction);
+            target.teleport(location);
         });
     }
 }
