@@ -16,7 +16,7 @@ public class VampireManorDungeon extends ContentPackagesConfigFields {
                 "em_the_vampire_manor",
                 World.Environment.NETHER,
                 true,
-                "em_the_vampire_manor,0,64,0,0,0",//todo needs final coords
+                "em_the_vampire_manor,281.5,31.0,1587.5,-180,0",
                 0,
                 "Difficulty: &cHard\n" +
                         "$bossCount level $lowestTier Big Boss!\n" +
