@@ -390,11 +390,8 @@ public class ScriptZone {
                 if (eliteEntity.getLivingEntity() == null || !eliteEntity.getLivingEntity().isValid()) {
                     // Cancel task if the elite entity is no longer valid
                     cancel();
-                    Logger.debug("boss " + eliteEntity.getName() + " is no longer valid, cancelling zone listener task.");
                     return;
                 }
-
-//                Logger.debug("checking zone for boss " + eliteEntity.getName());
 
                 // Retrieve current entities in the zone
                 Collection<LivingEntity> newEntities = getEntitiesInArea(generateShapes(scriptActionData, false), TargetType.ZONE_FULL);
@@ -403,7 +400,6 @@ public class ScriptZone {
                 for (LivingEntity livingEntity : newEntities) {
                     if (!entitiesInZone.contains(livingEntity)) {
                         zoneEnterEvent(eliteEntity, livingEntity);
-                        Logger.debug("triggering zone enter event for " + eliteEntity.getName());
                     }
                 }
 

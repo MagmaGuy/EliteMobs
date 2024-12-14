@@ -7,12 +7,12 @@ import com.magmaguy.elitemobs.instanced.dungeons.DungeonInstance;
 import com.magmaguy.elitemobs.mobconstructor.PersistentMovingEntity;
 import com.magmaguy.elitemobs.mobconstructor.PersistentObject;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
+import com.magmaguy.elitemobs.utils.AttributeManager;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,7 +67,7 @@ public class InstancedBossEntity extends RegionalBossEntity implements Persisten
         super.maxHealth = normalizedDungeonMaxHealth;
         super.health = maxHealth;
         if (livingEntity != null) {
-            livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(maxHealth);
+            AttributeManager.setAttribute(livingEntity, "generic_max_health", maxHealth);
             livingEntity.setHealth(maxHealth);
         }
     }
@@ -84,7 +84,7 @@ public class InstancedBossEntity extends RegionalBossEntity implements Persisten
         }
         //This is useful for phase boss entities that spawn in unloaded chunks and shouldn't full heal between phases, like in dungeons
         else if (livingEntity != null)
-            livingEntity.setHealth(Math.min(health, livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()));
+            livingEntity.setHealth(Math.min(health, AttributeManager.getAttributeBaseValue(livingEntity, "generic_max_health")));
     }
 
     @Override

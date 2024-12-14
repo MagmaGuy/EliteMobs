@@ -24,7 +24,7 @@ public class EventsPackage extends EMPackage {
             if (CustomEventsConfig.getCustomEvent(customEventName) != null)
                 customEvents.add(CustomEventsConfig.getCustomEvent(customEventName));
             else {
-                Logger.warn("could not find file " + customEventName);
+//                Logger.warn("Could not find file " + customEventName); todo: might want to reenable this with an alternative for finding out if something was installed
                 allFilesDownloaded = false;
             }
         }

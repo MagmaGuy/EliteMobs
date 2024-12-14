@@ -268,7 +268,7 @@ public class ItemEnchantmentMenu extends EliteMenu {
         }
 
         private void failure(InventoryClickEvent event) {
-            event.getWhoClicked().sendMessage(ChatColorConverter.convert("&8[EliteMobs] &cFailed enchantment! The enchantment did not bind to the item."));
+            event.getWhoClicked().sendMessage(ChatColorConverter.convert(DefaultConfig.getEnchantmentChallengeFailureMessage()));
             moveItemDown(event.getView().getTopInventory(), ITEM_SLOT, event.getWhoClicked());
         }
 
@@ -284,16 +284,16 @@ public class ItemEnchantmentMenu extends EliteMenu {
             if (currentItem.getAmount() > 0)
                 if (moveItemDown(event.getView().getTopInventory(), ITEM_SLOT, event.getWhoClicked(), false)) {
                     event.getWhoClicked().sendMessage(ChatColorConverter.convert(
-                            "&8[EliteMobs] &cYour inventory was full so the item you were trying to upgrade has been deleted! It will be restored if your item is not full by the time you leave the instanced dungeon."));
+                            DefaultConfig.getEnchantmentChallengeInventoryFullMessage()));
                 }
 
-            event.getWhoClicked().sendMessage(ChatColorConverter.convert("&8[EliteMobs] &6Challenge! Defeat the boss to get your upgraded item!"));
-            event.getWhoClicked().sendMessage(ChatColorConverter.convert("&cThere's a 10% chance of losing your item if you lose the fight! Leaving the arena counts as losing."));
+            event.getWhoClicked().sendMessage(ChatColorConverter.convert(DefaultConfig.getEnchantmentChallengeStartMessage()));
+            event.getWhoClicked().sendMessage(ChatColorConverter.convert(DefaultConfig.getEnchantmentChallengeConsequencesMessage()));
             broadcastEnchantmentMessage(currentItem, (Player) event.getWhoClicked(), SpecialItemSystemsConfig.getChallengeAnnouncement());
         }
 
         private void criticalFailure(InventoryClickEvent event) {
-            event.getWhoClicked().sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Critical failure! You lost the item!"));
+            event.getWhoClicked().sendMessage(ChatColorConverter.convert(DefaultConfig.getEnchantmentChallengeCriticalFailureMessage()));
             broadcastEnchantmentMessage(event.getView().getTopInventory().getItem(ITEM_SLOT), (Player) event.getWhoClicked(), SpecialItemSystemsConfig.getCriticalFailureAnnouncement());
         }
 
@@ -304,7 +304,7 @@ public class ItemEnchantmentMenu extends EliteMenu {
             HashMap<Integer, ItemStack> leftovers = player.getInventory().addItem(upgradedItem);
             if (!leftovers.isEmpty())
                 event.getWhoClicked().getWorld().dropItem(event.getWhoClicked().getLocation(), upgradedItem);
-            event.getWhoClicked().sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2Successful enchantment!"));
+            event.getWhoClicked().sendMessage(ChatColorConverter.convert(DefaultConfig.getEnchantmentChallengeSuccessMessage()));
             broadcastEnchantmentMessage(upgradedItem, (Player) event.getWhoClicked(), SpecialItemSystemsConfig.getSuccessAnnouncement());
         }
 

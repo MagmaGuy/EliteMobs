@@ -1,8 +1,10 @@
 package com.magmaguy.elitemobs.menus;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.CustomModelsConfig;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.menus.premade.BuyOrSellMenuConfig;
+import com.magmaguy.elitemobs.utils.CustomModelAdder;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -36,6 +38,7 @@ public class BuyOrSellMenu {
             ItemMeta itemMeta = info.getItemMeta();
             itemMeta.setCustomModelData(MetadataHandler.signatureID);
             info.setItemMeta(itemMeta);
+            CustomModelAdder.addCustomModel(info, CustomModelsConfig.goldenQuestionMark);
         }
 
         shopInventory.setItem(BuyOrSellMenuConfig.INFORMATION_SLOT, info);

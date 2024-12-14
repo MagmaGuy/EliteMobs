@@ -4,11 +4,11 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.utils.AttributeManager;
 import com.magmaguy.elitemobs.utils.CommandRunner;
 import com.magmaguy.elitemobs.utils.EntitySearch;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import org.bukkit.Bukkit;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -42,7 +42,7 @@ public class EliteMobEnterCombatEvent extends Event {
                     return;
                 }
                 if (!eliteEntity.isInCombatGracePeriod()) {
-                    double followRange = eliteEntity.getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE).getValue();
+                    double followRange = AttributeManager.getAttributeBaseValue(eliteEntity.getLivingEntity(), "generic_follow_range");
                     if (eliteEntity.getLivingEntity().getType().equals(EntityType.ENDER_DRAGON))
                         followRange = 200;
                     if (EntitySearch.getNearbyCombatPlayers(eliteEntity.getLocation(), followRange).isEmpty()) {

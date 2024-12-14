@@ -3,9 +3,9 @@ package com.magmaguy.elitemobs.collateralminecraftchanges;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.utils.AttributeManager;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -47,7 +47,7 @@ public class KeepNeutralsAngry {
                     if (!player.getGameMode().equals(GameMode.SPECTATOR) && !player.getGameMode().equals(GameMode.CREATIVE) &&
                             Objects.equals(player.getLocation().getWorld(), eliteEntity.getLocation().getWorld()) &&
                             player.getLocation().distanceSquared(eliteEntity.getLocation()) <
-                                    Math.pow(Objects.requireNonNull(eliteEntity.getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE)).getValue(), 2)) {
+                                    Math.pow(AttributeManager.getAttributeBaseValue(eliteEntity.getLivingEntity(), "generic_follow_range"), 2)) {
                         ((Mob) eliteEntity.getLivingEntity()).setTarget(player);
                         return;
                     }

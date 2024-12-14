@@ -13,6 +13,6 @@ public class MagmaguysToothpickConfig extends CustomItemsConfigFields {
                 "&4Magmaguy&c's &2Toothpick",
                 List.of("&aIn nearly mint condition!"));
         setEnchantments(List.of("VANISHING_CURSE,1"));
-        setCustomModelID(1);
+        setCustomModelID("elitemobs:equipment/magmaguys_toothpick");
     }
 }

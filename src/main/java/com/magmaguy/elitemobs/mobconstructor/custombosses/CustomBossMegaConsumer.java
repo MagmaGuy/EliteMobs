@@ -10,11 +10,11 @@ import com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser;
+import com.magmaguy.elitemobs.utils.AttributeManager;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -130,7 +130,7 @@ public class CustomBossMegaConsumer {
 
     private void setFrozen(LivingEntity livingEntity) {
         if (!customBossesConfigFields.isFrozen()) return;
-        livingEntity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0);
+        AttributeManager.setAttribute(livingEntity, "generic_movement_speed", 0);
         livingEntity.setCollidable(false);
     }
 
@@ -165,8 +165,8 @@ public class CustomBossMegaConsumer {
         setMovementSpeed(livingEntity);
         setFrozen(livingEntity);
         setScale(livingEntity);
-        customBossEntity.setMovementSpeedAttribute(livingEntity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue());
-        customBossEntity.setFollowDistance(livingEntity.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).getBaseValue());
+        customBossEntity.setMovementSpeedAttribute(AttributeManager.getAttributeBaseValue(livingEntity, "generic_movement_speed"));
+        customBossEntity.setFollowDistance(AttributeManager.getAttributeBaseValue(livingEntity, "generic_follow_range"));
 
         if (livingEntity.getType().equals(EntityType.ENDER_DRAGON)) {
             ((EnderDragon) livingEntity).setPhase(EnderDragon.Phase.CIRCLING);
@@ -185,16 +185,16 @@ public class CustomBossMegaConsumer {
         if (customBossesConfigFields.getFollowDistance() != null &&
                 customBossesConfigFields.getFollowDistance() > 0 &&
                 livingEntity instanceof Mob)
-            livingEntity.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(customBossesConfigFields.getFollowDistance());
+            AttributeManager.setAttribute(livingEntity, "generic_follow_range", customBossesConfigFields.getFollowDistance());
     }
 
     private void setMovementSpeed(LivingEntity livingEntity) {
         if (customBossesConfigFields.getMovementSpeedAttribute() != null)
-            livingEntity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(customBossesConfigFields.getMovementSpeedAttribute());
+            AttributeManager.setAttribute(livingEntity, "generic_movement_speed", customBossesConfigFields.getMovementSpeedAttribute());
     }
 
     private void setScale(LivingEntity livingEntity) {
         if (customBossesConfigFields.getScale() != 1D)
-            livingEntity.getAttribute(Attribute.GENERIC_SCALE).setBaseValue(customBossesConfigFields.getScale());
+            AttributeManager.setAttribute(livingEntity, "generic_scale", customBossesConfigFields.getScale());
     }
 }

@@ -23,6 +23,7 @@ import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import com.magmaguy.elitemobs.thirdparty.custommodels.CustomModel;
 import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
 import com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity;
+import com.magmaguy.elitemobs.utils.AttributeManager;
 import com.magmaguy.elitemobs.utils.ChunkLocationChecker;
 import com.magmaguy.elitemobs.utils.CommandRunner;
 import com.magmaguy.elitemobs.utils.EventCaller;
@@ -34,7 +35,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -597,9 +597,8 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
             if (regionalBossEntity.getCustomBossesConfigFields().isAlert()) return;
             if (regionalBossEntity.getLivingEntity() == null) return;
             if (regionalBossEntity.getMovementSpeedAttribute() > .12)
-                regionalBossEntity.getLivingEntity().getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(.12);
-            regionalBossEntity.getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE)
-                    .setBaseValue(regionalBossEntity.getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE).getBaseValue() / 3D);
+                AttributeManager.setAttribute(regionalBossEntity.getLivingEntity(), "generic_movement_speed",.12);
+            AttributeManager.setAttribute(regionalBossEntity.getLivingEntity(),"generic_follow_range",AttributeManager.getAttributeBaseValue(regionalBossEntity.getLivingEntity(), "generic_follow_range") / 3D);
         }
 
         @EventHandler
