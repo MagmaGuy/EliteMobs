@@ -17,6 +17,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -203,14 +204,16 @@ public class ItemLootShower implements Listener {
 
         ItemStack currencyItemStack = SoulbindEnchantment.addEnchantment(ItemStackGenerator.generateItemStack(material, "",
                 new ArrayList<>(List.of("EliteMobsCurrencyItem", value + "", ThreadLocalRandom.current().nextDouble() + ""))), player);
-        int model = 1;
+        String model = null;
         try {
-            model = EconomySettingsConfig.getThisConfiguration().getInt("lootShowerData." + (int) value);
+            model = EconomySettingsConfig.getThisConfiguration().getString("lootShowerDataV2." + (int) value);
         } catch (Exception ex) {
             Logger.warn("Failed to get coin model for value " + value + " !");
             ex.printStackTrace();
         }
-        setCoinModel(currencyItemStack, model);
+
+        if (model == null) Logger.warn("No model found for value " + value + " !");
+        else setCoinModel(currencyItemStack, model);
         Item currencyItem = location.getWorld().dropItem(location.clone().add(new Vector(0, 1, 0)), currencyItemStack);
         EntityTracker.registerVisualEffects(currencyItem);
         currencyItem.setInvulnerable(true);
@@ -338,9 +341,9 @@ public class ItemLootShower implements Listener {
         currencyItem.setCustomNameVisible(true);
     }
 
-    private ItemStack setCoinModel(ItemStack itemStack, int data) {
+    private ItemStack setCoinModel(ItemStack itemStack, String data) {
         ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.setCustomModelData(data);
+        itemMeta.setItemModel(NamespacedKey.fromString(data));
         itemStack.setItemMeta(itemMeta);
         return itemStack;
     }

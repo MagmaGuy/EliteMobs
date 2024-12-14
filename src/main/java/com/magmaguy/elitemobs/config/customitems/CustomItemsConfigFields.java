@@ -39,7 +39,7 @@ public class CustomItemsConfigFields extends CustomConfigFields {
     private CustomItem.ItemType itemType = CustomItem.ItemType.CUSTOM;
     @Getter
     @Setter
-    private Integer customModelID = -1;
+    private String customModelID = null;
     @Getter
     @Setter
     private String permission = "";
@@ -80,7 +80,7 @@ public class CustomItemsConfigFields extends CustomConfigFields {
         this.dropWeight = processString("dropWeight", dropWeight, "dynamic", false);
         this.scalability = processEnum("scalability", scalability, CustomItem.Scalability.SCALABLE, CustomItem.Scalability.class, false);
         this.itemType = processEnum("itemType", itemType, CustomItem.ItemType.CUSTOM, CustomItem.ItemType.class, false);
-        this.customModelID = processInt("customModelID", customModelID, -1, false);
+        this.customModelID = processString("customModelV2", customModelID, null, false);
         this.permission = processString("permission", permission, "", false);
         this.level = processInt("level", level, 0, false);
         this.soulbound = processBoolean("soulbound", soulbound, true, false);

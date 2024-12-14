@@ -4,8 +4,8 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
+import com.magmaguy.elitemobs.utils.AttributeManager;
 import com.magmaguy.magmacore.util.Round;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -108,7 +108,7 @@ public class GuildRank {
         if (AdventurersGuildConfig.getWorldsWithoutAGBonuses().contains(player.getWorld().getName())) return;
         double guildRankBonus = healthBonusValue(prestigeRank, activeGuildRank);
         double newMaxHealth = 20 + guildRankBonus;
-        player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(newMaxHealth);
+        AttributeManager.setAttribute(player, "generic_max_health", newMaxHealth);
     }
 
     public static void setMaxHealth(Player player) {

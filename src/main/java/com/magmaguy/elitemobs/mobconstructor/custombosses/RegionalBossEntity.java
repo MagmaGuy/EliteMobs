@@ -13,13 +13,13 @@ import com.magmaguy.elitemobs.mobconstructor.PersistentObject;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.transitiveblocks.TransitiveBlock;
 import com.magmaguy.elitemobs.pathfinding.Navigation;
 import com.magmaguy.elitemobs.powers.SpiritWalk;
+import com.magmaguy.elitemobs.utils.AttributeManager;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -312,8 +312,8 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
 
     public void removeSlow() {
         if (getCustomBossesConfigFields().isAlert() || getLivingEntity() == null) return;
-        getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(getFollowDistance());
-        getLivingEntity().getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(getMovementSpeedAttribute());
+        AttributeManager.setAttribute(getLivingEntity(), "generic_follow_range", getFollowDistance());
+        AttributeManager.setAttribute(getLivingEntity(), "generic_movement_speed", getMovementSpeedAttribute());
     }
 
 }

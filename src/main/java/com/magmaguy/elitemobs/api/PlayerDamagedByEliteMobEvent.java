@@ -8,11 +8,11 @@ import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
+import com.magmaguy.elitemobs.utils.AttributeManager;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Material;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -134,7 +134,7 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
 
             if (specialMultiplier != 1) specialMultiplier = 1;
 
-            double playerMaxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+            double playerMaxHealth = AttributeManager.getAttributeBaseValue(player,"generic_max_health");
 
             //Prevent 1-shots
             finalDamage = Math.min(finalDamage, playerMaxHealth - 1);

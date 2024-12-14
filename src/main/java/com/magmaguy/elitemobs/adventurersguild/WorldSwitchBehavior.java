@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.adventurersguild;
 
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
-import org.bukkit.attribute.Attribute;
+import com.magmaguy.elitemobs.utils.AttributeManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
@@ -13,7 +13,7 @@ public class WorldSwitchBehavior implements Listener {
         //to a world without bonuses
         if (AdventurersGuildConfig.getWorldsWithoutAGBonuses().contains(event.getPlayer().getWorld().getName()) &&
                 !AdventurersGuildConfig.getWorldsWithoutAGBonuses().contains(event.getFrom().getName()))
-            event.getPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(event.getPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH).getDefaultValue());
+            AttributeManager.setAttribute(event.getPlayer(), "generic_max_health", AttributeManager.getAttributeDefaultValue(event.getPlayer(), "generic_max_health"));
             //to a world with bonuses
         else if (!AdventurersGuildConfig.getWorldsWithoutAGBonuses().contains(event.getPlayer().getWorld().getName()) &&
                 AdventurersGuildConfig.getWorldsWithoutAGBonuses().contains(event.getFrom().getName()))

@@ -78,6 +78,18 @@ public class DefaultConfig extends ConfigurationFile {
     private static boolean resetPlayerScaleOnLogin;
     @Getter
     private static boolean forceMenuUnicode;
+    @Getter
+    private static String enchantmentChallengeFailureMessage;
+    @Getter
+    private static String enchantmentChallengeSuccessMessage;
+    @Getter
+    private static String enchantmentChallengeInventoryFullMessage;
+    @Getter
+    private static String enchantmentChallengeConsequencesMessage;
+    @Getter
+    private static String enchantmentChallengeCriticalFailureMessage;
+    @Getter
+    private static String enchantmentChallengeStartMessage;
 
     public DefaultConfig() {
         super("config.yml");
@@ -210,5 +222,28 @@ public class DefaultConfig extends ConfigurationFile {
                 file, fileConfiguration, "bossAlreadyGoneMessage", "&c[EliteMobs] Sorry, this boss is already gone!", true);
         resetPlayerScaleOnLogin = ConfigurationEngine.setBoolean(List.of("Sets whether to reset player scale (literally, the player size on login).", "This is important because some elite powers can modify it and if the server crashes players will be stuck to whatever scale was set when the server crashed, unless this option is set to true."), fileConfiguration, "resetPlayerScale", true);
         forceMenuUnicode = ConfigurationEngine.setBoolean(List.of("Sets whether the menu unicodes for the resource pack should be forced even if the pack is not being hosted through the recommended methods (which is using ResourcePackManager)"), fileConfiguration, "forceMenuUnicode", false);
+        enchantmentChallengeFailureMessage = ConfigurationEngine.setString(
+                List.of("Sets the message sent to players when they fail an enchantment challenge"),
+                file, fileConfiguration, "enchantmentChallengeFailureMessage", "&8[EliteMobs] &cFailed enchantment! The enchantment did not bind to the item.", true);
+        enchantmentChallengeSuccessMessage = ConfigurationEngine.setString(
+                List.of("Sets the message sent to players when they succeed an enchantment challenge"),
+                file, fileConfiguration, "enchantmentChallengeSuccessMessage", "&8[EliteMobs] &2Successful enchantment!", true);
+
+        enchantmentChallengeInventoryFullMessage = ConfigurationEngine.setString(
+                List.of("Sets the message sent to players when their inventory is full during an enchantment challenge"),
+                file, fileConfiguration, "enchantmentChallengeInventoryFullMessage", "&8[EliteMobs] &cYour inventory was full so the item you were trying to upgrade has been deleted! It will be restored if your item is not full by the time you leave the instanced dungeon.", true);
+
+        enchantmentChallengeConsequencesMessage = ConfigurationEngine.setString(
+                List.of("Sets the message sent to players about the consequences of an enchantment challenge"),
+                file, fileConfiguration, "enchantmentChallengeConsequencesMessage", "&cThere's a 10% chance of losing your item if you lose the fight! Leaving the arena counts as losing.", true);
+
+        enchantmentChallengeCriticalFailureMessage = ConfigurationEngine.setString(
+                List.of("Sets the message sent to players when they critically fail an enchantment challenge"),
+                file, fileConfiguration, "enchantmentChallengeCriticalFailureMessage", "&8[EliteMobs] &4Critical failure! You lost the item!", true);
+
+        enchantmentChallengeStartMessage = ConfigurationEngine.setString(
+                List.of("Sets the message sent to players at the start of an enchantment challenge"),
+                file, fileConfiguration, "enchantmentChallengeStartMessage", "&8[EliteMobs] &6Challenge! Defeat the boss to get your upgraded item!", true);
+
     }
 }

@@ -8,8 +8,8 @@ import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
+import com.magmaguy.elitemobs.utils.AttributeManager;
 import org.bukkit.Location;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -75,7 +75,7 @@ public class Navigation implements Listener {
         if (customBossEntity.getLivingEntity() == null) return;
         if (destination == null || destination.getWorld() == null) return;
         if (speed == null)
-            speed = customBossEntity.getLivingEntity().getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getValue();
+            speed = AttributeManager.getAttributeBaseValue(customBossEntity.getLivingEntity(), "generic_movement_speed");
         Double finalSpeed = speed;
         if (currentlyNavigating.get(customBossEntity) != null) currentlyNavigating.get(customBossEntity).cancel();
         int finalDuration = duration;
@@ -108,7 +108,7 @@ public class Navigation implements Listener {
         EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(event.getLivingEntity());
         if (!(eliteEntity instanceof RegionalBossEntity regionalBossEntity)) return;
         event.getLivingEntity().setInvulnerable(true);
-        event.getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(regionalBossEntity.getCustomBossesConfigFields().getLeashRadius() * 1.5);
+        AttributeManager.setAttribute(event.getLivingEntity(), "generic_follow_range", regionalBossEntity.getCustomBossesConfigFields().getLeashRadius() * 1.5);
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -122,9 +122,9 @@ public class Navigation implements Listener {
         event.getLivingEntity().setInvulnerable(false);
 
         if (regionalBossEntity.getCustomBossesConfigFields().getFollowDistance() != 0)
-            eliteEntity.getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(regionalBossEntity.getCustomBossesConfigFields().getFollowDistance());
+            AttributeManager.setAttribute(event.getLivingEntity(), "generic_follow_range", regionalBossEntity.getCustomBossesConfigFields().getFollowDistance());
         else
-            eliteEntity.getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(eliteEntity.getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE).getDefaultValue());
+            AttributeManager.setAttribute(event.getLivingEntity(), "generic_follow_range", AttributeManager.getAttributeDefaultValue(regionalBossEntity.getLivingEntity(), "generic_follow_range"));
         regionalBossEntity.fullHeal();
     }
 }

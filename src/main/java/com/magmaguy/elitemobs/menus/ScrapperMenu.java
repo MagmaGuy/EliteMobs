@@ -1,13 +1,14 @@
 package com.magmaguy.elitemobs.menus;
 
-import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
+import com.magmaguy.elitemobs.config.CustomModelsConfig;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.menus.premade.ScrapperMenuConfig;
 import com.magmaguy.elitemobs.items.customenchantments.RepairEnchantment;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
+import com.magmaguy.elitemobs.utils.CustomModelAdder;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
 import org.bukkit.Bukkit;
@@ -52,8 +53,9 @@ public class ScrapperMenu extends EliteMenu {
                 ItemStack infoButton = ScrapperMenuConfig.infoButton;
                 if (DefaultConfig.isForceMenuUnicode() || Bukkit.getPluginManager().isPluginEnabled("ResourcePackManager")) {
                     infoButton.setType(Material.PAPER);
+                    CustomModelAdder.addCustomModel(infoButton, CustomModelsConfig.goldenQuestionMark);
+
                     ItemMeta itemMeta = infoButton.getItemMeta();
-                    itemMeta.setCustomModelData(MetadataHandler.signatureID);
                     List<String> parsedLore = new ArrayList<>();
                     itemMeta.getLore().forEach(entry -> parsedLore.add(entry.replace("$chance", ScrapperMenuConfig.scrapChance * 100 + "")));
                     itemMeta.setLore(parsedLore);

@@ -20,6 +20,7 @@ import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import com.magmaguy.elitemobs.tagger.PersistentTagger;
+import com.magmaguy.elitemobs.utils.AttributeManager;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.Logger;
@@ -27,7 +28,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.inventory.ItemStack;
@@ -322,28 +322,28 @@ public class EliteEntity {
             this.defaultMaxHealth = EliteMobProperties.getPluginData(entityType).getDefaultMaxHealth();
         else this.defaultMaxHealth = 20;
         this.maxHealth = (level * CombatSystem.TARGET_HITS_TO_KILL_MINUS_ONE + this.defaultMaxHealth) * healthMultiplier;
-        if (livingEntity != null) livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(maxHealth);
+        if (livingEntity != null) AttributeManager.setAttribute(livingEntity, "generic_max_health", maxHealth);
         if (health == null) {
             if (livingEntity != null) livingEntity.setHealth(maxHealth);
             this.health = maxHealth;
         }
         //This is useful for phase boss entities that spawn in unloaded chunks and shouldn't full heal between phases, like in dungeons
         else if (livingEntity != null)
-            livingEntity.setHealth(Math.min(health, livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()));
+            livingEntity.setHealth(Math.min(health, AttributeManager.getAttributeBaseValue(livingEntity, "generic_max_health")));
     }
 
     public void setNormalizedMaxHealth() {
         this.defaultMaxHealth = MobCombatSettingsConfig.getNormalizedBaselineHealth();
         this.maxHealth = (level * CombatSystem.TARGET_HITS_TO_KILL_MINUS_ONE + this.defaultMaxHealth) * healthMultiplier;
         if (livingEntity != null) {
-            livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(maxHealth);
+            AttributeManager.setAttribute(livingEntity, "generic_max_health", maxHealth);
             livingEntity.setHealth(maxHealth);
         }
         this.health = maxHealth;
     }
 
     public void resetMaxHealth() {
-        livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(maxHealth);
+        AttributeManager.setAttribute(livingEntity, "generic_max_health", maxHealth);
         livingEntity.setHealth(maxHealth);
         this.health = maxHealth;
     }
@@ -367,7 +367,7 @@ public class EliteEntity {
 
     public void setHealth(double health) {
         if (livingEntity == null) return;
-        this.health = Math.min(health, Math.min(this.maxHealth, livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()));
+        this.health = Math.min(health, Math.min(this.maxHealth, AttributeManager.getAttributeBaseValue(livingEntity, "generic_max_health")));
         livingEntity.setHealth(this.health);
     }
 

@@ -165,7 +165,7 @@ public class MobCombatSettingsConfig extends ConfigurationFile {
                 file, fileConfiguration, "commandsOnEliteMobDeath", Collections.emptyList(), false);
         //Accepts placeholder $playerDamage
         bossKillParticipationMessage = ConfigurationEngine.setString(
-                List.of("Sets teh message sent to players that participate in big boss kills."),
+                List.of("Sets the message sent to players that participate in big boss kills."),
                 file, fileConfiguration, "bossKillParticipationMessage", "&eYour damage: &2$playerDamage", true);
         regenerateCustomBossHealthOnCombatEnd = ConfigurationEngine.setBoolean(
                 List.of("Sets if bosses regenerate health when they go out of combat. Strongly recommended."),

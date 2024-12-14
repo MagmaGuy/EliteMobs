@@ -5,8 +5,8 @@ import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.items.EliteItemLore;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
+import com.magmaguy.elitemobs.utils.AttributeManager;
 import org.bukkit.Material;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -61,7 +61,7 @@ public class EliteItemManager {
         if (itemStack.getType() == Material.CROSSBOW) return 7.0;
         //Check the default modifiers - these are usually the only modifiers
         try {
-            for (AttributeModifier attributeModifier : itemStack.getType().getDefaultAttributeModifiers(EquipmentSlot.HAND).get(Attribute.GENERIC_ATTACK_DAMAGE))
+            for (AttributeModifier attributeModifier : itemStack.getType().getDefaultAttributeModifiers(EquipmentSlot.HAND).get(AttributeManager.getAttribute("generic_attack_damage")))
                 defaultDamage = attributeCrawler(defaultDamage, attributeModifier);
         } catch (NoSuchMethodError e) {
             //If you're on an ancient version the damage will not work that well for the default materials.
@@ -70,11 +70,12 @@ public class EliteItemManager {
         //Check custom modifiers - this should only happen when third party plugins step in
         if (itemStack.getItemMeta() != null &&
                 itemStack.getItemMeta().getAttributeModifiers() != null &&
-                itemStack.getItemMeta().getAttributeModifiers(EquipmentSlot.HAND).containsKey(Attribute.GENERIC_ATTACK_DAMAGE))
-            for (AttributeModifier attributeModifier : itemStack
+                itemStack.getItemMeta().getAttributeModifiers(EquipmentSlot.HAND).containsKey(AttributeManager.getAttribute("generic_attack_damage")))
+            for (AttributeModifier attributeModifier :
+                    itemStack
                     .getItemMeta()
                     .getAttributeModifiers()
-                    .get(Attribute.GENERIC_ATTACK_SPEED))
+                    .get(AttributeManager.getAttribute("generic_attack_speed")))
                 defaultDamage = attributeCrawler(defaultDamage, attributeModifier);
         return defaultDamage;
     }
@@ -94,7 +95,7 @@ public class EliteItemManager {
         else if (itemStack.getType() == Material.CROSSBOW) return 0.8;
         //Check the default modifiers - these are usually the only modifiers
         try {
-            for (AttributeModifier attributeModifier : itemStack.getType().getDefaultAttributeModifiers(EquipmentSlot.HAND).get(Attribute.GENERIC_ATTACK_SPEED))
+            for (AttributeModifier attributeModifier : itemStack.getType().getDefaultAttributeModifiers(EquipmentSlot.HAND).get(AttributeManager.getAttribute("generic_attack_speed")))
                 defaultAttackSpeed = attributeCrawler(defaultAttackSpeed, attributeModifier);
         } catch (NoSuchMethodError e) {
             //If you're on an ancient version you just get the default sword speed.
@@ -103,11 +104,11 @@ public class EliteItemManager {
         //Check custom modifiers - this should only happen when third party plugins step in
         if (itemStack.getItemMeta() != null &&
                 itemStack.getItemMeta().getAttributeModifiers() != null &&
-                itemStack.getItemMeta().getAttributeModifiers(EquipmentSlot.HAND).containsKey(Attribute.GENERIC_ATTACK_SPEED))
+                itemStack.getItemMeta().getAttributeModifiers(EquipmentSlot.HAND).containsKey(AttributeManager.getAttribute("generic_attack_speed")))
             for (AttributeModifier attributeModifier : itemStack
                     .getItemMeta()
                     .getAttributeModifiers()
-                    .get(Attribute.GENERIC_ATTACK_SPEED))
+                    .get(AttributeManager.getAttribute("generic_attack_speed")))
                 defaultAttackSpeed = attributeCrawler(defaultAttackSpeed, attributeModifier);
         return defaultAttackSpeed;
     }

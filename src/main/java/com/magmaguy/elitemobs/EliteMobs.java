@@ -83,7 +83,7 @@ public class EliteMobs extends JavaPlugin {
     public Object placeholders = null;
 
     public static void initializeConfigs() {
-        //Initialized translations
+        new CustomModelsConfig();
         new DefaultConfig();
         new ItemSettingsConfig();
         new ProceduralItemGenerationSettingsConfig();

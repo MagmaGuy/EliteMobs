@@ -274,7 +274,7 @@ public class CustomSpawn {
         location.setY(ThreadLocalRandom.current().nextInt(-0, 256));
         World world = location.getWorld();
 
-        if (!customSpawnConfigFields.getValidBiomes().isEmpty() && !customSpawnConfigFields.getValidBiomes().contains(location.getBlock().getBiome()))
+        if (!customSpawnConfigFields.getValidBiomesStrings().isEmpty() && !customSpawnConfigFields.getValidBiomesStrings().contains(location.getBlock().getBiome()))
             return null;
 
         //Set Y level - Location isn't final yet
