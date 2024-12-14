@@ -48,12 +48,14 @@ public class MetaPackage extends EMPackage {
 
     @Override
     public void doInstall(Player player) {
+        player.closeInventory();
         getPackages().forEach(emPackage -> emPackage.doInstall(player));
         super.isInstalled = true;
     }
 
     @Override
     public void doUninstall(Player player) {
+        player.closeInventory();
         getPackages().forEach(emPackage -> emPackage.doUninstall(player));
         super.isInstalled = false;
     }

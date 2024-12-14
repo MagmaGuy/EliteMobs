@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.menus;
 
-import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.menus.premade.UnbinderMenuConfig;
@@ -11,6 +10,7 @@ import com.magmaguy.magmacore.util.ItemStackGenerator;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -60,7 +60,7 @@ public class UnbindMenu extends EliteMenu {
                 if (DefaultConfig.isForceMenuUnicode() || Bukkit.getPluginManager().isPluginEnabled("ResourcePackManager")) {
                     infoButton.setType(Material.PAPER);
                     ItemMeta itemMeta = infoButton.getItemMeta();
-                    itemMeta.setCustomModelData(MetadataHandler.signatureID);
+                    itemMeta.setItemModel(NamespacedKey.fromString("elitemobs:ui/goldenquestionmark"));
                     infoButton.setItemMeta(itemMeta);
                 }
                 UnbinderInventory.setItem(i, infoButton);

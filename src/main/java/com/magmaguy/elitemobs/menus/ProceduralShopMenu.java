@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.menus;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.CustomModelsConfig;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.menus.premade.BuyOrSellMenuConfig;
@@ -10,6 +11,7 @@ import com.magmaguy.elitemobs.items.EliteItemLore;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.ItemWorthCalculator;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
+import com.magmaguy.elitemobs.utils.CustomModelAdder;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -21,7 +23,6 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
@@ -62,9 +63,7 @@ public class ProceduralShopMenu {
         ItemStack rerollButton = ProceduralShopMenuConfig.rerollItem;
         if (DefaultConfig.isForceMenuUnicode() || Bukkit.getPluginManager().isPluginEnabled("ResourcePackManager")) {
             rerollButton.setType(Material.PAPER);
-            ItemMeta itemMeta = rerollButton.getItemMeta();
-            itemMeta.setCustomModelData(MetadataHandler.signatureID);
-            rerollButton.setItemMeta(itemMeta);
+            CustomModelAdder.addCustomModel(rerollButton, CustomModelsConfig.goldenQuestionMark);
         }
 
         shopInventory.setItem(ProceduralShopMenuConfig.rerollSlot, rerollButton);

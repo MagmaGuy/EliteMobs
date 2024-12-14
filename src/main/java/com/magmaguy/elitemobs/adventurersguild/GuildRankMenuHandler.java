@@ -1,12 +1,10 @@
 package com.magmaguy.elitemobs.adventurersguild;
 
-import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
-import com.magmaguy.elitemobs.config.DefaultConfig;
-import com.magmaguy.elitemobs.config.EconomySettingsConfig;
-import com.magmaguy.elitemobs.config.SoundsConfig;
+import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.config.menus.premade.GuildRankMenuConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldowns;
+import com.magmaguy.elitemobs.utils.CustomModelAdder;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -175,21 +173,27 @@ public class GuildRankMenuHandler implements Listener {
         switch (guildRankStatus) {
             case UNLOCKED:
                 itemStack = constructButtonItemStack(activeGuildRank, GuildRankMenuConfig.getUnlockedButton().clone(), player, priceString);
+                CustomModelAdder.addCustomModel(itemStack, CustomModelsConfig.grayLock);
                 break;
             case LOCKED:
                 itemStack = constructButtonItemStack(activeGuildRank, GuildRankMenuConfig.getLockedButton().clone(), player, priceString);
+                CustomModelAdder.addCustomModel(itemStack, CustomModelsConfig.redLock);
                 break;
             case SELECTED:
                 itemStack = constructButtonItemStack(activeGuildRank, GuildRankMenuConfig.getCurrentButton().clone(), player, priceString);
+                CustomModelAdder.addCustomModel(itemStack, CustomModelsConfig.greenLock);
                 break;
             case NEXT_UNLOCK:
                 itemStack = constructButtonItemStack(activeGuildRank, GuildRankMenuConfig.getNextButton().clone(), player, priceString);
+                CustomModelAdder.addCustomModel(itemStack, CustomModelsConfig.yellowLock);
                 break;
             case PRESTIGE_LOCKED:
                 itemStack = constructButtonItemStack(activeGuildRank, GuildRankMenuConfig.getPrestigeLockedButton().clone(), player, priceString);
+                CustomModelAdder.addCustomModel(itemStack, CustomModelsConfig.redCrown);
                 break;
             case PRESTIGE_NEXT_UNLOCK:
                 itemStack = constructButtonItemStack(activeGuildRank, GuildRankMenuConfig.getPrestigeNextUnlockButton().clone(), player, priceString);
+                CustomModelAdder.addCustomModel(itemStack, CustomModelsConfig.yellowCrown);
                 break;
         }
 

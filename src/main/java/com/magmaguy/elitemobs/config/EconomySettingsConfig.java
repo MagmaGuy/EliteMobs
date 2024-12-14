@@ -140,20 +140,21 @@ public class EconomySettingsConfig extends ConfigurationFile {
         ConfigurationEngine.setInt(
                 List.of("Sets the custom model ID for 1 dropped elite coin. Used by the resource pack."),
                 fileConfiguration, "lootShowerData.1", 1);
+        ConfigurationEngine.setString(fileConfiguration, "lootShowerDataV2.1", "elitemobs:coins/coin1");
         lootShowerMaterial5 = ConfigurationEngine.setString(file, fileConfiguration, "lootShowerMaterial.5", Material.GOLD_INGOT.name(), false);
-        ConfigurationEngine.setInt(fileConfiguration, "lootShowerData.5", 1);
+        ConfigurationEngine.setString(fileConfiguration, "lootShowerDataV2.5", "elitemobs:coins/coin1");
         lootShowerMaterial10 = ConfigurationEngine.setString(file, fileConfiguration, "lootShowerMaterial.10", Material.GOLD_BLOCK.name(), false);
-        ConfigurationEngine.setInt(fileConfiguration, "lootShowerData.10", 1);
+        ConfigurationEngine.setString(fileConfiguration, "lootShowerDataV2.10", "elitemobs:coins/coin2");
         lootShowerMaterial20 = ConfigurationEngine.setString(file, fileConfiguration, "lootShowerMaterial.20", Material.EMERALD.name(), false);
-        ConfigurationEngine.setInt(fileConfiguration, "lootShowerData.20", 1);
+        ConfigurationEngine.setString(fileConfiguration, "lootShowerDataV2.20", "elitemobs:coins/coin3");
         lootShowerMaterial50 = ConfigurationEngine.setString(file, fileConfiguration, "lootShowerMaterial.50", Material.EMERALD_BLOCK.name(), false);
-        ConfigurationEngine.setInt(fileConfiguration, "lootShowerData.50", 1);
+        ConfigurationEngine.setString(fileConfiguration, "lootShowerDataV2.50", "elitemobs:coins/coin4");
         lootShowerMaterial100 = ConfigurationEngine.setString(file, fileConfiguration, "lootShowerMaterial.100", Material.DIAMOND.name(), false);
-        ConfigurationEngine.setInt(fileConfiguration, "lootShowerData.100", 1);
+        ConfigurationEngine.setString(fileConfiguration, "lootShowerDataV2.100", "elitemobs:coins/coin4");
         lootShowerMaterial500 = ConfigurationEngine.setString(file, fileConfiguration, "lootShowerMaterial.500", Material.DIAMOND_BLOCK.name(), false);
-        ConfigurationEngine.setInt(fileConfiguration, "lootShowerData.500", 1);
+        ConfigurationEngine.setString(fileConfiguration, "lootShowerDataV2.500", "elitemobs:coins/coin4");
         lootShowerMaterial1000 = ConfigurationEngine.setString(file, fileConfiguration, "lootShowerMaterial.1000", Material.NETHER_STAR.name(), false);
-        ConfigurationEngine.setInt(fileConfiguration, "lootShowerData.1000", 1);
+        ConfigurationEngine.setString(fileConfiguration, "lootShowerDataV2.1000", "elitemobs:coins/coin4");
         adventurersGuildNotificationMessage = ConfigurationEngine.setString(
                 List.of("Send the message players get after looting currency. Useful for tutorial purposes."),
                 file, fileConfiguration, "adventurersGuildNotificationMessages", "&7[EM] Extra spending money? Try &a/ag !", true);

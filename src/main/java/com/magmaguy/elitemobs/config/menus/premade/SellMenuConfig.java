@@ -2,7 +2,9 @@ package com.magmaguy.elitemobs.config.menus.premade;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
+import com.magmaguy.elitemobs.config.CustomModelsConfig;
 import com.magmaguy.elitemobs.config.menus.MenusConfigFields;
+import com.magmaguy.elitemobs.utils.CustomModelAdder;
 import com.magmaguy.elitemobs.utils.ItemStackSerializer;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
 import org.bukkit.Material;
@@ -40,16 +42,19 @@ public class SellMenuConfig extends MenusConfigFields {
                                 "&ca value on their lore."))),
                 fileConfiguration);
         infoButton = ItemStackSerializer.deserialize("infoButton", fileConfiguration);
+        CustomModelAdder.addCustomModel(infoButton, CustomModelsConfig.goldenQuestionMark);
         infoSlot = ConfigurationEngine.setInt(fileConfiguration, "infoButtonSlot", 4);
         storeSlots = ConfigurationEngine.setList(file, fileConfiguration, "sellSlots", new ArrayList<>(List.of(19, 20, 21, 22, 23,
                 24, 25, 28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 43)), false);
         ItemStackSerializer.serialize("cancelButton", ItemStackGenerator.generateItemStack(Material.BARRIER,
                 "&4Cancel", List.of("&cCancel purchase!"), MetadataHandler.signatureID), fileConfiguration);
         cancelButton = ItemStackSerializer.deserialize("cancelButton", fileConfiguration);
+        CustomModelAdder.addCustomModel(cancelButton, CustomModelsConfig.redCross);
         cancelSlot = ConfigurationEngine.setInt(fileConfiguration, "cancelButtonSlot", 27);
         ItemStackSerializer.serialize("confirmButton", ItemStackGenerator.generateItemStack(Material.EMERALD,
                 "&2Confirm Sale", new ArrayList<>(List.of("&aSell item for", "&a$currency_amount $currency_name")), MetadataHandler.signatureID), fileConfiguration);
         confirmButton = ItemStackSerializer.deserialize("confirmButton", fileConfiguration);
+        CustomModelAdder.addCustomModel(confirmButton, CustomModelsConfig.bagOfCoins);
         confirmSlot = ConfigurationEngine.setInt(fileConfiguration, "confirmSaleSlot", 35);
     }
 

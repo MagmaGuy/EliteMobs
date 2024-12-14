@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.collateralminecraftchanges;
 
 import com.magmaguy.elitemobs.config.DefaultConfig;
-import org.bukkit.attribute.Attribute;
+import com.magmaguy.elitemobs.utils.AttributeManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -15,7 +15,7 @@ public class FixPlayerOnLoginOrRespawn implements Listener {
         event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 0, 0));
         event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 0, 0));
         if (DefaultConfig.isResetPlayerScaleOnLogin())
-            event.getPlayer().getAttribute(Attribute.GENERIC_SCALE).setBaseValue(1f);
+            AttributeManager.setAttribute(event.getPlayer(), "generic_scale", 1);
     }
 
     @EventHandler
@@ -23,6 +23,6 @@ public class FixPlayerOnLoginOrRespawn implements Listener {
         event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 0, 0));
         event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 0, 0));
         if (DefaultConfig.isResetPlayerScaleOnLogin())
-            event.getPlayer().getAttribute(Attribute.GENERIC_SCALE).setBaseValue(1f);
+            AttributeManager.setAttribute(event.getPlayer(), "generic_scale", 1);
     }
 }

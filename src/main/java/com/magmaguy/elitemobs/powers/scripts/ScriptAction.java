@@ -13,13 +13,13 @@ import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.powers.meta.CustomSummonPower;
 import com.magmaguy.elitemobs.powers.scripts.caching.ScriptActionBlueprint;
 import com.magmaguy.elitemobs.powers.scripts.enums.ActionType;
+import com.magmaguy.elitemobs.utils.AttributeManager;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.block.Block;
 import org.bukkit.boss.BossBar;
@@ -1040,7 +1040,7 @@ public class ScriptAction {
         int duration = blueprint.getDuration();
 
         getTargets(scriptActionData).forEach(target -> {
-            AttributeInstance attribute = target.getAttribute(Attribute.GENERIC_SCALE);
+            AttributeInstance attribute = AttributeManager.getAttributeInstance(target, "generic_scale");
             if (attribute != null) {
                 attribute.setBaseValue(scaleValue);
                 if (duration > 0) {

@@ -7,6 +7,7 @@ import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffectContainer;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
 import org.bukkit.Material;
@@ -34,7 +35,7 @@ public class ItemConstructor {
                                           EliteEntity eliteEntity,
                                           Player player,
                                           boolean showItemWorth,
-                                          int customModelID,
+                                          String customModelID,
                                           boolean soulbound,
                                           String filename) {
         /*
@@ -75,10 +76,11 @@ public class ItemConstructor {
         itemStack.setItemMeta(itemMeta);
 
         //Apply custom model id
-        if (customModelID > 0) {
-            itemMeta.setCustomModelData(customModelID);
-            itemStack.setItemMeta(itemMeta);
-        }
+        if (!VersionChecker.serverVersionOlderThan(21, 4))
+            if (customModelID != null) {
+                itemMeta.setItemModel(NamespacedKey.fromString(customModelID));
+                itemStack.setItemMeta(itemMeta);
+            }
 
 
         //Register filename of the custom item into the persistent metadata

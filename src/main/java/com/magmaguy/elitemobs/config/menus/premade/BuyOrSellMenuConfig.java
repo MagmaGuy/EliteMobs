@@ -2,7 +2,9 @@ package com.magmaguy.elitemobs.config.menus.premade;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
+import com.magmaguy.elitemobs.config.CustomModelsConfig;
 import com.magmaguy.elitemobs.config.menus.MenusConfigFields;
+import com.magmaguy.elitemobs.utils.CustomModelAdder;
 import com.magmaguy.elitemobs.utils.ItemStackSerializer;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
 import org.bukkit.Material;
@@ -43,10 +45,13 @@ public class BuyOrSellMenuConfig extends MenusConfigFields {
         BUY_PROCEDURAL_ITEM = ItemStackSerializer.deserialize("Buy procedurally generated items", fileConfiguration);
         ItemStackSerializer.serialize("Buy custom items",
                 ItemStackGenerator.generateItemStack(Material.EMERALD, "Buy custom items", new ArrayList<>(), MetadataHandler.signatureID), fileConfiguration);
+        CustomModelAdder.addCustomModel(BUY_PROCEDURAL_ITEM, CustomModelsConfig.bagOfCoins);
         BUY_CUSTOM_ITEM = ItemStackSerializer.deserialize("Buy custom items", fileConfiguration);
         ItemStackSerializer.serialize("Sell items",
                 ItemStackGenerator.generateItemStack(Material.REDSTONE, "Sell items", new ArrayList<>(), MetadataHandler.signatureID), fileConfiguration);
+        CustomModelAdder.addCustomModel(BUY_CUSTOM_ITEM, CustomModelsConfig.bagOfCoins);
         SELL_ITEM = ItemStackSerializer.deserialize("Sell items", fileConfiguration);
+        CustomModelAdder.addCustomModel(SELL_ITEM, CustomModelsConfig.handWithCoins);
         BUY_SLOT = ConfigurationEngine.setInt(fileConfiguration, "Buy slot", 11);
         SELL_SLOT = ConfigurationEngine.setInt(fileConfiguration, "Sell slot", 15);
     }
