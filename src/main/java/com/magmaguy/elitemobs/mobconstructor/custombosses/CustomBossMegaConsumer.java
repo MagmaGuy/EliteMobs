@@ -7,7 +7,6 @@ import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import com.magmaguy.elitemobs.thirdparty.custommodels.CustomModel;
 import com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity;
-import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser;
 import com.magmaguy.elitemobs.utils.AttributeManager;
@@ -74,7 +73,7 @@ public class CustomBossMegaConsumer {
             return null;
         }
         if (EliteMobs.worldGuardIsEnabled) {
-            if (!WorldGuardFlagChecker.checkFlag(spawnLocation, WorldGuardCompatibility.getELITEMOBS_SPAWN_FLAG())) {
+            if (!WorldGuardFlagChecker.doEliteMobsSpawnFlag(spawnLocation)) {
                 Logger.warn("Attempted to spawn " + customBossesConfigFields.getFilename() + " in location " +
                         spawnLocation + " which is protected by WorldGuard with elitemobs-spawning deny! This should not have happened.");
                 return null;
