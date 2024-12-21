@@ -8,6 +8,7 @@ import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
+import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
 import com.magmaguy.magmacore.util.Logger;
@@ -343,7 +344,8 @@ public class ItemLootShower implements Listener {
 
     private ItemStack setCoinModel(ItemStack itemStack, String data) {
         ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.setItemModel(NamespacedKey.fromString(data));
+        if (!VersionChecker.serverVersionOlderThan(21, 4))
+            itemMeta.setItemModel(NamespacedKey.fromString(data));
         itemStack.setItemMeta(itemMeta);
         return itemStack;
     }
