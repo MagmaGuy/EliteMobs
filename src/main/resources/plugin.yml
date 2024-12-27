@@ -1,5 +1,5 @@
 name: EliteMobs
-version: 9.2.1
+version: 9.2.2
 author: MagmaGuy
 main: com.magmaguy.elitemobs.EliteMobs
 api-version: 1.14
@@ -64,6 +64,9 @@ permissions:
     default: true
   elitemobs.enchant.command:
     description: Allows players to use the enchant command
+    default: true
+  elitemobs.scroll.command:
+    description: Allows players to use the scroll command
     default: true
   elitemobs.event.start:
     description: Allows admins to manually launch an event
@@ -232,6 +235,9 @@ permissions:
     default: true
   elitemobs.enchant.npc:
     description: Allows players to talk to the enchant npc
+    default: true
+  elitemobs.scroll.npc:
+    description: Allows players to talk to the elite scroll npc
     default: true
   elitemobs.protection.bypass:
     description: Allows players to run the bypass command to toggle bypassing dungeon protections
