@@ -1,8 +1,10 @@
 package com.magmaguy.elitemobs.npcs;
 
 import com.google.common.collect.ArrayListMultimap;
+import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
+import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
@@ -53,6 +55,7 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
     private ArmorStand roleDisplay;
     private boolean isDisguised = false;
     private String locationString;
+
     /**
      * Spawns NPC based off of the values in the NPCsConfig config file. Runs at startup and on reload.
      */
@@ -74,6 +77,7 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
         spawn();
         persistentObjectHandler = new PersistentObjectHandler(this);
     }
+
     /**
      * Spawns NPCs for dungeon instancing.
      */
@@ -163,7 +167,10 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
                 spawnLocation.getWorld() == null ||
                 !ChunkLocationChecker.locationIsLoaded(spawnLocation)) return;
         if (villager != null && villager.isValid()) return;
-        WorldGuardSpawnEventBypasser.forceSpawn();
+        if (npCsConfigFields.getInteractionType().equals(NPCInteractions.NPCInteractionType.SCROLL_APPLIER) &&
+                !ItemSettingsConfig.isUseEliteItemScrolls()) return;
+        if (EliteMobs.worldGuardIsEnabled)
+            WorldGuardSpawnEventBypasser.forceSpawn();
         villager = spawnLocation.getWorld().spawn(spawnLocation, Villager.class, villagerInstance -> {
             villagerInstance.setAI(false);
             villagerInstance.setPersistent(false);

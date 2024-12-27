@@ -93,15 +93,9 @@ public class EliteItemManager {
         //Ranged damage works differently. Bows take 1s to draw and crossbows take 1.25s to draw.
         if (itemStack.getType() == Material.BOW) return 1.0;
         else if (itemStack.getType() == Material.CROSSBOW) return 0.8;
-        //Check the default modifiers - these are usually the only modifiers
-        try {
-            for (AttributeModifier attributeModifier : itemStack.getType().getDefaultAttributeModifiers(EquipmentSlot.HAND).get(AttributeManager.getAttribute("generic_attack_speed")))
-                defaultAttackSpeed = attributeCrawler(defaultAttackSpeed, attributeModifier);
-        } catch (NoSuchMethodError e) {
-            //If you're on an ancient version you just get the default sword speed.
-            defaultAttackSpeed = 4.0;
-        }
+
         //Check custom modifiers - this should only happen when third party plugins step in
+        //Also weirdly enough if they are present the defaults go out of the window, they're not stacking
         if (itemStack.getItemMeta() != null &&
                 itemStack.getItemMeta().getAttributeModifiers() != null &&
                 itemStack.getItemMeta().getAttributeModifiers(EquipmentSlot.HAND).containsKey(AttributeManager.getAttribute("generic_attack_speed")))
@@ -110,6 +104,15 @@ public class EliteItemManager {
                     .getAttributeModifiers()
                     .get(AttributeManager.getAttribute("generic_attack_speed")))
                 defaultAttackSpeed = attributeCrawler(defaultAttackSpeed, attributeModifier);
+        else
+            //Check the default modifiers - these are usually the only modifiers
+            try {
+                for (AttributeModifier attributeModifier : itemStack.getType().getDefaultAttributeModifiers(EquipmentSlot.HAND).get(AttributeManager.getAttribute("generic_attack_speed")))
+                    defaultAttackSpeed = attributeCrawler(defaultAttackSpeed, attributeModifier);
+            } catch (NoSuchMethodError e) {
+                //If you're on an ancient version you just get the default sword speed.
+                defaultAttackSpeed = 4.0;
+            }
         return defaultAttackSpeed;
     }
 
@@ -276,6 +279,27 @@ public class EliteItemManager {
                 ItemTagger.setEliteDefenseAttribute(itemStack, defense);
         }
         new EliteItemLore(itemStack, false);
+    }
+
+    public static void setEliteLevel(@Nullable ItemStack itemStack, int level, boolean onlyArmorOrWeapons) {
+        if (itemStack == null) return;
+        if (isWeapon(itemStack)) {
+            double damage = calculateEliteBonus(itemStack, level);
+            if (damage > 0)
+                ItemTagger.setEliteDamageAttribute(itemStack, damage);
+        } else if (isArmor(itemStack)) {
+            double defense = calculateEliteBonus(itemStack, level);
+            if (defense > 0)
+                ItemTagger.setEliteDefenseAttribute(itemStack, defense);
+        } else if (onlyArmorOrWeapons) {
+            return;
+        }
+        if (!isEliteMobsItem(itemStack)) {
+            registerEliteItem(itemStack);
+            new EliteItemLore(itemStack, false,true);
+        } else {
+            new EliteItemLore(itemStack, false,false);
+        }
     }
 
     /**
