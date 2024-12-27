@@ -104,6 +104,9 @@ public class EventsRegistrer {
         if (ItemSettingsConfig.isPreventEliteItemDiamondToNetheriteUpgrade())
             register(new PreventUpgradeDiamondToNetherite());
 
+        if (ItemSettingsConfig.isUseEliteItemScrolls())
+            register(new EliteScrollMenu.EliteScrollMenuEvents());
+
         register(new FixPlayerOnLoginOrRespawn());
         register(new EnvironmentalDungeonDamage());
         register(new PlayerQuitCleanup());
@@ -350,8 +353,8 @@ public class EventsRegistrer {
         register(new NPCProximitySensor());
         register(new NPCEntity.NPCEntityEvents());
         register(new FindNewWorlds());
+        register(new WorldGuardSpawnEventBypasser());
         if (EliteMobs.worldGuardIsEnabled) {
-            register(new WorldGuardSpawnEventBypasser());
             register(new WorldGuardEliteMobOnlySpawnFlag());
             register(new WorldGuardDungeonFlag());
             register(new WorldGuardExplosionBlockDamageFlag());

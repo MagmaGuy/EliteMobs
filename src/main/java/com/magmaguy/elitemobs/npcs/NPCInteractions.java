@@ -187,6 +187,15 @@ public class NPCInteractions implements Listener {
                         }
                     }.runTaskLater(MetadataHandler.PLUGIN, 1);
                 break;
+            case SCROLL_APPLIER:
+                if (event.getPlayer().hasPermission("elitemobs.scroll.npc"))
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            new EliteScrollMenu(event.getPlayer());
+                        }
+                    }.runTaskLater(MetadataHandler.PLUGIN, 1);
+                break;
         }
 
     }
@@ -224,7 +233,8 @@ public class NPCInteractions implements Listener {
         UNBINDER,
         ARENA_MASTER,
         COMMAND,
-        ENCHANTER
+        ENCHANTER,
+        SCROLL_APPLIER
     }
 
 

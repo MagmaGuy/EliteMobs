@@ -26,6 +26,16 @@ public class AttributeManager {
         livingEntity.getAttribute(attribute).setBaseValue(value);
     }
 
+    public static double getAttributeValue(LivingEntity livingEntity, String attributeKey) {
+        Attribute attribute = getAttributeFromString(attributeKey);
+
+        if (attribute == null) {
+            Logger.warn("Failed to get attribute " + attributeKey + "!");
+            return 1;
+        }
+        return livingEntity.getAttribute(attribute).getValue();
+    }
+
     public static double getAttributeBaseValue(LivingEntity livingEntity, String attributeKey) {
         Attribute attribute = getAttributeFromString(attributeKey);
 
@@ -57,7 +67,6 @@ public class AttributeManager {
 
     public static Attribute getAttribute(String attributeKey) {
         return getAttributeFromString(attributeKey);
-
     }
 
     public static AttributeInstance getAttributeInstance(LivingEntity livingEntity, String attributeKey) {

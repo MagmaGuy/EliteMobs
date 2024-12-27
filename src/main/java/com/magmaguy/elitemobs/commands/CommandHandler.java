@@ -79,6 +79,7 @@ public class CommandHandler {
         emCommand.registerCommand(new ShopCustomCommand());
         emCommand.registerCommand(new RepairCommand());
         emCommand.registerCommand(new EnchantCommand());
+        emCommand.registerCommand(new EliteScrollCommand());
         emCommand.registerCommand(new ScrapCommand());
         emCommand.registerCommand(new UnbindCommand());
         emCommand.registerCommand(new MoneyCheckCommand());

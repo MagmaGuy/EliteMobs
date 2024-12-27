@@ -118,6 +118,14 @@ public class ItemSettingsConfig extends ConfigurationFile {
     private static String armorEntry;
     @Getter
     private static String levelRangeTooDifferent;
+    @Getter
+    private static boolean useEliteItemScrolls;
+    @Getter
+    private static double eliteItemScrollChance;
+    @Getter
+    private static String eliteItemScrollName;
+    @Getter
+    private static List<String> eliteItemScrollLore;
 
     public ItemSettingsConfig() {
         super("ItemSettings.yml");
@@ -341,6 +349,25 @@ public class ItemSettingsConfig extends ConfigurationFile {
         levelRangeTooDifferent = ConfigurationEngine.setString(
                 List.of("Sets the message sent when a played kills a boss but the gear level is too different from the boss level to get coins"),
                 file, fileConfiguration, "levelRangeTooDifferent", "&8EM] &4Your gear is level $playerLevel and the boss is level $bossLevel, level difference is too high to get coins!", true);
-
+        useEliteItemScrolls = ConfigurationEngine.setBoolean(List.of(
+                "Sets whether the plugin will use Elite Item Scrolls",
+                "Elite Item Scroll are recommended for servers that want to use other item plugins like ItemAdder",
+                "Elite item scrolls can be used at anvils to give non-elite items elite levels",
+                "Elite item scrolls drop from elites of the same level to guarantee that the loot is balanced",
+                "Note for item balance that elite damage does not affect damage outside of EliteMobs, so in most scenarios this should not result in broken (overpowered) items"),
+                fileConfiguration, "useEliteItemScrolls", false);
+        eliteItemScrollChance = ConfigurationEngine.setDouble(List.of(
+                "Sets the chance of an Elite Item Scroll dropping from a boss, where 0 is 0% and 1 is 100%, and 0.5 is 50%."),
+                fileConfiguration, "eliteItemScrollChance", 0.1);
+        eliteItemScrollName = ConfigurationEngine.setString(List.of(
+                "Sets the name of the elite item scroll item"),file,
+                fileConfiguration, "eliteItemScrollName", "&6Elite Item Scroll", true);
+        eliteItemScrollLore = ConfigurationEngine.setList(List.of(
+                        "Sets the name of the elite item scroll item"),file,
+                fileConfiguration, "eliteItemScrollLore", List.of(
+                        "&fUse at an anvil to enchant",
+                        "&fa non-elite item into",
+                        "&fa level $level elite item!"),
+                true);
     }
 }

@@ -47,9 +47,20 @@ public class EliteItemLore {
     private List<String> customLore = new ArrayList<>();
     private int prestigeLevel = 0;
     private int enchantmentCount = 0;
-
+    private List<String> thirdPartyLore = null;
 
     public EliteItemLore(ItemStack itemStack, boolean showItemWorth) {
+        initialize(itemStack, showItemWorth);
+    }
+
+    public EliteItemLore(ItemStack itemStack, boolean showItemWorth, boolean isNewItem) {
+        if (isNewItem && itemStack.getItemMeta().getLore() != null || !itemStack.getItemMeta().getLore().isEmpty()) {
+            thirdPartyLore = itemStack.getItemMeta().getLore();
+        }
+        initialize(itemStack, showItemWorth);
+    }
+
+    private void initialize(ItemStack itemStack, boolean showItemWorth){
 
         if (!EliteItemManager.isEliteMobsItem(itemStack)) {
             Logger.warn("Attempted to rewrite the lore of a non-elitemobs item! This is not supposed to happen.");
@@ -86,7 +97,6 @@ public class EliteItemLore {
         this.itemMeta.setLore(lore);
         ItemTagger.registerEnchantmentCount(itemMeta, enchantmentCount);
         this.itemStack.setItemMeta(this.itemMeta);
-
     }
 
     private void constructVanillaEnchantments() {
@@ -214,6 +224,9 @@ public class EliteItemLore {
     }
 
     private void writeNewLore() {
+        if (thirdPartyLore != null)
+            lore.addAll(thirdPartyLore);
+
         for (String string : ItemSettingsConfig.getLoreStructure()) {
 
             if (string.contains("$weaponOrArmorStats")) {
