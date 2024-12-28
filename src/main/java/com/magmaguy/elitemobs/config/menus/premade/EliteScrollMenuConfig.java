@@ -119,6 +119,7 @@ public class EliteScrollMenuConfig extends MenusConfigFields {
 
         outputInfoButton = ConfigurationEngine.setItemStack(file, fileConfiguration, "outputInfoButton",
                 ItemStackGenerator.generateItemStack(Material.RED_BANNER, "&2Result"), true);
+        CustomModelAdder.addCustomModel(outputInfoButton, CustomModelsConfig.boxOutput);
         outputInfoSlot = ConfigurationEngine.setInt(fileConfiguration, "outputInfoSlot", 24);
         outputSlot = ConfigurationEngine.setInt(fileConfiguration, "outputSlot", 33);
         CustomModelAdder.addCustomModel(eliteScrollItemInfoButton, CustomModelsConfig.boxInput);
