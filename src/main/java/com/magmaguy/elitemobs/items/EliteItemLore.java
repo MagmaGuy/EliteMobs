@@ -54,7 +54,11 @@ public class EliteItemLore {
     }
 
     public EliteItemLore(ItemStack itemStack, boolean showItemWorth, boolean isNewItem) {
-        if (isNewItem && itemStack.getItemMeta().getLore() != null || !itemStack.getItemMeta().getLore().isEmpty()) {
+        if (isNewItem
+                && itemStack.hasItemMeta()
+                && itemStack.getItemMeta().hasLore()
+                && itemStack.getItemMeta().getLore() != null
+                && !itemStack.getItemMeta().getLore().isEmpty()) {
             thirdPartyLore = itemStack.getItemMeta().getLore();
         }
         initialize(itemStack, showItemWorth);

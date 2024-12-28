@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.items;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
+import com.magmaguy.elitemobs.utils.CustomModelAdder;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -27,6 +28,7 @@ public class EliteScroll {
         ItemStack itemStack = ItemStackGenerator.generateItemStack(scrollMaterial, ItemSettingsConfig.getEliteItemScrollName(), lore);
         ItemMeta itemMeta = itemStack.getItemMeta();
         itemMeta.getPersistentDataContainer().set(eliteScrollNamespacedKey, PersistentDataType.INTEGER, scrollLevel);
+        CustomModelAdder.addCustomModel(itemMeta, ItemSettingsConfig.getEliteItemModel());
         itemStack.setItemMeta(itemMeta);
         return itemStack;
     }
