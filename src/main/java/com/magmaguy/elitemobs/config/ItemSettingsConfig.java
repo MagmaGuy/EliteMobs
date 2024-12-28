@@ -126,6 +126,8 @@ public class ItemSettingsConfig extends ConfigurationFile {
     private static String eliteItemScrollName;
     @Getter
     private static List<String> eliteItemScrollLore;
+    @Getter
+    private static String eliteItemModel;
 
     public ItemSettingsConfig() {
         super("ItemSettings.yml");
@@ -365,9 +367,10 @@ public class ItemSettingsConfig extends ConfigurationFile {
         eliteItemScrollLore = ConfigurationEngine.setList(List.of(
                         "Sets the name of the elite item scroll item"),file,
                 fileConfiguration, "eliteItemScrollLore", List.of(
-                        "&fUse at an anvil to enchant",
-                        "&fa non-elite item into",
-                        "&fa level $level elite item!"),
+                        "&fUse at the Scroll Applier NPC to enchant",
+                        "&fa non-elite item into a level $level",
+                        "&felite item!"),
                 true);
+        eliteItemModel = ConfigurationEngine.setString(List.of(), file, fileConfiguration, "eliteItemModel", "elitemobs:elitescroll/elitescroll", false);
     }
 }
