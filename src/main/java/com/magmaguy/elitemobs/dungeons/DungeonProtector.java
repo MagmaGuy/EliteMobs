@@ -186,4 +186,12 @@ public class DungeonProtector implements Listener {
         });
     }
 
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void onPlayerInteract(PlayerInteractEvent event) {
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getClickedBlock().getWorld().getUID())) return;
+        if (event.getClickedBlock() != null && event.getClickedBlock().getType() == Material.RESPAWN_ANCHOR) {
+            event.setCancelled(true);
+        }
+    }
+
 }
