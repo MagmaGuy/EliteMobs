@@ -8,7 +8,7 @@ public class AGVampireManorWormholeConfig extends WormholeConfigFields {
         super("ag_vampire_manor_wormhole",
                 true,
                 "em_adventurers_guild,290.5,105.5,293.5,45,0",
-                "vampire_manor.yml",
+                "vampire_manor_lair.yml",
                 Wormhole.WormholeStyle.CUBE);
         setBlindPlayer(true);
         setLocation1Text("&4『Vampire Manor Lair』 &5Lvls 120-140");
