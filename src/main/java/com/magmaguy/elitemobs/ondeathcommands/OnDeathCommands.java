@@ -109,7 +109,11 @@ public class OnDeathCommands implements Listener {
     }
 
     private static void runConsoleCommand(String command) {
-        Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), command);
+        try {
+            Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), command);
+        } catch (Exception e) {
+            Logger.warn("Failed to dispatch command " + command + " !");
+        }
     }
 
     @EventHandler
