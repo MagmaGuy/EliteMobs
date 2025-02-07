@@ -240,14 +240,10 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
         spawn();
     }
 
+    //This is not actually used because EntityTracker is the one managing the entity, not PersistentObjectTracker
     @Override
     public void chunkUnload() {
-        if (villager != null)
-            villager.remove();
-        if (getNPCsConfigFields().getTimeout() > 0) return;
-
-        if (villager != null)
-            villager.remove();
+        remove(RemovalReason.CHUNK_UNLOAD);
     }
 
     @Override

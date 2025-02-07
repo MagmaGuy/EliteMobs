@@ -4,13 +4,14 @@ import com.magmaguy.elitemobs.events.TimedEvent;
 import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
+import com.magmaguy.magmacore.command.arguments.ListStringCommandArgument;
 
 import java.util.List;
 
 public class EventCommand extends AdvancedCommand {
     public EventCommand() {
         super(List.of("event"));
-        addArgument("filename", TimedEvent.getBlueprintEvents().stream().map(timedEvent -> timedEvent.getCustomEventsConfigFields().getFilename()).toList());
+        addArgument("filename", new ListStringCommandArgument(TimedEvent.getBlueprintEvents().stream().map(timedEvent -> timedEvent.getCustomEventsConfigFields().getFilename()).toList(), "filename"));
         setUsage("/em event <event filename>");
         setPermission("elitemobs.event.start");
         setSenderType(SenderType.PLAYER);

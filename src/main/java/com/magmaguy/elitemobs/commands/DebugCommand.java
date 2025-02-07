@@ -5,14 +5,14 @@ import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
+import com.magmaguy.magmacore.command.arguments.ListStringCommandArgument;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class DebugCommand extends AdvancedCommand {
     public DebugCommand() {
         super(List.of("debug"));
-        addArgument("filename", new ArrayList<>(CustomBossesConfig.getCustomBosses().keySet()));
+        addArgument("filename", new ListStringCommandArgument(CustomBossesConfig.getCustomBosses().keySet().stream().toList(), "filename"));
         setUsage("/em debug <player name/boss filename>");
         setPermission("elitemobs.debug");
         setSenderType(SenderType.PLAYER);

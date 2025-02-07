@@ -14,6 +14,7 @@ import com.magmaguy.elitemobs.mobconstructor.custombosses.transitiveblocks.Trans
 import com.magmaguy.elitemobs.pathfinding.Navigation;
 import com.magmaguy.elitemobs.powers.SpiritWalk;
 import com.magmaguy.elitemobs.utils.AttributeManager;
+import com.magmaguy.elitemobs.utils.ChunkLocationChecker;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
@@ -289,6 +290,9 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
                 if (!(this instanceof InstancedBossEntity))
                     respawn();
                 break;
+            case CHUNK_UNLOAD:
+                if (ChunkLocationChecker.locationIsLoaded(spawnLocation))
+                    respawn();
             default:
                 break;
         }

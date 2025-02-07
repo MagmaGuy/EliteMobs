@@ -5,9 +5,9 @@ import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
+import com.magmaguy.magmacore.command.arguments.ListStringCommandArgument;
 import com.magmaguy.magmacore.util.Logger;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,7 +15,7 @@ public class TrackBossCommand extends AdvancedCommand {
     public TrackBossCommand() {
         super(List.of("track"));
         addLiteral("boss");
-        addArgument("id", new ArrayList<>());
+        addArgument("id", new ListStringCommandArgument("<id>"));
         setDescription("Tracks a Custom Boss.");
         setUsage("/em track boss <id>");
         setSenderType(SenderType.PLAYER);
