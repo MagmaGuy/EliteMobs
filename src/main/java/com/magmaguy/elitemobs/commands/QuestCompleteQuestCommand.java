@@ -4,15 +4,15 @@ import com.magmaguy.elitemobs.commands.quests.QuestCommand;
 import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
+import com.magmaguy.magmacore.command.arguments.ListStringCommandArgument;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class QuestCompleteQuestCommand extends AdvancedCommand {
     public QuestCompleteQuestCommand() {
         super(List.of("quest"));
         addLiteral("complete");
-        addArgument("id", new ArrayList<>());
+        addArgument("id", new ListStringCommandArgument("<id>"));
         setUsage("/em quest complete");
         setPermission("elitemobs.quest.complete");
         setSenderType(SenderType.PLAYER);

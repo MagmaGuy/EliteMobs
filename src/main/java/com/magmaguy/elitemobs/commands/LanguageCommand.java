@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.translations.TranslationsConfig;
 import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
+import com.magmaguy.magmacore.command.arguments.ListStringCommandArgument;
 import com.magmaguy.magmacore.util.Logger;
 
 import java.util.ArrayList;
@@ -14,7 +15,7 @@ public class LanguageCommand extends AdvancedCommand {
         super(List.of("language"));
         List<String> suggestions = new ArrayList<>(TranslationsConfig.getTranslationConfigs().keySet().stream().toList());
         suggestions.add("english");
-        addArgument("language", suggestions);
+        addArgument("language", new ListStringCommandArgument(suggestions, "<language>"));
         setUsage("/em language <filename>");
         setPermission("elitemobs.language");
         setDescription("Sets the language that the server will use for EliteMobs, based on a translation file in the translation files.");
@@ -30,6 +31,6 @@ public class LanguageCommand extends AdvancedCommand {
         }
         DefaultConfig.setLanguage(commandData.getCommandSender(), language);
         Logger.sendMessage(commandData.getCommandSender(), "&2Language set to " + language +
-                " ! &4Translations are created and manged for free by the community through Crowdin ( https://crowdin.com/project/elitemobs ), use at your own discretion!");
+                " ! &4Translations are created and managed for free by the community through Crowdin ( https://crowdin.com/project/elitemobs ), use at your own discretion!");
     }
 }

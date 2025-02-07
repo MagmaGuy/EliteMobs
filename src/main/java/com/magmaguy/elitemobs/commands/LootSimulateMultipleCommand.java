@@ -1,21 +1,21 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.commands.admin.SimLootCommand;
-import com.magmaguy.elitemobs.config.customitems.CustomItemsConfig;
 import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
+import com.magmaguy.magmacore.command.arguments.IntegerCommandArgument;
+import com.magmaguy.magmacore.command.arguments.PlayerCommandArgument;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class LootSimulateMultipleCommand extends AdvancedCommand {
     public LootSimulateMultipleCommand() {
         super(List.of("loot"));
         addLiteral("simulate");
-        addArgument("level", new ArrayList<>());
-        addArgument("times", new ArrayList<>(CustomItemsConfig.getCustomItems().keySet()));
-        addArgument("playerName", new ArrayList<>());
+        addArgument("level", new IntegerCommandArgument("<level>"));
+        addArgument("times", new IntegerCommandArgument("<times>"));
+        addArgument("playerName", new PlayerCommandArgument());
         setUsage("/em loot simulate <level> <times> <playerName>");
         setPermission("elitemobs.loot.admin");
         setSenderType(SenderType.PLAYER);

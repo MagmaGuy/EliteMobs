@@ -4,15 +4,15 @@ import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestsCo
 import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
+import com.magmaguy.magmacore.command.arguments.ListStringCommandArgument;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class PlaceTreasureChestCommand extends AdvancedCommand {
     public PlaceTreasureChestCommand() {
         super(List.of("place"));
         addLiteral("treasureChest");
-        addArgument("filename", new ArrayList<>(CustomTreasureChestsConfig.getCustomTreasureChestConfigFields().keySet()));
+        addArgument("filename", new ListStringCommandArgument(CustomTreasureChestsConfig.getCustomTreasureChestConfigFields().keySet().stream().toList(),"<filename>"));
         setUsage("/em place treasureChest <filename>");
         setPermission("elitemobs.place.admin");
         setSenderType(SenderType.PLAYER);

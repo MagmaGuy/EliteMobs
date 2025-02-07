@@ -4,17 +4,18 @@ import com.magmaguy.elitemobs.commands.admin.KillHandler;
 import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
+import com.magmaguy.magmacore.command.arguments.EntityTypeCommandArgument;
+import com.magmaguy.magmacore.command.arguments.IntegerCommandArgument;
 import org.bukkit.entity.EntityType;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class KillTypeRadiusCommand extends AdvancedCommand {
     public KillTypeRadiusCommand() {
         super(List.of("kill"));
         addLiteral("type");
-        addArgument("type", new ArrayList<>());
-        addArgument("range", new ArrayList<>());
+        addArgument("type", new EntityTypeCommandArgument());
+        addArgument("range", new IntegerCommandArgument("<range>"));
         setUsage("/em kill type <entityType> <radius>");
         setPermission("elitemobs.kill.command");
         setSenderType(SenderType.PLAYER);

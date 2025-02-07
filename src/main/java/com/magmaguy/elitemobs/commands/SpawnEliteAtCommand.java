@@ -4,10 +4,10 @@ import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
+import com.magmaguy.magmacore.command.arguments.*;
 import org.bukkit.entity.EntityType;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,13 +15,13 @@ public class SpawnEliteAtCommand extends AdvancedCommand {
     public SpawnEliteAtCommand() {
         super(List.of("spawn"));
         addLiteral("eliteAt");
-        addArgument("world", new ArrayList<>());
-        addArgument("x", new ArrayList<>());
-        addArgument("y", new ArrayList<>());
-        addArgument("z", new ArrayList<>());
-        addArgument("entityType", new ArrayList<>());
-        addArgument("level", new ArrayList<>());
-        addArgument("powers", ElitePower.getElitePowers().keySet().stream().toList());
+        addArgument("world", new WorldCommandArgument("<world>"));
+        addArgument("x", new DoubleCommandArgument("<x>"));
+        addArgument("y", new DoubleCommandArgument("<y>"));
+        addArgument("z", new DoubleCommandArgument("<z>"));
+        addArgument("entityType", new EntityTypeCommandArgument());
+        addArgument("level", new IntegerCommandArgument("<level>"));
+        addArgument("powers", new ListStringCommandArgument(ElitePower.getElitePowers().keySet().stream().toList(), "<powers>"));
         setUsage("/em spawn eliteAt <world> <x> <y> <z> <entityType> <level> <power1> <power2> <power3> <...>");
         setPermission("elitemobs.place.admin");
         setSenderType(SenderType.PLAYER);

@@ -273,6 +273,8 @@ public class EliteMobs extends JavaPlugin {
 
         DynamicQuest.startRandomizingQuests();
         CustomBossEntity.startUpdatingDynamicLevels();
+
+        EntityTracker.managedEntityWatchdog();
     }
 
     @Override

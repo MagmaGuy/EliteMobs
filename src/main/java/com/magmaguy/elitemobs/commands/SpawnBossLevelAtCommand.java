@@ -3,24 +3,23 @@ package com.magmaguy.elitemobs.commands;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
-import org.bukkit.Bukkit;
-import org.bukkit.generator.WorldInfo;
+import com.magmaguy.magmacore.command.arguments.IntegerCommandArgument;
+import com.magmaguy.magmacore.command.arguments.ListStringCommandArgument;
+import com.magmaguy.magmacore.command.arguments.WorldCommandArgument;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class SpawnBossLevelAtCommand extends AdvancedCommand {
     public SpawnBossLevelAtCommand() {
         super(List.of("spawn"));
         addLiteral("bossAt");
-        addArgument("filename", new ArrayList<>(CustomBossesConfig.getCustomBosses().keySet()));
-        addArgument("worldName", Bukkit.getWorlds().stream().map(WorldInfo::getName).collect(Collectors.toList()));
-        addArgument("x", new ArrayList<>());
-        addArgument("y", new ArrayList<>());
-        addArgument("z", new ArrayList<>());
-        addArgument("level", new ArrayList<>());
+        addArgument("filename", new ListStringCommandArgument(CustomBossesConfig.getCustomBosses().keySet().stream().toList(), "<filename>"));
+        addArgument("worldName", new WorldCommandArgument("<worldName>"));
+        addArgument("x", new IntegerCommandArgument("<x>"));
+        addArgument("y", new IntegerCommandArgument("<y>"));
+        addArgument("z", new IntegerCommandArgument("<z>"));
+        addArgument("level", new IntegerCommandArgument("<level>"));
         setUsage("/em spawn bossAt <filename> <worldName> <x> <y> <z> <level>");
         setPermission("elitemobs.place.admin");
         setDescription("Spawns a custom boss at the specified location with the specified level.");

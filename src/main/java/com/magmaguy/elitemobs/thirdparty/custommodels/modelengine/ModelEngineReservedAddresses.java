@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.thirdparty.custommodels.modelengine;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import org.bukkit.Bukkit;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -26,7 +25,7 @@ public class ModelEngineReservedAddresses {
      */
     public static void reserve() {
         //Nothing gets reserved if ModelEngine isn't installed
-        if (!Bukkit.getPluginManager().isPluginEnabled("ModelEngine")) return;
+        if (!ModelEngineChecker.modelEngineIsInstalled()) return;
         Path modelEngineBlueprintsPath = Paths.get(MetadataHandler.PLUGIN.getDataFolder().getParentFile().getAbsolutePath() + File.separatorChar + "ModelEngine" + File.separatorChar + "blueprints");
         //These are hardcoded and kept updated with releases. No two ways about it!
         makeDirectory(modelEngineBlueprintsPath, "em_1_primis");

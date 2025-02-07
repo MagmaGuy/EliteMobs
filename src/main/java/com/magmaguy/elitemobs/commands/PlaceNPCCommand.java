@@ -5,15 +5,15 @@ import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
 import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
+import com.magmaguy.magmacore.command.arguments.ListStringCommandArgument;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class PlaceNPCCommand extends AdvancedCommand {
     public PlaceNPCCommand() {
         super(List.of("place"));
         addLiteral("npc");
-        addArgument("filename", new ArrayList<>(NPCsConfig.npcEntities.keySet()));
+        addArgument("filename", new ListStringCommandArgument(NPCsConfig.npcEntities.keySet().stream().toList(),"<filename>"));
         setUsage("/em place npc <filename>");
         setPermission("elitemobs.place.npc");
         setSenderType(SenderType.PLAYER);

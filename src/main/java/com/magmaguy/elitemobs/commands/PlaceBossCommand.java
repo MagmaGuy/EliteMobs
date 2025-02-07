@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
+import com.magmaguy.magmacore.command.arguments.ListStringCommandArgument;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +19,7 @@ public class PlaceBossCommand extends AdvancedCommand {
         for (Map.Entry<String, ? extends CustomBossesConfigFields> entry : CustomBossesConfig.getCustomBosses().entrySet())
             if (entry.getValue().isRegionalBoss())
                 regionalBosses.add(entry.getKey());
-        addArgument("filename", regionalBosses);
+        addArgument("filename", new ListStringCommandArgument(regionalBosses, "<filename>"));
         setUsage("/em place boss <filename>");
         setPermission("elitemobs.place.admin");
         setSenderType(SenderType.PLAYER);
