@@ -74,7 +74,7 @@ public class SkeletonTrackingArrow extends MajorPower implements Listener {
                         if (((Player) nearbyEntity).getGameMode().equals(GameMode.ADVENTURE) ||
                                 ((Player) nearbyEntity).getGameMode().equals(GameMode.SURVIVAL)) {
                             Arrow arrow = AttackArrow.shootArrow(eliteEntity.getLivingEntity(), (Player) nearbyEntity);
-                            arrow.setVelocity(arrow.getVelocity().multiply(0.1));
+                            arrow.setVelocity(arrow.getVelocity().multiply(0.2));
                             arrow.setGravity(false);
                             trackingArrowLoop((Player) nearbyEntity, arrow);
                         }

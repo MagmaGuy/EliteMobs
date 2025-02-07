@@ -4,16 +4,17 @@ import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
+import com.magmaguy.magmacore.command.arguments.IntegerCommandArgument;
+import com.magmaguy.magmacore.command.arguments.ListStringCommandArgument;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class SpawnBossLevelCommand extends AdvancedCommand {
     public SpawnBossLevelCommand() {
         super(List.of("spawn"));
         addLiteral("boss");
-        addArgument("filename", new ArrayList<>(CustomBossesConfig.getCustomBosses().keySet()));
-        addArgument("level", List.of("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19"));
+        addArgument("filename", new ListStringCommandArgument(CustomBossesConfig.getCustomBosses().keySet().stream().toList(),"<filename>"));
+        addArgument("level", new IntegerCommandArgument("<level>"));
         setUsage("/em spawn boss <filename> <level>");
         setPermission("elitemobs.place.admin");
         setSenderType(SenderType.PLAYER);

@@ -4,14 +4,14 @@ import com.magmaguy.elitemobs.commands.admin.KillHandler;
 import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
+import com.magmaguy.magmacore.command.arguments.IntegerCommandArgument;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class KillRadiusCommand extends AdvancedCommand {
     public KillRadiusCommand() {
         super(List.of("kill"));
-        addArgument("radius", new ArrayList<>());
+        addArgument("radius", new IntegerCommandArgument( "<radius>"));
         setUsage("/em kill <radius>");
         setPermission("elitemobs.kill.command");
         setSenderType(SenderType.PLAYER);

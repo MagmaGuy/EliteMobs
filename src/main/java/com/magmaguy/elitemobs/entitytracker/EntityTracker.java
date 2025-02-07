@@ -23,9 +23,10 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.world.ChunkUnloadEvent;
+import org.bukkit.event.entity.EntityRemoveEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -66,12 +67,7 @@ public class EntityTracker implements Listener {
         return PersistentTagger.getEliteEntity(entity);
     }
 
-    public static void unregisterEliteEntity(Entity entity, RemovalReason removalReason) {
-        EliteEntity eliteEntity = getEliteMobEntity(entity);
-        if (eliteEntity == null) return;
-        //Removal from the hashmap is not guaranteed here as some forms of removal don't completely wipe the elite entity out
-        eliteEntity.remove(removalReason);
-    }
+    private static BukkitTask ManagedEntityTask = null;
 
     public static void registerVisualEffects(Entity entity) {
         PersistentTagger.tagVisualEffect(entity);
@@ -81,8 +77,12 @@ public class EntityTracker implements Listener {
         return PersistentTagger.isVisualEffect(entity);
     }
 
-    public static void unregisterVisualEffect(Entity entity) {
-        if (isVisualEffect(entity)) entity.remove();
+    public static boolean unregisterEliteEntity(Entity entity, RemovalReason removalReason) {
+        EliteEntity eliteEntity = getEliteMobEntity(entity);
+        if (eliteEntity == null) return false;
+        //Removal from the hashmap is not guaranteed here as some forms of removal don't completely wipe the elite entity out
+        eliteEntity.remove(removalReason);
+        return true;
     }
 
     public static void registerNPCEntity(NPCEntity npc) {
@@ -101,11 +101,12 @@ public class EntityTracker implements Listener {
         return PersistentTagger.getNPC(entity);
     }
 
-    public static void unregisterNPCEntity(Entity entity, RemovalReason removalReason) {
-        NPCEntity npcEntity = getNPCEntity(entity);
-        if (npcEntity == null) return;
-        //Removal from the hashmap is not guaranteed here as some forms of removal don't completely wipe the elite entity out
-        npcEntity.remove(removalReason);
+    public static boolean unregisterVisualEffect(Entity entity) {
+        if (isVisualEffect(entity)) {
+            entity.remove();
+            return true;
+        }
+        return false;
     }
 
     //Temporary blocks - blocks in powers
@@ -154,15 +155,20 @@ public class EntityTracker implements Listener {
         return PersistentTagger.isEliteProjectile(entity);
     }
 
-    public static void unregisterProjectileEntity(Entity entity) {
-        if (isProjectileEntity(entity)) entity.remove();
+    public static boolean unregisterNPCEntity(Entity entity, RemovalReason removalReason) {
+        NPCEntity npcEntity = getNPCEntity(entity);
+        if (npcEntity == null) return false;
+        //Removal from the hashmap is not guaranteed here as some forms of removal don't completely wipe the elite entity out
+        npcEntity.remove(removalReason);
+        return true;
     }
 
-    public static void unregister(Entity entity, RemovalReason removalReason) {
-        unregisterEliteEntity(entity, removalReason);
-        unregisterVisualEffect(entity);
-        unregisterProjectileEntity(entity);
-        unregisterNPCEntity(entity, removalReason);
+    public static boolean unregisterProjectileEntity(Entity entity) {
+        if (isProjectileEntity(entity)) {
+            entity.remove();
+            return true;
+        }
+        return false;
     }
 
     public static void wipeChunk(Chunk chunk, RemovalReason removalReason) {
@@ -175,7 +181,24 @@ public class EntityTracker implements Listener {
             wipeChunk(chunk, removalReason);
     }
 
+    public static void unregister(Entity entity, RemovalReason removalReason) {
+        if (unregisterEliteEntity(entity, removalReason)) return;
+        if (unregisterVisualEffect(entity)) return;
+        if (unregisterProjectileEntity(entity)) return;
+        if (unregisterNPCEntity(entity, removalReason)) {
+        }
+    }
+
+
+    //Events
+//    @EventHandler(ignoreCancelled = true)
+//    public void onUnload(ChunkUnloadEvent event) {
+//        EntityTracker.wipeChunk(event.getChunk(), RemovalReason.CHUNK_UNLOAD);
+//    }
+
     public static void wipeShutdown() {
+        if (ManagedEntityTask != null)
+            ManagedEntityTask.cancel();
         for (EliteEntity eliteEntity : ((HashMap<UUID, EliteEntity>) eliteMobEntities.clone()).values())
             eliteEntity.remove(RemovalReason.SHUTDOWN);
         getEliteMobEntities().clear();
@@ -193,13 +216,6 @@ public class EntityTracker implements Listener {
         CrashFix.knownSessionChunks.clear();
     }
 
-
-    //Events
-    @EventHandler(ignoreCancelled = true)
-    public void onUnload(ChunkUnloadEvent event) {
-        EntityTracker.wipeChunk(event.getChunk(), RemovalReason.CHUNK_UNLOAD);
-    }
-
     @EventHandler(ignoreCancelled = true)
     public void onWorldUnload(WorldUnloadEvent event) {
         EntityTracker.wipeWorld(event.getWorld(), RemovalReason.WORLD_UNLOAD);
@@ -212,5 +228,35 @@ public class EntityTracker implements Listener {
         event.setDropItems(false);
         removeTemporaryBlock(event.getBlock());
     }
+
+    //After many years of trying to make the chunk unload event work, I gave up and am now using a clock instead.
+    //There's just too many bugs with how the chunk unloading works, unfortunately
+    public static void managedEntityWatchdog() {
+        ManagedEntityTask = new BukkitRunnable() {
+            @Override
+            public void run() {
+                // Safely iterate over eliteMobEntities by cloning the values first to avoid CME
+                new HashSet<>(eliteMobEntities.values()).forEach(value -> {
+                    if (value.getLivingEntity() != null && !value.getLivingEntity().isValid()) {
+                        value.remove(RemovalReason.CHUNK_UNLOAD);
+                    }
+                });
+
+                // Safely iterate over npcEntities by cloning the values first to avoid CME
+                new HashSet<>(npcEntities.values()).forEach(value -> {
+                    if (value.getVillager() != null && !value.getVillager().isValid()) {
+                        value.remove(RemovalReason.CHUNK_UNLOAD);
+                    }
+                });
+            }
+        }.runTaskTimer(MetadataHandler.PLUGIN, 0,1);
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onRemove(EntityRemoveEvent event) {
+        if (event.getCause().equals(EntityRemoveEvent.Cause.UNLOAD))
+            EntityTracker.unregister(event.getEntity(), RemovalReason.CHUNK_UNLOAD);
+    }
+
 
 }

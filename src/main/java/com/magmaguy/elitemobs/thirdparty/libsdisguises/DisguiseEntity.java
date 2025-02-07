@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.thirdparty.libsdisguises;
 
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.magmacore.util.Logger;
 import me.libraryaddict.disguise.DisguiseAPI;
@@ -17,7 +18,6 @@ public class DisguiseEntity {
      * @param disguiseName Raw name following config format
      */
     public static void disguise(String disguiseName, Entity entity, String customDisguiseData, String filename) {
-
         if (disguiseName.contains("player:")) {
             playerDisguise(disguiseName.replace("player:", ""), entity);
             return;
@@ -58,28 +58,17 @@ public class DisguiseEntity {
 
     private static void playerDisguise(String playerName, Entity entity) {
         PlayerDisguise playerDisguise = new PlayerDisguise(playerName);
-        playerDisguise.setEntity(entity);
-        playerDisguise.setName(entity.getCustomName());
-        playerDisguise.setNameVisible(true); //libs really doesn't like dynamic name displays
-        //playerDisguise.setNameVisible(DefaultConfig.isAlwaysShowNametags() || entity.getType().equals(EntityType.VILLAGER));
-        playerDisguise.setDynamicName(true);
-        playerDisguise.startDisguise();
+        scheduleDisguise(playerDisguise, entity);
     }
 
     private static void livingEntityDisguise(DisguiseType disguiseType, Entity entity, boolean baby) {
         MobDisguise mobDisguise = new MobDisguise(disguiseType, !baby);
-        mobDisguise.setEntity(entity);
-        mobDisguise.setDisguiseName(entity.getCustomName());
-        mobDisguise.setDynamicName(true);
-        mobDisguise.startDisguise();
+        scheduleDisguise(mobDisguise, entity);
     }
 
     private static void miscEntityDisguise(DisguiseType disguiseType, Entity entity) {
         MiscDisguise miscDisguise = new MiscDisguise(disguiseType);
-        miscDisguise.setDisguiseName(entity.getCustomName());
-        miscDisguise.setDynamicName(true);
-        miscDisguise.setEntity(entity);
-        miscDisguise.startDisguise();
+        scheduleDisguise(miscDisguise, entity);
     }
 
     private static void customDisguise(String customDisguise, Entity entity, String customDisguiseData, String filename) {
@@ -92,20 +81,31 @@ public class DisguiseEntity {
                 }
             if (disguise == null)
                 throw new NullPointerException();
-            disguise.setEntity(entity);
-            disguise.setDisguiseName(entity.getCustomName());
-            disguise.setDynamicName(true);
-            if ((DefaultConfig.isAlwaysShowNametags() || entity.getType().equals(EntityType.VILLAGER))
-                    && disguise instanceof PlayerDisguise) {
-                ((PlayerDisguise) disguise).setNameVisible(true);
-            } else if (disguise instanceof PlayerDisguise) {
-                ((PlayerDisguise) disguise).setNameVisible(false);
-            }
-            disguise.startDisguise();
+            scheduleDisguise(disguise, entity);
         } catch (Exception ex) {
             Logger.warn("Failed to set custom disguise for " + filename + " !");
             Logger.warn("Does the disguise exist? Is LibsDisguises up-to-date?");
         }
+    }
+
+    private static void scheduleDisguise(Disguise disguise, Entity entity) {
+        applyDisguise(disguise, entity);
+        Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> {
+            applyDisguise(disguise, entity);
+        }, 20);
+    }
+
+    private static void applyDisguise(Disguise disguise, Entity entity) {
+        disguise.setEntity(entity);
+        disguise.setDisguiseName(entity.getCustomName());
+        disguise.setDynamicName(true);
+        if ((DefaultConfig.isAlwaysShowNametags() || entity.getType().equals(EntityType.VILLAGER))
+                && disguise instanceof PlayerDisguise) {
+            ((PlayerDisguise) disguise).setNameVisible(true);
+        } else if (disguise instanceof PlayerDisguise) {
+            ((PlayerDisguise) disguise).setNameVisible(false);
+        }
+        disguise.startDisguise();
     }
 
     public static void setDisguiseNameVisibility(boolean disguiseNameVisibility, Entity entity, String name) {
@@ -113,24 +113,7 @@ public class DisguiseEntity {
         Disguise disguise = DisguiseAPI.getDisguise(entity);
         if (disguise == null) return;
         if (disguise instanceof PlayerDisguise) {
-            /*
-            Currently broken, waiting for libs to fix it
-            if (disguiseNameVisibility) {
-                entity.setCustomName(name);
-                disguise.setDisguiseName(name);
-                disguise.setDynamicName(true);
-            }
-             */
-            //((PlayerDisguise) disguise).setNameVisible(disguiseNameVisibility);
             ((PlayerDisguise) disguise).setNameVisible(true);
         }
-        //todo: This doesn't work yes, check with libs later to see if he found a solution
-        /*
-        if (!(disguise.getWatcher() instanceof PlayerWatcher)) return;
-        PlayerWatcher playerWatcher = (PlayerWatcher) disguise.getWatcher();
-        playerWatcher.setNameVisible(disguiseNameVisibility);
-        playerWatcher.setCustomNameVisible(disguiseNameVisibility);
-         */
     }
-
 }

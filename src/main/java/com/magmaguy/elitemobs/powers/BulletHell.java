@@ -55,7 +55,7 @@ public class BulletHell extends BossPower implements Listener {
     }
 
     private static Vector arrowAdjustmentVector(Arrow arrow, Player player) {
-        return player.getEyeLocation().clone().subtract(new Vector(0, 0.5, 0)).subtract(arrow.getLocation()).toVector().normalize().multiply(0.1);
+        return player.getEyeLocation().clone().subtract(new Vector(0, 0.5, 0)).subtract(arrow.getLocation()).toVector().normalize().multiply(0.2);
     }
 
     @EventHandler

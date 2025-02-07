@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.thirdparty.custommodels.freeminecraftmodels.CustomModelFMM;
 import com.magmaguy.elitemobs.thirdparty.custommodels.modelengine.CustomModelMEG;
+import com.magmaguy.elitemobs.thirdparty.custommodels.modelengine.ModelEngineChecker;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
@@ -41,7 +42,7 @@ public class CustomModel implements CustomModelInterface {
     public static void initialize() {
         if (Bukkit.getPluginManager().isPluginEnabled("FreeMinecraftModels"))
             modelPlugin = ModelPlugin.FREE_MINECRAFT_MODELS;
-        else if (Bukkit.getPluginManager().isPluginEnabled("ModelEngine") && Bukkit.getPluginManager().getPlugin("ModelEngine").getDescription().getVersion().contains("R3"))
+        else if (ModelEngineChecker.modelEngineIsInstalled())
             modelPlugin = ModelPlugin.MODEL_ENGINE;
         else modelPlugin = ModelPlugin.NONE;
     }
