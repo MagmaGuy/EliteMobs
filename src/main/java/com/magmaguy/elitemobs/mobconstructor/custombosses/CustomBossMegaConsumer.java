@@ -58,7 +58,8 @@ public class CustomBossMegaConsumer {
                 .replace("$eventBossLevel", ChatColorConverter.convert("&4「&c" + level + "&4」&f")));
         livingEntity.setCustomName(parsedName);
         livingEntity.setCustomNameVisible(DefaultConfig.isAlwaysShowNametags());
-        DisguiseEntity.setDisguiseNameVisibility(DefaultConfig.isAlwaysShowNametags(), livingEntity, parsedName);
+        if (Bukkit.getPluginManager().isPluginEnabled("LibsDisguises"))
+            DisguiseEntity.setDisguiseNameVisibility(DefaultConfig.isAlwaysShowNametags(), livingEntity, parsedName);
         customBossEntity.setName(parsedName, false);
     }
 

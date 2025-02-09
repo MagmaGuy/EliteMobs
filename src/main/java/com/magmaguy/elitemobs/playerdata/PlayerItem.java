@@ -165,6 +165,10 @@ public class PlayerItem {
         eliteDamage = 0;
         blastProtection = 0;
         loudStrikesBonus = 0;
+        if (displayingAsBroken) {
+            BossBarUtil.HideBrokenItemBossBar(equipmentSlot, player);
+            displayingAsBroken = false;
+        }
         return true;
     }
 
