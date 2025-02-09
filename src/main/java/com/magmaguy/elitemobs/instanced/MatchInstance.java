@@ -182,7 +182,8 @@ public abstract class MatchInstance {
                 if (exitLocation != null) player.teleport(exitLocation);
                 else if (PlayerData.getBackTeleportLocation(player) != null)
                     player.teleport(PlayerData.getBackTeleportLocation(player));
-                else player.teleport(DefaultConfig.getDefaultSpawnLocation());
+                else if (DefaultConfig.getDefaultSpawnLocation() != null && DefaultConfig.getDefaultSpawnLocation().getWorld() != null)
+                    player.teleport(DefaultConfig.getDefaultSpawnLocation());
             }
     }
 
@@ -344,6 +345,11 @@ public abstract class MatchInstance {
                 matchInstance.removeAnyKind(event.getPlayer());
                 return;
             }
+
+            for (MatchInstance instance : instances)
+                if (instance.world.equals(event.getFrom()) || instance.world.equals(event.getTo()))
+                    return;
+
             event.setCancelled(true);
         }
     }
