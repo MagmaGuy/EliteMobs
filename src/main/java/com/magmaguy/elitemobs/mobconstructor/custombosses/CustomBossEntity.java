@@ -369,7 +369,8 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
         //Check if the boss is already dead
         if (livingEntity == null) return;
         super.setNameVisible(isVisible);
-        DisguiseEntity.setDisguiseNameVisibility(isVisible, livingEntity, name);
+        if (Bukkit.getPluginManager().isPluginEnabled("LibsDisguises"))
+            DisguiseEntity.setDisguiseNameVisibility(isVisible, livingEntity, name);
         if (customModel != null && isValid())
             customModel.setNameVisible(isVisible);
     }
