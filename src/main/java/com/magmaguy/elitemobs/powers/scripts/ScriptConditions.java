@@ -102,7 +102,8 @@ public class ScriptConditions {
      */
     private boolean checkRandomizer() {
         if (conditionsBlueprint.getRandomChance() == null) return true;
-        return ThreadLocalRandom.current().nextDouble() < conditionsBlueprint.getRandomChance();
+        double random = ThreadLocalRandom.current().nextDouble();
+        return random < conditionsBlueprint.getRandomChance();
     }
 
     /**

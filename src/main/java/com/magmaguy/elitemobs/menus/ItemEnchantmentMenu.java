@@ -250,8 +250,6 @@ public class ItemEnchantmentMenu extends EliteMenu {
                     .replace("$currencyName", EconomySettingsConfig.getCurrencyName())
                     .replace("$currentAmount", EconomyHandler.checkCurrency(event.getWhoClicked().getUniqueId()) + ""));
 
-            //challenge(event); cool for debugging, I'll remove this later
-
             EnumMap<Chance, Double> chance = getChanceBreakdown(event.getView().getTopInventory());
             double rolledChance = ThreadLocalRandom.current().nextDouble();
             if (rolledChance < chance.get(Chance.CRITICAL_FAILURE))
