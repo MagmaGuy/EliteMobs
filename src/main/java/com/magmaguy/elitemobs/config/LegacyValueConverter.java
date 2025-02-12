@@ -10,6 +10,8 @@ public class LegacyValueConverter {
 
     public static String parseEnchantment(String materialName) {
         switch (materialName.toUpperCase(Locale.ROOT)) {
+            case "DAMAGE_ALL":
+                return "SHARPNESS";
             case "ARROW_DAMAGE":
                 return "POWER";
             case "ARROW_FIRE":

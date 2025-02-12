@@ -1,5 +1,5 @@
 name: EliteMobs
-version: 9.3.1
+version: 9.3.2
 author: MagmaGuy
 main: com.magmaguy.elitemobs.EliteMobs
 api-version: 1.14
@@ -49,9 +49,6 @@ permissions:
   elitemobs.arena.start:
     description: Allows players to start an arena
     default: true
-  elitemobs.debug:
-    description: Gives access to the debug command
-    default: op
   elitemobs.discord.link:
     description: Gives the link to EliteMobs' discord server
     default: true

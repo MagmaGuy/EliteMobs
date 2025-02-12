@@ -186,4 +186,10 @@ public class DungeonProtector implements Listener {
         });
     }
 
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventSignEdits(SignChangeEvent event) {
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getPlayer().getWorld().getUID())) return;
+        event.setCancelled(true);
+    }
+
 }

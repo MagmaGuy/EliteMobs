@@ -46,6 +46,7 @@ import com.magmaguy.elitemobs.powers.*;
 import com.magmaguy.elitemobs.powers.meta.Bombardment;
 import com.magmaguy.elitemobs.powers.meta.CombatEnterScanPower;
 import com.magmaguy.elitemobs.powers.meta.CustomSummonPower;
+import com.magmaguy.elitemobs.powers.scripts.EliteScript;
 import com.magmaguy.elitemobs.powers.scripts.ScriptListener;
 import com.magmaguy.elitemobs.powers.specialpowers.EnderCrystalLightningRod;
 import com.magmaguy.elitemobs.powerstances.EffectEventHandlers;
@@ -208,6 +209,8 @@ public class EventsRegistrer {
 
         //special powers
         register(new EnderCrystalLightningRod.EnderCrystalLightningRodEvents());
+
+        register(new EliteScript.EliteScriptEvents());
 
         //Custom bosses
         register(new CustomBossEntity.CustomBossEntityEvents());

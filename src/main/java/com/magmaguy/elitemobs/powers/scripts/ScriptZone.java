@@ -79,6 +79,8 @@ public class ScriptZone {
         this.isValid = zoneBlueprint.getTarget() != null;
     }
 
+    private ZoneListenerTask zoneListenerTask = null;
+
     /**
      * Starts a zone listener that monitors entities entering or leaving the zone.
      *
@@ -86,10 +88,12 @@ public class ScriptZone {
      */
     public void startZoneListener(EliteEntity eliteEntity) {
         if (!zoneListener) return;
+        if (zoneListenerTask != null) zoneListenerTask.cancel();
 
         entitiesInZone = new HashSet<>();
         ScriptActionData scriptActionData = new ScriptActionData(eliteEntity, targets, this);
-        new ZoneListenerTask(eliteEntity, scriptActionData).runTaskTimer(MetadataHandler.PLUGIN, 1, 1);
+        zoneListenerTask = new ZoneListenerTask(eliteEntity, scriptActionData);
+        zoneListenerTask.runTaskTimer(MetadataHandler.PLUGIN, 1, 1);
     }
 
     /**

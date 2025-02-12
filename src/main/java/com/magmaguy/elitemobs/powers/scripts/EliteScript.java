@@ -1,6 +1,8 @@
 package com.magmaguy.elitemobs.powers.scripts;
 
+import com.magmaguy.elitemobs.api.EliteMobSpawnEvent;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import com.magmaguy.elitemobs.powers.scripts.caching.EliteScriptBlueprint;
 import lombok.Getter;
@@ -8,6 +10,8 @@ import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 
 import java.util.HashMap;
 import java.util.List;
@@ -31,10 +35,7 @@ public class EliteScript extends ElitePower implements Cloneable {
         this.scriptEvents = new ScriptEvents(scriptBlueprint.getScriptEventsBlueprint());
         this.scriptConditions = new ScriptConditions(scriptBlueprint.getScriptConditionsBlueprint(), this, false);
         this.scriptZone = new ScriptZone(scriptBlueprint.getScriptZoneBlueprint(), this);
-        if (scriptEvents.getScriptEventsBlueprint().isZoneListener()) {
-            scriptZone.setZoneListener(true);
-            scriptZone.startZoneListener(eliteEntity);
-        }
+        initializeCustomEvents(eliteEntity);
         this.scriptActions = new ScriptActions(scriptBlueprint.getScriptActionsBlueprint(), eliteScriptMap, this);
         this.scriptCooldowns = new ScriptCooldowns(scriptBlueprint.getScriptCooldownsBlueprint(), this);
         eliteScriptMap.put(scriptBlueprint.getScriptName(), this);
@@ -124,4 +125,22 @@ public class EliteScript extends ElitePower implements Cloneable {
         doCooldownTicks(previousScriptActionData.getEliteEntity());
     }
 
+    public void initializeCustomEvents(EliteEntity eliteEntity) {
+        if (scriptEvents.getScriptEventsBlueprint().isZoneListener()) {
+            scriptZone.setZoneListener(true);
+            scriptZone.startZoneListener(eliteEntity);
+        }
+    }
+
+    public static class EliteScriptEvents implements Listener {
+        @EventHandler
+        public void onSpawn(EliteMobSpawnEvent event) {
+            if (event.getEliteMobEntity() instanceof CustomBossEntity customBossEntity) {
+                customBossEntity.getElitePowers().forEach(elitePower -> {
+                    if (elitePower instanceof EliteScript eliteScript)
+                        eliteScript.initializeCustomEvents(event.getEliteMobEntity());
+                });
+            }
+        }
+    }
 }
