@@ -24,7 +24,6 @@ public class CommandHandler {
         emCommand.registerCommand(new PlaceTreasureChestCommand());
         emCommand.registerCommand(new PlaceNPCCommand());
         emCommand.registerCommand(new RemoveCommand());
-        emCommand.registerCommand(new DebugCommand());
         emCommand.registerCommand(new EventCommand());
         emCommand.registerCommand(new StatsCommand());
         emCommand.registerCommand(new LootMenuCommand());

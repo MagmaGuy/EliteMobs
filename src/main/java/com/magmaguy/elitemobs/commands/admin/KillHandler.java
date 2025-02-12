@@ -42,8 +42,10 @@ public class KillHandler {
         int counter = 0;
         for (Entity entity : player.getNearbyEntities(radius, radius, radius)) {
             EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(entity);
-            if (eliteEntity != null)
+            if (eliteEntity != null) {
                 eliteEntity.remove(RemovalReason.OTHER);
+                counter++;
+            }
         }
         player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Killed " + counter + " Elite Mobs."));
     }

@@ -652,21 +652,38 @@ public class ScriptAction {
                 ? new ScriptRelativeVector(blueprint.getScriptRelativeVectorBlueprint(), eliteScript, scriptActionData.getEliteEntity().getLocation()).getVector(scriptActionData)
                 : blueprint.getVValue();
 
+        // Ensure velocity is finite, otherwise default to zero vector
+        if (velocity == null || !isFiniteVector(velocity)) {
+            velocity = new Vector(0, 0, 0);
+        }
+
         boolean additive = blueprint.getBValue() != null && blueprint.getBValue();
 
         // Delay the push by one tick to avoid interference with other events.
+        Vector localFinalVelocity = velocity;
         new BukkitRunnable() {
             @Override
             public void run() {
+                Vector finalVelocity = localFinalVelocity;
                 getTargets(scriptActionData).forEach(target -> {
                     if (additive) {
-                        target.setVelocity(target.getVelocity().add(velocity));
+                        target.setVelocity(target.getVelocity().add(finalVelocity));
                     } else {
-                        target.setVelocity(velocity);
+                        target.setVelocity(finalVelocity);
                     }
                 });
             }
         }.runTaskLater(MetadataHandler.PLUGIN, 1);
+    }
+
+    /**
+     * Checks if a vector has only finite values.
+     *
+     * @param vector The vector to check.
+     * @return true if all components are finite, false otherwise.
+     */
+    private boolean isFiniteVector(Vector vector) {
+        return Double.isFinite(vector.getX()) && Double.isFinite(vector.getY()) && Double.isFinite(vector.getZ());
     }
 
     /**
@@ -881,11 +898,26 @@ public class ScriptAction {
                         world.setStorm(true);
                         world.setThundering(false);
                         world.setWeatherDuration(duration > 0 ? duration : 6000);
+                        if (duration > 0){
+                            new BukkitRunnable() {
+                                @Override
+                                public void run() {
+                                    world.setStorm(false);
+                                }
+                            }.runTaskLater(MetadataHandler.PLUGIN, duration+1);
+                        }
                     }
                     case THUNDER -> {
                         world.setStorm(true);
                         world.setThundering(true);
                         world.setThunderDuration(duration > 0 ? duration : 6000);
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                world.setStorm(false);
+                                world.setThundering(false);
+                            }
+                        }.runTaskLater(MetadataHandler.PLUGIN, duration+1);
                     }
                 }
             } catch (Exception e) {

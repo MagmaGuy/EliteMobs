@@ -13,7 +13,7 @@ public class QuestCompleteQuestCommand extends AdvancedCommand {
         super(List.of("quest"));
         addLiteral("complete");
         addArgument("id", new ListStringCommandArgument("<id>"));
-        setUsage("/em quest complete");
+        setUsage("/em quest complete <id>");
         setPermission("elitemobs.quest.complete");
         setSenderType(SenderType.PLAYER);
         setDescription("Completes a quest for a player. Meant to be used via menu, not directly.");

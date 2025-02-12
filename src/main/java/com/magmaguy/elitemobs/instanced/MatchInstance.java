@@ -338,6 +338,14 @@ public abstract class MatchInstance {
                 return;
             }
 
+            for (MatchInstance instance : instances) {
+                if (instance.world == null) continue;
+                if (instance.world.equals(event.getFrom()) || instance.world.equals(event.getTo())) {
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+
             MatchInstance matchInstance = PlayerData.getMatchInstance(event.getPlayer());
             if (matchInstance == null) return;
 
@@ -345,10 +353,6 @@ public abstract class MatchInstance {
                 matchInstance.removeAnyKind(event.getPlayer());
                 return;
             }
-
-            for (MatchInstance instance : instances)
-                if (instance.world.equals(event.getFrom()) || instance.world.equals(event.getTo()))
-                    return;
 
             event.setCancelled(true);
         }

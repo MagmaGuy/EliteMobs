@@ -2,8 +2,8 @@ package com.magmaguy.elitemobs.instanced.dungeons;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.SpecialItemSystemsConfig;
-import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfig;
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
+import com.magmaguy.elitemobs.dungeons.WorldDungeonPackage;
 import com.magmaguy.elitemobs.menus.ItemEnchantmentMenu;
 import com.magmaguy.elitemobs.utils.WorldInstantiator;
 import com.magmaguy.magmacore.util.ChatColorConverter;
@@ -51,8 +51,8 @@ public class EnchantmentDungeonInstance extends DungeonInstance {
     }
 
     public static boolean setupRandomEnchantedChallengeDungeon(Player player, ItemStack upgradedItem, ItemStack itemFromInventory) {
-        List<ContentPackagesConfigFields> contentPackagesConfigFieldsList = new ArrayList<>(ContentPackagesConfig.getEnchantedChallengeDungeonPackages().values().stream().toList());
-        contentPackagesConfigFieldsList.removeIf(dungeonPackagerConfigFields -> !dungeonPackagerConfigFields.isEnabled());
+        List<ContentPackagesConfigFields> contentPackagesConfigFieldsList = new ArrayList<>();
+        WorldDungeonPackage.getEmPackages().values().stream().forEach(emPackage -> {if (emPackage.isInstalled() && emPackage.getContentPackagesConfigFields().isEnchantmentChallenge()) contentPackagesConfigFieldsList.add(emPackage.getContentPackagesConfigFields());});
         if (contentPackagesConfigFieldsList.isEmpty()) {
             player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &cYou rolled challenge but your server has not installed any challenge dungeons! &2This will count as an automatic enchantment success."));
             return false;
