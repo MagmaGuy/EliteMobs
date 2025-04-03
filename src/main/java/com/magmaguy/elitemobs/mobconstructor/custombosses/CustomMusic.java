@@ -135,8 +135,14 @@ public class CustomMusic {
                     if (currentCustomMusic != null && !currentCustomMusic.equals(this)) {
                         currentCustomMusic.songTask.cancel();
                         ((Player) player).stopSound(currentCustomMusic.name);
-                        if (name2 != null)
-                            ((Player) player).stopSound(currentCustomMusic.name2);
+                        if (name2 != null) {
+                            try {
+                                ((Player) player).stopSound(currentCustomMusic.name2);
+                            } catch (Exception e) {
+                                Logger.warn("Error trying to stop song, key was " + name2 + " . Reporting this to the author would be appreciated. This does not break anything.");
+                                //Somehow this can happen, not sure how but the music can be null which would just mean we don't need to remove it
+                            }
+                        }
                         playerSongSingleton.remove((Player) player);
                     }
                     if (!players.containsKey((Player) player)) {

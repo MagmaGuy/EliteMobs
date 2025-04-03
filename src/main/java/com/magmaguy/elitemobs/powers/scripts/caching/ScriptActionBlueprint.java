@@ -2,6 +2,9 @@ package com.magmaguy.elitemobs.powers.scripts.caching;
 
 import com.magmaguy.elitemobs.powers.scripts.enums.ActionType;
 import com.magmaguy.elitemobs.powers.scripts.enums.WeatherType;
+import com.magmaguy.elitemobs.powers.scripts.primitives.ScriptFloat;
+import com.magmaguy.elitemobs.powers.scripts.primitives.ScriptInteger;
+import com.magmaguy.elitemobs.powers.scripts.primitives.ScriptVector;
 import com.magmaguy.elitemobs.utils.PotionEffectTypeUtil;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
@@ -29,13 +32,13 @@ public class ScriptActionBlueprint {
     @Getter
     private ActionType actionType = null;
     @Getter
-    private int duration = 0;
+    private ScriptInteger duration = new ScriptInteger(0);
     @Getter
-    private int wait = 0;
+    private ScriptInteger wait = new ScriptInteger(0);
     @Getter
     private PotionEffectType potionEffectType;
     @Getter
-    private int amplifier;
+    private ScriptInteger amplifier;
     @Getter
     private List<String> scripts = new ArrayList<>();
     @Getter
@@ -43,17 +46,17 @@ public class ScriptActionBlueprint {
     @Getter
     private ScriptConditionsBlueprint conditionsBlueprint;
     @Getter
-    private int times = -1;
+    private ScriptInteger times = new ScriptInteger(-1);
     @Getter
-    private int repeatEvery = 0;
+    private ScriptInteger repeatEvery = new ScriptInteger(0);
     @Getter
     private ScriptParticlesBlueprint scriptParticlesBlueprint = new ScriptParticlesBlueprint();
     @Getter
-    private double multiplier = 1;
+    private ScriptFloat multiplier = new ScriptFloat(1f);
     @Getter
     private Material material = Material.TARGET;
     @Getter
-    private double amount = 1;
+    private ScriptFloat amount = new ScriptFloat(1f);
     @Getter
     private Boolean bValue = null;
     @Getter
@@ -73,9 +76,9 @@ public class ScriptActionBlueprint {
     @Getter
     private BarStyle barStyle = BarStyle.SOLID;
     @Getter
-    private int fadeIn = 1;
+    private ScriptInteger fadeIn = new ScriptInteger(1);
     @Getter
-    private int fadeOut = 1;
+    private ScriptInteger fadeOut = new ScriptInteger(1);
     //fireworks
     @Getter
     private boolean flicker = true;
@@ -88,15 +91,15 @@ public class ScriptActionBlueprint {
     @Getter
     private List<List<FireworkColor>> fireworkEffects = new ArrayList<>();
     @Getter
-    private int power = 10;
+    private ScriptInteger power = new ScriptInteger(10);
     @Getter
     private boolean invulnerable = true;
     @Getter
-    private Vector offset = new Vector(0, 0, 0);
+    private ScriptVector offset = new ScriptVector(new ScriptFloat(0), new ScriptFloat(0), new ScriptFloat(0));
     @Getter
     private List<String> tags;
     @Getter
-    private int time = 0;
+    private ScriptInteger time = new ScriptInteger(0);
     @Getter
     private WeatherType weatherType = WeatherType.CLEAR;
     @Getter
@@ -104,13 +107,13 @@ public class ScriptActionBlueprint {
     @Getter
     private ScriptRelativeVectorBlueprint scriptRelativeVectorBlueprint = null;
     @Getter
-    private float volume = 1f;
+    private ScriptFloat volume = new ScriptFloat(1f);
     @Getter
-    private float pitch = 1f;
+    private ScriptFloat pitch = new ScriptFloat(1f);
     @Getter
-    private float velocity = 1f;
+    private ScriptFloat velocity = new ScriptFloat(1f);
     @Getter
-    private double scale = 1f;
+    private ScriptFloat scale = new ScriptFloat(1f);
     @Getter
     private boolean debug = false;
 
@@ -123,9 +126,9 @@ public class ScriptActionBlueprint {
         if (scriptTargets == null) scriptTargets = new ScriptTargetsBlueprint(entry, scriptName, scriptFilename);
         if (actionType == ActionType.SPAWN_PARTICLE &&
                 scriptTargets.isZoneTarget() &&
-                scriptTargets.getCoverage() == 1D &&
+                scriptTargets.getCoverage().getValue() == 1D &&
                 !scriptTargets.isCustomCoverage())
-            scriptTargets.setCoverage(.3);
+            scriptTargets.setCoverage(.3f);
     }
 
     private void processMapList(Map<?, ?> entry) {
@@ -137,9 +140,9 @@ public class ScriptActionBlueprint {
 
     protected void processKeyAndValue(String key, Object value) {
         switch (key.toLowerCase(Locale.ROOT)) {
-            case "duration" -> duration = parseInteger(key, value, scriptName);
-            case "wait" -> wait = parseInteger(key, value, scriptName);
-            case "amplifier" -> amplifier = parseInteger(key, value, scriptName);
+            case "duration" -> duration = parseScriptInteger(key, value, scriptName);
+            case "wait" -> wait = parseScriptInteger(key, value, scriptName);
+            case "amplifier" -> amplifier = parseScriptInteger(key, value, scriptName);
             case "action" -> actionType = parseEnum(key, value, ActionType.class, scriptName);
             case "potioneffecttype" -> {
                 try {
@@ -152,13 +155,13 @@ public class ScriptActionBlueprint {
             case "landingscripts" -> landingScripts = parseStringList(key, value, scriptName);
             case "conditions" ->
                     conditionsBlueprint = new ScriptConditionsBlueprint((Map<?, ?>) value, scriptName, scriptFilename);
-            case "times" -> times = parseInteger(key, value, scriptName);
-            case "repeatevery" -> repeatEvery = parseInteger(key, value, scriptName);
+            case "times" -> times = parseScriptInteger(key, value, scriptName);
+            case "repeatevery" -> repeatEvery = parseScriptInteger(key, value, scriptName);
             case "particles" ->
                     scriptParticlesBlueprint = new ScriptParticlesBlueprint((List<Map<?, ?>>) value, scriptName, scriptFilename);
-            case "multiplier" -> multiplier = parseDouble(key, value, scriptName);
+            case "multiplier" -> multiplier = parseScriptFloat(key, value, scriptName);
             case "material" -> material = parseEnum(key, value, Material.class, scriptName);
-            case "amount" -> amount = parseInteger(key, value, scriptName);
+            case "amount" -> amount = parseScriptFloat(key, value, scriptName);
             case "bvalue" -> bValue = parseBoolean(key, value, scriptName);
             case "svalue" -> sValue = parseString(key, value, scriptName);
             case "vvalue" -> vValue = parseVector(key, value, scriptName);
@@ -166,8 +169,8 @@ public class ScriptActionBlueprint {
             case "subtitle" -> subtitle = parseString(key, value, scriptName);
             case "barcolor" -> barColor = parseEnum(key, value, BarColor.class, scriptName);
             case "barstyle" -> barStyle = parseEnum(key, value, BarStyle.class, scriptName);
-            case "fadein" -> fadeIn = parseInteger(key, value, scriptName);
-            case "fadeout" -> fadeOut = parseInteger(key, value, scriptName);
+            case "fadein" -> fadeIn = parseScriptInteger(key, value, scriptName);
+            case "fadeout" -> fadeOut = parseScriptInteger(key, value, scriptName);
             case "flicker" -> flicker = parseBoolean(key, value, scriptName);
             case "withtrail" -> withTrail = parseBoolean(key, value, scriptName);
             case "fireworkeffecttype" ->
@@ -175,11 +178,11 @@ public class ScriptActionBlueprint {
             case "fireworkeffecttypes" ->
                     fireworkEffectTypes = parseEnumList(key, value, FireworkEffect.Type.class, scriptName);
             case "fireworkeffects" -> fireworkEffects = parseEnumListList(key, value, FireworkColor.class, scriptName);
-            case "power" -> power = parseInteger(key, value, scriptName);
+            case "power" -> power = parseScriptInteger(key, value, scriptName);
             case "invulnerable" -> invulnerable = parseBoolean(key, value, scriptName);
-            case "offset" -> offset = parseVector(key, value, scriptName);
+            case "offset" -> offset = parseScriptVector(key, value, scriptName);
             case "tags" -> tags = parseStringList(key, value, scriptName);
-            case "time" -> time = parseInteger(key, value, scriptName);
+            case "time" -> time = parseScriptInteger(key, value, scriptName);
             case "weather" -> weatherType = parseEnum(key, value, WeatherType.class, scriptName);
             case "target" -> {
                 if (value instanceof MemorySection)
@@ -196,10 +199,10 @@ public class ScriptActionBlueprint {
             case "onlyrunonescript" -> onlyRunOneScript = parseBoolean(key, value, scriptName);
             case "relativevector" ->
                     scriptRelativeVectorBlueprint = new ScriptRelativeVectorBlueprint(scriptName, scriptFilename, (Map<String, ?>) value);
-            case "pitch" -> pitch = parseFloat(key, value, scriptName);
-            case "volume" -> volume = parseFloat(key, value, scriptName);
-            case "velocity" -> velocity = parseFloat(key, value, scriptName);
-            case "scale" -> scale = parseFloat(key, value, scriptName);
+            case "pitch" -> pitch = parseScriptFloat(key, value, scriptName);
+            case "volume" -> volume = parseScriptFloat(key, value, scriptName);
+            case "velocity" -> velocity = parseScriptFloat(key, value, scriptName);
+            case "scale" -> scale = parseScriptFloat(key, value, scriptName);
             case "debug" -> debug = parseBoolean(key, value, scriptName);
             default -> Logger.warn("Failed to read key " + key + " for script " + scriptName + " in " + scriptFilename);
         }

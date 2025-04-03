@@ -75,7 +75,7 @@ public class EliteItemManager {
                     itemStack
                     .getItemMeta()
                     .getAttributeModifiers()
-                    .get(AttributeManager.getAttribute("generic_attack_speed")))
+                    .get(AttributeManager.getAttribute("generic_attack_damage")))
                 defaultDamage = attributeCrawler(defaultDamage, attributeModifier);
         return defaultDamage;
     }

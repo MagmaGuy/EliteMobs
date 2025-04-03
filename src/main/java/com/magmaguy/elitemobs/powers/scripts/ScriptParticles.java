@@ -27,10 +27,10 @@ public class ScriptParticles {
         }
 
         private void visualize(ScriptActionData scriptActionData, Location location, EliteScript eliteScript) {
-            double x = particleBlueprint.getX();
-            double y = particleBlueprint.getY();
-            double z = particleBlueprint.getZ();
-            int amount = particleBlueprint.getAmount();
+            double x = particleBlueprint.getX().getValue();
+            double y = particleBlueprint.getY().getValue();
+            double z = particleBlueprint.getZ().getValue();
+            int amount = particleBlueprint.getAmount().getValue();
 
             if (particleBlueprint.getRelativeVectorBlueprint() != null) {
                 ScriptRelativeVector scriptRelativeVector = null;
@@ -52,12 +52,12 @@ public class ScriptParticles {
                         x,
                         y,
                         z,
-                        particleBlueprint.getSpeed(),
+                        particleBlueprint.getSpeed().getValue(),
                         new Particle.DustOptions(
                                 Color.fromRGB(
-                                        particleBlueprint.getRed(),
-                                        particleBlueprint.getGreen(),
-                                        particleBlueprint.getBlue()),
+                                        particleBlueprint.getRed().getValue(),
+                                        particleBlueprint.getGreen().getValue(),
+                                        particleBlueprint.getBlue().getValue()),
                                 1));
             else if (particleBlueprint.getParticle().equals(Particle.DUST_COLOR_TRANSITION))
                 location.getWorld().spawnParticle(
@@ -67,16 +67,16 @@ public class ScriptParticles {
                         x,
                         y,
                         z,
-                        particleBlueprint.getSpeed(),
+                        (double) particleBlueprint.getSpeed().getValue(),
                         new Particle.DustTransition(
                                 Color.fromRGB(
-                                        particleBlueprint.getRed(),
-                                        particleBlueprint.getGreen(),
-                                        particleBlueprint.getBlue()),
+                                        particleBlueprint.getRed().getValue(),
+                                        particleBlueprint.getGreen().getValue(),
+                                        particleBlueprint.getBlue().getValue()),
                                 Color.fromRGB(
-                                        particleBlueprint.getToRed(),
-                                        particleBlueprint.getToGreen(),
-                                        particleBlueprint.getToBlue()),
+                                        particleBlueprint.getToRed().getValue(),
+                                        particleBlueprint.getToGreen().getValue(),
+                                        particleBlueprint.getToBlue().getValue()),
                                 1));
             else if (particleBlueprint.getParticle().equals(Particle.WITCH)
                 //|| particleBlueprint.getParticle().equals(Particle.WITCH_AMBIENT) todo: 1.20.6 changed this name
@@ -87,9 +87,9 @@ public class ScriptParticles {
                         y,
                         z,
                         amount,
-                        particleBlueprint.getRed(),
-                        particleBlueprint.getGreen(),
-                        particleBlueprint.getBlue());
+                        particleBlueprint.getRed().getValue(),
+                        particleBlueprint.getGreen().getValue(),
+                        particleBlueprint.getBlue().getValue());
             } else
                 location.getWorld().spawnParticle(
                         particleBlueprint.getParticle(),
@@ -98,7 +98,7 @@ public class ScriptParticles {
                         x,
                         y,
                         z,
-                        particleBlueprint.getSpeed());
+                        (double) particleBlueprint.getSpeed().getValue());
 
         }
     }

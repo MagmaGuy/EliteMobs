@@ -11,17 +11,17 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Cuboid extends Shape {
-    private final double x;
-    private final double y;
-    private final double xBorder;
-    private final double yBorder;
+    private final Float x;
+    private final Float y;
+    private final Float xBorder;
+    private final Float yBorder;
     private Location centerLocation = null;
     private List<Vector> locationVectors = null;
     private List<Vector> edgeVectors = null;
-    private double z;
-    private double zBorder;
+    private Float z;
+    private Float zBorder;
 
-    public Cuboid(Double x, Double y, Double z, Double xBorder, Double yBorder, Double zBorder, Location centerLocation) {
+    public Cuboid(Float x, Float y, Float z, Float xBorder, Float yBorder, Float zBorder, Location centerLocation) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -85,8 +85,8 @@ public class Cuboid extends Shape {
     private List<Vector> getLocationVectors() {
         if (locationVectors != null) return locationVectors;
         locationVectors = new ArrayList<>();
-        double xHalf = Math.floor(x / 2d);
-        double zHalf = Math.floor(z / 2d);
+        Float xHalf = (float) Math.floor(x / 2f);
+        Float zHalf = (float) Math.floor(z / 2f);
         for (int localX = 0; localX < x; localX++)
             for (int localZ = 0; localZ < z; localZ++)
                 for (int localY = 0; localY < y; localY++)

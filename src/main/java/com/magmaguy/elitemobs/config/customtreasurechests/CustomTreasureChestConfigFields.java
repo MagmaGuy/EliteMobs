@@ -28,7 +28,7 @@ public class CustomTreasureChestConfigFields extends CustomConfigFields {
     @Getter
     private int restockTimer = 0;
     @Getter
-    private List<String> lootList = null;
+    private List<Object> lootList = null;
     @Getter
     private double mimicChance = 0;
     @Getter
@@ -69,7 +69,7 @@ public class CustomTreasureChestConfigFields extends CustomConfigFields {
                                            Location location,
                                            TreasureChest.DropStyle dropStyle,
                                            int restockTimer,
-                                           List<String> lootList,
+                                           List<Object> lootList,
                                            double mimicChance,
                                            List<String> mimicCustomBossesList,
                                            long restockTime,
@@ -102,7 +102,7 @@ public class CustomTreasureChestConfigFields extends CustomConfigFields {
             worldName = worldName.split(",")[0];
         this.dropStyle = processEnum("dropStyle", dropStyle, TreasureChest.DropStyle.SINGLE, TreasureChest.DropStyle.class, true);
         this.restockTimer = processInt("restockTimer", restockTimer, 0, true);
-        this.lootList = processStringList("lootList", lootList, new ArrayList<>(), true);
+        this.lootList = processList("lootList", lootList, new ArrayList<>(), false);
         this.customLootTable = new CustomLootTable(this);
         this.mimicChance = processDouble("mimicChance", mimicChance, 0, true);
         this.mimicCustomBossesList = processStringList("mimicCustomBossesList", mimicCustomBossesList, new ArrayList<>(), true);

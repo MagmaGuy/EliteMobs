@@ -11,6 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class VanillaCustomLootEntry extends CustomLootEntry implements Serializable {
@@ -22,6 +23,52 @@ public class VanillaCustomLootEntry extends CustomLootEntry implements Serializa
         if (this.material == null) return;
         entries.add(this);
     }
+
+    public VanillaCustomLootEntry(List<CustomLootEntry> entries, Map<String, Object> configMap, String configFilename) {
+        parseAllFormats(configMap, configFilename);
+        if (this.material == null) return;
+        entries.add(this);
+    }
+
+    private void parseAllFormats(Map<String, Object> configMap, String configFilename) {
+        for (Map.Entry<String, Object> entry : configMap.entrySet()) {
+            String key = entry.getKey().toLowerCase(Locale.ROOT);
+            String value = entry.getValue().toString();
+            switch (key) {
+                case "type":
+                case "material":
+                    try {
+                        // Use toUpperCase() to ensure it matches the enum naming conventions
+                        this.material = Material.valueOf(value.toUpperCase());
+                    } catch (Exception ex) {
+                        errorMessage(value, configFilename, "material");
+                    }
+                    break;
+                case "amount":
+                    try {
+                        super.setAmount(Integer.parseInt(value));
+                    } catch (Exception ex) {
+                        errorMessage(value, configFilename, "amount");
+                    }
+                    break;
+                case "chance":
+                    try {
+                        super.setChance(Double.parseDouble(value));
+                    } catch (Exception ex) {
+                        errorMessage(value, configFilename, "chance");
+                    }
+                    break;
+                case "wave":
+                    try {
+                        super.setWave(Integer.parseInt(value));
+                    } catch (Exception ex) {
+                        errorMessage(value, configFilename, "wave");
+                    }
+                    break;
+            }
+        }
+    }
+
 
     private void parseAllFormats(String rawString, String configFilename) {
         for (String processedString : rawString.split(":")) {

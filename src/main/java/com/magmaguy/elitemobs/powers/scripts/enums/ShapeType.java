@@ -7,5 +7,6 @@ public enum ShapeType {
     STATIC_RAY,
     ROTATING_RAY,
     TRANSLATING_RAY,
-    CUBOID
+    CUBOID,
+    CONE
 }

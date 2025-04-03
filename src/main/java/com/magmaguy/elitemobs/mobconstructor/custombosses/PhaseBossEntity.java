@@ -90,7 +90,7 @@ public class PhaseBossEntity {
             }
             //Handle music, soundtrack shouldn't change if the new one is the same
             if (bossPhase.customBossesConfigFields.getSong() != null) {
-                if (currentPhase.customBossesConfigFields.getSong() == null){
+                if (currentPhase.customBossesConfigFields.getSong() == null) {
                     customBossEntity.setBossMusic(new CustomMusic(bossPhase.customBossesConfigFields.getSong(), customBossEntity));
                     customBossEntity.getBossMusic().start(customBossEntity);
                 }
