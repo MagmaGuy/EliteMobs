@@ -139,13 +139,13 @@ public class ScriptAction {
             finalScriptTargets.cacheTargets(scriptActionData);
         }
 
-        if (blueprint.getWait() > 0) {
+        if (blueprint.getWait().getValue() > 0) {
             new BukkitRunnable() {
                 @Override
                 public void run() {
                     runScriptTask(scriptActionData);
                 }
-            }.runTaskLater(MetadataHandler.PLUGIN, blueprint.getWait());
+            }.runTaskLater(MetadataHandler.PLUGIN, blueprint.getWait().getValue());
         } else {
             runScriptTask(scriptActionData);
         }
@@ -157,7 +157,7 @@ public class ScriptAction {
      * @param scriptActionData The data for the script action.
      */
     private void runScriptTask(ScriptActionData scriptActionData) {
-        if (blueprint.getRepeatEvery() > 0) {
+        if (blueprint.getRepeatEvery().getValue() > 0) {
             // If it's a repeating task, schedule it accordingly.
             new BukkitRunnable() {
                 int counter = 0;
@@ -171,19 +171,19 @@ public class ScriptAction {
                         return;
                     }
 
-                    if (blueprint.getTimes() > 0 && counter > blueprint.getTimes()) {
+                    if (blueprint.getTimes().getValue() > 0 && counter > blueprint.getTimes().getValue()) {
                         cancel();
                         return;
                     }
 
-                    if (blueprint.getTimes() < 0 && !scriptActionData.getEliteEntity().isValid()) {
+                    if (blueprint.getTimes().getValue() < 0 && !scriptActionData.getEliteEntity().isValid()) {
                         cancel();
                         return;
                     }
 
                     runActions(scriptActionData);
                 }
-            }.runTaskTimer(MetadataHandler.PLUGIN, 0, blueprint.getRepeatEvery());
+            }.runTaskTimer(MetadataHandler.PLUGIN, 0, blueprint.getRepeatEvery().getValue());
         } else {
             if (blueprint.getConditionsBlueprint() != null
                     && !scriptConditions.meetsActionConditions(scriptActionData)) {
@@ -347,7 +347,7 @@ public class ScriptAction {
         }
         getTargets(scriptActionData).forEach(target -> {
             if (target instanceof Player player) {
-                player.sendTitle(blueprint.getTitle(), blueprint.getSubtitle(), blueprint.getFadeIn(), blueprint.getDuration(), blueprint.getFadeOut());
+                player.sendTitle(blueprint.getTitle(), blueprint.getSubtitle(), blueprint.getFadeIn().getValue(), blueprint.getDuration().getValue(), blueprint.getFadeOut().getValue());
             } else {
                 Logger.warn("TITLE_MESSAGE actions must target players! Problematic script: '" + blueprint.getScriptName() + "' in file '" + blueprint.getScriptFilename() + "'");
             }
@@ -388,8 +388,8 @@ public class ScriptAction {
         getTargets(scriptActionData).forEach(target -> {
             if (target instanceof Player player) {
                 bossBar.addPlayer(player);
-                if (blueprint.getDuration() > 0) {
-                    Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, bossBar::removeAll, blueprint.getDuration());
+                if (blueprint.getDuration().getValue() > 0) {
+                    Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, bossBar::removeAll, blueprint.getDuration().getValue());
                 }
             } else {
                 Logger.warn("BOSS_BAR_MESSAGE actions must target players! Problematic script: '" + blueprint.getScriptName() + "' in file '" + blueprint.getScriptFilename() + "'");
@@ -403,7 +403,7 @@ public class ScriptAction {
      * @param scriptActionData The data for the script action.
      */
     private void runPotionEffect(ScriptActionData scriptActionData) {
-        PotionEffect effect = new PotionEffect(blueprint.getPotionEffectType(), blueprint.getDuration(), blueprint.getAmplifier());
+        PotionEffect effect = new PotionEffect(blueprint.getPotionEffectType(), blueprint.getDuration().getValue(), blueprint.getAmplifier().getValue());
         getTargets(scriptActionData).forEach(target -> {
             if (target.isValid()) {
                 target.addPotionEffect(effect);
@@ -450,8 +450,8 @@ public class ScriptAction {
      * @param scriptActionData The data for the script action.
      */
     private void runDamage(ScriptActionData scriptActionData) {
-        double damageAmount = blueprint.getAmount();
-        double multiplier = blueprint.getMultiplier();
+        double damageAmount = blueprint.getAmount().getValue();
+        double multiplier = blueprint.getMultiplier().getValue();
 
         getTargets(scriptActionData).forEach(target -> {
             if (target instanceof Player) {
@@ -479,7 +479,7 @@ public class ScriptAction {
      * @param scriptActionData The data for the script action.
      */
     private void runSetOnFire(ScriptActionData scriptActionData) {
-        int duration = blueprint.getDuration();
+        int duration = blueprint.getDuration().getValue();
         getTargets(scriptActionData).forEach(target -> target.setFireTicks(duration));
     }
 
@@ -489,7 +489,7 @@ public class ScriptAction {
      * @param scriptActionData The data for the script action.
      */
     private void runVisualFreeze(ScriptActionData scriptActionData) {
-        int freezeTicks = (int) blueprint.getAmount();
+        int freezeTicks = blueprint.getAmount().getValue().intValue();
         getTargets(scriptActionData).forEach(target -> target.setFreezeTicks(target.getFreezeTicks() + freezeTicks));
     }
 
@@ -501,8 +501,8 @@ public class ScriptAction {
     private void runPlaceBlock(ScriptActionData scriptActionData) {
         getLocationTargets(scriptActionData).forEach(location -> {
             Block block = location.getBlock();
-            if (blueprint.getDuration() > 0) {
-                EntityTracker.addTemporaryBlock(block, blueprint.getDuration(), blueprint.getMaterial());
+            if (blueprint.getDuration().getValue() > 0) {
+                EntityTracker.addTemporaryBlock(block, blueprint.getDuration().getValue(), blueprint.getMaterial());
             } else {
                 block.setType(blueprint.getMaterial());
             }
@@ -593,7 +593,7 @@ public class ScriptAction {
      */
     private void runSetMobAI(ScriptActionData scriptActionData) {
         boolean aiEnabled = blueprint.getBValue();
-        int duration = blueprint.getDuration();
+        int duration = blueprint.getDuration().getValue();
 
         getTargets(scriptActionData).forEach(target -> {
             target.setAI(aiEnabled);
@@ -610,7 +610,7 @@ public class ScriptAction {
      */
     private void runSetMobAware(ScriptActionData scriptActionData) {
         boolean aware = blueprint.getBValue();
-        int duration = blueprint.getDuration();
+        int duration = blueprint.getDuration().getValue();
 
         getTargets(scriptActionData).forEach(target -> {
             if (target instanceof Mob mob) {
@@ -631,8 +631,8 @@ public class ScriptAction {
      */
     private void runPlaySound(ScriptActionData scriptActionData) {
         String sound = blueprint.getSValue();
-        float volume = blueprint.getVolume();
-        float pitch = blueprint.getPitch();
+        float volume = blueprint.getVolume().getValue();
+        float pitch = blueprint.getPitch().getValue();
         getLocationTargets(scriptActionData).forEach(location -> {
             try {
                 location.getWorld().playSound(location, sound, volume, pitch);
@@ -693,7 +693,7 @@ public class ScriptAction {
      */
     private void runSummonReinforcement(ScriptActionData scriptActionData) {
         getLocationTargets(scriptActionData).forEach(location -> {
-            CustomBossEntity customBossEntity = CustomSummonPower.summonReinforcement(scriptActionData.getEliteEntity(), location, blueprint.getSValue(), blueprint.getDuration());
+            CustomBossEntity customBossEntity = CustomSummonPower.summonReinforcement(scriptActionData.getEliteEntity(), location, blueprint.getSValue(), blueprint.getDuration().getValue());
             if (customBossEntity != null && customBossEntity.getLivingEntity() != null) {
                 Vector velocity = blueprint.getScriptRelativeVectorBlueprint() != null
                         ? new ScriptRelativeVector(blueprint.getScriptRelativeVectorBlueprint(), eliteScript, customBossEntity.getLivingEntity().getLocation()).getVector(scriptActionData)
@@ -743,7 +743,7 @@ public class ScriptAction {
                     fireworkMeta.addEffect(effect);
                 }
 
-                fireworkMeta.setPower(blueprint.getPower());
+                fireworkMeta.setPower(blueprint.getPower().getValue());
 
                 if (blueprint.getVValue() != null) {
                     firework.setVelocity(blueprint.getVValue());
@@ -764,7 +764,7 @@ public class ScriptAction {
      */
     private void runMakeInvulnerable(ScriptActionData scriptActionData) {
         boolean invulnerable = blueprint.isInvulnerable();
-        int duration = blueprint.getDuration();
+        int duration = blueprint.getDuration().getValue();
 
         getTargets(scriptActionData).forEach(target -> {
             target.setInvulnerable(invulnerable);
@@ -797,7 +797,7 @@ public class ScriptAction {
      */
     private void runTag(ScriptActionData scriptActionData) {
         List<String> tags = blueprint.getTags();
-        int duration = blueprint.getDuration();
+        int duration = blueprint.getDuration().getValue();
 
         getTargets(scriptActionData).forEach(target -> {
             EliteEntity bossEntity = EntityTracker.getEliteMobEntity(target);
@@ -833,7 +833,7 @@ public class ScriptAction {
      */
     private void runUntag(ScriptActionData scriptActionData) {
         List<String> tags = blueprint.getTags();
-        int duration = blueprint.getDuration();
+        int duration = blueprint.getDuration().getValue();
 
         getTargets(scriptActionData).forEach(target -> {
             EliteEntity bossEntity = EntityTracker.getEliteMobEntity(target);
@@ -868,7 +868,7 @@ public class ScriptAction {
      * @param scriptActionData The data for the script action.
      */
     private void runSetTime(ScriptActionData scriptActionData) {
-        long time = blueprint.getTime();
+        long time = blueprint.getTime().getValue();
         getLocationTargets(scriptActionData).forEach(location -> {
             try {
                 location.getWorld().setTime(time);
@@ -884,7 +884,7 @@ public class ScriptAction {
      * @param scriptActionData The data for the script action.
      */
     private void runSetWeather(ScriptActionData scriptActionData) {
-        int duration = blueprint.getDuration();
+        int duration = blueprint.getDuration().getValue();
         getTargets(scriptActionData).forEach(target -> {
             World world = target.getWorld();
             try {
@@ -974,7 +974,7 @@ public class ScriptAction {
      */
     private void runModifyDamage(ScriptActionData scriptActionData) {
         if (scriptActionData.getEvent() instanceof EliteDamageEvent eliteDamageEvent) {
-            double newDamage = eliteDamageEvent.getDamage() * blueprint.getMultiplier();
+            double newDamage = eliteDamageEvent.getDamage() * blueprint.getMultiplier().getValue();
             eliteDamageEvent.setDamage(newDamage);
         }
     }
@@ -1050,9 +1050,9 @@ public class ScriptAction {
         }
 
         Location destination = destinations.iterator().next();
-        double speed = blueprint.getVelocity();
+        double speed = blueprint.getVelocity().getValue();
         boolean avoidObstacles = blueprint.getBValue();
-        int duration = blueprint.getDuration();
+        int duration = blueprint.getDuration().getValue();
 
         targets.forEach(target -> {
             EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(target);
@@ -1068,8 +1068,8 @@ public class ScriptAction {
      * @param scriptActionData The data for the script action.
      */
     private void runScale(ScriptActionData scriptActionData) {
-        double scaleValue = blueprint.getScale();
-        int duration = blueprint.getDuration();
+        double scaleValue = blueprint.getScale().getValue();
+        int duration = blueprint.getDuration().getValue();
 
         getTargets(scriptActionData).forEach(target -> {
             AttributeInstance attribute = AttributeManager.getAttributeInstance(target, "generic_scale");

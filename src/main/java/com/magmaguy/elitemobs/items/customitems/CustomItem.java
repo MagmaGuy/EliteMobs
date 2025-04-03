@@ -160,7 +160,7 @@ public class CustomItem {
 
     public static int limitItemLevel(Player player, int originalLevel) {
         int itemLevel;
-        if (AdventurersGuildConfig.isGuildLootLimiter()) {
+        if (player != null && AdventurersGuildConfig.isGuildLootLimiter()) {
             itemLevel = (int) LootTables.setItemTier(originalLevel);
             if (itemLevel > GuildRank.getActiveGuildRank(player) * 10)
                 itemLevel = GuildRank.getActiveGuildRank(player) * 10;

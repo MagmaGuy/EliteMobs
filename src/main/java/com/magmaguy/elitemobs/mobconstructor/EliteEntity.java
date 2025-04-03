@@ -28,11 +28,13 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.*;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -130,6 +132,8 @@ public class EliteEntity {
     @Getter
     @Setter
     private boolean healing = false;
+    //Used by other plugins to tag bosses with custom data
+    private final HashMap<NamespacedKey, Object> customData = new HashMap<>();
 
     /**
      * Functions as a placeholder for {@link CustomBossEntity} that haven't been initialized yet. Uses the builder pattern
@@ -152,12 +156,50 @@ public class EliteEntity {
                        CreatureSpawnEvent.SpawnReason spawnReason) {
         setLevel(level);
         setLivingEntity(livingEntity, spawnReason);
+        if (spawnReason == CreatureSpawnEvent.SpawnReason.NATURAL) {
+            isNaturalEntity = true;
+        }
         //Get correct instance of plugin data, necessary for settings names and health among other things
         EliteMobProperties eliteMobProperties = EliteMobProperties.getPluginData(livingEntity);
         setName(eliteMobProperties);
         setArmor();
         setMaxHealth();
         randomizePowers(eliteMobProperties);
+    }
+
+    /**
+     * This is used for other plugins to register custom data into a boss for their own tracking
+     * @param namespacedKey The key other authors want to use for their data,
+     * @param object The object to store. Can be null if you just want to "tag" the entity and check if it has the data later.
+     */
+    public void addCustomData(@NotNull NamespacedKey namespacedKey, Object object) {
+        customData.put(namespacedKey, object);
+    }
+
+    /**
+     * Removes custom data stored by plugins
+     * @param namespacedKey
+     */
+    public void removeCustomData(NamespacedKey namespacedKey) {
+        customData.remove(namespacedKey);
+    }
+
+    /**
+     * Checks if the specified namespacedKey is present for the boss
+     * @param namespacedKey
+     * @return
+     */
+    public boolean hasCustomData(NamespacedKey namespacedKey) {
+        return customData.containsKey(namespacedKey);
+    }
+
+    /**
+     * Returns the custom data the entity has
+     * @param namespacedKey
+     * @return
+     */
+    public Object getCustomData(NamespacedKey namespacedKey){
+        return customData.get(namespacedKey);
     }
 
     public Location getSpawnLocation() {

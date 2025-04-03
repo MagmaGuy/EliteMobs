@@ -2,6 +2,8 @@ package com.magmaguy.elitemobs.powers.scripts.caching;
 
 import com.magmaguy.elitemobs.powers.scripts.enums.Filter;
 import com.magmaguy.elitemobs.powers.scripts.enums.ShapeType;
+import com.magmaguy.elitemobs.powers.scripts.primitives.ScriptFloat;
+import com.magmaguy.elitemobs.powers.scripts.primitives.ScriptInteger;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.configuration.ConfigurationSection;
@@ -28,37 +30,37 @@ public class ScriptZoneBlueprint {
     @Getter
     private ShapeType shapeTypeEnum = ShapeType.CYLINDER;
     @Getter
-    private double height = 1;
+    private ScriptFloat height = new ScriptFloat(1);
     @Getter
     private Filter filter = Filter.PLAYER;
     @Getter
-    private double radius = 5;
+    private ScriptFloat radius = new ScriptFloat(5);
     @Getter
-    private double borderRadius = 1;
+    private ScriptFloat borderRadius = new ScriptFloat(1);
     @Getter
-    private double pointRadius = 0.5;
+    private ScriptFloat pointRadius = new ScriptFloat(0.5f);
     @Getter
-    private double pitchRotation = 0D;
+    private ScriptFloat pitchRotation = new ScriptFloat(0);
     @Getter
-    private double yawRotation = 0D;
+    private ScriptFloat yawRotation = new ScriptFloat(0);
     @Getter
-    private double pitchPreRotation = 0D;
+    private ScriptFloat pitchPreRotation = new ScriptFloat(0);
     @Getter
-    private double yawPreRotation = 0D;
+    private ScriptFloat yawPreRotation = new ScriptFloat(0);
     @Getter
-    private int animationDuration = 0;
+    private ScriptInteger animationDuration = new ScriptInteger(0);
     @Getter
-    private double x = 0;
+    private ScriptFloat x = new ScriptFloat(0);
     @Getter
-    private double y = 0;
+    private ScriptFloat y = new ScriptFloat(0);
     @Getter
-    private double z = 0;
+    private ScriptFloat z = new ScriptFloat(0);
     @Getter
-    private double xBorder = 0;
+    private ScriptFloat xBorder = new ScriptFloat(0);
     @Getter
-    private double yBorder = 0;
+    private ScriptFloat yBorder = new ScriptFloat(0);
     @Getter
-    private double zBorder = 0;
+    private ScriptFloat zBorder = new ScriptFloat(0);
     @Getter
     private boolean ignoresSolidBlocks = true;
 
@@ -85,14 +87,14 @@ public class ScriptZoneBlueprint {
         switch (key.toLowerCase(Locale.ROOT)) {
             case "shape" -> shapeTypeEnum = parseEnum(key, value, ShapeType.class, scriptName);
             case "filter" -> filter = parseEnum(key, value, Filter.class, scriptName);
-            case "height" -> height = parseDouble(key, value, scriptName);
-            case "radius" -> radius = parseDouble(key, value, scriptName);
-            case "borderradius" -> borderRadius = parseDouble(key, value, scriptName);
-            case "pointradius" -> pointRadius = parseDouble(key, value, scriptName);
-            case "pitchrotation" -> pitchRotation = parseDouble(key, value, scriptName);
-            case "pitchprerotation" -> pitchPreRotation = parseDouble(key, value, scriptName);
-            case "yawrotation" -> yawRotation = parseDouble(key, value, scriptName);
-            case "yawprerotation" -> yawPreRotation = parseDouble(key, value, scriptName);
+            case "height" -> height = parseScriptFloat(key, value, scriptName);
+            case "radius" -> radius = parseScriptFloat(key, value, scriptName);
+            case "borderradius" -> borderRadius = parseScriptFloat(key, value, scriptName);
+            case "pointradius" -> pointRadius = parseScriptFloat(key, value, scriptName);
+            case "pitchrotation" -> pitchRotation = parseScriptFloat(key, value, scriptName);
+            case "pitchprerotation" -> pitchPreRotation = parseScriptFloat(key, value, scriptName);
+            case "yawrotation" -> yawRotation = parseScriptFloat(key, value, scriptName);
+            case "yawprerotation" -> yawPreRotation = parseScriptFloat(key, value, scriptName);
             case "target" ->
                     target = new ScriptTargetsBlueprint(((MemorySection) value).getValues(false), scriptName, filename);
             case "finaltarget" ->
@@ -101,14 +103,14 @@ public class ScriptZoneBlueprint {
                     target2 = new ScriptTargetsBlueprint(((MemorySection) value).getValues(false), scriptName, filename);
             case "finaltarget2" ->
                     finalTarget2 = new ScriptTargetsBlueprint(((MemorySection) value).getValues(false), scriptName, filename);
-            case "animationduration" -> animationDuration = parseInteger(key, value, scriptName);
+            case "animationduration" -> animationDuration = parseScriptInteger(key, value, scriptName);
             case "ignoressolidblocks" -> ignoresSolidBlocks = parseBoolean(key, value, scriptName);
-            case "x" -> x = parseDouble(key, value, scriptName);
-            case "y" -> y = parseDouble(key, value, scriptName);
-            case "z" -> z = parseDouble(key, value, scriptName);
-            case "xborder" -> xBorder = parseDouble(key, value, scriptName);
-            case "yborder" -> yBorder = parseDouble(key, value, scriptName);
-            case "zborder" -> zBorder = parseDouble(key, value, scriptName);
+            case "x" -> x = parseScriptFloat(key, value, scriptName);
+            case "y" -> y = parseScriptFloat(key, value, scriptName);
+            case "z" -> z = parseScriptFloat(key, value, scriptName);
+            case "xborder" -> xBorder = parseScriptFloat(key, value, scriptName);
+            case "yborder" -> yBorder = parseScriptFloat(key, value, scriptName);
+            case "zborder" -> zBorder = parseScriptFloat(key, value, scriptName);
             default -> {
                 Logger.warn("Failed to read key " + key + " for script " + scriptName + " in file " + filename);
             }

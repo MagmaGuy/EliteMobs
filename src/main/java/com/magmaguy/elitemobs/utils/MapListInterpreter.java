@@ -1,6 +1,10 @@
 package com.magmaguy.elitemobs.utils;
 
 import com.magmaguy.elitemobs.config.LegacyValueConverter;
+import com.magmaguy.elitemobs.powers.scripts.primitives.ScriptDouble;
+import com.magmaguy.elitemobs.powers.scripts.primitives.ScriptFloat;
+import com.magmaguy.elitemobs.powers.scripts.primitives.ScriptInteger;
+import com.magmaguy.elitemobs.powers.scripts.primitives.ScriptVector;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Particle;
@@ -62,6 +66,26 @@ public class MapListInterpreter {
         }
     }
 
+    public static ScriptInteger parseScriptInteger(String key, Object value, String scriptName) {
+        try {
+            if (value instanceof Integer intValue)
+                return new ScriptInteger(intValue);
+            else if (value instanceof String stringValue) {
+                if (stringValue.contains("~")) {
+                    String[] strings = stringValue.split("~");
+                    return new ScriptInteger(Integer.parseInt(strings[0]), Integer.parseInt(strings[1]));
+                }
+                return new ScriptInteger(Integer.parseInt(stringValue));
+            } else {
+                Logger.warn("Failed to get integer value from " + value + " in script " + scriptName);
+                return null;
+            }
+        } catch (Exception ex) {
+            parsingErrorMessage(key, value, scriptName);
+            return null;
+        }
+    }
+
 
     public static Double parseDouble(String key, Object value, String scriptName) {
         try {
@@ -78,6 +102,27 @@ public class MapListInterpreter {
         return null;
     }
 
+    public static ScriptDouble parseScriptDouble(String key, Object value, String scriptName) {
+        try {
+            if (value instanceof Integer integer)
+                return new ScriptDouble(integer.doubleValue());
+            else if (value instanceof Double dbl)
+                return new ScriptDouble(dbl);
+            else if (value instanceof String string) {
+                if (((String) value).contains("~")) {
+                    String[] strings = ((String) value).split("~");
+                    return new ScriptDouble(Double.parseDouble(strings[0]), Double.parseDouble(strings[1]));
+                }
+                return new ScriptDouble(Double.parseDouble(string));
+            }
+        } catch (Exception ex) {
+            parsingErrorMessage(key, value, scriptName);
+            return null;
+        }
+        Logger.warn("Failed to parse " + value + " as double in " + scriptName + " for key " + key);
+        return null;
+    }
+
     public static Float parseFloat(String key, Object value, String scriptName) {
         try {
             if (value instanceof Integer integer)
@@ -90,6 +135,29 @@ public class MapListInterpreter {
             parsingErrorMessage(key, value, scriptName);
             return null;
         }
+        return null;
+    }
+
+    public static ScriptFloat parseScriptFloat(String key, Object value, String scriptName) {
+        try {
+            if (value instanceof Integer integer)
+                return new ScriptFloat(integer.floatValue());
+            else if (value instanceof Double dbl)
+                return new ScriptFloat(dbl.floatValue());
+            else if (value instanceof Float flt)
+                return new ScriptFloat(flt);
+            else if (value instanceof String string) {
+                if (((String) value).contains("~")) {
+                    String[] strings = ((String) value).split("~");
+                    return new ScriptFloat(Float.parseFloat(strings[0]), Float.parseFloat(strings[1]));
+                }
+                return new ScriptFloat(Float.parseFloat(string));
+            }
+        } catch (Exception ex) {
+            parsingErrorMessage(key, value, scriptName);
+            return null;
+        }
+        Logger.warn("Failed to parse " + value + " as double in " + scriptName + " for key " + key);
         return null;
     }
 
@@ -172,5 +240,15 @@ public class MapListInterpreter {
             parsingErrorMessage(key, value, scriptName);
         }
         return new Vector(0, 0, 0);
+    }
+
+    public static ScriptVector parseScriptVector(String key, Object value, String scriptName) {
+        try {
+            String[] strings = ((String) value).split(",");
+            return new ScriptVector(parseScriptFloat(key, strings[0], scriptName), parseScriptFloat(key, strings[1], scriptName), parseScriptFloat(key, strings[2], scriptName));
+        } catch (Exception ex) {
+            parsingErrorMessage(key, value, scriptName);
+        }
+        return new ScriptVector(new ScriptFloat(0), new ScriptFloat(0), new ScriptFloat(0));
     }
 }

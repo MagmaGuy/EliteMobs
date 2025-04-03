@@ -10,7 +10,7 @@ public class ScriptCooldowns {
 
     public ScriptCooldowns(ScriptCooldownsBlueprint scriptCooldownsBlueprint, ElitePower elitePower) {
         this.scriptCooldownsBlueprint = scriptCooldownsBlueprint;
-        elitePower.setGlobalCooldownTime(scriptCooldownsBlueprint.getGlobalCooldown());
-        elitePower.setPowerCooldownTime(scriptCooldownsBlueprint.getLocalCooldown());
+        elitePower.setGlobalCooldownTime(scriptCooldownsBlueprint.getGlobalCooldown().getValue());
+        elitePower.setPowerCooldownTime(scriptCooldownsBlueprint.getLocalCooldown().getValue());
     }
 }

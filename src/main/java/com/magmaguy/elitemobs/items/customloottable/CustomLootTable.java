@@ -31,7 +31,7 @@ public class CustomLootTable implements Serializable {
     }
 
     public CustomLootTable(CustomTreasureChestConfigFields treasureChestConfigFields) {
-        List<String> rawStrings = treasureChestConfigFields.getLootList();
+        List<Object> rawStrings = treasureChestConfigFields.getLootList();
         parseConfig(rawStrings, treasureChestConfigFields.getFilename());
     }
 
@@ -41,14 +41,14 @@ public class CustomLootTable implements Serializable {
     }
 
     public CustomLootTable(CustomArenasConfigFields customArenasConfigFields) {
-        List<String> rawStrings = customArenasConfigFields.getRawArenaRewards();
+        List<Object> rawStrings = customArenasConfigFields.getRawArenaRewards();
         parseConfig(rawStrings, customArenasConfigFields.getFilename());
     }
 
     private void parseConfig(List<?> lootTable, String filename) {
         if (lootTable == null) return;
         for (Object object : lootTable)
-            if (object instanceof String rawString)
+            if (object instanceof String rawString) {
                 switch (rawString.split(":")[0].toLowerCase(Locale.ROOT)) {
                     case "minecraft":
                         new VanillaCustomLootEntry(entries, rawString, filename);
@@ -61,13 +61,16 @@ public class CustomLootTable implements Serializable {
                         else if (rawString.contains("command=")) new CommandLootTable(entries, rawString, filename);
                         else new EliteCustomLootEntry(entries, rawString, filename);
                 }
+            }
             else if (object instanceof Map<?, ?> configMap) {
                 //This is used for the instanced loot
                 if (((Map<?, ?>) object).containsKey("currencyAmount") ||
                         ((Map<?, ?>) object).containsKey("currencyamount")) {
                     new CurrencyCustomLootEntry(entries, configMap, filename);
-                }
-                new EliteCustomLootEntry(entries, configMap, filename);
+                } else if (((Map<?, ?>) object).containsKey("material")) {
+                    new VanillaCustomLootEntry(entries, (Map<String, Object>) configMap, filename);
+                } else
+                    new EliteCustomLootEntry(entries, configMap, filename);
             }
         for (CustomLootEntry customLootEntry : entries) {
             if (customLootEntry.getWave() > 0) {

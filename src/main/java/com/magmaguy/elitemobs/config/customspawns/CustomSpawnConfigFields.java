@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.config.customspawns;
 
 import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.events.MoonPhaseDetector;
-import com.magmaguy.magmacore.thirdparty.CustomBiomeCompatibility;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import lombok.Setter;
@@ -81,12 +80,13 @@ public class CustomSpawnConfigFields extends CustomConfigFields {
                     Logger.warn("Null biome for " + validBiomesString);
                     continue;
                 }
-                List<Biome> customBiomes = CustomBiomeCompatibility.getCustomBiomes(biome);
-                if (customBiomes != null && !customBiomes.isEmpty())
-                    for (Biome customBiome : customBiomes) {
-                        String customBiomeString = biome.getKey().getNamespace() + ":" + customBiome.getKey().getKey();
-                        extendedDefaults.add(customBiomeString);
-                    }
+                //todo: reimplement this but using the new biome system
+//                List<String> customBiomes = CustomBiomeCompatibility.getCustomBiomes(biome);
+//                if (customBiomes != null && !customBiomes.isEmpty())
+//                    for (Biome customBiome : customBiomes) {
+//                        String customBiomeString = biome.getKey().getNamespace() + ":" + customBiome.getKey().getKey();
+//                        extendedDefaults.add(customBiomeString);
+//                    }
             }
         }
 

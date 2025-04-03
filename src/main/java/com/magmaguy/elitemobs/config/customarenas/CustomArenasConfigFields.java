@@ -40,7 +40,7 @@ public class CustomArenasConfigFields extends CustomConfigFields {
     private List<String> bossList = new ArrayList<>();
     @Getter
     @Setter
-    private List<String> rawArenaRewards = new ArrayList<>();
+    private List<Object> rawArenaRewards = new ArrayList<>();
     @Getter
     @Setter
     private CustomLootTable arenaRewards;
@@ -78,7 +78,7 @@ public class CustomArenasConfigFields extends CustomConfigFields {
         this.delayBetweenWaves = processInt("delayBetweenWaves", delayBetweenWaves, 0, false);
         this.spawnPoints = processStringList("spawnPoints", spawnPoints, new ArrayList<>(), false);
         this.bossList = processStringList("bossList", bossList, new ArrayList<>(), false);
-        this.rawArenaRewards = processStringList("rawArenaReward", rawArenaRewards, new ArrayList<>(), false);
+        this.rawArenaRewards = processList("rawArenaReward", rawArenaRewards, new ArrayList<>(), false);
         arenaRewards = new CustomLootTable(this);
         this.minimumPlayerCount = processInt("minimumPlayerCount", minimumPlayerCount, 1, false);
         this.maximumPlayerCount = processInt("maximumPlayerCount", maximumPlayerCount, 100, false);

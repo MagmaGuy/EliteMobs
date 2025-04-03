@@ -49,7 +49,7 @@ public class ScriptTargets {
 
     public void setAnonymousTargets(List anonymousTargets) {
         //Animated zones can't be cached!
-        if (getTargetBlueprint().isTrack() || eliteScript.getScriptZone().getZoneBlueprint().getAnimationDuration() > 1)
+        if (getTargetBlueprint().isTrack() || eliteScript.getScriptZone().getZoneBlueprint().getAnimationDuration().getValue() > 1)
             return;
         //Non-animated zones must be cached for script inheritance and such
         this.anonymousTargets = anonymousTargets;
@@ -76,7 +76,7 @@ public class ScriptTargets {
     protected void cacheTargets(ScriptActionData scriptActionData) {
         if (getTargetBlueprint().isTrack()) {
             //Zones that animate independently can not be set to track, as this causes confusion. This is forced to make it easier on scripters.
-            if (eliteScript.getScriptZone().isValid() && eliteScript.getScriptZone().getZoneBlueprint().getAnimationDuration() > 0)
+            if (eliteScript.getScriptZone().isValid() && eliteScript.getScriptZone().getZoneBlueprint().getAnimationDuration().getValue() > 0)
                 getTargetBlueprint().setTrack(false);
             else return;
         }
@@ -85,7 +85,7 @@ public class ScriptTargets {
         boolean animatedScriptZone = false;
         if (eliteScript.getScriptZone().isValid()) {
             scriptActionData.setShapesCachedByTarget(eliteScript.getScriptZone().generateShapes(scriptActionData, true));
-            if (eliteScript.getScriptZone().getZoneBlueprint().getAnimationDuration() > 0) animatedScriptZone = true;
+            if (eliteScript.getScriptZone().getZoneBlueprint().getAnimationDuration().getValue() > 0) animatedScriptZone = true;
             anonymousTargets = null;
         }
         if (!animatedScriptZone) {
@@ -121,18 +121,18 @@ public class ScriptTargets {
                 return eliteEntityLocation.getWorld()
                         .getNearbyEntities(
                                 eliteEntityLocation,
-                                targetBlueprint.getRange(),
-                                targetBlueprint.getRange(),
-                                targetBlueprint.getRange(),
+                                targetBlueprint.getRange().getValue(),
+                                targetBlueprint.getRange().getValue(),
+                                targetBlueprint.getRange().getValue(),
                                 (entity -> entity.getType() == EntityType.PLAYER))
                         .stream().map(Player.class::cast).collect(Collectors.toSet());
             case NEARBY_MOBS:
                 return eliteEntityLocation.getWorld()
                         .getNearbyEntities(
                                 eliteEntityLocation,
-                                targetBlueprint.getRange(),
-                                targetBlueprint.getRange(),
-                                targetBlueprint.getRange(),
+                                targetBlueprint.getRange().getValue(),
+                                targetBlueprint.getRange().getValue(),
+                                targetBlueprint.getRange().getValue(),
                                 (entity -> entity.getType() != EntityType.PLAYER && entity instanceof LivingEntity &&
                                         !entity.getUniqueId().equals(scriptActionData.getEliteEntity().getUnsyncedLivingEntity().getUniqueId())))
                         .stream().map(LivingEntity.class::cast).collect(Collectors.toSet());
@@ -198,8 +198,8 @@ public class ScriptTargets {
                 Logger.warn("Failed to get target type in script " + getTargetBlueprint().getScriptName() + " !");
         }
 
-        if (targetBlueprint.getCoverage() < 1)
-            newLocations.removeIf(targetLocation -> ThreadLocalRandom.current().nextDouble() > targetBlueprint.getCoverage());
+        if (targetBlueprint.getCoverage().getValue() < 1)
+            newLocations.removeIf(targetLocation -> ThreadLocalRandom.current().nextDouble() > targetBlueprint.getCoverage().getValue());
 
         return newLocations;
     }
@@ -226,7 +226,7 @@ public class ScriptTargets {
     }
 
     private Location addOffsets(Location originalLocation, ScriptActionData scriptActionData) {
-        Location location = originalLocation.clone().add(targetBlueprint.getOffset());
+        Location location = originalLocation.clone().add(targetBlueprint.getOffset().getValue());
         //if (scriptRelativeVector == null)
         if (targetBlueprint.getScriptRelativeVectorBlueprint() != null)
             scriptRelativeVector = new ScriptRelativeVector(targetBlueprint.getScriptRelativeVectorBlueprint(), eliteScript, location);
@@ -239,7 +239,7 @@ public class ScriptTargets {
     }
 
     private Collection<Location> addOffsets(Collection<Location> locations, ScriptActionData scriptActionData) {
-        if (targetBlueprint.getOffset().length() == 0 && scriptRelativeVector == null) return locations;
+        if (targetBlueprint.getOffset().getValue().length() == 0 && scriptRelativeVector == null) return locations;
         locations.forEach(entry -> addOffsets(entry, scriptActionData));
         return locations;
     }

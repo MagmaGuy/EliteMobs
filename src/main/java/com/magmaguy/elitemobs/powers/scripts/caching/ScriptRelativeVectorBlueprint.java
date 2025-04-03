@@ -1,10 +1,11 @@
 package com.magmaguy.elitemobs.powers.scripts.caching;
 
+import com.magmaguy.elitemobs.powers.scripts.primitives.ScriptFloat;
+import com.magmaguy.elitemobs.powers.scripts.primitives.ScriptVector;
 import com.magmaguy.elitemobs.utils.MapListInterpreter;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.configuration.MemorySection;
-import org.bukkit.util.Vector;
 
 import java.util.LinkedHashMap;
 import java.util.Locale;
@@ -22,9 +23,9 @@ public class ScriptRelativeVectorBlueprint {
     @Getter
     private boolean normalize = false;
     @Getter
-    private double multiplier = 1.0;
+    private ScriptFloat multiplier = new ScriptFloat(1.0f);
     @Getter
-    private Vector offset = new Vector(0, 0, 0);
+    private ScriptVector offset = new ScriptVector(new ScriptFloat(0), new ScriptFloat(0), new ScriptFloat(0));
 
     public ScriptRelativeVectorBlueprint(String scriptName, String scriptFilename, Map<String, ?> configurationValues) {
         this.scriptName = scriptName;
@@ -52,9 +53,9 @@ public class ScriptRelativeVectorBlueprint {
                 else
                     destinationTarget = new ScriptTargetsBlueprint((Map) value, scriptName, scriptFilename);
             }
-            case "multiplier" -> multiplier = MapListInterpreter.parseDouble(key, value, scriptName);
+            case "multiplier" -> multiplier = MapListInterpreter.parseScriptFloat(key, value, scriptName);
             case "normalize" -> normalize = MapListInterpreter.parseBoolean(key, value, scriptName);
-            case "offset" -> offset = MapListInterpreter.parseVector(key, value, scriptName);
+            case "offset" -> offset = MapListInterpreter.parseScriptVector(key, value, scriptName);
             default -> Logger.warn("Failed to read key " + key + " for script " + scriptName + " in " + scriptFilename);
         }
     }

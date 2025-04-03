@@ -1,5 +1,7 @@
 package com.magmaguy.elitemobs.powers.scripts.caching;
 
+import com.magmaguy.elitemobs.powers.scripts.primitives.ScriptFloat;
+import com.magmaguy.elitemobs.powers.scripts.primitives.ScriptInteger;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.Particle;
@@ -30,29 +32,29 @@ public class ScriptParticlesBlueprint {
         private final String scriptName;
         private final String filename;
         @Getter
-        private double x = 0.01;
+        private ScriptFloat x = new ScriptFloat(0.01f);
         @Getter
-        private double y = 0.01;
+        private ScriptFloat y = new ScriptFloat(0.01f);
         @Getter
-        private double z = 0.01;
+        private ScriptFloat z = new ScriptFloat(0.01f);
         @Getter
-        private int amount = 1;
+        private ScriptInteger amount = new ScriptInteger(1);
         @Getter
-        private int red = 255;
+        private ScriptInteger red = new ScriptInteger(255);
         @Getter
-        private int green = 255;
+        private ScriptInteger green = new ScriptInteger(255);
         @Getter
-        private int blue = 255;
+        private ScriptInteger blue = new ScriptInteger(255);
         @Getter
-        private int toRed = 255;
+        private ScriptInteger toRed = new ScriptInteger(255);
         @Getter
-        private int toGreen = 255;
+        private ScriptInteger toGreen = new ScriptInteger(255);
         @Getter
-        private int toBlue = 255;
+        private ScriptInteger toBlue = new ScriptInteger(255);
         @Getter
         private Particle particle = Particle.FLAME;
         @Getter
-        private double speed = 0.01;
+        private ScriptFloat speed = new ScriptFloat(0.01f);
         @Getter
         private Boolean moveToTarget = null;
         @Getter
@@ -73,18 +75,18 @@ public class ScriptParticlesBlueprint {
 
         private void processKeyAndValue(String key, Object value) {
             switch (key.toLowerCase(Locale.ROOT)) {
-                case "x" -> x = parseDouble(key, value, scriptName);
-                case "y" -> y = parseDouble(key, value, scriptName);
-                case "z" -> z = parseDouble(key, value, scriptName);
-                case "amount" -> amount = parseInteger(key, value, scriptName);
+                case "x" -> x = parseScriptFloat(key, value, scriptName);
+                case "y" -> y = parseScriptFloat(key, value, scriptName);
+                case "z" -> z = parseScriptFloat(key, value, scriptName);
+                case "amount" -> amount = parseScriptInteger(key, value, scriptName);
                 case "particle" -> particle = parseEnum(key, value, Particle.class, scriptName);
-                case "speed" -> speed = parseDouble(key, value, scriptName);
-                case "red" -> red = parseInteger(key, value, scriptName);
-                case "green" -> green = parseInteger(key, value, scriptName);
-                case "blue" -> blue = parseInteger(key, value, scriptName);
-                case "tored" -> toRed = parseInteger(key, value, scriptName);
-                case "togreen" -> toGreen = parseInteger(key, value, scriptName);
-                case "toblue" -> toBlue = parseInteger(key, value, scriptName);
+                case "speed" -> speed = parseScriptFloat(key, value, scriptName);
+                case "red" -> red = parseScriptInteger(key, value, scriptName);
+                case "green" -> green = parseScriptInteger(key, value, scriptName);
+                case "blue" -> blue = parseScriptInteger(key, value, scriptName);
+                case "tored" -> toRed = parseScriptInteger(key, value, scriptName);
+                case "togreen" -> toGreen = parseScriptInteger(key, value, scriptName);
+                case "toblue" -> toBlue = parseScriptInteger(key, value, scriptName);
                 case "movetotarget" -> moveToTarget = parseBoolean(key, value, scriptName);
                 case "relativevector" ->
                         relativeVectorBlueprint = new ScriptRelativeVectorBlueprint(scriptName, filename, (Map<String, ?>) value);
