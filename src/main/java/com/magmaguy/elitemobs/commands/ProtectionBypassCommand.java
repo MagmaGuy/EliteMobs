@@ -14,6 +14,7 @@ public class ProtectionBypassCommand extends AdvancedCommand {
         addLiteral("bypass");
         setPermission("elitemobs.protection.bypass");
         setDescription("Allows admins to toggle bypassing protections");
+        setUsage("/em protection bypass");
         setSenderType(SenderType.PLAYER);
     }
 

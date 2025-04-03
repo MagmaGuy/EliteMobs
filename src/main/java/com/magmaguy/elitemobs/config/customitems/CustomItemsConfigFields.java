@@ -49,6 +49,9 @@ public class CustomItemsConfigFields extends CustomConfigFields {
     @Getter
     @Setter
     private boolean soulbound = true;
+    @Getter
+    @Setter
+    private boolean showSource = true;
 
     public CustomItemsConfigFields(String fileName,
                                    boolean isEnabled,
@@ -84,6 +87,7 @@ public class CustomItemsConfigFields extends CustomConfigFields {
         this.permission = processString("permission", permission, "", false);
         this.level = processInt("level", level, 0, false);
         this.soulbound = processBoolean("soulbound", soulbound, true, false);
+        this.showSource = processBoolean("showSource", showSource, showSource, false);
         updatePostProcessor();
     }
 

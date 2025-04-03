@@ -49,8 +49,8 @@ public class ScriptRelativeVector {
 
         Vector vector = destinationLocation.clone().subtract(sourceLocation).toVector();
         if (scriptRelativeVectorBlueprint.isNormalize()) vector.normalize();
-        vector.multiply(scriptRelativeVectorBlueprint.getMultiplier());
-        vector.add(scriptRelativeVectorBlueprint.getOffset());
+        vector.multiply(scriptRelativeVectorBlueprint.getMultiplier().getValue());
+        vector.add(scriptRelativeVectorBlueprint.getOffset().getValue());
         return vector;
     }
 

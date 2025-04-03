@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.mobconstructor.custombosses;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.instanced.dungeons.DungeonInstance;
 import com.magmaguy.elitemobs.mobconstructor.PersistentMovingEntity;
@@ -9,6 +10,7 @@ import com.magmaguy.elitemobs.mobconstructor.PersistentObject;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.utils.AttributeManager;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
+import com.magmaguy.magmacore.instance.MatchInstance;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.Location;
@@ -20,7 +22,9 @@ import java.util.List;
 public class InstancedBossEntity extends RegionalBossEntity implements PersistentObject, PersistentMovingEntity {
     private static final ArrayListMultimap<String, InstancedBossContainer> instancedBossEntities = ArrayListMultimap.create();
     @Getter
-    private final DungeonInstance dungeonInstance;
+    private  DungeonInstance dungeonInstance = null;
+    @Getter
+    private  MatchInstance matchInstance;
 
     public InstancedBossEntity(CustomBossesConfigFields customBossesConfigFields, Location location, DungeonInstance dungeonInstance) {
         super(customBossesConfigFields, location, false, true);
@@ -32,6 +36,29 @@ public class InstancedBossEntity extends RegionalBossEntity implements Persisten
             else
                 level = ElitePlayerInventory.getPlayer(dungeonInstance.getPlayers().stream().findFirst().get()).getNaturalMobSpawnLevel(true);
         }
+    }
+
+    public InstancedBossEntity(CustomBossesConfigFields customBossesConfigFields, Location location, MatchInstance matchInstance, int level) {
+        super(customBossesConfigFields, location, false, true);
+        super.level = level;
+        this.matchInstance = matchInstance;
+        super.elitePowers = ElitePowerParser.parsePowers(customBossesConfigFields, this);
+//        if (level == -1) {
+//            if (matchInstance.getPlayers().isEmpty())
+//                Logger.warn("Failed to get players for new instance when assigning dynamic level! The bosses will default to level 1.");
+//            else
+//                level = ElitePlayerInventory.getPlayer(matchInstance.getPlayers().stream().findFirst().get()).getNaturalMobSpawnLevel(true);
+//        }
+    }
+
+    public static CustomBossEntity createInstancedBossEntity(String filename, Location location, MatchInstance matchInstance, int level){
+        CustomBossesConfigFields configFields = CustomBossesConfig.getCustomBoss(filename);
+        if (configFields == null){
+
+            Logger.warn("Failed to spawn instanced boss entity " + filename + " via API!");
+            return null;
+        }
+        return new InstancedBossEntity(configFields, location, matchInstance, level);
     }
 
     public static void shutdown() {
@@ -62,6 +89,7 @@ public class InstancedBossEntity extends RegionalBossEntity implements Persisten
 
     public void setNormalizedMaxHealth(int playerCount) {
         super.setNormalizedMaxHealth();
+        if (dungeonInstance == null) return;
         if (playerCount < 2) return;
         double normalizedDungeonMaxHealth = super.getMaxHealth() * .75 * playerCount;
         super.maxHealth = normalizedDungeonMaxHealth;
@@ -75,6 +103,7 @@ public class InstancedBossEntity extends RegionalBossEntity implements Persisten
     @Override
     public void setMaxHealth() {
         super.setNormalizedMaxHealth();
+        if (dungeonInstance == null) return;
         if (dungeonInstance.getPlayers().size() < 2) return;
         double normalizedDungeonMaxHealth = super.getMaxHealth() * .75 * dungeonInstance.getPlayers().size();
         super.maxHealth = normalizedDungeonMaxHealth;

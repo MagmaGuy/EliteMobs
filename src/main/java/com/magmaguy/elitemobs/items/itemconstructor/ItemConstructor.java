@@ -99,6 +99,7 @@ public class ItemConstructor {
         Generate material
          */
         Material itemMaterial = MaterialGenerator.generateMaterial(itemTier);
+        if (itemMaterial == null) return null;
         /*
         Construct initial item
          */

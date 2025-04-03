@@ -172,6 +172,7 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
         String name = null;
         for (int i = 0; i < getAmount(); i++) {
             ItemStack itemStack = generateCustomItem().generateItemStack(itemTier, player, null);
+            if (itemStack == null) continue;
             player.getInventory().addItem(itemStack);
             if (name == null && itemStack.getItemMeta() != null) {
                 if (itemStack.getItemMeta().hasDisplayName()) name = itemStack.getItemMeta().getDisplayName();

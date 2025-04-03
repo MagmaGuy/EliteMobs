@@ -59,8 +59,10 @@ public class QuestInteractionHandler {
                     customQuest.setQuestGiver(npcEntity.getNPCsConfigFields().getFilename());
                     anyQuestIsValid = true;
                 } else if (!customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission().isEmpty() &&
-                        player.hasMetadata(customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission()))
+                        player.hasMetadata(customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission())) {
                     questCompleteCount++;
+                    anyQuestIsValid = true;
+                }
             }
 
         if (npcEntity.getNPCsConfigFields().getQuestFilenames() != null &&

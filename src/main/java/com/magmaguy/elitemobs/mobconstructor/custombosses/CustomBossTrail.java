@@ -40,6 +40,7 @@ public class CustomBossTrail {
             } catch (Exception ex) {
             }
             try {
+                if (string.equals("LAVA")) return;
                 Material material = Material.valueOf(string);
                 doItemTrail(material);
             } catch (Exception ex) {

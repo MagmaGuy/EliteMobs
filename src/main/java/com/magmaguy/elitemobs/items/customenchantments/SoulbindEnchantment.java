@@ -59,6 +59,7 @@ public class SoulbindEnchantment extends CustomEnchantment {
     }
 
     public static void addPhysicalDisplay(Item item, Player player) {
+        if (player == null) return;
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -103,6 +104,13 @@ public class SoulbindEnchantment extends CustomEnchantment {
         else
             return getPrestigeLevel(itemMeta) == GuildRank.getGuildPrestigeRank(player) &&
                     itemMeta.getPersistentDataContainer().get(new NamespacedKey(MetadataHandler.PLUGIN, key), PersistentDataType.STRING).equals(player.getUniqueId().toString());
+    }
+
+    public static boolean isSoulboundItem(ItemMeta itemMeta) {
+        if (!isEnabled) return false;
+        if (itemMeta == null)
+            return false;
+        return !itemMeta.getPersistentDataContainer().has(SOULBIND_KEY, PersistentDataType.STRING);
     }
 
     public static Player getSoulboundPlayer(ItemMeta itemMeta) {

@@ -48,6 +48,8 @@ public class LegacyValueConverter {
                 return "PROJECTILE_PROTECTION";
             case "WATER_WORKER":
                 return "AQUA_AFFINITY";
+            case "CURSE_OF_VANISHING":
+                return "VANISHING_CURSE";
             default:
                 return materialName;
         }

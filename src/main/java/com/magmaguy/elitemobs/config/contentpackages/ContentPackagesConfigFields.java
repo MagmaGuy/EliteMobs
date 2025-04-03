@@ -296,6 +296,7 @@ public class ContentPackagesConfigFields extends CustomConfigFields {
     public void processConfigFields() {
         this.isEnabled = processBoolean("isEnabled", isEnabled, false, true);
         this.name = translatable(filename, "name", processString("name", name, null, true));
+        this.downloadLink = processString("downloadLink" , downloadLink, downloadLink, false);
         this.customInfo = translatable(filename, "customInfo", processStringList("customInfo", customInfo, null, true));
         this.relativeBossLocations = processStringList("relativeBossLocations", relativeBossLocations, null, false);
         this.relativeTreasureChestLocations = processStringList("relativeTreasureChestLocations", relativeTreasureChestLocations, null, false);

@@ -11,6 +11,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 public class Taze extends BossPower implements Listener {
 
@@ -29,9 +30,21 @@ public class Taze extends BossPower implements Listener {
 
     public void taze(Player player, Location entityLocation, int counter) {
         if (counter > 2) return;
-        player.setVelocity(player.getLocation().subtract(entityLocation.toVector()).toVector().normalize());
+
+        Vector direction = player.getLocation().toVector().subtract(entityLocation.toVector());
+
+        if (direction.lengthSquared() == 0) {
+            direction = new Vector(0, 0.5, 0);
+        } else {
+            direction.normalize();
+        }
+
+        // Apply the velocity
+        player.setVelocity(direction);
+
         player.sendTitle("", "Shocked!", 1, 30, 1);
         player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 30, 5));
+
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -39,5 +52,4 @@ public class Taze extends BossPower implements Listener {
             }
         }.runTaskLater(MetadataHandler.PLUGIN, 5);
     }
-
 }

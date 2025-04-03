@@ -1,11 +1,12 @@
 package com.magmaguy.elitemobs.powers.scripts.caching;
 
 import com.magmaguy.elitemobs.powers.scripts.enums.TargetType;
+import com.magmaguy.elitemobs.powers.scripts.primitives.ScriptFloat;
+import com.magmaguy.elitemobs.powers.scripts.primitives.ScriptVector;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.configuration.MemorySection;
-import org.bukkit.util.Vector;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -25,15 +26,14 @@ public class ScriptTargetsBlueprint {
     @Getter
     private String location;
     @Getter
-    private Vector offset = new Vector(0, 0, 0);
+    private ScriptVector offset = new ScriptVector(new ScriptFloat(0), new ScriptFloat(0), new ScriptFloat(0));
     @Getter
-    private double range = 20;
+    private ScriptFloat range = new ScriptFloat(20);
     @Getter
     @Setter
     private boolean track = true;
     @Getter
-    @Setter
-    private double coverage = 1.0;
+    private ScriptFloat coverage = new ScriptFloat(1.0f);
     @Getter
     private boolean isCustomCoverage = false;
     @Getter
@@ -43,10 +43,14 @@ public class ScriptTargetsBlueprint {
         this.scriptName = scriptName;
         this.filename = filename;
         processMapList(entry);
-        if (!isZoneTarget() && coverage < 1.0) {
+        if (!isZoneTarget() && coverage.getValue() < 1.0) {
             Logger.warn("Coverage for script " + scriptName + " in file " + filename + " was less than 1.0 but the targetType is neither ZONE_FULL nor ZONE_BORDER! Coverage should only be used for ZONE_FULL or ZONE_BORDER");
-            coverage = 1.0;
+            coverage = new ScriptFloat(1.0f);
         }
+    }
+
+    public void setCoverage(float coverage){
+        this.coverage = new ScriptFloat(coverage);
     }
 
     public boolean isZoneTarget() {
@@ -68,12 +72,12 @@ public class ScriptTargetsBlueprint {
             case "location" -> location = parseString(key, value, scriptName);
             case "locations" -> locations = parseStringList(key, value, scriptName);
             case "targettype" -> targetType = parseEnum(key, value, TargetType.class, scriptName);
-            case "range" -> range = parseDouble(key, value, scriptName);
-            case "offset" -> offset = parseVector(key, value, scriptName);
+            case "range" -> range = parseScriptFloat(key, value, scriptName);
+            case "offset" -> offset = parseScriptVector(key, value, scriptName);
             case "track" -> track = parseBoolean(key, value, scriptName);
             case "coverage" -> {
                 isCustomCoverage = true;
-                coverage = parseDouble(key, value, scriptName);
+                coverage = parseScriptFloat(key, value, scriptName);
             }
             case "relativeoffset" -> {
                 if (value instanceof MemorySection)

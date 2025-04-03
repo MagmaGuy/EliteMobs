@@ -14,6 +14,7 @@ import com.magmaguy.elitemobs.events.TimedEvent;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
+import com.magmaguy.magmacore.instance.MatchInstance;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import lombok.Setter;
@@ -235,6 +236,13 @@ public class CustomSpawn {
                 Location playerLocation = player.getLocation();
                 if (!ValidWorldsConfig.getValidWorlds().contains(playerLocation.getWorld().getName()))
                     continue;
+                boolean isInMatch = false;
+                for (MatchInstance instance : MatchInstance.getInstances())
+                    if (instance.isInRegion(playerLocation)) {
+                        isInMatch = true;
+                        break;
+                    }
+                if (isInMatch) continue;
                 if (timedEvent != null && EliteMobsWorld.isEliteMobsWorld(player.getWorld().getUID())) continue;
                 if (Boolean.FALSE.equals(playerLocation.getWorld().getGameRuleValue(GameRule.DO_MOB_SPAWNING)))
                     continue;

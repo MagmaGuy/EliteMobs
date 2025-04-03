@@ -199,9 +199,16 @@ public class ScriptZone {
             // Generate shapes based on the targets of the zone
             for (Location shapeTargetLocation : targets.getTargetLocations(scriptActionData)) {
                 switch (zoneBlueprint.getShapeTypeEnum()) {
-                    case CYLINDER -> shapes.add(new Cylinder(shapeTargetLocation, zoneBlueprint.getRadius(), zoneBlueprint.getHeight(), zoneBlueprint.getBorderRadius()));
-                    case SPHERE -> shapes.add(new Sphere(zoneBlueprint.getRadius(), shapeTargetLocation, zoneBlueprint.getBorderRadius()));
-                    case DOME -> shapes.add(new Dome(zoneBlueprint.getRadius(), shapeTargetLocation, zoneBlueprint.getBorderRadius()));
+                    case CYLINDER -> shapes.add(new Cylinder(shapeTargetLocation, zoneBlueprint.getRadius().getValue(), zoneBlueprint.getHeight().getValue(), zoneBlueprint.getBorderRadius().getValue()));
+                    case SPHERE -> shapes.add(new Sphere(zoneBlueprint.getRadius().getValue(), shapeTargetLocation, zoneBlueprint.getBorderRadius().getValue()));
+                    case DOME -> shapes.add(new Dome(zoneBlueprint.getRadius().getValue(), shapeTargetLocation, zoneBlueprint.getBorderRadius().getValue()));
+                    case CONE -> {
+                        if (targets2 == null) {
+                            Logger.warn("Script for boss '" + scriptActionData.getEliteEntity().getName() + "' has a CONE but no set target2 for the cone!");
+                            continue;
+                        }
+                        shapes.add(new Cone(shapeTargetLocation, targets2.getTargetLocations(scriptActionData).stream().toList().get(0), zoneBlueprint.getRadius().getValue(), zoneBlueprint.getBorderRadius().getValue()));
+                    }
                     case STATIC_RAY -> {
                         if (targets2 == null) {
                             Logger.warn("Script for boss '" + scriptActionData.getEliteEntity().getName() + "' has a STATIC_RAY but no set target2 for the ray!");
@@ -209,7 +216,7 @@ public class ScriptZone {
                         }
                         for (Location location : targets2.getTargetLocations(scriptActionData)) {
                             if (rayLocationValidator(shapeTargetLocation, location)) {
-                                shapes.add(new StaticRay(zoneBlueprint.isIgnoresSolidBlocks(), zoneBlueprint.getPointRadius(), shapeTargetLocation, location));
+                                shapes.add(new StaticRay(zoneBlueprint.isIgnoresSolidBlocks(), zoneBlueprint.getPointRadius().getValue(), shapeTargetLocation, location));
                             }
                         }
                     }
@@ -222,14 +229,14 @@ public class ScriptZone {
                             if (rayLocationValidator(shapeTargetLocation, target2Location)) {
                                 shapes.add(new RotatingRay(
                                         zoneBlueprint.isIgnoresSolidBlocks(),
-                                        zoneBlueprint.getPointRadius(),
+                                        zoneBlueprint.getPointRadius().getValue(),
                                         shapeTargetLocation,
                                         target2Location,
-                                        zoneBlueprint.getPitchPreRotation(),
-                                        zoneBlueprint.getYawPreRotation(),
-                                        zoneBlueprint.getPitchRotation(),
-                                        zoneBlueprint.getYawRotation(),
-                                        zoneBlueprint.getAnimationDuration()
+                                        zoneBlueprint.getPitchPreRotation().getValue(),
+                                        zoneBlueprint.getYawPreRotation().getValue(),
+                                        zoneBlueprint.getPitchRotation().getValue(),
+                                        zoneBlueprint.getYawRotation().getValue(),
+                                        zoneBlueprint.getAnimationDuration().getValue()
                                 ));
                             }
                         }
@@ -257,23 +264,23 @@ public class ScriptZone {
                             if (rayLocationValidator(shapeTargetLocation, location)) {
                                 shapes.add(new TranslatingRay(
                                         zoneBlueprint.isIgnoresSolidBlocks(),
-                                        zoneBlueprint.getPointRadius(),
+                                        zoneBlueprint.getPointRadius().getValue(),
                                         shapeTargetLocation,
                                         targetLocationEnd,
                                         location,
                                         target2LocationEnd,
-                                        zoneBlueprint.getAnimationDuration()
+                                        zoneBlueprint.getAnimationDuration().getValue()
                                 ));
                             }
                         }
                     }
                     case CUBOID -> shapes.add(new Cuboid(
-                            zoneBlueprint.getX(),
-                            zoneBlueprint.getY(),
-                            zoneBlueprint.getZ(),
-                            zoneBlueprint.getXBorder(),
-                            zoneBlueprint.getYBorder(),
-                            zoneBlueprint.getZBorder(),
+                            zoneBlueprint.getX().getValue(),
+                            zoneBlueprint.getY().getValue(),
+                            zoneBlueprint.getZ().getValue(),
+                            zoneBlueprint.getXBorder().getValue(),
+                            zoneBlueprint.getYBorder().getValue(),
+                            zoneBlueprint.getZBorder().getValue(),
                             shapeTargetLocation
                     ));
                     default -> Logger.warn("Unsupported shape type '" + zoneBlueprint.getShapeTypeEnum() + "' in script zone.");
@@ -282,6 +289,7 @@ public class ScriptZone {
             return shapes;
         } catch (Exception e) {
             Logger.warn("Error generating shapes: " + e.getMessage());
+            e.printStackTrace();
             return Collections.emptyList();
         }
     }

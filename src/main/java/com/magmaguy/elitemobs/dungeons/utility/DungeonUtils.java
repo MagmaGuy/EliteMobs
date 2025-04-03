@@ -5,7 +5,7 @@ import com.magmaguy.elitemobs.dungeons.EliteMobsWorld;
 import com.magmaguy.elitemobs.dungeons.WorldDungeonPackage;
 import com.magmaguy.elitemobs.dungeons.WorldPackage;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
-import com.magmaguy.magmacore.util.WorldLoader;
+import com.magmaguy.magmacore.util.TemporaryWorldManager;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -40,7 +40,7 @@ public class DungeonUtils {
     }
 
     public static World loadWorld(String worldName, World.Environment environment, ContentPackagesConfigFields contentPackagesConfigFields) {
-        World world = WorldLoader.loadVoidTemporaryWorld(worldName, environment);
+        World world = TemporaryWorldManager.loadVoidTemporaryWorld(worldName, environment);
         if (world != null) EliteMobsWorld.create(world.getUID(), contentPackagesConfigFields);
         return world;
     }

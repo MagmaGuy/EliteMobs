@@ -2,6 +2,8 @@ package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.magmacore.config.ConfigurationFile;
 
+import java.util.List;
+
 public class CustomModelsConfig extends ConfigurationFile {
     public static String anvilHammer;
     public static String bagOfCoins;
@@ -18,12 +20,17 @@ public class CustomModelsConfig extends ConfigurationFile {
     public static String whiteAnvil;
     public static String yellowCrown;
     public static String yellowLock;
+    public static boolean useModels;
+
     public CustomModelsConfig() {
-        super("CustomModels");
+        super("CustomModels.yml");
     }
 
     @Override
     public void initializeValues() {
+        useModels = ConfigurationEngine.setBoolean(List.of("Sets whether the models in this configuration file will be used.",
+                "Will not apply to custom models of things that aren't here, such as bosses."),
+                fileConfiguration, "useModels", true);
         anvilHammer = ConfigurationEngine.setString(file, fileConfiguration, "anvilHammer", "elitemobs:ui/anvilhammer", false);
         redCross = ConfigurationEngine.setString(file, fileConfiguration, "cancel", "elitemobs:ui/redcross", false);
         goldenQuestionMark = ConfigurationEngine.setString(file, fileConfiguration, "goldenQuestionMark", "elitemobs:ui/goldenquestionmark", false);

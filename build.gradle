@@ -10,6 +10,11 @@ plugins {
 compileJava.options.encoding = "UTF-8"
 compileTestJava.options.encoding = "UTF-8"
 
+//This allows any modules tagged as changing to be updated every time, which is extremely convenient for some of the shaded libs
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(17)
@@ -27,7 +32,7 @@ processResources {
 }
 
 group 'com.magmaguy'
-version '9.3.2'
+version '9.4.0'
 
 repositories {
     maven {
@@ -105,7 +110,9 @@ dependencies {
     //Model Engine - legacy
     compileOnly "com.ticxo.modelengine:api:R3.1.7"
     //Free Minecraft Models
-    compileOnly group: 'com.magmaguy', name: 'FreeMinecraftModels', version: '1.4.2'
+    compileOnly (group: 'com.magmaguy', name: 'FreeMinecraftModels', version: '1.4.2'){
+        changing = true
+    }
     // Mythic Mobs integration - currently only for arenas
     compileOnly group: 'io.lumine', name: 'Mythic-Dist', version: '5.3.5'
 
@@ -113,8 +120,10 @@ dependencies {
     implementation group: 'org.bstats', name: 'bstats-bukkit', version: '2.2.1'
     implementation group: 'commons-io', name: 'commons-io', version: '2.7'
     implementation group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
-    implementation group: 'com.magmaguy', name: 'EasyMinecraftGoals-dist', version: '1.15.0'
-    implementation group: 'com.magmaguy', name: 'MagmaCore', version: '1.10'
+    implementation group: 'com.magmaguy', name: 'EasyMinecraftGoals-dist', version: '1.19.0-SNAPSHOT'
+    implementation (group: 'com.magmaguy', name: 'MagmaCore', version: '1.13-SNAPSHOT'){
+        changing = true
+    }
 
 }
 
@@ -134,7 +143,7 @@ shadowJar {
         // Relocate bStats
         relocate('org.bstats', packagePath + '.bstats')
         // Relocate MagmaCore
-        relocate('com.magmaguy.magmacore', 'com.magmaguy.elitemobs.magmacore')
+//        relocate('com.magmaguy.magmacore', 'com.magmaguy.elitemobs.magmacore')
         relocate('com.magmaguy.easyminecraftgoals', 'com.magmaguy.elitemobs.easyminecraftgoals')
     }
     archiveClassifier.set(null)

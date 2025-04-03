@@ -87,6 +87,8 @@ public class MaterialGenerator {
             localValidMaterials.remove(GOLDEN_AXE);
         }
 
+        if (localValidMaterials.isEmpty()) return null;
+
         return localValidMaterials.get(ThreadLocalRandom.current().nextInt(localValidMaterials.size()));
 
     }
