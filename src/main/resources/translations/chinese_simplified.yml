@@ -1518,7 +1518,7 @@ protection_environmental:
 protection_explosions:
   name: 爆炸保护
 protection_fall:
-  name: 摔落保护
+  name: 摔落缓冲
 protection_fire:
   name: 火焰保护
 protection_projectile:
