@@ -14,7 +14,10 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.IOException;
+import java.net.ConnectException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +28,10 @@ public class VersionChecker {
     @Getter
     private static final boolean SHA1Updated = false;
     private static boolean pluginIsUpToDate = true;
+    private static final int MAX_RETRY_ATTEMPTS = 3;
+    private static final int RETRY_DELAY_SECONDS = 60;
+    private static boolean connectionFailed = false;
+    private static int connectionRetryCount = 0;
 
     private VersionChecker() {
     }
@@ -56,7 +63,6 @@ public class VersionChecker {
 
     }
 
-
     private static void checkPluginVersion() {
         new BukkitRunnable() {
             @Override
@@ -70,11 +76,11 @@ public class VersionChecker {
                 String publicVersion = "";
 
                 try {
-                    Logger.info("Latest public release is " + VersionChecker.readStringFromURL("https://api.spigotmc.org/legacy/update.php?resource=40090"));
-                    Logger.info("Your version is " + MetadataHandler.PLUGIN.getDescription().getVersion());
                     publicVersion = VersionChecker.readStringFromURL("https://api.spigotmc.org/legacy/update.php?resource=40090");
+                    Logger.info("Latest public release is " + publicVersion);
+                    Logger.info("Your version is " + MetadataHandler.PLUGIN.getDescription().getVersion());
                 } catch (IOException e) {
-                    Logger.warn("Couldn't check latest version");
+                    handleConnectionError("plugin version check", e);
                     return;
                 }
 
@@ -112,67 +118,117 @@ public class VersionChecker {
         Bukkit.getScheduler().runTaskAsynchronously(MetadataHandler.PLUGIN, () -> {
             try {
                 String remoteVersions = readStringFromURL("https://www.magmaguy.com/api/elitemobs_content");
-                String[] lines = remoteVersions.split("\n");
-                for (EMPackage emPackage : EMPackage.getEmPackages().values()) {
-                    if (!emPackage.isInstalled()) continue;
-                    if (!emPackage.getContentPackagesConfigFields().isDefaultDungeon()) continue;
-                    boolean containedInMetaPackage = false;
-                    for (EMPackage metaPackage : EMPackage.getEmPackages().values())
-                        if (metaPackage.getContentPackagesConfigFields().getContainedPackages() != null &&
-                                !metaPackage.getContentPackagesConfigFields().getContainedPackages().isEmpty() &&
-                                metaPackage.getContentPackagesConfigFields().getContainedPackages().contains(emPackage.getContentPackagesConfigFields().getFilename())) {
-                            containedInMetaPackage = true;
-                            break;
-                        }
+                connectionFailed = false; // Reset the flag if successful
+                connectionRetryCount = 0; // Reset retry count
 
-                    if (containedInMetaPackage) continue;
-                    boolean checked = false;
-                    for (String line : lines) {
-                        if (line.startsWith(emPackage.getContentPackagesConfigFields().getFilename().replace(".yml", ""))) {
-                            String[] split = line.split(":");
-                            int remoteVersion = 0;
-                            try {
-                                remoteVersion = Integer.parseInt(split[1].trim());
-                            } catch (Exception e) {
-                                Logger.warn("Remote version substring: " + split[1].trim());
-                                e.printStackTrace();
-                            }
-                            if (remoteVersion > emPackage.getContentPackagesConfigFields().getDungeonVersion()) {
-                                emPackage.setOutOfDate(true);
-                                outdatedPackages.add(emPackage);
-                                Logger.warn("Content " + emPackage.getContentPackagesConfigFields().getName() +
-                                        " is outdated! You should go download the updated version! Your version: " +
-                                        emPackage.getContentPackagesConfigFields().getDungeonVersion() + " / remote version: " +
-                                        remoteVersion + " / Link: " + emPackage.getContentPackagesConfigFields().getDownloadLink());
-                            }
-                            checked = true;
-                            break;
-                        }
-                    }
-                    if (!checked)
-                        Logger.warn("Failed to check content " + emPackage.getContentPackagesConfigFields().getFilename() + " ! The remote server doesn't have a version listed for it, report it to the developer!");
-                }
+                String[] lines = remoteVersions.split("\n");
+                processContentVersionData(lines);
+
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                handleConnectionError("content version check", e);
+
+                // If we've tried enough times, or this is not a connection issue,
+                // use cached data if available or proceed without updates
+                if (connectionRetryCount >= MAX_RETRY_ATTEMPTS ||
+                        !(e instanceof UnknownHostException || e instanceof ConnectException || e instanceof SocketTimeoutException)) {
+                    Logger.info("Using local data for content version checks as remote server is unavailable.");
+                    // Each package will be considered up-to-date since we can't verify
+                }
             }
         });
     }
 
-    private static String readStringFromURL(String url) throws IOException {
+    /**
+     * Process the content version data that was successfully retrieved
+     *
+     * @param lines Lines of data from the remote version file
+     */
+    private static void processContentVersionData(String[] lines) {
+        for (EMPackage emPackage : EMPackage.getEmPackages().values()) {
+            if (!emPackage.isInstalled()) continue;
+            if (!emPackage.getContentPackagesConfigFields().isDefaultDungeon()) continue;
+            boolean containedInMetaPackage = false;
+            for (EMPackage metaPackage : EMPackage.getEmPackages().values())
+                if (metaPackage.getContentPackagesConfigFields().getContainedPackages() != null &&
+                        !metaPackage.getContentPackagesConfigFields().getContainedPackages().isEmpty() &&
+                        metaPackage.getContentPackagesConfigFields().getContainedPackages().contains(emPackage.getContentPackagesConfigFields().getFilename())) {
+                    containedInMetaPackage = true;
+                    break;
+                }
 
+            if (containedInMetaPackage) continue;
+            boolean checked = false;
+            for (String line : lines) {
+                if (line.startsWith(emPackage.getContentPackagesConfigFields().getFilename().replace(".yml", ""))) {
+                    String[] split = line.split(":");
+                    int remoteVersion = 0;
+                    try {
+                        remoteVersion = Integer.parseInt(split[1].trim());
+                    } catch (Exception e) {
+                        Logger.warn("Remote version substring: " + split[1].trim());
+                        e.printStackTrace();
+                    }
+                    if (remoteVersion > emPackage.getContentPackagesConfigFields().getDungeonVersion()) {
+                        emPackage.setOutOfDate(true);
+                        outdatedPackages.add(emPackage);
+                        Logger.warn("Content " + emPackage.getContentPackagesConfigFields().getName() +
+                                " is outdated! You should go download the updated version! Your version: " +
+                                emPackage.getContentPackagesConfigFields().getDungeonVersion() + " / remote version: " +
+                                remoteVersion + " / Link: " + emPackage.getContentPackagesConfigFields().getDownloadLink());
+                    }
+                    checked = true;
+                    break;
+                }
+            }
+            if (!checked)
+                Logger.warn("Failed to check content " + emPackage.getContentPackagesConfigFields().getFilename() + " ! The remote server doesn't have a version listed for it, report it to the developer!");
+        }
+    }
+
+    /**
+     * Handles connection errors with proper logging and retry logic
+     *
+     * @param checkType Type of check being performed
+     * @param e The exception that occurred
+     */
+    private static void handleConnectionError(String checkType, Exception e) {
+        connectionFailed = true;
+
+        if (e instanceof UnknownHostException || e instanceof ConnectException || e instanceof SocketTimeoutException) {
+            // Network-related errors that can be retried
+            connectionRetryCount++;
+
+            if (connectionRetryCount <= MAX_RETRY_ATTEMPTS) {
+                Logger.warn("Network error during " + checkType + ". Will retry in " + RETRY_DELAY_SECONDS +
+                        " seconds (Attempt " + connectionRetryCount + "/" + MAX_RETRY_ATTEMPTS + ")");
+
+                // Schedule a retry after delay
+                Bukkit.getScheduler().runTaskLaterAsynchronously(MetadataHandler.PLUGIN,
+                        () -> checkContentVersion(), 20L * RETRY_DELAY_SECONDS);
+            } else {
+                Logger.warn("Failed to connect for " + checkType + " after " + MAX_RETRY_ATTEMPTS +
+                        " attempts. Will continue without version checking. Error: " + e.getMessage());
+            }
+        } else {
+            // Other errors that should be properly logged
+            Logger.warn("Error during " + checkType + ": " + e.getMessage());
+            if (e.getCause() != null) {
+                Logger.warn("Caused by: " + e.getCause().getMessage());
+            }
+        }
+    }
+
+    private static String readStringFromURL(String url) throws IOException {
         try (Scanner scanner = new Scanner(new URL(url).openStream(),
                 StandardCharsets.UTF_8)) {
             scanner.useDelimiter("\\A");
             return scanner.hasNext() ? scanner.next() : "";
         }
-
     }
 
     private static void outOfDateHandler() {
-
         Logger.warn("[EliteMobs] A newer version of this plugin is available for download!");
         pluginIsUpToDate = false;
-
     }
 
     public static void check() {
@@ -190,9 +246,16 @@ public class VersionChecker {
                 @Override
                 public void run() {
                     if (!event.getPlayer().isOnline()) return;
+
+                    if (connectionFailed && event.getPlayer().hasPermission("elitemobs.admin")) {
+                        event.getPlayer().sendMessage(ChatColorConverter.convert("&8[EliteMobs] &eWarning: Could not connect to update servers. " +
+                                "Version checking is currently unavailable. Check your internet connection or try again later."));
+                    }
+
                     if (!pluginIsUpToDate)
                         event.getPlayer().sendMessage(ChatColorConverter.convert("&cYour version of EliteMobs is outdated." +
                                 " &aYou can download the latest version from &3&n&ohttps://www.spigotmc.org/resources/%E2%9A%94elitemobs%E2%9A%94.40090/"));
+
                     if (!outdatedPackages.isEmpty()) {
                         Logger.sendSimpleMessage(event.getPlayer(), "&8&m-----------------------------------------------------");
                         Logger.sendMessage(event.getPlayer(), "&cThe following dungeons are outdated:");
@@ -222,8 +285,6 @@ public class VersionChecker {
                     }
                 }
             }.runTaskLater(MetadataHandler.PLUGIN, 20L * 3);
-
         }
     }
-
 }

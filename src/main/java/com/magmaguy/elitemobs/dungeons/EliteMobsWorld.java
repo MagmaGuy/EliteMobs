@@ -12,10 +12,11 @@ public class EliteMobsWorld {
     @Getter
     private final ContentPackagesConfigFields contentPackagesConfigFields;
     @Getter
-    private final boolean allowExplosions;
+    private boolean allowExplosions;
 
     private EliteMobsWorld(UUID worldUUID, ContentPackagesConfigFields contentPackagesConfigFields) {
         this.contentPackagesConfigFields = contentPackagesConfigFields;
+        if (!contentPackagesConfigFields.isProtect()) return;
         this.allowExplosions = contentPackagesConfigFields.isAllowExplosions();
         eliteMobsWorlds.put(worldUUID, this);
     }

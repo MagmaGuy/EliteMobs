@@ -56,7 +56,7 @@ public class ItemEnchantmentMenu extends EliteMenu {
 
     public ItemEnchantmentMenu(Player player) {
         String name = MENU_NAME;
-        if (DefaultConfig.isForceMenuUnicode() || Bukkit.getPluginManager().isPluginEnabled("ResourcePackManager"))
+        if (DefaultConfig.useResourcePackModels())
             name = ChatColor.WHITE + "\uF801\uDB80\uDC2A\uF805           " + MENU_NAME;
         Inventory inventory = Bukkit.createInventory(player, 54, name);
         ItemEnchantMenuEvents.menus.add(inventory);

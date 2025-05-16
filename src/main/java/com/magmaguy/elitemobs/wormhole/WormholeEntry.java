@@ -16,7 +16,6 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Consumer;
 import org.bukkit.util.Vector;
 
@@ -35,9 +34,6 @@ public class WormholeEntry implements PersistentObject {
     private String locationString;
     @Getter
     private String armorStandText;
-    @Getter
-    @Setter
-    private BukkitTask wormholeTask;
     @Getter
     @Setter
     private ArmorStand text = null;
@@ -63,6 +59,7 @@ public class WormholeEntry implements PersistentObject {
         else this.armorStandText = wormhole.getWormholeConfigFields().getLocation2Text();
 
         persistentObjectHandler = new PersistentObjectHandler(this);
+        wormholeEntries.add(this);
         if (ChunkLocationChecker.locationIsLoaded(location)) chunkLoad();
     }
 
@@ -81,11 +78,9 @@ public class WormholeEntry implements PersistentObject {
         }
         Location teleportLocation = emPackage.getContentPackagesConfigFields().getTeleportLocation();
         if (teleportLocation == null) return null;
-//        Vector offsetVector = teleportLocation.getDirection().clone().setY(0).normalize().multiply(1.5 * wormhole.getWormholeConfigFields().getSizeMultiplier()).setY(-1 * wormhole.getWormholeConfigFields().getSizeMultiplier());
 
         worldName = emPackage.getContentPackagesConfigFields().getWorldName();
 
-//        return teleportLocation.clone().subtract(offsetVector);
         return teleportLocation.clone();
     }
 
@@ -106,22 +101,26 @@ public class WormholeEntry implements PersistentObject {
     }
 
     public void onDungeonUninstall() {
-        stop();
+        if (text != null && text.isValid()) {
+            text.remove();
+            text = null;
+        }
         location = null;
-        wormholeTask = null;
     }
 
     @Override
     public void chunkLoad() {
         if (text == null || !text.isValid()) initializeTextDisplay();
-        if (wormholeTask != null && !wormholeTask.isCancelled()) wormholeTask.cancel();
         if (location == null) setLocationFromConfiguration();
-        wormholeTask = WormholeTask.startWormholeTask(this);
+        // No longer needs to start a task - all handled by WormholeManager
     }
 
     @Override
     public void chunkUnload() {
-        //This is handled by the repeating task itself. Also there seems to be some bug with this unload, it seems arbitrary
+        if (text != null && text.isValid()) {
+            text.remove();
+            text = null;
+        }
     }
 
     @Override
@@ -133,7 +132,10 @@ public class WormholeEntry implements PersistentObject {
     @Override
     public void worldUnload() {
         location.setWorld(null);
-        stop();
+        if (text != null && text.isValid()) {
+            text.remove();
+            text = null;
+        }
     }
 
     @Override
@@ -147,25 +149,21 @@ public class WormholeEntry implements PersistentObject {
     }
 
     public void stop() {
-        if (wormholeTask != null) {
-            wormholeTask.cancel();
+        if (text != null && text.isValid()) {
+            text.remove();
+            text = null;
         }
     }
 
     public void updateLocation(Player player) {
-        if (wormholeTask != null) {
-            wormholeTask.cancel();
-            wormholeTask = null;
-        }
         locationString = ConfigurationLocation.deserialize(player.getLocation());
         location = player.getLocation().add(new Vector(0, 1 * wormhole.getWormholeConfigFields().getSizeMultiplier(), 0));
         wormhole.getWormholeConfigFields().setWormholeEntryLocation(location, wormholeNumber);
-        wormholeTask = WormholeTask.startWormholeTask(this);
         if (persistentObjectHandler != null) persistentObjectHandler.remove();
         persistentObjectHandler = new PersistentObjectHandler(this);
     }
 
-    private void initializeTextDisplay() {
+    public void initializeTextDisplay() {
         if (text != null && text.isValid() && !text.isEmpty()) return;
         if (armorStandText == null) return;
         if (location == null || location.getWorld() == null) return;
@@ -183,5 +181,4 @@ public class WormholeEntry implements PersistentObject {
         });
         EntityTracker.registerVisualEffects(text);
     }
-
 }

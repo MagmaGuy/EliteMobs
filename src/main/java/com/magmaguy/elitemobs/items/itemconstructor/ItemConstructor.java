@@ -7,7 +7,7 @@ import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffectContainer;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
-import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
+import com.magmaguy.elitemobs.utils.CustomModelAdder;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
 import org.bukkit.Material;
@@ -76,12 +76,8 @@ public class ItemConstructor {
         itemStack.setItemMeta(itemMeta);
 
         //Apply custom model id
-        if (!VersionChecker.serverVersionOlderThan(21, 4))
-            if (customModelID != null) {
-                itemMeta.setItemModel(NamespacedKey.fromString(customModelID));
-                itemStack.setItemMeta(itemMeta);
-            }
-
+        itemStack = CustomModelAdder.addCustomModel(itemStack, customModelID);
+        itemMeta = itemStack.getItemMeta();
 
         //Register filename of the custom item into the persistent metadata
         Objects.requireNonNull(itemMeta).getPersistentDataContainer().set(new NamespacedKey(MetadataHandler.PLUGIN, filename), PersistentDataType.STRING, filename);

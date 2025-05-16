@@ -47,6 +47,7 @@ public class ScriptRelativeVector {
         else
             return new Vector(0, 0, 0);
 
+        if (!destinationLocation.getWorld().equals(sourceLocation.getWorld())) return new Vector(0, 0, 0);
         Vector vector = destinationLocation.clone().subtract(sourceLocation).toVector();
         if (scriptRelativeVectorBlueprint.isNormalize()) vector.normalize();
         vector.multiply(scriptRelativeVectorBlueprint.getMultiplier().getValue());
