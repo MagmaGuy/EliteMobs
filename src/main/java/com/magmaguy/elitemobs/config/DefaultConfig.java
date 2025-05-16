@@ -17,6 +17,9 @@ import java.util.List;
  */
 public class DefaultConfig extends ConfigurationFile {
     @Getter
+    private static boolean useResourcePackEvenIfResourcePackManagerIsNotInstalled;
+
+    @Getter
     public static DefaultConfig instance;
     @Getter
     private static boolean alwaysShowNametags;
@@ -55,8 +58,6 @@ public class DefaultConfig extends ConfigurationFile {
     @Getter
     private static boolean useGlassToFillMenuEmptySpace;
     @Getter
-    private static boolean menuUnicodeFormatting;
-    @Getter
     private static String language;
     @Getter
     private static String noPendingCommands;
@@ -77,8 +78,6 @@ public class DefaultConfig extends ConfigurationFile {
     @Getter
     private static boolean resetPlayerScaleOnLogin;
     @Getter
-    private static boolean forceMenuUnicode;
-    @Getter
     private static String enchantmentChallengeFailureMessage;
     @Getter
     private static String enchantmentChallengeSuccessMessage;
@@ -90,6 +89,10 @@ public class DefaultConfig extends ConfigurationFile {
     private static String enchantmentChallengeCriticalFailureMessage;
     @Getter
     private static String enchantmentChallengeStartMessage;
+
+    public static boolean useResourcePackModels(){
+        return DefaultConfig.useResourcePackEvenIfResourcePackManagerIsNotInstalled || Bukkit.getPluginManager().isPluginEnabled("ResourcePackManager");
+    }
 
     public DefaultConfig() {
         super("config.yml");
@@ -191,11 +194,6 @@ public class DefaultConfig extends ConfigurationFile {
         useGlassToFillMenuEmptySpace = ConfigurationEngine.setBoolean(
                 List.of("Sets if empty menu space will be filled with glass panes.", "Not recommended if you are using the EliteMobs resource pack."),
                 fileConfiguration, "useGlassToFillMenuEmptySpace", false);
-        menuUnicodeFormatting = ConfigurationEngine.setBoolean(
-                List.of("Sets if unicode will be used to format the EliteMobs resource pack.",
-                        "Do not set this manually, it is set automatically upon installation of the resource pack.",
-                        "Only set it manually if you had to merge the EliteMobs resource pack, and expect that the spacing might not work if you do that."),
-                fileConfiguration, "menuUnicodeFormatting", false);
         noPendingCommands = ConfigurationEngine.setString(
                 List.of("Sets the message sent to players if they run '/em confirm' with no pending commands."),
                 file, fileConfiguration, "noPendingCommands", "&cYou don't currently have any pending commands!", true);
@@ -221,7 +219,6 @@ public class DefaultConfig extends ConfigurationFile {
                 List.of("Sets the message that appears when a player tries to track a boss that is no longer valid"),
                 file, fileConfiguration, "bossAlreadyGoneMessage", "&c[EliteMobs] Sorry, this boss is already gone!", true);
         resetPlayerScaleOnLogin = ConfigurationEngine.setBoolean(List.of("Sets whether to reset player scale (literally, the player size on login).", "This is important because some elite powers can modify it and if the server crashes players will be stuck to whatever scale was set when the server crashed, unless this option is set to true."), fileConfiguration, "resetPlayerScale", true);
-        forceMenuUnicode = ConfigurationEngine.setBoolean(List.of("Sets whether the menu unicodes for the resource pack should be forced even if the pack is not being hosted through the recommended methods (which is using ResourcePackManager)"), fileConfiguration, "forceMenuUnicode", false);
         enchantmentChallengeFailureMessage = ConfigurationEngine.setString(
                 List.of("Sets the message sent to players when they fail an enchantment challenge"),
                 file, fileConfiguration, "enchantmentChallengeFailureMessage", "&8[EliteMobs] &cFailed enchantment! The enchantment did not bind to the item.", true);
@@ -244,6 +241,7 @@ public class DefaultConfig extends ConfigurationFile {
         enchantmentChallengeStartMessage = ConfigurationEngine.setString(
                 List.of("Sets the message sent to players at the start of an enchantment challenge"),
                 file, fileConfiguration, "enchantmentChallengeStartMessage", "&8[EliteMobs] &6Challenge! Defeat the boss to get your upgraded item!", true);
-
+        useResourcePackEvenIfResourcePackManagerIsNotInstalled = ConfigurationEngine.setBoolean(
+                List.of("Enables the use of resource packs even if the resource pack manager is not installed"), fileConfiguration, "useResourcePackEvenIfResourcePackManagerIsNotInstalled", false);
     }
 }

@@ -3,10 +3,12 @@ package com.magmaguy.elitemobs.items;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
+import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.utils.CustomModelAdder;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
@@ -33,6 +35,12 @@ public class EliteScroll {
         return itemStack;
     }
 
+    public static ItemStack generateScroll(int scrollLevel, Player player) {
+        ItemStack itemStack = generateScroll(scrollLevel);
+        SoulbindEnchantment.addEnchantment(itemStack, player);
+        return itemStack;
+    }
+
     public static boolean isEliteScroll(ItemStack itemStack) {
         if (itemStack == null) return false;
         if (!itemStack.hasItemMeta()) return false;
@@ -45,8 +53,10 @@ public class EliteScroll {
     }
 
     public static ItemStack convertVanillaItem(ItemStack originalItem, ItemStack scrollItemStack) {
+        Player player = SoulbindEnchantment.getSoulboundPlayer(scrollItemStack.getItemMeta());
         ItemStack newItem = originalItem.clone();
         EliteItemManager.setEliteLevel(newItem, getEliteScrollLevel(scrollItemStack), true);
+        if (player != null) SoulbindEnchantment.addEnchantment(newItem, player);
         return newItem;
     }
 }

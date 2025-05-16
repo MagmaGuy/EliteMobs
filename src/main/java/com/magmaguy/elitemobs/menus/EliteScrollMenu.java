@@ -22,7 +22,7 @@ public class EliteScrollMenu extends EliteMenu {
 
     public EliteScrollMenu(Player player) {
         String name = EliteScrollMenuConfig.getMenuName();
-        if (DefaultConfig.isForceMenuUnicode() || Bukkit.getPluginManager().isPluginEnabled("ResourcePackManager"))
+        if (DefaultConfig.useResourcePackModels())
             name = ChatColor.WHITE + "\uF801\uDB80\uDC2A\uF805           " + name;
         Inventory inventory = Bukkit.createInventory(player, 54, name);
 

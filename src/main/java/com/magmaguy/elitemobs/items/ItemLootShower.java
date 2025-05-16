@@ -8,7 +8,7 @@ import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
-import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
+import com.magmaguy.elitemobs.utils.CustomModelAdder;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
 import com.magmaguy.magmacore.util.Logger;
@@ -18,7 +18,6 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -28,7 +27,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -343,10 +341,7 @@ public class ItemLootShower implements Listener {
     }
 
     private ItemStack setCoinModel(ItemStack itemStack, String data) {
-        ItemMeta itemMeta = itemStack.getItemMeta();
-        if (!VersionChecker.serverVersionOlderThan(21, 4))
-            itemMeta.setItemModel(NamespacedKey.fromString(data));
-        itemStack.setItemMeta(itemMeta);
+        CustomModelAdder.addCustomModel(itemStack, data);
         return itemStack;
     }
 

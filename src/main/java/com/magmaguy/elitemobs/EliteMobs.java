@@ -61,6 +61,7 @@ import com.magmaguy.elitemobs.treasurechest.TreasureChest;
 import com.magmaguy.elitemobs.utils.BossBarUtil;
 import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import com.magmaguy.elitemobs.wormhole.Wormhole;
+import com.magmaguy.elitemobs.wormhole.WormholeManager;
 import com.magmaguy.magmacore.MagmaCore;
 import com.magmaguy.magmacore.util.Logger;
 import org.bstats.bukkit.Metrics;
@@ -275,6 +276,8 @@ public class EliteMobs extends JavaPlugin {
         CustomBossEntity.startUpdatingDynamicLevels();
 
         EntityTracker.managedEntityWatchdog();
+        //initialize the centralized wormhole manager
+        WormholeManager.getInstance();
     }
 
     @Override
