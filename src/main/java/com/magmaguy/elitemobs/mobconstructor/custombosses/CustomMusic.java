@@ -7,6 +7,7 @@ import com.magmaguy.elitemobs.dungeons.EliteMobsWorld;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.Location;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -157,7 +158,7 @@ public class CustomMusic {
         players.put(player, this);
         //Boss music overrides dungeon music
         if (playerSongSingleton.containsKey(player) && !players.get(player).equals(this)) return;
-        player.playSound(player.getLocation(), name, 1f, 1f);
+        player.playSound(player.getLocation(), name, SoundCategory.MUSIC, 1f, 1f);
         playerSongSingleton.put(player, this);
     }
 
@@ -178,13 +179,13 @@ public class CustomMusic {
                     }
                     if (playerSongSingleton.containsKey(player) && !players.get(player).equals(customMusic)) return;
                     if (!playerSongSingleton.containsKey(player)) playerSongSingleton.put(player, customMusic);
-                    player.playSound(player.getLocation(), name, 1f, 1f);
+                    player.playSound(player.getLocation(), name, SoundCategory.MUSIC,1f, 1f);
                 }
             }.runTaskTimer(MetadataHandler.PLUGIN, 0, durationTicks);
         }
         //case for a song with a transition
         else {
-            player.playSound(player.getLocation(), name, 1f, 1f);
+            player.playSound(player.getLocation(), name, SoundCategory.MUSIC, 1f, 1f);
             songTask = new BukkitRunnable() {
                 @Override
                 public void run() {
@@ -196,7 +197,7 @@ public class CustomMusic {
                         playerSongSingleton.remove(player);
                         return;
                     }
-                    player.playSound(player.getLocation(), name2, 1f, 1f);
+                    player.playSound(player.getLocation(), name2, SoundCategory.MUSIC,1f, 1f);
                 }
             }.runTaskTimer(MetadataHandler.PLUGIN, durationTicks, durationTicks2);
         }

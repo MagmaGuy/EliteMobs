@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.api;
 import com.magmaguy.elitemobs.dungeons.EliteMobsWorld;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.utils.EventCaller;
+import com.magmaguy.elitemobs.wormhole.WormholeManager;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
@@ -66,7 +67,7 @@ public class PlayerTeleportEvent extends Event implements Cancellable {
     public void executeTeleport() {
         if (!EliteMobsWorld.isEliteMobsWorld(player.getLocation().getWorld().getUID()))
             PlayerData.setBackTeleportLocation(player, originalLocation);
-
+        WormholeManager.getInstance().addPlayerToCooldown(player, null);
         player.teleport(destination);
     }
 

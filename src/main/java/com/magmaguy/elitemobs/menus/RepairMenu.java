@@ -57,7 +57,7 @@ public class RepairMenu extends EliteMenu {
      */
     public void constructRepairMenu(Player player) {
         String menuName = RepairMenuConfig.shopName;
-        if (DefaultConfig.isForceMenuUnicode() || Bukkit.getPluginManager().isPluginEnabled("ResourcePackManager"))
+        if (DefaultConfig.useResourcePackModels())
             menuName = ChatColor.WHITE + "\uF801\uDB80\uDC2A\uF805           " + menuName;
 
         Inventory repairInventory = Bukkit.createInventory(player, 54, menuName);
@@ -66,7 +66,7 @@ public class RepairMenu extends EliteMenu {
 
             if (i == RepairMenuConfig.infoSlot) {
                 ItemStack infoButton = RepairMenuConfig.infoButton;
-                if (DefaultConfig.isForceMenuUnicode() || Bukkit.getPluginManager().isPluginEnabled("ResourcePackManager")) {
+                if (DefaultConfig.useResourcePackModels()) {
                     infoButton.setType(Material.PAPER);
                     ItemMeta itemMeta = infoButton.getItemMeta();
                     itemMeta.setCustomModelData(MetadataHandler.signatureID);

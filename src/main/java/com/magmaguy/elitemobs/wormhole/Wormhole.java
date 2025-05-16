@@ -1,11 +1,8 @@
 package com.magmaguy.elitemobs.wormhole;
 
-import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.wormholes.WormholeConfigFields;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.Color;
-import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
@@ -15,8 +12,7 @@ import java.util.List;
 public class Wormhole {
     @Getter
     private static final HashSet<Wormhole> wormholes = new HashSet<>();
-    @Getter
-    private static final HashSet<Player> playerCooldowns = new HashSet<>();
+
     @Getter
     private final WormholeConfigFields wormholeConfigFields;
     @Getter
@@ -25,14 +21,9 @@ public class Wormhole {
     private final WormholeEntry wormholeEntry2;
     @Getter
     private final Color particleColor;
-
-    public static void addPlayerToCooldowns(Player player) {
-        playerCooldowns.add(player);
-        Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, () -> Wormhole.getPlayerCooldowns().remove(player), 20 * 5L);
-    }
-
     @Getter
     private List<List<Vector>> cachedRotations = new ArrayList<>();
+
 
     public Wormhole(WormholeConfigFields wormholeConfigFields) {
         this.wormholeConfigFields = wormholeConfigFields;
@@ -43,15 +34,23 @@ public class Wormhole {
         wormholeEntry1 = new WormholeEntry(this, getWormholeConfigFields().getLocation1(), 1);
         wormholeEntry2 = new WormholeEntry(this, getWormholeConfigFields().getLocation2(), 2);
         wormholes.add(this);
+
+        // Make sure the manager is initialized
+        WormholeManager.getInstance();
     }
 
     public static void shutdown() {
-        for (Wormhole wormhole : wormholes)
+        // Shutdown the centralized manager
+        WormholeManager.getInstance().shutdown();
+
+        // Clean up wormhole entries
+        for (Wormhole wormhole : wormholes) {
             wormhole.stop();
+        }
+
         wormholes.clear();
         WormholeEntry.getWormholeEntries().clear();
     }
-
 
     private void stop() {
         wormholeEntry1.stop();
@@ -84,5 +83,4 @@ public class Wormhole {
         ICOSAHEDRON,
         CUBE
     }
-
 }

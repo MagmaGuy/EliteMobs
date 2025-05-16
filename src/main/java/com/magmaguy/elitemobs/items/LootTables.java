@@ -89,7 +89,7 @@ public class LootTables implements Listener {
 
             if (ItemSettingsConfig.isUseEliteItemScrolls() &&
                     ThreadLocalRandom.current().nextDouble() < ItemSettingsConfig.getEliteItemScrollChance())
-                player.getWorld().dropItem(player.getLocation(), EliteScroll.generateScroll((int) itemLevel));
+                player.getWorld().dropItem(player.getLocation(), EliteScroll.generateScroll((int) itemLevel, player));
         }
     }
 

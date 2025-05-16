@@ -5,7 +5,6 @@ import com.magmaguy.elitemobs.dungeons.EMPackage;
 import com.magmaguy.elitemobs.dungeons.WorldInstancedDungeonPackage;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.menus.InstancedDungeonBrowser;
-import com.magmaguy.elitemobs.wormhole.Wormhole;
 import org.bukkit.entity.Player;
 
 public class DungeonCommands {
@@ -27,7 +26,6 @@ public class DungeonCommands {
         else {
             if (emPackage.getContentPackagesConfigFields().getTeleportLocation() != null) {
                 PlayerPreTeleportEvent.teleportPlayer(player, emPackage.getContentPackagesConfigFields().getTeleportLocation());
-                Wormhole.addPlayerToCooldowns(player);
             }
             else
                 player.sendMessage("[EliteMobs] Can't teleport you to the dungeon because the teleport location isn't set!" +
