@@ -15,7 +15,7 @@ public class Heal {
         if (healCooldown.contains(player)) return;
         PlayerPotionEffects.addOnHitCooldown(healCooldown, player, 20 * 5);
         double healedAmount = (elitePotionEffect.getPotionEffect().getAmplifier() + 1);
-        player.setHealth(Math.min(player.getHealth() + healedAmount, AttributeManager.getAttributeBaseValue(player, "generic_max_health")));
+        player.setHealth(Math.min(player.getHealth() + healedAmount, AttributeManager.getAttributeValue(player, "generic_max_health")));
     }
 
 }

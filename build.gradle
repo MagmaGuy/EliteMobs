@@ -32,7 +32,7 @@ processResources {
 }
 
 group 'com.magmaguy'
-version '9.4.1'
+version '9.4.2-SNAPSHOT-1'
 
 repositories {
     maven {
@@ -119,9 +119,8 @@ dependencies {
     ///Shaded in
     implementation group: 'org.bstats', name: 'bstats-bukkit', version: '2.2.1'
     implementation group: 'commons-io', name: 'commons-io', version: '2.7'
-    implementation group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
     implementation group: 'com.magmaguy', name: 'EasyMinecraftGoals-dist', version: '1.19.3'
-    implementation (group: 'com.magmaguy', name: 'MagmaCore', version: '1.13-SNAPSHOT'){
+    implementation (group: 'com.magmaguy', name: 'MagmaCore', version: '1.14-SNAPSHOT'){
         changing = true
     }
 

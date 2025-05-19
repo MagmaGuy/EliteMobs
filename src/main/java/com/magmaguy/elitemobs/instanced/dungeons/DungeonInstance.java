@@ -19,9 +19,9 @@ import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.elitemobs.utils.MapListInterpreter;
 import com.magmaguy.elitemobs.utils.WorldInstantiator;
+import com.magmaguy.magmacore.util.FileUtils;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
-import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -324,7 +324,8 @@ public class DungeonInstance extends MatchInstance {
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    try{FileUtils.deleteDirectory(instancedWorldFile);} catch (Exception e){
+                    try{
+                        FileUtils.deleteDirectory(instancedWorldFile);} catch (Exception e){
                         Logger.warn("Failed to delete " + instancedWorldFile + " ! This is bad, report this to the developer!");
                     }
                 }

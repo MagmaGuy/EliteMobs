@@ -9,7 +9,6 @@ import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -108,7 +107,7 @@ public class CustomMusic {
                 }
                 play(customBossEntity.getLocation(), customBossEntity.getCustomBossesConfigFields().getFollowDistance());
             }
-        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
+        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 10);
     }
 
     public void stop() {
@@ -124,33 +123,34 @@ public class CustomMusic {
     }
 
     private void play(Location location, double range) {
-        location.getWorld()
-                .getNearbyEntities(
-                        location,
-                        range,
-                        range,
-                        range,
-                        entity -> entity.getType().equals(EntityType.PLAYER))
-                .forEach(player -> {
-                    CustomMusic currentCustomMusic = playerSongSingleton.get((Player) player);
-                    if (currentCustomMusic != null && !currentCustomMusic.equals(this)) {
-                        currentCustomMusic.songTask.cancel();
-                        ((Player) player).stopSound(currentCustomMusic.name);
-                        if (name2 != null) {
-                            try {
-                                ((Player) player).stopSound(currentCustomMusic.name2);
-                            } catch (Exception e) {
-                                Logger.warn("Error trying to stop song, key was " + name2 + " . Reporting this to the author would be appreciated. This does not break anything.");
-                                //Somehow this can happen, not sure how but the music can be null which would just mean we don't need to remove it
-                            }
-                        }
-                        playerSongSingleton.remove((Player) player);
+        // Cache the squared range for faster distance checks
+        double rangeSquared = range * range;
+
+        // Get players directly instead of all entities
+        for (Player player : location.getWorld().getPlayers()) {
+            // Fast distance check using distanceSquared
+            if (player.getLocation().distanceSquared(location) > rangeSquared)
+                continue;
+
+            CustomMusic currentCustomMusic = playerSongSingleton.get(player);
+            if (currentCustomMusic != null && !currentCustomMusic.equals(this)) {
+                currentCustomMusic.songTask.cancel();
+                player.stopSound(currentCustomMusic.name);
+                if (currentCustomMusic.name2 != null) {
+                    try {
+                        player.stopSound(currentCustomMusic.name2);
+                    } catch (Exception e) {
+                        Logger.warn("Error trying to stop song, key was " + name2 + " . Reporting this to the author would be appreciated. This does not break anything.");
                     }
-                    if (!players.containsKey((Player) player)) {
-                        ((Player) player).playSound(player.getLocation(), name, 1f, 1f);
-                        startLoopingTask((Player) player, durationTicks);
-                    }
-                });
+                }
+                playerSongSingleton.remove(player);
+            }
+
+            if (!players.containsKey(player)) {
+                player.playSound(player.getLocation(), name, SoundCategory.MUSIC, 1f, 1f);
+                startLoopingTask(player, durationTicks);
+            }
+        }
     }
 
     private void play(Player player) {

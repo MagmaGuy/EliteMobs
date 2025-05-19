@@ -21,7 +21,7 @@ import java.util.List;
 public class TranslationsConfigFields extends CustomConfigFields {
 
     private final List<String> outdatedCustomKeys = new ArrayList<>();
-    boolean saving = false;
+    private boolean saving = false;
     private File translationDataFile;
     private FileConfiguration translationData;
     private FileConfiguration premadeTranslationsConfiguration;
@@ -35,162 +35,170 @@ public class TranslationsConfigFields extends CustomConfigFields {
      */
     public TranslationsConfigFields(String filename, boolean isEnabled) {
         super(filename, isEnabled);
-        //Only process if the language is selected, translation files are very large and can cause very slow loading
+
+        // only load the currently-selected language
         if (!DefaultConfig.getLanguage().equals(filename)) return;
 
-        //If the file doesn't exist, try to load it from the plugin resources to get the prepackaged translations
-        String parsedFilename = filename;
-        if (!parsedFilename.contains(".yml")) parsedFilename += ".yml";
-        Path realPath = Paths.get(MetadataHandler.PLUGIN.getDataFolder().getAbsolutePath() + File.separatorChar + "translations" + File.separatorChar + parsedFilename);
-        //This happens the first time the plugin gets installed
+        // build path: plugins/…/translations/<filename>.yml
+        String parsedFilename = filename.endsWith(".yml") ? filename : filename + ".yml";
+        Path folder = Paths.get(MetadataHandler.PLUGIN.getDataFolder().getAbsolutePath(), "translations");
+        Path realPath = folder.resolve(parsedFilename);
+
+        // if missing, try to copy from bundled resources; else mark as custom
         if (!Files.exists(realPath)) {
-            try {
-                InputStream inputStream = MetadataHandler.PLUGIN.getResource("translations/" + parsedFilename);
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                YamlConfiguration config = YamlConfiguration.loadConfiguration(bufferedReader);
-                ConfigurationEngine.fileSaverCustomValues(config, realPath.toFile());
-                inputStream.close();
-                inputStreamReader.close();
-                bufferedReader.close();
-            } catch (Exception ex) {
-                Logger.info("Translation filename " + parsedFilename + " is not prepackaged. This is fine if it is meant to be a custom translation.");
+            try (InputStream in = MetadataHandler.PLUGIN.getResource("translations/" + parsedFilename)) {
+                if (in != null) {
+                    Files.createDirectories(realPath.getParent());
+                    Files.copy(in, realPath);
+                    Logger.info("Copied bundled translation " + parsedFilename);
+                } else {
+                    Logger.info("No bundled translation for " + parsedFilename + ", treating as custom");
+                    customLanguage = true;
+                }
+            } catch (IOException ex) {
+                Logger.warn("Error creating translation file " + parsedFilename + ": " + ex.getMessage());
                 customLanguage = true;
             }
         }
 
+        // now load the file
+        try {
+            this.file = realPath.toFile();
+            this.fileConfiguration = YamlConfiguration.loadConfiguration(
+                    new InputStreamReader(Files.newInputStream(realPath), StandardCharsets.UTF_8)
+            );
+        } catch (IOException e) {
+            Logger.warn("Could not load translation file " + parsedFilename + ": " + e.getMessage());
+        }
     }
 
     @Override
     public void processConfigFields() {
-        //Only process if the language is selected, translation files are very large and can cause very slow loading
+        // only process if this is the selected language, and we have a bundled premade to compare
         if (!DefaultConfig.getLanguage().equals(filename)) return;
-
         if (MetadataHandler.PLUGIN.getResource("translations/" + filename) == null) return;
         if (customLanguage) return;
-        /*
-        Create translation_data file which will store the premade translations. This will be used to check if new premade translations are here.
-         */
+
+        // prepare .translation_data backup
         String languageDataFilename = filename.replace(".yml", ".translation_data");
-        Path dataPath = Paths.get(MetadataHandler.PLUGIN.getDataFolder().getAbsolutePath() + File.separatorChar + "translations" + File.separatorChar + languageDataFilename);
-        if (!Files.exists(dataPath))
+        Path dataPath = Paths.get(
+                MetadataHandler.PLUGIN.getDataFolder().getAbsolutePath(),
+                "translations", languageDataFilename
+        );
+        if (!Files.exists(dataPath)) {
             try {
+                Files.createDirectories(dataPath.getParent());
                 dataPath.toFile().createNewFile();
             } catch (Exception ex) {
-                Logger.info("Failed to create language data file for file " + filename + " backup file should've been " + languageDataFilename);
+                Logger.info("Could not create data file " + languageDataFilename);
             }
-
+        }
 
         translationDataFile = dataPath.toFile();
         try {
-            translationData = YamlConfiguration.loadConfiguration(new InputStreamReader(new FileInputStream(translationDataFile), StandardCharsets.UTF_8));
+            translationData = YamlConfiguration.loadConfiguration(
+                    new InputStreamReader(new FileInputStream(translationDataFile), StandardCharsets.UTF_8)
+            );
         } catch (Exception ex) {
             Logger.warn("Failed to read translation data!");
             return;
         }
-        /*
-        Get the prepackaged translations file
-         */
-        premadeTranslationsConfiguration = YamlConfiguration.loadConfiguration(new InputStreamReader(MetadataHandler.PLUGIN.getResource("translations/" + filename), StandardCharsets.UTF_8));
 
-        //Compare the prepackaged translation to the translation data
+        // load the bundled premade for diff’ing
+        premadeTranslationsConfiguration = YamlConfiguration.loadConfiguration(
+                new InputStreamReader(
+                        MetadataHandler.PLUGIN.getResource("translations/" + filename),
+                        StandardCharsets.UTF_8
+                )
+        );
+
+        // compare & auto-update unchanged entries
         for (String path : premadeTranslationsConfiguration.getKeys(true)) {
-            //Value from the current premade translations
             Object premadeValue = premadeTranslationsConfiguration.get(path);
             if (!(premadeValue instanceof String || premadeValue instanceof List)) continue;
 
-            //Value from the last known premade translations
             Object dataValue = translationData.get(path);
-            //Actual current live value
             Object liveValue = fileConfiguration.get(path);
 
-            if (premadeValue == null) {
-                Logger.warn("Something went wrong updating the translations, report this to the developer!");
-                continue;
-            }
-
-            //Handle case in which the live translation does not have any values by assigning it the default value
             if (dataValue == null) {
-                //Check if the live translation already has a custom value, shouldn't happen but who knows
+                // never-seen key: if live is empty, write default; else leave custom
                 if (liveValue != null) {
-                    //If that is the case, the value is custom and the admin should be notified that it didn't update
                     outdatedCustomKeys.add(path);
-                    Logger.info("Did not modify " + path + " because the value was custom");
-                } else
-                    //If there is no value set yet, set the default value
-                    fileConfiguration.set(path, premadeValue);
-            }
-            //Check if the prepackaged value and the data value are different, meaning that the premade translation updated
-            else if (!premadeValue.equals(dataValue)) {
-                //Check if the live value is custom
-                if (!dataValue.equals(liveValue)) {
-                    //The value is custom
-                    outdatedCustomKeys.add(path);
-                    Logger.info("Did not modify " + path + " because the value was custom");
+                    Logger.info("Skipped custom key " + path);
                 } else {
-                    //The value is not custom, can safely be autoupdated
                     fileConfiguration.set(path, premadeValue);
-                    Logger.info("Updated translation entry " + path + " for language " + filename);
+                }
+            } else if (!premadeValue.equals(dataValue)) {
+                // updated default: if live still matches old data, overwrite; else leave custom
+                if (!dataValue.equals(liveValue)) {
+                    outdatedCustomKeys.add(path);
+                    Logger.info("Skipped custom key " + path);
+                } else {
+                    fileConfiguration.set(path, premadeValue);
+                    Logger.info("Auto-updated translation " + path);
                 }
             }
 
-            //Finally, make sure the translation data gets updated
-            if (!premadeValue.equals(dataValue))
+            // always refresh our data snapshot
+            if (!premadeValue.equals(dataValue)) {
                 translationData.set(path, premadeValue);
+            }
         }
 
+        // save both files
         try {
-            //Save changes
             translationData.save(translationDataFile);
             fileConfiguration.save(file);
-        } catch (Exception exception) {
-            Logger.warn("Failed to save language files, report this to the developer!");
+        } catch (Exception ex) {
+            Logger.warn("Failed to save language files: " + ex.getMessage());
         }
     }
 
+    /** Adds a missing key to the language file at runtime. */
     public void add(String filename, String key, Object value) {
         if (value == null) return;
-
-        //Clean the value up
         String filteredFilename = filename.replace(".yml", "");
+
         if (value instanceof String) {
-            value = fixConfigColors((String) value);
-            if (((String) value).isEmpty()) return;
+            String s = fixConfigColors((String) value);
+            if (s.isEmpty()) return;
+            value = s;
         } else if (value instanceof List) {
-            value = fixConfigColors((List<String>) value);
-            if (((List<?>) value).isEmpty()) return;
+            List<String> list = fixConfigColors((List<String>) value);
+            if (list.isEmpty()) return;
+            value = list;
         }
 
         String realKey = filteredFilename + "." + key;
+        if (fileConfiguration.get(realKey) != null) return;
 
-        if (fileConfiguration.get(realKey) != null) {
-            return;
-        }
-
-        //Commit the value
         fileConfiguration.set(realKey, value);
         save();
     }
 
+    /** Debounced async save of new keys. */
     private void save() {
         if (saving) return;
         saving = true;
         Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, () -> {
             ConfigurationEngine.fileSaverCustomValues(fileConfiguration, file);
-            if (translationData != null)
+            if (translationData != null) {
                 ConfigurationEngine.fileSaverCustomValues(translationData, translationDataFile);
+            }
             saving = false;
         });
     }
 
+    /** Reads a translated value (with color codes converted). */
     public Object get(String filename, String key) {
         String filteredFilename = filename.replace(".yml", "");
-        Object object = fileConfiguration.get(filteredFilename + "." + key);
-        if (object instanceof String)
-            object = ChatColorConverter.convert((String) object);
-        else if (object instanceof List)
-            object = ChatColorConverter.convert((List<String>) object);
-        return object;
+        Object obj = fileConfiguration.get(filteredFilename + "." + key);
+        if (obj instanceof String) {
+            return ChatColorConverter.convert((String) obj);
+        } else if (obj instanceof List) {
+            return ChatColorConverter.convert((List<String>) obj);
+        }
+        return obj;
     }
 
     private String fixConfigColors(String value) {
@@ -199,9 +207,8 @@ public class TranslationsConfigFields extends CustomConfigFields {
     }
 
     private List<String> fixConfigColors(List<String> values) {
-        List<String> uncoloredList = new ArrayList<>();
-        values.forEach(s -> uncoloredList.add(fixConfigColors(s)));
-        return uncoloredList;
+        List<String> clean = new ArrayList<>();
+        values.forEach(s -> clean.add(fixConfigColors(s)));
+        return clean;
     }
-
 }
