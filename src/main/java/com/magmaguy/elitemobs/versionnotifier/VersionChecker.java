@@ -27,9 +27,9 @@ public class VersionChecker {
     private static final List<EMPackage> outdatedPackages = new ArrayList<>();
     @Getter
     private static final boolean SHA1Updated = false;
-    private static boolean pluginIsUpToDate = true;
     private static final int MAX_RETRY_ATTEMPTS = 3;
     private static final int RETRY_DELAY_SECONDS = 60;
+    private static boolean pluginIsUpToDate = true;
     private static boolean connectionFailed = false;
     private static int connectionRetryCount = 0;
 
@@ -189,7 +189,7 @@ public class VersionChecker {
      * Handles connection errors with proper logging and retry logic
      *
      * @param checkType Type of check being performed
-     * @param e The exception that occurred
+     * @param e         The exception that occurred
      */
     private static void handleConnectionError(String checkType, Exception e) {
         connectionFailed = true;
@@ -260,22 +260,48 @@ public class VersionChecker {
                         Logger.sendSimpleMessage(event.getPlayer(), "&8&m-----------------------------------------------------");
                         Logger.sendMessage(event.getPlayer(), "&cThe following dungeons are outdated:");
                         for (EMPackage emPackage : outdatedPackages) {
-                            event.getPlayer().spigot().sendMessage(
-                                    SpigotMessage.hoverLinkMessage("&c- " + emPackage.getContentPackagesConfigFields().getName(),
-                                            ChatColorConverter.convert("&9Click to go to download link!"),
-                                            emPackage.getContentPackagesConfigFields().getDownloadLink()));
+                            String name = emPackage.getContentPackagesConfigFields().getName();
+                            String link = emPackage.getContentPackagesConfigFields().getDownloadLink();
+
+                            if (link != null && !link.isEmpty()) {
+                                // only send the hover-link if we actually have a URL
+                                event.getPlayer().spigot().sendMessage(
+                                        SpigotMessage.hoverLinkMessage(
+                                                "&c- " + name,
+                                                ChatColorConverter.convert("&9Click to go to download link!"),
+                                                link
+                                        )
+                                );
+                            } else {
+                                // fall back to plain text if link is missing
+                                event.getPlayer().sendMessage(
+                                        ChatColorConverter.convert("&c- " + name + " &7(no download link available)")
+                                );
+                            }
                         }
+
                         event.getPlayer().spigot().sendMessage(
                                 SpigotMessage.simpleMessage("&8[EliteMobs]&f You can download the update at "),
                                 SpigotMessage.hoverLinkMessage(
-                                        "&9&nhttps://nightbreak.io/plugin/elitemobs/#content", "Click for Nightbreak link", "https://nightbreak.io/plugin/elitemobs/#content"
+                                        "&9&nhttps://nightbreak.io/plugin/elitemobs/#content",
+                                        "Click for Nightbreak link",
+                                        "https://nightbreak.io/plugin/elitemobs/#content"
                                 ),
-                                SpigotMessage.simpleMessage(" !"));
+                                SpigotMessage.simpleMessage(" !")
+                        );
                         event.getPlayer().spigot().sendMessage(
                                 SpigotMessage.simpleMessage("&2Updating is quick & easy! "),
-                                SpigotMessage.hoverLinkMessage("&9&nClick here", "Click for wiki link", "https://nightbreak.io/plugin/elitemobs/#setup"),
+                                SpigotMessage.hoverLinkMessage(
+                                        "&9&nClick here",
+                                        "Click for wiki link",
+                                        "https://nightbreak.io/plugin/elitemobs/#setup"
+                                ),
                                 SpigotMessage.simpleMessage(" &2for info on how to install updates and "),
-                                SpigotMessage.hoverLinkMessage("&9&nhere", "Discord support link", DiscordLinks.mainLink),
+                                SpigotMessage.hoverLinkMessage(
+                                        "&9&nhere",
+                                        "Discord support link",
+                                        DiscordLinks.mainLink
+                                ),
                                 SpigotMessage.simpleMessage(" &2for the support room.")
                         );
                         Logger.sendSimpleMessage(event.getPlayer(), "&8&m-----------------------------------------------------");
