@@ -125,9 +125,17 @@ public class WormholeEntry implements PersistentObject {
 
     @Override
     public void worldLoad(World world) {
-        getDungeonLocation();
-        if (ChunkLocationChecker.locationIsLoaded(location)) chunkLoad();
+        // Recalculate the Location from your config (coords or dungeon)
+        setLocationFromConfiguration();
+
+        // Only initialize if we have a valid world & chunk loaded
+        if (location != null
+                && location.getWorld() != null
+                && ChunkLocationChecker.locationIsLoaded(location)) {
+            chunkLoad();
+        }
     }
+
 
     @Override
     public void worldUnload() {

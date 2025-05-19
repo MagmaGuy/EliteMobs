@@ -5,7 +5,6 @@ import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.events.BossCustomAttackDamage;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.utils.CooldownHandler;
-import org.apache.commons.math3.exception.NotFiniteNumberException;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
@@ -53,10 +52,9 @@ public class FlamethrowerEnchantment extends CustomEnchantment {
                         if (((LivingEntity) entity).hasPotionEffect(PotionEffectType.FIRE_RESISTANCE)) continue;
                         BossCustomAttackDamage.dealCustomDamage(player, (LivingEntity) entity, ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getWeaponLevel(false));
                     }
-            } catch (NotFiniteNumberException e) {
-                //don't really know why this happens, also doesn't really seem to matter. Seems like an internal MC or API issue.s
+            } catch (Exception e) {
+                //don't really know why this happens, also doesn't really seem to matter. Seems like an internal MC or API issue.
             }
-
     }
 
 

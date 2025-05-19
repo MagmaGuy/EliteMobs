@@ -60,6 +60,7 @@ public class WormholeManager {
         if (instance == null) {
             instance = new WormholeManager();
         }
+        if (instance.wormholeTask== null || instance.wormholeTask.isCancelled()) instance.startWormholeTask();
         return instance;
     }
 
@@ -76,7 +77,7 @@ public class WormholeManager {
                 // Check cooldowns and safe distances
                 processPlayerCooldowns();
             }
-        }.runTaskTimerAsynchronously(MetadataHandler.PLUGIN, 0, 5);
+        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 5);
     }
 
     /**
@@ -356,35 +357,6 @@ public class WormholeManager {
     }
 
     /**
-     * Removes a player from the cooldown list
-     * @param player The player to remove
-     */
-    public void removePlayerFromCooldown(Player player) {
-        playerCooldowns.remove(player.getUniqueId());
-        playerDestinations.remove(player.getUniqueId());
-    }
-
-    /**
-     * Gets a set of all players currently in cooldown
-     * @return A set of players in cooldown
-     */
-    public HashSet<Player> getPlayersInCooldown() {
-        HashSet<Player> players = new HashSet<>();
-        long currentTime = System.currentTimeMillis();
-
-        for (Map.Entry<UUID, Long> entry : playerCooldowns.entrySet()) {
-            // Only include non-expired cooldowns
-            if (currentTime <= entry.getValue()) {
-                Player player = Bukkit.getPlayer(entry.getKey());
-                if (player != null && player.isOnline()) {
-                    players.add(player);
-                }
-            }
-        }
-        return players;
-    }
-
-    /**
      * Shuts down the manager
      */
     public void shutdown() {
@@ -396,12 +368,5 @@ public class WormholeManager {
         playerCooldowns.clear();
         playerDestinations.clear();
         rotationCounters.clear();
-    }
-
-    /**
-     * For backward compatibility with other code that might use this method
-     */
-    public Map<UUID, WormholeEntry> getPlayerCooldowns() {
-        return playerDestinations;
     }
 }
