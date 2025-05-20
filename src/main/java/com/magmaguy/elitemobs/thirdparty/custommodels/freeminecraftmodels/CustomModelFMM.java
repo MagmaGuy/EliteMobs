@@ -27,19 +27,19 @@ public class CustomModelFMM implements CustomModelInterface {
 
     @Override
     public void shoot() {
-        if (dynamicEntity.hasAnimation("attack_ranged")) dynamicEntity.playAnimation("attack_ranged", false);
-        else dynamicEntity.playAnimation("attack", false);
+        if (dynamicEntity.hasAnimation("attack_ranged")) dynamicEntity.playAnimation("attack_ranged", false, false);
+        else dynamicEntity.playAnimation("attack", false, false);
     }
 
     @Override
     public void melee() {
-        if (dynamicEntity.hasAnimation("attack_melee")) dynamicEntity.playAnimation("attack_melee", false);
-        else dynamicEntity.playAnimation("attack", false);
+        if (dynamicEntity.hasAnimation("attack_melee")) dynamicEntity.playAnimation("attack_melee", false, false);
+        else dynamicEntity.playAnimation("attack", false, false);
     }
 
     @Override
     public void playAnimationByName(String animationName) {
-        dynamicEntity.playAnimation(animationName, false);
+        dynamicEntity.playAnimation(animationName, false, false);
     }
 
     @Override
