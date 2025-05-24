@@ -80,11 +80,11 @@ public class EliteScrollMenu extends EliteMenu {
         }
 
         private void handleBottomInventory(InventoryClickEvent event) {
-            if (EliteItemManager.isEliteMobsItem(event.getCurrentItem())) return;
+//            if (EliteItemManager.isEliteMobsItem(event.getCurrentItem())) return;
             if (EliteScroll.isEliteScroll(event.getCurrentItem())) {
                 moveOneItemUp(EliteScrollMenuConfig.getEliteScrollItemSlot(), event);
             }
-            else {
+            else if (!EliteItemManager.isEliteMobsItem(event.getCurrentItem())){
                 moveOneItemUp(EliteScrollMenuConfig.getNonEliteItemSlot(), event);
             }
         }

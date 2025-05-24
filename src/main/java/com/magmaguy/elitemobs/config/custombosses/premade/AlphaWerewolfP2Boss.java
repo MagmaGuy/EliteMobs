@@ -18,7 +18,7 @@ public class AlphaWerewolfP2Boss extends CustomBossesConfigFields {
                 "dynamic");
         setPersistent(true);
         setHealthMultiplier(4);
-        setDamageMultiplier(2);
+        setDamageMultiplier(1.25);
         setPowers(new ArrayList<>(List.of("attack_blinding.yml", "ground_pound.yml", "moonwalk.yml", "spirit_walk.yml",
                 "summonable:summonType=ON_HIT:filename=beta_wolf.yml:amount=5:chance=0.1:inheritAggro=true:spawnNearby=true",
                 "summonable:summonType=ON_HIT:filename=gamma_werewolf.yml:amount=1:chance=0.1:inheritAggro=true:spawnNearby=true",

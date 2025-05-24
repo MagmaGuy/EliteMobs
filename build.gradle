@@ -32,7 +32,7 @@ processResources {
 }
 
 group 'com.magmaguy'
-version '9.4.2-SNAPSHOT-2'
+version '9.4.2'
 
 repositories {
     maven {

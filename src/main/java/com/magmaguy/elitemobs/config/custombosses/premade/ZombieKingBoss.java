@@ -19,7 +19,7 @@ public class ZombieKingBoss extends CustomBossesConfigFields {
                 "dynamic");
         setPersistent(true);
         setHealthMultiplier(4);
-        setDamageMultiplier(2);
+        setDamageMultiplier(1.25);
         setHelmet(new ItemStack(Material.DIAMOND_HELMET));
         setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
         setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));

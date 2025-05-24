@@ -18,7 +18,7 @@ public class AlphaWerewolfP1Boss extends CustomBossesConfigFields {
                 "dynamic");
         setPersistent(true);
         setHealthMultiplier(4);
-        setDamageMultiplier(2);
+        setDamageMultiplier(1.25);
         setPhases(List.of("alpha_werewolf_p2.yml:0.99"));
         setPowers(new ArrayList<>(new ArrayList<>(List.of("spirit_walk.yml",
                 "summonable:summonType=GLOBAL:filename=gamma_werewolf.yml:amount=1:customSpawn=normal_surface_spawn.yml",

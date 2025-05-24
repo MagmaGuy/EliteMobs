@@ -67,7 +67,7 @@ public class PlayerTeleportEvent extends Event implements Cancellable {
     public void executeTeleport() {
         if (!EliteMobsWorld.isEliteMobsWorld(player.getLocation().getWorld().getUID()))
             PlayerData.setBackTeleportLocation(player, originalLocation);
-        WormholeManager.getInstance().addPlayerToCooldown(player, null);
+        WormholeManager.getInstance(false).addPlayerToCooldown(player, null);
         player.teleport(destination);
     }
 

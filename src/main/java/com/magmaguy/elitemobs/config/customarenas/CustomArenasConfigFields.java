@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.config.customarenas;
 
 import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.items.customloottable.CustomLootTable;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
@@ -61,6 +62,9 @@ public class CustomArenasConfigFields extends CustomConfigFields {
     private String permission = null;
     @Getter
     private Location teleportLocation = null;
+    @Getter
+    private final List<Integer> intermissionWaves = new ArrayList<>();
+    protected List<String> rawIntermissionWaves = new ArrayList<>();
 
     public CustomArenasConfigFields(String filename, boolean isEnabled) {
         super(filename, isEnabled);
@@ -86,6 +90,14 @@ public class CustomArenasConfigFields extends CustomConfigFields {
         this.cylindricalArena = processBoolean("cylindricalArena", cylindricalArena, false, false);
         this.permission = processString("permission", permission, null, false);
         this.teleportLocation = processLocation("teleportLocation", teleportLocation, null, false);
+        this.rawIntermissionWaves = processStringList("rawIntermissionWaves", rawIntermissionWaves, new ArrayList<>(), false);
+        rawIntermissionWaves.forEach(wave -> {
+            try {
+                intermissionWaves.add(Integer.parseInt(wave));
+            } catch (Exception ex) {
+                Logger.warn("Failed to parse intermission wave " + wave + " for arena " + filename);
+            }
+        });
     }
 
 }

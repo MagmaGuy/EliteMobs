@@ -36,12 +36,12 @@ public class Wormhole {
         wormholes.add(this);
 
         // Make sure the manager is initialized
-        WormholeManager.getInstance();
+        WormholeManager.getInstance(false);
     }
 
     public static void shutdown() {
         // Shutdown the centralized manager
-        WormholeManager.getInstance().shutdown();
+        WormholeManager.getInstance(true).shutdown();
 
         // Clean up wormhole entries
         for (Wormhole wormhole : wormholes) {
