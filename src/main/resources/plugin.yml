@@ -1,5 +1,5 @@
 name: EliteMobs
-version: 9.4.2-SNAPSHOT-2
+version: 9.4.2
 author: MagmaGuy
 main: com.magmaguy.elitemobs.EliteMobs
 api-version: 1.14
@@ -287,3 +287,6 @@ permissions:
       elitemobs.unbind.npc: true
       elitemobs.enchant.npc: true
     default: true
+  elitemobs.scroll.get:
+    description: Gives the player a specified number of elite scrolls at a given level
+    default: op

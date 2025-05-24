@@ -810,5 +810,6 @@ public class WoodLeagueArena extends CustomArenasConfigFields {
         ))));
         setMaximumPlayerCount(5);
         setCylindricalArena(true);
+        rawIntermissionWaves.addAll(List.of("5", "10", "15", "20", "25", "30", "35", "40", "45"));
     }
 }

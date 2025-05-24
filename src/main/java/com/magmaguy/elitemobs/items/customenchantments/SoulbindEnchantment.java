@@ -27,6 +27,7 @@ import org.bukkit.util.Vector;
 
 import java.util.UUID;
 
+
 public class SoulbindEnchantment extends CustomEnchantment {
 
     public static final NamespacedKey PRESTIGE_KEY = new NamespacedKey(MetadataHandler.PLUGIN, "prestige");
@@ -46,6 +47,7 @@ public class SoulbindEnchantment extends CustomEnchantment {
         itemMeta.getPersistentDataContainer().set(SOULBIND_KEY, PersistentDataType.STRING, player.getUniqueId().toString());
         setPrestigeLevel(itemMeta, GuildRank.getGuildPrestigeRank(player));
         itemStack.setItemMeta(itemMeta);
+        new EliteItemLore(itemStack, true);
         return itemStack;
     }
 

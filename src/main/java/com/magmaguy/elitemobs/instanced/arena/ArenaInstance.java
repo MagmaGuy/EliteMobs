@@ -199,6 +199,12 @@ public class ArenaInstance extends MatchInstance {
             victory();
             return;
         }
+
+        int delayBetweenWaves = customArenasConfigFields.getDelayBetweenWaves();
+        if (customArenasConfigFields.getIntermissionWaves().contains(currentWave)) {
+            delayBetweenWaves *= 2;
+        }
+
         Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, () -> {
             if (arenaState == ArenaState.IDLE) return;
             String title = ArenasConfig.getWaveTitle();
@@ -213,7 +219,7 @@ public class ArenaInstance extends MatchInstance {
             spawnBosses();
             arenaState = ArenaState.ACTIVE;
             roundDamage.clear();
-        }, 20L * customArenasConfigFields.getDelayBetweenWaves());
+        }, 20L * delayBetweenWaves);
     }
 
     private void arenaWatchdog() {
