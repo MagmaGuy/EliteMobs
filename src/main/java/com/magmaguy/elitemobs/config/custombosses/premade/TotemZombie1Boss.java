@@ -21,7 +21,7 @@ public class TotemZombie1Boss extends CustomBossesConfigFields {
         setLeggings(new ItemStack(Material.NETHERITE_LEGGINGS));
         setBoots(new ItemStack(Material.NETHERITE_BOOTS));
         setMainHand(new ItemStack(Material.NETHERITE_SWORD));
-        setDamageMultiplier(2);
+        setDamageMultiplier(1.25);
         setHealthMultiplier(2);
         setSpawnMessage("&cA Dr. Craftenmine abomination has been sighted!");
         setDeathMessage("&aDr. Craftenmine's abomination been terminated by $players!");

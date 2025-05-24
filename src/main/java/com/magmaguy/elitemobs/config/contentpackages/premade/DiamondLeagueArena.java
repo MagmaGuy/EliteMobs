@@ -16,7 +16,7 @@ public class DiamondLeagueArena extends ContentPackagesConfigFields {
                 "em_diamond_arena",
                 World.Environment.NORMAL,
                 true,
-                "em_diamond_arena,4.5,78,-28.5,0,0",
+                "em_diamond_arena,4.5,79,-28.5,0,0",
                 0,
                 "Difficulty: &chard\n" +
                         "Face 50 waves of the arena, from\n" +

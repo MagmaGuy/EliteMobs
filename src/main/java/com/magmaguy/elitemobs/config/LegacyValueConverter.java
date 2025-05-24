@@ -50,6 +50,10 @@ public class LegacyValueConverter {
                 return "AQUA_AFFINITY";
             case "CURSE_OF_VANISHING":
                 return "VANISHING_CURSE";
+            case "CURSE_OF_BINDING":
+                return "BINDING_CURSE";
+            case "WATER_AFFINITY":
+                return "AQUA_AFFINITY";
             default:
                 return materialName;
         }

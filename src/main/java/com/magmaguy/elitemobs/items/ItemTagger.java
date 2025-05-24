@@ -43,6 +43,16 @@ public class ItemTagger {
         itemMeta.getPersistentDataContainer().set(eliteMobsItemNamespacedKey, PersistentDataType.BYTE, (byte) 1);
     }
 
+    public static void registerEliteItem(ItemStack itemStack) {
+        if (itemStack == null || itemStack.getItemMeta() == null) return;
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        itemMeta.getPersistentDataContainer().set(eliteMobsItemNamespacedKey, PersistentDataType.BYTE, (byte) 1);
+        itemStack.setItemMeta(itemMeta);
+        new EliteItemLore(itemStack, false);
+        return;
+    }
+
+
     /**
      * Used to register custom lore as a string to the item. This is necessary for the lore updater as it redraws the custom
      * lore portion of the item based on these contents.

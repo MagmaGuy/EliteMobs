@@ -17,7 +17,7 @@ public class CharmsGoblinBoss extends CustomBossesConfigFields {
                 "$eventBossLevel &2Charms Goblin",
                 "dynamic");
         setHealthMultiplier(4);
-        setDamageMultiplier(2);
+        setDamageMultiplier(1.25);
         setHelmet(new ItemStack(Material.IRON_HELMET));
         setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
         setLeggings(new ItemStack(Material.IRON_LEGGINGS));

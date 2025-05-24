@@ -56,7 +56,8 @@ public class WormholeManager {
      * Gets the singleton instance of the manager
      * @return the WormholeManager instance
      */
-    public static WormholeManager getInstance() {
+    public static WormholeManager getInstance(boolean shuttingDown) {
+        if (shuttingDown) return instance;
         if (instance == null) {
             instance = new WormholeManager();
         }

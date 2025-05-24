@@ -60,6 +60,6 @@ public class CustomModelFMM implements CustomModelInterface {
 
     @Override
     public void switchPhase() {
-        dynamicEntity.stopCurrentAnimations();
+        dynamicEntity.remove();
     }
 }

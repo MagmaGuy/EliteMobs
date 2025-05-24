@@ -277,7 +277,7 @@ public class EliteMobs extends JavaPlugin {
 
         EntityTracker.managedEntityWatchdog();
         //initialize the centralized wormhole manager
-        WormholeManager.getInstance();
+        WormholeManager.getInstance(false);
     }
 
     @Override

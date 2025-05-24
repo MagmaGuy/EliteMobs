@@ -16,7 +16,7 @@ public class IronLeagueArena extends ContentPackagesConfigFields {
                 "em_iron_league_arena",
                 World.Environment.NORMAL,
                 true,
-                "em_iron_league_arena,46,-42,38,-110,-24",
+                "em_iron_league_arena,46,-41,38,-110,-24",
                 0,
                 "Difficulty: &chard\n" +
                         "Face 50 waves of the arena, from\n" +

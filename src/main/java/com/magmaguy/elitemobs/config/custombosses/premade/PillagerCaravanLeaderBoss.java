@@ -19,7 +19,7 @@ public class PillagerCaravanLeaderBoss extends CustomBossesConfigFields {
                 "summonable:summonType=ON_COMBAT_ENTER:filename=pillager_caravan_guard.yml:spawnNearby=true:inheritLevel=true")));
         setMountedEntity("pillager_caravan_beast.yml");
         setFollowDistance(100);
-        setDamageMultiplier(2);
+        setDamageMultiplier(1.25);
         setHealthMultiplier(2);
         setUniqueLootList(new ArrayList<>(List.of("summon_merchant_scroll.yml:0.5",
                 "summon_merchant_scroll.yml:0.5",
