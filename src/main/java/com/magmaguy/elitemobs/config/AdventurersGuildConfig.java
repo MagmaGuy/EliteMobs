@@ -65,6 +65,8 @@ public class AdventurersGuildConfig extends ConfigurationFile {
     private static double peacefulModeEliteChanceDecrease;
     @Getter
     private static boolean disableCommonerRank;
+    @Getter
+    private static boolean defaultToCommonerRank;
 
     public AdventurersGuildConfig() {
         super("AdventurersGuild.yml");
@@ -501,5 +503,9 @@ public class AdventurersGuildConfig extends ConfigurationFile {
         disableCommonerRank = ConfigurationEngine.setBoolean(
                 List.of("Disables users' ability to switch to peaceful mode for EliteMobs. Peaceful mode lowers level and spawn rates of mobs around that player specifically"),
                 fileConfiguration, "disableCommonerRank", false);
+        defaultToCommonerRank = ConfigurationEngine.setBoolean(
+                List.of("Sets whether the default rank for new players will be peaceful mode or commoner.",
+                        "Not recommended as the expectation is most players will want to play with EliteMobs, which commoner rank virtually disables."),
+                fileConfiguration, "defaultToCommonerRank", false);
     }
 }

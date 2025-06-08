@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.playerdata.database;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.config.DatabaseConfig;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.quests.CustomQuest;
@@ -653,7 +654,7 @@ public class PlayerData {
         currency = 0;
         guildPrestigeLevel = 0;
         maxGuildLevel = 1;
-        activeGuildLevel = 1;
+        activeGuildLevel = !AdventurersGuildConfig.isDefaultToCommonerRank() ? 1 : 0;
         score = 0;
         kills = 0;
         highestLevelKilled = 0;
@@ -683,7 +684,7 @@ public class PlayerData {
                 //guild_max_level
                 " 1," +
                 //guild_active_level
-                " 1," +
+                " "+activeGuildLevel+"," +
                 //score
                 "0," +
                 //kills
