@@ -8,7 +8,7 @@ import java.util.List;
 
 public class TheNetherBellTeleporter extends NPCsConfigFields {
     public TheNetherBellTeleporter() {
-        super("the_nether_bell_teleported",
+        super("the_nether_bell_teleporter",
                 true,
                 "Ancient Corpse",
                 "<[50] The Nether Bell Teleporter>",
