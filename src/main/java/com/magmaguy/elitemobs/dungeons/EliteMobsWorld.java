@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.dungeons;
 
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
 import lombok.Getter;
+import org.bukkit.Bukkit;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -22,7 +23,7 @@ public class EliteMobsWorld {
     }
 
     public static void shutdown() {
-        eliteMobsWorlds.clear();
+        eliteMobsWorlds.keySet().removeIf(worldUUID -> Bukkit.getWorld(worldUUID) == null);
     }
 
     @Nullable

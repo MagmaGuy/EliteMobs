@@ -87,13 +87,21 @@ public class MobCombatSettingsConfig extends ConfigurationFile {
     private static double resistanceDamageMultiplier;
     @Getter
     private static double blockingDamageReduction;
+    private static MobCombatSettingsConfig instance;
 
     public MobCombatSettingsConfig() {
         super("MobCombatSettings.yml");
     }
 
+    public static void toggleNaturalMobSpawning(boolean enabled) {
+        doNaturalMobSpawning = enabled;
+        instance.fileConfiguration.set("doNaturalEliteMobSpawning", enabled);
+        ConfigurationEngine.fileSaverCustomValues(instance.fileConfiguration, instance.file);
+    }
+
     @Override
     public void initializeValues() {
+        instance = this;
         doNaturalMobSpawning = ConfigurationEngine.setBoolean(
                 List.of("Sets if naturally spawned elites will spawn. Note: event mobs like the zombie king are not naturally spawned elites! You will have to disable events if you want to disable event bosses."),
                 fileConfiguration, "doNaturalEliteMobSpawning", true);

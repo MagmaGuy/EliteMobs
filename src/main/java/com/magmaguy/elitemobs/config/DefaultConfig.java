@@ -89,6 +89,8 @@ public class DefaultConfig extends ConfigurationFile {
     private static String enchantmentChallengeCriticalFailureMessage;
     @Getter
     private static String enchantmentChallengeStartMessage;
+    @Getter
+    private static boolean useRandomizedScalingForElites;
 
     public static boolean useResourcePackModels(){
         return DefaultConfig.useResourcePackEvenIfResourcePackManagerIsNotInstalled || Bukkit.getPluginManager().isPluginEnabled("ResourcePackManager");
@@ -243,5 +245,9 @@ public class DefaultConfig extends ConfigurationFile {
                 file, fileConfiguration, "enchantmentChallengeStartMessage", "&8[EliteMobs] &6Challenge! Defeat the boss to get your upgraded item!", true);
         useResourcePackEvenIfResourcePackManagerIsNotInstalled = ConfigurationEngine.setBoolean(
                 List.of("Enables the use of resource packs even if the resource pack manager is not installed"), fileConfiguration, "useResourcePackEvenIfResourcePackManagerIsNotInstalled", false);
+    useRandomizedScalingForElites = ConfigurationEngine.setBoolean(
+                List.of("Sets whether the scale (size) of the elites will be slightly randomized, for variety.",
+                        "May mess with spawners, which may or may not be a good thing (I think it is >:] )"),
+                fileConfiguration, "useRandomizedScalingForElites", false);
     }
 }
