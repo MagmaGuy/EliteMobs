@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.powers.scripts;
 
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.scripts.caching.ScriptTargetsBlueprint;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
@@ -136,6 +137,18 @@ public class ScriptTargets {
                                 (entity -> entity.getType() != EntityType.PLAYER && entity instanceof LivingEntity &&
                                         !entity.getUniqueId().equals(scriptActionData.getEliteEntity().getUnsyncedLivingEntity().getUniqueId())))
                         .stream().map(LivingEntity.class::cast).collect(Collectors.toSet());
+            case NEARBY_ELITES:
+                return eliteEntityLocation.getWorld()
+                        .getNearbyEntities(
+                                eliteEntityLocation,
+                                targetBlueprint.getRange().getValue(),
+                                targetBlueprint.getRange().getValue(),
+                                targetBlueprint.getRange().getValue(),
+                                entity -> EntityTracker.isEliteMob(entity) &&
+                                        !entity.getUniqueId().equals(scriptActionData.getEliteEntity().getUnsyncedLivingEntity().getUniqueId()))
+                        .stream()
+                        .map(LivingEntity.class::cast)
+                        .collect(Collectors.toSet());
             case DIRECT_TARGET:
                 return new ArrayList<>(List.of(scriptActionData.getDirectTarget()));
             case SELF:
@@ -175,7 +188,7 @@ public class ScriptTargets {
         Collection<Location> newLocations = null;
 
         switch (this.getTargetBlueprint().getTargetType()) {
-            case ALL_PLAYERS, WORLD_PLAYERS, NEARBY_PLAYERS, DIRECT_TARGET, SELF, NEARBY_MOBS:
+            case ALL_PLAYERS, WORLD_PLAYERS, NEARBY_PLAYERS, DIRECT_TARGET, SELF, NEARBY_MOBS, NEARBY_ELITES:
                 return getTargetEntities(scriptActionData).stream().map(targetEntity -> addOffsets(targetEntity.getLocation(), scriptActionData)).collect(Collectors.toSet());
             case SELF_SPAWN:
                 return new ArrayList<>(List.of(addOffsets(scriptActionData.getEliteEntity().getSpawnLocation(), scriptActionData)));
@@ -227,7 +240,6 @@ public class ScriptTargets {
 
     private Location addOffsets(Location originalLocation, ScriptActionData scriptActionData) {
         Location location = originalLocation.clone().add(targetBlueprint.getOffset().getValue());
-        //if (scriptRelativeVector == null)
         if (targetBlueprint.getScriptRelativeVectorBlueprint() != null)
             scriptRelativeVector = new ScriptRelativeVector(targetBlueprint.getScriptRelativeVectorBlueprint(), eliteScript, location);
         else
