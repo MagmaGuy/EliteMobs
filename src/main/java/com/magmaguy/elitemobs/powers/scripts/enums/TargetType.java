@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.powers.scripts.enums;
 public enum TargetType {
     NEARBY_PLAYERS,
     NEARBY_MOBS,
+    NEARBY_ELITES,
     WORLD_PLAYERS,
     ALL_PLAYERS,
     DIRECT_TARGET,

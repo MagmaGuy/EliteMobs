@@ -8,6 +8,7 @@ import com.magmaguy.elitemobs.powers.scripts.enums.ConditionType;
 import com.magmaguy.elitemobs.powers.scripts.enums.TargetType;
 import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -15,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -24,34 +26,20 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class ScriptConditions {
 
-    /** The blueprint containing the conditions to be checked. */
     private final ScriptConditionsBlueprint conditionsBlueprint;
-
-    /** The EliteScript associated with these conditions. */
     private final EliteScript eliteScript;
-
-    /** The targets specified in the conditions, if any. */
     private final ScriptTargets scriptTargets;
 
-    /**
-     * Constructs a new ScriptConditions instance.
-     *
-     * @param scriptConditionsBlueprint The blueprint defining the conditions.
-     * @param eliteScript               The script associated with these conditions.
-     * @param actionCondition           True if the condition is for an action; false otherwise.
-     */
     public ScriptConditions(ScriptConditionsBlueprint scriptConditionsBlueprint, EliteScript eliteScript, boolean actionCondition) {
         this.conditionsBlueprint = scriptConditionsBlueprint;
         this.eliteScript = eliteScript;
 
-        // Initialize script targets if conditions are set
         if (conditionsBlueprint.getScriptTargets() != null) {
             this.scriptTargets = new ScriptTargets(conditionsBlueprint.getScriptTargets(), eliteScript);
         } else {
             this.scriptTargets = null;
         }
 
-        // Set the default condition type if not specified
         if (conditionsBlueprint.getConditionType() == null) {
             if (actionCondition) {
                 conditionsBlueprint.setConditionType(ConditionType.FILTERING);
@@ -62,281 +50,212 @@ public class ScriptConditions {
     }
 
     /**
+     * Generic evaluation helper: compares an actual boolean against an expected value,
+     * then optionally inverts based on runIf flag.
+     */
+    private boolean eval(boolean actual, Boolean expected, Boolean runIf) {
+        if (expected == null) return true;
+        boolean matches = actual == expected;
+        return runIf == null ? matches : (matches == runIf);
+    }
+
+    /**
      * Checks if a living entity's alive status matches the condition.
-     *
-     * @param livingEntity The living entity to check.
-     * @return True if the condition is met; false otherwise.
      */
     private boolean isAliveCheck(LivingEntity livingEntity) {
-        if (conditionsBlueprint.getIsAlive() == null) return true;
+        Boolean expected = conditionsBlueprint.getIsAlive();
+        if (expected == null) return true;
         if (livingEntity == null) return false;
-        return livingEntity.isValid() == conditionsBlueprint.getIsAlive();
+        boolean actual = livingEntity.isValid();
+        return eval(actual, expected, conditionsBlueprint.getRunIfIsAliveIs());
     }
 
     /**
-     * Checks if a living entity has all the required tags.
-     *
-     * @param target The living entity to check.
-     * @return True if the entity has all the required tags; false otherwise.
+     * Checks if a living entity has all the required tags, honoring inversion.
      */
     private boolean hasTagsCheck(LivingEntity target) {
-        if (conditionsBlueprint.getHasTags() == null) return true;
-        return checkTags(target, conditionsBlueprint.getHasTags());
+        List<String> tags = conditionsBlueprint.getHasTags();
+        if (tags == null) return true;
+        boolean actual = tagsUninverted(target, tags);
+        return eval(actual, Boolean.TRUE, conditionsBlueprint.getRunIfHasTagIs());
     }
 
     /**
-     * Checks if a living entity does not have any of the disallowed tags.
-     *
-     * @param target The living entity to check.
-     * @return True if the entity does not have any disallowed tags; false otherwise.
+     * Checks if a living entity does not have any of the disallowed tags, honoring inversion.
      */
     private boolean doesNotHaveTags(LivingEntity target) {
-        if (conditionsBlueprint.getDoesNotHaveTags() == null) return true;
-        return !checkTags(target, conditionsBlueprint.getDoesNotHaveTags());
+        List<String> tags = conditionsBlueprint.getDoesNotHaveTags();
+        if (tags == null) return true;
+        boolean actual = tagsUninverted(target, tags);
+        return eval(actual, Boolean.FALSE, conditionsBlueprint.getRunIfDoesNotHaveTagIs());
     }
 
     /**
-     * Checks if a random chance condition is met.
-     *
-     * @return True if the random chance condition is met; false otherwise.
+     * Helper: fetches entity's tags and returns true if all blueprintTags are present.
      */
-    private boolean checkRandomizer() {
-        if (conditionsBlueprint.getRandomChance() == null) return true;
-        double random = ThreadLocalRandom.current().nextDouble();
-        return random < conditionsBlueprint.getRandomChance();
-    }
-
-    /**
-     * Checks if a living entity has the specified tags.
-     *
-     * @param target        The living entity to check.
-     * @param blueprintTags The list of tags to check for.
-     * @return True if the entity has all the specified tags; false otherwise.
-     */
-    private boolean checkTags(LivingEntity target, List<String> blueprintTags) {
+    private boolean tagsUninverted(LivingEntity target, List<String> blueprintTags) {
         List<String> entityTags = null;
-
         try {
             if (target instanceof Player player) {
-                ElitePlayerInventory playerInventory = ElitePlayerInventory.getPlayer(player);
-                if (playerInventory != null) {
-                    entityTags = new ArrayList<>(playerInventory.getTags());
-                }
+                ElitePlayerInventory inv = ElitePlayerInventory.getPlayer(player);
+                if (inv != null) entityTags = new ArrayList<>(inv.getTags());
             } else {
-                EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(target);
-                if (eliteEntity != null) {
-                    entityTags = new ArrayList<>(eliteEntity.getTags());
-                }
+                EliteEntity mob = EntityTracker.getEliteMobEntity(target);
+                if (mob != null) entityTags = new ArrayList<>(mob.getTags());
             }
         } catch (Exception e) {
             Logger.warn("Failed to retrieve tags for entity '" + target.getName() + "': " + e.getMessage());
             return false;
         }
-
         if (entityTags == null) return false;
-
         return entityTags.containsAll(blueprintTags);
     }
 
-    /**
-     * Checks if a location is air or not, based on the condition.
-     *
-     * @param targetLocation The location to check.
-     * @return True if the condition is met; false otherwise.
-     */
+    private boolean targetCountLowerThan(int targetCount) {
+        Integer threshold = conditionsBlueprint.getTargetCountLowerThan();
+        if (threshold == null) return true;
+        boolean actual = targetCount < threshold;
+        return eval(actual, Boolean.TRUE, conditionsBlueprint.getRunIfTargetCountLowerThanIs());
+    }
+
+    private boolean targetCountGreaterThan(int targetCount) {
+        Integer threshold = conditionsBlueprint.getTargetCountGreaterThan();
+        if (threshold == null) return true;
+        boolean actual = targetCount > threshold;
+        return eval(actual, Boolean.TRUE, conditionsBlueprint.getRunIfTargetCountGreaterThanIs());
+    }
+
+    private boolean checkRandomizer() {
+        Double chance = conditionsBlueprint.getRandomChance();
+        if (chance == null) return true;
+        boolean actual = ThreadLocalRandom.current().nextDouble() < chance;
+        return eval(actual, Boolean.TRUE, conditionsBlueprint.getRunIfRandomChanceIs());
+    }
+
     private boolean isAirCheck(Location targetLocation) {
-        if (conditionsBlueprint.getLocationIsAir() == null) return true;
+        Boolean expected = conditionsBlueprint.getLocationIsAir();
+        if (expected == null) return true;
         try {
-            boolean isAir = targetLocation.getBlock().getType().isAir();
-            return conditionsBlueprint.getLocationIsAir() == isAir;
+            boolean actual = targetLocation.getBlock().getType().isAir();
+            return eval(actual, expected, conditionsBlueprint.getRunIfLocationIsAirIs());
         } catch (Exception e) {
             Logger.warn("Failed to check if location is air at '" + targetLocation + "': " + e.getMessage());
             return false;
         }
     }
 
-    /**
-     * Checks if a location is on the floor (i.e., not in the air), based on the condition.
-     *
-     * @param targetLocation The location to check.
-     * @return True if the condition is met; false otherwise.
-     */
     private boolean isOnFloor(Location targetLocation) {
-        if (conditionsBlueprint.getIsOnFloor() == null) return true;
+        Boolean expected = conditionsBlueprint.getIsOnFloor();
+        if (expected == null) return true;
         try {
-            Block currentBlock = targetLocation.getBlock();
-            Block floorBlock = targetLocation.clone().subtract(0, 1, 0).getBlock();
-            boolean isOnFloor = !currentBlock.getType().isSolid() && floorBlock.getType().isSolid();
-            return conditionsBlueprint.getIsOnFloor() == isOnFloor;
+            Block current = targetLocation.getBlock();
+            Block below = targetLocation.clone().subtract(0, 1, 0).getBlock();
+            boolean actual = !current.getType().isSolid() && below.getType().isSolid();
+            return eval(actual, expected, conditionsBlueprint.getRunIfIsOnFloorIs());
         } catch (Exception e) {
             Logger.warn("Failed to check if location is on floor at '" + targetLocation + "': " + e.getMessage());
             return false;
         }
     }
 
-    /**
-     * Checks if a location is standing on a specific material.
-     *
-     * @param targetLocation The location to check.
-     * @return True if the condition is met; false otherwise.
-     */
     private boolean isStandingOn(Location targetLocation) {
-        if (conditionsBlueprint.getIsStandingOnMaterial() == null) return true;
+        Material mat = conditionsBlueprint.getIsStandingOnMaterial();
+        if (mat == null) return true;
         try {
-            Block floorBlock = targetLocation.clone().subtract(0, 1, 0).getBlock();
-            return floorBlock.getType() == conditionsBlueprint.getIsStandingOnMaterial();
+            boolean actual = targetLocation.clone().subtract(0, 1, 0).getBlock().getType() == mat;
+            return eval(actual, Boolean.TRUE, conditionsBlueprint.getRunIfIsStandingOnMaterialIs());
         } catch (Exception e) {
             Logger.warn("Failed to check if location is standing on material at '" + targetLocation + "': " + e.getMessage());
             return false;
         }
     }
 
-    /**
-     * Determines if pre-action conditions are met for a script.
-     *
-     * @param eliteEntity  The EliteEntity executing the script.
-     * @param directTarget The direct target from the event that triggered the script.
-     * @return True if all pre-action conditions are met; false otherwise.
-     */
     public boolean meetsPreActionConditions(EliteEntity eliteEntity, LivingEntity directTarget) {
         if (scriptTargets == null) return true;
-        ScriptActionData scriptActionData = new ScriptActionData(eliteEntity, directTarget, scriptTargets, null);
+        ScriptActionData data = new ScriptActionData(eliteEntity, directTarget, scriptTargets, null);
+        Collection<LivingEntity> entities = scriptTargets.getTargetEntities(data);
+        int count = entities.size();
 
-        for (LivingEntity livingEntity : scriptTargets.getTargetEntities(scriptActionData)) {
-            if (!checkConditions(livingEntity)) return false;
-        }
-
-        for (Location location : scriptTargets.getTargetLocations(scriptActionData)) {
-            if (!checkConditions(location)) return false;
-        }
-
+        if (!targetCountLowerThan(count) || !targetCountGreaterThan(count)) return false;
+        for (LivingEntity e : entities) if (!checkConditions(e)) return false;
+        for (Location loc : scriptTargets.getTargetLocations(data)) if (!checkConditions(loc)) return false;
         return checkRandomizer();
     }
 
-    /**
-     * Determines if action conditions are met during the execution of a script action.
-     * This method only cares about blocking conditions; the action is either entirely valid or not at all.
-     *
-     * @param scriptActionData The data for the current script action.
-     * @return True if all action conditions are met; false otherwise.
-     */
-    public boolean meetsActionConditions(ScriptActionData scriptActionData) {
+    public boolean meetsActionConditions(ScriptActionData data) {
         if (scriptTargets == null) return true;
-        if (scriptActionData == null) {
-            Logger.warn("ScriptActionData is null in meetsActionConditions.");
+        if (data == null) { Logger.warn("ScriptActionData is null in meetsActionConditions."); return false; }
+
+        if (scriptTargets.getTargetBlueprint().getTargetType().equals(TargetType.SELF)
+                && !isAliveCheck(data.getEliteEntity().getLivingEntity())) {
             return false;
         }
-
-        // Special case: if the target is SELF and the condition isAlive is not met
-        if (scriptTargets.getTargetBlueprint().getTargetType().equals(TargetType.SELF) &&
-                !isAliveCheck(scriptActionData.getEliteEntity().getLivingEntity())) {
-            return false;
-        }
-
-        // Only proceed if the condition type is BLOCKING
         if (!conditionsBlueprint.getConditionType().equals(ConditionType.BLOCKING)) return true;
 
-        for (LivingEntity livingEntity : scriptTargets.getTargetEntities(scriptActionData)) {
-            if (!checkConditions(livingEntity)) return false;
-        }
-
-        for (Location location : scriptTargets.getTargetLocations(scriptActionData)) {
-            if (!checkConditions(location)) return false;
-        }
-
+        Collection<LivingEntity> entities = scriptTargets.getTargetEntities(data);
+        int count = entities.size();
+        if (!targetCountLowerThan(count) || !targetCountGreaterThan(count)) return false;
+        for (LivingEntity e : entities) if (!checkConditions(e)) return false;
+        if (scriptTargets.getTargetLocations(data) != null)
+            for (Location loc : scriptTargets.getTargetLocations(data)) if (!checkConditions(loc)) return false;
         return checkRandomizer();
     }
 
-    /**
-     * Checks all conditions for a living entity.
-     *
-     * @param livingEntity The living entity to check.
-     * @return True if all conditions are met; false otherwise.
-     */
     private boolean checkConditions(LivingEntity livingEntity) {
         if (scriptTargets == null) return true;
         if (livingEntity == null) return false;
-
-        if (!isAliveCheck(livingEntity)) return false;
-        if (!hasTagsCheck(livingEntity)) return false;
-        if (!checkConditions(livingEntity.getLocation())) return false;
-        if (!doesNotHaveTags(livingEntity)) return false;
-
-        return true;
+        return isAliveCheck(livingEntity)
+                && hasTagsCheck(livingEntity)
+                && checkConditions(livingEntity.getLocation())
+                && doesNotHaveTags(livingEntity);
     }
 
-    /**
-     * Checks all conditions for a location.
-     *
-     * @param location The location to check.
-     * @return True if all conditions are met; false otherwise.
-     */
     private boolean checkConditions(Location location) {
         if (scriptTargets == null) return true;
         if (location == null) return true;
-
-        return isAirCheck(location) &&
-                isOnFloor(location) &&
-                isStandingOn(location);
+        return isAirCheck(location)
+                && isOnFloor(location)
+                && isStandingOn(location);
     }
 
-    /**
-     * Validates and filters locations based on the conditions.
-     * Removes locations that do not meet the conditions.
-     *
-     * @param scriptActionData  The data for the current script action.
-     * @param originalLocations The original collection of locations.
-     * @return A collection of locations that meet the conditions.
-     */
-    protected Collection<Location> validateLocations(ScriptActionData scriptActionData,
-                                                     @NotNull Collection<Location> originalLocations) {
-        if (scriptTargets == null) return originalLocations;
-        if (scriptActionData == null) {
+    protected Collection<Location> validateLocations(ScriptActionData data, @NotNull Collection<Location> original) {
+        if (scriptTargets == null) {
+            return original;
+        }
+        if (data == null) {
             Logger.warn("ScriptActionData is null in validateLocations.");
-            return originalLocations;
+            return original;
         }
 
+        Collection<Location> targets = scriptTargets.getTargetLocations(data);
+
         if (scriptTargets.getTargetBlueprint().getTargetType().equals(TargetType.ACTION_TARGET)) {
-            // Exclude non-conforming locations, but the script will still run
-            originalLocations.removeIf(targetLocation -> !checkConditions(targetLocation));
-        } else {
-            // If the condition has a different target, cancel all effects if conditions are not met
-            Collection<Location> conditionTargetLocations = scriptTargets.getTargetLocations(scriptActionData);
-            for (Location location : conditionTargetLocations) {
-                if (!checkConditions(location)) return new ArrayList<>();
+            original.removeIf(loc -> !checkConditions(loc));
+            return original;
+        }
+
+        if (targets == null) {
+            // no target locations → skip action
+            return Collections.emptyList();
+        }
+
+        for (Location loc : targets) {
+            if (!checkConditions(loc)) {
+                return Collections.emptyList();
             }
         }
 
-        return originalLocations;
+        return original;
     }
 
-    /**
-     * Validates and filters entities based on the conditions.
-     * Removes entities that do not meet the conditions.
-     *
-     * @param scriptActionData  The data for the current script action.
-     * @param originalEntities  The original collection of entities.
-     * @return A collection of entities that meet the conditions.
-     */
-    protected Collection<LivingEntity> validateEntities(ScriptActionData scriptActionData,
-                                                        @NotNull Collection<LivingEntity> originalEntities) {
-        if (scriptTargets == null) return originalEntities;
-        if (scriptActionData == null) {
-            Logger.warn("ScriptActionData is null in validateEntities.");
-            return originalEntities;
-        }
-
+    protected Collection<LivingEntity> validateEntities(ScriptActionData data, @NotNull Collection<LivingEntity> original) {
+        if (scriptTargets == null) return original;
+        if (data == null) { Logger.warn("ScriptActionData is null in validateEntities."); return original; }
         if (scriptTargets.getTargetBlueprint().getTargetType().equals(TargetType.ACTION_TARGET)) {
-            // Exclude non-conforming entities, but the script will still run
-            originalEntities.removeIf(targetEntity -> !checkConditions(targetEntity));
+            original.removeIf(ent -> !checkConditions(ent));
         } else {
-            // If the condition has a different target, cancel all effects if conditions are not met
-            Collection<LivingEntity> conditionTargetEntities = scriptTargets.getTargetEntities(scriptActionData);
-            for (LivingEntity livingEntity : conditionTargetEntities) {
-                if (!checkConditions(livingEntity)) return new ArrayList<>();
-            }
+            for (LivingEntity e : scriptTargets.getTargetEntities(data)) if (!checkConditions(e)) return new ArrayList<>();
         }
-
-        return originalEntities;
+        return original;
     }
 }

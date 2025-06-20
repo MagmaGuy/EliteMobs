@@ -1,5 +1,5 @@
 name: EliteMobs
-version: 9.4.3
+version: 9.5.0
 author: MagmaGuy
 main: com.magmaguy.elitemobs.EliteMobs
 api-version: 1.14
@@ -27,13 +27,7 @@ commands:
     description: Main command
     aliases:
       - ag
-  logify:
-    description: Posts current latest.log in mclo.gs, to make reporting bugs easier for admins.
-
 permissions:
-  logify.*:
-    description: Lets admins run the /logify command, which sends the current latest server log to mclo.gs.
-    default: op
   elitemobs.*:
     description: Gives access to all elitemobs commands
     default: op

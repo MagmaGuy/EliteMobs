@@ -35,7 +35,8 @@ public enum ActionType {
     SUMMON_ENTITY(false),
     NAVIGATE(false),
     SCALE(false),
-    SET_FACING(false);
+    SET_FACING(false),
+    HEAL(true);
 
     @Getter
     private final boolean requiresLivingEntity;
