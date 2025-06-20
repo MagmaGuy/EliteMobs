@@ -204,6 +204,7 @@ public class ScriptActionBlueprint {
             case "velocity" -> velocity = parseScriptFloat(key, value, scriptName);
             case "scale" -> scale = parseScriptFloat(key, value, scriptName);
             case "debug" -> debug = parseBoolean(key, value, scriptName);
+
             default -> Logger.warn("Failed to read key " + key + " for script " + scriptName + " in " + scriptFilename);
         }
 

@@ -204,11 +204,26 @@ public class ScriptZone {
                     case DOME -> shapes.add(new Dome(zoneBlueprint.getRadius().getValue(), shapeTargetLocation, zoneBlueprint.getBorderRadius().getValue()));
                     case CONE -> {
                         if (targets2 == null) {
-                            Logger.warn("Script for boss '" + scriptActionData.getEliteEntity().getName() + "' has a CONE but no set target2 for the cone!");
+                            Logger.warn("Script for boss '"
+                                    + scriptActionData.getEliteEntity().getName()
+                                    + "' has a CONE but no set target2 for the cone!");
                             continue;
                         }
-                        shapes.add(new Cone(shapeTargetLocation, targets2.getTargetLocations(scriptActionData).stream().toList().get(0), zoneBlueprint.getRadius().getValue(), zoneBlueprint.getBorderRadius().getValue()));
+
+                        List<Location> target2Locations = new ArrayList<>(targets2.getTargetLocations(scriptActionData));
+                        if (target2Locations.isEmpty()) {
+                            continue;
+                        }
+
+                        Location secondPoint = target2Locations.get(0);
+                        shapes.add(new Cone(
+                                shapeTargetLocation,
+                                secondPoint,
+                                zoneBlueprint.getRadius().getValue(),
+                                zoneBlueprint.getBorderRadius().getValue()
+                        ));
                     }
+
                     case STATIC_RAY -> {
                         if (targets2 == null) {
                             Logger.warn("Script for boss '" + scriptActionData.getEliteEntity().getName() + "' has a STATIC_RAY but no set target2 for the ray!");

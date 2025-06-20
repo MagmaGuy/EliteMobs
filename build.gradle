@@ -32,7 +32,7 @@ processResources {
 }
 
 group 'com.magmaguy'
-version '9.4.3'
+version '9.5.0'
 
 repositories {
     maven {
@@ -110,7 +110,7 @@ dependencies {
     //Model Engine - legacy
     compileOnly "com.ticxo.modelengine:api:R3.1.7"
     //Free Minecraft Models
-    compileOnly (group: 'com.magmaguy', name: 'FreeMinecraftModels', version: '2.1.0'){
+    compileOnly (group: 'com.magmaguy', name: 'FreeMinecraftModels', version: '2.2.0'){
         changing = true
     }
     // Mythic Mobs integration - currently only for arenas
@@ -119,8 +119,8 @@ dependencies {
     ///Shaded in
     implementation group: 'org.bstats', name: 'bstats-bukkit', version: '2.2.1'
     implementation group: 'commons-io', name: 'commons-io', version: '2.7'
-    implementation group: 'com.magmaguy', name: 'EasyMinecraftGoals-dist', version: '1.19.3'
-    implementation (group: 'com.magmaguy', name: 'MagmaCore', version: '1.14-SNAPSHOT'){
+    implementation group: 'com.magmaguy', name: 'EasyMinecraftGoals-dist', version: '1.19.6-SNAPSHOT'
+    implementation (group: 'com.magmaguy', name: 'MagmaCore', version: '1.15-SNAPSHOT'){
         changing = true
     }
 

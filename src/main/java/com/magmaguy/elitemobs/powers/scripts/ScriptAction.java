@@ -239,6 +239,7 @@ public class ScriptAction {
             case NAVIGATE -> runNavigate(scriptActionData);
             case SCALE -> runScale(scriptActionData);
             case SET_FACING -> setFacing(scriptActionData);
+            case HEAL -> runHeal(scriptActionData);
             default -> Logger.warn("Unknown action type '"
                     + blueprint.getActionType() + "' in script '"
                     + blueprint.getScriptName() + "' for file '" + blueprint.getScriptFilename() + "'");
@@ -577,7 +578,7 @@ public class ScriptAction {
     private void runSpawnParticle(ScriptActionData scriptActionData) {
         boolean needsCentering = switch (scriptActionData.getTargetType()) {
             case ZONE_FULL, ZONE_BORDER, INHERIT_SCRIPT_ZONE_FULL, INHERIT_SCRIPT_ZONE_BORDER, LOCATION, LOCATIONS,
-                 LANDING_LOCATION -> true;
+                    LANDING_LOCATION -> true;
             default -> false;
         };
         getLocationTargets(scriptActionData).forEach(location -> {
@@ -898,13 +899,13 @@ public class ScriptAction {
                         world.setStorm(true);
                         world.setThundering(false);
                         world.setWeatherDuration(duration > 0 ? duration : 6000);
-                        if (duration > 0){
+                        if (duration > 0) {
                             new BukkitRunnable() {
                                 @Override
                                 public void run() {
                                     world.setStorm(false);
                                 }
-                            }.runTaskLater(MetadataHandler.PLUGIN, duration+1);
+                            }.runTaskLater(MetadataHandler.PLUGIN, duration + 1);
                         }
                     }
                     case THUNDER -> {
@@ -917,7 +918,7 @@ public class ScriptAction {
                                 world.setStorm(false);
                                 world.setThundering(false);
                             }
-                        }.runTaskLater(MetadataHandler.PLUGIN, duration+1);
+                        }.runTaskLater(MetadataHandler.PLUGIN, duration + 1);
                     }
                 }
             } catch (Exception e) {
@@ -1088,7 +1089,7 @@ public class ScriptAction {
                 : blueprint.getVValue();
 
         if (direction == null) {
-            Logger.warn("Tried to set direction in "+ getBlueprint().getScriptFilename() + " but no configuration for vvalue or relative vector are set in " + blueprint.getScriptName() +" !");
+            Logger.warn("Tried to set direction in " + getBlueprint().getScriptFilename() + " but no configuration for vvalue or relative vector are set in " + blueprint.getScriptName() + " !");
             return;
         }
 
@@ -1098,4 +1099,22 @@ public class ScriptAction {
             target.teleport(location);
         });
     }
+
+
+    private void runHeal(ScriptActionData scriptActionData) {
+        double healAmount = blueprint.getAmount().getValue();
+        getTargets(scriptActionData).forEach(target -> {
+            EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(target);
+            if (eliteEntity != null) {
+                // your existing Elite‐only heal
+                eliteEntity.heal(healAmount);
+            } else {
+                // fallback: clamp using your AttributeManager
+                double maxHp = AttributeManager.getAttributeBaseValue(target, "generic_max_health");
+                double newHp  = Math.min(target.getHealth() + healAmount, maxHp);
+                target.setHealth(newHp);
+            }
+        });
+    }
+
 }

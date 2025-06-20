@@ -81,7 +81,7 @@ public class ScriptTargetsBlueprint {
             }
             case "relativeoffset" -> {
                 if (value instanceof MemorySection)
-                    new ScriptRelativeVectorBlueprint(scriptName, filename, ((MemorySection) value).getValues(false));
+                    scriptRelativeVectorBlueprint = new ScriptRelativeVectorBlueprint(scriptName, filename, ((MemorySection) value).getValues(false));
                 else if (value instanceof LinkedHashMap<?, ?>)
                     scriptRelativeVectorBlueprint = new ScriptRelativeVectorBlueprint(scriptName, filename, ((LinkedHashMap) value));
                 else
