@@ -14,7 +14,7 @@ public class CustomModelFMM implements CustomModelInterface {
     public CustomModelFMM(LivingEntity livingEntity, String modelName, String nametagName) {
         dynamicEntity = DynamicEntity.create(modelName, livingEntity);
         if (dynamicEntity == null) return;
-        dynamicEntity.setName(nametagName);
+        dynamicEntity.setDisplayName(nametagName);
     }
 
     public static void reloadModels() {
@@ -44,13 +44,12 @@ public class CustomModelFMM implements CustomModelInterface {
 
     @Override
     public void setName(String nametagName, boolean visible) {
-        dynamicEntity.setName(nametagName);
-        dynamicEntity.setNameVisible(visible);
+        dynamicEntity.setDisplayName(nametagName);
     }
 
     @Override
     public void setNameVisible(boolean visible) {
-        dynamicEntity.setNameVisible(visible);
+        dynamicEntity.setDisplayNameVisible(visible);
     }
 
     @Override
