@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.quests.objectives;
 
+import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.utils.MapListInterpreter;
 import com.magmaguy.magmacore.util.ChatColorConverter;
@@ -56,6 +57,15 @@ public class CustomObjectivesParser {
                     break;
             }
         }
+
+        if (objectiveType== ObjectiveType.FETCH_ITEM && name == null) {
+            try{
+                name = CustomItem.getCustomItem(filename).getCustomItemsConfigFields().getName();
+            } catch (Exception ex){
+                Logger.warn("Failed to get name for custom item " + filename + " in Custom Quest " + customQuest.getCustomQuestsConfigFields().getFilename() + " . This objective will not display the item name.");
+            }
+        }
+
         if (filename == null) {
             Logger.warn("Invalid filename for entry " + rawMap + " in Custom Quest " + customQuest.getCustomQuestsConfigFields().getFilename() + " . This objective will not be registered.");
             return null;

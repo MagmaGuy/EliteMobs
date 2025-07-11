@@ -8,6 +8,7 @@ import com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldowns;
 import com.magmaguy.elitemobs.utils.ChunkLocationChecker;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import lombok.Getter;
+import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -19,30 +20,21 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
-/**
- * Centralized manager for all wormholes in the game.
- * Handles visual effects, teleportation, and player cooldowns.
- */
 public class WormholeManager {
     // Static cooldown time in seconds (20 seconds)
-    private static final long COOLDOWN_DURATION_SECONDS = 20;
+    private static final long COOLDOWN_DURATION_SECONDS = 5;
     // Distance for player-specific particle rendering
     private static final double PARTICLE_RENDER_DISTANCE = 30.0;
     // Distance at which a player is considered "away" from a wormhole and can use it again
-    private static final double SAFE_DISTANCE = 3.0;
+    private static final double SAFE_DISTANCE = 2.0;
     // Distance for teleportation trigger
     private static final double TELEPORT_DISTANCE_MULTIPLIER = 1.5;
     private static WormholeManager instance;
     // Map to track players in cooldown with expiration timestamps
     @Getter
-    private final Map<UUID, Long> playerCooldowns = new HashMap<>();
-    // Map to track which destination wormhole a player teleported to
-    private final Map<UUID, WormholeEntry> playerDestinations = new HashMap<>();
+    private final Map<UUID, PlayerWormholeData> playerTeleportData = new HashMap<>();
     // Maps to track rotation counters for each wormhole
     private final Map<WormholeEntry, Integer> rotationCounters = new HashMap<>();
     private BukkitTask wormholeTask;
@@ -54,6 +46,7 @@ public class WormholeManager {
 
     /**
      * Gets the singleton instance of the manager
+     *
      * @return the WormholeManager instance
      */
     public static WormholeManager getInstance(boolean shuttingDown) {
@@ -61,118 +54,14 @@ public class WormholeManager {
         if (instance == null) {
             instance = new WormholeManager();
         }
-        if (instance.wormholeTask== null || instance.wormholeTask.isCancelled()) instance.startWormholeTask();
+        if (instance.wormholeTask == null || instance.wormholeTask.isCancelled()) instance.startWormholeTask();
         return instance;
-    }
-
-    /**
-     * Starts the main task for processing wormholes
-     */
-    private void startWormholeTask() {
-        wormholeTask = new BukkitRunnable() {
-            @Override
-            public void run() {
-                // Process all wormholes in a single task
-                processWormholes();
-
-                // Check cooldowns and safe distances
-                processPlayerCooldowns();
-            }
-        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 5);
-    }
-
-    /**
-     * Main method to process all wormholes
-     */
-    private void processWormholes() {
-        // Get online players once per tick
-        HashSet<Player> onlinePlayers = new HashSet<>(Bukkit.getOnlinePlayers());
-
-        // Iterate through all wormhole entries
-        for (WormholeEntry wormholeEntry : WormholeEntry.getWormholeEntries()) {
-            // Skip if location is null or chunk is not loaded
-            if (wormholeEntry.getLocation() == null ||
-                    !ChunkLocationChecker.locationIsLoaded(wormholeEntry.getLocation())) {
-                continue;
-            }
-
-            // Initialize text display if needed
-            if (wormholeEntry.getText() == null || !wormholeEntry.getText().isValid()) {
-                Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, () -> {
-                    if (wormholeEntry.getLocation() != null && wormholeEntry.getLocation().getWorld() != null) {
-                        wormholeEntry.initializeTextDisplay();
-                    }
-                });
-            }
-
-            // Get nearby players for this wormhole
-            HashSet<Player> nearbyPlayers = getNearbyPlayers(wormholeEntry, onlinePlayers);
-            if (nearbyPlayers.isEmpty()) continue;
-
-            // Skip visual effects if particles are disabled
-            if (!WormholesConfig.isNoParticlesMode() &&
-                    wormholeEntry.getWormhole().getWormholeConfigFields().getStyle() != Wormhole.WormholeStyle.NONE) {
-                // Display visual effects to nearby players
-                displayVisualEffects(wormholeEntry, nearbyPlayers);
-            }
-
-            // Check for players who should teleport
-            checkForTeleports(wormholeEntry, nearbyPlayers);
-        }
-    }
-
-    /**
-     * Check if players have moved away from their destination wormhole
-     * and remove their cooldown if they have
-     */
-    private void processPlayerCooldowns() {
-        long currentTime = System.currentTimeMillis();
-        HashSet<UUID> toRemove = new HashSet<>();
-
-        // Process all players in cooldown
-        for (Map.Entry<UUID, Long> entry : playerCooldowns.entrySet()) {
-            UUID playerUUID = entry.getKey();
-            Long expirationTime = entry.getValue();
-
-            // Check if cooldown has expired by time
-            if (currentTime > expirationTime) {
-                toRemove.add(playerUUID);
-                playerDestinations.remove(playerUUID);
-                continue;
-            }
-
-            // Get the player's destination wormhole
-            WormholeEntry destinationEntry = playerDestinations.get(playerUUID);
-            if (destinationEntry == null) {
-                continue; // No destination tracked, keep the time-based cooldown
-            }
-
-            Player player = Bukkit.getPlayer(playerUUID);
-            if (player == null || !player.isOnline()) {
-                continue; // Player offline, keep the cooldown
-            }
-
-            // Check if player has moved away from destination wormhole
-            if (destinationEntry.getLocation() != null &&
-                    destinationEntry.getLocation().getWorld() != null &&
-                    player.getWorld().equals(destinationEntry.getLocation().getWorld()) &&
-                    player.getLocation().distance(destinationEntry.getLocation()) > SAFE_DISTANCE) {
-                // Player is now far enough away, clear cooldown
-                toRemove.add(playerUUID);
-                playerDestinations.remove(playerUUID);
-            }
-        }
-
-        // Remove all players marked for cooldown removal
-        for (UUID uuid : toRemove) {
-            playerCooldowns.remove(uuid);
-        }
     }
 
     /**
      * Gets players that are near a specific wormhole
      */
-    private HashSet<Player> getNearbyPlayers(WormholeEntry wormholeEntry, HashSet<Player> onlinePlayers) {
+    private HashSet<Player> getNearbyPlayers(WormholeEntry wormholeEntry) {
         HashSet<Player> nearbyPlayers = new HashSet<>();
         Location wormholeLocation = wormholeEntry.getLocation();
 
@@ -180,9 +69,9 @@ public class WormholeManager {
             return nearbyPlayers;
         }
 
-        for (Player player : onlinePlayers) {
+        for (Player player : Bukkit.getOnlinePlayers()) {
             if (player.getWorld().equals(wormholeLocation.getWorld()) &&
-                    player.getLocation().distance(wormholeLocation) <= PARTICLE_RENDER_DISTANCE) {
+                    player.getLocation().distanceSquared(wormholeLocation) <= Math.pow(PARTICLE_RENDER_DISTANCE, 2)) {
                 nearbyPlayers.add(player);
             }
         }
@@ -232,22 +121,11 @@ public class WormholeManager {
      * Checks if any players should be teleported by this wormhole
      */
     private void checkForTeleports(WormholeEntry wormholeEntry, HashSet<Player> nearbyPlayers) {
-        double teleportDistance = TELEPORT_DISTANCE_MULTIPLIER *
-                wormholeEntry.getWormhole().getWormholeConfigFields().getSizeMultiplier();
-
         for (Player player : nearbyPlayers) {
-            // Skip players in cooldown
-            if (isPlayerInCooldown(player)) {
+            if (player.getLocation().distanceSquared(wormholeEntry.getLocation()) > Math.pow(TELEPORT_DISTANCE_MULTIPLIER * wormholeEntry.getWormhole().getWormholeConfigFields().getSizeMultiplier(), 2))
                 continue;
-            }
-
-            // Check if player is within teleport range
-            if (player.getLocation().distance(wormholeEntry.getLocation()) <= teleportDistance) {
-                // Check if player can teleport
-                if (canPlayerTeleport(wormholeEntry, player)) {
-                    teleportPlayer(wormholeEntry, player);
-                }
-            }
+            if (!canPlayerTeleport(wormholeEntry, player)) continue;
+            teleportPlayer(wormholeEntry, player);
         }
     }
 
@@ -278,7 +156,8 @@ public class WormholeManager {
             EconomyHandler.subtractCurrency(player.getUniqueId(), coinCost);
         }
 
-        return true;
+        PlayerWormholeData playerWormholeData = playerTeleportData.get(player.getUniqueId());
+        return playerWormholeData == null || playerWormholeData.canTeleport();
     }
 
     /**
@@ -317,44 +196,36 @@ public class WormholeManager {
         final Location finalDestination = destination.clone();
 
         // Perform teleport on the main thread
-        Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, () -> {
-            if (sourceEntry.getWormhole().getWormholeConfigFields().isBlindPlayer()) {
-                player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20 * 2, 0));
-            }
+        if (sourceEntry.getWormhole().getWormholeConfigFields().isBlindPlayer()) {
+            player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20 * 2, 0));
+        }
 
-            player.teleport(finalDestination);
-            player.playSound(player.getLocation(), Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, 1f, 1f);
-            player.setFlying(false);
-
-            // No velocity applied to prevent bouncing
-        });
+        player.teleport(finalDestination);
+        player.playSound(player.getLocation(), Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, 1f, 1f);
+        player.setFlying(false);
     }
 
     /**
-     * Checks if a player is currently in cooldown
-     * @param player The player to check
-     * @return true if the player is in cooldown
-     */
-    public boolean isPlayerInCooldown(Player player) {
-        Long cooldownEnd = playerCooldowns.get(player.getUniqueId());
-        if (cooldownEnd == null) return false;
-
-        // Check if cooldown has expired
-        return System.currentTimeMillis() <= cooldownEnd;
-    }
-
-    /**
-     * Adds a player to the cooldown list with a 20-second timeout and tracks their destination
-     * @param player The player to add to cooldowns
+     * @param player           The player to add to cooldowns
      * @param destinationEntry The wormhole they teleported to
      */
-    public void addPlayerToCooldown(Player player, WormholeEntry destinationEntry) {
-        // Calculate expiration time (current time + 20 seconds)
-        long expirationTime = System.currentTimeMillis() + (COOLDOWN_DURATION_SECONDS * 1000);
-        playerCooldowns.put(player.getUniqueId(), expirationTime);
+    public void addPlayerToCooldown(Player player, @NonNull WormholeEntry destinationEntry) {
+        playerTeleportData.put(player.getUniqueId(), new PlayerWormholeData(player, destinationEntry, System.currentTimeMillis()));
+    }
 
-        // Track which wormhole the player teleported to
-        playerDestinations.put(player.getUniqueId(), destinationEntry);
+    public void addPlayerToCooldown(Player player, Location destination) {
+        WormholeEntry destinationEntry = null;
+        for (WormholeEntry wormholeEntry : WormholeEntry.getWormholeEntries()) {
+            if (wormholeEntry.getLocation() != null &&
+                    wormholeEntry.getLocation().getWorld() != null &&
+                    wormholeEntry.getLocation().getWorld().equals(destination.getWorld()) &&
+                    destination.distanceSquared(wormholeEntry.getLocation()) <= Math.pow(TELEPORT_DISTANCE_MULTIPLIER * wormholeEntry.getWormhole().getWormholeConfigFields().getSizeMultiplier(), 2)) {
+                destinationEntry = wormholeEntry;
+                break;
+            }
+        }
+        if (destinationEntry == null) return;
+        addPlayerToCooldown(player, destinationEntry);
     }
 
     /**
@@ -366,8 +237,95 @@ public class WormholeManager {
             wormholeTask = null;
         }
 
-        playerCooldowns.clear();
-        playerDestinations.clear();
+        playerTeleportData.clear();
         rotationCounters.clear();
+    }
+
+    /**
+     * Starts the main task for processing wormholes
+     */
+    private void startWormholeTask() {
+        wormholeTask = new BukkitRunnable() {
+            @Override
+            public void run() {
+                // Process all wormholes in a single task
+                processWormholes();
+            }
+        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 5);
+    }
+
+    /**
+     * Main method to process all wormholes
+     */
+    private void processWormholes() {
+        Collection<PlayerWormholeData> values = playerTeleportData.values();
+        for (PlayerWormholeData value : values) {
+            value.tick();
+        }
+
+        // Iterate through all wormhole entries
+        for (WormholeEntry wormholeEntry : WormholeEntry.getWormholeEntries()) {
+            // Skip if location is null or chunk is not loaded
+            if (wormholeEntry.getLocation() == null ||
+                    !ChunkLocationChecker.locationIsLoaded(wormholeEntry.getLocation())) {
+                continue;
+            }
+
+            // Initialize text display if needed
+            if ((wormholeEntry.getText() == null || !wormholeEntry.getText().isValid())
+                    && (wormholeEntry.getLocation() != null && wormholeEntry.getLocation().getWorld() != null))
+                wormholeEntry.initializeTextDisplay();
+
+            // Get nearby players for this wormhole
+            HashSet<Player> nearbyPlayers = getNearbyPlayers(wormholeEntry);
+            if (nearbyPlayers.isEmpty()) continue;
+
+            // Skip visual effects if particles are disabled
+            if (!WormholesConfig.isNoParticlesMode() &&
+                    wormholeEntry.getWormhole().getWormholeConfigFields().getStyle() != Wormhole.WormholeStyle.NONE) {
+                // Display visual effects to nearby players
+                displayVisualEffects(wormholeEntry, nearbyPlayers);
+            }
+
+            // Check for players who should teleport
+            checkForTeleports(wormholeEntry, nearbyPlayers);
+        }
+    }
+
+    private class PlayerWormholeData {
+        private final Player player;
+        private final Location destination;
+        private final long timeStamp;
+        private final WormholeEntry wormholeEntry;
+        private boolean hasLeftTeleportRadius = false;
+
+        public PlayerWormholeData(Player player, WormholeEntry destinationWormhole, long timeStamp) {
+            this.player = player;
+            this.destination = destinationWormhole.getLocation();
+            this.timeStamp = timeStamp;
+            this.wormholeEntry = destinationWormhole;
+        }
+
+        public boolean canTeleport() {
+            return timeStamp + COOLDOWN_DURATION_SECONDS * 1000 < System.currentTimeMillis() &&
+                    isHasLeftTeleportRadius();
+        }
+
+        //Has to run on the tick to see the distance. Should be efficient.
+        public void tick() {
+            if (isHasLeftTeleportRadius() && enoughTimeHasPassed()) playerTeleportData.remove(player.getUniqueId());
+        }
+
+        private boolean enoughTimeHasPassed() {
+            return timeStamp + COOLDOWN_DURATION_SECONDS * 1000 < System.currentTimeMillis();
+        }
+
+        private boolean isHasLeftTeleportRadius() {
+            if (hasLeftTeleportRadius) return true;
+            if (!player.getWorld().equals(destination.getWorld())) return false;
+            if (destination.distanceSquared(player.getLocation()) > Math.pow(TELEPORT_DISTANCE_MULTIPLIER * wormholeEntry.getWormhole().getWormholeConfigFields().getSizeMultiplier() + SAFE_DISTANCE, 2))
+                return hasLeftTeleportRadius = true;
+            return false;
+        }
     }
 }

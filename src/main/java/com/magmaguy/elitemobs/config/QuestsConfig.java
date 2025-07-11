@@ -173,6 +173,8 @@ public class QuestsConfig extends ConfigurationFile {
     }
 
     public static String getQuestScoreboardProgressionLine(Objective objective) {
+        if (objective == null) Logger.warn("Objective is null!");
+
         String newString = "";
         if (objective instanceof KillObjective)
             newString = killQuestScoreboardProgressionLine;
