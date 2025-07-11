@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.dungeons.EliteMobsWorld;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.elitemobs.wormhole.WormholeManager;
+import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
@@ -11,8 +12,10 @@ import org.bukkit.event.*;
 public class PlayerTeleportEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
+    @Getter
     private final Location destination;
     private final Location originalLocation;
+    @Getter
     private final Player player;
     private boolean isCancelled = false;
 
@@ -52,14 +55,6 @@ public class PlayerTeleportEvent extends Event implements Cancellable {
         this.isCancelled = b;
     }
 
-    public Player getPlayer() {
-        return player;
-    }
-
-    public Location getDestination() {
-        return destination;
-    }
-
     public Location getOriginalLocation() {
         return originalLocation;
     }
@@ -67,7 +62,7 @@ public class PlayerTeleportEvent extends Event implements Cancellable {
     public void executeTeleport() {
         if (!EliteMobsWorld.isEliteMobsWorld(player.getLocation().getWorld().getUID()))
             PlayerData.setBackTeleportLocation(player, originalLocation);
-        WormholeManager.getInstance(false).addPlayerToCooldown(player, null);
+        WormholeManager.getInstance(false).addPlayerToCooldown(player, destination);
         player.teleport(destination);
     }
 

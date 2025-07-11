@@ -104,7 +104,7 @@ public class Placeholders extends PlaceholderExpansion {
 
         switch (identifier) {
             case "player_combat_tier":
-                return "" + ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getFullPlayerTier(true);
+                return "" + ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getFullPlayerTier(false);
             case "player_active_guild_rank_numerical":
                 return "" + GuildRank.getActiveGuildRank(player, false);
             case "player_maximum_guild_rank_numerical":
