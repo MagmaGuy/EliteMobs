@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.CombatTagConfig;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.magmacore.util.ChatColorConverter;
+import lombok.Getter;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Location;
@@ -14,8 +15,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class PlayerPreTeleportEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
+    @Getter
     private final Location destination;
+    @Getter
     private final Location originalLocation;
+    @Getter
     private final Player player;
     private boolean isCancelled = false;
 
@@ -60,14 +64,16 @@ public class PlayerPreTeleportEvent extends Event implements Cancellable {
                         player.getLocation().getZ() != originalLocation.getZ())
                     isCancelled = true;
 
+                ChatMessageType chatMessageType = CombatTagConfig.isUseActionBarMessagesInsteadOfChat() ? ChatMessageType.ACTION_BAR : ChatMessageType.CHAT;
+
                 if (isCancelled) {
-                    player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
+                    player.spigot().sendMessage(chatMessageType,
                             TextComponent.fromLegacyText(ChatColorConverter.convert(CombatTagConfig.getTeleportCancelled())));
                     cancel();
                     return;
                 }
 
-                player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
+                player.spigot().sendMessage(chatMessageType,
                         TextComponent.fromLegacyText(ChatColorConverter.convert(CombatTagConfig.getTeleportTimeLeft())
                                 .replace("$time", timerLeft + "")));
 
@@ -96,18 +102,6 @@ public class PlayerPreTeleportEvent extends Event implements Cancellable {
     @Override
     public void setCancelled(boolean b) {
         this.isCancelled = b;
-    }
-
-    public Player getPlayer() {
-        return player;
-    }
-
-    public Location getDestination() {
-        return destination;
-    }
-
-    public Location getOriginalLocation() {
-        return originalLocation;
     }
 
     public static class PlayerPreTeleportEventEvents implements Listener {

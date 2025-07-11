@@ -16,6 +16,8 @@ public class CombatTagConfig extends ConfigurationFile {
     private static String teleportTimeLeft;
     @Getter
     private static String teleportCancelled;
+    @Getter
+    private static boolean useActionBarMessagesInsteadOfChat;
 
     public CombatTagConfig() {
         super("CombatTag.yml");
@@ -38,5 +40,7 @@ public class CombatTagConfig extends ConfigurationFile {
         teleportCancelled = ConfigurationEngine.setString(
                 List.of("Sets the message sent when players move while waiting for teleportation."),
                 file, fileConfiguration, "Teleport cancelled", "&7[EM] &cTeleport interrupted!", true);
+        useActionBarMessagesInsteadOfChat = ConfigurationEngine.setBoolean(List.of("Sets whether the action bar or chat will be used for the teleport countdown timer"),
+                fileConfiguration, "useActionBarMessagesInsteadOfChat", true);
     }
 }
