@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.collateralminecraftchanges;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
-import com.magmaguy.elitemobs.utils.AttributeManager;
+import com.magmaguy.magmacore.util.AttributeManager;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.EntityType;

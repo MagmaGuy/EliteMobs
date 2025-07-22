@@ -201,13 +201,13 @@ public class MobCombatSettingsConfig extends ConfigurationFile {
                 fileConfiguration, "doResistEffect", true);
         normalizedDamageToEliteMultiplier = ConfigurationEngine.setDouble(
                 List.of("Sets the multiplier for the damage dealt to bosses using the normalized damage system (regional dungeon bosses). Higher values increase the damage dealt, making bosses easier to kill.", "2.0 = 200%, 0.5 = 50%"),
-                fileConfiguration, "damageToEliteMobMultiplier", 1);
+                fileConfiguration, "normalizedDamageToEliteMultiplier", 1);
         normalizedDamageToPlayerMultiplier = ConfigurationEngine.setDouble(
                 List.of("Sets the multiplier for the damage dealt to players by bosses using the normalized damage system (regional dungeon bosses). Higher values increase the amount of damage dealt by bosses, making bosses hit harder.", "2.0 = 200%, 0.5 = 50%"),
-                fileConfiguration, "damageToPlayerMultiplier", 1);
+                fileConfiguration, "normalizedDamageToPlayerMultiplier", 1);
         normalizedBaselineDamage = ConfigurationEngine.setDouble(
                 List.of("Sets the baseline damage for custom bosses using the normalized damage (usually regional bosses)."),
-                fileConfiguration, "normalizedRegionalBossBaselineDamageV2", 3);
+                fileConfiguration, "normalizedBaselineDamageV3", 3);
         normalizedBaselineHealth = ConfigurationEngine.setDouble(
                 List.of("Sets the baseline health for custom bosses using the normalized health (usually regional bosses)."),
                 fileConfiguration, "normalizedRegionalBossBaselineHealthV3", 4);

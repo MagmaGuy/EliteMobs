@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.items.potioneffects.custom;
 
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffect;
 import com.magmaguy.elitemobs.items.potioneffects.PlayerPotionEffects;
-import com.magmaguy.elitemobs.utils.AttributeManager;
+import com.magmaguy.magmacore.util.AttributeManager;
 import org.bukkit.entity.Player;
 
 import java.util.HashSet;

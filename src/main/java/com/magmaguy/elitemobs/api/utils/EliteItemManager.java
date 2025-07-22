@@ -5,7 +5,7 @@ import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.items.EliteItemLore;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
-import com.magmaguy.elitemobs.utils.AttributeManager;
+import com.magmaguy.magmacore.util.AttributeManager;
 import org.bukkit.Material;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
