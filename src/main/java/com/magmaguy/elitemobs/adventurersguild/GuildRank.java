@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
-import com.magmaguy.elitemobs.utils.AttributeManager;
+import com.magmaguy.magmacore.util.AttributeManager;
 import com.magmaguy.magmacore.util.Round;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

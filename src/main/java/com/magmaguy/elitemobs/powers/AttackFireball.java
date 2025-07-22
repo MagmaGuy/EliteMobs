@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.combatsystem.EliteProjectile;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.powers.meta.MinorPower;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -23,11 +24,37 @@ public class AttackFireball extends MinorPower implements Listener {
     }
 
     public static Fireball shootFireball(Entity entity, Player player) {
-        Vector targetterToTargetted = player.getLocation().toVector().subtract(entity.getLocation().toVector()).normalize().multiply(0.01);
-        Fireball repeatingFireball = (Fireball) EliteProjectile.create(EntityType.FIREBALL, entity, player, targetterToTargetted, true);
-        repeatingFireball.setYield(3F);
-        repeatingFireball.setIsIncendiary(true);
-        repeatingFireball.setShooter((ProjectileSource) entity);
+        // Get locations with null checks
+        Location entityLoc = entity.getLocation();
+        Location playerLoc = player.getLocation();
+
+        if (entityLoc == null || playerLoc == null) {
+            return null;
+        }
+
+        // Calculate direction vector
+        Vector direction = playerLoc.toVector().subtract(entityLoc.toVector());
+
+        // Check if the vector is zero-length (entity and player at same position)
+        if (direction.lengthSquared() < 0.0001) {
+            // Use a default direction (upward slightly)
+            direction = new Vector(0, 1, 0);
+        } else {
+            direction.normalize();
+        }
+
+        // Multiply for velocity
+        direction.multiply(0.01);
+
+        // Create the fireball
+        Fireball repeatingFireball = (Fireball) EliteProjectile.create(EntityType.FIREBALL, entity, player, direction, true);
+
+        if (repeatingFireball != null) {
+            repeatingFireball.setYield(3F);
+            repeatingFireball.setIsIncendiary(true);
+            repeatingFireball.setShooter((ProjectileSource) entity);
+        }
+
         return repeatingFireball;
     }
 
@@ -55,11 +82,21 @@ public class AttackFireball extends MinorPower implements Listener {
                     return;
                 }
 
-                for (Entity nearbyEntity : monster.getNearbyEntities(20, 20, 20))
-                    if (nearbyEntity instanceof Player &&
-                            (((Player) nearbyEntity).getGameMode().equals(GameMode.ADVENTURE) ||
-                                    ((Player) nearbyEntity).getGameMode().equals(GameMode.SURVIVAL)))
-                        shootFireball(monster, (Player) nearbyEntity);
+                for (Entity nearbyEntity : monster.getNearbyEntities(20, 20, 20)) {
+                    if (nearbyEntity instanceof Player) {
+                        Player targetPlayer = (Player) nearbyEntity;
+                        if (targetPlayer.getGameMode().equals(GameMode.ADVENTURE) ||
+                                targetPlayer.getGameMode().equals(GameMode.SURVIVAL)) {
+
+                            // Shoot fireball with null check
+                            Fireball fireball = shootFireball(monster, targetPlayer);
+                            if (fireball == null) {
+                                // Log or handle the case where fireball creation failed
+                                MetadataHandler.PLUGIN.getLogger().warning("Failed to create fireball for entity at " + monster.getLocation());
+                            }
+                        }
+                    }
+                }
 
             }
 

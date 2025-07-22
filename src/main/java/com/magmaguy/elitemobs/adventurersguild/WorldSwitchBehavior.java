@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.adventurersguild;
 
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
-import com.magmaguy.elitemobs.utils.AttributeManager;
+import com.magmaguy.magmacore.util.AttributeManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
