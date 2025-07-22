@@ -13,7 +13,7 @@ import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.powers.meta.CustomSummonPower;
 import com.magmaguy.elitemobs.powers.scripts.caching.ScriptActionBlueprint;
 import com.magmaguy.elitemobs.powers.scripts.enums.ActionType;
-import com.magmaguy.elitemobs.utils.AttributeManager;
+import com.magmaguy.magmacore.util.AttributeManager;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
@@ -75,13 +75,7 @@ public class ScriptAction {
         this.eliteScript = eliteScript;
     }
 
-    /**
-     * Resets the state of all invulnerable players by removing their invulnerability.
-     */
-    public static void shutdown() {
-        invulnerablePlayers.forEach(player -> player.setInvulnerable(false));
-        invulnerablePlayers.clear();
-    }
+    private static final ThreadLocal<Integer> scriptDamageDepth = ThreadLocal.withInitial(() -> 0);
 
     /**
      * Executes the script action based on the provided EliteEntity, target, and event.
@@ -444,34 +438,64 @@ public class ScriptAction {
             }
         }
     }
+    private static final int MAX_SCRIPT_DAMAGE_DEPTH = 3; // Allow up to 3 levels of script damage
 
     /**
-     * Damages the target entities by a specified amount.
-     *
-     * @param scriptActionData The data for the script action.
+     * Resets the state of all invulnerable players by removing their invulnerability.
+     */
+    public static void shutdown() {
+        invulnerablePlayers.forEach(player -> player.setInvulnerable(false));
+        invulnerablePlayers.clear();
+        scriptDamageDepth.remove();
+    }
+
+    /**
+     * Damages the target entities with depth limiting to prevent infinite recursion.
      */
     private void runDamage(ScriptActionData scriptActionData) {
+        // Check current recursion depth
+        int currentDepth = scriptDamageDepth.get();
+        if (currentDepth >= MAX_SCRIPT_DAMAGE_DEPTH) {
+            Logger.warn("Maximum script damage depth (" + MAX_SCRIPT_DAMAGE_DEPTH +
+                    ") reached in script '" + blueprint.getScriptName() +
+                    "' in file '" + blueprint.getScriptFilename() +
+                    "'. Preventing infinite recursion.");
+            return;
+        }
+
         double damageAmount = blueprint.getAmount().getValue();
         double multiplier = blueprint.getMultiplier().getValue();
 
-        getTargets(scriptActionData).forEach(target -> {
-            if (target instanceof Player) {
-                PlayerDamagedByEliteMobEvent.PlayerDamagedByEliteMobEventFilter.setSpecialMultiplier(multiplier);
+        try {
+            // Increment depth before processing
+            scriptDamageDepth.set(currentDepth + 1);
 
-                if (scriptActionData.getEliteEntity().getLivingEntity() != null) {
-                    target.damage(damageAmount, scriptActionData.getEliteEntity().getLivingEntity());
-                } else {
-                    target.damage(damageAmount);
-                }
+            getTargets(scriptActionData).forEach(target -> {
+                if (target instanceof Player) {
+                    PlayerDamagedByEliteMobEvent.PlayerDamagedByEliteMobEventFilter.setSpecialMultiplier(multiplier);
 
-            } else {
-                if (scriptActionData.getEliteEntity().getLivingEntity() != null) {
-                    target.damage(damageAmount, scriptActionData.getEliteEntity().getLivingEntity());
+                    if (scriptActionData.getEliteEntity().getLivingEntity() != null) {
+                        target.damage(damageAmount, scriptActionData.getEliteEntity().getLivingEntity());
+                    } else {
+                        target.damage(damageAmount);
+                    }
                 } else {
-                    target.damage(damageAmount);
+                    if (scriptActionData.getEliteEntity().getLivingEntity() != null) {
+                        target.damage(damageAmount, scriptActionData.getEliteEntity().getLivingEntity());
+                    } else {
+                        target.damage(damageAmount);
+                    }
                 }
+            });
+        } finally {
+            // Always restore the previous depth
+            scriptDamageDepth.set(currentDepth);
+
+            // Clean up ThreadLocal if we're back to base level
+            if (currentDepth == 0) {
+                scriptDamageDepth.remove();
             }
-        });
+        }
     }
 
     /**

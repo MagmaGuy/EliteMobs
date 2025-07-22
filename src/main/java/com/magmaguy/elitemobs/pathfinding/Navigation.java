@@ -8,7 +8,7 @@ import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
-import com.magmaguy.elitemobs.utils.AttributeManager;
+import com.magmaguy.magmacore.util.AttributeManager;
 import org.bukkit.Location;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.EntityType;
@@ -86,8 +86,8 @@ public class Navigation implements Listener {
             public void run() {
                 if (counter >= finalDuration ||
                         !customBossEntity.exists() ||
-                        customBossEntity.getLivingEntity().getLocation().distanceSquared(destination) < Math.pow(1, 2)) {
-                    if (counter >= finalDuration && force) {
+                        customBossEntity.getLivingEntity() != null && customBossEntity.getLivingEntity().getLocation().distanceSquared(destination) < Math.pow(1, 2)) {
+                    if (customBossEntity.exists() && counter >= finalDuration && force) {
                         customBossEntity.getLivingEntity().teleport(destination);
                     }
                     cancel();

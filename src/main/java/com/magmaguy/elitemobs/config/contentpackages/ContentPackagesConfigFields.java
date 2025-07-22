@@ -411,6 +411,7 @@ public class ContentPackagesConfigFields extends CustomConfigFields {
         RAID,
         ADVENTURE,
         OTHER,
-        ARENA
+        ARENA,
+        REALM
     }
 }
