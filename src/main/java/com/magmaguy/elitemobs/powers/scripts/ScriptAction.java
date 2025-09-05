@@ -1038,6 +1038,16 @@ public class ScriptAction {
                     }
                 }
 
+                if (blueprint.getDuration().getValue() != null && entity != null) {
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            if (entity != null && entity.isValid())
+                                entity.remove();
+                        }
+                    }.runTaskLater(MetadataHandler.PLUGIN, blueprint.getDuration().getValue());
+                }
+
                 if (!blueprint.getLandingScripts().isEmpty()) {
                     FallingEntityDataPair dataPair = new FallingEntityDataPair(this, scriptActionData);
                     new BukkitRunnable() {
