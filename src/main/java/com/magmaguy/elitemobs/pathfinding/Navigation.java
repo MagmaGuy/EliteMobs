@@ -86,6 +86,8 @@ public class Navigation implements Listener {
             public void run() {
                 if (counter >= finalDuration ||
                         !customBossEntity.exists() ||
+                        customBossEntity.getLivingEntity() == null ||
+                        !customBossEntity.getLivingEntity().getWorld().equals(destination.getWorld()) ||
                         customBossEntity.getLivingEntity() != null && customBossEntity.getLivingEntity().getLocation().distanceSquared(destination) < Math.pow(1, 2)) {
                     if (customBossEntity.exists() && counter >= finalDuration && force) {
                         customBossEntity.getLivingEntity().teleport(destination);

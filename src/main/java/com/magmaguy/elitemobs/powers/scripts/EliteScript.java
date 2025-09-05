@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import com.magmaguy.elitemobs.powers.scripts.caching.EliteScriptBlueprint;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -19,18 +20,22 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class EliteScript extends ElitePower implements Cloneable {
-    protected final ScriptActions scriptActions;
+    protected ScriptActions scriptActions;
     //Parse from power file
-    private final ScriptEvents scriptEvents;
+    private ScriptEvents scriptEvents;
     @Getter
-    private final ScriptZone scriptZone;
-    private final ScriptCooldowns scriptCooldowns;
-    private final ScriptConditions scriptConditions;
+    private ScriptZone scriptZone;
+    private ScriptCooldowns scriptCooldowns;
+    private ScriptConditions scriptConditions;
     @Getter
     protected Map<String, EliteScript> eliteScriptMap;
+    @Setter
+    //Set by halt action
+    private boolean halt = false;
 
     public EliteScript(EliteScriptBlueprint scriptBlueprint, Map<String, EliteScript> eliteScriptMap, EliteEntity eliteEntity) {
         super(scriptBlueprint.getCustomConfigFields());
+        if (halt) return;
         this.eliteScriptMap = eliteScriptMap;
         this.scriptEvents = new ScriptEvents(scriptBlueprint.getScriptEventsBlueprint());
         this.scriptConditions = new ScriptConditions(scriptBlueprint.getScriptConditionsBlueprint(), this, false);

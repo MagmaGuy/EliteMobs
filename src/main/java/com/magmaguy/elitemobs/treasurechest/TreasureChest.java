@@ -147,10 +147,27 @@ public class TreasureChest implements PersistentObject {
                 blacklistedPlayersInstance.add(player.getUniqueId());
             } else if (customTreasureChestConfigFields.getRestockTimers() != null) {
                 customTreasureChestConfigFields.getRestockTimers().add(cooldownStringConstructor(player));
+
+                // Save the updated restockTimers to the config file
+                customTreasureChestConfigFields.getFileConfiguration().set("restockTimers", customTreasureChestConfigFields.getRestockTimers());
+                try {
+                    customTreasureChestConfigFields.getFileConfiguration().save(customTreasureChestConfigFields.getFile());
+                } catch (Exception ex) {
+                    Logger.warn("Failed to save restock timers for treasure chest " + customTreasureChestConfigFields.getFilename());
+                }
+
                 new BukkitRunnable() {
                     @Override
                     public void run() {
                         customTreasureChestConfigFields.getRestockTimers().removeIf(restockTime -> restockTime.split(":")[0].equals(player.getUniqueId().toString()));
+
+                        // Save the updated restockTimers to the config file after removal
+                        customTreasureChestConfigFields.getFileConfiguration().set("restockTimers", customTreasureChestConfigFields.getRestockTimers());
+                        try {
+                            customTreasureChestConfigFields.getFileConfiguration().save(customTreasureChestConfigFields.getFile());
+                        } catch (Exception ex) {
+                            Logger.warn("Failed to save restock timers for treasure chest " + customTreasureChestConfigFields.getFilename());
+                        }
                     }
                 }.runTaskLater(MetadataHandler.PLUGIN, 20L * 60 * customTreasureChestConfigFields.getRestockTimer());
             }
