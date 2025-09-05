@@ -207,8 +207,12 @@ public class ScriptTargets {
             case INHERIT_SCRIPT_TARGET:
                 return scriptActionData.getInheritedScriptActionData().getScriptTargets().getAnonymousTargets(
                         true, scriptActionData.getInheritedScriptActionData());
-            default:
-                Logger.warn("Failed to get target type in script " + getTargetBlueprint().getScriptName() + " !");
+            case ACTION_TARGET:
+                //This is an edge case of action target, if there were no nearby targets it can't assume a value so it passes action target as a fallback. That just means there aren't valid targets.
+                return new ArrayList<>();
+            default: {
+                Logger.warn("Failed to get target type in script " + getTargetBlueprint().getScriptName() + " ! Type was: " + getTargetBlueprint().getTargetType());
+            }
         }
 
         if (targetBlueprint.getCoverage().getValue() < 1)
