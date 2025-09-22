@@ -254,7 +254,7 @@ public class VersionChecker {
 
                     if (!pluginIsUpToDate)
                         event.getPlayer().sendMessage(ChatColorConverter.convert("&cYour version of EliteMobs is outdated." +
-                                " &aYou can download the latest version from &3&n&ohttps://www.spigotmc.org/resources/%E2%9A%94elitemobs%E2%9A%94.40090/"));
+                                " &aYou can download the latest version from &3&n&ohttps://nightbreak.io/plugin/elitemobs/"));
 
                     if (!outdatedPackages.isEmpty()) {
                         Logger.sendSimpleMessage(event.getPlayer(), "&8&m-----------------------------------------------------");

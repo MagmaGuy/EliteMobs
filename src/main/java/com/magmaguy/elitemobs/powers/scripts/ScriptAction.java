@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.powers.scripts;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteDamageEvent;
 import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
+import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.collateralminecraftchanges.LightningSpawnBypass;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
@@ -234,6 +235,7 @@ public class ScriptAction {
             case SCALE -> runScale(scriptActionData);
             case SET_FACING -> setFacing(scriptActionData);
             case HEAL -> runHeal(scriptActionData);
+            case REMOVE_ELITE -> runRemoveElite(scriptActionData);
             default -> Logger.warn("Unknown action type '"
                     + blueprint.getActionType() + "' in script '"
                     + blueprint.getScriptName() + "' for file '" + blueprint.getScriptFilename() + "'");
@@ -1147,6 +1149,15 @@ public class ScriptAction {
                 double maxHp = AttributeManager.getAttributeBaseValue(target, "generic_max_health");
                 double newHp  = Math.min(target.getHealth() + healAmount, maxHp);
                 target.setHealth(newHp);
+            }
+        });
+    }
+
+    private void runRemoveElite(ScriptActionData scriptActionData) {
+        getTargets(scriptActionData).forEach(target -> {
+            EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(target);
+            if (eliteEntity != null) {
+                eliteEntity.remove(RemovalReason.OTHER);
             }
         });
     }
