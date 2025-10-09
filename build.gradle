@@ -32,7 +32,7 @@ processResources {
 }
 
 group 'com.magmaguy'
-version '9.5.5'
+version '9.5.6'
 
 repositories {
     maven {
@@ -86,7 +86,7 @@ repositories {
 
 dependencies {
     //Spigot API
-    compileOnly "org.spigotmc:spigot-api:1.21.4-R0.1-SNAPSHOT"
+    compileOnly "org.spigotmc:spigot-api:1.21.10-R0.1-SNAPSHOT"
     //WorldGuard API
     compileOnly group: 'com.sk89q.worldguard', name: 'worldguard-bukkit', version: '7.0.7'
     //Vault
@@ -117,9 +117,9 @@ dependencies {
     compileOnly group: 'io.lumine', name: 'Mythic-Dist', version: '5.3.5'
 
     ///Shaded in
-    implementation group: 'org.bstats', name: 'bstats-bukkit', version: '2.2.1'
+    implementation group: 'org.bstats', name: 'bstats-bukkit', version: '3.0.2'
     implementation group: 'commons-io', name: 'commons-io', version: '2.7'
-    implementation group: 'com.magmaguy', name: 'EasyMinecraftGoals-dist', version: '1.19.11'
+    implementation group: 'com.magmaguy', name: 'EasyMinecraftGoals-dist', version: '1.19.13'
     implementation (group: 'com.magmaguy', name: 'MagmaCore', version: '1.18-SNAPSHOT'){
         changing = true
     }

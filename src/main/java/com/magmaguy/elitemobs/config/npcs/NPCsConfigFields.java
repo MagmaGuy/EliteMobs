@@ -4,12 +4,14 @@ import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.npcs.NPCInteractions;
 import com.magmaguy.magmacore.util.Logger;
+import com.magmaguy.magmacore.util.VersionChecker;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.entity.Villager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class NPCsConfigFields extends CustomConfigFields {
 
@@ -125,11 +127,21 @@ public class NPCsConfigFields extends CustomConfigFields {
         this.name = translatable(filename, "name", processString("name", name, "", true));
         this.role = translatable(filename, "role", processString("role", role, "", true));
         try {
-            this.profession = Villager.Profession.valueOf(processString("profession", profession.toString(), Villager.Profession.NITWIT.toString(), false));
+            if (VersionChecker.serverVersionOlderThan(21, 4))
+                this.profession = Villager.Profession.valueOf(processString("profession", profession.toString(), Villager.Profession.NITWIT.toString(), false));
+            else {
+                for (Villager.Profession value : Villager.Profession.values()) {
+                    if (value.getKey().getKey().toLowerCase(Locale.ROOT).equals(profession.toString().toLowerCase(Locale.ROOT))) {
+                        this.profession = value;
+                        break;
+                    }
+                }
+            }
         } catch (IncompatibleClassChangeError e) {
             //The early 1.21 API still used the profession enum, which was later dropped. This works for later releases, but not the early ones.
-        } catch (Exception e){
+        } catch (Exception e) {
             Logger.warn("NPC in configuration file " + filename + " has an invalid profession!");
+            e.printStackTrace();
         }
         this.spawnLocation = processString("spawnLocation", spawnLocation, null, true);
         this.locations = processStringList("spawnLocations", locations, null, false);
