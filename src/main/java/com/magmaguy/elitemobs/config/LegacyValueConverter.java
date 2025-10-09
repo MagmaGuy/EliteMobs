@@ -124,6 +124,8 @@ public class LegacyValueConverter {
     public static String parseDeserializedBlocks(String originalDeserializedBlock) {
         if (originalDeserializedBlock.endsWith("grass"))
             return originalDeserializedBlock.replace("grass", "grass_block[snowy=false]");
+        if (originalDeserializedBlock.contains("minecraft:chain"))
+            return originalDeserializedBlock.replace("minecraft:chain", "iron_chain");
         return originalDeserializedBlock;
     }
 }

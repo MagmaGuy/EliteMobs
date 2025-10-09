@@ -1,8 +1,8 @@
 name: EliteMobs
-version: 9.5.5
+version: 9.5.6
 author: MagmaGuy
 main: com.magmaguy.elitemobs.EliteMobs
-api-version: 1.14
+api-version: 1.21
 softdepend:
 - Multiverse-Core
 - WorldGuard
