@@ -39,7 +39,7 @@ public class EnderDragonPotionBombardment extends Bombardment {
                             new Vector(ThreadLocalRandom.current().nextInt(-1, 1),
                                     1,
                                     ThreadLocalRandom.current().nextInt(-1, 1)))
-                    , EntityType.POTION);
+                    , EntityType.SPLASH_POTION);
 
             thrownPotion.setItem(itemStack);
 
