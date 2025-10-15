@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.UUID;
 
 public class QuestReward implements Serializable {
@@ -47,6 +48,10 @@ public class QuestReward implements Serializable {
 
     public void doRewards() {
         customLootTable.questDrop(Bukkit.getPlayer(playerUUID), rewardLevel);
+    }
+
+    public List<ItemStack> previewRewards() {
+        return customLootTable.previewQuestDrop(Bukkit.getPlayer(playerUUID), rewardLevel);
     }
 
 }

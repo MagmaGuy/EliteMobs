@@ -138,4 +138,9 @@ public class VanillaCustomLootEntry extends CustomLootEntry implements Serializa
         if (name != null)
             player.sendMessage(ItemSettingsConfig.getDirectDropMinecraftLootMessage().replace("$itemName", getAmount() + "x " + name));
     }
+
+    @Override
+    public ItemStack previewDrop(int itemTier, Player player) {
+        return generateItemStack();
+    }
 }

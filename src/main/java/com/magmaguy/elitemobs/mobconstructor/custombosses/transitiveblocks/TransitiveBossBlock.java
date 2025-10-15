@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.mobconstructor.custombosses.transitiveblocks;
 import com.magmaguy.elitemobs.api.EliteMobRemoveEvent;
 import com.magmaguy.elitemobs.api.EliteMobSpawnEvent;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
-import com.magmaguy.elitemobs.utils.ChunkLocationChecker;
+import com.magmaguy.magmacore.util.ChunkLocationChecker;
 import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -17,7 +17,7 @@ public class TransitiveBossBlock implements Listener {
 
     private static void setBlockData(RegionalBossEntity regionalBossEntity, TransitiveBlock transitiveBlock, Location spawnLocation) {
         Location location;
-        if (!ChunkLocationChecker.locationIsLoaded(spawnLocation)) return;
+        if (!ChunkLocationChecker.chunkAtLocationIsLoaded(spawnLocation)) return;
         double rotation = 0;
 
         BlockData blockData = transitiveBlock.getBlockData().clone();

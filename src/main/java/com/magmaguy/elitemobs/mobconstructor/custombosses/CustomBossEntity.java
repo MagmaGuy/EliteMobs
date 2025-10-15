@@ -23,11 +23,11 @@ import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import com.magmaguy.elitemobs.thirdparty.custommodels.CustomModel;
 import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
 import com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity;
-import com.magmaguy.elitemobs.utils.ChunkLocationChecker;
 import com.magmaguy.elitemobs.utils.CommandRunner;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.magmacore.util.AttributeManager;
 import com.magmaguy.magmacore.util.ChatColorConverter;
+import com.magmaguy.magmacore.util.ChunkLocationChecker;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import lombok.Setter;
@@ -251,7 +251,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
             getDynamicLevel(spawnLocation);
         }
 
-        if (ChunkLocationChecker.locationIsLoaded(spawnLocation) || isMount) {
+        if (ChunkLocationChecker.chunkAtLocationIsLoaded(spawnLocation) || isMount) {
             super.livingEntity = new CustomBossMegaConsumer(this).spawn();
             setNormalizedHealth();
             if (super.livingEntity == null)
@@ -286,7 +286,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
             Logger.warn("- The region was protected by a plugin (most likely)");
             Logger.warn("- The spawn was interfered with by some incompatible third party plugin");
             Logger.warn("Debug data: ");
-            Logger.warn("Chunk is loaded: " + ChunkLocationChecker.locationIsLoaded(spawnLocation));
+            Logger.warn("Chunk is loaded: " + ChunkLocationChecker.chunkAtLocationIsLoaded(spawnLocation));
             Logger.warn("Attempted spawn location: " + spawnLocation.toString(), true);
             return;
         }

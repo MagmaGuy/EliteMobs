@@ -123,6 +123,13 @@ public class CustomLootTable implements Serializable {
             if (customLootEntry.willDrop(player)) customLootEntry.directDrop(questRewardLevel, player);
     }
 
+    public List<ItemStack> previewQuestDrop(Player player, int questRewardLevel) {
+        List<ItemStack> items = new ArrayList<>();
+        for (CustomLootEntry customLootEntry : entries)
+            if (customLootEntry.willDrop(player)) items.add(customLootEntry.previewDrop(questRewardLevel, player));
+        return items;
+    }
+
     public void arenaReward(Player player, int wave) {
         if (waveRewards.get(wave) == null) return;
         waveRewards.get(wave).forEach(reward -> {

@@ -33,4 +33,9 @@ public class ItemStackCustomLootEntry extends CustomLootEntry implements Seriali
         for (int i = 0; i < getAmount(); i++)
             player.getInventory().addItem(itemStack);
     }
+
+    @Override
+    public ItemStack previewDrop(int itemTier, Player player) {
+        return generateItemStack();
+    }
 }

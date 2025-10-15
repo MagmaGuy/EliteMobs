@@ -4,6 +4,7 @@ import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.io.Serializable;
 import java.util.List;
@@ -80,5 +81,15 @@ public class CommandLootTable extends CustomLootEntry implements Serializable {
         if (ThreadLocalRandom.current().nextDouble() < getChance()) return;
         for (int i = 0; i < getAmount(); i++)
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", player.getName()));
+    }
+
+    @Override
+    public ItemStack previewDrop(int itemTier, Player player) {
+        ItemStack paperItem = new ItemStack(org.bukkit.Material.PAPER);
+        org.bukkit.inventory.meta.ItemMeta paperMeta = paperItem.getItemMeta();
+        paperMeta.setDisplayName("Command");
+        paperMeta.setLore(List.of("Command: " + command, "Chance: " + getChance(), "Times: " + getAmount()));
+        paperItem.setItemMeta(paperMeta);
+        return paperItem;
     }
 }
