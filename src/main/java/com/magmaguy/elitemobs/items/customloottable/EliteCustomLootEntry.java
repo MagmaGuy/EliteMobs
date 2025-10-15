@@ -236,4 +236,9 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
             }
         }
     }
+
+    @Override
+    public ItemStack previewDrop(int itemTier, Player player) {
+        return generateItemStack(itemTier, player, null);
+    }
 }

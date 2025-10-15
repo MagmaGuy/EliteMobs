@@ -5,8 +5,8 @@ import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.WormholesConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldowns;
-import com.magmaguy.elitemobs.utils.ChunkLocationChecker;
 import com.magmaguy.magmacore.util.ChatColorConverter;
+import com.magmaguy.magmacore.util.ChunkLocationChecker;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
@@ -263,27 +263,27 @@ public class WormholeManager {
             value.tick();
         }
 
-        // Iterate through all wormhole entries
         for (WormholeEntry wormholeEntry : WormholeEntry.getWormholeEntries()) {
             // Skip if location is null or chunk is not loaded
             if (wormholeEntry.getLocation() == null ||
-                    !ChunkLocationChecker.locationIsLoaded(wormholeEntry.getLocation())) {
+                    !ChunkLocationChecker.chunkAtLocationIsLoaded(wormholeEntry.getLocation())) {
                 continue;
             }
 
-            // Initialize text display if needed
-            if ((wormholeEntry.getText() == null || !wormholeEntry.getText().isValid())
-                    && (wormholeEntry.getLocation() != null && wormholeEntry.getLocation().getWorld() != null))
-                wormholeEntry.initializeTextDisplay();
-
-            // Get nearby players for this wormhole
+            // Get nearby players FIRST - skip everything if no one is around
             HashSet<Player> nearbyPlayers = getNearbyPlayers(wormholeEntry);
             if (nearbyPlayers.isEmpty()) continue;
+
+            // Only initialize text display if players are nearby AND it's needed
+            // Consider adding a counter to do this less frequently (every 20 ticks instead of 5)
+            if ((wormholeEntry.getText() == null || !wormholeEntry.getText().isValid())
+                    && wormholeEntry.getLocation().getWorld() != null) {
+                wormholeEntry.initializeTextDisplay();
+            }
 
             // Skip visual effects if particles are disabled
             if (!WormholesConfig.isNoParticlesMode() &&
                     wormholeEntry.getWormhole().getWormholeConfigFields().getStyle() != Wormhole.WormholeStyle.NONE) {
-                // Display visual effects to nearby players
                 displayVisualEffects(wormholeEntry, nearbyPlayers);
             }
 

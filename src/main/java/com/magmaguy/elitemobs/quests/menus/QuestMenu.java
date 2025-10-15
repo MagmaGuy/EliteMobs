@@ -16,8 +16,10 @@ import com.magmaguy.elitemobs.quests.objectives.KillObjective;
 import com.magmaguy.elitemobs.quests.objectives.Objective;
 import com.magmaguy.elitemobs.thirdparty.geyser.GeyserDetector;
 import com.magmaguy.elitemobs.utils.BookMaker;
+import com.magmaguy.elitemobs.utils.DialogMaker;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.SpigotMessage;
+import com.magmaguy.magmacore.util.VersionChecker;
 import lombok.Getter;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.Player;
@@ -44,9 +46,15 @@ public class QuestMenu {
     public static void generateQuestMenu(List<? extends Quest> quests, Player player, NPCEntity npcEntity) {
         if (!PlayerData.getUseBookMenus(player.getUniqueId()) || GeyserDetector.bedrockPlayer(player) || DefaultConfig.isOnlyUseBedrockMenus()) {
             generateInventoryQuestEntries(quests, player, npcEntity);
-        } else {
+        } else if (VersionChecker.serverVersionOlderThan(21,6)) {
             generateBookQuestEntries(quests, player, npcEntity);
+        } else {
+            generateDialogMenu(quests, player, npcEntity);
         }
+    }
+
+    public static void generateDialogMenu(List<? extends Quest> quests, Player player, NPCEntity npcEntity) {
+        DialogMaker.sendQuestMessage(quests, player, npcEntity);
     }
 
     public static void generateBookQuestEntries(List<? extends Quest> quests, Player player, NPCEntity npcEntity) {
