@@ -5,10 +5,10 @@ import com.magmaguy.elitemobs.dungeons.EMPackage;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.PersistentObject;
 import com.magmaguy.elitemobs.mobconstructor.PersistentObjectHandler;
-import com.magmaguy.elitemobs.utils.ChunkLocationChecker;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import com.magmaguy.magmacore.util.ChatColorConverter;
+import com.magmaguy.magmacore.util.ChunkLocationChecker;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import lombok.Setter;
@@ -60,7 +60,7 @@ public class WormholeEntry implements PersistentObject {
 
         persistentObjectHandler = new PersistentObjectHandler(this);
         wormholeEntries.add(this);
-        if (ChunkLocationChecker.locationIsLoaded(location)) chunkLoad();
+        if (ChunkLocationChecker.chunkAtLocationIsLoaded(location)) chunkLoad();
     }
 
     private Location getDungeonLocation() {
@@ -131,7 +131,7 @@ public class WormholeEntry implements PersistentObject {
         // Only initialize if we have a valid world & chunk loaded
         if (location != null
                 && location.getWorld() != null
-                && ChunkLocationChecker.locationIsLoaded(location)) {
+                && ChunkLocationChecker.chunkAtLocationIsLoaded(location)) {
             chunkLoad();
         }
     }
@@ -172,21 +172,42 @@ public class WormholeEntry implements PersistentObject {
     }
 
     public void initializeTextDisplay() {
+        // Add guard to prevent multiple spawn attempts
         if (text != null && text.isValid() && !text.isEmpty()) return;
         if (armorStandText == null) return;
         if (location == null || location.getWorld() == null) return;
-        text = location.getWorld().spawn(location.clone().add(new Vector(0, 1.2, 0).multiply(wormhole.getWormholeConfigFields().getSizeMultiplier())), ArmorStand.class, new Consumer<ArmorStand>() {
-            @Override
-            public void accept(ArmorStand armorStand) {
-                armorStand.setCustomName(ChatColorConverter.convert(armorStandText));
-                armorStand.setCustomNameVisible(true);
-                armorStand.setMarker(true);
-                armorStand.setVisible(false);
-                armorStand.setGravity(false);
-                armorStand.setPersistent(false);
-                armorStand.setRemoveWhenFarAway(false);
+
+        // CRITICAL: Verify chunk is actually loaded before spawning
+        if (!location.getChunk().isLoaded()) {
+            return; // Silently fail if chunk isn't loaded - will retry later
+        }
+
+        // Remove old text entity if it exists but is invalid
+        if (text != null) {
+            try {
+                text.remove();
+            } catch (Exception e) {
+                // Ignore errors from removing invalid entities
             }
-        });
+            text = null;
+        }
+
+        text = location.getWorld().spawn(
+                location.clone().add(new Vector(0, 1.2, 0).multiply(wormhole.getWormholeConfigFields().getSizeMultiplier())),
+                ArmorStand.class,
+                new Consumer<ArmorStand>() {
+                    @Override
+                    public void accept(ArmorStand armorStand) {
+                        armorStand.setCustomName(ChatColorConverter.convert(armorStandText));
+                        armorStand.setCustomNameVisible(true);
+                        armorStand.setMarker(true);
+                        armorStand.setVisible(false);
+                        armorStand.setGravity(false);
+                        armorStand.setPersistent(false);
+                        armorStand.setRemoveWhenFarAway(false);
+                    }
+                }
+        );
         EntityTracker.registerVisualEffects(text);
     }
 }

@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.io.Serializable;
 import java.util.concurrent.ThreadLocalRandom;
@@ -55,5 +56,11 @@ public class CustomLootEntry implements Serializable {
     //used specifically so loot can be attributed to the right source
     public void directDrop(int itemTier, Player player, EliteEntity eliteEntity) {
         //meant to be overriden by the classes that extend it
+    }
+
+    //Used to preview rewards for quests
+    public ItemStack previewDrop(int itemTier, Player player){
+        //meant to be overriden by the classes that extend it
+        return null;
     }
 }

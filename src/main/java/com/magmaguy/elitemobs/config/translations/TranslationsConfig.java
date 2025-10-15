@@ -26,7 +26,7 @@ public class TranslationsConfig extends CustomConfig {
      * This saves a translatable element to the configuration files.
      */
     public static String add(String filename, String key, String value) {
-        if (DefaultConfig.getLanguage().equals("english"))
+        if (DefaultConfig.getLanguage().equals("english") || DefaultConfig.getLanguage().equals("english.yml"))
             return value;
         TranslationsConfigFields selectedLanguage = translationConfigs.get(DefaultConfig.getLanguage());
         if (selectedLanguage == null) {
@@ -38,7 +38,7 @@ public class TranslationsConfig extends CustomConfig {
     }
 
     public static List<String> add(String filename, String key, List<String> value) {
-        if (DefaultConfig.getLanguage().equals("english"))
+        if (DefaultConfig.getLanguage().equals("english") || DefaultConfig.getLanguage().equals("english.yml"))
             return value;
         TranslationsConfigFields selectedLanguage = translationConfigs.get(DefaultConfig.getLanguage());
         if (selectedLanguage == null) {

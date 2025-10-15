@@ -16,11 +16,11 @@ import com.magmaguy.elitemobs.npcs.chatter.NPCChatBubble;
 import com.magmaguy.elitemobs.thirdparty.custommodels.CustomModel;
 import com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser;
-import com.magmaguy.elitemobs.utils.ChunkLocationChecker;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.NonSolidBlockTypes;
 import com.magmaguy.magmacore.util.AttributeManager;
 import com.magmaguy.magmacore.util.ChatColorConverter;
+import com.magmaguy.magmacore.util.ChunkLocationChecker;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -165,7 +165,7 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
     private void spawn() {
         if (spawnLocation == null ||
                 spawnLocation.getWorld() == null ||
-                !ChunkLocationChecker.locationIsLoaded(spawnLocation)) return;
+                !ChunkLocationChecker.chunkAtLocationIsLoaded(spawnLocation)) return;
         if (villager != null && villager.isValid()) return;
         if (npCsConfigFields.getInteractionType().equals(NPCInteractions.NPCInteractionType.SCROLL_APPLIER) &&
                 !ItemSettingsConfig.isUseEliteItemScrolls()) return;

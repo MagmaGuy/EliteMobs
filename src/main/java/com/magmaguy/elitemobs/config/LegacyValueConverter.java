@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.config;
 
+import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import org.bukkit.Particle;
 
 import java.util.Locale;
@@ -124,7 +125,7 @@ public class LegacyValueConverter {
     public static String parseDeserializedBlocks(String originalDeserializedBlock) {
         if (originalDeserializedBlock.endsWith("grass"))
             return originalDeserializedBlock.replace("grass", "grass_block[snowy=false]");
-        if (originalDeserializedBlock.contains("minecraft:chain"))
+        if (!VersionChecker.serverVersionOlderThan(21,9) && originalDeserializedBlock.contains("minecraft:chain"))
             return originalDeserializedBlock.replace("minecraft:chain", "iron_chain");
         return originalDeserializedBlock;
     }

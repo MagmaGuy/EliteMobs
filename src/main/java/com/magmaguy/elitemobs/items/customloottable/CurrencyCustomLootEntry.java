@@ -10,6 +10,7 @@ import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.io.Serializable;
 import java.util.List;
@@ -104,5 +105,15 @@ public class CurrencyCustomLootEntry extends CustomLootEntry implements Serializ
         player.sendMessage(ItemSettingsConfig.getDirectDropCoinMessage()
                 .replace("$amount", currencyAmount + "")
                 .replace("$currencyName", EconomySettingsConfig.getCurrencyName()));
+    }
+
+    @Override
+    public ItemStack previewDrop(int itemTier, Player player) {
+        ItemStack paperItem = new ItemStack(org.bukkit.Material.PAPER);
+        org.bukkit.inventory.meta.ItemMeta paperMeta = paperItem.getItemMeta();
+        paperMeta.setDisplayName("Currency reward");
+        paperMeta.setLore(List.of("Amount: " + currencyAmount, "Chance: " + getChance()));
+        paperItem.setItemMeta(paperMeta);
+        return paperItem;
     }
 }
