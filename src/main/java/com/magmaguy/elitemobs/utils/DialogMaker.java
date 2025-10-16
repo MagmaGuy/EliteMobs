@@ -36,7 +36,7 @@ public class DialogMaker {
                 .title(processText(Title))
                 .addBody(DialogManager.PlainMessageBody.of(processText(message)))
                 .build();
-        player.performCommand("dialog show @s " + dialogJson.toString());
+        player.performCommand("minecraft:dialog show @s " + dialogJson.toString());
     }
 
     public static void sendQuestMessage(List<? extends Quest> quests, Player player, NPCEntity npcEntity) {
@@ -47,7 +47,7 @@ public class DialogMaker {
     private static void showQuestDialog(List<? extends Quest> quests, int questIndex, Player player, NPCEntity npcEntity) {
         DialogManager.MultiActionDialogBuilder builder = buildQuestDialogBuilder(quests, questIndex, player, npcEntity);
         JsonObject dialogJson = builder.build();
-        player.performCommand("dialog show @s " + dialogJson.toString());
+        player.performCommand("minecraft:dialog show @s " + dialogJson.toString());
     }
 
     private static DialogManager.MultiActionDialogBuilder buildQuestDialogBuilder(
