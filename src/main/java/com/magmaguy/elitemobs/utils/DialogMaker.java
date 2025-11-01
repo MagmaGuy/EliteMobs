@@ -31,12 +31,12 @@ public class DialogMaker {
     }
 
     public static void sendDialogMessage(Player player, String Title, String message) {
-        JsonObject dialogJson = new DialogManager
+        DialogManager.NoticeDialogBuilder builder = new DialogManager
                 .NoticeDialogBuilder()
                 .title(processText(Title))
-                .addBody(DialogManager.PlainMessageBody.of(processText(message)))
-                .build();
-        player.performCommand("dialog show @s " + dialogJson.toString());
+                .addBody(DialogManager.PlainMessageBody.of(processText(message)));
+
+        DialogManager.sendDialog(player, builder);
     }
 
     public static void sendQuestMessage(List<? extends Quest> quests, Player player, NPCEntity npcEntity) {
@@ -46,8 +46,7 @@ public class DialogMaker {
 
     private static void showQuestDialog(List<? extends Quest> quests, int questIndex, Player player, NPCEntity npcEntity) {
         DialogManager.MultiActionDialogBuilder builder = buildQuestDialogBuilder(quests, questIndex, player, npcEntity);
-        JsonObject dialogJson = builder.build();
-        player.performCommand("dialog show @s " + dialogJson.toString());
+        DialogManager.sendDialog(player, builder);
     }
 
     private static DialogManager.MultiActionDialogBuilder buildQuestDialogBuilder(
