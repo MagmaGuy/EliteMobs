@@ -87,6 +87,8 @@ public class MobCombatSettingsConfig extends ConfigurationFile {
     private static double resistanceDamageMultiplier;
     @Getter
     private static double blockingDamageReduction;
+    @Getter
+    private static boolean silenceAllDeathMessages;
     private static MobCombatSettingsConfig instance;
 
     public MobCombatSettingsConfig() {
@@ -226,5 +228,8 @@ public class MobCombatSettingsConfig extends ConfigurationFile {
         blockingDamageReduction = ConfigurationEngine.setDouble(
                 List.of("Sets the multiplier applied to damage reduction when a player is holding up a shield for melee attacks (powers excluded)."),
                 fileConfiguration, "blockingDamageReduction", 0.8);
+        silenceAllDeathMessages = ConfigurationEngine.setBoolean(
+                List.of("Sets if all death messages will be silenced. This is not recommended, as it might hide some lore in dungeons."),
+                fileConfiguration, "silenceAllDeathMessages", false);
     }
 }

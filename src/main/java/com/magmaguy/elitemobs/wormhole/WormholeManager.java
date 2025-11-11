@@ -11,14 +11,12 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.util.Vector;
 
 import java.util.*;
 
@@ -35,9 +33,9 @@ public class WormholeManager {
     // Map to track players in cooldown with expiration timestamps
     @Getter
     private final Map<UUID, PlayerWormholeData> playerTeleportData = new HashMap<>();
-    // Maps to track rotation counters for each wormhole
-    private final Map<WormholeEntry, Integer> rotationCounters = new HashMap<>();
     private BukkitTask wormholeTask;
+    private static final int TELEPORT_CHECK_INTERVAL = 5; // Check teleports every 5 ticks
+    private int tickCounter = 0;
 
     // Constructor
     private WormholeManager() {
@@ -77,44 +75,6 @@ public class WormholeManager {
         }
 
         return nearbyPlayers;
-    }
-
-    /**
-     * Displays the visual effects for a wormhole
-     */
-    private void displayVisualEffects(WormholeEntry wormholeEntry, HashSet<Player> nearbyPlayers) {
-        // Get or initialize rotation counter for this wormhole
-        int rotationIndex = rotationCounters.getOrDefault(wormholeEntry, 0);
-
-        // Reset if we've gone through all rotations
-        if (rotationIndex >= wormholeEntry.getWormhole().getCachedRotations().size()) {
-            rotationIndex = 0;
-        }
-
-        // Apply reduced particles mode if enabled
-        if (WormholesConfig.isReducedParticlesMode() && rotationIndex % 2 != 0) {
-            rotationCounters.put(wormholeEntry, rotationIndex + 1);
-            return;
-        }
-
-        // Get the vectors for the current frame
-        if (wormholeEntry.getWormhole().getCachedRotations().isEmpty()) return;
-
-        // Spawn particles for each nearby player
-        for (Player player : nearbyPlayers) {
-            for (Vector vector : wormholeEntry.getWormhole().getCachedRotations().get(rotationIndex)) {
-                Location particleLocation = wormholeEntry.getLocation().clone().add(vector);
-                player.spawnParticle(
-                        Particle.DUST,
-                        particleLocation,
-                        1, 0, 0, 0, 0,
-                        new Particle.DustOptions(wormholeEntry.getWormhole().getParticleColor(), 1)
-                );
-            }
-        }
-
-        // Update the rotation counter
-        rotationCounters.put(wormholeEntry, rotationIndex + 1);
     }
 
     /**
@@ -229,16 +189,24 @@ public class WormholeManager {
     }
 
     /**
-     * Shuts down the manager
+     * Shuts down the manager and cleans up all resources
      */
     public void shutdown() {
+        // Cancel the task first to stop processing
         if (wormholeTask != null) {
             wormholeTask.cancel();
             wormholeTask = null;
         }
 
+        // Clean up all wormhole entries (clear lines and text displays)
+        for (WormholeEntry wormholeEntry : WormholeEntry.getWormholeEntries()) {
+            if (wormholeEntry != null) {
+                wormholeEntry.stop();
+            }
+        }
+
+        // Clear player teleport data
         playerTeleportData.clear();
-        rotationCounters.clear();
     }
 
     /**
@@ -251,44 +219,42 @@ public class WormholeManager {
                 // Process all wormholes in a single task
                 processWormholes();
             }
-        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 5);
+        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1); // Run every tick for smooth 20 TPS animation
     }
 
     /**
      * Main method to process all wormholes
      */
     private void processWormholes() {
+        tickCounter++;
+        
+        // Tick player cooldowns
         Collection<PlayerWormholeData> values = playerTeleportData.values();
         for (PlayerWormholeData value : values) {
             value.tick();
         }
 
+        // Tick all wormhole entries - they handle chunk loading internally
+        // Visual effects update every tick for smooth animation
         for (WormholeEntry wormholeEntry : WormholeEntry.getWormholeEntries()) {
-            // Skip if location is null or chunk is not loaded
-            if (wormholeEntry.getLocation() == null ||
+            // Call tick() - it checks chunk loading internally and does nothing if chunk isn't loaded
+            // This updates visual effects every tick
+            wormholeEntry.tick();
+            
+            // Only process teleports every 5 ticks (distance checks are expensive)
+            if (tickCounter % TELEPORT_CHECK_INTERVAL == 0) {
+                // Only process teleports if chunk is loaded (tick() already checked)
+                if (wormholeEntry.getLocation() == null || 
                     !ChunkLocationChecker.chunkAtLocationIsLoaded(wormholeEntry.getLocation())) {
-                continue;
+                    continue;
+                }
+                
+                // Get nearby players and check for teleports
+                HashSet<Player> nearbyPlayers = getNearbyPlayers(wormholeEntry);
+                if (!nearbyPlayers.isEmpty()) {
+                    checkForTeleports(wormholeEntry, nearbyPlayers);
+                }
             }
-
-            // Get nearby players FIRST - skip everything if no one is around
-            HashSet<Player> nearbyPlayers = getNearbyPlayers(wormholeEntry);
-            if (nearbyPlayers.isEmpty()) continue;
-
-            // Only initialize text display if players are nearby AND it's needed
-            // Consider adding a counter to do this less frequently (every 20 ticks instead of 5)
-            if ((wormholeEntry.getText() == null || !wormholeEntry.getText().isValid())
-                    && wormholeEntry.getLocation().getWorld() != null) {
-                wormholeEntry.initializeTextDisplay();
-            }
-
-            // Skip visual effects if particles are disabled
-            if (!WormholesConfig.isNoParticlesMode() &&
-                    wormholeEntry.getWormhole().getWormholeConfigFields().getStyle() != Wormhole.WormholeStyle.NONE) {
-                displayVisualEffects(wormholeEntry, nearbyPlayers);
-            }
-
-            // Check for players who should teleport
-            checkForTeleports(wormholeEntry, nearbyPlayers);
         }
     }
 

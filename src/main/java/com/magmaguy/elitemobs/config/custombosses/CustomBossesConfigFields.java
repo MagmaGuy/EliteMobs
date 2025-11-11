@@ -218,6 +218,8 @@ public class CustomBossesConfigFields extends CustomConfigFields {
     private BossType bossType = BossType.NORMAL;
     @Getter
     private double scale = 1D;
+    @Getter
+    private boolean silent;
 
     /**
      * Creates a new default pre-made Custom Boss. The boss is further customized through a builder pattern.
@@ -395,6 +397,7 @@ public class CustomBossesConfigFields extends CustomConfigFields {
         }
 
         this.scale = processDouble("scale", scale, 1, false);
+        this.silent = processBoolean("silent", silent, false, false);
     }
 
     public boolean isCustomModelExists() {

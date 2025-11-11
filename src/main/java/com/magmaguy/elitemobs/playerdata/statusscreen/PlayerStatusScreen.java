@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.thirdparty.geyser.GeyserDetector;
 import com.magmaguy.elitemobs.utils.BookMaker;
 import com.magmaguy.magmacore.util.ChatColorConverter;
+import com.magmaguy.magmacore.util.VersionChecker;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -33,9 +34,10 @@ public class PlayerStatusScreen implements Listener {
     public PlayerStatusScreen(Player player) {
         if (!PlayerData.getUseBookMenus(player.getUniqueId()) || GeyserDetector.bedrockPlayer(player) || DefaultConfig.isOnlyUseBedrockMenus()) {
             generateChestMenu(player, player);
-        } else {
+        } else if (VersionChecker.serverVersionOlderThan(21,6)){
             generateBook(player, player);
-        }
+        } else
+            PlayerStatusScreenDialog.showPlayerStatusDialog(player);
         if (!PlayerData.getDismissEMStatusScreenMessage(player.getUniqueId()) && !DefaultConfig.isOnlyUseBedrockMenus()) {
             player.sendMessage(DefaultConfig.getDismissEMMessage());
         }
