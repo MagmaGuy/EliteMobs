@@ -84,6 +84,7 @@ public class CommandHandler {
         emCommand.registerCommand(new UnbindCommand());
         emCommand.registerCommand(new MoneyCheckCommand());
         emCommand.registerCommand(new QuestAcceptCommand());
+        emCommand.registerCommand(new QuestCheckCommand());
         emCommand.registerCommand(new QuestTrackCommand());
         emCommand.registerCommand(new QuestLeaveCommand());
         emCommand.registerCommand(new RankCommand());
@@ -98,6 +99,7 @@ public class CommandHandler {
         emCommand.registerCommand(new TrackBossCommand());
         emCommand.registerCommand(new PayCommand());
         emCommand.registerCommand(new AdventurersGuildArgCommand());
+        emCommand.registerCommand(new NPCQuestList());
 
         emCommand.registerCommand(new EliteMobsCommand());
         emCommand.registerCommand(new HelpCommand());
