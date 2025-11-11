@@ -30,23 +30,30 @@ public class DialogMaker {
         return text.replace("§0", "§f").replace("&0", "&f");
     }
 
-    public static void sendDialogMessage(Player player, String Title, String message) {
-        DialogManager.NoticeDialogBuilder builder = new DialogManager
-                .NoticeDialogBuilder()
-                .title(processText(Title))
-                .addBody(DialogManager.PlainMessageBody.of(processText(message)));
-
-        DialogManager.sendDialog(player, builder);
-    }
-
     public static void sendQuestMessage(List<? extends Quest> quests, Player player, NPCEntity npcEntity) {
         if (quests.isEmpty()) return;
-        showQuestDialog(quests, 0, player, npcEntity);
+        showQuestListDialog(quests, player, npcEntity);
     }
 
-    private static void showQuestDialog(List<? extends Quest> quests, int questIndex, Player player, NPCEntity npcEntity) {
-        DialogManager.MultiActionDialogBuilder builder = buildQuestDialogBuilder(quests, questIndex, player, npcEntity);
-        DialogManager.sendDialog(player, builder);
+    private static void showQuestListDialog(List<? extends Quest> quests, Player player, NPCEntity npcEntity) {
+        DialogManager.DialogListDialogBuilder listBuilder = new DialogManager.DialogListDialogBuilder();
+
+        // Add title
+        listBuilder.title("Available Quests");
+
+        // Add each quest as a dialog reference
+        for (int i = 0; i < quests.size(); i++) {
+            DialogManager.MultiActionDialogBuilder questDialog =
+                    buildQuestDialogBuilder(quests, i, player, npcEntity);
+
+            listBuilder.addDialog(DialogManager.DialogReference.inline(questDialog));
+        }
+
+        // Optional: configure columns and button width
+        listBuilder.columns(1);
+        listBuilder.buttonWidth(questDialogWidth);
+
+        DialogManager.sendDialog(player, listBuilder);
     }
 
     private static DialogManager.MultiActionDialogBuilder buildQuestDialogBuilder(
@@ -57,25 +64,21 @@ public class DialogMaker {
 
         DialogManager.MultiActionDialogBuilder builder = new DialogManager.MultiActionDialogBuilder();
 
-        // Set title and external title
-        setDialogTitles(builder, questText, questIndex, quests.size());
-
-        // Add all quest body sections
+        setDialogTitles(quest, builder, questText, questIndex, quests.size());
         addQuestBodySections(builder, quest, questText);
-
-        // Add action buttons (accept/complete/track)
         addActionButtons(builder, quest, questText);
 
-        // Add navigation buttons (previous/next)
-        addNavigationButtons(builder, quests, questIndex, player, npcEntity);
-
-        // Configure dialog properties
-        configureDialogBehavior(builder);
+        // Always add back button to return to quest list
+        String backCommand = "/elitemobs npc questList " + npcEntity.getUuid();
+        builder.addAction(DialogManager.ActionButton.of(
+                "← Back to Quest List",
+                new DialogManager.RunCommandAction(backCommand)
+        ).width(questDialogWidth));
 
         return builder;
     }
 
-    private static void setDialogTitles(DialogManager.MultiActionDialogBuilder builder,
+    private static void setDialogTitles(Quest quest, DialogManager.MultiActionDialogBuilder builder,
                                         QuestMenu.QuestText questText, int questIndex, int totalQuests) {
         // Main title
         String title = processText(questText.getHeader().getText());
@@ -83,10 +86,7 @@ public class DialogMaker {
             builder.title(title);
         }
 
-        // Quest counter as external title
-        if (totalQuests > 1) {
-            builder.externalTitle("Quest " + (questIndex + 1) + " of " + totalQuests);
-        }
+        builder.externalTitle(title + (quest.isAccepted() ? quest.getQuestObjectives().isOver() ? ChatColor.WHITE + " | " + ChatColor.DARK_GREEN + "Turn in!" : ChatColor.WHITE + " | " + ChatColor.GREEN + "Accepted" : ""));
     }
 
     private static void addQuestBodySections(DialogManager.MultiActionDialogBuilder builder,
@@ -183,9 +183,9 @@ public class DialogMaker {
 
     private static void addActionButtons(DialogManager.MultiActionDialogBuilder builder,
                                          Quest quest, QuestMenu.QuestText questText) {
-        if (quest instanceof CustomQuest) {
+        if (quest instanceof CustomQuest && quest.isAccepted()) {
             builder.columns(2);
-        }
+        } else builder.columns(1);
 
         // Accept/Leave/Complete button
         addButtonFromComponent(builder, questText.getAccept());
@@ -212,44 +212,6 @@ public class DialogMaker {
                     new DialogManager.RunCommandAction(command)
             ).width((int) (questDialogWidth / 3d)));
         }
-    }
-
-    private static void addNavigationButtons(DialogManager.MultiActionDialogBuilder builder,
-                                             List<? extends Quest> quests, int questIndex,
-                                             Player player, NPCEntity npcEntity) {
-        if (quests.size() <= 1) return;
-
-        if (questIndex > 0 && questIndex < quests.size() - 1) builder.columns(2);
-
-        // Previous quest button
-        if (questIndex > 0) {
-            final int prevIndex = questIndex - 1;
-            builder.addAction(DialogManager.ActionButton.of(
-                    "← Previous Quest",
-                    new DialogManager.ShowDialogAction(
-                            DialogManager.DialogReference.inline(
-                                    buildQuestDialogBuilder(quests, prevIndex, player, npcEntity)
-                            )
-                    )
-            ).width(questDialogWidth));
-        }
-
-        // Next quest button
-        if (questIndex < quests.size() - 1) {
-            final int nextIndex = questIndex + 1;
-            builder.addAction(DialogManager.ActionButton.of(
-                    "Next Quest →",
-                    new DialogManager.ShowDialogAction(
-                            DialogManager.DialogReference.inline(
-                                    buildQuestDialogBuilder(quests, nextIndex, player, npcEntity)
-                            )
-                    )
-            ).width(questDialogWidth));
-        }
-    }
-
-    private static void configureDialogBehavior(DialogManager.MultiActionDialogBuilder builder) {
-//        builder.canCloseWithEscape(true); this is default, honestly defaults are better here
     }
 
     private static String extractCommandFromComponent(TextComponent component) {

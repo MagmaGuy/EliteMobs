@@ -165,6 +165,7 @@ public class CustomBossMegaConsumer {
         setMovementSpeed(livingEntity);
         setFrozen(livingEntity);
         setScale(livingEntity);
+        setSilent(livingEntity);
         customBossEntity.setMovementSpeedAttribute(AttributeManager.getAttributeBaseValue(livingEntity, "generic_movement_speed"));
         customBossEntity.setFollowDistance(AttributeManager.getAttributeBaseValue(livingEntity, "generic_follow_range"));
 
@@ -196,5 +197,9 @@ public class CustomBossMegaConsumer {
     private void setScale(LivingEntity livingEntity) {
         if (customBossesConfigFields.getScale() != 1D)
             AttributeManager.setAttribute(livingEntity, "generic_scale", customBossesConfigFields.getScale());
+    }
+
+    private void setSilent(LivingEntity livingEntity){
+        if (customBossesConfigFields.isSilent()) livingEntity.setSilent(true);
     }
 }

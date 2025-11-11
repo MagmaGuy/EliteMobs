@@ -30,6 +30,8 @@ public class CustomBossDeath implements Listener {
     }
 
     private static void doDeathMessage(CustomBossEntity customBossEntity) {
+        if (!MobCombatSettingsConfig.isEnableDeathMessages()) return;
+
         //Do death message
         StringBuilder playersList = new StringBuilder();
         for (Player player : customBossEntity.getDamagers().keySet()) {
