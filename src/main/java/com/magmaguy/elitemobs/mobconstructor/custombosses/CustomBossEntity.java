@@ -64,7 +64,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
     protected Location persistentLocation;
     protected CustomBossTrail customBossTrail;
     @Getter
-    protected CustomBossBossBar customBossBossBar;
+    protected BossTrackingBar bossTrackingBar;
     protected Integer escapeMechanism;
     @Getter
     protected PhaseBossEntity phaseBossEntity = null;
@@ -387,7 +387,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
                 customBossesConfigFields.getLocationMessage() == null)
             return;
         trackableCustomBosses.add(this);
-        customBossBossBar = new CustomBossBossBar(this);
+        bossTrackingBar = new BossTrackingBar(this);
     }
 
     private void spawnMessage() {
@@ -540,8 +540,8 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
                 persistentObjectHandler.remove();
                 persistentObjectHandler = null;
             }
-            if (customBossBossBar != null)
-                customBossBossBar.remove();
+            if (bossTrackingBar != null)
+                bossTrackingBar.remove();
             if (!removalReason.equals(RemovalReason.SHUTDOWN) &&
                     !removalReason.equals(RemovalReason.DEATH) &&
                     !removalReason.equals(RemovalReason.ARENA_RESET))

@@ -10,6 +10,7 @@ import com.ticxo.modelengine.api.model.ActiveModel;
 import com.ticxo.modelengine.api.model.ModeledEntity;
 import com.ticxo.modelengine.api.model.bone.Nameable;
 import lombok.Getter;
+import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 
 public class CustomModelMEG implements CustomModelInterface {
@@ -154,4 +155,10 @@ public class CustomModelMEG implements CustomModelInterface {
         activeModel.getAnimationHandler().forceStopAllAnimations();
     }
 
+    @Override
+    public Location getNametagBoneLocation() {
+        // ModelEngine doesn't provide direct bone location access in the same way
+        // Return null to fall back to default behavior
+        return null;
+    }
 }

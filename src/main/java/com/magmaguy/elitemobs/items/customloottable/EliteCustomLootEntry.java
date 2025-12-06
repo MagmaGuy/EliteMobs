@@ -143,35 +143,51 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
     }
 
     public ItemStack generateItemStack(int level, Player player, EliteEntity eliteEntity) {
-        return generateCustomItem().generateItemStack(level, player, eliteEntity);
+        CustomItem customItem = generateCustomItem();
+        if (customItem == null) {
+            Logger.warn("Invalid custom item entry! Entry: " + filename);
+            return null;
+        }
+        return customItem.generateItemStack(level, player, eliteEntity);
     }
 
     //treasure chest
     @Override
     public void locationDrop(int itemTier, Player player, Location location) {
+        CustomItem customItem = generateCustomItem();
+        if (customItem == null) {
+            Logger.warn("Invalid loot entry for treasure chest! Entry: " + filename);
+            return;
+        }
         for (int i = 0; i < getAmount(); i++)
-            generateCustomItem().dropPlayerLoot(player, itemTier, location, null);
+            customItem.dropPlayerLoot(player, itemTier, location, null);
     }
 
     //This is for the custom boss drop
     @Override
     public void locationDrop(int itemTier, Player player, Location location, EliteEntity eliteEntity) {
         if (isGroupLoot(itemTier, player, eliteEntity)) return;
-        if (generateCustomItem() == null) {
+        CustomItem customItem = generateCustomItem();
+        if (customItem == null) {
             Logger.warn("Invalid loot entry for boss " + eliteEntity.getName() + "! Entry: " + filename);
             if (eliteEntity instanceof CustomBossEntity customBossEntity)
                 Logger.warn("Boss filename: " + customBossEntity.getCustomBossesConfigFields().getFilename());
             return;
         }
         for (int i = 0; i < getAmount(); i++)
-            generateCustomItem().dropPlayerLoot(player, itemTier, location, eliteEntity);
+            customItem.dropPlayerLoot(player, itemTier, location, eliteEntity);
     }
 
     @Override
     public void directDrop(int itemTier, Player player) {
+        CustomItem customItem = generateCustomItem();
+        if (customItem == null) {
+            Logger.warn("Invalid loot entry for direct drop! Entry: " + filename);
+            return;
+        }
         String name = null;
         for (int i = 0; i < getAmount(); i++) {
-            ItemStack itemStack = generateCustomItem().generateItemStack(itemTier, player, null);
+            ItemStack itemStack = customItem.generateItemStack(itemTier, player, null);
             if (itemStack == null) continue;
             player.getInventory().addItem(itemStack);
             if (name == null && itemStack.getItemMeta() != null) {
@@ -187,9 +203,14 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
     @Override
     public void directDrop(int itemTier, Player player, EliteEntity eliteEntity) {
         if (isGroupLoot(itemTier, player, eliteEntity)) return;
+        CustomItem customItem = generateCustomItem();
+        if (customItem == null) {
+            Logger.warn("Invalid loot entry for boss " + eliteEntity.getName() + "! Entry: " + filename);
+            return;
+        }
         String name = null;
         for (int i = 0; i < getAmount(); i++) {
-            ItemStack itemStack = generateCustomItem().generateItemStack(itemTier, player, eliteEntity);
+            ItemStack itemStack = customItem.generateItemStack(itemTier, player, eliteEntity);
             if (itemStack == null) return;
             player.getInventory().addItem(itemStack);
             if (name == null && itemStack.getItemMeta() != null) {

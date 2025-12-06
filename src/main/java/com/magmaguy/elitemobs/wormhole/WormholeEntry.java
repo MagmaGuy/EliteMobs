@@ -96,6 +96,10 @@ public class WormholeEntry implements PersistentObject {
     private Material concreteColor = null; // Cache the concrete color
     private boolean linesInitialized = false;
     private int rotationIndex = 0;
+    private static final long LINES_RECREATION_COOLDOWN_MS = 500; // 500ms cooldown after clearing
+    private volatile boolean isProcessingChunkEvent = false; // Prevent race conditions during chunk events
+    private long lastLinesClearTime = 0; // Cooldown to prevent rapid recreation
+    private int particleTickCounter = 0; // Counter for particle spawn rate
 
     public WormholeEntry(Wormhole wormhole, String locationString, int wormholeNumber) {
         this.wormhole = wormhole;
@@ -156,7 +160,7 @@ public class WormholeEntry implements PersistentObject {
 
     public void onDungeonInstall() {
         this.location = getDungeonLocation();
-        if (persistentObjectHandler != null) persistentObjectHandler = new PersistentObjectHandler(this);
+        if (persistentObjectHandler != null) persistentObjectHandler.remove();
         persistentObjectHandler = new PersistentObjectHandler(this);
         chunkLoad();
     }
@@ -172,10 +176,15 @@ public class WormholeEntry implements PersistentObject {
 
     @Override
     public void chunkUnload() {
-        clearLines();
-        if (textDisplay != null) {
-            textDisplay.remove();
-            textDisplay = null;
+        isProcessingChunkEvent = true;
+        try {
+            clearLines();
+            if (textDisplay != null) {
+                textDisplay.remove();
+                textDisplay = null;
+            }
+        } finally {
+            isProcessingChunkEvent = false;
         }
     }
 
@@ -226,6 +235,11 @@ public class WormholeEntry implements PersistentObject {
     }
 
     public void tick() {
+        // Prevent race condition during chunk load/unload events
+        if (isProcessingChunkEvent) {
+            return;
+        }
+
         // CRITICAL: Check chunk loading FIRST - do nothing if chunk isn't loaded
         if (location == null || location.getWorld() == null ||
                 !ChunkLocationChecker.chunkAtLocationIsLoaded(location)) {
@@ -249,16 +263,21 @@ public class WormholeEntry implements PersistentObject {
         if (armorStandText == null) return;
         if (location == null || location.getWorld() == null) return;
 
-        // Spawn new display
-        textDisplay = location.getWorld().spawn(
-                location.clone().add(new Vector(0, 1.2, 0).multiply(wormhole.getWormholeConfigFields().getSizeMultiplier())),
-                TextDisplay.class,
-                (Consumer<TextDisplay>) textDisplay -> {
-                    textDisplay.setBillboard(Display.Billboard.VERTICAL);
-                    textDisplay.setText(ChatColorConverter.convert(armorStandText));
-                    textDisplay.setPersistent(false);
-                }
-        );
+        try {
+            // Spawn new display
+            textDisplay = location.getWorld().spawn(
+                    location.clone().add(new Vector(0, 1.2, 0).multiply(wormhole.getWormholeConfigFields().getSizeMultiplier())),
+                    TextDisplay.class,
+                    (Consumer<TextDisplay>) textDisplay -> {
+                        textDisplay.setBillboard(Display.Billboard.VERTICAL);
+                        textDisplay.setText(ChatColorConverter.convert(armorStandText));
+                        textDisplay.setPersistent(false);
+                    }
+            );
+        } catch (Exception e) {
+            // If entity creation fails, textDisplay remains null and will retry next tick
+            textDisplay = null;
+        }
     }
 
     /**
@@ -276,8 +295,12 @@ public class WormholeEntry implements PersistentObject {
         // Update lines every frame (animation runs at tick rate)
         updateLines(cachedRotations.get(rotationIndex));
 
-        // Add minimal particles at key points
-        spawnMinimalParticles(cachedRotations.get(rotationIndex));
+        // Add minimal particles at key points (only every 5 ticks)
+        particleTickCounter++;
+        if (particleTickCounter >= 5) {
+            spawnMinimalParticles(cachedRotations.get(rotationIndex));
+            particleTickCounter = 0;
+        }
 
         // Increment for next frame - this ensures smooth animation
         rotationIndex++;
@@ -321,8 +344,16 @@ public class WormholeEntry implements PersistentObject {
         boolean needsRecreation = !linesInitialized || cachedEdges == null || areLinesDeleted();
 
         if (needsRecreation) {
-            // Clear any existing lines first
-            clearLines();
+            // Enforce cooldown to prevent rapid recreation (which causes UUID conflicts and jitter)
+            if (System.currentTimeMillis() - lastLinesClearTime < LINES_RECREATION_COOLDOWN_MS) {
+                return;
+            }
+
+            // Clear any existing lines first (only if there are any to avoid resetting cooldown)
+            if (!lineDataList.isEmpty()) {
+                clearLines();
+                return; // Wait for next cycle after clearing
+            }
 
             // **NEW: Clear any lingering display blocks in the area**
             clearNearbyDisplayBlocks();
@@ -334,24 +365,29 @@ public class WormholeEntry implements PersistentObject {
             cachedEdges = getEdgesForShape(currentFrame);
 
             // Create lines for each edge
-            for (long edge : cachedEdges) {
-                int p1 = (int) (edge >>> 32);
-                int p2 = (int) (edge & 0xFFFFFFFFL);
-                if (p1 >= currentFrame.size() || p2 >= currentFrame.size()) continue;
+            try {
+                for (long edge : cachedEdges) {
+                    int p1 = (int) (edge >>> 32);
+                    int p2 = (int) (edge & 0xFFFFFFFFL);
+                    if (p1 >= currentFrame.size() || p2 >= currentFrame.size()) continue;
 
-                Vector v1 = currentFrame.get(p1);
-                Vector v2 = currentFrame.get(p2);
+                    Vector v1 = currentFrame.get(p1);
+                    Vector v2 = currentFrame.get(p2);
 
-                Location loc1 = location.clone().add(v1);
-                Location loc2 = location.clone().add(v2);
+                    Location loc1 = location.clone().add(v1);
+                    Location loc2 = location.clone().add(v2);
 
-                DrawLine.LineData line = DrawLine.drawLine(loc1, loc2, LINE_WIDTH, concreteColor, -1);
-                if (line != null) {
-                    lineDataList.add(line);
+                    DrawLine.LineData line = DrawLine.drawLine(loc1, loc2, LINE_WIDTH, concreteColor, -1);
+                    if (line != null) {
+                        lineDataList.add(line);
+                    }
                 }
+                linesInitialized = true;
+            } catch (Exception e) {
+                // If entity creation fails (e.g., UUID conflict), clear and retry next cycle
+                clearLines();
+                return;
             }
-
-            linesInitialized = true;
         } else {
             // Update existing line positions instead of recreating
             int lineIndex = 0;
@@ -405,7 +441,7 @@ public class WormholeEntry implements PersistentObject {
         if (world == null) return;
 
         // Only spawn particles at a subset of points to keep it minimal
-        int particleInterval = Math.max(1, currentFrame.size() / 20); // ~20 particles max
+        int particleInterval = Math.max(1, currentFrame.size() / 8); // ~8 particles max
 
         for (int i = 0; i < currentFrame.size(); i += particleInterval) {
             Vector v = currentFrame.get(i);
@@ -623,6 +659,7 @@ public class WormholeEntry implements PersistentObject {
         lineDataList.clear();
         linesInitialized = false;
         cachedEdges = null;
+        lastLinesClearTime = System.currentTimeMillis();
     }
 
     /**

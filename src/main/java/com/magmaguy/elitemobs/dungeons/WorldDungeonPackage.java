@@ -13,6 +13,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 /**
  * This class is specifically for world-based dungeons
  */
@@ -36,7 +40,14 @@ public class WorldDungeonPackage extends WorldPackage implements Dungeon {
         if (contentPackagesConfigFields.getWormholeWorldName() != null &&
                 !contentPackagesConfigFields.getWormholeWorldName().isEmpty() &&
                 Bukkit.getWorld(contentPackagesConfigFields.getWormholeWorldName()) == null) {
-            wormholeWorld = DungeonUtils.loadWorld(this.getContentPackagesConfigFields().getWormholeWorldName(), this.getContentPackagesConfigFields().getEnvironment(), contentPackagesConfigFields);
+            // Check if the wormhole world file exists before attempting to load it
+            String wormholeWorldName = contentPackagesConfigFields.getWormholeWorldName();
+            boolean wormholeWorldExists = Files.exists(Paths.get(Bukkit.getWorldContainer() + File.separator + wormholeWorldName));
+
+            if (wormholeWorldExists) {
+                wormholeWorld = DungeonUtils.loadWorld(this.getContentPackagesConfigFields().getWormholeWorldName(), this.getContentPackagesConfigFields().getEnvironment(), contentPackagesConfigFields);
+            }
+            // If the world doesn't exist, silently skip loading (no warning needed as it's optional)
         }
     }
 

@@ -247,7 +247,9 @@ public class CustomBossesConfigFields extends CustomConfigFields {
     //This method unifies all level placeholders down to $level and applies a custom level for quest display purposes
     public String getCleanName(int level) {
         String cleanNameLevel;
-        if (level == 0) cleanNameLevel = level + "";
+        if (level == 0 && this.level.equalsIgnoreCase("dynamic")) cleanNameLevel = "?";
+        else if (level == 0) cleanNameLevel = level + "";
+        else if (this.level.equalsIgnoreCase("dynamic")) cleanNameLevel = level + "";
         else cleanNameLevel = this.level;
         return ChatColorConverter.convert(getName().replace("$level", cleanNameLevel)
                 .replace("$normalLevel", ChatColorConverter.convert("&2[&a" + cleanNameLevel + "&2]&f"))

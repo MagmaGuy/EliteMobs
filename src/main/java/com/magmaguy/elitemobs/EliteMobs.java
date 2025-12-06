@@ -340,6 +340,7 @@ public class EliteMobs extends JavaPlugin {
         ScriptAction.shutdown();
         CustomMusic.shutdown();
         CustomBossEntity.shutdown();
+        com.magmaguy.elitemobs.combatsystem.displays.BossHealthDisplay.shutdown();
         Logger.info("Saving EliteMobs databases...");
         PlayerData.closeConnection();
         MagmaCore.shutdown();

@@ -69,6 +69,9 @@ public abstract class EMPackage extends ContentPackage {
                 case INSTANCED_DUNGEON:
                     new WorldInstancedDungeonPackage(contentPackagesConfigFields);
                     break;
+                case DYNAMIC_DUNGEON:
+                    new DynamicDungeonPackage(contentPackagesConfigFields);
+                    break;
                 case OPEN_DUNGEON:
                     new WorldDungeonPackage(contentPackagesConfigFields);
                     break;
