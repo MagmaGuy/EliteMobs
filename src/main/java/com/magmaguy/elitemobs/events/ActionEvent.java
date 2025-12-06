@@ -7,6 +7,7 @@ import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.config.customevents.CustomEventsConfig;
 import com.magmaguy.elitemobs.config.customevents.CustomEventsConfigFields;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -84,6 +85,7 @@ public class ActionEvent extends CustomEvent {
         ActionEvent actionEvent = new ActionEvent(customEventsConfigFields);
         actionEvent.setEventStartLocation(location);
         CustomEventStartEvent customEventStartEvent = new CustomEventStartEvent(actionEvent);
+        new EventCaller(customEventStartEvent);
         if (customEventStartEvent.isCancelled()) return;
         if (!actionEvent.startConditions.areValid()) return;
 

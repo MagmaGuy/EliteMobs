@@ -33,6 +33,28 @@ public class DungeonsConfig extends ConfigurationFile {
     private static double poisonDamageMultiplier;
     @Getter
     private static double witherDamageMultiplier;
+    @Getter
+    private static String dynamicDungeonLevelSelectionMenuTitle;
+    @Getter
+    private static String dynamicDungeonLevelSelectionItemTitle;
+    @Getter
+    private static String dynamicDungeonLevelSelectionClickToSelect;
+    @Getter
+    private static String dynamicDungeonLevelSelectionMobsWillBeLevel;
+    @Getter
+    private static String dynamicDungeonLevelSelectionRecommended;
+    @Getter
+    private static String dynamicDungeonLevelSelectionEasier;
+    @Getter
+    private static String dynamicDungeonLevelSelectionHarder;
+    @Getter
+    private static String dynamicDungeonDifficultySelectionMenuTitle;
+    @Getter
+    private static String dynamicDungeonDifficultySelectionSelectedLevel;
+    @Getter
+    private static String dungeonLockoutSubtitle;
+    @Getter
+    private static String dungeonLockoutChatMessage;
 
     public DungeonsConfig() {
         super("dungeons.yml");
@@ -93,5 +115,45 @@ public class DungeonsConfig extends ConfigurationFile {
                 List.of("Sets the damage multiplier for fire damage in dungeons",
                         "This is important for balance as by default the damage is a bit too high for the dungeons as we design them"),
                 fileConfiguration, "poisonDamageMultiplier", 0.5);
+        dynamicDungeonLevelSelectionMenuTitle = ConfigurationEngine.setString(
+                List.of("Sets the title for the dynamic dungeon level selection menu"),
+                file, fileConfiguration, "dynamicDungeonLevelSelectionMenuTitle", "&8Select Dungeon Level", true);
+        dynamicDungeonLevelSelectionItemTitle = ConfigurationEngine.setString(
+                List.of("Sets the title for level selection items in the dynamic dungeon menu",
+                        "$level is the placeholder for the level number"),
+                file, fileConfiguration, "dynamicDungeonLevelSelectionItemTitle", "&fLevel $level", true);
+        dynamicDungeonLevelSelectionClickToSelect = ConfigurationEngine.setString(
+                List.of("Sets the 'click to select' text in the dynamic dungeon level selection menu",
+                        "$level is the placeholder for the level number"),
+                file, fileConfiguration, "dynamicDungeonLevelSelectionClickToSelect", "&7Click to select level &e$level", true);
+        dynamicDungeonLevelSelectionMobsWillBeLevel = ConfigurationEngine.setString(
+                List.of("Sets the 'mobs will be level' text in the dynamic dungeon level selection menu",
+                        "$level is the placeholder for the level number"),
+                file, fileConfiguration, "dynamicDungeonLevelSelectionMobsWillBeLevel", "&7All mobs will be level &e$level", true);
+        dynamicDungeonLevelSelectionRecommended = ConfigurationEngine.setString(
+                List.of("Sets the 'recommended level' text in the dynamic dungeon level selection menu"),
+                file, fileConfiguration, "dynamicDungeonLevelSelectionRecommended", "&a&lRecommended level!", true);
+        dynamicDungeonLevelSelectionEasier = ConfigurationEngine.setString(
+                List.of("Sets the 'easier than recommended' text in the dynamic dungeon level selection menu"),
+                file, fileConfiguration, "dynamicDungeonLevelSelectionEasier", "&eEasier than recommended", true);
+        dynamicDungeonLevelSelectionHarder = ConfigurationEngine.setString(
+                List.of("Sets the 'harder than recommended' text in the dynamic dungeon level selection menu"),
+                file, fileConfiguration, "dynamicDungeonLevelSelectionHarder", "&6Harder than recommended", true);
+        dynamicDungeonDifficultySelectionMenuTitle = ConfigurationEngine.setString(
+                List.of("Sets the title for the dynamic dungeon difficulty selection menu"),
+                file, fileConfiguration, "dynamicDungeonDifficultySelectionMenuTitle", "&8Select Difficulty", true);
+        dynamicDungeonDifficultySelectionSelectedLevel = ConfigurationEngine.setString(
+                List.of("Sets the 'selected level' text in the dynamic dungeon difficulty selection menu",
+                        "$level is the placeholder for the selected level number"),
+                file, fileConfiguration, "dynamicDungeonDifficultySelectionSelectedLevel", "&7Selected Level: &e$level", true);
+        dungeonLockoutSubtitle = ConfigurationEngine.setString(
+                List.of("Sets the subtitle shown when a player kills a boss they are locked out from"),
+                file, fileConfiguration, "dungeonLockoutSubtitle", "&cLockout!", true);
+        dungeonLockoutChatMessage = ConfigurationEngine.setString(
+                List.of("Sets the chat message shown when a player kills a boss they are locked out from",
+                        "$bossName is the placeholder for the boss name",
+                        "$remainingTime is the placeholder for the remaining lockout time"),
+                file, fileConfiguration, "dungeonLockoutChatMessage",
+                "&c[EliteMobs] &7You killed &c$bossName &7in the last lockout period and must wait another &e$remainingTime &7before it will drop loot for you again.", true);
     }
 }

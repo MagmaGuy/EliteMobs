@@ -88,6 +88,9 @@ public class NaturalMobSpawnEventHandler implements Listener {
         if (event.getEntity().getType().equals(EntityType.BEE))
             return;
 
+        if (event.getEntity().getType().equals(EntityType.VEX))
+            return;
+
 
         if (MobPropertiesConfig.getMobProperties().get(event.getEntityType()) == null ||
                 !MobPropertiesConfig.getMobProperties().get(event.getEntityType()).isEnabled())

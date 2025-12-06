@@ -312,6 +312,7 @@ public class CustomItem {
                         player,
                         showItemWorth,
                         customItemsConfigFields.getCustomModelID(),
+                        customItemsConfigFields.getEquipmentModelID(),
                         customItemsConfigFields.isSoulbound(),
                         getCustomItemsConfigFields().getFilename()
                 );

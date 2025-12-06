@@ -8,6 +8,7 @@ import com.magmaguy.elitemobs.config.customevents.CustomEventsConfig;
 import com.magmaguy.elitemobs.config.customevents.CustomEventsConfigFields;
 import com.magmaguy.elitemobs.mobconstructor.CustomSpawn;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.elitemobs.utils.WeightedProbability;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
@@ -110,6 +111,7 @@ public class TimedEvent extends CustomEvent implements Listener {
         Logger.info("Event " + getCustomEventsConfigFields().getFilename() + " has been queued!");
         TimedEvent timedEvent = new TimedEvent(customEventsConfigFields);
         CustomEventStartEvent customEventStartEvent = new CustomEventStartEvent(timedEvent);
+        new EventCaller(customEventStartEvent);
         if (customEventStartEvent.isCancelled()) return;
 
         timedEvent.customSpawn = new CustomSpawn(customEventsConfigFields.getSpawnType(),

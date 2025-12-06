@@ -207,6 +207,9 @@ public class WormholeManager {
 
         // Clear player teleport data
         playerTeleportData.clear();
+
+        // Reset singleton to allow clean restart
+        instance = null;
     }
 
     /**

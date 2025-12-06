@@ -55,7 +55,7 @@ public class BossTrackingPage {
         for (CustomBossEntity customBossEntity : CustomBossEntity.getTrackableCustomBosses()) {
             try {
                 textComponents.add(SpigotMessage.commandHoverMessage(
-                        customBossEntity.getCustomBossBossBar().bossBarMessage(player, customBossEntity.getCustomBossesConfigFields().getLocationMessage()) + "\n",
+                        customBossEntity.getBossTrackingBar().bossBarMessage(player, customBossEntity.getCustomBossesConfigFields().getLocationMessage()) + "\n",
                         PlayerStatusMenuConfig.getOnBossTrackHover(),
                         "/elitemobs track boss " + customBossEntity.getEliteUUID()));
 
@@ -92,7 +92,7 @@ public class BossTrackingPage {
         for (CustomBossEntity customBossEntity : CustomBossEntity.getTrackableCustomBosses()) {
             BossTrackingPageEvents.bosses.add(customBossEntity);
             inventory.setItem(counter, ItemStackGenerator.generateItemStack(Material.ZOMBIE_HEAD,
-                    customBossEntity.getCustomBossBossBar().bossBarMessage(targetPlayer, customBossEntity.getCustomBossesConfigFields().getLocationMessage()),
+                    customBossEntity.getBossTrackingBar().bossBarMessage(targetPlayer, customBossEntity.getCustomBossesConfigFields().getLocationMessage()),
                     Collections.singletonList(MobCombatSettingsConfig.getBossLocationMessage())));
             counter++;
         }
@@ -113,7 +113,7 @@ public class BossTrackingPage {
             event.setCancelled(true);
             if (bosses.size() - 1 >= event.getSlot()) {
                 player.closeInventory();
-                bosses.get(event.getSlot()).getCustomBossBossBar().addTrackingPlayer(player);
+                bosses.get(event.getSlot()).getBossTrackingBar().addTrackingPlayer(player);
                 return;
             }
             if (event.getSlot() == 53) {

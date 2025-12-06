@@ -1,5 +1,8 @@
 package com.magmaguy.elitemobs.commands;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.Quest;
 import com.magmaguy.elitemobs.quests.menus.QuestMenu;
@@ -171,8 +174,9 @@ public class QuestCheckCommand extends AdvancedCommand {
                             .showTooltip(true)
                             .showDecoration(true);
 
-                    com.google.gson.JsonObject components = DialogManager.serializeItemComponents(itemStack);
+                    JsonObject components = DialogManager.serializeItemComponents(itemStack);
                     if (components != null && !components.entrySet().isEmpty()) {
+                        fixCustomModelDataFormat(components);
                         itemBody.components(components);
                     }
 
@@ -233,5 +237,25 @@ public class QuestCheckCommand extends AdvancedCommand {
         }
 
         return null;
+    }
+
+    /**
+     * Fixes the custom_model_data format for Minecraft 1.21.4+
+     * Old format: "minecraft:custom_model_data": 36004
+     * New format: "minecraft:custom_model_data": {"floats": [36004.0]}
+     */
+    private void fixCustomModelDataFormat(JsonObject components) {
+        String key = "minecraft:custom_model_data";
+        if (components.has(key)) {
+            JsonElement element = components.get(key);
+            if (element.isJsonPrimitive()) {
+                double value = element.getAsDouble();
+                JsonObject newFormat = new JsonObject();
+                JsonArray floats = new JsonArray();
+                floats.add(value);
+                newFormat.add("floats", floats);
+                components.add(key, newFormat);
+            }
+        }
     }
 }

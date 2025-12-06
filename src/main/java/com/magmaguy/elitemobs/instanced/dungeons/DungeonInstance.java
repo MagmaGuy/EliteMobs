@@ -46,6 +46,7 @@ public class DungeonInstance extends MatchInstance {
     private List<InstancedBossEntity> instancedBossEntities = new ArrayList<>();
     @Getter
     private int levelSync = -1;
+    private String rawLevelSync = null; // Stores the original config value (e.g., "+5", "-3", or "70")
     private String difficultyName = null;
     @Getter
     private String difficultyID = null;
@@ -233,9 +234,10 @@ public class DungeonInstance extends MatchInstance {
 
         if (difficulty.get("levelSync") != null) {
             try {
-                this.levelSync = MapListInterpreter.parseInteger("levelSync", difficulty.get("levelSync"), contentPackagesConfigFields.getFilename());
+                this.rawLevelSync = MapListInterpreter.parseString("levelSync", difficulty.get("levelSync"), contentPackagesConfigFields.getFilename());
+                this.levelSync = parseLevelSync(rawLevelSync, contentPackagesConfigFields.getContentLevel());
             } catch (Exception exception) {
-                Logger.warn("Incorrect level sync entry for dungeon " + contentPackagesConfigFields.getFilename() + " ! Value: " + levelSync + " . No level sync will be applied!");
+                Logger.warn("Incorrect level sync entry for dungeon " + contentPackagesConfigFields.getFilename() + " ! Value: " + rawLevelSync + " . No level sync will be applied!");
                 this.levelSync = 0;
             }
         } else
@@ -245,6 +247,77 @@ public class DungeonInstance extends MatchInstance {
         if (difficulty.get("id") != null) {
             this.difficultyID = MapListInterpreter.parseString("id", difficulty.get("id"), contentPackagesConfigFields.getFilename());
         }
+    }
+
+    /**
+     * Parses the levelSync value from config. Supports:
+     * - Absolute values: "70" means level sync at 70
+     * - Relative values: "+5" means content level + 5, "-3" means content level - 3
+     * @param rawValue The raw string value from config
+     * @param contentLevel The content level to use for relative calculations (can be -1 for dynamic dungeons)
+     * @return The calculated level sync value, or 0 if invalid/disabled
+     */
+    protected int parseLevelSync(String rawValue, int contentLevel) {
+        if (rawValue == null || rawValue.isEmpty()) return 0;
+
+        rawValue = rawValue.trim();
+
+        // Check for relative values (+N or -N)
+        if (rawValue.startsWith("+") || rawValue.startsWith("-")) {
+            int offset;
+            try {
+                offset = Integer.parseInt(rawValue);
+            } catch (NumberFormatException e) {
+                Logger.warn("Invalid relative level sync value: " + rawValue);
+                return 0;
+            }
+            // If content level is -1 (dynamic), return 0 for now - will be recalculated later
+            if (contentLevel < 0) return 0;
+            return Math.max(1, contentLevel + offset);
+        }
+
+        // Absolute value
+        try {
+            return Integer.parseInt(rawValue);
+        } catch (NumberFormatException e) {
+            Logger.warn("Invalid level sync value: " + rawValue);
+            return 0;
+        }
+    }
+
+    /**
+     * Recalculates the level sync based on a dynamic level (used by DynamicDungeonInstance).
+     * This should be called after the player selects their level in the menu.
+     * @param dynamicLevel The player-selected level for the dungeon
+     */
+    protected void recalculateLevelSyncForDynamicLevel(int dynamicLevel) {
+        if (rawLevelSync == null || rawLevelSync.isEmpty()) {
+            this.levelSync = 0;
+            return;
+        }
+
+        String trimmed = rawLevelSync.trim();
+
+        // Check for relative values (+N or -N)
+        if (trimmed.startsWith("+") || trimmed.startsWith("-")) {
+            try {
+                int offset = Integer.parseInt(trimmed);
+                this.levelSync = Math.max(1, dynamicLevel + offset);
+            } catch (NumberFormatException e) {
+                this.levelSync = 0;
+            }
+        }
+        // Absolute values stay as they are (already parsed in setDifficulty)
+    }
+
+    /**
+     * Checks if the level sync is using a relative value (starts with + or -)
+     * @return true if relative, false if absolute or not set
+     */
+    protected boolean isRelativeLevelSync() {
+        if (rawLevelSync == null || rawLevelSync.isEmpty()) return false;
+        String trimmed = rawLevelSync.trim();
+        return trimmed.startsWith("+") || trimmed.startsWith("-");
     }
 
     @Override

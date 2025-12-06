@@ -74,8 +74,13 @@ public class PlayerItem {
             return false;
 
         //case when it became null
-        if (itemStack == null)
+        if (itemStack == null) {
+            if (displayingAsBroken) {
+                BossBarUtil.HideBrokenItemBossBar(equipmentSlot, player);
+                displayingAsBroken = false;
+            }
             return fillNullItem();
+        }
 
         if (isOnLastDamage(itemStack)) {
             if (!displayingAsBroken) {
@@ -150,6 +155,7 @@ public class PlayerItem {
 
     private boolean fillNullItem() {
         itemStack = null;
+        itemTier = 0;
         continuousPotionEffects = new ArrayList<>();
         onHitPotionEffects = new ArrayList<>();
         damageArthropodsLevel = 0;
@@ -165,10 +171,6 @@ public class PlayerItem {
         eliteDamage = 0;
         blastProtection = 0;
         loudStrikesBonus = 0;
-        if (displayingAsBroken) {
-            BossBarUtil.HideBrokenItemBossBar(equipmentSlot, player);
-            displayingAsBroken = false;
-        }
         return true;
     }
 

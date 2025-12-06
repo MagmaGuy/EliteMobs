@@ -41,7 +41,7 @@ public class EventsConfig extends ConfigurationFile {
                 fileConfiguration, "actionEventMinimumCooldownMinutes", 4);
         timedEventMinimumCooldown = ConfigurationEngine.setInt(
                 List.of("Sets the minimum cooldown, in minutes, between timed events"),
-                fileConfiguration, "actionEventMinimumCooldownMinutes", 4);
+                fileConfiguration, "timedEventMinimumCooldownMinutes", 4);
         actionEventsEnabled = ConfigurationEngine.setBoolean(
                 List.of("Sets if action events will happen.",
                         "https://github.com/MagmaGuy/EliteMobs/wiki/Creating-Custom-Events#action-events"),

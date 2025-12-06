@@ -21,6 +21,7 @@ public class CustomModelsConfig extends ConfigurationFile {
     public static String yellowCrown;
     public static String yellowLock;
     public static boolean useModels;
+    public static boolean useAttributeScaling;
 
     public CustomModelsConfig() {
         super("CustomModels.yml");
@@ -31,6 +32,12 @@ public class CustomModelsConfig extends ConfigurationFile {
         useModels = ConfigurationEngine.setBoolean(List.of("Sets whether the models in this configuration file will be used.",
                 "Will not apply to custom models of things that aren't here, such as bosses."),
                 fileConfiguration, "useModels", true);
+        useAttributeScaling = ConfigurationEngine.setBoolean(List.of(
+                "Sets whether elite items receive attribute bonuses based on their level.",
+                "When enabled, higher level items will have increased damage, armor, toughness, etc.",
+                "At level 200, items will be roughly 200% better than vanilla netherite.",
+                "This applies to procedurally generated items that receive custom skins."),
+                fileConfiguration, "useAttributeScaling", true);
         anvilHammer = ConfigurationEngine.setString(file, fileConfiguration, "anvilHammer", "elitemobs:ui/anvilhammer", false);
         redCross = ConfigurationEngine.setString(file, fileConfiguration, "cancel", "elitemobs:ui/redcross", false);
         goldenQuestionMark = ConfigurationEngine.setString(file, fileConfiguration, "goldenQuestionMark", "elitemobs:ui/goldenquestionmark", false);

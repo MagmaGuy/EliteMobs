@@ -1,9 +1,11 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.api.PlayerPreTeleportEvent;
+import com.magmaguy.elitemobs.dungeons.DynamicDungeonPackage;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
 import com.magmaguy.elitemobs.dungeons.WorldInstancedDungeonPackage;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
+import com.magmaguy.elitemobs.menus.DynamicDungeonBrowser;
 import com.magmaguy.elitemobs.menus.InstancedDungeonBrowser;
 import org.bukkit.entity.Player;
 
@@ -21,7 +23,9 @@ public class DungeonCommands {
             player.sendMessage("[EliteMobs] You're already in an instance! You will not be able to switch to another instance before you do /em quit");
             return;
         }
-        if (emPackage instanceof WorldInstancedDungeonPackage)
+        if (emPackage instanceof DynamicDungeonPackage)
+            new DynamicDungeonBrowser(player, emPackage.getContentPackagesConfigFields().getFilename());
+        else if (emPackage instanceof WorldInstancedDungeonPackage)
             new InstancedDungeonBrowser(player, emPackage.getContentPackagesConfigFields().getFilename());
         else {
             if (emPackage.getContentPackagesConfigFields().getTeleportLocation() != null) {

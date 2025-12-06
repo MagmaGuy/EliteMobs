@@ -20,7 +20,7 @@ public class ContentPackagesConfigFields extends CustomConfigFields {
     @Setter
     private String name;
     @Getter
-    private ContentType contentType = null;
+    protected ContentType contentType = null;
     @Getter
     @Setter
     private List<String> customInfo = null;
@@ -134,6 +134,9 @@ public class ContentPackagesConfigFields extends CustomConfigFields {
     @Getter
     @Setter
     private List<String> setupMenuDescription = new ArrayList<>();
+    @Getter
+    @Setter
+    private int dungeonLockoutMinutes = 0; // 0 = no lockout, otherwise lockout duration in minutes
 
     public ContentPackagesConfigFields(String fileName, boolean isEnabled) {
         super(fileName, isEnabled);
@@ -349,6 +352,7 @@ public class ContentPackagesConfigFields extends CustomConfigFields {
         this.modelNames = processStringList("modelNames", modelNames, null, false);
         if (modelNames != null) contentType = ContentType.MODELS_PACKAGE;
         this.setupMenuDescription = processStringList("setupMenuDescription", setupMenuDescription, new ArrayList<>(), false);
+        this.dungeonLockoutMinutes = processInt("dungeonLockoutMinutes", dungeonLockoutMinutes, 0, false);
         processAdditionalFields();
     }
 
@@ -395,6 +399,7 @@ public class ContentPackagesConfigFields extends CustomConfigFields {
     public enum ContentType {
         OPEN_DUNGEON,
         INSTANCED_DUNGEON,
+        DYNAMIC_DUNGEON,
         HUB,
         SCHEMATIC_DUNGEON,
         META_PACKAGE,

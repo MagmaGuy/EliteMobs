@@ -27,7 +27,7 @@ public class TrackBossCommand extends AdvancedCommand {
         try {
             for (CustomBossEntity customBossEntity : CustomBossEntity.getTrackableCustomBosses())
                 if (customBossEntity.getEliteUUID().equals(UUID.fromString(commandData.getStringArgument("id")))) {
-                    customBossEntity.getCustomBossBossBar().addTrackingPlayer(commandData.getPlayerSender());
+                    customBossEntity.getBossTrackingBar().addTrackingPlayer(commandData.getPlayerSender());
                     return;
                 }
             Logger.sendMessage(commandData.getCommandSender(), DefaultConfig.getBossAlreadyGoneMessage());

@@ -21,8 +21,18 @@ public class CustomBossDeath implements Listener {
         if (customBossEntity.isTriggeredAntiExploit()) return;
         if (customBossEntity.customBossesConfigFields.getUniqueLootList() == null ||
                 customBossEntity.customBossesConfigFields.getUniqueLootList().isEmpty()) return;
-        for (Player player : customBossEntity.getDamagers().keySet())
+
+        // Get locked out players for instanced bosses
+        Set<Player> lockedOutPlayers = Set.of();
+        if (customBossEntity instanceof InstancedBossEntity instancedBoss) {
+            lockedOutPlayers = instancedBoss.getLockoutPlayers();
+        }
+
+        for (Player player : customBossEntity.getDamagers().keySet()) {
+            // Skip loot for locked out players
+            if (lockedOutPlayers.contains(player)) continue;
             dropLoot(player, customBossEntity);
+        }
     }
 
     public static void dropLoot(Player player, CustomBossEntity customBossEntity) {
