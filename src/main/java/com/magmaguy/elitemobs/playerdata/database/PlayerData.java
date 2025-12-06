@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.playerdata.database;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.config.DatabaseConfig;
+import com.magmaguy.elitemobs.dungeons.DungeonBossLockout;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.Quest;
@@ -86,6 +87,9 @@ public class PlayerData {
     @Getter
     @Setter
     private MatchInstance matchInstance = null;
+    @Getter
+    @Setter
+    private DungeonBossLockout dungeonBossLockout = null;
 
     public PlayerData(UUID uuid) {
         Player player = Bukkit.getPlayer(uuid);
@@ -325,6 +329,31 @@ public class PlayerData {
             setDatabaseValue(uuid, "PlayerQuestCooldowns", ObjectSerializer.toString(playerQuestCooldowns));
         } catch (Exception ex) {
             Logger.warn("Failed to register player quest cooldowns!");
+            ex.printStackTrace();
+        }
+    }
+
+    @Nullable
+    public static DungeonBossLockout getDungeonBossLockout(UUID uuid) {
+        try {
+            if (!isInMemory(uuid))
+                return (DungeonBossLockout) ObjectSerializer.fromString((String) getDatabaseBlob(uuid, "DungeonBossLockouts"));
+            if (playerDataHashMap.get(uuid) == null) return new DungeonBossLockout();
+            return playerDataHashMap.get(uuid).dungeonBossLockout == null ? new DungeonBossLockout() : playerDataHashMap.get(uuid).dungeonBossLockout;
+        } catch (Exception ex) {
+            return new DungeonBossLockout();
+        }
+    }
+
+    public static void updateDungeonBossLockout(UUID uuid, DungeonBossLockout dungeonBossLockout) {
+        try {
+            // Clean up expired lockouts before saving
+            dungeonBossLockout.cleanupExpiredLockouts();
+            setDatabaseValue(uuid, "DungeonBossLockouts", ObjectSerializer.toString(dungeonBossLockout));
+            if (playerDataHashMap.containsKey(uuid))
+                playerDataHashMap.get(uuid).dungeonBossLockout = dungeonBossLockout;
+        } catch (Exception ex) {
+            Logger.warn("Failed to update dungeon boss lockouts!");
             ex.printStackTrace();
         }
     }
@@ -644,6 +673,19 @@ public class PlayerData {
             dismissEMStatusScreenMessage = resultSet.getBoolean("DismissEMStatusScreenMessage");
         } else {
             setDismissEMStatusScreenMessage(Bukkit.getPlayer(uuid), false);
+        }
+
+        if (resultSet.getBytes("DungeonBossLockouts") != null) {
+            try {
+                dungeonBossLockout = (DungeonBossLockout) ObjectSerializer.fromString(new String(resultSet.getBytes("DungeonBossLockouts"), StandardCharsets.UTF_8));
+                // Clean up expired lockouts on load
+                dungeonBossLockout.cleanupExpiredLockouts();
+            } catch (Exception exception) {
+                Logger.warn("Failed to get dungeon boss lockouts! This player's lockouts will be reset.");
+                dungeonBossLockout = new DungeonBossLockout();
+            }
+        } else {
+            dungeonBossLockout = new DungeonBossLockout();
         }
 
         Logger.info("User " + uuid + " data successfully read!");

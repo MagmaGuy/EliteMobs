@@ -169,8 +169,8 @@ public class CustomMusic {
             songTask = new BukkitRunnable() {
                 @Override
                 public void run() {
-                    if (contentType == ContentType.BOSS && !customBossEntity.exists() ||
-                            contentType == ContentType.BOSS && player.getLocation().distanceSquared(customBossEntity.getLivingEntity().getLocation()) > Math.pow(customBossEntity.getFollowDistance() * 1.5, 2) ||
+                    if (contentType == ContentType.BOSS && (!customBossEntity.exists() || customBossEntity.getLivingEntity() == null) ||
+                            contentType == ContentType.BOSS && customBossEntity.getLivingEntity() != null && player.getLocation().distanceSquared(customBossEntity.getLivingEntity().getLocation()) > Math.pow(customBossEntity.getFollowDistance() * 1.5, 2) ||
                             contentType == ContentType.DUNGEON && !player.getWorld().equals(world)) {
                         cancel();
                         players.remove(player);
@@ -189,8 +189,8 @@ public class CustomMusic {
             songTask = new BukkitRunnable() {
                 @Override
                 public void run() {
-                    if (contentType == ContentType.BOSS && !customBossEntity.exists() ||
-                            contentType == ContentType.BOSS && player.getLocation().distanceSquared(customBossEntity.getLivingEntity().getLocation()) > Math.pow(customBossEntity.getFollowDistance() * 1.5, 2) ||
+                    if (contentType == ContentType.BOSS && (!customBossEntity.exists() || customBossEntity.getLivingEntity() == null) ||
+                            contentType == ContentType.BOSS && customBossEntity.getLivingEntity() != null && player.getLocation().distanceSquared(customBossEntity.getLivingEntity().getLocation()) > Math.pow(customBossEntity.getFollowDistance() * 1.5, 2) ||
                             contentType == ContentType.DUNGEON && !player.getWorld().equals(world)) {
                         cancel();
                         players.remove(player);

@@ -9,6 +9,7 @@ import com.magmaguy.elitemobs.thirdparty.custommodels.modelengine.CustomModelMEG
 import com.magmaguy.elitemobs.thirdparty.custommodels.modelengine.ModelEngineChecker;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
@@ -127,6 +128,15 @@ public class CustomModel implements CustomModelInterface {
             case FREE_MINECRAFT_MODELS -> customModelFMM.switchPhase();
             case MODEL_ENGINE -> customModelMEG.switchPhase();
         }
+    }
+
+    @Override
+    public Location getNametagBoneLocation() {
+        return switch (modelPlugin) {
+            case FREE_MINECRAFT_MODELS -> customModelFMM.getNametagBoneLocation();
+            case MODEL_ENGINE -> customModelMEG.getNametagBoneLocation();
+            default -> null;
+        };
     }
 
     public enum ModelPlugin {

@@ -123,6 +123,14 @@ public class CustomSpawn {
         new BukkitRunnable() {
             @Override
             public void run() {
+                if (Objects.requireNonNull(spawnLocation.getWorld()).getTime() < customSpawnConfigFields.getEarliestTime() ||
+                        spawnLocation.getWorld().getTime() > customSpawnConfigFields.getLatestTime())
+                    return;
+
+                if (customSpawnConfigFields.getMoonPhase() != null)
+                    if (!MoonPhaseDetector.detectMoonPhase(spawnLocation.getWorld()).equals(customSpawnConfigFields.getMoonPhase()))
+                        return;
+
                 if (spawnLocation == null) {
                     Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> generateCustomSpawn(), 1);
                     cancel();
@@ -130,7 +138,7 @@ public class CustomSpawn {
                 }
                 //One last check
                 //Last line of defense - spawn a test mob. If some unknown protection system prevents spawning it should prevent this
-                LivingEntity testEntity = spawnLocation.getWorld().spawn(spawnLocation, Zombie.class);
+                LivingEntity testEntity = spawnLocation.getWorld().spawn(spawnLocation, Zombie.class, spawnEntity -> spawnEntity.setAdult());
                 if (!testEntity.isValid()) {
                     spawnLocation = null;
                     //Run 1 tick later to make sure it doesn't get stuck trying over and over again in the same tick
@@ -141,14 +149,6 @@ public class CustomSpawn {
                 testEntity.remove();
 
                 if (!keepTrying) cancel();
-
-                if (Objects.requireNonNull(spawnLocation.getWorld()).getTime() < customSpawnConfigFields.getEarliestTime() ||
-                        spawnLocation.getWorld().getTime() > customSpawnConfigFields.getLatestTime())
-                    return;
-
-                if (customSpawnConfigFields.getMoonPhase() != null)
-                    if (!MoonPhaseDetector.detectMoonPhase(spawnLocation.getWorld()).equals(customSpawnConfigFields.getMoonPhase()))
-                        return;
 
                 for (CustomBossEntity customBossEntity : customBossEntities)
                     if (!customBossEntity.exists())
@@ -274,7 +274,7 @@ public class CustomSpawn {
         if (ThreadLocalRandom.current().nextBoolean())
             randomizedVector.setX(randomizedVector.getX() * -1);
         if (ThreadLocalRandom.current().nextBoolean())
-            randomizedVector.setY(randomizedVector.getY() * -1);
+            randomizedVector.setZ(randomizedVector.getZ() * -1);
 
         //Temp location - do not run checks on it yet
         Location location = selectedPlayer.getLocation().clone().add(randomizedVector);

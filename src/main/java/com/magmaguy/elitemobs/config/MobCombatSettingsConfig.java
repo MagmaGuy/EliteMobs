@@ -89,6 +89,20 @@ public class MobCombatSettingsConfig extends ConfigurationFile {
     private static double blockingDamageReduction;
     @Getter
     private static boolean silenceAllDeathMessages;
+    @Getter
+    private static boolean displayVisualHealthBars;
+    @Getter
+    private static boolean displayNumericHealth;
+    @Getter
+    private static boolean displayBossBarForHighMultiplier;
+    @Getter
+    private static double bossBarHealthMultiplierThreshold;
+    @Getter
+    private static double proximityBossBarHealthMultiplierThreshold;
+    @Getter
+    private static int combatDisplayTimeoutSeconds;
+    @Getter
+    private static boolean useFixedHealthBarSize;
     private static MobCombatSettingsConfig instance;
 
     public MobCombatSettingsConfig() {
@@ -231,5 +245,32 @@ public class MobCombatSettingsConfig extends ConfigurationFile {
         silenceAllDeathMessages = ConfigurationEngine.setBoolean(
                 List.of("Sets if all death messages will be silenced. This is not recommended, as it might hide some lore in dungeons."),
                 fileConfiguration, "silenceAllDeathMessages", false);
+        displayVisualHealthBars = ConfigurationEngine.setBoolean(
+                List.of("Sets if visual health bars (using bar characters) will be displayed above elite mobs during combat.",
+                        "The number of bars scales with the health multiplier of the boss."),
+                fileConfiguration, "displayVisualHealthBars", true);
+        displayNumericHealth = ConfigurationEngine.setBoolean(
+                List.of("Sets if numeric health values (current/max) will be displayed above the visual health bars."),
+                fileConfiguration, "displayNumericHealth", true);
+        displayBossBarForHighMultiplier = ConfigurationEngine.setBoolean(
+                List.of("Sets if boss bars (at the top of the screen) will be displayed for bosses with health multiplier above the threshold."),
+                fileConfiguration, "displayBossBarForHighMultiplier", true);
+        bossBarHealthMultiplierThreshold = ConfigurationEngine.setDouble(
+                List.of("Sets the health multiplier threshold above which boss bars will be displayed when entering combat.",
+                        "Bosses with a health multiplier greater than this value will show boss bars to players in combat."),
+                fileConfiguration, "bossBarHealthMultiplierThreshold", 1.0);
+        proximityBossBarHealthMultiplierThreshold = ConfigurationEngine.setDouble(
+                List.of("Sets the health multiplier threshold above which boss bars will be displayed to nearby players (within 30 blocks).",
+                        "Bosses with a health multiplier of this value or greater will show boss bars even without combat engagement."),
+                fileConfiguration, "proximityBossBarHealthMultiplierThreshold", 9.0);
+        combatDisplayTimeoutSeconds = ConfigurationEngine.setInt(
+                List.of("Sets how many seconds after the last combat action the health display will remain visible.",
+                        "After this time, the visual health bars and boss bars will disappear."),
+                fileConfiguration, "combatDisplayTimeoutSeconds", 30);
+        useFixedHealthBarSize = ConfigurationEngine.setBoolean(
+                List.of("Sets if the health bar should always be a fixed size (10 bars) regardless of boss health multiplier.",
+                        "When false (default), the health bar scales with the boss health multiplier, adding more bars and rows for tankier bosses.",
+                        "When true, the health bar is always a single row of 10 bars."),
+                fileConfiguration, "useFixedHealthBarSize", false);
     }
 }

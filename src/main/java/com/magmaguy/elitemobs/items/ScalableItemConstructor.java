@@ -39,6 +39,7 @@ public class ScalableItemConstructor {
                 player,
                 false,
                 customItem.getCustomItemsConfigFields().getCustomModelID(),
+                customItem.getCustomItemsConfigFields().getEquipmentModelID(),
                 customItem.getCustomItemsConfigFields().isSoulbound(),
                 customItem.getCustomItemsConfigFields().getFilename()
         );
@@ -111,6 +112,7 @@ public class ScalableItemConstructor {
                 player,
                 false,
                 customItem.getCustomItemsConfigFields().getCustomModelID(),
+                customItem.getCustomItemsConfigFields().getEquipmentModelID(),
                 customItem.getCustomItemsConfigFields().isSoulbound(),
                 customItem.getCustomItemsConfigFields().getFilename()
         );

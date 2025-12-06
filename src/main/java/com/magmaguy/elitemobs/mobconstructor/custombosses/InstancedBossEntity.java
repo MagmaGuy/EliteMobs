@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.instanced.dungeons.DungeonInstance;
+import com.magmaguy.elitemobs.instanced.dungeons.DynamicDungeonInstance;
 import com.magmaguy.elitemobs.mobconstructor.PersistentMovingEntity;
 import com.magmaguy.elitemobs.mobconstructor.PersistentObject;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
@@ -13,11 +14,15 @@ import com.magmaguy.magmacore.instance.MatchInstance;
 import com.magmaguy.magmacore.util.AttributeManager;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class InstancedBossEntity extends RegionalBossEntity implements PersistentObject, PersistentMovingEntity {
     private static final ArrayListMultimap<String, InstancedBossContainer> instancedBossEntities = ArrayListMultimap.create();
@@ -25,16 +30,22 @@ public class InstancedBossEntity extends RegionalBossEntity implements Persisten
     private  DungeonInstance dungeonInstance = null;
     @Getter
     private  MatchInstance matchInstance;
+    @Getter @Setter
+    private Set<Player> lockoutPlayers = new HashSet<>();
 
     public InstancedBossEntity(CustomBossesConfigFields customBossesConfigFields, Location location, DungeonInstance dungeonInstance) {
         super(customBossesConfigFields, location, false, true);
         this.dungeonInstance = dungeonInstance;
         super.elitePowers = ElitePowerParser.parsePowers(customBossesConfigFields, this);
         if (level == -1) {
-            if (dungeonInstance.getPlayers().isEmpty())
+            // For dynamic dungeons, use the player-selected level instead of calculating from gear
+            if (dungeonInstance instanceof DynamicDungeonInstance dynamicDungeonInstance) {
+                level = dynamicDungeonInstance.getSelectedLevel();
+            } else if (dungeonInstance.getPlayers().isEmpty()) {
                 Logger.warn("Failed to get players for new instance when assigning dynamic level! The bosses will default to level 1.");
-            else
+            } else {
                 level = ElitePlayerInventory.getPlayer(dungeonInstance.getPlayers().stream().findFirst().get()).getNaturalMobSpawnLevel(true);
+            }
         }
     }
 
@@ -114,6 +125,11 @@ public class InstancedBossEntity extends RegionalBossEntity implements Persisten
         //This is useful for phase boss entities that spawn in unloaded chunks and shouldn't full heal between phases, like in dungeons
         else if (livingEntity != null)
             livingEntity.setHealth(Math.min(health, AttributeManager.getAttributeBaseValue(livingEntity, "generic_max_health")));
+    }
+
+    public void setEntityLevel(int level) {
+        this.level = level;
+        setMaxHealth();
     }
 
     @Override

@@ -1,5 +1,7 @@
 package com.magmaguy.elitemobs.playerdata.statusscreen;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
@@ -320,7 +322,7 @@ public class PlayerStatusScreenDialog {
         // Add boss tracking buttons
         for (CustomBossEntity customBossEntity : CustomBossEntity.getTrackableCustomBosses()) {
             try {
-                String bossName = customBossEntity.getCustomBossBossBar().bossBarMessage(
+                String bossName = customBossEntity.getBossTrackingBar().bossBarMessage(
                         player, customBossEntity.getCustomBossesConfigFields().getLocationMessage());
 
                 DialogManager.ActionButton button = DialogManager.ActionButton.of(
@@ -399,10 +401,33 @@ public class PlayerStatusScreenDialog {
 
         JsonObject components = DialogManager.serializeItemComponents(item);
         if (components != null && !components.entrySet().isEmpty()) {
+            // Fix custom_model_data format for 1.21.4+ (changed from int to object)
+            fixCustomModelDataFormat(components);
             itemBody.components(components);
         }
 
         builder.addBody(itemBody);
+    }
+
+    /**
+     * Fixes the custom_model_data format for Minecraft 1.21.4+
+     * Old format: "minecraft:custom_model_data": 36004
+     * New format: "minecraft:custom_model_data": {"floats": [36004.0]}
+     */
+    private static void fixCustomModelDataFormat(JsonObject components) {
+        String key = "minecraft:custom_model_data";
+        if (components.has(key)) {
+            JsonElement element = components.get(key);
+            if (element.isJsonPrimitive()) {
+                // Convert integer/number to new format
+                double value = element.getAsDouble();
+                JsonObject newFormat = new JsonObject();
+                JsonArray floats = new JsonArray();
+                floats.add(value);
+                newFormat.add("floats", floats);
+                components.add(key, newFormat);
+            }
+        }
     }
 
     /**

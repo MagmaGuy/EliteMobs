@@ -36,6 +36,7 @@ public class ItemConstructor {
                                           Player player,
                                           boolean showItemWorth,
                                           String customModelID,
+                                          String equipmentModelID,
                                           boolean soulbound,
                                           String filename) {
         /*
@@ -75,8 +76,22 @@ public class ItemConstructor {
 
         itemStack.setItemMeta(itemMeta);
 
-        //Apply custom model id
-        itemStack = CustomModelAdder.addCustomModel(itemStack, customModelID);
+        //Apply custom models - use config values if defined, otherwise fall back to level-based skin system
+        if ((customModelID != null && !customModelID.isEmpty()) || (equipmentModelID != null && !equipmentModelID.isEmpty())) {
+            //Config defines at least one model - use config values (may be null for the other)
+            String effectiveCustomModelID = (customModelID != null && !customModelID.isEmpty())
+                    ? customModelID
+                    : EliteItemSkins.getItemModelId(material, level);
+            String effectiveEquipmentModelID = (equipmentModelID != null && !equipmentModelID.isEmpty())
+                    ? equipmentModelID
+                    : EliteItemSkins.getEquipmentModelId(material, level);
+            CustomModelAdder.addCustomModel(itemStack, effectiveCustomModelID);
+            CustomModelAdder.addEquippableModel(itemStack, effectiveEquipmentModelID);
+        } else {
+            //No config models defined - use full level-based skin system
+            EliteItemSkins.applyLevelBasedSkin(itemStack, level);
+        }
+
         itemMeta = itemStack.getItemMeta();
 
         //Register filename of the custom item into the persistent metadata
@@ -131,6 +146,11 @@ public class ItemConstructor {
          */
         itemStack.setItemMeta(itemMeta);
         ItemQualityColorizer.dropQualityColorizer(itemStack);
+
+        /*
+        Apply level-based custom skins for procedurally generated items
+         */
+        EliteItemSkins.applyLevelBasedSkin(itemStack, (int) Math.round(itemTier));
 
         return commonFeatures(itemStack, killedMob, player, enchantmentMap, customEnchantmentMap, showItemWorth, true);
 

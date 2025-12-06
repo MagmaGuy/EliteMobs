@@ -137,11 +137,7 @@ public class TreasureChest implements PersistentObject {
             } else if (restockTime > Instant.now().getEpochSecond())
                 return;
 
-        if (ThreadLocalRandom.current().nextDouble() < customTreasureChestConfigFields.getMimicChance()) doMimic();
-        else doTreasure(player);
-
-        player.playSound(player.getLocation(), SoundsConfig.treasureChestOpenSound, 1, 1);
-
+        // Add player to cooldown BEFORE giving loot to prevent spam clicking exploits
         if (customTreasureChestConfigFields.getDropStyle().equals(DropStyle.GROUP)) {
             if (customTreasureChestConfigFields.isInstanced()) {
                 blacklistedPlayersInstance.add(player.getUniqueId());
@@ -171,6 +167,14 @@ public class TreasureChest implements PersistentObject {
                     }
                 }.runTaskLater(MetadataHandler.PLUGIN, 20L * 60 * customTreasureChestConfigFields.getRestockTimer());
             }
+        }
+
+        if (ThreadLocalRandom.current().nextDouble() < customTreasureChestConfigFields.getMimicChance()) doMimic();
+        else doTreasure(player);
+
+        player.playSound(player.getLocation(), SoundsConfig.treasureChestOpenSound, 1, 1);
+
+        if (customTreasureChestConfigFields.getDropStyle().equals(DropStyle.GROUP)) {
             return;
         }
 

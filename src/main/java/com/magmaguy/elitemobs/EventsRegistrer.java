@@ -9,12 +9,12 @@ import com.magmaguy.elitemobs.combatsystem.EliteMobDamagedByEliteMobHandler;
 import com.magmaguy.elitemobs.combatsystem.EliteMobGenericDamagedHandler;
 import com.magmaguy.elitemobs.combatsystem.antiexploit.*;
 import com.magmaguy.elitemobs.combatsystem.combattag.CombatTag;
-import com.magmaguy.elitemobs.combatsystem.displays.HealthDisplay;
-import com.magmaguy.elitemobs.combatsystem.displays.PopupDisplay;
+import com.magmaguy.elitemobs.combatsystem.displays.BossHealthDisplay;
 import com.magmaguy.elitemobs.commands.admin.RemoveCommand;
 import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
+import com.magmaguy.elitemobs.dungeons.DungeonBossLockoutHandler;
 import com.magmaguy.elitemobs.dungeons.DungeonProtector;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.events.ActionEvent;
@@ -253,6 +253,7 @@ public class EventsRegistrer {
         register(new CommandsPage.CommandsPageEvents());
         register(new BossTrackingPage.BossTrackingPageEvents());
         register(new InstancedDungeonBrowser.InstancedDungeonBrowserEvents());
+        register(new DynamicDungeonBrowser.DynamicDungeonBrowserEvents());
 
         //Shops
         register(new ProceduralShopMenu.ProceduralShopMenuEvents());
@@ -297,11 +298,10 @@ public class EventsRegistrer {
 
         register(new ActionEvent.ActionEventEvents());
 
-        //Set up health and damage displays
-        if (MobCombatSettingsConfig.isDisplayHealthOnHit())
-            register(new HealthDisplay());
-        if (MobCombatSettingsConfig.isDisplayDamageOnHit())
-            register(new PopupDisplay());
+        //Set up enhanced boss health display system (visual bars, numeric display, boss bars, damage/heal popups)
+        BossHealthDisplay bossHealthDisplay = new BossHealthDisplay();
+        register(bossHealthDisplay);
+        BossHealthDisplay.startMasterUpdateTask();
 
         //Initialize items from custom events
         register(new FlamethrowerEnchantment.FlamethrowerEnchantmentEvents());
@@ -363,6 +363,7 @@ public class EventsRegistrer {
             register(new WorldGuardExplosionBlockDamageFlag());
         }
         register(new DungeonProtector());
+        register(new DungeonBossLockoutHandler());
 
         register(new EntityTransformHandler());
         register(new EliteBlazeWaterDamagePrevention());

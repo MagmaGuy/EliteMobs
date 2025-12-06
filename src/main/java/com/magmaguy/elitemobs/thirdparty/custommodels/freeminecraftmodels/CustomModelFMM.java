@@ -4,8 +4,12 @@ import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.thirdparty.custommodels.CustomModelInterface;
 import com.magmaguy.freeminecraftmodels.api.ModeledEntityManager;
 import com.magmaguy.freeminecraftmodels.customentity.DynamicEntity;
+import com.magmaguy.freeminecraftmodels.customentity.core.Bone;
 import lombok.Getter;
+import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
+
+import java.util.List;
 
 public class CustomModelFMM implements CustomModelInterface {
     @Getter
@@ -60,5 +64,13 @@ public class CustomModelFMM implements CustomModelInterface {
     @Override
     public void switchPhase() {
         dynamicEntity.remove();
+    }
+
+    @Override
+    public Location getNametagBoneLocation() {
+        if (dynamicEntity == null) return null;
+        List<Bone> nametagBones = dynamicEntity.getNametagBones();
+        if (nametagBones == null || nametagBones.isEmpty()) return null;
+        return nametagBones.get(0).getBoneLocation();
     }
 }

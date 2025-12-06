@@ -29,7 +29,8 @@ public class GenerateDatabase {
                 "PlayerQuestCooldowns BLOB, " +
                 "BackTeleportLocation TEXT, " +
                 "UseBookMenus TINYINT(1), " +
-                "DismissEMStatusScreenMessage TINYINT(1)" +
+                "DismissEMStatusScreenMessage TINYINT(1), " +
+                "DungeonBossLockouts BLOB" +
                 ");";
         statement.executeUpdate(sql);
         statement.close();
@@ -50,6 +51,7 @@ public class GenerateDatabase {
         addEntryIfEmpty("BackTeleportLocation", ColumnValues.TEXT);
         addEntryIfEmpty("UseBookMenus", ColumnValues.BOOLEAN);
         addEntryIfEmpty("DismissEMStatusScreenMessage", ColumnValues.BOOLEAN);
+        addEntryIfEmpty("DungeonBossLockouts", ColumnValues.BLOB);
     }
 
     private static void addEntryIfEmpty(String columnName, ColumnValues columnValues) {
