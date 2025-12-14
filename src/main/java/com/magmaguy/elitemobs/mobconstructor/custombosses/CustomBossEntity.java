@@ -174,6 +174,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
         if (dynamicLevelUpdater != null)
             dynamicLevelUpdater.cancel();
         dynamicLevelBossEntities.clear();
+        trackableCustomBosses.clear();
     }
 
     @Override

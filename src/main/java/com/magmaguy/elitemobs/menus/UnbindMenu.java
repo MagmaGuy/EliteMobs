@@ -33,6 +33,10 @@ public class UnbindMenu extends EliteMenu {
     private static final int informationOutputSlot = UnbinderMenuConfig.getOutputInformationSlot();
     public static Set<Inventory> inventories = new HashSet<>();
 
+    public static void shutdown() {
+        inventories.clear();
+    }
+
     private static void calculateOutput(Inventory UnbinderInventory) {
         if (UnbinderInventory.getItem(UnbinderMenuConfig.getEliteUnbindInputSlot()) == null ||
                 UnbinderInventory.getItem(UnbinderMenuConfig.getEliteItemInputSlot()) == null) {

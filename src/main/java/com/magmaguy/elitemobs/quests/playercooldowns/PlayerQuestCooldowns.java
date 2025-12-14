@@ -14,7 +14,11 @@ import java.util.*;
 public class PlayerQuestCooldowns implements Serializable {
 
     @Getter
-    private static final HashSet<Player> bypassedPlayers = new HashSet<>();
+    private static final HashSet<UUID> bypassedPlayers = new HashSet<>();
+
+    public static void shutdown() {
+        bypassedPlayers.clear();
+    }
     @Getter
     private final List<QuestCooldown> questCooldowns = new ArrayList<>();
 
@@ -26,14 +30,15 @@ public class PlayerQuestCooldowns implements Serializable {
     }
 
     public static void toggleBypass(Player player) {
-        if (!bypassedPlayers.contains(player))
-            bypassedPlayers.add(player);
+        UUID playerUUID = player.getUniqueId();
+        if (!bypassedPlayers.contains(playerUUID))
+            bypassedPlayers.add(playerUUID);
         else
-            bypassedPlayers.remove(player);
+            bypassedPlayers.remove(playerUUID);
     }
 
     public static boolean bypassesQuestRestrictions(Player player) {
-        return bypassedPlayers.contains(player);
+        return bypassedPlayers.contains(player.getUniqueId());
     }
 
     public static PlayerQuestCooldowns initializePlayer() {

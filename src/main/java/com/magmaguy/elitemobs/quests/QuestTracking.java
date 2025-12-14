@@ -36,11 +36,12 @@ import org.bukkit.util.Vector;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 public class QuestTracking {
 
     @Getter
-    private static final HashMap<Player, QuestTracking> playerTrackingQuests = new HashMap<>();
+    private static final HashMap<UUID, QuestTracking> playerTrackingQuests = new HashMap<>();
     private final Player player;
     @Getter
     private final CustomQuest customQuest;
@@ -56,16 +57,16 @@ public class QuestTracking {
         this.customQuest = customQuest;
         startLocationGetter();
         startCompass();
-        playerTrackingQuests.put(player, this);
+        playerTrackingQuests.put(player.getUniqueId(), this);
         customQuest.getQuestObjectives().displayLazyObjectivesScoreboard(player);
     }
 
     public static boolean isTracking(Player player) {
-        return playerTrackingQuests.containsKey(player);
+        return playerTrackingQuests.containsKey(player.getUniqueId());
     }
 
-    public static void clear() {
-        ((HashMap<Player, QuestTracking>) playerTrackingQuests.clone()).values().forEach(QuestTracking::stop);
+    public static void shutdown() {
+        new HashMap<>(playerTrackingQuests).values().forEach(QuestTracking::stop);
     }
 
     public static void toggleTracking(Player player, String questID) {
@@ -78,8 +79,8 @@ public class QuestTracking {
     }
 
     public static void toggleTracking(Player player, CustomQuest quest) {
-        if (playerTrackingQuests.containsKey(player)) {
-            playerTrackingQuests.get(player).stop();
+        if (playerTrackingQuests.containsKey(player.getUniqueId())) {
+            playerTrackingQuests.get(player.getUniqueId()).stop();
         } else {
             if (quest == null) {
                 player.sendMessage("[EliteMobs] Failed to get a valid quest with that quest ID!");
@@ -180,7 +181,7 @@ public class QuestTracking {
     }
 
     public void stop() {
-        playerTrackingQuests.remove(player);
+        playerTrackingQuests.remove(player.getUniqueId());
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -323,7 +324,7 @@ public class QuestTracking {
     public static class QuestTrackingEvents implements Listener {
         @EventHandler
         public void onPlayerLogout(PlayerQuitEvent event) {
-            QuestTracking questTracking = getPlayerTrackingQuests().get(event.getPlayer());
+            QuestTracking questTracking = getPlayerTrackingQuests().get(event.getPlayer().getUniqueId());
             if (questTracking == null) return;
             questTracking.stop();
         }
@@ -332,19 +333,19 @@ public class QuestTracking {
         public void onQuestProgressEvent(QuestProgressionEvent event) {
             //if (event.getObjective().isObjectiveCompleted()) return;
             if (!isTracking(event.getPlayer())) return;
-            if (!getPlayerTrackingQuests().get(event.getPlayer()).getCustomQuest().getQuestID().equals(event.getQuest().getQuestID()))
+            if (!getPlayerTrackingQuests().get(event.getPlayer().getUniqueId()).getCustomQuest().getQuestID().equals(event.getQuest().getQuestID()))
                 return;
-            getPlayerTrackingQuests().get(event.getPlayer())
-                    .updateLocations(getPlayerTrackingQuests().get(event.getPlayer()).getCustomQuest());
-            getPlayerTrackingQuests().get(event.getPlayer()).refreshScoreboard();
+            getPlayerTrackingQuests().get(event.getPlayer().getUniqueId())
+                    .updateLocations(getPlayerTrackingQuests().get(event.getPlayer().getUniqueId()).getCustomQuest());
+            getPlayerTrackingQuests().get(event.getPlayer().getUniqueId()).refreshScoreboard();
         }
 
         @EventHandler(ignoreCancelled = true)
         public void onQuestCompleteEvent(QuestCompleteEvent event) {
             if (!isTracking(event.getPlayer())) return;
-            if (!getPlayerTrackingQuests().get(event.getPlayer()).getCustomQuest().getQuestID().equals(event.getQuest().getQuestID()))
+            if (!getPlayerTrackingQuests().get(event.getPlayer().getUniqueId()).getCustomQuest().getQuestID().equals(event.getQuest().getQuestID()))
                 return;
-            getPlayerTrackingQuests().get(event.getPlayer()).stop();
+            getPlayerTrackingQuests().get(event.getPlayer().getUniqueId()).stop();
         }
 
         @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)

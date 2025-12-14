@@ -52,6 +52,10 @@ public class BuyOrSellMenu {
     public static class BuyOrSellMenuEvents implements Listener {
         public static final Set<Inventory> menus = new HashSet<>();
 
+        public static void shutdown() {
+            menus.clear();
+        }
+
         @EventHandler
         public void onInventoryInteraction(InventoryClickEvent event) {
 

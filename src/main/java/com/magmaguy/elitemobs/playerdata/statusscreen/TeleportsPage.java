@@ -111,6 +111,11 @@ public class TeleportsPage {
         private static final Set<Inventory> pageInventories = new HashSet<>();
         private static final List<EMPackage> orderedDungeons = new ArrayList<>();
 
+        public static void shutdown() {
+            pageInventories.clear();
+            orderedDungeons.clear();
+        }
+
         @EventHandler(ignoreCancelled = true)
         public void onInventoryInteract(InventoryClickEvent event) {
             Player player = ((Player) event.getWhoClicked()).getPlayer();

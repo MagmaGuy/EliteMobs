@@ -609,6 +609,7 @@ public class PlayerData {
     }
 
     public static void closeConnection() {
+        playerDataHashMap.clear();
         try {
             if (connection == null) return;
             connection.close();

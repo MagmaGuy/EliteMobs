@@ -37,6 +37,11 @@ public class CrashFix implements Listener {
         return PersistentVanillaData.hasString(entity, fallingBlocksKey);
     }
 
+    public static void shutdown() {
+        temporarilyCachedChunks.clear();
+        knownSessionChunks.clear();
+    }
+
     public static void startupCheck() {
         for (World world : Bukkit.getWorlds())
             for (Chunk chunk : world.getLoadedChunks()) {

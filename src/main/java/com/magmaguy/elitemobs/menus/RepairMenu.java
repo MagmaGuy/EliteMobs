@@ -33,6 +33,10 @@ public class RepairMenu extends EliteMenu {
     private static final int informationOutputSlot = RepairMenuConfig.outputInformationSlot;
     public static Set<Inventory> inventories = new HashSet<>();
 
+    public static void shutdown() {
+        inventories.clear();
+    }
+
     private static void calculateOutput(Inventory repairInventory) {
         if (repairInventory.getItem(RepairMenuConfig.eliteScrapInputSlot) == null || repairInventory.getItem(RepairMenuConfig.eliteItemInputSlot) == null) {
             repairInventory.setItem(RepairMenuConfig.outputSlot, null);

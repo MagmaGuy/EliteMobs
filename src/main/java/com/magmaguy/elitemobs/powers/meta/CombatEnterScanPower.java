@@ -21,6 +21,10 @@ public abstract class CombatEnterScanPower extends MajorPower implements Listene
         combatEnterScanPowers.add(this);
     }
 
+    public static void shutdown() {
+        combatEnterScanPowers.clear();
+    }
+
     protected void activate(EliteEntity eliteEntity) {
         if (isActive) return;
         isActive = true;

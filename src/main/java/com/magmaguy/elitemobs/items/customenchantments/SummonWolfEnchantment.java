@@ -16,8 +16,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class SummonWolfEnchantment extends CustomEnchantment {
@@ -69,16 +70,21 @@ public class SummonWolfEnchantment extends CustomEnchantment {
     }
 
     public static class SummonWolfEnchantmentEvent implements Listener {
-        private static final List<Player> playerCooldowns = new ArrayList<>();
+        private static final Set<UUID> playerCooldowns = new HashSet<>();
+
+        public static void shutdown() {
+            playerCooldowns.clear();
+        }
 
         @EventHandler(ignoreCancelled = true)
         public void onRightClick(PlayerInteractEvent event) {
-            if (playerCooldowns.contains(event.getPlayer())) return;
-            playerCooldowns.add(event.getPlayer());
+            UUID playerUUID = event.getPlayer().getUniqueId();
+            if (playerCooldowns.contains(playerUUID)) return;
+            playerCooldowns.add(playerUUID);
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    playerCooldowns.remove(event.getPlayer());
+                    playerCooldowns.remove(playerUUID);
                 }
             }.runTaskLater(MetadataHandler.PLUGIN, 20 * 60L);
             if (!(event.getAction().equals(Action.RIGHT_CLICK_AIR) || event.getAction().equals(Action.RIGHT_CLICK_BLOCK)))

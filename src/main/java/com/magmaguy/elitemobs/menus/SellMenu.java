@@ -33,6 +33,10 @@ public class SellMenu extends EliteMenu implements Listener {
 
     public static Set<Inventory> inventories = new HashSet<>();
 
+    public static void shutdown() {
+        inventories.clear();
+    }
+
     private static double calculateShopValue(Inventory shopInventory, Player player) {
         double itemWorth = 0;
         for (Integer validSlot : validSlots) {

@@ -1,204 +1,279 @@
 package com.magmaguy.elitemobs.config.translations;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.config.ConfigurationEngine;
-import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 
-public class TranslationsConfigFields extends CustomConfigFields {
+/**
+ * Handles loading and accessing translations from a per-language CSV file.
+ * Each language has its own CSV with format: "key","en","<lang_code>"
+ * Example: french.csv has columns "key","en","fr"
+ */
+public class TranslationsConfigFields {
 
-    private final List<String> outdatedCustomKeys = new ArrayList<>();
+    private static final String TRANSLATIONS_DATA_SUFFIX = "_data.csv";
+
+    private final String languageName; // e.g., "french"
+    private final String languageCode; // e.g., "fr"
+    private TranslationCsvParser.TranslationData translationData;
+    private TranslationCsvParser.TranslationData translationDataSnapshot;
+    private Path translationsPath;
+    private Path translationsDataPath;
     private boolean saving = false;
-    private File translationDataFile;
-    private FileConfiguration translationData;
-    private FileConfiguration premadeTranslationsConfiguration;
-    private boolean customLanguage = false;
+    private boolean dirty = false;
+
+    public TranslationsConfigFields() {
+        // Parse language name from config (e.g., "french" or "french.yml" -> "french")
+        String configLang = DefaultConfig.getLanguage();
+        this.languageName = configLang.replace(".yml", "").replace(".csv", "").toLowerCase();
+        this.languageCode = getLanguageCode(languageName);
+        initialize();
+    }
 
     /**
-     * Used by plugin-generated files (defaults)
-     *
-     * @param filename
-     * @param isEnabled
+     * Maps language names to their ISO codes for CSV column headers.
+     * Special case: "custom" uses "custom" as both name and code.
      */
-    public TranslationsConfigFields(String filename, boolean isEnabled) {
-        super(filename, isEnabled);
+    private String getLanguageCode(String languageName) {
+        return switch (languageName) {
+            case "english" -> "en";
+            case "custom" -> "custom"; // Special: custom language for user modifications
+            case "french" -> "fr";
+            case "german" -> "de";
+            case "spanish" -> "es";
+            case "italian" -> "it";
+            case "brazilianPortuguese" -> "pt";
+            case "russian" -> "ru";
+            case "chinese", "chinesesimplified" -> "zh_cn";
+            case "chinesetraditional" -> "zh_tw";
+            case "japanese" -> "ja";
+            case "korean" -> "ko";
+            case "polish" -> "pl";
+            case "dutch" -> "nl";
+            case "czech" -> "cs";
+            case "hungarian" -> "hu";
+            case "romanian" -> "ro";
+            case "turkish" -> "tr";
+            case "vietnamese" -> "vi";
+            case "indonesian" -> "id";
+            default -> languageName; // Use name as code if unknown
+        };
+    }
 
-        // only load the currently-selected language
-        if (!DefaultConfig.getLanguage().equals(filename)) return;
-
-        // build path: plugins/…/translations/<filename>.yml
-        String parsedFilename = filename.endsWith(".yml") ? filename : filename + ".yml";
+    private void initialize() {
         Path folder = Paths.get(MetadataHandler.PLUGIN.getDataFolder().getAbsolutePath(), "translations");
-        Path realPath = folder.resolve(parsedFilename);
+        String csvFilename = languageName + ".csv";
+        translationsPath = folder.resolve(csvFilename);
+        translationsDataPath = folder.resolve(languageName + TRANSLATIONS_DATA_SUFFIX);
 
-        // if missing, try to copy from bundled resources; else mark as custom
-        if (!Files.exists(realPath)) {
-            try (InputStream in = MetadataHandler.PLUGIN.getResource("translations/" + parsedFilename)) {
-                if (in != null) {
-                    Files.createDirectories(realPath.getParent());
-                    Files.copy(in, realPath);
-                    Logger.info("Copied bundled translation " + parsedFilename);
-                } else {
-                    Logger.info("No bundled translation for " + parsedFilename + ", treating as custom");
-                    customLanguage = true;
-                }
-            } catch (IOException ex) {
-                Logger.warn("Error creating translation file " + parsedFilename + ": " + ex.getMessage());
-                customLanguage = true;
-            }
-        }
-
-        // now load the file
         try {
-            this.file = realPath.toFile();
-            this.fileConfiguration = YamlConfiguration.loadConfiguration(
-                    new InputStreamReader(Files.newInputStream(realPath), StandardCharsets.UTF_8)
-            );
+            Files.createDirectories(folder);
+
+            // Try to load existing CSV
+            if (Files.exists(translationsPath)) {
+                translationData = TranslationCsvParser.parse(translationsPath);
+                Logger.info("Loaded translations from " + csvFilename);
+            } else {
+                // Try to copy bundled CSV from resources
+                try (InputStream in = MetadataHandler.PLUGIN.getResource("translations/" + csvFilename)) {
+                    if (in != null) {
+                        Files.copy(in, translationsPath);
+                        translationData = TranslationCsvParser.parse(translationsPath);
+                        Logger.info("Copied bundled translation: " + csvFilename);
+                    } else {
+                        // Create empty translation data
+                        translationData = new TranslationCsvParser.TranslationData(List.of("en", languageCode));
+                        Logger.info("Created new empty translations for: " + languageName);
+                    }
+                }
+            }
+
+            // Ensure both language columns exist
+            translationData.addLanguage("en");
+            translationData.addLanguage(languageCode);
+
+            // Load or create snapshot for tracking customizations
+            if (Files.exists(translationsDataPath)) {
+                translationDataSnapshot = TranslationCsvParser.parse(translationsDataPath);
+            } else {
+                translationDataSnapshot = new TranslationCsvParser.TranslationData(List.of("en", languageCode));
+            }
+
+            // Process bundled translations to auto-update unchanged entries
+            processConfigFields();
+
         } catch (IOException e) {
-            Logger.warn("Could not load translation file " + parsedFilename + ": " + e.getMessage());
+            Logger.warn("Failed to initialize translations: " + e.getMessage());
+            translationData = new TranslationCsvParser.TranslationData(List.of("en", languageCode));
+            translationDataSnapshot = new TranslationCsvParser.TranslationData(List.of("en", languageCode));
         }
     }
 
-    @Override
-    public void processConfigFields() {
-        // only process if this is the selected language, and we have a bundled premade to compare
-        if (!DefaultConfig.getLanguage().equals(filename)) return;
-        if (MetadataHandler.PLUGIN.getResource("translations/" + filename) == null) return;
-        if (customLanguage) return;
+    /**
+     * Processes bundled translations and auto-updates unchanged entries.
+     */
+    private void processConfigFields() {
+        String csvFilename = languageName + ".csv";
+        try (InputStream in = MetadataHandler.PLUGIN.getResource("translations/" + csvFilename)) {
+            if (in == null) return;
 
-        // prepare .translation_data backup
-        String languageDataFilename = filename.replace(".yml", ".translation_data");
-        Path dataPath = Paths.get(
-                MetadataHandler.PLUGIN.getDataFolder().getAbsolutePath(),
-                "translations", languageDataFilename
-        );
-        if (!Files.exists(dataPath)) {
-            try {
-                Files.createDirectories(dataPath.getParent());
-                dataPath.toFile().createNewFile();
-            } catch (Exception ex) {
-                Logger.info("Could not create data file " + languageDataFilename);
-            }
-        }
+            Path tempPath = Files.createTempFile("elitemobs_trans_", ".csv");
+            Files.copy(in, tempPath, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            TranslationCsvParser.TranslationData bundledData = TranslationCsvParser.parse(tempPath);
+            Files.delete(tempPath);
 
-        translationDataFile = dataPath.toFile();
-        try {
-            translationData = YamlConfiguration.loadConfiguration(
-                    new InputStreamReader(new FileInputStream(translationDataFile), StandardCharsets.UTF_8)
-            );
-        } catch (Exception ex) {
-            Logger.warn("Failed to read translation data!");
-            return;
-        }
+            boolean updated = false;
 
-        // load the bundled premade for diff’ing
-        premadeTranslationsConfiguration = YamlConfiguration.loadConfiguration(
-                new InputStreamReader(
-                        MetadataHandler.PLUGIN.getResource("translations/" + filename),
-                        StandardCharsets.UTF_8
-                )
-        );
+            for (String key : bundledData.getKeys()) {
+                Object bundledEnValue = bundledData.get(key, "en");
+                if (bundledEnValue == null) continue;
 
-        // compare & auto-update unchanged entries
-        for (String path : premadeTranslationsConfiguration.getKeys(true)) {
-            Object premadeValue = premadeTranslationsConfiguration.get(path);
-            if (!(premadeValue instanceof String || premadeValue instanceof List)) continue;
+                Object snapshotEnValue = translationDataSnapshot.get(key, "en");
+                Object liveEnValue = translationData.get(key, "en");
 
-            Object dataValue = translationData.get(path);
-            Object liveValue = fileConfiguration.get(path);
-
-            if (dataValue == null) {
-                // never-seen key: if live is empty, write default; else leave custom
-                if (liveValue != null) {
-                    outdatedCustomKeys.add(path);
-                    Logger.info("Skipped custom key " + path);
-                } else {
-                    fileConfiguration.set(path, premadeValue);
+                if (snapshotEnValue == null) {
+                    // New key: add if not already present
+                    if (liveEnValue == null) {
+                        translationData.set(key, "en", bundledEnValue);
+                        Object bundledLangValue = bundledData.get(key, languageCode);
+                        if (bundledLangValue != null) {
+                            translationData.set(key, languageCode, bundledLangValue);
+                        }
+                        updated = true;
+                    }
+                } else if (!bundledEnValue.equals(snapshotEnValue)) {
+                    // Default changed: update if user hasn't customized
+                    if (snapshotEnValue.equals(liveEnValue)) {
+                        translationData.set(key, "en", bundledEnValue);
+                        Object bundledLangValue = bundledData.get(key, languageCode);
+                        if (bundledLangValue != null) {
+                            translationData.set(key, languageCode, bundledLangValue);
+                        }
+                        Logger.info("Auto-updated translation: " + key);
+                        updated = true;
+                    }
                 }
-            } else if (!premadeValue.equals(dataValue)) {
-                // updated default: if live still matches old data, overwrite; else leave custom
-                if (!dataValue.equals(liveValue)) {
-                    outdatedCustomKeys.add(path);
-                    Logger.info("Skipped custom key " + path);
-                } else {
-                    fileConfiguration.set(path, premadeValue);
-                    Logger.info("Auto-updated translation " + path);
+
+                // Update snapshot
+                translationDataSnapshot.set(key, "en", bundledEnValue);
+                Object bundledLangValue = bundledData.get(key, languageCode);
+                if (bundledLangValue != null) {
+                    translationDataSnapshot.set(key, languageCode, bundledLangValue);
                 }
             }
 
-            // always refresh our data snapshot
-            if (!premadeValue.equals(dataValue)) {
-                translationData.set(path, premadeValue);
+            if (updated) {
+                save();
+                saveSnapshot();
             }
-        }
 
-        // save both files
-        try {
-            translationData.save(translationDataFile);
-            fileConfiguration.save(file);
-        } catch (Exception ex) {
-            Logger.warn("Failed to save language files: " + ex.getMessage());
+        } catch (IOException e) {
+            Logger.warn("Failed to process bundled translations: " + e.getMessage());
         }
     }
 
-    /** Adds a missing key to the language file at runtime. */
+    /**
+     * Adds a translation key with its English value at runtime.
+     */
     public void add(String filename, String key, Object value) {
         if (value == null) return;
-        String filteredFilename = filename.replace(".yml", "");
 
-        if (value instanceof String) {
-            String s = fixConfigColors((String) value);
-            if (s.isEmpty()) return;
-            value = s;
-        } else if (value instanceof List) {
-            List<String> list = fixConfigColors((List<String>) value);
-            if (list.isEmpty()) return;
-            value = list;
+        String filteredFilename = filename.replace(".yml", "");
+        String realKey = filteredFilename + "." + key;
+
+        // Process value (fix color codes)
+        if (value instanceof String s) {
+            String fixed = fixConfigColors(s);
+            if (fixed.isEmpty()) return;
+            value = fixed;
+        } else if (value instanceof List<?> list) {
+            @SuppressWarnings("unchecked")
+            List<String> fixedList = fixConfigColors((List<String>) list);
+            if (fixedList.isEmpty()) return;
+            value = fixedList;
         }
 
-        String realKey = filteredFilename + "." + key;
-        if (fileConfiguration.get(realKey) != null) return;
+        // Only add if key doesn't exist for English
+        if (translationData.get(realKey, "en") != null) return;
 
-        fileConfiguration.set(realKey, value);
-        save();
+        // Add English value
+        translationData.set(realKey, "en", value);
+
+        // Also add to target language column (placeholder for translator)
+        if (!languageCode.equals("en") && translationData.get(realKey, languageCode) == null) {
+            translationData.set(realKey, languageCode, value);
+        }
+
+        dirty = true;
+        scheduleSave();
     }
 
-    /** Debounced async save of new keys. */
-    private void save() {
+    /**
+     * Gets the translated value for a key.
+     * Returns target language value if available, otherwise falls back to English.
+     */
+    public Object get(String filename, String key) {
+        String filteredFilename = filename.replace(".yml", "");
+        String realKey = filteredFilename + "." + key;
+
+        // Try target language first (unless we're English)
+        Object value = null;
+        if (!languageCode.equals("en")) {
+            value = translationData.get(realKey, languageCode);
+        }
+
+        // Fall back to English
+        if (value == null) {
+            value = translationData.get(realKey, "en");
+        }
+
+        // Apply color conversion
+        if (value instanceof String s) {
+            return ChatColorConverter.convert(s);
+        } else if (value instanceof List<?> list) {
+            @SuppressWarnings("unchecked")
+            List<String> stringList = (List<String>) list;
+            return ChatColorConverter.convert(stringList);
+        }
+
+        return value;
+    }
+
+    private void scheduleSave() {
         if (saving) return;
         saving = true;
         Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, () -> {
-            ConfigurationEngine.fileSaverCustomValues(fileConfiguration, file);
-            if (translationData != null) {
-                ConfigurationEngine.fileSaverCustomValues(translationData, translationDataFile);
+            if (dirty) {
+                save();
+                dirty = false;
             }
             saving = false;
-        });
+        }, 100L);
     }
 
-    /** Reads a translated value (with color codes converted). */
-    public Object get(String filename, String key) {
-        String filteredFilename = filename.replace(".yml", "");
-        Object obj = fileConfiguration.get(filteredFilename + "." + key);
-        if (obj instanceof String) {
-            return ChatColorConverter.convert((String) obj);
-        } else if (obj instanceof List) {
-            return ChatColorConverter.convert((List<String>) obj);
+    private void save() {
+        try {
+            TranslationCsvParser.write(translationData, translationsPath);
+        } catch (IOException e) {
+            Logger.warn("Failed to save translations: " + e.getMessage());
         }
-        return obj;
+    }
+
+    private void saveSnapshot() {
+        try {
+            TranslationCsvParser.write(translationDataSnapshot, translationsDataPath);
+        } catch (IOException e) {
+            Logger.warn("Failed to save translation snapshot: " + e.getMessage());
+        }
     }
 
     private String fixConfigColors(String value) {
@@ -207,8 +282,23 @@ public class TranslationsConfigFields extends CustomConfigFields {
     }
 
     private List<String> fixConfigColors(List<String> values) {
-        List<String> clean = new ArrayList<>();
-        values.forEach(s -> clean.add(fixConfigColors(s)));
-        return clean;
+        return values.stream()
+                .map(this::fixConfigColors)
+                .toList();
+    }
+
+    public String getLanguageName() {
+        return languageName;
+    }
+
+    public String getLanguageCode() {
+        return languageCode;
+    }
+
+    public void shutdown() {
+        if (dirty) {
+            save();
+            dirty = false;
+        }
     }
 }

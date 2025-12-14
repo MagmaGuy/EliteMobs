@@ -27,6 +27,10 @@ public class TrackingFireball extends MajorPower {
 
         public static HashMap<UUID, TrackingFireballTasks.TrackingFireballTask> trackingFireballs = new HashMap<>();
 
+        public static void shutdown() {
+            trackingFireballs.clear();
+        }
+
         @EventHandler(ignoreCancelled = true)
         public void targetEvent(EliteMobTargetPlayerEvent event) {
             if (!(event.getEliteMobEntity().getLivingEntity() instanceof Monster)) return;

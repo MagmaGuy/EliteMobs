@@ -32,6 +32,11 @@ public class QuestInventoryMenu {
     private static final HashMap<Inventory, QuestDirectory> questDirectories = new HashMap<>();
     private static final HashMap<Inventory, QuestInventory> questInventories = new HashMap<>();
 
+    public static void shutdown() {
+        questDirectories.clear();
+        questInventories.clear();
+    }
+
     private QuestInventoryMenu() {
     }
 

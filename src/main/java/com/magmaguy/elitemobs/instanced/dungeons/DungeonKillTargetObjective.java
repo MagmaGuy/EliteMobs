@@ -12,6 +12,11 @@ import java.util.List;
 
 public class DungeonKillTargetObjective extends DungeonObjective {
     private static final List<DungeonKillTargetObjective> dungeonKillTargetObjectiveList = new ArrayList<>();
+
+    public static void shutdown() {
+        dungeonKillTargetObjectiveList.clear();
+    }
+
     @Getter
     private String bossFilename;
     @Getter

@@ -44,6 +44,10 @@ public class EliteScriptBlueprint {
         blueprints.put(customConfigFields, this);
     }
 
+    public static void shutdown() {
+        blueprints.clear();
+    }
+
     public static List<EliteScriptBlueprint> parseBossScripts(ConfigurationSection configurationSection,
                                                               CustomConfigFields customConfigFields) {
         if (configurationSection == null) return Collections.emptyList();

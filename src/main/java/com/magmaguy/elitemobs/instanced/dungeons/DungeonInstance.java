@@ -12,6 +12,7 @@ import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields
 import com.magmaguy.elitemobs.dungeons.utility.DungeonUtils;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
+import com.magmaguy.elitemobs.instanced.WorldOperationQueue;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.InstancedBossEntity;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
@@ -19,10 +20,9 @@ import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.elitemobs.utils.MapListInterpreter;
 import com.magmaguy.elitemobs.utils.WorldInstantiator;
-import com.magmaguy.magmacore.util.FileUtils;
 import com.magmaguy.magmacore.util.Logger;
+import com.magmaguy.magmacore.util.TemporaryWorldManager;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -30,17 +30,20 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 
 public class DungeonInstance extends MatchInstance {
     @Getter
     private static final Set<DungeonInstance> dungeonInstances = new HashSet<>();
+
+    public static void shutdown() {
+        dungeonInstances.clear();
+    }
+
     private final List<DungeonObjective> dungeonObjectives = new ArrayList<>();
     @Getter
     private World world;
     @Getter
     private String instancedWorldName;
-    private File instancedWorldFile;
     @Getter
     private ContentPackagesConfigFields contentPackagesConfigFields;
     private List<InstancedBossEntity> instancedBossEntities = new ArrayList<>();
@@ -55,7 +58,6 @@ public class DungeonInstance extends MatchInstance {
                            Location lobbyLocation,
                            Location startLocation,
                            World world,
-                           File instancedWorldFile,
                            Player player,
                            String difficultyName) {
         super(startLocation,
@@ -69,7 +71,6 @@ public class DungeonInstance extends MatchInstance {
             this.dungeonObjectives.add(DungeonObjective.registerObjective(this, rawObjective));
         this.world = world;
         this.instancedWorldName = world.getName();
-        this.instancedWorldFile = instancedWorldFile;
         this.difficultyName = difficultyName;
         setDifficulty(difficultyName);
         addNewPlayer(player);
@@ -95,12 +96,12 @@ public class DungeonInstance extends MatchInstance {
 
         if (!launchEvent(instancedDungeonsConfigFields, instancedWorldName, player)) return;
 
-        CompletableFuture<File> future = CompletableFuture.supplyAsync(() ->
-                cloneWorldFiles(instancedDungeonsConfigFields, instancedWorldName, player));
-        future.thenAccept(file -> {
-            if (file == null) return;
-            new InitializeInstancedWorldTask(instancedDungeonsConfigFields, instancedWorldName, player, file, difficultyName).runTask(MetadataHandler.PLUGIN);
-        });
+        WorldOperationQueue.queueOperation(
+                player,
+                () -> cloneWorldFiles(instancedDungeonsConfigFields, instancedWorldName, player) != null,
+                () -> initializeInstancedWorld(instancedDungeonsConfigFields, instancedWorldName, player, difficultyName),
+                instancedDungeonsConfigFields.getName()
+        );
     }
 
     protected static boolean launchEvent(ContentPackagesConfigFields instancedDungeonsConfigFields, String instancedWordName, Player player) {
@@ -128,7 +129,6 @@ public class DungeonInstance extends MatchInstance {
     protected static DungeonInstance initializeInstancedWorld(ContentPackagesConfigFields instancedDungeonsConfigFields,
                                                               String instancedWordName,
                                                               Player player,
-                                                              File targetFile,
                                                               String difficultyName) {
         World world = DungeonUtils.loadWorld(instancedWordName, instancedDungeonsConfigFields.getEnvironment(), instancedDungeonsConfigFields);
         if (world == null) {
@@ -147,9 +147,9 @@ public class DungeonInstance extends MatchInstance {
         //todo: will probably want to define this at some point Location endLocation = ConfigurationLocation.serialize(instancedDungeonsConfigFields.getEndLocation());
         //endLocation.setWorld(world);
         if (!instancedDungeonsConfigFields.isEnchantmentChallenge())
-            return new DungeonInstance(instancedDungeonsConfigFields, lobbyLocation, startLocation, world, targetFile, player, difficultyName);
+            return new DungeonInstance(instancedDungeonsConfigFields, lobbyLocation, startLocation, world, player, difficultyName);
         else
-            return new EnchantmentDungeonInstance(instancedDungeonsConfigFields, lobbyLocation, startLocation, world, targetFile, player, difficultyName);
+            return new EnchantmentDungeonInstance(instancedDungeonsConfigFields, lobbyLocation, startLocation, world, player, difficultyName);
     }
 
     @Override
@@ -213,7 +213,7 @@ public class DungeonInstance extends MatchInstance {
             return;
         }
         world.getEntities().forEach(entity -> EntityTracker.unregister(entity, RemovalReason.WORLD_UNLOAD));
-        new RemoveInstanceTask(dungeonInstance, instancedWorldFile).runTaskLater(MetadataHandler.PLUGIN, 20 * 30L);
+        new RemoveInstanceTask(dungeonInstance).runTaskLater(MetadataHandler.PLUGIN, 20 * 30L);
     }
 
     private void setDifficulty(String difficultyName) {
@@ -325,31 +325,6 @@ public class DungeonInstance extends MatchInstance {
         return location.getWorld().equals(startLocation.getWorld());
     }
 
-    private static class InitializeInstancedWorldTask extends BukkitRunnable {
-        private final ContentPackagesConfigFields instancedDungeonsConfigFields;
-        private final String instancedWorldName;
-        private final Player player;
-        private final File file;
-        private final String difficultyName;
-
-        public InitializeInstancedWorldTask(ContentPackagesConfigFields instancedDungeonsConfigFields,
-                                            String instancedWorldName,
-                                            Player player,
-                                            File file,
-                                            String difficultyName) {
-            this.instancedDungeonsConfigFields = instancedDungeonsConfigFields;
-            this.instancedWorldName = instancedWorldName;
-            this.player = player;
-            this.file = file;
-            this.difficultyName = difficultyName;
-        }
-
-        @Override
-        public void run() {
-            initializeInstancedWorld(instancedDungeonsConfigFields, instancedWorldName, player, file, difficultyName);
-        }
-    }
-
     private class InitializeEntitiesTask extends BukkitRunnable {
         private final DungeonInstance dungeonInstance;
         private final ContentPackagesConfigFields contentPackagesConfigFields;
@@ -378,31 +353,16 @@ public class DungeonInstance extends MatchInstance {
 
     private class RemoveInstanceTask extends BukkitRunnable {
         private final DungeonInstance dungeonInstance;
-        private final File instancedWorldFile;
 
-        public RemoveInstanceTask(DungeonInstance dungeonInstance, File instancedWorldFile) {
+        public RemoveInstanceTask(DungeonInstance dungeonInstance) {
             this.dungeonInstance = dungeonInstance;
-            this.instancedWorldFile = instancedWorldFile;
         }
 
         @Override
         public void run() {
             new EventCaller(new InstancedDungeonRemoveEvent(dungeonInstance));
             dungeonInstances.remove(dungeonInstance);
-
-            if (!Bukkit.unloadWorld(world, false)) {
-                Logger.warn("Failed to unload world " + instancedWorldName + " ! This is bad, report this to the developer!");
-                return;
-            }
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    try{
-                        FileUtils.deleteDirectory(instancedWorldFile);} catch (Exception e){
-                        Logger.warn("Failed to delete " + instancedWorldFile + " ! This is bad, report this to the developer!");
-                    }
-                }
-            }.runTaskLaterAsynchronously(MetadataHandler.PLUGIN, 20L * 60 * 2); //wait 2 minutes after unloading world before removing files
+            TemporaryWorldManager.permanentlyDeleteWorld(world);
         }
     }
 }

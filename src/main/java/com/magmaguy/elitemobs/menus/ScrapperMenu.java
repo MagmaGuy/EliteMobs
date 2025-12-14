@@ -34,6 +34,10 @@ public class ScrapperMenu extends EliteMenu {
 
     public static Set<Inventory> inventories = new HashSet<>();
 
+    public static void shutdown() {
+        inventories.clear();
+    }
+
     /**
      * Creates a menu for scrapping elitemobs items. Only special Elite Mob items can be scrapped here.
      *

@@ -92,6 +92,11 @@ public class TreasureChest implements PersistentObject {
         treasureChestHashMap.clear();
     }
 
+    public static void shutdown() {
+        treasureChestHashMap.clear();
+        instancedTreasureChests.clear();
+    }
+
     public static TreasureChest getTreasureChest(Location location) {
         return getTreasureChestHashMap().get(location);
     }

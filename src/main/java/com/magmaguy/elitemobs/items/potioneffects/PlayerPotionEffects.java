@@ -20,7 +20,8 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * Created by MagmaGuy on 14/03/2017.
@@ -41,12 +42,13 @@ public class PlayerPotionEffects implements Listener {
         }.runTaskTimer(MetadataHandler.PLUGIN, 20L, 20L);
     }
 
-    public static void addOnHitCooldown(HashSet<Player> cooldownList, Player player, long delay) {
-        cooldownList.add(player);
+    public static void addOnHitCooldown(Set<UUID> cooldownList, Player player, long delay) {
+        UUID playerUUID = player.getUniqueId();
+        cooldownList.add(playerUUID);
         new BukkitRunnable() {
             @Override
             public void run() {
-                cooldownList.remove(player);
+                cooldownList.remove(playerUUID);
             }
         }.runTaskLater(MetadataHandler.PLUGIN, delay);
     }

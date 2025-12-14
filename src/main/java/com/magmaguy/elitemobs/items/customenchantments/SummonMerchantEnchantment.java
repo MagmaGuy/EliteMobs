@@ -15,8 +15,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 public class SummonMerchantEnchantment extends CustomEnchantment implements Listener {
 
@@ -58,7 +59,11 @@ public class SummonMerchantEnchantment extends CustomEnchantment implements List
     }
 
     public static class SummonMerchantEvents implements Listener {
-        private static final List<Player> playerCooldowns = new ArrayList<>();
+        private static final Set<UUID> playerCooldowns = new HashSet<>();
+
+        public static void shutdown() {
+            playerCooldowns.clear();
+        }
 
         @EventHandler
         public void onItemInteract(PlayerInteractEvent event) {
@@ -66,12 +71,13 @@ public class SummonMerchantEnchantment extends CustomEnchantment implements List
                 return;
             if (getEnchantment(event.getPlayer().getInventory().getItemInMainHand().getItemMeta()) < 1)
                 return;
-            if (playerCooldowns.contains(event.getPlayer())) return;
-            playerCooldowns.add(event.getPlayer());
+            UUID playerUUID = event.getPlayer().getUniqueId();
+            if (playerCooldowns.contains(playerUUID)) return;
+            playerCooldowns.add(playerUUID);
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    playerCooldowns.remove(event.getPlayer());
+                    playerCooldowns.remove(playerUUID);
                 }
             }.runTaskLater(MetadataHandler.PLUGIN, 20 * 60);
             doSummonMerchant(event.getPlayer(), false, event.getPlayer().getInventory().getItemInMainHand());
@@ -81,12 +87,13 @@ public class SummonMerchantEnchantment extends CustomEnchantment implements List
         public void onPlayerChat(AsyncPlayerChatEvent event) {
             if (merchantMessage.isEmpty()) return;
             if (event.getMessage().equalsIgnoreCase(merchantMessage)) {
-                if (playerCooldowns.contains(event.getPlayer())) return;
-                playerCooldowns.add(event.getPlayer());
+                UUID playerUUID = event.getPlayer().getUniqueId();
+                if (playerCooldowns.contains(playerUUID)) return;
+                playerCooldowns.add(playerUUID);
                 new BukkitRunnable() {
                     @Override
                     public void run() {
-                        playerCooldowns.remove(event.getPlayer());
+                        playerCooldowns.remove(playerUUID);
                     }
                 }.runTaskLater(MetadataHandler.PLUGIN, 20 * 60);
                 for (ItemStack itemStack : event.getPlayer().getInventory())
