@@ -5,6 +5,9 @@ package com.magmaguy.elitemobs;
  */
 
 import com.magmaguy.easyminecraftgoals.NMSManager;
+import com.magmaguy.elitemobs.adventurersguild.GuildRankMenuHandler;
+import com.magmaguy.elitemobs.collateralminecraftchanges.KeepNeutralsAngry;
+import com.magmaguy.elitemobs.collateralminecraftchanges.PlayerDeathMessageByEliteMob;
 import com.magmaguy.elitemobs.commands.CommandHandler;
 import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.config.commands.CommandsConfig;
@@ -24,6 +27,7 @@ import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
 import com.magmaguy.elitemobs.config.potioneffects.PotionEffectsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.config.wormholes.WormholeConfig;
+import com.magmaguy.elitemobs.dungeons.DungeonProtector;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
 import com.magmaguy.elitemobs.dungeons.EliteMobsWorld;
 import com.magmaguy.elitemobs.economy.VaultCompatibility;
@@ -33,25 +37,50 @@ import com.magmaguy.elitemobs.events.ActionEvent;
 import com.magmaguy.elitemobs.events.TimedEvent;
 import com.magmaguy.elitemobs.explosionregen.Explosion;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
+import com.magmaguy.elitemobs.instanced.WorldOperationQueue;
+import com.magmaguy.elitemobs.instanced.arena.ArenaInstance;
+import com.magmaguy.elitemobs.instanced.dungeons.DungeonInstance;
+import com.magmaguy.elitemobs.instanced.dungeons.DungeonKillPercentageObjective;
+import com.magmaguy.elitemobs.instanced.dungeons.DungeonKillTargetObjective;
+import com.magmaguy.elitemobs.items.ItemLootShower;
 import com.magmaguy.elitemobs.items.LootTables;
-import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantment;
+import com.magmaguy.elitemobs.items.customenchantments.*;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
-import com.magmaguy.elitemobs.menus.ProceduralShopMenu;
+import com.magmaguy.elitemobs.items.customloottable.SharedLootTable;
+import com.magmaguy.elitemobs.items.potioneffects.custom.Harm;
+import com.magmaguy.elitemobs.items.potioneffects.custom.Heal;
+import com.magmaguy.elitemobs.items.potioneffects.custom.Saturation;
+import com.magmaguy.elitemobs.menus.*;
 import com.magmaguy.elitemobs.mobconstructor.PersistentObjectHandler;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomMusic;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.InstancedBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.transitiveblocks.TransitiveBlockCommand;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.PluginMobProperties;
+import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
+import com.magmaguy.elitemobs.npcs.NPCInteractions;
+import com.magmaguy.elitemobs.npcs.chatter.NPCProximitySensor;
 import com.magmaguy.elitemobs.pathfinding.Navigation;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
+import com.magmaguy.elitemobs.playerdata.statusscreen.*;
+import com.magmaguy.elitemobs.powers.FrostCone;
+import com.magmaguy.elitemobs.powers.TrackingFireball.TrackingFireballEvents;
+import com.magmaguy.elitemobs.powers.meta.Bombardment;
+import com.magmaguy.elitemobs.powers.meta.CombatEnterScanPower;
+import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import com.magmaguy.elitemobs.powers.scripts.ScriptAction;
+import com.magmaguy.elitemobs.powers.scripts.ScriptListener;
+import com.magmaguy.elitemobs.powers.scripts.caching.EliteScriptBlueprint;
 import com.magmaguy.elitemobs.powerstances.MajorPowerStanceMath;
 import com.magmaguy.elitemobs.powerstances.MinorPowerStanceMath;
 import com.magmaguy.elitemobs.quests.DynamicQuest;
+import com.magmaguy.elitemobs.quests.Quest;
 import com.magmaguy.elitemobs.quests.QuestTracking;
+import com.magmaguy.elitemobs.quests.menus.QuestInventoryMenu;
+import com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldowns;
 import com.magmaguy.elitemobs.thirdparty.bstats.CustomCharts;
 import com.magmaguy.elitemobs.thirdparty.custommodels.CustomModel;
 import com.magmaguy.elitemobs.thirdparty.custommodels.modelengine.ModelEngineReservedAddresses;
@@ -59,6 +88,7 @@ import com.magmaguy.elitemobs.thirdparty.placeholderapi.Placeholders;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
 import com.magmaguy.elitemobs.utils.BossBarUtil;
+import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import com.magmaguy.elitemobs.wormhole.Wormhole;
 import com.magmaguy.elitemobs.wormhole.WormholeManager;
@@ -278,6 +308,10 @@ public class EliteMobs extends JavaPlugin {
         EntityTracker.managedEntityWatchdog();
         //initialize the centralized wormhole manager
         WormholeManager.getInstance(false);
+
+        // Regenerate cached item stacks after all plugins have loaded
+        // This ensures custom skins are applied correctly (ResourcePackManager may not be loaded during initial item generation)
+        Bukkit.getScheduler().runTask(this, CustomItem::regenerateCachedItemStacks);
     }
 
     @Override
@@ -301,7 +335,7 @@ public class EliteMobs extends JavaPlugin {
     @Override
     public void onDisable() {
         Logger.info("Starting EliteMobs shutdown sequence...");
-        Explosion.regenerateAllPendingBlocks();
+        Explosion.shutdown();
         Bukkit.getServer().getScheduler().cancelTasks(MetadataHandler.PLUGIN);
         Wormhole.shutdown();
         RegionalBossEntity.save();
@@ -328,8 +362,8 @@ public class EliteMobs extends JavaPlugin {
         RegionalBossEntity.regionalBossesShutdown();
         if (this.placeholders != null) ((Placeholders) placeholders).unregister();
         HandlerList.unregisterAll(MetadataHandler.PLUGIN);
-        TreasureChest.clearTreasureChests();
-        QuestTracking.clear();
+        TreasureChest.shutdown();
+        WorldOperationQueue.shutdown();
         MatchInstance.shutdown();
         CustomProjectileData.shutdown();
         DynamicQuest.shutdown();
@@ -341,6 +375,76 @@ public class EliteMobs extends JavaPlugin {
         CustomMusic.shutdown();
         CustomBossEntity.shutdown();
         com.magmaguy.elitemobs.combatsystem.displays.BossHealthDisplay.shutdown();
+        // Memory leak fixes - clear static collections
+        SummonWolfEnchantment.SummonWolfEnchantmentEvent.shutdown();
+        SummonMerchantEnchantment.SummonMerchantEvents.shutdown();
+        FlamethrowerEnchantment.shutdown();
+        LightningEnchantment.LightningEnchantmentEvents.shutdown();
+        FrostCone.shutdown();
+        ItemLootShower.shutdown();
+        Bombardment.shutdown();
+        TrackingFireballEvents.shutdown();
+        VersionChecker.shutdown();
+        KeepNeutralsAngry.shutdown();
+        LootMenu.shutdown();
+        TeleportsPage.TeleportsPageEvents.shutdown();
+        BossTrackingPage.BossTrackingPageEvents.shutdown();
+        // Additional memory leak fixes
+        PlayerDeathMessageByEliteMob.shutdown();
+        NPCInteractions.shutdown();
+        NPCProximitySensor.shutdown();
+        PlayerQuestCooldowns.shutdown();
+        GetLootMenu.shutdown();
+        TransitiveBlockCommand.shutdown();
+        DrillingEnchantment.shutdown();
+        Saturation.shutdown();
+        Heal.shutdown();
+        Harm.shutdown();
+        ScriptListener.shutdown();
+        CombatEnterScanPower.shutdown();
+        QuestTracking.shutdown();
+        SharedLootTable.shutdown();
+        // Menu shutdowns
+        CustomShopMenu.shutdown();
+        SellMenu.shutdown();
+        RepairMenu.shutdown();
+        ScrapperMenu.shutdown();
+        UnbindMenu.shutdown();
+        DynamicDungeonBrowser.shutdown();
+        InstancedDungeonBrowser.shutdown();
+        PlasmaBootsEnchantment.PlasmaBootsEnchantmentEvents.shutdown();
+        EarthquakeEnchantment.EarthquakeEnchantmentEvents.shutdown();
+        BuyOrSellMenu.BuyOrSellMenuEvents.shutdown();
+        Quest.shutdown();
+        QuestInventoryMenu.shutdown();
+        GuildRankMenuHandler.shutdown();
+        StatsPage.StatsPageEvents.shutdown();
+        GearPage.GearPageEvents.shutdown();
+        CommandsPage.CommandsPageEvents.shutdown();
+        CoverPage.CoverPageEvents.shutdown();
+        ArenaMenu.ArenaMenuEvents.shutdown();
+        ItemEnchantmentMenu.ItemEnchantMenuEvents.shutdown();
+        EliteScrollMenu.EliteScrollMenuEvents.shutdown();
+        // Third pass memory leak fixes
+        CrashFix.shutdown();
+        com.magmaguy.elitemobs.commands.admin.RemoveCommand.shutdown();
+        DungeonProtector.shutdown();
+        DungeonKillPercentageObjective.shutdown();
+        DungeonKillTargetObjective.shutdown();
+        ConfigurationLocation.shutdown();
+        // Fourth pass memory leak fixes
+        ElitePlayerInventory.shutdown();
+        FrostCone.shutdown();
+        Bombardment.shutdown();
+        KeepNeutralsAngry.shutdown();
+        Navigation.shutdown();
+        DynamicQuest.shutdown();
+        DungeonInstance.shutdown();
+        ArenaInstance.shutdown();
+        // Final pass memory leak fixes
+        ElitePower.shutdown();
+        EliteScriptBlueprint.shutdown();
+        EliteMobProperties.shutdown();
         Logger.info("Saving EliteMobs databases...");
         PlayerData.closeConnection();
         MagmaCore.shutdown();

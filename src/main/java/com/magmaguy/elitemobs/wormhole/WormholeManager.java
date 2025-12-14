@@ -57,19 +57,25 @@ public class WormholeManager {
     }
 
     /**
-     * Gets players that are near a specific wormhole
+     * Gets players that are near a specific wormhole (within 30 blocks).
+     * Uses optimized distanceSquared check to avoid sqrt calculation.
+     *
+     * @param wormholeEntry The wormhole entry to check
+     * @return List of players within render distance, empty list if none
      */
-    private HashSet<Player> getNearbyPlayers(WormholeEntry wormholeEntry) {
-        HashSet<Player> nearbyPlayers = new HashSet<>();
+    private List<Player> getNearbyPlayers(WormholeEntry wormholeEntry) {
+        List<Player> nearbyPlayers = new ArrayList<>();
         Location wormholeLocation = wormholeEntry.getLocation();
 
         if (wormholeLocation == null || wormholeLocation.getWorld() == null) {
             return nearbyPlayers;
         }
 
+        double maxDistanceSquared = PARTICLE_RENDER_DISTANCE * PARTICLE_RENDER_DISTANCE;
+
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (player.getWorld().equals(wormholeLocation.getWorld()) &&
-                    player.getLocation().distanceSquared(wormholeLocation) <= Math.pow(PARTICLE_RENDER_DISTANCE, 2)) {
+                    player.getLocation().distanceSquared(wormholeLocation) <= maxDistanceSquared) {
                 nearbyPlayers.add(player);
             }
         }
@@ -80,9 +86,10 @@ public class WormholeManager {
     /**
      * Checks if any players should be teleported by this wormhole
      */
-    private void checkForTeleports(WormholeEntry wormholeEntry, HashSet<Player> nearbyPlayers) {
+    private void checkForTeleports(WormholeEntry wormholeEntry, List<Player> nearbyPlayers) {
+        double teleportDistanceSquared = Math.pow(TELEPORT_DISTANCE_MULTIPLIER * wormholeEntry.getWormhole().getWormholeConfigFields().getSizeMultiplier(), 2);
         for (Player player : nearbyPlayers) {
-            if (player.getLocation().distanceSquared(wormholeEntry.getLocation()) > Math.pow(TELEPORT_DISTANCE_MULTIPLIER * wormholeEntry.getWormhole().getWormholeConfigFields().getSizeMultiplier(), 2))
+            if (player.getLocation().distanceSquared(wormholeEntry.getLocation()) > teleportDistanceSquared)
                 continue;
             if (!canPlayerTeleport(wormholeEntry, player)) continue;
             teleportPlayer(wormholeEntry, player);
@@ -230,33 +237,34 @@ public class WormholeManager {
      */
     private void processWormholes() {
         tickCounter++;
-        
+
         // Tick player cooldowns
         Collection<PlayerWormholeData> values = playerTeleportData.values();
         for (PlayerWormholeData value : values) {
             value.tick();
         }
 
-        // Tick all wormhole entries - they handle chunk loading internally
-        // Visual effects update every tick for smooth animation
+        // Tick all wormhole entries with distance-based culling
         for (WormholeEntry wormholeEntry : WormholeEntry.getWormholeEntries()) {
-            // Call tick() - it checks chunk loading internally and does nothing if chunk isn't loaded
-            // This updates visual effects every tick
-            wormholeEntry.tick();
-            
-            // Only process teleports every 5 ticks (distance checks are expensive)
+            // Skip if chunk isn't loaded
+            if (wormholeEntry.getLocation() == null ||
+                wormholeEntry.getLocation().getWorld() == null ||
+                !ChunkLocationChecker.chunkAtLocationIsLoaded(wormholeEntry.getLocation())) {
+                continue;
+            }
+
+            // Get nearby players (within 30 blocks) - skip everything if none
+            List<Player> nearbyPlayers = getNearbyPlayers(wormholeEntry);
+            if (nearbyPlayers.isEmpty()) {
+                continue; // No players nearby - skip visuals and teleport checks
+            }
+
+            // Tick visuals with nearby players list (for LOS culling)
+            wormholeEntry.tick(nearbyPlayers);
+
+            // Only process teleports every 5 ticks
             if (tickCounter % TELEPORT_CHECK_INTERVAL == 0) {
-                // Only process teleports if chunk is loaded (tick() already checked)
-                if (wormholeEntry.getLocation() == null || 
-                    !ChunkLocationChecker.chunkAtLocationIsLoaded(wormholeEntry.getLocation())) {
-                    continue;
-                }
-                
-                // Get nearby players and check for teleports
-                HashSet<Player> nearbyPlayers = getNearbyPlayers(wormholeEntry);
-                if (!nearbyPlayers.isEmpty()) {
-                    checkForTeleports(wormholeEntry, nearbyPlayers);
-                }
+                checkForTeleports(wormholeEntry, nearbyPlayers);
             }
         }
     }

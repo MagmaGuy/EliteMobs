@@ -10,16 +10,18 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 public class LootMenu extends EliteMenu {
     @Getter
-    private static final HashMap<Player, LootMenu> playerLoot = new HashMap<>();
+    private static final HashMap<UUID, LootMenu> playerLoot = new HashMap<>();
     private static final List<Integer> glassSlots = List.of(4, 13, 22, 31, 40, 49);
     private static final int greedInfo = 2;
     private static final int needInfo = 6;
@@ -52,11 +54,15 @@ public class LootMenu extends EliteMenu {
                         List.of("Click to move to the Greed item list!",
                                 "Items in the need list will only",
                                 "be rolled for people who needed them!")));
-        playerLoot.put(player, this);
+        playerLoot.put(player.getUniqueId(), this);
+    }
+
+    public static void shutdown() {
+        playerLoot.clear();
     }
 
     public static void openMenu(Player player) {
-        LootMenu lootMenu = playerLoot.get(player);
+        LootMenu lootMenu = playerLoot.get(player.getUniqueId());
         if (lootMenu == null) {
             player.sendMessage(ChatColorConverter.convert("&4[EliteMobs] &6You don't currently have any group loot to vote on!"));
             return;
@@ -85,11 +91,11 @@ public class LootMenu extends EliteMenu {
     }
 
     public void removeMenu() {
-        LootMenu lootMenu = playerLoot.get(player);
+        LootMenu lootMenu = playerLoot.get(player.getUniqueId());
         if (lootMenu == this) {
-            if (player.getOpenInventory().getTopInventory().equals(lootMenu.getInventory()))
+            if (player.isOnline() && player.getOpenInventory().getTopInventory().equals(lootMenu.getInventory()))
                 player.closeInventory();
-            playerLoot.remove(player);
+            playerLoot.remove(player.getUniqueId());
         }
     }
 
@@ -98,7 +104,7 @@ public class LootMenu extends EliteMenu {
         @EventHandler(ignoreCancelled = true)
         public void onInventoryInteract(InventoryClickEvent event) {
             Player player = ((Player) event.getWhoClicked()).getPlayer();
-            LootMenu lootMenu = playerLoot.get(player);
+            LootMenu lootMenu = playerLoot.get(player.getUniqueId());
             if (lootMenu == null) return;
             if (!lootMenu.inventory.equals(event.getInventory())) return;
             event.setCancelled(true);
@@ -116,6 +122,11 @@ public class LootMenu extends EliteMenu {
                 lootMenu.playerTable.removeNeed(event.getCurrentItem());
                 openMenu(player);
             }
+        }
+
+        @EventHandler
+        public void onPlayerQuit(PlayerQuitEvent event) {
+            playerLoot.remove(event.getPlayer().getUniqueId());
         }
     }
 }

@@ -38,6 +38,11 @@ public class ArenaInstance extends MatchInstance {
 
     @Getter
     private static final HashMap<String, ArenaInstance> arenaInstances = new HashMap<>();
+
+    public static void shutdown() {
+        arenaInstances.clear();
+    }
+
     @Getter
     private final HashSet<CustomBossEntity> customBosses = new HashSet<>();
     private final HashSet<Entity> nonEliteMobsEntities = new HashSet<>();

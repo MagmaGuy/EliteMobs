@@ -23,6 +23,11 @@ public class Quest implements Serializable {
     //protected static final HashMap<UUID, Quest> playerQuests = new HashMap<>();
     //Temporarily stores a list of quests a player might be considering joining
     protected static final HashMap<UUID, List<Quest>> pendingPlayerQuests = new HashMap<>();
+
+    public static void shutdown() {
+        pendingPlayerQuests.clear();
+    }
+
     @Getter
     protected final QuestObjectives questObjectives;
     @Getter

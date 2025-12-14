@@ -24,6 +24,10 @@ public class SharedLootTable {
     @Getter
     private static final HashMap<EliteEntity, SharedLootTable> sharedLootTables = new HashMap<>();
 
+    public static void shutdown() {
+        sharedLootTables.clear();
+    }
+
     private final int durationInSeconds = 60;
     @Getter
     private final List<ItemStack> loot = new ArrayList<>();

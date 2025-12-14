@@ -12,14 +12,12 @@ import com.magmaguy.magmacore.util.ChunkLocationChecker;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
 import org.bukkit.util.Consumer;
+import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
@@ -234,7 +232,12 @@ public class WormholeEntry implements PersistentObject {
         persistentObjectHandler = new PersistentObjectHandler(this);
     }
 
-    public void tick() {
+    /**
+     * Ticks the wormhole entry visuals. Called by WormholeManager with pre-filtered nearby players.
+     *
+     * @param nearbyPlayers List of players within 30 blocks (already filtered by WormholeManager)
+     */
+    public void tick(List<Player> nearbyPlayers) {
         // Prevent race condition during chunk load/unload events
         if (isProcessingChunkEvent) {
             return;
@@ -246,14 +249,61 @@ public class WormholeEntry implements PersistentObject {
             return;
         }
 
-        // Update text display if needed
+        // Update text display if needed (always update if players are nearby)
         if (armorStandText != null && (textDisplay == null || !textDisplay.isValid())) initializeTextDisplay();
 
-        // Update visual effects (lines) if enabled
+        // Update visual effects (lines) if enabled and at least one player has line of sight
         if (!WormholesConfig.isNoParticlesMode() &&
                 wormhole.getWormholeConfigFields().getStyle() != Wormhole.WormholeStyle.NONE) {
-            updateVisualEffects();
+            // Only update visuals if at least one player can see the wormhole
+            if (anyPlayerHasLineOfSight(nearbyPlayers)) {
+                updateVisualEffects();
+            }
         }
+    }
+
+    /**
+     * Checks if any player in the list has line of sight to the wormhole center.
+     * Uses raytrace to detect if blocks are obstructing the view.
+     *
+     * @param players List of nearby players to check
+     * @return true if at least one player can see the wormhole
+     */
+    private boolean anyPlayerHasLineOfSight(List<Player> players) {
+        if (players.isEmpty() || location == null || location.getWorld() == null) {
+            return false;
+        }
+
+        World world = location.getWorld();
+
+        for (Player player : players) {
+            Location playerEyes = player.getEyeLocation();
+            Vector direction = location.toVector().subtract(playerEyes.toVector());
+            double distance = direction.length();
+
+            if (distance < 0.1) {
+                // Player is essentially at the wormhole center
+                return true;
+            }
+
+            direction.normalize();
+
+            // Raytrace from player eyes to wormhole center
+            RayTraceResult result = world.rayTraceBlocks(
+                    playerEyes,
+                    direction,
+                    distance,
+                    FluidCollisionMode.NEVER,
+                    true // ignore passable blocks like grass, flowers, etc.
+            );
+
+            // If no block was hit, the player has line of sight
+            if (result == null) {
+                return true;
+            }
+        }
+
+        return false; // All players are blocked by terrain
     }
 
     /**

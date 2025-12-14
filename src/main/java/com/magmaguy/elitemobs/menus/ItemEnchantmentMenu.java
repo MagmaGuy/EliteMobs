@@ -171,6 +171,10 @@ public class ItemEnchantmentMenu extends EliteMenu {
     public static class ItemEnchantMenuEvents implements Listener {
         private static final Set<Inventory> menus = new HashSet<>();
 
+        public static void shutdown() {
+            menus.clear();
+        }
+
         @EventHandler(ignoreCancelled = true)
         public void onInventoryInteract(InventoryClickEvent event) {
             if (!EliteMenu.isEliteMenu(event, menus)) return;

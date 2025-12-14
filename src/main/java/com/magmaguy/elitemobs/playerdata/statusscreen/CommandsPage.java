@@ -52,6 +52,10 @@ public class CommandsPage {
     public static class CommandsPageEvents implements Listener {
         private static final Set<Inventory> pageInventories = new HashSet<>();
 
+        public static void shutdown() {
+            pageInventories.clear();
+        }
+
         @EventHandler(ignoreCancelled = true)
         public void onInventoryInteract(InventoryClickEvent event) {
             Player player = ((Player) event.getWhoClicked()).getPlayer();

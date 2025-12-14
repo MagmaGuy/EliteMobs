@@ -19,12 +19,13 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 
 public class CustomMusic {
-    private static final HashMap<Player, CustomMusic> playerSongSingleton = new HashMap<>();
-    private static final HashMap<World, CustomMusic> dungeonMusic = new HashMap<>();
-    private final HashMap<Player, CustomMusic> players = new HashMap<>();
+    private static final HashMap<UUID, CustomMusic> playerSongSingleton = new HashMap<>();
+    private static final HashMap<UUID, CustomMusic> dungeonMusic = new HashMap<>();
+    private final HashMap<UUID, CustomMusic> players = new HashMap<>();
     private final ContentType contentType;
     private CustomBossEntity customBossEntity = null;
     private ContentPackagesConfigFields contentPackagesConfigFields = null;
@@ -64,7 +65,7 @@ public class CustomMusic {
             parse(rawEntries[0], 1);
             parse(rawEntries[1], 2);
         }
-        dungeonMusic.put(world, this);
+        dungeonMusic.put(world.getUID(), this);
     }
 
     public static void shutdown() {
@@ -114,12 +115,17 @@ public class CustomMusic {
         if (bossScannerTask != null) {
             bossScannerTask.cancel();
         }
-        for (Map.Entry<Player, CustomMusic> entry : players.entrySet()) {
-            entry.getKey().stopSound(name);
-            if (name2 != null)
-                entry.getKey().stopSound(name2);
-            entry.getValue().songTask.cancel();
+        for (Map.Entry<UUID, CustomMusic> entry : players.entrySet()) {
+            Player player = org.bukkit.Bukkit.getPlayer(entry.getKey());
+            if (player != null) {
+                player.stopSound(name);
+                if (name2 != null)
+                    player.stopSound(name2);
+            }
+            if (entry.getValue().songTask != null)
+                entry.getValue().songTask.cancel();
         }
+        players.clear();
     }
 
     private void play(Location location, double range) {
@@ -132,9 +138,11 @@ public class CustomMusic {
             if (player.getLocation().distanceSquared(location) > rangeSquared)
                 continue;
 
-            CustomMusic currentCustomMusic = playerSongSingleton.get(player);
+            UUID playerUUID = player.getUniqueId();
+            CustomMusic currentCustomMusic = playerSongSingleton.get(playerUUID);
             if (currentCustomMusic != null && !currentCustomMusic.equals(this)) {
-                currentCustomMusic.songTask.cancel();
+                if (currentCustomMusic.songTask != null)
+                    currentCustomMusic.songTask.cancel();
                 player.stopSound(currentCustomMusic.name);
                 if (currentCustomMusic.name2 != null) {
                     try {
@@ -143,10 +151,10 @@ public class CustomMusic {
                         Logger.warn("Error trying to stop song, key was " + name2 + " . Reporting this to the author would be appreciated. This does not break anything.");
                     }
                 }
-                playerSongSingleton.remove(player);
+                playerSongSingleton.remove(playerUUID);
             }
 
-            if (!players.containsKey(player)) {
+            if (!players.containsKey(playerUUID)) {
                 player.playSound(player.getLocation(), name, SoundCategory.MUSIC, 1f, 1f);
                 startLoopingTask(player, durationTicks);
             }
@@ -154,32 +162,41 @@ public class CustomMusic {
     }
 
     private void play(Player player) {
+        UUID playerUUID = player.getUniqueId();
         startLoopingTask(player, durationTicks);
-        players.put(player, this);
+        players.put(playerUUID, this);
         //Boss music overrides dungeon music
-        if (playerSongSingleton.containsKey(player) && !players.get(player).equals(this)) return;
+        if (playerSongSingleton.containsKey(playerUUID) && !players.get(playerUUID).equals(this)) return;
         player.playSound(player.getLocation(), name, SoundCategory.MUSIC, 1f, 1f);
-        playerSongSingleton.put(player, this);
+        playerSongSingleton.put(playerUUID, this);
     }
 
     private void startLoopingTask(Player player, int durationTicks) {
         //Case for a song with no transition
         CustomMusic customMusic = this;
+        UUID playerUUID = player.getUniqueId();
         if (name2 == null) {
             songTask = new BukkitRunnable() {
                 @Override
                 public void run() {
-                    if (contentType == ContentType.BOSS && (!customBossEntity.exists() || customBossEntity.getLivingEntity() == null) ||
-                            contentType == ContentType.BOSS && customBossEntity.getLivingEntity() != null && player.getLocation().distanceSquared(customBossEntity.getLivingEntity().getLocation()) > Math.pow(customBossEntity.getFollowDistance() * 1.5, 2) ||
-                            contentType == ContentType.DUNGEON && !player.getWorld().equals(world)) {
+                    Player p = org.bukkit.Bukkit.getPlayer(playerUUID);
+                    if (p == null || !p.isOnline()) {
                         cancel();
-                        players.remove(player);
-                        playerSongSingleton.remove(player);
+                        players.remove(playerUUID);
+                        playerSongSingleton.remove(playerUUID);
                         return;
                     }
-                    if (playerSongSingleton.containsKey(player) && !players.get(player).equals(customMusic)) return;
-                    if (!playerSongSingleton.containsKey(player)) playerSongSingleton.put(player, customMusic);
-                    player.playSound(player.getLocation(), name, SoundCategory.MUSIC,1f, 1f);
+                    if (contentType == ContentType.BOSS && (!customBossEntity.exists() || customBossEntity.getLivingEntity() == null) ||
+                            contentType == ContentType.BOSS && customBossEntity.getLivingEntity() != null && p.getLocation().distanceSquared(customBossEntity.getLivingEntity().getLocation()) > Math.pow(customBossEntity.getFollowDistance() * 1.5, 2) ||
+                            contentType == ContentType.DUNGEON && !p.getWorld().equals(world)) {
+                        cancel();
+                        players.remove(playerUUID);
+                        playerSongSingleton.remove(playerUUID);
+                        return;
+                    }
+                    if (playerSongSingleton.containsKey(playerUUID) && !players.get(playerUUID).equals(customMusic)) return;
+                    if (!playerSongSingleton.containsKey(playerUUID)) playerSongSingleton.put(playerUUID, customMusic);
+                    p.playSound(p.getLocation(), name, SoundCategory.MUSIC,1f, 1f);
                 }
             }.runTaskTimer(MetadataHandler.PLUGIN, 0, durationTicks);
         }
@@ -189,20 +206,27 @@ public class CustomMusic {
             songTask = new BukkitRunnable() {
                 @Override
                 public void run() {
-                    if (contentType == ContentType.BOSS && (!customBossEntity.exists() || customBossEntity.getLivingEntity() == null) ||
-                            contentType == ContentType.BOSS && customBossEntity.getLivingEntity() != null && player.getLocation().distanceSquared(customBossEntity.getLivingEntity().getLocation()) > Math.pow(customBossEntity.getFollowDistance() * 1.5, 2) ||
-                            contentType == ContentType.DUNGEON && !player.getWorld().equals(world)) {
+                    Player p = org.bukkit.Bukkit.getPlayer(playerUUID);
+                    if (p == null || !p.isOnline()) {
                         cancel();
-                        players.remove(player);
-                        playerSongSingleton.remove(player);
+                        players.remove(playerUUID);
+                        playerSongSingleton.remove(playerUUID);
                         return;
                     }
-                    player.playSound(player.getLocation(), name2, SoundCategory.MUSIC,1f, 1f);
+                    if (contentType == ContentType.BOSS && (!customBossEntity.exists() || customBossEntity.getLivingEntity() == null) ||
+                            contentType == ContentType.BOSS && customBossEntity.getLivingEntity() != null && p.getLocation().distanceSquared(customBossEntity.getLivingEntity().getLocation()) > Math.pow(customBossEntity.getFollowDistance() * 1.5, 2) ||
+                            contentType == ContentType.DUNGEON && !p.getWorld().equals(world)) {
+                        cancel();
+                        players.remove(playerUUID);
+                        playerSongSingleton.remove(playerUUID);
+                        return;
+                    }
+                    p.playSound(p.getLocation(), name2, SoundCategory.MUSIC,1f, 1f);
                 }
             }.runTaskTimer(MetadataHandler.PLUGIN, durationTicks, durationTicks2);
         }
 
-        players.put(player, this);
+        players.put(playerUUID, this);
     }
 
     private enum ContentType {
@@ -215,7 +239,7 @@ public class CustomMusic {
         public void onTeleport(PlayerTeleportEvent event) {
             EliteMobsWorld eliteMobsWorld = EliteMobsWorld.getEliteMobsWorld(event.getDestination().getWorld().getUID());
             if (eliteMobsWorld == null || eliteMobsWorld.getContentPackagesConfigFields().getSong() == null) return;
-            CustomMusic customMusic = dungeonMusic.get(event.getDestination().getWorld());
+            CustomMusic customMusic = dungeonMusic.get(event.getDestination().getWorld().getUID());
             if (customMusic == null) {
                 Logger.warn("aFailed to get custom music for " + event.getDestination().getWorld().getName());
                 return;
@@ -233,7 +257,7 @@ public class CustomMusic {
         public void onLogin(PlayerJoinEvent event) {
             EliteMobsWorld eliteMobsWorld = EliteMobsWorld.getEliteMobsWorld(event.getPlayer().getWorld().getUID());
             if (eliteMobsWorld == null || eliteMobsWorld.getContentPackagesConfigFields().getSong() == null) return;
-            CustomMusic customMusic = dungeonMusic.get(event.getPlayer().getWorld());
+            CustomMusic customMusic = dungeonMusic.get(event.getPlayer().getWorld().getUID());
             if (customMusic == null) {
                 Logger.warn("Failed to get custom music for " + event.getPlayer().getWorld().getName());
                 return;

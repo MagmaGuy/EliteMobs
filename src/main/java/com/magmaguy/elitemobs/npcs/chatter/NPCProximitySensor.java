@@ -21,48 +21,61 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
 import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class NPCProximitySensor implements Listener {
 
-    private static final HashSet<Player> nearbyPlayers = new HashSet<>();
+    private static final Set<UUID> nearbyPlayers = new HashSet<>();
+    private static BukkitTask proximityScanTask = null;
 
     public NPCProximitySensor() {
-        new BukkitRunnable() {
+        proximityScanTask = new BukkitRunnable() {
 
             @Override
             public void run() {
-                HashSet<Player> unseenPlayerList = (HashSet<Player>) nearbyPlayers.clone();
+                Set<UUID> unseenPlayerList = new HashSet<>(nearbyPlayers);
                 for (NPCEntity npcEntity : EntityTracker.getNpcEntities().values()) {
                     if (!npcEntity.isValid()) continue;
                     for (Entity entity : npcEntity.getVillager().getNearbyEntities(npcEntity.getNPCsConfigFields().getActivationRadius(),
                             npcEntity.getNPCsConfigFields().getActivationRadius(), npcEntity.getNPCsConfigFields().getActivationRadius())) {
                         if (!entity.getType().equals(EntityType.PLAYER)) continue;
                         Player player = (Player) entity;
+                        UUID playerUUID = player.getUniqueId();
                         Location rotatedLocation = npcEntity.getVillager().getLocation().setDirection(entity.getLocation().subtract(npcEntity.getVillager().getLocation()).toVector());
                         npcEntity.getVillager().teleport(rotatedLocation);
-                        if (unseenPlayerList.contains(player)) {
+                        if (unseenPlayerList.contains(playerUUID)) {
                             if (!npcEntity.getNPCsConfigFields().getInteractionType().equals(NPCInteractions.NPCInteractionType.CHAT))
                                 npcEntity.sayDialog(player);
-                            unseenPlayerList.remove(player);
+                            unseenPlayerList.remove(playerUUID);
                         } else {
                             npcEntity.sayGreeting(player);
-                            nearbyPlayers.add(player);
+                            nearbyPlayers.add(playerUUID);
                             startQuestIndicator(npcEntity, player);
                         }
                     }
                 }
 
-                nearbyPlayers.removeIf(unseenPlayerList::contains);
+                nearbyPlayers.removeAll(unseenPlayerList);
 
             }
 
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 20L * 5L);
 
+    }
+
+    public static void shutdown() {
+        if (proximityScanTask != null && !proximityScanTask.isCancelled()) {
+            proximityScanTask.cancel();
+            proximityScanTask = null;
+        }
+        nearbyPlayers.clear();
     }
 
     private void startQuestIndicator(NPCEntity npcEntity, Player player) {

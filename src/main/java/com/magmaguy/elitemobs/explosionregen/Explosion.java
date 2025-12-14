@@ -55,6 +55,11 @@ public class Explosion {
         regenerate();
     }
 
+    public static void shutdown() {
+        regenerateAllPendingBlocks();
+        explosions.clear();
+    }
+
     public static void regenerateAllPendingBlocks() {
         for (Explosion explosion : explosions)
             explosion.resetAllBlocks();

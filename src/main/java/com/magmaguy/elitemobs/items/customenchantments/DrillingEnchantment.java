@@ -18,6 +18,7 @@ import org.bukkit.util.Vector;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 public class DrillingEnchantment extends CustomEnchantment {
 
@@ -27,8 +28,16 @@ public class DrillingEnchantment extends CustomEnchantment {
         super(key, false);
     }
 
+    public static void shutdown() {
+        DrillingEnchantmentEvents.shutdown();
+    }
+
     public static class DrillingEnchantmentEvents implements Listener {
-        private static final Set<Player> activePlayers = new HashSet<>();
+        private static final Set<UUID> activePlayers = new HashSet<>();
+
+        public static void shutdown() {
+            activePlayers.clear();
+        }
         private Material material = null;
         private ItemStack itemStack = null;
         private MiningDirection miningDirection = null;
@@ -43,7 +52,7 @@ public class DrillingEnchantment extends CustomEnchantment {
                 return;
             if (event.getPlayer().isSneaking()) return;
             if (!EnchantmentsConfig.getEnchantment("drilling.yml").isEnabled()) return;
-            if (activePlayers.contains(event.getPlayer())) return;
+            if (activePlayers.contains(event.getPlayer().getUniqueId())) return;
 
             drillBlocks(event.getBlock(),
                     ItemTagger.getEnchantment(event.getPlayer().getInventory().getItemInMainHand().getItemMeta(), new NamespacedKey(MetadataHandler.PLUGIN, key)),
@@ -60,7 +69,7 @@ public class DrillingEnchantment extends CustomEnchantment {
             this.itemStack = playerItem;
             this.miningDirection = determineDirection(originalBlock.getLocation(), playerLocation);
 
-            activePlayers.add(player);
+            activePlayers.add(player.getUniqueId());
 
             switch (enchantmentLevel) {
                 case 1:
@@ -85,7 +94,7 @@ public class DrillingEnchantment extends CustomEnchantment {
                     drillLevel3(drillLevel1(drillLevel1(originalBlock)));
             }
 
-            activePlayers.remove(player);
+            activePlayers.remove(player.getUniqueId());
 
         }
 

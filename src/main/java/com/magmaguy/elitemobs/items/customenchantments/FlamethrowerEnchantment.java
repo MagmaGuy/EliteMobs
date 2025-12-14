@@ -21,13 +21,12 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class FlamethrowerEnchantment extends CustomEnchantment {
 
-    private static final List<Player> playersUsingFlamethrower = new ArrayList<>();
+    private static final Set<UUID> playersUsingFlamethrower = new HashSet<>();
     public static String key = "flamethrower";
 
     public FlamethrowerEnchantment() {
@@ -58,6 +57,10 @@ public class FlamethrowerEnchantment extends CustomEnchantment {
     }
 
 
+    public static void shutdown() {
+        playersUsingFlamethrower.clear();
+    }
+
     public static class FlamethrowerEnchantmentEvents implements Listener {
 
         @EventHandler
@@ -70,7 +73,7 @@ public class FlamethrowerEnchantment extends CustomEnchantment {
             if (!(event.getAction().equals(Action.RIGHT_CLICK_BLOCK) || event.getAction().equals(Action.RIGHT_CLICK_AIR)))
                 return;
 
-            if (playersUsingFlamethrower.contains(player)) return;
+            if (playersUsingFlamethrower.contains(player.getUniqueId())) return;
 
             ItemStack zombieKingAxe = player.getInventory().getItemInMainHand();
 
@@ -82,7 +85,7 @@ public class FlamethrowerEnchantment extends CustomEnchantment {
 
 
                 doFlamethrowerPhase1(player, player.getTargetBlock(null, 30).getLocation().clone().add(0.5, 1, 0.5));
-                CooldownHandler.initialize(playersUsingFlamethrower, player, 3 * 60);
+                CooldownHandler.initialize(playersUsingFlamethrower.stream().toList(), player.getUniqueId(), 3 * 60);
                 player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 5 * 20, 20));
 
             }

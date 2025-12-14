@@ -23,6 +23,10 @@ import java.util.UUID;
 public class RemoveCommand {
     private static final Set<UUID> removingPlayers = new HashSet<>();
 
+    public static void shutdown() {
+        removingPlayers.clear();
+    }
+
     private RemoveCommand() {
     }
 

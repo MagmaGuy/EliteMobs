@@ -36,6 +36,13 @@ public class VersionChecker {
     private VersionChecker() {
     }
 
+    public static void shutdown() {
+        outdatedPackages.clear();
+        connectionRetryCount = 0;
+        connectionFailed = false;
+        pluginIsUpToDate = true;
+    }
+
     /**
      * Compares a Minecraft version with the current version on the server. Returns true if the version on the server is older.
      *

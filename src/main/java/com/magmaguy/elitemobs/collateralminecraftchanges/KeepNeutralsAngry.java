@@ -11,21 +11,34 @@ import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Wolf;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 public class KeepNeutralsAngry {
-    private static final HashSet<EliteEntity> angryMobs = new HashSet<>();
+    private static final Map<UUID, BukkitTask> angryMobTasks = new HashMap<>();
 
     private KeepNeutralsAngry() {
+    }
+
+    public static void shutdown() {
+        for (BukkitTask task : angryMobTasks.values()) {
+            if (task != null && !task.isCancelled()) {
+                task.cancel();
+            }
+        }
+        angryMobTasks.clear();
     }
 
     public static void showMeYouWarFace(EliteEntity eliteEntity) {
         //might already contain
         EntityType entityType = eliteEntity.getLivingEntity().getType();
-        if (angryMobs.contains(eliteEntity)) return;
-        new BukkitRunnable() {
+        UUID entityUUID = eliteEntity.getLivingEntity().getUniqueId();
+        if (angryMobTasks.containsKey(entityUUID)) return;
+        BukkitTask task = new BukkitRunnable() {
             @Override
             public void run() {
                 if (eliteEntity instanceof CustomBossEntity customBossEntity && customBossEntity.getCustomBossesConfigFields().isNeutral())
@@ -35,7 +48,7 @@ public class KeepNeutralsAngry {
                         !entityType.equals(eliteEntity.getLivingEntity().getType()) ||
                         entityType.equals(EntityType.WOLF) && ((Wolf) eliteEntity.getLivingEntity()).isTamed()) {
                     cancel();
-                    angryMobs.remove(eliteEntity);
+                    angryMobTasks.remove(entityUUID);
                     return;
                 }
 
@@ -56,5 +69,6 @@ public class KeepNeutralsAngry {
 
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 20);
+        angryMobTasks.put(entityUUID, task);
     }
 }
