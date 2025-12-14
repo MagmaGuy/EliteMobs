@@ -22,6 +22,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class LightningEnchantment extends CustomEnchantment {
@@ -45,18 +46,23 @@ public class LightningEnchantment extends CustomEnchantment {
     }
 
     public static class LightningEnchantmentEvents implements Listener {
-        private static final Set<Player> playersInCooldown = new HashSet<>();
+        private static final Set<UUID> playersInCooldown = new HashSet<>();
+
+        public static void shutdown() {
+            playersInCooldown.clear();
+        }
 
         @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
         public void onEntityDamagedByPlayer(EliteMobDamagedByPlayerEvent event) {
             if (event.getPlayer().hasMetadata("NPC") ||
                     !ElitePlayerInventory.playerInventories.containsKey(event.getPlayer().getUniqueId())) return;
-            if (playersInCooldown.contains(event.getPlayer())) return;
-            double lightningChance = ElitePlayerInventory.playerInventories.get(event.getPlayer().getUniqueId()).getLightningChance(true);
+            UUID playerUUID = event.getPlayer().getUniqueId();
+            if (playersInCooldown.contains(playerUUID)) return;
+            double lightningChance = ElitePlayerInventory.playerInventories.get(playerUUID).getLightningChance(true);
             if (lightningChance <= 0) return;
             if (lightningChance >= ThreadLocalRandom.current().nextDouble()) return;
-            playersInCooldown.add(event.getPlayer());
-            Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> playersInCooldown.remove(event.getPlayer()), LightningConfig.minimumCooldown * 20L);
+            playersInCooldown.add(playerUUID);
+            Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> playersInCooldown.remove(playerUUID), LightningConfig.minimumCooldown * 20L);
             playerLightning(event.getPlayer(), event.getEliteMobEntity().getLivingEntity().getLocation());
         }
     }

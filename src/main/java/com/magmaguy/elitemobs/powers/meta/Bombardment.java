@@ -25,6 +25,10 @@ public abstract class Bombardment extends MajorPower implements Listener {
     private boolean firing = false;
     private BukkitTask task = null;
 
+    public static void shutdown() {
+        bombardments.clear();
+    }
+
     public Bombardment(PowersConfigFields powersConfigFields) {
         super(powersConfigFields);
         bombardments.add(powersConfigFields.getFilename());

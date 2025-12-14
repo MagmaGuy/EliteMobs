@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfig;
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
 import com.magmaguy.elitemobs.dungeons.utility.DungeonUtils;
+import com.magmaguy.elitemobs.instanced.WorldOperationQueue;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.InstancedBossEntity;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.WorldInstantiator;
@@ -13,9 +14,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.io.File;
-import java.util.concurrent.CompletableFuture;
-
 public class DynamicDungeonInstance extends DungeonInstance {
     @Getter
     private final int selectedLevel;
@@ -24,11 +22,10 @@ public class DynamicDungeonInstance extends DungeonInstance {
                                   Location lobbyLocation,
                                   Location startLocation,
                                   World world,
-                                  File instancedWorldFile,
                                   Player player,
                                   String difficultyName,
                                   int selectedLevel) {
-        super(contentPackagesConfigFields, lobbyLocation, startLocation, world, instancedWorldFile, player, difficultyName);
+        super(contentPackagesConfigFields, lobbyLocation, startLocation, world, player, difficultyName);
         this.selectedLevel = selectedLevel;
 
         // Recalculate level sync for dynamic dungeons based on the player-selected level
@@ -54,18 +51,17 @@ public class DynamicDungeonInstance extends DungeonInstance {
 
         if (!launchEvent(dynamicDungeonConfigFields, instancedWorldName, player)) return;
 
-        CompletableFuture<File> future = CompletableFuture.supplyAsync(() ->
-                cloneWorldFiles(dynamicDungeonConfigFields, instancedWorldName, player));
-        future.thenAccept(file -> {
-            if (file == null) return;
-            new InitializeDynamicWorldTask(dynamicDungeonConfigFields, instancedWorldName, player, file, difficultyName, selectedLevel).runTask(MetadataHandler.PLUGIN);
-        });
+        WorldOperationQueue.queueOperation(
+                player,
+                () -> cloneWorldFiles(dynamicDungeonConfigFields, instancedWorldName, player) != null,
+                () -> initializeDynamicWorld(dynamicDungeonConfigFields, instancedWorldName, player, difficultyName, selectedLevel),
+                dynamicDungeonConfigFields.getName()
+        );
     }
 
     protected static DynamicDungeonInstance initializeDynamicWorld(ContentPackagesConfigFields dynamicDungeonConfigFields,
                                                                    String instancedWorldName,
                                                                    Player player,
-                                                                   File targetFile,
                                                                    String difficultyName,
                                                                    int selectedLevel) {
         World world = DungeonUtils.loadWorld(instancedWorldName, dynamicDungeonConfigFields.getEnvironment(), dynamicDungeonConfigFields);
@@ -80,7 +76,7 @@ public class DynamicDungeonInstance extends DungeonInstance {
         if (lobbyLocation != null) lobbyLocation.setWorld(world);
         else lobbyLocation = startLocation;
 
-        return new DynamicDungeonInstance(dynamicDungeonConfigFields, lobbyLocation, startLocation, world, targetFile, player, difficultyName, selectedLevel);
+        return new DynamicDungeonInstance(dynamicDungeonConfigFields, lobbyLocation, startLocation, world, player, difficultyName, selectedLevel);
     }
 
     @Override
@@ -89,34 +85,6 @@ public class DynamicDungeonInstance extends DungeonInstance {
         // Show additional info about the selected level for dynamic dungeons
         player.sendMessage("[EliteMobs] Dynamic dungeon level set to " + selectedLevel + "!");
         return true;
-    }
-
-    private static class InitializeDynamicWorldTask extends BukkitRunnable {
-        private final ContentPackagesConfigFields dynamicDungeonConfigFields;
-        private final String instancedWorldName;
-        private final Player player;
-        private final File file;
-        private final String difficultyName;
-        private final int selectedLevel;
-
-        public InitializeDynamicWorldTask(ContentPackagesConfigFields dynamicDungeonConfigFields,
-                                          String instancedWorldName,
-                                          Player player,
-                                          File file,
-                                          String difficultyName,
-                                          int selectedLevel) {
-            this.dynamicDungeonConfigFields = dynamicDungeonConfigFields;
-            this.instancedWorldName = instancedWorldName;
-            this.player = player;
-            this.file = file;
-            this.difficultyName = difficultyName;
-            this.selectedLevel = selectedLevel;
-        }
-
-        @Override
-        public void run() {
-            initializeDynamicWorld(dynamicDungeonConfigFields, instancedWorldName, player, file, difficultyName, selectedLevel);
-        }
     }
 
     private class SetBossLevelsTask extends BukkitRunnable {

@@ -158,6 +158,46 @@ public class CustomItem {
             }
     }
 
+    /**
+     * Regenerates all cached ItemStacks used for menus and displays.
+     * This is needed because on first boot, resource pack models may not be available yet
+     * when items are initially generated (due to plugin load order).
+     * Call this after all plugins have finished loading to ensure custom skins are applied.
+     */
+    public static void regenerateCachedItemStacks() {
+        // Clear existing cached ItemStacks
+        customItemStackList.clear();
+        customItemStackShopList.clear();
+        tieredLoot.clear();
+        weighedFixedItems.clear();
+
+        // Regenerate all cached ItemStacks with proper skins
+        for (CustomItem customItem : customItems.values()) {
+            if (customItem.getCustomItemsConfigFields() == null || !customItem.getCustomItemsConfigFields().isEnabled())
+                continue;
+            if (customItem.getCustomItemsConfigFields().getMaterial() == null) continue;
+
+            // Regenerate loot menu items
+            customItemStackList.add(customItem.generateDefaultsItemStack(null, false, null));
+            if (!customItem.getItemType().equals(ItemType.UNIQUE))
+                customItemStackShopList.add(customItem.generateDefaultsItemStack(null, true, null));
+
+            // Regenerate tiered loot
+            ItemStack itemStack = customItem.generateDefaultsItemStack(null, false, null);
+            int itemTier = customItem.getItemLevel();
+            if (tieredLoot.get(itemTier) == null)
+                tieredLoot.put(itemTier, new ArrayList<>(Collections.singletonList(itemStack)));
+            else
+                tieredLoot.get(itemTier).add(itemStack);
+
+            // Regenerate weighed fixed items
+            if (customItem.getScalability() == Scalability.FIXED && customItem.getDropWeight() > 0) {
+                ItemStack weighedStack = customItem.generateDefaultsItemStack(null, false, null);
+                weighedFixedItems.put(weighedStack, customItem.getDropWeight());
+            }
+        }
+    }
+
     public static int limitItemLevel(Player player, int originalLevel) {
         int itemLevel;
         if (player != null && AdventurersGuildConfig.isGuildLootLimiter()) {

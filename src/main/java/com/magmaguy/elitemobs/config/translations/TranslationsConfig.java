@@ -1,52 +1,88 @@
 package com.magmaguy.elitemobs.config.translations;
 
 import com.magmaguy.elitemobs.config.DefaultConfig;
-import com.magmaguy.magmacore.config.CustomConfig;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 
-import java.util.HashMap;
 import java.util.List;
 
-public class TranslationsConfig extends CustomConfig {
+/**
+ * Manages translations using per-language CSV files.
+ * CSV format: "key","en","<lang_code>" with indexed keys for lists.
+ *
+ * Special modes:
+ * - "english": Bypasses CSV entirely, uses plugin defaults
+ * - "custom": Uses auto-generated English→English CSV for customization
+ */
+public class TranslationsConfig {
+
     @Getter
-    private static HashMap<String, TranslationsConfigFields> translationConfigs = new HashMap<>();
+    private static TranslationsConfigFields translationsConfigFields;
 
     /**
-     * Initializes all configurations and stores them in a list for later access
+     * Initializes the translation system.
+     * Only creates TranslationsConfigFields if not using English.
      */
     public TranslationsConfig() {
-        super("translations", "com.magmaguy.elitemobs.config.translations.premade", TranslationsConfigFields.class);
-        translationConfigs = new HashMap<>();
-        for (String key : super.getCustomConfigFieldsHashMap().keySet())
-            translationConfigs.put(key, (TranslationsConfigFields) super.getCustomConfigFieldsHashMap().get(key));
+        if (isEnglish()) {
+            translationsConfigFields = null;
+            Logger.info("Language set to English - using plugin defaults");
+        } else {
+            translationsConfigFields = new TranslationsConfigFields();
+        }
     }
 
     /**
-     * This saves a translatable element to the configuration files.
+     * Adds a translatable string and returns the translated value.
+     * If the language is English, returns the original value (no CSV involved).
      */
     public static String add(String filename, String key, String value) {
-        if (DefaultConfig.getLanguage().equals("english") || DefaultConfig.getLanguage().equals("english.yml"))
-            return value;
-        TranslationsConfigFields selectedLanguage = translationConfigs.get(DefaultConfig.getLanguage());
-        if (selectedLanguage == null) {
-            Logger.warn("Failed to get valid language from " + filename + " , defaulting to English! (String)");
+        if (isEnglish()) return value;
+
+        if (translationsConfigFields == null) {
+            Logger.warn("TranslationsConfig not initialized, defaulting to English! (String)");
             return value;
         }
-        selectedLanguage.add(filename, key, value);
-        return (String) selectedLanguage.get(filename, key);
+
+        translationsConfigFields.add(filename, key, value);
+        Object result = translationsConfigFields.get(filename, key);
+        return result instanceof String ? (String) result : value;
     }
 
+    /**
+     * Adds a translatable list and returns the translated value.
+     * If the language is English, returns the original value (no CSV involved).
+     */
+    @SuppressWarnings("unchecked")
     public static List<String> add(String filename, String key, List<String> value) {
-        if (DefaultConfig.getLanguage().equals("english") || DefaultConfig.getLanguage().equals("english.yml"))
-            return value;
-        TranslationsConfigFields selectedLanguage = translationConfigs.get(DefaultConfig.getLanguage());
-        if (selectedLanguage == null) {
-            Logger.warn("Failed to get valid language from " + filename + " , defaulting to English! (List)");
+        if (isEnglish()) return value;
+
+        if (translationsConfigFields == null) {
+            Logger.warn("TranslationsConfig not initialized, defaulting to English! (List)");
             return value;
         }
-        selectedLanguage.add(filename, key, value);
-        return (List<String>) selectedLanguage.get(filename, key);
+
+        translationsConfigFields.add(filename, key, value);
+        Object result = translationsConfigFields.get(filename, key);
+        return result instanceof List ? (List<String>) result : value;
     }
 
+    /**
+     * Checks if the current language is English (plugin defaults mode).
+     */
+    private static boolean isEnglish() {
+        String lang = DefaultConfig.getLanguage();
+        if (lang == null) return true;
+        lang = lang.toLowerCase().replace(".yml", "").replace(".csv", "");
+        return lang.equals("english") || lang.equals("en");
+    }
+
+    /**
+     * Shuts down the translation system, saving any pending changes.
+     */
+    public static void shutdown() {
+        if (translationsConfigFields != null) {
+            translationsConfigFields.shutdown();
+        }
+    }
 }

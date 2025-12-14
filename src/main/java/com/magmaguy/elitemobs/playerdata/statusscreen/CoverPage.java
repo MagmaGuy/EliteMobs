@@ -83,6 +83,10 @@ public class CoverPage {
     public static class CoverPageEvents implements Listener {
         private static final Set<Inventory> pageInventories = new HashSet<>();
 
+        public static void shutdown() {
+            pageInventories.clear();
+        }
+
         @EventHandler
         public void onInventoryInteract(InventoryClickEvent event) {
             Player player = ((Player) event.getWhoClicked()).getPlayer();

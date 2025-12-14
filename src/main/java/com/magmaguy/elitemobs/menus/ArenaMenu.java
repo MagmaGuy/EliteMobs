@@ -39,6 +39,10 @@ public class ArenaMenu {
     public static class ArenaMenuEvents implements Listener {
         private static final Map<Inventory, MenuContainer> menus = new HashMap<>();
 
+        public static void shutdown() {
+            menus.clear();
+        }
+
         @EventHandler(ignoreCancelled = true)
         public void onInventoryClick(InventoryClickEvent event) {
             Player player = ((Player) event.getWhoClicked()).getPlayer();

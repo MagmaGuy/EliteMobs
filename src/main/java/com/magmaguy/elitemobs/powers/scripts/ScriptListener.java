@@ -21,6 +21,11 @@ public class ScriptListener implements Listener {
     public static HashMap<FallingBlock, FallingEntityDataPair> fallingBlocks = new HashMap();
     public static HashMap<Entity, FallingEntityDataPair> fallingEntities = new HashMap<>();
 
+    public static void shutdown() {
+        fallingBlocks.clear();
+        fallingEntities.clear();
+    }
+
     public static void runEvent(FallingEntityDataPair fallingEntityDataPair, Location landingLocation) {
         for (String string : fallingEntityDataPair.getScriptAction().getBlueprint().getLandingScripts()) {
             EliteScript iteratedScript = fallingEntityDataPair.getScriptAction().getEliteScriptMap().get(string);

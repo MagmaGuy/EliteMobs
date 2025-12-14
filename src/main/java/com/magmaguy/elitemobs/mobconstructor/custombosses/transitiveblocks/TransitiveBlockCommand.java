@@ -25,19 +25,11 @@ import org.bukkit.util.Vector;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 public class TransitiveBlockCommand {
 
-    public static HashMap<Player, TransitiveBlockCommand> activePlayers = new HashMap<>();
-    private final Player player;
-    private final CustomBossesConfigFields customBossesConfigFields;
-    private final TransitiveBlockType transitiveBlockType;
-    private List<TransitiveBlock> transitiveBlockList = new ArrayList<>();
-    private RegionalBossEntity regionalBossEntity;
-    @Getter
-    @Setter
-    private boolean regionalSelection = false;
-    private Location corner1, corner2;
+    public static HashMap<UUID, TransitiveBlockCommand> activePlayers = new HashMap<>();
 
     public TransitiveBlockCommand(Player player, CustomBossesConfigFields customBossesConfigFields, TransitiveBlockType transitiveBlockType, boolean edit) {
         this.player = player;
@@ -86,10 +78,23 @@ public class TransitiveBlockCommand {
                     transitiveBlockList = TransitiveBlock.serializeTransitiveBlocks(customBossesConfigFields.getOnRemoveBlockStates(), customBossesConfigFields.getFilename());
             }
 
-        activePlayers.put(player, this);
+        activePlayers.put(player.getUniqueId(), this);
         player.sendMessage(ChatColor.GREEN + "[EliteMobs] Now registering " + transitiveBlockType.toString() + " blocks! " + ChatColor.DARK_GREEN + "Punch blocks to register air at that location, or right click blocks to register the block you right clicked!");
         player.sendMessage(ChatColor.GOLD + "[EliteMobs] Run the same command to stop registering blocks and save!");
         player.sendMessage(ChatColor.GOLD + "[EliteMobs] Or run the command " + "/em cancelblocks " + " to cancel the registration!");
+    }
+    private final Player player;
+    private final CustomBossesConfigFields customBossesConfigFields;
+    private final TransitiveBlockType transitiveBlockType;
+    private List<TransitiveBlock> transitiveBlockList = new ArrayList<>();
+    private RegionalBossEntity regionalBossEntity;
+    @Getter
+    @Setter
+    private boolean regionalSelection = false;
+    private Location corner1, corner2;
+
+    public static void shutdown() {
+        activePlayers.clear();
     }
 
     public static TransitiveBlockCommand processCommand(Player player, String filename, String transitiveBlockType, boolean edit, boolean regionalSelection) {
@@ -118,8 +123,9 @@ public class TransitiveBlockCommand {
             player.sendMessage("Not a valid transitive block type, use ON_SPAWN or ON_REMOVE !");
             return null;
         }
-        if (activePlayers.containsKey(player)) {
-            activePlayers.get(player).commitLocations();
+        UUID playerUUID = player.getUniqueId();
+        if (activePlayers.containsKey(playerUUID)) {
+            activePlayers.get(playerUUID).commitLocations();
             return null;
         } else
             return new TransitiveBlockCommand(player, customBossesConfigFields, tbt, edit);
@@ -131,7 +137,7 @@ public class TransitiveBlockCommand {
      * @param player Player for whom registration should be cancelled
      */
     public static void processCommand(Player player) {
-        activePlayers.remove(player);
+        activePlayers.remove(player.getUniqueId());
         player.sendMessage(ChatColor.RED + "[EliteMobs] Block registration successfully cancelled!");
     }
 
@@ -185,7 +191,7 @@ public class TransitiveBlockCommand {
     }
 
     public void commitLocations() {
-        activePlayers.remove(player);
+        activePlayers.remove(player.getUniqueId());
         player.sendMessage(ChatColor.GREEN + "[EliteMobs] Now saving " + transitiveBlockType.toString() + " blocks!");
         List<String> deserializedData = new ArrayList<>();
 
@@ -247,29 +253,29 @@ public class TransitiveBlockCommand {
     public static class TemporaryBossBlockCommandEvents implements Listener {
         @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
         public void onPlayerInteractBlockEvent(PlayerInteractEvent event) {
-            if (!activePlayers.containsKey(event.getPlayer())) return;
+            UUID playerUUID = event.getPlayer().getUniqueId();
+            if (!activePlayers.containsKey(playerUUID)) return;
             if (event.getHand() != EquipmentSlot.HAND) return;
             if (event.getClickedBlock() == null) return;
             if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
                 if (event.getClickedBlock().getType().isAir()) return;
-                if (activePlayers.get(event.getPlayer()).isRegionalSelection())
-                    activePlayers.get(event.getPlayer()).setCorner(false, event.getClickedBlock().getLocation());
+                if (activePlayers.get(playerUUID).isRegionalSelection())
+                    activePlayers.get(playerUUID).setCorner(false, event.getClickedBlock().getLocation());
                 else
-                    activePlayers.get(event.getPlayer()).registerBlock(event.getClickedBlock());
+                    activePlayers.get(playerUUID).registerBlock(event.getClickedBlock());
                 event.setCancelled(true);
             } else if (event.getAction().equals(Action.LEFT_CLICK_BLOCK)) {
-                if (activePlayers.get(event.getPlayer()).isRegionalSelection())
-                    activePlayers.get(event.getPlayer()).setCorner(true, event.getClickedBlock().getLocation());
+                if (activePlayers.get(playerUUID).isRegionalSelection())
+                    activePlayers.get(playerUUID).setCorner(true, event.getClickedBlock().getLocation());
                 else
-                    activePlayers.get(event.getPlayer()).registerAir(event.getClickedBlock());
+                    activePlayers.get(playerUUID).registerAir(event.getClickedBlock());
                 event.setCancelled(true);
             }
         }
 
         @EventHandler
         public void onPlayerQuit(PlayerQuitEvent event) {
-            if (!activePlayers.containsKey(event.getPlayer())) return;
-            activePlayers.remove(event.getPlayer());
+            activePlayers.remove(event.getPlayer().getUniqueId());
         }
     }
 

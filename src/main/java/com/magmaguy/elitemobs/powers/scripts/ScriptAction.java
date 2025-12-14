@@ -42,10 +42,10 @@ import java.util.concurrent.ThreadLocalRandom;
 public class ScriptAction {
 
     /**
-     * A thread-safe set of players who are currently invulnerable due to scripts.
+     * A thread-safe set of player UUIDs who are currently invulnerable due to scripts.
      */
     @Getter
-    private static final Set<Player> invulnerablePlayers = ConcurrentHashMap.newKeySet();
+    private static final Set<UUID> invulnerablePlayers = ConcurrentHashMap.newKeySet();
 
     @Getter
     private final ScriptActionBlueprint blueprint;
@@ -446,7 +446,10 @@ public class ScriptAction {
      * Resets the state of all invulnerable players by removing their invulnerability.
      */
     public static void shutdown() {
-        invulnerablePlayers.forEach(player -> player.setInvulnerable(false));
+        invulnerablePlayers.forEach(uuid -> {
+            Player player = Bukkit.getPlayer(uuid);
+            if (player != null) player.setInvulnerable(false);
+        });
         invulnerablePlayers.clear();
         scriptDamageDepth.remove();
     }
@@ -797,19 +800,20 @@ public class ScriptAction {
             target.setInvulnerable(invulnerable);
             if (target instanceof Player player) {
                 if (invulnerable) {
-                    invulnerablePlayers.add(player);
+                    invulnerablePlayers.add(player.getUniqueId());
                 } else {
-                    invulnerablePlayers.remove(player);
+                    invulnerablePlayers.remove(player.getUniqueId());
                 }
             }
             if (duration > 0) {
+                UUID targetUUID = target.getUniqueId();
                 Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> {
                     target.setInvulnerable(!invulnerable);
-                    if (target instanceof Player player) {
+                    if (target instanceof Player) {
                         if (invulnerable) {
-                            invulnerablePlayers.remove(player);
+                            invulnerablePlayers.remove(targetUUID);
                         } else {
-                            invulnerablePlayers.add(player);
+                            invulnerablePlayers.add(targetUUID);
                         }
                     }
                 }, duration);

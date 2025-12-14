@@ -73,6 +73,11 @@ public class EarthquakeEnchantment extends CustomEnchantment {
         private static final HashSet<UUID> players = new HashSet<>();
         private static final HashSet<UUID> cooldownPlayers = new HashSet<>();
 
+        public static void shutdown() {
+            players.clear();
+            cooldownPlayers.clear();
+        }
+
         @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
         public void onSneak(PlayerToggleSneakEvent event) {
             if (!event.isSneaking()) return;

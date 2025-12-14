@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.items.itemconstructor;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.CustomModelsConfig;
 import com.magmaguy.elitemobs.utils.CustomModelAdder;
+import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
@@ -299,6 +300,7 @@ public class EliteItemSkins {
      * Applies attribute scaling to an item based on its level.
      * Weapons get damage and attack speed bonuses.
      * Armor gets armor, toughness, and knockback resistance bonuses.
+     * Note: Requires MC 1.21.2+ due to attribute naming changes (ARMOR vs GENERIC_ARMOR).
      *
      * @param itemStack The item to apply attributes to
      * @param level The item level (determines scaling)
@@ -306,6 +308,8 @@ public class EliteItemSkins {
     public static void applyAttributeScaling(ItemStack itemStack, int level) {
         if (itemStack == null || level < 1) return;
         if (!CustomModelsConfig.useAttributeScaling) return;
+        // Attribute names changed in 1.21.2 (GENERIC_ARMOR -> ARMOR, etc.)
+        if (VersionChecker.serverVersionOlderThan(21, 2)) return;
 
         Material material = itemStack.getType();
         ItemType itemType = ItemType.fromMaterial(material);

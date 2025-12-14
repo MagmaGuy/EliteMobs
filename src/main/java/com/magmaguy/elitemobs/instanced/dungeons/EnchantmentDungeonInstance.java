@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.SpecialItemSystemsConfig;
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
 import com.magmaguy.elitemobs.dungeons.WorldDungeonPackage;
+import com.magmaguy.elitemobs.instanced.WorldOperationQueue;
 import com.magmaguy.elitemobs.menus.ItemEnchantmentMenu;
 import com.magmaguy.elitemobs.utils.WorldInstantiator;
 import com.magmaguy.magmacore.util.ChatColorConverter;
@@ -15,11 +16,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class EnchantmentDungeonInstance extends DungeonInstance {
@@ -37,14 +36,12 @@ public class EnchantmentDungeonInstance extends DungeonInstance {
                                       Location lobbyLocation,
                                       Location startLocation,
                                       World world,
-                                      File instancedWorldFile,
                                       Player player,
                                       String difficultyName) {
         super(contentPackagesConfigFields,
                 lobbyLocation,
                 startLocation,
                 world,
-                instancedWorldFile,
                 player,
                 difficultyName);
         this.player = player;
@@ -62,21 +59,22 @@ public class EnchantmentDungeonInstance extends DungeonInstance {
 
         if (!launchEvent(contentPackagesConfigFields, instancedWordName, player)) return false;
 
-        CompletableFuture<File> future = CompletableFuture.supplyAsync(() ->
-                cloneWorldFiles(contentPackagesConfigFields, instancedWordName, player));
-        future.thenAccept(file -> {
-            if (file == null) return;
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    DungeonInstance dungeonInstance = initializeInstancedWorld(contentPackagesConfigFields, instancedWordName, player, file, (String) contentPackagesConfigFields.getDifficulties().get(0).get("name"));
+        // Clone items before passing to lambda to avoid modification
+        ItemStack upgradedItemClone = upgradedItem.clone();
+        ItemStack currentItemClone = itemFromInventory.clone();
+
+        WorldOperationQueue.queueOperation(
+                player,
+                () -> cloneWorldFiles(contentPackagesConfigFields, instancedWordName, player) != null,
+                () -> {
+                    DungeonInstance dungeonInstance = initializeInstancedWorld(contentPackagesConfigFields, instancedWordName, player, (String) contentPackagesConfigFields.getDifficulties().get(0).get("name"));
                     if (dungeonInstance instanceof EnchantmentDungeonInstance enchantmentDungeonInstance) {
-                        enchantmentDungeonInstance.setUpgradedItem(upgradedItem.clone());
-                        enchantmentDungeonInstance.setCurrentItem(itemFromInventory.clone());
+                        enchantmentDungeonInstance.setUpgradedItem(upgradedItemClone);
+                        enchantmentDungeonInstance.setCurrentItem(currentItemClone);
                     }
-                }
-            }.runTask(MetadataHandler.PLUGIN);
-        });
+                },
+                contentPackagesConfigFields.getName()
+        );
 
         return true;
     }

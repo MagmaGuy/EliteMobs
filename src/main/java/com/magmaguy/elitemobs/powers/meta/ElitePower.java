@@ -84,6 +84,16 @@ public class ElitePower {
             eliteEntity.getElitePowers().addAll(EliteScript.generateBossScripts(configFields.getEliteScriptBlueprints(), eliteEntity));
     }
 
+    public static void shutdown() {
+        elitePowers.clear();
+        bossPowers.clear();
+        majorPowers.clear();
+        defensivePowers.clear();
+        miscellaneousPowers.clear();
+        offensivePowers.clear();
+        specialPowers.clear();
+    }
+
     public static void initializePowers() {
         Reflections reflections = new Reflections("com.magmaguy.elitemobs.powers");
         reflections.getSubTypesOf(ElitePower.class).forEach(power -> {

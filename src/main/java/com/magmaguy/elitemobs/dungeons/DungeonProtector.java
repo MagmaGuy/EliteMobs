@@ -20,6 +20,10 @@ import java.util.UUID;
 public class DungeonProtector implements Listener {
     private static final HashSet<UUID> bypassingPlayers = new HashSet<>();
 
+    public static void shutdown() {
+        bypassingPlayers.clear();
+    }
+
     public static boolean toggleBypass(UUID playerUUID) {
         if (bypassingPlayers.contains(playerUUID)) {
             bypassingPlayers.remove(playerUUID);

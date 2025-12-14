@@ -105,6 +105,11 @@ public class BossTrackingPage {
         private static final Set<Inventory> pageInventories = new HashSet<>();
         private static final List<CustomBossEntity> bosses = new ArrayList<>();
 
+        public static void shutdown() {
+            pageInventories.clear();
+            bosses.clear();
+        }
+
         @EventHandler(ignoreCancelled = true)
         public void onInventoryInteract(InventoryClickEvent event) {
             if (event.getSlot() < 0) return;

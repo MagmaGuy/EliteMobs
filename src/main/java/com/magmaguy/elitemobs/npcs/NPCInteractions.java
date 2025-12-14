@@ -12,7 +12,6 @@ import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -22,17 +21,23 @@ import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 public class NPCInteractions implements Listener {
 
-    private static final HashSet<Player> cooldowns = new HashSet<>();
+    private static final Set<UUID> cooldowns = new HashSet<>();
+
+    public static void shutdown() {
+        cooldowns.clear();
+    }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void playerNPCInteract(PlayerInteractAtEntityEvent event) {
-
-        if (cooldowns.contains(event.getPlayer())) return;
-        cooldowns.add(event.getPlayer());
-        Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> cooldowns.remove(event.getPlayer()), 1);
+        UUID playerUUID = event.getPlayer().getUniqueId();
+        if (cooldowns.contains(playerUUID)) return;
+        cooldowns.add(playerUUID);
+        Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> cooldowns.remove(playerUUID), 1);
         if (event.isCancelled()) return;
 
         NPCEntity npcEntity = EntityTracker.getNPCEntity(event.getRightClicked());

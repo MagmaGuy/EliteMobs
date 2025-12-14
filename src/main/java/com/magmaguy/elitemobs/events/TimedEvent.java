@@ -16,6 +16,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,6 +27,7 @@ public class TimedEvent extends CustomEvent implements Listener {
     @Getter
     protected static List<TimedEvent> blueprintEvents = new ArrayList<>();
     protected static List<TimedEvent> timedEvents = new ArrayList<>();
+    private static BukkitTask eventPickerTask = null;
     //stores the time of the last global trigger
     @Getter
     private static double nextEventTrigger = System.currentTimeMillis() + 5D * 60D * 1000D;
@@ -48,6 +50,10 @@ public class TimedEvent extends CustomEvent implements Listener {
     }
 
     public static void shutdown() {
+        if (eventPickerTask != null && !eventPickerTask.isCancelled()) {
+            eventPickerTask.cancel();
+            eventPickerTask = null;
+        }
         blueprintEvents.clear();
         timedEvents.clear();
     }
@@ -61,7 +67,7 @@ public class TimedEvent extends CustomEvent implements Listener {
     }
 
     private static void startEventPicker() {
-        new BukkitRunnable() {
+        eventPickerTask = new BukkitRunnable() {
             @Override
             public void run() {
                 if (Bukkit.getServer().getOnlinePlayers().isEmpty()) return;

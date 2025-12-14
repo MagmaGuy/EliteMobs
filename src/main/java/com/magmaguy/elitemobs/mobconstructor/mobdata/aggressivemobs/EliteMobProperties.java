@@ -77,6 +77,10 @@ public abstract class EliteMobProperties extends PluginMobProperties {
         new EliteWither();
     }
 
+    public static void shutdown() {
+        eliteMobData.clear();
+    }
+
     public static boolean isValidEliteMobType(Entity entity) {
         if (entity instanceof LivingEntity)
             return isValidEliteMobType(entity.getType());

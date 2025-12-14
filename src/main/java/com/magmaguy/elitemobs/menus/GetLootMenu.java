@@ -12,10 +12,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by MagmaGuy on 04/05/2017.
@@ -24,13 +21,7 @@ public class GetLootMenu extends EliteMenu implements Listener {
 
     private static final List<Integer> lootSlots = new ArrayList<>(new ArrayList<>(List.of(10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31,
             32, 33, 34, 37, 38, 39, 40, 41, 42, 43, 46, 47, 48, 49, 50, 51, 52)));
-    public static HashMap<Player, GetLootMenu> inventories = new HashMap<>();
-    private final String shopName = GetLootMenuConfig.menuName;
-    public int currentHeaderPage = 1;
-    public int currentLootPage = 1;
-    public boolean filter = false;
-    public int filterRank = 0;
-    public Inventory inventory;
+    public static HashMap<UUID, GetLootMenu> inventories = new HashMap<>();
 
     public GetLootMenu(Player player) {
 
@@ -43,8 +34,14 @@ public class GetLootMenu extends EliteMenu implements Listener {
         player.openInventory(fakeChestInventory);
         inventory = fakeChestInventory;
 
-        inventories.put(player, this);
+        inventories.put(player.getUniqueId(), this);
     }
+    private final String shopName = GetLootMenuConfig.menuName;
+    public int currentHeaderPage = 1;
+    public int currentLootPage = 1;
+    public boolean filter = false;
+    public int filterRank = 0;
+    public Inventory inventory;
 
     public GetLootMenu(Player player, GetLootMenu getLootMenu) {
         this.currentHeaderPage = getLootMenu.currentHeaderPage;
@@ -60,7 +57,11 @@ public class GetLootMenu extends EliteMenu implements Listener {
         player.openInventory(fakeChestInventory);
         inventory = fakeChestInventory;
 
-        inventories.put(player, this);
+        inventories.put(player.getUniqueId(), this);
+    }
+
+    public static void shutdown() {
+        inventories.clear();
     }
 
     private void headerConstructor(Inventory inventory) {

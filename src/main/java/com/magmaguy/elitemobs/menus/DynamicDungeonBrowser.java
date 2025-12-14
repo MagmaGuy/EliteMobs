@@ -25,6 +25,10 @@ import java.util.Map;
 public class DynamicDungeonBrowser extends EliteMenu {
     private static final HashMap<Inventory, DynamicDungeonBrowser> inventories = new HashMap<>();
 
+    public static void shutdown() {
+        inventories.clear();
+    }
+
     @Getter
     private final EMPackage emPackage;
     private final MenuType menuType;

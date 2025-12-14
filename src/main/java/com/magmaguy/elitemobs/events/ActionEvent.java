@@ -22,15 +22,13 @@ import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class ActionEvent extends CustomEvent {
 
     private static final List<ActionEvent> blueprintEvents = new ArrayList<>();
-    private static final HashSet<Player> playerCooldowns = new HashSet<>();
+    private static final Set<UUID> playerCooldowns = new HashSet<>();
     private final double chance;
     private final List<Material> breakableMaterials;
     private Player player;
@@ -104,8 +102,9 @@ public class ActionEvent extends CustomEvent {
 
     @Override
     public void startModifiers() {
-        playerCooldowns.add(player);
-        Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> playerCooldowns.remove(player), 20L * 60L * EventsConfig.getActionEventMinimumCooldown());
+        UUID playerUUID = player.getUniqueId();
+        playerCooldowns.add(playerUUID);
+        Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> playerCooldowns.remove(playerUUID), 20L * 60L * EventsConfig.getActionEventMinimumCooldown());
     }
 
     @Override
@@ -121,7 +120,7 @@ public class ActionEvent extends CustomEvent {
     public static class ActionEventEvents implements Listener {
         @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
         public void onBlockBreakEvent(BlockBreakEvent event) {
-            if (playerCooldowns.contains(event.getPlayer())) return;
+            if (playerCooldowns.contains(event.getPlayer().getUniqueId())) return;
             if (!CustomEvent.isLocationValid(event.getBlock().getLocation())) return;
             for (ActionEvent actionEvent : blueprintEvents)
                 if (actionEvent.eventType.equals(EventType.BREAK_BLOCK) &&
@@ -133,7 +132,7 @@ public class ActionEvent extends CustomEvent {
         @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
         public void onFishEvent(PlayerFishEvent event) {
             if (event.getCaught() == null) return;
-            if (playerCooldowns.contains(event.getPlayer())) return;
+            if (playerCooldowns.contains(event.getPlayer().getUniqueId())) return;
             if (!CustomEvent.isLocationValid(event.getCaught().getLocation())) return;
             for (ActionEvent actionEvent : blueprintEvents)
                 if (actionEvent.eventType.equals(EventType.FISH) && actionEvent.checkFishStartConditions())
@@ -144,7 +143,7 @@ public class ActionEvent extends CustomEvent {
         public void onTillSoil(PlayerInteractEvent event) {
             if (!event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) return;
             if (event.getClickedBlock() == null) return;
-            if (playerCooldowns.contains(event.getPlayer())) return;
+            if (playerCooldowns.contains(event.getPlayer().getUniqueId())) return;
             Location location = event.getClickedBlock().getLocation().clone().add(new Vector(0.5, 1, 0.5));
             if (!CustomEvent.isLocationValid(location)) return;
             if (!(event.getPlayer().getInventory().getItemInMainHand().getType().equals(Material.DIAMOND_HOE) ||

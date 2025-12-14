@@ -13,22 +13,27 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 
 import java.util.HashMap;
+import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class PlayerDeathMessageByEliteMob implements Listener {
 
-    private static final HashMap<Player, String> deadPlayerList = new HashMap<>();
+    private static final HashMap<UUID, String> deadPlayerList = new HashMap<>();
+
+    public static void shutdown() {
+        deadPlayerList.clear();
+    }
 
     public static void addDeadPlayer(Player player, String deathMessage) {
-        deadPlayerList.put(player, deathMessage);
+        deadPlayerList.put(player.getUniqueId(), deathMessage);
     }
 
     private static boolean isDeadPlayer(Player player) {
-        return deadPlayerList.containsKey(player);
+        return deadPlayerList.containsKey(player.getUniqueId());
     }
 
     private static void removeDeadPlayer(Player player) {
-        deadPlayerList.remove(player);
+        deadPlayerList.remove(player.getUniqueId());
     }
 
     public static String initializeDeathMessage(Player player, EliteEntity eliteEntity) {
@@ -71,7 +76,7 @@ public class PlayerDeathMessageByEliteMob implements Listener {
     public void onPlayerDeath(PlayerDeathEvent event) {
 
         if (isDeadPlayer(event.getEntity())) {
-            event.setDeathMessage(deadPlayerList.get(event.getEntity()));
+            event.setDeathMessage(deadPlayerList.get(event.getEntity().getUniqueId()));
             PlayerStatsTracker.registerPlayerDeath(event.getEntity());
             removeDeadPlayer(event.getEntity());
         }

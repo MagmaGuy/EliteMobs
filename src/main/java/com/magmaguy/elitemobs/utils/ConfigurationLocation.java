@@ -12,6 +12,10 @@ import java.util.Set;
 public class ConfigurationLocation {
     private static final Set<String> notLoadedWorldNames = new HashSet<>();
 
+    public static void shutdown() {
+        notLoadedWorldNames.clear();
+    }
+
     private ConfigurationLocation() {
     }
 

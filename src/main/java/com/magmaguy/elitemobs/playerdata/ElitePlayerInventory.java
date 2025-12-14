@@ -44,6 +44,10 @@ public class ElitePlayerInventory {
         return playerInventories.get(player.getUniqueId());
     }
 
+    public static void shutdown() {
+        playerInventories.clear();
+    }
+
     public static void initialize() {
         for (Player player : Bukkit.getOnlinePlayers())
             playerInventories.put(player.getUniqueId(), new ElitePlayerInventory(player));

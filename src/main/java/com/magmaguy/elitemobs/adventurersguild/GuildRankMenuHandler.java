@@ -29,6 +29,10 @@ public class GuildRankMenuHandler implements Listener {
             4, 11, 12, 13, 14, 15, 20, 21, 22, 23, 24, 29, 30, 31, 32, 33, 38, 39, 40, 41, 42)));
     private static final int prestigeRankSlot = 49;
 
+    public static void shutdown() {
+        inventories.clear();
+    }
+
     private static void selectUnlockedRank(Player player, int guildRank) {
         GuildRank.setActiveGuildRank(player, guildRank);
     }

@@ -13,7 +13,6 @@ import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Snowball;
 import org.bukkit.event.EventHandler;
@@ -25,12 +24,17 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.HashMap;
+import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class FrostCone extends BossPower implements Listener {
 
     private static final NamespacedKey frostConeSnowballKey = new NamespacedKey(MetadataHandler.PLUGIN, "frost_cone_snowball");
-    private static final HashMap<Player, Integer> frostconePlayer = new HashMap<>();
+    private static final HashMap<UUID, Integer> frostconePlayer = new HashMap<>();
+
+    public static void shutdown() {
+        frostconePlayer.clear();
+    }
 
     public FrostCone() {
         super(PowersConfig.getPower("frost_cone.yml"));
@@ -128,19 +132,20 @@ public class FrostCone extends BossPower implements Listener {
         if (event.getProjectile() == null) return;
         if (!event.getProjectile().getPersistentDataContainer().has(frostConeSnowballKey, PersistentDataType.STRING))
             return;
-        if (!frostconePlayer.containsKey(event.getPlayer()))
-            frostconePlayer.put(event.getPlayer(), 1);
+        UUID playerUUID = event.getPlayer().getUniqueId();
+        if (!frostconePlayer.containsKey(playerUUID))
+            frostconePlayer.put(playerUUID, 1);
         else
-            frostconePlayer.put(event.getPlayer(), frostconePlayer.get(event.getPlayer()) + 1);
-        event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 20 * 7, frostconePlayer.get(event.getPlayer())));
+            frostconePlayer.put(playerUUID, frostconePlayer.get(playerUUID) + 1);
+        event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 20 * 7, frostconePlayer.get(playerUUID)));
         new BukkitRunnable() {
-            final int amount = frostconePlayer.get(event.getPlayer());
+            final int amount = frostconePlayer.get(playerUUID);
 
             @Override
             public void run() {
-                if (!frostconePlayer.containsKey(event.getPlayer())) return;
-                if (amount != frostconePlayer.get(event.getPlayer())) return;
-                frostconePlayer.remove(event.getPlayer());
+                if (!frostconePlayer.containsKey(playerUUID)) return;
+                if (amount != frostconePlayer.get(playerUUID)) return;
+                frostconePlayer.remove(playerUUID);
             }
         }.runTaskLater(MetadataHandler.PLUGIN, 20L * 5);
     }
