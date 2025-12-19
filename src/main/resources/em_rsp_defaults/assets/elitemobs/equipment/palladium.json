@@ -1,0 +1,14 @@
+{
+  "layers": {
+    "humanoid": [
+      {
+        "texture": "elitemobs:palladium"
+      }
+    ],
+    "humanoid_leggings": [
+      {
+        "texture": "elitemobs:palladium"
+      }
+    ]
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "minecraft:item/netherite_sword"
+    },
+ 
+    "overrides":[
+ 
+     {"predicate": {"custom_model_data":1}, "model":"elitemobs:equipment/primis_gladius_sword"},
+     {"predicate": {"custom_model_data":2}, "model":"elitemobs:equipment/frost_palace_fire_sword"},
+     {"predicate": {"custom_model_data":3}, "model":"elitemobs:equipment/frost_palace_ice_sword"}
+
+     ]
+}

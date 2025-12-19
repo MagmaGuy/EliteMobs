@@ -4,6 +4,8 @@ import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.elitemobs.dungeons.DynamicDungeonPackage;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
+import com.magmaguy.elitemobs.instanced.MatchInstance;
+import com.magmaguy.elitemobs.instanced.dungeons.DungeonInstance;
 import com.magmaguy.elitemobs.instanced.dungeons.DynamicDungeonInstance;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
@@ -16,11 +18,13 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class DynamicDungeonBrowser extends EliteMenu {
     private static final HashMap<Inventory, DynamicDungeonBrowser> inventories = new HashMap<>();
@@ -34,7 +38,10 @@ public class DynamicDungeonBrowser extends EliteMenu {
     private final MenuType menuType;
     private final List<Integer> levelSlots = List.of(2, 4, 6, 0, 8, 1, 3, 5, 7);
     private final List<Integer> difficultySlots = List.of(2, 4, 6, 0, 8, 1, 3, 5, 7);
+    private final List<Integer> validSlots = new ArrayList<>(List.of(18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
+            31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53));
     private Integer selectedLevel = null;
+    private List<DynamicDungeonInstance> instancesList = new ArrayList<>();
 
     public DynamicDungeonBrowser(Player player, String dynamicDungeonName) {
         this(player, dynamicDungeonName, MenuType.LEVEL_SELECTION, null);
@@ -70,7 +77,16 @@ public class DynamicDungeonBrowser extends EliteMenu {
             availableLevels.add(level);
         }
 
-        Inventory inventory = Bukkit.createInventory(player, 9, ChatColorConverter.convert(DungeonsConfig.getDynamicDungeonLevelSelectionMenuTitle()));
+        // Find existing dynamic dungeon instances for this dungeon
+        instancesList = DungeonInstance.getDungeonInstances().stream()
+                .filter(instance -> instance instanceof DynamicDungeonInstance)
+                .filter(instance -> instance.getContentPackagesConfigFields().getFilename().equals(dynamicDungeonName))
+                .map(instance -> (DynamicDungeonInstance) instance)
+                .collect(Collectors.toList());
+
+        // Expand to 54 slots if there are existing instances to show
+        int slots = instancesList.isEmpty() ? 9 : 54;
+        Inventory inventory = Bukkit.createInventory(player, slots, ChatColorConverter.convert(DungeonsConfig.getDynamicDungeonLevelSelectionMenuTitle()));
 
         for (int i = 0; i < availableLevels.size() && i < levelSlots.size(); i++) {
             int level = availableLevels.get(i);
@@ -96,8 +112,42 @@ public class DynamicDungeonBrowser extends EliteMenu {
                     description));
         }
 
+        // Add existing instances to the lower slots
+        for (int i = 0; i < instancesList.size() && i < validSlots.size(); i++) {
+            DynamicDungeonInstance instance = instancesList.get(i);
+            ItemStack itemStack = null;
+            if (instance.getState().equals(MatchInstance.InstancedRegionState.WAITING))
+                itemStack = playerItem(instance);
+            else if (DungeonsConfig.isAllowSpectatorsInInstancedContent())
+                itemStack = spectatorItem(instance);
+            if (itemStack != null)
+                inventory.setItem(validSlots.get(i), itemStack);
+        }
+
         player.openInventory(inventory);
         inventories.put(inventory, this);
+    }
+
+    private ItemStack spectatorItem(DynamicDungeonInstance dungeonInstance) {
+        List<String> lore = new ArrayList<>();
+        lore.add(ChatColorConverter.convert("&7Level: &e" + dungeonInstance.getSelectedLevel()));
+        lore.add(ChatColorConverter.convert("&2Players:"));
+        dungeonInstance.getPlayers().forEach(player -> lore.add(ChatColorConverter.convert("&f- " + player.getDisplayName())));
+        return ItemStackGenerator.generateItemStack(
+                Material.ORANGE_STAINED_GLASS_PANE,
+                DungeonsConfig.getDungeonJoinAsSpectatorText().replace("$dungeonName", dungeonInstance.getContentPackagesConfigFields().getName()),
+                lore);
+    }
+
+    private ItemStack playerItem(DynamicDungeonInstance dungeonInstance) {
+        List<String> lore = new ArrayList<>();
+        lore.add(ChatColorConverter.convert("&7Level: &e" + dungeonInstance.getSelectedLevel()));
+        lore.add(ChatColorConverter.convert("&2Players:"));
+        dungeonInstance.getPlayers().forEach(player -> lore.add(ChatColorConverter.convert("&f- " + player.getDisplayName())));
+        return ItemStackGenerator.generateItemStack(
+                Material.GREEN_STAINED_GLASS_PANE,
+                DungeonsConfig.getDungeonJoinAsPlayerText().replace("$dungeonName", dungeonInstance.getContentPackagesConfigFields().getName()),
+                lore);
     }
 
     private void showDifficultySelectionMenu(Player player, String dynamicDungeonName) {
@@ -151,6 +201,21 @@ public class DynamicDungeonBrowser extends EliteMenu {
                             browser.getEmPackage().getContentPackagesConfigFields().getFilename(),
                             MenuType.DIFFICULTY_SELECTION,
                             selectedLevel);
+                } else if (browser.validSlots.contains(event.getSlot())) {
+                    // Player clicked on an existing instance to join
+                    int instanceIndex = browser.validSlots.indexOf(event.getSlot());
+                    if (instanceIndex < browser.instancesList.size()) {
+                        DynamicDungeonInstance dungeonInstance = browser.instancesList.get(instanceIndex);
+                        switch (dungeonInstance.getState()) {
+                            case ONGOING, STARTING -> {
+                                if (DungeonsConfig.isAllowSpectatorsInInstancedContent())
+                                    dungeonInstance.addSpectator(player, false);
+                            }
+                            case WAITING -> dungeonInstance.addNewPlayer(player);
+                            case COMPLETED, COMPLETED_VICTORY, COMPLETED_DEFEAT ->
+                                    player.sendMessage("[EliteMobs] This match already ended! Can't join it!");
+                        }
+                    }
                 }
             } else if (browser.menuType == MenuType.DIFFICULTY_SELECTION) {
                 if (browser.difficultySlots.contains(event.getSlot())) {

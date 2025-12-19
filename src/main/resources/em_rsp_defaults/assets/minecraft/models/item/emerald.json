@@ -1,0 +1,16 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "minecraft:item/emerald"
+    },
+ 
+    "overrides":[
+ 
+     {"predicate": {"custom_model_data":1}, "model":"elitemobs:coins/coin2"},
+	 {"predicate": {"custom_model_data":31173}, "model":"elitemobs:ui/bagofcoins"},
+	 {"predicate": {"custom_model_data":31174}, "model":"elitemobs:ui/anvilhammer"},
+	 {"predicate": {"custom_model_data":31175}, "model":"elitemobs:ui/whiteanvil"}
+
+
+     ]
+}

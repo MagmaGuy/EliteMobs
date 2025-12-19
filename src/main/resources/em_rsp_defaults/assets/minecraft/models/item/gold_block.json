@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/gold_block",
+    "overrides": [
+        { "predicate": {"custom_model_data": 1}, "model": "elitemobs:coins/coin2"}
+    ]
+}

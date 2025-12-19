@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/template_banner",
+    "overrides": [
+        { "predicate": {"custom_model_data": 31173}, "model": "elitemobs:ui/boxoutput"}
+    ]
+}
