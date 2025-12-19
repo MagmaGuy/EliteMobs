@@ -1,0 +1,14 @@
+{
+  "layers": {
+    "humanoid": [
+      {
+        "texture": "elitemobs:corrupted"
+      }
+    ],
+    "humanoid_leggings": [
+      {
+        "texture": "elitemobs:corrupted"
+      }
+    ]
+  }
+}

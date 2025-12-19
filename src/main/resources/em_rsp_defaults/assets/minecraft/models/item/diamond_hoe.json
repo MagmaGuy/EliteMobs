@@ -1,0 +1,15 @@
+{
+    "parent": "item/handheld",
+    "textures": {
+        "layer0": "item/diamond_hoe"
+    },
+    
+    "overrides": [
+        {"predicate": {"custom_model_data":1}, "model": "elitemobs:equipment/bronze_scythe"},
+        {"predicate": {"custom_model_data":2}, "model": "elitemobs:equipment/palladium_scythe"},
+        {"predicate": {"custom_model_data":3}, "model": "elitemobs:equipment/corrupted_scythe"},
+        {"predicate": {"custom_model_data":4}, "model": "elitemobs:equipment/living_scythe"},
+        {"predicate": {"custom_model_data":5}, "model": "elitemobs:equipment/ultimatium_scythe"}
+
+    ]
+}

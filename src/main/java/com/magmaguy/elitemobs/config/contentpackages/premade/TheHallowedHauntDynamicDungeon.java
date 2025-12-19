@@ -40,8 +40,8 @@ public class TheHallowedHauntDynamicDungeon extends ContentPackagesConfigFields 
         // normal: easier (+5 means higher gear can be used), mythic: harder (-0 means gear must match level)
         setDifficulties(List.of(
                 Map.of("name", "normal", "levelSync", "+5", "id", 0),
-                Map.of("name", "hard", "levelSync", "+3", "id", 1),
-                Map.of("name", "mythic", "levelSync", "+0", "id", 2)));
+                Map.of("name", "hard", "levelSync", "0", "id", 1),
+                Map.of("name", "mythic", "levelSync", "-5", "id", 2)));
         setSetupMenuDescription(List.of(
                 "&2A Dynamic Dungeon where you choose the level!",
                 "&2Select from levels based on your guild rank!"));

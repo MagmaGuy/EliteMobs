@@ -54,6 +54,7 @@ public class EliteSetupMenu {
         new SetupMenu(player, infoButton, emPackages,
                 List.of(createFilter(emPackages, Material.GRASS_BLOCK, "Filter By Open Dungeons", EliteSetupMenu::filterOpenDungeon),
                         createFilter(emPackages, Material.CRYING_OBSIDIAN, "Filter By Instanced Dungeons", EliteSetupMenu::filterInstancedDungeon),
+                        createFilter(emPackages, Material.ENDER_PEARL, "Filter By Dynamic Dungeons", EliteSetupMenu::filterDynamicDungeon),
                         createFilter(emPackages, Material.SKULL_BANNER_PATTERN, "Filter By Events", EliteSetupMenu::filterEvents),
                         createFilter(emPackages, Material.DIAMOND_SWORD, "Filter By Custom Items", EliteSetupMenu::filterItems),
                         createFilter(emPackages, Material.ARMOR_STAND, "Filter By Custom Models", EliteSetupMenu::filterModels)));
@@ -77,6 +78,11 @@ public class EliteSetupMenu {
     private static boolean filterInstancedDungeon(EMPackage pkg) {
         return pkg instanceof WorldInstancedDungeonPackage ||
                 (pkg instanceof MetaPackage metaPackage && metaPackage.getPackages().stream().allMatch(WorldInstancedDungeonPackage.class::isInstance));
+    }
+
+    private static boolean filterDynamicDungeon(EMPackage pkg) {
+        return pkg instanceof DynamicDungeonPackage ||
+                (pkg instanceof MetaPackage metaPackage && metaPackage.getPackages().stream().allMatch(DynamicDungeonPackage.class::isInstance));
     }
 
     private static boolean filterEvents(EMPackage pkg) {

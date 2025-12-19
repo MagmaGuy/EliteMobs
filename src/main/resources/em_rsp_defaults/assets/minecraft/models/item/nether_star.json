@@ -1,0 +1,13 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "minecraft:item/nether_star"
+    },
+ 
+    "overrides":[
+ 
+     {"predicate": {"custom_model_data":1}, "model":"elitemobs:coins/coin4"}
+
+
+     ]
+}

@@ -108,6 +108,7 @@ public class CustomTreasureChestConfigFields extends CustomConfigFields {
         this.mimicCustomBossesList = processStringList("mimicCustomBossesList", mimicCustomBossesList, new ArrayList<>(), true);
         this.restockTime = processLong("restockTime", restockTime, 0, false);
         this.restockTimers = processStringList("restockTimers", restockTimers, new ArrayList<>(), false);
+        if (this.restockTimers == null) this.restockTimers = new ArrayList<>();
         this.effects = processStringList("effects", effects, new ArrayList<>(), false);
         this.locationsString = processStringList("locations", locationsString, new ArrayList<>(), false);
         this.locationString = processString("location", locationString, null, false);
