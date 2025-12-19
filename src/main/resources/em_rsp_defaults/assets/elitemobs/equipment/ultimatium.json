@@ -1,0 +1,14 @@
+{
+  "layers": {
+    "humanoid": [
+      {
+        "texture": "elitemobs:ultimatium"
+      }
+    ],
+    "humanoid_leggings": [
+      {
+        "texture": "elitemobs:ultimatium"
+      }
+    ]
+  }
+}

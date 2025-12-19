@@ -1,0 +1,47 @@
+{
+  "treasure_chest.open": {
+    "sounds": [
+      "custom/treasure_chest_open"
+    ]
+ },
+  "guild.rankup": {
+    "sounds": [
+      "custom/guild_rank_up"
+    ]
+ },
+  "guild.prestige": {
+    "sounds": [
+      "custom/guild_prestige"
+    ]
+ },
+   "quest.progression": {
+    "sounds": [
+      "custom/quest_progression"
+    ]
+ },
+   "quest.completion": {
+    "sounds": [
+      "custom/quest_completion"
+    ]
+ },
+   "quest.abandon": {
+    "sounds": [
+      "custom/quest_abandon"
+    ]
+ },
+    "quest.accept": {
+    "sounds": [
+      "custom/quest_accept"
+    ]
+ },
+   "dark_cathedral.ambient": {
+    "sounds": [
+      "custom/dark_cathedral_ambient"
+    ]
+ },
+   "dark_cathedral.fight": {
+    "sounds": [
+      "custom/dark_cathedral_fight"
+    ]
+ }
+}

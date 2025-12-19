@@ -1,0 +1,143 @@
+{
+	"credit": "Made with Blockbench",
+	"ambientocclusion": false,
+	"texture_size": [64, 64],
+	"textures": {
+		"0": "elitemobs:items/bronzescythe",
+		"particle": "elitemobs:items/bronzescythe"
+	},
+	"elements": [
+		{
+			"from": [7, 1, 7],
+			"to": [9, 18, 9],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 17.75, 7.75]},
+			"faces": {
+				"north": {"uv": [0.5, 8.25, 1, 12.5], "texture": "#0"},
+				"east": {"uv": [0, 8.25, 0.5, 12.5], "texture": "#0"},
+				"south": {"uv": [1.5, 8.25, 2, 12.5], "texture": "#0"},
+				"west": {"uv": [1, 8.25, 1.5, 12.5], "texture": "#0"},
+				"up": {"uv": [1, 8.25, 0.5, 7.75], "texture": "#0"},
+				"down": {"uv": [1.5, 7.75, 1, 8.25], "texture": "#0"}
+			}
+		},
+		{
+			"from": [6.8, 0.8, 6.8],
+			"to": [9.2, 18.2, 9.2],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 17.75, 7.75]},
+			"faces": {
+				"north": {"uv": [6.75, 0.5, 7.25, 4.75], "texture": "#0"},
+				"east": {"uv": [6.25, 0.5, 6.75, 4.75], "texture": "#0"},
+				"south": {"uv": [7.75, 0.5, 8.25, 4.75], "texture": "#0"},
+				"west": {"uv": [7.25, 0.5, 7.75, 4.75], "texture": "#0"},
+				"up": {"uv": [7.25, 0.5, 6.75, 0], "texture": "#0"},
+				"down": {"uv": [7.75, 0, 7.25, 0.5], "texture": "#0"}
+			}
+		},
+		{
+			"from": [6.9, 21.36768, 4.97383],
+			"to": [9.1, 28.56768, 8.17383],
+			"rotation": {"angle": 22.5, "axis": "x", "origin": [8, 17.75, 7.75]},
+			"faces": {
+				"north": {"uv": [3, 8.5, 3.5, 10.25], "texture": "#0"},
+				"east": {"uv": [2.25, 8.5, 3, 10.25], "texture": "#0"},
+				"south": {"uv": [4.25, 8.5, 4.75, 10.25], "texture": "#0"},
+				"west": {"uv": [3.5, 8.5, 4.25, 10.25], "texture": "#0"},
+				"up": {"uv": [3.5, 8.5, 3, 7.75], "texture": "#0"},
+				"down": {"uv": [4, 7.75, 3.5, 8.5], "texture": "#0"}
+			}
+		},
+		{
+			"from": [7.5, 24, 0],
+			"to": [8.5, 28, 9],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 17.75, 7.75]},
+			"faces": {
+				"north": {"uv": [2.25, 2.25, 2.5, 3.25], "texture": "#0"},
+				"east": {"uv": [0, 2.25, 2.25, 3.25], "texture": "#0"},
+				"south": {"uv": [4.75, 2.25, 5, 3.25], "texture": "#0"},
+				"west": {"uv": [2.5, 2.25, 4.75, 3.25], "texture": "#0"},
+				"up": {"uv": [2.5, 2.25, 2.25, 0], "texture": "#0"},
+				"down": {"uv": [2.75, 0, 2.5, 2.25], "texture": "#0"}
+			}
+		},
+		{
+			"from": [7.5, 24.5, 10],
+			"to": [8.5, 27.5, 14],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 17.75, 7.75]},
+			"faces": {
+				"north": {"uv": [4, 1, 4.25, 1.75], "texture": "#0"},
+				"east": {"uv": [3, 1, 4, 1.75], "texture": "#0"},
+				"south": {"uv": [5.25, 1, 5.5, 1.75], "texture": "#0"},
+				"west": {"uv": [4.25, 1, 5.25, 1.75], "texture": "#0"},
+				"up": {"uv": [4.25, 1, 4, 0], "texture": "#0"},
+				"down": {"uv": [4.5, 0, 4.25, 1], "texture": "#0"}
+			}
+		},
+		{
+			"from": [8, 22, -9],
+			"to": [8, 28, 16],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 17.75, 7.75]},
+			"faces": {
+				"north": {"uv": [6.25, 6, 6.25, 7.5], "texture": "#0"},
+				"east": {"uv": [0, 6, 6.25, 7.5], "texture": "#0"},
+				"south": {"uv": [12.5, 6, 12.5, 7.5], "texture": "#0"},
+				"west": {"uv": [6.25, 6, 12.5, 7.5], "texture": "#0"},
+				"up": {"uv": [6.25, 6, 6.25, -0.25], "texture": "#0"},
+				"down": {"uv": [6.25, -0.25, 6.25, 6], "texture": "#0"}
+			}
+		},
+		{
+			"from": [7.15, 17.15, 7.15],
+			"to": [8.85, 23.85, 8.85],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 17.75, 7.75]},
+			"faces": {
+				"north": {"uv": [0.5, 4, 1, 5.75], "texture": "#0"},
+				"east": {"uv": [0, 4, 0.5, 5.75], "texture": "#0"},
+				"south": {"uv": [1.5, 4, 2, 5.75], "texture": "#0"},
+				"west": {"uv": [1, 4, 1.5, 5.75], "texture": "#0"},
+				"up": {"uv": [1, 4, 0.5, 3.5], "texture": "#0"},
+				"down": {"uv": [1.5, 3.5, 1, 4], "texture": "#0"}
+			}
+		}
+	],
+	"display": {
+		"thirdperson_righthand": {
+			"translation": [0, -7.25, 0.75]
+		},
+		"thirdperson_lefthand": {
+			"translation": [0, -7.25, 0.75]
+		},
+		"firstperson_righthand": {
+			"translation": [3, -4.25, 0]
+		},
+		"firstperson_lefthand": {
+			"translation": [3, -4.25, 0]
+		},
+		"ground": {
+			"translation": [0, 3.25, 0],
+			"scale": [0.65, 0.65, 0.65]
+		},
+		"gui": {
+			"rotation": [-90, -60, -90],
+			"translation": [-5, -3.75, 0],
+			"scale": [0.55, 0.55, 0.55]
+		},
+		"fixed": {
+			"rotation": [-90, -60, -90],
+			"translation": [-6, -4.5, 0],
+			"scale": [0.65, 0.65, 0.65]
+		},
+		"on_shelf": {
+			"rotation": [0, 90, 0],
+			"translation": [2.75, -1.75, 0],
+			"scale": [0.6, 0.6, 0.6]
+		}
+	},
+	"groups": [
+		{
+			"name": "BronzeHoe",
+			"origin": [0, 9, 0],
+			"color": 0,
+			"children": [0, 1, 2, 3, 4, 5, 6]
+		}
+	]
+}

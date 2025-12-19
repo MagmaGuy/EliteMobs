@@ -1,0 +1,44 @@
+{
+    "sources": [
+        {
+            "type": "directory",
+            "source": "entity",
+			"prefix": "entity/"
+        },
+        {
+            "type": "directory",
+            "source": "items",
+			"prefix": "items/"
+        },
+        {
+            "type": "directory",
+            "source": "blocks",
+			"prefix": "blocks/"
+        },
+        {
+            "type": "directory",
+            "source": "primis_map",
+			"prefix": "primis_map/"
+        },
+		{
+            "type": "directory",
+            "source": "elitescroll",
+			"prefix": "elitescroll/"
+        },
+		{
+            "type": "directory",
+            "source": "coins",
+			"prefix": "coins/"
+        },
+		{
+			"source":"ui",
+			"prefix":"ui/",
+			"type":"directory"
+		},
+		{
+			"source":"gui",
+			"prefix":"gui/",
+			"type":"directory"
+		}
+    ]
+}

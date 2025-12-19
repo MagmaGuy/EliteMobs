@@ -1,0 +1,10 @@
+{
+	"parent": "item/handheld",
+	"textures": {
+		"layer0": "item/wooden_sword"
+	},
+	
+	"overrides": [
+		{"predicate": {"custom_model_data":1}, "model": "elitemobs:equipment/magmaguys_toothpick"}
+	]
+}

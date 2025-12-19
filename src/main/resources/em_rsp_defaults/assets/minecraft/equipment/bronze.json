@@ -1,0 +1,14 @@
+{
+  "layers": {
+    "humanoid": [
+      {
+        "texture": "elitemobs:bronze"
+      }
+    ],
+    "humanoid_leggings": [
+      {
+        "texture": "elitemobs:bronze"
+      }
+    ]
+  }
+}
