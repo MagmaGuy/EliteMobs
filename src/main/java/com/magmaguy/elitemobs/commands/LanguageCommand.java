@@ -80,7 +80,7 @@ public class LanguageCommand extends AdvancedCommand {
         CommandSender sender = commandData.getCommandSender();
 
         // Normalize language name
-        language = language.replace(".csv", "").replace(".yml", "").toLowerCase();
+        language = language.replace(".csv", "").replace(".yml", "");
 
         String finalLanguage = language;
         if (!suggestions.stream().anyMatch(s -> s.equalsIgnoreCase(finalLanguage))) {
