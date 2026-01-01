@@ -1,8 +1,6 @@
 package com.magmaguy.elitemobs.thirdparty.placeholderapi;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.adventurersguild.GuildRank;
-import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
@@ -105,16 +103,6 @@ public class Placeholders extends PlaceholderExpansion {
         switch (identifier) {
             case "player_combat_tier":
                 return "" + ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getFullPlayerTier(false);
-            case "player_active_guild_rank_numerical":
-                return "" + GuildRank.getActiveGuildRank(player, false);
-            case "player_maximum_guild_rank_numerical":
-                return "" + GuildRank.getMaxGuildRank(player, false);
-            case "player_active_guild_rank_name":
-                return GuildRank.getRankName(GuildRank.getGuildPrestigeRank(player, false), GuildRank.getActiveGuildRank(player, false));
-            case "player_maximum_guild_rank_name":
-                return GuildRank.getRankName(GuildRank.getGuildPrestigeRank(player, false), GuildRank.getMaxGuildRank(player, false));
-            case "player_prestige_guild_rank_numerical":
-                return "" + GuildRank.getGuildPrestigeRank(player, false);
             case "player_money":
                 return "" + Round.twoDecimalPlaces(EconomyHandler.checkCurrency(player.getUniqueId()));
             case "player_top_tier":
@@ -125,23 +113,19 @@ public class Placeholders extends PlaceholderExpansion {
                         highestThreat = currentTier;
                 }
                 return "" + highestThreat;
-            case "player_top_guild_rank":
-                int highestGuildRank = 0;
-                String highestGuildUser = "";
-                for (Player iteratedPlayer : Bukkit.getOnlinePlayers()) {
-                    int currentGuildRank = GuildRank.getMaxGuildRank(iteratedPlayer, false);
-                    if (currentGuildRank > highestGuildRank) {
-                        highestGuildRank = currentGuildRank;
-                        highestGuildUser = iteratedPlayer.getDisplayName();
-                    }
-                }
-                return highestGuildUser;
-            case "player_shortened_guild_rank":
-                return AdventurersGuildConfig.getShortenedRankName(GuildRank.getGuildPrestigeRank(player, false), GuildRank.getActiveGuildRank(player, false));
             case "player_kills":
                 return "" + PlayerData.getKills(player.getUniqueId());
             case "player_deaths":
                 return "" + PlayerData.getDeaths(player.getUniqueId());
+            // Guild rank placeholders removed - they will return null which PAPI handles gracefully
+            case "player_active_guild_rank_numerical":
+            case "player_maximum_guild_rank_numerical":
+            case "player_active_guild_rank_name":
+            case "player_maximum_guild_rank_name":
+            case "player_prestige_guild_rank_numerical":
+            case "player_top_guild_rank":
+            case "player_shortened_guild_rank":
+                return "N/A"; // Guild rank system removed
         }
 
         // We return null if an invalid placeholder (f.e. %someplugin_placeholder3%)

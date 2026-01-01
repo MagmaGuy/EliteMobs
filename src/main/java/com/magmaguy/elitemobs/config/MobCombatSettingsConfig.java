@@ -131,8 +131,8 @@ public class MobCombatSettingsConfig extends ConfigurationFile {
                 List.of("Sets the super mob range to scan for super mob stacking"),
                 fileConfiguration, "superMobStackRange", 15), 2);
         naturalEliteMobLevelCap = ConfigurationEngine.setInt(
-                List.of("Sets the maximum level elites can spawn at.", "Note: elite mob level is based on what armor and weapons players are wearing, and armor only scales up to level 200."),
-                fileConfiguration, "naturalEliteMobsLevelCap", 250);
+                List.of("Sets the maximum level elites can spawn at.", "Note: elite mob level is based on player skill levels and gear. The skill system scales up to level 100."),
+                fileConfiguration, "naturalEliteMobsLevelCap", 120);
         doEliteArmor = ConfigurationEngine.setBoolean(
                 List.of("Sets if elites will wear armor based on their level. This is for visual purposes only and does not affect combat."),
                 fileConfiguration, "doElitesWearArmor", true);

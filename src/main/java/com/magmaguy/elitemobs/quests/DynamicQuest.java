@@ -1,11 +1,11 @@
 package com.magmaguy.elitemobs.quests;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.QuestsConfig;
 import com.magmaguy.elitemobs.config.menus.premade.DynamicQuestMenuConfig;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
+import com.magmaguy.elitemobs.skills.CombatLevelCalculator;
 import com.magmaguy.elitemobs.quests.objectives.DynamicKillObjective;
 import com.magmaguy.elitemobs.quests.objectives.QuestObjectives;
 import com.magmaguy.elitemobs.quests.rewards.QuestReward;
@@ -54,7 +54,9 @@ public class DynamicQuest extends Quest {
     }
 
     public static List<DynamicQuest> generateQuests(Player player) {
-        int questLevel = GuildRank.getActiveGuildRank(player);
+        int combatLevel = CombatLevelCalculator.calculateCombatLevel(player.getUniqueId());
+        // Scale combat level (1-100) to quest level (1-20)
+        int questLevel = Math.min(20, Math.max(1, combatLevel / 5));
         if (questLevel == 0) {
             player.sendMessage(QuestsConfig.getLowRankDynamicQuestWarning());
             return new ArrayList<>();

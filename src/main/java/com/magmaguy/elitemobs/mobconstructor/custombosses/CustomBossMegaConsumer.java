@@ -131,7 +131,7 @@ public class CustomBossMegaConsumer {
     private void setFrozen(LivingEntity livingEntity) {
         if (!customBossesConfigFields.isFrozen()) return;
         AttributeManager.setAttribute(livingEntity, "generic_movement_speed", 0);
-        livingEntity.setCollidable(false);
+        // Note: Do NOT set collidable to false - it prevents projectiles from hitting the entity
     }
 
     private void setEquipment(LivingEntity livingEntity) {

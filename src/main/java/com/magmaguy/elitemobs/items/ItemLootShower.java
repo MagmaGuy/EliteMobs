@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.items;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
@@ -200,8 +199,7 @@ public class ItemLootShower implements Listener {
     }
 
     private int getCurrencyAmount(double eliteMobTier) {
-        return (int) (eliteMobTier / 2D * EconomySettingsConfig.getCurrencyShowerMultiplier() *
-                GuildRank.currencyBonusMultiplier(GuildRank.getGuildPrestigeRank(player)));
+        return (int) (eliteMobTier / 2D * EconomySettingsConfig.getCurrencyShowerMultiplier());
     }
 
     private void addDirectly(double eliteMobTier) {

@@ -14,16 +14,12 @@ public class PortOldData {
 
     public PortOldData() {
         File playerCache = new File(MetadataHandler.PLUGIN.getDataFolder().getPath() + "/data/playerCache.yml");
-        File playerGuildRank = new File(MetadataHandler.PLUGIN.getDataFolder().getPath() + "/data/playerGuildRank.yml");
-        File playerMaxGuildRank = new File(MetadataHandler.PLUGIN.getDataFolder().getPath() + "/data/playerMaxGuildRank.yml");
         File playerMoneyData = new File(MetadataHandler.PLUGIN.getDataFolder().getPath() + "/data/playerMoneyData.yml");
 
-        if (!playerCache.isFile() && !playerGuildRank.isFile() && !playerMaxGuildRank.isFile() && !playerMoneyData.isFile())
+        if (!playerCache.isFile() && !playerMoneyData.isFile())
             return;
 
         FileConfiguration playerCacheConfig = null,
-                playerGuildRankConfig = null,
-                playerMaxGuildRankConfig = null,
                 playerMoneyDataConfig = null;
 
         HashSet<UUID> uuids = new HashSet<>();
@@ -34,18 +30,6 @@ public class PortOldData {
                 uuids.add(UUID.fromString(string));
         }
 
-        if (playerGuildRank.exists()) {
-            playerGuildRankConfig = YamlConfiguration.loadConfiguration(playerGuildRank);
-            for (String string : playerGuildRankConfig.getKeys(false))
-                uuids.add(UUID.fromString(string));
-        }
-
-        if (playerMaxGuildRank.exists()) {
-            playerMaxGuildRankConfig = YamlConfiguration.loadConfiguration(playerMaxGuildRank);
-            for (String string : playerMaxGuildRankConfig.getKeys(false))
-                uuids.add(UUID.fromString(string));
-        }
-
         if (playerMoneyData.exists()) {
             playerMoneyDataConfig = YamlConfiguration.loadConfiguration(playerMoneyData);
             for (String string : playerMoneyDataConfig.getKeys(false))
@@ -53,15 +37,13 @@ public class PortOldData {
         }
 
         if (uuids.isEmpty()) {
-            deleteConfigs(playerCache, playerGuildRank, playerMaxGuildRank, playerMoneyData);
+            deleteConfigs(playerCache, playerMoneyData);
             return;
         }
 
         boolean errored = false;
 
         for (UUID uuid : uuids) {
-
-            boolean wasOldMaxRank = false;
 
             String displayName = null;
             if (playerCacheConfig != null) {
@@ -72,29 +54,6 @@ public class PortOldData {
                 displayName = "PlaceholderName";
             }
 
-            Integer playerActiveGuildRank = null;
-            if (playerGuildRankConfig != null) {
-                if (playerGuildRankConfig.contains(uuid.toString()))
-                    playerActiveGuildRank = playerGuildRankConfig.getInt(uuid.toString());
-            }
-            if (playerActiveGuildRank == null) {
-                playerActiveGuildRank = 1;
-            }
-
-            Integer playerMaxGuildRankValue = null;
-            if (playerMaxGuildRankConfig != null) {
-                if (playerMaxGuildRankConfig.contains(uuid.toString()))
-                    playerMaxGuildRankValue = playerMaxGuildRankConfig.getInt(uuid.toString());
-            }
-            if (playerMaxGuildRankValue == null) {
-                playerMaxGuildRankValue = 1;
-            }
-            if (playerMaxGuildRankValue == 11) {
-                playerActiveGuildRank = 10;
-                playerMaxGuildRankValue = 10;
-                wasOldMaxRank = true;
-            }
-
             Double currency = null;
             if (playerMoneyDataConfig != null) {
                 if (playerMoneyDataConfig.contains(uuid.toString()))
@@ -103,26 +62,18 @@ public class PortOldData {
             if (currency == null) {
                 currency = 0.0;
             }
-            if (wasOldMaxRank)
-                currency += 30000;
 
             try {
                 Statement statement = null;
                 statement = PlayerData.getConnection().createStatement();
                 String sql = "INSERT INTO " + PlayerData.getPLAYER_DATA_TABLE_NAME() +
-                        " (PlayerUUID, DisplayName, Currency, GuildPrestigeLevel, GuildMaxLevel, GuildActiveLevel) " +
+                        " (PlayerUUID, DisplayName, Currency) " +
                         //identifier
                         "VALUES ('" + uuid.toString() + "'," +
                         //display name
                         " '" + displayName + "'," +
                         //currency
-                        " " + currency + "," +
-                        //guild_prestige_level
-                        " 0," +
-                        //guild_max_level
-                        " " + playerMaxGuildRankValue + "," +
-                        //guild_active_level
-                        " " + playerActiveGuildRank + ");";
+                        " " + currency + ");";
                 statement.executeUpdate(sql);
                 statement.close();
                 PlayerData.getConnection().commit();
@@ -136,14 +87,12 @@ public class PortOldData {
         }
 
         if (!errored)
-            deleteConfigs(playerCache, playerGuildRank, playerMaxGuildRank, playerMoneyData);
+            deleteConfigs(playerCache, playerMoneyData);
 
     }
 
-    private void deleteConfigs(File playerCache, File playerGuildRank, File playerMaxGuildRank, File playerMoneyData) {
+    private void deleteConfigs(File playerCache, File playerMoneyData) {
         deleteConfig(playerCache);
-        deleteConfig(playerGuildRank);
-        deleteConfig(playerMaxGuildRank);
         deleteConfig(playerMoneyData);
     }
 

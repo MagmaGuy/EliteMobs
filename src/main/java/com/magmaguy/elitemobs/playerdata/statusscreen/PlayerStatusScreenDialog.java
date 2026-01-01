@@ -3,9 +3,7 @@ package com.magmaguy.elitemobs.playerdata.statusscreen;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
-import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.config.menus.premade.PlayerStatusMenuConfig;
 import com.magmaguy.elitemobs.dungeons.CombatContent;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
@@ -86,8 +84,7 @@ public class PlayerStatusScreenDialog {
 
             String line = PlayerStatusMenuConfig.getStatsTextLines()[i]
                     .replace("$money", EconomyHandler.checkCurrency(player.getUniqueId()) + "")
-                    .replace("$guildtier", processText(AdventurersGuildConfig.getShortenedRankName(
-                            GuildRank.getGuildPrestigeRank(player), GuildRank.getActiveGuildRank(player))))
+                    .replace("$guildtier", "N/A")
                     .replace("$kills", PlayerData.getKills(player.getUniqueId()) + "")
                     .replace("$highestkill", PlayerData.getHighestLevelKilled(player.getUniqueId()) + "")
                     .replace("$deaths", PlayerData.getDeaths(player.getUniqueId()) + "")

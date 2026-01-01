@@ -17,7 +17,7 @@ configurations.all {
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
+        languageVersion = JavaLanguageVersion.of(21)
     }
 }
 
@@ -32,7 +32,7 @@ processResources {
 }
 
 group 'com.magmaguy'
-version '9.6.2'
+version '10.0.0-SNAPSHOT'
 
 repositories {
     maven {
@@ -119,7 +119,7 @@ dependencies {
     ///Shaded in
     implementation group: 'org.bstats', name: 'bstats-bukkit', version: '3.0.2'
     implementation group: 'commons-io', name: 'commons-io', version: '2.7'
-    implementation (group: 'com.magmaguy', name: 'EasyMinecraftGoals-dist', version: '1.19.19'){
+    implementation (group: 'com.magmaguy', name: 'EasyMinecraftGoals-dist', version: '1.19.22'){
         changing = true
     }
     implementation (group: 'com.magmaguy', name: 'MagmaCore', version: '1.22-SNAPSHOT'){
@@ -140,13 +140,11 @@ String packagePath = 'com.magmaguy.shaded'
 
 // Relocating a Package
 shadowJar {
-    dependencies {
-        // Relocate bStats
-        relocate('org.bstats', packagePath + '.bstats')
-        // Relocate MagmaCore
-//        relocate('com.magmaguy.magmacore', 'com.magmaguy.elitemobs.magmacore')
-        relocate('com.magmaguy.easyminecraftgoals', 'com.magmaguy.elitemobs.easyminecraftgoals')
-    }
+    // Relocate bStats
+    relocate 'org.bstats', packagePath + '.bstats'
+    // Relocate EasyMinecraftGoals
+    relocate 'com.magmaguy.easyminecraftgoals', 'com.magmaguy.elitemobs.easyminecraftgoals'
+
     archiveClassifier.set(null)
     archiveFileName.set(project.name + ".jar")
     destinationDirectory.set(new File("testbed/plugins"))

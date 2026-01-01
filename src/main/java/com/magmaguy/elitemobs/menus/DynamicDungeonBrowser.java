@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.menus;
 
-import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.elitemobs.dungeons.DynamicDungeonPackage;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
@@ -66,8 +65,8 @@ public class DynamicDungeonBrowser extends EliteMenu {
     }
 
     private void showLevelSelectionMenu(Player player, String dynamicDungeonName) {
-        int maxGuildRank = GuildRank.getMaxGuildRank(player);
-        int baseLevel = maxGuildRank * 10;
+        // Default to level 50 for all players (mid-range)
+        int baseLevel = 50;
 
         int minLevel = Math.max(5, baseLevel - 5);
         int maxLevel = Math.min(200, baseLevel + 5);
@@ -192,8 +191,8 @@ public class DynamicDungeonBrowser extends EliteMenu {
             if (browser.menuType == MenuType.LEVEL_SELECTION) {
                 if (browser.levelSlots.contains(event.getSlot())) {
                     int levelIndex = browser.levelSlots.indexOf(event.getSlot());
-                    int maxGuildRank = GuildRank.getMaxGuildRank(player);
-                    int baseLevel = maxGuildRank * 10;
+                    // Default to level 50 for all players (mid-range)
+                    int baseLevel = 50;
                     int minLevel = Math.max(5, baseLevel - 5);
                     int selectedLevel = minLevel + (levelIndex * 5);
 
