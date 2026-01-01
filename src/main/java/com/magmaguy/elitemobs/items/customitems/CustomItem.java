@@ -1,8 +1,6 @@
 package com.magmaguy.elitemobs.items.customitems;
 
-import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
-import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.config.customitems.CustomItemsConfig;
 import com.magmaguy.elitemobs.config.customitems.CustomItemsConfigFields;
 import com.magmaguy.elitemobs.items.LootTables;
@@ -199,14 +197,9 @@ public class CustomItem {
     }
 
     public static int limitItemLevel(Player player, int originalLevel) {
-        int itemLevel;
-        if (player != null && AdventurersGuildConfig.isGuildLootLimiter()) {
-            itemLevel = (int) LootTables.setItemTier(originalLevel);
-            if (itemLevel > GuildRank.getActiveGuildRank(player) * 10)
-                itemLevel = GuildRank.getActiveGuildRank(player) * 10;
-        } else
-            itemLevel = originalLevel + 1;
-        return itemLevel;
+        // Skill-based gear restriction now handles equipping, not drops
+        // Items drop at their original level
+        return originalLevel + 1;
     }
 
     public Item dropPlayerLoot(Player player, int tier, Location location, EliteEntity eliteEntity) {

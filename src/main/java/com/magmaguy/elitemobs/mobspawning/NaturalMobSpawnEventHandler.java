@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.mobspawning;
 
 import com.magmaguy.elitemobs.EliteMobs;
-import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
@@ -132,14 +131,7 @@ public class NaturalMobSpawnEventHandler implements Listener {
         double huntingGearChanceAdder = HunterEnchantment.getHuntingGearBonus(nearbyPlayers);
         validChance += huntingGearChanceAdder;
 
-        AtomicInteger peacefulModeDebuffs = new AtomicInteger();
-        nearbyPlayers.forEach(player -> {
-            //Handles situations where fake players got caught in the detection
-            if (PlayerData.getPlayerData(player.getUniqueId()) != null && GuildRank.getActiveGuildRank(player) == 0)
-                peacefulModeDebuffs.getAndIncrement();
-        });
-
-        validChance -= peacefulModeDebuffs.get() * AdventurersGuildConfig.getPeacefulModeEliteChanceDecrease();
+        // Peaceful mode removed with guild rank system
 
         if (ThreadLocalRandom.current().nextDouble() >= validChance) return;
 

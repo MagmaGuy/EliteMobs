@@ -5,7 +5,6 @@ package com.magmaguy.elitemobs;
  */
 
 import com.magmaguy.easyminecraftgoals.NMSManager;
-import com.magmaguy.elitemobs.adventurersguild.GuildRankMenuHandler;
 import com.magmaguy.elitemobs.collateralminecraftchanges.KeepNeutralsAngry;
 import com.magmaguy.elitemobs.collateralminecraftchanges.PlayerDeathMessageByEliteMob;
 import com.magmaguy.elitemobs.commands.CommandHandler;
@@ -78,6 +77,11 @@ import com.magmaguy.elitemobs.powerstances.MajorPowerStanceMath;
 import com.magmaguy.elitemobs.powerstances.MinorPowerStanceMath;
 import com.magmaguy.elitemobs.quests.DynamicQuest;
 import com.magmaguy.elitemobs.quests.Quest;
+import com.magmaguy.elitemobs.skills.CombatLevelDisplay;
+import com.magmaguy.elitemobs.skills.SkillSystemMigration;
+import com.magmaguy.elitemobs.skills.SkillXPBar;
+import com.magmaguy.elitemobs.skills.bonuses.SkillBonusInitializer;
+import com.magmaguy.elitemobs.config.skillbonuses.SkillBonusesConfig;
 import com.magmaguy.elitemobs.quests.QuestTracking;
 import com.magmaguy.elitemobs.quests.menus.QuestInventoryMenu;
 import com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldowns;
@@ -121,6 +125,7 @@ public class EliteMobs extends JavaPlugin {
         PotionEffectsConfig.initializeConfigs();
         new EconomySettingsConfig();
         new EventsConfig();
+        new SkillsConfig();
         new EnchantmentsConfig();
         new AntiExploitConfig();
         new CombatTagConfig();
@@ -172,6 +177,8 @@ public class EliteMobs extends JavaPlugin {
         }
 
         NMSManager.initializeAdapter(this);
+        // TODO: DIAGNOSTIC - Remove after EasyMinecraftGoals testing is complete
+        testEasyMinecraftGoalsMapping();
 
         if (Bukkit.getServer().spigot().getConfig().getDouble("settings.attribute.maxHealth.max") < 100000000) {
             Bukkit.getServer().spigot().getConfig().set("settings.attribute.maxHealth.max", 100000000);
@@ -215,6 +222,12 @@ public class EliteMobs extends JavaPlugin {
         new DatabaseConfig();
         PlayerData.initializeDatabaseConnection();
         ElitePlayerInventory.initialize();
+
+        //Initialize skill system
+        SkillSystemMigration.initialize();
+        new SkillBonusesConfig();
+        SkillBonusInitializer.initialize();
+        CombatLevelDisplay.initialize();
 
         //Get world list
         worldScanner();
@@ -392,6 +405,8 @@ public class EliteMobs extends JavaPlugin {
         // Additional memory leak fixes
         PlayerDeathMessageByEliteMob.shutdown();
         NPCInteractions.shutdown();
+        com.magmaguy.elitemobs.items.GearRestrictionHandler.shutdown();
+        com.magmaguy.elitemobs.antiexploit.FarmingProtection.shutdown();
         NPCProximitySensor.shutdown();
         PlayerQuestCooldowns.shutdown();
         GetLootMenu.shutdown();
@@ -417,11 +432,15 @@ public class EliteMobs extends JavaPlugin {
         BuyOrSellMenu.BuyOrSellMenuEvents.shutdown();
         Quest.shutdown();
         QuestInventoryMenu.shutdown();
-        GuildRankMenuHandler.shutdown();
         StatsPage.StatsPageEvents.shutdown();
         GearPage.GearPageEvents.shutdown();
         CommandsPage.CommandsPageEvents.shutdown();
         CoverPage.CoverPageEvents.shutdown();
+        SkillsPage.SkillsPageEvents.shutdown();
+        SkillSystemMigration.shutdown();
+        SkillBonusInitializer.shutdown();
+        SkillXPBar.shutdown();
+        CombatLevelDisplay.shutdown();
         ArenaMenu.ArenaMenuEvents.shutdown();
         ItemEnchantmentMenu.ItemEnchantMenuEvents.shutdown();
         EliteScrollMenu.EliteScrollMenuEvents.shutdown();
@@ -457,6 +476,43 @@ public class EliteMobs extends JavaPlugin {
     private void launchRunnables() {
         //save regional bosses when the files update
         RegionalBossEntity.regionalDataSaver();
+    }
+
+    // TODO: DIAGNOSTIC - Remove after EasyMinecraftGoals testing is complete
+    private void testEasyMinecraftGoalsMapping() {
+        getLogger().info("=== EasyMinecraftGoals Diagnostic ===");
+        try {
+            // Check if NMSAdapter loaded
+            if (NMSManager.getAdapter() == null) {
+                getLogger().severe("NMSAdapter is NULL - initialization failed!");
+                return;
+            }
+            getLogger().info("NMSAdapter class: " + NMSManager.getAdapter().getClass().getName());
+
+            // Check PathNavigation.createPath method signature
+            Class<?> pathNavClass = Class.forName("net.minecraft.world.entity.ai.navigation.PathNavigation");
+            java.lang.reflect.Method createPathMethod = null;
+            for (java.lang.reflect.Method m : pathNavClass.getMethods()) {
+                if (m.getName().equals("createPath") || m.getName().equals("a")) {
+                    getLogger().info("Found method: " + m.getName() + " returns: " + m.getReturnType().getName());
+                    if (m.getParameterCount() == 4) {
+                        createPathMethod = m;
+                    }
+                }
+            }
+            if (createPathMethod != null) {
+                getLogger().info("createPath(4 args) return type: " + createPathMethod.getReturnType().getName());
+                if (createPathMethod.getReturnType().getName().contains("BinaryHeap")) {
+                    getLogger().severe("MAPPING ERROR: createPath returns BinaryHeap instead of Path!");
+                } else if (createPathMethod.getReturnType().getName().contains("Path")) {
+                    getLogger().info("MAPPING OK: createPath returns Path");
+                }
+            }
+        } catch (Exception e) {
+            getLogger().severe("Diagnostic failed: " + e.getMessage());
+            e.printStackTrace();
+        }
+        getLogger().info("=== End Diagnostic ===");
     }
 
 }

@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.treasurechest;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.SoundsConfig;
 import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestConfigFields;
@@ -218,7 +217,7 @@ public class TreasureChest implements PersistentObject {
     }
 
     private void lowRankMessage(Player player) {
-        player.sendMessage(ChatColorConverter.convert(DefaultConfig.getChestLowRankMessage().replace("$rank", GuildRank.getRankName(Math.max(0, customTreasureChestConfigFields.getChestTier() - 10), customTreasureChestConfigFields.getChestTier()))));
+        // Guild rank removed - message removed
     }
 
     private void groupTimerCooldownMessage(Player player, long targetTime) {
@@ -311,10 +310,8 @@ public class TreasureChest implements PersistentObject {
             TreasureChest treasureChest = getTreasureChest(event.getClickedBlock().getLocation());
             if (treasureChest == null) return;
             event.setCancelled(true);
-            if (GuildRank.getMaxGuildRank(event.getPlayer()) < treasureChest.customTreasureChestConfigFields.getChestTier())
-                treasureChest.lowRankMessage(event.getPlayer());
-            else
-                treasureChest.doInteraction(event.getPlayer());
+            // Guild rank requirement removed - all players can access chests
+            treasureChest.doInteraction(event.getPlayer());
         }
 
         @EventHandler(ignoreCancelled = true)

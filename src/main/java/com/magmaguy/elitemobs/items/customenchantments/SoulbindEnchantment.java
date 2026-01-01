@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.items.customenchantments;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.config.enchantments.premade.SoulbindConfig;
@@ -45,7 +44,7 @@ public class SoulbindEnchantment extends CustomEnchantment {
         if (itemStack == null || player == null) return null;
         ItemMeta itemMeta = itemStack.getItemMeta();
         itemMeta.getPersistentDataContainer().set(SOULBIND_KEY, PersistentDataType.STRING, player.getUniqueId().toString());
-        setPrestigeLevel(itemMeta, GuildRank.getGuildPrestigeRank(player));
+        setPrestigeLevel(itemMeta, 0);
         itemStack.setItemMeta(itemMeta);
         new EliteItemLore(itemStack, true);
         return itemStack;
@@ -98,14 +97,7 @@ public class SoulbindEnchantment extends CustomEnchantment {
             return true;
         if (!itemMeta.getPersistentDataContainer().has(SOULBIND_KEY, PersistentDataType.STRING))
             return true;
-        if (GuildRank.getGuildPrestigeRank(player) == 0)
-            return itemMeta.getPersistentDataContainer().get(new NamespacedKey(MetadataHandler.PLUGIN, key), PersistentDataType.STRING).equals(player.getUniqueId().toString());
-            //this is kept for legacy reasons, old items just appended the prestige tier at the end of the uuid
-        else if ((itemMeta.getPersistentDataContainer().get(new NamespacedKey(MetadataHandler.PLUGIN, key), PersistentDataType.STRING)).equals(player.getUniqueId().toString() + GuildRank.getGuildPrestigeRank(player)))
-            return true;
-        else
-            return getPrestigeLevel(itemMeta) == GuildRank.getGuildPrestigeRank(player) &&
-                    itemMeta.getPersistentDataContainer().get(new NamespacedKey(MetadataHandler.PLUGIN, key), PersistentDataType.STRING).equals(player.getUniqueId().toString());
+        return itemMeta.getPersistentDataContainer().get(new NamespacedKey(MetadataHandler.PLUGIN, key), PersistentDataType.STRING).equals(player.getUniqueId().toString());
     }
 
     public static boolean isSoulboundItem(ItemMeta itemMeta) {

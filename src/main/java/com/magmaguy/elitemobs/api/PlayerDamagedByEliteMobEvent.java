@@ -1,13 +1,23 @@
 package com.magmaguy.elitemobs.api;
 
-import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.collateralminecraftchanges.PlayerDeathMessageByEliteMob;
+import com.magmaguy.elitemobs.combatsystem.CombatSystem;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
+import com.magmaguy.elitemobs.playerdata.database.PlayerData;
+import com.magmaguy.elitemobs.skills.SkillType;
+import com.magmaguy.elitemobs.skills.SkillXPCalculator;
+import com.magmaguy.elitemobs.skills.bonuses.PlayerSkillSelection;
+import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
+import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
+import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
+import com.magmaguy.elitemobs.skills.bonuses.interfaces.ConditionalSkill;
+import com.magmaguy.elitemobs.skills.bonuses.interfaces.CooldownSkill;
+import com.magmaguy.elitemobs.skills.bonuses.interfaces.ProcSkill;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.magmacore.util.AttributeManager;
 import lombok.Getter;
@@ -28,6 +38,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -78,6 +89,102 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
         return handlers;
     }
 
+    /**
+     * Unified method to apply all active ARMOR skill bonuses to this damage event.
+     * This is the single entry point for the skill bonus system to modify incoming damage.
+     * <p>
+     * Processes all active armor skills, applying damage reduction from
+     * PASSIVE, CONDITIONAL, COOLDOWN, and PROC skills.
+     *
+     * @return true if damage was completely negated (e.g., by dodge or death prevention), false otherwise
+     */
+    public boolean applySkillBonuses() {
+        if (player == null || player.hasMetadata("NPC")) return false;
+        if (!ElitePlayerInventory.playerInventories.containsKey(player.getUniqueId())) return false;
+
+        int skillLevel = SkillBonusRegistry.getPlayerSkillLevel(player, SkillType.ARMOR);
+        List<String> activeSkillIds = PlayerSkillSelection.getActiveSkills(player.getUniqueId(), SkillType.ARMOR);
+
+        double damageMultiplier = 1.0;
+
+        // Process each active armor skill
+        for (String skillId : activeSkillIds) {
+            SkillBonus skill = SkillBonusRegistry.getSkillById(skillId);
+            if (skill == null || !skill.isEnabled()) continue;
+            if (!skill.meetsLevelRequirement(skillLevel)) continue;
+
+            DefensiveSkillResult result = processDefensiveSkill(skill, skillLevel);
+
+            // Check for complete damage negation (dodge, death prevention, etc.)
+            if (result.negatesDamage) {
+                setCancelled(true);
+                return true;
+            }
+
+            damageMultiplier *= result.multiplier;
+        }
+
+        // Apply the combined damage reduction
+        if (damageMultiplier != 1.0) {
+            setDamage(getDamage() * damageMultiplier);
+        }
+
+        return false;
+    }
+
+    /**
+     * Processes a single defensive skill and returns its result.
+     * Tracks proc counts for testing purposes.
+     */
+    private DefensiveSkillResult processDefensiveSkill(SkillBonus skill, int skillLevel) {
+        return switch (skill.getBonusType()) {
+            case PASSIVE -> {
+                skill.incrementProcCount(player); // Track activation
+                yield new DefensiveSkillResult(1.0 - skill.getBonusValue(skillLevel), false);
+            }
+            case CONDITIONAL -> {
+                if (skill instanceof ConditionalSkill conditionalSkill) {
+                    if (conditionalSkill.conditionMet(player, this)) {
+                        skill.incrementProcCount(player); // Track activation
+                        yield new DefensiveSkillResult(1.0 - conditionalSkill.getConditionalBonus(skillLevel), false);
+                    }
+                }
+                yield new DefensiveSkillResult(1.0, false);
+            }
+            case COOLDOWN -> {
+                if (skill instanceof CooldownSkill cooldownSkill) {
+                    if (!cooldownSkill.isOnCooldown(player)) {
+                        // Check for death prevention skills (like Last Stand)
+                        if (player.getHealth() - getDamage() <= 0) {
+                            cooldownSkill.onActivate(player, this);
+                            cooldownSkill.startCooldown(player, skillLevel);
+                            skill.incrementProcCount(player); // Track activation
+                            yield new DefensiveSkillResult(1.0, true); // Damage negated
+                        }
+                    }
+                }
+                yield new DefensiveSkillResult(1.0, false);
+            }
+            case PROC -> {
+                if (skill instanceof ProcSkill procSkill) {
+                    double procChance = procSkill.getProcChance(skillLevel);
+                    if (ThreadLocalRandom.current().nextDouble() < procChance) {
+                        procSkill.onProc(player, this);
+                        skill.incrementProcCount(player); // Track proc
+                        yield new DefensiveSkillResult(1.0 - skill.getBonusValue(skillLevel), false);
+                    }
+                }
+                yield new DefensiveSkillResult(1.0, false);
+            }
+            default -> new DefensiveSkillResult(1.0, false);
+        };
+    }
+
+    /**
+     * Result of processing a defensive skill.
+     */
+    private record DefensiveSkillResult(double multiplier, boolean negatesDamage) {}
+
     //Thing that launches the event
     public static class PlayerDamagedByEliteMobEventFilter implements Listener {
         @Getter
@@ -109,8 +216,23 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
             ElitePlayerInventory elitePlayerInventory = ElitePlayerInventory.getPlayer(player);
             if (elitePlayerInventory == null) return 0;
 
-            //Bosses now gain .5 damage per level instead of 1 damage per level to make fight against high level and low level mobs more lenient
-            double damageReduction = elitePlayerInventory.getEliteDefense(true) * 0.5;
+            // Get item's elite defense (represents item level contribution)
+            double itemEliteDefense = elitePlayerInventory.getEliteDefense(true);
+
+            // Get player's armor skill level
+            long armorSkillXP = PlayerData.getSkillXP(player.getUniqueId(), SkillType.ARMOR);
+            int armorSkillLevel = SkillXPCalculator.levelFromTotalXP(armorSkillXP);
+
+            // Calculate skill defense contribution (similar formula to item defense)
+            // Each armor skill level provides 0.25 defense (1/4 because there are 4 armor pieces)
+            double skillDefense = armorSkillLevel * 0.25;
+
+            // Apply 50/50 split for damage reduction
+            // The 0.5 multiplier on defense is kept for balance (mobs gain 0.5 damage per level)
+            double effectiveDefense = ((skillDefense * CombatSystem.SKILL_CONTRIBUTION_RATIO)
+                    + (itemEliteDefense * CombatSystem.ITEM_CONTRIBUTION_RATIO)) * 0.5;
+
+            double damageReduction = effectiveDefense;
             if (event.getDamager() instanceof AbstractArrow)
                 damageReduction += elitePlayerInventory.getEliteProjectileProtection(true);
             if (event.getDamager() instanceof Fireball || event.getDamager() instanceof Creeper) {
@@ -181,12 +303,7 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
 
             //By this point, it is guaranteed that this kind of damage should have custom EliteMobs behavior
 
-            //dodge chance
-            if (ThreadLocalRandom.current().nextDouble() < GuildRank.dodgeBonusValue(GuildRank.getGuildPrestigeRank(player), GuildRank.getActiveGuildRank(player)) / 100) {
-                player.sendTitle(" ", "Dodged!");
-                event.setCancelled(true);
-                return;
-            }
+            // Dodge chance removed with guild rank system
 
             boolean blocking = false;
 

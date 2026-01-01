@@ -133,7 +133,8 @@ public class CustomBossDeath implements Listener {
                                                 Round.twoDecimalPlaces(customBossEntity.getDamagers().get(player)) + "")));
 
             } else {
-                if (customBossEntity.customBossesConfigFields.getDeathMessage() != null) {
+                if (customBossEntity.customBossesConfigFields.getDeathMessage() != null
+                        && !customBossEntity.customBossesConfigFields.getDeathMessage().isEmpty()) {
                     if (customBossEntity.customBossesConfigFields.getAnnouncementPriority() == 0)
                         for (Player player : customBossEntity.getDamagers().keySet())
                             player.sendMessage(ChatColorConverter.convert(
