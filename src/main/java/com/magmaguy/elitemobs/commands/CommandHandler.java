@@ -62,7 +62,6 @@ public class CommandHandler {
         emCommand.registerCommand(new TransitiveBlocksEditCommand());
         emCommand.registerCommand(new TransitiveBlocksRegisterAreaCommand());
         emCommand.registerCommand(new TransitiveBlocksEditAreaCommand());
-        emCommand.registerCommand(new RankSetCommand());
         emCommand.registerCommand(new SpawnElite());
         emCommand.registerCommand(new SpawnEliteAtCommand());
         emCommand.registerCommand(new DiscordMessageCommand());
@@ -87,7 +86,11 @@ public class CommandHandler {
         emCommand.registerCommand(new QuestCheckCommand());
         emCommand.registerCommand(new QuestTrackCommand());
         emCommand.registerCommand(new QuestLeaveCommand());
-        emCommand.registerCommand(new RankCommand());
+        emCommand.registerCommand(new SkillSetCommand());
+        emCommand.registerCommand(new SkillSetAllCommand());
+        emCommand.registerCommand(new SkillCheckCommand());
+        emCommand.registerCommand(new SkillTestCommand());
+        emCommand.registerCommand(new SkillTestCancelCommand());
         emCommand.registerCommand(new LootCommand());
         emCommand.registerCommand(new QuitCommand());
         emCommand.registerCommand(new StartCommand());

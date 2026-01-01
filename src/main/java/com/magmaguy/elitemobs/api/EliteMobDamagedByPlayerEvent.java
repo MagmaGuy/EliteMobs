@@ -2,8 +2,8 @@ package com.magmaguy.elitemobs.api;
 
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
+import com.magmaguy.elitemobs.combatsystem.CombatSystem;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.dungeons.EliteMobsWorld;
@@ -12,6 +12,17 @@ import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
+import com.magmaguy.elitemobs.playerdata.database.PlayerData;
+import com.magmaguy.elitemobs.skills.SkillType;
+import com.magmaguy.elitemobs.skills.SkillXPCalculator;
+import com.magmaguy.elitemobs.skills.bonuses.PlayerSkillSelection;
+import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
+import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
+import com.magmaguy.elitemobs.skills.bonuses.interfaces.ConditionalSkill;
+import com.magmaguy.elitemobs.skills.bonuses.interfaces.CooldownSkill;
+import com.magmaguy.elitemobs.skills.bonuses.interfaces.ProcSkill;
+import com.magmaguy.elitemobs.skills.bonuses.interfaces.StackingSkill;
+import com.magmaguy.elitemobs.skills.bonuses.interfaces.ToggleSkill;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import com.magmaguy.elitemobs.utils.EntityFinder;
@@ -28,7 +39,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.inventory.ItemStack;
 
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
@@ -68,10 +81,31 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
         this.eliteMobEntity = eliteEntity;
         this.player = player;
         this.entityDamageByEntityEvent = event;
-        this.rangedAttack = event.getDamager() instanceof Projectile;
+        this.rangedAttack = event != null && event.getDamager() instanceof Projectile;
         this.criticalStrike = criticalStrike;
         this.isCustomDamage = isCustomDamage;
         this.damageModifier = damageModifier;
+    }
+
+    /**
+     * Constructor for testing purposes that allows explicit ranged attack flag.
+     * Use this when simulating attacks without an actual EntityDamageByEntityEvent.
+     *
+     * @param eliteEntity    Elite damaged.
+     * @param player         Player acting as the damager.
+     * @param damage         Base damage amount.
+     * @param isRangedAttack Whether this is a ranged attack.
+     */
+    public EliteMobDamagedByPlayerEvent(EliteEntity eliteEntity, Player player, double damage, boolean isRangedAttack) {
+        super(damage, null);
+        this.entity = eliteEntity.getLivingEntity();
+        this.eliteMobEntity = eliteEntity;
+        this.player = player;
+        this.entityDamageByEntityEvent = null;
+        this.rangedAttack = isRangedAttack;
+        this.criticalStrike = false;
+        this.isCustomDamage = false;
+        this.damageModifier = 1.0;
     }
 
     public static HandlerList getHandlerList() {
@@ -83,6 +117,122 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
         return handlers;
     }
 
+    /**
+     * Unified method to apply all active skill bonuses to this damage event.
+     * This is the single entry point for the skill bonus system to modify offensive damage.
+     * <p>
+     * Processes all active weapon skills for the player's current weapon type,
+     * applying damage multipliers from PASSIVE, CONDITIONAL, STACKING, and PROC skills.
+     */
+    public void applySkillBonuses() {
+        if (player == null || player.hasMetadata("NPC")) return;
+        if (!ElitePlayerInventory.playerInventories.containsKey(player.getUniqueId())) return;
+
+        // Determine weapon type from main hand
+        SkillType weaponSkillType = getWeaponSkillType(player);
+        if (weaponSkillType == null) return;
+
+        int skillLevel = SkillBonusRegistry.getPlayerSkillLevel(player, weaponSkillType);
+        List<String> activeSkillIds = PlayerSkillSelection.getActiveSkills(player.getUniqueId(), weaponSkillType);
+
+        double damageMultiplier = 1.0;
+
+        // Process each active skill for this weapon type
+        for (String skillId : activeSkillIds) {
+            SkillBonus skill = SkillBonusRegistry.getSkillById(skillId);
+            if (skill == null || !skill.isEnabled()) continue;
+            if (!skill.meetsLevelRequirement(skillLevel)) continue;
+
+            damageMultiplier *= processOffensiveSkill(skill, skillLevel);
+        }
+
+        // Apply the combined damage multiplier
+        if (damageMultiplier != 1.0) {
+            setDamage(getDamage() * damageMultiplier);
+        }
+    }
+
+    /**
+     * Processes a single offensive skill and returns its damage multiplier contribution.
+     * Tracks proc counts for testing purposes.
+     */
+    private double processOffensiveSkill(SkillBonus skill, int skillLevel) {
+        return switch (skill.getBonusType()) {
+            case PASSIVE -> {
+                skill.incrementProcCount(player); // Track activation
+                yield 1.0 + skill.getBonusValue(skillLevel);
+            }
+            case CONDITIONAL -> {
+                if (skill instanceof ConditionalSkill conditionalSkill) {
+                    if (conditionalSkill.conditionMet(player, this)) {
+                        skill.incrementProcCount(player); // Track activation
+                        yield 1.0 + conditionalSkill.getConditionalBonus(skillLevel);
+                    }
+                }
+                yield 1.0;
+            }
+            case STACKING -> {
+                if (skill instanceof StackingSkill stackingSkill) {
+                    int stacks = stackingSkill.getCurrentStacks(player);
+                    stackingSkill.addStack(player); // Add stack for this hit
+                    skill.incrementProcCount(player); // Track activation
+                    yield 1.0 + (stacks * stackingSkill.getBonusPerStack(skillLevel));
+                }
+                yield 1.0;
+            }
+            case PROC -> {
+                if (skill instanceof ProcSkill procSkill) {
+                    double procChance = procSkill.getProcChance(skillLevel);
+                    if (ThreadLocalRandom.current().nextDouble() < procChance) {
+                        procSkill.onProc(player, this);
+                        skill.incrementProcCount(player); // Track proc
+                        yield 1.0 + skill.getBonusValue(skillLevel);
+                    }
+                }
+                yield 1.0;
+            }
+            case COOLDOWN -> {
+                if (skill instanceof CooldownSkill cooldownSkill) {
+                    if (!cooldownSkill.isOnCooldown(player)) {
+                        cooldownSkill.onActivate(player, this);
+                        cooldownSkill.startCooldown(player, skillLevel);
+                        skill.incrementProcCount(player); // Track activation
+                        yield 1.0 + skill.getBonusValue(skillLevel);
+                    }
+                }
+                yield 1.0;
+            }
+            case TOGGLE -> {
+                if (skill instanceof ToggleSkill toggleSkill) {
+                    if (toggleSkill.isToggled(player)) {
+                        skill.incrementProcCount(player); // Track activation while toggled
+                        yield 1.0 + toggleSkill.getPositiveBonus(skillLevel);
+                    }
+                }
+                yield 1.0;
+            }
+        };
+    }
+
+    /**
+     * Determines the weapon skill type based on the player's main hand item.
+     */
+    private static SkillType getWeaponSkillType(Player player) {
+        ItemStack mainHand = player.getInventory().getItemInMainHand();
+        if (mainHand == null || mainHand.getType() == Material.AIR) return null;
+
+        Material type = mainHand.getType();
+        String typeName = type.name();
+
+        if (typeName.endsWith("_SWORD")) return SkillType.SWORDS;
+        if (typeName.endsWith("_AXE")) return SkillType.AXES;
+        if (type == Material.BOW) return SkillType.BOWS;
+        if (type == Material.CROSSBOW) return SkillType.CROSSBOWS;
+        if (type == Material.TRIDENT) return SkillType.TRIDENTS;
+        if (typeName.endsWith("_HOE")) return SkillType.HOES;
+
+        return null;
+    }
 
     //The thing that calls the event
     public static class EliteMobDamagedByPlayerEventFilter implements Listener {
@@ -104,7 +254,8 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
         }
 
         /**
-         * Gets the amount of damage dealt by EliteMobs-specific features
+         * Gets the amount of damage dealt by EliteMobs-specific features.
+         * Uses 50/50 split: half from player skill level, half from item level.
          *
          * @param player Damager
          * @return Bonus damage applied
@@ -112,17 +263,67 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
         private static double getEliteMeleeDamage(Player player, LivingEntity livingEntity) {
             if (player.getInventory().getItemInMainHand().getType().equals(Material.BOW) || player.getInventory().getItemInMainHand().getType().equals(Material.CROSSBOW))
                 return 0.0;
-            double eliteDamage = ElitePlayerInventory.getPlayer(player).getEliteDamage(true);
+
+            // Get item's elite damage (represents item level contribution)
+            double itemEliteDamage = ElitePlayerInventory.getPlayer(player).getEliteDamage(true);
+
+            // Get player's skill level for the weapon type
+            SkillType weaponSkillType = getWeaponSkillType(player);
+            int playerSkillLevel = 1;
+            if (weaponSkillType != null) {
+                long skillXP = PlayerData.getSkillXP(player.getUniqueId(), weaponSkillType);
+                playerSkillLevel = SkillXPCalculator.levelFromTotalXP(skillXP);
+            }
+
+            // Calculate skill damage contribution (same formula as item damage)
+            // skillDamage = skillLevel * DPS_PER_LEVEL / attackSpeed
+            double attackSpeed = EliteItemManager.getAttackSpeed(player.getInventory().getItemInMainHand());
+            double skillDamage = playerSkillLevel * CombatSystem.DPS_PER_LEVEL / attackSpeed;
+
+            // Apply 50/50 split: half from skill, half from item
+            double effectiveEliteDamage = (skillDamage * CombatSystem.SKILL_CONTRIBUTION_RATIO)
+                    + (itemEliteDamage * CombatSystem.ITEM_CONTRIBUTION_RATIO);
+
             double bonusEliteDamage = secondaryEnchantmentDamageIncrease(player, livingEntity);
-            return (eliteDamage + bonusEliteDamage) * player.getAttackCooldown();
+            return (effectiveEliteDamage + bonusEliteDamage) * player.getAttackCooldown();
         }
 
+        /**
+         * Gets the amount of ranged damage dealt by EliteMobs-specific features.
+         * Uses 50/50 split: half from player skill level, half from item level.
+         */
         private static double getEliteRangedDamage(Projectile arrow) {
             //note: the arrow velocity amplitude at full load is about 2.8
             double arrowSpeedMultiplier = Math.sqrt(Math.pow(arrow.getVelocity().getX(), 2D) + Math.pow(arrow.getVelocity().getY(), 2D) + Math.pow(arrow.getVelocity().getZ(), 2D));
             arrowSpeedMultiplier /= 4.0D;
-            double arrowDamage = EliteItemManager.getArrowEliteDamage(arrow);
-            return arrowSpeedMultiplier * arrowDamage;
+
+            // Get item's elite damage from the arrow (tagged when shot)
+            double itemArrowDamage = EliteItemManager.getArrowEliteDamage(arrow);
+
+            // Get player's skill level for the ranged weapon
+            if (arrow.getShooter() instanceof Player player && !player.hasMetadata("NPC")) {
+                Material weaponType = player.getInventory().getItemInMainHand().getType();
+                SkillType skillType = (weaponType == Material.BOW) ? SkillType.BOWS :
+                        (weaponType == Material.CROSSBOW) ? SkillType.CROSSBOWS : null;
+
+                if (skillType != null) {
+                    long skillXP = PlayerData.getSkillXP(player.getUniqueId(), skillType);
+                    int playerSkillLevel = SkillXPCalculator.levelFromTotalXP(skillXP);
+
+                    // Calculate skill damage contribution
+                    // For ranged, we use a base damage value since bows/crossbows don't have attack speed
+                    double skillDamage = playerSkillLevel * CombatSystem.DPS_PER_LEVEL;
+
+                    // Apply 50/50 split
+                    double effectiveDamage = (skillDamage * CombatSystem.SKILL_CONTRIBUTION_RATIO)
+                            + (itemArrowDamage * CombatSystem.ITEM_CONTRIBUTION_RATIO);
+
+                    return arrowSpeedMultiplier * effectiveDamage;
+                }
+            }
+
+            // Fallback for non-player shooters or unrecognized weapons
+            return arrowSpeedMultiplier * itemArrowDamage;
         }
 
         private static double getCustomDamageModifier(EliteEntity eliteEntity, Material itemStackType) {
@@ -150,7 +351,7 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
 
         private static boolean isCriticalHit(Player player) {
             double criticalStrike = ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getCritChance(false);
-            criticalStrike += (GuildRank.critBonusValue(GuildRank.getGuildPrestigeRank(player), GuildRank.getActiveGuildRank(player)) / 100);
+            // Note: Guild rank crit bonus removed - skill bonuses will be added in the future
             return ThreadLocalRandom.current().nextDouble() < criticalStrike;
         }
 

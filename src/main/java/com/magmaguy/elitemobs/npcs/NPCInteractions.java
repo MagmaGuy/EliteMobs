@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.npcs;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.adventurersguild.GuildRankMenuHandler;
+import com.magmaguy.elitemobs.menus.SkillBonusMenu;
 import com.magmaguy.elitemobs.api.PlayerPreTeleportEvent;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.menus.*;
@@ -56,7 +56,7 @@ public class NPCInteractions implements Listener {
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                            GuildRankMenuHandler.initializeGuildRankMenu(event.getPlayer());
+                            SkillBonusMenu.openWeaponSelectMenu(event.getPlayer());
                         }
                     }.runTaskLater(MetadataHandler.PLUGIN, 1);
                 }

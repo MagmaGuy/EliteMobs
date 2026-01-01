@@ -1,7 +1,5 @@
 package com.magmaguy.elitemobs.playerdata.statusscreen;
 
-import com.magmaguy.elitemobs.adventurersguild.GuildRank;
-import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.config.menus.premade.PlayerStatusMenuConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
@@ -32,7 +30,7 @@ public class StatsPage {
             if (PlayerStatusMenuConfig.getStatsTextLines()[i] == null) continue;
             TextComponent line = new TextComponent(PlayerStatusMenuConfig.getStatsTextLines()[i]
                     .replace("$money", EconomyHandler.checkCurrency(targetPlayer.getUniqueId()) + "")
-                    .replace("$guildtier", PlayerStatusScreen.convertLightColorsToBlack(AdventurersGuildConfig.getShortenedRankName(GuildRank.getGuildPrestigeRank(targetPlayer), GuildRank.getActiveGuildRank(targetPlayer))))
+                    .replace("$guildtier", "N/A")
                     .replace("$kills", PlayerData.getKills(targetPlayer.getUniqueId()) + "")
                     .replace("$highestkill", PlayerData.getHighestLevelKilled(targetPlayer.getUniqueId()) + "")
                     .replace("$deaths", PlayerData.getDeaths(targetPlayer.getUniqueId()) + "")
@@ -62,8 +60,7 @@ public class StatsPage {
                 replaceItemNamePlaceholder(PlayerStatusMenuConfig.getStatsMoneyItem().clone(), "$money",
                         EconomyHandler.checkCurrency(targetPlayer.getUniqueId()) + ""));
         inventory.setItem(PlayerStatusMenuConfig.getStatsGuildTierSlot(),
-                replaceItemNamePlaceholder(PlayerStatusMenuConfig.getStatsGuildTierItem().clone(), "$tier",
-                        AdventurersGuildConfig.getShortenedRankName(GuildRank.getGuildPrestigeRank(targetPlayer), GuildRank.getActiveGuildRank(targetPlayer))));
+                replaceItemNamePlaceholder(PlayerStatusMenuConfig.getStatsGuildTierItem().clone(), "$tier", "N/A"));
         inventory.setItem(PlayerStatusMenuConfig.getStatsEliteKillsSlot(),
                 replaceItemNamePlaceholder(PlayerStatusMenuConfig.getStatsEliteKillsItem().clone(), "$kills",
                         PlayerData.getKills(targetPlayer.getUniqueId()) + ""));

@@ -1,8 +1,5 @@
 package com.magmaguy.elitemobs;
 
-import com.magmaguy.elitemobs.adventurersguild.GuildRank;
-import com.magmaguy.elitemobs.adventurersguild.GuildRankMenuHandler;
-import com.magmaguy.elitemobs.adventurersguild.WorldSwitchBehavior;
 import com.magmaguy.elitemobs.api.*;
 import com.magmaguy.elitemobs.collateralminecraftchanges.*;
 import com.magmaguy.elitemobs.combatsystem.EliteMobDamagedByEliteMobHandler;
@@ -40,6 +37,12 @@ import com.magmaguy.elitemobs.ondeathcommands.OnDeathCommands;
 import com.magmaguy.elitemobs.pathfinding.Navigation;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.playerdata.PlayerStatsTracker;
+import com.magmaguy.elitemobs.skills.CombatLevelDisplay;
+import com.magmaguy.elitemobs.skills.SkillSystemMigration;
+import com.magmaguy.elitemobs.skills.SkillXPBar;
+import com.magmaguy.elitemobs.skills.SkillXPHandler;
+import com.magmaguy.elitemobs.skills.bonuses.SkillBonusEventHandler;
+import com.magmaguy.elitemobs.menus.SkillBonusMenu;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.playerdata.statusscreen.*;
 import com.magmaguy.elitemobs.powers.*;
@@ -95,6 +98,12 @@ public class EventsRegistrer {
         register(new PlayerData.PlayerDataEvents());
         register(new ElitePlayerInventory.ElitePlayerInventoryEvents());
         register(new PlayerStatsTracker());
+        register(new SkillXPHandler());
+        register(new SkillXPBar());
+        register(new SkillSystemMigration.MigrationEvents());
+        register(new CombatLevelDisplay());
+        register(new SkillBonusEventHandler());
+        register(new SkillBonusMenu.SkillBonusMenuEvents());
         register(new PlayerQuestCooldownsLogout());
 
         if (ItemSettingsConfig.isPreventEliteItemEnchantment())
@@ -248,6 +257,7 @@ public class EventsRegistrer {
         //player status menu
         register(new CoverPage.CoverPageEvents());
         register(new StatsPage.StatsPageEvents());
+        register(new SkillsPage.SkillsPageEvents());
         register(new GearPage.GearPageEvents());
         register(new TeleportsPage.TeleportsPageEvents());
         register(new CommandsPage.CommandsPageEvents());
@@ -314,9 +324,6 @@ public class EventsRegistrer {
         register(new EarthquakeEnchantment.EarthquakeEnchantmentEvents());
         //register(new UnbindEnchantment.UnbindEvents());
 
-        //Initialize adventurer's guild
-        register(new GuildRankMenuHandler());
-        register(new WorldSwitchBehavior());
         //register quests
         register(new KillObjective.KillObjectiveEvents());
         register(new CustomFetchObjective.CustomFetchObjectiveEvents());
@@ -377,8 +384,7 @@ public class EventsRegistrer {
         //On death commands
         register(new OnDeathCommands());
 
-        //Player stuff
-        register(new GuildRank.GuildRankEvents());
+        //Player stuff (guild rank events removed - skill system replacement)
 
         //Commands
         register(new RemoveCommand.RemoveCommandEvents());

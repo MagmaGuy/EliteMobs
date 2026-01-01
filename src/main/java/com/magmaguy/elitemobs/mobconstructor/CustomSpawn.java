@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.mobconstructor;
 
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.ValidWorldsConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
@@ -232,7 +231,6 @@ public class CustomSpawn {
         if (world == null)
             for (Player player : Bukkit.getOnlinePlayers()) {
                 if (!PlayerData.isInMemory(player.getUniqueId())) continue;
-                if (GuildRank.isAtOrAboveGuildRank(player, 0, 0)) continue;
                 Location playerLocation = player.getLocation();
                 if (!ValidWorldsConfig.getValidWorlds().contains(playerLocation.getWorld().getName()))
                     continue;
@@ -252,7 +250,7 @@ public class CustomSpawn {
                 if (!customSpawnConfigFields.getValidWorldEnvironments().isEmpty())
                     if (!customSpawnConfigFields.getValidWorldEnvironments().contains(Objects.requireNonNull(playerLocation.getWorld()).getEnvironment()))
                         continue;
-                if (GuildRank.getActiveGuildRank(player) == 0) continue;
+                // Guild rank peaceful mode checks removed
                 validPlayers.add(player);
             }
         else

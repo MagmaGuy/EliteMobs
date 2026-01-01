@@ -34,8 +34,8 @@ public class TranslationsConfigFields {
     public TranslationsConfigFields() {
         // Parse language name from config (e.g., "french" or "french.yml" -> "french")
         String configLang = DefaultConfig.getLanguage();
-        this.languageName = configLang.replace(".yml", "").replace(".csv", "").toLowerCase();
-        this.languageCode = getLanguageCode(languageName);
+        this.languageName = configLang.replace(".yml", "").replace(".csv", "");
+        this.languageCode = getLanguageCode(languageName.toLowerCase());
         initialize();
     }
 
@@ -51,7 +51,7 @@ public class TranslationsConfigFields {
             case "german" -> "de";
             case "spanish" -> "es";
             case "italian" -> "it";
-            case "brazilianPortuguese" -> "pt";
+            case "brazilianportuguese" -> "pt";
             case "russian" -> "ru";
             case "chinese", "chinesesimplified" -> "zh_cn";
             case "chinesetraditional" -> "zh_tw";

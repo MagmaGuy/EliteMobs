@@ -35,7 +35,7 @@ public class CustomModelsConfig extends ConfigurationFile {
         useAttributeScaling = ConfigurationEngine.setBoolean(List.of(
                 "Sets whether elite items receive attribute bonuses based on their level.",
                 "When enabled, higher level items will have increased damage, armor, toughness, etc.",
-                "At level 200, items will be roughly 200% better than vanilla netherite.",
+                "At level 100, items will be roughly 100% better than vanilla netherite.",
                 "This applies to procedurally generated items that receive custom skins."),
                 fileConfiguration, "useAttributeScaling", true);
         anvilHammer = ConfigurationEngine.setString(file, fileConfiguration, "anvilHammer", "elitemobs:ui/anvilhammer", false);

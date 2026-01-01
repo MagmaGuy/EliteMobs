@@ -232,13 +232,13 @@ public class ItemSettingsConfig extends ConfigurationFile {
                 fileConfiguration, "defaultLootMultiplier", 0);
         maxLevelForDefaultLootMultiplier = ConfigurationEngine.setInt(
                 List.of("Sets the maximum level for the default loot multiplier."),
-                fileConfiguration, "levelCapForDefaultLootMultiplier", 200);
+                fileConfiguration, "levelCapForDefaultLootMultiplier", 100);
         defaultExperienceMultiplier = ConfigurationEngine.setDouble(
                 List.of("Sets the vanilla Minecraft experience dropped multiplier for the boss, based on the level of the boss."),
                 fileConfiguration, "defaultExperienceMultiplier", 1);
         maximumItemLevel = ConfigurationEngine.setInt(
-                List.of("Sets the level of the maximum loot that will be dropped by EliteMobs. Strongly recommended to leave it at 200."),
-                fileConfiguration, "maximumItemLevel", 200);
+                List.of("Sets the level of the maximum loot that will be dropped by EliteMobs. Strongly recommended to leave it at 100."),
+                fileConfiguration, "maximumItemLevel", 100);
         useEliteEnchantments = ConfigurationEngine.setBoolean(
                 List.of("Sets if elite enchantments will be used. ",
                         "Elite enchantments replace vanilla enchantments when elite items get enchantment levels that go beyond vanilla limits.",

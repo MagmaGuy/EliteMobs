@@ -1,11 +1,17 @@
 package com.magmaguy.elitemobs.playerdata.statusscreen;
 
 import com.magmaguy.elitemobs.commands.guild.AdventurersGuildCommand;
+import com.magmaguy.elitemobs.config.SkillsConfig;
 import com.magmaguy.elitemobs.config.menus.premade.PlayerStatusMenuConfig;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.List;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -76,8 +82,30 @@ public class CoverPage {
             inventory.setItem(PlayerStatusMenuConfig.getIndexQuestTrackingSlot(), PlayerStatusMenuConfig.getIndexQuestTrackingItem());
         if (PlayerStatusMenuConfig.isDoBossTrackingPage())
             inventory.setItem(PlayerStatusMenuConfig.getIndexBossTrackingSlot(), PlayerStatusMenuConfig.getIndexBossTrackingItem());
+
+        // Add Skills page button (slot 22)
+        if (SkillsConfig.isSkillSystemEnabled()) {
+            inventory.setItem(22, createSkillsItem());
+        }
+
         CoverPageEvents.pageInventories.add(inventory);
         requestingPlayer.openInventory(inventory);
+    }
+
+    private static final int SKILLS_SLOT = 22;
+
+    private static ItemStack createSkillsItem() {
+        ItemStack item = new ItemStack(Material.EXPERIENCE_BOTTLE);
+        ItemMeta meta = item.getItemMeta();
+        meta.setDisplayName("\u00A75\u00A7lSkills");
+        meta.setLore(List.of(
+                "\u00A77View your skill levels",
+                "\u00A77and XP progress.",
+                "",
+                "\u00A7eClick to view!"
+        ));
+        item.setItemMeta(meta);
+        return item;
     }
 
     public static class CoverPageEvents implements Listener {
@@ -132,6 +160,13 @@ public class CoverPage {
             if (event.getSlot() == PlayerStatusMenuConfig.getIndexBossTrackingSlot() && PlayerStatusMenuConfig.isDoBossTrackingPage()) {
                 player.closeInventory();
                 BossTrackingPage.bossTrackingPage(player, player);
+                return;
+            }
+
+            // Skills page
+            if (event.getSlot() == SKILLS_SLOT && SkillsConfig.isSkillSystemEnabled()) {
+                player.closeInventory();
+                SkillsPage.skillsPage(player, player);
             }
         }
 

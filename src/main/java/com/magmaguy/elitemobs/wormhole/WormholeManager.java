@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.wormhole;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.WormholesConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldowns;
@@ -110,9 +109,7 @@ public class WormholeManager {
 
         // Check currency
         if (wormholeEntry.getWormhole().getWormholeConfigFields().getCoinCost() > 0) {
-            double coinCost = wormholeEntry.getWormhole().getWormholeConfigFields().getCoinCost() +
-                    wormholeEntry.getWormhole().getWormholeConfigFields().getCoinCost() *
-                            GuildRank.currencyBonusMultiplier(player.getUniqueId());
+            double coinCost = wormholeEntry.getWormhole().getWormholeConfigFields().getCoinCost();
 
             if (EconomyHandler.checkCurrency(player.getUniqueId()) < coinCost) {
                 player.sendMessage(ChatColorConverter.convert(WormholesConfig.getInsufficientCurrencyForWormholeMessage())
@@ -165,6 +162,11 @@ public class WormholeManager {
         // Perform teleport on the main thread
         if (sourceEntry.getWormhole().getWormholeConfigFields().isBlindPlayer()) {
             player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20 * 2, 0));
+        }
+
+        // Remove passengers before teleporting to prevent teleport failures
+        if (!player.getPassengers().isEmpty()) {
+            player.getPassengers().forEach(player::removePassenger);
         }
 
         player.teleport(finalDestination);

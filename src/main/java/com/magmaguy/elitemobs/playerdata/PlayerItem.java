@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.instanced.dungeons.DungeonInstance;
+import com.magmaguy.elitemobs.items.GearRestrictionHandler;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.customenchantments.*;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffect;
@@ -107,6 +108,15 @@ public class PlayerItem {
                 itemStack.setAmount(0);
                 itemStack = new ItemStack(Material.AIR);
             }
+        }
+
+        // Skill-based gear restriction check
+        if (!GearRestrictionHandler.canEquip(player, itemStack)) {
+            GearRestrictionHandler.sendRestrictionMessage(player, itemStack);
+            // Drop the item instead of just removing it
+            player.getWorld().dropItem(player.getLocation(), itemStack);
+            itemStack.setAmount(0);
+            itemStack = new ItemStack(Material.AIR);
         }
 
         //Neither offhand nor armor contribute to baseline damage outside of the enchants, so we reset the damage before anything
