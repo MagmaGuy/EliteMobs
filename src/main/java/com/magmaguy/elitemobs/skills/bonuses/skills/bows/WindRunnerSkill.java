@@ -65,5 +65,7 @@ public class WindRunnerSkill extends SkillBonus {
     @Override
     public String getFormattedBonus(int skillLevel) { return String.format("Speed %d on hit", getSpeedAmplifier(skillLevel) + 1); }
     @Override
+    public boolean affectsDamage() { return false; } // Speed boost doesn't affect damage
+    @Override
     public void shutdown() { activePlayers.clear(); }
 }

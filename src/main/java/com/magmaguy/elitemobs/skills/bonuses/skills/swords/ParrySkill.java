@@ -116,6 +116,11 @@ public class ParrySkill extends SkillBonus implements ConditionalSkill {
     }
 
     @Override
+    public boolean affectsDamage() {
+        return false; // Defensive skill - reduces damage taken, doesn't affect damage dealt
+    }
+
+    @Override
     public void shutdown() {
         activePlayers.clear();
     }

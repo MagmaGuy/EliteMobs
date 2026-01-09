@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.dungeons.EMPackage;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.instanced.dungeons.DungeonInstance;
 import com.magmaguy.elitemobs.instanced.dungeons.DynamicDungeonInstance;
+import com.magmaguy.elitemobs.skills.CombatLevelCalculator;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
 import lombok.Getter;
@@ -65,8 +66,8 @@ public class DynamicDungeonBrowser extends EliteMenu {
     }
 
     private void showLevelSelectionMenu(Player player, String dynamicDungeonName) {
-        // Default to level 50 for all players (mid-range)
-        int baseLevel = 50;
+        // Use the player's combat level as the base
+        int baseLevel = Math.max(1, CombatLevelCalculator.calculateCombatLevel(player.getUniqueId()));
 
         int minLevel = Math.max(5, baseLevel - 5);
         int maxLevel = Math.min(200, baseLevel + 5);
@@ -191,8 +192,8 @@ public class DynamicDungeonBrowser extends EliteMenu {
             if (browser.menuType == MenuType.LEVEL_SELECTION) {
                 if (browser.levelSlots.contains(event.getSlot())) {
                     int levelIndex = browser.levelSlots.indexOf(event.getSlot());
-                    // Default to level 50 for all players (mid-range)
-                    int baseLevel = 50;
+                    // Use the player's combat level as the base
+                    int baseLevel = Math.max(1, CombatLevelCalculator.calculateCombatLevel(player.getUniqueId()));
                     int minLevel = Math.max(5, baseLevel - 5);
                     int selectedLevel = minLevel + (levelIndex * 5);
 

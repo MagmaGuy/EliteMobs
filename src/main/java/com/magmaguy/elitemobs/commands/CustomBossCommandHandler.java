@@ -17,7 +17,9 @@ public class CustomBossCommandHandler {
         Location newLocation = new Location(originalLocation.getWorld(),
                 originalLocation.getBlockX() + 0.5,
                 originalLocation.getBlockY() + 0.5,
-                originalLocation.getBlockZ() + 0.5);
+                originalLocation.getBlockZ() + 0.5,
+                originalLocation.getYaw(),
+                originalLocation.getPitch());
         for (int i = 0; i < 4; i++)
             if (newLocation.add(new Vector(0, i, 0)).getBlock().isPassable()) {
                 new DebugBlockLocation(newLocation);

@@ -2,13 +2,11 @@ package com.magmaguy.elitemobs.skills.bonuses.skills.swords;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
-import com.magmaguy.elitemobs.config.skillbonuses.SkillBonusConfigFields;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.ProcSkill;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -163,6 +161,11 @@ public class LacerateSkill extends SkillBonus implements ProcSkill {
     @Override
     public String getFormattedBonus(int skillLevel) {
         return String.format("+%.1f Bleed Damage/s", calculateBleedDamage(skillLevel));
+    }
+
+    @Override
+    public boolean affectsDamage() {
+        return false; // DoT skill - applies bleed via onProc, doesn't multiply main hit damage
     }
 
     @Override

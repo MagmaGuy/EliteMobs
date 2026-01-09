@@ -81,5 +81,7 @@ public class SuppressingFireSkill extends SkillBonus implements ProcSkill {
     @Override
     public String getFormattedBonus(int skillLevel) { return String.format("%.0f%% suppress chance", getProcChance(skillLevel) * 100); }
     @Override
+    public boolean affectsDamage() { return false; } // Applies debuffs, not damage
+    @Override
     public void shutdown() { activePlayers.clear(); }
 }

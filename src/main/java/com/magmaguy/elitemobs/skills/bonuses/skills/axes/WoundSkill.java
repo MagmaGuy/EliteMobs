@@ -110,6 +110,8 @@ public class WoundSkill extends SkillBonus implements ProcSkill {
     public double getBonusValue(int skillLevel) { return BASE_BLEED_DAMAGE + (skillLevel * 0.15); }
     @Override
     public String getFormattedBonus(int skillLevel) { return String.format("+%.1f Wound Damage/s", getBonusValue(skillLevel)); }
+    @Override
+    public boolean affectsDamage() { return false; } // Proc applies DoT, doesn't multiply main hit damage
 
     @Override
     public void shutdown() {

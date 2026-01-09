@@ -293,4 +293,17 @@ public abstract class SkillBonus {
         int skillLevel = SkillBonusRegistry.getPlayerSkillLevel(player, skillType);
         return configFields.calculateCooldown(skillLevel);
     }
+
+    /**
+     * Returns whether this skill affects damage when used offensively.
+     * <p>
+     * By default, returns true. Override this method in utility skills
+     * (like movement speed, knockback reduction) to return false, so they
+     * don't incorrectly apply damage multipliers.
+     *
+     * @return true if this skill modifies damage, false if it's a utility skill
+     */
+    public boolean affectsDamage() {
+        return true;
+    }
 }

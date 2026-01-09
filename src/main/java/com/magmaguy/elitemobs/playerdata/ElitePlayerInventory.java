@@ -1,8 +1,8 @@
 package com.magmaguy.elitemobs.playerdata;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.items.MobTierCalculator;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffect;
+import com.magmaguy.elitemobs.skills.CombatLevelCalculator;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
@@ -123,28 +123,12 @@ public class ElitePlayerInventory {
     }
 
     public int getFullPlayerTier(boolean update) {
-        if (isUpdateLock) update = false;
-        int fullPlayerTier = (int) ((helmet.getTier(player.getInventory().getHelmet(), update) +
-                chestplate.getTier(player.getInventory().getChestplate(), update) +
-                leggings.getTier(player.getInventory().getLeggings(), update) +
-                boots.getTier(player.getInventory().getBoots(), update) +
-                mainhand.getTier(player.getInventory().getItemInMainHand(), update))
-                / 5D);
-        updateLock();
-        return fullPlayerTier;
+        return CombatLevelCalculator.calculateCombatLevel(player.getUniqueId());
     }
 
     public int getNaturalMobSpawnLevel(boolean update) {
-        if (isUpdateLock) update = false;
         if (player.getGameMode().equals(GameMode.SPECTATOR)) return 0;
-        int naturalMobSpawnLevel = (int) ((helmet.getTier(player.getInventory().getHelmet(), update) +
-                chestplate.getTier(player.getInventory().getChestplate(), update) +
-                leggings.getTier(player.getInventory().getLeggings(), update) +
-                boots.getTier(player.getInventory().getBoots(), update) +
-                mainhand.getTier(player.getInventory().getItemInMainHand(), update))
-                / 5D * MobTierCalculator.PER_TIER_LEVEL_INCREASE);
-        updateLock();
-        return naturalMobSpawnLevel;
+        return CombatLevelCalculator.calculateCombatLevel(player.getUniqueId());
     }
 
     /**

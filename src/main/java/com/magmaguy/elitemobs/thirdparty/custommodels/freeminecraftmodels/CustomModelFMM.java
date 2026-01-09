@@ -31,28 +31,34 @@ public class CustomModelFMM implements CustomModelInterface {
 
     @Override
     public void shoot() {
+        if (dynamicEntity == null) return;
         if (dynamicEntity.hasAnimation("attack_ranged")) dynamicEntity.playAnimation("attack_ranged", false, false);
-        else dynamicEntity.playAnimation("attack", false, false);
+        else if (dynamicEntity.hasAnimation("attack")) dynamicEntity.playAnimation("attack", false, false);
     }
 
     @Override
     public void melee() {
+        if (dynamicEntity == null) return;
         if (dynamicEntity.hasAnimation("attack_melee")) dynamicEntity.playAnimation("attack_melee", false, false);
-        else dynamicEntity.playAnimation("attack", false, false);
+        else if (dynamicEntity.hasAnimation("attack")) dynamicEntity.playAnimation("attack", false, false);
     }
 
     @Override
     public void playAnimationByName(String animationName) {
+        if (dynamicEntity == null) return;
+        if (!dynamicEntity.hasAnimation(animationName)) return;
         dynamicEntity.playAnimation(animationName, false, false);
     }
 
     @Override
     public void setName(String nametagName, boolean visible) {
+        if (dynamicEntity == null) return;
         dynamicEntity.setDisplayName(nametagName);
     }
 
     @Override
     public void setNameVisible(boolean visible) {
+        if (dynamicEntity == null) return;
         dynamicEntity.setDisplayNameVisible(visible);
     }
 
@@ -63,6 +69,7 @@ public class CustomModelFMM implements CustomModelInterface {
 
     @Override
     public void switchPhase() {
+        if (dynamicEntity == null) return;
         dynamicEntity.remove();
     }
 

@@ -31,6 +31,8 @@ public class ItemTagger {
     private static final NamespacedKey ELITE_DAMAGE = new NamespacedKey(MetadataHandler.PLUGIN, "eliteDamage");
     @Getter
     private static final NamespacedKey ELITE_DEFENSE = new NamespacedKey(MetadataHandler.PLUGIN, "eliteDefense");
+    @Getter
+    private static final NamespacedKey ELITE_LEVEL = new NamespacedKey(MetadataHandler.PLUGIN, "eliteLevel");
 
     public static String itemValue = "ItemValue";
 
@@ -274,6 +276,20 @@ public class ItemTagger {
         if (itemStack == null || itemStack.getItemMeta() == null) return;
         ItemMeta itemMeta = itemStack.getItemMeta();
         itemMeta.getPersistentDataContainer().set(ELITE_DEFENSE, PersistentDataType.DOUBLE, defenseValue);
+        itemStack.setItemMeta(itemMeta);
+    }
+
+    public static int getStoredItemLevel(@Nullable ItemStack itemStack) {
+        if (itemStack == null) return -1;
+        if (itemStack.getItemMeta() == null) return -1;
+        Integer level = itemStack.getItemMeta().getPersistentDataContainer().get(ELITE_LEVEL, PersistentDataType.INTEGER);
+        return level == null ? -1 : level;
+    }
+
+    public static void setItemLevel(@Nullable ItemStack itemStack, int level) {
+        if (itemStack == null || itemStack.getItemMeta() == null) return;
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        itemMeta.getPersistentDataContainer().set(ELITE_LEVEL, PersistentDataType.INTEGER, level);
         itemStack.setItemMeta(itemMeta);
     }
 

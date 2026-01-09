@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.config.custombosses.premade;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import org.bukkit.entity.EntityType;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Training Dummy - Level 50
@@ -18,22 +18,18 @@ public class TrainingDummyLv50Config extends CustomBossesConfigFields {
                 "&8[&6Lv.50 &7Training Dummy&8]",
                 "50");
         setRegionalBoss(true);
-        setSpawnCooldown(1); // 1 minute respawn
+        setSpawnCooldown(0);
         setHealthMultiplier(1.0);
-        setDamageMultiplier(0.0); // Doesn't deal damage
-        setNeutral(true);
-        setFrozen(true);
+        setDamageMultiplier(0.0);
         setSilent(true);
-        setLeashRadius(1);
-        setFollowDistance(0);
-        setTimeout(0);
-        setPersistent(true);
-        setRemoveAfterDeath(false);
+        setAi(false);
+        setAlwaysShowName(true);
+        setFollowDistance(15);
         setDropsEliteMobsLoot(false);
         setDropsVanillaLoot(false);
         setDropsRandomLoot(false);
         setDropsSkillXP(false);
-        setPowers(new ArrayList<>());
-        setAnnouncementPriority(0);
+        setCustomModel("em_trainingdummy2");
+        setSpawnLocations(List.of("em_adventurers_guild,264.5,87,218.5,6.900183,55.291626"));
     }
 }

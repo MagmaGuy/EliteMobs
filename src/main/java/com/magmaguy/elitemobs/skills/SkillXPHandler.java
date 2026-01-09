@@ -172,6 +172,11 @@ public class SkillXPHandler implements Listener {
         // Update combat level display
         CombatLevelDisplay.updateDisplay(player);
 
+        // Update armor health bonus if armor skill leveled up
+        if (skillType == SkillType.ARMOR) {
+            ArmorSkillHealthBonus.updateHealthBonus(player);
+        }
+
         Logger.debug("Player " + player.getName() + " reached " + skillType.getDisplayName() + " level " + newLevel);
     }
 

@@ -2,15 +2,17 @@ package com.magmaguy.elitemobs.testing;
 
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
-import com.magmaguy.elitemobs.entitytracker.EntityTracker;
-import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.elitemobs.combatsystem.DamageBreakdown;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.items.EliteItemLore;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -60,17 +62,16 @@ public class CombatSimulator {
 
     /**
      * Test dummy config file name.
-     * IMPORTANT: For armor skill testing to work, this config MUST have damageMultiplier > 0.
-     * The default training_dummy.yml has damageMultiplier: 0.0 which breaks defensive tests.
-     * Consider using a separate config like "training_dummy_combat.yml" with damageMultiplier: 1.0
+     * Uses the level 50 training dummy as a balanced default for testing.
      */
-    private static final String DUMMY_CONFIG = "training_dummy.yml";
+    private static final String DUMMY_CONFIG = "training_dummy_lv50.yml";
 
     /**
      * Alternative config for armor skill testing (with damageMultiplier > 0).
-     * TODO: Create this config or modify training_dummy.yml
+     * Uses level 50 dummy - note: training dummies have damageMultiplier: 0.0
+     * so armor skill testing may need a different approach.
      */
-    private static final String COMBAT_DUMMY_CONFIG = "training_dummy_combat.yml";
+    private static final String COMBAT_DUMMY_CONFIG = "training_dummy_lv50.yml";
 
     // Distance in front of player to spawn dummy
     private static final double SPAWN_DISTANCE = 5.0;
@@ -545,5 +546,194 @@ public class CombatSimulator {
      */
     public int getDummyCount() {
         return dummies.size();
+    }
+
+    // ===== DAMAGE BREAKDOWN TESTING =====
+
+    /**
+     * Performs a melee attack with full damage breakdown tracking.
+     * Returns the breakdown object for analysis.
+     *
+     * @param skillId The skill ID for the dummy
+     * @return DamageBreakdown with all damage components, or null if attack failed
+     */
+    public DamageBreakdown simulateMeleeAttackWithBreakdown(String skillId) {
+        LivingEntity target = getDummyEntity(skillId);
+        if (target == null || !target.isValid()) return null;
+
+        // Start tracking breakdown
+        DamageBreakdown breakdown = DamageBreakdown.startTracking(player);
+
+        // Reset iframes before attack
+        target.setNoDamageTicks(0);
+
+        double healthBefore = target.getHealth();
+        // Use actual player attack - attack speed is set very high to bypass cooldown
+        player.attack(target);
+        double healthAfter = target.getHealth();
+        double actualDamage = Math.max(0, healthBefore - healthAfter);
+
+        // Stop tracking and get results
+        DamageBreakdown result = DamageBreakdown.stopTracking(player);
+        if (result != null) {
+            // The breakdown should have been populated during the attack event
+            result.compute();
+        }
+
+        return result;
+    }
+
+    /**
+     * Performs multiple melee attacks and returns an averaged breakdown summary.
+     *
+     * @param skillId   The skill ID for the dummy
+     * @param hitCount  Number of hits to simulate
+     * @return Formatted string with breakdown summary
+     */
+    public String simulateMultipleAttacksWithBreakdown(String skillId, int hitCount) {
+        LivingEntity target = getDummyEntity(skillId);
+        if (target == null || !target.isValid()) return "§cNo valid target found!";
+
+        EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(target);
+        if (eliteEntity == null) return "§cTarget is not an elite entity!";
+
+        StringBuilder report = new StringBuilder();
+        report.append("§6=== COMBAT SIMULATION REPORT ===\n");
+        report.append(String.format("§7Target: §f%s §7(Lv %d, HP: %.0f)\n",
+                target.getName(), eliteEntity.getLevel(), target.getMaxHealth()));
+        report.append(String.format("§7Hits simulated: §f%d\n\n", hitCount));
+
+        double totalDamage = 0;
+        double minDamage = Double.MAX_VALUE;
+        double maxDamage = 0;
+        int crits = 0;
+        DamageBreakdown sampleBreakdown = null;
+
+        for (int i = 0; i < hitCount; i++) {
+            // Respawn if dead
+            if (!target.isValid() || target.isDead() || target.getHealth() <= 0) {
+                healDummy(skillId);
+                target = getDummyEntity(skillId);
+                if (target == null) break;
+            }
+
+            DamageBreakdown breakdown = simulateMeleeAttackWithBreakdown(skillId);
+            if (breakdown != null) {
+                double dmg = breakdown.getFinalDamage();
+                totalDamage += dmg;
+                minDamage = Math.min(minDamage, dmg);
+                maxDamage = Math.max(maxDamage, dmg);
+                if (breakdown.isCriticalHit()) crits++;
+
+                // Keep first non-crit sample for detailed breakdown
+                if (sampleBreakdown == null && !breakdown.isCriticalHit()) {
+                    sampleBreakdown = breakdown;
+                }
+            }
+
+            // Heal for next hit
+            healDummy(skillId);
+        }
+
+        double avgDamage = hitCount > 0 ? totalDamage / hitCount : 0;
+        double critRate = hitCount > 0 ? (double) crits / hitCount * 100 : 0;
+        double hitsToKill = avgDamage > 0 ? target.getMaxHealth() / avgDamage : 0;
+
+        report.append("§6--- DAMAGE STATISTICS ---\n");
+        report.append(String.format("§7Average Damage: §f%.1f\n", avgDamage));
+        report.append(String.format("§7Min/Max: §f%.1f §7/ §f%.1f\n", minDamage, maxDamage));
+        report.append(String.format("§7Crit Rate: §f%.1f%% §7(%d/%d)\n", critRate, crits, hitCount));
+        report.append(String.format("§7Estimated Hits to Kill: §f%.1f\n", hitsToKill));
+        report.append(String.format("§7Total DPS (1 hit/s): §f%.1f\n\n", avgDamage));
+
+        // Include detailed breakdown from sample hit
+        if (sampleBreakdown != null) {
+            report.append("§6--- SAMPLE HIT BREAKDOWN ---\n");
+            report.append(sampleBreakdown.toFormattedString());
+        }
+
+        return report.toString();
+    }
+
+    /**
+     * Outputs a detailed damage breakdown to the player.
+     *
+     * @param breakdown The breakdown to display
+     */
+    public void sendBreakdownToPlayer(DamageBreakdown breakdown) {
+        if (breakdown == null) {
+            Logger.sendMessage(player, "§cNo damage breakdown available.");
+            return;
+        }
+
+        // Split the breakdown into lines and send each one
+        String[] lines = breakdown.toFormattedString().split("\n");
+        for (String line : lines) {
+            Logger.sendMessage(player, line);
+        }
+    }
+
+    /**
+     * Runs a quick damage test and outputs the results.
+     * Spawns a temporary dummy, performs an attack, and shows the breakdown.
+     *
+     * @param dummyLevel The level of dummy to spawn (uses training_dummy_lv{level}.yml)
+     */
+    public void runQuickDamageTest(int dummyLevel) {
+        String dummyConfig = "training_dummy_lv" + dummyLevel + ".yml";
+        CustomBossesConfigFields config = CustomBossesConfig.getCustomBoss(dummyConfig);
+
+        if (config == null) {
+            Logger.sendMessage(player, "§cDummy config not found: " + dummyConfig);
+            return;
+        }
+
+        // Spawn dummy in front of player
+        org.bukkit.util.Vector direction = player.getLocation().getDirection();
+        direction.setY(0).normalize();
+        Location spawnLoc = player.getLocation().add(direction.multiply(5));
+        int highestY = spawnLoc.getWorld().getHighestBlockYAt(spawnLoc);
+        spawnLoc.setY(highestY + 1);
+        spawnLoc.setDirection(player.getLocation().toVector().subtract(spawnLoc.toVector()).normalize());
+
+        CustomBossEntity dummy = RegionalBossEntity.createTemporaryRegionalBossEntity(dummyConfig, spawnLoc);
+        if (dummy == null) {
+            Logger.sendMessage(player, "§cFailed to spawn dummy!");
+            return;
+        }
+
+        dummy.spawn(true);
+
+        if (dummy.getLivingEntity() == null) {
+            Logger.sendMessage(player, "§cDummy entity is null!");
+            return;
+        }
+
+        LivingEntity entity = dummy.getLivingEntity();
+        entity.setMaximumNoDamageTicks(0);
+        entity.setNoDamageTicks(0);
+        entity.setCustomName("§eDamage Test Dummy §7(Lv " + dummyLevel + ")");
+        entity.setCustomNameVisible(true);
+        entity.setGlowing(true);
+
+        Logger.sendMessage(player, "§aSpawned Lv" + dummyLevel + " test dummy. Attack it to see damage breakdown!");
+        Logger.sendMessage(player, "§7Dummy HP: §f" + String.format("%.0f", entity.getMaxHealth()));
+
+        // Start tracking - the breakdown will be populated when the player attacks
+        DamageBreakdown.startTracking(player);
+    }
+
+    /**
+     * Checks if the player has an active damage breakdown tracking session.
+     */
+    public boolean hasActiveBreakdownTracking() {
+        return DamageBreakdown.isTracking(player);
+    }
+
+    /**
+     * Stops breakdown tracking and returns the result.
+     */
+    public DamageBreakdown stopBreakdownTracking() {
+        return DamageBreakdown.stopTracking(player);
     }
 }

@@ -20,7 +20,10 @@ import com.magmaguy.elitemobs.initialsetup.FirstTimeSetup;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.instanced.arena.ArenaInstance;
 import com.magmaguy.elitemobs.instanced.dungeons.DungeonKillTargetObjective;
-import com.magmaguy.elitemobs.items.*;
+import com.magmaguy.elitemobs.items.DefaultDropsHandler;
+import com.magmaguy.elitemobs.items.LootTables;
+import com.magmaguy.elitemobs.items.PlaceEventPrevent;
+import com.magmaguy.elitemobs.items.RareDropEffect;
 import com.magmaguy.elitemobs.items.customenchantments.*;
 import com.magmaguy.elitemobs.items.potioneffects.PlayerPotionEffects;
 import com.magmaguy.elitemobs.menus.*;
@@ -37,12 +40,6 @@ import com.magmaguy.elitemobs.ondeathcommands.OnDeathCommands;
 import com.magmaguy.elitemobs.pathfinding.Navigation;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.playerdata.PlayerStatsTracker;
-import com.magmaguy.elitemobs.skills.CombatLevelDisplay;
-import com.magmaguy.elitemobs.skills.SkillSystemMigration;
-import com.magmaguy.elitemobs.skills.SkillXPBar;
-import com.magmaguy.elitemobs.skills.SkillXPHandler;
-import com.magmaguy.elitemobs.skills.bonuses.SkillBonusEventHandler;
-import com.magmaguy.elitemobs.menus.SkillBonusMenu;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.playerdata.statusscreen.*;
 import com.magmaguy.elitemobs.powers.*;
@@ -62,6 +59,11 @@ import com.magmaguy.elitemobs.quests.objectives.CustomFetchObjective;
 import com.magmaguy.elitemobs.quests.objectives.DialogObjective;
 import com.magmaguy.elitemobs.quests.objectives.KillObjective;
 import com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldownsLogout;
+import com.magmaguy.elitemobs.skills.CombatLevelDisplay;
+import com.magmaguy.elitemobs.skills.SkillSystemMigration;
+import com.magmaguy.elitemobs.skills.SkillXPBar;
+import com.magmaguy.elitemobs.skills.SkillXPHandler;
+import com.magmaguy.elitemobs.skills.bonuses.SkillBonusEventHandler;
 import com.magmaguy.elitemobs.thirdparty.custommodels.CustomModel;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardDungeonFlag;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardEliteMobOnlySpawnFlag;
@@ -133,7 +135,6 @@ public class EventsRegistrer {
 
         //Mob loot
         register(new DefaultDropsHandler());
-        register(new ItemLootShower.ItemLootShowerEvents());
 
         //potion effects - also initializes the task
         register(new PlayerPotionEffects());

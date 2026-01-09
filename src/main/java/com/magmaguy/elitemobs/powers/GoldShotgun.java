@@ -5,10 +5,7 @@ import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.meta.BossPower;
-import com.magmaguy.magmacore.util.ItemStackGenerator;
-import org.bukkit.Material;
 import org.bukkit.Particle;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -19,6 +16,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * Boss power that fires a shotgun blast of gold nuggets at the player.
+ * Uses packet-based FakeItem projectiles that cannot be picked up.
+ */
 public class GoldShotgun extends BossPower implements Listener {
 
     public GoldShotgun() {
@@ -27,27 +28,24 @@ public class GoldShotgun extends BossPower implements Listener {
 
     @EventHandler
     public void onHit(EliteMobDamagedByPlayerEvent event) {
-
         GoldShotgun goldShotgun = (GoldShotgun) event.getEliteMobEntity().getPower(this);
         if (goldShotgun == null) return;
         if (!eventIsValid(event, goldShotgun)) return;
 
         goldShotgun.doCooldownTicks(event.getEliteMobEntity());
         goldShotgun.doGoldShotgun(event.getEliteMobEntity(), event.getPlayer());
-
     }
 
     private void doGoldShotgun(EliteEntity eliteEntity, Player player) {
-
         eliteEntity.getLivingEntity().setAI(false);
-        Vector shotVector = player.getLocation().add(new Vector(0, 1, 0)).toVector().subtract(eliteEntity.getLivingEntity().getLocation().toVector()).normalize().multiply(.5);
+        Vector shotVector = player.getLocation().add(new Vector(0, 1, 0)).toVector()
+                .subtract(eliteEntity.getLivingEntity().getLocation().toVector()).normalize().multiply(.5);
 
         new BukkitRunnable() {
             int counter = 0;
 
             @Override
             public void run() {
-
                 if (!eliteEntity.isValid()) {
                     cancel();
                     return;
@@ -61,14 +59,11 @@ public class GoldShotgun extends BossPower implements Listener {
 
                 cancel();
                 eliteEntity.getLivingEntity().setAI(true);
-                List<Item> nuggetList = generateVisualItems(eliteEntity, shotVector);
-                if (nuggetList == null) return;
-                ProjectileDamage.doGoldNuggetDamage(nuggetList, eliteEntity);
-
+                List<ProjectileDamage.FakeProjectile> projectiles = generateVisualProjectiles(eliteEntity, shotVector);
+                if (projectiles == null || projectiles.isEmpty()) return;
+                ProjectileDamage.doGoldNuggetDamage(projectiles, eliteEntity);
             }
-
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
-
     }
 
     private void doSmokeEffect(EliteEntity eliteEntity, Vector shotVector) {
@@ -85,25 +80,23 @@ public class GoldShotgun extends BossPower implements Listener {
         }
     }
 
-    private List<Item> generateVisualItems(EliteEntity eliteEntity, Vector shotVector) {
-        List<Item> nuggetList = new ArrayList<>();
+    private List<ProjectileDamage.FakeProjectile> generateVisualProjectiles(EliteEntity eliteEntity, Vector shotVector) {
+        List<ProjectileDamage.FakeProjectile> projectiles = new ArrayList<>();
         for (int i = 0; i < 200; i++) {
-            Item visualProjectile = eliteEntity.getLivingEntity().getWorld().dropItem(
+            ProjectileDamage.FakeProjectile projectile = ProjectileDamage.createGoldNuggetProjectile(
                     eliteEntity.getLivingEntity().getLocation(),
-                    ItemStackGenerator.generateItemStack(
-                            Material.GOLD_NUGGET,
-                            "visual projectile",
-                            List.of(ThreadLocalRandom.current().nextDouble() + "")));
-            ProjectileDamage.configureVisualProjectile(visualProjectile);
-            visualProjectile.setVelocity(getShotVector(shotVector));
-            visualProjectile.setGravity(false);
-            nuggetList.add(visualProjectile);
+                    getShotVector(shotVector));
+            projectiles.add(projectile);
         }
-        return nuggetList;
+        return projectiles;
     }
 
     private Vector getShotVector(Vector originalShotVector) {
-        return originalShotVector.clone().add(new Vector(ThreadLocalRandom.current().nextDouble(-.1, .1), ThreadLocalRandom.current().nextDouble(-.1, .1), ThreadLocalRandom.current().nextDouble(-.1, .1)).normalize().multiply(0.1));
+        return originalShotVector.clone().add(
+                new Vector(
+                        ThreadLocalRandom.current().nextDouble(-.1, .1),
+                        ThreadLocalRandom.current().nextDouble(-.1, .1),
+                        ThreadLocalRandom.current().nextDouble(-.1, .1)
+                ).normalize().multiply(0.1));
     }
-
 }

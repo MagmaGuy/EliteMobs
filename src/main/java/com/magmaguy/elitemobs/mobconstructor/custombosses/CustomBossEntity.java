@@ -361,19 +361,23 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
     @Override
     public void setName(EliteMobProperties eliteMobProperties) {
         super.setName(eliteMobProperties);
-        if (isValid() && customModel != null)
-            customModel.setName(name, DefaultConfig.isAlwaysShowNametags());
+        if (isValid() && customModel != null) {
+            boolean showName = DefaultConfig.isAlwaysShowNametags() || customBossesConfigFields.isAlwaysShowName();
+            customModel.setName(name, showName);
+        }
     }
 
     @Override
     public void setNameVisible(boolean isVisible) {
         //Check if the boss is already dead
         if (livingEntity == null) return;
-        super.setNameVisible(isVisible);
+        //If alwaysShowName is set for this boss, override to always visible
+        boolean effectiveVisibility = isVisible || customBossesConfigFields.isAlwaysShowName();
+        super.setNameVisible(effectiveVisibility);
         if (Bukkit.getPluginManager().isPluginEnabled("LibsDisguises"))
-            DisguiseEntity.setDisguiseNameVisibility(isVisible, livingEntity, name);
+            DisguiseEntity.setDisguiseNameVisibility(effectiveVisibility, livingEntity, name);
         if (customModel != null && isValid())
-            customModel.setNameVisible(isVisible);
+            customModel.setNameVisible(effectiveVisibility);
     }
 
     public void announceSpawn() {
