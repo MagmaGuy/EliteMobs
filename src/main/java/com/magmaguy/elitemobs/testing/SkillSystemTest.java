@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.testing;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.combatsystem.DamageBreakdown;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.SkillXPCalculator;
@@ -178,7 +179,46 @@ public class SkillSystemTest {
             return;
         }
 
+        // Sample damage at level 50 to show baseline damage values
+        if (currentType != SkillType.ARMOR) {
+            sampleDamageBreakdown(firstSkill.getSkillId(), 50);
+        }
+
         testNextLevel();
+    }
+
+    /**
+     * Samples a single attack and outputs the damage breakdown.
+     * Useful for debugging damage calculation issues.
+     */
+    private void sampleDamageBreakdown(String skillId, int level) {
+        // Temporarily set player to test level
+        setPlayerSkillLevel(currentType, level);
+        combatSimulator.equipWeapon(currentType);
+
+        // Clear all skill bonuses for baseline test
+        for (String id : new ArrayList<>(PlayerSkillSelection.getActiveSkills(playerUUID, currentType))) {
+            PlayerSkillSelection.removeActiveSkill(playerUUID, currentType, id);
+        }
+
+        // Perform a single attack with breakdown tracking
+        DamageBreakdown breakdown = combatSimulator.simulateMeleeAttackWithBreakdown(skillId);
+
+        if (breakdown != null) {
+            log("§7--- Baseline Damage at Lv." + level + " (no skill bonuses) ---");
+            log(breakdown.toCompactString());
+            testLog.log("Baseline Lv." + level + ": " + breakdown.toCompactString().replaceAll("§.", ""));
+
+            // Show key values
+            log(String.format("§7  Vanilla: §f%.1f §7| Skill: §f%.1f §7| Item: §f%.1f §7| Total: §e%.1f",
+                    breakdown.getVanillaDamage(),
+                    breakdown.getSkillDamage() * 0.5,
+                    breakdown.getItemDamage() * 0.5,
+                    breakdown.getFinalDamage()));
+        }
+
+        // Heal dummy
+        combatSimulator.healDummy(skillId);
     }
 
     private void testNextLevel() {

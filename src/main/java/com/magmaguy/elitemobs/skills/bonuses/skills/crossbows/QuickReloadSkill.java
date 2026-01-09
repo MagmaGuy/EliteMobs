@@ -65,5 +65,7 @@ public class QuickReloadSkill extends SkillBonus {
     @Override
     public String getFormattedBonus(int skillLevel) { return String.format("Haste %d on hit", getHasteAmplifier(skillLevel) + 1); }
     @Override
+    public boolean affectsDamage() { return false; } // Haste for reloading doesn't affect damage
+    @Override
     public void shutdown() { activePlayers.clear(); }
 }

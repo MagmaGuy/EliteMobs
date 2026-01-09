@@ -4,6 +4,8 @@ import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.combatsystem.CombatSystem;
+import com.magmaguy.elitemobs.combatsystem.DamageBreakdown;
+import com.magmaguy.elitemobs.combatsystem.LevelScaling;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.dungeons.EliteMobsWorld;
@@ -18,11 +20,7 @@ import com.magmaguy.elitemobs.skills.SkillXPCalculator;
 import com.magmaguy.elitemobs.skills.bonuses.PlayerSkillSelection;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
-import com.magmaguy.elitemobs.skills.bonuses.interfaces.ConditionalSkill;
-import com.magmaguy.elitemobs.skills.bonuses.interfaces.CooldownSkill;
-import com.magmaguy.elitemobs.skills.bonuses.interfaces.ProcSkill;
-import com.magmaguy.elitemobs.skills.bonuses.interfaces.StackingSkill;
-import com.magmaguy.elitemobs.skills.bonuses.interfaces.ToggleSkill;
+import com.magmaguy.elitemobs.skills.bonuses.interfaces.*;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import com.magmaguy.elitemobs.utils.EntityFinder;
@@ -136,6 +134,8 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
         List<String> activeSkillIds = PlayerSkillSelection.getActiveSkills(player.getUniqueId(), weaponSkillType);
 
         double damageMultiplier = 1.0;
+        StringBuilder debugLog = new StringBuilder();
+        debugLog.append("[SkillBonuses] ");
 
         // Process each active skill for this weapon type
         for (String skillId : activeSkillIds) {
@@ -143,12 +143,26 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
             if (skill == null || !skill.isEnabled()) continue;
             if (!skill.meetsLevelRequirement(skillLevel)) continue;
 
-            damageMultiplier *= processOffensiveSkill(skill, skillLevel);
+            // Skip skills that don't affect damage
+            if (!skill.affectsDamage()) {
+                continue;
+            }
+
+            double skillMultiplier = processOffensiveSkill(skill, skillLevel);
+            if (skillMultiplier != 1.0) {
+                debugLog.append(skill.getBonusName()).append("=").append(String.format("%.2fx", skillMultiplier)).append(" ");
+            }
+            damageMultiplier *= skillMultiplier;
         }
 
         // Apply the combined damage multiplier
         if (damageMultiplier != 1.0) {
-            setDamage(getDamage() * damageMultiplier);
+            double oldDamage = getDamage();
+            setDamage(oldDamage * damageMultiplier);
+            debugLog.append("| Total=").append(String.format("%.2fx", damageMultiplier))
+                    .append(" | Damage: ").append(String.format("%.1f", oldDamage))
+                    .append(" -> ").append(String.format("%.1f", getDamage()));
+            com.magmaguy.magmacore.util.Logger.debug(debugLog.toString());
         }
     }
 
@@ -256,6 +270,7 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
         /**
          * Gets the amount of damage dealt by EliteMobs-specific features.
          * Uses 50/50 split: half from player skill level, half from item level.
+         * Both scale exponentially with level to match mob HP scaling.
          *
          * @param player Damager
          * @return Bonus damage applied
@@ -263,9 +278,6 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
         private static double getEliteMeleeDamage(Player player, LivingEntity livingEntity) {
             if (player.getInventory().getItemInMainHand().getType().equals(Material.BOW) || player.getInventory().getItemInMainHand().getType().equals(Material.CROSSBOW))
                 return 0.0;
-
-            // Get item's elite damage (represents item level contribution)
-            double itemEliteDamage = ElitePlayerInventory.getPlayer(player).getEliteDamage(true);
 
             // Get player's skill level for the weapon type
             SkillType weaponSkillType = getWeaponSkillType(player);
@@ -275,30 +287,55 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
                 playerSkillLevel = SkillXPCalculator.levelFromTotalXP(skillXP);
             }
 
-            // Calculate skill damage contribution (same formula as item damage)
-            // skillDamage = skillLevel * DPS_PER_LEVEL / attackSpeed
-            double attackSpeed = EliteItemManager.getAttackSpeed(player.getInventory().getItemInMainHand());
-            double skillDamage = playerSkillLevel * CombatSystem.DPS_PER_LEVEL / attackSpeed;
+            // Get item level
+            int itemLevel = (int) EliteItemManager.getItemLevel(player.getInventory().getItemInMainHand());
 
-            // Apply 50/50 split: half from skill, half from item
-            double effectiveEliteDamage = (skillDamage * CombatSystem.SKILL_CONTRIBUTION_RATIO)
-                    + (itemEliteDamage * CombatSystem.ITEM_CONTRIBUTION_RATIO);
+            // Calculate effective level using 50/50 split
+            // This is the average of skill level and item level
+            int effectiveLevel = (int) ((playerSkillLevel * CombatSystem.SKILL_CONTRIBUTION_RATIO)
+                    + (itemLevel * CombatSystem.ITEM_CONTRIBUTION_RATIO));
+
+            // Use exponential damage scaling (matches mob HP scaling)
+            // This ensures same-level combat feels consistent at all levels
+            double attackSpeed = EliteItemManager.getAttackSpeed(player.getInventory().getItemInMainHand());
+            double effectiveEliteDamage = LevelScaling.calculatePlayerDamage(effectiveLevel, attackSpeed);
 
             double bonusEliteDamage = secondaryEnchantmentDamageIncrease(player, livingEntity);
-            return (effectiveEliteDamage + bonusEliteDamage) * player.getAttackCooldown();
+
+            // Populate breakdown if tracking is active
+            DamageBreakdown breakdown = DamageBreakdown.getActiveBreakdown(player);
+            if (breakdown != null) {
+                breakdown.setSkillDamage(playerSkillLevel); // Now represents level, not raw damage
+                breakdown.setItemDamage(itemLevel); // Now represents level, not raw damage
+                breakdown.setPlayerSkillLevel(playerSkillLevel);
+                breakdown.setItemLevel(itemLevel);
+                breakdown.setEnchantmentDamage(bonusEliteDamage);
+                breakdown.setAttackCooldownMultiplier(player.getAttackCooldown());
+                breakdown.setWeaponType(player.getInventory().getItemInMainHand().getType().name());
+                breakdown.setRangedAttack(false);
+            }
+
+            // Always log melee damage components for debugging
+            double finalEliteDamage = (effectiveEliteDamage + bonusEliteDamage) * player.getAttackCooldown();
+            com.magmaguy.magmacore.util.Logger.debug("[MeleeDmg] SkillLv=" + playerSkillLevel +
+                    " ItemLv=" + itemLevel +
+                    " EffectiveLv=" + effectiveLevel +
+                    " BaseDmg=" + String.format("%.1f", effectiveEliteDamage) +
+                    " Cooldown=" + String.format("%.2f", player.getAttackCooldown()) +
+                    " Final=" + String.format("%.1f", finalEliteDamage));
+
+            return finalEliteDamage;
         }
 
         /**
          * Gets the amount of ranged damage dealt by EliteMobs-specific features.
          * Uses 50/50 split: half from player skill level, half from item level.
+         * Both scale exponentially with level to match mob HP scaling.
          */
         private static double getEliteRangedDamage(Projectile arrow) {
             //note: the arrow velocity amplitude at full load is about 2.8
             double arrowSpeedMultiplier = Math.sqrt(Math.pow(arrow.getVelocity().getX(), 2D) + Math.pow(arrow.getVelocity().getY(), 2D) + Math.pow(arrow.getVelocity().getZ(), 2D));
             arrowSpeedMultiplier /= 4.0D;
-
-            // Get item's elite damage from the arrow (tagged when shot)
-            double itemArrowDamage = EliteItemManager.getArrowEliteDamage(arrow);
 
             // Get player's skill level for the ranged weapon
             if (arrow.getShooter() instanceof Player player && !player.hasMetadata("NPC")) {
@@ -310,20 +347,35 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
                     long skillXP = PlayerData.getSkillXP(player.getUniqueId(), skillType);
                     int playerSkillLevel = SkillXPCalculator.levelFromTotalXP(skillXP);
 
-                    // Calculate skill damage contribution
-                    // For ranged, we use a base damage value since bows/crossbows don't have attack speed
-                    double skillDamage = playerSkillLevel * CombatSystem.DPS_PER_LEVEL;
+                    // Get item level
+                    int itemLevel = (int) EliteItemManager.getItemLevel(player.getInventory().getItemInMainHand());
 
-                    // Apply 50/50 split
-                    double effectiveDamage = (skillDamage * CombatSystem.SKILL_CONTRIBUTION_RATIO)
-                            + (itemArrowDamage * CombatSystem.ITEM_CONTRIBUTION_RATIO);
+                    // Calculate effective level using 50/50 split
+                    int effectiveLevel = (int) ((playerSkillLevel * CombatSystem.SKILL_CONTRIBUTION_RATIO)
+                            + (itemLevel * CombatSystem.ITEM_CONTRIBUTION_RATIO));
+
+                    // Use exponential damage scaling (matches mob HP scaling)
+                    // For ranged, we use base DPS (no attack speed division)
+                    double effectiveDamage = LevelScaling.calculatePlayerDPS(effectiveLevel);
+
+                    // Populate breakdown if tracking is active
+                    DamageBreakdown breakdown = DamageBreakdown.getActiveBreakdown(player);
+                    if (breakdown != null) {
+                        breakdown.setSkillDamage(playerSkillLevel);
+                        breakdown.setItemDamage(itemLevel);
+                        breakdown.setPlayerSkillLevel(playerSkillLevel);
+                        breakdown.setItemLevel(itemLevel);
+                        breakdown.setAttackCooldownMultiplier(arrowSpeedMultiplier);
+                        breakdown.setWeaponType(weaponType.name());
+                        breakdown.setRangedAttack(true);
+                    }
 
                     return arrowSpeedMultiplier * effectiveDamage;
                 }
             }
 
-            // Fallback for non-player shooters or unrecognized weapons
-            return arrowSpeedMultiplier * itemArrowDamage;
+            // Fallback for non-player shooters or unrecognized weapons - use level 1 damage
+            return arrowSpeedMultiplier * LevelScaling.calculatePlayerDPS(1);
         }
 
         private static double getCustomDamageModifier(EliteEntity eliteEntity, Material itemStackType) {
@@ -353,6 +405,20 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
             double criticalStrike = ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getCritChance(false);
             // Note: Guild rank crit bonus removed - skill bonuses will be added in the future
             return ThreadLocalRandom.current().nextDouble() < criticalStrike;
+        }
+
+        /**
+         * Gets the player's effective offensive level for level scaling calculations.
+         * This is based on the player's weapon skill level for the weapon they are currently using.
+         *
+         * @param player The player to get the offensive level for
+         * @return The player's offensive level (weapon skill level, or 1 if no valid weapon)
+         */
+        private static int getPlayerOffensiveLevel(Player player) {
+            SkillType weaponSkillType = getWeaponSkillType(player);
+            if (weaponSkillType == null) return 1;
+            long skillXP = PlayerData.getSkillXP(player.getUniqueId(), weaponSkillType);
+            return Math.max(1, SkillXPCalculator.levelFromTotalXP(skillXP));
         }
 
         @EventHandler(ignoreCancelled = true)
@@ -391,10 +457,16 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
             //Sometimes players are "fake" due to npc plugins
             boolean validPlayer = !player.hasMetadata("NPC") && ElitePlayerInventory.getPlayer(player) != null;
 
-            if (validPlayer && event.getCause().equals(EntityDamageEvent.DamageCause.THORNS))
+            // Check if breakdown tracking is active for this player
+            DamageBreakdown breakdown = validPlayer ? DamageBreakdown.getActiveBreakdown(player) : null;
+
+            if (validPlayer && event.getCause().equals(EntityDamageEvent.DamageCause.THORNS)) {
                 //Thorns are their own kind of damage
                 eliteDamage = getThornsDamage(player);
-            else if (validPlayer && (event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK) || event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK) && EliteItemManager.isEliteMobsItem(player.getInventory().getItemInMainHand())))
+                if (breakdown != null) {
+                    breakdown.setThornsDamage(eliteDamage);
+                }
+            } else if (validPlayer && (event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK) || event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK) && EliteItemManager.isEliteMobsItem(player.getInventory().getItemInMainHand())))
                 eliteDamage = getEliteMeleeDamage(player, livingEntity);
             else if (event.getCause().equals(EntityDamageEvent.DamageCause.PROJECTILE))
                 //Scan arrow for arrow damage
@@ -408,16 +480,55 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
                     damageModifier = getCustomDamageModifier(eliteEntity, CustomProjectileData.getCustomProjectileDataHashMap().get(event.getDamager()).getProjectileShooterMaterial());
             else getCustomDamageModifier(eliteEntity, player.getInventory().getItemInMainHand().getType());
 
+            double combatMultiplier;
             if (eliteEntity instanceof CustomBossEntity customBossEntity && customBossEntity.isNormalizedCombat())
-                damage = Round.twoDecimalPlaces((damage + eliteDamage) * damageModifier * MobCombatSettingsConfig.getNormalizedDamageToEliteMultiplier());
+                combatMultiplier = MobCombatSettingsConfig.getNormalizedDamageToEliteMultiplier();
             else
-                damage = Round.twoDecimalPlaces((damage + eliteDamage) * damageModifier * MobCombatSettingsConfig.getDamageToEliteMultiplier());
+                combatMultiplier = MobCombatSettingsConfig.getDamageToEliteMultiplier();
+
+            damage = Round.twoDecimalPlaces((damage + eliteDamage) * damageModifier * combatMultiplier);
+
+            // Populate breakdown with vanilla damage and multipliers
+            if (breakdown != null) {
+                breakdown.setVanillaDamage(event.getDamage());
+                breakdown.setDamageModifier(damageModifier);
+                breakdown.setCombatMultiplier(combatMultiplier);
+                breakdown.setEliteLevel(eliteEntity.getLevel());
+            }
+
+            // Level scaling is now built into mob HP (exponential scaling)
+            // rather than modifying damage dealt. This feels better for players.
+            if (validPlayer) {
+                int playerLevel = getPlayerOffensiveLevel(player);
+                int eliteLevel = eliteEntity.getLevel();
+
+                if (breakdown != null) {
+                    breakdown.setPlayerLevel(playerLevel);
+                    breakdown.setLevelScalingModifier(1.0); // No longer modifying damage
+                }
+
+                // Debug logging for combat balance tuning
+                com.magmaguy.magmacore.util.Logger.debug("[Combat] Player Lv" + playerLevel + " vs Elite Lv" + eliteLevel +
+                        " | Damage: " + String.format("%.1f", damage) +
+                        " | Elite HP: " + String.format("%.1f", eliteEntity.getHealth()));
+            }
 
             boolean criticalHit = false;
 
             if (validPlayer) {
                 criticalHit = isCriticalHit(player);
-                if (criticalHit) damage *= 1.5;
+                if (criticalHit) {
+                    damage *= 1.5;
+                    if (breakdown != null) {
+                        breakdown.setCriticalHit(true);
+                        breakdown.setCritMultiplier(1.5);
+                    }
+                }
+            }
+
+            // Finalize breakdown computation
+            if (breakdown != null) {
+                breakdown.compute();
             }
 
             EliteMobDamagedByPlayerEvent eliteMobDamagedByPlayerEvent = new EliteMobDamagedByPlayerEvent(eliteEntity, player, event, damage, criticalHit, bypass, damageModifier);

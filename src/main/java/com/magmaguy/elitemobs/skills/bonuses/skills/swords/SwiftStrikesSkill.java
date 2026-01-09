@@ -88,6 +88,11 @@ public class SwiftStrikesSkill extends SkillBonus {
     }
 
     @Override
+    public boolean affectsDamage() {
+        return false; // Movement speed skill doesn't affect damage
+    }
+
+    @Override
     public void shutdown() {
         activePlayers.clear();
     }

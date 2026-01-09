@@ -225,6 +225,15 @@ public class CustomBossesConfigFields extends CustomConfigFields {
     @Getter
     @Setter
     private boolean silent;
+    @Getter
+    @Setter
+    private boolean ai = true;
+    @Getter
+    @Setter
+    private boolean alwaysShowName = false;
+    @Getter
+    @Setter
+    private List<String> spawnLocations = new ArrayList<>();
 
     /**
      * Creates a new default pre-made Custom Boss. The boss is further customized through a builder pattern.
@@ -406,6 +415,8 @@ public class CustomBossesConfigFields extends CustomConfigFields {
 
         this.scale = processDouble("scale", scale, 1, false);
         this.silent = processBoolean("silent", silent, false, false);
+        this.ai = processBoolean("ai", ai, true, false);
+        this.alwaysShowName = processBoolean("alwaysShowName", alwaysShowName, false, false);
     }
 
     public boolean isCustomModelExists() {

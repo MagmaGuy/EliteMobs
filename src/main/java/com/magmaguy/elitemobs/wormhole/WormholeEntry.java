@@ -1,11 +1,13 @@
 package com.magmaguy.elitemobs.wormhole;
 
+import com.magmaguy.easyminecraftgoals.internal.FakeText;
 import com.magmaguy.elitemobs.config.WormholesConfig;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
 import com.magmaguy.elitemobs.mobconstructor.PersistentObject;
 import com.magmaguy.elitemobs.mobconstructor.PersistentObjectHandler;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.DiscordLinks;
+import com.magmaguy.elitemobs.utils.VisualDisplay;
 import com.magmaguy.magmacore.DrawLine;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.ChunkLocationChecker;
@@ -15,8 +17,6 @@ import lombok.Setter;
 import org.bukkit.*;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.TextDisplay;
-import org.bukkit.util.Consumer;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
@@ -81,7 +81,7 @@ public class WormholeEntry implements PersistentObject {
     @Getter
     private String armorStandText;
     // Track by UUID instead of entity object
-    private TextDisplay textDisplay = null;
+    private FakeText fakeText = null;
     private String worldName;
     @Getter
     @Setter
@@ -177,9 +177,9 @@ public class WormholeEntry implements PersistentObject {
         isProcessingChunkEvent = true;
         try {
             clearLines();
-            if (textDisplay != null) {
-                textDisplay.remove();
-                textDisplay = null;
+            if (fakeText != null) {
+                fakeText.remove();
+                fakeText = null;
             }
         } finally {
             isProcessingChunkEvent = false;
@@ -220,7 +220,7 @@ public class WormholeEntry implements PersistentObject {
     }
 
     private void remove(){
-        if (textDisplay != null) textDisplay.remove();
+        if (fakeText != null) fakeText.remove();
         clearLines();
     }
 
@@ -250,7 +250,7 @@ public class WormholeEntry implements PersistentObject {
         }
 
         // Update text display if needed (always update if players are nearby)
-        if (armorStandText != null && (textDisplay == null || !textDisplay.isValid())) initializeTextDisplay();
+        if (armorStandText != null && fakeText == null) initializeTextDisplay();
 
         // Update visual effects (lines) if enabled and at least one player has line of sight
         if (!WormholesConfig.isNoParticlesMode() &&
@@ -313,20 +313,10 @@ public class WormholeEntry implements PersistentObject {
         if (armorStandText == null) return;
         if (location == null || location.getWorld() == null) return;
 
-        try {
-            // Spawn new display
-            textDisplay = location.getWorld().spawn(
-                    location.clone().add(new Vector(0, 1.2, 0).multiply(wormhole.getWormholeConfigFields().getSizeMultiplier())),
-                    TextDisplay.class,
-                    (Consumer<TextDisplay>) textDisplay -> {
-                        textDisplay.setBillboard(Display.Billboard.VERTICAL);
-                        textDisplay.setText(ChatColorConverter.convert(armorStandText));
-                        textDisplay.setPersistent(false);
-                    }
-            );
-        } catch (Exception e) {
-            // If entity creation fails, textDisplay remains null and will retry next tick
-            textDisplay = null;
+        Location textLocation = location.clone().add(new Vector(0, 1.2, 0).multiply(wormhole.getWormholeConfigFields().getSizeMultiplier()));
+        fakeText = VisualDisplay.generateFakeTextGlobal(textLocation, armorStandText);
+        if (fakeText != null) {
+            fakeText.setBillboard(Display.Billboard.VERTICAL);
         }
     }
 
@@ -366,17 +356,13 @@ public class WormholeEntry implements PersistentObject {
         double clearRadius = 5.0 * wormhole.getWormholeConfigFields().getSizeMultiplier();
 
         // Get all display entities near the wormhole location
+        // Note: fakeText is packet-based and won't be in this list
         world.getNearbyEntities(location, clearRadius, clearRadius, clearRadius).stream()
                 .filter(entity -> entity instanceof Display)
-                .filter(entity -> !(entity.equals(textDisplay))) // Don't remove our text display
                 .forEach(entity -> {
-                    // Optional: Add additional checks here to ensure we're only removing
-                    // display blocks (not other displays that might be intentional)
-                    Display display = (Display) entity;
-
-                    // Check if it's a block display (DrawLine creates block displays)
-                    if (display instanceof org.bukkit.entity.BlockDisplay) {
-                        display.remove();
+                    // Only remove block displays (DrawLine creates block displays)
+                    if (entity instanceof org.bukkit.entity.BlockDisplay) {
+                        entity.remove();
                     }
                 });
     }

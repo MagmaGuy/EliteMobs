@@ -1,6 +1,8 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
+import com.magmaguy.elitemobs.skills.ArmorSkillHealthBonus;
+import com.magmaguy.elitemobs.skills.CombatLevelDisplay;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.SkillXPCalculator;
 import com.magmaguy.magmacore.command.AdvancedCommand;
@@ -51,6 +53,12 @@ public class SkillSetAllCommand extends AdvancedCommand {
         for (SkillType skillType : SkillType.values()) {
             PlayerData.setSkillXP(targetPlayer.getUniqueId(), skillType, targetXP);
         }
+
+        // Update combat level display
+        CombatLevelDisplay.updateDisplay(targetPlayer);
+
+        // Update armor health bonus (since armor skill was changed)
+        ArmorSkillHealthBonus.updateHealthBonus(targetPlayer);
 
         Logger.sendMessage(commandData.getCommandSender(),
                 "&aSet all of " + targetPlayer.getName() + "'s skills to level " + level);

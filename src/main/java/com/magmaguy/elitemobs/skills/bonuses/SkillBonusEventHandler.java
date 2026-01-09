@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.skills.bonuses;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
+import com.magmaguy.elitemobs.skills.ArmorSkillHealthBonus;
 import com.magmaguy.elitemobs.skills.SkillType;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -69,6 +70,8 @@ public class SkillBonusEventHandler implements Listener {
                 if (player.isOnline()) {
                     PlayerSkillSelection.onPlayerJoin(player);
                     SkillBonusRegistry.applyAllBonuses(player);
+                    // Apply armor skill health bonus (+1 heart per armor level)
+                    ArmorSkillHealthBonus.applyHealthBonus(player);
                 }
             }
         }.runTaskLater(MetadataHandler.PLUGIN, 40); // 2 seconds after PlayerData loads
@@ -85,6 +88,8 @@ public class SkillBonusEventHandler implements Listener {
         // Save and cleanup
         PlayerSkillSelection.onPlayerLeave(player);
         SkillBonusRegistry.removeAllBonuses(player);
+        // Remove armor skill health bonus
+        ArmorSkillHealthBonus.removeHealthBonus(player);
 
         // Clear player-specific data
         playerStacks.remove(uuid);

@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.skills.bonuses.skills.axes;
 
-import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.skills.SkillType;
@@ -12,7 +11,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashSet;
 import java.util.List;
@@ -85,6 +83,8 @@ public class StaggerSkill extends SkillBonus implements ProcSkill {
     public double getBonusValue(int skillLevel) { return getProcChance(skillLevel); }
     @Override
     public String getFormattedBonus(int skillLevel) { return String.format("%.1f%% Stagger Chance", getProcChance(skillLevel) * 100); }
+    @Override
+    public boolean affectsDamage() { return false; } // Applies debuffs, not damage
     @Override
     public void shutdown() { activePlayers.clear(); }
 }

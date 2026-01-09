@@ -1,11 +1,11 @@
 package com.magmaguy.elitemobs.npcs.chatter;
 
+import com.magmaguy.easyminecraftgoals.internal.FakeText;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.utils.VisualDisplay;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.TextDisplay;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -32,19 +32,22 @@ public class NPCChatBubble {
                     .add(player.getLocation().clone().subtract(npcEntity.getVillager().getLocation()).toVector().normalize().multiply(0.5))
                     .add(new Vector(0, -0.4 - (0.2 * lineCounter), 0));
 
-            TextDisplay visualArmorStand = VisualDisplay.generateTemporaryTextDisplay(newLocation, substring);
+            FakeText fakeText = VisualDisplay.generateFakeText(newLocation, substring, player);
+            if (fakeText == null) return;
 
             new BukkitRunnable() {
                 int counter = 0;
+                Location currentLocation = newLocation.clone();
 
                 @Override
                 public void run() {
-                    if (counter > 20 * 5 || npcEntity.getVillager() == null || !npcEntity.getVillager().isValid() || !visualArmorStand.isValid()) {
-                        visualArmorStand.remove();
+                    if (counter > 20 * 5 || npcEntity.getVillager() == null || !npcEntity.getVillager().isValid()) {
+                        fakeText.remove();
                         cancel();
                         return;
                     }
-                    visualArmorStand.teleport(visualArmorStand.getLocation().clone().add(new Vector(0, 0.005, 0)));
+                    currentLocation.add(0, 0.005, 0);
+                    fakeText.teleport(currentLocation);
                     counter++;
                 }
             }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);

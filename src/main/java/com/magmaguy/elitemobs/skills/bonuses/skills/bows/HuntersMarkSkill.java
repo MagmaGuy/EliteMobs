@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.skills.bonuses.skills.bows;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
-import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.ProcSkill;
 import net.md_5.bungee.api.ChatMessageType;
@@ -13,12 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Hunter's Mark (PROC) - Mark enemies to take bonus damage.
@@ -99,6 +93,8 @@ public class HuntersMarkSkill extends SkillBonus implements ProcSkill {
     public double getBonusValue(int skillLevel) { return getMarkBonus(skillLevel); }
     @Override
     public String getFormattedBonus(int skillLevel) { return String.format("+%.1f%% to marked targets", getMarkBonus(skillLevel) * 100); }
+    @Override
+    public boolean affectsDamage() { return false; } // Proc applies mark, bonus checked separately on marked targets
     @Override
     public void shutdown() {
         activePlayers.clear();

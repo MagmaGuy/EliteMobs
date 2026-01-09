@@ -2,8 +2,8 @@ package com.magmaguy.elitemobs.thirdparty.placeholderapi;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
-import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
+import com.magmaguy.elitemobs.skills.CombatLevelCalculator;
 import com.magmaguy.magmacore.util.Round;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.Bukkit;
@@ -102,17 +102,19 @@ public class Placeholders extends PlaceholderExpansion {
 
         switch (identifier) {
             case "player_combat_tier":
-                return "" + ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getFullPlayerTier(false);
+            case "player_combat_level":
+                return "" + CombatLevelCalculator.calculateCombatLevel(player.getUniqueId());
             case "player_money":
                 return "" + Round.twoDecimalPlaces(EconomyHandler.checkCurrency(player.getUniqueId()));
             case "player_top_tier":
-                double highestThreat = 0;
+            case "player_top_combat_level":
+                int highestLevel = 0;
                 for (Player iteratedPlayer : Bukkit.getOnlinePlayers()) {
-                    double currentTier = ElitePlayerInventory.playerInventories.get(iteratedPlayer.getUniqueId()).getFullPlayerTier(true);
-                    if (currentTier > highestThreat)
-                        highestThreat = currentTier;
+                    int currentLevel = CombatLevelCalculator.calculateCombatLevel(iteratedPlayer.getUniqueId());
+                    if (currentLevel > highestLevel)
+                        highestLevel = currentLevel;
                 }
-                return "" + highestThreat;
+                return "" + highestLevel;
             case "player_kills":
                 return "" + PlayerData.getKills(player.getUniqueId());
             case "player_deaths":

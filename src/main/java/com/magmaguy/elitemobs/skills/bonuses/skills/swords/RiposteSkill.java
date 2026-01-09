@@ -12,7 +12,10 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * Riposte (COOLDOWN) - After blocking, your next attack deals bonus damage.
@@ -171,6 +174,12 @@ public class RiposteSkill extends SkillBonus implements CooldownSkill {
     @Override
     public String getFormattedBonus(int skillLevel) {
         return String.format("+%.0f%% Riposte Damage", (getDamageMultiplier(skillLevel) - 1) * 100);
+    }
+
+    @Override
+    public boolean affectsDamage() {
+        // Riposte handles its own damage via onProc() when player blocks then attacks
+        return false;
     }
 
     @Override
