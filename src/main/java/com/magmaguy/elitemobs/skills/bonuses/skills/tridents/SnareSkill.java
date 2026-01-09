@@ -120,6 +120,11 @@ public class SnareSkill extends SkillBonus implements ProcSkill {
     }
 
     @Override
+    public boolean affectsDamage() {
+        return false; // Applies slowness debuffs, not damage
+    }
+
+    @Override
     public void shutdown() {
         activePlayers.clear();
     }

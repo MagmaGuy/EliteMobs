@@ -92,5 +92,7 @@ public class MultishotSkill extends SkillBonus implements ProcSkill {
     @Override
     public String getFormattedBonus(int skillLevel) { return String.format("%.0f%% chance for extra arrows", getProcChance(skillLevel) * 100); }
     @Override
+    public boolean affectsDamage() { return false; } // Spawns extra arrows, doesn't multiply main damage
+    @Override
     public void shutdown() { activePlayers.clear(); }
 }

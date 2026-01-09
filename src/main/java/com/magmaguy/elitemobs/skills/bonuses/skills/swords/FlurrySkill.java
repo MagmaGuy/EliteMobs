@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.skills.bonuses.skills.swords;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
-import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.StackingSkill;
 import org.bukkit.entity.Player;
@@ -159,6 +158,11 @@ public class FlurrySkill extends SkillBonus implements StackingSkill {
     @Override
     public String getFormattedBonus(int skillLevel) {
         return String.format("+%.1f%% Attack Speed (max)", getBonusPerStack(skillLevel) * MAX_STACKS * 100);
+    }
+
+    @Override
+    public boolean affectsDamage() {
+        return false; // Attack speed skill doesn't directly affect damage
     }
 
     @Override

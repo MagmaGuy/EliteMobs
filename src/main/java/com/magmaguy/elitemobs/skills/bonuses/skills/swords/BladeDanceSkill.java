@@ -2,9 +2,8 @@ package com.magmaguy.elitemobs.skills.bonuses.skills.swords;
 
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
-import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
-import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusEventHandler;
+import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.ToggleSkill;
 import org.bukkit.entity.Player;
 
@@ -144,6 +143,13 @@ public class BladeDanceSkill extends SkillBonus implements ToggleSkill {
     @Override
     public String getFormattedBonus(int skillLevel) {
         return String.format("+%.1f%% Dodge (toggle)", getPositiveBonus(skillLevel) * 100);
+    }
+
+    @Override
+    public boolean affectsDamage() {
+        // This toggle skill trades dodge for REDUCED damage, not increased
+        // The damage reduction is checked via getDamageMultiplier() separately
+        return false;
     }
 
     @Override

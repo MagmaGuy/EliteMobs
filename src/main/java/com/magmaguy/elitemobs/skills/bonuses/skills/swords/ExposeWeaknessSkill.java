@@ -153,6 +153,12 @@ public class ExposeWeaknessSkill extends SkillBonus implements ProcSkill {
     }
 
     @Override
+    public boolean affectsDamage() {
+        // Proc applies debuff, damage bonus checked separately on future hits
+        return false;
+    }
+
+    @Override
     public void shutdown() {
         for (DebuffData data : debuffedEntities.values()) {
             data.cancel();

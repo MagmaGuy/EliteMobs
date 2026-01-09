@@ -1,10 +1,9 @@
 package com.magmaguy.elitemobs.items.customenchantments;
 
+import com.magmaguy.easyminecraftgoals.internal.FakeText;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.config.enchantments.premade.SoulbindConfig;
-import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.items.EliteItemLore;
 import com.magmaguy.elitemobs.utils.VisualDisplay;
 import com.magmaguy.magmacore.util.ChatColorConverter;
@@ -13,7 +12,6 @@ import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.TextDisplay;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -66,8 +64,10 @@ public class SoulbindEnchantment extends CustomEnchantment {
             public void run() {
                 if (item == null)
                     return;
-                TextDisplay soulboundPlayer = VisualDisplay.generateTemporaryTextDisplay(item.getLocation().clone().add(new Vector(0, -50, 0)), ChatColorConverter.convert(
-                        SoulbindConfig.hologramStrings.replace("$player", player.getDisplayName())));
+                FakeText fakeText = VisualDisplay.generateFakeText(item.getLocation().clone().add(new Vector(0, -50, 0)), ChatColorConverter.convert(
+                        SoulbindConfig.hologramStrings.replace("$player", player.getDisplayName())), 30);
+                if (fakeText == null) return;
+
                 new BukkitRunnable() {
                     final Location lastLocation = item.getLocation().clone();
                     int counter = 0;
@@ -77,13 +77,13 @@ public class SoulbindEnchantment extends CustomEnchantment {
                         counter++;
                         if (counter > 20 * 60 * 5 || !item.isValid()) {
                             cancel();
-                            EntityTracker.unregister(soulboundPlayer, RemovalReason.EFFECT_TIMEOUT);
+                            fakeText.remove();
                             return;
                         }
                         if (!lastLocation.equals(item.getLocation()))
-                            soulboundPlayer.teleport(item.getLocation().clone().add(new Vector(0, 0.5, 0)));
+                            fakeText.teleport(item.getLocation().clone().add(new Vector(0, 0.5, 0)));
                         if (counter == 1)
-                            soulboundPlayer.teleport(item.getLocation().clone().add(new Vector(0, 0.5, 0)));
+                            fakeText.teleport(item.getLocation().clone().add(new Vector(0, 0.5, 0)));
                     }
                 }.runTaskTimer(MetadataHandler.PLUGIN, 1, 1);
             }

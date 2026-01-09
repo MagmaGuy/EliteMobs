@@ -14,7 +14,6 @@ import com.magmaguy.elitemobs.skills.SkillXPCalculator;
 import com.magmaguy.elitemobs.skills.bonuses.PlayerSkillSelection;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
-import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.ConditionalSkill;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.CooldownSkill;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.ProcSkill;
@@ -253,6 +252,9 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
             else
                 finalDamage = Math.max(baseDamage + bonusDamage - damageReduction - potionEffectDamageReduction, 1) *
                         customBossDamageMultiplier * specialMultiplier * MobCombatSettingsConfig.getDamageToPlayerMultiplier();
+
+            // Level scaling is now built into mob HP (exponential scaling)
+            // rather than modifying damage. Mob damage is based on their level directly.
 
             if (specialMultiplier != 1) specialMultiplier = 1;
 

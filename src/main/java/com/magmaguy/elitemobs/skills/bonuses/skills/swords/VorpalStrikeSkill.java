@@ -168,6 +168,12 @@ public class VorpalStrikeSkill extends SkillBonus implements CooldownSkill {
     }
 
     @Override
+    public boolean affectsDamage() {
+        // Only triggers on critical hits via onProc, not via generic damage multiplier
+        return false;
+    }
+
+    @Override
     public void shutdown() {
         playersOnCooldown.clear();
         activePlayers.clear();

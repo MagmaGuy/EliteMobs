@@ -4,7 +4,6 @@ import com.magmaguy.elitemobs.mobconstructor.custombosses.InstancedBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.magmacore.config.CustomConfig;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -26,7 +25,7 @@ public class CustomBossesConfig extends CustomConfig {
                 //Instanced regional bosses don't actually get initialized alongside normal Regional Bosses
                 if (customBossesConfigFields.isInstanced()) {
                     //Initialize the regional bosses in the world
-                    List<String> locations = customBossesConfigFields.processStringList("spawnLocations", new ArrayList<>(), new ArrayList<>(), false);
+                    List<String> locations = customBossesConfigFields.processStringList("spawnLocations", customBossesConfigFields.getSpawnLocations(), customBossesConfigFields.getSpawnLocations(), false);
 //                    if (locations.isEmpty() && !customBossesConfigFields.isRemoveAfterDeath())
 //                        Logger.info(customBossesConfigFields.getFilename() + " does not have a set location yet! It will not spawn. Did you install its minidungeon?");
                     for (String string : locations)
@@ -38,7 +37,7 @@ public class CustomBossesConfig extends CustomConfig {
                 //Reinforcement elites are only temporary and situational, don't initialize them
                 if (!customBossesConfigFields.isReinforcement()) {
                     //Initialize the regional bosses in the world
-                    List<String> locations = customBossesConfigFields.processStringList("spawnLocations", new ArrayList<>(), new ArrayList<>(), false);
+                    List<String> locations = customBossesConfigFields.processStringList("spawnLocations", customBossesConfigFields.getSpawnLocations(), customBossesConfigFields.getSpawnLocations(), false);
 //                    if (locations.isEmpty() && !customBossesConfigFields.isRemoveAfterDeath())
 //                        Logger.info(customBossesConfigFields.getFilename() + " does not have a set location yet! It will not spawn. Did you install its minidungeon?");
                     for (String string : locations)

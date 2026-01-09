@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.skills.bonuses.skills.swords;
 
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
-import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import org.bukkit.entity.Player;
 
@@ -86,6 +85,11 @@ public class PoiseSkill extends SkillBonus {
     @Override
     public String getFormattedBonus(int skillLevel) {
         return String.format("-%.1f%% Knockback", getKnockbackReduction(skillLevel) * 100);
+    }
+
+    @Override
+    public boolean affectsDamage() {
+        return false; // Knockback reduction skill doesn't affect damage
     }
 
     @Override
