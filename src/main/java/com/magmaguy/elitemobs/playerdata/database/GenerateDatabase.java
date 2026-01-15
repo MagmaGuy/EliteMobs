@@ -35,7 +35,8 @@ public class GenerateDatabase {
                 "SkillXP_CROSSBOWS BIGINT, " +
                 "SkillXP_TRIDENTS BIGINT, " +
                 "SkillXP_HOES BIGINT, " +
-                "SkillBonusSelections BLOB" +
+                "SkillBonusSelections BLOB, " +
+                "GamblingDebt DOUBLE" +
                 ");";
         statement.executeUpdate(sql);
         statement.close();
@@ -66,6 +67,9 @@ public class GenerateDatabase {
 
         // Skill bonus selections (JSON)
         addEntryIfEmpty("SkillBonusSelections", ColumnValues.BLOB);
+
+        // Gambling debt
+        addEntryIfEmpty("GamblingDebt", ColumnValues.REAL);
     }
 
     private static void addEntryIfEmpty(String columnName, ColumnValues columnValues) {

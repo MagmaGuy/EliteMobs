@@ -6,7 +6,10 @@ import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.magmacore.util.Logger;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -152,22 +155,38 @@ public class SkillXPHandler implements Listener {
     }
 
     /**
-     * Notifies a player that they leveled up a skill.
-     * Note: Sound and particle effects are handled by SkillXPBar.
+     * Notifies a player that they leveled up a skill with full effects.
+     * <p>
+     * Effects include:
+     * - Title display showing the level up
+     * - Level-up sound effect
+     * - Particle burst around the player
+     * - Server-wide announcement
      */
     private void notifyLevelUp(Player player, SkillType skillType, int newLevel) {
-        // Send level up message
-        String message = "&a&lSKILL UP! &r&a" + skillType.getDisplayName() + " &7is now level &e" + newLevel;
-        player.sendMessage(message.replace("&", "\u00A7"));
+        // Title display for every level up
+        player.sendTitle(
+                "\u00A76\u00A7lLEVEL UP!",
+                "\u00A7e" + skillType.getDisplayName() + " \u00A77\u2192 \u00A7aLevel " + newLevel,
+                10, 70, 20
+        );
 
-        // Show title for milestone levels (every 10 levels)
-        if (newLevel % 10 == 0) {
-            player.sendTitle(
-                    "\u00A7a\u00A7l" + skillType.getDisplayName() + " Level " + newLevel,
-                    "\u00A77Congratulations!",
-                    10, 70, 20
-            );
-        }
+        // Play level-up sound
+        player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1.0f, 1.0f);
+
+        // Spawn celebratory particles
+        player.getWorld().spawnParticle(
+                Particle.TOTEM_OF_UNDYING,
+                player.getLocation().add(0, 1, 0),
+                50,  // count
+                0.5, 1.0, 0.5,  // offset x, y, z
+                0.1  // speed
+        );
+
+        // Server-wide announcement
+        String announcement = "\u00A76" + player.getName() + " \u00A77reached \u00A7e" +
+                skillType.getDisplayName() + " \u00A77level \u00A7a" + newLevel + "\u00A77!";
+        Bukkit.broadcastMessage(announcement);
 
         // Update combat level display
         CombatLevelDisplay.updateDisplay(player);

@@ -20,10 +20,7 @@ import com.magmaguy.elitemobs.initialsetup.FirstTimeSetup;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.instanced.arena.ArenaInstance;
 import com.magmaguy.elitemobs.instanced.dungeons.DungeonKillTargetObjective;
-import com.magmaguy.elitemobs.items.DefaultDropsHandler;
-import com.magmaguy.elitemobs.items.LootTables;
-import com.magmaguy.elitemobs.items.PlaceEventPrevent;
-import com.magmaguy.elitemobs.items.RareDropEffect;
+import com.magmaguy.elitemobs.items.*;
 import com.magmaguy.elitemobs.items.customenchantments.*;
 import com.magmaguy.elitemobs.items.potioneffects.PlayerPotionEffects;
 import com.magmaguy.elitemobs.menus.*;
@@ -135,6 +132,7 @@ public class EventsRegistrer {
 
         //Mob loot
         register(new DefaultDropsHandler());
+        register(new ItemLootShower.ItemLootShowerEvents());
 
         //potion effects - also initializes the task
         register(new PlayerPotionEffects());
@@ -276,6 +274,15 @@ public class EventsRegistrer {
         register(new RepairMenu.RepairMenuEvents());
         register(new UnbindMenu.UnbinderMenuEvents());
         register(new ItemEnchantmentMenu.ItemEnchantMenuEvents());
+        register(new ArrowShopMenu.ArrowShopMenuEvents());
+
+        //Gambling menus
+        register(new com.magmaguy.elitemobs.menus.gambling.BettingMenu.BettingMenuEvents());
+        register(new com.magmaguy.elitemobs.menus.gambling.BlackjackGame.BlackjackMenuEvents());
+        register(new com.magmaguy.elitemobs.menus.gambling.CoinFlipGame.CoinFlipMenuEvents());
+        register(new com.magmaguy.elitemobs.menus.gambling.HigherLowerGame.HigherLowerMenuEvents());
+        register(new com.magmaguy.elitemobs.menus.gambling.SlotMachineGame.SlotMachineMenuEvents());
+        register(new com.magmaguy.elitemobs.gambling.DebtCollectorManager());
 
         //loot menu
         register(new LootMenu.LootMenuEvents());

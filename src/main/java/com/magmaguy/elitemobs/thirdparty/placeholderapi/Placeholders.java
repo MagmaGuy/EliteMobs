@@ -4,6 +4,8 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.skills.CombatLevelCalculator;
+import com.magmaguy.elitemobs.skills.SkillType;
+import com.magmaguy.elitemobs.skills.SkillXPCalculator;
 import com.magmaguy.magmacore.util.Round;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.Bukkit;
@@ -73,6 +75,28 @@ public class Placeholders extends PlaceholderExpansion {
     }
 
     /**
+     * Converts a number to tiny text Roman numerals.
+     * Uses small caps Unicode characters: ɪ ᴠ x ʟ ᴄ ᴅ ᴍ
+     *
+     * @param num The number to convert (1-3999)
+     * @return The tiny Roman numeral string
+     */
+    private static String toTinyRoman(int num) {
+        if (num <= 0 || num > 3999) return String.valueOf(num);
+
+        // Tiny text Roman numeral characters
+        String[] thousands = {"", "ᴍ", "ᴍᴍ", "ᴍᴍᴍ"};
+        String[] hundreds = {"", "ᴄ", "ᴄᴄ", "ᴄᴄᴄ", "ᴄᴅ", "ᴅ", "ᴅᴄ", "ᴅᴄᴄ", "ᴅᴄᴄᴄ", "ᴄᴍ"};
+        String[] tens = {"", "x", "xx", "xxx", "xʟ", "ʟ", "ʟx", "ʟxx", "ʟxxx", "xᴄ"};
+        String[] ones = {"", "ɪ", "ɪɪ", "ɪɪɪ", "ɪᴠ", "ᴠ", "ᴠɪ", "ᴠɪɪ", "ᴠɪɪɪ", "ɪx"};
+
+        return thousands[num / 1000] +
+                hundreds[(num % 1000) / 100] +
+                tens[(num % 100) / 10] +
+                ones[num % 10];
+    }
+
+    /**
      * This is the method called when a placeholder with our identifier
      * is found and needs a value.
      * <br>We specify the value identifier in this method.
@@ -104,6 +128,8 @@ public class Placeholders extends PlaceholderExpansion {
             case "player_combat_tier":
             case "player_combat_level":
                 return "" + CombatLevelCalculator.calculateCombatLevel(player.getUniqueId());
+            case "player_combat_level_roman":
+                return toTinyRoman(CombatLevelCalculator.calculateCombatLevel(player.getUniqueId()));
             case "player_money":
                 return "" + Round.twoDecimalPlaces(EconomyHandler.checkCurrency(player.getUniqueId()));
             case "player_top_tier":
@@ -119,6 +145,30 @@ public class Placeholders extends PlaceholderExpansion {
                 return "" + PlayerData.getKills(player.getUniqueId());
             case "player_deaths":
                 return "" + PlayerData.getDeaths(player.getUniqueId());
+
+            // Skill level placeholders
+            case "player_swords_level":
+                return "" + SkillXPCalculator.levelFromTotalXP(
+                        PlayerData.getSkillXP(player.getUniqueId(), SkillType.SWORDS));
+            case "player_axes_level":
+                return "" + SkillXPCalculator.levelFromTotalXP(
+                        PlayerData.getSkillXP(player.getUniqueId(), SkillType.AXES));
+            case "player_bows_level":
+                return "" + SkillXPCalculator.levelFromTotalXP(
+                        PlayerData.getSkillXP(player.getUniqueId(), SkillType.BOWS));
+            case "player_crossbows_level":
+                return "" + SkillXPCalculator.levelFromTotalXP(
+                        PlayerData.getSkillXP(player.getUniqueId(), SkillType.CROSSBOWS));
+            case "player_tridents_level":
+                return "" + SkillXPCalculator.levelFromTotalXP(
+                        PlayerData.getSkillXP(player.getUniqueId(), SkillType.TRIDENTS));
+            case "player_hoes_level":
+                return "" + SkillXPCalculator.levelFromTotalXP(
+                        PlayerData.getSkillXP(player.getUniqueId(), SkillType.HOES));
+            case "player_armor_level":
+                return "" + SkillXPCalculator.levelFromTotalXP(
+                        PlayerData.getSkillXP(player.getUniqueId(), SkillType.ARMOR));
+
             // Guild rank placeholders removed - they will return null which PAPI handles gracefully
             case "player_active_guild_rank_numerical":
             case "player_maximum_guild_rank_numerical":

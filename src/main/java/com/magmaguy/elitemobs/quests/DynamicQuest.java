@@ -5,10 +5,10 @@ import com.magmaguy.elitemobs.config.QuestsConfig;
 import com.magmaguy.elitemobs.config.menus.premade.DynamicQuestMenuConfig;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
-import com.magmaguy.elitemobs.skills.CombatLevelCalculator;
 import com.magmaguy.elitemobs.quests.objectives.DynamicKillObjective;
 import com.magmaguy.elitemobs.quests.objectives.QuestObjectives;
 import com.magmaguy.elitemobs.quests.rewards.QuestReward;
+import com.magmaguy.elitemobs.skills.CombatLevelCalculator;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -93,6 +93,47 @@ public class DynamicQuest extends Quest {
         }
 
         return dynamicQuests;
+    }
+
+    /**
+     * Adapts all active DynamicQuests for a player to a new mob level.
+     * Called when a player enters a dynamic dungeon with a specific level selection.
+     *
+     * @param player The player whose quests should be adapted
+     * @param newMobLevel The new mob level from the dynamic dungeon
+     */
+    public static void adaptPlayerQuestsToLevel(Player player, int newMobLevel) {
+        if (PlayerData.getQuests(player.getUniqueId()) == null) return;
+
+        for (Quest quest : PlayerData.getQuests(player.getUniqueId())) {
+            if (quest instanceof DynamicQuest dynamicQuest) {
+                dynamicQuest.adaptToLevel(newMobLevel);
+            }
+        }
+    }
+
+    /**
+     * Adapts this quest to a new mob level.
+     * Updates the quest level, objectives' minMobLevel, and quest name.
+     *
+     * @param newMobLevel The new mob level from the dynamic dungeon
+     */
+    public void adaptToLevel(int newMobLevel) {
+        // Convert mob level to quest level (mob level 10 = quest level 1, etc.)
+        int newQuestLevel = newMobLevel / 10;
+        setQuestLevel(newQuestLevel);
+
+        // Adapt objectives
+        getQuestObjectives().adaptToLevel(newMobLevel);
+
+        // Update quest name to reflect new level
+        if (!getQuestObjectives().getObjectives().isEmpty() &&
+                getQuestObjectives().getObjectives().get(0) instanceof DynamicKillObjective dynamicKillObjective) {
+            this.questName = DynamicQuestMenuConfig.getQuestName()
+                    .replace("$amount", dynamicKillObjective.getTargetAmount() + "")
+                    .replace("$name", ChatColor.stripColor(
+                            EliteMobProperties.getPluginData(dynamicKillObjective.getEntityType()).getName(newMobLevel)));
+        }
     }
 
 }

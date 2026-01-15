@@ -25,6 +25,7 @@ import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
 import com.magmaguy.elitemobs.config.potioneffects.PotionEffectsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
+import com.magmaguy.elitemobs.config.skillbonuses.SkillBonusesConfig;
 import com.magmaguy.elitemobs.config.wormholes.WormholeConfig;
 import com.magmaguy.elitemobs.dungeons.DungeonProtector;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
@@ -77,14 +78,13 @@ import com.magmaguy.elitemobs.powerstances.MajorPowerStanceMath;
 import com.magmaguy.elitemobs.powerstances.MinorPowerStanceMath;
 import com.magmaguy.elitemobs.quests.DynamicQuest;
 import com.magmaguy.elitemobs.quests.Quest;
+import com.magmaguy.elitemobs.quests.QuestTracking;
+import com.magmaguy.elitemobs.quests.menus.QuestInventoryMenu;
+import com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldowns;
 import com.magmaguy.elitemobs.skills.CombatLevelDisplay;
 import com.magmaguy.elitemobs.skills.SkillSystemMigration;
 import com.magmaguy.elitemobs.skills.SkillXPBar;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusInitializer;
-import com.magmaguy.elitemobs.config.skillbonuses.SkillBonusesConfig;
-import com.magmaguy.elitemobs.quests.QuestTracking;
-import com.magmaguy.elitemobs.quests.menus.QuestInventoryMenu;
-import com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldowns;
 import com.magmaguy.elitemobs.thirdparty.bstats.CustomCharts;
 import com.magmaguy.elitemobs.thirdparty.custommodels.CustomModel;
 import com.magmaguy.elitemobs.thirdparty.custommodels.modelengine.ModelEngineReservedAddresses;
@@ -148,6 +148,7 @@ public class EliteMobs extends JavaPlugin {
         //ModelsConfig.initializeConfig();
         new DungeonsConfig();
         new SoundsConfig();
+        new com.magmaguy.elitemobs.config.GamblingConfig();
     }
 
     public static void worldScanner() {
@@ -228,6 +229,11 @@ public class EliteMobs extends JavaPlugin {
         new SkillBonusesConfig();
         SkillBonusInitializer.initialize();
         CombatLevelDisplay.initialize();
+
+        //Initialize gambling system
+        com.magmaguy.elitemobs.economy.GamblingEconomyHandler.initialize();
+        com.magmaguy.elitemobs.gambling.DebtCollectorManager.initialize();
+        com.magmaguy.elitemobs.gambling.GamblingDenOwnerDisplay.initialize();
 
         //Get world list
         worldScanner();
@@ -425,6 +431,15 @@ public class EliteMobs extends JavaPlugin {
         RepairMenu.shutdown();
         ScrapperMenu.shutdown();
         UnbindMenu.shutdown();
+        // Gambling menu shutdowns
+        com.magmaguy.elitemobs.menus.gambling.BettingMenu.shutdown();
+        com.magmaguy.elitemobs.menus.gambling.BlackjackGame.shutdown();
+        com.magmaguy.elitemobs.menus.gambling.CoinFlipGame.shutdown();
+        com.magmaguy.elitemobs.menus.gambling.HigherLowerGame.shutdown();
+        com.magmaguy.elitemobs.menus.gambling.SlotMachineGame.shutdown();
+        com.magmaguy.elitemobs.gambling.DebtCollectorManager.shutdown();
+        com.magmaguy.elitemobs.gambling.GamblingDenOwnerDisplay.shutdown();
+        com.magmaguy.elitemobs.economy.GamblingEconomyHandler.shutdown();
         DynamicDungeonBrowser.shutdown();
         InstancedDungeonBrowser.shutdown();
         PlasmaBootsEnchantment.PlasmaBootsEnchantmentEvents.shutdown();
