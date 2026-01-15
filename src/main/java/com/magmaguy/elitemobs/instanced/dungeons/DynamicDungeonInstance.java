@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields
 import com.magmaguy.elitemobs.dungeons.utility.DungeonUtils;
 import com.magmaguy.elitemobs.instanced.WorldOperationQueue;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.InstancedBossEntity;
+import com.magmaguy.elitemobs.quests.DynamicQuest;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.WorldInstantiator;
 import lombok.Getter;
@@ -84,6 +85,10 @@ public class DynamicDungeonInstance extends DungeonInstance {
         if (!super.addNewPlayer(player)) return false;
         // Show additional info about the selected level for dynamic dungeons
         player.sendMessage("[EliteMobs] Dynamic dungeon level set to " + selectedLevel + "!");
+
+        // Adapt player's active DynamicQuests to the dungeon's selected level
+        DynamicQuest.adaptPlayerQuestsToLevel(player, selectedLevel);
+
         return true;
     }
 

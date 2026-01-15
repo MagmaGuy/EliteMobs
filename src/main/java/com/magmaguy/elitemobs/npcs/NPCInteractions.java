@@ -1,10 +1,10 @@
 package com.magmaguy.elitemobs.npcs;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.menus.SkillBonusMenu;
 import com.magmaguy.elitemobs.api.PlayerPreTeleportEvent;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.menus.*;
+import com.magmaguy.elitemobs.menus.gambling.BettingMenu;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.QuestInteractionHandler;
 import com.magmaguy.magmacore.util.ChatColorConverter;
@@ -201,6 +201,51 @@ public class NPCInteractions implements Listener {
                         }
                     }.runTaskLater(MetadataHandler.PLUGIN, 1);
                 break;
+            case ARROW_SHOP:
+                if (event.getPlayer().hasPermission("elitemobs.shop.arrow.npc"))
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            ArrowShopMenu.openArrowShop(event.getPlayer());
+                        }
+                    }.runTaskLater(MetadataHandler.PLUGIN, 1);
+                break;
+            case GAMBLING_BLACKJACK:
+                if (event.getPlayer().hasPermission("elitemobs.gambling.npc"))
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            BettingMenu.openBettingMenu(event.getPlayer(), BettingMenu.GameType.BLACKJACK);
+                        }
+                    }.runTaskLater(MetadataHandler.PLUGIN, 1);
+                break;
+            case GAMBLING_COINFLIP:
+                if (event.getPlayer().hasPermission("elitemobs.gambling.npc"))
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            BettingMenu.openBettingMenu(event.getPlayer(), BettingMenu.GameType.COIN_FLIP);
+                        }
+                    }.runTaskLater(MetadataHandler.PLUGIN, 1);
+                break;
+            case GAMBLING_SLOTS:
+                if (event.getPlayer().hasPermission("elitemobs.gambling.npc"))
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            BettingMenu.openBettingMenu(event.getPlayer(), BettingMenu.GameType.SLOTS);
+                        }
+                    }.runTaskLater(MetadataHandler.PLUGIN, 1);
+                break;
+            case GAMBLING_HIGHERLOWER:
+                if (event.getPlayer().hasPermission("elitemobs.gambling.npc"))
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            BettingMenu.openBettingMenu(event.getPlayer(), BettingMenu.GameType.HIGHER_LOWER);
+                        }
+                    }.runTaskLater(MetadataHandler.PLUGIN, 1);
+                break;
         }
 
     }
@@ -239,7 +284,12 @@ public class NPCInteractions implements Listener {
         ARENA_MASTER,
         COMMAND,
         ENCHANTER,
-        SCROLL_APPLIER
+        SCROLL_APPLIER,
+        ARROW_SHOP,
+        GAMBLING_BLACKJACK,
+        GAMBLING_COINFLIP,
+        GAMBLING_SLOTS,
+        GAMBLING_HIGHERLOWER
     }
 
 

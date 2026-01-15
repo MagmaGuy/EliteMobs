@@ -22,6 +22,18 @@ public class MaterialGenerator {
 
     }
 
+    /**
+     * Generates a random material from all valid procedural materials, ignoring tier restrictions.
+     * Used by the skill-based shop system to first pick a material, then determine level based on player's skill.
+     *
+     * @return A random valid material, or null if none available
+     */
+    public static Material generateRandomMaterial() {
+        if (validProceduralMaterials.isEmpty()) initializeValidProceduralMaterials();
+        if (validProceduralMaterials.isEmpty()) return null;
+        return validProceduralMaterials.get(ThreadLocalRandom.current().nextInt(validProceduralMaterials.size()));
+    }
+
     public static Material generateMaterial(double itemTier) {
 
         List<Material> localValidMaterials = (List<Material>) validProceduralMaterials.clone();
@@ -85,6 +97,9 @@ public class MaterialGenerator {
             localValidMaterials.remove(GOLDEN_SHOVEL);
             localValidMaterials.remove(GOLDEN_PICKAXE);
             localValidMaterials.remove(GOLDEN_AXE);
+            localValidMaterials.remove(WOODEN_SWORD);
+            localValidMaterials.remove(WOODEN_AXE);
+            localValidMaterials.remove(WOODEN_HOE);
         }
 
         if (localValidMaterials.isEmpty()) return null;

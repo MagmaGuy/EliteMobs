@@ -133,6 +133,8 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
     public void remove(RemovalReason removalReason) {
         if (roleDisplay != null)
             roleDisplay.remove();
+        // Remove house earnings display if this is the gambling den owner
+        com.magmaguy.elitemobs.gambling.GamblingDenOwnerDisplay.removeDisplay(uuid);
         if (villager != null) {
             villager.remove();
             EntityTracker.getNpcEntities().remove(villager.getUniqueId());
@@ -187,6 +189,8 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
         EntityTracker.registerNPCEntity(this);
         initializeRole();
         setTimeout();
+        // Create house earnings display if this is the gambling den owner
+        com.magmaguy.elitemobs.gambling.GamblingDenOwnerDisplay.createDisplay(this);
     }
 
     private void setDisguise(LivingEntity livingEntity) {
