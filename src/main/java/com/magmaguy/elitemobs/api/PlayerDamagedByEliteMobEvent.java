@@ -1,12 +1,11 @@
 package com.magmaguy.elitemobs.api;
 
 import com.magmaguy.elitemobs.collateralminecraftchanges.PlayerDeathMessageByEliteMob;
-import com.magmaguy.elitemobs.combatsystem.CombatSystem;
+import com.magmaguy.elitemobs.combatsystem.LevelScaling;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
-import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.skills.SkillType;
@@ -193,75 +192,116 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
         @Setter
         private static double specialMultiplier = 1;
 
+        /**
+         * Calculates boss damage to player using armor-skill-based scaling.
+         * <p>
+         * The goal is for properly geared players to survive ~5 normal hits from
+         * same-level content, and ~2 hits from content 10 levels above them.
+         * This scales with player's armor skill level since that determines their
+         * max health (via ArmorSkillHealthBonus).
+         * <p>
+         * Formula:
+         * 1. Player max health = 20 + (armorLevel - 1) * 2
+         * 2. Target damage per hit = playerMaxHealth / TARGET_HITS_TO_KILL_PLAYER
+         * 3. Raw damage = targetDamage / EXPECTED_GEAR_DAMAGE_MULTIPLIER (pre-compensate for gear reduction)
+         * 4. Level modifier = 2^((mobLevel - armorLevel) / LEVELS_PER_BOSS_DAMAGE_DOUBLE)
+         * 5. Final damage = rawDamage * levelModifier * otherMultipliers
+         * <p>
+         * Expected outcomes with full gear/skills:
+         * <ul>
+         *   <li>Same level: ~5 hits to kill</li>
+         *   <li>+5 levels: ~3 hits to kill</li>
+         *   <li>+10 levels: ~2 hits to kill</li>
+         * </ul>
+         */
         private static double eliteToPlayerDamageFormula(Player player, EliteEntity eliteEntity, EntityDamageByEntityEvent event) {
-            double baseDamage = EliteMobProperties.getBaselineDamage(eliteEntity.getLivingEntity().getType(), eliteEntity);
-            //Case for creeper and ghast explosions
-            if (eliteEntity.getLivingEntity() != null && player.isValid() && player.getLocation().getWorld().equals(eliteEntity.getLivingEntity().getWorld()))
-                if (eliteEntity.getLivingEntity().getType().equals(EntityType.CREEPER)) {
-                    Creeper creeper = (Creeper) eliteEntity.getLivingEntity();
-                    double distance = player.getLocation().distance(eliteEntity.getLivingEntity().getLocation());
-                    double distanceAttenuation = 1 - distance / creeper.getExplosionRadius();
-                    distanceAttenuation = distanceAttenuation < 0 ? 0 : distanceAttenuation;
-                    baseDamage *= distanceAttenuation;
-                } else if (eliteEntity.getLivingEntity().getType().equals(EntityType.GHAST) &&
-                        event.getDamager().getType().equals(EntityType.FIREBALL)) {
-                    double distance = player.getLocation().distance(eliteEntity.getLivingEntity().getLocation());
-                    double distanceAttenuation = 1 - distance / ((Fireball) event.getDamager()).getYield();
-                    distanceAttenuation = distanceAttenuation < 0 ? 0 : distanceAttenuation;
-                    baseDamage *= distanceAttenuation;
-                }
-            double bonusDamage = eliteEntity.getLevel() * .5; //A .5 increase in damage for every level the mob has
-
             ElitePlayerInventory elitePlayerInventory = ElitePlayerInventory.getPlayer(player);
             if (elitePlayerInventory == null) return 0;
 
-            // Get item's elite defense (represents item level contribution)
-            double itemEliteDefense = elitePlayerInventory.getEliteDefense(true);
-
-            // Get player's armor skill level
+            // Get player's armor skill level (determines their max health and defensive scaling)
             long armorSkillXP = PlayerData.getSkillXP(player.getUniqueId(), SkillType.ARMOR);
-            int armorSkillLevel = SkillXPCalculator.levelFromTotalXP(armorSkillXP);
+            int armorSkillLevel = Math.max(1, SkillXPCalculator.levelFromTotalXP(armorSkillXP));
 
-            // Calculate skill defense contribution (similar formula to item defense)
-            // Each armor skill level provides 0.25 defense (1/4 because there are 4 armor pieces)
-            double skillDefense = armorSkillLevel * 0.25;
+            // Calculate player's max health from armor skill level
+            // This matches the ArmorSkillHealthBonus formula: 20 base + (level - 1) * 2
+            double playerMaxHealth = 20.0 + Math.max(0, armorSkillLevel - 1) * 2.0;
 
-            // Apply 50/50 split for damage reduction
-            // The 0.5 multiplier on defense is kept for balance (mobs gain 0.5 damage per level)
-            double effectiveDefense = ((skillDefense * CombatSystem.SKILL_CONTRIBUTION_RATIO)
-                    + (itemEliteDefense * CombatSystem.ITEM_CONTRIBUTION_RATIO)) * 0.5;
+            // Calculate target damage per hit (what we want player to RECEIVE after all reductions)
+            double targetDamagePerHit = playerMaxHealth / LevelScaling.TARGET_HITS_TO_KILL_PLAYER;
 
-            double damageReduction = effectiveDefense;
-            if (event.getDamager() instanceof AbstractArrow)
-                damageReduction += elitePlayerInventory.getEliteProjectileProtection(true);
-            if (event.getDamager() instanceof Fireball || event.getDamager() instanceof Creeper) {
-                damageReduction += elitePlayerInventory.getEliteBlastProtection(true);
+            // Pre-compensate for expected gear and skill damage reductions
+            // Armor provides ~50% reduction, defense skills provide ~50% reduction
+            // Combined: player receives 25% of raw damage, so we multiply by 4 to compensate
+            double baseDamagePerHit = targetDamagePerHit / LevelScaling.EXPECTED_GEAR_DAMAGE_MULTIPLIER;
+
+            // Apply level scaling based on mob level vs player armor level
+            // Uses separate scaling constant for boss damage (softer than player damage scaling)
+            // +10 levels = ~2.5x damage, resulting in ~2 hits to kill
+            int mobLevel = eliteEntity.getLevel();
+            double levelModifier = Math.pow(LevelScaling.SCALING_BASE,
+                    (mobLevel - armorSkillLevel) / LevelScaling.LEVELS_PER_BOSS_DAMAGE_DOUBLE);
+
+            // Clamp the modifier to prevent extreme cases
+            levelModifier = LevelScaling.clampModifier(levelModifier);
+
+            // Calculate level-scaled base damage
+            double scaledDamage = baseDamagePerHit * levelModifier;
+
+            // Apply distance attenuation for explosions (creeper, ghast)
+            if (eliteEntity.getLivingEntity() != null && player.isValid() &&
+                    player.getLocation().getWorld().equals(eliteEntity.getLivingEntity().getWorld())) {
+                if (eliteEntity.getLivingEntity().getType().equals(EntityType.CREEPER)) {
+                    Creeper creeper = (Creeper) eliteEntity.getLivingEntity();
+                    double distance = player.getLocation().distance(eliteEntity.getLivingEntity().getLocation());
+                    double distanceAttenuation = Math.max(0, 1 - distance / creeper.getExplosionRadius());
+                    scaledDamage *= distanceAttenuation;
+                } else if (eliteEntity.getLivingEntity().getType().equals(EntityType.GHAST) &&
+                        event.getDamager().getType().equals(EntityType.FIREBALL)) {
+                    double distance = player.getLocation().distance(eliteEntity.getLivingEntity().getLocation());
+                    double distanceAttenuation = Math.max(0, 1 - distance / ((Fireball) event.getDamager()).getYield());
+                    scaledDamage *= distanceAttenuation;
+                }
             }
 
+            // Apply protection enchantments as flat damage reduction
+            double damageReduction = 0;
+            if (event.getDamager() instanceof AbstractArrow)
+                damageReduction += elitePlayerInventory.getEliteProjectileProtection(true);
+            if (event.getDamager() instanceof Fireball || event.getDamager() instanceof Creeper)
+                damageReduction += elitePlayerInventory.getEliteBlastProtection(true);
+
+            // Apply resistance potion effect (percentage-based)
+            double potionMultiplier = 1.0;
+            if (player.hasPotionEffect(PotionEffectType.RESISTANCE)) {
+                int amplifier = player.getPotionEffect(PotionEffectType.RESISTANCE).getAmplifier();
+                potionMultiplier = 1.0 - ((amplifier + 1) * MobCombatSettingsConfig.getResistanceDamageMultiplier());
+                potionMultiplier = Math.max(0, potionMultiplier);
+            }
+
+            // Apply boss damage multiplier (for custom bosses with increased damage)
             double customBossDamageMultiplier = eliteEntity.getDamageMultiplier();
-            double potionEffectDamageReduction = 0;
 
-            if (player.hasPotionEffect(PotionEffectType.RESISTANCE))
-                potionEffectDamageReduction = (player.getPotionEffect(PotionEffectType.RESISTANCE).
-                        getAmplifier() + 1) * MobCombatSettingsConfig.getResistanceDamageMultiplier();
-
-            double finalDamage;
+            // Apply config multipliers
+            double configMultiplier;
             if (eliteEntity instanceof CustomBossEntity customBossEntity && customBossEntity.isNormalizedCombat())
-                finalDamage = Math.max(baseDamage + bonusDamage - damageReduction - potionEffectDamageReduction, 1) *
-                        customBossDamageMultiplier * specialMultiplier * MobCombatSettingsConfig.getNormalizedDamageToPlayerMultiplier();
+                configMultiplier = MobCombatSettingsConfig.getNormalizedDamageToPlayerMultiplier();
             else
-                finalDamage = Math.max(baseDamage + bonusDamage - damageReduction - potionEffectDamageReduction, 1) *
-                        customBossDamageMultiplier * specialMultiplier * MobCombatSettingsConfig.getDamageToPlayerMultiplier();
+                configMultiplier = MobCombatSettingsConfig.getDamageToPlayerMultiplier();
 
-            // Level scaling is now built into mob HP (exponential scaling)
-            // rather than modifying damage. Mob damage is based on their level directly.
+            // Calculate final damage
+            double finalDamage = Math.max(scaledDamage - damageReduction, 1)
+                    * potionMultiplier
+                    * customBossDamageMultiplier
+                    * specialMultiplier
+                    * configMultiplier;
 
             if (specialMultiplier != 1) specialMultiplier = 1;
 
-            double playerMaxHealth = AttributeManager.getAttributeBaseValue(player,"generic_max_health");
+            // Get actual max health (may differ from calculated due to other effects)
+            double actualMaxHealth = AttributeManager.getAttributeBaseValue(player, "generic_max_health");
 
-            //Prevent 1-shots
-            finalDamage = Math.min(finalDamage, playerMaxHealth - 1);
+            // Prevent 1-shots
+            finalDamage = Math.min(finalDamage, actualMaxHealth - 1);
 
             return finalDamage;
         }

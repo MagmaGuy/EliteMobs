@@ -89,7 +89,7 @@ public class ProceduralItemGenerationSettingsConfig extends ConfigurationFile {
 
         addMaterial(Material.DIAMOND_SWORD);
         addMaterial(Material.DIAMOND_AXE);
-
+        addMaterial(Material.DIAMOND_HOE);
 
         addMaterial(Material.IRON_HELMET);
         addMaterial(Material.IRON_CHESTPLATE);
@@ -98,7 +98,7 @@ public class ProceduralItemGenerationSettingsConfig extends ConfigurationFile {
 
         addMaterial(Material.IRON_SWORD);
         addMaterial(Material.IRON_AXE);
-
+        addMaterial(Material.IRON_HOE);
 
         addMaterial(Material.GOLDEN_HELMET);
         addMaterial(Material.GOLDEN_CHESTPLATE);
@@ -107,7 +107,7 @@ public class ProceduralItemGenerationSettingsConfig extends ConfigurationFile {
 
         addMaterial(Material.GOLDEN_SWORD);
         addMaterial(Material.GOLDEN_AXE);
-
+        addMaterial(Material.GOLDEN_HOE);
 
         addMaterial(Material.CHAINMAIL_HELMET);
         addMaterial(Material.CHAINMAIL_CHESTPLATE);
@@ -123,11 +123,11 @@ public class ProceduralItemGenerationSettingsConfig extends ConfigurationFile {
 
         addMaterial(Material.STONE_SWORD);
         addMaterial(Material.STONE_AXE);
-
+        addMaterial(Material.STONE_HOE);
 
         addMaterial(Material.WOODEN_SWORD);
         addMaterial(Material.WOODEN_AXE);
-
+        addMaterial(Material.WOODEN_HOE);
 
         addMaterial(Material.SHIELD);
         addMaterial(Material.TURTLE_HELMET);

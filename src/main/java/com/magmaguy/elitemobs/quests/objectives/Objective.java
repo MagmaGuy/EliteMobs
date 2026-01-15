@@ -23,6 +23,7 @@ public abstract class Objective implements Serializable {
     protected int targetAmount;
 
     @Getter
+    @Setter
     protected String objectiveName;
 
     public Objective(int targetAmount, String objectiveName) {

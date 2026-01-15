@@ -160,6 +160,60 @@ public class LevelScaling {
      */
     public static final double BASE_PLAYER_DPS = 0.73;
 
+    /**
+     * Target number of hits for a player to die when fighting same-level content
+     * with full appropriate gear and defensive skills.
+     * <p>
+     * This constant is used in boss damage scaling to ensure consistent difficulty.
+     * At any level, a properly geared player should survive approximately this many
+     * normal hits from same-level elite mobs.
+     */
+    public static final double TARGET_HITS_TO_KILL_PLAYER = 5.0;
+
+    /**
+     * Target number of hits for a player to die when fighting content 10 levels above them.
+     * <p>
+     * Used to calculate the boss damage level scaling exponent.
+     * With values of 5 hits at same level and 2 hits at +10, the scaling
+     * feels challenging but not impossible for skilled players.
+     */
+    public static final double TARGET_HITS_AT_PLUS_10 = 2.0;
+
+    /**
+     * Expected damage multiplier from gear and defensive skills at same level.
+     * <p>
+     * When a player has appropriate armor and defensive skill level:
+     * <ul>
+     *   <li>Elite armor provides ~50% damage reduction</li>
+     *   <li>Defense skill bonuses provide ~50% damage reduction</li>
+     *   <li>Combined: player receives 25% of raw damage (0.5 * 0.5 = 0.25)</li>
+     * </ul>
+     * <p>
+     * The damage formula pre-compensates for this so that AFTER reductions,
+     * players still die in TARGET_HITS_TO_KILL_PLAYER hits.
+     */
+    public static final double EXPECTED_GEAR_DAMAGE_MULTIPLIER = 0.25;
+
+    /**
+     * Levels required for boss damage to double against players.
+     * <p>
+     * This is calculated from TARGET_HITS_TO_KILL_PLAYER and TARGET_HITS_AT_PLUS_10:
+     * <ul>
+     *   <li>At same level: 5 hits to kill</li>
+     *   <li>At +10 levels: 2 hits to kill</li>
+     *   <li>Damage ratio: 5/2 = 2.5x at +10 levels</li>
+     *   <li>Formula: 2^(10/x) = 2.5 → x ≈ 7.57</li>
+     * </ul>
+     * <p>
+     * Using 7.5 for cleaner math:
+     * <ul>
+     *   <li>+5 levels: 2^(5/7.5) = ~1.6x damage (3.1 hits)</li>
+     *   <li>+10 levels: 2^(10/7.5) = ~2.5x damage (2 hits)</li>
+     *   <li>+15 levels: 2^(15/7.5) = 4x damage (1.25 hits)</li>
+     * </ul>
+     */
+    public static final double LEVELS_PER_BOSS_DAMAGE_DOUBLE = 7.5;
+
     private LevelScaling() {
         // Utility class - no instantiation
     }

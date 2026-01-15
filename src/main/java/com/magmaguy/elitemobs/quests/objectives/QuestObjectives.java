@@ -131,5 +131,18 @@ public class QuestObjectives implements Serializable {
         return strings;
     }
 
+    /**
+     * Adapts this quest's objectives to a new mob level.
+     * Used when a player enters a dynamic dungeon with a specific level selection.
+     *
+     * @param newMobLevel The new mob level from the dynamic dungeon
+     */
+    public void adaptToLevel(int newMobLevel) {
+        for (Objective objective : objectives) {
+            if (objective instanceof DynamicKillObjective dynamicKillObjective) {
+                dynamicKillObjective.adaptToLevel(newMobLevel);
+            }
+        }
+    }
 
 }

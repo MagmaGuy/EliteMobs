@@ -1,7 +1,9 @@
 package com.magmaguy.elitemobs.dungeons;
 
 import com.magmaguy.elitemobs.config.DungeonsConfig;
+import com.magmaguy.elitemobs.treasurechest.TreasureChest;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
@@ -195,6 +197,41 @@ public class DungeonProtector implements Listener {
         if (!EliteMobsWorld.isEliteMobsWorld(event.getPlayer().getWorld().getUID())) return;
         if (shouldBypass(event.getPlayer())) return;
         event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventContainerAccess(PlayerInteractEvent event) {
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getPlayer().getWorld().getUID())) return;
+        if (shouldBypass(event.getPlayer())) return;
+
+        Block block = event.getClickedBlock();
+        if (block == null) return;
+
+        Material type = block.getType();
+
+        // Check if this is a container type
+        if (type == Material.CHEST || type == Material.TRAPPED_CHEST ||
+                type == Material.BARREL || type == Material.SHULKER_BOX ||
+                type.name().endsWith("_SHULKER_BOX")) {
+
+            // Allow treasure chest interaction
+            if (TreasureChest.getTreasureChest(block.getLocation()) != null) {
+                return;
+            }
+
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventDragonEggInteraction(PlayerInteractEvent event) {
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getPlayer().getWorld().getUID())) return;
+        if (shouldBypass(event.getPlayer())) return;
+
+        Block block = event.getClickedBlock();
+        if (block != null && block.getType() == Material.DRAGON_EGG) {
+            event.setCancelled(true);
+        }
     }
 
 }

@@ -2,12 +2,12 @@ package com.magmaguy.elitemobs.playerdata.database;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.DatabaseConfig;
-import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.dungeons.DungeonBossLockout;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.Quest;
 import com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldowns;
+import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.ObjectSerializer;
 import com.magmaguy.magmacore.util.Logger;
@@ -109,6 +109,11 @@ public class PlayerData {
     @Getter
     @Setter
     private String skillBonusSelections = "{}";
+
+    // Gambling debt - tracks how much the player owes from gambling
+    @Getter
+    @Setter
+    private double gamblingDebt = 0;
 
     public PlayerData(UUID uuid) {
         Player player = Bukkit.getPlayer(uuid);
@@ -607,6 +612,68 @@ public class PlayerData {
             playerDataHashMap.get(uuid).skillBonusSelections = selections;
     }
 
+    // ==================== GAMBLING DEBT METHODS ====================
+
+    /**
+     * Gets the gambling debt for a player.
+     *
+     * @param uuid The player's UUID
+     * @return The amount of debt the player owes
+     */
+    public static double getGamblingDebt(UUID uuid) {
+        if (!isInMemory(uuid))
+            return getDatabaseDouble(uuid, "GamblingDebt");
+        PlayerData data = playerDataHashMap.get(uuid);
+        return data != null ? data.gamblingDebt : 0;
+    }
+
+    /**
+     * Sets the gambling debt for a player.
+     * Debt is clamped between 0 and the maximum allowed debt.
+     *
+     * @param uuid The player's UUID
+     * @param debt The new debt amount
+     */
+    public static void setGamblingDebt(UUID uuid, double debt) {
+        // Clamp debt to valid range (0 to max debt)
+        debt = Math.max(0, Math.min(500, debt));
+        setDatabaseValue(uuid, "GamblingDebt", debt);
+        if (playerDataHashMap.containsKey(uuid))
+            playerDataHashMap.get(uuid).gamblingDebt = debt;
+    }
+
+    /**
+     * Adds to the player's gambling debt.
+     *
+     * @param uuid   The player's UUID
+     * @param amount The amount of debt to add
+     */
+    public static void addGamblingDebt(UUID uuid, double amount) {
+        double currentDebt = getGamblingDebt(uuid);
+        setGamblingDebt(uuid, currentDebt + amount);
+    }
+
+    /**
+     * Reduces the player's gambling debt.
+     *
+     * @param uuid   The player's UUID
+     * @param amount The amount of debt to reduce
+     */
+    public static void reduceGamblingDebt(UUID uuid, double amount) {
+        double currentDebt = getGamblingDebt(uuid);
+        setGamblingDebt(uuid, currentDebt - amount);
+    }
+
+    /**
+     * Checks if the player is in gambling debt.
+     *
+     * @param uuid The player's UUID
+     * @return true if the player has gambling debt
+     */
+    public static boolean hasGamblingDebt(UUID uuid) {
+        return getGamblingDebt(uuid) > 0;
+    }
+
     private static Boolean getDatabaseBoolean(UUID uuid, String value) {
         try {
             Statement statement = getConnection().createStatement();
@@ -811,6 +878,9 @@ public class PlayerData {
         String skillSelections = resultSet.getString("SkillBonusSelections");
         skillBonusSelections = (skillSelections != null) ? skillSelections : "{}";
 
+        // Read gambling debt
+        gamblingDebt = resultSet.getDouble("GamblingDebt");
+
         Logger.info("User " + uuid + " data successfully read!");
     }
 
@@ -832,6 +902,8 @@ public class PlayerData {
         skillXP_HOES = 0;
         // Initialize skill bonus selections to empty
         skillBonusSelections = "{}";
+        // Initialize gambling debt to 0
+        gamblingDebt = 0;
         statement = getConnection().createStatement();
         String sql = "INSERT INTO " + PLAYER_DATA_TABLE_NAME + " (" +
                 "PlayerUUID," +
@@ -849,7 +921,8 @@ public class PlayerData {
                 " SkillXP_CROSSBOWS," +
                 " SkillXP_TRIDENTS," +
                 " SkillXP_HOES," +
-                " SkillBonusSelections) " +
+                " SkillBonusSelections," +
+                " GamblingDebt) " +
                 //identifier
                 "VALUES ('" + uuid + "'," +
                 //display name
@@ -869,7 +942,9 @@ public class PlayerData {
                 //skill XP values (all start at 0)
                 "0,0,0,0,0,0,0," +
                 //skill bonus selections (empty JSON)
-                "'{}');";
+                "'{}', " +
+                //gambling debt (starts at 0)
+                "0);";
         statement.executeUpdate(sql);
         statement.close();
         Logger.info("No player entry detected, generating new entry!");
