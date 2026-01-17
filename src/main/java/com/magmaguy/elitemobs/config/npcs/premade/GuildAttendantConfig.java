@@ -14,7 +14,7 @@ public class GuildAttendantConfig extends NPCsConfigFields {
                 "Gillian",
                 "<Guild Attendant>",
                 Villager.Profession.LIBRARIAN,
-                "em_adventurers_guild,283.5,91,229.5,179,0",
+                "em_adventurers_guild,288.5,91,229.5,179,0",
                 new ArrayList<>(List.of(
                         "Welcome to the\\nAdventurer's Guild!",
                         "Welcome!")),

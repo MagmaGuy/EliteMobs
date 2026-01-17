@@ -71,7 +71,7 @@ public class SellMenu extends EliteMenu implements Listener {
 
         String menuName = SellMenuConfig.shopName;
         if (DefaultConfig.useResourcePackModels())
-            menuName = ChatColor.WHITE + "\uF801\uDB80\uDC5B\uF805          " + menuName;
+            menuName = ChatColor.WHITE + "\uDB83\uDEF1\uDB83\uDE05\uDB83\uDEF5          " + menuName;
 
         Inventory sellInventory = Bukkit.createInventory(player, 54, menuName);
 

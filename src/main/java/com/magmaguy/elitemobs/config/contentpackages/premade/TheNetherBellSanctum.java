@@ -12,7 +12,7 @@ public class TheNetherBellSanctum extends ContentPackagesConfigFields {
     public TheNetherBellSanctum() {
         super("the_nether_bell_sanctum",
                 true,
-                "&2[lvl 055] &3The Nether Bell Sanctum",
+                "&3The Nether Bell Sanctum",
                 new ArrayList<>(List.of("&fVenture into the deepest part of the Nether!",
                         "&6Credits: Dali_, MagmaGuy, Frostcone")),
                 DiscordLinks.freeMinidungeons,
@@ -28,11 +28,13 @@ public class TheNetherBellSanctum extends ContentPackagesConfigFields {
                 "&bYou have left The Nether Bell!",
                 List.of("filename=em_id_the_nether_bell_boss_void_bell_p1.yml"),
                 "em_id_the_nether_bell",
-                55,
+                -1,
                 false);
+        setContentType(ContentType.DYNAMIC_DUNGEON);
         setDifficulties(List.of(
-                Map.of("name", "normal", "levelSync", 57, "id", 0),
-                Map.of("name", "hard", "levelSync", 55, "id", 1),
-                Map.of("name", "mythic", "levelSync", 53, "id", 2)));
+                Map.of("name", "normal", "levelSync", "+5", "id", 0),
+                Map.of("name", "hard", "levelSync", "+0", "id", 1),
+                Map.of("name", "mythic", "levelSync", "-5", "id", 2)));
+        setDungeonLockoutMinutes(1440);
     }
 }

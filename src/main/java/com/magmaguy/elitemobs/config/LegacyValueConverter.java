@@ -129,4 +129,15 @@ public class LegacyValueConverter {
             return originalDeserializedBlock.replace("minecraft:chain", "iron_chain");
         return originalDeserializedBlock;
     }
+
+    /**
+     * Converts legacy material names to their new equivalents.
+     * In 1.21.9+, CHAIN was renamed to CHAIN_BLOCK.
+     */
+    public static String parseMaterial(String materialName) {
+        if (materialName == null) return null;
+        if (!VersionChecker.serverVersionOlderThan(21, 9) && materialName.equalsIgnoreCase("CHAIN"))
+            return "CHAIN_BLOCK";
+        return materialName;
+    }
 }

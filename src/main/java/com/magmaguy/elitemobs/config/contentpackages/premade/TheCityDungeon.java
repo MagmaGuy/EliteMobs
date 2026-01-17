@@ -12,7 +12,7 @@ public class TheCityDungeon extends ContentPackagesConfigFields {
     public TheCityDungeon() {
         super("the_city_dungeon",
                 true,
-                "&2[lvl 030] &3The City Dungeon",
+                "&3The City Dungeon",
                 new ArrayList<>(List.of("&fThe perfect intermediate instanced sanctum!",
                         "&6Credits: Dali_, MagmaGuy, Frostcone")),
                 DiscordLinks.freeMinidungeons,
@@ -31,11 +31,13 @@ public class TheCityDungeon extends ContentPackagesConfigFields {
                         "filename=em_id_the_city_mini_boss_three.yml",
                         "filename=em_id_the_city_royal_guard_p1.yml"),
                 "em_id_the_city",
-                30,
+                -1,
                 false);
+        setContentType(ContentType.DYNAMIC_DUNGEON);
         setDifficulties(List.of(
-                Map.of("name", "normal", "levelSync", 35, "id", 0),
-                Map.of("name", "hard", "levelSync", 30, "id", 1),
-                Map.of("name", "mythic", "levelSync", 25, "id", 2)));
+                Map.of("name", "normal", "levelSync", "+5", "id", 0),
+                Map.of("name", "hard", "levelSync", "+0", "id", 1),
+                Map.of("name", "mythic", "levelSync", "-5", "id", 2)));
+        setDungeonLockoutMinutes(1440);
     }
 }

@@ -18,6 +18,8 @@ public class CombatTagConfig extends ConfigurationFile {
     private static String teleportCancelled;
     @Getter
     private static boolean useActionBarMessagesInsteadOfChat;
+    @Getter
+    private static boolean preventFlyToggleInDungeons;
 
     public CombatTagConfig() {
         super("CombatTag.yml");
@@ -42,5 +44,8 @@ public class CombatTagConfig extends ConfigurationFile {
                 file, fileConfiguration, "Teleport cancelled", "&7[EM] &cTeleport interrupted!", true);
         useActionBarMessagesInsteadOfChat = ConfigurationEngine.setBoolean(List.of("Sets whether the action bar or chat will be used for the teleport countdown timer"),
                 fileConfiguration, "useActionBarMessagesInsteadOfChat", true);
+        preventFlyToggleInDungeons = ConfigurationEngine.setBoolean(
+                List.of("Sets whether non-op players are prevented from toggling flight in EliteMobs worlds."),
+                fileConfiguration, "Prevent fly toggle in dungeons", true);
     }
 }

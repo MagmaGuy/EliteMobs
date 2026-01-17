@@ -72,6 +72,12 @@ public class BossHealthDisplay implements Listener {
     // Popup animation duration in ticks
     private static final int POPUP_DURATION_TICKS = 20;
 
+    // Number formatting thresholds
+    private static final double THOUSAND = 1_000D;
+    private static final double MILLION = 1_000_000D;
+    private static final double BILLION = 1_000_000_000D;
+    private static final double TRILLION = 1_000_000_000_000D;
+
     // Active displays per elite entity
     private static final Map<UUID, HealthDisplayData> activeDisplays = new ConcurrentHashMap<>();
 
@@ -155,6 +161,32 @@ public class BossHealthDisplay implements Listener {
     }
 
     /**
+     * Formats a number with K, M, B, T suffixes for large values.
+     * Examples: 1500 -> "1.5K", 2300000 -> "2.3M", 7040000000 -> "7.04B"
+     *
+     * @param value The number to format
+     * @return Formatted string with appropriate suffix
+     */
+    private static String formatNumber(double value) {
+        if (value < 0) {
+            return "-" + formatNumber(-value);
+        }
+        if (value >= TRILLION) {
+            return Round.twoDecimalPlaces(value / TRILLION) + "T";
+        }
+        if (value >= BILLION) {
+            return Round.twoDecimalPlaces(value / BILLION) + "B";
+        }
+        if (value >= MILLION) {
+            return Round.twoDecimalPlaces(value / MILLION) + "M";
+        }
+        if (value >= THOUSAND) {
+            return Round.twoDecimalPlaces(value / THOUSAND) + "K";
+        }
+        return String.valueOf(Round.twoDecimalPlaces(value));
+    }
+
+    /**
      * Gets or creates display data for an elite entity
      */
     private static HealthDisplayData getOrCreateDisplay(EliteEntity eliteEntity) {
@@ -222,7 +254,7 @@ public class BossHealthDisplay implements Listener {
             textBuilder.append("&l");
         }
 
-        textBuilder.append(Round.twoDecimalPlaces(damage));
+        textBuilder.append(formatNumber(damage));
 
         // Create popup with enhanced display
         createAnimatedPopup(baseLoc, ChatColorConverter.convert(textBuilder.toString()),
@@ -391,7 +423,7 @@ public class BossHealthDisplay implements Listener {
         if (isFullHeal) {
             text = MobCombatSettingsConfig.getFullHealMessage();
         } else {
-            text = COLOR_HEAL + "+" + Round.twoDecimalPlaces(healAmount) + " HP";
+            text = COLOR_HEAL + "+" + formatNumber(healAmount) + " HP";
         }
 
         createAnimatedPopup(baseLoc, ChatColorConverter.convert(text), PopupType.HEAL, isFullHeal ? 1.2f : 1.0f);
@@ -728,7 +760,7 @@ public class BossHealthDisplay implements Listener {
             double healthPercent = (currentHealth / maxHealth) * 100;
             String color = getHealthColor(healthPercent);
 
-            String numericText = color + "&l" + Round.twoDecimalPlaces(currentHealth) + " &7/ " + color + "&l" + Round.twoDecimalPlaces(maxHealth);
+            String numericText = color + "&l" + formatNumber(currentHealth) + " &7/ " + color + "&l" + formatNumber(maxHealth);
 
             Location baseLoc = getBaseLocation();
             if (baseLoc == null) return;

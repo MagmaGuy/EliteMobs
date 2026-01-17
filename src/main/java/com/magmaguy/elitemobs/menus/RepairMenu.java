@@ -62,7 +62,7 @@ public class RepairMenu extends EliteMenu {
     public void constructRepairMenu(Player player) {
         String menuName = RepairMenuConfig.shopName;
         if (DefaultConfig.useResourcePackModels())
-            menuName = ChatColor.WHITE + "\uF801\uDB80\uDC2A\uF805           " + menuName;
+            menuName = ChatColor.WHITE + "\uDB83\uDEF1\uDB83\uDE01\uDB83\uDEF5           " + menuName;
 
         Inventory repairInventory = Bukkit.createInventory(player, 54, menuName);
 

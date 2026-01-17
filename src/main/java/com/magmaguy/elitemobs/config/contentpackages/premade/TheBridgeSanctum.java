@@ -12,7 +12,7 @@ public class TheBridgeSanctum extends ContentPackagesConfigFields {
     public TheBridgeSanctum() {
         super("the_bridge_sanctum",
                 true,
-                "&2[lvl 025] &3The Bridge Sanctum",
+                "&3The Bridge Sanctum",
                 new ArrayList<>(List.of("&fThe perfect intermediate instanced sanctum!",
                         "&6Credits: Dali_, MagmaGuy, Frostcone")),
                 DiscordLinks.freeMinidungeons,
@@ -28,11 +28,13 @@ public class TheBridgeSanctum extends ContentPackagesConfigFields {
                 "&bYou have left The Bridge!",
                 List.of("filename=the_bridge_ancient_guardian_p1.yml"),
                 "em_id_the_bridge",
-                25,
+                -1,
                 false);
+        setContentType(ContentType.DYNAMIC_DUNGEON);
         setDifficulties(List.of(
-                Map.of("name", "normal", "levelSync", 30, "id", 0),
-                Map.of("name", "hard", "levelSync", 25, "id", 1),
-                Map.of("name", "mythic", "levelSync", 20, "id", 2)));
+                Map.of("name", "normal", "levelSync", "+5", "id", 0),
+                Map.of("name", "hard", "levelSync", "+0", "id", 1),
+                Map.of("name", "mythic", "levelSync", "-5", "id", 2)));
+        setDungeonLockoutMinutes(1440);
     }
 }

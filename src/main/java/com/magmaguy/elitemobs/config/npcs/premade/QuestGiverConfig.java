@@ -14,7 +14,7 @@ public class QuestGiverConfig extends NPCsConfigFields {
                 "Qel'Thuzad",
                 "<Quest Giver>",
                 Villager.Profession.FLETCHER,
-                "em_adventurers_guild,278.5,91,215.5,0,0",
+                "em_adventurers_guild,283.5,91,215.5,0,0",
                 new ArrayList<>(List.of(
                         "Greetings, adventurer!\\nFancy a quest?",
                         "You! I've got a quest!",

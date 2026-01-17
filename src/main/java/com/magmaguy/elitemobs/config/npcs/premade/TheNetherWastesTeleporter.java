@@ -13,7 +13,7 @@ public class TheNetherWastesTeleporter extends NPCsConfigFields {
                 "Nether Shroom",
                 "<[50] The Nether Wastes Teleporter>",
                 Villager.Profession.ARMORER,
-                "em_adventurers_guild,295.5,78.18,198.5,180,0",
+                "em_adventurers_guild,300.5,78.18,198.5,180,0",
                 List.of(""),
                 List.of(),
                 List.of(),

@@ -7,7 +7,7 @@ public class AGPirateShipWormholeConfig extends WormholeConfigFields {
     public AGPirateShipWormholeConfig() {
         super("ag_pirate_ship_wormhole",
                 true,
-                "em_adventurers_guild,299.5,98.5,302.5,133,0",
+                "em_adventurers_guild,297.5,93,268.5,90,0",
                 "pirate_ship_minidungeon.yml",
                 Wormhole.WormholeStyle.CUBE);
         setBlindPlayer(true);

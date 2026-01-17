@@ -30,6 +30,6 @@ public class TrainingDummyLv1Config extends CustomBossesConfigFields {
         setDropsRandomLoot(false);
         setDropsSkillXP(false);
         setCustomModel("em_trainingdummy1");
-        setSpawnLocations(List.of("em_adventurers_guild,259.5,87,215.5,-1.1998163,16.443604"));
+        setSpawnLocations(List.of("em_adventurers_guild,229.5,87,216.5,-70,0"));
     }
 }

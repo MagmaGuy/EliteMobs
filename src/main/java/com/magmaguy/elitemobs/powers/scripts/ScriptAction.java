@@ -328,7 +328,7 @@ public class ScriptAction {
      * @param scriptActionData The data for the script action.
      */
     private void runMessage(ScriptActionData scriptActionData) {
-        String message = ChatColorConverter.convert(blueprint.getSValue());
+        String message = ChatColorConverter.convert(parsePlaceholders(scriptActionData, blueprint.getSValue()));
         getTargets(scriptActionData).forEach(target -> target.sendMessage(message));
     }
 
@@ -342,9 +342,11 @@ public class ScriptAction {
             Logger.warn("TITLE_MESSAGE action does not have any titles or subtitles for script '" + blueprint.getScriptName() + "' in file '" + blueprint.getScriptFilename() + "'");
             return;
         }
+        String title = ChatColorConverter.convert(parsePlaceholders(scriptActionData, blueprint.getTitle()));
+        String subtitle = ChatColorConverter.convert(parsePlaceholders(scriptActionData, blueprint.getSubtitle()));
         getTargets(scriptActionData).forEach(target -> {
             if (target instanceof Player player) {
-                player.sendTitle(blueprint.getTitle(), blueprint.getSubtitle(), blueprint.getFadeIn().getValue(), blueprint.getDuration().getValue(), blueprint.getFadeOut().getValue());
+                player.sendTitle(title, subtitle, blueprint.getFadeIn().getValue(), blueprint.getDuration().getValue(), blueprint.getFadeOut().getValue());
             } else {
                 Logger.warn("TITLE_MESSAGE actions must target players! Problematic script: '" + blueprint.getScriptName() + "' in file '" + blueprint.getScriptFilename() + "'");
             }
@@ -361,7 +363,7 @@ public class ScriptAction {
             Logger.warn("ACTION_BAR_MESSAGE action does not have a sValue for script '" + blueprint.getScriptName() + "' in file '" + blueprint.getScriptFilename() + "'");
             return;
         }
-        String message = blueprint.getSValue();
+        String message = ChatColorConverter.convert(parsePlaceholders(scriptActionData, blueprint.getSValue()));
         getTargets(scriptActionData).forEach(target -> {
             if (target instanceof Player player) {
                 player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(message));
@@ -381,7 +383,8 @@ public class ScriptAction {
             Logger.warn("BOSS_BAR_MESSAGE action does not have a valid sValue for script '" + blueprint.getScriptName() + "' in file '" + blueprint.getScriptFilename() + "'");
             return;
         }
-        BossBar bossBar = Bukkit.createBossBar(blueprint.getSValue(), blueprint.getBarColor(), blueprint.getBarStyle());
+        String message = ChatColorConverter.convert(parsePlaceholders(scriptActionData, blueprint.getSValue()));
+        BossBar bossBar = Bukkit.createBossBar(message, blueprint.getBarColor(), blueprint.getBarStyle());
         getTargets(scriptActionData).forEach(target -> {
             if (target instanceof Player player) {
                 bossBar.addPlayer(player);
@@ -545,10 +548,12 @@ public class ScriptAction {
      * @param scriptActionData The data for the script action.
      */
     private void runPlayerCommand(ScriptActionData scriptActionData) {
-        String command = parseCommand(scriptActionData.getEliteEntity(), blueprint.getSValue());
+        String command = parsePlaceholders(scriptActionData, blueprint.getSValue());
         getTargets(scriptActionData).forEach(target -> {
             if (target instanceof Player player) {
-                player.performCommand(command);
+                // Replace $targetName with the specific target player's name for per-target commands
+                String targetCommand = command.replace("$targetName", player.getName());
+                player.performCommand(targetCommand);
             } else {
                 Logger.warn("RUN_COMMAND_AS_PLAYER action must target players! Problematic script: '" + blueprint.getScriptName() + "' in file '" + blueprint.getScriptFilename() + "'");
             }
@@ -561,33 +566,57 @@ public class ScriptAction {
      * @param scriptActionData The data for the script action.
      */
     private void runConsoleCommand(ScriptActionData scriptActionData) {
-        String command = parseCommand(scriptActionData.getEliteEntity(), blueprint.getSValue());
+        String command = parsePlaceholders(scriptActionData, blueprint.getSValue());
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
     }
 
     /**
-     * Parses command placeholders with actual values.
+     * Parses placeholders in a string with actual values from the script action data.
+     * <p>
+     * Supported placeholders:
+     * <ul>
+     *   <li>$playerName - Name of the player who triggered the event (direct target)</li>
+     *   <li>$playerX, $playerY, $playerZ - Player's coordinates</li>
+     *   <li>$bossName - Name of the elite mob running the script</li>
+     *   <li>$bossX, $bossY, $bossZ - Boss's coordinates</li>
+     *   <li>$bossLevel - Level of the elite mob</li>
+     *   <li>$bossWorldName - World name where the boss is located</li>
+     * </ul>
      *
-     * @param eliteEntity     The elite entity executing the command.
-     * @param commandTemplate The command template with placeholders.
-     * @return The parsed command.
+     * @param scriptActionData The script action data containing context.
+     * @param template         The string template with placeholders.
+     * @return The parsed string with placeholders replaced.
      */
-    private String parseCommand(EliteEntity eliteEntity, String commandTemplate) {
-        Player player = (eliteEntity.getLivingEntity() instanceof Player) ? (Player) eliteEntity.getLivingEntity() : null;
-        String playerName = player != null ? player.getName() : "Unknown";
-        Location playerLocation = player != null ? player.getLocation() : new Location(null, 0, 0, 0);
+    private String parsePlaceholders(ScriptActionData scriptActionData, String template) {
+        if (template == null || template.isEmpty()) return template;
 
-        return commandTemplate
+        EliteEntity eliteEntity = scriptActionData.getEliteEntity();
+        LivingEntity directTarget = scriptActionData.getDirectTarget();
+
+        // Get player from direct target (the entity that triggered the event, e.g., player who hit the boss)
+        Player player = (directTarget instanceof Player) ? (Player) directTarget : null;
+        String playerName = player != null ? player.getName() : "Unknown";
+        Location playerLocation = player != null ? player.getLocation() : new Location(Bukkit.getWorlds().get(0), 0, 0, 0);
+
+        // Get boss info
+        String bossName = eliteEntity != null ? eliteEntity.getName() : "Unknown";
+        Location bossLocation = eliteEntity != null && eliteEntity.getLocation() != null
+                ? eliteEntity.getLocation()
+                : new Location(Bukkit.getWorlds().get(0), 0, 0, 0);
+        int bossLevel = eliteEntity != null ? eliteEntity.getLevel() : 0;
+        String bossWorldName = bossLocation.getWorld() != null ? bossLocation.getWorld().getName() : "Unknown";
+
+        return template
                 .replace("$playerName", playerName)
                 .replace("$playerX", String.valueOf(playerLocation.getX()))
                 .replace("$playerY", String.valueOf(playerLocation.getY()))
                 .replace("$playerZ", String.valueOf(playerLocation.getZ()))
-                .replace("$bossName", eliteEntity.getName())
-                .replace("$bossX", String.valueOf(eliteEntity.getLocation().getX()))
-                .replace("$bossY", String.valueOf(eliteEntity.getLocation().getY()))
-                .replace("$bossZ", String.valueOf(eliteEntity.getLocation().getZ()))
-                .replace("$bossLevel", String.valueOf(eliteEntity.getLevel()))
-                .replace("$bossWorldName", eliteEntity.getLocation().getWorld().getName());
+                .replace("$bossName", bossName)
+                .replace("$bossX", String.valueOf(bossLocation.getX()))
+                .replace("$bossY", String.valueOf(bossLocation.getY()))
+                .replace("$bossZ", String.valueOf(bossLocation.getZ()))
+                .replace("$bossLevel", String.valueOf(bossLevel))
+                .replace("$bossWorldName", bossWorldName);
     }
 
     /**

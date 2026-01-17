@@ -20,6 +20,7 @@ public class ContentPackagesConfigFields extends CustomConfigFields {
     @Setter
     private String name;
     @Getter
+    @Setter
     protected ContentType contentType = null;
     @Getter
     @Setter
@@ -93,6 +94,7 @@ public class ContentPackagesConfigFields extends CustomConfigFields {
     @Getter
     private String dungeonConfigFolderName;
     @Getter
+    @Setter
     private int contentLevel;
     @Getter
     @Setter

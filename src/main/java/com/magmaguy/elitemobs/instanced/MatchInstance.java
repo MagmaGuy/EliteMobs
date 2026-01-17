@@ -340,7 +340,11 @@ public abstract class MatchInstance {
 
             for (MatchInstance instance : instances) {
                 if (instance.world == null) continue;
-                if (instance.world.equals(event.getFrom()) || instance.world.equals(event.getTo())) {
+                // Only block if the player is actually in this instance
+                if (!instance.players.contains(event.getPlayer()) && !instance.spectators.contains(event.getPlayer()))
+                    continue;
+                if (instance.world.equals(event.getFrom().getWorld()) ||
+                    (event.getTo() != null && instance.world.equals(event.getTo().getWorld()))) {
                     event.setCancelled(true);
                     return;
                 }
@@ -348,6 +352,14 @@ public abstract class MatchInstance {
 
             MatchInstance matchInstance = PlayerData.getMatchInstance(event.getPlayer());
             if (matchInstance == null) return;
+
+            // Prevent spectators from teleporting using the vanilla spectator menu
+            if (event.getCause() == PlayerTeleportEvent.TeleportCause.SPECTATE) {
+                if (matchInstance.spectators.contains(event.getPlayer())) {
+                    event.setCancelled(true);
+                    return;
+                }
+            }
 
             if (matchInstance.state == InstancedRegionState.WAITING) {
                 matchInstance.removeAnyKind(event.getPlayer());

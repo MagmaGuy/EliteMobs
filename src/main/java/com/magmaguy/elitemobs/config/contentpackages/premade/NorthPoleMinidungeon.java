@@ -4,13 +4,15 @@ import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields
 import org.bukkit.World;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class NorthPoleMinidungeon extends ContentPackagesConfigFields {
     public NorthPoleMinidungeon() {
         super("north_pole_minidungeon",
                 true,
-                "&2[lvl 055-060] &9The North Pole",
+                "&9The North Pole",
                 new ArrayList<>(List.of("&fThe Christmas minidungeon!",
                         "&6Credits: MagmaGuy & 69OzCanOfBepis")),
                 "https://nightbreak.io/plugin/elitemobs/#north-pole",
@@ -27,7 +29,14 @@ public class NorthPoleMinidungeon extends ContentPackagesConfigFields {
                 "&8[EM] &7Come back and visit. &fThere are plenty of sweets and treats for next time!",
                 "the_north_pole",
                 false);
+        setContentType(ContentType.DYNAMIC_DUNGEON);
+        setContentLevel(-1);
+        setDifficulties(List.of(
+                Map.of("name", "normal", "levelSync", "+5", "id", 0),
+                Map.of("name", "hard", "levelSync", "+0", "id", 1),
+                Map.of("name", "mythic", "levelSync", "-5", "id", 2)));
+        setDungeonLockoutMinutes(1440);
         setSetupMenuDescription(List.of(
-                "&2A Christmas-themed Minidungeon for players around level 60!"));
+                "&2A dynamic Christmas-themed Minidungeon!"));
     }
 }
