@@ -7,7 +7,7 @@ public class AGPrimisWormholeConfig extends WormholeConfigFields {
     public AGPrimisWormholeConfig() {
         super("ag_primis_wormhole",
                 true,
-                "em_adventurers_guild,290.5,98,302.5,109,0",
+                "em_adventurers_guild,288.5,94,290.5,109,0",
                 "primis_adventure.yml",
                 Wormhole.WormholeStyle.ICOSAHEDRON);
         setBlindPlayer(true);

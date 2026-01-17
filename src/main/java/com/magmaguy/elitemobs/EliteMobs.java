@@ -181,14 +181,14 @@ public class EliteMobs extends JavaPlugin {
         // TODO: DIAGNOSTIC - Remove after EasyMinecraftGoals testing is complete
         testEasyMinecraftGoalsMapping();
 
-        if (Bukkit.getServer().spigot().getConfig().getDouble("settings.attribute.maxHealth.max") < 100000000) {
-            Bukkit.getServer().spigot().getConfig().set("settings.attribute.maxHealth.max", 100000000);
+        if (Bukkit.getServer().spigot().getConfig().getDouble("settings.attribute.maxHealth.max") < Double.MAX_VALUE) {
+            Bukkit.getServer().spigot().getConfig().set("settings.attribute.maxHealth.max", Double.MAX_VALUE);
             try {
                 File spigotConfigContainer = new File(Paths.get(MetadataHandler.PLUGIN.getDataFolder().getParentFile().getCanonicalFile().getParentFile().toString() + "/spigot.yml").toString());
                 Bukkit.getServer().spigot().getConfig().save(spigotConfigContainer);
                 Logger.info("New default max health set correctly!");
             } catch (IOException e) {
-                Logger.warn("Failed to save max health value! For the plugin to work correctly, you should increase your max health on the spigot.yml config file to " + 100000000);
+                Logger.warn("Failed to save max health value! For the plugin to work correctly, you should increase your max health on the spigot.yml config file to " + Double.MAX_VALUE);
             }
         }
 

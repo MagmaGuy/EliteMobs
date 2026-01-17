@@ -77,7 +77,7 @@ public class ArrowShopMenu {
     public static void openArrowShop(Player player) {
         String menuName = ChatColorConverter.convert(ArrowShopMenuConfig.getShopName());
         if (DefaultConfig.useResourcePackModels()) {
-            menuName = ChatColor.WHITE + "\uF801\uDB80\uDC8B\uF805          " + menuName;
+            menuName = ChatColor.WHITE + "\uDB83\uDEF1\uDB83\uDE06\uDB83\uDEF5          " + menuName;
         }
 
         Inventory inventory = Bukkit.createInventory(player, 27, menuName);

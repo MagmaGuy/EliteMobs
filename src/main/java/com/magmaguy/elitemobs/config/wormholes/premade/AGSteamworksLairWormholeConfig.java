@@ -7,7 +7,7 @@ public class AGSteamworksLairWormholeConfig extends WormholeConfigFields {
     public AGSteamworksLairWormholeConfig() {
         super("ag_steamworks_lair_wormhole",
                 true,
-                "em_adventurers_guild,296.5,107,308.5,-175,0",
+                "em_adventurers_guild,289.5,93,258.5,-90,0",
                 "steamworks_lair.yml",
                 Wormhole.WormholeStyle.ICOSAHEDRON);
         setLocation1Text("&6『The Steamworks Lair』 &aLvl 140");

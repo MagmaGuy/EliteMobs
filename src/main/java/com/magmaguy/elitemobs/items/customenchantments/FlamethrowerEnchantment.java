@@ -85,7 +85,7 @@ public class FlamethrowerEnchantment extends CustomEnchantment {
 
 
                 doFlamethrowerPhase1(player, player.getTargetBlock(null, 30).getLocation().clone().add(0.5, 1, 0.5));
-                CooldownHandler.initialize(playersUsingFlamethrower.stream().toList(), player.getUniqueId(), 3 * 60);
+                CooldownHandler.initialize(playersUsingFlamethrower, player.getUniqueId(), 3 * 60);
                 player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 5 * 20, 20));
 
             }

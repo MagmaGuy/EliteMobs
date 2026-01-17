@@ -7,7 +7,7 @@ public class AGBinderOfWorldsLairWormholeConfig extends WormholeConfigFields {
     public AGBinderOfWorldsLairWormholeConfig() {
         super("ag_binder_of_worlds_wormhole",
                 true,
-                "em_adventurers_guild,290.5,123,302.5,90,0",
+                "em_adventurers_guild,297.5,93,297.5,180,0",
                 "shadow_of_the_binder_of_worlds_lair.yml",
                 Wormhole.WormholeStyle.CRYSTAL);
         setBlindPlayer(true);

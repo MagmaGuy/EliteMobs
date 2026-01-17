@@ -7,7 +7,7 @@ public class AGDarkCathedralWormholeConfig extends WormholeConfigFields {
     public AGDarkCathedralWormholeConfig() {
         super("ag_dark_cathedral_wormhole",
                 true,
-                "em_adventurers_guild,290.5,101.5,293.5,-40,0",
+                "em_adventurers_guild,297.5,93,283.5,-90,0",
                 "dark_cathedral_lair.yml",
                 Wormhole.WormholeStyle.CUBE);
         setBlindPlayer(true);

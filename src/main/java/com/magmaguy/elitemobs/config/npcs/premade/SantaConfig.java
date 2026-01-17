@@ -15,7 +15,7 @@ public class SantaConfig extends NPCsConfigFields {
                 "&4Saint Nick",
                 "&c<Santa!>",
                 Villager.Profession.NITWIT,
-                "em_adventurers_guild,212.5,88,236.5,104,0",
+                "em_adventurers_guild,217.5,88,236.5,104,0",
                 List.of(
                         "Ho ho ho!"),
                 new ArrayList<>(List.of(

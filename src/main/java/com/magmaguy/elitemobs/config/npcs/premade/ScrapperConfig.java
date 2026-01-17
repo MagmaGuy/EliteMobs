@@ -14,7 +14,7 @@ public class ScrapperConfig extends NPCsConfigFields {
                 "Kelly",
                 "<Scrapper>",
                 Villager.Profession.WEAPONSMITH,
-                "em_adventurers_guild,292.5,81,263.5,90,0",
+                "em_adventurers_guild,297.5,81,263.5,90,0",
                 new ArrayList<>(List.of(
                         "Want to get rid of items?",
                         "Need to recycle items?",

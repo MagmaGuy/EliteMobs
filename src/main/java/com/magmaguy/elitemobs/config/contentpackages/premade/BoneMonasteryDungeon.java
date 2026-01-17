@@ -11,7 +11,7 @@ public class BoneMonasteryDungeon extends ContentPackagesConfigFields {
     public BoneMonasteryDungeon() {
         super("bone_monastery_dungeon",
                 true,
-                "&2[lvl 085] &cThe Bone Monastery",
+                "&cThe Bone Monastery",
                 new ArrayList<>(List.of("&fSpooky skeletons await.",
                         "&6Credits: MagmaGuy, Matevagyok, Frostcone, 69OzCanOfBepis")),
                 "https://nightbreak.io/plugin/elitemobs/#bone-monastery",
@@ -27,13 +27,15 @@ public class BoneMonasteryDungeon extends ContentPackagesConfigFields {
                 "&bYou have left the bone monastery!",
                 List.of("filename=bone_monastery_bone_saint_himiko_p1.yml"),
                 "the_bone_monastery",
-                85,
+                -1,
                 false);
+        setContentType(ContentType.DYNAMIC_DUNGEON);
         setDifficulties(List.of(
-                Map.of("name", "normal", "levelSync", 90, "id", 0),
-                Map.of("name", "hard", "levelSync", 85, "id", 1),
-                Map.of("name", "mythic", "levelSync", 80, "id", 2)));
+                Map.of("name", "normal", "levelSync", "+5", "id", 0),
+                Map.of("name", "hard", "levelSync", "+0", "id", 1),
+                Map.of("name", "mythic", "levelSync", "-5", "id", 2)));
+        setDungeonLockoutMinutes(1440);
         setSetupMenuDescription(List.of(
-                "&2A Dungeon for players around level 85!"));
+                "&2A dynamic Dungeon!"));
     }
 }

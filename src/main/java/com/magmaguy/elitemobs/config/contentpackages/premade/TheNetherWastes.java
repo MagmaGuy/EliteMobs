@@ -12,7 +12,7 @@ public class TheNetherWastes extends ContentPackagesConfigFields {
     public TheNetherWastes() {
         super("the_nether_wastes_dungeon",
                 true,
-                "&2[lvl 050] &3The Nether Wastes Dungeon",
+                "&3The Nether Wastes Dungeon",
                 new ArrayList<>(List.of("&fAn unexplored part of the Nether.",
                         "&6Credits: MagmaGuy, Frostcone, Dali_")),
                 DiscordLinks.freeMinidungeons,
@@ -28,11 +28,13 @@ public class TheNetherWastes extends ContentPackagesConfigFields {
                 "&bYou have left The Nether Wastes!",
                 List.of("filename=em_id_the_nether_wastes_miniboss_5_shroud_p1.yml"),
                 "em_id_the_nether_wastes",
-                50,
+                -1,
                 false);
+        setContentType(ContentType.DYNAMIC_DUNGEON);
         setDifficulties(List.of(
-                Map.of("name", "normal", "levelSync", 52, "id", 0),
-                Map.of("name", "hard", "levelSync", 50, "id", 1),
-                Map.of("name", "mythic", "levelSync", 48, "id", 2)));
+                Map.of("name", "normal", "levelSync", "+5", "id", 0),
+                Map.of("name", "hard", "levelSync", "+0", "id", 1),
+                Map.of("name", "mythic", "levelSync", "-5", "id", 2)));
+        setDungeonLockoutMinutes(1440);
     }
 }

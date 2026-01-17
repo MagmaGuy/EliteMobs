@@ -134,6 +134,14 @@ public class LevelScaling {
      */
     public static final double MIN_MODIFIER = 0.125;
 
+    /**
+     * Maximum mob health allowed.
+     * <p>
+     * Set to Double.MAX_VALUE to allow theoretically unlimited health.
+     * The actual limit is configured in spigot.yml via settings.attribute.maxHealth.max
+     */
+    public static final double MINECRAFT_MAX_HEALTH = Double.MAX_VALUE;
+
     // ========================================
     // CALCULATION METHODS
     // ========================================
@@ -447,7 +455,9 @@ public class LevelScaling {
      */
     public static double calculateMobHealth(int level, double baseEntityHP) {
         // Pure exponential scaling: guarantees +5 levels = exactly 2x HP at all levels
-        return BASE_MOB_HP * Math.pow(SCALING_BASE, level / LEVELS_PER_POWER_DOUBLE);
+        double health = BASE_MOB_HP * Math.pow(SCALING_BASE, level / LEVELS_PER_POWER_DOUBLE);
+        // Cap at Minecraft's maximum allowed health value
+        return Math.min(health, MINECRAFT_MAX_HEALTH);
     }
 
     /**
@@ -501,18 +511,17 @@ public class LevelScaling {
      * Useful for visualizing how the current constants affect combat.
      */
     public static void printModifierTable() {
-        System.out.println("=== Level Scaling Reference Table ===");
-        System.out.println("Settings: SCALING_BASE=" + SCALING_BASE +
+        com.magmaguy.magmacore.util.Logger.info("=== Level Scaling Reference Table ===");
+        com.magmaguy.magmacore.util.Logger.info("Settings: SCALING_BASE=" + SCALING_BASE +
                 ", LEVELS_PER_POWER_DOUBLE=" + LEVELS_PER_POWER_DOUBLE);
-        System.out.println();
-        System.out.printf("%-12s %-12s %-15s%n", "Level Diff", "Modifier", "Description");
-        System.out.println("-".repeat(40));
+        com.magmaguy.magmacore.util.Logger.info(String.format("%-12s %-12s %-15s", "Level Diff", "Modifier", "Description"));
+        com.magmaguy.magmacore.util.Logger.info("-".repeat(40));
 
         int[] differences = {-15, -10, -5, -3, -1, 0, 1, 3, 5, 10, 15};
         for (int diff : differences) {
             double modifier = getLevelModifierFromDifference(diff);
             String desc = diff < 0 ? "Easier" : (diff > 0 ? "Harder" : "Balanced");
-            System.out.printf("%-12d %-12.3f %-15s%n", diff, modifier, desc);
+            com.magmaguy.magmacore.util.Logger.info(String.format("%-12d %-12.3f %-15s", diff, modifier, desc));
         }
     }
 
@@ -520,18 +529,17 @@ public class LevelScaling {
      * Prints a reference table of mob HP at various levels.
      */
     public static void printHealthTable() {
-        System.out.println("=== Mob HP Scaling Reference Table ===");
-        System.out.println("Formula: HP = " + BASE_MOB_HP + " * 2^(level/5)");
-        System.out.println("+5 levels = exactly 2x HP at all levels");
-        System.out.println();
-        System.out.printf("%-8s %-12s %-15s%n", "Level", "HP", "+5 Level HP");
-        System.out.println("-".repeat(40));
+        com.magmaguy.magmacore.util.Logger.info("=== Mob HP Scaling Reference Table ===");
+        com.magmaguy.magmacore.util.Logger.info("Formula: HP = " + BASE_MOB_HP + " * 2^(level/5)");
+        com.magmaguy.magmacore.util.Logger.info("+5 levels = exactly 2x HP at all levels");
+        com.magmaguy.magmacore.util.Logger.info(String.format("%-8s %-12s %-15s", "Level", "HP", "+5 Level HP"));
+        com.magmaguy.magmacore.util.Logger.info("-".repeat(40));
 
         int[] levels = {1, 5, 10, 15, 20, 25, 30, 50, 75, 100};
         for (int level : levels) {
             double hp = calculateMobHealth(level, 20);
             double hpPlus5 = calculateMobHealth(level + 5, 20);
-            System.out.printf("%-8d %-12.1f %-15.1f (2x)%n", level, hp, hpPlus5);
+            com.magmaguy.magmacore.util.Logger.info(String.format("%-8d %-12.1f %-15.1f (2x)", level, hp, hpPlus5));
         }
     }
 }

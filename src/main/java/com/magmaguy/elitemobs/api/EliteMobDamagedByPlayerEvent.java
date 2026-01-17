@@ -23,6 +23,7 @@ import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.*;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
+import com.magmaguy.elitemobs.utils.DebugMessage;
 import com.magmaguy.elitemobs.utils.EntityFinder;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.magmacore.util.Round;
@@ -162,7 +163,7 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
             debugLog.append("| Total=").append(String.format("%.2fx", damageMultiplier))
                     .append(" | Damage: ").append(String.format("%.1f", oldDamage))
                     .append(" -> ").append(String.format("%.1f", getDamage()));
-            com.magmaguy.magmacore.util.Logger.debug(debugLog.toString());
+            DebugMessage.log(player, debugLog.toString());
         }
     }
 
@@ -315,9 +316,9 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
                 breakdown.setRangedAttack(false);
             }
 
-            // Always log melee damage components for debugging
+            // Log melee damage components when debug mode is enabled
             double finalEliteDamage = (effectiveEliteDamage + bonusEliteDamage) * player.getAttackCooldown();
-            com.magmaguy.magmacore.util.Logger.debug("[MeleeDmg] SkillLv=" + playerSkillLevel +
+            DebugMessage.log(player, "[MeleeDmg] SkillLv=" + playerSkillLevel +
                     " ItemLv=" + itemLevel +
                     " EffectiveLv=" + effectiveLevel +
                     " BaseDmg=" + String.format("%.1f", effectiveEliteDamage) +
@@ -508,7 +509,7 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
                 }
 
                 // Debug logging for combat balance tuning
-                com.magmaguy.magmacore.util.Logger.debug("[Combat] Player Lv" + playerLevel + " vs Elite Lv" + eliteLevel +
+                DebugMessage.log(player, "[Combat] Player Lv" + playerLevel + " vs Elite Lv" + eliteLevel +
                         " | Damage: " + String.format("%.1f", damage) +
                         " | Elite HP: " + String.format("%.1f", eliteEntity.getHealth()));
             }

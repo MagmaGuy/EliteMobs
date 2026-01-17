@@ -17,7 +17,7 @@ public class CardSharkConfig extends NPCsConfigFields {
                 "Ace Morgan",
                 "<Card Shark>",
                 Villager.Profession.NITWIT,
-                "em_adventurers_guild,277,81,227,-135,0",
+                "em_adventurers_guild,282.5,81,227.5,-135,0",
                 new ArrayList<>(List.of(
                         "Higher or lower? How far can you go?",
                         "Risk it all or cash out smart...",

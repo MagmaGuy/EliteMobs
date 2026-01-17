@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.dungeons;
 
+import com.magmaguy.elitemobs.config.CombatTagConfig;
 import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
 import org.bukkit.Material;
@@ -13,6 +14,7 @@ import org.bukkit.event.block.*;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.HashSet;
@@ -161,8 +163,10 @@ public class DungeonProtector implements Listener {
         if (event.getClickedBlock() == null) return;
         if (shouldBypass(event.getPlayer())) return;
         Material material = event.getClickedBlock().getType();
-        if (material.toString().toLowerCase(Locale.ROOT).endsWith("_door") ||
-                material.toString().toLowerCase(Locale.ROOT).endsWith("_trapdoor"))
+        String materialName = material.toString().toLowerCase(Locale.ROOT);
+        if (materialName.endsWith("_door") ||
+                materialName.endsWith("_trapdoor") ||
+                materialName.endsWith("_fence_gate"))
             event.setCancelled(true);
     }
 
@@ -230,6 +234,17 @@ public class DungeonProtector implements Listener {
 
         Block block = event.getClickedBlock();
         if (block != null && block.getType() == Material.DRAGON_EGG) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventFlyToggle(PlayerToggleFlightEvent event) {
+        if (!CombatTagConfig.isPreventFlyToggleInDungeons()) return;
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getPlayer().getWorld().getUID())) return;
+        if (event.getPlayer().isOp()) return;
+        if (shouldBypass(event.getPlayer())) return;
+        if (event.isFlying()) {
             event.setCancelled(true);
         }
     }

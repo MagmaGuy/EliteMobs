@@ -14,7 +14,7 @@ public class BlacksmithConfig extends NPCsConfigFields {
                 "Greg",
                 "<Blacksmith>",
                 Villager.Profession.TOOLSMITH,
-                "em_adventurers_guild,285.5,93,261.5,179,0",
+                "em_adventurers_guild,297.5,81,237.5,90,0",
                 new ArrayList<>(List.of(
                         "Welcome to our shop!",
                         "Sell your goods here!",

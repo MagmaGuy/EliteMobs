@@ -69,6 +69,7 @@ public class CommandHandler {
         emCommand.registerCommand(new MoneyRemoveCommand());
         emCommand.registerCommand(new ProtectionBypassCommand());
         emCommand.registerCommand(new FirstTimeSetupCommand());
+        emCommand.registerCommand(new DebugCommand());
 
         //User commands
 //        emCommand.registerCommand(new AdventurersGuildCommand());

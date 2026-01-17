@@ -12,7 +12,7 @@ public class ThePalaceSanctum extends ContentPackagesConfigFields {
     public ThePalaceSanctum() {
         super("the_palace_sanctum",
                 true,
-                "&2[lvl 030] &3The Palace Sanctum",
+                "&3The Palace Sanctum",
                 new ArrayList<>(List.of("&fThe perfect intermediate instanced sanctum!",
                         "&6Credits: Dali_, MagmaGuy, Frostcone")),
                 DiscordLinks.freeMinidungeons,
@@ -28,11 +28,13 @@ public class ThePalaceSanctum extends ContentPackagesConfigFields {
                 "&bYou have left The Palace!",
                 List.of("the_palace_old_stone_king_p1.yml"),
                 "em_id_the_palace",
-                35,
+                -1,
                 false);
+        setContentType(ContentType.DYNAMIC_DUNGEON);
         setDifficulties(List.of(
-                Map.of("name", "normal", "levelSync", 40, "id", 0),
-                Map.of("name", "hard", "levelSync", 35, "id", 1),
-                Map.of("name", "mythic", "levelSync", 30, "id", 2)));
+                Map.of("name", "normal", "levelSync", "+5", "id", 0),
+                Map.of("name", "hard", "levelSync", "+0", "id", 1),
+                Map.of("name", "mythic", "levelSync", "-5", "id", 2)));
+        setDungeonLockoutMinutes(1440);
     }
 }

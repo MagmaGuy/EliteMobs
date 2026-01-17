@@ -4,13 +4,15 @@ import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields
 import org.bukkit.World;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class InvasionMinidungeon extends ContentPackagesConfigFields {
     public InvasionMinidungeon() {
         super("invasion_minidungeon",
                 true,
-                "&2[lvl 035-045] &2The Invasion",
+                "&2The Invasion",
                 new ArrayList<>(List.of("&fThe Halloween Minidungeon!",
                         "&6Credits: MagmaGuy & 69OzCanOfBepis")),
                 "https://nightbreak.io/plugin/elitemobs/#the-invasion",
@@ -27,7 +29,14 @@ public class InvasionMinidungeon extends ContentPackagesConfigFields {
                 "&8[EM] &7You have escaped the alien abductions! No one will ever believe you.",
                 "invasion",
                 false);
+        setContentType(ContentType.DYNAMIC_DUNGEON);
+        setContentLevel(-1);
+        setDifficulties(List.of(
+                Map.of("name", "normal", "levelSync", "+5", "id", 0),
+                Map.of("name", "hard", "levelSync", "+0", "id", 1),
+                Map.of("name", "mythic", "levelSync", "-5", "id", 2)));
+        setDungeonLockoutMinutes(1440);
         setSetupMenuDescription(List.of(
-                "&2A Minidungeon for players around level 40!"));
+                "&2A dynamic Minidungeon!"));
     }
 }

@@ -240,9 +240,8 @@ public class WormholeManager {
     private void processWormholes() {
         tickCounter++;
 
-        // Tick player cooldowns
-        Collection<PlayerWormholeData> values = playerTeleportData.values();
-        for (PlayerWormholeData value : values) {
+        // Tick player cooldowns (copy to avoid ConcurrentModificationException)
+        for (PlayerWormholeData value : new java.util.ArrayList<>(playerTeleportData.values())) {
             value.tick();
         }
 

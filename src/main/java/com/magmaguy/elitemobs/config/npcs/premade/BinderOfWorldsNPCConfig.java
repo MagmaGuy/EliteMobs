@@ -14,7 +14,7 @@ public class BinderOfWorldsNPCConfig extends NPCsConfigFields {
                 "Buði the Doomsayer",
                 "<[200] Binder of Worlds Teleport>",
                 Villager.Profession.ARMORER,
-                "em_adventurers_guild,294.5,91,223.5,180,0",
+                "em_adventurers_guild,299.5,91,223.5,180,0",
                 List.of(
                         "You are not prepared."),
                 new ArrayList<>(List.of(

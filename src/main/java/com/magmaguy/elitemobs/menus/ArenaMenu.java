@@ -27,7 +27,7 @@ public class ArenaMenu {
         }
         String menuName = ArenaMenuConfig.getMenuName() + arenaInstance.getCustomArenasConfigFields().getArenaName();
         if (DefaultConfig.useResourcePackModels())
-            menuName = "\uF801\uDB80\uDD0B\uF805          " + menuName;
+            menuName = "\uDB83\uDEF1\uDB83\uDE0A\uDB83\uDEF5          " + menuName;
         Inventory shopInventory = Bukkit.createInventory(player, 9, menuName);
         shopInventory.setItem(ArenaMenuConfig.getPlayerItemSlot(), ArenaMenuConfig.getPlayerItem());
         if (DungeonsConfig.isAllowSpectatorsInInstancedContent())
