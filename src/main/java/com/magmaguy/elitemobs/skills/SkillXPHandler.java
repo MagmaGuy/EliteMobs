@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
+import com.magmaguy.elitemobs.utils.DebugMessage;
 import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -196,7 +197,7 @@ public class SkillXPHandler implements Listener {
             ArmorSkillHealthBonus.updateHealthBonus(player);
         }
 
-        Logger.debug("Player " + player.getName() + " reached " + skillType.getDisplayName() + " level " + newLevel);
+        DebugMessage.log(player, "Player " + player.getName() + " reached " + skillType.getDisplayName() + " level " + newLevel);
     }
 
     /**

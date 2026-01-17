@@ -17,7 +17,7 @@ public class CoinFlipperConfig extends NPCsConfigFields {
                 "Lucky Pete",
                 "<Coin Flipper>",
                 Villager.Profession.CARTOGRAPHER,
-                "em_adventurers_guild,293,81,211,45,0",
+                "em_adventurers_guild,298,81,211,45,0",
                 new ArrayList<>(List.of(
                         "Heads or tails? Simple as that!",
                         "Flip a coin, double your money!",

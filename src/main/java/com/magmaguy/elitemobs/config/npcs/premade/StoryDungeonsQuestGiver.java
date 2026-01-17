@@ -13,7 +13,7 @@ public class StoryDungeonsQuestGiver extends NPCsConfigFields {
                 "&eManager Wallitz",
                 "&e<Story Mode Quests>",
                 Villager.Profession.NITWIT,
-                "em_adventurers_guild,303.5,78.0,212.5,-17.84,3.6",
+                "em_adventurers_guild,308.5,78.0,212.5,-17.84,3.6",
                 List.of("Salutations!", "Good day."),
                 List.of("I'm a bit busy..."),
                 List.of("Bye.", "Until next time."),

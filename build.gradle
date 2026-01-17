@@ -122,7 +122,7 @@ dependencies {
     implementation (group: 'com.magmaguy', name: 'EasyMinecraftGoals-dist', version: '1.19.22'){
         changing = true
     }
-    implementation (group: 'com.magmaguy', name: 'MagmaCore', version: '1.22-SNAPSHOT'){
+    implementation (group: 'com.magmaguy', name: 'MagmaCore', version: '1.23-SNAPSHOT'){
         changing = true
     }
 

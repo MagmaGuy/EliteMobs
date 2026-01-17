@@ -63,8 +63,8 @@ public class ConfigurationLocation {
                 y = Double.parseDouble(slicedString[2]);
                 z = Double.parseDouble(slicedString[3]);
                 if (slicedString.length > 4) {
-                    pitch = Float.parseFloat(slicedString[4]);
-                    yaw = Float.parseFloat(slicedString[5]);
+                    yaw = Float.parseFloat(slicedString[4]);
+                    pitch = Float.parseFloat(slicedString[5]);
                 } else {
                     yaw = 0;
                     pitch = 0;
@@ -73,8 +73,8 @@ public class ConfigurationLocation {
                 x = Double.parseDouble(slicedString[0]);
                 y = Double.parseDouble(slicedString[1]);
                 z = Double.parseDouble(slicedString[2]);
-                pitch = Float.parseFloat(slicedString[3]);
-                yaw = Float.parseFloat(slicedString[4]);
+                yaw = Float.parseFloat(slicedString[3]);
+                pitch = Float.parseFloat(slicedString[4]);
             } else throw new Exception();
         } catch (Exception ex) {
             if (locationString.equals("null"))
@@ -113,8 +113,8 @@ public class ConfigurationLocation {
                 y = Double.parseDouble(slicedString[2]);
                 z = Double.parseDouble(slicedString[3]);
                 if (slicedString.length > 4) {
-                    pitch = Float.parseFloat(slicedString[4]);
-                    yaw = Float.parseFloat(slicedString[5]);
+                    yaw = Float.parseFloat(slicedString[4]);
+                    pitch = Float.parseFloat(slicedString[5]);
                 } else {
                     yaw = 0;
                     pitch = 0;
@@ -123,8 +123,8 @@ public class ConfigurationLocation {
                 x = Double.parseDouble(slicedString[0]);
                 y = Double.parseDouble(slicedString[1]);
                 z = Double.parseDouble(slicedString[2]);
-                pitch = Float.parseFloat(slicedString[3]);
-                yaw = Float.parseFloat(slicedString[4]);
+                yaw = Float.parseFloat(slicedString[3]);
+                pitch = Float.parseFloat(slicedString[4]);
             } else throw new Exception();
         } catch (Exception ex) {
             if (locationString.equals("null"))

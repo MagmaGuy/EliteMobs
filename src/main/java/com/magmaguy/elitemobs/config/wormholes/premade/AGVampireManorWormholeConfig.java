@@ -7,7 +7,7 @@ public class AGVampireManorWormholeConfig extends WormholeConfigFields {
     public AGVampireManorWormholeConfig() {
         super("ag_vampire_manor_wormhole",
                 true,
-                "em_adventurers_guild,290.5,105.5,293.5,45,0",
+                "em_adventurers_guild,289.5,93,268.5,-90,0",
                 "vampire_manor_lair.yml",
                 Wormhole.WormholeStyle.CUBE);
         setBlindPlayer(true);

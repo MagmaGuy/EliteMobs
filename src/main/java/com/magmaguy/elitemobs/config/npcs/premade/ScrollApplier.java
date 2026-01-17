@@ -14,7 +14,7 @@ public class ScrollApplier  extends NPCsConfigFields {
                 "Scotty",
                 "<Scroll Applier>",
                 Villager.Profession.WEAPONSMITH,
-                "em_adventurers_guild,274.5,77,245.5,-20,0",
+                "em_adventurers_guild,279.5,77,245.5,-20,0",
                 new ArrayList<>(List.of(
                         "Got elite scrolls?",
                         "Is it elite scroll time?",

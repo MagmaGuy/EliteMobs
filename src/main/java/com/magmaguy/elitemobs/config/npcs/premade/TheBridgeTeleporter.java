@@ -13,7 +13,7 @@ public class TheBridgeTeleporter extends NPCsConfigFields {
                 "Old Dwarf Jotun",
                 "<[25] The Bridge Teleporter>",
                 Villager.Profession.ARMORER,
-                "em_adventurers_guild,303.5,78.18,202.5,90,0",
+                "em_adventurers_guild,308.5,78.18,202.5,90,0",
                 List.of(""),
                 List.of(),
                 List.of(),

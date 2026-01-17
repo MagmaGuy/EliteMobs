@@ -59,7 +59,7 @@ public class ProceduralShopMenu {
     public static void shopConstructor(Player player) {
         String menuName = ProceduralShopMenuConfig.shopName;
         if (DefaultConfig.useResourcePackModels())
-            menuName = ChatColor.WHITE + "\uF801\uDB80\uDC8B\uF805          " + menuName;
+            menuName = ChatColor.WHITE + "\uDB83\uDEF1\uDB83\uDE06\uDB83\uDEF5          " + menuName;
         Inventory shopInventory = Bukkit.createInventory(player, 54, menuName);
         populateShop(shopInventory, player);
         player.openInventory(shopInventory);

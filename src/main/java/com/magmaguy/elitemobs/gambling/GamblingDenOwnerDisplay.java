@@ -49,7 +49,7 @@ public class GamblingDenOwnerDisplay {
         if (earningsDisplays.containsKey(npcEntity.getUuid())) return;
 
         // Create armor stand above the role display (which is above the NPC)
-        Vector offset = new Vector(0, 2.0, 0);
+        Vector offset = new Vector(0, 2.3, 0);
         ArmorStand display = npcEntity.getVillager().getWorld().spawn(
                 npcEntity.getVillager().getLocation().add(offset),
                 ArmorStand.class,

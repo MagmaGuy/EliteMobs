@@ -12,7 +12,7 @@ public class TheCaveSanctum extends ContentPackagesConfigFields {
     public TheCaveSanctum() {
         super("the_cave_sanctum",
                 true,
-                "&2[lvl 010] &3The Cave Sanctum",
+                "&3The Cave Sanctum",
                 new ArrayList<>(List.of("&fThe perfect starter instanced sanctum!",
                         "&6Credits: MagmaGuy, Frostcone, 69OzCanOfBepis, Realm of Lotheridon")),
                 DiscordLinks.freeMinidungeons,
@@ -28,11 +28,13 @@ public class TheCaveSanctum extends ContentPackagesConfigFields {
                 "&bYou have left The Cave!",
                 List.of("filename=the_cave_boiler_p1.yml"),
                 "em_id_the_cave",
-                15,
+                -1,
                 false);
+        setContentType(ContentType.DYNAMIC_DUNGEON);
         setDifficulties(List.of(
-                Map.of("name", "normal", "levelSync", 20, "id", 0),
-                Map.of("name", "hard", "levelSync", 15, "id", 1),
-                Map.of("name", "mythic", "levelSync", 10, "id", 2)));
+                Map.of("name", "normal", "levelSync", "+5", "id", 0),
+                Map.of("name", "hard", "levelSync", "+0", "id", 1),
+                Map.of("name", "mythic", "levelSync", "-5", "id", 2)));
+        setDungeonLockoutMinutes(1440);
     }
 }

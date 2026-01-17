@@ -41,7 +41,7 @@ public class SkillBonusMenu {
     public static void openWeaponSelectMenu(Player player) {
         String menuName = SkillBonusMenuConfig.getWeaponSelectMenuName();
         if (DefaultConfig.useResourcePackModels()) {
-            menuName = "\uF801\uDB80\uDD0B\uF805          " + menuName;
+            menuName = "\uDB83\uDEF1\uDB83\uDE0A\uDB83\uDEF5          " + menuName;
         }
         menuName = ChatColorConverter.convert(menuName);
 
@@ -66,7 +66,7 @@ public class SkillBonusMenu {
     public static void openSkillSelectMenu(Player player, SkillType skillType) {
         String menuName = SkillBonusMenuConfig.getSkillSelectMenuName().replace("%skill_type%", skillType.getDisplayName());
         if (DefaultConfig.useResourcePackModels()) {
-            menuName = "\uF801\uDB80\uDD0B\uF805          " + menuName;
+            menuName = "\uDB83\uDEF1\uDB83\uDE0A\uDB83\uDEF5          " + menuName;
         }
         menuName = ChatColorConverter.convert(menuName);
 

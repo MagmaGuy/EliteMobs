@@ -55,7 +55,7 @@ public class UnbindMenu extends EliteMenu {
     public void constructUnbinderMenu(Player player) {
         String menuName = UnbinderMenuConfig.getShopName();
         if (DefaultConfig.useResourcePackModels())
-            menuName = ChatColor.WHITE + "\uF801\uDB80\uDC9B\uF805          " + menuName;
+            menuName = ChatColor.WHITE + "\uDB83\uDEF1\uDB83\uDE09\uDB83\uDEF5          " + menuName;
         Inventory UnbinderInventory = Bukkit.createInventory(player, 54, menuName);
 
         for (int i = 0; i < UnbinderInventory.getSize(); i++) {

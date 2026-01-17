@@ -47,7 +47,7 @@ public class ScrapperMenu extends EliteMenu {
 
         String menuName = ScrapperMenuConfig.shopName;
         if (DefaultConfig.useResourcePackModels())
-            menuName = ChatColor.WHITE + "\uF801\uDB80\uDC2B\uF805         " + menuName;
+            menuName = ChatColor.WHITE + "\uDB83\uDEF1\uDB83\uDE02\uDB83\uDEF5         " + menuName;
 
         Inventory scrapInventory = Bukkit.createInventory(player, 54, menuName);
 

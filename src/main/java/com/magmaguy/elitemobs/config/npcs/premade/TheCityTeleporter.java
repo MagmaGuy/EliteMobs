@@ -13,7 +13,7 @@ public class TheCityTeleporter extends NPCsConfigFields {
                 "Dwarf Olav",
                 "<[30] The City Teleporter>",
                 Villager.Profession.ARMORER,
-                "em_adventurers_guild,302.5,78.18,201.5,0,0",
+                "em_adventurers_guild,307.5,78.18,201.5,0,0",
                 List.of(""),
                 List.of(),
                 List.of(),

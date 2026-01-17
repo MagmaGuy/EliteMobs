@@ -14,7 +14,7 @@ public class BarkeepConfig extends NPCsConfigFields {
                 "Bartley",
                 "<Barkeep>",
                 Villager.Profession.BUTCHER,
-                "em_adventurers_guild,285.5,91,209.5,0,0",
+                "em_adventurers_guild,290.5,91,209.5,0,0",
                 new ArrayList<>(List.of(
                         "Need a drink?",
                         "Want a drink",

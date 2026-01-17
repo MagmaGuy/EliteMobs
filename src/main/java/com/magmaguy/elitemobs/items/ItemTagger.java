@@ -267,9 +267,14 @@ public class ItemTagger {
     public static double getEliteDefenseAttribute(@Nullable ItemStack itemStack) {
         if (itemStack == null) return 0D;
         if (itemStack.getItemMeta() == null) return 0D;
-        if (itemStack.getItemMeta().getPersistentDataContainer().get(ELITE_DEFENSE, PersistentDataType.DOUBLE) == null)
-            return 0D;
-        return itemStack.getItemMeta().getPersistentDataContainer().get(ELITE_DEFENSE, PersistentDataType.DOUBLE);
+        try {
+            Double value = itemStack.getItemMeta().getPersistentDataContainer().get(ELITE_DEFENSE, PersistentDataType.DOUBLE);
+            return value != null ? value : 0D;
+        } catch (IllegalArgumentException e) {
+            // Legacy items may have stored this as Float
+            Float value = itemStack.getItemMeta().getPersistentDataContainer().get(ELITE_DEFENSE, PersistentDataType.FLOAT);
+            return value != null ? value.doubleValue() : 0D;
+        }
     }
 
     public static void setEliteDefenseAttribute(@Nullable ItemStack itemStack, double defenseValue) {

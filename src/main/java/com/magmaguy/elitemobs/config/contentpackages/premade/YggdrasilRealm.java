@@ -3,13 +3,15 @@ package com.magmaguy.elitemobs.config.contentpackages.premade;
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
 import org.bukkit.World;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class YggdrasilRealm extends ContentPackagesConfigFields {
     public YggdrasilRealm() {
         super("yggdrasil_realm",
                 true,
-                "&2[lvl 075-085] &5Yggdrasil",
+                "&5Yggdrasil",
                 List.of("&5A mythic Norse dungeon at the roots of Yggdrasil!",
                         "&5Credits: MagmaGuy, Dali, Frost"),
                 "https://nightbreak.io/plugin/elitemobs/#the-vampire-manor",
@@ -27,8 +29,15 @@ public class YggdrasilRealm extends ContentPackagesConfigFields {
                 "&8[EM] &5You have left Yggdrasil",
                 "em_yggdrasil",
                 false);
+        setContentType(ContentType.DYNAMIC_DUNGEON);
+        setContentLevel(-1);
+        setDifficulties(List.of(
+                Map.of("name", "normal", "levelSync", "+5", "id", 0),
+                Map.of("name", "hard", "levelSync", "+0", "id", 1),
+                Map.of("name", "mythic", "levelSync", "-5", "id", 2)));
+        setDungeonLockoutMinutes(1440);
         setSetupMenuDescription(List.of(
-                "&2A Realm for players around level 75!"
+                "&2A dynamic Realm!"
         ));
     }
 }

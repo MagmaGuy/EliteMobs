@@ -27,7 +27,7 @@ public class BuyOrSellMenu {
     public static void constructBuyOrSellMenu(Player player, ItemStack buyItemStack) {
         String inventoryName = BuyOrSellMenuConfig.SHOP_NAME;
         if (DefaultConfig.useResourcePackModels())
-            inventoryName = ChatColor.WHITE + "\uF801\uDB80\uDC7B\uF805       " + inventoryName;
+            inventoryName = ChatColor.WHITE + "\uDB83\uDEF1\uDB83\uDE07\uDB83\uDEF5       " + inventoryName;
 
         Inventory shopInventory = Bukkit.createInventory(player, 18, inventoryName);
         menus.add(shopInventory);

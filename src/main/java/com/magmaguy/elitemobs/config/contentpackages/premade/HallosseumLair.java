@@ -4,13 +4,15 @@ import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields
 import org.bukkit.World;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class HallosseumLair extends ContentPackagesConfigFields {
     public HallosseumLair() {
         super("hallosseum_lair",
                 true,
-                "&2[lvl 030] &cThe Hallosseum",
+                "&cThe Hallosseum",
                 new ArrayList<>(List.of("&fThe 2020 spooky halloween encounter!",
                         "&6Credits: MagmaGuy & 69OzCanOfBepis")),
                 "https://nightbreak.io/plugin/elitemobs/#hallosseum",
@@ -27,7 +29,14 @@ public class HallosseumLair extends ContentPackagesConfigFields {
                 "&8[EM] &4You've escaped with your soul intact.",
                 "the_hallosseum",
                 false);
+        setContentType(ContentType.DYNAMIC_DUNGEON);
+        setContentLevel(-1);
+        setDifficulties(List.of(
+                Map.of("name", "normal", "levelSync", "+5", "id", 0),
+                Map.of("name", "hard", "levelSync", "+0", "id", 1),
+                Map.of("name", "mythic", "levelSync", "-5", "id", 2)));
+        setDungeonLockoutMinutes(1440);
         setSetupMenuDescription(List.of(
-                "&2An arena for players between levels 100-150!"));
+                "&2A dynamic Lair!"));
     }
 }
