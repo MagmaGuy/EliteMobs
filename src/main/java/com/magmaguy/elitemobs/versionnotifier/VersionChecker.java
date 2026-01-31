@@ -14,14 +14,9 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.IOException;
-import java.net.ConnectException;
-import java.net.SocketTimeoutException;
-import java.net.URL;
-import java.net.UnknownHostException;
+import java.net.*;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class VersionChecker {
     private static final List<EMPackage> outdatedPackages = new ArrayList<>();
@@ -124,71 +119,230 @@ public class VersionChecker {
     private static void checkContentVersion() {
         Bukkit.getScheduler().runTaskAsynchronously(MetadataHandler.PLUGIN, () -> {
             try {
-                String remoteVersions = readStringFromURL("https://www.magmaguy.com/api/elitemobs_content");
-                connectionFailed = false; // Reset the flag if successful
-                connectionRetryCount = 0; // Reset retry count
+                String jsonResponse = fetchFromNightbreak("https://nightbreak.io/api/dlc");
+                connectionFailed = false;
+                connectionRetryCount = 0;
 
-                String[] lines = remoteVersions.split("\n");
-                processContentVersionData(lines);
+                Map<String, Integer> remoteVersions = parseNightbreakDlcResponse(jsonResponse);
+                processContentVersionData(remoteVersions);
 
             } catch (IOException e) {
                 handleConnectionError("content version check", e);
 
-                // If we've tried enough times, or this is not a connection issue,
-                // use cached data if available or proceed without updates
                 if (connectionRetryCount >= MAX_RETRY_ATTEMPTS ||
                         !(e instanceof UnknownHostException || e instanceof ConnectException || e instanceof SocketTimeoutException)) {
                     Logger.info("Using local data for content version checks as remote server is unavailable.");
-                    // Each package will be considered up-to-date since we can't verify
                 }
             }
         });
     }
 
     /**
-     * Process the content version data that was successfully retrieved
+     * Fetches JSON data from the Nightbreak API
      *
-     * @param lines Lines of data from the remote version file
+     * @param urlString The URL to fetch from
+     * @return The JSON response as a string
+     * @throws IOException If the request fails
      */
-    private static void processContentVersionData(String[] lines) {
+    private static String fetchFromNightbreak(String urlString) throws IOException {
+        URL url = new URL(urlString);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        connection.setRequestProperty("Accept", "application/json");
+        connection.setConnectTimeout(10000);
+        connection.setReadTimeout(10000);
+
+        int responseCode = connection.getResponseCode();
+        if (responseCode != 200) {
+            throw new IOException("Nightbreak API returned status code: " + responseCode);
+        }
+
+        try (Scanner scanner = new Scanner(connection.getInputStream(), StandardCharsets.UTF_8)) {
+            scanner.useDelimiter("\\A");
+            return scanner.hasNext() ? scanner.next() : "";
+        }
+    }
+
+    /**
+     * Parses the Nightbreak /api/dlc response and extracts slug -> version mappings
+     *
+     * @param json The JSON response from the API
+     * @return Map of slug to version number
+     */
+    private static Map<String, Integer> parseNightbreakDlcResponse(String json) {
+        Map<String, Integer> versions = new HashMap<>();
+
+        // Parse DLC entries from all categories (accessible, patreonRequired, purchaseAvailable)
+        String[] categories = {"accessible", "patreonRequired", "purchaseAvailable"};
+
+        for (String category : categories) {
+            String categoryKey = "\"" + category + "\":";
+            int categoryStart = json.indexOf(categoryKey);
+            if (categoryStart == -1) continue;
+
+            // Find the array for this category
+            int arrayStart = json.indexOf("[", categoryStart);
+            if (arrayStart == -1) continue;
+
+            int arrayEnd = findMatchingBracket(json, arrayStart);
+            if (arrayEnd == -1) continue;
+
+            String arrayContent = json.substring(arrayStart, arrayEnd + 1);
+            parseEntriesFromArray(arrayContent, versions);
+        }
+
+        return versions;
+    }
+
+    /**
+     * Finds the matching closing bracket for an opening bracket
+     */
+    private static int findMatchingBracket(String json, int openPos) {
+        int depth = 0;
+        boolean inString = false;
+        for (int i = openPos; i < json.length(); i++) {
+            char c = json.charAt(i);
+            if (c == '"' && (i == 0 || json.charAt(i - 1) != '\\')) {
+                inString = !inString;
+            } else if (!inString) {
+                if (c == '[') depth++;
+                else if (c == ']') {
+                    depth--;
+                    if (depth == 0) return i;
+                }
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * Parses individual DLC entries from a JSON array and extracts slug/version
+     */
+    private static void parseEntriesFromArray(String arrayJson, Map<String, Integer> versions) {
+        int pos = 0;
+        while (pos < arrayJson.length()) {
+            int objectStart = arrayJson.indexOf("{", pos);
+            if (objectStart == -1) break;
+
+            int objectEnd = findMatchingBrace(arrayJson, objectStart);
+            if (objectEnd == -1) break;
+
+            String objectJson = arrayJson.substring(objectStart, objectEnd + 1);
+
+            String slug = extractJsonString(objectJson, "slug");
+            String versionStr = extractJsonString(objectJson, "currentVersion");
+
+            if (slug != null && versionStr != null && !versionStr.isEmpty()) {
+                try {
+                    // Version format is "v11" or similar, strip the 'v' prefix
+                    String numericVersion = versionStr.startsWith("v") ? versionStr.substring(1) : versionStr;
+                    int version = Integer.parseInt(numericVersion);
+                    versions.put(slug, version);
+                } catch (NumberFormatException e) {
+                    // Skip entries with non-numeric versions
+                }
+            }
+
+            pos = objectEnd + 1;
+        }
+    }
+
+    /**
+     * Finds the matching closing brace for an opening brace
+     */
+    private static int findMatchingBrace(String json, int openPos) {
+        int depth = 0;
+        boolean inString = false;
+        for (int i = openPos; i < json.length(); i++) {
+            char c = json.charAt(i);
+            if (c == '"' && (i == 0 || json.charAt(i - 1) != '\\')) {
+                inString = !inString;
+            } else if (!inString) {
+                if (c == '{') depth++;
+                else if (c == '}') {
+                    depth--;
+                    if (depth == 0) return i;
+                }
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * Extracts a string value from a JSON object
+     */
+    private static String extractJsonString(String json, String key) {
+        String searchKey = "\"" + key + "\":";
+        int keyIndex = json.indexOf(searchKey);
+        if (keyIndex == -1) return null;
+
+        int valueStart = keyIndex + searchKey.length();
+        // Skip whitespace
+        while (valueStart < json.length() && Character.isWhitespace(json.charAt(valueStart))) {
+            valueStart++;
+        }
+
+        if (valueStart >= json.length()) return null;
+
+        // Check for null value
+        if (json.substring(valueStart).startsWith("null")) {
+            return null;
+        }
+
+        // Check for string value
+        if (json.charAt(valueStart) == '"') {
+            int stringEnd = json.indexOf("\"", valueStart + 1);
+            if (stringEnd == -1) return null;
+            return json.substring(valueStart + 1, stringEnd);
+        }
+
+        return null;
+    }
+
+    /**
+     * Process the content version data from Nightbreak API
+     *
+     * @param remoteVersions Map of slug to version from Nightbreak
+     */
+    private static void processContentVersionData(Map<String, Integer> remoteVersions) {
         for (EMPackage emPackage : EMPackage.getEmPackages().values()) {
             if (!emPackage.isInstalled()) continue;
             if (!emPackage.getContentPackagesConfigFields().isDefaultDungeon()) continue;
+
+            // Skip packages contained in meta packages
             boolean containedInMetaPackage = false;
-            for (EMPackage metaPackage : EMPackage.getEmPackages().values())
+            for (EMPackage metaPackage : EMPackage.getEmPackages().values()) {
                 if (metaPackage.getContentPackagesConfigFields().getContainedPackages() != null &&
                         !metaPackage.getContentPackagesConfigFields().getContainedPackages().isEmpty() &&
                         metaPackage.getContentPackagesConfigFields().getContainedPackages().contains(emPackage.getContentPackagesConfigFields().getFilename())) {
                     containedInMetaPackage = true;
                     break;
                 }
-
-            if (containedInMetaPackage) continue;
-            boolean checked = false;
-            for (String line : lines) {
-                if (line.startsWith(emPackage.getContentPackagesConfigFields().getFilename().replace(".yml", ""))) {
-                    String[] split = line.split(":");
-                    int remoteVersion = 0;
-                    try {
-                        remoteVersion = Integer.parseInt(split[1].trim());
-                    } catch (Exception e) {
-                        Logger.warn("Remote version substring: " + split[1].trim());
-                        e.printStackTrace();
-                    }
-                    if (remoteVersion > emPackage.getContentPackagesConfigFields().getDungeonVersion()) {
-                        emPackage.setOutOfDate(true);
-                        outdatedPackages.add(emPackage);
-                        Logger.warn("Content " + emPackage.getContentPackagesConfigFields().getName() +
-                                " is outdated! You should go download the updated version! Your version: " +
-                                emPackage.getContentPackagesConfigFields().getDungeonVersion() + " / remote version: " +
-                                remoteVersion + " / Link: " + emPackage.getContentPackagesConfigFields().getDownloadLink());
-                    }
-                    checked = true;
-                    break;
-                }
             }
-            if (!checked)
-                Logger.warn("Failed to check content " + emPackage.getContentPackagesConfigFields().getFilename() + " ! The remote server doesn't have a version listed for it, report it to the developer!");
+            if (containedInMetaPackage) continue;
+
+            // Get the Nightbreak slug from the content package
+            String slug = emPackage.getContentPackagesConfigFields().getNightbreakSlug();
+            if (slug == null || slug.isEmpty()) {
+                // No slug configured, skip version checking for this content
+                continue;
+            }
+
+            Integer remoteVersion = remoteVersions.get(slug);
+            if (remoteVersion == null) {
+                Logger.warn("No version info found on Nightbreak for content: " + emPackage.getContentPackagesConfigFields().getName() + " (slug: " + slug + ")");
+                continue;
+            }
+
+            int localVersion = emPackage.getContentPackagesConfigFields().getDungeonVersion();
+            if (remoteVersion > localVersion) {
+                emPackage.setOutOfDate(true);
+                outdatedPackages.add(emPackage);
+                Logger.warn("Content " + emPackage.getContentPackagesConfigFields().getName() +
+                        " is outdated! You should go download the updated version! Your version: " +
+                        localVersion + " / remote version: " + remoteVersion +
+                        " / Link: " + emPackage.getContentPackagesConfigFields().getDownloadLink());
+            }
         }
     }
 

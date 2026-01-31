@@ -17,7 +17,7 @@ public class FletcherConfig extends NPCsConfigFields {
                 "Robin",
                 "<Fletcher>",
                 Villager.Profession.FLETCHER,
-                "em_adventurers_guild,297.5,81,268.5,90,0",
+                "em_adventurers_guild,297.5,78,242.5,90,0",
                 new ArrayList<>(List.of(
                         "Looking for arrows?",
                         "I've got the sharpest arrows in town!",

@@ -14,7 +14,7 @@ public class EnchanterConfig extends NPCsConfigFields {
                 "Eden",
                 "<Enchanter>",
                 Villager.Profession.TOOLSMITH,
-                "em_adventurers_guild,283.5,77,243.5,0,0",
+                "em_adventurers_guild,284.5,74,246.5,0,0",
                 new ArrayList<>(List.of(
                         "Need something enchanted?",
                         "Feeling lucky?",

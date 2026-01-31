@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.config.contentpackages.premade;
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
 import org.bukkit.World;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -11,7 +10,7 @@ public class KnightCastleLair extends ContentPackagesConfigFields {
     public KnightCastleLair() {
         super("knights_castle_lair",
                 true,
-                "&fThe Knight's Castle",
+                "&2[Dynamic] &fThe Knight's Castle",
                 List.of("&fChallenge the knights of the castle!"),
                 "https://nightbreak.io/plugin/elitemobs/#the-knights-castle",
                 DungeonSizeCategory.LAIR,
@@ -36,5 +35,6 @@ public class KnightCastleLair extends ContentPackagesConfigFields {
         setDungeonLockoutMinutes(1440);
         setSetupMenuDescription(List.of(
                 "&2A dynamic Lair!"));
+        setNightbreakSlug("the-knights-castle");
     }
 }

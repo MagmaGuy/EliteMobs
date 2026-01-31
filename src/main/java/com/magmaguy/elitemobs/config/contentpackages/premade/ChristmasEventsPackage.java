@@ -22,5 +22,6 @@ public class ChristmasEventsPackage extends ContentPackagesConfigFields {
         setName("&2Christmas Events");
         setCustomInfo(List.of("Christmas-themed events!"));
         setDownloadLink("https://nightbreak.io/plugin/elitemobs/#christmas-events");
+        setNightbreakSlug("christmas-events");
     }
 }

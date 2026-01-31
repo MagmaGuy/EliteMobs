@@ -36,5 +36,6 @@ public class PrimisGladiusInvasionDungeon extends ContentPackagesConfigFields {
         ));
         setMaxPlayerCount(5);
         setListedInTeleports(false);
+        setNightbreakSlug("primis-adventure");
     }
 }

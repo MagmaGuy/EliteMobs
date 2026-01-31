@@ -13,7 +13,7 @@ public class WoodLeagueArenaMasterConfig extends NPCsConfigFields {
                 "Gladius",
                 "<Arena Master>",
                 Villager.Profession.ARMORER,
-                "em_adventurers_guild,240.5,92,270,-108,0",
+                "em_adventurers_guild,219.5,93,257.5,0,0",
                 List.of("Welcome to the\\nArena!"),
                 List.of("Prepared to face the arena?"),
                 List.of("Return with your shield, or on it!"),

@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.config.contentpackages.premade;
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
 import org.bukkit.World;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -11,7 +10,7 @@ public class CatacombsLair extends ContentPackagesConfigFields {
     public CatacombsLair() {
         super("catacombs_lair",
                 true,
-                "&8The Catacombs",
+                "&2[Dynamic] &8The Catacombs",
                 List.of("&fA great starter lair for players!",
                         "&6Credits: Realm of Lotheridon, MagmaGuy, Dali, Frost"),
                 "https://nightbreak.io/plugin/elitemobs/#the-catacombs",
@@ -37,5 +36,6 @@ public class CatacombsLair extends ContentPackagesConfigFields {
         setDungeonLockoutMinutes(1440);
         setSetupMenuDescription(List.of(
                 "&2A dynamic Lair!"));
+        setNightbreakSlug("the-catacombs");
     }
 }

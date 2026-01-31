@@ -39,5 +39,6 @@ public class CraftenminesLabSanctum extends ContentPackagesConfigFields {
         setSetupMenuDescription(List.of(
                 "&2A dynamic Sanctum!",
                 "Includes custom models and a custom soundtrack!"));
+        setNightbreakSlug("craftenmines-laboratory");
     }
 }

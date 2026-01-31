@@ -29,5 +29,6 @@ public class PrimisAdventure extends ContentPackagesConfigFields {
                 false);
         setWormholeWorldName("em_primis_wormhole");
         setHasCustomModels(true);
+        setNightbreakSlug("primis-adventure");
     }
 }

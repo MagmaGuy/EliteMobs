@@ -4,7 +4,6 @@ import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields
 import org.bukkit.World;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,7 +11,7 @@ public class FireworksLair extends ContentPackagesConfigFields {
     public FireworksLair() {
         super("fireworks_lair",
                 true,
-                "&aThe Fireworks",
+                "&2[Dynamic] &aThe Fireworks",
                 new ArrayList<>(List.of("&fThe 2021 4th of July map!",
                         "&6Credits: MagmaGuy")),
                 "https://nightbreak.io/plugin/elitemobs/#fireworks",
@@ -38,5 +37,6 @@ public class FireworksLair extends ContentPackagesConfigFields {
         setDungeonLockoutMinutes(1440);
         setSetupMenuDescription(List.of(
                 "&2A dynamic Lair!"));
+        setNightbreakSlug("fireworks");
     }
 }

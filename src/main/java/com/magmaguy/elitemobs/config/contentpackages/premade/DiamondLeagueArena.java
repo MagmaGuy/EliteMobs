@@ -27,5 +27,6 @@ public class DiamondLeagueArena extends ContentPackagesConfigFields {
                 false);
         setSetupMenuDescription(List.of(
                 "&2An arena for players between levels 100-150!"));
+        setNightbreakSlug("arena-diamond-league-arena");
     }
 }

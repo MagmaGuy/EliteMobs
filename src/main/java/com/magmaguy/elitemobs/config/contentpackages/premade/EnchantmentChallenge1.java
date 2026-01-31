@@ -32,5 +32,6 @@ public class EnchantmentChallenge1 extends ContentPackagesConfigFields {
                 Map.of("name", "normal", "id", 0)));
         setEnchantmentChallenge(true);
         setMaxPlayerCount(1);
+        setNightbreakSlug("free-enchantment-challenge-sanctums");
     }
 }

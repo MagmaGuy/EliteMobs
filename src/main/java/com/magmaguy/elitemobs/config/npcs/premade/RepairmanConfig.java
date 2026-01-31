@@ -14,7 +14,7 @@ public class RepairmanConfig extends NPCsConfigFields {
                 "Reggie",
                 "<Repairman>",
                 Villager.Profession.WEAPONSMITH,
-                "em_adventurers_guild,283.5,81,263.5,-90,0",
+                "em_adventurers_guild,283.5,78,266.5,-90,0",
                 new ArrayList<>(List.of(
                         "Get your items repaired!",
                         "Repairing items for scrap!",

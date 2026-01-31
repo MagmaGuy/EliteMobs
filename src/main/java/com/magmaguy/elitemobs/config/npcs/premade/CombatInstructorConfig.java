@@ -14,7 +14,7 @@ public class CombatInstructorConfig extends NPCsConfigFields {
                 "Charles",
                 "<Combat Instructor>",
                 Villager.Profession.NITWIT,
-                "em_adventurers_guild,268.5,91.0,295.5,294,0",
+                "em_adventurers_guild,301.5,91.0,219.5,90,0",
                 new ArrayList<>(List.of(
                         "Want to learn about combat?",
                         "Need a combat lesson?",

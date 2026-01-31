@@ -13,7 +13,7 @@ public class CatacombsTeleporter extends NPCsConfigFields {
                 "Crypt Keeper",
                 "<Catacombs Teleporter>",
                 Villager.Profession.ARMORER,
-                "em_adventurers_guild,283.5,92,283.5,0,0",
+                "em_adventurers_guild,295.5,92,307.5,90,0",
                 List.of(""),
                 List.of(),
                 List.of(),
@@ -21,5 +21,7 @@ public class CatacombsTeleporter extends NPCsConfigFields {
                 1,
                 NPCInteractions.NPCInteractionType.COMMAND);
         setCommand("em dungeontp catacombs_lair.yml");
+        setCustomModel("em_ag_cryptkeeper");
+        setSyncMovement(false);
     }
 }

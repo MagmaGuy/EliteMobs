@@ -13,7 +13,7 @@ public class BeastsSanctuaryTeleporter extends NPCsConfigFields {
                 "Beast Warden",
                 "<Beasts Sanctuary Teleporter>",
                 Villager.Profession.ARMORER,
-                "em_adventurers_guild,289.5,92,297.5,180,0",
+                "em_adventurers_guild,291.5,92,304.5,-90,0",
                 List.of(""),
                 List.of(),
                 List.of(),
@@ -21,5 +21,7 @@ public class BeastsSanctuaryTeleporter extends NPCsConfigFields {
                 1,
                 NPCInteractions.NPCInteractionType.COMMAND);
         setCommand("em dungeontp beasts_sanctuary_lair.yml");
+        setCustomModel("em_ag_beastwarden");
+        setSyncMovement(false);
     }
 }
