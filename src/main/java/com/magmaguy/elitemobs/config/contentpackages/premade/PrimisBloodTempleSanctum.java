@@ -33,5 +33,6 @@ public class PrimisBloodTempleSanctum extends ContentPackagesConfigFields {
         setDifficulties(List.of(
                 Map.of("name", "normal", "id", 0)));
         setListedInTeleports(false);
+        setNightbreakSlug("primis-adventure");
     }
 }

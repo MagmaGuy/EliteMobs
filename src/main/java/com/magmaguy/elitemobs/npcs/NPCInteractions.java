@@ -12,6 +12,7 @@ import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -32,121 +33,109 @@ public class NPCInteractions implements Listener {
         cooldowns.clear();
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void playerNPCInteract(PlayerInteractAtEntityEvent event) {
-        UUID playerUUID = event.getPlayer().getUniqueId();
+    public static void handleNPCInteraction(Player player, NPCEntity npcEntity) {
+        UUID playerUUID = player.getUniqueId();
         if (cooldowns.contains(playerUUID)) return;
         cooldowns.add(playerUUID);
         Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> cooldowns.remove(playerUUID), 1);
-        if (event.isCancelled()) return;
-
-        NPCEntity npcEntity = EntityTracker.getNPCEntity(event.getRightClicked());
-        if (npcEntity == null) return;
-        if (event.getPlayer().getInventory().getItemInMainHand().getType().equals(Material.NAME_TAG)) {
-            event.setCancelled(true);
-            event.getPlayer().sendMessage("[EliteMobs] You can't rename NPCs using name tags!");
-            return;
-        }
-
-        event.setCancelled(true);
 
         switch (npcEntity.getNPCsConfigFields().getInteractionType()) {
             case GUILD_GREETER:
-                if (event.getPlayer().hasPermission("elitemobs.rank.npc")) {
+                if (player.hasPermission("elitemobs.rank.npc")) {
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                            SkillBonusMenu.openWeaponSelectMenu(event.getPlayer());
+                            SkillBonusMenu.openWeaponSelectMenu(player);
                         }
                     }.runTaskLater(MetadataHandler.PLUGIN, 1);
                 }
                 break;
             case CHAT:
-                npcEntity.sayDialog(event.getPlayer());
+                npcEntity.sayDialog(player);
                 break;
             case CUSTOM_SHOP:
-                if (event.getPlayer().hasPermission("elitemobs.shop.custom.npc"))
+                if (player.hasPermission("elitemobs.shop.custom.npc"))
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                            CustomShopMenu.customShopInitializer(event.getPlayer());
+                            CustomShopMenu.customShopInitializer(player);
                         }
                     }.runTaskLater(MetadataHandler.PLUGIN, 1);
 
                 break;
             case PROCEDURALLY_GENERATED_SHOP:
-                if (event.getPlayer().hasPermission("elitemobs.shop.dynamic.npc"))
+                if (player.hasPermission("elitemobs.shop.dynamic.npc"))
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                            ProceduralShopMenu.shopInitializer(event.getPlayer());
+                            ProceduralShopMenu.shopInitializer(player);
                         }
                     }.runTaskLater(MetadataHandler.PLUGIN, 1);
                 break;
             case QUEST_GIVER:
-                if (event.getPlayer().hasPermission("elitemobs.quest.npc"))
+                if (player.hasPermission("elitemobs.quest.npc"))
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                            QuestInteractionHandler.processDynamicQuests(event.getPlayer(), npcEntity);
+                            QuestInteractionHandler.processDynamicQuests(player, npcEntity);
                         }
                     }.runTaskLater(MetadataHandler.PLUGIN, 1);
                 break;
             case CUSTOM_QUEST_GIVER:
-                QuestInteractionHandler.processNPCQuests(event.getPlayer(), npcEntity);
+                QuestInteractionHandler.processNPCQuests(player, npcEntity);
                 break;
             case BAR:
-                event.getPlayer().sendMessage("[EliteMobs] This feature is coming soon!");
+                player.sendMessage("[EliteMobs] This feature is coming soon!");
                 break;
             case SELL:
-                if (event.getPlayer().hasPermission("elitemobs.shop.sell.npc"))
+                if (player.hasPermission("elitemobs.shop.sell.npc"))
                     new BukkitRunnable() {
                         @Override
                         public void run() {
                             SellMenu sellMenu = new SellMenu();
-                            sellMenu.constructSellMenu(event.getPlayer());
+                            sellMenu.constructSellMenu(player);
                         }
                     }.runTaskLater(MetadataHandler.PLUGIN, 1);
                 break;
             case TELEPORT_BACK:
-                if (event.getPlayer().hasPermission("elitemobs.back.npc")) {
-                    Location previousLocation = PlayerData.getBackTeleportLocation(event.getPlayer());
+                if (player.hasPermission("elitemobs.back.npc")) {
+                    Location previousLocation = PlayerData.getBackTeleportLocation(player);
                     if (previousLocation == null) {
                         if (npcEntity.npCsConfigFields.noPreviousLocationMessage != null)
-                            event.getPlayer().sendMessage(ChatColorConverter.convert(npcEntity.npCsConfigFields.noPreviousLocationMessage));
+                            player.sendMessage(ChatColorConverter.convert(npcEntity.npCsConfigFields.noPreviousLocationMessage));
                     } else
-                        PlayerPreTeleportEvent.teleportPlayer(event.getPlayer(), previousLocation);
+                        PlayerPreTeleportEvent.teleportPlayer(player, previousLocation);
                 }
                 break;
             case SCRAPPER:
-                if (event.getPlayer().hasPermission("elitemobs.scrap.npc")) {
+                if (player.hasPermission("elitemobs.scrap.npc")) {
                     new BukkitRunnable() {
                         @Override
                         public void run() {
                             ScrapperMenu scrapperMenu = new ScrapperMenu();
-                            scrapperMenu.constructScrapMenu(event.getPlayer());
+                            scrapperMenu.constructScrapMenu(player);
                         }
                     }.runTaskLater(MetadataHandler.PLUGIN, 1);
                 }
                 break;
             case REPAIRMAN:
-                if (event.getPlayer().hasPermission("elitemobs.repair.npc")) {
+                if (player.hasPermission("elitemobs.repair.npc")) {
                     new BukkitRunnable() {
                         @Override
                         public void run() {
                             RepairMenu repairMenu = new RepairMenu();
-                            repairMenu.constructRepairMenu(event.getPlayer());
+                            repairMenu.constructRepairMenu(player);
                         }
                     }.runTaskLater(MetadataHandler.PLUGIN, 1);
                 }
                 break;
             case UNBINDER:
-                if (event.getPlayer().hasPermission("elitemobs.unbind.npc")) {
+                if (player.hasPermission("elitemobs.unbind.npc")) {
                     new BukkitRunnable() {
                         @Override
                         public void run() {
                             UnbindMenu unbindMenu = new UnbindMenu();
-                            unbindMenu.constructUnbinderMenu(event.getPlayer());
+                            unbindMenu.constructUnbinderMenu(player);
                         }
                     }.runTaskLater(MetadataHandler.PLUGIN, 1);
                 }
@@ -156,7 +145,7 @@ public class NPCInteractions implements Listener {
                     @Override
                     public void run() {
                         ArenaMenu arenaMenu = new ArenaMenu();
-                        arenaMenu.constructArenaMenu(event.getPlayer(), npcEntity.getNPCsConfigFields().getArenaFilename());
+                        arenaMenu.constructArenaMenu(player, npcEntity.getNPCsConfigFields().getArenaFilename());
                     }
                 }.runTaskLater(MetadataHandler.PLUGIN, 1);
                 break;
@@ -171,83 +160,98 @@ public class NPCInteractions implements Listener {
                 new BukkitRunnable() {
                     @Override
                     public void run() {
-                        event.getPlayer().performCommand(npcEntity.getNPCsConfigFields().getCommand());
+                        player.performCommand(npcEntity.getNPCsConfigFields().getCommand());
                     }
                 }.runTaskLater(MetadataHandler.PLUGIN, 1);
                 break;
             case ENHANCER:
             case REFINER:
             case SMELTER:
-                event.getPlayer().sendMessage(ChatColorConverter.convert("&8[EliteMobs] &cThis feature has been replaced! This NPC should be removed by an admin as soon as possible."));
-                if (event.getPlayer().isOp() || event.getPlayer().hasPermission("elitemobs.*")) {
-                    event.getPlayer().sendMessage(ChatColorConverter.convert("&2To remove this NPC, use the command &6/em remove &2and hit the NPC!"));
+                player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &cThis feature has been replaced! This NPC should be removed by an admin as soon as possible."));
+                if (player.isOp() || player.hasPermission("elitemobs.*")) {
+                    player.sendMessage(ChatColorConverter.convert("&2To remove this NPC, use the command &6/em remove &2and hit the NPC!"));
                 }
                 break;
             case ENCHANTER:
-                if (event.getPlayer().hasPermission("elitemobs.enchant.npc"))
+                if (player.hasPermission("elitemobs.enchant.npc"))
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                            new ItemEnchantmentMenu(event.getPlayer());
+                            new ItemEnchantmentMenu(player);
                         }
                     }.runTaskLater(MetadataHandler.PLUGIN, 1);
                 break;
             case SCROLL_APPLIER:
-                if (event.getPlayer().hasPermission("elitemobs.scroll.npc"))
+                if (player.hasPermission("elitemobs.scroll.npc"))
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                            new EliteScrollMenu(event.getPlayer());
+                            new EliteScrollMenu(player);
                         }
                     }.runTaskLater(MetadataHandler.PLUGIN, 1);
                 break;
             case ARROW_SHOP:
-                if (event.getPlayer().hasPermission("elitemobs.shop.arrow.npc"))
+                if (player.hasPermission("elitemobs.shop.arrow.npc"))
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                            ArrowShopMenu.openArrowShop(event.getPlayer());
+                            ArrowShopMenu.openArrowShop(player);
                         }
                     }.runTaskLater(MetadataHandler.PLUGIN, 1);
                 break;
             case GAMBLING_BLACKJACK:
-                if (event.getPlayer().hasPermission("elitemobs.gambling.npc"))
+                if (player.hasPermission("elitemobs.gambling.npc"))
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                            BettingMenu.openBettingMenu(event.getPlayer(), BettingMenu.GameType.BLACKJACK);
+                            BettingMenu.openBettingMenu(player, BettingMenu.GameType.BLACKJACK);
                         }
                     }.runTaskLater(MetadataHandler.PLUGIN, 1);
                 break;
             case GAMBLING_COINFLIP:
-                if (event.getPlayer().hasPermission("elitemobs.gambling.npc"))
+                if (player.hasPermission("elitemobs.gambling.npc"))
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                            BettingMenu.openBettingMenu(event.getPlayer(), BettingMenu.GameType.COIN_FLIP);
+                            BettingMenu.openBettingMenu(player, BettingMenu.GameType.COIN_FLIP);
                         }
                     }.runTaskLater(MetadataHandler.PLUGIN, 1);
                 break;
             case GAMBLING_SLOTS:
-                if (event.getPlayer().hasPermission("elitemobs.gambling.npc"))
+                if (player.hasPermission("elitemobs.gambling.npc"))
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                            BettingMenu.openBettingMenu(event.getPlayer(), BettingMenu.GameType.SLOTS);
+                            BettingMenu.openBettingMenu(player, BettingMenu.GameType.SLOTS);
                         }
                     }.runTaskLater(MetadataHandler.PLUGIN, 1);
                 break;
             case GAMBLING_HIGHERLOWER:
-                if (event.getPlayer().hasPermission("elitemobs.gambling.npc"))
+                if (player.hasPermission("elitemobs.gambling.npc"))
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                            BettingMenu.openBettingMenu(event.getPlayer(), BettingMenu.GameType.HIGHER_LOWER);
+                            BettingMenu.openBettingMenu(player, BettingMenu.GameType.HIGHER_LOWER);
                         }
                     }.runTaskLater(MetadataHandler.PLUGIN, 1);
                 break;
         }
 
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void playerNPCInteract(PlayerInteractAtEntityEvent event) {
+        if (event.isCancelled()) return;
+        NPCEntity npcEntity = EntityTracker.getNPCEntity(event.getRightClicked());
+        if (npcEntity == null) return;
+        Player player = event.getPlayer();
+        if (player.getInventory().getItemInMainHand().getType().equals(Material.NAME_TAG)) {
+            event.setCancelled(true);
+            player.sendMessage("[EliteMobs] You can't rename NPCs using name tags!");
+            return;
+        }
+        event.setCancelled(true);
+        handleNPCInteraction(player, npcEntity);
     }
 
     @EventHandler

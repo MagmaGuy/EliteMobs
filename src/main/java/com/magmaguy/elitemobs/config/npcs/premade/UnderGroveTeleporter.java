@@ -6,22 +6,22 @@ import org.bukkit.entity.Villager;
 
 import java.util.List;
 
-public class InvasionTeleporter extends NPCsConfigFields {
-    public InvasionTeleporter() {
-        super("invasion_teleporter",
+public class UnderGroveTeleporter extends NPCsConfigFields {
+    public UnderGroveTeleporter() {
+        super("under_grove_teleporter",
                 true,
-                "Invasion Scout",
-                "<Invasion Teleporter>",
-                Villager.Profession.ARMORER,
-                "em_adventurers_guild,295.5,92,304.5,90,0",
+                "Grove Keeper",
+                "<Under Grove Teleporter>",
+                Villager.Profession.FARMER,
+                "em_adventurers_guild,293.5,92,309.5,-180,0",
                 List.of(""),
                 List.of(),
                 List.of(),
                 true,
                 1,
                 NPCInteractions.NPCInteractionType.COMMAND);
-        setCommand("em dungeontp invasion.yml");
-        setCustomModel("em_ag_invasionscout");
+        setCommand("em dungeontp under_grove_lair.yml");
+        setCustomModel("em_ag_grovekeeper");
         setSyncMovement(false);
     }
 }

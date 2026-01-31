@@ -19,5 +19,6 @@ public class GoblinModelsPackage extends ContentPackagesConfigFields {
         setSetupMenuDescription(List.of(
                 "&2Makes goblins from EliteMobs events look real fancy!"));
         setDownloadLink("https://nightbreak.io/plugin/elitemobs/#goblin-models");
+        setNightbreakSlug("goblin-models");
     }
 }

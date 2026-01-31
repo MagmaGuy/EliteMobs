@@ -27,5 +27,6 @@ public class IronLeagueArena extends ContentPackagesConfigFields {
                 false);
         setSetupMenuDescription(List.of(
                 "&2An arena for players between levels 50-100!"));
+        setNightbreakSlug("iron-league-arena");
     }
 }

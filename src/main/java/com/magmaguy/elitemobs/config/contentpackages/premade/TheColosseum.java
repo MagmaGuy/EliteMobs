@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.config.contentpackages.premade;
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
 import org.bukkit.World;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -11,9 +10,9 @@ public class TheColosseum extends ContentPackagesConfigFields {
     public TheColosseum() {
         super("the_colosseum_lair",
                 true,
-                "&8The Colosseum",
+                "&2[Dynamic] &8The Colosseum",
                 List.of("&fA colosseum!", "&6Credits: MagmaGuy, Dali, Frost"),
-                null, // website field appears to be missing in YAML, set to null
+                "https://nightbreak.io/plugin/elitemobs/#the-colosseum",
                 DungeonSizeCategory.LAIR,
                 "em_the_colosseum",
                 World.Environment.NORMAL,
@@ -37,5 +36,6 @@ public class TheColosseum extends ContentPackagesConfigFields {
         setSetupMenuDescription(List.of(
                 "&2A dynamic Lair!"
         ));
+        setNightbreakSlug("the-colosseum-remake-soon");
     }
 }

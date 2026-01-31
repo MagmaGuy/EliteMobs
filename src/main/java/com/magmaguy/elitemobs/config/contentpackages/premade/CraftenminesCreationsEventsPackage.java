@@ -23,5 +23,6 @@ public class CraftenminesCreationsEventsPackage extends ContentPackagesConfigFie
         setName("&2Craftenmines Creations Events");
         setCustomInfo(List.of("Horrible creations will haunt your server!!"));
         setDownloadLink("https://nightbreak.io/plugin/elitemobs/#craftenmines-creations");
+        setNightbreakSlug("craftenmines-creations");
     }
 }

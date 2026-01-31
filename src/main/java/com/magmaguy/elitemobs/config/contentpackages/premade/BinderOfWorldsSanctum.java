@@ -37,5 +37,6 @@ public class BinderOfWorldsSanctum extends ContentPackagesConfigFields {
                 Map.of("name", "mythic", "levelSync", 195, "id", 2)));
         setSetupMenuDescription(List.of(
                 "&2Basically the final boss of EliteMobs!"));
+        setNightbreakSlug("binder-of-worlds");
     }
 }

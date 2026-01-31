@@ -4,6 +4,8 @@ import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.thirdparty.custommodels.CustomModelInterface;
 import com.magmaguy.freeminecraftmodels.api.ModeledEntityManager;
 import com.magmaguy.freeminecraftmodels.customentity.DynamicEntity;
+import com.magmaguy.freeminecraftmodels.customentity.ModeledEntityLeftClickCallback;
+import com.magmaguy.freeminecraftmodels.customentity.ModeledEntityRightClickCallback;
 import com.magmaguy.freeminecraftmodels.customentity.core.Bone;
 import lombok.Getter;
 import org.bukkit.Location;
@@ -19,6 +21,16 @@ public class CustomModelFMM implements CustomModelInterface {
         dynamicEntity = DynamicEntity.create(modelName, livingEntity);
         if (dynamicEntity == null) return;
         dynamicEntity.setDisplayName(nametagName);
+    }
+
+    public CustomModelFMM(LivingEntity livingEntity, String modelName, String nametagName,
+                          ModeledEntityLeftClickCallback leftClickCallback,
+                          ModeledEntityRightClickCallback rightClickCallback) {
+        dynamicEntity = DynamicEntity.create(modelName, livingEntity);
+        if (dynamicEntity == null) return;
+        dynamicEntity.setDisplayName(nametagName);
+        if (leftClickCallback != null) dynamicEntity.setLeftClickCallback(leftClickCallback);
+        if (rightClickCallback != null) dynamicEntity.setRightClickCallback(rightClickCallback);
     }
 
     public static void reloadModels() {
@@ -79,5 +91,11 @@ public class CustomModelFMM implements CustomModelInterface {
         List<Bone> nametagBones = dynamicEntity.getNametagBones();
         if (nametagBones == null || nametagBones.isEmpty()) return null;
         return nametagBones.get(0).getBoneLocation();
+    }
+
+    @Override
+    public void setSyncMovement(boolean syncMovement) {
+        if (dynamicEntity == null) return;
+        dynamicEntity.setSyncMovement(syncMovement);
     }
 }

@@ -11,7 +11,7 @@ public class BoneMonasteryDungeon extends ContentPackagesConfigFields {
     public BoneMonasteryDungeon() {
         super("bone_monastery_dungeon",
                 true,
-                "&cThe Bone Monastery",
+                "&2[Dynamic] &cThe Bone Monastery",
                 new ArrayList<>(List.of("&fSpooky skeletons await.",
                         "&6Credits: MagmaGuy, Matevagyok, Frostcone, 69OzCanOfBepis")),
                 "https://nightbreak.io/plugin/elitemobs/#bone-monastery",
@@ -37,5 +37,6 @@ public class BoneMonasteryDungeon extends ContentPackagesConfigFields {
         setDungeonLockoutMinutes(1440);
         setSetupMenuDescription(List.of(
                 "&2A dynamic Dungeon!"));
+        setNightbreakSlug("bone-monastery");
     }
 }

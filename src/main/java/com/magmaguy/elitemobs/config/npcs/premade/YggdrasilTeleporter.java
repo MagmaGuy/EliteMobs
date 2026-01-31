@@ -13,7 +13,7 @@ public class YggdrasilTeleporter extends NPCsConfigFields {
                 "Norse Guide",
                 "<Yggdrasil Teleporter>",
                 Villager.Profession.ARMORER,
-                "em_adventurers_guild,289.5,92,273.5,-90,0",
+                "em_adventurers_guild,288.5,92,288.5,-90,0",
                 List.of(""),
                 List.of(),
                 List.of(),
@@ -21,5 +21,7 @@ public class YggdrasilTeleporter extends NPCsConfigFields {
                 1,
                 NPCInteractions.NPCInteractionType.COMMAND);
         setCommand("em dungeontp yggdrasil_realm.yml");
+        setCustomModel("em_ag_norseguide");
+        setSyncMovement(false);
     }
 }

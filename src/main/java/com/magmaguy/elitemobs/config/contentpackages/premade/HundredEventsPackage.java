@@ -112,5 +112,6 @@ public class HundredEventsPackage extends ContentPackagesConfigFields {
         setName("&2100 Events");
         setCustomInfo(List.of("Expand your server with 100 new events!"));
         setDownloadLink("https://nightbreak.io/plugin/elitemobs/#100-events");
+        setNightbreakSlug("events");
     }
 }

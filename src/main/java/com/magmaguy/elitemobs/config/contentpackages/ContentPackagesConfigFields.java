@@ -139,6 +139,9 @@ public class ContentPackagesConfigFields extends CustomConfigFields {
     @Getter
     @Setter
     private int dungeonLockoutMinutes = 0; // 0 = no lockout, otherwise lockout duration in minutes
+    @Getter
+    @Setter
+    private String nightbreakSlug = null; // Slug for Nightbreak API version checking
 
     public ContentPackagesConfigFields(String fileName, boolean isEnabled) {
         super(fileName, isEnabled);
