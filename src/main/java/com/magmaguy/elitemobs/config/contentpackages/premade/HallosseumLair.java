@@ -4,7 +4,6 @@ import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields
 import org.bukkit.World;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,7 +11,7 @@ public class HallosseumLair extends ContentPackagesConfigFields {
     public HallosseumLair() {
         super("hallosseum_lair",
                 true,
-                "&cThe Hallosseum",
+                "&2[Dynamic] &cThe Hallosseum",
                 new ArrayList<>(List.of("&fThe 2020 spooky halloween encounter!",
                         "&6Credits: MagmaGuy & 69OzCanOfBepis")),
                 "https://nightbreak.io/plugin/elitemobs/#hallosseum",
@@ -38,5 +37,6 @@ public class HallosseumLair extends ContentPackagesConfigFields {
         setDungeonLockoutMinutes(1440);
         setSetupMenuDescription(List.of(
                 "&2A dynamic Lair!"));
+        setNightbreakSlug("hallosseum");
     }
 }

@@ -10,10 +10,10 @@ public class RuinsTeleporter extends NPCsConfigFields {
     public RuinsTeleporter() {
         super("ruins_teleporter",
                 true,
-                "Ancient Scholar",
+                "Ruinwarden",
                 "<Ruins Teleporter>",
                 Villager.Profession.ARMORER,
-                "em_adventurers_guild,297.5,92,263.5,90,0",
+                "em_adventurers_guild,302.7,92,292.5,-90,0",
                 List.of(""),
                 List.of(),
                 List.of(),
@@ -21,5 +21,7 @@ public class RuinsTeleporter extends NPCsConfigFields {
                 1,
                 NPCInteractions.NPCInteractionType.COMMAND);
         setCommand("em dungeontp the_ruins.yml");
+        setCustomModel("em_ag_ruinwarden");
+        setSyncMovement(false);
     }
 }

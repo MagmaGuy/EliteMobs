@@ -14,10 +14,9 @@ import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.*;
-import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
-import org.bukkit.util.Consumer;
+import org.bukkit.entity.TextDisplay;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
@@ -81,8 +80,8 @@ public class WormholeEntry implements PersistentObject {
     private String locationString;
     @Getter
     private String armorStandText;
-    // Use real ArmorStand entity like NPCs do - Minecraft handles visibility automatically
-    private ArmorStand textArmorStand = null;
+    // Use real TextDisplay entity - Minecraft handles visibility automatically
+    private TextDisplay textDisplay = null;
     private String worldName;
     @Getter
     @Setter
@@ -180,9 +179,9 @@ public class WormholeEntry implements PersistentObject {
         isProcessingChunkEvent = true;
         try {
             clearLines();
-            if (textArmorStand != null) {
-                textArmorStand.remove();
-                textArmorStand = null;
+            if (textDisplay != null && textDisplay.isValid()) {
+                textDisplay.remove();
+                textDisplay = null;
             }
         } finally {
             isProcessingChunkEvent = false;
@@ -223,9 +222,9 @@ public class WormholeEntry implements PersistentObject {
     }
 
     private void remove(){
-        if (textArmorStand != null) {
-            textArmorStand.remove();
-            textArmorStand = null;
+        if (textDisplay != null && textDisplay.isValid()) {
+            textDisplay.remove();
+            textDisplay = null;
         }
         clearLines();
     }
@@ -255,8 +254,8 @@ public class WormholeEntry implements PersistentObject {
             return;
         }
 
-        // Update text display if needed - use ArmorStand like NPCs do for automatic visibility handling
-        if (armorStandText != null && (textArmorStand == null || !textArmorStand.isValid())) {
+        // Update text display if needed - use real TextDisplay entity
+        if (armorStandText != null && (textDisplay == null || !textDisplay.isValid())) {
             initializeTextDisplay();
         }
 
@@ -323,32 +322,28 @@ public class WormholeEntry implements PersistentObject {
     }
 
     /**
-     * Initialize text display using ArmorStand like NPCs do.
-     * Minecraft handles entity visibility automatically - no manual packet management needed.
+     * Initialize text display using real TextDisplay entity.
+     * Minecraft handles visibility automatically.
      */
     public void initializeTextDisplay() {
         if (armorStandText == null) return;
         if (location == null || location.getWorld() == null) return;
 
-        // Remove old armor stand if it exists
-        if (textArmorStand != null && textArmorStand.isValid()) {
-            textArmorStand.remove();
+        // Remove old text display if it exists
+        if (textDisplay != null && textDisplay.isValid()) {
+            textDisplay.remove();
         }
 
-        Location textLocation = location.clone().add(new Vector(0, 1.2, 0).multiply(wormhole.getWormholeConfigFields().getSizeMultiplier()));
-        textArmorStand = location.getWorld().spawn(textLocation, ArmorStand.class, new Consumer<ArmorStand>() {
-            @Override
-            public void accept(ArmorStand armorStand) {
-                armorStand.setCustomName(ChatColorConverter.convert(armorStandText));
-                armorStand.setCustomNameVisible(true);
-                armorStand.setMarker(true);
-                armorStand.setVisible(false);
-                armorStand.setGravity(false);
-                armorStand.setPersistent(false);
-                armorStand.setRemoveWhenFarAway(false);
-            }
+        double yOffset = 1.2 * wormhole.getWormholeConfigFields().getSizeMultiplier();
+        Location textLocation = location.clone().add(0, yOffset, 0);
+
+        textDisplay = textLocation.getWorld().spawn(textLocation, TextDisplay.class, display -> {
+            display.setText(ChatColorConverter.convert(armorStandText));
+            display.setBillboard(Display.Billboard.CENTER);
+            display.setShadowed(false);
+            display.setPersistent(false);
         });
-        EntityTracker.registerVisualEffects(textArmorStand);
+        EntityTracker.registerVisualEffects(textDisplay);
     }
 
     /**

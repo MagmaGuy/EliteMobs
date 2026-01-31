@@ -29,5 +29,6 @@ public class FreeStoryModeDungeonMetaPack extends ContentPackagesConfigFields {
                 "&2Featuring multiple custom soundtracks, models",
                 "&2unique powers and elaborate maps, it's a really",
                 "&2fun way of experiencing EliteMobs content!"));
+        setNightbreakSlug("story-mode-dungeons");
     }
 }

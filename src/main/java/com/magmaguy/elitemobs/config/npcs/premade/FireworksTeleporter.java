@@ -13,7 +13,7 @@ public class FireworksTeleporter extends NPCsConfigFields {
                 "Pyrotechnician Pete",
                 "<Fireworks Teleporter>",
                 Villager.Profession.ARMORER,
-                "em_adventurers_guild,289.5,92,307.5,-90,0",
+                "em_adventurers_guild,299.5,92,265.5,90,0",
                 List.of(""),
                 List.of(),
                 List.of(),
@@ -21,5 +21,7 @@ public class FireworksTeleporter extends NPCsConfigFields {
                 1,
                 NPCInteractions.NPCInteractionType.COMMAND);
         setCommand("em dungeontp fireworks_lair.yml");
+        setCustomModel("em_ag_pyrotechnicianpete");
+        setSyncMovement(false);
     }
 }

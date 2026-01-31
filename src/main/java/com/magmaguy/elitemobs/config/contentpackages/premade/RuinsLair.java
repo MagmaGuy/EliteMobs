@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.config.contentpackages.premade;
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
 import org.bukkit.World;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -11,7 +10,7 @@ public class RuinsLair extends ContentPackagesConfigFields {
     public RuinsLair() {
         super("the_ruins",
                 true,
-                "&6The Ruins",
+                "&2[Dynamic] &6The Ruins",
                 List.of("&fA fight against a myth from",
                         "&fNorse mythology, be prepared for a smiting!",
                         "&6Credits: 69OzCanOfBepis, MagmaGuy, Dali, Frost"),
@@ -38,5 +37,6 @@ public class RuinsLair extends ContentPackagesConfigFields {
         setDungeonLockoutMinutes(1440);
         setSetupMenuDescription(List.of(
                 "&2A dynamic Lair!"));
+        setNightbreakSlug("the-ruins");
     }
 }

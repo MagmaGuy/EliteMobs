@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.config.contentpackages.premade;
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
 import org.bukkit.World;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -11,10 +10,10 @@ public class YggdrasilRealm extends ContentPackagesConfigFields {
     public YggdrasilRealm() {
         super("yggdrasil_realm",
                 true,
-                "&5Yggdrasil",
+                "&2[Dynamic] &5Yggdrasil",
                 List.of("&5A mythic Norse dungeon at the roots of Yggdrasil!",
                         "&5Credits: MagmaGuy, Dali, Frost"),
-                "https://nightbreak.io/plugin/elitemobs/#the-vampire-manor",
+                "https://nightbreak.io/plugin/elitemobs/#yggdrasil-realm",
                 DungeonSizeCategory.REALM,
                 "em_yggdrasil",
                 World.Environment.NORMAL,
@@ -39,5 +38,6 @@ public class YggdrasilRealm extends ContentPackagesConfigFields {
         setSetupMenuDescription(List.of(
                 "&2A dynamic Realm!"
         ));
+        setNightbreakSlug("yggdrasil-realm");
     }
 }

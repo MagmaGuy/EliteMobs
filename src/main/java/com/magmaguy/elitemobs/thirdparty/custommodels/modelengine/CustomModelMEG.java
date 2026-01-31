@@ -161,4 +161,9 @@ public class CustomModelMEG implements CustomModelInterface {
         // Return null to fall back to default behavior
         return null;
     }
+
+    @Override
+    public void setSyncMovement(boolean syncMovement) {
+        // Not implemented for ModelEngine
+    }
 }

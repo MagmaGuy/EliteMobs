@@ -13,7 +13,7 @@ public class HallosseumTeleporter extends NPCsConfigFields {
                 "Haunted Harbinger",
                 "<Hallosseum Teleporter>",
                 Villager.Profession.ARMORER,
-                "em_adventurers_guild,297.5,92,307.5,90,0",
+                "em_adventurers_guild,289.5,92,271.5,0,0",
                 List.of(""),
                 List.of(),
                 List.of(),
@@ -21,5 +21,7 @@ public class HallosseumTeleporter extends NPCsConfigFields {
                 1,
                 NPCInteractions.NPCInteractionType.COMMAND);
         setCommand("em dungeontp hallosseum_lair.yml");
+        setCustomModel("em_ag_hauntedharbinger");
+        setSyncMovement(false);
     }
 }

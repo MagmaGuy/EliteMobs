@@ -13,7 +13,7 @@ public class KnightsCastleTeleporter extends NPCsConfigFields {
                 "Castle Keeper",
                 "<Knight's Castle Teleporter>",
                 Villager.Profession.ARMORER,
-                "em_adventurers_guild,297.5,92,278.5,90,0",
+                "em_adventurers_guild,299.5,92,261.5,90,0",
                 List.of(""),
                 List.of(),
                 List.of(),
@@ -21,5 +21,7 @@ public class KnightsCastleTeleporter extends NPCsConfigFields {
                 1,
                 NPCInteractions.NPCInteractionType.COMMAND);
         setCommand("em dungeontp knights_castle_lair.yml");
+        setCustomModel("em_ag_castlekeeper");
+        setSyncMovement(false);
     }
 }

@@ -13,13 +13,15 @@ public class NorthPoleTeleporter extends NPCsConfigFields {
                 "Frosty Guide",
                 "<North Pole Teleporter>",
                 Villager.Profession.ARMORER,
-                "em_adventurers_guild,297.5,92,273.5,90,0",
+                "em_adventurers_guild,289.5,92,277.5,180,0",
                 List.of(""),
                 List.of(),
                 List.of(),
                 true,
                 1,
                 NPCInteractions.NPCInteractionType.COMMAND);
-        setCommand("em dungeontp north_pole_minidungeon.yml");
+        setCommand("em dungeontp the_north_pole.yml");
+        setCustomModel("em_ag_frostyguide");
+        setSyncMovement(false);
     }
 }

@@ -6,22 +6,22 @@ import org.bukkit.entity.Villager;
 
 import java.util.List;
 
-public class InvasionTeleporter extends NPCsConfigFields {
-    public InvasionTeleporter() {
-        super("invasion_teleporter",
+public class PirateShipTeleporter extends NPCsConfigFields {
+    public PirateShipTeleporter() {
+        super("pirate_ship_teleporter",
                 true,
-                "Invasion Scout",
-                "<Invasion Teleporter>",
-                Villager.Profession.ARMORER,
-                "em_adventurers_guild,295.5,92,304.5,90,0",
+                "Sea Dog",
+                "<Pirate Ship Teleporter>",
+                Villager.Profession.FISHERMAN,
+                "em_adventurers_guild,302.7,92,288.5,-90,0",
                 List.of(""),
                 List.of(),
                 List.of(),
                 true,
                 1,
                 NPCInteractions.NPCInteractionType.COMMAND);
-        setCommand("em dungeontp invasion.yml");
-        setCustomModel("em_ag_invasionscout");
+        setCommand("em dungeontp pirate_ship_minidungeon.yml");
+        setCustomModel("em_ag_seadog");
         setSyncMovement(false);
     }
 }

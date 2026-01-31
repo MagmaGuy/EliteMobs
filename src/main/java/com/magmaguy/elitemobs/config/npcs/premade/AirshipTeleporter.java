@@ -13,13 +13,15 @@ public class AirshipTeleporter extends NPCsConfigFields {
                 "Sky Captain",
                 "<Airship Teleporter>",
                 Villager.Profession.ARMORER,
-                "em_adventurers_guild,283.5,92,297.5,180,0",
+                "em_adventurers_guild,291.5,92,301.5,-90,0",
                 List.of(""),
                 List.of(),
                 List.of(),
                 true,
                 1,
                 NPCInteractions.NPCInteractionType.COMMAND);
-        setCommand("em dungeontp airship_minidungeon.yml");
+        setCommand("em dungeontp the_airship.yml");
+        setCustomModel("em_ag_skycaptain");
+        setSyncMovement(false);
     }
 }

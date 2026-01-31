@@ -1,5 +1,8 @@
 {
     "providers": [
+        {"type": "reference", "id": "minecraft:include/space"},
+        {"type": "reference", "id": "minecraft:include/default"},
+        {"type": "reference", "id": "minecraft:include/unifont"},
         {"type": "bitmap", "file": "elitemobs:gui/ranksmenu.png", "ascent": 136, "height": 256, "chars":["󰸀"]},
         {"type": "bitmap", "file": "elitemobs:gui/repairmenu.png", "ascent": 136, "height": 256, "chars":["󰸁"]},
         {"type": "bitmap", "file": "elitemobs:gui/scrappermenu.png", "ascent": 136, "height": 256, "chars":["󰸂"]},

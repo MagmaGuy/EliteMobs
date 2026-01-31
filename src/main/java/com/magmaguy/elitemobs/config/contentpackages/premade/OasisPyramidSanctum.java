@@ -33,5 +33,6 @@ public class OasisPyramidSanctum extends ContentPackagesConfigFields {
         setDifficulties(List.of(
                 Map.of("name", "normal", "id", 0)));
         setListedInTeleports(false);
+        setNightbreakSlug("the-oasis-adventure");
     }
 }

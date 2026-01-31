@@ -5,10 +5,10 @@ import com.magmaguy.elitemobs.economy.GamblingEconomyHandler;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.magmacore.util.ChatColorConverter;
-import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Display;
+import org.bukkit.entity.TextDisplay;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.util.Vector;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +20,7 @@ import java.util.UUID;
  */
 public class GamblingDenOwnerDisplay {
 
-    private static final Map<UUID, ArmorStand> earningsDisplays = new HashMap<>();
+    private static final Map<UUID, TextDisplay> earningsDisplays = new HashMap<>();
     private static BukkitTask updateTask;
 
     /**
@@ -48,18 +48,15 @@ public class GamblingDenOwnerDisplay {
         // Check if display already exists
         if (earningsDisplays.containsKey(npcEntity.getUuid())) return;
 
-        // Create armor stand above the role display (which is above the NPC)
-        Vector offset = new Vector(0, 2.3, 0);
-        ArmorStand display = npcEntity.getVillager().getWorld().spawn(
-                npcEntity.getVillager().getLocation().add(offset),
-                ArmorStand.class,
-                armorStand -> {
-                    armorStand.setCustomName(getDisplayText());
-                    armorStand.setCustomNameVisible(true);
-                    armorStand.setMarker(true);
-                    armorStand.setVisible(false);
-                    armorStand.setGravity(false);
-                    armorStand.setPersistent(false);
+        // Create TextDisplay above the NPC - Minecraft handles visibility automatically
+        TextDisplay display = npcEntity.getVillager().getWorld().spawn(
+                npcEntity.getVillager().getLocation().add(0, 2.8, 0),
+                TextDisplay.class,
+                textDisplay -> {
+                    textDisplay.setText(getDisplayText());
+                    textDisplay.setBillboard(Display.Billboard.CENTER);
+                    textDisplay.setShadowed(false);
+                    textDisplay.setPersistent(false);
                 }
         );
 
@@ -73,8 +70,8 @@ public class GamblingDenOwnerDisplay {
      * @param npcUUID The NPC's UUID
      */
     public static void removeDisplay(UUID npcUUID) {
-        ArmorStand display = earningsDisplays.remove(npcUUID);
-        if (display != null && !display.isDead()) {
+        TextDisplay display = earningsDisplays.remove(npcUUID);
+        if (display != null && display.isValid()) {
             display.remove();
         }
     }
@@ -86,11 +83,11 @@ public class GamblingDenOwnerDisplay {
         String displayText = getDisplayText();
 
         earningsDisplays.entrySet().removeIf(entry -> {
-            ArmorStand display = entry.getValue();
-            if (display == null || display.isDead()) {
+            TextDisplay display = entry.getValue();
+            if (display == null || !display.isValid()) {
                 return true;
             }
-            display.setCustomName(displayText);
+            display.setText(displayText);
             return false;
         });
     }
@@ -114,8 +111,8 @@ public class GamblingDenOwnerDisplay {
         }
 
         // Remove all displays
-        for (ArmorStand display : earningsDisplays.values()) {
-            if (display != null && !display.isDead()) {
+        for (TextDisplay display : earningsDisplays.values()) {
+            if (display != null && display.isValid()) {
                 display.remove();
             }
         }

@@ -178,8 +178,6 @@ public class EliteMobs extends JavaPlugin {
         }
 
         NMSManager.initializeAdapter(this);
-        // TODO: DIAGNOSTIC - Remove after EasyMinecraftGoals testing is complete
-        testEasyMinecraftGoalsMapping();
 
         if (Bukkit.getServer().spigot().getConfig().getDouble("settings.attribute.maxHealth.max") < Double.MAX_VALUE) {
             Bukkit.getServer().spigot().getConfig().set("settings.attribute.maxHealth.max", Double.MAX_VALUE);
@@ -491,43 +489,6 @@ public class EliteMobs extends JavaPlugin {
     private void launchRunnables() {
         //save regional bosses when the files update
         RegionalBossEntity.regionalDataSaver();
-    }
-
-    // TODO: DIAGNOSTIC - Remove after EasyMinecraftGoals testing is complete
-    private void testEasyMinecraftGoalsMapping() {
-        getLogger().info("=== EasyMinecraftGoals Diagnostic ===");
-        try {
-            // Check if NMSAdapter loaded
-            if (NMSManager.getAdapter() == null) {
-                getLogger().severe("NMSAdapter is NULL - initialization failed!");
-                return;
-            }
-            getLogger().info("NMSAdapter class: " + NMSManager.getAdapter().getClass().getName());
-
-            // Check PathNavigation.createPath method signature
-            Class<?> pathNavClass = Class.forName("net.minecraft.world.entity.ai.navigation.PathNavigation");
-            java.lang.reflect.Method createPathMethod = null;
-            for (java.lang.reflect.Method m : pathNavClass.getMethods()) {
-                if (m.getName().equals("createPath") || m.getName().equals("a")) {
-                    getLogger().info("Found method: " + m.getName() + " returns: " + m.getReturnType().getName());
-                    if (m.getParameterCount() == 4) {
-                        createPathMethod = m;
-                    }
-                }
-            }
-            if (createPathMethod != null) {
-                getLogger().info("createPath(4 args) return type: " + createPathMethod.getReturnType().getName());
-                if (createPathMethod.getReturnType().getName().contains("BinaryHeap")) {
-                    getLogger().severe("MAPPING ERROR: createPath returns BinaryHeap instead of Path!");
-                } else if (createPathMethod.getReturnType().getName().contains("Path")) {
-                    getLogger().info("MAPPING OK: createPath returns Path");
-                }
-            }
-        } catch (Exception e) {
-            getLogger().severe("Diagnostic failed: " + e.getMessage());
-            e.printStackTrace();
-        }
-        getLogger().info("=== End Diagnostic ===");
     }
 
 }

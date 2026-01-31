@@ -37,5 +37,6 @@ public class StoryModeDungeonsChapter1MetaPackage extends ContentPackagesConfigF
                 "&2unique powers and elaborate maps, it''s a really",
                 "&2fun way of experiencing EliteMobs content!"
         ));
+        setNightbreakSlug("story-mode-dungeons");
     }
 }

@@ -37,5 +37,6 @@ public class TheDeepMinesDungeon extends ContentPackagesConfigFields {
                 Map.of("name", "hard", "levelSync", "+0", "id", 1),
                 Map.of("name", "mythic", "levelSync", "-5", "id", 2)));
         setDungeonLockoutMinutes(1440);
+        setNightbreakSlug("story-mode-dungeons");
     }
 }

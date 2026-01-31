@@ -13,13 +13,15 @@ public class DarkSpireTeleporter extends NPCsConfigFields {
                 "Dark Warlock",
                 "<Dark Spire Teleporter>",
                 Villager.Profession.ARMORER,
-                "em_adventurers_guild,289.5,92,302.5,-90,0",
+                "em_adventurers_guild,293.5,92,299.5,0,0",
                 List.of(""),
                 List.of(),
                 List.of(),
                 true,
                 1,
                 NPCInteractions.NPCInteractionType.COMMAND);
-        setCommand("em dungeontp dark_spire_minidungeon.yml");
+        setCommand("em dungeontp the_dark_spire.yml");
+        setCustomModel("em_ag_darkwarlock");
+        setSyncMovement(false);
     }
 }

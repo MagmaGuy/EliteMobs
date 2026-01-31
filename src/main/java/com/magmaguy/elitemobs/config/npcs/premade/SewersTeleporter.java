@@ -6,22 +6,22 @@ import org.bukkit.entity.Villager;
 
 import java.util.List;
 
-public class InvasionTeleporter extends NPCsConfigFields {
-    public InvasionTeleporter() {
-        super("invasion_teleporter",
+public class SewersTeleporter extends NPCsConfigFields {
+    public SewersTeleporter() {
+        super("sewers_teleporter",
                 true,
-                "Invasion Scout",
-                "<Invasion Teleporter>",
-                Villager.Profession.ARMORER,
-                "em_adventurers_guild,295.5,92,304.5,90,0",
+                "Sewer Rat",
+                "<Sewers Teleporter>",
+                Villager.Profession.LEATHERWORKER,
+                "em_adventurers_guild,297.5,92,259.5,0,0",
                 List.of(""),
                 List.of(),
                 List.of(),
                 true,
                 1,
                 NPCInteractions.NPCInteractionType.COMMAND);
-        setCommand("em dungeontp invasion.yml");
-        setCustomModel("em_ag_invasionscout");
+        setCommand("em dungeontp sewers_minidungeon.yml");
+        setCustomModel("em_ag_sewerrat");
         setSyncMovement(false);
     }
 }

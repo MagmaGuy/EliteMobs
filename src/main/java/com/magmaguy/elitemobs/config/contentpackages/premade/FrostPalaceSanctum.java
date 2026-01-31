@@ -11,7 +11,7 @@ public class FrostPalaceSanctum extends ContentPackagesConfigFields {
     public FrostPalaceSanctum() {
         super("frost_palace_sanctum",
                 true,
-                "&3The Frost Palace",
+                "&2[Dynamic] &3The Frost Palace",
                 new ArrayList<>(List.of("&fA 7 phase fight against",
                         "the queen of ice!",
                         "&6Credits: MagmaGuy, Delio")),
@@ -40,5 +40,6 @@ public class FrostPalaceSanctum extends ContentPackagesConfigFields {
                 "&2A dynamic Sanctum!",
                 "&2The first Sanctum we made, with customs",
                 "&2models and a soundtrack!"));
+        setNightbreakSlug("the-frost-palace");
     }
 }

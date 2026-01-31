@@ -27,5 +27,6 @@ public class FreeEnchantmentChallengesMetaPackage extends ContentPackagesConfigF
         setSetupMenuDescription(List.of(
                 "&2Free challenges that players can randomly",
                 "&2get teleported to when enchanting elite items!"));
+        setNightbreakSlug("free-enchantment-challenge-sanctums");
     }
 }

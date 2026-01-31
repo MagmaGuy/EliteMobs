@@ -4,15 +4,14 @@ import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields
 import org.bukkit.World;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class AirshipMinidungeon extends ContentPackagesConfigFields {
     public AirshipMinidungeon() {
-        super("airship_minidungeon",
+        super("the_airship",
                 true,
-                "&6The Airship",
+                "&2[Dynamic] &6The Airship",
                 new ArrayList<>(List.of("&fAn awesome airship full of undead pirates!",
                         "&6Credits: MagmaGuy, 69OzCanOfBepis",
                         "&6and Realm of Lotheridon")),
@@ -40,5 +39,6 @@ public class AirshipMinidungeon extends ContentPackagesConfigFields {
         setDungeonLockoutMinutes(1440);
         setSetupMenuDescription(List.of(
                 "&2A dynamic Minidungeon!"));
+        setNightbreakSlug("the-airship");
     }
 }
