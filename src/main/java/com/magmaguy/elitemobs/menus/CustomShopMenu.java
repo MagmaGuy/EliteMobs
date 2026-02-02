@@ -62,7 +62,7 @@ public class CustomShopMenu {
     public static void customShopConstructor(Player player) {
         String menuName = CustomShopMenuConfig.shopName;
         if (DefaultConfig.useResourcePackModels())
-            menuName = ChatColor.WHITE + "\uDB83\uDEF1\uDB83\uDE07\uDB83\uDEF5          " + menuName;
+            menuName = ChatColor.WHITE + "\uDB83\uDEF1\uDB83\uDE06\uDB83\uDEF5          " + menuName;
         Inventory shopInventory = Bukkit.createInventory(player, 54, menuName);
         populateShop(shopInventory, player);
         player.openInventory(shopInventory);
