@@ -10,7 +10,6 @@ import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.utils.CustomModelAdder;
-import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
 import com.magmaguy.magmacore.util.Logger;
@@ -104,8 +103,8 @@ public class ItemLootShower {
      */
     private static boolean useFakeItems() {
         if (useFakeItems == null) {
-            // FakeItem requires 1.21.4+
-            useFakeItems = !VersionChecker.serverVersionOlderThan(21, 4);
+            // Check if the NMS adapter supports FakeItems
+            useFakeItems = NMSManager.getAdapter().supportsFakeItems();
         }
         return useFakeItems;
     }

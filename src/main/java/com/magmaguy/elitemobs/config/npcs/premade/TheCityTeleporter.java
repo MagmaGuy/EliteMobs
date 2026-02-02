@@ -20,7 +20,7 @@ public class TheCityTeleporter extends NPCsConfigFields {
                 true,
                 1,
                 NPCInteractions.NPCInteractionType.COMMAND);
-        setCommand("em dungeontp the_city_sanctum.yml");
+        setCommand("em dungeontp the_city_dungeon.yml");
         setCustomModel("em_ag_dwarfolav");
         setSyncMovement(false);
     }

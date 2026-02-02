@@ -20,7 +20,7 @@ public class TheDeepMinesTeleporter extends NPCsConfigFields {
                 true,
                 1,
                 NPCInteractions.NPCInteractionType.COMMAND);
-        setCommand("em dungeontp the_deep_mines_sanctum.yml");
+        setCommand("em dungeontp the_deep_mines_dungeon.yml");
         setCustomModel("em_ag_netherlurk");
         setSyncMovement(false);
     }
