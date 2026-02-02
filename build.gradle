@@ -119,7 +119,7 @@ dependencies {
     ///Shaded in
     implementation group: 'org.bstats', name: 'bstats-bukkit', version: '3.0.2'
     implementation group: 'commons-io', name: 'commons-io', version: '2.7'
-    implementation (group: 'com.magmaguy', name: 'EasyMinecraftGoals-dist', version: '1.19.23'){
+    implementation (group: 'com.magmaguy', name: 'EasyMinecraftGoals-dist', version: '1.19.24'){
         changing = true
     }
     implementation (group: 'com.magmaguy', name: 'MagmaCore', version: '1.24-SNAPSHOT'){

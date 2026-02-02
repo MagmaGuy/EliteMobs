@@ -20,7 +20,7 @@ public class TheClimbTeleporter extends NPCsConfigFields {
                 true,
                 1,
                 NPCInteractions.NPCInteractionType.COMMAND);
-        setCommand("em dungeontp the_climb_sanctum.yml");
+        setCommand("em dungeontp the_climb_dungeon.yml");
         setCustomModel("em_ag_minerregulus");
         setSyncMovement(false);
     }

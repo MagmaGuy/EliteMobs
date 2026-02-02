@@ -20,7 +20,7 @@ public class TheNetherWastesTeleporter extends NPCsConfigFields {
                 true,
                 1,
                 NPCInteractions.NPCInteractionType.COMMAND);
-        setCommand("em dungeontp the_nether_wastes_sanctum.yml");
+        setCommand("em dungeontp the_nether_wastes_dungeon.yml");
         setCustomModel("em_ag_nethershroom");
         setSyncMovement(false);
     }

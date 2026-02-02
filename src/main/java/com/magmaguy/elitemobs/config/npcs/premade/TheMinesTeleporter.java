@@ -20,7 +20,7 @@ public class TheMinesTeleporter extends NPCsConfigFields {
                 true,
                 1,
                 NPCInteractions.NPCInteractionType.COMMAND);
-        setCommand("em dungeontp the_mines_sanctum.yml");
+        setCommand("em dungeontp the_mines_dungeon.yml");
         setCustomModel("em_ag_prospectorvoultar");
         setSyncMovement(false);
     }
