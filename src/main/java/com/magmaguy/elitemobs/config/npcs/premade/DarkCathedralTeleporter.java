@@ -10,8 +10,8 @@ public class DarkCathedralTeleporter extends NPCsConfigFields {
     public DarkCathedralTeleporter() {
         super("dark_cathedral_teleporter",
                 true,
-                "Dark Acolyte",
-                "<Dark Cathedral Teleporter>",
+                "<g:#4A4A6A:#5A5A7A>Dark Acolyte</g>",
+                "<g:#3A3A5A:#4A4A6A><Dark Cathedral></g>",
                 Villager.Profession.CLERIC,
                 "em_adventurers_guild,289.5,92,258.5,0,0",
                 List.of(""),

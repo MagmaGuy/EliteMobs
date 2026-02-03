@@ -11,8 +11,8 @@ public class ScrollApplier  extends NPCsConfigFields {
     public ScrollApplier() {
         super("scroll_applier_config",
                 true,
-                "Scotty",
-                "<Scroll Applier>",
+                "<g:#4A7A7A:#5A8A8A>Scotty</g>",
+                "<g:#3A6A6A:#4A7A7A><Scroll Applier></g>",
                 Villager.Profession.WEAPONSMITH,
                 "em_adventurers_guild,279.5,77,245.5,-20,0",
                 new ArrayList<>(List.of(

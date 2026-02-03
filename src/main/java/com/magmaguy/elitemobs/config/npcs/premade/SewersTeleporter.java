@@ -10,8 +10,8 @@ public class SewersTeleporter extends NPCsConfigFields {
     public SewersTeleporter() {
         super("sewers_teleporter",
                 true,
-                "Sewer Rat",
-                "<Sewers Teleporter>",
+                "<g:#5A6A4A:#6A7A5A>Sewer Rat</g>",
+                "<g:#4A5A3A:#5A6A4A><Sewers></g>",
                 Villager.Profession.LEATHERWORKER,
                 "em_adventurers_guild,297.5,92,259.5,0,0",
                 List.of(""),

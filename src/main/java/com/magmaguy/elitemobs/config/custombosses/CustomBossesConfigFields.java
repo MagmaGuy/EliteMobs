@@ -403,7 +403,7 @@ public class CustomBossesConfigFields extends CustomConfigFields {
         this.neutral = processBoolean("neutral", neutral, false, false);
 
         this.onKillMessage = ConfigurationEngine.setString(
-                List.of("Sets the message that is shown when a boss is killed", "Placeholders:", "$player - username of the player the boss killed"),
+                List.of("Sets the message that is shown when a boss is killed", "Placeholders:", "$player - display name of the player (with prefix/suffix)", "$playerName - plain username of the player (no prefix/suffix)"),
                 file, fileConfiguration, "onKillMessage", null, true);
 
         String bossTypeString = ConfigurationEngine.setString(file, fileConfiguration, "bossType", "NORMAL", false);

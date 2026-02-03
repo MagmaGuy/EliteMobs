@@ -14,8 +14,8 @@ public class FletcherConfig extends NPCsConfigFields {
     public FletcherConfig() {
         super("fletcher",
                 true,
-                "Robin",
-                "<Fletcher>",
+                "<g:#5A7A4A:#6A8A5A>Robin</g>",
+                "<g:#4A6A3A:#5A7A4A><Fletcher></g>",
                 Villager.Profession.FLETCHER,
                 "em_adventurers_guild,297.5,78,242.5,90,0",
                 new ArrayList<>(List.of(

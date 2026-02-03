@@ -201,7 +201,7 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
         if (!Bukkit.getPluginManager().isPluginEnabled("LibsDisguises")) return;
         try {
             DisguiseEntity.disguise(npCsConfigFields.getDisguise(), livingEntity, npCsConfigFields.getCustomDisguiseData(), npCsConfigFields.getFilename());
-            DisguiseEntity.setDisguiseNameVisibility(true, livingEntity, npCsConfigFields.getName());
+            DisguiseEntity.setDisguiseNameVisibility(true, livingEntity, ChatColorConverter.convert(npCsConfigFields.getName()));
             livingEntity.setCustomNameVisible(true);
             isDisguised = true;
         } catch (Exception ex) {
@@ -211,7 +211,7 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
     }
 
     private void setCustomModel(LivingEntity livingEntity) {
-        customModel = CustomModel.generateCustomModel(livingEntity, getNPCsConfigFields().getCustomModel(), getNPCsConfigFields().getName(),
+        customModel = CustomModel.generateCustomModel(livingEntity, getNPCsConfigFields().getCustomModel(), ChatColorConverter.convert(getNPCsConfigFields().getName()),
                 (player, modeledEntity) -> NPCInteractions.handleNPCInteraction(player, this),
                 (player, modeledEntity) -> NPCInteractions.handleNPCInteraction(player, this));
         if (customModel != null)

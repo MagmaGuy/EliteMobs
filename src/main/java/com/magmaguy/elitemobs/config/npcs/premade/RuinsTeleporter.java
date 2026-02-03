@@ -10,8 +10,8 @@ public class RuinsTeleporter extends NPCsConfigFields {
     public RuinsTeleporter() {
         super("ruins_teleporter",
                 true,
-                "Ruinwarden",
-                "<Ruins Teleporter>",
+                "<g:#9A8A7A:#AA9A8A>Ruinwarden</g>",
+                "<g:#8A7A6A:#9A8A7A><The Ruins></g>",
                 Villager.Profession.ARMORER,
                 "em_adventurers_guild,302.7,92,292.5,-90,0",
                 List.of(""),

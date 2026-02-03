@@ -10,8 +10,8 @@ public class InvasionTeleporter extends NPCsConfigFields {
     public InvasionTeleporter() {
         super("invasion_teleporter",
                 true,
-                "Invasion Scout",
-                "<Invasion Teleporter>",
+                "<g:#2E8B57:#3CB371>Invasion Scout</g>",
+                "<g:#228B22:#6B8E23><Invasion></g>",
                 Villager.Profession.ARMORER,
                 "em_adventurers_guild,295.5,92,304.5,90,0",
                 List.of(""),

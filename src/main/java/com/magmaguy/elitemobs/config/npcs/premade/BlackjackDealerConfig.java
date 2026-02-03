@@ -14,8 +14,8 @@ public class BlackjackDealerConfig extends NPCsConfigFields {
     public BlackjackDealerConfig() {
         super("blackjack_dealer",
                 true,
-                "Vincent",
-                "<Blackjack Dealer>",
+                "<g:#2F4F4F:#708090>Vincent</g>",
+                "<g:#696969:#A9A9A9><Blackjack Dealer></g>",
                 Villager.Profession.LIBRARIAN,
                 "em_adventurers_guild,282.5,81,211.5,-45,0",
                 new ArrayList<>(List.of(

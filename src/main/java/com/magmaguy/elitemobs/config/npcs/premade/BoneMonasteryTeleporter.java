@@ -10,8 +10,8 @@ public class BoneMonasteryTeleporter extends NPCsConfigFields {
     public BoneMonasteryTeleporter() {
         super("bone_monastery_teleporter",
                 true,
-                "Sister Frieda",
-                "<Bone Monastery Teleport>",
+                "<g:#C8B8A0:#D8C8B0>Sister Frieda</g>",
+                "<g:#B8A890:#C8B8A0><Bone Monastery></g>",
                 Villager.Profession.ARMORER,
                 "em_adventurers_guild,295.5,92,301.5,90,0",
                 List.of(""),

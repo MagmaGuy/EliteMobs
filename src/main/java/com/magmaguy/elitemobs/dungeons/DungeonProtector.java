@@ -5,6 +5,8 @@ import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
@@ -12,9 +14,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.*;
-import org.bukkit.event.player.PlayerBucketEmptyEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerToggleFlightEvent;
+import org.bukkit.event.hanging.HangingBreakByEntityEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.HashSet;
@@ -247,6 +248,48 @@ public class DungeonProtector implements Listener {
         if (event.isFlying()) {
             event.setCancelled(true);
         }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventItemFrameBreak(HangingBreakByEntityEvent event) {
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getEntity().getWorld().getUID())) return;
+        // Check if a player caused the break (directly or via projectile)
+        if (event.getRemover() instanceof Player player) {
+            if (shouldBypass(player)) return;
+        } else if (event.getRemover() instanceof Projectile projectile && projectile.getShooter() instanceof Player player) {
+            if (shouldBypass(player)) return;
+        }
+        event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventItemFrameInteract(PlayerInteractEntityEvent event) {
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getPlayer().getWorld().getUID())) return;
+        if (shouldBypass(event.getPlayer())) return;
+        // Prevent taking items from or rotating item frames
+        if (event.getRightClicked() instanceof ItemFrame) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventArmorStandManipulate(PlayerArmorStandManipulateEvent event) {
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getPlayer().getWorld().getUID())) return;
+        if (shouldBypass(event.getPlayer())) return;
+        event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventArmorStandDamage(EntityDamageByEntityEvent event) {
+        if (!(event.getEntity() instanceof ArmorStand)) return;
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getEntity().getWorld().getUID())) return;
+        // Check if a player caused the damage (directly or via projectile)
+        if (event.getDamager() instanceof Player player) {
+            if (shouldBypass(player)) return;
+        } else if (event.getDamager() instanceof Projectile projectile && projectile.getShooter() instanceof Player player) {
+            if (shouldBypass(player)) return;
+        }
+        event.setCancelled(true);
     }
 
 }

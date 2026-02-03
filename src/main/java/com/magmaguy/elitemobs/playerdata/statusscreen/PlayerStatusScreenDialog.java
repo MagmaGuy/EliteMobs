@@ -177,12 +177,18 @@ public class PlayerStatusScreenDialog {
             if (!emPackage.getContentPackagesConfigFields().isListedInTeleports()) continue;
 
             String dungeonName = processText(emPackage.getContentPackagesConfigFields().getName());
-            String hoverInfo = ChatColorConverter.convert(
-                    PlayerStatusMenuConfig.getOnTeleportHover() + "\n" +
-                            emPackage.getContentPackagesConfigFields().getPlayerInfo()
-                                    .replace("$bossCount", emPackage.getCustomBossEntityList().size() + "")
-                                    .replace("$lowestTier", ((CombatContent) emPackage).getLowestLevel() + "")
-                                    .replace("$highestTier", ((CombatContent) emPackage).getHighestLevel() + ""));
+            String playerInfo = emPackage.getContentPackagesConfigFields().getPlayerInfo();
+            String hoverInfo;
+            if (playerInfo != null) {
+                hoverInfo = ChatColorConverter.convert(
+                        PlayerStatusMenuConfig.getOnTeleportHover() + "\n" +
+                                playerInfo
+                                        .replace("$bossCount", emPackage.getCustomBossEntityList().size() + "")
+                                        .replace("$lowestTier", ((CombatContent) emPackage).getLowestLevel() + "")
+                                        .replace("$highestTier", ((CombatContent) emPackage).getHighestLevel() + ""));
+            } else {
+                hoverInfo = ChatColorConverter.convert(PlayerStatusMenuConfig.getOnTeleportHover());
+            }
 
             DialogManager.ActionButton button = DialogManager.ActionButton.of(
                     dungeonName,

@@ -41,7 +41,7 @@ public class NPCInteractions implements Listener {
 
         switch (npcEntity.getNPCsConfigFields().getInteractionType()) {
             case GUILD_GREETER:
-                if (player.hasPermission("elitemobs.rank.npc")) {
+                if (player.hasPermission("elitemobs.skill.npc")) {
                     new BukkitRunnable() {
                         @Override
                         public void run() {

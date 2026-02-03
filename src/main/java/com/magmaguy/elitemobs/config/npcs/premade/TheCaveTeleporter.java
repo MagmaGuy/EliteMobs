@@ -10,8 +10,8 @@ public class TheCaveTeleporter extends NPCsConfigFields {
     public TheCaveTeleporter() {
         super("the_cave_teleporter",
                 true,
-                "Village Mother Martha",
-                "<The Cave Teleporter>",
+                "<g:#7A6A5A:#8A7A6A>Village Mother Martha</g>",
+                "<g:#6A5A4A:#7A6A5A><The Cave></g>",
                 Villager.Profession.ARMORER,
                 "em_adventurers_guild,308.4,78,206.4,90,0",
                 List.of(""),

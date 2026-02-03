@@ -10,8 +10,8 @@ public class HallowedHauntTeleporter extends NPCsConfigFields {
     public HallowedHauntTeleporter() {
         super("hallowed_haunt_teleporter",
                 true,
-                "Alaric Greystone",
-                "<Hallowed Haunt Teleporter>",
+                "<g:#9A8AAA:#AA9ABA>Alaric Greystone</g>",
+                "<g:#8A7A9A:#9A8AAA><Hallowed Haunt></g>",
                 Villager.Profession.ARMORER,
                 "em_adventurers_guild,291.5,92,295.5,180,0",
                 List.of(""),

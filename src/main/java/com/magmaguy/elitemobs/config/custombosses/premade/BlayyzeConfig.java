@@ -13,7 +13,7 @@ public class BlayyzeConfig extends CustomBossesConfigFields {
         super("blayyze",
                 EntityType.BLAZE,
                 true,
-                "$eventBossLevel &6Blayyze",
+                "$eventBossLevel <g:#00FF00:#7CFC00>Blayyze</g>",
                 "dynamic");
         setTimeout(30);
         setPersistent(true);

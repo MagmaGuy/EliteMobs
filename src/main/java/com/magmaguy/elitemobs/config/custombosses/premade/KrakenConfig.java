@@ -13,7 +13,7 @@ public class KrakenConfig extends CustomBossesConfigFields {
         super("kraken",
                 EntityType.ELDER_GUARDIAN,
                 true,
-                "$eventBossLevel &3Kraken",
+                "$eventBossLevel <g:#1E90FF:#00CED1>Kraken</g>",
                 "dynamic");
         setUniqueLootList(Collections.singletonList("rod_of_the_depths.yml:1"));
         setTrails(new ArrayList<>(List.of(Particle.LARGE_SMOKE.toString(),

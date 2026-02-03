@@ -11,8 +11,8 @@ public class ScrapperConfig extends NPCsConfigFields {
     public ScrapperConfig() {
         super("scrapper_config",
                 true,
-                "Kelly",
-                "<Scrapper>",
+                "<g:#5A6A4A:#6A7A5A>Kelly</g>",
+                "<g:#4A5A3A:#5A6A4A><Scrapper></g>",
                 Villager.Profession.WEAPONSMITH,
                 "em_adventurers_guild,297.5,78,254.5,90,0",
                 new ArrayList<>(List.of(

@@ -14,8 +14,8 @@ public class SlotMachineOperatorConfig extends NPCsConfigFields {
     public SlotMachineOperatorConfig() {
         super("slot_machine_operator",
                 true,
-                "Spinner Sam",
-                "<Slot Machine>",
+                "<g:#9A7A40:#AA8A50>Spinner Sam</g>",
+                "<g:#8A6A30:#9A7A40><Slot Machine></g>",
                 Villager.Profession.CLERIC,
                 "em_adventurers_guild,298.5,81,227.5,135,0",
                 new ArrayList<>(List.of(

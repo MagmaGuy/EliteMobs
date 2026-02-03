@@ -10,8 +10,8 @@ public class FireworksTeleporter extends NPCsConfigFields {
     public FireworksTeleporter() {
         super("fireworks_teleporter",
                 true,
-                "Pyrotechnician Pete",
-                "<Fireworks Teleporter>",
+                "<g:#AA7A40:#BA8A50>Pyrotechnician Pete</g>",
+                "<g:#9A6A30:#AA7A40><Fireworks></g>",
                 Villager.Profession.ARMORER,
                 "em_adventurers_guild,299.5,92,265.5,90,0",
                 List.of(""),

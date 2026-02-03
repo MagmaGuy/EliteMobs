@@ -17,7 +17,7 @@ public class DebtCollectorConfig extends CustomBossesConfigFields {
         super("debt_collector",
                 EntityType.VINDICATOR,
                 true,
-                "$bossLevel &c&lThe Debt Collector",
+                "$bossLevel <g:#8B0000:#DC143C>The Debt Collector</g>",
                 "dynamic");
 
         // Health and damage settings from config

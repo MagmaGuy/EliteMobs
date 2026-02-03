@@ -14,8 +14,8 @@ public class CoinFlipperConfig extends NPCsConfigFields {
     public CoinFlipperConfig() {
         super("coin_flipper",
                 true,
-                "Lucky Pete",
-                "<Coin Flipper>",
+                "<g:#9A7A40:#AA8A50>Lucky Pete</g>",
+                "<g:#8A6A30:#9A7A40><Coin Flipper></g>",
                 Villager.Profession.CARTOGRAPHER,
                 "em_adventurers_guild,298.5,81,211.5,45,0",
                 new ArrayList<>(List.of(

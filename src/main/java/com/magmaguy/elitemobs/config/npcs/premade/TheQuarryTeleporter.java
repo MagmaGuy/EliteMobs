@@ -10,8 +10,8 @@ public class TheQuarryTeleporter extends NPCsConfigFields {
     public TheQuarryTeleporter() {
         super("the_quarry_teleporter",
                 true,
-                "Dwarf Berge",
-                "<The Quarry Teleporter>",
+                "<g:#7A6A5A:#8A7A6A>Dwarf Berge</g>",
+                "<g:#6A5A4A:#7A6A5A><The Quarry></g>",
                 Villager.Profession.ARMORER,
                 "em_adventurers_guild,303.4,78,201.3,0,0",
                 List.of(""),

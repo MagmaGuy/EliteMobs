@@ -65,6 +65,7 @@ public class BossHealthDisplay implements Listener {
     private static final String COLOR_DAMAGE = "&c";         // Red for damage
     private static final String COLOR_HEAL = "&a";           // Green for healing
     private static final String COLOR_CRIT = "&d";           // Magenta for crits
+    private static final String COLOR_XP = "&e";             // Yellow/gold for XP
 
     // Proximity check range for high multiplier bosses
     private static final double PROXIMITY_RANGE = 30.0;
@@ -83,6 +84,9 @@ public class BossHealthDisplay implements Listener {
 
     // Active popup displays (for animated cleanup)
     private static final List<PopupData> activePopups = Collections.synchronizedList(new ArrayList<>());
+
+    // Active XP popups with animated gradients
+    private static final List<XpPopupData> activeXpPopups = Collections.synchronizedList(new ArrayList<>());
 
     // Master update task
     private static BukkitTask masterUpdateTask = null;
@@ -134,6 +138,18 @@ public class BossHealthDisplay implements Listener {
                         }
                     }
                 }
+
+                // Update XP popup animations (with animated gradients)
+                synchronized (activeXpPopups) {
+                    Iterator<XpPopupData> xpPopupIterator = activeXpPopups.iterator();
+                    while (xpPopupIterator.hasNext()) {
+                        XpPopupData xpPopup = xpPopupIterator.next();
+                        if (!xpPopup.update()) {
+                            xpPopup.cleanup();
+                            xpPopupIterator.remove();
+                        }
+                    }
+                }
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1); // Run every tick for smooth animations
     }
@@ -157,6 +173,13 @@ public class BossHealthDisplay implements Listener {
                 popup.cleanup();
             }
             activePopups.clear();
+        }
+
+        synchronized (activeXpPopups) {
+            for (XpPopupData xpPopup : activeXpPopups) {
+                xpPopup.cleanup();
+            }
+            activeXpPopups.clear();
         }
     }
 
@@ -430,6 +453,54 @@ public class BossHealthDisplay implements Listener {
     }
 
     /**
+     * Creates an XP gain popup at the specified location, visible only to the specified player.
+     * Uses an animated gold/yellow gradient that shifts over time.
+     *
+     * @param location The location where the popup should appear (typically at the dead mob's location)
+     * @param player   The player who should see the popup
+     * @param xpAmount The amount of XP gained
+     */
+    public static void createXPPopup(Location location, Player player, long xpAmount) {
+        if (location == null || location.getWorld() == null || player == null) return;
+        if (!player.isOnline()) return;
+
+        // Add slight random offset for visual variety
+        Vector offset = new Vector(
+                ThreadLocalRandom.current().nextDouble(-0.5, 0.5),
+                ThreadLocalRandom.current().nextDouble(0.5, 1.0),
+                ThreadLocalRandom.current().nextDouble(-0.5, 0.5)
+        );
+
+        Location popupLoc = location.clone().add(offset);
+
+        // Raw XP text (gradient will be applied and animated by XpPopupData)
+        String xpText = "+" + formatNumber(xpAmount) + " ✦XP";
+
+        // Initial gradient text
+        String initialText = ChatColorConverter.convert("<gradient:#FF6B00:#FFD700:#FFFF00>" + xpText + "</gradient>");
+
+        // Create the popup with warm golden background
+        Color backgroundColor = Color.fromARGB(120, 80, 60, 0);
+        FakeText fakeText = VisualDisplay.createStyledFakeText(
+                popupLoc,
+                initialText,
+                backgroundColor,
+                true,
+                0.85f  // Slightly smaller scale than damage popups
+        );
+
+        if (fakeText == null) return;
+
+        // Only show to the player who earned the XP
+        fakeText.displayTo(player);
+
+        // Add to XP popups for animated gradient
+        synchronized (activeXpPopups) {
+            activeXpPopups.add(new XpPopupData(fakeText, popupLoc, xpText, 0.85f));
+        }
+    }
+
+    /**
      * Creates an animated popup display
      */
     private void createAnimatedPopup(Location location, String text, PopupType type, float scale) {
@@ -452,6 +523,9 @@ public class BossHealthDisplay implements Listener {
                 break;
             case RESIST:
                 backgroundColor = Color.fromARGB(100, 80, 0, 0);
+                break;
+            case XP:
+                backgroundColor = Color.fromARGB(120, 80, 60, 0);  // Warm golden background
                 break;
             default:
                 backgroundColor = Color.fromARGB(80, 0, 0, 0);
@@ -561,7 +635,7 @@ public class BossHealthDisplay implements Listener {
      * Popup type enum for different display styles
      */
     private enum PopupType {
-        DAMAGE, CRITICAL, HEAL, WEAK, RESIST
+        DAMAGE, CRITICAL, HEAL, WEAK, RESIST, XP
     }
 
     /**
@@ -623,6 +697,126 @@ public class BossHealthDisplay implements Listener {
             }
 
             return true;
+        }
+
+        public void cleanup() {
+            if (display != null) {
+                display.remove();
+            }
+        }
+    }
+
+    /**
+     * Data class for animated XP popups with shifting gradient
+     */
+    private static class XpPopupData {
+        private static final int XP_POPUP_DURATION_TICKS = 50; // 2.5 seconds
+        private static final java.awt.Color[] GRADIENT_COLORS = {
+                new java.awt.Color(0xFF, 0x6B, 0x00), // Orange
+                new java.awt.Color(0xFF, 0xD7, 0x00), // Gold
+                new java.awt.Color(0xFF, 0xFF, 0x00), // Yellow
+                new java.awt.Color(0xFF, 0xD7, 0x00), // Gold (loop back)
+                new java.awt.Color(0xFF, 0x6B, 0x00)  // Orange (loop back)
+        };
+
+        private final FakeText display;
+        private final Location startLocation;
+        private final String rawText;
+        private final float baseScale;
+        private int ticksAlive = 0;
+
+        public XpPopupData(FakeText display, Location startLocation, String rawText, float baseScale) {
+            this.display = display;
+            this.startLocation = startLocation.clone();
+            this.rawText = rawText;
+            this.baseScale = baseScale;
+        }
+
+        /**
+         * Updates the XP popup animation. Returns false when animation is complete.
+         */
+        public boolean update() {
+            ticksAlive++;
+
+            if (ticksAlive >= XP_POPUP_DURATION_TICKS || display == null) {
+                return false;
+            }
+
+            // Calculate animation progress (0 to 1)
+            float progress = (float) ticksAlive / XP_POPUP_DURATION_TICKS;
+
+            // Move upward slowly
+            double yOffset = progress * 1.2; // Rise 1.2 blocks over 2.5 seconds
+            Location newLoc = startLocation.clone().add(0, yOffset, 0);
+            display.teleport(newLoc);
+
+            // Update gradient with shift based on time
+            float gradientShift = (ticksAlive % 20) / 20f; // Complete cycle every second
+            String shiftedGradientText = applyShiftedGradient(rawText, gradientShift);
+            display.setText(shiftedGradientText);
+
+            // Scale animation - gentle pulse
+            float pulsePhase = (float) Math.sin(ticksAlive * 0.15) * 0.1f;
+            float scaleMultiplier;
+            if (progress < 0.1f) {
+                // Quick grow at start
+                scaleMultiplier = 1.0f + (progress / 0.1f) * 0.2f;
+            } else if (progress > 0.8f) {
+                // Shrink at end
+                scaleMultiplier = 1.2f - ((progress - 0.8f) / 0.2f) * 0.4f;
+            } else {
+                // Gentle pulse in the middle
+                scaleMultiplier = 1.2f + pulsePhase;
+            }
+
+            display.setScale(baseScale * scaleMultiplier);
+
+            // Fade out near end
+            if (progress > 0.75f) {
+                byte opacity = (byte) ((1.0f - ((progress - 0.75f) / 0.25f)) * 255);
+                display.setTextOpacity(opacity);
+            }
+
+            return true;
+        }
+
+        /**
+         * Applies a shifted gradient to the text for animation effect.
+         */
+        private String applyShiftedGradient(String text, float shift) {
+            if (text == null || text.isEmpty()) return "";
+
+            StringBuilder result = new StringBuilder();
+            int length = text.length();
+            int numColors = GRADIENT_COLORS.length;
+
+            for (int i = 0; i < length; i++) {
+                // Calculate position with shift for animation
+                float position = ((float) i / length + shift) % 1.0f;
+                float scaledPos = position * (numColors - 1);
+                int colorIdx1 = (int) scaledPos;
+                int colorIdx2 = (colorIdx1 + 1) % numColors;
+                float localRatio = scaledPos - colorIdx1;
+
+                java.awt.Color interpolated = interpolateColor(GRADIENT_COLORS[colorIdx1], GRADIENT_COLORS[colorIdx2], localRatio);
+                String hex = String.format("#%02X%02X%02X", interpolated.getRed(), interpolated.getGreen(), interpolated.getBlue());
+
+                try {
+                    result.append(net.md_5.bungee.api.ChatColor.of(hex)).append(text.charAt(i));
+                } catch (Exception e) {
+                    // Fallback for older versions
+                    result.append(org.bukkit.ChatColor.GOLD).append(text.charAt(i));
+                }
+            }
+
+            return result.toString();
+        }
+
+        private java.awt.Color interpolateColor(java.awt.Color c1, java.awt.Color c2, float ratio) {
+            int r = (int) (c1.getRed() + ratio * (c2.getRed() - c1.getRed()));
+            int g = (int) (c1.getGreen() + ratio * (c2.getGreen() - c1.getGreen()));
+            int b = (int) (c1.getBlue() + ratio * (c2.getBlue() - c1.getBlue()));
+            return new java.awt.Color(r, g, b);
         }
 
         public void cleanup() {

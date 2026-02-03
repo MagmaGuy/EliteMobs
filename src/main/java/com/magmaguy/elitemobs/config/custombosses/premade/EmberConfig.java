@@ -11,7 +11,7 @@ public class EmberConfig extends CustomBossesConfigFields {
         super("ember",
                 EntityType.BLAZE,
                 true,
-                "$reinforcementLevel &cEmber",
+                "$reinforcementLevel <g:#FF6347:#FFA500>Ember</g>",
                 "dynamic");
         setHealthMultiplier(0.3);
         setDamageMultiplier(0.3);

@@ -10,8 +10,8 @@ public class TheCityTeleporter extends NPCsConfigFields {
     public TheCityTeleporter() {
         super("the_city_teleporter",
                 true,
-                "Dwarf Olav",
-                "<The City Teleporter>",
+                "<g:#7A5A4A:#8A6A5A>Dwarf Olav</g>",
+                "<g:#6A4A3A:#7A5A4A><The City></g>",
                 Villager.Profession.ARMORER,
                 "em_adventurers_guild,307.4,78,201.4,0,0",
                 List.of(""),

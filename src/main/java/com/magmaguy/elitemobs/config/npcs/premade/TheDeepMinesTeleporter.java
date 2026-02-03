@@ -10,8 +10,8 @@ public class TheDeepMinesTeleporter extends NPCsConfigFields {
     public TheDeepMinesTeleporter() {
         super("the_deep_mines_teleporter",
                 true,
-                "Nether Lurk",
-                "<The Deep Mines Teleporter>",
+                "<g:#8A4A3A:#9A5A4A>Nether Lurk</g>",
+                "<g:#7A3A2A:#8A4A3A><The Deep Mines></g>",
                 Villager.Profession.ARMORER,
                 "em_adventurers_guild,301.4,78,201.3,0,0",
                 List.of(""),

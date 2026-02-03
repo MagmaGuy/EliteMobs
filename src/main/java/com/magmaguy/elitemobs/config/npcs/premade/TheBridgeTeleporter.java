@@ -10,8 +10,8 @@ public class TheBridgeTeleporter extends NPCsConfigFields {
     public TheBridgeTeleporter() {
         super("the_bridge_teleporter",
                 true,
-                "Old Dwarf Jotun",
-                "<The Bridge Teleporter>",
+                "<g:#7A6A5A:#8A7A6A>Old Dwarf Jotun</g>",
+                "<g:#6A5A4A:#7A6A5A><The Bridge></g>",
                 Villager.Profession.ARMORER,
                 "em_adventurers_guild,308.4,78,202.4,90,0",
                 List.of(""),

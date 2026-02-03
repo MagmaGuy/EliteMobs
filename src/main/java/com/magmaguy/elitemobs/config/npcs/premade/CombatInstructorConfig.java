@@ -11,8 +11,8 @@ public class CombatInstructorConfig extends NPCsConfigFields {
     public CombatInstructorConfig() {
         super("combat_instructor",
                 true,
-                "Charles",
-                "<Combat Instructor>",
+                "<g:#8A4A4A:#9A5A5A>Charles</g>",
+                "<g:#7A3A3A:#8A4A4A><Combat Instructor></g>",
                 Villager.Profession.NITWIT,
                 "em_adventurers_guild,301.5,91.0,219.5,90,0",
                 new ArrayList<>(List.of(

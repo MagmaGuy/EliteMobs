@@ -2,15 +2,12 @@ package com.magmaguy.elitemobs.skills;
 
 import com.magmaguy.elitemobs.antiexploit.FarmingProtection;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
+import com.magmaguy.elitemobs.combatsystem.displays.BossHealthDisplay;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.utils.DebugMessage;
-import com.magmaguy.magmacore.util.Logger;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -46,6 +43,9 @@ public class SkillXPHandler implements Listener {
         }
 
         int mobLevel = eliteEntity.getLevel();
+
+        // Capture the death location for XP popups (before entity becomes invalid)
+        Location deathLocation = eliteEntity.getLocation();
 
         // Calculate total damage for proportional XP distribution
         double totalDamage = eliteEntity.getDamagers().values().stream()
@@ -96,22 +96,30 @@ public class SkillXPHandler implements Listener {
             if (earnedXP <= 0) continue;
 
             // Award weapon XP based on main hand weapon
-            awardWeaponXP(player, earnedXP);
+            long weaponXP = awardWeaponXP(player, earnedXP);
 
             // Award armor XP (always, at 1/3 rate)
-            awardArmorXP(player, earnedXP);
+            long armorXP = awardArmorXP(player, earnedXP);
+
+            // Show XP popup with total XP earned (weapon + armor)
+            long totalXPEarned = weaponXP + armorXP;
+            if (totalXPEarned > 0 && deathLocation != null) {
+                BossHealthDisplay.createXPPopup(deathLocation, player, totalXPEarned);
+            }
         }
     }
 
     /**
      * Awards weapon XP to a player based on their equipped weapon.
+     *
+     * @return The amount of XP awarded, or 0 if no weapon skill applies
      */
-    private void awardWeaponXP(Player player, long baseXP) {
+    private long awardWeaponXP(Player player, long baseXP) {
         Material weaponMaterial = player.getInventory().getItemInMainHand().getType();
         SkillType skillType = SkillType.fromMaterial(weaponMaterial);
 
         // No XP if not holding a recognized weapon
-        if (skillType == null) return;
+        if (skillType == null) return 0;
 
         // Get current XP before adding
         long oldXP = PlayerData.getSkillXP(player.getUniqueId(), skillType);
@@ -129,14 +137,18 @@ public class SkillXPHandler implements Listener {
         if (newLevel > previousLevel) {
             notifyLevelUp(player, skillType, newLevel);
         }
+
+        return xpToAdd;
     }
 
     /**
      * Awards armor XP to a player at 1/3 the rate of weapon XP.
      * Armor XP is always awarded on kills regardless of equipped gear,
      * but at a reduced rate so it trails behind weapon skills.
+     *
+     * @return The amount of XP awarded
      */
-    private void awardArmorXP(Player player, long baseXP) {
+    private long awardArmorXP(Player player, long baseXP) {
         // Get current XP before adding
         long oldXP = PlayerData.getSkillXP(player.getUniqueId(), SkillType.ARMOR);
         int previousLevel = SkillXPCalculator.levelFromTotalXP(oldXP);
@@ -153,6 +165,8 @@ public class SkillXPHandler implements Listener {
         if (newLevel > previousLevel) {
             notifyLevelUp(player, SkillType.ARMOR, newLevel);
         }
+
+        return armorXP;
     }
 
     /**

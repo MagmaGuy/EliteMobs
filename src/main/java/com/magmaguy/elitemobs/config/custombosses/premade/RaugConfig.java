@@ -11,7 +11,7 @@ public class RaugConfig extends CustomBossesConfigFields {
         super("raug",
                 EntityType.SILVERFISH,
                 true,
-                "$reinforcementLevel &4Raug",
+                "$reinforcementLevel <g:#8B0000:#FF4500>Raug</g>",
                 "dynamic");
         setHealthMultiplier(0.1);
         setDamageMultiplier(0.1);

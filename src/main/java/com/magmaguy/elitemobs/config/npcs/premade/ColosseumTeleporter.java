@@ -10,8 +10,8 @@ public class ColosseumTeleporter extends NPCsConfigFields {
     public ColosseumTeleporter() {
         super("colosseum_teleporter",
                 true,
-                "Arena Master",
-                "<Colosseum Teleporter>",
+                "<g:#A89040:#B8A050>Arena Master</g>",
+                "<g:#988030:#A89040><Colosseum></g>",
                 Villager.Profession.ARMORER,
                 "em_adventurers_guild,291.5,92,307.5,-90,0",
                 List.of(""),

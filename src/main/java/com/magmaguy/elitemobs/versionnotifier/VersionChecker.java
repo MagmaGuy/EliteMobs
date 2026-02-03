@@ -124,6 +124,7 @@ public class VersionChecker {
                 connectionRetryCount = 0;
 
                 Map<String, Integer> remoteVersions = parseNightbreakDlcResponse(jsonResponse);
+                Logger.info("Parsed " + remoteVersions.size() + " content versions from Nightbreak API");
                 processContentVersionData(remoteVersions);
 
             } catch (IOException e) {
@@ -239,8 +240,11 @@ public class VersionChecker {
                     int version = Integer.parseInt(numericVersion);
                     versions.put(slug, version);
                 } catch (NumberFormatException e) {
-                    // Skip entries with non-numeric versions
+                    Logger.warn("Failed to parse version '" + versionStr + "' for slug '" + slug + "'");
                 }
+            } else if (slug != null && (versionStr == null || versionStr.isEmpty())) {
+                // Slug exists but no version - this is expected for some free content
+                // Only log at debug level to avoid spam
             }
 
             pos = objectEnd + 1;

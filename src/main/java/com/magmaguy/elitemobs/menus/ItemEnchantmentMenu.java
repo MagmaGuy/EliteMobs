@@ -145,12 +145,12 @@ public class ItemEnchantmentMenu extends EliteMenu {
             if (!message.contains("$itemName"))
                 Bukkit.getOnlinePlayers().forEach(player -> player.spigot().sendMessage(
                         ChatMessageType.CHAT, TextComponent.fromLegacyText(
-                                ChatColorConverter.convert(message.replace("$player", upgradingPlayer.getDisplayName())))));
+                                ChatColorConverter.convert(message.replace("$playerName", upgradingPlayer.getName()).replace("$player", upgradingPlayer.getDisplayName())))));
             else {
                 TextComponent itemName = ShareItem.hoverableItemTextComponent(upgradedItem);
                 String[] text = message.replace("$itemName", "itemName").split("itemName");
-                BaseComponent[] baseComponent1 = TextComponent.fromLegacyText(ChatColorConverter.convert(text[0].replace("$player", upgradingPlayer.getDisplayName())));
-                BaseComponent[] baseComponent2 = TextComponent.fromLegacyText(ChatColorConverter.convert(text[1].replace("$player", upgradingPlayer.getDisplayName())));
+                BaseComponent[] baseComponent1 = TextComponent.fromLegacyText(ChatColorConverter.convert(text[0].replace("$playerName", upgradingPlayer.getName()).replace("$player", upgradingPlayer.getDisplayName())));
+                BaseComponent[] baseComponent2 = TextComponent.fromLegacyText(ChatColorConverter.convert(text[1].replace("$playerName", upgradingPlayer.getName()).replace("$player", upgradingPlayer.getDisplayName())));
 
                 ComponentBuilder componentBuilder = new ComponentBuilder();
                 componentBuilder.append(baseComponent1);
