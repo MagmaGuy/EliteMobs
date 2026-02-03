@@ -10,8 +10,8 @@ public class AirshipTeleporter extends NPCsConfigFields {
     public AirshipTeleporter() {
         super("airship_teleporter",
                 true,
-                "Sky Captain",
-                "<Airship Teleporter>",
+                "<g:#6A9AB0:#7AAAC0>Sky Captain</g>",
+                "<g:#5A8AA0:#6A9AB0><Airship></g>",
                 Villager.Profession.ARMORER,
                 "em_adventurers_guild,291.5,92,301.5,-90,0",
                 List.of(""),

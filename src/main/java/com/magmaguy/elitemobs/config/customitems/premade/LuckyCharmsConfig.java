@@ -11,7 +11,7 @@ public class LuckyCharmsConfig extends CustomItemsConfigFields {
         super("lucky_charms",
                 true,
                 Material.COOKIE,
-                "&bLucky Charms",
+                "<g:#FFD700:#32CD32>Lucky Charms</g>",
                 new ArrayList<>(List.of("&aPart of a complete breakfast!", "&cNote: Absolutely not a part of", "&ca complete breakfast.")));
         setEnchantments(List.of("VANISHING_CURSE,1"));
         setPotionEffects(List.of("LUCK,0,self,continuous"));

@@ -10,8 +10,8 @@ public class BeastsSanctuaryTeleporter extends NPCsConfigFields {
     public BeastsSanctuaryTeleporter() {
         super("beasts_sanctuary_teleporter",
                 true,
-                "Beast Warden",
-                "<Beasts Sanctuary Teleporter>",
+                "<g:#7A5A40:#8A6A50>Beast Warden</g>",
+                "<g:#6A4A30:#7A5A40><Beast's Sanctuary></g>",
                 Villager.Profession.ARMORER,
                 "em_adventurers_guild,291.5,92,304.5,-90,0",
                 List.of(""),

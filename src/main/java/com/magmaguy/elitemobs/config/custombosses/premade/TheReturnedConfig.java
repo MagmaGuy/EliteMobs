@@ -8,7 +8,7 @@ public class TheReturnedConfig extends CustomBossesConfigFields {
         super("the_returned",
                 EntityType.HUSK,
                 true,
-                "$reinforcementLevel &6The Returned",
+                "$reinforcementLevel <g:#696969:#A9A9A9>The Returned</g>",
                 "dynamic");
         setHealthMultiplier(0.5);
         setDamageMultiplier(0.5);

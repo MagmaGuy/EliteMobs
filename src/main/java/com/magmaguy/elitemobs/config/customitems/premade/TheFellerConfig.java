@@ -12,7 +12,7 @@ public class TheFellerConfig extends CustomItemsConfigFields {
         super("the_feller",
                 true,
                 Material.DIAMOND_AXE,
-                "&2The Feller",
+                "<g:#228B22:#32CD32>The Feller</g>",
                 new ArrayList<>(List.of("&aEven in your sleep,", "&ayou can feel this axe''s", "&asaplust")));
         setEnchantments(new ArrayList<>(List.of("FORTUNE,4", "SILK_TOUCH,1", "UNBREAKING,6", "EFFICIENCY,6", "VANISHING_CURSE,1")));
         setPotionEffects(new ArrayList<>(List.of("FAST_DIGGING,1,self,continuous", "NIGHT_VISION,0,self,continuous")));

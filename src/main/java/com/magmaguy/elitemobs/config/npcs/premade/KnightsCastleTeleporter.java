@@ -10,8 +10,8 @@ public class KnightsCastleTeleporter extends NPCsConfigFields {
     public KnightsCastleTeleporter() {
         super("knights_castle_teleporter",
                 true,
-                "Castle Keeper",
-                "<Knight's Castle Teleporter>",
+                "<g:#7A8A9A:#8A9AAA>Castle Keeper</g>",
+                "<g:#6A7A8A:#7A8A9A><Knight's Castle></g>",
                 Villager.Profession.ARMORER,
                 "em_adventurers_guild,299.5,92,261.5,90,0",
                 List.of(""),

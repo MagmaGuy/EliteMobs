@@ -11,8 +11,8 @@ public class QuestGiverConfig extends NPCsConfigFields {
     public QuestGiverConfig() {
         super("quest_giver",
                 true,
-                "Qel'Thuzad",
-                "<Quest Giver>",
+                "<g:#4A6A8A:#5A7A9A>Qel'Thuzad</g>",
+                "<g:#3A5A7A:#4A6A8A><Quest Giver></g>",
                 Villager.Profession.FLETCHER,
                 "em_adventurers_guild,283.5,91,215.5,0,0",
                 new ArrayList<>(List.of(

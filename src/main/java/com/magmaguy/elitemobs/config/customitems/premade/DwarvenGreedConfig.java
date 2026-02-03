@@ -12,7 +12,7 @@ public class DwarvenGreedConfig extends CustomItemsConfigFields {
         super("dwarven_greed",
                 true,
                 Material.WOODEN_PICKAXE,
-                "&4Dwarven Greed",
+                "<g:#FFD700:#B8860B>Dwarven Greed</g>",
                 new ArrayList<>(List.of("&cThose who delve too greedily", "&cand too deep may wake ancient", "&chorrors of shadow and flame", "&cbest left undisturbed.")));
         setEnchantments(new ArrayList<>(List.of("FORTUNE,4", "UNBREAKING,6", "EFFICIENCY,6", "VANISHING_CURSE,1")));
         setPotionEffects(new ArrayList<>(List.of("FAST_DIGGING,1,self,continuous", "NIGHT_VISION,0,self,continuous")));

@@ -17,6 +17,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -59,11 +60,17 @@ public class PlayerPotionEffects implements Listener {
         if (elitePotionEffect.getPotionEffect().getType().equals(PotionEffectType.ABSORPTION)) return;
         if (elitePotionEffect.getPotionEffect().getType().equals(PotionEffectType.HEALTH_BOOST)) return;
 
-
-        //if the player has a higher amplifier potion effect, ignore. If it's the same, reapply to refresh the effect
-        if (player.hasPotionEffect(elitePotionEffect.getPotionEffect().getType()) &&
-                player.getPotionEffect(elitePotionEffect.getPotionEffect().getType()).getAmplifier() > elitePotionEffect.getPotionEffect().getAmplifier())
-            return;
+        // Check if player already has this effect active
+        if (player.hasPotionEffect(elitePotionEffect.getPotionEffect().getType())) {
+            PotionEffect existingEffect = player.getPotionEffect(elitePotionEffect.getPotionEffect().getType());
+            // Don't override if existing effect has higher amplifier
+            if (existingEffect.getAmplifier() > elitePotionEffect.getPotionEffect().getAmplifier())
+                return;
+            // Don't override if existing effect has more than 2 seconds (40 ticks) remaining
+            // This prevents overwriting long-duration potion effects with short-duration charm effects
+            if (existingEffect.getDuration() > 40)
+                return;
+        }
 
         if (elitePotionEffect.getPotionEffect().getType().equals(PotionEffectType.INSTANT_HEALTH)) {
             Heal.doHeal(player, elitePotionEffect);

@@ -10,8 +10,8 @@ public class DarkSpireTeleporter extends NPCsConfigFields {
     public DarkSpireTeleporter() {
         super("dark_spire_teleporter",
                 true,
-                "Dark Warlock",
-                "<Dark Spire Teleporter>",
+                "<g:#3A3A5A:#4A4A6A>Dark Warlock</g>",
+                "<g:#2A2A4A:#3A3A5A><Dark Spire></g>",
                 Villager.Profession.ARMORER,
                 "em_adventurers_guild,293.5,92,299.5,0,0",
                 List.of(""),

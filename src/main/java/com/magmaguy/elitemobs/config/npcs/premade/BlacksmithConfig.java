@@ -11,8 +11,8 @@ public class BlacksmithConfig extends NPCsConfigFields {
     public BlacksmithConfig() {
         super("blacksmith",
                 true,
-                "Greg",
-                "<Blacksmith>",
+                "<g:#8A6A4A:#9A7A5A>Greg</g>",
+                "<g:#7A5A3A:#8A6A4A><Blacksmith></g>",
                 Villager.Profession.TOOLSMITH,
                 "em_adventurers_guild,293.5,78,276.5,-180,0",
                 new ArrayList<>(List.of(

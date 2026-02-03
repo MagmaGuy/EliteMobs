@@ -9,7 +9,7 @@ import java.util.List;
 
 public class InvictusShovelConfig extends CustomItemsConfigFields {
     public InvictusShovelConfig() {
-        super("invictus_shovel", true, Material.NETHERITE_SHOVEL, "&4Invictus Shovel", new ArrayList<>(List.of("&2Awarded to the champions of the", "&2Wood League Arena!")));
+        super("invictus_shovel", true, Material.NETHERITE_SHOVEL, "<g:#FFD700:#FF4500>Invictus Shovel</g>", new ArrayList<>(List.of("&2Awarded to the champions of the", "&2Wood League Arena!")));
         setEnchantments(new ArrayList<>(List.of("EFFICIENCY,6", "DRILLING,3", "UNBREAKING,5")));
         setPotionEffects(List.of("FAST_DIGGING,0,self,continuous"));
         setItemType(CustomItem.ItemType.UNIQUE);

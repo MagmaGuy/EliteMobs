@@ -13,7 +13,7 @@ public class LightningFaeConfig extends CustomBossesConfigFields {
         super("lightning_fae",
                 EntityType.VEX,
                 true,
-                "$eventBossLevel &eLightning Fae",
+                "$eventBossLevel <g:#FFFF00:#FFD700>Lightning Fae</g>",
                 "dynamic");
         setHealthMultiplier(0.3);
         setDamageMultiplier(0.3);

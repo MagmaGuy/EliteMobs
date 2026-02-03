@@ -10,8 +10,8 @@ public class TheNetherBellTeleporter extends NPCsConfigFields {
     public TheNetherBellTeleporter() {
         super("the_nether_bell_teleporter",
                 true,
-                "Ancient Corpse",
-                "<The Nether Bell Teleporter>",
+                "<g:#7A3A3A:#8A4A4A>Ancient Corpse</g>",
+                "<g:#6A2A2A:#7A3A3A><The Nether Bell></g>",
                 Villager.Profession.ARMORER,
                 "em_adventurers_guild,300.4,78,198.3,180,0",
                 List.of(""),

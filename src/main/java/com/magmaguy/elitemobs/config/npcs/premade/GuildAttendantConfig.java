@@ -11,8 +11,8 @@ public class GuildAttendantConfig extends NPCsConfigFields {
     public GuildAttendantConfig() {
         super("guild_attendant",
                 true,
-                "Gillian",
-                "<Guild Attendant>",
+                "<g:#A89040:#B8A050>Gillian</g>",
+                "<g:#988030:#A89040><Guild Attendant></g>",
                 Villager.Profession.LIBRARIAN,
                 "em_adventurers_guild,288.5,91,229.5,179,0",
                 new ArrayList<>(List.of(

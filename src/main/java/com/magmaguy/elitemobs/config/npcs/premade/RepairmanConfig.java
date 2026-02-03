@@ -11,8 +11,8 @@ public class RepairmanConfig extends NPCsConfigFields {
     public RepairmanConfig() {
         super("repairman_config",
                 true,
-                "Reggie",
-                "<Repairman>",
+                "<g:#6A6A6A:#7A7A7A>Reggie</g>",
+                "<g:#5A5A5A:#6A6A6A><Repairman></g>",
                 Villager.Profession.WEAPONSMITH,
                 "em_adventurers_guild,283.5,78,266.5,-90,0",
                 new ArrayList<>(List.of(
