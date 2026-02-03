@@ -10,8 +10,8 @@ public class CatacombsTeleporter extends NPCsConfigFields {
     public CatacombsTeleporter() {
         super("catacombs_teleporter",
                 true,
-                "Crypt Keeper",
-                "<Catacombs Teleporter>",
+                "<g:#6A6A6A:#7A7A7A>Crypt Keeper</g>",
+                "<g:#5A5A5A:#6A6A6A><Catacombs></g>",
                 Villager.Profession.ARMORER,
                 "em_adventurers_guild,295.5,92,307.5,90,0",
                 List.of(""),

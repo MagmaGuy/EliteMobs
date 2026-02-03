@@ -10,8 +10,8 @@ public class TheMinesTeleporter extends NPCsConfigFields {
     public TheMinesTeleporter() {
         super("the_mines_teleporter",
                 true,
-                "Prospector Voultar",
-                "<The Mines Teleporter>",
+                "<g:#5A5A5A:#6A6A6A>Prospector Voultar</g>",
+                "<g:#4A4A4A:#5A5A5A><The Mines></g>",
                 Villager.Profession.ARMORER,
                 "em_adventurers_guild,308.4,78,204.4,90,0",
                 List.of(""),

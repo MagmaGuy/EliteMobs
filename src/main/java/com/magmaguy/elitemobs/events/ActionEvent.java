@@ -76,8 +76,8 @@ public class ActionEvent extends CustomEvent {
     }
 
     public void instantiateEvent(Location location, Player player) {
-        this.player = player;
         ActionEvent actionEvent = new ActionEvent(customEventsConfigFields);
+        actionEvent.player = player;
         actionEvent.setEventStartLocation(location);
         CustomEventStartEvent customEventStartEvent = new CustomEventStartEvent(actionEvent);
         new EventCaller(customEventStartEvent);

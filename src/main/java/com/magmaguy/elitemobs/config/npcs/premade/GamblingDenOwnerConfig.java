@@ -14,8 +14,8 @@ public class GamblingDenOwnerConfig extends NPCsConfigFields {
     public GamblingDenOwnerConfig() {
         super("gambling_den_owner",
                 true,
-                "&6The Baron",
-                "<Gambling Den Owner>",
+                "<g:#9A7A40:#AA8A50>The Baron</g>",
+                "<g:#8A6A30:#9A7A40><Gambling Den Owner></g>",
                 Villager.Profession.WEAPONSMITH,
                 "em_adventurers_guild,286.5,81,231.5,-90,0",
                 new ArrayList<>(List.of(

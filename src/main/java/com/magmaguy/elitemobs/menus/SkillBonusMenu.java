@@ -22,7 +22,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.*;
 
@@ -85,13 +84,17 @@ public class SkillBonusMenu {
         // Sort by unlock tier
         skills.sort(Comparator.comparingInt(SkillBonusConfigFields::getUnlockTier));
 
-        // Place skills in inventory
+        // Create menu data with slot mapping
+        SkillMenuData menuData = new SkillMenuData(skillType, player.getUniqueId());
+
+        // Place skills in inventory and build slot mapping
         int slot = 0;
         for (SkillBonusConfigFields skillConfig : skills) {
             if (slot >= 45) break; // Leave bottom row for navigation
 
             ItemStack skillItem = createSkillItem(skillConfig, skillLevel, activeSkillIds);
             inventory.setItem(slot, skillItem);
+            menuData.getSlotToSkill().put(slot, skillConfig);
             slot++;
         }
 
@@ -100,7 +103,7 @@ public class SkillBonusMenu {
         inventory.setItem(SkillBonusMenuConfig.getInfoSlot(), createInfoItem(player, skillType, skillLevel, activeSkillIds));
 
         player.openInventory(inventory);
-        SkillBonusMenuEvents.skillSelectMenus.put(inventory, new SkillMenuData(skillType, player.getUniqueId()));
+        SkillBonusMenuEvents.skillSelectMenus.put(inventory, menuData);
     }
 
     /**
@@ -148,20 +151,7 @@ public class SkillBonusMenu {
             lore.add(SkillBonusMenuConfig.getLockedLore().replace("%level%", String.valueOf(skillConfig.getRequiredLevel())));
         }
 
-        ItemStack item = ItemStackGenerator.generateItemStack(material, name, lore);
-
-        // Store skill ID in item for click handling
-        ItemMeta meta = item.getItemMeta();
-        if (meta != null) {
-            // Use lore to store the skill ID (hacky but works)
-            List<String> existingLore = meta.getLore();
-            if (existingLore == null) existingLore = new ArrayList<>();
-            existingLore.add(ChatColorConverter.convert("&8ID: " + skillConfig.getSkillId()));
-            meta.setLore(existingLore);
-            item.setItemMeta(meta);
-        }
-
-        return item;
+        return ItemStackGenerator.generateItemStack(material, name, lore);
     }
 
     /**
@@ -211,8 +201,10 @@ public class SkillBonusMenu {
             if (!(event.getWhoClicked() instanceof Player player)) return;
 
             // Handle weapon selection menu
-            if (weaponSelectMenus.contains(event.getInventory())) {
+            if (EliteMenu.isEliteMenu(event, weaponSelectMenus)) {
                 event.setCancelled(true);
+                if (!EliteMenu.isTopMenu(event)) return;
+                if (!SharedShopElements.itemNullPointerPrevention(event)) return;
                 handleWeaponSelectClick(player, event);
                 return;
             }
@@ -220,6 +212,8 @@ public class SkillBonusMenu {
             // Handle skill selection menu
             if (skillSelectMenus.containsKey(event.getInventory())) {
                 event.setCancelled(true);
+                if (!EliteMenu.isTopMenu(event)) return;
+                if (!SharedShopElements.itemNullPointerPrevention(event)) return;
                 handleSkillSelectClick(player, event);
             }
         }
@@ -258,18 +252,11 @@ public class SkillBonusMenu {
                 return;
             }
 
-            // Handle skill click
-            ItemStack clickedItem = event.getCurrentItem();
-            if (clickedItem == null || clickedItem.getType() == Material.AIR) return;
-
-            // Extract skill ID from item lore
-            String skillId = extractSkillId(clickedItem);
-            if (skillId == null) return;
-
-            // Get skill config
-            SkillBonusConfigFields skillConfig = SkillBonusesConfig.getBySkillId(skillId);
+            // Get skill config from slot mapping
+            SkillBonusConfigFields skillConfig = menuData.getSlotToSkill().get(slot);
             if (skillConfig == null) return;
 
+            String skillId = skillConfig.getSkillId();
             UUID playerUUID = player.getUniqueId();
             SkillType skillType = menuData.getSkillType();
 
@@ -315,23 +302,6 @@ public class SkillBonusMenu {
             openSkillSelectMenu(player, skillType);
         }
 
-        private String extractSkillId(ItemStack item) {
-            if (item == null || !item.hasItemMeta()) return null;
-            ItemMeta meta = item.getItemMeta();
-            if (meta == null || !meta.hasLore()) return null;
-
-            List<String> lore = meta.getLore();
-            if (lore == null) return null;
-
-            for (String line : lore) {
-                String stripped = ChatColorConverter.convert(line);
-                if (stripped.startsWith("ID: ")) {
-                    return stripped.substring(4);
-                }
-            }
-            return null;
-        }
-
         @EventHandler
         public void onInventoryClose(InventoryCloseEvent event) {
             weaponSelectMenus.remove(event.getInventory());
@@ -341,12 +311,15 @@ public class SkillBonusMenu {
 
     /**
      * Data class for skill selection menu.
+     * Stores the skill type and a slot-to-skill mapping for click handling.
      */
     private static class SkillMenuData {
         @Getter
         private final SkillType skillType;
         @Getter
         private final UUID playerUUID;
+        @Getter
+        private final Map<Integer, SkillBonusConfigFields> slotToSkill = new HashMap<>();
 
         public SkillMenuData(SkillType skillType, UUID playerUUID) {
             this.skillType = skillType;

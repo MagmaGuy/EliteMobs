@@ -11,8 +11,8 @@ public class BinderOfWorldsNPCConfig extends NPCsConfigFields {
     public BinderOfWorldsNPCConfig() {
         super("binder_of_worlds_teleporter",
                 true,
-                "Buði the Doomsayer",
-                "<[100] Binder of Worlds Teleport>",
+                "<g:#4A3A5A:#5A4A6A>Buði the Doomsayer</g>",
+                "<g:#3A2A4A:#4A3A5A><[100] Binder of Worlds Teleport></g>",
                 Villager.Profession.ARMORER,
                 "em_adventurers_guild,289.5,92,264.5,-180,0",
                 List.of(

@@ -10,8 +10,8 @@ public class BackTeleporter extends NPCsConfigFields {
     public BackTeleporter() {
         super("back_teleporter",
                 true,
-                "Hermes",
-                "<Transporter>",
+                "&7Hermes",
+                "&8<Transporter>",
                 Villager.Profession.FLETCHER,
                 "em_adventurers_guild,213.5,88,232,0,0",
                 List.of("Welcome to the\\nAdventurer's Guild Hub!"),

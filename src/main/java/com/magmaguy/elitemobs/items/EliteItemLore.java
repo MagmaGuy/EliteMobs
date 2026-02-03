@@ -176,6 +176,7 @@ public class EliteItemLore {
                 EnchantmentsConfig.getEnchantment("soulbind.yml")
                         .getFileConfiguration()
                         .getString("loreStrings")
+                        .replace("$playerName", player.getName())
                         .replace("$player", player.getDisplayName()));
     }
 

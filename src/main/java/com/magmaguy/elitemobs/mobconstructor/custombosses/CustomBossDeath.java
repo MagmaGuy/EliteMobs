@@ -44,11 +44,15 @@ public class CustomBossDeath implements Listener {
 
         //Do death message
         StringBuilder playersList = new StringBuilder();
+        StringBuilder playersNameList = new StringBuilder();
         for (Player player : customBossEntity.getDamagers().keySet()) {
-            if (playersList.length() == 0)
+            if (playersList.length() == 0) {
                 playersList.append(player.getDisplayName());
-            else
+                playersNameList.append(player.getName());
+            } else {
                 playersList.append(", &f").append(player.getDisplayName());
+                playersNameList.append(", ").append(player.getName());
+            }
         }
 
         playersList = new StringBuilder(ChatColorConverter.convert(playersList.toString()));
@@ -79,6 +83,11 @@ public class CustomBossDeath implements Listener {
                 }
 
                 for (String string : customBossEntity.customBossesConfigFields.getDeathMessages()) {
+                    if (string.contains("$damager1Name"))
+                        if (topDamager != null)
+                            string = string.replace("$damager1Name", topDamager.getName());
+                        else
+                            string = "";
                     if (string.contains("$damager1name"))
                         if (topDamager != null)
                             string = string.replace("$damager1name", topDamager.getDisplayName());
@@ -88,6 +97,11 @@ public class CustomBossDeath implements Listener {
                         if (topDamager != null)
                             string = string.replace("$damager1damage",
                                     Round.twoDecimalPlaces(customBossEntity.getDamagers().get(topDamager)) + "");
+                        else
+                            string = "";
+                    if (string.contains("$damager2Name"))
+                        if (secondDamager != null)
+                            string = string.replace("$damager2Name", secondDamager.getName());
                         else
                             string = "";
                     if (string.contains("$damager2name"))
@@ -101,6 +115,11 @@ public class CustomBossDeath implements Listener {
                                     Round.twoDecimalPlaces(customBossEntity.getDamagers().get(secondDamager)) + "");
                         else
                             string = "";
+                    if (string.contains("$damager3Name"))
+                        if (thirdDamager != null)
+                            string = string.replace("$damager3Name", thirdDamager.getName());
+                        else
+                            string = "";
                     if (string.contains("$damager3name"))
                         if (thirdDamager != null)
                             string = string.replace("$damager3name", thirdDamager.getDisplayName());
@@ -112,6 +131,8 @@ public class CustomBossDeath implements Listener {
                                     Round.twoDecimalPlaces(customBossEntity.getDamagers().get(thirdDamager)) + "");
                         else
                             string = "";
+                    if (string.contains("$playersName"))
+                        string = string.replace("$playersName", playersNameList.toString());
                     if (string.contains("$players"))
                         string = string.replace("$players", playersList.toString());
                     if (customBossEntity.customBossesConfigFields.getAnnouncementPriority() > 0)
@@ -135,16 +156,16 @@ public class CustomBossDeath implements Listener {
             } else {
                 if (customBossEntity.customBossesConfigFields.getDeathMessage() != null
                         && !customBossEntity.customBossesConfigFields.getDeathMessage().isEmpty()) {
+                    String deathMsg = customBossEntity.customBossesConfigFields.getDeathMessage()
+                            .replace("$playersName", playersNameList.toString())
+                            .replace("$players", playersList.toString());
                     if (customBossEntity.customBossesConfigFields.getAnnouncementPriority() == 0)
                         for (Player player : customBossEntity.getDamagers().keySet())
-                            player.sendMessage(ChatColorConverter.convert(
-                                    customBossEntity.customBossesConfigFields.getDeathMessage().replace("$players", playersList.toString())));
+                            player.sendMessage(ChatColorConverter.convert(deathMsg));
                     if (customBossEntity.customBossesConfigFields.getAnnouncementPriority() > 0)
-                        Bukkit.broadcastMessage(ChatColorConverter.convert(
-                                customBossEntity.customBossesConfigFields.getDeathMessage().replace("$players", playersList.toString())));
+                        Bukkit.broadcastMessage(ChatColorConverter.convert(deathMsg));
                     if (customBossEntity.customBossesConfigFields.getAnnouncementPriority() > 2)
-                        new DiscordSRVAnnouncement(ChatColorConverter.convert(
-                                customBossEntity.customBossesConfigFields.getDeathMessage().replace("$players", playersList.toString())));
+                        new DiscordSRVAnnouncement(ChatColorConverter.convert(deathMsg));
                 }
             }
     }

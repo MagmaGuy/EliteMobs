@@ -13,7 +13,7 @@ public class FireFaeConfig extends CustomBossesConfigFields {
         super("fire_fae",
                 EntityType.VEX,
                 true,
-                "$eventBossLevel &cFire Fae",
+                "$eventBossLevel <g:#FF4500:#FF6347>Fire Fae</g>",
                 "dynamic");
         setHealthMultiplier(0.3);
         setDamageMultiplier(0.3);

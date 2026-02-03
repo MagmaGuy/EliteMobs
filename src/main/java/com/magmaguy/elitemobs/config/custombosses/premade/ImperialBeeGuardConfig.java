@@ -11,7 +11,7 @@ public class ImperialBeeGuardConfig extends CustomBossesConfigFields {
         super("imperial_bee_guard",
                 EntityType.BEE,
                 true,
-                "$reinforcementLevel &eImperial Bee Soldier",
+                "$reinforcementLevel <g:#FFD700:#FFA500>Imperial Bee Soldier</g>",
                 "dynamic");
         setDropsEliteMobsLoot(false);
         setDropsVanillaLoot(false);

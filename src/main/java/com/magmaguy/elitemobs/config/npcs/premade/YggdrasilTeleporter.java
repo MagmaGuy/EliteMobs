@@ -10,8 +10,8 @@ public class YggdrasilTeleporter extends NPCsConfigFields {
     public YggdrasilTeleporter() {
         super("yggdrasil_teleporter",
                 true,
-                "Norse Guide",
-                "<Yggdrasil Teleporter>",
+                "<g:#5A8A5A:#6A9A6A>Norse Guide</g>",
+                "<g:#4A7A4A:#5A8A5A><Yggdrasil></g>",
                 Villager.Profession.ARMORER,
                 "em_adventurers_guild,288.5,92,288.5,-90,0",
                 List.of(""),

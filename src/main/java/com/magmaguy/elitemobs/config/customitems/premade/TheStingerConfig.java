@@ -12,7 +12,7 @@ public class TheStingerConfig extends CustomItemsConfigFields {
         super("the_stinger",
                 true,
                 Material.GOLDEN_SWORD,
-                "&eThe Stinger",
+                "<g:#FFD700:#FFA500>The Stinger</g>",
                 new ArrayList<>(List.of("&aFloat like a butterfly,", "&asting like a bee!")));
         setEnchantments(new ArrayList<>(List.of("SHARPNESS,1", "UNBREAKING,1", "VANISHING_CURSE,1")));
         setPotionEffects(List.of("POISON,0,target,onHit"));

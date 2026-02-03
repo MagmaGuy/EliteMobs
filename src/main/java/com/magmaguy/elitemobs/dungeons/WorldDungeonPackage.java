@@ -1,13 +1,11 @@
 package com.magmaguy.elitemobs.dungeons;
 
-import com.magmaguy.elitemobs.api.DungeonUninstallEvent;
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
 import com.magmaguy.elitemobs.dungeons.utility.DungeonUtils;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
-import com.magmaguy.elitemobs.utils.EventCaller;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -63,11 +61,16 @@ public class WorldDungeonPackage extends WorldPackage implements Dungeon {
 
     @Override
     public void doUninstall(Player player) {
-        DungeonUninstallEvent event = new DungeonUninstallEvent(contentPackagesConfigFields);
-        new EventCaller(event);
-        isInstalled = false;
+        // Clear dungeon-specific data
         customBossEntityList.clear();
         treasureChestList.clear();
+        npcEntities.clear();
+
+        // Call parent to unload worlds (handles wormholeWorld too) and persist isEnabled = false
+        super.doUninstall(player);
+
+        // Clear wormhole world reference after parent unloads it
+        wormholeWorld = null;
     }
 
     private void getEntities() {

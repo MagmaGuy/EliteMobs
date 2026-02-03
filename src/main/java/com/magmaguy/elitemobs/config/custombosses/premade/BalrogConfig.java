@@ -13,7 +13,7 @@ public class BalrogConfig extends CustomBossesConfigFields {
         super("balrog",
                 EntityType.SILVERFISH,
                 true,
-                "$eventBossLevel &4Balrog",
+                "$eventBossLevel <g:#FF4500:#8B0000>Balrog</g>",
                 "dynamic");
         setPowers(new ArrayList<>(List.of("summonable:summonType=ON_HIT:chance=0.5:filename=raug.yml")));
         setUniqueLootList(Collections.singletonList("dwarven_greed.yml:1"));

@@ -156,7 +156,9 @@ public class CustomBossBossBar {
 
         if (!customBossEntity.exists()) return;
 
-        if (customBossEntity.getHealth() / customBossEntity.getMaxHealth() > 1 || customBossEntity.getHealth() / customBossEntity.getMaxHealth() < 0) {
+        // Round to handle floating point precision issues (e.g., 49.95000076293945 / 49.95 = 1.000000015...)
+        double healthRatio = Round.twoDecimalPlaces(customBossEntity.getHealth() / customBossEntity.getMaxHealth());
+        if (healthRatio > 1 || healthRatio < 0) {
             if (!warned) {
                 Logger.warn("The following boss had more health than it should: " + customBossEntity.getName());
                 Logger.warn("This is a problem usually caused by running more than one plugin that modifies mob health!" +

@@ -9,7 +9,7 @@ import java.util.List;
 
 public class InvictusPickaxeConfig extends CustomItemsConfigFields {
     public InvictusPickaxeConfig() {
-        super("invictus_pickaxe", true, Material.NETHERITE_PICKAXE, "&4Invictus Pickaxe", new ArrayList<>(List.of("&2Awarded to the champions of the", "&2Wood League Arena!")));
+        super("invictus_pickaxe", true, Material.NETHERITE_PICKAXE, "<g:#FFD700:#FF4500>Invictus Pickaxe</g>", new ArrayList<>(List.of("&2Awarded to the champions of the", "&2Wood League Arena!")));
         setEnchantments(new ArrayList<>(List.of("EFFICIENCY,6", "DRILLING,3", "UNBREAKING,5")));
         setPotionEffects(List.of("FAST_DIGGING,0,self,continuous"));
         setItemType(CustomItem.ItemType.UNIQUE);

@@ -65,7 +65,7 @@ public class SoulbindEnchantment extends CustomEnchantment {
                 if (item == null)
                     return;
                 FakeText fakeText = VisualDisplay.generateFakeText(item.getLocation().clone().add(new Vector(0, -50, 0)), ChatColorConverter.convert(
-                        SoulbindConfig.hologramStrings.replace("$player", player.getDisplayName())), 30);
+                        SoulbindConfig.hologramStrings.replace("$playerName", player.getName()).replace("$player", player.getDisplayName())), 30);
                 if (fakeText == null) return;
 
                 new BukkitRunnable() {

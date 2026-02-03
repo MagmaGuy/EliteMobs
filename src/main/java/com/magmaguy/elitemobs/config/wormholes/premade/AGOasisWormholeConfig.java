@@ -11,7 +11,7 @@ public class AGOasisWormholeConfig extends WormholeConfigFields {
                 "oasis_adventure.yml",
                 Wormhole.WormholeStyle.ICOSAHEDRON);
         setBlindPlayer(true);
-        setLocation1Text("&2『Oasis Adventure』 &aLvls 20-55");
+        setLocation1Text("<g:#FFD700:#F0E68C>『Oasis Adventure』</g> <g:#98FB98:#90EE90>Lvls 20-55</g>");
         setParticleColor(0xFFFF00);
     }
 }

@@ -13,7 +13,7 @@ public class IceFaeConfig extends CustomBossesConfigFields {
         super("ice_fae",
                 EntityType.VEX,
                 true,
-                "$eventBossLevel &bIce Fae",
+                "$eventBossLevel <g:#87CEEB:#E0FFFF>Ice Fae</g>",
                 "dynamic");
         setHealthMultiplier(0.3);
         setDamageMultiplier(0.3);

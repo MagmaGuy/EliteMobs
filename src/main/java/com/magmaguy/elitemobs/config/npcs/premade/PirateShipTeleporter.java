@@ -10,8 +10,8 @@ public class PirateShipTeleporter extends NPCsConfigFields {
     public PirateShipTeleporter() {
         super("pirate_ship_teleporter",
                 true,
-                "Sea Dog",
-                "<Pirate Ship Teleporter>",
+                "<g:#4A7A9A:#5A8AAA>Sea Dog</g>",
+                "<g:#3A6A8A:#4A7A9A><Pirate Ship></g>",
                 Villager.Profession.FISHERMAN,
                 "em_adventurers_guild,302.7,92,288.5,-90,0",
                 List.of(""),

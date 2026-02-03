@@ -40,6 +40,7 @@ public class DungeonInstance extends MatchInstance {
     }
 
     private final List<DungeonObjective> dungeonObjectives = new ArrayList<>();
+    private boolean instanceRemovalScheduled = false;
     @Getter
     private World world;
     @Getter
@@ -203,6 +204,13 @@ public class DungeonInstance extends MatchInstance {
     }
 
     public void removeInstance() {
+        // Prevent multiple removal attempts for the same instance
+        if (instanceRemovalScheduled) {
+            Logger.debug("removeInstance() called but already scheduled for " + (world != null ? world.getName() : "null world"));
+            return;
+        }
+        instanceRemovalScheduled = true;
+
         participants.forEach(player -> player.sendMessage(DungeonsConfig.getInstancedDungeonClosingInstanceMessage()));
         HashSet<Player> participants = new HashSet<>(this.participants);
         participants.forEach(this::removeAnyKind);
@@ -212,6 +220,10 @@ public class DungeonInstance extends MatchInstance {
             Logger.warn("Instanced dungeon's world was already unloaded before removing the entities in it! This shouldn't happen, but doesn't break anything.");
             return;
         }
+
+        String worldName = world.getName();
+        Logger.debug("removeInstance() scheduling world deletion for " + worldName + " in 30 seconds");
+
         world.getEntities().forEach(entity -> EntityTracker.unregister(entity, RemovalReason.WORLD_UNLOAD));
         new RemoveInstanceTask(dungeonInstance).runTaskLater(MetadataHandler.PLUGIN, 20 * 30L);
     }
@@ -360,9 +372,41 @@ public class DungeonInstance extends MatchInstance {
 
         @Override
         public void run() {
+            // Check if world was already removed
+            if (world == null) {
+                Logger.debug("RemoveInstanceTask: World already null, skipping deletion");
+                return;
+            }
+
             new EventCaller(new InstancedDungeonRemoveEvent(dungeonInstance));
             dungeonInstances.remove(dungeonInstance);
-            TemporaryWorldManager.permanentlyDeleteWorld(world);
+
+            World worldToDelete = world;
+            String worldName = worldToDelete.getName();
+            world = null; // Clear reference before deletion to prevent race conditions
+
+            // Log diagnostic info before attempting deletion
+            int entityCount = worldToDelete.getEntities().size();
+            int playerCount = worldToDelete.getPlayers().size();
+            int loadedChunks = worldToDelete.getLoadedChunks().length;
+
+            if (playerCount > 0) {
+                Logger.warn("Attempting to delete world " + worldName + " with " + playerCount + " players still in it! This will likely fail.");
+                for (org.bukkit.entity.Player p : worldToDelete.getPlayers()) {
+                    Logger.warn(" - Player still in world: " + p.getName());
+                }
+            }
+
+            Logger.debug("Deleting instanced world " + worldName + " (entities: " + entityCount + ", chunks: " + loadedChunks + ")");
+
+            try {
+                // Disable auto-save to prevent new async save tasks from being queued during unload
+                worldToDelete.setAutoSave(false);
+                TemporaryWorldManager.permanentlyDeleteWorld(worldToDelete);
+            } catch (Exception e) {
+                Logger.warn("Exception while deleting world " + worldName + ": " + e.getMessage());
+                e.printStackTrace();
+            }
         }
     }
 }

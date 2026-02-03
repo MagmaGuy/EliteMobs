@@ -10,8 +10,8 @@ public class VampireManorTeleporter extends NPCsConfigFields {
     public VampireManorTeleporter() {
         super("vampire_manor_teleporter",
                 true,
-                "Blood Servant",
-                "<Vampire Manor Teleporter>",
+                "<g:#6A2A2A:#7A3A3A>Blood Servant</g>",
+                "<g:#5A1A1A:#6A2A2A><Vampire Manor></g>",
                 Villager.Profession.BUTCHER,
                 "em_adventurers_guild,298.5,92,288.5,90,0",
                 List.of(""),
