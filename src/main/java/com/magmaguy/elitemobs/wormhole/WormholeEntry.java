@@ -5,8 +5,10 @@ import com.magmaguy.elitemobs.dungeons.EMPackage;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.PersistentObject;
 import com.magmaguy.elitemobs.mobconstructor.PersistentObjectHandler;
+import com.magmaguy.elitemobs.thirdparty.custommodels.CustomModel;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.DiscordLinks;
+import com.magmaguy.freeminecraftmodels.customentity.StaticEntity;
 import com.magmaguy.magmacore.DrawLine;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.ChunkLocationChecker;
@@ -82,6 +84,8 @@ public class WormholeEntry implements PersistentObject {
     private String armorStandText;
     // Use real TextDisplay entity - Minecraft handles visibility automatically
     private TextDisplay textDisplay = null;
+    // Custom model for this entry point (FreeMinecraftModels only)
+    private StaticEntity staticModel = null;
     private String worldName;
     @Getter
     @Setter
@@ -115,6 +119,46 @@ public class WormholeEntry implements PersistentObject {
 
         persistentObjectHandler = new PersistentObjectHandler(this);
         wormholeEntries.add(this);
+    }
+
+    /**
+     * Gets the custom model name for this wormhole entry point.
+     * @return The model name from customModel1 or customModel2 based on wormholeNumber
+     */
+    private String getCustomModelName() {
+        return (wormholeNumber == 1)
+                ? wormhole.getWormholeConfigFields().getCustomModel1()
+                : wormhole.getWormholeConfigFields().getCustomModel2();
+    }
+
+    /**
+     * Checks if this wormhole entry should use a custom model.
+     * @return true if custom model is configured, enabled, and exists
+     */
+    private boolean shouldUseCustomModel() {
+        String modelName = getCustomModelName();
+        return modelName != null && !modelName.isEmpty()
+                && CustomModel.customModelsEnabled()
+                && CustomModel.getModelPlugin() == CustomModel.ModelPlugin.FREE_MINECRAFT_MODELS
+                && CustomModel.modelExists(modelName);
+    }
+
+    /**
+     * Initialize the custom model for this wormhole entry.
+     * Uses StaticEntity from FreeMinecraftModels (no underlying entity needed).
+     */
+    private void initializeCustomModel() {
+        String modelName = getCustomModelName();
+        if (modelName == null || modelName.isEmpty()) return;
+        if (location == null || location.getWorld() == null) return;
+        if (!CustomModel.customModelsEnabled()) return;
+        if (CustomModel.getModelPlugin() != CustomModel.ModelPlugin.FREE_MINECRAFT_MODELS) return;
+        if (!CustomModel.modelExists(modelName)) return;
+
+        if (staticModel != null) {
+            staticModel.remove();
+        }
+        staticModel = StaticEntity.create(modelName, location.clone());
     }
 
     /**
@@ -167,6 +211,10 @@ public class WormholeEntry implements PersistentObject {
 
     public void onDungeonUninstall() {
         clearLines();
+        if (staticModel != null) {
+            staticModel.remove();
+            staticModel = null;
+        }
         location = null;
     }
 
@@ -182,6 +230,10 @@ public class WormholeEntry implements PersistentObject {
             if (textDisplay != null && textDisplay.isValid()) {
                 textDisplay.remove();
                 textDisplay = null;
+            }
+            if (staticModel != null) {
+                staticModel.remove();
+                staticModel = null;
             }
         } finally {
             isProcessingChunkEvent = false;
@@ -226,6 +278,10 @@ public class WormholeEntry implements PersistentObject {
             textDisplay.remove();
             textDisplay = null;
         }
+        if (staticModel != null) {
+            staticModel.remove();
+            staticModel = null;
+        }
         clearLines();
     }
 
@@ -254,9 +310,19 @@ public class WormholeEntry implements PersistentObject {
             return;
         }
 
+        // Initialize custom model if needed (lazy initialization like textDisplay)
+        if (shouldUseCustomModel() && staticModel == null) {
+            initializeCustomModel();
+        }
+
         // Update text display if needed - use real TextDisplay entity
         if (armorStandText != null && (textDisplay == null || !textDisplay.isValid())) {
             initializeTextDisplay();
+        }
+
+        // Skip geometry rendering when custom model is active
+        if (staticModel != null) {
+            return;
         }
 
         // Update visual effects (lines) if enabled and at least one player has line of sight
@@ -334,7 +400,9 @@ public class WormholeEntry implements PersistentObject {
             textDisplay.remove();
         }
 
-        double yOffset = 1.2 * wormhole.getWormholeConfigFields().getSizeMultiplier();
+        // Adjust Y offset: higher when custom model is present to clear the model
+        double sizeMultiplier = wormhole.getWormholeConfigFields().getSizeMultiplier();
+        double yOffset = (staticModel != null) ? 2.0 * sizeMultiplier : 1.2 * sizeMultiplier;
         Location textLocation = location.clone().add(0, yOffset, 0);
 
         textDisplay = textLocation.getWorld().spawn(textLocation, TextDisplay.class, display -> {

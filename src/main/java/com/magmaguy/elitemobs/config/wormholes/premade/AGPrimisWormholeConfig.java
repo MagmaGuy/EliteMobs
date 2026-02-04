@@ -14,6 +14,7 @@ public class AGPrimisWormholeConfig extends WormholeConfigFields {
         setLocation1Text("<g:#228B22:#32CD32>『Primis Adventure』</g> <g:#98FB98:#90EE90>Lvls 0-20</g>");
         setParticleColor(0x008000);
         setSizeMultiplier(2);
+        setCustomModel1("em_primis_portal");
     }
 }
 
