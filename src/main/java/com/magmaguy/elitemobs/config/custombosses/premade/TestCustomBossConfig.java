@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class TestCustomBossesConfig extends CustomBossesConfigFields {
-    public TestCustomBossesConfig() {
+public class TestCustomBossConfig extends CustomBossesConfigFields {
+    public TestCustomBossConfig() {
         super("test_boss",
                 EntityType.ZOMBIE,
                 true,
