@@ -13,5 +13,6 @@ public class AGOasisWormholeConfig extends WormholeConfigFields {
         setBlindPlayer(true);
         setLocation1Text("<g:#FFD700:#F0E68C>『Oasis Adventure』</g> <g:#98FB98:#90EE90>Lvls 20-55</g>");
         setParticleColor(0xFFFF00);
+        setCustomModel1("em_oasis_portal");
     }
 }
