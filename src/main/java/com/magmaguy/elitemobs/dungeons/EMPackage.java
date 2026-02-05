@@ -181,7 +181,7 @@ public abstract class EMPackage extends ContentPackage {
         }
         tooltip.addAll(contentPackagesConfigFields.getSetupMenuDescription());
         ItemStack itemStack = ItemStackGenerator.generateItemStack(
-                SetupMenuIcons.BASE_MATERIAL,
+                Material.PURPLE_STAINED_GLASS_PANE,
                 contentPackagesConfigFields.getName(),
                 tooltip);
         ItemMeta itemMeta = itemStack.getItemMeta();
@@ -224,7 +224,7 @@ public abstract class EMPackage extends ContentPackage {
         tooltip.add("&7Click to see how to get access.");
         tooltip.addAll(contentPackagesConfigFields.getSetupMenuDescription());
         ItemStack itemStack = ItemStackGenerator.generateItemStack(
-                SetupMenuIcons.BASE_MATERIAL,
+                Material.ORANGE_STAINED_GLASS_PANE,
                 contentPackagesConfigFields.getName(),
                 tooltip);
         ItemMeta itemMeta = itemStack.getItemMeta();
@@ -248,12 +248,12 @@ public abstract class EMPackage extends ContentPackage {
         return itemStack;
     }
 
-    private ItemStack generateItemStackWithIcon(List<String> specificTooltip, Material fallbackMaterial, int customModelData) {
+    private ItemStack generateItemStackWithIcon(List<String> specificTooltip, Material material, int customModelData) {
         List<String> tooltip = new ArrayList<>(specificTooltip);
         tooltip.addAll(contentPackagesConfigFields.getSetupMenuDescription());
-        // Use emerald as base for custom model, fallback material shown if no resource pack
+        // Use the actual material - resource pack shows custom icon, fallback shows colored glass pane
         ItemStack itemStack = ItemStackGenerator.generateItemStack(
-                SetupMenuIcons.BASE_MATERIAL,
+                material,
                 contentPackagesConfigFields.getName(),
                 tooltip);
         ItemMeta itemMeta = itemStack.getItemMeta();

@@ -2,12 +2,14 @@
   "parent": "minecraft:item/generated",
   "textures": {
     "layer0": "minecraft:block/yellow_stained_glass"
-    },
- 
-    "overrides":[
- 
-     {"predicate": {"custom_model_data":31173}, "model":"elitemobs:ui/yellowlock"}
-
-
-     ]
+  },
+  "overrides": [
+    {"predicate": {"custom_model_data": 31173}, "model": "elitemobs:ui/yellowlock"},
+    {"predicate": {"custom_model_data": 31180}, "model": "elitemobs:ui/em_lockedchain"},
+    {"predicate": {"custom_model_data": 31181}, "model": "elitemobs:ui/em_lockedcoin"},
+    {"predicate": {"custom_model_data": 31182}, "model": "elitemobs:ui/em_unlocked"},
+    {"predicate": {"custom_model_data": 31184}, "model": "elitemobs:ui/em_keygray"},
+    {"predicate": {"custom_model_data": 31185}, "model": "elitemobs:ui/em_keychain"},
+    {"predicate": {"custom_model_data": 31187}, "model": "elitemobs:ui/em_keystar"}
+  ]
 }
