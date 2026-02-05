@@ -1,7 +1,10 @@
 package com.magmaguy.elitemobs.commands.setup;
 
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.dungeons.*;
 import com.magmaguy.magmacore.menus.MenuButton;
+import com.magmaguy.magmacore.nightbreak.NightbreakAccount;
+import org.bukkit.Bukkit;
 import com.magmaguy.magmacore.menus.SetupMenu;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
@@ -28,6 +31,19 @@ public class EliteSetupMenu {
         rawEmPackages.stream()
                 .filter(MetaPackage.class::isInstance)
                 .forEach(rawEmPackage -> ((MetaPackage) rawEmPackage).getPackages().forEach(emPackages::remove));
+
+        // Prefetch access info for packages with Nightbreak slugs
+        if (NightbreakAccount.hasToken()) {
+            Bukkit.getScheduler().runTaskAsynchronously(MetadataHandler.PLUGIN, () -> {
+                for (EMPackage pkg : emPackages) {
+                    String slug = pkg.getContentPackagesConfigFields().getNightbreakSlug();
+                    if (slug != null && !slug.isEmpty() && !pkg.isDownloaded()) {
+                        NightbreakAccount.AccessInfo info = NightbreakAccount.getInstance().checkAccess(slug);
+                        pkg.setCachedAccessInfo(info);
+                    }
+                }
+            });
+        }
 
         MenuButton infoButton = new MenuButton(ItemStackGenerator.generateSkullItemStack("magmaguy",
                 "&2Installation instructions:",

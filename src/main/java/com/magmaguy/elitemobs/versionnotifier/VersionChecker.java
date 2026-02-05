@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.versionnotifier;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
 import com.magmaguy.elitemobs.utils.DiscordLinks;
+import com.magmaguy.magmacore.nightbreak.NightbreakAccount;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.Logger;
 import com.magmaguy.magmacore.util.SpigotMessage;
@@ -470,6 +471,17 @@ public class VersionChecker {
                                 SpigotMessage.simpleMessage(" &2for the support room.")
                         );
                         Logger.sendSimpleMessage(event.getPlayer(), "&8&m-----------------------------------------------------");
+
+                        // Suggest update command if Nightbreak token is registered
+                        if (NightbreakAccount.hasToken()) {
+                            event.getPlayer().spigot().sendMessage(
+                                    SpigotMessage.commandHoverMessage(
+                                            "&a[Click here to update all content automatically]",
+                                            "&eRuns /em updatecontent",
+                                            "/em updatecontent"
+                                    )
+                            );
+                        }
                     }
                     if (SHA1Updated) {
                         event.getPlayer().sendMessage(ChatColorConverter.convert("&8[EliteMobs] &cThe EliteMobs resource pack has updated! This means that the current resource pack will not fully work until you restart your server. You only need to restart once!"));
