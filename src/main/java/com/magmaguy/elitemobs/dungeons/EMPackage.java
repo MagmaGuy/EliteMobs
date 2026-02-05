@@ -1,21 +1,26 @@
 package com.magmaguy.elitemobs.dungeons;
 
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
 import com.magmaguy.magmacore.menus.ContentPackage;
+import com.magmaguy.magmacore.nightbreak.NightbreakAccount;
+import com.magmaguy.magmacore.nightbreak.NightbreakContentManager;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +41,9 @@ public abstract class EMPackage extends ContentPackage {
     protected boolean isInstalled;
     @Setter
     protected boolean outOfDate = false;
+    @Getter
+    @Setter
+    protected NightbreakAccount.AccessInfo cachedAccessInfo = null;
     @Getter
     protected List<CustomBossEntity> customBossEntityList = new ArrayList<>();
     protected List<TreasureChest> treasureChestList = new ArrayList<>();
@@ -128,6 +136,28 @@ public abstract class EMPackage extends ContentPackage {
         return generateItemStack(List.of("Content is not downloaded!", "Click for download link!"), Material.RED_STAINED_GLASS_PANE);
     }
 
+    protected ItemStack getNeedsAccessItemStack() {
+        List<String> tooltip = new ArrayList<>();
+        tooltip.add("&cYou need access to download this content!");
+        tooltip.add("&eClick to see how to get access.");
+        if (cachedAccessInfo != null) {
+            if (cachedAccessInfo.patreonLink != null && !cachedAccessInfo.patreonLink.isEmpty()) {
+                tooltip.add("&7Available via: &6Patreon");
+            }
+            if (cachedAccessInfo.itchLink != null && !cachedAccessInfo.itchLink.isEmpty()) {
+                tooltip.add("&7Available via: &ditch.io");
+            }
+        }
+        tooltip.addAll(contentPackagesConfigFields.getSetupMenuDescription());
+        ItemStack itemStack = ItemStackGenerator.generateItemStack(Material.PURPLE_STAINED_GLASS_PANE, contentPackagesConfigFields.getName(), tooltip);
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+        itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        itemMeta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
+        itemStack.setItemMeta(itemMeta);
+        return itemStack;
+    }
+
     private ItemStack generateItemStack(List<String> specificTooltip, Material material) {
         List<String> tooltip = new ArrayList<>(specificTooltip);
         tooltip.addAll(contentPackagesConfigFields.getSetupMenuDescription());
@@ -145,14 +175,99 @@ public abstract class EMPackage extends ContentPackage {
     public abstract void doUninstall(Player player);
 
     public void doDownload(Player player) {
+        String slug = contentPackagesConfigFields.getNightbreakSlug();
+
+        // If no Nightbreak slug, use legacy download link behavior
+        if (slug == null || slug.isEmpty()) {
+            player.sendMessage("----------------------------------------------------");
+            player.sendMessage(ChatColorConverter.convert("&4Download this at &9" + getContentPackagesConfigFields().getDownloadLink() + " &4!"));
+            player.sendMessage("----------------------------------------------------");
+            return;
+        }
+
+        // If no Nightbreak token registered, prompt user
+        if (!NightbreakAccount.hasToken()) {
+            player.sendMessage("----------------------------------------------------");
+            player.sendMessage(ChatColorConverter.convert("&eThis content can be downloaded automatically with a Nightbreak account."));
+            player.sendMessage(ChatColorConverter.convert("&71. Get your token at: &9https://nightbreak.io/account"));
+            player.sendMessage(ChatColorConverter.convert("&72. Run: &e/nightbreakLogin <your-token>"));
+            player.sendMessage("");
+            player.sendMessage(ChatColorConverter.convert("&7Or download manually at: &9" + getContentPackagesConfigFields().getDownloadLink()));
+            player.sendMessage("----------------------------------------------------");
+            return;
+        }
+
+        // Check access first
+        player.sendMessage(ChatColorConverter.convert("&7[EliteMobs] Checking access for " + contentPackagesConfigFields.getName() + "..."));
+
+        NightbreakContentManager.checkAccessAsync(slug, accessInfo -> {
+            cachedAccessInfo = accessInfo;
+
+            if (accessInfo == null) {
+                player.sendMessage(ChatColorConverter.convert("&c[EliteMobs] Failed to check access. Try again later or download manually:"));
+                player.sendMessage(ChatColorConverter.convert("&9" + getContentPackagesConfigFields().getDownloadLink()));
+                return;
+            }
+
+            if (!accessInfo.hasAccess) {
+                doShowAccessInfo(player);
+                return;
+            }
+
+            // Has access - proceed with download
+            File importsFolder = new File(MetadataHandler.PLUGIN.getDataFolder(), "imports");
+            if (!importsFolder.exists()) {
+                importsFolder.mkdirs();
+            }
+
+            NightbreakContentManager.downloadAsync(slug, importsFolder, player, success -> {
+                if (success) {
+                    player.sendMessage(ChatColorConverter.convert("&a[EliteMobs] Content downloaded! Reloading EliteMobs..."));
+                    // Schedule reload after a short delay
+                    Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> {
+                        com.magmaguy.elitemobs.commands.ReloadCommand.reload(player);
+                    }, 20L);
+                }
+            });
+        });
+    }
+
+    public void doShowAccessInfo(Player player) {
         player.sendMessage("----------------------------------------------------");
-        player.sendMessage(ChatColorConverter.convert("&4Download this at &9" + getContentPackagesConfigFields().getDownloadLink() + " &4!"));
+        player.sendMessage(ChatColorConverter.convert("&cYou don't have access to: &f" + contentPackagesConfigFields.getName()));
+        player.sendMessage("");
+        player.sendMessage(ChatColorConverter.convert("&eYou can get access through:"));
+        if (cachedAccessInfo != null) {
+            if (cachedAccessInfo.patreonLink != null && !cachedAccessInfo.patreonLink.isEmpty()) {
+                player.sendMessage(ChatColorConverter.convert("&6• Patreon: &9" + cachedAccessInfo.patreonLink));
+            }
+            if (cachedAccessInfo.itchLink != null && !cachedAccessInfo.itchLink.isEmpty()) {
+                player.sendMessage(ChatColorConverter.convert("&d• itch.io: &9" + cachedAccessInfo.itchLink));
+            }
+        }
+        if (cachedAccessInfo == null ||
+            ((cachedAccessInfo.patreonLink == null || cachedAccessInfo.patreonLink.isEmpty()) &&
+             (cachedAccessInfo.itchLink == null || cachedAccessInfo.itchLink.isEmpty()))) {
+            player.sendMessage(ChatColorConverter.convert("&a• Visit: &9https://nightbreak.io"));
+        }
+        player.sendMessage("");
+        player.sendMessage(ChatColorConverter.convert("&7After purchasing, use &e/nightbreakLogin <token> &7to link your account."));
         player.sendMessage("----------------------------------------------------");
     }
 
     protected ContentState getContentState() {
         if (isInstalled) return ContentState.INSTALLED;
         if (isDownloaded) return ContentState.NOT_INSTALLED;
+
+        // Check if this content requires Nightbreak access
+        String slug = contentPackagesConfigFields.getNightbreakSlug();
+        if (slug != null && !slug.isEmpty() && NightbreakAccount.hasToken()) {
+            // If we have cached access info showing no access, show NEEDS_ACCESS
+            if (cachedAccessInfo != null && !cachedAccessInfo.hasAccess) {
+                return ContentState.NEEDS_ACCESS;
+            }
+        }
+
         return ContentState.NOT_DOWNLOADED;
     }
 
