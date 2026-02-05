@@ -1,13 +1,12 @@
 package com.magmaguy.elitemobs.menus;
 
-import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 /**
  * Constants and utilities for setup menu icons.
  * Uses custom model data to display custom icons when the resource pack is loaded.
- * Falls back to plain emerald (visible name/lore) when resource pack is not loaded.
+ * Falls back to colored stained glass panes when resource pack is not loaded.
  */
 public class SetupMenuIcons {
 
@@ -37,9 +36,6 @@ public class SetupMenuIcons {
 
     /** Out of date, can update - key with star */
     public static final int CMD_KEY_STAR = 31187;
-
-    /** Base material for all setup menu icons */
-    public static final Material BASE_MATERIAL = Material.EMERALD;
 
     /**
      * Applies custom model data to an ItemStack for setup menu display.
