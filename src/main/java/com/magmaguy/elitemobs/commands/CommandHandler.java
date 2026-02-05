@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.commands.admin.UpdateContentCommand;
 import com.magmaguy.magmacore.command.CommandManager;
 
 public class CommandHandler {
@@ -70,6 +71,7 @@ public class CommandHandler {
         emCommand.registerCommand(new ProtectionBypassCommand());
         emCommand.registerCommand(new FirstTimeSetupCommand());
         emCommand.registerCommand(new DebugCommand());
+        emCommand.registerCommand(new UpdateContentCommand());
 
         //User commands
 //        emCommand.registerCommand(new AdventurersGuildCommand());
