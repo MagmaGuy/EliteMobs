@@ -9,6 +9,7 @@ import com.magmaguy.magmacore.menus.ContentPackage;
 import com.magmaguy.magmacore.nightbreak.NightbreakAccount;
 import com.magmaguy.magmacore.nightbreak.NightbreakContentManager;
 import com.magmaguy.magmacore.util.ChatColorConverter;
+import com.magmaguy.elitemobs.menus.SetupMenuIcons;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
@@ -118,22 +119,52 @@ public abstract class EMPackage extends ContentPackage {
     }
 
     protected ItemStack getInstalledItemStack() {
-        return generateItemStack(List.of("Content is installed!", "Click to uninstall!"), Material.GREEN_STAINED_GLASS_PANE);
+        return generateItemStackWithIcon(
+                List.of("Content is installed!", "Click to uninstall!"),
+                Material.GREEN_STAINED_GLASS_PANE,
+                SetupMenuIcons.CMD_KEY_GOLD);
     }
 
     protected ItemStack getNotInstalledItemStack() {
-        return generateItemStack(List.of("Content is not installed!", "Click to install!"), Material.YELLOW_STAINED_GLASS_PANE);
+        return generateItemStackWithIcon(
+                List.of("Content is not installed!", "Click to install!"),
+                Material.YELLOW_STAINED_GLASS_PANE,
+                SetupMenuIcons.CMD_KEY_GRAY);
     }
 
     protected ItemStack getPartiallyInstalledItemStack() {
-        return generateItemStack(List.of("Content partially installed!",
-                "This is either because you haven't downloaded all of it,",
-                "or because some elements have been manually disabled.",
-                "Click to download!"), Material.ORANGE_STAINED_GLASS_PANE);
+        return generateItemStackWithIcon(
+                List.of("Content partially installed!",
+                        "This is either because you haven't downloaded all of it,",
+                        "or because some elements have been manually disabled.",
+                        "Click to download!"),
+                Material.ORANGE_STAINED_GLASS_PANE,
+                SetupMenuIcons.CMD_KEY_GRAY);
     }
 
     protected ItemStack getNotDownloadedItemStack() {
-        return generateItemStack(List.of("Content is not downloaded!", "Click for download link!"), Material.RED_STAINED_GLASS_PANE);
+        // Determine icon based on Nightbreak token and access
+        int customModelData;
+        String slug = contentPackagesConfigFields.getNightbreakSlug();
+
+        if (slug == null || slug.isEmpty()) {
+            // No Nightbreak integration - show unlocked (can download manually)
+            customModelData = SetupMenuIcons.CMD_UNLOCKED;
+        } else if (!NightbreakAccount.hasToken()) {
+            // Has Nightbreak slug but no token - show locked with chain
+            customModelData = SetupMenuIcons.CMD_LOCKED_CHAIN;
+        } else if (cachedAccessInfo != null && cachedAccessInfo.hasAccess) {
+            // Has token and access - show unlocked
+            customModelData = SetupMenuIcons.CMD_UNLOCKED;
+        } else {
+            // Has token but no access - show locked with coin (need to pay)
+            customModelData = SetupMenuIcons.CMD_LOCKED_COIN;
+        }
+
+        return generateItemStackWithIcon(
+                List.of("Content is not downloaded!", "Click to download!"),
+                Material.YELLOW_STAINED_GLASS_PANE,
+                customModelData);
     }
 
     protected ItemStack getNeedsAccessItemStack() {
@@ -149,11 +180,58 @@ public abstract class EMPackage extends ContentPackage {
             }
         }
         tooltip.addAll(contentPackagesConfigFields.getSetupMenuDescription());
-        ItemStack itemStack = ItemStackGenerator.generateItemStack(Material.PURPLE_STAINED_GLASS_PANE, contentPackagesConfigFields.getName(), tooltip);
+        ItemStack itemStack = ItemStackGenerator.generateItemStack(
+                SetupMenuIcons.BASE_MATERIAL,
+                contentPackagesConfigFields.getName(),
+                tooltip);
         ItemMeta itemMeta = itemStack.getItemMeta();
         itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
         itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         itemMeta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
+        itemMeta.setCustomModelData(SetupMenuIcons.CMD_LOCKED_COIN);
+        itemStack.setItemMeta(itemMeta);
+        return itemStack;
+    }
+
+    @Override
+    protected ItemStack getOutOfDateUpdatableItemStack() {
+        // Determine icon based on Nightbreak token status
+        int customModelData;
+        String slug = contentPackagesConfigFields.getNightbreakSlug();
+
+        if (slug == null || slug.isEmpty()) {
+            // No Nightbreak integration - show star (can update manually)
+            customModelData = SetupMenuIcons.CMD_KEY_STAR;
+        } else if (!NightbreakAccount.hasToken()) {
+            // Has Nightbreak slug but no token - show key with chain
+            customModelData = SetupMenuIcons.CMD_KEY_CHAIN;
+        } else {
+            // Has token - show star (can auto-update)
+            customModelData = SetupMenuIcons.CMD_KEY_STAR;
+        }
+
+        return generateItemStackWithIcon(
+                List.of("&eUpdate available!", "&aClick to update automatically!"),
+                Material.YELLOW_STAINED_GLASS_PANE,
+                customModelData);
+    }
+
+    @Override
+    protected ItemStack getOutOfDateNoAccessItemStack() {
+        List<String> tooltip = new ArrayList<>();
+        tooltip.add("&eUpdate available!");
+        tooltip.add("&cYou need access to download this update.");
+        tooltip.add("&7Click to see how to get access.");
+        tooltip.addAll(contentPackagesConfigFields.getSetupMenuDescription());
+        ItemStack itemStack = ItemStackGenerator.generateItemStack(
+                SetupMenuIcons.BASE_MATERIAL,
+                contentPackagesConfigFields.getName(),
+                tooltip);
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+        itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        itemMeta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
+        itemMeta.setCustomModelData(SetupMenuIcons.CMD_KEY_COIN);
         itemStack.setItemMeta(itemMeta);
         return itemStack;
     }
@@ -166,6 +244,23 @@ public abstract class EMPackage extends ContentPackage {
         itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
         itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         itemMeta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
+        itemStack.setItemMeta(itemMeta);
+        return itemStack;
+    }
+
+    private ItemStack generateItemStackWithIcon(List<String> specificTooltip, Material fallbackMaterial, int customModelData) {
+        List<String> tooltip = new ArrayList<>(specificTooltip);
+        tooltip.addAll(contentPackagesConfigFields.getSetupMenuDescription());
+        // Use emerald as base for custom model, fallback material shown if no resource pack
+        ItemStack itemStack = ItemStackGenerator.generateItemStack(
+                SetupMenuIcons.BASE_MATERIAL,
+                contentPackagesConfigFields.getName(),
+                tooltip);
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+        itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        itemMeta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
+        itemMeta.setCustomModelData(customModelData);
         itemStack.setItemMeta(itemMeta);
         return itemStack;
     }
@@ -192,7 +287,7 @@ public abstract class EMPackage extends ContentPackage {
             player.sendMessage(ChatColorConverter.convert("&71. Get your token at: &9https://nightbreak.io/account"));
             player.sendMessage(ChatColorConverter.convert("&72. Run: &e/nightbreakLogin <your-token>"));
             player.sendMessage("");
-            player.sendMessage(ChatColorConverter.convert("&7Or download manually at: &9" + getContentPackagesConfigFields().getDownloadLink()));
+            player.sendMessage(ChatColorConverter.convert("&7Or download manually at: &9https://nightbreak.io/plugin/elitemobs"));
             player.sendMessage("----------------------------------------------------");
             return;
         }
@@ -203,9 +298,11 @@ public abstract class EMPackage extends ContentPackage {
         NightbreakContentManager.checkAccessAsync(slug, accessInfo -> {
             cachedAccessInfo = accessInfo;
 
+            if (!player.isOnline()) return;
+
             if (accessInfo == null) {
                 player.sendMessage(ChatColorConverter.convert("&c[EliteMobs] Failed to check access. Try again later or download manually:"));
-                player.sendMessage(ChatColorConverter.convert("&9" + getContentPackagesConfigFields().getDownloadLink()));
+                player.sendMessage(ChatColorConverter.convert("&9https://nightbreak.io/plugin/elitemobs"));
                 return;
             }
 
@@ -221,7 +318,7 @@ public abstract class EMPackage extends ContentPackage {
             }
 
             NightbreakContentManager.downloadAsync(slug, importsFolder, player, success -> {
-                if (success) {
+                if (success && player.isOnline()) {
                     player.sendMessage(ChatColorConverter.convert("&a[EliteMobs] Content downloaded! Reloading EliteMobs..."));
                     // Schedule reload after a short delay
                     Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> {
@@ -237,6 +334,7 @@ public abstract class EMPackage extends ContentPackage {
         player.sendMessage(ChatColorConverter.convert("&cYou don't have access to: &f" + contentPackagesConfigFields.getName()));
         player.sendMessage("");
         player.sendMessage(ChatColorConverter.convert("&eYou can get access through:"));
+        player.sendMessage(ChatColorConverter.convert("&a• Nightbreak: &9https://nightbreak.io/plugin/elitemobs"));
         if (cachedAccessInfo != null) {
             if (cachedAccessInfo.patreonLink != null && !cachedAccessInfo.patreonLink.isEmpty()) {
                 player.sendMessage(ChatColorConverter.convert("&6• Patreon: &9" + cachedAccessInfo.patreonLink));
@@ -245,17 +343,31 @@ public abstract class EMPackage extends ContentPackage {
                 player.sendMessage(ChatColorConverter.convert("&d• itch.io: &9" + cachedAccessInfo.itchLink));
             }
         }
-        if (cachedAccessInfo == null ||
-            ((cachedAccessInfo.patreonLink == null || cachedAccessInfo.patreonLink.isEmpty()) &&
-             (cachedAccessInfo.itchLink == null || cachedAccessInfo.itchLink.isEmpty()))) {
-            player.sendMessage(ChatColorConverter.convert("&a• Visit: &9https://nightbreak.io"));
-        }
         player.sendMessage("");
         player.sendMessage(ChatColorConverter.convert("&7After purchasing, use &e/nightbreakLogin <token> &7to link your account."));
         player.sendMessage("----------------------------------------------------");
     }
 
     protected ContentState getContentState() {
+        // Check for out-of-date installed content first
+        if (isInstalled && outOfDate) {
+            String slug = contentPackagesConfigFields.getNightbreakSlug();
+            if (slug != null && !slug.isEmpty() && NightbreakAccount.hasToken()) {
+                // If we have cached access info showing access, can update
+                if (cachedAccessInfo != null && cachedAccessInfo.hasAccess) {
+                    return ContentState.OUT_OF_DATE_UPDATABLE;
+                }
+                // If we have cached access info showing no access, can't update
+                if (cachedAccessInfo != null && !cachedAccessInfo.hasAccess) {
+                    return ContentState.OUT_OF_DATE_NO_ACCESS;
+                }
+                // No cached info yet - default to updatable (will check on click)
+                return ContentState.OUT_OF_DATE_UPDATABLE;
+            }
+            // No slug or no token - show as updatable (manual download)
+            return ContentState.OUT_OF_DATE_UPDATABLE;
+        }
+
         if (isInstalled) return ContentState.INSTALLED;
         if (isDownloaded) return ContentState.NOT_INSTALLED;
 
