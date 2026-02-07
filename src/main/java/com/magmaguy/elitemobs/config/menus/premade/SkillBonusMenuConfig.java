@@ -48,6 +48,14 @@ public class SkillBonusMenuConfig extends MenusConfigFields {
     private static ItemStack armorItem;
     @Getter
     private static int armorSlot;
+    @Getter
+    private static ItemStack macesItem;
+    @Getter
+    private static int macesSlot;
+    @Getter
+    private static ItemStack spearsItem;
+    @Getter
+    private static int spearsSlot;
 
     // Skill status items
     @Getter
@@ -85,37 +93,59 @@ public class SkillBonusMenuConfig extends MenusConfigFields {
 
     @Override
     public void processAdditionalFields() {
-        weaponSelectMenuName = ConfigurationEngine.setString(file, fileConfiguration, "weaponSelectMenuName", "&2Select Weapon Type", true);
-        skillSelectMenuName = ConfigurationEngine.setString(file, fileConfiguration, "skillSelectMenuName", "&2%skill_type% Skills", true);
+        weaponSelectMenuName = ConfigurationEngine.setString(file, fileConfiguration, "weaponSelectMenuName", "&6Select Weapon Type", true);
+        skillSelectMenuName = ConfigurationEngine.setString(file, fileConfiguration, "skillSelectMenuName", "&6%skill_type% Skills", true);
 
         // Weapon type items
         swordsItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "swordsItem",
                 ItemStackGenerator.generateItemStack(Material.DIAMOND_SWORD, "&6Swords", List.of("&7View sword skills", "&7Click to select")), true);
-        swordsSlot = ConfigurationEngine.setInt(fileConfiguration, "swordsSlot", 10);
+        swordsSlot = ConfigurationEngine.setInt(fileConfiguration, "swordsSlot", 11);
 
         axesItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "axesItem",
                 ItemStackGenerator.generateItemStack(Material.DIAMOND_AXE, "&6Axes", List.of("&7View axe skills", "&7Click to select")), true);
-        axesSlot = ConfigurationEngine.setInt(fileConfiguration, "axesSlot", 11);
+        axesSlot = ConfigurationEngine.setInt(fileConfiguration, "axesSlot", 12);
 
         bowsItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "bowsItem",
                 ItemStackGenerator.generateItemStack(Material.BOW, "&6Bows", List.of("&7View bow skills", "&7Click to select")), true);
-        bowsSlot = ConfigurationEngine.setInt(fileConfiguration, "bowsSlot", 12);
+        bowsSlot = ConfigurationEngine.setInt(fileConfiguration, "bowsSlot", 13);
 
         crossbowsItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "crossbowsItem",
                 ItemStackGenerator.generateItemStack(Material.CROSSBOW, "&6Crossbows", List.of("&7View crossbow skills", "&7Click to select")), true);
-        crossbowsSlot = ConfigurationEngine.setInt(fileConfiguration, "crossbowsSlot", 13);
+        crossbowsSlot = ConfigurationEngine.setInt(fileConfiguration, "crossbowsSlot", 14);
 
         tridentsItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "tridentsItem",
                 ItemStackGenerator.generateItemStack(Material.TRIDENT, "&6Tridents", List.of("&7View trident skills", "&7Click to select")), true);
-        tridentsSlot = ConfigurationEngine.setInt(fileConfiguration, "tridentsSlot", 14);
+        tridentsSlot = ConfigurationEngine.setInt(fileConfiguration, "tridentsSlot", 15);
 
         hoesItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "hoesItem",
                 ItemStackGenerator.generateItemStack(Material.DIAMOND_HOE, "&6Hoes (Scythes)", List.of("&7View hoe/scythe skills", "&7Click to select")), true);
-        hoesSlot = ConfigurationEngine.setInt(fileConfiguration, "hoesSlot", 15);
+        hoesSlot = ConfigurationEngine.setInt(fileConfiguration, "hoesSlot", 20);
+
+        // Maces (1.21+) - use IRON_BLOCK as fallback for older versions
+        Material macesMaterial;
+        try {
+            macesMaterial = Material.MACE;
+        } catch (NoSuchFieldError e) {
+            macesMaterial = Material.IRON_BLOCK;
+        }
+        macesItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "macesItem",
+                ItemStackGenerator.generateItemStack(macesMaterial, "&6Maces", List.of("&7View mace skills", "&7Click to select")), true);
+        macesSlot = ConfigurationEngine.setInt(fileConfiguration, "macesSlot", 21);
+
+        // Spears (1.21.11+) - use IRON_SWORD as fallback for older versions
+        Material spearsMaterial;
+        try {
+            spearsMaterial = Material.IRON_SPEAR;
+        } catch (NoSuchFieldError e) {
+            spearsMaterial = Material.IRON_SWORD;
+        }
+        spearsItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "spearsItem",
+                ItemStackGenerator.generateItemStack(spearsMaterial, "&6Spears", List.of("&7View spear skills", "&7Click to select")), true);
+        spearsSlot = ConfigurationEngine.setInt(fileConfiguration, "spearsSlot", 22);
 
         armorItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "armorItem",
                 ItemStackGenerator.generateItemStack(Material.DIAMOND_CHESTPLATE, "&6Armor", List.of("&7View armor skills", "&7Click to select")), true);
-        armorSlot = ConfigurationEngine.setInt(fileConfiguration, "armorSlot", 16);
+        armorSlot = ConfigurationEngine.setInt(fileConfiguration, "armorSlot", 23);
 
         // Navigation items
         backItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "backItem",

@@ -18,7 +18,7 @@ public class BeastsSanctuaryLair extends ContentPackagesConfigFields {
                 "em_beasts_sanctuary",
                 World.Environment.NORMAL,
                 true,
-                "em_beasts_sanctuary,32.5,88.2,36.5,0,0",
+                "em_beasts_sanctuary,35.5,88.2,20.5,46,23",
                 "em_beasts_sanctuary,32.5,88.2,36.5,0,0",
                 1,
                 "Difficulty: &4Dynamic content!",

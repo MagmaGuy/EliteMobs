@@ -47,6 +47,10 @@ public class ProceduralItemGenerationSettingsConfig extends ConfigurationFile {
     @Getter
     private static String crossbowName;
     @Getter
+    private static String maceName;
+    @Getter
+    private static String spearName;
+    @Getter
     private static List<String> nameFormat;
     @Getter
     private static List<String> nouns;
@@ -135,6 +139,26 @@ public class ProceduralItemGenerationSettingsConfig extends ConfigurationFile {
         addMaterial(Material.BOW);
         addMaterial(Material.CROSSBOW);
 
+        // MACE (1.21+) - EliteMobs already requires 1.21+, so no version check needed
+        try {
+            addMaterial(Material.MACE);
+        } catch (NoSuchFieldError e) {
+            // MACE doesn't exist pre-1.21
+        }
+
+        // SPEARS (1.21.11+) - tiered like swords
+        try {
+            addMaterial(Material.DIAMOND_SPEAR);
+            addMaterial(Material.IRON_SPEAR);
+            addMaterial(Material.GOLDEN_SPEAR);
+            addMaterial(Material.STONE_SPEAR);
+            addMaterial(Material.WOODEN_SPEAR);
+            addMaterial(Material.COPPER_SPEAR);
+            addMaterial(Material.NETHERITE_SPEAR);
+        } catch (NoSuchFieldError e) {
+            // SPEAR doesn't exist pre-1.21.11
+        }
+
         cacheMaterials();
 
         swordName = ConfigurationEngine.setString(file, fileConfiguration, "materialNames.swordName", "Sword", true);
@@ -152,6 +176,8 @@ public class ProceduralItemGenerationSettingsConfig extends ConfigurationFile {
         shieldName = ConfigurationEngine.setString(file, fileConfiguration, "materialNames.shield", "Shield", true);
         tridentName = ConfigurationEngine.setString(file, fileConfiguration, "materialNames.trident", "Trident", true);
         crossbowName = ConfigurationEngine.setString(file, fileConfiguration, "materialNames.crossbow", "Crossbow", true);
+        maceName = ConfigurationEngine.setString(file, fileConfiguration, "materialNames.mace", "Mace", true);
+        spearName = ConfigurationEngine.setString(file, fileConfiguration, "materialNames.spear", "Spear", true);
 
         nameFormat = ConfigurationEngine.setList(file, fileConfiguration, "nameFormats", new ArrayList<>(List.of(
                 "$verb $itemType of the $adjective $noun",

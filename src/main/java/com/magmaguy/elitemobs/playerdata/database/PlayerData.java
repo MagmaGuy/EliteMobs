@@ -104,6 +104,12 @@ public class PlayerData {
     @Getter
     @Setter
     private long skillXP_HOES = 0;
+    @Getter
+    @Setter
+    private long skillXP_MACES = 0;
+    @Getter
+    @Setter
+    private long skillXP_SPEARS = 0;
 
     // Skill bonus selections - JSON string mapping skill types to selected skill IDs
     @Getter
@@ -565,6 +571,8 @@ public class PlayerData {
             case CROSSBOWS -> playerData.skillXP_CROSSBOWS;
             case TRIDENTS -> playerData.skillXP_TRIDENTS;
             case HOES -> playerData.skillXP_HOES;
+            case MACES -> playerData.skillXP_MACES;
+            case SPEARS -> playerData.skillXP_SPEARS;
         };
     }
 
@@ -580,6 +588,8 @@ public class PlayerData {
             case CROSSBOWS -> playerData.skillXP_CROSSBOWS = xp;
             case TRIDENTS -> playerData.skillXP_TRIDENTS = xp;
             case HOES -> playerData.skillXP_HOES = xp;
+            case MACES -> playerData.skillXP_MACES = xp;
+            case SPEARS -> playerData.skillXP_SPEARS = xp;
         }
     }
 
@@ -873,6 +883,14 @@ public class PlayerData {
         skillXP_CROSSBOWS = resultSet.getLong("SkillXP_CROSSBOWS");
         skillXP_TRIDENTS = resultSet.getLong("SkillXP_TRIDENTS");
         skillXP_HOES = resultSet.getLong("SkillXP_HOES");
+        try {
+            skillXP_MACES = resultSet.getLong("SkillXP_MACES");
+            skillXP_SPEARS = resultSet.getLong("SkillXP_SPEARS");
+        } catch (SQLException e) {
+            // Columns may not exist yet for older databases - will be added on next save
+            skillXP_MACES = 0;
+            skillXP_SPEARS = 0;
+        }
 
         // Read skill bonus selections
         String skillSelections = resultSet.getString("SkillBonusSelections");
@@ -900,6 +918,8 @@ public class PlayerData {
         skillXP_CROSSBOWS = 0;
         skillXP_TRIDENTS = 0;
         skillXP_HOES = 0;
+        skillXP_MACES = 0;
+        skillXP_SPEARS = 0;
         // Initialize skill bonus selections to empty
         skillBonusSelections = "{}";
         // Initialize gambling debt to 0
@@ -921,6 +941,8 @@ public class PlayerData {
                 " SkillXP_CROSSBOWS," +
                 " SkillXP_TRIDENTS," +
                 " SkillXP_HOES," +
+                " SkillXP_MACES," +
+                " SkillXP_SPEARS," +
                 " SkillBonusSelections," +
                 " GamblingDebt) " +
                 //identifier
@@ -940,7 +962,7 @@ public class PlayerData {
                 //questsCompleted
                 "0," +
                 //skill XP values (all start at 0)
-                "0,0,0,0,0,0,0," +
+                "0,0,0,0,0,0,0,0,0," +
                 //skill bonus selections (empty JSON)
                 "'{}', " +
                 //gambling debt (starts at 0)

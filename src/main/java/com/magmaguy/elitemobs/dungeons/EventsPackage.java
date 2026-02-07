@@ -58,7 +58,6 @@ public class EventsPackage extends EMPackage {
     }
 
     private void handleInstallation(Player player, boolean enable) {
-        player.closeInventory();
         String action = enable ? "Installing" : "Uninstalling";
         Logger.sendMessage(player, action + " " + customEvents.size() + " events...");
 

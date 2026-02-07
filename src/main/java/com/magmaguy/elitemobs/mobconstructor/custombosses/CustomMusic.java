@@ -241,7 +241,7 @@ public class CustomMusic {
             if (eliteMobsWorld == null || eliteMobsWorld.getContentPackagesConfigFields().getSong() == null) return;
             CustomMusic customMusic = dungeonMusic.get(event.getDestination().getWorld().getUID());
             if (customMusic == null) {
-                Logger.warn("aFailed to get custom music for " + event.getDestination().getWorld().getName());
+                Logger.warn("Failed to get custom music for " + event.getDestination().getWorld().getName());
                 return;
             }
             //Wait for a second after teleporting, just to make sure

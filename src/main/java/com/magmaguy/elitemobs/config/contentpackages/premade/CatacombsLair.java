@@ -19,16 +19,18 @@ public class CatacombsLair extends ContentPackagesConfigFields {
                 World.Environment.NORMAL,
                 true,
                 "em_the_catacombs,41.5,65.0,82.5,176,0",
+                "em_the_catacombs,42.5,66.0,75.5,155,0",
                 0,
                 "Difficulty: &cHard\n" +
                         "$bossCount bosses, from tier $lowestTier to $highestTier\n" +
                         "&2A great Lair challenge for groups of beginners!",
                 "&8[EM] &8Now entering the Catacombs. Be careful with what dwells below...",
                 "&8[EM] &8You have left the Catacombs. Was it worth it?",
+                List.of("filename=catacombs_tier_15_boss.yml"),
                 "the_catacombs",
+                -1,
                 false);
-        setContentType(ContentType.DYNAMIC_DUNGEON);
-        setContentLevel(-1);
+        this.contentType = ContentType.DYNAMIC_DUNGEON;
         setDifficulties(List.of(
                 Map.of("name", "normal", "levelSync", "+5", "id", 0),
                 Map.of("name", "hard", "levelSync", "+0", "id", 1),

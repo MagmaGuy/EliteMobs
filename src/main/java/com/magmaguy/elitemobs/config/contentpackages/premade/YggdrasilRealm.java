@@ -19,6 +19,7 @@ public class YggdrasilRealm extends ContentPackagesConfigFields {
                 World.Environment.NORMAL,
                 true,
                 "em_yggdrasil,-321.5,-22.0,102.5,141.5,0.0",
+                "em_yggdrasil,-322.5,-22.0,101.5,141.5,0.0",
                 0,
                 "Difficulty: &6Hard\n" +
                         "$bossCount bosses, from level $lowestTier to $highestTier\n" +
@@ -26,10 +27,11 @@ public class YggdrasilRealm extends ContentPackagesConfigFields {
                         "&5for brave warriors seeking glory!",
                 "&8[EM] &5Yggdrasil awaits!",
                 "&8[EM] &5You have left Yggdrasil",
+                List.of("filename=em_yggdrasil_final_boss_loki_p1.yml"),
                 "em_yggdrasil",
+                -1,
                 false);
-        setContentType(ContentType.DYNAMIC_DUNGEON);
-        setContentLevel(-1);
+        this.contentType = ContentType.DYNAMIC_DUNGEON;
         setDifficulties(List.of(
                 Map.of("name", "normal", "levelSync", "+5", "id", 0),
                 Map.of("name", "hard", "levelSync", "+0", "id", 1),

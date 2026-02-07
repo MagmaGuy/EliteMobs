@@ -35,6 +35,8 @@ public class GenerateDatabase {
                 "SkillXP_CROSSBOWS BIGINT, " +
                 "SkillXP_TRIDENTS BIGINT, " +
                 "SkillXP_HOES BIGINT, " +
+                "SkillXP_MACES BIGINT, " +
+                "SkillXP_SPEARS BIGINT, " +
                 "SkillBonusSelections BLOB, " +
                 "GamblingDebt DOUBLE" +
                 ");";
@@ -64,6 +66,8 @@ public class GenerateDatabase {
         addEntryIfEmpty("SkillXP_CROSSBOWS", ColumnValues.BIGINT);
         addEntryIfEmpty("SkillXP_TRIDENTS", ColumnValues.BIGINT);
         addEntryIfEmpty("SkillXP_HOES", ColumnValues.BIGINT);
+        addEntryIfEmpty("SkillXP_MACES", ColumnValues.BIGINT);
+        addEntryIfEmpty("SkillXP_SPEARS", ColumnValues.BIGINT);
 
         // Skill bonus selections (JSON)
         addEntryIfEmpty("SkillBonusSelections", ColumnValues.BLOB);

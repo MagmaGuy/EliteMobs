@@ -23,5 +23,6 @@ public class TheClimbTeleporter extends NPCsConfigFields {
         setCommand("em dungeontp the_climb_dungeon.yml");
         setCustomModel("em_ag_minerregulus");
         setSyncMovement(false);
+        setInstanced(false);
     }
 }

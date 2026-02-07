@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.dungeons;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
+import com.magmaguy.elitemobs.menus.SetupMenuIcons;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
@@ -9,7 +10,6 @@ import com.magmaguy.magmacore.menus.ContentPackage;
 import com.magmaguy.magmacore.nightbreak.NightbreakAccount;
 import com.magmaguy.magmacore.nightbreak.NightbreakContentManager;
 import com.magmaguy.magmacore.util.ChatColorConverter;
-import com.magmaguy.elitemobs.menus.SetupMenuIcons;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
@@ -122,14 +122,14 @@ public abstract class EMPackage extends ContentPackage {
         return generateItemStackWithIcon(
                 List.of("Content is installed!", "Click to uninstall!"),
                 Material.GREEN_STAINED_GLASS_PANE,
-                SetupMenuIcons.CMD_KEY_GOLD);
+                SetupMenuIcons.MODEL_CHECKMARK);
     }
 
     protected ItemStack getNotInstalledItemStack() {
         return generateItemStackWithIcon(
                 List.of("Content is not installed!", "Click to install!"),
                 Material.YELLOW_STAINED_GLASS_PANE,
-                SetupMenuIcons.CMD_KEY_GRAY);
+                SetupMenuIcons.MODEL_GRAY_X);
     }
 
     protected ItemStack getPartiallyInstalledItemStack() {
@@ -139,32 +139,32 @@ public abstract class EMPackage extends ContentPackage {
                         "or because some elements have been manually disabled.",
                         "Click to download!"),
                 Material.ORANGE_STAINED_GLASS_PANE,
-                SetupMenuIcons.CMD_KEY_GRAY);
+                SetupMenuIcons.MODEL_GRAY_X);
     }
 
     protected ItemStack getNotDownloadedItemStack() {
         // Determine icon based on Nightbreak token and access
-        int customModelData;
+        String modelId;
         String slug = contentPackagesConfigFields.getNightbreakSlug();
 
         if (slug == null || slug.isEmpty()) {
             // No Nightbreak integration - show unlocked (can download manually)
-            customModelData = SetupMenuIcons.CMD_UNLOCKED;
+            modelId = SetupMenuIcons.MODEL_UNLOCKED;
         } else if (!NightbreakAccount.hasToken()) {
-            // Has Nightbreak slug but no token - show locked with chain
-            customModelData = SetupMenuIcons.CMD_LOCKED_CHAIN;
+            // Has Nightbreak slug but no token - show locked unlinked
+            modelId = SetupMenuIcons.MODEL_LOCKED_UNLINKED;
         } else if (cachedAccessInfo != null && cachedAccessInfo.hasAccess) {
-            // Has token and access - show unlocked
-            customModelData = SetupMenuIcons.CMD_UNLOCKED;
+            // Has token and access - show unlocked (can download)
+            modelId = SetupMenuIcons.MODEL_UNLOCKED;
         } else {
-            // Has token but no access - show locked with coin (need to pay)
-            customModelData = SetupMenuIcons.CMD_LOCKED_COIN;
+            // Has token but no access - show locked unpaid
+            modelId = SetupMenuIcons.MODEL_LOCKED_UNPAID;
         }
 
         return generateItemStackWithIcon(
                 List.of("Content is not downloaded!", "Click to download!"),
                 Material.YELLOW_STAINED_GLASS_PANE,
-                customModelData);
+                modelId);
     }
 
     protected ItemStack getNeedsAccessItemStack() {
@@ -188,32 +188,32 @@ public abstract class EMPackage extends ContentPackage {
         itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
         itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         itemMeta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
-        itemMeta.setCustomModelData(SetupMenuIcons.CMD_LOCKED_COIN);
         itemStack.setItemMeta(itemMeta);
+        SetupMenuIcons.applyItemModel(itemStack, SetupMenuIcons.MODEL_LOCKED_UNPAID);
         return itemStack;
     }
 
     @Override
     protected ItemStack getOutOfDateUpdatableItemStack() {
         // Determine icon based on Nightbreak token status
-        int customModelData;
+        String modelId;
         String slug = contentPackagesConfigFields.getNightbreakSlug();
 
         if (slug == null || slug.isEmpty()) {
-            // No Nightbreak integration - show star (can update manually)
-            customModelData = SetupMenuIcons.CMD_KEY_STAR;
+            // No Nightbreak integration - show update (can update manually)
+            modelId = SetupMenuIcons.MODEL_UPDATE;
         } else if (!NightbreakAccount.hasToken()) {
-            // Has Nightbreak slug but no token - show key with chain
-            customModelData = SetupMenuIcons.CMD_KEY_CHAIN;
+            // Has Nightbreak slug but no token - show update unlinked
+            modelId = SetupMenuIcons.MODEL_UPDATE_UNLINKED;
         } else {
-            // Has token - show star (can auto-update)
-            customModelData = SetupMenuIcons.CMD_KEY_STAR;
+            // Has token - show update (can auto-update)
+            modelId = SetupMenuIcons.MODEL_UPDATE;
         }
 
         return generateItemStackWithIcon(
                 List.of("&eUpdate available!", "&aClick to update automatically!"),
                 Material.YELLOW_STAINED_GLASS_PANE,
-                customModelData);
+                modelId);
     }
 
     @Override
@@ -231,8 +231,8 @@ public abstract class EMPackage extends ContentPackage {
         itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
         itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         itemMeta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
-        itemMeta.setCustomModelData(SetupMenuIcons.CMD_KEY_COIN);
         itemStack.setItemMeta(itemMeta);
+        SetupMenuIcons.applyItemModel(itemStack, SetupMenuIcons.MODEL_UPDATE_UNPAID);
         return itemStack;
     }
 
@@ -248,7 +248,7 @@ public abstract class EMPackage extends ContentPackage {
         return itemStack;
     }
 
-    private ItemStack generateItemStackWithIcon(List<String> specificTooltip, Material material, int customModelData) {
+    private ItemStack generateItemStackWithIcon(List<String> specificTooltip, Material material, String modelId) {
         List<String> tooltip = new ArrayList<>(specificTooltip);
         tooltip.addAll(contentPackagesConfigFields.getSetupMenuDescription());
         // Use the actual material - resource pack shows custom icon, fallback shows colored glass pane
@@ -260,8 +260,8 @@ public abstract class EMPackage extends ContentPackage {
         itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
         itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         itemMeta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
-        itemMeta.setCustomModelData(customModelData);
         itemStack.setItemMeta(itemMeta);
+        SetupMenuIcons.applyItemModel(itemStack, modelId);
         return itemStack;
     }
 

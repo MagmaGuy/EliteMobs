@@ -19,6 +19,7 @@ public class NorthPoleMinidungeon extends ContentPackagesConfigFields {
                 "em_north_pole",
                 World.Environment.NORMAL,
                 true,
+                "em_north_pole,-258.5,41.2,-514.5,47,0",
                 "em_north_pole,-264.5,43.2,-503.5,47,0",
                 0,
                 "Difficulty: &6Medium\n" +
@@ -26,10 +27,11 @@ public class NorthPoleMinidungeon extends ContentPackagesConfigFields {
                         "&6Christmas in a snow globe!",
                 "&8[EM] &7You have reached the North Pole! &fHave you been naughty this year?",
                 "&8[EM] &7Come back and visit. &fThere are plenty of sweets and treats for next time!",
+                List.of("filename=northpole_santa_claus.yml"),
                 "the_north_pole",
+                -1,
                 false);
-        setContentType(ContentType.DYNAMIC_DUNGEON);
-        setContentLevel(-1);
+        this.contentType = ContentType.DYNAMIC_DUNGEON;
         setDifficulties(List.of(
                 Map.of("name", "normal", "levelSync", "+5", "id", 0),
                 Map.of("name", "hard", "levelSync", "+0", "id", 1),

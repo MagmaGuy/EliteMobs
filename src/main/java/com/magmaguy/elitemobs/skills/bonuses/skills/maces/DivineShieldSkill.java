@@ -11,12 +11,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Divine Shield (COOLDOWN) - When taking fatal damage, become invulnerable briefly.
@@ -71,6 +66,11 @@ public class DivineShieldSkill extends SkillBonus implements CooldownSkill {
     @Override
     public void endCooldown(Player player) {
         cooldowns.remove(player.getUniqueId());
+    }
+
+    @Override
+    public void onActivate(Player player, Object event) {
+        activateShield(player);
     }
 
     /**

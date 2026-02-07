@@ -14,6 +14,7 @@ import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -40,11 +41,11 @@ public class SkillBonusMenu {
     public static void openWeaponSelectMenu(Player player) {
         String menuName = SkillBonusMenuConfig.getWeaponSelectMenuName();
         if (DefaultConfig.useResourcePackModels()) {
-            menuName = "\uDB83\uDEF1\uDB83\uDE0A\uDB83\uDEF5          " + menuName;
+            menuName = ChatColor.WHITE + "\uDB83\uDEF1\uDB83\uDE0D\uDB83\uDEF5          " + menuName;
         }
         menuName = ChatColorConverter.convert(menuName);
 
-        Inventory inventory = Bukkit.createInventory(player, 27, menuName);
+        Inventory inventory = Bukkit.createInventory(player, 36, menuName);
 
         // Set weapon type items
         inventory.setItem(SkillBonusMenuConfig.getSwordsSlot(), SkillBonusMenuConfig.getSwordsItem());
@@ -54,6 +55,8 @@ public class SkillBonusMenu {
         inventory.setItem(SkillBonusMenuConfig.getTridentsSlot(), SkillBonusMenuConfig.getTridentsItem());
         inventory.setItem(SkillBonusMenuConfig.getHoesSlot(), SkillBonusMenuConfig.getHoesItem());
         inventory.setItem(SkillBonusMenuConfig.getArmorSlot(), SkillBonusMenuConfig.getArmorItem());
+        inventory.setItem(SkillBonusMenuConfig.getMacesSlot(), SkillBonusMenuConfig.getMacesItem());
+        inventory.setItem(SkillBonusMenuConfig.getSpearsSlot(), SkillBonusMenuConfig.getSpearsItem());
 
         player.openInventory(inventory);
         SkillBonusMenuEvents.weaponSelectMenus.add(inventory);
@@ -65,7 +68,7 @@ public class SkillBonusMenu {
     public static void openSkillSelectMenu(Player player, SkillType skillType) {
         String menuName = SkillBonusMenuConfig.getSkillSelectMenuName().replace("%skill_type%", skillType.getDisplayName());
         if (DefaultConfig.useResourcePackModels()) {
-            menuName = "\uDB83\uDEF1\uDB83\uDE0A\uDB83\uDEF5          " + menuName;
+            menuName = ChatColor.WHITE + "\uDB83\uDEF1\uDB83\uDE0C\uDB83\uDEF5          " + menuName;
         }
         menuName = ChatColorConverter.convert(menuName);
 
@@ -87,15 +90,30 @@ public class SkillBonusMenu {
         // Create menu data with slot mapping
         SkillMenuData menuData = new SkillMenuData(skillType, player.getUniqueId());
 
-        // Place skills in inventory and build slot mapping
-        int slot = 0;
+        // Group skills by tier
+        Map<Integer, List<SkillBonusConfigFields>> tierMap = new LinkedHashMap<>();
         for (SkillBonusConfigFields skillConfig : skills) {
-            if (slot >= 45) break; // Leave bottom row for navigation
+            tierMap.computeIfAbsent(skillConfig.getUnlockTier(), k -> new ArrayList<>()).add(skillConfig);
+        }
 
-            ItemStack skillItem = createSkillItem(skillConfig, skillLevel, activeSkillIds);
-            inventory.setItem(slot, skillItem);
-            menuData.getSlotToSkill().put(slot, skillConfig);
-            slot++;
+        // Layout: Row 1 = tier1 + tier2, Row 3 = tier3 + tier4
+        // -000-000- pattern: left group starts at offset 1, right group at offset 5
+        int[][] tierSlots = {
+            {10, 11, 12},  // Tier 1 (row 1, left)
+            {14, 15, 16},  // Tier 2 (row 1, right)
+            {28, 29, 30},  // Tier 3 (row 3, left)
+            {32, 33, 34},  // Tier 4 (row 3, right)
+        };
+
+        for (int tier = 1; tier <= 4; tier++) {
+            List<SkillBonusConfigFields> tierSkills = tierMap.getOrDefault(tier, List.of());
+            int[] slots = tierSlots[tier - 1];
+            for (int i = 0; i < tierSkills.size() && i < slots.length; i++) {
+                SkillBonusConfigFields skillConfig = tierSkills.get(i);
+                ItemStack skillItem = createSkillItem(skillConfig, skillLevel, activeSkillIds);
+                inventory.setItem(slots[i], skillItem);
+                menuData.getSlotToSkill().put(slots[i], skillConfig);
+            }
         }
 
         // Add navigation items
@@ -229,6 +247,8 @@ public class SkillBonusMenu {
             else if (slot == SkillBonusMenuConfig.getTridentsSlot()) selectedType = SkillType.TRIDENTS;
             else if (slot == SkillBonusMenuConfig.getHoesSlot()) selectedType = SkillType.HOES;
             else if (slot == SkillBonusMenuConfig.getArmorSlot()) selectedType = SkillType.ARMOR;
+            else if (slot == SkillBonusMenuConfig.getMacesSlot()) selectedType = SkillType.MACES;
+            else if (slot == SkillBonusMenuConfig.getSpearsSlot()) selectedType = SkillType.SPEARS;
 
             if (selectedType != null) {
                 openSkillSelectMenu(player, selectedType);

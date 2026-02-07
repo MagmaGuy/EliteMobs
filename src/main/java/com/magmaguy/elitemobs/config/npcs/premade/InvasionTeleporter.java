@@ -20,7 +20,7 @@ public class InvasionTeleporter extends NPCsConfigFields {
                 true,
                 1,
                 NPCInteractions.NPCInteractionType.COMMAND);
-        setCommand("em dungeontp invasion.yml");
+        setCommand("em dungeontp invasion_minidungeon.yml");
         setCustomModel("em_ag_invasionscout");
         setSyncMovement(false);
     }

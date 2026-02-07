@@ -18,12 +18,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Impaler (COOLDOWN) - Pin an enemy in place, dealing massive damage.
@@ -79,6 +74,13 @@ public class ImpalerSkill extends SkillBonus implements CooldownSkill {
     @Override
     public void endCooldown(Player player) {
         cooldowns.remove(player.getUniqueId());
+    }
+
+    @Override
+    public void onActivate(Player player, Object event) {
+        if (event instanceof EliteMobDamagedByPlayerEvent dmgEvent) {
+            checkAndApply(player, dmgEvent);
+        }
     }
 
     /**

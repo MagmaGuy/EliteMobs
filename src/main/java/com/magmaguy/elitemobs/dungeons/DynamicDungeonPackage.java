@@ -39,6 +39,7 @@ public class DynamicDungeonPackage extends EMPackage implements CombatContent {
         new EventCaller(event);
         contentPackagesConfigFields.simpleUninstall();
         isInstalled = false;
+        player.sendMessage(ChatColorConverter.convert("&a[EliteMobs] Successfully uninstalled " + contentPackagesConfigFields.getName() + "!"));
     }
 
     @Override

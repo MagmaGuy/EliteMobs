@@ -1,52 +1,49 @@
 package com.magmaguy.elitemobs.menus;
 
+import com.magmaguy.elitemobs.utils.CustomModelAdder;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 /**
  * Constants and utilities for setup menu icons.
- * Uses custom model data to display custom icons when the resource pack is loaded.
+ * Uses item_model (1.21.4+) to display custom icons when the resource pack is loaded.
  * Falls back to colored stained glass panes when resource pack is not loaded.
  */
 public class SetupMenuIcons {
 
-    // Custom Model Data values for setup menu icons
-    // Range: 31180-31187 (continuing from existing 31173-31175)
+    // Item model IDs for setup menu icons (1.21.4+ format)
+    // These reference files in assets/elitemobs/items/ui/
 
-    /** Not downloaded, no Nightbreak token - locked padlock with chain */
-    public static final int CMD_LOCKED_CHAIN = 31180;
+    /** Can't download automatically: account not linked */
+    public static final String MODEL_LOCKED_UNLINKED = "elitemobs:ui/lockedunlinked";
 
-    /** Needs access (didn't pay) - locked padlock with coin */
-    public static final int CMD_LOCKED_COIN = 31181;
+    /** Can't download automatically: didn't pay for it */
+    public static final String MODEL_LOCKED_UNPAID = "elitemobs:ui/lockedunpaid";
 
-    /** Not downloaded, has access - unlocked padlock */
-    public static final int CMD_UNLOCKED = 31182;
+    /** Can download automatically */
+    public static final String MODEL_UNLOCKED = "elitemobs:ui/unlocked";
 
-    /** Installed and active - golden key */
-    public static final int CMD_KEY_GOLD = 31183;
+    /** Installed & active */
+    public static final String MODEL_CHECKMARK = "elitemobs:ui/checkmark";
 
-    /** Downloaded but not installed/active - gray key */
-    public static final int CMD_KEY_GRAY = 31184;
+    /** Installed & deactivated */
+    public static final String MODEL_GRAY_X = "elitemobs:ui/grayX";
 
-    /** Out of date, no token - key with chain */
-    public static final int CMD_KEY_CHAIN = 31185;
+    /** Installed, has update, not linked */
+    public static final String MODEL_UPDATE_UNLINKED = "elitemobs:ui/updateunlinked";
 
-    /** Out of date, no access - key with coin */
-    public static final int CMD_KEY_COIN = 31186;
+    /** Installed, has update, no access */
+    public static final String MODEL_UPDATE_UNPAID = "elitemobs:ui/updateunpaid";
 
-    /** Out of date, can update - key with star */
-    public static final int CMD_KEY_STAR = 31187;
+    /** Installed, has update, can click to update */
+    public static final String MODEL_UPDATE = "elitemobs:ui/update";
 
     /**
-     * Applies custom model data to an ItemStack for setup menu display.
+     * Applies a custom item model to an ItemStack for setup menu display.
+     * Uses the 1.21.4+ item_model system via CustomModelAdder.
      * @param itemStack The ItemStack to modify
-     * @param customModelData The CMD value to apply
+     * @param modelId The item model ID (e.g., "elitemobs:ui/checkmark")
      */
-    public static void applyCustomModelData(ItemStack itemStack, int customModelData) {
-        ItemMeta meta = itemStack.getItemMeta();
-        if (meta != null) {
-            meta.setCustomModelData(customModelData);
-            itemStack.setItemMeta(meta);
-        }
+    public static void applyItemModel(ItemStack itemStack, String modelId) {
+        CustomModelAdder.addCustomModel(itemStack, modelId);
     }
 }

@@ -20,7 +20,7 @@ public class NorthPoleTeleporter extends NPCsConfigFields {
                 true,
                 1,
                 NPCInteractions.NPCInteractionType.COMMAND);
-        setCommand("em dungeontp the_north_pole.yml");
+        setCommand("em dungeontp north_pole_minidungeon.yml");
         setCustomModel("em_ag_frostyguide");
         setSyncMovement(false);
     }

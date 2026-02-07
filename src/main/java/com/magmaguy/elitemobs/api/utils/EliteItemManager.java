@@ -275,6 +275,17 @@ public class EliteItemManager {
                         itemStack.getType().equals(Material.DIAMOND_HOE) ||
                         itemStack.getType().equals(Material.NETHERITE_HOE)))
             return true;
+        // Mace has slow attack speed (0.6) - needs special handling like wooden axe
+        try {
+            if (itemStack.getType().equals(Material.MACE))
+                return true;
+        } catch (NoSuchFieldError ignored) {
+            // MACE doesn't exist pre-1.21
+        }
+        // Spears have variable attack speeds - check by name pattern
+        String materialName = itemStack.getType().name();
+        if (materialName.endsWith("_SPEAR"))
+            return true;
         return getWeaponLevel(itemStack) > 3.0;
     }
 

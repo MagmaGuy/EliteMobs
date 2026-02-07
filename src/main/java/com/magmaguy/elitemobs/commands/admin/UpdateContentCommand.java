@@ -23,7 +23,7 @@ public class UpdateContentCommand extends AdvancedCommand {
     public UpdateContentCommand() {
         super(List.of("updatecontent", "updateall"));
         setPermission("elitemobs.updatecontent");
-        setSenderType(SenderType.PLAYER_OR_CONSOLE);
+        setSenderType(SenderType.ANY);
         setDescription("Updates all outdated content packages via Nightbreak");
         setUsage("/em updatecontent");
     }
@@ -74,6 +74,27 @@ public class UpdateContentCommand extends AdvancedCommand {
     private void downloadNextPackage(List<EMPackage> packages, int index, File importsFolder,
                                       Player player, CommandSender sender,
                                       AtomicInteger completed, AtomicInteger failed) {
+        // Check if player disconnected
+        if (player != null && !player.isOnline()) {
+            // Continue downloads silently, just don't send messages
+            if (index >= packages.size()) {
+                if (completed.get() > 0) {
+                    Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> {
+                        ReloadCommand.reload(Bukkit.getConsoleSender());
+                    }, 20L);
+                }
+                return;
+            }
+            EMPackage pkg = packages.get(index);
+            String slug = pkg.getContentPackagesConfigFields().getNightbreakSlug();
+            NightbreakContentManager.downloadAsync(slug, importsFolder, null, success -> {
+                if (success) completed.incrementAndGet();
+                else failed.incrementAndGet();
+                downloadNextPackage(packages, index + 1, importsFolder, player, sender, completed, failed);
+            });
+            return;
+        }
+
         if (index >= packages.size()) {
             // All done
             sender.sendMessage(ChatColorConverter.convert(
@@ -93,15 +114,28 @@ public class UpdateContentCommand extends AdvancedCommand {
         String name = pkg.getContentPackagesConfigFields().getName();
 
         sender.sendMessage(ChatColorConverter.convert(
-            "&7[EliteMobs] (" + (index + 1) + "/" + packages.size() + ") Updating: " + name));
+            "&7[EliteMobs] (" + (index + 1) + "/" + packages.size() + ") Downloading: " + name + "..."));
 
-        NightbreakContentManager.downloadAsync(slug, importsFolder, player, success -> {
+        // Pass null for player to suppress library's own "use em reload" messages
+        NightbreakContentManager.downloadAsync(slug, importsFolder, null, success -> {
             if (success) {
                 completed.incrementAndGet();
+                if (player == null || player.isOnline()) {
+                    int remaining = packages.size() - (index + 1);
+                    if (remaining > 0) {
+                        sender.sendMessage(ChatColorConverter.convert(
+                            "&a[EliteMobs] Downloaded " + name + "! &7Please hold on, " + remaining + " more to go..."));
+                    } else {
+                        sender.sendMessage(ChatColorConverter.convert(
+                            "&a[EliteMobs] Downloaded " + name + "!"));
+                    }
+                }
             } else {
                 failed.incrementAndGet();
-                sender.sendMessage(ChatColorConverter.convert(
-                    "&c[EliteMobs] Failed to update: " + name));
+                if (player == null || player.isOnline()) {
+                    sender.sendMessage(ChatColorConverter.convert(
+                        "&c[EliteMobs] Failed to download: " + name));
+                }
             }
             // Download next package
             downloadNextPackage(packages, index + 1, importsFolder, player, sender, completed, failed);

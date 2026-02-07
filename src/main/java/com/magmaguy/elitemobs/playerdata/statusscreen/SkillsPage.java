@@ -68,8 +68,8 @@ public class SkillsPage {
     protected static void skillsPage(Player targetPlayer, Player requestingPlayer) {
         Inventory inventory = Bukkit.createInventory(requestingPlayer, 27, SkillsConfig.getSkillsMenuTitle().replace("&", "\u00A7"));
 
-        // Skill slots: 10-16 (top row of items), could also use 2-8
-        int[] skillSlots = {10, 11, 12, 13, 14, 15, 16};
+        // Skill slots: spread across two rows to fit all 9 skills
+        int[] skillSlots = {10, 11, 12, 13, 14, 15, 16, 19, 20};
         int slotIndex = 0;
 
         for (SkillType skillType : SkillType.values()) {
@@ -137,6 +137,14 @@ public class SkillsPage {
             case CROSSBOWS -> Material.CROSSBOW;
             case TRIDENTS -> Material.TRIDENT;
             case HOES -> Material.DIAMOND_HOE;
+            case MACES -> Material.MACE;
+            case SPEARS -> {
+                try {
+                    yield Material.IRON_SPEAR;
+                } catch (NoSuchFieldError e) {
+                    yield Material.TRIDENT; // Fallback for pre-1.21.11
+                }
+            }
         };
     }
 

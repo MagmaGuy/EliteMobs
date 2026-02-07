@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.wormhole;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.api.PlayerTeleportEvent;
 import com.magmaguy.elitemobs.config.WormholesConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldowns;
@@ -164,12 +165,8 @@ public class WormholeManager {
             player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20 * 2, 0));
         }
 
-        // Remove passengers before teleporting to prevent teleport failures
-        if (!player.getPassengers().isEmpty()) {
-            player.getPassengers().forEach(player::removePassenger);
-        }
-
-        player.teleport(finalDestination);
+        // Use PlayerTeleportEvent to trigger dungeon music and other listeners
+        PlayerTeleportEvent.teleportPlayer(player, finalDestination);
         player.playSound(player.getLocation(), Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, 1f, 1f);
         player.setFlying(false);
     }
