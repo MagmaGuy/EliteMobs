@@ -11,6 +11,6 @@ public class MacesStunningForceConfig extends SkillBonusConfigFields {
     public MacesStunningForceConfig() {
         super("maces_stunning_force.yml", true, "&eStunning Force",
               List.of("&7Increased knockback.", "&7Chance to root enemies."),
-              SkillType.MACES, SkillBonusType.PASSIVE, 3, 1.5, 0.02, Material.CHAIN);
+              SkillType.MACES, SkillBonusType.PASSIVE, 3, 1.5, 0.02, Material.IRON_BARS);
     }
 }

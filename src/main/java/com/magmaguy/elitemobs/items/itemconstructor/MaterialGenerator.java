@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.items.itemconstructor;
 import com.magmaguy.elitemobs.combatsystem.CombatSystem;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.ProceduralItemGenerationSettingsConfig;
+import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Material;
 
@@ -43,6 +44,19 @@ public class MaterialGenerator {
         if (itemTier < CombatSystem.DIAMOND_TIER_LEVEL + ItemSettingsConfig.getMinimumProcedurallyGeneratedDiamondLootLevelPlusSeven())
             localValidMaterials.remove(TRIDENT);
 
+        // Remove SPEARs if server is pre-1.21.11
+        if (VersionChecker.serverVersionOlderThan(21, 11)) {
+            try {
+                localValidMaterials.remove(Material.DIAMOND_SPEAR);
+                localValidMaterials.remove(Material.IRON_SPEAR);
+                localValidMaterials.remove(Material.GOLDEN_SPEAR);
+                localValidMaterials.remove(Material.STONE_SPEAR);
+                localValidMaterials.remove(Material.WOODEN_SPEAR);
+                localValidMaterials.remove(Material.COPPER_SPEAR);
+                localValidMaterials.remove(Material.NETHERITE_SPEAR);
+            } catch (NoSuchFieldError ignored) {}
+        }
+
         if (itemTier < CombatSystem.DIAMOND_TIER_LEVEL + ItemSettingsConfig.getMinimumProcedurallyGeneratedDiamondLootLevelPlusSeven()) {
             localValidMaterials.remove(DIAMOND_AXE);
             localValidMaterials.remove(DIAMOND_HORSE_ARMOR);
@@ -54,6 +68,12 @@ public class MaterialGenerator {
             localValidMaterials.remove(DIAMOND_SHOVEL);
             localValidMaterials.remove(DIAMOND_SWORD);
             localValidMaterials.remove(DIAMOND_BOOTS);
+            // MACE and DIAMOND_SPEAR are diamond-tier items
+            try {
+                localValidMaterials.remove(MACE);
+                localValidMaterials.remove(Material.DIAMOND_SPEAR);
+                localValidMaterials.remove(Material.NETHERITE_SPEAR);
+            } catch (NoSuchFieldError ignored) {}
         }
 
         if (itemTier < CombatSystem.IRON_TIER_LEVEL) {
@@ -71,6 +91,11 @@ public class MaterialGenerator {
             localValidMaterials.remove(BOW);
             localValidMaterials.remove(CROSSBOW);
             localValidMaterials.remove(TURTLE_HELMET);
+            // IRON_SPEAR and COPPER_SPEAR are iron-tier items
+            try {
+                localValidMaterials.remove(Material.IRON_SPEAR);
+                localValidMaterials.remove(Material.COPPER_SPEAR);
+            } catch (NoSuchFieldError ignored) {}
         }
 
         if (itemTier < CombatSystem.STONE_CHAIN_TIER_LEVEL) {
@@ -84,6 +109,10 @@ public class MaterialGenerator {
             localValidMaterials.remove(STONE_SHOVEL);
             localValidMaterials.remove(STONE_PICKAXE);
             localValidMaterials.remove(STONE_AXE);
+            // STONE_SPEAR is stone-tier
+            try {
+                localValidMaterials.remove(Material.STONE_SPEAR);
+            } catch (NoSuchFieldError ignored) {}
 
         }
 
@@ -100,6 +129,11 @@ public class MaterialGenerator {
             localValidMaterials.remove(WOODEN_SWORD);
             localValidMaterials.remove(WOODEN_AXE);
             localValidMaterials.remove(WOODEN_HOE);
+            // GOLDEN_SPEAR and WOODEN_SPEAR are gold/wood-tier
+            try {
+                localValidMaterials.remove(Material.GOLDEN_SPEAR);
+                localValidMaterials.remove(Material.WOODEN_SPEAR);
+            } catch (NoSuchFieldError ignored) {}
         }
 
         if (localValidMaterials.isEmpty()) return null;

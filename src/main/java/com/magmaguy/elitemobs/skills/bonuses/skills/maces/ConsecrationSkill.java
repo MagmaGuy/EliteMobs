@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.skills.bonuses.skills.maces;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.combatsystem.CombatSystem;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.skills.SkillType;
@@ -19,12 +18,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Consecration (COOLDOWN) - Create holy ground that damages enemies standing in it.
@@ -82,6 +76,11 @@ public class ConsecrationSkill extends SkillBonus implements CooldownSkill {
         cooldowns.remove(player.getUniqueId());
     }
 
+    @Override
+    public void onActivate(Player player, Object event) {
+        activateConsecration(player);
+    }
+
     /**
      * Activates the Consecration ability.
      */
@@ -125,7 +124,7 @@ public class ConsecrationSkill extends SkillBonus implements CooldownSkill {
 
                         EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(living);
                         if (eliteEntity != null) {
-                            eliteEntity.damage(damagePerTick, player);
+                            living.damage(damagePerTick, player);
                             // Small hit effect
                             living.getWorld().spawnParticle(Particle.FLAME,
                                 living.getLocation().add(0, 1, 0), 5, 0.2, 0.2, 0.2, 0.02);

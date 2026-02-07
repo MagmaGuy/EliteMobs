@@ -3,13 +3,15 @@ package com.magmaguy.elitemobs.skills.bonuses;
 import com.magmaguy.elitemobs.config.skillbonuses.SkillBonusConfigFields;
 import com.magmaguy.elitemobs.config.skillbonuses.SkillBonusesConfig;
 import com.magmaguy.elitemobs.config.skillbonuses.premade.*;
-import com.magmaguy.elitemobs.skills.bonuses.skills.swords.*;
+import com.magmaguy.elitemobs.skills.bonuses.skills.armor.*;
 import com.magmaguy.elitemobs.skills.bonuses.skills.axes.*;
 import com.magmaguy.elitemobs.skills.bonuses.skills.bows.*;
 import com.magmaguy.elitemobs.skills.bonuses.skills.crossbows.*;
-import com.magmaguy.elitemobs.skills.bonuses.skills.tridents.*;
 import com.magmaguy.elitemobs.skills.bonuses.skills.hoes.*;
-import com.magmaguy.elitemobs.skills.bonuses.skills.armor.*;
+import com.magmaguy.elitemobs.skills.bonuses.skills.maces.*;
+import com.magmaguy.elitemobs.skills.bonuses.skills.spears.*;
+import com.magmaguy.elitemobs.skills.bonuses.skills.swords.*;
+import com.magmaguy.elitemobs.skills.bonuses.skills.tridents.*;
 import com.magmaguy.magmacore.util.Logger;
 
 /**
@@ -49,6 +51,12 @@ public class SkillBonusInitializer {
 
         // Register ARMOR skills
         registerArmorSkills();
+
+        // Register MACES skills
+        registerMacesSkills();
+
+        // Register SPEARS skills
+        registerSpearsSkills();
 
         Logger.info("Registered " + SkillBonusRegistry.getAllBonuses().size() + " skill bonuses.");
     }
@@ -209,6 +217,52 @@ public class SkillBonusInitializer {
         // Tier 4 (Level 75)
         registerSkill(new LastStandSkill(), new ArmorLastStandConfig());
         registerSkill(new ReactiveShieldingSkill(), new ArmorReactiveShieldingConfig());
+    }
+
+    /**
+     * Registers all MACES skill bonuses.
+     */
+    private static void registerMacesSkills() {
+        // Tier 1 (Level 10)
+        registerSkill(new ConcussionSkill(), new MacesConcussionConfig());
+        registerSkill(new CrushingBlowSkill(), new MacesCrushingBlowConfig());
+        registerSkill(new RighteousFurySkill(), new MacesRighteousFuryConfig());
+
+        // Tier 2 (Level 25)
+        registerSkill(new JudgmentSkill(), new MacesJudgmentConfig());
+        registerSkill(new ShatterSkill(), new MacesShatterConfig());
+        registerSkill(new DivineShieldSkill(), new MacesDivineShieldConfig());
+
+        // Tier 3 (Level 50)
+        registerSkill(new ConsecrationSkill(), new MacesConsecrationConfig());
+        registerSkill(new StunningForceSkill(), new MacesStunningForceConfig());
+
+        // Tier 4 (Level 75)
+        registerSkill(new HammerOfWrathSkill(), new MacesHammerOfWrathConfig());
+        registerSkill(new AvatarOfJudgmentSkill(), new MacesAvatarOfJudgmentConfig());
+    }
+
+    /**
+     * Registers all SPEARS skill bonuses.
+     */
+    private static void registerSpearsSkills() {
+        // Tier 1 (Level 10)
+        registerSkill(new FirstStrikeSkill(), new SpearsFirstStrikeConfig());
+        registerSkill(new LongReachSkill(), new SpearsLongReachConfig());
+        registerSkill(new PrecisionThrustSkill(), new SpearsPrecisionThrustConfig());
+
+        // Tier 2 (Level 25)
+        registerSkill(new PhalanxSkill(), new SpearsPhalanxConfig());
+        registerSkill(new ImpalingStrikeSkill(), new SpearsImpalingStrikeConfig());
+        registerSkill(new SkewerSkill(), new SpearsSkewerConfig());
+
+        // Tier 3 (Level 50)
+        registerSkill(new LegionsDisciplineSkill(), new SpearsLegionsDisciplineConfig());
+        registerSkill(new VanguardSkill(), new SpearsVanguardConfig());
+
+        // Tier 4 (Level 75)
+        registerSkill(new PolearmMasterySkill(), new SpearsPolearmMasteryConfig());
+        registerSkill(new ImpalerSkill(), new SpearsImpalerConfig());
     }
 
     /**

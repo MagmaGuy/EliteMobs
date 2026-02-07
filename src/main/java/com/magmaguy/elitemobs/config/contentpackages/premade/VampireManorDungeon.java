@@ -17,7 +17,7 @@ public class VampireManorDungeon extends ContentPackagesConfigFields {
                 "em_the_vampire_manor",
                 World.Environment.NETHER,
                 true,
-                "em_the_vampire_manor,281.5,31.0,1587.5,-180,0",
+                "em_the_vampire_manor,283.5,31.0,1591.5,-180,0",
                 "em_the_vampire_manor,281.5,31.0,1587.5,-180,0",
                 1,
                 "Difficulty: &4Dynamic content!",

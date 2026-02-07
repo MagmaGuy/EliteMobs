@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.skills.bonuses.skills.maces;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.combatsystem.CombatSystem;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.skills.SkillType;
@@ -15,6 +14,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -22,12 +22,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Shatter (COOLDOWN) - AoE ground pound that damages and slows nearby enemies.
@@ -85,6 +80,11 @@ public class ShatterSkill extends SkillBonus implements CooldownSkill {
         cooldowns.remove(player.getUniqueId());
     }
 
+    @Override
+    public void onActivate(Player player, Object event) {
+        activateShatter(player);
+    }
+
     /**
      * Activates the Shatter ability.
      * Called when attacking while ability is off cooldown.
@@ -135,9 +135,10 @@ public class ShatterSkill extends SkillBonus implements CooldownSkill {
 
             EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(living);
             if (eliteEntity != null) {
-                // Deal damage based on player's base damage
-                double damage = CombatSystem.getPlayerMaxDamage(player, eliteEntity) * damageMultiplier;
-                eliteEntity.damage(damage, player);
+                // Deal damage based on player's attack damage attribute
+                double baseDamage = player.getAttribute(Attribute.ATTACK_DAMAGE).getValue();
+                double damage = baseDamage * damageMultiplier;
+                living.damage(damage, player);
 
                 // Apply slow
                 living.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, SLOW_DURATION_TICKS, 1));

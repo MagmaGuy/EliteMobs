@@ -14,12 +14,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Hammer of Wrath (COOLDOWN) - Massive damage to enemies below 30% health.
@@ -74,6 +69,13 @@ public class HammerOfWrathSkill extends SkillBonus implements CooldownSkill {
     @Override
     public void endCooldown(Player player) {
         cooldowns.remove(player.getUniqueId());
+    }
+
+    @Override
+    public void onActivate(Player player, Object event) {
+        if (event instanceof EliteMobDamagedByPlayerEvent dmgEvent) {
+            checkAndApply(player, dmgEvent);
+        }
     }
 
     /**

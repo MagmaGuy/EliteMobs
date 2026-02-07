@@ -1,10 +1,9 @@
 package com.magmaguy.elitemobs.commands.setup;
 
-import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.dungeons.*;
+import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import com.magmaguy.magmacore.menus.MenuButton;
-import com.magmaguy.magmacore.nightbreak.NightbreakAccount;
-import org.bukkit.Bukkit;
 import com.magmaguy.magmacore.menus.SetupMenu;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
@@ -32,18 +31,8 @@ public class EliteSetupMenu {
                 .filter(MetaPackage.class::isInstance)
                 .forEach(rawEmPackage -> ((MetaPackage) rawEmPackage).getPackages().forEach(emPackages::remove));
 
-        // Prefetch access info for packages with Nightbreak slugs
-        if (NightbreakAccount.hasToken()) {
-            Bukkit.getScheduler().runTaskAsynchronously(MetadataHandler.PLUGIN, () -> {
-                for (EMPackage pkg : emPackages) {
-                    String slug = pkg.getContentPackagesConfigFields().getNightbreakSlug();
-                    if (slug != null && !slug.isEmpty() && !pkg.isDownloaded()) {
-                        NightbreakAccount.AccessInfo info = NightbreakAccount.getInstance().checkAccess(slug);
-                        pkg.setCachedAccessInfo(info);
-                    }
-                }
-            });
-        }
+        // Trigger async refresh of version and access info
+        VersionChecker.refreshContentAndAccess();
 
         MenuButton infoButton = new MenuButton(ItemStackGenerator.generateSkullItemStack("magmaguy",
                 "&2Installation instructions:",
@@ -67,13 +56,18 @@ public class EliteSetupMenu {
             }
         };
 
+        String menuTitle = "Setup menu";
+        if (DefaultConfig.useResourcePackModels())
+            menuTitle = ChatColor.WHITE + "\uDB83\uDEF1\uDB83\uDE0B\uDB83\uDEF5          " + menuTitle;
+
         new SetupMenu(player, infoButton, emPackages,
                 List.of(createFilter(emPackages, Material.GRASS_BLOCK, "Filter By Open Dungeons", EliteSetupMenu::filterOpenDungeon),
                         createFilter(emPackages, Material.CRYING_OBSIDIAN, "Filter By Instanced Dungeons", EliteSetupMenu::filterInstancedDungeon),
                         createFilter(emPackages, Material.ENDER_PEARL, "Filter By Dynamic Dungeons", EliteSetupMenu::filterDynamicDungeon),
                         createFilter(emPackages, Material.SKULL_BANNER_PATTERN, "Filter By Events", EliteSetupMenu::filterEvents),
                         createFilter(emPackages, Material.DIAMOND_SWORD, "Filter By Custom Items", EliteSetupMenu::filterItems),
-                        createFilter(emPackages, Material.ARMOR_STAND, "Filter By Custom Models", EliteSetupMenu::filterModels)));
+                        createFilter(emPackages, Material.ARMOR_STAND, "Filter By Custom Models", EliteSetupMenu::filterModels)),
+                menuTitle);
     }
 
     private static SetupMenu.SetupMenuFilter createFilter(List<EMPackage> orderedPackages, Material material, String name, Predicate<EMPackage> predicate) {

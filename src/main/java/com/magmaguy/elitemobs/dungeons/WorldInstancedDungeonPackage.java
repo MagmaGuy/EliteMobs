@@ -43,6 +43,7 @@ public class WorldInstancedDungeonPackage extends EMPackage implements CombatCon
         new EventCaller(event);
         contentPackagesConfigFields.simpleUninstall();
         isInstalled = false;
+        player.sendMessage(ChatColorConverter.convert("&a[EliteMobs] Successfully uninstalled " + contentPackagesConfigFields.getName() + "!"));
     }
 
     @Override

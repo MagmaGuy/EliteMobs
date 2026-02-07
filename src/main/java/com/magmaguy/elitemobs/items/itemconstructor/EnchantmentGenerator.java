@@ -100,6 +100,35 @@ public class EnchantmentGenerator {
                 validEnchantments.putAll(validateEnchantments("MENDING"));
                 validEnchantments.putAll(validateEnchantments("VANISHING_CURSE"));
                 break;
+            case MACE:
+                validEnchantments.putAll(validateEnchantments("DENSITY"));
+                validEnchantments.putAll(validateEnchantments("BREACH"));
+                validEnchantments.putAll(validateEnchantments("WIND_BURST"));
+                validEnchantments.putAll(validateEnchantments("SMITE"));
+                validEnchantments.putAll(validateEnchantments("BANE_OF_ARTHROPODS"));
+                validEnchantments.putAll(validateEnchantments("FIRE_ASPECT"));
+                validEnchantments.putAll(validateEnchantments("UNBREAKING"));
+                validEnchantments.putAll(validateEnchantments("MENDING"));
+                validEnchantments.putAll(validateEnchantments("VANISHING_CURSE"));
+                break;
+            case DIAMOND_SPEAR:
+            case IRON_SPEAR:
+            case GOLDEN_SPEAR:
+            case STONE_SPEAR:
+            case WOODEN_SPEAR:
+            case COPPER_SPEAR:
+            case NETHERITE_SPEAR:
+                validEnchantments.putAll(validateEnchantments("LUNGE"));
+                validEnchantments.putAll(validateEnchantments("SHARPNESS"));
+                validEnchantments.putAll(validateEnchantments("SMITE"));
+                validEnchantments.putAll(validateEnchantments("BANE_OF_ARTHROPODS"));
+                validEnchantments.putAll(validateEnchantments("FIRE_ASPECT"));
+                validEnchantments.putAll(validateEnchantments("KNOCKBACK"));
+                validEnchantments.putAll(validateEnchantments("LOOTING"));
+                validEnchantments.putAll(validateEnchantments("UNBREAKING"));
+                validEnchantments.putAll(validateEnchantments("MENDING"));
+                validEnchantments.putAll(validateEnchantments("VANISHING_CURSE"));
+                break;
             case DIAMOND_PICKAXE:
             case GOLDEN_PICKAXE:
             case IRON_PICKAXE:
@@ -348,6 +377,14 @@ public class EnchantmentGenerator {
             case IRON_AXE:
             case STONE_AXE:
             case WOODEN_AXE:
+            case MACE:
+            case DIAMOND_SPEAR:
+            case IRON_SPEAR:
+            case GOLDEN_SPEAR:
+            case STONE_SPEAR:
+            case WOODEN_SPEAR:
+            case COPPER_SPEAR:
+            case NETHERITE_SPEAR:
                 validSecondaryEnchantments.putAll(validateSecondaryCustomEnchantments(CriticalStrikesEnchantment.key));
                 break;
             case CHAINMAIL_HELMET:

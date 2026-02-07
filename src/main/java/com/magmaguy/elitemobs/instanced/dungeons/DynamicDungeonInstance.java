@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfig;
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
 import com.magmaguy.elitemobs.dungeons.utility.DungeonUtils;
 import com.magmaguy.elitemobs.instanced.WorldOperationQueue;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomMusic;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.InstancedBossEntity;
 import com.magmaguy.elitemobs.quests.DynamicQuest;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
@@ -70,6 +71,10 @@ public class DynamicDungeonInstance extends DungeonInstance {
             player.sendMessage("[EliteMobs] Failed to load the world! Report this to the dev. The dungeon will not start.");
             return null;
         }
+
+        // Initialize dungeon music for this dynamic instanced world
+        if (dynamicDungeonConfigFields.getSong() != null)
+            new CustomMusic(dynamicDungeonConfigFields.getSong(), dynamicDungeonConfigFields, world);
 
         Location startLocation = ConfigurationLocation.serialize(dynamicDungeonConfigFields.getStartLocationString());
         startLocation.setWorld(world);

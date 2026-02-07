@@ -13,6 +13,7 @@ import com.magmaguy.elitemobs.dungeons.utility.DungeonUtils;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.instanced.WorldOperationQueue;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomMusic;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.InstancedBossEntity;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
@@ -136,6 +137,10 @@ public class DungeonInstance extends MatchInstance {
             player.sendMessage("[EliteMobs] Failed to load the world! Report this to the dev. The dungeon will not start.");
             return null;
         }
+
+        // Initialize dungeon music for this instanced world
+        if (instancedDungeonsConfigFields.getSong() != null)
+            new CustomMusic(instancedDungeonsConfigFields.getSong(), instancedDungeonsConfigFields, world);
 
         //Location where players are teleported to start completing the dungeon
         Location startLocation = ConfigurationLocation.serialize(instancedDungeonsConfigFields.getStartLocationString());

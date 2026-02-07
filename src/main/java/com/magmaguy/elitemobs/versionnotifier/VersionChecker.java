@@ -25,19 +25,15 @@ public class VersionChecker {
     private static final boolean SHA1Updated = false;
     private static final int MAX_RETRY_ATTEMPTS = 3;
     private static final int RETRY_DELAY_SECONDS = 60;
+    private static final long REFRESH_COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes
     private static boolean pluginIsUpToDate = true;
     private static boolean connectionFailed = false;
     private static int connectionRetryCount = 0;
+    private static final long CHECK_INTERVAL_TICKS = 20L * 60 * 60 * 24; // 24 hours in ticks
 
     private VersionChecker() {
     }
-
-    public static void shutdown() {
-        outdatedPackages.clear();
-        connectionRetryCount = 0;
-        connectionFailed = false;
-        pluginIsUpToDate = true;
-    }
+    private static volatile long lastRefreshTimestamp = 0;
 
     /**
      * Compares a Minecraft version with the current version on the server. Returns true if the version on the server is older.
@@ -117,26 +113,12 @@ public class VersionChecker {
         }.runTaskAsynchronously(MetadataHandler.PLUGIN);
     }
 
-    private static void checkContentVersion() {
-        Bukkit.getScheduler().runTaskAsynchronously(MetadataHandler.PLUGIN, () -> {
-            try {
-                String jsonResponse = fetchFromNightbreak("https://nightbreak.io/api/dlc");
-                connectionFailed = false;
-                connectionRetryCount = 0;
-
-                Map<String, Integer> remoteVersions = parseNightbreakDlcResponse(jsonResponse);
-                Logger.info("Parsed " + remoteVersions.size() + " content versions from Nightbreak API");
-                processContentVersionData(remoteVersions);
-
-            } catch (IOException e) {
-                handleConnectionError("content version check", e);
-
-                if (connectionRetryCount >= MAX_RETRY_ATTEMPTS ||
-                        !(e instanceof UnknownHostException || e instanceof ConnectException || e instanceof SocketTimeoutException)) {
-                    Logger.info("Using local data for content version checks as remote server is unavailable.");
-                }
-            }
-        });
+    public static void shutdown() {
+        outdatedPackages.clear();
+        connectionRetryCount = 0;
+        connectionFailed = false;
+        pluginIsUpToDate = true;
+        lastRefreshTimestamp = 0;
     }
 
     /**
@@ -304,19 +286,50 @@ public class VersionChecker {
         return null;
     }
 
+    private static void checkContentVersion() {
+        Bukkit.getScheduler().runTaskAsynchronously(MetadataHandler.PLUGIN, () -> {
+            try {
+                String jsonResponse = fetchFromNightbreak("https://nightbreak.io/api/dlc");
+                connectionFailed = false;
+                connectionRetryCount = 0;
+
+                Map<String, Integer> remoteVersions = parseNightbreakDlcResponse(jsonResponse);
+                Logger.info("Parsed " + remoteVersions.size() + " content versions from Nightbreak API");
+                processContentVersionData(remoteVersions);
+
+                // Prefetch access info after version check completes
+                prefetchAccessInfoInternal();
+
+            } catch (IOException e) {
+                handleConnectionError("content version check", e);
+
+                if (connectionRetryCount >= MAX_RETRY_ATTEMPTS ||
+                        !(e instanceof UnknownHostException || e instanceof ConnectException || e instanceof SocketTimeoutException)) {
+                    Logger.info("Using local data for content version checks as remote server is unavailable.");
+                }
+            }
+        });
+    }
+
     /**
      * Process the content version data from Nightbreak API
      *
      * @param remoteVersions Map of slug to version from Nightbreak
      */
     private static void processContentVersionData(Map<String, Integer> remoteVersions) {
-        for (EMPackage emPackage : EMPackage.getEmPackages().values()) {
+        // Track newly found outdated packages
+        List<EMPackage> newlyOutdated = new ArrayList<>();
+
+        // Snapshot to avoid ConcurrentModificationException from async iteration
+        List<EMPackage> packageSnapshot = new ArrayList<>(EMPackage.getEmPackages().values());
+
+        for (EMPackage emPackage : packageSnapshot) {
             if (!emPackage.isInstalled()) continue;
             if (!emPackage.getContentPackagesConfigFields().isDefaultDungeon()) continue;
 
             // Skip packages contained in meta packages
             boolean containedInMetaPackage = false;
-            for (EMPackage metaPackage : EMPackage.getEmPackages().values()) {
+            for (EMPackage metaPackage : packageSnapshot) {
                 if (metaPackage.getContentPackagesConfigFields().getContainedPackages() != null &&
                         !metaPackage.getContentPackagesConfigFields().getContainedPackages().isEmpty() &&
                         metaPackage.getContentPackagesConfigFields().getContainedPackages().contains(emPackage.getContentPackagesConfigFields().getFilename())) {
@@ -342,12 +355,20 @@ public class VersionChecker {
             int localVersion = emPackage.getContentPackagesConfigFields().getDungeonVersion();
             if (remoteVersion > localVersion) {
                 emPackage.setOutOfDate(true);
-                outdatedPackages.add(emPackage);
+                if (!outdatedPackages.contains(emPackage)) {
+                    outdatedPackages.add(emPackage);
+                    newlyOutdated.add(emPackage);
+                }
                 Logger.warn("Content " + emPackage.getContentPackagesConfigFields().getName() +
                         " is outdated! You should go download the updated version! Your version: " +
                         localVersion + " / remote version: " + remoteVersion +
                         " / Link: " + emPackage.getContentPackagesConfigFields().getDownloadLink());
             }
+        }
+
+        // Notify online admins about newly found outdated packages
+        if (!newlyOutdated.isEmpty()) {
+            notifyOnlineAdmins(newlyOutdated);
         }
     }
 
@@ -397,9 +418,110 @@ public class VersionChecker {
         pluginIsUpToDate = false;
     }
 
+    /**
+     * Notifies all online players with admin permission about outdated content.
+     * This is called after version check completes so admins don't need to relog.
+     */
+    private static void notifyOnlineAdmins(List<EMPackage> newlyOutdated) {
+        // Must run on main thread to access Bukkit
+        Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, () -> {
+            for (org.bukkit.entity.Player player : Bukkit.getOnlinePlayers()) {
+                if (!player.hasPermission("elitemobs.versionnotification")) continue;
+
+                Logger.sendSimpleMessage(player, "&8&m-----------------------------------------------------");
+                Logger.sendMessage(player, "&e" + newlyOutdated.size() + " content update(s) available:");
+                for (EMPackage emPackage : newlyOutdated) {
+                    String name = emPackage.getContentPackagesConfigFields().getName();
+                    player.sendMessage(ChatColorConverter.convert("&e- " + name));
+                }
+                player.spigot().sendMessage(
+                        SpigotMessage.simpleMessage("&7Use &e/em setup &7to view and update, or "),
+                        SpigotMessage.hoverLinkMessage(
+                                "&9&nhttps://nightbreak.io/plugin/elitemobs/#content",
+                                "Click for Nightbreak link",
+                                "https://nightbreak.io/plugin/elitemobs/#content"
+                        )
+                );
+                if (NightbreakAccount.hasToken()) {
+                    player.spigot().sendMessage(
+                            SpigotMessage.commandHoverMessage(
+                                    "&a[Click here to update all content automatically]",
+                                    "&eRuns /em updatecontent",
+                                    "/em updatecontent"
+                            )
+                    );
+                }
+                Logger.sendSimpleMessage(player, "&8&m-----------------------------------------------------");
+            }
+        });
+    }
+
     public static void check() {
+        // Run immediately on startup
         checkPluginVersion();
         checkContentVersion();
+
+        // Schedule repeating task every 24 hours
+        Bukkit.getScheduler().runTaskTimer(MetadataHandler.PLUGIN, () -> {
+            Logger.info("Running scheduled 24-hour version and access check...");
+            checkPluginVersion();
+            checkContentVersion();
+        }, CHECK_INTERVAL_TICKS, CHECK_INTERVAL_TICKS);
+    }
+
+    /**
+     * Public method to trigger a version and access refresh.
+     * Called when setup menu is opened to ensure fresh data.
+     * Throttled to prevent excessive API calls when opened repeatedly.
+     */
+    public static void refreshContentAndAccess() {
+        long now = System.currentTimeMillis();
+        if (now - lastRefreshTimestamp < REFRESH_COOLDOWN_MS) return;
+        lastRefreshTimestamp = now;
+        checkContentVersion();
+    }
+
+    /**
+     * Prefetches access info for all content packages with Nightbreak slugs.
+     * Called internally after version checks complete.
+     */
+    private static void prefetchAccessInfoInternal() {
+        if (!NightbreakAccount.hasToken()) return;
+
+        // Snapshot to avoid ConcurrentModificationException from async iteration
+        List<EMPackage> packageSnapshot = new ArrayList<>(EMPackage.getEmPackages().values());
+
+        // Deduplicate by slug — many packages share the same slug, no need to hit the API repeatedly
+        Map<String, NightbreakAccount.AccessInfo> slugCache = new HashMap<>();
+        List<String> failedSlugs = new ArrayList<>();
+        int prefetched = 0;
+
+        for (EMPackage pkg : packageSnapshot) {
+            String slug = pkg.getContentPackagesConfigFields().getNightbreakSlug();
+            if (slug == null || slug.isEmpty()) continue;
+
+            NightbreakAccount.AccessInfo info;
+            if (slugCache.containsKey(slug)) {
+                info = slugCache.get(slug);
+            } else {
+                info = NightbreakAccount.getInstance().checkAccess(slug);
+                slugCache.put(slug, info);
+                if (info == null && !failedSlugs.contains(slug)) {
+                    failedSlugs.add(slug);
+                }
+            }
+
+            if (info != null) {
+                pkg.setCachedAccessInfo(info);
+                prefetched++;
+            }
+        }
+        if (prefetched > 0) {
+            Logger.info("Prefetched Nightbreak access info for " + prefetched + " content packages");
+        }
+        if (!failedSlugs.isEmpty()) {
+            Logger.warn("Failed to prefetch access info for " + failedSlugs.size() + " slugs: " + String.join(", ", failedSlugs));
+        }
     }
 
     public static class VersionCheckerEvents implements Listener {

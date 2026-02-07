@@ -17,6 +17,7 @@ public class KnightCastleLair extends ContentPackagesConfigFields {
                 "em_knight_castle",
                 World.Environment.NORMAL,
                 true,
+                "em_knight_castle,-33.5,3.5,48.5,-17,0",
                 "em_knight_castle,-20.5,6.2,55.5,-120,0",
                 0,
                 "Difficulty: &chard\n" +
@@ -24,10 +25,11 @@ public class KnightCastleLair extends ContentPackagesConfigFields {
                         "&6Face an honorable duel!",
                 "&fAssault the castle!",
                 "&fNow leaving the castle!",
+                List.of("filename=the_castle_charlemagne_p1.yml"),
                 "the_knight_castle",
+                -1,
                 false);
-        setContentType(ContentType.DYNAMIC_DUNGEON);
-        setContentLevel(-1);
+        this.contentType = ContentType.DYNAMIC_DUNGEON;
         setDifficulties(List.of(
                 Map.of("name", "normal", "levelSync", "+5", "id", 0),
                 Map.of("name", "hard", "levelSync", "+0", "id", 1),

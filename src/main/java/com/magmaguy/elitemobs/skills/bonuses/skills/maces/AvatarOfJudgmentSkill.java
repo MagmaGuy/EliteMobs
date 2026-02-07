@@ -15,12 +15,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Avatar of Judgment (COOLDOWN) - Massive damage boost with visual effects for 10 seconds.
@@ -76,6 +71,11 @@ public class AvatarOfJudgmentSkill extends SkillBonus implements CooldownSkill {
     @Override
     public void endCooldown(Player player) {
         cooldowns.remove(player.getUniqueId());
+    }
+
+    @Override
+    public void onActivate(Player player, Object event) {
+        activateAvatar(player);
     }
 
     /**

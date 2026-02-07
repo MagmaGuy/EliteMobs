@@ -208,6 +208,16 @@ public class SkillBonusEventHandler implements Listener {
         if (type == Material.TRIDENT) return SkillType.TRIDENTS;
         if (typeName.endsWith("_HOE")) return SkillType.HOES;
 
+        // Check for maces (1.21+)
+        try {
+            if (type == Material.MACE) return SkillType.MACES;
+        } catch (NoSuchFieldError e) {
+            // MACE doesn't exist pre-1.21
+        }
+
+        // Check for spears (1.21.11+)
+        if (typeName.endsWith("_SPEAR")) return SkillType.SPEARS;
+
         return null;
     }
 
