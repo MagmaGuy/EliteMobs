@@ -79,8 +79,8 @@ public class StunningForceSkill extends SkillBonus {
         // Visual effect
         target.getWorld().spawnParticle(Particle.BLOCK,
             target.getLocation(), 20, 0.3, 0.1, 0.3, 0,
-            org.bukkit.Material.CHAIN.createBlockData());
-        target.getWorld().playSound(target.getLocation(), Sound.BLOCK_CHAIN_PLACE, 1.0f, 0.5f);
+            org.bukkit.Material.IRON_BARS.createBlockData());
+        target.getWorld().playSound(target.getLocation(), Sound.BLOCK_IRON_DOOR_CLOSE, 1.0f, 0.5f);
 
         player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
             TextComponent.fromLegacyText("\u00A7e\u00A7lROOTED!"));

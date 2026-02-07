@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.skills.bonuses.skills.spears;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.combatsystem.CombatSystem;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.skills.SkillType;
@@ -14,18 +13,14 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Vanguard (COOLDOWN) - Charge forward, damaging enemies in path.
@@ -83,6 +78,11 @@ public class VanguardSkill extends SkillBonus implements CooldownSkill {
         cooldowns.remove(player.getUniqueId());
     }
 
+    @Override
+    public void onActivate(Player player, Object event) {
+        activateVanguard(player);
+    }
+
     /**
      * Activates the Vanguard charge.
      */
@@ -132,8 +132,9 @@ public class VanguardSkill extends SkillBonus implements CooldownSkill {
 
                     EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(living);
                     if (eliteEntity != null) {
-                        double damage = CombatSystem.getPlayerMaxDamage(player, eliteEntity) * damageMultiplier;
-                        eliteEntity.damage(damage, player);
+                        double baseDamage = player.getAttribute(Attribute.ATTACK_DAMAGE).getValue();
+                        double damage = baseDamage * damageMultiplier;
+                        living.damage(damage, player);
                         hitEntities.add(entity.getUniqueId());
 
                         // Knockback

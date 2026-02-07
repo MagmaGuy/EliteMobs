@@ -18,7 +18,7 @@ public class UnderGroveLair extends ContentPackagesConfigFields {
                 World.Environment.NORMAL,
                 true,
                 "em_under_grove,-2.5,-38.8,35.5,90,0",
-                "em_under_grove,-2.5,-38.8,35.5,90,0",
+                "em_under_grove,-9.5,-38.8,35.5,90,0",
                 1,
                 "Difficulty: &4Dynamic content!",
                 "&8[EM] &aYou are now trespassing the sacred grove!",

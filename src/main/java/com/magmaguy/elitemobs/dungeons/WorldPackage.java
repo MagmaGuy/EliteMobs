@@ -46,12 +46,14 @@ public class WorldPackage extends EMPackage {
         isInstalled = false;
         if (!DungeonUtils.unloadWorld(this)) {
             isInstalled = true;
+            player.sendMessage(ChatColorConverter.convert("&c[EliteMobs] Failed to uninstall " + contentPackagesConfigFields.getName() + "! There may still be players in the world."));
             return;
         }
         for (Wormhole wormhole : Wormhole.getWormholes())
             wormhole.onDungeonUninstall(contentPackagesConfigFields.getFilename());
         contentPackagesConfigFields.uninstallWorld();
         world = null;
+        player.sendMessage(ChatColorConverter.convert("&a[EliteMobs] Successfully uninstalled " + contentPackagesConfigFields.getName() + "!"));
     }
 
     @Override

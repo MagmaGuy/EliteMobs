@@ -14,8 +14,9 @@ public enum SkillType {
     BOWS("Bows", 1.0),
     CROSSBOWS("Crossbows", 1.0),
     TRIDENTS("Tridents", 1.0),
-    HOES("Hoes", 1.0);
-    // Future additions: SPEARS, MACES
+    HOES("Hoes", 1.0),
+    MACES("Maces", 1.0),
+    SPEARS("Spears", 1.0);
 
     @Getter
     private final String displayName;
@@ -69,6 +70,20 @@ public enum SkillType {
             return TRIDENTS;
         }
 
+        // Check for maces (1.21+)
+        try {
+            if (material == Material.MACE) {
+                return MACES;
+            }
+        } catch (NoSuchFieldError e) {
+            // MACE doesn't exist in this version
+        }
+
+        // Check for spears (1.21.11+)
+        if (name.endsWith("_SPEAR")) {
+            return SPEARS;
+        }
+
         // Not a recognized weapon type
         return null;
     }
@@ -114,7 +129,7 @@ public enum SkillType {
      * @return Array of weapon skill types
      */
     public static SkillType[] getWeaponSkills() {
-        return new SkillType[]{SWORDS, AXES, BOWS, CROSSBOWS, TRIDENTS, HOES};
+        return new SkillType[]{SWORDS, AXES, BOWS, CROSSBOWS, TRIDENTS, HOES, MACES, SPEARS};
     }
 
     /**

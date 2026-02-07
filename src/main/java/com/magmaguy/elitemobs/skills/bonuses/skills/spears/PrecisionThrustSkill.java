@@ -60,7 +60,7 @@ public class PrecisionThrustSkill extends SkillBonus implements ProcSkill {
         // Visual effects - precise strike
         target.getWorld().spawnParticle(Particle.DAMAGE_INDICATOR,
             target.getLocation().add(0, 1, 0), 5, 0.2, 0.2, 0.2, 0.1);
-        target.getWorld().spawnParticle(Particle.CRIT_MAGIC,
+        target.getWorld().spawnParticle(Particle.ENCHANTED_HIT,
             target.getLocation().add(0, 1, 0), 10, 0.3, 0.3, 0.3, 0.2);
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.0f, 1.2f);
 

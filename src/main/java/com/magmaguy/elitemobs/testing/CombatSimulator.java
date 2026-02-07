@@ -318,6 +318,14 @@ public class CombatSimulator {
             case CROSSBOWS -> new ItemStack(Material.CROSSBOW);
             case TRIDENTS -> new ItemStack(Material.TRIDENT);
             case HOES -> new ItemStack(Material.NETHERITE_HOE);
+            case MACES -> new ItemStack(Material.MACE);
+            case SPEARS -> {
+                try {
+                    yield new ItemStack(Material.IRON_SPEAR);
+                } catch (NoSuchFieldError e) {
+                    yield new ItemStack(Material.TRIDENT); // Fallback for pre-1.21.11
+                }
+            }
             case ARMOR -> null;
         };
 

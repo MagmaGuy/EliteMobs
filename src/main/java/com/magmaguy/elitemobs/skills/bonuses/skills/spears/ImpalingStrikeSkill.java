@@ -15,12 +15,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Impaling Strike (PROC) - Chance to cause bleed damage over time.
@@ -93,7 +88,7 @@ public class ImpalingStrikeSkill extends SkillBonus implements ProcSkill {
 
                 // Apply bleed damage every tick interval
                 if (ticksRemaining % BLEED_TICK_INTERVAL == 0) {
-                    target.damage(damagePerTick, player);
+                    livingTarget.damage(damagePerTick, player);
 
                     // Bleed particle effect
                     LivingEntity living = target.getLivingEntity();

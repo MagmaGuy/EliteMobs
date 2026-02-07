@@ -105,6 +105,16 @@ public class NameGenerator {
                 return ProceduralItemGenerationSettingsConfig.getTridentName();
             case CROSSBOW:
                 return ProceduralItemGenerationSettingsConfig.getCrossbowName();
+            case MACE:
+                return ProceduralItemGenerationSettingsConfig.getMaceName();
+            case DIAMOND_SPEAR:
+            case IRON_SPEAR:
+            case GOLDEN_SPEAR:
+            case STONE_SPEAR:
+            case WOODEN_SPEAR:
+            case COPPER_SPEAR:
+            case NETHERITE_SPEAR:
+                return ProceduralItemGenerationSettingsConfig.getSpearName();
         }
 
         if (ProceduralItemGenerationSettingsConfig.getInstance().getFileConfiguration().getString("materialNames." + material.toString().toLowerCase(Locale.ROOT)) != null)

@@ -42,6 +42,15 @@ public class GetTierCommand {
         addDurability(crossbow);
         ItemStack trident = new ItemStack(Material.TRIDENT);
         addDurability(trident);
+        ItemStack mace = new ItemStack(Material.MACE);
+        addDurability(mace);
+        ItemStack spear = null;
+        try {
+            spear = new ItemStack(Material.IRON_SPEAR);
+            addDurability(spear);
+        } catch (NoSuchFieldError ignored) {
+            // SPEAR doesn't exist pre-1.21.11
+        }
         ItemStack cheatSword = new ItemStack(Material.NETHERITE_SWORD);
         addDurability(cheatSword);
 
@@ -55,6 +64,8 @@ public class GetTierCommand {
         EliteItemManager.setEliteLevel(bow, tierLevel);
         EliteItemManager.setEliteLevel(crossbow, tierLevel);
         EliteItemManager.setEliteLevel(trident, tierLevel);
+        EliteItemManager.setEliteLevel(mace, tierLevel);
+        if (spear != null) EliteItemManager.setEliteLevel(spear, tierLevel);
         EliteItemManager.setEliteLevel(cheatSword, tierLevel);
         ItemMeta cheatItemMeta = cheatSword.getItemMeta();
         cheatItemMeta.setDisplayName("CHEAT SWORD");
@@ -71,6 +82,8 @@ public class GetTierCommand {
         new EliteItemLore(bow, false);
         new EliteItemLore(crossbow, false);
         new EliteItemLore(trident, false);
+        new EliteItemLore(mace, false);
+        if (spear != null) new EliteItemLore(spear, false);
         new EliteItemLore(cheatSword, false);
 
         // Apply level-based custom skins AFTER lore is set
@@ -84,6 +97,8 @@ public class GetTierCommand {
         EliteItemSkins.applyLevelBasedSkin(bow, tierLevel);
         EliteItemSkins.applyLevelBasedSkin(crossbow, tierLevel);
         EliteItemSkins.applyLevelBasedSkin(trident, tierLevel);
+        EliteItemSkins.applyLevelBasedSkin(mace, tierLevel);
+        if (spear != null) EliteItemSkins.applyLevelBasedSkin(spear, tierLevel);
         // cheatSword intentionally doesn't get custom skin
 
 
@@ -97,6 +112,8 @@ public class GetTierCommand {
         player.getInventory().addItem(bow);
         player.getInventory().addItem(crossbow);
         player.getInventory().addItem(trident);
+        player.getInventory().addItem(mace);
+        if (spear != null) player.getInventory().addItem(spear);
         player.getInventory().addItem(cheatSword);
         player.getInventory().addItem(new ItemStack(Material.COOKED_BEEF, 64));
         player.getInventory().addItem(new ItemStack(Material.SHIELD));

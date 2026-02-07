@@ -18,16 +18,18 @@ public class TheColosseum extends ContentPackagesConfigFields {
                 World.Environment.NORMAL,
                 true,
                 "em_the_colosseum,-83.5,66.0,251.5,-72,0",
+                "em_the_colosseum,-79.5,65.2,253.5,-66,0",
                 0,
                 "Difficulty: &cHard\n" +
                         "$bossCount bosses, from tier $lowestTier to $highestTier\n" +
                         "&2A great Lair!",
                 "&8[EM] &8Now entering the Colosseum. Do you dare challenge the champion...",
                 "&8[EM] &8You have left the Colosseum.",
+                List.of("filename=colosseum_tier_70_boss_p1.yml"),
                 "the_colosseum",
+                -1,
                 false);
-        setContentType(ContentType.DYNAMIC_DUNGEON);
-        setContentLevel(-1);
+        this.contentType = ContentType.DYNAMIC_DUNGEON;
         setDifficulties(List.of(
                 Map.of("name", "normal", "levelSync", "+5", "id", 0),
                 Map.of("name", "hard", "levelSync", "+0", "id", 1),

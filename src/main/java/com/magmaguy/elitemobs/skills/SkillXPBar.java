@@ -10,12 +10,11 @@ import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
-
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -353,6 +352,8 @@ public class SkillXPBar implements Listener {
                 case CROSSBOWS -> BarColor.GREEN;
                 case TRIDENTS -> BarColor.BLUE;
                 case HOES -> BarColor.PURPLE;
+                case MACES -> BarColor.YELLOW;
+                case SPEARS -> BarColor.WHITE;
             };
         }
 
