@@ -8,8 +8,6 @@ import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.CooldownSkill;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
@@ -18,7 +16,11 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Impaler (COOLDOWN) - Pin an enemy in place, dealing massive damage.
@@ -31,9 +33,9 @@ public class ImpalerSkill extends SkillBonus implements CooldownSkill {
     private static final int PIN_DURATION_TICKS = 60; // 3 seconds
     private static final double BASE_DAMAGE_MULTIPLIER = 4.0; // 400% damage
 
-    private static final Map<UUID, Long> cooldowns = new HashMap<>();
-    private static final Set<UUID> activePlayers = new HashSet<>();
-    private static final Set<UUID> pinnedEntities = new HashSet<>();
+    private static final Map<UUID, Long> cooldowns = new ConcurrentHashMap<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
+    private static final Set<UUID> pinnedEntities = ConcurrentHashMap.newKeySet();
 
     public ImpalerSkill() {
         super(SkillType.SPEARS, 75, "Impaler",
@@ -144,11 +146,7 @@ public class ImpalerSkill extends SkillBonus implements CooldownSkill {
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
 
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-            TextComponent.fromLegacyText("\u00A7b\u00A7l\u2694 IMPALED! \u2694"));
-
         startCooldown(player, skillLevel);
-        incrementProcCount(player);
     }
 
     public double getDamageMultiplier(int skillLevel) {
@@ -186,11 +184,9 @@ public class ImpalerSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        return List.of(
-            "&7Damage: &f" + String.format("%.0f", getDamageMultiplier(skillLevel) * 100) + "%",
-            "&7Pin Duration: &f3 seconds",
-            "&7Cooldown: &f" + getCooldownSeconds(skillLevel) + "s"
-        );
+        return applyLoreTemplates(Map.of(
+                "damage", String.format("%.0f", getDamageMultiplier(skillLevel) * 100),
+                "cooldown", String.valueOf(getCooldownSeconds(skillLevel))));
     }
 
     @Override
@@ -200,7 +196,9 @@ public class ImpalerSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("%.0f%% + Pin (CD: %ds)", getDamageMultiplier(skillLevel) * 100, getCooldownSeconds(skillLevel));
+        return applyFormattedBonusTemplate(Map.of(
+                "damage", String.format("%.0f", getDamageMultiplier(skillLevel) * 100),
+                "cooldown", String.valueOf(getCooldownSeconds(skillLevel))));
     }
 
     @Override

@@ -6,17 +6,16 @@ import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.ProcSkill;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Snare (PROC) - Trident attacks have a chance to heavily slow and ground targets.
@@ -29,7 +28,7 @@ public class SnareSkill extends SkillBonus implements ProcSkill {
     private static final int SNARE_DURATION = 60; // 3 seconds
 
     // Track which players have this skill active
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public SnareSkill() {
         super(SkillType.TRIDENTS, 10, "Snare",
@@ -57,9 +56,6 @@ public class SnareSkill extends SkillBonus implements ProcSkill {
         // Apply slowness and prevent jumping
         target.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, SNARE_DURATION, 3 + amplifier));
         target.addPotionEffect(new PotionEffect(PotionEffectType.JUMP_BOOST, SNARE_DURATION, 128)); // Negative jump
-
-        // Send feedback to player
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("§bSNARED!"));
     }
 
     private int calculateAmplifier(int skillLevel) {
@@ -102,11 +98,10 @@ public class SnareSkill extends SkillBonus implements ProcSkill {
     public List<String> getLoreDescription(int skillLevel) {
         double procChance = getProcChance(skillLevel) * 100;
         int amplifier = calculateAmplifier(skillLevel);
-        return List.of(
-                "&7Chance: &f" + String.format("%.1f", procChance) + "%",
-                "&7Slowness Level: &f" + (4 + amplifier),
-                "&7Duration: &f3 seconds"
-        );
+        return applyLoreTemplates(Map.of(
+                "procChance", String.format("%.1f", procChance),
+                "slownessLevel", String.valueOf(4 + amplifier)
+        ));
     }
 
     @Override
@@ -116,7 +111,9 @@ public class SnareSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("Slowness %d", 4 + calculateAmplifier(skillLevel));
+        return applyFormattedBonusTemplate(Map.of(
+                "slownessLevel", String.valueOf(4 + calculateAmplifier(skillLevel))
+        ));
     }
 
     @Override

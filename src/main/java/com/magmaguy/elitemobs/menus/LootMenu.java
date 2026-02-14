@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.menus;
 
+import com.magmaguy.elitemobs.config.menus.premade.LootMenuConfig;
 import com.magmaguy.elitemobs.items.customloottable.SharedLootTable;
-import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -43,17 +43,17 @@ public class LootMenu extends EliteMenu {
         inventory.setItem(greedInfo,
                 ItemStackGenerator.generateItemStack(
                         Material.ORANGE_STAINED_GLASS_PANE,
-                        ChatColorConverter.convert("&2Greed Item List"),
-                        List.of("Click to move to the Need item list!",
-                                "Items in the greed list will only",
-                                "be rolled for if no one needs them!")));
+                        LootMenuConfig.getGreedListTitle(),
+                        List.of(LootMenuConfig.getGreedListLore1(),
+                                LootMenuConfig.getGreedListLore2(),
+                                LootMenuConfig.getGreedListLore3())));
         inventory.setItem(needInfo,
                 ItemStackGenerator.generateItemStack(
                         Material.GREEN_STAINED_GLASS_PANE,
-                        ChatColorConverter.convert("&2Need Item List"),
-                        List.of("Click to move to the Greed item list!",
-                                "Items in the need list will only",
-                                "be rolled for people who needed them!")));
+                        LootMenuConfig.getNeedListTitle(),
+                        List.of(LootMenuConfig.getNeedListLore1(),
+                                LootMenuConfig.getNeedListLore2(),
+                                LootMenuConfig.getNeedListLore3())));
         playerLoot.put(player.getUniqueId(), this);
     }
 
@@ -64,7 +64,7 @@ public class LootMenu extends EliteMenu {
     public static void openMenu(Player player) {
         LootMenu lootMenu = playerLoot.get(player.getUniqueId());
         if (lootMenu == null) {
-            player.sendMessage(ChatColorConverter.convert("&4[EliteMobs] &6You don't currently have any group loot to vote on!"));
+            player.sendMessage(LootMenuConfig.getNoGroupLootMessage());
             return;
         }
         player.openInventory(lootMenu.renderMenu());

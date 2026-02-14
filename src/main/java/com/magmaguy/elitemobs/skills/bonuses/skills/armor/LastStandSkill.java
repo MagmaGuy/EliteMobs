@@ -1,23 +1,19 @@
 package com.magmaguy.elitemobs.skills.bonuses.skills.armor;
 
-import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.CooldownSkill;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Tier 4 ARMOR skill - Last Stand
@@ -25,8 +21,8 @@ import java.util.UUID;
  */
 public class LastStandSkill extends SkillBonus implements CooldownSkill {
 
-    private static final HashSet<UUID> activePlayers = new HashSet<>();
-    private static final Map<UUID, Long> cooldownMap = new HashMap<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
+    private static final Map<UUID, Long> cooldownMap = new ConcurrentHashMap<>();
 
     public LastStandSkill() {
         super(
@@ -36,13 +32,13 @@ public class LastStandSkill extends SkillBonus implements CooldownSkill {
             "Survive a fatal blow once per cooldown",
             SkillBonusType.COOLDOWN,
             4,
-            "last_stand"
+            "armor_last_stand"
         );
     }
 
     @Override
     public void applyBonus(Player player, int skillLevel) {
-        // Cooldown skill, triggered when fatal damage would occur
+        activePlayers.add(player.getUniqueId());
     }
 
     @Override
@@ -68,11 +64,8 @@ public class LastStandSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        List<String> lore = new ArrayList<>();
-        lore.add("Survive a fatal blow once per cooldown");
-        lore.add("Prevents death and restores you to 1 HP");
-        lore.add(String.format("Cooldown: %ds", getCooldownSeconds(skillLevel)));
-        return lore;
+        return applyLoreTemplates(Map.of(
+                "cooldown", String.format("%ds", getCooldownSeconds(skillLevel))));
     }
 
     @Override
@@ -82,7 +75,8 @@ public class LastStandSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("Prevent death (CD: %ds)", getCooldownSeconds(skillLevel));
+        return applyFormattedBonusTemplate(Map.of(
+                "cooldown", String.format("%ds", getCooldownSeconds(skillLevel))));
     }
 
     @Override
@@ -144,9 +138,6 @@ public class LastStandSkill extends SkillBonus implements CooldownSkill {
         player.getWorld().spawnParticle(Particle.TOTEM_OF_UNDYING,
             player.getLocation(), 50, 1, 1, 1, 0.5);
         player.getWorld().playSound(player.getLocation(), Sound.ITEM_TOTEM_USE, 1.0f, 1.0f);
-
-        // Send action bar message
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("Last Stand! You survived!"));
 
         // Start cooldown
         startCooldown(player, skillLevel);

@@ -12,5 +12,10 @@ public class CrossbowsHeavyBoltsConfig extends SkillBonusConfigFields {
         super("crossbows_heavy_bolts.yml", true, "&8Heavy Bolts",
               List.of("&7Bolts deal bonus damage", "&7and increased knockback."),
               SkillType.CROSSBOWS, SkillBonusType.PASSIVE, 3, 0.25, 0.005, Material.IRON_INGOT);
+        this.loreTemplates = List.of(
+                "&7Bonus Damage: &f$damage%",
+                "&7Knockback: &f$knockback"
+        );
+        this.formattedBonusTemplate = "+$damage% damage + knockback";
     }
 }

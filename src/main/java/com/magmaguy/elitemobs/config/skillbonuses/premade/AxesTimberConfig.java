@@ -12,5 +12,10 @@ public class AxesTimberConfig extends SkillBonusConfigFields {
         super("axes_timber.yml", true, "&2Timber!",
               List.of("&7Bonus damage and hits", "&7disable enemy shields."),
               SkillType.AXES, SkillBonusType.PASSIVE, 4, 0.20, 0.004, Material.OAK_LOG);
+        this.loreTemplates = List.of(
+                "&7Damage Bonus: &f+$damageBonus%",
+                "&7Shield Disable: &f+$shieldDisable%"
+        );
+        this.formattedBonusTemplate = "+$damageBonus% Damage";
     }
 }

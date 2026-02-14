@@ -32,11 +32,5 @@ public enum SkillBonusType {
      * Can trigger but has internal cooldown.
      * Example: "Survive fatal damage (60s cooldown)"
      */
-    COOLDOWN,
-
-    /**
-     * Player manually activates/deactivates.
-     * Example: "Deal more damage but take more damage"
-     */
-    TOGGLE
+    COOLDOWN
 }

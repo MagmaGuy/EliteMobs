@@ -3,15 +3,15 @@ package com.magmaguy.elitemobs.skills.bonuses.skills.crossbows;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
-import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.ConditionalSkill;
 import org.bukkit.entity.Player;
 
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * First Blood (CONDITIONAL) - Massive bonus damage on first hit.
@@ -23,7 +23,7 @@ public class FirstBloodSkill extends SkillBonus implements ConditionalSkill {
     private static final double HEALTH_THRESHOLD = 0.99; // Target must be at 99%+ health
     private static final double BASE_BONUS = 0.50; // 50% bonus
 
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public FirstBloodSkill() {
         super(SkillType.CROSSBOWS, 75, "First Blood",
@@ -58,16 +58,16 @@ public class FirstBloodSkill extends SkillBonus implements ConditionalSkill {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        return List.of(
-                "&7First Hit Bonus: &f" + String.format("%.1f", getConditionalBonus(skillLevel) * 100) + "%",
-                "&7Triggers on full health targets"
-        );
+        return applyLoreTemplates(Map.of("value", String.format("%.1f", getConditionalBonus(skillLevel) * 100)));
     }
 
     @Override
     public double getBonusValue(int skillLevel) { return getConditionalBonus(skillLevel); }
     @Override
-    public String getFormattedBonus(int skillLevel) { return String.format("+%.1f%% first hit damage", getConditionalBonus(skillLevel) * 100); }
+    public String getFormattedBonus(int skillLevel) { return applyFormattedBonusTemplate(Map.of("value", String.format("%.1f", getConditionalBonus(skillLevel) * 100))); }
+    @Override
+    public TestStrategy getTestStrategy() { return TestStrategy.CONDITION_SETUP; }
+
     @Override
     public void shutdown() { activePlayers.clear(); }
 }

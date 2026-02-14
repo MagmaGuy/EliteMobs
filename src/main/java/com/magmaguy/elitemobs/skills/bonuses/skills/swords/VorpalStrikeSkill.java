@@ -2,21 +2,21 @@ package com.magmaguy.elitemobs.skills.bonuses.skills.swords;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
+import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.CooldownSkill;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Vorpal Strike (COOLDOWN) - Critical attacks have a chance to deal massive bonus damage.
@@ -29,8 +29,8 @@ public class VorpalStrikeSkill extends SkillBonus implements CooldownSkill {
     private static final double BASE_COOLDOWN = 30.0; // 30 seconds
     private static final double BASE_DAMAGE_MULTIPLIER = 3.0; // Triple damage
 
-    private static final Set<UUID> playersOnCooldown = new HashSet<>();
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Set<UUID> playersOnCooldown = ConcurrentHashMap.newKeySet();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public VorpalStrikeSkill() {
         super(SkillType.SWORDS, 75, "Vorpal Strike",
@@ -62,7 +62,7 @@ public class VorpalStrikeSkill extends SkillBonus implements CooldownSkill {
                 playersOnCooldown.remove(uuid);
                 Player p = org.bukkit.Bukkit.getPlayer(uuid);
                 if (p != null && p.isOnline()) {
-                    p.sendMessage("§6Vorpal Strike §aready!");
+                    p.sendMessage(DungeonsConfig.getVorpalStrikeReadyMessage());
                 }
             }
         }.runTaskLater(MetadataHandler.PLUGIN, seconds * 20L);
@@ -78,36 +78,35 @@ public class VorpalStrikeSkill extends SkillBonus implements CooldownSkill {
         playersOnCooldown.remove(player.getUniqueId());
     }
 
-    public void onProc(Player player, Object context) {
-        if (!(context instanceof EliteMobDamagedByPlayerEvent event)) return;
+    @Override
+    public void onActivate(Player player, Object event) {
+        if (!(event instanceof EliteMobDamagedByPlayerEvent damageEvent)) return;
 
         // Only triggers on critical hits
-        if (!event.isCriticalStrike()) return;
-
-        if (isOnCooldown(player)) return;
+        if (!damageEvent.isCriticalStrike()) return;
 
         int skillLevel = SkillBonusRegistry.getPlayerSkillLevel(player, SkillType.SWORDS);
         double multiplier = getDamageMultiplier(skillLevel);
 
-        event.setDamage(event.getDamage() * multiplier);
+        damageEvent.setDamage(damageEvent.getDamage() * multiplier);
 
         // Visual effects
-        if (event.getEliteMobEntity().getLivingEntity() != null) {
-            event.getEliteMobEntity().getLivingEntity().getWorld().spawnParticle(
+        if (damageEvent.getEliteMobEntity().getLivingEntity() != null) {
+            damageEvent.getEliteMobEntity().getLivingEntity().getWorld().spawnParticle(
                     Particle.CRIT,
-                    event.getEliteMobEntity().getLivingEntity().getLocation().add(0, 1, 0),
+                    damageEvent.getEliteMobEntity().getLivingEntity().getLocation().add(0, 1, 0),
                     30, 0.5, 0.5, 0.5, 0.3
             );
         }
 
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("§4§lVORPAL STRIKE!"));
-
         startCooldown(player, skillLevel);
+        incrementProcCount(player);
+        SkillBonus.sendSkillActionBar(player, this);
     }
 
     private double getDamageMultiplier(int skillLevel) {
-        // Base 3x + 0.02x per level
-        return BASE_DAMAGE_MULTIPLIER + (skillLevel * 0.02);
+        // Base 3x + 0.02x per level, capped at 4.0x
+        return Math.min(4.0, BASE_DAMAGE_MULTIPLIER + (skillLevel * 0.02));
     }
 
     /**
@@ -150,11 +149,10 @@ public class VorpalStrikeSkill extends SkillBonus implements CooldownSkill {
     public List<String> getLoreDescription(int skillLevel) {
         double multiplier = getDamageMultiplier(skillLevel);
         double cooldown = getCooldownSeconds(skillLevel);
-        return List.of(
-                "&7Damage Multiplier: &f" + String.format("%.1f", multiplier) + "x",
-                "&7Cooldown: &f" + String.format("%.1f", cooldown) + "s",
-                "&7Only triggers on critical hits"
-        );
+        return applyLoreTemplates(Map.of(
+                "multiplier", String.format("%.1f", multiplier),
+                "cooldown", String.format("%.1f", cooldown)
+        ));
     }
 
     @Override
@@ -164,7 +162,9 @@ public class VorpalStrikeSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("%.1fx Critical Damage", getDamageMultiplier(skillLevel));
+        return applyFormattedBonusTemplate(Map.of(
+                "multiplier", String.format("%.1f", getDamageMultiplier(skillLevel)),
+                "cooldown", String.format("%d", getCooldownSeconds(skillLevel))));
     }
 
     @Override

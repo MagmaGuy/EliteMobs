@@ -11,5 +11,12 @@ public class SpearsLegionsDisciplineConfig extends SkillBonusConfigFields {
         super("spears_legions_discipline.yml", true, "&bLegion's Discipline",
               List.of("&7Consecutive hits increase", "&7damage. Resets on miss."),
               SkillType.SPEARS, 3, 10, 0.03, 0.005, Material.IRON_BARS);
+        this.loreTemplates = List.of(
+                "&7Max Stacks: &f$maxStacks",
+                "&7Damage/Stack: &f+$perStack%",
+                "&7Max Bonus: &f+$maxBonus%",
+                "&7Resets on miss"
+        );
+        this.formattedBonusTemplate = "+$maxBonus% Max (Discipline)";
     }
 }

@@ -1,16 +1,16 @@
 package com.magmaguy.elitemobs.skills.bonuses.skills.hoes;
 
-import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.ConditionalSkill;
 import org.bukkit.entity.Player;
 
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Reap What You Sow (CONDITIONAL) - Risk/reward skill that grants bonus damage at low health.
@@ -23,7 +23,7 @@ public class ReapWhatYouSowSkill extends SkillBonus implements ConditionalSkill 
     private static final double HEALTH_THRESHOLD = 0.50; // 50% health
     private static final double BASE_BONUS = 0.50; // 50% bonus at threshold
 
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public ReapWhatYouSowSkill() {
         super(SkillType.HOES, 50, "Reap What You Sow",
@@ -63,7 +63,7 @@ public class ReapWhatYouSowSkill extends SkillBonus implements ConditionalSkill 
 
         // Scale bonus: more bonus the lower the health
         // At 50% HP: 0% extra, At 0% HP: full bonus * 2
-        double riskMultiplier = 1 + (HEALTH_THRESHOLD - healthPercent) * 2;
+        double riskMultiplier = Math.min(3.0, 1 + (HEALTH_THRESHOLD - healthPercent) * 2);
         return baseBonus * riskMultiplier;
     }
 
@@ -95,13 +95,11 @@ public class ReapWhatYouSowSkill extends SkillBonus implements ConditionalSkill 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
         double bonusPercent = getConditionalBonus(skillLevel) * 100;
-        double maxBonus = bonusPercent * 2; // Max at 0% HP
-        return List.of(
-                "&7Base Bonus: &f+" + String.format("%.0f", bonusPercent) + "%",
-                "&7Max Bonus: &f+" + String.format("%.0f", maxBonus) + "% (at 0% HP)",
-                "&7Condition: Below 50% health",
-                "&7Risk equals reward"
-        );
+        double maxBonus = bonusPercent * 2;
+        return applyLoreTemplates(Map.of(
+                "bonusPercent", String.format("%.0f", bonusPercent),
+                "maxBonus", String.format("%.0f", maxBonus)
+        ));
     }
 
     @Override
@@ -111,7 +109,9 @@ public class ReapWhatYouSowSkill extends SkillBonus implements ConditionalSkill 
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("+%.0f%% at Low HP", getConditionalBonus(skillLevel) * 100);
+        return applyFormattedBonusTemplate(Map.of(
+                "bonusPercent", String.format("%.0f", getConditionalBonus(skillLevel) * 100)
+        ));
     }
 
     @Override

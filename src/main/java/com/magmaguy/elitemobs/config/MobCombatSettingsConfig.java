@@ -103,6 +103,12 @@ public class MobCombatSettingsConfig extends ConfigurationFile {
     private static int combatDisplayTimeoutSeconds;
     @Getter
     private static boolean useFixedHealthBarSize;
+    @Getter
+    private static String healPopupFormat;
+    @Getter
+    private static String xpPopupFormat;
+    @Getter
+    private static String healthDisplaySeparator;
     private static MobCombatSettingsConfig instance;
 
     public MobCombatSettingsConfig() {
@@ -272,5 +278,16 @@ public class MobCombatSettingsConfig extends ConfigurationFile {
                         "When false (default), the health bar scales with the boss health multiplier, adding more bars and rows for tankier bosses.",
                         "When true, the health bar is always a single row of 10 bars."),
                 fileConfiguration, "useFixedHealthBarSize", false);
+        healPopupFormat = ConfigurationEngine.setString(
+                List.of("Format for the heal popup text when a boss partially heals.",
+                        "Use $amount for the heal amount. Color is applied automatically."),
+                file, fileConfiguration, "healPopupFormat", "+$amount HP", true);
+        xpPopupFormat = ConfigurationEngine.setString(
+                List.of("Format for the XP gain popup text.",
+                        "Use $amount for the XP amount."),
+                file, fileConfiguration, "xpPopupFormat", "+$amount \u2726XP", true);
+        healthDisplaySeparator = ConfigurationEngine.setString(
+                List.of("Separator between current and max health in the numeric health display."),
+                file, fileConfiguration, "healthDisplaySeparator", " &7/ ", true);
     }
 }

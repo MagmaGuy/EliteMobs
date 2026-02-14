@@ -148,10 +148,9 @@ public class CustomBossDeath implements Listener {
                 for (Player player : Bukkit.getOnlinePlayers())
                     if (customBossEntity.getDamagers().containsKey(player))
                         player.sendMessage(
-                                ChatColorConverter.convert(
                                         MobCombatSettingsConfig.getBossKillParticipationMessage().replace(
                                                 "$playerDamage",
-                                                Round.twoDecimalPlaces(customBossEntity.getDamagers().get(player)) + "")));
+                                                Round.twoDecimalPlaces(customBossEntity.getDamagers().get(player)) + ""));
 
             } else {
                 if (customBossEntity.customBossesConfigFields.getDeathMessage() != null

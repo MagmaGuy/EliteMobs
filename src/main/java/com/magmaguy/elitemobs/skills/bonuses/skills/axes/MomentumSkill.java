@@ -8,7 +8,11 @@ import com.magmaguy.elitemobs.skills.bonuses.interfaces.StackingSkill;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Momentum (STACKING) - Build up damage with consecutive hits.
@@ -21,9 +25,9 @@ public class MomentumSkill extends SkillBonus implements StackingSkill {
     private static final double DAMAGE_PER_STACK = 0.04;
     private static final int DECAY_TICKS = 80;
 
-    private static final Map<UUID, Integer> playerStacks = new HashMap<>();
-    private static final Map<UUID, BukkitRunnable> decayTasks = new HashMap<>();
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Map<UUID, Integer> playerStacks = new ConcurrentHashMap<>();
+    private static final Map<UUID, BukkitRunnable> decayTasks = new ConcurrentHashMap<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public MomentumSkill() {
         super(SkillType.AXES, 50, "Momentum",
@@ -53,16 +57,16 @@ public class MomentumSkill extends SkillBonus implements StackingSkill {
         cancelDecayTimer(player.getUniqueId());
     }
 
-    @Override
-    public double getBonusPerStack(int skillLevel) {
-        return DAMAGE_PER_STACK + (skillLevel * 0.0005);
-    }
-
     public static double getDamageMultiplier(Player player, int skillLevel) {
         if (!activePlayers.contains(player.getUniqueId())) return 1.0;
         int stacks = playerStacks.getOrDefault(player.getUniqueId(), 0);
-        double bonus = (DAMAGE_PER_STACK + (skillLevel * 0.0005)) * stacks;
+        double bonus = Math.min(0.10, DAMAGE_PER_STACK + (skillLevel * 0.0005)) * stacks;
         return 1.0 + bonus;
+    }
+
+    @Override
+    public double getBonusPerStack(int skillLevel) {
+        return Math.min(0.10, DAMAGE_PER_STACK + (skillLevel * 0.0005));
     }
 
     private void resetDecayTimer(Player player) {
@@ -102,17 +106,17 @@ public class MomentumSkill extends SkillBonus implements StackingSkill {
     @Override
     public List<String> getLoreDescription(int skillLevel) {
         double bonusPerStack = getBonusPerStack(skillLevel) * 100;
-        return List.of(
-                "&7Max Stacks: &f" + MAX_STACKS,
-                "&7Damage per Stack: &f+" + String.format("%.1f", bonusPerStack) + "%",
-                "&7Max Bonus: &f+" + String.format("%.1f", bonusPerStack * MAX_STACKS) + "%"
-        );
+        return applyLoreTemplates(Map.of(
+                "maxStacks", String.valueOf(MAX_STACKS),
+                "bonusPerStack", String.format("%.1f", bonusPerStack),
+                "maxBonus", String.format("%.1f", bonusPerStack * MAX_STACKS)
+        ));
     }
 
     @Override
     public double getBonusValue(int skillLevel) { return getBonusPerStack(skillLevel) * MAX_STACKS; }
     @Override
-    public String getFormattedBonus(int skillLevel) { return String.format("+%.0f%% Max Damage", getBonusValue(skillLevel) * 100); }
+    public String getFormattedBonus(int skillLevel) { return applyFormattedBonusTemplate(Map.of("maxBonus", String.format("%.0f", getBonusValue(skillLevel) * 100))); }
 
     @Override
     public void shutdown() {

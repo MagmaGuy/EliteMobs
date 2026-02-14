@@ -5,13 +5,15 @@ import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.CooldownSkill;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Divine Shield (COOLDOWN) - When taking fatal damage, become invulnerable briefly.
@@ -23,8 +25,8 @@ public class DivineShieldSkill extends SkillBonus implements CooldownSkill {
     private static final long BASE_COOLDOWN_SECONDS = 120; // 2 minutes
     private static final int INVULN_DURATION_TICKS = 40; // 2 seconds
 
-    private static final Map<UUID, Long> cooldowns = new HashMap<>();
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Map<UUID, Long> cooldowns = new ConcurrentHashMap<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public DivineShieldSkill() {
         super(SkillType.MACES, 25, "Divine Shield",
@@ -76,19 +78,23 @@ public class DivineShieldSkill extends SkillBonus implements CooldownSkill {
     /**
      * Attempts to prevent fatal damage.
      * Called from damage event handler before damage is applied.
+     * Static method that retrieves the skill instance from the registry.
      *
      * @param player The player about to take damage
      * @param incomingDamage The damage that would be dealt
      * @return true if death was prevented, false otherwise
      */
-    public boolean preventDeath(Player player, double incomingDamage) {
-        if (!isActive(player) || isOnCooldown(player)) {
-            return false;
-        }
+    public static boolean preventDeath(Player player, double incomingDamage) {
+        if (!activePlayers.contains(player.getUniqueId())) return false;
+
+        SkillBonus skill = SkillBonusRegistry.getSkillById(SKILL_ID);
+        if (!(skill instanceof DivineShieldSkill divineShield)) return false;
+
+        if (divineShield.isOnCooldown(player)) return false;
 
         // Check if damage would be fatal
         if (player.getHealth() - incomingDamage <= 0) {
-            activateShield(player);
+            divineShield.activateShield(player);
             return true;
         }
 
@@ -120,8 +126,11 @@ public class DivineShieldSkill extends SkillBonus implements CooldownSkill {
         player.getWorld().playSound(player.getLocation(), Sound.ITEM_TOTEM_USE, 1.0f, 1.2f);
         player.getWorld().playSound(player.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1.0f, 1.5f);
 
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-            TextComponent.fromLegacyText("\u00A7e\u00A7lDIVINE SHIELD!"));
+        // Send clear chat feedback so the player knows Divine Shield saved them
+        SkillBonus.sendSkillActionBar(player, this);
+        if (configFields instanceof com.magmaguy.elitemobs.config.skillbonuses.premade.MacesDivineShieldConfig divineConfig) {
+            player.sendMessage(com.magmaguy.magmacore.util.ChatColorConverter.convert(divineConfig.getProcMessage()));
+        }
 
         startCooldown(player, skillLevel);
         incrementProcCount(player);
@@ -155,11 +164,9 @@ public class DivineShieldSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        return List.of(
-            "&7Prevents death once",
-            "&7Invulnerable for 2 seconds",
-            "&7Cooldown: &f" + getCooldownSeconds(skillLevel) + "s"
-        );
+        return applyLoreTemplates(Map.of(
+                "cooldown", String.valueOf(getCooldownSeconds(skillLevel))
+        ));
     }
 
     @Override
@@ -169,7 +176,9 @@ public class DivineShieldSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("Prevent Death (CD: %ds)", getCooldownSeconds(skillLevel));
+        return applyFormattedBonusTemplate(Map.of(
+                "cooldown", String.valueOf(getCooldownSeconds(skillLevel))
+        ));
     }
 
     @Override

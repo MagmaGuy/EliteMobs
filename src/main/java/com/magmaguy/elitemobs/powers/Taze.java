@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.powers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
+import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.powers.meta.BossPower;
 import org.bukkit.Location;
@@ -42,7 +43,7 @@ public class Taze extends BossPower implements Listener {
         // Apply the velocity
         player.setVelocity(direction);
 
-        player.sendTitle("", "Shocked!", 1, 30, 1);
+        player.sendTitle(DungeonsConfig.getTazeShockedTitle(), DungeonsConfig.getTazeShockedSubtitle(), 1, 30, 1);
         player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 30, 5));
 
         new BukkitRunnable() {

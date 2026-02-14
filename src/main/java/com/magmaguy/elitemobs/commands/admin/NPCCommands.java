@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.commands.admin;
 
+import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
@@ -13,7 +14,7 @@ public class NPCCommands {
 
         NPCsConfigFields npCsConfigFields = NPCsConfig.getNpcEntities().get(npcFileName);
         if (npCsConfigFields == null) {
-            player.sendMessage("[EliteMobs] Invalid NPC filename.");
+            player.sendMessage(CommandMessagesConfig.getInvalidNpcFilenameMessage());
             return;
         }
 

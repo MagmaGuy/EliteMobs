@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.commands;
 
+import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.utils.DebugMessage;
 import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
@@ -25,9 +26,9 @@ public class DebugCommand extends AdvancedCommand {
     public void execute(CommandData commandData) {
         boolean enabled = DebugMessage.toggleDebug(commandData.getPlayerSender());
         if (enabled) {
-            Logger.sendMessage(commandData.getPlayerSender(), "&aDebug mode &2enabled&a. Combat damage calculations will be logged to console.");
+            Logger.sendMessage(commandData.getPlayerSender(), CommandMessagesConfig.getDebugEnabledMessage());
         } else {
-            Logger.sendMessage(commandData.getPlayerSender(), "&cDebug mode &4disabled&c.");
+            Logger.sendMessage(commandData.getPlayerSender(), CommandMessagesConfig.getDebugDisabledMessage());
         }
     }
 }

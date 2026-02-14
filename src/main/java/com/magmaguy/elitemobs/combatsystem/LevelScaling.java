@@ -154,19 +154,6 @@ public class LevelScaling {
      * At level 25: 2.1875 * 2^5 = 2.1875 * 32 = 70 HP
      */
     public static final double BASE_MOB_HP = 2.1875;
-    /**
-     * Base damage constant for the exponential scaling formula.
-     * <p>
-     * This is tuned so that same-level combat feels consistent across all levels.
-     * A level 25 player fighting a level 25 mob should feel the same as a
-     * level 50 player fighting a level 50 mob.
-     * <p>
-     * Formula: DPS = BASE_PLAYER_DPS * 2^(level / 5)
-     * <p>
-     * Tuned for ~3 hits to kill at same level with a sword (1.6 attack speed).
-     * At level 25: 0.73 * 32 = 23.4 DPS, vs 70 HP = ~3 seconds to kill
-     */
-    public static final double BASE_PLAYER_DPS = 0.73;
 
     /**
      * Target number of hits for a player to die when fighting same-level content
@@ -188,19 +175,21 @@ public class LevelScaling {
     public static final double TARGET_HITS_AT_PLUS_10 = 2.0;
 
     /**
-     * Expected damage multiplier from gear and defensive skills at same level.
+     * Controls how fast the skill-based damage adjustment scales exponentially
+     * in the defensive (elite→player) damage formula.
      * <p>
-     * When a player has appropriate armor and defensive skill level:
+     * Formula: {@code skillAdjustment = 2^((mobLevel - armorSkillLevel) / SKILL_SCALING_RATE)}
      * <ul>
-     *   <li>Elite armor provides ~50% damage reduction</li>
-     *   <li>Defense skill bonuses provide ~50% damage reduction</li>
-     *   <li>Combined: player receives 25% of raw damage (0.5 * 0.5 = 0.25)</li>
+     *   <li>At +7.5 levels: damage doubles</li>
+     *   <li>At +15 levels: damage quadruples</li>
+     *   <li>At -7.5 levels: damage halves</li>
      * </ul>
      * <p>
-     * The damage formula pre-compensates for this so that AFTER reductions,
-     * players still die in TARGET_HITS_TO_KILL_PLAYER hits.
+     * Note: This is the defensive equivalent of {@link #LEVELS_PER_BOSS_DAMAGE_DOUBLE},
+     * which is used for the offensive (old level modifier) path. They happen to share the
+     * same value but are conceptually separate constants.
      */
-    public static final double EXPECTED_GEAR_DAMAGE_MULTIPLIER = 0.25;
+    public static final double SKILL_SCALING_RATE = 7.5;
 
     /**
      * Levels required for boss damage to double against players.
@@ -221,6 +210,45 @@ public class LevelScaling {
      * </ul>
      */
     public static final double LEVELS_PER_BOSS_DAMAGE_DOUBLE = 7.5;
+
+    // ========================================
+    // OFFENSIVE FORMULA CONSTANTS (Player → Elite)
+    // Mirror the defensive constants for symmetry
+    // ========================================
+
+    /**
+     * Target number of sword hits to kill a standard elite mob (healthMultiplier=1.0)
+     * at matched combat (weapon skill level == mob level, weapon level == mob level).
+     * <p>
+     * This is the core offensive balance constant. A mob with healthMultiplier=2.0
+     * will take exactly 2× this many hits, at ALL levels.
+     * <p>
+     * Note: This is defined in sword hits (1.6 attacks/sec). Faster weapons deal
+     * proportionally less per hit but the same DPS.
+     */
+    public static final double TARGET_HITS_TO_KILL_MOB = 3.0;
+
+    /**
+     * Reference weapon attack speed used to define {@link #TARGET_HITS_TO_KILL_MOB}.
+     * <p>
+     * Sword speed is 1.6 attacks/sec. All other weapon speeds are normalized
+     * against this reference so that DPS remains consistent across weapon types.
+     */
+    public static final double REFERENCE_ATTACK_SPEED = 1.6;
+
+    /**
+     * Controls how fast the skill-based damage adjustment scales exponentially
+     * in the offensive (player→elite) damage formula.
+     * <p>
+     * Formula: {@code skillAdjustment = 2^((weaponSkillLevel - mobLevel) / OFFENSIVE_SKILL_SCALING_RATE)}
+     * <ul>
+     *   <li>At +7.5 skill levels above mob: damage doubles</li>
+     *   <li>At -7.5 skill levels below mob: damage halves</li>
+     * </ul>
+     * <p>
+     * Matches the defensive {@link #SKILL_SCALING_RATE} for symmetric scaling.
+     */
+    public static final double OFFENSIVE_SKILL_SCALING_RATE = 7.5;
 
     private LevelScaling() {
         // Utility class - no instantiation
@@ -460,50 +488,47 @@ public class LevelScaling {
         return Math.min(health, MINECRAFT_MAX_HEALTH);
     }
 
+
+    // ========================================
+    // OFFENSIVE FORMULA METHODS (Player → Elite)
+    // ========================================
+
     /**
-     * Calculates player DPS using the same exponential scaling as mob HP.
+     * Calculates the base damage a player should deal per sword hit to a normalized
+     * elite mob (healthMultiplier=1.0) at the given mob level.
      * <p>
-     * This ensures that same-level combat feels consistent at all levels:
-     * <ul>
-     *   <li>Level 25 player vs Level 25 mob = ~3 hits to kill</li>
-     *   <li>Level 50 player vs Level 50 mob = ~3 hits to kill</li>
-     *   <li>Level 100 player vs Level 100 mob = ~3 hits to kill</li>
-     * </ul>
+     * {@code baseDamage = calculateMobHealth(mobLevel, 0) / TARGET_HITS_TO_KILL_MOB}
      * <p>
-     * The effective level is typically the average of skill level and item level
-     * (50/50 split from CombatSystem).
+     * This ensures that at matched combat, a standard mob always takes exactly
+     * {@link #TARGET_HITS_TO_KILL_MOB} sword hits to kill, at ALL levels.
      *
-     * @param effectiveLevel The player's effective combat level (average of skill and item levels)
-     * @return The base DPS before attack speed adjustments
-     *
-     * <h3>Example DPS Values:</h3>
-     * <table border="1">
-     *   <tr><th>Level</th><th>DPS</th><th>+5 Level DPS</th></tr>
-     *   <tr><td>1</td><td>~0.84</td><td>→ 1.68 (2x)</td></tr>
-     *   <tr><td>5</td><td>~1.46</td><td>→ 2.92 (2x)</td></tr>
-     *   <tr><td>25</td><td>~23.4</td><td>→ 46.7 (2x)</td></tr>
-     *   <tr><td>50</td><td>~747</td><td>→ 1495 (2x)</td></tr>
-     * </table>
+     * @param mobLevel The elite mob's level
+     * @return The base damage per sword hit
      */
-    public static double calculatePlayerDPS(int effectiveLevel) {
-        // Same exponential formula as mob HP: guarantees consistent same-level combat
-        return BASE_PLAYER_DPS * Math.pow(SCALING_BASE, effectiveLevel / LEVELS_PER_POWER_DOUBLE);
+    public static double calculateBaseDamageToElite(int mobLevel) {
+        return calculateMobHealth(mobLevel, 0) / TARGET_HITS_TO_KILL_MOB;
+    }
+
+    /**
+     * Calculates the offensive skill adjustment multiplier.
+     * <p>
+     * {@code skillAdjustment = 2^((weaponSkillLevel - mobLevel) / OFFENSIVE_SKILL_SCALING_RATE)}
+     * <p>
+     * When skill level matches mob level, returns 1.0 (baseline).
+     * When skill level is higher, returns > 1.0 (bonus damage).
+     * When skill level is lower, returns < 1.0 (reduced damage).
+     *
+     * @param weaponSkillLevel The player's weapon skill level
+     * @param mobLevel         The elite mob's level
+     * @return The skill adjustment multiplier
+     */
+    public static double calculateOffensiveSkillAdjustment(int weaponSkillLevel, int mobLevel) {
+        return Math.pow(2.0, (weaponSkillLevel - mobLevel) / OFFENSIVE_SKILL_SCALING_RATE);
     }
 
     // ========================================
     // DEBUG / REFERENCE METHODS
     // ========================================
-
-    /**
-     * Calculates damage per hit from DPS and attack speed.
-     *
-     * @param effectiveLevel The player's effective combat level
-     * @param attackSpeed    The weapon's attack speed (attacks per second)
-     * @return Damage per hit
-     */
-    public static double calculatePlayerDamage(int effectiveLevel, double attackSpeed) {
-        return calculatePlayerDPS(effectiveLevel) / attackSpeed;
-    }
 
     /**
      * Prints a reference table of level modifiers for debugging.

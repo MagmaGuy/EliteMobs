@@ -12,7 +12,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Death Mark (PROC) - Attacks have a chance to mark enemies for death.
@@ -26,9 +30,9 @@ public class DeathMarkSkill extends SkillBonus implements ProcSkill {
     private static final long MARK_DURATION = 15000; // 15 seconds
     private static final double BASE_DAMAGE_BONUS = 0.50; // 50% extra damage
 
-    private static final Map<UUID, UUID> markedTargets = new HashMap<>(); // EntityUUID -> PlayerUUID
-    private static final Map<UUID, Long> markExpiry = new HashMap<>();
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Map<UUID, UUID> markedTargets = new ConcurrentHashMap<>(); // EntityUUID -> PlayerUUID
+    private static final Map<UUID, Long> markExpiry = new ConcurrentHashMap<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public DeathMarkSkill() {
         super(SkillType.HOES, 25, "Death Mark",
@@ -120,14 +124,10 @@ public class DeathMarkSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        double procChance = getProcChance(skillLevel) * 100;
-        double damageBonus = getMarkDamageBonus(skillLevel) * 100;
-        return List.of(
-                "&7Chance: &f" + String.format("%.1f", procChance) + "%",
-                "&7Mark Damage: &f+" + String.format("%.0f", damageBonus) + "%",
-                "&7Duration: &f15 seconds",
-                "&7Marked enemies glow"
-        );
+        return applyLoreTemplates(Map.of(
+                "procChance", String.format("%.1f", getProcChance(skillLevel) * 100),
+                "damageBonus", String.format("%.0f", getMarkDamageBonus(skillLevel) * 100)
+        ));
     }
 
     @Override
@@ -137,7 +137,9 @@ public class DeathMarkSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("+%.0f%% vs Marked", getMarkDamageBonus(skillLevel) * 100);
+        return applyFormattedBonusTemplate(Map.of(
+                "damageBonus", String.format("%.0f", getMarkDamageBonus(skillLevel) * 100)
+        ));
     }
 
     @Override

@@ -6,16 +6,15 @@ import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.ProcSkill;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Undertow (PROC) - Trident attacks have a chance to pull targets toward the player.
@@ -28,7 +27,7 @@ public class UndertowSkill extends SkillBonus implements ProcSkill {
     private static final double BASE_PULL_STRENGTH = 1.0;
 
     // Track which players have this skill active
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public UndertowSkill() {
         super(SkillType.TRIDENTS, 50, "Undertow",
@@ -64,9 +63,6 @@ public class UndertowSkill extends SkillBonus implements ProcSkill {
         direction.normalize().multiply(pullStrength);
         direction.setY(0.2);
         target.setVelocity(direction);
-
-        // Send feedback to player
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("§3UNDERTOW!"));
     }
 
     private double calculatePullStrength(int skillLevel) {
@@ -109,11 +105,10 @@ public class UndertowSkill extends SkillBonus implements ProcSkill {
     public List<String> getLoreDescription(int skillLevel) {
         double procChance = getProcChance(skillLevel) * 100;
         double pullStrength = calculatePullStrength(skillLevel);
-        return List.of(
-                "&7Chance: &f" + String.format("%.1f", procChance) + "%",
-                "&7Pull Strength: &f" + String.format("%.1f", pullStrength),
-                "&7Pulls targets toward you"
-        );
+        return applyLoreTemplates(Map.of(
+                "procChance", String.format("%.1f", procChance),
+                "pullStrength", String.format("%.1f", pullStrength)
+        ));
     }
 
     @Override
@@ -123,7 +118,9 @@ public class UndertowSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("%.1f Pull Strength", calculatePullStrength(skillLevel));
+        return applyFormattedBonusTemplate(Map.of(
+                "pullStrength", String.format("%.1f", calculatePullStrength(skillLevel))
+        ));
     }
 
     @Override

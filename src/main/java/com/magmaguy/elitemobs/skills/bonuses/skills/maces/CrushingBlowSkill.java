@@ -6,17 +6,16 @@ import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.ProcSkill;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Crushing Blow (PROC) - Chance to ignore enemy armor.
@@ -28,7 +27,7 @@ public class CrushingBlowSkill extends SkillBonus implements ProcSkill {
     private static final double BASE_PROC_CHANCE = 0.12;
     private static final double BASE_ARMOR_IGNORE = 0.25; // 25% armor ignored
 
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public CrushingBlowSkill() {
         super(SkillType.MACES, 10, "Crushing Blow",
@@ -65,11 +64,6 @@ public class CrushingBlowSkill extends SkillBonus implements ProcSkill {
             );
             player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_LAND, 0.5f, 1.5f);
         }
-
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-            TextComponent.fromLegacyText("\u00A7e\u00A7lCRUSHING BLOW!"));
-
-        incrementProcCount(player);
     }
 
     @Override
@@ -99,10 +93,10 @@ public class CrushingBlowSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        return List.of(
-            "&7Proc Chance: &f" + String.format("%.1f", getProcChance(skillLevel) * 100) + "%",
-            "&7Armor Ignored: &f" + String.format("%.0f", getArmorIgnore(skillLevel) * 100) + "%"
-        );
+        return applyLoreTemplates(Map.of(
+                "procChance", String.format("%.1f", getProcChance(skillLevel) * 100),
+                "armorIgnore", String.format("%.0f", getArmorIgnore(skillLevel) * 100)
+        ));
     }
 
     @Override
@@ -112,7 +106,9 @@ public class CrushingBlowSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("%.0f%% Armor Pen (proc)", getArmorIgnore(skillLevel) * 100);
+        return applyFormattedBonusTemplate(Map.of(
+                "armorIgnore", String.format("%.0f", getArmorIgnore(skillLevel) * 100)
+        ));
     }
 
     @Override

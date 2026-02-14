@@ -11,5 +11,11 @@ public class TridentsTidalSurgeConfig extends SkillBonusConfigFields {
         super("tridents_tidal_surge.yml", true, "&9Tidal Surge",
               List.of("&7Create a wave that knocks", "&7back nearby enemies. 20s CD."),
               SkillType.TRIDENTS, 2, 1.0, 0.02, 0.0, 20.0, Material.WATER_BUCKET, true);
+        this.loreTemplates = List.of(
+                "&7Cooldown: &f$cooldowns",
+                "&7Knockback: &f$knockback",
+                "&7Radius: &f$radius blocks"
+        );
+        this.formattedBonusTemplate = "$knockback Knockback";
     }
 }

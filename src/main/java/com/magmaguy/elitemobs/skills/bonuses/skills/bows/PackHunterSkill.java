@@ -1,17 +1,18 @@
 package com.magmaguy.elitemobs.skills.bonuses.skills.bows;
 
-import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
-import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.ConditionalSkill;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.entity.Player;
 
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Pack Hunter (CONDITIONAL) - Bonus damage when allies are nearby.
@@ -23,7 +24,7 @@ public class PackHunterSkill extends SkillBonus implements ConditionalSkill {
     private static final double ALLY_RANGE = 10.0;
     private static final double BASE_BONUS_PER_ALLY = 0.08; // 8% per ally
 
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public PackHunterSkill() {
         super(SkillType.BOWS, 10, "Pack Hunter",
@@ -31,8 +32,16 @@ public class PackHunterSkill extends SkillBonus implements ConditionalSkill {
               SkillBonusType.CONDITIONAL, 1, SKILL_ID);
     }
 
+    /**
+     * Test override: when true, conditionMet() always returns true regardless of nearby players.
+     * Used by SkillSystemTest to test PackHunter without requiring multiple online players.
+     */
+    @Getter @Setter
+    private static boolean testOverrideNearbyPlayers = false;
+
     @Override
     public boolean conditionMet(Player player, Object context) {
+        if (testOverrideNearbyPlayers) return true;
         long nearbyPlayers = player.getNearbyEntities(ALLY_RANGE, ALLY_RANGE, ALLY_RANGE).stream()
                 .filter(e -> e instanceof Player && !e.equals(player))
                 .count();
@@ -65,17 +74,20 @@ public class PackHunterSkill extends SkillBonus implements ConditionalSkill {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        return List.of(
-                "&7Bonus per Ally: &f" + String.format("%.1f", getConditionalBonus(skillLevel) * 100) + "%",
-                "&7Max Allies: &f3",
-                "&7Range: &f" + (int)ALLY_RANGE + " blocks"
-        );
+        return applyLoreTemplates(Map.of(
+                "bonusPerAlly", String.format("%.1f", getConditionalBonus(skillLevel) * 100),
+                "range", String.valueOf((int) ALLY_RANGE)
+        ));
     }
 
     @Override
     public double getBonusValue(int skillLevel) { return getConditionalBonus(skillLevel) * 3; }
     @Override
-    public String getFormattedBonus(int skillLevel) { return String.format("+%.1f%% damage per ally", getConditionalBonus(skillLevel) * 100); }
+    public String getFormattedBonus(int skillLevel) {
+        return applyFormattedBonusTemplate(Map.of(
+                "bonusPerAlly", String.format("%.1f", getConditionalBonus(skillLevel) * 100)
+        ));
+    }
     @Override
     public void shutdown() { activePlayers.clear(); }
 }

@@ -6,10 +6,11 @@ import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.ConditionalSkill;
 import org.bukkit.entity.Player;
 
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Riptide Mastery (CONDITIONAL) - Bonus damage when in water or rain.
@@ -22,7 +23,7 @@ public class RiptideMasterySkill extends SkillBonus implements ConditionalSkill 
     private static final double BASE_BONUS = 0.5;
 
     // Track which players have this skill active
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public RiptideMasterySkill() {
         super(SkillType.TRIDENTS, 50, "Riptide Mastery",
@@ -96,11 +97,10 @@ public class RiptideMasterySkill extends SkillBonus implements ConditionalSkill 
     public List<String> getLoreDescription(int skillLevel) {
         double bonus = getConditionalBonus(skillLevel) * 100;
         double doubleBonus = bonus * 1.5;
-        return List.of(
-                "&7Active: &fIn water or rain",
-                "&7Damage Bonus: &f+" + String.format("%.1f", bonus) + "%",
-                "&7Both conditions: &f+" + String.format("%.1f", doubleBonus) + "%"
-        );
+        return applyLoreTemplates(Map.of(
+                "damageBonus", String.format("%.1f", bonus),
+                "doubleBonus", String.format("%.1f", doubleBonus)
+        ));
     }
 
     @Override
@@ -110,7 +110,9 @@ public class RiptideMasterySkill extends SkillBonus implements ConditionalSkill 
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("+%.1f%% (Water/Rain)", getConditionalBonus(skillLevel) * 100);
+        return applyFormattedBonusTemplate(Map.of(
+                "damageBonus", String.format("%.1f", getConditionalBonus(skillLevel) * 100)
+        ));
     }
 
     @Override

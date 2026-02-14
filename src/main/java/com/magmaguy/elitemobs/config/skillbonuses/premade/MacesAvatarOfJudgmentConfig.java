@@ -11,5 +11,11 @@ public class MacesAvatarOfJudgmentConfig extends SkillBonusConfigFields {
         super("maces_avatar_of_judgment.yml", true, "&e&lAvatar of Judgment",
               List.of("&7Become an avatar of divine wrath.", "&7Massive damage boost for 10s. 90s CD."),
               SkillType.MACES, 4, 2.0, 0.03, 0.0, 90.0, Material.NETHER_STAR, true);
+        this.loreTemplates = List.of(
+                "&7Damage Boost: &f+$damageBoost%",
+                "&7Duration: &f10 seconds",
+                "&7Cooldown: &f$cooldown" + "s"
+        );
+        this.formattedBonusTemplate = "+$damageBoost% for 10s (CD: $cooldown" + "s)";
     }
 }

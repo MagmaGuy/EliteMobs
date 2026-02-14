@@ -7,18 +7,17 @@ import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.ProcSkill;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Concussion (PROC) - Chance to daze enemies, reducing their damage.
@@ -30,7 +29,7 @@ public class ConcussionSkill extends SkillBonus implements ProcSkill {
     private static final double BASE_PROC_CHANCE = 0.15;
     private static final int DAZE_DURATION_TICKS = 60; // 3 seconds
 
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public ConcussionSkill() {
         super(SkillType.MACES, 10, "Concussion",
@@ -60,11 +59,6 @@ public class ConcussionSkill extends SkillBonus implements ProcSkill {
         // Visual effect
         target.getWorld().spawnParticle(Particle.CRIT,
             target.getLocation().add(0, 1.5, 0), 15, 0.3, 0.3, 0.3, 0.1);
-
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-            TextComponent.fromLegacyText("\u00A7e\u00A7lCONCUSSION!"));
-
-        incrementProcCount(player);
     }
 
     @Override
@@ -94,11 +88,9 @@ public class ConcussionSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        return List.of(
-            "&7Proc Chance: &f" + String.format("%.1f", getProcChance(skillLevel) * 100) + "%",
-            "&7Duration: &f3 seconds",
-            "&7Applies Weakness"
-        );
+        return applyLoreTemplates(Map.of(
+                "procChance", String.format("%.1f", getProcChance(skillLevel) * 100)
+        ));
     }
 
     @Override
@@ -108,7 +100,9 @@ public class ConcussionSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("%.1f%% Daze Chance", getProcChance(skillLevel) * 100);
+        return applyFormattedBonusTemplate(Map.of(
+                "procChance", String.format("%.1f", getProcChance(skillLevel) * 100)
+        ));
     }
 
     @Override

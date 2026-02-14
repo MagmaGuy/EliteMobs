@@ -12,5 +12,9 @@ public class SpearsPhalanxConfig extends SkillBonusConfigFields {
         super("spears_phalanx.yml", true, "&bPhalanx",
               List.of("&7Reduced damage from", "&7frontal attacks."),
               SkillType.SPEARS, SkillBonusType.PASSIVE, 2, 0.15, 0.002, Material.SHIELD);
+        this.loreTemplates = List.of(
+                "&7Frontal Damage Reduction: &f$value%"
+        );
+        this.formattedBonusTemplate = "-$value% Frontal Damage";
     }
 }

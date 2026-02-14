@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.commands.quests.QuestCommand;
+import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldowns;
 import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
@@ -23,8 +24,8 @@ public class QuestBypassCommand extends AdvancedCommand {
     public void execute(CommandData commandData) {
         QuestCommand.bypassQuestRequirements(commandData.getPlayerSender());
         if (PlayerQuestCooldowns.bypassesQuestRestrictions(commandData.getPlayerSender()))
-            Logger.sendMessage(commandData.getCommandSender(), "Now bypassing quest permission requirements!");
+            Logger.sendMessage(commandData.getCommandSender(), CommandMessagesConfig.getQuestBypassOnMessage());
         else
-            Logger.sendMessage(commandData.getCommandSender(), "No longer bypassing quest permission requirements!");
+            Logger.sendMessage(commandData.getCommandSender(), CommandMessagesConfig.getQuestBypassOffMessage());
     }
 }

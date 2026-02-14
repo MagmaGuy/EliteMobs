@@ -1,21 +1,17 @@
 package com.magmaguy.elitemobs.skills.bonuses.skills.armor;
 
-import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.StackingSkill;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Tier 3 ARMOR skill - Fortify
@@ -23,9 +19,9 @@ import java.util.UUID;
  */
 public class FortifySkill extends SkillBonus implements StackingSkill {
 
-    private static final HashSet<UUID> activePlayers = new HashSet<>();
-    private static final Map<UUID, Integer> stackMap = new HashMap<>();
-    private static final Map<UUID, Long> lastDamageTime = new HashMap<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
+    private static final Map<UUID, Integer> stackMap = new ConcurrentHashMap<>();
+    private static final Map<UUID, Long> lastDamageTime = new ConcurrentHashMap<>();
     private static final long STACK_DECAY_TIME = 10000; // 10 seconds
 
     public FortifySkill() {
@@ -36,13 +32,13 @@ public class FortifySkill extends SkillBonus implements StackingSkill {
             "Build damage reduction stacks when taking damage",
             SkillBonusType.STACKING,
             3,
-            "fortify"
+            "armor_fortify"
         );
     }
 
     @Override
     public void applyBonus(Player player, int skillLevel) {
-        // Stacking bonus is applied when damage is taken
+        activePlayers.add(player.getUniqueId());
     }
 
     @Override
@@ -69,12 +65,9 @@ public class FortifySkill extends SkillBonus implements StackingSkill {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        List<String> lore = new ArrayList<>();
-        lore.add("Build damage reduction stacks when taking damage");
-        lore.add(String.format("Max Stacks: %d", getMaxStacks()));
-        lore.add(String.format("Reduction per Stack: %.1f%%", getBonusPerStack(skillLevel) * 100));
-        lore.add("Stacks decay after 10 seconds without damage");
-        return lore;
+        return applyLoreTemplates(Map.of(
+                "maxStacks", String.valueOf(getMaxStacks()),
+                "reductionPerStack", String.format("%.1f", getBonusPerStack(skillLevel) * 100)));
     }
 
     @Override
@@ -84,8 +77,9 @@ public class FortifySkill extends SkillBonus implements StackingSkill {
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("%.1f%% reduction per stack (max %d)",
-            getBonusPerStack(skillLevel) * 100, getMaxStacks());
+        return applyFormattedBonusTemplate(Map.of(
+                "reductionPerStack", String.format("%.1f", getBonusPerStack(skillLevel) * 100),
+                "maxStacks", String.valueOf(getMaxStacks())));
     }
 
     @Override
@@ -126,10 +120,6 @@ public class FortifySkill extends SkillBonus implements StackingSkill {
         int current = stackMap.getOrDefault(player.getUniqueId(), 0);
         if (current < getMaxStacks()) {
             stackMap.put(player.getUniqueId(), current + 1);
-
-            // Send action bar message
-            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(String.format("Fortify: %d/%d stacks",
-                current + 1, getMaxStacks())));
         }
         lastDamageTime.put(player.getUniqueId(), System.currentTimeMillis());
     }

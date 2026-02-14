@@ -11,5 +11,11 @@ public class TridentsImpaleConfig extends SkillBonusConfigFields {
         super("tridents_impale.yml", true, "&4Impale",
               List.of("&7Chance to impale enemies", "&7for massive bonus damage."),
               SkillType.TRIDENTS, 1, 0.50, 0.01, 0.20, 0.0, Material.TRIDENT, false);
+        this.loreTemplates = List.of(
+                "&7Chance: &f$procChance%",
+                "&7Damage Multiplier: &f$multiplierx",
+                "&7Ignores armor"
+        );
+        this.formattedBonusTemplate = "$multiplierx Damage";
     }
 }

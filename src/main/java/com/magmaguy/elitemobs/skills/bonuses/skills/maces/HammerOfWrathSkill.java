@@ -7,14 +7,16 @@ import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.CooldownSkill;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Hammer of Wrath (COOLDOWN) - Massive damage to enemies below 30% health.
@@ -27,8 +29,8 @@ public class HammerOfWrathSkill extends SkillBonus implements CooldownSkill {
     private static final double HEALTH_THRESHOLD = 0.30; // 30% health
     private static final double BASE_DAMAGE_MULTIPLIER = 3.0; // 300% damage
 
-    private static final Map<UUID, Long> cooldowns = new HashMap<>();
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Map<UUID, Long> cooldowns = new ConcurrentHashMap<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public HammerOfWrathSkill() {
         super(SkillType.MACES, 75, "Hammer of Wrath",
@@ -112,11 +114,7 @@ public class HammerOfWrathSkill extends SkillBonus implements CooldownSkill {
         target.getWorld().playSound(target.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1.0f, 0.7f);
         target.getWorld().playSound(target.getLocation(), Sound.BLOCK_ANVIL_LAND, 1.0f, 0.5f);
 
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-            TextComponent.fromLegacyText("\u00A7e\u00A7lHAMMER OF WRATH!"));
-
         startCooldown(player, skillLevel);
-        incrementProcCount(player);
     }
 
     public double getDamageMultiplier(int skillLevel) {
@@ -154,11 +152,10 @@ public class HammerOfWrathSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        return List.of(
-            "&7Damage: &f" + String.format("%.0f", getDamageMultiplier(skillLevel) * 100) + "%",
-            "&7Threshold: &f<30% HP",
-            "&7Cooldown: &f" + getCooldownSeconds(skillLevel) + "s"
-        );
+        return applyLoreTemplates(Map.of(
+                "damage", String.format("%.0f", getDamageMultiplier(skillLevel) * 100),
+                "cooldown", String.valueOf(getCooldownSeconds(skillLevel))
+        ));
     }
 
     @Override
@@ -168,7 +165,10 @@ public class HammerOfWrathSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("%.0f%% vs Low HP (CD: %ds)", getDamageMultiplier(skillLevel) * 100, getCooldownSeconds(skillLevel));
+        return applyFormattedBonusTemplate(Map.of(
+                "damage", String.format("%.0f", getDamageMultiplier(skillLevel) * 100),
+                "cooldown", String.valueOf(getCooldownSeconds(skillLevel))
+        ));
     }
 
     @Override

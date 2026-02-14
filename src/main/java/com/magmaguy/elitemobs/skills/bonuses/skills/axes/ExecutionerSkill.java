@@ -10,10 +10,11 @@ import com.magmaguy.elitemobs.skills.bonuses.interfaces.ConditionalSkill;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Executioner (CONDITIONAL) - Bonus damage to enemies below 40% HP.
@@ -25,7 +26,7 @@ public class ExecutionerSkill extends SkillBonus implements ConditionalSkill {
     private static final double BASE_DAMAGE_BONUS = 0.40;
     private static final double HEALTH_THRESHOLD = 0.40;
 
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public ExecutionerSkill() {
         super(SkillType.AXES, 25, "Executioner",
@@ -72,16 +73,17 @@ public class ExecutionerSkill extends SkillBonus implements ConditionalSkill {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        return List.of(
-                "&7Execute Bonus: &f+" + String.format("%.0f", getConditionalBonus(skillLevel) * 100) + "%",
-                "&7Threshold: &fBelow 40% HP"
-        );
+        return applyLoreTemplates(Map.of(
+                "executeBonus", String.format("%.0f", getConditionalBonus(skillLevel) * 100)
+        ));
     }
 
     @Override
+    public TestStrategy getTestStrategy() { return TestStrategy.CONDITION_SETUP; }
+    @Override
     public double getBonusValue(int skillLevel) { return getConditionalBonus(skillLevel); }
     @Override
-    public String getFormattedBonus(int skillLevel) { return String.format("+%.0f%% Execute Damage", getConditionalBonus(skillLevel) * 100); }
+    public String getFormattedBonus(int skillLevel) { return applyFormattedBonusTemplate(Map.of("executeBonus", String.format("%.0f", getConditionalBonus(skillLevel) * 100))); }
     @Override
     public void shutdown() { activePlayers.clear(); }
 }

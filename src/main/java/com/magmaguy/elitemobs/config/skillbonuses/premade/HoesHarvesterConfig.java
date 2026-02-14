@@ -12,5 +12,11 @@ public class HoesHarvesterConfig extends SkillBonusConfigFields {
         super("hoes_harvester.yml", true, "&aHarvester",
               List.of("&7Increased loot drops", "&7from slain enemies."),
               SkillType.HOES, SkillBonusType.PASSIVE, 2, 0.25, 0.005, Material.WHEAT);
+        this.loreTemplates = List.of(
+                "&7Damage Bonus: &f+$damagePercent%",
+                "&7Loot Quality: &f+$lootPercent%",
+                "&7Passive harvest benefits"
+        );
+        this.formattedBonusTemplate = "+$damagePercent% Damage & Loot";
     }
 }

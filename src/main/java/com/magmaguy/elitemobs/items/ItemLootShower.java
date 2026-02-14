@@ -77,7 +77,7 @@ public class ItemLootShower {
                         return;
                     }
                     player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(
-                            ChatColorConverter.convert(ItemSettingsConfig.getLevelRangeTooDifferent())
+                            ItemSettingsConfig.getLevelRangeTooDifferent()
                                     .replace("$playerLevel", ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getFullPlayerTier(false) + "")
                                     .replace("$bossLevel", (int) mobLevel + "")));
                 }
@@ -140,9 +140,9 @@ public class ItemLootShower {
                     return;
                 }
 
-                player.sendMessage(ChatColorConverter.convert(EconomySettingsConfig.getChatCurrencyShowerMessage()
+                player.sendMessage(EconomySettingsConfig.getChatCurrencyShowerMessage()
                         .replace("$currency_name", EconomySettingsConfig.getCurrencyName())
-                        .replace("$amount", playerCurrencyPickup.get(playerUUID) + "")));
+                        .replace("$amount", playerCurrencyPickup.get(playerUUID) + ""));
 
                 playerCurrencyPickup.remove(playerUUID);
                 sendAdventurersGuildNotification(player);
@@ -157,7 +157,7 @@ public class ItemLootShower {
 
     private static void sendAdventurersGuildNotification(Player player) {
         player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                TextComponent.fromLegacyText(ChatColorConverter.convert(EconomySettingsConfig.getAdventurersGuildNotificationMessage())));
+                TextComponent.fromLegacyText(EconomySettingsConfig.getAdventurersGuildNotificationMessage()));
     }
 
     private void addIndirectly(Location location, int currencyAmount2) {
@@ -232,9 +232,9 @@ public class ItemLootShower {
 
     private void addDirectly(double eliteMobTier) {
         EconomyHandler.addCurrency(player.getUniqueId(), getCurrencyAmount(eliteMobTier));
-        player.sendMessage(ChatColorConverter.convert(EconomySettingsConfig.getChatCurrencyShowerMessage()
+        player.sendMessage(EconomySettingsConfig.getChatCurrencyShowerMessage()
                 .replace("$currency_name", EconomySettingsConfig.getCurrencyName())
-                .replace("$amount", getCurrencyAmount(eliteMobTier) + "")));
+                .replace("$amount", getCurrencyAmount(eliteMobTier) + ""));
     }
 
     /**
@@ -426,9 +426,9 @@ public class ItemLootShower {
 
             player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
                     TextComponent.fromLegacyText(
-                            ChatColorConverter.convert(EconomySettingsConfig.getActionBarCurrencyShowerMessage()
+                            EconomySettingsConfig.getActionBarCurrencyShowerMessage()
                                     .replace("$currency_name", EconomySettingsConfig.getCurrencyName())
-                                    .replace("$amount", Round.twoDecimalPlaces(playerCurrencyPickup.get(playerUUID)) + ""))));
+                                    .replace("$amount", Round.twoDecimalPlaces(playerCurrencyPickup.get(playerUUID)) + "")));
         }
 
         @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
@@ -558,9 +558,9 @@ public class ItemLootShower {
 
             targetPlayer.spigot().sendMessage(ChatMessageType.ACTION_BAR,
                     TextComponent.fromLegacyText(
-                            ChatColorConverter.convert(EconomySettingsConfig.getActionBarCurrencyShowerMessage()
+                            EconomySettingsConfig.getActionBarCurrencyShowerMessage()
                                     .replace("$currency_name", EconomySettingsConfig.getCurrencyName())
-                                    .replace("$amount", Round.twoDecimalPlaces(playerCurrencyPickup.get(playerUUID)) + ""))));
+                                    .replace("$amount", Round.twoDecimalPlaces(playerCurrencyPickup.get(playerUUID)) + "")));
         }
     }
 
@@ -627,9 +627,9 @@ public class ItemLootShower {
 
                         player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
                                 TextComponent.fromLegacyText(
-                                        ChatColorConverter.convert(EconomySettingsConfig.getActionBarCurrencyShowerMessage()
+                                        EconomySettingsConfig.getActionBarCurrencyShowerMessage()
                                                 .replace("$currency_name", EconomySettingsConfig.getCurrencyName())
-                                                .replace("$amount", Round.twoDecimalPlaces(playerCurrencyPickup.get(coinPlayerUUID)) + ""))));
+                                                .replace("$amount", Round.twoDecimalPlaces(playerCurrencyPickup.get(coinPlayerUUID)) + "")));
                         coinValues.remove(item.getUniqueId());
                         cancel();
                         return;

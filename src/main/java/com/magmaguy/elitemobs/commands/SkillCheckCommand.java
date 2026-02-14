@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.commands;
 
+import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.SkillXPCalculator;
@@ -28,11 +29,11 @@ public class SkillCheckCommand extends AdvancedCommand {
 
         Player targetPlayer = Bukkit.getPlayer(playerName);
         if (targetPlayer == null) {
-            Logger.sendMessage(commandData.getCommandSender(), "&cPlayer not found: " + playerName);
+            Logger.sendMessage(commandData.getCommandSender(), CommandMessagesConfig.getSkillPlayerNotFoundMessage().replace("$player", playerName));
             return;
         }
 
-        Logger.sendMessage(commandData.getCommandSender(), "&6=== " + targetPlayer.getName() + "'s Skills ===");
+        Logger.sendMessage(commandData.getCommandSender(), CommandMessagesConfig.getSkillCheckHeaderMessage().replace("$player", targetPlayer.getName()));
 
         for (SkillType skillType : SkillType.values()) {
             long xp = PlayerData.getSkillXP(targetPlayer.getUniqueId(), skillType);
@@ -42,12 +43,12 @@ public class SkillCheckCommand extends AdvancedCommand {
             double progress = SkillXPCalculator.levelProgress(xp) * 100;
 
             Logger.sendMessage(commandData.getCommandSender(),
-                    String.format("&7%s: &aLevel %d &7(%s/%s XP, %.1f%%)",
-                            skillType.getDisplayName(),
-                            level,
-                            formatNumber(xpProgress),
-                            formatNumber(xpNeeded),
-                            progress));
+                    CommandMessagesConfig.getSkillCheckEntryFormat()
+                            .replace("$skill", skillType.getDisplayName())
+                            .replace("$level", String.valueOf(level))
+                            .replace("$xpProgress", formatNumber(xpProgress))
+                            .replace("$xpNeeded", formatNumber(xpNeeded))
+                            .replace("$progress", String.format("%.1f", progress)));
         }
     }
 

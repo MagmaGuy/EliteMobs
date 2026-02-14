@@ -6,8 +6,6 @@ import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
@@ -16,10 +14,11 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Stunning Force (PASSIVE) - Increased knockback, chance to root enemies.
@@ -32,7 +31,7 @@ public class StunningForceSkill extends SkillBonus {
     private static final double BASE_ROOT_CHANCE = 0.15;
     private static final int ROOT_DURATION_TICKS = 40; // 2 seconds
 
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public StunningForceSkill() {
         super(SkillType.MACES, 50, "Stunning Force",
@@ -81,11 +80,6 @@ public class StunningForceSkill extends SkillBonus {
             target.getLocation(), 20, 0.3, 0.1, 0.3, 0,
             org.bukkit.Material.IRON_BARS.createBlockData());
         target.getWorld().playSound(target.getLocation(), Sound.BLOCK_IRON_DOOR_CLOSE, 1.0f, 0.5f);
-
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-            TextComponent.fromLegacyText("\u00A7e\u00A7lROOTED!"));
-
-        incrementProcCount(player);
     }
 
     @Override
@@ -115,11 +109,10 @@ public class StunningForceSkill extends SkillBonus {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        return List.of(
-            "&7Knockback: &f" + String.format("%.0f", getKnockbackMultiplier(skillLevel) * 100) + "%",
-            "&7Root Chance: &f" + String.format("%.1f", getRootChance(skillLevel) * 100) + "%",
-            "&7Root Duration: &f2 seconds"
-        );
+        return applyLoreTemplates(Map.of(
+                "knockback", String.format("%.0f", getKnockbackMultiplier(skillLevel) * 100),
+                "rootChance", String.format("%.1f", getRootChance(skillLevel) * 100)
+        ));
     }
 
     @Override
@@ -129,8 +122,10 @@ public class StunningForceSkill extends SkillBonus {
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("%.0f%% Knockback, %.1f%% Root",
-            getKnockbackMultiplier(skillLevel) * 100, getRootChance(skillLevel) * 100);
+        return applyFormattedBonusTemplate(Map.of(
+                "knockback", String.format("%.0f", getKnockbackMultiplier(skillLevel) * 100),
+                "rootChance", String.format("%.1f", getRootChance(skillLevel) * 100)
+        ));
     }
 
     @Override

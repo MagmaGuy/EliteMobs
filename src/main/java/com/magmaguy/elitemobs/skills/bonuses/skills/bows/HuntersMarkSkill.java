@@ -5,14 +5,16 @@ import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.ProcSkill;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Hunter's Mark (PROC) - Mark enemies to take bonus damage.
@@ -25,9 +27,9 @@ public class HuntersMarkSkill extends SkillBonus implements ProcSkill {
     private static final long MARK_DURATION = 10000; // 10 seconds
     private static final double BASE_BONUS_DAMAGE = 0.20; // 20% bonus to marked
 
-    private static final Set<UUID> activePlayers = new HashSet<>();
-    private static final Map<UUID, UUID> markedTargets = new HashMap<>(); // Target UUID -> Marker UUID
-    private static final Map<UUID, Long> markExpiry = new HashMap<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
+    private static final Map<UUID, UUID> markedTargets = new ConcurrentHashMap<>(); // Target UUID -> Marker UUID
+    private static final Map<UUID, Long> markExpiry = new ConcurrentHashMap<>();
 
     public HuntersMarkSkill() {
         super(SkillType.BOWS, 25, "Hunter's Mark",
@@ -49,8 +51,6 @@ public class HuntersMarkSkill extends SkillBonus implements ProcSkill {
         markedTargets.put(target.getUniqueId(), player.getUniqueId());
         markExpiry.put(target.getUniqueId(), System.currentTimeMillis() + MARK_DURATION);
         target.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, (int)(MARK_DURATION / 50), 0));
-
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("§6TARGET MARKED!"));
     }
 
     public static boolean isMarkedBy(LivingEntity target, Player player) {
@@ -82,17 +82,20 @@ public class HuntersMarkSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        return List.of(
-                "&7Proc Chance: &f" + String.format("%.1f", getProcChance(skillLevel) * 100) + "%",
-                "&7Mark Bonus: &f" + String.format("%.1f", getMarkBonus(skillLevel) * 100) + "% damage",
-                "&7Duration: &f10 seconds"
-        );
+        return applyLoreTemplates(Map.of(
+                "procChance", String.format("%.1f", getProcChance(skillLevel) * 100),
+                "markBonus", String.format("%.1f", getMarkBonus(skillLevel) * 100)
+        ));
     }
 
     @Override
     public double getBonusValue(int skillLevel) { return getMarkBonus(skillLevel); }
     @Override
-    public String getFormattedBonus(int skillLevel) { return String.format("+%.1f%% to marked targets", getMarkBonus(skillLevel) * 100); }
+    public String getFormattedBonus(int skillLevel) {
+        return applyFormattedBonusTemplate(Map.of(
+                "markBonus", String.format("%.1f", getMarkBonus(skillLevel) * 100)
+        ));
+    }
     @Override
     public boolean affectsDamage() { return false; } // Proc applies mark, bonus checked separately on marked targets
     @Override

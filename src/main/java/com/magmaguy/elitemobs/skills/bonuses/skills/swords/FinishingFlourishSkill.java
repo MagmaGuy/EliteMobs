@@ -7,15 +7,14 @@ import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.ConditionalSkill;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Finishing Flourish (CONDITIONAL) - Execute: Deal bonus damage to low HP enemies.
@@ -28,7 +27,7 @@ public class FinishingFlourishSkill extends SkillBonus implements ConditionalSki
     private static final double BASE_EXECUTE_BONUS = 0.50; // 50% bonus damage
     private static final double HEALTH_THRESHOLD = 0.30; // 30% HP threshold
 
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public FinishingFlourishSkill() {
         super(SkillType.SWORDS, 50, "Finishing Flourish",
@@ -72,9 +71,6 @@ public class FinishingFlourishSkill extends SkillBonus implements ConditionalSki
         int skillLevel = SkillBonusRegistry.getPlayerSkillLevel(player, SkillType.SWORDS);
         double bonus = BASE_EXECUTE_BONUS + (skillLevel * 0.01);
 
-        // Visual feedback
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("§c§lFINISHING FLOURISH!"));
-
         return currentDamage * (1 + bonus);
     }
 
@@ -106,12 +102,11 @@ public class FinishingFlourishSkill extends SkillBonus implements ConditionalSki
     @Override
     public List<String> getLoreDescription(int skillLevel) {
         double bonus = getConditionalBonus(skillLevel) * 100;
-        return List.of(
-                "&7Execute Damage: &f+" + String.format("%.0f", bonus) + "%",
-                "&7Threshold: &fBelow 30% HP",
-                "&7Finish off weakened enemies!"
-        );
+        return applyLoreTemplates(Map.of("value", String.format("%.0f", bonus)));
     }
+
+    @Override
+    public TestStrategy getTestStrategy() { return TestStrategy.CONDITION_SETUP; }
 
     @Override
     public double getBonusValue(int skillLevel) {
@@ -120,7 +115,7 @@ public class FinishingFlourishSkill extends SkillBonus implements ConditionalSki
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("+%.0f%% Execute Damage", getConditionalBonus(skillLevel) * 100);
+        return applyFormattedBonusTemplate(Map.of("value", String.format("%.0f", getConditionalBonus(skillLevel) * 100)));
     }
 
     @Override

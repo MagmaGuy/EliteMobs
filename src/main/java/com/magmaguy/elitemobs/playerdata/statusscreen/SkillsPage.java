@@ -14,6 +14,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -38,7 +39,7 @@ public class SkillsPage {
         TextComponent textComponent = new TextComponent();
 
         // Header
-        TextComponent header = new TextComponent("\u00A75\u00A7lYour Skills\n\n");
+        TextComponent header = new TextComponent(PlayerStatusMenuConfig.getSkillsPageHeader() + "\n\n");
         textComponent.addExtra(header);
 
         // Add each skill
@@ -52,10 +53,15 @@ public class SkillsPage {
             // Create progress bar
             String progressBar = createProgressBar(progress);
 
-            TextComponent line = new TextComponent(
-                    "\u00A76" + skillType.getDisplayName() + " \u00A77Lv.\u00A7e" + level + "\n" +
-                            "\u00A78" + progressBar + " \u00A77" + formatNumber(xpInLevel) + "/" + formatNumber(xpForNext) + "\n\n"
-            );
+            String levelLine = PlayerStatusMenuConfig.getSkillsPageLevelFormat()
+                    .replace("$skillName", skillType.getDisplayName())
+                    .replace("$level", String.valueOf(level));
+            String xpLine = PlayerStatusMenuConfig.getSkillsPageXpFormat()
+                    .replace("$progressBar", progressBar)
+                    .replace("$currentXp", formatNumber(xpInLevel))
+                    .replace("$nextXp", formatNumber(xpForNext));
+
+            TextComponent line = new TextComponent(levelLine + "\n" + xpLine + "\n\n");
             textComponent.addExtra(line);
         }
 
@@ -97,29 +103,19 @@ public class SkillsPage {
 
         long totalXP = PlayerData.getSkillXP(player.getUniqueId(), skillType);
         int level = SkillXPCalculator.levelFromTotalXP(totalXP);
-        long xpInLevel = SkillXPCalculator.xpProgressInCurrentLevel(totalXP);
-        long xpForNext = SkillXPCalculator.xpToNextLevel(level);
-        double progress = SkillXPCalculator.levelProgress(totalXP);
 
         // Display name with level
-        meta.setDisplayName("\u00A76\u00A7l" + skillType.getDisplayName() + " \u00A77- Level \u00A7e" + level);
+        meta.setDisplayName(PlayerStatusMenuConfig.getSkillItemDisplayNameFormat()
+                .replace("$level", String.valueOf(level))
+                .replace("$skillName", skillType.getDisplayName()));
 
-        // Lore with XP info
+        // Lore
         List<String> lore = new ArrayList<>();
-        lore.add("");
-        lore.add("\u00A77XP Progress:");
-        lore.add("\u00A78" + createProgressBar(progress));
-        lore.add("\u00A77" + formatNumber(xpInLevel) + " / " + formatNumber(xpForNext) + " XP");
-        lore.add("");
-        lore.add("\u00A77Total XP: \u00A7e" + formatNumber(totalXP));
-
-        // Kills to next level estimate (fighting same-level mobs)
-        if (level < 200) {
-            long killsNeeded = SkillXPCalculator.killsToNextLevel(level, level);
-            lore.add("\u00A77Kills to next: \u00A7a~" + formatNumber(killsNeeded));
-        }
+        lore.add(PlayerStatusMenuConfig.getSkillItemSelectLore1());
+        lore.add(PlayerStatusMenuConfig.getSkillItemSelectLore2());
 
         meta.setLore(lore);
+        meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
         item.setItemMeta(meta);
 
         return item;

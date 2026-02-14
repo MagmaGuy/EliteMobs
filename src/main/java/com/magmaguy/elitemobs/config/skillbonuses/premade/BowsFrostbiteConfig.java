@@ -11,5 +11,10 @@ public class BowsFrostbiteConfig extends SkillBonusConfigFields {
         super("bows_frostbite.yml", true, "&bFrostbite",
               List.of("&7Arrows can freeze enemies,", "&7slowing their movement."),
               SkillType.BOWS, 1, 0.15, 0.003, 0.15, 0.0, Material.PACKED_ICE, false);
+        this.loreTemplates = List.of(
+                "&7Proc Chance: &f$procChance%",
+                "&7Applies: &bSlowness &7and &8Mining Fatigue"
+        );
+        this.formattedBonusTemplate = "$procChance% proc chance";
     }
 }

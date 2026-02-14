@@ -10,11 +10,8 @@ import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Ricochet (PROC) - Arrows bounce to nearby enemies.
@@ -27,7 +24,7 @@ public class RicochetSkill extends SkillBonus implements ProcSkill {
     private static final double RICOCHET_RANGE = 5.0;
     private static final double BASE_RICOCHET_DAMAGE = 0.50; // 50% of original damage
 
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public RicochetSkill() {
         super(SkillType.BOWS, 50, "Ricochet",
@@ -86,17 +83,21 @@ public class RicochetSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        return List.of(
-                "&7Proc Chance: &f" + String.format("%.1f", getProcChance(skillLevel) * 100) + "%",
-                "&7Ricochet Damage: &f" + String.format("%.0f", getRicochetDamageMultiplier(skillLevel) * 100) + "%",
-                "&7Range: &f" + (int)RICOCHET_RANGE + " blocks"
-        );
+        return applyLoreTemplates(Map.of(
+                "procChance", String.format("%.1f", getProcChance(skillLevel) * 100),
+                "ricochetDamage", String.format("%.0f", getRicochetDamageMultiplier(skillLevel) * 100),
+                "range", String.valueOf((int) RICOCHET_RANGE)
+        ));
     }
 
     @Override
     public double getBonusValue(int skillLevel) { return getRicochetDamageMultiplier(skillLevel); }
     @Override
-    public String getFormattedBonus(int skillLevel) { return String.format("%.0f%% ricochet damage", getRicochetDamageMultiplier(skillLevel) * 100); }
+    public String getFormattedBonus(int skillLevel) {
+        return applyFormattedBonusTemplate(Map.of(
+                "ricochetDamage", String.format("%.0f", getRicochetDamageMultiplier(skillLevel) * 100)
+        ));
+    }
     @Override
     public void shutdown() { activePlayers.clear(); }
 }

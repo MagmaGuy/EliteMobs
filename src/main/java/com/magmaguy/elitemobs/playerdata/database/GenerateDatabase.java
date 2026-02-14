@@ -28,6 +28,7 @@ public class GenerateDatabase {
                 "UseBookMenus TINYINT(1), " +
                 "DismissEMStatusScreenMessage TINYINT(1), " +
                 "DungeonBossLockouts BLOB, " +
+                "QuestLockouts BLOB, " +
                 "SkillXP_ARMOR BIGINT, " +
                 "SkillXP_SWORDS BIGINT, " +
                 "SkillXP_AXES BIGINT, " +
@@ -57,6 +58,7 @@ public class GenerateDatabase {
         addEntryIfEmpty("UseBookMenus", ColumnValues.BOOLEAN);
         addEntryIfEmpty("DismissEMStatusScreenMessage", ColumnValues.BOOLEAN);
         addEntryIfEmpty("DungeonBossLockouts", ColumnValues.BLOB);
+        addEntryIfEmpty("QuestLockouts", ColumnValues.BLOB);
 
         // Skill XP columns
         addEntryIfEmpty("SkillXP_ARMOR", ColumnValues.BIGINT);

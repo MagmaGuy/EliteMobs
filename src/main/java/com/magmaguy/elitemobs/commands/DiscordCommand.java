@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.commands;
 
+import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
@@ -17,6 +18,6 @@ public class DiscordCommand extends AdvancedCommand {
 
     @Override
     public void execute(CommandData commandData) {
-        Logger.sendMessage(commandData.getPlayerSender(), "&6Discord room for support & downloads: &9" + DiscordLinks.mainLink);
+        Logger.sendMessage(commandData.getPlayerSender(), CommandMessagesConfig.getDiscordMessage() + DiscordLinks.mainLink);
     }
 }

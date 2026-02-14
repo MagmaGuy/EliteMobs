@@ -1,19 +1,14 @@
 package com.magmaguy.elitemobs.items.itemconstructor;
 
-import com.magmaguy.elitemobs.config.ProceduralItemGenerationSettingsConfig;
+import com.magmaguy.elitemobs.config.StaticItemNamesConfig;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Material;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class NameGenerator {
-    private static final List<String> nouns = ProceduralItemGenerationSettingsConfig.getNouns();
-    private static final List<String> adjectives = ProceduralItemGenerationSettingsConfig.getAdjectives();
-    private static final List<String> verbs = ProceduralItemGenerationSettingsConfig.getVerbs();
-    private static final List<String> verbers = ProceduralItemGenerationSettingsConfig.getVerbers();
 
     private NameGenerator() {
     }
@@ -23,90 +18,86 @@ public class NameGenerator {
     }
 
     public static String generateName(Material material) {
-
-        int nounConstructorSelector = ThreadLocalRandom.current().nextInt(ProceduralItemGenerationSettingsConfig.getNameFormat().size());
-
-        return (ProceduralItemGenerationSettingsConfig.getNameFormat().get(nounConstructorSelector))
-                .replace("$noun", nouns.get(ThreadLocalRandom.current().nextInt(nouns.size())))
-                .replace("$verb-er", verbers.get(ThreadLocalRandom.current().nextInt(verbers.size())))
-                .replace("$verb", verbs.get(ThreadLocalRandom.current().nextInt(verbs.size())))
-                .replace("$itemType", materialStringParser(material))
-                .replace("$adjective", adjectives.get(ThreadLocalRandom.current().nextInt(adjectives.size())));
-
+        List<String> names = getNameListForMaterial(material);
+        if (names == null || names.isEmpty()) {
+            Logger.warn("Found unexpected material type in procedurally generated loot. Can't generate item name.");
+            Logger.warn("Material name: " + material);
+            return "";
+        }
+        return names.get(ThreadLocalRandom.current().nextInt(names.size()));
     }
 
-    private static String materialStringParser(Material material) {
-
+    private static List<String> getNameListForMaterial(Material material) {
         switch (material) {
             case DIAMOND_SWORD:
             case GOLDEN_SWORD:
             case IRON_SWORD:
             case STONE_SWORD:
             case WOODEN_SWORD:
-                return ProceduralItemGenerationSettingsConfig.getSwordName();
+                return StaticItemNamesConfig.getSwordNames();
             case BOW:
-                return ProceduralItemGenerationSettingsConfig.getBowName();
+                return StaticItemNamesConfig.getBowNames();
             case DIAMOND_PICKAXE:
             case GOLDEN_PICKAXE:
             case IRON_PICKAXE:
             case STONE_PICKAXE:
             case WOODEN_PICKAXE:
-                return ProceduralItemGenerationSettingsConfig.getPickaxeName();
+                return StaticItemNamesConfig.getPickaxeNames();
             case DIAMOND_SHOVEL:
             case GOLDEN_SHOVEL:
             case IRON_SHOVEL:
             case STONE_SHOVEL:
             case WOODEN_SHOVEL:
-                return ProceduralItemGenerationSettingsConfig.getSpadeName();
+                return StaticItemNamesConfig.getShovelNames();
             case DIAMOND_HOE:
             case GOLDEN_HOE:
             case IRON_HOE:
             case STONE_HOE:
             case WOODEN_HOE:
-                return ProceduralItemGenerationSettingsConfig.getHoeName();
+                return StaticItemNamesConfig.getHoeNames();
             case DIAMOND_AXE:
             case GOLDEN_AXE:
             case IRON_AXE:
             case STONE_AXE:
             case WOODEN_AXE:
-                return ProceduralItemGenerationSettingsConfig.getAxeName();
+                return StaticItemNamesConfig.getAxeNames();
             case CHAINMAIL_HELMET:
             case DIAMOND_HELMET:
             case GOLDEN_HELMET:
             case IRON_HELMET:
             case LEATHER_HELMET:
             case TURTLE_HELMET:
-                return ProceduralItemGenerationSettingsConfig.getHelmetName();
+                return StaticItemNamesConfig.getHelmetNames();
             case CHAINMAIL_CHESTPLATE:
             case DIAMOND_CHESTPLATE:
             case GOLDEN_CHESTPLATE:
             case IRON_CHESTPLATE:
             case LEATHER_CHESTPLATE:
-                return ProceduralItemGenerationSettingsConfig.getChestplateName();
+                return StaticItemNamesConfig.getChestplateNames();
             case CHAINMAIL_LEGGINGS:
             case DIAMOND_LEGGINGS:
             case GOLDEN_LEGGINGS:
             case IRON_LEGGINGS:
             case LEATHER_LEGGINGS:
-                return ProceduralItemGenerationSettingsConfig.getLeggingsName();
+                return StaticItemNamesConfig.getLeggingsNames();
             case CHAINMAIL_BOOTS:
             case DIAMOND_BOOTS:
             case GOLDEN_BOOTS:
             case IRON_BOOTS:
             case LEATHER_BOOTS:
-                return ProceduralItemGenerationSettingsConfig.getBootsName();
+                return StaticItemNamesConfig.getBootsNames();
             case SHEARS:
-                return ProceduralItemGenerationSettingsConfig.getShearsName();
+                return StaticItemNamesConfig.getShearsNames();
             case FISHING_ROD:
-                return ProceduralItemGenerationSettingsConfig.getFishingRodName();
+                return StaticItemNamesConfig.getFishingRodNames();
             case SHIELD:
-                return ProceduralItemGenerationSettingsConfig.getShieldName();
+                return StaticItemNamesConfig.getShieldNames();
             case TRIDENT:
-                return ProceduralItemGenerationSettingsConfig.getTridentName();
+                return StaticItemNamesConfig.getTridentNames();
             case CROSSBOW:
-                return ProceduralItemGenerationSettingsConfig.getCrossbowName();
+                return StaticItemNamesConfig.getCrossbowNames();
             case MACE:
-                return ProceduralItemGenerationSettingsConfig.getMaceName();
+                return StaticItemNamesConfig.getMaceNames();
             case DIAMOND_SPEAR:
             case IRON_SPEAR:
             case GOLDEN_SPEAR:
@@ -114,17 +105,10 @@ public class NameGenerator {
             case WOODEN_SPEAR:
             case COPPER_SPEAR:
             case NETHERITE_SPEAR:
-                return ProceduralItemGenerationSettingsConfig.getSpearName();
+                return StaticItemNamesConfig.getSpearNames();
+            default:
+                return null;
         }
-
-        if (ProceduralItemGenerationSettingsConfig.getInstance().getFileConfiguration().getString("materialNames." + material.toString().toLowerCase(Locale.ROOT)) != null)
-            return ProceduralItemGenerationSettingsConfig.getInstance().getFileConfiguration().getString("materialNames." + material.toString().toLowerCase(Locale.ROOT));
-
-        Logger.warn("Found unexpected material type in procedurally generated loot. Can't generate item type name.");
-        Logger.warn("Material name: " + material);
-        Logger.warn("If you're trying to set a non-default item type, you need to add the name format like this under materialNames: " + material.toString().toLowerCase(Locale.ROOT) + ": Name");
-        return "";
-
     }
 
 }

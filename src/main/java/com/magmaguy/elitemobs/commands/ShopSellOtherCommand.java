@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.commands;
 
+import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.menus.SellMenu;
 import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
@@ -25,7 +26,7 @@ public class ShopSellOtherCommand extends AdvancedCommand {
         try {
             sellMenu.constructSellMenu(Bukkit.getPlayer(commandData.getStringArgument("player")));
         } catch (Exception ex) {
-            Logger.sendMessage(commandData.getCommandSender(), "Failed to get player with that username!");
+            Logger.sendMessage(commandData.getCommandSender(), CommandMessagesConfig.getShopPlayerNotFoundMessage());
         }
     }
 }

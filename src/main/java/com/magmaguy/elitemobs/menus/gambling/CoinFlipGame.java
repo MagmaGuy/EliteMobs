@@ -13,7 +13,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -48,7 +47,7 @@ public class CoinFlipGame {
         CoinFlipSession session = new CoinFlipSession(player.getUniqueId(), betAmount);
         activeSessions.put(player.getUniqueId(), session);
 
-        String title = ChatColorConverter.convert(GamblingConfig.getCoinFlipMenuTitle());
+        String title = GamblingConfig.getCoinFlipMenuTitle();
         Inventory inventory = Bukkit.createInventory(player, 27, title);
 
         setupInitialDisplay(inventory, session);
@@ -63,11 +62,11 @@ public class CoinFlipGame {
         // Coin display (animated later)
         ItemStack coin = ItemStackGenerator.generateItemStack(
                 Material.GOLD_INGOT,
-                ChatColorConverter.convert("&6&lThe Coin"),
+                GamblingConfig.getCoinFlipCoinTitle(),
                 List.of(
                         "",
-                        ChatColorConverter.convert("&7Choose Heads or Tails!"),
-                        ChatColorConverter.convert("&7The coin will flip...")
+                        GamblingConfig.getCoinFlipChooseLore(),
+                        GamblingConfig.getCoinFlipWillFlipLore()
                 ),
                 1
         );
@@ -76,11 +75,11 @@ public class CoinFlipGame {
         // Heads button
         ItemStack headsButton = ItemStackGenerator.generateItemStack(
                 Material.PLAYER_HEAD,
-                ChatColorConverter.convert("&e&lHEADS"),
+                GamblingConfig.getCoinFlipHeadsButtonText(),
                 List.of(
                         "",
-                        ChatColorConverter.convert("&7Click to bet on Heads!"),
-                        ChatColorConverter.convert("&7Win: &a" + String.format("%.2f", session.betAmount * GamblingConfig.getCoinFlipPayout()) + " coins")
+                        GamblingConfig.getCoinFlipHeadsBetLore(),
+                        ChatColorConverter.convert(GamblingConfig.getCoinFlipWinLore() + String.format("%.2f", session.betAmount * GamblingConfig.getCoinFlipPayout()) + " " + GamblingConfig.getGamblingCurrencyWord())
                 ),
                 1
         );
@@ -89,7 +88,7 @@ public class CoinFlipGame {
         // Result display (empty for now)
         ItemStack resultDisplay = ItemStackGenerator.generateItemStack(
                 Material.GRAY_STAINED_GLASS_PANE,
-                ChatColorConverter.convert("&7Make your choice!"),
+                GamblingConfig.getCoinFlipMakeYourChoice(),
                 List.of(),
                 1
         );
@@ -98,11 +97,11 @@ public class CoinFlipGame {
         // Tails button
         ItemStack tailsButton = ItemStackGenerator.generateItemStack(
                 Material.SUNFLOWER,
-                ChatColorConverter.convert("&6&lTAILS"),
+                GamblingConfig.getCoinFlipTailsButtonText(),
                 List.of(
                         "",
-                        ChatColorConverter.convert("&7Click to bet on Tails!"),
-                        ChatColorConverter.convert("&7Win: &a" + String.format("%.2f", session.betAmount * GamblingConfig.getCoinFlipPayout()) + " coins")
+                        GamblingConfig.getCoinFlipTailsBetLore(),
+                        ChatColorConverter.convert(GamblingConfig.getCoinFlipWinLore() + String.format("%.2f", session.betAmount * GamblingConfig.getCoinFlipPayout()) + " " + GamblingConfig.getGamblingCurrencyWord())
                 ),
                 1
         );
@@ -111,14 +110,14 @@ public class CoinFlipGame {
         // Bet info
         ItemStack betInfo = ItemStackGenerator.generateItemStack(
                 Material.EMERALD,
-                ChatColorConverter.convert("&aBet: " + session.betAmount + " coins"),
+                GamblingConfig.getCoinFlipBetLabel() + session.betAmount + " " + GamblingConfig.getGamblingCurrencyWord(),
                 List.of(
                         "",
-                        ChatColorConverter.convert("&7Normal Win: &a" + String.format("%.2f", session.betAmount * GamblingConfig.getCoinFlipPayout())),
-                        ChatColorConverter.convert("&7Payout: &e" + GamblingConfig.getCoinFlipPayout() + "x"),
+                        GamblingConfig.getCoinFlipNormalWinLabel() + String.format("%.2f", session.betAmount * GamblingConfig.getCoinFlipPayout()),
+                        GamblingConfig.getCoinFlipPayoutLabel() + GamblingConfig.getCoinFlipPayout() + "x",
                         "",
-                        ChatColorConverter.convert("&b✦ 1% chance to land on EDGE!"),
-                        ChatColorConverter.convert("&b✦ Edge Payout: &a10x &7(&a" + String.format("%.2f", session.betAmount * 10.0) + " coins&7)")
+                        GamblingConfig.getCoinFlipEdgeChanceLore(),
+                        ChatColorConverter.convert(GamblingConfig.getCoinFlipEdgePayoutLore() + String.format("%.2f", session.betAmount * 10.0) + " " + GamblingConfig.getGamblingCurrencyWord() + "&7)")
                 ),
                 1
         );
@@ -146,8 +145,7 @@ public class CoinFlipGame {
             session.landedOnEdge = true;
             session.playerWon = true;
             double payout = GamblingEconomyHandler.calculatePayout(session.betAmount, 10.0);
-            GamblingEconomyHandler.awardWinnings(player.getUniqueId(), payout);
-            session.winAmount = payout;
+            session.winAmount = GamblingEconomyHandler.resolveOutcome(player.getUniqueId(), payout);
         } else {
             // Normal flip
             boolean coinIsHeads = ThreadLocalRandom.current().nextBoolean();
@@ -155,11 +153,12 @@ public class CoinFlipGame {
             session.coinResult = coinIsHeads;
             session.playerWon = playerWins;
 
-            // STEP 2: Process winnings BEFORE any animation
+            // STEP 2: Resolve outcome BEFORE any animation
             if (playerWins) {
                 double payout = GamblingEconomyHandler.calculatePayout(session.betAmount, GamblingConfig.getCoinFlipPayout());
-                GamblingEconomyHandler.awardWinnings(player.getUniqueId(), payout);
-                session.winAmount = payout;
+                session.winAmount = GamblingEconomyHandler.resolveOutcome(player.getUniqueId(), payout);
+            } else {
+                GamblingEconomyHandler.resolveOutcome(player.getUniqueId(), 0);
             }
         }
 
@@ -176,7 +175,7 @@ public class CoinFlipGame {
     private static void disableChoiceButtons(Inventory inventory) {
         ItemStack disabled = ItemStackGenerator.generateItemStack(
                 Material.GRAY_STAINED_GLASS_PANE,
-                ChatColorConverter.convert("&7Flipping..."),
+                GamblingConfig.getCoinFlipFlipping(),
                 List.of(),
                 1
         );
@@ -204,12 +203,12 @@ public class CoinFlipGame {
                 if (ticks < totalTicks) {
                     // Alternate between heads and tails appearance
                     Material coinMaterial = showingHeads ? Material.PLAYER_HEAD : Material.SUNFLOWER;
-                    String coinName = showingHeads ? "&e&lHEADS" : "&6&lTAILS";
+                    String coinName = showingHeads ? GamblingConfig.getCoinFlipHeadsText() : GamblingConfig.getCoinFlipTailsText();
 
                     ItemStack animatedCoin = ItemStackGenerator.generateItemStack(
                             coinMaterial,
                             ChatColorConverter.convert(coinName),
-                            List.of(ChatColorConverter.convert("&7Flipping...")),
+                            List.of(GamblingConfig.getCoinFlipFlipping()),
                             1
                     );
                     inventory.setItem(COIN_SLOT, animatedCoin);
@@ -237,34 +236,34 @@ public class CoinFlipGame {
             // EDGE! Super rare outcome - special display
             ItemStack edgeCoin = ItemStackGenerator.generateItemStack(
                     Material.IRON_NUGGET,
-                    ChatColorConverter.convert("&b&l✦ EDGE! ✦"),
-                    List.of(ChatColorConverter.convert("&7The coin landed on its &bEDGE&7!")),
+                    GamblingConfig.getCoinFlipEdgeCoinTitle(),
+                    List.of(GamblingConfig.getCoinFlipEdgeCoinLore()),
                     1
             );
             inventory.setItem(COIN_SLOT, edgeCoin);
 
             ItemStack edgeResult = ItemStackGenerator.generateItemStack(
                     Material.DIAMOND_BLOCK,
-                    ChatColorConverter.convert("&b&l✦ INCREDIBLE! ✦"),
+                    GamblingConfig.getCoinFlipEdgeResultTitle(),
                     List.of(
                             "",
-                            ChatColorConverter.convert("&7The coin landed on its &bEDGE&7!"),
-                            ChatColorConverter.convert("&7This is incredibly rare! (1% chance)"),
+                            GamblingConfig.getCoinFlipEdgeLandedLore(),
+                            GamblingConfig.getCoinFlipEdgeRareLore(),
                             "",
-                            ChatColorConverter.convert("&7You won &a" + String.format("%.2f", session.winAmount) + " coins&7!"),
-                            ChatColorConverter.convert("&6&l10x PAYOUT!"),
+                            ChatColorConverter.convert(GamblingConfig.getCoinFlipEdgeWonPrefix() + String.format("%.2f", session.winAmount) + " " + GamblingConfig.getGamblingCurrencyWord() + "&7!"),
+                            GamblingConfig.getCoinFlipEdgePayoutMultiplier(),
                             "",
-                            ChatColorConverter.convert("&eClose to continue")
+                            GamblingConfig.getCoinFlipCloseToContinue()
                     ),
                     1
             );
             inventory.setItem(RESULT_SLOT, edgeResult);
 
-            player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1.0f, 1.0f);
-            player.sendMessage(ChatColorConverter.convert(
-                    "&b&l✦ EDGE! ✦ &7The coin landed on its edge! &a10x PAYOUT! &7You won &a" +
-                    String.format("%.2f", session.winAmount) + " coins&7!"
-            ));
+            GamblingDisplay.playBigWinSound(player);
+            player.sendMessage(
+                    GamblingConfig.getCoinFlipEdgeChatMessage()
+                            .replace("%amount%", String.format("%.2f", session.winAmount))
+            );
 
             session.gameOver = true;
             return;
@@ -272,12 +271,12 @@ public class CoinFlipGame {
 
         // Normal result - Update coin to show final result
         Material resultMaterial = session.coinResult ? Material.PLAYER_HEAD : Material.SUNFLOWER;
-        String resultName = session.coinResult ? "&e&lHEADS" : "&6&lTAILS";
+        String resultName = session.coinResult ? GamblingConfig.getCoinFlipHeadsText() : GamblingConfig.getCoinFlipTailsText();
 
         ItemStack finalCoin = ItemStackGenerator.generateItemStack(
                 resultMaterial,
                 ChatColorConverter.convert(resultName),
-                List.of(ChatColorConverter.convert("&7The coin landed on " + (session.coinResult ? "Heads" : "Tails") + "!")),
+                List.of(GamblingConfig.getCoinFlipLandedOnLore() + (session.coinResult ? GamblingConfig.getCoinFlipHeadsWord() : GamblingConfig.getCoinFlipTailsWord()) + "!"),
                 1
         );
         inventory.setItem(COIN_SLOT, finalCoin);
@@ -286,39 +285,35 @@ public class CoinFlipGame {
         if (session.playerWon) {
             ItemStack winResult = ItemStackGenerator.generateItemStack(
                     Material.EMERALD_BLOCK,
-                    ChatColorConverter.convert("&a&lYOU WIN!"),
+                    GamblingConfig.getCoinFlipYouWin(),
                     List.of(
                             "",
-                            ChatColorConverter.convert("&7You won &a" + String.format("%.2f", session.winAmount) + " coins&7!"),
+                            ChatColorConverter.convert(GamblingConfig.getCoinFlipWonPrefix() + String.format("%.2f", session.winAmount) + " " + GamblingConfig.getGamblingCurrencyWord() + "&7!"),
                             "",
-                            ChatColorConverter.convert("&eClose to continue")
+                            GamblingConfig.getCoinFlipCloseToContinue()
                     ),
                     1
             );
             inventory.setItem(RESULT_SLOT, winResult);
 
-            player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
-            player.sendMessage(ChatColorConverter.convert(
-                    GamblingConfig.getWinMessage().replace("%amount%", String.format("%.2f", session.winAmount))
-            ));
+            GamblingDisplay.playWinSound(player);
+            GamblingDisplay.sendWinMessage(player, session.winAmount);
         } else {
             ItemStack loseResult = ItemStackGenerator.generateItemStack(
                     Material.REDSTONE_BLOCK,
-                    ChatColorConverter.convert("&c&lYOU LOSE"),
+                    GamblingConfig.getCoinFlipYouLose(),
                     List.of(
                             "",
-                            ChatColorConverter.convert("&7You lost &c" + session.betAmount + " coins&7."),
+                            ChatColorConverter.convert(GamblingConfig.getCoinFlipLostPrefix() + session.betAmount + " " + GamblingConfig.getGamblingCurrencyWord() + "&7."),
                             "",
-                            ChatColorConverter.convert("&eClose to continue")
+                            GamblingConfig.getCoinFlipCloseToContinue()
                     ),
                     1
             );
             inventory.setItem(RESULT_SLOT, loseResult);
 
-            player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
-            player.sendMessage(ChatColorConverter.convert(
-                    GamblingConfig.getLoseMessage().replace("%amount%", String.valueOf(session.betAmount))
-            ));
+            GamblingDisplay.playLoseSound(player);
+            GamblingDisplay.sendLoseMessage(player, session.betAmount);
         }
 
         session.gameOver = true;
@@ -332,9 +327,7 @@ public class CoinFlipGame {
     /**
      * Stores game session data.
      */
-    private static class CoinFlipSession {
-        final UUID playerUUID;
-        final int betAmount;
+    private static class CoinFlipSession extends GamblingSession {
         boolean hasChosen = false;
         boolean coinResult; // true = heads, false = tails
         boolean landedOnEdge = false; // 1% chance - 10x payout!
@@ -343,8 +336,7 @@ public class CoinFlipGame {
         boolean gameOver = false;
 
         CoinFlipSession(UUID playerUUID, int betAmount) {
-            this.playerUUID = playerUUID;
-            this.betAmount = betAmount;
+            super(playerUUID, betAmount);
         }
     }
 
@@ -356,14 +348,8 @@ public class CoinFlipGame {
 
         @EventHandler
         public void onClick(InventoryClickEvent event) {
-            if (!menus.contains(event.getInventory())) return;
-            if (event.getClickedInventory() == null || !event.getClickedInventory().getType().equals(InventoryType.CHEST)) {
-                event.setCancelled(true);
-                return;
-            }
-            event.setCancelled(true);
-
-            if (!(event.getWhoClicked() instanceof Player player)) return;
+            Player player = GamblingDisplay.validateClick(event, menus);
+            if (player == null) return;
 
             CoinFlipSession session = activeSessions.get(player.getUniqueId());
             if (session == null || session.hasChosen) return;
@@ -379,8 +365,13 @@ public class CoinFlipGame {
 
         @EventHandler
         public void onClose(InventoryCloseEvent event) {
-            menus.remove(event.getInventory());
-            activeSessions.remove(event.getPlayer().getUniqueId());
+            if (!menus.remove(event.getInventory())) return;
+            CoinFlipSession session = activeSessions.remove(event.getPlayer().getUniqueId());
+            if (session == null) return;
+            // If player closed without choosing, forfeit the bet
+            if (!session.hasChosen) {
+                GamblingEconomyHandler.resolveOutcome(event.getPlayer().getUniqueId(), 0);
+            }
         }
     }
 }

@@ -13,7 +13,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -44,7 +43,6 @@ public class BlackjackGame {
 
     // Card values (1-13 representing A-K)
     private static final String[] CARD_NAMES = {"A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"};
-    private static final String[] SUIT_NAMES = {"Spades", "Hearts", "Diamonds", "Clubs"};
     private static final String[] SUIT_COLORS = {"&8", "&c", "&c", "&8"};
 
     /**
@@ -65,7 +63,7 @@ public class BlackjackGame {
 
         activeSessions.put(player.getUniqueId(), session);
 
-        String title = ChatColorConverter.convert(GamblingConfig.getBlackjackMenuTitle());
+        String title = GamblingConfig.getBlackjackMenuTitle();
         Inventory inventory = Bukkit.createInventory(player, 54, title);
 
         updateDisplay(inventory, session, false);
@@ -147,7 +145,7 @@ public class BlackjackGame {
         String dealerTotalText = showDealerHand ? String.valueOf(calculateHandValue(session.dealerHand)) : dealerVisible + " + ?";
         ItemStack dealerTotal = ItemStackGenerator.generateItemStack(
                 Material.RED_BANNER,
-                ChatColorConverter.convert("&cDealer: " + dealerTotalText),
+                GamblingConfig.getBlackjackDealerLabel() + dealerTotalText,
                 List.of(),
                 1
         );
@@ -158,7 +156,7 @@ public class BlackjackGame {
         Material totalMaterial = playerTotal > 21 ? Material.REDSTONE_BLOCK : (playerTotal == 21 ? Material.EMERALD_BLOCK : Material.BLUE_BANNER);
         ItemStack playerTotalItem = ItemStackGenerator.generateItemStack(
                 totalMaterial,
-                ChatColorConverter.convert("&aYou: " + playerTotal),
+                GamblingConfig.getBlackjackPlayerLabel() + playerTotal,
                 List.of(),
                 1
         );
@@ -169,10 +167,10 @@ public class BlackjackGame {
             // Hit button
             ItemStack hitButton = ItemStackGenerator.generateItemStack(
                     Material.LIME_CONCRETE,
-                    ChatColorConverter.convert("&a&lHIT"),
+                    GamblingConfig.getBlackjackHitButtonText(),
                     List.of(
                             "",
-                            ChatColorConverter.convert("&7Draw another card")
+                            GamblingConfig.getBlackjackHitButtonLore()
                     ),
                     1
             );
@@ -181,10 +179,10 @@ public class BlackjackGame {
             // Stand button
             ItemStack standButton = ItemStackGenerator.generateItemStack(
                     Material.YELLOW_CONCRETE,
-                    ChatColorConverter.convert("&e&lSTAND"),
+                    GamblingConfig.getBlackjackStandButtonText(),
                     List.of(
                             "",
-                            ChatColorConverter.convert("&7Keep your current hand")
+                            GamblingConfig.getBlackjackStandButtonLore()
                     ),
                     1
             );
@@ -195,12 +193,12 @@ public class BlackjackGame {
                 boolean canAffordDouble = GamblingEconomyHandler.canAffordBet(session.playerUUID, session.betAmount);
                 ItemStack doubleButton = ItemStackGenerator.generateItemStack(
                         canAffordDouble ? Material.GOLD_BLOCK : Material.GRAY_CONCRETE,
-                        ChatColorConverter.convert(canAffordDouble ? "&6&lDOUBLE DOWN" : "&7Double Down"),
+                        canAffordDouble ? GamblingConfig.getBlackjackDoubleDownButtonText() : GamblingConfig.getBlackjackDoubleDownDisabledText(),
                         List.of(
                                 "",
                                 canAffordDouble
-                                        ? ChatColorConverter.convert("&7Double your bet, take one card, then stand")
-                                        : ChatColorConverter.convert("&cYou can't afford to double!")
+                                        ? GamblingConfig.getBlackjackDoubleDownButtonLore()
+                                        : GamblingConfig.getBlackjackDoubleDownCantAffordLore()
                         ),
                         1
                 );
@@ -218,11 +216,11 @@ public class BlackjackGame {
         // Bet info
         ItemStack betInfo = ItemStackGenerator.generateItemStack(
                 Material.EMERALD,
-                ChatColorConverter.convert("&aBet: " + session.betAmount),
+                GamblingConfig.getBlackjackBetLabel() + session.betAmount,
                 List.of(
                         "",
-                        ChatColorConverter.convert("&7Win: " + String.format("%.2f", session.betAmount * GamblingConfig.getBlackjackPayoutNormal())),
-                        ChatColorConverter.convert("&7Blackjack: " + String.format("%.2f", session.betAmount * GamblingConfig.getBlackjackPayoutBlackjack()))
+                        GamblingConfig.getBlackjackWinPayoutLabel() + String.format("%.2f", session.betAmount * GamblingConfig.getBlackjackPayoutNormal()),
+                        GamblingConfig.getBlackjackBlackjackPayoutLabel() + String.format("%.2f", session.betAmount * GamblingConfig.getBlackjackPayoutBlackjack())
                 ),
                 1
         );
@@ -237,7 +235,7 @@ public class BlackjackGame {
         return ItemStackGenerator.generateItemStack(
                 material,
                 ChatColorConverter.convert(card.getName()),
-                List.of(ChatColorConverter.convert("&7Value: " + card.getBlackjackValue())),
+                List.of(GamblingConfig.getBlackjackCardValueLabel() + card.getBlackjackValue()),
                 1
         );
     }
@@ -248,8 +246,8 @@ public class BlackjackGame {
     private static ItemStack createHiddenCardItem() {
         return ItemStackGenerator.generateItemStack(
                 Material.GRAY_BANNER,
-                ChatColorConverter.convert("&8???"),
-                List.of(ChatColorConverter.convert("&7Hidden")),
+                GamblingConfig.getBlackjackHiddenCardText(),
+                List.of(GamblingConfig.getBlackjackHiddenCardLore()),
                 1
         );
     }
@@ -300,7 +298,7 @@ public class BlackjackGame {
 
         // SAFETY-FIRST: Process the additional bet
         if (!GamblingEconomyHandler.placeBet(player.getUniqueId(), session.betAmount)) {
-            player.sendMessage(ChatColorConverter.convert(GamblingConfig.getInsufficientFundsMessage()));
+            player.sendMessage(GamblingConfig.getInsufficientFundsMessage());
             return;
         }
 
@@ -373,49 +371,47 @@ public class BlackjackGame {
         switch (session.gameState) {
             case PLAYER_BLACKJACK -> {
                 payout = session.betAmount * GamblingConfig.getBlackjackPayoutBlackjack();
-                resultMessage = "&a&lBLACKJACK!";
+                resultMessage = GamblingConfig.getBlackjackResultBlackjack();
                 resultMaterial = Material.EMERALD_BLOCK;
                 resultSound = Sound.UI_TOAST_CHALLENGE_COMPLETE;
             }
             case PLAYER_WINS -> {
                 payout = session.betAmount * GamblingConfig.getBlackjackPayoutNormal();
-                resultMessage = "&a&lYOU WIN!";
+                resultMessage = GamblingConfig.getBlackjackResultYouWin();
                 resultMaterial = Material.EMERALD_BLOCK;
                 resultSound = Sound.ENTITY_PLAYER_LEVELUP;
             }
             case DEALER_BUST -> {
                 payout = session.betAmount * GamblingConfig.getBlackjackPayoutNormal();
-                resultMessage = "&a&lDEALER BUSTS!";
+                resultMessage = GamblingConfig.getBlackjackResultDealerBusts();
                 resultMaterial = Material.EMERALD_BLOCK;
                 resultSound = Sound.ENTITY_PLAYER_LEVELUP;
             }
             case PUSH -> {
                 payout = session.betAmount; // Return bet
-                resultMessage = "&e&lPUSH - TIE";
+                resultMessage = GamblingConfig.getBlackjackResultPush();
                 resultMaterial = Material.YELLOW_CONCRETE;
                 resultSound = Sound.BLOCK_NOTE_BLOCK_PLING;
             }
             case PLAYER_BUST -> {
-                resultMessage = "&c&lBUST!";
+                resultMessage = GamblingConfig.getBlackjackResultBust();
                 resultMaterial = Material.REDSTONE_BLOCK;
                 resultSound = Sound.ENTITY_VILLAGER_NO;
             }
             case DEALER_WINS -> {
-                resultMessage = "&c&lDEALER WINS";
+                resultMessage = GamblingConfig.getBlackjackResultDealerWins();
                 resultMaterial = Material.REDSTONE_BLOCK;
                 resultSound = Sound.ENTITY_VILLAGER_NO;
             }
             default -> {
-                resultMessage = "&7Game Over";
+                resultMessage = GamblingConfig.getBlackjackResultGameOver();
                 resultMaterial = Material.GRAY_CONCRETE;
                 resultSound = Sound.BLOCK_NOTE_BLOCK_BASS;
             }
         }
 
-        // SAFETY-FIRST: Award winnings BEFORE showing result
-        if (payout > 0) {
-            GamblingEconomyHandler.awardWinnings(player.getUniqueId(), payout);
-        }
+        // SAFETY-FIRST: Resolve outcome BEFORE showing result
+        payout = GamblingEconomyHandler.resolveOutcome(player.getUniqueId(), payout);
 
         // Update display to show dealer's full hand
         updateDisplay(inventory, session, true);
@@ -423,22 +419,22 @@ public class BlackjackGame {
         // Show result
         List<String> resultLore = new ArrayList<>();
         resultLore.add("");
-        resultLore.add(ChatColorConverter.convert("&7Player: " + calculateHandValue(session.playerHand)));
-        resultLore.add(ChatColorConverter.convert("&7Dealer: " + calculateHandValue(session.dealerHand)));
+        resultLore.add(GamblingConfig.getBlackjackResultPlayerLabel() + calculateHandValue(session.playerHand));
+        resultLore.add(GamblingConfig.getBlackjackResultDealerLabel() + calculateHandValue(session.dealerHand));
         resultLore.add("");
         if (payout > 0) {
-            resultLore.add(ChatColorConverter.convert(payout > session.betAmount
-                    ? "&aYou won " + String.format("%.2f", payout - session.betAmount) + " coins!"
-                    : "&7Your bet was returned."));
+            resultLore.add(payout > session.betAmount
+                    ? GamblingConfig.getBlackjackResultWonPrefix() + String.format("%.2f", payout - session.betAmount) + GamblingConfig.getBlackjackResultWonSuffix()
+                    : GamblingConfig.getBlackjackResultBetReturned());
         } else {
-            resultLore.add(ChatColorConverter.convert("&cYou lost " + session.betAmount + " coins."));
+            resultLore.add(GamblingConfig.getBlackjackResultLostPrefix() + session.betAmount + " " + GamblingConfig.getGamblingCurrencyWord() + ".");
         }
         resultLore.add("");
-        resultLore.add(ChatColorConverter.convert("&eClose to continue"));
+        resultLore.add(GamblingConfig.getBlackjackResultCloseToContinue());
 
         ItemStack resultItem = ItemStackGenerator.generateItemStack(
                 resultMaterial,
-                ChatColorConverter.convert(resultMessage),
+                resultMessage,
                 resultLore,
                 1
         );
@@ -447,13 +443,9 @@ public class BlackjackGame {
         player.playSound(player.getLocation(), resultSound, 1.0f, 1.0f);
 
         if (payout > session.betAmount) {
-            player.sendMessage(ChatColorConverter.convert(
-                    GamblingConfig.getWinMessage().replace("%amount%", String.format("%.2f", payout - session.betAmount))
-            ));
+            GamblingDisplay.sendWinMessage(player, payout - session.betAmount);
         } else if (payout == 0) {
-            player.sendMessage(ChatColorConverter.convert(
-                    GamblingConfig.getLoseMessage().replace("%amount%", String.valueOf(session.betAmount))
-            ));
+            GamblingDisplay.sendLoseMessage(player, session.betAmount);
         }
     }
 
@@ -489,7 +481,13 @@ public class BlackjackGame {
         }
 
         String getName() {
-            return SUIT_COLORS[suit] + CARD_NAMES[value - 1] + " &7of " + SUIT_NAMES[suit];
+            String[] suitNames = {
+                    GamblingConfig.getBlackjackCardSuitSpades(),
+                    GamblingConfig.getBlackjackCardSuitHearts(),
+                    GamblingConfig.getBlackjackCardSuitDiamonds(),
+                    GamblingConfig.getBlackjackCardSuitClubs()
+            };
+            return SUIT_COLORS[suit] + CARD_NAMES[value - 1] + GamblingConfig.getBlackjackCardOfText() + suitNames[suit];
         }
 
         int getBlackjackValue() {
@@ -502,17 +500,14 @@ public class BlackjackGame {
     /**
      * Stores game session data.
      */
-    private static class BlackjackSession {
-        final UUID playerUUID;
+    private static class BlackjackSession extends GamblingSession {
         final List<Card> playerHand = new ArrayList<>();
         final List<Card> dealerHand = new ArrayList<>();
-        int betAmount;
         GameState gameState = GameState.PLAYING;
         boolean canDoubleDown = true;
 
         BlackjackSession(UUID playerUUID, int betAmount) {
-            this.playerUUID = playerUUID;
-            this.betAmount = betAmount;
+            super(playerUUID, betAmount);
         }
     }
 
@@ -524,14 +519,8 @@ public class BlackjackGame {
 
         @EventHandler
         public void onClick(InventoryClickEvent event) {
-            if (!menus.contains(event.getInventory())) return;
-            if (event.getClickedInventory() == null || !event.getClickedInventory().getType().equals(InventoryType.CHEST)) {
-                event.setCancelled(true);
-                return;
-            }
-            event.setCancelled(true);
-
-            if (!(event.getWhoClicked() instanceof Player player)) return;
+            Player player = GamblingDisplay.validateClick(event, menus);
+            if (player == null) return;
 
             BlackjackSession session = activeSessions.get(player.getUniqueId());
             if (session == null || session.gameState != GameState.PLAYING) return;
@@ -549,8 +538,34 @@ public class BlackjackGame {
 
         @EventHandler
         public void onClose(InventoryCloseEvent event) {
-            menus.remove(event.getInventory());
-            activeSessions.remove(event.getPlayer().getUniqueId());
+            if (!menus.remove(event.getInventory())) return;
+            BlackjackSession session = activeSessions.remove(event.getPlayer().getUniqueId());
+            if (session == null) return;
+
+            // If closed during dealer's turn, resolve the hand
+            if (session.gameState == GameState.DEALER_TURN) {
+                // Play out dealer's hand
+                while (calculateHandValue(session.dealerHand) < 17) {
+                    session.dealerHand.add(drawCard(session));
+                }
+                int dealerTotal = calculateHandValue(session.dealerHand);
+                int playerTotal = calculateHandValue(session.playerHand);
+
+                double payout = 0;
+                if (dealerTotal > 21 || playerTotal > dealerTotal) {
+                    payout = session.betAmount * GamblingConfig.getBlackjackPayoutNormal();
+                } else if (playerTotal == dealerTotal) {
+                    payout = session.betAmount; // Push - return bet
+                }
+
+                double awarded = GamblingEconomyHandler.resolveOutcome(event.getPlayer().getUniqueId(), payout);
+                if (awarded > 0 && event.getPlayer() instanceof Player player) {
+                    GamblingDisplay.sendWinMessage(player, awarded - session.betAmount);
+                }
+            } else if (session.gameState == GameState.PLAYING) {
+                // Player closed mid-game without standing — forfeit
+                GamblingEconomyHandler.resolveOutcome(event.getPlayer().getUniqueId(), 0);
+            }
         }
     }
 }

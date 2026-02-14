@@ -53,6 +53,30 @@ public class ArrowShopMenuConfig extends MenusConfigFields {
     @Getter
     private static int tippedArrowHealingAmount;
 
+    // Arrow display names
+    @Getter
+    private static String arrowDisplayName;
+    @Getter
+    private static String spectralArrowDisplayName;
+    @Getter
+    private static String arrowOfPoisonDisplayName;
+    @Getter
+    private static String arrowOfSlownessDisplayName;
+    @Getter
+    private static String arrowOfWeaknessDisplayName;
+    @Getter
+    private static String arrowOfHarmingDisplayName;
+    @Getter
+    private static String arrowOfHealingDisplayName;
+
+    // Shop item lore formats
+    @Getter
+    private static String shopItemAmountFormat;
+    @Getter
+    private static String shopItemPriceFormat;
+    @Getter
+    private static String shopItemClickToPurchase;
+
     public ArrowShopMenuConfig() {
         super("arrow_shop_menu", true);
     }
@@ -89,5 +113,29 @@ public class ArrowShopMenuConfig extends MenusConfigFields {
         tippedArrowHarmingAmount = ConfigurationEngine.setInt(fileConfiguration, "tippedArrowHarmingAmount", 8);
         tippedArrowHealingPrice = ConfigurationEngine.setInt(fileConfiguration, "tippedArrowHealingPrice", 75);
         tippedArrowHealingAmount = ConfigurationEngine.setInt(fileConfiguration, "tippedArrowHealingAmount", 8);
+
+        // Arrow display names
+        arrowDisplayName = ConfigurationEngine.setString(file, fileConfiguration, "arrowDisplayName",
+                "&fArrows", true);
+        spectralArrowDisplayName = ConfigurationEngine.setString(file, fileConfiguration, "spectralArrowDisplayName",
+                "&eSpectral Arrows", true);
+        arrowOfPoisonDisplayName = ConfigurationEngine.setString(file, fileConfiguration, "arrowOfPoisonDisplayName",
+                "&2Arrow of Poison", true);
+        arrowOfSlownessDisplayName = ConfigurationEngine.setString(file, fileConfiguration, "arrowOfSlownessDisplayName",
+                "&8Arrow of Slowness", true);
+        arrowOfWeaknessDisplayName = ConfigurationEngine.setString(file, fileConfiguration, "arrowOfWeaknessDisplayName",
+                "&7Arrow of Weakness", true);
+        arrowOfHarmingDisplayName = ConfigurationEngine.setString(file, fileConfiguration, "arrowOfHarmingDisplayName",
+                "&4Arrow of Harming", true);
+        arrowOfHealingDisplayName = ConfigurationEngine.setString(file, fileConfiguration, "arrowOfHealingDisplayName",
+                "&dArrow of Healing", true);
+
+        // Shop item lore formats
+        shopItemAmountFormat = ConfigurationEngine.setString(file, fileConfiguration, "shopItemAmountFormat",
+                "&7Amount: &f$amount", true);
+        shopItemPriceFormat = ConfigurationEngine.setString(file, fileConfiguration, "shopItemPriceFormat",
+                "&7Price: &6$price &7Elite Coins", true);
+        shopItemClickToPurchase = ConfigurationEngine.setString(file, fileConfiguration, "shopItemClickToPurchase",
+                "&eClick to purchase!", true);
     }
 }

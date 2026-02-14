@@ -48,9 +48,9 @@ public class QuestInteractionHandler {
 
                 CustomQuest customQuest = CustomQuest.getQuest(questString, player);
                 if (customQuest == null) {
-                    player.sendMessage("[EliteMobs] This NPC's quest is not valid! This might be a configuration error on the NPC or on the quest.");
+                    player.sendMessage(QuestsConfig.getInvalidQuestNpcMessage());
                     if (player.hasPermission("elitemobs.*"))
-                        player.sendMessage("Invalid quest: " + questString);
+                        player.sendMessage(QuestsConfig.getInvalidQuestMessage().replace("$quest", questString));
                     continue;
                 }
 
@@ -58,10 +58,17 @@ public class QuestInteractionHandler {
                     customQuestList.add(customQuest);
                     customQuest.setQuestGiver(npcEntity.getNPCsConfigFields().getFilename());
                     anyQuestIsValid = true;
-                } else if (!customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission().isEmpty() &&
-                        player.hasMetadata(customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission())) {
-                    questCompleteCount++;
-                    anyQuestIsValid = true;
+                } else {
+                    // Check if player has completed this quest (either via old permission system or new lockout system)
+                    boolean completedViaPermission = !customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission().isEmpty() &&
+                            player.hasMetadata(customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission());
+                    boolean completedViaLockout = customQuest.getCustomQuestsConfigFields().getQuestLockoutMinutes() > 0 &&
+                            com.magmaguy.elitemobs.quests.QuestLockoutHandler.isLockedOut(player, customQuest.getConfigurationFilename(), customQuest.getCustomQuestsConfigFields().getQuestName());
+
+                    if (completedViaPermission || completedViaLockout) {
+                        questCompleteCount++;
+                        anyQuestIsValid = true;
+                    }
                 }
             }
 

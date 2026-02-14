@@ -1,19 +1,16 @@
 package com.magmaguy.elitemobs.skills.bonuses.skills.bows;
 
-import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
-import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.ConditionalSkill;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Overdraw (CONDITIONAL) - Bonus damage for holding bow longer.
@@ -22,11 +19,12 @@ import java.util.UUID;
 public class OverdrawSkill extends SkillBonus implements ConditionalSkill {
 
     public static final String SKILL_ID = "bows_overdraw";
-    private static final long FULL_DRAW_TIME = 1000; // 1 second for full draw
+    private static final long FULL_DRAW_TIME = 1500; // 1.5 seconds for full draw
     private static final double BASE_BONUS = 0.15; // 15% base bonus
 
-    private static final Set<UUID> activePlayers = new HashSet<>();
-    private static final Map<UUID, Long> drawStartTimes = new HashMap<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
+    private static final Map<UUID, Long> drawStartTimes = new ConcurrentHashMap<>();
+    private static final Map<UUID, Long> snapshotDrawDurations = new ConcurrentHashMap<>();
 
     public OverdrawSkill() {
         super(SkillType.BOWS, 25, "Overdraw",
@@ -34,15 +32,36 @@ public class OverdrawSkill extends SkillBonus implements ConditionalSkill {
               SkillBonusType.CONDITIONAL, 2, SKILL_ID);
     }
 
+    public static boolean hasActiveSkill(UUID playerUUID) {
+        return activePlayers.contains(playerUUID);
+    }
+
     public static void startDrawing(UUID uuid) {
         drawStartTimes.put(uuid, System.currentTimeMillis());
+        snapshotDrawDurations.remove(uuid);
+    }
+
+    /**
+     * Called on bow shoot to snapshot the draw duration before the draw start is cleared.
+     * The snapshot persists until the arrow hits and the damage event reads it.
+     */
+    public static void snapshotDrawDuration(UUID uuid) {
+        Long startTime = drawStartTimes.remove(uuid);
+        if (startTime != null) {
+            snapshotDrawDurations.put(uuid, System.currentTimeMillis() - startTime);
+        }
     }
 
     public static void stopDrawing(UUID uuid) {
         drawStartTimes.remove(uuid);
+        snapshotDrawDurations.remove(uuid);
     }
 
     public static long getDrawTime(UUID uuid) {
+        // First check snapshot (set at bow release, used at arrow impact)
+        Long snapshot = snapshotDrawDurations.get(uuid);
+        if (snapshot != null) return snapshot;
+        // Fallback: still drawing
         Long startTime = drawStartTimes.get(uuid);
         if (startTime == null) return 0;
         return System.currentTimeMillis() - startTime;
@@ -66,6 +85,21 @@ public class OverdrawSkill extends SkillBonus implements ConditionalSkill {
         return getConditionalBonus(skillLevel) * (1 + overdrawMultiplier);
     }
 
+    /**
+     * Simulates a full bow draw for testing purposes.
+     * Backdates the draw start time so the skill thinks the bow was drawn for 2 seconds.
+     */
+    public static void simulateFullDraw(UUID uuid) {
+        // Set draw start to 2 seconds ago (exceeds FULL_DRAW_TIME of 1000ms)
+        drawStartTimes.put(uuid, System.currentTimeMillis() - 2000);
+        snapshotDrawDuration(uuid);
+    }
+
+    @Override
+    public TestStrategy getTestStrategy() {
+        return TestStrategy.CONDITION_SETUP;
+    }
+
     @Override
     public void applyBonus(Player player, int skillLevel) { activePlayers.add(player.getUniqueId()); }
     @Override
@@ -85,20 +119,23 @@ public class OverdrawSkill extends SkillBonus implements ConditionalSkill {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        return List.of(
-                "&7Base Bonus: &f" + String.format("%.1f", getConditionalBonus(skillLevel) * 100) + "%",
-                "&7Max Overdraw: &f3x bonus",
-                "&7Requires full draw"
-        );
+        return applyLoreTemplates(Map.of(
+                "baseBonus", String.format("%.1f", getConditionalBonus(skillLevel) * 100)
+        ));
     }
 
     @Override
     public double getBonusValue(int skillLevel) { return getConditionalBonus(skillLevel) * 3; }
     @Override
-    public String getFormattedBonus(int skillLevel) { return String.format("+%.1f%% damage (overdraw)", getConditionalBonus(skillLevel) * 100); }
+    public String getFormattedBonus(int skillLevel) {
+        return applyFormattedBonusTemplate(Map.of(
+                "baseBonus", String.format("%.1f", getConditionalBonus(skillLevel) * 100)
+        ));
+    }
     @Override
     public void shutdown() {
         activePlayers.clear();
         drawStartTimes.clear();
+        snapshotDrawDurations.clear();
     }
 }

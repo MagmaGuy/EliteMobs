@@ -3,10 +3,12 @@ package com.magmaguy.elitemobs.skills;
 import com.magmaguy.elitemobs.antiexploit.FarmingProtection;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.combatsystem.displays.BossHealthDisplay;
+import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.utils.DebugMessage;
+import com.magmaguy.magmacore.util.ChatColorConverter;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -181,8 +183,10 @@ public class SkillXPHandler implements Listener {
     private void notifyLevelUp(Player player, SkillType skillType, int newLevel) {
         // Title display for every level up
         player.sendTitle(
-                "\u00A76\u00A7lLEVEL UP!",
-                "\u00A7e" + skillType.getDisplayName() + " \u00A77\u2192 \u00A7aLevel " + newLevel,
+                DungeonsConfig.getSkillLevelUpTitle(),
+                DungeonsConfig.getSkillLevelUpSubtitle()
+                        .replace("$skill", skillType.getDisplayName())
+                        .replace("$level", String.valueOf(newLevel)),
                 10, 70, 20
         );
 
@@ -199,8 +203,10 @@ public class SkillXPHandler implements Listener {
         );
 
         // Server-wide announcement
-        String announcement = "\u00A76" + player.getName() + " \u00A77reached \u00A7e" +
-                skillType.getDisplayName() + " \u00A77level \u00A7a" + newLevel + "\u00A77!";
+        String announcement = DungeonsConfig.getSkillLevelUpBroadcast()
+                .replace("$player", player.getName())
+                .replace("$skill", skillType.getDisplayName())
+                .replace("$level", String.valueOf(newLevel));
         Bukkit.broadcastMessage(announcement);
 
         // Update combat level display
@@ -226,15 +232,19 @@ public class SkillXPHandler implements Listener {
 
         String message;
         if (noXP) {
-            int levelDiff = combatLevel - mobLevel;
-            message = "&7[&eEliteMobs&7] &cNo XP gained &7- this mob (level &f" + mobLevel +
-                    "&7) is &f" + levelDiff + " levels &7below your combat level (&f" + combatLevel + "&7).";
+            message = DungeonsConfig.getSkillXpNoGainMessage()
+                    .replace("$mobLevel", String.valueOf(mobLevel))
+                    .replace("$skill", "combat")
+                    .replace("$playerLevel", String.valueOf(combatLevel));
         } else {
             int cappedLevel = combatLevel + 5;
-            message = "&7[&eEliteMobs&7] &6XP capped &7- this mob (level &f" + mobLevel +
-                    "&7) is too high. XP calculated as if level &f" + cappedLevel + "&7.";
+            message = DungeonsConfig.getSkillXpCappedMessage()
+                    .replace("$mobLevel", String.valueOf(mobLevel))
+                    .replace("$skill", "combat")
+                    .replace("$playerLevel", String.valueOf(combatLevel))
+                    .replace("$xp", String.valueOf(cappedLevel));
         }
 
-        player.sendMessage(message.replace("&", "\u00A7"));
+        player.sendMessage(ChatColorConverter.convert(message));
     }
 }

@@ -12,5 +12,10 @@ public class ArmorBattleHardenedConfig extends SkillBonusConfigFields {
         super("armor_battle_hardened.yml", true, "&6Battle Hardened",
               List.of("&7Passive damage reduction", "&7from all sources."),
               SkillType.ARMOR, SkillBonusType.PASSIVE, 1, 0.20, 0.004, Material.NETHERITE_CHESTPLATE);
+        this.loreTemplates = List.of(
+                "&7Passive damage reduction from all sources",
+                "&7Damage Reduction: $value%"
+        );
+        this.formattedBonusTemplate = "$value% Damage Reduction";
     }
 }

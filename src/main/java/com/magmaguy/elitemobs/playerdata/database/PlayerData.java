@@ -81,6 +81,9 @@ public class PlayerData {
     @Getter
     @Setter
     private DungeonBossLockout dungeonBossLockout = null;
+    @Getter
+    @Setter
+    private com.magmaguy.elitemobs.quests.QuestLockout questLockout = null;
 
     // Skill XP fields - each skill has independent progression
     @Getter
@@ -321,6 +324,31 @@ public class PlayerData {
                 playerDataHashMap.get(uuid).dungeonBossLockout = dungeonBossLockout;
         } catch (Exception ex) {
             Logger.warn("Failed to update dungeon boss lockouts!");
+            ex.printStackTrace();
+        }
+    }
+
+    @Nullable
+    public static com.magmaguy.elitemobs.quests.QuestLockout getQuestLockout(UUID uuid) {
+        try {
+            if (!isInMemory(uuid))
+                return (com.magmaguy.elitemobs.quests.QuestLockout) ObjectSerializer.fromString((String) getDatabaseBlob(uuid, "QuestLockouts"));
+            if (playerDataHashMap.get(uuid) == null) return new com.magmaguy.elitemobs.quests.QuestLockout();
+            return playerDataHashMap.get(uuid).questLockout == null ? new com.magmaguy.elitemobs.quests.QuestLockout() : playerDataHashMap.get(uuid).questLockout;
+        } catch (Exception ex) {
+            return new com.magmaguy.elitemobs.quests.QuestLockout();
+        }
+    }
+
+    public static void updateQuestLockout(UUID uuid, com.magmaguy.elitemobs.quests.QuestLockout questLockout) {
+        try {
+            // Clean up expired lockouts before saving
+            questLockout.cleanupExpiredLockouts();
+            setDatabaseValue(uuid, "QuestLockouts", ObjectSerializer.toString(questLockout));
+            if (playerDataHashMap.containsKey(uuid))
+                playerDataHashMap.get(uuid).questLockout = questLockout;
+        } catch (Exception ex) {
+            Logger.warn("Failed to update quest lockouts!");
             ex.printStackTrace();
         }
     }
@@ -873,6 +901,19 @@ public class PlayerData {
             }
         } else {
             dungeonBossLockout = new DungeonBossLockout();
+        }
+
+        if (resultSet.getBytes("QuestLockouts") != null) {
+            try {
+                questLockout = (com.magmaguy.elitemobs.quests.QuestLockout) ObjectSerializer.fromString(new String(resultSet.getBytes("QuestLockouts"), StandardCharsets.UTF_8));
+                // Clean up expired lockouts on load
+                questLockout.cleanupExpiredLockouts();
+            } catch (Exception exception) {
+                Logger.warn("Failed to get quest lockouts! This player's lockouts will be reset.");
+                questLockout = new com.magmaguy.elitemobs.quests.QuestLockout();
+            }
+        } else {
+            questLockout = new com.magmaguy.elitemobs.quests.QuestLockout();
         }
 
         // Read skill XP values

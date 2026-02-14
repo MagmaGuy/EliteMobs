@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.api.PlayerPreTeleportEvent;
 import com.magmaguy.elitemobs.api.PlayerTeleportEvent;
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.config.CombatTagConfig;
+import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
 import com.magmaguy.elitemobs.menus.SkillBonusMenu;
 import com.magmaguy.elitemobs.utils.EventCaller;
@@ -16,7 +17,7 @@ public class AdventurersGuildCommand {
         if (player.hasPermission("elitemobs.adventurersguild.command"))
             SkillBonusMenu.openWeaponSelectMenu(player);
         else
-            player.sendMessage("Missing permission: elitemobs.adventurersguild.command / elitemobs.adventurersguild.teleport");
+            player.sendMessage(CommandMessagesConfig.getMissingPermissionMessage());
     }
 
     public static boolean adventurersGuildTeleport(Player player) {

@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.skills.bonuses.skills.hoes;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
@@ -11,7 +12,11 @@ import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Soul Siphon (STACKING) - Gain stacking damage bonus on kills.
@@ -23,12 +28,12 @@ public class SoulSiphonSkill extends SkillBonus implements StackingSkill {
     public static final String SKILL_ID = "hoes_soul_siphon";
     private static final int MAX_STACKS = 10;
     private static final long STACK_DECAY_TIME = 30000; // 30 seconds
-    private static final double BASE_BONUS_PER_STACK = 0.05; // 5% per stack
+    private static final double BASE_BONUS_PER_STACK = 0.08; // 8% per stack
 
-    private static final Map<UUID, Integer> soulStacks = new HashMap<>();
-    private static final Map<UUID, Long> lastKillTime = new HashMap<>();
-    private static final Map<UUID, BukkitRunnable> decayTasks = new HashMap<>();
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Map<UUID, Integer> soulStacks = new ConcurrentHashMap<>();
+    private static final Map<UUID, Long> lastKillTime = new ConcurrentHashMap<>();
+    private static final Map<UUID, BukkitRunnable> decayTasks = new ConcurrentHashMap<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public SoulSiphonSkill() {
         super(SkillType.HOES, 25, "Soul Siphon",
@@ -56,9 +61,6 @@ public class SoulSiphonSkill extends SkillBonus implements StackingSkill {
             soulStacks.put(uuid, current + 1);
             player.getWorld().spawnParticle(Particle.SOUL,
                 player.getLocation().add(0, 1, 0), 5, 0.3, 0.5, 0.3, 0.02);
-
-            // Send stack count feedback
-            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("§5Soul Siphon: " + (current + 1) + "/" + MAX_STACKS));
         }
 
         lastKillTime.put(uuid, System.currentTimeMillis());
@@ -110,7 +112,7 @@ public class SoulSiphonSkill extends SkillBonus implements StackingSkill {
                 resetStacks(player);
                 decayTasks.remove(uuid);
                 if (player.isOnline()) {
-                    player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("§7Soul Siphon stacks decayed"));
+                    player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(DungeonsConfig.getSoulSiphonDecayMessage()));
                 }
             }
         };
@@ -163,12 +165,11 @@ public class SoulSiphonSkill extends SkillBonus implements StackingSkill {
     public List<String> getLoreDescription(int skillLevel) {
         double bonusPerStack = getBonusPerStack(skillLevel) * 100;
         double maxBonus = bonusPerStack * MAX_STACKS;
-        return List.of(
-                "&7Bonus per Stack: &f+" + String.format("%.1f", bonusPerStack) + "%",
-                "&7Max Stacks: &f" + MAX_STACKS,
-                "&7Max Bonus: &f+" + String.format("%.1f", maxBonus) + "%",
-                "&7Stacks decay after 30s"
-        );
+        return applyLoreTemplates(Map.of(
+                "bonusPerStack", String.format("%.1f", bonusPerStack),
+                "maxStacks", String.valueOf(MAX_STACKS),
+                "maxBonus", String.format("%.1f", maxBonus)
+        ));
     }
 
     @Override
@@ -178,7 +179,9 @@ public class SoulSiphonSkill extends SkillBonus implements StackingSkill {
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("+%.1f%% per Soul Stack", getBonusPerStack(skillLevel) * 100);
+        return applyFormattedBonusTemplate(Map.of(
+                "bonusPerStack", String.format("%.1f", getBonusPerStack(skillLevel) * 100)
+        ));
     }
 
     @Override

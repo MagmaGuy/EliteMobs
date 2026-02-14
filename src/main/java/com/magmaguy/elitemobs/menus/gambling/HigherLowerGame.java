@@ -13,7 +13,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -39,6 +38,10 @@ public class HigherLowerGame {
     private static final int LOWER_SLOT = 25;
     private static final int STREAK_SLOT = 4;
     private static final int BET_INFO_SLOT = 13;
+
+    // Safety cap to prevent integer overflow / absurd payouts
+    // 1.5^12 = ~129.7x, first time over 100k at max bet (1000)
+    private static final int MAX_STREAK = 12;
 
     // Card values (2-14, where 11=J, 12=Q, 13=K, 14=A)
     private static final String[] CARD_NAMES = {"", "", "2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King", "Ace"};
@@ -71,7 +74,7 @@ public class HigherLowerGame {
         session.currentCard = drawCard();
         activeSessions.put(player.getUniqueId(), session);
 
-        String title = ChatColorConverter.convert(GamblingConfig.getHigherLowerMenuTitle());
+        String title = GamblingConfig.getHigherLowerMenuTitle();
         Inventory inventory = Bukkit.createInventory(player, 27, title);
 
         updateDisplay(inventory, session);
@@ -112,8 +115,8 @@ public class HigherLowerGame {
                 ChatColorConverter.convert("&6&l" + getCardName(session.currentCard)),
                 List.of(
                         "",
-                        ChatColorConverter.convert("&7Value: &f" + session.currentCard),
-                        ChatColorConverter.convert("&7Is the next card higher or lower?")
+                        GamblingConfig.getHigherLowerCardValueLabel() + session.currentCard,
+                        GamblingConfig.getHigherLowerNextCardPrompt()
                 ),
                 1
         );
@@ -122,10 +125,10 @@ public class HigherLowerGame {
         // Next card (hidden)
         ItemStack nextCard = ItemStackGenerator.generateItemStack(
                 Material.GRAY_BANNER,
-                ChatColorConverter.convert("&8&l???"),
+                GamblingConfig.getHigherLowerHiddenCardText(),
                 List.of(
                         "",
-                        ChatColorConverter.convert("&7Make your guess!")
+                        GamblingConfig.getHigherLowerMakeGuessLore()
                 ),
                 1
         );
@@ -134,11 +137,11 @@ public class HigherLowerGame {
         // Higher button
         ItemStack higherButton = ItemStackGenerator.generateItemStack(
                 Material.LIME_CONCRETE,
-                ChatColorConverter.convert("&a&lHIGHER"),
+                GamblingConfig.getHigherLowerHigherButtonText(),
                 List.of(
                         "",
-                        ChatColorConverter.convert("&7Click if you think the next"),
-                        ChatColorConverter.convert("&7card is &ahigher &7than " + getCardName(session.currentCard))
+                        GamblingConfig.getHigherLowerHigherLore1(),
+                        GamblingConfig.getHigherLowerHigherLore2() + getCardName(session.currentCard)
                 ),
                 1
         );
@@ -150,21 +153,21 @@ public class HigherLowerGame {
         if (session.streak > 0) {
             cashOutButton = ItemStackGenerator.generateItemStack(
                     Material.GOLD_INGOT,
-                    ChatColorConverter.convert("&e&lCASH OUT"),
+                    GamblingConfig.getHigherLowerCashOutButtonText(),
                     List.of(
                             "",
-                            ChatColorConverter.convert("&7Current Winnings: &a" + String.format("%.2f", currentPayout)),
-                            ChatColorConverter.convert("&7Click to take your winnings!")
+                            GamblingConfig.getHigherLowerCurrentWinningsLabel() + String.format("%.2f", currentPayout),
+                            GamblingConfig.getHigherLowerCashOutClickLore()
                     ),
                     1
             );
         } else {
             cashOutButton = ItemStackGenerator.generateItemStack(
                     Material.GRAY_STAINED_GLASS_PANE,
-                    ChatColorConverter.convert("&7Cash Out"),
+                    GamblingConfig.getHigherLowerCashOutDisabledText(),
                     List.of(
                             "",
-                            ChatColorConverter.convert("&7Win at least once to cash out!")
+                            GamblingConfig.getHigherLowerCashOutWinOnceLore()
                     ),
                     1
             );
@@ -174,11 +177,11 @@ public class HigherLowerGame {
         // Lower button
         ItemStack lowerButton = ItemStackGenerator.generateItemStack(
                 Material.RED_CONCRETE,
-                ChatColorConverter.convert("&c&lLOWER"),
+                GamblingConfig.getHigherLowerLowerButtonText(),
                 List.of(
                         "",
-                        ChatColorConverter.convert("&7Click if you think the next"),
-                        ChatColorConverter.convert("&7card is &clower &7than " + getCardName(session.currentCard))
+                        GamblingConfig.getHigherLowerLowerLore1(),
+                        GamblingConfig.getHigherLowerLowerLore2() + getCardName(session.currentCard)
                 ),
                 1
         );
@@ -187,11 +190,12 @@ public class HigherLowerGame {
         // Streak display
         ItemStack streakDisplay = ItemStackGenerator.generateItemStack(
                 Material.BLAZE_POWDER,
-                ChatColorConverter.convert("&6Streak: " + session.streak),
+                GamblingConfig.getHigherLowerStreakLabel() + session.streak + "/" + MAX_STREAK,
                 List.of(
                         "",
-                        ChatColorConverter.convert("&7Multiplier: &e" + String.format("%.2f", session.multiplier) + "x"),
-                        ChatColorConverter.convert("&7Potential Win: &a" + String.format("%.2f", currentPayout))
+                        GamblingConfig.getHigherLowerMultiplierLabel() + String.format("%.2f", session.multiplier) + "x",
+                        GamblingConfig.getHigherLowerPotentialWinLabel() + String.format("%.2f", currentPayout),
+                        ChatColorConverter.convert(GamblingConfig.getHigherLowerMaxStreakLabel() + MAX_STREAK + GamblingConfig.getHigherLowerAutoCashoutSuffix())
                 ),
                 1
         );
@@ -200,10 +204,10 @@ public class HigherLowerGame {
         // Bet info
         ItemStack betInfo = ItemStackGenerator.generateItemStack(
                 Material.EMERALD,
-                ChatColorConverter.convert("&aBet: " + session.betAmount),
+                GamblingConfig.getHigherLowerBetLabel() + session.betAmount,
                 List.of(
                         "",
-                        ChatColorConverter.convert("&7Each correct guess multiplies by &e" + GamblingConfig.getHigherLowerMultiplier() + "x")
+                        GamblingConfig.getHigherLowerEachGuessLore() + GamblingConfig.getHigherLowerMultiplier() + "x"
                 ),
                 1
         );
@@ -237,10 +241,19 @@ public class HigherLowerGame {
         if (playerWins) {
             session.streak++;
             session.multiplier *= GamblingConfig.getHigherLowerMultiplier();
-            // Don't award yet - player might continue
+
+            // Force cash-out at max streak to prevent infinite multiplier exploit
+            if (session.streak >= MAX_STREAK) {
+                session.gameOver = true;
+                session.forcedCashOut = true;
+                double payout = session.betAmount * session.multiplier;
+                session.winAmount = GamblingEconomyHandler.resolveOutcome(player.getUniqueId(), payout);
+            }
+            // Otherwise don't award yet - player might continue
         } else {
             session.gameOver = true;
-            // Player loses - bet was already taken, nothing more to do
+            // Player loses - resolve with 0 payout (house keeps the bet)
+            GamblingEconomyHandler.resolveOutcome(player.getUniqueId(), 0);
         }
 
         // STEP 3: Disable buttons
@@ -259,17 +272,15 @@ public class HigherLowerGame {
         session.gameOver = true;
         double payout = session.betAmount * session.multiplier;
 
-        // Award winnings
-        GamblingEconomyHandler.awardWinnings(player.getUniqueId(), payout);
+        // Resolve outcome through central handler
+        payout = GamblingEconomyHandler.resolveOutcome(player.getUniqueId(), payout);
 
         // Update display
         disableButtons(inventory);
         showCashOutResult(inventory, session, payout);
 
-        player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
-        player.sendMessage(ChatColorConverter.convert(
-                GamblingConfig.getWinMessage().replace("%amount%", String.format("%.2f", payout))
-        ));
+        GamblingDisplay.playWinSound(player);
+        GamblingDisplay.sendWinMessage(player, payout);
     }
 
     /**
@@ -278,7 +289,7 @@ public class HigherLowerGame {
     private static void disableButtons(Inventory inventory) {
         ItemStack disabled = ItemStackGenerator.generateItemStack(
                 Material.GRAY_STAINED_GLASS_PANE,
-                ChatColorConverter.convert("&7Wait..."),
+                GamblingConfig.getHigherLowerWait(),
                 List.of(),
                 1
         );
@@ -309,7 +320,7 @@ public class HigherLowerGame {
                     ItemStack shuffledCard = ItemStackGenerator.generateItemStack(
                             getCardMaterial(randomValue),
                             ChatColorConverter.convert("&8" + getCardName(randomValue)),
-                            List.of(ChatColorConverter.convert("&7Revealing...")),
+                            List.of(GamblingConfig.getHigherLowerRevealing()),
                             1
                     );
                     inventory.setItem(NEXT_CARD_SLOT, shuffledCard);
@@ -321,7 +332,7 @@ public class HigherLowerGame {
                             ChatColorConverter.convert("&6&l" + getCardName(nextCard)),
                             List.of(
                                     "",
-                                    ChatColorConverter.convert("&7Value: &f" + nextCard)
+                                    GamblingConfig.getHigherLowerCardValueLabel() + nextCard
                             ),
                             1
                     );
@@ -346,8 +357,22 @@ public class HigherLowerGame {
         session.currentCard = session.nextCard;
         session.isProcessing = false;
 
+        // Check if max streak was reached (forced cash-out)
+        if (session.forcedCashOut) {
+            GamblingDisplay.playBigWinSound(player);
+            player.sendMessage(
+                    GamblingConfig.getHigherLowerMaxStreakChat()
+                            .replace("%streak%", String.valueOf(MAX_STREAK))
+                            .replace("%amount%", String.format("%.2f", session.winAmount)));
+            showCashOutResult(inventory, session, session.winAmount);
+            return;
+        }
+
         player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 1.5f);
-        player.sendMessage(ChatColorConverter.convert("&a[Casino] Correct! Streak: " + session.streak + " | Multiplier: " + String.format("%.2f", session.multiplier) + "x"));
+        player.sendMessage(
+                GamblingConfig.getHigherLowerCorrectChat()
+                        .replace("%streak%", String.valueOf(session.streak))
+                        .replace("%multiplier%", String.format("%.2f", session.multiplier)));
 
         // Update display for next round
         updateDisplay(inventory, session);
@@ -360,22 +385,20 @@ public class HigherLowerGame {
         // Update center card to show GAME OVER
         ItemStack gameOver = ItemStackGenerator.generateItemStack(
                 Material.REDSTONE_BLOCK,
-                ChatColorConverter.convert("&c&lGAME OVER"),
+                GamblingConfig.getHigherLowerGameOverTitle(),
                 List.of(
                         "",
-                        ChatColorConverter.convert("&7You lost! The card was " + getCardName(session.nextCard)),
-                        ChatColorConverter.convert("&7You lost &c" + session.betAmount + " coins"),
+                        GamblingConfig.getHigherLowerLostCardLore() + getCardName(session.nextCard),
+                        GamblingConfig.getHigherLowerLostCoinsLore() + session.betAmount + " " + GamblingConfig.getGamblingCurrencyWord(),
                         "",
-                        ChatColorConverter.convert("&eClose to continue")
+                        GamblingConfig.getHigherLowerCloseToContinue()
                 ),
                 1
         );
         inventory.setItem(BET_INFO_SLOT, gameOver);
 
-        player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
-        player.sendMessage(ChatColorConverter.convert(
-                GamblingConfig.getLoseMessage().replace("%amount%", String.valueOf(session.betAmount))
-        ));
+        GamblingDisplay.playLoseSound(player);
+        GamblingDisplay.sendLoseMessage(player, session.betAmount);
     }
 
     /**
@@ -384,13 +407,13 @@ public class HigherLowerGame {
     private static void showCashOutResult(Inventory inventory, HigherLowerSession session, double payout) {
         ItemStack cashOutResult = ItemStackGenerator.generateItemStack(
                 Material.EMERALD_BLOCK,
-                ChatColorConverter.convert("&a&lCASHED OUT!"),
+                GamblingConfig.getHigherLowerCashedOutTitle(),
                 List.of(
                         "",
-                        ChatColorConverter.convert("&7You cashed out with &a" + String.format("%.2f", payout) + " coins!"),
-                        ChatColorConverter.convert("&7Streak: &e" + session.streak),
+                        GamblingConfig.getHigherLowerCashedOutLore() + String.format("%.2f", payout) + " " + GamblingConfig.getGamblingCurrencyWord() + "!",
+                        GamblingConfig.getHigherLowerCashedOutStreakLore() + session.streak,
                         "",
-                        ChatColorConverter.convert("&eClose to continue")
+                        GamblingConfig.getHigherLowerCloseToContinue()
                 ),
                 1
         );
@@ -405,9 +428,7 @@ public class HigherLowerGame {
     /**
      * Stores game session data.
      */
-    private static class HigherLowerSession {
-        final UUID playerUUID;
-        final int betAmount;
+    private static class HigherLowerSession extends GamblingSession {
         int currentCard;
         int nextCard;
         int streak = 0;
@@ -415,10 +436,11 @@ public class HigherLowerGame {
         boolean isProcessing = false;
         boolean lastGuessCorrect = false;
         boolean gameOver = false;
+        boolean forcedCashOut = false;
+        double winAmount = 0;
 
         HigherLowerSession(UUID playerUUID, int betAmount) {
-            this.playerUUID = playerUUID;
-            this.betAmount = betAmount;
+            super(playerUUID, betAmount);
         }
     }
 
@@ -430,14 +452,8 @@ public class HigherLowerGame {
 
         @EventHandler
         public void onClick(InventoryClickEvent event) {
-            if (!menus.contains(event.getInventory())) return;
-            if (event.getClickedInventory() == null || !event.getClickedInventory().getType().equals(InventoryType.CHEST)) {
-                event.setCancelled(true);
-                return;
-            }
-            event.setCancelled(true);
-
-            if (!(event.getWhoClicked() instanceof Player player)) return;
+            Player player = GamblingDisplay.validateClick(event, menus);
+            if (player == null) return;
 
             HigherLowerSession session = activeSessions.get(player.getUniqueId());
             if (session == null) return;
@@ -455,8 +471,24 @@ public class HigherLowerGame {
 
         @EventHandler
         public void onClose(InventoryCloseEvent event) {
-            menus.remove(event.getInventory());
-            activeSessions.remove(event.getPlayer().getUniqueId());
+            if (!menus.remove(event.getInventory())) return;
+            HigherLowerSession session = activeSessions.remove(event.getPlayer().getUniqueId());
+            if (session == null) return;
+
+            // Auto-cash-out if player has a winning streak and hasn't been paid yet
+            if (session.streak > 0 && !session.gameOver) {
+                double payout = session.betAmount * session.multiplier;
+                double awarded = GamblingEconomyHandler.resolveOutcome(event.getPlayer().getUniqueId(), payout);
+                if (awarded > 0 && event.getPlayer() instanceof Player player) {
+                    player.sendMessage(
+                            GamblingConfig.getHigherLowerAutoCashOutChat()
+                                    .replace("%amount%", String.format("%.2f", awarded))
+                                    .replace("%streak%", String.valueOf(session.streak)));
+                }
+            } else if (!session.gameOver) {
+                // No streak, player closed without playing — forfeit
+                GamblingEconomyHandler.resolveOutcome(event.getPlayer().getUniqueId(), 0);
+            }
         }
     }
 }

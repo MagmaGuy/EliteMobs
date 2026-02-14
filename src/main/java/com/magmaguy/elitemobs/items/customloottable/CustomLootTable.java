@@ -7,7 +7,6 @@ import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.config.customquests.CustomQuestsConfigFields;
 import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestConfigFields;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
-import com.magmaguy.magmacore.util.ChatColorConverter;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -115,7 +114,7 @@ public class CustomLootTable implements Serializable {
                 }
             }
         if (!anythingDropped)
-            player.sendMessage(ChatColorConverter.convert(DefaultConfig.getTreasureChestNoDropMessage()));
+            player.sendMessage(DefaultConfig.getTreasureChestNoDropMessage());
     }
 
     public void questDrop(Player player, int questRewardLevel) {

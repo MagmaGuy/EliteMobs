@@ -59,6 +59,21 @@ public class SkillBonusConfigFields extends CustomConfigFields {
     @Getter
     private String skillId;
 
+    @Getter
+    protected List<String> loreTemplates = List.of();
+
+    @Getter
+    protected String formattedBonusTemplate = "";
+
+    /**
+     * Fallback constructor for user-created or orphaned config files.
+     * Used by MagmaCore when no matching premade config class exists.
+     */
+    public SkillBonusConfigFields(String filename, boolean isEnabled) {
+        super(filename, isEnabled);
+        this.skillId = filename.replace(".yml", "").toLowerCase(Locale.ROOT);
+    }
+
     /**
      * Constructor for premade skill config files.
      */
@@ -238,6 +253,10 @@ public class SkillBonusConfigFields extends CustomConfigFields {
         // Generate skill ID from filename
         this.skillId = filename.replace(".yml", "").toLowerCase(Locale.ROOT);
 
+        // Translatable lore and formatted bonus templates
+        this.loreTemplates = translatable(filename, "loreTemplates", processStringList("loreTemplates", loreTemplates, loreTemplates, false));
+        this.formattedBonusTemplate = translatable(filename, "formattedBonusTemplate", processString("formattedBonusTemplate", formattedBonusTemplate, formattedBonusTemplate, false));
+
         processAdditionalFields();
     }
 
@@ -269,7 +288,7 @@ public class SkillBonusConfigFields extends CustomConfigFields {
      * @return The calculated bonus value
      */
     public double calculateValue(int skillLevel) {
-        return baseValue + (skillLevel * scalingPerLevel);
+        return Math.min(10.0, baseValue + (skillLevel * scalingPerLevel));
     }
 
     /**

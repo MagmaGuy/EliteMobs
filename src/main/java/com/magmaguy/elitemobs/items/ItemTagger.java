@@ -9,7 +9,6 @@ import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffect;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffectContainer;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.utils.PersistentVanillaData;
-import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.NamespacedKey;
@@ -33,6 +32,12 @@ public class ItemTagger {
     private static final NamespacedKey ELITE_DEFENSE = new NamespacedKey(MetadataHandler.PLUGIN, "eliteDefense");
     @Getter
     private static final NamespacedKey ELITE_LEVEL = new NamespacedKey(MetadataHandler.PLUGIN, "eliteLevel");
+
+    // Arrow combat data — stored at launch time for accurate ranged damage calculation
+    private static final NamespacedKey ARROW_WEAPON_LEVEL = new NamespacedKey(MetadataHandler.PLUGIN, "arrowWeaponLevel");
+    private static final NamespacedKey ARROW_SKILL_TYPE = new NamespacedKey(MetadataHandler.PLUGIN, "arrowSkillType");
+    private static final NamespacedKey ARROW_SKILL_LEVEL = new NamespacedKey(MetadataHandler.PLUGIN, "arrowSkillLevel");
+    private static final NamespacedKey ARROW_DAMAGE_MULTIPLIER = new NamespacedKey(MetadataHandler.PLUGIN, "arrowDamageMultiplier");
 
     public static String itemValue = "ItemValue";
 
@@ -192,10 +197,10 @@ public class ItemTagger {
 
     public static void registerItemSource(EliteEntity eliteEntity, ItemMeta itemMeta) {
         if (eliteEntity == null) {
-            itemMeta.getPersistentDataContainer().set(itemSource, PersistentDataType.STRING, ChatColorConverter.convert(ItemSettingsConfig.getShopItemSource()));
+            itemMeta.getPersistentDataContainer().set(itemSource, PersistentDataType.STRING, ItemSettingsConfig.getShopItemSource());
             return;
         }
-        itemMeta.getPersistentDataContainer().set(itemSource, PersistentDataType.STRING, ChatColorConverter.convert(ItemSettingsConfig.getMobItemSource().replace("$mob", eliteEntity.getName())));
+        itemMeta.getPersistentDataContainer().set(itemSource, PersistentDataType.STRING, ItemSettingsConfig.getMobItemSource().replace("$mob", eliteEntity.getName()));
     }
 
     public static String getItemSource(ItemMeta itemMeta) {
@@ -262,6 +267,65 @@ public class ItemTagger {
                 trident.setDamage(trident.getDamage() + damageValue);
             }
         }
+    }
+
+    // ==================== ARROW COMBAT DATA ====================
+
+    public static void setArrowWeaponLevel(@Nullable Projectile projectile, double level) {
+        if (projectile == null) return;
+        projectile.getPersistentDataContainer().set(ARROW_WEAPON_LEVEL, PersistentDataType.DOUBLE, level);
+    }
+
+    public static double getArrowWeaponLevel(@Nullable Projectile projectile) {
+        if (projectile == null) return -1;
+        Double val = projectile.getPersistentDataContainer().get(ARROW_WEAPON_LEVEL, PersistentDataType.DOUBLE);
+        return val != null ? val : -1;
+    }
+
+    public static void setArrowSkillType(@Nullable Projectile projectile, String skillType) {
+        if (projectile == null || skillType == null) return;
+        projectile.getPersistentDataContainer().set(ARROW_SKILL_TYPE, PersistentDataType.STRING, skillType);
+    }
+
+    @Nullable
+    public static String getArrowSkillType(@Nullable Projectile projectile) {
+        if (projectile == null) return null;
+        return projectile.getPersistentDataContainer().get(ARROW_SKILL_TYPE, PersistentDataType.STRING);
+    }
+
+    public static void setArrowSkillLevel(@Nullable Projectile projectile, int level) {
+        if (projectile == null) return;
+        projectile.getPersistentDataContainer().set(ARROW_SKILL_LEVEL, PersistentDataType.INTEGER, level);
+    }
+
+    public static int getArrowSkillLevel(@Nullable Projectile projectile) {
+        if (projectile == null) return -1;
+        Integer val = projectile.getPersistentDataContainer().get(ARROW_SKILL_LEVEL, PersistentDataType.INTEGER);
+        return val != null ? val : -1;
+    }
+
+    /**
+     * Sets a damage multiplier on a projectile, used by skill-spawned arrows
+     * (e.g. Multishot, Arrow Rain) to reduce their damage relative to the formula output.
+     *
+     * @param projectile The projectile to tag
+     * @param multiplier The damage multiplier (e.g. 0.5 for 50% damage)
+     */
+    public static void setArrowDamageMultiplier(@Nullable Projectile projectile, double multiplier) {
+        if (projectile == null) return;
+        projectile.getPersistentDataContainer().set(ARROW_DAMAGE_MULTIPLIER, PersistentDataType.DOUBLE, multiplier);
+    }
+
+    /**
+     * Gets the damage multiplier stored on a projectile.
+     *
+     * @param projectile The projectile to read
+     * @return The stored multiplier, or -1 if not set
+     */
+    public static double getArrowDamageMultiplier(@Nullable Projectile projectile) {
+        if (projectile == null) return -1;
+        Double val = projectile.getPersistentDataContainer().get(ARROW_DAMAGE_MULTIPLIER, PersistentDataType.DOUBLE);
+        return val != null ? val : -1;
     }
 
     public static double getEliteDefenseAttribute(@Nullable ItemStack itemStack) {

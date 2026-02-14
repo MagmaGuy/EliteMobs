@@ -11,5 +11,11 @@ public class SpearsVanguardConfig extends SkillBonusConfigFields {
         super("spears_vanguard.yml", true, "&bVanguard",
               List.of("&7Charge forward, damaging", "&7enemies in your path. 20s CD."),
               SkillType.SPEARS, 3, 1.0, 0.02, 0.0, 20.0, Material.FEATHER, true);
+        this.loreTemplates = List.of(
+                "&7Damage: &f$damage%",
+                "&7Distance: &f$distance blocks",
+                "&7Cooldown: &f$cooldowns"
+        );
+        this.formattedBonusTemplate = "Charge $damage% (CD: $cooldowns)";
     }
 }

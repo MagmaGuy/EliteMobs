@@ -8,8 +8,6 @@ import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.CooldownSkill;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -18,7 +16,11 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Consecration (COOLDOWN) - Create holy ground that damages enemies standing in it.
@@ -32,8 +34,8 @@ public class ConsecrationSkill extends SkillBonus implements CooldownSkill {
     private static final int DURATION_TICKS = 100; // 5 seconds
     private static final int TICK_INTERVAL = 20; // Damage every second
 
-    private static final Map<UUID, Long> cooldowns = new HashMap<>();
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Map<UUID, Long> cooldowns = new ConcurrentHashMap<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public ConsecrationSkill() {
         super(SkillType.MACES, 50, "Consecration",
@@ -136,16 +138,12 @@ public class ConsecrationSkill extends SkillBonus implements CooldownSkill {
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
 
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-            TextComponent.fromLegacyText("\u00A7e\u00A7lCONSECRATION!"));
-
         startCooldown(player, skillLevel);
-        incrementProcCount(player);
     }
 
     public double getDamagePerTick(int skillLevel) {
         if (configFields != null) {
-            return configFields.calculateValue(skillLevel) * 10; // Base damage per tick
+            return configFields.calculateValue(skillLevel); // Base damage per tick
         }
         return 5.0 + (skillLevel * 0.1);
     }
@@ -178,12 +176,11 @@ public class ConsecrationSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        return List.of(
-            "&7Damage/Second: &f" + String.format("%.1f", getDamagePerTick(skillLevel)),
-            "&7Radius: &f" + AOE_RADIUS + " blocks",
-            "&7Duration: &f5 seconds",
-            "&7Cooldown: &f" + getCooldownSeconds(skillLevel) + "s"
-        );
+        return applyLoreTemplates(Map.of(
+                "damagePerSecond", String.format("%.1f", getDamagePerTick(skillLevel)),
+                "radius", String.valueOf(AOE_RADIUS),
+                "cooldown", String.valueOf(getCooldownSeconds(skillLevel))
+        ));
     }
 
     @Override
@@ -193,7 +190,10 @@ public class ConsecrationSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("%.1f DPS Zone (CD: %ds)", getDamagePerTick(skillLevel), getCooldownSeconds(skillLevel));
+        return applyFormattedBonusTemplate(Map.of(
+                "damagePerSecond", String.format("%.1f", getDamagePerTick(skillLevel)),
+                "cooldown", String.valueOf(getCooldownSeconds(skillLevel))
+        ));
     }
 
     @Override

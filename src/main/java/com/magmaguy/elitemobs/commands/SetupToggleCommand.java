@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.commands;
 
+import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
 import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
@@ -23,12 +24,12 @@ public class SetupToggleCommand extends AdvancedCommand {
     public void execute(CommandData commandData) {
         String dungeon = commandData.getStringArgument("empackages");
         if (dungeon.isEmpty() || EMPackage.getEmPackages().get(dungeon) == null)
-            Logger.sendMessage(commandData.getCommandSender(), "Not a valid em package!");
+            Logger.sendMessage(commandData.getCommandSender(), CommandMessagesConfig.getSetupNotValidPackageMessage());
         EMPackage emPackage = EMPackage.getEmPackages().get(dungeon);
         emPackage.doInstall(null);
         if (emPackage.isInstalled())
-            Logger.sendMessage(commandData.getCommandSender(), "Successfully installed content!");
+            Logger.sendMessage(commandData.getCommandSender(), CommandMessagesConfig.getSetupInstalledMessage());
         else
-            Logger.sendMessage(commandData.getCommandSender(), "Successfully uninstalled content!");
+            Logger.sendMessage(commandData.getCommandSender(), CommandMessagesConfig.getSetupUninstalledMessage());
     }
 }

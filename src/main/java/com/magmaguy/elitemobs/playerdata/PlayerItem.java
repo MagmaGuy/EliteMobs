@@ -11,7 +11,6 @@ import com.magmaguy.elitemobs.items.customenchantments.*;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffect;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.utils.BossBarUtil;
-import com.magmaguy.magmacore.util.ChatColorConverter;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
@@ -85,7 +84,7 @@ public class PlayerItem {
 
         if (isOnLastDamage(itemStack)) {
             if (!displayingAsBroken) {
-                BossBarUtil.DisplayBrokenItemBossBar(equipmentSlot, player, ChatColorConverter.convert(ItemSettingsConfig.getNoItemDurabilityMessage().replace("$item", !itemStack.getItemMeta().hasDisplayName() ? itemStack.getType().toString() : itemStack.getItemMeta().getDisplayName())));
+                BossBarUtil.DisplayBrokenItemBossBar(equipmentSlot, player, ItemSettingsConfig.getNoItemDurabilityMessage().replace("$item", !itemStack.getItemMeta().hasDisplayName() ? itemStack.getType().toString() : itemStack.getItemMeta().getDisplayName()));
                 displayingAsBroken = true;
             }
 //            player.sendMessage(ChatColorConverter.convert(ItemSettingsConfig.getNoItemDurabilityMessage().replace(

@@ -1,6 +1,8 @@
 package com.magmaguy.elitemobs.skills;
 
+import com.magmaguy.elitemobs.config.SkillsConfig;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
+import com.magmaguy.magmacore.util.ChatColorConverter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -63,6 +65,6 @@ public class CombatLevelCalculator {
      */
     public static String getFormattedCombatLevel(UUID playerUUID) {
         int combatLevel = calculateCombatLevel(playerUUID);
-        return "\u00A76\u00A7lCombat Lv. " + combatLevel;
+        return ChatColorConverter.convert(SkillsConfig.getCombatLevelFormat().replace("$level", String.valueOf(combatLevel)));
     }
 }

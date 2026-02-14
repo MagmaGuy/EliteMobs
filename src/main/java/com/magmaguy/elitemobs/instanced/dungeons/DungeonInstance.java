@@ -84,13 +84,13 @@ public class DungeonInstance extends MatchInstance {
     public static void setupInstancedDungeon(Player player, String instancedDungeonConfigFieldsString, String difficultyName) {
         ContentPackagesConfigFields instancedDungeonsConfigFields = ContentPackagesConfig.getDungeonPackages().get(instancedDungeonConfigFieldsString);
         if (instancedDungeonsConfigFields == null) {
-            player.sendMessage("[EliteMobs] Failed to get data for dungeon " + instancedDungeonConfigFieldsString + "! The dungeon will not start.");
+            player.sendMessage(DungeonsConfig.getDungeonDataFailedMessage().replace("$dungeon", instancedDungeonConfigFieldsString));
             return;
         }
 
         if (instancedDungeonsConfigFields.getPermission() != null && !instancedDungeonsConfigFields.getPermission().isEmpty())
             if (!player.hasPermission(instancedDungeonsConfigFields.getPermission())) {
-                player.sendMessage("[EliteMobs] You don't have the permission to go to this dungeon!");
+                player.sendMessage(DungeonsConfig.getDungeonNoPermissionMessage());
                 return;
             }
 
@@ -113,7 +113,7 @@ public class DungeonInstance extends MatchInstance {
                 instancedDungeonsConfigFields);
         new EventCaller(worldInstanceEvent);
         if (worldInstanceEvent.isCancelled()) {
-            player.sendMessage("[EliteMobs] Something cancelled the instancing event! The dungeon will not start.");
+            player.sendMessage(DungeonsConfig.getDungeonCancelledEventMessage());
             return false;
         }
         return true;
@@ -122,7 +122,7 @@ public class DungeonInstance extends MatchInstance {
     protected static File cloneWorldFiles(ContentPackagesConfigFields instancedDungeonsConfigFields, String instancedWordName, Player player) {
         File targetFile = WorldInstantiator.cloneWorld(instancedDungeonsConfigFields.getWorldName(), instancedWordName, instancedDungeonsConfigFields.getDungeonConfigFolderName());
         if (targetFile == null) {
-            player.sendMessage("[EliteMobs] Failed to copy the world! Report this to the dev. The dungeon will not start.");
+            player.sendMessage(DungeonsConfig.getDungeonCopyFailedMessage());
             return null;
         }
         return targetFile;
@@ -134,7 +134,7 @@ public class DungeonInstance extends MatchInstance {
                                                               String difficultyName) {
         World world = DungeonUtils.loadWorld(instancedWordName, instancedDungeonsConfigFields.getEnvironment(), instancedDungeonsConfigFields);
         if (world == null) {
-            player.sendMessage("[EliteMobs] Failed to load the world! Report this to the dev. The dungeon will not start.");
+            player.sendMessage(DungeonsConfig.getDungeonWorldLoadFailedMessage());
             return null;
         }
 
@@ -162,7 +162,7 @@ public class DungeonInstance extends MatchInstance {
     public boolean addNewPlayer(Player player) {
         if (!super.addNewPlayer(player)) return false;
         if (levelSync > 0)
-            player.sendMessage("[EliteMobs] Dungeon difficulty is set to " + difficultyName + " ! Level sync caps your item level to " + levelSync + ".");
+            player.sendMessage(DungeonsConfig.getDungeonDifficultyMessage().replace("$difficulty", difficultyName).replace("$levelSync", String.valueOf(levelSync)));
         return true;
     }
 

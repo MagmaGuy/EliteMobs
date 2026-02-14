@@ -2,17 +2,15 @@ package com.magmaguy.elitemobs.skills.bonuses.skills.crossbows;
 
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
-import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.ConditionalSkill;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Steady Aim (CONDITIONAL) - Bonus damage when standing still.
@@ -24,13 +22,17 @@ public class SteadyAimSkill extends SkillBonus implements ConditionalSkill {
     private static final long STAND_TIME_REQUIRED = 1500; // 1.5 seconds
     private static final double BASE_BONUS = 0.20; // 20% bonus
 
-    private static final Set<UUID> activePlayers = new HashSet<>();
-    private static final Map<UUID, Long> standingStillSince = new HashMap<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
+    private static final Map<UUID, Long> standingStillSince = new ConcurrentHashMap<>();
 
     public SteadyAimSkill() {
         super(SkillType.CROSSBOWS, 10, "Steady Aim",
               "Standing still increases your damage.",
               SkillBonusType.CONDITIONAL, 1, SKILL_ID);
+    }
+
+    public static boolean hasActiveSkill(UUID playerUUID) {
+        return activePlayers.contains(playerUUID);
     }
 
     public static void updatePlayerMovement(UUID uuid, boolean isMoving) {
@@ -63,6 +65,19 @@ public class SteadyAimSkill extends SkillBonus implements ConditionalSkill {
         return getConditionalBonus(skillLevel) * (1 + timeBonus);
     }
 
+    /**
+     * Simulates the player standing still for testing purposes.
+     * Sets the standingStillSince timestamp to the given duration ago.
+     */
+    public static void simulateStationary(UUID uuid, long durationMs) {
+        standingStillSince.put(uuid, System.currentTimeMillis() - durationMs);
+    }
+
+    @Override
+    public TestStrategy getTestStrategy() {
+        return TestStrategy.CONDITION_SETUP;
+    }
+
     @Override
     public void applyBonus(Player player, int skillLevel) { activePlayers.add(player.getUniqueId()); }
     @Override
@@ -82,17 +97,13 @@ public class SteadyAimSkill extends SkillBonus implements ConditionalSkill {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        return List.of(
-                "&7Base Bonus: &f" + String.format("%.1f", getConditionalBonus(skillLevel) * 100) + "%",
-                "&7Max Bonus: &f3x base",
-                "&7Stand still for 1.5s to activate"
-        );
+        return applyLoreTemplates(Map.of("value", String.format("%.1f", getConditionalBonus(skillLevel) * 100)));
     }
 
     @Override
     public double getBonusValue(int skillLevel) { return getConditionalBonus(skillLevel) * 3; }
     @Override
-    public String getFormattedBonus(int skillLevel) { return String.format("+%.1f%% when stationary", getConditionalBonus(skillLevel) * 100); }
+    public String getFormattedBonus(int skillLevel) { return applyFormattedBonusTemplate(Map.of("value", String.format("%.1f", getConditionalBonus(skillLevel) * 100))); }
     @Override
     public void shutdown() {
         activePlayers.clear();

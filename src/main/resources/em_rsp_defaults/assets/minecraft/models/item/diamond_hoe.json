@@ -5,11 +5,11 @@
     },
     
     "overrides": [
-        {"predicate": {"custom_model_data":1}, "model": "elitemobs:equipment/bronze_scythe"},
-        {"predicate": {"custom_model_data":2}, "model": "elitemobs:equipment/palladium_scythe"},
-        {"predicate": {"custom_model_data":3}, "model": "elitemobs:equipment/corrupted_scythe"},
-        {"predicate": {"custom_model_data":4}, "model": "elitemobs:equipment/living_scythe"},
-        {"predicate": {"custom_model_data":5}, "model": "elitemobs:equipment/ultimatium_scythe"}
+        {"predicate": {"custom_model_data":1}, "model": "elitemobs:gear/bronze_scythe"},
+        {"predicate": {"custom_model_data":2}, "model": "elitemobs:gear/palladium_scythe"},
+        {"predicate": {"custom_model_data":3}, "model": "elitemobs:gear/corrupted_scythe"},
+        {"predicate": {"custom_model_data":4}, "model": "elitemobs:gear/living_scythe"},
+        {"predicate": {"custom_model_data":5}, "model": "elitemobs:gear/ultimatium_scythe"}
 
     ]
 }
