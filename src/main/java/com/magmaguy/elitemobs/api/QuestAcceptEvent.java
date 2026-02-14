@@ -5,7 +5,6 @@ import com.magmaguy.elitemobs.config.SoundsConfig;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.Quest;
-import com.magmaguy.magmacore.util.ChatColorConverter;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -50,17 +49,17 @@ public class QuestAcceptEvent extends Event implements Cancellable {
             if (PlayerData.getQuests(event.getPlayer().getUniqueId()).size() < QuestsConfig.getMaximumActiveQuests())
                 return;
             event.setCancelled(true);
-            event.getPlayer().sendMessage(ChatColorConverter.convert(QuestsConfig.getQuestCapMessage()));
+            event.getPlayer().sendMessage(QuestsConfig.getQuestCapMessage());
         }
 
         @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
         public void onQuestAccept(QuestAcceptEvent event) {
-            event.getPlayer().sendMessage(QuestsConfig.getQuestJoinMessage().replace("$questName", ChatColorConverter.convert(event.getQuest().getQuestName())));
+            event.getPlayer().sendMessage(QuestsConfig.getQuestJoinMessage().replace("$questName", event.getQuest().getQuestName()));
             event.getQuest().setAccepted(true);
             if (QuestsConfig.isUseQuestAcceptTitles())
                 event.getPlayer().sendTitle(
-                        ChatColorConverter.convert(QuestsConfig.getQuestStartTitle().replace("$questName", event.getQuest().getQuestName())),
-                        ChatColorConverter.convert(QuestsConfig.getQuestStartSubtitle().replace("$questName", event.getQuest().getQuestName())),
+                        QuestsConfig.getQuestStartTitle().replace("$questName", event.getQuest().getQuestName()),
+                        QuestsConfig.getQuestStartSubtitle().replace("$questName", event.getQuest().getQuestName()),
                         20, 60, 20);
 
             boolean playedCustomSound = false;

@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.versionnotifier;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import com.magmaguy.magmacore.nightbreak.NightbreakAccount;
@@ -429,24 +430,24 @@ public class VersionChecker {
                 if (!player.hasPermission("elitemobs.versionnotification")) continue;
 
                 Logger.sendSimpleMessage(player, "&8&m-----------------------------------------------------");
-                Logger.sendMessage(player, "&e" + newlyOutdated.size() + " content update(s) available:");
+                Logger.sendMessage(player, CommandMessagesConfig.getContentUpdatesAvailable().replace("$count", String.valueOf(newlyOutdated.size())));
                 for (EMPackage emPackage : newlyOutdated) {
                     String name = emPackage.getContentPackagesConfigFields().getName();
-                    player.sendMessage(ChatColorConverter.convert("&e- " + name));
+                    player.sendMessage(CommandMessagesConfig.getContentUpdateEntry().replace("$name", name));
                 }
                 player.spigot().sendMessage(
-                        SpigotMessage.simpleMessage("&7Use &e/em setup &7to view and update, or "),
+                        SpigotMessage.simpleMessage(CommandMessagesConfig.getVersionUseSetupMessage()),
                         SpigotMessage.hoverLinkMessage(
                                 "&9&nhttps://nightbreak.io/plugin/elitemobs/#content",
-                                "Click for Nightbreak link",
+                                CommandMessagesConfig.getVersionNightbreakHover(),
                                 "https://nightbreak.io/plugin/elitemobs/#content"
                         )
                 );
                 if (NightbreakAccount.hasToken()) {
                     player.spigot().sendMessage(
                             SpigotMessage.commandHoverMessage(
-                                    "&a[Click here to update all content automatically]",
-                                    "&eRuns /em updatecontent",
+                                    CommandMessagesConfig.getVersionAutoUpdateMessage(),
+                                    CommandMessagesConfig.getVersionAutoUpdateHover(),
                                     "/em updatecontent"
                             )
                     );
@@ -536,17 +537,15 @@ public class VersionChecker {
                     if (!event.getPlayer().isOnline()) return;
 
                     if (connectionFailed && event.getPlayer().hasPermission("elitemobs.admin")) {
-                        event.getPlayer().sendMessage(ChatColorConverter.convert("&8[EliteMobs] &eWarning: Could not connect to update servers. " +
-                                "Version checking is currently unavailable. Check your internet connection or try again later."));
+                        event.getPlayer().sendMessage(CommandMessagesConfig.getVersionCheckConnectionWarning());
                     }
 
                     if (!pluginIsUpToDate)
-                        event.getPlayer().sendMessage(ChatColorConverter.convert("&cYour version of EliteMobs is outdated." +
-                                " &aYou can download the latest version from &3&n&ohttps://nightbreak.io/plugin/elitemobs/"));
+                        event.getPlayer().sendMessage(CommandMessagesConfig.getVersionOutdatedMessage());
 
                     if (!outdatedPackages.isEmpty()) {
                         Logger.sendSimpleMessage(event.getPlayer(), "&8&m-----------------------------------------------------");
-                        Logger.sendMessage(event.getPlayer(), "&cThe following dungeons are outdated:");
+                        Logger.sendMessage(event.getPlayer(), CommandMessagesConfig.getDungeonsOutdatedMessage());
                         for (EMPackage emPackage : outdatedPackages) {
                             String name = emPackage.getContentPackagesConfigFields().getName();
                             String link = emPackage.getContentPackagesConfigFields().getDownloadLink();
@@ -555,42 +554,42 @@ public class VersionChecker {
                                 // only send the hover-link if we actually have a URL
                                 event.getPlayer().spigot().sendMessage(
                                         SpigotMessage.hoverLinkMessage(
-                                                "&c- " + name,
-                                                ChatColorConverter.convert("&9Click to go to download link!"),
+                                                CommandMessagesConfig.getVersionOutdatedEntryPrefix() + name,
+                                                ChatColorConverter.convert(CommandMessagesConfig.getVersionClickDownloadHover()),
                                                 link
                                         )
                                 );
                             } else {
                                 // fall back to plain text if link is missing
                                 event.getPlayer().sendMessage(
-                                        ChatColorConverter.convert("&c- " + name + " &7(no download link available)")
+                                        ChatColorConverter.convert(CommandMessagesConfig.getVersionOutdatedEntryPrefix() + name + CommandMessagesConfig.getVersionNoDownloadLink())
                                 );
                             }
                         }
 
                         event.getPlayer().spigot().sendMessage(
-                                SpigotMessage.simpleMessage("&8[EliteMobs]&f You can download the update at "),
+                                SpigotMessage.simpleMessage(CommandMessagesConfig.getVersionDownloadAtMessage()),
                                 SpigotMessage.hoverLinkMessage(
                                         "&9&nhttps://nightbreak.io/plugin/elitemobs/#content",
-                                        "Click for Nightbreak link",
+                                        CommandMessagesConfig.getVersionNightbreakHover(),
                                         "https://nightbreak.io/plugin/elitemobs/#content"
                                 ),
                                 SpigotMessage.simpleMessage(" !")
                         );
                         event.getPlayer().spigot().sendMessage(
-                                SpigotMessage.simpleMessage("&2Updating is quick & easy! "),
+                                SpigotMessage.simpleMessage(CommandMessagesConfig.getVersionUpdateEasyMessage()),
                                 SpigotMessage.hoverLinkMessage(
-                                        "&9&nClick here",
-                                        "Click for wiki link",
+                                        CommandMessagesConfig.getVersionClickHereLabel(),
+                                        CommandMessagesConfig.getVersionWikiHover(),
                                         "https://nightbreak.io/plugin/elitemobs/#setup"
                                 ),
-                                SpigotMessage.simpleMessage(" &2for info on how to install updates and "),
+                                SpigotMessage.simpleMessage(CommandMessagesConfig.getVersionInstallInfoMessage()),
                                 SpigotMessage.hoverLinkMessage(
-                                        "&9&nhere",
-                                        "Discord support link",
+                                        CommandMessagesConfig.getVersionHereLabel(),
+                                        CommandMessagesConfig.getVersionDiscordHover(),
                                         DiscordLinks.mainLink
                                 ),
-                                SpigotMessage.simpleMessage(" &2for the support room.")
+                                SpigotMessage.simpleMessage(CommandMessagesConfig.getVersionSupportRoomMessage())
                         );
                         Logger.sendSimpleMessage(event.getPlayer(), "&8&m-----------------------------------------------------");
 
@@ -598,15 +597,15 @@ public class VersionChecker {
                         if (NightbreakAccount.hasToken()) {
                             event.getPlayer().spigot().sendMessage(
                                     SpigotMessage.commandHoverMessage(
-                                            "&a[Click here to update all content automatically]",
-                                            "&eRuns /em updatecontent",
+                                            CommandMessagesConfig.getVersionAutoUpdateMessage(),
+                                            CommandMessagesConfig.getVersionAutoUpdateHover(),
                                             "/em updatecontent"
                                     )
                             );
                         }
                     }
                     if (SHA1Updated) {
-                        event.getPlayer().sendMessage(ChatColorConverter.convert("&8[EliteMobs] &cThe EliteMobs resource pack has updated! This means that the current resource pack will not fully work until you restart your server. You only need to restart once!"));
+                        event.getPlayer().sendMessage(CommandMessagesConfig.getResourcePackUpdatedMessage());
                     }
                 }
             }.runTaskLater(MetadataHandler.PLUGIN, 20L * 3);

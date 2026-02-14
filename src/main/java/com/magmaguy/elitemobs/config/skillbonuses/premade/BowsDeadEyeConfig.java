@@ -11,5 +11,11 @@ public class BowsDeadEyeConfig extends SkillBonusConfigFields {
         super("bows_dead_eye.yml", true, "&4Dead Eye",
               List.of("&7Critical hits deal massive", "&7bonus damage. 45s cooldown."),
               SkillType.BOWS, 4, 1.5, 0.03, 0.0, 45.0, Material.ENDER_EYE, true);
+        this.loreTemplates = List.of(
+                "&7Damage Multiplier: &f$damageMultiplierx",
+                "&7Cooldown: &f$cooldowns",
+                "&7Triggers on critical hits"
+        );
+        this.formattedBonusTemplate = "$damageMultiplierx critical damage";
     }
 }

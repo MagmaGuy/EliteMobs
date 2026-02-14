@@ -2,9 +2,9 @@ package com.magmaguy.elitemobs.instanced;
 
 import com.magmaguy.easyminecraftgoals.internal.FakeText;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.utils.VisualDisplay;
-import com.magmaguy.magmacore.util.ChatColorConverter;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -32,9 +32,9 @@ public class InstanceDeathLocation {
         this.deadPlayer = player;
         this.bannerBlock = player.getLocation().getBlock();
         findBannerLocation(player.getLocation());
-        instructions = VisualDisplay.generateFakeText(deathLocation.clone().add(new Vector(0, 2.2, 0)), ChatColorConverter.convert("&2Punch to rez!"), 30);
+        instructions = VisualDisplay.generateFakeText(deathLocation.clone().add(new Vector(0, 2.2, 0)), DungeonsConfig.getInstancePunchToRez(), 30);
         nameTag = VisualDisplay.generateFakeText(deathLocation.clone().add(new Vector(0, 2, 0)), player.getDisplayName(), 30);
-        livesLeft = VisualDisplay.generateFakeText(deathLocation.clone().add(new Vector(0, 1.8, 0)), matchInstance.playerLives.get(deadPlayer) + " lives left!", 30);
+        livesLeft = VisualDisplay.generateFakeText(deathLocation.clone().add(new Vector(0, 1.8, 0)), DungeonsConfig.getInstanceLivesLeft().replace("$amount", String.valueOf(matchInstance.playerLives.get(deadPlayer))), 30);
         if (deathLocation != null)
             matchInstance.deathBanners.put(bannerBlock, this);
 

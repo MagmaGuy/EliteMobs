@@ -6,15 +6,14 @@ import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.ConditionalSkill;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Parry (CONDITIONAL) - Reduce damage taken while blocking with a sword.
@@ -26,7 +25,7 @@ public class ParrySkill extends SkillBonus implements ConditionalSkill {
     public static final String SKILL_ID = "swords_parry";
     private static final double BASE_DAMAGE_REDUCTION = 0.30; // 30% extra reduction
 
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public ParrySkill() {
         super(SkillType.SWORDS, 50, "Parry",
@@ -56,7 +55,7 @@ public class ParrySkill extends SkillBonus implements ConditionalSkill {
      */
     public static double applyParryReduction(Player player, PlayerDamagedByEliteMobEvent event, double currentDamage) {
         if (!activePlayers.contains(player.getUniqueId())) return currentDamage;
-        if (!player.isBlocking()) return currentDamage;
+        if (!event.isPlayerBlocking()) return currentDamage;
 
         Material mainHand = player.getInventory().getItemInMainHand().getType();
         if (!mainHand.name().endsWith("_SWORD")) return currentDamage;
@@ -64,10 +63,12 @@ public class ParrySkill extends SkillBonus implements ConditionalSkill {
         int skillLevel = SkillBonusRegistry.getPlayerSkillLevel(player, SkillType.SWORDS);
         double reduction = Math.min(0.60, BASE_DAMAGE_REDUCTION + (skillLevel * 0.005));
 
-        // Visual feedback
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("§aParry!"));
-
-        return currentDamage * (1 - reduction);
+        double reducedDamage = currentDamage * (1 - reduction);
+        if (reducedDamage != currentDamage) {
+            SkillBonus parrySkill = SkillBonusRegistry.getSkillById(SKILL_ID);
+            if (parrySkill != null) parrySkill.incrementProcCount(player);
+        }
+        return reducedDamage;
     }
 
     @Override
@@ -98,11 +99,7 @@ public class ParrySkill extends SkillBonus implements ConditionalSkill {
     @Override
     public List<String> getLoreDescription(int skillLevel) {
         double reduction = getConditionalBonus(skillLevel) * 100;
-        return List.of(
-                "&7Damage Reduction: &f" + String.format("%.1f", reduction) + "%",
-                "&7Condition: Blocking with sword",
-                "&7Stacks with normal blocking"
-        );
+        return applyLoreTemplates(Map.of("value", String.format("%.1f", reduction)));
     }
 
     @Override
@@ -112,7 +109,7 @@ public class ParrySkill extends SkillBonus implements ConditionalSkill {
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("-%.1f%% Damage when Parrying", getConditionalBonus(skillLevel) * 100);
+        return applyFormattedBonusTemplate(Map.of("value", String.format("%.1f", getConditionalBonus(skillLevel) * 100)));
     }
 
     @Override

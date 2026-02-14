@@ -6,7 +6,6 @@ import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields
 import com.magmaguy.elitemobs.instanced.dungeons.DungeonInstance;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.InstancedBossEntity;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
-import com.magmaguy.magmacore.util.ChatColorConverter;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.Player;
@@ -86,20 +85,18 @@ public class DungeonBossLockoutHandler implements Listener {
      */
     private static void notifyLockout(Player player, InstancedBossEntity boss, DungeonBossLockout lockout, String bossIdentifier) {
         // Show subtitle
-        String subtitle = ChatColorConverter.convert(DungeonsConfig.getDungeonLockoutSubtitle());
+        String subtitle = DungeonsConfig.getDungeonLockoutSubtitle();
         player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(subtitle));
 
         // Send title with empty title and just subtitle
-        player.sendTitle("", subtitle, 10, 70, 20);
+        player.sendTitle(DungeonsConfig.getDungeonLockoutTitle(), subtitle, 10, 70, 20);
 
         // Send chat message
         String bossName = boss.getName();
         String remainingTime = lockout.getFormattedRemainingTime(bossIdentifier);
-        String chatMessage = ChatColorConverter.convert(
-                DungeonsConfig.getDungeonLockoutChatMessage()
+        String chatMessage = DungeonsConfig.getDungeonLockoutChatMessage()
                         .replace("$bossName", bossName)
-                        .replace("$remainingTime", remainingTime)
-        );
+                        .replace("$remainingTime", remainingTime);
         player.sendMessage(chatMessage);
     }
 

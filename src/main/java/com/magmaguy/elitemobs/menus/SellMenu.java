@@ -7,7 +7,6 @@ import com.magmaguy.elitemobs.config.menus.premade.SellMenuConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.items.ItemWorthCalculator;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
-import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
 import com.magmaguy.magmacore.util.Round;
 import org.bukkit.Bukkit;
@@ -136,13 +135,13 @@ public class SellMenu extends EliteMenu implements Listener {
 
             //Check if it's an elitemobs item. The soulbind check only says if the player would be able to pick it up, and vanilla items can be picked up
             if (!EliteItemManager.isEliteMobsItem(event.getCurrentItem())) {
-                event.getWhoClicked().sendMessage(ChatColorConverter.convert(EconomySettingsConfig.getShopSaleInstructions()));
+                event.getWhoClicked().sendMessage(EconomySettingsConfig.getShopSaleInstructions());
                 return;
             }
 
             //If the item isn't soulbound to the player, it can't be sold by that player
             if (!SoulbindEnchantment.isValidSoulbindUser(currentItem.getItemMeta(), player)) {
-                player.sendMessage(ChatColorConverter.convert(EconomySettingsConfig.getShopSaleOthersItems()));
+                player.sendMessage(EconomySettingsConfig.getShopSaleOthersItems());
                 return;
             }
 
@@ -184,24 +183,24 @@ public class SellMenu extends EliteMenu implements Listener {
                     totalItemValue += itemValue;
 
                     if (amount < 4)
-                        player.sendMessage(ChatColorConverter.convert(
+                        player.sendMessage(
                                 EconomySettingsConfig.getShopSellMessage()
                                         .replace("$item_name", itemStack.getItemMeta().getDisplayName())
                                         .replace("$currency_amount", Round.twoDecimalPlaces(itemValue) + "")
-                                        .replace("$currency_name", EconomySettingsConfig.getCurrencyName())));
+                                        .replace("$currency_name", EconomySettingsConfig.getCurrencyName()));
                     shopInventory.clear(validSlot);
                 }
 
                 if (amount >= 3)
-                    player.sendMessage(ChatColorConverter.convert(
+                    player.sendMessage(
                             EconomySettingsConfig.getShopBatchSellMessage()
                                     .replace("$currency_amount", totalItemValue + "")
-                                    .replace("$currency_name", EconomySettingsConfig.getCurrencyName())));
+                                    .replace("$currency_name", EconomySettingsConfig.getCurrencyName()));
 
-                player.sendMessage(ChatColorConverter.convert(
+                player.sendMessage(
                         EconomySettingsConfig.getShopCurrentBalance()
                                 .replace("$currency_amount", EconomyHandler.checkCurrency(player.getUniqueId()) + "")
-                                .replace("$currency_name", EconomySettingsConfig.getCurrencyName())));
+                                .replace("$currency_name", EconomySettingsConfig.getCurrencyName()));
                 updateConfirmButton(0);
                 return;
             }

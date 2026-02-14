@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.commands.admin;
 
+import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
 import com.magmaguy.elitemobs.powerstances.GenericRotationMatrixMath;
 import com.magmaguy.magmacore.util.ChatColorConverter;
@@ -12,19 +13,19 @@ public class RelativeCoordinatesCommand {
 
         EMPackage emPackage = EMPackage.getEmPackages().get(minidungeonString);
         if (emPackage == null) {
-            player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Minidungeons name " + minidungeonString + " &4isn't valid!"));
+            player.sendMessage(CommandMessagesConfig.getInvalidMinidungeonMessage().replace("$name", minidungeonString));
             return;
         }
 
         if (!emPackage.isInstalled()) {
-            player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Minidungeon isn't installed! Can't get the relative location for uninstalled Minidungeons!"));
+            player.sendMessage(CommandMessagesConfig.getMinidungeonNotInstalledMessage());
             return;
         }
 
         Location anchorpoint = emPackage.getContentPackagesConfigFields().getAnchorPoint();
 
         if (anchorpoint == null) {
-            player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Something went wrong and made the anchor point not valid!"));
+            player.sendMessage(CommandMessagesConfig.getInvalidAnchorPointMessage());
             return;
         }
 
@@ -37,7 +38,9 @@ public class RelativeCoordinatesCommand {
                 + relativeVector.getBlockZ();
 
         player.sendMessage(ChatColorConverter.convert(
-                "[EliteMobs] Relative position to anchor point of " + emPackage.getContentPackagesConfigFields().getName() + ": " + relativePosition));
+                CommandMessagesConfig.getRelativePositionMessage()
+                        .replace("$filename", emPackage.getContentPackagesConfigFields().getName())
+                        .replace("$coordinates", relativePosition)));
 
     }
 

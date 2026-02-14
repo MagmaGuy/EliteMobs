@@ -9,10 +9,11 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Phalanx (PASSIVE) - Reduced damage from frontal attacks.
@@ -21,9 +22,9 @@ import java.util.UUID;
 public class PhalanxSkill extends SkillBonus {
 
     public static final String SKILL_ID = "spears_phalanx";
-    private static final double BASE_DAMAGE_REDUCTION = 0.15; // 15% reduction
+    private static final double BASE_DAMAGE_REDUCTION = 0.20; // 20% reduction
 
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public PhalanxSkill() {
         super(SkillType.SPEARS, 25, "Phalanx",
@@ -77,6 +78,35 @@ public class PhalanxSkill extends SkillBonus {
         return Math.min(0.35, BASE_DAMAGE_REDUCTION + (skillLevel * 0.002));
     }
 
+    /**
+     * Static entry point for the defensive event handler.
+     * Checks if the player has Phalanx active and is holding a spear,
+     * then applies frontal damage reduction.
+     */
+    public static double applyFrontalReduction(Player player, Object event, double currentDamage) {
+        if (!activePlayers.contains(player.getUniqueId())) return currentDamage;
+
+        // Check if player is holding a spear
+        String mainHandName = player.getInventory().getItemInMainHand().getType().name();
+        if (!mainHandName.endsWith("_SPEAR")) return currentDamage;
+
+        SkillBonus skill = SkillBonusRegistry.getSkillById(SKILL_ID);
+        if (!(skill instanceof PhalanxSkill phalanx)) return currentDamage;
+
+        // Need attacker for frontal check - extract from event
+        if (event instanceof com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent pde) {
+            LivingEntity attacker = pde.getAttacker();
+            if (attacker == null) return currentDamage;
+            double multiplier = phalanx.getDamageMultiplier(player, attacker);
+            if (multiplier != 1.0) {
+                SkillBonus.sendSkillActionBar(player, skill);
+                skill.incrementProcCount(player);
+            }
+            return currentDamage * multiplier;
+        }
+        return currentDamage;
+    }
+
     @Override
     public void applyBonus(Player player, int skillLevel) {
         activePlayers.add(player.getUniqueId());
@@ -104,9 +134,7 @@ public class PhalanxSkill extends SkillBonus {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        return List.of(
-            "&7Frontal Damage Reduction: &f" + String.format("%.0f", getDamageReduction(skillLevel) * 100) + "%"
-        );
+        return applyLoreTemplates(Map.of("value", String.format("%.0f", getDamageReduction(skillLevel) * 100)));
     }
 
     @Override
@@ -116,7 +144,7 @@ public class PhalanxSkill extends SkillBonus {
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("-%.0f%% Frontal Damage", getDamageReduction(skillLevel) * 100);
+        return applyFormattedBonusTemplate(Map.of("value", String.format("%.0f", getDamageReduction(skillLevel) * 100)));
     }
 
     @Override

@@ -1,16 +1,16 @@
 package com.magmaguy.elitemobs.skills.bonuses.skills.armor;
 
-import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Tier 1 ARMOR skill - Battle Hardened
@@ -18,7 +18,7 @@ import java.util.UUID;
  */
 public class BattleHardenedSkill extends SkillBonus {
 
-    private static final HashSet<UUID> activePlayers = new HashSet<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public BattleHardenedSkill() {
         super(
@@ -28,14 +28,13 @@ public class BattleHardenedSkill extends SkillBonus {
             "Passive damage reduction from all sources",
             SkillBonusType.PASSIVE,
             1,
-            "battle_hardened"
+            "armor_battle_hardened"
         );
     }
 
     @Override
     public void applyBonus(Player player, int skillLevel) {
-        // Passive bonus, no active application needed
-        // Damage reduction is calculated on damage events
+        activePlayers.add(player.getUniqueId());
     }
 
     @Override
@@ -60,10 +59,7 @@ public class BattleHardenedSkill extends SkillBonus {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        List<String> lore = new ArrayList<>();
-        lore.add("Passive damage reduction from all sources");
-        lore.add(String.format("Damage Reduction: %.1f%%", getBonusValue(skillLevel) * 15.0));
-        return lore;
+        return applyLoreTemplates(Map.of("value", String.format("%.1f", getBonusValue(skillLevel) * 8.0)));
     }
 
     @Override
@@ -73,7 +69,7 @@ public class BattleHardenedSkill extends SkillBonus {
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("%.1f%% Damage Reduction", getBonusValue(skillLevel) * 15.0);
+        return applyFormattedBonusTemplate(Map.of("value", String.format("%.1f", getBonusValue(skillLevel) * 8.0)));
     }
 
     @Override
@@ -95,8 +91,8 @@ public class BattleHardenedSkill extends SkillBonus {
         }
 
         int skillLevel = getPlayerSkillLevel(player);
-        // Reduce damage by up to 15% based on skill level
-        return originalDamage * (1 - getScaledValue(skillLevel) * 0.15);
+        // Reduce damage by up to 8% based on skill level
+        return originalDamage * (1 - getScaledValue(skillLevel) * 0.08);
     }
 
     private int getPlayerSkillLevel(Player player) {

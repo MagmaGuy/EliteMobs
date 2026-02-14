@@ -5,10 +5,11 @@ import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import org.bukkit.entity.Player;
 
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Timber (PASSIVE) - Axes deal bonus damage and have increased shield disable.
@@ -20,7 +21,7 @@ public class TimberSkill extends SkillBonus {
     private static final double BASE_DAMAGE_BONUS = 0.15;
     private static final double BASE_SHIELD_DISABLE_BONUS = 0.30;
 
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public TimberSkill() {
         super(SkillType.AXES, 75, "Timber",
@@ -51,16 +52,16 @@ public class TimberSkill extends SkillBonus {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        return List.of(
-                "&7Damage Bonus: &f+" + String.format("%.1f", getDamageBonus(skillLevel) * 100) + "%",
-                "&7Shield Disable: &f+" + String.format("%.0f", getShieldDisableBonus(skillLevel) * 100) + "%"
-        );
+        return applyLoreTemplates(Map.of(
+                "damageBonus", String.format("%.1f", getDamageBonus(skillLevel) * 100),
+                "shieldDisable", String.format("%.0f", getShieldDisableBonus(skillLevel) * 100)
+        ));
     }
 
     @Override
     public double getBonusValue(int skillLevel) { return getDamageBonus(skillLevel); }
     @Override
-    public String getFormattedBonus(int skillLevel) { return String.format("+%.1f%% Damage", getDamageBonus(skillLevel) * 100); }
+    public String getFormattedBonus(int skillLevel) { return applyFormattedBonusTemplate(Map.of("damageBonus", String.format("%.1f", getDamageBonus(skillLevel) * 100))); }
     @Override
     public void shutdown() { activePlayers.clear(); }
 }

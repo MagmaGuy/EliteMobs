@@ -46,6 +46,8 @@ public class SkillTestResult {
 
     // Status
     private boolean passed = true;
+    private boolean skipped = false;
+    private String verificationTag = null;
     private final List<String> issues = new ArrayList<>();
     private final List<String> logs = new ArrayList<>();
 
@@ -56,23 +58,8 @@ public class SkillTestResult {
         this.testLevel = testLevel;
     }
 
-    public void recordHit(double baseDamage, double finalDamage, boolean procced) {
-        totalHits++;
-        baseDamageDealt += baseDamage;
-        totalDamageDealt += finalDamage;
-        if (procced) procCount++;
-
-        double bonusDamage = finalDamage - baseDamage;
-        if (bonusDamage > 0) skillBonusDamage += bonusDamage;
-    }
-
     public void setExpectedProcRate(double rate) {
         this.expectedProcRate = rate;
-    }
-
-    public void setActualProcRate(double rate) {
-        // Set procCount based on rate and totalHits
-        this.procCount = (int) Math.round(rate * totalHits);
     }
 
     public void setTotalHits(int hits) {
@@ -108,6 +95,16 @@ public class SkillTestResult {
     public void addIssue(String issue) {
         issues.add(issue);
         passed = false;
+    }
+
+    public void markSkipped(String reason) {
+        this.skipped = true;
+        this.passed = true; // Skipped skills don't count as failures
+        issues.add(reason);
+    }
+
+    public void setVerificationTag(String tag) {
+        this.verificationTag = tag;
     }
 
     public void validate() {

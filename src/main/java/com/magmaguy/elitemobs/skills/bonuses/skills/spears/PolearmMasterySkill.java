@@ -1,14 +1,21 @@
 package com.magmaguy.elitemobs.skills.bonuses.skills.spears;
 
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
+import org.bukkit.NamespacedKey;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlotGroup;
 
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Polearm Mastery (PASSIVE) - Significant attack speed and damage increase.
@@ -17,10 +24,11 @@ import java.util.UUID;
 public class PolearmMasterySkill extends SkillBonus {
 
     public static final String SKILL_ID = "spears_polearm_mastery";
+    public static final String MODIFIER_KEY_STRING = "polearm_mastery_speed";
     private static final double BASE_DAMAGE_BONUS = 0.20; // 20% damage bonus
-    private static final double BASE_ATTACK_SPEED_BONUS = 0.15; // 15% attack speed
+    private static final double BASE_ATTACK_SPEED_BONUS = 0.40; // 40% attack speed
 
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public PolearmMasterySkill() {
         super(SkillType.SPEARS, 75, "Polearm Mastery",
@@ -35,8 +43,11 @@ public class PolearmMasterySkill extends SkillBonus {
         return BASE_DAMAGE_BONUS + (skillLevel * 0.003);
     }
 
-    public double getAttackSpeedBonus(int skillLevel) {
-        return BASE_ATTACK_SPEED_BONUS + (skillLevel * 0.002);
+    /**
+     * Checks if a player has this skill active.
+     */
+    public static boolean hasActiveSkill(UUID playerUUID) {
+        return activePlayers.contains(playerUUID);
     }
 
     /**
@@ -50,16 +61,54 @@ public class PolearmMasterySkill extends SkillBonus {
         return 1.0;
     }
 
+    /**
+     * Applies the attack speed attribute modifier.
+     */
+    public static void applyAttackSpeedBonus(Player player, int skillLevel) {
+        if (!activePlayers.contains(player.getUniqueId())) return;
+        AttributeInstance attr = player.getAttribute(Attribute.ATTACK_SPEED);
+        if (attr == null) return;
+        NamespacedKey key = new NamespacedKey(MetadataHandler.PLUGIN, MODIFIER_KEY_STRING);
+        removeModifierByKey(attr, key);
+        double bonus = BASE_ATTACK_SPEED_BONUS + (skillLevel * 0.005);
+        attr.addModifier(new AttributeModifier(key, bonus, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.ANY));
+    }
+
+    /**
+     * Removes the attack speed attribute modifier.
+     */
+    public static void removeAttackSpeedBonus(Player player) {
+        AttributeInstance attr = player.getAttribute(Attribute.ATTACK_SPEED);
+        if (attr == null) return;
+        removeModifierByKey(attr, new NamespacedKey(MetadataHandler.PLUGIN, MODIFIER_KEY_STRING));
+    }
+
+    private static void removeModifierByKey(AttributeInstance attr, NamespacedKey key) {
+        for (AttributeModifier modifier : attr.getModifiers()) {
+            if (modifier.getKey().equals(key)) {
+                attr.removeModifier(modifier);
+                return;
+            }
+        }
+    }
+
+    public double getAttackSpeedBonus(int skillLevel) {
+        return BASE_ATTACK_SPEED_BONUS + (skillLevel * 0.005);
+    }
+
     @Override
     public void applyBonus(Player player, int skillLevel) {
         activePlayers.add(player.getUniqueId());
-        // Attack speed bonus would be applied through attribute modifiers
-        // This is handled at the combat/item system level
+        // Apply attack speed bonus if player is already holding a spear
+        if (player.getInventory().getItemInMainHand().getType().name().endsWith("_SPEAR")) {
+            applyAttackSpeedBonus(player, skillLevel);
+        }
     }
 
     @Override
     public void removeBonus(Player player) {
         activePlayers.remove(player.getUniqueId());
+        removeAttackSpeedBonus(player);
     }
 
     @Override
@@ -79,10 +128,9 @@ public class PolearmMasterySkill extends SkillBonus {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        return List.of(
-            "&7Damage: &f+" + String.format("%.0f", getDamageBonus(skillLevel) * 100) + "%",
-            "&7Attack Speed: &f+" + String.format("%.0f", getAttackSpeedBonus(skillLevel) * 100) + "%"
-        );
+        return applyLoreTemplates(Map.of(
+                "damage", String.format("%.0f", getDamageBonus(skillLevel) * 100),
+                "speed", String.format("%.0f", getAttackSpeedBonus(skillLevel) * 100)));
     }
 
     @Override
@@ -92,8 +140,14 @@ public class PolearmMasterySkill extends SkillBonus {
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("+%.0f%% Damage, +%.0f%% Speed",
-            getDamageBonus(skillLevel) * 100, getAttackSpeedBonus(skillLevel) * 100);
+        return applyFormattedBonusTemplate(Map.of(
+                "damage", String.format("%.0f", getDamageBonus(skillLevel) * 100),
+                "speed", String.format("%.0f", getAttackSpeedBonus(skillLevel) * 100)));
+    }
+
+    @Override
+    public TestStrategy getTestStrategy() {
+        return TestStrategy.ATTRIBUTE_CHECK;
     }
 
     @Override

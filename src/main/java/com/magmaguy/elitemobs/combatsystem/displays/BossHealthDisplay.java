@@ -227,84 +227,50 @@ public class BossHealthDisplay implements Listener {
     }
 
     /**
-     * Creates a damage popup with animation
+     * Creates an XP gain popup at the specified location, visible only to the specified player.
+     * Uses an animated gold/yellow gradient that shifts over time.
+     *
+     * @param location The location where the popup should appear (typically at the dead mob's location)
+     * @param player   The player who should see the popup
+     * @param xpAmount The amount of XP gained
      */
-    private void createDamagePopup(EliteEntity eliteEntity, double damage, boolean isCritical,
-                                   double damageModifier, Vector offset, Player player) {
-        if (!MobCombatSettingsConfig.isDisplayDamageOnHit()) return;
+    public static void createXPPopup(Location location, Player player, long xpAmount) {
+        if (location == null || location.getWorld() == null || player == null) return;
+        if (!player.isOnline()) return;
 
-        LivingEntity entity = eliteEntity.getUnsyncedLivingEntity();
-        if (entity == null || !entity.isValid()) return;
+        // Add slight random offset for visual variety
+        Vector offset = new Vector(
+                ThreadLocalRandom.current().nextDouble(-0.5, 0.5),
+                ThreadLocalRandom.current().nextDouble(0.5, 1.0),
+                ThreadLocalRandom.current().nextDouble(-0.5, 0.5)
+        );
 
-        Location baseLoc = entity.getLocation().clone();
-        Location mobLocation = eliteEntity.getLocation();
-        double eyeHeight = entity.getEyeHeight();
-        baseLoc.add(offset.getX(), eyeHeight + offset.getY() + 0.3, offset.getZ());
+        Location popupLoc = location.clone().add(offset);
 
-        // Build damage text with modifiers
-        StringBuilder textBuilder = new StringBuilder();
+        // Raw XP text (gradient will be applied and animated by XpPopupData)
+        String xpText = MobCombatSettingsConfig.getXpPopupFormat().replace("$amount", formatNumber(xpAmount));
 
-        // Add weak/resist prefix and effects
-        if (damageModifier < 1) {
-            // Resist hit
-            textBuilder.append(MobCombatSettingsConfig.getResistTextColor());
-            // Play resist sound
-            if (mobLocation.getWorld() != null) {
-                mobLocation.getWorld().playSound(mobLocation, Sound.BLOCK_ANVIL_USE, 1f, 1f);
-            }
-            // Create resist visual effect (shield armor stand)
-            if (MobCombatSettingsConfig.isDoResistEffect() && player != null) {
-                createResistArmorStandEffect(eliteEntity, player);
-            }
-        } else if (damageModifier > 1) {
-            // Weak hit
-            textBuilder.append(MobCombatSettingsConfig.getWeakTextColor());
-            // Play weak sound
-            if (mobLocation.getWorld() != null) {
-                mobLocation.getWorld().playSound(mobLocation, Sound.ENTITY_ITEM_BREAK, 1f, 1f);
-            }
-            // Create weak visual effect (sword text displays)
-            if (MobCombatSettingsConfig.isDoWeakEffect() && player != null) {
-                createWeakVisualEffect(eliteEntity, player);
-            }
-        } else {
-            textBuilder.append(COLOR_DAMAGE);
-        }
+        // Initial gradient text
+        String initialText = ChatColorConverter.convert("<gradient:#FF6B00:#FFD700:#FFFF00>" + xpText + "</gradient>");
 
-        // Add critical indicator
-        if (isCritical) {
-            textBuilder.append(CriticalStrikesConfig.getCriticalHitColor());
-            textBuilder.append("&l");
-        }
+        // Create the popup with warm golden background
+        Color backgroundColor = Color.fromARGB(120, 80, 60, 0);
+        FakeText fakeText = VisualDisplay.createStyledFakeText(
+                popupLoc,
+                initialText,
+                backgroundColor,
+                true,
+                0.85f  // Slightly smaller scale than damage popups
+        );
 
-        textBuilder.append(formatNumber(damage));
+        if (fakeText == null) return;
 
-        // Create popup with enhanced display
-        createAnimatedPopup(baseLoc, ChatColorConverter.convert(textBuilder.toString()),
-                isCritical ? PopupType.CRITICAL : PopupType.DAMAGE, isCritical ? 1.3f : 1.0f);
+        // Only show to the player who earned the XP
+        fakeText.displayTo(player);
 
-        // Create additional popup for weak/resist text
-        if (damageModifier < 1) {
-            Vector modifierOffset = offset.clone().subtract(new Vector(0, 0.3, 0));
-            Location modifierLoc = entity.getLocation().clone();
-            modifierLoc.add(modifierOffset.getX(), eyeHeight + modifierOffset.getY() + 0.3, modifierOffset.getZ());
-            createAnimatedPopup(modifierLoc, ChatColorConverter.convert(MobCombatSettingsConfig.getResistText()),
-                    PopupType.RESIST, 0.8f);
-        } else if (damageModifier > 1) {
-            Vector modifierOffset = offset.clone().subtract(new Vector(0, 0.3, 0));
-            Location modifierLoc = entity.getLocation().clone();
-            modifierLoc.add(modifierOffset.getX(), eyeHeight + modifierOffset.getY() + 0.3, modifierOffset.getZ());
-            createAnimatedPopup(modifierLoc, ChatColorConverter.convert(MobCombatSettingsConfig.getWeakText()),
-                    PopupType.WEAK, 0.8f);
-        }
-
-        // Create critical hit popup
-        if (isCritical) {
-            Vector critOffset = offset.clone().add(new Vector(0, 0.4, 0));
-            Location critLoc = entity.getLocation().clone();
-            critLoc.add(critOffset.getX(), eyeHeight + critOffset.getY() + 0.3, critOffset.getZ());
-            createAnimatedPopup(critLoc, ChatColorConverter.convert(CriticalStrikesConfig.getCriticalHitPopup()),
-                    PopupType.CRITICAL, 0.9f);
+        // Add to XP popups for animated gradient
+        synchronized (activeXpPopups) {
+            activeXpPopups.add(new XpPopupData(fakeText, popupLoc, xpText, 0.85f));
         }
     }
 
@@ -424,6 +390,88 @@ public class BossHealthDisplay implements Listener {
     }
 
     /**
+     * Creates a damage popup with animation
+     */
+    private void createDamagePopup(EliteEntity eliteEntity, double damage, boolean isCritical,
+                                   double damageModifier, Vector offset, Player player) {
+        if (!MobCombatSettingsConfig.isDisplayDamageOnHit()) return;
+
+        LivingEntity entity = eliteEntity.getUnsyncedLivingEntity();
+        if (entity == null || !entity.isValid()) return;
+
+        Location baseLoc = entity.getLocation().clone();
+        Location mobLocation = eliteEntity.getLocation();
+        double eyeHeight = entity.getEyeHeight();
+        baseLoc.add(offset.getX(), eyeHeight + offset.getY() + 0.3, offset.getZ());
+
+        // Build damage text with modifiers
+        StringBuilder textBuilder = new StringBuilder();
+
+        // Add weak/resist prefix and effects
+        if (damageModifier < 1) {
+            // Resist hit
+            textBuilder.append(MobCombatSettingsConfig.getResistTextColor());
+            // Play resist sound
+            if (mobLocation.getWorld() != null) {
+                mobLocation.getWorld().playSound(mobLocation, Sound.BLOCK_ANVIL_USE, 1f, 1f);
+            }
+            // Create resist visual effect (shield armor stand)
+            if (MobCombatSettingsConfig.isDoResistEffect() && player != null) {
+                createResistArmorStandEffect(eliteEntity, player);
+            }
+        } else if (damageModifier > 1) {
+            // Weak hit
+            textBuilder.append(MobCombatSettingsConfig.getWeakTextColor());
+            // Play weak sound
+            if (mobLocation.getWorld() != null) {
+                mobLocation.getWorld().playSound(mobLocation, Sound.ENTITY_ITEM_BREAK, 1f, 1f);
+            }
+            // Create weak visual effect (sword text displays)
+            if (MobCombatSettingsConfig.isDoWeakEffect() && player != null) {
+                createWeakVisualEffect(eliteEntity, player);
+            }
+        } else {
+            textBuilder.append(COLOR_DAMAGE);
+        }
+
+        // Add critical indicator
+        if (isCritical) {
+            textBuilder.append(CriticalStrikesConfig.getCriticalHitColor());
+            textBuilder.append("&l");
+        }
+
+        textBuilder.append(formatNumber(damage));
+
+        // Create popup with enhanced display
+        createAnimatedPopup(baseLoc, ChatColorConverter.convert(textBuilder.toString()),
+                isCritical ? PopupType.CRITICAL : PopupType.DAMAGE, isCritical ? 1.3f : 1.0f);
+
+        // Create additional popup for weak/resist text
+        if (damageModifier < 1) {
+            Vector modifierOffset = offset.clone().subtract(new Vector(0, 0.3, 0));
+            Location modifierLoc = entity.getLocation().clone();
+            modifierLoc.add(modifierOffset.getX(), eyeHeight + modifierOffset.getY() + 0.3, modifierOffset.getZ());
+            createAnimatedPopup(modifierLoc, MobCombatSettingsConfig.getResistText(),
+                    PopupType.RESIST, 0.8f);
+        } else if (damageModifier > 1) {
+            Vector modifierOffset = offset.clone().subtract(new Vector(0, 0.3, 0));
+            Location modifierLoc = entity.getLocation().clone();
+            modifierLoc.add(modifierOffset.getX(), eyeHeight + modifierOffset.getY() + 0.3, modifierOffset.getZ());
+            createAnimatedPopup(modifierLoc, MobCombatSettingsConfig.getWeakText(),
+                    PopupType.WEAK, 0.8f);
+        }
+
+        // Create critical hit popup
+        if (isCritical) {
+            Vector critOffset = offset.clone().add(new Vector(0, 0.4, 0));
+            Location critLoc = entity.getLocation().clone();
+            critLoc.add(critOffset.getX(), eyeHeight + critOffset.getY() + 0.3, critOffset.getZ());
+            createAnimatedPopup(critLoc, CriticalStrikesConfig.getCriticalHitPopup(),
+                    PopupType.CRITICAL, 0.9f);
+        }
+    }
+
+    /**
      * Creates a heal popup with animation
      */
     private void createHealPopup(EliteEntity eliteEntity, double healAmount, boolean isFullHeal) {
@@ -446,58 +494,10 @@ public class BossHealthDisplay implements Listener {
         if (isFullHeal) {
             text = MobCombatSettingsConfig.getFullHealMessage();
         } else {
-            text = COLOR_HEAL + "+" + formatNumber(healAmount) + " HP";
+            text = COLOR_HEAL + MobCombatSettingsConfig.getHealPopupFormat().replace("$amount", formatNumber(healAmount));
         }
 
         createAnimatedPopup(baseLoc, ChatColorConverter.convert(text), PopupType.HEAL, isFullHeal ? 1.2f : 1.0f);
-    }
-
-    /**
-     * Creates an XP gain popup at the specified location, visible only to the specified player.
-     * Uses an animated gold/yellow gradient that shifts over time.
-     *
-     * @param location The location where the popup should appear (typically at the dead mob's location)
-     * @param player   The player who should see the popup
-     * @param xpAmount The amount of XP gained
-     */
-    public static void createXPPopup(Location location, Player player, long xpAmount) {
-        if (location == null || location.getWorld() == null || player == null) return;
-        if (!player.isOnline()) return;
-
-        // Add slight random offset for visual variety
-        Vector offset = new Vector(
-                ThreadLocalRandom.current().nextDouble(-0.5, 0.5),
-                ThreadLocalRandom.current().nextDouble(0.5, 1.0),
-                ThreadLocalRandom.current().nextDouble(-0.5, 0.5)
-        );
-
-        Location popupLoc = location.clone().add(offset);
-
-        // Raw XP text (gradient will be applied and animated by XpPopupData)
-        String xpText = "+" + formatNumber(xpAmount) + " ✦XP";
-
-        // Initial gradient text
-        String initialText = ChatColorConverter.convert("<gradient:#FF6B00:#FFD700:#FFFF00>" + xpText + "</gradient>");
-
-        // Create the popup with warm golden background
-        Color backgroundColor = Color.fromARGB(120, 80, 60, 0);
-        FakeText fakeText = VisualDisplay.createStyledFakeText(
-                popupLoc,
-                initialText,
-                backgroundColor,
-                true,
-                0.85f  // Slightly smaller scale than damage popups
-        );
-
-        if (fakeText == null) return;
-
-        // Only show to the player who earned the XP
-        fakeText.displayTo(player);
-
-        // Add to XP popups for animated gradient
-        synchronized (activeXpPopups) {
-            activeXpPopups.add(new XpPopupData(fakeText, popupLoc, xpText, 0.85f));
-        }
     }
 
     /**
@@ -954,7 +954,7 @@ public class BossHealthDisplay implements Listener {
             double healthPercent = (currentHealth / maxHealth) * 100;
             String color = getHealthColor(healthPercent);
 
-            String numericText = color + "&l" + formatNumber(currentHealth) + " &7/ " + color + "&l" + formatNumber(maxHealth);
+            String numericText = color + "&l" + formatNumber(currentHealth) + MobCombatSettingsConfig.getHealthDisplaySeparator() + color + "&l" + formatNumber(maxHealth);
 
             Location baseLoc = getBaseLocation();
             if (baseLoc == null) return;

@@ -10,10 +10,11 @@ import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Scythe Sweep (PROC) - Attacks have a chance to sweep hit nearby enemies.
@@ -27,7 +28,7 @@ public class ScytheSweepSkill extends SkillBonus implements ProcSkill {
     private static final double SWEEP_RADIUS = 3.0;
     private static final double BASE_SWEEP_MULTIPLIER = 0.50; // 50% of damage
 
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public ScytheSweepSkill() {
         super(SkillType.HOES, 50, "Scythe Sweep",
@@ -108,14 +109,11 @@ public class ScytheSweepSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        double procChance = getProcChance(skillLevel) * 100;
-        double sweepPercent = calculateSweepMultiplier(skillLevel) * 100;
-        return List.of(
-                "&7Chance: &f" + String.format("%.1f", procChance) + "%",
-                "&7Sweep Damage: &f" + String.format("%.0f", sweepPercent) + "% of hit",
-                "&7Radius: &f" + String.format("%.1f", SWEEP_RADIUS) + " blocks",
-                "&7AoE cleave attack"
-        );
+        return applyLoreTemplates(Map.of(
+                "procChance", String.format("%.1f", getProcChance(skillLevel) * 100),
+                "sweepPercent", String.format("%.0f", calculateSweepMultiplier(skillLevel) * 100),
+                "radius", String.format("%.1f", SWEEP_RADIUS)
+        ));
     }
 
     @Override
@@ -125,7 +123,9 @@ public class ScytheSweepSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("%.0f%% AoE Sweep", calculateSweepMultiplier(skillLevel) * 100);
+        return applyFormattedBonusTemplate(Map.of(
+                "sweepPercent", String.format("%.0f", calculateSweepMultiplier(skillLevel) * 100)
+        ));
     }
 
     @Override

@@ -9,10 +9,11 @@ import com.magmaguy.elitemobs.skills.bonuses.interfaces.ProcSkill;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Soul Drain (PROC) - Attacks have a chance to drain health from the target.
@@ -23,9 +24,9 @@ public class SoulDrainSkill extends SkillBonus implements ProcSkill {
 
     public static final String SKILL_ID = "hoes_soul_drain";
     private static final double BASE_PROC_CHANCE = 0.20; // 20% base chance
-    private static final double BASE_DRAIN_MULTIPLIER = 0.30; // 30% of damage
+    private static final double BASE_DRAIN_MULTIPLIER = 0.10; // 10% of damage
 
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public SoulDrainSkill() {
         super(SkillType.HOES, 10, "Soul Drain",
@@ -49,6 +50,8 @@ public class SoulDrainSkill extends SkillBonus implements ProcSkill {
         double damage = event.getDamage();
         int skillLevel = getPlayerSkillLevel(player);
         double drainAmount = damage * calculateDrainMultiplier(skillLevel);
+        // Cap max heal per proc at 10% of max HP
+        drainAmount = Math.min(drainAmount, player.getMaxHealth() * 0.10);
 
         // Heal player
         double newHealth = Math.min(player.getHealth() + drainAmount, player.getMaxHealth());
@@ -66,7 +69,7 @@ public class SoulDrainSkill extends SkillBonus implements ProcSkill {
         if (configFields != null) {
             return configFields.calculateValue(skillLevel);
         }
-        return BASE_DRAIN_MULTIPLIER + (skillLevel * 0.005);
+        return BASE_DRAIN_MULTIPLIER + (skillLevel * 0.002);
     }
 
     private int getPlayerSkillLevel(Player player) {
@@ -100,13 +103,10 @@ public class SoulDrainSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        double procChance = getProcChance(skillLevel) * 100;
-        double drainPercent = calculateDrainMultiplier(skillLevel) * 100;
-        return List.of(
-                "&7Chance: &f" + String.format("%.1f", procChance) + "%",
-                "&7Drain: &f" + String.format("%.1f", drainPercent) + "% of damage",
-                "&7Heals you for damage dealt"
-        );
+        return applyLoreTemplates(Map.of(
+                "procChance", String.format("%.1f", getProcChance(skillLevel) * 100),
+                "drainPercent", String.format("%.1f", calculateDrainMultiplier(skillLevel) * 100)
+        ));
     }
 
     @Override
@@ -116,7 +116,14 @@ public class SoulDrainSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("%.1f%% Life Drain", calculateDrainMultiplier(skillLevel) * 100);
+        return applyFormattedBonusTemplate(Map.of(
+                "drainPercent", String.format("%.1f", calculateDrainMultiplier(skillLevel) * 100)
+        ));
+    }
+
+    @Override
+    public boolean affectsDamage() {
+        return false; // Life drain only heals, doesn't modify hit damage
     }
 
     @Override

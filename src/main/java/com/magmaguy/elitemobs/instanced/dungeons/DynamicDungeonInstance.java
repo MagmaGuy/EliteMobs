@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.instanced.dungeons;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfig;
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
 import com.magmaguy.elitemobs.dungeons.utility.DungeonUtils;
@@ -39,13 +40,13 @@ public class DynamicDungeonInstance extends DungeonInstance {
     public static void setupDynamicDungeon(Player player, String dungeonConfigFieldsString, String difficultyName, int selectedLevel) {
         ContentPackagesConfigFields dynamicDungeonConfigFields = ContentPackagesConfig.getDungeonPackages().get(dungeonConfigFieldsString);
         if (dynamicDungeonConfigFields == null) {
-            player.sendMessage("[EliteMobs] Failed to get data for dynamic dungeon " + dungeonConfigFieldsString + "! The dungeon will not start.");
+            player.sendMessage(DungeonsConfig.getDynamicDungeonDataFailedMessage().replace("$dungeon", dungeonConfigFieldsString));
             return;
         }
 
         if (dynamicDungeonConfigFields.getPermission() != null && !dynamicDungeonConfigFields.getPermission().isEmpty())
             if (!player.hasPermission(dynamicDungeonConfigFields.getPermission())) {
-                player.sendMessage("[EliteMobs] You don't have the permission to go to this dungeon!");
+                player.sendMessage(DungeonsConfig.getDynamicDungeonNoPermissionMessage());
                 return;
             }
 
@@ -68,7 +69,7 @@ public class DynamicDungeonInstance extends DungeonInstance {
                                                                    int selectedLevel) {
         World world = DungeonUtils.loadWorld(instancedWorldName, dynamicDungeonConfigFields.getEnvironment(), dynamicDungeonConfigFields);
         if (world == null) {
-            player.sendMessage("[EliteMobs] Failed to load the world! Report this to the dev. The dungeon will not start.");
+            player.sendMessage(DungeonsConfig.getDynamicDungeonWorldLoadFailedMessage());
             return null;
         }
 
@@ -89,7 +90,7 @@ public class DynamicDungeonInstance extends DungeonInstance {
     public boolean addNewPlayer(Player player) {
         if (!super.addNewPlayer(player)) return false;
         // Show additional info about the selected level for dynamic dungeons
-        player.sendMessage("[EliteMobs] Dynamic dungeon level set to " + selectedLevel + "!");
+        player.sendMessage(DungeonsConfig.getDynamicDungeonLevelSetMessage().replace("$level", String.valueOf(selectedLevel)));
 
         // Adapt player's active DynamicQuests to the dungeon's selected level
         DynamicQuest.adaptPlayerQuestsToLevel(player, selectedLevel);

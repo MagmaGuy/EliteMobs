@@ -8,8 +8,6 @@ import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.CooldownSkill;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -22,7 +20,11 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Shatter (COOLDOWN) - AoE ground pound that damages and slows nearby enemies.
@@ -35,8 +37,8 @@ public class ShatterSkill extends SkillBonus implements CooldownSkill {
     private static final double AOE_RADIUS = 5.0;
     private static final int SLOW_DURATION_TICKS = 60; // 3 seconds
 
-    private static final Map<UUID, Long> cooldowns = new HashMap<>();
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Map<UUID, Long> cooldowns = new ConcurrentHashMap<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public ShatterSkill() {
         super(SkillType.MACES, 25, "Shatter",
@@ -128,28 +130,26 @@ public class ShatterSkill extends SkillBonus implements CooldownSkill {
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
 
-        // Damage and slow nearby enemies
-        for (Entity entity : center.getWorld().getNearbyEntities(center, AOE_RADIUS, 3, AOE_RADIUS)) {
-            if (!(entity instanceof LivingEntity living)) continue;
-            if (entity.equals(player)) continue;
+        // Damage and slow nearby enemies on next tick to avoid nested damage events
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                for (Entity entity : center.getWorld().getNearbyEntities(center, AOE_RADIUS, 3, AOE_RADIUS)) {
+                    if (!(entity instanceof LivingEntity living)) continue;
+                    if (entity.equals(player)) continue;
 
-            EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(living);
-            if (eliteEntity != null) {
-                // Deal damage based on player's attack damage attribute
-                double baseDamage = player.getAttribute(Attribute.ATTACK_DAMAGE).getValue();
-                double damage = baseDamage * damageMultiplier;
-                living.damage(damage, player);
-
-                // Apply slow
-                living.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, SLOW_DURATION_TICKS, 1));
+                    EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(living);
+                    if (eliteEntity != null) {
+                        double baseDamage = player.getAttribute(Attribute.ATTACK_DAMAGE).getValue();
+                        double damage = baseDamage * damageMultiplier;
+                        living.damage(damage, player);
+                        living.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, SLOW_DURATION_TICKS, 1));
+                    }
+                }
             }
-        }
-
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-            TextComponent.fromLegacyText("\u00A7e\u00A7lSHATTER!"));
+        }.runTask(MetadataHandler.PLUGIN);
 
         startCooldown(player, skillLevel);
-        incrementProcCount(player);
     }
 
     public double getDamageMultiplier(int skillLevel) {
@@ -187,12 +187,11 @@ public class ShatterSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        return List.of(
-            "&7Damage: &f" + String.format("%.0f", getDamageMultiplier(skillLevel) * 100) + "% weapon damage",
-            "&7Radius: &f" + AOE_RADIUS + " blocks",
-            "&7Slow Duration: &f3 seconds",
-            "&7Cooldown: &f" + getCooldownSeconds(skillLevel) + "s"
-        );
+        return applyLoreTemplates(Map.of(
+                "damage", String.format("%.0f", getDamageMultiplier(skillLevel) * 100),
+                "radius", String.valueOf(AOE_RADIUS),
+                "cooldown", String.valueOf(getCooldownSeconds(skillLevel))
+        ));
     }
 
     @Override
@@ -202,7 +201,10 @@ public class ShatterSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("AoE %.0f%% (CD: %ds)", getDamageMultiplier(skillLevel) * 100, getCooldownSeconds(skillLevel));
+        return applyFormattedBonusTemplate(Map.of(
+                "damage", String.format("%.0f", getDamageMultiplier(skillLevel) * 100),
+                "cooldown", String.valueOf(getCooldownSeconds(skillLevel))
+        ));
     }
 
     @Override

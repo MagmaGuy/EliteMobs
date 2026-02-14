@@ -4,20 +4,18 @@ import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
-import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.ProcSkill;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Precision Thrust (PROC) - Chance to deal critical damage.
@@ -29,7 +27,7 @@ public class PrecisionThrustSkill extends SkillBonus implements ProcSkill {
     private static final double BASE_PROC_CHANCE = 0.10;
     private static final double BASE_CRIT_MULTIPLIER = 1.5; // 150% damage
 
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public PrecisionThrustSkill() {
         super(SkillType.SPEARS, 10, "Precision Thrust",
@@ -49,11 +47,8 @@ public class PrecisionThrustSkill extends SkillBonus implements ProcSkill {
         EliteEntity eliteEntity = event.getEliteMobEntity();
         if (eliteEntity == null || eliteEntity.getLivingEntity() == null) return;
 
-        int skillLevel = SkillBonusRegistry.getPlayerSkillLevel(player, SkillType.SPEARS);
-        double critMultiplier = getCritMultiplier(skillLevel);
-
-        // Apply critical damage
-        event.setDamage(event.getDamage() * critMultiplier);
+        // Damage is applied via getBonusValue() in processOffensiveSkill (first pass additive system).
+        // Do NOT multiply event damage here — that would double-count with the first pass multiplier.
 
         LivingEntity target = eliteEntity.getLivingEntity();
 
@@ -63,18 +58,13 @@ public class PrecisionThrustSkill extends SkillBonus implements ProcSkill {
         target.getWorld().spawnParticle(Particle.ENCHANTED_HIT,
             target.getLocation().add(0, 1, 0), 10, 0.3, 0.3, 0.3, 0.2);
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.0f, 1.2f);
-
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-            TextComponent.fromLegacyText("\u00A7b\u00A7lPRECISION THRUST!"));
-
-        incrementProcCount(player);
     }
 
     public double getCritMultiplier(int skillLevel) {
         if (configFields != null) {
-            return configFields.calculateValue(skillLevel);
+            return Math.min(3.0, configFields.calculateValue(skillLevel));
         }
-        return BASE_CRIT_MULTIPLIER + (skillLevel * 0.01);
+        return Math.min(3.0, BASE_CRIT_MULTIPLIER + (skillLevel * 0.005));
     }
 
     @Override
@@ -104,20 +94,23 @@ public class PrecisionThrustSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        return List.of(
-            "&7Proc Chance: &f" + String.format("%.1f", getProcChance(skillLevel) * 100) + "%",
-            "&7Crit Damage: &f" + String.format("%.0f", getCritMultiplier(skillLevel) * 100) + "%"
-        );
+        return applyLoreTemplates(Map.of(
+                "chance", String.format("%.1f", getProcChance(skillLevel) * 100),
+                "critDamage", String.format("%.0f", getCritMultiplier(skillLevel) * 100)));
     }
 
     @Override
     public double getBonusValue(int skillLevel) {
-        return getCritMultiplier(skillLevel);
+        // Return the bonus portion only (e.g., 0.5 for 150% crit).
+        // processOffensiveSkill adds 1.0 + this, so total = critMultiplier.
+        return getCritMultiplier(skillLevel) - 1.0;
     }
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("%.1f%% for %.0f%% Crit", getProcChance(skillLevel) * 100, getCritMultiplier(skillLevel) * 100);
+        return applyFormattedBonusTemplate(Map.of(
+                "chance", String.format("%.1f", getProcChance(skillLevel) * 100),
+                "critDamage", String.format("%.0f", getCritMultiplier(skillLevel) * 100)));
     }
 
     @Override

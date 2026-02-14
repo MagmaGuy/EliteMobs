@@ -1,23 +1,19 @@
 package com.magmaguy.elitemobs.skills.bonuses.skills.armor;
 
-import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.CooldownSkill;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Tier 3 ARMOR skill - Second Wind
@@ -25,8 +21,8 @@ import java.util.UUID;
  */
 public class SecondWindSkill extends SkillBonus implements CooldownSkill {
 
-    private static final HashSet<UUID> activePlayers = new HashSet<>();
-    private static final Map<UUID, Long> cooldownMap = new HashMap<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
+    private static final Map<UUID, Long> cooldownMap = new ConcurrentHashMap<>();
     private static final double HEALTH_THRESHOLD = 0.25; // 25% health
 
     public SecondWindSkill() {
@@ -37,13 +33,13 @@ public class SecondWindSkill extends SkillBonus implements CooldownSkill {
             "Automatically heal when health drops below 25%",
             SkillBonusType.COOLDOWN,
             3,
-            "second_wind"
+            "armor_second_wind"
         );
     }
 
     @Override
     public void applyBonus(Player player, int skillLevel) {
-        // Cooldown skill, triggered by health threshold
+        activePlayers.add(player.getUniqueId());
     }
 
     @Override
@@ -69,11 +65,9 @@ public class SecondWindSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        List<String> lore = new ArrayList<>();
-        lore.add("Automatically heal when health drops below 25%");
-        lore.add(String.format("Heal Amount: %.1f%%", getHealPercent(skillLevel) * 100));
-        lore.add(String.format("Cooldown: %ds", getCooldownSeconds(skillLevel)));
-        return lore;
+        return applyLoreTemplates(Map.of(
+                "healAmount", String.format("%.1f", getHealPercent(skillLevel) * 100),
+                "cooldown", String.format("%ds", getCooldownSeconds(skillLevel))));
     }
 
     @Override
@@ -83,8 +77,9 @@ public class SecondWindSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("%.1f%% heal on low health (CD: %ds)",
-            getHealPercent(skillLevel) * 100, getCooldownSeconds(skillLevel));
+        return applyFormattedBonusTemplate(Map.of(
+                "healAmount", String.format("%.1f", getHealPercent(skillLevel) * 100),
+                "cooldown", String.format("%ds", getCooldownSeconds(skillLevel))));
     }
 
     @Override
@@ -149,9 +144,6 @@ public class SecondWindSkill extends SkillBonus implements CooldownSkill {
             player.getLocation().add(0, 1, 0), 10, 0.5, 0.5, 0.5, 0);
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.5f, 1.5f);
 
-        // Send action bar message
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(String.format("Second Wind! Healed %.1f HP", healAmount)));
-
         // Start cooldown
         startCooldown(player, skillLevel);
     }
@@ -170,6 +162,7 @@ public class SecondWindSkill extends SkillBonus implements CooldownSkill {
 
         if (newHealthPercent <= HEALTH_THRESHOLD) {
             onActivate(player, null);
+            incrementProcCount(player);
         }
     }
 

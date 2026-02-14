@@ -168,6 +168,50 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
     private static ItemStack commandsShareItemItem;
     @Getter
     private static int commandsShareItemSlot;
+    @Getter
+    private static String skillsItemDisplayName;
+    @Getter
+    private static String skillsItemLore1;
+    @Getter
+    private static String skillsItemLore2;
+    @Getter
+    private static String skillsItemClickLore;
+    @Getter
+    private static String skillsPageHeader;
+    @Getter
+    private static String skillsPageLevelFormat;
+    @Getter
+    private static String skillsPageXpFormat;
+    @Getter
+    private static String skillItemDisplayNameFormat;
+    @Getter
+    private static String skillItemSelectLore1;
+    @Getter
+    private static String skillItemSelectLore2;
+
+    // Dialog titles
+    @Getter
+    private static String dialogTitlePlayerStatus;
+    @Getter
+    private static String dialogTitleStats;
+    @Getter
+    private static String dialogTitleGear;
+    @Getter
+    private static String dialogTitleTeleports;
+    @Getter
+    private static String dialogTitleCommands;
+    @Getter
+    private static String dialogTitleQuests;
+    @Getter
+    private static String dialogTitleBossTracking;
+    @Getter
+    private static String dialogTitleSkills;
+    @Getter
+    private static String dialogNoActiveQuests;
+    @Getter
+    private static String dialogActiveQuestsFormat;
+    @Getter
+    private static String dialogBackButton;
 
 
     public PlayerStatusMenuConfig() {
@@ -244,7 +288,7 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
         indexLineCreator(9, "&bp. $commandsPage &8- &6Commands", "Click to go!", "$commandsPage", fileConfiguration, file);
         indexLineCreator(10, "&bp. $questsPage &8- &6Quest Tracking", "Click to go!", "$questsPage", fileConfiguration, file);
         indexLineCreator(11, "&bp. $bossTrackingPage &8- &6Boss Tracking", "Click to go!", "$bossTrackingPage", fileConfiguration, file);
-        indexLineCreator(12, "", "", "", fileConfiguration, file);
+        indexLineCreator(12, "&bp. $skillsPage &8- &6Skills", "Click to go!", "$skillsPage", fileConfiguration, file);
 
 
         statsLineCreator(0, "&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯", "", "", fileConfiguration, file);
@@ -495,6 +539,61 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
                                 "&fShares the Elite Item you're holding",
                                 "&fon chat!"))), true);
         commandsShareItemSlot = ConfigurationEngine.setInt(fileConfiguration, "commandsShareItemSlot", 15);
+
+        skillsItemDisplayName = ConfigurationEngine.setString(file, fileConfiguration, "skillsItemDisplayName", "&5&lSkills", true);
+        skillsItemLore1 = ConfigurationEngine.setString(file, fileConfiguration, "skillsItemLore1", "&7View your skill levels", true);
+        skillsItemLore2 = ConfigurationEngine.setString(file, fileConfiguration, "skillsItemLore2", "&7and XP progress.", true);
+        skillsItemClickLore = ConfigurationEngine.setString(file, fileConfiguration, "skillsItemClickLore", "&eClick to view!", true);
+        skillsPageHeader = ConfigurationEngine.setString(file, fileConfiguration, "skillsPageHeader", "&5&lYour Skills", true);
+        skillsPageLevelFormat = ConfigurationEngine.setString(file, fileConfiguration, "skillsPageLevelFormat", "&6$skillName &7Lv.&e$level", true);
+        skillsPageXpFormat = ConfigurationEngine.setString(file, fileConfiguration, "skillsPageXpFormat", "&8$progressBar &7$currentXp/$nextXp", true);
+        skillItemDisplayNameFormat = ConfigurationEngine.setString(file, fileConfiguration, "skillItemDisplayNameFormat", "&6&lLevel $level $skillName", true);
+        skillItemSelectLore1 = ConfigurationEngine.setString(file, fileConfiguration, "skillItemSelectLore1", "&eClick to select passive skills", true);
+        skillItemSelectLore2 = ConfigurationEngine.setString(file, fileConfiguration, "skillItemSelectLore2", "&eand see more details!", true);
+
+        dialogTitlePlayerStatus = ConfigurationEngine.setString(
+                List.of("Title for the main player status dialog menu."),
+                file, fileConfiguration, "dialog.titlePlayerStatus", "Player Status Menu", true);
+
+        dialogTitleStats = ConfigurationEngine.setString(
+                List.of("Title for the Stats dialog section."),
+                file, fileConfiguration, "dialog.titleStats", "Stats", true);
+
+        dialogTitleGear = ConfigurationEngine.setString(
+                List.of("Title for the Gear dialog section."),
+                file, fileConfiguration, "dialog.titleGear", "Gear", true);
+
+        dialogTitleTeleports = ConfigurationEngine.setString(
+                List.of("Title for the Teleports dialog section."),
+                file, fileConfiguration, "dialog.titleTeleports", "Teleports", true);
+
+        dialogTitleCommands = ConfigurationEngine.setString(
+                List.of("Title for the Commands dialog section."),
+                file, fileConfiguration, "dialog.titleCommands", "Commands", true);
+
+        dialogTitleQuests = ConfigurationEngine.setString(
+                List.of("Title for the Quests dialog section."),
+                file, fileConfiguration, "dialog.titleQuests", "Quests", true);
+
+        dialogTitleBossTracking = ConfigurationEngine.setString(
+                List.of("Title for the Boss Tracking dialog section."),
+                file, fileConfiguration, "dialog.titleBossTracking", "Boss Tracking", true);
+
+        dialogTitleSkills = ConfigurationEngine.setString(
+                List.of("Title for the Skills dialog section."),
+                file, fileConfiguration, "dialog.titleSkills", "Skills", true);
+
+        dialogNoActiveQuests = ConfigurationEngine.setString(
+                List.of("Message shown when the player has no active quests."),
+                file, fileConfiguration, "dialog.noActiveQuests", "No active quests", true);
+
+        dialogActiveQuestsFormat = ConfigurationEngine.setString(
+                List.of("Message showing the number of active quests. Use $amount for the quest count."),
+                file, fileConfiguration, "dialog.activeQuestsFormat", "You have $amount active quest(s).", true);
+
+        dialogBackButton = ConfigurationEngine.setString(
+                List.of("Text for the back button in dialog sections."),
+                file, fileConfiguration, "dialog.backButton", "\u2190 Back to Menu", true);
     }
 
 }

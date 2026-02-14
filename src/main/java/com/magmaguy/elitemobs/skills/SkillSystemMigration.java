@@ -1,8 +1,8 @@
 package com.magmaguy.elitemobs.skills;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.elitemobs.config.SkillsConfig;
-import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -114,19 +114,19 @@ public class SkillSystemMigration {
      * @param player The player to warn
      */
     public static void sendMigrationWarning(Player player) {
-        player.sendMessage(ChatColorConverter.convert(""));
-        player.sendMessage(ChatColorConverter.convert("&8&m------------------------------------------------"));
-        player.sendMessage(ChatColorConverter.convert("&5&lSKILL SYSTEM ACTIVATED"));
-        player.sendMessage(ChatColorConverter.convert("&7EliteMobs now uses a new skill leveling system!"));
-        player.sendMessage(ChatColorConverter.convert(""));
-        player.sendMessage(ChatColorConverter.convert("&eYou now level individual skills by killing mobs:"));
-        player.sendMessage(ChatColorConverter.convert("&7- Swords, Axes, Bows, Crossbows, Tridents, Hoes"));
-        player.sendMessage(ChatColorConverter.convert("&7- Armor levels on every kill at 1/3 XP rate"));
-        player.sendMessage(ChatColorConverter.convert(""));
-        player.sendMessage(ChatColorConverter.convert("&cAll players start fresh with Level 1 in all skills."));
-        player.sendMessage(ChatColorConverter.convert("&7Type &e/em &7and click &5Skills &7to view your progress!"));
-        player.sendMessage(ChatColorConverter.convert("&8&m------------------------------------------------"));
-        player.sendMessage(ChatColorConverter.convert(""));
+        player.sendMessage("");
+        player.sendMessage(DungeonsConfig.getSkillMigrationSeparator());
+        player.sendMessage(DungeonsConfig.getSkillMigrationTitle());
+        player.sendMessage(DungeonsConfig.getSkillMigrationLine1());
+        player.sendMessage("");
+        player.sendMessage(DungeonsConfig.getSkillMigrationLine2());
+        player.sendMessage(DungeonsConfig.getSkillMigrationLine3());
+        player.sendMessage(DungeonsConfig.getSkillMigrationLine4());
+        player.sendMessage("");
+        player.sendMessage(DungeonsConfig.getSkillMigrationLine5());
+        player.sendMessage(DungeonsConfig.getSkillMigrationLine6());
+        player.sendMessage(DungeonsConfig.getSkillMigrationSeparator());
+        player.sendMessage("");
     }
 
     /**

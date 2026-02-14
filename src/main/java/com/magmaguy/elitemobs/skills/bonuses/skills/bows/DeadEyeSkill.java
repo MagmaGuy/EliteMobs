@@ -4,21 +4,17 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
-import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.CooldownSkill;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Dead Eye (COOLDOWN) - Massive damage on critical shots.
@@ -28,11 +24,11 @@ public class DeadEyeSkill extends SkillBonus implements CooldownSkill {
 
     public static final String SKILL_ID = "bows_dead_eye";
     private static final long BASE_COOLDOWN = 45; // 45 seconds
-    private static final double BASE_DAMAGE_MULTIPLIER = 2.5; // 250% damage
+    private static final double BASE_DAMAGE_MULTIPLIER = 1.5; // 150% damage
 
-    private static final Set<UUID> activePlayers = new HashSet<>();
-    private static final Set<UUID> onCooldown = new HashSet<>();
-    private static final Map<UUID, Long> cooldownEndTimes = new HashMap<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
+    private static final Set<UUID> onCooldown = ConcurrentHashMap.newKeySet();
+    private static final Map<UUID, Long> cooldownEndTimes = new ConcurrentHashMap<>();
 
     public DeadEyeSkill() {
         super(SkillType.BOWS, 75, "Dead Eye",
@@ -83,22 +79,15 @@ public class DeadEyeSkill extends SkillBonus implements CooldownSkill {
     public void onActivate(Player player, Object event) {
         if (!(event instanceof EliteMobDamagedByPlayerEvent damageEvent)) return;
 
-        int skillLevel = SkillBonusRegistry.getPlayerSkillLevel(player, SkillType.BOWS);
-        double multiplier = getDamageMultiplier(skillLevel);
-
-        damageEvent.setDamage(damageEvent.getDamage() * multiplier);
-
-        // Visual effect
+        // Visual effect only - damage is applied via getBonusValue in processOffensiveSkill
         if (damageEvent.getEliteMobEntity().getLivingEntity() != null) {
             damageEvent.getEliteMobEntity().getLivingEntity().getWorld().spawnParticle(
                     Particle.ENCHANTED_HIT, damageEvent.getEliteMobEntity().getLivingEntity().getLocation().add(0, 1, 0), 30, 0.5, 0.5, 0.5, 0.2);
         }
-
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("§c§lDEAD EYE!"));
     }
 
     private double getDamageMultiplier(int skillLevel) {
-        return BASE_DAMAGE_MULTIPLIER + (skillLevel * 0.02); // 250% base + 2% per level
+        return BASE_DAMAGE_MULTIPLIER + (skillLevel * 0.01); // 150% base + 1% per level
     }
 
     @Override
@@ -120,17 +109,20 @@ public class DeadEyeSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        return List.of(
-                "&7Damage Multiplier: &f" + String.format("%.1f", getDamageMultiplier(skillLevel)) + "x",
-                "&7Cooldown: &f" + getCooldownSeconds(skillLevel) + "s",
-                "&7Triggers on critical hits"
-        );
+        return applyLoreTemplates(Map.of(
+                "damageMultiplier", String.format("%.1f", getDamageMultiplier(skillLevel)),
+                "cooldown", String.valueOf(getCooldownSeconds(skillLevel))
+        ));
     }
 
     @Override
-    public double getBonusValue(int skillLevel) { return getDamageMultiplier(skillLevel); }
+    public double getBonusValue(int skillLevel) { return getDamageMultiplier(skillLevel) - 1.0; }
     @Override
-    public String getFormattedBonus(int skillLevel) { return String.format("%.1fx critical damage", getDamageMultiplier(skillLevel)); }
+    public String getFormattedBonus(int skillLevel) {
+        return applyFormattedBonusTemplate(Map.of(
+                "damageMultiplier", String.format("%.1f", getDamageMultiplier(skillLevel))
+        ));
+    }
     @Override
     public void shutdown() {
         activePlayers.clear();

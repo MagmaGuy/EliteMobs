@@ -12,5 +12,11 @@ public class BowsPackHunterConfig extends SkillBonusConfigFields {
         super("bows_pack_hunter.yml", true, "&6Pack Hunter",
               List.of("&7Deal bonus damage when", "&7allies are nearby."),
               SkillType.BOWS, SkillBonusType.CONDITIONAL, 1, 0.10, 0.002, Material.WOLF_SPAWN_EGG);
+        this.loreTemplates = List.of(
+                "&7Bonus per Ally: &f$bonusPerAlly%",
+                "&7Max Allies: &f3",
+                "&7Range: &f$range blocks"
+        );
+        this.formattedBonusTemplate = "+$bonusPerAlly% damage per ally";
     }
 }

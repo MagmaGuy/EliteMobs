@@ -8,14 +8,16 @@ import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.ProcSkill;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Impaling Strike (PROC) - Chance to cause bleed damage over time.
@@ -27,10 +29,10 @@ public class ImpalingStrikeSkill extends SkillBonus implements ProcSkill {
     private static final double BASE_PROC_CHANCE = 0.15;
     private static final int BLEED_DURATION_TICKS = 100; // 5 seconds
     private static final int BLEED_TICK_INTERVAL = 20; // Damage every second
-    private static final double BASE_BLEED_DAMAGE = 0.5; // Percentage of initial hit
+    private static final double BASE_BLEED_DAMAGE = 0.10; // 10% of initial hit per tick (50% total over 5s)
 
-    private static final Set<UUID> activePlayers = new HashSet<>();
-    private static final Map<UUID, BukkitRunnable> activeBleedTasks = new HashMap<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
+    private static final Map<UUID, BukkitRunnable> activeBleedTasks = new ConcurrentHashMap<>();
 
     public ImpalingStrikeSkill() {
         super(SkillType.SPEARS, 25, "Impaling Strike",
@@ -52,13 +54,10 @@ public class ImpalingStrikeSkill extends SkillBonus implements ProcSkill {
 
         int skillLevel = SkillBonusRegistry.getPlayerSkillLevel(player, SkillType.SPEARS);
         double bleedDamage = event.getDamage() * getBleedDamagePercent(skillLevel);
+        // Cap bleed per tick to 15% of hit damage to prevent insane DoT
+        bleedDamage = Math.min(bleedDamage, event.getDamage() * 0.15);
 
         applyBleed(player, eliteEntity, bleedDamage);
-
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-            TextComponent.fromLegacyText("\u00A7b\u00A7lIMPALING STRIKE!"));
-
-        incrementProcCount(player);
     }
 
     private void applyBleed(Player player, EliteEntity target, double damagePerTick) {
@@ -141,11 +140,9 @@ public class ImpalingStrikeSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        return List.of(
-            "&7Proc Chance: &f" + String.format("%.1f", getProcChance(skillLevel) * 100) + "%",
-            "&7Bleed: &f" + String.format("%.0f", getBleedDamagePercent(skillLevel) * 100) + "% hit/sec",
-            "&7Duration: &f5 seconds"
-        );
+        return applyLoreTemplates(Map.of(
+                "chance", String.format("%.1f", getProcChance(skillLevel) * 100),
+                "bleedDamage", String.format("%.0f", getBleedDamagePercent(skillLevel) * 100)));
     }
 
     @Override
@@ -155,7 +152,8 @@ public class ImpalingStrikeSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("%.0f%% Bleed (5s)", getBleedDamagePercent(skillLevel) * 100 * 5);
+        return applyFormattedBonusTemplate(Map.of(
+                "totalBleed", String.format("%.0f", getBleedDamagePercent(skillLevel) * 100 * 5)));
     }
 
     @Override

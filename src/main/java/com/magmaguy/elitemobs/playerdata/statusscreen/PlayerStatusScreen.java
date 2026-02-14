@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.playerdata.statusscreen;
 
 import com.magmaguy.elitemobs.config.DefaultConfig;
+import com.magmaguy.elitemobs.config.SkillsConfig;
 import com.magmaguy.elitemobs.config.menus.premade.PlayerStatusMenuConfig;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.thirdparty.geyser.GeyserDetector;
@@ -69,6 +70,7 @@ public class PlayerStatusScreen implements Listener {
         int commandsPage = -1;
         int questsPage = -1;
         int bossTrackingPage = -1;
+        int skillsPage = -1;
         if (PlayerStatusMenuConfig.isDoStatsPage()) {
             statsPage = pageCounter;
             pages[pageCounter] = StatsPage.statsPage(targetPlayer);
@@ -107,7 +109,13 @@ public class PlayerStatusScreen implements Listener {
             }
         }
 
-        pages[0] = CoverPage.coverPage(statsPage, gearPage, teleportsPage, commandsPage, questsPage, bossTrackingPage);
+        if (SkillsConfig.isSkillSystemEnabled()) {
+            skillsPage = pageCounter;
+            pages[pageCounter] = SkillsPage.skillsPage(targetPlayer);
+            pageCounter++;
+        }
+
+        pages[0] = CoverPage.coverPage(statsPage, gearPage, teleportsPage, commandsPage, questsPage, bossTrackingPage, skillsPage);
 
         int counter = 0;
         for (TextComponent textComponent : pages) {

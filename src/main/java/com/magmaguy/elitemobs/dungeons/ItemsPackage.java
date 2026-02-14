@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.dungeons;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.commands.ReloadCommand;
+import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
 import com.magmaguy.elitemobs.config.customitems.CustomItemsConfig;
 import com.magmaguy.elitemobs.config.customitems.CustomItemsConfigFields;
@@ -55,18 +56,20 @@ public class ItemsPackage extends EMPackage {
     }
 
     private void handleInstallation(Player player, boolean enable) {
-        String action = enable ? "Installing" : "Uninstalling";
-        Logger.sendMessage(player, action + " " + customItems.size() + " items...");
+        String actionMessage = enable
+                ? DungeonsConfig.getItemsInstallingMessage().replace("$count", String.valueOf(customItems.size()))
+                : DungeonsConfig.getItemsUninstallingMessage().replace("$count", String.valueOf(customItems.size()));
+        Logger.sendMessage(player, actionMessage);
 
         List<CompletableFuture<Void>> futures = customItems.stream()
                 .map(customItem -> customItem.setEnabledAndSave(enable))
                 .toList();
 
-        Logger.sendMessage(player, "Saving " + customItems.size() + " item files...");
+        Logger.sendMessage(player, DungeonsConfig.getItemsSavingMessage().replace("$count", String.valueOf(customItems.size())));
 
         CompletableFuture<Void> allFutures = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
         allFutures.thenRun(() -> {
-            Logger.sendMessage(player, "Reloading EliteMobs to apply item changes!");
+            Logger.sendMessage(player, DungeonsConfig.getItemsReloadingMessage());
             Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, () -> ReloadCommand.reload(player));
         }).join(); // This ensures the current thread waits until all futures are complete
     }

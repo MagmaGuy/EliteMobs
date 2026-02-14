@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.wormhole;
 
+import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.config.WormholesConfig;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
@@ -22,10 +23,7 @@ import org.bukkit.entity.TextDisplay;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class WormholeEntry implements PersistentObject {
     @Getter
@@ -104,6 +102,7 @@ public class WormholeEntry implements PersistentObject {
     private long lastLinesClearTime = 0; // Cooldown to prevent rapid recreation
     private int particleTickCounter = 0; // Counter for particle spawn rate
     private int ticksWithoutLOS = 0; // Track how long no player has had LOS
+    private final Set<UUID> playersViewingLines = new HashSet<>(); // Track which players are viewing lines
 
     public WormholeEntry(Wormhole wormhole, String locationString, int wormholeNumber) {
         this.wormhole = wormhole;
@@ -183,7 +182,7 @@ public class WormholeEntry implements PersistentObject {
             //Logger.info("Wormhole " + wormhole.getWormholeConfigFields().getFilename() + " will not lead anywhere because the dungeon " + locationString + " is not installed!");
             setPortalMissingMessage(WormholesConfig.getDungeonNotInstalledMessage().replace("$dungeonID", emPackage.getContentPackagesConfigFields().getName()));
 
-            this.opMessage = ChatColorConverter.convert("&8[EliteMobs - OP-only message] &fDownload links are available on &9https://magmaguy.itch.io/ &f" + "(free and premium) and &9https://www.patreon.com/magmaguy &f(premium). You can check the difference " + "between the two and get support here: " + DiscordLinks.mainLink);
+            this.opMessage = CommandMessagesConfig.getWormholeOpDownloadMessage() + DiscordLinks.mainLink;
         }
         Location teleportLocation = emPackage.getContentPackagesConfigFields().getTeleportLocation();
         if (teleportLocation == null) return null;
@@ -227,6 +226,7 @@ public class WormholeEntry implements PersistentObject {
         isProcessingChunkEvent = true;
         try {
             clearLines();
+            playersViewingLines.clear(); // Clear player tracking on chunk unload
             if (textDisplay != null && textDisplay.isValid()) {
                 textDisplay.remove();
                 textDisplay = null;
@@ -324,6 +324,31 @@ public class WormholeEntry implements PersistentObject {
         if (staticModel != null) {
             return;
         }
+
+        // Track players who left the area - clear lines if player set changed significantly
+        Set<UUID> currentNearbyPlayerUUIDs = new HashSet<>();
+        for (Player player : nearbyPlayers) {
+            currentNearbyPlayerUUIDs.add(player.getUniqueId());
+        }
+
+        // If players have left and lines are initialized, check if we should recreate
+        // This prevents ghosting when players return after leaving
+        if (linesInitialized && !playersViewingLines.isEmpty()) {
+            Set<UUID> playersWhoLeft = new HashSet<>(playersViewingLines);
+            playersWhoLeft.removeAll(currentNearbyPlayerUUIDs);
+
+            // If any player who was viewing left the area, consider recreating lines
+            // to ensure clean state when they return
+            if (!playersWhoLeft.isEmpty()) {
+                // Small grace period to avoid constant recreation
+                if (ticksWithoutLOS > 20) { // ~1 second grace period
+                    clearLines();
+                }
+            }
+        }
+
+        playersViewingLines.clear();
+        playersViewingLines.addAll(currentNearbyPlayerUUIDs);
 
         // Update visual effects (lines) if enabled and at least one player has line of sight
         if (!WormholesConfig.isNoParticlesMode() &&
@@ -829,6 +854,7 @@ public class WormholeEntry implements PersistentObject {
         lineDataList.clear();
         linesInitialized = false;
         cachedEdges = null;
+        playersViewingLines.clear(); // Clear player tracking to force fresh state
         lastLinesClearTime = System.currentTimeMillis();
     }
 

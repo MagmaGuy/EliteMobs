@@ -11,7 +11,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -48,7 +47,7 @@ public class BettingMenu {
      */
     public static void openBettingMenu(Player player, GameType gameType) {
         if (!GamblingConfig.isGamblingEnabled()) {
-            player.sendMessage(ChatColorConverter.convert("&c[Casino] The casino is currently closed!"));
+            player.sendMessage(GamblingConfig.getBettingCasinoClosedMessage());
             return;
         }
 
@@ -56,9 +55,7 @@ public class BettingMenu {
         BetSession session = new BetSession(player.getUniqueId(), gameType, defaultBet);
         activeSessions.put(player.getUniqueId(), session);
 
-        String title = ChatColorConverter.convert(
-                GamblingConfig.getBettingMenuTitle().replace("%game%", gameType.getDisplayName())
-        );
+        String title = GamblingConfig.getBettingMenuTitle().replace("%game%", gameType.getDisplayName());
         Inventory inventory = Bukkit.createInventory(player, 27, title);
 
         updateBettingDisplay(inventory, player, session);
@@ -80,7 +77,7 @@ public class BettingMenu {
                         "",
                         ChatColorConverter.convert("&7" + session.gameType.getDescription()),
                         "",
-                        ChatColorConverter.convert("&eSelect your bet amount below!")
+                        GamblingConfig.getBettingSelectBetLore()
                 ),
                 1
         );
@@ -91,14 +88,14 @@ public class BettingMenu {
         double debt = GamblingEconomyHandler.getDebt(uuid);
         List<String> balanceLore = new ArrayList<>();
         balanceLore.add("");
-        balanceLore.add(ChatColorConverter.convert("&7Balance: &a" + String.format("%.2f", balance)));
+        balanceLore.add(GamblingConfig.getBettingBalanceLabel() + String.format("%.2f", balance));
         if (debt > 0) {
-            balanceLore.add(ChatColorConverter.convert("&7Debt: &c" + String.format("%.2f", debt)));
-            balanceLore.add(ChatColorConverter.convert("&7Available Credit: &e" + String.format("%.2f", GamblingEconomyHandler.getAvailableCredit(uuid))));
+            balanceLore.add(GamblingConfig.getBettingDebtLabel() + String.format("%.2f", debt));
+            balanceLore.add(GamblingConfig.getBettingAvailableCreditLabel() + String.format("%.2f", GamblingEconomyHandler.getAvailableCredit(uuid)));
         }
         ItemStack balanceItem = ItemStackGenerator.generateItemStack(
                 Material.GOLD_INGOT,
-                ChatColorConverter.convert("&6Your Finances"),
+                GamblingConfig.getBettingYourFinancesTitle(),
                 balanceLore,
                 1
         );
@@ -108,10 +105,10 @@ public class BettingMenu {
         boolean canAfford = GamblingEconomyHandler.canAffordBet(uuid, session.betAmount);
         ItemStack betDisplay = ItemStackGenerator.generateItemStack(
                 canAfford ? Material.EMERALD : Material.REDSTONE,
-                ChatColorConverter.convert((canAfford ? "&a" : "&c") + "Current Bet: " + session.betAmount),
+                ChatColorConverter.convert((canAfford ? GamblingConfig.getBettingAffordableColor() : GamblingConfig.getBettingUnaffordableColor()) + GamblingConfig.getBettingCurrentBetPrefix() + session.betAmount),
                 List.of(
                         "",
-                        ChatColorConverter.convert(canAfford ? "&7Click Play to start!" : "&cYou can't afford this bet!")
+                        canAfford ? GamblingConfig.getBettingClickPlayLore() : GamblingConfig.getBettingCantAffordLore()
                 ),
                 1
         );
@@ -137,11 +134,11 @@ public class BettingMenu {
         double maxAvailable = GamblingEconomyHandler.getMaxBet(uuid);
         ItemStack allInButton = ItemStackGenerator.generateItemStack(
                 Material.DIAMOND,
-                ChatColorConverter.convert("&b&lALL IN"),
+                GamblingConfig.getBettingAllInButtonText(),
                 List.of(
                         "",
-                        ChatColorConverter.convert("&7Bet everything you have!"),
-                        ChatColorConverter.convert("&7Max available: &6" + (int) maxAvailable)
+                        GamblingConfig.getBettingAllInLore(),
+                        GamblingConfig.getBettingMaxAvailableLabel() + (int) maxAvailable
                 ),
                 1
         );
@@ -150,10 +147,10 @@ public class BettingMenu {
         // Zero button (under -100)
         ItemStack zeroButton = ItemStackGenerator.generateItemStack(
                 Material.COAL,
-                ChatColorConverter.convert("&8&lRESET"),
+                GamblingConfig.getBettingResetButtonText(),
                 List.of(
                         "",
-                        ChatColorConverter.convert("&7Reset to minimum bet: &6" + GamblingConfig.getMinBet())
+                        GamblingConfig.getBettingResetLore() + GamblingConfig.getMinBet()
                 ),
                 1
         );
@@ -162,8 +159,8 @@ public class BettingMenu {
         // Cancel button
         ItemStack cancelButton = ItemStackGenerator.generateItemStack(
                 Material.BARRIER,
-                ChatColorConverter.convert(GamblingConfig.getCancelButtonText()),
-                List.of(ChatColorConverter.convert("&7Click to leave the casino")),
+                GamblingConfig.getCancelButtonText(),
+                List.of(GamblingConfig.getBettingCancelLore()),
                 1
         );
         inventory.setItem(CANCEL_SLOT, cancelButton);
@@ -171,12 +168,12 @@ public class BettingMenu {
         // Play button
         ItemStack playButton = ItemStackGenerator.generateItemStack(
                 canAfford ? Material.LIME_CONCRETE : Material.GRAY_CONCRETE,
-                ChatColorConverter.convert(canAfford ? GamblingConfig.getPlayButtonText() : "&c&lCan't Afford"),
+                canAfford ? GamblingConfig.getPlayButtonText() : GamblingConfig.getBettingCantAffordButtonText(),
                 List.of(
                         "",
-                        ChatColorConverter.convert(canAfford
-                                ? "&7Start the game with your current bet!"
-                                : "&7Reduce your bet or pay off debt")
+                        canAfford
+                                ? GamblingConfig.getBettingStartGameLore()
+                                : GamblingConfig.getBettingReduceBetLore()
                 ),
                 1
         );
@@ -190,7 +187,7 @@ public class BettingMenu {
         return ItemStackGenerator.generateItemStack(
                 material,
                 ChatColorConverter.convert("&f" + text),
-                List.of(ChatColorConverter.convert("&7Click to adjust bet by " + text)),
+                List.of(GamblingConfig.getBettingAdjustBetLore() + text),
                 1
         );
     }
@@ -225,22 +222,22 @@ public class BettingMenu {
     private static void startGame(Player player, BetSession session) {
         // SAFETY-FIRST: Process the bet BEFORE any game logic
         if (!GamblingEconomyHandler.placeBet(player.getUniqueId(), session.betAmount)) {
-            player.sendMessage(ChatColorConverter.convert(GamblingConfig.getInsufficientFundsMessage()));
+            player.sendMessage(GamblingConfig.getInsufficientFundsMessage());
             return;
         }
 
         // Check if player went into debt
         if (GamblingEconomyHandler.isInDebt(player.getUniqueId())) {
-            player.sendMessage(ChatColorConverter.convert(
+            player.sendMessage(
                     GamblingConfig.getDebtWarningMessage()
                             .replace("%debt%", String.format("%.2f", GamblingEconomyHandler.getDebt(player.getUniqueId())))
-            ));
+            );
         }
 
-        player.sendMessage(ChatColorConverter.convert(
+        player.sendMessage(
                 GamblingConfig.getBetPlacedMessage()
                         .replace("%amount%", String.valueOf(session.betAmount))
-        ));
+        );
 
         // Close the betting menu
         player.closeInventory();
@@ -263,25 +260,27 @@ public class BettingMenu {
      * Types of gambling games available.
      */
     public enum GameType {
-        BLACKJACK("Blackjack", "Get as close to 21 as possible without going over!"),
-        COIN_FLIP("Coin Flip", "Heads or Tails? Simple 50/50 chance!"),
-        SLOTS("Slot Machine", "Match three symbols to win big!"),
-        HIGHER_LOWER("Higher or Lower", "Guess if the next card is higher or lower!");
-
-        private final String displayName;
-        private final String description;
-
-        GameType(String displayName, String description) {
-            this.displayName = displayName;
-            this.description = description;
-        }
+        BLACKJACK,
+        COIN_FLIP,
+        SLOTS,
+        HIGHER_LOWER;
 
         public String getDisplayName() {
-            return displayName;
+            return switch (this) {
+                case BLACKJACK -> GamblingConfig.getBettingBlackjackName();
+                case COIN_FLIP -> GamblingConfig.getBettingCoinFlipName();
+                case SLOTS -> GamblingConfig.getBettingSlotsName();
+                case HIGHER_LOWER -> GamblingConfig.getBettingHigherLowerName();
+            };
         }
 
         public String getDescription() {
-            return description;
+            return switch (this) {
+                case BLACKJACK -> GamblingConfig.getBettingBlackjackDescription();
+                case COIN_FLIP -> GamblingConfig.getBettingCoinFlipDescription();
+                case SLOTS -> GamblingConfig.getBettingSlotsDescription();
+                case HIGHER_LOWER -> GamblingConfig.getBettingHigherLowerDescription();
+            };
         }
     }
 
@@ -308,14 +307,8 @@ public class BettingMenu {
 
         @EventHandler
         public void onClick(InventoryClickEvent event) {
-            if (!menus.contains(event.getInventory())) return;
-            if (event.getClickedInventory() == null || !event.getClickedInventory().getType().equals(InventoryType.CHEST)) {
-                event.setCancelled(true);
-                return;
-            }
-            event.setCancelled(true);
-
-            if (!(event.getWhoClicked() instanceof Player player)) return;
+            Player player = GamblingDisplay.validateClick(event, menus);
+            if (player == null) return;
 
             BetSession session = activeSessions.get(player.getUniqueId());
             if (session == null) {

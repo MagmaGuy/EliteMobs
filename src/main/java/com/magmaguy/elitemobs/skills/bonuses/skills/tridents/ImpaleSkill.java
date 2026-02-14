@@ -5,14 +5,13 @@ import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.ProcSkill;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.Player;
 
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Impale (PROC) - Trident attacks have a chance to deal massive bonus damage that ignores armor.
@@ -21,11 +20,11 @@ import java.util.UUID;
 public class ImpaleSkill extends SkillBonus implements ProcSkill {
 
     public static final String SKILL_ID = "tridents_impale";
-    private static final double BASE_PROC_CHANCE = 0.20; // 20% base chance
-    private static final double BASE_DAMAGE_MULTIPLIER = 1.5;
+    private static final double BASE_PROC_CHANCE = 0.15; // 15% base chance
+    private static final double BASE_DAMAGE_MULTIPLIER = 1.0;
 
     // Track which players have this skill active
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public ImpaleSkill() {
         super(SkillType.TRIDENTS, 10, "Impale",
@@ -35,16 +34,14 @@ public class ImpaleSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public double getProcChance(int skillLevel) {
-        // Base chance + 0.2% per level, capped at 40%
-        return Math.min(0.40, BASE_PROC_CHANCE + (skillLevel * 0.002));
+        // Base chance + 0.15% per level, capped at 25%
+        return Math.min(0.25, BASE_PROC_CHANCE + (skillLevel * 0.0015));
     }
 
     @Override
     public void onProc(Player player, Object context) {
         if (!(context instanceof EliteMobDamagedByPlayerEvent event)) return;
 
-        // Send feedback to player
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("§cIMPALE!"));
     }
 
     private double calculateDamageMultiplier(int skillLevel) {
@@ -83,11 +80,10 @@ public class ImpaleSkill extends SkillBonus implements ProcSkill {
     public List<String> getLoreDescription(int skillLevel) {
         double procChance = getProcChance(skillLevel) * 100;
         double multiplier = calculateDamageMultiplier(skillLevel);
-        return List.of(
-                "&7Chance: &f" + String.format("%.1f", procChance) + "%",
-                "&7Damage Multiplier: &f" + String.format("%.1f", multiplier) + "x",
-                "&7Ignores armor"
-        );
+        return applyLoreTemplates(Map.of(
+                "procChance", String.format("%.1f", procChance),
+                "multiplier", String.format("%.1f", multiplier)
+        ));
     }
 
     @Override
@@ -97,7 +93,9 @@ public class ImpaleSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("%.1fx Damage", calculateDamageMultiplier(skillLevel));
+        return applyFormattedBonusTemplate(Map.of(
+                "multiplier", String.format("%.1f", calculateDamageMultiplier(skillLevel))
+        ));
     }
 
     @Override

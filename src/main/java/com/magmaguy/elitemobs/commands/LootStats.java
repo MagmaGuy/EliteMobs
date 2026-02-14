@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
+import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
@@ -28,11 +29,11 @@ public class LootStats extends AdvancedCommand {
         double dps = EliteItemManager.getDPS(item);
         double itemLevel = EliteItemManager.getWeaponLevel(item);
         double bonusEDPS = EliteItemManager.getTotalDPS(item);
-        player.sendMessage("[EliteMobs] Item Stats:");
-        player.sendMessage("Item attack speed: " + attackSpeed);
-        player.sendMessage("Item damage: " + damage);
-        player.sendMessage("Item EDPS: " + dps);
-        player.sendMessage("Item level: " + itemLevel);
-        player.sendMessage("Item bonus EDPS: " + bonusEDPS);
+        player.sendMessage(CommandMessagesConfig.getLootStatsHeader());
+        player.sendMessage(CommandMessagesConfig.getLootStatsAttackSpeed() + attackSpeed);
+        player.sendMessage(CommandMessagesConfig.getLootStatsDamage() + damage);
+        player.sendMessage(CommandMessagesConfig.getLootStatsEdps() + dps);
+        player.sendMessage(CommandMessagesConfig.getLootStatsLevel() + itemLevel);
+        player.sendMessage(CommandMessagesConfig.getLootStatsBonusEdps() + bonusEDPS);
     }
 }

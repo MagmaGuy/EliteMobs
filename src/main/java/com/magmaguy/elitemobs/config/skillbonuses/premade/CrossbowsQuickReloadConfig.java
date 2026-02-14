@@ -12,5 +12,11 @@ public class CrossbowsQuickReloadConfig extends SkillBonusConfigFields {
         super("crossbows_quick_reload.yml", true, "&eQuick Reload",
               List.of("&7Gain haste after hitting", "&7for faster reloading."),
               SkillType.CROSSBOWS, SkillBonusType.PASSIVE, 1, 0.5, 0.01, Material.SUGAR);
+        this.loreTemplates = List.of(
+                "&7Haste Level: &f$hasteLevel",
+                "&7Duration: &f3 seconds",
+                "&7Triggers on hit"
+        );
+        this.formattedBonusTemplate = "Haste $hasteLevel on hit";
     }
 }

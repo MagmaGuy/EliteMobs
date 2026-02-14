@@ -5,7 +5,9 @@ import com.magmaguy.elitemobs.config.menus.MenusConfigFields;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
 import lombok.Getter;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.List;
 
@@ -87,8 +89,58 @@ public class SkillBonusMenuConfig extends MenusConfigFields {
     @Getter
     private static String maxActiveSkillsReached;
 
+    // Skill item lore labels
+    @Getter
+    private static String skillTypeLabel;
+    @Getter
+    private static String skillTierLabel;
+    @Getter
+    private static String skillTierLevelFormat;
+    @Getter
+    private static String skillValueLabel;
+
+    // Info item strings
+    @Getter
+    private static String infoItemTitle;
+    @Getter
+    private static String infoSkillTypeLabel;
+    @Getter
+    private static String infoYourLevelLabel;
+    @Getter
+    private static String infoActiveSkillsLabel;
+    @Getter
+    private static String infoActiveSkillsHeader;
+    @Getter
+    private static String infoActiveSkillPrefix;
+    @Getter
+    private static String infoUnlockLevelsHeader;
+    @Getter
+    private static String infoTier1Unlock;
+    @Getter
+    private static String infoTier2Unlock;
+    @Getter
+    private static String infoTier3Unlock;
+    @Getter
+    private static String infoTier4Unlock;
+
+    // Chat messages
+    @Getter
+    private static String skillRequiresLevelMessage;
+    @Getter
+    private static String skillDeactivatedMessage;
+    @Getter
+    private static String skillActivatedMessage;
+
     public SkillBonusMenuConfig() {
         super("skill_bonus_menu", true);
+    }
+
+    private static void hideAttributes(ItemStack item) {
+        ItemMeta meta = item.getItemMeta();
+        if (meta != null) {
+            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+            item.setItemMeta(meta);
+        }
     }
 
     @Override
@@ -147,6 +199,17 @@ public class SkillBonusMenuConfig extends MenusConfigFields {
                 ItemStackGenerator.generateItemStack(Material.DIAMOND_CHESTPLATE, "&6Armor", List.of("&7View armor skills", "&7Click to select")), true);
         armorSlot = ConfigurationEngine.setInt(fileConfiguration, "armorSlot", 23);
 
+        // Hide vanilla attribute tooltips (attack damage, attack speed) for weapon display items
+        hideAttributes(swordsItem);
+        hideAttributes(axesItem);
+        hideAttributes(bowsItem);
+        hideAttributes(crossbowsItem);
+        hideAttributes(tridentsItem);
+        hideAttributes(hoesItem);
+        hideAttributes(macesItem);
+        hideAttributes(spearsItem);
+        hideAttributes(armorItem);
+
         // Navigation items
         backItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "backItem",
                 ItemStackGenerator.generateItemStack(Material.ARROW, "&cBack", List.of("&7Return to weapon selection")), true);
@@ -175,5 +238,29 @@ public class SkillBonusMenuConfig extends MenusConfigFields {
         clickToActivate = ConfigurationEngine.setString(file, fileConfiguration, "clickToActivate", "&aClick to activate this skill", true);
         clickToDeactivate = ConfigurationEngine.setString(file, fileConfiguration, "clickToDeactivate", "&eClick to deactivate this skill", true);
         maxActiveSkillsReached = ConfigurationEngine.setString(file, fileConfiguration, "maxActiveSkillsReached", "&cYou already have 3 active skills! Deactivate one first.", true);
+
+        // Skill item lore labels
+        skillTypeLabel = ConfigurationEngine.setString(List.of("Label for the skill bonus type in the skill item lore."), file, fileConfiguration, "skillTypeLabel", "&7Type: &f", true);
+        skillTierLabel = ConfigurationEngine.setString(List.of("Label for the skill tier in the skill item lore."), file, fileConfiguration, "skillTierLabel", "&7Tier: &f", true);
+        skillTierLevelFormat = ConfigurationEngine.setString(List.of("Format for the tier level display. %tier% = tier number, %level% = required level."), file, fileConfiguration, "skillTierLevelFormat", "%tier% (Level %level%)", true);
+        skillValueLabel = ConfigurationEngine.setString(List.of("Label for the skill value at the player's current level."), file, fileConfiguration, "skillValueLabel", "&7Value at your level: &a", true);
+
+        // Info item strings
+        infoItemTitle = ConfigurationEngine.setString(List.of("Title of the info item in the skill selection menu."), file, fileConfiguration, "infoItemTitle", "&eSkill Info", true);
+        infoSkillTypeLabel = ConfigurationEngine.setString(List.of("Label for the skill type in the info item lore."), file, fileConfiguration, "infoSkillTypeLabel", "&7Skill Type: &f", true);
+        infoYourLevelLabel = ConfigurationEngine.setString(List.of("Label for the player's level in the info item lore."), file, fileConfiguration, "infoYourLevelLabel", "&7Your Level: &f", true);
+        infoActiveSkillsLabel = ConfigurationEngine.setString(List.of("Label for the active skills count in the info item lore. %count% = current count."), file, fileConfiguration, "infoActiveSkillsLabel", "&7Active Skills: &f%count%/3", true);
+        infoActiveSkillsHeader = ConfigurationEngine.setString(List.of("Header for the list of active skills in the info item lore."), file, fileConfiguration, "infoActiveSkillsHeader", "&6Active Skills:", true);
+        infoActiveSkillPrefix = ConfigurationEngine.setString(List.of("Prefix for each active skill name in the info item lore."), file, fileConfiguration, "infoActiveSkillPrefix", "&7- ", true);
+        infoUnlockLevelsHeader = ConfigurationEngine.setString(List.of("Header for the skill unlock levels section in the info item lore."), file, fileConfiguration, "infoUnlockLevelsHeader", "&7Skills unlock at levels:", true);
+        infoTier1Unlock = ConfigurationEngine.setString(List.of("Tier 1 unlock level display in the info item lore."), file, fileConfiguration, "infoTier1Unlock", "&a Tier 1: &fLevel 10", true);
+        infoTier2Unlock = ConfigurationEngine.setString(List.of("Tier 2 unlock level display in the info item lore."), file, fileConfiguration, "infoTier2Unlock", "&e Tier 2: &fLevel 25", true);
+        infoTier3Unlock = ConfigurationEngine.setString(List.of("Tier 3 unlock level display in the info item lore."), file, fileConfiguration, "infoTier3Unlock", "&6 Tier 3: &fLevel 50", true);
+        infoTier4Unlock = ConfigurationEngine.setString(List.of("Tier 4 unlock level display in the info item lore."), file, fileConfiguration, "infoTier4Unlock", "&c Tier 4: &fLevel 75", true);
+
+        // Chat messages
+        skillRequiresLevelMessage = ConfigurationEngine.setString(List.of("Message sent when a player tries to activate a skill they haven't unlocked. %level% = required level."), file, fileConfiguration, "skillRequiresLevelMessage", "&cThis skill requires level %level%!", true);
+        skillDeactivatedMessage = ConfigurationEngine.setString(List.of("Message sent when a player deactivates a skill. %skill% = skill name."), file, fileConfiguration, "skillDeactivatedMessage", "&eDeactivated skill: %skill%", true);
+        skillActivatedMessage = ConfigurationEngine.setString(List.of("Message sent when a player activates a skill. %skill% = skill name."), file, fileConfiguration, "skillActivatedMessage", "&aActivated skill: %skill%", true);
     }
 }

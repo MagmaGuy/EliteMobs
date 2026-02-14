@@ -11,5 +11,12 @@ public class HoesSpectralScytheConfig extends SkillBonusConfigFields {
         super("hoes_spectral_scythe.yml", true, "&bSpectral Scythe",
               List.of("&7Launch a spectral scythe", "&7projectile. 25s CD."),
               SkillType.HOES, 4, 1.5, 0.03, 0.0, 25.0, Material.PHANTOM_MEMBRANE, true);
+        this.loreTemplates = List.of(
+                "&7Damage: &f$damagePercent% weapon damage",
+                "&7Range: &f$range blocks",
+                "&7Cooldown: &f$cooldown seconds",
+                "&7Pierces through enemies"
+        );
+        this.formattedBonusTemplate = "$damagePercent% Projectile Damage";
     }
 }

@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.skills.bonuses.skills.armor;
 
-import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
@@ -8,10 +7,11 @@ import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.ConditionalSkill;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Tier 3 ARMOR skill - Grit
@@ -19,7 +19,7 @@ import java.util.UUID;
  */
 public class GritSkill extends SkillBonus implements ConditionalSkill {
 
-    private static final HashSet<UUID> activePlayers = new HashSet<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
     private static final double HEALTH_THRESHOLD = 0.50; // 50% health
 
     public GritSkill() {
@@ -30,13 +30,13 @@ public class GritSkill extends SkillBonus implements ConditionalSkill {
             "Gain increased damage reduction when below 50% health",
             SkillBonusType.CONDITIONAL,
             3,
-            "grit"
+            "armor_grit"
         );
     }
 
     @Override
     public void applyBonus(Player player, int skillLevel) {
-        // Conditional bonus is checked on damage event
+        activePlayers.add(player.getUniqueId());
     }
 
     @Override
@@ -61,12 +61,8 @@ public class GritSkill extends SkillBonus implements ConditionalSkill {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        List<String> lore = new ArrayList<>();
-        lore.add("Gain increased damage reduction when below 50% health");
-        lore.add("Lower health = more damage reduction");
-        lore.add(String.format("Max Reduction: %.1f%%", getMaxReduction(skillLevel) * 100));
-        lore.add("Requires: Health below 50%");
-        return lore;
+        return applyLoreTemplates(Map.of(
+                "maxReduction", String.format("%.1f", getMaxReduction(skillLevel) * 100)));
     }
 
     @Override
@@ -76,7 +72,8 @@ public class GritSkill extends SkillBonus implements ConditionalSkill {
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("Up to %.1f%% damage reduction", getMaxReduction(skillLevel) * 100);
+        return applyFormattedBonusTemplate(Map.of(
+                "maxReduction", String.format("%.1f", getMaxReduction(skillLevel) * 100)));
     }
 
     @Override
@@ -136,6 +133,9 @@ public class GritSkill extends SkillBonus implements ConditionalSkill {
         double reduction = getMaxReduction(skillLevel) * lowHealthMultiplier;
         return originalDamage * (1 - reduction);
     }
+
+    @Override
+    public TestStrategy getTestStrategy() { return TestStrategy.CONDITION_SETUP; }
 
     private int getPlayerSkillLevel(Player player) {
         return SkillBonusRegistry.getPlayerSkillLevel(player, SkillType.ARMOR);

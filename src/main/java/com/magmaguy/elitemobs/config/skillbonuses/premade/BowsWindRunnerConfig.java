@@ -12,5 +12,11 @@ public class BowsWindRunnerConfig extends SkillBonusConfigFields {
         super("bows_wind_runner.yml", true, "&fWind Runner",
               List.of("&7Gain speed boost when", "&7hitting enemies with arrows."),
               SkillType.BOWS, SkillBonusType.PASSIVE, 3, 0.5, 0.01, Material.FEATHER);
+        this.loreTemplates = List.of(
+                "&7Speed Level: &f$speedLevel",
+                "&7Duration: &f5 seconds",
+                "&7Triggers on hit"
+        );
+        this.formattedBonusTemplate = "Speed $speedLevel on hit";
     }
 }

@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.commands;
 
+import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.testing.SkillSystemTest;
 import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
@@ -26,17 +27,17 @@ public class SkillTestCancelCommand extends AdvancedCommand {
     @Override
     public void execute(CommandData commandData) {
         if (!(commandData.getCommandSender() instanceof Player player)) {
-            Logger.sendMessage(commandData.getCommandSender(), "&cThis command can only be run by a player!");
+            Logger.sendMessage(commandData.getCommandSender(), CommandMessagesConfig.getSkillTestOnlyPlayerMessage());
             return;
         }
 
         SkillSystemTest session = SkillSystemTest.getSession(player.getUniqueId());
         if (session == null) {
-            Logger.sendMessage(player, "&cNo active test to cancel.");
+            Logger.sendMessage(player, CommandMessagesConfig.getSkillTestCancelNoTestMessage());
             return;
         }
 
         session.cancel();
-        Logger.sendMessage(player, "&aTest cancelled and player state restored.");
+        Logger.sendMessage(player, CommandMessagesConfig.getSkillTestCancelSuccessMessage());
     }
 }

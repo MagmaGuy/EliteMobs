@@ -1,22 +1,20 @@
 package com.magmaguy.elitemobs.skills.bonuses.skills.armor;
 
-import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.ProcSkill;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -25,7 +23,7 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class RetaliationSkill extends SkillBonus implements ProcSkill {
 
-    private static final HashSet<UUID> activePlayers = new HashSet<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public RetaliationSkill() {
         super(
@@ -35,13 +33,13 @@ public class RetaliationSkill extends SkillBonus implements ProcSkill {
             "Chance to reflect damage back to attackers",
             SkillBonusType.PROC,
             2,
-            "retaliation"
+            "armor_retaliation"
         );
     }
 
     @Override
     public void applyBonus(Player player, int skillLevel) {
-        // Retaliation is checked on damage event, no persistent bonus to apply
+        activePlayers.add(player.getUniqueId());
     }
 
     @Override
@@ -66,11 +64,9 @@ public class RetaliationSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        List<String> lore = new ArrayList<>();
-        lore.add("Chance to reflect damage back to attackers");
-        lore.add(String.format("Proc Chance: %.1f%%", getProcChance(skillLevel) * 100));
-        lore.add(String.format("Reflect Damage: %.1f%%", getReflectPercent(skillLevel) * 100));
-        return lore;
+        return applyLoreTemplates(Map.of(
+                "procChance", String.format("%.1f", getProcChance(skillLevel) * 100),
+                "reflectDamage", String.format("%.1f", getReflectPercent(skillLevel) * 100)));
     }
 
     @Override
@@ -80,9 +76,9 @@ public class RetaliationSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("%.1f%% chance to reflect %.1f%% damage",
-            getProcChance(skillLevel) * 100,
-            getReflectPercent(skillLevel) * 100);
+        return applyFormattedBonusTemplate(Map.of(
+                "procChance", String.format("%.1f", getProcChance(skillLevel) * 100),
+                "reflectDamage", String.format("%.1f", getReflectPercent(skillLevel) * 100)));
     }
 
     @Override
@@ -117,9 +113,6 @@ public class RetaliationSkill extends SkillBonus implements ProcSkill {
                 // Visual effect
                 player.getWorld().spawnParticle(Particle.CRIT,
                     attacker.getLocation().add(0, 1, 0), 10, 0.3, 0.3, 0.3, 0);
-
-                // Send action bar message
-                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(String.format("Retaliated %.1f damage!", reflectDamage)));
             }
         }
     }
@@ -131,8 +124,8 @@ public class RetaliationSkill extends SkillBonus implements ProcSkill {
      * @return The reflect percentage (0.0 to 1.0)
      */
     private double getReflectPercent(int skillLevel) {
-        // Base 30% + scaled value
-        return 0.30 * getScaledValue(skillLevel);
+        // Base 30% + scaled value, capped at 50%
+        return Math.min(0.50, 0.30 * getScaledValue(skillLevel));
     }
 
     /**
@@ -151,6 +144,7 @@ public class RetaliationSkill extends SkillBonus implements ProcSkill {
         int skillLevel = getPlayerSkillLevel(player);
         if (ThreadLocalRandom.current().nextDouble() < getProcChance(skillLevel)) {
             onProc(player, new Object[]{attacker, damage});
+            incrementProcCount(player);
         }
     }
 

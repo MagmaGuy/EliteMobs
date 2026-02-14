@@ -130,8 +130,9 @@ public class DebtCollectorManager implements Listener {
         // Send spawn message
         double debt = PlayerData.getGamblingDebt(player.getUniqueId());
         player.sendMessage(ChatColorConverter.convert(
-                "&c[Debt Collector] &7Well well well... &e" + player.getName() + "&7. You owe us &6" +
-                        String.format("%.0f", debt) + " coins&7."
+                GamblingConfig.getDebtCollectorSpawnMessage()
+                        .replace("$player", player.getName())
+                        .replace("$amount", String.format("%.0f", debt))
         ));
 
         // Set up timeout
@@ -142,8 +143,8 @@ public class DebtCollectorManager implements Listener {
                 if (boss.exists()) {
                     // Timeout message
                     player.sendMessage(ChatColorConverter.convert(
-                            "&c[Debt Collector] &7Running won't save you. I'll find you again, &e" +
-                                    player.getName() + "&7..."
+                            GamblingConfig.getDebtCollectorTimeoutMessage()
+                                    .replace("$player", player.getName())
                     ));
                     boss.remove(com.magmaguy.elitemobs.api.internal.RemovalReason.BOSS_TIMEOUT);
                     activeDebtCollectors.remove(player.getUniqueId());
@@ -233,7 +234,8 @@ public class DebtCollectorManager implements Listener {
             Player targetPlayer = Bukkit.getPlayer(targetPlayerUUID);
             if (targetPlayer != null && targetPlayer.isOnline()) {
                 targetPlayer.sendMessage(ChatColorConverter.convert(
-                        "&c[Debt Collector] &7Ugh... I'll be back... and I'm bringing &efriends&7 next time..."
+                        GamblingConfig.getDebtCollectorDeathMessage()
+                                .replace("$player", targetPlayer.getName())
                 ));
             }
         }
@@ -270,18 +272,19 @@ public class DebtCollectorManager implements Listener {
 
         // Send message
         player.sendMessage(ChatColorConverter.convert(
-                "&c[Debt Collector] &7Pleasure doing business, &e" + player.getName() +
-                        "&7. The boss sends his regards."
+                GamblingConfig.getDebtCollectorKillMessage()
+                        .replace("$player", player.getName())
         ));
 
         if (remainingDebt > 0) {
             player.sendMessage(ChatColorConverter.convert(
-                    "&7[Casino] &e" + String.format("%.0f", debtReduction) +
-                            " coins &7of debt paid. Remaining debt: &c" + String.format("%.0f", remainingDebt)
+                    GamblingConfig.getDebtPaidMessage()
+                            .replace("$amount", String.format("%.0f", debtReduction))
+                            .replace("$remaining", String.format("%.0f", remainingDebt))
             ));
         } else {
             player.sendMessage(ChatColorConverter.convert(
-                    "&a[Casino] &7Your debt has been cleared! Don't gamble again..."
+                    GamblingConfig.getDebtClearedMessage()
             ));
         }
 

@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.commands;
 
+import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
@@ -9,7 +10,6 @@ import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
-import com.magmaguy.magmacore.util.ChatColorConverter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -56,7 +56,7 @@ public class SpawnCommand {
                     level,
                     powers);
         } catch (Exception e) {
-            commandSender.sendMessage("[EliteMobs] World argument was not valid!");
+            commandSender.sendMessage(CommandMessagesConfig.getWorldNotValidMessage());
         }
     }
 
@@ -66,7 +66,7 @@ public class SpawnCommand {
                                                    Integer level,
                                                    Optional<String> powers) {
         if (!EliteMobProperties.getValidMobTypes().contains(entityType)) {
-            commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Entity type " + entityType.toString() + " can't be an Elite!"));
+            commandSender.sendMessage(CommandMessagesConfig.getInvalidEntityTypeMessage().replace("$type", entityType.toString()));
             return;
         }
         LivingEntity livingEntity = (LivingEntity) location.getWorld().spawnEntity(location, entityType);
@@ -90,14 +90,14 @@ public class SpawnCommand {
             Location location = new Location(Bukkit.getWorld(world), coords.getX(), coords.getY(), coords.getZ());
             CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(fileName);
             if (customBossesConfigFields == null) {
-                commandSender.sendMessage("Filename " + fileName + " is not valid! Make sure you are writing the name of a configuration file in the custombosses folder!");
+                commandSender.sendMessage(CommandMessagesConfig.getFilenameNotValidMessage().replace("$filename", fileName));
                 return;
             }
             CustomBossEntity customBossEntity = new CustomBossEntity(customBossesConfigFields);
             customBossEntity.setSpawnLocation(location);
             customBossEntity.spawn(false);
         } catch (Exception e) {
-            commandSender.sendMessage("[EliteMobs] World argument was not valid!");
+            commandSender.sendMessage(CommandMessagesConfig.getWorldNotValidMessage());
         }
 
     }
@@ -111,7 +111,7 @@ public class SpawnCommand {
             Location location = new Location(Bukkit.getWorld(world), coords.getX(), coords.getY(), coords.getZ());
             CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(fileName);
             if (customBossesConfigFields == null) {
-                commandSender.sendMessage("Filename " + fileName + " is not valid! Make sure you are writing the name of a configuration file in the custombosses folder!");
+                commandSender.sendMessage(CommandMessagesConfig.getFilenameNotValidMessage().replace("$filename", fileName));
                 return;
             }
             CustomBossEntity customBossEntity = new CustomBossEntity(customBossesConfigFields);
@@ -119,7 +119,7 @@ public class SpawnCommand {
             customBossEntity.setLevel(level);
             customBossEntity.spawn(false);
         } catch (Exception e) {
-            commandSender.sendMessage("[EliteMobs] World argument was not valid!");
+            commandSender.sendMessage(CommandMessagesConfig.getWorldNotValidMessage());
         }
 
     }
@@ -127,7 +127,7 @@ public class SpawnCommand {
     public static void spawnCustomBossCommand(Player player, String fileName, int level) {
         CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(fileName);
         if (customBossesConfigFields == null) {
-            player.sendMessage("Filename " + fileName + " is not valid! Make sure you are writing the name of a configuration file in the custombosses folder!");
+            player.sendMessage(CommandMessagesConfig.getFilenameNotValidMessage().replace("$filename", fileName));
             return;
         }
         CustomBossEntity customBossEntity = new CustomBossEntity(customBossesConfigFields);
@@ -139,7 +139,7 @@ public class SpawnCommand {
     public static void spawnCustomBossCommand(Player player, String fileName) {
         CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(fileName);
         if (customBossesConfigFields == null) {
-            player.sendMessage("Filename " + fileName + " is not valid! Make sure you are writing the name of a configuration file in the custombosses folder!");
+            player.sendMessage(CommandMessagesConfig.getFilenameNotValidMessage().replace("$filename", fileName));
             return;
         }
         CustomBossEntity customBossEntity = new CustomBossEntity(customBossesConfigFields);
@@ -159,7 +159,7 @@ public class SpawnCommand {
         for (String string : mobPowers) {
             PowersConfigFields powersConfigFields = PowersConfig.getPower(string);
             if (powersConfigFields == null) {
-                commandSender.sendMessage("[EliteMobs] Power " + string + " is not a valid power! Valid powers:");
+                commandSender.sendMessage(CommandMessagesConfig.getInvalidPowerMessage().replace("$power", string));
                 StringBuilder allPowers = new StringBuilder();
                 for (CustomConfigFields iteratedField : ElitePower.getElitePowers().values())
                     allPowers.append(iteratedField.getFilename()).append(", ");

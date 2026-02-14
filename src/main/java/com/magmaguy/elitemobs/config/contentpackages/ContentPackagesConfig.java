@@ -26,12 +26,18 @@ public class ContentPackagesConfig extends CustomConfig {
                 dungeonPackages.put(key, (ContentPackagesConfigFields) super.getCustomConfigFieldsHashMap().get(key));
             else
                 enchantedChallengeDungeonPackages.put(key, (ContentPackagesConfigFields) super.getCustomConfigFieldsHashMap().get(key));
-            EMPackage.initialize((ContentPackagesConfigFields) super.getCustomConfigFieldsHashMap().get(key));
         }
 
         //Initialize blueprints folder
         File worldsBluePrint = new File(MetadataHandler.PLUGIN.getDataFolder().getAbsolutePath() + File.separatorChar + "world_blueprints");
         if (!worldsBluePrint.exists()) worldsBluePrint.mkdir();
+    }
+
+    public static void initializePackages() {
+        for (ContentPackagesConfigFields fields : dungeonPackages.values())
+            EMPackage.initialize(fields);
+        for (ContentPackagesConfigFields fields : enchantedChallengeDungeonPackages.values())
+            EMPackage.initialize(fields);
     }
 
 }

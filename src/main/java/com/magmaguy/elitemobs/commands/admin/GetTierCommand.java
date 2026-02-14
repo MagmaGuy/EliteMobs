@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.commands.admin;
 
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
+import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.items.EliteItemLore;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.itemconstructor.EliteItemSkins;
@@ -68,7 +69,7 @@ public class GetTierCommand {
         if (spear != null) EliteItemManager.setEliteLevel(spear, tierLevel);
         EliteItemManager.setEliteLevel(cheatSword, tierLevel);
         ItemMeta cheatItemMeta = cheatSword.getItemMeta();
-        cheatItemMeta.setDisplayName("CHEAT SWORD");
+        cheatItemMeta.setDisplayName(CommandMessagesConfig.getCheatSwordDisplayName());
         ItemTagger.registerEnchantment(cheatItemMeta, Enchantment.SHARPNESS.getKey(), 100);
         cheatSword.setItemMeta(cheatItemMeta);
 
@@ -132,9 +133,9 @@ public class GetTierCommand {
         // Update armor health bonus (since armor skill was changed)
         ArmorSkillHealthBonus.updateHealthBonus(player);
 
-        Logger.sendMessage(player, "&aGave level " + tierLevel + " test gear and set all skills to level " + tierLevel + ".");
-        Logger.sendMessage(player, "&7Use the &fIron Sword &7for balanced damage testing.");
-        Logger.sendMessage(player, "&7The &cCHEAT SWORD &7has Sharpness 100 - use it only to skip fights!");
+        Logger.sendMessage(player, CommandMessagesConfig.getGetTierGaveGearMessage().replace("$level", String.valueOf(tierLevel)));
+        Logger.sendMessage(player, CommandMessagesConfig.getGetTierIronSwordMessage());
+        Logger.sendMessage(player, CommandMessagesConfig.getGetTierCheatSwordMessage());
     }
 
     private static void addDurability(ItemStack itemStack) {

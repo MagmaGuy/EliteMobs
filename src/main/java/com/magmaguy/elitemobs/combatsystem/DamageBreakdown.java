@@ -4,70 +4,68 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Tracks the breakdown of damage components for debugging and testing purposes.
  * <p>
- * Damage in EliteMobs is calculated from multiple sources:
- * <ul>
- *   <li><b>Vanilla Damage</b>: Base damage from the weapon type in Minecraft</li>
- *   <li><b>Skill Damage</b>: Contribution from player's weapon skill level (50% of elite damage)</li>
- *   <li><b>Item Damage</b>: Contribution from item's elite level (50% of elite damage)</li>
- *   <li><b>Enchantment Damage</b>: Bonus from secondary enchantments (Smite, Bane, etc.)</li>
- *   <li><b>Thorns Damage</b>: Damage from thorns enchantments</li>
- *   <li><b>Damage Modifier</b>: Boss-specific damage reduction (damageModifier config)</li>
- *   <li><b>Combat Multiplier</b>: Global config multiplier (normalizedDamageToEliteMultiplier)</li>
- *   <li><b>Skill Bonus Multiplier</b>: From active skill bonuses</li>
- *   <li><b>Level Scaling</b>: Modifier based on player vs enemy level difference</li>
- *   <li><b>Critical Strike</b>: 1.5x multiplier on critical hits</li>
- * </ul>
- * <p>
- * The final damage formula is:
+ * The offensive damage formula uses multiplicative layers:
  * <pre>
- * eliteDamage = (skillDamage * 0.5) + (itemDamage * 0.5) + enchantmentDamage
- * preLevelDamage = (vanillaDamage + eliteDamage) * damageModifier * combatMultiplier * skillBonusMultiplier
- * postLevelDamage = preLevelDamage / levelScalingModifier
- * finalDamage = postLevelDamage * critMultiplier
+ * formulaDamage = baseDamage × attackSpeedFactor × skillAdjustment × weaponAdjustment × cooldownOrVelocity × sweepMultiplier
+ * finalDamage = max(formulaDamage, 1) × damageModifier × combatMultiplier × critMultiplier
  * </pre>
+ * <p>
+ * Where:
+ * <ul>
+ *   <li><b>Base Damage</b>: normalizedMobHP / TARGET_HITS_TO_KILL_MOB — scales with mob level</li>
+ *   <li><b>Attack Speed Factor</b>: REFERENCE_ATTACK_SPEED / actualAttackSpeed — normalizes DPS across weapons</li>
+ *   <li><b>Skill Adjustment</b>: 2^((skillLevel - mobLevel) / 7.5) — exponential skill scaling</li>
+ *   <li><b>Weapon Adjustment</b>: two-part linear curve from weapon level vs mob level [0.5, 1.25]</li>
+ *   <li><b>Cooldown/Velocity</b>: attack cooldown (melee) or arrow velocity (ranged) [0, 1]</li>
+ *   <li><b>Sweep Multiplier</b>: 0.25 for sweep secondary targets, 1.0 otherwise</li>
+ *   <li><b>Damage Modifier</b>: boss-specific damage reduction</li>
+ *   <li><b>Combat Multiplier</b>: global config multiplier</li>
+ *   <li><b>Critical Strike</b>: 1.5x on critical hits</li>
+ * </ul>
  */
 public class DamageBreakdown {
 
     // Per-player breakdown tracking
-    private static final Map<UUID, DamageBreakdown> activeBreakdowns = new HashMap<>();
+    private static final Map<UUID, DamageBreakdown> activeBreakdowns = new ConcurrentHashMap<>();
 
-    // Input components
-    @Getter @Setter private double vanillaDamage = 0;
-    @Getter @Setter private double skillDamage = 0;
-    @Getter @Setter private double itemDamage = 0;
-    @Getter @Setter private double enchantmentDamage = 0;
+    // Formula components
+    @Getter @Setter private double baseDamage = 0;
+    @Getter @Setter private double attackSpeedFactor = 1.0;
+    @Getter @Setter private double skillAdjustment = 1.0;
+    @Getter @Setter private double weaponAdjustment = 1.0;
+    @Getter @Setter private double cooldownOrVelocity = 1.0;
+    @Getter @Setter private double sweepMultiplier = 1.0;
     @Getter @Setter private double thornsDamage = 0;
+    @Getter @Setter private double enchantmentMultiplier = 1.0;
+    @Getter @Setter private double arrowDamageMultiplier = 1.0;
 
     // Levels
-    @Getter @Setter private int playerLevel = 1;
     @Getter @Setter private int playerSkillLevel = 1;
     @Getter @Setter private int itemLevel = 0;
     @Getter @Setter private int eliteLevel = 1;
 
     // Multipliers
-    @Getter @Setter private double attackCooldownMultiplier = 1.0;
     @Getter @Setter private double damageModifier = 1.0;
     @Getter @Setter private double combatMultiplier = 1.0;
     @Getter @Setter private double skillBonusMultiplier = 1.0;
-    @Getter @Setter private double levelScalingModifier = 1.0;
     @Getter @Setter private double critMultiplier = 1.0;
 
     // Computed values
-    @Getter private double eliteDamage = 0;
-    @Getter private double preLevelDamage = 0;
-    @Getter private double postLevelDamage = 0;
+    @Getter private double formulaDamage = 0;
     @Getter private double finalDamage = 0;
 
     // Metadata
     @Getter @Setter private boolean isCriticalHit = false;
     @Getter @Setter private boolean isRangedAttack = false;
+    @Getter @Setter private boolean isSweepAttack = false;
+    @Getter @Setter private boolean isThornsAttack = false;
     @Getter @Setter private String weaponType = "UNKNOWN";
 
     /**
@@ -122,37 +120,21 @@ public class DamageBreakdown {
     }
 
     /**
-     * Calculates what the expected damage SHOULD be given proper gear.
-     * Useful for comparing expected vs actual damage.
+     * Calculates what the expected damage SHOULD be given proper gear at matched combat.
+     * Uses the new multiplicative formula.
      *
-     * @param weaponLevel   The level of the weapon being used
-     * @param skillLevel    The player's skill level
-     * @param targetLevel   The elite's level
-     * @param attackSpeed   The weapon's attack speed
+     * @param weaponLevel The level of the weapon being used
+     * @param skillLevel  The player's skill level
+     * @param targetLevel The elite's level
+     * @param attackSpeed The weapon's attack speed
      * @return Expected damage per hit
      */
     public static double calculateExpectedDamage(int weaponLevel, int skillLevel, int targetLevel, double attackSpeed) {
-        // Skill damage contribution
-        double skillDamage = skillLevel * CombatSystem.DPS_PER_LEVEL / attackSpeed;
-
-        // Item damage contribution (same formula, using weapon level)
-        double itemDamage = weaponLevel * CombatSystem.DPS_PER_LEVEL / attackSpeed;
-
-        // Effective elite damage with 50/50 split
-        double eliteDamage = (skillDamage * CombatSystem.SKILL_CONTRIBUTION_RATIO)
-                + (itemDamage * CombatSystem.ITEM_CONTRIBUTION_RATIO);
-
-        // Assume vanilla iron sword damage (~6)
-        double vanillaDamage = 6.0;
-
-        // Total pre-level damage
-        double totalDamage = vanillaDamage + eliteDamage;
-
-        // Apply level scaling
-        double levelModifier = LevelScaling.getLevelModifier(skillLevel, targetLevel);
-        totalDamage = totalDamage / levelModifier;
-
-        return totalDamage;
+        double base = LevelScaling.calculateBaseDamageToElite(targetLevel);
+        double speedFactor = LevelScaling.REFERENCE_ATTACK_SPEED / attackSpeed;
+        double skillAdj = LevelScaling.calculateOffensiveSkillAdjustment(skillLevel, targetLevel);
+        double weaponAdj = WeaponOffenseCalculator.getWeaponAdjustment(weaponLevel, targetLevel);
+        return Math.max(base * speedFactor * skillAdj * weaponAdj, 1);
     }
 
     /**
@@ -163,27 +145,19 @@ public class DamageBreakdown {
     }
 
     /**
-     * Computes intermediate and final damage values from the components.
+     * Computes final damage from all components using the multiplicative formula.
      * Call this after setting all components.
      */
     public void compute() {
-        // Calculate effective elite damage (50/50 skill/item split + enchantments)
-        eliteDamage = (skillDamage * CombatSystem.SKILL_CONTRIBUTION_RATIO)
-                + (itemDamage * CombatSystem.ITEM_CONTRIBUTION_RATIO)
-                + enchantmentDamage
-                + thornsDamage;
+        if (isThornsAttack) {
+            formulaDamage = thornsDamage;
+        } else {
+            formulaDamage = baseDamage * attackSpeedFactor * skillAdjustment
+                    * weaponAdjustment * cooldownOrVelocity * sweepMultiplier
+                    * enchantmentMultiplier * arrowDamageMultiplier;
+        }
 
-        // Apply attack cooldown to elite damage (melee only)
-        double effectiveEliteDamage = eliteDamage * attackCooldownMultiplier;
-
-        // Combine vanilla and elite damage, apply multipliers
-        preLevelDamage = (vanillaDamage + effectiveEliteDamage) * damageModifier * combatMultiplier * skillBonusMultiplier;
-
-        // Apply level scaling (divides by modifier when attacking higher level)
-        postLevelDamage = preLevelDamage / levelScalingModifier;
-
-        // Apply critical hit multiplier
-        finalDamage = postLevelDamage * critMultiplier;
+        finalDamage = Math.max(formulaDamage, 1) * damageModifier * combatMultiplier * critMultiplier;
     }
 
     /**
@@ -194,54 +168,54 @@ public class DamageBreakdown {
 
         StringBuilder sb = new StringBuilder();
         sb.append("§6=== DAMAGE BREAKDOWN ===\n");
-        sb.append(String.format("§7Weapon: §f%s %s\n", weaponType, isRangedAttack ? "§e(Ranged)" : "§a(Melee)"));
+        sb.append(String.format("§7Weapon: §f%s %s\n", weaponType,
+                isThornsAttack ? "§d(Thorns)" : isRangedAttack ? "§e(Ranged)" : isSweepAttack ? "§b(Sweep)" : "§a(Melee)"));
         sb.append("\n§6--- LEVELS ---\n");
         sb.append(String.format("§7Player Skill Level: §f%d\n", playerSkillLevel));
-        sb.append(String.format("§7Item Level: §f%d\n", itemLevel));
-        sb.append(String.format("§7Effective Player Level: §f%d\n", playerLevel));
+        sb.append(String.format("§7Weapon Level: §f%d\n", itemLevel));
         sb.append(String.format("§7Elite Level: §f%d\n", eliteLevel));
-        sb.append(String.format("§7Level Difference: §f%d\n", playerLevel - eliteLevel));
+        sb.append(String.format("§7Skill Difference: §f%d\n", playerSkillLevel - eliteLevel));
 
-        sb.append("\n§6--- DAMAGE COMPONENTS ---\n");
-        sb.append(String.format("§7Vanilla Damage: §f%.1f\n", vanillaDamage));
-        sb.append(String.format("§7Skill Damage (raw): §f%.1f\n", skillDamage));
-        sb.append(String.format("§7Item Damage (raw): §f%.1f\n", itemDamage));
-        sb.append(String.format("§7  -> Skill Contribution (%.0f%%): §f%.1f\n",
-                CombatSystem.SKILL_CONTRIBUTION_RATIO * 100, skillDamage * CombatSystem.SKILL_CONTRIBUTION_RATIO));
-        sb.append(String.format("§7  -> Item Contribution (%.0f%%): §f%.1f\n",
-                CombatSystem.ITEM_CONTRIBUTION_RATIO * 100, itemDamage * CombatSystem.ITEM_CONTRIBUTION_RATIO));
-        if (enchantmentDamage > 0) {
-            sb.append(String.format("§7Enchantment Damage: §f%.1f\n", enchantmentDamage));
-        }
-        if (thornsDamage > 0) {
+        if (isThornsAttack) {
+            sb.append("\n§6--- THORNS ---\n");
             sb.append(String.format("§7Thorns Damage: §f%.1f\n", thornsDamage));
+        } else {
+            sb.append("\n§6--- FORMULA COMPONENTS ---\n");
+            sb.append(String.format("§7Base Damage (HP/%s): §f%.1f\n",
+                    String.format("%.0f", LevelScaling.TARGET_HITS_TO_KILL_MOB), baseDamage));
+            if (!isRangedAttack) {
+                sb.append(String.format("§7Attack Speed Factor: §f%.2fx\n", attackSpeedFactor));
+            }
+            sb.append(String.format("§7Skill Adjustment: §f%.3fx %s\n", skillAdjustment,
+                    skillAdjustment > 1 ? "§a(bonus)" : skillAdjustment < 1 ? "§c(penalty)" : "§7(matched)"));
+            sb.append(String.format("§7Weapon Adjustment: §f%.2fx %s\n", weaponAdjustment,
+                    weaponAdjustment > 1 ? "§a(over-level)" : weaponAdjustment < 1 ? "§c(under-level)" : "§7(matched)"));
+            sb.append(String.format("§7%s: §f%.2f\n",
+                    isRangedAttack ? "Arrow Velocity" : "Attack Cooldown", cooldownOrVelocity));
+            if (isSweepAttack) {
+                sb.append(String.format("§7Sweep Reduction: §c%.0f%%\n", sweepMultiplier * 100));
+            }
+            if (enchantmentMultiplier != 1.0) {
+                sb.append(String.format("§7Enchantment Multiplier: §e%.2fx\n", enchantmentMultiplier));
+            }
+            if (arrowDamageMultiplier != 1.0) {
+                sb.append(String.format("§7Arrow Damage Multiplier: §c%.0f%%\n", arrowDamageMultiplier * 100));
+            }
         }
-        sb.append(String.format("§7§lTotal Elite Damage: §f%.1f\n", eliteDamage));
 
         sb.append("\n§6--- MULTIPLIERS ---\n");
-        if (attackCooldownMultiplier < 1.0) {
-            sb.append(String.format("§7Attack Cooldown: §c%.1f%%\n", attackCooldownMultiplier * 100));
-        }
         sb.append(String.format("§7Damage Modifier: §f%.2fx\n", damageModifier));
         sb.append(String.format("§7Combat Multiplier: §f%.2fx\n", combatMultiplier));
         if (skillBonusMultiplier != 1.0) {
             sb.append(String.format("§7Skill Bonus Multiplier: §e%.2fx\n", skillBonusMultiplier));
         }
-        sb.append(String.format("§7Level Scaling: §f%.3fx %s\n",
-                levelScalingModifier,
-                levelScalingModifier > 1 ? "§c(penalty)" : levelScalingModifier < 1 ? "§a(bonus)" : "§7(neutral)"));
         if (isCriticalHit) {
             sb.append(String.format("§7Critical Hit: §e%.1fx\n", critMultiplier));
         }
 
-        sb.append("\n§6--- DAMAGE CALCULATION ---\n");
-        sb.append(String.format("§7Vanilla + Elite: §f%.1f + %.1f = %.1f\n",
-                vanillaDamage, eliteDamage * attackCooldownMultiplier, vanillaDamage + eliteDamage * attackCooldownMultiplier));
-        sb.append(String.format("§7After Multipliers: §f%.1f\n", preLevelDamage));
-        sb.append(String.format("§7After Level Scaling: §f%.1f\n", postLevelDamage));
-        if (isCriticalHit) {
-            sb.append(String.format("§7After Crit: §e%.1f\n", finalDamage));
-        }
+        sb.append("\n§6--- RESULT ---\n");
+        sb.append(String.format("§7Formula Damage: §f%.1f\n", formulaDamage));
+        sb.append(String.format("§7After Multipliers: §f%.1f\n", finalDamage));
         sb.append(String.format("§6§lFINAL DAMAGE: §f§l%.1f\n", finalDamage));
 
         return sb.toString();
@@ -252,9 +226,10 @@ public class DamageBreakdown {
      */
     public String toCompactString() {
         compute();
-        return String.format("§7[Lv%d vs Lv%d] §fVanilla:%.1f + Elite:%.1f = §e%.1f §7(scale:%.2fx%s)",
-                playerLevel, eliteLevel, vanillaDamage, eliteDamage,
-                finalDamage, levelScalingModifier,
+        return String.format("§7[SkLv%d WpLv%d vs Lv%d] §fBase:%.1f × Skill:%.2f × Wpn:%.2f = §e%.1f%s",
+                playerSkillLevel, itemLevel, eliteLevel,
+                baseDamage, skillAdjustment, weaponAdjustment,
+                finalDamage,
                 isCriticalHit ? " §cCRIT" : "");
     }
 

@@ -12,5 +12,10 @@ public class SpearsPolearmMasteryConfig extends SkillBonusConfigFields {
         super("spears_polearm_mastery.yml", true, "&b&lPolearm Mastery",
               List.of("&7Significant attack speed", "&7and damage increase."),
               SkillType.SPEARS, SkillBonusType.PASSIVE, 4, 0.20, 0.003, Material.TRIDENT);
+        this.loreTemplates = List.of(
+                "&7Damage: &f+$damage%",
+                "&7Attack Speed: &f+$speed%"
+        );
+        this.formattedBonusTemplate = "+$damage% Damage, +$speed% Speed";
     }
 }

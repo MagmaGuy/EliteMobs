@@ -12,5 +12,9 @@ public class SpearsLongReachConfig extends SkillBonusConfigFields {
         super("spears_long_reach.yml", true, "&bLong Reach",
               List.of("&7Attacks have slightly", "&7increased range."),
               SkillType.SPEARS, SkillBonusType.PASSIVE, 1, 0.5, 0.01, Material.STICK);
+        this.loreTemplates = List.of(
+                "&7Extra Reach: &f+$value blocks"
+        );
+        this.formattedBonusTemplate = "+$value Block Reach";
     }
 }

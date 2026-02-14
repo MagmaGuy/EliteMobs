@@ -5,7 +5,6 @@ import com.magmaguy.elitemobs.api.PlayerTeleportEvent;
 import com.magmaguy.elitemobs.config.WormholesConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldowns;
-import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.ChunkLocationChecker;
 import lombok.Getter;
 import lombok.NonNull;
@@ -113,7 +112,7 @@ public class WormholeManager {
             double coinCost = wormholeEntry.getWormhole().getWormholeConfigFields().getCoinCost();
 
             if (EconomyHandler.checkCurrency(player.getUniqueId()) < coinCost) {
-                player.sendMessage(ChatColorConverter.convert(WormholesConfig.getInsufficientCurrencyForWormholeMessage())
+                player.sendMessage(WormholesConfig.getInsufficientCurrencyForWormholeMessage()
                         .replace("$amount", "" + coinCost));
                 return false;
             }
@@ -143,7 +142,7 @@ public class WormholeManager {
         // Check if destination is valid
         if (destination == null || destination.getWorld() == null) {
             if (sourceEntry.getPortalMissingMessage() == null) {
-                player.sendMessage(ChatColorConverter.convert(WormholesConfig.getDefaultPortalMissingMessage()));
+                player.sendMessage(WormholesConfig.getDefaultPortalMissingMessage());
             } else {
                 player.sendMessage(sourceEntry.getPortalMissingMessage());
                 if (player.isOp() || player.hasPermission("elitemobs.*")) {

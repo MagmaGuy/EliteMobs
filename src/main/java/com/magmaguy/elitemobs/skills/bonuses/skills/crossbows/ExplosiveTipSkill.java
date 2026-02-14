@@ -6,17 +6,16 @@ import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.ProcSkill;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Explosive Tip (PROC) - Chance for bolts to explode on impact.
@@ -26,10 +25,10 @@ public class ExplosiveTipSkill extends SkillBonus implements ProcSkill {
 
     public static final String SKILL_ID = "crossbows_explosive_tip";
     private static final double BASE_PROC_CHANCE = 0.15; // 15% chance
-    private static final double EXPLOSION_RADIUS = 3.0;
+    private static final double BASE_EXPLOSION_RADIUS = 4.0;
     private static final double BASE_EXPLOSION_DAMAGE = 0.50; // 50% of original
 
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public ExplosiveTipSkill() {
         super(SkillType.CROSSBOWS, 25, "Explosive Tip",
@@ -42,6 +41,10 @@ public class ExplosiveTipSkill extends SkillBonus implements ProcSkill {
         return Math.min(0.35, BASE_PROC_CHANCE + (skillLevel * 0.002));
     }
 
+    public double getExplosionRadius(int skillLevel) {
+        return BASE_EXPLOSION_RADIUS + (skillLevel * 0.02); // 4.0 to 5.5 at level 75
+    }
+
     @Override
     public void onProc(Player player, Object context) {
         if (!(context instanceof EliteMobDamagedByPlayerEvent event)) return;
@@ -50,6 +53,7 @@ public class ExplosiveTipSkill extends SkillBonus implements ProcSkill {
         LivingEntity target = event.getEliteMobEntity().getLivingEntity();
         int skillLevel = SkillBonusRegistry.getPlayerSkillLevel(player, SkillType.CROSSBOWS);
         double explosionDamage = event.getDamage() * getExplosionDamageMultiplier(skillLevel);
+        double radius = getExplosionRadius(skillLevel);
 
         // Create explosion effect
         target.getWorld().spawnParticle(Particle.EXPLOSION, target.getLocation(), 1);
@@ -59,14 +63,12 @@ public class ExplosiveTipSkill extends SkillBonus implements ProcSkill {
         // Use bypass to prevent recursive skill processing
         EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = true;
         try {
-            target.getNearbyEntities(EXPLOSION_RADIUS, EXPLOSION_RADIUS, EXPLOSION_RADIUS).stream()
+            target.getNearbyEntities(radius, radius, radius).stream()
                     .filter(e -> e instanceof LivingEntity && !(e instanceof Player))
                     .forEach(e -> ((LivingEntity) e).damage(explosionDamage, player));
         } finally {
             EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = false;
         }
-
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("§6EXPLOSIVE!"));
     }
 
     private double getExplosionDamageMultiplier(int skillLevel) {
@@ -86,17 +88,17 @@ public class ExplosiveTipSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        return List.of(
-                "&7Proc Chance: &f" + String.format("%.1f", getProcChance(skillLevel) * 100) + "%",
-                "&7AoE Damage: &f" + String.format("%.0f", getExplosionDamageMultiplier(skillLevel) * 100) + "%",
-                "&7Radius: &f" + (int)EXPLOSION_RADIUS + " blocks"
-        );
+        return applyLoreTemplates(Map.of(
+                "procChance", String.format("%.1f", getProcChance(skillLevel) * 100),
+                "aoeDamage", String.format("%.0f", getExplosionDamageMultiplier(skillLevel) * 100),
+                "radius", String.format("%.1f", getExplosionRadius(skillLevel))
+        ));
     }
 
     @Override
     public double getBonusValue(int skillLevel) { return getExplosionDamageMultiplier(skillLevel); }
     @Override
-    public String getFormattedBonus(int skillLevel) { return String.format("%.0f%% AoE damage", getExplosionDamageMultiplier(skillLevel) * 100); }
+    public String getFormattedBonus(int skillLevel) { return applyFormattedBonusTemplate(Map.of("aoeDamage", String.format("%.0f", getExplosionDamageMultiplier(skillLevel) * 100))); }
     @Override
     public void shutdown() { activePlayers.clear(); }
 }

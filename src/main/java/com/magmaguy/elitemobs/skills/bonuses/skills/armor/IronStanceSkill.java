@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.skills.bonuses.skills.armor;
 
-import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
@@ -8,12 +7,11 @@ import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.ConditionalSkill;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Tier 1 ARMOR skill - Iron Stance
@@ -21,8 +19,10 @@ import java.util.UUID;
  */
 public class IronStanceSkill extends SkillBonus implements ConditionalSkill {
 
-    private static final HashSet<UUID> activePlayers = new HashSet<>();
-    private static final Map<UUID, Long> lastMoveTime = new HashMap<>();
+    public static final String SKILL_ID = "armor_iron_stance";
+
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
+    private static final Map<UUID, Long> lastMoveTime = new ConcurrentHashMap<>();
     private static final long STAND_TIME_REQUIRED = 1000; // 1 second
 
     public IronStanceSkill() {
@@ -33,13 +33,16 @@ public class IronStanceSkill extends SkillBonus implements ConditionalSkill {
             "Gain damage reduction when standing still",
             SkillBonusType.CONDITIONAL,
             1,
-            "iron_stance"
+            SKILL_ID
         );
     }
 
-    @Override
-    public void applyBonus(Player player, int skillLevel) {
-        // Conditional bonus is checked on damage event
+    /**
+     * Simulates the player being stationary for testing purposes.
+     * Removes movement tracking so conditionMet() returns true.
+     */
+    public static void simulateStationary(UUID uuid) {
+        lastMoveTime.remove(uuid);
     }
 
     @Override
@@ -64,12 +67,8 @@ public class IronStanceSkill extends SkillBonus implements ConditionalSkill {
     }
 
     @Override
-    public List<String> getLoreDescription(int skillLevel) {
-        List<String> lore = new ArrayList<>();
-        lore.add("Gain damage reduction when standing still");
-        lore.add(String.format("Damage Reduction: %.1f%%", getConditionalBonus(skillLevel) * 50.0));
-        lore.add("Requires: Standing still for 1 second");
-        return lore;
+    public void applyBonus(Player player, int skillLevel) {
+        activePlayers.add(player.getUniqueId());
     }
 
     @Override
@@ -78,8 +77,9 @@ public class IronStanceSkill extends SkillBonus implements ConditionalSkill {
     }
 
     @Override
-    public String getFormattedBonus(int skillLevel) {
-        return String.format("%.1f%% Damage Reduction", getConditionalBonus(skillLevel) * 50.0);
+    public List<String> getLoreDescription(int skillLevel) {
+        return applyLoreTemplates(Map.of(
+                "reduction", String.format("%.1f", getConditionalBonus(skillLevel) * 50.0)));
     }
 
     @Override
@@ -107,6 +107,15 @@ public class IronStanceSkill extends SkillBonus implements ConditionalSkill {
     public double getConditionalBonus(int skillLevel) {
         return getScaledValue(skillLevel);
     }
+
+    @Override
+    public String getFormattedBonus(int skillLevel) {
+        return applyFormattedBonusTemplate(Map.of(
+                "reduction", String.format("%.1f", getConditionalBonus(skillLevel) * 50.0)));
+    }
+
+    @Override
+    public TestStrategy getTestStrategy() { return TestStrategy.CONDITION_SETUP; }
 
     /**
      * Called to update player movement state.

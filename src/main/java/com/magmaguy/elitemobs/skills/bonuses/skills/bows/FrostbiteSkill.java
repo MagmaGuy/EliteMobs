@@ -11,10 +11,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Frostbite (PROC) - Chance to slow and weaken enemies on hit.
@@ -26,7 +27,7 @@ public class FrostbiteSkill extends SkillBonus implements ProcSkill {
     private static final double BASE_PROC_CHANCE = 0.15; // 15% chance
     private static final int SLOW_DURATION = 60; // 3 seconds
 
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public FrostbiteSkill() {
         super(SkillType.BOWS, 10, "Frostbite",
@@ -74,16 +75,19 @@ public class FrostbiteSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        return List.of(
-                "&7Proc Chance: &f" + String.format("%.1f", getProcChance(skillLevel) * 100) + "%",
-                "&7Applies: &bSlowness &7and &8Mining Fatigue"
-        );
+        return applyLoreTemplates(Map.of(
+                "procChance", String.format("%.1f", getProcChance(skillLevel) * 100)
+        ));
     }
 
     @Override
     public double getBonusValue(int skillLevel) { return getDamageBonus(skillLevel); }
     @Override
-    public String getFormattedBonus(int skillLevel) { return String.format("%.0f%% proc chance", getProcChance(skillLevel) * 100); }
+    public String getFormattedBonus(int skillLevel) {
+        return applyFormattedBonusTemplate(Map.of(
+                "procChance", String.format("%.0f", getProcChance(skillLevel) * 100)
+        ));
+    }
     @Override
     public void shutdown() { activePlayers.clear(); }
 }

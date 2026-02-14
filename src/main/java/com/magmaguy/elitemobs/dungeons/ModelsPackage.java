@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.dungeons;
 
+import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
 import com.magmaguy.elitemobs.thirdparty.custommodels.CustomModel;
 import com.magmaguy.magmacore.util.Logger;
@@ -13,12 +14,12 @@ public class ModelsPackage extends EMPackage {
 
     @Override
     public void doInstall(Player player) {
-        Logger.sendMessage(player, "Models are installed automatically, you can't do this manually!");
+        Logger.sendMessage(player, DungeonsConfig.getModelsAutoInstallMessage());
     }
 
     @Override
     public void doUninstall(Player player) {
-        Logger.sendMessage(player, "Models can't currently be uninstalled via this menu! You'll have to manually delete the files from your server.");
+        Logger.sendMessage(player, DungeonsConfig.getModelsCannotUninstallMessage());
     }
 
     @Override

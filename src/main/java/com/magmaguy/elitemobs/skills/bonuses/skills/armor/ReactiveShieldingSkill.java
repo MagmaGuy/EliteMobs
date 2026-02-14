@@ -1,23 +1,19 @@
 package com.magmaguy.elitemobs.skills.bonuses.skills.armor;
 
-import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.CooldownSkill;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Tier 4 ARMOR skill - Reactive Shielding
@@ -25,9 +21,9 @@ import java.util.UUID;
  */
 public class ReactiveShieldingSkill extends SkillBonus implements CooldownSkill {
 
-    private static final HashSet<UUID> activePlayers = new HashSet<>();
-    private static final Map<UUID, Long> cooldownMap = new HashMap<>();
-    private static final Map<UUID, Long> shieldActiveMap = new HashMap<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
+    private static final Map<UUID, Long> cooldownMap = new ConcurrentHashMap<>();
+    private static final Map<UUID, Long> shieldActiveMap = new ConcurrentHashMap<>();
     private static final long SHIELD_DURATION = 3000; // 3 seconds
     private static final double BIG_HIT_THRESHOLD = 0.20; // 20% of max health
 
@@ -39,13 +35,13 @@ public class ReactiveShieldingSkill extends SkillBonus implements CooldownSkill 
             "Activate damage reduction shield when taking a big hit",
             SkillBonusType.COOLDOWN,
             4,
-            "reactive_shielding"
+            "armor_reactive_shielding"
         );
     }
 
     @Override
     public void applyBonus(Player player, int skillLevel) {
-        // Cooldown skill, triggered by big damage hits
+        activePlayers.add(player.getUniqueId());
     }
 
     @Override
@@ -72,13 +68,10 @@ public class ReactiveShieldingSkill extends SkillBonus implements CooldownSkill 
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        List<String> lore = new ArrayList<>();
-        lore.add("Activate damage reduction shield when taking a big hit");
-        lore.add("Triggers on hits dealing 20%+ of max health");
-        lore.add(String.format("Shield Reduction: %.1f%%", getShieldReduction(skillLevel) * 100));
-        lore.add(String.format("Shield Duration: %.1fs", SHIELD_DURATION / 1000.0));
-        lore.add(String.format("Cooldown: %ds", getCooldownSeconds(skillLevel)));
-        return lore;
+        return applyLoreTemplates(Map.of(
+                "shieldReduction", String.format("%.1f", getShieldReduction(skillLevel) * 100),
+                "shieldDuration", String.format("%.1fs", SHIELD_DURATION / 1000.0),
+                "cooldown", String.format("%ds", getCooldownSeconds(skillLevel))));
     }
 
     @Override
@@ -88,8 +81,9 @@ public class ReactiveShieldingSkill extends SkillBonus implements CooldownSkill 
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("%.1f%% damage reduction shield (CD: %ds)",
-            getShieldReduction(skillLevel) * 100, getCooldownSeconds(skillLevel));
+        return applyFormattedBonusTemplate(Map.of(
+                "shieldReduction", String.format("%.1f", getShieldReduction(skillLevel) * 100),
+                "cooldown", String.format("%ds", getCooldownSeconds(skillLevel))));
     }
 
     @Override
@@ -152,9 +146,6 @@ public class ReactiveShieldingSkill extends SkillBonus implements CooldownSkill 
         player.getWorld().spawnParticle(Particle.END_ROD,
             player.getLocation(), 30, 1, 1, 1, 0.05);
         player.getWorld().playSound(player.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 0.5f, 1.5f);
-
-        // Send action bar message
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("Reactive Shield Activated!"));
 
         // Start cooldown
         startCooldown(player, skillLevel);

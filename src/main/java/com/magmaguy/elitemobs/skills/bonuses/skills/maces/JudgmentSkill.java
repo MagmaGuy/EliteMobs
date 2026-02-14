@@ -4,23 +4,19 @@ import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
-import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.ProcSkill;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Judgment (PROC) - Mark enemies for judgment, causing them to take bonus damage.
@@ -33,9 +29,9 @@ public class JudgmentSkill extends SkillBonus implements ProcSkill {
     private static final long MARK_DURATION = 10000; // 10 seconds
     private static final double BASE_DAMAGE_BONUS = 0.40; // 40% extra damage
 
-    private static final Map<UUID, UUID> judgedTargets = new HashMap<>(); // EntityUUID -> PlayerUUID
-    private static final Map<UUID, Long> markExpiry = new HashMap<>();
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Map<UUID, UUID> judgedTargets = new ConcurrentHashMap<>(); // EntityUUID -> PlayerUUID
+    private static final Map<UUID, Long> markExpiry = new ConcurrentHashMap<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public JudgmentSkill() {
         super(SkillType.MACES, 25, "Judgment",
@@ -66,11 +62,6 @@ public class JudgmentSkill extends SkillBonus implements ProcSkill {
         target.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, (int)(MARK_DURATION / 50), 0));
         target.getWorld().spawnParticle(Particle.END_ROD,
             target.getLocation().add(0, 1.5, 0), 20, 0.5, 0.5, 0.5, 0.05);
-
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-            TextComponent.fromLegacyText("\u00A7e\u00A7lJUDGMENT!"));
-
-        incrementProcCount(player);
     }
 
     /**
@@ -130,14 +121,10 @@ public class JudgmentSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        double procChance = getProcChance(skillLevel) * 100;
-        double damageBonus = getJudgmentDamageBonus(skillLevel) * 100;
-        return List.of(
-                "&7Chance: &f" + String.format("%.1f", procChance) + "%",
-                "&7Judgment Damage: &f+" + String.format("%.0f", damageBonus) + "%",
-                "&7Duration: &f10 seconds",
-                "&7Judged enemies glow"
-        );
+        return applyLoreTemplates(Map.of(
+                "procChance", String.format("%.1f", getProcChance(skillLevel) * 100),
+                "damageBonus", String.format("%.0f", getJudgmentDamageBonus(skillLevel) * 100)
+        ));
     }
 
     @Override
@@ -147,7 +134,9 @@ public class JudgmentSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("+%.0f%% vs Judged", getJudgmentDamageBonus(skillLevel) * 100);
+        return applyFormattedBonusTemplate(Map.of(
+                "damageBonus", String.format("%.0f", getJudgmentDamageBonus(skillLevel) * 100)
+        ));
     }
 
     @Override

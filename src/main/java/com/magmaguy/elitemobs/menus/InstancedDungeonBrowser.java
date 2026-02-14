@@ -5,7 +5,6 @@ import com.magmaguy.elitemobs.dungeons.EMPackage;
 import com.magmaguy.elitemobs.dungeons.WorldInstancedDungeonPackage;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.instanced.dungeons.DungeonInstance;
-import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -38,7 +37,7 @@ public class InstancedDungeonBrowser extends EliteMenu {
         EMPackage emPackage = EMPackage.getEmPackages().get(instancedDungeonName);
         this.emPackage = emPackage;
         if (!(emPackage instanceof WorldInstancedDungeonPackage)) {
-            player.sendMessage("[EliteMobs] Not a valid instanced dungeon!");
+            player.sendMessage(DungeonsConfig.getInvalidInstancedDungeonMessage());
             return;
         }
         Set<DungeonInstance> dungeonInstances = new HashSet<>();
@@ -78,8 +77,8 @@ public class InstancedDungeonBrowser extends EliteMenu {
 
     private ItemStack spectatorItem(DungeonInstance dungeonInstance) {
         List<String> players = new ArrayList<>();
-        players.add(ChatColorConverter.convert("&2Players:"));
-        dungeonInstance.getPlayers().forEach(player -> players.add(player.getDisplayName()));
+        players.add(DungeonsConfig.getDungeonBrowserPlayersLabel());
+        dungeonInstance.getPlayers().forEach(player -> players.add(DungeonsConfig.getDungeonBrowserPlayerEntryFormat().replace("$playerName", player.getDisplayName())));
         return ItemStackGenerator.generateItemStack(
                 Material.ORANGE_STAINED_GLASS_PANE,
                 DungeonsConfig.getDungeonJoinAsSpectatorText().replace("$dungeonName", dungeonInstance.getContentPackagesConfigFields().getName()),
@@ -88,8 +87,8 @@ public class InstancedDungeonBrowser extends EliteMenu {
 
     private ItemStack playerItem(DungeonInstance dungeonInstance) {
         List<String> players = new ArrayList<>();
-        players.add(ChatColorConverter.convert("&2Players:"));
-        dungeonInstance.getPlayers().forEach(player -> players.add(player.getDisplayName()));
+        players.add(DungeonsConfig.getDungeonBrowserPlayersLabel());
+        dungeonInstance.getPlayers().forEach(player -> players.add(DungeonsConfig.getDungeonBrowserPlayerEntryFormat().replace("$playerName", player.getDisplayName())));
         return ItemStackGenerator.generateItemStack(
                 Material.GREEN_STAINED_GLASS_PANE,
                 DungeonsConfig.getDungeonJoinAsPlayerText().replace("$dungeonName", dungeonInstance.getContentPackagesConfigFields().getName()),
@@ -120,7 +119,7 @@ public class InstancedDungeonBrowser extends EliteMenu {
                     }
                     case WAITING -> dungeonInstance.addNewPlayer((Player) event.getWhoClicked());
                     case COMPLETED ->
-                            event.getWhoClicked().sendMessage("[EliteMobs] This match already ended! Can't join it!");
+                            event.getWhoClicked().sendMessage(DungeonsConfig.getMatchAlreadyEndedMessage());
                 }
             }
         }

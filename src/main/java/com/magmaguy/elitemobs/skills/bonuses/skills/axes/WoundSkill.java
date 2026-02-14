@@ -14,7 +14,11 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Wound (PROC) - Chance to inflict a deep wound that bleeds heavily.
@@ -27,8 +31,8 @@ public class WoundSkill extends SkillBonus implements ProcSkill {
     private static final double BASE_BLEED_DAMAGE = 3.0;
     private static final int BLEED_DURATION = 80; // 4 seconds
 
-    private static final Map<UUID, BukkitRunnable> activeWounds = new HashMap<>();
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Map<UUID, BukkitRunnable> activeWounds = new ConcurrentHashMap<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public WoundSkill() {
         super(SkillType.AXES, 10, "Wound",
@@ -49,12 +53,13 @@ public class WoundSkill extends SkillBonus implements ProcSkill {
         if (target == null || target.getLivingEntity() == null) return;
 
         int skillLevel = SkillBonusRegistry.getPlayerSkillLevel(player, SkillType.AXES);
-        applyWound(player, target, skillLevel);
+        // Bleed damage = % of the hit damage, scales properly at all levels
+        double bleedDamagePerTick = event.getDamage() * getBleedPercent(skillLevel);
+        applyWound(player, target, bleedDamagePerTick);
     }
 
-    private void applyWound(Player player, EliteEntity target, int skillLevel) {
+    private void applyWound(Player player, EliteEntity target, double damagePerTick) {
         UUID entityUUID = target.getLivingEntity().getUniqueId();
-        double damage = BASE_BLEED_DAMAGE + (skillLevel * 0.15);
 
         if (activeWounds.containsKey(entityUUID)) {
             activeWounds.get(entityUUID).cancel();
@@ -73,7 +78,7 @@ public class WoundSkill extends SkillBonus implements ProcSkill {
                 // Use bypass to prevent recursive skill processing
                 EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = true;
                 try {
-                    entity.damage(damage, player);
+                    entity.damage(damagePerTick, player);
                 } finally {
                     EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = false;
                 }
@@ -84,6 +89,15 @@ public class WoundSkill extends SkillBonus implements ProcSkill {
         };
         woundTask.runTaskTimer(MetadataHandler.PLUGIN, 0, 20);
         activeWounds.put(entityUUID, woundTask);
+    }
+
+    /**
+     * Gets the bleed damage per tick as a fraction of hit damage.
+     * Each tick does a % of the original hit, total DoT = percent * 4 ticks.
+     */
+    private double getBleedPercent(int skillLevel) {
+        // 10% per tick base (40% total over 4s), +0.15% per level
+        return 0.10 + (skillLevel * 0.0015);
     }
 
     @Override
@@ -99,17 +113,19 @@ public class WoundSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        return List.of(
-                "&7Proc Chance: &f" + String.format("%.1f", getProcChance(skillLevel) * 100) + "%",
-                "&7Bleed Damage: &f" + String.format("%.1f", BASE_BLEED_DAMAGE + (skillLevel * 0.15)) + "/s",
-                "&7Duration: &f4 seconds"
-        );
+        double bleedPercent = getBleedPercent(skillLevel) * 100;
+        double totalPercent = bleedPercent * 4;
+        return applyLoreTemplates(Map.of(
+                "procChance", String.format("%.1f", getProcChance(skillLevel) * 100),
+                "bleedPercent", String.format("%.0f", bleedPercent),
+                "totalPercent", String.format("%.0f", totalPercent)
+        ));
     }
 
     @Override
-    public double getBonusValue(int skillLevel) { return BASE_BLEED_DAMAGE + (skillLevel * 0.15); }
+    public double getBonusValue(int skillLevel) { return getBleedPercent(skillLevel); }
     @Override
-    public String getFormattedBonus(int skillLevel) { return String.format("+%.1f Wound Damage/s", getBonusValue(skillLevel)); }
+    public String getFormattedBonus(int skillLevel) { return applyFormattedBonusTemplate(Map.of("totalPercent", String.format("%.0f", getBleedPercent(skillLevel) * 400))); }
     @Override
     public boolean affectsDamage() { return false; } // Proc applies DoT, doesn't multiply main hit damage
 

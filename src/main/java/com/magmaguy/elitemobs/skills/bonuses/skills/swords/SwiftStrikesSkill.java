@@ -5,10 +5,11 @@ import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import org.bukkit.entity.Player;
 
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Swift Strikes (PASSIVE) - Increases movement speed while wielding a sword.
@@ -20,7 +21,7 @@ public class SwiftStrikesSkill extends SkillBonus {
     public static final String SKILL_ID = "swords_swift_strikes";
     private static final double BASE_SPEED_BONUS = 0.05; // 5% movement speed
 
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public SwiftStrikesSkill() {
         super(SkillType.SWORDS, 10, "Swift Strikes",
@@ -43,6 +44,21 @@ public class SwiftStrikesSkill extends SkillBonus {
         return activePlayers.contains(playerUUID);
     }
 
+    /**
+     * Applies the speed bonus to the player's walk speed attribute.
+     */
+    public static void applySpeedBonus(Player player, int skillLevel) {
+        double bonus = getSpeedBonus(skillLevel);
+        player.setWalkSpeed(Math.min(1.0f, 0.2f + (float) bonus));
+    }
+
+    /**
+     * Removes the speed bonus, restoring default walk speed.
+     */
+    public static void removeSpeedBonus(Player player) {
+        player.setWalkSpeed(0.2f);
+    }
+
     @Override
     public void applyBonus(Player player, int skillLevel) {
         activePlayers.add(player.getUniqueId());
@@ -51,6 +67,7 @@ public class SwiftStrikesSkill extends SkillBonus {
     @Override
     public void removeBonus(Player player) {
         activePlayers.remove(player.getUniqueId());
+        removeSpeedBonus(player);
     }
 
     @Override
@@ -61,6 +78,7 @@ public class SwiftStrikesSkill extends SkillBonus {
     @Override
     public void onDeactivate(Player player) {
         activePlayers.remove(player.getUniqueId());
+        removeSpeedBonus(player);
     }
 
     @Override
@@ -71,10 +89,7 @@ public class SwiftStrikesSkill extends SkillBonus {
     @Override
     public List<String> getLoreDescription(int skillLevel) {
         double speed = getSpeedBonus(skillLevel) * 100;
-        return List.of(
-                "&7Movement Speed: &f+" + String.format("%.1f", speed) + "%",
-                "&7Active while holding a sword"
-        );
+        return applyLoreTemplates(Map.of("value", String.format("%.1f", speed)));
     }
 
     @Override
@@ -84,12 +99,17 @@ public class SwiftStrikesSkill extends SkillBonus {
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("+%.1f%% Movement Speed", getSpeedBonus(skillLevel) * 100);
+        return applyFormattedBonusTemplate(Map.of("value", String.format("%.1f", getSpeedBonus(skillLevel) * 100)));
     }
 
     @Override
     public boolean affectsDamage() {
         return false; // Movement speed skill doesn't affect damage
+    }
+
+    @Override
+    public TestStrategy getTestStrategy() {
+        return TestStrategy.ATTRIBUTE_CHECK;
     }
 
     @Override

@@ -8,10 +8,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Poseidon's Favor (PASSIVE) - On hit, grants water breathing, dolphin's grace, and conduit power.
@@ -25,7 +26,7 @@ public class PoseidonsFavorSkill extends SkillBonus {
     private static final double BASE_DAMAGE_BONUS = 0.15;
 
     // Track which players have this skill active
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public PoseidonsFavorSkill() {
         super(SkillType.TRIDENTS, 25, "Poseidon's Favor",
@@ -96,12 +97,10 @@ public class PoseidonsFavorSkill extends SkillBonus {
     public List<String> getLoreDescription(int skillLevel) {
         int amplifier = calculateAmplifier(skillLevel);
         double damageBonus = calculateDamageBonus(skillLevel) * 100;
-        return List.of(
-                "&7On hit: &fWater Breathing",
-                "&7Dolphin's Grace &f" + (amplifier + 1),
-                "&7Conduit Power",
-                "&7Damage Bonus: &f+" + String.format("%.1f", damageBonus) + "%"
-        );
+        return applyLoreTemplates(Map.of(
+                "dolphinLevel", String.valueOf(amplifier + 1),
+                "damageBonus", String.format("%.1f", damageBonus)
+        ));
     }
 
     @Override
@@ -111,7 +110,9 @@ public class PoseidonsFavorSkill extends SkillBonus {
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("+%.1f%% Damage", calculateDamageBonus(skillLevel) * 100);
+        return applyFormattedBonusTemplate(Map.of(
+                "damageBonus", String.format("%.1f", calculateDamageBonus(skillLevel) * 100)
+        ));
     }
 
     @Override

@@ -9,10 +9,11 @@ import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.ConditionalSkill;
 import org.bukkit.entity.Player;
 
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Duelist (CONDITIONAL) - Deals bonus damage when fighting a single enemy.
@@ -25,7 +26,7 @@ public class DuelistSkill extends SkillBonus implements ConditionalSkill {
     private static final double BASE_DAMAGE_BONUS = 0.25; // 25% bonus
     private static final double DETECTION_RADIUS = 10.0;
 
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public DuelistSkill() {
         super(SkillType.SWORDS, 50, "Duelist",
@@ -108,11 +109,7 @@ public class DuelistSkill extends SkillBonus implements ConditionalSkill {
     @Override
     public List<String> getLoreDescription(int skillLevel) {
         double bonus = getConditionalBonus(skillLevel) * 100;
-        return List.of(
-                "&7Damage Bonus: &f+" + String.format("%.1f", bonus) + "%",
-                "&7Condition: No other elites within 10 blocks",
-                "&7Active only in 1v1 situations"
-        );
+        return applyLoreTemplates(Map.of("value", String.format("%.1f", bonus)));
     }
 
     @Override
@@ -122,7 +119,7 @@ public class DuelistSkill extends SkillBonus implements ConditionalSkill {
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("+%.1f%% 1v1 Damage", getConditionalBonus(skillLevel) * 100);
+        return applyFormattedBonusTemplate(Map.of("value", String.format("%.1f", getConditionalBonus(skillLevel) * 100)));
     }
 
     @Override

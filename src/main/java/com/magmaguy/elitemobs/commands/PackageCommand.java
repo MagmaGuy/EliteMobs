@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.magmacore.util.ChatColorConverter;
+import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.magmacore.util.Logger;
 import com.magmaguy.magmacore.util.ZipFile;
 import org.bukkit.command.CommandSender;
@@ -18,14 +18,14 @@ public class PackageCommand {
     public PackageCommand(CommandSender commandSender, String dungeonFolderName, String versionNumber) {
         this.commandSender = commandSender;
         if (dungeonFolderName == null || dungeonFolderName.isEmpty()) {
-            commandSender.sendMessage("[EliteMobs] This commands needs a valid dungeon name!");
+            commandSender.sendMessage(CommandMessagesConfig.getPackageNeedsDungeonNameMessage());
             return;
         }
         int version = 0;
         try {
             version = Integer.parseInt(versionNumber);
         } catch (Exception exception) {
-            commandSender.sendMessage("This command needs a valid natural number! (1, 2, 3, 4...)");
+            commandSender.sendMessage(CommandMessagesConfig.getPackageNeedsNumberMessage());
             return;
         }
 
@@ -43,17 +43,17 @@ public class PackageCommand {
         packContents("world_blueprints");
         packContents("powers");
 
-        commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2Done! You can find your package in &9~/plugins/EliteMobs/exports &2. &6If you are making a dungeon, make sure to create your own dungeonpackages file!"));
-        commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &6Don't forget to add your world and schematic files to the package if needed!"));
+        commandSender.sendMessage(CommandMessagesConfig.getPackageDoneMessage());
+        commandSender.sendMessage(CommandMessagesConfig.getPackageDontForgetMessage());
 
         try {
             ZipFile.ZipUtility.zip(new File(MetadataHandler.PLUGIN.getDataFolder().getPath() + File.separatorChar + "exports" + File.separatorChar + dungeonFolderName),
                     MetadataHandler.PLUGIN.getDataFolder().getPath() + File.separatorChar + "exports" + File.separatorChar + dungeonFolderName + "_packaged.zip");
         } catch (Exception exception) {
-            commandSender.sendMessage(ChatColorConverter.convert("4&[EliteMobs] Failed to zip package!"));
+            commandSender.sendMessage(CommandMessagesConfig.getPackageZipFailedMessage());
         }
 
-        commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &6Zipped files for your convenience. Don't forget any additional files like the dungeonpackager or world/schematics files before distributing!"));
+        commandSender.sendMessage(CommandMessagesConfig.getPackageZippedMessage());
     }
 
     private void clearPreviousContents() {
@@ -74,7 +74,7 @@ public class PackageCommand {
         Path path = Path.of(MetadataHandler.PLUGIN.getDataFolder().getPath() + File.separatorChar + subdirectory + File.separatorChar + dungeonFolderName);
 
         if (!Files.exists(path) || !Files.isDirectory(path)) {
-            commandSender.sendMessage("[EliteMobs] Could not find any " + subdirectory + " for this dungeon. This might be normal depending on your setup.");
+            commandSender.sendMessage(CommandMessagesConfig.getPackageNoSubdirectoryMessage().replace("$subdirectory", subdirectory));
             return;
         }
         File sourceFolder = new File(path.toString());
@@ -84,7 +84,7 @@ public class PackageCommand {
                 targetFolder.mkdirs();
                 targetFolder.mkdir();
             } catch (Exception ex) {
-                commandSender.sendMessage("[EliteMobs] Failed to create directory " + targetFolder.getPath());
+                commandSender.sendMessage(CommandMessagesConfig.getPackageFailedDirectoryMessage().replace("$path", targetFolder.getPath()));
                 ex.printStackTrace();
                 return;
             }

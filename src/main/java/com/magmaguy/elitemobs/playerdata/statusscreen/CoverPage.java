@@ -8,21 +8,20 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-
-import java.util.List;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class CoverPage {
-    protected static TextComponent coverPage(int statsPage, int gearPage, int teleportsPage, int commandsPage, int questsPage, int bossTrackingPage) {
+    protected static TextComponent coverPage(int statsPage, int gearPage, int teleportsPage, int commandsPage, int questsPage, int bossTrackingPage, int skillsPage) {
 
         TextComponent textComponent = new TextComponent();
 
@@ -36,6 +35,7 @@ public class CoverPage {
                             .replace("$commandsPage", commandsPage + "")
                             .replace("$questsPage", questsPage + "")
                             .replace("$bossTrackingPage", bossTrackingPage + "")
+                            .replace("$skillsPage", skillsPage + "")
                             + "\n");
 
             if (PlayerStatusMenuConfig.getIndexHoverLines()[i] == null) continue;
@@ -55,6 +55,8 @@ public class CoverPage {
                 line.setClickEvent(new ClickEvent(ClickEvent.Action.CHANGE_PAGE, PlayerStatusMenuConfig.getIndexCommandLines()[i].replace("$questsPage", questsPage + "")));
             else if (PlayerStatusMenuConfig.getIndexCommandLines()[i].contains("$bossTrackingPage"))
                 line.setClickEvent(new ClickEvent(ClickEvent.Action.CHANGE_PAGE, PlayerStatusMenuConfig.getIndexCommandLines()[i].replace("$bossTrackingPage", bossTrackingPage + "")));
+            else if (PlayerStatusMenuConfig.getIndexCommandLines()[i].contains("$skillsPage"))
+                line.setClickEvent(new ClickEvent(ClickEvent.Action.CHANGE_PAGE, PlayerStatusMenuConfig.getIndexCommandLines()[i].replace("$skillsPage", skillsPage + "")));
 
             else
                 line.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, PlayerStatusMenuConfig.getIndexCommandLines()[i]));
@@ -97,12 +99,12 @@ public class CoverPage {
     private static ItemStack createSkillsItem() {
         ItemStack item = new ItemStack(Material.EXPERIENCE_BOTTLE);
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName("\u00A75\u00A7lSkills");
+        meta.setDisplayName(PlayerStatusMenuConfig.getSkillsItemDisplayName());
         meta.setLore(List.of(
-                "\u00A77View your skill levels",
-                "\u00A77and XP progress.",
+                PlayerStatusMenuConfig.getSkillsItemLore1(),
+                PlayerStatusMenuConfig.getSkillsItemLore2(),
                 "",
-                "\u00A7eClick to view!"
+                PlayerStatusMenuConfig.getSkillsItemClickLore()
         ));
         item.setItemMeta(meta);
         return item;

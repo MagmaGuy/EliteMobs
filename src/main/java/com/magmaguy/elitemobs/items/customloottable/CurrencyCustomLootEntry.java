@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.items.customloottable;
 
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
+import com.magmaguy.elitemobs.config.StaticItemNamesConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.items.ItemLootShower;
 import com.magmaguy.elitemobs.utils.MapListInterpreter;
@@ -109,8 +110,8 @@ public class CurrencyCustomLootEntry extends CustomLootEntry implements Serializ
     public ItemStack previewDrop(int itemTier, Player player) {
         ItemStack paperItem = new ItemStack(org.bukkit.Material.PAPER);
         org.bukkit.inventory.meta.ItemMeta paperMeta = paperItem.getItemMeta();
-        paperMeta.setDisplayName("Currency reward");
-        paperMeta.setLore(List.of("Amount: " + currencyAmount, "Chance: " + getChance()));
+        paperMeta.setDisplayName(StaticItemNamesConfig.getLootPreviewCurrencyDisplayName());
+        paperMeta.setLore(List.of(StaticItemNamesConfig.getLootPreviewAmountLabel() + currencyAmount, StaticItemNamesConfig.getLootPreviewChanceLabel() + getChance()));
         paperItem.setItemMeta(paperMeta);
         return paperItem;
     }

@@ -11,7 +11,11 @@ import com.magmaguy.elitemobs.skills.bonuses.interfaces.ProcSkill;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Expose Weakness (PROC) - Attacks have a chance to reduce target's defense.
@@ -26,8 +30,8 @@ public class ExposeWeaknessSkill extends SkillBonus implements ProcSkill {
     private static final int DEBUFF_DURATION_TICKS = 100; // 5 seconds
 
     // Track debuffed entities: EntityUUID -> (debuff stacks, expiry runnable)
-    private static final Map<UUID, DebuffData> debuffedEntities = new HashMap<>();
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Map<UUID, DebuffData> debuffedEntities = new ConcurrentHashMap<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public ExposeWeaknessSkill() {
         super(SkillType.SWORDS, 25, "Expose Weakness",
@@ -135,11 +139,10 @@ public class ExposeWeaknessSkill extends SkillBonus implements ProcSkill {
     public List<String> getLoreDescription(int skillLevel) {
         double proc = getProcChance(skillLevel) * 100;
         double reduction = getDefenseReduction(skillLevel) * 100;
-        return List.of(
-                "&7Proc Chance: &f" + String.format("%.1f", proc) + "%",
-                "&7Defense Reduction: &f" + String.format("%.1f", reduction) + "%",
-                "&7Duration: &f5 seconds"
-        );
+        return applyLoreTemplates(Map.of(
+                "procChance", String.format("%.1f", proc),
+                "reduction", String.format("%.1f", reduction)
+        ));
     }
 
     @Override
@@ -149,7 +152,7 @@ public class ExposeWeaknessSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("-%.1f%% Target Defense", getDefenseReduction(skillLevel) * 100);
+        return applyFormattedBonusTemplate(Map.of("reduction", String.format("%.1f", getDefenseReduction(skillLevel) * 100)));
     }
 
     @Override

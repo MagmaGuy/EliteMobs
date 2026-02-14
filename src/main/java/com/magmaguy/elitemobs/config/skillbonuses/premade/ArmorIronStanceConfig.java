@@ -12,5 +12,11 @@ public class ArmorIronStanceConfig extends SkillBonusConfigFields {
         super("armor_iron_stance.yml", true, "&7Iron Stance",
               List.of("&7Take less damage while", "&7standing still."),
               SkillType.ARMOR, SkillBonusType.CONDITIONAL, 1, 0.30, 0.006, Material.IRON_CHESTPLATE);
+        this.loreTemplates = List.of(
+                "&7Gain damage reduction when standing still",
+                "&7Damage Reduction: $reduction%",
+                "&7Requires: Standing still for 1 second"
+        );
+        this.formattedBonusTemplate = "$reduction% Damage Reduction";
     }
 }

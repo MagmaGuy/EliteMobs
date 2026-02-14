@@ -11,7 +11,11 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Lacerate (PROC) - Attacks have a chance to cause bleeding.
@@ -27,9 +31,9 @@ public class LacerateSkill extends SkillBonus implements ProcSkill {
     private static final int BLEED_TICK_INTERVAL = 20; // Every second
 
     // Track active bleed effects: EntityUUID -> BukkitRunnable
-    private static final Map<UUID, BukkitRunnable> activeBleedEffects = new HashMap<>();
+    private static final Map<UUID, BukkitRunnable> activeBleedEffects = new ConcurrentHashMap<>();
     // Track which players have this skill active
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public LacerateSkill() {
         super(SkillType.SWORDS, 10, "Lacerate",
@@ -51,9 +55,10 @@ public class LacerateSkill extends SkillBonus implements ProcSkill {
         if (eliteEntity == null || eliteEntity.getLivingEntity() == null) return;
 
         int skillLevel = getPlayerSkillLevel(player);
-        double bleedDamage = calculateBleedDamage(skillLevel);
+        // Bleed damage = % of the hit damage, not flat. Scales properly at all levels.
+        double bleedDamagePerTick = event.getDamage() * getBleedPercent(skillLevel);
 
-        applyBleedEffect(player, eliteEntity, bleedDamage);
+        applyBleedEffect(player, eliteEntity, bleedDamagePerTick);
     }
 
     /**
@@ -104,13 +109,12 @@ public class LacerateSkill extends SkillBonus implements ProcSkill {
     }
 
     /**
-     * Calculates bleed damage per tick based on skill level.
+     * Gets the bleed damage per tick as a fraction of hit damage.
+     * Each tick does a small % of the original hit, so total DoT = percent * 5 ticks.
      */
-    private double calculateBleedDamage(int skillLevel) {
-        if (configFields != null) {
-            return configFields.calculateValue(skillLevel);
-        }
-        return BASE_BLEED_DAMAGE + (skillLevel * 0.1);
+    private double getBleedPercent(int skillLevel) {
+        // 8% per tick base (40% total over 5s), +0.1% per level
+        return 0.08 + (skillLevel * 0.001);
     }
 
     private int getPlayerSkillLevel(Player player) {
@@ -145,22 +149,23 @@ public class LacerateSkill extends SkillBonus implements ProcSkill {
     @Override
     public List<String> getLoreDescription(int skillLevel) {
         double procChance = getProcChance(skillLevel) * 100;
-        double damage = calculateBleedDamage(skillLevel);
-        return List.of(
-                "&7Chance: &f" + String.format("%.1f", procChance) + "%",
-                "&7Bleed Damage: &f" + String.format("%.1f", damage) + "/s",
-                "&7Duration: &f5 seconds"
-        );
+        double bleedPercent = getBleedPercent(skillLevel) * 100;
+        double totalPercent = bleedPercent * 5;
+        return applyLoreTemplates(Map.of(
+                "procChance", String.format("%.1f", procChance),
+                "bleedPercent", String.format("%.0f", bleedPercent),
+                "totalPercent", String.format("%.0f", totalPercent)
+        ));
     }
 
     @Override
     public double getBonusValue(int skillLevel) {
-        return calculateBleedDamage(skillLevel);
+        return getBleedPercent(skillLevel);
     }
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("+%.1f Bleed Damage/s", calculateBleedDamage(skillLevel));
+        return applyFormattedBonusTemplate(Map.of("totalPercent", String.format("%.0f", getBleedPercent(skillLevel) * 500)));
     }
 
     @Override

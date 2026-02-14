@@ -6,16 +6,15 @@ import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.ConditionalSkill;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Depth Charge (CONDITIONAL) - When target is in water, creates an explosion that damages nearby aquatic enemies.
@@ -29,7 +28,7 @@ public class DepthChargeSkill extends SkillBonus implements ConditionalSkill {
     private static final double BASE_AOE_DAMAGE = 0.4;
 
     // Track which players have this skill active
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public DepthChargeSkill() {
         super(SkillType.TRIDENTS, 75, "Depth Charge",
@@ -84,9 +83,6 @@ public class DepthChargeSkill extends SkillBonus implements ConditionalSkill {
         } finally {
             EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = false;
         }
-
-        // Send feedback to player
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("§9DEPTH CHARGE!"));
     }
 
     private double calculateAoeDamage(int skillLevel) {
@@ -129,12 +125,11 @@ public class DepthChargeSkill extends SkillBonus implements ConditionalSkill {
     public List<String> getLoreDescription(int skillLevel) {
         double damageBonus = getConditionalBonus(skillLevel) * 100;
         double aoeDamage = calculateAoeDamage(skillLevel) * 100;
-        return List.of(
-                "&7Active: &fTarget in water",
-                "&7Damage Bonus: &f+" + String.format("%.1f", damageBonus) + "%",
-                "&7AOE Damage: &f" + String.format("%.1f", aoeDamage) + "%",
-                "&7Radius: &f" + AOE_RADIUS + " blocks"
-        );
+        return applyLoreTemplates(Map.of(
+                "damageBonus", String.format("%.1f", damageBonus),
+                "aoeDamage", String.format("%.1f", aoeDamage),
+                "radius", String.valueOf(AOE_RADIUS)
+        ));
     }
 
     @Override
@@ -144,7 +139,9 @@ public class DepthChargeSkill extends SkillBonus implements ConditionalSkill {
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("+%.1f%% (In Water)", getConditionalBonus(skillLevel) * 100);
+        return applyFormattedBonusTemplate(Map.of(
+                "damageBonus", String.format("%.1f", getConditionalBonus(skillLevel) * 100)
+        ));
     }
 
     @Override

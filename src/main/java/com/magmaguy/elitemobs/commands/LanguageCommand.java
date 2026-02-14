@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
@@ -84,8 +85,8 @@ public class LanguageCommand extends AdvancedCommand {
 
         String finalLanguage = language;
         if (!suggestions.stream().anyMatch(s -> s.equalsIgnoreCase(finalLanguage))) {
-            Logger.sendMessage(sender, "&cLanguage not found. Valid options:");
-            suggestions.forEach(s -> Logger.sendMessage(sender, "  - " + s));
+            Logger.sendMessage(sender, CommandMessagesConfig.getLanguageNotFoundMessage());
+            suggestions.forEach(s -> Logger.sendMessage(sender, CommandMessagesConfig.getLanguageListPrefix() + s));
             return;
         }
 
@@ -93,7 +94,7 @@ public class LanguageCommand extends AdvancedCommand {
         if (language.equals("english")) {
             // English uses plugin defaults directly, no CSV
             DefaultConfig.setLanguage(sender, language);
-            Logger.sendMessage(sender, "&2Language set to English! Using plugin defaults.");
+            Logger.sendMessage(sender, CommandMessagesConfig.getLanguageSetEnglishMessage());
             return;
         }
 
@@ -106,19 +107,16 @@ public class LanguageCommand extends AdvancedCommand {
             Path target = folder.resolve("custom.csv");
 
             if (!Files.exists(target)) {
-                Logger.sendMessage(sender, "&eGenerating custom.csv template...");
+                Logger.sendMessage(sender, CommandMessagesConfig.getLanguageGeneratingCustomMessage());
                 if (!generateCustomCsv(target)) {
-                    Logger.sendMessage(sender, "&cFailed to generate custom.csv. Language not changed.");
+                    Logger.sendMessage(sender, CommandMessagesConfig.getLanguageGenerateFailedMessage());
                     return;
                 }
-                Logger.sendMessage(sender, "&2Generated custom.csv! Edit it to customize text or add translations.");
+                Logger.sendMessage(sender, CommandMessagesConfig.getLanguageGenerateSuccessMessage());
             }
 
             DefaultConfig.setLanguage(sender, language);
-            Logger.sendMessage(sender,
-                    "&2Language set to custom! " +
-                    "&eEdit plugins/EliteMobs/translations/custom.csv to customize text. " +
-                    "New keys will be added automatically as the plugin runs.");
+            Logger.sendMessage(sender, CommandMessagesConfig.getLanguageSetCustomMessage());
             return;
         }
 
@@ -130,19 +128,17 @@ public class LanguageCommand extends AdvancedCommand {
         Path target = folder.resolve(language + ".csv");
 
         if (!Files.exists(target)) {
-            Logger.sendMessage(sender, "&eDownloading " + language + ".csv...");
+            Logger.sendMessage(sender, CommandMessagesConfig.getLanguageDownloadingMessage().replace("$language", language));
             if (!downloadRemoteLanguage(language, target)) {
-                Logger.sendMessage(sender, "&cFailed to download " + language + ".csv. Language not changed.");
+                Logger.sendMessage(sender, CommandMessagesConfig.getLanguageDownloadFailedMessage().replace("$language", language));
                 return;
             }
-            Logger.sendMessage(sender, "&2Downloaded " + language + ".csv successfully.");
+            Logger.sendMessage(sender, CommandMessagesConfig.getLanguageDownloadSuccessMessage().replace("$language", language));
         }
 
         // Set the language and reload
         DefaultConfig.setLanguage(sender, language);
-        Logger.sendMessage(sender,
-                "&2Language set to " + language + "! " +
-                "&eTranslations are community-managed. Use at your own discretion.");
+        Logger.sendMessage(sender, CommandMessagesConfig.getLanguageSetMessage().replace("$language", language));
     }
 
     /**

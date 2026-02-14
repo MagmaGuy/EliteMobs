@@ -12,5 +12,12 @@ public class TridentsDepthChargeConfig extends SkillBonusConfigFields {
         super("tridents_depth_charge.yml", true, "&9Depth Charge",
               List.of("&7Bonus damage and AOE against", "&7enemies in water."),
               SkillType.TRIDENTS, SkillBonusType.CONDITIONAL, 4, 0.50, 0.01, Material.PRISMARINE_SHARD);
+        this.loreTemplates = List.of(
+                "&7Active: &fTarget in water",
+                "&7Damage Bonus: &f+$damageBonus%",
+                "&7AOE Damage: &f$aoeDamage%",
+                "&7Radius: &f$radius blocks"
+        );
+        this.formattedBonusTemplate = "+$damageBonus% (In Water)";
     }
 }

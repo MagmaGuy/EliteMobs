@@ -81,7 +81,6 @@ public class SkillBonusInitializer {
         registerSkill(new ParrySkill(), new SwordsParryConfig());
 
         // Tier 4 (Level 75)
-        registerSkill(new BladeDanceSkill(), new SwordsBladeDanceConfig());
         registerSkill(new VorpalStrikeSkill(), new SwordsVorpalStrikeConfig());
     }
 
@@ -98,7 +97,6 @@ public class SkillBonusInitializer {
         registerSkill(new StaggerSkill(), new AxesStaggerConfig());
 
         // Tier 3 (Level 50)
-        registerSkill(new RecklessFurySkill(), new AxesRecklessFuryConfig());
         registerSkill(new MomentumSkill(), new AxesMomentumConfig());
 
         // Tier 4 (Level 75)
@@ -187,7 +185,6 @@ public class SkillBonusInitializer {
         registerSkill(new HarvesterSkill(), new HoesHarvesterConfig());
 
         // Tier 3 (Level 50)
-        registerSkill(new DreadAuraSkill(), new HoesDreadAuraConfig());
         registerSkill(new ScytheSweepSkill(), new HoesScytheSweepConfig());
         registerSkill(new ReapWhatYouSowSkill(), new HoesReapWhatYouSowConfig());
 
@@ -254,7 +251,7 @@ public class SkillBonusInitializer {
         // Tier 2 (Level 25)
         registerSkill(new PhalanxSkill(), new SpearsPhalanxConfig());
         registerSkill(new ImpalingStrikeSkill(), new SpearsImpalingStrikeConfig());
-        registerSkill(new SkewerSkill(), new SpearsSkewerConfig());
+        registerSkill(new VortexThrustSkill(), new SpearsVortexThrustConfig());
 
         // Tier 3 (Level 50)
         registerSkill(new LegionsDisciplineSkill(), new SpearsLegionsDisciplineConfig());
