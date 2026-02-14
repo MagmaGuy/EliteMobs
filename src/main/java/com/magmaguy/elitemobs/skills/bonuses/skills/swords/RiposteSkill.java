@@ -7,15 +7,14 @@ import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.CooldownSkill;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Riposte (COOLDOWN) - After blocking, your next attack deals bonus damage.
@@ -28,9 +27,9 @@ public class RiposteSkill extends SkillBonus implements CooldownSkill {
     private static final double BASE_COOLDOWN = 10.0; // 10 seconds
     private static final double BASE_DAMAGE_MULTIPLIER = 1.5; // 50% bonus damage
 
-    private static final Set<UUID> playersOnCooldown = new HashSet<>();
-    private static final Set<UUID> playersWithRiposteReady = new HashSet<>();
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Set<UUID> playersOnCooldown = ConcurrentHashMap.newKeySet();
+    private static final Set<UUID> playersWithRiposteReady = ConcurrentHashMap.newKeySet();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public RiposteSkill() {
         super(SkillType.SWORDS, 25, "Riposte",
@@ -75,6 +74,12 @@ public class RiposteSkill extends SkillBonus implements CooldownSkill {
         playersOnCooldown.remove(player.getUniqueId());
     }
 
+    @Override
+    public void onActivate(Player player, Object event) {
+        // Riposte is triggered from the damage bonus integration, not the generic handler
+        // Do nothing here - riposte ready check + damage is handled in onProc()
+    }
+
     public void onProc(Player player, Object context) {
         if (!(context instanceof EliteMobDamagedByPlayerEvent event)) return;
 
@@ -91,9 +96,8 @@ public class RiposteSkill extends SkillBonus implements CooldownSkill {
 
         // Start cooldown
         startCooldown(player, skillLevel);
-
-        // Visual feedback
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("§6Riposte!"));
+        incrementProcCount(player);
+        SkillBonus.sendSkillActionBar(player, this);
     }
 
     /**
@@ -123,8 +127,8 @@ public class RiposteSkill extends SkillBonus implements CooldownSkill {
     }
 
     private double getDamageMultiplier(int skillLevel) {
-        // Base 50% bonus + 1% per level
-        return BASE_DAMAGE_MULTIPLIER + (skillLevel * 0.01);
+        // Base 50% bonus + 1% per level, capped at 2.5x
+        return Math.min(2.5, BASE_DAMAGE_MULTIPLIER + (skillLevel * 0.01));
     }
 
     @Override
@@ -159,11 +163,10 @@ public class RiposteSkill extends SkillBonus implements CooldownSkill {
     public List<String> getLoreDescription(int skillLevel) {
         double multiplier = (getDamageMultiplier(skillLevel) - 1) * 100;
         double cooldown = getCooldownSeconds(skillLevel);
-        return List.of(
-                "&7Bonus Damage: &f+" + String.format("%.0f", multiplier) + "%",
-                "&7Cooldown: &f" + String.format("%.1f", cooldown) + "s",
-                "&7Block to activate, then attack within 3s"
-        );
+        return applyLoreTemplates(Map.of(
+                "damage", String.format("%.0f", multiplier),
+                "cooldown", String.format("%.1f", cooldown)
+        ));
     }
 
     @Override
@@ -173,7 +176,7 @@ public class RiposteSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("+%.0f%% Riposte Damage", (getDamageMultiplier(skillLevel) - 1) * 100);
+        return applyFormattedBonusTemplate(Map.of("damage", String.format("%.0f", (getDamageMultiplier(skillLevel) - 1) * 100)));
     }
 
     @Override

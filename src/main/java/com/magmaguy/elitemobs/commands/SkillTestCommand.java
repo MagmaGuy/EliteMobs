@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.commands;
 
+import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.testing.SkillSystemTest;
 import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
@@ -26,18 +27,18 @@ public class SkillTestCommand extends AdvancedCommand {
     @Override
     public void execute(CommandData commandData) {
         if (!(commandData.getCommandSender() instanceof Player player)) {
-            Logger.sendMessage(commandData.getCommandSender(), "&cThis command can only be run by a player!");
+            Logger.sendMessage(commandData.getCommandSender(), CommandMessagesConfig.getSkillTestOnlyPlayerMessage());
             return;
         }
 
         if (SkillSystemTest.hasActiveSession(player.getUniqueId())) {
-            Logger.sendMessage(player, "&cA test is already running! Use &e/em skill test cancel &cto stop it.");
+            Logger.sendMessage(player, CommandMessagesConfig.getSkillTestAlreadyRunningMessage());
             return;
         }
 
-        Logger.sendMessage(player, "&a[Test] Starting skill system test...");
-        Logger.sendMessage(player, "&7This will temporarily modify your skill levels and selections.");
-        Logger.sendMessage(player, "&7Your original state will be restored after the test.");
+        Logger.sendMessage(player, CommandMessagesConfig.getSkillTestStartMessage());
+        Logger.sendMessage(player, CommandMessagesConfig.getSkillTestInfoMessage1());
+        Logger.sendMessage(player, CommandMessagesConfig.getSkillTestInfoMessage2());
 
         SkillSystemTest test = new SkillSystemTest(player);
         test.start();

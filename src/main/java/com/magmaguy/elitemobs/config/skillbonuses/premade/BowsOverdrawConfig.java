@@ -12,5 +12,11 @@ public class BowsOverdrawConfig extends SkillBonusConfigFields {
         super("bows_overdraw.yml", true, "&cOverdraw",
               List.of("&7Hold your bow longer for", "&7increased damage."),
               SkillType.BOWS, SkillBonusType.CONDITIONAL, 2, 0.25, 0.005, Material.BOW);
+        this.loreTemplates = List.of(
+                "&7Base Bonus: &f$baseBonus%",
+                "&7Max Overdraw: &f3x bonus",
+                "&7Requires full draw"
+        );
+        this.formattedBonusTemplate = "+$baseBonus% damage (overdraw)";
     }
 }

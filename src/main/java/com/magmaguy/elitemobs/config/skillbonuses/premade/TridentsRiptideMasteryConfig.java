@@ -12,5 +12,11 @@ public class TridentsRiptideMasteryConfig extends SkillBonusConfigFields {
         super("tridents_riptide_mastery.yml", true, "&3Riptide Mastery",
               List.of("&7Bonus damage in water or rain.", "&7Extra bonus when both!"),
               SkillType.TRIDENTS, SkillBonusType.CONDITIONAL, 3, 0.35, 0.007, Material.HEART_OF_THE_SEA);
+        this.loreTemplates = List.of(
+                "&7Active: &fIn water or rain",
+                "&7Damage Bonus: &f+$damageBonus%",
+                "&7Both conditions: &f+$doubleBonus%"
+        );
+        this.formattedBonusTemplate = "+$damageBonus% (Water/Rain)";
     }
 }

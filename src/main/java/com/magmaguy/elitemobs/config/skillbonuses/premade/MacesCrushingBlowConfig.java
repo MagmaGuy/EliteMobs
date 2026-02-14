@@ -11,5 +11,10 @@ public class MacesCrushingBlowConfig extends SkillBonusConfigFields {
         super("maces_crushing_blow.yml", true, "&eCrushing Blow",
               List.of("&7Chance to ignore enemy", "&7armor on hit."),
               SkillType.MACES, 1, 0.25, 0.003, 0.12, Material.ANVIL);
+        this.loreTemplates = List.of(
+                "&7Proc Chance: &f$procChance%",
+                "&7Armor Ignored: &f$armorIgnore%"
+        );
+        this.formattedBonusTemplate = "$armorIgnore% Armor Pen (proc)";
     }
 }

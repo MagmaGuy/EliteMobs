@@ -12,5 +12,10 @@ public class CrossbowsHuntersPreyConfig extends SkillBonusConfigFields {
         super("crossbows_hunters_prey.yml", true, "&4Hunter's Prey",
               List.of("&7Deal bonus damage to enemies", "&7below 50% health."),
               SkillType.CROSSBOWS, SkillBonusType.CONDITIONAL, 2, 0.40, 0.008, Material.BONE);
+        this.loreTemplates = List.of(
+                "&7Bonus Damage: &f$value%",
+                "&7Threshold: &fBelow 50% HP"
+        );
+        this.formattedBonusTemplate = "+$value% to low HP targets";
     }
 }

@@ -6,15 +6,14 @@ import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.ProcSkill;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Devastating Blow (PROC) - Chance to deal massive bonus damage.
@@ -26,7 +25,7 @@ public class DevastatingBlowSkill extends SkillBonus implements ProcSkill {
     private static final double BASE_PROC_CHANCE = 0.10; // 10% chance
     private static final double BASE_DAMAGE_MULTIPLIER = 2.0; // Double damage
 
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public DevastatingBlowSkill() {
         super(SkillType.AXES, 10, "Devastating Blow",
@@ -54,8 +53,6 @@ public class DevastatingBlowSkill extends SkillBonus implements ProcSkill {
                     Particle.EXPLOSION, event.getEliteMobEntity().getLivingEntity().getLocation(), 1
             );
         }
-
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("§c§lDEVASTATING BLOW!"));
     }
 
     private double getDamageMultiplier(int skillLevel) {
@@ -75,16 +72,16 @@ public class DevastatingBlowSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        return List.of(
-                "&7Proc Chance: &f" + String.format("%.1f", getProcChance(skillLevel) * 100) + "%",
-                "&7Damage: &f" + String.format("%.1f", getDamageMultiplier(skillLevel)) + "x"
-        );
+        return applyLoreTemplates(Map.of(
+                "procChance", String.format("%.1f", getProcChance(skillLevel) * 100),
+                "damageMultiplier", String.format("%.1f", getDamageMultiplier(skillLevel))
+        ));
     }
 
     @Override
     public double getBonusValue(int skillLevel) { return getDamageMultiplier(skillLevel); }
     @Override
-    public String getFormattedBonus(int skillLevel) { return String.format("%.1fx Damage (proc)", getDamageMultiplier(skillLevel)); }
+    public String getFormattedBonus(int skillLevel) { return applyFormattedBonusTemplate(Map.of("damageMultiplier", String.format("%.1f", getDamageMultiplier(skillLevel)))); }
     @Override
     public void shutdown() { activePlayers.clear(); }
 }

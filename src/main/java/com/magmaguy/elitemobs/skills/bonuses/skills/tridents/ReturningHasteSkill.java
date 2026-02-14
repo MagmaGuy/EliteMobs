@@ -6,7 +6,11 @@ import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.StackingSkill;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Returning Haste (STACKING) - Build stacks with consecutive trident throws.
@@ -21,11 +25,11 @@ public class ReturningHasteSkill extends SkillBonus implements StackingSkill {
     private static final double BASE_BONUS_PER_STACK = 0.1;
 
     // Track player stacks: PlayerUUID -> Stack count
-    private static final Map<UUID, Integer> playerStacks = new HashMap<>();
+    private static final Map<UUID, Integer> playerStacks = new ConcurrentHashMap<>();
     // Track last throw time: PlayerUUID -> Timestamp
-    private static final Map<UUID, Long> lastThrowTime = new HashMap<>();
+    private static final Map<UUID, Long> lastThrowTime = new ConcurrentHashMap<>();
     // Track which players have this skill active
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public ReturningHasteSkill() {
         super(SkillType.TRIDENTS, 50, "Returning Haste",
@@ -105,17 +109,28 @@ public class ReturningHasteSkill extends SkillBonus implements StackingSkill {
         return activePlayers.contains(player.getUniqueId());
     }
 
+    /**
+     * Simulates having stacks for testing. Pre-sets the stack count and timestamp
+     * so the stacking bonus is active during test attacks.
+     */
+    public static void simulateStacks(UUID uuid, int stacks) {
+        playerStacks.put(uuid, stacks);
+        lastThrowTime.put(uuid, System.currentTimeMillis());
+    }
+
     @Override
     public List<String> getLoreDescription(int skillLevel) {
         double bonusPerStack = getBonusPerStack(skillLevel) * 100;
         double maxBonus = bonusPerStack * getMaxStacks();
-        return List.of(
-                "&7Max Stacks: &f" + getMaxStacks(),
-                "&7Per Stack: &f+" + String.format("%.1f", bonusPerStack) + "%",
-                "&7Max Bonus: &f+" + String.format("%.1f", maxBonus) + "%",
-                "&7Decay: &f5 seconds"
-        );
+        return applyLoreTemplates(Map.of(
+                "maxStacks", String.valueOf(getMaxStacks()),
+                "bonusPerStack", String.format("%.1f", bonusPerStack),
+                "maxBonus", String.format("%.1f", maxBonus)
+        ));
     }
+
+    @Override
+    public TestStrategy getTestStrategy() { return TestStrategy.CONDITION_SETUP; }
 
     @Override
     public double getBonusValue(int skillLevel) {
@@ -124,7 +139,9 @@ public class ReturningHasteSkill extends SkillBonus implements StackingSkill {
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("+%.1f%% per stack", getBonusPerStack(skillLevel) * 100);
+        return applyFormattedBonusTemplate(Map.of(
+                "bonusPerStack", String.format("%.1f", getBonusPerStack(skillLevel) * 100)
+        ));
     }
 
     @Override

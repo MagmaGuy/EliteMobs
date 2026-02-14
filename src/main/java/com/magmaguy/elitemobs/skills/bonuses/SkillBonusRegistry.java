@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.skills.SkillXPCalculator;
 import org.bukkit.entity.Player;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Registry for managing skill bonuses.
@@ -19,7 +20,7 @@ import java.util.*;
 public class SkillBonusRegistry {
 
     private static final Map<SkillType, List<SkillBonus>> bonusesBySkill = new EnumMap<>(SkillType.class);
-    private static final Map<String, SkillBonus> bonusesById = new HashMap<>();
+    private static final Map<String, SkillBonus> bonusesById = new ConcurrentHashMap<>();
 
     private SkillBonusRegistry() {
         // Static utility class

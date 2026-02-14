@@ -2,25 +2,29 @@ package com.magmaguy.elitemobs.skills.bonuses.skills.crossbows;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
+import com.magmaguy.elitemobs.api.utils.EliteItemManager;
+import com.magmaguy.elitemobs.combatsystem.WeaponOffenseCalculator;
+import com.magmaguy.elitemobs.items.ItemTagger;
+import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.skills.SkillType;
+import com.magmaguy.elitemobs.skills.SkillXPCalculator;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.CooldownSkill;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
+import com.magmaguy.elitemobs.testing.CombatSimulator;
 import org.bukkit.Location;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -33,9 +37,9 @@ public class ArrowRainSkill extends SkillBonus implements CooldownSkill {
     private static final long BASE_COOLDOWN = 30; // 30 seconds
     private static final double BASE_ARROW_DAMAGE = 0.30; // 30% of original
 
-    private static final Set<UUID> activePlayers = new HashSet<>();
-    private static final Set<UUID> onCooldown = new HashSet<>();
-    private static final Map<UUID, Long> cooldownEndTimes = new HashMap<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
+    private static final Set<UUID> onCooldown = ConcurrentHashMap.newKeySet();
+    private static final Map<UUID, Long> cooldownEndTimes = new ConcurrentHashMap<>();
 
     public ArrowRainSkill() {
         super(SkillType.CROSSBOWS, 75, "Arrow Rain",
@@ -84,12 +88,22 @@ public class ArrowRainSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public void onActivate(Player player, Object event) {
+        if (CombatSimulator.isTestingActive()) return;
         if (!(event instanceof EliteMobDamagedByPlayerEvent damageEvent)) return;
         if (damageEvent.getEliteMobEntity().getLivingEntity() == null) return;
 
         int skillLevel = SkillBonusRegistry.getPlayerSkillLevel(player, SkillType.CROSSBOWS);
-        double arrowDamage = damageEvent.getDamage() * getArrowDamageMultiplier(skillLevel);
+        double damageMultiplier = getArrowDamageMultiplier(skillLevel);
         Location targetLoc = damageEvent.getEliteMobEntity().getLivingEntity().getLocation().add(0, 10, 0);
+
+        // Capture combat data NOW (at activation time) since the BukkitRunnable fires later
+        // and the player may have switched weapons by then.
+        // These arrows are spawned via world.spawn() and do NOT fire ProjectileLaunchEvent,
+        // so they need ALL PDC combat data set manually.
+        ItemStack weapon = player.getInventory().getItemInMainHand();
+        double weaponLevel = WeaponOffenseCalculator.getEffectiveWeaponLevel(weapon);
+        long crossbowXP = PlayerData.getSkillXP(player.getUniqueId(), SkillType.CROSSBOWS);
+        int crossbowSkillLevel = Math.max(1, SkillXPCalculator.levelFromTotalXP(crossbowXP));
 
         new BukkitRunnable() {
             int count = 0;
@@ -108,14 +122,18 @@ public class ArrowRainSkill extends SkillBonus implements CooldownSkill {
                     Arrow arrow = player.getWorld().spawn(spawnLoc, Arrow.class);
                     arrow.setShooter(player);
                     arrow.setVelocity(new Vector(0, -2, 0));
-                    arrow.setDamage(arrowDamage);
                     arrow.setPickupStatus(Arrow.PickupStatus.DISALLOWED);
+
+                    // Stamp all combat PDC data (no ProjectileLaunchEvent for world.spawn arrows)
+                    ItemTagger.setArrowWeaponLevel(arrow, weaponLevel);
+                    ItemTagger.setArrowSkillType(arrow, SkillType.CROSSBOWS.name());
+                    ItemTagger.setArrowSkillLevel(arrow, crossbowSkillLevel);
+                    ItemTagger.setArrowDamageMultiplier(arrow, damageMultiplier);
+                    EliteItemManager.tagArrow(arrow);
                 }
                 count++;
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 5);
-
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("§b§lARROW RAIN!"));
     }
 
     private double getArrowDamageMultiplier(int skillLevel) {
@@ -141,17 +159,16 @@ public class ArrowRainSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        return List.of(
-                "&7Arrow Damage: &f" + String.format("%.0f", getArrowDamageMultiplier(skillLevel) * 100) + "%",
-                "&7Arrows: &f15 total (3x5 waves)",
-                "&7Cooldown: &f" + getCooldownSeconds(skillLevel) + "s"
-        );
+        return applyLoreTemplates(Map.of(
+                "arrowDamage", String.format("%.0f", getArrowDamageMultiplier(skillLevel) * 100),
+                "cooldown", String.valueOf(getCooldownSeconds(skillLevel))
+        ));
     }
 
     @Override
     public double getBonusValue(int skillLevel) { return getArrowDamageMultiplier(skillLevel); }
     @Override
-    public String getFormattedBonus(int skillLevel) { return String.format("%.0f%% arrow damage", getArrowDamageMultiplier(skillLevel) * 100); }
+    public String getFormattedBonus(int skillLevel) { return applyFormattedBonusTemplate(Map.of("arrowDamage", String.format("%.0f", getArrowDamageMultiplier(skillLevel) * 100))); }
     @Override
     public void shutdown() {
         activePlayers.clear();

@@ -5,10 +5,11 @@ import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import org.bukkit.entity.Player;
 
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Harvester (PASSIVE) - Passive damage and loot bonus.
@@ -21,7 +22,7 @@ public class HarvesterSkill extends SkillBonus {
     private static final double BASE_DAMAGE_BONUS = 0.10; // 10% damage
     private static final double BASE_LOOT_BONUS = 0.15; // 15% loot quality
 
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public HarvesterSkill() {
         super(SkillType.HOES, 25, "Harvester",
@@ -89,13 +90,10 @@ public class HarvesterSkill extends SkillBonus {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        double damagePercent = getDamageBonus(skillLevel) * 100;
-        double lootPercent = getLootBonus(skillLevel) * 100;
-        return List.of(
-                "&7Damage Bonus: &f+" + String.format("%.1f", damagePercent) + "%",
-                "&7Loot Quality: &f+" + String.format("%.1f", lootPercent) + "%",
-                "&7Passive harvest benefits"
-        );
+        return applyLoreTemplates(Map.of(
+                "damagePercent", String.format("%.1f", getDamageBonus(skillLevel) * 100),
+                "lootPercent", String.format("%.1f", getLootBonus(skillLevel) * 100)
+        ));
     }
 
     @Override
@@ -105,7 +103,9 @@ public class HarvesterSkill extends SkillBonus {
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("+%.1f%% Damage & Loot", getDamageBonus(skillLevel) * 100);
+        return applyFormattedBonusTemplate(Map.of(
+                "damagePercent", String.format("%.1f", getDamageBonus(skillLevel) * 100)
+        ));
     }
 
     @Override

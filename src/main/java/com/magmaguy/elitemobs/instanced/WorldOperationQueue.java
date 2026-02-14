@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.instanced;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -37,9 +38,9 @@ public class WorldOperationQueue {
 
         int queuePosition = operationQueue.size();
         if (queuePosition > 1) {
-            player.sendMessage("[EliteMobs] Preparing your dungeon... (Queue position: " + queuePosition + ")");
+            player.sendMessage(DungeonsConfig.getDungeonPreparingQueueMessage().replace("$position", String.valueOf(queuePosition)));
         } else {
-            player.sendMessage("[EliteMobs] Preparing your dungeon...");
+            player.sendMessage(DungeonsConfig.getDungeonPreparingMessage());
         }
 
         processNextOperation();
@@ -71,7 +72,7 @@ public class WorldOperationQueue {
         }).thenAccept(success -> {
             if (!success) {
                 if (operation.player.isOnline()) {
-                    operation.player.sendMessage("[EliteMobs] Failed to prepare dungeon. Please try again.");
+                    operation.player.sendMessage(DungeonsConfig.getDungeonPrepareFailedMessage());
                 }
                 isProcessing.set(false);
                 processNextOperation();
@@ -88,7 +89,7 @@ public class WorldOperationQueue {
                         Logger.warn("World operation failed during sync phase: " + e.getMessage());
                         e.printStackTrace();
                         if (operation.player.isOnline()) {
-                            operation.player.sendMessage("[EliteMobs] Failed to load dungeon. Please try again.");
+                            operation.player.sendMessage(DungeonsConfig.getDungeonLoadFailedMessage());
                         }
                     } finally {
                         isProcessing.set(false);
@@ -109,7 +110,7 @@ public class WorldOperationQueue {
         int position = 1;
         for (WorldOperation op : operationQueue) {
             if (op.player.isOnline()) {
-                op.player.sendMessage("[EliteMobs] Preparing your dungeon... (Queue position: " + position + ")");
+                op.player.sendMessage(DungeonsConfig.getDungeonPreparingQueueMessage().replace("$position", String.valueOf(position)));
             }
             position++;
         }
@@ -128,7 +129,7 @@ public class WorldOperationQueue {
     public static void shutdown() {
         for (WorldOperation op : operationQueue) {
             if (op.player.isOnline()) {
-                op.player.sendMessage("[EliteMobs] Dungeon preparation cancelled due to server shutdown.");
+                op.player.sendMessage(DungeonsConfig.getDungeonCancelledShutdownMessage());
             }
         }
         operationQueue.clear();

@@ -12,5 +12,10 @@ public class CrossbowsFirstBloodConfig extends SkillBonusConfigFields {
         super("crossbows_first_blood.yml", true, "&4First Blood",
               List.of("&7Deal massive bonus damage", "&7with the first hit on an enemy."),
               SkillType.CROSSBOWS, SkillBonusType.CONDITIONAL, 4, 0.75, 0.015, Material.REDSTONE);
+        this.loreTemplates = List.of(
+                "&7First Hit Bonus: &f$value%",
+                "&7Triggers on full health targets"
+        );
+        this.formattedBonusTemplate = "+$value% first hit damage";
     }
 }

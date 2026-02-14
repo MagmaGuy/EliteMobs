@@ -9,7 +9,9 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Handles gambling-specific economy operations including debt management.
@@ -28,6 +30,13 @@ public class GamblingEconomyHandler {
      */
     @Getter
     private static double houseEarnings = 0;
+
+    /**
+     * Tracks players with active, unresolved gambling sessions.
+     * Added by {@link #placeBet}, removed by {@link #resolveOutcome}.
+     * Guarantees that every game session is financially resolved exactly once.
+     */
+    private static final Set<UUID> unresolvedGames = ConcurrentHashMap.newKeySet();
 
     private static File houseDataFile;
     private static FileConfiguration houseDataConfig;
@@ -100,6 +109,7 @@ public class GamblingEconomyHandler {
      */
     public static void shutdown() {
         saveHouseEarnings();
+        unresolvedGames.clear();
     }
 
     /**
@@ -176,12 +186,34 @@ public class GamblingEconomyHandler {
         // House takes the bet
         recordHouseWin(betAmount);
 
+        // Mark this player as having an unresolved game
+        unresolvedGames.add(uuid);
+
         return true;
     }
 
     /**
+     * Central resolution point for all gambling game outcomes.
+     * MUST be called before any visual animation begins.
+     * Idempotent — calling multiple times for the same session is safe (returns 0 on subsequent calls).
+     * All games MUST use this instead of calling {@link #awardWinnings} directly.
+     *
+     * @param uuid          The player's UUID
+     * @param payoutAmount  Total payout (0 for loss, betAmount for push, &gt; betAmount for win)
+     * @return The actual amount awarded (0 if already resolved or loss)
+     */
+    public static double resolveOutcome(UUID uuid, double payoutAmount) {
+        if (!unresolvedGames.remove(uuid)) return 0; // Already resolved or no active game
+        if (payoutAmount > 0) {
+            awardWinnings(uuid, payoutAmount);
+            return payoutAmount;
+        }
+        return 0;
+    }
+
+    /**
      * Awards winnings to a player. Winnings are first applied to pay off debt.
-     * SAFETY: This should be called BEFORE any visual animations.
+     * Internal — games should use {@link #resolveOutcome} instead.
      *
      * @param uuid   The player's UUID
      * @param amount The amount won (including original bet if applicable)

@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.menus;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
-import com.magmaguy.magmacore.util.ChatColorConverter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -27,17 +26,15 @@ public class SharedShopElements {
             public void run() {
 
                 player.sendMessage(
-                        ChatColorConverter.convert(
                                 EconomySettingsConfig.getShopBuyMessage()
                                         .replace("$item_name", itemDisplayName)
                                         .replace("$item_value", itemValue + "")
-                                        .replace("$currency_name", EconomySettingsConfig.getCurrencyName())));
+                                        .replace("$currency_name", EconomySettingsConfig.getCurrencyName()));
 
                 player.sendMessage(
-                        ChatColorConverter.convert(
                                 EconomySettingsConfig.getShopCurrentBalance()
                                         .replace("$currency_amount", EconomyHandler.checkCurrency(player.getUniqueId()) + "")
-                                        .replace("$currency_name", EconomySettingsConfig.getCurrencyName())));
+                                        .replace("$currency_name", EconomySettingsConfig.getCurrencyName()));
 
 
             }
@@ -55,21 +52,18 @@ public class SharedShopElements {
             public void run() {
 
                 player.sendMessage(
-                        ChatColorConverter.convert(
                                 EconomySettingsConfig.getShopInsufficientFundsMessage()
-                                        .replace("$currency_name", EconomySettingsConfig.getCurrencyName())));
+                                        .replace("$currency_name", EconomySettingsConfig.getCurrencyName()));
 
                 player.sendMessage(
-                        ChatColorConverter.convert(
                                 EconomySettingsConfig.getShopCurrentBalance()
                                         .replace("$currency_amount", EconomyHandler.checkCurrency(player.getUniqueId()) + "")
-                                        .replace("$currency_name", EconomySettingsConfig.getCurrencyName())));
+                                        .replace("$currency_name", EconomySettingsConfig.getCurrencyName()));
 
                 player.sendMessage(
-                        ChatColorConverter.convert(
                                 EconomySettingsConfig.getShopItemPrice()
                                         .replace("$item_value", itemValue + "")
-                                        .replace("$currency_name", EconomySettingsConfig.getCurrencyName())));
+                                        .replace("$currency_name", EconomySettingsConfig.getCurrencyName()));
 
             }
 

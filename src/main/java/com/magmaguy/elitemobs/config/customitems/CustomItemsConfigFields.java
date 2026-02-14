@@ -78,7 +78,18 @@ public class CustomItemsConfigFields extends CustomConfigFields {
     @Override
     public void processConfigFields() {
         this.isEnabled = processBoolean("isEnabled", isEnabled, true, true);
-        this.material = processEnum("material", material, Material.WOODEN_SWORD, Material.class, true);
+        // Materials for future versions (e.g. spears) may not exist yet — skip silently
+        if (configHas("material")) {
+            String rawMaterial = fileConfiguration.getString("material");
+            if (rawMaterial != null && rawMaterial.toUpperCase(java.util.Locale.ROOT).endsWith("_SPEAR")) {
+                this.material = Material.WOODEN_SWORD;
+                this.isEnabled = false;
+            } else {
+                this.material = processEnum("material", material, Material.WOODEN_SWORD, Material.class, true);
+            }
+        } else {
+            this.material = processEnum("material", material, Material.WOODEN_SWORD, Material.class, true);
+        }
         this.name = translatable(filename, "name", processString("name", name, "Default name", true));
         this.lore = translatable(filename, "lore", processStringList("lore", lore, new ArrayList<>(), true));
         this.enchantments = processStringList("enchantments", enchantments, null, false);

@@ -5,17 +5,30 @@ import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
 import com.magmaguy.elitemobs.skills.ArmorSkillHealthBonus;
 import com.magmaguy.elitemobs.skills.SkillType;
+import com.magmaguy.elitemobs.skills.bonuses.skills.armor.IronStanceSkill;
+import com.magmaguy.elitemobs.skills.bonuses.skills.bows.OverdrawSkill;
+import com.magmaguy.elitemobs.skills.bonuses.skills.crossbows.SteadyAimSkill;
+import com.magmaguy.elitemobs.skills.bonuses.skills.hoes.GrimReachSkill;
+import com.magmaguy.elitemobs.skills.bonuses.skills.spears.LongReachSkill;
+import com.magmaguy.elitemobs.skills.bonuses.skills.spears.PolearmMasterySkill;
+import com.magmaguy.elitemobs.skills.bonuses.skills.swords.FlurrySkill;
+import com.magmaguy.elitemobs.skills.bonuses.skills.swords.PoiseSkill;
+import com.magmaguy.elitemobs.skills.bonuses.skills.swords.SwiftStrikesSkill;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityShootBowEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Central event handler for processing skill bonuses.
@@ -26,25 +39,29 @@ import java.util.*;
 public class SkillBonusEventHandler implements Listener {
 
     // Cooldown tracking: skillId -> Set of player UUIDs on cooldown
-    private static final Map<String, Set<UUID>> skillCooldowns = new HashMap<>();
+    private static final Map<String, Set<UUID>> skillCooldowns = new ConcurrentHashMap<>();
 
     // Stack tracking: playerUUID -> skillId -> current stacks
-    private static final Map<UUID, Map<String, Integer>> playerStacks = new HashMap<>();
-
-    // Active toggle skills: playerUUID -> Set of active skillIds
-    private static final Map<UUID, Set<String>> activeToggles = new HashMap<>();
+    private static final Map<UUID, Map<String, Integer>> playerStacks = new ConcurrentHashMap<>();
 
     public SkillBonusEventHandler() {
         // Register ourselves as listener
     }
 
     /**
-     * Handles player dealing damage to elite mobs.
-     * Delegates to the event's unified skill bonus processing.
+     * Starts a cooldown for a skill.
      */
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
-    public void onEliteMobDamagedByPlayer(EliteMobDamagedByPlayerEvent event) {
-        event.applySkillBonuses();
+    public static void startCooldown(String skillId, UUID playerUUID, int seconds) {
+        Set<UUID> cooldownSet = skillCooldowns.computeIfAbsent(skillId, k -> ConcurrentHashMap.newKeySet());
+        cooldownSet.add(playerUUID);
+
+        // Schedule cooldown removal
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                endCooldown(skillId, playerUUID);
+            }
+        }.runTaskLater(MetadataHandler.PLUGIN, seconds * 20L);
     }
 
     /**
@@ -93,7 +110,6 @@ public class SkillBonusEventHandler implements Listener {
 
         // Clear player-specific data
         playerStacks.remove(uuid);
-        activeToggles.remove(uuid);
 
         // Remove from all cooldowns
         for (Set<UUID> cooldownSet : skillCooldowns.values()) {
@@ -112,19 +128,11 @@ public class SkillBonusEventHandler implements Listener {
     }
 
     /**
-     * Starts a cooldown for a skill.
+     * Sets the stacks for a skill.
      */
-    public static void startCooldown(String skillId, UUID playerUUID, int seconds) {
-        Set<UUID> cooldownSet = skillCooldowns.computeIfAbsent(skillId, k -> new HashSet<>());
-        cooldownSet.add(playerUUID);
-
-        // Schedule cooldown removal
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                endCooldown(skillId, playerUUID);
-            }
-        }.runTaskLater(MetadataHandler.PLUGIN, seconds * 20L);
+    public static void setStacks(UUID playerUUID, String skillId, int count) {
+        Map<String, Integer> stacks = playerStacks.computeIfAbsent(playerUUID, k -> new ConcurrentHashMap<>());
+        stacks.put(skillId, count);
     }
 
     /**
@@ -149,11 +157,22 @@ public class SkillBonusEventHandler implements Listener {
     }
 
     /**
-     * Sets the stacks for a skill.
+     * Gets weapon skill type from an item stack (for weapon switch handling).
      */
-    public static void setStacks(UUID playerUUID, String skillId, int count) {
-        Map<String, Integer> stacks = playerStacks.computeIfAbsent(playerUUID, k -> new HashMap<>());
-        stacks.put(skillId, count);
+    private static SkillType getWeaponSkillTypeFromItem(ItemStack item) {
+        if (item == null || item.getType() == Material.AIR) return null;
+        String typeName = item.getType().name();
+        if (typeName.endsWith("_SWORD")) return SkillType.SWORDS;
+        if (typeName.endsWith("_AXE")) return SkillType.AXES;
+        if (item.getType() == Material.BOW) return SkillType.BOWS;
+        if (item.getType() == Material.CROSSBOW) return SkillType.CROSSBOWS;
+        if (item.getType() == Material.TRIDENT) return SkillType.TRIDENTS;
+        if (typeName.endsWith("_HOE")) return SkillType.HOES;
+        try {
+            if (item.getType() == Material.MACE) return SkillType.MACES;
+        } catch (NoSuchFieldError e) { /* pre-1.21 */ }
+        if (typeName.endsWith("_SPEAR")) return SkillType.SPEARS;
+        return null;
     }
 
     /**
@@ -166,25 +185,126 @@ public class SkillBonusEventHandler implements Listener {
         }
     }
 
-    // ==================== TOGGLE MANAGEMENT ====================
+    // ==================== WEAPON SKILL EVENT HOOKS ====================
 
     /**
-     * Checks if a toggle skill is active for a player.
+     * Handles player dealing damage to elite mobs.
+     * Delegates to the event's unified skill bonus processing.
      */
-    public static boolean isToggleActive(UUID playerUUID, String skillId) {
-        Set<String> toggles = activeToggles.get(playerUUID);
-        return toggles != null && toggles.contains(skillId);
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
+    public void onEliteMobDamagedByPlayer(EliteMobDamagedByPlayerEvent event) {
+        // Skip skill processing for bypass/custom damage events (DOT ticks, AOE secondary hits, etc.)
+        // These are intentionally flagged to prevent recursive skill activation
+        if (event.isCustomDamage()) return;
+        event.applySkillBonuses();
     }
 
     /**
-     * Sets a toggle skill state for a player.
+     * Handles weapon switching - applies/removes passive weapon skill effects.
      */
-    public static void setToggle(UUID playerUUID, String skillId, boolean active) {
-        Set<String> toggles = activeToggles.computeIfAbsent(playerUUID, k -> new HashSet<>());
-        if (active) {
-            toggles.add(skillId);
-        } else {
-            toggles.remove(skillId);
+    @EventHandler(priority = EventPriority.NORMAL)
+    public void onItemHeldChange(PlayerItemHeldEvent event) {
+        Player player = event.getPlayer();
+        UUID uuid = player.getUniqueId();
+
+        // Determine old and new weapon types
+        ItemStack oldItem = player.getInventory().getItem(event.getPreviousSlot());
+        ItemStack newItem = player.getInventory().getItem(event.getNewSlot());
+        SkillType oldType = getWeaponSkillTypeFromItem(oldItem);
+        SkillType newType = getWeaponSkillTypeFromItem(newItem);
+
+        // Remove effects from old weapon type
+        if (oldType == SkillType.SWORDS) {
+            if (SwiftStrikesSkill.hasActiveSkill(uuid)) {
+                SwiftStrikesSkill.removeSpeedBonus(player);
+            }
+            if (PoiseSkill.hasActiveSkill(uuid)) {
+                PoiseSkill.removeKnockbackResistance(player);
+            }
+            if (FlurrySkill.hasActiveSkill(uuid)) {
+                FlurrySkill.removeAttackSpeedModifier(player);
+            }
+        }
+        if (oldType == SkillType.HOES) {
+            GrimReachSkill.removeReachBonus(player);
+        }
+        if (oldType == SkillType.SPEARS) {
+            LongReachSkill.removeReachBonus(player);
+            PolearmMasterySkill.removeAttackSpeedBonus(player);
+        }
+        if (oldType == SkillType.BOWS) {
+            OverdrawSkill.stopDrawing(uuid);
+        }
+
+        // Apply effects for new weapon type
+        if (newType == SkillType.SWORDS) {
+            if (SwiftStrikesSkill.hasActiveSkill(uuid)) {
+                int skillLevel = SkillBonusRegistry.getPlayerSkillLevel(player, SkillType.SWORDS);
+                SwiftStrikesSkill.applySpeedBonus(player, skillLevel);
+            }
+            if (PoiseSkill.hasActiveSkill(uuid)) {
+                int skillLevel = SkillBonusRegistry.getPlayerSkillLevel(player, SkillType.SWORDS);
+                PoiseSkill.applyKnockbackResistance(player, skillLevel);
+            }
+        }
+        if (newType == SkillType.HOES) {
+            int skillLevel = SkillBonusRegistry.getPlayerSkillLevel(player, SkillType.HOES);
+            GrimReachSkill.applyReachBonus(player, skillLevel);
+        }
+        if (newType == SkillType.SPEARS) {
+            int skillLevel = SkillBonusRegistry.getPlayerSkillLevel(player, SkillType.SPEARS);
+            LongReachSkill.applyReachBonus(player, skillLevel);
+            if (PolearmMasterySkill.hasActiveSkill(uuid)) {
+                PolearmMasterySkill.applyAttackSpeedBonus(player, skillLevel);
+            }
+        }
+    }
+
+    /**
+     * Handles bow draw start for Overdraw skill.
+     */
+    @EventHandler(priority = EventPriority.NORMAL)
+    public void onPlayerInteract(PlayerInteractEvent event) {
+        if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+        if (event.getItem() == null) return;
+        if (event.getItem().getType() != Material.BOW) return;
+
+        UUID uuid = event.getPlayer().getUniqueId();
+        if (OverdrawSkill.hasActiveSkill(uuid)) {
+            OverdrawSkill.startDrawing(uuid);
+        }
+    }
+
+    /**
+     * Handles bow shoot for Overdraw skill - snapshots draw duration for the damage event.
+     * We do NOT clear the draw time here; the arrow damage event needs it.
+     * The draw time is cleared on next draw start or weapon switch instead.
+     */
+    @EventHandler(priority = EventPriority.NORMAL)
+    public void onBowShoot(EntityShootBowEvent event) {
+        if (event.getEntity() instanceof Player player) {
+            OverdrawSkill.snapshotDrawDuration(player.getUniqueId());
+        }
+    }
+
+    /**
+     * Handles player movement for SteadyAim and IronStance skills.
+     * Only tracks actual movement (not just head rotation).
+     */
+    @EventHandler(priority = EventPriority.NORMAL)
+    public void onPlayerMove(PlayerMoveEvent event) {
+        if (event.getTo() == null) return;
+        UUID uuid = event.getPlayer().getUniqueId();
+
+        // Check if player actually moved (not just head rotation)
+        boolean moved = event.getFrom().getBlockX() != event.getTo().getBlockX() ||
+                event.getFrom().getBlockZ() != event.getTo().getBlockZ();
+
+        if (SteadyAimSkill.hasActiveSkill(uuid)) {
+            SteadyAimSkill.updatePlayerMovement(uuid, moved);
+        }
+        if (moved) {
+            IronStanceSkill.updatePlayerMovement(uuid, true);
         }
     }
 
@@ -227,7 +347,6 @@ public class SkillBonusEventHandler implements Listener {
     public static void shutdown() {
         skillCooldowns.clear();
         playerStacks.clear();
-        activeToggles.clear();
         PlayerSkillSelection.shutdown();
     }
 }

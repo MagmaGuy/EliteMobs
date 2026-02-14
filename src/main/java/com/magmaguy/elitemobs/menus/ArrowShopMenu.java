@@ -1,11 +1,9 @@
 package com.magmaguy.elitemobs.menus;
 
-import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.menus.premade.ArrowShopMenuConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -33,52 +31,49 @@ public class ArrowShopMenu {
         slotToArrow.put(10, new ArrowItem(Material.ARROW,
                 ArrowShopMenuConfig.getArrowSmallStackAmount(),
                 ArrowShopMenuConfig.getArrowSmallStackPrice(),
-                null, "&fArrows"));
+                null, ArrowShopMenuConfig.getArrowDisplayName()));
 
         slotToArrow.put(11, new ArrowItem(Material.ARROW,
                 ArrowShopMenuConfig.getArrowLargeStackAmount(),
                 ArrowShopMenuConfig.getArrowLargeStackPrice(),
-                null, "&fArrows"));
+                null, ArrowShopMenuConfig.getArrowDisplayName()));
 
         slotToArrow.put(12, new ArrowItem(Material.SPECTRAL_ARROW,
                 ArrowShopMenuConfig.getSpectralArrowAmount(),
                 ArrowShopMenuConfig.getSpectralArrowPrice(),
-                null, "&eSpectral Arrows"));
+                null, ArrowShopMenuConfig.getSpectralArrowDisplayName()));
 
         slotToArrow.put(14, new ArrowItem(Material.TIPPED_ARROW,
                 ArrowShopMenuConfig.getTippedArrowPoisonAmount(),
                 ArrowShopMenuConfig.getTippedArrowPoisonPrice(),
-                PotionType.POISON, "&2Arrow of Poison"));
+                PotionType.POISON, ArrowShopMenuConfig.getArrowOfPoisonDisplayName()));
 
         slotToArrow.put(15, new ArrowItem(Material.TIPPED_ARROW,
                 ArrowShopMenuConfig.getTippedArrowSlownessAmount(),
                 ArrowShopMenuConfig.getTippedArrowSlownessPrice(),
-                PotionType.SLOWNESS, "&8Arrow of Slowness"));
+                PotionType.SLOWNESS, ArrowShopMenuConfig.getArrowOfSlownessDisplayName()));
 
         slotToArrow.put(16, new ArrowItem(Material.TIPPED_ARROW,
                 ArrowShopMenuConfig.getTippedArrowWeaknessAmount(),
                 ArrowShopMenuConfig.getTippedArrowWeaknessPrice(),
-                PotionType.WEAKNESS, "&7Arrow of Weakness"));
+                PotionType.WEAKNESS, ArrowShopMenuConfig.getArrowOfWeaknessDisplayName()));
 
         slotToArrow.put(21, new ArrowItem(Material.TIPPED_ARROW,
                 ArrowShopMenuConfig.getTippedArrowHarmingAmount(),
                 ArrowShopMenuConfig.getTippedArrowHarmingPrice(),
-                PotionType.HARMING, "&4Arrow of Harming"));
+                PotionType.HARMING, ArrowShopMenuConfig.getArrowOfHarmingDisplayName()));
 
         slotToArrow.put(23, new ArrowItem(Material.TIPPED_ARROW,
                 ArrowShopMenuConfig.getTippedArrowHealingAmount(),
                 ArrowShopMenuConfig.getTippedArrowHealingPrice(),
-                PotionType.HEALING, "&dArrow of Healing"));
+                PotionType.HEALING, ArrowShopMenuConfig.getArrowOfHealingDisplayName()));
     }
 
     /**
      * Opens the arrow shop for a player.
      */
     public static void openArrowShop(Player player) {
-        String menuName = ChatColorConverter.convert(ArrowShopMenuConfig.getShopName());
-        if (DefaultConfig.useResourcePackModels()) {
-            menuName = ChatColor.WHITE + "\uDB83\uDEF1\uDB83\uDE06\uDB83\uDEF5          " + menuName;
-        }
+        String menuName = ArrowShopMenuConfig.getShopName();
 
         Inventory inventory = Bukkit.createInventory(player, 27, menuName);
 
@@ -104,10 +99,10 @@ public class ArrowShopMenu {
             meta.setDisplayName(ChatColorConverter.convert(arrowItem.displayName));
             meta.setLore(List.of(
                     "",
-                    ChatColorConverter.convert("&7Amount: &f" + arrowItem.amount),
-                    ChatColorConverter.convert("&7Price: &6" + arrowItem.price + " &7Elite Coins"),
+                    ArrowShopMenuConfig.getShopItemAmountFormat().replace("$amount", String.valueOf(arrowItem.amount)),
+                    ArrowShopMenuConfig.getShopItemPriceFormat().replace("$price", String.valueOf(arrowItem.price)),
                     "",
-                    ChatColorConverter.convert("&eClick to purchase!")
+                    ArrowShopMenuConfig.getShopItemClickToPurchase()
             ));
             item.setItemMeta(meta);
         } else {
@@ -116,10 +111,10 @@ public class ArrowShopMenu {
             meta.setDisplayName(ChatColorConverter.convert(arrowItem.displayName));
             meta.setLore(List.of(
                     "",
-                    ChatColorConverter.convert("&7Amount: &f" + arrowItem.amount),
-                    ChatColorConverter.convert("&7Price: &6" + arrowItem.price + " &7Elite Coins"),
+                    ArrowShopMenuConfig.getShopItemAmountFormat().replace("$amount", String.valueOf(arrowItem.amount)),
+                    ArrowShopMenuConfig.getShopItemPriceFormat().replace("$price", String.valueOf(arrowItem.price)),
                     "",
-                    ChatColorConverter.convert("&eClick to purchase!")
+                    ArrowShopMenuConfig.getShopItemClickToPurchase()
             ));
             item.setItemMeta(meta);
         }
@@ -178,16 +173,16 @@ public class ArrowShopMenu {
             // Check if player has enough money
             double playerBalance = EconomyHandler.checkCurrency(player.getUniqueId());
             if (playerBalance < arrowItem.price) {
-                player.sendMessage(ChatColorConverter.convert(
+                player.sendMessage(
                         ArrowShopMenuConfig.getInsufficientFundsMessage()
                                 .replace("%price%", String.valueOf(arrowItem.price))
-                ));
+                );
                 return;
             }
 
             // Check if player has inventory space
             if (player.getInventory().firstEmpty() == -1) {
-                player.sendMessage(ChatColorConverter.convert(ArrowShopMenuConfig.getInventoryFullMessage()));
+                player.sendMessage(ArrowShopMenuConfig.getInventoryFullMessage());
                 return;
             }
 
@@ -195,12 +190,12 @@ public class ArrowShopMenu {
             EconomyHandler.subtractCurrency(player.getUniqueId(), arrowItem.price);
             player.getInventory().addItem(createArrowItem(arrowItem));
 
-            player.sendMessage(ChatColorConverter.convert(
+            player.sendMessage(
                     ArrowShopMenuConfig.getPurchaseSuccessMessage()
                             .replace("%amount%", String.valueOf(arrowItem.amount))
                             .replace("%item%", arrowItem.displayName.replace("&", "\u00A7"))
                             .replace("%price%", String.valueOf(arrowItem.price))
-            ));
+            );
         }
 
         @EventHandler

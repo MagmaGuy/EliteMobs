@@ -9,10 +9,11 @@ import com.magmaguy.elitemobs.skills.bonuses.interfaces.ConditionalSkill;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Reaper's Harvest (CONDITIONAL) - Massive damage bonus against low health enemies.
@@ -25,7 +26,7 @@ public class ReapersHarvestSkill extends SkillBonus implements ConditionalSkill 
     private static final double HEALTH_THRESHOLD = 0.25; // 25% health
     private static final double BASE_BONUS = 1.0; // 100% extra damage
 
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public ReapersHarvestSkill() {
         super(SkillType.HOES, 10, "Reaper's Harvest",
@@ -80,12 +81,9 @@ public class ReapersHarvestSkill extends SkillBonus implements ConditionalSkill 
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        double bonusPercent = getConditionalBonus(skillLevel) * 100;
-        return List.of(
-                "&7Bonus Damage: &f+" + String.format("%.0f", bonusPercent) + "%",
-                "&7Condition: Target below 25% HP",
-                "&7Execute weakened foes"
-        );
+        return applyLoreTemplates(Map.of(
+                "bonusPercent", String.format("%.0f", getConditionalBonus(skillLevel) * 100)
+        ));
     }
 
     @Override
@@ -95,7 +93,9 @@ public class ReapersHarvestSkill extends SkillBonus implements ConditionalSkill 
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("+%.0f%% Execute Damage", getConditionalBonus(skillLevel) * 100);
+        return applyFormattedBonusTemplate(Map.of(
+                "bonusPercent", String.format("%.0f", getConditionalBonus(skillLevel) * 100)
+        ));
     }
 
     @Override

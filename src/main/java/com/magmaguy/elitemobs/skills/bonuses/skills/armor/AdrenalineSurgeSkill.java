@@ -1,25 +1,20 @@
 package com.magmaguy.elitemobs.skills.bonuses.skills.armor;
 
-import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.CooldownSkill;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Tier 2 ARMOR skill - Adrenaline Surge
@@ -27,8 +22,8 @@ import java.util.UUID;
  */
 public class AdrenalineSurgeSkill extends SkillBonus implements CooldownSkill {
 
-    private static final HashSet<UUID> activePlayers = new HashSet<>();
-    private static final Map<UUID, Long> cooldownMap = new HashMap<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
+    private static final Map<UUID, Long> cooldownMap = new ConcurrentHashMap<>();
     private static final double HEALTH_THRESHOLD = 0.30; // 30% health
 
     public AdrenalineSurgeSkill() {
@@ -39,13 +34,13 @@ public class AdrenalineSurgeSkill extends SkillBonus implements CooldownSkill {
             "Gain buffs when health drops below 30%",
             SkillBonusType.COOLDOWN,
             2,
-            "adrenaline_surge"
+            "armor_adrenaline_surge"
         );
     }
 
     @Override
     public void applyBonus(Player player, int skillLevel) {
-        // Cooldown skill, triggered by health threshold
+        activePlayers.add(player.getUniqueId());
     }
 
     @Override
@@ -71,12 +66,9 @@ public class AdrenalineSurgeSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        List<String> lore = new ArrayList<>();
-        lore.add("Gain buffs when health drops below 30%");
-        lore.add(String.format("Buffs: Speed, Strength, Resistance"));
-        lore.add(String.format("Duration: %.1fs", getDuration(skillLevel) / 20.0));
-        lore.add(String.format("Cooldown: %ds", getCooldownSeconds(skillLevel)));
-        return lore;
+        return applyLoreTemplates(Map.of(
+                "duration", String.format("%.1fs", getDuration(skillLevel) / 20.0),
+                "cooldown", String.format("%ds", getCooldownSeconds(skillLevel))));
     }
 
     @Override
@@ -86,7 +78,8 @@ public class AdrenalineSurgeSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("Buffs on low health (CD: %ds)", getCooldownSeconds(skillLevel));
+        return applyFormattedBonusTemplate(Map.of(
+                "cooldown", String.format("%ds", getCooldownSeconds(skillLevel))));
     }
 
     @Override
@@ -153,9 +146,6 @@ public class AdrenalineSurgeSkill extends SkillBonus implements CooldownSkill {
         player.getWorld().spawnParticle(Particle.ANGRY_VILLAGER,
             player.getLocation(), 10, 0.5, 0.5, 0.5, 0);
 
-        // Send action bar message
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("Adrenaline Surge!"));
-
         // Start cooldown
         startCooldown(player, skillLevel);
     }
@@ -174,6 +164,7 @@ public class AdrenalineSurgeSkill extends SkillBonus implements CooldownSkill {
 
         if (newHealthPercent <= HEALTH_THRESHOLD) {
             onActivate(player, null);
+            incrementProcCount(player);
         }
     }
 

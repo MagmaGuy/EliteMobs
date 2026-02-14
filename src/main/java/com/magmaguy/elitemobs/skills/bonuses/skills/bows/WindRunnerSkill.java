@@ -8,10 +8,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Wind Runner (PASSIVE) - Gain speed boost on successful hits.
@@ -22,7 +23,7 @@ public class WindRunnerSkill extends SkillBonus {
     public static final String SKILL_ID = "bows_wind_runner";
     private static final int SPEED_DURATION = 100; // 5 seconds
 
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public WindRunnerSkill() {
         super(SkillType.BOWS, 50, "Wind Runner",
@@ -53,17 +54,19 @@ public class WindRunnerSkill extends SkillBonus {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        return List.of(
-                "&7Speed Level: &f" + (getSpeedAmplifier(skillLevel) + 1),
-                "&7Duration: &f5 seconds",
-                "&7Triggers on hit"
-        );
+        return applyLoreTemplates(Map.of(
+                "speedLevel", String.valueOf(getSpeedAmplifier(skillLevel) + 1)
+        ));
     }
 
     @Override
     public double getBonusValue(int skillLevel) { return getSpeedAmplifier(skillLevel) + 1; }
     @Override
-    public String getFormattedBonus(int skillLevel) { return String.format("Speed %d on hit", getSpeedAmplifier(skillLevel) + 1); }
+    public String getFormattedBonus(int skillLevel) {
+        return applyFormattedBonusTemplate(Map.of(
+                "speedLevel", String.valueOf(getSpeedAmplifier(skillLevel) + 1)
+        ));
+    }
     @Override
     public boolean affectsDamage() { return false; } // Speed boost doesn't affect damage
     @Override

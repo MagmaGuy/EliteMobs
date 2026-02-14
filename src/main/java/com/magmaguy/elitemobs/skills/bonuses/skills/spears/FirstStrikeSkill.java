@@ -6,33 +6,48 @@ import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
+import com.magmaguy.elitemobs.skills.bonuses.interfaces.ConditionalSkill;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * First Strike (PASSIVE) - Bonus damage against full-health enemies.
+ * First Strike (CONDITIONAL) - Bonus damage against full-health enemies.
  * Tier 1 unlock.
  */
-public class FirstStrikeSkill extends SkillBonus {
+public class FirstStrikeSkill extends SkillBonus implements ConditionalSkill {
 
     public static final String SKILL_ID = "spears_first_strike";
     private static final double BASE_DAMAGE_BONUS = 0.30; // 30% bonus damage
 
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public FirstStrikeSkill() {
         super(SkillType.SPEARS, 10, "First Strike",
               "Deal bonus damage to full-health enemies.",
-              SkillBonusType.PASSIVE, 1, SKILL_ID);
+              SkillBonusType.CONDITIONAL, 1, SKILL_ID);
+    }
+
+    @Override
+    public boolean conditionMet(Player player, Object context) {
+        if (!(context instanceof EliteMobDamagedByPlayerEvent event)) return false;
+        EliteEntity eliteEntity = event.getEliteMobEntity();
+        if (eliteEntity == null || eliteEntity.getLivingEntity() == null) return false;
+        LivingEntity target = eliteEntity.getLivingEntity();
+        // Only trigger when target is at full health
+        return target.getHealth() >= target.getMaxHealth();
+    }
+
+    @Override
+    public double getConditionalBonus(int skillLevel) {
+        return getDamageBonus(skillLevel);
     }
 
     /**
@@ -58,10 +73,6 @@ public class FirstStrikeSkill extends SkillBonus {
             target.getLocation().add(0, 1.5, 0), 10, 0.3, 0.3, 0.3, 0.1);
         player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 1.5f);
 
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-            TextComponent.fromLegacyText("\u00A7b\u00A7lFIRST STRIKE!"));
-
-        incrementProcCount(player);
         return 1.0 + bonus;
     }
 
@@ -99,9 +110,7 @@ public class FirstStrikeSkill extends SkillBonus {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        return List.of(
-            "&7Bonus vs Full HP: &f+" + String.format("%.0f", getDamageBonus(skillLevel) * 100) + "%"
-        );
+        return applyLoreTemplates(Map.of("value", String.format("%.0f", getDamageBonus(skillLevel) * 100)));
     }
 
     @Override
@@ -111,7 +120,7 @@ public class FirstStrikeSkill extends SkillBonus {
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("+%.0f%% vs Full HP", getDamageBonus(skillLevel) * 100);
+        return applyFormattedBonusTemplate(Map.of("value", String.format("%.0f", getDamageBonus(skillLevel) * 100)));
     }
 
     @Override

@@ -1,12 +1,13 @@
 package com.magmaguy.elitemobs.skills;
 
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
+import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Player;
-
-import java.util.UUID;
+import org.bukkit.inventory.EquipmentSlotGroup;
 
 /**
  * Applies bonus max health to players based on their Armor skill level.
@@ -14,9 +15,7 @@ import java.util.UUID;
  */
 public class ArmorSkillHealthBonus {
 
-    // Consistent UUID for the attribute modifier so we can find and remove it
-    private static final UUID MODIFIER_UUID = UUID.fromString("e1b2c3d4-a5f6-4890-abcd-ef1234567890");
-    private static final String MODIFIER_NAME = "elitemobs.armor_skill_health";
+    private static final String MODIFIER_KEY_STRING = "armor_skill_health";
 
     private ArmorSkillHealthBonus() {
         // Static utility class
@@ -47,13 +46,8 @@ public class ArmorSkillHealthBonus {
         // Apply the attribute modifier
         AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
         if (maxHealth != null) {
-            AttributeModifier modifier = new AttributeModifier(
-                    MODIFIER_UUID,
-                    MODIFIER_NAME,
-                    bonusHealth,
-                    AttributeModifier.Operation.ADD_NUMBER
-            );
-            maxHealth.addModifier(modifier);
+            NamespacedKey key = new NamespacedKey(MetadataHandler.PLUGIN, MODIFIER_KEY_STRING);
+            maxHealth.addModifier(new AttributeModifier(key, bonusHealth, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.ANY));
         }
     }
 
@@ -68,9 +62,8 @@ public class ArmorSkillHealthBonus {
 
         AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
         if (maxHealth != null) {
-            // Remove modifier by UUID
             for (AttributeModifier modifier : maxHealth.getModifiers()) {
-                if (modifier.getUniqueId().equals(MODIFIER_UUID)) {
+                if (modifier.getKey().equals(new NamespacedKey(MetadataHandler.PLUGIN, MODIFIER_KEY_STRING))) {
                     maxHealth.removeModifier(modifier);
                     break;
                 }

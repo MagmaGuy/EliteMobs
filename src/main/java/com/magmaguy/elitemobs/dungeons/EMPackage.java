@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.dungeons;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
 import com.magmaguy.elitemobs.menus.SetupMenuIcons;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
@@ -9,7 +10,6 @@ import com.magmaguy.elitemobs.treasurechest.TreasureChest;
 import com.magmaguy.magmacore.menus.ContentPackage;
 import com.magmaguy.magmacore.nightbreak.NightbreakAccount;
 import com.magmaguy.magmacore.nightbreak.NightbreakContentManager;
-import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
@@ -120,24 +120,24 @@ public abstract class EMPackage extends ContentPackage {
 
     protected ItemStack getInstalledItemStack() {
         return generateItemStackWithIcon(
-                List.of("Content is installed!", "Click to uninstall!"),
+                List.of(DungeonsConfig.getContentInstalledLine1(), DungeonsConfig.getContentInstalledLine2()),
                 Material.GREEN_STAINED_GLASS_PANE,
                 SetupMenuIcons.MODEL_CHECKMARK);
     }
 
     protected ItemStack getNotInstalledItemStack() {
         return generateItemStackWithIcon(
-                List.of("Content is not installed!", "Click to install!"),
+                List.of(DungeonsConfig.getContentNotInstalledLine1(), DungeonsConfig.getContentNotInstalledLine2()),
                 Material.YELLOW_STAINED_GLASS_PANE,
                 SetupMenuIcons.MODEL_GRAY_X);
     }
 
     protected ItemStack getPartiallyInstalledItemStack() {
         return generateItemStackWithIcon(
-                List.of("Content partially installed!",
-                        "This is either because you haven't downloaded all of it,",
-                        "or because some elements have been manually disabled.",
-                        "Click to download!"),
+                List.of(DungeonsConfig.getContentPartialLine1(),
+                        DungeonsConfig.getContentPartialLine2(),
+                        DungeonsConfig.getContentPartialLine3(),
+                        DungeonsConfig.getContentPartialLine4()),
                 Material.ORANGE_STAINED_GLASS_PANE,
                 SetupMenuIcons.MODEL_GRAY_X);
     }
@@ -162,21 +162,21 @@ public abstract class EMPackage extends ContentPackage {
         }
 
         return generateItemStackWithIcon(
-                List.of("Content is not downloaded!", "Click to download!"),
+                List.of(DungeonsConfig.getContentNotDownloadedLine1(), DungeonsConfig.getContentNotDownloadedLine2()),
                 Material.YELLOW_STAINED_GLASS_PANE,
                 modelId);
     }
 
     protected ItemStack getNeedsAccessItemStack() {
         List<String> tooltip = new ArrayList<>();
-        tooltip.add("&cYou need access to download this content!");
-        tooltip.add("&eClick to see how to get access.");
+        tooltip.add(DungeonsConfig.getContentNeedAccessMessage());
+        tooltip.add(DungeonsConfig.getContentAccessClickMessage());
         if (cachedAccessInfo != null) {
             if (cachedAccessInfo.patreonLink != null && !cachedAccessInfo.patreonLink.isEmpty()) {
-                tooltip.add("&7Available via: &6Patreon");
+                tooltip.add(DungeonsConfig.getContentAvailablePatreon());
             }
             if (cachedAccessInfo.itchLink != null && !cachedAccessInfo.itchLink.isEmpty()) {
-                tooltip.add("&7Available via: &ditch.io");
+                tooltip.add(DungeonsConfig.getContentAvailableItch());
             }
         }
         tooltip.addAll(contentPackagesConfigFields.getSetupMenuDescription());
@@ -211,7 +211,7 @@ public abstract class EMPackage extends ContentPackage {
         }
 
         return generateItemStackWithIcon(
-                List.of("&eUpdate available!", "&aClick to update automatically!"),
+                List.of(DungeonsConfig.getContentUpdateAvailable(), DungeonsConfig.getContentUpdateClickMessage()),
                 Material.YELLOW_STAINED_GLASS_PANE,
                 modelId);
     }
@@ -219,9 +219,9 @@ public abstract class EMPackage extends ContentPackage {
     @Override
     protected ItemStack getOutOfDateNoAccessItemStack() {
         List<String> tooltip = new ArrayList<>();
-        tooltip.add("&eUpdate available!");
-        tooltip.add("&cYou need access to download this update.");
-        tooltip.add("&7Click to see how to get access.");
+        tooltip.add(DungeonsConfig.getContentUpdateAvailable());
+        tooltip.add(DungeonsConfig.getContentUpdateNeedAccess());
+        tooltip.add(DungeonsConfig.getContentUpdateAccessClick());
         tooltip.addAll(contentPackagesConfigFields.getSetupMenuDescription());
         ItemStack itemStack = ItemStackGenerator.generateItemStack(
                 Material.ORANGE_STAINED_GLASS_PANE,
@@ -274,26 +274,26 @@ public abstract class EMPackage extends ContentPackage {
 
         // If no Nightbreak slug, use legacy download link behavior
         if (slug == null || slug.isEmpty()) {
-            player.sendMessage("----------------------------------------------------");
-            player.sendMessage(ChatColorConverter.convert("&4Download this at &9" + getContentPackagesConfigFields().getDownloadLink() + " &4!"));
-            player.sendMessage("----------------------------------------------------");
+            player.sendMessage(DungeonsConfig.getContentDownloadSeparator());
+            player.sendMessage(DungeonsConfig.getContentDownloadLegacyMessage().replace("$link", getContentPackagesConfigFields().getDownloadLink()));
+            player.sendMessage(DungeonsConfig.getContentDownloadSeparator());
             return;
         }
 
         // If no Nightbreak token registered, prompt user
         if (!NightbreakAccount.hasToken()) {
-            player.sendMessage("----------------------------------------------------");
-            player.sendMessage(ChatColorConverter.convert("&eThis content can be downloaded automatically with a Nightbreak account."));
-            player.sendMessage(ChatColorConverter.convert("&71. Get your token at: &9https://nightbreak.io/account"));
-            player.sendMessage(ChatColorConverter.convert("&72. Run: &e/nightbreakLogin <your-token>"));
+            player.sendMessage(DungeonsConfig.getContentDownloadSeparator());
+            player.sendMessage(DungeonsConfig.getContentNightbreakPromptLine1());
+            player.sendMessage(DungeonsConfig.getContentNightbreakPromptLine2());
+            player.sendMessage(DungeonsConfig.getContentNightbreakPromptLine3());
             player.sendMessage("");
-            player.sendMessage(ChatColorConverter.convert("&7Or download manually at: &9https://nightbreak.io/plugin/elitemobs"));
-            player.sendMessage("----------------------------------------------------");
+            player.sendMessage(DungeonsConfig.getContentNightbreakPromptLine4());
+            player.sendMessage(DungeonsConfig.getContentDownloadSeparator());
             return;
         }
 
         // Check access first
-        player.sendMessage(ChatColorConverter.convert("&7[EliteMobs] Checking access for " + contentPackagesConfigFields.getName() + "..."));
+        player.sendMessage(DungeonsConfig.getContentCheckingAccessMessage().replace("$name", contentPackagesConfigFields.getName()));
 
         NightbreakContentManager.checkAccessAsync(slug, accessInfo -> {
             cachedAccessInfo = accessInfo;
@@ -301,8 +301,8 @@ public abstract class EMPackage extends ContentPackage {
             if (!player.isOnline()) return;
 
             if (accessInfo == null) {
-                player.sendMessage(ChatColorConverter.convert("&c[EliteMobs] Failed to check access. Try again later or download manually:"));
-                player.sendMessage(ChatColorConverter.convert("&9https://nightbreak.io/plugin/elitemobs"));
+                player.sendMessage(DungeonsConfig.getContentAccessFailedMessage());
+                player.sendMessage(DungeonsConfig.getContentAccessFailedLink());
                 return;
             }
 
@@ -319,7 +319,7 @@ public abstract class EMPackage extends ContentPackage {
 
             NightbreakContentManager.downloadAsync(slug, importsFolder, player, success -> {
                 if (success && player.isOnline()) {
-                    player.sendMessage(ChatColorConverter.convert("&a[EliteMobs] Content downloaded! Reloading EliteMobs..."));
+                    player.sendMessage(DungeonsConfig.getContentDownloadedReloadMessage());
                     // Schedule reload after a short delay
                     Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> {
                         com.magmaguy.elitemobs.commands.ReloadCommand.reload(player);
@@ -330,22 +330,22 @@ public abstract class EMPackage extends ContentPackage {
     }
 
     public void doShowAccessInfo(Player player) {
-        player.sendMessage("----------------------------------------------------");
-        player.sendMessage(ChatColorConverter.convert("&cYou don't have access to: &f" + contentPackagesConfigFields.getName()));
+        player.sendMessage(DungeonsConfig.getContentDownloadSeparator());
+        player.sendMessage(DungeonsConfig.getContentNoAccessMessage().replace("$name", contentPackagesConfigFields.getName()));
         player.sendMessage("");
-        player.sendMessage(ChatColorConverter.convert("&eYou can get access through:"));
-        player.sendMessage(ChatColorConverter.convert("&a• Nightbreak: &9https://nightbreak.io/plugin/elitemobs"));
+        player.sendMessage(DungeonsConfig.getContentGetAccessMessage());
+        player.sendMessage(DungeonsConfig.getContentNightbreakLink());
         if (cachedAccessInfo != null) {
             if (cachedAccessInfo.patreonLink != null && !cachedAccessInfo.patreonLink.isEmpty()) {
-                player.sendMessage(ChatColorConverter.convert("&6• Patreon: &9" + cachedAccessInfo.patreonLink));
+                player.sendMessage(DungeonsConfig.getContentPatreonLink().replace("$link", cachedAccessInfo.patreonLink));
             }
             if (cachedAccessInfo.itchLink != null && !cachedAccessInfo.itchLink.isEmpty()) {
-                player.sendMessage(ChatColorConverter.convert("&d• itch.io: &9" + cachedAccessInfo.itchLink));
+                player.sendMessage(DungeonsConfig.getContentItchLink().replace("$link", cachedAccessInfo.itchLink));
             }
         }
         player.sendMessage("");
-        player.sendMessage(ChatColorConverter.convert("&7After purchasing, use &e/nightbreakLogin <token> &7to link your account."));
-        player.sendMessage("----------------------------------------------------");
+        player.sendMessage(DungeonsConfig.getContentLinkAccountMessage());
+        player.sendMessage(DungeonsConfig.getContentDownloadSeparator());
     }
 
     protected ContentState getContentState() {

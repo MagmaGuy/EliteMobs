@@ -1,21 +1,19 @@
 package com.magmaguy.elitemobs.skills.bonuses.skills.armor;
 
-import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.ProcSkill;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -24,7 +22,7 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class EvasionSkill extends SkillBonus implements ProcSkill {
 
-    private static final HashSet<UUID> activePlayers = new HashSet<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public EvasionSkill() {
         super(
@@ -34,13 +32,13 @@ public class EvasionSkill extends SkillBonus implements ProcSkill {
             "Chance to completely dodge incoming attacks",
             SkillBonusType.PROC,
             1,
-            "evasion"
+            "armor_evasion"
         );
     }
 
     @Override
     public void applyBonus(Player player, int skillLevel) {
-        // Evasion is checked on damage event, no persistent bonus to apply
+        activePlayers.add(player.getUniqueId());
     }
 
     @Override
@@ -65,10 +63,8 @@ public class EvasionSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        List<String> lore = new ArrayList<>();
-        lore.add("Chance to completely dodge incoming attacks");
-        lore.add(String.format("Evasion Chance: %.1f%%", getProcChance(skillLevel) * 100));
-        return lore;
+        return applyLoreTemplates(Map.of(
+                "procChance", String.format("%.1f", getProcChance(skillLevel) * 100)));
     }
 
     @Override
@@ -80,7 +76,8 @@ public class EvasionSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("%.1f%% Evasion Chance", getProcChance(skillLevel) * 100);
+        return applyFormattedBonusTemplate(Map.of(
+                "procChance", String.format("%.1f", getProcChance(skillLevel) * 100)));
     }
 
     @Override
@@ -92,8 +89,8 @@ public class EvasionSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public double getProcChance(int skillLevel) {
-        // Base 10% + 5% per scaled value
-        return 0.10 + getScaledValue(skillLevel) * 0.05;
+        // Base 10% + 5% per scaled value, capped at 35%
+        return Math.min(0.35, 0.10 + getScaledValue(skillLevel) * 0.05);
     }
 
     @Override
@@ -101,9 +98,6 @@ public class EvasionSkill extends SkillBonus implements ProcSkill {
         // Visual effect for dodge
         player.getWorld().spawnParticle(Particle.CLOUD, player.getLocation(), 10, 0.3, 0.5, 0.3, 0.05);
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PHANTOM_FLAP, 0.5f, 1.5f);
-
-        // Send action bar message
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("Evaded!"));
     }
 
     /**

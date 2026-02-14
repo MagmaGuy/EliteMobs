@@ -12,5 +12,10 @@ public class SwordsPoiseConfig extends SkillBonusConfigFields {
         super("swords_poise.yml", true, "&aPoise",
               List.of("&7Reduces knockback taken while", "&7wielding a sword."),
               SkillType.SWORDS, SkillBonusType.PASSIVE, 1, 0.20, 0.003, Material.IRON_BOOTS);
+        this.loreTemplates = List.of(
+                "&7Knockback Reduction: &f$value%",
+                "&7Always active when selected"
+        );
+        this.formattedBonusTemplate = "-$value% Knockback";
     }
 }

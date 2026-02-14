@@ -12,5 +12,12 @@ public class TridentsReturningHasteConfig extends SkillBonusConfigFields {
         super("tridents_returning_haste.yml", true, "&aReturning Haste",
               List.of("&7Consecutive throws increase", "&7damage. Stacks up to 5x."),
               SkillType.TRIDENTS, SkillBonusType.STACKING, 3, 0.06, 0.0012, Material.ENDER_PEARL);
+        this.loreTemplates = List.of(
+                "&7Max Stacks: &f$maxStacks",
+                "&7Per Stack: &f+$bonusPerStack%",
+                "&7Max Bonus: &f+$maxBonus%",
+                "&7Decay: &f5 seconds"
+        );
+        this.formattedBonusTemplate = "+$bonusPerStack% per stack";
     }
 }

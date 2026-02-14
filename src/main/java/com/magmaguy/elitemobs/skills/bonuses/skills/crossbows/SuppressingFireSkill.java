@@ -6,16 +6,15 @@ import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.ProcSkill;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Suppressing Fire (PROC) - Chance to weaken and slow enemies.
@@ -27,7 +26,7 @@ public class SuppressingFireSkill extends SkillBonus implements ProcSkill {
     private static final double BASE_PROC_CHANCE = 0.20; // 20% chance
     private static final int DEBUFF_DURATION = 80; // 4 seconds
 
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public SuppressingFireSkill() {
         super(SkillType.CROSSBOWS, 50, "Suppressing Fire",
@@ -52,8 +51,6 @@ public class SuppressingFireSkill extends SkillBonus implements ProcSkill {
                 new PotionEffect(PotionEffectType.WEAKNESS, DEBUFF_DURATION, amplifier));
         event.getEliteMobEntity().getLivingEntity().addPotionEffect(
                 new PotionEffect(PotionEffectType.SLOWNESS, DEBUFF_DURATION, 1));
-
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("§7SUPPRESSED!"));
     }
 
     @Override
@@ -69,17 +66,13 @@ public class SuppressingFireSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        return List.of(
-                "&7Proc Chance: &f" + String.format("%.1f", getProcChance(skillLevel) * 100) + "%",
-                "&7Applies: &8Weakness &7and &bSlowness",
-                "&7Duration: &f4 seconds"
-        );
+        return applyLoreTemplates(Map.of("procChance", String.format("%.1f", getProcChance(skillLevel) * 100)));
     }
 
     @Override
     public double getBonusValue(int skillLevel) { return getProcChance(skillLevel); }
     @Override
-    public String getFormattedBonus(int skillLevel) { return String.format("%.0f%% suppress chance", getProcChance(skillLevel) * 100); }
+    public String getFormattedBonus(int skillLevel) { return applyFormattedBonusTemplate(Map.of("procChance", String.format("%.0f", getProcChance(skillLevel) * 100))); }
     @Override
     public boolean affectsDamage() { return false; } // Applies debuffs, not damage
     @Override

@@ -1,21 +1,21 @@
 package com.magmaguy.elitemobs.skills.bonuses.skills.tridents;
 
-import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.CooldownSkill;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Tidal Surge (COOLDOWN) - Creates a water surge that knocks back and damages nearby enemies.
@@ -28,9 +28,9 @@ public class TidalSurgeSkill extends SkillBonus implements CooldownSkill {
     private static final double SURGE_RADIUS = 5.0;
 
     // Track cooldowns: PlayerUUID -> Cooldown end time
-    private static final Map<UUID, Long> cooldownMap = new HashMap<>();
+    private static final Map<UUID, Long> cooldownMap = new ConcurrentHashMap<>();
     // Track which players have this skill active
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public TidalSurgeSkill() {
         super(SkillType.TRIDENTS, 25, "Tidal Surge",
@@ -115,9 +115,6 @@ public class TidalSurgeSkill extends SkillBonus implements CooldownSkill {
         } finally {
             EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = false;
         }
-
-        // Send feedback to player
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("§9TIDAL SURGE!"));
     }
 
     private double calculateKnockback(int skillLevel) {
@@ -131,7 +128,7 @@ public class TidalSurgeSkill extends SkillBonus implements CooldownSkill {
         if (configFields != null) {
             return 0.3 * configFields.calculateValue(skillLevel);
         }
-        return 0.3 + (skillLevel * 0.005);
+        return 0.3 + (skillLevel * 0.003);
     }
 
     private int getPlayerSkillLevel(Player player) {
@@ -169,11 +166,11 @@ public class TidalSurgeSkill extends SkillBonus implements CooldownSkill {
     public List<String> getLoreDescription(int skillLevel) {
         long cooldown = getCooldownSeconds(skillLevel);
         double knockback = calculateKnockback(skillLevel);
-        return List.of(
-                "&7Cooldown: &f" + cooldown + "s",
-                "&7Knockback: &f" + String.format("%.1f", knockback),
-                "&7Radius: &f" + SURGE_RADIUS + " blocks"
-        );
+        return applyLoreTemplates(Map.of(
+                "cooldown", String.valueOf(cooldown),
+                "knockback", String.format("%.1f", knockback),
+                "radius", String.valueOf(SURGE_RADIUS)
+        ));
     }
 
     @Override
@@ -183,7 +180,9 @@ public class TidalSurgeSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("%.1f Knockback", calculateKnockback(skillLevel));
+        return applyFormattedBonusTemplate(Map.of(
+                "knockback", String.format("%.1f", calculateKnockback(skillLevel))
+        ));
     }
 
     @Override

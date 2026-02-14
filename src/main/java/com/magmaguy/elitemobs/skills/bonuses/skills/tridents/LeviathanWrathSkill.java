@@ -1,21 +1,22 @@
 package com.magmaguy.elitemobs.skills.bonuses.skills.tridents;
 
-import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.CooldownSkill;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
+import com.magmaguy.elitemobs.testing.CombatSimulator;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Leviathan's Wrath (COOLDOWN) - Massive AOE water attack with lightning strikes.
@@ -30,9 +31,9 @@ public class LeviathanWrathSkill extends SkillBonus implements CooldownSkill {
     private static final double BASE_DAMAGE_MULTIPLIER = 2.0;
 
     // Track cooldowns: PlayerUUID -> Cooldown end time
-    private static final Map<UUID, Long> cooldownMap = new HashMap<>();
+    private static final Map<UUID, Long> cooldownMap = new ConcurrentHashMap<>();
     // Track which players have this skill active
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public LeviathanWrathSkill() {
         super(SkillType.TRIDENTS, 75, "Leviathan's Wrath",
@@ -93,13 +94,15 @@ public class LeviathanWrathSkill extends SkillBonus implements CooldownSkill {
         target.getWorld().spawnParticle(Particle.SPLASH, target.getLocation(), 200, 3, 2, 3, 0.5);
         target.getWorld().playSound(target.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, 1.0f, 0.5f);
 
-        // Strike lightning at multiple points
-        for (int i = 0; i < 3; i++) {
-            target.getWorld().strikeLightningEffect(target.getLocation().add(
-                    (Math.random() - 0.5) * AOE_RADIUS,
-                    0,
-                    (Math.random() - 0.5) * AOE_RADIUS
-            ));
+        // Strike lightning at multiple points (suppress during testing to avoid entity spam)
+        if (!CombatSimulator.isTestingActive()) {
+            for (int i = 0; i < 3; i++) {
+                target.getWorld().strikeLightningEffect(target.getLocation().add(
+                        (Math.random() - 0.5) * AOE_RADIUS,
+                        0,
+                        (Math.random() - 0.5) * AOE_RADIUS
+                ));
+            }
         }
 
         // Massive damage to all nearby enemies
@@ -113,9 +116,6 @@ public class LeviathanWrathSkill extends SkillBonus implements CooldownSkill {
         } finally {
             EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = false;
         }
-
-        // Send feedback to player
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("§5LEVIATHAN'S WRATH!"));
     }
 
     private double calculateDamageMultiplier(int skillLevel) {
@@ -160,12 +160,11 @@ public class LeviathanWrathSkill extends SkillBonus implements CooldownSkill {
     public List<String> getLoreDescription(int skillLevel) {
         long cooldown = getCooldownSeconds(skillLevel);
         double damageMultiplier = calculateDamageMultiplier(skillLevel);
-        return List.of(
-                "&7Cooldown: &f" + cooldown + "s",
-                "&7Damage Multiplier: &f" + String.format("%.1f", damageMultiplier) + "x",
-                "&7Radius: &f" + AOE_RADIUS + " blocks",
-                "&7Lightning strikes + AOE damage"
-        );
+        return applyLoreTemplates(Map.of(
+                "cooldown", String.valueOf(cooldown),
+                "multiplier", String.format("%.1f", damageMultiplier),
+                "radius", String.valueOf(AOE_RADIUS)
+        ));
     }
 
     @Override
@@ -175,7 +174,9 @@ public class LeviathanWrathSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("%.1fx AOE Damage", calculateDamageMultiplier(skillLevel));
+        return applyFormattedBonusTemplate(Map.of(
+                "multiplier", String.format("%.1f", calculateDamageMultiplier(skillLevel))
+        ));
     }
 
     @Override

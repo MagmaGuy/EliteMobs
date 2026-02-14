@@ -12,5 +12,11 @@ public class SwordsLacerateConfig extends SkillBonusConfigFields {
         super("swords_lacerate.yml", true, "&cLacerate",
               List.of("&7Attacks have a chance to cause", "&7bleeding, dealing damage over time."),
               SkillType.SWORDS, SkillBonusType.PROC, 1, 2.0, 0.1, Material.REDSTONE);
+        this.loreTemplates = List.of(
+                "&7Chance: &f$procChance%",
+                "&7Bleed: &f$bleedPercent% of hit/tick",
+                "&7Total DoT: &f$totalPercent% over 5s"
+        );
+        this.formattedBonusTemplate = "$totalPercent% bleed over 5s";
     }
 }

@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.skills.bonuses.skills.maces;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
@@ -15,7 +16,11 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Avatar of Judgment (COOLDOWN) - Massive damage boost with visual effects for 10 seconds.
@@ -28,9 +33,9 @@ public class AvatarOfJudgmentSkill extends SkillBonus implements CooldownSkill {
     private static final int BUFF_DURATION_TICKS = 200; // 10 seconds
     private static final double BASE_DAMAGE_BOOST = 2.0; // 200% damage
 
-    private static final Map<UUID, Long> cooldowns = new HashMap<>();
-    private static final Set<UUID> activePlayers = new HashSet<>();
-    private static final Set<UUID> buffedPlayers = new HashSet<>();
+    private static final Map<UUID, Long> cooldowns = new ConcurrentHashMap<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
+    private static final Set<UUID> buffedPlayers = ConcurrentHashMap.newKeySet();
 
     public AvatarOfJudgmentSkill() {
         super(SkillType.MACES, 75, "Avatar of Judgment",
@@ -99,9 +104,6 @@ public class AvatarOfJudgmentSkill extends SkillBonus implements CooldownSkill {
         player.getWorld().spawnParticle(Particle.END_ROD,
             player.getLocation().add(0, 1, 0), 100, 1, 1, 1, 0.3);
 
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-            TextComponent.fromLegacyText("\u00A7e\u00A7l\u2728 AVATAR OF JUDGMENT! \u2728"));
-
         // Particle aura while active
         new BukkitRunnable() {
             int ticksRemaining = BUFF_DURATION_TICKS;
@@ -112,7 +114,7 @@ public class AvatarOfJudgmentSkill extends SkillBonus implements CooldownSkill {
                     buffedPlayers.remove(player.getUniqueId());
                     if (player.isOnline()) {
                         player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                            TextComponent.fromLegacyText("\u00A77Avatar fades..."));
+                            TextComponent.fromLegacyText(DungeonsConfig.getAvatarFadesMessage()));
                     }
                     cancel();
                     return;
@@ -180,12 +182,16 @@ public class AvatarOfJudgmentSkill extends SkillBonus implements CooldownSkill {
     }
 
     @Override
+    public boolean affectsDamage() {
+        return false; // Avatar triggers as a side effect; damage boost is applied via hasAvatarBuff() check
+    }
+
+    @Override
     public List<String> getLoreDescription(int skillLevel) {
-        return List.of(
-            "&7Damage Boost: &f+" + String.format("%.0f", (getDamageBoost(skillLevel) - 1) * 100) + "%",
-            "&7Duration: &f10 seconds",
-            "&7Cooldown: &f" + getCooldownSeconds(skillLevel) + "s"
-        );
+        return applyLoreTemplates(Map.of(
+                "damageBoost", String.format("%.0f", (getDamageBoost(skillLevel) - 1) * 100),
+                "cooldown", String.valueOf(getCooldownSeconds(skillLevel))
+        ));
     }
 
     @Override
@@ -195,7 +201,10 @@ public class AvatarOfJudgmentSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("+%.0f%% for 10s (CD: %ds)", (getDamageBoost(skillLevel) - 1) * 100, getCooldownSeconds(skillLevel));
+        return applyFormattedBonusTemplate(Map.of(
+                "damageBoost", String.format("%.0f", (getDamageBoost(skillLevel) - 1) * 100),
+                "cooldown", String.valueOf(getCooldownSeconds(skillLevel))
+        ));
     }
 
     @Override

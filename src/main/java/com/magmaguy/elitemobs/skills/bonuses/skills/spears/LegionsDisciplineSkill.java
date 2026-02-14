@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.skills.bonuses.skills.spears;
 
+import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
@@ -10,12 +11,11 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Legion's Discipline (STACKING) - Consecutive hits increase damage. Resets on miss.
@@ -27,8 +27,8 @@ public class LegionsDisciplineSkill extends SkillBonus implements StackingSkill 
     private static final int BASE_MAX_STACKS = 10;
     private static final double BASE_STACK_BONUS = 0.03; // 3% per stack
 
-    private static final Map<UUID, Integer> playerStacks = new HashMap<>();
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Map<UUID, Integer> playerStacks = new ConcurrentHashMap<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public LegionsDisciplineSkill() {
         super(SkillType.SPEARS, 50, "Legion's Discipline",
@@ -42,7 +42,7 @@ public class LegionsDisciplineSkill extends SkillBonus implements StackingSkill 
     }
 
     public int getMaxStacks(int skillLevel) {
-        return BASE_MAX_STACKS + (skillLevel / 15);
+        return BASE_MAX_STACKS;
     }
 
     @Override
@@ -68,12 +68,6 @@ public class LegionsDisciplineSkill extends SkillBonus implements StackingSkill 
                 player.getLocation().add(0, 1, 0), 2, 0.2, 0.2, 0.2, 0);
         }
 
-        // Show stacks to player
-        int stacks = getCurrentStacks(player);
-        StringBuilder discipline = new StringBuilder("\u00A7b");
-        for (int i = 0; i < Math.min(stacks, 10); i++) discipline.append("|");
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-            TextComponent.fromLegacyText(discipline + " \u00A73Discipline x" + stacks));
     }
 
     @Override
@@ -82,7 +76,7 @@ public class LegionsDisciplineSkill extends SkillBonus implements StackingSkill 
         if (current > 0) {
             playerStacks.remove(player.getUniqueId());
             player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                TextComponent.fromLegacyText("\u00A77Discipline broken..."));
+                TextComponent.fromLegacyText(DungeonsConfig.getLegionsDisciplineBrokenMessage()));
         }
     }
 
@@ -129,12 +123,10 @@ public class LegionsDisciplineSkill extends SkillBonus implements StackingSkill 
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        return List.of(
-            "&7Max Stacks: &f" + getMaxStacks(skillLevel),
-            "&7Damage/Stack: &f+" + String.format("%.1f", getBonusPerStack(skillLevel) * 100) + "%",
-            "&7Max Bonus: &f+" + String.format("%.0f", getMaxStacks(skillLevel) * getBonusPerStack(skillLevel) * 100) + "%",
-            "&7Resets on miss"
-        );
+        return applyLoreTemplates(Map.of(
+                "maxStacks", String.valueOf(getMaxStacks(skillLevel)),
+                "perStack", String.format("%.1f", getBonusPerStack(skillLevel) * 100),
+                "maxBonus", String.format("%.0f", getMaxStacks(skillLevel) * getBonusPerStack(skillLevel) * 100)));
     }
 
     @Override
@@ -144,7 +136,8 @@ public class LegionsDisciplineSkill extends SkillBonus implements StackingSkill 
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("+%.0f%% Max (Discipline)", getBonusValue(skillLevel) * 100);
+        return applyFormattedBonusTemplate(Map.of(
+                "maxBonus", String.format("%.0f", getBonusValue(skillLevel) * 100)));
     }
 
     @Override

@@ -19,15 +19,15 @@ public class CustomBossesConfig extends CustomConfig {
                 CustomBossesConfigFields customBossesConfigFields = (CustomBossesConfigFields) super.getCustomConfigFieldsHashMap().get(key);
                 customBosses.put(key, customBossesConfigFields);
             }
-        //This one initializes mobs, which require all mobs to be initialized for phases / reinforcements
+    }
+
+    public static void initializeBosses() {
         for (CustomBossesConfigFields customBossesConfigFields : customBosses.values()) {
             if (customBossesConfigFields.isRegionalBoss()) {
                 //Instanced regional bosses don't actually get initialized alongside normal Regional Bosses
                 if (customBossesConfigFields.isInstanced()) {
                     //Initialize the regional bosses in the world
                     List<String> locations = customBossesConfigFields.processStringList("spawnLocations", customBossesConfigFields.getSpawnLocations(), customBossesConfigFields.getSpawnLocations(), false);
-//                    if (locations.isEmpty() && !customBossesConfigFields.isRemoveAfterDeath())
-//                        Logger.info(customBossesConfigFields.getFilename() + " does not have a set location yet! It will not spawn. Did you install its minidungeon?");
                     for (String string : locations)
                         InstancedBossEntity.add(string, customBossesConfigFields);
                     continue;
@@ -38,8 +38,6 @@ public class CustomBossesConfig extends CustomConfig {
                 if (!customBossesConfigFields.isReinforcement()) {
                     //Initialize the regional bosses in the world
                     List<String> locations = customBossesConfigFields.processStringList("spawnLocations", customBossesConfigFields.getSpawnLocations(), customBossesConfigFields.getSpawnLocations(), false);
-//                    if (locations.isEmpty() && !customBossesConfigFields.isRemoveAfterDeath())
-//                        Logger.info(customBossesConfigFields.getFilename() + " does not have a set location yet! It will not spawn. Did you install its minidungeon?");
                     for (String string : locations)
                         new RegionalBossEntity(customBossesConfigFields, string).initialize();
                 }

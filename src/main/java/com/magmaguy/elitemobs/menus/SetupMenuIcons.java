@@ -26,7 +26,7 @@ public class SetupMenuIcons {
     public static final String MODEL_CHECKMARK = "elitemobs:ui/checkmark";
 
     /** Installed & deactivated */
-    public static final String MODEL_GRAY_X = "elitemobs:ui/grayX";
+    public static final String MODEL_GRAY_X = "elitemobs:ui/gray_x";
 
     /** Installed, has update, not linked */
     public static final String MODEL_UPDATE_UNLINKED = "elitemobs:ui/updateunlinked";
@@ -36,6 +36,12 @@ public class SetupMenuIcons {
 
     /** Installed, has update, can click to update */
     public static final String MODEL_UPDATE = "elitemobs:ui/update";
+
+    /** Red cross: no Nightbreak token linked */
+    public static final String MODEL_RED_CROSS = "elitemobs:ui/redcross";
+
+    /** Yellow crown: content available to download, or updates pending */
+    public static final String MODEL_CROWN_YELLOW = "elitemobs:ui/yellowcrown";
 
     /**
      * Applies a custom item model to an ItemStack for setup menu display.

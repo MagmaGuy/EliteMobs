@@ -13,7 +13,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -68,7 +67,7 @@ public class SlotMachineGame {
         SlotSession session = new SlotSession(player.getUniqueId(), betAmount);
         activeSessions.put(player.getUniqueId(), session);
 
-        String title = ChatColorConverter.convert(GamblingConfig.getSlotsMenuTitle());
+        String title = GamblingConfig.getSlotsMenuTitle();
         Inventory inventory = Bukkit.createInventory(player, 36, title);
 
         setupInitialDisplay(inventory, session);
@@ -109,7 +108,7 @@ public class SlotMachineGame {
         // Payline indicators
         ItemStack paylineIndicator = ItemStackGenerator.generateItemStack(
                 Material.YELLOW_STAINED_GLASS_PANE,
-                ChatColorConverter.convert("&e>>> PAYLINE >>>"),
+                GamblingConfig.getSlotsPaylineLabel(),
                 List.of(),
                 1
         );
@@ -124,11 +123,11 @@ public class SlotMachineGame {
         // Spin button
         ItemStack spinButton = ItemStackGenerator.generateItemStack(
                 Material.LIME_CONCRETE,
-                ChatColorConverter.convert("&a&lSPIN!"),
+                GamblingConfig.getSlotsSpinButtonText(),
                 List.of(
                         "",
-                        ChatColorConverter.convert("&7Click to spin the reels!"),
-                        ChatColorConverter.convert("&7Bet: &6" + session.betAmount + " coins")
+                        GamblingConfig.getSlotsSpinClickLore(),
+                        GamblingConfig.getSlotsSpinBetLore() + session.betAmount + " " + GamblingConfig.getGamblingCurrencyWord()
                 ),
                 1
         );
@@ -137,11 +136,11 @@ public class SlotMachineGame {
         // Bet info
         ItemStack betInfo = ItemStackGenerator.generateItemStack(
                 Material.EMERALD,
-                ChatColorConverter.convert("&aBet: " + session.betAmount + " coins"),
+                GamblingConfig.getSlotsBetLabel() + session.betAmount + " " + GamblingConfig.getGamblingCurrencyWord(),
                 List.of(
                         "",
-                        ChatColorConverter.convert("&7Match 3 symbols to win!"),
-                        ChatColorConverter.convert("&7Match 2 symbols for a small return")
+                        GamblingConfig.getSlotsMatch3Lore(),
+                        GamblingConfig.getSlotsMatch2Lore()
                 ),
                 1
         );
@@ -150,7 +149,7 @@ public class SlotMachineGame {
         // Payout info - shows rarity-based payouts
         List<String> payoutLore = new ArrayList<>();
         payoutLore.add("");
-        payoutLore.add(ChatColorConverter.convert("&6&lPAYOUTS &7(Rarer = Higher!)"));
+        payoutLore.add(GamblingConfig.getSlotsPayoutsTitle());
         payoutLore.add("");
         for (Symbol symbol : Symbol.values()) {
             String rarity = symbol.getChancePercent() >= 20 ? "&7" :
@@ -158,14 +157,14 @@ public class SlotMachineGame {
                            symbol.getChancePercent() >= 5 ? "&6" : "&b";
             String multiplier = String.format("%.1f", symbol.getPayoutMultiplier());
             String twoMatch = String.format("%.2f", symbol.getPayoutMultiplier() * 0.25);
-            payoutLore.add(ChatColorConverter.convert(symbol.displayName + "&7: &a" + multiplier + "x &8(2x: " + twoMatch + "x)"));
+            payoutLore.add(ChatColorConverter.convert(GamblingConfig.getSlotsPayoutSymbolFormat().replace("$symbol", symbol.displayName).replace("$multiplier", multiplier).replace("$twoMatch", twoMatch)));
         }
         payoutLore.add("");
-        payoutLore.add(ChatColorConverter.convert("&8Chance shown as rarity colors"));
+        payoutLore.add(GamblingConfig.getSlotsChanceRarityNote());
 
         ItemStack payoutInfo = ItemStackGenerator.generateItemStack(
                 Material.BOOK,
-                ChatColorConverter.convert("&6Payout Table"),
+                GamblingConfig.getSlotsPayoutTableTitle(),
                 payoutLore,
                 1
         );
@@ -219,10 +218,8 @@ public class SlotMachineGame {
         session.winAmount = payout;
         session.playerWon = payout > 0;
 
-        // STEP 3: Award winnings BEFORE animation (safety-first)
-        if (payout > 0) {
-            GamblingEconomyHandler.awardWinnings(player.getUniqueId(), payout);
-        }
+        // STEP 3: Resolve outcome BEFORE animation (safety-first)
+        session.winAmount = GamblingEconomyHandler.resolveOutcome(player.getUniqueId(), payout);
 
         // STEP 4: Disable spin button
         disableSpinButton(inventory);
@@ -267,7 +264,7 @@ public class SlotMachineGame {
     private static void disableSpinButton(Inventory inventory) {
         ItemStack disabled = ItemStackGenerator.generateItemStack(
                 Material.GRAY_CONCRETE,
-                ChatColorConverter.convert("&7Spinning..."),
+                GamblingConfig.getSlotsSpinning(),
                 List.of(),
                 1
         );
@@ -367,17 +364,17 @@ public class SlotMachineGame {
             float pitch;
 
             if (isJackpot) {
-                resultTitle = "&6&l✦ JACKPOT! ✦";
+                resultTitle = GamblingConfig.getSlotsJackpotTitle();
                 resultMaterial = Material.DIAMOND_BLOCK;
                 resultSound = Sound.UI_TOAST_CHALLENGE_COMPLETE;
                 pitch = 1.0f;
             } else if (isThreeMatch) {
-                resultTitle = "&a&lBIG WIN!";
+                resultTitle = GamblingConfig.getSlotsBigWinTitle();
                 resultMaterial = Material.EMERALD_BLOCK;
                 resultSound = Sound.ENTITY_PLAYER_LEVELUP;
                 pitch = 1.2f;
             } else {
-                resultTitle = "&e&lSmall Win!";
+                resultTitle = GamblingConfig.getSlotsSmallWinTitle();
                 resultMaterial = Material.GOLD_BLOCK;
                 resultSound = Sound.ENTITY_EXPERIENCE_ORB_PICKUP;
                 pitch = 1.5f;
@@ -385,40 +382,36 @@ public class SlotMachineGame {
 
             ItemStack resultItem = ItemStackGenerator.generateItemStack(
                     resultMaterial,
-                    ChatColorConverter.convert(resultTitle),
+                    resultTitle,
                     List.of(
                             "",
-                            ChatColorConverter.convert("&7You won &a" + String.format("%.2f", payout) + " coins&7!"),
+                            ChatColorConverter.convert(GamblingConfig.getSlotsWonPrefix() + String.format("%.2f", payout) + " " + GamblingConfig.getGamblingCurrencyWord() + "&7!"),
                             "",
-                            ChatColorConverter.convert("&eClose to continue")
+                            GamblingConfig.getSlotsCloseToContinue()
                     ),
                     1
             );
             inventory.setItem(SPIN_BUTTON_SLOT, resultItem);
 
             player.playSound(player.getLocation(), resultSound, 1.0f, pitch);
-            player.sendMessage(ChatColorConverter.convert(
-                    GamblingConfig.getWinMessage().replace("%amount%", String.format("%.2f", payout))
-            ));
+            GamblingDisplay.sendWinMessage(player, payout);
         } else {
             // Loss
             ItemStack loseItem = ItemStackGenerator.generateItemStack(
                     Material.REDSTONE_BLOCK,
-                    ChatColorConverter.convert("&c&lNo Match"),
+                    GamblingConfig.getSlotsNoMatchTitle(),
                     List.of(
                             "",
-                            ChatColorConverter.convert("&7You lost &c" + session.betAmount + " coins&7."),
+                            ChatColorConverter.convert(GamblingConfig.getSlotsLostPrefix() + session.betAmount + " " + GamblingConfig.getGamblingCurrencyWord() + "&7."),
                             "",
-                            ChatColorConverter.convert("&eClose to continue")
+                            GamblingConfig.getSlotsCloseToContinue()
                     ),
                     1
             );
             inventory.setItem(SPIN_BUTTON_SLOT, loseItem);
 
-            player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
-            player.sendMessage(ChatColorConverter.convert(
-                    GamblingConfig.getLoseMessage().replace("%amount%", String.valueOf(session.betAmount))
-            ));
+            GamblingDisplay.playLoseSound(player);
+            GamblingDisplay.sendLoseMessage(player, session.betAmount);
         }
     }
 
@@ -477,9 +470,7 @@ public class SlotMachineGame {
     /**
      * Stores game session data.
      */
-    private static class SlotSession {
-        final UUID playerUUID;
-        final int betAmount;
+    private static class SlotSession extends GamblingSession {
         Symbol[] results;
         boolean isSpinning = false;
         boolean playerWon = false;
@@ -487,8 +478,7 @@ public class SlotMachineGame {
         boolean gameOver = false;
 
         SlotSession(UUID playerUUID, int betAmount) {
-            this.playerUUID = playerUUID;
-            this.betAmount = betAmount;
+            super(playerUUID, betAmount);
         }
     }
 
@@ -500,14 +490,8 @@ public class SlotMachineGame {
 
         @EventHandler
         public void onClick(InventoryClickEvent event) {
-            if (!menus.contains(event.getInventory())) return;
-            if (event.getClickedInventory() == null || !event.getClickedInventory().getType().equals(InventoryType.CHEST)) {
-                event.setCancelled(true);
-                return;
-            }
-            event.setCancelled(true);
-
-            if (!(event.getWhoClicked() instanceof Player player)) return;
+            Player player = GamblingDisplay.validateClick(event, menus);
+            if (player == null) return;
 
             SlotSession session = activeSessions.get(player.getUniqueId());
             if (session == null || session.isSpinning) return;
@@ -519,8 +503,13 @@ public class SlotMachineGame {
 
         @EventHandler
         public void onClose(InventoryCloseEvent event) {
-            menus.remove(event.getInventory());
-            activeSessions.remove(event.getPlayer().getUniqueId());
+            if (!menus.remove(event.getInventory())) return;
+            SlotSession session = activeSessions.remove(event.getPlayer().getUniqueId());
+            if (session == null) return;
+            // If player closed without spinning, forfeit the bet
+            if (!session.isSpinning && !session.gameOver) {
+                GamblingEconomyHandler.resolveOutcome(event.getPlayer().getUniqueId(), 0);
+            }
         }
     }
 }

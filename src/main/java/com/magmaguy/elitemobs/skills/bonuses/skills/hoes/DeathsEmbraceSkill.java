@@ -4,13 +4,15 @@ import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.CooldownSkill;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Death's Embrace (COOLDOWN) - Cheat death once per cooldown.
@@ -24,8 +26,8 @@ public class DeathsEmbraceSkill extends SkillBonus implements CooldownSkill {
     private static final double HEAL_PERCENT = 0.20; // Heal to 20% HP
     private static final double BASE_PASSIVE_BONUS = 0.05; // 5% passive damage
 
-    private static final Map<UUID, Long> cooldowns = new HashMap<>();
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Map<UUID, Long> cooldowns = new ConcurrentHashMap<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public DeathsEmbraceSkill() {
         super(SkillType.HOES, 75, "Death's Embrace",
@@ -79,6 +81,10 @@ public class DeathsEmbraceSkill extends SkillBonus implements CooldownSkill {
     public static boolean preventDeath(Player player) {
         if (!activePlayers.contains(player.getUniqueId())) return false;
 
+        // Only works when holding a hoe
+        String mainHandName = player.getInventory().getItemInMainHand().getType().name();
+        if (!mainHandName.endsWith("_HOE")) return false;
+
         // Get the instance from registry
         SkillBonus skill = com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry.getSkillById(SKILL_ID);
         if (!(skill instanceof DeathsEmbraceSkill deathsEmbrace)) return false;
@@ -99,11 +105,9 @@ public class DeathsEmbraceSkill extends SkillBonus implements CooldownSkill {
         player.getWorld().playSound(player.getLocation(),
             Sound.ENTITY_WITHER_SPAWN, 0.5f, 1.5f);
 
-        // Feedback
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("§5Death's Embrace saved you!"));
-
         // Start cooldown
         deathsEmbrace.startCooldown(player, skillLevel);
+        deathsEmbrace.incrementProcCount(player);
 
         return true;
     }
@@ -145,15 +149,11 @@ public class DeathsEmbraceSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        long cooldown = getCooldownSeconds(skillLevel);
-        double healPercent = HEAL_PERCENT * 100;
-        double passiveBonus = getPassiveDamageBonus(skillLevel) * 100;
-        return List.of(
-                "&7Prevents fatal damage",
-                "&7Heals to: &f" + String.format("%.0f", healPercent) + "% HP",
-                "&7Passive Bonus: &f+" + String.format("%.1f", passiveBonus) + "% damage",
-                "&7Cooldown: &f" + cooldown + " seconds"
-        );
+        return applyLoreTemplates(Map.of(
+                "healPercent", String.format("%.0f", HEAL_PERCENT * 100),
+                "passiveBonus", String.format("%.1f", getPassiveDamageBonus(skillLevel) * 100),
+                "cooldown", String.valueOf(getCooldownSeconds(skillLevel))
+        ));
     }
 
     @Override
@@ -163,7 +163,14 @@ public class DeathsEmbraceSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("+%.1f%% Damage & Death Prevention", getPassiveDamageBonus(skillLevel) * 100);
+        return applyFormattedBonusTemplate(Map.of(
+                "passiveBonus", String.format("%.1f", getPassiveDamageBonus(skillLevel) * 100)
+        ));
+    }
+
+    @Override
+    public boolean affectsDamage() {
+        return false; // Death prevention skill - doesn't modify offensive damage
     }
 
     @Override

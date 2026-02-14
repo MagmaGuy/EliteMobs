@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.gambling;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.GamblingConfig;
 import com.magmaguy.elitemobs.economy.GamblingEconomyHandler;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
@@ -98,7 +99,7 @@ public class GamblingDenOwnerDisplay {
      * @return The formatted text
      */
     private static String getDisplayText() {
-        return ChatColorConverter.convert("&6House Earnings: " + GamblingEconomyHandler.getFormattedHouseEarnings());
+        return ChatColorConverter.convert(GamblingConfig.getHouseEarningsLabel() + GamblingEconomyHandler.getFormattedHouseEarnings());
     }
 
     /**

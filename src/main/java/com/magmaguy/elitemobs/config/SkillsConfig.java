@@ -30,6 +30,12 @@ public class SkillsConfig extends ConfigurationFile {
     private static boolean showCombatLevelDisplay;
     @Getter
     private static boolean showXPBar;
+    @Getter
+    private static String skillBarTitleFormat;
+    @Getter
+    private static String skillLevelUpTitleFormat;
+    @Getter
+    private static String combatLevelFormat;
 
     public SkillsConfig() {
         super("skills.yml");
@@ -83,5 +89,17 @@ public class SkillsConfig extends ConfigurationFile {
                 List.of("Whether to show an animated XP progress bar when gaining skill XP.",
                         "The bar shows level progress and plays effects on level up."),
                 fileConfiguration, "showXPBar", true);
+        skillBarTitleFormat = ConfigurationEngine.setString(
+                List.of("Format for the skill XP bar title.",
+                        "Use $skillName for the skill name, $level for the level, $xpText for the XP gained text."),
+                file, fileConfiguration, "skillBarTitleFormat", "&6$skillName &7Lv.$level$xpText", true);
+        skillLevelUpTitleFormat = ConfigurationEngine.setString(
+                List.of("Format for the skill level up boss bar title.",
+                        "Use $skillName for the skill name, $level for the new level."),
+                file, fileConfiguration, "skillLevelUpTitleFormat", "&e&l\u2726 $skillName LEVEL UP! &7\u2192 &eLv.$level &e&l\u2726", true);
+        combatLevelFormat = ConfigurationEngine.setString(
+                List.of("Format for displaying the combat level.",
+                        "Use $level for the combat level number."),
+                file, fileConfiguration, "combatLevelFormat", "&6&lCombat Lv. $level", true);
     }
 }

@@ -12,10 +12,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Stagger (PROC) - Chance to stagger enemies, slowing and weakening them.
@@ -27,7 +28,7 @@ public class StaggerSkill extends SkillBonus implements ProcSkill {
     private static final double BASE_PROC_CHANCE = 0.12;
     private static final int STAGGER_DURATION = 40; // 2 seconds
 
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public StaggerSkill() {
         super(SkillType.AXES, 25, "Stagger",
@@ -72,17 +73,15 @@ public class StaggerSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        return List.of(
-                "&7Proc Chance: &f" + String.format("%.1f", getProcChance(skillLevel) * 100) + "%",
-                "&7Effect: &fSlowness + Weakness",
-                "&7Duration: &f2 seconds"
-        );
+        return applyLoreTemplates(Map.of(
+                "procChance", String.format("%.1f", getProcChance(skillLevel) * 100)
+        ));
     }
 
     @Override
     public double getBonusValue(int skillLevel) { return getProcChance(skillLevel); }
     @Override
-    public String getFormattedBonus(int skillLevel) { return String.format("%.1f%% Stagger Chance", getProcChance(skillLevel) * 100); }
+    public String getFormattedBonus(int skillLevel) { return applyFormattedBonusTemplate(Map.of("procChance", String.format("%.1f", getProcChance(skillLevel) * 100))); }
     @Override
     public boolean affectsDamage() { return false; } // Applies debuffs, not damage
     @Override

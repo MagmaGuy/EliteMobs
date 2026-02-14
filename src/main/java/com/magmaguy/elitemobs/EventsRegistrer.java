@@ -49,6 +49,7 @@ import com.magmaguy.elitemobs.powers.specialpowers.EnderCrystalLightningRod;
 import com.magmaguy.elitemobs.powerstances.EffectEventHandlers;
 import com.magmaguy.elitemobs.powerstances.VisualEffectObfuscator;
 import com.magmaguy.elitemobs.quests.CustomQuest;
+import com.magmaguy.elitemobs.quests.QuestLockoutHandler;
 import com.magmaguy.elitemobs.quests.QuestTracking;
 import com.magmaguy.elitemobs.quests.menus.QuestInventoryMenu;
 import com.magmaguy.elitemobs.quests.objectives.ArenaObjective;
@@ -119,6 +120,7 @@ public class EventsRegistrer {
         register(new FixPlayerOnLoginOrRespawn());
         register(new EnvironmentalDungeonDamage());
         register(new PlayerQuitCleanup());
+        register(new com.magmaguy.elitemobs.wormhole.WormholePlayerListener());
 
         //Mob damage
         register(new EliteMobGenericDamagedHandler());
@@ -379,6 +381,7 @@ public class EventsRegistrer {
         }
         register(new DungeonProtector());
         register(new DungeonBossLockoutHandler());
+        register(new QuestLockoutHandler());
 
         register(new EntityTransformHandler());
         register(new EliteBlazeWaterDamagePrevention());

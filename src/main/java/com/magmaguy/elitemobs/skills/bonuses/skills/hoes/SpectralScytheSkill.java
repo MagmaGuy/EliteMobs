@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.skills.bonuses.skills.hoes;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
+import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
@@ -17,6 +18,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Spectral Scythe (COOLDOWN) - Launch a spectral projectile that damages enemies in its path.
@@ -28,10 +30,10 @@ public class SpectralScytheSkill extends SkillBonus implements CooldownSkill {
     public static final String SKILL_ID = "hoes_spectral_scythe";
     private static final long BASE_COOLDOWN = 25; // 25 seconds
     private static final double PROJECTILE_RANGE = 10.0;
-    private static final double BASE_DAMAGE_MULTIPLIER = 2.0; // 200% of weapon damage
+    private static final double BASE_DAMAGE_MULTIPLIER = 1.0; // 100% of weapon damage
 
-    private static final Map<UUID, Long> cooldowns = new HashMap<>();
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Map<UUID, Long> cooldowns = new ConcurrentHashMap<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public SpectralScytheSkill() {
         super(SkillType.HOES, 75, "Spectral Scythe",
@@ -82,7 +84,7 @@ public class SpectralScytheSkill extends SkillBonus implements CooldownSkill {
     public void onActivate(Player player, Object event) {
         if (isOnCooldown(player)) {
             long remaining = getRemainingCooldown(player);
-            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("§cSpectral Scythe on cooldown: " + remaining + "s"));
+            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(DungeonsConfig.getSpectralScytheCooldownMessage().replace("$time", String.valueOf(remaining))));
             return;
         }
 
@@ -142,8 +144,8 @@ public class SpectralScytheSkill extends SkillBonus implements CooldownSkill {
         if (configFields != null) {
             return configFields.calculateValue(skillLevel);
         }
-        // Base 200% + 5% per level
-        return BASE_DAMAGE_MULTIPLIER + (skillLevel * 0.05);
+        // Base 100% + 2% per level
+        return BASE_DAMAGE_MULTIPLIER + (skillLevel * 0.02);
     }
 
     private int getPlayerSkillLevel(Player player) {
@@ -179,14 +181,11 @@ public class SpectralScytheSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        long cooldown = getCooldownSeconds(skillLevel);
-        double damagePercent = calculateDamage(skillLevel) * 100;
-        return List.of(
-                "&7Damage: &f" + String.format("%.0f", damagePercent) + "% weapon damage",
-                "&7Range: &f" + String.format("%.1f", PROJECTILE_RANGE) + " blocks",
-                "&7Cooldown: &f" + cooldown + " seconds",
-                "&7Pierces through enemies"
-        );
+        return applyLoreTemplates(Map.of(
+                "damagePercent", String.format("%.0f", calculateDamage(skillLevel) * 100),
+                "range", String.format("%.1f", PROJECTILE_RANGE),
+                "cooldown", String.valueOf(getCooldownSeconds(skillLevel))
+        ));
     }
 
     @Override
@@ -196,7 +195,9 @@ public class SpectralScytheSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("%.0f%% Projectile Damage", calculateDamage(skillLevel) * 100);
+        return applyFormattedBonusTemplate(Map.of(
+                "damagePercent", String.format("%.0f", calculateDamage(skillLevel) * 100)
+        ));
     }
 
     @Override

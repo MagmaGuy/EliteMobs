@@ -50,6 +50,8 @@ public class ItemEnchantmentMenuConfig extends MenusConfigFields {
     private static ItemStack luckyTicketInfoButton;
     @Getter
     private static String enchantmentLimitMessage;
+    @Getter
+    private static String missingItemsMessage;
 
 
     public ItemEnchantmentMenuConfig() {
@@ -148,6 +150,13 @@ public class ItemEnchantmentMenuConfig extends MenusConfigFields {
                 fileConfiguration,
                 "enchantmentLimitMessage",
                 "&c[EliteMobs] Can't enchant item beyond enchantment limit!",
+                true);
+        missingItemsMessage = ConfigurationEngine.setString(
+                List.of("Sets the message that appears when a player tries to enchant without adding both an elite item and an enchanted book."),
+                file,
+                fileConfiguration,
+                "missingItemsMessage",
+                "&8[EliteMobs] &cYou must add an elite item and an enchanted book to enchant an item!",
                 true);
     }
 }

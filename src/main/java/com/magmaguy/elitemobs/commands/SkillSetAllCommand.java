@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.commands;
 
+import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.skills.ArmorSkillHealthBonus;
 import com.magmaguy.elitemobs.skills.CombatLevelDisplay;
@@ -33,17 +34,17 @@ public class SkillSetAllCommand extends AdvancedCommand {
 
         Player targetPlayer = Bukkit.getPlayer(playerName);
         if (targetPlayer == null) {
-            Logger.sendMessage(commandData.getCommandSender(), "&cPlayer not found: " + playerName);
+            Logger.sendMessage(commandData.getCommandSender(), CommandMessagesConfig.getSkillPlayerNotFoundMessage().replace("$player", playerName));
             return;
         }
 
         if (level < 1) {
-            Logger.sendMessage(commandData.getCommandSender(), "&cLevel must be at least 1!");
+            Logger.sendMessage(commandData.getCommandSender(), CommandMessagesConfig.getSkillLevelMinMessage());
             return;
         }
 
         if (level > 100) {
-            Logger.sendMessage(commandData.getCommandSender(), "&eWarning: Level " + level + " is above the soft cap of 100.");
+            Logger.sendMessage(commandData.getCommandSender(), CommandMessagesConfig.getSkillLevelWarningMessage().replace("$level", String.valueOf(level)));
         }
 
         // Calculate the XP needed for the target level
@@ -61,6 +62,9 @@ public class SkillSetAllCommand extends AdvancedCommand {
         ArmorSkillHealthBonus.updateHealthBonus(targetPlayer);
 
         Logger.sendMessage(commandData.getCommandSender(),
-                "&aSet all of " + targetPlayer.getName() + "'s skills to level " + level);
+                CommandMessagesConfig.getSkillSetAllSuccessMessage()
+                        .replace("$player", targetPlayer.getName())
+                        .replace("$level", String.valueOf(level))
+                        .replace("$xp", String.valueOf(targetXP)));
     }
 }

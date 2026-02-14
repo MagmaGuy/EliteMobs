@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.commands.guild.AdventurersGuildCommand;
+import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.menus.EliteScrollMenu;
 import com.magmaguy.magmacore.command.AdvancedCommand;
@@ -22,7 +23,7 @@ public class EliteScrollCommand extends AdvancedCommand {
     @Override
     public void execute(CommandData commandData) {
         if (!ItemSettingsConfig.isUseEliteItemScrolls()) {
-            Logger.sendMessage(commandData.getCommandSender(), "Elite Scrolls are not currently enabled on this server! They should only be used if the server uses an item system other than EliteMobs' built in item system. To enable elite scrolls, an admin has to set them to true in the ~/plugins/EliteMobs/ItemSettings.yml and set useEliteItemScrolls to true.");
+            Logger.sendMessage(commandData.getCommandSender(), CommandMessagesConfig.getEliteScrollConfigMessage());
             return;
         }
         if (!AdventurersGuildCommand.adventurersGuildTeleport(commandData.getPlayerSender()))

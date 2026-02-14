@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.npcs;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.PlayerPreTeleportEvent;
+import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.menus.*;
 import com.magmaguy.elitemobs.menus.gambling.BettingMenu;
@@ -85,7 +86,7 @@ public class NPCInteractions implements Listener {
                 QuestInteractionHandler.processNPCQuests(player, npcEntity);
                 break;
             case BAR:
-                player.sendMessage("[EliteMobs] This feature is coming soon!");
+                player.sendMessage(CommandMessagesConfig.getNpcFeatureComingSoonMessage());
                 break;
             case SELL:
                 if (player.hasPermission("elitemobs.shop.sell.npc"))
@@ -167,9 +168,9 @@ public class NPCInteractions implements Listener {
             case ENHANCER:
             case REFINER:
             case SMELTER:
-                player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &cThis feature has been replaced! This NPC should be removed by an admin as soon as possible."));
+                player.sendMessage(CommandMessagesConfig.getNpcFeatureReplacedMessage());
                 if (player.isOp() || player.hasPermission("elitemobs.*")) {
-                    player.sendMessage(ChatColorConverter.convert("&2To remove this NPC, use the command &6/em remove &2and hit the NPC!"));
+                    player.sendMessage(CommandMessagesConfig.getNpcRemoveInstructions());
                 }
                 break;
             case ENCHANTER:
@@ -247,7 +248,7 @@ public class NPCInteractions implements Listener {
         Player player = event.getPlayer();
         if (player.getInventory().getItemInMainHand().getType().equals(Material.NAME_TAG)) {
             event.setCancelled(true);
-            player.sendMessage("[EliteMobs] You can't rename NPCs using name tags!");
+            player.sendMessage(CommandMessagesConfig.getNpcCannotRenameMessage());
             return;
         }
         event.setCancelled(true);

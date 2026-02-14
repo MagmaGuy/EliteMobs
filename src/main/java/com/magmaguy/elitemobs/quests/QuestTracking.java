@@ -14,7 +14,6 @@ import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.objectives.*;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
 import com.magmaguy.elitemobs.wormhole.Wormhole;
-import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.SpigotMessage;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -72,7 +71,7 @@ public class QuestTracking {
     public static void toggleTracking(Player player, String questID) {
         CustomQuest customQuest = (CustomQuest) PlayerData.getQuest(player.getUniqueId(), questID);
         if (customQuest == null) {
-            player.sendMessage("[EliteMobs] Failed to get a valid quest with that quest ID!");
+            player.sendMessage(QuestsConfig.getQuestTrackingInvalidMessage());
             return;
         }
         toggleTracking(player, customQuest);
@@ -83,7 +82,7 @@ public class QuestTracking {
             playerTrackingQuests.get(player.getUniqueId()).stop();
         } else {
             if (quest == null) {
-                player.sendMessage("[EliteMobs] Failed to get a valid quest with that quest ID!");
+                player.sendMessage(QuestsConfig.getQuestTrackingInvalidMessage());
                 return;
             }
             if (!quest.getCustomQuestsConfigFields().isTrackable()) return;
@@ -355,14 +354,14 @@ public class QuestTracking {
             if (QuestsConfig.isAutoTrackQuestsOnAccept()) {
                 toggleTracking(event.getPlayer(), (CustomQuest) event.getQuest());
                 event.getPlayer().spigot().sendMessage(SpigotMessage.commandHoverMessage(
-                        ChatColorConverter.convert(QuestsConfig.getChatTrackingMessage()),
-                        ChatColorConverter.convert(QuestsConfig.getChatTrackingHover()),
+                        QuestsConfig.getChatTrackingMessage(),
+                        QuestsConfig.getChatTrackingHover(),
                         QuestsConfig.getChatTrackingCommand().replace("$questID", event.getQuest().getQuestID().toString())
                 ));
             } else
                 event.getPlayer().spigot().sendMessage(SpigotMessage.commandHoverMessage(
-                        ChatColorConverter.convert(QuestsConfig.getChatTrackMessage()),
-                        ChatColorConverter.convert(QuestsConfig.getChatTrackHover()),
+                        QuestsConfig.getChatTrackMessage(),
+                        QuestsConfig.getChatTrackHover(),
                         QuestsConfig.getChatTrackCommand().replace("$questID", event.getQuest().getQuestID().toString())
                 ));
         }

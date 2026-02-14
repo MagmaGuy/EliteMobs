@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 
 import java.lang.reflect.Type;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Manages player skill selections.
@@ -25,7 +26,7 @@ public class PlayerSkillSelection {
     private static final Type SELECTION_TYPE = new TypeToken<Map<String, List<String>>>() {}.getType();
 
     // In-memory cache: UUID -> SkillType -> List<SkillId>
-    private static final Map<UUID, Map<SkillType, List<String>>> activeSkills = new HashMap<>();
+    private static final Map<UUID, Map<SkillType, List<String>>> activeSkills = new ConcurrentHashMap<>();
 
     private PlayerSkillSelection() {
         // Static utility class

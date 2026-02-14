@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.quests;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.QuestAcceptEvent;
 import com.magmaguy.elitemobs.api.QuestRewardEvent;
+import com.magmaguy.elitemobs.config.QuestsConfig;
 import com.magmaguy.elitemobs.config.customquests.CustomQuestsConfig;
 import com.magmaguy.elitemobs.config.customquests.CustomQuestsConfigFields;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
@@ -10,7 +11,6 @@ import com.magmaguy.elitemobs.quests.objectives.QuestObjectives;
 import com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldowns;
 import com.magmaguy.elitemobs.quests.rewards.QuestReward;
 import com.magmaguy.elitemobs.utils.EventCaller;
-import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -58,7 +58,7 @@ public class CustomQuest extends Quest {
                 break;
             }
         if (quest == null) {
-            player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &cInvalid quest ID for ID " + questID));
+            player.sendMessage(QuestsConfig.getInvalidQuestIdMessage().replace("$questId", questID));
             return null;
         }
         QuestAcceptEvent questAcceptEvent = new QuestAcceptEvent(player, quest);
@@ -110,6 +110,15 @@ public class CustomQuest extends Quest {
         if (!customQuestsConfigFields.getQuestAcceptPermission().isEmpty() &&
                 !player.hasMetadata(customQuestsConfigFields.getQuestAcceptPermission()))
             return false;
+
+        // Check new lockout system (preferred) - if lockoutMinutes is configured, use the new system
+        if (customQuestsConfigFields.getQuestLockoutMinutes() > 0) {
+            // Only check the new lockout system, ignore old permission-based lockouts
+            return !QuestLockoutHandler.isLockedOut(player, configurationFilename, customQuestsConfigFields.getQuestName());
+        }
+
+        // Legacy permission-based lockout (only used if questLockoutMinutes is not configured)
+        // This preserves backwards compatibility for quests still using the old system
         return customQuestsConfigFields.getQuestLockoutPermission().isEmpty() ||
                 !player.hasMetadata(customQuestsConfigFields.getQuestLockoutPermission());
     }

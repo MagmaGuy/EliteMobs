@@ -1,11 +1,16 @@
 package com.magmaguy.elitemobs.skills.bonuses;
 
+import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.elitemobs.config.skillbonuses.SkillBonusConfigFields;
 import com.magmaguy.elitemobs.skills.SkillType;
+import com.magmaguy.magmacore.util.ChatColorConverter;
 import lombok.Getter;
 import lombok.Setter;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -19,6 +24,19 @@ import java.util.concurrent.ConcurrentHashMap;
  * Skills unlock at different level tiers (10, 25, 50, 75).
  */
 public abstract class SkillBonus {
+
+    /**
+     * Sends a skill trigger action bar message to the player.
+     *
+     * @param player The player to send the message to
+     * @param skill  The skill that triggered
+     */
+    public static void sendSkillActionBar(Player player, SkillBonus skill) {
+        player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
+                TextComponent.fromLegacyText(ChatColorConverter.convert(
+                        DungeonsConfig.getSkillActivationFormat()
+                                .replace("$skillName", skill.getBonusName()))));
+    }
 
     @Getter
     protected final SkillType skillType;
@@ -154,6 +172,43 @@ public abstract class SkillBonus {
     }
 
     /**
+     * Sends a stacking skill action bar message showing current stack count.
+     *
+     * @param player        The player to send the message to
+     * @param skill         The stacking skill
+     * @param currentStacks Current number of stacks
+     * @param maxStacks     Maximum number of stacks
+     */
+    public static void sendStackingSkillActionBar(Player player, SkillBonus skill, int currentStacks, int maxStacks) {
+        player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
+                TextComponent.fromLegacyText(ChatColorConverter.convert(
+                        DungeonsConfig.getSkillStackFormat()
+                                .replace("$skillName", skill.getBonusName())
+                                .replace("$current", String.valueOf(currentStacks))
+                                .replace("$max", String.valueOf(maxStacks)))));
+    }
+
+    /**
+     * Applies placeholder replacements to lore templates from config.
+     * Subclasses call this to build their lore from translatable templates.
+     *
+     * @param replacements Key-value pairs where keys are placeholder names (without $) and values are their replacements
+     * @return The processed lore lines, or empty list if no templates configured
+     */
+    protected List<String> applyLoreTemplates(Map<String, String> replacements) {
+        if (configFields == null || configFields.getLoreTemplates().isEmpty()) return List.of();
+        List<String> result = new ArrayList<>();
+        for (String template : configFields.getLoreTemplates()) {
+            String line = template;
+            for (Map.Entry<String, String> entry : replacements.entrySet()) {
+                line = line.replace("$" + entry.getKey(), entry.getValue());
+            }
+            result.add(line);
+        }
+        return result;
+    }
+
+    /**
      * Applies this bonus to a player based on their skill level.
      * Called when bonuses need to be recalculated (e.g., on level up, login).
      *
@@ -239,6 +294,31 @@ public abstract class SkillBonus {
     }
 
     /**
+     * Applies placeholder replacements to the formatted bonus template from config.
+     *
+     * @param replacements Key-value pairs where keys are placeholder names (without $) and values are their replacements
+     * @return The processed formatted bonus string, or empty string if no template configured
+     */
+    protected String applyFormattedBonusTemplate(Map<String, String> replacements) {
+        if (configFields == null || configFields.getFormattedBonusTemplate().isEmpty()) return "";
+        String result = configFields.getFormattedBonusTemplate();
+        for (Map.Entry<String, String> entry : replacements.entrySet()) {
+            result = result.replace("$" + entry.getKey(), entry.getValue());
+        }
+        return result;
+    }
+
+    /**
+     * Returns the test strategy for verifying this skill in automated testing.
+     * Override in subclasses that need special testing approaches.
+     *
+     * @return The test strategy (default: PROC_COUNT)
+     */
+    public TestStrategy getTestStrategy() {
+        return TestStrategy.PROC_COUNT;
+    }
+
+    /**
      * Called on plugin shutdown. Override to clean up static resources.
      */
     public void shutdown() {
@@ -305,5 +385,21 @@ public abstract class SkillBonus {
      */
     public boolean affectsDamage() {
         return true;
+    }
+
+    /**
+     * Defines how the test system should verify this skill works correctly.
+     * <ul>
+     *   <li>PROC_COUNT - Default. Checks if incrementProcCount was called during combat simulation.</li>
+     *   <li>ATTRIBUTE_CHECK - For passive utility skills (speed, knockback resist, reach).
+     *       Verifies player attributes changed instead of checking proc counts.</li>
+     *   <li>CONDITION_SETUP - For conditional skills that need special test state (draw time, standing still).
+     *       The test system sets up the required conditions before testing.</li>
+     * </ul>
+     */
+    public enum TestStrategy {
+        PROC_COUNT,
+        ATTRIBUTE_CHECK,
+        CONDITION_SETUP
     }
 }

@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.commands;
 
+import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.skills.ArmorSkillHealthBonus;
 import com.magmaguy.elitemobs.skills.CombatLevelDisplay;
@@ -39,7 +40,7 @@ public class SkillSetCommand extends AdvancedCommand {
 
         Player targetPlayer = Bukkit.getPlayer(playerName);
         if (targetPlayer == null) {
-            Logger.sendMessage(commandData.getCommandSender(), "&cPlayer not found: " + playerName);
+            Logger.sendMessage(commandData.getCommandSender(), CommandMessagesConfig.getSkillPlayerNotFoundMessage().replace("$player", playerName));
             return;
         }
 
@@ -47,19 +48,19 @@ public class SkillSetCommand extends AdvancedCommand {
         try {
             skillType = SkillType.valueOf(skillTypeName.toUpperCase());
         } catch (IllegalArgumentException e) {
-            Logger.sendMessage(commandData.getCommandSender(), "&cInvalid skill type: " + skillTypeName);
-            Logger.sendMessage(commandData.getCommandSender(), "&7Valid types: " +
-                    String.join(", ", Arrays.stream(SkillType.values()).map(Enum::name).toList()));
+            Logger.sendMessage(commandData.getCommandSender(), CommandMessagesConfig.getSkillInvalidTypeMessage().replace("$type", skillTypeName));
+            Logger.sendMessage(commandData.getCommandSender(), CommandMessagesConfig.getSkillValidTypesMessage()
+                    .replace("$types", String.join(", ", Arrays.stream(SkillType.values()).map(Enum::name).toList())));
             return;
         }
 
         if (level < 1) {
-            Logger.sendMessage(commandData.getCommandSender(), "&cLevel must be at least 1!");
+            Logger.sendMessage(commandData.getCommandSender(), CommandMessagesConfig.getSkillLevelMinMessage());
             return;
         }
 
         if (level > 100) {
-            Logger.sendMessage(commandData.getCommandSender(), "&eWarning: Level " + level + " is above the soft cap of 100.");
+            Logger.sendMessage(commandData.getCommandSender(), CommandMessagesConfig.getSkillLevelWarningMessage().replace("$level", String.valueOf(level)));
         }
 
         // Calculate the XP needed for the target level
@@ -77,7 +78,10 @@ public class SkillSetCommand extends AdvancedCommand {
         }
 
         Logger.sendMessage(commandData.getCommandSender(),
-                "&aSet " + targetPlayer.getName() + "'s " + skillType.getDisplayName() +
-                        " skill to level " + level + " (" + targetXP + " XP)");
+                CommandMessagesConfig.getSkillSetSuccessMessage()
+                        .replace("$player", targetPlayer.getName())
+                        .replace("$skill", skillType.getDisplayName())
+                        .replace("$level", String.valueOf(level))
+                        .replace("$xp", String.valueOf(targetXP)));
     }
 }

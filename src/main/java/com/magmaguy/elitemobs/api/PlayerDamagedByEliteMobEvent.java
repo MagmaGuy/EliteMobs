@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.api;
 
 import com.magmaguy.elitemobs.collateralminecraftchanges.PlayerDeathMessageByEliteMob;
+import com.magmaguy.elitemobs.combatsystem.ArmorDefenseCalculator;
 import com.magmaguy.elitemobs.combatsystem.LevelScaling;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
@@ -16,6 +17,14 @@ import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.ConditionalSkill;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.CooldownSkill;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.ProcSkill;
+import com.magmaguy.elitemobs.skills.bonuses.interfaces.StackingSkill;
+import com.magmaguy.elitemobs.skills.bonuses.skills.armor.*;
+import com.magmaguy.elitemobs.skills.bonuses.skills.hoes.DeathsEmbraceSkill;
+import com.magmaguy.elitemobs.skills.bonuses.skills.maces.DivineShieldSkill;
+import com.magmaguy.elitemobs.skills.bonuses.skills.spears.PhalanxSkill;
+import com.magmaguy.elitemobs.skills.bonuses.skills.swords.ParrySkill;
+import com.magmaguy.elitemobs.skills.bonuses.skills.swords.RiposteSkill;
+import com.magmaguy.elitemobs.testing.CombatSimulator;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.magmacore.util.AttributeManager;
 import lombok.Getter;
@@ -48,6 +57,8 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
     private final Player player;
     private final EntityDamageByEntityEvent entityDamageByEntityEvent;
     private final Projectile projectile;
+    @Getter
+    private boolean playerBlocking;
 
     public PlayerDamagedByEliteMobEvent(EliteEntity eliteEntity, Player player, EntityDamageByEntityEvent event, Projectile projectile, double damage) {
         super(damage, event);
@@ -82,6 +93,19 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
         return this.entityDamageByEntityEvent;
     }
 
+    /**
+     * Gets the attacker entity from this event.
+     * Handles both direct melee and projectile attacks.
+     *
+     * @return The living entity that caused the damage, or null if not applicable
+     */
+    public LivingEntity getAttacker() {
+        if (eliteEntity != null && eliteEntity.getLivingEntity() != null) {
+            return eliteEntity.getLivingEntity();
+        }
+        return null;
+    }
+
     @Override
     public HandlerList getHandlers() {
         return handlers;
@@ -103,28 +127,142 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
         int skillLevel = SkillBonusRegistry.getPlayerSkillLevel(player, SkillType.ARMOR);
         List<String> activeSkillIds = PlayerSkillSelection.getActiveSkills(player.getUniqueId(), SkillType.ARMOR);
 
-        double damageMultiplier = 1.0;
-
-        // Process each active armor skill
+        // Custom armor skill handling - process skills with custom trigger methods
         for (String skillId : activeSkillIds) {
             SkillBonus skill = SkillBonusRegistry.getSkillById(skillId);
             if (skill == null || !skill.isEnabled()) continue;
             if (!skill.meetsLevelRequirement(skillLevel)) continue;
 
-            DefensiveSkillResult result = processDefensiveSkill(skill, skillLevel);
+            // Evasion - chance to completely dodge
+            if (skill instanceof EvasionSkill evasion) {
+                if (evasion.tryEvade(player, this)) {
+                    skill.incrementProcCount(player);
+                    SkillBonus.sendSkillActionBar(player, skill);
+                    setCancelled(true);
+                    return true;
+                }
+                continue; // Skip generic processing for this skill
+            }
 
-            // Check for complete damage negation (dodge, death prevention, etc.)
+            // Retaliation - chance to reflect damage back
+            if (skill instanceof RetaliationSkill retaliation) {
+                LivingEntity attacker = getAttacker();
+                if (attacker != null) {
+                    retaliation.onDamageTaken(player, attacker, getDamage());
+                }
+                continue;
+            }
+
+            // Fortify - stacking damage reduction
+            if (skill instanceof FortifySkill fortify) {
+                double modifiedDamage = fortify.modifyIncomingDamage(player, getDamage());
+                if (modifiedDamage != getDamage()) {
+                    setDamage(modifiedDamage);
+                    skill.incrementProcCount(player);
+                    SkillBonus.sendSkillActionBar(player, skill);
+                }
+                continue;
+            }
+
+            // ReactiveShielding - check trigger + apply shield reduction
+            if (skill instanceof ReactiveShieldingSkill reactiveShielding) {
+                // Check if this hit should trigger the shield
+                double damagePercent = getDamage() / player.getMaxHealth();
+                reactiveShielding.checkTrigger(player, damagePercent);
+                // Apply shield reduction if active (might have been activated by this hit or a previous one)
+                double modifiedDamage = reactiveShielding.modifyIncomingDamage(player, getDamage());
+                if (modifiedDamage != getDamage()) {
+                    setDamage(modifiedDamage);
+                    skill.incrementProcCount(player);
+                    SkillBonus.sendSkillActionBar(player, skill);
+                }
+                continue;
+            }
+
+            // AdrenalineSurge - buffs when health drops below threshold
+            if (skill instanceof AdrenalineSurgeSkill adrenaline) {
+                double newHealthPercent = (player.getHealth() - getDamage()) / player.getMaxHealth();
+                adrenaline.checkTrigger(player, newHealthPercent);
+                continue;
+            }
+
+            // SecondWind - heal when health drops below threshold
+            if (skill instanceof SecondWindSkill secondWind) {
+                double newHealthPercent = (player.getHealth() - getDamage()) / player.getMaxHealth();
+                secondWind.checkTrigger(player, newHealthPercent);
+                continue;
+            }
+
+            // LastStand - prevent fatal damage
+            if (skill instanceof LastStandSkill lastStand) {
+                boolean fatal = player.getHealth() - getDamage() <= 0;
+                if (fatal) {
+                    if (lastStand.preventDeath(player, getDamage())) {
+                        skill.incrementProcCount(player);
+                        SkillBonus.sendSkillActionBar(player, skill);
+                        setCancelled(true);
+                        return true;
+                    }
+                }
+                continue;
+            }
+
+            // IronStance - damage reduction when standing still (custom movement check)
+            if (skill instanceof IronStanceSkill ironStance) {
+                double modifiedDamage = ironStance.modifyIncomingDamage(player, getDamage(), this);
+                if (modifiedDamage != getDamage()) {
+                    setDamage(modifiedDamage);
+                    skill.incrementProcCount(player);
+                    SkillBonus.sendSkillActionBar(player, skill);
+                }
+                continue;
+            }
+
+            // Grit - scaling damage reduction based on health (custom health-based scaling)
+            if (skill instanceof GritSkill grit) {
+                double modifiedDamage = grit.modifyIncomingDamage(player, getDamage(), this);
+                if (modifiedDamage != getDamage()) {
+                    setDamage(modifiedDamage);
+                    skill.incrementProcCount(player);
+                    SkillBonus.sendSkillActionBar(player, skill);
+                }
+                continue;
+            }
+
+            // For any remaining skills (PASSIVE like BattleHardened),
+            // use the generic handler
+            DefensiveSkillResult result = processDefensiveSkill(skill, skillLevel);
             if (result.negatesDamage) {
                 setCancelled(true);
                 return true;
             }
-
-            damageMultiplier *= result.multiplier;
+            if (result.multiplier != 1.0) {
+                setDamage(getDamage() * result.multiplier);
+            }
         }
 
-        // Apply the combined damage reduction
-        if (damageMultiplier != 1.0) {
-            setDamage(getDamage() * damageMultiplier);
+        // Check weapon-type defensive skills (Parry - sword blocking)
+        double parryDamage = ParrySkill.applyParryReduction(player, this, getDamage());
+        if (parryDamage != getDamage()) {
+            setDamage(parryDamage);
+        }
+
+        // Phalanx - frontal damage reduction when holding spear
+        double phalanxDamage = PhalanxSkill.applyFrontalReduction(player, this, getDamage());
+        if (phalanxDamage != getDamage()) {
+            setDamage(phalanxDamage);
+        }
+
+        // Check death prevention skills from weapon types
+        if (player.getHealth() - getDamage() <= 0) {
+            if (DeathsEmbraceSkill.preventDeath(player)) {
+                setCancelled(true);
+                return true;
+            }
+            if (DivineShieldSkill.preventDeath(player, getDamage())) {
+                setCancelled(true);
+                return true;
+            }
         }
 
         return false;
@@ -144,8 +282,19 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
                 if (skill instanceof ConditionalSkill conditionalSkill) {
                     if (conditionalSkill.conditionMet(player, this)) {
                         skill.incrementProcCount(player); // Track activation
+                        SkillBonus.sendSkillActionBar(player, skill);
                         yield new DefensiveSkillResult(1.0 - conditionalSkill.getConditionalBonus(skillLevel), false);
                     }
+                }
+                yield new DefensiveSkillResult(1.0, false);
+            }
+            case STACKING -> {
+                if (skill instanceof StackingSkill stackingSkill) {
+                    int stacks = stackingSkill.getCurrentStacks(player);
+                    stackingSkill.addStack(player);
+                    skill.incrementProcCount(player); // Track activation
+                    SkillBonus.sendStackingSkillActionBar(player, skill, stacks + 1, stackingSkill.getMaxStacks());
+                    yield new DefensiveSkillResult(1.0 - (stacks * stackingSkill.getBonusPerStack(skillLevel)), false);
                 }
                 yield new DefensiveSkillResult(1.0, false);
             }
@@ -157,6 +306,7 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
                             cooldownSkill.onActivate(player, this);
                             cooldownSkill.startCooldown(player, skillLevel);
                             skill.incrementProcCount(player); // Track activation
+                            SkillBonus.sendSkillActionBar(player, skill);
                             yield new DefensiveSkillResult(1.0, true); // Damage negated
                         }
                     }
@@ -169,12 +319,12 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
                     if (ThreadLocalRandom.current().nextDouble() < procChance) {
                         procSkill.onProc(player, this);
                         skill.incrementProcCount(player); // Track proc
+                        SkillBonus.sendSkillActionBar(player, skill);
                         yield new DefensiveSkillResult(1.0 - skill.getBonusValue(skillLevel), false);
                     }
                 }
                 yield new DefensiveSkillResult(1.0, false);
             }
-            default -> new DefensiveSkillResult(1.0, false);
         };
     }
 
@@ -193,61 +343,49 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
         private static double specialMultiplier = 1;
 
         /**
-         * Calculates boss damage to player using armor-skill-based scaling.
+         * Calculates boss damage to player using the redesigned defensive formula.
          * <p>
-         * The goal is for properly geared players to survive ~5 normal hits from
-         * same-level content, and ~2 hits from content 10 levels above them.
-         * This scales with player's armor skill level since that determines their
-         * max health (via ArmorSkillHealthBonus).
+         * No pre-compensation. Three multiplicative layers:
+         * <ol>
+         *   <li><b>Base damage</b> = playerMaxHP / {@link LevelScaling#TARGET_HITS_TO_KILL_PLAYER}</li>
+         *   <li><b>Skill adjustment</b> = 2^((mobLevel - armorSkillLevel) / {@link LevelScaling#SKILL_SCALING_RATE})
+         *       — exponential scaling from skill vs mob level difference</li>
+         *   <li><b>Gear adjustment</b> = 2.0 * (1 - gearReduction)
+         *       — damage-type-aware, from {@link ArmorDefenseCalculator}</li>
+         * </ol>
          * <p>
-         * Formula:
-         * 1. Player max health = 20 + (armorLevel - 1) * 2
-         * 2. Target damage per hit = playerMaxHealth / TARGET_HITS_TO_KILL_PLAYER
-         * 3. Raw damage = targetDamage / EXPECTED_GEAR_DAMAGE_MULTIPLIER (pre-compensate for gear reduction)
-         * 4. Level modifier = 2^((mobLevel - armorLevel) / LEVELS_PER_BOSS_DAMAGE_DOUBLE)
-         * 5. Final damage = rawDamage * levelModifier * otherMultipliers
-         * <p>
-         * Expected outcomes with full gear/skills:
+         * Expected outcomes:
          * <ul>
-         *   <li>Same level: ~5 hits to kill</li>
-         *   <li>+5 levels: ~3 hits to kill</li>
-         *   <li>+10 levels: ~2 hits to kill</li>
+         *   <li>Naked vs same level: ~2.5 hits to kill (gear adjustment = 2.0)</li>
+         *   <li>Matching gear + skill vs same level: ~5 hits to kill (gear adjustment = 1.0)</li>
+         *   <li>Peak gear vs same level: ~10 hits to kill (gear adjustment = 0.5)</li>
+         *   <li>+7.5 levels above skill: damage doubles</li>
          * </ul>
+         * Final damage is capped at maxHP - 1 (1-shot protection).
          */
         private static double eliteToPlayerDamageFormula(Player player, EliteEntity eliteEntity, EntityDamageByEntityEvent event) {
-            ElitePlayerInventory elitePlayerInventory = ElitePlayerInventory.getPlayer(player);
-            if (elitePlayerInventory == null) return 0;
+            if (ElitePlayerInventory.getPlayer(player) == null) return 0;
 
-            // Get player's armor skill level (determines their max health and defensive scaling)
+            // 1. Player stats
             long armorSkillXP = PlayerData.getSkillXP(player.getUniqueId(), SkillType.ARMOR);
             int armorSkillLevel = Math.max(1, SkillXPCalculator.levelFromTotalXP(armorSkillXP));
-
-            // Calculate player's max health from armor skill level
-            // This matches the ArmorSkillHealthBonus formula: 20 base + (level - 1) * 2
             double playerMaxHealth = 20.0 + Math.max(0, armorSkillLevel - 1) * 2.0;
-
-            // Calculate target damage per hit (what we want player to RECEIVE after all reductions)
-            double targetDamagePerHit = playerMaxHealth / LevelScaling.TARGET_HITS_TO_KILL_PLAYER;
-
-            // Pre-compensate for expected gear and skill damage reductions
-            // Armor provides ~50% reduction, defense skills provide ~50% reduction
-            // Combined: player receives 25% of raw damage, so we multiply by 4 to compensate
-            double baseDamagePerHit = targetDamagePerHit / LevelScaling.EXPECTED_GEAR_DAMAGE_MULTIPLIER;
-
-            // Apply level scaling based on mob level vs player armor level
-            // Uses separate scaling constant for boss damage (softer than player damage scaling)
-            // +10 levels = ~2.5x damage, resulting in ~2 hits to kill
             int mobLevel = eliteEntity.getLevel();
-            double levelModifier = Math.pow(LevelScaling.SCALING_BASE,
-                    (mobLevel - armorSkillLevel) / LevelScaling.LEVELS_PER_BOSS_DAMAGE_DOUBLE);
 
-            // Clamp the modifier to prevent extreme cases
-            levelModifier = LevelScaling.clampModifier(levelModifier);
+            // 2. Base damage (no pre-compensation)
+            double baseDamage = playerMaxHealth / LevelScaling.TARGET_HITS_TO_KILL_PLAYER;
 
-            // Calculate level-scaled base damage
-            double scaledDamage = baseDamagePerHit * levelModifier;
+            // 3. Skill adjustment (exponential, replaces old level modifier + skill reduction)
+            double skillAdjustment = Math.pow(2.0, (mobLevel - armorSkillLevel) / LevelScaling.SKILL_SCALING_RATE);
 
-            // Apply distance attenuation for explosions (creeper, ghast)
+            // 4. Gear adjustment (damage-type-aware)
+            ArmorDefenseCalculator.DamageType damageType = ArmorDefenseCalculator.fromEvent(event);
+            double gearScore = ArmorDefenseCalculator.getGearScore(player, damageType);
+            double gearAdjustment = ArmorDefenseCalculator.getGearAdjustment(gearScore, mobLevel);
+
+            double scaledDamage = baseDamage * skillAdjustment * gearAdjustment;
+
+            // 5. Distance attenuation for explosions (creeper, ghast)
             if (eliteEntity.getLivingEntity() != null && player.isValid() &&
                     player.getLocation().getWorld().equals(eliteEntity.getLivingEntity().getWorld())) {
                 if (eliteEntity.getLivingEntity().getType().equals(EntityType.CREEPER)) {
@@ -263,14 +401,7 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
                 }
             }
 
-            // Apply protection enchantments as flat damage reduction
-            double damageReduction = 0;
-            if (event.getDamager() instanceof AbstractArrow)
-                damageReduction += elitePlayerInventory.getEliteProjectileProtection(true);
-            if (event.getDamager() instanceof Fireball || event.getDamager() instanceof Creeper)
-                damageReduction += elitePlayerInventory.getEliteBlastProtection(true);
-
-            // Apply resistance potion effect (percentage-based)
+            // 6. Resistance potion effect (percentage-based)
             double potionMultiplier = 1.0;
             if (player.hasPotionEffect(PotionEffectType.RESISTANCE)) {
                 int amplifier = player.getPotionEffect(PotionEffectType.RESISTANCE).getAmplifier();
@@ -278,10 +409,10 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
                 potionMultiplier = Math.max(0, potionMultiplier);
             }
 
-            // Apply boss damage multiplier (for custom bosses with increased damage)
+            // 7. Boss damage multiplier (for custom bosses with increased damage)
             double customBossDamageMultiplier = eliteEntity.getDamageMultiplier();
 
-            // Apply config multipliers
+            // Config multipliers
             double configMultiplier;
             if (eliteEntity instanceof CustomBossEntity customBossEntity && customBossEntity.isNormalizedCombat())
                 configMultiplier = MobCombatSettingsConfig.getNormalizedDamageToPlayerMultiplier();
@@ -289,7 +420,7 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
                 configMultiplier = MobCombatSettingsConfig.getDamageToPlayerMultiplier();
 
             // Calculate final damage
-            double finalDamage = Math.max(scaledDamage - damageReduction, 1)
+            double finalDamage = Math.max(scaledDamage, 1)
                     * potionMultiplier
                     * customBossDamageMultiplier
                     * specialMultiplier
@@ -297,10 +428,8 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
 
             if (specialMultiplier != 1) specialMultiplier = 1;
 
-            // Get actual max health (may differ from calculated due to other effects)
+            // 8. 1-shot protection
             double actualMaxHealth = AttributeManager.getAttributeBaseValue(player, "generic_max_health");
-
-            // Prevent 1-shots
             finalDamage = Math.min(finalDamage, actualMaxHealth - 1);
 
             return finalDamage;
@@ -326,8 +455,7 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
             if (!(event.getEntity() instanceof Player player)) return;
 
             //citizens
-            if (player.hasMetadata("NPC") || ElitePlayerInventory.getPlayer(player) == null)
-                return;
+            if (player.hasMetadata("NPC") || ElitePlayerInventory.getPlayer(player) == null) return;
 
             Projectile projectile = null;
 
@@ -350,7 +478,7 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
             boolean blocking = false;
 
             //Blocking reduces melee damage and nullifies most ranged damage at the cost of shield durability
-            if (player.isBlocking()) {
+            if (player.isBlocking() || (com.magmaguy.elitemobs.testing.CombatSimulator.isTestingActive() && com.magmaguy.elitemobs.testing.CombatSimulator.isBlockingOverride())) {
                 blocking = true;
                 if (player.getInventory().getItemInOffHand().getType().equals(Material.SHIELD)) {
                     ItemMeta itemMeta = player.getInventory().getItemInOffHand().getItemMeta();
@@ -369,10 +497,17 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
                     event.getDamager().remove();
                     return;
                 }
+
+                // Trigger Riposte skill on successful block (melee only)
+                RiposteSkill.onPlayerBlock(player);
             }
 
             //Calculate the damage for the event
             double newDamage = eliteToPlayerDamageFormula(player, eliteEntity, event);
+            // Test damage override: bypass defense formula during automated testing
+            if (CombatSimulator.isTestingActive() && CombatSimulator.getTestDamageOverride() >= 0) {
+                newDamage = CombatSimulator.getTestDamageOverride();
+            }
             //Blocking reduces damage by 80%
             if (blocking)
                 newDamage = newDamage - newDamage * MobCombatSettingsConfig.getBlockingDamageReduction();
@@ -391,6 +526,7 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
 
             //Run the event, see if it will get cancelled or suffer further damage modifications
             PlayerDamagedByEliteMobEvent playerDamagedByEliteMobEvent = new PlayerDamagedByEliteMobEvent(eliteEntity, player, event, projectile, newDamage);
+            playerDamagedByEliteMobEvent.playerBlocking = blocking;
             new EventCaller(playerDamagedByEliteMobEvent);
 
             //In case damage got modified along the way

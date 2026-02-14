@@ -2,20 +2,22 @@ package com.magmaguy.elitemobs.commands.admin;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.commands.ReloadCommand;
+import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
 import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
 import com.magmaguy.magmacore.nightbreak.NightbreakAccount;
 import com.magmaguy.magmacore.nightbreak.NightbreakContentManager;
-import com.magmaguy.magmacore.util.ChatColorConverter;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class UpdateContentCommand extends AdvancedCommand {
@@ -33,30 +35,32 @@ public class UpdateContentCommand extends AdvancedCommand {
         CommandSender sender = commandData.getCommandSender();
 
         if (!NightbreakAccount.hasToken()) {
-            sender.sendMessage(ChatColorConverter.convert(
-                "&c[EliteMobs] No Nightbreak token registered. Use /nightbreakLogin <token> first."));
+            sender.sendMessage(
+                CommandMessagesConfig.getUpdateNoTokenMessage());
             return;
         }
 
         // Find all outdated packages with Nightbreak slugs
+        // Deduplicate by slug so each unique slug is only downloaded once
         List<EMPackage> outdatedWithSlugs = new ArrayList<>();
+        Set<String> seenSlugs = new HashSet<>();
         for (EMPackage pkg : EMPackage.getEmPackages().values()) {
             if (pkg.isOutOfDate()) {
                 String slug = pkg.getContentPackagesConfigFields().getNightbreakSlug();
-                if (slug != null && !slug.isEmpty()) {
+                if (slug != null && !slug.isEmpty() && seenSlugs.add(slug)) {
                     outdatedWithSlugs.add(pkg);
                 }
             }
         }
 
         if (outdatedWithSlugs.isEmpty()) {
-            sender.sendMessage(ChatColorConverter.convert(
-                "&a[EliteMobs] All content is up to date!"));
+            sender.sendMessage(
+                CommandMessagesConfig.getUpdateAllUpToDateMessage());
             return;
         }
 
-        sender.sendMessage(ChatColorConverter.convert(
-            "&e[EliteMobs] Found " + outdatedWithSlugs.size() + " outdated packages. Starting updates..."));
+        sender.sendMessage(
+            CommandMessagesConfig.getUpdateFoundOutdatedMessage().replace("$count", String.valueOf(outdatedWithSlugs.size())));
 
         Player player = sender instanceof Player ? (Player) sender : null;
         File importsFolder = new File(MetadataHandler.PLUGIN.getDataFolder(), "imports");
@@ -97,11 +101,13 @@ public class UpdateContentCommand extends AdvancedCommand {
 
         if (index >= packages.size()) {
             // All done
-            sender.sendMessage(ChatColorConverter.convert(
-                "&a[EliteMobs] Update complete! Downloaded: " + completed.get() + ", Failed: " + failed.get()));
+            sender.sendMessage(
+                CommandMessagesConfig.getUpdateCompleteMessage()
+                        .replace("$completed", String.valueOf(completed.get()))
+                        .replace("$failed", String.valueOf(failed.get())));
             if (completed.get() > 0) {
-                sender.sendMessage(ChatColorConverter.convert(
-                    "&a[EliteMobs] Reloading to apply updates..."));
+                sender.sendMessage(
+                    CommandMessagesConfig.getUpdateReloadingMessage());
                 Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> {
                     ReloadCommand.reload(sender);
                 }, 20L);
@@ -113,8 +119,11 @@ public class UpdateContentCommand extends AdvancedCommand {
         String slug = pkg.getContentPackagesConfigFields().getNightbreakSlug();
         String name = pkg.getContentPackagesConfigFields().getName();
 
-        sender.sendMessage(ChatColorConverter.convert(
-            "&7[EliteMobs] (" + (index + 1) + "/" + packages.size() + ") Downloading: " + name + "..."));
+        sender.sendMessage(
+            CommandMessagesConfig.getUpdateProgressMessage()
+                    .replace("$current", String.valueOf(index + 1))
+                    .replace("$total", String.valueOf(packages.size()))
+                    .replace("$name", name));
 
         // Pass null for player to suppress library's own "use em reload" messages
         NightbreakContentManager.downloadAsync(slug, importsFolder, null, success -> {
@@ -123,18 +132,20 @@ public class UpdateContentCommand extends AdvancedCommand {
                 if (player == null || player.isOnline()) {
                     int remaining = packages.size() - (index + 1);
                     if (remaining > 0) {
-                        sender.sendMessage(ChatColorConverter.convert(
-                            "&a[EliteMobs] Downloaded " + name + "! &7Please hold on, " + remaining + " more to go..."));
+                        sender.sendMessage(
+                            CommandMessagesConfig.getUpdateDownloadedMoreMessage()
+                                    .replace("$name", name)
+                                    .replace("$remaining", String.valueOf(remaining)));
                     } else {
-                        sender.sendMessage(ChatColorConverter.convert(
-                            "&a[EliteMobs] Downloaded " + name + "!"));
+                        sender.sendMessage(
+                            CommandMessagesConfig.getUpdateDownloadedMessage().replace("$name", name));
                     }
                 }
             } else {
                 failed.incrementAndGet();
                 if (player == null || player.isOnline()) {
-                    sender.sendMessage(ChatColorConverter.convert(
-                        "&c[EliteMobs] Failed to download: " + name));
+                    sender.sendMessage(
+                        CommandMessagesConfig.getUpdateFailedMessage().replace("$name", name));
                 }
             }
             // Download next package

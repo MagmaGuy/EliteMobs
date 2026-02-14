@@ -1,9 +1,9 @@
 package com.magmaguy.elitemobs.commands;
 
+import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.utils.DebugBlockLocation;
-import com.magmaguy.magmacore.util.ChatColorConverter;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -31,11 +31,11 @@ public class CustomBossCommandHandler {
     public static void addSpawnLocation(String customBossConfigFieldsString, Player player) {
         CustomBossesConfigFields customBossesConfigFields = CustomBossesConfigFields.getRegionalElites().get(customBossConfigFieldsString);
         if (customBossesConfigFields == null)
-            player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Failed to add spawn location! Custom Boss " + customBossConfigFieldsString + " is not valid regional boss!"));
+            player.sendMessage(CommandMessagesConfig.getBossNotValidRegionalMessage().replace("$boss", customBossConfigFieldsString));
         else {
             Location safeSpawnLocation = autoSeekSafeSpawnLocation(player.getLocation());
             if (safeSpawnLocation == null)
-                player.sendMessage("[EliteMobs] No safe spawn location found! Make sure the area is passable!");
+                player.sendMessage(CommandMessagesConfig.getNoSafeSpawnMessage());
             else {
                 RegionalBossEntity.createPermanentRegionalBossEntity(customBossesConfigFields, safeSpawnLocation);
             }
@@ -45,7 +45,7 @@ public class CustomBossCommandHandler {
     public static void setLeashRadius(String customBossConfigFieldsString, CommandSender commandSender, int leashRadius) {
         CustomBossesConfigFields customBossesConfigFields = CustomBossesConfigFields.getRegionalElites().get(customBossConfigFieldsString);
         if (customBossesConfigFields == null) {
-            commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Failed set the leash radius! Was the boss a valid regional boss?"));
+            commandSender.sendMessage(CommandMessagesConfig.getLeashRadiusFailedMessage());
             return;
         }
         customBossesConfigFields.runtimeSetLeashRadius(leashRadius);

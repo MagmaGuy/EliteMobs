@@ -34,8 +34,8 @@ import java.util.TreeMap;
  *   <li>Register it in the static block with {@code registerTier(minLevel, SkinTier.YOUR_TIER)}</li>
  *   <li>Add corresponding resource pack assets:
  *     <ul>
- *       <li>Item models: {@code assets/elitemobs/models/equipment/[tier]_[itemtype].json}</li>
- *       <li>Item definitions: {@code assets/elitemobs/items/equipment/[tier]_[itemtype].json}</li>
+ *       <li>Item models: {@code assets/elitemobs/models/gear/[tier]_[itemtype].json}</li>
+ *       <li>Item definitions: {@code assets/elitemobs/items/gear/[tier]_[itemtype].json}</li>
  *       <li>Equipment definition: {@code assets/elitemobs/equipment/[tier].json}</li>
  *       <li>Worn textures: {@code assets/elitemobs/textures/entity/equipment/humanoid/[tier].png}</li>
  *     </ul>
@@ -150,7 +150,7 @@ public class EliteItemSkins {
      *
      * @param material The item material
      * @param level The item level
-     * @return The item model ID (e.g., "elitemobs:equipment/bronze_sword") or null
+     * @return The item model ID (e.g., "elitemobs:gear/bronze_sword") or null
      */
     public static String getItemModelId(Material material, int level) {
         SkinTier tier = getSkinTier(level);
@@ -186,7 +186,7 @@ public class EliteItemSkins {
      * Override this method to change the resource pack path structure.
      */
     private static String buildItemModelId(SkinTier tier, ItemType itemType) {
-        return "elitemobs:equipment/" + tier.getId() + "_" + itemType.getModelName();
+        return "elitemobs:gear/" + tier.getId() + "_" + itemType.getModelName();
     }
 
     /**

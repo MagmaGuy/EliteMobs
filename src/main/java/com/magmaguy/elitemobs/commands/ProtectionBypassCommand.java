@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.commands;
 
+import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.dungeons.DungeonProtector;
 import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
@@ -21,6 +22,6 @@ public class ProtectionBypassCommand extends AdvancedCommand {
     @Override
     public void execute(CommandData commandData) {
         boolean outcome = DungeonProtector.toggleBypass(commandData.getPlayerSender().getUniqueId());
-        Logger.sendMessage(commandData.getCommandSender(), "Bypassing dungeon protections is now " + outcome);
+        Logger.sendMessage(commandData.getCommandSender(), CommandMessagesConfig.getProtectionBypassMessage().replace("$status", String.valueOf(outcome)));
     }
 }

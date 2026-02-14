@@ -22,7 +22,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.*;
 
@@ -149,13 +151,15 @@ public class SkillBonusMenu {
         lore.add("");
 
         // Add skill type and tier info
-        lore.add("&7Type: &f" + skillConfig.getBonusType().name());
-        lore.add("&7Tier: &f" + skillConfig.getUnlockTier() + " (Level " + skillConfig.getRequiredLevel() + ")");
+        lore.add(SkillBonusMenuConfig.getSkillTypeLabel() + skillConfig.getBonusType().name());
+        lore.add(SkillBonusMenuConfig.getSkillTierLabel() + SkillBonusMenuConfig.getSkillTierLevelFormat()
+                .replace("%tier%", String.valueOf(skillConfig.getUnlockTier()))
+                .replace("%level%", String.valueOf(skillConfig.getRequiredLevel())));
 
         // Add current value at player's level
         if (isUnlocked) {
             double value = skillConfig.calculateValue(playerLevel);
-            lore.add("&7Value at your level: &a" + String.format("%.1f", value));
+            lore.add(SkillBonusMenuConfig.getSkillValueLabel() + String.format("%.1f", value));
         }
 
         lore.add("");
@@ -169,7 +173,11 @@ public class SkillBonusMenu {
             lore.add(SkillBonusMenuConfig.getLockedLore().replace("%level%", String.valueOf(skillConfig.getRequiredLevel())));
         }
 
-        return ItemStackGenerator.generateItemStack(material, name, lore);
+        ItemStack item = ItemStackGenerator.generateItemStack(material, name, lore);
+        ItemMeta meta = item.getItemMeta();
+        meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+        item.setItemMeta(meta);
+        return item;
     }
 
     /**
@@ -177,29 +185,29 @@ public class SkillBonusMenu {
      */
     private static ItemStack createInfoItem(Player player, SkillType skillType, int skillLevel, List<String> activeSkillIds) {
         List<String> lore = new ArrayList<>();
-        lore.add("&7Skill Type: &f" + skillType.getDisplayName());
-        lore.add("&7Your Level: &f" + skillLevel);
-        lore.add("&7Active Skills: &f" + activeSkillIds.size() + "/3");
+        lore.add(SkillBonusMenuConfig.getInfoSkillTypeLabel() + skillType.getDisplayName());
+        lore.add(SkillBonusMenuConfig.getInfoYourLevelLabel() + skillLevel);
+        lore.add(SkillBonusMenuConfig.getInfoActiveSkillsLabel().replace("%count%", String.valueOf(activeSkillIds.size())));
         lore.add("");
 
         if (!activeSkillIds.isEmpty()) {
-            lore.add("&6Active Skills:");
+            lore.add(SkillBonusMenuConfig.getInfoActiveSkillsHeader());
             for (String skillId : activeSkillIds) {
                 SkillBonusConfigFields config = SkillBonusesConfig.getBySkillId(skillId);
                 if (config != null) {
-                    lore.add("&7- " + config.getName());
+                    lore.add(SkillBonusMenuConfig.getInfoActiveSkillPrefix() + config.getName());
                 }
             }
         }
 
         lore.add("");
-        lore.add("&7Skills unlock at levels:");
-        lore.add("&a Tier 1: &fLevel 10");
-        lore.add("&e Tier 2: &fLevel 25");
-        lore.add("&6 Tier 3: &fLevel 50");
-        lore.add("&c Tier 4: &fLevel 75");
+        lore.add(SkillBonusMenuConfig.getInfoUnlockLevelsHeader());
+        lore.add(SkillBonusMenuConfig.getInfoTier1Unlock());
+        lore.add(SkillBonusMenuConfig.getInfoTier2Unlock());
+        lore.add(SkillBonusMenuConfig.getInfoTier3Unlock());
+        lore.add(SkillBonusMenuConfig.getInfoTier4Unlock());
 
-        return ItemStackGenerator.generateItemStack(Material.BOOK, "&eSkill Info", lore);
+        return ItemStackGenerator.generateItemStack(Material.BOOK, SkillBonusMenuConfig.getInfoItemTitle(), lore);
     }
 
     /**
@@ -284,7 +292,7 @@ public class SkillBonusMenu {
             long xp = PlayerData.getSkillXP(playerUUID, skillType);
             int playerLevel = SkillXPCalculator.levelFromTotalXP(xp);
             if (playerLevel < skillConfig.getRequiredLevel()) {
-                player.sendMessage(ChatColorConverter.convert("&cThis skill requires level " + skillConfig.getRequiredLevel() + "!"));
+                player.sendMessage(SkillBonusMenuConfig.getSkillRequiresLevelMessage().replace("%level%", String.valueOf(skillConfig.getRequiredLevel())));
                 return;
             }
 
@@ -293,7 +301,7 @@ public class SkillBonusMenu {
             if (activeSkills.contains(skillId)) {
                 // Deactivate
                 PlayerSkillSelection.removeActiveSkill(playerUUID, skillType, skillId);
-                player.sendMessage(ChatColorConverter.convert("&eDeactivated skill: " + skillConfig.getName()));
+                player.sendMessage(SkillBonusMenuConfig.getSkillDeactivatedMessage().replace("%skill%", skillConfig.getName()));
 
                 // Call skill deactivation
                 SkillBonus skill = SkillBonusRegistry.getSkillById(skillId);
@@ -303,13 +311,13 @@ public class SkillBonusMenu {
             } else {
                 // Check if at max
                 if (activeSkills.size() >= PlayerSkillSelection.MAX_ACTIVE_SKILLS) {
-                    player.sendMessage(ChatColorConverter.convert(SkillBonusMenuConfig.getMaxActiveSkillsReached()));
+                    player.sendMessage(SkillBonusMenuConfig.getMaxActiveSkillsReached());
                     return;
                 }
 
                 // Activate
                 PlayerSkillSelection.addActiveSkill(playerUUID, skillType, skillId);
-                player.sendMessage(ChatColorConverter.convert("&aActivated skill: " + skillConfig.getName()));
+                player.sendMessage(SkillBonusMenuConfig.getSkillActivatedMessage().replace("%skill%", skillConfig.getName()));
 
                 // Call skill activation
                 SkillBonus skill = SkillBonusRegistry.getSkillById(skillId);

@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.commands.admin;
 
+import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
-import com.magmaguy.magmacore.util.ChatColorConverter;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -14,7 +14,7 @@ public class LootCommand {
     public static void get(Player player, String args1) {
         CustomItem customItem = CustomItem.getCustomItem(args1);
         if (customItem == null) {
-            player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &cFile name " + args1 + " &cis not a valid custom item file name!"));
+            player.sendMessage(CommandMessagesConfig.getInvalidItemFilenameMessage().replace("$filename", args1));
             return;
         }
         player.getInventory().addItem(customItem.generateDefaultsItemStack(player, false, null, true));
@@ -23,15 +23,15 @@ public class LootCommand {
     public static void give(CommandSender commandSender, String playerString, String args1) {
         CustomItem customItem = CustomItem.getCustomItem(args1);
         if (customItem == null) {
-            commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &cFile name " + args1 + " &cis not a valid custom item file name!"));
+            commandSender.sendMessage(CommandMessagesConfig.getInvalidItemFilenameMessage().replace("$filename", args1));
             return;
         }
         Player player = Bukkit.getPlayer(playerString);
         if (player == null)
-            commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &cTried to give item to invalid player!"));
+            commandSender.sendMessage(CommandMessagesConfig.getInvalidPlayerForItemMessage());
         else {
             player.getInventory().addItem(customItem.generateDefaultsItemStack(player, false, null));
-            commandSender.sendMessage("[EliteMobs] Successfully gave " + player.getName() + " item " + customItem.getCustomItemsConfigFields().getName());
+            commandSender.sendMessage(CommandMessagesConfig.getGaveItemMessage().replace("$player", player.getName()).replace("$item", customItem.getCustomItemsConfigFields().getName()));
         }
     }
 

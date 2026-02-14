@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.mobconstructor.custombosses;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
-import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.Logger;
 import com.magmaguy.magmacore.util.Round;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -86,15 +85,15 @@ public class CustomBossBossBar {
         if (customBossEntity.getCustomBossesConfigFields().getLocationMessage().contains("$distance") ||
                 customBossEntity.getCustomBossesConfigFields().getLocationMessage().contains("$location")) {
             if (!player.getLocation().getWorld().equals(customBossEntity.getLocation().getWorld()))
-                return ChatColorConverter.convert(MobCombatSettingsConfig.getDefaultOtherWorldBossLocationMessage()
-                        .replace("$name", customBossEntity.getName()));
+                return MobCombatSettingsConfig.getDefaultOtherWorldBossLocationMessage()
+                        .replace("$name", customBossEntity.getName());
 
-            return ChatColorConverter.convert(customBossEntity.getCustomBossesConfigFields().getLocationMessage()
-                            .replace("$distance", "" + (int) customBossEntity.getLocation().distance(player.getLocation())))
+            return customBossEntity.getCustomBossesConfigFields().getLocationMessage()
+                            .replace("$distance", "" + (int) customBossEntity.getLocation().distance(player.getLocation()))
                     .replace("$location", locationString);
         }
 
-        return ChatColorConverter.convert(customBossEntity.getCustomBossesConfigFields().getLocationMessage());
+        return customBossEntity.getCustomBossesConfigFields().getLocationMessage();
 
     }
 

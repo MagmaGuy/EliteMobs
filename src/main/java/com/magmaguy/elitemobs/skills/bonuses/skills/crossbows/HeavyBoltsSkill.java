@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.skills.bonuses.skills.crossbows;
 
-import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
@@ -9,10 +8,11 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Heavy Bolts (PASSIVE) - Bolts deal bonus damage and apply knockback.
@@ -22,9 +22,9 @@ public class HeavyBoltsSkill extends SkillBonus {
 
     public static final String SKILL_ID = "crossbows_heavy_bolts";
     private static final double BASE_DAMAGE_BONUS = 0.15; // 15% bonus
-    private static final double BASE_KNOCKBACK = 0.5;
+    private static final double BASE_KNOCKBACK = 1.2;
 
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public HeavyBoltsSkill() {
         super(SkillType.CROSSBOWS, 50, "Heavy Bolts",
@@ -43,7 +43,7 @@ public class HeavyBoltsSkill extends SkillBonus {
             return;
         }
         knockback.normalize().multiply(knockbackStrength);
-        knockback.setY(0.3);
+        knockback.setY(0.6);
         target.setVelocity(target.getVelocity().add(knockback));
     }
 
@@ -68,16 +68,16 @@ public class HeavyBoltsSkill extends SkillBonus {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        return List.of(
-                "&7Bonus Damage: &f" + String.format("%.1f", getDamageBonus(skillLevel) * 100) + "%",
-                "&7Knockback: &f" + String.format("%.1f", getKnockbackStrength(skillLevel))
-        );
+        return applyLoreTemplates(Map.of(
+                "damage", String.format("%.1f", getDamageBonus(skillLevel) * 100),
+                "knockback", String.format("%.1f", getKnockbackStrength(skillLevel))
+        ));
     }
 
     @Override
     public double getBonusValue(int skillLevel) { return getDamageBonus(skillLevel); }
     @Override
-    public String getFormattedBonus(int skillLevel) { return String.format("+%.1f%% damage + knockback", getDamageBonus(skillLevel) * 100); }
+    public String getFormattedBonus(int skillLevel) { return applyFormattedBonusTemplate(Map.of("damage", String.format("%.1f", getDamageBonus(skillLevel) * 100))); }
     @Override
     public void shutdown() { activePlayers.clear(); }
 }

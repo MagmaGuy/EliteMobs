@@ -4,7 +4,6 @@ import com.magmaguy.elitemobs.commands.DungeonCommands;
 import com.magmaguy.elitemobs.config.menus.premade.PlayerStatusMenuConfig;
 import com.magmaguy.elitemobs.dungeons.CombatContent;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
-import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -54,11 +53,11 @@ public class TeleportsPage {
 
             TextComponent message = new TextComponent(PlayerStatusScreen.convertLightColorsToBlack(emPackage.getContentPackagesConfigFields().getName() + "\n"));
             String playerInfo = emPackage.getContentPackagesConfigFields().getPlayerInfo();
-            String hoverMessage = ChatColorConverter.convert(PlayerStatusMenuConfig.getOnTeleportHover() +
+            String hoverMessage = PlayerStatusMenuConfig.getOnTeleportHover() +
                     (playerInfo != null ? "\n" + playerInfo
                             .replace("$bossCount", emPackage.getCustomBossEntityList().size() + "")
                             .replace("$lowestTier", ((CombatContent) emPackage).getLowestLevel() + "")
-                            .replace("$highestTier", ((CombatContent) emPackage).getHighestLevel() + "") : ""));
+                            .replace("$highestTier", ((CombatContent) emPackage).getHighestLevel() + "") : "");
             message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(hoverMessage).create()));
             message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/elitemobs dungeontp " + emPackage.getContentPackagesConfigFields().getFilename()));
             textComponents.add(message);

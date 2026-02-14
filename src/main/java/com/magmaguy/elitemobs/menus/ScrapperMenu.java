@@ -9,7 +9,6 @@ import com.magmaguy.elitemobs.config.menus.premade.ScrapperMenuConfig;
 import com.magmaguy.elitemobs.items.customenchantments.RepairEnchantment;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.utils.CustomModelAdder;
-import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -121,13 +120,13 @@ public class ScrapperMenu extends EliteMenu {
 
                 //Check if it's an elitemobs item. The soulbind check only says if the player would be able to pick it up, and vanilla items can be picked up
                 if (!EliteItemManager.isEliteMobsItem(event.getCurrentItem())) {
-                    event.getWhoClicked().sendMessage(ChatColorConverter.convert(EconomySettingsConfig.getShopSaleInstructions()));
+                    event.getWhoClicked().sendMessage(EconomySettingsConfig.getShopSaleInstructions());
                     return;
                 }
 
                 //If the item isn't soulbound to the player, it can't be sold by that player
                 if (!SoulbindEnchantment.isValidSoulbindUser(currentItem.getItemMeta(), player)) {
-                    player.sendMessage(ChatColorConverter.convert(EconomySettingsConfig.getShopSaleOthersItems()));
+                    player.sendMessage(EconomySettingsConfig.getShopSaleOthersItems());
                     return;
                 }
 
@@ -169,9 +168,9 @@ public class ScrapperMenu extends EliteMenu {
                         itemStack.setAmount(0);
                     }
                     if (successes > 0)
-                        player.sendMessage(ChatColorConverter.convert(ItemSettingsConfig.getScrapSucceededMessage().replace("$amount", successes + "")));
+                        player.sendMessage(ItemSettingsConfig.getScrapSucceededMessage().replace("$amount", successes + ""));
                     if (failures > 0)
-                        player.sendMessage(ChatColorConverter.convert(ItemSettingsConfig.getScrapFailedMessage().replace("$amount", failures + "")));
+                        player.sendMessage(ItemSettingsConfig.getScrapFailedMessage().replace("$amount", failures + ""));
 
                     return;
                 }

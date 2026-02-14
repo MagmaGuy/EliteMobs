@@ -5,17 +5,14 @@ import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.StackingSkill;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Righteous Fury (STACKING) - Build stacks on hit, increasing damage.
@@ -28,9 +25,9 @@ public class RighteousFurySkill extends SkillBonus implements StackingSkill {
     private static final double BASE_STACK_BONUS = 0.05; // 5% per stack
     private static final long STACK_DECAY_MS = 5000; // 5 seconds
 
-    private static final Map<UUID, Integer> playerStacks = new HashMap<>();
-    private static final Map<UUID, Long> lastHitTime = new HashMap<>();
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Map<UUID, Integer> playerStacks = new ConcurrentHashMap<>();
+    private static final Map<UUID, Long> lastHitTime = new ConcurrentHashMap<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public RighteousFurySkill() {
         super(SkillType.MACES, 10, "Righteous Fury",
@@ -72,12 +69,6 @@ public class RighteousFurySkill extends SkillBonus implements StackingSkill {
         }
         lastHitTime.put(player.getUniqueId(), System.currentTimeMillis());
 
-        // Show stacks to player
-        int stacks = getCurrentStacks(player);
-        StringBuilder fury = new StringBuilder("\u00A7e");
-        for (int i = 0; i < stacks; i++) fury.append("\u26A1");
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-            TextComponent.fromLegacyText(fury + " \u00A76Fury x" + stacks));
     }
 
     @Override
@@ -126,11 +117,10 @@ public class RighteousFurySkill extends SkillBonus implements StackingSkill {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        return List.of(
-            "&7Max Stacks: &f" + getMaxStacks(skillLevel),
-            "&7Damage/Stack: &f+" + String.format("%.1f", getBonusPerStack(skillLevel) * 100) + "%",
-            "&7Decay: &f5 seconds"
-        );
+        return applyLoreTemplates(Map.of(
+                "maxStacks", String.valueOf(getMaxStacks(skillLevel)),
+                "damagePerStack", String.format("%.1f", getBonusPerStack(skillLevel) * 100)
+        ));
     }
 
     @Override
@@ -140,7 +130,9 @@ public class RighteousFurySkill extends SkillBonus implements StackingSkill {
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("+%.0f%% Max Damage", getBonusValue(skillLevel) * 100);
+        return applyFormattedBonusTemplate(Map.of(
+                "maxDamage", String.format("%.0f", getBonusValue(skillLevel) * 100)
+        ));
     }
 
     @Override

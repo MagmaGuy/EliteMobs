@@ -3,12 +3,22 @@ package com.magmaguy.elitemobs.skills.bonuses.skills.swords;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
+import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.StackingSkill;
+import org.bukkit.NamespacedKey;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Flurry (STACKING) - Consecutive hits increase attack speed.
@@ -18,13 +28,14 @@ import java.util.*;
 public class FlurrySkill extends SkillBonus implements StackingSkill {
 
     public static final String SKILL_ID = "swords_flurry";
+    public static final String MODIFIER_KEY_STRING = "flurry_attack_speed";
     private static final int MAX_STACKS = 5;
-    private static final double ATTACK_SPEED_PER_STACK = 0.05; // 5% per stack
+    private static final double ATTACK_SPEED_PER_STACK = 0.065; // 6.5% per stack
     private static final int STACK_DECAY_TICKS = 60; // 3 seconds
 
-    private static final Map<UUID, Integer> playerStacks = new HashMap<>();
-    private static final Map<UUID, BukkitRunnable> decayTasks = new HashMap<>();
-    private static final Set<UUID> activePlayers = new HashSet<>();
+    private static final Map<UUID, Integer> playerStacks = new ConcurrentHashMap<>();
+    private static final Map<UUID, BukkitRunnable> decayTasks = new ConcurrentHashMap<>();
+    private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public FlurrySkill() {
         super(SkillType.SWORDS, 25, "Flurry",
@@ -42,6 +53,37 @@ public class FlurrySkill extends SkillBonus implements StackingSkill {
         return playerStacks.getOrDefault(player.getUniqueId(), 0);
     }
 
+    /**
+     * Applies or updates the attack speed attribute modifier.
+     */
+    public static void applyAttackSpeedModifier(Player player, double speedBonus) {
+        AttributeInstance attr = player.getAttribute(Attribute.ATTACK_SPEED);
+        if (attr == null) return;
+        NamespacedKey key = new NamespacedKey(MetadataHandler.PLUGIN, MODIFIER_KEY_STRING);
+        removeModifierByKey(attr, key);
+        if (speedBonus > 0) {
+            attr.addModifier(new AttributeModifier(key, speedBonus, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.ANY));
+        }
+    }
+
+    /**
+     * Removes the attack speed modifier from a player.
+     */
+    public static void removeAttackSpeedModifier(Player player) {
+        AttributeInstance attr = player.getAttribute(Attribute.ATTACK_SPEED);
+        if (attr == null) return;
+        removeModifierByKey(attr, new NamespacedKey(MetadataHandler.PLUGIN, MODIFIER_KEY_STRING));
+    }
+
+    private static void removeModifierByKey(AttributeInstance attr, NamespacedKey key) {
+        for (AttributeModifier modifier : attr.getModifiers()) {
+            if (modifier.getKey().equals(key)) {
+                attr.removeModifier(modifier);
+                return;
+            }
+        }
+    }
+
     @Override
     public void addStack(Player player) {
         UUID uuid = player.getUniqueId();
@@ -49,6 +91,11 @@ public class FlurrySkill extends SkillBonus implements StackingSkill {
         if (current < MAX_STACKS) {
             playerStacks.put(uuid, current + 1);
         }
+        // Apply attack speed attribute modifier
+        int skillLevel = SkillBonusRegistry.getPlayerSkillLevel(player, SkillType.SWORDS);
+        int newStacks = playerStacks.get(uuid);
+        double speedBonus = newStacks * getBonusPerStack(skillLevel);
+        applyAttackSpeedModifier(player, speedBonus);
         resetDecayTimer(player);
     }
 
@@ -122,6 +169,7 @@ public class FlurrySkill extends SkillBonus implements StackingSkill {
         activePlayers.remove(uuid);
         playerStacks.remove(uuid);
         cancelDecayTimer(uuid);
+        removeAttackSpeedModifier(player);
     }
 
     @Override
@@ -142,12 +190,11 @@ public class FlurrySkill extends SkillBonus implements StackingSkill {
     @Override
     public List<String> getLoreDescription(int skillLevel) {
         double bonusPerStack = getBonusPerStack(skillLevel) * 100;
-        return List.of(
-                "&7Max Stacks: &f" + MAX_STACKS,
-                "&7Attack Speed per Stack: &f+" + String.format("%.1f", bonusPerStack) + "%",
-                "&7Max Bonus: &f+" + String.format("%.1f", bonusPerStack * MAX_STACKS) + "%",
-                "&7Stacks decay after 3 seconds"
-        );
+        return applyLoreTemplates(Map.of(
+                "maxStacks", String.valueOf(MAX_STACKS),
+                "perStack", String.format("%.1f", bonusPerStack),
+                "maxBonus", String.format("%.1f", bonusPerStack * MAX_STACKS)
+        ));
     }
 
     @Override
@@ -157,12 +204,17 @@ public class FlurrySkill extends SkillBonus implements StackingSkill {
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return String.format("+%.1f%% Attack Speed (max)", getBonusPerStack(skillLevel) * MAX_STACKS * 100);
+        return applyFormattedBonusTemplate(Map.of("maxBonus", String.format("%.1f", getBonusPerStack(skillLevel) * MAX_STACKS * 100)));
     }
 
     @Override
     public boolean affectsDamage() {
         return false; // Attack speed skill doesn't directly affect damage
+    }
+
+    @Override
+    public TestStrategy getTestStrategy() {
+        return TestStrategy.ATTRIBUTE_CHECK;
     }
 
     @Override
