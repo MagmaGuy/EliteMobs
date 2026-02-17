@@ -72,7 +72,7 @@ public class QuestCheckCommand extends AdvancedCommand {
         DialogManager.MultiActionDialogBuilder builder = new DialogManager.MultiActionDialogBuilder();
 
         // Set title
-        String title = processText(questText.getHeader().getText());
+        String title = processText(questText.getHeader().toPlainText());
         if (title != null && !title.isEmpty()) {
             builder.title(title);
         }
@@ -115,8 +115,8 @@ public class QuestCheckCommand extends AdvancedCommand {
 
         StringBuilder text = new StringBuilder();
         for (net.md_5.bungee.api.chat.TextComponent component : components) {
-            if (component.getText() != null) {
-                text.append(processText(component.getText())).append("\n");
+            if (component.toPlainText() != null) {
+                text.append(processText(component.toPlainText())).append("\n");
             }
         }
 
@@ -128,15 +128,15 @@ public class QuestCheckCommand extends AdvancedCommand {
     private void addBodySectionWithHeader(DialogManager.MultiActionDialogBuilder builder,
                                           net.md_5.bungee.api.chat.TextComponent header,
                                           List<net.md_5.bungee.api.chat.TextComponent> items) {
-        if (header != null && header.getText() != null) {
-            builder.addBody(DialogManager.PlainMessageBody.of(processText(header.getText())).width(QUEST_DIALOG_WIDTH));
+        if (header != null && header.toPlainText() != null) {
+            builder.addBody(DialogManager.PlainMessageBody.of(processText(header.toPlainText())).width(QUEST_DIALOG_WIDTH));
         }
 
         if (items != null && !items.isEmpty()) {
             StringBuilder text = new StringBuilder();
             for (net.md_5.bungee.api.chat.TextComponent item : items) {
-                if (item.getText() != null) {
-                    text.append("  ").append(processText(item.getText())).append("\n");
+                if (item.toPlainText() != null) {
+                    text.append("  ").append(processText(item.toPlainText())).append("\n");
                 }
             }
 
@@ -150,8 +150,8 @@ public class QuestCheckCommand extends AdvancedCommand {
                                            net.md_5.bungee.api.chat.TextComponent header,
                                            List<net.md_5.bungee.api.chat.TextComponent> items,
                                            Quest quest) {
-        if (header != null && header.getText() != null) {
-            builder.addBody(DialogManager.PlainMessageBody.of(processText(header.getText())).width(QUEST_DIALOG_WIDTH));
+        if (header != null && header.toPlainText() != null) {
+            builder.addBody(DialogManager.PlainMessageBody.of(processText(header.toPlainText())).width(QUEST_DIALOG_WIDTH));
         }
 
         // Try to show actual item rewards if available
@@ -168,8 +168,8 @@ public class QuestCheckCommand extends AdvancedCommand {
                     String itemId = itemStack.getType().getKey().toString();
 
                     String description = "";
-                    if (items != null && i < items.size() && items.get(i).getText() != null) {
-                        description = processText(items.get(i).getText());
+                    if (items != null && i < items.size() && items.get(i).toPlainText() != null) {
+                        description = processText(items.get(i).toPlainText());
                     }
 
                     DialogManager.ItemBody itemBody = DialogManager.ItemBody.of(itemId, itemStack.getAmount())
@@ -208,11 +208,11 @@ public class QuestCheckCommand extends AdvancedCommand {
 
     private void addButtonFromComponent(DialogManager.MultiActionDialogBuilder builder,
                                         net.md_5.bungee.api.chat.TextComponent component) {
-        if (component == null || component.getText() == null || component.getText().isEmpty()) {
+        if (component == null || component.toPlainText() == null || component.toPlainText().isEmpty()) {
             return;
         }
 
-        String text = processText(component.getText());
+        String text = processText(component.toPlainText());
         if (text.contains("[Abandon]")) {
             text = QuestsConfig.getQuestAbandonText();
         }

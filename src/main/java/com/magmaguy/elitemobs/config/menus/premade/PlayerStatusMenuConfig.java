@@ -326,8 +326,8 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
         teleportLineCreator(0, "&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯", "", "", fileConfiguration, file);
         teleportLineCreator(1, "&2&lTeleports", "", "", fileConfiguration, file);
         teleportLineCreator(2, "&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯", "", "", fileConfiguration, file);
-        teleportLineCreator(3, "&0Spawn", "Teleport to spawn!", "/em spawntp", fileConfiguration, file);
-        teleportLineCreator(4, PlayerStatusScreen.convertLightColorsToBlack(AdventurersGuildConfig.getAdventurersGuildMenuName()), "Teleport to the Adventurer's Guild Hub!", "/ag", fileConfiguration, file);
+        teleportLineCreator(3, "&r&0Spawn", "Teleport to spawn!", "/em spawntp", fileConfiguration, file);
+        teleportLineCreator(4, "&r" + PlayerStatusScreen.convertLightColorsToBlack(AdventurersGuildConfig.getAdventurersGuildMenuName()), "Teleport to the Adventurer's Guild Hub!", "/ag", fileConfiguration, file);
 
         onTeleportHover = ConfigurationEngine.setString(file, fileConfiguration, "onTeleportsHover", "Click to teleport!", true);
 

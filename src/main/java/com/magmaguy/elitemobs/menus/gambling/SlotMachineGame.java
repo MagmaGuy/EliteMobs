@@ -349,6 +349,7 @@ public class SlotMachineGame {
      * Shows the final result of the spin.
      */
     private static void showResult(Player player, SlotSession session, Inventory inventory, double payout) {
+        session.isSpinning = false;
         session.gameOver = true;
 
         if (payout > 0) {

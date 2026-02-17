@@ -14,7 +14,7 @@
         {"type": "bitmap", "file": "elitemobs:gui/buyorsell.png", "ascent": 136, "height": 256, "chars":["󰸈"]},
         {"type": "bitmap", "file": "elitemobs:gui/unbind.png", "ascent": 136, "height": 256, "chars":["󰸉"]},
         {"type": "bitmap", "file": "elitemobs:gui/arenamenu.png", "ascent": 136, "height": 256, "chars":["󰸊"]},
-        {"type": "bitmap", "file": "elitemobs:gui/setupmenu.png", "ascent": 130, "height": 256, "chars":["󰸋"]},
+        {"type": "bitmap", "file": "elitemobs:gui/setupmenu.png", "ascent": 136, "height": 256, "chars":["󰸋"]},
         {"type": "bitmap", "file": "elitemobs:gui/skillsmenu.png", "ascent": 130, "height": 256, "chars":["󰸌"]},
         {"type": "bitmap", "file": "elitemobs:gui/weaponselectmenu.png", "ascent": 130, "height": 256, "chars":["󰸍"]},
 
