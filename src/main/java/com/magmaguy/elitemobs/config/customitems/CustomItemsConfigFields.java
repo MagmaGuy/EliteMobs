@@ -81,7 +81,8 @@ public class CustomItemsConfigFields extends CustomConfigFields {
         // Materials for future versions (e.g. spears) may not exist yet — skip silently
         if (configHas("material")) {
             String rawMaterial = fileConfiguration.getString("material");
-            if (rawMaterial != null && rawMaterial.toUpperCase(java.util.Locale.ROOT).endsWith("_SPEAR")) {
+            if (rawMaterial != null && rawMaterial.toUpperCase(java.util.Locale.ROOT).endsWith("_SPEAR")
+                    && com.magmaguy.elitemobs.versionnotifier.VersionChecker.serverVersionOlderThan(21, 11)) {
                 this.material = Material.WOODEN_SWORD;
                 this.isEnabled = false;
             } else {

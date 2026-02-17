@@ -117,7 +117,7 @@ public class CoinFlipGame {
                         GamblingConfig.getCoinFlipPayoutLabel() + GamblingConfig.getCoinFlipPayout() + "x",
                         "",
                         GamblingConfig.getCoinFlipEdgeChanceLore(),
-                        ChatColorConverter.convert(GamblingConfig.getCoinFlipEdgePayoutLore() + String.format("%.2f", session.betAmount * 10.0) + " " + GamblingConfig.getGamblingCurrencyWord() + "&7)")
+                        ChatColorConverter.convert(GamblingConfig.getCoinFlipEdgePayoutLore() + String.format("%.2f", session.betAmount * GamblingConfig.getCoinFlipEdgePayout()) + " " + GamblingConfig.getGamblingCurrencyWord() + "&7)")
                 ),
                 1
         );
@@ -138,13 +138,13 @@ public class CoinFlipGame {
         session.hasChosen = true;
 
         // STEP 1: BACKEND FIRST - Determine outcome
-        // 1% chance to land on edge (10x payout, player always wins!)
+        // Configurable chance to land on edge (bonus payout, player always wins!)
         double roll = ThreadLocalRandom.current().nextDouble();
-        if (roll < 0.01) {
+        if (GamblingConfig.getCoinFlipEdgeChance() > 0 && roll < GamblingConfig.getCoinFlipEdgeChance()) {
             // EDGE! Super rare outcome
             session.landedOnEdge = true;
             session.playerWon = true;
-            double payout = GamblingEconomyHandler.calculatePayout(session.betAmount, 10.0);
+            double payout = GamblingEconomyHandler.calculatePayout(session.betAmount, GamblingConfig.getCoinFlipEdgePayout());
             session.winAmount = GamblingEconomyHandler.resolveOutcome(player.getUniqueId(), payout);
         } else {
             // Normal flip
@@ -297,7 +297,7 @@ public class CoinFlipGame {
             inventory.setItem(RESULT_SLOT, winResult);
 
             GamblingDisplay.playWinSound(player);
-            GamblingDisplay.sendWinMessage(player, session.winAmount);
+            GamblingDisplay.sendWinMessage(player, session.winAmount, GamblingConfig.getBettingCoinFlipName());
         } else {
             ItemStack loseResult = ItemStackGenerator.generateItemStack(
                     Material.REDSTONE_BLOCK,
@@ -313,7 +313,7 @@ public class CoinFlipGame {
             inventory.setItem(RESULT_SLOT, loseResult);
 
             GamblingDisplay.playLoseSound(player);
-            GamblingDisplay.sendLoseMessage(player, session.betAmount);
+            GamblingDisplay.sendLoseMessage(player, session.betAmount, GamblingConfig.getBettingCoinFlipName());
         }
 
         session.gameOver = true;

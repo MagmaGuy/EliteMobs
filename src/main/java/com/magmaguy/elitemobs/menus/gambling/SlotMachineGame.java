@@ -41,6 +41,7 @@ public class SlotMachineGame {
     private static final int REEL_3_BOT = 23;
     private static final int SPIN_BUTTON_SLOT = 31;
     private static final int BET_INFO_SLOT = 27;
+    private static final int SPIN_AGAIN_SLOT = 30;
     private static final int PAYOUT_INFO_SLOT = 35;
 
     // Payline indicator slots
@@ -394,7 +395,7 @@ public class SlotMachineGame {
             inventory.setItem(SPIN_BUTTON_SLOT, resultItem);
 
             player.playSound(player.getLocation(), resultSound, 1.0f, pitch);
-            GamblingDisplay.sendWinMessage(player, payout);
+            GamblingDisplay.sendWinMessage(player, payout, GamblingConfig.getBettingSlotsName());
         } else {
             // Loss
             ItemStack loseItem = ItemStackGenerator.generateItemStack(
@@ -411,7 +412,22 @@ public class SlotMachineGame {
             inventory.setItem(SPIN_BUTTON_SLOT, loseItem);
 
             GamblingDisplay.playLoseSound(player);
-            GamblingDisplay.sendLoseMessage(player, session.betAmount);
+            GamblingDisplay.sendLoseMessage(player, session.betAmount, GamblingConfig.getBettingSlotsName());
+        }
+
+        // Add "Spin Again" button if the player can afford another bet
+        if (GamblingEconomyHandler.canAffordBet(player.getUniqueId(), session.betAmount)) {
+            ItemStack spinAgainButton = ItemStackGenerator.generateItemStack(
+                    Material.LIME_CONCRETE,
+                    ChatColorConverter.convert("&a&lSPIN AGAIN"),
+                    List.of(
+                            "",
+                            ChatColorConverter.convert("&7Click to spin again!"),
+                            ChatColorConverter.convert("&7Bet: &6" + session.betAmount + " " + GamblingConfig.getGamblingCurrencyWord())
+                    ),
+                    1
+            );
+            inventory.setItem(SPIN_AGAIN_SLOT, spinAgainButton);
         }
     }
 
@@ -498,6 +514,21 @@ public class SlotMachineGame {
 
             if (event.getSlot() == SPIN_BUTTON_SLOT && !session.gameOver) {
                 processSpin(player, session, event.getInventory());
+            } else if (event.getSlot() == SPIN_AGAIN_SLOT && session.gameOver) {
+                if (!GamblingEconomyHandler.canAffordBet(player.getUniqueId(), session.betAmount)) {
+                    player.sendMessage(GamblingConfig.getInsufficientFundsMessage());
+                    return;
+                }
+                if (!GamblingEconomyHandler.placeBet(player.getUniqueId(), session.betAmount)) {
+                    player.sendMessage(GamblingConfig.getInsufficientFundsMessage());
+                    return;
+                }
+                session.gameOver = false;
+                session.isSpinning = false;
+                session.results = null;
+                session.playerWon = false;
+                session.winAmount = 0;
+                setupInitialDisplay(event.getInventory(), session);
             }
         }
 

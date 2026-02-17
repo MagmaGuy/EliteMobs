@@ -33,6 +33,18 @@ public class ContentPackagesConfig extends CustomConfig {
         if (!worldsBluePrint.exists()) worldsBluePrint.mkdir();
     }
 
+    /**
+     * Re-reads dungeonVersion from disk for all content packages.
+     * Must be called after the importer extracts new content (which overwrites YAML files)
+     * but before initializePackages() and VersionChecker.check().
+     */
+    public static void refreshDungeonVersions() {
+        for (ContentPackagesConfigFields fields : dungeonPackages.values())
+            fields.refreshDungeonVersionFromDisk();
+        for (ContentPackagesConfigFields fields : enchantedChallengeDungeonPackages.values())
+            fields.refreshDungeonVersionFromDisk();
+    }
+
     public static void initializePackages() {
         for (ContentPackagesConfigFields fields : dungeonPackages.values())
             EMPackage.initialize(fields);

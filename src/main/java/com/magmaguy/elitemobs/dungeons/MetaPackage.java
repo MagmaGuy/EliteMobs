@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.dungeons;
 
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
+import com.magmaguy.magmacore.nightbreak.NightbreakAccount;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -33,6 +34,18 @@ public class MetaPackage extends EMPackage {
         }
         if (allInstalled) {
             isInstalled = true;
+            // Check if meta-package itself is out of date
+            if (outOfDate) {
+                String slug = contentPackagesConfigFields.getNightbreakSlug();
+                if (slug != null && !slug.isEmpty() && NightbreakAccount.hasToken()) {
+                    if (cachedAccessInfo != null && cachedAccessInfo.hasAccess)
+                        return ContentState.OUT_OF_DATE_UPDATABLE;
+                    if (cachedAccessInfo != null && !cachedAccessInfo.hasAccess)
+                        return ContentState.OUT_OF_DATE_NO_ACCESS;
+                    return ContentState.OUT_OF_DATE_UPDATABLE;
+                }
+                return ContentState.OUT_OF_DATE_UPDATABLE;
+            }
             return ContentState.INSTALLED;
         }
         if (someInstalled) {

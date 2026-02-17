@@ -280,7 +280,7 @@ public class HigherLowerGame {
         showCashOutResult(inventory, session, payout);
 
         GamblingDisplay.playWinSound(player);
-        GamblingDisplay.sendWinMessage(player, payout);
+        GamblingDisplay.sendWinMessage(player, payout, GamblingConfig.getBettingHigherLowerName());
     }
 
     /**
@@ -398,7 +398,7 @@ public class HigherLowerGame {
         inventory.setItem(BET_INFO_SLOT, gameOver);
 
         GamblingDisplay.playLoseSound(player);
-        GamblingDisplay.sendLoseMessage(player, session.betAmount);
+        GamblingDisplay.sendLoseMessage(player, session.betAmount, GamblingConfig.getBettingHigherLowerName());
     }
 
     /**

@@ -153,14 +153,11 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
                 continue;
             }
 
-            // Fortify - stacking damage reduction
+            // Fortify - stacking damage reduction (always applies, action bar handled internally)
             if (skill instanceof FortifySkill fortify) {
                 double modifiedDamage = fortify.modifyIncomingDamage(player, getDamage());
-                if (modifiedDamage != getDamage()) {
-                    setDamage(modifiedDamage);
-                    skill.incrementProcCount(player);
-                    SkillBonus.sendSkillActionBar(player, skill);
-                }
+                setDamage(modifiedDamage);
+                skill.incrementProcCount(player);
                 continue;
             }
 
@@ -245,6 +242,8 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
         double parryDamage = ParrySkill.applyParryReduction(player, this, getDamage());
         if (parryDamage != getDamage()) {
             setDamage(parryDamage);
+            SkillBonus parrySkill = SkillBonusRegistry.getSkillById(ParrySkill.SKILL_ID);
+            if (parrySkill != null) SkillBonus.sendSkillActionBar(player, parrySkill);
         }
 
         // Phalanx - frontal damage reduction when holding spear

@@ -3,12 +3,15 @@ package com.magmaguy.elitemobs.items.customloottable;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.CommandMessagesConfig;
+import com.magmaguy.elitemobs.config.InitializeConfig;
 import com.magmaguy.elitemobs.items.EliteItemLore;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.menus.LootMenu;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.magmacore.util.ChatColorConverter;
+import com.magmaguy.magmacore.util.Logger;
+import com.magmaguy.magmacore.util.SpigotMessage;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -49,10 +52,17 @@ public class SharedLootTable {
     }
 
     private void messagePlayers() {
-        damagers.forEach(damagers -> {
-            damagers.sendMessage(CommandMessagesConfig.getLootVoteSeparator());
-            damagers.sendMessage(CommandMessagesConfig.getLootVoteMessage().replace("$count", String.valueOf(loot.size())));
-            damagers.sendMessage(CommandMessagesConfig.getLootVoteSeparator());
+        damagers.forEach(player -> {
+            Logger.sendSimpleMessage(player, CommandMessagesConfig.getLootVoteSeparator());
+            player.spigot().sendMessage(
+                    SpigotMessage.simpleMessage(CommandMessagesConfig.getLootVoteMessage()),
+                    SpigotMessage.commandHoverMessage(
+                            InitializeConfig.getEmLootDisplay(),
+                            InitializeConfig.getEmLootHover(),
+                            "/em loot"),
+                    SpigotMessage.simpleMessage(CommandMessagesConfig.getLootVoteMessageSuffix()
+                            .replace("$count", String.valueOf(loot.size()))));
+            Logger.sendSimpleMessage(player, CommandMessagesConfig.getLootVoteSeparator());
         });
     }
 

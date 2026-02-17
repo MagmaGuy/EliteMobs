@@ -75,8 +75,6 @@ public class StatsCommand {
         commandSender.sendMessage(
                 CommandMessagesConfig.getStatsAverageThreatMessage()
                         .replace("$average", String.valueOf(Round.twoDecimalPlaces(threatAverage))));
-        // Guild rank stats removed
-        commandSender.sendMessage(CommandMessagesConfig.getStatsSeparator());
         commandSender.sendMessage(CommandMessagesConfig.getTrackedBossCountMessage() + EntityTracker.getEliteMobEntities().size());
         commandSender.sendMessage(CommandMessagesConfig.getTrackedNpcCountMessage() + EntityTracker.getNpcEntities().size());
         int loadedCounter = 0;
@@ -84,6 +82,7 @@ public class StatsCommand {
             if (regionalBossEntity.isValid())
                 loadedCounter++;
         commandSender.sendMessage(CommandMessagesConfig.getRegionalBossStatsMessage().replace("$total", String.valueOf(RegionalBossEntity.getRegionalBossEntities().size())).replace("$loaded", String.valueOf(loadedCounter)));
+        commandSender.sendMessage(CommandMessagesConfig.getStatsSeparator());
     }
 
 }

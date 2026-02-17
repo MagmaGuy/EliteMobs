@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.mobspawning;
 
 import com.magmaguy.elitemobs.EliteMobs;
-import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.ValidWorldsConfig;
@@ -12,7 +11,6 @@ import com.magmaguy.elitemobs.items.customenchantments.HunterEnchantment;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
-import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser;
@@ -29,7 +27,6 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.*;
 
@@ -51,7 +48,9 @@ public class NaturalMobSpawnEventHandler implements Listener {
         int playerCount = 0;
 
         for (Player player : nearbyPlayers) {
-            int individualPlayerThreat = ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getNaturalMobSpawnLevel(true);
+            ElitePlayerInventory inventory = ElitePlayerInventory.playerInventories.get(player.getUniqueId());
+            if (inventory == null) continue;
+            int individualPlayerThreat = inventory.getNaturalMobSpawnLevel(true);
             playerCount++;
 
             if (individualPlayerThreat > eliteMobLevel)
@@ -109,7 +108,7 @@ public class NaturalMobSpawnEventHandler implements Listener {
 
         if (!MobCombatSettingsConfig.isDoNaturalMobSpawning())
             return;
-        if (!ValidWorldsConfig.getInstance().getFileConfiguration().getBoolean("Valid worlds." + event.getEntity().getWorld().getName()))
+        if (!ValidWorldsConfig.getInstance().getFileConfiguration().getBoolean("validWorlds." + event.getEntity().getWorld().getName()))
             return;
         if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.SPAWNER) &&
                 !MobCombatSettingsConfig.isDoSpawnersSpawnEliteMobs() ||

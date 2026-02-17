@@ -1,5 +1,7 @@
 package com.magmaguy.elitemobs.items.customloottable;
 
+import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.PluginState;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.instanced.dungeons.DungeonInstance;
@@ -37,7 +39,8 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
         if (filename == null) return;
         CustomItem customItem = CustomItem.getCustomItem(filename);
         if (customItem == null) {
-            errorMessage(rawString, configFilename, "filename");
+            if (MetadataHandler.pluginState != PluginState.INITIALIZING)
+                errorMessage(rawString, configFilename, "filename");
             return;
         }
         entries.add(this);
