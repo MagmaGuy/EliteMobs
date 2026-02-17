@@ -14,11 +14,7 @@ public class GamblingConfig extends ConfigurationFile {
     @Getter
     private static boolean gamblingEnabled;
     @Getter
-    private static double maxDebt;
-    @Getter
     private static int minBet;
-    @Getter
-    private static int maxBet;
 
     // Debt Collector settings
     @Getter
@@ -27,10 +23,6 @@ public class GamblingConfig extends ConfigurationFile {
     private static int debtCollectorCheckIntervalMinutes;
     @Getter
     private static int debtCollectorTimeoutSeconds;
-    @Getter
-    private static double debtCollectorHealthMultiplier;
-    @Getter
-    private static double debtCollectorDamageMultiplier;
     @Getter
     private static double debtReductionOnPlayerDeath;
 
@@ -42,25 +34,15 @@ public class GamblingConfig extends ConfigurationFile {
     @Getter
     private static double coinFlipPayout;
     @Getter
-    private static double slotsPayoutCherry;
+    private static double coinFlipEdgeChance;
     @Getter
-    private static double slotsPayoutLemon;
-    @Getter
-    private static double slotsPayoutBell;
-    @Getter
-    private static double slotsPayoutBar;
-    @Getter
-    private static double slotsPayoutSeven;
-    @Getter
-    private static double slotsPayoutTwoMatch;
+    private static double coinFlipEdgePayout;
     @Getter
     private static double higherLowerMultiplier;
 
     // Messages
     @Getter
     private static String insufficientFundsMessage;
-    @Getter
-    private static String maxDebtReachedMessage;
     @Getter
     private static String winMessage;
     @Getter
@@ -69,8 +51,6 @@ public class GamblingConfig extends ConfigurationFile {
     private static String debtWarningMessage;
     @Getter
     private static String betPlacedMessage;
-    @Getter
-    private static String balanceDisplayMessage;
 
     // Betting menu
     @Getter
@@ -79,8 +59,6 @@ public class GamblingConfig extends ConfigurationFile {
     private static String playButtonText;
     @Getter
     private static String cancelButtonText;
-    @Getter
-    private static String maxBetButtonText;
 
     // Game-specific menu titles
     @Getter
@@ -434,18 +412,9 @@ public class GamblingConfig extends ConfigurationFile {
                         "When disabled, gambling NPCs will not work and the Debt Collector will not spawn."),
                 fileConfiguration, "gamblingEnabled", true);
 
-        maxDebt = ConfigurationEngine.setDouble(
-                List.of("Maximum amount of debt a player can accumulate from gambling.",
-                        "Players cannot place bets that would put them over this limit."),
-                fileConfiguration, "maxDebt", 500.0);
-
         minBet = ConfigurationEngine.setInt(
                 List.of("Minimum bet amount for all gambling games."),
                 fileConfiguration, "minBet", 10);
-
-        maxBet = ConfigurationEngine.setInt(
-                List.of("Maximum bet amount for all gambling games."),
-                fileConfiguration, "maxBet", 1000);
 
         // Debt Collector settings
         debtCollectorSpawnChance = ConfigurationEngine.setDouble(
@@ -460,14 +429,6 @@ public class GamblingConfig extends ConfigurationFile {
         debtCollectorTimeoutSeconds = ConfigurationEngine.setInt(
                 List.of("How long (in seconds) before the Debt Collector despawns if not killed."),
                 fileConfiguration, "debtCollector.timeoutSeconds", 600);
-
-        debtCollectorHealthMultiplier = ConfigurationEngine.setDouble(
-                List.of("Health multiplier for the Debt Collector boss."),
-                fileConfiguration, "debtCollector.healthMultiplier", 5.0);
-
-        debtCollectorDamageMultiplier = ConfigurationEngine.setDouble(
-                List.of("Damage multiplier for the Debt Collector boss."),
-                fileConfiguration, "debtCollector.damageMultiplier", 1.0);
 
         debtReductionOnPlayerDeath = ConfigurationEngine.setDouble(
                 List.of("Amount of debt reduced when the Debt Collector kills a player.",
@@ -488,53 +449,37 @@ public class GamblingConfig extends ConfigurationFile {
                         "Set below 2.0 for house edge (1.9 = 5% house edge)."),
                 fileConfiguration, "payouts.coinFlip", 1.9);
 
-        slotsPayoutCherry = ConfigurationEngine.setDouble(
-                List.of("Payout multiplier for matching 3 cherries on the slot machine."),
-                fileConfiguration, "payouts.slots.cherry", 2.0);
+        coinFlipEdgeChance = ConfigurationEngine.setDouble(
+                List.of("Chance (0.0 to 1.0) for the coin to land on its edge (bonus win).",
+                        "Default 0.01 = 1% chance. Set to 0.0 to disable the edge mechanic."),
+                fileConfiguration, "payouts.coinFlip.edgeChance", 0.01);
 
-        slotsPayoutLemon = ConfigurationEngine.setDouble(
-                List.of("Payout multiplier for matching 3 lemons on the slot machine."),
-                fileConfiguration, "payouts.slots.lemon", 3.0);
-
-        slotsPayoutBell = ConfigurationEngine.setDouble(
-                List.of("Payout multiplier for matching 3 bells on the slot machine."),
-                fileConfiguration, "payouts.slots.bell", 5.0);
-
-        slotsPayoutBar = ConfigurationEngine.setDouble(
-                List.of("Payout multiplier for matching 3 bars on the slot machine."),
-                fileConfiguration, "payouts.slots.bar", 10.0);
-
-        slotsPayoutSeven = ConfigurationEngine.setDouble(
-                List.of("Payout multiplier for matching 3 sevens on the slot machine (jackpot)."),
-                fileConfiguration, "payouts.slots.seven", 25.0);
-
-        slotsPayoutTwoMatch = ConfigurationEngine.setDouble(
-                List.of("Payout multiplier for matching only 2 symbols on the slot machine."),
-                fileConfiguration, "payouts.slots.twoMatch", 0.5);
+        coinFlipEdgePayout = ConfigurationEngine.setDouble(
+                List.of("Payout multiplier when the coin lands on its edge.",
+                        "Combined with the edge chance and normal payout, this determines the overall house edge.",
+                        "With 1% edge chance and 1.9x normal payout: 5.0x edge = ~1% house edge, 10.0x edge = ~4% player edge."),
+                fileConfiguration, "payouts.coinFlip.edgePayout", 5.0);
 
         higherLowerMultiplier = ConfigurationEngine.setDouble(
                 List.of("Multiplier applied to the bet for each correct guess in Higher/Lower.",
-                        "This stacks: 1st correct = 1.5x, 2nd = 2.25x, 3rd = 3.375x, etc."),
-                fileConfiguration, "payouts.higherLower.multiplier", 1.5);
+                        "This stacks: 1st correct = 1.3x, 2nd = 1.69x, 3rd = 2.197x, etc.",
+                        "With ~71% average win rate per guess: 1.3x = ~7.7% house edge, 1.5x = ~6.5% player edge."),
+                fileConfiguration, "payouts.higherLower.multiplierV2", 1.3);
 
         // Messages
         insufficientFundsMessage = ConfigurationEngine.setString(
                 List.of("Message shown when a player tries to bet more than they can afford."),
                 file, fileConfiguration, "messages.insufficientFunds", "&c[Casino] You can't afford that bet!", true);
 
-        maxDebtReachedMessage = ConfigurationEngine.setString(
-                List.of("Message shown when a player has reached maximum debt."),
-                file, fileConfiguration, "messages.maxDebtReached", "&c[Casino] You've reached your credit limit! Pay off some debt first.", true);
-
         winMessage = ConfigurationEngine.setString(
                 List.of("Message shown when a player wins a gambling game.",
-                        "Use %amount% for the win amount."),
-                file, fileConfiguration, "messages.win", "&a[Casino] Congratulations! You won &6%amount% coins&a!", true);
+                        "Use %amount% for the win amount, %game% for the game name."),
+                file, fileConfiguration, "messages.win", "&a[Casino] Congratulations! You won &6%amount% coins &ain %game%!", true);
 
         loseMessage = ConfigurationEngine.setString(
                 List.of("Message shown when a player loses a gambling game.",
-                        "Use %amount% for the lost amount."),
-                file, fileConfiguration, "messages.lose", "&c[Casino] Better luck next time. You lost &6%amount% coins&c.", true);
+                        "Use %amount% for the lost amount, %game% for the game name."),
+                file, fileConfiguration, "messages.lose", "&c[Casino] Better luck next time. You lost &6%amount% coins &cin %game%.", true);
 
         debtWarningMessage = ConfigurationEngine.setString(
                 List.of("Message shown when a player goes into debt.",
@@ -545,11 +490,6 @@ public class GamblingConfig extends ConfigurationFile {
                 List.of("Message shown when a bet is placed.",
                         "Use %amount% for the bet amount."),
                 file, fileConfiguration, "messages.betPlaced", "&7[Casino] Bet placed: &6%amount% coins", true);
-
-        balanceDisplayMessage = ConfigurationEngine.setString(
-                List.of("Message format for displaying balance and debt.",
-                        "Use %balance% and %debt%."),
-                file, fileConfiguration, "messages.balanceDisplay", "&7Balance: &a%balance% &7| Debt: &c%debt%", true);
 
         // Menu titles
         bettingMenuTitle = ConfigurationEngine.setString(
@@ -564,10 +504,6 @@ public class GamblingConfig extends ConfigurationFile {
         cancelButtonText = ConfigurationEngine.setString(
                 List.of("Text for the cancel button in the betting menu."),
                 file, fileConfiguration, "menus.cancelButton", "&c&lCancel", true);
-
-        maxBetButtonText = ConfigurationEngine.setString(
-                List.of("Text for the max bet button in the betting menu."),
-                file, fileConfiguration, "menus.maxBetButton", "&e&lMax Bet", true);
 
         // Game menu titles
         blackjackMenuTitle = ConfigurationEngine.setString(
@@ -778,7 +714,7 @@ public class GamblingConfig extends ConfigurationFile {
 
         coinFlipEdgePayoutLore = ConfigurationEngine.setString(
                 List.of("Lore describing the edge payout. Amount is inserted dynamically."),
-                file, fileConfiguration, "coinFlip.edgePayoutLore", "&b✦ Edge Payout: &a10x &7(&a", true);
+                file, fileConfiguration, "coinFlip.edgePayoutLoreV2", "&b✦ Edge Payout: &a5x &7(&a", true);
 
         coinFlipFlipping = ConfigurationEngine.setString(
                 List.of("Text shown while the coin is flipping."),
@@ -818,12 +754,12 @@ public class GamblingConfig extends ConfigurationFile {
 
         coinFlipEdgePayoutMultiplier = ConfigurationEngine.setString(
                 List.of("Text showing the payout multiplier in the edge result."),
-                file, fileConfiguration, "coinFlip.edgePayoutMultiplier", "&6&l10x PAYOUT!", true);
+                file, fileConfiguration, "coinFlip.edgePayoutMultiplierV2", "&6&l5x PAYOUT!", true);
 
         coinFlipEdgeChatMessage = ConfigurationEngine.setString(
                 List.of("Chat message sent when the coin lands on edge.",
                         "Use %amount% for the win amount."),
-                file, fileConfiguration, "coinFlip.edgeChatMessage", "&b&l✦ EDGE! ✦ &7The coin landed on its edge! &a10x PAYOUT! &7You won &a%amount% coins&7!", true);
+                file, fileConfiguration, "coinFlip.edgeChatMessageV2", "&b&l✦ EDGE! ✦ &7The coin landed on its edge! &a5x PAYOUT! &7You won &a%amount% coins&7!", true);
 
         coinFlipLandedOnLore = ConfigurationEngine.setString(
                 List.of("Lore prefix for the final coin result. The side name is appended."),

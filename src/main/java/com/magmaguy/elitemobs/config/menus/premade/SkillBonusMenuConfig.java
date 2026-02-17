@@ -65,8 +65,6 @@ public class SkillBonusMenuConfig extends MenusConfigFields {
     @Getter
     private static int backSlot;
     @Getter
-    private static ItemStack infoItem;
-    @Getter
     private static int infoSlot;
 
     // Skill status colors/lore
@@ -78,10 +76,6 @@ public class SkillBonusMenuConfig extends MenusConfigFields {
     private static String activePrefix;
     @Getter
     private static String lockedLore;
-    @Getter
-    private static String unlockedLore;
-    @Getter
-    private static String activeLore;
     @Getter
     private static String clickToActivate;
     @Getter
@@ -215,17 +209,6 @@ public class SkillBonusMenuConfig extends MenusConfigFields {
                 ItemStackGenerator.generateItemStack(Material.ARROW, "&cBack", List.of("&7Return to weapon selection")), true);
         backSlot = ConfigurationEngine.setInt(fileConfiguration, "backSlot", 45);
 
-        infoItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "infoItem",
-                ItemStackGenerator.generateItemStack(Material.BOOK, "&eSkill Info", List.of(
-                        "&7You can have up to &63 active skills",
-                        "&7per weapon type.",
-                        "",
-                        "&7Skills unlock at levels:",
-                        "&a Tier 1: &fLevel 10",
-                        "&e Tier 2: &fLevel 25",
-                        "&6 Tier 3: &fLevel 50",
-                        "&c Tier 4: &fLevel 75"
-                )), true);
         infoSlot = ConfigurationEngine.setInt(fileConfiguration, "infoSlot", 49);
 
         // Status text
@@ -233,8 +216,6 @@ public class SkillBonusMenuConfig extends MenusConfigFields {
         unlockedPrefix = ConfigurationEngine.setString(file, fileConfiguration, "unlockedPrefix", "&a[UNLOCKED] ", true);
         activePrefix = ConfigurationEngine.setString(file, fileConfiguration, "activePrefix", "&6[ACTIVE] ", true);
         lockedLore = ConfigurationEngine.setString(file, fileConfiguration, "lockedLore", "&cRequires level %level%", true);
-        unlockedLore = ConfigurationEngine.setString(file, fileConfiguration, "unlockedLore", "&aClick to activate", true);
-        activeLore = ConfigurationEngine.setString(file, fileConfiguration, "activeLore", "&eClick to deactivate", true);
         clickToActivate = ConfigurationEngine.setString(file, fileConfiguration, "clickToActivate", "&aClick to activate this skill", true);
         clickToDeactivate = ConfigurationEngine.setString(file, fileConfiguration, "clickToDeactivate", "&eClick to deactivate this skill", true);
         maxActiveSkillsReached = ConfigurationEngine.setString(file, fileConfiguration, "maxActiveSkillsReached", "&cYou already have 3 active skills! Deactivate one first.", true);

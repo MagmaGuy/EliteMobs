@@ -109,10 +109,6 @@ public class EvasionSkill extends SkillBonus implements ProcSkill {
      * @return true if the attack was evaded
      */
     public boolean tryEvade(Player player, Object context) {
-        if (!isActive(player)) {
-            return false;
-        }
-
         int skillLevel = getPlayerSkillLevel(player);
         if (ThreadLocalRandom.current().nextDouble() < getProcChance(skillLevel)) {
             onProc(player, context);

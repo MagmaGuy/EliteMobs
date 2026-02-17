@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.commands.ReloadCommand;
 import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
+import com.magmaguy.elitemobs.dungeons.MetaPackage;
 import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
@@ -18,9 +19,13 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class DownloadAllContentCommand extends AdvancedCommand {
+
+    /** Shared guard preventing concurrent bulk download/update operations. */
+    static final AtomicBoolean IS_BULK_DOWNLOADING = new AtomicBoolean(false);
 
     public DownloadAllContentCommand() {
         super(List.of("downloadall"));
@@ -40,12 +45,24 @@ public class DownloadAllContentCommand extends AdvancedCommand {
             return;
         }
 
+        if (!IS_BULK_DOWNLOADING.compareAndSet(false, true)) {
+            sender.sendMessage(
+                CommandMessagesConfig.getDownloadAllAlreadyRunningMessage());
+            return;
+        }
+
+        // Filter out children of MetaPackages (they're covered by their parent's slug)
+        Set<String> metaChildren = EMPackage.getMetaPackageChildFilenames();
+
         // Find all packages that need downloading (not downloaded) or updating (outdated)
         // Deduplicate by slug so each unique slug is only downloaded once
         List<EMPackage> downloadable = new ArrayList<>();
         Set<String> seenSlugs = new HashSet<>();
         boolean hasAnySlug = false;
         for (EMPackage pkg : EMPackage.getEmPackages().values()) {
+            if (metaChildren.contains(pkg.getContentPackagesConfigFields().getFilename())) continue;
+            // For MetaPackages, ensure isDownloaded/isInstalled are derived from children
+            if (pkg instanceof MetaPackage) pkg.refreshState();
             String slug = pkg.getContentPackagesConfigFields().getNightbreakSlug();
             if (slug == null || slug.isEmpty()) continue;
             hasAnySlug = true;
@@ -59,6 +76,7 @@ public class DownloadAllContentCommand extends AdvancedCommand {
         }
 
         if (downloadable.isEmpty()) {
+            IS_BULK_DOWNLOADING.set(false);
             if (!hasAnySlug) {
                 sender.sendMessage(
                     CommandMessagesConfig.getDownloadAllNoAccessMessage());
@@ -81,17 +99,20 @@ public class DownloadAllContentCommand extends AdvancedCommand {
         // Download packages sequentially
         AtomicInteger completed = new AtomicInteger(0);
         AtomicInteger failed = new AtomicInteger(0);
+        List<String> failedNames = new ArrayList<>();
 
-        downloadNextPackage(downloadable, 0, importsFolder, player, sender, completed, failed);
+        downloadNextPackage(downloadable, 0, importsFolder, player, sender, completed, failed, failedNames);
     }
 
     private void downloadNextPackage(List<EMPackage> packages, int index, File importsFolder,
                                       Player player, CommandSender sender,
-                                      AtomicInteger completed, AtomicInteger failed) {
+                                      AtomicInteger completed, AtomicInteger failed,
+                                      List<String> failedNames) {
         // Check if player disconnected
         if (player != null && !player.isOnline()) {
             // Continue downloads silently, just don't send messages
             if (index >= packages.size()) {
+                IS_BULK_DOWNLOADING.set(false);
                 if (completed.get() > 0) {
                     Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> {
                         ReloadCommand.reload(Bukkit.getConsoleSender());
@@ -101,20 +122,27 @@ public class DownloadAllContentCommand extends AdvancedCommand {
             }
             EMPackage pkg = packages.get(index);
             String slug = pkg.getContentPackagesConfigFields().getNightbreakSlug();
+            String name = pkg.getContentPackagesConfigFields().getName();
             NightbreakContentManager.downloadAsync(slug, importsFolder, null, success -> {
                 if (success) completed.incrementAndGet();
-                else failed.incrementAndGet();
-                downloadNextPackage(packages, index + 1, importsFolder, player, sender, completed, failed);
+                else { failed.incrementAndGet(); failedNames.add(name); }
+                downloadNextPackage(packages, index + 1, importsFolder, player, sender, completed, failed, failedNames);
             });
             return;
         }
 
         if (index >= packages.size()) {
+            IS_BULK_DOWNLOADING.set(false);
             // All done
             sender.sendMessage(
                 CommandMessagesConfig.getDownloadAllCompleteMessage()
                         .replace("$completed", String.valueOf(completed.get()))
                         .replace("$failed", String.valueOf(failed.get())));
+            if (!failedNames.isEmpty()) {
+                sender.sendMessage(
+                    CommandMessagesConfig.getDownloadAllFailedListMessage()
+                            .replace("$names", String.join(", ", failedNames)));
+            }
             if (completed.get() > 0) {
                 sender.sendMessage(
                     CommandMessagesConfig.getDownloadAllReloadingMessage());
@@ -153,13 +181,14 @@ public class DownloadAllContentCommand extends AdvancedCommand {
                 }
             } else {
                 failed.incrementAndGet();
+                failedNames.add(name);
                 if (player == null || player.isOnline()) {
                     sender.sendMessage(
                         CommandMessagesConfig.getDownloadAllFailedMessage().replace("$name", name));
                 }
             }
             // Download next package
-            downloadNextPackage(packages, index + 1, importsFolder, player, sender, completed, failed);
+            downloadNextPackage(packages, index + 1, importsFolder, player, sender, completed, failed, failedNames);
         });
     }
 }

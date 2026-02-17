@@ -98,10 +98,6 @@ public class FortifySkill extends SkillBonus implements StackingSkill {
 
     @Override
     public int getCurrentStacks(Player player) {
-        if (!isActive(player)) {
-            return 0;
-        }
-
         // Check if stacks have decayed
         Long lastDamage = lastDamageTime.get(player.getUniqueId());
         if (lastDamage != null && System.currentTimeMillis() - lastDamage > STACK_DECAY_TIME) {
@@ -113,10 +109,6 @@ public class FortifySkill extends SkillBonus implements StackingSkill {
 
     @Override
     public void addStack(Player player) {
-        if (!isActive(player)) {
-            return;
-        }
-
         int current = stackMap.getOrDefault(player.getUniqueId(), 0);
         if (current < getMaxStacks()) {
             stackMap.put(player.getUniqueId(), current + 1);
@@ -145,10 +137,6 @@ public class FortifySkill extends SkillBonus implements StackingSkill {
      * @return The modified damage amount
      */
     public double modifyIncomingDamage(Player player, double originalDamage) {
-        if (!isActive(player)) {
-            return originalDamage;
-        }
-
         int skillLevel = getPlayerSkillLevel(player);
         int currentStacks = getCurrentStacks(player);
 
@@ -158,6 +146,9 @@ public class FortifySkill extends SkillBonus implements StackingSkill {
 
         // Add a stack after calculating damage
         addStack(player);
+
+        // Always show action bar with current stack count (after adding)
+        sendStackingSkillActionBar(player, this, getCurrentStacks(player), getMaxStacks());
 
         return modifiedDamage;
     }

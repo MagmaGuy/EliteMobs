@@ -28,8 +28,6 @@ public class QuestsConfig extends ConfigurationFile {
     @Getter
     private static String leaveWhenNoActiveQuestsExist;
     @Getter
-    private static String questLeaveConfirmationMessage;
-    @Getter
     private static boolean useQuestAcceptTitles;
     @Getter
     private static String questStartTitle;
@@ -229,9 +227,6 @@ public class QuestsConfig extends ConfigurationFile {
         leaveWhenNoActiveQuestsExist = ConfigurationEngine.setString(
                 List.of("Sets the message sent when a player tried to abandon a quest when none are active."),
                 file, fileConfiguration, "leaveWhenNoActiveQuestsExist", "&cYou don't currently have an active quest!", true);
-        questLeaveConfirmationMessage = ConfigurationEngine.setString(
-                List.of("Sets the confirmation message sent when players try to leave a quest."),
-                file, fileConfiguration, "questLeaveConfirmationMessage", "&cAre you sure you want to abandon your current quest? Do &a/em confirm &c to confirm your choice!", true);
         useQuestAcceptTitles = ConfigurationEngine.setBoolean(
                 List.of("Sets if some of the messages related to quests will use titles instead of chat messages."),
                 fileConfiguration, "useQuestAcceptTitles", true);

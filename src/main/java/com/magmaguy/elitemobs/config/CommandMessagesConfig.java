@@ -358,6 +358,8 @@ public class CommandMessagesConfig extends ConfigurationFile {
     private static String lootVoteSeparator;
     @Getter
     private static String lootVoteMessage;
+    @Getter
+    private static String lootVoteMessageSuffix;
 
     // VersionChecker messages
     @Getter
@@ -406,6 +408,10 @@ public class CommandMessagesConfig extends ConfigurationFile {
     // WormholeEntry OP message
     @Getter
     private static String wormholeOpDownloadMessage;
+    @Getter
+    private static String wormholeOpSetupMessage;
+    @Getter
+    private static String wormholeAgSpawnRecommendation;
 
     // FarmingProtection messages
     @Getter
@@ -464,6 +470,10 @@ public class CommandMessagesConfig extends ConfigurationFile {
     private static String downloadAllCompleteMessage;
     @Getter
     private static String downloadAllReloadingMessage;
+    @Getter
+    private static String downloadAllAlreadyRunningMessage;
+    @Getter
+    private static String downloadAllFailedListMessage;
     @Getter
     private static String downloadAllSetupClickMessage;
     @Getter
@@ -978,7 +988,7 @@ public class CommandMessagesConfig extends ConfigurationFile {
                 file, fileConfiguration, "trackedNpcCountMessage", "Tracked NPC count: ", true);
         statsSeparator = ConfigurationEngine.setString(
                 List.of("Sets the separator line for the stats command."),
-                file, fileConfiguration, "statsSeparator", "&5&m-----------------------------------------------------", true);
+                file, fileConfiguration, "statsSeparator", "<g:#8B0000:#CC4400:#DAA520>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬</g>", true);
         statsVersionHeader = ConfigurationEngine.setString(
                 List.of("Sets the version header for the stats command.",
                         "$version is the placeholder for the plugin version."),
@@ -1019,18 +1029,24 @@ public class CommandMessagesConfig extends ConfigurationFile {
         // SharedLootTable messages
         lootVoteSeparator = ConfigurationEngine.setString(
                 List.of("Sets the separator line for loot votes"),
-                file, fileConfiguration, "lootVoteSeparator", "&e&l---------------------------------------------", true);
+                file, fileConfiguration, "lootVoteSeparator", "<g:#8B0000:#CC4400:#DAA520>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬</g>", true);
         lootVoteMessage = ConfigurationEngine.setString(
-                List.of("Sets the loot vote message", "$count - the number of items to vote on"),
-                file, fileConfiguration, "lootVoteMessage", "&8[EliteMobs] &6Loot vote! Do &9/em loot &6 to vote on $count items!", true);
+                List.of("Sets the loot vote message prefix, before the clickable /em loot command.",
+                        "$count - the number of items to vote on, used in the suffix."),
+                file, fileConfiguration, "lootVoteMessage", "&8[EliteMobs] &6Loot vote! Click ", true);
+        lootVoteMessageSuffix = ConfigurationEngine.setString(
+                List.of("Sets the loot vote message suffix, after the clickable /em loot command.",
+                        "$count - the number of items to vote on"),
+                file, fileConfiguration, "lootVoteMessageSuffix", " &6to vote on $count items!", true);
 
         // VersionChecker messages
         versionCheckConnectionWarning = ConfigurationEngine.setString(
                 List.of("Sets the warning message when connection to update servers fails"),
                 file, fileConfiguration, "versionCheckConnectionWarning", "&8[EliteMobs] &eWarning: Could not connect to update servers. Version checking is currently unavailable. Check your internet connection or try again later.", true);
         versionOutdatedMessage = ConfigurationEngine.setString(
-                List.of("Sets the message sent when the plugin version is outdated"),
-                file, fileConfiguration, "versionOutdatedMessage", "&cYour version of EliteMobs is outdated. &aYou can download the latest version from &3&n&ohttps://nightbreak.io/plugin/elitemobs/", true);
+                List.of("Sets the message prefix when the plugin is outdated.",
+                        "Followed by a clickable nightbreak.io/elitemobs link."),
+                file, fileConfiguration, "versionOutdatedMessage", "&cYour version of EliteMobs is outdated. &aYou can download the latest version from ", true);
         resourcePackUpdatedMessage = ConfigurationEngine.setString(
                 List.of("Sets the message sent when the resource pack has been updated"),
                 file, fileConfiguration, "resourcePackUpdatedMessage", "&8[EliteMobs] &cThe EliteMobs resource pack has updated! This means that the current resource pack will not fully work until you restart your server. You only need to restart once!", true);
@@ -1044,8 +1060,9 @@ public class CommandMessagesConfig extends ConfigurationFile {
                 List.of("Sets the message header for outdated dungeons on player login"),
                 file, fileConfiguration, "dungeonsOutdatedMessage", "&cThe following dungeons are outdated:", true);
         versionUseSetupMessage = ConfigurationEngine.setString(
-                List.of("Message telling admins to use /em setup to view and update content."),
-                file, fileConfiguration, "versionUseSetupMessage", "&7Use &e/em setup &7to view and update, or ", true);
+                List.of("Message telling admins to use /em setup to view and update content.",
+                        "Followed by a clickable /em setup command and content link."),
+                file, fileConfiguration, "versionUseSetupMessage", "&7Use ", true);
         versionClickDownloadHover = ConfigurationEngine.setString(
                 List.of("Hover text on outdated content entries with a download link."),
                 file, fileConfiguration, "versionClickDownloadHover", "&9Click to go to download link!", true);
@@ -1091,8 +1108,16 @@ public class CommandMessagesConfig extends ConfigurationFile {
 
         // WormholeEntry OP message
         wormholeOpDownloadMessage = ConfigurationEngine.setString(
-                List.of("Sets the OP-only message about download links for wormhole content"),
-                file, fileConfiguration, "wormholeOpDownloadMessage", "&8[EliteMobs - OP-only message] &fDownload links are available on &9https://magmaguy.itch.io/ &f(free and premium) and &9https://www.patreon.com/magmaguy &f(premium). You can check the difference between the two and get support here: ", true);
+                List.of("Sets the OP-only message prefix about download links for wormhole content.",
+                        "Followed by clickable /em setup and Discord links."),
+                file, fileConfiguration, "wormholeOpDownloadMessage", "&8[OP] &7This content is not installed. Use ", true);
+        wormholeOpSetupMessage = ConfigurationEngine.setString(
+                List.of("Sets the OP-only message shown when a wormhole destination is not set up yet.",
+                        "$filename - the wormhole config filename", "$number - the wormhole entry number (1 or 2)"),
+                file, fileConfiguration, "wormholeOpSetupMessage", "&8[EliteMobs - OP-only message] &fTo set up this portal, stand at the desired destination and run: &a/em place wormhole $filename $number", true);
+        wormholeAgSpawnRecommendation = ConfigurationEngine.setString(
+                List.of("Sets the OP-only message recommending where to place the Adventurer's Guild wormhole."),
+                file, fileConfiguration, "wormholeAgSpawnRecommendation", "&8[EliteMobs - OP-only message] &fThe official recommendation is to place this at your server's spawn so players can access the Adventurer's Guild through this portal!", true);
 
         // Download all content command
         downloadAllNoTokenMessage = ConfigurationEngine.setString(
@@ -1128,6 +1153,12 @@ public class CommandMessagesConfig extends ConfigurationFile {
         downloadAllReloadingMessage = ConfigurationEngine.setString(
                 List.of("Sets the message sent when reloading to apply downloads"),
                 file, fileConfiguration, "downloadAllReloadingMessage", "&a[EliteMobs] Reloading to apply downloads...", true);
+        downloadAllAlreadyRunningMessage = ConfigurationEngine.setString(
+                List.of("Sets the message sent when a bulk download is already in progress"),
+                file, fileConfiguration, "downloadAllAlreadyRunningMessage", "&c[EliteMobs] A bulk download is already in progress! Please wait for it to finish.", true);
+        downloadAllFailedListMessage = ConfigurationEngine.setString(
+                List.of("Sets the message listing which packages failed to download", "$names - comma-separated list of failed package names"),
+                file, fileConfiguration, "downloadAllFailedListMessage", "&c[EliteMobs] Failed packages: $names", true);
         downloadAllSetupClickMessage = ConfigurationEngine.setString(
                 List.of("Clickable message to download all available content from the setup menu"),
                 file, fileConfiguration, "downloadAllSetupClickMessage", "&a[Click to download all available content]", true);

@@ -91,17 +91,28 @@ public class VortexThrustSkill extends SkillBonus implements CooldownSkill {
     }
 
     /**
-     * Activates the Vortex Thrust ability, pulling nearby enemies toward the target.
+     * Activates the Vortex Thrust ability, pulling nearby enemies toward the target
+     * and pulling the hit target toward the player.
      */
     public void activateVortexThrust(Player player, LivingEntity target) {
         if (!isActive(player) || isOnCooldown(player)) return;
 
         int skillLevel = SkillBonusRegistry.getPlayerSkillLevel(player, SkillType.SPEARS);
         Location targetLoc = target.getLocation();
+        Location playerLoc = player.getLocation();
         double pullStrength = PULL_STRENGTH + (skillLevel * 0.005);
 
         // Sound effect
         player.getWorld().playSound(targetLoc, Sound.ENTITY_EVOKER_PREPARE_ATTACK, 1.0f, 1.5f);
+
+        // Pull the hit target toward the player
+        Vector targetPull = playerLoc.toVector().subtract(target.getLocation().toVector());
+        if (targetPull.lengthSquared() >= 0.1) {
+            targetPull.normalize().multiply(pullStrength);
+            targetPull.setY(0.2);
+            target.setVelocity(target.getVelocity().add(targetPull));
+            spawnPullParticles(target.getLocation(), playerLoc);
+        }
 
         // Pull nearby enemies toward the target
         for (Entity entity : targetLoc.getWorld().getNearbyEntities(targetLoc, PULL_RADIUS, PULL_RADIUS, PULL_RADIUS)) {

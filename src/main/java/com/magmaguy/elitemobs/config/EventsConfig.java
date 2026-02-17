@@ -34,8 +34,8 @@ public class EventsConfig extends ConfigurationFile {
     public void initializeValues() {
         instance = this;
         announcementBroadcastWorldOnly = ConfigurationEngine.setBoolean(
-                List.of("Sets if events will only broadcasted in the world the events happens in."),
-                fileConfiguration, "Only broadcast event message in event worlds", false);
+                List.of("Whether event announcements are only broadcast in the world where the event is happening."),
+                fileConfiguration, "announcementBroadcastWorldOnly", false);
         actionEventMinimumCooldown = ConfigurationEngine.setInt(
                 List.of("Sets the minimum cooldown, in minutes, between action events"),
                 fileConfiguration, "actionEventMinimumCooldownMinutes", 4);

@@ -443,9 +443,9 @@ public class BlackjackGame {
         player.playSound(player.getLocation(), resultSound, 1.0f, 1.0f);
 
         if (payout > session.betAmount) {
-            GamblingDisplay.sendWinMessage(player, payout - session.betAmount);
+            GamblingDisplay.sendWinMessage(player, payout - session.betAmount, GamblingConfig.getBettingBlackjackName());
         } else if (payout == 0) {
-            GamblingDisplay.sendLoseMessage(player, session.betAmount);
+            GamblingDisplay.sendLoseMessage(player, session.betAmount, GamblingConfig.getBettingBlackjackName());
         }
     }
 
@@ -560,7 +560,7 @@ public class BlackjackGame {
 
                 double awarded = GamblingEconomyHandler.resolveOutcome(event.getPlayer().getUniqueId(), payout);
                 if (awarded > 0 && event.getPlayer() instanceof Player player) {
-                    GamblingDisplay.sendWinMessage(player, awarded - session.betAmount);
+                    GamblingDisplay.sendWinMessage(player, awarded - session.betAmount, GamblingConfig.getBettingBlackjackName());
                 }
             } else if (session.gameState == GameState.PLAYING) {
                 // Player closed mid-game without standing — forfeit

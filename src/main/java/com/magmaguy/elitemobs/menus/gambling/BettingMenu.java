@@ -28,9 +28,9 @@ public class BettingMenu {
     private static final int GAME_INFO_SLOT = 0;
     private static final int BALANCE_SLOT = 8;
     private static final int BET_DISPLAY_SLOT = 13;
-    private static final int PLUS_10_SLOT = 10;
+    private static final int PLUS_100_SLOT = 10;
     private static final int PLUS_50_SLOT = 11;
-    private static final int PLUS_100_SLOT = 12;
+    private static final int PLUS_10_SLOT = 12;
     private static final int MINUS_10_SLOT = 14;
     private static final int MINUS_50_SLOT = 15;
     private static final int MINUS_100_SLOT = 16;

@@ -250,10 +250,18 @@ public class SkillBonusEventHandler implements Listener {
         if (newType == SkillType.HOES) {
             int skillLevel = SkillBonusRegistry.getPlayerSkillLevel(player, SkillType.HOES);
             GrimReachSkill.applyReachBonus(player, skillLevel);
+            SkillBonus grimReach = SkillBonusRegistry.getSkillById(GrimReachSkill.SKILL_ID);
+            if (grimReach != null && grimReach.isActive(player)) {
+                SkillBonus.sendSkillActionBar(player, grimReach);
+            }
         }
         if (newType == SkillType.SPEARS) {
             int skillLevel = SkillBonusRegistry.getPlayerSkillLevel(player, SkillType.SPEARS);
             LongReachSkill.applyReachBonus(player, skillLevel);
+            SkillBonus longReach = SkillBonusRegistry.getSkillById(LongReachSkill.SKILL_ID);
+            if (longReach != null && longReach.isActive(player)) {
+                SkillBonus.sendSkillActionBar(player, longReach);
+            }
             if (PolearmMasterySkill.hasActiveSkill(uuid)) {
                 PolearmMasterySkill.applyAttackSpeedBonus(player, skillLevel);
             }

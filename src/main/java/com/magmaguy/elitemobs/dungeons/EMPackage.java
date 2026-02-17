@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.dungeons;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.DungeonsConfig;
+import com.magmaguy.elitemobs.config.InitializeConfig;
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
 import com.magmaguy.elitemobs.menus.SetupMenuIcons;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
@@ -12,6 +13,7 @@ import com.magmaguy.magmacore.nightbreak.NightbreakAccount;
 import com.magmaguy.magmacore.nightbreak.NightbreakContentManager;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
 import com.magmaguy.magmacore.util.Logger;
+import com.magmaguy.magmacore.util.SpigotMessage;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -22,10 +24,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public abstract class EMPackage extends ContentPackage {
 
@@ -70,6 +69,19 @@ public abstract class EMPackage extends ContentPackage {
     public static void shutdown() {
         content.clear();
         emPackages.clear();
+    }
+
+    /**
+     * Returns filenames of packages that are children of MetaPackages.
+     * Useful for filtering out children during bulk operations (download, update).
+     */
+    public static Set<String> getMetaPackageChildFilenames() {
+        Set<String> childFilenames = new HashSet<>();
+        for (EMPackage pkg : emPackages.values()) {
+            List<String> contained = pkg.getContentPackagesConfigFields().getContainedPackages();
+            if (contained != null) childFilenames.addAll(contained);
+        }
+        return childFilenames;
     }
 
     public static void initialize(ContentPackagesConfigFields contentPackagesConfigFields) {
@@ -274,21 +286,35 @@ public abstract class EMPackage extends ContentPackage {
 
         // If no Nightbreak slug, use legacy download link behavior
         if (slug == null || slug.isEmpty()) {
-            player.sendMessage(DungeonsConfig.getContentDownloadSeparator());
-            player.sendMessage(DungeonsConfig.getContentDownloadLegacyMessage().replace("$link", getContentPackagesConfigFields().getDownloadLink()));
-            player.sendMessage(DungeonsConfig.getContentDownloadSeparator());
+            Logger.sendSimpleMessage(player, DungeonsConfig.getContentDownloadSeparator());
+            player.spigot().sendMessage(
+                    SpigotMessage.simpleMessage(DungeonsConfig.getContentDownloadLegacyMessage().replace("$link", "")),
+                    SpigotMessage.hoverLinkMessage(
+                            "&9&n" + getContentPackagesConfigFields().getDownloadLink(),
+                            "&7Click to download",
+                            getContentPackagesConfigFields().getDownloadLink()));
+            Logger.sendSimpleMessage(player, DungeonsConfig.getContentDownloadSeparator());
             return;
         }
 
         // If no Nightbreak token registered, prompt user
         if (!NightbreakAccount.hasToken()) {
-            player.sendMessage(DungeonsConfig.getContentDownloadSeparator());
-            player.sendMessage(DungeonsConfig.getContentNightbreakPromptLine1());
-            player.sendMessage(DungeonsConfig.getContentNightbreakPromptLine2());
-            player.sendMessage(DungeonsConfig.getContentNightbreakPromptLine3());
-            player.sendMessage("");
-            player.sendMessage(DungeonsConfig.getContentNightbreakPromptLine4());
-            player.sendMessage(DungeonsConfig.getContentDownloadSeparator());
+            Logger.sendSimpleMessage(player, DungeonsConfig.getContentDownloadSeparator());
+            Logger.sendSimpleMessage(player, DungeonsConfig.getContentNightbreakPromptLine1());
+            player.spigot().sendMessage(
+                    SpigotMessage.simpleMessage(DungeonsConfig.getContentNightbreakPromptLine2()),
+                    SpigotMessage.hoverLinkMessage(
+                            InitializeConfig.getAccountLinkDisplay(),
+                            InitializeConfig.getAccountLinkHover(),
+                            "https://nightbreak.io/account/"));
+            Logger.sendSimpleMessage(player, DungeonsConfig.getContentNightbreakPromptLine3());
+            player.spigot().sendMessage(
+                    SpigotMessage.simpleMessage(DungeonsConfig.getContentNightbreakPromptLine4()),
+                    SpigotMessage.hoverLinkMessage(
+                            InitializeConfig.getContentLinkDisplay(),
+                            InitializeConfig.getContentLinkHover(),
+                            "https://nightbreak.io/plugin/elitemobs/"));
+            Logger.sendSimpleMessage(player, DungeonsConfig.getContentDownloadSeparator());
             return;
         }
 
@@ -330,22 +356,37 @@ public abstract class EMPackage extends ContentPackage {
     }
 
     public void doShowAccessInfo(Player player) {
-        player.sendMessage(DungeonsConfig.getContentDownloadSeparator());
-        player.sendMessage(DungeonsConfig.getContentNoAccessMessage().replace("$name", contentPackagesConfigFields.getName()));
-        player.sendMessage("");
-        player.sendMessage(DungeonsConfig.getContentGetAccessMessage());
-        player.sendMessage(DungeonsConfig.getContentNightbreakLink());
+        Logger.sendSimpleMessage(player, DungeonsConfig.getContentDownloadSeparator());
+        Logger.sendSimpleMessage(player, DungeonsConfig.getContentNoAccessMessage().replace("$name", contentPackagesConfigFields.getName()));
+        Logger.sendSimpleMessage(player, "");
+        Logger.sendSimpleMessage(player, DungeonsConfig.getContentGetAccessMessage());
+        player.spigot().sendMessage(
+                SpigotMessage.simpleMessage(DungeonsConfig.getContentNightbreakLink()),
+                SpigotMessage.hoverLinkMessage(
+                        InitializeConfig.getContentLinkDisplay(),
+                        InitializeConfig.getContentLinkHover(),
+                        "https://nightbreak.io/plugin/elitemobs/"));
         if (cachedAccessInfo != null) {
             if (cachedAccessInfo.patreonLink != null && !cachedAccessInfo.patreonLink.isEmpty()) {
-                player.sendMessage(DungeonsConfig.getContentPatreonLink().replace("$link", cachedAccessInfo.patreonLink));
+                player.spigot().sendMessage(
+                        SpigotMessage.simpleMessage(DungeonsConfig.getContentPatreonLink()),
+                        SpigotMessage.hoverLinkMessage(
+                                "&9&n" + cachedAccessInfo.patreonLink,
+                                "&7Click to open Patreon",
+                                cachedAccessInfo.patreonLink));
             }
             if (cachedAccessInfo.itchLink != null && !cachedAccessInfo.itchLink.isEmpty()) {
-                player.sendMessage(DungeonsConfig.getContentItchLink().replace("$link", cachedAccessInfo.itchLink));
+                player.spigot().sendMessage(
+                        SpigotMessage.simpleMessage(DungeonsConfig.getContentItchLink()),
+                        SpigotMessage.hoverLinkMessage(
+                                "&9&n" + cachedAccessInfo.itchLink,
+                                "&7Click to open itch.io",
+                                cachedAccessInfo.itchLink));
             }
         }
-        player.sendMessage("");
-        player.sendMessage(DungeonsConfig.getContentLinkAccountMessage());
-        player.sendMessage(DungeonsConfig.getContentDownloadSeparator());
+        Logger.sendSimpleMessage(player, "");
+        Logger.sendSimpleMessage(player, DungeonsConfig.getContentLinkAccountMessage());
+        Logger.sendSimpleMessage(player, DungeonsConfig.getContentDownloadSeparator());
     }
 
     protected ContentState getContentState() {
@@ -386,6 +427,14 @@ public abstract class EMPackage extends ContentPackage {
     public boolean isOutOfDate() {
         if (!isInstalled) return false;
         return outOfDate;
+    }
+
+    /**
+     * Forces re-derivation of isDownloaded/isInstalled state from children (for MetaPackages)
+     * or from the current content state. Useful when commands need accurate state outside the menu.
+     */
+    public void refreshState() {
+        getContentState();
     }
 
     /**

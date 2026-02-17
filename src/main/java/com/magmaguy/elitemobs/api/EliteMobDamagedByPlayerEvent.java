@@ -491,6 +491,8 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
                 if (skill instanceof CooldownSkill cooldownSkill) {
                     if (!cooldownSkill.isOnCooldown(player)) {
                         cooldownSkill.onActivate(player, this);
+                        skill.incrementProcCount(player);
+                        SkillBonus.sendSkillActionBar(player, skill);
                         // Note: skills that conditionally activate (e.g. VorpalStrike on crits)
                         // handle their own cooldown start in onActivate
                     }
@@ -532,6 +534,12 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
                 // Trigger on-hit effects for passive skills that need them
                 if (skill instanceof PoseidonsFavorSkill pf) {
                     pf.onHit(player, EliteMobDamagedByPlayerEvent.this);
+                    SkillBonus.sendSkillActionBar(player, skill);
+                }
+                // Heavy Bolts: apply knockback alongside the damage bonus
+                if (skill instanceof HeavyBoltsSkill hb && eliteMobEntity != null && eliteMobEntity.getLivingEntity() != null) {
+                    hb.applyKnockback(player, eliteMobEntity.getLivingEntity());
+                    SkillBonus.sendSkillActionBar(player, skill);
                 }
                 skill.incrementProcCount(player); // Track activation
                 yield 1.0 + skill.getBonusValue(skillLevel);
