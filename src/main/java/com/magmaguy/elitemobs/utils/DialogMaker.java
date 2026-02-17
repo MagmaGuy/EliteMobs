@@ -83,7 +83,7 @@ public class DialogMaker {
     private static void setDialogTitles(Quest quest, DialogManager.MultiActionDialogBuilder builder,
                                         QuestMenu.QuestText questText, int questIndex, int totalQuests) {
         // Main title
-        String title = processText(questText.getHeader().getText());
+        String title = processText(questText.getHeader().toPlainText());
         if (title != null && !title.isEmpty()) {
             builder.title(title);
         }
@@ -109,8 +109,8 @@ public class DialogMaker {
 
         StringBuilder text = new StringBuilder();
         for (TextComponent component : components) {
-            if (component.getText() != null) {
-                text.append(processText(component.getText())).append("\n");
+            if (component.toPlainText() != null) {
+                text.append(processText(component.toPlainText())).append("\n");
             }
         }
 
@@ -123,8 +123,8 @@ public class DialogMaker {
                                                  TextComponent header, List<TextComponent> items,
                                                  Quest quest, boolean showItemsIfAvailable) {
         // Add header as text if present
-        if (header != null && header.getText() != null) {
-            builder.addBody(DialogManager.PlainMessageBody.of(processText(header.getText())).width(questDialogWidth));
+        if (header != null && header.toPlainText() != null) {
+            builder.addBody(DialogManager.PlainMessageBody.of(processText(header.toPlainText())).width(questDialogWidth));
         }
 
         // Check if we should and can display items
@@ -144,8 +144,8 @@ public class DialogMaker {
 
                     // Get the description from the corresponding TextComponent
                     String description = "";
-                    if (i < items.size() && items.get(i).getText() != null) {
-                        description = processText(items.get(i).getText());
+                    if (i < items.size() && items.get(i).toPlainText() != null) {
+                        description = processText(items.get(i).toPlainText());
                     }
 
                     // Create and add the ItemBody
@@ -172,8 +172,8 @@ public class DialogMaker {
             if (items != null && !items.isEmpty()) {
                 StringBuilder text = new StringBuilder();
                 for (TextComponent item : items) {
-                    if (item.getText() != null) {
-                        text.append("  ").append(processText(item.getText())).append("\n");
+                    if (item.toPlainText() != null) {
+                        text.append("  ").append(processText(item.toPlainText())).append("\n");
                     }
                 }
 
@@ -201,11 +201,11 @@ public class DialogMaker {
 
     private static void addButtonFromComponent(DialogManager.MultiActionDialogBuilder builder,
                                                TextComponent component) {
-        if (component == null || component.getText() == null || component.getText().isEmpty()) {
+        if (component == null || component.toPlainText() == null || component.toPlainText().isEmpty()) {
             return;
         }
 
-        String text = processText(component.getText());
+        String text = processText(component.toPlainText());
         if (text.contains("[Abandon]")) text = ChatColor.BOLD + "" + ChatColor.RED + "[Abandon]";
 
         String command = extractCommandFromComponent(component);

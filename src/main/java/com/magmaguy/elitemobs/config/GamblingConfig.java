@@ -474,12 +474,12 @@ public class GamblingConfig extends ConfigurationFile {
         winMessage = ConfigurationEngine.setString(
                 List.of("Message shown when a player wins a gambling game.",
                         "Use %amount% for the win amount, %game% for the game name."),
-                file, fileConfiguration, "messages.win", "&a[Casino] Congratulations! You won &6%amount% coins &ain %game%!", true);
+                file, fileConfiguration, "messages.win", "&a[%game%] Congratulations! You won &6%amount% coins&a!", true);
 
         loseMessage = ConfigurationEngine.setString(
                 List.of("Message shown when a player loses a gambling game.",
                         "Use %amount% for the lost amount, %game% for the game name."),
-                file, fileConfiguration, "messages.lose", "&c[Casino] Better luck next time. You lost &6%amount% coins &cin %game%.", true);
+                file, fileConfiguration, "messages.lose", "&c[%game%] Better luck next time. You lost &6%amount% coins&c.", true);
 
         debtWarningMessage = ConfigurationEngine.setString(
                 List.of("Message shown when a player goes into debt.",
