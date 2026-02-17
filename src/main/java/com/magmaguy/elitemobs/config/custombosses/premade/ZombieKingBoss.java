@@ -32,7 +32,7 @@ public class ZombieKingBoss extends CustomBossesConfigFields {
         majorBossDeathString("The Zombie King has been slain!");
         setEscapeMessage("&4The Zombie King has escaped!");
         setLocationMessage("&cZombie King: $distance blocks away!");
-        setUniqueLootList(Collections.singletonList("zombie_kings_axe.yml:1"));
+        setUniqueLootList(Collections.singletonList("zombie_kings_axe.yml"));
         setTrails(Collections.singletonList(Particle.FLAME.toString()));
         setAnnouncementPriority(2);
     }

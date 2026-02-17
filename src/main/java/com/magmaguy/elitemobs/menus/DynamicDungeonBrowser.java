@@ -1,13 +1,12 @@
 package com.magmaguy.elitemobs.menus;
 
-import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.elitemobs.dungeons.DynamicDungeonPackage;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.instanced.dungeons.DungeonInstance;
 import com.magmaguy.elitemobs.instanced.dungeons.DynamicDungeonInstance;
-import com.magmaguy.magmacore.util.ChatColorConverter;
+import com.magmaguy.elitemobs.skills.CombatLevelCalculator;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -54,7 +53,7 @@ public class DynamicDungeonBrowser extends EliteMenu {
         this.selectedLevel = selectedLevel;
 
         if (!(emPackage instanceof DynamicDungeonPackage)) {
-            player.sendMessage("[EliteMobs] Not a valid dynamic dungeon!");
+            player.sendMessage(DungeonsConfig.getInvalidDynamicDungeonMessage());
             return;
         }
 
@@ -66,8 +65,8 @@ public class DynamicDungeonBrowser extends EliteMenu {
     }
 
     private void showLevelSelectionMenu(Player player, String dynamicDungeonName) {
-        int maxGuildRank = GuildRank.getMaxGuildRank(player);
-        int baseLevel = maxGuildRank * 10;
+        // Use the player's combat level as the base
+        int baseLevel = Math.max(1, CombatLevelCalculator.calculateCombatLevel(player.getUniqueId()));
 
         int minLevel = Math.max(5, baseLevel - 5);
         int maxLevel = Math.min(200, baseLevel + 5);
@@ -86,29 +85,29 @@ public class DynamicDungeonBrowser extends EliteMenu {
 
         // Expand to 54 slots if there are existing instances to show
         int slots = instancesList.isEmpty() ? 9 : 54;
-        Inventory inventory = Bukkit.createInventory(player, slots, ChatColorConverter.convert(DungeonsConfig.getDynamicDungeonLevelSelectionMenuTitle()));
+        Inventory inventory = Bukkit.createInventory(player, slots, DungeonsConfig.getDynamicDungeonLevelSelectionMenuTitle());
 
         for (int i = 0; i < availableLevels.size() && i < levelSlots.size(); i++) {
             int level = availableLevels.get(i);
             List<String> description = new ArrayList<>();
-            description.add(ChatColorConverter.convert(DungeonsConfig.getDynamicDungeonLevelSelectionClickToSelect().replace("$level", String.valueOf(level))));
-            description.add(ChatColorConverter.convert(DungeonsConfig.getDynamicDungeonLevelSelectionMobsWillBeLevel().replace("$level", String.valueOf(level))));
+            description.add(DungeonsConfig.getDynamicDungeonLevelSelectionClickToSelect().replace("$level", String.valueOf(level)));
+            description.add(DungeonsConfig.getDynamicDungeonLevelSelectionMobsWillBeLevel().replace("$level", String.valueOf(level)));
 
             Material material;
             if (level == baseLevel) {
                 material = Material.LIME_STAINED_GLASS_PANE;
-                description.add(ChatColorConverter.convert(DungeonsConfig.getDynamicDungeonLevelSelectionRecommended()));
+                description.add(DungeonsConfig.getDynamicDungeonLevelSelectionRecommended());
             } else if (level < baseLevel) {
                 material = Material.YELLOW_STAINED_GLASS_PANE;
-                description.add(ChatColorConverter.convert(DungeonsConfig.getDynamicDungeonLevelSelectionEasier()));
+                description.add(DungeonsConfig.getDynamicDungeonLevelSelectionEasier());
             } else {
                 material = Material.ORANGE_STAINED_GLASS_PANE;
-                description.add(ChatColorConverter.convert(DungeonsConfig.getDynamicDungeonLevelSelectionHarder()));
+                description.add(DungeonsConfig.getDynamicDungeonLevelSelectionHarder());
             }
 
             inventory.setItem(levelSlots.get(i), ItemStackGenerator.generateItemStack(
                     material,
-                    ChatColorConverter.convert(DungeonsConfig.getDynamicDungeonLevelSelectionItemTitle().replace("$level", String.valueOf(level))),
+                    DungeonsConfig.getDynamicDungeonLevelSelectionItemTitle().replace("$level", String.valueOf(level)),
                     description));
         }
 
@@ -130,9 +129,9 @@ public class DynamicDungeonBrowser extends EliteMenu {
 
     private ItemStack spectatorItem(DynamicDungeonInstance dungeonInstance) {
         List<String> lore = new ArrayList<>();
-        lore.add(ChatColorConverter.convert("&7Level: &e" + dungeonInstance.getSelectedLevel()));
-        lore.add(ChatColorConverter.convert("&2Players:"));
-        dungeonInstance.getPlayers().forEach(player -> lore.add(ChatColorConverter.convert("&f- " + player.getDisplayName())));
+        lore.add(DungeonsConfig.getDungeonBrowserLevelLabel().replace("$level", String.valueOf(dungeonInstance.getSelectedLevel())));
+        lore.add(DungeonsConfig.getDungeonBrowserPlayersLabel());
+        dungeonInstance.getPlayers().forEach(player -> lore.add(DungeonsConfig.getDungeonBrowserPlayerEntryFormat().replace("$playerName", player.getDisplayName())));
         return ItemStackGenerator.generateItemStack(
                 Material.ORANGE_STAINED_GLASS_PANE,
                 DungeonsConfig.getDungeonJoinAsSpectatorText().replace("$dungeonName", dungeonInstance.getContentPackagesConfigFields().getName()),
@@ -141,9 +140,9 @@ public class DynamicDungeonBrowser extends EliteMenu {
 
     private ItemStack playerItem(DynamicDungeonInstance dungeonInstance) {
         List<String> lore = new ArrayList<>();
-        lore.add(ChatColorConverter.convert("&7Level: &e" + dungeonInstance.getSelectedLevel()));
-        lore.add(ChatColorConverter.convert("&2Players:"));
-        dungeonInstance.getPlayers().forEach(player -> lore.add(ChatColorConverter.convert("&f- " + player.getDisplayName())));
+        lore.add(DungeonsConfig.getDungeonBrowserLevelLabel().replace("$level", String.valueOf(dungeonInstance.getSelectedLevel())));
+        lore.add(DungeonsConfig.getDungeonBrowserPlayersLabel());
+        dungeonInstance.getPlayers().forEach(player -> lore.add(DungeonsConfig.getDungeonBrowserPlayerEntryFormat().replace("$playerName", player.getDisplayName())));
         return ItemStackGenerator.generateItemStack(
                 Material.GREEN_STAINED_GLASS_PANE,
                 DungeonsConfig.getDungeonJoinAsPlayerText().replace("$dungeonName", dungeonInstance.getContentPackagesConfigFields().getName()),
@@ -151,14 +150,14 @@ public class DynamicDungeonBrowser extends EliteMenu {
     }
 
     private void showDifficultySelectionMenu(Player player, String dynamicDungeonName) {
-        Inventory inventory = Bukkit.createInventory(player, 9, ChatColorConverter.convert(DungeonsConfig.getDynamicDungeonDifficultySelectionMenuTitle()));
+        Inventory inventory = Bukkit.createInventory(player, 9, DungeonsConfig.getDynamicDungeonDifficultySelectionMenuTitle());
 
         int difficultyCounter = 0;
         for (Map map : emPackage.getContentPackagesConfigFields().getDifficulties()) {
             List<String> description = new ArrayList<>();
             for (String string : DungeonsConfig.getInstancedDungeonDescription())
                 description.add(string.replace("$dungeonName", emPackage.getContentPackagesConfigFields().getName()));
-            description.add(ChatColorConverter.convert(DungeonsConfig.getDynamicDungeonDifficultySelectionSelectedLevel().replace("$level", String.valueOf(selectedLevel))));
+            description.add(DungeonsConfig.getDynamicDungeonDifficultySelectionSelectedLevel().replace("$level", String.valueOf(selectedLevel)));
 
             inventory.setItem(difficultySlots.get(difficultyCounter), ItemStackGenerator.generateItemStack(
                     Material.GREEN_STAINED_GLASS_PANE,
@@ -192,8 +191,8 @@ public class DynamicDungeonBrowser extends EliteMenu {
             if (browser.menuType == MenuType.LEVEL_SELECTION) {
                 if (browser.levelSlots.contains(event.getSlot())) {
                     int levelIndex = browser.levelSlots.indexOf(event.getSlot());
-                    int maxGuildRank = GuildRank.getMaxGuildRank(player);
-                    int baseLevel = maxGuildRank * 10;
+                    // Use the player's combat level as the base
+                    int baseLevel = Math.max(1, CombatLevelCalculator.calculateCombatLevel(player.getUniqueId()));
                     int minLevel = Math.max(5, baseLevel - 5);
                     int selectedLevel = minLevel + (levelIndex * 5);
 
@@ -213,7 +212,7 @@ public class DynamicDungeonBrowser extends EliteMenu {
                             }
                             case WAITING -> dungeonInstance.addNewPlayer(player);
                             case COMPLETED, COMPLETED_VICTORY, COMPLETED_DEFEAT ->
-                                    player.sendMessage("[EliteMobs] This match already ended! Can't join it!");
+                                    player.sendMessage(DungeonsConfig.getMatchAlreadyEndedMessage());
                         }
                     }
                 }

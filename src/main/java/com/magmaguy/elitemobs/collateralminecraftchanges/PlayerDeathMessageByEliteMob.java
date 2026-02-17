@@ -41,7 +41,9 @@ public class PlayerDeathMessageByEliteMob implements Listener {
         String deathMessage = "";
 
         if (eliteEntity instanceof CustomBossEntity customBossEntity && customBossEntity.getCustomBossesConfigFields().getOnKillMessage() != null && !customBossEntity.getCustomBossesConfigFields().getOnKillMessage().isEmpty())
-            return deathMessageSender(customBossEntity.getCustomBossesConfigFields().getOnKillMessage().replace("$player", player.getDisplayName()), player, customBossEntity.getLivingEntity());
+            return deathMessageSender(customBossEntity.getCustomBossesConfigFields().getOnKillMessage()
+                    .replace("$playerName", player.getName())
+                    .replace("$player", player.getDisplayName()), player, customBossEntity.getLivingEntity());
 
         if (MobPropertiesConfig.getMobProperties().containsKey(eliteEntity.getLivingEntity().getType()))
             deathMessage = deathMessageSender
@@ -64,6 +66,7 @@ public class PlayerDeathMessageByEliteMob implements Listener {
 
         String livingEntityName = EntityTracker.getEliteMobEntity(livingEntity).getName();
 
+        deathMessage = deathMessage.replace("$playerName", player.getName());
         deathMessage = deathMessage.replace("$player", player.getDisplayName());
         deathMessage = deathMessage.replace("$entity", livingEntityName);
         deathMessage = ChatColorConverter.convert("&7" + deathMessage);

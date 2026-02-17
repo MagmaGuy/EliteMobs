@@ -11,7 +11,7 @@ public class FrostPalaceSanctum extends ContentPackagesConfigFields {
     public FrostPalaceSanctum() {
         super("frost_palace_sanctum",
                 true,
-                "&2[lvl 050] &3The Frost Palace",
+                "&2[Dynamic] &3The Frost Palace",
                 new ArrayList<>(List.of("&fA 7 phase fight against",
                         "the queen of ice!",
                         "&6Credits: MagmaGuy, Delio")),
@@ -28,15 +28,18 @@ public class FrostPalaceSanctum extends ContentPackagesConfigFields {
                 "&bYou have left the Frost Palace!",
                 List.of("filename=frost_palace_frost_queen_p0.yml"),
                 "frost_palace",
-                50,
+                -1,
                 true);
+        setContentType(ContentType.DYNAMIC_DUNGEON);
         setDifficulties(List.of(
-                Map.of("name", "normal", "levelSync", 55, "id", 0),
-                Map.of("name", "hard", "levelSync", 50, "id", 1),
-                Map.of("name", "mythic", "levelSync", 45, "id", 2)));
+                Map.of("name", "normal", "levelSync", "+5", "id", 0),
+                Map.of("name", "hard", "levelSync", "+0", "id", 1),
+                Map.of("name", "mythic", "levelSync", "-5", "id", 2)));
+        setDungeonLockoutMinutes(1440);
         setSetupMenuDescription(List.of(
-                "&2A Sanctum for players around level 50!",
+                "&2A dynamic Sanctum!",
                 "&2The first Sanctum we made, with customs",
                 "&2models and a soundtrack!"));
+        setNightbreakSlug("the-frost-palace");
     }
 }

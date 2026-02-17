@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.commands.admin;
 
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.adventurersguild.GuildRank;
+import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
@@ -39,7 +39,7 @@ public class StatsCommand {
                         entitiesCounted.put(livingEntity.getType(), entitiesCounted.get(livingEntity.getType()) + 1);
                 }
 
-        StringBuilder breakdownString = new StringBuilder("&2Breakdown: &a");
+        StringBuilder breakdownString = new StringBuilder(CommandMessagesConfig.getStatsBreakdownPrefix());
 
         for (EntityType entityType : entitiesCounted.keySet()) {
             breakdownString.append(entitiesCounted.get(entityType)).append(" ").append(entityType).append("&2, &a");
@@ -48,54 +48,41 @@ public class StatsCommand {
         double highestThreat = 0;
         String highestThreatUser = "";
         double threatAverage = 0;
-        int highestGuildRank = 0;
-        String highestGuildUser = "";
-        double guildRankAverage = 0;
-        Player highestGuildRankPlayer = null;
         for (Player player : Bukkit.getOnlinePlayers()) {
             double currentTier = ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getFullPlayerTier(true);
             threatAverage += currentTier;
-            int currentGuildRank = GuildRank.getActiveGuildRank(player);
-            guildRankAverage += currentGuildRank;
             if (currentTier > highestThreat) {
                 highestThreat = currentTier;
                 highestThreatUser = player.getDisplayName();
             }
-            if (currentGuildRank > highestGuildRank) {
-                highestGuildRankPlayer = player;
-                highestGuildRank = currentGuildRank;
-                highestGuildUser = player.getDisplayName();
-            }
         }
         threatAverage /= Bukkit.getOnlinePlayers().size();
-        guildRankAverage /= Bukkit.getOnlinePlayers().size();
 
-        commandSender.sendMessage(ChatColorConverter.convert(
-                "§5§m-----------------------------------------------------"));
-        commandSender.sendMessage(ChatColorConverter.convert(
-                "&7[EM] §a§lEliteMobs v. " + Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getDescription().getVersion() + " stats:"));
-        commandSender.sendMessage(ChatColorConverter.convert(
-                "&7[EM] &2There are currently §l§6" + (aggressiveCount + passiveCount) + " §f§2EliteMobs mobs entities in the world, of which &a"
-                        + aggressiveCount + " &2are Elite Mobs and &a" + passiveCount + " &2are Super Mobs."));
+        commandSender.sendMessage(CommandMessagesConfig.getStatsSeparator());
+        commandSender.sendMessage(
+                CommandMessagesConfig.getStatsVersionHeader()
+                        .replace("$version", Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getDescription().getVersion()));
+        commandSender.sendMessage(
+                CommandMessagesConfig.getStatsEntityCountMessage()
+                        .replace("$total", String.valueOf(aggressiveCount + passiveCount))
+                        .replace("$aggressive", String.valueOf(aggressiveCount))
+                        .replace("$passive", String.valueOf(passiveCount)));
         commandSender.sendMessage(ChatColorConverter.convert(breakdownString.toString()));
-        if (highestGuildRankPlayer == null) return;
-        commandSender.sendMessage(ChatColorConverter.convert(
-                "&7[EM] &2Highest online threat tier: &a" + highestThreatUser + " &2at total threat tier &a" + highestThreat));
-        commandSender.sendMessage(ChatColorConverter.convert(
-                "&7[EM] &2Average threat tier: &a" + Round.twoDecimalPlaces(threatAverage)));
-        commandSender.sendMessage(ChatColorConverter.convert(
-                "&7[EM] &2Highest adventurer's guild tier: &a" + highestGuildUser + " &2at guild rank &a" + GuildRank.getRankName(GuildRank.getGuildPrestigeRank(highestGuildRankPlayer), highestGuildRank) + " &2(&a" + highestGuildRank + "&2)"));
-        commandSender.sendMessage(ChatColorConverter.convert(
-                "&7[EM] &2Average guild rank: &a" + Round.twoDecimalPlaces(guildRankAverage)));
-        commandSender.sendMessage(ChatColorConverter.convert(
-                "§5§m-----------------------------------------------------"));
-        commandSender.sendMessage("Tracked boss count: " + EntityTracker.getEliteMobEntities().size());
-        commandSender.sendMessage("Tracked NPC count: " + EntityTracker.getNpcEntities().size());
+        commandSender.sendMessage(
+                CommandMessagesConfig.getStatsHighestThreatMessage()
+                        .replace("$player", highestThreatUser)
+                        .replace("$threat", String.valueOf(highestThreat)));
+        commandSender.sendMessage(
+                CommandMessagesConfig.getStatsAverageThreatMessage()
+                        .replace("$average", String.valueOf(Round.twoDecimalPlaces(threatAverage))));
+        commandSender.sendMessage(CommandMessagesConfig.getTrackedBossCountMessage() + EntityTracker.getEliteMobEntities().size());
+        commandSender.sendMessage(CommandMessagesConfig.getTrackedNpcCountMessage() + EntityTracker.getNpcEntities().size());
         int loadedCounter = 0;
         for (RegionalBossEntity regionalBossEntity : RegionalBossEntity.getRegionalBossEntities())
             if (regionalBossEntity.isValid())
                 loadedCounter++;
-        commandSender.sendMessage(ChatColorConverter.convert("&7[EM] &2There are &c" + RegionalBossEntity.getRegionalBossEntities().size() + " &2Regional Bosses installed, of which &c" + loadedCounter + " &2are currently loaded."));
+        commandSender.sendMessage(CommandMessagesConfig.getRegionalBossStatsMessage().replace("$total", String.valueOf(RegionalBossEntity.getRegionalBossEntities().size())).replace("$loaded", String.valueOf(loadedCounter)));
+        commandSender.sendMessage(CommandMessagesConfig.getStatsSeparator());
     }
 
 }

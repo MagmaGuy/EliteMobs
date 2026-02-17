@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ public class ContentPackagesConfigFields extends CustomConfigFields {
     @Setter
     private String name;
     @Getter
+    @Setter
     protected ContentType contentType = null;
     @Getter
     @Setter
@@ -93,6 +95,7 @@ public class ContentPackagesConfigFields extends CustomConfigFields {
     @Getter
     private String dungeonConfigFolderName;
     @Getter
+    @Setter
     private int contentLevel;
     @Getter
     @Setter
@@ -137,6 +140,9 @@ public class ContentPackagesConfigFields extends CustomConfigFields {
     @Getter
     @Setter
     private int dungeonLockoutMinutes = 0; // 0 = no lockout, otherwise lockout duration in minutes
+    @Getter
+    @Setter
+    private String nightbreakSlug = null; // Slug for Nightbreak API version checking
 
     public ContentPackagesConfigFields(String fileName, boolean isEnabled) {
         super(fileName, isEnabled);
@@ -357,6 +363,20 @@ public class ContentPackagesConfigFields extends CustomConfigFields {
     }
 
     public void processAdditionalFields() {
+    }
+
+    /**
+     * Re-reads the dungeonVersion from the YAML file on disk.
+     * This is needed after the importer extracts new content packages,
+     * since the in-memory fileConfiguration was loaded before the importer ran.
+     */
+    public void refreshDungeonVersionFromDisk() {
+        if (file == null || !file.exists()) return;
+        YamlConfiguration freshConfig = YamlConfiguration.loadConfiguration(file);
+        int freshVersion = freshConfig.getInt("dungeonVersion", 0);
+        if (freshVersion > this.dungeonVersion) {
+            this.dungeonVersion = freshVersion;
+        }
     }
 
     /**

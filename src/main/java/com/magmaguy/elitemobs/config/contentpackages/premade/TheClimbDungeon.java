@@ -12,7 +12,7 @@ public class TheClimbDungeon extends ContentPackagesConfigFields {
     public TheClimbDungeon() {
         super("the_climb_dungeon",
                 true,
-                "&2[lvl 010] &3The Climb Dungeon",
+                "&3The Climb Dungeon",
                 new ArrayList<>(List.of("&fThe perfect starter instanced dungeon!",
                         "&6Credits: MagmaGuy, Frostcone, 69OzCanOfBepis, Realm of Lotheridon")),
                 DiscordLinks.freeMinidungeons,
@@ -31,11 +31,14 @@ public class TheClimbDungeon extends ContentPackagesConfigFields {
                         "filename=the_climb_bone_champion.yml",
                         "filename=the_climb_undead_guardian.yml"),
                 "em_id_the_climb",
-                10,
+                -1,
                 false);
+        setContentType(ContentType.DYNAMIC_DUNGEON);
         setDifficulties(List.of(
-                Map.of("name", "normal", "levelSync", 15, "id", 0),
-                Map.of("name", "hard", "levelSync", 10, "id", 1),
-                Map.of("name", "mythic", "levelSync", 5, "id", 2)));
+                Map.of("name", "normal", "levelSync", "+5", "id", 0),
+                Map.of("name", "hard", "levelSync", "+0", "id", 1),
+                Map.of("name", "mythic", "levelSync", "-5", "id", 2)));
+        setDungeonLockoutMinutes(1440);
+        setNightbreakSlug("story-mode-dungeons");
     }
 }

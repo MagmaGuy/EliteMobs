@@ -110,6 +110,9 @@ public class CustomBossesConfigFields extends CustomConfigFields {
     @Getter
     @Setter
     private boolean dropsRandomLoot = true;
+    @Getter
+    @Setter
+    private boolean dropsSkillXP = true;
     /**
      * Integration with LibsDisguises. Only used if that plugin is loaded.
      */
@@ -167,6 +170,7 @@ public class CustomBossesConfigFields extends CustomConfigFields {
     @Setter
     private ItemStack offHand = null;
     @Getter
+    @Setter
     private boolean regionalBoss = false;
     @Getter
     @Setter
@@ -219,7 +223,17 @@ public class CustomBossesConfigFields extends CustomConfigFields {
     @Getter
     private double scale = 1D;
     @Getter
+    @Setter
     private boolean silent;
+    @Getter
+    @Setter
+    private boolean ai = true;
+    @Getter
+    @Setter
+    private boolean alwaysShowName = false;
+    @Getter
+    @Setter
+    private List<String> spawnLocations = new ArrayList<>();
 
     /**
      * Creates a new default pre-made Custom Boss. The boss is further customized through a builder pattern.
@@ -322,6 +336,7 @@ public class CustomBossesConfigFields extends CustomConfigFields {
         this.dropsEliteMobsLoot = processBoolean("dropsEliteMobsLoot", dropsEliteMobsLoot, true, false);
         this.dropsVanillaLoot = processBoolean("dropsVanillaLoot", dropsVanillaLoot, true, false);
         this.dropsRandomLoot = processBoolean("dropsRandomLoot", dropsRandomLoot, true, false);
+        this.dropsSkillXP = processBoolean("dropsSkillXP", dropsSkillXP, true, false);
         this.frozen = processBoolean("frozen", frozen, false, false);
         this.reinforcement = processBoolean("reinforcement", reinforcement, false, false);
         this.onDeathCommands = processStringList("onDeathCommands", onDeathCommands, new ArrayList<>(), false);
@@ -388,7 +403,7 @@ public class CustomBossesConfigFields extends CustomConfigFields {
         this.neutral = processBoolean("neutral", neutral, false, false);
 
         this.onKillMessage = ConfigurationEngine.setString(
-                List.of("Sets the message that is shown when a boss is killed", "Placeholders:", "$player - username of the player the boss killed"),
+                List.of("Sets the message that is shown when a boss is killed", "Placeholders:", "$player - display name of the player (with prefix/suffix)", "$playerName - plain username of the player (no prefix/suffix)"),
                 file, fileConfiguration, "onKillMessage", null, true);
 
         String bossTypeString = ConfigurationEngine.setString(file, fileConfiguration, "bossType", "NORMAL", false);
@@ -400,6 +415,8 @@ public class CustomBossesConfigFields extends CustomConfigFields {
 
         this.scale = processDouble("scale", scale, 1, false);
         this.silent = processBoolean("silent", silent, false, false);
+        this.ai = processBoolean("ai", ai, true, false);
+        this.alwaysShowName = processBoolean("alwaysShowName", alwaysShowName, false, false);
     }
 
     public boolean isCustomModelExists() {

@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.instanced;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.PlayerJoinArenaEvent;
 import com.magmaguy.elitemobs.api.PlayerJoinDungeonEvent;
+import com.magmaguy.elitemobs.api.PlayerTeleportEvent;
 import com.magmaguy.elitemobs.api.instanced.MatchJoinEvent;
 import com.magmaguy.elitemobs.api.instanced.MatchLeaveEvent;
 import com.magmaguy.elitemobs.collateralminecraftchanges.AlternativeDurabilityLoss;
@@ -57,10 +58,12 @@ public class InstancePlayerManager {
             public void run() {
                 //Teleport the player to the correct location
                 MatchInstance.MatchInstanceEvents.teleportBypass = true;
-                if (matchInstance.state.equals(MatchInstance.InstancedRegionState.WAITING) && matchInstance.lobbyLocation != null)
-                    player.teleport(matchInstance.lobbyLocation);
-                else
-                    player.teleport(matchInstance.startLocation);
+                Location destination = (matchInstance.state.equals(MatchInstance.InstancedRegionState.WAITING) && matchInstance.lobbyLocation != null)
+                        ? matchInstance.lobbyLocation
+                        : matchInstance.startLocation;
+
+                // Use PlayerTeleportEvent to trigger dungeon music and other listeners
+                PlayerTeleportEvent.teleportPlayer(player, destination);
 
                 //Set the lives that the player has //todo: this needs to become configurable and be expanded upon in the future
                 matchInstance.playerLives.put(player, 3);

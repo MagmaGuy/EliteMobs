@@ -5,7 +5,6 @@ import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.elitemobs.config.menus.premade.ArenaMenuConfig;
 import com.magmaguy.elitemobs.instanced.arena.ArenaInstance;
-import com.magmaguy.magmacore.util.ChatColorConverter;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -22,12 +21,12 @@ public class ArenaMenu {
     public void constructArenaMenu(Player player, String arenaFilename) {
         ArenaInstance arenaInstance = ArenaInstance.getArenaInstances().get(arenaFilename);
         if (arenaInstance == null) {
-            player.sendMessage(ChatColorConverter.convert("&4[EliteMobs] &cInvalid arena name! The arena you are trying to join is not correctly setup."));
+            player.sendMessage(ArenaMenuConfig.getInvalidArenaMessage());
             return;
         }
         String menuName = ArenaMenuConfig.getMenuName() + arenaInstance.getCustomArenasConfigFields().getArenaName();
         if (DefaultConfig.useResourcePackModels())
-            menuName = "\uF801\uDB80\uDD0B\uF805          " + menuName;
+            menuName = "\uDB83\uDEF1\uDB83\uDE0A\uDB83\uDEF5          " + menuName;
         Inventory shopInventory = Bukkit.createInventory(player, 9, menuName);
         shopInventory.setItem(ArenaMenuConfig.getPlayerItemSlot(), ArenaMenuConfig.getPlayerItem());
         if (DungeonsConfig.isAllowSpectatorsInInstancedContent())

@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.mobconstructor.custombosses.transitiveblocks;
 
+import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
@@ -8,7 +9,6 @@ import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -52,18 +52,17 @@ public class TransitiveBlockCommand {
                         }
                     }
             if (this.regionalBossEntity == null) {
-                player.sendMessage(ChatColor.RED + "[EliteMobs] Transitive blocks require one Regional Boss from the configuration files to be placed in order to add transitive blocks relative to the spawn coordinates of that boss.");
-                player.sendMessage(ChatColor.RED + "[EliteMobs] Cancelling block registration!");
+                player.sendMessage(CommandMessagesConfig.getTransitiveBlockRequiresRegionalMessage());
+                player.sendMessage(CommandMessagesConfig.getTransitiveBlockCancellingMessage());
                 return;
             }
         }
 
         if (this.regionalBossEntity == null) {
             if (regionalBossEntities.size() > 1) {
-                player.sendMessage(ChatColor.RED + "[EliteMobs] Transitive blocks require having ONLY one Regional Boss from the configuration files to be placed in order to add transitive blocks relative to the spawn coordinates of that boss." +
-                        " If there is more than one boss, the plugin can't determine which boss specifically should be getting the transitive blocks");
-                player.sendMessage(ChatColor.RED + "[EliteMobs] If want multiple bosses to have transitive blocks, you will need one configuration file per boss that has them!");
-                player.sendMessage(ChatColor.RED + "[EliteMobs] Cancelling block registration!");
+                player.sendMessage(CommandMessagesConfig.getTransitiveBlockMultipleBossesMessage());
+                player.sendMessage(CommandMessagesConfig.getTransitiveBlockMultipleBossesHintMessage());
+                player.sendMessage(CommandMessagesConfig.getTransitiveBlockCancellingMessage());
                 return;
             }
             this.regionalBossEntity = regionalBossEntities.get(0);
@@ -79,9 +78,9 @@ public class TransitiveBlockCommand {
             }
 
         activePlayers.put(player.getUniqueId(), this);
-        player.sendMessage(ChatColor.GREEN + "[EliteMobs] Now registering " + transitiveBlockType.toString() + " blocks! " + ChatColor.DARK_GREEN + "Punch blocks to register air at that location, or right click blocks to register the block you right clicked!");
-        player.sendMessage(ChatColor.GOLD + "[EliteMobs] Run the same command to stop registering blocks and save!");
-        player.sendMessage(ChatColor.GOLD + "[EliteMobs] Or run the command " + "/em cancelblocks " + " to cancel the registration!");
+        player.sendMessage(CommandMessagesConfig.getTransitiveBlockNowRegisteringMessage().replace("$type", transitiveBlockType.toString()));
+        player.sendMessage(CommandMessagesConfig.getTransitiveBlockRunSameCommandMessage());
+        player.sendMessage(CommandMessagesConfig.getTransitiveBlockCancelCommandMessage());
     }
     private final Player player;
     private final CustomBossesConfigFields customBossesConfigFields;
@@ -102,25 +101,25 @@ public class TransitiveBlockCommand {
         if (transitiveBlockCommand != null)
             transitiveBlockCommand.setRegionalSelection(regionalSelection);
         if (transitiveBlockCommand != null)
-            player.sendMessage("[EliteMobs] Now registering large selection for transitive blocks! Left click to set corner 1, right click to set corner 2! Run the same command again to stop registering blocks and run /em cancelblocks to cancel!");
+            player.sendMessage(CommandMessagesConfig.getTransitiveBlockStartMessage());
         return transitiveBlockCommand;
     }
 
     public static TransitiveBlockCommand processCommand(Player player, String filename, String transitiveBlockType, boolean edit) {
         CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(filename);
         if (customBossesConfigFields == null) {
-            player.sendMessage("Boss file isn't valid! Try again with a valid filename for your custom boss.");
+            player.sendMessage(CommandMessagesConfig.getTransitiveBlockInvalidBossMessage());
             return null;
         }
         if (!customBossesConfigFields.isRegionalBoss()) {
-            player.sendMessage(ChatColor.RED + "Boss file isn't for a regional boss! This feature only works for regional bosses.");
-            player.sendMessage(ChatColor.GREEN + "Ignore this warning if you are setting blocks for a phase boss whose first phase is a regional boss!");
+            player.sendMessage(CommandMessagesConfig.getTransitiveBlockNotRegionalMessage());
+            player.sendMessage(CommandMessagesConfig.getTransitiveBlockIgnoreWarningMessage());
         }
         TransitiveBlockType tbt = null;
         try {
             tbt = TransitiveBlockType.valueOf(transitiveBlockType);
         } catch (Exception ex) {
-            player.sendMessage("Not a valid transitive block type, use ON_SPAWN or ON_REMOVE !");
+            player.sendMessage(CommandMessagesConfig.getTransitiveBlockInvalidTypeMessage());
             return null;
         }
         UUID playerUUID = player.getUniqueId();
@@ -138,22 +137,24 @@ public class TransitiveBlockCommand {
      */
     public static void processCommand(Player player) {
         activePlayers.remove(player.getUniqueId());
-        player.sendMessage(ChatColor.RED + "[EliteMobs] Block registration successfully cancelled!");
+        player.sendMessage(CommandMessagesConfig.getTransitiveBlockCancelledMessage());
     }
 
     public void setCorner(boolean leftClick, Location location) {
         if (leftClick) {
             corner1 = location;
-            player.sendMessage("Set corner 1!");
+            player.sendMessage(CommandMessagesConfig.getTransitiveBlockCorner1Message());
         } else {
             corner2 = location;
-            player.sendMessage("Set corner 2!");
+            player.sendMessage(CommandMessagesConfig.getTransitiveBlockCorner2Message());
         }
 
         if (corner1 != null && corner2 != null && corner1.getWorld() == corner2.getWorld()) {
             int blockCount = (int) ((Math.abs(corner1.getX() - corner2.getX()) + 1) * (Math.abs(corner1.getY() - corner2.getY()) + 1) * (Math.abs(corner1.getZ() - corner2.getZ()) + 1));
             if (blockCount > DefaultConfig.getDefaultTransitiveBlockLimiter())
-                player.sendMessage("[EliteMobs] Current selection has " + blockCount + " blocks selected. For performance reasons, it is recommended you don't go over " + DefaultConfig.getDefaultTransitiveBlockLimiter() + " blocks!");
+                player.sendMessage(CommandMessagesConfig.getTransitiveBlockSelectionCountMessage()
+                        .replace("$count", String.valueOf(blockCount))
+                        .replace("$limit", String.valueOf(DefaultConfig.getDefaultTransitiveBlockLimiter())));
         }
 
     }
@@ -167,13 +168,13 @@ public class TransitiveBlockCommand {
     public void registerBlock(Block block) {
         if (doubleEntryCheck(block, false)) return;
         transitiveBlockList.add(new TransitiveBlock(block.getBlockData(), getRelativeCoordinate(block.getLocation())));
-        player.sendMessage("Registered " + block.getType() + " block!");
+        player.sendMessage(CommandMessagesConfig.getTransitiveBlockRegisteredMessage().replace("$type", block.getType().toString()));
     }
 
     public void registerAir(Block block) {
         if (doubleEntryCheck(block, true)) return;
         transitiveBlockList.add(new TransitiveBlock(Material.AIR.createBlockData(), getRelativeCoordinate(block.getLocation())));
-        player.sendMessage("Registered air block!");
+        player.sendMessage(CommandMessagesConfig.getTransitiveBlockRegisteredAirMessage());
     }
 
     private boolean doubleEntryCheck(Block block, boolean isAir) {
@@ -186,19 +187,19 @@ public class TransitiveBlockCommand {
                 }
         if (transitiveBlock == null) return false;
         transitiveBlockList.remove(transitiveBlock);
-        player.sendMessage("Unregistered block!");
+        player.sendMessage(CommandMessagesConfig.getTransitiveBlockUnregisteredMessage());
         return true;
     }
 
     public void commitLocations() {
         activePlayers.remove(player.getUniqueId());
-        player.sendMessage(ChatColor.GREEN + "[EliteMobs] Now saving " + transitiveBlockType.toString() + " blocks!");
+        player.sendMessage(CommandMessagesConfig.getTransitiveBlockNowSavingMessage().replace("$type", transitiveBlockType.toString()));
         List<String> deserializedData = new ArrayList<>();
 
         if (regionalSelection) {
             int blockCount = (int) ((Math.abs(corner1.getX() - corner2.getX()) + 1) * (Math.abs(corner1.getY() - corner2.getY()) + 1) * (Math.abs(corner1.getZ() - corner2.getZ()) + 1));
             if (blockCount > DefaultConfig.getDefaultTransitiveBlockLimiter()) {
-                player.sendMessage("[EliteMobs] You registered more than " + DefaultConfig.getDefaultTransitiveBlockLimiter() + " blocks at once. For performance reasons, it is recommended you keep the selections low. Avoid things like selecting a lot of unnecessary air blocks!");
+                player.sendMessage(CommandMessagesConfig.getTransitiveBlockTooManyMessage().replace("$limit", String.valueOf(DefaultConfig.getDefaultTransitiveBlockLimiter())));
             }
             int lowestX, highestX, lowestY, highestY, lowestZ, highestZ;
             lowestX = (int) Math.min(corner1.getX(), corner2.getX());
@@ -215,7 +216,7 @@ public class TransitiveBlockCommand {
                         transitiveBlockList.add(new TransitiveBlock(blockLocation.getBlock().getBlockData(), getRelativeCoordinate(blockLocation)));
                     }
 
-            player.sendMessage("Successfully registered " + transitiveBlockList.size() + " blocks between your corners!");
+            player.sendMessage(CommandMessagesConfig.getTransitiveBlockRegisteredCornerMessage().replace("$count", String.valueOf(transitiveBlockList.size())));
 
         }
 
@@ -232,16 +233,16 @@ public class TransitiveBlockCommand {
                 customBossesConfigFields.setOnSpawnBlockStates(deserializedData);
                 if (regionalBossEntity.getCustomBossesConfigFields().getFilename().equals(customBossesConfigFields.getFilename()))
                     regionalBossEntity.setOnSpawnTransitiveBlocks(TransitiveBlock.serializeTransitiveBlocks(deserializedData, customBossesConfigFields.getFilename()));
-                player.sendMessage("Locations registered correctly!");
+                player.sendMessage(CommandMessagesConfig.getTransitiveBlockLocationsRegisteredMessage());
                 break;
             case ON_REMOVE:
                 customBossesConfigFields.setOnRemoveBlockStates(deserializedData);
                 if (regionalBossEntity.getCustomBossesConfigFields().getFilename().equals(customBossesConfigFields.getFilename()))
                     regionalBossEntity.setOnRemoveTransitiveBlocks(TransitiveBlock.serializeTransitiveBlocks(deserializedData, customBossesConfigFields.getFilename()));
-                player.sendMessage("Locations registered correctly!");
+                player.sendMessage(CommandMessagesConfig.getTransitiveBlockLocationsRegisteredMessage());
                 break;
             default:
-                player.sendMessage("Failed to commit locations!");
+                player.sendMessage(CommandMessagesConfig.getTransitiveBlockLocationsFailedMessage());
         }
     }
 

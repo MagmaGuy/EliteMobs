@@ -3,9 +3,9 @@ package com.magmaguy.elitemobs.dungeons;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.DungeonInstallEvent;
 import com.magmaguy.elitemobs.api.DungeonUninstallEvent;
+import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
 import com.magmaguy.elitemobs.utils.EventCaller;
-import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.Logger;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
@@ -26,10 +26,10 @@ public class DynamicDungeonPackage extends EMPackage implements CombatContent {
         DungeonInstallEvent event = new DungeonInstallEvent(contentPackagesConfigFields);
         new EventCaller(event);
         contentPackagesConfigFields.simpleInstall();
-        player.sendMessage(ChatColorConverter.convert("&2Dynamic dungeon " + contentPackagesConfigFields.getFilename() + " installed!"));
-        player.sendMessage(ChatColorConverter.convert("&6Dynamic dungeons must be accessed either through the &a/em &6menu or an NPC! NPCs for premade EliteMobs content can be found at the Adventurer's Guild Hub map."));
-        player.sendMessage("Dynamic dungeons allow you to select the level before entering based on your guild rank!");
-        player.sendMessage("Remember that instanced dungeons create a world when you join them and remove that world when you are done playing in them!");
+        player.sendMessage(DungeonsConfig.getDynamicDungeonInstalledMessage().replace("$name", contentPackagesConfigFields.getFilename()));
+        player.sendMessage(DungeonsConfig.getDynamicDungeonAccessMessage1());
+        player.sendMessage(DungeonsConfig.getDynamicDungeonAccessMessage2());
+        player.sendMessage(DungeonsConfig.getDynamicDungeonAccessMessage3());
         this.isInstalled = true;
     }
 
@@ -39,6 +39,7 @@ public class DynamicDungeonPackage extends EMPackage implements CombatContent {
         new EventCaller(event);
         contentPackagesConfigFields.simpleUninstall();
         isInstalled = false;
+        player.sendMessage(DungeonsConfig.getContentUninstalledMessage().replace("$name", contentPackagesConfigFields.getName()));
     }
 
     @Override

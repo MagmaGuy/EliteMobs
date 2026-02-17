@@ -4,14 +4,6 @@ import org.bukkit.Material;
 
 public class CombatSystem {
     public static final double PER_LEVEL_POWER_INCREASE = 0.5;
-    /**
-     * This determines how many hits it takes to kill a boss.
-     * Unfortunately, since it's flat, at a scale, all bosses tend to end up having the same amount of life.
-     * It accomplishes this by adding this flat amount of health to bosses.
-     * <p>
-     * Minus one because bosses start with 7 hp in the normalized combat system. They always have some baseline hp.
-     */
-    public static final double TARGET_HITS_TO_KILL_MINUS_ONE = 3D; //affects max health assignment on EliteMobEntity.java
     //this sets the tier of various materials
     public static final int NETHERITE_TIER_LEVEL = 8;
     public static final int DIAMOND_TIER_LEVEL = 7;
@@ -22,6 +14,11 @@ public class CombatSystem {
     //DPS increase per tier
     public static final double DPS_PER_LEVEL = 1.6;
 
+    /**
+     * Maximum level for the skill system.
+     * Beyond this level, soft caps apply and progression becomes exponentially harder.
+     */
+    public static final int MAX_SKILL_LEVEL = 100;
 
     private CombatSystem() {
     }

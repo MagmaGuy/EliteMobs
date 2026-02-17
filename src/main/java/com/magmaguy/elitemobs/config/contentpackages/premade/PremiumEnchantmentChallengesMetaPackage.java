@@ -28,5 +28,6 @@ public class PremiumEnchantmentChallengesMetaPackage extends ContentPackagesConf
                 "&2Free challenges that players can randomly",
                 "&2get teleported to when enchanting elite items!",
                 "&2Has custom models!"));
+        setNightbreakSlug("premium-enchantment-sanctums");
     }
 }

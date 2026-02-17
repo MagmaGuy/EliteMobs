@@ -5,12 +5,12 @@ import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.instanced.dungeons.DungeonInstance;
+import com.magmaguy.elitemobs.items.GearRestrictionHandler;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.customenchantments.*;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffect;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.utils.BossBarUtil;
-import com.magmaguy.magmacore.util.ChatColorConverter;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
@@ -84,7 +84,7 @@ public class PlayerItem {
 
         if (isOnLastDamage(itemStack)) {
             if (!displayingAsBroken) {
-                BossBarUtil.DisplayBrokenItemBossBar(equipmentSlot, player, ChatColorConverter.convert(ItemSettingsConfig.getNoItemDurabilityMessage().replace("$item", !itemStack.getItemMeta().hasDisplayName() ? itemStack.getType().toString() : itemStack.getItemMeta().getDisplayName())));
+                BossBarUtil.DisplayBrokenItemBossBar(equipmentSlot, player, ItemSettingsConfig.getNoItemDurabilityMessage().replace("$item", !itemStack.getItemMeta().hasDisplayName() ? itemStack.getType().toString() : itemStack.getItemMeta().getDisplayName()));
                 displayingAsBroken = true;
             }
 //            player.sendMessage(ChatColorConverter.convert(ItemSettingsConfig.getNoItemDurabilityMessage().replace(
@@ -107,6 +107,15 @@ public class PlayerItem {
                 itemStack.setAmount(0);
                 itemStack = new ItemStack(Material.AIR);
             }
+        }
+
+        // Skill-based gear restriction check
+        if (!GearRestrictionHandler.canEquip(player, itemStack)) {
+            GearRestrictionHandler.sendRestrictionMessage(player, itemStack);
+            // Drop the item instead of just removing it
+            player.getWorld().dropItem(player.getLocation(), itemStack);
+            itemStack.setAmount(0);
+            itemStack = new ItemStack(Material.AIR);
         }
 
         //Neither offhand nor armor contribute to baseline damage outside of the enchants, so we reset the damage before anything

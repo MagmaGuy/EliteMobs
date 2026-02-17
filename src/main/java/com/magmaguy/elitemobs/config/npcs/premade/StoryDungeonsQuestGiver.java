@@ -10,10 +10,10 @@ public class StoryDungeonsQuestGiver extends NPCsConfigFields {
     public StoryDungeonsQuestGiver() {
         super("story_dungeons_quest_giver",
                 true,
-                "&eManager Wallitz",
-                "&e<Story Mode Quests>",
+                "<g:#8A7A5A:#9A8A6A>Manager Wallitz</g>",
+                "<g:#7A6A4A:#8A7A5A><Story Mode Quests></g>",
                 Villager.Profession.NITWIT,
-                "em_adventurers_guild,303.5,78.0,212.5,-17.84,3.6",
+                "em_adventurers_guild,308.5,78.0,212.5,-17.84,3.6",
                 List.of("Salutations!", "Good day."),
                 List.of("I'm a bit busy..."),
                 List.of("Bye.", "Until next time."),

@@ -28,5 +28,6 @@ public class OasisAdventure extends ContentPackagesConfigFields {
                 "oasis",
                 false);
         setWormholeWorldName("em_oasis_wormhole");
+        setNightbreakSlug("the-oasis-adventure");
     }
 }

@@ -26,12 +26,30 @@ public class ContentPackagesConfig extends CustomConfig {
                 dungeonPackages.put(key, (ContentPackagesConfigFields) super.getCustomConfigFieldsHashMap().get(key));
             else
                 enchantedChallengeDungeonPackages.put(key, (ContentPackagesConfigFields) super.getCustomConfigFieldsHashMap().get(key));
-            EMPackage.initialize((ContentPackagesConfigFields) super.getCustomConfigFieldsHashMap().get(key));
         }
 
         //Initialize blueprints folder
         File worldsBluePrint = new File(MetadataHandler.PLUGIN.getDataFolder().getAbsolutePath() + File.separatorChar + "world_blueprints");
         if (!worldsBluePrint.exists()) worldsBluePrint.mkdir();
+    }
+
+    /**
+     * Re-reads dungeonVersion from disk for all content packages.
+     * Must be called after the importer extracts new content (which overwrites YAML files)
+     * but before initializePackages() and VersionChecker.check().
+     */
+    public static void refreshDungeonVersions() {
+        for (ContentPackagesConfigFields fields : dungeonPackages.values())
+            fields.refreshDungeonVersionFromDisk();
+        for (ContentPackagesConfigFields fields : enchantedChallengeDungeonPackages.values())
+            fields.refreshDungeonVersionFromDisk();
+    }
+
+    public static void initializePackages() {
+        for (ContentPackagesConfigFields fields : dungeonPackages.values())
+            EMPackage.initialize(fields);
+        for (ContentPackagesConfigFields fields : enchantedChallengeDungeonPackages.values())
+            EMPackage.initialize(fields);
     }
 
 }

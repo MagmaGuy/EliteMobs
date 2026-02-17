@@ -11,7 +11,7 @@ public class CraftenminesLabSanctum extends ContentPackagesConfigFields {
     public CraftenminesLabSanctum() {
         super("craftenmines_lab_sanctum",
                 true,
-                "&2[lvl 030] &aCraftenmines Sanctum",
+                "&aCraftenmines Sanctum",
                 new ArrayList<>(List.of("&aFace the creator of the devious creations!",
                         "&6Credits: MagmaGuy, 69OzCanOfBepis")),
                 "https://nightbreak.io/plugin/elitemobs/#craftenmines-laboratory",
@@ -28,14 +28,17 @@ public class CraftenminesLabSanctum extends ContentPackagesConfigFields {
                 "&8[EM] &5You have left Dr. Craftenmine's laboratory!",
                 List.of("filename=dr_craftenmine_p1.yml"),
                 "em_id_craftenmines_lab",
-                30,
+                -1,
                 false);
+        setContentType(ContentType.DYNAMIC_DUNGEON);
         setDifficulties(List.of(
-                Map.of("name", "normal", "levelSync", 25, "id", 0),
-                Map.of("name", "hard", "levelSync", 30, "id", 1),
-                Map.of("name", "mythic", "levelSync", 35, "id", 2)));
+                Map.of("name", "normal", "levelSync", "+5", "id", 0),
+                Map.of("name", "hard", "levelSync", "+0", "id", 1),
+                Map.of("name", "mythic", "levelSync", "-5", "id", 2)));
+        setDungeonLockoutMinutes(1440);
         setSetupMenuDescription(List.of(
-                "&2A crazy Sanctum for players around level 30!",
+                "&2A dynamic Sanctum!",
                 "Includes custom models and a custom soundtrack!"));
+        setNightbreakSlug("craftenmines-laboratory");
     }
 }

@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.treasurechest;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.SoundsConfig;
 import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestConfigFields;
@@ -13,7 +12,6 @@ import com.magmaguy.elitemobs.mobconstructor.PersistentObjectHandler;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.WeightedProbability;
-import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.Logger;
 import com.magmaguy.magmacore.util.Round;
 import lombok.Getter;
@@ -218,11 +216,11 @@ public class TreasureChest implements PersistentObject {
     }
 
     private void lowRankMessage(Player player) {
-        player.sendMessage(ChatColorConverter.convert(DefaultConfig.getChestLowRankMessage().replace("$rank", GuildRank.getRankName(Math.max(0, customTreasureChestConfigFields.getChestTier() - 10), customTreasureChestConfigFields.getChestTier()))));
+        // Guild rank removed - message removed
     }
 
     private void groupTimerCooldownMessage(Player player, long targetTime) {
-        player.sendMessage(ChatColorConverter.convert(DefaultConfig.getChestCooldownMessage().replace("$time", timeConverter(targetTime - Instant.now().getEpochSecond()))));
+        player.sendMessage(DefaultConfig.getChestCooldownMessage().replace("$time", timeConverter(targetTime - Instant.now().getEpochSecond())));
     }
 
     private boolean playerIsInCooldown(Player player) {
@@ -311,10 +309,8 @@ public class TreasureChest implements PersistentObject {
             TreasureChest treasureChest = getTreasureChest(event.getClickedBlock().getLocation());
             if (treasureChest == null) return;
             event.setCancelled(true);
-            if (GuildRank.getMaxGuildRank(event.getPlayer()) < treasureChest.customTreasureChestConfigFields.getChestTier())
-                treasureChest.lowRankMessage(event.getPlayer());
-            else
-                treasureChest.doInteraction(event.getPlayer());
+            // Guild rank requirement removed - all players can access chests
+            treasureChest.doInteraction(event.getPlayer());
         }
 
         @EventHandler(ignoreCancelled = true)

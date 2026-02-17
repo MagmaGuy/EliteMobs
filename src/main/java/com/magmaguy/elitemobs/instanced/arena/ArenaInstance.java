@@ -303,11 +303,8 @@ public class ArenaInstance extends MatchInstance {
 
         super.players.forEach(player -> {
             if (highestArenaMobLevel > 0) {
-                if (AdventurersGuildConfig.isGuildLootLimiter() &&
-                        PlayerData.getMaxGuildLevel(player.getUniqueId()) < highestArenaMobLevel / 10) {
-                    Logger.sendSimpleMessage(player, AdventurersGuildConfig.getLootLimiterMessage());
-                    return;
-                } else if (Math.abs(ElitePlayerInventory.getPlayer(player).getFullPlayerTier(true) - highestArenaMobLevel) > ItemSettingsConfig.getLootLevelDifferenceLockout()) {
+                // Guild rank loot limiter removed
+                if (Math.abs(ElitePlayerInventory.getPlayer(player).getFullPlayerTier(true) - highestArenaMobLevel) > ItemSettingsConfig.getLootLevelDifferenceLockout()) {
                     Logger.sendSimpleMessage(player, ItemSettingsConfig.getLevelRangeTooDifferent()
                             .replace("$playerLevel", ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getFullPlayerTier(false) + "")
                             .replace("$bossLevel", highestArenaMobLevel + ""));

@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.npcs.chatter;
 
+import com.magmaguy.easyminecraftgoals.internal.FakeText;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.npcs.NPCInteractions;
@@ -16,7 +16,6 @@ import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.TextDisplay;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -151,9 +150,13 @@ public class NPCProximitySensor implements Listener {
         Location newLocation = npcEntity.getVillager().getEyeLocation().clone()
                 .add(player.getLocation().clone().subtract(npcEntity.getVillager().getLocation()).toVector().normalize().multiply(0.5))
                 .add(new Vector(0, -0.1, 0));
-        TextDisplay visualArmorStand = VisualDisplay.generateTemporaryTextDisplay(newLocation, messageUp);
+        FakeText fakeText = VisualDisplay.generateFakeText(newLocation, messageUp, player);
+        if (fakeText == null) return;
+
         AtomicInteger counter = new AtomicInteger();
         AtomicBoolean up = new AtomicBoolean(true);
+        final Location[] currentLocation = {newLocation.clone()};
+
         Bukkit.getScheduler().runTaskTimer(MetadataHandler.PLUGIN, task -> {
             if (!player.isValid() ||
                     npcEntity.getVillager() == null ||
@@ -161,7 +164,7 @@ public class NPCProximitySensor implements Listener {
                     !npcEntity.getVillager().getWorld().equals(player.getWorld()) ||
                     npcEntity.getVillager().getLocation().distance(player.getLocation()) > npcEntity.getNPCsConfigFields().getActivationRadius()) {
                 task.cancel();
-                EntityTracker.unregister(visualArmorStand, RemovalReason.EFFECT_TIMEOUT);
+                fakeText.remove();
                 return;
             }
 
@@ -170,12 +173,13 @@ public class NPCProximitySensor implements Listener {
             if (counter.get() % 20 == 0) {
                 up.getAndSet(!up.get());
                 if (up.get())
-                    visualArmorStand.setCustomName(messageUp);
+                    fakeText.setText(messageUp);
                 else
-                    visualArmorStand.setCustomName(messageDown);
+                    fakeText.setText(messageDown);
             }
 
-            visualArmorStand.teleport(visualArmorStand.getLocation().clone().add(new Vector(0, up.get() ? 0.01 : -0.01, 0)));
+            currentLocation[0].add(new Vector(0, up.get() ? 0.01 : -0.01, 0));
+            fakeText.teleport(currentLocation[0]);
 
         }, 0L, 1L);
     }

@@ -5,11 +5,11 @@
     },
     
     "overrides": [
-        {"predicate": {"custom_model_data":1}, "model": "elitemobs:equipment/bronze_axe"},
-        {"predicate": {"custom_model_data":2}, "model": "elitemobs:equipment/palladium_axe"},
-        {"predicate": {"custom_model_data":3}, "model": "elitemobs:equipment/corrupted_axe"},
-        {"predicate": {"custom_model_data":4}, "model": "elitemobs:equipment/living_axe"},
-        {"predicate": {"custom_model_data":5}, "model": "elitemobs:equipment/ultimatium_axe"}
+        {"predicate": {"custom_model_data":1}, "model": "elitemobs:gear/bronze_axe"},
+        {"predicate": {"custom_model_data":2}, "model": "elitemobs:gear/palladium_axe"},
+        {"predicate": {"custom_model_data":3}, "model": "elitemobs:gear/corrupted_axe"},
+        {"predicate": {"custom_model_data":4}, "model": "elitemobs:gear/living_axe"},
+        {"predicate": {"custom_model_data":5}, "model": "elitemobs:gear/ultimatium_axe"}
 
     ]
 }

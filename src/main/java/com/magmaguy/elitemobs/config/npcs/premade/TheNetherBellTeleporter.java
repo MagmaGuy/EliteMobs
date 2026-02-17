@@ -10,10 +10,10 @@ public class TheNetherBellTeleporter extends NPCsConfigFields {
     public TheNetherBellTeleporter() {
         super("the_nether_bell_teleporter",
                 true,
-                "Ancient Corpse",
-                "<[50] The Nether Bell Teleporter>",
+                "<g:#7A3A3A:#8A4A4A>Ancient Corpse</g>",
+                "<g:#6A2A2A:#7A3A3A><The Nether Bell></g>",
                 Villager.Profession.ARMORER,
-                "em_adventurers_guild,293.5,78.18,196.5,-90,0",
+                "em_adventurers_guild,300.4,78,198.3,180,0",
                 List.of(""),
                 List.of(),
                 List.of(),
@@ -21,6 +21,7 @@ public class TheNetherBellTeleporter extends NPCsConfigFields {
                 1,
                 NPCInteractions.NPCInteractionType.COMMAND);
         setCommand("em dungeontp the_nether_bell_sanctum.yml");
-        setDisguise("BOGGED");
+        setCustomModel("em_ag_ancientcorpse");
+        setSyncMovement(false);
     }
 }

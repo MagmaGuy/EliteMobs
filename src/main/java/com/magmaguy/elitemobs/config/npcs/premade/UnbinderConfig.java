@@ -11,10 +11,10 @@ public class UnbinderConfig extends NPCsConfigFields {
     public UnbinderConfig() {
         super("unbinder",
                 true,
-                "Ulfric",
-                "<Unbinder>",
+                "<g:#5A4A6A:#6A5A7A>Ulfric</g>",
+                "<g:#4A3A5A:#5A4A6A><Unbinder></g>",
                 Villager.Profession.WEAPONSMITH,
-                "em_adventurers_guild,296.5,81,253.5,90,0",
+                "em_adventurers_guild,307.5,78,266.5,90,0",
                 new ArrayList<>(List.of(
                         "Greetings.",
                         "Well met.",

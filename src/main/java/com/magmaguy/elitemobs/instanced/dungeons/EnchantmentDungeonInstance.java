@@ -1,13 +1,13 @@
 package com.magmaguy.elitemobs.instanced.dungeons;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.elitemobs.config.SpecialItemSystemsConfig;
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
 import com.magmaguy.elitemobs.dungeons.WorldDungeonPackage;
 import com.magmaguy.elitemobs.instanced.WorldOperationQueue;
 import com.magmaguy.elitemobs.menus.ItemEnchantmentMenu;
 import com.magmaguy.elitemobs.utils.WorldInstantiator;
-import com.magmaguy.magmacore.util.ChatColorConverter;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
@@ -51,7 +51,7 @@ public class EnchantmentDungeonInstance extends DungeonInstance {
         List<ContentPackagesConfigFields> contentPackagesConfigFieldsList = new ArrayList<>();
         WorldDungeonPackage.getEmPackages().values().stream().forEach(emPackage -> {if (emPackage.isInstalled() && emPackage.getContentPackagesConfigFields().isEnchantmentChallenge()) contentPackagesConfigFieldsList.add(emPackage.getContentPackagesConfigFields());});
         if (contentPackagesConfigFieldsList.isEmpty()) {
-            player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &cYou rolled challenge but your server has not installed any challenge dungeons! &2This will count as an automatic enchantment success."));
+            player.sendMessage(DungeonsConfig.getEnchantNoChallengeMessage());
             return false;
         }
         ContentPackagesConfigFields contentPackagesConfigFields = contentPackagesConfigFieldsList.get(ThreadLocalRandom.current().nextInt(0, contentPackagesConfigFieldsList.size()));
@@ -92,8 +92,8 @@ public class EnchantmentDungeonInstance extends DungeonInstance {
     @Override
     protected void victory() {
         super.victory();
-        player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2Challenge complete! Instance will close in 10 seconds. &6You can leave earlier by doing &9/em quit&6!"));
-        player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2You succeeded your item enchantment challenge! Your item has been successfully enchanted."));
+        player.sendMessage(DungeonsConfig.getEnchantChallengeCompleteMessage());
+        player.sendMessage(DungeonsConfig.getEnchantChallengeSuccessMessage());
         ItemEnchantmentMenu.broadcastEnchantmentMessage(upgradedItem, player, SpecialItemSystemsConfig.getSuccessAnnouncement());
         //scanCurrentItemForRemoval();
         HashMap<Integer, ItemStack> leftOvers = player.getInventory().addItem(upgradedItem);
@@ -104,11 +104,11 @@ public class EnchantmentDungeonInstance extends DungeonInstance {
     protected void defeat() {
         super.defeat();
         if (ThreadLocalRandom.current().nextDouble() < SpecialItemSystemsConfig.getCriticalFailureChanceDuringChallengeChance()) {
-            player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Critical enchantment failure! You have lost " + currentItem.getItemMeta().getDisplayName() + " &c!"));
+            player.sendMessage(DungeonsConfig.getEnchantCriticalFailureMessage().replace("$item", currentItem.getItemMeta().getDisplayName()));
             ItemEnchantmentMenu.broadcastEnchantmentMessage(upgradedItem, player, SpecialItemSystemsConfig.getCriticalFailureAnnouncement());
             //scanCurrentItemForRemoval();
         } else {
-            player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &cYou have failed the enchantment challenge! Your item " + currentItem.getItemMeta().getDisplayName() + " &cwas not enchanted."));
+            player.sendMessage(DungeonsConfig.getEnchantChallengeFailedMessage().replace("$item", currentItem.getItemMeta().getDisplayName()));
             HashMap<Integer, ItemStack> leftOvers = player.getInventory().addItem(currentItem);
             if (!leftOvers.isEmpty()) player.getWorld().dropItem(player.getLocation(), currentItem);
         }

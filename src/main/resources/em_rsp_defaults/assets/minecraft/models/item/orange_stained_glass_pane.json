@@ -1,0 +1,10 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "minecraft:block/orange_stained_glass"
+  },
+  "overrides": [
+    {"predicate": {"custom_model_data": 31184}, "model": "elitemobs:ui/em_keygray"},
+    {"predicate": {"custom_model_data": 31186}, "model": "elitemobs:ui/em_keycoin"}
+  ]
+}

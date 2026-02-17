@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.config.customtreasurechests;
 
+import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
 import com.magmaguy.magmacore.config.CustomConfig;
 import com.magmaguy.magmacore.util.Logger;
@@ -25,7 +26,7 @@ public class CustomTreasureChestsConfig extends CustomConfig {
     public static void addTreasureChestEntry(Player player, String customChestFileName) {
         CustomTreasureChestConfigFields customTreasureChestConfigFields = getCustomTreasureChestConfigFields().get(customChestFileName);
         if (customTreasureChestConfigFields == null) {
-            player.sendMessage("[EM] Invalid Treasure Chest file name!");
+            player.sendMessage(CommandMessagesConfig.getInvalidTreasureChestFilename());
             return;
         }
         addTreasureChestEntry(new Location(player.getWorld(), player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ()), customChestFileName);

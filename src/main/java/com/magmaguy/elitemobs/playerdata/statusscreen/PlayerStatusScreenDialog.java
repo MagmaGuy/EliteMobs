@@ -3,9 +3,8 @@ package com.magmaguy.elitemobs.playerdata.statusscreen;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
-import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
+import com.magmaguy.elitemobs.config.SkillsConfig;
 import com.magmaguy.elitemobs.config.menus.premade.PlayerStatusMenuConfig;
 import com.magmaguy.elitemobs.dungeons.CombatContent;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
@@ -14,8 +13,9 @@ import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.Quest;
+import com.magmaguy.elitemobs.skills.SkillType;
+import com.magmaguy.elitemobs.skills.SkillXPCalculator;
 import com.magmaguy.magmacore.dialog.DialogManager;
-import com.magmaguy.magmacore.util.ChatColorConverter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -34,7 +34,7 @@ public class PlayerStatusScreenDialog {
     public static void showPlayerStatusDialog(Player player) {
         DialogManager.DialogListDialogBuilder listBuilder = new DialogManager.DialogListDialogBuilder();
 
-        listBuilder.title("Player Status Menu");
+        listBuilder.title(PlayerStatusMenuConfig.getDialogTitlePlayerStatus());
 
         // Add each page as a dialog reference
         if (PlayerStatusMenuConfig.isDoStatsPage()) {
@@ -61,6 +61,10 @@ public class PlayerStatusScreenDialog {
             listBuilder.addDialog(DialogManager.DialogReference.inline(buildBossTrackingDialog(player)));
         }
 
+        if (SkillsConfig.isSkillSystemEnabled()) {
+            listBuilder.addDialog(DialogManager.DialogReference.inline(buildSkillsDialog(player)));
+        }
+
         listBuilder.columns(1);
         listBuilder.buttonWidth(DIALOG_WIDTH);
 
@@ -77,7 +81,7 @@ public class PlayerStatusScreenDialog {
     private static DialogManager.MultiActionDialogBuilder buildStatsDialog(Player player) {
         DialogManager.MultiActionDialogBuilder builder = new DialogManager.MultiActionDialogBuilder();
 
-        builder.title("Stats");
+        builder.title(PlayerStatusMenuConfig.getDialogTitleStats());
 
         // Build stats body
         StringBuilder statsText = new StringBuilder();
@@ -86,8 +90,7 @@ public class PlayerStatusScreenDialog {
 
             String line = PlayerStatusMenuConfig.getStatsTextLines()[i]
                     .replace("$money", EconomyHandler.checkCurrency(player.getUniqueId()) + "")
-                    .replace("$guildtier", processText(AdventurersGuildConfig.getShortenedRankName(
-                            GuildRank.getGuildPrestigeRank(player), GuildRank.getActiveGuildRank(player))))
+                    .replace("$guildtier", "N/A")
                     .replace("$kills", PlayerData.getKills(player.getUniqueId()) + "")
                     .replace("$highestkill", PlayerData.getHighestLevelKilled(player.getUniqueId()) + "")
                     .replace("$deaths", PlayerData.getDeaths(player.getUniqueId()) + "")
@@ -129,7 +132,7 @@ public class PlayerStatusScreenDialog {
     private static DialogManager.MultiActionDialogBuilder buildGearDialog(Player player) {
         DialogManager.MultiActionDialogBuilder builder = new DialogManager.MultiActionDialogBuilder();
 
-        builder.title("Gear");
+        builder.title(PlayerStatusMenuConfig.getDialogTitleGear());
 
         // Build gear body
         StringBuilder gearText = new StringBuilder();
@@ -159,7 +162,7 @@ public class PlayerStatusScreenDialog {
     private static DialogManager.MultiActionDialogBuilder buildTeleportsDialog(Player player) {
         DialogManager.MultiActionDialogBuilder builder = new DialogManager.MultiActionDialogBuilder();
 
-        builder.title("Teleports");
+        builder.title(PlayerStatusMenuConfig.getDialogTitleTeleports());
 
         // Add config text lines
         StringBuilder teleportText = new StringBuilder();
@@ -180,12 +183,17 @@ public class PlayerStatusScreenDialog {
             if (!emPackage.getContentPackagesConfigFields().isListedInTeleports()) continue;
 
             String dungeonName = processText(emPackage.getContentPackagesConfigFields().getName());
-            String hoverInfo = ChatColorConverter.convert(
-                    PlayerStatusMenuConfig.getOnTeleportHover() + "\n" +
-                            emPackage.getContentPackagesConfigFields().getPlayerInfo()
-                                    .replace("$bossCount", emPackage.getCustomBossEntityList().size() + "")
-                                    .replace("$lowestTier", ((CombatContent) emPackage).getLowestLevel() + "")
-                                    .replace("$highestTier", ((CombatContent) emPackage).getHighestLevel() + ""));
+            String playerInfo = emPackage.getContentPackagesConfigFields().getPlayerInfo();
+            String hoverInfo;
+            if (playerInfo != null) {
+                hoverInfo = PlayerStatusMenuConfig.getOnTeleportHover() + "\n" +
+                                playerInfo
+                                        .replace("$bossCount", emPackage.getCustomBossEntityList().size() + "")
+                                        .replace("$lowestTier", ((CombatContent) emPackage).getLowestLevel() + "")
+                                        .replace("$highestTier", ((CombatContent) emPackage).getHighestLevel() + "");
+            } else {
+                hoverInfo = PlayerStatusMenuConfig.getOnTeleportHover();
+            }
 
             DialogManager.ActionButton button = DialogManager.ActionButton.of(
                     dungeonName,
@@ -214,7 +222,7 @@ public class PlayerStatusScreenDialog {
     private static DialogManager.MultiActionDialogBuilder buildCommandsDialog(Player player) {
         DialogManager.MultiActionDialogBuilder builder = new DialogManager.MultiActionDialogBuilder();
 
-        builder.title("Commands");
+        builder.title(PlayerStatusMenuConfig.getDialogTitleCommands());
 
         // Build commands body
         StringBuilder commandsText = new StringBuilder();
@@ -263,15 +271,15 @@ public class PlayerStatusScreenDialog {
     private static DialogManager.MultiActionDialogBuilder buildQuestsDialog(Player player) {
         DialogManager.MultiActionDialogBuilder builder = new DialogManager.MultiActionDialogBuilder();
 
-        builder.title("Quests");
+        builder.title(PlayerStatusMenuConfig.getDialogTitleQuests());
 
         List<Quest> quests = PlayerData.getQuests(player.getUniqueId());
 
         if (quests == null || quests.isEmpty()) {
-            builder.addBody(DialogManager.PlainMessageBody.of("No active quests").width(DIALOG_WIDTH));
+            builder.addBody(DialogManager.PlainMessageBody.of(PlayerStatusMenuConfig.getDialogNoActiveQuests()).width(DIALOG_WIDTH));
         } else {
             builder.addBody(DialogManager.PlainMessageBody.of(
-                    "You have " + quests.size() + " active quest(s)."
+                    PlayerStatusMenuConfig.getDialogActiveQuestsFormat().replace("$amount", String.valueOf(quests.size()))
             ).width(DIALOG_WIDTH));
 
             builder.columns(1);
@@ -299,7 +307,7 @@ public class PlayerStatusScreenDialog {
     private static DialogManager.MultiActionDialogBuilder buildBossTrackingDialog(Player player) {
         DialogManager.MultiActionDialogBuilder builder = new DialogManager.MultiActionDialogBuilder();
 
-        builder.title("Boss Tracking");
+        builder.title(PlayerStatusMenuConfig.getDialogTitleBossTracking());
 
         // Add config text
         StringBuilder trackingText = new StringBuilder();
@@ -345,6 +353,80 @@ public class PlayerStatusScreenDialog {
         addBackButton(builder);
 
         return builder;
+    }
+
+    /**
+     * Skills Page Dialog
+     */
+    private static DialogManager.MultiActionDialogBuilder buildSkillsDialog(Player player) {
+        DialogManager.MultiActionDialogBuilder builder = new DialogManager.MultiActionDialogBuilder();
+
+        builder.title(PlayerStatusMenuConfig.getDialogTitleSkills());
+
+        StringBuilder skillsText = new StringBuilder();
+        skillsText.append(processText(PlayerStatusMenuConfig.getSkillsPageHeader())).append("\n\n");
+
+        for (SkillType skillType : SkillType.values()) {
+            long totalXP = PlayerData.getSkillXP(player.getUniqueId(), skillType);
+            int level = SkillXPCalculator.levelFromTotalXP(totalXP);
+            long xpInLevel = SkillXPCalculator.xpProgressInCurrentLevel(totalXP);
+            long xpForNext = SkillXPCalculator.xpToNextLevel(level);
+            double progress = SkillXPCalculator.levelProgress(totalXP);
+
+            String progressBar = createProgressBar(progress);
+
+            String levelLine = PlayerStatusMenuConfig.getSkillsPageLevelFormat()
+                    .replace("$skillName", skillType.getDisplayName())
+                    .replace("$level", String.valueOf(level));
+            String xpLine = PlayerStatusMenuConfig.getSkillsPageXpFormat()
+                    .replace("$progressBar", progressBar)
+                    .replace("$currentXp", formatNumber(xpInLevel))
+                    .replace("$nextXp", formatNumber(xpForNext));
+
+            skillsText.append(processText(levelLine)).append("\n");
+            skillsText.append(processText(xpLine)).append("\n\n");
+        }
+
+        builder.addBody(DialogManager.PlainMessageBody.of(skillsText.toString().trim()).width(DIALOG_WIDTH));
+
+        addBackButton(builder);
+
+        return builder;
+    }
+
+    /**
+     * Creates a visual progress bar for skills.
+     */
+    private static String createProgressBar(double progress) {
+        int totalBars = 20;
+        int filledBars = (int) (progress * totalBars);
+        int emptyBars = totalBars - filledBars;
+
+        StringBuilder bar = new StringBuilder("\u00A7a");
+        for (int i = 0; i < filledBars; i++) {
+            bar.append("|");
+        }
+        bar.append("\u00A77");
+        for (int i = 0; i < emptyBars; i++) {
+            bar.append("|");
+        }
+
+        return bar.toString();
+    }
+
+    /**
+     * Formats large numbers with K, M suffixes.
+     */
+    private static String formatNumber(long number) {
+        if (number >= 1_000_000_000) {
+            return String.format("%.1fB", number / 1_000_000_000.0);
+        } else if (number >= 1_000_000) {
+            return String.format("%.1fM", number / 1_000_000.0);
+        } else if (number >= 1_000) {
+            return String.format("%.1fK", number / 1_000.0);
+        } else {
+            return String.valueOf(number);
+        }
     }
 
     /**
@@ -455,7 +537,7 @@ public class PlayerStatusScreenDialog {
      */
     private static void addBackButton(DialogManager.MultiActionDialogBuilder builder) {
         builder.addAction(DialogManager.ActionButton.of(
-                "← Back to Menu",
+                PlayerStatusMenuConfig.getDialogBackButton(),
                 new DialogManager.RunCommandAction("/elitemobs")
         ).width(DIALOG_WIDTH));
     }

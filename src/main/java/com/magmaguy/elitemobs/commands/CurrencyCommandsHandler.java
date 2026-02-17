@@ -1,8 +1,8 @@
 package com.magmaguy.elitemobs.commands;
 
+import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
-import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.Round;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -17,14 +17,14 @@ public class CurrencyCommandsHandler {
 
         //CASE: Negative amount
         if (amount <= 0) {
-            sender.sendMessage(ChatColorConverter.convert("&4[EliteMobs]Nice try."));
+            sender.sendMessage(CommandMessagesConfig.getPayNiceTryMessage());
             return;
         }
 
         //CASE: Offline player
         Player recipient = Bukkit.getPlayer(recipientName);
         if (recipient == null) {
-            sender.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Player " + recipientName + " is not online and can therefore not get a payment."));
+            sender.sendMessage(CommandMessagesConfig.getPayPlayerNotOnlineMessage().replace("$player", recipientName));
             return;
         }
 
@@ -32,9 +32,8 @@ public class CurrencyCommandsHandler {
         double senderCurrency = EconomyHandler.checkCurrency(sender.getUniqueId());
         if (senderCurrency - amount < 0) {
             sender.sendMessage(
-                    ChatColorConverter.convert(
                             EconomySettingsConfig.getEconomyPaymentInsufficientCurrency()
-                                    .replace("$currency_name", EconomySettingsConfig.getCurrencyName())));
+                                    .replace("$currency_name", EconomySettingsConfig.getCurrencyName()));
             return;
         }
 
@@ -46,34 +45,30 @@ public class CurrencyCommandsHandler {
         EconomyHandler.subtractCurrency(sender.getUniqueId(), amount);
 
         sender.sendMessage(
-                ChatColorConverter.convert(
                         EconomySettingsConfig.getEconomyPayMessage()
                                 .replace("$amount_sent", amount + "")
                                 .replace("$amount_received", actuallyReceivedAmount + "")
                                 .replace("$taxes", taxes + "")
                                 .replace("$currency_name", EconomySettingsConfig.getCurrencyName())
-                                .replace("$receiver", recipient.getDisplayName())));
+                                .replace("$receiver", recipient.getDisplayName()));
 
         sender.sendMessage(
-                ChatColorConverter.convert(
                         EconomySettingsConfig.getEconomyCurrencyLeftMessage()
                                 .replace("$amount_left", String.valueOf(EconomyHandler.checkCurrency(sender.getUniqueId())))
-                                .replace("$currency_name", EconomySettingsConfig.getCurrencyName())));
+                                .replace("$currency_name", EconomySettingsConfig.getCurrencyName()));
 
         recipient.sendMessage(
-                ChatColorConverter.convert(
                         EconomySettingsConfig.getEconomyPaymentReceivedMessage()
                                 .replace("$amount_sent", amount + "")
                                 .replace("$amount_received", actuallyReceivedAmount + "")
                                 .replace("$taxes", taxes + "")
                                 .replace("$sender", sender.getDisplayName())
-                                .replace("$currency_name", EconomySettingsConfig.getCurrencyName())));
+                                .replace("$currency_name", EconomySettingsConfig.getCurrencyName()));
 
         recipient.sendMessage(
-                ChatColorConverter.convert(
                         EconomySettingsConfig.getEconomyCurrencyLeftMessage()
                                 .replace("$amount_left", String.valueOf(EconomyHandler.checkCurrency(recipient.getUniqueId())))
-                                .replace("$currency_name", EconomySettingsConfig.getCurrencyName())));
+                                .replace("$currency_name", EconomySettingsConfig.getCurrencyName()));
 
     }
 
@@ -84,18 +79,18 @@ public class CurrencyCommandsHandler {
     public static void addCommand(CommandSender commandSender, String onlinePlayer, double amount) {
         Player player = Bukkit.getPlayer(onlinePlayer);
         if (player == null) {
-            commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Player " + onlinePlayer + " &4is not valid!"));
+            commandSender.sendMessage(CommandMessagesConfig.getCurrencyPlayerNotValidMessage().replace("$player", onlinePlayer));
             return;
         }
         addCommand(player, amount);
-        commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2You have added " + amount + " to " + onlinePlayer));
-        commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2They now have " + EconomyHandler.checkCurrency(player.getUniqueId())));
+        commandSender.sendMessage(CommandMessagesConfig.getCurrencyAddedMessage().replace("$amount", String.valueOf(amount)).replace("$player", onlinePlayer));
+        commandSender.sendMessage(CommandMessagesConfig.getCurrencyNowHasMessage().replace("$amount", String.valueOf(EconomyHandler.checkCurrency(player.getUniqueId()))));
     }
 
     public static void addAllCommand(CommandSender commandSender, double amount) {
         for (Player player : Bukkit.getOnlinePlayers())
             addCommand(player, amount);
-        commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2You have added " + amount + " to all online players."));
+        commandSender.sendMessage(CommandMessagesConfig.getCurrencyAddedAllMessage().replace("$amount", String.valueOf(amount)));
     }
 
     public static void subtractCommand(String playerName, double amount) {
@@ -105,41 +100,40 @@ public class CurrencyCommandsHandler {
     public static void subtractCommand(CommandSender commandSender, String onlinePlayer, int amount) {
         Player player = Bukkit.getPlayer(onlinePlayer);
         if (player == null) {
-            commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Player " + onlinePlayer + " &4is not valid!"));
+            commandSender.sendMessage(CommandMessagesConfig.getCurrencyPlayerNotValidMessage().replace("$player", onlinePlayer));
             return;
         }
         subtractCommand(onlinePlayer, amount);
-        commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2You have subtracted " + amount + " from " + onlinePlayer));
-        commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs]They now have " + EconomyHandler.checkCurrency(player.getUniqueId())));
+        commandSender.sendMessage(CommandMessagesConfig.getCurrencySubtractedMessage().replace("$amount", String.valueOf(amount)).replace("$player", onlinePlayer));
+        commandSender.sendMessage(CommandMessagesConfig.getCurrencyNowHasMessage().replace("$amount", String.valueOf(EconomyHandler.checkCurrency(player.getUniqueId()))));
     }
 
     public static void setCommand(CommandSender commandSender, String onlinePlayer, double amount) {
         Player player = Bukkit.getPlayer(onlinePlayer);
         if (player == null) {
-            commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Player " + onlinePlayer + " &4is not valid!"));
+            commandSender.sendMessage(CommandMessagesConfig.getCurrencyPlayerNotValidMessage().replace("$player", onlinePlayer));
             return;
         }
         EconomyHandler.setCurrency(player.getUniqueId(), amount);
-        commandSender.sendMessage("You set " + onlinePlayer + "'s " + EconomySettingsConfig.getCurrencyName() + " to " + amount);
+        commandSender.sendMessage(CommandMessagesConfig.getCurrencySetMessage().replace("$player", onlinePlayer).replace("$currencyName", EconomySettingsConfig.getCurrencyName()).replace("$amount", String.valueOf(amount)));
     }
 
 
     public static void checkCommand(CommandSender commandSender, String playerName) {
         Player player = Bukkit.getPlayer(playerName);
         if (player == null) {
-            commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Player " + playerName + " &4is not valid!"));
+            commandSender.sendMessage(CommandMessagesConfig.getCurrencyPlayerNotValidMessage().replace("$player", playerName));
             return;
         }
         double money = EconomyHandler.checkCurrency(player.getUniqueId());
-        commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs]&f " + playerName + " &2has " + money + " " + EconomySettingsConfig.getCurrencyName()));
+        commandSender.sendMessage(CommandMessagesConfig.getCurrencyCheckMessage().replace("$player", playerName).replace("$amount", String.valueOf(money)).replace("$currencyName", EconomySettingsConfig.getCurrencyName()));
     }
 
     public static void walletCommand(Player player) {
         player.sendMessage(
-                ChatColorConverter.convert(
                         EconomySettingsConfig.getEconomyWalletCommand()
                                 .replace("$balance", String.valueOf(EconomyHandler.checkCurrency(player.getUniqueId())))
-                                .replace("$currency_name", EconomySettingsConfig.getCurrencyName())));
+                                .replace("$currency_name", EconomySettingsConfig.getCurrencyName()));
     }
 
 }

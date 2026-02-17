@@ -11,10 +11,10 @@ public class BarkeepConfig extends NPCsConfigFields {
     public BarkeepConfig() {
         super("barkeep",
                 true,
-                "Bartley",
-                "<Barkeep>",
+                "<g:#7A5A40:#8A6A50>Bartley</g>",
+                "<g:#6A4A30:#7A5A40><Barkeep></g>",
                 Villager.Profession.BUTCHER,
-                "em_adventurers_guild,285.5,91,209.5,0,0",
+                "em_adventurers_guild,290.5,91,208.5,0,0",
                 new ArrayList<>(List.of(
                         "Need a drink?",
                         "Want a drink",

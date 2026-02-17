@@ -1,16 +1,15 @@
 package com.magmaguy.elitemobs.instanced;
 
+import com.magmaguy.easyminecraftgoals.internal.FakeText;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.api.internal.RemovalReason;
+import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.utils.VisualDisplay;
-import com.magmaguy.magmacore.util.ChatColorConverter;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.TextDisplay;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -21,9 +20,9 @@ public class InstanceDeathLocation {
     @Getter
     private Player deadPlayer;
     private Location deathLocation = null;
-    private TextDisplay nameTag;
-    private TextDisplay livesLeft;
-    private TextDisplay instructions;
+    private FakeText nameTag;
+    private FakeText livesLeft;
+    private FakeText instructions;
 
 
     protected InstanceDeathLocation(Player player, MatchInstance matchInstance) {
@@ -33,9 +32,9 @@ public class InstanceDeathLocation {
         this.deadPlayer = player;
         this.bannerBlock = player.getLocation().getBlock();
         findBannerLocation(player.getLocation());
-        instructions = VisualDisplay.generateTemporaryTextDisplay(deathLocation.clone().add(new Vector(0, 2.2, 0)), ChatColorConverter.convert("&2Punch to rez!"));
-        nameTag = VisualDisplay.generateTemporaryTextDisplay(deathLocation.clone().add(new Vector(0, 2, 0)), player.getDisplayName());
-        livesLeft = VisualDisplay.generateTemporaryTextDisplay(deathLocation.clone().add(new Vector(0, 1.8, 0)), matchInstance.playerLives.get(deadPlayer) + " lives left!");
+        instructions = VisualDisplay.generateFakeText(deathLocation.clone().add(new Vector(0, 2.2, 0)), DungeonsConfig.getInstancePunchToRez(), 30);
+        nameTag = VisualDisplay.generateFakeText(deathLocation.clone().add(new Vector(0, 2, 0)), player.getDisplayName(), 30);
+        livesLeft = VisualDisplay.generateFakeText(deathLocation.clone().add(new Vector(0, 1.8, 0)), DungeonsConfig.getInstanceLivesLeft().replace("$amount", String.valueOf(matchInstance.playerLives.get(deadPlayer))), 30);
         if (deathLocation != null)
             matchInstance.deathBanners.put(bannerBlock, this);
 
@@ -57,9 +56,9 @@ public class InstanceDeathLocation {
 
     public void clear(boolean resurrect) {
         bannerBlock.setType(Material.AIR);
-        EntityTracker.unregister(nameTag, RemovalReason.EFFECT_TIMEOUT);
-        EntityTracker.unregister(instructions, RemovalReason.EFFECT_TIMEOUT);
-        EntityTracker.unregister(livesLeft, RemovalReason.EFFECT_TIMEOUT);
+        if (nameTag != null) nameTag.remove();
+        if (instructions != null) instructions.remove();
+        if (livesLeft != null) livesLeft.remove();
         matchInstance.deathBanners.remove(bannerBlock);
         if (resurrect)
             matchInstance.revivePlayer(deadPlayer, this);
@@ -75,9 +74,9 @@ public class InstanceDeathLocation {
                     return;
                 }
                 if (bannerBlock.getType().equals(Material.RED_BANNER)) return;
-                EntityTracker.unregister(nameTag, RemovalReason.EFFECT_TIMEOUT);
-                EntityTracker.unregister(instructions, RemovalReason.EFFECT_TIMEOUT);
-                EntityTracker.unregister(livesLeft, RemovalReason.EFFECT_TIMEOUT);
+                if (nameTag != null) nameTag.remove();
+                if (instructions != null) instructions.remove();
+                if (livesLeft != null) livesLeft.remove();
                 findBannerLocation(deathLocation);
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 5, 5);

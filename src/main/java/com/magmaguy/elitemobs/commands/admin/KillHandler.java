@@ -1,10 +1,10 @@
 package com.magmaguy.elitemobs.commands.admin;
 
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
+import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
-import com.magmaguy.magmacore.util.ChatColorConverter;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -22,7 +22,7 @@ public class KillHandler {
             eliteEntity.remove(RemovalReason.OTHER);
             counter++;
         }
-        commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Killed " + counter + " Elite Mobs."));
+        commandSender.sendMessage(CommandMessagesConfig.getKilledElitesMessage().replace("$count", String.valueOf(counter)));
     }
 
     public static void killEntityType(CommandSender commandSender, EntityType entityType) {
@@ -33,9 +33,9 @@ public class KillHandler {
                 eliteEntity.remove(RemovalReason.OTHER);
                 counter++;
             }
-            commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Killed " + counter + " Elite " + entityType.toString() + "."));
+            commandSender.sendMessage(CommandMessagesConfig.getKilledEliteTypeMessage().replace("$count", String.valueOf(counter)).replace("$type", entityType.toString()));
         } else
-            commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &cNot a valid entity type for EliteMobs!"));
+            commandSender.sendMessage(CommandMessagesConfig.getInvalidEliteTypeMessage());
     }
 
     public static void radiusKillAggressiveMobs(Player player, int radius) {
@@ -47,7 +47,7 @@ public class KillHandler {
                 counter++;
             }
         }
-        player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Killed " + counter + " Elite Mobs."));
+        player.sendMessage(CommandMessagesConfig.getKilledElitesMessage().replace("$count", String.valueOf(counter)));
     }
 
     public static void radiusKillSpecificMobs(Player player, EntityType entityType, int radius) {
@@ -60,7 +60,7 @@ public class KillHandler {
                 counter++;
             }
         }
-        player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Killed " + counter + " Elite Mobs."));
+        player.sendMessage(CommandMessagesConfig.getKilledElitesMessage().replace("$count", String.valueOf(counter)));
     }
 
 }

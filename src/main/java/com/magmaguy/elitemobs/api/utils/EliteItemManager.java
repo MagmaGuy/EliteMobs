@@ -231,12 +231,28 @@ public class EliteItemManager {
     }
 
     /**
-     * Calculates the item level of any given {@ItemStack}
+     * Gets the item level of any given {@ItemStack}. First checks for stored level,
+     * then falls back to calculation if not stored.
      *
      * @param itemStack ItemStack to analyze
      * @return Item level
      */
     public static double getItemLevel(@Nullable ItemStack itemStack) {
+        int storedLevel = ItemTagger.getStoredItemLevel(itemStack);
+        if (storedLevel >= 0) return storedLevel;
+        double value = getWeaponLevel(itemStack);
+        if (value > 3.0) return value;
+        return getArmorLevel(itemStack);
+    }
+
+    /**
+     * Calculates the item level of any given {@ItemStack} based on stats.
+     * This ignores any stored level and always calculates from item attributes.
+     *
+     * @param itemStack ItemStack to analyze
+     * @return Calculated item level
+     */
+    public static double calculateItemLevel(@Nullable ItemStack itemStack) {
         double value = getWeaponLevel(itemStack);
         if (value > 3.0) return value;
         return getArmorLevel(itemStack);
@@ -259,6 +275,17 @@ public class EliteItemManager {
                         itemStack.getType().equals(Material.DIAMOND_HOE) ||
                         itemStack.getType().equals(Material.NETHERITE_HOE)))
             return true;
+        // Mace has slow attack speed (0.6) - needs special handling like wooden axe
+        try {
+            if (itemStack.getType().equals(Material.MACE))
+                return true;
+        } catch (NoSuchFieldError ignored) {
+            // MACE doesn't exist pre-1.21
+        }
+        // Spears have variable attack speeds - check by name pattern
+        String materialName = itemStack.getType().name();
+        if (materialName.endsWith("_SPEAR"))
+            return true;
         return getWeaponLevel(itemStack) > 3.0;
     }
 
@@ -269,6 +296,7 @@ public class EliteItemManager {
     public static void setEliteLevel(@Nullable ItemStack itemStack, int level) {
         if (itemStack == null) return;
         registerEliteItem(itemStack);
+        ItemTagger.setItemLevel(itemStack, level);
         if (isWeapon(itemStack)) {
             double damage = calculateEliteBonus(itemStack, level);
             if (damage > 0)
@@ -284,15 +312,19 @@ public class EliteItemManager {
     public static void setEliteLevel(@Nullable ItemStack itemStack, int level, boolean onlyArmorOrWeapons) {
         if (itemStack == null) return;
         if (isWeapon(itemStack)) {
+            ItemTagger.setItemLevel(itemStack, level);
             double damage = calculateEliteBonus(itemStack, level);
             if (damage > 0)
                 ItemTagger.setEliteDamageAttribute(itemStack, damage);
         } else if (isArmor(itemStack)) {
+            ItemTagger.setItemLevel(itemStack, level);
             double defense = calculateEliteBonus(itemStack, level);
             if (defense > 0)
                 ItemTagger.setEliteDefenseAttribute(itemStack, defense);
         } else if (onlyArmorOrWeapons) {
             return;
+        } else {
+            ItemTagger.setItemLevel(itemStack, level);
         }
         if (!isEliteMobsItem(itemStack)) {
             registerEliteItem(itemStack);

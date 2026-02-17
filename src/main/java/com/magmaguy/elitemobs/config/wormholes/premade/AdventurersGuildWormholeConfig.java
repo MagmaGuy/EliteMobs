@@ -11,5 +11,7 @@ public class AdventurersGuildWormholeConfig extends WormholeConfigFields {
                 "your_world_here,0.5,64,0.5,0,0",
                 Wormhole.WormholeStyle.ICOSAHEDRON);
         setBlindPlayer(true);
+        setCustomModel1("em_ag_portal");
+        setCustomModel2("em_ag_portal");
     }
 }

@@ -3,6 +3,8 @@ package com.magmaguy.elitemobs.commands;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.magmaguy.elitemobs.config.CommandMessagesConfig;
+import com.magmaguy.elitemobs.config.QuestsConfig;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.Quest;
 import com.magmaguy.elitemobs.quests.menus.QuestMenu;
@@ -42,7 +44,7 @@ public class QuestCheckCommand extends AdvancedCommand {
         List<Quest> quests = PlayerData.getQuests(player.getUniqueId());
 
         if (quests == null || quests.isEmpty()) {
-            player.sendMessage("You have no active quests.");
+            player.sendMessage(CommandMessagesConfig.getNoActiveQuestsMessage());
             return;
         }
 
@@ -56,7 +58,7 @@ public class QuestCheckCommand extends AdvancedCommand {
         }
 
         if (targetQuest == null) {
-            player.sendMessage("Quest not found.");
+            player.sendMessage(CommandMessagesConfig.getQuestNotFoundMessage());
             return;
         }
 
@@ -79,9 +81,9 @@ public class QuestCheckCommand extends AdvancedCommand {
         String statusSuffix = "";
         if (quest.isAccepted()) {
             if (quest.getQuestObjectives().isOver()) {
-                statusSuffix = " §f| §2Turn in!";
+                statusSuffix = QuestsConfig.getQuestTurnInStatus();
             } else {
-                statusSuffix = " §f| §aAccepted";
+                statusSuffix = QuestsConfig.getQuestAcceptedStatus();
             }
         }
         builder.externalTitle(title + statusSuffix);
@@ -100,7 +102,7 @@ public class QuestCheckCommand extends AdvancedCommand {
 
         // Add back button to return to status menu
         builder.addAction(DialogManager.ActionButton.of(
-                "← Back to Status Menu",
+                QuestsConfig.getQuestBackToStatusMenu(),
                 new DialogManager.RunCommandAction("/elitemobs")
         ).width(QUEST_DIALOG_WIDTH));
 
@@ -212,7 +214,7 @@ public class QuestCheckCommand extends AdvancedCommand {
 
         String text = processText(component.getText());
         if (text.contains("[Abandon]")) {
-            text = "§l§c[Abandon]";
+            text = QuestsConfig.getQuestAbandonText();
         }
 
         String command = extractCommandFromComponent(component);

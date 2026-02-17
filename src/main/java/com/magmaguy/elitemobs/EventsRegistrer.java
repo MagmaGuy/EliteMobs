@@ -1,8 +1,5 @@
 package com.magmaguy.elitemobs;
 
-import com.magmaguy.elitemobs.adventurersguild.GuildRank;
-import com.magmaguy.elitemobs.adventurersguild.GuildRankMenuHandler;
-import com.magmaguy.elitemobs.adventurersguild.WorldSwitchBehavior;
 import com.magmaguy.elitemobs.api.*;
 import com.magmaguy.elitemobs.collateralminecraftchanges.*;
 import com.magmaguy.elitemobs.combatsystem.EliteMobDamagedByEliteMobHandler;
@@ -52,6 +49,7 @@ import com.magmaguy.elitemobs.powers.specialpowers.EnderCrystalLightningRod;
 import com.magmaguy.elitemobs.powerstances.EffectEventHandlers;
 import com.magmaguy.elitemobs.powerstances.VisualEffectObfuscator;
 import com.magmaguy.elitemobs.quests.CustomQuest;
+import com.magmaguy.elitemobs.quests.QuestLockoutHandler;
 import com.magmaguy.elitemobs.quests.QuestTracking;
 import com.magmaguy.elitemobs.quests.menus.QuestInventoryMenu;
 import com.magmaguy.elitemobs.quests.objectives.ArenaObjective;
@@ -59,6 +57,11 @@ import com.magmaguy.elitemobs.quests.objectives.CustomFetchObjective;
 import com.magmaguy.elitemobs.quests.objectives.DialogObjective;
 import com.magmaguy.elitemobs.quests.objectives.KillObjective;
 import com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldownsLogout;
+import com.magmaguy.elitemobs.skills.CombatLevelDisplay;
+import com.magmaguy.elitemobs.skills.SkillSystemMigration;
+import com.magmaguy.elitemobs.skills.SkillXPBar;
+import com.magmaguy.elitemobs.skills.SkillXPHandler;
+import com.magmaguy.elitemobs.skills.bonuses.SkillBonusEventHandler;
 import com.magmaguy.elitemobs.thirdparty.custommodels.CustomModel;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardDungeonFlag;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardEliteMobOnlySpawnFlag;
@@ -95,6 +98,12 @@ public class EventsRegistrer {
         register(new PlayerData.PlayerDataEvents());
         register(new ElitePlayerInventory.ElitePlayerInventoryEvents());
         register(new PlayerStatsTracker());
+        register(new SkillXPHandler());
+        register(new SkillXPBar());
+        register(new SkillSystemMigration.MigrationEvents());
+        register(new CombatLevelDisplay());
+        register(new SkillBonusEventHandler());
+        register(new SkillBonusMenu.SkillBonusMenuEvents());
         register(new PlayerQuestCooldownsLogout());
 
         if (ItemSettingsConfig.isPreventEliteItemEnchantment())
@@ -111,6 +120,7 @@ public class EventsRegistrer {
         register(new FixPlayerOnLoginOrRespawn());
         register(new EnvironmentalDungeonDamage());
         register(new PlayerQuitCleanup());
+        register(new com.magmaguy.elitemobs.wormhole.WormholePlayerListener());
 
         //Mob damage
         register(new EliteMobGenericDamagedHandler());
@@ -248,6 +258,7 @@ public class EventsRegistrer {
         //player status menu
         register(new CoverPage.CoverPageEvents());
         register(new StatsPage.StatsPageEvents());
+        register(new SkillsPage.SkillsPageEvents());
         register(new GearPage.GearPageEvents());
         register(new TeleportsPage.TeleportsPageEvents());
         register(new CommandsPage.CommandsPageEvents());
@@ -265,6 +276,15 @@ public class EventsRegistrer {
         register(new RepairMenu.RepairMenuEvents());
         register(new UnbindMenu.UnbinderMenuEvents());
         register(new ItemEnchantmentMenu.ItemEnchantMenuEvents());
+        register(new ArrowShopMenu.ArrowShopMenuEvents());
+
+        //Gambling menus
+        register(new com.magmaguy.elitemobs.menus.gambling.BettingMenu.BettingMenuEvents());
+        register(new com.magmaguy.elitemobs.menus.gambling.BlackjackGame.BlackjackMenuEvents());
+        register(new com.magmaguy.elitemobs.menus.gambling.CoinFlipGame.CoinFlipMenuEvents());
+        register(new com.magmaguy.elitemobs.menus.gambling.HigherLowerGame.HigherLowerMenuEvents());
+        register(new com.magmaguy.elitemobs.menus.gambling.SlotMachineGame.SlotMachineMenuEvents());
+        register(new com.magmaguy.elitemobs.gambling.DebtCollectorManager());
 
         //loot menu
         register(new LootMenu.LootMenuEvents());
@@ -314,9 +334,6 @@ public class EventsRegistrer {
         register(new EarthquakeEnchantment.EarthquakeEnchantmentEvents());
         //register(new UnbindEnchantment.UnbindEvents());
 
-        //Initialize adventurer's guild
-        register(new GuildRankMenuHandler());
-        register(new WorldSwitchBehavior());
         //register quests
         register(new KillObjective.KillObjectiveEvents());
         register(new CustomFetchObjective.CustomFetchObjectiveEvents());
@@ -364,6 +381,7 @@ public class EventsRegistrer {
         }
         register(new DungeonProtector());
         register(new DungeonBossLockoutHandler());
+        register(new QuestLockoutHandler());
 
         register(new EntityTransformHandler());
         register(new EliteBlazeWaterDamagePrevention());
@@ -377,8 +395,7 @@ public class EventsRegistrer {
         //On death commands
         register(new OnDeathCommands());
 
-        //Player stuff
-        register(new GuildRank.GuildRankEvents());
+        //Player stuff (guild rank events removed - skill system replacement)
 
         //Commands
         register(new RemoveCommand.RemoveCommandEvents());

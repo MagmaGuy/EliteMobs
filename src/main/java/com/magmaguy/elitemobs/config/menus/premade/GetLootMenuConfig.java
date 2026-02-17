@@ -21,31 +21,31 @@ public class GetLootMenuConfig extends MenusConfigFields {
     @Override
     public void processAdditionalFields() {
 
-        menuName = ConfigurationEngine.setString(file, fileConfiguration, "Menu name", "[EM] Getloot menu", true);
+        menuName = ConfigurationEngine.setString(file, fileConfiguration, "menuName", "[EM] Getloot menu", true);
 
         ItemStackSerializer.serialize(
-                "Info button",
+                "infoButton",
                 ItemStackGenerator.generateSkullItemStack("magmaguy",
                         "&4&lEliteMobs &r&cby &4&lMagmaGuy",
                         List.of("&8Support the plugins you enjoy!")),
                 fileConfiguration);
-        infoItem = ItemStackSerializer.deserialize("Info button", fileConfiguration);
+        infoItem = ItemStackSerializer.deserialize("infoButton", fileConfiguration);
 
         ItemStackSerializer.serialize(
-                "Left button",
+                "leftButton",
                 ItemStackGenerator.generateSkullItemStack("MHF_ArrowLeft",
                         "Previous Item Ranks",
                         List.of("")),
                 fileConfiguration);
-        leftArrowItem = ItemStackSerializer.deserialize("Left button", fileConfiguration);
+        leftArrowItem = ItemStackSerializer.deserialize("leftButton", fileConfiguration);
 
         ItemStackSerializer.serialize(
-                "Right button",
+                "rightButton",
                 ItemStackGenerator.generateSkullItemStack("MHF_ArrowRight",
                         "Next Item Ranks",
                         List.of("")),
                 fileConfiguration);
-        rightArrowItem = ItemStackSerializer.deserialize("Right button", fileConfiguration);
+        rightArrowItem = ItemStackSerializer.deserialize("rightButton", fileConfiguration);
 
         tierTranslation = ConfigurationEngine.setString(file, fileConfiguration, "tierTranslation", "Level", true);
         itemFilterTranslation = ConfigurationEngine.setString(file, fileConfiguration, "itemFilterTranslation", "Filter by items of this level.", true);

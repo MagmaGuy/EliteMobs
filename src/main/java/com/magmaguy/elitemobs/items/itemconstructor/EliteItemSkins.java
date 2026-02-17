@@ -34,8 +34,8 @@ import java.util.TreeMap;
  *   <li>Register it in the static block with {@code registerTier(minLevel, SkinTier.YOUR_TIER)}</li>
  *   <li>Add corresponding resource pack assets:
  *     <ul>
- *       <li>Item models: {@code assets/elitemobs/models/equipment/[tier]_[itemtype].json}</li>
- *       <li>Item definitions: {@code assets/elitemobs/items/equipment/[tier]_[itemtype].json}</li>
+ *       <li>Item models: {@code assets/elitemobs/models/gear/[tier]_[itemtype].json}</li>
+ *       <li>Item definitions: {@code assets/elitemobs/items/gear/[tier]_[itemtype].json}</li>
  *       <li>Equipment definition: {@code assets/elitemobs/equipment/[tier].json}</li>
  *       <li>Worn textures: {@code assets/elitemobs/textures/entity/equipment/humanoid/[tier].png}</li>
  *     </ul>
@@ -100,19 +100,14 @@ public class EliteItemSkins {
     static {
         // Tier registration - add new tiers here!
         // Format: registerTier(minimumLevel, SkinTier.TIER_NAME)
+        // Scaled for level 1-100 progression system
+        // Tiers start at level 20 (when gear restrictions kick in)
 
         registerTier(20, SkinTier.BRONZE);
-        registerTier(50, SkinTier.PALLADIUM);
-        registerTier(100, SkinTier.CORRUPTED);
-        registerTier(150, SkinTier.LIVING);
-        registerTier(200, SkinTier.ULTIMATIUM);
-
-        // Future tiers - uncomment and add resource pack assets when ready:
-        // registerTier(210, SkinTier.TIER_210);
-        // registerTier(220, SkinTier.TIER_220);
-        // registerTier(230, SkinTier.TIER_230);
-        // registerTier(240, SkinTier.TIER_240);
-        // registerTier(250, SkinTier.TIER_250);
+        registerTier(40, SkinTier.PALLADIUM);
+        registerTier(60, SkinTier.CORRUPTED);
+        registerTier(80, SkinTier.LIVING);
+        registerTier(100, SkinTier.ULTIMATIUM);
     }
 
     /**
@@ -155,7 +150,7 @@ public class EliteItemSkins {
      *
      * @param material The item material
      * @param level The item level
-     * @return The item model ID (e.g., "elitemobs:equipment/bronze_sword") or null
+     * @return The item model ID (e.g., "elitemobs:gear/bronze_sword") or null
      */
     public static String getItemModelId(Material material, int level) {
         SkinTier tier = getSkinTier(level);
@@ -191,7 +186,7 @@ public class EliteItemSkins {
      * Override this method to change the resource pack path structure.
      */
     private static String buildItemModelId(SkinTier tier, ItemType itemType) {
-        return "elitemobs:equipment/" + tier.getId() + "_" + itemType.getModelName();
+        return "elitemobs:gear/" + tier.getId() + "_" + itemType.getModelName();
     }
 
     /**
@@ -318,7 +313,8 @@ public class EliteItemSkins {
         ItemMeta meta = itemStack.getItemMeta();
         if (meta == null) return;
 
-        double levelMultiplier = level / 100.0; // Level 200 = 2.0 = 200% bonus
+        // Level 100 = 1.0 = 100% bonus (cap at level 100 for vanilla attribute scaling)
+        double levelMultiplier = Math.min(level, 100) / 100.0;
 
         switch (itemType) {
             case SWORD -> applyWeaponAttributes(meta, NETHERITE_SWORD_DAMAGE, SWORD_ATTACK_SPEED, levelMultiplier, EquipmentSlotGroup.MAINHAND);

@@ -42,10 +42,6 @@ public class DynamicQuestMenuConfig extends MenusConfigFields {
     @Getter
     private static String completedCommandLines;
     @Getter
-    private static String turnedInTextLines;
-    @Getter
-    private static String turnedInHoverLines;
-    @Getter
     private static String ongoingColorCode;
     @Getter
     private static String completedColorCode;
@@ -130,9 +126,6 @@ public class DynamicQuestMenuConfig extends MenusConfigFields {
         completedTextLines = ConfigurationEngine.setString(file, fileConfiguration, "completedTextLines", "&2&l[Turn in!]", true);
         completedHoverLines = ConfigurationEngine.setString(file, fileConfiguration, "completedHoverLines", "&aClick to turn quest in!", true);
         completedCommandLines = ConfigurationEngine.setString(file, fileConfiguration, "completedCommandLines", "/em quest complete $questID", false);
-
-        turnedInTextLines = ConfigurationEngine.setString(file, fileConfiguration, "turnedInTextLines", "&8[Completed!]", true);
-        turnedInHoverLines = ConfigurationEngine.setString(file, fileConfiguration, "turnedInHoverLines", "&8Already turned in!", true);
 
         objectivesLine = ConfigurationEngine.setString(file, fileConfiguration, "objectivesLine", "&c&lObjectives:", true);
         killQuestDefaultSummaryLine = ConfigurationEngine.setString(file, fileConfiguration, "killQuestDefaultSummaryLine", "&c➤Kill $name:$color$current&0/$color$target", true);

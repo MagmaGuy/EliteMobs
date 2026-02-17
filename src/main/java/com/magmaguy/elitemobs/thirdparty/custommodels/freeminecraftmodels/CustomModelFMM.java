@@ -4,6 +4,8 @@ import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.thirdparty.custommodels.CustomModelInterface;
 import com.magmaguy.freeminecraftmodels.api.ModeledEntityManager;
 import com.magmaguy.freeminecraftmodels.customentity.DynamicEntity;
+import com.magmaguy.freeminecraftmodels.customentity.ModeledEntityLeftClickCallback;
+import com.magmaguy.freeminecraftmodels.customentity.ModeledEntityRightClickCallback;
 import com.magmaguy.freeminecraftmodels.customentity.core.Bone;
 import lombok.Getter;
 import org.bukkit.Location;
@@ -21,6 +23,16 @@ public class CustomModelFMM implements CustomModelInterface {
         dynamicEntity.setDisplayName(nametagName);
     }
 
+    public CustomModelFMM(LivingEntity livingEntity, String modelName, String nametagName,
+                          ModeledEntityLeftClickCallback leftClickCallback,
+                          ModeledEntityRightClickCallback rightClickCallback) {
+        dynamicEntity = DynamicEntity.create(modelName, livingEntity);
+        if (dynamicEntity == null) return;
+        dynamicEntity.setDisplayName(nametagName);
+        if (leftClickCallback != null) dynamicEntity.setLeftClickCallback(leftClickCallback);
+        if (rightClickCallback != null) dynamicEntity.setRightClickCallback(rightClickCallback);
+    }
+
     public static void reloadModels() {
         ModeledEntityManager.reload();
     }
@@ -31,28 +43,34 @@ public class CustomModelFMM implements CustomModelInterface {
 
     @Override
     public void shoot() {
+        if (dynamicEntity == null) return;
         if (dynamicEntity.hasAnimation("attack_ranged")) dynamicEntity.playAnimation("attack_ranged", false, false);
-        else dynamicEntity.playAnimation("attack", false, false);
+        else if (dynamicEntity.hasAnimation("attack")) dynamicEntity.playAnimation("attack", false, false);
     }
 
     @Override
     public void melee() {
+        if (dynamicEntity == null) return;
         if (dynamicEntity.hasAnimation("attack_melee")) dynamicEntity.playAnimation("attack_melee", false, false);
-        else dynamicEntity.playAnimation("attack", false, false);
+        else if (dynamicEntity.hasAnimation("attack")) dynamicEntity.playAnimation("attack", false, false);
     }
 
     @Override
     public void playAnimationByName(String animationName) {
+        if (dynamicEntity == null) return;
+        if (!dynamicEntity.hasAnimation(animationName)) return;
         dynamicEntity.playAnimation(animationName, false, false);
     }
 
     @Override
     public void setName(String nametagName, boolean visible) {
+        if (dynamicEntity == null) return;
         dynamicEntity.setDisplayName(nametagName);
     }
 
     @Override
     public void setNameVisible(boolean visible) {
+        if (dynamicEntity == null) return;
         dynamicEntity.setDisplayNameVisible(visible);
     }
 
@@ -63,6 +81,7 @@ public class CustomModelFMM implements CustomModelInterface {
 
     @Override
     public void switchPhase() {
+        if (dynamicEntity == null) return;
         dynamicEntity.remove();
     }
 
@@ -72,5 +91,11 @@ public class CustomModelFMM implements CustomModelInterface {
         List<Bone> nametagBones = dynamicEntity.getNametagBones();
         if (nametagBones == null || nametagBones.isEmpty()) return null;
         return nametagBones.get(0).getBoneLocation();
+    }
+
+    @Override
+    public void setSyncMovement(boolean syncMovement) {
+        if (dynamicEntity == null) return;
+        dynamicEntity.setSyncMovement(syncMovement);
     }
 }

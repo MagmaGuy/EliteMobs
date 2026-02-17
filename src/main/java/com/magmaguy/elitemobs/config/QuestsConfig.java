@@ -28,8 +28,6 @@ public class QuestsConfig extends ConfigurationFile {
     @Getter
     private static String leaveWhenNoActiveQuestsExist;
     @Getter
-    private static String questLeaveConfirmationMessage;
-    @Getter
     private static boolean useQuestAcceptTitles;
     @Getter
     private static String questStartTitle;
@@ -103,6 +101,26 @@ public class QuestsConfig extends ConfigurationFile {
     private static int horizontalCharacterLimitBedrockMenu;
     @Getter
     private static int itemEntryCharacterLimitBedrockMenu;
+    @Getter
+    private static String questLockoutSubtitle;
+    @Getter
+    private static String questLockoutChatMessage;
+    @Getter
+    private static String invalidQuestIdMessage;
+    @Getter
+    private static String invalidQuestNpcMessage;
+    @Getter
+    private static String invalidQuestMessage;
+    @Getter
+    private static String questTrackingInvalidMessage;
+    @Getter
+    private static String questTurnInStatus;
+    @Getter
+    private static String questAcceptedStatus;
+    @Getter
+    private static String questBackToStatusMenu;
+    @Getter
+    private static String questAbandonText;
 
     public QuestsConfig() {
         super("Quests.yml");
@@ -209,9 +227,6 @@ public class QuestsConfig extends ConfigurationFile {
         leaveWhenNoActiveQuestsExist = ConfigurationEngine.setString(
                 List.of("Sets the message sent when a player tried to abandon a quest when none are active."),
                 file, fileConfiguration, "leaveWhenNoActiveQuestsExist", "&cYou don't currently have an active quest!", true);
-        questLeaveConfirmationMessage = ConfigurationEngine.setString(
-                List.of("Sets the confirmation message sent when players try to leave a quest."),
-                file, fileConfiguration, "questLeaveConfirmationMessage", "&cAre you sure you want to abandon your current quest? Do &a/em confirm &c to confirm your choice!", true);
         useQuestAcceptTitles = ConfigurationEngine.setBoolean(
                 List.of("Sets if some of the messages related to quests will use titles instead of chat messages."),
                 fileConfiguration, "useQuestAcceptTitles", true);
@@ -247,7 +262,7 @@ public class QuestsConfig extends ConfigurationFile {
                 file, fileConfiguration, "ongoingQuestColorCode", "&c", false);
         completedColorCode = ConfigurationEngine.setString(
                 List.of("Sets the color codes for completed objectives."),
-                file, fileConfiguration, "ongoingQuestColorCode", "&2", false);
+                file, fileConfiguration, "completedQuestColorCode", "&2", false);
         killQuestChatProgressionMessage = ConfigurationEngine.setString(
                 List.of("Sets the formatting for progression messages of kill quests."),
                 file, fileConfiguration, "killQuestChatProgressionMessage", "&8[EliteMobs]&c➤Kill $name:$color$current&0/$color$target", true);
@@ -333,6 +348,48 @@ public class QuestsConfig extends ConfigurationFile {
         itemEntryCharacterLimitBedrockMenu = ConfigurationEngine.setInt(
                 List.of("Sets the maximum amount of characters per item entry in inventory-based menus for quests before creating another item to continue the entry."),
                 fileConfiguration, "itemEntryCharacterLimitBedrockMenu", 300);
+
+        questLockoutSubtitle = ConfigurationEngine.setString(
+                List.of("Sets the subtitle shown when a player tries to accept a quest they are locked out from"),
+                file, fileConfiguration, "questLockoutSubtitle", "&cQuest Lockout!", true);
+        questLockoutChatMessage = ConfigurationEngine.setString(
+                List.of("Sets the chat message shown when a player tries to accept a quest they are locked out from",
+                        "$questName is the placeholder for the quest name",
+                        "$remainingTime is the placeholder for the remaining lockout time"),
+                file, fileConfiguration, "questLockoutChatMessage",
+                "&c[EliteMobs] &7You completed &c$questName &7recently and must wait another &e$remainingTime &7before you can accept it again.", true);
+
+        invalidQuestIdMessage = ConfigurationEngine.setString(
+                List.of("Sets the message sent when a player tries to start a quest with an invalid ID.",
+                        "$questId is the placeholder for the quest ID"),
+                file, fileConfiguration, "invalidQuestIdMessage",
+                "&8[EliteMobs] &cInvalid quest ID for ID $questId", true);
+        invalidQuestNpcMessage = ConfigurationEngine.setString(
+                List.of("Sets the message sent when an NPC has an invalid quest configuration."),
+                file, fileConfiguration, "invalidQuestNpcMessage",
+                "[EliteMobs] This NPC's quest is not valid! This might be a configuration error on the NPC or on the quest.", true);
+        invalidQuestMessage = ConfigurationEngine.setString(
+                List.of("Sets the message sent to admins when a specific quest filename is invalid.",
+                        "$quest is the placeholder for the quest filename"),
+                file, fileConfiguration, "invalidQuestMessage",
+                "Invalid quest: $quest", true);
+        questTrackingInvalidMessage = ConfigurationEngine.setString(
+                List.of("Sets the message sent when quest tracking fails due to an invalid quest ID."),
+                file, fileConfiguration, "questTrackingInvalidMessage",
+                "[EliteMobs] Failed to get a valid quest with that quest ID!", true);
+
+        questTurnInStatus = ConfigurationEngine.setString(
+                List.of("Sets the status suffix shown when a quest is ready to turn in."),
+                file, fileConfiguration, "questTurnInStatus", " \u00A7f| \u00A72Turn in!", true);
+        questAcceptedStatus = ConfigurationEngine.setString(
+                List.of("Sets the status suffix shown when a quest is accepted."),
+                file, fileConfiguration, "questAcceptedStatus", " \u00A7f| \u00A7aAccepted", true);
+        questBackToStatusMenu = ConfigurationEngine.setString(
+                List.of("Sets the text for the back button to return to the status menu."),
+                file, fileConfiguration, "questBackToStatusMenu", "\u2190 Back to Status Menu", true);
+        questAbandonText = ConfigurationEngine.setString(
+                List.of("Sets the text shown on the abandon quest button."),
+                file, fileConfiguration, "questAbandonText", "\u00A7l\u00A7c[Abandon]", true);
 
     }
 }
