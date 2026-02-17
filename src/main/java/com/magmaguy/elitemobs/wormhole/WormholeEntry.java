@@ -8,7 +8,6 @@ import com.magmaguy.elitemobs.mobconstructor.PersistentObject;
 import com.magmaguy.elitemobs.mobconstructor.PersistentObjectHandler;
 import com.magmaguy.elitemobs.thirdparty.custommodels.CustomModel;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
-import com.magmaguy.elitemobs.utils.DiscordLinks;
 import com.magmaguy.freeminecraftmodels.customentity.StaticEntity;
 import com.magmaguy.magmacore.DrawLine;
 import com.magmaguy.magmacore.util.ChatColorConverter;
@@ -91,6 +90,8 @@ public class WormholeEntry implements PersistentObject {
     @Getter
     @Setter
     private String opMessage = null;
+    @Getter
+    private boolean showDownloadHint = false;
     private PersistentObjectHandler persistentObjectHandler = null;
     private long[] cachedEdges = null; // Cache edges as long array (p1 << 32 | p2)
     private Material concreteColor = null; // Cache the concrete color
@@ -174,7 +175,10 @@ public class WormholeEntry implements PersistentObject {
     private Location getDungeonLocation() {
         EMPackage emPackage = EMPackage.getEmPackages().get(locationString);
         if (emPackage == null) {
-            Logger.warn("Dungeon " + locationString + " is not a valid dungeon packager name! Wormhole " + wormhole.getWormholeConfigFields().getFilename() + " will not lead anywhere.");
+            // During async init, packages may not be loaded yet; syncInitialization re-resolves wormhole destinations
+            if (!EMPackage.getEmPackages().isEmpty()) {
+                Logger.warn("Dungeon " + locationString + " is not a valid dungeon packager name! Wormhole " + wormhole.getWormholeConfigFields().getFilename() + " will not lead anywhere.");
+            }
             setPortalMissingMessage(WormholesConfig.getDefaultPortalMissingMessage());
             return null;
         }
@@ -182,7 +186,7 @@ public class WormholeEntry implements PersistentObject {
             //Logger.info("Wormhole " + wormhole.getWormholeConfigFields().getFilename() + " will not lead anywhere because the dungeon " + locationString + " is not installed!");
             setPortalMissingMessage(WormholesConfig.getDungeonNotInstalledMessage().replace("$dungeonID", emPackage.getContentPackagesConfigFields().getName()));
 
-            this.opMessage = CommandMessagesConfig.getWormholeOpDownloadMessage() + DiscordLinks.mainLink;
+            this.showDownloadHint = true;
         }
         Location teleportLocation = emPackage.getContentPackagesConfigFields().getTeleportLocation();
         if (teleportLocation == null) return null;
@@ -196,6 +200,21 @@ public class WormholeEntry implements PersistentObject {
         if (locationString.contains(",")) {
             this.worldName = ConfigurationLocation.worldName(locationString);
             this.location = ConfigurationLocation.serialize(locationString);
+            if (this.location == null || this.location.getWorld() == null) {
+                setPortalMissingMessage(WormholesConfig.getDefaultPortalMissingMessage());
+                String filename = wormhole.getWormholeConfigFields().getFilename();
+                String setupMsg = CommandMessagesConfig.getWormholeOpSetupMessage();
+                if (setupMsg != null) {
+                    setupMsg = setupMsg
+                            .replace("$filename", filename)
+                            .replace("$number", String.valueOf(wormholeNumber));
+                    if (filename.equals("adventurers_guild_wormhole")) {
+                        String agMsg = CommandMessagesConfig.getWormholeAgSpawnRecommendation();
+                        if (agMsg != null) setupMsg += "\n" + agMsg;
+                    }
+                    setOpMessage(setupMsg);
+                }
+            }
         } else {
             this.location = getDungeonLocation();
         }

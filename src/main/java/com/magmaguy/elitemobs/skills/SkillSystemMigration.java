@@ -2,8 +2,10 @@ package com.magmaguy.elitemobs.skills;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.DungeonsConfig;
+import com.magmaguy.elitemobs.config.InitializeConfig;
 import com.magmaguy.elitemobs.config.SkillsConfig;
 import com.magmaguy.magmacore.util.Logger;
+import com.magmaguy.magmacore.util.SpigotMessage;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -114,19 +116,23 @@ public class SkillSystemMigration {
      * @param player The player to warn
      */
     public static void sendMigrationWarning(Player player) {
-        player.sendMessage("");
-        player.sendMessage(DungeonsConfig.getSkillMigrationSeparator());
-        player.sendMessage(DungeonsConfig.getSkillMigrationTitle());
-        player.sendMessage(DungeonsConfig.getSkillMigrationLine1());
-        player.sendMessage("");
-        player.sendMessage(DungeonsConfig.getSkillMigrationLine2());
-        player.sendMessage(DungeonsConfig.getSkillMigrationLine3());
-        player.sendMessage(DungeonsConfig.getSkillMigrationLine4());
-        player.sendMessage("");
-        player.sendMessage(DungeonsConfig.getSkillMigrationLine5());
-        player.sendMessage(DungeonsConfig.getSkillMigrationLine6());
-        player.sendMessage(DungeonsConfig.getSkillMigrationSeparator());
-        player.sendMessage("");
+        Logger.sendSimpleMessage(player, DungeonsConfig.getSkillMigrationSeparator());
+        Logger.sendSimpleMessage(player, DungeonsConfig.getSkillMigrationTitle());
+        Logger.sendSimpleMessage(player, DungeonsConfig.getSkillMigrationLine1());
+        Logger.sendSimpleMessage(player, "");
+        Logger.sendSimpleMessage(player, DungeonsConfig.getSkillMigrationLine2());
+        Logger.sendSimpleMessage(player, DungeonsConfig.getSkillMigrationLine3());
+        Logger.sendSimpleMessage(player, DungeonsConfig.getSkillMigrationLine4());
+        Logger.sendSimpleMessage(player, "");
+        Logger.sendSimpleMessage(player, DungeonsConfig.getSkillMigrationLine5());
+        player.spigot().sendMessage(
+                SpigotMessage.simpleMessage(DungeonsConfig.getSkillMigrationLine6()),
+                SpigotMessage.commandHoverMessage(
+                        InitializeConfig.getEmCommandDisplay(),
+                        InitializeConfig.getEmCommandHover(),
+                        "/em"),
+                SpigotMessage.simpleMessage(DungeonsConfig.getSkillMigrationLine6Suffix()));
+        Logger.sendSimpleMessage(player, DungeonsConfig.getSkillMigrationSeparator());
     }
 
     /**

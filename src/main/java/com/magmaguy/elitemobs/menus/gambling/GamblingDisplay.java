@@ -52,18 +52,22 @@ public class GamblingDisplay {
     /**
      * Sends the configured win message to the player.
      */
-    public static void sendWinMessage(Player player, double amount) {
+    public static void sendWinMessage(Player player, double amount, String gameName) {
         player.sendMessage(
-                GamblingConfig.getWinMessage().replace("%amount%", formatCurrency(amount))
+                GamblingConfig.getWinMessage()
+                        .replace("%amount%", formatCurrency(amount))
+                        .replace("%game%", gameName)
         );
     }
 
     /**
      * Sends the configured lose message to the player.
      */
-    public static void sendLoseMessage(Player player, int betAmount) {
+    public static void sendLoseMessage(Player player, int betAmount, String gameName) {
         player.sendMessage(
-                GamblingConfig.getLoseMessage().replace("%amount%", String.valueOf(betAmount))
+                GamblingConfig.getLoseMessage()
+                        .replace("%amount%", String.valueOf(betAmount))
+                        .replace("%game%", gameName)
         );
     }
 

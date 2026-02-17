@@ -85,10 +85,8 @@ public class GritSkill extends SkillBonus implements ConditionalSkill {
 
     @Override
     public boolean conditionMet(Player player, Object context) {
-        if (!isActive(player)) {
-            return false;
-        }
-        return player.getHealth() / player.getMaxHealth() < HEALTH_THRESHOLD;
+        double damage = context instanceof Number ? ((Number) context).doubleValue() : 0;
+        return (player.getHealth() - damage) / player.getMaxHealth() < HEALTH_THRESHOLD;
     }
 
     @Override
@@ -118,16 +116,17 @@ public class GritSkill extends SkillBonus implements ConditionalSkill {
      * @return The modified damage amount
      */
     public double modifyIncomingDamage(Player player, double originalDamage, Object context) {
-        if (!conditionMet(player, context)) {
+        if (!conditionMet(player, originalDamage)) {
             return originalDamage;
         }
 
         int skillLevel = getPlayerSkillLevel(player);
 
-        // Calculate reduction based on how low health is
+        // Calculate reduction based on how low health would be after damage
         // At 50% health: 0% reduction
         // At 0% health: full reduction (up to 50%)
-        double healthPercent = player.getHealth() / player.getMaxHealth();
+        double postDamageHealth = Math.max(0, player.getHealth() - originalDamage);
+        double healthPercent = postDamageHealth / player.getMaxHealth();
         double lowHealthMultiplier = (HEALTH_THRESHOLD - healthPercent) / HEALTH_THRESHOLD; // 0 at 50%, 1 at 0%
 
         double reduction = getMaxReduction(skillLevel) * lowHealthMultiplier;

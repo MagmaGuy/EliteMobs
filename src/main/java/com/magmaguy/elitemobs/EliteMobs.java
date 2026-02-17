@@ -86,6 +86,7 @@ import com.magmaguy.elitemobs.skills.CombatLevelDisplay;
 import com.magmaguy.elitemobs.skills.SkillSystemMigration;
 import com.magmaguy.elitemobs.skills.SkillXPBar;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusInitializer;
+import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.thirdparty.bstats.CustomCharts;
 import com.magmaguy.elitemobs.thirdparty.custommodels.CustomModel;
 import com.magmaguy.elitemobs.thirdparty.custommodels.modelengine.ModelEngineReservedAddresses;
@@ -102,6 +103,7 @@ import com.magmaguy.magmacore.util.Logger;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -150,13 +152,14 @@ public class EliteMobs extends JavaPlugin {
         //ModelsConfig.initializeConfig();
         new DungeonsConfig();
         new CommandMessagesConfig();
+        new InitializeConfig();
         new SoundsConfig();
         new com.magmaguy.elitemobs.config.GamblingConfig();
     }
 
     public static void worldScanner() {
         for (World world : Bukkit.getWorlds())
-            if (ValidWorldsConfig.getInstance().getFileConfiguration().getBoolean("Valid worlds." + world.getName())) {
+            if (ValidWorldsConfig.getInstance().getFileConfiguration().getBoolean("validWorlds." + world.getName())) {
                 validWorldList.add(world);
             }
 
@@ -268,6 +271,11 @@ public class EliteMobs extends JavaPlugin {
         //Initialize importer (fires ResourcePackGenerationEvent, must be sync)
         MagmaCore.initializeImporter();
 
+        //Refresh dungeon versions from disk after importer extracts new content packages.
+        //The importer may overwrite YAML files with updated dungeonVersion values, but the
+        //in-memory configs were loaded before the importer ran, so they need to be refreshed.
+        ContentPackagesConfig.refreshDungeonVersions();
+
         //Initializes custom models
         CustomModel.initialize();
         //Reserves ModelEngine addresses if present
@@ -294,6 +302,8 @@ public class EliteMobs extends JavaPlugin {
         //Initialize skill system
         SkillSystemMigration.initialize();
         SkillBonusInitializer.initialize();
+        // Re-apply skill bonuses for any players already online (e.g. after plugin reload)
+        for (Player p : Bukkit.getOnlinePlayers()) SkillBonusRegistry.applyAllBonuses(p);
         CombatLevelDisplay.initialize();
 
         //Initialize gambling system
@@ -339,6 +349,12 @@ public class EliteMobs extends JavaPlugin {
                 Logger.warn("Failed to load EliteMobs Package " + emPackage.getContentPackagesConfigFields().getFilename() + " !");
                 exception.printStackTrace();
             }
+
+        //Re-resolve wormhole destinations now that packages are loaded
+        for (EMPackage emPackage : EMPackage.getEmPackages().values())
+            if (emPackage.isInstalled())
+                for (Wormhole wormhole : Wormhole.getWormholes())
+                    wormhole.onDungeonInstall(emPackage.getContentPackagesConfigFields().getFilename());
 
         //Initialize custom spawn methods, this runs late because it compares loaded worlds against worlds listed in the config
         try {

@@ -20,8 +20,9 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Quick Reload (PASSIVE) - Gain attack speed on hit for faster reloading.
- * Uses Attribute.ATTACK_SPEED modifier instead of Haste potion (which only affects mining speed).
+ * Quick Reload (PASSIVE) - Hitting enemies grants a brief movement speed boost.
+ * ATTACK_SPEED has no effect on crossbow reload speed, so this provides a
+ * movement speed buff instead, letting the player reposition faster after shooting.
  * Tier 1 unlock.
  */
 public class QuickReloadSkill extends SkillBonus {
@@ -34,7 +35,7 @@ public class QuickReloadSkill extends SkillBonus {
 
     public QuickReloadSkill() {
         super(SkillType.CROSSBOWS, 10, "Quick Reload",
-              "Successful hits grant attack speed for faster reloading.",
+              "Successful hits grant a brief movement speed boost.",
               SkillBonusType.PASSIVE, 1, SKILL_ID);
     }
 
@@ -49,9 +50,9 @@ public class QuickReloadSkill extends SkillBonus {
 
     public void applyHaste(Player player) {
         int skillLevel = SkillBonusRegistry.getPlayerSkillLevel(player, SkillType.CROSSBOWS);
-        double speedBonus = getAttackSpeedBonus(skillLevel);
+        double speedBonus = getSpeedBonus(skillLevel);
 
-        AttributeInstance attr = player.getAttribute(Attribute.ATTACK_SPEED);
+        AttributeInstance attr = player.getAttribute(Attribute.MOVEMENT_SPEED);
         if (attr == null) return;
 
         NamespacedKey key = new NamespacedKey(MetadataHandler.PLUGIN, MODIFIER_KEY_STRING);
@@ -63,7 +64,7 @@ public class QuickReloadSkill extends SkillBonus {
             @Override
             public void run() {
                 if (player.isOnline()) {
-                    AttributeInstance a = player.getAttribute(Attribute.ATTACK_SPEED);
+                    AttributeInstance a = player.getAttribute(Attribute.MOVEMENT_SPEED);
                     if (a != null) {
                         removeModifierByKey(a, key);
                     }
@@ -72,9 +73,9 @@ public class QuickReloadSkill extends SkillBonus {
         }.runTaskLater(MetadataHandler.PLUGIN, BUFF_DURATION_TICKS);
     }
 
-    private double getAttackSpeedBonus(int skillLevel) {
-        // 0.5 base + 0.02 per level, giving a noticeable speed increase
-        return 0.5 + (skillLevel * 0.02);
+    private double getSpeedBonus(int skillLevel) {
+        // Base 0.03 + 0.001 per level movement speed bonus (base walk speed is 0.1)
+        return 0.03 + (skillLevel * 0.001);
     }
 
     @Override
@@ -90,13 +91,13 @@ public class QuickReloadSkill extends SkillBonus {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        return applyLoreTemplates(Map.of("hasteLevel", String.format("%.0f", getAttackSpeedBonus(skillLevel) * 100)));
+        return applyLoreTemplates(Map.of("speedBonus", String.format("%.0f", getSpeedBonus(skillLevel) * 100)));
     }
 
     @Override
-    public double getBonusValue(int skillLevel) { return getAttackSpeedBonus(skillLevel); }
+    public double getBonusValue(int skillLevel) { return getSpeedBonus(skillLevel); }
     @Override
-    public String getFormattedBonus(int skillLevel) { return applyFormattedBonusTemplate(Map.of("hasteLevel", String.format("%.0f", getAttackSpeedBonus(skillLevel) * 100))); }
+    public String getFormattedBonus(int skillLevel) { return applyFormattedBonusTemplate(Map.of("speedBonus", String.format("%.0f", getSpeedBonus(skillLevel) * 100))); }
     @Override
     public boolean affectsDamage() { return false; }
     @Override

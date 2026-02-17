@@ -129,12 +129,21 @@ public class ItemSettingsConfig extends ConfigurationFile {
     @Getter
     private static String eliteItemModel;
 
+    private static ItemSettingsConfig instance;
+
     public ItemSettingsConfig() {
         super("ItemSettings.yml");
     }
 
+    public static void toggleEliteMobsLoot(boolean enabled) {
+        doEliteMobsLoot = enabled;
+        instance.fileConfiguration.set("doEliteMobsLoot", enabled);
+        ConfigurationEngine.fileSaverCustomValues(instance.fileConfiguration, instance.file);
+    }
+
     @Override
     public void initializeValues() {
+        instance = this;
 
         doEliteMobsLoot = ConfigurationEngine.setBoolean(
                 List.of("Sets if any EliteMobs loot will drop.",

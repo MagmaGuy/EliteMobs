@@ -16,7 +16,7 @@ public class GenerateDatabase {
         String sql = "CREATE TABLE IF NOT EXISTS " + PlayerData.getPLAYER_DATA_TABLE_NAME() + " (" +
                 "PlayerUUID VARCHAR(36) PRIMARY KEY NOT NULL, " +
                 "DisplayName TEXT, " +
-                "Currency DOUBLE, " +
+                "CurrencyV2 DOUBLE, " +
                 "QuestStatus BLOB, " +
                 "Score INT, " +
                 "Kills INT, " +
@@ -46,7 +46,7 @@ public class GenerateDatabase {
 
         // Check and add missing columns if any
         addEntryIfEmpty("DisplayName", ColumnValues.TEXT);
-        addEntryIfEmpty("Currency", ColumnValues.REAL);
+        addEntryIfEmpty("CurrencyV2", ColumnValues.REAL);
         addEntryIfEmpty("QuestStatus", ColumnValues.BLOB);
         addEntryIfEmpty("Score", ColumnValues.INT);
         addEntryIfEmpty("Kills", ColumnValues.INT);

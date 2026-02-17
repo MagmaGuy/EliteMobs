@@ -11,7 +11,7 @@ public class BinderOfWorldsSanctum extends ContentPackagesConfigFields {
     public BinderOfWorldsSanctum() {
         super("binder_of_worlds_sanctum",
                 true,
-                "&2[lvl 200] &5The Binder Of Worlds",
+                "&2[lvl 100] &5The Binder Of Worlds",
                 new ArrayList<>(List.of("&5The ultimate challenge. Be prepared!",
                         "&6Credits: MagmaGuy, 69OzCanOfBepis & Frostcone")),
                 "https://nightbreak.io/plugin/elitemobs/#binder-of-worlds",

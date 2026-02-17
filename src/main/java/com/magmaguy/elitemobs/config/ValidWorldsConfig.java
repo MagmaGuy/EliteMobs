@@ -21,11 +21,11 @@ public class ValidWorldsConfig extends ConfigurationFile {
     }
 
     public static void addWorld(String worldName) {
-        if (instance.fileConfiguration.getKeys(true).contains("Valid worlds." + worldName)) return;
+        if (instance.fileConfiguration.getKeys(true).contains("validWorlds." + worldName)) return;
 
         ConfigurationEngine.setBoolean(
-                List.of("Sets if elites will spawn in this world."),
-                instance.fileConfiguration, "Valid worlds." + worldName, true);
+                List.of("Whether elites will spawn in this world."),
+                instance.fileConfiguration, "validWorlds." + worldName, true);
         ConfigurationEngine.fileSaverOnlyDefaults(instance.fileConfiguration, instance.file);
         validWorlds.add(worldName);
     }
@@ -34,9 +34,9 @@ public class ValidWorldsConfig extends ConfigurationFile {
     public void initializeValues() {
 
         for (World world : Bukkit.getWorlds())
-            ConfigurationEngine.setBoolean(fileConfiguration, "Valid worlds." + world.getName(), true);
+            ConfigurationEngine.setBoolean(fileConfiguration, "validWorlds." + world.getName(), true);
 
-        ConfigurationSection validWorldsSection = fileConfiguration.getConfigurationSection("Valid worlds");
+        ConfigurationSection validWorldsSection = fileConfiguration.getConfigurationSection("validWorlds");
 
         for (String key : validWorldsSection.getKeys(false))
             if (validWorldsSection.getBoolean(key))

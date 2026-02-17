@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.versionnotifier;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.CommandMessagesConfig;
+import com.magmaguy.elitemobs.config.InitializeConfig;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import com.magmaguy.magmacore.nightbreak.NightbreakAccount;
@@ -302,6 +303,8 @@ public class VersionChecker {
                 prefetchAccessInfoInternal();
 
             } catch (IOException e) {
+                // Reset throttle so the next setup menu open can retry immediately
+                lastRefreshTimestamp = 0;
                 handleConnectionError("content version check", e);
 
                 if (connectionRetryCount >= MAX_RETRY_ATTEMPTS ||
@@ -429,7 +432,7 @@ public class VersionChecker {
             for (org.bukkit.entity.Player player : Bukkit.getOnlinePlayers()) {
                 if (!player.hasPermission("elitemobs.versionnotification")) continue;
 
-                Logger.sendSimpleMessage(player, "&8&m-----------------------------------------------------");
+                Logger.sendSimpleMessage(player, "<g:#8B0000:#CC4400:#DAA520>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬</g>");
                 Logger.sendMessage(player, CommandMessagesConfig.getContentUpdatesAvailable().replace("$count", String.valueOf(newlyOutdated.size())));
                 for (EMPackage emPackage : newlyOutdated) {
                     String name = emPackage.getContentPackagesConfigFields().getName();
@@ -437,9 +440,14 @@ public class VersionChecker {
                 }
                 player.spigot().sendMessage(
                         SpigotMessage.simpleMessage(CommandMessagesConfig.getVersionUseSetupMessage()),
+                        SpigotMessage.commandHoverMessage(
+                                InitializeConfig.getEmSetupDisplay(),
+                                InitializeConfig.getEmSetupHover(),
+                                "/em setup"),
+                        SpigotMessage.simpleMessage(" &8| "),
                         SpigotMessage.hoverLinkMessage(
-                                "&9&nhttps://nightbreak.io/plugin/elitemobs/#content",
-                                CommandMessagesConfig.getVersionNightbreakHover(),
+                                InitializeConfig.getContentLinkDisplay(),
+                                InitializeConfig.getContentLinkHover(),
                                 "https://nightbreak.io/plugin/elitemobs/#content"
                         )
                 );
@@ -452,7 +460,7 @@ public class VersionChecker {
                             )
                     );
                 }
-                Logger.sendSimpleMessage(player, "&8&m-----------------------------------------------------");
+                Logger.sendSimpleMessage(player, "<g:#8B0000:#CC4400:#DAA520>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬</g>");
             }
         });
     }
@@ -541,10 +549,15 @@ public class VersionChecker {
                     }
 
                     if (!pluginIsUpToDate)
-                        event.getPlayer().sendMessage(CommandMessagesConfig.getVersionOutdatedMessage());
+                        event.getPlayer().spigot().sendMessage(
+                                SpigotMessage.simpleMessage(CommandMessagesConfig.getVersionOutdatedMessage()),
+                                SpigotMessage.hoverLinkMessage(
+                                        InitializeConfig.getContentLinkDisplay(),
+                                        InitializeConfig.getContentLinkHover(),
+                                        "https://nightbreak.io/plugin/elitemobs/"));
 
                     if (!outdatedPackages.isEmpty()) {
-                        Logger.sendSimpleMessage(event.getPlayer(), "&8&m-----------------------------------------------------");
+                        Logger.sendSimpleMessage(event.getPlayer(), "<g:#8B0000:#CC4400:#DAA520>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬</g>");
                         Logger.sendMessage(event.getPlayer(), CommandMessagesConfig.getDungeonsOutdatedMessage());
                         for (EMPackage emPackage : outdatedPackages) {
                             String name = emPackage.getContentPackagesConfigFields().getName();
@@ -570,8 +583,8 @@ public class VersionChecker {
                         event.getPlayer().spigot().sendMessage(
                                 SpigotMessage.simpleMessage(CommandMessagesConfig.getVersionDownloadAtMessage()),
                                 SpigotMessage.hoverLinkMessage(
-                                        "&9&nhttps://nightbreak.io/plugin/elitemobs/#content",
-                                        CommandMessagesConfig.getVersionNightbreakHover(),
+                                        InitializeConfig.getContentLinkDisplay(),
+                                        InitializeConfig.getContentLinkHover(),
                                         "https://nightbreak.io/plugin/elitemobs/#content"
                                 ),
                                 SpigotMessage.simpleMessage(" !")
@@ -591,8 +604,6 @@ public class VersionChecker {
                                 ),
                                 SpigotMessage.simpleMessage(CommandMessagesConfig.getVersionSupportRoomMessage())
                         );
-                        Logger.sendSimpleMessage(event.getPlayer(), "&8&m-----------------------------------------------------");
-
                         // Suggest update command if Nightbreak token is registered
                         if (NightbreakAccount.hasToken()) {
                             event.getPlayer().spigot().sendMessage(
@@ -603,6 +614,7 @@ public class VersionChecker {
                                     )
                             );
                         }
+                        Logger.sendSimpleMessage(event.getPlayer(), "<g:#8B0000:#CC4400:#DAA520>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬</g>");
                     }
                     if (SHA1Updated) {
                         event.getPlayer().sendMessage(CommandMessagesConfig.getResourcePackUpdatedMessage());

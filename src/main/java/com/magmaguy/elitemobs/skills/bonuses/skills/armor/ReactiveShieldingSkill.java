@@ -25,7 +25,7 @@ public class ReactiveShieldingSkill extends SkillBonus implements CooldownSkill 
     private static final Map<UUID, Long> cooldownMap = new ConcurrentHashMap<>();
     private static final Map<UUID, Long> shieldActiveMap = new ConcurrentHashMap<>();
     private static final long SHIELD_DURATION = 3000; // 3 seconds
-    private static final double BIG_HIT_THRESHOLD = 0.20; // 20% of max health
+    private static final double BIG_HIT_THRESHOLD = 0.10; // 10% of max health
 
     public ReactiveShieldingSkill() {
         super(
@@ -158,10 +158,6 @@ public class ReactiveShieldingSkill extends SkillBonus implements CooldownSkill 
      * @return true if shield is active
      */
     public boolean isShieldActive(Player player) {
-        if (!isActive(player)) {
-            return false;
-        }
-
         Long activeUntil = shieldActiveMap.get(player.getUniqueId());
         if (activeUntil == null) {
             return false;
@@ -183,11 +179,11 @@ public class ReactiveShieldingSkill extends SkillBonus implements CooldownSkill 
      * @param damagePercent The damage as a percentage of max health (0.0 to 1.0)
      */
     public void checkTrigger(Player player, double damagePercent) {
-        if (!isActive(player) || isOnCooldown(player)) {
+        if (isOnCooldown(player)) {
             return;
         }
 
-        // Trigger on big hits (20%+ of max health)
+        // Trigger on big hits (10%+ of max health)
         if (damagePercent >= BIG_HIT_THRESHOLD) {
             onActivate(player, null);
         }

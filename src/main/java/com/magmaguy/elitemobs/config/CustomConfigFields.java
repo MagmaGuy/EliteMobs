@@ -15,7 +15,8 @@ public class CustomConfigFields extends com.magmaguy.magmacore.config.CustomConf
         // Materials for future versions (e.g. spears) may not exist yet — skip silently
         if (enumClass == Material.class && configHas(path)) {
             String rawValue = fileConfiguration.getString(path);
-            if (rawValue != null && rawValue.toUpperCase(Locale.ROOT).endsWith("_SPEAR"))
+            if (rawValue != null && rawValue.toUpperCase(Locale.ROOT).endsWith("_SPEAR")
+                    && com.magmaguy.elitemobs.versionnotifier.VersionChecker.serverVersionOlderThan(21, 11))
                 return pluginDefault;
         }
         return super.processEnum(path, value, pluginDefault, enumClass, forceWriteDefault);

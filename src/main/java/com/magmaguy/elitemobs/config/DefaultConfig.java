@@ -26,15 +26,9 @@ public class DefaultConfig extends ConfigurationFile {
     @Getter
     private static int superMobStackAmount;
     @Getter
-    private static boolean preventCreeperDamageToPassiveMobs;
-    @Getter
-    private static boolean doPermissionTitles;
-    @Getter
     private static boolean preventEliteMobConversionOfNamedMobs;
     @Getter
     private static boolean doStrictSpawningRules;
-    @Getter
-    private static double nightmareWorldSpawnBonus;
     @Getter
     private static boolean emLeadsToStatusMenu;
     @Getter
@@ -60,11 +54,7 @@ public class DefaultConfig extends ConfigurationFile {
     @Getter
     private static String language;
     @Getter
-    private static String noPendingCommands;
-    @Getter
     private static String trackMessage;
-    @Getter
-    private static String chestLowRankMessage;
     @Getter
     private static String chestCooldownMessage;
     @Getter
@@ -103,12 +93,12 @@ public class DefaultConfig extends ConfigurationFile {
 
     public static void toggleSetupDone() {
         setupDone = !setupDone;
-        ConfigurationEngine.writeValue(setupDone, instance.file, instance.getFileConfiguration(), "setupDoneV4");
+        ConfigurationEngine.writeValue(setupDone, instance.file, instance.getFileConfiguration(), "setupDoneV5");
     }
 
     public static void toggleSetupDone(boolean value) {
         setupDone = value;
-        ConfigurationEngine.writeValue(setupDone, instance.file, instance.getFileConfiguration(), "setupDoneV4");
+        ConfigurationEngine.writeValue(setupDone, instance.file, instance.getFileConfiguration(), "setupDoneV5");
     }
 
 
@@ -138,12 +128,6 @@ public class DefaultConfig extends ConfigurationFile {
         superMobStackAmount = Math.max(ConfigurationEngine.setInt(
                 List.of("Sets the amount of passive mobs that have to be in close proximity before they can be merged.", "Don't set this to 0!"),
                 fileConfiguration, "superMobStackAmount", 50), 1);
-        preventCreeperDamageToPassiveMobs = ConfigurationEngine.setBoolean(
-                List.of("Makes elites not damage passive mobs with explosions."),
-                fileConfiguration, "preventEliteCreeperDamageToPassiveMobs", true);
-        doPermissionTitles = ConfigurationEngine.setBoolean(
-                List.of("Sets whether EliteMobs will use titles to warn players about missing permissions"),
-                fileConfiguration, "useTitlesForMissingPermissionMessages", true);
         preventEliteMobConversionOfNamedMobs = ConfigurationEngine.setBoolean(
                 List.of("Sets whether EliteMobs will prevent converting named mobs to elites.", "Especially important for compatibility with other plugins."),
                 fileConfiguration, "preventEliteMobConversionOfNamedMobs", true);
@@ -155,9 +139,6 @@ public class DefaultConfig extends ConfigurationFile {
             Logger.info("Other boss mob plugins have been detected, high compatibility mode will be used!");
             doStrictSpawningRules = true;
         }
-        nightmareWorldSpawnBonus = ConfigurationEngine.setDouble(
-                List.of("Sets the elite spawn bonus for the nightmare gamemode"),
-                fileConfiguration, "nightmareWorldSpawnBonus", 0.5);
         emLeadsToStatusMenu = ConfigurationEngine.setBoolean(
                 List.of("Sets if the centralized /em command opens the main status page of the plugin.", "Highly recommended!"),
                 fileConfiguration, "emLeadsToStatusMenu", true);
@@ -166,7 +147,7 @@ public class DefaultConfig extends ConfigurationFile {
                 fileConfiguration, "otherCommandsLeadToEMStatusMenu", true);
         setupDone = ConfigurationEngine.setBoolean(
                 List.of("Sets if the setup is complete.", "Do not set this value manually, it is meant to be modified through in-game commands."),
-                fileConfiguration, "setupDoneV4", false);
+                fileConfiguration, "setupDoneV5", false);
         preventVanillaReinforcementsForEliteEntities = ConfigurationEngine.setBoolean(
                 List.of("Sets if elites will prevent spawning vanilla reinforcements, such as for the Zombie reinforcement feature."),
                 fileConfiguration, "preventVanillaReinforcementsForEliteEntities", true);
@@ -196,15 +177,9 @@ public class DefaultConfig extends ConfigurationFile {
         useGlassToFillMenuEmptySpace = ConfigurationEngine.setBoolean(
                 List.of("Sets if empty menu space will be filled with glass panes.", "Not recommended if you are using the EliteMobs resource pack."),
                 fileConfiguration, "useGlassToFillMenuEmptySpace", false);
-        noPendingCommands = ConfigurationEngine.setString(
-                List.of("Sets the message sent to players if they run '/em confirm' with no pending commands."),
-                file, fileConfiguration, "noPendingCommands", "&cYou don't currently have any pending commands!", true);
         trackMessage = ConfigurationEngine.setString(
                 List.of("Sets the tracking message for bosses that send tracking messages."),
                 file, fileConfiguration, "trackMessage", "Track the $name", true);
-        chestLowRankMessage = ConfigurationEngine.setString(
-                List.of("Sets the message sent to players that open treasure chests with level requirements above their guild rank."),
-                file, fileConfiguration, "chestLowRankMessage", "&7[EM] &cYour guild rank needs to be at least $rank &cin order to open this chest!", true);
         chestCooldownMessage = ConfigurationEngine.setString(
                 List.of("Sets the message sent to players that try to reopen a treasure chest they have already opened."),
                 file, fileConfiguration, "chestCooldownMessage", "&7[EM] &cYou've already opened this chest recently! Wait $time!", true);

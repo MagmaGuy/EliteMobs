@@ -202,21 +202,21 @@ public class PlayerData {
 
     public static double getCurrency(UUID uuid) {
         if (!isInMemory(uuid))
-            return getDatabaseDouble(uuid, "Currency");
+            return getDatabaseDouble(uuid, "CurrencyV2");
         return playerDataHashMap.get(uuid).currency;
     }
 
     public static double getCurrency(UUID uuid, boolean databaseAccess) {
         if (!isInMemory(uuid))
             if (databaseAccess)
-                return getDatabaseDouble(uuid, "Currency");
+                return getDatabaseDouble(uuid, "CurrencyV2");
             else
                 return 0;
         return playerDataHashMap.get(uuid).currency;
     }
 
     public static void setCurrency(UUID uuid, double currency) {
-        setDatabaseValue(uuid, "Currency", currency);
+        setDatabaseValue(uuid, "CurrencyV2", currency);
         if (playerDataHashMap.containsKey(uuid))
             playerDataHashMap.get(uuid).currency = currency;
     }
@@ -837,7 +837,7 @@ public class PlayerData {
 
     private void readExistingData(Statement statement, UUID uuid, ResultSet resultSet) throws Exception {
         playerDataHashMap.put(uuid, this);
-        currency = resultSet.getDouble("Currency");
+        currency = resultSet.getDouble("CurrencyV2");
         score = resultSet.getInt("Score");
         kills = resultSet.getInt("Kills");
         highestLevelKilled = resultSet.getInt("HighestLevelKilled");
@@ -969,7 +969,7 @@ public class PlayerData {
         String sql = "INSERT INTO " + PLAYER_DATA_TABLE_NAME + " (" +
                 "PlayerUUID," +
                 " DisplayName," +
-                " Currency," +
+                " CurrencyV2," +
                 " Score," +
                 " Kills," +
                 " HighestLevelKilled," +

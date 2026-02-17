@@ -63,6 +63,8 @@ public class PolearmMasterySkill extends SkillBonus {
 
     /**
      * Applies the attack speed attribute modifier.
+     * Uses MULTIPLY_SCALAR_1 so the 0.40 base value gives a real 40% increase
+     * (ADD_NUMBER 0.40 on base 4.0 was only a 10% effective increase).
      */
     public static void applyAttackSpeedBonus(Player player, int skillLevel) {
         if (!activePlayers.contains(player.getUniqueId())) return;
@@ -71,7 +73,7 @@ public class PolearmMasterySkill extends SkillBonus {
         NamespacedKey key = new NamespacedKey(MetadataHandler.PLUGIN, MODIFIER_KEY_STRING);
         removeModifierByKey(attr, key);
         double bonus = BASE_ATTACK_SPEED_BONUS + (skillLevel * 0.005);
-        attr.addModifier(new AttributeModifier(key, bonus, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.ANY));
+        attr.addModifier(new AttributeModifier(key, bonus, AttributeModifier.Operation.MULTIPLY_SCALAR_1, EquipmentSlotGroup.ANY));
     }
 
     /**

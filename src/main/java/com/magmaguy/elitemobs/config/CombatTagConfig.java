@@ -28,24 +28,26 @@ public class CombatTagConfig extends ConfigurationFile {
     @Override
     public void initializeValues() {
         enableCombatTag = ConfigurationEngine.setBoolean(
-                List.of("Sets if the combat tag is enabled.", "When enabled, flying players that engage in combat are set to stop flying."),
-                fileConfiguration, "Enable combat tag", true);
+                List.of("Whether the combat tag is enabled. Flying players who enter combat are forced to stop flying."),
+                fileConfiguration, "enableCombatTag", true);
         combatTagMessage = ConfigurationEngine.setString(
-                List.of("Sets the message sent when the combat tag is activated."),
-                file, fileConfiguration, "Combat tag message", "&c[EliteMobs] Combat tag activated!", true);
+                List.of("Message shown when a player's combat tag activates."),
+                file, fileConfiguration, "combatTagMessage", "&c[EliteMobs] Combat tag activated!", true);
         enableTeleportTimer = ConfigurationEngine.setBoolean(
-                List.of("Sets if the /ag command will have a timer before teleportation"),
-                fileConfiguration, "Enable adventurers guild teleport timer", true);
+                List.of("Whether the /ag teleport has a countdown timer before teleporting."),
+                fileConfiguration, "enableAdventurersGuildTeleportTimer", true);
         teleportTimeLeft = ConfigurationEngine.setString(
-                List.of("Sets the action message set while waiting for the teleport timer."),
-                file, fileConfiguration, "Teleport time left", "&7[EM] Teleporting in &a$time &7seconds...", true);
+                List.of("Action bar message shown during the teleport countdown.",
+                        "Placeholder: $time"),
+                file, fileConfiguration, "teleportTimeLeft", "&7[EM] Teleporting in &a$time &7seconds...", true);
         teleportCancelled = ConfigurationEngine.setString(
-                List.of("Sets the message sent when players move while waiting for teleportation."),
-                file, fileConfiguration, "Teleport cancelled", "&7[EM] &cTeleport interrupted!", true);
-        useActionBarMessagesInsteadOfChat = ConfigurationEngine.setBoolean(List.of("Sets whether the action bar or chat will be used for the teleport countdown timer"),
+                List.of("Message shown when a player moves and cancels a pending teleport."),
+                file, fileConfiguration, "teleportCancelled", "&7[EM] &cTeleport interrupted!", true);
+        useActionBarMessagesInsteadOfChat = ConfigurationEngine.setBoolean(
+                List.of("Whether to show the teleport countdown in the action bar instead of chat."),
                 fileConfiguration, "useActionBarMessagesInsteadOfChat", true);
         preventFlyToggleInDungeons = ConfigurationEngine.setBoolean(
-                List.of("Sets whether non-op players are prevented from toggling flight in EliteMobs worlds."),
-                fileConfiguration, "Prevent fly toggle in dungeons", true);
+                List.of("Whether non-OP players are prevented from toggling flight in EliteMobs worlds."),
+                fileConfiguration, "preventFlyToggleInDungeons", true);
     }
 }

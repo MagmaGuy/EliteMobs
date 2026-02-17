@@ -163,6 +163,7 @@ public class SecondWindSkill extends SkillBonus implements CooldownSkill {
         if (newHealthPercent <= HEALTH_THRESHOLD) {
             onActivate(player, null);
             incrementProcCount(player);
+            SkillBonus.sendSkillActionBar(player, this);
         }
     }
 

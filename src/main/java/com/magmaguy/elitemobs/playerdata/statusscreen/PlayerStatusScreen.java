@@ -50,7 +50,10 @@ public class PlayerStatusScreen implements Listener {
 
     public static String convertLightColorsToBlack(String string) {
         string = ChatColorConverter.convert(string);
-        string = string.replace("§f", "§0").replace("§e", "§0");
+        string = string.replace("§f", "§0").replace("§e", "§0")
+                .replace("§a", "§0").replace("§b", "§0")
+                .replace("§d", "§0").replace("§6", "§0")
+                .replace("§9", "§0");
         if (!string.startsWith("§"))
             string = "§0" + string;
         return string;

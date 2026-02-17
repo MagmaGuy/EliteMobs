@@ -223,6 +223,8 @@ public class DungeonsConfig extends ConfigurationFile {
     private static String skillMigrationLine5;
     @Getter
     private static String skillMigrationLine6;
+    @Getter
+    private static String skillMigrationLine6Suffix;
 
     // DynamicDungeonPackage install message
     @Getter
@@ -594,19 +596,21 @@ public class DungeonsConfig extends ConfigurationFile {
                 file, fileConfiguration, "contentDownloadLegacyMessage", "&4Download this at &9$link &4!", true);
         contentDownloadSeparator = ConfigurationEngine.setString(
                 List.of("Sets the separator line used in download messages."),
-                file, fileConfiguration, "contentDownloadSeparator", "----------------------------------------------------", true);
+                file, fileConfiguration, "contentDownloadSeparator", "<g:#8B0000:#CC4400:#DAA520>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬</g>", true);
         contentNightbreakPromptLine1 = ConfigurationEngine.setString(
                 List.of("Sets the first line of the Nightbreak account prompt."),
                 file, fileConfiguration, "contentNightbreakPromptLine1", "&eThis content can be downloaded automatically with a Nightbreak account.", true);
         contentNightbreakPromptLine2 = ConfigurationEngine.setString(
-                List.of("Sets the second line of the Nightbreak account prompt."),
-                file, fileConfiguration, "contentNightbreakPromptLine2", "&71. Get your token at: &9https://nightbreak.io/account", true);
+                List.of("Sets the second line of the Nightbreak account prompt.",
+                        "Followed by a clickable nightbreak.io/account link."),
+                file, fileConfiguration, "contentNightbreakPromptLine2", "<g:#B8860B:#DAA520>Step 1:</g> &7Get your token at: ", true);
         contentNightbreakPromptLine3 = ConfigurationEngine.setString(
                 List.of("Sets the third line of the Nightbreak account prompt."),
-                file, fileConfiguration, "contentNightbreakPromptLine3", "&72. Run: &e/nightbreaklogin <your-token>", true);
+                file, fileConfiguration, "contentNightbreakPromptLine3", "<g:#B8860B:#DAA520>Step 2:</g> &7Run: &e/nightbreaklogin <your-token>", true);
         contentNightbreakPromptLine4 = ConfigurationEngine.setString(
-                List.of("Sets the fourth line of the Nightbreak account prompt."),
-                file, fileConfiguration, "contentNightbreakPromptLine4", "&7Or download manually at: &9https://nightbreak.io/plugin/elitemobs", true);
+                List.of("Sets the fourth line of the Nightbreak account prompt.",
+                        "Followed by a clickable content link."),
+                file, fileConfiguration, "contentNightbreakPromptLine4", "&8Or download manually at: ", true);
         contentCheckingAccessMessage = ConfigurationEngine.setString(
                 List.of("Sets the message shown when checking access for content.",
                         "$name is the placeholder for the content name."),
@@ -630,16 +634,17 @@ public class DungeonsConfig extends ConfigurationFile {
                 List.of("Sets the message prompting the player on how to get access."),
                 file, fileConfiguration, "contentGetAccessMessage", "&eYou can get access through:", true);
         contentNightbreakLink = ConfigurationEngine.setString(
-                List.of("Sets the Nightbreak link shown in the access info."),
-                file, fileConfiguration, "contentNightbreakLink", "&a\u2022 Nightbreak: &9https://nightbreak.io/plugin/elitemobs", true);
+                List.of("Sets the Nightbreak link prefix in access info.",
+                        "Followed by a clickable nightbreak.io/elitemobs link."),
+                file, fileConfiguration, "contentNightbreakLink", "&a\u2022 Nightbreak: ", true);
         contentPatreonLink = ConfigurationEngine.setString(
-                List.of("Sets the Patreon link shown in the access info.",
-                        "$link is the placeholder for the Patreon link."),
-                file, fileConfiguration, "contentPatreonLink", "&6\u2022 Patreon: &9$link", true);
+                List.of("Sets the Patreon link prefix in access info.",
+                        "Followed by a clickable Patreon link."),
+                file, fileConfiguration, "contentPatreonLink", "&6\u2022 Patreon: ", true);
         contentItchLink = ConfigurationEngine.setString(
-                List.of("Sets the itch.io link shown in the access info.",
-                        "$link is the placeholder for the itch.io link."),
-                file, fileConfiguration, "contentItchLink", "&d\u2022 itch.io: &9$link", true);
+                List.of("Sets the itch.io link prefix in access info.",
+                        "Followed by a clickable itch.io link."),
+                file, fileConfiguration, "contentItchLink", "&d\u2022 itch.io: ", true);
         contentLinkAccountMessage = ConfigurationEngine.setString(
                 List.of("Sets the message telling the player how to link their account after purchasing."),
                 file, fileConfiguration, "contentLinkAccountMessage", "&7After purchasing, use &e/nightbreaklogin <token> &7to link your account.", true);
@@ -671,10 +676,10 @@ public class DungeonsConfig extends ConfigurationFile {
         // SkillSystemMigration messages
         skillMigrationSeparator = ConfigurationEngine.setString(
                 List.of("Sets the separator line used in the skill migration notification."),
-                file, fileConfiguration, "skillMigrationSeparator", "&8&m------------------------------------------------", true);
+                file, fileConfiguration, "skillMigrationSeparator", "<g:#8B0000:#CC4400:#DAA520>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬</g>", true);
         skillMigrationTitle = ConfigurationEngine.setString(
                 List.of("Sets the title of the skill migration notification."),
-                file, fileConfiguration, "skillMigrationTitle", "&5&lSKILL SYSTEM ACTIVATED", true);
+                file, fileConfiguration, "skillMigrationTitle", "<g:#7B2FBE:#A855F7>&lSKILL SYSTEM ACTIVATED</g>", true);
         skillMigrationLine1 = ConfigurationEngine.setString(
                 List.of("Sets the first line of the skill migration notification."),
                 file, fileConfiguration, "skillMigrationLine1", "&7EliteMobs now uses a new skill leveling system!", true);
@@ -691,8 +696,12 @@ public class DungeonsConfig extends ConfigurationFile {
                 List.of("Sets the fifth line of the skill migration notification."),
                 file, fileConfiguration, "skillMigrationLine5", "&cAll players start fresh with Level 1 in all skills.", true);
         skillMigrationLine6 = ConfigurationEngine.setString(
-                List.of("Sets the sixth line of the skill migration notification."),
-                file, fileConfiguration, "skillMigrationLine6", "&7Type &e/em &7and click &5Skills &7to view your progress!", true);
+                List.of("Sets the sixth line of the skill migration notification.",
+                        "Followed by a clickable /em command, then the suffix."),
+                file, fileConfiguration, "skillMigrationLine6", "&7Type ", true);
+        skillMigrationLine6Suffix = ConfigurationEngine.setString(
+                List.of("Sets the text after the clickable /em command in the skill migration notification."),
+                file, fileConfiguration, "skillMigrationLine6Suffix", " &7and click &5Skills &7to view your progress!", true);
 
         // DynamicDungeonPackage install message
         dynamicDungeonInstalledMessage = ConfigurationEngine.setString(
