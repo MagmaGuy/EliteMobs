@@ -12,7 +12,7 @@ public class TheQuarryDungeon extends ContentPackagesConfigFields {
     public TheQuarryDungeon() {
         super("the_quarry_dungeon",
                 true,
-                "&2[lvl 040] &3The Quarry Dungeon",
+                "&3The Quarry Dungeon",
                 new ArrayList<>(List.of("&fAn ancient dwarven quarry deep underground.",
                         "&6Credits: Dali_, MagmaGuy, Frostcone")),
                 DiscordLinks.freeMinidungeons,
@@ -30,11 +30,14 @@ public class TheQuarryDungeon extends ContentPackagesConfigFields {
                         "filename=em_id_the_quarry_royal_wizard_three.yml",
                         "filename=LiftStateFinishDungeon.yml"),
                 "em_id_the_quarry",
-                40,
+                -1,
                 false);
+        setContentType(ContentType.DYNAMIC_DUNGEON);
         setDifficulties(List.of(
-                Map.of("name", "normal", "levelSync", 42, "id", 0),
-                Map.of("name", "hard", "levelSync", 40, "id", 1),
-                Map.of("name", "mythic", "levelSync", 37, "id", 2)));
+                Map.of("name", "normal", "levelSync", "+5", "id", 0),
+                Map.of("name", "hard", "levelSync", "+0", "id", 1),
+                Map.of("name", "mythic", "levelSync", "-5", "id", 2)));
+        setDungeonLockoutMinutes(1440);
+        setNightbreakSlug("story-mode-dungeons");
     }
 }

@@ -4,7 +4,6 @@ import com.magmaguy.elitemobs.commands.DungeonCommands;
 import com.magmaguy.elitemobs.config.menus.premade.PlayerStatusMenuConfig;
 import com.magmaguy.elitemobs.dungeons.CombatContent;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
-import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -53,11 +52,12 @@ public class TeleportsPage {
             if (!emPackage.getContentPackagesConfigFields().isListedInTeleports()) continue;
 
             TextComponent message = new TextComponent(PlayerStatusScreen.convertLightColorsToBlack(emPackage.getContentPackagesConfigFields().getName() + "\n"));
-            String hoverMessage = ChatColorConverter.convert(PlayerStatusMenuConfig.getOnTeleportHover() + "\n" +
-                    emPackage.getContentPackagesConfigFields().getPlayerInfo()
+            String playerInfo = emPackage.getContentPackagesConfigFields().getPlayerInfo();
+            String hoverMessage = PlayerStatusMenuConfig.getOnTeleportHover() +
+                    (playerInfo != null ? "\n" + playerInfo
                             .replace("$bossCount", emPackage.getCustomBossEntityList().size() + "")
                             .replace("$lowestTier", ((CombatContent) emPackage).getLowestLevel() + "")
-                            .replace("$highestTier", ((CombatContent) emPackage).getHighestLevel() + ""));
+                            .replace("$highestTier", ((CombatContent) emPackage).getHighestLevel() + "") : "");
             message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(hoverMessage).create()));
             message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/elitemobs dungeontp " + emPackage.getContentPackagesConfigFields().getFilename()));
             textComponents.add(message);
@@ -95,11 +95,13 @@ public class TeleportsPage {
             if (!emPackage.getContentPackagesConfigFields().isListedInTeleports()) continue;
 
             TeleportsPageEvents.orderedDungeons.add(emPackage);
-            inventory.setItem(counter, ItemStackGenerator.generateItemStack(Material.PAPER, emPackage.getContentPackagesConfigFields().getName()
-                    , Collections.singletonList(emPackage.getContentPackagesConfigFields().getPlayerInfo()
+            String chestPlayerInfo = emPackage.getContentPackagesConfigFields().getPlayerInfo();
+            String loreText = chestPlayerInfo != null ? chestPlayerInfo
                             .replace("$bossCount", emPackage.getCustomBossEntityList().size() + "")
                             .replace("$lowestTier", ((CombatContent) emPackage).getLowestLevel() + "")
-                            .replace("$highestTier", ((CombatContent) emPackage).getHighestLevel() + ""))));
+                            .replace("$highestTier", ((CombatContent) emPackage).getHighestLevel() + "") : "";
+            inventory.setItem(counter, ItemStackGenerator.generateItemStack(Material.PAPER, emPackage.getContentPackagesConfigFields().getName()
+                    , Collections.singletonList(loreText)));
             counter++;
         }
         inventory.setItem(53, PlayerStatusMenuConfig.getBackItem());

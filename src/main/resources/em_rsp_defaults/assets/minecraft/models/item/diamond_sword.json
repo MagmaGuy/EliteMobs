@@ -5,16 +5,16 @@
     },
     
     "overrides": [
-        {"predicate": {"custom_model_data":1}, "model": "elitemobs:equipment/bronze_sword"},
-        {"predicate": {"custom_model_data":2}, "model": "elitemobs:equipment/palladium_sword"},
-        {"predicate": {"custom_model_data":3}, "model": "elitemobs:equipment/corrupted_sword"},
-        {"predicate": {"custom_model_data":4}, "model": "elitemobs:equipment/living_sword"},
-        {"predicate": {"custom_model_data":5}, "model": "elitemobs:equipment/ultimatium_sword"},
-        {"predicate": {"custom_model_data":6}, "model": "elitemobs:equipment/bronze_trident"},
-        {"predicate": {"custom_model_data":7}, "model": "elitemobs:equipment/palladium_trident"},
-        {"predicate": {"custom_model_data":8}, "model": "elitemobs:equipment/corrupted_trident"},
-        {"predicate": {"custom_model_data":9}, "model": "elitemobs:equipment/living_trident"},
-        {"predicate": {"custom_model_data":10},"model": "elitemobs:equipment/ultimatium_trident"}
+        {"predicate": {"custom_model_data":1}, "model": "elitemobs:gear/bronze_sword"},
+        {"predicate": {"custom_model_data":2}, "model": "elitemobs:gear/palladium_sword"},
+        {"predicate": {"custom_model_data":3}, "model": "elitemobs:gear/corrupted_sword"},
+        {"predicate": {"custom_model_data":4}, "model": "elitemobs:gear/living_sword"},
+        {"predicate": {"custom_model_data":5}, "model": "elitemobs:gear/ultimatium_sword"},
+        {"predicate": {"custom_model_data":6}, "model": "elitemobs:gear/bronze_trident"},
+        {"predicate": {"custom_model_data":7}, "model": "elitemobs:gear/palladium_trident"},
+        {"predicate": {"custom_model_data":8}, "model": "elitemobs:gear/corrupted_trident"},
+        {"predicate": {"custom_model_data":9}, "model": "elitemobs:gear/living_trident"},
+        {"predicate": {"custom_model_data":10},"model": "elitemobs:gear/ultimatium_trident"}
 
     ]
 }

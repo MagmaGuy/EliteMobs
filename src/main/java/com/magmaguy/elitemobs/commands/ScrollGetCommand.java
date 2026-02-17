@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.commands;
 
+import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.items.EliteScroll;
 import com.magmaguy.magmacore.command.AdvancedCommand;
@@ -27,9 +28,7 @@ public class ScrollGetCommand extends AdvancedCommand {
     public void execute(CommandData commandData) {
         // Check if scrolls are enabled in config
         if (!ItemSettingsConfig.isUseEliteItemScrolls()) {
-            Logger.sendMessage(commandData.getCommandSender(),
-                    "Elite Scrolls are not currently enabled on this server! " +
-                            "An admin must enable them in ~/plugins/EliteMobs/ItemSettings.yml by setting useEliteItemScrolls to true.");
+            Logger.sendMessage(commandData.getCommandSender(), CommandMessagesConfig.getScrollsNotEnabledMessage());
             return;
         }
 
@@ -38,17 +37,17 @@ public class ScrollGetCommand extends AdvancedCommand {
             level = commandData.getIntegerArgument("level");
             amount = commandData.getIntegerArgument("amount");
         } catch (NumberFormatException e) {
-            Logger.sendMessage(commandData.getCommandSender(), "Level and amount must be valid integers.");
+            Logger.sendMessage(commandData.getCommandSender(), CommandMessagesConfig.getScrollInvalidNumberMessage());
             return;
         }
 
         if (level <= 0) {
-            Logger.sendMessage(commandData.getCommandSender(), "Scroll level must be greater than zero.");
+            Logger.sendMessage(commandData.getCommandSender(), CommandMessagesConfig.getScrollLevelZeroMessage());
             return;
         }
 
         if (amount <= 0) {
-            Logger.sendMessage(commandData.getCommandSender(), "Amount must be greater than zero.");
+            Logger.sendMessage(commandData.getCommandSender(), CommandMessagesConfig.getScrollAmountZeroMessage());
             return;
         }
 
@@ -59,6 +58,9 @@ public class ScrollGetCommand extends AdvancedCommand {
         }
 
         Logger.sendMessage(commandData.getCommandSender(),
-                "Gave you " + amount + " elite scroll" + (amount == 1 ? "" : "s") + " of level " + level + ".");
+                CommandMessagesConfig.getScrollGaveMessage()
+                        .replace("$amount", String.valueOf(amount))
+                        .replace("$level", String.valueOf(level))
+                        .replace("$player", player.getName()));
     }
 }

@@ -1,6 +1,8 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.commands.admin.DownloadAllContentCommand;
+import com.magmaguy.elitemobs.commands.admin.UpdateContentCommand;
 import com.magmaguy.magmacore.command.CommandManager;
 
 public class CommandHandler {
@@ -62,7 +64,6 @@ public class CommandHandler {
         emCommand.registerCommand(new TransitiveBlocksEditCommand());
         emCommand.registerCommand(new TransitiveBlocksRegisterAreaCommand());
         emCommand.registerCommand(new TransitiveBlocksEditAreaCommand());
-        emCommand.registerCommand(new RankSetCommand());
         emCommand.registerCommand(new SpawnElite());
         emCommand.registerCommand(new SpawnEliteAtCommand());
         emCommand.registerCommand(new DiscordMessageCommand());
@@ -70,6 +71,9 @@ public class CommandHandler {
         emCommand.registerCommand(new MoneyRemoveCommand());
         emCommand.registerCommand(new ProtectionBypassCommand());
         emCommand.registerCommand(new FirstTimeSetupCommand());
+        emCommand.registerCommand(new DebugCommand());
+        emCommand.registerCommand(new UpdateContentCommand());
+        emCommand.registerCommand(new DownloadAllContentCommand());
 
         //User commands
 //        emCommand.registerCommand(new AdventurersGuildCommand());
@@ -87,7 +91,13 @@ public class CommandHandler {
         emCommand.registerCommand(new QuestCheckCommand());
         emCommand.registerCommand(new QuestTrackCommand());
         emCommand.registerCommand(new QuestLeaveCommand());
-        emCommand.registerCommand(new RankCommand());
+        emCommand.registerCommand(new SkillSetCommand());
+        emCommand.registerCommand(new SkillSetAllCommand());
+        emCommand.registerCommand(new SkillCheckCommand());
+        emCommand.registerCommand(new SkillTestCommand());
+        emCommand.registerCommand(new SkillTestTypeCommand());
+        emCommand.registerCommand(new SkillTestCancelCommand());
+        emCommand.registerCommand(new SkillTestResultsCommand());
         emCommand.registerCommand(new LootCommand());
         emCommand.registerCommand(new QuitCommand());
         emCommand.registerCommand(new StartCommand());

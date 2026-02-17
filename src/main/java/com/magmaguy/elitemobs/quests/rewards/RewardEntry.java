@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.quests.rewards;
 
-import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.utils.ObjectSerializer;
 import com.magmaguy.magmacore.util.Logger;
@@ -48,7 +47,7 @@ public class RewardEntry implements Serializable {
     }
 
     public RewardEntry(double currencyAmount, double chance, int amount, Player player) {
-        this.currencyAmount = currencyAmount * GuildRank.currencyBonusMultiplier(player.getUniqueId());
+        this.currencyAmount = currencyAmount;
         this.chance = chance;
         this.amount = amount;
     }

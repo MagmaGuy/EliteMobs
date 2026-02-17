@@ -26,16 +26,11 @@ import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Villager;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Consumer;
-import org.bukkit.util.Vector;
 
 import java.util.List;
 import java.util.UUID;
@@ -52,9 +47,11 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
     private Villager villager = null;
     private Location spawnLocation;
     private boolean isTalking = false;
-    private ArmorStand roleDisplay;
+    private TextDisplay roleDisplay;
     private boolean isDisguised = false;
     private String locationString;
+    @Getter
+    private CustomModel customModel = null;
 
     /**
      * Spawns NPC based off of the values in the NPCsConfig config file. Runs at startup and on reload.
@@ -131,8 +128,12 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
     }
 
     public void remove(RemovalReason removalReason) {
-        if (roleDisplay != null)
+        if (roleDisplay != null) {
             roleDisplay.remove();
+            roleDisplay = null;
+        }
+        // Remove house earnings display if this is the gambling den owner
+        com.magmaguy.elitemobs.gambling.GamblingDenOwnerDisplay.removeDisplay(uuid);
         if (villager != null) {
             villager.remove();
             EntityTracker.getNpcEntities().remove(villager.getUniqueId());
@@ -179,14 +180,20 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
             villagerInstance.setCustomNameVisible(true);
             villagerInstance.setProfession(npCsConfigFields.getProfession());
             AttributeManager.setAttribute(villagerInstance, "generic_scale", npCsConfigFields.getScale());
-            if (getNPCsConfigFields().getCustomModel() != null && !getNPCsConfigFields().getCustomModel().isEmpty())
-                setCustomModel(villagerInstance);
-            else
-                setDisguise(villagerInstance);
         });
+        // Apply custom model or disguise after spawn completes (not inside consumer)
+        if (CustomModel.customModelsEnabled() &&
+                getNPCsConfigFields().getCustomModel() != null &&
+                !getNPCsConfigFields().getCustomModel().isEmpty() &&
+                CustomModel.modelExists(getNPCsConfigFields().getCustomModel()))
+            setCustomModel(villager);
+        else
+            setDisguise(villager);
         EntityTracker.registerNPCEntity(this);
         initializeRole();
         setTimeout();
+        // Create house earnings display if this is the gambling den owner
+        com.magmaguy.elitemobs.gambling.GamblingDenOwnerDisplay.createDisplay(this);
     }
 
     private void setDisguise(LivingEntity livingEntity) {
@@ -194,7 +201,7 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
         if (!Bukkit.getPluginManager().isPluginEnabled("LibsDisguises")) return;
         try {
             DisguiseEntity.disguise(npCsConfigFields.getDisguise(), livingEntity, npCsConfigFields.getCustomDisguiseData(), npCsConfigFields.getFilename());
-            DisguiseEntity.setDisguiseNameVisibility(true, livingEntity, npCsConfigFields.getName());
+            DisguiseEntity.setDisguiseNameVisibility(true, livingEntity, ChatColorConverter.convert(npCsConfigFields.getName()));
             livingEntity.setCustomNameVisible(true);
             isDisguised = true;
         } catch (Exception ex) {
@@ -204,7 +211,11 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
     }
 
     private void setCustomModel(LivingEntity livingEntity) {
-        CustomModel.generateCustomModel(livingEntity, getNPCsConfigFields().getCustomModel(), getNPCsConfigFields().getName());
+        customModel = CustomModel.generateCustomModel(livingEntity, getNPCsConfigFields().getCustomModel(), ChatColorConverter.convert(getNPCsConfigFields().getName()),
+                (player, modeledEntity) -> NPCInteractions.handleNPCInteraction(player, this),
+                (player, modeledEntity) -> NPCInteractions.handleNPCInteraction(player, this));
+        if (customModel != null)
+            customModel.setSyncMovement(getNPCsConfigFields().isSyncMovement());
     }
 
     public Villager getVillager() {
@@ -275,21 +286,27 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
 
     //Can't be used after the NPCEntity is done initialising
     private void initializeRole() {
-        Vector offSet;
-        if (!isDisguised)
-            offSet = new Vector(0, 1.72, 0);
-        else
-            offSet = new Vector(0, 1.55, 0);
-        roleDisplay = this.villager.getWorld().spawn(villager.getLocation().add(offSet), ArmorStand.class, new Consumer<ArmorStand>() {
-            @Override
-            public void accept(ArmorStand armorStand) {
-                armorStand.setCustomName(ChatColorConverter.convert(npCsConfigFields.getRole()));
-                armorStand.setCustomNameVisible(true);
-                armorStand.setMarker(true);
-                armorStand.setVisible(false);
-                armorStand.setGravity(false);
-                armorStand.setPersistent(false);
-            }
+        if (npCsConfigFields.getRole() == null || npCsConfigFields.getRole().isEmpty()) return;
+
+        // Determine vertical offset based on model type
+        double yOffset;
+        if (customModel != null) {
+            // Custom models typically need more height
+            yOffset = 2.3;
+        } else if (isDisguised) {
+            yOffset = 1.55;
+        } else {
+            yOffset = 2.52;
+        }
+
+        Location roleLocation = villager.getLocation().clone().add(0, yOffset, 0);
+
+        // Use real TextDisplay entity - Minecraft handles visibility automatically
+        roleDisplay = roleLocation.getWorld().spawn(roleLocation, TextDisplay.class, textDisplay -> {
+            textDisplay.setText(ChatColorConverter.convert(npCsConfigFields.getRole()));
+            textDisplay.setPersistent(false);
+            textDisplay.setBillboard(Display.Billboard.CENTER);
+            textDisplay.setShadowed(false);
         });
         EntityTracker.registerVisualEffects(roleDisplay);
     }

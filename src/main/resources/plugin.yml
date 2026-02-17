@@ -1,5 +1,5 @@
 name: EliteMobs
-version: 9.6.3
+version: 10.0.0
 author: MagmaGuy
 main: com.magmaguy.elitemobs.EliteMobs
 api-version: 1.21
@@ -235,6 +235,15 @@ permissions:
   elitemobs.scroll.npc:
     description: Allows players to talk to the elite scroll npc
     default: true
+  elitemobs.shop.arrow.npc:
+    description: Allows players to talk to the arrow shop npc
+    default: true
+  elitemobs.gambling.npc:
+    description: Allows players to use the gambling NPCs
+    default: true
+  elitemobs.skill.npc:
+    description: Allows players to use the skill bonus NPC
+    default: true
   elitemobs.protection.bypass:
     description: Allows players to run the bypass command to toggle bypassing dungeon protections
     default: op
@@ -280,6 +289,10 @@ permissions:
       elitemobs.repair.npc: true
       elitemobs.unbind.npc: true
       elitemobs.enchant.npc: true
+      elitemobs.scroll.npc: true
+      elitemobs.shop.arrow.npc: true
+      elitemobs.gambling.npc: true
+      elitemobs.skill.npc: true
     default: true
   elitemobs.scroll.get:
     description: Gives the player a specified number of elite scrolls at a given level

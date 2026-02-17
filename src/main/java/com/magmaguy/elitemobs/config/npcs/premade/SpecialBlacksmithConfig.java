@@ -11,10 +11,10 @@ public class SpecialBlacksmithConfig extends NPCsConfigFields {
     public SpecialBlacksmithConfig() {
         super("special_blacksmith",
                 true,
-                "Grog",
-                "<Special Blacksmith>",
+                "<g:#9A7A40:#AA8A50>Grog</g>",
+                "<g:#8A6A30:#9A7A40><Special Blacksmith></g>",
                 Villager.Profession.WEAPONSMITH,
-                "em_adventurers_guild,282.5,93,258.5,-90,0",
+                "em_adventurers_guild,299.5,78,276.5,-180,0",
                 new ArrayList<>(List.of(
                         "Need something?",
                         "Got anything good?",

@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.magmacore.util.Logger;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,32 +28,27 @@ public class ConfigurationExporter {
     }
 
     public static void initializeConfigs() {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                Path pluginFolder = Paths.get(MetadataHandler.PLUGIN.getDataFolder().getAbsolutePath());
-                Path exportsPath = pluginFolder.resolve("resource_pack");
+        Path pluginFolder = Paths.get(MetadataHandler.PLUGIN.getDataFolder().getAbsolutePath());
+        Path exportsPath = pluginFolder.resolve("resource_pack");
 
-                // Create exports directory if it doesn't exist
-                if (!Files.isDirectory(exportsPath)) {
-                    try {
-                        Files.createDirectories(exportsPath);
-                    } catch (Exception exception) {
-                        Logger.warn("Failed to create exports directory! Tell the dev!");
-                        exception.printStackTrace();
-                        return;
-                    }
-                }
-
-                // Export the resource pack from jar resources
-                try {
-                    exportResourcePack(exportsPath);
-                } catch (Exception e) {
-                    Logger.warn("Failed to export resource pack! Tell the dev!");
-                    e.printStackTrace();
-                }
+        // Create exports directory if it doesn't exist
+        if (!Files.isDirectory(exportsPath)) {
+            try {
+                Files.createDirectories(exportsPath);
+            } catch (Exception exception) {
+                Logger.warn("Failed to create exports directory! Tell the dev!");
+                exception.printStackTrace();
+                return;
             }
-        }.runTaskAsynchronously(MetadataHandler.PLUGIN);
+        }
+
+        // Export the resource pack from jar resources
+        try {
+            exportResourcePack(exportsPath);
+        } catch (Exception e) {
+            Logger.warn("Failed to export resource pack! Tell the dev!");
+            e.printStackTrace();
+        }
     }
 
     /**

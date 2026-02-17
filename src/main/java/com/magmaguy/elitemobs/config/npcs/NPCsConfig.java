@@ -14,8 +14,11 @@ public class NPCsConfig extends CustomConfig {
         npcEntities = new HashMap<>();
         for (String key : super.getCustomConfigFieldsHashMap().keySet()) {
             npcEntities.put(key, (NPCsConfigFields) super.getCustomConfigFieldsHashMap().get(key));
-            //Initializes NPC entities
-            NPCsConfigFields npCsConfigFields = (NPCsConfigFields) super.getCustomConfigFieldsHashMap().get(key);
+        }
+    }
+
+    public static void initializeNPCs() {
+        for (NPCsConfigFields npCsConfigFields : npcEntities.values()) {
             if (npCsConfigFields.isEnabled())
                 NPCEntity.initializeNPCs(npCsConfigFields);
         }

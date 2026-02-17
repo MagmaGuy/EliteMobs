@@ -23,4 +23,10 @@ public interface CustomModelInterface {
      * @return The location of the nametag bone, or null if none exists
      */
     Location getNametagBoneLocation();
+
+    /**
+     * Sets whether the model should sync movement with the base entity.
+     * @param syncMovement true to sync movement, false otherwise
+     */
+    void setSyncMovement(boolean syncMovement);
 }

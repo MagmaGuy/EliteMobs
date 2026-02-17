@@ -3,19 +3,20 @@ package com.magmaguy.elitemobs.utils;
 import com.magmaguy.elitemobs.MetadataHandler;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.List;
+import java.util.Collection;
 
 public class CooldownHandler {
     private CooldownHandler() {
     }
 
-    public static void initialize(List list, Object object, int cooldownInTicks) {
-        list.add(object);
+    @SuppressWarnings("unchecked")
+    public static <T> void initialize(Collection<T> collection, T object, int cooldownInTicks) {
+        collection.add(object);
 
         new BukkitRunnable() {
             @Override
             public void run() {
-                list.remove(object);
+                collection.remove(object);
             }
         }.runTaskLater(MetadataHandler.PLUGIN, cooldownInTicks);
 

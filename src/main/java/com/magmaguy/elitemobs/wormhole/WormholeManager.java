@@ -1,12 +1,16 @@
 package com.magmaguy.elitemobs.wormhole;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.adventurersguild.GuildRank;
+import com.magmaguy.elitemobs.api.PlayerTeleportEvent;
+import com.magmaguy.elitemobs.config.CommandMessagesConfig;
+import com.magmaguy.elitemobs.config.InitializeConfig;
 import com.magmaguy.elitemobs.config.WormholesConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldowns;
-import com.magmaguy.magmacore.util.ChatColorConverter;
+import com.magmaguy.elitemobs.utils.DiscordLinks;
 import com.magmaguy.magmacore.util.ChunkLocationChecker;
+import com.magmaguy.magmacore.util.Logger;
+import com.magmaguy.magmacore.util.SpigotMessage;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
@@ -110,12 +114,10 @@ public class WormholeManager {
 
         // Check currency
         if (wormholeEntry.getWormhole().getWormholeConfigFields().getCoinCost() > 0) {
-            double coinCost = wormholeEntry.getWormhole().getWormholeConfigFields().getCoinCost() +
-                    wormholeEntry.getWormhole().getWormholeConfigFields().getCoinCost() *
-                            GuildRank.currencyBonusMultiplier(player.getUniqueId());
+            double coinCost = wormholeEntry.getWormhole().getWormholeConfigFields().getCoinCost();
 
             if (EconomyHandler.checkCurrency(player.getUniqueId()) < coinCost) {
-                player.sendMessage(ChatColorConverter.convert(WormholesConfig.getInsufficientCurrencyForWormholeMessage())
+                player.sendMessage(WormholesConfig.getInsufficientCurrencyForWormholeMessage()
                         .replace("$amount", "" + coinCost));
                 return false;
             }
@@ -144,12 +146,25 @@ public class WormholeManager {
 
         // Check if destination is valid
         if (destination == null || destination.getWorld() == null) {
-            if (sourceEntry.getPortalMissingMessage() == null) {
-                player.sendMessage(ChatColorConverter.convert(WormholesConfig.getDefaultPortalMissingMessage()));
+            // Check destination entry for messages first (it's the broken side), then source entry
+            String missingMessage = destinationEntry.getPortalMissingMessage();
+            if (missingMessage == null) missingMessage = sourceEntry.getPortalMissingMessage();
+
+            if (missingMessage == null) {
+                player.sendMessage(WormholesConfig.getDefaultPortalMissingMessage());
             } else {
-                player.sendMessage(sourceEntry.getPortalMissingMessage());
-                if (player.isOp() || player.hasPermission("elitemobs.*")) {
-                    player.sendMessage(sourceEntry.getOpMessage());
+                player.sendMessage(missingMessage);
+            }
+
+            if (player.isOp() || player.hasPermission("elitemobs.*")) {
+                // Check for download hint first (rich formatted message)
+                boolean showDownload = destinationEntry.isShowDownloadHint() || sourceEntry.isShowDownloadHint();
+                if (showDownload) {
+                    sendDownloadHint(player);
+                } else {
+                    String opMsg = destinationEntry.getOpMessage();
+                    if (opMsg == null) opMsg = sourceEntry.getOpMessage();
+                    if (opMsg != null) Logger.sendSimpleMessage(player, opMsg);
                 }
             }
             return;
@@ -167,9 +182,24 @@ public class WormholeManager {
             player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20 * 2, 0));
         }
 
-        player.teleport(finalDestination);
+        // Use PlayerTeleportEvent to trigger dungeon music and other listeners
+        PlayerTeleportEvent.teleportPlayer(player, finalDestination);
         player.playSound(player.getLocation(), Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, 1f, 1f);
         player.setFlying(false);
+    }
+
+    private void sendDownloadHint(Player player) {
+        player.spigot().sendMessage(
+                SpigotMessage.simpleMessage(CommandMessagesConfig.getWormholeOpDownloadMessage()),
+                SpigotMessage.commandHoverMessage(
+                        InitializeConfig.getEmSetupDisplay(),
+                        InitializeConfig.getEmSetupHover(),
+                        "/em setup"),
+                SpigotMessage.simpleMessage(" &8| "),
+                SpigotMessage.hoverLinkMessage(
+                        InitializeConfig.getDiscordLinkDisplay(),
+                        InitializeConfig.getDiscordLinkHover(),
+                        DiscordLinks.mainLink));
     }
 
     /**
@@ -238,9 +268,8 @@ public class WormholeManager {
     private void processWormholes() {
         tickCounter++;
 
-        // Tick player cooldowns
-        Collection<PlayerWormholeData> values = playerTeleportData.values();
-        for (PlayerWormholeData value : values) {
+        // Tick player cooldowns (copy to avoid ConcurrentModificationException)
+        for (PlayerWormholeData value : new java.util.ArrayList<>(playerTeleportData.values())) {
             value.tick();
         }
 

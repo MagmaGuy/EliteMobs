@@ -101,6 +101,48 @@ public class ItemConstructor {
         return commonFeatures(itemStack, eliteEntity, player, enchantments, customEnchantments, showItemWorth, soulbound);
     }
 
+    /**
+     * Constructs a procedural item with a specific material and level.
+     * Used by the skill-based shop system where the material is chosen first,
+     * then the level is determined based on player's skill level.
+     *
+     * @param material      The material to use for the item
+     * @param level         The elite level to assign to the item
+     * @param player        The player (for soulbinding)
+     * @param showItemWorth Whether to show the item's worth in lore
+     * @return The constructed ItemStack, or null if material is invalid
+     */
+    public static ItemStack constructItemWithMaterial(Material material, int level, Player player, boolean showItemWorth) {
+        if (material == null) return null;
+
+        // Construct initial item
+        ItemStack itemStack = ItemStackGenerator.generateItemStack(material);
+
+        // Set the item level
+        EliteItemManager.setEliteLevel(itemStack, level);
+
+        // Get meta
+        ItemMeta itemMeta = itemStack.getItemMeta();
+
+        // Generate item enchantments based on level
+        HashMap<Enchantment, Integer> enchantmentMap = EnchantmentGenerator.generateEnchantments(level, material, itemMeta);
+
+        // Generate custom enchantments based on level
+        HashMap<String, Integer> customEnchantmentMap = EnchantmentGenerator.generateCustomEnchantments(level, material);
+
+        // Generate item name
+        itemMeta.setDisplayName(NameGenerator.generateName(material));
+
+        // Colorize with MMO colors
+        itemStack.setItemMeta(itemMeta);
+        ItemQualityColorizer.dropQualityColorizer(itemStack);
+
+        // Apply level-based custom skins
+        EliteItemSkins.applyLevelBasedSkin(itemStack, level);
+
+        return commonFeatures(itemStack, null, player, enchantmentMap, customEnchantmentMap, showItemWorth, true);
+    }
+
     /*
     For procedurally generated items
      */

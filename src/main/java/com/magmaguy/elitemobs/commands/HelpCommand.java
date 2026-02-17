@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.commands;
 
+import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.CommandManager;
@@ -18,7 +19,7 @@ public class HelpCommand extends AdvancedCommand {
 
     @Override
     public void execute(CommandData commandData) {
-        Logger.sendMessage(commandData.getCommandSender(), "Commands:");
+        Logger.sendMessage(commandData.getCommandSender(), CommandMessagesConfig.getHelpHeaderMessage());
         for (CommandManager commandManager : CommandManager.getCommandManagers()) {
             commandManager.commands.forEach(command -> {
                 if (commandData.getCommandSender() instanceof Player player) {

@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.items.itemconstructor;
 
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
+import com.magmaguy.magmacore.util.ChatColorConverter;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -12,6 +13,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ItemQualityColorizer {
+
+    // Gradient color definitions for item quality tiers
+    // LIGHT_BLUE (Mythic, >100%) - Prismatic shifting cyan-magenta-cyan
+    private static final String MYTHIC_GRADIENT = "<g:#00FFFF:#FF00FF:#00FFFF>";
+    private static final String MYTHIC_GRADIENT_END = "</g>";
+    // GOLD (Legendary, >83%) - Rich gold-orange-gold gradient
+    private static final String LEGENDARY_GRADIENT = "<g:#FFD700:#FFA500:#FFD700>";
+    private static final String LEGENDARY_GRADIENT_END = "</g>";
+    // PURPLE (Epic, >67%) - Deep purple gradient
+    private static final String EPIC_GRADIENT = "<g:#9400D3:#8A2BE2>";
+    private static final String EPIC_GRADIENT_END = "</g>";
+    // BLUE (Rare, >50%) - Blue gradient
+    private static final String RARE_GRADIENT = "<g:#4169E1:#1E90FF>";
+    private static final String RARE_GRADIENT_END = "</g>";
 
     //    /*
 //    item quality: light blue (above max config enchant level) > gold > purple > blue > green > white > gray
@@ -85,19 +100,23 @@ public class ItemQualityColorizer {
 
             if (enchantPercentage > 100) {
 
-                colorizeBoldNameAndLore(ChatColor.DARK_AQUA, itemMeta);
+                // Mythic tier - prismatic gradient with bold
+                itemMeta = colorizeGradientBoldNameAndLore(MYTHIC_GRADIENT, MYTHIC_GRADIENT_END, itemMeta);
 
             } else if (enchantPercentage > 100 / 6 * 5) {
 
-                itemMeta = colorizeNameAndLore(ChatColor.GOLD, itemMeta);
+                // Legendary tier - gold gradient
+                itemMeta = colorizeGradientNameAndLore(LEGENDARY_GRADIENT, LEGENDARY_GRADIENT_END, itemMeta);
 
             } else if (enchantPercentage > 100 / 6 * 4) {
 
-                itemMeta = colorizeNameAndLore(ChatColor.DARK_PURPLE, itemMeta);
+                // Epic tier - purple gradient
+                itemMeta = colorizeGradientNameAndLore(EPIC_GRADIENT, EPIC_GRADIENT_END, itemMeta);
 
             } else if (enchantPercentage > 100 / 6 * 3) {
 
-                itemMeta = colorizeNameAndLore(ChatColor.BLUE, itemMeta);
+                // Rare tier - blue gradient
+                itemMeta = colorizeGradientNameAndLore(RARE_GRADIENT, RARE_GRADIENT_END, itemMeta);
 
             } else if (enchantPercentage > 100 / 6 * 2) {
 
@@ -132,6 +151,74 @@ public class ItemQualityColorizer {
                 if (!string.isEmpty()) {
 
                     String colorizedString = chatColor + "" + ChatColor.ITALIC + string;
+                    list.add(colorizedString);
+
+                }
+
+            }
+
+            itemMeta.setLore(list);
+
+        }
+
+        return itemMeta;
+
+    }
+
+    private static ItemMeta colorizeGradientNameAndLore(String gradientStart, String gradientEnd, ItemMeta itemMeta) {
+
+        /*
+        Cancel colorization in case item already has a color (for custom and unique items)
+         */
+        if (itemMeta.getDisplayName().equals(ChatColor.stripColor(itemMeta.getDisplayName()))) {
+            String gradientName = gradientStart + itemMeta.getDisplayName() + gradientEnd;
+            itemMeta.setDisplayName(ChatColorConverter.convert(gradientName));
+        }
+
+        List<String> list = new ArrayList<>();
+
+        if (itemMeta.getLore() != null) {
+
+            for (String string : itemMeta.getLore()) {
+
+                if (!string.isEmpty()) {
+
+                    String gradientLore = gradientStart + string + gradientEnd;
+                    String colorizedString = ChatColorConverter.convert(gradientLore) + ChatColor.ITALIC;
+                    list.add(colorizedString);
+
+                }
+
+            }
+
+            itemMeta.setLore(list);
+
+        }
+
+        return itemMeta;
+
+    }
+
+    private static ItemMeta colorizeGradientBoldNameAndLore(String gradientStart, String gradientEnd, ItemMeta itemMeta) {
+
+        /*
+        Cancel colorization in case item already has a color (for custom and unique items)
+         */
+        if (itemMeta.getDisplayName().equals(ChatColor.stripColor(itemMeta.getDisplayName()))) {
+            String gradientName = gradientStart + itemMeta.getDisplayName() + gradientEnd;
+            itemMeta.setDisplayName(ChatColor.BOLD + ChatColorConverter.convert(gradientName));
+        }
+
+        List<String> list = new ArrayList<>();
+
+        if (itemMeta.getLore() != null && !itemMeta.getLore().isEmpty()) {
+
+            for (String string : itemMeta.getLore()) {
+
+                if (!string.isEmpty()) {
+
+                    String gradientLore = gradientStart + string + gradientEnd;
+                    String colorizedString = ChatColor.BOLD + "" + ChatColor.ITALIC + ChatColorConverter.convert(gradientLore);
                     list.add(colorizedString);
 
                 }

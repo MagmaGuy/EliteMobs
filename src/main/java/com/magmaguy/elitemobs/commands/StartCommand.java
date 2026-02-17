@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.commands;
 
+import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
@@ -23,6 +24,6 @@ public class StartCommand extends AdvancedCommand {
         if (matchInstance != null) {
             matchInstance.countdownMatch();
         } else
-            Logger.sendMessage(commandData.getCommandSender(), "You are not queued for instanced content!");
+            Logger.sendMessage(commandData.getCommandSender(), CommandMessagesConfig.getNotQueuedForInstanceMessage());
     }
 }

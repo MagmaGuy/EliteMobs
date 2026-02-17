@@ -29,31 +29,31 @@ public class BuyOrSellMenuConfig extends MenusConfigFields {
 
     @Override
     public void processAdditionalFields() {
-        SHOP_NAME = ConfigurationEngine.setString(file, fileConfiguration, "Shop name", "[EM] Buy or Sell", true);
+        SHOP_NAME = ConfigurationEngine.setString(file, fileConfiguration, "shopName", "[EM] Buy or Sell", true);
         ItemStackSerializer.serialize(
-                "Information button",
+                "informationButton",
                 ItemStackGenerator.generateSkullItemStack("magmaguy",
                         "&4&lEliteMobs &r&cby &4&lMagmaGuy",
                         new ArrayList<>(List.of("&8Support the plugins you enjoy!",
                                 "&aClick on the emerald to buy items!",
                                 "&cClick on the redstone to sell items!"))),
                 fileConfiguration);
-        INFORMATION_ITEM = ItemStackSerializer.deserialize("Information button", fileConfiguration);
-        INFORMATION_SLOT = ConfigurationEngine.setInt(fileConfiguration, "Information button slot", 4);
-        ItemStackSerializer.serialize("Buy procedurally generated items",
+        INFORMATION_ITEM = ItemStackSerializer.deserialize("informationButton", fileConfiguration);
+        INFORMATION_SLOT = ConfigurationEngine.setInt(fileConfiguration, "informationButtonSlot", 4);
+        ItemStackSerializer.serialize("buyProcedurallyGeneratedItems",
                 ItemStackGenerator.generateItemStack(Material.EMERALD, "Buy items", new ArrayList<>(), MetadataHandler.signatureID), fileConfiguration);
-        BUY_PROCEDURAL_ITEM = ItemStackSerializer.deserialize("Buy procedurally generated items", fileConfiguration);
-        ItemStackSerializer.serialize("Buy custom items",
+        BUY_PROCEDURAL_ITEM = ItemStackSerializer.deserialize("buyProcedurallyGeneratedItems", fileConfiguration);
+        ItemStackSerializer.serialize("buyCustomItems",
                 ItemStackGenerator.generateItemStack(Material.EMERALD, "Buy custom items", new ArrayList<>(), MetadataHandler.signatureID), fileConfiguration);
         CustomModelAdder.addCustomModel(BUY_PROCEDURAL_ITEM, CustomModelsConfig.bagOfCoins);
-        BUY_CUSTOM_ITEM = ItemStackSerializer.deserialize("Buy custom items", fileConfiguration);
-        ItemStackSerializer.serialize("Sell items",
+        BUY_CUSTOM_ITEM = ItemStackSerializer.deserialize("buyCustomItems", fileConfiguration);
+        ItemStackSerializer.serialize("sellItems",
                 ItemStackGenerator.generateItemStack(Material.REDSTONE, "Sell items", new ArrayList<>(), MetadataHandler.signatureID), fileConfiguration);
         CustomModelAdder.addCustomModel(BUY_CUSTOM_ITEM, CustomModelsConfig.bagOfCoins);
-        SELL_ITEM = ItemStackSerializer.deserialize("Sell items", fileConfiguration);
+        SELL_ITEM = ItemStackSerializer.deserialize("sellItems", fileConfiguration);
         CustomModelAdder.addCustomModel(SELL_ITEM, CustomModelsConfig.handWithCoins);
-        BUY_SLOT = ConfigurationEngine.setInt(fileConfiguration, "Buy slot", 11);
-        SELL_SLOT = ConfigurationEngine.setInt(fileConfiguration, "Sell slot", 15);
+        BUY_SLOT = ConfigurationEngine.setInt(fileConfiguration, "buySlot", 11);
+        SELL_SLOT = ConfigurationEngine.setInt(fileConfiguration, "sellSlot", 15);
     }
 
 }

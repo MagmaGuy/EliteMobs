@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.items.customloottable;
 
+import com.magmaguy.elitemobs.config.StaticItemNamesConfig;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -87,8 +88,8 @@ public class CommandLootTable extends CustomLootEntry implements Serializable {
     public ItemStack previewDrop(int itemTier, Player player) {
         ItemStack paperItem = new ItemStack(org.bukkit.Material.PAPER);
         org.bukkit.inventory.meta.ItemMeta paperMeta = paperItem.getItemMeta();
-        paperMeta.setDisplayName("Command");
-        paperMeta.setLore(List.of("Command: " + command, "Chance: " + getChance(), "Times: " + getAmount()));
+        paperMeta.setDisplayName(StaticItemNamesConfig.getLootPreviewCommandDisplayName());
+        paperMeta.setLore(List.of(StaticItemNamesConfig.getLootPreviewCommandLabel() + command, StaticItemNamesConfig.getLootPreviewChanceLabel() + getChance(), StaticItemNamesConfig.getLootPreviewTimesLabel() + getAmount()));
         paperItem.setItemMeta(paperMeta);
         return paperItem;
     }

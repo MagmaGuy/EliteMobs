@@ -11,8 +11,8 @@ public class TravellingMerchantConfig extends NPCsConfigFields {
     public TravellingMerchantConfig() {
         super("travelling_merchant",
                 true,
-                "Jeeves",
-                "<Travelling Merchant>",
+                "<g:#7A5A3A:#8A6A4A>Jeeves</g>",
+                "<g:#6A4A2A:#7A5A3A><Travelling Merchant></g>",
                 Villager.Profession.LIBRARIAN,
                 null,
                 new ArrayList<>(List.of(

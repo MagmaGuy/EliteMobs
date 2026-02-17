@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.events;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.api.CustomEventStartEvent;
 import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.config.customevents.CustomEventsConfig;
@@ -13,7 +12,6 @@ import com.magmaguy.elitemobs.utils.WeightedProbability;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -71,13 +69,6 @@ public class TimedEvent extends CustomEvent implements Listener {
             @Override
             public void run() {
                 if (Bukkit.getServer().getOnlinePlayers().isEmpty()) return;
-                boolean validPlayer = false;
-                for (Player onlinePlayer : Bukkit.getServer().getOnlinePlayers())
-                    if (!GuildRank.isAtOrAboveGuildRank(onlinePlayer, 0, 0)) {
-                        validPlayer = true;
-                        break;
-                    }
-                if (!validPlayer) return;
                 if (System.currentTimeMillis() < nextEventTrigger) return;
                 pickEvent();
             }
@@ -108,25 +99,37 @@ public class TimedEvent extends CustomEvent implements Listener {
             }
     }
 
-    /**
-     * Just because the event is instantiated, does not necessarily mean it started. If the spawn isn't instant, then
-     * it needs to be queued for a later date. If the spawn is instant but no valid location can be found, it should retry
-     * on a delay.
-     */
-    public void instantiateEvent() {
-        Logger.info("Event " + getCustomEventsConfigFields().getFilename() + " has been queued!");
+    public EventStartResult instantiateEvent() {
         TimedEvent timedEvent = new TimedEvent(customEventsConfigFields);
         CustomEventStartEvent customEventStartEvent = new CustomEventStartEvent(timedEvent);
         new EventCaller(customEventStartEvent);
-        if (customEventStartEvent.isCancelled()) return;
+        if (customEventStartEvent.isCancelled()) {
+            Logger.warn("Event " + getCustomEventsConfigFields().getFilename() + " was cancelled by another plugin.");
+            return EventStartResult.CANCELLED_BY_PLUGIN;
+        }
 
-        timedEvent.customSpawn = new CustomSpawn(customEventsConfigFields.getSpawnType(),
+        String spawnType = customEventsConfigFields.getSpawnType();
+        if (spawnType == null || spawnType.isEmpty()) {
+            Logger.warn("Event " + getCustomEventsConfigFields().getFilename() + " has no spawnType set! Add a valid custom spawn filename to the event config.");
+            return EventStartResult.NO_SPAWN_TYPE;
+        }
+
+        timedEvent.customSpawn = new CustomSpawn(spawnType,
                 customEventsConfigFields.getBossFilenames(),
                 timedEvent);
 
         //Failed to initialize event
-        if (timedEvent.customSpawn.getCustomSpawnConfigFields() == null)
-            return;
+        if (timedEvent.customSpawn.getCustomSpawnConfigFields() == null) {
+            Logger.warn("Event " + getCustomEventsConfigFields().getFilename() + " failed to start because its spawnType '" + spawnType + "' is not a valid custom spawn file. Make sure the file exists in the customspawns folder and is enabled.");
+            return EventStartResult.INVALID_SPAWN_TYPE;
+        }
+
+        if (timedEvent.customSpawn.getCustomBossEntities().isEmpty()) {
+            Logger.warn("Event " + getCustomEventsConfigFields().getFilename() + " failed to start because none of its boss filenames are valid: " + customEventsConfigFields.getBossFilenames());
+            return EventStartResult.NO_VALID_BOSSES;
+        }
+
+        Logger.info("Event " + getCustomEventsConfigFields().getFilename() + " has been queued!");
 
         //This handles the elitemobs-events flag
         timedEvent.customSpawn.setEvent(true);
@@ -138,6 +141,20 @@ public class TimedEvent extends CustomEvent implements Listener {
         setNextEventTrigger();
 
         timedEvents.add(timedEvent);
+        return EventStartResult.SUCCESS;
+    }
+
+    /**
+     * Just because the event is instantiated, does not necessarily mean it started. If the spawn isn't instant, then
+     * it needs to be queued for a later date. If the spawn is instant but no valid location can be found, it should retry
+     * on a delay.
+     */
+    public enum EventStartResult {
+        SUCCESS,
+        CANCELLED_BY_PLUGIN,
+        NO_SPAWN_TYPE,
+        INVALID_SPAWN_TYPE,
+        NO_VALID_BOSSES
     }
 
     private void setNextEventTrigger() {

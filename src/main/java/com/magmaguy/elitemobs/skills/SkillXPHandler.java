@@ -1,0 +1,250 @@
+package com.magmaguy.elitemobs.skills;
+
+import com.magmaguy.elitemobs.antiexploit.FarmingProtection;
+import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
+import com.magmaguy.elitemobs.combatsystem.displays.BossHealthDisplay;
+import com.magmaguy.elitemobs.config.DungeonsConfig;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.playerdata.database.PlayerData;
+import com.magmaguy.elitemobs.utils.DebugMessage;
+import com.magmaguy.magmacore.util.ChatColorConverter;
+import org.bukkit.*;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+
+import java.util.Map;
+
+/**
+ * Handles skill XP awards when elite mobs are killed.
+ * <p>
+ * Players earn weapon XP based on the weapon they used to deal damage,
+ * and armor XP at 1/3 the rate on every kill (so it always trails behind weapons).
+ */
+public class SkillXPHandler implements Listener {
+
+    /**
+     * Awards skill XP to all players who contributed to killing an elite mob.
+     * <p>
+     * XP is distributed proportionally based on damage contribution.
+     */
+    @EventHandler(priority = EventPriority.NORMAL)
+    public void onEliteMobDeath(EliteMobDeathEvent event) {
+        EliteEntity eliteEntity = event.getEliteEntity();
+
+        // Skip if anti-exploit triggered or no damagers
+        if (eliteEntity.isTriggeredAntiExploit()) return;
+        if (eliteEntity.getDamagers().isEmpty()) return;
+
+        // Custom bosses can disable skill XP - also no XP if they don't drop EliteMobs loot
+        if (eliteEntity instanceof CustomBossEntity customBoss) {
+            if (!customBoss.getCustomBossesConfigFields().isDropsSkillXP()) return;
+            if (!customBoss.getCustomBossesConfigFields().isDropsEliteMobsLoot()) return;
+        }
+
+        int mobLevel = eliteEntity.getLevel();
+
+        // Capture the death location for XP popups (before entity becomes invalid)
+        Location deathLocation = eliteEntity.getLocation();
+
+        // Calculate total damage for proportional XP distribution
+        double totalDamage = eliteEntity.getDamagers().values().stream()
+                .mapToDouble(Double::doubleValue)
+                .sum();
+
+        if (totalDamage <= 0) return;
+
+        // Award XP to each player who contributed
+        for (Map.Entry<Player, Double> entry : eliteEntity.getDamagers().entrySet()) {
+            Player player = entry.getKey();
+            double damageDealt = entry.getValue();
+
+            // Skip NPCs and players not in memory
+            if (player.hasMetadata("NPC")) continue;
+            if (!PlayerData.isInMemory(player.getUniqueId())) continue;
+
+            // Check farming protection for natural elites
+            if (!(eliteEntity instanceof CustomBossEntity)) {
+                if (!FarmingProtection.recordNaturalEliteKill(player, eliteEntity)) {
+                    continue; // Player is capped, no XP
+                }
+            }
+
+            // Get effective mob level (capped at +5 above combat level)
+            int effectiveMobLevel = FarmingProtection.getEffectiveMobLevelForXP(player, mobLevel);
+
+            // Check if mob is too low level for XP (5+ levels below)
+            double xpMultiplier = FarmingProtection.getXPMultiplier(player, mobLevel);
+            if (xpMultiplier <= 0) {
+                // Notify player that mob is too low level
+                notifyLevelDifferenceLimit(player, mobLevel, true);
+                continue; // No XP for low-level mobs
+            }
+
+            // Notify if XP is capped due to high mob level
+            if (effectiveMobLevel < mobLevel) {
+                notifyLevelDifferenceLimit(player, mobLevel, false);
+            }
+
+            // Calculate base XP using effective mob level
+            long baseXP = SkillXPCalculator.calculateMobXP(effectiveMobLevel);
+
+            // Calculate proportional XP based on damage contribution
+            double damagePercent = damageDealt / totalDamage;
+            long earnedXP = (long) (baseXP * damagePercent);
+
+            if (earnedXP <= 0) continue;
+
+            // Award weapon XP based on main hand weapon
+            long weaponXP = awardWeaponXP(player, earnedXP);
+
+            // Award armor XP (always, at 1/3 rate)
+            long armorXP = awardArmorXP(player, earnedXP);
+
+            // Show XP popup with total XP earned (weapon + armor)
+            long totalXPEarned = weaponXP + armorXP;
+            if (totalXPEarned > 0 && deathLocation != null) {
+                BossHealthDisplay.createXPPopup(deathLocation, player, totalXPEarned);
+            }
+        }
+    }
+
+    /**
+     * Awards weapon XP to a player based on their equipped weapon.
+     *
+     * @return The amount of XP awarded, or 0 if no weapon skill applies
+     */
+    private long awardWeaponXP(Player player, long baseXP) {
+        Material weaponMaterial = player.getInventory().getItemInMainHand().getType();
+        SkillType skillType = SkillType.fromMaterial(weaponMaterial);
+
+        // No XP if not holding a recognized weapon
+        if (skillType == null) return 0;
+
+        // Get current XP before adding
+        long oldXP = PlayerData.getSkillXP(player.getUniqueId(), skillType);
+        int previousLevel = SkillXPCalculator.levelFromTotalXP(oldXP);
+
+        // Add XP with the skill's multiplier (weapons have 1.0x)
+        long xpToAdd = SkillXPCalculator.applySkillMultiplier(skillType, baseXP);
+        long newXP = PlayerData.addSkillXP(player.getUniqueId(), skillType, xpToAdd);
+
+        // Show XP bar animation
+        SkillXPBar.showXPGain(player, skillType, oldXP, newXP, xpToAdd);
+
+        // Check for level up
+        int newLevel = SkillXPCalculator.levelFromTotalXP(newXP);
+        if (newLevel > previousLevel) {
+            notifyLevelUp(player, skillType, newLevel);
+        }
+
+        return xpToAdd;
+    }
+
+    /**
+     * Awards armor XP to a player at 1/3 the rate of weapon XP.
+     * Armor XP is always awarded on kills regardless of equipped gear,
+     * but at a reduced rate so it trails behind weapon skills.
+     *
+     * @return The amount of XP awarded
+     */
+    private long awardArmorXP(Player player, long baseXP) {
+        // Get current XP before adding
+        long oldXP = PlayerData.getSkillXP(player.getUniqueId(), SkillType.ARMOR);
+        int previousLevel = SkillXPCalculator.levelFromTotalXP(oldXP);
+
+        // Armor XP is at 1/3 rate (always awarded on kills)
+        long armorXP = SkillXPCalculator.applySkillMultiplier(SkillType.ARMOR, baseXP);
+        long newXP = PlayerData.addSkillXP(player.getUniqueId(), SkillType.ARMOR, armorXP);
+
+        // Show XP bar animation
+        SkillXPBar.showXPGain(player, SkillType.ARMOR, oldXP, newXP, armorXP);
+
+        // Check for level up
+        int newLevel = SkillXPCalculator.levelFromTotalXP(newXP);
+        if (newLevel > previousLevel) {
+            notifyLevelUp(player, SkillType.ARMOR, newLevel);
+        }
+
+        return armorXP;
+    }
+
+    /**
+     * Notifies a player that they leveled up a skill with full effects.
+     * <p>
+     * Effects include:
+     * - Title display showing the level up
+     * - Level-up sound effect
+     * - Particle burst around the player
+     * - Server-wide announcement
+     */
+    private void notifyLevelUp(Player player, SkillType skillType, int newLevel) {
+        // Title display for every level up
+        player.sendTitle(
+                DungeonsConfig.getSkillLevelUpTitle(),
+                DungeonsConfig.getSkillLevelUpSubtitle()
+                        .replace("$skill", skillType.getDisplayName())
+                        .replace("$level", String.valueOf(newLevel)),
+                10, 70, 20
+        );
+
+        // Play level-up sound
+        player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1.0f, 1.0f);
+
+        // Spawn celebratory particles
+        player.getWorld().spawnParticle(
+                Particle.TOTEM_OF_UNDYING,
+                player.getLocation().add(0, 1, 0),
+                50,  // count
+                0.5, 1.0, 0.5,  // offset x, y, z
+                0.1  // speed
+        );
+
+        // Server-wide announcement
+        String announcement = DungeonsConfig.getSkillLevelUpBroadcast()
+                .replace("$player", player.getName())
+                .replace("$skill", skillType.getDisplayName())
+                .replace("$level", String.valueOf(newLevel));
+        Bukkit.broadcastMessage(announcement);
+
+        // Update combat level display
+        CombatLevelDisplay.updateDisplay(player);
+
+        // Update armor health bonus if armor skill leveled up
+        if (skillType == SkillType.ARMOR) {
+            ArmorSkillHealthBonus.updateHealthBonus(player);
+        }
+
+        DebugMessage.log(player, "Player " + player.getName() + " reached " + skillType.getDisplayName() + " level " + newLevel);
+    }
+
+    /**
+     * Notifies a player that their XP gain is limited due to level difference.
+     *
+     * @param player The player to notify
+     * @param mobLevel The level of the mob killed
+     * @param noXP True if no XP is given (mob too low), false if XP is capped (mob too high)
+     */
+    private void notifyLevelDifferenceLimit(Player player, int mobLevel, boolean noXP) {
+        int combatLevel = CombatLevelCalculator.calculateCombatLevel(player.getUniqueId());
+
+        String message;
+        if (noXP) {
+            message = DungeonsConfig.getSkillXpNoGainMessage()
+                    .replace("$mobLevel", String.valueOf(mobLevel))
+                    .replace("$skill", "combat")
+                    .replace("$playerLevel", String.valueOf(combatLevel));
+        } else {
+            int cappedLevel = combatLevel + 5;
+            message = DungeonsConfig.getSkillXpCappedMessage()
+                    .replace("$mobLevel", String.valueOf(mobLevel))
+                    .replace("$skill", "combat")
+                    .replace("$playerLevel", String.valueOf(combatLevel))
+                    .replace("$xp", String.valueOf(cappedLevel));
+        }
+
+        player.sendMessage(ChatColorConverter.convert(message));
+    }
+}

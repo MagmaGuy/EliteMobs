@@ -11,10 +11,10 @@ public class EnchanterConfig extends NPCsConfigFields {
     public EnchanterConfig() {
         super("enchanted",
                 true,
-                "Eden",
-                "<Enchanter>",
+                "<g:#6A4A7A:#7A5A8A>Eden</g>",
+                "<g:#5A3A6A:#6A4A7A><Enchanter></g>",
                 Villager.Profession.TOOLSMITH,
-                "em_adventurers_guild,278.5,77,243.5,0,0",
+                "em_adventurers_guild,284.5,74,246.5,0,0",
                 new ArrayList<>(List.of(
                         "Need something enchanted?",
                         "Feeling lucky?",

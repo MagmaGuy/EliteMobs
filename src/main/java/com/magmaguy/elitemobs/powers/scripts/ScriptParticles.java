@@ -27,6 +27,9 @@ public class ScriptParticles {
         }
 
         private void visualize(ScriptActionData scriptActionData, Location location, EliteScript eliteScript) {
+            // Skip if world is no longer loaded (e.g., dungeon instance closing)
+            if (location.getWorld() == null) return;
+
             double x = particleBlueprint.getX().getValue();
             double y = particleBlueprint.getY().getValue();
             double z = particleBlueprint.getZ().getValue();

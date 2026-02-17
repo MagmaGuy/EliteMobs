@@ -45,5 +45,6 @@ public class DarkCathedralLair extends ContentPackagesConfigFields {
                 Map.of("name", "mythic", "levelSync", "-5", "id", 2)));
         this.contentType = ContentType.DYNAMIC_DUNGEON;
         setDungeonLockoutMinutes(1440);
+        setNightbreakSlug("the-dark-cathedral");
     }
 }

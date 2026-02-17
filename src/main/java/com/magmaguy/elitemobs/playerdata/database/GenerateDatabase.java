@@ -16,10 +16,7 @@ public class GenerateDatabase {
         String sql = "CREATE TABLE IF NOT EXISTS " + PlayerData.getPLAYER_DATA_TABLE_NAME() + " (" +
                 "PlayerUUID VARCHAR(36) PRIMARY KEY NOT NULL, " +
                 "DisplayName TEXT, " +
-                "Currency DOUBLE, " +
-                "GuildPrestigeLevel INT, " +
-                "GuildMaxLevel INT, " +
-                "GuildActiveLevel INT, " +
+                "CurrencyV2 DOUBLE, " +
                 "QuestStatus BLOB, " +
                 "Score INT, " +
                 "Kills INT, " +
@@ -30,17 +27,26 @@ public class GenerateDatabase {
                 "BackTeleportLocation TEXT, " +
                 "UseBookMenus TINYINT(1), " +
                 "DismissEMStatusScreenMessage TINYINT(1), " +
-                "DungeonBossLockouts BLOB" +
+                "DungeonBossLockouts BLOB, " +
+                "QuestLockouts BLOB, " +
+                "SkillXP_ARMOR BIGINT, " +
+                "SkillXP_SWORDS BIGINT, " +
+                "SkillXP_AXES BIGINT, " +
+                "SkillXP_BOWS BIGINT, " +
+                "SkillXP_CROSSBOWS BIGINT, " +
+                "SkillXP_TRIDENTS BIGINT, " +
+                "SkillXP_HOES BIGINT, " +
+                "SkillXP_MACES BIGINT, " +
+                "SkillXP_SPEARS BIGINT, " +
+                "SkillBonusSelections BLOB, " +
+                "GamblingDebt DOUBLE" +
                 ");";
         statement.executeUpdate(sql);
         statement.close();
 
         // Check and add missing columns if any
         addEntryIfEmpty("DisplayName", ColumnValues.TEXT);
-        addEntryIfEmpty("Currency", ColumnValues.REAL);
-        addEntryIfEmpty("GuildPrestigeLevel", ColumnValues.INT);
-        addEntryIfEmpty("GuildMaxLevel", ColumnValues.INT);
-        addEntryIfEmpty("GuildActiveLevel", ColumnValues.INT);
+        addEntryIfEmpty("CurrencyV2", ColumnValues.REAL);
         addEntryIfEmpty("QuestStatus", ColumnValues.BLOB);
         addEntryIfEmpty("Score", ColumnValues.INT);
         addEntryIfEmpty("Kills", ColumnValues.INT);
@@ -52,6 +58,24 @@ public class GenerateDatabase {
         addEntryIfEmpty("UseBookMenus", ColumnValues.BOOLEAN);
         addEntryIfEmpty("DismissEMStatusScreenMessage", ColumnValues.BOOLEAN);
         addEntryIfEmpty("DungeonBossLockouts", ColumnValues.BLOB);
+        addEntryIfEmpty("QuestLockouts", ColumnValues.BLOB);
+
+        // Skill XP columns
+        addEntryIfEmpty("SkillXP_ARMOR", ColumnValues.BIGINT);
+        addEntryIfEmpty("SkillXP_SWORDS", ColumnValues.BIGINT);
+        addEntryIfEmpty("SkillXP_AXES", ColumnValues.BIGINT);
+        addEntryIfEmpty("SkillXP_BOWS", ColumnValues.BIGINT);
+        addEntryIfEmpty("SkillXP_CROSSBOWS", ColumnValues.BIGINT);
+        addEntryIfEmpty("SkillXP_TRIDENTS", ColumnValues.BIGINT);
+        addEntryIfEmpty("SkillXP_HOES", ColumnValues.BIGINT);
+        addEntryIfEmpty("SkillXP_MACES", ColumnValues.BIGINT);
+        addEntryIfEmpty("SkillXP_SPEARS", ColumnValues.BIGINT);
+
+        // Skill bonus selections (JSON)
+        addEntryIfEmpty("SkillBonusSelections", ColumnValues.BLOB);
+
+        // Gambling debt
+        addEntryIfEmpty("GamblingDebt", ColumnValues.REAL);
     }
 
     private static void addEntryIfEmpty(String columnName, ColumnValues columnValues) {
@@ -86,6 +110,7 @@ public class GenerateDatabase {
     private enum ColumnValues {
         BLOB,
         INT,
+        BIGINT,
         TEXT,
         REAL,
         BOOLEAN

@@ -1,9 +1,8 @@
 package com.magmaguy.elitemobs.items;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.adventurersguild.GuildRank;
+import com.magmaguy.elitemobs.antiexploit.FarmingProtection;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
-import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.ProceduralItemGenerationSettingsConfig;
 import com.magmaguy.elitemobs.config.SpecialItemSystemsConfig;
@@ -53,29 +52,27 @@ public class LootTables implements Listener {
 
             if (!eliteEntity.isEliteLoot()) continue;
 
+            // Check if mob is too low level for loot (5+ levels below combat level)
+            // Only applies to natural elites, not custom bosses
+            if (!(eliteEntity instanceof CustomBossEntity) && !FarmingProtection.shouldDropLoot(player, eliteEntity.getLevel())) {
+                continue; // No loot for low-level mobs
+            }
+
+            // Check if player is capped from farming natural elites
+            if (!(eliteEntity instanceof CustomBossEntity) && FarmingProtection.isPlayerCapped(player)) {
+                continue; // Player is capped, no loot
+            }
+
             double itemLevel = setItemTier(eliteEntity.getLevel());
             double eliteLevel = eliteEntity.getLevel();
-            if (AdventurersGuildConfig.isGuildLootLimiter()) {
-                if (itemLevel > GuildRank.getActiveGuildRank(player) * 10) {
-                    itemLevel = GuildRank.getActiveGuildRank(player) * 10D;
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(AdventurersGuildConfig.getLootLimiterMessage()));
-                        }
-                    }.runTaskLater(MetadataHandler.PLUGIN, 20 * 10L);
-                }
-            }
 
             if (eliteEntity.getPower("bonus_coins.yml") == null)
                 new ItemLootShower(itemLevel, eliteLevel, eliteEntity.getUnsyncedLivingEntity().getLocation(), player);
 
             if (!(eliteEntity.isRandomLoot())) continue;
 
-            if (AdventurersGuildConfig.isGuildLootLimiter())
-                generateLoot((int) Math.floor(itemLevel), eliteEntity, player);
-            else
-                generateLoot(eliteEntity, player);
+            // Skill-based gear restriction now handles equipping, not drops
+            generateLoot(eliteEntity, player);
 
             if (SpecialItemSystemsConfig.isDropSpecialLoot()) {
                 if (eliteEntity instanceof CustomBossEntity customBossEntity &&
