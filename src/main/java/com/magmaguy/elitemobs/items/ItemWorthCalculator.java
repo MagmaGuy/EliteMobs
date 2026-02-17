@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.items;
 
-import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantment;
@@ -23,17 +22,10 @@ public class ItemWorthCalculator {
         // double value = ItemTagger.getItemValue(itemStack);
         // if (value != -1) return value;
 
-        double prestigeMultiplier;
-        if (player == null)
-            prestigeMultiplier = 1;
-        else
-            prestigeMultiplier = GuildRank.currencyBonusMultiplier(GuildRank.getGuildPrestigeRank(player));
-
         return 1 + Round.twoDecimalPlaces(
                 (EconomySettingsConfig.getMaterialWorth(itemStack.getType()) +
                         getAllEnchantmentValues(itemStack) +
-                        getAllPotionEffectValues(itemStack.getItemMeta())) *
-                        prestigeMultiplier);
+                        getAllPotionEffectValues(itemStack.getItemMeta())));
 
     }
 

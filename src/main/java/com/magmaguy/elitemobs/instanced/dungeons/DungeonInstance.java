@@ -13,6 +13,7 @@ import com.magmaguy.elitemobs.dungeons.utility.DungeonUtils;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.instanced.WorldOperationQueue;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomMusic;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.InstancedBossEntity;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
@@ -40,6 +41,7 @@ public class DungeonInstance extends MatchInstance {
     }
 
     private final List<DungeonObjective> dungeonObjectives = new ArrayList<>();
+    private boolean instanceRemovalScheduled = false;
     @Getter
     private World world;
     @Getter
@@ -82,13 +84,13 @@ public class DungeonInstance extends MatchInstance {
     public static void setupInstancedDungeon(Player player, String instancedDungeonConfigFieldsString, String difficultyName) {
         ContentPackagesConfigFields instancedDungeonsConfigFields = ContentPackagesConfig.getDungeonPackages().get(instancedDungeonConfigFieldsString);
         if (instancedDungeonsConfigFields == null) {
-            player.sendMessage("[EliteMobs] Failed to get data for dungeon " + instancedDungeonConfigFieldsString + "! The dungeon will not start.");
+            player.sendMessage(DungeonsConfig.getDungeonDataFailedMessage().replace("$dungeon", instancedDungeonConfigFieldsString));
             return;
         }
 
         if (instancedDungeonsConfigFields.getPermission() != null && !instancedDungeonsConfigFields.getPermission().isEmpty())
             if (!player.hasPermission(instancedDungeonsConfigFields.getPermission())) {
-                player.sendMessage("[EliteMobs] You don't have the permission to go to this dungeon!");
+                player.sendMessage(DungeonsConfig.getDungeonNoPermissionMessage());
                 return;
             }
 
@@ -111,7 +113,7 @@ public class DungeonInstance extends MatchInstance {
                 instancedDungeonsConfigFields);
         new EventCaller(worldInstanceEvent);
         if (worldInstanceEvent.isCancelled()) {
-            player.sendMessage("[EliteMobs] Something cancelled the instancing event! The dungeon will not start.");
+            player.sendMessage(DungeonsConfig.getDungeonCancelledEventMessage());
             return false;
         }
         return true;
@@ -120,7 +122,7 @@ public class DungeonInstance extends MatchInstance {
     protected static File cloneWorldFiles(ContentPackagesConfigFields instancedDungeonsConfigFields, String instancedWordName, Player player) {
         File targetFile = WorldInstantiator.cloneWorld(instancedDungeonsConfigFields.getWorldName(), instancedWordName, instancedDungeonsConfigFields.getDungeonConfigFolderName());
         if (targetFile == null) {
-            player.sendMessage("[EliteMobs] Failed to copy the world! Report this to the dev. The dungeon will not start.");
+            player.sendMessage(DungeonsConfig.getDungeonCopyFailedMessage());
             return null;
         }
         return targetFile;
@@ -132,9 +134,13 @@ public class DungeonInstance extends MatchInstance {
                                                               String difficultyName) {
         World world = DungeonUtils.loadWorld(instancedWordName, instancedDungeonsConfigFields.getEnvironment(), instancedDungeonsConfigFields);
         if (world == null) {
-            player.sendMessage("[EliteMobs] Failed to load the world! Report this to the dev. The dungeon will not start.");
+            player.sendMessage(DungeonsConfig.getDungeonWorldLoadFailedMessage());
             return null;
         }
+
+        // Initialize dungeon music for this instanced world
+        if (instancedDungeonsConfigFields.getSong() != null)
+            new CustomMusic(instancedDungeonsConfigFields.getSong(), instancedDungeonsConfigFields, world);
 
         //Location where players are teleported to start completing the dungeon
         Location startLocation = ConfigurationLocation.serialize(instancedDungeonsConfigFields.getStartLocationString());
@@ -156,7 +162,7 @@ public class DungeonInstance extends MatchInstance {
     public boolean addNewPlayer(Player player) {
         if (!super.addNewPlayer(player)) return false;
         if (levelSync > 0)
-            player.sendMessage("[EliteMobs] Dungeon difficulty is set to " + difficultyName + " ! Level sync caps your item level to " + levelSync + ".");
+            player.sendMessage(DungeonsConfig.getDungeonDifficultyMessage().replace("$difficulty", difficultyName).replace("$levelSync", String.valueOf(levelSync)));
         return true;
     }
 
@@ -203,6 +209,13 @@ public class DungeonInstance extends MatchInstance {
     }
 
     public void removeInstance() {
+        // Prevent multiple removal attempts for the same instance
+        if (instanceRemovalScheduled) {
+            Logger.debug("removeInstance() called but already scheduled for " + (world != null ? world.getName() : "null world"));
+            return;
+        }
+        instanceRemovalScheduled = true;
+
         participants.forEach(player -> player.sendMessage(DungeonsConfig.getInstancedDungeonClosingInstanceMessage()));
         HashSet<Player> participants = new HashSet<>(this.participants);
         participants.forEach(this::removeAnyKind);
@@ -212,6 +225,10 @@ public class DungeonInstance extends MatchInstance {
             Logger.warn("Instanced dungeon's world was already unloaded before removing the entities in it! This shouldn't happen, but doesn't break anything.");
             return;
         }
+
+        String worldName = world.getName();
+        Logger.debug("removeInstance() scheduling world deletion for " + worldName + " in 30 seconds");
+
         world.getEntities().forEach(entity -> EntityTracker.unregister(entity, RemovalReason.WORLD_UNLOAD));
         new RemoveInstanceTask(dungeonInstance).runTaskLater(MetadataHandler.PLUGIN, 20 * 30L);
     }
@@ -360,9 +377,41 @@ public class DungeonInstance extends MatchInstance {
 
         @Override
         public void run() {
+            // Check if world was already removed
+            if (world == null) {
+                Logger.debug("RemoveInstanceTask: World already null, skipping deletion");
+                return;
+            }
+
             new EventCaller(new InstancedDungeonRemoveEvent(dungeonInstance));
             dungeonInstances.remove(dungeonInstance);
-            TemporaryWorldManager.permanentlyDeleteWorld(world);
+
+            World worldToDelete = world;
+            String worldName = worldToDelete.getName();
+            world = null; // Clear reference before deletion to prevent race conditions
+
+            // Log diagnostic info before attempting deletion
+            int entityCount = worldToDelete.getEntities().size();
+            int playerCount = worldToDelete.getPlayers().size();
+            int loadedChunks = worldToDelete.getLoadedChunks().length;
+
+            if (playerCount > 0) {
+                Logger.warn("Attempting to delete world " + worldName + " with " + playerCount + " players still in it! This will likely fail.");
+                for (org.bukkit.entity.Player p : worldToDelete.getPlayers()) {
+                    Logger.warn(" - Player still in world: " + p.getName());
+                }
+            }
+
+            Logger.debug("Deleting instanced world " + worldName + " (entities: " + entityCount + ", chunks: " + loadedChunks + ")");
+
+            try {
+                // Disable auto-save to prevent new async save tasks from being queued during unload
+                worldToDelete.setAutoSave(false);
+                TemporaryWorldManager.permanentlyDeleteWorld(worldToDelete);
+            } catch (Exception e) {
+                Logger.warn("Exception while deleting world " + worldName + ": " + e.getMessage());
+                e.printStackTrace();
+            }
         }
     }
 }

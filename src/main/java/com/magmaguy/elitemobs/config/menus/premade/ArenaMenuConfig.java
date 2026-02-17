@@ -21,6 +21,8 @@ public class ArenaMenuConfig extends MenusConfigFields {
     private static ItemStack spectatorItem;
     @Getter
     private static int spectatorItemSlot;
+    @Getter
+    private static String invalidArenaMessage;
 
     public ArenaMenuConfig() {
         super("arena_menu", true);
@@ -35,6 +37,8 @@ public class ArenaMenuConfig extends MenusConfigFields {
         spectatorItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "spectatorItem",
                 ItemStackGenerator.generateItemStack(Material.SPYGLASS, "&aSpectate!", List.of("&2Spectate players in the arena!"), MetadataHandler.signatureID), true);
         spectatorItemSlot = ConfigurationEngine.setInt(fileConfiguration, "spectatorItemSlot", 2);
+        invalidArenaMessage = ConfigurationEngine.setString(file, fileConfiguration, "invalidArenaMessage",
+                "&4[EliteMobs] &cInvalid arena name! The arena you are trying to join is not correctly setup.", true);
     }
 
 }

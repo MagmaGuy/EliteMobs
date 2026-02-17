@@ -24,5 +24,6 @@ public class PrimisMetaPack extends ContentPackagesConfigFields {
                 "&2many bosses and npcs, among other things!",
                 "&2Also has custom models!"
         ));
+        setNightbreakSlug("primis-adventure");
     }
 }

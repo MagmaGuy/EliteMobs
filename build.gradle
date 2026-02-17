@@ -32,7 +32,7 @@ processResources {
 }
 
 group 'com.magmaguy'
-version '9.6.3'
+version '10.0.0'
 
 repositories {
     maven {
@@ -86,7 +86,7 @@ repositories {
 
 dependencies {
     //Spigot API
-    compileOnly "org.spigotmc:spigot-api:1.21.10-R0.1-SNAPSHOT"
+    compileOnly "org.spigotmc:spigot-api:1.21.11-R0.1-SNAPSHOT"
     //WorldGuard API
     compileOnly group: 'com.sk89q.worldguard', name: 'worldguard-bukkit', version: '7.0.7'
     //Vault
@@ -110,7 +110,7 @@ dependencies {
     //Model Engine - legacy
     compileOnly "com.ticxo.modelengine:api:R3.1.7"
     //Free Minecraft Models
-    compileOnly (group: 'com.magmaguy', name: 'FreeMinecraftModels', version: '2.3.13'){
+    compileOnly (group: 'com.magmaguy', name: 'FreeMinecraftModels', version: '2.3.17'){
         changing = true
     }
     // Mythic Mobs integration - currently only for arenas
@@ -119,10 +119,10 @@ dependencies {
     ///Shaded in
     implementation group: 'org.bstats', name: 'bstats-bukkit', version: '3.0.2'
     implementation group: 'commons-io', name: 'commons-io', version: '2.7'
-    implementation (group: 'com.magmaguy', name: 'EasyMinecraftGoals-dist', version: '1.19.22'){
+    implementation (group: 'com.magmaguy', name: 'EasyMinecraftGoals-dist', version: '1.19.25'){
         changing = true
     }
-    implementation (group: 'com.magmaguy', name: 'MagmaCore', version: '1.22-SNAPSHOT'){
+    implementation (group: 'com.magmaguy', name: 'MagmaCore', version: '1.26-SNAPSHOT'){
         changing = true
     }
 
@@ -140,13 +140,11 @@ String packagePath = 'com.magmaguy.shaded'
 
 // Relocating a Package
 shadowJar {
-    dependencies {
-        // Relocate bStats
-        relocate('org.bstats', packagePath + '.bstats')
-        // Relocate MagmaCore
-//        relocate('com.magmaguy.magmacore', 'com.magmaguy.elitemobs.magmacore')
-        relocate('com.magmaguy.easyminecraftgoals', 'com.magmaguy.elitemobs.easyminecraftgoals')
-    }
+    // Relocate bStats
+    relocate 'org.bstats', packagePath + '.bstats'
+    // Relocate EasyMinecraftGoals
+    relocate 'com.magmaguy.easyminecraftgoals', 'com.magmaguy.elitemobs.easyminecraftgoals'
+
     archiveClassifier.set(null)
     archiveFileName.set(project.name + ".jar")
     destinationDirectory.set(new File("testbed/plugins"))

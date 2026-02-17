@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.combatsystem.displays;
 
+import com.magmaguy.easyminecraftgoals.internal.FakeText;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.api.EliteMobEnterCombatEvent;
@@ -11,13 +12,17 @@ import com.magmaguy.elitemobs.config.enchantments.premade.CriticalStrikesConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.utils.VisualDisplay;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.Round;
 import org.bukkit.*;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
-import org.bukkit.entity.*;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -26,10 +31,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.EulerAngle;
-import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
-import org.joml.AxisAngle4f;
-import org.joml.Vector3f;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -63,6 +65,7 @@ public class BossHealthDisplay implements Listener {
     private static final String COLOR_DAMAGE = "&c";         // Red for damage
     private static final String COLOR_HEAL = "&a";           // Green for healing
     private static final String COLOR_CRIT = "&d";           // Magenta for crits
+    private static final String COLOR_XP = "&e";             // Yellow/gold for XP
 
     // Proximity check range for high multiplier bosses
     private static final double PROXIMITY_RANGE = 30.0;
@@ -70,11 +73,20 @@ public class BossHealthDisplay implements Listener {
     // Popup animation duration in ticks
     private static final int POPUP_DURATION_TICKS = 20;
 
+    // Number formatting thresholds
+    private static final double THOUSAND = 1_000D;
+    private static final double MILLION = 1_000_000D;
+    private static final double BILLION = 1_000_000_000D;
+    private static final double TRILLION = 1_000_000_000_000D;
+
     // Active displays per elite entity
     private static final Map<UUID, HealthDisplayData> activeDisplays = new ConcurrentHashMap<>();
 
     // Active popup displays (for animated cleanup)
     private static final List<PopupData> activePopups = Collections.synchronizedList(new ArrayList<>());
+
+    // Active XP popups with animated gradients
+    private static final List<XpPopupData> activeXpPopups = Collections.synchronizedList(new ArrayList<>());
 
     // Master update task
     private static BukkitTask masterUpdateTask = null;
@@ -126,6 +138,18 @@ public class BossHealthDisplay implements Listener {
                         }
                     }
                 }
+
+                // Update XP popup animations (with animated gradients)
+                synchronized (activeXpPopups) {
+                    Iterator<XpPopupData> xpPopupIterator = activeXpPopups.iterator();
+                    while (xpPopupIterator.hasNext()) {
+                        XpPopupData xpPopup = xpPopupIterator.next();
+                        if (!xpPopup.update()) {
+                            xpPopup.cleanup();
+                            xpPopupIterator.remove();
+                        }
+                    }
+                }
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1); // Run every tick for smooth animations
     }
@@ -150,6 +174,39 @@ public class BossHealthDisplay implements Listener {
             }
             activePopups.clear();
         }
+
+        synchronized (activeXpPopups) {
+            for (XpPopupData xpPopup : activeXpPopups) {
+                xpPopup.cleanup();
+            }
+            activeXpPopups.clear();
+        }
+    }
+
+    /**
+     * Formats a number with K, M, B, T suffixes for large values.
+     * Examples: 1500 -> "1.5K", 2300000 -> "2.3M", 7040000000 -> "7.04B"
+     *
+     * @param value The number to format
+     * @return Formatted string with appropriate suffix
+     */
+    private static String formatNumber(double value) {
+        if (value < 0) {
+            return "-" + formatNumber(-value);
+        }
+        if (value >= TRILLION) {
+            return Round.twoDecimalPlaces(value / TRILLION) + "T";
+        }
+        if (value >= BILLION) {
+            return Round.twoDecimalPlaces(value / BILLION) + "B";
+        }
+        if (value >= MILLION) {
+            return Round.twoDecimalPlaces(value / MILLION) + "M";
+        }
+        if (value >= THOUSAND) {
+            return Round.twoDecimalPlaces(value / THOUSAND) + "K";
+        }
+        return String.valueOf(Round.twoDecimalPlaces(value));
     }
 
     /**
@@ -170,84 +227,50 @@ public class BossHealthDisplay implements Listener {
     }
 
     /**
-     * Creates a damage popup with animation
+     * Creates an XP gain popup at the specified location, visible only to the specified player.
+     * Uses an animated gold/yellow gradient that shifts over time.
+     *
+     * @param location The location where the popup should appear (typically at the dead mob's location)
+     * @param player   The player who should see the popup
+     * @param xpAmount The amount of XP gained
      */
-    private void createDamagePopup(EliteEntity eliteEntity, double damage, boolean isCritical,
-                                   double damageModifier, Vector offset, Player player) {
-        if (!MobCombatSettingsConfig.isDisplayDamageOnHit()) return;
+    public static void createXPPopup(Location location, Player player, long xpAmount) {
+        if (location == null || location.getWorld() == null || player == null) return;
+        if (!player.isOnline()) return;
 
-        LivingEntity entity = eliteEntity.getUnsyncedLivingEntity();
-        if (entity == null || !entity.isValid()) return;
+        // Add slight random offset for visual variety
+        Vector offset = new Vector(
+                ThreadLocalRandom.current().nextDouble(-0.5, 0.5),
+                ThreadLocalRandom.current().nextDouble(0.5, 1.0),
+                ThreadLocalRandom.current().nextDouble(-0.5, 0.5)
+        );
 
-        Location baseLoc = entity.getLocation().clone();
-        Location mobLocation = eliteEntity.getLocation();
-        double eyeHeight = entity.getEyeHeight();
-        baseLoc.add(offset.getX(), eyeHeight + offset.getY() + 0.3, offset.getZ());
+        Location popupLoc = location.clone().add(offset);
 
-        // Build damage text with modifiers
-        StringBuilder textBuilder = new StringBuilder();
+        // Raw XP text (gradient will be applied and animated by XpPopupData)
+        String xpText = MobCombatSettingsConfig.getXpPopupFormat().replace("$amount", formatNumber(xpAmount));
 
-        // Add weak/resist prefix and effects
-        if (damageModifier < 1) {
-            // Resist hit
-            textBuilder.append(MobCombatSettingsConfig.getResistTextColor());
-            // Play resist sound
-            if (mobLocation.getWorld() != null) {
-                mobLocation.getWorld().playSound(mobLocation, Sound.BLOCK_ANVIL_USE, 1f, 1f);
-            }
-            // Create resist visual effect (shield armor stand)
-            if (MobCombatSettingsConfig.isDoResistEffect() && player != null) {
-                createResistArmorStandEffect(eliteEntity, player);
-            }
-        } else if (damageModifier > 1) {
-            // Weak hit
-            textBuilder.append(MobCombatSettingsConfig.getWeakTextColor());
-            // Play weak sound
-            if (mobLocation.getWorld() != null) {
-                mobLocation.getWorld().playSound(mobLocation, Sound.ENTITY_ITEM_BREAK, 1f, 1f);
-            }
-            // Create weak visual effect (sword text displays)
-            if (MobCombatSettingsConfig.isDoWeakEffect() && player != null) {
-                createWeakVisualEffect(eliteEntity, player);
-            }
-        } else {
-            textBuilder.append(COLOR_DAMAGE);
-        }
+        // Initial gradient text
+        String initialText = ChatColorConverter.convert("<gradient:#FF6B00:#FFD700:#FFFF00>" + xpText + "</gradient>");
 
-        // Add critical indicator
-        if (isCritical) {
-            textBuilder.append(CriticalStrikesConfig.getCriticalHitColor());
-            textBuilder.append("&l");
-        }
+        // Create the popup with warm golden background
+        Color backgroundColor = Color.fromARGB(120, 80, 60, 0);
+        FakeText fakeText = VisualDisplay.createStyledFakeText(
+                popupLoc,
+                initialText,
+                backgroundColor,
+                true,
+                0.85f  // Slightly smaller scale than damage popups
+        );
 
-        textBuilder.append(Round.twoDecimalPlaces(damage));
+        if (fakeText == null) return;
 
-        // Create popup with enhanced display
-        createAnimatedPopup(baseLoc, ChatColorConverter.convert(textBuilder.toString()),
-                isCritical ? PopupType.CRITICAL : PopupType.DAMAGE, isCritical ? 1.3f : 1.0f);
+        // Only show to the player who earned the XP
+        fakeText.displayTo(player);
 
-        // Create additional popup for weak/resist text
-        if (damageModifier < 1) {
-            Vector modifierOffset = offset.clone().subtract(new Vector(0, 0.3, 0));
-            Location modifierLoc = entity.getLocation().clone();
-            modifierLoc.add(modifierOffset.getX(), eyeHeight + modifierOffset.getY() + 0.3, modifierOffset.getZ());
-            createAnimatedPopup(modifierLoc, ChatColorConverter.convert(MobCombatSettingsConfig.getResistText()),
-                    PopupType.RESIST, 0.8f);
-        } else if (damageModifier > 1) {
-            Vector modifierOffset = offset.clone().subtract(new Vector(0, 0.3, 0));
-            Location modifierLoc = entity.getLocation().clone();
-            modifierLoc.add(modifierOffset.getX(), eyeHeight + modifierOffset.getY() + 0.3, modifierOffset.getZ());
-            createAnimatedPopup(modifierLoc, ChatColorConverter.convert(MobCombatSettingsConfig.getWeakText()),
-                    PopupType.WEAK, 0.8f);
-        }
-
-        // Create critical hit popup
-        if (isCritical) {
-            Vector critOffset = offset.clone().add(new Vector(0, 0.4, 0));
-            Location critLoc = entity.getLocation().clone();
-            critLoc.add(critOffset.getX(), eyeHeight + critOffset.getY() + 0.3, critOffset.getZ());
-            createAnimatedPopup(critLoc, ChatColorConverter.convert(CriticalStrikesConfig.getCriticalHitPopup()),
-                    PopupType.CRITICAL, 0.9f);
+        // Add to XP popups for animated gradient
+        synchronized (activeXpPopups) {
+            activeXpPopups.add(new XpPopupData(fakeText, popupLoc, xpText, 0.85f));
         }
     }
 
@@ -311,11 +334,12 @@ public class BossHealthDisplay implements Listener {
         if (!eliteEntity.isValid() || !player.isValid()) return;
         if (!eliteEntity.getLocation().getWorld().equals(player.getWorld())) return;
 
-        TextDisplay[] textDisplays = new TextDisplay[2];
-        textDisplays[0] = generateWeakTextDisplay(player, eliteEntity, -1);
-        textDisplays[1] = generateWeakTextDisplay(player, eliteEntity, 1);
+        FakeText[] fakeTexts = new FakeText[2];
+        Location[] locations = new Location[2];
+        fakeTexts[0] = generateWeakFakeText(player, eliteEntity, -1, locations, 0);
+        fakeTexts[1] = generateWeakFakeText(player, eliteEntity, 1, locations, 1);
 
-        if (textDisplays[0] == null || textDisplays[1] == null) return;
+        if (fakeTexts[0] == null || fakeTexts[1] == null) return;
 
         new BukkitRunnable() {
             int counter = 0;
@@ -324,15 +348,17 @@ public class BossHealthDisplay implements Listener {
             public void run() {
                 if (counter > 10 || !eliteEntity.isValid() || !player.isValid() ||
                         !eliteEntity.getLocation().getWorld().equals(player.getWorld())) {
-                    if (textDisplays[0] != null) EntityTracker.unregister(textDisplays[0], RemovalReason.EFFECT_TIMEOUT);
-                    if (textDisplays[1] != null) EntityTracker.unregister(textDisplays[1], RemovalReason.EFFECT_TIMEOUT);
+                    if (fakeTexts[0] != null) fakeTexts[0].remove();
+                    if (fakeTexts[1] != null) fakeTexts[1].remove();
                     cancel();
                     return;
                 }
-                for (TextDisplay display : textDisplays) {
-                    if (display != null && display.isValid()) {
-                        display.teleport(display.getLocation().add(eliteEntity.getLocation()
-                                .subtract(display.getLocation()).toVector().normalize().multiply(.4)));
+                for (int i = 0; i < fakeTexts.length; i++) {
+                    FakeText display = fakeTexts[i];
+                    if (display != null) {
+                        Location newLoc = locations[i].add(eliteEntity.getLocation()
+                                .subtract(locations[i]).toVector().normalize().multiply(.4));
+                        display.teleport(newLoc);
                     }
                 }
                 counter++;
@@ -340,7 +366,7 @@ public class BossHealthDisplay implements Listener {
         }.runTaskTimer(MetadataHandler.PLUGIN, 1, 1);
     }
 
-    private TextDisplay generateWeakTextDisplay(Player player, EliteEntity eliteEntity, int offset) {
+    private FakeText generateWeakFakeText(Player player, EliteEntity eliteEntity, int offset, Location[] locations, int index) {
         Vector displayVector = player.getLocation().clone().add(new Vector(0, 2, 0))
                 .subtract(eliteEntity.getLocation()).toVector().normalize().multiply(3.0).rotateAroundY(Math.PI / 8 * offset);
         Location displayLocation = eliteEntity.getLocation().add(displayVector);
@@ -348,18 +374,100 @@ public class BossHealthDisplay implements Listener {
 
         if (displayLocation.getWorld() == null) return null;
 
-        try {
-            TextDisplay display = displayLocation.getWorld().spawn(displayLocation, TextDisplay.class, td -> {
-                td.setText(ChatColorConverter.convert("&9&l✦"));
-                td.setPersistent(false);
-                td.setBillboard(Display.Billboard.CENTER);
-                td.setShadowed(true);
-                td.setBackgroundColor(Color.fromARGB(0, 0, 0, 0));
-            });
-            EntityTracker.registerVisualEffects(display);
-            return display;
-        } catch (Exception e) {
-            return null;
+        locations[index] = displayLocation.clone();
+
+        FakeText fakeText = VisualDisplay.createStyledFakeText(
+                displayLocation,
+                "&9&l✦",
+                Color.fromARGB(0, 0, 0, 0),
+                true,
+                1.0f
+        );
+        if (fakeText != null) {
+            fakeText.displayTo(player);
+        }
+        return fakeText;
+    }
+
+    /**
+     * Creates a damage popup with animation
+     */
+    private void createDamagePopup(EliteEntity eliteEntity, double damage, boolean isCritical,
+                                   double damageModifier, Vector offset, Player player) {
+        if (!MobCombatSettingsConfig.isDisplayDamageOnHit()) return;
+
+        LivingEntity entity = eliteEntity.getUnsyncedLivingEntity();
+        if (entity == null || !entity.isValid()) return;
+
+        Location baseLoc = entity.getLocation().clone();
+        Location mobLocation = eliteEntity.getLocation();
+        double eyeHeight = entity.getEyeHeight();
+        baseLoc.add(offset.getX(), eyeHeight + offset.getY() + 0.3, offset.getZ());
+
+        // Build damage text with modifiers
+        StringBuilder textBuilder = new StringBuilder();
+
+        // Add weak/resist prefix and effects
+        if (damageModifier < 1) {
+            // Resist hit
+            textBuilder.append(MobCombatSettingsConfig.getResistTextColor());
+            // Play resist sound
+            if (mobLocation.getWorld() != null) {
+                mobLocation.getWorld().playSound(mobLocation, Sound.BLOCK_ANVIL_USE, 1f, 1f);
+            }
+            // Create resist visual effect (shield armor stand)
+            if (MobCombatSettingsConfig.isDoResistEffect() && player != null) {
+                createResistArmorStandEffect(eliteEntity, player);
+            }
+        } else if (damageModifier > 1) {
+            // Weak hit
+            textBuilder.append(MobCombatSettingsConfig.getWeakTextColor());
+            // Play weak sound
+            if (mobLocation.getWorld() != null) {
+                mobLocation.getWorld().playSound(mobLocation, Sound.ENTITY_ITEM_BREAK, 1f, 1f);
+            }
+            // Create weak visual effect (sword text displays)
+            if (MobCombatSettingsConfig.isDoWeakEffect() && player != null) {
+                createWeakVisualEffect(eliteEntity, player);
+            }
+        } else {
+            textBuilder.append(COLOR_DAMAGE);
+        }
+
+        // Add critical indicator
+        if (isCritical) {
+            textBuilder.append(CriticalStrikesConfig.getCriticalHitColor());
+            textBuilder.append("&l");
+        }
+
+        textBuilder.append(formatNumber(damage));
+
+        // Create popup with enhanced display
+        createAnimatedPopup(baseLoc, ChatColorConverter.convert(textBuilder.toString()),
+                isCritical ? PopupType.CRITICAL : PopupType.DAMAGE, isCritical ? 1.3f : 1.0f);
+
+        // Create additional popup for weak/resist text
+        if (damageModifier < 1) {
+            Vector modifierOffset = offset.clone().subtract(new Vector(0, 0.3, 0));
+            Location modifierLoc = entity.getLocation().clone();
+            modifierLoc.add(modifierOffset.getX(), eyeHeight + modifierOffset.getY() + 0.3, modifierOffset.getZ());
+            createAnimatedPopup(modifierLoc, MobCombatSettingsConfig.getResistText(),
+                    PopupType.RESIST, 0.8f);
+        } else if (damageModifier > 1) {
+            Vector modifierOffset = offset.clone().subtract(new Vector(0, 0.3, 0));
+            Location modifierLoc = entity.getLocation().clone();
+            modifierLoc.add(modifierOffset.getX(), eyeHeight + modifierOffset.getY() + 0.3, modifierOffset.getZ());
+            createAnimatedPopup(modifierLoc, MobCombatSettingsConfig.getWeakText(),
+                    PopupType.WEAK, 0.8f);
+        }
+
+        // Create critical hit popup
+        if (isCritical) {
+            Vector critOffset = offset.clone().add(new Vector(0, 0.4, 0));
+            Location critLoc = entity.getLocation().clone();
+            critLoc.add(critOffset.getX(), eyeHeight + critOffset.getY() + 0.3, critOffset.getZ());
+            createAnimatedPopup(critLoc, CriticalStrikesConfig.getCriticalHitPopup(),
+                    PopupType.CRITICAL, 0.9f);
         }
     }
 
@@ -386,7 +494,7 @@ public class BossHealthDisplay implements Listener {
         if (isFullHeal) {
             text = MobCombatSettingsConfig.getFullHealMessage();
         } else {
-            text = COLOR_HEAL + "+" + Round.twoDecimalPlaces(healAmount) + " HP";
+            text = COLOR_HEAL + MobCombatSettingsConfig.getHealPopupFormat().replace("$amount", formatNumber(healAmount));
         }
 
         createAnimatedPopup(baseLoc, ChatColorConverter.convert(text), PopupType.HEAL, isFullHeal ? 1.2f : 1.0f);
@@ -398,56 +506,51 @@ public class BossHealthDisplay implements Listener {
     private void createAnimatedPopup(Location location, String text, PopupType type, float scale) {
         if (location == null || location.getWorld() == null) return;
 
-        try {
-            TextDisplay display = location.getWorld().spawn(location, TextDisplay.class, textDisplay -> {
-                textDisplay.setText(text);
-                textDisplay.setPersistent(false);
-                textDisplay.setBillboard(Display.Billboard.CENTER);
-                textDisplay.setShadowed(true);
-                textDisplay.setSeeThrough(false);
+        // Determine background color based on type
+        Color backgroundColor;
+        switch (type) {
+            case DAMAGE:
+                backgroundColor = Color.fromARGB(100, 50, 0, 0);
+                break;
+            case CRITICAL:
+                backgroundColor = Color.fromARGB(120, 80, 0, 80);
+                break;
+            case HEAL:
+                backgroundColor = Color.fromARGB(100, 0, 50, 0);
+                break;
+            case WEAK:
+                backgroundColor = Color.fromARGB(100, 0, 0, 80);
+                break;
+            case RESIST:
+                backgroundColor = Color.fromARGB(100, 80, 0, 0);
+                break;
+            case XP:
+                backgroundColor = Color.fromARGB(120, 80, 60, 0);  // Warm golden background
+                break;
+            default:
+                backgroundColor = Color.fromARGB(80, 0, 0, 0);
+        }
 
-                // Set background color based on type
-                switch (type) {
-                    case DAMAGE:
-                        textDisplay.setBackgroundColor(Color.fromARGB(100, 50, 0, 0));
-                        break;
-                    case CRITICAL:
-                        textDisplay.setBackgroundColor(Color.fromARGB(120, 80, 0, 80));
-                        break;
-                    case HEAL:
-                        textDisplay.setBackgroundColor(Color.fromARGB(100, 0, 50, 0));
-                        break;
-                    case WEAK:
-                        textDisplay.setBackgroundColor(Color.fromARGB(100, 0, 0, 80));
-                        break;
-                    case RESIST:
-                        textDisplay.setBackgroundColor(Color.fromARGB(100, 80, 0, 0));
-                        break;
-                }
+        FakeText fakeText = VisualDisplay.createStyledFakeText(
+                location,
+                text,
+                backgroundColor,
+                true,
+                scale
+        );
 
-                // Set up interpolation for smooth animation
-                textDisplay.setInterpolationDelay(0);
-                textDisplay.setInterpolationDuration(POPUP_DURATION_TICKS);
+        if (fakeText == null) return;
 
-                // Initial transformation with scale
-                Transformation transformation = new Transformation(
-                        new Vector3f(0, 0, 0),           // Translation
-                        new AxisAngle4f(0, 0, 1, 0),     // Left rotation
-                        new Vector3f(scale, scale, scale), // Scale
-                        new AxisAngle4f(0, 0, 1, 0)      // Right rotation
-                );
-                textDisplay.setTransformation(transformation);
-            });
-
-            EntityTracker.registerVisualEffects(display);
-
-            // Add to active popups for animation
-            synchronized (activePopups) {
-                activePopups.add(new PopupData(display, location, type, scale));
+        // Show to all nearby players
+        for (Player player : location.getWorld().getPlayers()) {
+            if (player.getLocation().distanceSquared(location) <= 900) { // 30 block range
+                fakeText.displayTo(player);
             }
+        }
 
-        } catch (Exception e) {
-            // Silently fail if TextDisplay creation fails
+        // Add to active popups for animation
+        synchronized (activePopups) {
+            activePopups.add(new PopupData(fakeText, location, type, scale));
         }
     }
 
@@ -465,14 +568,18 @@ public class BossHealthDisplay implements Listener {
         createDamagePopup(eliteEntity, event.getDamage(), event.isCriticalStrike(),
                 event.getDamageModifier(), offset, event.getPlayer());
 
-        // Update health display
+        // Update health display - delay by 1 tick so damage is applied first
         if (MobCombatSettingsConfig.isDisplayVisualHealthBars() ||
             MobCombatSettingsConfig.isDisplayNumericHealth() ||
             MobCombatSettingsConfig.isDisplayBossBarForHighMultiplier()) {
 
             HealthDisplayData data = getOrCreateDisplay(eliteEntity);
             data.resetCombatTimer();
-            data.updateHealthDisplay();
+            Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, () -> {
+                if (eliteEntity.isValid()) {
+                    data.updateHealthDisplay();
+                }
+            });
         }
     }
 
@@ -528,21 +635,21 @@ public class BossHealthDisplay implements Listener {
      * Popup type enum for different display styles
      */
     private enum PopupType {
-        DAMAGE, CRITICAL, HEAL, WEAK, RESIST
+        DAMAGE, CRITICAL, HEAL, WEAK, RESIST, XP
     }
 
     /**
      * Data class for animated popups
      */
     private static class PopupData {
-        private final TextDisplay display;
+        private final FakeText display;
         private final Location startLocation;
         private final PopupType type;
         private final float baseScale;
         private final int maxTicks = POPUP_DURATION_TICKS;
         private int ticksAlive = 0;
 
-        public PopupData(TextDisplay display, Location startLocation, PopupType type, float baseScale) {
+        public PopupData(FakeText display, Location startLocation, PopupType type, float baseScale) {
             this.display = display;
             this.startLocation = startLocation.clone();
             this.type = type;
@@ -555,7 +662,7 @@ public class BossHealthDisplay implements Listener {
         public boolean update() {
             ticksAlive++;
 
-            if (ticksAlive >= maxTicks || display == null || !display.isValid()) {
+            if (ticksAlive >= maxTicks || display == null) {
                 return false;
             }
 
@@ -579,15 +686,9 @@ public class BossHealthDisplay implements Listener {
                 scaleMultiplier = 1.3f;
             }
 
-            // Update scale transformation
+            // Update scale
             float finalScale = baseScale * scaleMultiplier;
-            Transformation transformation = new Transformation(
-                    new Vector3f(0, 0, 0),
-                    new AxisAngle4f(0, 0, 1, 0),
-                    new Vector3f(finalScale, finalScale, finalScale),
-                    new AxisAngle4f(0, 0, 1, 0)
-            );
-            display.setTransformation(transformation);
+            display.setScale(finalScale);
 
             // Fade out near end
             if (progress > 0.7f) {
@@ -599,8 +700,128 @@ public class BossHealthDisplay implements Listener {
         }
 
         public void cleanup() {
-            if (display != null && display.isValid()) {
-                EntityTracker.unregister(display, RemovalReason.EFFECT_TIMEOUT);
+            if (display != null) {
+                display.remove();
+            }
+        }
+    }
+
+    /**
+     * Data class for animated XP popups with shifting gradient
+     */
+    private static class XpPopupData {
+        private static final int XP_POPUP_DURATION_TICKS = 50; // 2.5 seconds
+        private static final java.awt.Color[] GRADIENT_COLORS = {
+                new java.awt.Color(0xFF, 0x6B, 0x00), // Orange
+                new java.awt.Color(0xFF, 0xD7, 0x00), // Gold
+                new java.awt.Color(0xFF, 0xFF, 0x00), // Yellow
+                new java.awt.Color(0xFF, 0xD7, 0x00), // Gold (loop back)
+                new java.awt.Color(0xFF, 0x6B, 0x00)  // Orange (loop back)
+        };
+
+        private final FakeText display;
+        private final Location startLocation;
+        private final String rawText;
+        private final float baseScale;
+        private int ticksAlive = 0;
+
+        public XpPopupData(FakeText display, Location startLocation, String rawText, float baseScale) {
+            this.display = display;
+            this.startLocation = startLocation.clone();
+            this.rawText = rawText;
+            this.baseScale = baseScale;
+        }
+
+        /**
+         * Updates the XP popup animation. Returns false when animation is complete.
+         */
+        public boolean update() {
+            ticksAlive++;
+
+            if (ticksAlive >= XP_POPUP_DURATION_TICKS || display == null) {
+                return false;
+            }
+
+            // Calculate animation progress (0 to 1)
+            float progress = (float) ticksAlive / XP_POPUP_DURATION_TICKS;
+
+            // Move upward slowly
+            double yOffset = progress * 1.2; // Rise 1.2 blocks over 2.5 seconds
+            Location newLoc = startLocation.clone().add(0, yOffset, 0);
+            display.teleport(newLoc);
+
+            // Update gradient with shift based on time
+            float gradientShift = (ticksAlive % 20) / 20f; // Complete cycle every second
+            String shiftedGradientText = applyShiftedGradient(rawText, gradientShift);
+            display.setText(shiftedGradientText);
+
+            // Scale animation - gentle pulse
+            float pulsePhase = (float) Math.sin(ticksAlive * 0.15) * 0.1f;
+            float scaleMultiplier;
+            if (progress < 0.1f) {
+                // Quick grow at start
+                scaleMultiplier = 1.0f + (progress / 0.1f) * 0.2f;
+            } else if (progress > 0.8f) {
+                // Shrink at end
+                scaleMultiplier = 1.2f - ((progress - 0.8f) / 0.2f) * 0.4f;
+            } else {
+                // Gentle pulse in the middle
+                scaleMultiplier = 1.2f + pulsePhase;
+            }
+
+            display.setScale(baseScale * scaleMultiplier);
+
+            // Fade out near end
+            if (progress > 0.75f) {
+                byte opacity = (byte) ((1.0f - ((progress - 0.75f) / 0.25f)) * 255);
+                display.setTextOpacity(opacity);
+            }
+
+            return true;
+        }
+
+        /**
+         * Applies a shifted gradient to the text for animation effect.
+         */
+        private String applyShiftedGradient(String text, float shift) {
+            if (text == null || text.isEmpty()) return "";
+
+            StringBuilder result = new StringBuilder();
+            int length = text.length();
+            int numColors = GRADIENT_COLORS.length;
+
+            for (int i = 0; i < length; i++) {
+                // Calculate position with shift for animation
+                float position = ((float) i / length + shift) % 1.0f;
+                float scaledPos = position * (numColors - 1);
+                int colorIdx1 = (int) scaledPos;
+                int colorIdx2 = (colorIdx1 + 1) % numColors;
+                float localRatio = scaledPos - colorIdx1;
+
+                java.awt.Color interpolated = interpolateColor(GRADIENT_COLORS[colorIdx1], GRADIENT_COLORS[colorIdx2], localRatio);
+                String hex = String.format("#%02X%02X%02X", interpolated.getRed(), interpolated.getGreen(), interpolated.getBlue());
+
+                try {
+                    result.append(net.md_5.bungee.api.ChatColor.of(hex)).append(text.charAt(i));
+                } catch (Exception e) {
+                    // Fallback for older versions
+                    result.append(org.bukkit.ChatColor.GOLD).append(text.charAt(i));
+                }
+            }
+
+            return result.toString();
+        }
+
+        private java.awt.Color interpolateColor(java.awt.Color c1, java.awt.Color c2, float ratio) {
+            int r = (int) (c1.getRed() + ratio * (c2.getRed() - c1.getRed()));
+            int g = (int) (c1.getGreen() + ratio * (c2.getGreen() - c1.getGreen()));
+            int b = (int) (c1.getBlue() + ratio * (c2.getBlue() - c1.getBlue()));
+            return new java.awt.Color(r, g, b);
+        }
+
+        public void cleanup() {
+            if (display != null) {
+                display.remove();
             }
         }
     }
@@ -610,10 +831,10 @@ public class BossHealthDisplay implements Listener {
      */
     private static class HealthDisplayData {
         private final EliteEntity eliteEntity;
-        private final List<TextDisplay> healthBarDisplays = new ArrayList<>();
+        private final List<FakeText> healthBarDisplays = new ArrayList<>();
         private final Map<Player, BossBar> playerBossBars = new ConcurrentHashMap<>();
         private final double healthMultiplier;
-        private TextDisplay numericDisplay = null;
+        private FakeText numericDisplay = null;
         private long lastCombatTime;
 
         public HealthDisplayData(EliteEntity eliteEntity) {
@@ -665,14 +886,14 @@ public class BossHealthDisplay implements Listener {
         }
 
         private void cleanupVisualDisplays() {
-            if (numericDisplay != null && numericDisplay.isValid()) {
-                EntityTracker.unregister(numericDisplay, RemovalReason.EFFECT_TIMEOUT);
+            if (numericDisplay != null) {
+                numericDisplay.remove();
                 numericDisplay = null;
             }
 
-            for (TextDisplay display : healthBarDisplays) {
-                if (display != null && display.isValid()) {
-                    EntityTracker.unregister(display, RemovalReason.EFFECT_TIMEOUT);
+            for (FakeText display : healthBarDisplays) {
+                if (display != null) {
+                    display.remove();
                 }
             }
             healthBarDisplays.clear();
@@ -717,7 +938,7 @@ public class BossHealthDisplay implements Listener {
                 // Position each row with 0.22 spacing
                 Location displayLoc = baseLoc.clone().add(0, row * 0.22, 0);
 
-                TextDisplay display = createHealthBarDisplay(displayLoc, ChatColorConverter.convert(barText.toString()));
+                FakeText display = createHealthBarFakeText(displayLoc, ChatColorConverter.convert(barText.toString()));
                 if (display != null) {
                     healthBarDisplays.add(display);
                 }
@@ -733,7 +954,7 @@ public class BossHealthDisplay implements Listener {
             double healthPercent = (currentHealth / maxHealth) * 100;
             String color = getHealthColor(healthPercent);
 
-            String numericText = color + "&l" + Round.twoDecimalPlaces(currentHealth) + " &7/ " + color + "&l" + Round.twoDecimalPlaces(maxHealth);
+            String numericText = color + "&l" + formatNumber(currentHealth) + MobCombatSettingsConfig.getHealthDisplaySeparator() + color + "&l" + formatNumber(maxHealth);
 
             Location baseLoc = getBaseLocation();
             if (baseLoc == null) return;
@@ -742,7 +963,7 @@ public class BossHealthDisplay implements Listener {
             BarLayout layout = calculateBarLayout();
             int rows = MobCombatSettingsConfig.isDisplayVisualHealthBars() ? layout.rows : 0;
             Location numericLoc = baseLoc.clone().add(0, rows * 0.22, 0);
-            numericDisplay = createHealthBarDisplay(numericLoc, ChatColorConverter.convert(numericText));
+            numericDisplay = createHealthBarFakeText(numericLoc, ChatColorConverter.convert(numericText));
         }
 
         /**
@@ -818,23 +1039,27 @@ public class BossHealthDisplay implements Listener {
             return entity.getLocation().clone().add(0, height, 0);
         }
 
-        private TextDisplay createHealthBarDisplay(Location location, String text) {
+        private FakeText createHealthBarFakeText(Location location, String text) {
             if (location == null || location.getWorld() == null) return null;
 
-            try {
-                TextDisplay display = location.getWorld().spawn(location, TextDisplay.class, textDisplay -> {
-                    textDisplay.setText(text);
-                    textDisplay.setPersistent(false);
-                    textDisplay.setBillboard(Display.Billboard.CENTER);
-                    textDisplay.setShadowed(true);
-                    textDisplay.setSeeThrough(false);
-                    textDisplay.setBackgroundColor(Color.fromARGB(80, 0, 0, 0));
-                });
-                EntityTracker.registerVisualEffects(display);
-                return display;
-            } catch (Exception e) {
-                return null;
+            FakeText fakeText = VisualDisplay.createStyledFakeText(
+                    location,
+                    text,
+                    Color.fromARGB(80, 0, 0, 0),
+                    true,
+                    1.0f
+            );
+
+            if (fakeText == null) return null;
+
+            // Show to all nearby players
+            for (Player player : location.getWorld().getPlayers()) {
+                if (player.getLocation().distanceSquared(location) <= 900) { // 30 block range
+                    fakeText.displayTo(player);
+                }
             }
+
+            return fakeText;
         }
 
         public void updatePositions() {
@@ -847,15 +1072,15 @@ public class BossHealthDisplay implements Listener {
 
             // Update health bar positions (0.22 spacing between rows)
             for (int i = 0; i < healthBarDisplays.size(); i++) {
-                TextDisplay display = healthBarDisplays.get(i);
-                if (display != null && display.isValid()) {
+                FakeText display = healthBarDisplays.get(i);
+                if (display != null) {
                     Location newLoc = baseLoc.clone().add(0, i * 0.22, 0);
                     display.teleport(newLoc);
                 }
             }
 
             // Update numeric display position (above health bars)
-            if (numericDisplay != null && numericDisplay.isValid()) {
+            if (numericDisplay != null) {
                 int rows = MobCombatSettingsConfig.isDisplayVisualHealthBars() ? layout.rows : 0;
                 Location numericLoc = baseLoc.clone().add(0, rows * 0.22, 0);
                 numericDisplay.teleport(numericLoc);

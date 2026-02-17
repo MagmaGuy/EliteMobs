@@ -10,9 +10,9 @@ public class MagmaguysToothpickConfig extends CustomItemsConfigFields {
         super("magmaguys_toothpick",
                 true,
                 Material.WOODEN_SWORD,
-                "&4Magmaguy&c's &2Toothpick",
+                "<g:#FF4500:#FF6347>Magmaguy</g>&c's <g:#228B22:#32CD32>Toothpick</g>",
                 List.of("&aIn nearly mint condition!"));
         setEnchantments(List.of("VANISHING_CURSE,1"));
-        setCustomModelID("elitemobs:equipment/magmaguys_toothpick");
+        setCustomModelID("elitemobs:gear/magmaguys_toothpick");
     }
 }

@@ -57,9 +57,10 @@ public class CustomBossMegaConsumer {
                 .replace("$reinforcementLevel", ChatColorConverter.convert("&8〔&7") + level + "&8〕&f")
                 .replace("$eventBossLevel", ChatColorConverter.convert("&4「&c" + level + "&4」&f")));
         livingEntity.setCustomName(parsedName);
-        livingEntity.setCustomNameVisible(DefaultConfig.isAlwaysShowNametags());
+        boolean showName = DefaultConfig.isAlwaysShowNametags() || customBossEntity.customBossesConfigFields.isAlwaysShowName();
+        livingEntity.setCustomNameVisible(showName);
         if (Bukkit.getPluginManager().isPluginEnabled("LibsDisguises"))
-            DisguiseEntity.setDisguiseNameVisibility(DefaultConfig.isAlwaysShowNametags(), livingEntity, parsedName);
+            DisguiseEntity.setDisguiseNameVisibility(showName, livingEntity, parsedName);
         customBossEntity.setName(parsedName, false);
     }
 
@@ -131,7 +132,7 @@ public class CustomBossMegaConsumer {
     private void setFrozen(LivingEntity livingEntity) {
         if (!customBossesConfigFields.isFrozen()) return;
         AttributeManager.setAttribute(livingEntity, "generic_movement_speed", 0);
-        livingEntity.setCollidable(false);
+        // Note: Do NOT set collidable to false - it prevents projectiles from hitting the entity
     }
 
     private void setEquipment(LivingEntity livingEntity) {
@@ -166,6 +167,7 @@ public class CustomBossMegaConsumer {
         setFrozen(livingEntity);
         setScale(livingEntity);
         setSilent(livingEntity);
+        setAI(livingEntity);
         customBossEntity.setMovementSpeedAttribute(AttributeManager.getAttributeBaseValue(livingEntity, "generic_movement_speed"));
         customBossEntity.setFollowDistance(AttributeManager.getAttributeBaseValue(livingEntity, "generic_follow_range"));
 
@@ -201,5 +203,10 @@ public class CustomBossMegaConsumer {
 
     private void setSilent(LivingEntity livingEntity){
         if (customBossesConfigFields.isSilent()) livingEntity.setSilent(true);
+    }
+
+    private void setAI(LivingEntity livingEntity) {
+        if (!customBossesConfigFields.isAi() && livingEntity instanceof Mob mob)
+            mob.setAI(false);
     }
 }

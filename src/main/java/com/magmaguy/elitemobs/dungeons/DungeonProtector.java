@@ -1,7 +1,12 @@
 package com.magmaguy.elitemobs.dungeons;
 
+import com.magmaguy.elitemobs.config.CombatTagConfig;
 import com.magmaguy.elitemobs.config.DungeonsConfig;
+import com.magmaguy.elitemobs.treasurechest.TreasureChest;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
@@ -9,8 +14,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.*;
-import org.bukkit.event.player.PlayerBucketEmptyEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.hanging.HangingBreakByEntityEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.HashSet;
@@ -159,8 +164,10 @@ public class DungeonProtector implements Listener {
         if (event.getClickedBlock() == null) return;
         if (shouldBypass(event.getPlayer())) return;
         Material material = event.getClickedBlock().getType();
-        if (material.toString().toLowerCase(Locale.ROOT).endsWith("_door") ||
-                material.toString().toLowerCase(Locale.ROOT).endsWith("_trapdoor"))
+        String materialName = material.toString().toLowerCase(Locale.ROOT);
+        if (materialName.endsWith("_door") ||
+                materialName.endsWith("_trapdoor") ||
+                materialName.endsWith("_fence_gate"))
             event.setCancelled(true);
     }
 
@@ -194,6 +201,94 @@ public class DungeonProtector implements Listener {
     public void preventSignEdits(SignChangeEvent event) {
         if (!EliteMobsWorld.isEliteMobsWorld(event.getPlayer().getWorld().getUID())) return;
         if (shouldBypass(event.getPlayer())) return;
+        event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventContainerAccess(PlayerInteractEvent event) {
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getPlayer().getWorld().getUID())) return;
+        if (shouldBypass(event.getPlayer())) return;
+
+        Block block = event.getClickedBlock();
+        if (block == null) return;
+
+        Material type = block.getType();
+
+        // Check if this is a container type
+        if (type == Material.CHEST || type == Material.TRAPPED_CHEST ||
+                type == Material.BARREL || type == Material.SHULKER_BOX ||
+                type.name().endsWith("_SHULKER_BOX")) {
+
+            // Allow treasure chest interaction
+            if (TreasureChest.getTreasureChest(block.getLocation()) != null) {
+                return;
+            }
+
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventDragonEggInteraction(PlayerInteractEvent event) {
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getPlayer().getWorld().getUID())) return;
+        if (shouldBypass(event.getPlayer())) return;
+
+        Block block = event.getClickedBlock();
+        if (block != null && block.getType() == Material.DRAGON_EGG) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventFlyToggle(PlayerToggleFlightEvent event) {
+        if (!CombatTagConfig.isPreventFlyToggleInDungeons()) return;
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getPlayer().getWorld().getUID())) return;
+        if (event.getPlayer().isOp()) return;
+        if (shouldBypass(event.getPlayer())) return;
+        if (event.isFlying()) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventItemFrameBreak(HangingBreakByEntityEvent event) {
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getEntity().getWorld().getUID())) return;
+        // Check if a player caused the break (directly or via projectile)
+        if (event.getRemover() instanceof Player player) {
+            if (shouldBypass(player)) return;
+        } else if (event.getRemover() instanceof Projectile projectile && projectile.getShooter() instanceof Player player) {
+            if (shouldBypass(player)) return;
+        }
+        event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventItemFrameInteract(PlayerInteractEntityEvent event) {
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getPlayer().getWorld().getUID())) return;
+        if (shouldBypass(event.getPlayer())) return;
+        // Prevent taking items from or rotating item frames
+        if (event.getRightClicked() instanceof ItemFrame) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventArmorStandManipulate(PlayerArmorStandManipulateEvent event) {
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getPlayer().getWorld().getUID())) return;
+        if (shouldBypass(event.getPlayer())) return;
+        event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventArmorStandDamage(EntityDamageByEntityEvent event) {
+        if (!(event.getEntity() instanceof ArmorStand)) return;
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getEntity().getWorld().getUID())) return;
+        // Check if a player caused the damage (directly or via projectile)
+        if (event.getDamager() instanceof Player player) {
+            if (shouldBypass(player)) return;
+        } else if (event.getDamager() instanceof Projectile projectile && projectile.getShooter() instanceof Player player) {
+            if (shouldBypass(player)) return;
+        }
         event.setCancelled(true);
     }
 

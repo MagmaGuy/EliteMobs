@@ -22,5 +22,6 @@ public class OasisMetaPack  extends ContentPackagesConfigFields {
                 "&2Adventures are massive maps with quests,",
                 "&2many bosses and npcs, among other things!"
         ));
+        setNightbreakSlug("the-oasis-adventure");
     }
 }

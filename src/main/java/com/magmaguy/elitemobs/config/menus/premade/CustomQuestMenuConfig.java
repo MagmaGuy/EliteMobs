@@ -57,8 +57,6 @@ public class CustomQuestMenuConfig extends MenusConfigFields {
     private static String objectivesLine;
     @Getter
     private static String rewardsLine;
-    @Getter
-    private static String turnedInTextLines;
     private static String turnedInHoverLines;
     private static String killQuestDefaultSummaryLine;
     private static String fetchQuestDefaultSummaryLine;
@@ -159,7 +157,6 @@ public class CustomQuestMenuConfig extends MenusConfigFields {
         completedHoverLines = ConfigurationEngine.setString(file, fileConfiguration, "completedHoverLines", "&aClick to turn quest in!", true);
         completedCommandLines = ConfigurationEngine.setString(file, fileConfiguration, "completedCommandLines", "/em quest complete $questID", false);
 
-        turnedInTextLines = ConfigurationEngine.setString(file, fileConfiguration, "turnedInTextLines", "&8[Completed!]", true);
         turnedInHoverLines = ConfigurationEngine.setString(file, fileConfiguration, "turnedInHoverLines", "&8Already turned in!", true);
 
         objectivesLine = ConfigurationEngine.setString(file, fileConfiguration, "objectivesLine", "&c&lObjectives:", true);

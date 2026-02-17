@@ -40,6 +40,12 @@ public class WormholeConfigFields extends CustomConfigFields {
     @Getter
     @Setter
     private double sizeMultiplier = 1D;
+    @Getter
+    @Setter
+    private String customModel1 = null;
+    @Getter
+    @Setter
+    private String customModel2 = null;
 
     public WormholeConfigFields(String filename,
                                 boolean isEnabled,
@@ -69,6 +75,8 @@ public class WormholeConfigFields extends CustomConfigFields {
         this.particleColor = processInt("particleColor", particleColor, 0x800080, false);
         this.blindPlayer = processBoolean("blindPlayer", blindPlayer, false, false);
         this.sizeMultiplier = processDouble("sizeMultiplier", sizeMultiplier, 1D, false);
+        this.customModel1 = processString("customModel1", customModel1, null, false);
+        this.customModel2 = processString("customModel2", customModel2, null, false);
     }
 
     public void setWormholeEntryLocation(Location location, int wormholeNumber) {

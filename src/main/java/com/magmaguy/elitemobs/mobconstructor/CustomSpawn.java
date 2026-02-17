@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.mobconstructor;
 
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.ValidWorldsConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
@@ -50,6 +49,38 @@ public class CustomSpawn {
     private Location spawnLocation;
     @Setter
     private boolean keepTrying = true;
+
+    // Cached GameRule for mob spawning (resolved once at runtime)
+    private static GameRule<Boolean> mobSpawningRule = null;
+    private static boolean mobSpawningRuleResolved = false;
+
+    /**
+     * Checks if mob spawning is disabled in the world.
+     * Handles the GameRule rename from DO_MOB_SPAWNING (pre-1.21.11) to SPAWN_MOBS (1.21.11+).
+     *
+     * @param world The world to check
+     * @return true if mob spawning is disabled, false otherwise
+     */
+    @SuppressWarnings("unchecked")
+    private static boolean isMobSpawningDisabled(World world) {
+        if (!mobSpawningRuleResolved) {
+            mobSpawningRuleResolved = true;
+            // Try to find the correct GameRule by name using reflection
+            // SPAWN_MOBS is used in 1.21.11+, DO_MOB_SPAWNING in earlier versions
+            mobSpawningRule = (GameRule<Boolean>) GameRule.getByName("spawnMobs");
+            if (mobSpawningRule == null) {
+                mobSpawningRule = (GameRule<Boolean>) GameRule.getByName("doMobSpawning");
+            }
+        }
+
+        if (mobSpawningRule == null) {
+            // Neither rule found, assume spawning is allowed
+            return false;
+        }
+
+        Boolean value = world.getGameRuleValue(mobSpawningRule);
+        return Boolean.FALSE.equals(value);
+    }
 
     /**
      * Used by the TimedEvent system to find valid locations
@@ -232,7 +263,6 @@ public class CustomSpawn {
         if (world == null)
             for (Player player : Bukkit.getOnlinePlayers()) {
                 if (!PlayerData.isInMemory(player.getUniqueId())) continue;
-                if (GuildRank.isAtOrAboveGuildRank(player, 0, 0)) continue;
                 Location playerLocation = player.getLocation();
                 if (!ValidWorldsConfig.getValidWorlds().contains(playerLocation.getWorld().getName()))
                     continue;
@@ -244,7 +274,7 @@ public class CustomSpawn {
                     }
                 if (isInMatch) continue;
                 if (timedEvent != null && EliteMobsWorld.isEliteMobsWorld(player.getWorld().getUID())) continue;
-                if (Boolean.FALSE.equals(playerLocation.getWorld().getGameRuleValue(GameRule.DO_MOB_SPAWNING)))
+                if (isMobSpawningDisabled(playerLocation.getWorld()))
                     continue;
                 if (!customSpawnConfigFields.getValidWorlds().isEmpty())
                     if (!customSpawnConfigFields.getValidWorlds().contains(playerLocation.getWorld()))
@@ -252,7 +282,7 @@ public class CustomSpawn {
                 if (!customSpawnConfigFields.getValidWorldEnvironments().isEmpty())
                     if (!customSpawnConfigFields.getValidWorldEnvironments().contains(Objects.requireNonNull(playerLocation.getWorld()).getEnvironment()))
                         continue;
-                if (GuildRank.getActiveGuildRank(player) == 0) continue;
+                // Guild rank peaceful mode checks removed
                 validPlayers.add(player);
             }
         else

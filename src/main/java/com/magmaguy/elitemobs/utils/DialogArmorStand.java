@@ -1,23 +1,22 @@
 package com.magmaguy.elitemobs.utils;
 
+import com.magmaguy.easyminecraftgoals.internal.FakeText;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.api.internal.RemovalReason;
-import com.magmaguy.elitemobs.entitytracker.EntityTracker;
+import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.TextDisplay;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 public class DialogArmorStand {
 
-    public static TextDisplay createDialogArmorStand(Entity sourceEntity, String dialog, Vector offset) {
+    public static FakeText createDialogArmorStand(Entity sourceEntity, String dialog, Vector offset) {
 
         offset.add(getDisplacementVector(sourceEntity).subtract(new Vector(0, 1, 0)));
         Vector finalOffset = offset;
-        TextDisplay armorStand = VisualDisplay.generateTemporaryTextDisplay(sourceEntity.getLocation().clone().add(finalOffset), dialog);
+        FakeText fakeText = VisualDisplay.generateFakeText(sourceEntity.getLocation().clone().add(finalOffset), dialog, 30);
+        if (fakeText == null) return null;
 
-        //This part is necessary because armorstands are visible on their first tick to players
         new BukkitRunnable() {
             int taskTimer = 0;
 
@@ -26,16 +25,17 @@ public class DialogArmorStand {
                 taskTimer++;
 
                 if (taskTimer > 15 || !sourceEntity.isValid()) {
-                    EntityTracker.unregister(armorStand, RemovalReason.EFFECT_TIMEOUT);
+                    fakeText.remove();
                     cancel();
                     return;
                 }
-                armorStand.teleport(sourceEntity.getLocation().clone().add(finalOffset).add(new Vector(0, taskTimer * 0.05, 0)));
+                Location newLoc = sourceEntity.getLocation().clone().add(finalOffset).add(new Vector(0, taskTimer * 0.05, 0));
+                fakeText.teleport(newLoc);
             }
 
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 2);
 
-        return armorStand;
+        return fakeText;
     }
 
     private static Vector getDisplacementVector(Entity sourceEntity) {
@@ -45,27 +45,28 @@ public class DialogArmorStand {
         return new Vector(0, height, 0);
     }
 
-    public static TextDisplay createDialogArmorStand(LivingEntity sourceEntity, String dialog) {
+    public static FakeText createDialogArmorStand(LivingEntity sourceEntity, String dialog) {
 
         if (sourceEntity == null) return null;
 
-        TextDisplay armorStand = VisualDisplay.generateTemporaryTextDisplay(sourceEntity.getLocation().clone().add(getDisplacementVector(sourceEntity)), dialog);
-        //This part is necessary because armorstands are visible on their first tick to players
+        FakeText fakeText = VisualDisplay.generateFakeText(sourceEntity.getLocation().clone().add(getDisplacementVector(sourceEntity)), dialog, 30);
+        if (fakeText == null) return null;
+
         new BukkitRunnable() {
             int taskTimer = 0;
 
             @Override
             public void run() {
                 if (taskTimer > 15 || !sourceEntity.isValid()) {
-                    EntityTracker.unregister(armorStand, RemovalReason.EFFECT_TIMEOUT);
+                    fakeText.remove();
                     cancel();
                     return;
                 }
-                armorStand.teleport(sourceEntity.getLocation().clone().add(getDisplacementVector(sourceEntity)));
+                fakeText.teleport(sourceEntity.getLocation().clone().add(getDisplacementVector(sourceEntity)));
                 taskTimer++;
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
-        return armorStand;
+        return fakeText;
     }
 
 }

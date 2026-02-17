@@ -80,9 +80,12 @@ public class MeteorShowerEnchantment extends CustomEnchantment {
     public static class MeteorShowerEvents implements Listener {
         @EventHandler
         public void onInteract(PlayerInteractEvent event) {
-            int meteorShower = ItemTagger.getEnchantment(event.getPlayer().getInventory().getItemInMainHand().getItemMeta(), new NamespacedKey(MetadataHandler.PLUGIN, MeteorShowerEnchantment.key));
+            org.bukkit.inventory.ItemStack mainHandItem = event.getPlayer().getInventory().getItemInMainHand();
+            if (mainHandItem == null || mainHandItem.getType().isAir()) return;
+            if (mainHandItem.getItemMeta() == null) return;
+            int meteorShower = ItemTagger.getEnchantment(mainHandItem.getItemMeta(), new NamespacedKey(MetadataHandler.PLUGIN, MeteorShowerEnchantment.key));
             if (meteorShower < 1) return;
-            event.getItem().setAmount(event.getItem().getAmount() - 1);
+            mainHandItem.setAmount(mainHandItem.getAmount() - 1);
             MeteorShowerEnchantment.doMeteorShower(event.getPlayer());
         }
     }

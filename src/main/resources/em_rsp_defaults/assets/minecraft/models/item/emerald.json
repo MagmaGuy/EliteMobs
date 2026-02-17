@@ -2,15 +2,19 @@
   "parent": "minecraft:item/generated",
   "textures": {
     "layer0": "minecraft:item/emerald"
-    },
- 
-    "overrides":[
- 
-     {"predicate": {"custom_model_data":1}, "model":"elitemobs:coins/coin2"},
-	 {"predicate": {"custom_model_data":31173}, "model":"elitemobs:ui/bagofcoins"},
-	 {"predicate": {"custom_model_data":31174}, "model":"elitemobs:ui/anvilhammer"},
-	 {"predicate": {"custom_model_data":31175}, "model":"elitemobs:ui/whiteanvil"}
-
-
-     ]
+  },
+  "overrides": [
+    {"predicate": {"custom_model_data": 1}, "model": "elitemobs:coins/coin2"},
+    {"predicate": {"custom_model_data": 31173}, "model": "elitemobs:ui/bagofcoins"},
+    {"predicate": {"custom_model_data": 31174}, "model": "elitemobs:ui/anvilhammer"},
+    {"predicate": {"custom_model_data": 31175}, "model": "elitemobs:ui/whiteanvil"},
+    {"predicate": {"custom_model_data": 31180}, "model": "elitemobs:ui/em_lockedchain"},
+    {"predicate": {"custom_model_data": 31181}, "model": "elitemobs:ui/em_lockedcoin"},
+    {"predicate": {"custom_model_data": 31182}, "model": "elitemobs:ui/em_unlocked"},
+    {"predicate": {"custom_model_data": 31183}, "model": "elitemobs:ui/em_keygold"},
+    {"predicate": {"custom_model_data": 31184}, "model": "elitemobs:ui/em_keygray"},
+    {"predicate": {"custom_model_data": 31185}, "model": "elitemobs:ui/em_keychain"},
+    {"predicate": {"custom_model_data": 31186}, "model": "elitemobs:ui/em_keycoin"},
+    {"predicate": {"custom_model_data": 31187}, "model": "elitemobs:ui/em_keystar"}
+  ]
 }

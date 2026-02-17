@@ -2,12 +2,16 @@ package com.magmaguy.elitemobs.items.customloottable;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
+import com.magmaguy.elitemobs.config.CommandMessagesConfig;
+import com.magmaguy.elitemobs.config.InitializeConfig;
 import com.magmaguy.elitemobs.items.EliteItemLore;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.menus.LootMenu;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.magmacore.util.ChatColorConverter;
+import com.magmaguy.magmacore.util.Logger;
+import com.magmaguy.magmacore.util.SpigotMessage;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -48,10 +52,17 @@ public class SharedLootTable {
     }
 
     private void messagePlayers() {
-        damagers.forEach(damagers -> {
-            damagers.sendMessage(ChatColorConverter.convert("&e&l---------------------------------------------"));
-            damagers.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &6Loot vote! Do &9/em loot &6 to vote on " + loot.size() + " items!"));
-            damagers.sendMessage(ChatColorConverter.convert("&e&l---------------------------------------------"));
+        damagers.forEach(player -> {
+            Logger.sendSimpleMessage(player, CommandMessagesConfig.getLootVoteSeparator());
+            player.spigot().sendMessage(
+                    SpigotMessage.simpleMessage(CommandMessagesConfig.getLootVoteMessage()),
+                    SpigotMessage.commandHoverMessage(
+                            InitializeConfig.getEmLootDisplay(),
+                            InitializeConfig.getEmLootHover(),
+                            "/em loot"),
+                    SpigotMessage.simpleMessage(CommandMessagesConfig.getLootVoteMessageSuffix()
+                            .replace("$count", String.valueOf(loot.size()))));
+            Logger.sendSimpleMessage(player, CommandMessagesConfig.getLootVoteSeparator());
         });
     }
 
@@ -127,12 +138,18 @@ public class SharedLootTable {
 
         public void addNeed(ItemStack itemStack) {
             needItems.add(itemStack);
-            sharedLootTable.damagers.forEach(damager -> damager.sendMessage(ChatColorConverter.convert(player.getDisplayName() + " &chas selected need for " + itemStack.getItemMeta().getDisplayName() + " !")));
+            sharedLootTable.damagers.forEach(damager -> damager.sendMessage(ChatColorConverter.convert(
+                    CommandMessagesConfig.getLootNeedMessage()
+                            .replace("$player", player.getDisplayName())
+                            .replace("$item", itemStack.getItemMeta().getDisplayName()))));
         }
 
         public void removeNeed(ItemStack itemStack) {
             needItems.remove(itemStack);
-            sharedLootTable.damagers.forEach(damager -> damager.sendMessage(ChatColorConverter.convert(player.getDisplayName() + " &2has selected greed for " + itemStack.getItemMeta().getDisplayName() + " !")));
+            sharedLootTable.damagers.forEach(damager -> damager.sendMessage(ChatColorConverter.convert(
+                    CommandMessagesConfig.getLootGreedMessage()
+                            .replace("$player", player.getDisplayName())
+                            .replace("$item", itemStack.getItemMeta().getDisplayName()))));
         }
     }
 }

@@ -4,7 +4,6 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobHealEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.collateralminecraftchanges.KeepNeutralsAngry;
-import com.magmaguy.elitemobs.combatsystem.CombatSystem;
 import com.magmaguy.elitemobs.combatsystem.antiexploit.AntiExploitMessage;
 import com.magmaguy.elitemobs.config.AntiExploitConfig;
 import com.magmaguy.elitemobs.config.DefaultConfig;
@@ -363,7 +362,9 @@ public class EliteEntity {
         if (EliteMobProperties.getPluginData(entityType) != null)
             this.defaultMaxHealth = EliteMobProperties.getPluginData(entityType).getDefaultMaxHealth();
         else this.defaultMaxHealth = 20;
-        this.maxHealth = (level * CombatSystem.TARGET_HITS_TO_KILL_MINUS_ONE + this.defaultMaxHealth) * healthMultiplier;
+        // Use exponential HP scaling: +5 levels = 2x HP, -5 levels = 0.5x HP
+        // This replaces the old damage modifier system for a better player experience
+        this.maxHealth = com.magmaguy.elitemobs.combatsystem.LevelScaling.calculateMobHealth(level, this.defaultMaxHealth) * healthMultiplier;
         if (livingEntity != null) AttributeManager.setAttribute(livingEntity, "generic_max_health", maxHealth);
         if (health == null) {
             if (livingEntity != null) livingEntity.setHealth(maxHealth);
@@ -376,7 +377,8 @@ public class EliteEntity {
 
     public void setNormalizedMaxHealth() {
         this.defaultMaxHealth = MobCombatSettingsConfig.getNormalizedBaselineHealth();
-        this.maxHealth = (level * CombatSystem.TARGET_HITS_TO_KILL_MINUS_ONE + this.defaultMaxHealth) * healthMultiplier;
+        // Use exponential HP scaling for normalized combat too
+        this.maxHealth = com.magmaguy.elitemobs.combatsystem.LevelScaling.calculateMobHealth(level, this.defaultMaxHealth) * healthMultiplier;
         if (livingEntity != null) {
             AttributeManager.setAttribute(livingEntity, "generic_max_health", maxHealth);
             livingEntity.setHealth(maxHealth);

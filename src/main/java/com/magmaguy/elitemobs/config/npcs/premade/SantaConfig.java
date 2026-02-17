@@ -12,10 +12,10 @@ public class SantaConfig extends NPCsConfigFields {
     public SantaConfig() {
         super("santa.yml",
                 false,
-                "&4Saint Nick",
-                "&c<Santa!>",
+                "<g:#8A3A3A:#9A4A4A>Saint Nick</g>",
+                "<g:#7A2A2A:#8A3A3A><Santa!></g>",
                 Villager.Profession.NITWIT,
-                "em_adventurers_guild,212.5,88,236.5,104,0",
+                "em_adventurers_guild,217.5,88,236.5,104,0",
                 List.of(
                         "Ho ho ho!"),
                 new ArrayList<>(List.of(

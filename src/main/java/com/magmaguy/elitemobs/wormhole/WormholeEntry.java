@@ -1,11 +1,14 @@
 package com.magmaguy.elitemobs.wormhole;
 
+import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.config.WormholesConfig;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.PersistentObject;
 import com.magmaguy.elitemobs.mobconstructor.PersistentObjectHandler;
+import com.magmaguy.elitemobs.thirdparty.custommodels.CustomModel;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
-import com.magmaguy.elitemobs.utils.DiscordLinks;
+import com.magmaguy.freeminecraftmodels.customentity.StaticEntity;
 import com.magmaguy.magmacore.DrawLine;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.ChunkLocationChecker;
@@ -16,14 +19,10 @@ import org.bukkit.*;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
-import org.bukkit.util.Consumer;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class WormholeEntry implements PersistentObject {
     @Getter
@@ -80,8 +79,10 @@ public class WormholeEntry implements PersistentObject {
     private String locationString;
     @Getter
     private String armorStandText;
-    // Track by UUID instead of entity object
+    // Use real TextDisplay entity - Minecraft handles visibility automatically
     private TextDisplay textDisplay = null;
+    // Custom model for this entry point (FreeMinecraftModels only)
+    private StaticEntity staticModel = null;
     private String worldName;
     @Getter
     @Setter
@@ -89,15 +90,20 @@ public class WormholeEntry implements PersistentObject {
     @Getter
     @Setter
     private String opMessage = null;
+    @Getter
+    private boolean showDownloadHint = false;
     private PersistentObjectHandler persistentObjectHandler = null;
     private long[] cachedEdges = null; // Cache edges as long array (p1 << 32 | p2)
     private Material concreteColor = null; // Cache the concrete color
     private boolean linesInitialized = false;
     private int rotationIndex = 0;
     private static final long LINES_RECREATION_COOLDOWN_MS = 500; // 500ms cooldown after clearing
+    private static final int TICKS_WITHOUT_LOS_BEFORE_CLEAR = 100; // Clear lines after ~5 seconds without LOS
     private volatile boolean isProcessingChunkEvent = false; // Prevent race conditions during chunk events
     private long lastLinesClearTime = 0; // Cooldown to prevent rapid recreation
     private int particleTickCounter = 0; // Counter for particle spawn rate
+    private int ticksWithoutLOS = 0; // Track how long no player has had LOS
+    private final Set<UUID> playersViewingLines = new HashSet<>(); // Track which players are viewing lines
 
     public WormholeEntry(Wormhole wormhole, String locationString, int wormholeNumber) {
         this.wormhole = wormhole;
@@ -116,6 +122,46 @@ public class WormholeEntry implements PersistentObject {
     }
 
     /**
+     * Gets the custom model name for this wormhole entry point.
+     * @return The model name from customModel1 or customModel2 based on wormholeNumber
+     */
+    private String getCustomModelName() {
+        return (wormholeNumber == 1)
+                ? wormhole.getWormholeConfigFields().getCustomModel1()
+                : wormhole.getWormholeConfigFields().getCustomModel2();
+    }
+
+    /**
+     * Checks if this wormhole entry should use a custom model.
+     * @return true if custom model is configured, enabled, and exists
+     */
+    private boolean shouldUseCustomModel() {
+        String modelName = getCustomModelName();
+        return modelName != null && !modelName.isEmpty()
+                && CustomModel.customModelsEnabled()
+                && CustomModel.getModelPlugin() == CustomModel.ModelPlugin.FREE_MINECRAFT_MODELS
+                && CustomModel.modelExists(modelName);
+    }
+
+    /**
+     * Initialize the custom model for this wormhole entry.
+     * Uses StaticEntity from FreeMinecraftModels (no underlying entity needed).
+     */
+    private void initializeCustomModel() {
+        String modelName = getCustomModelName();
+        if (modelName == null || modelName.isEmpty()) return;
+        if (location == null || location.getWorld() == null) return;
+        if (!CustomModel.customModelsEnabled()) return;
+        if (CustomModel.getModelPlugin() != CustomModel.ModelPlugin.FREE_MINECRAFT_MODELS) return;
+        if (!CustomModel.modelExists(modelName)) return;
+
+        if (staticModel != null) {
+            staticModel.remove();
+        }
+        staticModel = StaticEntity.create(modelName, location.clone());
+    }
+
+    /**
      * Encode two indices as a long: (smaller << 32) | larger
      */
     private static long encodeEdge(int p1, int p2) {
@@ -129,7 +175,10 @@ public class WormholeEntry implements PersistentObject {
     private Location getDungeonLocation() {
         EMPackage emPackage = EMPackage.getEmPackages().get(locationString);
         if (emPackage == null) {
-            Logger.warn("Dungeon " + locationString + " is not a valid dungeon packager name! Wormhole " + wormhole.getWormholeConfigFields().getFilename() + " will not lead anywhere.");
+            // During async init, packages may not be loaded yet; syncInitialization re-resolves wormhole destinations
+            if (!EMPackage.getEmPackages().isEmpty()) {
+                Logger.warn("Dungeon " + locationString + " is not a valid dungeon packager name! Wormhole " + wormhole.getWormholeConfigFields().getFilename() + " will not lead anywhere.");
+            }
             setPortalMissingMessage(WormholesConfig.getDefaultPortalMissingMessage());
             return null;
         }
@@ -137,7 +186,7 @@ public class WormholeEntry implements PersistentObject {
             //Logger.info("Wormhole " + wormhole.getWormholeConfigFields().getFilename() + " will not lead anywhere because the dungeon " + locationString + " is not installed!");
             setPortalMissingMessage(WormholesConfig.getDungeonNotInstalledMessage().replace("$dungeonID", emPackage.getContentPackagesConfigFields().getName()));
 
-            this.opMessage = ChatColorConverter.convert("&8[EliteMobs - OP-only message] &fDownload links are available on &9https://magmaguy.itch.io/ &f" + "(free and premium) and &9https://www.patreon.com/magmaguy &f(premium). You can check the difference " + "between the two and get support here: " + DiscordLinks.mainLink);
+            this.showDownloadHint = true;
         }
         Location teleportLocation = emPackage.getContentPackagesConfigFields().getTeleportLocation();
         if (teleportLocation == null) return null;
@@ -151,6 +200,21 @@ public class WormholeEntry implements PersistentObject {
         if (locationString.contains(",")) {
             this.worldName = ConfigurationLocation.worldName(locationString);
             this.location = ConfigurationLocation.serialize(locationString);
+            if (this.location == null || this.location.getWorld() == null) {
+                setPortalMissingMessage(WormholesConfig.getDefaultPortalMissingMessage());
+                String filename = wormhole.getWormholeConfigFields().getFilename();
+                String setupMsg = CommandMessagesConfig.getWormholeOpSetupMessage();
+                if (setupMsg != null) {
+                    setupMsg = setupMsg
+                            .replace("$filename", filename)
+                            .replace("$number", String.valueOf(wormholeNumber));
+                    if (filename.equals("adventurers_guild_wormhole")) {
+                        String agMsg = CommandMessagesConfig.getWormholeAgSpawnRecommendation();
+                        if (agMsg != null) setupMsg += "\n" + agMsg;
+                    }
+                    setOpMessage(setupMsg);
+                }
+            }
         } else {
             this.location = getDungeonLocation();
         }
@@ -165,6 +229,10 @@ public class WormholeEntry implements PersistentObject {
 
     public void onDungeonUninstall() {
         clearLines();
+        if (staticModel != null) {
+            staticModel.remove();
+            staticModel = null;
+        }
         location = null;
     }
 
@@ -177,9 +245,14 @@ public class WormholeEntry implements PersistentObject {
         isProcessingChunkEvent = true;
         try {
             clearLines();
-            if (textDisplay != null) {
+            playersViewingLines.clear(); // Clear player tracking on chunk unload
+            if (textDisplay != null && textDisplay.isValid()) {
                 textDisplay.remove();
                 textDisplay = null;
+            }
+            if (staticModel != null) {
+                staticModel.remove();
+                staticModel = null;
             }
         } finally {
             isProcessingChunkEvent = false;
@@ -220,7 +293,14 @@ public class WormholeEntry implements PersistentObject {
     }
 
     private void remove(){
-        if (textDisplay != null) textDisplay.remove();
+        if (textDisplay != null && textDisplay.isValid()) {
+            textDisplay.remove();
+            textDisplay = null;
+        }
+        if (staticModel != null) {
+            staticModel.remove();
+            staticModel = null;
+        }
         clearLines();
     }
 
@@ -249,15 +329,60 @@ public class WormholeEntry implements PersistentObject {
             return;
         }
 
-        // Update text display if needed (always update if players are nearby)
-        if (armorStandText != null && (textDisplay == null || !textDisplay.isValid())) initializeTextDisplay();
+        // Initialize custom model if needed (lazy initialization like textDisplay)
+        if (shouldUseCustomModel() && staticModel == null) {
+            initializeCustomModel();
+        }
+
+        // Update text display if needed - use real TextDisplay entity
+        if (armorStandText != null && (textDisplay == null || !textDisplay.isValid())) {
+            initializeTextDisplay();
+        }
+
+        // Skip geometry rendering when custom model is active
+        if (staticModel != null) {
+            return;
+        }
+
+        // Track players who left the area - clear lines if player set changed significantly
+        Set<UUID> currentNearbyPlayerUUIDs = new HashSet<>();
+        for (Player player : nearbyPlayers) {
+            currentNearbyPlayerUUIDs.add(player.getUniqueId());
+        }
+
+        // If players have left and lines are initialized, check if we should recreate
+        // This prevents ghosting when players return after leaving
+        if (linesInitialized && !playersViewingLines.isEmpty()) {
+            Set<UUID> playersWhoLeft = new HashSet<>(playersViewingLines);
+            playersWhoLeft.removeAll(currentNearbyPlayerUUIDs);
+
+            // If any player who was viewing left the area, consider recreating lines
+            // to ensure clean state when they return
+            if (!playersWhoLeft.isEmpty()) {
+                // Small grace period to avoid constant recreation
+                if (ticksWithoutLOS > 20) { // ~1 second grace period
+                    clearLines();
+                }
+            }
+        }
+
+        playersViewingLines.clear();
+        playersViewingLines.addAll(currentNearbyPlayerUUIDs);
 
         // Update visual effects (lines) if enabled and at least one player has line of sight
         if (!WormholesConfig.isNoParticlesMode() &&
                 wormhole.getWormholeConfigFields().getStyle() != Wormhole.WormholeStyle.NONE) {
             // Only update visuals if at least one player can see the wormhole
             if (anyPlayerHasLineOfSight(nearbyPlayers)) {
+                ticksWithoutLOS = 0; // Reset counter when player has LOS
                 updateVisualEffects();
+            } else {
+                // No player has LOS - track and clear lines after a while to prevent ghost artifacts
+                ticksWithoutLOS++;
+                if (ticksWithoutLOS >= TICKS_WITHOUT_LOS_BEFORE_CLEAR && linesInitialized) {
+                    clearLines();
+                    ticksWithoutLOS = 0;
+                }
             }
         }
     }
@@ -307,27 +432,30 @@ public class WormholeEntry implements PersistentObject {
     }
 
     /**
-     * Initialize text display - only called when chunk is confirmed loaded
+     * Initialize text display using real TextDisplay entity.
+     * Minecraft handles visibility automatically.
      */
     public void initializeTextDisplay() {
         if (armorStandText == null) return;
         if (location == null || location.getWorld() == null) return;
 
-        try {
-            // Spawn new display
-            textDisplay = location.getWorld().spawn(
-                    location.clone().add(new Vector(0, 1.2, 0).multiply(wormhole.getWormholeConfigFields().getSizeMultiplier())),
-                    TextDisplay.class,
-                    (Consumer<TextDisplay>) textDisplay -> {
-                        textDisplay.setBillboard(Display.Billboard.VERTICAL);
-                        textDisplay.setText(ChatColorConverter.convert(armorStandText));
-                        textDisplay.setPersistent(false);
-                    }
-            );
-        } catch (Exception e) {
-            // If entity creation fails, textDisplay remains null and will retry next tick
-            textDisplay = null;
+        // Remove old text display if it exists
+        if (textDisplay != null && textDisplay.isValid()) {
+            textDisplay.remove();
         }
+
+        // Adjust Y offset: higher when custom model is present to clear the model
+        double sizeMultiplier = wormhole.getWormholeConfigFields().getSizeMultiplier();
+        double yOffset = (staticModel != null) ? 2.0 * sizeMultiplier : 1.2 * sizeMultiplier;
+        Location textLocation = location.clone().add(0, yOffset, 0);
+
+        textDisplay = textLocation.getWorld().spawn(textLocation, TextDisplay.class, display -> {
+            display.setText(ChatColorConverter.convert(armorStandText));
+            display.setBillboard(Display.Billboard.CENTER);
+            display.setShadowed(false);
+            display.setPersistent(false);
+        });
+        EntityTracker.registerVisualEffects(textDisplay);
     }
 
     /**
@@ -366,17 +494,13 @@ public class WormholeEntry implements PersistentObject {
         double clearRadius = 5.0 * wormhole.getWormholeConfigFields().getSizeMultiplier();
 
         // Get all display entities near the wormhole location
+        // Note: fakeText is packet-based and won't be in this list
         world.getNearbyEntities(location, clearRadius, clearRadius, clearRadius).stream()
                 .filter(entity -> entity instanceof Display)
-                .filter(entity -> !(entity.equals(textDisplay))) // Don't remove our text display
                 .forEach(entity -> {
-                    // Optional: Add additional checks here to ensure we're only removing
-                    // display blocks (not other displays that might be intentional)
-                    Display display = (Display) entity;
-
-                    // Check if it's a block display (DrawLine creates block displays)
-                    if (display instanceof org.bukkit.entity.BlockDisplay) {
-                        display.remove();
+                    // Only remove block displays (DrawLine creates block displays)
+                    if (entity instanceof org.bukkit.entity.BlockDisplay) {
+                        entity.remove();
                     }
                 });
     }
@@ -396,17 +520,18 @@ public class WormholeEntry implements PersistentObject {
         if (needsRecreation) {
             // Enforce cooldown to prevent rapid recreation (which causes UUID conflicts and jitter)
             if (System.currentTimeMillis() - lastLinesClearTime < LINES_RECREATION_COOLDOWN_MS) {
+                // During cooldown, still try to update existing valid lines
+                if (!lineDataList.isEmpty()) {
+                    updateExistingLines(currentFrame);
+                }
                 return;
             }
 
-            // Clear any existing lines first (only if there are any to avoid resetting cooldown)
-            if (!lineDataList.isEmpty()) {
-                clearLines();
-                return; // Wait for next cycle after clearing
-            }
-
-            // **NEW: Clear any lingering display blocks in the area**
-            clearNearbyDisplayBlocks();
+            // Store old lines temporarily so we can remove them AFTER creating new ones
+            List<DrawLine.LineData> oldLines = new ArrayList<>(lineDataList);
+            lineDataList.clear();
+            linesInitialized = false;
+            cachedEdges = null;
 
             // Get concrete color that matches the wormhole's particle color (only once)
             concreteColor = getConcreteColorForWormhole();
@@ -433,9 +558,21 @@ public class WormholeEntry implements PersistentObject {
                     }
                 }
                 linesInitialized = true;
+
+                // Now remove old lines AFTER new ones are created to prevent flickering
+                for (DrawLine.LineData oldLine : oldLines) {
+                    if (oldLine != null) oldLine.remove();
+                }
+                lastLinesClearTime = System.currentTimeMillis();
             } catch (Exception e) {
-                // If entity creation fails (e.g., UUID conflict), clear and retry next cycle
-                clearLines();
+                // If entity creation fails, restore old lines and retry next cycle
+                for (DrawLine.LineData newLine : lineDataList) {
+                    if (newLine != null) newLine.remove();
+                }
+                lineDataList.clear();
+                lineDataList.addAll(oldLines);
+                linesInitialized = !lineDataList.isEmpty();
+                lastLinesClearTime = System.currentTimeMillis();
                 return;
             }
         } else {
@@ -481,6 +618,33 @@ public class WormholeEntry implements PersistentObject {
         }
 
         return false;
+    }
+
+    /**
+     * Update existing lines during cooldown period - only updates valid lines
+     */
+    private void updateExistingLines(List<Vector> currentFrame) {
+        if (cachedEdges == null) return;
+
+        int lineIndex = 0;
+        for (long edge : cachedEdges) {
+            int p1 = (int) (edge >>> 32);
+            int p2 = (int) (edge & 0xFFFFFFFFL);
+            if (p1 >= currentFrame.size() || p2 >= currentFrame.size()) continue;
+            if (lineIndex >= lineDataList.size()) break;
+
+            Vector v1 = currentFrame.get(p1);
+            Vector v2 = currentFrame.get(p2);
+
+            Location loc1 = location.clone().add(v1);
+            Location loc2 = location.clone().add(v2);
+
+            DrawLine.LineData line = lineDataList.get(lineIndex);
+            if (line != null && line.getDisplay().isValid()) {
+                DrawLine.updateLine(line, loc1, loc2);
+            }
+            lineIndex++;
+        }
     }
 
     /**
@@ -709,6 +873,7 @@ public class WormholeEntry implements PersistentObject {
         lineDataList.clear();
         linesInitialized = false;
         cachedEdges = null;
+        playersViewingLines.clear(); // Clear player tracking to force fresh state
         lastLinesClearTime = System.currentTimeMillis();
     }
 

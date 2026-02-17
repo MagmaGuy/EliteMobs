@@ -1,13 +1,13 @@
 package com.magmaguy.elitemobs.playerdata.database;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.config.DatabaseConfig;
 import com.magmaguy.elitemobs.dungeons.DungeonBossLockout;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.Quest;
 import com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldowns;
+import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.ObjectSerializer;
 import com.magmaguy.magmacore.util.Logger;
@@ -47,15 +47,6 @@ public class PlayerData {
     private double currency;
     @Getter
     @Setter
-    private int guildPrestigeLevel;
-    @Getter
-    @Setter
-    private int maxGuildLevel;
-    @Getter
-    @Setter
-    private int activeGuildLevel;
-    @Getter
-    @Setter
     private int score;
     @Getter
     @Setter
@@ -90,6 +81,48 @@ public class PlayerData {
     @Getter
     @Setter
     private DungeonBossLockout dungeonBossLockout = null;
+    @Getter
+    @Setter
+    private com.magmaguy.elitemobs.quests.QuestLockout questLockout = null;
+
+    // Skill XP fields - each skill has independent progression
+    @Getter
+    @Setter
+    private long skillXP_ARMOR = 0;
+    @Getter
+    @Setter
+    private long skillXP_SWORDS = 0;
+    @Getter
+    @Setter
+    private long skillXP_AXES = 0;
+    @Getter
+    @Setter
+    private long skillXP_BOWS = 0;
+    @Getter
+    @Setter
+    private long skillXP_CROSSBOWS = 0;
+    @Getter
+    @Setter
+    private long skillXP_TRIDENTS = 0;
+    @Getter
+    @Setter
+    private long skillXP_HOES = 0;
+    @Getter
+    @Setter
+    private long skillXP_MACES = 0;
+    @Getter
+    @Setter
+    private long skillXP_SPEARS = 0;
+
+    // Skill bonus selections - JSON string mapping skill types to selected skill IDs
+    @Getter
+    @Setter
+    private String skillBonusSelections = "{}";
+
+    // Gambling debt - tracks how much the player owes from gambling
+    @Getter
+    @Setter
+    private double gamblingDebt = 0;
 
     public PlayerData(UUID uuid) {
         Player player = Bukkit.getPlayer(uuid);
@@ -169,86 +202,23 @@ public class PlayerData {
 
     public static double getCurrency(UUID uuid) {
         if (!isInMemory(uuid))
-            return getDatabaseDouble(uuid, "Currency");
+            return getDatabaseDouble(uuid, "CurrencyV2");
         return playerDataHashMap.get(uuid).currency;
     }
 
     public static double getCurrency(UUID uuid, boolean databaseAccess) {
         if (!isInMemory(uuid))
             if (databaseAccess)
-                return getDatabaseDouble(uuid, "Currency");
+                return getDatabaseDouble(uuid, "CurrencyV2");
             else
                 return 0;
         return playerDataHashMap.get(uuid).currency;
     }
 
     public static void setCurrency(UUID uuid, double currency) {
-        setDatabaseValue(uuid, "Currency", currency);
+        setDatabaseValue(uuid, "CurrencyV2", currency);
         if (playerDataHashMap.containsKey(uuid))
             playerDataHashMap.get(uuid).currency = currency;
-    }
-
-    public static int getGuildPrestigeLevel(UUID uuid) {
-        if (!isInMemory(uuid))
-            return getDatabaseInteger(uuid, "GuildPrestigeLevel");
-        return playerDataHashMap.get(uuid).guildPrestigeLevel;
-    }
-
-    public static int getGuildPrestigeLevel(UUID uuid, boolean databaseAccess) {
-        if (!isInMemory(uuid))
-            if (databaseAccess)
-                return getDatabaseInteger(uuid, "GuildPrestigeLevel");
-            else
-                return 0;
-        return playerDataHashMap.get(uuid).guildPrestigeLevel;
-    }
-
-    public static void setGuildPrestigeLevel(UUID uuid, int newPrestigeLevel) {
-        setDatabaseValue(uuid, "GuildPrestigeLevel", newPrestigeLevel);
-        if (playerDataHashMap.containsKey(uuid))
-            playerDataHashMap.get(uuid).guildPrestigeLevel = newPrestigeLevel;
-    }
-
-    public static int getMaxGuildLevel(UUID uuid) {
-        if (!isInMemory(uuid))
-            return getDatabaseInteger(uuid, "GuildMaxLevel");
-        return playerDataHashMap.get(uuid).maxGuildLevel;
-    }
-
-    public static int getMaxGuildLevel(UUID uuid, boolean databaseAccess) {
-        if (!isInMemory(uuid))
-            if (databaseAccess)
-                return getDatabaseInteger(uuid, "GuildMaxLevel");
-            else
-                return 0;
-        return playerDataHashMap.get(uuid).maxGuildLevel;
-    }
-
-    public static void setMaxGuildLevel(UUID uuid, int maxGuildLevel) {
-        setDatabaseValue(uuid, "GuildMaxLevel", maxGuildLevel);
-        if (playerDataHashMap.containsKey(uuid))
-            playerDataHashMap.get(uuid).maxGuildLevel = maxGuildLevel;
-    }
-
-    public static int getActiveGuildLevel(UUID uuid) {
-        if (!isInMemory(uuid))
-            return getDatabaseInteger(uuid, "GuildActiveLevel");
-        return playerDataHashMap.get(uuid).activeGuildLevel;
-    }
-
-    public static int getActiveGuildLevel(UUID uuid, boolean databaseAccess) {
-        if (!isInMemory(uuid))
-            if (databaseAccess)
-                return getDatabaseInteger(uuid, "GuildActiveLevel");
-            else
-                return 0;
-        return playerDataHashMap.get(uuid).activeGuildLevel;
-    }
-
-    public static void setActiveGuildLevel(UUID uuid, int activeGuildLevel) {
-        setDatabaseValue(uuid, "GuildActiveLevel", activeGuildLevel);
-        if (playerDataHashMap.containsKey(uuid))
-            playerDataHashMap.get(uuid).activeGuildLevel = activeGuildLevel;
     }
 
     public static List<Quest> getQuests(UUID uuid) {
@@ -354,6 +324,31 @@ public class PlayerData {
                 playerDataHashMap.get(uuid).dungeonBossLockout = dungeonBossLockout;
         } catch (Exception ex) {
             Logger.warn("Failed to update dungeon boss lockouts!");
+            ex.printStackTrace();
+        }
+    }
+
+    @Nullable
+    public static com.magmaguy.elitemobs.quests.QuestLockout getQuestLockout(UUID uuid) {
+        try {
+            if (!isInMemory(uuid))
+                return (com.magmaguy.elitemobs.quests.QuestLockout) ObjectSerializer.fromString((String) getDatabaseBlob(uuid, "QuestLockouts"));
+            if (playerDataHashMap.get(uuid) == null) return new com.magmaguy.elitemobs.quests.QuestLockout();
+            return playerDataHashMap.get(uuid).questLockout == null ? new com.magmaguy.elitemobs.quests.QuestLockout() : playerDataHashMap.get(uuid).questLockout;
+        } catch (Exception ex) {
+            return new com.magmaguy.elitemobs.quests.QuestLockout();
+        }
+    }
+
+    public static void updateQuestLockout(UUID uuid, com.magmaguy.elitemobs.quests.QuestLockout questLockout) {
+        try {
+            // Clean up expired lockouts before saving
+            questLockout.cleanupExpiredLockouts();
+            setDatabaseValue(uuid, "QuestLockouts", ObjectSerializer.toString(questLockout));
+            if (playerDataHashMap.containsKey(uuid))
+                playerDataHashMap.get(uuid).questLockout = questLockout;
+        } catch (Exception ex) {
+            Logger.warn("Failed to update quest lockouts!");
             ex.printStackTrace();
         }
     }
@@ -510,6 +505,213 @@ public class PlayerData {
             playerDataHashMap.get(player.getUniqueId()).matchInstance = newMatchInstance;
     }
 
+    // ==================== SKILL XP METHODS ====================
+
+    /**
+     * Gets the total XP for a specific skill.
+     *
+     * @param uuid      The player's UUID
+     * @param skillType The skill type to check
+     * @return The total XP for that skill
+     */
+    public static long getSkillXP(UUID uuid, SkillType skillType) {
+        String columnName = skillType.getColumnName();
+        if (!isInMemory(uuid))
+            return getDatabaseLong(uuid, columnName);
+        return getSkillXPByType(playerDataHashMap.get(uuid), skillType);
+    }
+
+    /**
+     * Sets the total XP for a specific skill.
+     *
+     * @param uuid      The player's UUID
+     * @param skillType The skill type to set
+     * @param xp        The new total XP value
+     */
+    public static void setSkillXP(UUID uuid, SkillType skillType, long xp) {
+        String columnName = skillType.getColumnName();
+        setDatabaseValue(uuid, columnName, xp);
+        if (playerDataHashMap.containsKey(uuid))
+            setSkillXPByType(playerDataHashMap.get(uuid), skillType, xp);
+    }
+
+    /**
+     * Adds XP to a specific skill.
+     *
+     * @param uuid      The player's UUID
+     * @param skillType The skill type to add XP to
+     * @param xpToAdd   The amount of XP to add
+     * @return The new total XP for that skill
+     */
+    public static long addSkillXP(UUID uuid, SkillType skillType, long xpToAdd) {
+        long currentXP = getSkillXP(uuid, skillType);
+        long newXP = currentXP + xpToAdd;
+        setSkillXP(uuid, skillType, newXP);
+        return newXP;
+    }
+
+    /**
+     * Gets the XP for all skills as an array.
+     *
+     * @param uuid The player's UUID
+     * @return Array of XP values indexed by SkillType ordinal
+     */
+    public static long[] getAllSkillXP(UUID uuid) {
+        long[] xpArray = new long[SkillType.values().length];
+        for (SkillType skillType : SkillType.values()) {
+            xpArray[skillType.ordinal()] = getSkillXP(uuid, skillType);
+        }
+        return xpArray;
+    }
+
+    /**
+     * Gets the player's overall combat level.
+     * This replaces the old guild rank system.
+     *
+     * @param uuid The player's UUID
+     * @return The player's combat level (average of top 2 weapons + armor)
+     */
+    public static int getPlayerLevel(UUID uuid) {
+        return com.magmaguy.elitemobs.skills.CombatLevelCalculator.calculateCombatLevel(uuid);
+    }
+
+    /**
+     * Gets the player's skill level for a specific skill type.
+     *
+     * @param uuid The player's UUID
+     * @param skillType The skill type to check
+     * @return The skill level (1-100+)
+     */
+    public static int getSkillLevel(UUID uuid, SkillType skillType) {
+        long xp = getSkillXP(uuid, skillType);
+        return com.magmaguy.elitemobs.skills.SkillXPCalculator.levelFromTotalXP(xp);
+    }
+
+    /**
+     * Helper method to get skill XP from a PlayerData instance by SkillType.
+     */
+    private static long getSkillXPByType(PlayerData playerData, SkillType skillType) {
+        return switch (skillType) {
+            case ARMOR -> playerData.skillXP_ARMOR;
+            case SWORDS -> playerData.skillXP_SWORDS;
+            case AXES -> playerData.skillXP_AXES;
+            case BOWS -> playerData.skillXP_BOWS;
+            case CROSSBOWS -> playerData.skillXP_CROSSBOWS;
+            case TRIDENTS -> playerData.skillXP_TRIDENTS;
+            case HOES -> playerData.skillXP_HOES;
+            case MACES -> playerData.skillXP_MACES;
+            case SPEARS -> playerData.skillXP_SPEARS;
+        };
+    }
+
+    /**
+     * Helper method to set skill XP on a PlayerData instance by SkillType.
+     */
+    private static void setSkillXPByType(PlayerData playerData, SkillType skillType, long xp) {
+        switch (skillType) {
+            case ARMOR -> playerData.skillXP_ARMOR = xp;
+            case SWORDS -> playerData.skillXP_SWORDS = xp;
+            case AXES -> playerData.skillXP_AXES = xp;
+            case BOWS -> playerData.skillXP_BOWS = xp;
+            case CROSSBOWS -> playerData.skillXP_CROSSBOWS = xp;
+            case TRIDENTS -> playerData.skillXP_TRIDENTS = xp;
+            case HOES -> playerData.skillXP_HOES = xp;
+            case MACES -> playerData.skillXP_MACES = xp;
+            case SPEARS -> playerData.skillXP_SPEARS = xp;
+        }
+    }
+
+    // ==================== SKILL BONUS SELECTION METHODS ====================
+
+    /**
+     * Gets the skill bonus selections JSON string for a player.
+     *
+     * @param uuid The player's UUID
+     * @return JSON string of skill bonus selections (or "{}" if none)
+     */
+    public static String getSkillBonusSelections(UUID uuid) {
+        if (!isInMemory(uuid)) {
+            String dbValue = getDatabaseString(uuid, "SkillBonusSelections");
+            return dbValue != null ? dbValue : "{}";
+        }
+        PlayerData data = playerDataHashMap.get(uuid);
+        return data != null ? data.skillBonusSelections : "{}";
+    }
+
+    /**
+     * Sets the skill bonus selections JSON string for a player.
+     *
+     * @param uuid       The player's UUID
+     * @param selections JSON string of skill bonus selections
+     */
+    public static void setSkillBonusSelections(UUID uuid, String selections) {
+        setDatabaseValue(uuid, "SkillBonusSelections", selections);
+        if (playerDataHashMap.containsKey(uuid))
+            playerDataHashMap.get(uuid).skillBonusSelections = selections;
+    }
+
+    // ==================== GAMBLING DEBT METHODS ====================
+
+    /**
+     * Gets the gambling debt for a player.
+     *
+     * @param uuid The player's UUID
+     * @return The amount of debt the player owes
+     */
+    public static double getGamblingDebt(UUID uuid) {
+        if (!isInMemory(uuid))
+            return getDatabaseDouble(uuid, "GamblingDebt");
+        PlayerData data = playerDataHashMap.get(uuid);
+        return data != null ? data.gamblingDebt : 0;
+    }
+
+    /**
+     * Sets the gambling debt for a player.
+     * Debt is clamped between 0 and the maximum allowed debt.
+     *
+     * @param uuid The player's UUID
+     * @param debt The new debt amount
+     */
+    public static void setGamblingDebt(UUID uuid, double debt) {
+        // Clamp debt to valid range (0 to max debt)
+        debt = Math.max(0, Math.min(500, debt));
+        setDatabaseValue(uuid, "GamblingDebt", debt);
+        if (playerDataHashMap.containsKey(uuid))
+            playerDataHashMap.get(uuid).gamblingDebt = debt;
+    }
+
+    /**
+     * Adds to the player's gambling debt.
+     *
+     * @param uuid   The player's UUID
+     * @param amount The amount of debt to add
+     */
+    public static void addGamblingDebt(UUID uuid, double amount) {
+        double currentDebt = getGamblingDebt(uuid);
+        setGamblingDebt(uuid, currentDebt + amount);
+    }
+
+    /**
+     * Reduces the player's gambling debt.
+     *
+     * @param uuid   The player's UUID
+     * @param amount The amount of debt to reduce
+     */
+    public static void reduceGamblingDebt(UUID uuid, double amount) {
+        double currentDebt = getGamblingDebt(uuid);
+        setGamblingDebt(uuid, currentDebt - amount);
+    }
+
+    /**
+     * Checks if the player is in gambling debt.
+     *
+     * @param uuid The player's UUID
+     * @return true if the player has gambling debt
+     */
+    public static boolean hasGamblingDebt(UUID uuid) {
+        return getGamblingDebt(uuid) > 0;
+    }
+
     private static Boolean getDatabaseBoolean(UUID uuid, String value) {
         try {
             Statement statement = getConnection().createStatement();
@@ -570,6 +772,21 @@ public class PlayerData {
         }
     }
 
+    private static Long getDatabaseLong(UUID uuid, String value) {
+        try {
+            Statement statement = getConnection().createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM " + PLAYER_DATA_TABLE_NAME + " WHERE PlayerUUID = '" + uuid.toString() + "';");
+            long reply = resultSet.getLong(value);
+            resultSet.close();
+            statement.close();
+            return reply;
+        } catch (Exception e) {
+            Logger.warn("Failed to get long value from database!");
+            e.printStackTrace();
+            return 0L;
+        }
+    }
+
     public static Connection getConnection() throws Exception {
         File dataFolder = new File(MetadataHandler.PLUGIN.getDataFolder(), "data/" + DATABASE_NAME);
         if (connection == null || connection.isClosed()) {
@@ -620,10 +837,7 @@ public class PlayerData {
 
     private void readExistingData(Statement statement, UUID uuid, ResultSet resultSet) throws Exception {
         playerDataHashMap.put(uuid, this);
-        currency = resultSet.getDouble("Currency");
-        guildPrestigeLevel = resultSet.getInt("GuildPrestigeLevel");
-        maxGuildLevel = resultSet.getInt("GuildMaxLevel");
-        activeGuildLevel = resultSet.getInt("GuildActiveLevel");
+        currency = resultSet.getDouble("CurrencyV2");
         score = resultSet.getInt("Score");
         kills = resultSet.getInt("Kills");
         highestLevelKilled = resultSet.getInt("HighestLevelKilled");
@@ -689,45 +903,95 @@ public class PlayerData {
             dungeonBossLockout = new DungeonBossLockout();
         }
 
+        if (resultSet.getBytes("QuestLockouts") != null) {
+            try {
+                questLockout = (com.magmaguy.elitemobs.quests.QuestLockout) ObjectSerializer.fromString(new String(resultSet.getBytes("QuestLockouts"), StandardCharsets.UTF_8));
+                // Clean up expired lockouts on load
+                questLockout.cleanupExpiredLockouts();
+            } catch (Exception exception) {
+                Logger.warn("Failed to get quest lockouts! This player's lockouts will be reset.");
+                questLockout = new com.magmaguy.elitemobs.quests.QuestLockout();
+            }
+        } else {
+            questLockout = new com.magmaguy.elitemobs.quests.QuestLockout();
+        }
+
+        // Read skill XP values
+        skillXP_ARMOR = resultSet.getLong("SkillXP_ARMOR");
+        skillXP_SWORDS = resultSet.getLong("SkillXP_SWORDS");
+        skillXP_AXES = resultSet.getLong("SkillXP_AXES");
+        skillXP_BOWS = resultSet.getLong("SkillXP_BOWS");
+        skillXP_CROSSBOWS = resultSet.getLong("SkillXP_CROSSBOWS");
+        skillXP_TRIDENTS = resultSet.getLong("SkillXP_TRIDENTS");
+        skillXP_HOES = resultSet.getLong("SkillXP_HOES");
+        try {
+            skillXP_MACES = resultSet.getLong("SkillXP_MACES");
+            skillXP_SPEARS = resultSet.getLong("SkillXP_SPEARS");
+        } catch (SQLException e) {
+            // Columns may not exist yet for older databases - will be added on next save
+            skillXP_MACES = 0;
+            skillXP_SPEARS = 0;
+        }
+
+        // Read skill bonus selections
+        String skillSelections = resultSet.getString("SkillBonusSelections");
+        skillBonusSelections = (skillSelections != null) ? skillSelections : "{}";
+
+        // Read gambling debt
+        gamblingDebt = resultSet.getDouble("GamblingDebt");
+
         Logger.info("User " + uuid + " data successfully read!");
     }
 
     private void writeNewData(Statement statement, UUID uuid) throws Exception {
         playerDataHashMap.put(uuid, this);
         currency = 0;
-        guildPrestigeLevel = 0;
-        maxGuildLevel = 1;
-        activeGuildLevel = !AdventurersGuildConfig.isDefaultToCommonerRank() ? 1 : 0;
         score = 0;
         kills = 0;
         highestLevelKilled = 0;
         deaths = 0;
         questsCompleted = 0;
+        // Initialize all skill XP to 0
+        skillXP_ARMOR = 0;
+        skillXP_SWORDS = 0;
+        skillXP_AXES = 0;
+        skillXP_BOWS = 0;
+        skillXP_CROSSBOWS = 0;
+        skillXP_TRIDENTS = 0;
+        skillXP_HOES = 0;
+        skillXP_MACES = 0;
+        skillXP_SPEARS = 0;
+        // Initialize skill bonus selections to empty
+        skillBonusSelections = "{}";
+        // Initialize gambling debt to 0
+        gamblingDebt = 0;
         statement = getConnection().createStatement();
         String sql = "INSERT INTO " + PLAYER_DATA_TABLE_NAME + " (" +
                 "PlayerUUID," +
                 " DisplayName," +
-                " Currency," +
-                " GuildPrestigeLevel," +
-                " GuildMaxLevel," +
-                " GuildActiveLevel," +
+                " CurrencyV2," +
                 " Score," +
                 " Kills," +
                 " HighestLevelKilled," +
                 " Deaths," +
-                " QuestsCompleted) " +
+                " QuestsCompleted," +
+                " SkillXP_ARMOR," +
+                " SkillXP_SWORDS," +
+                " SkillXP_AXES," +
+                " SkillXP_BOWS," +
+                " SkillXP_CROSSBOWS," +
+                " SkillXP_TRIDENTS," +
+                " SkillXP_HOES," +
+                " SkillXP_MACES," +
+                " SkillXP_SPEARS," +
+                " SkillBonusSelections," +
+                " GamblingDebt) " +
                 //identifier
                 "VALUES ('" + uuid + "'," +
                 //display name
                 " '" + Bukkit.getPlayer(uuid).getName() + "'," +
                 //currency
                 " 0," +
-                //guild_prestige_level
-                " 0," +
-                //guild_max_level
-                " 1," +
-                //guild_active_level
-                " "+activeGuildLevel+"," +
                 //score
                 "0," +
                 //kills
@@ -737,6 +1001,12 @@ public class PlayerData {
                 //deaths
                 "0," +
                 //questsCompleted
+                "0," +
+                //skill XP values (all start at 0)
+                "0,0,0,0,0,0,0,0,0," +
+                //skill bonus selections (empty JSON)
+                "'{}', " +
+                //gambling debt (starts at 0)
                 "0);";
         statement.executeUpdate(sql);
         statement.close();

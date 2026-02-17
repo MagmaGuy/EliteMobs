@@ -3,10 +3,10 @@ package com.magmaguy.elitemobs.dungeons;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.DungeonInstallEvent;
 import com.magmaguy.elitemobs.api.DungeonUninstallEvent;
+import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfig;
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
 import com.magmaguy.elitemobs.utils.EventCaller;
-import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.Logger;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
@@ -26,12 +26,12 @@ public class WorldInstancedDungeonPackage extends EMPackage implements CombatCon
         DungeonInstallEvent event = new DungeonInstallEvent(contentPackagesConfigFields);
         new EventCaller(event);
         contentPackagesConfigFields.simpleInstall();
-        player.sendMessage(ChatColorConverter.convert("&2Dungeon " + contentPackagesConfigFields.getFilename() + " installed!"));
+        player.sendMessage(DungeonsConfig.getInstancedDungeonInstalledMessage().replace("$name", contentPackagesConfigFields.getFilename()));
         if (!contentPackagesConfigFields.isEnchantmentChallenge()) {
-            player.sendMessage(ChatColorConverter.convert("&6Instanced dungeons must be accessed either through the &a/em &6menu or an NPC! NPCs for premade EliteMobs content can be found at the Adventurer's Guild Hub map."));
-            player.sendMessage("Remember that instanced dungeons create a world when you join them and remove that world when you are done playing in them!");
+            player.sendMessage(DungeonsConfig.getInstancedDungeonAccessMessage());
+            player.sendMessage(DungeonsConfig.getInstancedDungeonInstallNote());
         } else {
-            player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2Enchantment instanced dungeon installed! This dungeon can only be accessed when attempting to enchant items and getting a challenge as a result!"));
+            player.sendMessage(DungeonsConfig.getEnchantmentDungeonInstalledMessage());
             ContentPackagesConfig.getEnchantedChallengeDungeonPackages().put(contentPackagesConfigFields.getFilename(), contentPackagesConfigFields);
         }
         this.isInstalled = true;
@@ -43,6 +43,7 @@ public class WorldInstancedDungeonPackage extends EMPackage implements CombatCon
         new EventCaller(event);
         contentPackagesConfigFields.simpleUninstall();
         isInstalled = false;
+        player.sendMessage(DungeonsConfig.getContentUninstalledMessage().replace("$name", contentPackagesConfigFields.getName()));
     }
 
     @Override

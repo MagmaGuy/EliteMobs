@@ -1,12 +1,12 @@
 package com.magmaguy.elitemobs.dungeons;
 
 import com.magmaguy.elitemobs.api.DungeonUninstallEvent;
+import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
 import com.magmaguy.elitemobs.dungeons.utility.DungeonUtils;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomMusic;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.elitemobs.wormhole.Wormhole;
-import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -36,7 +36,7 @@ public class WorldPackage extends EMPackage {
             new CustomMusic(contentPackagesConfigFields.getSong(), contentPackagesConfigFields, world);
         for (Wormhole wormhole : Wormhole.getWormholes())
             wormhole.onDungeonInstall(contentPackagesConfigFields.getFilename());
-        player.sendMessage(ChatColorConverter.convert("[EliteMobs] Successfully installed " + contentPackagesConfigFields.getName() + "! To uninstall, do /em setup again and click on this content again."));
+        player.sendMessage(DungeonsConfig.getContentInstalledMessage().replace("$name", contentPackagesConfigFields.getName()));
     }
 
     @Override
@@ -46,12 +46,14 @@ public class WorldPackage extends EMPackage {
         isInstalled = false;
         if (!DungeonUtils.unloadWorld(this)) {
             isInstalled = true;
+            player.sendMessage(DungeonsConfig.getContentUninstallFailedMessage().replace("$name", contentPackagesConfigFields.getName()));
             return;
         }
         for (Wormhole wormhole : Wormhole.getWormholes())
             wormhole.onDungeonUninstall(contentPackagesConfigFields.getFilename());
         contentPackagesConfigFields.uninstallWorld();
         world = null;
+        player.sendMessage(DungeonsConfig.getContentUninstalledMessage().replace("$name", contentPackagesConfigFields.getName()));
     }
 
     @Override

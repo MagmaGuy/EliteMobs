@@ -7,6 +7,7 @@ import com.magmaguy.elitemobs.powers.scripts.primitives.ScriptInteger;
 import com.magmaguy.elitemobs.powers.scripts.primitives.ScriptVector;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.Logger;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
@@ -166,6 +167,8 @@ public class MapListInterpreter {
             value = LegacyValueConverter.parseParticle((String) value);
         else if (enumClass.isAssignableFrom(PotionEffectType.class))
             value = LegacyValueConverter.parsePotionEffect((String) value);
+        else if (enumClass.isAssignableFrom(Material.class))
+            value = LegacyValueConverter.parseMaterial((String) value);
         try {
             return Enum.valueOf(enumClass, (String) value);
         } catch (Exception ex) {

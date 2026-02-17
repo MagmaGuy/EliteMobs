@@ -14,8 +14,6 @@ public class MobCombatSettingsConfig extends ConfigurationFile {
     @Getter
     private static double aggressiveMobConversionPercentage;
     @Getter
-    private static int superMobsStackRange;
-    @Getter
     private static int naturalEliteMobLevelCap;
     @Getter
     private static boolean doEliteArmor;
@@ -29,8 +27,6 @@ public class MobCombatSettingsConfig extends ConfigurationFile {
     private static boolean enableWarningVisualEffects;
     @Getter
     private static boolean enableDeathMessages;
-    @Getter
-    private static boolean displayHealthOnHit;
     @Getter
     private static boolean displayDamageOnHit;
     @Getter
@@ -82,13 +78,9 @@ public class MobCombatSettingsConfig extends ConfigurationFile {
     @Getter
     private static String fullHealMessage;
     @Getter
-    private static double strengthAndWeaknessDamageMultipliers;
-    @Getter
     private static double resistanceDamageMultiplier;
     @Getter
     private static double blockingDamageReduction;
-    @Getter
-    private static boolean silenceAllDeathMessages;
     @Getter
     private static boolean displayVisualHealthBars;
     @Getter
@@ -103,6 +95,12 @@ public class MobCombatSettingsConfig extends ConfigurationFile {
     private static int combatDisplayTimeoutSeconds;
     @Getter
     private static boolean useFixedHealthBarSize;
+    @Getter
+    private static String healPopupFormat;
+    @Getter
+    private static String xpPopupFormat;
+    @Getter
+    private static String healthDisplaySeparator;
     private static MobCombatSettingsConfig instance;
 
     public MobCombatSettingsConfig() {
@@ -127,12 +125,9 @@ public class MobCombatSettingsConfig extends ConfigurationFile {
         aggressiveMobConversionPercentage = ConfigurationEngine.setDouble(
                 List.of("Sets the percentage of naturally spawned mobs that get converted to elite mobs."),
                 fileConfiguration, "eliteMobsSpawnPercentage", 0.05);
-        superMobsStackRange = Math.max(ConfigurationEngine.setInt(
-                List.of("Sets the super mob range to scan for super mob stacking"),
-                fileConfiguration, "superMobStackRange", 15), 2);
         naturalEliteMobLevelCap = ConfigurationEngine.setInt(
-                List.of("Sets the maximum level elites can spawn at.", "Note: elite mob level is based on what armor and weapons players are wearing, and armor only scales up to level 200."),
-                fileConfiguration, "naturalEliteMobsLevelCap", 250);
+                List.of("Sets the maximum level elites can spawn at.", "Note: elite mob level is based on player skill levels and gear. The skill system scales up to level 100."),
+                fileConfiguration, "naturalEliteMobsLevelCap", 120);
         doEliteArmor = ConfigurationEngine.setBoolean(
                 List.of("Sets if elites will wear armor based on their level. This is for visual purposes only and does not affect combat."),
                 fileConfiguration, "doElitesWearArmor", true);
@@ -151,9 +146,6 @@ public class MobCombatSettingsConfig extends ConfigurationFile {
         enableDeathMessages = ConfigurationEngine.setBoolean(
                 List.of("Sets if custom death messages will be used when players die from elites."),
                 fileConfiguration, "doCustomEliteMobsDeathMessages", true);
-        displayHealthOnHit = ConfigurationEngine.setBoolean(
-                List.of("Sets if EliteMobs will show health indicators for elites."),
-                fileConfiguration, "doDisplayMobHealthOnHit", true);
         displayDamageOnHit = ConfigurationEngine.setBoolean(
                 List.of("Sets if EliteMobs will show damage indicators for damage done to elites."),
                 fileConfiguration, "doDisplayMobDamageOnHit", true);
@@ -233,18 +225,12 @@ public class MobCombatSettingsConfig extends ConfigurationFile {
         fullHealMessage = ConfigurationEngine.setString(
                 List.of("Sets the message that appears when a boss heals from going out of combat."),
                 file, fileConfiguration, "fullHealMessage", "&2FULL HEAL!", true);
-        strengthAndWeaknessDamageMultipliers = ConfigurationEngine.setDouble(
-                List.of("Sets the multipliers applied to attacks bosses are strong and weak against."),
-                fileConfiguration, "strengthAndWeaknessDamageMultipliers", 2D);
         resistanceDamageMultiplier = ConfigurationEngine.setDouble(
                 List.of("Sets the multiplier applied to damage reduction from the resistance potion effect for players."),
                 fileConfiguration, "resistanceDamageMultiplier", 1);
         blockingDamageReduction = ConfigurationEngine.setDouble(
                 List.of("Sets the multiplier applied to damage reduction when a player is holding up a shield for melee attacks (powers excluded)."),
                 fileConfiguration, "blockingDamageReduction", 0.8);
-        silenceAllDeathMessages = ConfigurationEngine.setBoolean(
-                List.of("Sets if all death messages will be silenced. This is not recommended, as it might hide some lore in dungeons."),
-                fileConfiguration, "silenceAllDeathMessages", false);
         displayVisualHealthBars = ConfigurationEngine.setBoolean(
                 List.of("Sets if visual health bars (using bar characters) will be displayed above elite mobs during combat.",
                         "The number of bars scales with the health multiplier of the boss."),
@@ -272,5 +258,16 @@ public class MobCombatSettingsConfig extends ConfigurationFile {
                         "When false (default), the health bar scales with the boss health multiplier, adding more bars and rows for tankier bosses.",
                         "When true, the health bar is always a single row of 10 bars."),
                 fileConfiguration, "useFixedHealthBarSize", false);
+        healPopupFormat = ConfigurationEngine.setString(
+                List.of("Format for the heal popup text when a boss partially heals.",
+                        "Use $amount for the heal amount. Color is applied automatically."),
+                file, fileConfiguration, "healPopupFormat", "+$amount HP", true);
+        xpPopupFormat = ConfigurationEngine.setString(
+                List.of("Format for the XP gain popup text.",
+                        "Use $amount for the XP amount."),
+                file, fileConfiguration, "xpPopupFormat", "+$amount \u2726XP", true);
+        healthDisplaySeparator = ConfigurationEngine.setString(
+                List.of("Separator between current and max health in the numeric health display."),
+                file, fileConfiguration, "healthDisplaySeparator", " &7/ ", true);
     }
 }

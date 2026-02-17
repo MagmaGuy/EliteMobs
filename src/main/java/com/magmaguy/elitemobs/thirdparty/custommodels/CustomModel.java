@@ -7,6 +7,8 @@ import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.thirdparty.custommodels.freeminecraftmodels.CustomModelFMM;
 import com.magmaguy.elitemobs.thirdparty.custommodels.modelengine.CustomModelMEG;
 import com.magmaguy.elitemobs.thirdparty.custommodels.modelengine.ModelEngineChecker;
+import com.magmaguy.freeminecraftmodels.customentity.ModeledEntityLeftClickCallback;
+import com.magmaguy.freeminecraftmodels.customentity.ModeledEntityRightClickCallback;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -31,6 +33,21 @@ public class CustomModel implements CustomModelInterface {
         switch (modelPlugin) {
             case FREE_MINECRAFT_MODELS:
                 customModelFMM = new CustomModelFMM(livingEntity, modelName, nametagName);
+                initialized = true;
+                break;
+            case MODEL_ENGINE:
+                customModelMEG = new CustomModelMEG(livingEntity, modelName, nametagName);
+                initialized = true;
+                break;
+        }
+    }
+
+    private CustomModel(LivingEntity livingEntity, String modelName, String nametagName,
+                        ModeledEntityLeftClickCallback leftClickCallback,
+                        ModeledEntityRightClickCallback rightClickCallback) {
+        switch (modelPlugin) {
+            case FREE_MINECRAFT_MODELS:
+                customModelFMM = new CustomModelFMM(livingEntity, modelName, nametagName, leftClickCallback, rightClickCallback);
                 initialized = true;
                 break;
             case MODEL_ENGINE:
@@ -67,6 +84,13 @@ public class CustomModel implements CustomModelInterface {
 
     public static CustomModel generateCustomModel(LivingEntity livingEntity, String modelName, String nametagName) {
         CustomModel customModel = new CustomModel(livingEntity, modelName, nametagName);
+        return customModel.initialized ? customModel : null;
+    }
+
+    public static CustomModel generateCustomModel(LivingEntity livingEntity, String modelName, String nametagName,
+                                                   ModeledEntityLeftClickCallback leftClickCallback,
+                                                   ModeledEntityRightClickCallback rightClickCallback) {
+        CustomModel customModel = new CustomModel(livingEntity, modelName, nametagName, leftClickCallback, rightClickCallback);
         return customModel.initialized ? customModel : null;
     }
 
@@ -137,6 +161,14 @@ public class CustomModel implements CustomModelInterface {
             case MODEL_ENGINE -> customModelMEG.getNametagBoneLocation();
             default -> null;
         };
+    }
+
+    @Override
+    public void setSyncMovement(boolean syncMovement) {
+        switch (modelPlugin) {
+            case FREE_MINECRAFT_MODELS -> customModelFMM.setSyncMovement(syncMovement);
+            case MODEL_ENGINE -> customModelMEG.setSyncMovement(syncMovement);
+        }
     }
 
     public enum ModelPlugin {

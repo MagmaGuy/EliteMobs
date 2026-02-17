@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.playerdata.statusscreen;
 
 import com.magmaguy.elitemobs.config.DefaultConfig;
+import com.magmaguy.elitemobs.config.SkillsConfig;
 import com.magmaguy.elitemobs.config.menus.premade.PlayerStatusMenuConfig;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.thirdparty.geyser.GeyserDetector;
@@ -49,7 +50,10 @@ public class PlayerStatusScreen implements Listener {
 
     public static String convertLightColorsToBlack(String string) {
         string = ChatColorConverter.convert(string);
-        string = string.replace("§f", "§0").replace("§e", "§0");
+        string = string.replace("§f", "§0").replace("§e", "§0")
+                .replace("§a", "§0").replace("§b", "§0")
+                .replace("§d", "§0").replace("§6", "§0")
+                .replace("§9", "§0");
         if (!string.startsWith("§"))
             string = "§0" + string;
         return string;
@@ -69,6 +73,7 @@ public class PlayerStatusScreen implements Listener {
         int commandsPage = -1;
         int questsPage = -1;
         int bossTrackingPage = -1;
+        int skillsPage = -1;
         if (PlayerStatusMenuConfig.isDoStatsPage()) {
             statsPage = pageCounter;
             pages[pageCounter] = StatsPage.statsPage(targetPlayer);
@@ -107,7 +112,13 @@ public class PlayerStatusScreen implements Listener {
             }
         }
 
-        pages[0] = CoverPage.coverPage(statsPage, gearPage, teleportsPage, commandsPage, questsPage, bossTrackingPage);
+        if (SkillsConfig.isSkillSystemEnabled()) {
+            skillsPage = pageCounter;
+            pages[pageCounter] = SkillsPage.skillsPage(targetPlayer);
+            pageCounter++;
+        }
+
+        pages[0] = CoverPage.coverPage(statsPage, gearPage, teleportsPage, commandsPage, questsPage, bossTrackingPage, skillsPage);
 
         int counter = 0;
         for (TextComponent textComponent : pages) {

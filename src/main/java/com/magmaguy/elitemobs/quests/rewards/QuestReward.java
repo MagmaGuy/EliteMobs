@@ -31,7 +31,8 @@ public class QuestReward implements Serializable {
         int baselineReward = (int) (rewardLevel / 2D * killAmount);
         customLootTable = new CustomLootTable();
         customLootTable.generateCurrencyEntry(baselineReward);
-        ItemStack itemReward = LootTables.generateItemStack(Math.min(rewardLevel, PlayerData.getMaxGuildLevel(player.getUniqueId()) * 10), player, null);
+        // Skill-based gear restriction handles equipping, not drops - rewards drop at quest level
+        ItemStack itemReward = LootTables.generateItemStack(rewardLevel, player, null);
         customLootTable.generateEliteEntry(itemReward);
     }
 

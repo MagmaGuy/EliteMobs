@@ -1,22 +1,27 @@
 package com.magmaguy.elitemobs.playerdata.statusscreen;
 
 import com.magmaguy.elitemobs.commands.guild.AdventurersGuildCommand;
+import com.magmaguy.elitemobs.config.SkillsConfig;
 import com.magmaguy.elitemobs.config.menus.premade.PlayerStatusMenuConfig;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class CoverPage {
-    protected static TextComponent coverPage(int statsPage, int gearPage, int teleportsPage, int commandsPage, int questsPage, int bossTrackingPage) {
+    protected static TextComponent coverPage(int statsPage, int gearPage, int teleportsPage, int commandsPage, int questsPage, int bossTrackingPage, int skillsPage) {
 
         TextComponent textComponent = new TextComponent();
 
@@ -30,6 +35,7 @@ public class CoverPage {
                             .replace("$commandsPage", commandsPage + "")
                             .replace("$questsPage", questsPage + "")
                             .replace("$bossTrackingPage", bossTrackingPage + "")
+                            .replace("$skillsPage", skillsPage + "")
                             + "\n");
 
             if (PlayerStatusMenuConfig.getIndexHoverLines()[i] == null) continue;
@@ -49,6 +55,8 @@ public class CoverPage {
                 line.setClickEvent(new ClickEvent(ClickEvent.Action.CHANGE_PAGE, PlayerStatusMenuConfig.getIndexCommandLines()[i].replace("$questsPage", questsPage + "")));
             else if (PlayerStatusMenuConfig.getIndexCommandLines()[i].contains("$bossTrackingPage"))
                 line.setClickEvent(new ClickEvent(ClickEvent.Action.CHANGE_PAGE, PlayerStatusMenuConfig.getIndexCommandLines()[i].replace("$bossTrackingPage", bossTrackingPage + "")));
+            else if (PlayerStatusMenuConfig.getIndexCommandLines()[i].contains("$skillsPage"))
+                line.setClickEvent(new ClickEvent(ClickEvent.Action.CHANGE_PAGE, PlayerStatusMenuConfig.getIndexCommandLines()[i].replace("$skillsPage", skillsPage + "")));
 
             else
                 line.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, PlayerStatusMenuConfig.getIndexCommandLines()[i]));
@@ -76,8 +84,30 @@ public class CoverPage {
             inventory.setItem(PlayerStatusMenuConfig.getIndexQuestTrackingSlot(), PlayerStatusMenuConfig.getIndexQuestTrackingItem());
         if (PlayerStatusMenuConfig.isDoBossTrackingPage())
             inventory.setItem(PlayerStatusMenuConfig.getIndexBossTrackingSlot(), PlayerStatusMenuConfig.getIndexBossTrackingItem());
+
+        // Add Skills page button (slot 22)
+        if (SkillsConfig.isSkillSystemEnabled()) {
+            inventory.setItem(22, createSkillsItem());
+        }
+
         CoverPageEvents.pageInventories.add(inventory);
         requestingPlayer.openInventory(inventory);
+    }
+
+    private static final int SKILLS_SLOT = 22;
+
+    private static ItemStack createSkillsItem() {
+        ItemStack item = new ItemStack(Material.EXPERIENCE_BOTTLE);
+        ItemMeta meta = item.getItemMeta();
+        meta.setDisplayName(PlayerStatusMenuConfig.getSkillsItemDisplayName());
+        meta.setLore(List.of(
+                PlayerStatusMenuConfig.getSkillsItemLore1(),
+                PlayerStatusMenuConfig.getSkillsItemLore2(),
+                "",
+                PlayerStatusMenuConfig.getSkillsItemClickLore()
+        ));
+        item.setItemMeta(meta);
+        return item;
     }
 
     public static class CoverPageEvents implements Listener {
@@ -132,6 +162,13 @@ public class CoverPage {
             if (event.getSlot() == PlayerStatusMenuConfig.getIndexBossTrackingSlot() && PlayerStatusMenuConfig.isDoBossTrackingPage()) {
                 player.closeInventory();
                 BossTrackingPage.bossTrackingPage(player, player);
+                return;
+            }
+
+            // Skills page
+            if (event.getSlot() == SKILLS_SLOT && SkillsConfig.isSkillSystemEnabled()) {
+                player.closeInventory();
+                SkillsPage.skillsPage(player, player);
             }
         }
 

@@ -12,7 +12,7 @@ public class TheDeepMinesDungeon extends ContentPackagesConfigFields {
     public TheDeepMinesDungeon() {
         super("the_deep_mines_dungeon",
                 true,
-                "&2[lvl 045] &3The Deep Mines Dungeon",
+                "&3The Deep Mines Dungeon",
                 new ArrayList<>(List.of("&fBelow lies the deepest mine ever dug.",
                         "&6Credits: Dali, MagmaGuy, FrostCone")),
                 DiscordLinks.freeMinidungeons,
@@ -29,11 +29,14 @@ public class TheDeepMinesDungeon extends ContentPackagesConfigFields {
                 List.of("filename=em_id_the_deep_mines_tnt_box.yml",
                         "filename=em_id_the_deep_mines_boss_the_pursuer_p1.yml"),
                 "em_id_the_deep_mines",
-                45,
+                -1,
                 false);
+        setContentType(ContentType.DYNAMIC_DUNGEON);
         setDifficulties(List.of(
-                Map.of("name", "normal", "levelSync", 47, "id", 0),
-                Map.of("name", "hard", "levelSync", 45, "id", 1),
-                Map.of("name", "mythic", "levelSync", 43, "id", 2)));
+                Map.of("name", "normal", "levelSync", "+5", "id", 0),
+                Map.of("name", "hard", "levelSync", "+0", "id", 1),
+                Map.of("name", "mythic", "levelSync", "-5", "id", 2)));
+        setDungeonLockoutMinutes(1440);
+        setNightbreakSlug("story-mode-dungeons");
     }
 }

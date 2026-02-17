@@ -1,7 +1,8 @@
 package com.magmaguy.elitemobs.items;
 
+import com.magmaguy.easyminecraftgoals.NMSManager;
+import com.magmaguy.easyminecraftgoals.internal.FakeItem;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
@@ -18,6 +19,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.Display;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -36,16 +38,18 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class ItemLootShower implements Listener {
+/**
+ * Handles the visual coin shower effect when players defeat elite mobs.
+ * On 1.21.4+, uses packet-based FakeItem entities that cannot be picked up by hoppers or other plugins.
+ * On older versions, falls back to real Item entities with pickup protection.
+ */
+public class ItemLootShower {
 
     private static final HashMap<UUID, Double> playerCurrencyPickup = new HashMap<>();
-    public static HashMap<UUID, Coin> coinValues = new HashMap<>();
-
-    public static void shutdown() {
-        playerCurrencyPickup.clear();
-        coinValues.clear();
-    }
-    private final Player player;
+    // For legacy (pre-1.21.4) real item system
+    public static HashMap<UUID, LegacyCoin> coinValues = new HashMap<>();
+    // Cached version check result
+    private static Boolean useFakeItems = null;
 
     public ItemLootShower(double itemLevel, double mobLevel, Location location, Player player) {
 
@@ -53,7 +57,11 @@ public class ItemLootShower implements Listener {
 
         if (ElitePlayerInventory.playerInventories.get(player.getUniqueId()) == null) return;
 
-        if (!EconomySettingsConfig.isEnableCurrencyShower() || !SoulbindEnchantment.isEnabled)
+        if (!EconomySettingsConfig.isEnableCurrencyShower())
+            return;
+
+        // Legacy system requires soulbind to be enabled
+        if (!useFakeItems() && !SoulbindEnchantment.isEnabled)
             return;
 
         if (Math.abs(mobLevel - ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getFullPlayerTier(false))
@@ -69,7 +77,7 @@ public class ItemLootShower implements Listener {
                         return;
                     }
                     player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(
-                            ChatColorConverter.convert(ItemSettingsConfig.getLevelRangeTooDifferent())
+                            ItemSettingsConfig.getLevelRangeTooDifferent()
                                     .replace("$playerLevel", ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getFullPlayerTier(false) + "")
                                     .replace("$bossLevel", (int) mobLevel + "")));
                 }
@@ -80,6 +88,25 @@ public class ItemLootShower implements Listener {
             addDirectly(getCurrencyAmount(itemLevel));
         else
             addIndirectly(location, getCurrencyAmount(itemLevel));
+    }
+
+    public static void shutdown() {
+        playerCurrencyPickup.clear();
+        coinValues.clear();
+        useFakeItems = null;
+    }
+
+    private final Player player;
+
+    /**
+     * Check if we should use FakeItem (1.21.4+) or real Items (older versions)
+     */
+    private static boolean useFakeItems() {
+        if (useFakeItems == null) {
+            // Check if the NMS adapter supports FakeItems
+            useFakeItems = NMSManager.getAdapter().supportsFakeItems();
+        }
+        return useFakeItems;
     }
 
     public ItemLootShower(Location location, Player player, int amount) {
@@ -113,9 +140,9 @@ public class ItemLootShower implements Listener {
                     return;
                 }
 
-                player.sendMessage(ChatColorConverter.convert(EconomySettingsConfig.getChatCurrencyShowerMessage()
+                player.sendMessage(EconomySettingsConfig.getChatCurrencyShowerMessage()
                         .replace("$currency_name", EconomySettingsConfig.getCurrencyName())
-                        .replace("$amount", playerCurrencyPickup.get(playerUUID) + "")));
+                        .replace("$amount", playerCurrencyPickup.get(playerUUID) + ""));
 
                 playerCurrencyPickup.remove(playerUUID);
                 sendAdventurersGuildNotification(player);
@@ -130,7 +157,7 @@ public class ItemLootShower implements Listener {
 
     private static void sendAdventurersGuildNotification(Player player) {
         player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                TextComponent.fromLegacyText(ChatColorConverter.convert(EconomySettingsConfig.getAdventurersGuildNotificationMessage())));
+                TextComponent.fromLegacyText(EconomySettingsConfig.getAdventurersGuildNotificationMessage()));
     }
 
     private void addIndirectly(Location location, int currencyAmount2) {
@@ -200,21 +227,34 @@ public class ItemLootShower implements Listener {
     }
 
     private int getCurrencyAmount(double eliteMobTier) {
-        return (int) (eliteMobTier / 2D * EconomySettingsConfig.getCurrencyShowerMultiplier() *
-                GuildRank.currencyBonusMultiplier(GuildRank.getGuildPrestigeRank(player)));
+        return (int) (eliteMobTier / 2D * EconomySettingsConfig.getCurrencyShowerMultiplier());
     }
 
     private void addDirectly(double eliteMobTier) {
         EconomyHandler.addCurrency(player.getUniqueId(), getCurrencyAmount(eliteMobTier));
-        player.sendMessage(ChatColorConverter.convert(EconomySettingsConfig.getChatCurrencyShowerMessage()
+        player.sendMessage(EconomySettingsConfig.getChatCurrencyShowerMessage()
                 .replace("$currency_name", EconomySettingsConfig.getCurrencyName())
-                .replace("$amount", getCurrencyAmount(eliteMobTier) + "")));
+                .replace("$amount", getCurrencyAmount(eliteMobTier) + ""));
     }
 
-    private Item generateCurrencyItem(Material material, Location location, double value) {
+    /**
+     * Generate currency item - uses FakeItem on 1.21.4+ or real Item on older versions
+     */
+    private void generateCurrencyItem(Material material, Location location, double value, String colorCode) {
+        if (useFakeItems()) {
+            generateFakeCurrencyItem(material, location, value, colorCode);
+        } else {
+            generateLegacyCurrencyItem(material, location, value, colorCode);
+        }
+    }
 
-        ItemStack currencyItemStack = SoulbindEnchantment.addEnchantment(ItemStackGenerator.generateItemStack(material, "",
-                new ArrayList<>(List.of("EliteMobsCurrencyItem", value + "", ThreadLocalRandom.current().nextDouble() + ""))), player);
+    /**
+     * Modern implementation using packet-based FakeItem (1.21.4+)
+     */
+    private void generateFakeCurrencyItem(Material material, Location location, double value, String colorCode) {
+        ItemStack currencyItemStack = ItemStackGenerator.generateItemStack(material, "",
+                new ArrayList<>(List.of("EliteMobsCurrencyItem", value + "", ThreadLocalRandom.current().nextDouble() + "")));
+
         String model = null;
         try {
             model = EconomySettingsConfig.getThisConfiguration().getString("lootShowerDataV2." + (int) value);
@@ -225,6 +265,42 @@ public class ItemLootShower implements Listener {
 
         if (model == null) Logger.warn("No model found for value " + value + " !");
         else setCoinModel(currencyItemStack, model);
+
+        // Create packet-based FakeItem - only visible to the target player
+        Location spawnLocation = location.clone().add(0, 1, 0);
+        FakeItem fakeItem = NMSManager.getAdapter().fakeItemBuilder()
+                .itemStack(currencyItemStack)
+                .billboard(Display.Billboard.CENTER)
+                .scale(0.6f)
+                .customName(ChatColorConverter.convert(colorCode + (int) value + " " + EconomySettingsConfig.getCurrencyName()))
+                .customNameVisible(true)
+                .build(spawnLocation);
+
+        // Show only to the target player
+        fakeItem.displayTo(player);
+
+        // Start the coin animation
+        new FakeCoin(value, player, fakeItem, spawnLocation);
+    }
+
+    /**
+     * Legacy implementation using real Item entities (pre-1.21.4)
+     */
+    private void generateLegacyCurrencyItem(Material material, Location location, double value, String colorCode) {
+        ItemStack currencyItemStack = SoulbindEnchantment.addEnchantment(ItemStackGenerator.generateItemStack(material, "",
+                new ArrayList<>(List.of("EliteMobsCurrencyItem", value + "", ThreadLocalRandom.current().nextDouble() + ""))), player);
+
+        String model = null;
+        try {
+            model = EconomySettingsConfig.getThisConfiguration().getString("lootShowerDataV2." + (int) value);
+        } catch (Exception ex) {
+            Logger.warn("Failed to get coin model for value " + value + " !");
+            ex.printStackTrace();
+        }
+
+        if (model == null) Logger.warn("No model found for value " + value + " !");
+        else setCoinModel(currencyItemStack, model);
+
         Item currencyItem = location.getWorld().dropItem(location.clone().add(new Vector(0, 1, 0)), currencyItemStack);
         EntityTracker.registerVisualEffects(currencyItem);
         currencyItem.setInvulnerable(true);
@@ -236,120 +312,82 @@ public class ItemLootShower implements Listener {
 
         SoulbindEnchantment.addPhysicalDisplay(currencyItem, this.player);
 
-        new Coin(value, player, currencyItem);
+        currencyItem.setCustomName(ChatColorConverter.convert(colorCode + (int) value + " " + EconomySettingsConfig.getCurrencyName()));
+        currencyItem.setCustomNameVisible(true);
 
-        return currencyItem;
-
+        new LegacyCoin(value, player, currencyItem);
     }
 
     private void dropOne(Location location) {
-
-        Item currencyItem;
         try {
-            currencyItem = generateCurrencyItem(Material.getMaterial(EconomySettingsConfig.getLootShowerMaterial1()), location, 1);
+            generateCurrencyItem(Material.getMaterial(EconomySettingsConfig.getLootShowerMaterial1()), location, 1, "&7");
         } catch (Exception ex) {
             Logger.warn("Material for EliteMob shower 1 is invalid. Defaulting to gold nugget.");
-            currencyItem = generateCurrencyItem(Material.GOLD_NUGGET, location, 1);
+            generateCurrencyItem(Material.GOLD_NUGGET, location, 1, "&7");
         }
-
-        currencyItem.setCustomName(ChatColorConverter.convert("&7" + 1 + " " + EconomySettingsConfig.getCurrencyName()));
-        currencyItem.setCustomNameVisible(true);
-
     }
 
     private void dropFive(Location location) {
-
-        Item currencyItem;
         try {
-            currencyItem = generateCurrencyItem(Material.getMaterial(EconomySettingsConfig.getLootShowerMaterial5()), location, 5);
+            generateCurrencyItem(Material.getMaterial(EconomySettingsConfig.getLootShowerMaterial5()), location, 5, "&f");
         } catch (Exception ex) {
             Logger.warn("Material for EliteMob shower 5 is invalid. Defaulting to gold ingot.");
-            currencyItem = generateCurrencyItem(Material.GOLD_INGOT, location, 5);
+            generateCurrencyItem(Material.GOLD_INGOT, location, 5, "&f");
         }
-
-        currencyItem.setCustomName(ChatColorConverter.convert("&f" + 5 + " " + EconomySettingsConfig.getCurrencyName()));
-        currencyItem.setCustomNameVisible(true);
     }
 
     private void dropTen(Location location) {
-
-        Item currencyItem;
         try {
-            currencyItem = generateCurrencyItem(Material.getMaterial(EconomySettingsConfig.getLootShowerMaterial10()), location, 10);
+            generateCurrencyItem(Material.getMaterial(EconomySettingsConfig.getLootShowerMaterial10()), location, 10, "&a");
         } catch (Exception ex) {
             Logger.warn("Material for EliteMob shower 10 is invalid. Defaulting to Gold block.");
-            currencyItem = generateCurrencyItem(Material.GOLD_BLOCK, location, 10);
+            generateCurrencyItem(Material.GOLD_BLOCK, location, 10, "&a");
         }
-
-        currencyItem.setCustomName(ChatColorConverter.convert("&a" + 10 + " " + EconomySettingsConfig.getCurrencyName()));
-        currencyItem.setCustomNameVisible(true);
     }
 
     private void dropTwenty(Location location) {
-
-        Item currencyItem;
         try {
-            currencyItem = generateCurrencyItem(Material.getMaterial(EconomySettingsConfig.getLootShowerMaterial20()), location, 20);
+            generateCurrencyItem(Material.getMaterial(EconomySettingsConfig.getLootShowerMaterial20()), location, 20, "&2");
         } catch (Exception ex) {
             Logger.warn("Material for EliteMob shower 20 is invalid. Defaulting to emerald.");
-            currencyItem = generateCurrencyItem(Material.EMERALD, location, 20);
+            generateCurrencyItem(Material.EMERALD, location, 20, "&2");
         }
-
-        currencyItem.setCustomName(ChatColorConverter.convert("&2" + 20 + " " + EconomySettingsConfig.getCurrencyName()));
-        currencyItem.setCustomNameVisible(true);
     }
 
     private void dropFifty(Location location) {
-
-        Item currencyItem;
         try {
-            currencyItem = generateCurrencyItem(Material.getMaterial(EconomySettingsConfig.getLootShowerMaterial50()), location, 50);
+            generateCurrencyItem(Material.getMaterial(EconomySettingsConfig.getLootShowerMaterial50()), location, 50, "&2");
         } catch (Exception ex) {
             Logger.warn("Material for EliteMob shower 50 is invalid. Defaulting to emerald block.");
-            currencyItem = generateCurrencyItem(Material.EMERALD_BLOCK, location, 50);
+            generateCurrencyItem(Material.EMERALD_BLOCK, location, 50, "&2");
         }
-
-        currencyItem.setCustomName(ChatColorConverter.convert("&2" + 50 + " " + EconomySettingsConfig.getCurrencyName()));
-        currencyItem.setCustomNameVisible(true);
     }
 
     private void dropOneHundred(Location location) {
-        Item currencyItem;
         try {
-            currencyItem = generateCurrencyItem(Material.getMaterial(EconomySettingsConfig.getLootShowerMaterial100()), location, 100);
+            generateCurrencyItem(Material.getMaterial(EconomySettingsConfig.getLootShowerMaterial100()), location, 100, "&2");
         } catch (Exception ex) {
             Logger.warn("Material for EliteMob shower 100 is invalid. Defaulting to diamond.");
-            currencyItem = generateCurrencyItem(Material.DIAMOND, location, 100);
+            generateCurrencyItem(Material.DIAMOND, location, 100, "&2");
         }
-
-        currencyItem.setCustomName(ChatColorConverter.convert("&2" + 100 + " " + EconomySettingsConfig.getCurrencyName()));
-        currencyItem.setCustomNameVisible(true);
     }
 
     private void dropFiveHundred(Location location) {
-        Item currencyItem;
         try {
-            currencyItem = generateCurrencyItem(Material.getMaterial(EconomySettingsConfig.getLootShowerMaterial500()), location, 500);
+            generateCurrencyItem(Material.getMaterial(EconomySettingsConfig.getLootShowerMaterial500()), location, 500, "&2");
         } catch (Exception ex) {
             Logger.warn("Material for EliteMob shower 500 is invalid. Defaulting to diamond block.");
-            currencyItem = generateCurrencyItem(Material.DIAMOND_BLOCK, location, 500);
+            generateCurrencyItem(Material.DIAMOND_BLOCK, location, 500, "&2");
         }
-
-        currencyItem.setCustomName(ChatColorConverter.convert("&2" + 500 + " " + EconomySettingsConfig.getCurrencyName()));
-        currencyItem.setCustomNameVisible(true);
     }
 
     private void dropOneThousand(Location location) {
-        Item currencyItem;
         try {
-            currencyItem = generateCurrencyItem(Material.getMaterial(EconomySettingsConfig.getLootShowerMaterial1000()), location, 1000);
+            generateCurrencyItem(Material.getMaterial(EconomySettingsConfig.getLootShowerMaterial1000()), location, 1000, "&2");
         } catch (Exception ex) {
             Logger.warn("Material for EliteMob shower 1000 is invalid. Defaulting to nether star.");
-            currencyItem = generateCurrencyItem(Material.NETHER_STAR, location, 1000);
+            generateCurrencyItem(Material.NETHER_STAR, location, 1000, "&2");
         }
-
-        currencyItem.setCustomName(ChatColorConverter.convert("&2" + 1000 + " " + EconomySettingsConfig.getCurrencyName()));
-        currencyItem.setCustomNameVisible(true);
     }
 
     private ItemStack setCoinModel(ItemStack itemStack, String data) {
@@ -358,17 +396,17 @@ public class ItemLootShower implements Listener {
     }
 
     /**
-     * Currency pickup event
+     * Event listeners for legacy (pre-1.21.4) real item pickup prevention
      */
     public static class ItemLootShowerEvents implements Listener {
         @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
         public static void onItemPickup(EntityPickupItemEvent event) {
-            //coins are soulbound so if someone can pick them up they can have it
+            // Coins are soulbound so if someone can pick them up they can have it
             if (!coinValues.containsKey(event.getItem().getUniqueId())) return;
             event.setCancelled(true);
             if (!event.getEntity().getType().equals(EntityType.PLAYER)) return;
 
-            Coin coin = coinValues.get(event.getItem().getUniqueId());
+            LegacyCoin coin = coinValues.get(event.getItem().getUniqueId());
             if (!coin.pickupable)
                 return;
 
@@ -379,7 +417,7 @@ public class ItemLootShower implements Listener {
             EconomyHandler.addCurrency(player.getUniqueId(), amountIncremented);
             sendCurrencyNotification(player);
 
-            //cache for counting how much coin they're getting over a short amount of time
+            // Cache for counting how much coin they're getting over a short amount of time
             UUID playerUUID = player.getUniqueId();
             if (playerCurrencyPickup.containsKey(playerUUID))
                 playerCurrencyPickup.put(playerUUID, playerCurrencyPickup.get(playerUUID) + amountIncremented);
@@ -388,9 +426,9 @@ public class ItemLootShower implements Listener {
 
             player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
                     TextComponent.fromLegacyText(
-                            ChatColorConverter.convert(EconomySettingsConfig.getActionBarCurrencyShowerMessage()
+                            EconomySettingsConfig.getActionBarCurrencyShowerMessage()
                                     .replace("$currency_name", EconomySettingsConfig.getCurrencyName())
-                                    .replace("$amount", Round.twoDecimalPlaces(playerCurrencyPickup.get(playerUUID)) + ""))));
+                                    .replace("$amount", Round.twoDecimalPlaces(playerCurrencyPickup.get(playerUUID)) + "")));
         }
 
         @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
@@ -400,19 +438,151 @@ public class ItemLootShower implements Listener {
         }
     }
 
-    private class Coin {
+    /**
+     * Packet-based coin that floats toward the player and awards currency on "pickup".
+     * Since this is packet-based, no other plugins or hoppers can interact with it.
+     * Used on 1.21.4+
+     */
+    private class FakeCoin {
+        private final UUID playerUUID;
+        private final double value;
+        private final FakeItem fakeItem;
+        private Location currentLocation;
+        private Vector velocity;
+
+        public FakeCoin(double value, Player player, FakeItem fakeItem, Location spawnLocation) {
+            this.playerUUID = player.getUniqueId();
+            this.value = value;
+            this.fakeItem = fakeItem;
+            this.currentLocation = spawnLocation.clone();
+
+            // Initial upward + random horizontal velocity
+            this.velocity = new Vector(
+                    (ThreadLocalRandom.current().nextDouble() - 0.5) * 0.3,
+                    0.4,
+                    (ThreadLocalRandom.current().nextDouble() - 0.5) * 0.3
+            );
+
+            // Remove after 5 minutes if not collected
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    fakeItem.remove();
+                }
+            }.runTaskLater(MetadataHandler.PLUGIN, 20 * 60 * 5);
+
+            // Animation task
+            new BukkitRunnable() {
+                int counter = 0;
+                final int LAUNCH_TICKS = 15; // Initial launch phase
+                final float ROTATION_PER_TICK = 9f; // 360 degrees / 40 ticks = 1 full turn per 2 seconds
+                boolean attracting = false;
+                float rotation = 0; // Y-axis rotation in degrees
+
+                @Override
+                public void run() {
+                    Player targetPlayer = player.isOnline() ? player : null;
+
+                    // Player disconnected or invalid
+                    if (targetPlayer == null || !targetPlayer.isValid()) {
+                        fakeItem.remove();
+                        cancel();
+                        return;
+                    }
+
+                    // Different world
+                    if (!targetPlayer.getWorld().equals(currentLocation.getWorld())) {
+                        fakeItem.remove();
+                        cancel();
+                        return;
+                    }
+
+                    // Check if close enough to "collect"
+                    double distanceSquared = targetPlayer.getLocation().add(0, 1, 0).distanceSquared(currentLocation);
+                    if (distanceSquared <= 1.5) {
+                        collectCoin(targetPlayer);
+                        cancel();
+                        return;
+                    }
+
+                    // Too far away - give up after some time
+                    if (counter > 20 * 10 && distanceSquared > 900) {
+                        fakeItem.remove();
+                        cancel();
+                        return;
+                    }
+
+                    // Update rotation - 1 full turn every 2 seconds
+                    rotation += ROTATION_PER_TICK;
+                    if (rotation >= 360) rotation -= 360;
+                    fakeItem.setYawRotation(rotation);
+
+                    // Launch phase - apply gravity and initial velocity
+                    if (counter < LAUNCH_TICKS) {
+                        velocity.setY(velocity.getY() - 0.04); // Gravity
+                        currentLocation.add(velocity);
+                        fakeItem.teleport(currentLocation);
+                    }
+                    // Attract phase - float toward player
+                    else {
+                        if (!attracting) {
+                            attracting = true;
+                            velocity = new Vector(0, 0, 0);
+                        }
+
+                        Location targetLoc = targetPlayer.getLocation().add(0, 1, 0);
+                        Vector direction = targetLoc.clone().subtract(currentLocation).toVector();
+
+                        if (direction.lengthSquared() > 0.01) {
+                            direction.normalize().multiply(0.35);
+                            currentLocation.add(direction);
+                            fakeItem.teleport(currentLocation);
+                        }
+                    }
+
+                    counter++;
+                }
+            }.runTaskTimer(MetadataHandler.PLUGIN, 1, 1);
+        }
+
+        private void collectCoin(Player targetPlayer) {
+            fakeItem.remove();
+            EconomyHandler.addCurrency(targetPlayer.getUniqueId(), value);
+            sendCurrencyNotification(targetPlayer);
+
+            // Cache for counting how much coin they're getting over a short amount of time
+            if (playerCurrencyPickup.containsKey(playerUUID))
+                playerCurrencyPickup.put(playerUUID, playerCurrencyPickup.get(playerUUID) + value);
+            else
+                playerCurrencyPickup.put(playerUUID, value);
+
+            targetPlayer.spigot().sendMessage(ChatMessageType.ACTION_BAR,
+                    TextComponent.fromLegacyText(
+                            EconomySettingsConfig.getActionBarCurrencyShowerMessage()
+                                    .replace("$currency_name", EconomySettingsConfig.getCurrencyName())
+                                    .replace("$amount", Round.twoDecimalPlaces(playerCurrencyPickup.get(playerUUID)) + "")));
+        }
+    }
+
+    /**
+     * Legacy coin using real Item entities (pre-1.21.4)
+     * Coins are soulbound and protected from hopper/entity pickup via events
+     */
+    private class LegacyCoin {
         UUID player;
         UUID item;
         double value;
         boolean pickupable;
 
-        public Coin(double value, Player player, Item item) {
+        public LegacyCoin(double value, Player player, Item item) {
             this.player = player.getUniqueId();
             this.value = value;
             this.item = item.getUniqueId();
             coinValues.put(item.getUniqueId(), this);
             pickupable = false;
             item.setGravity(false);
+
+            // Remove after 5 minutes if not collected
             new BukkitRunnable() {
                 @Override
                 public void run() {
@@ -424,12 +594,12 @@ public class ItemLootShower implements Listener {
                 }
             }.runTaskLater(MetadataHandler.PLUGIN, 20 * 60 * 5);
 
+            // Animation/attraction task
             new BukkitRunnable() {
                 int counter = 0;
 
                 @Override
                 public void run() {
-
                     if (!item.isValid() ||
                             !player.isValid() ||
                             !player.getWorld().equals(item.getWorld()) ||
@@ -448,7 +618,7 @@ public class ItemLootShower implements Listener {
                         EconomyHandler.addCurrency(player.getUniqueId(), value);
                         sendCurrencyNotification(player);
 
-                        //cache for counting how much coin they're getting over a short amount of time
+                        // Cache for counting how much coin they're getting over a short amount of time
                         UUID coinPlayerUUID = player.getUniqueId();
                         if (playerCurrencyPickup.containsKey(coinPlayerUUID))
                             playerCurrencyPickup.put(coinPlayerUUID, playerCurrencyPickup.get(coinPlayerUUID) + value);
@@ -457,9 +627,9 @@ public class ItemLootShower implements Listener {
 
                         player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
                                 TextComponent.fromLegacyText(
-                                        ChatColorConverter.convert(EconomySettingsConfig.getActionBarCurrencyShowerMessage()
+                                        EconomySettingsConfig.getActionBarCurrencyShowerMessage()
                                                 .replace("$currency_name", EconomySettingsConfig.getCurrencyName())
-                                                .replace("$amount", Round.twoDecimalPlaces(playerCurrencyPickup.get(coinPlayerUUID)) + ""))));
+                                                .replace("$amount", Round.twoDecimalPlaces(playerCurrencyPickup.get(coinPlayerUUID)) + "")));
                         coinValues.remove(item.getUniqueId());
                         cancel();
                         return;
@@ -470,5 +640,4 @@ public class ItemLootShower implements Listener {
             }.runTaskTimer(MetadataHandler.PLUGIN, 1, 1);
         }
     }
-
 }

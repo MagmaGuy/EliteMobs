@@ -5,7 +5,7 @@ package com.magmaguy.elitemobs;
  */
 
 import com.magmaguy.easyminecraftgoals.NMSManager;
-import com.magmaguy.elitemobs.adventurersguild.GuildRankMenuHandler;
+import com.magmaguy.elitemobs.api.EliteMobsInitializedEvent;
 import com.magmaguy.elitemobs.collateralminecraftchanges.KeepNeutralsAngry;
 import com.magmaguy.elitemobs.collateralminecraftchanges.PlayerDeathMessageByEliteMob;
 import com.magmaguy.elitemobs.commands.CommandHandler;
@@ -26,6 +26,7 @@ import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
 import com.magmaguy.elitemobs.config.potioneffects.PotionEffectsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
+import com.magmaguy.elitemobs.config.skillbonuses.SkillBonusesConfig;
 import com.magmaguy.elitemobs.config.wormholes.WormholeConfig;
 import com.magmaguy.elitemobs.dungeons.DungeonProtector;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
@@ -81,6 +82,11 @@ import com.magmaguy.elitemobs.quests.Quest;
 import com.magmaguy.elitemobs.quests.QuestTracking;
 import com.magmaguy.elitemobs.quests.menus.QuestInventoryMenu;
 import com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldowns;
+import com.magmaguy.elitemobs.skills.CombatLevelDisplay;
+import com.magmaguy.elitemobs.skills.SkillSystemMigration;
+import com.magmaguy.elitemobs.skills.SkillXPBar;
+import com.magmaguy.elitemobs.skills.bonuses.SkillBonusInitializer;
+import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.thirdparty.bstats.CustomCharts;
 import com.magmaguy.elitemobs.thirdparty.custommodels.CustomModel;
 import com.magmaguy.elitemobs.thirdparty.custommodels.modelengine.ModelEngineReservedAddresses;
@@ -97,6 +103,7 @@ import com.magmaguy.magmacore.util.Logger;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -118,9 +125,11 @@ public class EliteMobs extends JavaPlugin {
         new DefaultConfig();
         new ItemSettingsConfig();
         new ProceduralItemGenerationSettingsConfig();
+        new StaticItemNamesConfig();
         PotionEffectsConfig.initializeConfigs();
         new EconomySettingsConfig();
         new EventsConfig();
+        new SkillsConfig();
         new EnchantmentsConfig();
         new AntiExploitConfig();
         new CombatTagConfig();
@@ -142,12 +151,15 @@ public class EliteMobs extends JavaPlugin {
         new ArenasConfig();
         //ModelsConfig.initializeConfig();
         new DungeonsConfig();
+        new CommandMessagesConfig();
+        new InitializeConfig();
         new SoundsConfig();
+        new com.magmaguy.elitemobs.config.GamblingConfig();
     }
 
     public static void worldScanner() {
         for (World world : Bukkit.getWorlds())
-            if (ValidWorldsConfig.getInstance().getFileConfiguration().getBoolean("Valid worlds." + world.getName())) {
+            if (ValidWorldsConfig.getInstance().getFileConfiguration().getBoolean("validWorlds." + world.getName())) {
                 validWorldList.add(world);
             }
 
@@ -155,6 +167,12 @@ public class EliteMobs extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        // ═══════════════════════════════════════════════════════
+        // SYNC PREAMBLE -- quick setup, stays on main thread
+        // ═══════════════════════════════════════════════════════
+        MetadataHandler.pluginState = PluginState.INITIALIZING;
+        MetadataHandler.shutdownRequested = false;
+
         Bukkit.getLogger().info(" _____ _     _____ _____ ________  ______________  _____");
         Bukkit.getLogger().info("|  ___| |   |_   _|_   _|  ___|  \\/  |  _  | ___ \\/  ___|");
         Bukkit.getLogger().info("| |__ | |     | |   | | | |__ | .  . | | | | |_/ /\\ `--.");
@@ -167,30 +185,96 @@ public class EliteMobs extends JavaPlugin {
 
         if (VersionChecker.serverVersionOlderThan(21, 0)) {
             Logger.warn("You are running a Minecraft version older than 1.21.0! EliteMobs 9.0 and later are only compatible with Minecraft 1.21.0 or later, if you are running an older Minecraft version you will need to use a pre-9.0 version of EliteMobs.");
+            MetadataHandler.pluginState = PluginState.UNINITIALIZED;
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
 
         NMSManager.initializeAdapter(this);
 
-        if (Bukkit.getServer().spigot().getConfig().getDouble("settings.attribute.maxHealth.max") < 100000000) {
-            Bukkit.getServer().spigot().getConfig().set("settings.attribute.maxHealth.max", 100000000);
+        if (Bukkit.getServer().spigot().getConfig().getDouble("settings.attribute.maxHealth.max") < Double.MAX_VALUE) {
+            Bukkit.getServer().spigot().getConfig().set("settings.attribute.maxHealth.max", Double.MAX_VALUE);
             try {
                 File spigotConfigContainer = new File(Paths.get(MetadataHandler.PLUGIN.getDataFolder().getParentFile().getCanonicalFile().getParentFile().toString() + "/spigot.yml").toString());
                 Bukkit.getServer().spigot().getConfig().save(spigotConfigContainer);
                 Logger.info("New default max health set correctly!");
             } catch (IOException e) {
-                Logger.warn("Failed to save max health value! For the plugin to work correctly, you should increase your max health on the spigot.yml config file to " + 100000000);
+                Logger.warn("Failed to save max health value! For the plugin to work correctly, you should increase your max health on the spigot.yml config file to " + Double.MAX_VALUE);
             }
         }
 
         //Remove entities that should not exist
         CrashFix.startupCheck();
 
-        /*
-        New config loading
-         */
+        // ═══════════════════════════════════════════════════════
+        // ASYNC PHASE -- heavy file I/O on async thread
+        // ═══════════════════════════════════════════════════════
+        Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
+            try {
+                asyncInitialization();
+                if (MetadataHandler.shutdownRequested) {
+                    Logger.warn("EliteMobs init cancelled -- server shutting down.");
+                    return;
+                }
+                // ═══════════════════════════════════════════════════════
+                // SYNC FINALE -- return to main thread for Bukkit API
+                // ═══════════════════════════════════════════════════════
+                Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, () -> {
+                    try {
+                        syncInitialization();
+                        MetadataHandler.pluginState = PluginState.INITIALIZED;
+                        Bukkit.getPluginManager().callEvent(new EliteMobsInitializedEvent());
+                        Logger.info("EliteMobs fully initialized!");
+                        if (MetadataHandler.pendingReloadSender != null) {
+                            Logger.sendMessage(MetadataHandler.pendingReloadSender, com.magmaguy.elitemobs.config.CommandMessagesConfig.getReloadSuccessMessage());
+                            MetadataHandler.pendingReloadSender = null;
+                        }
+                    } catch (Exception e) {
+                        Logger.warn("EliteMobs sync initialization failed!");
+                        e.printStackTrace();
+                        MetadataHandler.pluginState = PluginState.UNINITIALIZED;
+                        MetadataHandler.pendingReloadSender = null;
+                    }
+                });
+            } catch (Exception e) {
+                Logger.warn("EliteMobs async initialization failed!");
+                e.printStackTrace();
+                MetadataHandler.pluginState = PluginState.UNINITIALIZED;
+                MetadataHandler.pendingReloadSender = null;
+            }
+        });
+    }
+
+    private void asyncInitialization() {
         initializeConfigs();
+        new DatabaseConfig();
+        new SkillBonusesConfig();
+        ActionEvent.initializeBlueprintEvents();
+        TimedEvent.initializeBlueprintEvents();
+        PluginMobProperties.initializePluginMobValues();
+        MinorPowerStanceMath.initializeVectorCache();
+        MajorPowerStanceMath.initializeVectorCache();
+        ConfigurationExporter.initializeConfigs();
+        new CustomItemsConfig();
+        CustomItem.initializeCustomItems();
+        LootTables.initialize();
+        new ContentPackagesConfig();
+        new CustomBossesConfig();
+        new NPCsConfig();
+        new WormholeConfig();
+        new CustomArenasConfig();
+        new CustomQuestsConfig();
+        new SpecialItemSystemsConfig();
+    }
+
+    private void syncInitialization() {
+        //Initialize importer (fires ResourcePackGenerationEvent, must be sync)
+        MagmaCore.initializeImporter();
+
+        //Refresh dungeon versions from disk after importer extracts new content packages.
+        //The importer may overwrite YAML files with updated dungeonVersion values, but the
+        //in-memory configs were loaded before the importer ran, so they need to be refreshed.
+        ContentPackagesConfig.refreshDungeonVersions();
 
         //Initializes custom models
         CustomModel.initialize();
@@ -212,30 +296,26 @@ public class EliteMobs extends JavaPlugin {
         EventsRegistrer.registerEvents();
 
         //Launch the local data cache
-        new DatabaseConfig();
         PlayerData.initializeDatabaseConnection();
         ElitePlayerInventory.initialize();
+
+        //Initialize skill system
+        SkillSystemMigration.initialize();
+        SkillBonusInitializer.initialize();
+        // Re-apply skill bonuses for any players already online (e.g. after plugin reload)
+        for (Player p : Bukkit.getOnlinePlayers()) SkillBonusRegistry.applyAllBonuses(p);
+        CombatLevelDisplay.initialize();
+
+        //Initialize gambling system
+        com.magmaguy.elitemobs.economy.GamblingEconomyHandler.initialize();
+        com.magmaguy.elitemobs.gambling.DebtCollectorManager.initialize();
+        com.magmaguy.elitemobs.gambling.GamblingDenOwnerDisplay.initialize();
 
         //Get world list
         worldScanner();
 
         //Start the repeating tasks such as scanners
         launchRunnables();
-
-        //launch events
-        ActionEvent.initializeBlueprintEvents();
-        TimedEvent.initializeBlueprintEvents();
-
-        /*
-        Initialize mob values
-         */
-        PluginMobProperties.initializePluginMobValues();
-
-        /*
-        Cache animation vectors
-         */
-        MinorPowerStanceMath.initializeVectorCache();
-        MajorPowerStanceMath.initializeVectorCache();
 
         // Small check to make sure that PlaceholderAPI is installed
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
@@ -249,27 +329,17 @@ public class EliteMobs extends JavaPlugin {
         //Initialize custom charts
         new CustomCharts();
 
-        MagmaCore.initializeImporter();
-        ConfigurationExporter.initializeConfigs();
-
-        //Import custom items after potentially importing new items
-        new CustomItemsConfig();
-        CustomItem.initializeCustomItems();
-        LootTables.initialize();
-
         //Initialize em package content, such as world loading
-        new ContentPackagesConfig();
+        ContentPackagesConfig.initializePackages();
 
         //Initialize custom & regional bosses
-        new CustomBossesConfig();
-        //Initialize treasure chests
+        CustomBossesConfig.initializeBosses();
+
+        //Initialize treasure chests (requires block state access)
         new CustomTreasureChestsConfig();
-        //Initialize npcs
-        new NPCsConfig();
-        //Initialize wormholes
-        new WormholeConfig();
-        //Arenas
-        new CustomArenasConfig();
+
+        //Initialize NPCs (requires entity spawning)
+        NPCsConfig.initializeNPCs();
 
         //Initialize em package content
         for (EMPackage emPackage : EMPackage.getEmPackages().values())
@@ -280,6 +350,11 @@ public class EliteMobs extends JavaPlugin {
                 exception.printStackTrace();
             }
 
+        //Re-resolve wormhole destinations now that packages are loaded
+        for (EMPackage emPackage : EMPackage.getEmPackages().values())
+            if (emPackage.isInstalled())
+                for (Wormhole wormhole : Wormhole.getWormholes())
+                    wormhole.onDungeonInstall(emPackage.getContentPackagesConfigFields().getFilename());
 
         //Initialize custom spawn methods, this runs late because it compares loaded worlds against worlds listed in the config
         try {
@@ -290,12 +365,8 @@ public class EliteMobs extends JavaPlugin {
             Logger.warn(" This does not mean that you have to update your Minecraft version, but it does mean you must update your server version to the latest patch" + " available for that Minecraft version. Download from trustworthy sources, as if you download Spigot from some random website other than Spigot," + " you are probably not getting the latest version (and also there's a high chance you'll get a virus).");
         }
 
-        new CustomQuestsConfig();
-
         //Commands
         CommandHandler.registerCommands();
-
-        new SpecialItemSystemsConfig();
 
         /*
         Check for new plugin version or for dungeon updates
@@ -311,7 +382,7 @@ public class EliteMobs extends JavaPlugin {
 
         // Regenerate cached item stacks after all plugins have loaded
         // This ensures custom skins are applied correctly (ResourcePackManager may not be loaded during initial item generation)
-        Bukkit.getScheduler().runTask(this, CustomItem::regenerateCachedItemStacks);
+        CustomItem.regenerateCachedItemStacks();
     }
 
     @Override
@@ -334,6 +405,18 @@ public class EliteMobs extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (MetadataHandler.pluginState == PluginState.INITIALIZING) {
+            MetadataHandler.shutdownRequested = true;
+            Bukkit.getServer().getScheduler().cancelTasks(MetadataHandler.PLUGIN);
+            MetadataHandler.pluginState = PluginState.UNINITIALIZED;
+            MagmaCore.shutdown();
+            Logger.info("EliteMobs shutdown during init -- cancelled async loading.");
+            return;
+        }
+        if (MetadataHandler.pluginState == PluginState.UNINITIALIZED) {
+            MagmaCore.shutdown();
+            return;
+        }
         Logger.info("Starting EliteMobs shutdown sequence...");
         Explosion.shutdown();
         Bukkit.getServer().getScheduler().cancelTasks(MetadataHandler.PLUGIN);
@@ -392,6 +475,8 @@ public class EliteMobs extends JavaPlugin {
         // Additional memory leak fixes
         PlayerDeathMessageByEliteMob.shutdown();
         NPCInteractions.shutdown();
+        com.magmaguy.elitemobs.items.GearRestrictionHandler.shutdown();
+        com.magmaguy.elitemobs.antiexploit.FarmingProtection.shutdown();
         NPCProximitySensor.shutdown();
         PlayerQuestCooldowns.shutdown();
         GetLootMenu.shutdown();
@@ -410,6 +495,15 @@ public class EliteMobs extends JavaPlugin {
         RepairMenu.shutdown();
         ScrapperMenu.shutdown();
         UnbindMenu.shutdown();
+        // Gambling menu shutdowns
+        com.magmaguy.elitemobs.menus.gambling.BettingMenu.shutdown();
+        com.magmaguy.elitemobs.menus.gambling.BlackjackGame.shutdown();
+        com.magmaguy.elitemobs.menus.gambling.CoinFlipGame.shutdown();
+        com.magmaguy.elitemobs.menus.gambling.HigherLowerGame.shutdown();
+        com.magmaguy.elitemobs.menus.gambling.SlotMachineGame.shutdown();
+        com.magmaguy.elitemobs.gambling.DebtCollectorManager.shutdown();
+        com.magmaguy.elitemobs.gambling.GamblingDenOwnerDisplay.shutdown();
+        com.magmaguy.elitemobs.economy.GamblingEconomyHandler.shutdown();
         DynamicDungeonBrowser.shutdown();
         InstancedDungeonBrowser.shutdown();
         PlasmaBootsEnchantment.PlasmaBootsEnchantmentEvents.shutdown();
@@ -417,11 +511,15 @@ public class EliteMobs extends JavaPlugin {
         BuyOrSellMenu.BuyOrSellMenuEvents.shutdown();
         Quest.shutdown();
         QuestInventoryMenu.shutdown();
-        GuildRankMenuHandler.shutdown();
         StatsPage.StatsPageEvents.shutdown();
         GearPage.GearPageEvents.shutdown();
         CommandsPage.CommandsPageEvents.shutdown();
         CoverPage.CoverPageEvents.shutdown();
+        SkillsPage.SkillsPageEvents.shutdown();
+        SkillSystemMigration.shutdown();
+        SkillBonusInitializer.shutdown();
+        SkillXPBar.shutdown();
+        CombatLevelDisplay.shutdown();
         ArenaMenu.ArenaMenuEvents.shutdown();
         ItemEnchantmentMenu.ItemEnchantMenuEvents.shutdown();
         EliteScrollMenu.EliteScrollMenuEvents.shutdown();
@@ -448,6 +546,7 @@ public class EliteMobs extends JavaPlugin {
         Logger.info("Saving EliteMobs databases...");
         PlayerData.closeConnection();
         MagmaCore.shutdown();
+        MetadataHandler.pluginState = PluginState.UNINITIALIZED;
         Logger.info("All done! Good night.");
     }
 

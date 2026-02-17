@@ -29,5 +29,6 @@ public class AdventurersGuildHub extends ContentPackagesConfigFields {
                 "&2It does not replace your worlds, it just",
                 "&2adds an isolated world with all the NPCs",
                 "&2and portals for EliteMobs!"));
+        setNightbreakSlug("the-adventurers-guild");
     }
 }

@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.commands;
 
+import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
 import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
@@ -20,6 +21,6 @@ public class DiscordMessageCommand extends AdvancedCommand {
     @Override
     public void execute(CommandData commandData) {
         new DiscordSRVAnnouncement(commandData.getStringSequenceArgument("message"));
-        Logger.sendMessage(commandData.getCommandSender(), "&aAttempted to send a message to Discord!");
+        Logger.sendMessage(commandData.getCommandSender(), CommandMessagesConfig.getDiscordMessageSentMessage());
     }
 }

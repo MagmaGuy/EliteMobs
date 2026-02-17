@@ -4,20 +4,22 @@ import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields
 import org.bukkit.World;
 
 import java.util.List;
+import java.util.Map;
 
 public class YggdrasilRealm extends ContentPackagesConfigFields {
     public YggdrasilRealm() {
         super("yggdrasil_realm",
                 true,
-                "&2[lvl 075-085] &5Yggdrasil",
+                "&2[Dynamic] &5Yggdrasil",
                 List.of("&5A mythic Norse dungeon at the roots of Yggdrasil!",
                         "&5Credits: MagmaGuy, Dali, Frost"),
-                "https://nightbreak.io/plugin/elitemobs/#the-vampire-manor",
+                "https://nightbreak.io/plugin/elitemobs/#yggdrasil-realm",
                 DungeonSizeCategory.REALM,
                 "em_yggdrasil",
                 World.Environment.NORMAL,
                 true,
                 "em_yggdrasil,-321.5,-22.0,102.5,141.5,0.0",
+                "em_yggdrasil,-322.5,-22.0,101.5,141.5,0.0",
                 0,
                 "Difficulty: &6Hard\n" +
                         "$bossCount bosses, from level $lowestTier to $highestTier\n" +
@@ -25,10 +27,19 @@ public class YggdrasilRealm extends ContentPackagesConfigFields {
                         "&5for brave warriors seeking glory!",
                 "&8[EM] &5Yggdrasil awaits!",
                 "&8[EM] &5You have left Yggdrasil",
+                List.of("filename=em_yggdrasil_final_boss_loki_p1.yml"),
                 "em_yggdrasil",
+                -1,
                 false);
+        this.contentType = ContentType.DYNAMIC_DUNGEON;
+        setDifficulties(List.of(
+                Map.of("name", "normal", "levelSync", "+5", "id", 0),
+                Map.of("name", "hard", "levelSync", "+0", "id", 1),
+                Map.of("name", "mythic", "levelSync", "-5", "id", 2)));
+        setDungeonLockoutMinutes(1440);
         setSetupMenuDescription(List.of(
-                "&2A Realm for players around level 75!"
+                "&2A dynamic Realm!"
         ));
+        setNightbreakSlug("yggdrasil-realm");
     }
 }

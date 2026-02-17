@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.commands;
 
+import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.config.wormholes.WormholeConfig;
 import com.magmaguy.elitemobs.wormhole.Wormhole;
 import com.magmaguy.magmacore.command.AdvancedCommand;
@@ -35,9 +36,9 @@ public class PlaceWormholeCommand extends AdvancedCommand {
                         wormhole.getWormholeEntry2().updateLocation(commandData.getPlayerSender());
                         return;
                     default:
-                        Logger.sendMessage(commandData.getCommandSender(), "Not a valid wormhole option! Pick 1 or 2 to set either end of the wormhole.");
+                        Logger.sendMessage(commandData.getCommandSender(), CommandMessagesConfig.getWormholeInvalidOptionMessage());
                 }
         }
-        Logger.sendMessage(commandData.getCommandSender(), "Failed to set location for this wormhole.");
+        Logger.sendMessage(commandData.getCommandSender(), CommandMessagesConfig.getWormholeSetFailedMessage());
     }
 }

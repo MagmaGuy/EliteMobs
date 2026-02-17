@@ -18,7 +18,7 @@ public class SnoopyConfig extends CustomBossesConfigFields {
         super("snoopy",
                 EntityType.WOLF,
                 true,
-                "&6{&4☠&6} &fSnoopy",
+                "&6{&4☠&6} <rainbow>Snoopy</rainbow>",
                 "dynamic");
         setTimeout(3);
         setHealthMultiplier(10);

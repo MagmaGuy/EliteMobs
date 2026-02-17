@@ -50,6 +50,9 @@ public class Wormhole {
 
         wormholes.clear();
         WormholeEntry.getWormholeEntries().clear();
+
+        // Clean up player listener tracking
+        WormholePlayerListener.shutdown();
     }
 
     private void stop() {

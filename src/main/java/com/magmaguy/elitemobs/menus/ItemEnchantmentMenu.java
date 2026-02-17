@@ -57,7 +57,7 @@ public class ItemEnchantmentMenu extends EliteMenu {
     public ItemEnchantmentMenu(Player player) {
         String name = MENU_NAME;
         if (DefaultConfig.useResourcePackModels())
-            name = ChatColor.WHITE + "\uF801\uDB80\uDC2A\uF805           " + MENU_NAME;
+            name = ChatColor.WHITE + "\uDB83\uDEF1\uDB83\uDE01\uDB83\uDEF5           " + MENU_NAME;
         Inventory inventory = Bukkit.createInventory(player, 54, name);
         ItemEnchantMenuEvents.menus.add(inventory);
 
@@ -145,12 +145,12 @@ public class ItemEnchantmentMenu extends EliteMenu {
             if (!message.contains("$itemName"))
                 Bukkit.getOnlinePlayers().forEach(player -> player.spigot().sendMessage(
                         ChatMessageType.CHAT, TextComponent.fromLegacyText(
-                                ChatColorConverter.convert(message.replace("$player", upgradingPlayer.getDisplayName())))));
+                                ChatColorConverter.convert(message.replace("$playerName", upgradingPlayer.getName()).replace("$player", upgradingPlayer.getDisplayName())))));
             else {
                 TextComponent itemName = ShareItem.hoverableItemTextComponent(upgradedItem);
                 String[] text = message.replace("$itemName", "itemName").split("itemName");
-                BaseComponent[] baseComponent1 = TextComponent.fromLegacyText(ChatColorConverter.convert(text[0].replace("$player", upgradingPlayer.getDisplayName())));
-                BaseComponent[] baseComponent2 = TextComponent.fromLegacyText(ChatColorConverter.convert(text[1].replace("$player", upgradingPlayer.getDisplayName())));
+                BaseComponent[] baseComponent1 = TextComponent.fromLegacyText(ChatColorConverter.convert(text[0].replace("$playerName", upgradingPlayer.getName()).replace("$player", upgradingPlayer.getDisplayName())));
+                BaseComponent[] baseComponent2 = TextComponent.fromLegacyText(ChatColorConverter.convert(text[1].replace("$playerName", upgradingPlayer.getName()).replace("$player", upgradingPlayer.getDisplayName())));
 
                 ComponentBuilder componentBuilder = new ComponentBuilder();
                 componentBuilder.append(baseComponent1);
@@ -244,7 +244,7 @@ public class ItemEnchantmentMenu extends EliteMenu {
 
             if (event.getView().getTopInventory().getItem(ITEM_SLOT) == null ||
                     event.getView().getTopInventory().getItem(ENCHANTED_BOOK_SLOT) == null) {
-                event.getWhoClicked().sendMessage(ChatColorConverter.convert("&8[EliteMobs] &cYou must add an elite item and an enchanted book to enchant an item!"));
+                event.getWhoClicked().sendMessage(ItemEnchantmentMenuConfig.getMissingItemsMessage());
                 return;
             }
 
@@ -270,7 +270,7 @@ public class ItemEnchantmentMenu extends EliteMenu {
         }
 
         private void failure(InventoryClickEvent event) {
-            event.getWhoClicked().sendMessage(ChatColorConverter.convert(DefaultConfig.getEnchantmentChallengeFailureMessage()));
+            event.getWhoClicked().sendMessage(DefaultConfig.getEnchantmentChallengeFailureMessage());
             moveItemDown(event.getView().getTopInventory(), ITEM_SLOT, event.getWhoClicked());
         }
 
@@ -285,17 +285,17 @@ public class ItemEnchantmentMenu extends EliteMenu {
             currentItem.setAmount(currentItem.getAmount() - 1);
             if (currentItem.getAmount() > 0)
                 if (moveItemDown(event.getView().getTopInventory(), ITEM_SLOT, event.getWhoClicked(), false)) {
-                    event.getWhoClicked().sendMessage(ChatColorConverter.convert(
-                            DefaultConfig.getEnchantmentChallengeInventoryFullMessage()));
+                    event.getWhoClicked().sendMessage(
+                            DefaultConfig.getEnchantmentChallengeInventoryFullMessage());
                 }
 
-            event.getWhoClicked().sendMessage(ChatColorConverter.convert(DefaultConfig.getEnchantmentChallengeStartMessage()));
-            event.getWhoClicked().sendMessage(ChatColorConverter.convert(DefaultConfig.getEnchantmentChallengeConsequencesMessage()));
+            event.getWhoClicked().sendMessage(DefaultConfig.getEnchantmentChallengeStartMessage());
+            event.getWhoClicked().sendMessage(DefaultConfig.getEnchantmentChallengeConsequencesMessage());
             broadcastEnchantmentMessage(currentItem, (Player) event.getWhoClicked(), SpecialItemSystemsConfig.getChallengeAnnouncement());
         }
 
         private void criticalFailure(InventoryClickEvent event) {
-            event.getWhoClicked().sendMessage(ChatColorConverter.convert(DefaultConfig.getEnchantmentChallengeCriticalFailureMessage()));
+            event.getWhoClicked().sendMessage(DefaultConfig.getEnchantmentChallengeCriticalFailureMessage());
             broadcastEnchantmentMessage(event.getView().getTopInventory().getItem(ITEM_SLOT), (Player) event.getWhoClicked(), SpecialItemSystemsConfig.getCriticalFailureAnnouncement());
         }
 
@@ -306,7 +306,7 @@ public class ItemEnchantmentMenu extends EliteMenu {
             HashMap<Integer, ItemStack> leftovers = player.getInventory().addItem(upgradedItem);
             if (!leftovers.isEmpty())
                 event.getWhoClicked().getWorld().dropItem(event.getWhoClicked().getLocation(), upgradedItem);
-            event.getWhoClicked().sendMessage(ChatColorConverter.convert(DefaultConfig.getEnchantmentChallengeSuccessMessage()));
+            event.getWhoClicked().sendMessage(DefaultConfig.getEnchantmentChallengeSuccessMessage());
             broadcastEnchantmentMessage(upgradedItem, (Player) event.getWhoClicked(), SpecialItemSystemsConfig.getSuccessAnnouncement());
         }
 

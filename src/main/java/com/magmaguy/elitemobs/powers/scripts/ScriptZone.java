@@ -420,6 +420,12 @@ public class ScriptZone {
                     return;
                 }
 
+                // Cancel task if the world is no longer loaded (e.g., dungeon instance closing)
+                if (eliteEntity.getLivingEntity().getLocation().getWorld() == null) {
+                    cancel();
+                    return;
+                }
+
                 // Retrieve current entities in the zone
                 Collection<LivingEntity> newEntities = getEntitiesInArea(generateShapes(scriptActionData, false), TargetType.ZONE_FULL);
 

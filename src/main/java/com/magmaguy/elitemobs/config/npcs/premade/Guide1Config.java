@@ -15,7 +15,7 @@ public class Guide1Config extends NPCsConfigFields {
                 "Casus",
                 "<Guide>",
                 Villager.Profession.NITWIT,
-                "em_adventurers_guild,215.5,87,239.5,131,0",
+                "em_adventurers_guild,213.5,87,239.5,126,0",
                 new ArrayList<>(List.of(
                         "Need guidance?",
                         "Need a hint",
