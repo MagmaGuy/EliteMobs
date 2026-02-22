@@ -274,7 +274,7 @@ public class WormholeManager {
         }
 
         // Tick all wormhole entries with distance-based culling
-        for (WormholeEntry wormholeEntry : WormholeEntry.getWormholeEntries()) {
+        for (WormholeEntry wormholeEntry : new java.util.ArrayList<>(WormholeEntry.getWormholeEntries())) {
             // Skip if chunk isn't loaded
             if (wormholeEntry.getLocation() == null ||
                 wormholeEntry.getLocation().getWorld() == null ||

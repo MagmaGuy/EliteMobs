@@ -7,9 +7,14 @@ import com.magmaguy.elitemobs.config.SoundsConfig;
 import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestConfigFields;
 import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestsConfig;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
+import com.magmaguy.elitemobs.instanced.MatchInstance;
+import com.magmaguy.elitemobs.instanced.dungeons.DungeonInstance;
+import com.magmaguy.elitemobs.instanced.dungeons.DynamicDungeonInstance;
 import com.magmaguy.elitemobs.mobconstructor.PersistentObject;
 import com.magmaguy.elitemobs.mobconstructor.PersistentObjectHandler;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
+import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.WeightedProbability;
 import com.magmaguy.magmacore.util.Logger;
@@ -30,10 +35,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class TreasureChest implements PersistentObject {
@@ -172,7 +174,7 @@ public class TreasureChest implements PersistentObject {
             }
         }
 
-        if (ThreadLocalRandom.current().nextDouble() < customTreasureChestConfigFields.getMimicChance()) doMimic();
+        if (ThreadLocalRandom.current().nextDouble() < customTreasureChestConfigFields.getMimicChance()) doMimic(player);
         else doTreasure(player);
 
         player.playSound(player.getLocation(), SoundsConfig.treasureChestOpenSound, 1, 1);
@@ -191,7 +193,7 @@ public class TreasureChest implements PersistentObject {
 
     }
 
-    private void doMimic() {
+    private void doMimic(Player player) {
         HashMap<String, Double> weighedValues = new HashMap<>();
         for (String string : this.customTreasureChestConfigFields.getMimicCustomBossesList()) {
             String filename = string.split(":")[0];
@@ -204,15 +206,77 @@ public class TreasureChest implements PersistentObject {
             weighedValues.put(filename, weight);
         }
         CustomBossEntity customBossEntity = CustomBossEntity.createCustomBossEntity(WeightedProbability.pickWeighedProbability(weighedValues));
+        if (customBossEntity == null) {
+            Logger.warn("Failed to spawn mimic for treasure chest " + customTreasureChestConfigFields.getFilename() + ": custom boss config was not found.");
+            return;
+        }
+
+        Integer dynamicDungeonLevel = getDynamicDungeonLevel(player);
+        if (customBossEntity.getCustomBossesConfigFields().getLevel() == -1) {
+            // If this is inside a dynamic dungeon instance, match the selected dungeon level.
+            if (dynamicDungeonLevel != null) {
+                customBossEntity.spawn(location, randomizeLevel(dynamicDungeonLevel), false);
+            } else {
+                // Outside instances, dynamic mimics should follow the opener's level with slight noise.
+                ElitePlayerInventory elitePlayerInventory = ElitePlayerInventory.getPlayer(player);
+                if (elitePlayerInventory != null) {
+                    customBossEntity.spawn(location, randomizeLevel(elitePlayerInventory.getNaturalMobSpawnLevel(false)), false);
+                } else {
+                    // Fallback for rare edge cases where player inventory data is unavailable.
+                    customBossEntity.spawn(location, false);
+                }
+            }
+            return;
+        }
+
         customBossEntity.spawn(location, randomizeTier(), false);
     }
 
     private void doTreasure(Player player) {
+        Integer dynamicDungeonLevel = getDynamicDungeonLevel(player);
+        if (dynamicDungeonLevel != null) {
+            this.customTreasureChestConfigFields.getCustomLootTable().treasureChestDropAtLevel(player, dynamicDungeonLevel, location);
+            return;
+        }
+        // Outside of instances, scalable chest loot should follow the opener's level.
+        if (PlayerData.getMatchInstance(player) == null) {
+            ElitePlayerInventory elitePlayerInventory = ElitePlayerInventory.getPlayer(player);
+            if (elitePlayerInventory != null) {
+                int playerLevel = elitePlayerInventory.getNaturalMobSpawnLevel(false);
+                this.customTreasureChestConfigFields.getCustomLootTable()
+                        .treasureChestDropScalableToPlayerLevel(player, customTreasureChestConfigFields.getChestTier(), playerLevel, location);
+                return;
+            }
+        }
         this.customTreasureChestConfigFields.getCustomLootTable().treasureChestDrop(player, customTreasureChestConfigFields.getChestTier(), location);
     }
 
     private int randomizeTier() {
         return customTreasureChestConfigFields.getChestTier() * 10 + ThreadLocalRandom.current().nextInt(11);
+    }
+
+    private int randomizeLevel(int baseLevel) {
+        return Math.max(1, baseLevel + ThreadLocalRandom.current().nextInt(-1, 2));
+    }
+
+    private Integer getDynamicDungeonLevel(Player player) {
+        if (player != null) {
+            MatchInstance matchInstance = PlayerData.getMatchInstance(player);
+            if (matchInstance instanceof DynamicDungeonInstance dynamicDungeonInstance)
+                return dynamicDungeonInstance.getSelectedLevel();
+        }
+        // Fallback for edge cases where player data isn't available yet.
+        return getDynamicDungeonLevelByWorld();
+    }
+
+    private Integer getDynamicDungeonLevelByWorld() {
+        if (location == null || location.getWorld() == null) return null;
+        for (DungeonInstance dungeonInstance : DungeonInstance.getDungeonInstances()) {
+            if (!(dungeonInstance instanceof DynamicDungeonInstance dynamicDungeonInstance)) continue;
+            if (dungeonInstance.getWorld() == null) continue;
+            if (dungeonInstance.getWorld().equals(location.getWorld())) return dynamicDungeonInstance.getSelectedLevel();
+        }
+        return null;
     }
 
     private void lowRankMessage(Player player) {
@@ -227,17 +291,47 @@ public class TreasureChest implements PersistentObject {
         if (customTreasureChestConfigFields.isInstanced())
             return blacklistedPlayersInstance.contains(player.getUniqueId());
         if (customTreasureChestConfigFields.getRestockTimers() == null) return false;
-        for (String string : customTreasureChestConfigFields.getRestockTimers())
-            if (string.split(":")[0].equals(player.getUniqueId().toString()))
+        long now = Instant.now().getEpochSecond();
+        boolean saveNeeded = false;
+        for (Iterator<String> iterator = customTreasureChestConfigFields.getRestockTimers().iterator(); iterator.hasNext(); ) {
+            String string = iterator.next();
+            String[] split = string.split(":");
+            if (split.length < 2) continue;
+            long targetTime;
+            try {
+                targetTime = Long.parseLong(split[1]);
+            } catch (Exception ex) {
+                iterator.remove();
+                saveNeeded = true;
+                continue;
+            }
+            if (targetTime <= now) {
+                iterator.remove();
+                saveNeeded = true;
+                continue;
+            }
+            if (split[0].equals(player.getUniqueId().toString())) {
+                if (saveNeeded) saveRestockTimers();
                 return true;
+            }
+        }
+        if (saveNeeded) saveRestockTimers();
         return false;
     }
 
     private long getPlayerCooldown(Player player) {
-        for (String string : customTreasureChestConfigFields.getRestockTimers())
-            if (string.split(":")[0].equals(player.getUniqueId().toString()))
-                return Long.parseLong(string.split(":")[1]);
-        return 0;
+        if (customTreasureChestConfigFields.getRestockTimers() == null) return Instant.now().getEpochSecond();
+        for (String string : customTreasureChestConfigFields.getRestockTimers()) {
+            String[] split = string.split(":");
+            if (split.length < 2) continue;
+            if (!split[0].equals(player.getUniqueId().toString())) continue;
+            try {
+                return Long.parseLong(split[1]);
+            } catch (Exception ex) {
+                return Instant.now().getEpochSecond();
+            }
+        }
+        return Instant.now().getEpochSecond();
     }
 
     private String cooldownStringConstructor(Player player) {
@@ -249,6 +343,7 @@ public class TreasureChest implements PersistentObject {
     }
 
     private String timeConverter(long seconds) {
+        if (seconds < 0) seconds = 0;
         if (seconds < 60 * 2)
             return seconds + " seconds";
         if (seconds < 60 * 60 * 2)
@@ -257,6 +352,16 @@ public class TreasureChest implements PersistentObject {
             return Round.twoDecimalPlaces(seconds / 60D / 60) + "hours";
         else
             return Round.twoDecimalPlaces(seconds / 60D / 60 / 48) + "days";
+    }
+
+    private void saveRestockTimers() {
+        if (customTreasureChestConfigFields.getRestockTimers() == null) return;
+        customTreasureChestConfigFields.getFileConfiguration().set("restockTimers", customTreasureChestConfigFields.getRestockTimers());
+        try {
+            customTreasureChestConfigFields.getFileConfiguration().save(customTreasureChestConfigFields.getFile());
+        } catch (Exception ex) {
+            Logger.warn("Failed to save restock timers for treasure chest " + customTreasureChestConfigFields.getFilename());
+        }
     }
 
     public void removeTreasureChest() {

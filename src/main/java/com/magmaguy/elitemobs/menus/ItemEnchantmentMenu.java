@@ -175,7 +175,7 @@ public class ItemEnchantmentMenu extends EliteMenu {
             menus.clear();
         }
 
-        @EventHandler(ignoreCancelled = true)
+        @EventHandler
         public void onInventoryInteract(InventoryClickEvent event) {
             if (!EliteMenu.isEliteMenu(event, menus)) return;
             event.setCancelled(true);

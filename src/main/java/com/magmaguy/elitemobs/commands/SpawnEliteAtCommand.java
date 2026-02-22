@@ -30,6 +30,8 @@ public class SpawnEliteAtCommand extends AdvancedCommand {
 
     @Override
     public void execute(CommandData commandData) {
+        String powersArg = commandData.getStringSequenceArgument("powers");
+        Optional<String> powers = (powersArg == null || powersArg.isBlank()) ? Optional.empty() : Optional.of(powersArg.trim());
         SpawnCommand.spawnEliteEntityTypeCommand(
                 commandData.getPlayerSender(),
                 EntityType.valueOf(commandData.getStringArgument("entityType")),
@@ -39,6 +41,6 @@ public class SpawnEliteAtCommand extends AdvancedCommand {
                         commandData.getIntegerArgument("y"),
                         commandData.getIntegerArgument("z")),
                 commandData.getIntegerArgument("level"),
-                Optional.of(commandData.getStringSequenceArgument("powers")));
+                powers);
     }
 }

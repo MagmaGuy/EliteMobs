@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.skills;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.SkillsConfig;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
@@ -16,6 +17,7 @@ import org.bukkit.inventory.EquipmentSlotGroup;
 public class ArmorSkillHealthBonus {
 
     private static final String MODIFIER_KEY_STRING = "armor_skill_health";
+    private static final double VANILLA_MAX_HEALTH = 20.0;
 
     private ArmorSkillHealthBonus() {
         // Static utility class
@@ -30,7 +32,16 @@ public class ArmorSkillHealthBonus {
     public static void applyHealthBonus(Player player) {
         if (player == null || !player.isOnline()) return;
 
-        // First remove any existing modifier
+        if (!SkillsConfig.isArmorSkillHealthBonusEnabled()) {
+            // Optional hard reset for servers that want to fully remove old extra-heart values.
+            if (SkillsConfig.isForceDefaultHealthWhenArmorSkillHealthBonusDisabled()) {
+                removeHealthBonus(player);
+                forceVanillaMaxHealth(player);
+            }
+            return;
+        }
+
+        // First remove any existing modifier to avoid duplicates/stale values
         removeHealthBonus(player);
 
         // Get the player's armor skill level
@@ -48,6 +59,15 @@ public class ArmorSkillHealthBonus {
         if (maxHealth != null) {
             NamespacedKey key = new NamespacedKey(MetadataHandler.PLUGIN, MODIFIER_KEY_STRING);
             maxHealth.addModifier(new AttributeModifier(key, bonusHealth, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.ANY));
+        }
+    }
+
+    private static void forceVanillaMaxHealth(Player player) {
+        AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
+        if (maxHealth == null) return;
+        maxHealth.setBaseValue(VANILLA_MAX_HEALTH);
+        if (player.getHealth() > VANILLA_MAX_HEALTH) {
+            player.setHealth(VANILLA_MAX_HEALTH);
         }
     }
 
@@ -89,12 +109,22 @@ public class ArmorSkillHealthBonus {
      */
     public static double getBonusHealth(Player player) {
         if (player == null) return 0;
+        if (!SkillsConfig.isArmorSkillHealthBonusEnabled()) return 0;
 
         long armorXP = PlayerData.getSkillXP(player.getUniqueId(), SkillType.ARMOR);
         int armorLevel = SkillXPCalculator.levelFromTotalXP(armorXP);
 
         if (armorLevel <= 1) return 0;
         return (armorLevel - 1) * 2.0;
+    }
+
+    /**
+     * Gets the max health value used by armor skill progression for combat calculations.
+     * Returns vanilla max health when the mechanic is disabled.
+     */
+    public static double getConfiguredMaxHealthForArmorLevel(int armorLevel) {
+        if (!SkillsConfig.isArmorSkillHealthBonusEnabled()) return VANILLA_MAX_HEALTH;
+        return VANILLA_MAX_HEALTH + Math.max(0, armorLevel - 1) * 2.0;
     }
 
     /**

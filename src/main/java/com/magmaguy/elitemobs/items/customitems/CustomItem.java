@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.items.customitems;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.customitems.CustomItemsConfig;
 import com.magmaguy.elitemobs.config.customitems.CustomItemsConfigFields;
-import com.magmaguy.elitemobs.items.LootTables;
 import com.magmaguy.elitemobs.items.ScalableItemConstructor;
 import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantment;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
@@ -228,6 +227,17 @@ public class CustomItem {
         return loot;
     }
 
+    public Item dropPlayerLootExact(Player player, int level, Location location, EliteEntity eliteEntity) {
+        if (!permission.isEmpty() && !player.hasPermission(permission)) return null;
+        ItemStack itemStack = generateItemStackExact(level, player, eliteEntity);
+        if (itemStack == null) return null;
+        Item loot = location.getWorld().dropItem(location, itemStack);
+        SoulbindEnchantment.addPhysicalDisplay(loot, player);
+        loot.setCustomName(loot.getItemStack().getItemMeta().getDisplayName());
+        loot.setCustomNameVisible(true);
+        return loot;
+    }
+
     private void parseEnchantments() {
         for (String string : this.customItemsConfigFields.getEnchantments())
             try {
@@ -361,6 +371,21 @@ public class CustomItem {
         //This can happen when doing drop tables, the loot is not yet assigned to anyone
         if (player != null)
             itemTier = limitItemLevel(player, itemTier);
+        switch (this.scalability) {
+            case FIXED:
+                itemStack = generateDefaultsItemStack(player, false, eliteEntity);
+                break;
+            case LIMITED:
+                itemStack = ScalableItemConstructor.constructLimitedItem(itemTier, this, player, eliteEntity);
+                break;
+            case SCALABLE:
+                itemStack = ScalableItemConstructor.constructScalableItem(itemTier, this, player, eliteEntity);
+        }
+        return itemStack;
+    }
+
+    public ItemStack generateItemStackExact(int itemTier, Player player, EliteEntity eliteEntity) {
+        ItemStack itemStack = null;
         switch (this.scalability) {
             case FIXED:
                 itemStack = generateDefaultsItemStack(player, false, eliteEntity);

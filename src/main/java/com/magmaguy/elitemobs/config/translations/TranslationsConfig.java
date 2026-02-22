@@ -70,7 +70,7 @@ public class TranslationsConfig {
     /**
      * Checks if the current language is English (plugin defaults mode).
      */
-    private static boolean isEnglish() {
+    public static boolean isEnglish() {
         String lang = DefaultConfig.getLanguage();
         if (lang == null) return true;
         lang = lang.toLowerCase().replace(".yml", "").replace(".csv", "");

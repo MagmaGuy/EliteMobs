@@ -121,6 +121,7 @@ public class PolearmMasterySkill extends SkillBonus {
     @Override
     public void onDeactivate(Player player) {
         activePlayers.remove(player.getUniqueId());
+        removeAttackSpeedBonus(player);
     }
 
     @Override

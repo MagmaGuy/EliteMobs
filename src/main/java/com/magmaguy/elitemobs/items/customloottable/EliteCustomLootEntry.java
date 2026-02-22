@@ -154,6 +154,11 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
         return customItem.generateItemStack(level, player, eliteEntity);
     }
 
+    public boolean isScalableItem() {
+        CustomItem customItem = generateCustomItem();
+        return customItem != null && customItem.getScalability() == CustomItem.Scalability.SCALABLE;
+    }
+
     //treasure chest
     @Override
     public void locationDrop(int itemTier, Player player, Location location) {
@@ -164,6 +169,16 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
         }
         for (int i = 0; i < getAmount(); i++)
             customItem.dropPlayerLoot(player, itemTier, location, null);
+    }
+
+    public void locationDropExactLevel(int itemTier, Player player, Location location) {
+        CustomItem customItem = generateCustomItem();
+        if (customItem == null) {
+            Logger.warn("Invalid loot entry for treasure chest! Entry: " + filename);
+            return;
+        }
+        for (int i = 0; i < getAmount(); i++)
+            customItem.dropPlayerLootExact(player, itemTier, location, null);
     }
 
     //This is for the custom boss drop
@@ -191,6 +206,26 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
         String name = null;
         for (int i = 0; i < getAmount(); i++) {
             ItemStack itemStack = customItem.generateItemStack(itemTier, player, null);
+            if (itemStack == null) continue;
+            player.getInventory().addItem(itemStack);
+            if (name == null && itemStack.getItemMeta() != null) {
+                if (itemStack.getItemMeta().hasDisplayName()) name = itemStack.getItemMeta().getDisplayName();
+                else name = itemStack.getType().toString().replace("_", " ");
+            }
+        }
+        if (name != null)
+            player.sendMessage(ItemSettingsConfig.getDirectDropCustomLootMessage().replace("$itemName", getAmount() + "x " + name));
+    }
+
+    public void directDropExactLevel(int itemTier, Player player) {
+        CustomItem customItem = generateCustomItem();
+        if (customItem == null) {
+            Logger.warn("Invalid loot entry for direct drop! Entry: " + filename);
+            return;
+        }
+        String name = null;
+        for (int i = 0; i < getAmount(); i++) {
+            ItemStack itemStack = customItem.generateItemStackExact(itemTier, player, null);
             if (itemStack == null) continue;
             player.getInventory().addItem(itemStack);
             if (name == null && itemStack.getItemMeta() != null) {

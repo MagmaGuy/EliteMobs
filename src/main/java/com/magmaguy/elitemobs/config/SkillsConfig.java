@@ -19,6 +19,10 @@ public class SkillsConfig extends ConfigurationFile {
     @Getter
     private static boolean showXPBar;
     @Getter
+    private static boolean armorSkillHealthBonusEnabled;
+    @Getter
+    private static boolean forceDefaultHealthWhenArmorSkillHealthBonusDisabled;
+    @Getter
     private static String skillBarTitleFormat;
     @Getter
     private static String skillLevelUpTitleFormat;
@@ -43,6 +47,17 @@ public class SkillsConfig extends ConfigurationFile {
                 List.of("Enables or disables the skill leveling system.",
                         "When enabled, players will earn XP for different weapon types and armor."),
                 fileConfiguration, "skillSystemEnabled", true);
+
+        armorSkillHealthBonusEnabled = ConfigurationEngine.setBoolean(
+                List.of("Whether Armor skill grants bonus max health (+1 heart per level above 1).",
+                        "Set to false to disable this mechanic."),
+                fileConfiguration, "armorSkillHealthBonusEnabled", true);
+
+        forceDefaultHealthWhenArmorSkillHealthBonusDisabled = ConfigurationEngine.setBoolean(
+                List.of("Only applies when armorSkillHealthBonusEnabled is false.",
+                        "If true, players are forced to vanilla 20 max health on join/updates.",
+                        "If false, existing max health values are left untouched."),
+                fileConfiguration, "forceDefaultHealthWhenArmorSkillHealthBonusDisabled", false);
 
         skillsMenuTitle = ConfigurationEngine.setString(
                 List.of("Title of the skills menu."),

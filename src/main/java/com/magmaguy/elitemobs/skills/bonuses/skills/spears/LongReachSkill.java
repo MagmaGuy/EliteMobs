@@ -106,6 +106,7 @@ public class LongReachSkill extends SkillBonus {
     @Override
     public void onDeactivate(Player player) {
         activePlayers.remove(player.getUniqueId());
+        removeReachBonus(player);
     }
 
     @Override
