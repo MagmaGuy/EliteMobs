@@ -56,6 +56,7 @@ public class GrimReachSkill extends SkillBonus {
      * Applies the entity interaction range modifier to the player.
      */
     public static void applyReachBonus(Player player, int skillLevel) {
+        if (!activePlayers.contains(player.getUniqueId())) return;
         try {
             AttributeInstance attr = player.getAttribute(Attribute.ENTITY_INTERACTION_RANGE);
             if (attr == null) return;
@@ -113,6 +114,7 @@ public class GrimReachSkill extends SkillBonus {
     @Override
     public void onDeactivate(Player player) {
         activePlayers.remove(player.getUniqueId());
+        removeReachBonus(player);
     }
 
     @Override

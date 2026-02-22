@@ -56,7 +56,7 @@ public class EliteScrollMenu extends EliteMenu {
             menus.clear();
         }
 
-        @EventHandler(ignoreCancelled = true)
+        @EventHandler
         public void onInventoryInteract(InventoryClickEvent event) {
             if (!EliteMenu.isEliteMenu(event, menus)) return;
             event.setCancelled(true);
@@ -84,12 +84,12 @@ public class EliteScrollMenu extends EliteMenu {
         }
 
         private void handleBottomInventory(InventoryClickEvent event) {
-//            if (EliteItemManager.isEliteMobsItem(event.getCurrentItem())) return;
             if (EliteScroll.isEliteScroll(event.getCurrentItem())) {
-                moveOneItemUp(EliteScrollMenuConfig.getEliteScrollItemSlot(), event);
-            }
-            else if (!EliteItemManager.isEliteMobsItem(event.getCurrentItem())){
-                moveOneItemUp(EliteScrollMenuConfig.getNonEliteItemSlot(), event);
+                if (event.getView().getTopInventory().getItem(EliteScrollMenuConfig.getEliteScrollItemSlot()) == null)
+                    moveOneItemUp(EliteScrollMenuConfig.getEliteScrollItemSlot(), event);
+            } else if (!EliteItemManager.isEliteMobsItem(event.getCurrentItem())) {
+                if (event.getView().getTopInventory().getItem(EliteScrollMenuConfig.getNonEliteItemSlot()) == null)
+                    moveOneItemUp(EliteScrollMenuConfig.getNonEliteItemSlot(), event);
             }
         }
 

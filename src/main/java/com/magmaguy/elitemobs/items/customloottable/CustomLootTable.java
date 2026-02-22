@@ -14,6 +14,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class CustomLootTable implements Serializable {
 
@@ -112,6 +113,59 @@ public class CustomLootTable implements Serializable {
                 } else {
                     customLootEntry.locationDrop(chestLevel * 10, player, dropLocation);
                 }
+            }
+        if (!anythingDropped)
+            player.sendMessage(DefaultConfig.getTreasureChestNoDropMessage());
+    }
+
+    public void treasureChestDropAtLevel(Player player, int level, Location dropLocation) {
+        boolean anythingDropped = false;
+        for (CustomLootEntry customLootEntry : entries)
+            if (customLootEntry.willDrop(player)) {
+                anythingDropped = true;
+                if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory()) {
+                    if (customLootEntry instanceof EliteCustomLootEntry eliteCustomLootEntry) {
+                        int exactLevel = level;
+                        if (eliteCustomLootEntry.isScalableItem())
+                            exactLevel = Math.max(1, level + ThreadLocalRandom.current().nextInt(-1, 2));
+                        eliteCustomLootEntry.directDropExactLevel(exactLevel, player);
+                    }
+                    else
+                        customLootEntry.directDrop(level, player);
+                } else {
+                    if (customLootEntry instanceof EliteCustomLootEntry eliteCustomLootEntry) {
+                        int exactLevel = level;
+                        if (eliteCustomLootEntry.isScalableItem())
+                            exactLevel = Math.max(1, level + ThreadLocalRandom.current().nextInt(-1, 2));
+                        eliteCustomLootEntry.locationDropExactLevel(exactLevel, player, dropLocation);
+                    }
+                    else
+                        customLootEntry.locationDrop(level, player, dropLocation);
+                }
+            }
+        if (!anythingDropped)
+            player.sendMessage(DefaultConfig.getTreasureChestNoDropMessage());
+    }
+
+    public void treasureChestDropScalableToPlayerLevel(Player player, int chestLevel, int playerLevel, Location dropLocation) {
+        boolean anythingDropped = false;
+        int defaultLevel = chestLevel * 10;
+        for (CustomLootEntry customLootEntry : entries)
+            if (customLootEntry.willDrop(player)) {
+                anythingDropped = true;
+                if (customLootEntry instanceof EliteCustomLootEntry eliteCustomLootEntry &&
+                        eliteCustomLootEntry.isScalableItem()) {
+                    int scalableLevel = Math.max(1, playerLevel + ThreadLocalRandom.current().nextInt(-1, 2));
+                    if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory())
+                        eliteCustomLootEntry.directDropExactLevel(scalableLevel, player);
+                    else
+                        eliteCustomLootEntry.locationDropExactLevel(scalableLevel, player, dropLocation);
+                    continue;
+                }
+                if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory())
+                    customLootEntry.directDrop(defaultLevel, player);
+                else
+                    customLootEntry.locationDrop(defaultLevel, player, dropLocation);
             }
         if (!anythingDropped)
             player.sendMessage(DefaultConfig.getTreasureChestNoDropMessage());

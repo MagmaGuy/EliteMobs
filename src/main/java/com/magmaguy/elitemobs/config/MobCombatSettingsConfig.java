@@ -226,8 +226,10 @@ public class MobCombatSettingsConfig extends ConfigurationFile {
                 List.of("Sets the message that appears when a boss heals from going out of combat."),
                 file, fileConfiguration, "fullHealMessage", "&2FULL HEAL!", true);
         resistanceDamageMultiplier = ConfigurationEngine.setDouble(
-                List.of("Sets the multiplier applied to damage reduction from the resistance potion effect for players."),
-                fileConfiguration, "resistanceDamageMultiplier", 1);
+                List.of("Sets the damage reduction per resistance level applied to elite mob damage.",
+                        "Resistance I = (1 * this value), Resistance II = (2 * this value), etc.",
+                        "Default of 0.2 matches vanilla: Resistance I = 20% reduction, Resistance V = 100% reduction (immune)."),
+                fileConfiguration, "resistanceDamageMultiplierV2", 0.2);
         blockingDamageReduction = ConfigurationEngine.setDouble(
                 List.of("Sets the multiplier applied to damage reduction when a player is holding up a shield for melee attacks (powers excluded)."),
                 fileConfiguration, "blockingDamageReduction", 0.8);

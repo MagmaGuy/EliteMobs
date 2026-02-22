@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.playerdata.statusscreen;
 
 import com.magmaguy.elitemobs.config.SkillsConfig;
 import com.magmaguy.elitemobs.config.menus.premade.PlayerStatusMenuConfig;
+import com.magmaguy.elitemobs.menus.SkillBonusMenu;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.SkillXPCalculator;
@@ -19,9 +20,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 /**
  * Skills page for the player status screen.
@@ -78,11 +79,15 @@ public class SkillsPage {
         int[] skillSlots = {10, 11, 12, 13, 14, 15, 16, 19, 20};
         int slotIndex = 0;
 
+        // Create slot-to-skill mapping
+        Map<Integer, SkillType> slotToSkillType = new HashMap<>();
+
         for (SkillType skillType : SkillType.values()) {
             if (slotIndex >= skillSlots.length) break;
 
             ItemStack skillItem = createSkillItem(targetPlayer, skillType);
             inventory.setItem(skillSlots[slotIndex], skillItem);
+            slotToSkillType.put(skillSlots[slotIndex], skillType);
             slotIndex++;
         }
 
@@ -90,7 +95,7 @@ public class SkillsPage {
         inventory.setItem(26, PlayerStatusMenuConfig.getBackItem());
 
         requestingPlayer.openInventory(inventory);
-        SkillsPageEvents.pageInventories.add(inventory);
+        SkillsPageEvents.pageInventories.put(inventory, slotToSkillType);
     }
 
     /**
@@ -180,7 +185,7 @@ public class SkillsPage {
     }
 
     public static class SkillsPageEvents implements Listener {
-        private static final Set<Inventory> pageInventories = new HashSet<>();
+        private static final Map<Inventory, Map<Integer, SkillType>> pageInventories = new HashMap<>();
 
         public static void shutdown() {
             pageInventories.clear();
@@ -189,13 +194,22 @@ public class SkillsPage {
         @EventHandler
         public void onInventoryInteract(InventoryClickEvent event) {
             Player player = ((Player) event.getWhoClicked()).getPlayer();
-            if (!pageInventories.contains(event.getInventory())) return;
+            if (!pageInventories.containsKey(event.getInventory())) return;
             event.setCancelled(true);
 
             // Back button
             if (event.getSlot() == 26) {
                 player.closeInventory();
                 CoverPage.coverPage(player);
+                return;
+            }
+
+            // Check if clicked on a skill item
+            Map<Integer, SkillType> slotToSkillType = pageInventories.get(event.getInventory());
+            SkillType clickedSkillType = slotToSkillType.get(event.getSlot());
+            if (clickedSkillType != null) {
+                player.closeInventory();
+                SkillBonusMenu.openSkillSelectMenu(player, clickedSkillType);
             }
         }
 

@@ -42,7 +42,7 @@ public class ArenaMenu {
             menus.clear();
         }
 
-        @EventHandler(ignoreCancelled = true)
+        @EventHandler
         public void onInventoryClick(InventoryClickEvent event) {
             Player player = ((Player) event.getWhoClicked()).getPlayer();
             if (!menus.containsKey(event.getInventory())) return;

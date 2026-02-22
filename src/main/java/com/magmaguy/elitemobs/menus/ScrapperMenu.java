@@ -103,7 +103,7 @@ public class ScrapperMenu extends EliteMenu {
     }
 
     public static class ScrapperMenuEvents implements Listener {
-        @EventHandler(ignoreCancelled = true)
+        @EventHandler
         public void onInventoryInteract(InventoryClickEvent event) {
             if (!isEliteMenu(event, inventories)) return;
             event.setCancelled(true);

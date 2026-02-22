@@ -17,6 +17,15 @@ import java.util.List;
 public class ConfigurationEngine extends com.magmaguy.magmacore.config.ConfigurationEngine {
 
     public static String setString(File file, FileConfiguration fileConfiguration, String key, String defaultValue, boolean translatable) {
+        if (translatable && !TranslationsConfig.isEnglish()) {
+            // Read existing value (from previous English run) or use default
+            String rawValue = fileConfiguration.getString(key);
+            String value = rawValue != null ? rawValue : defaultValue;
+            // Remove from config so it won't be written to YAML
+            fileConfiguration.set(key, null);
+            if (value == null) return null;
+            return TranslationsConfig.add(file.getName(), key, ChatColorConverter.convert(value));
+        }
         fileConfiguration.addDefault(key, defaultValue);
         if (translatable)
             return TranslationsConfig.add(file.getName(), key, ChatColorConverter.convert(fileConfiguration.getString(key)));
@@ -26,11 +35,19 @@ public class ConfigurationEngine extends com.magmaguy.magmacore.config.Configura
 
     public static String setString(List<String> comments, File file, FileConfiguration fileConfiguration, String key, String defaultValue, boolean translatable) {
         String value = setString(file, fileConfiguration, key, defaultValue, translatable);
-        setComments(fileConfiguration, key, comments);
+        if (!translatable || TranslationsConfig.isEnglish())
+            setComments(fileConfiguration, key, comments);
         return value;
     }
 
+    @SuppressWarnings("unchecked")
     public static List setList(File file, FileConfiguration fileConfiguration, String key, List defaultValue, boolean translatable) {
+        if (translatable && !TranslationsConfig.isEnglish()) {
+            List<String> rawValue = (List<String>) fileConfiguration.getList(key);
+            List<String> value = rawValue != null ? rawValue : (defaultValue != null ? (List<String>) defaultValue : new ArrayList<>());
+            fileConfiguration.set(key, null);
+            return TranslationsConfig.add(file.getName(), key, value);
+        }
         fileConfiguration.addDefault(key, defaultValue);
         if (translatable)
             return TranslationsConfig.add(file.getName(), key, (List<String>) fileConfiguration.getList(key));
@@ -40,16 +57,19 @@ public class ConfigurationEngine extends com.magmaguy.magmacore.config.Configura
 
     public static List setList(List<String> comment, File file, FileConfiguration fileConfiguration, String key, List defaultValue, boolean translatable) {
         List value = setList(file, fileConfiguration, key, defaultValue, translatable);
-        setComments(fileConfiguration, key, comment);
+        if (!translatable || TranslationsConfig.isEnglish())
+            setComments(fileConfiguration, key, comment);
         return value;
     }
 
     public static ItemStack setItemStack(File file, FileConfiguration fileConfiguration, String key, ItemStack itemStack, boolean translatable) {
         fileConfiguration.addDefault(key + ".material", itemStack.getType().toString());
-        if (itemStack.hasItemMeta() && itemStack.getItemMeta().hasDisplayName())
-            fileConfiguration.addDefault(key + ".name", itemStack.getItemMeta().getDisplayName());
-        if (itemStack.hasItemMeta() && itemStack.getItemMeta().hasLore())
-            fileConfiguration.addDefault(key + ".lore", itemStack.getItemMeta().getLore());
+        if (TranslationsConfig.isEnglish()) {
+            if (itemStack.hasItemMeta() && itemStack.getItemMeta().hasDisplayName())
+                fileConfiguration.addDefault(key + ".name", itemStack.getItemMeta().getDisplayName());
+            if (itemStack.hasItemMeta() && itemStack.getItemMeta().hasLore())
+                fileConfiguration.addDefault(key + ".lore", itemStack.getItemMeta().getLore());
+        }
         if (itemStack.getType().equals(Material.PLAYER_HEAD))
             fileConfiguration.addDefault(key + ".owner", ((SkullMeta) itemStack.getItemMeta()).getOwner());
         Material material;

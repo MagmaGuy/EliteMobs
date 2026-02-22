@@ -354,28 +354,35 @@ public class PlayerData {
     }
 
     public static void setDatabaseValue(UUID uuid, String key, Object value) {
+        if (!MetadataHandler.PLUGIN.isEnabled()) {
+            executeDatabaseUpdate(uuid, key, value);
+            return;
+        }
         new BukkitRunnable() {
             @Override
             public void run() {
-                Statement statement = null;
-                try {
-                    statement = getConnection().createStatement();
-                    String sql;
-                    if (value instanceof String) {
-                        sql = "UPDATE " + PLAYER_DATA_TABLE_NAME + " SET " + key + " = '" + value + "' WHERE PlayerUUID = '" + uuid.toString() + "';";
-                    } else if (value instanceof Boolean) {
-                        sql = "UPDATE " + PLAYER_DATA_TABLE_NAME + " SET " + key + " = " + (((Boolean) value) ? 1 : 0) + " WHERE PlayerUUID = '" + uuid.toString() + "';";
-                    } else {
-                        sql = "UPDATE " + PLAYER_DATA_TABLE_NAME + " SET " + key + " = " + value + " WHERE PlayerUUID = '" + uuid.toString() + "';";
-                    }
-                    statement.executeUpdate(sql);
-                    statement.close();
-                } catch (Exception e) {
-                    Logger.warn("Failed to update database value.");
-                    e.printStackTrace();
-                }
+                executeDatabaseUpdate(uuid, key, value);
             }
         }.runTaskAsynchronously(MetadataHandler.PLUGIN);
+    }
+
+    private static void executeDatabaseUpdate(UUID uuid, String key, Object value) {
+        try {
+            Statement statement = getConnection().createStatement();
+            String sql;
+            if (value instanceof String) {
+                sql = "UPDATE " + PLAYER_DATA_TABLE_NAME + " SET " + key + " = '" + value + "' WHERE PlayerUUID = '" + uuid.toString() + "';";
+            } else if (value instanceof Boolean) {
+                sql = "UPDATE " + PLAYER_DATA_TABLE_NAME + " SET " + key + " = " + (((Boolean) value) ? 1 : 0) + " WHERE PlayerUUID = '" + uuid.toString() + "';";
+            } else {
+                sql = "UPDATE " + PLAYER_DATA_TABLE_NAME + " SET " + key + " = " + value + " WHERE PlayerUUID = '" + uuid.toString() + "';";
+            }
+            statement.executeUpdate(sql);
+            statement.close();
+        } catch (Exception e) {
+            Logger.warn("Failed to update database value.");
+            e.printStackTrace();
+        }
     }
 
     private static Object getDatabaseBlob(UUID uuid, String value) {

@@ -222,7 +222,7 @@ public class SkillBonusMenu {
             skillSelectMenus.clear();
         }
 
-        @EventHandler(ignoreCancelled = true)
+        @EventHandler
         public void onInventoryClick(InventoryClickEvent event) {
             if (!(event.getWhoClicked() instanceof Player player)) return;
 

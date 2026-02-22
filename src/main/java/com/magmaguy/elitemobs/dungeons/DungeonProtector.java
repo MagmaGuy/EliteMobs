@@ -263,6 +263,19 @@ public class DungeonProtector implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventItemFrameDamage(EntityDamageByEntityEvent event) {
+        if (!(event.getEntity() instanceof ItemFrame)) return;
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getEntity().getWorld().getUID())) return;
+        // Check if a player caused the damage (directly or via projectile)
+        if (event.getDamager() instanceof Player player) {
+            if (shouldBypass(player)) return;
+        } else if (event.getDamager() instanceof Projectile projectile && projectile.getShooter() instanceof Player player) {
+            if (shouldBypass(player)) return;
+        }
+        event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void preventItemFrameInteract(PlayerInteractEntityEvent event) {
         if (!EliteMobsWorld.isEliteMobsWorld(event.getPlayer().getWorld().getUID())) return;
         if (shouldBypass(event.getPlayer())) return;
