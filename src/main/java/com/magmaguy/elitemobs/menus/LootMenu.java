@@ -101,7 +101,7 @@ public class LootMenu extends EliteMenu {
 
 
     public static class LootMenuEvents implements Listener {
-        @EventHandler(ignoreCancelled = true)
+        @EventHandler
         public void onInventoryInteract(InventoryClickEvent event) {
             Player player = ((Player) event.getWhoClicked()).getPlayer();
             LootMenu lootMenu = playerLoot.get(player.getUniqueId());

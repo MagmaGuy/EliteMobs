@@ -13,6 +13,8 @@ import com.magmaguy.elitemobs.skills.bonuses.skills.spears.*;
 import com.magmaguy.elitemobs.skills.bonuses.skills.swords.*;
 import com.magmaguy.elitemobs.skills.bonuses.skills.tridents.*;
 import com.magmaguy.magmacore.util.Logger;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 /**
  * Initializes and registers all skill bonuses.
@@ -277,6 +279,10 @@ public class SkillBonusInitializer {
      * Called during plugin disable.
      */
     public static void shutdown() {
+        // Ensure attribute/speed/reach modifiers are cleaned up before registry clears state.
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            SkillBonusRegistry.removeAllBonuses(player);
+        }
         SkillBonusRegistry.shutdown();
         SkillBonusesConfig.shutdown();
         PlayerSkillSelection.shutdown();

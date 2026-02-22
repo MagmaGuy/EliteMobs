@@ -65,6 +65,7 @@ public class CommandHandler {
         emCommand.registerCommand(new TransitiveBlocksRegisterAreaCommand());
         emCommand.registerCommand(new TransitiveBlocksEditAreaCommand());
         emCommand.registerCommand(new SpawnElite());
+        emCommand.registerCommand(new SpawnElitePowers());
         emCommand.registerCommand(new SpawnEliteAtCommand());
         emCommand.registerCommand(new DiscordMessageCommand());
         emCommand.registerCommand(new DiscordCommand());

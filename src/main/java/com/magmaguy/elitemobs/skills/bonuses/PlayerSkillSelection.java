@@ -3,6 +3,8 @@ package com.magmaguy.elitemobs.skills.bonuses;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import com.magmaguy.elitemobs.config.skillbonuses.SkillBonusConfigFields;
+import com.magmaguy.elitemobs.config.skillbonuses.SkillBonusesConfig;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.magmacore.util.Logger;
@@ -45,7 +47,12 @@ public class PlayerSkillSelection {
         if (playerSkills == null) {
             return Collections.emptyList();
         }
-        return playerSkills.getOrDefault(skillType, Collections.emptyList());
+        if (sanitizeSkillList(playerSkills, skillType)) {
+            saveToDatabase(uuid);
+        }
+        List<String> skillIds = playerSkills.get(skillType);
+        if (skillIds == null || skillIds.isEmpty()) return Collections.emptyList();
+        return List.copyOf(skillIds);
     }
 
     /**
@@ -71,6 +78,11 @@ public class PlayerSkillSelection {
      */
     public static boolean addActiveSkill(UUID uuid, SkillType skillType, String skillId, boolean bypassLimit) {
         ensureLoaded(uuid);
+        if (skillId == null || skillId.isBlank()) return false;
+        String normalizedSkillId = skillId.toLowerCase(Locale.ROOT);
+        if (!isSkillEnabledForType(skillType, normalizedSkillId)) {
+            return false;
+        }
         Map<SkillType, List<String>> playerSkills = activeSkills.computeIfAbsent(uuid, k -> new EnumMap<>(SkillType.class));
         List<String> typeSkills = playerSkills.computeIfAbsent(skillType, k -> new ArrayList<>());
 
@@ -80,11 +92,11 @@ public class PlayerSkillSelection {
         }
 
         // Check if already active
-        if (typeSkills.contains(skillId)) {
+        if (typeSkills.contains(normalizedSkillId)) {
             return false;
         }
 
-        typeSkills.add(skillId);
+        typeSkills.add(normalizedSkillId);
         saveToDatabase(uuid);
         return true;
     }
@@ -99,6 +111,8 @@ public class PlayerSkillSelection {
      */
     public static boolean removeActiveSkill(UUID uuid, SkillType skillType, String skillId) {
         ensureLoaded(uuid);
+        if (skillId == null || skillId.isBlank()) return false;
+        String normalizedSkillId = skillId.toLowerCase(Locale.ROOT);
         Map<SkillType, List<String>> playerSkills = activeSkills.get(uuid);
         if (playerSkills == null) {
             return false;
@@ -109,7 +123,7 @@ public class PlayerSkillSelection {
             return false;
         }
 
-        boolean removed = typeSkills.remove(skillId);
+        boolean removed = typeSkills.remove(normalizedSkillId);
         if (removed) {
             saveToDatabase(uuid);
         }
@@ -124,14 +138,20 @@ public class PlayerSkillSelection {
      * @return true if the skill is active
      */
     public static boolean isSkillActive(UUID uuid, String skillId) {
+        if (skillId == null || skillId.isBlank()) return false;
+        String normalizedSkillId = skillId.toLowerCase(Locale.ROOT);
         ensureLoaded(uuid);
         Map<SkillType, List<String>> playerSkills = activeSkills.get(uuid);
         if (playerSkills == null) {
             return false;
         }
 
+        if (sanitizeAllSkillLists(playerSkills)) {
+            saveToDatabase(uuid);
+        }
+
         for (List<String> typeSkills : playerSkills.values()) {
-            if (typeSkills.contains(skillId)) {
+            if (typeSkills.contains(normalizedSkillId)) {
                 return true;
             }
         }
@@ -171,6 +191,9 @@ public class PlayerSkillSelection {
         List<String> allSkills = new ArrayList<>();
         Map<SkillType, List<String>> playerSkills = activeSkills.get(uuid);
         if (playerSkills != null) {
+            if (sanitizeAllSkillLists(playerSkills)) {
+                saveToDatabase(uuid);
+            }
             for (List<String> typeSkills : playerSkills.values()) {
                 allSkills.addAll(typeSkills);
             }
@@ -219,7 +242,14 @@ public class PlayerSkillSelection {
                 for (Map.Entry<String, List<String>> entry : parsed.entrySet()) {
                     try {
                         SkillType skillType = SkillType.valueOf(entry.getKey());
-                        converted.put(skillType, new ArrayList<>(entry.getValue()));
+                        List<String> normalizedIds = new ArrayList<>();
+                        if (entry.getValue() != null) {
+                            for (String rawId : entry.getValue()) {
+                                if (rawId == null) continue;
+                                normalizedIds.add(rawId.toLowerCase(Locale.ROOT));
+                            }
+                        }
+                        converted.put(skillType, normalizedIds);
                     } catch (IllegalArgumentException e) {
                         Logger.warn("Unknown skill type in database: " + entry.getKey());
                     }
@@ -227,6 +257,9 @@ public class PlayerSkillSelection {
             }
 
             activeSkills.put(uuid, converted);
+            if (sanitizeAllSkillLists(converted)) {
+                saveToDatabase(uuid);
+            }
         } catch (Exception e) {
             Logger.warn("Failed to parse skill selections for player " + uuid + ": " + e.getMessage());
             activeSkills.put(uuid, new EnumMap<>(SkillType.class));
@@ -295,5 +328,41 @@ public class PlayerSkillSelection {
             saveToDatabase(uuid);
         }
         activeSkills.clear();
+    }
+
+    private static boolean isSkillEnabledForType(SkillType skillType, String skillId) {
+        SkillBonusConfigFields config = SkillBonusesConfig.getBySkillId(skillId);
+        return config != null && config.isEnabled() && config.getSkillType() == skillType;
+    }
+
+    private static boolean sanitizeSkillList(Map<SkillType, List<String>> playerSkills, SkillType skillType) {
+        List<String> rawList = playerSkills.get(skillType);
+        if (rawList == null || rawList.isEmpty()) return false;
+
+        List<String> sanitized = new ArrayList<>();
+        Set<String> seen = new HashSet<>();
+
+        for (String skillId : rawList) {
+            if (skillId == null) continue;
+            String normalizedId = skillId.toLowerCase(Locale.ROOT);
+            if (!seen.add(normalizedId)) continue;
+            if (!isSkillEnabledForType(skillType, normalizedId)) continue;
+            sanitized.add(normalizedId);
+            if (sanitized.size() >= MAX_ACTIVE_SKILLS) break;
+        }
+
+        if (sanitized.equals(rawList)) return false;
+
+        if (sanitized.isEmpty()) playerSkills.remove(skillType);
+        else playerSkills.put(skillType, sanitized);
+        return true;
+    }
+
+    private static boolean sanitizeAllSkillLists(Map<SkillType, List<String>> playerSkills) {
+        boolean changed = false;
+        for (SkillType skillType : SkillType.values()) {
+            changed |= sanitizeSkillList(playerSkills, skillType);
+        }
+        return changed;
     }
 }

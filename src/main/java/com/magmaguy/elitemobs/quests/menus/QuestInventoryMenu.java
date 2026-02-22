@@ -60,11 +60,11 @@ public class QuestInventoryMenu {
             questMap.put(questSlots.get(i), quests.get(i));
             QuestMenu.QuestText questText = new QuestMenu.QuestText(quests.get(i), npcEntity, player);
             if (!quests.get(i).isAccepted())
-                questInventory.setItem(questSlots.get(i), ItemStackGenerator.generateItemStack(acceptMaterial, questText.getHeader().getText()));
+                questInventory.setItem(questSlots.get(i), ItemStackGenerator.generateItemStack(acceptMaterial, questText.getHeader().toPlainText()));
             else if (!quests.get(i).getQuestObjectives().isOver())
-                questInventory.setItem(questSlots.get(i), ItemStackGenerator.generateItemStack(inProgressMaterial, questText.getHeader().getText()));
+                questInventory.setItem(questSlots.get(i), ItemStackGenerator.generateItemStack(inProgressMaterial, questText.getHeader().toPlainText()));
             else
-                questInventory.setItem(questSlots.get(i), ItemStackGenerator.generateItemStack(completeMaterial, questText.getHeader().getText()));
+                questInventory.setItem(questSlots.get(i), ItemStackGenerator.generateItemStack(completeMaterial, questText.getHeader().toPlainText()));
         }
 
         new QuestDirectory(player, questMap, questInventory, npcEntity);
@@ -74,8 +74,8 @@ public class QuestInventoryMenu {
     public static void generateInventoryQuestEntry(Quest quest, Player player, NPCEntity npcEntity) {
         QuestMenu.QuestText questText = new QuestMenu.QuestText(quest, npcEntity, player);
         String title = "";
-        if (questText.getHeader().getText() != null)
-            title = questText.getHeader().getText();
+        if (questText.getHeader().toPlainText() != null)
+            title = questText.getHeader().toPlainText();
         Inventory questInventory = Bukkit.createInventory(player, 27, title);
         int titleEntry = 4;
         List<Integer> loreEntries = new ArrayList<>(new ArrayList<>(List.of(13, 14, 12, 15, 11, 16, 10, 17, 9)));
@@ -114,12 +114,12 @@ public class QuestInventoryMenu {
     public static List<ItemStack> generateItemStackEntry(TextComponent title, List<TextComponent> textComponents, Material material) {
         List<String> list = new ArrayList<>();
         textComponents.forEach(component -> {
-            if (component.getText().length() < 27)
-                list.add(ChatColor.WHITE + component.getText().replace(ChatColor.BLACK + "", ChatColor.WHITE + ""));
+            if (component.toPlainText().length() < 27)
+                list.add(ChatColor.WHITE + component.toPlainText().replace(ChatColor.BLACK + "", ChatColor.WHITE + ""));
             else {
                 ChatColor currentColor = ChatColor.WHITE;
-                for (int i = 0; i < component.getText().length() / 26D; i++) {
-                    String string = currentColor + ChatColorConverter.convert(component.getText().substring(i * 26, Math.min((i + 1) * 26, component.getText().length())).replace(ChatColor.BLACK + "", ChatColor.WHITE + ""));
+                for (int i = 0; i < component.toPlainText().length() / 26D; i++) {
+                    String string = currentColor + ChatColorConverter.convert(component.toPlainText().substring(i * 26, Math.min((i + 1) * 26, component.toPlainText().length())).replace(ChatColor.BLACK + "", ChatColor.WHITE + ""));
                     list.add(string);
                     String lastColor = ChatColor.getLastColors(string);
                     if (!lastColor.isEmpty())
@@ -128,11 +128,11 @@ public class QuestInventoryMenu {
                 }
             }
         });
-        return generateParsedItemStackEntry(title.getText(), list, material);
+        return generateParsedItemStackEntry(title.toPlainText(), list, material);
     }
 
     public static List<ItemStack> generateItemStackEntry(TextComponent title, TextComponent textComponent, Material material) {
-        return generateParsedItemStackEntry(title.getText(), Collections.singletonList(textComponent.getText()), material);
+        return generateParsedItemStackEntry(title.toPlainText(), Collections.singletonList(textComponent.toPlainText()), material);
     }
 
     public static List<ItemStack> generateParsedItemStackEntry(String title, List<String> rawLore, Material material) {

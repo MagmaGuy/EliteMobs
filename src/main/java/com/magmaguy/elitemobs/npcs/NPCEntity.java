@@ -294,7 +294,7 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
             // Custom models typically need more height
             yOffset = 2.3;
         } else if (isDisguised) {
-            yOffset = 1.55;
+            yOffset = 2.30;
         } else {
             yOffset = 2.52;
         }

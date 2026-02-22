@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.elitemobs.config.translations.TranslationsConfig;
 import org.bukkit.Material;
+import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.List;
@@ -43,10 +44,20 @@ public class CustomConfigFields extends com.magmaguy.magmacore.config.CustomConf
     }
 
     protected String translatable(String filename, String key, String value) {
+        if (!TranslationsConfig.isEnglish() && fileConfiguration != null) {
+            fileConfiguration.set(key, null);
+            Configuration defaults = fileConfiguration.getDefaults();
+            if (defaults != null) defaults.set(key, null);
+        }
         return TranslationsConfig.add(filename, key, value);
     }
 
     protected List<String> translatable(String filename, String key, List<String> value) {
+        if (!TranslationsConfig.isEnglish() && fileConfiguration != null) {
+            fileConfiguration.set(key, null);
+            Configuration defaults = fileConfiguration.getDefaults();
+            if (defaults != null) defaults.set(key, null);
+        }
         return TranslationsConfig.add(filename, key, value);
     }
 
@@ -58,7 +69,7 @@ public class CustomConfigFields extends com.magmaguy.magmacore.config.CustomConf
 
         for (String key : newValue.getKeys(true))
             if (key.equalsIgnoreCase("message"))
-                newValue.set(key, translatable(filename, key, (String) newValue.get(key)));
+                newValue.set(key, TranslationsConfig.add(filename, key, (String) newValue.get(key)));
         return newValue;
     }
 }

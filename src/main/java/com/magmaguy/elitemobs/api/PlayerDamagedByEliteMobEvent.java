@@ -9,6 +9,7 @@ import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
+import com.magmaguy.elitemobs.skills.ArmorSkillHealthBonus;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.SkillXPCalculator;
 import com.magmaguy.elitemobs.skills.bonuses.PlayerSkillSelection;
@@ -368,7 +369,7 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
             // 1. Player stats
             long armorSkillXP = PlayerData.getSkillXP(player.getUniqueId(), SkillType.ARMOR);
             int armorSkillLevel = Math.max(1, SkillXPCalculator.levelFromTotalXP(armorSkillXP));
-            double playerMaxHealth = 20.0 + Math.max(0, armorSkillLevel - 1) * 2.0;
+            double playerMaxHealth = ArmorSkillHealthBonus.getConfiguredMaxHealthForArmorLevel(armorSkillLevel);
             int mobLevel = eliteEntity.getLevel();
 
             // 2. Base damage (no pre-compensation)
