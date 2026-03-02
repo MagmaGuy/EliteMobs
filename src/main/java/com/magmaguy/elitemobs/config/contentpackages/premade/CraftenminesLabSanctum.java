@@ -22,8 +22,7 @@ public class CraftenminesLabSanctum extends ContentPackagesConfigFields {
                 "em_id_craftenmines_lab,-26.5,68,0.5,-90.0,0.0",
                 "em_id_craftenmines_lab,-19,66,0,-90,0",
                 0,
-                "Difficulty: &6Hard\n" +
-                        "Difficulty: &45-man hard content!",
+                "&aDynamic Sanctum\n" + "$bossCount boss encounters\n" + "&aFace the creator of the\n" + "&adevious creations!",
                 "&8[EM] &5Someone must stop Dr. Craftenmine and his horrific creations!",
                 "&8[EM] &5You have left Dr. Craftenmine's laboratory!",
                 List.of("filename=dr_craftenmine_p1.yml"),

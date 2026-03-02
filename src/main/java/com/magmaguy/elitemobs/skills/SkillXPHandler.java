@@ -4,6 +4,8 @@ import com.magmaguy.elitemobs.antiexploit.FarmingProtection;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.combatsystem.displays.BossHealthDisplay;
 import com.magmaguy.elitemobs.config.DungeonsConfig;
+import com.magmaguy.elitemobs.config.SkillsConfig;
+import com.magmaguy.elitemobs.config.menus.premade.SkillBonusMenuConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
@@ -32,16 +34,17 @@ public class SkillXPHandler implements Listener {
      */
     @EventHandler(priority = EventPriority.NORMAL)
     public void onEliteMobDeath(EliteMobDeathEvent event) {
+        if (!SkillsConfig.isSkillSystemEnabled()) return;
+
         EliteEntity eliteEntity = event.getEliteEntity();
 
         // Skip if anti-exploit triggered or no damagers
         if (eliteEntity.isTriggeredAntiExploit()) return;
         if (eliteEntity.getDamagers().isEmpty()) return;
 
-        // Custom bosses can disable skill XP - also no XP if they don't drop EliteMobs loot
+        // Custom bosses can disable skill XP
         if (eliteEntity instanceof CustomBossEntity customBoss) {
             if (!customBoss.getCustomBossesConfigFields().isDropsSkillXP()) return;
-            if (!customBoss.getCustomBossesConfigFields().isDropsEliteMobsLoot()) return;
         }
 
         int mobLevel = eliteEntity.getLevel();
@@ -185,7 +188,7 @@ public class SkillXPHandler implements Listener {
         player.sendTitle(
                 DungeonsConfig.getSkillLevelUpTitle(),
                 DungeonsConfig.getSkillLevelUpSubtitle()
-                        .replace("$skill", skillType.getDisplayName())
+                        .replace("$skill", SkillBonusMenuConfig.getSkillTypeDisplayName(skillType))
                         .replace("$level", String.valueOf(newLevel)),
                 10, 70, 20
         );
@@ -205,7 +208,7 @@ public class SkillXPHandler implements Listener {
         // Server-wide announcement
         String announcement = DungeonsConfig.getSkillLevelUpBroadcast()
                 .replace("$player", player.getName())
-                .replace("$skill", skillType.getDisplayName())
+                .replace("$skill", SkillBonusMenuConfig.getSkillTypeDisplayName(skillType))
                 .replace("$level", String.valueOf(newLevel));
         Bukkit.broadcastMessage(announcement);
 
@@ -217,7 +220,7 @@ public class SkillXPHandler implements Listener {
             ArmorSkillHealthBonus.updateHealthBonus(player);
         }
 
-        DebugMessage.log(player, "Player " + player.getName() + " reached " + skillType.getDisplayName() + " level " + newLevel);
+        DebugMessage.log(player, "Player " + player.getName() + " reached " + SkillBonusMenuConfig.getSkillTypeDisplayName(skillType) + " level " + newLevel);
     }
 
     /**

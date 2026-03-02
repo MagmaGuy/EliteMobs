@@ -66,9 +66,9 @@ public class WormholeConfigFields extends CustomConfigFields {
     public void processConfigFields() {
         this.isEnabled = processBoolean("isEnabled", isEnabled, true, true);
         this.location1 = processString("location1", location1, null, true);
-        this.location1Text = processString("location1Text", location1Text, null, false);
+        this.location1Text = translatable(filename, "location1Text", processString("location1Text", location1Text, null, false));
         this.location2 = processString("location2", location2, null, true);
-        this.location2Text = processString("location2Text", location2Text, null, false);
+        this.location2Text = translatable(filename, "location2Text", processString("location2Text", location2Text, null, false));
         this.permission = processString("permission", permission, null, false);
         this.coinCost = processDouble("coinCost", coinCost, 0, false);
         this.style = processEnum("style", style, Wormhole.WormholeStyle.CUBE, Wormhole.WormholeStyle.class, false);

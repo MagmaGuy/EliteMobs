@@ -32,7 +32,7 @@ public class DialogObjective extends Objective {
     public boolean checkProgress(Player player, QuestObjectives questObjectives) {
         if (super.currentAmount >= super.targetAmount) return false;
         progressObjective(questObjectives);
-        dialog.forEach(player::sendMessage);
+        if (dialog != null) dialog.forEach(player::sendMessage);
         return true;
     }
 

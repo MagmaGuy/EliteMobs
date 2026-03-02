@@ -44,17 +44,17 @@ public class ScrapperMenuConfig extends MenusConfigFields {
                                 "&aUse scrap at the smelter,",
                                 "&arepairman and refiner!"))),
                 fileConfiguration);
-        infoButton = ItemStackSerializer.deserialize("infoButton", fileConfiguration);
+        infoButton = ItemStackSerializer.deserialize("infoButton", fileConfiguration, file);
         infoSlot = ConfigurationEngine.setInt(fileConfiguration, "infoButtonSlot", 4);
         storeSlots = ConfigurationEngine.setList(file, fileConfiguration, "scrapSlots", new ArrayList<>(List.of(19, 20, 21, 22, 23,
                 24, 25, 28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 43)), false);
         ItemStackSerializer.serialize("cancelButton", ItemStackGenerator.generateItemStack(Material.BARRIER,
                 "&4Cancel", List.of("&cCancel scrap!"), MetadataHandler.signatureID), fileConfiguration);
-        cancelButton = ItemStackSerializer.deserialize("cancelButton", fileConfiguration);
+        cancelButton = ItemStackSerializer.deserialize("cancelButton", fileConfiguration, file);
         cancelSlot = ConfigurationEngine.setInt(fileConfiguration, "cancelButtonSlot", 27);
         ItemStackSerializer.serialize("confirmButton", ItemStackGenerator.generateItemStack(Material.EMERALD,
                 "&2Confirm Scrap", new ArrayList<>(List.of("&aScrap items!", "&a$chance% chance of success!")) ), fileConfiguration);
-        confirmButton = ItemStackSerializer.deserialize("confirmButton", fileConfiguration);
+        confirmButton = ItemStackSerializer.deserialize("confirmButton", fileConfiguration, file);
         CustomModelAdder.addCustomModel(confirmButton, CustomModelsConfig.anvilHammer);
         confirmSlot = ConfigurationEngine.setInt(fileConfiguration, "confirmScrapSlot", 35);
         scrapChance = ConfigurationEngine.setDouble(fileConfiguration, "scrapChance", 0.75);

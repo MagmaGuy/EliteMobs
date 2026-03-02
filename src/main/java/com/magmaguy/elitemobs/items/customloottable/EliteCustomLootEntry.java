@@ -17,6 +17,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -38,11 +39,8 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
         }
         if (filename == null) return;
         CustomItem customItem = CustomItem.getCustomItem(filename);
-        if (customItem == null) {
-            if (MetadataHandler.pluginState != PluginState.INITIALIZING)
-                errorMessage(rawString, configFilename, "filename");
-            return;
-        }
+        if (customItem == null && MetadataHandler.pluginState != PluginState.INITIALIZING)
+            errorMessage(rawString, configFilename, "filename");
         entries.add(this);
     }
 
@@ -207,7 +205,8 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
         for (int i = 0; i < getAmount(); i++) {
             ItemStack itemStack = customItem.generateItemStack(itemTier, player, null);
             if (itemStack == null) continue;
-            player.getInventory().addItem(itemStack);
+            HashMap<Integer, ItemStack> leftOvers = player.getInventory().addItem(itemStack);
+            leftOvers.values().forEach(leftOver -> player.getWorld().dropItem(player.getLocation(), leftOver));
             if (name == null && itemStack.getItemMeta() != null) {
                 if (itemStack.getItemMeta().hasDisplayName()) name = itemStack.getItemMeta().getDisplayName();
                 else name = itemStack.getType().toString().replace("_", " ");
@@ -227,7 +226,8 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
         for (int i = 0; i < getAmount(); i++) {
             ItemStack itemStack = customItem.generateItemStackExact(itemTier, player, null);
             if (itemStack == null) continue;
-            player.getInventory().addItem(itemStack);
+            HashMap<Integer, ItemStack> leftOvers = player.getInventory().addItem(itemStack);
+            leftOvers.values().forEach(leftOver -> player.getWorld().dropItem(player.getLocation(), leftOver));
             if (name == null && itemStack.getItemMeta() != null) {
                 if (itemStack.getItemMeta().hasDisplayName()) name = itemStack.getItemMeta().getDisplayName();
                 else name = itemStack.getType().toString().replace("_", " ");
@@ -250,7 +250,8 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
         for (int i = 0; i < getAmount(); i++) {
             ItemStack itemStack = customItem.generateItemStack(itemTier, player, eliteEntity);
             if (itemStack == null) return;
-            player.getInventory().addItem(itemStack);
+            HashMap<Integer, ItemStack> leftOvers = player.getInventory().addItem(itemStack);
+            leftOvers.values().forEach(leftOver -> player.getWorld().dropItem(player.getLocation(), leftOver));
             if (name == null && itemStack.getItemMeta() != null) {
                 if (itemStack.getItemMeta().hasDisplayName()) name = itemStack.getItemMeta().getDisplayName();
                 else name = itemStack.getType().toString().replace("_", " ");

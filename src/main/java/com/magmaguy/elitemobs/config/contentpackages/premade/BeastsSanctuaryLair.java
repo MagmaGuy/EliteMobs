@@ -21,7 +21,7 @@ public class BeastsSanctuaryLair extends ContentPackagesConfigFields {
                 "em_beasts_sanctuary,35.5,88.2,20.5,46,23",
                 "em_beasts_sanctuary,32.5,88.2,36.5,0,0",
                 1,
-                "Difficulty: &4Dynamic content!",
+                "&aDynamic Lair\n" + "$bossCount boss encounters\n" + "&cA dark sanctuary corrupted\n" + "&cby the terrifying Beast.",
                 "&8[EM] &aYou have entered the Beast Sanctuary! Beware of what prowls here!",
                 "&8[EM] &aYou've left the Beast Sanctuary! Did you take trophies?",
                 List.of("filename=the_beasts_sanctuary_beast_human_p1.yml"),

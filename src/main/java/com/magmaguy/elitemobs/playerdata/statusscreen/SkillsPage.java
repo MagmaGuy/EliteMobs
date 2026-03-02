@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.playerdata.statusscreen;
 
 import com.magmaguy.elitemobs.config.SkillsConfig;
 import com.magmaguy.elitemobs.config.menus.premade.PlayerStatusMenuConfig;
+import com.magmaguy.elitemobs.config.menus.premade.SkillBonusMenuConfig;
 import com.magmaguy.elitemobs.menus.SkillBonusMenu;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.skills.SkillType;
@@ -55,7 +56,7 @@ public class SkillsPage {
             String progressBar = createProgressBar(progress);
 
             String levelLine = PlayerStatusMenuConfig.getSkillsPageLevelFormat()
-                    .replace("$skillName", skillType.getDisplayName())
+                    .replace("$skillName", SkillBonusMenuConfig.getSkillTypeDisplayName(skillType))
                     .replace("$level", String.valueOf(level));
             String xpLine = PlayerStatusMenuConfig.getSkillsPageXpFormat()
                     .replace("$progressBar", progressBar)
@@ -112,7 +113,7 @@ public class SkillsPage {
         // Display name with level
         meta.setDisplayName(PlayerStatusMenuConfig.getSkillItemDisplayNameFormat()
                 .replace("$level", String.valueOf(level))
-                .replace("$skillName", skillType.getDisplayName()));
+                .replace("$skillName", SkillBonusMenuConfig.getSkillTypeDisplayName(skillType)));
 
         // Lore
         List<String> lore = new ArrayList<>();

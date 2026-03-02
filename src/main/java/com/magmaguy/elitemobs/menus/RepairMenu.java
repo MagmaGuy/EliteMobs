@@ -19,10 +19,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class RepairMenu extends EliteMenu {
     private static final int eliteItemInputSlot = RepairMenuConfig.eliteItemInputSlot;
@@ -169,7 +166,8 @@ public class RepairMenu extends EliteMenu {
 
                 //return item to inventory
                 if (event.getSlot() == scrapItemInputSlot || event.getSlot() == eliteItemInputSlot) {
-                    player.getWorld().dropItem(player.getLocation(), currentItem);
+                    HashMap<Integer, ItemStack> leftOvers = player.getInventory().addItem(currentItem);
+                    leftOvers.values().forEach(leftOver -> player.getWorld().dropItem(player.getLocation(), leftOver));
                     repairInventory.remove(currentItem);
                     calculateOutput(repairInventory);
                     return;
@@ -187,8 +185,10 @@ public class RepairMenu extends EliteMenu {
                         repairInventory.setItem(RepairMenuConfig.eliteItemInputSlot, null);
                         repairInventory.setItem(RepairMenuConfig.eliteScrapInputSlot, null);
                         if (repairInventory.getItem(outputSlot) != null) {
-                            player.getWorld().dropItem(player.getLocation(), repairInventory.getItem(outputSlot));
-                            repairInventory.remove(repairInventory.getItem(outputSlot));
+                            ItemStack outputItem = repairInventory.getItem(outputSlot);
+                            HashMap<Integer, ItemStack> leftOvers = player.getInventory().addItem(outputItem);
+                            leftOvers.values().forEach(leftOver -> player.getWorld().dropItem(player.getLocation(), leftOver));
+                            repairInventory.remove(outputItem);
                         }
                         repairInventory.setItem(outputSlot, null);
                     }

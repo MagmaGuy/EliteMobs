@@ -72,14 +72,14 @@ public class EliteScrollMenuConfig extends MenusConfigFields {
                                 "&2To convert a non-elite item into an elite item, place",
                                 "&2your non-elite item below, as well as a Elite Scroll!"))),
                 fileConfiguration);
-        infoButton = ItemStackSerializer.deserialize("infoButton", fileConfiguration);
+        infoButton = ItemStackSerializer.deserialize("infoButton", fileConfiguration, file);
         CustomModelAdder.addCustomModel(infoButton, CustomModelsConfig.goldenQuestionMark);
         cancelSlot = ConfigurationEngine.setInt(
                 List.of("Sets the item slot number of the cancel button in the chest menu."),
                 fileConfiguration, "cancelSlot", 27);
         ItemStackSerializer.serialize("cancelButton", ItemStackGenerator.generateItemStack(Material.BARRIER,
                 "&4Cancel", List.of("&cCancel!"), MetadataHandler.signatureID), fileConfiguration);
-        cancelButton = ItemStackSerializer.deserialize("cancelButton", fileConfiguration);
+        cancelButton = ItemStackSerializer.deserialize("cancelButton", fileConfiguration, file);
         CustomModelAdder.addCustomModel(cancelButton, CustomModelsConfig.redCross);
         confirmSlot = ConfigurationEngine.setInt(
                 List.of("Sets the item slot number of the confirm button in the chest menu."),
@@ -87,7 +87,7 @@ public class EliteScrollMenuConfig extends MenusConfigFields {
         ItemStackSerializer.serialize("confirmButton", ItemStackGenerator.generateItemStack(Material.EMERALD,
                 "&2Apply!", new ArrayList<>(),
                 "elitemobs:ui/anvilhammer"), fileConfiguration);
-        confirmButton = ItemStackSerializer.deserialize("confirmButton", fileConfiguration);
+        confirmButton = ItemStackSerializer.deserialize("confirmButton", fileConfiguration, file);
         CustomModelAdder.addCustomModel(confirmButton, CustomModelsConfig.anvilHammer);
         nonEliteItemSlot = ConfigurationEngine.setInt(
                 List.of("Sets the item slot number of the non-elite item in the chest menu."),
@@ -101,7 +101,7 @@ public class EliteScrollMenuConfig extends MenusConfigFields {
                         "&2Non-Elite Item Input slot",
                         List.of("&aPut your non-elite item here!"), MetadataHandler.signatureID),
                 fileConfiguration);
-        nonEliteItemInfoButton = ItemStackSerializer.deserialize("itemInfoButton", fileConfiguration);
+        nonEliteItemInfoButton = ItemStackSerializer.deserialize("itemInfoButton", fileConfiguration, file);
         CustomModelAdder.addCustomModel(nonEliteItemInfoButton, CustomModelsConfig.boxInput);
         eliteScrollItemInfoSlot = ConfigurationEngine.setInt(
                 List.of("Sets the item slot number of the elite scroll item info button in the chest menu."),
@@ -112,7 +112,7 @@ public class EliteScrollMenuConfig extends MenusConfigFields {
                         "&2Elite Scroll Input slot",
                         List.of("&aPut your elite scroll here!"), MetadataHandler.signatureID),
                 fileConfiguration);
-        eliteScrollItemInfoButton = ItemStackSerializer.deserialize("eliteScrollItemInfoButton", fileConfiguration);
+        eliteScrollItemInfoButton = ItemStackSerializer.deserialize("eliteScrollItemInfoButton", fileConfiguration, file);
         eliteScrollItemSlot = ConfigurationEngine.setInt(
                 List.of("Sets the item slot number of elite scroll in the chest menu."),
                 fileConfiguration, "eliteScrollItemSlot", 31);

@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.items;
 
-import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.antiexploit.FarmingProtection;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
@@ -15,15 +14,12 @@ import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.utils.WeightedProbability;
 import com.magmaguy.magmacore.util.Logger;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Location;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
 import java.util.concurrent.ThreadLocalRandom;
@@ -85,8 +81,14 @@ public class LootTables implements Listener {
             }
 
             if (ItemSettingsConfig.isUseEliteItemScrolls() &&
-                    ThreadLocalRandom.current().nextDouble() < ItemSettingsConfig.getEliteItemScrollChance())
-                player.getWorld().dropItem(player.getLocation(), EliteScroll.generateScroll((int) itemLevel, player));
+                    ThreadLocalRandom.current().nextDouble() < ItemSettingsConfig.getEliteItemScrollChance()) {
+                ItemStack scrollItem = EliteScroll.generateScroll((int) itemLevel, player);
+                if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory()) {
+                    HashMap<Integer, ItemStack> leftOvers = player.getInventory().addItem(scrollItem);
+                    leftOvers.values().forEach(leftOver -> player.getWorld().dropItem(player.getLocation(), leftOver));
+                } else
+                    player.getWorld().dropItem(player.getLocation(), scrollItem);
+            }
         }
     }
 
@@ -263,7 +265,7 @@ public class LootTables implements Listener {
 
     public static ItemStack dropWeighedFixedItem(EliteEntity eliteEntity, Player player) {
         ItemStack itemStack = generateWeighedFixedItemStack(player);
-        if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory()) player.getInventory().addItem(itemStack);
+        if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory()) addToInventoryOrDrop(player, itemStack);
         else processPhysicalItem(eliteEntity.getLocation(), itemStack, player);
         return itemStack;
     }
@@ -271,7 +273,7 @@ public class LootTables implements Listener {
 
     public static ItemStack dropWeighedFixedItem(Location location, Player player) {
         ItemStack itemStack = generateWeighedFixedItemStack(player);
-        if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory()) player.getInventory().addItem(itemStack);
+        if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory()) addToInventoryOrDrop(player, itemStack);
         else processPhysicalItem(location, itemStack, player);
         return itemStack;
     }
@@ -302,14 +304,14 @@ public class LootTables implements Listener {
 
     private static ItemStack dropProcedurallyGeneratedItem(int itemLevel, EliteEntity eliteEntity, Player player) {
         ItemStack itemStack = generateProcedurallyGeneratedItem(itemLevel, player, eliteEntity);
-        if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory()) player.getInventory().addItem(itemStack);
+        if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory()) addToInventoryOrDrop(player, itemStack);
         else processPhysicalItem(eliteEntity.getLocation(), itemStack, player);
         return itemStack;
     }
 
     private static ItemStack dropProcedurallyGeneratedItem(int itemLevel, Location location, Player player) {
         ItemStack itemStack = generateProcedurallyGeneratedItem(itemLevel, player, null);
-        if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory()) player.getInventory().addItem(itemStack);
+        if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory()) addToInventoryOrDrop(player, itemStack);
         else processPhysicalItem(location, itemStack, player);
         return itemStack;
     }
@@ -320,14 +322,14 @@ public class LootTables implements Listener {
 
     private static ItemStack dropScalableItem(EliteEntity eliteEntity, int itemLevel, Player player) {
         ItemStack itemStack = generateScalableItem(itemLevel, player, eliteEntity);
-        if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory()) player.getInventory().addItem(itemStack);
+        if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory()) addToInventoryOrDrop(player, itemStack);
         else processPhysicalItem(eliteEntity.getLocation(), itemStack, player);
         return itemStack;
     }
 
     private static ItemStack dropScalableItem(Location location, int itemLevel, Player player) {
         ItemStack itemStack = generateScalableItem(itemLevel, player, null);
-        if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory()) player.getInventory().addItem(itemStack);
+        if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory()) addToInventoryOrDrop(player, itemStack);
         else processPhysicalItem(location, itemStack, player);
         return itemStack;
     }
@@ -338,14 +340,14 @@ public class LootTables implements Listener {
 
     private static ItemStack dropLimitedItem(EliteEntity eliteEntity, int itemLevel, Player player) {
         ItemStack itemStack = generateLimitedItem(itemLevel, player, eliteEntity);
-        if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory()) player.getInventory().addItem(itemStack);
+        if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory()) addToInventoryOrDrop(player, itemStack);
         else processPhysicalItem(eliteEntity.getLocation(), itemStack, player);
         return itemStack;
     }
 
     private static ItemStack dropLimitedItem(Location location, int itemTier, Player player) {
         ItemStack itemStack = generateLimitedItem(itemTier, player, null);
-        if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory()) player.getInventory().addItem(itemStack);
+        if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory()) addToInventoryOrDrop(player, itemStack);
         else processPhysicalItem(location, itemStack, player);
         return itemStack;
     }
@@ -356,20 +358,25 @@ public class LootTables implements Listener {
 
     private static ItemStack dropFixedItem(EliteEntity eliteEntity, int itemTier, Player player) {
         ItemStack itemStack = generateFixedItem(itemTier, player, eliteEntity);
-        if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory()) player.getInventory().addItem(itemStack);
+        if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory()) addToInventoryOrDrop(player, itemStack);
         else processPhysicalItem(eliteEntity.getLocation(), itemStack, player);
         return itemStack;
     }
 
     private static ItemStack dropFixedItem(Location location, int itemTier, Player player) {
         ItemStack itemStack = generateFixedItem(itemTier, player, null);
-        if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory()) player.getInventory().addItem(itemStack);
+        if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory()) addToInventoryOrDrop(player, itemStack);
         else processPhysicalItem(location, itemStack, player);
         return itemStack;
     }
 
     private static ItemStack generateFixedItem(int itemTier, Player player, EliteEntity eliteEntity) {
         return CustomItem.getFixedItems().get(itemTier).get(ThreadLocalRandom.current().nextInt(CustomItem.getFixedItems().get(itemTier).size())).generateDefaultsItemStack(player, false, eliteEntity);
+    }
+
+    private static void addToInventoryOrDrop(Player player, ItemStack itemStack) {
+        HashMap<Integer, ItemStack> leftOvers = player.getInventory().addItem(itemStack);
+        leftOvers.values().forEach(leftOver -> player.getWorld().dropItem(player.getLocation(), leftOver));
     }
 
     private static void processPhysicalItem(Location location, ItemStack itemStack, Player player) {
@@ -385,7 +392,12 @@ public class LootTables implements Listener {
     public static void generateSpecialLoot(Player player, int level, EliteEntity eliteEntity) {
         CustomItem customItem = WeightedProbability.pickWeighedProbabilityFromCustomItems(SpecialItemSystemsConfig.getSpecialValues());
         if (customItem == null) return;
-        player.getWorld().dropItem(player.getLocation(), customItem.generateItemStack(level, player, eliteEntity));
+        ItemStack specialItem = customItem.generateItemStack(level, player, eliteEntity);
+        if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory()) {
+            HashMap<Integer, ItemStack> leftOvers = player.getInventory().addItem(specialItem);
+            leftOvers.values().forEach(leftOver -> player.getWorld().dropItem(player.getLocation(), leftOver));
+        } else
+            player.getWorld().dropItem(player.getLocation(), specialItem);
     }
 
 

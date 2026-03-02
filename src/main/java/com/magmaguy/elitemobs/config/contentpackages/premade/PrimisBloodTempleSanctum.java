@@ -23,7 +23,7 @@ public class PrimisBloodTempleSanctum extends ContentPackagesConfigFields {
                 "em_id_bloodtemple,326.5,87.0,-738.5,-44,35",
                 "em_id_bloodtemple,324.5,73.0,-711.5,-90,5",
                 0,
-                "Difficulty: &4solo hard content!",
+                "&aSanctum &7- Level 20\n" + "$bossCount boss encounters\n" + "&aThe Fire Elemental awaits!",
                 "&bWelcome to the Blood Temple!",
                 "&bYou have left the Blood Temple!",
                 List.of("filename=primis_final_elemental_p1.yml"),

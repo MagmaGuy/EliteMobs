@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.skills;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.SkillsConfig;
+import com.magmaguy.elitemobs.config.menus.premade.SkillBonusMenuConfig;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
@@ -336,11 +337,11 @@ public class SkillXPBar implements Listener {
 
         private static String getBarTitle(SkillType skillType, int level, long xpGained) {
             String xpText = xpGained > 0 ? " &a(+" + formatNumber(xpGained) + " XP)" : "";
-            return ChatColorConverter.convert(SkillsConfig.getSkillBarTitleFormat().replace("$skillName", skillType.getDisplayName()).replace("$level", String.valueOf(level)).replace("$xpText", xpText));
+            return ChatColorConverter.convert(SkillsConfig.getSkillBarTitleFormat().replace("$skillName", SkillBonusMenuConfig.getSkillTypeDisplayName(skillType)).replace("$level", String.valueOf(level)).replace("$xpText", xpText));
         }
 
         private static String getLevelUpTitle(SkillType skillType, int newLevel) {
-            return ChatColorConverter.convert(SkillsConfig.getSkillLevelUpTitleFormat().replace("$skillName", skillType.getDisplayName()).replace("$level", String.valueOf(newLevel)));
+            return ChatColorConverter.convert(SkillsConfig.getSkillLevelUpTitleFormat().replace("$skillName", SkillBonusMenuConfig.getSkillTypeDisplayName(skillType)).replace("$level", String.valueOf(newLevel)));
         }
 
         private static BarColor getBarColor(SkillType skillType) {

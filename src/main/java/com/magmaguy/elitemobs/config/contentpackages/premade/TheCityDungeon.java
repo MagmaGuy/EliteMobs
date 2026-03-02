@@ -23,7 +23,7 @@ public class TheCityDungeon extends ContentPackagesConfigFields {
                 "em_id_the_city,-87.5,119,-13.5,-90,0",
                 "em_id_the_city,-60.5,122,-12.5,-67,0",
                 0,
-                "Difficulty: &45-man hard content!",
+                "&aDynamic Dungeon\n" + "$bossCount boss encounters\n" + "&3Fight through the streets\n" + "&3of the city!",
                 "&bBefore being able to enter the city you must deal with the guardian on the bridge!",
                 "&bYou have left The City!",
                 List.of("filename=em_id_the_city_mini_boss_one.yml",

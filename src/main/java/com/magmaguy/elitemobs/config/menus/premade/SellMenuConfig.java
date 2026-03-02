@@ -41,19 +41,19 @@ public class SellMenuConfig extends MenusConfigFields {
                                 "&cshop! These should have",
                                 "&ca value on their lore."))),
                 fileConfiguration);
-        infoButton = ItemStackSerializer.deserialize("infoButton", fileConfiguration);
+        infoButton = ItemStackSerializer.deserialize("infoButton", fileConfiguration, file);
         CustomModelAdder.addCustomModel(infoButton, CustomModelsConfig.goldenQuestionMark);
         infoSlot = ConfigurationEngine.setInt(fileConfiguration, "infoButtonSlot", 4);
         storeSlots = ConfigurationEngine.setList(file, fileConfiguration, "sellSlots", new ArrayList<>(List.of(19, 20, 21, 22, 23,
                 24, 25, 28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 43)), false);
         ItemStackSerializer.serialize("cancelButton", ItemStackGenerator.generateItemStack(Material.BARRIER,
                 "&4Cancel", List.of("&cCancel purchase!"), MetadataHandler.signatureID), fileConfiguration);
-        cancelButton = ItemStackSerializer.deserialize("cancelButton", fileConfiguration);
+        cancelButton = ItemStackSerializer.deserialize("cancelButton", fileConfiguration, file);
         CustomModelAdder.addCustomModel(cancelButton, CustomModelsConfig.redCross);
         cancelSlot = ConfigurationEngine.setInt(fileConfiguration, "cancelButtonSlot", 27);
         ItemStackSerializer.serialize("confirmButton", ItemStackGenerator.generateItemStack(Material.EMERALD,
                 "&2Confirm Sale", new ArrayList<>(List.of("&aSell item for", "&a$currency_amount $currency_name")), MetadataHandler.signatureID), fileConfiguration);
-        confirmButton = ItemStackSerializer.deserialize("confirmButton", fileConfiguration);
+        confirmButton = ItemStackSerializer.deserialize("confirmButton", fileConfiguration, file);
         CustomModelAdder.addCustomModel(confirmButton, CustomModelsConfig.bagOfCoins);
         confirmSlot = ConfigurationEngine.setInt(fileConfiguration, "confirmSaleSlot", 35);
     }
