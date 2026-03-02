@@ -206,6 +206,9 @@ public class EliteMobs extends JavaPlugin {
         //Remove entities that should not exist
         CrashFix.startupCheck();
 
+        //Initialize the admin progress bar
+        InitProgressBar.start(34);
+
         // ═══════════════════════════════════════════════════════
         // ASYNC PHASE -- heavy file I/O on async thread
         // ═══════════════════════════════════════════════════════
@@ -222,6 +225,7 @@ public class EliteMobs extends JavaPlugin {
                 Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, () -> {
                     try {
                         syncInitialization();
+                        InitProgressBar.complete();
                         MetadataHandler.pluginState = PluginState.INITIALIZED;
                         Bukkit.getPluginManager().callEvent(new EliteMobsInitializedEvent());
                         Logger.info("EliteMobs fully initialized!");
@@ -230,6 +234,7 @@ public class EliteMobs extends JavaPlugin {
                             MetadataHandler.pendingReloadSender = null;
                         }
                     } catch (Exception e) {
+                        InitProgressBar.complete();
                         Logger.warn("EliteMobs sync initialization failed!");
                         e.printStackTrace();
                         MetadataHandler.pluginState = PluginState.UNINITIALIZED;
@@ -237,6 +242,7 @@ public class EliteMobs extends JavaPlugin {
                     }
                 });
             } catch (Exception e) {
+                Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, InitProgressBar::complete);
                 Logger.warn("EliteMobs async initialization failed!");
                 e.printStackTrace();
                 MetadataHandler.pluginState = PluginState.UNINITIALIZED;
@@ -246,37 +252,57 @@ public class EliteMobs extends JavaPlugin {
     }
 
     private void asyncInitialization() {
+        InitProgressBar.step("Configs");
         initializeConfigs();
+        InitProgressBar.step("Database");
         new DatabaseConfig();
+        InitProgressBar.step("Skill Bonuses Config");
         new SkillBonusesConfig();
+        InitProgressBar.step("Events");
         ActionEvent.initializeBlueprintEvents();
         TimedEvent.initializeBlueprintEvents();
+        InitProgressBar.step("Mob Properties");
         PluginMobProperties.initializePluginMobValues();
+        InitProgressBar.step("Power Stances");
         MinorPowerStanceMath.initializeVectorCache();
         MajorPowerStanceMath.initializeVectorCache();
+        InitProgressBar.step("Configuration Export");
         ConfigurationExporter.initializeConfigs();
+        InitProgressBar.step("Custom Items");
         new CustomItemsConfig();
         CustomItem.initializeCustomItems();
+        InitProgressBar.step("Loot Tables");
         LootTables.initialize();
+        InitProgressBar.step("Content Packages Config");
         new ContentPackagesConfig();
+        InitProgressBar.step("Custom Bosses Config");
         new CustomBossesConfig();
+        InitProgressBar.step("NPCs Config");
         new NPCsConfig();
+        InitProgressBar.step("Wormholes Config");
         new WormholeConfig();
+        InitProgressBar.step("Arenas Config");
         new CustomArenasConfig();
+        InitProgressBar.step("Quests Config");
         new CustomQuestsConfig();
+        InitProgressBar.step("Special Items Config");
         new SpecialItemSystemsConfig();
+        //Initialize importer — heavy ZIP I/O runs off the main thread.
+        //Bukkit API calls within the importer (unloadWorld, callEvent) are
+        //dispatched back to the main thread internally by MagmaCore.
+        InitProgressBar.step("Content Importer");
+        MagmaCore.initializeImporter();
     }
 
     private void syncInitialization() {
-        //Initialize importer (fires ResourcePackGenerationEvent, must be sync)
-        MagmaCore.initializeImporter();
-
         //Refresh dungeon versions from disk after importer extracts new content packages.
         //The importer may overwrite YAML files with updated dungeonVersion values, but the
         //in-memory configs were loaded before the importer ran, so they need to be refreshed.
+        InitProgressBar.step("Dungeon Versions");
         ContentPackagesConfig.refreshDungeonVersions();
 
         //Initializes custom models
+        InitProgressBar.step("Custom Models");
         CustomModel.initialize();
         //Reserves ModelEngine addresses if present
         ModelEngineReservedAddresses.reserve();
@@ -285,6 +311,7 @@ public class EliteMobs extends JavaPlugin {
         else Logger.info("WorldGuard compatibility is not enabled!");
 
         //Enable Vault
+        InitProgressBar.step("Economy");
         try {
             VaultCompatibility.vaultSetup();
         } catch (Exception e) {
@@ -293,13 +320,16 @@ public class EliteMobs extends JavaPlugin {
         }
 
         //Hook up all listeners, some depend on config
+        InitProgressBar.step("Event Listeners");
         EventsRegistrer.registerEvents();
 
         //Launch the local data cache
+        InitProgressBar.step("Player Database");
         PlayerData.initializeDatabaseConnection();
         ElitePlayerInventory.initialize();
 
         //Initialize skill system
+        InitProgressBar.step("Skills System");
         SkillSystemMigration.initialize();
         SkillBonusInitializer.initialize();
         // Re-apply skill bonuses for any players already online (e.g. after plugin reload)
@@ -307,14 +337,17 @@ public class EliteMobs extends JavaPlugin {
         CombatLevelDisplay.initialize();
 
         //Initialize gambling system
+        InitProgressBar.step("Gambling System");
         com.magmaguy.elitemobs.economy.GamblingEconomyHandler.initialize();
         com.magmaguy.elitemobs.gambling.DebtCollectorManager.initialize();
         com.magmaguy.elitemobs.gambling.GamblingDenOwnerDisplay.initialize();
 
         //Get world list
+        InitProgressBar.step("World Scanner");
         worldScanner();
 
         //Start the repeating tasks such as scanners
+        InitProgressBar.step("Scheduled Tasks");
         launchRunnables();
 
         // Small check to make sure that PlaceholderAPI is installed
@@ -330,18 +363,23 @@ public class EliteMobs extends JavaPlugin {
         new CustomCharts();
 
         //Initialize em package content, such as world loading
+        InitProgressBar.step("Content Packages");
         ContentPackagesConfig.initializePackages();
 
         //Initialize custom & regional bosses
+        InitProgressBar.step("Custom Bosses");
         CustomBossesConfig.initializeBosses();
 
         //Initialize treasure chests (requires block state access)
+        InitProgressBar.step("Treasure Chests");
         new CustomTreasureChestsConfig();
 
         //Initialize NPCs (requires entity spawning)
+        InitProgressBar.step("NPCs");
         NPCsConfig.initializeNPCs();
 
         //Initialize em package content
+        InitProgressBar.step("EM Packages");
         for (EMPackage emPackage : EMPackage.getEmPackages().values())
             try {
                 if (emPackage.isInstalled()) emPackage.initializeContent();
@@ -357,6 +395,7 @@ public class EliteMobs extends JavaPlugin {
                     wormhole.onDungeonInstall(emPackage.getContentPackagesConfigFields().getFilename());
 
         //Initialize custom spawn methods, this runs late because it compares loaded worlds against worlds listed in the config
+        InitProgressBar.step("Custom Spawns");
         try {
             new CustomSpawnConfig();
         } catch (Exception ex) {
@@ -366,6 +405,7 @@ public class EliteMobs extends JavaPlugin {
         }
 
         //Commands
+        InitProgressBar.step("Commands");
         CommandHandler.registerCommands();
 
         /*
@@ -382,6 +422,7 @@ public class EliteMobs extends JavaPlugin {
 
         // Regenerate cached item stacks after all plugins have loaded
         // This ensures custom skins are applied correctly (ResourcePackManager may not be loaded during initial item generation)
+        InitProgressBar.step("Item Cache");
         CustomItem.regenerateCachedItemStacks();
     }
 
@@ -405,6 +446,7 @@ public class EliteMobs extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        InitProgressBar.complete();
         if (MetadataHandler.pluginState == PluginState.INITIALIZING) {
             MetadataHandler.shutdownRequested = true;
             Bukkit.getServer().getScheduler().cancelTasks(MetadataHandler.PLUGIN);

@@ -23,7 +23,7 @@ public class TheDeepMinesDungeon extends ContentPackagesConfigFields {
                 "em_id_the_deep_mines,-205.5,154,-85.5,0,0",
                 "em_id_the_deep_mines,-207.5,154,-68.5,0,0",
                 0,
-                "Difficulty: &45-man hard content!",
+                "&aDynamic Sanctum\n" + "$bossCount boss encounters\n" + "&8Below lies the deepest\n" + "&8mine ever dug.",
                 "&bVenture far down and find out how deep the deep mines are.",
                 "&bYou have left The Deep Mines!",
                 List.of("filename=em_id_the_deep_mines_tnt_box.yml",

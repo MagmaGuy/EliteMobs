@@ -23,7 +23,7 @@ public class OasisPyramidSanctum extends ContentPackagesConfigFields {
                 "em_id_oasis_pyramid,-9.5,77.0,-153.5,-115,17",
                 "em_id_oasis_pyramid,0.5,75.0,-169.5,-180,3",
                 0,
-                "Difficulty: &4solo hard content!",
+                "&aSanctum &7- Level 55\n" + "$bossCount boss encounters\n" + "&6The final dungeon of the\n" + "&6Oasis adventure!",
                 "&bWelcome to the Pyramid!",
                 "&bYou have left the Pyramid!",
                 List.of("filename=oasis_pharaoh_p1.yml"),

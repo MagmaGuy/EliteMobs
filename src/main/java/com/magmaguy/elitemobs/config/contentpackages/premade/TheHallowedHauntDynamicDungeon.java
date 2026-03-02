@@ -23,7 +23,7 @@ public class TheHallowedHauntDynamicDungeon extends ContentPackagesConfigFields 
                 "em_id_the_hallowed_haunt,-0.5,72,146.5,170,0",
                 "em_id_the_hallowed_haunt,-4.5,72,131.5,162,0",
                 1,
-                "Difficulty: &4Dynamic 5-man content!",
+                "&aDynamic Dungeon\n" + "$bossCount boss encounters\n" + "&5The spookiest manor in\n" + "&5all of MineCraft!",
                 "&bBeware the horror the lurks in the manor!",
                 "&bYou have left The Hallowed Haunt!",
                 List.of("filename=em_the_hallowed_haunt_miniboss_ooze.yml",

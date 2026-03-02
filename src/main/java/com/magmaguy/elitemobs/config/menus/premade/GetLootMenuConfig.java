@@ -29,7 +29,7 @@ public class GetLootMenuConfig extends MenusConfigFields {
                         "&4&lEliteMobs &r&cby &4&lMagmaGuy",
                         List.of("&8Support the plugins you enjoy!")),
                 fileConfiguration);
-        infoItem = ItemStackSerializer.deserialize("infoButton", fileConfiguration);
+        infoItem = ItemStackSerializer.deserialize("infoButton", fileConfiguration, file);
 
         ItemStackSerializer.serialize(
                 "leftButton",
@@ -37,7 +37,7 @@ public class GetLootMenuConfig extends MenusConfigFields {
                         "Previous Item Ranks",
                         List.of("")),
                 fileConfiguration);
-        leftArrowItem = ItemStackSerializer.deserialize("leftButton", fileConfiguration);
+        leftArrowItem = ItemStackSerializer.deserialize("leftButton", fileConfiguration, file);
 
         ItemStackSerializer.serialize(
                 "rightButton",
@@ -45,7 +45,7 @@ public class GetLootMenuConfig extends MenusConfigFields {
                         "Next Item Ranks",
                         List.of("")),
                 fileConfiguration);
-        rightArrowItem = ItemStackSerializer.deserialize("rightButton", fileConfiguration);
+        rightArrowItem = ItemStackSerializer.deserialize("rightButton", fileConfiguration, file);
 
         tierTranslation = ConfigurationEngine.setString(file, fileConfiguration, "tierTranslation", "Level", true);
         itemFilterTranslation = ConfigurationEngine.setString(file, fileConfiguration, "itemFilterTranslation", "Filter by items of this level.", true);
@@ -56,7 +56,7 @@ public class GetLootMenuConfig extends MenusConfigFields {
                         "Previous Loot Page",
                         List.of("")),
                 fileConfiguration);
-        previousLootItem = ItemStackSerializer.deserialize("previousLoot", fileConfiguration);
+        previousLootItem = ItemStackSerializer.deserialize("previousLoot", fileConfiguration, file);
 
         ItemStackSerializer.serialize(
                 "nextLoot",
@@ -64,7 +64,7 @@ public class GetLootMenuConfig extends MenusConfigFields {
                         "Next Loot Page",
                         List.of("")),
                 fileConfiguration);
-        nextLootItem = ItemStackSerializer.deserialize("nextLoot", fileConfiguration);
+        nextLootItem = ItemStackSerializer.deserialize("nextLoot", fileConfiguration, file);
 
     }
 

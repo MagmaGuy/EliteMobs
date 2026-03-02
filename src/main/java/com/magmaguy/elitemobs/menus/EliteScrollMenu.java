@@ -94,6 +94,8 @@ public class EliteScrollMenu extends EliteMenu {
         }
 
         private void confirm(InventoryClickEvent event) {
+            // Only proceed if there is actually an output item to give
+            if (event.getView().getTopInventory().getItem(EliteScrollMenuConfig.getOutputSlot()) == null) return;
             moveItemDown(event.getView().getTopInventory(), EliteScrollMenuConfig.getOutputSlot(), event.getWhoClicked());
             event.getView().getTopInventory().clear();
             event.getWhoClicked().closeInventory();

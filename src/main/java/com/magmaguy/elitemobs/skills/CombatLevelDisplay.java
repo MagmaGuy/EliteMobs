@@ -8,9 +8,12 @@ import com.magmaguy.magmacore.util.ChatColorConverter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerBedEnterEvent;
+import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -155,5 +158,29 @@ public class CombatLevelDisplay implements Listener {
         // Remove the quitting player's display
         removeDisplay(event.getPlayer());
         // The global tracker handles hiding other displays from the quitting player
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onPlayerBedEnter(PlayerBedEnterEvent event) {
+        // When a player sleeps, the server re-syncs passenger data which doesn't include
+        // our packet-only entity, causing it to detach and float. Remove it preemptively.
+        if (event.useBed() != Event.Result.ALLOW
+                && event.getBedEnterResult() != PlayerBedEnterEvent.BedEnterResult.OK) return;
+        removeDisplay(event.getPlayer());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerBedLeave(PlayerBedLeaveEvent event) {
+        if (!SkillsConfig.isSkillSystemEnabled()) return;
+        if (!SkillsConfig.isShowCombatLevelDisplay()) return;
+
+        Player player = event.getPlayer();
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (!player.isOnline()) return;
+                createDisplay(player);
+            }
+        }.runTaskLater(MetadataHandler.PLUGIN, 5L);
     }
 }

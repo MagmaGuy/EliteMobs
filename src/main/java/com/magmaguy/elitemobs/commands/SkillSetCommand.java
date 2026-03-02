@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.config.CommandMessagesConfig;
+import com.magmaguy.elitemobs.config.menus.premade.SkillBonusMenuConfig;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.skills.ArmorSkillHealthBonus;
 import com.magmaguy.elitemobs.skills.CombatLevelDisplay;
@@ -80,7 +81,7 @@ public class SkillSetCommand extends AdvancedCommand {
         Logger.sendMessage(commandData.getCommandSender(),
                 CommandMessagesConfig.getSkillSetSuccessMessage()
                         .replace("$player", targetPlayer.getName())
-                        .replace("$skill", skillType.getDisplayName())
+                        .replace("$skill", SkillBonusMenuConfig.getSkillTypeDisplayName(skillType))
                         .replace("$level", String.valueOf(level))
                         .replace("$xp", String.valueOf(targetXP)));
     }

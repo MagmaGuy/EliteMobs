@@ -22,10 +22,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class ScrapperMenu extends EliteMenu {
@@ -162,7 +159,8 @@ public class ScrapperMenu extends EliteMenu {
                                 failures++;
                                 continue;
                             }
-                            player.getWorld().dropItem(player.getLocation(), scrapItem);
+                            HashMap<Integer, ItemStack> leftOvers = player.getInventory().addItem(scrapItem.clone());
+                            leftOvers.values().forEach(leftOver -> player.getWorld().dropItem(player.getLocation(), leftOver));
                             successes++;
                         }
                         itemStack.setAmount(0);

@@ -2,6 +2,8 @@ package com.magmaguy.elitemobs.config.menus.premade;
 
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.menus.MenusConfigFields;
+import com.magmaguy.elitemobs.skills.SkillType;
+import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
 import lombok.Getter;
 import org.bukkit.Material;
@@ -9,7 +11,9 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Configuration for the skill bonus selection menu.
@@ -124,6 +128,18 @@ public class SkillBonusMenuConfig extends MenusConfigFields {
     private static String skillDeactivatedMessage;
     @Getter
     private static String skillActivatedMessage;
+
+    // Translatable display names for SkillType and SkillBonusType
+    private static final Map<SkillType, String> skillTypeDisplayNames = new EnumMap<>(SkillType.class);
+    private static final Map<SkillBonusType, String> bonusTypeDisplayNames = new EnumMap<>(SkillBonusType.class);
+
+    public static String getSkillTypeDisplayName(SkillType type) {
+        return skillTypeDisplayNames.getOrDefault(type, type.getDisplayName());
+    }
+
+    public static String getBonusTypeDisplayName(SkillBonusType type) {
+        return bonusTypeDisplayNames.getOrDefault(type, type.name());
+    }
 
     public SkillBonusMenuConfig() {
         super("skill_bonus_menu", true);
@@ -243,5 +259,21 @@ public class SkillBonusMenuConfig extends MenusConfigFields {
         skillRequiresLevelMessage = ConfigurationEngine.setString(List.of("Message sent when a player tries to activate a skill they haven't unlocked. %level% = required level."), file, fileConfiguration, "skillRequiresLevelMessage", "&cThis skill requires level %level%!", true);
         skillDeactivatedMessage = ConfigurationEngine.setString(List.of("Message sent when a player deactivates a skill. %skill% = skill name."), file, fileConfiguration, "skillDeactivatedMessage", "&eDeactivated skill: %skill%", true);
         skillActivatedMessage = ConfigurationEngine.setString(List.of("Message sent when a player activates a skill. %skill% = skill name."), file, fileConfiguration, "skillActivatedMessage", "&aActivated skill: %skill%", true);
+
+        // Translatable skill type display names
+        skillTypeDisplayNames.clear();
+        for (SkillType type : SkillType.values()) {
+            String key = "skillTypeName." + type.name().toLowerCase();
+            String translated = ConfigurationEngine.setString(file, fileConfiguration, key, type.getDisplayName(), true);
+            skillTypeDisplayNames.put(type, translated);
+        }
+
+        // Translatable bonus type display names
+        bonusTypeDisplayNames.clear();
+        bonusTypeDisplayNames.put(SkillBonusType.PROC, ConfigurationEngine.setString(file, fileConfiguration, "bonusTypeName.proc", "Proc", true));
+        bonusTypeDisplayNames.put(SkillBonusType.PASSIVE, ConfigurationEngine.setString(file, fileConfiguration, "bonusTypeName.passive", "Passive", true));
+        bonusTypeDisplayNames.put(SkillBonusType.CONDITIONAL, ConfigurationEngine.setString(file, fileConfiguration, "bonusTypeName.conditional", "Conditional", true));
+        bonusTypeDisplayNames.put(SkillBonusType.STACKING, ConfigurationEngine.setString(file, fileConfiguration, "bonusTypeName.stacking", "Stacking", true));
+        bonusTypeDisplayNames.put(SkillBonusType.COOLDOWN, ConfigurationEngine.setString(file, fileConfiguration, "bonusTypeName.cooldown", "Cooldown", true));
     }
 }

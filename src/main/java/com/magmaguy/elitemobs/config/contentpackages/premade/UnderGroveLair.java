@@ -20,7 +20,7 @@ public class UnderGroveLair extends ContentPackagesConfigFields {
                 "em_under_grove,-2.5,-38.8,35.5,90,0",
                 "em_under_grove,-9.5,-38.8,35.5,90,0",
                 1,
-                "Difficulty: &4Dynamic content!",
+                "&aDynamic Lair\n" + "$bossCount boss encounters\n" + "&6Stop the dryad's\n" + "&6sinister ritual!",
                 "&8[EM] &aYou are now trespassing the sacred grove!",
                 "&8[EM] &aYou have left the sacred grove!",
                 List.of("filename=the_under_grove_rotroot_dryad_p1.yml"),

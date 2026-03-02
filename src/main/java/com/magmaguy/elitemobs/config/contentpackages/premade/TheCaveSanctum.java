@@ -23,7 +23,7 @@ public class TheCaveSanctum extends ContentPackagesConfigFields {
                 "em_id_the_cave,0.5,65,0.5,70,0",
                 "em_id_the_cave,-18.5,58,-17.5,90.0,30.0",
                 0,
-                "Difficulty: &45-man hard content!",
+                "&aDynamic Sanctum\n" + "$bossCount boss encounters\n" + "&7Explore the depths of\n" + "&7the cave!",
                 "&bYou've been asked to clear the path to the underground. Deal with the thing in the cave!",
                 "&bYou have left The Cave!",
                 List.of("filename=the_cave_boiler_p1.yml"),

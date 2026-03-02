@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.items.customenchantments;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
+import com.magmaguy.elitemobs.config.enchantments.premade.SummonMerchantConfig;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.magmacore.util.ChatColorConverter;
@@ -21,7 +21,6 @@ import java.util.UUID;
 
 public class SummonMerchantEnchantment extends CustomEnchantment implements Listener {
 
-    private static final String merchantMessage = EnchantmentsConfig.getEnchantment("summon_merchant.yml").getFileConfiguration().getString("message");
     public static String key = "summon_merchant";
 
     public SummonMerchantEnchantment() {
@@ -45,7 +44,8 @@ public class SummonMerchantEnchantment extends CustomEnchantment implements List
             itemStack.setAmount(itemStack.getAmount() - 1);
         if (!fromMessage) {
             new NPCEntity(player.getLocation());
-            if (!merchantMessage.isEmpty())
+            String merchantMessage = SummonMerchantConfig.message;
+            if (merchantMessage != null && !merchantMessage.isEmpty())
                 player.chat(ChatColorConverter.convert(merchantMessage));
             return;
         }
@@ -85,7 +85,8 @@ public class SummonMerchantEnchantment extends CustomEnchantment implements List
 
         @EventHandler
         public void onPlayerChat(AsyncPlayerChatEvent event) {
-            if (merchantMessage.isEmpty()) return;
+            String merchantMessage = SummonMerchantConfig.message;
+            if (merchantMessage == null || merchantMessage.isEmpty()) return;
             if (event.getMessage().equalsIgnoreCase(merchantMessage)) {
                 UUID playerUUID = event.getPlayer().getUniqueId();
                 if (playerCooldowns.contains(playerUUID)) return;

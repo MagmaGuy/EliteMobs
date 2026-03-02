@@ -46,7 +46,7 @@ public class RepairMenuConfig extends MenusConfigFields {
                         new ArrayList<>(List.of("&8Support the plugins you enjoy!",
                                 "&aUse scrap to repair elite items!"))),
                 fileConfiguration);
-        infoButton = ItemStackSerializer.deserialize("infoButton", fileConfiguration);
+        infoButton = ItemStackSerializer.deserialize("infoButton", fileConfiguration, file);
         CustomModelAdder.addCustomModel(infoButton, CustomModelsConfig.goldenQuestionMark);
         infoSlot = ConfigurationEngine.setInt(fileConfiguration, "infoButtonSlot", 4);
         eliteItemInputInformationSlot = ConfigurationEngine.setInt(fileConfiguration, "eliteItemInputInformationSlot", 20);
@@ -57,7 +57,7 @@ public class RepairMenuConfig extends MenusConfigFields {
                         "&2 Elite Item Input slots",
                         List.of("&aThis slot is for your elite item!"), MetadataHandler.signatureID),
                 fileConfiguration);
-        eliteItemInputInfoButton = ItemStackSerializer.deserialize("eliteItemInputInformationButton", fileConfiguration);
+        eliteItemInputInfoButton = ItemStackSerializer.deserialize("eliteItemInputInformationButton", fileConfiguration, file);
         CustomModelAdder.addCustomModel(eliteItemInputInfoButton, CustomModelsConfig.boxInput);
         eliteScrapInputInformationSlot = ConfigurationEngine.setInt(fileConfiguration, "eliteScrapInputInformationSlot", 22);
         eliteScrapInputSlot = ConfigurationEngine.setInt(fileConfiguration, "eliteScrapInputSlot", 31);
@@ -67,7 +67,7 @@ public class RepairMenuConfig extends MenusConfigFields {
                         "&2Elite Scrap Input slots",
                         List.of("&aThis slot is for your elite scrap!"), MetadataHandler.signatureID),
                 fileConfiguration);
-        eliteScrapInputInfoButton = ItemStackSerializer.deserialize("eliteScrapInputInformationButton", fileConfiguration);
+        eliteScrapInputInfoButton = ItemStackSerializer.deserialize("eliteScrapInputInformationButton", fileConfiguration, file);
         CustomModelAdder.addCustomModel(eliteScrapInputInfoButton, CustomModelsConfig.boxInput);
         outputInformationSlot = ConfigurationEngine.setInt(fileConfiguration, "informationOutputButtonSlot", 24);
         outputSlot = ConfigurationEngine.setInt(fileConfiguration, "outputSlot", 33);
@@ -79,13 +79,13 @@ public class RepairMenuConfig extends MenusConfigFields {
                         "&2Output slots",
                         List.of("&aThis slot previews the result of your repair!"), MetadataHandler.signatureID),
                 fileConfiguration);
-        outputInfoButton = ItemStackSerializer.deserialize("outputInformationButton", fileConfiguration);
+        outputInfoButton = ItemStackSerializer.deserialize("outputInformationButton", fileConfiguration, file);
         CustomModelAdder.addCustomModel(outputInfoButton, CustomModelsConfig.boxOutput);
-        cancelButton = ItemStackSerializer.deserialize("cancelButton", fileConfiguration);
+        cancelButton = ItemStackSerializer.deserialize("cancelButton", fileConfiguration, file);
         cancelSlot = ConfigurationEngine.setInt(fileConfiguration, "cancelButtonSlot", 27);
         ItemStackSerializer.serialize("confirmButton", ItemStackGenerator.generateItemStack(Material.EMERALD,
                 "&2Confirm!", List.of("&aRepair item!")), fileConfiguration);
-        confirmButton = ItemStackSerializer.deserialize("confirmButton", fileConfiguration);
+        confirmButton = ItemStackSerializer.deserialize("confirmButton", fileConfiguration, file);
         CustomModelAdder.addCustomModel(confirmButton, CustomModelsConfig.anvilHammer);
         confirmSlot = ConfigurationEngine.setInt(fileConfiguration, "confirmRepairSlot", 35);
     }

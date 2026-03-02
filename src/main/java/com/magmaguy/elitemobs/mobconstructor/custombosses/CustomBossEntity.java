@@ -392,6 +392,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
                 customBossesConfigFields.getLocationMessage() == null)
             return;
         trackableCustomBosses.add(this);
+        if (bossTrackingBar != null) bossTrackingBar.remove();
         bossTrackingBar = new BossTrackingBar(this);
     }
 
@@ -566,10 +567,14 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
 
             if (customBossesConfigFields.isCullReinforcements()) cullReinforcements(true);
 
-        } else if (removalReason.equals(RemovalReason.CHUNK_UNLOAD) || removalReason.equals(RemovalReason.WORLD_UNLOAD))
+        } else if (removalReason.equals(RemovalReason.CHUNK_UNLOAD) || removalReason.equals(RemovalReason.WORLD_UNLOAD)) {
+            //Cancel boss tracking bar to prevent task leak and potential NPE from stale world references
+            if (bossTrackingBar != null)
+                bossTrackingBar.remove();
             //when bosses get removed due to chunk unloads and are persistent they should remain stored
             if (persistentObjectHandler != null)
                 persistentObjectHandler.updatePersistentLocation(getPersistentLocation());
+        }
 
         if (!removalReason.equals(RemovalReason.PHASE_BOSS_PHASE_END) && bossMusic != null) {
             bossMusic.stop();

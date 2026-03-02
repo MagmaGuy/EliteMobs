@@ -240,6 +240,20 @@ public class DungeonProtector implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventFlowerpotInteraction(PlayerInteractEvent event) {
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getPlayer().getWorld().getUID())) return;
+        if (shouldBypass(event.getPlayer())) return;
+
+        Block block = event.getClickedBlock();
+        if (block == null) return;
+
+        String materialName = block.getType().name();
+        if (block.getType() == Material.FLOWER_POT || materialName.startsWith("POTTED_")) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void preventFlyToggle(PlayerToggleFlightEvent event) {
         if (!CombatTagConfig.isPreventFlyToggleInDungeons()) return;
         if (!EliteMobsWorld.isEliteMobsWorld(event.getPlayer().getWorld().getUID())) return;

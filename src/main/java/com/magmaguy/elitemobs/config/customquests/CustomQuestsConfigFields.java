@@ -172,6 +172,8 @@ public class CustomQuestsConfigFields extends CustomConfigFields {
                 for (Map.Entry<String, Object> entry : maps.getValue().entrySet())
                     if (entry.getKey().equals("dialog"))
                         parsedMap.put(entry.getKey(), translatable(filename, "customObjectives." + maps.getKey() + "." + entry.getKey(), (List<String>) entry.getValue()));
+                    else if (entry.getKey().equals("npcName") || entry.getKey().equals("location"))
+                        parsedMap.put(entry.getKey(), translatable(filename, "customObjectives." + maps.getKey() + "." + entry.getKey(), (String) entry.getValue()));
                     else
                         parsedMap.put(entry.getKey(), entry.getValue());
                 parsedObjectives.put(maps.getKey(), parsedMap);
@@ -192,6 +194,8 @@ public class CustomQuestsConfigFields extends CustomConfigFields {
             for (Map.Entry<?, ?> entry : ((ConfigurationSection) maps.getValue()).getValues(false).entrySet())
                 if (entry.getKey().equals("dialog"))
                     parsedMap.put((String) entry.getKey(), translatable(filename, "customObjectives." + maps.getKey() + "." + entry.getKey(), (List<String>) entry.getValue()));
+                else if (entry.getKey().equals("npcName") || entry.getKey().equals("location"))
+                    parsedMap.put((String) entry.getKey(), translatable(filename, "customObjectives." + maps.getKey() + "." + entry.getKey(), (String) entry.getValue()));
                 else
                     parsedMap.put((String) entry.getKey(), entry.getValue());
             parsedObjectives.put(maps.getKey(), parsedMap);

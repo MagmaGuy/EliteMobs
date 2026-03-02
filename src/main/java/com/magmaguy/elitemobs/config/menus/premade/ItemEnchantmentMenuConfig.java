@@ -80,14 +80,14 @@ public class ItemEnchantmentMenuConfig extends MenusConfigFields {
                                 "&8Challenge makes you fight a boss for the enchant.",
                                 "&8Critical failures make you lose the item!"))),
                 fileConfiguration);
-        infoButton = ItemStackSerializer.deserialize("infoButton", fileConfiguration);
+        infoButton = ItemStackSerializer.deserialize("infoButton", fileConfiguration, file);
         CustomModelAdder.addCustomModel(infoButton, CustomModelsConfig.goldenQuestionMark);
         cancelSlot = ConfigurationEngine.setInt(
                 List.of("Sets the item slot number of the cancel button in the chest menu."),
                 fileConfiguration, "cancelSlot", 27);
         ItemStackSerializer.serialize("cancelButton", ItemStackGenerator.generateItemStack(Material.BARRIER,
                 "&4Cancel", List.of("&cCancel repair!"), MetadataHandler.signatureID), fileConfiguration);
-        cancelButton = ItemStackSerializer.deserialize("cancelButton", fileConfiguration);
+        cancelButton = ItemStackSerializer.deserialize("cancelButton", fileConfiguration, file);
         CustomModelAdder.addCustomModel(cancelButton, CustomModelsConfig.redCross);
         confirmSlot = ConfigurationEngine.setInt(
                 List.of("Sets the item slot number of the confirm button in the chest menu."),
@@ -100,7 +100,7 @@ public class ItemEnchantmentMenuConfig extends MenusConfigFields {
                         "&6Challenge chance: $challengeChance%",
                         "&4Chance of critical failure: $criticalFailureChance%"),
                 "elitemobs:ui/anvilhammer"), fileConfiguration);
-        confirmButton = ItemStackSerializer.deserialize("confirmButton", fileConfiguration);
+        confirmButton = ItemStackSerializer.deserialize("confirmButton", fileConfiguration, file);
         CustomModelAdder.addCustomModel(confirmButton, CustomModelsConfig.anvilHammer);
         itemSlot = ConfigurationEngine.setInt(
                 List.of("Sets the item slot number of the elite item in the chest menu."),
@@ -114,7 +114,7 @@ public class ItemEnchantmentMenuConfig extends MenusConfigFields {
                         "&2Elite Item Input slot",
                         List.of("&aPut your elite item here!"), MetadataHandler.signatureID),
                 fileConfiguration);
-        itemInfoButton = ItemStackSerializer.deserialize("itemInfoButton", fileConfiguration);
+        itemInfoButton = ItemStackSerializer.deserialize("itemInfoButton", fileConfiguration, file);
         CustomModelAdder.addCustomModel(itemInfoButton, CustomModelsConfig.boxInput);
         enchantedBookInfoSlot = ConfigurationEngine.setInt(
                 List.of("Sets the item slot number of the enchanted book info button in the chest menu."),
@@ -125,7 +125,7 @@ public class ItemEnchantmentMenuConfig extends MenusConfigFields {
                         "&2Enchanted Book Input slot",
                         List.of("&aPut your elite enchanted books here!"), MetadataHandler.signatureID),
                 fileConfiguration);
-        enchantedBookInfoButton = ItemStackSerializer.deserialize("enchantedBookInfoButton", fileConfiguration);
+        enchantedBookInfoButton = ItemStackSerializer.deserialize("enchantedBookInfoButton", fileConfiguration, file);
         enchantedBookSlot = ConfigurationEngine.setInt(
                 List.of("Sets the item slot number of the enchanted book in the chest menu."),
                 fileConfiguration, "enchantedBookSlot", 31);
@@ -142,7 +142,7 @@ public class ItemEnchantmentMenuConfig extends MenusConfigFields {
                                 "&2Increase the odds of the enchantment succeeding",
                                 "&2by adding an elite lucky ticket!"), MetadataHandler.signatureID),
                 fileConfiguration);
-        luckyTicketInfoButton = ItemStackSerializer.deserialize("luckyTicketInfoButton", fileConfiguration);
+        luckyTicketInfoButton = ItemStackSerializer.deserialize("luckyTicketInfoButton", fileConfiguration, file);
         CustomModelAdder.addCustomModel(luckyTicketInfoButton, CustomModelsConfig.boxInput);
         enchantmentLimitMessage = ConfigurationEngine.setString(
                 List.of("Sets the message that appears when a player attempts to enchant an item beyond the configured maximum enchantment level of any enchantment."),

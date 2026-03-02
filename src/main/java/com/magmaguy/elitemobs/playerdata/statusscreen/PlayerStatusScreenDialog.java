@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.SkillsConfig;
 import com.magmaguy.elitemobs.config.menus.premade.PlayerStatusMenuConfig;
+import com.magmaguy.elitemobs.config.menus.premade.SkillBonusMenuConfig;
 import com.magmaguy.elitemobs.dungeons.CombatContent;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
@@ -376,7 +377,7 @@ public class PlayerStatusScreenDialog {
             String progressBar = createProgressBar(progress);
 
             String levelLine = PlayerStatusMenuConfig.getSkillsPageLevelFormat()
-                    .replace("$skillName", skillType.getDisplayName())
+                    .replace("$skillName", SkillBonusMenuConfig.getSkillTypeDisplayName(skillType))
                     .replace("$level", String.valueOf(level));
             String xpLine = PlayerStatusMenuConfig.getSkillsPageXpFormat()
                     .replace("$progressBar", progressBar)

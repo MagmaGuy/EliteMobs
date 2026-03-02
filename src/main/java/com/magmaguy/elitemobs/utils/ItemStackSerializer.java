@@ -1,14 +1,17 @@
 package com.magmaguy.elitemobs.utils;
 
+import com.magmaguy.elitemobs.config.translations.TranslationsConfig;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
 import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Material;
+import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,31 +33,57 @@ public class ItemStackSerializer {
     }
 
     public static ItemStack deserialize(String identifier, FileConfiguration fileConfiguration) {
+        return deserialize(identifier, fileConfiguration, null);
+    }
+
+    public static ItemStack deserialize(String identifier, FileConfiguration fileConfiguration, File file) {
         Material material;
-        identifier += ".";
+        String fullId = identifier + ".";
         try {
-            material = Material.valueOf(fileConfiguration.getString(identifier + "material"));
+            material = Material.valueOf(fileConfiguration.getString(fullId + "material"));
         } catch (Exception ex) {
             Logger.warn("Attempted to add material name " + fileConfiguration.getString("material") + " to a menu. This is not a valid material. Item will default to glass.");
             material = Material.RED_STAINED_GLASS_PANE;
         }
 
         String name = "";
-        if (fileConfiguration.contains(identifier + "name"))
-            name = ChatColorConverter.convert(fileConfiguration.getString(identifier + "name"));
+        if (fileConfiguration.contains(fullId + "name")) {
+            if (file != null) {
+                String rawName = fileConfiguration.getString(fullId + "name");
+                if (!TranslationsConfig.isEnglish()) {
+                    fileConfiguration.set(fullId + "name", null);
+                    Configuration defaults = fileConfiguration.getDefaults();
+                    if (defaults != null) defaults.set(fullId + "name", null);
+                }
+                name = TranslationsConfig.add(file.getName(), identifier + ".name", rawName);
+            } else {
+                name = ChatColorConverter.convert(fileConfiguration.getString(fullId + "name"));
+            }
+        }
 
         List<String> lore = new ArrayList<>();
-        if (fileConfiguration.contains(identifier + "lore"))
-            lore = ChatColorConverter.convert(fileConfiguration.getStringList(identifier + "lore"));
+        if (fileConfiguration.contains(fullId + "lore")) {
+            if (file != null) {
+                List<String> rawLore = fileConfiguration.getStringList(fullId + "lore");
+                if (!TranslationsConfig.isEnglish()) {
+                    fileConfiguration.set(fullId + "lore", null);
+                    Configuration defaults = fileConfiguration.getDefaults();
+                    if (defaults != null) defaults.set(fullId + "lore", null);
+                }
+                lore = TranslationsConfig.add(file.getName(), identifier + ".lore", rawLore);
+            } else {
+                lore = ChatColorConverter.convert(fileConfiguration.getStringList(fullId + "lore"));
+            }
+        }
 
         if (material.equals(Material.PLAYER_HEAD)) {
-            String owner = fileConfiguration.getString(identifier + "owner");
+            String owner = fileConfiguration.getString(fullId + "owner");
             return ItemStackGenerator.generateSkullItemStack(owner, name, lore);
         }
 
         int customModelID = 0;
-        if (fileConfiguration.contains(identifier + "customModelID")) {
-            customModelID = fileConfiguration.getInt(identifier + "customModelID");
+        if (fileConfiguration.contains(fullId + "customModelID")) {
+            customModelID = fileConfiguration.getInt(fullId + "customModelID");
         }
 
         return ItemStackGenerator.generateItemStack(material, name, lore, customModelID);

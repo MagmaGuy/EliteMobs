@@ -6,13 +6,15 @@ import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.configuration.file.FileConfiguration;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public class SpecialItemSystemsConfig extends ConfigurationFile {
 
-    @Getter
     private static final HashMap<CustomItem, Double> specialValues = new HashMap<>();
+    private static final List<PendingSpecialItem> pendingSpecialItems = new ArrayList<>();
+    private static boolean specialValuesResolved = false;
     @Getter
     private static boolean dropSpecialLoot;
     @Getter
@@ -44,20 +46,35 @@ public class SpecialItemSystemsConfig extends ConfigurationFile {
         super("SpecialItemSystems.yml");
     }
 
+    public static HashMap<CustomItem, Double> getSpecialValues() {
+        if (!specialValuesResolved) resolveSpecialItems();
+        return specialValues;
+    }
+
+    private static void resolveSpecialItems() {
+        specialValuesResolved = true;
+        for (PendingSpecialItem pending : pendingSpecialItems) {
+            CustomItem customItem = CustomItem.getCustomItem(pending.filename + ".yml");
+            if (customItem == null) {
+                Logger.warn("Failed to get custom item " + pending.filename + ".yml for the special loot list!");
+                continue;
+            }
+            specialValues.put(customItem, pending.weight);
+        }
+        pendingSpecialItems.clear();
+    }
+
     private static void addDefaultEnchantmentBook(FileConfiguration fileConfiguration, String configFilename, double chance) {
         String key = "enchantedBookWeightedDropChance." + configFilename;
         fileConfiguration.addDefault(key, chance);
-        CustomItem customItem = CustomItem.getCustomItem(configFilename + ".yml");
-        if (customItem == null) {
-            Logger.warn("Failed to get custom item " + configFilename + ".yml for the special loot list!");
-            return;
-        }
-        specialValues.put(customItem, fileConfiguration.getDouble(key));
+        pendingSpecialItems.add(new PendingSpecialItem(configFilename, fileConfiguration.getDouble(key)));
     }
 
     @Override
     public void initializeValues() {
         specialValues.clear();
+        pendingSpecialItems.clear();
+        specialValuesResolved = false;
 
         dropSpecialLoot = ConfigurationEngine.setBoolean(
                 List.of("Sets if special loot will drop."),
@@ -165,5 +182,8 @@ public class SpecialItemSystemsConfig extends ConfigurationFile {
                 List.of("Sets the message announced to all players when losing an item while trying to enchant it if the item has more than 10 enchantments"),
                 file, fileConfiguration, "criticalFailureAnnouncement", "&8[EliteMobs] $player &clost $itemName &cwhile trying to enchant it!", true);
 
+    }
+
+    private record PendingSpecialItem(String filename, double weight) {
     }
 }

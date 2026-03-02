@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
+import com.magmaguy.elitemobs.config.enchantments.premade.SoulbindConfig;
 import com.magmaguy.elitemobs.config.potioneffects.PotionEffectsConfig;
 import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantment;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
@@ -172,12 +173,9 @@ public class EliteItemLore {
             soulbindInfo = ItemSettingsConfig.getNoSoulbindLore();
             return;
         }
-        soulbindInfo = ChatColorConverter.convert(
-                EnchantmentsConfig.getEnchantment("soulbind.yml")
-                        .getFileConfiguration()
-                        .getString("loreStrings")
-                        .replace("$playerName", player.getName())
-                        .replace("$player", player.getDisplayName()));
+        soulbindInfo = SoulbindConfig.loreStrings
+                .replace("$playerName", player.getName())
+                .replace("$player", player.getDisplayName());
     }
 
     private void constructPrestigeLevel() {
