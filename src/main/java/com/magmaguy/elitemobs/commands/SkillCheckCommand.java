@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.config.CommandMessagesConfig;
+import com.magmaguy.elitemobs.config.menus.premade.SkillBonusMenuConfig;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.SkillXPCalculator;
@@ -44,7 +45,7 @@ public class SkillCheckCommand extends AdvancedCommand {
 
             Logger.sendMessage(commandData.getCommandSender(),
                     CommandMessagesConfig.getSkillCheckEntryFormat()
-                            .replace("$skill", skillType.getDisplayName())
+                            .replace("$skill", SkillBonusMenuConfig.getSkillTypeDisplayName(skillType))
                             .replace("$level", String.valueOf(level))
                             .replace("$xpProgress", formatNumber(xpProgress))
                             .replace("$xpNeeded", formatNumber(xpNeeded))

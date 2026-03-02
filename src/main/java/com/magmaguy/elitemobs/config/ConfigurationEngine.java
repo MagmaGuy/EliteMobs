@@ -24,11 +24,11 @@ public class ConfigurationEngine extends com.magmaguy.magmacore.config.Configura
             // Remove from config so it won't be written to YAML
             fileConfiguration.set(key, null);
             if (value == null) return null;
-            return TranslationsConfig.add(file.getName(), key, ChatColorConverter.convert(value));
+            return TranslationsConfig.add(file.getName(), key, value);
         }
         fileConfiguration.addDefault(key, defaultValue);
         if (translatable)
-            return TranslationsConfig.add(file.getName(), key, ChatColorConverter.convert(fileConfiguration.getString(key)));
+            return TranslationsConfig.add(file.getName(), key, fileConfiguration.getString(key));
         else
             return ChatColorConverter.convert(fileConfiguration.getString(key));
     }

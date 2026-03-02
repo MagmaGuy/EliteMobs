@@ -23,7 +23,7 @@ public class TheNetherWastes extends ContentPackagesConfigFields {
                 "em_id_the_nether_wastes,38.5,84,64.5,-155,0",
                 "em_id_the_nether_wastes,41.5,82.5,55.5,-167,0",
                 0,
-                "Difficulty: &45-man hard content!",
+                "&aDynamic Dungeon\n" + "$bossCount boss encounters\n" + "&cAn unexplored and dangerous\n" + "&cpart of the Nether.",
                 "&bTraverse the wastes and see what you can find.",
                 "&bYou have left The Nether Wastes!",
                 List.of("filename=em_id_the_nether_wastes_miniboss_5_shroud_p1.yml"),

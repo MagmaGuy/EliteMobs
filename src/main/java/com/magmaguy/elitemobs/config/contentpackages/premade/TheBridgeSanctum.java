@@ -23,7 +23,7 @@ public class TheBridgeSanctum extends ContentPackagesConfigFields {
                 "em_id_the_bridge,-255.5,100,-14.5,-90.0,0.0",
                 "em_id_the_bridge,-216.5,103,-14.5,-90.0,0.0",
                 0,
-                "Difficulty: &45-man hard content!",
+                "&aDynamic Sanctum\n" + "$bossCount boss encounters\n" + "&bCross the bridge and face\n" + "&bits ancient guardian!",
                 "&bBefore being able to enter the city you must deal with the guardian on the bridge!",
                 "&bYou have left The Bridge!",
                 List.of("filename=the_bridge_ancient_guardian_p1.yml"),

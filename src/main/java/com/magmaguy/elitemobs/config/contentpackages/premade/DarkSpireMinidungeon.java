@@ -23,7 +23,7 @@ public class DarkSpireMinidungeon extends ContentPackagesConfigFields {
                 "em_dark_spire,60,97.5,97,110,0",
                 "em_dark_spire,47.5,94.5,94.5,110,0",
                 1,
-                "Difficulty: &4Dynamic content!",
+                "&aDynamic Minidungeon\n" + "$bossCount boss encounters\n" + "&7Descend into the depths\n" + "&7of the Dark Spire!",
                 "&8[EM] &1An invasion is in progress. &9Stop the insurrection!",
                 "&8[EM] &1You managed to hold them back. &9For now...",
                 List.of("filename=darkspire_level_130_miniboss_phase_brute.yml"),

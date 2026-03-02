@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.menus;
 
 import com.magmaguy.elitemobs.config.DefaultConfig;
+import com.magmaguy.elitemobs.config.SkillsConfig;
 import com.magmaguy.elitemobs.config.menus.premade.SkillBonusMenuConfig;
 import com.magmaguy.elitemobs.config.skillbonuses.SkillBonusConfigFields;
 import com.magmaguy.elitemobs.config.skillbonuses.SkillBonusesConfig;
@@ -41,6 +42,7 @@ public class SkillBonusMenu {
      * Opens the weapon type selection menu.
      */
     public static void openWeaponSelectMenu(Player player) {
+        if (!SkillsConfig.isSkillSystemEnabled()) return;
         String menuName = SkillBonusMenuConfig.getWeaponSelectMenuName();
         if (DefaultConfig.useResourcePackModels()) {
             menuName = ChatColor.WHITE + "\uDB83\uDEF1\uDB83\uDE0D\uDB83\uDEF5          " + menuName;
@@ -68,7 +70,8 @@ public class SkillBonusMenu {
      * Opens the skill selection menu for a specific weapon type.
      */
     public static void openSkillSelectMenu(Player player, SkillType skillType) {
-        String menuName = SkillBonusMenuConfig.getSkillSelectMenuName().replace("%skill_type%", skillType.getDisplayName());
+        if (!SkillsConfig.isSkillSystemEnabled()) return;
+        String menuName = SkillBonusMenuConfig.getSkillSelectMenuName().replace("%skill_type%", SkillBonusMenuConfig.getSkillTypeDisplayName(skillType));
         if (DefaultConfig.useResourcePackModels()) {
             menuName = ChatColor.WHITE + "\uDB83\uDEF1\uDB83\uDE0C\uDB83\uDEF5          " + menuName;
         }
@@ -151,7 +154,7 @@ public class SkillBonusMenu {
         lore.add("");
 
         // Add skill type and tier info
-        lore.add(SkillBonusMenuConfig.getSkillTypeLabel() + skillConfig.getBonusType().name());
+        lore.add(SkillBonusMenuConfig.getSkillTypeLabel() + SkillBonusMenuConfig.getBonusTypeDisplayName(skillConfig.getBonusType()));
         lore.add(SkillBonusMenuConfig.getSkillTierLabel() + SkillBonusMenuConfig.getSkillTierLevelFormat()
                 .replace("%tier%", String.valueOf(skillConfig.getUnlockTier()))
                 .replace("%level%", String.valueOf(skillConfig.getRequiredLevel())));
@@ -185,7 +188,7 @@ public class SkillBonusMenu {
      */
     private static ItemStack createInfoItem(Player player, SkillType skillType, int skillLevel, List<String> activeSkillIds) {
         List<String> lore = new ArrayList<>();
-        lore.add(SkillBonusMenuConfig.getInfoSkillTypeLabel() + skillType.getDisplayName());
+        lore.add(SkillBonusMenuConfig.getInfoSkillTypeLabel() + SkillBonusMenuConfig.getSkillTypeDisplayName(skillType));
         lore.add(SkillBonusMenuConfig.getInfoYourLevelLabel() + skillLevel);
         lore.add(SkillBonusMenuConfig.getInfoActiveSkillsLabel().replace("%count%", String.valueOf(activeSkillIds.size())));
         lore.add("");

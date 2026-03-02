@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.config.contentpackages;
 
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.CustomConfigFields;
+import com.magmaguy.elitemobs.config.translations.TranslationsConfig;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
@@ -12,6 +13,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -345,6 +347,18 @@ public class ContentPackagesConfigFields extends CustomConfigFields {
         if (fileConfiguration.contains("difficulties"))
             this.difficulties = (List<Map<String, Object>>) fileConfiguration.getList("difficulties");
         else fileConfiguration.addDefault("difficulties", difficulties);
+        // Wrap in mutable copies — both YAML getList() and List.of()/Map.of() from
+        // premade constructors return immutable collections
+        if (this.difficulties != null) {
+            List<Map<String, Object>> mutableDifficulties = new ArrayList<>();
+            for (int i = 0; i < this.difficulties.size(); i++) {
+                Map<String, Object> difficulty = new HashMap<>(this.difficulties.get(i));
+                if (difficulty.containsKey("name"))
+                    difficulty.put("name", TranslationsConfig.add(filename, "difficulties." + i + ".name", (String) difficulty.get("name")));
+                mutableDifficulties.add(difficulty);
+            }
+            this.difficulties = mutableDifficulties;
+        }
         enchantmentChallenge = processBoolean("enchantmentChallenge", enchantmentChallenge, false, false);
         this.allowExplosions = processBoolean("allowExplosionBlockDamage", allowExplosions, false, false);
         this.listedInTeleports = processBoolean("listedInTeleports", listedInTeleports, true, false);

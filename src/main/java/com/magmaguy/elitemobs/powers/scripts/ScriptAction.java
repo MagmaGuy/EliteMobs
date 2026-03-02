@@ -160,6 +160,14 @@ public class ScriptAction {
                 @Override
                 public void run() {
                     counter++;
+
+                    //Cancel if the entity's world is no longer loaded (e.g. world/chunk unloaded)
+                    Location entityLocation = scriptActionData.getEliteEntity().getLocation();
+                    if (entityLocation == null || entityLocation.getWorld() == null) {
+                        cancel();
+                        return;
+                    }
+
                     if (blueprint.getConditionsBlueprint() != null
                             && !scriptConditions.meetsActionConditions(scriptActionData)) {
                         cancel();

@@ -38,19 +38,19 @@ public class BuyOrSellMenuConfig extends MenusConfigFields {
                                 "&aClick on the emerald to buy items!",
                                 "&cClick on the redstone to sell items!"))),
                 fileConfiguration);
-        INFORMATION_ITEM = ItemStackSerializer.deserialize("informationButton", fileConfiguration);
+        INFORMATION_ITEM = ItemStackSerializer.deserialize("informationButton", fileConfiguration, file);
         INFORMATION_SLOT = ConfigurationEngine.setInt(fileConfiguration, "informationButtonSlot", 4);
         ItemStackSerializer.serialize("buyProcedurallyGeneratedItems",
                 ItemStackGenerator.generateItemStack(Material.EMERALD, "Buy items", new ArrayList<>(), MetadataHandler.signatureID), fileConfiguration);
-        BUY_PROCEDURAL_ITEM = ItemStackSerializer.deserialize("buyProcedurallyGeneratedItems", fileConfiguration);
+        BUY_PROCEDURAL_ITEM = ItemStackSerializer.deserialize("buyProcedurallyGeneratedItems", fileConfiguration, file);
         ItemStackSerializer.serialize("buyCustomItems",
                 ItemStackGenerator.generateItemStack(Material.EMERALD, "Buy custom items", new ArrayList<>(), MetadataHandler.signatureID), fileConfiguration);
         CustomModelAdder.addCustomModel(BUY_PROCEDURAL_ITEM, CustomModelsConfig.bagOfCoins);
-        BUY_CUSTOM_ITEM = ItemStackSerializer.deserialize("buyCustomItems", fileConfiguration);
+        BUY_CUSTOM_ITEM = ItemStackSerializer.deserialize("buyCustomItems", fileConfiguration, file);
         ItemStackSerializer.serialize("sellItems",
                 ItemStackGenerator.generateItemStack(Material.REDSTONE, "Sell items", new ArrayList<>(), MetadataHandler.signatureID), fileConfiguration);
         CustomModelAdder.addCustomModel(BUY_CUSTOM_ITEM, CustomModelsConfig.bagOfCoins);
-        SELL_ITEM = ItemStackSerializer.deserialize("sellItems", fileConfiguration);
+        SELL_ITEM = ItemStackSerializer.deserialize("sellItems", fileConfiguration, file);
         CustomModelAdder.addCustomModel(SELL_ITEM, CustomModelsConfig.handWithCoins);
         BUY_SLOT = ConfigurationEngine.setInt(fileConfiguration, "buySlot", 11);
         SELL_SLOT = ConfigurationEngine.setInt(fileConfiguration, "sellSlot", 15);

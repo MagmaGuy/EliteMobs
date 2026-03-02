@@ -10,6 +10,8 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarFlag;
 import org.bukkit.boss.BarStyle;
@@ -44,8 +46,10 @@ public class BossTrackingBar {
     }
 
     private void sendLocation() {
+        Location bossLoc = customBossEntity.getLocation();
+        if (bossLoc == null || bossLoc.getWorld() == null) return;
         for (Player player : Bukkit.getOnlinePlayers()) {
-            if (!player.getWorld().equals(customBossEntity.getLocation().getWorld())) continue;
+            if (!player.getWorld().equals(bossLoc.getWorld())) continue;
             TextComponent interactiveMessage = new TextComponent(MobCombatSettingsConfig.getBossLocationMessage());
             interactiveMessage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/elitemobs track boss " + customBossEntity.getEliteUUID()));
             interactiveMessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(DefaultConfig.getTrackMessage().replace("$name", customBossEntity.getName())).create()));
@@ -90,12 +94,15 @@ public class BossTrackingBar {
         if (customBossEntity.getCustomBossesConfigFields().getLocationMessage() == null) return "";
         if (customBossEntity.getCustomBossesConfigFields().getLocationMessage().contains("$distance") ||
                 customBossEntity.getCustomBossesConfigFields().getLocationMessage().contains("$location")) {
-            if (!player.getLocation().getWorld().equals(customBossEntity.getLocation().getWorld()))
+            Location bossLoc = customBossEntity.getLocation();
+            World playerWorld = player.getLocation().getWorld();
+            World bossWorld = bossLoc != null ? bossLoc.getWorld() : null;
+            if (playerWorld == null || bossWorld == null || !playerWorld.equals(bossWorld))
                 return MobCombatSettingsConfig.getDefaultOtherWorldBossLocationMessage()
                         .replace("$name", customBossEntity.getName());
 
             return customBossEntity.getCustomBossesConfigFields().getLocationMessage()
-                            .replace("$distance", "" + (int) customBossEntity.getLocation().distance(player.getLocation()))
+                            .replace("$distance", "" + (int) bossLoc.distance(player.getLocation()))
                     .replace("$location", locationString);
         }
 
@@ -106,9 +113,11 @@ public class BossTrackingBar {
     private void updateBossBar(Player player, BossBar bossBar) {
         if (player == null) return;
         if (bossBar == null) return;
-        String locationString = customBossEntity.getLocation().getBlockX() +
-                ", " + customBossEntity.getLocation().getBlockY() +
-                ", " + customBossEntity.getLocation().getBlockZ();
+        Location loc = customBossEntity.getLocation();
+        if (loc == null || loc.getWorld() == null) return;
+        String locationString = loc.getBlockX() +
+                ", " + loc.getBlockY() +
+                ", " + loc.getBlockZ();
         bossBar.setTitle(bossBarMessage(player, locationString));
         double progress = Round.twoDecimalPlaces(customBossEntity.getHealth() / customBossEntity.getMaxHealth());
         if (progress > 1) return;
@@ -122,6 +131,15 @@ public class BossTrackingBar {
             public void run() {
                 //This can happen on phase changes where boss bars might not be configured on subsequent entities
                 if (!customBossEntity.exists() || customBossEntity.getCustomBossesConfigFields().getLocationMessage() == null) {
+                    cancel();
+                    remove();
+                    return;
+                }
+
+                //Cancel if the boss's world is no longer loaded (e.g. world/chunk unloaded)
+                Location bossLocation = customBossEntity.getLocation();
+                if (bossLocation == null || bossLocation.getWorld() == null ||
+                        Bukkit.getWorld(bossLocation.getWorld().getUID()) == null) {
                     cancel();
                     remove();
                     return;
@@ -155,9 +173,11 @@ public class BossTrackingBar {
     }
 
     private void createBossBar(Player player) {
-        String locationString = (int) customBossEntity.getLocation().getX() +
-                ", " + (int) customBossEntity.getLocation().getY() +
-                ", " + (int) customBossEntity.getLocation().getZ();
+        Location loc = customBossEntity.getLocation();
+        if (loc == null || loc.getWorld() == null) return;
+        String locationString = (int) loc.getX() +
+                ", " + (int) loc.getY() +
+                ", " + (int) loc.getZ();
         BossBar bossBar = Bukkit.createBossBar(bossBarMessage(player, locationString), BarColor.GREEN, BarStyle.SOLID, BarFlag.PLAY_BOSS_MUSIC);
 
         if (!customBossEntity.exists()) return;

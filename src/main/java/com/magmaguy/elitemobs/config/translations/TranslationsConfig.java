@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.config.translations;
 
 import com.magmaguy.elitemobs.config.DefaultConfig;
+import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 
@@ -33,38 +34,40 @@ public class TranslationsConfig {
     }
 
     /**
-     * Adds a translatable string and returns the translated value.
-     * If the language is English, returns the original value (no CSV involved).
+     * Adds a translatable string and returns the display-ready (color-converted) value.
+     * Callers receive a value with gradients/hex expanded for in-game rendering.
+     * The CSV stores the raw format (e.g. gradient tags) so translators see readable text.
      */
     public static String add(String filename, String key, String value) {
-        if (isEnglish()) return value;
+        if (isEnglish()) return ChatColorConverter.convert(value);
 
         if (translationsConfigFields == null) {
             Logger.warn("TranslationsConfig not initialized, defaulting to English! (String)");
-            return value;
+            return ChatColorConverter.convert(value);
         }
 
         translationsConfigFields.add(filename, key, value);
         Object result = translationsConfigFields.get(filename, key);
-        return result instanceof String ? (String) result : value;
+        return result instanceof String ? (String) result : ChatColorConverter.convert(value);
     }
 
     /**
-     * Adds a translatable list and returns the translated value.
-     * If the language is English, returns the original value (no CSV involved).
+     * Adds a translatable list and returns the display-ready (color-converted) value.
+     * Callers receive values with gradients/hex expanded for in-game rendering.
+     * The CSV stores the raw format so translators see readable text.
      */
     @SuppressWarnings("unchecked")
     public static List<String> add(String filename, String key, List<String> value) {
-        if (isEnglish()) return value;
+        if (isEnglish()) return ChatColorConverter.convert(value);
 
         if (translationsConfigFields == null) {
             Logger.warn("TranslationsConfig not initialized, defaulting to English! (List)");
-            return value;
+            return ChatColorConverter.convert(value);
         }
 
         translationsConfigFields.add(filename, key, value);
         Object result = translationsConfigFields.get(filename, key);
-        return result instanceof List ? (List<String>) result : value;
+        return result instanceof List ? (List<String>) result : ChatColorConverter.convert(value);
     }
 
     /**

@@ -23,7 +23,7 @@ public class TheClimbDungeon extends ContentPackagesConfigFields {
                 "em_id_the_climb,371.5,34,350.5,-70.0,-10.0",
                 "em_id_the_climb,379.5,36,352.5,-70,-10",
                 0,
-                "Difficulty: &45-man hard content!",
+                "&aDynamic Dungeon\n" + "$bossCount boss encounters\n" + "&3Scale the heights of\n" + "&3this dangerous ascent!",
                 "&bYou've been asked to investigate the path to the caves. Climb your way to the top!",
                 "&bYou have left The Climb!",
                 List.of("filename=the_climb_undead_beastmaster.yml",

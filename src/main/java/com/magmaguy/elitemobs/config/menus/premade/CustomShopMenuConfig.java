@@ -29,7 +29,7 @@ public class CustomShopMenuConfig extends MenusConfigFields {
                         "&4&lEliteMobs &r&cby &4&lMagmaGuy",
                         List.of("&8Support the plugins you enjoy!")),
                 fileConfiguration);
-        rerollItem = ItemStackSerializer.deserialize("rerollButton", fileConfiguration);
+        rerollItem = ItemStackSerializer.deserialize("rerollButton", fileConfiguration, file);
         rerollSlot = ConfigurationEngine.setInt(fileConfiguration, "rerollButtonSlot", 4);
         storeSlots = ConfigurationEngine.setList(file, fileConfiguration, "storeItemSlots", new ArrayList<>(List.of(9, 10, 11, 12, 13, 14, 15, 16,
                 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42,

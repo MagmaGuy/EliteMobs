@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.items;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
+import com.magmaguy.elitemobs.config.menus.premade.SkillBonusMenuConfig;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.SkillXPCalculator;
@@ -102,7 +103,7 @@ public class GearRestrictionHandler {
         String message = AdventurersGuildConfig.getGearRestrictionMessage()
                 .replace("$itemLevel", String.valueOf(itemLevel))
                 .replace("$skillLevel", String.valueOf(playerSkillLevel))
-                .replace("$skillType", skillType.getDisplayName());
+                .replace("$skillType", SkillBonusMenuConfig.getSkillTypeDisplayName(skillType));
 
         player.sendMessage(ChatColorConverter.convert(message));
     }

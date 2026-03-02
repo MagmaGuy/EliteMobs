@@ -18,7 +18,7 @@ public class SoulbindConfig extends EnchantmentsConfigFields {
 
     @Override
     public void processAdditionalFields() {
-        loreStrings = translatable(filename, "name", processString("loreStrings", "&7Soulbound to &f$player", null, true));
-        hologramStrings = translatable(filename, "name", processString("hologramString", "$player&f's", null, true));
+        loreStrings = translatable(filename, "loreStrings", processString("loreStrings", "&7Soulbound to &f$player", null, true));
+        hologramStrings = translatable(filename, "hologramString", processString("hologramString", "$player&f's", null, true));
     }
 }

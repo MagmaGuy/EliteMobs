@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.skills.bonuses;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
+import com.magmaguy.elitemobs.config.SkillsConfig;
 import com.magmaguy.elitemobs.skills.ArmorSkillHealthBonus;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.skills.armor.IronStanceSkill;
@@ -70,6 +71,7 @@ public class SkillBonusEventHandler implements Listener {
      */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onPlayerDamagedByEliteMob(PlayerDamagedByEliteMobEvent event) {
+        if (!SkillsConfig.isSkillSystemEnabled()) return;
         event.applySkillBonuses();
     }
 
@@ -78,6 +80,8 @@ public class SkillBonusEventHandler implements Listener {
      */
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerJoin(PlayerJoinEvent event) {
+        if (!SkillsConfig.isSkillSystemEnabled()) return;
+
         Player player = event.getPlayer();
 
         // Delay slightly to ensure PlayerData is loaded
@@ -193,6 +197,7 @@ public class SkillBonusEventHandler implements Listener {
      */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onEliteMobDamagedByPlayer(EliteMobDamagedByPlayerEvent event) {
+        if (!SkillsConfig.isSkillSystemEnabled()) return;
         // Skip skill processing for bypass/custom damage events (DOT ticks, AOE secondary hits, etc.)
         // These are intentionally flagged to prevent recursive skill activation
         if (event.isCustomDamage()) return;
@@ -204,6 +209,7 @@ public class SkillBonusEventHandler implements Listener {
      */
     @EventHandler(priority = EventPriority.NORMAL)
     public void onItemHeldChange(PlayerItemHeldEvent event) {
+        if (!SkillsConfig.isSkillSystemEnabled()) return;
         Player player = event.getPlayer();
         UUID uuid = player.getUniqueId();
 
@@ -273,6 +279,7 @@ public class SkillBonusEventHandler implements Listener {
      */
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerInteract(PlayerInteractEvent event) {
+        if (!SkillsConfig.isSkillSystemEnabled()) return;
         if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
         if (event.getItem() == null) return;
         if (event.getItem().getType() != Material.BOW) return;
@@ -290,6 +297,7 @@ public class SkillBonusEventHandler implements Listener {
      */
     @EventHandler(priority = EventPriority.NORMAL)
     public void onBowShoot(EntityShootBowEvent event) {
+        if (!SkillsConfig.isSkillSystemEnabled()) return;
         if (event.getEntity() instanceof Player player) {
             OverdrawSkill.snapshotDrawDuration(player.getUniqueId());
         }
@@ -301,6 +309,7 @@ public class SkillBonusEventHandler implements Listener {
      */
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerMove(PlayerMoveEvent event) {
+        if (!SkillsConfig.isSkillSystemEnabled()) return;
         if (event.getTo() == null) return;
         UUID uuid = event.getPlayer().getUniqueId();
 

@@ -23,7 +23,7 @@ public class ThePalaceSanctum extends ContentPackagesConfigFields {
                 "em_id_the_palace,208.5,144,-101.5,-90.0,0.0",
                 "em_id_the_palace,238.5,144,-100.5,0.0,0.0",
                 0,
-                "Difficulty: &45-man hard content!",
+                "&aDynamic Sanctum\n" + "$bossCount boss encounters\n" + "&3Storm the palace and\n" + "&3defeat its ruler!",
                 "&bBefore being able to enter the city you must deal with the guardian on the bridge!",
                 "&bYou have left The Palace!",
                 List.of("the_palace_old_stone_king_p1.yml"),
