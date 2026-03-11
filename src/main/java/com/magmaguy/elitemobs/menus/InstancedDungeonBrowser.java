@@ -1,6 +1,8 @@
 package com.magmaguy.elitemobs.menus;
 
+import com.magmaguy.elitemobs.commands.DungeonCommands;
 import com.magmaguy.elitemobs.config.DungeonsConfig;
+import com.magmaguy.elitemobs.config.menus.premade.PlayerStatusMenuConfig;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
 import com.magmaguy.elitemobs.dungeons.WorldInstancedDungeonPackage;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
@@ -21,6 +23,7 @@ import java.util.*;
 
 public class InstancedDungeonBrowser extends EliteMenu {
     private static final HashMap<Inventory, InstancedDungeonBrowser> inventories = new HashMap<>();
+    private static final int BACK_SLOT = 17;
 
     public static void shutdown() {
         inventories.clear();
@@ -31,11 +34,18 @@ public class InstancedDungeonBrowser extends EliteMenu {
             31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53));
     @Getter
     private final EMPackage emPackage;
+    private final DungeonCommands.TeleportMenuSource teleportMenuSource;
     private List<DungeonInstance> instancesList;
 
     public InstancedDungeonBrowser(Player player, String instancedDungeonName) {
+        this(player, instancedDungeonName, DungeonCommands.TeleportMenuSource.NONE);
+    }
+
+    public InstancedDungeonBrowser(Player player, String instancedDungeonName,
+                                   DungeonCommands.TeleportMenuSource teleportMenuSource) {
         EMPackage emPackage = EMPackage.getEmPackages().get(instancedDungeonName);
         this.emPackage = emPackage;
+        this.teleportMenuSource = teleportMenuSource;
         if (!(emPackage instanceof WorldInstancedDungeonPackage)) {
             player.sendMessage(DungeonsConfig.getInvalidInstancedDungeonMessage());
             return;
@@ -47,7 +57,7 @@ public class InstancedDungeonBrowser extends EliteMenu {
         });
         instancesList = new ArrayList<>(dungeonInstances);
         int slots;
-        if (dungeonInstances.isEmpty()) slots = 9;
+        if (dungeonInstances.isEmpty()) slots = hasBackButton() ? 18 : 9;
         else slots = 54;
         Inventory inventory = Bukkit.createInventory(player, slots);
         int difficultyCounter = 0;
@@ -71,8 +81,14 @@ public class InstancedDungeonBrowser extends EliteMenu {
             if (itemStack != null)
                 inventory.setItem(validSlots.get(i), itemStack);
         }
+        if (hasBackButton())
+            inventory.setItem(BACK_SLOT, PlayerStatusMenuConfig.getBackItem());
         player.openInventory(inventory);
         inventories.put(inventory, this);
+    }
+
+    private boolean hasBackButton() {
+        return teleportMenuSource != DungeonCommands.TeleportMenuSource.NONE;
     }
 
     private ItemStack spectatorItem(DungeonInstance dungeonInstance) {
@@ -103,6 +119,13 @@ public class InstancedDungeonBrowser extends EliteMenu {
             if (!isTopMenu(event)) return;
             if (event.getCurrentItem() == null || event.getCurrentItem().getType().equals(Material.AIR)) return;
             InstancedDungeonBrowser instancedDungeonBrowser = inventories.get(event.getInventory());
+
+            if (instancedDungeonBrowser.hasBackButton() && event.getSlot() == BACK_SLOT) {
+                event.getWhoClicked().closeInventory();
+                DungeonCommands.reopenTeleportBrowser((Player) event.getWhoClicked(), instancedDungeonBrowser.teleportMenuSource);
+                return;
+            }
+
             event.getWhoClicked().closeInventory();
 
             //Case for creating a new instance

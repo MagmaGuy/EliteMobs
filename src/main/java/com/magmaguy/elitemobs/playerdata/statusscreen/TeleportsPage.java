@@ -109,6 +109,10 @@ public class TeleportsPage {
         TeleportsPageEvents.pageInventories.add(inventory);
     }
 
+    public static void showTeleportInventory(Player player) {
+        teleportsPage(player, player);
+    }
+
     public static class TeleportsPageEvents implements Listener {
         private static final Set<Inventory> pageInventories = new HashSet<>();
         private static final List<EMPackage> orderedDungeons = new ArrayList<>();
@@ -126,7 +130,9 @@ public class TeleportsPage {
             if (event.getSlot() < 0) return;
             if (orderedDungeons.size() - 1 >= event.getSlot()) {
                 player.closeInventory();
-                DungeonCommands.teleport(player, orderedDungeons.get(event.getSlot()).getContentPackagesConfigFields().getFilename());
+                DungeonCommands.teleport(player,
+                        orderedDungeons.get(event.getSlot()).getContentPackagesConfigFields().getFilename(),
+                        DungeonCommands.TeleportMenuSource.INVENTORY);
                 return;
             }
             if (event.getSlot() == 53) {

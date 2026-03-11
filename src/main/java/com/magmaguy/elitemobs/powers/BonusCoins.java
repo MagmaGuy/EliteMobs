@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.powers;
 
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
+import com.magmaguy.elitemobs.combatsystem.ScaledCombatRewardResolver;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.items.ItemLootShower;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
@@ -22,7 +23,8 @@ public class BonusCoins extends BossPower {
     }
 
     public void doCoinDrop(EliteEntity eliteEntity, Player player) {
-        new ItemLootShower(eliteEntity.getLevel() * coinMultiplier, eliteEntity.getLevel(), eliteEntity.getUnsyncedLivingEntity().getLocation(), player);
+        int rewardLevel = ScaledCombatRewardResolver.getRewardLevel(eliteEntity, player);
+        new ItemLootShower(rewardLevel * coinMultiplier, rewardLevel, eliteEntity.getUnsyncedLivingEntity().getLocation(), player);
     }
 
     public static class BonusCoinsEvents implements Listener {

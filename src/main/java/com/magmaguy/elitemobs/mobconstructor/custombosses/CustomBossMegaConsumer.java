@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
+import com.magmaguy.elitemobs.mobconstructor.MobLevelPlaceholderFormatter;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import com.magmaguy.elitemobs.thirdparty.custommodels.CustomModel;
 import com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity;
@@ -50,12 +51,8 @@ public class CustomBossMegaConsumer {
     }
 
     protected static void setName(LivingEntity livingEntity, CustomBossEntity customBossEntity, int level) {
-        String parsedName = ChatColorConverter.convert(customBossEntity.customBossesConfigFields.getName().replace("$level", level + "")
-                .replace("$normalLevel", ChatColorConverter.convert("&2[&a" + level + "&2]&f"))
-                .replace("$minibossLevel", ChatColorConverter.convert("&6〖&e" + level + "&6〗&f"))
-                .replace("$bossLevel", ChatColorConverter.convert("&4『&c" + level + "&4』&f"))
-                .replace("$reinforcementLevel", ChatColorConverter.convert("&8〔&7") + level + "&8〕&f")
-                .replace("$eventBossLevel", ChatColorConverter.convert("&4「&c" + level + "&4」&f")));
+        String parsedName = ChatColorConverter.convert(MobLevelPlaceholderFormatter.replaceLevelPlaceholders(
+                customBossEntity.customBossesConfigFields.getName(), customBossEntity, level));
         livingEntity.setCustomName(parsedName);
         boolean showName = DefaultConfig.isAlwaysShowNametags() || customBossEntity.customBossesConfigFields.isAlwaysShowName();
         livingEntity.setCustomNameVisible(showName);

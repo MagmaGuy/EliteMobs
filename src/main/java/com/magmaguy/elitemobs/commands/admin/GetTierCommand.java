@@ -22,7 +22,14 @@ public class GetTierCommand {
     }
 
     public static void get(Player player, int tierLevel) {
+        grantLoadout(player, tierLevel, false);
+    }
 
+    public static void getLimited(Player player, int tierLevel) {
+        grantLoadout(player, tierLevel, true);
+    }
+
+    private static void grantLoadout(Player player, int tierLevel, boolean limited) {
         ItemStack helmet = new ItemStack(Material.IRON_HELMET);
         addDurability(helmet);
         ItemStack chestplate = new ItemStack(Material.IRON_CHESTPLATE);
@@ -33,24 +40,31 @@ public class GetTierCommand {
         addDurability(boots);
         ItemStack sword = new ItemStack(Material.IRON_SWORD);
         addDurability(sword);
-        ItemStack axe = new ItemStack(Material.IRON_AXE);
-        addDurability(axe);
-        ItemStack scythe = new ItemStack(Material.IRON_HOE);
-        addDurability(scythe);
         ItemStack bow = new ItemStack(Material.BOW);
         addDurability(bow);
-        ItemStack crossbow = new ItemStack(Material.CROSSBOW);
-        addDurability(crossbow);
-        ItemStack trident = new ItemStack(Material.TRIDENT);
-        addDurability(trident);
-        ItemStack mace = new ItemStack(Material.MACE);
-        addDurability(mace);
         ItemStack spear = null;
-        try {
-            spear = new ItemStack(Material.IRON_SPEAR);
-            addDurability(spear);
-        } catch (NoSuchFieldError ignored) {
-            // SPEAR doesn't exist pre-1.21.11
+        ItemStack axe = null;
+        ItemStack scythe = null;
+        ItemStack crossbow = null;
+        ItemStack trident = null;
+        ItemStack mace = null;
+        if (!limited) {
+            axe = new ItemStack(Material.IRON_AXE);
+            addDurability(axe);
+            scythe = new ItemStack(Material.IRON_HOE);
+            addDurability(scythe);
+            crossbow = new ItemStack(Material.CROSSBOW);
+            addDurability(crossbow);
+            trident = new ItemStack(Material.TRIDENT);
+            addDurability(trident);
+            mace = new ItemStack(Material.MACE);
+            addDurability(mace);
+            try {
+                spear = new ItemStack(Material.IRON_SPEAR);
+                addDurability(spear);
+            } catch (NoSuchFieldError ignored) {
+                // SPEAR doesn't exist pre-1.21.11
+            }
         }
         ItemStack cheatSword = new ItemStack(Material.NETHERITE_SWORD);
         addDurability(cheatSword);
@@ -60,12 +74,12 @@ public class GetTierCommand {
         EliteItemManager.setEliteLevel(leggings, tierLevel);
         EliteItemManager.setEliteLevel(boots, tierLevel);
         EliteItemManager.setEliteLevel(sword, tierLevel);
-        EliteItemManager.setEliteLevel(axe, tierLevel);
-        EliteItemManager.setEliteLevel(scythe, tierLevel);
         EliteItemManager.setEliteLevel(bow, tierLevel);
-        EliteItemManager.setEliteLevel(crossbow, tierLevel);
-        EliteItemManager.setEliteLevel(trident, tierLevel);
-        EliteItemManager.setEliteLevel(mace, tierLevel);
+        if (axe != null) EliteItemManager.setEliteLevel(axe, tierLevel);
+        if (scythe != null) EliteItemManager.setEliteLevel(scythe, tierLevel);
+        if (crossbow != null) EliteItemManager.setEliteLevel(crossbow, tierLevel);
+        if (trident != null) EliteItemManager.setEliteLevel(trident, tierLevel);
+        if (mace != null) EliteItemManager.setEliteLevel(mace, tierLevel);
         if (spear != null) EliteItemManager.setEliteLevel(spear, tierLevel);
         EliteItemManager.setEliteLevel(cheatSword, tierLevel);
         ItemMeta cheatItemMeta = cheatSword.getItemMeta();
@@ -78,12 +92,12 @@ public class GetTierCommand {
         new EliteItemLore(leggings, false);
         new EliteItemLore(boots, false);
         new EliteItemLore(sword, false);
-        new EliteItemLore(axe, false);
-        new EliteItemLore(scythe, false);
         new EliteItemLore(bow, false);
-        new EliteItemLore(crossbow, false);
-        new EliteItemLore(trident, false);
-        new EliteItemLore(mace, false);
+        if (axe != null) new EliteItemLore(axe, false);
+        if (scythe != null) new EliteItemLore(scythe, false);
+        if (crossbow != null) new EliteItemLore(crossbow, false);
+        if (trident != null) new EliteItemLore(trident, false);
+        if (mace != null) new EliteItemLore(mace, false);
         if (spear != null) new EliteItemLore(spear, false);
         new EliteItemLore(cheatSword, false);
 
@@ -93,12 +107,12 @@ public class GetTierCommand {
         EliteItemSkins.applyLevelBasedSkin(leggings, tierLevel);
         EliteItemSkins.applyLevelBasedSkin(boots, tierLevel);
         EliteItemSkins.applyLevelBasedSkin(sword, tierLevel);
-        EliteItemSkins.applyLevelBasedSkin(axe, tierLevel);
-        EliteItemSkins.applyLevelBasedSkin(scythe, tierLevel);
         EliteItemSkins.applyLevelBasedSkin(bow, tierLevel);
-        EliteItemSkins.applyLevelBasedSkin(crossbow, tierLevel);
-        EliteItemSkins.applyLevelBasedSkin(trident, tierLevel);
-        EliteItemSkins.applyLevelBasedSkin(mace, tierLevel);
+        if (axe != null) EliteItemSkins.applyLevelBasedSkin(axe, tierLevel);
+        if (scythe != null) EliteItemSkins.applyLevelBasedSkin(scythe, tierLevel);
+        if (crossbow != null) EliteItemSkins.applyLevelBasedSkin(crossbow, tierLevel);
+        if (trident != null) EliteItemSkins.applyLevelBasedSkin(trident, tierLevel);
+        if (mace != null) EliteItemSkins.applyLevelBasedSkin(mace, tierLevel);
         if (spear != null) EliteItemSkins.applyLevelBasedSkin(spear, tierLevel);
         // cheatSword intentionally doesn't get custom skin
 
@@ -108,18 +122,18 @@ public class GetTierCommand {
         player.getInventory().setLeggings(leggings);
         player.getInventory().setBoots(boots);
         player.getInventory().addItem(sword);
-        player.getInventory().addItem(axe);
-        player.getInventory().addItem(scythe);
         player.getInventory().addItem(bow);
-        player.getInventory().addItem(crossbow);
-        player.getInventory().addItem(trident);
-        player.getInventory().addItem(mace);
+        if (axe != null) player.getInventory().addItem(axe);
+        if (scythe != null) player.getInventory().addItem(scythe);
+        if (crossbow != null) player.getInventory().addItem(crossbow);
+        if (trident != null) player.getInventory().addItem(trident);
+        if (mace != null) player.getInventory().addItem(mace);
         if (spear != null) player.getInventory().addItem(spear);
         player.getInventory().addItem(cheatSword);
-        player.getInventory().addItem(new ItemStack(Material.COOKED_BEEF, 64));
         player.getInventory().addItem(new ItemStack(Material.SHIELD));
         player.getInventory().addItem(new ItemStack(Material.ARROW, 64));
-        player.getInventory().addItem(new ItemStack(Material.ARROW, 64));
+        if (!limited) player.getInventory().addItem(new ItemStack(Material.COOKED_BEEF, 64));
+        if (!limited) player.getInventory().addItem(new ItemStack(Material.ARROW, 64));
 
         // Also set all skill levels to match the tier level
         long targetXP = SkillXPCalculator.totalXPForLevel(tierLevel);

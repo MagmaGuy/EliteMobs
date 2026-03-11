@@ -27,7 +27,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class QuestObjectives implements Serializable {
 
     @Getter
-    private final UUID uuid = UUID.randomUUID();
+    private final UUID uuid;
     @Getter
     @Setter
     protected QuestReward questReward;
@@ -48,7 +48,13 @@ public class QuestObjectives implements Serializable {
      * Used for dynamic quests
      */
     public QuestObjectives(int questLevel) {
+        this.uuid = UUID.randomUUID();
         generateRandomObjective(questLevel);
+    }
+
+    public QuestObjectives(UUID uuid, List<Objective> objectives) {
+        this.uuid = uuid;
+        this.objectives = objectives;
     }
 
     /**
@@ -57,13 +63,14 @@ public class QuestObjectives implements Serializable {
      * @param customQuestReward Predetermined Quest Reward
      */
     public QuestObjectives(QuestReward customQuestReward) {
+        this.uuid = UUID.randomUUID();
         this.questReward = customQuestReward;
     }
 
     private void generateRandomObjective(int questLevel) {
         int killAmount = ThreadLocalRandom.current().nextInt(1 + questLevel, 1 + questLevel * 10);
         EntityType entityType = QuestsConfig.getQuestEntityTypes().get(ThreadLocalRandom.current().nextInt(QuestsConfig.getQuestEntityTypes().size()));
-        KillObjective killObjective = new DynamicKillObjective(killAmount, entityType, questLevel);
+        KillObjective killObjective = new DynamicKillObjective(killAmount, entityType, questLevel * 10);
         this.objectives = Collections.singletonList(killObjective);
     }
 
@@ -126,7 +133,7 @@ public class QuestObjectives implements Serializable {
             if (quest.getQuestTaker() == null) return strings;
             NPCsConfigFields npCsConfigFields = NPCsConfig.getNpcEntities().get(quest.getQuestTaker());
             if (npCsConfigFields == null) return strings;
-            strings.add(QuestsConfig.getQuestTurnInObjective().replace("$npcName", npCsConfigFields.getName()));
+            strings.add(QuestsConfig.getQuestTurnInObjective().replace("$npcName", npCsConfigFields.getName() == null ? "" : npCsConfigFields.getName()));
         }
         return strings;
     }

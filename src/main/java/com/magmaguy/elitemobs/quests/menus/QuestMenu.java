@@ -98,7 +98,7 @@ public class QuestMenu {
         else if (quest instanceof DynamicQuest)
             body.add(new TextComponent(DynamicQuestMenuConfig.getDefaultLoreTextLines()
                     .replace("$amount", quest.getQuestObjectives().getObjectives().get(0).getTargetAmount() + "")
-                    .replace("$name", EliteMobProperties.getPluginData(((DynamicKillObjective) quest.getQuestObjectives().getObjectives().get(0)).getEntityType()).getName(quest.getQuestLevel() * 10))));
+                    .replace("$name", EliteMobProperties.getPluginData(((DynamicKillObjective) quest.getQuestObjectives().getObjectives().get(0)).getEntityType()).getName(((DynamicKillObjective) quest.getQuestObjectives().getObjectives().get(0)).getMinMobLevel()))));
         return body;
     }
 

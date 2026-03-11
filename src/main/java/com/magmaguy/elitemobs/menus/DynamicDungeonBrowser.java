@@ -1,6 +1,8 @@
 package com.magmaguy.elitemobs.menus;
 
+import com.magmaguy.elitemobs.commands.DungeonCommands;
 import com.magmaguy.elitemobs.config.DungeonsConfig;
+import com.magmaguy.elitemobs.config.menus.premade.PlayerStatusMenuConfig;
 import com.magmaguy.elitemobs.dungeons.DynamicDungeonPackage;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
@@ -27,6 +29,7 @@ import java.util.stream.Collectors;
 
 public class DynamicDungeonBrowser extends EliteMenu {
     private static final HashMap<Inventory, DynamicDungeonBrowser> inventories = new HashMap<>();
+    private static final int BACK_SLOT = 17;
 
     public static void shutdown() {
         inventories.clear();
@@ -35,6 +38,7 @@ public class DynamicDungeonBrowser extends EliteMenu {
     @Getter
     private final EMPackage emPackage;
     private final MenuType menuType;
+    private final DungeonCommands.TeleportMenuSource teleportMenuSource;
     private final List<Integer> levelSlots = List.of(2, 4, 6, 0, 8, 1, 3, 5, 7);
     private final List<Integer> difficultySlots = List.of(2, 4, 6, 0, 8, 1, 3, 5, 7);
     private final List<Integer> validSlots = new ArrayList<>(List.of(18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
@@ -43,14 +47,20 @@ public class DynamicDungeonBrowser extends EliteMenu {
     private List<DynamicDungeonInstance> instancesList = new ArrayList<>();
 
     public DynamicDungeonBrowser(Player player, String dynamicDungeonName) {
-        this(player, dynamicDungeonName, MenuType.LEVEL_SELECTION, null);
+        this(player, dynamicDungeonName, DungeonCommands.TeleportMenuSource.NONE);
     }
 
-    private DynamicDungeonBrowser(Player player, String dynamicDungeonName, MenuType menuType, Integer selectedLevel) {
+    public DynamicDungeonBrowser(Player player, String dynamicDungeonName, DungeonCommands.TeleportMenuSource teleportMenuSource) {
+        this(player, dynamicDungeonName, MenuType.LEVEL_SELECTION, null, teleportMenuSource);
+    }
+
+    private DynamicDungeonBrowser(Player player, String dynamicDungeonName, MenuType menuType, Integer selectedLevel,
+                                  DungeonCommands.TeleportMenuSource teleportMenuSource) {
         EMPackage emPackage = EMPackage.getEmPackages().get(dynamicDungeonName);
         this.emPackage = emPackage;
         this.menuType = menuType;
         this.selectedLevel = selectedLevel;
+        this.teleportMenuSource = teleportMenuSource;
 
         if (!(emPackage instanceof DynamicDungeonPackage)) {
             player.sendMessage(DungeonsConfig.getInvalidDynamicDungeonMessage());
@@ -84,7 +94,7 @@ public class DynamicDungeonBrowser extends EliteMenu {
                 .collect(Collectors.toList());
 
         // Expand to 54 slots if there are existing instances to show
-        int slots = instancesList.isEmpty() ? 9 : 54;
+        int slots = instancesList.isEmpty() ? hasBackButton() ? 18 : 9 : 54;
         Inventory inventory = Bukkit.createInventory(player, slots, DungeonsConfig.getDynamicDungeonLevelSelectionMenuTitle());
 
         for (int i = 0; i < availableLevels.size() && i < levelSlots.size(); i++) {
@@ -123,6 +133,10 @@ public class DynamicDungeonBrowser extends EliteMenu {
                 inventory.setItem(validSlots.get(i), itemStack);
         }
 
+        if (hasBackButton()) {
+            inventory.setItem(BACK_SLOT, PlayerStatusMenuConfig.getBackItem());
+        }
+
         player.openInventory(inventory);
         inventories.put(inventory, this);
     }
@@ -150,7 +164,8 @@ public class DynamicDungeonBrowser extends EliteMenu {
     }
 
     private void showDifficultySelectionMenu(Player player, String dynamicDungeonName) {
-        Inventory inventory = Bukkit.createInventory(player, 9, DungeonsConfig.getDynamicDungeonDifficultySelectionMenuTitle());
+        Inventory inventory = Bukkit.createInventory(player, hasBackButton() ? 18 : 9,
+                DungeonsConfig.getDynamicDungeonDifficultySelectionMenuTitle());
 
         int difficultyCounter = 0;
         for (Map map : emPackage.getContentPackagesConfigFields().getDifficulties()) {
@@ -167,8 +182,16 @@ public class DynamicDungeonBrowser extends EliteMenu {
             difficultyCounter++;
         }
 
+        if (hasBackButton()) {
+            inventory.setItem(BACK_SLOT, PlayerStatusMenuConfig.getBackItem());
+        }
+
         player.openInventory(inventory);
         inventories.put(inventory, this);
+    }
+
+    private boolean hasBackButton() {
+        return teleportMenuSource != DungeonCommands.TeleportMenuSource.NONE;
     }
 
     private enum MenuType {
@@ -186,6 +209,13 @@ public class DynamicDungeonBrowser extends EliteMenu {
 
             DynamicDungeonBrowser browser = inventories.get(event.getInventory());
             Player player = (Player) event.getWhoClicked();
+
+            if (browser.hasBackButton() && event.getSlot() == BACK_SLOT) {
+                event.getWhoClicked().closeInventory();
+                DungeonCommands.reopenTeleportBrowser(player, browser.teleportMenuSource);
+                return;
+            }
+
             event.getWhoClicked().closeInventory();
 
             if (browser.menuType == MenuType.LEVEL_SELECTION) {
@@ -199,7 +229,8 @@ public class DynamicDungeonBrowser extends EliteMenu {
                     new DynamicDungeonBrowser(player,
                             browser.getEmPackage().getContentPackagesConfigFields().getFilename(),
                             MenuType.DIFFICULTY_SELECTION,
-                            selectedLevel);
+                            selectedLevel,
+                            browser.teleportMenuSource);
                 } else if (browser.validSlots.contains(event.getSlot())) {
                     // Player clicked on an existing instance to join
                     int instanceIndex = browser.validSlots.indexOf(event.getSlot());

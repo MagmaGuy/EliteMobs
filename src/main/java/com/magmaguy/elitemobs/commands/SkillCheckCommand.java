@@ -34,7 +34,7 @@ public class SkillCheckCommand extends AdvancedCommand {
             return;
         }
 
-        Logger.sendMessage(commandData.getCommandSender(), CommandMessagesConfig.getSkillCheckHeaderMessage().replace("$player", targetPlayer.getName()));
+        Logger.sendSimpleMessage(commandData.getCommandSender(), CommandMessagesConfig.getSkillCheckHeaderMessage().replace("$player", targetPlayer.getName()));
 
         for (SkillType skillType : SkillType.values()) {
             long xp = PlayerData.getSkillXP(targetPlayer.getUniqueId(), skillType);
@@ -43,7 +43,7 @@ public class SkillCheckCommand extends AdvancedCommand {
             long xpNeeded = SkillXPCalculator.xpToNextLevel(level);
             double progress = SkillXPCalculator.levelProgress(xp) * 100;
 
-            Logger.sendMessage(commandData.getCommandSender(),
+            Logger.sendSimpleMessage(commandData.getCommandSender(),
                     CommandMessagesConfig.getSkillCheckEntryFormat()
                             .replace("$skill", SkillBonusMenuConfig.getSkillTypeDisplayName(skillType))
                             .replace("$level", String.valueOf(level))

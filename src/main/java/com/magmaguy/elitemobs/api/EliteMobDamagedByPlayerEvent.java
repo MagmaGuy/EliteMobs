@@ -3,9 +3,7 @@ package com.magmaguy.elitemobs.api;
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
-import com.magmaguy.elitemobs.combatsystem.DamageBreakdown;
-import com.magmaguy.elitemobs.combatsystem.LevelScaling;
-import com.magmaguy.elitemobs.combatsystem.WeaponOffenseCalculator;
+import com.magmaguy.elitemobs.combatsystem.*;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.dungeons.EliteMobsWorld;
@@ -88,6 +86,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * <pre>
  * formulaDamage = baseDamage × attackSpeedFactor × skillAdjustment
  *               × weaponAdjustment × cooldownOrVelocity × sweepMultiplier
+ *               × potionMultiplier
  *               × enchantmentMultiplier
  *
  * finalDamage = max(formulaDamage, 1) × damageModifier × combatMultiplier × critMultiplier
@@ -750,13 +749,23 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
             boolean isRanged = event.getCause() == EntityDamageEvent.DamageCause.PROJECTILE;
             boolean isSweep = event.getCause() == EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK;
 
+            // Ranged-only weapons (bows, crossbows) used in melee count as unarmed strikes
+            boolean isRangedWeaponMelee = false;
+            if (!isRanged && weapon != null) {
+                Material weaponType = weapon.getType();
+                if (weaponType == Material.BOW || weaponType == Material.CROSSBOW) {
+                    isRangedWeaponMelee = true;
+                }
+            }
+
             // 1. Base damage — fraction of normalized mob HP
-            double baseDamage = LevelScaling.calculateBaseDamageToElite(mobLevel);
+            double baseDamage = NaturalEliteCombatTweak.getTweakedBaseDamageToElite(eliteEntity, mobLevel);
 
             // 2. Attack speed normalization (melee only)
             double attackSpeedFactor = 1.0;
             if (!isRanged) {
-                double attackSpeed = EliteItemManager.getAttackSpeed(weapon);
+                // Ranged weapons used in melee use default fist attack speed (4.0)
+                double attackSpeed = isRangedWeaponMelee ? 4.0 : EliteItemManager.getAttackSpeed(weapon);
                 attackSpeedFactor = LevelScaling.REFERENCE_ATTACK_SPEED / attackSpeed;
             }
 
@@ -779,6 +788,10 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
                 Projectile proj = (Projectile) event.getDamager();
                 int storedSkillLevel = ItemTagger.getArrowSkillLevel(proj);
                 weaponSkillLevel = storedSkillLevel >= 0 ? storedSkillLevel : getPlayerWeaponSkillLevel(player);
+            } else if (isRangedWeaponMelee) {
+                // Ranged weapons used in melee = unarmed (level 0, skill level 1)
+                weaponLevel = 0;
+                weaponSkillLevel = 1;
             } else {
                 weaponLevel = WeaponOffenseCalculator.getEffectiveWeaponLevel(weapon);
                 weaponSkillLevel = getPlayerWeaponSkillLevel(player);
@@ -798,12 +811,15 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
             // 6. Sweep reduction (secondary targets)
             double sweepMultiplier = WeaponOffenseCalculator.getSweepMultiplier(event);
 
-            // 7. Secondary enchantment multiplier (Smite/Bane)
+            // 7. Strength/Weakness potion scaling
+            double potionMultiplier = PotionCombatModifierCalculator.getOutgoingDamageMultiplier(player);
+
+            // 8. Secondary enchantment multiplier (Smite/Bane)
             LivingEntity target = eliteEntity.getLivingEntity();
             double enchantmentMultiplier = (target != null) ?
                     getSecondaryEnchantmentMultiplier(player, target) : 1.0;
 
-            // 8. Skill-spawned arrow damage multiplier (Multishot, Arrow Rain, etc.)
+            // 9. Skill-spawned arrow damage multiplier (Multishot, Arrow Rain, etc.)
             // Skills that spawn extra arrows store a damage multiplier in the arrow's PDC
             // to reduce their damage relative to the formula output.
             double arrowDamageMultiplier = 1.0;
@@ -817,6 +833,7 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
             // Compute formula damage
             double formulaDamage = baseDamage * attackSpeedFactor * skillAdjustment
                     * weaponAdjustment * cooldownOrVelocity * sweepMultiplier
+                    * potionMultiplier
                     * enchantmentMultiplier * arrowDamageMultiplier;
 
             // Populate breakdown if tracking is active
@@ -828,6 +845,7 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
                 breakdown.setWeaponAdjustment(weaponAdjustment);
                 breakdown.setCooldownOrVelocity(cooldownOrVelocity);
                 breakdown.setSweepMultiplier(sweepMultiplier);
+                breakdown.setPotionMultiplier(potionMultiplier);
                 breakdown.setEnchantmentMultiplier(enchantmentMultiplier);
                 breakdown.setArrowDamageMultiplier(arrowDamageMultiplier);
                 breakdown.setPlayerSkillLevel(weaponSkillLevel);
@@ -846,11 +864,60 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
                     " Wpn=" + String.format("%.2f", weaponAdjustment) +
                     " (Lv" + (int) weaponLevel + ")" +
                     " CD=" + String.format("%.2f", cooldownOrVelocity) +
+                    (potionMultiplier != 1.0 ? " Pot=" + String.format("%.2f", potionMultiplier) : "") +
                     (isSweep ? " Sweep=" + String.format("%.2f", sweepMultiplier) : "") +
                     (arrowDamageMultiplier != 1.0 ? " ArrowMult=" + String.format("%.2f", arrowDamageMultiplier) : "") +
                     " = " + String.format("%.1f", formulaDamage));
 
             return formulaDamage;
+        }
+
+        /**
+         * Wraps playerToEliteDamageFormula for scaled combat.
+         * Simulates the boss at the player's weapon skill level, then rescales
+         * to the boss's actual HP pool. This makes level irrelevant while
+         * keeping gear meaningful.
+         */
+        private static double scaledPlayerToEliteDamage(Player player, EliteEntity eliteEntity, EntityDamageByEntityEvent event) {
+            // 1. Get the player's weapon skill level (the "simulated" mob level)
+            // Ranged weapons used in melee = unarmed, so simulated level is 1
+            boolean isRangedMelee = event.getCause() != EntityDamageEvent.DamageCause.PROJECTILE;
+            if (isRangedMelee) {
+                ItemStack mainHand = player.getInventory().getItemInMainHand();
+                if (mainHand != null) {
+                    Material type = mainHand.getType();
+                    isRangedMelee = type == Material.BOW || type == Material.CROSSBOW;
+                } else {
+                    isRangedMelee = false;
+                }
+            }
+            int simulatedMobLevel = isRangedMelee ? 1 : getPlayerWeaponSkillLevel(player);
+            if (simulatedMobLevel <= 0) simulatedMobLevel = 1;
+
+            // For ranged attacks, read skill level from projectile PDC (stored at launch time)
+            if (event.getCause() == EntityDamageEvent.DamageCause.PROJECTILE && event.getDamager() instanceof Projectile proj) {
+                int storedSkillLevel = ItemTagger.getArrowSkillLevel(proj);
+                if (storedSkillLevel > 0) simulatedMobLevel = storedSkillLevel;
+            }
+
+            // 2. Temporarily override mob level to simulate matched combat
+            int realMobLevel = eliteEntity.getLevel();
+            eliteEntity.setLevel(simulatedMobLevel);
+
+            // 3. Run the standard formula (now sees mobLevel = player's level)
+            double formulaDamage = playerToEliteDamageFormula(player, eliteEntity, event);
+
+            // 4. Restore real level immediately
+            eliteEntity.setLevel(realMobLevel);
+
+            // 5. Rescale: convert from "damage to simulated mob" to "equivalent % of actual boss HP"
+            double simulatedMobHP = NaturalEliteCombatTweak.getTweakedMobHealthForLevel(
+                    eliteEntity, simulatedMobLevel, eliteEntity.getHealthMultiplier());
+            double actualBossMaxHP = eliteEntity.getMaxHealth();
+            double damagePercentage = formulaDamage / simulatedMobHP;
+            double rescaledDamage = damagePercentage * actualBossMaxHP;
+
+            return rescaledDamage;
         }
 
         /**
@@ -872,7 +939,7 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
             int thornsLevel = getEliteThornsLevel(player);
             if (thornsLevel <= 0) return 0;
 
-            double baseDamage = LevelScaling.calculateBaseDamageToElite(eliteEntity.getLevel());
+            double baseDamage = NaturalEliteCombatTweak.getTweakedBaseDamageToElite(eliteEntity, eliteEntity.getLevel());
             return baseDamage * thornsLevel * WeaponOffenseCalculator.THORNS_PERCENT_PER_LEVEL;
         }
 
@@ -943,8 +1010,18 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
                 // Custom/bypass damage: use raw event damage, no formula
                 damage = event.getOriginalDamage(EntityDamageEvent.DamageModifier.BASE);
             } else if (event.getCause().equals(EntityDamageEvent.DamageCause.THORNS)) {
-                // Thorns: formula-based percentage of base damage
-                damage = calculateThornsDamage(player, eliteEntity);
+                if (eliteEntity.isScaledCombat()) {
+                    int simulatedLevel = getPlayerWeaponSkillLevel(player);
+                    if (simulatedLevel <= 0) simulatedLevel = 1;
+                    double baseDamage = NaturalEliteCombatTweak.getTweakedBaseDamageToElite(eliteEntity, simulatedLevel);
+                    double thornsDamage = baseDamage * getEliteThornsLevel(player) * WeaponOffenseCalculator.THORNS_PERCENT_PER_LEVEL;
+                    double simulatedMobHP = NaturalEliteCombatTweak.getTweakedMobHealthForLevel(
+                            eliteEntity, simulatedLevel, eliteEntity.getHealthMultiplier());
+                    double actualBossMaxHP = eliteEntity.getMaxHealth();
+                    damage = thornsDamage * (actualBossMaxHP / simulatedMobHP);
+                } else {
+                    damage = calculateThornsDamage(player, eliteEntity);
+                }
                 if (breakdown != null) {
                     breakdown.setThornsDamage(damage);
                     breakdown.setThornsAttack(true);
@@ -954,7 +1031,10 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
                     || event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK)
                     || event.getCause().equals(EntityDamageEvent.DamageCause.PROJECTILE)) {
                 // Main combat formula: melee, sweep, or ranged
-                damage = playerToEliteDamageFormula(player, eliteEntity, event);
+                if (eliteEntity.isScaledCombat())
+                    damage = scaledPlayerToEliteDamage(player, eliteEntity, event);
+                else
+                    damage = playerToEliteDamageFormula(player, eliteEntity, event);
             } else {
                 // Other damage types: use raw vanilla event damage
                 damage = event.getDamage();
@@ -971,7 +1051,9 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
 
             // Config combat multiplier
             double combatMultiplier;
-            if (eliteEntity instanceof CustomBossEntity customBossEntity && customBossEntity.isNormalizedCombat())
+            if (eliteEntity.isScaledCombat())
+                combatMultiplier = MobCombatSettingsConfig.getScaledDamageToEliteMultiplier();
+            else if (eliteEntity instanceof CustomBossEntity customBossEntity && customBossEntity.isNormalizedCombat())
                 combatMultiplier = MobCombatSettingsConfig.getNormalizedDamageToEliteMultiplier();
             else
                 combatMultiplier = MobCombatSettingsConfig.getDamageToEliteMultiplier();

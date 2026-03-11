@@ -224,9 +224,9 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
     }
 
     private static void teleportLineCreator(int line, String text, String hover, String command, FileConfiguration fileConfiguration, File file) {
-        teleportTextLines[line] = ConfigurationEngine.setString(file, fileConfiguration, "teleportText" + line, text, true);
-        teleportHoverLines[line] = ConfigurationEngine.setString(file, fileConfiguration, "teleportHover" + line, hover, true);
-        teleportCommandLines[line] = ConfigurationEngine.setString(file, fileConfiguration, "teleportCommand" + line, command, false);
+        teleportTextLines[line] = ConfigurationEngine.setString(file, fileConfiguration, "teleportTextV2" + line, text, true);
+        teleportHoverLines[line] = ConfigurationEngine.setString(file, fileConfiguration, "teleportHoverV2" + line, hover, true);
+        teleportCommandLines[line] = ConfigurationEngine.setString(file, fileConfiguration, "teleportCommandV2" + line, command, false);
     }
 
     private static void commandsLineCreator(int line, String text, String hover, String command, FileConfiguration fileConfiguration, File file) {

@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobHealEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.collateralminecraftchanges.KeepNeutralsAngry;
+import com.magmaguy.elitemobs.combatsystem.NaturalEliteCombatTweak;
 import com.magmaguy.elitemobs.combatsystem.antiexploit.AntiExploitMessage;
 import com.magmaguy.elitemobs.config.AntiExploitConfig;
 import com.magmaguy.elitemobs.config.DefaultConfig;
@@ -80,7 +81,17 @@ public class EliteEntity {
     @Setter
     protected boolean visualEffectObfuscated = true;
     @Getter
+    @Setter
     protected boolean isNaturalEntity;
+
+    /**
+     * Returns whether this entity uses scaled combat.
+     * Natural elites use scaled combat when the global config is enabled.
+     * Custom bosses override this with their per-boss config.
+     */
+    public boolean isScaledCombat() {
+        return isNaturalEntity && MobCombatSettingsConfig.isUseScaledCombatForNaturalElites();
+    }
     protected EntityType entityType;
     @Getter
     protected Boolean isPersistent = false;
@@ -364,7 +375,9 @@ public class EliteEntity {
         else this.defaultMaxHealth = 20;
         // Use exponential HP scaling: +5 levels = 2x HP, -5 levels = 0.5x HP
         // This replaces the old damage modifier system for a better player experience
-        this.maxHealth = com.magmaguy.elitemobs.combatsystem.LevelScaling.calculateMobHealth(level, this.defaultMaxHealth) * healthMultiplier;
+        double calculatedHealth = com.magmaguy.elitemobs.combatsystem.LevelScaling.calculateMobHealth(level, this.defaultMaxHealth);
+        calculatedHealth = NaturalEliteCombatTweak.getTweakedMobHealth(this, level, calculatedHealth);
+        this.maxHealth = calculatedHealth * healthMultiplier;
         if (livingEntity != null) AttributeManager.setAttribute(livingEntity, "generic_max_health", maxHealth);
         if (health == null) {
             if (livingEntity != null) livingEntity.setHealth(maxHealth);
@@ -580,8 +593,8 @@ public class EliteEntity {
 
     public void setName(EliteMobProperties eliteMobProperties) {
         this.name = ChatColorConverter.convert(
-                eliteMobProperties.getName().replace(
-                        "$level", level + ""));
+                MobLevelPlaceholderFormatter.replaceLevelPlaceholders(
+                        eliteMobProperties.getName(), this, level));
         livingEntity.setCustomName(this.name);
         livingEntity.setCustomNameVisible(DefaultConfig.isAlwaysShowNametags());
     }

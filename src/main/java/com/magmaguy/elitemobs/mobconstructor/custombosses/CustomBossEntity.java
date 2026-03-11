@@ -91,6 +91,8 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
     @Getter
     private boolean normalizedCombat;
     @Getter
+    private boolean scaledCombat;
+    @Getter
     @Setter
     private CustomMusic bossMusic = null;
     @Getter
@@ -196,6 +198,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
             normalizedCombat = phaseBossEntity.getPhase1Config().isNormalizedCombat();
         if (MobCombatSettingsConfig.isNormalizeRegionalBosses() && this instanceof RegionalBossEntity)
             normalizedCombat = true;
+        scaledCombat = customBossesConfigFields.isScaledCombat();
         super.setDamageMultiplier(customBossesConfigFields.getDamageMultiplier());
         super.setHealthMultiplier(customBossesConfigFields.getHealthMultiplier());
         super.setEliteLoot(customBossesConfigFields.isDropsEliteMobsLoot());
@@ -331,6 +334,16 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
             setNormalizedMaxHealth();
     }
 
+    @Override
+    public boolean isScaledCombat() {
+        // Explicit per-boss config takes priority
+        if (scaledCombat) return true;
+        // Normalized combat bosses (dungeon/regional) never use scaled combat
+        if (normalizedCombat) return false;
+        // Fall back to parent (natural entity check)
+        return super.isScaledCombat();
+    }
+
     private void setPluginName() {
         if (customBossesConfigFields.getName() == null) return;
         if (this.level == -1)
@@ -342,12 +355,8 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
                             .replace("$eventBossLevel", ChatColorConverter.convert("&4「&c" + "?" + "&4」&f"))),
                     false);
         else
-            setName(ChatColorConverter.convert(customBossesConfigFields.getName().replace("$level", this.level + "")
-                            .replace("$normalLevel", ChatColorConverter.convert("&2[&a" + this.level + "&2]&f"))
-                            .replace("$minibossLevel", ChatColorConverter.convert("&6〖&e" + this.level + "&6〗&f"))
-                            .replace("$bossLevel", ChatColorConverter.convert("&4『&c" + this.level + "&4』&f"))
-                            .replace("$reinforcementLevel", ChatColorConverter.convert("&8〔&7") + this.level + "&8〕&f")
-                            .replace("$eventBossLevel", ChatColorConverter.convert("&4「&c" + this.level + "&4」&f"))),
+            setName(ChatColorConverter.convert(MobLevelPlaceholderFormatter.replaceLevelPlaceholders(
+                            customBossesConfigFields.getName(), this, this.level)),
                     false);
     }
 
@@ -388,8 +397,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
 
     private void setTracking() {
         if (customBossesConfigFields.getAnnouncementPriority() < 1 ||
-                !MobCombatSettingsConfig.isShowCustomBossLocation() ||
-                customBossesConfigFields.getLocationMessage() == null)
+                !MobCombatSettingsConfig.isShowCustomBossLocation())
             return;
         trackableCustomBosses.add(this);
         if (bossTrackingBar != null) bossTrackingBar.remove();

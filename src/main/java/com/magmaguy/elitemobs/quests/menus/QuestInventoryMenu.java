@@ -113,21 +113,8 @@ public class QuestInventoryMenu {
 
     public static List<ItemStack> generateItemStackEntry(TextComponent title, List<TextComponent> textComponents, Material material) {
         List<String> list = new ArrayList<>();
-        textComponents.forEach(component -> {
-            if (component.toPlainText().length() < 27)
-                list.add(ChatColor.WHITE + component.toPlainText().replace(ChatColor.BLACK + "", ChatColor.WHITE + ""));
-            else {
-                ChatColor currentColor = ChatColor.WHITE;
-                for (int i = 0; i < component.toPlainText().length() / 26D; i++) {
-                    String string = currentColor + ChatColorConverter.convert(component.toPlainText().substring(i * 26, Math.min((i + 1) * 26, component.toPlainText().length())).replace(ChatColor.BLACK + "", ChatColor.WHITE + ""));
-                    list.add(string);
-                    String lastColor = ChatColor.getLastColors(string);
-                    if (!lastColor.isEmpty())
-                        currentColor = ChatColor.getByChar(lastColor);
-                    if (currentColor == null) currentColor = ChatColor.WHITE;
-                }
-            }
-        });
+        textComponents.forEach(component -> list.add(ChatColor.WHITE
+                + ChatColorConverter.convert(component.toPlainText().replace(ChatColor.BLACK + "", ChatColor.WHITE + ""))));
         return generateParsedItemStackEntry(title.toPlainText(), list, material);
     }
 
@@ -159,7 +146,7 @@ public class QuestInventoryMenu {
                 currentCharacterCount = 0;
             }
             if (entry.length() > maxCharactersPerLine) {
-                int size = 30;
+                int size = maxCharactersPerLine;
                 //for languages that have no spaces
                 if (!entry.contains(" ")) {
                     List<String> substrings = new ArrayList<>((entry.length() + size - 1) / size);

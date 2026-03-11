@@ -11,6 +11,7 @@ import com.magmaguy.elitemobs.treasurechest.TreasureChest;
 import com.magmaguy.magmacore.menus.ContentPackage;
 import com.magmaguy.magmacore.nightbreak.NightbreakAccount;
 import com.magmaguy.magmacore.nightbreak.NightbreakContentManager;
+import com.magmaguy.magmacore.nightbreak.NightbreakManagedContent;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
 import com.magmaguy.magmacore.util.Logger;
 import com.magmaguy.magmacore.util.SpigotMessage;
@@ -26,7 +27,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.io.File;
 import java.util.*;
 
-public abstract class EMPackage extends ContentPackage {
+public abstract class EMPackage extends ContentPackage implements NightbreakManagedContent {
 
     protected static final HashMap<String, EMPackage> content = new HashMap<>();
     @Getter
@@ -321,7 +322,7 @@ public abstract class EMPackage extends ContentPackage {
         // Check access first
         player.sendMessage(DungeonsConfig.getContentCheckingAccessMessage().replace("$name", contentPackagesConfigFields.getName()));
 
-        NightbreakContentManager.checkAccessAsync(slug, accessInfo -> {
+        NightbreakContentManager.checkAccessAsync(MetadataHandler.PLUGIN, slug, accessInfo -> {
             cachedAccessInfo = accessInfo;
 
             if (!player.isOnline()) return;
@@ -343,7 +344,7 @@ public abstract class EMPackage extends ContentPackage {
                 importsFolder.mkdirs();
             }
 
-            NightbreakContentManager.downloadAsync(slug, importsFolder, player, success -> {
+            NightbreakContentManager.downloadAsync(MetadataHandler.PLUGIN, slug, importsFolder, player, success -> {
                 if (success && player.isOnline()) {
                     player.sendMessage(DungeonsConfig.getContentDownloadedReloadMessage());
                     // Schedule reload after a short delay
@@ -427,6 +428,26 @@ public abstract class EMPackage extends ContentPackage {
     public boolean isOutOfDate() {
         if (!isInstalled) return false;
         return outOfDate;
+    }
+
+    @Override
+    public String getNightbreakSlug() {
+        return contentPackagesConfigFields.getNightbreakSlug();
+    }
+
+    @Override
+    public String getDisplayName() {
+        return contentPackagesConfigFields.getName();
+    }
+
+    @Override
+    public String getDownloadLink() {
+        return contentPackagesConfigFields.getDownloadLink();
+    }
+
+    @Override
+    public int getLocalVersion() {
+        return contentPackagesConfigFields.getDungeonVersion();
     }
 
     /**

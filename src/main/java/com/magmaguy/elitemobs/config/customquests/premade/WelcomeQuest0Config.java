@@ -12,7 +12,7 @@ public class WelcomeQuest0Config extends CustomQuestsConfigFields {
                 true,
                 Map.of("Objective1", Map.of("objectiveType", "DIALOG",
                         "filename", "guide_1.yml",
-                        "npcName", "Odigos",
+                        "npcName", "Casus",
                         "location", "at the Adventurer's Guild",
                         "dialog", List.of(
                                 "&8[&aCasus&8]&f Welcome to the Adventurer's Guild Hub, the hub for all things EliteMobs!",
@@ -25,7 +25,7 @@ public class WelcomeQuest0Config extends CustomQuestsConfigFields {
         );
         setQuestLockoutPermission();
         setTurnInNPC("guide_1.yml");
-        setQuestAcceptDialog(new ArrayList<>(List.of("&8[Odigos]&f Alright, make sure you use &2/ag &f or &2/adventurersguild&f to head off to the Adventurer's Guild Hub!",
+        setQuestAcceptDialog(new ArrayList<>(List.of("&8[Dux]&f Alright, make sure you use &2/ag &f or &2/adventurersguild&f to head off to the Adventurer's Guild Hub!",
                 "Make sure you talk to Casus when you're there!")));
     }
 }

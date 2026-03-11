@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.items;
 
 import com.magmaguy.elitemobs.antiexploit.FarmingProtection;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
+import com.magmaguy.elitemobs.combatsystem.ScaledCombatRewardResolver;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.ProceduralItemGenerationSettingsConfig;
 import com.magmaguy.elitemobs.config.SpecialItemSystemsConfig;
@@ -48,9 +49,11 @@ public class LootTables implements Listener {
 
             if (!eliteEntity.isEliteLoot()) continue;
 
+            int rewardLevel = ScaledCombatRewardResolver.getRewardLevel(eliteEntity, player);
+
             // Check if mob is too low level for loot (5+ levels below combat level)
             // Only applies to natural elites, not custom bosses
-            if (!(eliteEntity instanceof CustomBossEntity) && !FarmingProtection.shouldDropLoot(player, eliteEntity.getLevel())) {
+            if (!(eliteEntity instanceof CustomBossEntity) && !FarmingProtection.shouldDropLoot(player, rewardLevel)) {
                 continue; // No loot for low-level mobs
             }
 
@@ -59,8 +62,8 @@ public class LootTables implements Listener {
                 continue; // Player is capped, no loot
             }
 
-            double itemLevel = setItemTier(eliteEntity.getLevel());
-            double eliteLevel = eliteEntity.getLevel();
+            double itemLevel = setItemTier(rewardLevel);
+            double eliteLevel = rewardLevel;
 
             if (eliteEntity.getPower("bonus_coins.yml") == null)
                 new ItemLootShower(itemLevel, eliteLevel, eliteEntity.getUnsyncedLivingEntity().getLocation(), player);

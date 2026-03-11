@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>
  * The offensive damage formula uses multiplicative layers:
  * <pre>
- * formulaDamage = baseDamage × attackSpeedFactor × skillAdjustment × weaponAdjustment × cooldownOrVelocity × sweepMultiplier
+ * formulaDamage = baseDamage × attackSpeedFactor × skillAdjustment × weaponAdjustment × cooldownOrVelocity × sweepMultiplier × potionMultiplier
  * finalDamage = max(formulaDamage, 1) × damageModifier × combatMultiplier × critMultiplier
  * </pre>
  * <p>
@@ -42,6 +42,7 @@ public class DamageBreakdown {
     @Getter @Setter private double weaponAdjustment = 1.0;
     @Getter @Setter private double cooldownOrVelocity = 1.0;
     @Getter @Setter private double sweepMultiplier = 1.0;
+    @Getter @Setter private double potionMultiplier = 1.0;
     @Getter @Setter private double thornsDamage = 0;
     @Getter @Setter private double enchantmentMultiplier = 1.0;
     @Getter @Setter private double arrowDamageMultiplier = 1.0;
@@ -154,6 +155,7 @@ public class DamageBreakdown {
         } else {
             formulaDamage = baseDamage * attackSpeedFactor * skillAdjustment
                     * weaponAdjustment * cooldownOrVelocity * sweepMultiplier
+                    * potionMultiplier
                     * enchantmentMultiplier * arrowDamageMultiplier;
         }
 
@@ -194,6 +196,9 @@ public class DamageBreakdown {
                     isRangedAttack ? "Arrow Velocity" : "Attack Cooldown", cooldownOrVelocity));
             if (isSweepAttack) {
                 sb.append(String.format("§7Sweep Reduction: §c%.0f%%\n", sweepMultiplier * 100));
+            }
+            if (potionMultiplier != 1.0) {
+                sb.append(String.format("§7Potion Multiplier: §e%.2fx\n", potionMultiplier));
             }
             if (enchantmentMultiplier != 1.0) {
                 sb.append(String.format("§7Enchantment Multiplier: §e%.2fx\n", enchantmentMultiplier));

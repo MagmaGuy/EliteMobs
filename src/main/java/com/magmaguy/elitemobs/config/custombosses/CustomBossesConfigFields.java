@@ -183,6 +183,9 @@ public class CustomBossesConfigFields extends CustomConfigFields {
     private boolean normalizedCombat = false;
     @Getter
     @Setter
+    private boolean scaledCombat = false;
+    @Getter
+    @Setter
     private Double movementSpeedAttribute = null;
     //this saves files for regional boss respawn cooldowns
     @Getter
@@ -271,6 +274,18 @@ public class CustomBossesConfigFields extends CustomConfigFields {
                 .replace("$bossLevel", ChatColorConverter.convert("&4『&c" + cleanNameLevel + "&4』&f"))
                 .replace("$reinforcementLevel", ChatColorConverter.convert("&8〔&7") + cleanNameLevel + "&8〕&f")
                 .replace("$eventBossLevel", ChatColorConverter.convert("&4「&c" + cleanNameLevel + "&4」&f")));
+    }
+
+    private boolean hasAnnouncementContent() {
+        return hasText(locationMessage) ||
+                hasText(spawnMessage) ||
+                hasText(deathMessage) ||
+                hasText(escapeMessage) ||
+                (deathMessages != null && !deathMessages.isEmpty());
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.isBlank();
     }
 
     public void runtimeSetLeashRadius(double leashRadius) {
@@ -368,7 +383,7 @@ public class CustomBossesConfigFields extends CustomConfigFields {
         this.customDisguiseData = processString("customDisguiseData", customDisguiseData, null, false);
         this.customModel = processString("customModel", customModel, null, false);
 
-        this.announcementPriority = processInt("announcementPriority", announcementPriority, 0, false);
+        this.announcementPriority = processInt("announcementPriority", announcementPriority, hasAnnouncementContent() ? 1 : 0, false);
         this.followDistance = processInt("followDistance", followDistance, 0, false);
         this.spawnCooldown = processInt("spawnCooldown", spawnCooldown, 0, false);
         this.timeout = processInt("timeout", timeout, 0, false);
@@ -390,6 +405,8 @@ public class CustomBossesConfigFields extends CustomConfigFields {
             this.normalizedCombat = true;
         else
             this.normalizedCombat = processBoolean("normalizedCombat", normalizedCombat, false, false);
+
+        this.scaledCombat = processBoolean("scaledCombat", scaledCombat, false, false);
 
         this.movementSpeedAttribute = processDouble("movementSpeedAttribute", movementSpeedAttribute, null, false);
 
