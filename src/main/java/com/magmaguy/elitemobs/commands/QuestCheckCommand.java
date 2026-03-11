@@ -13,6 +13,7 @@ import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
 import com.magmaguy.magmacore.command.arguments.ListStringCommandArgument;
 import com.magmaguy.magmacore.dialog.DialogManager;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -32,7 +33,23 @@ public class QuestCheckCommand extends AdvancedCommand {
 
     private static String processText(String text) {
         if (text == null) return null;
-        return text.replace("§0", "§f").replace("&0", "&f");
+        return ChatColor.stripColor(
+                ChatColor.translateAlternateColorCodes('&',
+                        text.replace("§0", "§f")
+                                .replace("&0", "&f")
+                                .replace("\r", "")
+                )
+        );
+    }
+
+    private static String processSingleLineText(String text) {
+        String processedText = processText(text);
+        if (processedText == null) return null;
+
+        return processedText
+                .replace('\n', ' ')
+                .replaceAll("\\s+", " ")
+                .trim();
     }
 
     @Override
@@ -72,7 +89,7 @@ public class QuestCheckCommand extends AdvancedCommand {
         DialogManager.MultiActionDialogBuilder builder = new DialogManager.MultiActionDialogBuilder();
 
         // Set title
-        String title = processText(questText.getHeader().toPlainText());
+        String title = processSingleLineText(questText.getHeader().toPlainText());
         if (title != null && !title.isEmpty()) {
             builder.title(title);
         }
@@ -86,7 +103,7 @@ public class QuestCheckCommand extends AdvancedCommand {
                 statusSuffix = QuestsConfig.getQuestAcceptedStatus();
             }
         }
-        builder.externalTitle(title + statusSuffix);
+        builder.externalTitle(processSingleLineText(title + statusSuffix));
 
         // Add quest body (description)
         addBodySection(builder, questText.getBody());
@@ -102,7 +119,7 @@ public class QuestCheckCommand extends AdvancedCommand {
 
         // Add back button to return to status menu
         builder.addAction(DialogManager.ActionButton.of(
-                QuestsConfig.getQuestBackToStatusMenu(),
+                processSingleLineText(QuestsConfig.getQuestBackToStatusMenu()),
                 new DialogManager.RunCommandAction("/elitemobs")
         ).width(QUEST_DIALOG_WIDTH));
 
@@ -212,9 +229,9 @@ public class QuestCheckCommand extends AdvancedCommand {
             return;
         }
 
-        String text = processText(component.toPlainText());
+        String text = processSingleLineText(component.toPlainText());
         if (text.contains("[Abandon]")) {
-            text = QuestsConfig.getQuestAbandonText();
+            text = processSingleLineText(QuestsConfig.getQuestAbandonText());
         }
 
         String command = extractCommandFromComponent(component);

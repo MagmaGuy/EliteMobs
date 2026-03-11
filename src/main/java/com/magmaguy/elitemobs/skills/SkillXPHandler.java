@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.skills;
 
 import com.magmaguy.elitemobs.antiexploit.FarmingProtection;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
+import com.magmaguy.elitemobs.combatsystem.ScaledCombatRewardResolver;
 import com.magmaguy.elitemobs.combatsystem.displays.BossHealthDisplay;
 import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.elitemobs.config.SkillsConfig;
@@ -47,8 +48,6 @@ public class SkillXPHandler implements Listener {
             if (!customBoss.getCustomBossesConfigFields().isDropsSkillXP()) return;
         }
 
-        int mobLevel = eliteEntity.getLevel();
-
         // Capture the death location for XP popups (before entity becomes invalid)
         Location deathLocation = eliteEntity.getLocation();
 
@@ -68,6 +67,8 @@ public class SkillXPHandler implements Listener {
             if (player.hasMetadata("NPC")) continue;
             if (!PlayerData.isInMemory(player.getUniqueId())) continue;
 
+            int rewardLevel = ScaledCombatRewardResolver.getRewardLevel(eliteEntity, player);
+
             // Check farming protection for natural elites
             if (!(eliteEntity instanceof CustomBossEntity)) {
                 if (!FarmingProtection.recordNaturalEliteKill(player, eliteEntity)) {
@@ -76,19 +77,19 @@ public class SkillXPHandler implements Listener {
             }
 
             // Get effective mob level (capped at +5 above combat level)
-            int effectiveMobLevel = FarmingProtection.getEffectiveMobLevelForXP(player, mobLevel);
+            int effectiveMobLevel = FarmingProtection.getEffectiveMobLevelForXP(player, rewardLevel);
 
             // Check if mob is too low level for XP (5+ levels below)
-            double xpMultiplier = FarmingProtection.getXPMultiplier(player, mobLevel);
+            double xpMultiplier = FarmingProtection.getXPMultiplier(player, rewardLevel);
             if (xpMultiplier <= 0) {
                 // Notify player that mob is too low level
-                notifyLevelDifferenceLimit(player, mobLevel, true);
+                notifyLevelDifferenceLimit(player, rewardLevel, true);
                 continue; // No XP for low-level mobs
             }
 
             // Notify if XP is capped due to high mob level
-            if (effectiveMobLevel < mobLevel) {
-                notifyLevelDifferenceLimit(player, mobLevel, false);
+            if (effectiveMobLevel < rewardLevel) {
+                notifyLevelDifferenceLimit(player, rewardLevel, false);
             }
 
             // Calculate base XP using effective mob level

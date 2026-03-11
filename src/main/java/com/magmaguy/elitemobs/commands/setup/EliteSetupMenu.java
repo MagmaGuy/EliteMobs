@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.commands.setup;
 
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.InitializeConfig;
@@ -17,6 +18,7 @@ import com.magmaguy.magmacore.util.SpigotMessage;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -93,7 +95,7 @@ public class EliteSetupMenu {
         if (DefaultConfig.useResourcePackModels())
             menuTitle = ChatColor.WHITE + "\uDB83\uDEF1\uDB83\uDE0B\uDB83\uDEF5          " + menuTitle;
 
-        new SetupMenu(player, infoButton, allPackages,
+        new SetupMenu((JavaPlugin) MetadataHandler.PLUGIN, player, infoButton, allPackages,
                 List.of(createFilter(emPackages, Material.GRASS_BLOCK, "Filter By Dungeons", EliteSetupMenu::filterDungeon),
                         createFilter(emPackages, Material.SKULL_BANNER_PATTERN, "Filter By Events", EliteSetupMenu::filterEvents),
                         createFilter(emPackages, Material.ARMOR_STAND, "Filter By Custom Models", EliteSetupMenu::filterModels)),

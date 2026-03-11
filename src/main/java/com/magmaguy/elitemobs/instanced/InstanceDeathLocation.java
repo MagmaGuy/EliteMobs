@@ -64,6 +64,10 @@ public class InstanceDeathLocation {
             matchInstance.revivePlayer(deadPlayer, this);
     }
 
+    public Location getRespawnLocation() {
+        return bannerBlock.getLocation().clone().add(0.5, 0, 0.5);
+    }
+
     //This is necessary because physics updates might remove the banner while it should still be on there
     public void bannerWatchdog() {
         new BukkitRunnable() {

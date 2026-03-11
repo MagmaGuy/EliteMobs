@@ -71,7 +71,10 @@ public class WormholeManager {
         List<Player> nearbyPlayers = new ArrayList<>();
         Location wormholeLocation = wormholeEntry.getLocation();
 
-        if (wormholeLocation == null || wormholeLocation.getWorld() == null) {
+        if (wormholeLocation == null) return nearbyPlayers;
+        try {
+            if (wormholeLocation.getWorld() == null) return nearbyPlayers;
+        } catch (IllegalArgumentException e) {
             return nearbyPlayers;
         }
 
@@ -144,8 +147,16 @@ public class WormholeManager {
 
         Location destination = destinationEntry.getLocation();
 
-        // Check if destination is valid
-        if (destination == null || destination.getWorld() == null) {
+        // Check if destination is valid - Location.getWorld() throws on Paper when world is unloaded
+        boolean destinationInvalid = destination == null;
+        if (!destinationInvalid) {
+            try {
+                destinationInvalid = destination.getWorld() == null;
+            } catch (IllegalArgumentException e) {
+                destinationInvalid = true;
+            }
+        }
+        if (destinationInvalid) {
             // Check destination entry for messages first (it's the broken side), then source entry
             String missingMessage = destinationEntry.getPortalMissingMessage();
             if (missingMessage == null) missingMessage = sourceEntry.getPortalMissingMessage();
@@ -213,12 +224,16 @@ public class WormholeManager {
     public void addPlayerToCooldown(Player player, Location destination) {
         WormholeEntry destinationEntry = null;
         for (WormholeEntry wormholeEntry : WormholeEntry.getWormholeEntries()) {
-            if (wormholeEntry.getLocation() != null &&
-                    wormholeEntry.getLocation().getWorld() != null &&
-                    wormholeEntry.getLocation().getWorld().equals(destination.getWorld()) &&
-                    destination.distanceSquared(wormholeEntry.getLocation()) <= Math.pow(TELEPORT_DISTANCE_MULTIPLIER * wormholeEntry.getWormhole().getWormholeConfigFields().getSizeMultiplier(), 2)) {
-                destinationEntry = wormholeEntry;
-                break;
+            try {
+                if (wormholeEntry.getLocation() != null &&
+                        wormholeEntry.getLocation().getWorld() != null &&
+                        wormholeEntry.getLocation().getWorld().equals(destination.getWorld()) &&
+                        destination.distanceSquared(wormholeEntry.getLocation()) <= Math.pow(TELEPORT_DISTANCE_MULTIPLIER * wormholeEntry.getWormhole().getWormholeConfigFields().getSizeMultiplier(), 2)) {
+                    destinationEntry = wormholeEntry;
+                    break;
+                }
+            } catch (IllegalArgumentException e) {
+                // World unloaded, skip this entry
             }
         }
         if (destinationEntry == null) return;
@@ -275,10 +290,14 @@ public class WormholeManager {
 
         // Tick all wormhole entries with distance-based culling
         for (WormholeEntry wormholeEntry : new java.util.ArrayList<>(WormholeEntry.getWormholeEntries())) {
-            // Skip if chunk isn't loaded
-            if (wormholeEntry.getLocation() == null ||
-                wormholeEntry.getLocation().getWorld() == null ||
-                !ChunkLocationChecker.chunkAtLocationIsLoaded(wormholeEntry.getLocation())) {
+            // Skip if chunk isn't loaded - Location.getWorld() throws IllegalArgumentException on Paper when world is unloaded
+            if (wormholeEntry.getLocation() == null) continue;
+            try {
+                if (wormholeEntry.getLocation().getWorld() == null ||
+                    !ChunkLocationChecker.chunkAtLocationIsLoaded(wormholeEntry.getLocation())) {
+                    continue;
+                }
+            } catch (IllegalArgumentException e) {
                 continue;
             }
 
@@ -328,7 +347,11 @@ public class WormholeManager {
 
         private boolean isHasLeftTeleportRadius() {
             if (hasLeftTeleportRadius) return true;
-            if (!player.getWorld().equals(destination.getWorld())) return false;
+            try {
+                if (!player.getWorld().equals(destination.getWorld())) return false;
+            } catch (IllegalArgumentException e) {
+                return false;
+            }
             if (destination.distanceSquared(player.getLocation()) > Math.pow(TELEPORT_DISTANCE_MULTIPLIER * wormholeEntry.getWormhole().getWormholeConfigFields().getSizeMultiplier() + SAFE_DISTANCE, 2))
                 return hasLeftTeleportRadius = true;
             return false;

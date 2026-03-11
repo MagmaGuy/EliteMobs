@@ -209,6 +209,14 @@ public class BossHealthDisplay implements Listener {
         return String.valueOf(Round.twoDecimalPlaces(value));
     }
 
+    private static String formatPercentage(double ratio) {
+        double percent = Math.max(0, ratio) * 100;
+        if (percent >= 99.95) return "100%";
+        if (percent >= 10) return Math.round(percent) + "%";
+        if (percent >= 1) return Round.twoDecimalPlaces(percent) + "%";
+        return String.format(Locale.US, "%.3f%%", percent);
+    }
+
     /**
      * Gets or creates display data for an elite entity
      */
@@ -440,7 +448,12 @@ public class BossHealthDisplay implements Listener {
             textBuilder.append("&l");
         }
 
-        textBuilder.append(formatNumber(damage));
+        if (eliteEntity.isScaledCombat()) {
+            double maxHealth = Math.max(1D, eliteEntity.getMaxHealth());
+            textBuilder.append(formatPercentage(damage / maxHealth));
+        } else {
+            textBuilder.append(formatNumber(damage));
+        }
 
         // Create popup with enhanced display
         createAnimatedPopup(baseLoc, ChatColorConverter.convert(textBuilder.toString()),
@@ -954,7 +967,12 @@ public class BossHealthDisplay implements Listener {
             double healthPercent = (currentHealth / maxHealth) * 100;
             String color = getHealthColor(healthPercent);
 
-            String numericText = color + "&l" + formatNumber(currentHealth) + MobCombatSettingsConfig.getHealthDisplaySeparator() + color + "&l" + formatNumber(maxHealth);
+            String numericText;
+            if (eliteEntity.isScaledCombat()) {
+                numericText = color + "&l" + formatPercentage(currentHealth / maxHealth);
+            } else {
+                numericText = color + "&l" + formatNumber(currentHealth) + MobCombatSettingsConfig.getHealthDisplaySeparator() + color + "&l" + formatNumber(maxHealth);
+            }
 
             Location baseLoc = getBaseLocation();
             if (baseLoc == null) return;

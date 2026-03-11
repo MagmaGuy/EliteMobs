@@ -12,6 +12,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,12 +77,12 @@ public class CustomQuestMenuConfig extends MenusConfigFields {
         if (objective instanceof CustomKillObjective)
             newString = killQuestDefaultSummaryLine;
         else if (objective instanceof DialogObjective)
-            newString = dialogQuestDefaultSummaryLine.replace("$location", ((DialogObjective) objective).getTargetLocation());
+            newString = dialogQuestDefaultSummaryLine.replace("$location", safeString(((DialogObjective) objective).getTargetLocation()));
         else if (objective instanceof CustomFetchObjective)
             newString = fetchQuestDefaultSummaryLine;
         else if (objective instanceof ArenaObjective)
             newString = arenaQuestDefaultSummaryLine;
-        newString = newString.replace("$name", ChatColor.BLACK + ChatColor.stripColor(objective.getObjectiveName()));
+        newString = newString.replace("$name", safeObjectiveName(objective));
         newString = newString.replace("$current", objective.getCurrentAmount() + "");
         newString = newString.replace("$target", objective.getTargetAmount() + "");
         if (!objective.isObjectiveCompleted())
@@ -100,9 +101,13 @@ public class CustomQuestMenuConfig extends MenusConfigFields {
             else if (customLootEntry instanceof ItemStackCustomLootEntry)
                 itemStack = ((ItemStackCustomLootEntry) customLootEntry).generateItemStack();
             if (itemStack != null) {
+                ItemMeta itemMeta = itemStack.getItemMeta();
+                String rewardName = itemMeta != null && itemMeta.getDisplayName() != null && !itemMeta.getDisplayName().isEmpty() ?
+                        itemMeta.getDisplayName() :
+                        itemStack.getType().toString().replace("_", " ");
                 textComponent.add(new TextComponent(rewardsDefaultSummaryLine
                         .replace("$amount", customLootEntry.getAmount() + "")
-                        .replace("$rewardName", itemStack.getItemMeta().getDisplayName())
+                        .replace("$rewardName", rewardName)
                         .replace("$chance", (int) (customLootEntry.getChance() * 100) + "")));
                 continue;
             }
@@ -126,6 +131,16 @@ public class CustomQuestMenuConfig extends MenusConfigFields {
             }
         }
         return textComponent;
+    }
+
+    private static String safeObjectiveName(Objective objective) {
+        if (objective == null || objective.getObjectiveName() == null) return "";
+        String strippedName = ChatColor.stripColor(objective.getObjectiveName());
+        return ChatColor.BLACK + safeString(strippedName);
+    }
+
+    private static String safeString(String value) {
+        return value == null ? "" : value;
     }
 
 

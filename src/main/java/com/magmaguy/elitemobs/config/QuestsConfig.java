@@ -181,7 +181,7 @@ public class QuestsConfig extends ConfigurationFile {
             newString = fetchQuestChatProgressionMessage;
         else if (objective instanceof DialogObjective)
             newString = dialogQuestChatProgressionMessage;
-        newString = newString.replace("$name", ChatColor.WHITE + ChatColor.stripColor(objective.getObjectiveName()));
+        newString = newString.replace("$name", safeObjectiveName(objective));
         newString = newString.replace("$current", objective.getCurrentAmount() + "");
         newString = newString.replace("$target", objective.getTargetAmount() + "");
         if (!objective.isObjectiveCompleted())
@@ -200,13 +200,19 @@ public class QuestsConfig extends ConfigurationFile {
             newString = fetchQuestScoreboardProgressionLine;
         else if (objective instanceof DialogObjective)
             newString = dialogQuestScoreboardProgressionLine;
-        newString = newString.replace("$name", ChatColor.WHITE + ChatColor.stripColor(objective.getObjectiveName()));
+        newString = newString.replace("$name", safeObjectiveName(objective));
         newString = newString.replace("$current", objective.getCurrentAmount() + "");
         newString = newString.replace("$target", objective.getTargetAmount() + "");
         if (!objective.isObjectiveCompleted())
             return newString.replace("$color", ongoingColorCode);
         else
             return newString.replace("$color", completedColorCode);
+    }
+
+    private static String safeObjectiveName(Objective objective) {
+        if (objective == null || objective.getObjectiveName() == null) return "";
+        String strippedName = ChatColor.stripColor(objective.getObjectiveName());
+        return ChatColor.WHITE + (strippedName == null ? "" : strippedName);
     }
 
     @Override

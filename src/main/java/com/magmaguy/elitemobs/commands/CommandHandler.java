@@ -30,6 +30,7 @@ public class CommandHandler {
         emCommand.registerCommand(new StatsCommand());
         emCommand.registerCommand(new LootMenuCommand());
         emCommand.registerCommand(new LootGiveCommand());
+        emCommand.registerCommand(new LootRewardCommand());
         emCommand.registerCommand(new LootRandomCommand());
         emCommand.registerCommand(new LootSimulateMultipleCommand());
         emCommand.registerCommand(new LootSimulateCommand());
@@ -39,6 +40,7 @@ public class CommandHandler {
         emCommand.registerCommand(new KillRadiusCommand());
         emCommand.registerCommand(new KillTypeCommand());
         emCommand.registerCommand(new KillTypeRadiusCommand());
+        emCommand.registerCommand(new LootDebugLimitedCommand());
         emCommand.registerCommand(new LootDebugCommand());
         emCommand.registerCommand(new MoneyAddCommand());
         emCommand.registerCommand(new MoneyAddAllCommand());
@@ -107,6 +109,7 @@ public class CommandHandler {
         emCommand.registerCommand(new AltCommand());
         emCommand.registerCommand(new SpawnTeleportCommand());
         emCommand.registerCommand(new DungeonTeleportCommand());
+        emCommand.registerCommand(new DungeonTeleportDialogCommand());
         emCommand.registerCommand(new TrackBossCommand());
         emCommand.registerCommand(new PayCommand());
         emCommand.registerCommand(new AdventurersGuildArgCommand());

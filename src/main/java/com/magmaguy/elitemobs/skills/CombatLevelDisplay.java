@@ -4,6 +4,7 @@ import com.magmaguy.easyminecraftgoals.NMSManager;
 import com.magmaguy.easyminecraftgoals.internal.FakeText;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.SkillsConfig;
+import com.magmaguy.elitemobs.thirdparty.geyser.GeyserDetector;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Display;
@@ -31,6 +32,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class CombatLevelDisplay implements Listener {
 
+    private static final float DEFAULT_Y_TRANSLATION = 0.5f;
+    private static final float BEDROCK_Y_TRANSLATION_BONUS = 1.0f;
     private static final Map<UUID, FakeText> playerDisplays = new ConcurrentHashMap<>();
 
     /**
@@ -52,7 +55,7 @@ public class CombatLevelDisplay implements Listener {
                 .billboard(Display.Billboard.CENTER)
                 .shadow(true)
                 .seeThrough(false)
-                .translation(0, 0.5f, 0) // Offset upward
+                .translation(0, getDisplayHeight(player), 0)
                 .build(player.getLocation());
 
         playerDisplays.put(player.getUniqueId(), fakeText);
@@ -60,6 +63,10 @@ public class CombatLevelDisplay implements Listener {
         // Attach to the player - this mounts and registers with the global tracker
         // which handles visibility, world changes, respawns, etc. automatically
         fakeText.attachTo(player);
+    }
+
+    private static float getDisplayHeight(Player player) {
+        return DEFAULT_Y_TRANSLATION + (GeyserDetector.bedrockPlayer(player) ? BEDROCK_Y_TRANSLATION_BONUS : 0f);
     }
 
     /**

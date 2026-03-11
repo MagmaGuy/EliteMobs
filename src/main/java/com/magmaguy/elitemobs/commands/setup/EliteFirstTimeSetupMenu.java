@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.commands.setup;
 
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.commands.ReloadCommand;
 import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.utils.DiscordLinks;
@@ -10,6 +11,7 @@ import com.magmaguy.magmacore.util.Logger;
 import com.magmaguy.magmacore.util.SpigotMessage;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +20,7 @@ public class EliteFirstTimeSetupMenu {
 
     public static void createMenu(Player player) {
         new FirstTimeSetupMenu(
+                (JavaPlugin) MetadataHandler.PLUGIN,
                 player,
                 InitializeConfig.getMenuTitle(),
                 InitializeConfig.getMenuSubtitle(),
