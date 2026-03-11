@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.mobconstructor.custombosses;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
+import com.magmaguy.elitemobs.wormhole.WormholeNavigation;
 import com.magmaguy.magmacore.util.Logger;
 import com.magmaguy.magmacore.util.Round;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -10,6 +11,7 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarFlag;
 import org.bukkit.boss.BarStyle;
@@ -25,6 +27,7 @@ import java.util.HashSet;
 import java.util.Map;
 
 public class CustomBossBossBar {
+    private static final String DEFAULT_LOCATION_MESSAGE = "$name: $distance blocks away!";
 
     private final CustomBossEntity customBossEntity;
     private final Map<Player, BossBar> bossBars = new HashMap<>();
@@ -81,19 +84,25 @@ public class CustomBossBossBar {
      * @return
      */
     public String bossBarMessage(Player player, String locationString) {
-        if (customBossEntity.getCustomBossesConfigFields().getLocationMessage() == null) return "";
-        if (customBossEntity.getCustomBossesConfigFields().getLocationMessage().contains("$distance") ||
-                customBossEntity.getCustomBossesConfigFields().getLocationMessage().contains("$location")) {
-            if (!player.getLocation().getWorld().equals(customBossEntity.getLocation().getWorld()))
-                return MobCombatSettingsConfig.getDefaultOtherWorldBossLocationMessage()
-                        .replace("$name", customBossEntity.getName());
+        String locationMessage = getLocationMessageTemplate();
+        Location trackedLocation = getTrackedLocation(player);
+        if (trackedLocation == null)
+            return MobCombatSettingsConfig.getDefaultOtherWorldBossLocationMessage()
+                    .replace("$name", customBossEntity.getName());
 
-            return customBossEntity.getCustomBossesConfigFields().getLocationMessage()
-                            .replace("$distance", "" + (int) customBossEntity.getLocation().distance(player.getLocation()))
-                    .replace("$location", locationString);
+        if (locationMessage.contains("$distance") ||
+                locationMessage.contains("$location") ||
+                locationMessage.contains("$name")) {
+            String trackedLocationString = trackedLocation.getBlockX() +
+                    ", " + trackedLocation.getBlockY() +
+                    ", " + trackedLocation.getBlockZ();
+            return locationMessage
+                    .replace("$name", customBossEntity.getName())
+                    .replace("$distance", "" + (int) trackedLocation.distance(player.getLocation()))
+                    .replace("$location", trackedLocationString);
         }
 
-        return customBossEntity.getCustomBossesConfigFields().getLocationMessage();
+        return locationMessage;
 
     }
 
@@ -114,7 +123,7 @@ public class CustomBossBossBar {
             @Override
             public void run() {
                 //This can happen on phase changes where boss bars might not be configured on subsequent entities
-                if (!customBossEntity.exists() || customBossEntity.getCustomBossesConfigFields().getLocationMessage() == null) {
+                if (!customBossEntity.exists()) {
                     cancel();
                     remove();
                     return;
@@ -171,6 +180,18 @@ public class CustomBossBossBar {
         bossBars.put(player, bossBar);
         updateBossBar(player, bossBar);
         bossBar.addPlayer(player);
+    }
+
+    private String getLocationMessageTemplate() {
+        String configuredLocationMessage = customBossEntity.getCustomBossesConfigFields().getLocationMessage();
+        if (configuredLocationMessage == null || configuredLocationMessage.isBlank())
+            return DEFAULT_LOCATION_MESSAGE;
+        return configuredLocationMessage;
+    }
+
+    private Location getTrackedLocation(Player player) {
+        if (player == null) return null;
+        return WormholeNavigation.findNavigationTarget(player.getLocation(), customBossEntity.getLocation());
     }
 
 }

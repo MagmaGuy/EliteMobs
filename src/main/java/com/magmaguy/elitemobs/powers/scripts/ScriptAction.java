@@ -1061,27 +1061,41 @@ public class ScriptAction {
             return;
         }
 
-        getLocationTargets(scriptActionData).forEach(location -> {
+        Class<? extends Entity> entityClass = entityType.getEntityClass();
+        if (entityClass == null) {
+            Logger.warn("getEntityClass() returned null for EntityType " + entityType + " in script '" + blueprint.getScriptName() + "' in file '" + blueprint.getScriptFilename() + "'");
+            return;
+        }
+
+        Collection<Location> locationTargets = getLocationTargets(scriptActionData);
+        if (locationTargets.isEmpty()) return;
+
+        locationTargets.forEach(location -> {
+            if (location == null || location.getWorld() == null) return;
+
             Vector velocity = blueprint.getScriptRelativeVectorBlueprint() != null
                     ? new ScriptRelativeVector(blueprint.getScriptRelativeVectorBlueprint(), eliteScript, location).getVector(scriptActionData)
                     : blueprint.getVValue();
 
+            boolean isProjectile = Projectile.class.isAssignableFrom(entityClass);
+            boolean hasLivingEntity = scriptActionData.getEliteEntity().getLivingEntity() != null;
+
             try {
                 Entity entity;
-                if (scriptActionData.getEliteEntity().getLivingEntity() != null && Projectile.class.isAssignableFrom(entityType.getEntityClass())) {
-                    entity = scriptActionData.getEliteEntity().getLivingEntity().launchProjectile(entityType.getEntityClass().asSubclass(Projectile.class), velocity);
+                if (hasLivingEntity && isProjectile) {
+                    entity = scriptActionData.getEliteEntity().getLivingEntity().launchProjectile(entityClass.asSubclass(Projectile.class), velocity);
                     ((Projectile) entity).setShooter(scriptActionData.getEliteEntity().getLivingEntity());
                     if (entity instanceof Fireball fireball) {
                         fireball.setDirection(velocity);
                     }
                 } else {
-                    entity = location.getWorld().spawn(location, entityType.getEntityClass());
+                    entity = location.getWorld().spawn(location, entityClass);
                     if (velocity != null) {
                         entity.setVelocity(velocity);
                     }
                 }
 
-                if (blueprint.getDuration().getValue() != null && entity != null) {
+                if (blueprint.getDuration().getValue() != null && blueprint.getDuration().getValue() > 0 && entity != null) {
                     new BukkitRunnable() {
                         @Override
                         public void run() {
@@ -1108,7 +1122,7 @@ public class ScriptAction {
                     }.runTaskTimer(MetadataHandler.PLUGIN, 1, 1);
                 }
             } catch (Exception e) {
-                Logger.warn("Failed to summon entity at location '" + location + "' in script '" + blueprint.getScriptName() + "': " + e.getMessage());
+                Logger.warn("Failed to summon entity in script '" + blueprint.getScriptName() + "' in file '" + blueprint.getScriptFilename() + "': " + e.getMessage());
             }
         });
     }

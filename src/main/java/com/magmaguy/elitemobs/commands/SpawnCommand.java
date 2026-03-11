@@ -31,6 +31,7 @@ public class SpawnCommand {
         LivingEntity livingEntity = (LivingEntity) player.getLocation().getWorld().spawnEntity(getLocation(player), entityType);
         EliteEntity eliteEntity = new EliteEntity();
         eliteEntity.setLevel(level);
+        eliteEntity.setNaturalEntity(true);
 
         if (powers.isPresent()) {
             String[] powersArray = powers.get().split(" ");
@@ -77,6 +78,7 @@ public class SpawnCommand {
         }
         EliteEntity eliteEntity = new EliteEntity();
         eliteEntity.setLevel(level);
+        eliteEntity.setNaturalEntity(true);
         eliteEntity.setLivingEntity(livingEntity, CreatureSpawnEvent.SpawnReason.CUSTOM);
         if (!mobPowers.isEmpty()) eliteEntity.applyPowers(mobPowers);
         else eliteEntity.randomizePowers(EliteMobProperties.getPluginData(livingEntity));

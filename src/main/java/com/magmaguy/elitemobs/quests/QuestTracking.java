@@ -13,7 +13,7 @@ import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.objectives.*;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
-import com.magmaguy.elitemobs.wormhole.Wormhole;
+import com.magmaguy.elitemobs.wormhole.WormholeNavigation;
 import com.magmaguy.magmacore.util.SpigotMessage;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -230,31 +230,12 @@ public class QuestTracking {
             if (!locationsOutOfBounds) {
                 if (world != null) {
                     boolean wormholeIsViable = false;
-                    for (Wormhole wormhole : Wormhole.getWormholes()) {
-                        if (wormhole.getWormholeEntry1().getLocation() != null &&
-                                wormhole.getWormholeEntry1().getLocation().getWorld() != null &&
-                                wormhole.getWormholeEntry1().getLocation().getWorld().equals(player.getWorld())) {
-                            if (wormhole.getWormholeEntry2().getLocation() != null &&
-                                    wormhole.getWormholeEntry2().getLocation().getWorld() != null &&
-                                    wormhole.getWormholeEntry2().getLocation().getWorld().equals(world)) {
-                                LocationAndSymbol pair = processLocations(wormhole.getWormholeEntry1().getLocation(), null);
-                                if (pair != null)
-                                    compassText = compassText.substring(0, pair.getKey()) + pair.getValue() + compassText.substring(pair.getKey() + 1);
-                                wormholeIsViable = true;
-                            }
-
-                        } else if (wormhole.getWormholeEntry2().getLocation() != null &&
-                                wormhole.getWormholeEntry2().getLocation().getWorld() != null &&
-                                wormhole.getWormholeEntry2().getLocation().getWorld().equals(player.getWorld())) {
-                            if (wormhole.getWormholeEntry1().getLocation() != null &&
-                                    wormhole.getWormholeEntry1().getLocation().getWorld() != null &&
-                                    wormhole.getWormholeEntry1().getLocation().getWorld().equals(world)) {
-                                LocationAndSymbol pair = processLocations(wormhole.getWormholeEntry2().getLocation(), null);
-                                if (pair != null)
-                                    compassText = compassText.substring(0, pair.getKey()) + pair.getValue() + compassText.substring(pair.getKey() + 1);
-                                wormholeIsViable = true;
-                            }
-                        }
+                    Location wormholeLocation = WormholeNavigation.findDirectWormholeEntry(player.getWorld(), world);
+                    if (wormholeLocation != null) {
+                        LocationAndSymbol pair = processLocations(wormholeLocation, null);
+                        if (pair != null)
+                            compassText = compassText.substring(0, pair.getKey()) + pair.getValue() + compassText.substring(pair.getKey() + 1);
+                        wormholeIsViable = true;
                     }
                     if (!wormholeIsViable)
                         compassText = QuestsConfig.getQuestDestinationInOtherWorld().replace("$world", world.getName());

@@ -24,11 +24,12 @@ public class DynamicQuest extends Quest {
     private static final HashMap<Integer, List<QuestObjectives>> threeRandomDynamicObjectives = new HashMap<>();
     private static BukkitTask randomizerTask;
 
-    public DynamicQuest(Player player, int questLevel, QuestObjectives questObjectives) {
-        super(player, questObjectives, questLevel);
+    public DynamicQuest(Player player, int targetMobLevel, QuestObjectives questObjectives) {
+        super(player, questObjectives, DynamicQuestLevel.clamp(targetMobLevel));
+        DynamicKillObjective dynamicKillObjective = (DynamicKillObjective) questObjectives.getObjectives().get(0);
         super.questName = DynamicQuestMenuConfig.getQuestName()
                 .replace("$amount", questObjectives.getObjectives().get(0).getTargetAmount() + "")
-                .replace("$name", ChatColor.stripColor(EliteMobProperties.getPluginData(((DynamicKillObjective) questObjectives.getObjectives().get(0)).getEntityType()).getName(questLevel * 10)));
+                .replace("$name", ChatColor.stripColor(EliteMobProperties.getPluginData(dynamicKillObjective.getEntityType()).getName(dynamicKillObjective.getMinMobLevel())));
         questObjectives.setQuest(this);
     }
 
@@ -54,19 +55,28 @@ public class DynamicQuest extends Quest {
     }
 
     public static List<DynamicQuest> generateQuests(Player player) {
-        int combatLevel = CombatLevelCalculator.calculateCombatLevel(player.getUniqueId());
-        // Scale combat level (1-100) to quest level (1-20)
-        int questLevel = Math.min(20, Math.max(1, combatLevel / 5));
-        if (questLevel == 0) {
+        int combatLevel = DynamicQuestLevel.clamp(CombatLevelCalculator.calculateCombatLevel(player.getUniqueId()));
+        int questTemplateBucket = DynamicQuestLevel.toTemplateBucket(combatLevel);
+        if (questTemplateBucket == 0) {
             player.sendMessage(QuestsConfig.getLowRankDynamicQuestWarning());
             return new ArrayList<>();
         }
         List<DynamicQuest> dynamicQuests = new ArrayList<>();
 
-        for (QuestObjectives questObjectives : threeRandomDynamicObjectives.get(questLevel)) {
-            QuestReward questReward = new QuestReward(questLevel, questObjectives, player);
-            questObjectives.setQuestReward(questReward);
-            dynamicQuests.add(new DynamicQuest(player, questLevel, questObjectives));
+        List<QuestObjectives> questTemplates = threeRandomDynamicObjectives.get(questTemplateBucket);
+        if (questTemplates == null) return dynamicQuests;
+
+        for (QuestObjectives questTemplate : questTemplates) {
+            DynamicKillObjective templateObjective = (DynamicKillObjective) questTemplate.getObjectives().get(0);
+            QuestObjectives playerQuestObjectives = new QuestObjectives(
+                    questTemplate.getUuid(),
+                    List.of(new DynamicKillObjective(
+                            templateObjective.getTargetAmount(),
+                            templateObjective.getEntityType(),
+                            combatLevel)));
+            QuestReward questReward = new QuestReward(combatLevel, playerQuestObjectives, player);
+            playerQuestObjectives.setQuestReward(questReward);
+            dynamicQuests.add(new DynamicQuest(player, combatLevel, playerQuestObjectives));
         }
 
         return dynamicQuests;
@@ -119,12 +129,11 @@ public class DynamicQuest extends Quest {
      * @param newMobLevel The new mob level from the dynamic dungeon
      */
     public void adaptToLevel(int newMobLevel) {
-        // Convert mob level to quest level (mob level 10 = quest level 1, etc.)
-        int newQuestLevel = newMobLevel / 10;
-        setQuestLevel(newQuestLevel);
+        int cappedMobLevel = DynamicQuestLevel.clamp(newMobLevel);
+        setQuestLevel(cappedMobLevel);
 
         // Adapt objectives
-        getQuestObjectives().adaptToLevel(newMobLevel);
+        getQuestObjectives().adaptToLevel(cappedMobLevel);
 
         // Update quest name to reflect new level
         if (!getQuestObjectives().getObjectives().isEmpty() &&
@@ -132,7 +141,7 @@ public class DynamicQuest extends Quest {
             this.questName = DynamicQuestMenuConfig.getQuestName()
                     .replace("$amount", dynamicKillObjective.getTargetAmount() + "")
                     .replace("$name", ChatColor.stripColor(
-                            EliteMobProperties.getPluginData(dynamicKillObjective.getEntityType()).getName(newMobLevel)));
+                            EliteMobProperties.getPluginData(dynamicKillObjective.getEntityType()).getName(cappedMobLevel)));
         }
     }
 

@@ -28,8 +28,23 @@ public class DialogMaker {
      */
     private static String processText(String text) {
         if (text == null) return null;
-        // Replace both section symbol and ampersand variants
-        return text.replace("§0", "§f").replace("&0", "&f");
+        return ChatColor.stripColor(
+                ChatColor.translateAlternateColorCodes('&',
+                        text.replace("§0", "§f")
+                                .replace("&0", "&f")
+                                .replace("\r", "")
+                )
+        );
+    }
+
+    private static String processSingleLineText(String text) {
+        String processedText = processText(text);
+        if (processedText == null) return null;
+
+        return processedText
+                .replace('\n', ' ')
+                .replaceAll("\\s+", " ")
+                .trim();
     }
 
     public static void sendQuestMessage(List<? extends Quest> quests, Player player, NPCEntity npcEntity) {
@@ -83,12 +98,17 @@ public class DialogMaker {
     private static void setDialogTitles(Quest quest, DialogManager.MultiActionDialogBuilder builder,
                                         QuestMenu.QuestText questText, int questIndex, int totalQuests) {
         // Main title
-        String title = processText(questText.getHeader().toPlainText());
+        String title = processSingleLineText(questText.getHeader().toPlainText());
         if (title != null && !title.isEmpty()) {
             builder.title(title);
         }
 
-        builder.externalTitle(title + (quest.isAccepted() ? quest.getQuestObjectives().isOver() ? ChatColor.WHITE + " | " + ChatColor.DARK_GREEN + "Turn in!" : ChatColor.WHITE + " | " + ChatColor.GREEN + "Accepted" : ""));
+        String externalTitle = title + (quest.isAccepted() ?
+                quest.getQuestObjectives().isOver() ?
+                        ChatColor.WHITE + " | " + ChatColor.DARK_GREEN + "Turn in!" :
+                        ChatColor.WHITE + " | " + ChatColor.GREEN + "Accepted" :
+                "");
+        builder.externalTitle(processSingleLineText(externalTitle));
     }
 
     private static void addQuestBodySections(DialogManager.MultiActionDialogBuilder builder,
@@ -205,8 +225,8 @@ public class DialogMaker {
             return;
         }
 
-        String text = processText(component.toPlainText());
-        if (text.contains("[Abandon]")) text = ChatColor.BOLD + "" + ChatColor.RED + "[Abandon]";
+        String text = processSingleLineText(component.toPlainText());
+        if (text.contains("[Abandon]")) text = "[Abandon]";
 
         String command = extractCommandFromComponent(component);
         if (command != null && !command.isEmpty()) {

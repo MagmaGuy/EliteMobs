@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.api;
 import com.magmaguy.elitemobs.collateralminecraftchanges.PlayerDeathMessageByEliteMob;
 import com.magmaguy.elitemobs.combatsystem.ArmorDefenseCalculator;
 import com.magmaguy.elitemobs.combatsystem.LevelScaling;
+import com.magmaguy.elitemobs.combatsystem.PotionCombatModifierCalculator;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
@@ -43,7 +44,6 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import java.util.HashSet;
 import java.util.List;
@@ -372,6 +372,11 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
             double playerMaxHealth = ArmorSkillHealthBonus.getConfiguredMaxHealthForArmorLevel(armorSkillLevel);
             int mobLevel = eliteEntity.getLevel();
 
+            // Scaled combat: simulate the boss at the player's armor skill level
+            if (eliteEntity.isScaledCombat()) {
+                mobLevel = armorSkillLevel;
+            }
+
             // 2. Base damage (no pre-compensation)
             double baseDamage = playerMaxHealth / LevelScaling.TARGET_HITS_TO_KILL_PLAYER;
 
@@ -402,19 +407,16 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
             }
 
             // 6. Resistance potion effect (percentage-based)
-            double potionMultiplier = 1.0;
-            if (player.hasPotionEffect(PotionEffectType.RESISTANCE)) {
-                int amplifier = player.getPotionEffect(PotionEffectType.RESISTANCE).getAmplifier();
-                potionMultiplier = 1.0 - ((amplifier + 1) * MobCombatSettingsConfig.getResistanceDamageMultiplier());
-                potionMultiplier = Math.max(0, potionMultiplier);
-            }
+            double potionMultiplier = PotionCombatModifierCalculator.getIncomingDamageMultiplier(player);
 
             // 7. Boss damage multiplier (for custom bosses with increased damage)
             double customBossDamageMultiplier = eliteEntity.getDamageMultiplier();
 
             // Config multipliers
             double configMultiplier;
-            if (eliteEntity instanceof CustomBossEntity customBossEntity && customBossEntity.isNormalizedCombat())
+            if (eliteEntity.isScaledCombat())
+                configMultiplier = MobCombatSettingsConfig.getScaledDamageToPlayerMultiplier();
+            else if (eliteEntity instanceof CustomBossEntity customBossEntity && customBossEntity.isNormalizedCombat())
                 configMultiplier = MobCombatSettingsConfig.getNormalizedDamageToPlayerMultiplier();
             else
                 configMultiplier = MobCombatSettingsConfig.getDamageToPlayerMultiplier();
@@ -429,7 +431,7 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
             if (specialMultiplier != 1) specialMultiplier = 1;
 
             // 8. 1-shot protection
-            double actualMaxHealth = AttributeManager.getAttributeBaseValue(player, "generic_max_health");
+            double actualMaxHealth = AttributeManager.getAttributeValue(player, "generic_max_health");
             finalDamage = Math.min(finalDamage, actualMaxHealth - 1);
 
             return finalDamage;

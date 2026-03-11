@@ -76,9 +76,25 @@ public class MobCombatSettingsConfig extends ConfigurationFile {
     @Getter
     private static boolean normalizeRegionalBosses;
     @Getter
+    private static boolean useScaledCombatForNaturalElites;
+    @Getter
+    private static double scaledDamageToEliteMultiplier;
+    @Getter
+    private static double scaledDamageToPlayerMultiplier;
+    @Getter
+    private static boolean useRecommendedHealthScaling;
+    @Getter
+    private static String scaledStandardLevelSymbol;
+    @Getter
+    private static String scaledHighThreatLevelSymbol;
+    @Getter
     private static String fullHealMessage;
     @Getter
     private static double resistanceDamageMultiplier;
+    @Getter
+    private static double strengthDamageMultiplier;
+    @Getter
+    private static double weaknessDamageMultiplier;
     @Getter
     private static double blockingDamageReduction;
     @Getter
@@ -222,6 +238,38 @@ public class MobCombatSettingsConfig extends ConfigurationFile {
         normalizeRegionalBosses = ConfigurationEngine.setBoolean(
                 List.of("Sets if regional bosses will used the normalized combat system.", "This is very strongly recommended, and premade content will not be balanced properly if modified."),
                 fileConfiguration, "normalizeRegionalBosses", true);
+        useScaledCombatForNaturalElites = ConfigurationEngine.setBoolean(
+                List.of("Sets if naturally spawned elite mobs use scaled combat.",
+                        "Scaled combat simulates the boss at the player's level, so gear still matters but level doesn't.",
+                        "This makes overworld elites feel equally fair for all players regardless of progression.",
+                        "Dungeon bosses use normalized combat and are unaffected by this setting."),
+                fileConfiguration, "useScaledCombatForNaturalElites", true);
+        scaledDamageToEliteMultiplier = ConfigurationEngine.setDouble(
+                List.of("Sets the multiplier for player damage dealt to bosses using scaled combat.",
+                        "2.0 = 200%, 0.5 = 50%"),
+                fileConfiguration, "scaledDamageToEliteMultiplier", 1);
+        scaledDamageToPlayerMultiplier = ConfigurationEngine.setDouble(
+                List.of("Sets the multiplier for damage dealt to players by bosses using scaled combat.",
+                        "2.0 = 200%, 0.5 = 50%"),
+                fileConfiguration, "scaledDamageToPlayerMultiplier", 1);
+        useRecommendedHealthScaling = ConfigurationEngine.setBoolean(
+                List.of("Sets whether naturally spawned elite mobs use the recommended EliteMobs 10 health scaling values.",
+                        "When true, natural elites use the current recommended scaling model. This is strongly recommended.",
+                        "When false, natural elite HP and player damage numbers against natural elites are side-loaded to use much smaller legacy-style values closer to EliteMobs 9.",
+                        "This exists for backwards compatibility with servers that built integrations around older EliteMobs combat numbers.",
+                        "False is no longer recommended because it makes player progression feel flatter and players will feel their power growth much less clearly.",
+                        "This setting does not change normalized regional boss combat."),
+                fileConfiguration, "useRecommendedHealthScaling", true);
+        scaledStandardLevelSymbol = ConfigurationEngine.setString(
+                List.of("Sets the symbol shown in place of a numeric level for scaled entities with no custom health multiplier.",
+                        "This is only used for scaled entities.",
+                        "Default: 「⚔」"),
+                file, fileConfiguration, "scaledStandardLevelSymbol", "「⚔」", true);
+        scaledHighThreatLevelSymbol = ConfigurationEngine.setString(
+                List.of("Sets the symbol shown in place of a numeric level for scaled entities with a health multiplier above 1.",
+                        "This is only used for scaled entities and is intended to signal higher event-style threat.",
+                        "Default: ☠"),
+                file, fileConfiguration, "scaledHighThreatLevelSymbol", "☠", true);
         fullHealMessage = ConfigurationEngine.setString(
                 List.of("Sets the message that appears when a boss heals from going out of combat."),
                 file, fileConfiguration, "fullHealMessage", "&2FULL HEAL!", true);
@@ -230,6 +278,16 @@ public class MobCombatSettingsConfig extends ConfigurationFile {
                         "Resistance I = (1 * this value), Resistance II = (2 * this value), etc.",
                         "Default of 0.2 matches vanilla: Resistance I = 20% reduction, Resistance V = 100% reduction (immune)."),
                 fileConfiguration, "resistanceDamageMultiplierV2", 0.2);
+        strengthDamageMultiplier = ConfigurationEngine.setDouble(
+                List.of("Sets the bonus damage per strength level applied to player damage against elites.",
+                        "Strength I = + (1 * this value), Strength II = + (2 * this value), etc.",
+                        "Default of 0.2 means Strength I = +20% damage."),
+                fileConfiguration, "strengthDamageMultiplierV2", 0.2);
+        weaknessDamageMultiplier = ConfigurationEngine.setDouble(
+                List.of("Sets the damage penalty per weakness level applied to player damage against elites.",
+                        "Weakness I = - (1 * this value), Weakness II = - (2 * this value), etc.",
+                        "Default of 0.2 means Weakness I = -20% damage."),
+                fileConfiguration, "weaknessDamageMultiplierV2", 0.2);
         blockingDamageReduction = ConfigurationEngine.setDouble(
                 List.of("Sets the multiplier applied to damage reduction when a player is holding up a shield for melee attacks (powers excluded)."),
                 fileConfiguration, "blockingDamageReduction", 0.8);

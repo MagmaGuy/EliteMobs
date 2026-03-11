@@ -14,9 +14,9 @@ public class DynamicKillObjective extends KillObjective {
     @Setter
     private int minMobLevel;
 
-    public DynamicKillObjective(int targetAmount, EntityType entityType, int questLevel) {
-        super(targetAmount, EliteMobProperties.getPluginData(entityType).getName(questLevel * 10));
-        this.minMobLevel = questLevel * 10;
+    public DynamicKillObjective(int targetAmount, EntityType entityType, int minMobLevel) {
+        super(targetAmount, EliteMobProperties.getPluginData(entityType).getName(minMobLevel));
+        this.minMobLevel = minMobLevel;
         this.entityType = entityType;
     }
 

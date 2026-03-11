@@ -76,6 +76,10 @@ public class PlayerStatusScreenDialog {
 //        }
     }
 
+    public static void showTeleportsDialog(Player player) {
+        DialogManager.sendDialog(player, buildTeleportsDialog(player));
+    }
+
     /**
      * Stats Page Dialog
      */
@@ -198,7 +202,7 @@ public class PlayerStatusScreenDialog {
 
             DialogManager.ActionButton button = DialogManager.ActionButton.of(
                     dungeonName,
-                    new DialogManager.RunCommandAction("/elitemobs dungeontp " +
+                    new DialogManager.RunCommandAction("/elitemobs dungeontpdialog " +
                             emPackage.getContentPackagesConfigFields().getFilename())
             ).width(DIALOG_WIDTH);
 

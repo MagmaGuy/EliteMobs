@@ -33,4 +33,7 @@ public class DungeonObjective {
         this.dungeonInstance = dungeonInstance;
     }
 
+    public void unregister() {
+    }
+
 }

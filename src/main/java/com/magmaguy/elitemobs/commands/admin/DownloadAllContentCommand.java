@@ -123,7 +123,7 @@ public class DownloadAllContentCommand extends AdvancedCommand {
             EMPackage pkg = packages.get(index);
             String slug = pkg.getContentPackagesConfigFields().getNightbreakSlug();
             String name = pkg.getContentPackagesConfigFields().getName();
-            NightbreakContentManager.downloadAsync(slug, importsFolder, null, success -> {
+            NightbreakContentManager.downloadAsync(MetadataHandler.PLUGIN, slug, importsFolder, null, success -> {
                 if (success) completed.incrementAndGet();
                 else { failed.incrementAndGet(); failedNames.add(name); }
                 downloadNextPackage(packages, index + 1, importsFolder, player, sender, completed, failed, failedNames);
@@ -164,7 +164,7 @@ public class DownloadAllContentCommand extends AdvancedCommand {
                     .replace("$name", name));
 
         // Pass null for player to suppress library's own "use em reload" messages
-        NightbreakContentManager.downloadAsync(slug, importsFolder, null, success -> {
+        NightbreakContentManager.downloadAsync(MetadataHandler.PLUGIN, slug, importsFolder, null, success -> {
             if (success) {
                 completed.incrementAndGet();
                 if (player == null || player.isOnline()) {

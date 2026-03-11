@@ -56,16 +56,24 @@ public class DungeonKillTargetObjective extends DungeonObjective {
         if (currentAmount >= targetAmount) {
             super.completed = true;
             dungeonInstance.checkCompletionStatus();
-            dungeonKillTargetObjectiveList.remove(this);
+            unregister();
         }
+    }
+
+    @Override
+    public void unregister() {
+        dungeonKillTargetObjectiveList.remove(this);
     }
 
     public static class DungeonKillTargetObjectiveListener implements Listener {
         @EventHandler
         public void onEliteDeath(EliteMobDeathEvent event) {
             if (!(event.getEliteEntity() instanceof InstancedBossEntity instancedBossEntity)) return;
+            if (instancedBossEntity.getDungeonInstance() == null) return;
             List<DungeonKillTargetObjective> cloneList = new ArrayList<>(dungeonKillTargetObjectiveList);
             for (DungeonKillTargetObjective dungeonKillTargetObjective : cloneList) {
+                if (dungeonKillTargetObjective.isCompleted()) continue;
+                if (dungeonKillTargetObjective.getDungeonInstance() != instancedBossEntity.getDungeonInstance()) continue;
                 if (instancedBossEntity.getCustomBossesConfigFields().getFilename().equals(dungeonKillTargetObjective.getBossFilename()) ||
                         instancedBossEntity.getPhaseBossEntity() != null &&
                                 instancedBossEntity.getPhaseBossEntity().getPhase1Config().getFilename().equals(dungeonKillTargetObjective.getBossFilename()))

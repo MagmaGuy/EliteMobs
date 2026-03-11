@@ -181,7 +181,7 @@ public class DungeonInstance extends MatchInstance {
     }
 
     public boolean checkCompletionStatus() {
-        //if (!super.state.equals(InstancedRegionState.ONGOING)) return;
+        if (!super.state.equals(InstancedRegionState.ONGOING)) return false;
         for (DungeonObjective dungeonObjective : dungeonObjectives)
             if (!dungeonObjective.isCompleted())
                 return false;
@@ -215,6 +215,7 @@ public class DungeonInstance extends MatchInstance {
             return;
         }
         instanceRemovalScheduled = true;
+        dungeonObjectives.forEach(DungeonObjective::unregister);
 
         participants.forEach(player -> player.sendMessage(DungeonsConfig.getInstancedDungeonClosingInstanceMessage()));
         HashSet<Player> participants = new HashSet<>(this.participants);

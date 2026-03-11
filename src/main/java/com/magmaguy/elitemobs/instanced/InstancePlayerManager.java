@@ -134,8 +134,9 @@ public class InstancePlayerManager {
         matchInstance.players.add(player);
         player.setGameMode(GameMode.SURVIVAL);
         matchInstance.spectators.remove(player);
+        player.setHealth(player.getMaxHealth());
         MatchInstance.MatchInstanceEvents.teleportBypass = true;
-        player.teleport(deathLocation.getBannerBlock().getLocation());
+        player.teleport(deathLocation.getRespawnLocation());
         PlayerData.setMatchInstance(player, matchInstance);
     }
 
