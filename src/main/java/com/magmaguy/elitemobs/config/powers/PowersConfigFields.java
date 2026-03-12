@@ -1,8 +1,10 @@
 package com.magmaguy.elitemobs.config.powers;
 
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import com.magmaguy.elitemobs.powers.scripts.caching.EliteScriptBlueprint;
+import com.magmaguy.elitemobs.powers.scripts.loading.ScriptValueNormalizer;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import lombok.Setter;
@@ -37,6 +39,7 @@ public class PowersConfigFields extends CustomConfigFields {
     private Class<? extends ElitePower> elitePowerClass = null;
 
     @Getter
+    @Setter
     private PowerType powerType;
 
     /**
@@ -126,7 +129,12 @@ public class PowersConfigFields extends CustomConfigFields {
 
     public void initializeScripts() {
         try {
-            if (scripts != null) eliteScriptBlueprints = EliteScriptBlueprint.parseBossScripts(scripts, this);
+            Map<String, Object> mergedScripts = ScriptValueNormalizer.normalizeSection(scripts);
+            if (!mergedScripts.isEmpty()) {
+                eliteScriptBlueprints = EliteScriptBlueprint.parseBossScripts(mergedScripts, this);
+            } else {
+                eliteScriptBlueprints = new ArrayList<>();
+            }
         } catch (Exception exception) {
             Logger.warn("You have a script with invalid data! Script in " + filename + " is not valid.");
             exception.printStackTrace();

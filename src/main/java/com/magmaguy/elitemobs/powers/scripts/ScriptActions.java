@@ -15,8 +15,8 @@ public class ScriptActions {
     @Getter
     private final List<ScriptAction> scriptActionsList = new ArrayList();
 
-    public ScriptActions(ScriptActionsBlueprint scriptActionsBlueprint, Map<String, EliteScript> eliteScriptMap, EliteScript eliteScript) {
-        scriptActionsBlueprint.getScriptActionsBlueprintList().forEach(scriptActionBlueprint -> scriptActionsList.add(new ScriptAction(scriptActionBlueprint, eliteScriptMap, eliteScript)));
+    public ScriptActions(ScriptActionsBlueprint scriptActionsBlueprint, Map<String, ScriptExecutable> eliteScriptMap, ScriptRuntimeOwner runtimeOwner) {
+        scriptActionsBlueprint.getScriptActionsBlueprintList().forEach(scriptActionBlueprint -> scriptActionsList.add(new ScriptAction(scriptActionBlueprint, eliteScriptMap, runtimeOwner)));
     }
 
     public void runScripts(EliteEntity eliteEntity, LivingEntity directTarget, Event event) {

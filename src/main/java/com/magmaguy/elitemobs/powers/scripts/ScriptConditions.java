@@ -27,15 +27,15 @@ import java.util.concurrent.ThreadLocalRandom;
 public class ScriptConditions {
 
     private final ScriptConditionsBlueprint conditionsBlueprint;
-    private final EliteScript eliteScript;
+    private final ScriptRuntimeOwner runtimeOwner;
     private final ScriptTargets scriptTargets;
 
-    public ScriptConditions(ScriptConditionsBlueprint scriptConditionsBlueprint, EliteScript eliteScript, boolean actionCondition) {
+    public ScriptConditions(ScriptConditionsBlueprint scriptConditionsBlueprint, ScriptRuntimeOwner runtimeOwner, boolean actionCondition) {
         this.conditionsBlueprint = scriptConditionsBlueprint;
-        this.eliteScript = eliteScript;
+        this.runtimeOwner = runtimeOwner;
 
         if (conditionsBlueprint.getScriptTargets() != null) {
-            this.scriptTargets = new ScriptTargets(conditionsBlueprint.getScriptTargets(), eliteScript);
+            this.scriptTargets = new ScriptTargets(conditionsBlueprint.getScriptTargets(), runtimeOwner);
         } else {
             this.scriptTargets = null;
         }

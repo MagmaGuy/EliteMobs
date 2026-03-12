@@ -53,27 +53,27 @@ public class ScriptAction {
     private final ScriptConditions scriptConditions;
     private final ScriptParticles scriptParticles;
     @Getter
-    private final Map<String, EliteScript> eliteScriptMap;
-    private final EliteScript eliteScript;
+    private final Map<String, ScriptExecutable> eliteScriptMap;
+    private final ScriptRuntimeOwner runtimeOwner;
     private final ScriptTargets finalScriptTargets;
 
     /**
      * Constructs a new ScriptAction with the given blueprint, script map, and elite script.
      *
      * @param blueprint      The blueprint defining this action.
-     * @param eliteScriptMap Map of script names to EliteScript instances.
-     * @param eliteScript    The elite script associated with this action.
+     * @param eliteScriptMap Map of script names to executable scripts.
+     * @param runtimeOwner   The script runtime owner associated with this action.
      */
-    public ScriptAction(ScriptActionBlueprint blueprint, Map<String, EliteScript> eliteScriptMap, EliteScript eliteScript) {
+    public ScriptAction(ScriptActionBlueprint blueprint, Map<String, ScriptExecutable> eliteScriptMap, ScriptRuntimeOwner runtimeOwner) {
         this.blueprint = blueprint;
-        this.scriptTargets = new ScriptTargets(blueprint.getScriptTargets(), eliteScript);
+        this.scriptTargets = new ScriptTargets(blueprint.getScriptTargets(), runtimeOwner);
         this.finalScriptTargets = blueprint.getFinalTarget() != null
-                ? new ScriptTargets(blueprint.getFinalTarget(), eliteScript)
+                ? new ScriptTargets(blueprint.getFinalTarget(), runtimeOwner)
                 : null;
-        this.scriptConditions = new ScriptConditions(blueprint.getConditionsBlueprint(), eliteScript, true);
+        this.scriptConditions = new ScriptConditions(blueprint.getConditionsBlueprint(), runtimeOwner, true);
         this.scriptParticles = new ScriptParticles(blueprint.getScriptParticlesBlueprint());
         this.eliteScriptMap = eliteScriptMap;
-        this.eliteScript = eliteScript;
+        this.runtimeOwner = runtimeOwner;
     }
 
     private static final ThreadLocal<Integer> scriptDamageDepth = ThreadLocal.withInitial(() -> 0);
@@ -92,7 +92,7 @@ public class ScriptAction {
             return;
         }
 
-        ScriptActionData scriptActionData = new ScriptActionData(eliteEntity, directTarget, scriptTargets, eliteScript.getScriptZone(), event);
+        ScriptActionData scriptActionData = new ScriptActionData(eliteEntity, directTarget, scriptTargets, runtimeOwner.getScriptZone(), event);
         scriptTask(scriptActionData);
     }
 
@@ -108,7 +108,7 @@ public class ScriptAction {
             return;
         }
 
-        ScriptActionData scriptActionData = new ScriptActionData(scriptTargets, eliteScript.getScriptZone(), previousScriptActionData);
+        ScriptActionData scriptActionData = new ScriptActionData(scriptTargets, runtimeOwner.getScriptZone(), previousScriptActionData);
         scriptTask(scriptActionData);
     }
 
@@ -119,7 +119,7 @@ public class ScriptAction {
      * @param landingLocation          The location where the action should be executed.
      */
     public void runScript(ScriptActionData previousScriptActionData, Location landingLocation) {
-        ScriptActionData scriptActionData = new ScriptActionData(scriptTargets, eliteScript.getScriptZone(), previousScriptActionData, landingLocation);
+        ScriptActionData scriptActionData = new ScriptActionData(scriptTargets, runtimeOwner.getScriptZone(), previousScriptActionData, landingLocation);
         scriptTask(scriptActionData);
     }
 
@@ -434,7 +434,7 @@ public class ScriptAction {
 
         if (blueprint.isOnlyRunOneScript()) {
             String scriptName = blueprint.getScripts().get(ThreadLocalRandom.current().nextInt(blueprint.getScripts().size()));
-            EliteScript script = eliteScriptMap.get(scriptName);
+            ScriptExecutable script = eliteScriptMap.get(scriptName);
             if (script != null) {
                 script.check(scriptActionData.getEliteEntity(), scriptActionData.getDirectTarget(), scriptActionData);
             } else {
@@ -442,7 +442,7 @@ public class ScriptAction {
             }
         } else {
             for (String scriptName : blueprint.getScripts()) {
-                EliteScript script = eliteScriptMap.get(scriptName);
+                ScriptExecutable script = eliteScriptMap.get(scriptName);
                 if (script != null) {
                     script.check(scriptActionData.getEliteEntity(), scriptActionData.getDirectTarget(), scriptActionData);
                 } else {
@@ -649,7 +649,7 @@ public class ScriptAction {
         };
         getLocationTargets(scriptActionData).forEach(location -> {
             Location targetLocation = needsCentering ? location.clone().add(0.5, 0, 0.5) : location;
-            scriptParticles.visualize(scriptActionData, targetLocation, eliteScript);
+            scriptParticles.visualize(scriptActionData, targetLocation, runtimeOwner);
         });
     }
 
@@ -716,7 +716,7 @@ public class ScriptAction {
      */
     private void runPush(ScriptActionData scriptActionData) {
         Vector velocity = blueprint.getScriptRelativeVectorBlueprint() != null
-                ? new ScriptRelativeVector(blueprint.getScriptRelativeVectorBlueprint(), eliteScript, scriptActionData.getEliteEntity().getLocation()).getVector(scriptActionData)
+                ? new ScriptRelativeVector(blueprint.getScriptRelativeVectorBlueprint(), runtimeOwner, scriptActionData.getEliteEntity().getLocation()).getVector(scriptActionData)
                 : blueprint.getVValue();
 
         // Ensure velocity is finite, otherwise default to zero vector
@@ -763,7 +763,7 @@ public class ScriptAction {
             CustomBossEntity customBossEntity = CustomSummonPower.summonReinforcement(scriptActionData.getEliteEntity(), location, blueprint.getSValue(), blueprint.getDuration().getValue());
             if (customBossEntity != null && customBossEntity.getLivingEntity() != null) {
                 Vector velocity = blueprint.getScriptRelativeVectorBlueprint() != null
-                        ? new ScriptRelativeVector(blueprint.getScriptRelativeVectorBlueprint(), eliteScript, customBossEntity.getLivingEntity().getLocation()).getVector(scriptActionData)
+                        ? new ScriptRelativeVector(blueprint.getScriptRelativeVectorBlueprint(), runtimeOwner, customBossEntity.getLivingEntity().getLocation()).getVector(scriptActionData)
                         : blueprint.getVValue();
                 if (velocity != null) {
                     customBossEntity.getLivingEntity().setVelocity(velocity);
@@ -1021,7 +1021,7 @@ public class ScriptAction {
                 fallingBlock.setHurtEntities(false);
 
                 Vector velocity = blueprint.getScriptRelativeVectorBlueprint() != null
-                        ? new ScriptRelativeVector(blueprint.getScriptRelativeVectorBlueprint(), eliteScript, location).getVector(scriptActionData)
+                        ? new ScriptRelativeVector(blueprint.getScriptRelativeVectorBlueprint(), runtimeOwner, location).getVector(scriptActionData)
                         : blueprint.getVValue();
 
                 if (velocity != null) {
@@ -1074,7 +1074,7 @@ public class ScriptAction {
             if (location == null || location.getWorld() == null) return;
 
             Vector velocity = blueprint.getScriptRelativeVectorBlueprint() != null
-                    ? new ScriptRelativeVector(blueprint.getScriptRelativeVectorBlueprint(), eliteScript, location).getVector(scriptActionData)
+                    ? new ScriptRelativeVector(blueprint.getScriptRelativeVectorBlueprint(), runtimeOwner, location).getVector(scriptActionData)
                     : blueprint.getVValue();
 
             boolean isProjectile = Projectile.class.isAssignableFrom(entityClass);
@@ -1176,7 +1176,7 @@ public class ScriptAction {
 
     private void setFacing(ScriptActionData scriptActionData) {
         Vector direction = blueprint.getScriptRelativeVectorBlueprint() != null
-                ? new ScriptRelativeVector(blueprint.getScriptRelativeVectorBlueprint(), eliteScript, scriptActionData.getEliteEntity().getLocation()).getVector(scriptActionData)
+                ? new ScriptRelativeVector(blueprint.getScriptRelativeVectorBlueprint(), runtimeOwner, scriptActionData.getEliteEntity().getLocation()).getVector(scriptActionData)
                 : blueprint.getVValue();
 
         if (direction == null) {

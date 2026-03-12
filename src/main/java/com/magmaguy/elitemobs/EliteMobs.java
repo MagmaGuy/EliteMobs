@@ -72,6 +72,7 @@ import com.magmaguy.elitemobs.powers.TrackingFireball.TrackingFireballEvents;
 import com.magmaguy.elitemobs.powers.meta.Bombardment;
 import com.magmaguy.elitemobs.powers.meta.CombatEnterScanPower;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
+import com.magmaguy.elitemobs.powers.lua.LuaPowerManager;
 import com.magmaguy.elitemobs.powers.scripts.ScriptAction;
 import com.magmaguy.elitemobs.powers.scripts.ScriptListener;
 import com.magmaguy.elitemobs.powers.scripts.caching.EliteScriptBlueprint;
@@ -95,6 +96,7 @@ import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
 import com.magmaguy.elitemobs.utils.BossBarUtil;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
+import com.magmaguy.elitemobs.utils.GameClock;
 import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import com.magmaguy.elitemobs.wormhole.Wormhole;
 import com.magmaguy.elitemobs.wormhole.WormholeManager;
@@ -559,9 +561,11 @@ public class EliteMobs extends JavaPlugin {
         Bombardment.shutdown();
         KeepNeutralsAngry.shutdown();
         Navigation.shutdown();
+        GameClock.shutdown();
         DynamicQuest.shutdown();
         DungeonInstance.shutdown();
         ArenaInstance.shutdown();
+        LuaPowerManager.shutdown();
         // Final pass memory leak fixes
         ElitePower.shutdown();
         EliteScriptBlueprint.shutdown();
@@ -578,6 +582,7 @@ public class EliteMobs extends JavaPlugin {
      */
     private void launchRunnables() {
         //save regional bosses when the files update
+        GameClock.initialize();
         RegionalBossEntity.regionalDataSaver();
     }
 

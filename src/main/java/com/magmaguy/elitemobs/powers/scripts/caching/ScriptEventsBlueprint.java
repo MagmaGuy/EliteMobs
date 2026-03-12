@@ -1,12 +1,13 @@
 package com.magmaguy.elitemobs.powers.scripts.caching;
 
 import com.magmaguy.elitemobs.api.*;
+import com.magmaguy.elitemobs.utils.MapListInterpreter;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
-import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class ScriptEventsBlueprint {
@@ -15,8 +16,7 @@ public class ScriptEventsBlueprint {
     @Getter
     private boolean zoneListener = false;
 
-    public ScriptEventsBlueprint(ConfigurationSection configurationSection, String scriptName, String filename) {
-        List<String> values = configurationSection.getStringList("Events");
+    public ScriptEventsBlueprint(List<String> values, String scriptName, String filename) {
         for (String entry : values) {
             switch (entry) {
                 case "EliteMobDamagedByEliteMobEvent" -> events.add(EliteMobDamagedByEliteMobEvent.class);
@@ -42,5 +42,9 @@ public class ScriptEventsBlueprint {
                         Logger.warn("Failed to get valid script event from entry " + entry + " in " + scriptName + " for file " + filename + " !");
             }
         }
+    }
+
+    public ScriptEventsBlueprint(Map<String, Object> configurationValues, String scriptName, String filename) {
+        this(MapListInterpreter.parseStringList("Events", configurationValues.get("Events"), scriptName), scriptName, filename);
     }
 }

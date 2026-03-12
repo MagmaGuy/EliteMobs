@@ -36,7 +36,7 @@ public class InstancedBossEntity extends RegionalBossEntity implements Persisten
     public InstancedBossEntity(CustomBossesConfigFields customBossesConfigFields, Location location, DungeonInstance dungeonInstance) {
         super(customBossesConfigFields, location, false, true);
         this.dungeonInstance = dungeonInstance;
-        super.elitePowers = ElitePowerParser.parsePowers(customBossesConfigFields, this);
+        super.setElitePowers(ElitePowerParser.parsePowers(customBossesConfigFields, this));
         if (level == -1) {
             // For dynamic dungeons, use the player-selected level instead of calculating from gear
             if (dungeonInstance instanceof DynamicDungeonInstance dynamicDungeonInstance) {
@@ -53,7 +53,7 @@ public class InstancedBossEntity extends RegionalBossEntity implements Persisten
         super(customBossesConfigFields, location, false, true);
         super.level = level;
         this.matchInstance = matchInstance;
-        super.elitePowers = ElitePowerParser.parsePowers(customBossesConfigFields, this);
+        super.setElitePowers(ElitePowerParser.parsePowers(customBossesConfigFields, this));
 //        if (level == -1) {
 //            if (matchInstance.getPlayers().isEmpty())
 //                Logger.warn("Failed to get players for new instance when assigning dynamic level! The bosses will default to level 1.");

@@ -14,16 +14,16 @@ public class ScriptRelativeVector {
     private boolean sourceIsAction = false;
     private boolean destinationIsAction = false;
 
-    public ScriptRelativeVector(ScriptRelativeVectorBlueprint scriptRelativeVectorBlueprint, EliteScript eliteScript, Location actionLocation) {
+    public ScriptRelativeVector(ScriptRelativeVectorBlueprint scriptRelativeVectorBlueprint, ScriptRuntimeOwner runtimeOwner, Location actionLocation) {
         this.scriptRelativeVectorBlueprint = scriptRelativeVectorBlueprint;
         this.actionLocation = actionLocation;
         if (!scriptRelativeVectorBlueprint.getSourceTarget().getTargetType().equals(TargetType.ACTION_TARGET)) {
-            sourceTarget = new ScriptTargets(scriptRelativeVectorBlueprint.getSourceTarget(), eliteScript);
+            sourceTarget = new ScriptTargets(scriptRelativeVectorBlueprint.getSourceTarget(), runtimeOwner);
         } else {
             sourceIsAction = true;
         }
         if (!scriptRelativeVectorBlueprint.getDestinationTarget().getTargetType().equals(TargetType.ACTION_TARGET))
-            destinationTarget = new ScriptTargets(scriptRelativeVectorBlueprint.getDestinationTarget(), eliteScript);
+            destinationTarget = new ScriptTargets(scriptRelativeVectorBlueprint.getDestinationTarget(), runtimeOwner);
         else
             destinationIsAction = true;
     }

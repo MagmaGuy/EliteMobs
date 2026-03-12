@@ -23,19 +23,15 @@ public class ScriptTargets {
     @Getter
     private final ScriptTargetsBlueprint targetBlueprint;
     @Getter
-    private final EliteScript eliteScript;
-    //raw zone from the elite script
-    @Getter
-    private final ScriptZone scriptZone;
+    private final ScriptRuntimeOwner runtimeOwner;
     //collection of targets, can be shapes, entities or locations
     private List anonymousTargets = null;
     @Getter
     private ScriptRelativeVector scriptRelativeVector = null;
 
-    public ScriptTargets(ScriptTargetsBlueprint targetBlueprint, EliteScript eliteScript) {
+    public ScriptTargets(ScriptTargetsBlueprint targetBlueprint, ScriptRuntimeOwner runtimeOwner) {
         this.targetBlueprint = targetBlueprint;
-        this.eliteScript = eliteScript;
-        this.scriptZone = eliteScript.getScriptZone();
+        this.runtimeOwner = runtimeOwner;
     }
 
     public List getAnonymousTargets(boolean locations, ScriptActionData scriptActionData) {
@@ -50,7 +46,7 @@ public class ScriptTargets {
 
     public void setAnonymousTargets(List anonymousTargets) {
         //Animated zones can't be cached!
-        if (getTargetBlueprint().isTrack() || eliteScript.getScriptZone().getZoneBlueprint().getAnimationDuration().getValue() > 1)
+        if (getTargetBlueprint().isTrack() || getScriptZone().getZoneBlueprint().getAnimationDuration().getValue() > 1)
             return;
         //Non-animated zones must be cached for script inheritance and such
         this.anonymousTargets = anonymousTargets;
@@ -61,7 +57,7 @@ public class ScriptTargets {
                                               String locationString,
                                               ScriptActionData scriptActionData) {
         if (locationString == null) {
-            Logger.warn("Failed to get location target in script " + targetBlueprint.getScriptName() + " in " + eliteScript.getFileName());
+            Logger.warn("Failed to get location target in script " + targetBlueprint.getScriptName() + " in " + runtimeOwner.getFileName());
             return null;
         }
         Location parsedLocation = ConfigurationLocation.serialize(locationString);
@@ -77,29 +73,29 @@ public class ScriptTargets {
     protected void cacheTargets(ScriptActionData scriptActionData) {
         if (getTargetBlueprint().isTrack()) {
             //Zones that animate independently can not be set to track, as this causes confusion. This is forced to make it easier on scripters.
-            if (eliteScript.getScriptZone().isValid() && eliteScript.getScriptZone().getZoneBlueprint().getAnimationDuration().getValue() > 0)
+            if (getScriptZone().isValid() && getScriptZone().getZoneBlueprint().getAnimationDuration().getValue() > 0)
                 getTargetBlueprint().setTrack(false);
             else return;
         }
         //Only cache locations - caching living entities would probably be very confusing
         //if (actionType.isRequiresLivingEntity()) return;
         boolean animatedScriptZone = false;
-        if (eliteScript.getScriptZone().isValid()) {
-            scriptActionData.setShapesCachedByTarget(eliteScript.getScriptZone().generateShapes(scriptActionData, true));
-            if (eliteScript.getScriptZone().getZoneBlueprint().getAnimationDuration().getValue() > 0) animatedScriptZone = true;
+        if (getScriptZone().isValid()) {
+            scriptActionData.setShapesCachedByTarget(getScriptZone().generateShapes(scriptActionData, true));
+            if (getScriptZone().getZoneBlueprint().getAnimationDuration().getValue() > 0) animatedScriptZone = true;
             anonymousTargets = null;
         }
         if (!animatedScriptZone) {
             anonymousTargets = new ArrayList<>(getTargetLocations(scriptActionData));
         }
         if (!getTargetBlueprint().isTrack() && targetBlueprint.getScriptRelativeVectorBlueprint() != null) {
-            scriptRelativeVector = new ScriptRelativeVector(targetBlueprint.getScriptRelativeVectorBlueprint(), eliteScript, null);
+            scriptRelativeVector = new ScriptRelativeVector(targetBlueprint.getScriptRelativeVectorBlueprint(), runtimeOwner, null);
             scriptRelativeVector.cacheVector(scriptActionData);
         }
     }
 
     //Get living entity targets. New array lists so they are not immutable.
-    protected Collection<LivingEntity> getTargetEntities(ScriptActionData scriptActionData) {
+    public Collection<LivingEntity> getTargetEntities(ScriptActionData scriptActionData) {
         if (getTargetBlueprint().isTrack() && anonymousTargets != null &&
                 (anonymousTargets.isEmpty() || anonymousTargets.get(0) instanceof LivingEntity)) {
             return (List<LivingEntity>) anonymousTargets;
@@ -155,7 +151,7 @@ public class ScriptTargets {
             case SELF_SPAWN:
                 return new ArrayList<>(List.of(scriptActionData.getEliteEntity().getUnsyncedLivingEntity()));
             case ZONE_FULL, ZONE_BORDER, INHERIT_SCRIPT_ZONE_FULL, INHERIT_SCRIPT_ZONE_BORDER:
-                return eliteScript.getScriptZone().getZoneEntities(scriptActionData, targetBlueprint);
+                return getScriptZone().getZoneEntities(scriptActionData, targetBlueprint);
             case INHERIT_SCRIPT_TARGET:
                 if (scriptActionData.getInheritedScriptActionData() != null) {
                     try {
@@ -169,7 +165,7 @@ public class ScriptTargets {
                 }
 
             default:
-                Logger.warn("Could not find default target for script in " + eliteScript.getFileName());
+                Logger.warn("Could not find default target for script in " + runtimeOwner.getFileName());
                 return null;
         }
     }
@@ -180,7 +176,7 @@ public class ScriptTargets {
      *
      * @return Validated location for the script behavior
      */
-    protected Collection<Location> getTargetLocations(ScriptActionData scriptActionData) {
+    public Collection<Location> getTargetLocations(ScriptActionData scriptActionData) {
         if (anonymousTargets != null && !anonymousTargets.isEmpty() && anonymousTargets.get(0) instanceof Location location) {
             return (List<Location>) anonymousTargets;
         }
@@ -226,7 +222,11 @@ public class ScriptTargets {
             Logger.warn("Your script " + targetBlueprint.getScriptName() + " uses " + targetBlueprint.getTargetType().toString() + " but does not have a valid Zone defined!");
             return new ArrayList<>();
         }
-        return addOffsets(eliteScript.getScriptZone().getZoneLocations(scriptActionData, this), scriptActionData);
+        return addOffsets(getScriptZone().getZoneLocations(scriptActionData, this), scriptActionData);
+    }
+
+    private ScriptZone getScriptZone() {
+        return runtimeOwner.getScriptZone();
     }
 
     //Parse the locations key
@@ -245,7 +245,7 @@ public class ScriptTargets {
     private Location addOffsets(Location originalLocation, ScriptActionData scriptActionData) {
         Location location = originalLocation.clone().add(targetBlueprint.getOffset().getValue());
         if (targetBlueprint.getScriptRelativeVectorBlueprint() != null)
-            scriptRelativeVector = new ScriptRelativeVector(targetBlueprint.getScriptRelativeVectorBlueprint(), eliteScript, location);
+            scriptRelativeVector = new ScriptRelativeVector(targetBlueprint.getScriptRelativeVectorBlueprint(), runtimeOwner, location);
         else
             return location;
 
