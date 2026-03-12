@@ -187,12 +187,16 @@ public class ScriptActionBlueprint {
             case "target" -> {
                 if (value instanceof MemorySection)
                     scriptTargets = new ScriptTargetsBlueprint(((MemorySection) value).getValues(false), scriptName, scriptFilename);
+                else if (value instanceof String stringValue)
+                    scriptTargets = new ScriptTargetsBlueprint(Map.of("targetType", stringValue), scriptName, scriptFilename);
                 else
                     scriptTargets = new ScriptTargetsBlueprint((Map) value, scriptName, scriptFilename);
             }
             case "finaltarget" -> {
                 if (value instanceof MemorySection)
                     finalTarget = new ScriptTargetsBlueprint(((MemorySection) value).getValues(false), scriptName, scriptFilename);
+                else if (value instanceof String stringValue)
+                    finalTarget = new ScriptTargetsBlueprint(Map.of("targetType", stringValue), scriptName, scriptFilename);
                 else
                     finalTarget = new ScriptTargetsBlueprint((Map) value, scriptName, scriptFilename);
             }
