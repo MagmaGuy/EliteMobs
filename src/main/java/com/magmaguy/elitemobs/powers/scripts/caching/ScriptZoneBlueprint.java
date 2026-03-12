@@ -6,7 +6,6 @@ import com.magmaguy.elitemobs.powers.scripts.primitives.ScriptFloat;
 import com.magmaguy.elitemobs.powers.scripts.primitives.ScriptInteger;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemorySection;
 
 import java.util.HashMap;
@@ -64,12 +63,11 @@ public class ScriptZoneBlueprint {
     @Getter
     private boolean ignoresSolidBlocks = true;
 
-    public ScriptZoneBlueprint(ConfigurationSection configurationSection, String scriptName, String filename) {
+    public ScriptZoneBlueprint(Map<String, Object> configurationValues, String scriptName, String filename) {
         this.scriptName = scriptName;
         this.filename = filename;
-        ConfigurationSection subSection = configurationSection.getConfigurationSection("Zone");
-        if (subSection == null) return;
-        Map<?, ?> values = subSection.getValues(false);
+        Object zoneValues = configurationValues.get("Zone");
+        if (!(zoneValues instanceof Map<?, ?> values)) return;
         processMapList(values);
         if (target == null) target = new ScriptTargetsBlueprint(new HashMap<>(), scriptName, filename);
     }
@@ -95,14 +93,10 @@ public class ScriptZoneBlueprint {
             case "pitchprerotation" -> pitchPreRotation = parseScriptFloat(key, value, scriptName);
             case "yawrotation" -> yawRotation = parseScriptFloat(key, value, scriptName);
             case "yawprerotation" -> yawPreRotation = parseScriptFloat(key, value, scriptName);
-            case "target" ->
-                    target = new ScriptTargetsBlueprint(((MemorySection) value).getValues(false), scriptName, filename);
-            case "finaltarget" ->
-                    finalTarget = new ScriptTargetsBlueprint(((MemorySection) value).getValues(false), scriptName, filename);
-            case "target2" ->
-                    target2 = new ScriptTargetsBlueprint(((MemorySection) value).getValues(false), scriptName, filename);
-            case "finaltarget2" ->
-                    finalTarget2 = new ScriptTargetsBlueprint(((MemorySection) value).getValues(false), scriptName, filename);
+            case "target" -> target = createTargetsBlueprint(value);
+            case "finaltarget" -> finalTarget = createTargetsBlueprint(value);
+            case "target2" -> target2 = createTargetsBlueprint(value);
+            case "finaltarget2" -> finalTarget2 = createTargetsBlueprint(value);
             case "animationduration" -> animationDuration = parseScriptInteger(key, value, scriptName);
             case "ignoressolidblocks" -> ignoresSolidBlocks = parseBoolean(key, value, scriptName);
             case "x" -> x = parseScriptFloat(key, value, scriptName);
@@ -115,5 +109,16 @@ public class ScriptZoneBlueprint {
                 Logger.warn("Failed to read key " + key + " for script " + scriptName + " in file " + filename);
             }
         }
+    }
+
+    private ScriptTargetsBlueprint createTargetsBlueprint(Object value) {
+        if (value instanceof MemorySection memorySection) {
+            return new ScriptTargetsBlueprint(memorySection.getValues(false), scriptName, filename);
+        }
+        if (value instanceof Map<?, ?> map) {
+            return new ScriptTargetsBlueprint(map, scriptName, filename);
+        }
+        Logger.warn("Failed to read target section for script " + scriptName + " in file " + filename);
+        return null;
     }
 }

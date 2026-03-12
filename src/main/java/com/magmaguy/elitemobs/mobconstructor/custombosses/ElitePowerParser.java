@@ -13,13 +13,15 @@ import com.magmaguy.magmacore.util.Logger;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
 public class ElitePowerParser {
 
     public static HashSet<ElitePower> parsePowers(CustomBossesConfigFields customBossesConfigFields, CustomBossEntity customBossEntity) {
-        HashSet<ElitePower> elitePowers = new HashSet<>(EliteScript.generateBossScripts(customBossesConfigFields.getEliteScript(), customBossEntity));
+        HashSet<ElitePower> elitePowers = new LinkedHashSet<>(EliteScript.generateBossScripts(customBossesConfigFields.getEliteScript(), customBossEntity));
+        elitePowers.forEach(power -> power.setOwnerEntity(customBossEntity));
         if (customBossesConfigFields.getPowers() == null) return elitePowers;
         CustomSummonPower customSummonPower = null;
         List<Object> powers = new ArrayList<>(customBossesConfigFields.getPowers());
@@ -31,6 +33,7 @@ public class ElitePowerParser {
                         || powerName.split(":")[0].equalsIgnoreCase("summonable"))
                     if (customSummonPower == null) {
                         customSummonPower = new CustomSummonPower(powerName, customBossesConfigFields);
+                        customSummonPower.setOwnerEntity(customBossEntity);
                         elitePowers.add(customSummonPower);
                     } else
                         customSummonPower.addEntry(powerName, customBossesConfigFields.getFilename());
@@ -76,6 +79,7 @@ public class ElitePowerParser {
                     //Parse reinforcements bosses
                     if (customSummonPower == null) {
                         customSummonPower = new CustomSummonPower(powerObject, customBossesConfigFields);
+                        customSummonPower.setOwnerEntity(customBossEntity);
                         elitePowers.add(customSummonPower);
                     } else
                         customSummonPower.addEntry(powerObject, customBossesConfigFields.getFilename());
@@ -101,12 +105,20 @@ public class ElitePowerParser {
         PowersConfigFields powersConfigFields = PowersConfig.getPower(powerName);
         if (powersConfigFields != null) {
             if (!powersConfigFields.getEliteScriptBlueprints().isEmpty()) {
-                elitePowers.addAll(EliteScript.generateBossScripts(powersConfigFields.getEliteScriptBlueprints(), eliteEntity));
+                EliteScript.generateBossScripts(powersConfigFields.getEliteScriptBlueprints(), eliteEntity).forEach(script -> {
+                    script.setOwnerEntity(eliteEntity);
+                    elitePowers.add(script);
+                });
                 return null;
             }
             ElitePower elitePower;
             try {
-                elitePower = powersConfigFields.getElitePowerClass().newInstance();
+                if (powersConfigFields instanceof com.magmaguy.elitemobs.config.powers.LuaPowerConfigFields luaPowerConfigFields) {
+                    elitePower = new com.magmaguy.elitemobs.powers.lua.LuaElitePower(luaPowerConfigFields);
+                } else {
+                    elitePower = powersConfigFields.getElitePowerClass().newInstance();
+                }
+                elitePower.setOwnerEntity(eliteEntity);
                 elitePowers.add(elitePower);
                 return elitePower;
             } catch (Exception ex) {

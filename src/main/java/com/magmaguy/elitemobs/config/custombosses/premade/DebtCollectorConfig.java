@@ -33,9 +33,9 @@ public class DebtCollectorConfig extends CustomBossesConfigFields {
         // Powers - mix of threatening abilities
         setPowers(new ArrayList<>(List.of(
                 "attack_push.yml",           // Knockback attacks
-                "attack_blinding.yml",       // Blind the target briefly
+                "attack_blinding.lua",       // Blind the target briefly
                 "movement_speed.yml",        // Fast pursuer
-                "attack_gravity.yml",        // Pull player back if they try to run
+                "attack_gravity.lua",        // Pull player back if they try to run
                 "spirit_walk.yml"            // Phase through blocks to chase
         )));
 

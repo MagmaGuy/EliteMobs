@@ -19,7 +19,7 @@ public class TheLivingDeadConfig extends CustomBossesConfigFields {
         setChestplate(ItemStackGenerator.generateItemStack(Material.CHAINMAIL_CHESTPLATE));
         setLeggings(ItemStackGenerator.generateItemStack(Material.CHAINMAIL_LEGGINGS));
         setBoots(ItemStackGenerator.generateItemStack(Material.CHAINMAIL_BOOTS));
-        setPowers(new ArrayList<>(List.of("attack_fire.yml", "corpse.yml", "ground_pound.yml")));
+        setPowers(new ArrayList<>(List.of("attack_fire.lua", "corpse.lua", "ground_pound.yml")));
         setFollowDistance(100);
     }
 }

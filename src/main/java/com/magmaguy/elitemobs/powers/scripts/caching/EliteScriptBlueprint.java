@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.powers.scripts.caching;
 
 import com.magmaguy.elitemobs.config.CustomConfigFields;
+import com.magmaguy.elitemobs.powers.scripts.loading.ScriptValueNormalizer;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.configuration.ConfigurationSection;
@@ -31,17 +32,23 @@ public class EliteScriptBlueprint {
 
 
     public EliteScriptBlueprint(CustomConfigFields customConfigFields,
-                                ConfigurationSection configurationSection,
+                                Map<String, Object> configurationValues,
                                 String scriptName) {
         this.filename = customConfigFields.getFilename();
-        this.scriptName = configurationSection.getName();
+        this.scriptName = scriptName;
         this.customConfigFields = customConfigFields;
-        this.scriptEventsBlueprint = new ScriptEventsBlueprint(configurationSection, scriptName, filename);
-        this.scriptConditionsBlueprint = new ScriptConditionsBlueprint(configurationSection, scriptName, filename);
-        this.scriptZoneBlueprint = new ScriptZoneBlueprint(configurationSection, scriptName, filename);
-        this.scriptActionsBlueprint = new ScriptActionsBlueprint(configurationSection, scriptName, filename);
-        this.scriptCooldownsBlueprint = new ScriptCooldownsBlueprint(configurationSection, scriptName, filename);
+        this.scriptEventsBlueprint = new ScriptEventsBlueprint(configurationValues, scriptName, filename);
+        this.scriptConditionsBlueprint = new ScriptConditionsBlueprint((Map<?, ?>) configurationValues.get("Conditions"), scriptName, filename);
+        this.scriptZoneBlueprint = new ScriptZoneBlueprint(configurationValues, scriptName, filename);
+        this.scriptActionsBlueprint = new ScriptActionsBlueprint(configurationValues, scriptName, filename);
+        this.scriptCooldownsBlueprint = new ScriptCooldownsBlueprint((Map<?, ?>) configurationValues.get("Cooldowns"), scriptName, filename);
         blueprints.put(customConfigFields, this);
+    }
+
+    public EliteScriptBlueprint(CustomConfigFields customConfigFields,
+                                ConfigurationSection configurationSection,
+                                String scriptName) {
+        this(customConfigFields, ScriptValueNormalizer.normalizeSection(configurationSection), scriptName);
     }
 
     public static void shutdown() {
@@ -51,17 +58,22 @@ public class EliteScriptBlueprint {
     public static List<EliteScriptBlueprint> parseBossScripts(ConfigurationSection configurationSection,
                                                               CustomConfigFields customConfigFields) {
         if (configurationSection == null) return Collections.emptyList();
-        List<EliteScriptBlueprint> eliteScripts = new ArrayList<>();
-        Map<String, EliteScriptBlueprint> permanentMap = new HashMap<>();
         //Check for legacy scripts, old target formatting
         checkLegacyFormat(configurationSection, customConfigFields);
-        for (Map.Entry<String, Object> entry : configurationSection.getValues(false).entrySet()) {
-            EliteScriptBlueprint eliteScript = new EliteScriptBlueprint(
-                    customConfigFields, configurationSection.getConfigurationSection(entry.getKey()), entry.getKey());
-            eliteScripts.add(eliteScript);
-            permanentMap.put(entry.getKey(), eliteScript);
-        }
+        return parseBossScripts(ScriptValueNormalizer.normalizeSection(configurationSection), customConfigFields);
+    }
 
+    public static List<EliteScriptBlueprint> parseBossScripts(Map<String, Object> configurationValues,
+                                                              CustomConfigFields customConfigFields) {
+        if (configurationValues == null || configurationValues.isEmpty()) return Collections.emptyList();
+        List<EliteScriptBlueprint> eliteScripts = new ArrayList<>();
+        for (Map.Entry<String, Object> entry : configurationValues.entrySet()) {
+            if (!(entry.getValue() instanceof Map<?, ?> scriptValues)) {
+                Logger.warn("Script " + entry.getKey() + " in " + customConfigFields.getFilename() + " is not a valid map!");
+                continue;
+            }
+            eliteScripts.add(new EliteScriptBlueprint(customConfigFields, ScriptValueNormalizer.normalizeMap(scriptValues), entry.getKey()));
+        }
         return eliteScripts;
     }
 

@@ -16,6 +16,7 @@ import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
+import com.magmaguy.elitemobs.powers.PowerExecutionOrder;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
@@ -51,7 +52,8 @@ public class EliteEntity {
     Once added, they can just be stored in a pool
      */
     @Getter
-    protected HashSet<ElitePower> elitePowers = new HashSet<>();
+    protected HashSet<ElitePower> elitePowers = new TrackedElitePowerSet();
+    private transient List<ElitePower> orderedElitePowers = null;
     //coming soon - decoupling aggro from damage to allow for tanking mechanics
     protected HashMap<Player, Double> aggro = new HashMap<>();
     /*
@@ -144,6 +146,7 @@ public class EliteEntity {
     private boolean healing = false;
     //Used by other plugins to tag bosses with custom data
     private final HashMap<NamespacedKey, Object> customData = new HashMap<>();
+    private final HashMap<String, Long> sharedCooldowns = new HashMap<>();
 
     /**
      * Functions as a placeholder for {@link CustomBossEntity} that haven't been initialized yet. Uses the builder pattern
@@ -563,6 +566,18 @@ public class EliteEntity {
         powersConfigFields.forEach(field -> ElitePower.addPower(this, field));
     }
 
+    public void setElitePowers(Collection<ElitePower> elitePowers) {
+        this.elitePowers.clear();
+        this.elitePowers.addAll(elitePowers);
+    }
+
+    public List<ElitePower> getElitePowersInExecutionOrder() {
+        if (orderedElitePowers == null) {
+            orderedElitePowers = PowerExecutionOrder.ordered(elitePowers);
+        }
+        return orderedElitePowers;
+    }
+
     public boolean hasPower(ElitePower mobPower) {
         for (ElitePower elitePower : elitePowers)
             if (elitePower.getPowersConfigFields().equals(mobPower.getPowersConfigFields()))
@@ -637,6 +652,56 @@ public class EliteEntity {
         if (triggeredAntiExploit) {
             this.eliteLoot = false;
             this.vanillaLoot = false;
+        }
+    }
+
+    private void invalidateElitePowerOrder() {
+        orderedElitePowers = null;
+    }
+
+    private final class TrackedElitePowerSet extends LinkedHashSet<ElitePower> {
+        @Override
+        public boolean add(ElitePower elitePower) {
+            boolean changed = super.add(elitePower);
+            if (changed) invalidateElitePowerOrder();
+            return changed;
+        }
+
+        @Override
+        public boolean addAll(Collection<? extends ElitePower> collection) {
+            boolean changed = super.addAll(collection);
+            if (changed) invalidateElitePowerOrder();
+            return changed;
+        }
+
+        @Override
+        public boolean remove(Object object) {
+            boolean changed = super.remove(object);
+            if (changed) invalidateElitePowerOrder();
+            return changed;
+        }
+
+        @Override
+        public boolean removeAll(Collection<?> collection) {
+            boolean changed = super.removeAll(collection);
+            if (changed) invalidateElitePowerOrder();
+            return changed;
+        }
+
+        @Override
+        public boolean retainAll(Collection<?> collection) {
+            boolean changed = super.retainAll(collection);
+            if (changed) invalidateElitePowerOrder();
+            return changed;
+        }
+
+        @Override
+        public void clear() {
+            if (isEmpty()) {
+                return;
+            }
+            super.clear();
+            invalidateElitePowerOrder();
         }
     }
 
@@ -751,6 +816,40 @@ public class EliteEntity {
 
     public void removeTags(List<String> tags) {
         customMetadata.removeAll(tags);
+    }
+
+    public boolean isSharedCooldownReady(String key) {
+        cleanupSharedCooldown(key);
+        return !sharedCooldowns.containsKey(key);
+    }
+
+    public long getSharedCooldownRemainingTicks(String key) {
+        cleanupSharedCooldown(key);
+        Long expiresAt = sharedCooldowns.get(key);
+        if (expiresAt == null) {
+            return 0L;
+        }
+        long remainingNanos = expiresAt - System.nanoTime();
+        if (remainingNanos <= 0) {
+            sharedCooldowns.remove(key);
+            return 0L;
+        }
+        return Math.max(1L, remainingNanos / 50_000_000L);
+    }
+
+    public void setSharedCooldown(String key, long ticks) {
+        if (ticks <= 0) {
+            sharedCooldowns.remove(key);
+            return;
+        }
+        sharedCooldowns.put(key, System.nanoTime() + ticks * 50_000_000L);
+    }
+
+    private void cleanupSharedCooldown(String key) {
+        Long expiresAt = sharedCooldowns.get(key);
+        if (expiresAt != null && expiresAt <= System.nanoTime()) {
+            sharedCooldowns.remove(key);
+        }
     }
 
 }

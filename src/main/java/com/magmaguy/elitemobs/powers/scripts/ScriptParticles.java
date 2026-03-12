@@ -14,8 +14,8 @@ public class ScriptParticles {
         this.particlesBlueprint = particlesBlueprint;
     }
 
-    public void visualize(ScriptActionData scriptActionData, Location location, EliteScript eliteScript) {
-        particlesBlueprint.getParticleBlueprints().forEach(particleBlueprint -> new ScriptParticle(particleBlueprint).visualize(scriptActionData, location, eliteScript));
+    public void visualize(ScriptActionData scriptActionData, Location location, ScriptRuntimeOwner runtimeOwner) {
+        particlesBlueprint.getParticleBlueprints().forEach(particleBlueprint -> new ScriptParticle(particleBlueprint).visualize(scriptActionData, location, runtimeOwner));
     }
 
     private class ScriptParticle {
@@ -26,7 +26,7 @@ public class ScriptParticles {
             this.particleBlueprint = scriptParticlesBlueprint;
         }
 
-        private void visualize(ScriptActionData scriptActionData, Location location, EliteScript eliteScript) {
+        private void visualize(ScriptActionData scriptActionData, Location location, ScriptRuntimeOwner runtimeOwner) {
             // Skip if world is no longer loaded (e.g., dungeon instance closing)
             if (location.getWorld() == null) return;
 
@@ -37,7 +37,7 @@ public class ScriptParticles {
 
             if (particleBlueprint.getRelativeVectorBlueprint() != null) {
                 ScriptRelativeVector scriptRelativeVector = null;
-                scriptRelativeVector = new ScriptRelativeVector(this.particleBlueprint.getRelativeVectorBlueprint(), eliteScript, location);
+                scriptRelativeVector = new ScriptRelativeVector(this.particleBlueprint.getRelativeVectorBlueprint(), runtimeOwner, location);
 
                 Vector movementVector = scriptRelativeVector.getVector(scriptActionData);
                 amount = 0;

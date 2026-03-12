@@ -10,7 +10,7 @@ public class EliteCreeper extends EliteMobProperties {
         this.entityType = EntityType.CREEPER;
         this.defaultMaxHealth = 20;
         this.baseDamage = MobPropertiesConfig.getMobProperties().get(EntityType.CREEPER).getBaseDamage();
-        super.removeDefensivePower("invisibility.yml");
+        super.removeDefensivePower("invisibility.lua");
         isEnabled = MobPropertiesConfig.getMobProperties().get(EntityType.CREEPER).isEnabled();
         eliteMobData.add(this);
     }

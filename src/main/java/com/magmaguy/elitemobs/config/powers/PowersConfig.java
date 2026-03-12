@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.config.powers;
 
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
+import com.magmaguy.elitemobs.powers.lua.LuaPowerManager;
 import com.magmaguy.magmacore.config.CustomConfig;
 
 import java.util.HashMap;
@@ -19,7 +20,14 @@ public class PowersConfig extends CustomConfig {
             powersConfigFields.initializeScripts();
         }
 
+        Map<String, PowersConfigFields> premadeLuaPowers = PremadeLuaPowers.load();
+        powers.putAll(premadeLuaPowers);
+
+        powers.putAll(LuaPowerManager.discoverLuaPowers(powers.values()));
+        powers.putAll(premadeLuaPowers);
+
         ElitePower.initializePowers();
+        powers.values().forEach(ElitePower::registerConfiguredPower);
     }
 
     public static Map<String, PowersConfigFields> getPowers() {

@@ -4,8 +4,10 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
 import com.magmaguy.elitemobs.config.CustomConfigFields;
+import com.magmaguy.elitemobs.config.powers.LuaPowerConfigFields;
 import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.elitemobs.powers.lua.LuaElitePower;
 import com.magmaguy.elitemobs.powers.scripts.EliteScript;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
@@ -54,6 +56,9 @@ public class ElitePower {
     @Getter
     @Setter
     private boolean isFiring = false;
+    @Getter
+    @Setter
+    private EliteEntity ownerEntity = null;
 
 
     //Constructor for scripts
@@ -72,16 +77,31 @@ public class ElitePower {
     }
 
     public static void addPower(EliteEntity eliteEntity, PowersConfigFields configFields) {
+        if (configFields instanceof LuaPowerConfigFields luaPowerConfigFields) {
+            LuaElitePower luaElitePower = new LuaElitePower(luaPowerConfigFields);
+            luaElitePower.setOwnerEntity(eliteEntity);
+            eliteEntity.getElitePowers().add(luaElitePower);
+            luaElitePower.applyPowers(eliteEntity.getLivingEntity());
+            return;
+        }
+
         if (configFields.getEliteScriptBlueprints().isEmpty())
             try {
                 ElitePower elitePower = configFields.getElitePowerClass().newInstance();
+                elitePower.setOwnerEntity(eliteEntity);
                 eliteEntity.getElitePowers().add(elitePower);
                 elitePower.applyPowers(eliteEntity.getLivingEntity());
             } catch (Exception ex) {
                 Logger.warn("Failed to assign power for config field " + configFields.getFilename());
             }
-        else
+        else {
             eliteEntity.getElitePowers().addAll(EliteScript.generateBossScripts(configFields.getEliteScriptBlueprints(), eliteEntity));
+            eliteEntity.getElitePowers().forEach(power -> {
+                if (power.getOwnerEntity() == null) {
+                    power.setOwnerEntity(eliteEntity);
+                }
+            });
+        }
     }
 
     public static void shutdown() {
@@ -148,6 +168,26 @@ public class ElitePower {
      */
     public void applyPowers(LivingEntity livingEntity) {
         //This is overwritten by certain classes to apply powers to a living entity upon activation
+    }
+
+    public int getExecutionPriority() {
+        return 0;
+    }
+
+    public static void registerConfiguredPower(PowersConfigFields configFields) {
+        elitePowers.put(configFields.getFilename(), configFields);
+        if (configFields.getPowerType() == null) {
+            return;
+        }
+        switch (configFields.getPowerType()) {
+            case DEFENSIVE -> defensivePowers.add(configFields);
+            case OFFENSIVE -> offensivePowers.add(configFields);
+            case MAJOR_BLAZE, MAJOR_ENDERMAN, MAJOR_SKELETON, MAJOR_GHAST, MAJOR_ZOMBIE -> majorPowers.add(configFields);
+            case MISCELLANEOUS -> miscellaneousPowers.add(configFields);
+            case UNIQUE -> specialPowers.add(configFields);
+            default -> {
+            }
+        }
     }
 
     public boolean isInCooldown(EliteEntity eliteEntity) {
