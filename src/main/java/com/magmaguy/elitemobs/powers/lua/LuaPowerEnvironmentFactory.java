@@ -29,10 +29,7 @@ public final class LuaPowerEnvironmentFactory {
         em.set("create_location", new VarArgFunction() {
             @Override
             public Varargs invoke(Varargs args) {
-                LuaTable table = new LuaTable();
-                table.set("x", args.checkdouble(1));
-                table.set("y", args.checkdouble(2));
-                table.set("z", args.checkdouble(3));
+                LuaTable table = createLocationTable(args.checkdouble(1), args.checkdouble(2), args.checkdouble(3));
                 if (args.narg() >= 4 && args.arg(4).isstring()) {
                     table.set("world", args.arg(4));
                 }
@@ -90,8 +87,57 @@ public final class LuaPowerEnvironmentFactory {
                 for (int index = 0; index < numericFields.length; index++) {
                     table.set(numericFields[index], args.checkdouble(index + 1));
                 }
+                table.set("set_center", tableMethod(table, methodArgs -> {
+                    table.set("origin", methodArgs.arg1());
+                    return table;
+                }));
+                table.set("set_origin", table.get("set_center"));
+                table.set("set_destination", tableMethod(table, methodArgs -> {
+                    table.set("destination", methodArgs.arg1());
+                    return table;
+                }));
+                table.set("point_toward", table.get("set_destination"));
                 return table;
             }
         };
+    }
+
+    private static LuaTable createLocationTable(double x, double y, double z) {
+        LuaTable table = new LuaTable();
+        table.set("x", x);
+        table.set("y", y);
+        table.set("z", z);
+        table.set("add", tableMethod(table, args -> {
+            table.set("x", LuaValue.valueOf(table.get("x").optdouble(0) + args.optdouble(1, 0)));
+            table.set("y", LuaValue.valueOf(table.get("y").optdouble(0) + args.optdouble(2, 0)));
+            table.set("z", LuaValue.valueOf(table.get("z").optdouble(0) + args.optdouble(3, 0)));
+            return table;
+        }));
+        return table;
+    }
+
+    private static LuaValue tableMethod(LuaTable owner, LuaCallback callback) {
+        return new VarArgFunction() {
+            @Override
+            public Varargs invoke(Varargs args) {
+                return callback.invoke(stripMethodSelf(args, owner));
+            }
+        };
+    }
+
+    private static Varargs stripMethodSelf(Varargs args, LuaTable owner) {
+        if (args.narg() == 0 || !args.arg1().raweq(owner)) {
+            return args;
+        }
+        LuaValue[] stripped = new LuaValue[Math.max(0, args.narg() - 1)];
+        for (int index = 2; index <= args.narg(); index++) {
+            stripped[index - 2] = args.arg(index);
+        }
+        return LuaValue.varargsOf(stripped);
+    }
+
+    @FunctionalInterface
+    private interface LuaCallback {
+        Varargs invoke(Varargs args);
     }
 }

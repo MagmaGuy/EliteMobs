@@ -20,6 +20,7 @@ import org.bukkit.util.Vector;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.Varargs;
+import org.luaj.vm2.lib.VarArgFunction;
 
 import java.util.*;
 
@@ -45,6 +46,17 @@ final class LuaPowerSupport {
         if (location.getWorld() != null) {
             table.set("world", LuaValue.valueOf(location.getWorld().getName()));
         }
+        table.set("add", new VarArgFunction() {
+            @Override
+            public Varargs invoke(Varargs args) {
+                LuaTable target = args.arg1().istable() ? args.arg1().checktable() : table;
+                int offsetIndex = args.arg1().raweq(table) ? 2 : 1;
+                target.set("x", LuaValue.valueOf(target.get("x").optdouble(0) + args.optdouble(offsetIndex, 0)));
+                target.set("y", LuaValue.valueOf(target.get("y").optdouble(0) + args.optdouble(offsetIndex + 1, 0)));
+                target.set("z", LuaValue.valueOf(target.get("z").optdouble(0) + args.optdouble(offsetIndex + 2, 0)));
+                return target;
+            }
+        });
         return table;
     }
 
@@ -89,9 +101,21 @@ final class LuaPowerSupport {
             table = table.get("direction").checktable();
         }
         return new Vector(
-                table.get("x").optdouble(0),
-                table.get("y").optdouble(0),
-                table.get("z").optdouble(0));
+                getIndexedOrNamedDouble(table, 1, "x"),
+                getIndexedOrNamedDouble(table, 2, "y"),
+                getIndexedOrNamedDouble(table, 3, "z"));
+    }
+
+    private double getIndexedOrNamedDouble(LuaTable table, int index, String key) {
+        LuaValue named = table.get(key);
+        if (named.isnumber()) {
+            return named.todouble();
+        }
+        LuaValue indexed = table.get(index);
+        if (indexed.isnumber()) {
+            return indexed.todouble();
+        }
+        return 0;
     }
 
     float getFloat(Varargs args, int index, float fallback) {

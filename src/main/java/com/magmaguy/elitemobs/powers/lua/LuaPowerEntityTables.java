@@ -2,12 +2,16 @@ package com.magmaguy.elitemobs.powers.lua;
 
 import com.magmaguy.elitemobs.api.EliteDamageEvent;
 import com.magmaguy.elitemobs.api.EliteMobSpawnEvent;
+import com.magmaguy.elitemobs.api.ScriptZoneEnterEvent;
+import com.magmaguy.elitemobs.api.ScriptZoneLeaveEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.pathfinding.Navigation;
+import com.magmaguy.elitemobs.powers.meta.CustomSummonPower;
 import com.magmaguy.elitemobs.utils.GameClock;
+import com.magmaguy.elitemobs.utils.shapes.Shape;
 import com.magmaguy.magmacore.util.AttributeManager;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import net.md_5.bungee.api.ChatMessageType;
@@ -18,6 +22,7 @@ import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -29,6 +34,8 @@ import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.Varargs;
 import org.luaj.vm2.lib.VarArgFunction;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 final class LuaPowerEntityTables {
@@ -52,8 +59,11 @@ final class LuaPowerEntityTables {
         boss.set("is_in_combat", LuaValue.valueOf(eliteEntity.isInCombat()));
         boss.set("exists", LuaValue.valueOf(eliteEntity.exists()));
         boss.set("current_location", support.toLocationTable(eliteEntity.getLocation()));
+        boss.set("is_alive", method(boss, args -> LuaValue.valueOf(isAlive(eliteEntity.getLivingEntity()) && eliteEntity.exists())));
+        boss.set("get_location", method(boss, args -> support.toLocationTable(eliteEntity.getLocation())));
         boss.set("add_tag", method(boss, args -> {
             eliteEntity.addTag(args.checkjstring(1));
+            scheduleTagRemoval(eliteEntity.getLivingEntity(), args.optint(2, 0), args.checkjstring(1));
             return LuaValue.NIL;
         }));
         boss.set("remove_tag", method(boss, args -> {
@@ -83,17 +93,23 @@ final class LuaPowerEntityTables {
             return LuaValue.NIL;
         }));
         boss.set("set_ai_enabled", method(boss, args -> {
-            if (eliteEntity.getLivingEntity() != null) {
-                eliteEntity.getLivingEntity().setAI(args.checkboolean(1));
-            }
+            applyAiState(eliteEntity.getLivingEntity(), args.checkboolean(1), args.optint(2, 0));
             return LuaValue.NIL;
         }));
         boss.set("play_sound_at_self", method(boss, args -> {
-            support.playSound(eliteEntity.getLocation(), args.checkjstring(1), support.getFloat(args, 2, 1f), support.getFloat(args, 3, 1f));
+            support.playSound(eliteEntity.getLocation(), args.checkjstring(1), resolveVolume(args), resolvePitch(args));
+            return LuaValue.NIL;
+        }));
+        boss.set("play_sound", method(boss, args -> {
+            support.playSound(eliteEntity.getLocation(), args.checkjstring(1), resolveLegacyVolume(args), resolveLegacyPitch(args));
             return LuaValue.NIL;
         }));
         boss.set("spawn_particle_at_self", method(boss, args -> {
             support.spawnParticle(eliteEntity.getLocation(), args.arg(1), args.optint(2, 1));
+            return LuaValue.NIL;
+        }));
+        boss.set("spawn_particles_at_location", method(boss, args -> {
+            support.spawnParticle(resolveLocationArgument(args.arg1()), particleSpec(args), args.optint(3, 1));
             return LuaValue.NIL;
         }));
         boss.set("set_velocity_vector", method(boss, args -> {
@@ -147,6 +163,97 @@ final class LuaPowerEntityTables {
             }
             return LuaValue.NIL;
         }));
+        boss.set("face_toward", method(boss, args -> {
+            if (eliteEntity.getLivingEntity() == null) {
+                return LuaValue.NIL;
+            }
+            Location destination = support.toLocation(args.arg1());
+            if (destination == null) {
+                return LuaValue.NIL;
+            }
+            Vector direction = destination.toVector().subtract(eliteEntity.getLivingEntity().getLocation().toVector());
+            if (direction.lengthSquared() > 0) {
+                Location facing = eliteEntity.getLivingEntity().getLocation();
+                facing.setDirection(direction);
+                eliteEntity.getLivingEntity().teleport(facing);
+            }
+            return LuaValue.NIL;
+        }));
+        boss.set("send_message", method(boss, args -> {
+            if (eliteEntity.getLocation() == null || eliteEntity.getLocation().getWorld() == null) {
+                return LuaValue.NIL;
+            }
+            String message = ChatColorConverter.convert(args.checkjstring(1));
+            double range = args.optdouble(2, 20);
+            double rangeSquared = range * range;
+            for (Player player : eliteEntity.getLocation().getWorld().getPlayers()) {
+                if (player.getLocation().distanceSquared(eliteEntity.getLocation()) <= rangeSquared) {
+                    player.sendMessage(message);
+                }
+            }
+            return LuaValue.NIL;
+        }));
+        boss.set("get_nearby_players", method(boss, args -> getNearbyPlayers(args.checkdouble(1))));
+        boss.set("get_target_player", method(boss, args -> {
+            if (eliteEntity.getLivingEntity() instanceof Mob mob && mob.getTarget() instanceof Player player) {
+                return createPlayerTable(player);
+            }
+            return LuaValue.NIL;
+        }));
+        boss.set("get_nearby_players_in_zone", method(boss, args -> getPlayersInZone(args.arg1())));
+        boss.set("spawn_particles_in_zone", method(boss, args -> {
+            spawnParticlesInZone(args.arg1(), false, particleSpec(args), args.optdouble(8, 1.0));
+            return LuaValue.NIL;
+        }));
+        boss.set("spawn_particles_in_zone_border", method(boss, args -> {
+            spawnParticlesInZone(args.arg1(), true, particleSpec(args), args.optdouble(8, 1.0));
+            return LuaValue.NIL;
+        }));
+        boss.set("get_particles_from_self_toward_zone", method(boss, args ->
+                buildDirectionalParticles(args.arg1(), args.checkjstring(2), eliteEntity.getLocation(), false, args.optdouble(3, 0.1))));
+        boss.set("get_particles_toward_self", method(boss, args ->
+                buildDirectionalParticles(args.arg1(), args.checkjstring(2), eliteEntity.getLocation(), true, args.optdouble(args.narg(), 0.1))));
+        boss.set("spawn_particles_with_vector", method(boss, args -> {
+            spawnDirectionalParticles(args.arg1());
+            return LuaValue.NIL;
+        }));
+        boss.set("summon_reinforcement", method(boss, args -> {
+            Location location = chooseZoneLocation(args.arg(2));
+            if (location == null) {
+                location = eliteEntity.getLocation();
+            }
+            CustomBossEntity reinforcement = CustomSummonPower.summonReinforcement(eliteEntity, location, args.checkjstring(1), args.optint(3, 0));
+            return reinforcement == null || reinforcement.getLivingEntity() == null
+                    ? LuaValue.NIL
+                    : createEntityTable(reinforcement.getLivingEntity());
+        }));
+        boss.set("summon_projectile", method(boss, args -> {
+            Location origin = resolveLocationArgument(args.arg(2));
+            Location destination = resolveLocationArgument(args.arg(3));
+            if (origin == null || destination == null || origin.getWorld() == null) {
+                return LuaValue.NIL;
+            }
+            EntityType entityType = support.parseEnum(args.checkjstring(1), EntityType.class, null);
+            if (entityType == null) {
+                return LuaValue.NIL;
+            }
+            org.bukkit.entity.Entity projectile = origin.getWorld().spawnEntity(origin, entityType);
+            Vector velocity = destination.toVector().subtract(origin.toVector());
+            if (velocity.lengthSquared() > 0) {
+                velocity.normalize().multiply(args.optdouble(4, 1.0));
+                projectile.setVelocity(velocity);
+            }
+            return LuaValue.NIL;
+        }));
+        boss.set("tag", boss.get("add_tag"));
+        boss.set("untag", boss.get("remove_tag"));
+        boss.set("set_ai", boss.get("set_ai_enabled"));
+        boss.set("play_animation", boss.get("play_model_animation"));
+        boss.set("damage", boss.get("deal_damage"));
+        boss.set("add_potion_effect", method(boss, args -> {
+            support.applyPotionEffect(eliteEntity.getLivingEntity(), args.checkjstring(1), args.checkint(3), args.optint(2, 0));
+            return LuaValue.NIL;
+        }));
         addEntityEffectMethods(boss, eliteEntity.getLivingEntity());
         return boss;
     }
@@ -187,6 +294,11 @@ final class LuaPowerEntityTables {
         }
         if (event instanceof EliteMobSpawnEvent spawnEvent) {
             eventTable.set("spawn_reason", LuaValue.valueOf(spawnEvent.getReason().name()));
+        }
+        if (event instanceof ScriptZoneEnterEvent zoneEnterEvent) {
+            eventTable.set("entity", createEntityTable(zoneEnterEvent.getEntity()));
+        } else if (event instanceof ScriptZoneLeaveEvent zoneLeaveEvent) {
+            eventTable.set("entity", createEntityTable(zoneLeaveEvent.getEntity()));
         }
         return eventTable;
     }
@@ -244,9 +356,11 @@ final class LuaPowerEntityTables {
         entity.set("is_player", LuaValue.valueOf(livingEntity instanceof Player));
         entity.set("is_elite", LuaValue.valueOf(EntityTracker.getEliteMobEntity(livingEntity) != null));
         entity.set("is_valid", LuaValue.valueOf(livingEntity.isValid()));
+        entity.set("is_alive", method(entity, args -> LuaValue.valueOf(isAlive(livingEntity))));
         entity.set("health", LuaValue.valueOf(livingEntity.getHealth()));
         entity.set("maximum_health", LuaValue.valueOf(Objects.requireNonNull(livingEntity.getAttribute(Attribute.MAX_HEALTH)).getValue()));
         entity.set("current_location", support.toLocationTable(livingEntity.getLocation()));
+        entity.set("get_location", method(entity, args -> support.toLocationTable(livingEntity.getLocation())));
         entity.set("deal_damage", method(entity, args -> {
             livingEntity.damage(args.checkdouble(1));
             return LuaValue.NIL;
@@ -257,7 +371,11 @@ final class LuaPowerEntityTables {
             return LuaValue.NIL;
         }));
         entity.set("play_sound_at_entity", method(entity, args -> {
-            support.playSound(livingEntity.getLocation(), args.checkjstring(1), support.getFloat(args, 2, 1f), support.getFloat(args, 3, 1f));
+            support.playSound(livingEntity.getLocation(), args.checkjstring(1), resolveVolume(args), resolvePitch(args));
+            return LuaValue.NIL;
+        }));
+        entity.set("play_sound", method(entity, args -> {
+            support.playSound(livingEntity.getLocation(), args.checkjstring(1), resolveLegacyVolume(args), resolveLegacyPitch(args));
             return LuaValue.NIL;
         }));
         VarArgFunction teleportToLocation = method(entity, args -> {
@@ -296,16 +414,7 @@ final class LuaPowerEntityTables {
         entity.set("push", push);
         entity.set("apply_push_vector", push);
         entity.set("set_ai_enabled", method(entity, args -> {
-            livingEntity.setAI(args.checkboolean(1));
-            int duration = args.optint(2, 0);
-            if (duration > 0) {
-                boolean targetValue = args.checkboolean(1);
-                GameClock.scheduleLater(duration, () -> {
-                    if (livingEntity.isValid()) {
-                        livingEntity.setAI(!targetValue);
-                    }
-                });
-            }
+            applyAiState(livingEntity, args.checkboolean(1), args.optint(2, 0));
             return LuaValue.NIL;
         }));
         VarArgFunction setAware = method(entity, args -> {
@@ -395,6 +504,7 @@ final class LuaPowerEntityTables {
         entity.set("navigate_to_location", navigateTo);
         entity.set("add_tag", method(entity, args -> {
             support.applyTag(livingEntity, args.checkjstring(1), true);
+            scheduleTagRemoval(livingEntity, args.optint(2, 0), args.checkjstring(1));
             return LuaValue.NIL;
         }));
         entity.set("remove_tag", method(entity, args -> {
@@ -402,8 +512,220 @@ final class LuaPowerEntityTables {
             return LuaValue.NIL;
         }));
         entity.set("has_tag", method(entity, args -> LuaValue.valueOf(support.hasTag(livingEntity, args.checkjstring(1)))));
+        entity.set("tag", entity.get("add_tag"));
+        entity.set("untag", entity.get("remove_tag"));
+        entity.set("set_ai", entity.get("set_ai_enabled"));
+        entity.set("damage", entity.get("deal_damage"));
+        entity.set("push_relative_to", method(entity, args -> {
+            Location source = resolveLocationArgument(args.arg1());
+            if (source == null || !livingEntity.isValid()) {
+                return LuaValue.NIL;
+            }
+            Vector relativePush = livingEntity.getLocation().toVector().subtract(source.toVector());
+            if (relativePush.lengthSquared() > 0) {
+                relativePush.normalize().multiply(args.optdouble(2, 1.0));
+            }
+            relativePush.add(new Vector(args.optdouble(3, 0), args.optdouble(4, 0), args.optdouble(5, 0)));
+            livingEntity.setVelocity(relativePush);
+            return LuaValue.NIL;
+        }));
+        entity.set("add_potion_effect", method(entity, args -> {
+            support.applyPotionEffect(livingEntity, args.checkjstring(1), args.checkint(3), args.optint(2, 0));
+            return LuaValue.NIL;
+        }));
         addEntityEffectMethods(entity, livingEntity);
         return entity;
+    }
+
+    private boolean isAlive(LivingEntity livingEntity) {
+        return livingEntity != null && livingEntity.isValid() && !livingEntity.isDead();
+    }
+
+    private void applyAiState(LivingEntity livingEntity, boolean targetValue, int duration) {
+        if (livingEntity == null) {
+            return;
+        }
+        livingEntity.setAI(targetValue);
+        if (duration > 0) {
+            GameClock.scheduleLater(duration, () -> {
+                if (livingEntity.isValid()) {
+                    livingEntity.setAI(!targetValue);
+                }
+            });
+        }
+    }
+
+    private float resolveVolume(Varargs args) {
+        if (args.narg() >= 2 && args.arg(2).istable()) {
+            return (float) args.arg(2).checktable().get("volume").optdouble(1.0);
+        }
+        return support.getFloat(args, 2, 1f);
+    }
+
+    private float resolvePitch(Varargs args) {
+        if (args.narg() >= 2 && args.arg(2).istable()) {
+            return (float) args.arg(2).checktable().get("pitch").optdouble(1.0);
+        }
+        return support.getFloat(args, 3, 1f);
+    }
+
+    private float resolveLegacyVolume(Varargs args) {
+        if (args.narg() >= 2 && args.arg(2).istable()) {
+            return (float) args.arg(2).checktable().get("volume").optdouble(1.0);
+        }
+        return support.getFloat(args, 3, 1f);
+    }
+
+    private float resolveLegacyPitch(Varargs args) {
+        if (args.narg() >= 2 && args.arg(2).istable()) {
+            return (float) args.arg(2).checktable().get("pitch").optdouble(1.0);
+        }
+        return support.getFloat(args, 2, 1f);
+    }
+
+    private void scheduleTagRemoval(LivingEntity livingEntity, int duration, String tag) {
+        if (livingEntity == null || duration <= 0) {
+            return;
+        }
+        GameClock.scheduleLater(duration, () -> {
+            if (livingEntity.isValid()) {
+                support.applyTag(livingEntity, tag, false);
+            }
+        });
+    }
+
+    private LuaValue getNearbyPlayers(double range) {
+        LuaTable results = new LuaTable();
+        if (eliteEntity.getLocation() == null || eliteEntity.getLocation().getWorld() == null) {
+            return results;
+        }
+        int index = 1;
+        double rangeSquared = range * range;
+        for (Player player : eliteEntity.getLocation().getWorld().getPlayers()) {
+            if (player.getLocation().distanceSquared(eliteEntity.getLocation()) <= rangeSquared) {
+                results.set(index++, createPlayerTable(player));
+            }
+        }
+        return results;
+    }
+
+    private LuaValue getPlayersInZone(LuaValue zoneValue) {
+        LuaTable results = new LuaTable();
+        Shape shape = support.createShape(zoneValue);
+        if (shape == null || eliteEntity.getLocation() == null || eliteEntity.getLocation().getWorld() == null) {
+            return results;
+        }
+        int index = 1;
+        for (Player player : eliteEntity.getLocation().getWorld().getPlayers()) {
+            if (shape.contains(player)) {
+                results.set(index++, createPlayerTable(player));
+            }
+        }
+        return results;
+    }
+
+    private void spawnParticlesInZone(LuaValue zoneValue, boolean border, LuaTable particle, double coverage) {
+        Shape shape = support.createShape(zoneValue);
+        if (shape == null) {
+            return;
+        }
+        for (Location location : sampleLocations(shape, border, coverage)) {
+            support.spawnParticle(location, particle, particle.get("amount").optint(1));
+        }
+    }
+
+    private LuaTable buildDirectionalParticles(LuaValue zoneValue, String particleKey, Location anchor, boolean towardAnchor, double speed) {
+        LuaTable results = new LuaTable();
+        Shape shape = support.createShape(zoneValue);
+        if (shape == null || anchor == null) {
+            return results;
+        }
+        int index = 1;
+        for (Location location : sampleLocations(shape, false, 0.2)) {
+            Vector direction = towardAnchor
+                    ? anchor.toVector().subtract(location.toVector())
+                    : location.toVector().subtract(anchor.toVector());
+            if (direction.lengthSquared() <= 0) {
+                continue;
+            }
+            direction.normalize();
+            LuaTable particle = new LuaTable();
+            particle.set("location", support.toLocationTable(location));
+            particle.set("particle", LuaValue.valueOf(particleKey));
+            particle.set("amount", LuaValue.ZERO);
+            particle.set("x", LuaValue.valueOf(direction.getX()));
+            particle.set("y", LuaValue.valueOf(direction.getY()));
+            particle.set("z", LuaValue.valueOf(direction.getZ()));
+            particle.set("speed", LuaValue.valueOf(speed));
+            results.set(index++, particle);
+        }
+        return results;
+    }
+
+    private void spawnDirectionalParticles(LuaValue particlesValue) {
+        if (!particlesValue.istable()) {
+            return;
+        }
+        LuaTable particles = particlesValue.checktable();
+        LuaValue key = LuaValue.NIL;
+        while (true) {
+            Varargs next = particles.next(key);
+            key = next.arg1();
+            if (key.isnil()) {
+                break;
+            }
+            LuaValue particleValue = next.arg(2);
+            if (!particleValue.istable()) {
+                continue;
+            }
+            LuaTable particle = particleValue.checktable();
+            support.spawnParticle(resolveLocationArgument(particle.get("location")), particle, particle.get("amount").optint(1));
+        }
+    }
+
+    private List<Location> sampleLocations(Shape shape, boolean border, double coverage) {
+        List<Location> source = border ? shape.getEdgeLocations() : shape.getLocations();
+        if (source.isEmpty()) {
+            return source;
+        }
+        double normalizedCoverage = Math.max(0.01, Math.min(1.0, coverage));
+        List<Location> sampled = new java.util.ArrayList<>();
+        for (Location location : source) {
+            if (Math.random() <= normalizedCoverage) {
+                sampled.add(location);
+            }
+        }
+        if (sampled.isEmpty()) {
+            sampled.add(source.get(0));
+        }
+        return sampled;
+    }
+
+    private Location chooseZoneLocation(LuaValue zoneValue) {
+        Shape shape = support.createShape(zoneValue);
+        if (shape == null) {
+            return resolveLocationArgument(zoneValue);
+        }
+        List<Location> locations = shape.getLocations();
+        if (locations.isEmpty()) {
+            return shape.getCenter();
+        }
+        return locations.get((int) (Math.random() * locations.size()));
+    }
+
+    private Location resolveLocationArgument(LuaValue value) {
+        return support.toLocation(value);
+    }
+
+    private LuaTable particleSpec(Varargs args) {
+        LuaTable particle = new LuaTable();
+        particle.set("particle", args.arg(2).isstring() ? args.arg(2) : args.arg(1));
+        particle.set("amount", LuaValue.valueOf(args.narg() >= 3 ? args.arg(3).optint(1) : 1));
+        particle.set("x", LuaValue.valueOf(args.narg() >= 4 ? args.arg(4).optdouble(0) : 0));
+        particle.set("y", LuaValue.valueOf(args.narg() >= 5 ? args.arg(5).optdouble(0) : 0));
+        particle.set("z", LuaValue.valueOf(args.narg() >= 6 ? args.arg(6).optdouble(0) : 0));
+        particle.set("speed", LuaValue.valueOf(args.narg() >= 7 ? args.arg(7).optdouble(0) : 0));
+        return particle;
     }
 
     private void addEntityEffectMethods(LuaTable entityTable, LivingEntity livingEntity) {
