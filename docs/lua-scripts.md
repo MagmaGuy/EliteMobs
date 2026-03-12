@@ -2,7 +2,7 @@
 
 EliteMobs now supports experimental standalone Lua power files in the `powers` config tree.
 
-The old `eliteScript` DSL remains YAML-only. Lua is not used as an alternate authoring format for that DSL.
+Lua can also drive the existing `eliteScript` action runtime by passing YAML-shaped tables to `context.script:execute(...)` or registering named script blocks with `context.script:register_script(...)`.
 
 ## Availability
 
@@ -47,6 +47,32 @@ return {
 ```
 
 The Lua API is intentionally verbose and self-documenting. Prefer names like `context.cooldowns.set_local(...)` and `context.player:place_temporary_block(...)` over short or ambiguous helper names.
+
+## YAML parity bridge
+
+Lua can execute the same action engine used by YAML scripts:
+
+```lua
+context.script:register_script("slam_followup", {
+  Actions = {
+    {
+      action = "DAMAGE",
+      target = {
+        targetType = "NEARBY_PLAYERS",
+        range = 4
+      },
+      amount = 2.0
+    }
+  }
+})
+
+context.script:execute({
+  action = "RUN_SCRIPT",
+  scripts = { "slam_followup" }
+})
+```
+
+Registered scripts may define `Zone` plus `Actions`, and executed action tables use the normal YAML action keys such as `target`, `finalTarget`, `relativeVector`, `landingScripts`, `conditions`, and `particles`.
 
 ## Supported top-level fields
 

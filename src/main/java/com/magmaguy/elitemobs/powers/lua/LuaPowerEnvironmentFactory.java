@@ -42,7 +42,6 @@ public final class LuaPowerEnvironmentFactory {
                 return table;
             }
         });
-        em.set("location", em.get("create_location"));
         em.set("create_vector", new VarArgFunction() {
             @Override
             public Varargs invoke(Varargs args) {
@@ -53,32 +52,23 @@ public final class LuaPowerEnvironmentFactory {
                 return table;
             }
         });
-        em.set("vector", em.get("create_vector"));
 
         LuaTable zone = new LuaTable();
-        zone.set("create_sphere_zone", zoneBuilder("sphere", "radius"));
-        zone.set("create_dome_zone", zoneBuilder("dome", "radius"));
-        zone.set("create_cylinder_zone", zoneBuilder("cylinder", "radius", "height"));
-        zone.set("create_cuboid_zone", zoneBuilder("cuboid", "x", "y", "z"));
-        zone.set("create_cone_zone", zoneBuilder("cone", "length", "radius"));
-        zone.set("create_static_ray_zone", zoneBuilder("static_ray", "length", "thickness"));
-        zone.set("create_rotating_ray_zone", zoneBuilder("rotating_ray", "length", "point_radius", "animation_duration"));
-        zone.set("create_translating_ray_zone", zoneBuilder("translating_ray", "length", "point_radius", "animation_duration"));
-        zone.set("sphere", zone.get("create_sphere_zone"));
-        zone.set("dome", zone.get("create_dome_zone"));
-        zone.set("cylinder", zone.get("create_cylinder_zone"));
-        zone.set("cuboid", zone.get("create_cuboid_zone"));
-        zone.set("cone", zone.get("create_cone_zone"));
-        zone.set("static_ray", zone.get("create_static_ray_zone"));
-        zone.set("rotating_ray", zone.get("create_rotating_ray_zone"));
-        zone.set("translating_ray", zone.get("create_translating_ray_zone"));
+        zone.set("create_sphere_zone", zoneBuilder("sphere", "set_center", null, "radius"));
+        zone.set("create_dome_zone", zoneBuilder("dome", "set_center", null, "radius"));
+        zone.set("create_cylinder_zone", zoneBuilder("cylinder", "set_center", null, "radius", "height"));
+        zone.set("create_cuboid_zone", zoneBuilder("cuboid", "set_center", null, "x", "y", "z"));
+        zone.set("create_cone_zone", zoneBuilder("cone", "set_origin", "set_destination", "length", "radius"));
+        zone.set("create_static_ray_zone", zoneBuilder("static_ray", "set_origin", "set_destination", "length", "thickness"));
+        zone.set("create_rotating_ray_zone", zoneBuilder("rotating_ray", "set_origin", "set_destination", "length", "point_radius", "animation_duration"));
+        zone.set("create_translating_ray_zone", zoneBuilder("translating_ray", "set_origin", "set_destination", "length", "point_radius", "animation_duration"));
         em.set("zone", zone);
 
         globals.set("em", em);
         return globals;
     }
 
-    private static LuaValue zoneBuilder(String kind, String... numericFields) {
+    private static LuaValue zoneBuilder(String kind, String originMethod, String destinationMethod, String... numericFields) {
         return new VarArgFunction() {
             @Override
             public Varargs invoke(Varargs args) {
@@ -87,16 +77,16 @@ public final class LuaPowerEnvironmentFactory {
                 for (int index = 0; index < numericFields.length; index++) {
                     table.set(numericFields[index], args.checkdouble(index + 1));
                 }
-                table.set("set_center", tableMethod(table, methodArgs -> {
+                table.set(originMethod, tableMethod(table, methodArgs -> {
                     table.set("origin", methodArgs.arg1());
                     return table;
                 }));
-                table.set("set_origin", table.get("set_center"));
-                table.set("set_destination", tableMethod(table, methodArgs -> {
-                    table.set("destination", methodArgs.arg1());
-                    return table;
-                }));
-                table.set("point_toward", table.get("set_destination"));
+                if (destinationMethod != null) {
+                    table.set(destinationMethod, tableMethod(table, methodArgs -> {
+                        table.set("destination", methodArgs.arg1());
+                        return table;
+                    }));
+                }
                 return table;
             }
         };

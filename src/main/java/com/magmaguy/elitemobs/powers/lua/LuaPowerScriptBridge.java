@@ -2,17 +2,21 @@ package com.magmaguy.elitemobs.powers.lua;
 
 import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.elitemobs.powers.scripts.ScriptAction;
 import com.magmaguy.elitemobs.powers.scripts.ScriptActionData;
+import com.magmaguy.elitemobs.powers.scripts.ScriptExecutable;
 import com.magmaguy.elitemobs.powers.scripts.ScriptParticles;
 import com.magmaguy.elitemobs.powers.scripts.ScriptRelativeVector;
 import com.magmaguy.elitemobs.powers.scripts.ScriptTargets;
 import com.magmaguy.elitemobs.powers.scripts.ScriptZone;
+import com.magmaguy.elitemobs.powers.scripts.caching.ScriptActionBlueprint;
 import com.magmaguy.elitemobs.powers.scripts.caching.ScriptParticlesBlueprint;
 import com.magmaguy.elitemobs.powers.scripts.caching.ScriptRelativeVectorBlueprint;
 import com.magmaguy.elitemobs.powers.scripts.caching.ScriptTargetsBlueprint;
 import com.magmaguy.elitemobs.powers.scripts.caching.ScriptZoneBlueprint;
 import com.magmaguy.elitemobs.powers.scripts.enums.TargetType;
 import com.magmaguy.elitemobs.utils.shapes.Shape;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
@@ -49,6 +53,7 @@ final class LuaPowerScriptBridge {
     private final LuaPowerSupport support;
     private final LuaPowerEntityTables entityTables;
     private final OwnedTaskController taskController;
+    private final Map<String, ScriptExecutable> registeredScripts = new LinkedHashMap<>();
 
     LuaPowerScriptBridge(LuaPowerDefinition definition,
                          EliteEntity eliteEntity,
@@ -64,6 +69,14 @@ final class LuaPowerScriptBridge {
 
     LuaTable createTable(Event event, LivingEntity directTarget) {
         LuaTable scripts = new LuaTable();
+        scripts.set("register_script", method(scripts, args -> {
+            registerScript(args.checkjstring(1), args.arg(2));
+            return LuaValue.NIL;
+        }));
+        scripts.set("execute", method(scripts, args -> {
+            execute(args.arg1(), event, directTarget);
+            return LuaValue.NIL;
+        }));
         scripts.set("target", method(scripts, args -> createTargetHandle(args.checktable(1), event, directTarget, null)));
         scripts.set("zone", method(scripts, args -> createZoneHandle(args.checktable(1), event, directTarget)));
         scripts.set("relative_vector", method(scripts, args -> {
@@ -91,6 +104,110 @@ final class LuaPowerScriptBridge {
             return LuaValue.NIL;
         }));
         return scripts;
+    }
+
+    private void registerScript(String name, LuaValue specValue) {
+        CompiledLuaScript compiledLuaScript = compileScript(name, specValue);
+        if (compiledLuaScript != null) {
+            registeredScripts.put(name, compiledLuaScript);
+        }
+    }
+
+    private void execute(LuaValue specValue, Event event, LivingEntity directTarget) {
+        if (specValue == null || specValue.isnil()) {
+            return;
+        }
+        if (specValue.isstring()) {
+            ScriptExecutable scriptExecutable = registeredScripts.get(specValue.tojstring());
+            if (scriptExecutable instanceof CompiledLuaScript compiledLuaScript) {
+                compiledLuaScript.run(event, directTarget);
+            } else {
+                Logger.warn("Failed to find registered Lua script '" + specValue.tojstring() + "' in " + definition.getFileName() + ".");
+            }
+            return;
+        }
+
+        CompiledLuaScript compiledLuaScript = compileScript("__lua_inline__", specValue);
+        if (compiledLuaScript != null) {
+            compiledLuaScript.run(event, directTarget);
+        }
+    }
+
+    private CompiledLuaScript compileScript(String scriptName, LuaValue specValue) {
+        Object rawSpecification = LuaPowerTableConverter.toJavaObject(specValue);
+        if (!(rawSpecification instanceof Map<?, ?>) && !(rawSpecification instanceof List<?>)) {
+            Logger.warn("Failed to compile Lua script specification '" + scriptName + "' in " + definition.getFileName() + ".");
+            return null;
+        }
+
+        LuaScriptRuntimeOwner runtimeOwner = new LuaScriptRuntimeOwner(definition.getFileName());
+        List<Map<String, Object>> actionSpecs;
+
+        if (rawSpecification instanceof Map<?, ?> rawMap) {
+            Map<String, Object> specification = castStringObjectMap(rawMap);
+            Object zoneSpec = getValueIgnoreCase(specification, "Zone");
+            if (zoneSpec instanceof Map<?, ?> rawZoneMap) {
+                Map<String, Object> zoneMap = castStringObjectMap(rawZoneMap);
+                ScriptZone scriptZone = new ScriptZone(
+                        new ScriptZoneBlueprint(Map.of("Zone", zoneMap), scriptName, definition.getFileName()),
+                        runtimeOwner);
+                runtimeOwner.setScriptZone(scriptZone);
+            }
+
+            Object actionsSpec = getValueIgnoreCase(specification, "Actions");
+            actionSpecs = actionsSpec == null
+                    ? List.of(specification)
+                    : extractActionSpecs(actionsSpec, scriptName);
+        } else {
+            actionSpecs = extractActionSpecs(rawSpecification, scriptName);
+        }
+
+        List<ScriptAction> actions = new java.util.ArrayList<>();
+        for (Map<String, Object> actionSpec : actionSpecs) {
+            actions.add(new ScriptAction(
+                    new ScriptActionBlueprint(actionSpec, scriptName, definition.getFileName()),
+                    registeredScripts,
+                    runtimeOwner));
+        }
+        return new CompiledLuaScript(actions);
+    }
+
+    private List<Map<String, Object>> extractActionSpecs(Object rawActions, String scriptName) {
+        if (rawActions instanceof List<?> list) {
+            List<Map<String, Object>> actionSpecs = new java.util.ArrayList<>();
+            for (Object entry : list) {
+                if (entry instanceof Map<?, ?> rawMap) {
+                    actionSpecs.add(castStringObjectMap(rawMap));
+                }
+            }
+            if (!actionSpecs.isEmpty()) {
+                return actionSpecs;
+            }
+        } else if (rawActions instanceof Map<?, ?> rawMap) {
+            return List.of(castStringObjectMap(rawMap));
+        }
+
+        Logger.warn("Failed to parse Lua action list for '" + scriptName + "' in " + definition.getFileName() + ".");
+        return Collections.emptyList();
+    }
+
+    private Map<String, Object> castStringObjectMap(Map<?, ?> rawMap) {
+        Map<String, Object> castedMap = new LinkedHashMap<>();
+        for (Map.Entry<?, ?> entry : rawMap.entrySet()) {
+            if (entry.getKey() instanceof String key) {
+                castedMap.put(key, entry.getValue());
+            }
+        }
+        return castedMap;
+    }
+
+    private Object getValueIgnoreCase(Map<String, Object> values, String key) {
+        for (Map.Entry<String, Object> entry : values.entrySet()) {
+            if (entry.getKey().equalsIgnoreCase(key)) {
+                return entry.getValue();
+            }
+        }
+        return null;
     }
 
     private <T> T extractHandle(LuaValue value, Class<T> type) {
@@ -384,6 +501,31 @@ final class LuaPowerScriptBridge {
     @RequiredArgsConstructor
     private static final class LuaTargetHandle {
         private final LuaTargetResolver resolver;
+    }
+
+    @RequiredArgsConstructor
+    private final class CompiledLuaScript implements ScriptExecutable {
+        private final List<ScriptAction> actions;
+
+        private void run(Event event, LivingEntity directTarget) {
+            for (ScriptAction action : actions) {
+                action.runScript(eliteEntity, directTarget, event);
+            }
+        }
+
+        @Override
+        public void check(EliteEntity eliteEntity, LivingEntity directTarget, ScriptActionData previousScriptActionData) {
+            for (ScriptAction action : actions) {
+                action.runScript(previousScriptActionData);
+            }
+        }
+
+        @Override
+        public void check(Location landingLocation, ScriptActionData previousScriptActionData) {
+            for (ScriptAction action : actions) {
+                action.runScript(previousScriptActionData, landingLocation);
+            }
+        }
     }
 
     private final class LuaZoneHandle {
