@@ -215,13 +215,8 @@ public class LuaPowerInstance {
             eliteEntity.setSharedCooldown(key, duration);
             return LuaValue.TRUE;
         }));
-        cooldowns.set("check", cooldowns.get("check_local"));
         cooldowns.set("set_local", method(cooldowns, args -> {
             eliteEntity.setSharedCooldown(resolveCooldownKey(args, 2), args.checklong(1));
-            return LuaValue.NIL;
-        }));
-        cooldowns.set("set", method(cooldowns, args -> {
-            eliteEntity.setSharedCooldown(resolveCooldownKey(args, 1), args.checklong(2));
             return LuaValue.NIL;
         }));
         cooldowns.set("global_ready", method(cooldowns, args -> LuaValue.valueOf(!eliteEntity.isInCooldown())));
@@ -239,7 +234,6 @@ public class LuaPowerInstance {
             LuaFunction callback = args.checkfunction(2);
             return LuaValue.valueOf(ownLaterTask(ticks, callback));
         }));
-        scheduler.set("run_delayed", scheduler.get("run_after"));
         scheduler.set("run_every", method(scheduler, args -> {
             int ticks = args.checkint(1);
             LuaFunction callback = args.checkfunction(2);
@@ -249,7 +243,6 @@ public class LuaPowerInstance {
             cancelOwnedTask(args.checkint(1));
             return LuaValue.NIL;
         }));
-        scheduler.set("timer", method(scheduler, args -> createLegacyTimerBuilder(args.checkint(1))));
         return scheduler;
     }
 
@@ -279,91 +272,7 @@ public class LuaPowerInstance {
             }
             return LuaValue.NIL;
         }));
-        zones.set("get_zone", method(zones, args -> createLegacyNamedZone(args.checkjstring(1))));
-        zones.set("sphere", method(zones, args -> createLegacySphereBuilder(args.checkdouble(1))));
         return zones;
-    }
-
-    private LuaTable createLegacyNamedZone(String name) {
-        LuaTable zone = new LuaTable();
-        zone.set("name", LuaValue.valueOf(name));
-        zone.set("contains", method(zone, args -> LuaValue.FALSE));
-        return zone;
-    }
-
-    private LuaTable createLegacyTimerBuilder(int intervalTicks) {
-        LuaTable timer = new LuaTable();
-        LegacyTimerState state = new LegacyTimerState(intervalTicks);
-        timer.set("repeating", method(timer, args -> {
-            state.repeating = true;
-            return timer;
-        }));
-        timer.set("delay", method(timer, args -> {
-            state.initialDelayTicks = args.checkint(1);
-            return timer;
-        }));
-        timer.set("run", method(timer, args -> {
-            LuaFunction callback = args.checkfunction(1);
-            int initialDelayTicks = state.initialDelayTicks == null ? intervalTicks : state.initialDelayTicks;
-            if (state.repeating) {
-                return LuaValue.valueOf(ownRepeatingTask(initialDelayTicks, intervalTicks, callback));
-            }
-            return LuaValue.valueOf(ownLaterTask(initialDelayTicks, callback));
-        }));
-        return timer;
-    }
-
-    private LuaTable createLegacySphereBuilder(double radius) {
-        LuaTable builder = new LuaTable();
-        LegacySphereState state = new LegacySphereState(radius);
-        builder.set("at_boss", method(builder, args -> builder));
-        builder.set("track_boss", method(builder, args -> {
-            state.trackBoss = true;
-            return builder;
-        }));
-        builder.set("every", method(builder, args -> {
-            state.intervalTicks = args.checkint(1);
-            return builder;
-        }));
-        builder.set("particles", method(builder, args -> {
-            String particleKey = args.checkjstring(1);
-            LuaTable options = args.narg() >= 2 && args.arg(2).istable() ? args.arg(2).checktable() : new LuaTable();
-            return LuaValue.valueOf(ownRepeatingTask(state.intervalTicks, state.intervalTicks, () ->
-                    runLegacySphereParticles(state, particleKey, options)));
-        }));
-        return builder;
-    }
-
-    private void runLegacySphereParticles(LegacySphereState state, String particleKey, LuaTable options) {
-        Location center = state.trackBoss || state.anchorLocation == null ? eliteEntity.getLocation() : state.anchorLocation;
-        if (center == null || center.getWorld() == null) {
-            return;
-        }
-        if (!state.trackBoss && state.anchorLocation == null) {
-            state.anchorLocation = center.clone();
-        }
-        Location particleLocation = center.clone().add(randomVectorInSphere(state.radius));
-        Vector offset = support.toVector(options.get("offset"));
-        if (offset != null) {
-            particleLocation.add(offset);
-        }
-        LuaTable particle = new LuaTable();
-        particle.set("particle", LuaValue.valueOf(particleKey));
-        particle.set("amount", LuaValue.valueOf(options.get("amount").optint(1)));
-        particle.set("speed", LuaValue.valueOf(options.get("speed").optdouble(0)));
-        support.spawnParticle(particleLocation, particle, 1);
-    }
-
-    private Vector randomVectorInSphere(double radius) {
-        double x;
-        double y;
-        double z;
-        do {
-            x = (Math.random() * 2 - 1) * radius;
-            y = (Math.random() * 2 - 1) * radius;
-            z = (Math.random() * 2 - 1) * radius;
-        } while (x * x + y * y + z * z > radius * radius);
-        return new Vector(x, y, z);
     }
 
     private void runCallback(LuaFunction callback) {
@@ -551,24 +460,4 @@ public class LuaPowerInstance {
         Varargs invoke(Varargs args);
     }
 
-    private static final class LegacyTimerState {
-        private final int intervalTicks;
-        private boolean repeating = false;
-        private Integer initialDelayTicks = null;
-
-        private LegacyTimerState(int intervalTicks) {
-            this.intervalTicks = intervalTicks;
-        }
-    }
-
-    private static final class LegacySphereState {
-        private final double radius;
-        private boolean trackBoss = false;
-        private int intervalTicks = 1;
-        private Location anchorLocation = null;
-
-        private LegacySphereState(double radius) {
-            this.radius = radius;
-        }
-    }
 }
