@@ -43,6 +43,7 @@ import com.magmaguy.elitemobs.powers.*;
 import com.magmaguy.elitemobs.powers.meta.Bombardment;
 import com.magmaguy.elitemobs.powers.meta.CombatEnterScanPower;
 import com.magmaguy.elitemobs.powers.meta.CustomSummonPower;
+import com.magmaguy.elitemobs.powers.lua.LuaPowerEvents;
 import com.magmaguy.elitemobs.powers.scripts.EliteScript;
 import com.magmaguy.elitemobs.powers.scripts.ScriptListener;
 import com.magmaguy.elitemobs.powers.specialpowers.EnderCrystalLightningRod;
@@ -162,6 +163,7 @@ public class EventsRegistrer {
          */
         //Minor mob powers
         register(new ScriptListener());
+        register(new LuaPowerEvents());
         registerPower(new InvulnerabilityArrow(), "invulnerability_arrow.yml");
         registerPower(new InvulnerabilityFallDamage(), "invulnerability_fall_damage.yml");
         registerPower(new InvulnerabilityKnockback(), "invulnerability_knockback.yml");

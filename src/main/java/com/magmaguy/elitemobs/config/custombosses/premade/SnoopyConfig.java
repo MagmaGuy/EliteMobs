@@ -23,7 +23,7 @@ public class SnoopyConfig extends CustomBossesConfigFields {
         setTimeout(3);
         setHealthMultiplier(10);
         setDamageMultiplier(2);
-        setPowers(new ArrayList<>(List.of("invulnerability_fire.yml")));
+        setPowers(new ArrayList<>(List.of("invulnerability_fire.lua")));
         setDropsVanillaLoot(false);
         setDropsEliteMobsLoot(false);
         setTrails(Collections.singletonList(Material.BONE.toString()));

@@ -7,6 +7,7 @@ import com.magmaguy.elitemobs.items.customloottable.CustomLootTable;
 import com.magmaguy.elitemobs.mobconstructor.BossType;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.powers.scripts.caching.EliteScriptBlueprint;
+import com.magmaguy.elitemobs.powers.scripts.loading.ScriptValueNormalizer;
 import com.magmaguy.elitemobs.thirdparty.custommodels.CustomModel;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.Logger;
@@ -411,7 +412,16 @@ public class CustomBossesConfigFields extends CustomConfigFields {
         this.movementSpeedAttribute = processDouble("movementSpeedAttribute", movementSpeedAttribute, null, false);
 
         rawEliteScripts = fileConfiguration.getConfigurationSection("eliteScript");
-        if (rawEliteScripts != null) eliteScript = EliteScriptBlueprint.parseBossScripts(rawEliteScripts, this);
+        try {
+            Map<String, Object> normalizedScripts = ScriptValueNormalizer.normalizeSection(rawEliteScripts);
+            eliteScript = normalizedScripts.isEmpty()
+                    ? new ArrayList<>()
+                    : EliteScriptBlueprint.parseBossScripts(normalizedScripts, this);
+        } catch (Exception exception) {
+            eliteScript = new ArrayList<>();
+            Logger.warn("You have a script with invalid data! Script in " + filename + " is not valid.");
+            exception.printStackTrace();
+        }
 
         this.song = processString("song", song, null, false);
         this.alert = processBoolean("alert", alert, false, false);

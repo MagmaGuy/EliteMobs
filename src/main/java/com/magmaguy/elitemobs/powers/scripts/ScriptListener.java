@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.powers.scripts;
 import com.magmaguy.elitemobs.api.*;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
+import com.magmaguy.elitemobs.powers.lua.LuaElitePower;
 import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -13,6 +14,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 
 import java.util.HashMap;
@@ -28,7 +30,7 @@ public class ScriptListener implements Listener {
 
     public static void runEvent(FallingEntityDataPair fallingEntityDataPair, Location landingLocation) {
         for (String string : fallingEntityDataPair.getScriptAction().getBlueprint().getLandingScripts()) {
-            EliteScript iteratedScript = fallingEntityDataPair.getScriptAction().getEliteScriptMap().get(string);
+            ScriptExecutable iteratedScript = fallingEntityDataPair.getScriptAction().getEliteScriptMap().get(string);
             if (iteratedScript == null) {
                 Logger.warn("Elite script " + string + " does not exist for landing scripts!");
                 return;
@@ -122,20 +124,32 @@ public class ScriptListener implements Listener {
     }
 
     private void runEvent(Event event, EliteEntity eliteEntity) {
-        for (ElitePower elitePower : eliteEntity.getElitePowers())
+        for (ElitePower elitePower : eliteEntity.getElitePowersInExecutionOrder()) {
+            if (event instanceof Cancellable cancellable && cancellable.isCancelled()) return;
             if (elitePower instanceof EliteScript eliteScript)
                 eliteScript.check(event, eliteEntity, null);
+            else if (elitePower instanceof LuaElitePower luaElitePower)
+                luaElitePower.check(event, eliteEntity, (org.bukkit.entity.LivingEntity) null);
+        }
     }
 
     private void runEventGeneric(Event event, EliteEntity eliteEntity, LivingEntity directTarget) {
-        for (ElitePower elitePower : eliteEntity.getElitePowers())
+        for (ElitePower elitePower : eliteEntity.getElitePowersInExecutionOrder()) {
+            if (event instanceof Cancellable cancellable && cancellable.isCancelled()) return;
             if (elitePower instanceof EliteScript eliteScript)
                 eliteScript.check(event, eliteEntity, directTarget);
+            else if (elitePower instanceof LuaElitePower luaElitePower)
+                luaElitePower.check(event, eliteEntity, directTarget);
+        }
     }
 
     private void runEvent(Event event, EliteEntity eliteEntity, Player player) {
-        for (ElitePower elitePower : eliteEntity.getElitePowers())
+        for (ElitePower elitePower : eliteEntity.getElitePowersInExecutionOrder()) {
+            if (event instanceof Cancellable cancellable && cancellable.isCancelled()) return;
             if (elitePower instanceof EliteScript eliteScript)
                 eliteScript.check(event, eliteEntity, player);
+            else if (elitePower instanceof LuaElitePower luaElitePower)
+                luaElitePower.check(event, eliteEntity, player);
+        }
     }
 }

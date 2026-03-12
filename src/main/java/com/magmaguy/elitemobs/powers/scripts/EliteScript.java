@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class EliteScript extends ElitePower implements Cloneable {
+public class EliteScript extends ElitePower implements Cloneable, ScriptRuntimeOwner, ScriptExecutable {
     protected ScriptActions scriptActions;
     //Parse from power file
     private ScriptEvents scriptEvents;
@@ -28,12 +28,12 @@ public class EliteScript extends ElitePower implements Cloneable {
     private ScriptCooldowns scriptCooldowns;
     private ScriptConditions scriptConditions;
     @Getter
-    protected Map<String, EliteScript> eliteScriptMap;
+    protected Map<String, ScriptExecutable> eliteScriptMap;
     @Setter
     //Set by halt action
     private boolean halt = false;
 
-    public EliteScript(EliteScriptBlueprint scriptBlueprint, Map<String, EliteScript> eliteScriptMap, EliteEntity eliteEntity) {
+    public EliteScript(EliteScriptBlueprint scriptBlueprint, Map<String, ScriptExecutable> eliteScriptMap, EliteEntity eliteEntity) {
         super(scriptBlueprint.getCustomConfigFields());
         if (halt) return;
         this.eliteScriptMap = eliteScriptMap;
@@ -49,7 +49,7 @@ public class EliteScript extends ElitePower implements Cloneable {
     //Parse from boss config
     public static List<EliteScript> generateBossScripts(List<EliteScriptBlueprint> blueprints, EliteEntity eliteEntity) {
         //The map is declared here because it needs to be shared inside of all scripts in the same file so they can be referenced.
-        HashMap<String, EliteScript> powerMap = new HashMap();
+        HashMap<String, ScriptExecutable> powerMap = new HashMap();
         return blueprints.stream().map(eliteScriptBlueprint -> new EliteScript(eliteScriptBlueprint, powerMap, eliteEntity)).collect(Collectors.toList());
     }
 

@@ -60,20 +60,20 @@ public class ScriptZone {
      * @param zoneBlueprint The blueprint defining the zone's properties.
      * @param eliteScript   The script associated with this zone.
      */
-    public ScriptZone(ScriptZoneBlueprint zoneBlueprint, EliteScript eliteScript) {
+    public ScriptZone(ScriptZoneBlueprint zoneBlueprint, ScriptRuntimeOwner runtimeOwner) {
         this.zoneBlueprint = zoneBlueprint;
-        this.targets = new ScriptTargets(zoneBlueprint.getTarget(), eliteScript);
+        this.targets = new ScriptTargets(zoneBlueprint.getTarget(), runtimeOwner);
 
         if (zoneBlueprint.getFinalTarget() != null) {
-            this.finalTargets = new ScriptTargets(zoneBlueprint.getFinalTarget(), eliteScript);
+            this.finalTargets = new ScriptTargets(zoneBlueprint.getFinalTarget(), runtimeOwner);
         }
 
         if (zoneBlueprint.getTarget2() != null) {
-            this.targets2 = new ScriptTargets(zoneBlueprint.getTarget2(), eliteScript);
+            this.targets2 = new ScriptTargets(zoneBlueprint.getTarget2(), runtimeOwner);
         }
 
         if (zoneBlueprint.getFinalTarget2() != null) {
-            this.finalTargets2 = new ScriptTargets(zoneBlueprint.getFinalTarget2(), eliteScript);
+            this.finalTargets2 = new ScriptTargets(zoneBlueprint.getFinalTarget2(), runtimeOwner);
         }
 
         this.isValid = zoneBlueprint.getTarget() != null;
