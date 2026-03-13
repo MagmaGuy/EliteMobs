@@ -57,8 +57,8 @@ public class EnderDragonTornadoLuaConfig extends InlineLuaPowerConfig {
                   local result = 0
                   local bit = 1
                   while a > 0 or b > 0 do
-                    local a_bit = a %% 2
-                    local b_bit = b %% 2
+                    local a_bit = a % 2
+                    local b_bit = b % 2
                     if a_bit ~= b_bit then
                       result = result + bit
                     end
@@ -197,7 +197,7 @@ public class EnderDragonTornadoLuaConfig extends InlineLuaPowerConfig {
                           context.state.tornado_speed.z
                         )
 
-                        if counter %% 2 == 0 then
+                        if counter % 2 == 0 then
                           do_tornado_particles(context)
                           do_terrain_destruction(context)
                           do_entity_displacement(context)

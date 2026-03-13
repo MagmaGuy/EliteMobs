@@ -22,26 +22,30 @@ public class GetTierCommand {
     }
 
     public static void get(Player player, int tierLevel) {
-        grantLoadout(player, tierLevel, false);
+        grantLoadout(player, tierLevel, false, false);
     }
 
     public static void getLimited(Player player, int tierLevel) {
-        grantLoadout(player, tierLevel, true);
+        grantLoadout(player, tierLevel, true, false);
     }
 
-    private static void grantLoadout(Player player, int tierLevel, boolean limited) {
+    public static void getUnbreakable(Player player, int tierLevel) {
+        grantLoadout(player, tierLevel, false, true);
+    }
+
+    private static void grantLoadout(Player player, int tierLevel, boolean limited, boolean unbreakable) {
         ItemStack helmet = new ItemStack(Material.IRON_HELMET);
-        addDurability(helmet);
+        addDurability(helmet, unbreakable);
         ItemStack chestplate = new ItemStack(Material.IRON_CHESTPLATE);
-        addDurability(chestplate);
+        addDurability(chestplate, unbreakable);
         ItemStack leggings = new ItemStack(Material.IRON_LEGGINGS);
-        addDurability(leggings);
+        addDurability(leggings, unbreakable);
         ItemStack boots = new ItemStack(Material.IRON_BOOTS);
-        addDurability(boots);
+        addDurability(boots, unbreakable);
         ItemStack sword = new ItemStack(Material.IRON_SWORD);
-        addDurability(sword);
+        addDurability(sword, unbreakable);
         ItemStack bow = new ItemStack(Material.BOW);
-        addDurability(bow);
+        addDurability(bow, unbreakable);
         ItemStack spear = null;
         ItemStack axe = null;
         ItemStack scythe = null;
@@ -50,24 +54,24 @@ public class GetTierCommand {
         ItemStack mace = null;
         if (!limited) {
             axe = new ItemStack(Material.IRON_AXE);
-            addDurability(axe);
+            addDurability(axe, unbreakable);
             scythe = new ItemStack(Material.IRON_HOE);
-            addDurability(scythe);
+            addDurability(scythe, unbreakable);
             crossbow = new ItemStack(Material.CROSSBOW);
-            addDurability(crossbow);
+            addDurability(crossbow, unbreakable);
             trident = new ItemStack(Material.TRIDENT);
-            addDurability(trident);
+            addDurability(trident, unbreakable);
             mace = new ItemStack(Material.MACE);
-            addDurability(mace);
+            addDurability(mace, unbreakable);
             try {
                 spear = new ItemStack(Material.IRON_SPEAR);
-                addDurability(spear);
+                addDurability(spear, unbreakable);
             } catch (NoSuchFieldError ignored) {
                 // SPEAR doesn't exist pre-1.21.11
             }
         }
         ItemStack cheatSword = new ItemStack(Material.NETHERITE_SWORD);
-        addDurability(cheatSword);
+        addDurability(cheatSword, unbreakable);
 
         EliteItemManager.setEliteLevel(helmet, tierLevel);
         EliteItemManager.setEliteLevel(chestplate, tierLevel);
@@ -153,8 +157,12 @@ public class GetTierCommand {
     }
 
     private static void addDurability(ItemStack itemStack) {
+        addDurability(itemStack, false);
+    }
+
+    private static void addDurability(ItemStack itemStack, boolean unbreakable) {
         ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.addEnchant(Enchantment.UNBREAKING, 5, true);
+        itemMeta.addEnchant(Enchantment.UNBREAKING, unbreakable ? 99 : 5, true);
         itemStack.setItemMeta(itemMeta);
     }
 
