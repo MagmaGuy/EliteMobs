@@ -19,6 +19,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.util.Vector;
+import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.Varargs;
@@ -32,16 +33,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-final class LuaPowerScriptBridge {
+final class LuaPowerScriptApi {
 
     private static final String HANDLE_KEY = "__lua_script_handle";
 
     interface OwnedTaskController {
         int runLater(int ticks, Runnable runnable);
 
-        int runRepeating(int ticks, Runnable runnable);
+        int runRepeating(int initialDelayTicks, int intervalTicks, Runnable runnable);
 
         void cancel(int taskId);
+    }
+
+    interface CallbackInvoker {
+        void invoke(String failureContext, LuaFunction callback, LuaValue... args);
     }
 
     private final LuaPowerDefinition definition;
@@ -49,17 +54,20 @@ final class LuaPowerScriptBridge {
     private final LuaPowerSupport support;
     private final LuaPowerEntityTables entityTables;
     private final OwnedTaskController taskController;
+    private final CallbackInvoker callbackInvoker;
 
-    LuaPowerScriptBridge(LuaPowerDefinition definition,
-                         EliteEntity eliteEntity,
-                         LuaPowerSupport support,
-                         LuaPowerEntityTables entityTables,
-                         OwnedTaskController taskController) {
+    LuaPowerScriptApi(LuaPowerDefinition definition,
+                      EliteEntity eliteEntity,
+                      LuaPowerSupport support,
+                      LuaPowerEntityTables entityTables,
+                      OwnedTaskController taskController,
+                      CallbackInvoker callbackInvoker) {
         this.definition = definition;
         this.eliteEntity = eliteEntity;
         this.support = support;
         this.entityTables = entityTables;
         this.taskController = taskController;
+        this.callbackInvoker = callbackInvoker;
     }
 
     LuaTable createTable(Event event, LivingEntity directTarget) {
@@ -179,7 +187,7 @@ final class LuaPowerScriptBridge {
         LuaValue onLeave = callbacks.get("on_leave");
         Map<UUID, LivingEntity> inside = new HashMap<>();
         final int[] taskId = new int[1];
-        taskId[0] = taskController.runRepeating(1, () -> {
+        taskId[0] = taskController.runRepeating(1, 1, () -> {
             if (!eliteEntity.exists() || eliteEntity.getLivingEntity() == null || !eliteEntity.getLivingEntity().isValid()) {
                 taskController.cancel(taskId[0]);
                 return;
@@ -196,7 +204,7 @@ final class LuaPowerScriptBridge {
                 }
                 current.put(livingEntity.getUniqueId(), livingEntity);
                 if (!inside.containsKey(livingEntity.getUniqueId()) && onEnter.isfunction()) {
-                    onEnter.checkfunction().call(entityTables.createEntityTable(livingEntity));
+                    callbackInvoker.invoke("a zone enter callback", onEnter.checkfunction(), entityTables.createEntityTable(livingEntity));
                 }
             }
 
@@ -204,7 +212,7 @@ final class LuaPowerScriptBridge {
                 if (current.containsKey(entry.getKey()) || entry.getValue() == null || !onLeave.isfunction()) {
                     continue;
                 }
-                onLeave.checkfunction().call(entityTables.createEntityTable(entry.getValue()));
+                callbackInvoker.invoke("a zone leave callback", onLeave.checkfunction(), entityTables.createEntityTable(entry.getValue()));
             }
 
             inside.clear();
