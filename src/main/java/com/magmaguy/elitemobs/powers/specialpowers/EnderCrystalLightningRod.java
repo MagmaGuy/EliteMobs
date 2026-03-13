@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.powers.specialpowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
-import com.magmaguy.elitemobs.powers.EnderDragonEmpoweredLightning;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.EnderCrystal;
 import org.bukkit.entity.EntityType;
@@ -34,7 +33,7 @@ public class EnderCrystalLightningRod {
                             0,
                             ThreadLocalRandom.current().nextInt(-15, 15));
 
-                    EnderDragonEmpoweredLightning.lightningTask(enderCrystal.getLocation().clone().add(randomVector));
+                    EnderDragonEmpoweredLightningSupport.lightningTask(enderCrystal.getLocation().clone().add(randomVector));
                 }
 
                 counter++;

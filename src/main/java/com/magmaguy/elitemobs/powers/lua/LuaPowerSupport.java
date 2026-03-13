@@ -1,8 +1,14 @@
 package com.magmaguy.elitemobs.powers.lua;
 
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
+import com.magmaguy.elitemobs.combatsystem.ScaledCombatRewardResolver;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
+import com.magmaguy.elitemobs.explosionregen.Explosion;
+import com.magmaguy.elitemobs.items.ItemLootShower;
+import com.magmaguy.elitemobs.items.LootTables;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.elitemobs.playerdata.database.PlayerData;
+import com.magmaguy.elitemobs.powers.ProjectileDamage;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.powers.scripts.ScriptAction;
 import com.magmaguy.elitemobs.utils.GameClock;
@@ -10,10 +16,16 @@ import com.magmaguy.elitemobs.utils.shapes.*;
 import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.ThrownPotion;
+import org.bukkit.inventory.ItemStack;
+import com.magmaguy.elitemobs.config.powers.PowersConfig;
+import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
 import org.bukkit.inventory.meta.FireworkMeta;
+import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
@@ -325,9 +337,9 @@ final class LuaPowerSupport {
         return false;
     }
 
-    void spawnFirework(Location location, LuaTable spec) {
+    Firework spawnFirework(Location location, LuaTable spec) {
         if (location == null || location.getWorld() == null) {
-            return;
+            return null;
         }
         Firework firework = location.getWorld().spawn(location, Firework.class);
         firework.setPersistent(false);
@@ -353,7 +365,117 @@ final class LuaPowerSupport {
         Vector velocity = toVector(spec.get("velocity"));
         if (velocity != null) {
             firework.setVelocity(velocity);
-            firework.setShotAtAngle(true);
+            firework.setShotAtAngle(spec.get("shot_at_angle").optboolean(true));
+        }
+        return firework;
+    }
+
+    ThrownPotion spawnSplashPotion(Location location, LuaTable spec) {
+        if (location == null || location.getWorld() == null) {
+            return null;
+        }
+
+        ItemStack itemStack = new ItemStack(Material.SPLASH_POTION);
+        PotionMeta potionMeta = (PotionMeta) itemStack.getItemMeta();
+        if (potionMeta == null) {
+            return null;
+        }
+
+        if (spec.get("effects").istable()) {
+            LuaTable effects = spec.get("effects").checktable();
+            LuaValue key = LuaValue.NIL;
+            while (true) {
+                Varargs next = effects.next(key);
+                key = next.arg1();
+                if (key.isnil()) {
+                    break;
+                }
+                if (!next.arg(2).istable()) {
+                    continue;
+                }
+                LuaTable effectSpec = next.arg(2).checktable();
+                String effectKey = effectSpec.get("type").optjstring("").toUpperCase(Locale.ROOT);
+                PotionEffectType effectType = PotionEffectType.getByName(effectKey);
+                if (effectType == null) {
+                    Logger.warn("Unknown potion effect " + effectKey + " in Lua power " + definition.getFileName() + ".");
+                    continue;
+                }
+                potionMeta.addCustomEffect(
+                        new PotionEffect(
+                                effectType,
+                                effectSpec.get("duration").optint(0),
+                                effectSpec.get("amplifier").optint(0)),
+                        effectSpec.get("overwrite").optboolean(true));
+            }
+        }
+
+        itemStack.setItemMeta(potionMeta);
+
+        ThrownPotion thrownPotion = location.getWorld().spawn(location, ThrownPotion.class);
+        thrownPotion.setItem(itemStack);
+
+        Vector velocity = toVector(spec.get("velocity"));
+        if (velocity != null) {
+            thrownPotion.setVelocity(velocity);
+        }
+        return thrownPotion;
+    }
+
+    float getBlastResistance(Location location) {
+        if (location == null || location.getWorld() == null) {
+            return 0f;
+        }
+        return location.getBlock().getType().getBlastResistance();
+    }
+
+    void generateFakeExplosion(List<Location> blockLocations, Location explosionSourceLocation) {
+        if (eliteEntity.getLivingEntity() == null || blockLocations == null || blockLocations.isEmpty()) {
+            return;
+        }
+        List<Block> blocks = new ArrayList<>();
+        for (Location blockLocation : blockLocations) {
+            if (blockLocation == null || blockLocation.getWorld() == null) {
+                continue;
+            }
+            blocks.add(blockLocation.getBlock());
+        }
+        PowersConfigFields powersConfigFields = PowersConfig.getPower(definition.getFileName());
+        Explosion.generateFakeExplosion(blocks, eliteEntity.getLivingEntity(), powersConfigFields, explosionSourceLocation);
+    }
+
+    ProjectileDamage.FakeProjectile spawnGoldNuggetProjectile(Location location, Vector velocity) {
+        if (location == null || velocity == null) {
+            return null;
+        }
+        return ProjectileDamage.createGoldNuggetProjectile(location, velocity);
+    }
+
+    void runGoldNuggetDamage(List<ProjectileDamage.FakeProjectile> projectiles) {
+        if (projectiles == null || projectiles.isEmpty()) {
+            return;
+        }
+        ProjectileDamage.doGoldNuggetDamage(projectiles, eliteEntity);
+    }
+
+    void generatePlayerLoot(int times) {
+        for (int i = 0; i < times; i++) {
+            LootTables.generatePlayerLoot(eliteEntity);
+        }
+    }
+
+    void dropBonusCoins(double coinMultiplier) {
+        if (eliteEntity.getUnsyncedLivingEntity() == null) {
+            return;
+        }
+        for (Player player : eliteEntity.getDamagers().keySet()) {
+            if (player.hasMetadata("NPC") || !PlayerData.isInMemory(player.getUniqueId())) {
+                continue;
+            }
+            if (eliteEntity.getDamagers().get(player) / eliteEntity.getMaxHealth() <= 0.1) {
+                continue;
+            }
+            int rewardLevel = ScaledCombatRewardResolver.getRewardLevel(eliteEntity, player);
+            new ItemLootShower(rewardLevel * coinMultiplier, rewardLevel, eliteEntity.getUnsyncedLivingEntity().getLocation(), player);
         }
     }
 
@@ -421,6 +543,44 @@ final class LuaPowerSupport {
             return Color.fromRGB(table.get("red").optint(255), table.get("green").optint(255), table.get("blue").optint(255));
         }
         return Color.WHITE;
+    }
+
+    Entity resolveEntityReference(LuaValue value) {
+        if (value == null || value.isnil() || !value.istable()) {
+            return null;
+        }
+        LuaTable table = value.checktable();
+        LuaValue uuidValue = table.get("uuid");
+        if (!uuidValue.isstring()) {
+            return null;
+        }
+        try {
+            return Bukkit.getEntity(UUID.fromString(uuidValue.tojstring()));
+        } catch (Exception exception) {
+            return null;
+        }
+    }
+
+    LivingEntity resolveLivingEntityReference(LuaValue value) {
+        Entity entity = resolveEntityReference(value);
+        return entity instanceof LivingEntity livingEntity ? livingEntity : null;
+    }
+
+    Player resolvePlayerReference(LuaValue value) {
+        Entity entity = resolveEntityReference(value);
+        if (entity instanceof Player player) {
+            return player;
+        }
+        if (value != null && value.istable()) {
+            LuaValue uuidValue = value.checktable().get("uuid");
+            if (uuidValue.isstring()) {
+                try {
+                    return Bukkit.getPlayer(UUID.fromString(uuidValue.tojstring()));
+                } catch (Exception ignored) {
+                }
+            }
+        }
+        return null;
     }
 
     String resolveZoneFilter(LuaValue optionsValue) {
