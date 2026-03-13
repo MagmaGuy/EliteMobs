@@ -18,13 +18,16 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 
 import java.util.HashMap;
+import java.util.function.BiConsumer;
 
 public class ScriptListener implements Listener {
     public static HashMap<FallingBlock, FallingEntityDataPair> fallingBlocks = new HashMap();
+    public static HashMap<FallingBlock, BiConsumer<FallingBlock, Location>> luaFallingBlocks = new HashMap<>();
     public static HashMap<Entity, FallingEntityDataPair> fallingEntities = new HashMap<>();
 
     public static void shutdown() {
         fallingBlocks.clear();
+        luaFallingBlocks.clear();
         fallingEntities.clear();
     }
 
@@ -103,13 +106,20 @@ public class ScriptListener implements Listener {
     //This is use to track falling blocks
     @EventHandler(priority = EventPriority.MONITOR)
     public void onEntityChangeBlockEvent(EntityChangeBlockEvent event) {
-        if (fallingBlocks.isEmpty()) return;
         FallingEntityDataPair fallingEntityDataPair = fallingBlocks.get(event.getEntity());
-        if (fallingEntityDataPair == null) return;
-        ScriptAction scriptAction = fallingEntityDataPair.getScriptAction();
-        if (scriptAction == null) return;
+        BiConsumer<FallingBlock, Location> luaCallback = luaFallingBlocks.get(event.getEntity());
+        if (fallingEntityDataPair == null && luaCallback == null) return;
         event.setCancelled(true);
-        runEvent(fallingBlocks.get(event.getEntity()), event.getBlock().getLocation());
+        if (fallingEntityDataPair != null) {
+            ScriptAction scriptAction = fallingEntityDataPair.getScriptAction();
+            if (scriptAction != null) {
+                runEvent(fallingEntityDataPair, event.getBlock().getLocation());
+            }
+        }
+        if (luaCallback != null) {
+            luaCallback.accept((FallingBlock) event.getEntity(), event.getBlock().getLocation());
+            luaFallingBlocks.remove(event.getEntity());
+        }
         fallingBlocks.remove(event.getEntity());
     }
 

@@ -2,8 +2,6 @@
 
 EliteMobs now supports experimental standalone Lua power files in the `powers` config tree.
 
-Lua can also drive the existing `eliteScript` action runtime by passing YAML-shaped tables to `context.script:execute(...)` or registering named script blocks with `context.script:register_script(...)`.
-
 ## Availability
 
 Standalone `.lua` power files in the `powers` tree load automatically.
@@ -48,31 +46,44 @@ return {
 
 The Lua API is intentionally verbose and self-documenting. Prefer names like `context.cooldowns.set_local(...)` and `context.player:place_temporary_block(...)` over short or ambiguous helper names.
 
-## YAML parity bridge
+## Direct scripting helpers
 
-Lua can execute the same action engine used by YAML scripts:
+`context.script` is a direct helper surface for targeting, zones, relative vectors, scripted pushes, scripted damage, facing, and particles:
 
 ```lua
-context.script:register_script("slam_followup", {
-  Actions = {
-    {
-      action = "DAMAGE",
-      target = {
-        targetType = "NEARBY_PLAYERS",
-        range = 4
-      },
-      amount = 2.0
-    }
-  }
+local zone = context.script:zone({
+  type = "sphere",
+  radius = 4
 })
 
-context.script:execute({
-  action = "RUN_SCRIPT",
-  scripts = { "slam_followup" }
-})
+local targets = zone:full_target()
+context.script:damage(targets, 2.0, 1.0)
 ```
 
-Registered scripts may define `Zone` plus `Actions`, and executed action tables use the normal YAML action keys such as `target`, `finalTarget`, `relativeVector`, `landingScripts`, `conditions`, and `particles`.
+These helpers are intentionally direct. Lua does not register synthetic YAML script containers anymore.
+
+## Native parity helpers
+
+The native Lua runtime now exposes the bridge-only behaviors directly:
+
+- `context.world:set_block_at_location(location, material, require_air)`
+- `context.world:place_temporary_block_at_location(location, material, duration, require_air)`
+- `context.world:get_block_type_at_location(location)`
+- `context.world:is_air_at_location(location)`
+- `context.world:is_on_floor_at_location(location)`
+- `context.world:is_standing_on_material(location, material)`
+- `context.world:spawn_entity_at_location(entity_type, location, { velocity = ..., duration = ..., effect = ..., on_land = function(...) ... end, max_ticks = ... })`
+- `context.world:spawn_falling_block_at_location(location, material, { velocity = ..., drop_item = false, hurt_entities = false, on_land = function(...) ... end })`
+- `context.boss:summon_projectile(entity_type, origin, destination, speed, { duration = ..., effect = ..., on_land = function(...) ... end, max_ticks = ... })`
+- `context.world:spawn_fireworks_at_location(location, { power = 1, effects = { { type = "BALL_LARGE", colors = { "ORANGE" }, fade_colors = { "WHITE" }, flicker = true, trail = true } } })`
+
+Landing callbacks receive:
+
+```lua
+function(landing_location, spawned_entity)
+  context.world:spawn_particle_at_location(landing_location, "EXPLOSION", 1)
+end
+```
 
 ## Supported top-level fields
 
@@ -91,8 +102,6 @@ Registered scripts may define `Zone` plus `Actions`, and executed action tables 
   - `on_boss_target_changed`
   - `on_death`
   - `on_phase_switch`
-  - `on_zone_enter`
-  - `on_zone_leave`
 
 ## Runtime helpers
 
@@ -103,7 +112,7 @@ The runtime exposes a safe `context` object with helpers for:
 - scheduler ownership
 - cooldown inspection and shared cooldowns
 - event mutation on supported damage events
-- particles, sounds, lightning, and boss spawning
+- particles, sounds, lightning, boss spawning, entity spawning, falling blocks, and block inspection helpers
 - simple zone queries and `watch_zone(zone_definition, { on_enter = ..., on_leave = ... })`
 
 Unsafe globals such as `os`, `io`, `debug`, `package`, `require`, and Java interop are not exposed.
