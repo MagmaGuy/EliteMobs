@@ -12,7 +12,7 @@ import com.magmaguy.elitemobs.mobconstructor.PersistentMovingEntity;
 import com.magmaguy.elitemobs.mobconstructor.PersistentObject;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.transitiveblocks.TransitiveBlock;
 import com.magmaguy.elitemobs.pathfinding.Navigation;
-import com.magmaguy.elitemobs.powers.SpiritWalk;
+import com.magmaguy.elitemobs.powers.specialpowers.SpiritWalkSupport;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.magmacore.util.AttributeManager;
 import com.magmaguy.magmacore.util.ChunkLocationChecker;
@@ -237,7 +237,7 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
                     return;
                 }
                 if (getLivingEntity().getLocation().distanceSquared(spawnLocation) > Math.pow(leashRadius, 2))
-                    SpiritWalk.spiritWalkRegionalBossAnimation(regionalBossEntity, getLivingEntity().getLocation(), getSpawnLocation());
+                    SpiritWalkSupport.spiritWalkRegionalBossAnimation(regionalBossEntity, getLivingEntity().getLocation(), getSpawnLocation());
             } catch (Exception ex) {
                 ex.printStackTrace();
                 Logger.warn("Async leash task errored!");

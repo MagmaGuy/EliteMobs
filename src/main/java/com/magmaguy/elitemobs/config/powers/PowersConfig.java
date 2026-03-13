@@ -1,11 +1,13 @@
 package com.magmaguy.elitemobs.config.powers;
 
+import com.magmaguy.elitemobs.config.luapowers.LuaPowersConfig;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import com.magmaguy.elitemobs.powers.lua.LuaPowerManager;
 import com.magmaguy.magmacore.config.CustomConfig;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Locale;
 
 public class PowersConfig extends CustomConfig {
 
@@ -20,10 +22,11 @@ public class PowersConfig extends CustomConfig {
             powersConfigFields.initializeScripts();
         }
 
-        Map<String, PowersConfigFields> premadeLuaPowers = PremadeLuaPowers.load();
+        Map<String, PowersConfigFields> premadeLuaPowers = LuaPowersConfig.getLuaPowers();
         powers.putAll(premadeLuaPowers);
 
-        powers.putAll(LuaPowerManager.discoverLuaPowers(powers.values()));
+        Map<String, PowersConfigFields> discoveredLuaPowers = LuaPowerManager.discoverLuaPowers(powers.values());
+        powers.putAll(discoveredLuaPowers);
         powers.putAll(premadeLuaPowers);
 
         ElitePower.initializePowers();
@@ -35,7 +38,22 @@ public class PowersConfig extends CustomConfig {
     }
 
     public static PowersConfigFields getPower(String filename) {
-        return powers.get(filename);
-    }
+        if (filename == null) {
+            return null;
+        }
 
+        PowersConfigFields directMatch = powers.get(filename);
+        if (directMatch != null) {
+            return directMatch;
+        }
+
+        String lowerCaseFilename = filename.toLowerCase(Locale.ROOT);
+        if (lowerCaseFilename.endsWith(".yml")) {
+            return powers.get(filename.substring(0, filename.length() - 4) + ".lua");
+        }
+        if (lowerCaseFilename.endsWith(".yaml")) {
+            return powers.get(filename.substring(0, filename.length() - 5) + ".lua");
+        }
+        return null;
+    }
 }
