@@ -157,7 +157,29 @@ final class LuaPowerSupport {
             double y = table.get("y").optdouble(0);
             double z = table.get("z").optdouble(0);
             double speed = table.get("speed").optdouble(0);
-            location.getWorld().spawnParticle(particle, location, amount, x, y, z, speed);
+            if (particle.equals(Particle.DUST)) {
+                location.getWorld().spawnParticle(particle, location, amount, x, y, z, speed,
+                        new Particle.DustOptions(
+                                Color.fromRGB(
+                                        table.get("red").optint(255),
+                                        table.get("green").optint(255),
+                                        table.get("blue").optint(255)),
+                                1));
+            } else if (particle.equals(Particle.DUST_COLOR_TRANSITION)) {
+                location.getWorld().spawnParticle(particle, location, amount, x, y, z, speed,
+                        new Particle.DustTransition(
+                                Color.fromRGB(
+                                        table.get("red").optint(255),
+                                        table.get("green").optint(255),
+                                        table.get("blue").optint(255)),
+                                Color.fromRGB(
+                                        table.get("toRed").optint(table.get("to_red").optint(255)),
+                                        table.get("toGreen").optint(table.get("to_green").optint(255)),
+                                        table.get("toBlue").optint(table.get("to_blue").optint(255))),
+                                1));
+            } else {
+                location.getWorld().spawnParticle(particle, location, amount, x, y, z, speed);
+            }
         } catch (Exception exception) {
             Logger.warn("Unknown particle " + particleKey + " in Lua power " + definition.getFileName() + ".");
         }
@@ -179,13 +201,8 @@ final class LuaPowerSupport {
         if (location == null || location.getWorld() == null) {
             return;
         }
-        Material material;
-        try {
-            material = Material.valueOf(materialKey.toUpperCase(Locale.ROOT));
-        } catch (Exception exception) {
-            Logger.warn("Unknown material " + materialKey + " in Lua power " + definition.getFileName() + ".");
-            return;
-        }
+        Material material = parseMaterial(materialKey);
+        if (material == null) return;
         Block block = location.getBlock();
         if (requireAir && !block.getType().isAir()) {
             return;
@@ -194,6 +211,15 @@ final class LuaPowerSupport {
             EntityTracker.addTemporaryBlock(block, duration, material);
         } else {
             block.setType(material);
+        }
+    }
+
+    Material parseMaterial(String materialKey) {
+        try {
+            return Material.valueOf(materialKey.toUpperCase(Locale.ROOT));
+        } catch (Exception exception) {
+            Logger.warn("Unknown material " + materialKey + " in Lua power " + definition.getFileName() + ".");
+            return null;
         }
     }
 
@@ -306,29 +332,22 @@ final class LuaPowerSupport {
         Firework firework = location.getWorld().spawn(location, Firework.class);
         firework.setPersistent(false);
         FireworkMeta meta = firework.getFireworkMeta();
-        String typeName = spec.get("type").optjstring("BALL_LARGE");
-        FireworkEffect.Type type = parseEnum(typeName, FireworkEffect.Type.class, FireworkEffect.Type.BALL_LARGE);
-        FireworkEffect.Builder builder = FireworkEffect.builder()
-                .with(type)
-                .flicker(spec.get("flicker").optboolean(true))
-                .trail(spec.get("trail").optboolean(true));
-        if (spec.get("colors").istable()) {
-            LuaTable colors = spec.get("colors").checktable();
-            List<Color> parsedColors = new ArrayList<>();
+        if (spec.get("effects").istable()) {
+            LuaTable effects = spec.get("effects").checktable();
             LuaValue key = LuaValue.NIL;
             while (true) {
-                Varargs next = colors.next(key);
+                Varargs next = effects.next(key);
                 key = next.arg1();
                 if (key.isnil()) {
                     break;
                 }
-                parsedColors.add(parseColor(next.arg(2)));
+                if (next.arg(2).istable()) {
+                    meta.addEffect(buildFireworkEffect(next.arg(2).checktable()));
+                }
             }
-            if (!parsedColors.isEmpty()) {
-                builder.withColor(parsedColors);
-            }
+        } else {
+            meta.addEffect(buildFireworkEffect(spec));
         }
-        meta.addEffect(builder.build());
         meta.setPower(spec.get("power").optint(1));
         firework.setFireworkMeta(meta);
         Vector velocity = toVector(spec.get("velocity"));
@@ -336,6 +355,42 @@ final class LuaPowerSupport {
             firework.setVelocity(velocity);
             firework.setShotAtAngle(true);
         }
+    }
+
+    private FireworkEffect buildFireworkEffect(LuaTable spec) {
+        String typeName = spec.get("type").optjstring("BALL_LARGE");
+        FireworkEffect.Type type = parseEnum(typeName, FireworkEffect.Type.class, FireworkEffect.Type.BALL_LARGE);
+        FireworkEffect.Builder builder = FireworkEffect.builder()
+                .with(type)
+                .flicker(spec.get("flicker").optboolean(true))
+                .trail(spec.get("trail").optboolean(true));
+        List<Color> colors = parseColors(spec.get("colors"));
+        if (!colors.isEmpty()) {
+            builder.withColor(colors);
+        }
+        List<Color> fadeColors = parseColors(spec.get("fade_colors"));
+        if (!fadeColors.isEmpty()) {
+            builder.withFade(fadeColors);
+        }
+        return builder.build();
+    }
+
+    private List<Color> parseColors(LuaValue colorsValue) {
+        List<Color> parsedColors = new ArrayList<>();
+        if (!colorsValue.istable()) {
+            return parsedColors;
+        }
+        LuaTable colors = colorsValue.checktable();
+        LuaValue key = LuaValue.NIL;
+        while (true) {
+            Varargs next = colors.next(key);
+            key = next.arg1();
+            if (key.isnil()) {
+                break;
+            }
+            parsedColors.add(parseColor(next.arg(2)));
+        }
+        return parsedColors;
     }
 
     Color parseColor(LuaValue value) {

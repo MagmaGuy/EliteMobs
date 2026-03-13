@@ -47,7 +47,7 @@ public class LuaPowerInstance {
     private final LuaPowerSupport support;
     private final LuaPowerEntityTables entityTables;
     private final LuaPowerContextTables contextTables;
-    private final LuaPowerScriptBridge scriptBridge;
+    private final LuaPowerScriptApi scriptApi;
     private final Map<Integer, OwnedTask> ownedTasks = new LinkedHashMap<>();
     private final List<ZoneWatch> zoneWatches = new ArrayList<>();
     private Integer clockTaskId = null;
@@ -57,24 +57,26 @@ public class LuaPowerInstance {
         this.definition = definition;
         this.eliteEntity = eliteEntity;
         this.support = new LuaPowerSupport(definition, eliteEntity);
-        this.entityTables = new LuaPowerEntityTables(definition, eliteEntity, support);
-        this.contextTables = new LuaPowerContextTables(definition, eliteEntity, support, entityTables);
-        this.scriptBridge = new LuaPowerScriptBridge(definition, eliteEntity, support, entityTables, new LuaPowerScriptBridge.OwnedTaskController() {
+        LuaPowerScriptApi.OwnedTaskController taskController = new LuaPowerScriptApi.OwnedTaskController() {
             @Override
             public int runLater(int ticks, Runnable runnable) {
                 return ownLaterTask(ticks, runnable);
             }
 
             @Override
-            public int runRepeating(int ticks, Runnable runnable) {
-                return ownRepeatingTask(ticks, runnable);
+            public int runRepeating(int initialDelayTicks, int intervalTicks, Runnable runnable) {
+                return ownRepeatingTask(initialDelayTicks, intervalTicks, runnable);
             }
 
             @Override
             public void cancel(int taskId) {
                 cancelOwnedTask(taskId);
             }
-        });
+        };
+        LuaPowerScriptApi.CallbackInvoker callbackInvoker = this::invokeLuaCallback;
+        this.entityTables = new LuaPowerEntityTables(definition, eliteEntity, support, taskController, callbackInvoker);
+        this.contextTables = new LuaPowerContextTables(definition, eliteEntity, support, entityTables, taskController, callbackInvoker);
+        this.scriptApi = new LuaPowerScriptApi(definition, eliteEntity, support, entityTables, taskController, callbackInvoker);
         this.scriptTable = definition.instantiate();
         updateClockRegistration();
     }
@@ -110,25 +112,26 @@ public class LuaPowerInstance {
     }
 
     public void handleEvent(LuaPowerHook hook, Event event, LivingEntity directTarget, LivingEntity eventActor) {
-        if (closed || hook == null || !definition.getHooks().contains(hook)) return;
+        if (closed || hook == null) return;
 
         LuaValue function = scriptTable.get(hook.getKey());
-        if (!function.isfunction()) return;
+        if (definition.getHooks().contains(hook) && function.isfunction()) {
+            long startNanos = System.nanoTime();
+            try {
+                function.checkfunction().call(buildContext(event, directTarget, eventActor));
+            } catch (Exception exception) {
+                Logger.warn("Lua power " + definition.getFileName() + " failed while handling " + hook.getKey() + ".");
+                exception.printStackTrace();
+                shutdown();
+                return;
+            }
 
-        long startNanos = System.nanoTime();
-        try {
-            function.checkfunction().call(buildContext(event, directTarget, eventActor));
-        } catch (Exception exception) {
-            Logger.warn("Lua power " + definition.getFileName() + " failed while handling " + hook.getKey() + ".");
-            exception.printStackTrace();
-            shutdown();
-            return;
-        }
-
-        long elapsedMillis = (System.nanoTime() - startNanos) / 1_000_000L;
-        if (elapsedMillis > 50) {
-            Logger.warn("Lua power " + definition.getFileName() + " exceeded the 50ms execution budget on " + hook.getKey() + " and was disabled.");
-            shutdown();
+            long elapsedMillis = (System.nanoTime() - startNanos) / 1_000_000L;
+            if (elapsedMillis > 50) {
+                Logger.warn("Lua power " + definition.getFileName() + " exceeded the 50ms execution budget on " + hook.getKey() + " and was disabled.");
+                shutdown();
+                return;
+            }
         }
     }
 
@@ -177,9 +180,29 @@ public class LuaPowerInstance {
             case "zones" -> createZonesTable();
             case "player" -> contextPlayer == null ? LuaValue.NIL : entityTables.createPlayerTable(contextPlayer);
             case "event" -> event == null ? LuaValue.NIL : entityTables.createEventTable(event);
-            case "script" -> scriptBridge.createTable(event, directTarget);
+            case "script" -> scriptApi.createTable(event, directTarget);
             default -> LuaValue.NIL;
         };
+    }
+
+    private void invokeLuaCallback(String failureContext, LuaFunction callback, LuaValue... args) {
+        if (closed) return;
+        long startNanos = System.nanoTime();
+        try {
+            callback.invoke(LuaValue.varargsOf(args));
+        } catch (Exception exception) {
+            Logger.warn("Lua power " + definition.getFileName() + " failed inside " + failureContext + ".");
+            exception.printStackTrace();
+            shutdown();
+            return;
+        }
+
+        long elapsedMillis = (System.nanoTime() - startNanos) / 1_000_000L;
+        if (elapsedMillis > 50) {
+            Logger.warn("Lua power " + definition.getFileName() + " exceeded the 50ms execution budget inside "
+                    + failureContext + " and was disabled.");
+            shutdown();
+        }
     }
 
     private Player resolveContextPlayer(LivingEntity directTarget, LivingEntity eventActor) {

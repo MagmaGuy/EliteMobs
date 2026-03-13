@@ -22,13 +22,17 @@ import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Fireball;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
+import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.util.Vector;
+import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.Varargs;
@@ -43,11 +47,19 @@ final class LuaPowerEntityTables {
     private final LuaPowerDefinition definition;
     private final EliteEntity eliteEntity;
     private final LuaPowerSupport support;
+    private final LuaPowerScriptApi.OwnedTaskController taskController;
+    private final LuaPowerScriptApi.CallbackInvoker callbackInvoker;
 
-    LuaPowerEntityTables(LuaPowerDefinition definition, EliteEntity eliteEntity, LuaPowerSupport support) {
+    LuaPowerEntityTables(LuaPowerDefinition definition,
+                         EliteEntity eliteEntity,
+                         LuaPowerSupport support,
+                         LuaPowerScriptApi.OwnedTaskController taskController,
+                         LuaPowerScriptApi.CallbackInvoker callbackInvoker) {
         this.definition = definition;
         this.eliteEntity = eliteEntity;
         this.support = support;
+        this.taskController = taskController;
+        this.callbackInvoker = callbackInvoker;
     }
 
     LuaTable createBossTable() {
@@ -208,13 +220,34 @@ final class LuaPowerEntityTables {
             if (entityType == null) {
                 return LuaValue.NIL;
             }
-            org.bukkit.entity.Entity projectile = origin.getWorld().spawnEntity(origin, entityType);
+            LuaTable options = args.narg() >= 5 && args.arg(5).istable() ? args.arg(5).checktable() : new LuaTable();
             Vector velocity = destination.toVector().subtract(origin.toVector());
             if (velocity.lengthSquared() > 0) {
                 velocity.normalize().multiply(args.optdouble(4, 1.0));
-                projectile.setVelocity(velocity);
             }
-            return LuaValue.NIL;
+            Entity projectile;
+            Class<? extends Entity> entityClass = entityType.getEntityClass();
+            if (entityClass != null
+                    && Projectile.class.isAssignableFrom(entityClass)
+                    && eliteEntity.getLivingEntity() != null) {
+                projectile = eliteEntity.getLivingEntity().launchProjectile(entityClass.asSubclass(Projectile.class), velocity);
+                ((Projectile) projectile).setShooter(eliteEntity.getLivingEntity());
+                if (projectile instanceof Fireball fireball && velocity.lengthSquared() > 0) {
+                    fireball.setDirection(velocity);
+                }
+            } else {
+                projectile = origin.getWorld().spawnEntity(origin, entityType);
+                if (velocity.lengthSquared() > 0) {
+                    projectile.setVelocity(velocity);
+                }
+            }
+            applyGenericSpawnOptions(projectile, options);
+            if (options.get("on_land").isfunction()) {
+                monitorEntityLanding(projectile,
+                        options.get("on_land").checkfunction(),
+                        options.get("max_ticks").optint(20 * 60 * 5));
+            }
+            return createEntityReferenceTable(projectile);
         }));
         addEntityEffectMethods(boss, eliteEntity.getLivingEntity());
         return boss;
@@ -267,6 +300,40 @@ final class LuaPowerEntityTables {
 
     LuaTable createEntityTable(LivingEntity livingEntity) {
         return livingEntity instanceof Player player ? createPlayerTable(player) : createLivingEntityTable(livingEntity);
+    }
+
+    LuaValue createEntityReferenceTable(Entity entity) {
+        if (entity instanceof LivingEntity livingEntity) {
+            return createEntityTable(livingEntity);
+        }
+        LuaTable table = new LuaTable();
+        table.set("name", LuaValue.valueOf(entity.getName()));
+        table.set("uuid", LuaValue.valueOf(entity.getUniqueId().toString()));
+        table.set("entity_type", LuaValue.valueOf(entity.getType().name()));
+        table.set("is_player", LuaValue.FALSE);
+        table.set("is_elite", LuaValue.FALSE);
+        table.set("is_valid", method(table, args -> LuaValue.valueOf(entity.isValid())));
+        table.set("current_location", support.toLocationTable(entity.getLocation()));
+        table.set("get_location", method(table, args -> support.toLocationTable(entity.getLocation())));
+        table.set("teleport_to_location", method(table, args -> {
+            Location destination = support.toLocation(args.arg1());
+            if (destination != null) {
+                entity.teleport(destination);
+            }
+            return LuaValue.NIL;
+        }));
+        table.set("set_velocity_vector", method(table, args -> {
+            Vector velocity = support.toVector(args.arg1());
+            if (velocity != null) {
+                entity.setVelocity(velocity);
+            }
+            return LuaValue.NIL;
+        }));
+        table.set("remove", method(table, args -> {
+            entity.remove();
+            return LuaValue.NIL;
+        }));
+        return table;
     }
 
     LuaTable createPlayerTable(Player player) {
@@ -326,8 +393,14 @@ final class LuaPowerEntityTables {
             return LuaValue.NIL;
         }));
         entity.set("restore_health", method(entity, args -> {
-            double maxHealth = Objects.requireNonNull(livingEntity.getAttribute(Attribute.MAX_HEALTH)).getValue();
-            livingEntity.setHealth(Math.min(maxHealth, livingEntity.getHealth() + args.checkdouble(1)));
+            double amount = args.checkdouble(1);
+            EliteEntity trackedElite = EntityTracker.getEliteMobEntity(livingEntity);
+            if (trackedElite != null) {
+                trackedElite.heal(amount);
+            } else {
+                double maxHealth = AttributeManager.getAttributeBaseValue(livingEntity, "generic_max_health");
+                livingEntity.setHealth(Math.min(maxHealth, livingEntity.getHealth() + amount));
+            }
             return LuaValue.NIL;
         }));
         entity.set("play_sound_at_entity", method(entity, args -> {
@@ -689,5 +762,43 @@ final class LuaPowerEntityTables {
     @FunctionalInterface
     private interface LuaCallback {
         Varargs invoke(Varargs args);
+    }
+
+    private void applyGenericSpawnOptions(Entity entity, LuaTable options) {
+        int duration = options.get("duration").optint(0);
+        if (duration > 0) {
+            GameClock.scheduleLater(duration, () -> {
+                if (entity.isValid()) {
+                    entity.remove();
+                }
+            });
+        }
+        String effectName = options.get("effect").optjstring(null);
+        if (effectName != null) {
+            try {
+                entity.playEffect(EntityEffect.valueOf(effectName.toUpperCase(java.util.Locale.ROOT)));
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
+    }
+
+    private void monitorEntityLanding(Entity entity, LuaFunction callback, int maxTicks) {
+        final int[] taskId = new int[1];
+        taskId[0] = taskController.runRepeating(1, 1, new Runnable() {
+            private int counter = 0;
+
+            @Override
+            public void run() {
+                if (!entity.isValid() || entity.isOnGround() || counter > maxTicks) {
+                    taskController.cancel(taskId[0]);
+                    callbackInvoker.invoke("a launched entity landing callback",
+                            callback,
+                            support.toLocationTable(entity.getLocation()),
+                            createEntityReferenceTable(entity));
+                    return;
+                }
+                counter++;
+            }
+        });
     }
 }
