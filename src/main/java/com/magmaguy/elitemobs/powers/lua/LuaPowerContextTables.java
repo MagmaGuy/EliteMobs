@@ -4,17 +4,21 @@ import com.magmaguy.elitemobs.collateralminecraftchanges.LightningSpawnBypass;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.powers.meta.CustomSummonPower;
+import com.magmaguy.elitemobs.powers.scripts.ScriptListener;
 import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.EntityEffect;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.Varargs;
@@ -29,15 +33,21 @@ final class LuaPowerContextTables {
     private final EliteEntity eliteEntity;
     private final LuaPowerSupport support;
     private final LuaPowerEntityTables entityTables;
+    private final LuaPowerScriptApi.OwnedTaskController taskController;
+    private final LuaPowerScriptApi.CallbackInvoker callbackInvoker;
 
     LuaPowerContextTables(LuaPowerDefinition definition,
                           EliteEntity eliteEntity,
                           LuaPowerSupport support,
-                          LuaPowerEntityTables entityTables) {
+                          LuaPowerEntityTables entityTables,
+                          LuaPowerScriptApi.OwnedTaskController taskController,
+                          LuaPowerScriptApi.CallbackInvoker callbackInvoker) {
         this.definition = definition;
         this.eliteEntity = eliteEntity;
         this.support = support;
         this.entityTables = entityTables;
+        this.taskController = taskController;
+        this.callbackInvoker = callbackInvoker;
     }
 
     LuaTable createPlayersTable(LivingEntity eventActor) {
@@ -202,6 +212,41 @@ final class LuaPowerContextTables {
             support.spawnParticle(support.toLocation(args.arg1()), args.arg(2), args.optint(3, 1));
             return LuaValue.NIL;
         }));
+        world.set("set_block_at_location", method(world, args -> {
+            support.placeTemporaryBlock(support.toLocation(args.arg1()), args.checkjstring(2), 0, args.optboolean(3, false));
+            return LuaValue.NIL;
+        }));
+        world.set("place_temporary_block_at_location", method(world, args -> {
+            support.placeTemporaryBlock(support.toLocation(args.arg1()), args.checkjstring(2), args.optint(3, 0), args.optboolean(4, false));
+            return LuaValue.NIL;
+        }));
+        world.set("get_block_type_at_location", method(world, args -> {
+            Location location = support.toLocation(args.arg1());
+            if (location == null) {
+                return LuaValue.NIL;
+            }
+            return LuaValue.valueOf(location.getBlock().getType().name());
+        }));
+        world.set("is_air_at_location", method(world, args -> {
+            Location location = support.toLocation(args.arg1());
+            return LuaValue.valueOf(location != null && location.getBlock().getType().isAir());
+        }));
+        world.set("is_on_floor_at_location", method(world, args -> {
+            Location location = support.toLocation(args.arg1());
+            if (location == null) {
+                return LuaValue.FALSE;
+            }
+            return LuaValue.valueOf(!location.getBlock().getType().isSolid()
+                    && location.clone().subtract(0, 1, 0).getBlock().getType().isSolid());
+        }));
+        world.set("is_standing_on_material", method(world, args -> {
+            Location location = support.toLocation(args.arg1());
+            Material material = support.parseMaterial(args.checkjstring(2));
+            if (location == null || material == null) {
+                return LuaValue.FALSE;
+            }
+            return LuaValue.valueOf(location.clone().subtract(0, 1, 0).getBlock().getType() == material);
+        }));
         world.set("strike_lightning_at_location", method(world, args -> {
             Location location = support.toLocation(args.arg1());
             if (location != null && location.getWorld() != null) {
@@ -281,31 +326,58 @@ final class LuaPowerContextTables {
                 Logger.warn("Unknown entity type " + args.arg(1) + " in Lua power " + definition.getFileName() + ".");
                 return LuaValue.NIL;
             }
+            LuaTable options = args.narg() >= 3 && args.arg(3).istable() ? args.arg(3).checktable() : new LuaTable();
             Entity entity = location.getWorld().spawnEntity(location, entityType);
-            if (args.narg() >= 3 && args.arg(3).istable()) {
-                LuaTable options = args.arg(3).checktable();
-                Vector velocity = support.toVector(options.get("velocity"));
-                if (velocity != null) {
-                    entity.setVelocity(velocity);
-                }
-                int duration = options.get("duration").optint(0);
-                if (duration > 0) {
-                    Entity spawnedEntity = entity;
-                    com.magmaguy.elitemobs.utils.GameClock.scheduleLater(duration, () -> {
-                        if (spawnedEntity.isValid()) {
-                            spawnedEntity.remove();
-                        }
-                    });
-                }
-                String effectName = options.get("effect").optjstring(null);
-                if (effectName != null) {
-                    try {
-                        entity.playEffect(EntityEffect.valueOf(effectName.toUpperCase(Locale.ROOT)));
-                    } catch (IllegalArgumentException ignored) {
+            Vector velocity = support.toVector(options.get("velocity"));
+            if (velocity != null) {
+                entity.setVelocity(velocity);
+            }
+            int duration = options.get("duration").optint(0);
+            if (duration > 0) {
+                Entity spawnedEntity = entity;
+                com.magmaguy.elitemobs.utils.GameClock.scheduleLater(duration, () -> {
+                    if (spawnedEntity.isValid()) {
+                        spawnedEntity.remove();
                     }
+                });
+            }
+            String effectName = options.get("effect").optjstring(null);
+            if (effectName != null) {
+                try {
+                    entity.playEffect(EntityEffect.valueOf(effectName.toUpperCase(Locale.ROOT)));
+                } catch (IllegalArgumentException ignored) {
                 }
             }
-            return entity instanceof LivingEntity livingEntity ? entityTables.createEntityTable(livingEntity) : LuaValue.NIL;
+            if (options.get("on_land").isfunction()) {
+                monitorEntityLanding(entity,
+                        options.get("on_land").checkfunction(),
+                        options.get("max_ticks").optint(20 * 60 * 5));
+            }
+            return entityTables.createEntityReferenceTable(entity);
+        }));
+        world.set("spawn_falling_block_at_location", method(world, args -> {
+            Location location = support.toLocation(args.arg1());
+            Material material = support.parseMaterial(args.checkjstring(2));
+            if (location == null || location.getWorld() == null || material == null) {
+                return LuaValue.NIL;
+            }
+            LuaTable options = args.narg() >= 3 && args.arg(3).istable() ? args.arg(3).checktable() : new LuaTable();
+            FallingBlock fallingBlock = location.getWorld().spawnFallingBlock(location, material.createBlockData());
+            fallingBlock.setDropItem(options.get("drop_item").optboolean(false));
+            fallingBlock.setHurtEntities(options.get("hurt_entities").optboolean(false));
+            Vector velocity = support.toVector(options.get("velocity"));
+            if (velocity != null) {
+                fallingBlock.setVelocity(velocity);
+            }
+            if (options.get("on_land").isfunction()) {
+                LuaFunction onLand = options.get("on_land").checkfunction();
+                ScriptListener.luaFallingBlocks.put(fallingBlock, (entity, landingLocation) ->
+                        callbackInvoker.invoke("a falling block landing callback",
+                                onLand,
+                                support.toLocationTable(landingLocation),
+                                entityTables.createEntityReferenceTable(entity)));
+            }
+            return entityTables.createEntityReferenceTable(fallingBlock);
         }));
         world.set("spawn_reinforcement_at_location", method(world, args -> {
             Location location = support.toLocation(args.arg(2));
@@ -398,5 +470,25 @@ final class LuaPowerContextTables {
     @FunctionalInterface
     private interface LuaCallback {
         Varargs invoke(Varargs args);
+    }
+
+    private void monitorEntityLanding(Entity entity, LuaFunction callback, int maxTicks) {
+        final int[] taskId = new int[1];
+        taskId[0] = taskController.runRepeating(1, 1, new Runnable() {
+            private int counter = 0;
+
+            @Override
+            public void run() {
+                if (!entity.isValid() || entity.isOnGround() || counter > maxTicks) {
+                    taskController.cancel(taskId[0]);
+                    callbackInvoker.invoke("an entity landing callback",
+                            callback,
+                            support.toLocationTable(entity.getLocation()),
+                            entityTables.createEntityReferenceTable(entity));
+                    return;
+                }
+                counter++;
+            }
+        });
     }
 }

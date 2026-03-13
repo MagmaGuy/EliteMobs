@@ -50,10 +50,6 @@ public class CustomSpawn {
     @Setter
     private boolean keepTrying = true;
 
-    // Cached GameRule for mob spawning (resolved once at runtime)
-    private static GameRule<Boolean> mobSpawningRule = null;
-    private static boolean mobSpawningRuleResolved = false;
-
     /**
      * Checks if mob spawning is disabled in the world.
      * Handles the GameRule rename from DO_MOB_SPAWNING (pre-1.21.11) to SPAWN_MOBS (1.21.11+).
@@ -61,25 +57,26 @@ public class CustomSpawn {
      * @param world The world to check
      * @return true if mob spawning is disabled, false otherwise
      */
-    @SuppressWarnings("unchecked")
     private static boolean isMobSpawningDisabled(World world) {
-        if (!mobSpawningRuleResolved) {
-            mobSpawningRuleResolved = true;
-            // Try to find the correct GameRule by name using reflection
-            // SPAWN_MOBS is used in 1.21.11+, DO_MOB_SPAWNING in earlier versions
-            mobSpawningRule = (GameRule<Boolean>) GameRule.getByName("spawnMobs");
-            if (mobSpawningRule == null) {
-                mobSpawningRule = (GameRule<Boolean>) GameRule.getByName("doMobSpawning");
+        Boolean spawnMobs = getMobSpawningRuleValue(world, "SPAWN_MOBS");
+        if (spawnMobs != null) {
+            return Boolean.FALSE.equals(spawnMobs);
+        }
+        Boolean legacyRule = getMobSpawningRuleValue(world, "DO_MOB_SPAWNING");
+        return Boolean.FALSE.equals(legacyRule);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Boolean getMobSpawningRuleValue(World world, String fieldName) {
+        try {
+            Object fieldValue = GameRule.class.getField(fieldName).get(null);
+            if (!(fieldValue instanceof GameRule<?> gameRule)) {
+                return null;
             }
+            return world.getGameRuleValue((GameRule<Boolean>) gameRule);
+        } catch (ReflectiveOperationException ignored) {
+            return null;
         }
-
-        if (mobSpawningRule == null) {
-            // Neither rule found, assume spawning is allowed
-            return false;
-        }
-
-        Boolean value = world.getGameRuleValue(mobSpawningRule);
-        return Boolean.FALSE.equals(value);
     }
 
     /**
