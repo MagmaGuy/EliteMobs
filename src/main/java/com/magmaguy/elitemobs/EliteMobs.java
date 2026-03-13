@@ -25,6 +25,7 @@ import com.magmaguy.elitemobs.config.menus.MenusConfig;
 import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
 import com.magmaguy.elitemobs.config.potioneffects.PotionEffectsConfig;
+import com.magmaguy.elitemobs.config.luapowers.LuaPowersConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.config.skillbonuses.SkillBonusesConfig;
 import com.magmaguy.elitemobs.config.wormholes.WormholeConfig;
@@ -67,15 +68,13 @@ import com.magmaguy.elitemobs.pathfinding.Navigation;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.playerdata.statusscreen.*;
-import com.magmaguy.elitemobs.powers.FrostCone;
-import com.magmaguy.elitemobs.powers.TrackingFireball.TrackingFireballEvents;
-import com.magmaguy.elitemobs.powers.meta.Bombardment;
 import com.magmaguy.elitemobs.powers.meta.CombatEnterScanPower;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import com.magmaguy.elitemobs.powers.lua.LuaPowerManager;
 import com.magmaguy.elitemobs.powers.scripts.ScriptAction;
 import com.magmaguy.elitemobs.powers.scripts.ScriptListener;
 import com.magmaguy.elitemobs.powers.scripts.caching.EliteScriptBlueprint;
+import com.magmaguy.elitemobs.powers.specialpowers.TrackingFireballSupport;
 import com.magmaguy.elitemobs.powerstances.MajorPowerStanceMath;
 import com.magmaguy.elitemobs.powerstances.MinorPowerStanceMath;
 import com.magmaguy.elitemobs.quests.DynamicQuest;
@@ -142,6 +141,7 @@ public class EliteMobs extends JavaPlugin {
         new ValidWorldsConfig();
 
         new MenusConfig();
+        new LuaPowersConfig();
         new PowersConfig();
         MobPropertiesConfig.initializeConfigs();
         CustomEnchantment.initializeCustomEnchantments();
@@ -488,10 +488,8 @@ public class EliteMobs extends JavaPlugin {
         SummonMerchantEnchantment.SummonMerchantEvents.shutdown();
         FlamethrowerEnchantment.shutdown();
         LightningEnchantment.LightningEnchantmentEvents.shutdown();
-        FrostCone.shutdown();
         ItemLootShower.shutdown();
-        Bombardment.shutdown();
-        TrackingFireballEvents.shutdown();
+        TrackingFireballSupport.shutdown();
         VersionChecker.shutdown();
         KeepNeutralsAngry.shutdown();
         LootMenu.shutdown();
@@ -557,8 +555,6 @@ public class EliteMobs extends JavaPlugin {
         ConfigurationLocation.shutdown();
         // Fourth pass memory leak fixes
         ElitePlayerInventory.shutdown();
-        FrostCone.shutdown();
-        Bombardment.shutdown();
         KeepNeutralsAngry.shutdown();
         Navigation.shutdown();
         GameClock.shutdown();

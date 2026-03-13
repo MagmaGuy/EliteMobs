@@ -40,13 +40,13 @@ import com.magmaguy.elitemobs.playerdata.PlayerStatsTracker;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.playerdata.statusscreen.*;
 import com.magmaguy.elitemobs.powers.*;
-import com.magmaguy.elitemobs.powers.meta.Bombardment;
 import com.magmaguy.elitemobs.powers.meta.CombatEnterScanPower;
 import com.magmaguy.elitemobs.powers.meta.CustomSummonPower;
 import com.magmaguy.elitemobs.powers.lua.LuaPowerEvents;
 import com.magmaguy.elitemobs.powers.scripts.EliteScript;
 import com.magmaguy.elitemobs.powers.scripts.ScriptListener;
 import com.magmaguy.elitemobs.powers.specialpowers.EnderCrystalLightningRod;
+import com.magmaguy.elitemobs.powers.specialpowers.TrackingFireballSupport;
 import com.magmaguy.elitemobs.powerstances.EffectEventHandlers;
 import com.magmaguy.elitemobs.powerstances.VisualEffectObfuscator;
 import com.magmaguy.elitemobs.quests.CustomQuest;
@@ -164,57 +164,13 @@ public class EventsRegistrer {
         //Minor mob powers
         register(new ScriptListener());
         register(new LuaPowerEvents());
-        registerPower(new InvulnerabilityArrow(), "invulnerability_arrow.yml");
-        registerPower(new InvulnerabilityFallDamage(), "invulnerability_fall_damage.yml");
-        registerPower(new InvulnerabilityKnockback(), "invulnerability_knockback.yml");
-        registerPower(new InvulnerabilityFireworks(), "invulnerability_fireworks.yml");
-        registerPower(new BonusLoot(), "bonus_loot.yml");
-        registerPower(new Taunt(), "taunt.yml");
-        registerPower(new Implosion(), "implosion.yml");
-        registerPower(new AttackArrow(), "attack_arrow.yml");
-        registerPower(new ArrowFireworks(), "arrow_fireworks.yml");
-        registerPower(new AttackFireball(), "attack_fireball.yml");
-        registerPower(new TrackingFireball.TrackingFireballEvents(), "tracking_fireball.yml");
-        registerPower(new AttackLightning(), "attack_lightning.yml");
-        registerPower(new AttackPush(), "attack_push.yml");
-        registerPower(new AttackVacuum(), "attack_vacuum.yml");
-        registerPower(new ArrowRain(), "arrow_rain.yml");
-        registerPower(new GroundPound(), "ground_pound.yml");
-        registerPower(new LightningBolts(), "lightning_bolts.yml");
-        registerPower(new FrostCone(), "frost_cone.yml");
-        registerPower(new Thunderstorm(), "thunderstorm.yml");
-        registerPower(new Firestorm(), "firestorm.yml");
-        register(new Bombardment.BombardmentEvents());
-        registerPower(new ShieldWall.ShieldWallEvents(), "shield_wall.yml");
-        registerPower(new Taze(), "taze.yml");
-
-        //Major mob powers
-        registerPower(new SkeletonPillar(), "skeleton_pillar.yml");
-        registerPower(new SkeletonTrackingArrow(), "skeleton_tracking_arrow.yml");
-        registerPower(new ZombieBloat(), "zombie_bloat.yml");
-        registerPower(new ZombieFriends(), "zombie_friends.yml");
-        registerPower(new ZombieNecronomicon(), "zombie_necronomicon.yml");
-        registerPower(new ZombieParents(), "zombie_parents.yml");
+        registerPower(new TrackingFireballSupport.Events(), "tracking_fireball.yml");
 
         //boss powers
-        registerPower(new SpiritWalk(), "spirit_walk.yml");
-        registerPower(new GoldShotgun(), "gold_shotgun.yml");
-        registerPower(new GoldExplosion(), "gold_explosion.yml");
-        registerPower(new Flamethrower(), "flamethrower.yml");
         register(new PlasmaBootsEnchantment.PlasmaBootsEnchantmentEvents());
         if (EnchantmentsConfig.getEnchantment(SoulbindEnchantment.key + ".yml").isEnabled())
             register(new SoulbindEnchantment.SoulbindEnchantmentEvents());
-        registerPower(new FlamePyre(), "flame_pyre.yml");
-        registerPower(new SummonTheReturned(), "summon_the_returned.yml");
-        registerPower(new HyperLoot(), "hyper_loot.yml");
-        registerPower(new SummonTheReturned(), "summon_the_returned.yml");
-        registerPower(new SummonEmbers(), "summon_embers.yml");
-        registerPower(new MeteorShower(), "meteor_shower.yml");
-        registerPower(new BulletHell(), "bullet_hell.yml");
-        registerPower(new DeathSlice(), "death_slice.yml");
-        registerPower(new FireworksBarrage.FireworksBarrageEvents(), "fireworks_barrage.yml");
         register(new CustomSummonPower.CustomSummonPowerEvent());
-        registerPower(new EnderDragonEmpoweredLightning.EnderDragonEmpoweredLightningEvents(), "ender_dragon_empowered_lightning.yml");
         register(new CombatEnterScanPower.MajorCombatEnterScanningPowerEvents());
         register(new LightningEnchantment.LightningEnchantmentEvents());
         registerPower(new BonusCoins.BonusCoinsEvents(), "bonus_coins.yml");
@@ -226,6 +182,7 @@ public class EventsRegistrer {
 
         //Custom bosses
         register(new CustomBossEntity.CustomBossEntityEvents());
+        register(new FrozenCustomBossKnockbackHandler());
         register(new CustomBossDeath());
         register(new PersistentObjectHandler.PersistentObjectHandlerEvents());
         register(new CustomBossTaunts());

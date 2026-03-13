@@ -177,6 +177,7 @@ public class LuaPowerInstance {
             case "entities" -> contextTables.createEntitiesTable(directTarget);
             case "vectors" -> contextTables.createVectorsTable();
             case "world" -> contextTables.createWorldTable();
+            case "settings" -> contextTables.createSettingsTable();
             case "zones" -> createZonesTable();
             case "player" -> contextPlayer == null ? LuaValue.NIL : entityTables.createPlayerTable(contextPlayer);
             case "event" -> event == null ? LuaValue.NIL : entityTables.createEventTable(event);
