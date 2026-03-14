@@ -123,7 +123,7 @@ dependencies {
     implementation (group: 'com.magmaguy', name: 'EasyMinecraftGoals-dist', version: '1.19.25'){
         changing = true
     }
-    implementation (group: 'com.magmaguy', name: 'MagmaCore', version: '1.28-SNAPSHOT'){
+    implementation (group: 'com.magmaguy', name: 'MagmaCore', version: '1.29-SNAPSHOT'){
         changing = true
     }
     testImplementation "org.spigotmc:spigot-api:1.21.11-R0.1-SNAPSHOT"
