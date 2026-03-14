@@ -9,6 +9,7 @@ import com.magmaguy.elitemobs.api.EliteMobsInitializedEvent;
 import com.magmaguy.elitemobs.collateralminecraftchanges.KeepNeutralsAngry;
 import com.magmaguy.elitemobs.collateralminecraftchanges.PlayerDeathMessageByEliteMob;
 import com.magmaguy.elitemobs.commands.CommandHandler;
+import com.magmaguy.elitemobs.commands.ReloadCommand;
 import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.config.commands.CommandsConfig;
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfig;
@@ -100,8 +101,14 @@ import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import com.magmaguy.elitemobs.wormhole.Wormhole;
 import com.magmaguy.elitemobs.wormhole.WormholeManager;
 import com.magmaguy.magmacore.MagmaCore;
+import com.magmaguy.magmacore.command.CommandManager;
 import com.magmaguy.magmacore.initialization.PluginInitializationConfig;
 import com.magmaguy.magmacore.initialization.PluginInitializationContext;
+import com.magmaguy.magmacore.nightbreak.NightbreakFirstTimeSetupSpec;
+import com.magmaguy.magmacore.nightbreak.NightbreakFirstTimeSetupWarner;
+import com.magmaguy.magmacore.nightbreak.NightbreakPluginBootstrap;
+import com.magmaguy.magmacore.nightbreak.NightbreakPluginHooks;
+import com.magmaguy.magmacore.nightbreak.NightbreakPluginSpec;
 import com.magmaguy.magmacore.util.Logger;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
@@ -117,6 +124,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EliteMobs extends JavaPlugin {
+
+    public static final NightbreakPluginSpec NIGHTBREAK_PLUGIN_SPEC = new NightbreakPluginSpec(
+            "EliteMobs", "elitemobs", "elitemobs.*", "elitemobs.setup", "elitemobs.initialize",
+            "https://nightbreak.io/plugin/elitemobs/", "Reloaded EliteMobs.",
+            true, true, true);
+
+    public static final NightbreakFirstTimeSetupSpec FIRST_TIME_SETUP_SPEC = new NightbreakFirstTimeSetupSpec(
+            "EliteMobs", "elitemobs.*", "/elitemobs initialize", "/elitemobs setup",
+            "/elitemobs downloadall", "https://nightbreak.io/plugin/elitemobs/",
+            "https://discord.gg/nightbreak", List.of(), List.of());
 
     public static List<World> validWorldList = new ArrayList<>();
     public static boolean worldGuardIsEnabled = false;
@@ -185,8 +202,6 @@ public class EliteMobs extends JavaPlugin {
         Bukkit.getLogger().info("\\____/\\_____/\\___/  \\_/ \\____/\\_|  |_/\\___/\\____/ \\____/");
         Bukkit.getLogger().info("By MagmaGuy - v. " + MetadataHandler.PLUGIN.getDescription().getVersion());
 
-        MagmaCore.onEnable(this);
-
         if (VersionChecker.serverVersionOlderThan(21, 0)) {
             Logger.warn("You are running a Minecraft version older than 1.21.0! EliteMobs 9.0 and later are only compatible with Minecraft 1.21.0 or later, if you are running an older Minecraft version you will need to use a pre-9.0 version of EliteMobs.");
             MetadataHandler.pluginState = PluginState.UNINITIALIZED;
@@ -210,27 +225,36 @@ public class EliteMobs extends JavaPlugin {
         //Remove entities that should not exist
         CrashFix.startupCheck();
 
-        MagmaCore.startInitialization(this,
+        NightbreakPluginBootstrap.startInitialization(this,
                 new PluginInitializationConfig("EliteMobs", "elitemobs.*", 34),
-                this::asyncInitialization,
-                this::syncInitialization,
-                () -> {
-                    if (MetadataHandler.shutdownRequested) {
-                        Logger.warn("EliteMobs init cancelled -- server shutting down.");
-                        return;
+                NIGHTBREAK_PLUGIN_SPEC,
+                new NightbreakPluginHooks() {
+                    @Override
+                    public void asyncInitialization(PluginInitializationContext context) {
+                        EliteMobs.this.asyncInitialization(context);
                     }
-                    MetadataHandler.pluginState = PluginState.INITIALIZED;
-                    Bukkit.getPluginManager().callEvent(new EliteMobsInitializedEvent());
-                    Logger.info("EliteMobs fully initialized!");
-                    if (MetadataHandler.pendingReloadSender != null) {
-                        Logger.sendMessage(MetadataHandler.pendingReloadSender, com.magmaguy.elitemobs.config.CommandMessagesConfig.getReloadSuccessMessage());
-                        MetadataHandler.pendingReloadSender = null;
+
+                    @Override
+                    public void syncInitialization(PluginInitializationContext context) {
+                        EliteMobs.this.syncInitialization(context);
                     }
-                },
-                throwable -> {
-                    MetadataHandler.pluginState = PluginState.UNINITIALIZED;
-                    MetadataHandler.pendingReloadSender = null;
-                    throwable.printStackTrace();
+
+                    @Override
+                    public void onInitializationSuccess() {
+                        if (MetadataHandler.shutdownRequested) {
+                            Logger.warn("EliteMobs init cancelled -- server shutting down.");
+                            return;
+                        }
+                        MetadataHandler.pluginState = PluginState.INITIALIZED;
+                        Bukkit.getPluginManager().callEvent(new EliteMobsInitializedEvent());
+                        Logger.info("EliteMobs fully initialized!");
+                    }
+
+                    @Override
+                    public void onInitializationFailure(Throwable throwable) {
+                        MetadataHandler.pluginState = PluginState.UNINITIALIZED;
+                        throwable.printStackTrace();
+                    }
                 });
     }
 
@@ -389,7 +413,19 @@ public class EliteMobs extends JavaPlugin {
 
         //Commands
         initializationContext.step("Commands");
-        CommandHandler.registerCommands();
+        CommandManager emCommandManager = CommandHandler.registerCommands();
+        NightbreakPluginBootstrap.registerStandardCommands(this,
+                emCommandManager,
+                NIGHTBREAK_PLUGIN_SPEC,
+                player -> com.magmaguy.elitemobs.commands.setup.EliteSetupMenu.createMenu(player),
+                player -> com.magmaguy.elitemobs.commands.setup.EliteFirstTimeSetupMenu.createMenu(player),
+                () -> new ArrayList<>(EMPackage.getEmPackages().values()),
+                sender -> ReloadCommand.reload(sender));
+
+        //First-time setup warner
+        Bukkit.getPluginManager().registerEvents(
+                new NightbreakFirstTimeSetupWarner(this, FIRST_TIME_SETUP_SPEC,
+                        () -> DefaultConfig.isSetupDone(), NIGHTBREAK_PLUGIN_SPEC), this);
 
         /*
         Check for new plugin version or for dungeon updates

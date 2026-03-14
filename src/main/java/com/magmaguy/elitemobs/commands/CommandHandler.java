@@ -1,8 +1,6 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.commands.admin.DownloadAllContentCommand;
-import com.magmaguy.elitemobs.commands.admin.UpdateContentCommand;
 import com.magmaguy.magmacore.command.CommandManager;
 
 public class CommandHandler {
@@ -11,11 +9,12 @@ public class CommandHandler {
     private CommandHandler() {
     }
 
-    public static void registerCommands() {
+    public static CommandManager registerCommands() {
         emCommand = new CommandManager(MetadataHandler.PLUGIN, "elitemobs");
 
         //Admin commands
-        emCommand.registerCommand(new SetupCommand());
+        // Note: setup, initialize, downloadall, and updatecontent commands are now
+        // registered via NightbreakPluginBootstrap.registerStandardCommands()
         emCommand.registerCommand(new SetupDoneCommand());
         emCommand.registerCommand(new SetupToggleCommand());
         emCommand.registerCommand(new SpawnBossCommand());
@@ -74,10 +73,7 @@ public class CommandHandler {
         emCommand.registerCommand(new DiscordCommand());
         emCommand.registerCommand(new MoneyRemoveCommand());
         emCommand.registerCommand(new ProtectionBypassCommand());
-        emCommand.registerCommand(new FirstTimeSetupCommand());
         emCommand.registerCommand(new DebugCommand());
-        emCommand.registerCommand(new UpdateContentCommand());
-        emCommand.registerCommand(new DownloadAllContentCommand());
 
         //User commands
 //        emCommand.registerCommand(new AdventurersGuildCommand());
@@ -121,5 +117,7 @@ public class CommandHandler {
 
         adventurersGuildCommand =new CommandManager(MetadataHandler.PLUGIN, "adventurersguild");
         adventurersGuildCommand.registerCommand(new AdventurersGuildCommand());
+
+        return emCommand;
     }
 }
