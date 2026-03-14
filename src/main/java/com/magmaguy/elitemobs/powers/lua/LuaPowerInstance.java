@@ -9,7 +9,6 @@ import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.pathfinding.Navigation;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.powers.meta.CustomSummonPower;
-import com.magmaguy.elitemobs.powers.scripts.ScriptAction;
 import com.magmaguy.elitemobs.utils.GameClock;
 import com.magmaguy.elitemobs.utils.shapes.*;
 import com.magmaguy.magmacore.util.AttributeManager;

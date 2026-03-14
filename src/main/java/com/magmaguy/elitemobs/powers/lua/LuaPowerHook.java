@@ -17,9 +17,7 @@ public enum LuaPowerHook {
     ON_HEAL("on_heal"),
     ON_TARGET("on_boss_target_changed"),
     ON_DEATH("on_death"),
-    ON_PHASE_SWITCH("on_phase_switch"),
-    ON_ZONE_ENTER("on_zone_enter"),
-    ON_ZONE_LEAVE("on_zone_leave");
+    ON_PHASE_SWITCH("on_phase_switch");
 
     private static final Map<String, LuaPowerHook> BY_KEY = new HashMap<>();
 

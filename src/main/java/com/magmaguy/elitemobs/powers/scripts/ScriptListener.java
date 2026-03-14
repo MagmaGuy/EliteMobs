@@ -18,16 +18,14 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 
 import java.util.HashMap;
-import java.util.function.BiConsumer;
 
 public class ScriptListener implements Listener {
     public static HashMap<FallingBlock, FallingEntityDataPair> fallingBlocks = new HashMap();
-    public static HashMap<FallingBlock, BiConsumer<FallingBlock, Location>> luaFallingBlocks = new HashMap<>();
     public static HashMap<Entity, FallingEntityDataPair> fallingEntities = new HashMap<>();
 
     public static void shutdown() {
         fallingBlocks.clear();
-        luaFallingBlocks.clear();
+        com.magmaguy.elitemobs.powers.lua.LuaFallingBlockRegistry.clear();
         fallingEntities.clear();
     }
 
@@ -107,18 +105,15 @@ public class ScriptListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onEntityChangeBlockEvent(EntityChangeBlockEvent event) {
         FallingEntityDataPair fallingEntityDataPair = fallingBlocks.get(event.getEntity());
-        BiConsumer<FallingBlock, Location> luaCallback = luaFallingBlocks.get(event.getEntity());
-        if (fallingEntityDataPair == null && luaCallback == null) return;
+        boolean luaHandled = event.getEntity() instanceof FallingBlock fb
+                && com.magmaguy.elitemobs.powers.lua.LuaFallingBlockRegistry.handle(fb, event.getBlock().getLocation());
+        if (fallingEntityDataPair == null && !luaHandled) return;
         event.setCancelled(true);
         if (fallingEntityDataPair != null) {
             ScriptAction scriptAction = fallingEntityDataPair.getScriptAction();
             if (scriptAction != null) {
                 runEvent(fallingEntityDataPair, event.getBlock().getLocation());
             }
-        }
-        if (luaCallback != null) {
-            luaCallback.accept((FallingBlock) event.getEntity(), event.getBlock().getLocation());
-            luaFallingBlocks.remove(event.getEntity());
         }
         fallingBlocks.remove(event.getEntity());
     }

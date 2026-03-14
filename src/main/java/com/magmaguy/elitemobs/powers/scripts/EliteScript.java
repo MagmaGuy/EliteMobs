@@ -137,13 +137,14 @@ public class EliteScript extends ElitePower implements Cloneable, ScriptRuntimeO
         }
     }
 
-    public static class EliteScriptEvents implements Listener {
+public static class EliteScriptEvents implements Listener {
         @EventHandler
         public void onSpawn(EliteMobSpawnEvent event) {
             if (event.getEliteMobEntity() instanceof CustomBossEntity customBossEntity) {
                 customBossEntity.getElitePowers().forEach(elitePower -> {
-                    if (elitePower instanceof EliteScript eliteScript)
+                    if (elitePower instanceof EliteScript eliteScript) {
                         eliteScript.initializeCustomEvents(event.getEliteMobEntity());
+                    }
                 });
             }
         }
