@@ -10,7 +10,7 @@ import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.powers.ProjectileDamage;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
-import com.magmaguy.elitemobs.powers.scripts.ScriptAction;
+import com.magmaguy.elitemobs.utils.InvulnerabilityTracker;
 import com.magmaguy.elitemobs.utils.GameClock;
 import com.magmaguy.elitemobs.utils.shapes.*;
 import com.magmaguy.magmacore.util.Logger;
@@ -281,9 +281,9 @@ final class LuaPowerSupport {
         livingEntity.setInvulnerable(invulnerable);
         if (livingEntity instanceof Player player) {
             if (invulnerable) {
-                ScriptAction.getInvulnerablePlayers().add(player.getUniqueId());
+                InvulnerabilityTracker.add(player.getUniqueId());
             } else {
-                ScriptAction.getInvulnerablePlayers().remove(player.getUniqueId());
+                InvulnerabilityTracker.remove(player.getUniqueId());
             }
         }
         if (duration > 0) {
@@ -295,9 +295,9 @@ final class LuaPowerSupport {
                 livingEntity.setInvulnerable(!invulnerable);
                 if (livingEntity instanceof Player) {
                     if (invulnerable) {
-                        ScriptAction.getInvulnerablePlayers().remove(uuid);
+                        InvulnerabilityTracker.remove(uuid);
                     } else {
-                        ScriptAction.getInvulnerablePlayers().add(uuid);
+                        InvulnerabilityTracker.add(uuid);
                     }
                 }
             });

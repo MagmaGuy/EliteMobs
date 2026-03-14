@@ -1,6 +1,16 @@
 package com.magmaguy.elitemobs.powers.lua;
 
-import com.magmaguy.elitemobs.api.*;
+import com.magmaguy.elitemobs.api.EliteMobDamagedByEliteMobEvent;
+import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
+import com.magmaguy.elitemobs.api.EliteMobDamagedEvent;
+import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
+import com.magmaguy.elitemobs.api.EliteMobEnterCombatEvent;
+import com.magmaguy.elitemobs.api.EliteMobExitCombatEvent;
+import com.magmaguy.elitemobs.api.EliteMobHealEvent;
+import com.magmaguy.elitemobs.api.EliteMobSpawnEvent;
+import com.magmaguy.elitemobs.api.EliteMobTargetPlayerEvent;
+import com.magmaguy.elitemobs.api.ElitePhaseSwitchEvent;
+import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
 import com.magmaguy.elitemobs.config.powers.LuaPowerConfigFields;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
@@ -62,7 +72,10 @@ public class LuaElitePower extends ElitePower {
 
     private void initializeInstance() {
         EliteEntity ownerEntity = getOwnerEntity();
-        if (ownerEntity == null || ownerEntity.getLivingEntity() == null) {
+        if (ownerEntity == null) {
+            return;
+        }
+        if (ownerEntity.getLivingEntity() == null && ownerEntity.getUnsyncedLivingEntity() == null) {
             return;
         }
         if (instance != null && !instance.isClosed()) {
@@ -89,8 +102,6 @@ public class LuaElitePower extends ElitePower {
         if (event instanceof EliteMobTargetPlayerEvent) return LuaPowerHook.ON_TARGET;
         if (event instanceof EliteMobDeathEvent) return LuaPowerHook.ON_DEATH;
         if (event instanceof ElitePhaseSwitchEvent) return LuaPowerHook.ON_PHASE_SWITCH;
-        if (event instanceof ScriptZoneEnterEvent) return LuaPowerHook.ON_ZONE_ENTER;
-        if (event instanceof ScriptZoneLeaveEvent) return LuaPowerHook.ON_ZONE_LEAVE;
         return null;
     }
 }

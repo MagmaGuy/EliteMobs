@@ -6,8 +6,6 @@ import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.api.EliteMobDamagedEvent;
 import com.magmaguy.elitemobs.api.EliteMobSpawnEvent;
 import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
-import com.magmaguy.elitemobs.api.ScriptZoneEnterEvent;
-import com.magmaguy.elitemobs.api.ScriptZoneLeaveEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.events.BossCustomAttackDamage;
@@ -149,12 +147,11 @@ final class LuaPowerEntityTables {
             eventTable.set("spawn_reason", LuaValue.valueOf(spawnEvent.getReason().name()));
         }
         if (event instanceof com.magmaguy.elitemobs.api.EliteMobDeathEvent deathEvent) {
-            eventTable.set("entity", createEntityReferenceTable(deathEvent.getEntity()));
-        }
-        if (event instanceof ScriptZoneEnterEvent zoneEnterEvent) {
-            eventTable.set("entity", createEntityTable(zoneEnterEvent.getEntity()));
-        } else if (event instanceof ScriptZoneLeaveEvent zoneLeaveEvent) {
-            eventTable.set("entity", createEntityTable(zoneLeaveEvent.getEntity()));
+            if (deathEvent.getEntity() instanceof LivingEntity livingDeathEntity) {
+                eventTable.set("entity", createEntityTable(livingDeathEntity));
+            } else {
+                eventTable.set("entity", createEntityReferenceTable(deathEvent.getEntity()));
+            }
         }
         return eventTable;
     }

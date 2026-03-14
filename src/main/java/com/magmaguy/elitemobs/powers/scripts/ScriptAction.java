@@ -14,6 +14,7 @@ import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.powers.meta.CustomSummonPower;
 import com.magmaguy.elitemobs.powers.scripts.caching.ScriptActionBlueprint;
 import com.magmaguy.elitemobs.powers.scripts.enums.ActionType;
+import com.magmaguy.elitemobs.utils.InvulnerabilityTracker;
 import com.magmaguy.magmacore.util.AttributeManager;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.Logger;
@@ -32,7 +33,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -41,11 +41,6 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class ScriptAction {
 
-    /**
-     * A thread-safe set of player UUIDs who are currently invulnerable due to scripts.
-     */
-    @Getter
-    private static final Set<UUID> invulnerablePlayers = ConcurrentHashMap.newKeySet();
 
     @Getter
     private final ScriptActionBlueprint blueprint;
@@ -457,11 +452,7 @@ public class ScriptAction {
      * Resets the state of all invulnerable players by removing their invulnerability.
      */
     public static void shutdown() {
-        invulnerablePlayers.forEach(uuid -> {
-            Player player = Bukkit.getPlayer(uuid);
-            if (player != null) player.setInvulnerable(false);
-        });
-        invulnerablePlayers.clear();
+        InvulnerabilityTracker.shutdown();
         scriptDamageDepth.remove();
     }
 
@@ -837,9 +828,9 @@ public class ScriptAction {
             target.setInvulnerable(invulnerable);
             if (target instanceof Player player) {
                 if (invulnerable) {
-                    invulnerablePlayers.add(player.getUniqueId());
+                    InvulnerabilityTracker.add(player.getUniqueId());
                 } else {
-                    invulnerablePlayers.remove(player.getUniqueId());
+                    InvulnerabilityTracker.remove(player.getUniqueId());
                 }
             }
             if (duration > 0) {
@@ -848,9 +839,9 @@ public class ScriptAction {
                     target.setInvulnerable(!invulnerable);
                     if (target instanceof Player) {
                         if (invulnerable) {
-                            invulnerablePlayers.remove(targetUUID);
+                            InvulnerabilityTracker.remove(targetUUID);
                         } else {
-                            invulnerablePlayers.add(targetUUID);
+                            InvulnerabilityTracker.add(targetUUID);
                         }
                     }
                 }, duration);

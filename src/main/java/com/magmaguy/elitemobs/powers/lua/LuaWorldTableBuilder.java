@@ -6,7 +6,6 @@ import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.powers.ProjectileDamage;
 import com.magmaguy.elitemobs.powers.meta.CustomSummonPower;
-import com.magmaguy.elitemobs.powers.scripts.ScriptListener;
 import com.magmaguy.elitemobs.powers.specialpowers.EnderDragonEmpoweredLightningSupport;
 import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Bukkit;
@@ -257,6 +256,9 @@ final class LuaWorldTableBuilder {
                         options.get("on_land").checkfunction(),
                         options.get("max_ticks").optint(20 * 60 * 5));
             }
+            if (entity instanceof LivingEntity livingEntity) {
+                return entityTables.createEntityTable(livingEntity);
+            }
             return entityTables.createEntityReferenceTable(entity);
         }));
         world.set("spawn_falling_block_at_location", method(world, args -> {
@@ -275,7 +277,7 @@ final class LuaWorldTableBuilder {
             }
             if (options.get("on_land").isfunction()) {
                 LuaFunction onLand = options.get("on_land").checkfunction();
-                ScriptListener.luaFallingBlocks.put(fallingBlock, (entity, landingLocation) ->
+                LuaFallingBlockRegistry.register(fallingBlock, (entity, landingLocation) ->
                         callbackInvoker.invoke("a falling block landing callback",
                                 onLand,
                                 support.toLocationTable(landingLocation),
