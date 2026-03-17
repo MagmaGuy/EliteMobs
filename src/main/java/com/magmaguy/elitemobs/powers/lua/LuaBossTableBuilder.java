@@ -14,14 +14,8 @@ import com.magmaguy.elitemobs.powers.specialpowers.ZombieNecronomiconSupport;
 import com.magmaguy.elitemobs.utils.GameClock;
 import com.magmaguy.elitemobs.utils.shapes.Shape;
 import com.magmaguy.magmacore.util.ChatColorConverter;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.Bukkit;
 import org.bukkit.EntityEffect;
 import org.bukkit.Location;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
-import org.bukkit.boss.BossBar;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -71,45 +65,26 @@ final class LuaBossTableBuilder {
     }
 
     LuaTable build() {
-        LuaTable boss = new LuaTable();
+        // Start from the living entity base — boss inherits ALL entity methods
+        // (push_relative_to, apply_push_vector, set_gravity, set_scale, etc.)
+        LuaTable boss = eliteEntity.getLivingEntity() != null
+                ? entityTables.createLivingEntityTable(eliteEntity.getLivingEntity())
+                : new LuaTable();
+
+        // ── Override properties/methods that need EliteEntity-level semantics ──
         boss.set("name", LuaValue.valueOf(eliteEntity.getName() == null ? definition.getFileName() : eliteEntity.getName()));
         boss.set("uuid", LuaValue.valueOf(eliteEntity.getEliteUUID().toString()));
-        boss.set("entity_type", LuaValue.valueOf(eliteEntity.getLivingEntity() == null
-                ? "UNKNOWN"
-                : eliteEntity.getLivingEntity().getType().name()));
-        boss.set("is_monster", LuaValue.valueOf(eliteEntity.getLivingEntity() instanceof Monster));
-        boss.set("level", LuaValue.valueOf(eliteEntity.getLevel()));
         boss.set("health", LuaValue.valueOf(eliteEntity.getHealth()));
         boss.set("maximum_health", LuaValue.valueOf(eliteEntity.getMaxHealth()));
-        boss.set("damager_count", LuaValue.valueOf(eliteEntity.getDamagers().size()));
-        boss.set("is_in_combat", LuaValue.valueOf(eliteEntity.isInCombat()));
-        boss.set("exists", LuaValue.valueOf(eliteEntity.exists()));
         boss.set("current_location", support.toLocationTable(eliteEntity.getLocation()));
         boss.set("is_alive", method(boss, args -> LuaValue.valueOf(isAlive(eliteEntity.getLivingEntity()) && eliteEntity.exists())));
-        boss.set("is_ai_enabled", method(boss, args -> LuaValue.valueOf(eliteEntity.getLivingEntity() != null
-                && eliteEntity.getLivingEntity().hasAI())));
         boss.set("get_health", method(boss, args -> LuaValue.valueOf(eliteEntity.getHealth())));
         boss.set("get_maximum_health", method(boss, args -> LuaValue.valueOf(eliteEntity.getMaxHealth())));
-        boss.set("get_damager_count", method(boss, args -> LuaValue.valueOf(eliteEntity.getDamagers().size())));
         boss.set("get_location", method(boss, args -> support.toLocationTable(eliteEntity.getLocation())));
-        boss.set("get_eye_location", method(boss, args -> eliteEntity.getLivingEntity() == null
-                ? LuaValue.NIL
-                : support.toLocationTable(eliteEntity.getLivingEntity().getEyeLocation())));
-        boss.set("get_ender_dragon_phase", method(boss, args -> eliteEntity.getLivingEntity() instanceof EnderDragon enderDragon
-                ? LuaValue.valueOf(enderDragon.getPhase().name())
-                : LuaValue.NIL));
-        boss.set("set_ender_dragon_phase", method(boss, args -> {
-            if (eliteEntity.getLivingEntity() instanceof EnderDragon enderDragon) {
-                EnderDragon.Phase phase = support.parseEnum(args.checkjstring(1), EnderDragon.Phase.class, null);
-                if (phase != null) {
-                    enderDragon.setPhase(phase);
-                }
-            }
+        boss.set("restore_health", method(boss, args -> {
+            eliteEntity.heal(args.checkdouble(1));
             return LuaValue.NIL;
         }));
-        boss.set("get_height", method(boss, args -> LuaValue.valueOf(eliteEntity.getLivingEntity() == null
-                ? 0
-                : eliteEntity.getLivingEntity().getHeight())));
         boss.set("add_tag", method(boss, args -> {
             eliteEntity.addTag(args.checkjstring(1));
             entityTables.scheduleTagRemoval(eliteEntity.getLivingEntity(), args.optint(2, 0), args.checkjstring(1));
@@ -120,88 +95,23 @@ final class LuaBossTableBuilder {
             return LuaValue.NIL;
         }));
         boss.set("has_tag", method(boss, args -> LuaValue.valueOf(eliteEntity.hasTag(args.checkjstring(1)))));
-        boss.set("restore_health", method(boss, args -> {
-            eliteEntity.heal(args.checkdouble(1));
-            return LuaValue.NIL;
-        }));
-        boss.set("deal_damage", method(boss, args -> {
-            if (eliteEntity.getLivingEntity() != null) {
-                eliteEntity.getLivingEntity().damage(args.checkdouble(1));
-            }
-            return LuaValue.NIL;
-        }));
-        boss.set("teleport_to_location", method(boss, args -> {
-            Location destination = support.toLocation(args.arg1());
-            if (eliteEntity.getLivingEntity() != null && destination != null) {
-                eliteEntity.getLivingEntity().teleport(destination);
-            }
-            return LuaValue.NIL;
-        }));
-        boss.set("despawn", method(boss, args -> {
-            eliteEntity.remove(RemovalReason.OTHER);
-            return LuaValue.NIL;
-        }));
-        boss.set("set_ai_enabled", method(boss, args -> {
-            entityTables.applyAiState(eliteEntity.getLivingEntity(), args.checkboolean(1), args.optint(2, 0));
-            return LuaValue.NIL;
-        }));
-        boss.set("play_sound_at_self", method(boss, args -> {
-            support.playSound(eliteEntity.getLocation(), args.checkjstring(1), resolveVolume(args), resolvePitch(args));
-            return LuaValue.NIL;
-        }));
-        boss.set("spawn_particle_at_self", method(boss, args -> {
-            support.spawnParticle(eliteEntity.getLocation(), args.arg(1), args.optint(2, 1));
-            return LuaValue.NIL;
-        }));
-        boss.set("spawn_particles_at_location", method(boss, args -> {
-            support.spawnParticle(support.toLocation(args.arg1()), particleSpec(args), args.optint(3, 1));
-            return LuaValue.NIL;
-        }));
-        boss.set("set_velocity_vector", method(boss, args -> {
-            if (eliteEntity.getLivingEntity() != null) {
-                Vector velocity = support.toVector(args.arg1());
-                if (velocity != null) {
-                    eliteEntity.getLivingEntity().setVelocity(velocity);
-                }
-            }
-            return LuaValue.NIL;
-        }));
-        boss.set("is_on_ground", method(boss, args -> LuaValue.valueOf(eliteEntity.getLivingEntity() != null
-                && eliteEntity.getLivingEntity().isOnGround())));
-        boss.set("set_custom_name", method(boss, args -> {
-            if (eliteEntity.getLivingEntity() != null) {
-                eliteEntity.getLivingEntity().setCustomName(ChatColorConverter.convert(args.checkjstring(1)));
-            }
-            return LuaValue.NIL;
-        }));
         boss.set("reset_custom_name", method(boss, args -> {
             if (eliteEntity.getLivingEntity() != null) {
                 eliteEntity.getLivingEntity().setCustomName(eliteEntity.getName());
             }
             return LuaValue.NIL;
         }));
-        boss.set("set_custom_name_visible", method(boss, args -> {
-            if (eliteEntity.getLivingEntity() != null) {
-                eliteEntity.getLivingEntity().setCustomNameVisible(args.checkboolean(1));
-            }
+        // Override sound/particle to use eliteEntity.getLocation() (works even if entity ref is stale)
+        boss.set("play_sound_at_self", method(boss, args -> {
+            support.playSound(eliteEntity.getLocation(), args.checkjstring(1), resolveVolume(args), resolvePitch(args));
             return LuaValue.NIL;
         }));
-        boss.set("face_direction_or_location", method(boss, args -> {
-            if (eliteEntity.getLivingEntity() == null) {
-                return LuaValue.NIL;
-            }
-            Vector direction = support.toVector(args.arg1());
-            if (direction == null && args.arg1().istable()) {
-                Location destination = support.toLocation(args.arg1());
-                if (destination != null) {
-                    direction = destination.toVector().subtract(eliteEntity.getLivingEntity().getLocation().toVector());
-                }
-            }
-            if (direction != null && direction.lengthSquared() > 0) {
-                Location location = eliteEntity.getLivingEntity().getLocation();
-                location.setDirection(direction);
-                eliteEntity.getLivingEntity().teleport(location);
-            }
+        boss.set("play_sound_at_entity", method(boss, args -> {
+            support.playSound(eliteEntity.getLocation(), args.checkjstring(1), resolveVolume(args), resolvePitch(args));
+            return LuaValue.NIL;
+        }));
+        boss.set("spawn_particle_at_self", method(boss, args -> {
+            support.spawnParticle(eliteEntity.getLocation(), args.arg(1), args.optint(2, 1));
             return LuaValue.NIL;
         }));
         boss.set("play_model_animation", method(boss, args -> {
@@ -219,6 +129,31 @@ final class LuaBossTableBuilder {
             }
             return LuaValue.NIL;
         }));
+
+        // ── Boss-only properties ──
+        boss.set("level", LuaValue.valueOf(eliteEntity.getLevel()));
+        boss.set("damager_count", LuaValue.valueOf(eliteEntity.getDamagers().size()));
+        boss.set("is_in_combat", LuaValue.valueOf(eliteEntity.isInCombat()));
+        boss.set("exists", LuaValue.valueOf(eliteEntity.exists()));
+        boss.set("get_damager_count", method(boss, args -> LuaValue.valueOf(eliteEntity.getDamagers().size())));
+        boss.set("despawn", method(boss, args -> {
+            eliteEntity.remove(RemovalReason.OTHER);
+            return LuaValue.NIL;
+        }));
+        boss.set("get_ender_dragon_phase", method(boss, args -> eliteEntity.getLivingEntity() instanceof EnderDragon enderDragon
+                ? LuaValue.valueOf(enderDragon.getPhase().name())
+                : LuaValue.NIL));
+        boss.set("set_ender_dragon_phase", method(boss, args -> {
+            if (eliteEntity.getLivingEntity() instanceof EnderDragon enderDragon) {
+                EnderDragon.Phase phase = support.parseEnum(args.checkjstring(1), EnderDragon.Phase.class, null);
+                if (phase != null) {
+                    enderDragon.setPhase(phase);
+                }
+            }
+            return LuaValue.NIL;
+        }));
+
+        // ── Boss-only methods ──
         boss.set("start_tracking_fireball_system", method(boss, args -> {
             if (eliteEntity.getLivingEntity() instanceof Monster monster) {
                 TrackingFireballSupport.begin(monster, args.optdouble(1, 0.5));
@@ -276,11 +211,11 @@ final class LuaBossTableBuilder {
         }));
         boss.set("get_nearby_players_in_zone", method(boss, args -> getPlayersInZone(args.arg1())));
         boss.set("spawn_particles_in_zone", method(boss, args -> {
-            spawnParticlesInZone(args.arg1(), false, particleSpec(args), args.optdouble(8, 1.0));
+            spawnParticlesInZone(args.arg1(), false, support.toParticleSpec(args), args.optdouble(8, 1.0));
             return LuaValue.NIL;
         }));
         boss.set("spawn_particles_in_zone_border", method(boss, args -> {
-            spawnParticlesInZone(args.arg1(), true, particleSpec(args), args.optdouble(8, 1.0));
+            spawnParticlesInZone(args.arg1(), true, support.toParticleSpec(args), args.optdouble(8, 1.0));
             return LuaValue.NIL;
         }));
         boss.set("get_particles_from_self_toward_zone", method(boss, args ->
@@ -356,7 +291,11 @@ final class LuaBossTableBuilder {
             }
             return entityTables.createEntityReferenceTable(projectile);
         }));
-        entityTables.addEntityEffectMethods(boss, eliteEntity.getLivingEntity());
+        // Entity effect methods (potion, equipment, fire ticks, etc.) are inherited from the base entity table.
+        // Only add them if the base was empty (null livingEntity case).
+        if (eliteEntity.getLivingEntity() == null) {
+            entityTables.addEntityEffectMethods(boss, null);
+        }
         return boss;
     }
 
@@ -479,17 +418,6 @@ final class LuaBossTableBuilder {
             return shape.getCenter();
         }
         return locations.get((int) (Math.random() * locations.size()));
-    }
-
-    private LuaTable particleSpec(Varargs args) {
-        LuaTable particle = new LuaTable();
-        particle.set("particle", args.arg(2).isstring() ? args.arg(2) : args.arg(1));
-        particle.set("amount", LuaValue.valueOf(args.narg() >= 3 ? args.arg(3).optint(1) : 1));
-        particle.set("x", LuaValue.valueOf(args.narg() >= 4 ? args.arg(4).optdouble(0) : 0));
-        particle.set("y", LuaValue.valueOf(args.narg() >= 5 ? args.arg(5).optdouble(0) : 0));
-        particle.set("z", LuaValue.valueOf(args.narg() >= 6 ? args.arg(6).optdouble(0) : 0));
-        particle.set("speed", LuaValue.valueOf(args.narg() >= 7 ? args.arg(7).optdouble(0) : 0));
-        return particle;
     }
 
     private void applyGenericSpawnOptions(Entity entity, LuaTable options) {
