@@ -120,15 +120,15 @@ public class LuaPowerInstance {
             try {
                 function.checkfunction().call(buildContext(event, directTarget, eventActor));
             } catch (Exception exception) {
-                Logger.warn("Lua power " + definition.getFileName() + " failed while handling " + hook.getKey() + ".");
-                exception.printStackTrace();
+                logLuaError(hook.getKey(), exception);
                 shutdown();
                 return;
             }
 
             long elapsedMillis = (System.nanoTime() - startNanos) / 1_000_000L;
             if (elapsedMillis > 50) {
-                Logger.warn("Lua power " + definition.getFileName() + " exceeded the 50ms execution budget on " + hook.getKey() + " and was disabled.");
+                Logger.warn("[Lua] " + definition.getFileName() + " took " + elapsedMillis + "ms in '"
+                        + hook.getKey() + "' (limit: 50ms) — power disabled to prevent lag.");
                 shutdown();
                 return;
             }
@@ -192,16 +192,15 @@ public class LuaPowerInstance {
         try {
             callback.invoke(LuaValue.varargsOf(args));
         } catch (Exception exception) {
-            Logger.warn("Lua power " + definition.getFileName() + " failed inside " + failureContext + ".");
-            exception.printStackTrace();
+            logLuaError(failureContext, exception);
             shutdown();
             return;
         }
 
         long elapsedMillis = (System.nanoTime() - startNanos) / 1_000_000L;
         if (elapsedMillis > 50) {
-            Logger.warn("Lua power " + definition.getFileName() + " exceeded the 50ms execution budget inside "
-                    + failureContext + " and was disabled.");
+            Logger.warn("[Lua] " + definition.getFileName() + " took " + elapsedMillis + "ms in '"
+                    + failureContext + "' (limit: 50ms) — power disabled to prevent lag.");
             shutdown();
         }
     }
@@ -304,8 +303,7 @@ public class LuaPowerInstance {
         try {
             callback.call(buildContext(null, null, null));
         } catch (Exception exception) {
-            Logger.warn("Lua power " + definition.getFileName() + " failed inside a scheduled callback.");
-            exception.printStackTrace();
+            logLuaError("scheduled callback", exception);
             shutdown();
         }
     }
@@ -418,6 +416,64 @@ public class LuaPowerInstance {
         return LuaValue.varargsOf(stripped);
     }
 
+    private void logLuaError(String context, Exception exception) {
+        String fileName = definition.getFileName();
+        String rawMessage = exception.getMessage() != null ? exception.getMessage() : exception.toString();
+
+        // Parse LuaJ error format: "filename:line message"
+        String lineInfo = "";
+        String errorDetail = rawMessage;
+        if (rawMessage.contains(fileName)) {
+            int fileStart = rawMessage.indexOf(fileName);
+            String afterFile = rawMessage.substring(fileStart + fileName.length());
+            if (afterFile.startsWith(":")) {
+                afterFile = afterFile.substring(1);
+                int spaceIndex = afterFile.indexOf(' ');
+                if (spaceIndex > 0) {
+                    lineInfo = afterFile.substring(0, spaceIndex);
+                    errorDetail = afterFile.substring(spaceIndex + 1).trim();
+                }
+            }
+        }
+
+        // Build a friendly message
+        StringBuilder message = new StringBuilder();
+        message.append("[Lua] Error in '").append(fileName).append("'");
+        if (!lineInfo.isEmpty()) {
+            message.append(" at line ").append(lineInfo);
+        }
+        message.append(" during '").append(context).append("':");
+        Logger.warn(message.toString());
+
+        // Translate common errors into plain English
+        if (errorDetail.contains("attempt to call nil")) {
+            String target = extractNilCallTarget(rawMessage);
+            Logger.warn("[Lua]   -> You tried to call a method or function that doesn't exist" +
+                    (target.isEmpty() ? "." : ": '" + target + "'"));
+            Logger.warn("[Lua]   -> Check the method name for typos, or make sure you're using ':' (colon) for method calls, not '.' (dot).");
+        } else if (errorDetail.contains("index expected, got nil")) {
+            Logger.warn("[Lua]   -> You tried to access a field on something that is nil (doesn't exist).");
+            Logger.warn("[Lua]   -> A variable or table field you're reading hasn't been set yet. Check that earlier code initialized it.");
+        } else if (errorDetail.contains("attempt to index")) {
+            Logger.warn("[Lua]   -> You tried to access a property on a nil or invalid value.");
+            Logger.warn("[Lua]   -> Check that the object exists before accessing its fields.");
+        } else if (errorDetail.contains("bad argument")) {
+            Logger.warn("[Lua]   -> A function received the wrong type of argument (e.g. string instead of number).");
+            Logger.warn("[Lua]   -> Detail: " + errorDetail);
+        } else {
+            Logger.warn("[Lua]   -> " + errorDetail);
+        }
+
+        Logger.warn("[Lua]   -> Power has been disabled for this boss to prevent further errors.");
+    }
+
+    private static String extractNilCallTarget(String message) {
+        // Try to extract useful context from the raw LuaJ error
+        if (message == null) return "";
+        // Common pattern: the variable name sometimes appears before the error
+        return "";
+    }
+
     private String resolveCooldownKey(Varargs args, int index) {
         if (args.narg() < index || args.arg(index).isnil()) {
             return "__lua:" + definition.getFileName();
@@ -467,8 +523,7 @@ public class LuaPowerInstance {
             try {
                 callback.call(entityTables.createEntityTable(livingEntity));
             } catch (Exception exception) {
-                Logger.warn("Lua power " + definition.getFileName() + " failed inside a zone callback.");
-                exception.printStackTrace();
+                logLuaError("zone callback", exception);
                 shutdown();
             }
         }

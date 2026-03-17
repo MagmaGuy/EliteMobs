@@ -696,6 +696,17 @@ final class LuaPowerSupport {
         };
     }
 
+    LuaTable toParticleSpec(Varargs args) {
+        LuaTable particle = new LuaTable();
+        particle.set("particle", args.arg(2).isstring() ? args.arg(2) : args.arg(1));
+        particle.set("amount", LuaValue.valueOf(args.narg() >= 3 ? args.arg(3).optint(1) : 1));
+        particle.set("x", LuaValue.valueOf(args.narg() >= 4 ? args.arg(4).optdouble(0) : 0));
+        particle.set("y", LuaValue.valueOf(args.narg() >= 5 ? args.arg(5).optdouble(0) : 0));
+        particle.set("z", LuaValue.valueOf(args.narg() >= 6 ? args.arg(6).optdouble(0) : 0));
+        particle.set("speed", LuaValue.valueOf(args.narg() >= 7 ? args.arg(7).optdouble(0) : 0));
+        return particle;
+    }
+
     private Location resolveLocation(LuaValue value) {
         return toLocation(value);
     }

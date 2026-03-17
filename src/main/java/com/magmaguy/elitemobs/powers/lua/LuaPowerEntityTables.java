@@ -334,6 +334,18 @@ final class LuaPowerEntityTables {
             support.playSound(livingEntity.getLocation(), args.checkjstring(1), resolveVolume(args), resolvePitch(args));
             return LuaValue.NIL;
         }));
+        entity.set("play_sound_at_self", method(entity, args -> {
+            support.playSound(livingEntity.getLocation(), args.checkjstring(1), resolveVolume(args), resolvePitch(args));
+            return LuaValue.NIL;
+        }));
+        entity.set("spawn_particle_at_self", method(entity, args -> {
+            support.spawnParticle(livingEntity.getLocation(), args.arg(1), args.optint(2, 1));
+            return LuaValue.NIL;
+        }));
+        entity.set("spawn_particles_at_location", method(entity, args -> {
+            support.spawnParticle(support.toLocation(args.arg1()), support.toParticleSpec(args), args.optint(3, 1));
+            return LuaValue.NIL;
+        }));
         entity.set("teleport_to_location", method(entity, args -> {
             Location destination = support.toLocation(args.arg1());
             if (destination != null) {
