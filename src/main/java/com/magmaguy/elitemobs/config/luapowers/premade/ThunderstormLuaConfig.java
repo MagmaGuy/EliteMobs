@@ -47,15 +47,13 @@ public class ThunderstormLuaConfig extends LuaPowersConfigFields {
                 return {
                   api_version = 1,
                   on_boss_damaged_by_player = function(context)
-                    if not context.boss:is_ai_enabled() then
-                      return
-                    end
                     if not context.cooldowns.global_ready() or math.random() > 0.25 then
                       return
                     end
 
                     context.cooldowns.set_global(400)
                     context.boss:set_ai_enabled(false, 100)
+                    context.state.thunderstorm_active = true
 
                     local storm_task
                     local counter = 0
@@ -63,6 +61,7 @@ public class ThunderstormLuaConfig extends LuaPowersConfigFields {
                       counter = counter + 1
                       if counter > 100 or not context.boss:is_alive() then
                         context.scheduler:cancel_task(storm_task)
+                        context.state.thunderstorm_active = false
                         return
                       end
 
@@ -76,6 +75,12 @@ public class ThunderstormLuaConfig extends LuaPowersConfigFields {
                         end
                       end
                     end)
+                  end,
+
+                  on_boss_damaged = function(context)
+                    if context.state.thunderstorm_active and context.event.damage_cause == "LIGHTNING" then
+                      context.event.cancel_event()
+                    end
                   end
                 }
                 """;

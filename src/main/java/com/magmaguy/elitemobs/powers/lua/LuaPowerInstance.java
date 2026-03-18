@@ -501,7 +501,7 @@ public class LuaPowerInstance {
             Set<UUID> seen = new HashSet<>();
             for (LivingEntity livingEntity : support.filterEntities(eliteEntity.getLocation().getWorld(), filter)) {
                 if (livingEntity.equals(eliteEntity.getLivingEntity())) continue;
-                boolean contains = borderMode ? shape.borderContains(livingEntity.getLocation()) : shape.contains(livingEntity);
+                boolean contains = borderMode ? shape.borderContains(livingEntity) : shape.contains(livingEntity);
                 if (!contains) continue;
                 seen.add(livingEntity.getUniqueId());
                 if (!currentInside.containsKey(livingEntity.getUniqueId())) {

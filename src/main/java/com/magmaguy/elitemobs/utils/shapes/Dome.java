@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.utils.shapes;
 
 import org.bukkit.Location;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
@@ -19,6 +20,11 @@ public class Dome extends Sphere {
     @Override
     public boolean borderContains(Location position) {
         return super.borderContains(position) && position.getY() > centerLocation.getY() - 1;
+    }
+
+    @Override
+    public boolean borderContains(LivingEntity livingEntity) {
+        return super.borderContains(livingEntity) && livingEntity.getLocation().getY() > centerLocation.getY() - 1;
     }
 
     @Override

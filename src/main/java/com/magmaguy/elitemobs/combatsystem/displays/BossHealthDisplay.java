@@ -606,7 +606,8 @@ public class BossHealthDisplay implements Listener {
 
         // Update health display
         if (MobCombatSettingsConfig.isDisplayVisualHealthBars() ||
-            MobCombatSettingsConfig.isDisplayNumericHealth()) {
+            MobCombatSettingsConfig.isDisplayNumericHealth() ||
+            MobCombatSettingsConfig.isDisplayBossBarForHighMultiplier()) {
 
             HealthDisplayData data = activeDisplays.get(eliteEntity.getEliteUUID());
             if (data != null) {

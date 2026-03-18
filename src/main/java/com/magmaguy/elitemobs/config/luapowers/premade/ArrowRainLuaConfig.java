@@ -76,7 +76,7 @@ public class ArrowRainLuaConfig extends LuaPowersConfigFields {
                           -0.5,
                           random_between(-0.5, 0.5)
                         )
-                        context.boss:summon_projectile("ARROW", arrow_origin, arrow_target, 1.0)
+                        context.boss:summon_projectile("ARROW", arrow_origin, arrow_target, 1.0, { spawn_at_origin = true })
                       end
                     end)
                   end

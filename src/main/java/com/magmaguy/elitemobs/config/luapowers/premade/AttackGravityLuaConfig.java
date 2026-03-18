@@ -9,7 +9,7 @@ public class AttackGravityLuaConfig extends PlayerDamagedPotionLuaPowerConfig {
                 Material.ELYTRA.toString(),
                 PowersConfigFields.PowerType.OFFENSIVE,
                 "levitation",
-                60,
+                100,
                 0,
                 0,
                 0);

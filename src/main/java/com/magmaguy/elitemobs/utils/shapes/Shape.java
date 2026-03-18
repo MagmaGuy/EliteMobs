@@ -13,6 +13,8 @@ public abstract class Shape {
 
     public abstract boolean borderContains(Location position);
 
+    public abstract boolean borderContains(LivingEntity livingEntity);
+
     public abstract void visualize(Particle particle);
 
     public abstract Location getCenter();

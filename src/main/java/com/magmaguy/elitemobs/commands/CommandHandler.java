@@ -40,7 +40,6 @@ public class CommandHandler {
         emCommand.registerCommand(new KillRadiusCommand());
         emCommand.registerCommand(new KillTypeCommand());
         emCommand.registerCommand(new KillTypeRadiusCommand());
-        emCommand.registerCommand(new LootDebugUnbreakableCommand());
         emCommand.registerCommand(new LootDebugLimitedCommand());
         emCommand.registerCommand(new LootDebugCommand());
         emCommand.registerCommand(new MoneyAddCommand());

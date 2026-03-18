@@ -33,7 +33,7 @@ public class FlamePyreLuaConfig extends InlineLuaPowerConfig {
                 local function spawn_phase_one_particles(context, center, particle)
                   for _ = 1, 10 do
                     local location = offset_location(center, (math.random() - 0.5) * 0.5, 0, (math.random() - 0.5) * 0.5)
-                    context.world.spawn_particle_at_location(location, {
+                    context.world:spawn_particle_at_location(location, {
                       particle = particle,
                       amount = 0,
                       x = 0,
@@ -47,7 +47,7 @@ public class FlamePyreLuaConfig extends InlineLuaPowerConfig {
                 local function spawn_phase_two_particles(context, center, particle)
                   for _ = 1, 10 do
                     local location = offset_location(center, (math.random() - 0.5) * 3, 0, (math.random() - 0.5) * 3)
-                    context.world.spawn_particle_at_location(location, {
+                    context.world:spawn_particle_at_location(location, {
                       particle = particle,
                       amount = 0,
                       x = 0,
@@ -59,7 +59,7 @@ public class FlamePyreLuaConfig extends InlineLuaPowerConfig {
                 end
 
                 local function spawn_phase_three_particles(context, center, particle)
-                  context.world.spawn_particle_at_location(center, {
+                  context.world:spawn_particle_at_location(center, {
                     particle = particle,
                     amount = 50,
                     x = 0.01,
@@ -74,12 +74,12 @@ public class FlamePyreLuaConfig extends InlineLuaPowerConfig {
                   context.state.flame_pyre_active = false
                 end
 
-                local function run_phase_four()
+                local function run_phase_four(context)
                   local counter = 0
                   local task_id
-                  task_id = context.scheduler.run_every(1, function(context)
+                  task_id = context.scheduler:run_every(1, function(context)
                     if not context.boss:is_alive() then
-                      context.scheduler.cancel_task(task_id)
+                      context.scheduler:cancel_task(task_id)
                       finish_flame_pyre(context)
                       return
                     end
@@ -89,18 +89,18 @@ public class FlamePyreLuaConfig extends InlineLuaPowerConfig {
                     spawn_phase_three_particles(context, center, "FLAME")
                     damage_nearby(context, center, 5)
                     if counter >= 40 then
-                      context.scheduler.cancel_task(task_id)
+                      context.scheduler:cancel_task(task_id)
                       finish_flame_pyre(context)
                     end
                   end)
                 end
 
-                local function run_phase_three()
+                local function run_phase_three(context)
                   local counter = 0
                   local task_id
-                  task_id = context.scheduler.run_every(1, function(context)
+                  task_id = context.scheduler:run_every(1, function(context)
                     if not context.boss:is_alive() then
-                      context.scheduler.cancel_task(task_id)
+                      context.scheduler:cancel_task(task_id)
                       finish_flame_pyre(context)
                       return
                     end
@@ -111,18 +111,18 @@ public class FlamePyreLuaConfig extends InlineLuaPowerConfig {
                     damage_nearby(context, center, 3)
                     spawn_phase_three_particles(context, center, "SMOKE")
                     if counter >= 40 then
-                      context.scheduler.cancel_task(task_id)
-                      run_phase_four()
+                      context.scheduler:cancel_task(task_id)
+                      run_phase_four(context)
                     end
                   end)
                 end
 
-                local function run_phase_two()
+                local function run_phase_two(context)
                   local counter = 0
                   local task_id
-                  task_id = context.scheduler.run_every(1, function(context)
+                  task_id = context.scheduler:run_every(1, function(context)
                     if not context.boss:is_alive() then
-                      context.scheduler.cancel_task(task_id)
+                      context.scheduler:cancel_task(task_id)
                       finish_flame_pyre(context)
                       return
                     end
@@ -133,18 +133,18 @@ public class FlamePyreLuaConfig extends InlineLuaPowerConfig {
                     damage_nearby(context, center, 0.5)
                     spawn_phase_two_particles(context, center, "SMOKE")
                     if counter >= 40 then
-                      context.scheduler.cancel_task(task_id)
-                      run_phase_three()
+                      context.scheduler:cancel_task(task_id)
+                      run_phase_three(context)
                     end
                   end)
                 end
 
-                local function run_phase_one()
+                local function run_phase_one(context)
                   local counter = 0
                   local task_id
-                  task_id = context.scheduler.run_every(1, function(context)
+                  task_id = context.scheduler:run_every(1, function(context)
                     if not context.boss:is_alive() then
-                      context.scheduler.cancel_task(task_id)
+                      context.scheduler:cancel_task(task_id)
                       finish_flame_pyre(context)
                       return
                     end
@@ -152,8 +152,8 @@ public class FlamePyreLuaConfig extends InlineLuaPowerConfig {
                     counter = counter + 1
                     spawn_phase_one_particles(context, context.boss:get_location(), "SMOKE")
                     if counter >= 40 then
-                      context.scheduler.cancel_task(task_id)
-                      run_phase_two()
+                      context.scheduler:cancel_task(task_id)
+                      run_phase_two(context)
                     end
                   end)
                 end
@@ -164,15 +164,14 @@ public class FlamePyreLuaConfig extends InlineLuaPowerConfig {
                     if context.state.flame_pyre_active or math.random() > 0.25 then
                       return
                     end
-                    if not context.cooldowns.global_ready() then
+                    if not context.cooldowns.check_local("flame_pyre", 400) then
                       return
                     end
 
-                    context.cooldowns.set_global(400)
-
+                    context.cooldowns.set_global(300)
                     context.state.flame_pyre_active = true
                     context.boss:set_ai_enabled(false)
-                    run_phase_one()
+                    run_phase_one(context)
                   end
                 }
                 """);

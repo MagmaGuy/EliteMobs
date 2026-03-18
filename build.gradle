@@ -149,6 +149,7 @@ shadowJar {
     relocate 'com.magmaguy.easyminecraftgoals', 'com.magmaguy.elitemobs.easyminecraftgoals'
     relocate 'org.luaj', packagePath + '.luaj'
 
+    minimize()
     archiveClassifier.set(null)
     archiveFileName.set(project.name + ".jar")
     destinationDirectory.set(new File("testbed/plugins"))

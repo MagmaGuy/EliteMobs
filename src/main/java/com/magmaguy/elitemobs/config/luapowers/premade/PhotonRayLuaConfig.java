@@ -78,9 +78,9 @@ public class PhotonRayLuaConfig extends InlineLuaPowerConfig {
                     local entity_location = entity:get_location()
                     if entity.uuid ~= context.boss.uuid
                       and entity_location.world == location.world
-                      and math.abs(entity_location.x - location.x) <= 0.5
-                      and math.abs(entity_location.y - location.y) <= 0.5
-                      and math.abs(entity_location.z - location.z) <= 0.5 then
+                      and math.abs(entity_location.x - location.x) <= 1.0
+                      and math.abs(entity_location.y - location.y) <= 1.0
+                      and math.abs(entity_location.z - location.z) <= 1.0 then
                       entity:deal_custom_damage(1)
                     end
                   end
@@ -119,9 +119,9 @@ public class PhotonRayLuaConfig extends InlineLuaPowerConfig {
                     local entity_location = entity:get_location()
                     if entity.is_player
                       and entity_location.world == location.world
-                      and math.abs(entity_location.x - location.x) <= 0.25
-                      and math.abs(entity_location.y - location.y) <= 0.25
-                      and math.abs(entity_location.z - location.z) <= 0.25 then
+                      and math.abs(entity_location.x - location.x) <= 1.0
+                      and math.abs(entity_location.y - location.y) <= 1.0
+                      and math.abs(entity_location.z - location.z) <= 1.0 then
                       do_damage(context, location)
                     end
                   end

@@ -15,7 +15,7 @@ public class CorpseLuaConfig extends LuaPowersConfigFields {
                 return {
                   api_version = 1,
                   on_death = function(context)
-                    context.boss:place_temporary_block("BONE_BLOCK", 2400, true)
+                    context.world:place_temporary_block_at_location(context.boss:get_location(), "BONE_BLOCK", 2400, true)
                   end
                 }
                 """;
