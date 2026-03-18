@@ -43,6 +43,12 @@ public class Sphere extends Shape {
     }
 
     @Override
+    public boolean borderContains(LivingEntity livingEntity) {
+        Sphere innerSphere = new Sphere(borderRadius, centerLocation, borderRadius);
+        return contains(livingEntity) && !innerSphere.contains(livingEntity);
+    }
+
+    @Override
     public void visualize(Particle particle) {
         getLocations().forEach(newLocation -> newLocation.getWorld().spawnParticle(particle, newLocation, 1, 0, 0, 0, 0));
     }

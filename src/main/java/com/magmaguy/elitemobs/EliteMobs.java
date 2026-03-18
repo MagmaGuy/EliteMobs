@@ -251,6 +251,10 @@ public class EliteMobs extends JavaPlugin {
         MajorPowerStanceMath.initializeVectorCache();
         initializationContext.step("Configuration Export");
         ConfigurationExporter.initializeConfigs();
+        //Initialize importer before loading content configs so that newly imported
+        //files are on disk when the config classes scan for them.
+        initializationContext.step("Content Importer");
+        MagmaCore.initializeImporter(this);
         initializationContext.step("Custom Items");
         new CustomItemsConfig();
         CustomItem.initializeCustomItems();
@@ -270,11 +274,6 @@ public class EliteMobs extends JavaPlugin {
         new CustomQuestsConfig();
         initializationContext.step("Special Items Config");
         new SpecialItemSystemsConfig();
-        //Initialize importer — heavy ZIP I/O runs off the main thread.
-        //Bukkit API calls within the importer (unloadWorld, callEvent) are
-        //dispatched back to the main thread internally by MagmaCore.
-        initializationContext.step("Content Importer");
-        MagmaCore.initializeImporter(this);
     }
 
     private void syncInitialization(PluginInitializationContext initializationContext) {

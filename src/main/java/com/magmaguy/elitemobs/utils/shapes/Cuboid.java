@@ -58,6 +58,18 @@ public class Cuboid extends Shape {
     }
 
     @Override
+    public boolean borderContains(LivingEntity livingEntity) {
+        return contains(livingEntity) && !innerCuboidContains(livingEntity);
+    }
+
+    private boolean innerCuboidContains(LivingEntity livingEntity) {
+        BoundingBox boundingBox = new BoundingBox(
+                Math.floor(xBorder / 2D + centerLocation.getBlockX()), yBorder / 2D + centerLocation.getBlockY(), Math.floor(zBorder / 2D + centerLocation.getBlockZ()),
+                Math.floor(-xBorder / 2D + centerLocation.getBlockX()), centerLocation.getBlockY(), Math.floor(-zBorder / 2D + centerLocation.getBlockZ()));
+        return livingEntity.getBoundingBox().overlaps(boundingBox);
+    }
+
+    @Override
     public void visualize(Particle particle) {
 
     }

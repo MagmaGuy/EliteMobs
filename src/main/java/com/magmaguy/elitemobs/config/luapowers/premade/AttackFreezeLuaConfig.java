@@ -30,7 +30,7 @@ public class AttackFreezeLuaConfig extends LuaPowersConfigFields {
                     local task_id = nil
                     task_id = context.scheduler.run_every(1, function()
                       iterations = iterations + 1
-                      player:add_visual_freeze_ticks(1)
+                      player:add_visual_freeze_ticks(3)
                       if iterations >= 60 then
                         context.scheduler.cancel_task(task_id)
                       end

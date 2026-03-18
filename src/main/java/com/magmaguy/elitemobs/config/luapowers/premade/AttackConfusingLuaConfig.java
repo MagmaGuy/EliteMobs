@@ -9,7 +9,7 @@ public class AttackConfusingLuaConfig extends PlayerDamagedPotionLuaPowerConfig 
                 Particle.WITCH.toString(),
                 PowersConfigFields.PowerType.MISCELLANEOUS,
                 "nausea",
-                60,
+                200,
                 0,
                 0,
                 0);

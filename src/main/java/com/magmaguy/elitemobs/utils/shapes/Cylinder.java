@@ -45,6 +45,12 @@ public class Cylinder extends Shape {
         return contains(position) && !innerCylinder.contains(position);
     }
 
+    @Override
+    public boolean borderContains(LivingEntity livingEntity) {
+        Cylinder innerCylinder = new Cylinder(centerLocation, borderRadius, height, borderRadius);
+        return contains(livingEntity) && !innerCylinder.contains(livingEntity);
+    }
+
     public boolean contains(Location position) {
         return contains(position.toVector());
     }

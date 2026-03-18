@@ -68,7 +68,7 @@ public class FlamethrowerLuaConfig extends InlineLuaPowerConfig {
                   local origin = context.boss:get_eye_location()
                   origin = offset_location(origin, direction.x, -0.5, direction.z)
                   for _ = 1, 5 do
-                    context.world.spawn_particle_at_location(origin, {
+                    context.world:spawn_particle_at_location(origin, {
                       particle = particle,
                       amount = 0,
                       x = (math.random() - 0.5) * 0.1 + direction.x,
@@ -84,12 +84,12 @@ public class FlamethrowerLuaConfig extends InlineLuaPowerConfig {
                   context.state.flamethrower_active = false
                 end
 
-                local function run_phase_three(fixed_player_location)
+                local function run_phase_three(context, fixed_player_location)
                   local timer = 0
                   local task_id
-                  task_id = context.scheduler.run_every(1, function(context)
+                  task_id = context.scheduler:run_every(1, function(context)
                     if not context.boss:is_alive() then
-                      context.scheduler.cancel_task(task_id)
+                      context.scheduler:cancel_task(task_id)
                       context.state.flamethrower_active = false
                       return
                     end
@@ -97,19 +97,19 @@ public class FlamethrowerLuaConfig extends InlineLuaPowerConfig {
                     timer = timer + 1
                     do_particle_effect(context, fixed_player_location, "SMOKE")
                     if timer >= 20 then
-                      context.scheduler.cancel_task(task_id)
+                      context.scheduler:cancel_task(task_id)
                       finish_flamethrower(context)
                     end
                   end)
                 end
 
-                local function run_phase_two(fixed_player_location)
+                local function run_phase_two(context, fixed_player_location)
                   local damage_points = generate_damage_points(context, fixed_player_location)
                   local timer = 0
                   local task_id
-                  task_id = context.scheduler.run_every(1, function(context)
+                  task_id = context.scheduler:run_every(1, function(context)
                     if not context.boss:is_alive() then
-                      context.scheduler.cancel_task(task_id)
+                      context.scheduler:cancel_task(task_id)
                       context.state.flamethrower_active = false
                       return
                     end
@@ -118,18 +118,18 @@ public class FlamethrowerLuaConfig extends InlineLuaPowerConfig {
                     do_damage(context, damage_points)
                     timer = timer + 1
                     if timer >= 60 then
-                      context.scheduler.cancel_task(task_id)
-                      run_phase_three(fixed_player_location)
+                      context.scheduler:cancel_task(task_id)
+                      run_phase_three(context, fixed_player_location)
                     end
                   end)
                 end
 
-                local function run_phase_one(fixed_player_location)
+                local function run_phase_one(context, fixed_player_location)
                   local counter = 0
                   local task_id
-                  task_id = context.scheduler.run_every(1, function(context)
+                  task_id = context.scheduler:run_every(1, function(context)
                     if not context.boss:is_alive() then
-                      context.scheduler.cancel_task(task_id)
+                      context.scheduler:cancel_task(task_id)
                       context.state.flamethrower_active = false
                       return
                     end
@@ -137,8 +137,8 @@ public class FlamethrowerLuaConfig extends InlineLuaPowerConfig {
                     do_particle_effect(context, fixed_player_location, "SMOKE")
                     counter = counter + 1
                     if counter >= 40 then
-                      context.scheduler.cancel_task(task_id)
-                      run_phase_two(fixed_player_location)
+                      context.scheduler:cancel_task(task_id)
+                      run_phase_two(context, fixed_player_location)
                     end
                   end)
                 end
@@ -149,15 +149,14 @@ public class FlamethrowerLuaConfig extends InlineLuaPowerConfig {
                     if context.player == nil or context.state.flamethrower_active or math.random() > 0.25 then
                       return
                     end
-                    if not context.cooldowns.global_ready() then
+                    if not context.cooldowns.check_local("flamethrower", 400) then
                       return
                     end
 
-                    context.cooldowns.set_global(400)
-
+                    context.cooldowns.set_global(300)
                     context.state.flamethrower_active = true
                     context.boss:set_ai_enabled(false)
-                    run_phase_one(clone_location(context.player:get_location()))
+                    run_phase_one(context, clone_location(context.player:get_location()))
                   end
                 }
                 """);

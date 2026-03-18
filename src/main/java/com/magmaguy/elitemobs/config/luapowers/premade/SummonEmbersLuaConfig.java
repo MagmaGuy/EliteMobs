@@ -19,12 +19,14 @@ public class SummonEmbersLuaConfig extends InlineLuaPowerConfig {
                 local function do_summon(context)
                   for _ = 1, 10 do
                     local spawn_location = context.boss:get_location()
-                    context.world.spawn_boss_at_location("ember.yml", spawn_location, context.boss.level)
-                    context.boss:set_velocity_vector(em.create_vector(
-                      math.random() - 0.5,
-                      0.5,
-                      math.random() - 0.5
-                    ))
+                    local ember = context.world:spawn_boss_at_location("ember.yml", spawn_location, context.boss.level)
+                    if ember ~= nil then
+                      ember:set_velocity_vector(em.create_vector(
+                        math.random() - 0.5,
+                        0.5,
+                        math.random() - 0.5
+                      ))
+                    end
                   end
                 end
 
@@ -62,11 +64,13 @@ public class SummonEmbersLuaConfig extends InlineLuaPowerConfig {
                   on_boss_damaged_by_player = function(context)
                     if math.random() > 0.25
                       or not context.boss:is_ai_enabled()
+                      or not context.cooldowns.local_ready("summon_embers")
                       or not context.cooldowns.global_ready() then
                       return
                     end
 
-                    context.cooldowns.set_global(400)
+                    context.cooldowns.set_local(400, "summon_embers")
+                    context.cooldowns.set_global(300)
                     do_summon_particles(context)
                   end
                 }

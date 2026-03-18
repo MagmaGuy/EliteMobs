@@ -8,8 +8,8 @@ public class MoonwalkLuaConfig extends SpawnSelfPotionLuaPowerConfig {
         super("moonwalk",
                 Material.SLIME_BLOCK.toString(),
                 PowersConfigFields.PowerType.MISCELLANEOUS,
-                "jump_boost",
-                Integer.MAX_VALUE,
+                "JUMP_BOOST",
+                -1,
                 3);
     }
 }

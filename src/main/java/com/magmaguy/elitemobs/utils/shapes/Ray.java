@@ -83,6 +83,12 @@ public class Ray extends Shape {
 
     //Children override this
     @Override
+    public boolean borderContains(LivingEntity livingEntity) {
+        return false;
+    }
+
+    //Children override this
+    @Override
     public void visualize(Particle particle) {
 
     }

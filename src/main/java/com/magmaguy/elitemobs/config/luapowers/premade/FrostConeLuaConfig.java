@@ -58,7 +58,7 @@ public class FrostConeLuaConfig extends InlineLuaPowerConfig {
                     gravity = false,
                     persistent = false,
                     duration = 60,
-                    custom_damage = 2
+                    custom_damage = 3
                   })
                   if projectile ~= nil then
                     context.state.frost_cone_projectiles = context.state.frost_cone_projectiles or {}
@@ -127,6 +127,34 @@ public class FrostConeLuaConfig extends InlineLuaPowerConfig {
                     local current_amount = (context.state.frost_cone_stacks[player_uuid] or 0) + 1
                     context.state.frost_cone_stacks[player_uuid] = current_amount
                     context.player:apply_potion_effect("SLOWNESS", 140, current_amount)
+
+                    if not context.state.frost_cone_freeze_tasks then
+                      context.state.frost_cone_freeze_tasks = {}
+                    end
+                    local existing_task = context.state.frost_cone_freeze_tasks[player_uuid]
+                    if existing_task ~= nil then
+                      context.scheduler.cancel_task(existing_task)
+                    end
+                    local freeze_counter = 0
+                    local freeze_task_id
+                    freeze_task_id = context.scheduler.run_every(1, function(context)
+                      freeze_counter = freeze_counter + 1
+                      if freeze_counter > 140 then
+                        context.scheduler.cancel_task(freeze_task_id)
+                        if context.state.frost_cone_freeze_tasks then
+                          context.state.frost_cone_freeze_tasks[player_uuid] = nil
+                        end
+                        return
+                      end
+                      local players = context.boss:get_nearby_players(30)
+                      for i = 1, #players do
+                        if players[i].uuid == player_uuid then
+                          players[i]:add_visual_freeze_ticks(3)
+                          break
+                        end
+                      end
+                    end)
+                    context.state.frost_cone_freeze_tasks[player_uuid] = freeze_task_id
 
                     context.scheduler.run_after(100, function(context)
                       if context.state.frost_cone_stacks ~= nil and context.state.frost_cone_stacks[player_uuid] == current_amount then

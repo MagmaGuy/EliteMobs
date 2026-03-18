@@ -21,6 +21,6 @@ public class LootDebugCommand extends AdvancedCommand {
 
     @Override
     public void execute(CommandData commandData) {
-        GetTierCommand.get(commandData.getPlayerSender(), commandData.getIntegerArgument("level"));
+        GetTierCommand.getUnbreakable(commandData.getPlayerSender(), commandData.getIntegerArgument("level"));
     }
 }

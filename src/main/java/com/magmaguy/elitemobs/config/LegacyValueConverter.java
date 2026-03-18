@@ -132,12 +132,17 @@ public class LegacyValueConverter {
 
     /**
      * Converts legacy material names to their new equivalents.
-     * In 1.21.9+, CHAIN was renamed to CHAIN_BLOCK.
+     * In 1.21.9+, CHAIN was renamed to IRON_CHAIN.
      */
     public static String parseMaterial(String materialName) {
         if (materialName == null) return null;
-        if (!VersionChecker.serverVersionOlderThan(21, 9) && materialName.equalsIgnoreCase("CHAIN"))
-            return "CHAIN_BLOCK";
+        if (!VersionChecker.serverVersionOlderThan(21, 9)) {
+            if (materialName.equalsIgnoreCase("CHAIN") || materialName.equalsIgnoreCase("CHAIN_BLOCK"))
+                return "IRON_CHAIN";
+        } else {
+            if (materialName.equalsIgnoreCase("IRON_CHAIN") || materialName.equalsIgnoreCase("CHAIN_BLOCK"))
+                return "CHAIN";
+        }
         return materialName;
     }
 }

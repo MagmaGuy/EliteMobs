@@ -6,33 +6,30 @@ public class MeteorShowerLuaConfig extends InlineLuaPowerConfig {
     public MeteorShowerLuaConfig() {
         super("meteor_shower", null, PowersConfigFields.PowerType.UNIQUE, """
                 local function clone_location(location)
-                  return {
-                    x = location.x,
-                    y = location.y,
-                    z = location.z,
-                    yaw = location.yaw,
-                    pitch = location.pitch,
-                    world = location.world
-                  }
+                  return em.create_location(
+                    location.x,
+                    location.y,
+                    location.z,
+                    location.world,
+                    location.yaw,
+                    location.pitch
+                  )
                 end
 
                 local function offset_location(location, x, y, z)
-                  return {
-                    x = location.x + x,
-                    y = location.y + y,
-                    z = location.z + z,
-                    yaw = location.yaw,
-                    pitch = location.pitch,
-                    world = location.world
-                  }
+                  return em.create_location(
+                    location.x + x,
+                    location.y + y,
+                    location.z + z,
+                    location.world,
+                    location.yaw,
+                    location.pitch
+                  )
                 end
 
                 return {
                   api_version = 1,
                   on_boss_damaged_by_player = function(context)
-                    if not context.boss:is_ai_enabled() then
-                      return
-                    end
                     if math.random() > 0.25 or not context.cooldowns.global_ready() then
                       return
                     end
@@ -68,7 +65,8 @@ public class MeteorShowerLuaConfig extends InlineLuaPowerConfig {
                         local direction = em.create_vector(math.random() - 0.5, -0.5, math.random() - 0.5)
                         local destination = offset_location(spawn_location, direction.x, direction.y, direction.z)
                         context.boss:summon_projectile("FIREBALL", spawn_location, destination, 0.5, {
-                          duration = 100
+                          duration = 100,
+                          spawn_at_origin = true
                         })
                       end
 

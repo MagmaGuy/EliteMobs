@@ -29,17 +29,9 @@ public class AttackArrowLuaConfig extends LuaPowersConfigFields {
                     if context.state.attack_arrow_task ~= nil then
                       return
                     end
-                    if not context.boss.is_monster then
-                      return
-                    end
 
                     local task_id
                     task_id = context.scheduler:run_every(160, function()
-                      if not context.boss:is_alive() then
-                        clear_task(context)
-                        return
-                      end
-
                       local target = context.boss:get_target_player()
                       if target == nil then
                         clear_task(context)
@@ -48,21 +40,7 @@ public class AttackArrowLuaConfig extends LuaPowersConfigFields {
 
                       for _, player in ipairs(context.boss:get_nearby_players(20)) do
                         if valid_player(player) then
-                          local boss_loc = context.boss:get_location()
-                          local player_loc = player:get_location()
-                          local direction = context.vectors.get_vector_between_locations(boss_loc, player_loc)
-                          direction = context.vectors.normalize_vector(direction)
-                          local origin = em.create_location(
-                            boss_loc.x + direction.x, boss_loc.y + 1 + direction.y, boss_loc.z + direction.z,
-                            boss_loc.world, boss_loc.yaw, boss_loc.pitch
-                          )
-                          local destination = em.create_location(
-                            origin.x, origin.y + 1, origin.z,
-                            origin.world, origin.yaw, origin.pitch
-                          )
-                          context.boss:summon_projectile("ARROW", origin, destination, 2.0, {
-                            spawn_at_origin = true
-                          })
+                          context.boss:summon_projectile("ARROW", context.boss:get_location(), player:get_location(), 2.0)
                         end
                       end
                     end)
