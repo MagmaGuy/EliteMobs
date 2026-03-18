@@ -273,7 +273,7 @@ final class LuaPowerContextTables {
                     livingEntity.getUniqueId().equals(eliteEntity.getLivingEntity().getUniqueId())) {
                 continue;
             }
-            boolean contains = borderMode ? shape.borderContains(livingEntity.getLocation()) : shape.contains(livingEntity);
+            boolean contains = borderMode ? shape.borderContains(livingEntity) : shape.contains(livingEntity);
             if (contains) {
                 results.set(index++, entityTables.createEntityTable(livingEntity));
             }

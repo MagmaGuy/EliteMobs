@@ -98,31 +98,16 @@ public class BulletHellLuaConfig extends InlineLuaPowerConfig {
                 local function spawn_tracking_arrow(context, player)
                   local boss_location = context.boss:get_location()
                   local player_location = player:get_location()
-                  local direction = context.vectors.get_vector_between_locations(boss_location, player_location)
-                  direction = context.vectors.normalize_vector(direction)
-                  local origin = em.create_location(
-                    boss_location.x + direction.x,
-                    boss_location.y + 1 + direction.y,
-                    boss_location.z + direction.z,
-                    boss_location.world,
-                    boss_location.yaw,
-                    boss_location.pitch
-                  )
-                  local destination = em.create_location(
-                    origin.x, origin.y + 1, origin.z,
-                    origin.world, origin.yaw, origin.pitch
-                  )
-                  local arrow = context.boss:summon_projectile("ARROW", origin, destination, 2.0, {
-                    spawn_at_origin = true,
+                  local arrow = context.boss:summon_projectile("ARROW", boss_location, player_location, 1.0, {
                     gravity = false,
                     persistent = false
                   })
                   if arrow ~= nil then
                     local velocity = arrow:get_velocity()
                     arrow:set_velocity_vector(em.create_vector(
-                      velocity.x * 0.1,
-                      velocity.y * 0.1,
-                      velocity.z * 0.1
+                      velocity.x * 0.5,
+                      velocity.y * 0.5,
+                      velocity.z * 0.5
                     ))
                     track_arrow(context, arrow, player)
                   end
@@ -142,20 +127,19 @@ public class BulletHellLuaConfig extends InlineLuaPowerConfig {
                     if context.state.bullet_hell_active or math.random() > 0.25 then
                       return
                     end
-                    if not context.cooldowns.global_ready() then
+                    if not context.cooldowns.check_local("bullet_hell", 400) then
                       return
                     end
 
-                    context.cooldowns.set_global(400)
                     context.state.bullet_hell_active = true
                     context.boss:set_ai_enabled(false)
-
-                    local initial_location = clone_location(context.boss:get_location())
 
                     local hover_location = offset_location(context.boss:get_location(), 0, 10, 0)
                     if context.world.get_block_type_at_location(hover_location) == "AIR" then
                       context.boss:teleport_to_location(hover_location)
                     end
+
+                    local initial_location = clone_location(context.boss:get_location())
                     local counter = 0
                     local task_id
                     task_id = context.scheduler.run_every(10, function(context)

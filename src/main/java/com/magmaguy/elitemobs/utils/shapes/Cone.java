@@ -74,11 +74,16 @@ public class Cone extends Shape {
     }
 
     /**
-     * For a living entity we use its location (or center) for testing.
+     * For a living entity we test multiple points along the entity's bounding box.
      */
     @Override
     public boolean contains(LivingEntity livingEntity) {
-        return contains(livingEntity.getLocation());
+        org.bukkit.util.BoundingBox bb = livingEntity.getBoundingBox();
+        // Check feet, center, and eye-level positions
+        Location feet = livingEntity.getLocation();
+        Location center = new Location(feet.getWorld(), bb.getCenterX(), bb.getCenterY(), bb.getCenterZ());
+        Location top = new Location(feet.getWorld(), bb.getCenterX(), bb.getMaxY(), bb.getCenterZ());
+        return contains(feet) || contains(center) || contains(top);
     }
 
     /**
@@ -90,6 +95,12 @@ public class Cone extends Shape {
         // Create an inner cone with a smaller base radius.
         Cone innerCone = new Cone(top, bottom, borderRadius, borderRadius);
         return contains(position) && !innerCone.contains(position);
+    }
+
+    @Override
+    public boolean borderContains(LivingEntity livingEntity) {
+        Cone innerCone = new Cone(top, bottom, borderRadius, borderRadius);
+        return contains(livingEntity) && !innerCone.contains(livingEntity);
     }
 
     /**

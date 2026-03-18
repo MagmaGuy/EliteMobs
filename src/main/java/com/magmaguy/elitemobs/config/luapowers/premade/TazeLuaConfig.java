@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.config.luapowers.premade;
 
-import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.elitemobs.config.luapowers.LuaPowersConfigFields;
 import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
 
@@ -24,8 +23,16 @@ public class TazeLuaConfig extends LuaPowersConfigFields {
                     push = context.vectors.normalize_vector(push)
                   end
 
+                  context.world:spawn_particle_at_location(context.player:get_location(), {
+                    particle = "FIREWORKS_SPARK",
+                    amount = 20,
+                    x = 0.5,
+                    y = 0.5,
+                    z = 0.5,
+                    speed = 0.1
+                  })
+                  context.player:show_title("&7Tazed!", "", 5, 30, 5)
                   context.player:set_velocity_vector(push)
-                  context.player:show_title(%s, %s, 1, 30, 1)
                   context.player:apply_potion_effect("SLOWNESS", 30, 5)
                   context.scheduler:run_after(5, function()
                     taze_player(context, player_location, depth + 1)
@@ -46,6 +53,6 @@ public class TazeLuaConfig extends LuaPowersConfigFields {
                     taze_player(context, context.boss:get_location(), 0)
                   end
                 }
-                """.formatted(luaQuote(DungeonsConfig.getTazeShockedTitle()), luaQuote(DungeonsConfig.getTazeShockedSubtitle()));
+                """;
     }
 }

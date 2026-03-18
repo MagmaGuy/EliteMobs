@@ -338,7 +338,7 @@ public class ScriptZone {
             } : filterByLiving(shape.getCenter());
 
             for (LivingEntity livingEntity : livingEntities) {
-                boolean contains = targetType.equals(TargetType.ZONE_FULL) ? shape.contains(livingEntity) : shape.borderContains(livingEntity.getLocation());
+                boolean contains = targetType.equals(TargetType.ZONE_FULL) ? shape.contains(livingEntity) : shape.borderContains(livingEntity);
                 if (contains) {
                     validatedEntities.add(livingEntity);
                 }

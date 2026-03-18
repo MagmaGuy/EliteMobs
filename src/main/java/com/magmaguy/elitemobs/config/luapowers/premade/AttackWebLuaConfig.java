@@ -22,7 +22,8 @@ public class AttackWebLuaConfig extends LuaPowersConfigFields {
                       return
                     end
 
-                    context.player:place_temporary_block("COBWEB", 120, true)
+                    context.player:place_temporary_block("COBWEB", 60, true)
+                    context.boss:apply_potion_effect("SPEED", 60, 2)
                     context.cooldowns.set_local(60)
                     context.cooldowns.set_global(20)
                   end

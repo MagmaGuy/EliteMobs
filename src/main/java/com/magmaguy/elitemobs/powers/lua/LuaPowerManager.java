@@ -66,6 +66,7 @@ public final class LuaPowerManager {
                                                     String effect,
                                                     PowerType powerType) throws IOException {
         String source = Files.readString(file.toPath(), StandardCharsets.UTF_8);
+        source = source.replace("\r", "");
         LuaPowerDefinition definition = LuaPowerDefinition.validate(registryKey, file, source);
         definitions.put(registryKey, definition);
         return new LuaPowerConfigFields(registryKey, file, definition, effect, powerType);

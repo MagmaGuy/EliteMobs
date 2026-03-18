@@ -7,14 +7,14 @@ public class ImplosionLuaConfig extends InlineLuaPowerConfig {
     public ImplosionLuaConfig() {
         super("implosion", Material.SLIME_BALL.toString(), PowersConfigFields.PowerType.MISCELLANEOUS, """
                 local function clone_location(location)
-                  return {
-                    x = location.x,
-                    y = location.y,
-                    z = location.z,
-                    yaw = location.yaw,
-                    pitch = location.pitch,
-                    world = location.world
-                  }
+                  return em.create_location(
+                    location.x,
+                    location.y,
+                    location.z,
+                    location.world,
+                    location.yaw,
+                    location.pitch
+                  )
                 end
 
                 return {
@@ -46,9 +46,7 @@ public class ImplosionLuaConfig extends InlineLuaPowerConfig {
                             local dx = location.x - death_location.x
                             local dy = location.y - death_location.y
                             local dz = location.z - death_location.z
-                            if (dx * dx) + (dy * dy) + (dz * dz) <= 100
-                              and entity.game_mode ~= "SPECTATOR"
-                              and not (entity.is_elite and entity:is_frozen()) then
+                            if (dx * dx) + (dy * dy) + (dz * dz) <= 100 and entity.game_mode ~= "SPECTATOR" then
                               local pull = context.vectors.get_vector_between_locations(location, death_location)
                               pull = context.vectors.normalize_vector(pull)
                               entity:set_velocity_vector(pull)

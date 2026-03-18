@@ -94,7 +94,7 @@ public class SkeletonTrackingArrowLuaConfig extends InlineLuaPowerConfig {
                 end
 
                 local function spawn_tracking_arrow(context, player)
-                  local target_vector = context.vectors.get_vector_between_locations(player:get_location(), player:get_eye_location())
+                  local target_vector = context.vectors.get_vector_between_locations(context.boss:get_location(), player:get_location())
                   target_vector = context.vectors.normalize_vector(target_vector)
                   target_vector.x = target_vector.x * 2
                   target_vector.y = target_vector.y * 2
@@ -120,16 +120,16 @@ public class SkeletonTrackingArrowLuaConfig extends InlineLuaPowerConfig {
 
                   local velocity = arrow:get_velocity()
                   arrow:set_velocity_vector(em.create_vector(
-                    velocity.x * 0.2,
-                    velocity.y * 0.2,
-                    velocity.z * 0.2
+                    velocity.x * 0.5,
+                    velocity.y * 0.5,
+                    velocity.z * 0.5
                   ))
                   arrow:set_gravity(false)
                   tracking_arrow_loop(context, player, arrow)
                 end
 
                 local function start_tracking(context)
-                  context.state.skeleton_tracking_arrow_task = context.scheduler:run_every(160, function(context)
+                  context.state.skeleton_tracking_arrow_task = context.scheduler:run_every(60, function(context)
                     if not context.boss:is_alive() then
                       context.scheduler:cancel_task(context.state.skeleton_tracking_arrow_task)
                       context.state.skeleton_tracking_arrow_task = nil
@@ -142,6 +142,7 @@ public class SkeletonTrackingArrowLuaConfig extends InlineLuaPowerConfig {
                       local player = nearby_players[index]
                       if is_combat_player(player) then
                         spawn_tracking_arrow(context, player)
+                        break
                       end
                     end
                   end)
