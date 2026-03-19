@@ -36,7 +36,7 @@ public class Explosion {
 
     private static final HashSet<Explosion> explosions = new HashSet<>();
     public final List<BlockState> detonatedBlocks = new ArrayList<>();
-    private final int delayBeforeRegen = 2;
+    private final int delayBeforeRegen = 1;
     private UUID worldUUID;
 
     public Explosion(List<BlockState> detonatedBlocks) {
