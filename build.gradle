@@ -141,7 +141,7 @@ String packagePath = 'com.magmaguy.shaded'
 shadowJar {
     // Relocate bStats
     relocate 'org.bstats', packagePath + '.bstats'
-    // MagmaCore handles EMG and LuaJ internally
+    relocate 'com.magmaguy.easyminecraftgoals', 'com.magmaguy.elitemobs.easyminecraftgoals'
 
     minimize()
     archiveClassifier.set(null)
