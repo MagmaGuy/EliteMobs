@@ -12,7 +12,7 @@ import com.magmaguy.elitemobs.powers.specialpowers.SpiritWalkSupport;
 import com.magmaguy.elitemobs.powers.specialpowers.TrackingFireballSupport;
 import com.magmaguy.elitemobs.powers.specialpowers.ZombieNecronomiconSupport;
 import com.magmaguy.elitemobs.utils.GameClock;
-import com.magmaguy.elitemobs.utils.shapes.Shape;
+import com.magmaguy.magmacore.scripting.zones.Shape;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import org.bukkit.EntityEffect;
 import org.bukkit.Location;

@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.utils.shapes;
 
+import com.magmaguy.magmacore.scripting.zones.Ray;
 import org.bukkit.Location;
 
 public class StaticRay extends Ray {

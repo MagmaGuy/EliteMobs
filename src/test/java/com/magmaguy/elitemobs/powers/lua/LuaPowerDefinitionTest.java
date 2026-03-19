@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.powers.lua;
 
 import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
+import com.magmaguy.magmacore.scripting.LuaEnvironmentFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import com.magmaguy.shaded.luaj.vm2.Globals;
@@ -58,7 +59,7 @@ class LuaPowerDefinitionTest {
 
     @Test
     void sandboxHidesUnsafeGlobals() {
-        Globals globals = LuaPowerEnvironmentFactory.createGlobals();
+        Globals globals = LuaEnvironmentFactory.createGlobals();
         LuaValue result = globals.load("return os == nil and io == nil and debug == nil and package == nil and require == nil", "sandbox").call();
         assertTrue(result.toboolean());
     }

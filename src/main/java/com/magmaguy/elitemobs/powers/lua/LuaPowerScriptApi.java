@@ -12,7 +12,8 @@ import com.magmaguy.elitemobs.powers.scripts.caching.ScriptRelativeVectorBluepri
 import com.magmaguy.elitemobs.powers.scripts.caching.ScriptTargetsBlueprint;
 import com.magmaguy.elitemobs.powers.scripts.caching.ScriptZoneBlueprint;
 import com.magmaguy.elitemobs.powers.scripts.enums.TargetType;
-import com.magmaguy.elitemobs.utils.shapes.Shape;
+import com.magmaguy.magmacore.scripting.tables.LuaTableConverter;
+import com.magmaguy.magmacore.scripting.zones.Shape;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
@@ -226,7 +227,7 @@ final class LuaPowerScriptApi {
                                                   LivingEntity directTarget,
                                                   LuaZoneHandle zoneHandle) {
         @SuppressWarnings("unchecked")
-        Map<String, Object> spec = (Map<String, Object>) LuaPowerTableConverter.toJavaObject(specTable);
+        Map<String, Object> spec = (Map<String, Object>) LuaTableConverter.toJavaObject(specTable);
         LuaScriptRuntimeOwner runtimeOwner = zoneHandle == null ? new LuaScriptRuntimeOwner(definition.getFileName()) : zoneHandle.runtimeOwner;
         ScriptTargets targets = new ScriptTargets(new ScriptTargetsBlueprint(spec, "__lua_target__", definition.getFileName()), runtimeOwner);
         return new LuaTargetResolver(targets,
@@ -237,7 +238,7 @@ final class LuaPowerScriptApi {
 
     private LuaZoneHandle buildZoneHandle(LuaTable specTable, Event event, LivingEntity directTarget) {
         @SuppressWarnings("unchecked")
-        Map<String, Object> zoneSpec = (Map<String, Object>) LuaPowerTableConverter.toJavaObject(specTable);
+        Map<String, Object> zoneSpec = (Map<String, Object>) LuaTableConverter.toJavaObject(specTable);
         LuaScriptRuntimeOwner runtimeOwner = new LuaScriptRuntimeOwner(definition.getFileName());
         ScriptZone scriptZone = new ScriptZone(new ScriptZoneBlueprint(Map.of("Zone", zoneSpec), "__lua_zone__", definition.getFileName()), runtimeOwner);
         runtimeOwner.setScriptZone(scriptZone);
@@ -255,7 +256,7 @@ final class LuaPowerScriptApi {
                                                               Event event,
                                                               LivingEntity directTarget) {
         @SuppressWarnings("unchecked")
-        Map<String, Object> spec = (Map<String, Object>) LuaPowerTableConverter.toJavaObject(specTable);
+        Map<String, Object> spec = (Map<String, Object>) LuaTableConverter.toJavaObject(specTable);
         LuaScriptRuntimeOwner runtimeOwner = zoneHandle == null ? new LuaScriptRuntimeOwner(definition.getFileName()) : zoneHandle.runtimeOwner;
         Location actionLocation = actionLocationValue == null || actionLocationValue.isnil()
                 ? eliteEntity.getLocation()
@@ -349,7 +350,7 @@ final class LuaPowerScriptApi {
     }
 
     private ScriptParticles buildScriptParticles(LuaValue particlesValue) {
-        Object rawParticles = LuaPowerTableConverter.toJavaObject(particlesValue);
+        Object rawParticles = LuaTableConverter.toJavaObject(particlesValue);
         List<Map<?, ?>> particleEntries = new java.util.ArrayList<>();
 
         if (rawParticles instanceof List<?> list) {
