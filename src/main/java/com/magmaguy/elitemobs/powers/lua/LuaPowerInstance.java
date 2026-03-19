@@ -32,8 +32,8 @@ import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
-import org.luaj.vm2.*;
-import org.luaj.vm2.lib.VarArgFunction;
+import com.magmaguy.shaded.luaj.vm2.*;
+import com.magmaguy.shaded.luaj.vm2.lib.VarArgFunction;
 
 import java.util.*;
 

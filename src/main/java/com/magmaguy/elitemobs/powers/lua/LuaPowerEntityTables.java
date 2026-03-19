@@ -40,10 +40,10 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
-import org.luaj.vm2.LuaTable;
-import org.luaj.vm2.LuaValue;
-import org.luaj.vm2.Varargs;
-import org.luaj.vm2.lib.VarArgFunction;
+import com.magmaguy.shaded.luaj.vm2.LuaTable;
+import com.magmaguy.shaded.luaj.vm2.LuaValue;
+import com.magmaguy.shaded.luaj.vm2.Varargs;
+import com.magmaguy.shaded.luaj.vm2.lib.VarArgFunction;
 
 import java.util.Objects;
 

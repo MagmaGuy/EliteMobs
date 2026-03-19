@@ -1,8 +1,8 @@
 package com.magmaguy.elitemobs.powers.lua;
 
-import org.luaj.vm2.LuaTable;
-import org.luaj.vm2.LuaValue;
-import org.luaj.vm2.Varargs;
+import com.magmaguy.shaded.luaj.vm2.LuaTable;
+import com.magmaguy.shaded.luaj.vm2.LuaValue;
+import com.magmaguy.shaded.luaj.vm2.Varargs;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
