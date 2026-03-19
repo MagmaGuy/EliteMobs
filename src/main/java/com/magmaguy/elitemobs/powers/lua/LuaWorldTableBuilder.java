@@ -19,11 +19,11 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.Vector;
-import org.luaj.vm2.LuaFunction;
-import org.luaj.vm2.LuaTable;
-import org.luaj.vm2.LuaValue;
-import org.luaj.vm2.Varargs;
-import org.luaj.vm2.lib.VarArgFunction;
+import com.magmaguy.shaded.luaj.vm2.LuaFunction;
+import com.magmaguy.shaded.luaj.vm2.LuaTable;
+import com.magmaguy.shaded.luaj.vm2.LuaValue;
+import com.magmaguy.shaded.luaj.vm2.Varargs;
+import com.magmaguy.shaded.luaj.vm2.lib.VarArgFunction;
 
 import java.util.List;
 import java.util.Locale;
