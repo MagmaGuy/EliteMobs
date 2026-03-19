@@ -143,7 +143,10 @@ shadowJar {
     relocate 'org.bstats', packagePath + '.bstats'
     relocate 'com.magmaguy.easyminecraftgoals', 'com.magmaguy.elitemobs.easyminecraftgoals'
 
-    minimize()
+    minimize {
+        // EMG NMS adapters are loaded via reflection — don't strip them
+        exclude(dependency('com.magmaguy:MagmaCore:.*'))
+    }
     archiveClassifier.set(null)
     archiveFileName.set(project.name + ".jar")
     destinationDirectory.set(new File("testbed/plugins"))
