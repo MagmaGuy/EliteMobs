@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.powers.lua;
 
+import com.magmaguy.magmacore.scripting.LuaEnvironmentFactory;
 import lombok.Getter;
 import com.magmaguy.shaded.luaj.vm2.Globals;
 import com.magmaguy.shaded.luaj.vm2.LuaFunction;
@@ -28,7 +29,7 @@ public class LuaPowerDefinition {
     }
 
     public static LuaPowerDefinition validate(String fileName, File sourceFile, String source) {
-        Globals globals = LuaPowerEnvironmentFactory.createGlobals();
+        Globals globals = LuaEnvironmentFactory.createGlobals();
         LuaTable scriptTable = evaluate(fileName, source, globals);
         int apiVersion = extractIntField(scriptTable, "api_version", fileName, true);
         if (apiVersion != 1) {
@@ -62,7 +63,7 @@ public class LuaPowerDefinition {
     }
 
     public LuaTable instantiate() {
-        return evaluate(fileName, source, LuaPowerEnvironmentFactory.createGlobals());
+        return evaluate(fileName, source, LuaEnvironmentFactory.createGlobals());
     }
 
     public boolean supportsHook(LuaPowerHook hook) {

@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.powers.scripts;
 
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.scripts.enums.TargetType;
-import com.magmaguy.elitemobs.utils.shapes.Shape;
+import com.magmaguy.magmacore.scripting.zones.Shape;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;

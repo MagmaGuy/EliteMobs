@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.utils.shapes;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.utils.Lerp;
+import com.magmaguy.magmacore.scripting.zones.Ray;
 import org.bukkit.Location;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;

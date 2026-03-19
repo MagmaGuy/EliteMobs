@@ -261,7 +261,7 @@ final class LuaPowerContextTables {
 
     LuaTable queryZoneEntities(LuaValue zoneDefinition, LuaValue optionsValue) {
         LuaTable results = new LuaTable();
-        com.magmaguy.elitemobs.utils.shapes.Shape shape = support.createShape(zoneDefinition);
+        com.magmaguy.magmacore.scripting.zones.Shape shape = support.createShape(zoneDefinition);
         if (shape == null || eliteEntity.getLocation() == null || eliteEntity.getLocation().getWorld() == null) {
             return results;
         }
@@ -283,7 +283,7 @@ final class LuaPowerContextTables {
 
     LuaTable queryZoneLocations(LuaValue zoneDefinition, LuaValue optionsValue) {
         LuaTable results = new LuaTable();
-        com.magmaguy.elitemobs.utils.shapes.Shape shape = support.createShape(zoneDefinition);
+        com.magmaguy.magmacore.scripting.zones.Shape shape = support.createShape(zoneDefinition);
         if (shape == null) {
             return results;
         }
