@@ -1143,7 +1143,7 @@ public class ScriptAction {
 
         Location destination = destinations.iterator().next();
         double speed = blueprint.getVelocity().getValue();
-        boolean avoidObstacles = blueprint.getBValue();
+        boolean avoidObstacles = blueprint.getBValue() != null && blueprint.getBValue();
         int duration = blueprint.getDuration().getValue();
 
         targets.forEach(target -> {
