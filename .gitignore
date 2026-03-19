@@ -1,5 +1,7 @@
 /.idea/
 /.gradle/
+/.claude/
 /testbed/
 /build/
+/docs/plans/
 gradle.properties
