@@ -5,7 +5,7 @@ import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
 import com.magmaguy.elitemobs.powers.lua.LuaPowerManager;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
-import org.reflections.Reflections;
+import com.magmaguy.shaded.reflections.Reflections;
 
 import java.io.File;
 import java.io.IOException;

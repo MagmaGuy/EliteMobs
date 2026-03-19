@@ -14,7 +14,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.reflections.Reflections;
+import com.magmaguy.shaded.reflections.Reflections;
 
 import java.util.HashMap;
 import java.util.HashSet;

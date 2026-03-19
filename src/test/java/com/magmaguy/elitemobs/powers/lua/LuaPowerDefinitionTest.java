@@ -3,8 +3,8 @@ package com.magmaguy.elitemobs.powers.lua;
 import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.luaj.vm2.Globals;
-import org.luaj.vm2.LuaValue;
+import com.magmaguy.shaded.luaj.vm2.Globals;
+import com.magmaguy.shaded.luaj.vm2.LuaValue;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
