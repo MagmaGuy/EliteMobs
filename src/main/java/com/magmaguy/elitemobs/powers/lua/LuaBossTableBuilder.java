@@ -14,24 +14,16 @@ import com.magmaguy.elitemobs.powers.specialpowers.ZombieNecronomiconSupport;
 import com.magmaguy.elitemobs.utils.GameClock;
 import com.magmaguy.magmacore.scripting.zones.Shape;
 import com.magmaguy.magmacore.util.ChatColorConverter;
-import org.bukkit.EntityEffect;
-import org.bukkit.Location;
-import org.bukkit.entity.EnderDragon;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Fireball;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Mob;
-import org.bukkit.entity.Monster;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.util.Vector;
 import com.magmaguy.shaded.luaj.vm2.LuaFunction;
 import com.magmaguy.shaded.luaj.vm2.LuaTable;
 import com.magmaguy.shaded.luaj.vm2.LuaValue;
 import com.magmaguy.shaded.luaj.vm2.Varargs;
 import com.magmaguy.shaded.luaj.vm2.lib.VarArgFunction;
+import org.bukkit.EntityEffect;
+import org.bukkit.Location;
+import org.bukkit.entity.*;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.util.Vector;
 
 import java.util.List;
 import java.util.Locale;
@@ -255,12 +247,15 @@ final class LuaBossTableBuilder {
             boolean spawnAtOrigin = options.get("spawn_at_origin").optboolean(false);
             boolean directionOnly = options.get("direction_only").optboolean(false);
             Class<? extends Entity> entityClass = entityType.getEntityClass();
+            boolean shouldTrack = options.get("track").optboolean(true);
             if (entityClass != null
                     && Projectile.class.isAssignableFrom(entityClass)
                     && eliteEntity.getLivingEntity() != null
                     && !spawnAtOrigin) {
                 projectile = eliteEntity.getLivingEntity().launchProjectile(entityClass.asSubclass(Projectile.class), velocity);
                 ((Projectile) projectile).setShooter(eliteEntity.getLivingEntity());
+                // Tag immediately after creation, before setting direction which could trigger collision
+                if (shouldTrack) EntityTracker.registerProjectileEntity((Projectile) projectile);
                 if (projectile instanceof Fireball fireball && velocity.lengthSquared() > 0) {
                     fireball.setDirection(velocity);
                 }
@@ -268,6 +263,10 @@ final class LuaBossTableBuilder {
                 projectile = origin.getWorld().spawnEntity(origin, entityType);
                 if (projectile instanceof Projectile spawnedProjectile && eliteEntity.getLivingEntity() != null) {
                     spawnedProjectile.setShooter(eliteEntity.getLivingEntity());
+                }
+                // Tag immediately after creation, before setting velocity/direction which could trigger collision
+                if (projectile instanceof Projectile trackedProjectile && shouldTrack) {
+                    EntityTracker.registerProjectileEntity(trackedProjectile);
                 }
                 if (velocity.lengthSquared() > 0) {
                     if (projectile instanceof Fireball fireball) {
@@ -279,9 +278,6 @@ final class LuaBossTableBuilder {
                         projectile.setVelocity(velocity);
                     }
                 }
-            }
-            if (projectile instanceof Projectile trackedProjectile && options.get("track").optboolean(true)) {
-                EntityTracker.registerProjectileEntity(trackedProjectile);
             }
             applyGenericSpawnOptions(projectile, options);
             if (options.get("on_land").isfunction()) {
