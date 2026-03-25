@@ -45,6 +45,9 @@ public class CustomItemsConfigFields extends CustomConfigFields {
     private String equipmentModelID = null;
     @Getter
     @Setter
+    private String scriptedItem = null;
+    @Getter
+    @Setter
     private String permission = "";
     @Getter
     @Setter
@@ -100,6 +103,7 @@ public class CustomItemsConfigFields extends CustomConfigFields {
         this.itemType = processEnum("itemType", itemType, CustomItem.ItemType.CUSTOM, CustomItem.ItemType.class, false);
         this.customModelID = processString("customModelV2", customModelID, null, false);
         this.equipmentModelID = processString("equipmentModelID", equipmentModelID, null, false);
+        this.scriptedItem = processString("scriptedItem", scriptedItem, null, false);
         this.permission = processString("permission", permission, "", false);
         this.level = processInt("level", level, 0, false);
         this.soulbound = processBoolean("soulbound", soulbound, true, false);
