@@ -16,7 +16,6 @@ public class ItemEnchantmentPrevention implements Listener {
                 !ItemTagger.isEliteItem(event.getInventory().getItem(1)))
             return;
         event.setResult(ItemStackGenerator.generateItemStack(Material.AIR));
-        event.getInventory().setRepairCost(300);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

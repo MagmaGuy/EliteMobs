@@ -90,7 +90,6 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
     private CustomModel customModel = null;
     @Getter
     private boolean normalizedCombat;
-    @Getter
     private boolean scaledCombat;
     @Getter
     @Setter

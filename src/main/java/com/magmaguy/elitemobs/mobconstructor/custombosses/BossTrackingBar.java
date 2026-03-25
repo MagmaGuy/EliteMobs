@@ -4,8 +4,6 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.wormhole.WormholeNavigation;
-import com.magmaguy.magmacore.util.Logger;
-import com.magmaguy.magmacore.util.Round;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -38,7 +36,6 @@ public class BossTrackingBar {
     private final Map<Player, BossBar> bossBars = new HashMap<>();
     private final HashSet<Player> trackingPlayers = new HashSet<>();
     private BukkitTask bossBarUpdater;
-    private boolean warned = false;
 
     public BossTrackingBar(CustomBossEntity customBossEntity) {
         this.customBossEntity = customBossEntity;
@@ -123,9 +120,9 @@ public class BossTrackingBar {
                 ", " + loc.getBlockY() +
                 ", " + loc.getBlockZ();
         bossBar.setTitle(bossBarMessage(player, locationString));
-        double progress = Round.twoDecimalPlaces(customBossEntity.getHealth() / customBossEntity.getMaxHealth());
-        if (progress > 1) return;
-        if (progress < 0) return;
+        // Clamp to [0,1] — ratio can briefly exceed 1 during dynamic level scaling
+        double progress = Math.min(1.0, Math.max(0.0,
+                customBossEntity.getHealth() / customBossEntity.getMaxHealth()));
         bossBar.setProgress(progress);
     }
 
@@ -185,17 +182,6 @@ public class BossTrackingBar {
         BossBar bossBar = Bukkit.createBossBar(bossBarMessage(player, locationString), BarColor.GREEN, BarStyle.SOLID, BarFlag.PLAY_BOSS_MUSIC);
 
         if (!customBossEntity.exists()) return;
-
-        if (customBossEntity.getHealth() / customBossEntity.getMaxHealth() > 1 || customBossEntity.getHealth() / customBossEntity.getMaxHealth() < 0) {
-            if (!warned) {
-                Logger.warn("The following boss had more health than it should: " + customBossEntity.getName());
-                Logger.warn("This is a problem usually caused by running more than one plugin that modifies mob health!" +
-                        " EliteMobs can't fix this issue because it is being caused by another plugin." +
-                        " If you want EliteMobs to work correctly, find a way to fix this issue with whatever other plugin is causing it.");
-                warned = true;
-            }
-            return;
-        }
 
         bossBars.put(player, bossBar);
         updateBossBar(player, bossBar);
