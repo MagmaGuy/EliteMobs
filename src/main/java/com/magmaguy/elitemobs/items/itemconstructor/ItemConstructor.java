@@ -38,7 +38,8 @@ public class ItemConstructor {
                                           String customModelID,
                                           String equipmentModelID,
                                           boolean soulbound,
-                                          String filename) {
+                                          String filename,
+                                          String scriptedItem) {
         /*
         Construct initial item
          */
@@ -76,20 +77,22 @@ public class ItemConstructor {
 
         itemStack.setItemMeta(itemMeta);
 
-        //Apply custom models - use config values if defined, otherwise fall back to level-based skin system
-        if ((customModelID != null && !customModelID.isEmpty()) || (equipmentModelID != null && !equipmentModelID.isEmpty())) {
-            //Config defines at least one model - use config values (may be null for the other)
-            String effectiveCustomModelID = (customModelID != null && !customModelID.isEmpty())
-                    ? customModelID
-                    : EliteItemSkins.getItemModelId(material, level);
-            String effectiveEquipmentModelID = (equipmentModelID != null && !equipmentModelID.isEmpty())
-                    ? equipmentModelID
-                    : EliteItemSkins.getEquipmentModelId(material, level);
-            CustomModelAdder.addCustomModel(itemStack, effectiveCustomModelID);
-            CustomModelAdder.addEquippableModel(itemStack, effectiveEquipmentModelID);
-        } else {
-            //No config models defined - use full level-based skin system
-            EliteItemSkins.applyLevelBasedSkin(itemStack, level);
+        // Apply custom models — skip if scriptedItem is set (FMM provides the model)
+        if (scriptedItem == null || scriptedItem.isEmpty()) {
+            if ((customModelID != null && !customModelID.isEmpty()) || (equipmentModelID != null && !equipmentModelID.isEmpty())) {
+                //Config defines at least one model - use config values (may be null for the other)
+                String effectiveCustomModelID = (customModelID != null && !customModelID.isEmpty())
+                        ? customModelID
+                        : EliteItemSkins.getItemModelId(material, level);
+                String effectiveEquipmentModelID = (equipmentModelID != null && !equipmentModelID.isEmpty())
+                        ? equipmentModelID
+                        : EliteItemSkins.getEquipmentModelId(material, level);
+                CustomModelAdder.addCustomModel(itemStack, effectiveCustomModelID);
+                CustomModelAdder.addEquippableModel(itemStack, effectiveEquipmentModelID);
+            } else {
+                //No config models defined - use full level-based skin system
+                EliteItemSkins.applyLevelBasedSkin(itemStack, level);
+            }
         }
 
         itemMeta = itemStack.getItemMeta();
@@ -97,6 +100,24 @@ public class ItemConstructor {
         //Register filename of the custom item into the persistent metadata
         Objects.requireNonNull(itemMeta).getPersistentDataContainer().set(new NamespacedKey(MetadataHandler.PLUGIN, filename), PersistentDataType.STRING, filename);
         itemStack.setItemMeta(itemMeta);
+
+        // Apply FMM scripted item data if configured and FMM is installed
+        if (scriptedItem != null && !scriptedItem.isEmpty()
+                && org.bukkit.Bukkit.getPluginManager().getPlugin("FreeMinecraftModels") != null) {
+            try {
+                Class<?> apiClass = Class.forName("com.magmaguy.freeminecraftmodels.api.ScriptedItemAPI");
+                java.lang.reflect.Method applyMethod = apiClass.getMethod("applyScriptedItemData",
+                        ItemStack.class, String.class);
+                boolean applied = (boolean) applyMethod.invoke(null, itemStack, scriptedItem);
+                if (!applied) {
+                    com.magmaguy.magmacore.util.Logger.warn("Scripted item '" + scriptedItem
+                            + "' not found in FreeMinecraftModels! Referenced by custom item: " + filename);
+                }
+            } catch (Exception e) {
+                com.magmaguy.magmacore.util.Logger.warn("Failed to apply scripted item data for '"
+                        + scriptedItem + "': " + e.getMessage());
+            }
+        }
 
         return commonFeatures(itemStack, eliteEntity, player, enchantments, customEnchantments, showItemWorth, soulbound);
     }
