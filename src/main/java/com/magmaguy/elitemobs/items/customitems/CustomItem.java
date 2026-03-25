@@ -357,7 +357,8 @@ public class CustomItem {
                         customItemsConfigFields.getCustomModelID(),
                         customItemsConfigFields.getEquipmentModelID(),
                         customItemsConfigFields.isSoulbound(),
-                        getCustomItemsConfigFields().getFilename()
+                        getCustomItemsConfigFields().getFilename(),
+                        customItemsConfigFields.getScriptedItem()
                 );
         ItemMeta itemMeta = itemStack.getItemMeta();
         //Adds the filename to the persistent data container, useful for several things but mostly used for tracking quest keys

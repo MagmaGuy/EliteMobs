@@ -41,7 +41,8 @@ public class ScalableItemConstructor {
                 customItem.getCustomItemsConfigFields().getCustomModelID(),
                 customItem.getCustomItemsConfigFields().getEquipmentModelID(),
                 customItem.getCustomItemsConfigFields().isSoulbound(),
-                customItem.getCustomItemsConfigFields().getFilename()
+                customItem.getCustomItemsConfigFields().getFilename(),
+                customItem.getCustomItemsConfigFields().getScriptedItem()
         );
     }
 
@@ -114,7 +115,8 @@ public class ScalableItemConstructor {
                 customItem.getCustomItemsConfigFields().getCustomModelID(),
                 customItem.getCustomItemsConfigFields().getEquipmentModelID(),
                 customItem.getCustomItemsConfigFields().isSoulbound(),
-                customItem.getCustomItemsConfigFields().getFilename()
+                customItem.getCustomItemsConfigFields().getFilename(),
+                customItem.getCustomItemsConfigFields().getScriptedItem()
         );
 
     }
