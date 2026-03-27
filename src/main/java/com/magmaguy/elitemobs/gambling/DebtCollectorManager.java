@@ -110,9 +110,7 @@ public class DebtCollectorManager implements Listener {
             return; // Config not found
         }
 
-        // Calculate level based on player's combat level or a minimum
-        int playerLevel = Math.max(1, com.magmaguy.elitemobs.skills.CombatLevelCalculator.calculateCombatLevel(player.getUniqueId()));
-        boss.spawn(spawnLoc, playerLevel, false);
+        boss.spawn(spawnLoc, false);
 
         if (!boss.exists()) {
             return; // Failed to spawn

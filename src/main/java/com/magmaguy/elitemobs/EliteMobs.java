@@ -21,11 +21,11 @@ import com.magmaguy.elitemobs.config.customquests.CustomQuestsConfig;
 import com.magmaguy.elitemobs.config.customspawns.CustomSpawnConfig;
 import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
+import com.magmaguy.elitemobs.config.luapowers.LuaPowersConfig;
 import com.magmaguy.elitemobs.config.menus.MenusConfig;
 import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
 import com.magmaguy.elitemobs.config.potioneffects.PotionEffectsConfig;
-import com.magmaguy.elitemobs.config.luapowers.LuaPowersConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.config.skillbonuses.SkillBonusesConfig;
 import com.magmaguy.elitemobs.config.wormholes.WormholeConfig;
@@ -65,12 +65,14 @@ import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.npcs.NPCInteractions;
 import com.magmaguy.elitemobs.npcs.chatter.NPCProximitySensor;
 import com.magmaguy.elitemobs.pathfinding.Navigation;
+import com.magmaguy.elitemobs.peacebanner.PeaceBannerItem;
+import com.magmaguy.elitemobs.peacebanner.PeaceBannerManager;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.playerdata.statusscreen.*;
+import com.magmaguy.elitemobs.powers.lua.LuaPowerManager;
 import com.magmaguy.elitemobs.powers.meta.CombatEnterScanPower;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
-import com.magmaguy.elitemobs.powers.lua.LuaPowerManager;
 import com.magmaguy.elitemobs.powers.scripts.ScriptAction;
 import com.magmaguy.elitemobs.powers.scripts.ScriptListener;
 import com.magmaguy.elitemobs.powers.scripts.caching.EliteScriptBlueprint;
@@ -149,6 +151,7 @@ public class EliteMobs extends JavaPlugin {
         new MobCombatSettingsConfig();
         CommandsConfig.initializeConfigs();
         new DiscordSRVConfig();
+        new PeaceBannerConfig();
         new CustomEventsConfig();
         new QuestsConfig();
         new WormholesConfig();
@@ -390,6 +393,10 @@ public class EliteMobs extends JavaPlugin {
         initializationContext.step("Commands");
         CommandHandler.registerCommands();
 
+        // Peace Banner system
+        PeaceBannerManager.loadData();
+        PeaceBannerItem.registerRecipe();
+
         /*
         Check for new plugin version or for dungeon updates
          */
@@ -454,6 +461,8 @@ public class EliteMobs extends JavaPlugin {
         EntityTracker.wipeShutdown();
         TimedEvent.shutdown();
         ActionEvent.shutdown();
+        PeaceBannerManager.shutdown();
+        PeaceBannerItem.unregisterRecipe();
         validWorldList.clear();
         CustomBossesConfigFields.getRegionalElites().clear();
         CustomEnchantment.getCustomEnchantmentMap().clear();

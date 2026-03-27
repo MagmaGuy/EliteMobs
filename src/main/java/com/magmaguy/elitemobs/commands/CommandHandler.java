@@ -77,6 +77,8 @@ public class CommandHandler {
         emCommand.registerCommand(new DebugCommand());
         emCommand.registerCommand(new UpdateContentCommand());
         emCommand.registerCommand(new DownloadAllContentCommand());
+        emCommand.registerCommand(new PeaceBannerGiveCommand());
+        emCommand.registerCommand(new PeaceBannerListCommand());
 
         //User commands
 //        emCommand.registerCommand(new AdventurersGuildCommand());

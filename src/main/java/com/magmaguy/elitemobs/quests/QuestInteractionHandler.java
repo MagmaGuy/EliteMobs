@@ -60,8 +60,9 @@ public class QuestInteractionHandler {
                     anyQuestIsValid = true;
                 } else {
                     // Check if player has completed this quest (either via old permission system or new lockout system)
-                    boolean completedViaPermission = !customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission().isEmpty() &&
-                            player.hasMetadata(customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission());
+                    String lockoutPerm = customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission();
+                    boolean completedViaPermission = lockoutPerm != null && !lockoutPerm.isEmpty() &&
+                            player.hasMetadata(lockoutPerm);
                     boolean completedViaLockout = customQuest.getCustomQuestsConfigFields().getQuestLockoutMinutes() > 0 &&
                             com.magmaguy.elitemobs.quests.QuestLockoutHandler.isLockedOut(player, customQuest.getConfigurationFilename(), customQuest.getCustomQuestsConfigFields().getQuestName());
 

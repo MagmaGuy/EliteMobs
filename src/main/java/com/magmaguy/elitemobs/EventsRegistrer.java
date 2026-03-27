@@ -35,14 +35,15 @@ import com.magmaguy.elitemobs.npcs.NPCInteractions;
 import com.magmaguy.elitemobs.npcs.chatter.NPCProximitySensor;
 import com.magmaguy.elitemobs.ondeathcommands.OnDeathCommands;
 import com.magmaguy.elitemobs.pathfinding.Navigation;
+import com.magmaguy.elitemobs.peacebanner.PeaceBannerListener;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.playerdata.PlayerStatsTracker;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.playerdata.statusscreen.*;
-import com.magmaguy.elitemobs.powers.*;
+import com.magmaguy.elitemobs.powers.BonusCoins;
+import com.magmaguy.elitemobs.powers.lua.LuaPowerEvents;
 import com.magmaguy.elitemobs.powers.meta.CombatEnterScanPower;
 import com.magmaguy.elitemobs.powers.meta.CustomSummonPower;
-import com.magmaguy.elitemobs.powers.lua.LuaPowerEvents;
 import com.magmaguy.elitemobs.powers.scripts.EliteScript;
 import com.magmaguy.elitemobs.powers.scripts.ScriptListener;
 import com.magmaguy.elitemobs.powers.specialpowers.EnderCrystalLightningRod;
@@ -202,6 +203,10 @@ public class EventsRegistrer {
 
         //Natural Mob Metadata Assigner
         register(new NaturalMobSpawnEventHandler());
+
+        //Peace Banner zone protection
+        if (PeaceBannerConfig.isEnabled())
+            register(new PeaceBannerListener());
 
         //Visual effects
         register(new EffectEventHandlers());

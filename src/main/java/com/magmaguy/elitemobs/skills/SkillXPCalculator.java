@@ -4,9 +4,9 @@ package com.magmaguy.elitemobs.skills;
  * Utility class for calculating skill XP values.
  * <p>
  * XP Progression System:
- * - Players reach level 100 after approximately 100,000 same-level mob kills
  * - Quadratic mob XP rewards higher-level mobs proportionally
  * - Cubic level requirements create linear kills-per-level scaling
+ * - Boss multipliers reward players for fighting tougher enemies
  * - Soft cap beyond level 100 makes progression exponentially harder
  */
 public class SkillXPCalculator {
@@ -35,13 +35,13 @@ public class SkillXPCalculator {
     /**
      * Calculates the XP required to advance from a given level to the next level.
      * <p>
-     * For levels 1-100: xp_to_next_level(L) = 20 * L^3
-     * For levels > 100: xp_to_next_level(L) = 20 * L^3 * (1 + ((L - 100)^2 / 100))
+     * For levels 1-100: xp_to_next_level(L) = 8.5 * L^3
+     * For levels > 100: xp_to_next_level(L) = 8.5 * L^3 * (1 + ((L - 100)^2 / 100))
      * <p>
      * The soft cap formula ensures:
      * - Continuous at level 100 (multiplier = 1.0)
      * - Quadratic growth beyond 100, making progress increasingly difficult
-     * - At level 150, multiplier is 26x, making progress nearly impossible
+     * - At level 150, multiplier is 26x on top of the base, making progress nearly impossible
      *
      * @param currentLevel The player's current level (must be >= 1)
      * @return The XP required to reach the next level
@@ -49,7 +49,7 @@ public class SkillXPCalculator {
     public static long xpToNextLevel(int currentLevel) {
         if (currentLevel < 1) currentLevel = 1;
 
-        long baseXP = 20L * (long) currentLevel * currentLevel * currentLevel;
+        long baseXP = (long) (8.5 * (long) currentLevel * currentLevel * currentLevel);
 
         if (currentLevel <= 100) {
             return baseXP;
@@ -163,5 +163,25 @@ public class SkillXPCalculator {
      */
     public static long applySkillMultiplier(SkillType skillType, long baseXP) {
         return (long) (baseXP * skillType.getXpMultiplier());
+    }
+
+    /**
+     * Calculates the XP multiplier for a boss based on its health and damage multipliers.
+     * <p>
+     * HP component uses a slightly super-linear exponent (1.15) to reward the compounding
+     * difficulty of longer fights. Damage component is dampened since even small increases
+     * in damage significantly increase difficulty.
+     * <p>
+     * Formula: hpMultiplier^1.15 * (1 + (dmgMultiplier - 1) * 0.5)
+     *
+     * @param healthMultiplier The mob's health multiplier (e.g. 1.0 for normal, 10.0 for boss)
+     * @param damageMultiplier The mob's damage multiplier (e.g. 0.8 for trash, 1.5 for boss)
+     * @return The XP multiplier to apply (minimum 0.01 to avoid zero XP)
+     */
+    public static double calculateBossXPMultiplier(double healthMultiplier, double damageMultiplier) {
+        double hpComponent = Math.pow(Math.max(healthMultiplier, 0.01), 1.15);
+        double dmgComponent = 1.0 + (damageMultiplier - 1.0) * 0.5;
+        if (dmgComponent < 0.1) dmgComponent = 0.1;
+        return hpComponent * dmgComponent;
     }
 }

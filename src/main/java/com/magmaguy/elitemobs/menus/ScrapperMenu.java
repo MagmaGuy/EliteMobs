@@ -153,6 +153,10 @@ public class ScrapperMenu extends EliteMenu {
                             continue;
 
                         ItemStack scrapItem = RepairEnchantment.generateScrap(itemStack, player, null);
+                        if (scrapItem == null) {
+                            // Don't consume the item if scrap generation failed
+                            continue;
+                        }
 
                         for (int i = 0; i < itemStack.getAmount(); i++) {
                             if (ThreadLocalRandom.current().nextDouble() > ScrapperMenuConfig.scrapChance) {

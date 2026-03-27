@@ -3,9 +3,11 @@ package com.magmaguy.elitemobs.events;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.CustomEventStartEvent;
 import com.magmaguy.elitemobs.config.EventsConfig;
+import com.magmaguy.elitemobs.config.PeaceBannerConfig;
 import com.magmaguy.elitemobs.config.customevents.CustomEventsConfig;
 import com.magmaguy.elitemobs.config.customevents.CustomEventsConfigFields;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.peacebanner.PeaceBannerManager;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Bukkit;
@@ -76,6 +78,7 @@ public class ActionEvent extends CustomEvent {
     }
 
     public void instantiateEvent(Location location, Player player) {
+        if (PeaceBannerConfig.isSuppressEvents() && PeaceBannerManager.isProtected(location)) return;
         ActionEvent actionEvent = new ActionEvent(customEventsConfigFields);
         actionEvent.player = player;
         actionEvent.setEventStartLocation(location);

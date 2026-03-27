@@ -39,26 +39,36 @@ public class VersionChecker {
 
     /**
      * Compares a Minecraft version with the current version on the server. Returns true if the version on the server is older.
+     * Handles both legacy format (1.21.11) and new year.drop format (26.1).
      *
-     * @param majorVersion Target major version to compare (i.e. 1.>>>17<<<.0)
-     * @param minorVersion Target minor version to compare (i.e. 1.17.>>>0<<<)
+     * @param majorVersion Target major version to compare (e.g. 21 for 1.21.x, or 26 for 26.x)
+     * @param minorVersion Target minor version to compare (e.g. 11 for 1.21.11, or 1 for 26.1)
      * @return Whether the version is under the value to be compared
      */
     public static boolean serverVersionOlderThan(int majorVersion, int minorVersion) {
 
         String[] splitVersion = Bukkit.getBukkitVersion().split("[.]");
 
-        int actualMajorVersion = Integer.parseInt(splitVersion[1].split("-")[0]);
-
+        int actualMajorVersion;
         int actualMinorVersion = 0;
-        if (splitVersion.length > 2)
-            actualMinorVersion = Integer.parseInt(splitVersion[2].split("-")[0]);
+
+        if (splitVersion[0].equals("1")) {
+            // Legacy format: 1.MAJOR.MINOR-R0.1-SNAPSHOT (e.g. 1.21.11-R0.1-SNAPSHOT)
+            actualMajorVersion = Integer.parseInt(splitVersion[1].split("-")[0]);
+            if (splitVersion.length > 2)
+                actualMinorVersion = Integer.parseInt(splitVersion[2].split("-")[0]);
+        } else {
+            // New year.drop format: MAJOR.MINOR-R0.1-SNAPSHOT (e.g. 26.1-R0.1-SNAPSHOT)
+            actualMajorVersion = Integer.parseInt(splitVersion[0].split("-")[0]);
+            if (splitVersion.length > 1)
+                actualMinorVersion = Integer.parseInt(splitVersion[1].split("-")[0]);
+        }
 
         if (actualMajorVersion < majorVersion)
             return true;
 
-        if (splitVersion.length > 2)
-            return actualMajorVersion == majorVersion && actualMinorVersion < minorVersion;
+        if (actualMajorVersion == majorVersion)
+            return actualMinorVersion < minorVersion;
 
         return false;
 

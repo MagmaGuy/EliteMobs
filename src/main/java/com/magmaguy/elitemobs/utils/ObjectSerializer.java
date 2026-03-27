@@ -4,8 +4,6 @@ package com.magmaguy.elitemobs.utils;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
-import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
-
 import java.io.*;
 import java.util.Base64;
 
@@ -58,7 +56,7 @@ public class ObjectSerializer {
 
             // Serialize that array
             dataOutput.close();
-            return Base64Coder.encodeLines(outputStream.toByteArray());
+            return Base64.getMimeEncoder().encodeToString(outputStream.toByteArray());
         } catch (Exception e) {
             throw new IllegalStateException("Unable to save item stacks.", e);
         }
@@ -75,7 +73,7 @@ public class ObjectSerializer {
      */
     public static ItemStack itemStackArrayFromBase64(String data) throws IOException {
         try {
-            ByteArrayInputStream inputStream = new ByteArrayInputStream(Base64Coder.decodeLines(data));
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(Base64.getMimeDecoder().decode(data));
             BukkitObjectInputStream dataInput = new BukkitObjectInputStream(inputStream);
             ItemStack itemStack = (ItemStack) dataInput.readObject();
             dataInput.close();
