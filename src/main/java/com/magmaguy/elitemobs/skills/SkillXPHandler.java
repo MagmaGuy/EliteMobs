@@ -95,6 +95,11 @@ public class SkillXPHandler implements Listener {
             // Calculate base XP using effective mob level
             long baseXP = SkillXPCalculator.calculateMobXP(effectiveMobLevel);
 
+            // Apply boss multiplier based on HP and damage multipliers
+            double bossMultiplier = SkillXPCalculator.calculateBossXPMultiplier(
+                    eliteEntity.getHealthMultiplier(), eliteEntity.getDamageMultiplier());
+            baseXP = (long) (baseXP * bossMultiplier);
+
             // Calculate proportional XP based on damage contribution
             double damagePercent = damageDealt / totalDamage;
             long earnedXP = (long) (baseXP * damagePercent);

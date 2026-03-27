@@ -10,6 +10,7 @@ import com.magmaguy.elitemobs.items.MobTierCalculator;
 import com.magmaguy.elitemobs.items.customenchantments.HunterEnchantment;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
+import com.magmaguy.elitemobs.peacebanner.PeaceBannerManager;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
@@ -117,6 +118,9 @@ public class NaturalMobSpawnEventHandler implements Listener {
         if (event.getEntity().getCustomName() != null && DefaultConfig.isPreventEliteMobConversionOfNamedMobs())
             return;
 
+        // Peace banner suppression
+        if (PeaceBannerManager.isProtected(event.getLocation())) return;
+
         if (!EliteMobProperties.isValidEliteMobType(event.getEntityType()))
             return;
 
@@ -130,7 +134,7 @@ public class NaturalMobSpawnEventHandler implements Listener {
         double huntingGearChanceAdder = HunterEnchantment.getHuntingGearBonus(nearbyPlayers);
         validChance += huntingGearChanceAdder;
 
-        // Peaceful mode removed with guild rank system
+        // Peace banner suppression is handled earlier in onSpawn
 
         if (ThreadLocalRandom.current().nextDouble() >= validChance) return;
 

@@ -48,10 +48,7 @@ public class LootCommand {
             commandSender.sendMessage(CommandMessagesConfig.getInvalidPlayerForItemMessage());
         } else {
             int combatLevel = CombatLevelCalculator.calculateCombatLevel(player.getUniqueId());
-            ItemStack itemStack = customItem.generateItemStack(combatLevel, player, null);
-            if (itemStack == null) {
-                itemStack = customItem.generateDefaultsItemStack(player, false, null);
-            }
+            ItemStack itemStack = customItem.generateItemStackExact(combatLevel, player, null);
             if (itemStack != null) {
                 for (ItemStack overflow : player.getInventory().addItem(itemStack).values()) {
                     player.getWorld().dropItem(player.getLocation(), overflow);
