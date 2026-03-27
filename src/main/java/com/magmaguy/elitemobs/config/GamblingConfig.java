@@ -327,6 +327,10 @@ public class GamblingConfig extends ConfigurationFile {
     private static String debtPaidMessage;
     @Getter
     private static String debtClearedMessage;
+    @Getter
+    private static String debtAutoCollectedMessage;
+    @Getter
+    private static String debtAutoClearedMessage;
 
     // ---- BettingMenu strings ----
     @Getter
@@ -1058,6 +1062,14 @@ public class GamblingConfig extends ConfigurationFile {
         debtClearedMessage = ConfigurationEngine.setString(
                 List.of("Sets the message shown when a player's debt is fully cleared."),
                 file, fileConfiguration, "debtCollector.debtClearedMessage", "&a[Casino] &7Your debt has been cleared! You're free... for now.", true);
+        debtAutoCollectedMessage = ConfigurationEngine.setString(
+                List.of("Sets the message shown when currency is automatically collected toward gambling debt.",
+                        "$amount is the placeholder for the collected amount.",
+                        "$remaining is the placeholder for the remaining debt."),
+                file, fileConfiguration, "debtCollector.debtAutoCollectedMessage", "&c[Debt Collector] &7Nice earnings. I'll be taking &6$amount coins &7off the top. You still owe &6$remaining coins&7. Don't forget it.", true);
+        debtAutoClearedMessage = ConfigurationEngine.setString(
+                List.of("Sets the message shown when currency collection fully clears the gambling debt."),
+                file, fileConfiguration, "debtCollector.debtAutoClearedMessage", "&c[Debt Collector] &7That settles your debt. You're square with us... for now. Try not to push your luck again.", true);
 
         // ---- BettingMenu strings ----
         bettingCasinoClosedMessage = ConfigurationEngine.setString(

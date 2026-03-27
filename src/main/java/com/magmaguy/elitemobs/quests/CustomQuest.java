@@ -117,10 +117,15 @@ public class CustomQuest extends Quest {
             return !QuestLockoutHandler.isLockedOut(player, configurationFilename, customQuestsConfigFields.getQuestName());
         }
 
-        // Legacy permission-based lockout (only used if questLockoutMinutes is not configured)
-        // This preserves backwards compatibility for quests still using the old system
-        return customQuestsConfigFields.getQuestLockoutPermission().isEmpty() ||
-                !player.hasMetadata(customQuestsConfigFields.getQuestLockoutPermission());
+        // If neither lockout system is configured, the quest is available.
+        // This handles EM9 quest files that may have a questLockoutPermission set but no functional
+        // guild rank system in EM10 to back it - without an active lockout system, the quest is open.
+        String lockoutPermission = customQuestsConfigFields.getQuestLockoutPermission();
+        if (lockoutPermission == null || lockoutPermission.isEmpty()) return true;
+
+        // Legacy permission-based lockout: only block if the player actually has the lockout metadata,
+        // meaning they completed the quest and were given the lockout marker via PlayerQuestCooldowns
+        return !player.hasMetadata(lockoutPermission);
     }
 
     public static class CustomQuestEvents implements Listener {

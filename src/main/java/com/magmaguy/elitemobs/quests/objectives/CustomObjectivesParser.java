@@ -1,5 +1,7 @@
 package com.magmaguy.elitemobs.quests.objectives;
 
+import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
+import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.utils.MapListInterpreter;
@@ -75,8 +77,15 @@ public class CustomObjectivesParser {
                 return new CustomKillObjective(filename, amount, customQuest.getQuestLevel());
             else if (objectiveType.equals(ObjectiveType.FETCH_ITEM))
                 return new CustomFetchObjective(amount, name, filename);
-            else if (objectiveType.equals(ObjectiveType.DIALOG))
+            else if (objectiveType.equals(ObjectiveType.DIALOG)) {
+                // Resolve NPC name from config if not explicitly set, so it picks up translations
+                if (name == null || name.isEmpty()) {
+                    NPCsConfigFields npcConfig = NPCsConfig.getNpcEntities().get(filename);
+                    if (npcConfig != null && npcConfig.getName() != null)
+                        name = npcConfig.getName();
+                }
                 return new DialogObjective(filename, name, location, dialog);
+            }
             else if (objectiveType.equals(ObjectiveType.ARENA))
                 return new ArenaObjective(name, filename);
         } catch (Exception ex) {

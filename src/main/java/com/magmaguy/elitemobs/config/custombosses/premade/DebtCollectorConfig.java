@@ -20,6 +20,9 @@ public class DebtCollectorConfig extends CustomBossesConfigFields {
                 "$bossLevel <g:#8B0000:#DC143C>The Debt Collector</g>",
                 "dynamic");
 
+        // Scaled combat - level scales to player
+        setScaledCombat(true);
+
         // Health and damage settings from config
         setHealthMultiplier(5.0);
         setDamageMultiplier(1.0);

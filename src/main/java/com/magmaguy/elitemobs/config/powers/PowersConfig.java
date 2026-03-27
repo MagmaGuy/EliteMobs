@@ -1,13 +1,13 @@
 package com.magmaguy.elitemobs.config.powers;
 
 import com.magmaguy.elitemobs.config.luapowers.LuaPowersConfig;
-import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import com.magmaguy.elitemobs.powers.lua.LuaPowerManager;
+import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import com.magmaguy.magmacore.config.CustomConfig;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Locale;
+import java.util.Map;
 
 public class PowersConfig extends CustomConfig {
 
@@ -42,18 +42,17 @@ public class PowersConfig extends CustomConfig {
             return null;
         }
 
-        PowersConfigFields directMatch = powers.get(filename);
-        if (directMatch != null) {
-            return directMatch;
-        }
-
+        // Try Lua variant first for yml/yaml requests (Lua powers supersede legacy YAML powers)
         String lowerCaseFilename = filename.toLowerCase(Locale.ROOT);
         if (lowerCaseFilename.endsWith(".yml")) {
-            return powers.get(filename.substring(0, filename.length() - 4) + ".lua");
+            PowersConfigFields luaMatch = powers.get(filename.substring(0, filename.length() - 4) + ".lua");
+            if (luaMatch != null) return luaMatch;
+        } else if (lowerCaseFilename.endsWith(".yaml")) {
+            PowersConfigFields luaMatch = powers.get(filename.substring(0, filename.length() - 5) + ".lua");
+            if (luaMatch != null) return luaMatch;
         }
-        if (lowerCaseFilename.endsWith(".yaml")) {
-            return powers.get(filename.substring(0, filename.length() - 5) + ".lua");
-        }
-        return null;
+
+        // Fall back to direct match (covers .lua requests and YAML-only powers)
+        return powers.get(filename);
     }
 }

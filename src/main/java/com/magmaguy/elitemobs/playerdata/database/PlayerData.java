@@ -723,6 +723,11 @@ public class PlayerData {
         try {
             Statement statement = getConnection().createStatement();
             ResultSet resultSet = statement.executeQuery("SELECT * FROM " + PLAYER_DATA_TABLE_NAME + " WHERE PlayerUUID = '" + uuid.toString() + "';");
+            if (!resultSet.next()) {
+                resultSet.close();
+                statement.close();
+                return null;
+            }
             boolean reply = resultSet.getBoolean(value);
             resultSet.close();
             statement.close();
@@ -738,6 +743,11 @@ public class PlayerData {
         try {
             Statement statement = getConnection().createStatement();
             ResultSet resultSet = statement.executeQuery("SELECT * FROM " + PLAYER_DATA_TABLE_NAME + " WHERE PlayerUUID = '" + uuid.toString() + "';");
+            if (!resultSet.next()) {
+                resultSet.close();
+                statement.close();
+                return null;
+            }
             String reply = resultSet.getString(value);
             resultSet.close();
             statement.close();
@@ -753,6 +763,11 @@ public class PlayerData {
         try {
             Statement statement = getConnection().createStatement();
             ResultSet resultSet = statement.executeQuery("SELECT * FROM " + PLAYER_DATA_TABLE_NAME + " WHERE PlayerUUID = '" + uuid.toString() + "';");
+            if (!resultSet.next()) {
+                resultSet.close();
+                statement.close();
+                return null;
+            }
             double reply = resultSet.getDouble(value);
             resultSet.close();
             statement.close();
@@ -768,6 +783,11 @@ public class PlayerData {
         try {
             Statement statement = getConnection().createStatement();
             ResultSet resultSet = statement.executeQuery("SELECT * FROM " + PLAYER_DATA_TABLE_NAME + " WHERE PlayerUUID = '" + uuid.toString() + "';");
+            if (!resultSet.next()) {
+                resultSet.close();
+                statement.close();
+                return null;
+            }
             int reply = resultSet.getInt(value);
             resultSet.close();
             statement.close();
@@ -783,6 +803,11 @@ public class PlayerData {
         try {
             Statement statement = getConnection().createStatement();
             ResultSet resultSet = statement.executeQuery("SELECT * FROM " + PLAYER_DATA_TABLE_NAME + " WHERE PlayerUUID = '" + uuid.toString() + "';");
+            if (!resultSet.next()) {
+                resultSet.close();
+                statement.close();
+                return 0L;
+            }
             long reply = resultSet.getLong(value);
             resultSet.close();
             statement.close();

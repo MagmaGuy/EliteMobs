@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.mobconstructor;
 
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.PeaceBannerConfig;
 import com.magmaguy.elitemobs.config.ValidWorldsConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
@@ -11,6 +12,7 @@ import com.magmaguy.elitemobs.dungeons.EliteMobsWorld;
 import com.magmaguy.elitemobs.events.MoonPhaseDetector;
 import com.magmaguy.elitemobs.events.TimedEvent;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.peacebanner.PeaceBannerManager;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import com.magmaguy.magmacore.instance.MatchInstance;
@@ -177,6 +179,12 @@ public class CustomSpawn {
                 testEntity.remove();
 
                 if (!keepTrying) cancel();
+
+                if (PeaceBannerConfig.isSuppressEvents() && PeaceBannerManager.isProtected(spawnLocation)) {
+                    cancel();
+                    if (timedEvent != null) timedEvent.queueEvent();
+                    return;
+                }
 
                 for (CustomBossEntity customBossEntity : customBossEntities)
                     if (!customBossEntity.exists())

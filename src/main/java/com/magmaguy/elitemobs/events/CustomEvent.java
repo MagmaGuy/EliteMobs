@@ -164,7 +164,7 @@ public abstract class CustomEvent {
         primaryEliteMobs.forEach(eliteMobEntity -> {
             if (eliteMobEntity.exists()) eliteMobEntity.remove(RemovalReason.BOSS_TIMEOUT);
         });
-        if (this.endMessage != null)
+        if (this.endMessage != null && eventStartLocation != null && eventStartLocation.getWorld() != null)
             AnnouncementPriority.announce(this.endMessage, eventStartLocation.getWorld(), this.announcementPriority);
         if (this.endEventCommands != null)
             Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, () -> CommandRunner.runCommandFromList(this.endEventCommands, new ArrayList<>()));

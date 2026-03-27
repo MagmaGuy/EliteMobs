@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.dungeons;
 import com.magmaguy.elitemobs.config.CombatTagConfig;
 import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
+import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
@@ -51,7 +52,10 @@ public class DungeonProtector implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void preventPlayerBlockBreak(BlockBreakEvent event) {
-        if (!EliteMobsWorld.isEliteMobsWorld(event.getBlock().getWorld().getUID())) return;
+        UUID worldUID = event.getBlock().getWorld().getUID();
+        boolean isProtected = EliteMobsWorld.isEliteMobsWorld(worldUID);
+        Logger.info("[DungeonProtector Debug] BlockBreakEvent: worldUID=" + worldUID + " worldName=" + event.getBlock().getWorld().getName() + " isEliteMobsWorld=" + isProtected);
+        if (!isProtected) return;
         if (shouldBypass(event.getPlayer())) return;
         event.setCancelled(true);
     }
