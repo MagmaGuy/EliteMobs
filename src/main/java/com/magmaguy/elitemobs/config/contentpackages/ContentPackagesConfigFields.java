@@ -72,6 +72,7 @@ public class ContentPackagesConfigFields extends CustomConfigFields {
     @Setter
     private boolean hasCustomModels = false;
     @Getter
+    @Setter
     private boolean defaultDungeon = false;
     @Getter
     private Location teleportLocation = null;

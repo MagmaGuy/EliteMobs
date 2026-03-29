@@ -24,5 +24,7 @@ public class FreeGoblinsEventPack extends ContentPackagesConfigFields {
         setSetupMenuDescription(List.of(
                 "&2Unleash annoying little goblins",
                 "&2all across your server!"));
+        setDefaultDungeon(true);
+        setNightbreakSlug("10-free-elitemobs-goblin-events");
     }
 }

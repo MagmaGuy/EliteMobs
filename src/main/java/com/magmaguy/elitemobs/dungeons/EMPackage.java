@@ -287,13 +287,18 @@ public abstract class EMPackage extends ContentPackage implements NightbreakMana
 
         // If no Nightbreak slug, use legacy download link behavior
         if (slug == null || slug.isEmpty()) {
+            String downloadLink = getContentPackagesConfigFields().getDownloadLink();
+            if (downloadLink == null || downloadLink.isEmpty()) {
+                Logger.sendSimpleMessage(player, "&cNo download link available for this content pack.");
+                return;
+            }
             Logger.sendSimpleMessage(player, DungeonsConfig.getContentDownloadSeparator());
             player.spigot().sendMessage(
                     SpigotMessage.simpleMessage(DungeonsConfig.getContentDownloadLegacyMessage().replace("$link", "")),
                     SpigotMessage.hoverLinkMessage(
-                            "&9&n" + getContentPackagesConfigFields().getDownloadLink(),
+                            "&9&n" + downloadLink,
                             "&7Click to download",
-                            getContentPackagesConfigFields().getDownloadLink()));
+                            downloadLink));
             Logger.sendSimpleMessage(player, DungeonsConfig.getContentDownloadSeparator());
             return;
         }

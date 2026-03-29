@@ -5,3 +5,21 @@
 /build/
 /docs/plans/
 gradle.properties
+
+# OS files
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Java
+*.class
+*.jar
+*.war
+
+# Gradle
+gradlew
+!gradlew.bat
+.gradle/
+
+# Logs
+*.log
