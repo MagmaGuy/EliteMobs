@@ -339,7 +339,9 @@ public class VersionChecker {
 
         for (EMPackage emPackage : packageSnapshot) {
             if (!emPackage.isInstalled()) continue;
-            if (!emPackage.getContentPackagesConfigFields().isDefaultDungeon()) continue;
+            // Skip non-default dungeons unless they have a nightbreak slug for version checking
+            String slug = emPackage.getContentPackagesConfigFields().getNightbreakSlug();
+            if (!emPackage.getContentPackagesConfigFields().isDefaultDungeon() && (slug == null || slug.isEmpty())) continue;
 
             // Skip packages contained in meta packages
             boolean containedInMetaPackage = false;
@@ -353,8 +355,7 @@ public class VersionChecker {
             }
             if (containedInMetaPackage) continue;
 
-            // Get the Nightbreak slug from the content package
-            String slug = emPackage.getContentPackagesConfigFields().getNightbreakSlug();
+            // slug already fetched above for defaultDungeon check
             if (slug == null || slug.isEmpty()) {
                 // No slug configured, skip version checking for this content
                 continue;
