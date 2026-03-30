@@ -211,7 +211,7 @@ public class DungeonInstance extends MatchInstance {
     public void removeInstance() {
         // Prevent multiple removal attempts for the same instance
         if (instanceRemovalScheduled) {
-            Logger.debug("removeInstance() called but already scheduled for " + (world != null ? world.getName() : "null world"));
+            Logger.warn("removeInstance() called but already scheduled for " + (world != null ? world.getName() : "null world"));
             return;
         }
         instanceRemovalScheduled = true;
@@ -226,9 +226,6 @@ public class DungeonInstance extends MatchInstance {
             Logger.warn("Instanced dungeon's world was already unloaded before removing the entities in it! This shouldn't happen, but doesn't break anything.");
             return;
         }
-
-        String worldName = world.getName();
-        Logger.debug("removeInstance() scheduling world deletion for " + worldName + " in 30 seconds");
 
         world.getEntities().forEach(entity -> EntityTracker.unregister(entity, RemovalReason.WORLD_UNLOAD));
         new RemoveInstanceTask(dungeonInstance).runTaskLater(MetadataHandler.PLUGIN, 20 * 30L);
@@ -380,7 +377,7 @@ public class DungeonInstance extends MatchInstance {
         public void run() {
             // Check if world was already removed
             if (world == null) {
-                Logger.debug("RemoveInstanceTask: World already null, skipping deletion");
+                Logger.warn("RemoveInstanceTask: World already null, skipping deletion");
                 return;
             }
 
@@ -402,8 +399,6 @@ public class DungeonInstance extends MatchInstance {
                     Logger.warn(" - Player still in world: " + p.getName());
                 }
             }
-
-            Logger.debug("Deleting instanced world " + worldName + " (entities: " + entityCount + ", chunks: " + loadedChunks + ")");
 
             try {
                 // Disable auto-save to prevent new async save tasks from being queued during unload

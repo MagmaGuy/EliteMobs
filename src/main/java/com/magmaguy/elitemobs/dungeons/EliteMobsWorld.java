@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.dungeons;
 
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
-import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 
@@ -19,12 +18,10 @@ public class EliteMobsWorld {
     private EliteMobsWorld(UUID worldUUID, ContentPackagesConfigFields contentPackagesConfigFields) {
         this.contentPackagesConfigFields = contentPackagesConfigFields;
         if (!contentPackagesConfigFields.isProtect()) {
-            Logger.info("[DungeonProtector Debug] World NOT registered (protect=false): UUID=" + worldUUID + " name=" + (Bukkit.getWorld(worldUUID) != null ? Bukkit.getWorld(worldUUID).getName() : "unknown"));
             return;
         }
         this.allowExplosions = contentPackagesConfigFields.isAllowExplosions();
         eliteMobsWorlds.put(worldUUID, this);
-        Logger.info("[DungeonProtector Debug] World registered: UUID=" + worldUUID + " name=" + (Bukkit.getWorld(worldUUID) != null ? Bukkit.getWorld(worldUUID).getName() : "unknown"));
     }
 
     public static void shutdown() {
@@ -41,7 +38,6 @@ public class EliteMobsWorld {
     }
 
     public static void create(UUID woldUUID, ContentPackagesConfigFields contentPackagesConfigFields) {
-        Logger.info("[DungeonProtector Debug] create() called with UUID=" + woldUUID + " name=" + (Bukkit.getWorld(woldUUID) != null ? Bukkit.getWorld(woldUUID).getName() : "unknown") + " protect=" + contentPackagesConfigFields.isProtect());
         new EliteMobsWorld(woldUUID, contentPackagesConfigFields);
     }
 
