@@ -62,7 +62,7 @@ public class DebugMessage {
      */
     public static void log(String message) {
         if (isAnyDebugEnabled()) {
-            Logger.debug(message);
+            Logger.warn(message);
         }
     }
 
@@ -74,7 +74,7 @@ public class DebugMessage {
      */
     public static void log(Player player, String message) {
         if (isDebugEnabled(player)) {
-            Logger.debug(message);
+            Logger.warn(message);
         }
     }
 
