@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.powers.lua;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.combatsystem.ScaledCombatRewardResolver;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
+import com.magmaguy.magmacore.util.TemporaryBlockManager;
 import com.magmaguy.elitemobs.explosionregen.Explosion;
 import com.magmaguy.elitemobs.items.ItemLootShower;
 import com.magmaguy.elitemobs.items.LootTables;
@@ -219,14 +220,7 @@ final class LuaPowerSupport {
         Material material = parseMaterial(materialKey);
         if (material == null) return;
         Block block = location.getBlock();
-        if (requireAir && !block.getType().isAir()) {
-            return;
-        }
-        if (duration > 0) {
-            EntityTracker.addTemporaryBlock(block, duration, material);
-        } else {
-            block.setType(material);
-        }
+        TemporaryBlockManager.addTemporaryBlock(block, duration, material, requireAir);
     }
 
     Material parseMaterial(String materialKey) {

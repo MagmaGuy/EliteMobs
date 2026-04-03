@@ -10,7 +10,10 @@ import com.magmaguy.shaded.luaj.vm2.LuaValue;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Wraps an {@link EliteEntity} as a {@link ScriptableEntity} so it can be
@@ -86,6 +89,19 @@ public class ScriptableBoss extends ScriptableEntity {
         // Boss-specific extra context (players, entities, event, script,
         // cooldowns, settings) will be wired in a future pass.
         return LuaValue.NIL;
+    }
+
+    // ── Global cooldown (shared per EliteEntity) ─────────────────────────
+
+    private static final Map<EliteEntity, Map<String, Long>> bossGlobalCooldowns = new ConcurrentHashMap<>();
+
+    @Override
+    public Map<String, Long> getGlobalCooldownStore() {
+        return bossGlobalCooldowns.computeIfAbsent(eliteEntity, k -> new HashMap<>());
+    }
+
+    public static void clearGlobalCooldowns(EliteEntity entity) {
+        bossGlobalCooldowns.remove(entity);
     }
 
     // ── EliteMobs-specific accessor ─────────────────────────────────────
