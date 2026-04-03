@@ -10,13 +10,13 @@ import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.tagger.PersistentTagger;
 import com.magmaguy.elitemobs.utils.EventCaller;
+import com.magmaguy.magmacore.util.TemporaryBlockManager;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Projectile;
@@ -39,8 +39,6 @@ public class EntityTracker implements Listener {
     private static final HashMap<UUID, EliteEntity> eliteMobEntities = new HashMap<>();
     @Getter
     private static final HashMap<UUID, NPCEntity> npcEntities = new HashMap<>();
-    @Getter
-    private static final HashSet<Block> temporaryBlocks = new HashSet<>();
 
     public static void registerEliteMob(EliteEntity eliteEntity) {
         EliteMobSpawnEvent eliteMobSpawnEvent = new EliteMobSpawnEvent(eliteEntity);
@@ -109,40 +107,19 @@ public class EntityTracker implements Listener {
         return false;
     }
 
-    //Temporary blocks - blocks in powers
+    //Temporary blocks - delegated to MagmaCore's TemporaryBlockManager
     public static void addTemporaryBlock(Block block, int ticks, Material replacementMaterial) {
-        BlockData previousBlockData = block.getBlockData().clone();
-        if (temporaryBlocks.contains(block)) previousBlockData = null;
         //Don't override death banners, this causes issues
-        if (temporaryBlocks.contains(block) && block.getType().equals(Material.RED_BANNER)) return;
-        temporaryBlocks.add(block);
-        block.setType(replacementMaterial);
-        UUID worldUUID = block.getWorld().getUID();
-        BlockData finalPreviousBlockData = previousBlockData;
-        //Death banners for instanced content don't timeout
-        if (ticks < 0) return;
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (Bukkit.getWorld(worldUUID) == null) return;
-                temporaryBlocks.remove(block);
-                if (!block.getBlockData().equals(finalPreviousBlockData))
-                    if (finalPreviousBlockData != null)
-                        //Case if a temp block was placed and now needs to be restored
-                        block.setBlockData(finalPreviousBlockData);
-                    else
-                        //Case if a temp block was placed on a temp block
-                        block.setType(Material.AIR);
-            }
-        }.runTaskLater(MetadataHandler.PLUGIN, ticks);
+        if (TemporaryBlockManager.isTemporaryBlock(block) && block.getType().equals(Material.RED_BANNER)) return;
+        TemporaryBlockManager.addTemporaryBlock(block, ticks, replacementMaterial);
     }
 
     public static boolean isTemporaryBlock(Block block) {
-        return temporaryBlocks.contains(block);
+        return TemporaryBlockManager.isTemporaryBlock(block);
     }
 
     public static void removeTemporaryBlock(Block block) {
-        temporaryBlocks.remove(block);
+        TemporaryBlockManager.removeTemporaryBlock(block);
     }
 
     //Projectile entities - Minecraft already stores data about who fired them, so just simple entities.
@@ -205,9 +182,7 @@ public class EntityTracker implements Listener {
         for (NPCEntity npcEntity : ((HashMap<UUID, NPCEntity>) npcEntities.clone()).values())
             npcEntity.remove(RemovalReason.SHUTDOWN);
         getNpcEntities().clear();
-        for (Block block : temporaryBlocks)
-            block.setType(Material.AIR);
-        temporaryBlocks.clear();
+        TemporaryBlockManager.shutdown();
         //Necessary for things such as visual effects which are not stored in memory, only tagged
         for (World world : Bukkit.getWorlds())
             for (Entity entity : world.getEntities())
@@ -219,7 +194,7 @@ public class EntityTracker implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onWorldUnload(WorldUnloadEvent event) {
         EntityTracker.wipeWorld(event.getWorld(), RemovalReason.WORLD_UNLOAD);
-        temporaryBlocks.removeIf(block -> block.getWorld().equals(event.getWorld()));
+        // Temporary block world cleanup is handled by MagmaCore's TemporaryBlockManager
     }
 
     @EventHandler(ignoreCancelled = true)
