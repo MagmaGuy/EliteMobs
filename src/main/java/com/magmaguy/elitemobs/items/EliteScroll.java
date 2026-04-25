@@ -86,7 +86,8 @@ public class EliteScroll {
         if (itemMeta == null) return newItem;
 
         // Hide vanilla enchantment tooltips — elite lore displays them instead
-        itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        if (ItemSettingsConfig.isHideEnchants())
+            itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 
         // Register the item's vanilla enchantments into PDC for the EM 10 combat system
         HashMap<Enchantment, Integer> enchantmentMap = new HashMap<>(itemMeta.getEnchants());

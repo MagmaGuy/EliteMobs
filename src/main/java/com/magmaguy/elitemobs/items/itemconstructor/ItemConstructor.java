@@ -9,6 +9,7 @@ import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffectContainer;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.utils.CustomModelAdder;
 import com.magmaguy.magmacore.util.ChatColorConverter;
+import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -229,8 +230,8 @@ public class ItemConstructor {
 
         ItemMeta itemMeta = itemStack.getItemMeta();
 
-        //hide default lore
-        itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        if (ItemSettingsConfig.isHideEnchants())
+            itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 
         /*
         Register elite item
