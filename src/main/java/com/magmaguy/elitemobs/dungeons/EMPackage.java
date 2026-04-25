@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.dungeons;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.elitemobs.config.InitializeConfig;
+import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
 import com.magmaguy.elitemobs.menus.SetupMenuIcons;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
@@ -198,7 +199,8 @@ public abstract class EMPackage extends ContentPackage {
                 tooltip);
         ItemMeta itemMeta = itemStack.getItemMeta();
         itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-        itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        if (ItemSettingsConfig.isHideEnchants())
+            itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         itemMeta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
         itemStack.setItemMeta(itemMeta);
         SetupMenuIcons.applyItemModel(itemStack, SetupMenuIcons.MODEL_LOCKED_UNPAID);
@@ -241,7 +243,8 @@ public abstract class EMPackage extends ContentPackage {
                 tooltip);
         ItemMeta itemMeta = itemStack.getItemMeta();
         itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-        itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        if (ItemSettingsConfig.isHideEnchants())
+            itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         itemMeta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
         itemStack.setItemMeta(itemMeta);
         SetupMenuIcons.applyItemModel(itemStack, SetupMenuIcons.MODEL_UPDATE_UNPAID);
@@ -254,7 +257,8 @@ public abstract class EMPackage extends ContentPackage {
         ItemStack itemStack = ItemStackGenerator.generateItemStack(material, contentPackagesConfigFields.getName(), tooltip);
         ItemMeta itemMeta = itemStack.getItemMeta();
         itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-        itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        if (ItemSettingsConfig.isHideEnchants())
+            itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         itemMeta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
         itemStack.setItemMeta(itemMeta);
         return itemStack;
@@ -270,7 +274,8 @@ public abstract class EMPackage extends ContentPackage {
                 tooltip);
         ItemMeta itemMeta = itemStack.getItemMeta();
         itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-        itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        if (ItemSettingsConfig.isHideEnchants())
+            itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         itemMeta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
         itemStack.setItemMeta(itemMeta);
         SetupMenuIcons.applyItemModel(itemStack, modelId);
