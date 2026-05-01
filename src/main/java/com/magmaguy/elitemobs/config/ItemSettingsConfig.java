@@ -113,6 +113,8 @@ public class ItemSettingsConfig extends ConfigurationFile {
     @Getter
     private static boolean hideAttributes;
     @Getter
+    private static boolean hideEnchants;
+    @Getter
     private static String weaponEntry;
     @Getter
     private static String armorEntry;
@@ -351,6 +353,9 @@ public class ItemSettingsConfig extends ConfigurationFile {
         hideAttributes = ConfigurationEngine.setBoolean(
                 List.of("Sets if EliteMobs will hide vanilla Minecraft attributes."),
                 fileConfiguration, "hideItemAttributes", true);
+        hideEnchants = ConfigurationEngine.setBoolean(
+                List.of("Sets if EliteMobs will hide enchantment tooltips on EliteMobs items."),
+                fileConfiguration, "hideEnchants", true);
         weaponEntry = ConfigurationEngine.setString(
                 List.of("Sets the weapon-specific lore entry on an elite item. The $EDPS placeholder gets replaced with the elite DPS (damage per second) of the weapon."),
                 file, fileConfiguration, "weaponEntry", "&7Elite DPS: &2$EDPS", true);

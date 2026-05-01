@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.items.itemconstructor;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
+import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.items.EliteItemLore;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
@@ -230,7 +231,8 @@ public class ItemConstructor {
         ItemMeta itemMeta = itemStack.getItemMeta();
 
         //hide default lore
-        itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        if (ItemSettingsConfig.isHideEnchants())
+            itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 
         /*
         Register elite item
