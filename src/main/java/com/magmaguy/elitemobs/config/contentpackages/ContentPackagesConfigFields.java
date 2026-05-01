@@ -120,6 +120,9 @@ public class ContentPackagesConfigFields extends CustomConfigFields {
     private boolean allowLiquidFlow = true;
     @Getter
     @Setter
+    private boolean allowElytra = false;
+    @Getter
+    @Setter
     //For meta packages
     private List<String> containedPackages;
     @Getter
@@ -365,6 +368,7 @@ public class ContentPackagesConfigFields extends CustomConfigFields {
         this.listedInTeleports = processBoolean("listedInTeleports", listedInTeleports, true, false);
         this.song = processString("song", song, null, false);
         this.allowLiquidFlow = processBoolean("allowLiquidFlow", allowLiquidFlow, allowLiquidFlow, false);
+        this.allowElytra = processBoolean("allowElytra", allowElytra, false, false);
         this.containedPackages = processStringList("containedPackages", containedPackages, null, false);
         this.customItemFilenames = processStringList("customItemFilenames", customItemFilenames, null, false);
         if (customItemFilenames != null) contentType = ContentType.ITEMS_PACKAGE;
@@ -373,7 +377,7 @@ public class ContentPackagesConfigFields extends CustomConfigFields {
         this.modelNames = processStringList("modelNames", modelNames, null, false);
         if (modelNames != null) contentType = ContentType.MODELS_PACKAGE;
         this.setupMenuDescription = processStringList("setupMenuDescription", setupMenuDescription, new ArrayList<>(), false);
-        this.dungeonLockoutMinutes = processInt("dungeonLockoutMinutes", dungeonLockoutMinutes, 0, false);
+        this.dungeonLockoutMinutes = processInt("dungeonLockoutMinutes", dungeonLockoutMinutes, 0, true);
         processAdditionalFields();
     }
 

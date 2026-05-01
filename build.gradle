@@ -32,7 +32,7 @@ processResources {
 }
 
 group 'com.magmaguy'
-version '10.1.1'
+version '10.2.0'
 
 repositories {
     maven {
@@ -109,7 +109,7 @@ dependencies {
     //Model Engine - legacy
     compileOnly "com.ticxo.modelengine:api:R3.1.7"
     //Free Minecraft Models
-    compileOnly (group: 'com.magmaguy', name: 'FreeMinecraftModels', version: '2.3.17'){
+    compileOnly (group: 'com.magmaguy', name: 'FreeMinecraftModels', version: '2.4.0'){
         changing = true
     }
     // Mythic Mobs integration - currently only for arenas

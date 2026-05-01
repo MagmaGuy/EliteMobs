@@ -12,7 +12,7 @@ public class TheCityDungeon extends ContentPackagesConfigFields {
     public TheCityDungeon() {
         super("the_city_dungeon",
                 true,
-                "&3The City Dungeon",
+                "&2[Dynamic] &3The City Dungeon",
                 new ArrayList<>(List.of("&fThe perfect intermediate instanced sanctum!",
                         "&6Credits: Dali_, MagmaGuy, Frostcone")),
                 DiscordLinks.freeMinidungeons,

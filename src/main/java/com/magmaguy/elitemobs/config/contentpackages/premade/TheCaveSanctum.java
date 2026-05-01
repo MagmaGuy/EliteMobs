@@ -12,7 +12,7 @@ public class TheCaveSanctum extends ContentPackagesConfigFields {
     public TheCaveSanctum() {
         super("the_cave_sanctum",
                 true,
-                "&3The Cave Sanctum",
+                "&2[Dynamic] &3The Cave Sanctum",
                 new ArrayList<>(List.of("&fThe perfect starter instanced sanctum!",
                         "&6Credits: MagmaGuy, Frostcone, 69OzCanOfBepis, Realm of Lotheridon")),
                 DiscordLinks.freeMinidungeons,

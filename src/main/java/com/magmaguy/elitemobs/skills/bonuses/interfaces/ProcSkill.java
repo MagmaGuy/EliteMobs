@@ -25,4 +25,19 @@ public interface ProcSkill {
      * @param context The context object for this proc (varies by skill)
      */
     void onProc(Player player, Object context);
+
+    /**
+     * Minimum time in milliseconds that must pass between successive procs of
+     * this skill for the same player. Returns 0 for no internal cooldown
+     * (the default — proc is gated only by {@link #getProcChance(int)}).
+     * <p>
+     * Override for procs that deal large burst damage or have heavy side
+     * effects, to prevent autoclickers from spamming them faster than a
+     * legitimate attack cadence would allow.
+     *
+     * @return Internal proc cooldown in milliseconds; 0 disables the gate.
+     */
+    default long getInternalCooldownMillis() {
+        return 0L;
+    }
 }

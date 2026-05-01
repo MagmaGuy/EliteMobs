@@ -2,6 +2,8 @@ package com.magmaguy.elitemobs.config.menus.premade;
 
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
+import com.magmaguy.elitemobs.config.customarenas.CustomArenasConfig;
+import com.magmaguy.elitemobs.config.customarenas.CustomArenasConfigFields;
 import com.magmaguy.elitemobs.config.menus.MenusConfigFields;
 import com.magmaguy.elitemobs.items.customloottable.*;
 import com.magmaguy.elitemobs.quests.objectives.*;
@@ -80,8 +82,12 @@ public class CustomQuestMenuConfig extends MenusConfigFields {
             newString = dialogQuestDefaultSummaryLine.replace("$location", safeString(((DialogObjective) objective).getTargetLocation()));
         else if (objective instanceof CustomFetchObjective)
             newString = fetchQuestDefaultSummaryLine;
-        else if (objective instanceof ArenaObjective)
-            newString = arenaQuestDefaultSummaryLine;
+        else if (objective instanceof ArenaObjective) {
+            String arenaFilename = ((ArenaObjective) objective).getArenaFilename();
+            CustomArenasConfigFields arenaFields = CustomArenasConfig.getCustomArena(arenaFilename);
+            String arenaDisplayName = arenaFields != null ? arenaFields.getArenaName() : arenaFilename;
+            newString = arenaQuestDefaultSummaryLine.replace("$arenaName", safeString(arenaDisplayName));
+        }
         newString = newString.replace("$name", safeObjectiveName(objective));
         newString = newString.replace("$current", objective.getCurrentAmount() + "");
         newString = newString.replace("$target", objective.getTargetAmount() + "");

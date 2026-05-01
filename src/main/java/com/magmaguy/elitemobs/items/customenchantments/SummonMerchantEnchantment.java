@@ -44,9 +44,11 @@ public class SummonMerchantEnchantment extends CustomEnchantment implements List
             itemStack.setAmount(itemStack.getAmount() - 1);
         if (!fromMessage) {
             new NPCEntity(player.getLocation());
-            String merchantMessage = SummonMerchantConfig.message;
-            if (merchantMessage != null && !merchantMessage.isEmpty())
-                player.chat(ChatColorConverter.convert(merchantMessage));
+            if (SummonMerchantConfig.playersSayMessage) {
+                String merchantMessage = SummonMerchantConfig.message;
+                if (merchantMessage != null && !merchantMessage.isEmpty())
+                    player.chat(ChatColorConverter.convert(merchantMessage));
+            }
             return;
         }
         //pass to a sync task

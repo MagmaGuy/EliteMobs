@@ -12,7 +12,7 @@ public class ThePalaceSanctum extends ContentPackagesConfigFields {
     public ThePalaceSanctum() {
         super("the_palace_sanctum",
                 true,
-                "&3The Palace Sanctum",
+                "&2[Dynamic] &3The Palace Sanctum",
                 new ArrayList<>(List.of("&fThe perfect intermediate instanced sanctum!",
                         "&6Credits: Dali_, MagmaGuy, Frostcone")),
                 DiscordLinks.freeMinidungeons,

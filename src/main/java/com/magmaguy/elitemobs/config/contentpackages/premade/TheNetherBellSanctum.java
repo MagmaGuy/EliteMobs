@@ -12,7 +12,7 @@ public class TheNetherBellSanctum extends ContentPackagesConfigFields {
     public TheNetherBellSanctum() {
         super("the_nether_bell_sanctum",
                 true,
-                "&3The Nether Bell Sanctum",
+                "&2[Dynamic] &3The Nether Bell Sanctum",
                 new ArrayList<>(List.of("&fVenture into the deepest part of the Nether!",
                         "&6Credits: Dali_, MagmaGuy, Frostcone")),
                 DiscordLinks.freeMinidungeons,
