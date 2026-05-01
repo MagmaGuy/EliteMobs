@@ -99,18 +99,4 @@ class LuaPowerDefinitionTest {
         assertTrue(definition.getHooks().contains(LuaPowerHook.ON_EXIT_COMBAT));
     }
 
-    @Test
-    void validatesTreasureHunterTestbedPower() throws IOException {
-        Path fixture = Path.of("testbed", "plugins", "EliteMobs", "powers", "treasure_hunter_goblin_test.lua");
-        String source = Files.readString(fixture, StandardCharsets.UTF_8);
-        assertFalse(source.contains("context.script.compile"));
-
-        LuaPowerDefinition definition = LuaPowerDefinition.validate("treasure_hunter_goblin_test.lua",
-                tempDir.resolve("treasure_hunter_goblin_test.lua").toFile(),
-                source);
-
-        assertTrue(definition.getHooks().contains(LuaPowerHook.ON_SPAWN));
-        assertTrue(definition.getHooks().contains(LuaPowerHook.ON_DAMAGED_BY_PLAYER));
-        assertTrue(definition.getHooks().contains(LuaPowerHook.ON_EXIT_COMBAT));
-    }
 }

@@ -11,7 +11,7 @@ public class CraftenminesLabSanctum extends ContentPackagesConfigFields {
     public CraftenminesLabSanctum() {
         super("craftenmines_lab_sanctum",
                 true,
-                "&aCraftenmines Sanctum",
+                "&2[Dynamic] &aCraftenmines Sanctum",
                 new ArrayList<>(List.of("&aFace the creator of the devious creations!",
                         "&6Credits: MagmaGuy, 69OzCanOfBepis")),
                 "https://nightbreak.io/plugin/elitemobs/#craftenmines-laboratory",

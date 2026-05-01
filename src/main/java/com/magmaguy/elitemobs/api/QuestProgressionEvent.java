@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.Quest;
 import com.magmaguy.elitemobs.quests.QuestTracking;
 import com.magmaguy.elitemobs.quests.objectives.Objective;
+import com.magmaguy.elitemobs.utils.MessageThrottler;
 import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
@@ -39,7 +40,8 @@ public class QuestProgressionEvent extends Event {
         public void onQuestProgression(QuestProgressionEvent event) {
             event.getQuest().getQuestObjectives().updateQuestStatus(event.getPlayer().getUniqueId());
             if (QuestsConfig.isDoQuestChatProgression())
-                event.getPlayer().sendMessage(QuestsConfig.getQuestChatProgressionMessage(event.getObjective()));
+                MessageThrottler.pushQuestProgress(event.getPlayer(), event.getObjective(),
+                        QuestsConfig.getQuestChatProgressionMessage(event.getObjective()));
             if (!QuestTracking.isTracking(event.player))
                 event.getQuest().getQuestObjectives().displayTemporaryObjectivesScoreboard(event.getPlayer());
             PlayerData.updateQuestStatus(event.getPlayer().getUniqueId(), event.getQuest());

@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfigFields;
 
 public class SummonMerchantConfig extends EnchantmentsConfigFields {
     public static String message;
+    public static boolean playersSayMessage;
 
     public SummonMerchantConfig() {
         super("summon_merchant",
@@ -20,5 +21,6 @@ public class SummonMerchantConfig extends EnchantmentsConfigFields {
     @Override
     public void processAdditionalFields() {
         message = ConfigurationEngine.setString(file, super.fileConfiguration, "message", "Jeeves!", true);
+        playersSayMessage = ConfigurationEngine.setBoolean(super.fileConfiguration, "playersSayMessage", true);
     }
 }

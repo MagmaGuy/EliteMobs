@@ -46,6 +46,8 @@ public class DefaultConfig extends ConfigurationFile {
     @Getter
     private static int defaultTransitiveBlockLimiter;
     @Getter
+    private static int notificationThrottleSeconds;
+    @Getter
     private static boolean onlyUseBedrockMenus;
     @Getter
     private static int characterLimitForBookMenuPages;
@@ -168,6 +170,7 @@ public class DefaultConfig extends ConfigurationFile {
                 List.of("Sets if the explosion regen will also regenerate the contents of containers such as chests.", "Turning it to false will make elite explosions not blow up containers."),
                 fileConfiguration, "doRegenerateContainers", true);
         defaultTransitiveBlockLimiter = ConfigurationEngine.setInt(fileConfiguration, "defaultTransitiveBlockLimiter", 500);
+        notificationThrottleSeconds = Math.max(1, ConfigurationEngine.setInt(fileConfiguration, "notificationThrottleSeconds", 10));
         onlyUseBedrockMenus = ConfigurationEngine.setBoolean(
                 List.of("Sets whether the /em menu will only use the inventory-based menu style which is compatible with bedrock.", "As a reminder, players can otherwise do the command /em alt to switch between /em menu styles"),
                 fileConfiguration, "onlyUseBedrockMenus", false);

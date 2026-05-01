@@ -12,7 +12,7 @@ public class TheMinesDungeon extends ContentPackagesConfigFields {
     public TheMinesDungeon() {
         super("the_mines_dungeon",
                 true,
-                "&3The Mines Dungeon",
+                "&2[Dynamic] &3The Mines Dungeon",
                 new ArrayList<>(List.of("&fReady to step up your dungeon game?",
                         "&6Credits: MagmaGuy, Frostcone, 69OzCanOfBepis, Realm of Lotheridon, Dali_")),
                 DiscordLinks.freeMinidungeons,

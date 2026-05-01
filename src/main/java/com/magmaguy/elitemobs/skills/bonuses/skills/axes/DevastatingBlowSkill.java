@@ -38,6 +38,15 @@ public class DevastatingBlowSkill extends SkillBonus implements ProcSkill {
         return Math.min(0.30, BASE_PROC_CHANCE + (skillLevel * 0.002));
     }
 
+    /**
+     * 1.5s internal cooldown so autoclickers cannot spam devastating blows
+     * faster than a legitimate attack cadence would allow.
+     */
+    @Override
+    public long getInternalCooldownMillis() {
+        return 1500L;
+    }
+
     @Override
     public void onProc(Player player, Object context) {
         if (!(context instanceof EliteMobDamagedByPlayerEvent event)) return;

@@ -12,7 +12,7 @@ public class TheQuarryDungeon extends ContentPackagesConfigFields {
     public TheQuarryDungeon() {
         super("the_quarry_dungeon",
                 true,
-                "&3The Quarry Dungeon",
+                "&2[Dynamic] &3The Quarry Dungeon",
                 new ArrayList<>(List.of("&fAn ancient dwarven quarry deep underground.",
                         "&6Credits: Dali_, MagmaGuy, Frostcone")),
                 DiscordLinks.freeMinidungeons,
