@@ -21,10 +21,17 @@ public class DungeonObjective {
     }
 
     public static DungeonObjective registerObjective(DungeonInstance dungeonInstance, String objectiveString) {
-        if (objectiveString.toLowerCase(Locale.ROOT).contains("filename")) {
+        if (objectiveString == null) return null;
+        String lower = objectiveString.toLowerCase(Locale.ROOT);
+        if (lower.contains("filename")) {
             return new DungeonKillTargetObjective(dungeonInstance, objectiveString);
-        } else if (objectiveString.toLowerCase(Locale.ROOT).contains("clearpercentage")) {
+        } else if (lower.contains("clearpercentage")) {
             return new DungeonKillPercentageObjective(dungeonInstance, objectiveString);
+        } else if (lower.endsWith(".yml")) {
+            // Legacy / typo'd entry: a bare boss filename without the "filename="
+            // prefix. Auto-correct so existing servers with the old format keep
+            // working instead of NPE-ing during instance teardown.
+            return new DungeonKillTargetObjective(dungeonInstance, "filename=" + objectiveString);
         }
         return null;
     }

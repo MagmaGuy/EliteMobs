@@ -8,14 +8,11 @@ import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomMusic;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.elitemobs.wormhole.Wormhole;
 import com.magmaguy.magmacore.util.Logger;
+import com.magmaguy.magmacore.util.WorldFolderResolver;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 public class WorldPackage extends EMPackage {
 
@@ -81,8 +78,8 @@ public class WorldPackage extends EMPackage {
         //Since the world isn't loaded, check if it should be
         this.isInstalled = contentPackagesConfigFields.isEnabled();
 
-        //Check if the world's been downloaded
-        isDownloaded = Files.exists(Paths.get(Bukkit.getWorldContainer() + File.separator + contentPackagesConfigFields.getWorldName()));
+        //Check if the world's been downloaded (either legacy or Paper-26.1+ modern layout)
+        isDownloaded = WorldFolderResolver.folderExists(contentPackagesConfigFields.getWorldName());
 
         if (isDownloaded && isInstalled) {
             world = DungeonUtils.loadWorld(this);

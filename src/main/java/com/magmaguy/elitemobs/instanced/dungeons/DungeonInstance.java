@@ -69,8 +69,19 @@ public class DungeonInstance extends MatchInstance {
         if (cancelled) return;
         super.lobbyLocation = lobbyLocation;
         this.contentPackagesConfigFields = contentPackagesConfigFields;
-        for (String rawObjective : contentPackagesConfigFields.getRawDungeonObjectives())
-            this.dungeonObjectives.add(DungeonObjective.registerObjective(this, rawObjective));
+        List<String> rawDungeonObjectives = contentPackagesConfigFields.getRawDungeonObjectives();
+        if (rawDungeonObjectives != null) {
+            for (String rawObjective : rawDungeonObjectives) {
+                DungeonObjective objective = DungeonObjective.registerObjective(this, rawObjective);
+                if (objective == null) {
+                    Logger.warn("Could not register dungeon objective '" + rawObjective + "' for "
+                            + contentPackagesConfigFields.getFilename()
+                            + " — entries must be of the form 'filename=<bossfile.yml>' or 'clearpercentage=<value>'.");
+                    continue;
+                }
+                this.dungeonObjectives.add(objective);
+            }
+        }
         this.world = world;
         this.instancedWorldName = world.getName();
         this.difficultyName = difficultyName;
@@ -215,7 +226,9 @@ public class DungeonInstance extends MatchInstance {
             return;
         }
         instanceRemovalScheduled = true;
-        dungeonObjectives.forEach(DungeonObjective::unregister);
+        for (DungeonObjective dungeonObjective : dungeonObjectives) {
+            if (dungeonObjective != null) dungeonObjective.unregister();
+        }
 
         participants.forEach(player -> player.sendMessage(DungeonsConfig.getInstancedDungeonClosingInstanceMessage()));
         HashSet<Player> participants = new HashSet<>(this.participants);

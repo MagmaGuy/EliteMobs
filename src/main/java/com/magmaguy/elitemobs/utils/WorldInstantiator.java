@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.utils;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.magmacore.util.Logger;
+import com.magmaguy.magmacore.util.WorldFolderResolver;
 import org.bukkit.Bukkit;
 
 import java.io.File;
@@ -26,9 +27,10 @@ public class WorldInstantiator {
             return null;
         }
 
+        // Wipe both legacy and Paper-26.1+ modern paths so the blueprint clone
+        // doesn't collide with leftovers from a previous instance of this world.
+        WorldFolderResolver.deleteAllLayouts(targetWorldName);
         File destinationWorld = new File(Bukkit.getWorldContainer(), targetWorldName);
-        if (destinationWorld.exists())
-            recursivelyDelete(destinationWorld);
 
         copyAll(blueprintWorld, destinationWorld);
 
@@ -72,7 +74,8 @@ public class WorldInstantiator {
     public static String getNewWorldName(String blueprintWorldName) {
         List<String> worldNames = new ArrayList<>();
         Bukkit.getWorlds().forEach(world -> worldNames.add(world.getName()));
-        for (File file : Bukkit.getWorldContainer().listFiles()) worldNames.add(file.getName());
+        // Picks up world folders at both legacy and Paper-26.1+ modern locations.
+        worldNames.addAll(WorldFolderResolver.listAllWorldNames());
         int highestNumber = 0;
 
         for (String worldName : worldNames) {
