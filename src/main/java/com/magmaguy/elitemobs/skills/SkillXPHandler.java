@@ -11,6 +11,7 @@ import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.utils.DebugMessage;
+import com.magmaguy.elitemobs.utils.MessageThrottler;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
@@ -245,6 +246,7 @@ public class SkillXPHandler implements Listener {
                     .replace("$mobLevel", String.valueOf(mobLevel))
                     .replace("$skill", "combat")
                     .replace("$playerLevel", String.valueOf(combatLevel));
+            MessageThrottler.pushNoXp(player, ChatColorConverter.convert(message));
         } else {
             int cappedLevel = combatLevel + 5;
             message = DungeonsConfig.getSkillXpCappedMessage()
@@ -252,8 +254,7 @@ public class SkillXPHandler implements Listener {
                     .replace("$skill", "combat")
                     .replace("$playerLevel", String.valueOf(combatLevel))
                     .replace("$xp", String.valueOf(cappedLevel));
+            player.sendMessage(ChatColorConverter.convert(message));
         }
-
-        player.sendMessage(ChatColorConverter.convert(message));
     }
 }

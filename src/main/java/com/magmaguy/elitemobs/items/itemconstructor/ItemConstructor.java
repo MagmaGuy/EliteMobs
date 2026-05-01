@@ -106,15 +106,13 @@ public class ItemConstructor {
         if (scriptedItem != null && !scriptedItem.isEmpty()
                 && org.bukkit.Bukkit.getPluginManager().getPlugin("FreeMinecraftModels") != null) {
             try {
-                Class<?> apiClass = Class.forName("com.magmaguy.freeminecraftmodels.api.ScriptedItemAPI");
-                java.lang.reflect.Method applyMethod = apiClass.getMethod("applyScriptedItemData",
-                        ItemStack.class, String.class);
-                boolean applied = (boolean) applyMethod.invoke(null, itemStack, scriptedItem);
+                boolean applied = com.magmaguy.freeminecraftmodels.api.ScriptedItemAPI
+                        .applyScriptedItemData(itemStack, scriptedItem);
                 if (!applied) {
                     com.magmaguy.magmacore.util.Logger.warn("Scripted item '" + scriptedItem
                             + "' not found in FreeMinecraftModels! Referenced by custom item: " + filename);
                 }
-            } catch (Exception e) {
+            } catch (NoClassDefFoundError e) {
                 com.magmaguy.magmacore.util.Logger.warn("Failed to apply scripted item data for '"
                         + scriptedItem + "': " + e.getMessage());
             }

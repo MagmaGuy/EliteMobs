@@ -449,7 +449,9 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
             case PROC -> {
                 if (skill instanceof ProcSkill procSkill) {
                     double procChance = procSkill.getProcChance(skillLevel);
-                    if (ThreadLocalRandom.current().nextDouble() < procChance) {
+                    if (ThreadLocalRandom.current().nextDouble() < procChance
+                            && com.magmaguy.elitemobs.skills.bonuses.interfaces.ProcCooldownTracker
+                                    .tryConsume(player, skill.getSkillId(), procSkill.getInternalCooldownMillis())) {
                         procSkill.onProc(player, this);
                         skill.incrementProcCount(player);
                         SkillBonus.sendSkillActionBar(player, skill);
@@ -580,7 +582,9 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
             case PROC -> {
                 if (skill instanceof ProcSkill procSkill) {
                     double procChance = procSkill.getProcChance(skillLevel);
-                    if (ThreadLocalRandom.current().nextDouble() < procChance) {
+                    if (ThreadLocalRandom.current().nextDouble() < procChance
+                            && com.magmaguy.elitemobs.skills.bonuses.interfaces.ProcCooldownTracker
+                                    .tryConsume(player, skill.getSkillId(), procSkill.getInternalCooldownMillis())) {
                         procSkill.onProc(player, this);
                         skill.incrementProcCount(player); // Track proc
                         SkillBonus.sendSkillActionBar(player, skill);
@@ -990,6 +994,15 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
             From this point on, the damage is confirmed to be processed by EliteMobs
              */
 
+            // Anti-autoclicker throttle: only count genuine melee swings against elites.
+            // Sweep secondaries, thorns, and projectiles don't represent additional clicks.
+            if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK
+                    && com.magmaguy.elitemobs.combatsystem.antiexploit.AutoclickerThrottle.shouldBlockHit(player)) {
+                event.setDamage(0);
+                event.setCancelled(true);
+                return;
+            }
+
             //nullify vanilla reductions, this is needed because boss armor is just cosmetic
             for (EntityDamageEvent.DamageModifier modifier : EntityDamageByEntityEvent.DamageModifier.values())
                 if (event.isApplicable(modifier) && modifier != EntityDamageEvent.DamageModifier.BASE)
@@ -1058,8 +1071,8 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
             else
                 combatMultiplier = MobCombatSettingsConfig.getDamageToEliteMultiplier();
 
-            // Apply floor + multipliers
-            damage = Round.twoDecimalPlaces(Math.max(damage, 1) * damageModifier * combatMultiplier);
+            // Apply multipliers
+            damage = Round.twoDecimalPlaces(damage * damageModifier * combatMultiplier);
 
             // Populate breakdown multipliers
             if (breakdown != null) {

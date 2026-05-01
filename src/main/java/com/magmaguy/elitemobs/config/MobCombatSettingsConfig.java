@@ -117,6 +117,14 @@ public class MobCombatSettingsConfig extends ConfigurationFile {
     private static String xpPopupFormat;
     @Getter
     private static String healthDisplaySeparator;
+    @Getter
+    private static boolean autoclickerThrottleEnabled;
+    @Getter
+    private static int autoclickerThrottleMaxHitsPerSecond;
+    @Getter
+    private static int autoclickerThrottlePenaltySeconds;
+    @Getter
+    private static String autoclickerThrottleMessage;
     private static MobCombatSettingsConfig instance;
 
     public MobCombatSettingsConfig() {
@@ -329,5 +337,18 @@ public class MobCombatSettingsConfig extends ConfigurationFile {
         healthDisplaySeparator = ConfigurationEngine.setString(
                 List.of("Separator between current and max health in the numeric health display."),
                 file, fileConfiguration, "healthDisplaySeparator", " &7/ ", true);
+        autoclickerThrottleEnabled = ConfigurationEngine.setBoolean(
+                List.of("Sets if EliteMobs will penalize players who hit elites faster than legitimate clicking allows (autoclickers).",
+                        "When a player lands more than autoclickerThrottleMaxHitsPerSecond melee hits on elites within one second, they are locked out of dealing damage to elites for autoclickerThrottlePenaltySeconds seconds and warned in chat."),
+                fileConfiguration, "autoclickerThrottleEnabled", true);
+        autoclickerThrottleMaxHitsPerSecond = ConfigurationEngine.setInt(
+                List.of("Sets the maximum number of melee hits a player can land on elites within a one-second sliding window before the throttle fires."),
+                fileConfiguration, "autoclickerThrottleMaxHitsPerSecond", 5);
+        autoclickerThrottlePenaltySeconds = ConfigurationEngine.setInt(
+                List.of("Sets how many seconds a player is locked out of dealing damage to elites after tripping the autoclicker throttle."),
+                fileConfiguration, "autoclickerThrottlePenaltySeconds", 5);
+        autoclickerThrottleMessage = ConfigurationEngine.setString(
+                List.of("Sets the message sent to players when the autoclicker throttle fires. Placeholder: $seconds for the remaining penalty duration."),
+                file, fileConfiguration, "autoclickerThrottleMessage", "&c[EliteMobs] &7You are attacking too fast. Damage to elites disabled for &e$seconds&7s.", true);
     }
 }

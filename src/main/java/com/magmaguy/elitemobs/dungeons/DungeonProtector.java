@@ -256,6 +256,42 @@ public class DungeonProtector implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventElytraGlideStart(EntityToggleGlideEvent event) {
+        if (!(event.getEntity() instanceof Player player)) return;
+        if (!event.isGliding()) return;
+        if (!EliteMobsWorld.isEliteMobsWorld(player.getWorld().getUID())) return;
+        if (EliteMobsWorld.getEliteMobsWorld(player.getWorld().getUID()).getContentPackagesConfigFields().isAllowElytra())
+            return;
+        if (shouldBypass(player)) return;
+        event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventElytraOnWorldEnter(PlayerChangedWorldEvent event) {
+        Player player = event.getPlayer();
+        if (!player.isGliding()) return;
+        if (!EliteMobsWorld.isEliteMobsWorld(player.getWorld().getUID())) return;
+        if (EliteMobsWorld.getEliteMobsWorld(player.getWorld().getUID()).getContentPackagesConfigFields().isAllowElytra())
+            return;
+        if (shouldBypass(player)) return;
+        player.setGliding(false);
+    }
+
+    // Backstop for client-side desync: cancelling EntityToggleGlideEvent does not reliably stop
+    // gliding on the client in 1.21.6+, so we re-assert setGliding(false) on every move tick while
+    // the player is gliding in a protected world. Cheap — early-exits for non-gliders.
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void enforceNoElytraInProtectedWorld(PlayerMoveEvent event) {
+        Player player = event.getPlayer();
+        if (!player.isGliding()) return;
+        if (!EliteMobsWorld.isEliteMobsWorld(player.getWorld().getUID())) return;
+        if (EliteMobsWorld.getEliteMobsWorld(player.getWorld().getUID()).getContentPackagesConfigFields().isAllowElytra())
+            return;
+        if (shouldBypass(player)) return;
+        player.setGliding(false);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void preventFlyToggle(PlayerToggleFlightEvent event) {
         if (!CombatTagConfig.isPreventFlyToggleInDungeons()) return;
         if (!EliteMobsWorld.isEliteMobsWorld(event.getPlayer().getWorld().getUID())) return;

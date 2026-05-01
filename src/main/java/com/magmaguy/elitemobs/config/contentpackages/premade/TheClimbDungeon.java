@@ -12,7 +12,7 @@ public class TheClimbDungeon extends ContentPackagesConfigFields {
     public TheClimbDungeon() {
         super("the_climb_dungeon",
                 true,
-                "&3The Climb Dungeon",
+                "&2[Dynamic] &3The Climb Dungeon",
                 new ArrayList<>(List.of("&fThe perfect starter instanced dungeon!",
                         "&6Credits: MagmaGuy, Frostcone, 69OzCanOfBepis, Realm of Lotheridon")),
                 DiscordLinks.freeMinidungeons,

@@ -12,7 +12,7 @@ public class TheBridgeSanctum extends ContentPackagesConfigFields {
     public TheBridgeSanctum() {
         super("the_bridge_sanctum",
                 true,
-                "&3The Bridge Sanctum",
+                "&2[Dynamic] &3The Bridge Sanctum",
                 new ArrayList<>(List.of("&fThe perfect intermediate instanced sanctum!",
                         "&6Credits: Dali_, MagmaGuy, Frostcone")),
                 DiscordLinks.freeMinidungeons,

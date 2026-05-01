@@ -12,7 +12,7 @@ public class TheNetherWastes extends ContentPackagesConfigFields {
     public TheNetherWastes() {
         super("the_nether_wastes_dungeon",
                 true,
-                "&3The Nether Wastes Dungeon",
+                "&2[Dynamic] &3The Nether Wastes Dungeon",
                 new ArrayList<>(List.of("&fAn unexplored part of the Nether.",
                         "&6Credits: MagmaGuy, Frostcone, Dali_")),
                 DiscordLinks.freeMinidungeons,

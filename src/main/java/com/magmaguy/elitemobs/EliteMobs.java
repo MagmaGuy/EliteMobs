@@ -5,6 +5,7 @@ package com.magmaguy.elitemobs;
  */
 
 import com.magmaguy.easyminecraftgoals.NMSManager;
+import com.magmaguy.elitemobs.api.EMDungeonLocator;
 import com.magmaguy.elitemobs.api.EliteMobsInitializedEvent;
 import com.magmaguy.elitemobs.collateralminecraftchanges.KeepNeutralsAngry;
 import com.magmaguy.elitemobs.collateralminecraftchanges.PlayerDeathMessageByEliteMob;
@@ -104,6 +105,7 @@ import com.magmaguy.elitemobs.wormhole.WormholeManager;
 import com.magmaguy.magmacore.MagmaCore;
 import com.magmaguy.magmacore.initialization.PluginInitializationConfig;
 import com.magmaguy.magmacore.initialization.PluginInitializationContext;
+import com.magmaguy.magmacore.location.LocationQueryRegistry;
 import com.magmaguy.magmacore.util.Logger;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
@@ -334,6 +336,7 @@ public class EliteMobs extends JavaPlugin {
         //Start the repeating tasks such as scanners
         initializationContext.step("Scheduled Tasks");
         launchRunnables();
+        com.magmaguy.elitemobs.utils.MessageThrottler.start();
 
         // Small check to make sure that PlaceholderAPI is installed
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
@@ -350,6 +353,20 @@ public class EliteMobs extends JavaPlugin {
         //Initialize em package content, such as world loading
         initializationContext.step("Content Packages");
         ContentPackagesConfig.initializePackages();
+        EMDungeonLocator emDungeonLocator = new EMDungeonLocator();
+        LocationQueryRegistry.registerDungeonLocator(emDungeonLocator);
+        if (Bukkit.getPluginManager().getPlugin("FreeMinecraftModels") != null) {
+            try {
+                com.magmaguy.freeminecraftmodels.api.LocationAPI.registerDungeonLocator(
+                        "EliteMobs", emDungeonLocator::contains);
+                Logger.info("Bridged EliteMobs dungeon locator into FreeMinecraftModels.");
+            } catch (NoClassDefFoundError e) {
+                Logger.warn("Failed to bridge dungeon locator into FreeMinecraftModels — the "
+                        + "installed FMM jar is older than 2.4.0 (missing LocationAPI). "
+                        + "is_in_dungeon in FMM scripts will not see EliteMobs dungeons.");
+            }
+        }
+        com.magmaguy.elitemobs.scripting.LuaEntityEnricher.register();
 
         //Initialize custom & regional bosses
         initializationContext.step("Custom Bosses");
@@ -497,6 +514,7 @@ public class EliteMobs extends JavaPlugin {
         FlamethrowerEnchantment.shutdown();
         LightningEnchantment.LightningEnchantmentEvents.shutdown();
         ItemLootShower.shutdown();
+        com.magmaguy.elitemobs.utils.MessageThrottler.shutdown();
         TrackingFireballSupport.shutdown();
         VersionChecker.shutdown();
         KeepNeutralsAngry.shutdown();

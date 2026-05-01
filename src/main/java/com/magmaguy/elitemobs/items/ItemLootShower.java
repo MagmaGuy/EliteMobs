@@ -10,6 +10,7 @@ import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.utils.CustomModelAdder;
+import com.magmaguy.elitemobs.utils.MessageThrottler;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
 import com.magmaguy.magmacore.util.Logger;
@@ -45,7 +46,6 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class ItemLootShower {
 
-    private static final HashMap<UUID, Double> playerCurrencyPickup = new HashMap<>();
     // For legacy (pre-1.21.4) real item system
     public static HashMap<UUID, LegacyCoin> coinValues = new HashMap<>();
     // Cached version check result
@@ -91,7 +91,6 @@ public class ItemLootShower {
     }
 
     public static void shutdown() {
-        playerCurrencyPickup.clear();
         coinValues.clear();
         useFakeItems = null;
     }
@@ -112,52 +111,6 @@ public class ItemLootShower {
     public ItemLootShower(Location location, Player player, int amount) {
         this.player = player;
         addIndirectly(location, amount);
-    }
-
-    private static void sendCurrencyNotification(Player player) {
-        UUID playerUUID = player.getUniqueId();
-        if (playerCurrencyPickup.containsKey(playerUUID)) return;
-
-        new BukkitRunnable() {
-            double oldAmount = 0;
-
-            @Override
-            public void run() {
-
-                if (!playerCurrencyPickup.containsKey(playerUUID)) {
-                    playerCurrencyPickup.put(playerUUID, 0.0);
-                    return;
-                }
-
-                if (oldAmount != playerCurrencyPickup.get(playerUUID)) {
-                    oldAmount = playerCurrencyPickup.get(playerUUID);
-                    return;
-                }
-
-                if (!player.isOnline()) {
-                    playerCurrencyPickup.remove(playerUUID);
-                    cancel();
-                    return;
-                }
-
-                player.sendMessage(EconomySettingsConfig.getChatCurrencyShowerMessage()
-                        .replace("$currency_name", EconomySettingsConfig.getCurrencyName())
-                        .replace("$amount", playerCurrencyPickup.get(playerUUID) + ""));
-
-                playerCurrencyPickup.remove(playerUUID);
-                sendAdventurersGuildNotification(player);
-
-                cancel();
-
-            }
-
-        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 40);
-
-    }
-
-    private static void sendAdventurersGuildNotification(Player player) {
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                TextComponent.fromLegacyText(EconomySettingsConfig.getAdventurersGuildNotificationMessage()));
     }
 
     private void addIndirectly(Location location, int currencyAmount2) {
@@ -415,20 +368,13 @@ public class ItemLootShower {
             Player player = (Player) event.getEntity();
             event.getItem().remove();
             EconomyHandler.addCurrency(player.getUniqueId(), amountIncremented);
-            sendCurrencyNotification(player);
-
-            // Cache for counting how much coin they're getting over a short amount of time
-            UUID playerUUID = player.getUniqueId();
-            if (playerCurrencyPickup.containsKey(playerUUID))
-                playerCurrencyPickup.put(playerUUID, playerCurrencyPickup.get(playerUUID) + amountIncremented);
-            else
-                playerCurrencyPickup.put(playerUUID, amountIncremented);
+            double runningTotal = MessageThrottler.pushCurrency(player, amountIncremented);
 
             player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
                     TextComponent.fromLegacyText(
                             EconomySettingsConfig.getActionBarCurrencyShowerMessage()
                                     .replace("$currency_name", EconomySettingsConfig.getCurrencyName())
-                                    .replace("$amount", Round.twoDecimalPlaces(playerCurrencyPickup.get(playerUUID)) + "")));
+                                    .replace("$amount", Round.twoDecimalPlaces(runningTotal) + "")));
         }
 
         @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
@@ -548,19 +494,13 @@ public class ItemLootShower {
         private void collectCoin(Player targetPlayer) {
             fakeItem.remove();
             EconomyHandler.addCurrency(targetPlayer.getUniqueId(), value);
-            sendCurrencyNotification(targetPlayer);
-
-            // Cache for counting how much coin they're getting over a short amount of time
-            if (playerCurrencyPickup.containsKey(playerUUID))
-                playerCurrencyPickup.put(playerUUID, playerCurrencyPickup.get(playerUUID) + value);
-            else
-                playerCurrencyPickup.put(playerUUID, value);
+            double runningTotal = MessageThrottler.pushCurrency(targetPlayer, value);
 
             targetPlayer.spigot().sendMessage(ChatMessageType.ACTION_BAR,
                     TextComponent.fromLegacyText(
                             EconomySettingsConfig.getActionBarCurrencyShowerMessage()
                                     .replace("$currency_name", EconomySettingsConfig.getCurrencyName())
-                                    .replace("$amount", Round.twoDecimalPlaces(playerCurrencyPickup.get(playerUUID)) + "")));
+                                    .replace("$amount", Round.twoDecimalPlaces(runningTotal) + "")));
         }
     }
 
@@ -616,20 +556,13 @@ public class ItemLootShower {
                     if (player.getLocation().distanceSquared(item.getLocation()) <= 1) {
                         item.remove();
                         EconomyHandler.addCurrency(player.getUniqueId(), value);
-                        sendCurrencyNotification(player);
-
-                        // Cache for counting how much coin they're getting over a short amount of time
-                        UUID coinPlayerUUID = player.getUniqueId();
-                        if (playerCurrencyPickup.containsKey(coinPlayerUUID))
-                            playerCurrencyPickup.put(coinPlayerUUID, playerCurrencyPickup.get(coinPlayerUUID) + value);
-                        else
-                            playerCurrencyPickup.put(coinPlayerUUID, value);
+                        double runningTotal = MessageThrottler.pushCurrency(player, value);
 
                         player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
                                 TextComponent.fromLegacyText(
                                         EconomySettingsConfig.getActionBarCurrencyShowerMessage()
                                                 .replace("$currency_name", EconomySettingsConfig.getCurrencyName())
-                                                .replace("$amount", Round.twoDecimalPlaces(playerCurrencyPickup.get(coinPlayerUUID)) + "")));
+                                                .replace("$amount", Round.twoDecimalPlaces(runningTotal) + "")));
                         coinValues.remove(item.getUniqueId());
                         cancel();
                         return;

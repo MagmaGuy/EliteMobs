@@ -12,7 +12,7 @@ public class TheDeepMinesDungeon extends ContentPackagesConfigFields {
     public TheDeepMinesDungeon() {
         super("the_deep_mines_dungeon",
                 true,
-                "&3The Deep Mines Dungeon",
+                "&2[Dynamic] &3The Deep Mines Dungeon",
                 new ArrayList<>(List.of("&fBelow lies the deepest mine ever dug.",
                         "&6Credits: Dali, MagmaGuy, FrostCone")),
                 DiscordLinks.freeMinidungeons,

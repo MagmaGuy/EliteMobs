@@ -1,5 +1,8 @@
 package com.magmaguy.elitemobs.config;
 
+import com.magmaguy.elitemobs.config.customarenas.CustomArenasConfig;
+import com.magmaguy.elitemobs.config.customarenas.CustomArenasConfigFields;
+import com.magmaguy.elitemobs.quests.objectives.ArenaObjective;
 import com.magmaguy.elitemobs.quests.objectives.CustomFetchObjective;
 import com.magmaguy.elitemobs.quests.objectives.DialogObjective;
 import com.magmaguy.elitemobs.quests.objectives.KillObjective;
@@ -65,6 +68,8 @@ public class QuestsConfig extends ConfigurationFile {
     private static String fetchQuestScoreboardProgressionLine;
     @Getter
     private static String dialogQuestScoreboardProgressionLine;
+    @Getter
+    private static String arenaQuestScoreboardProgressionLine;
     @Getter
     private static int maximumActiveQuests;
     @Getter
@@ -200,6 +205,13 @@ public class QuestsConfig extends ConfigurationFile {
             newString = fetchQuestScoreboardProgressionLine;
         else if (objective instanceof DialogObjective)
             newString = dialogQuestScoreboardProgressionLine;
+        else if (objective instanceof ArenaObjective arenaObjective) {
+            CustomArenasConfigFields arenaFields = CustomArenasConfig.getCustomArena(arenaObjective.getArenaFilename());
+            String arenaDisplayName = arenaFields != null && arenaFields.getArenaName() != null
+                    ? arenaFields.getArenaName()
+                    : arenaObjective.getArenaFilename();
+            newString = arenaQuestScoreboardProgressionLine.replace("$arenaName", arenaDisplayName);
+        }
         newString = newString.replace("$name", safeObjectiveName(objective));
         newString = newString.replace("$current", objective.getCurrentAmount() + "");
         newString = newString.replace("$target", objective.getTargetAmount() + "");
@@ -299,6 +311,9 @@ public class QuestsConfig extends ConfigurationFile {
         dialogQuestScoreboardProgressionLine = ConfigurationEngine.setString(
                 List.of("Sets the formatting for scoreboard progression messages of dialog quests."),
                 file, fileConfiguration, "dialogQuestScoreboardProgressionMessage", "&c➤Talk to $name:$color$current&0/$color$target", true);
+        arenaQuestScoreboardProgressionLine = ConfigurationEngine.setString(
+                List.of("Sets the formatting for scoreboard progression messages of arena quests."),
+                file, fileConfiguration, "arenaQuestScoreboardProgressionMessage", "&c➤Complete $arenaName", true);
 
         questEntityTypes = setEntityTypes(fileConfiguration, file);
 
