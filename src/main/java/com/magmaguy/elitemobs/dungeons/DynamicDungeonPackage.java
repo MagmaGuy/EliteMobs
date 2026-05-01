@@ -7,7 +7,7 @@ import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.magmacore.util.Logger;
-import org.apache.commons.io.FileUtils;
+import com.magmaguy.magmacore.util.WorldFolderResolver;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -51,14 +51,12 @@ public class DynamicDungeonPackage extends EMPackage implements CombatContent {
             this.isInstalled = false;
             return;
         } else {
-            for (File worldFile : Bukkit.getWorldContainer().listFiles()) {
-                if (worldFile.getName().contains(file.getName()) && worldFile.getName().matches(".*_\\d{1,2}$")) {
-                    try {
-                        FileUtils.deleteDirectory(worldFile);
-                        Logger.info("Removing previously instanced world " + worldFile.getName());
-                    } catch (Exception e) {
-                        Logger.warn("Failed to remove previously instanced world " + worldFile.getName());
-                    }
+            //Scans both legacy and Paper-26.1+ modern world layouts.
+            String dungeonName = file.getName();
+            for (String worldName : WorldFolderResolver.listAllWorldNames()) {
+                if (worldName.contains(dungeonName) && worldName.matches(".*_\\d{1,2}$")) {
+                    WorldFolderResolver.deleteAllLayouts(worldName);
+                    Logger.info("Removing previously instanced world " + worldName);
                 }
             }
         }

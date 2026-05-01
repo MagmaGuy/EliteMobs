@@ -26,7 +26,7 @@ public class ThePalaceSanctum extends ContentPackagesConfigFields {
                 "&aDynamic Sanctum\n" + "$bossCount boss encounters\n" + "&3Storm the palace and\n" + "&3defeat its ruler!",
                 "&bBefore being able to enter the city you must deal with the guardian on the bridge!",
                 "&bYou have left The Palace!",
-                List.of("the_palace_old_stone_king_p1.yml"),
+                List.of("filename=the_palace_old_stone_king_p1.yml"),
                 "em_id_the_palace",
                 -1,
                 false);
