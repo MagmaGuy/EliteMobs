@@ -6,14 +6,11 @@ import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
+import com.magmaguy.magmacore.util.WorldFolderResolver;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 /**
  * This class is specifically for world-based dungeons
@@ -40,7 +37,8 @@ public class WorldDungeonPackage extends WorldPackage implements Dungeon {
                 Bukkit.getWorld(contentPackagesConfigFields.getWormholeWorldName()) == null) {
             // Check if the wormhole world file exists before attempting to load it
             String wormholeWorldName = contentPackagesConfigFields.getWormholeWorldName();
-            boolean wormholeWorldExists = Files.exists(Paths.get(Bukkit.getWorldContainer() + File.separator + wormholeWorldName));
+            // Picks up the wormhole world at either legacy or Paper-26.1+ modern layout.
+            boolean wormholeWorldExists = WorldFolderResolver.folderExists(wormholeWorldName);
 
             if (wormholeWorldExists) {
                 wormholeWorld = DungeonUtils.loadWorld(this.getContentPackagesConfigFields().getWormholeWorldName(), this.getContentPackagesConfigFields().getEnvironment(), contentPackagesConfigFields);
