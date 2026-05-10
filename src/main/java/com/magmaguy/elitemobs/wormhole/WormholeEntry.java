@@ -878,6 +878,17 @@ public class WormholeEntry implements PersistentObject {
     }
 
     /**
+     * Called by {@link WormholeManager} when no players are within the wormhole's
+     * nearby radius this tick. Tears down any in-memory line entities so they
+     * can't accumulate as orphans across reload / restart cycles — players who
+     * walk back will get a freshly recreated set on next tick.
+     */
+    public void onNoNearbyPlayers() {
+        if (!linesInitialized && lineDataList.isEmpty()) return;
+        clearLines();
+    }
+
+    /**
      * Maps the wormhole's particle color (RGB) to the closest matching concrete color
      */
     private Material getConcreteColorForWormhole() {

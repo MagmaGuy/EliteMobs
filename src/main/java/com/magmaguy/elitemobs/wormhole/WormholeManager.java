@@ -301,10 +301,13 @@ public class WormholeManager {
                 continue;
             }
 
-            // Get nearby players (within 30 blocks) - skip everything if none
+            // Get nearby players (within 30 blocks) - skip everything if none,
+            // but tear down any lingering line visuals first so they can't
+            // accumulate as orphans across the away-period.
             List<Player> nearbyPlayers = getNearbyPlayers(wormholeEntry);
             if (nearbyPlayers.isEmpty()) {
-                continue; // No players nearby - skip visuals and teleport checks
+                wormholeEntry.onNoNearbyPlayers();
+                continue;
             }
 
             // Tick visuals with nearby players list (for LOS culling)
