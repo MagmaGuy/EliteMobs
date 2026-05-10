@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
@@ -291,6 +292,23 @@ public class EliteItemManager {
 
     public static boolean isArmor(@Nullable ItemStack itemStack) {
         return getArmorLevel(itemStack) > 0;
+    }
+
+    /**
+     * Returns true if the ItemStack is an elite item that is one durability point
+     * away from breaking. Used by the broken-state UI and to gate combat actions
+     * (cancel bow shots, cancel melee damage) when the elite weapon is "broken".
+     *
+     * <p>Returns false for null, non-elite, non-damageable, or zero-max-durability
+     * items so callers can pass arbitrary ItemStacks safely.
+     */
+    public static boolean isOnLastDamage(@Nullable ItemStack itemStack) {
+        if (itemStack == null) return false;
+        if (!itemStack.hasItemMeta()) return false;
+        if (!ItemTagger.isEliteItem(itemStack)) return false;
+        if (!(itemStack.getItemMeta() instanceof Damageable damageable)) return false;
+        if (itemStack.getType().getMaxDurability() == 0) return false;
+        return damageable.getDamage() + 1 >= itemStack.getType().getMaxDurability();
     }
 
     public static void setEliteLevel(@Nullable ItemStack itemStack, int level) {

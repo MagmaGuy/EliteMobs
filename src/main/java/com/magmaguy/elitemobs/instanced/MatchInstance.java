@@ -323,6 +323,30 @@ public abstract class MatchInstance {
         public void onPlayerDamage(EntityDamageEvent event) {
             if (!event.getEntityType().equals(EntityType.PLAYER)) return;
             Player player = (Player) event.getEntity();
+
+            // Loud admin warning: a player taking WORLD_BORDER damage inside an EM
+            // instance almost always means the dungeon's blueprint world shipped
+            // without its world-border data, or the border data didn't carry over
+            // when the world was cloned. On Paper 1.21.6+ the border is stored in
+            // its own file inside the dimension data folder, so a stale clone is
+            // easy to miss. Without this warning the symptom looks like "dungeon
+            // closes the moment players walk in", because the border tick deals
+            // lethal damage which cascades into removePlayer → defeat → removeInstance.
+            if (event.getCause() == EntityDamageEvent.DamageCause.WORLD_BORDER) {
+                MatchInstance matchInstanceForWarn = PlayerData.getMatchInstance(player);
+                if (matchInstanceForWarn != null) {
+                    org.bukkit.Location loc = player.getLocation();
+                    com.magmaguy.magmacore.util.Logger.warn(
+                            "Player " + player.getName() + " took WORLD_BORDER damage inside dungeon instance '"
+                                    + (loc.getWorld() != null ? loc.getWorld().getName() : "?")
+                                    + "' at " + loc.getX() + "," + loc.getY() + "," + loc.getZ()
+                                    + ". This usually means the blueprint world is missing its world-border config "
+                                    + "(on Paper 1.21.6+ border data lives in its own file inside the dimension data folder, "
+                                    + "and a stale blueprint clone may not include it). The instance will be torn down by "
+                                    + "the lethal-damage path. Fix the blueprint world's border so players spawn inside it.");
+                }
+            }
+
             if (event.getFinalDamage() < player.getHealth()) return;
             MatchInstance matchInstance = PlayerData.getMatchInstance(player);
             if (matchInstance == null) return;

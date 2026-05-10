@@ -3,11 +3,14 @@ package com.magmaguy.elitemobs.collateralminecraftchanges;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.items.ItemTagger;
+import com.magmaguy.magmacore.util.ChatColorConverter;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
@@ -29,15 +32,6 @@ public class AlternativeDurabilityLoss implements Listener {
         double durabilityLevel = 1 + (ItemTagger.getEnchantment(itemStack.getItemMeta(), Enchantment.UNBREAKING.getKey()) / 4d);
         double defaultMultiplier = 0.5; //just tweaking defaults
         return durabilityLoss / durabilityLevel * defaultMultiplier;
-    }
-
-    private static boolean isOnLastDamage(ItemStack itemStack) {
-        if (itemStack == null) return false;
-        if (!itemStack.hasItemMeta()) return false;
-        if (!ItemTagger.isEliteItem(itemStack)) return false;
-        if (!(itemStack.getItemMeta() instanceof Damageable)) return false;
-        if (itemStack.getType().getMaxDurability() == 0) return false;
-        return ((Damageable) itemStack.getItemMeta()).getDamage() + 1 >= itemStack.getType().getMaxDurability();
     }
 
     public static void doDurabilityLoss(Player player) {
@@ -82,7 +76,34 @@ public class AlternativeDurabilityLoss implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerShoot(EntityShootBowEvent event) {
         if (!EliteItemManager.isEliteMobsItem(event.getBow())) return;
-        if (isOnLastDamage(event.getBow())) event.setCancelled(true);
+        if (EliteItemManager.isOnLastDamage(event.getBow())) {
+            event.setCancelled(true);
+            if (event.getEntity() instanceof Player player) sendBrokenWeaponWarning(player);
+        }
+    }
+
+    /**
+     * Mirror of the bow handler for melee. Cancels EntityDamageByEntityEvent when the
+     * attacking player's mainhand is an elite weapon at last durability, so a "broken"
+     * elite spear/sword/axe/scythe truly stops dealing damage instead of only losing
+     * its cached enchantment effects via {@link com.magmaguy.elitemobs.playerdata.PlayerItem}.
+     */
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    public void onMeleeAttack(EntityDamageByEntityEvent event) {
+        if (!(event.getDamager() instanceof Player player)) return;
+        EntityDamageEvent.DamageCause cause = event.getCause();
+        if (cause != EntityDamageEvent.DamageCause.ENTITY_ATTACK
+                && cause != EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK) return;
+        ItemStack mainHand = player.getInventory().getItemInMainHand();
+        if (!EliteItemManager.isOnLastDamage(mainHand)) return;
+        event.setCancelled(true);
+        sendBrokenWeaponWarning(player);
+    }
+
+    private static void sendBrokenWeaponWarning(Player player) {
+        String warning = ItemSettingsConfig.getBrokenItemSubtitleWarning();
+        if (warning == null || warning.isEmpty()) return;
+        player.sendTitle("", ChatColorConverter.convert(warning), 0, 20, 10);
     }
 
 }
