@@ -429,8 +429,23 @@ public class ScriptZone {
                     return;
                 }
 
+                // Cancel if any shape's center has lost its world (e.g. a referenced
+                // entity got despawned mid-tick) — otherwise filterBy* would log
+                // "World is null in filterByElite/Player/Living" once per shape per
+                // tick forever and the script keeps ticking with no work to do.
+                List<Shape> shapes = generateShapes(scriptActionData, false);
+                for (Shape shape : shapes) {
+                    Location center = shape.getCenter();
+                    if (center == null || center.getWorld() == null) {
+                        Logger.warn("Cancelling zone listener task for boss '"
+                                + eliteEntity.getName() + "' — shape origin world is null.");
+                        cancel();
+                        return;
+                    }
+                }
+
                 // Retrieve current entities in the zone
-                Collection<LivingEntity> newEntities = getEntitiesInArea(generateShapes(scriptActionData, false), TargetType.ZONE_FULL);
+                Collection<LivingEntity> newEntities = getEntitiesInArea(shapes, TargetType.ZONE_FULL);
 
                 // Trigger enter events for entities that have just entered
                 for (LivingEntity livingEntity : newEntities) {

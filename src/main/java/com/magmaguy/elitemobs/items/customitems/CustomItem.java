@@ -104,7 +104,7 @@ public class CustomItem {
     // Adds custom items to the list used by the getloot GUI
     private static void addCustomItem(CustomItem customItem) {
         customItemStackList.add(customItem.generateDefaultsItemStack(null, false, null));
-        if (customItem.getItemType().equals(ItemType.UNIQUE)) return;
+        if (isShopExcluded(customItem.getItemType())) return;
         customItemStackShopList.add(customItem.generateDefaultsItemStack(null, true, null));
     }
 
@@ -176,7 +176,7 @@ public class CustomItem {
 
             // Regenerate loot menu items
             customItemStackList.add(customItem.generateDefaultsItemStack(null, false, null));
-            if (!customItem.getItemType().equals(ItemType.UNIQUE))
+            if (!isShopExcluded(customItem.getItemType()))
                 customItemStackShopList.add(customItem.generateDefaultsItemStack(null, true, null));
 
             // Regenerate tiered loot
@@ -401,8 +401,33 @@ public class CustomItem {
     }
 
     public enum ItemType {
+        /**
+         * Default. Item enters the random elite drop pool AND is purchasable in
+         * shops (CustomShopMenu).
+         */
         CUSTOM,
-        UNIQUE
+        /**
+         * Boss-only / quest-only. Item is excluded from the random elite drop pool
+         * AND from shops — it can only be obtained through the explicit drop tables
+         * of specific bosses, treasure chests, or quest rewards.
+         */
+        UNIQUE,
+        /**
+         * Drops only. Item enters the random elite drop pool just like CUSTOM, but
+         * is excluded from shops — players can find it as a normal elite drop but
+         * can never simply buy it. Useful for items that should feel earned but
+         * don't need to be locked to a specific boss.
+         */
+        DROPPABLE
+    }
+
+    /**
+     * Items of these types are kept out of the shop's randomized inventory
+     * ({@link #customItemStackShopList}). Drop-pool eligibility is controlled
+     * separately in {@link #parseScalability()}.
+     */
+    private static boolean isShopExcluded(ItemType type) {
+        return type == ItemType.UNIQUE || type == ItemType.DROPPABLE;
     }
 
     public enum Scalability {

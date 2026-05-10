@@ -16,7 +16,6 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.Damageable;
 
 import java.util.ArrayList;
 
@@ -59,14 +58,6 @@ public class PlayerItem {
         fullUpdate(itemStack);
     }
 
-    private boolean isOnLastDamage(ItemStack itemStack) {
-        if (!itemStack.hasItemMeta()) return false;
-        if (!ItemTagger.isEliteItem(itemStack)) return false;
-        if (!(itemStack.getItemMeta() instanceof Damageable)) return false;
-        if (itemStack.getType().getMaxDurability() == 0) return false;
-        return ((Damageable) itemStack.getItemMeta()).getDamage() + 1 >= itemStack.getType().getMaxDurability();
-    }
-
     private boolean fullUpdate(ItemStack itemStack) {
 
         //case when both are null
@@ -82,7 +73,7 @@ public class PlayerItem {
             return fillNullItem();
         }
 
-        if (isOnLastDamage(itemStack)) {
+        if (EliteItemManager.isOnLastDamage(itemStack)) {
             if (!displayingAsBroken) {
                 BossBarUtil.DisplayBrokenItemBossBar(equipmentSlot, player, ItemSettingsConfig.getNoItemDurabilityMessage().replace("$item", !itemStack.getItemMeta().hasDisplayName() ? itemStack.getType().toString() : itemStack.getItemMeta().getDisplayName()));
                 displayingAsBroken = true;

@@ -355,12 +355,59 @@ public class EliteMobs extends JavaPlugin {
         ContentPackagesConfig.initializePackages();
         EMDungeonLocator emDungeonLocator = new EMDungeonLocator();
         LocationQueryRegistry.registerDungeonLocator(emDungeonLocator);
+
+        // Per-dungeon protection check — EliteMobsWorld is only populated for
+        // worlds where the content pack opted into protection (isProtect=true
+        // in the package config). Sandbox/unprotected EM worlds register as
+        // owned but report is_protected=false.
+        java.util.function.Predicate<org.bukkit.Location> emProtectionFn = loc ->
+                loc != null && loc.getWorld() != null
+                        && com.magmaguy.elitemobs.dungeons.EliteMobsWorld.isEliteMobsWorld(loc.getWorld().getUID());
+
+        // Kind-tagging for typed queries — every EM-owned location reports its
+        // package type and DungeonSizeCategory so cross-plugin scripts can branch
+        // on whether they're in an adventure, minidungeon, raid, etc., without
+        // hardcoding world names. Always includes "elitemobs" as a stable base tag.
+        java.util.function.Function<org.bukkit.Location, java.util.Set<String>> emKindsFn = loc -> {
+            if (loc == null || loc.getWorld() == null) return java.util.Collections.emptySet();
+            com.magmaguy.elitemobs.dungeons.EMPackage pkg =
+                    com.magmaguy.elitemobs.dungeons.EMPackage.getContent(loc.getWorld().getName());
+            if (!(pkg instanceof com.magmaguy.elitemobs.dungeons.WorldPackage)) return java.util.Collections.emptySet();
+            java.util.Set<String> kinds = new java.util.HashSet<>();
+            kinds.add("elitemobs");
+            kinds.add("world_package");
+            if (pkg instanceof com.magmaguy.elitemobs.dungeons.WorldDungeonPackage) kinds.add("open_world_dungeon");
+            com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields.DungeonSizeCategory size =
+                    pkg.getContentPackagesConfigFields().getDungeonSizeCategory();
+            if (size != null) kinds.add(size.name().toLowerCase(java.util.Locale.ROOT));
+            return kinds;
+        };
+
+        // Cross-plugin discovery via Bukkit's ServicesManager. Any consumer plugin
+        // shading MagmaCore (FMM, MegaBlockSurvivors, BetterStructures, …) can call
+        // em.location.owned_by(loc, "EliteMobs"), .owners(loc), .is_protected(loc),
+        // .kinds_at(loc), .has_kind(loc, "adventure") and see this entry, independent
+        // of which classloader hosts their Lua scripts.
+        com.magmaguy.magmacore.location.api.LocationOwnership.registerTyped(
+                this, "EliteMobs", emKindsFn, emProtectionFn);
+
+        // Same protection function on EM's own LocationQueryRegistry copy so
+        // EM-internal callers of is_protected get the right answer too.
+        LocationQueryRegistry.registerProtectionProvider(new com.magmaguy.magmacore.location.RegionProtectionProvider() {
+            @Override public boolean isProtected(org.bukkit.Location loc) { return emProtectionFn.test(loc); }
+            @Override public String providerName() { return "EliteMobs"; }
+        });
+
+        // Legacy bridge: older FMM jars don't query LocationOwnership yet, so push
+        // directly into their isolated registry. Newer FMM picks it up via the
+        // ServicesManager path above and ignores this side; harmless either way.
         if (Bukkit.getPluginManager().getPlugin("FreeMinecraftModels") != null) {
             try {
                 com.magmaguy.freeminecraftmodels.api.LocationAPI.registerDungeonLocator(
                         "EliteMobs", emDungeonLocator::contains);
-                Logger.info("Bridged EliteMobs dungeon locator into FreeMinecraftModels.");
             } catch (NoClassDefFoundError e) {
+                // FMM too old to expose LocationAPI — older versions also lack
+                // the LocationOwnership ServicesManager path, so just warn.
                 Logger.warn("Failed to bridge dungeon locator into FreeMinecraftModels — the "
                         + "installed FMM jar is older than 2.4.0 (missing LocationAPI). "
                         + "is_in_dungeon in FMM scripts will not see EliteMobs dungeons.");

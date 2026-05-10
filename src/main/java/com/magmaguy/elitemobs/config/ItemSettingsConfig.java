@@ -99,6 +99,8 @@ public class ItemSettingsConfig extends ConfigurationFile {
     @Getter
     private static String noItemDurabilityMessage;
     @Getter
+    private static String brokenItemSubtitleWarning;
+    @Getter
     private static int minimumProcedurallyGeneratedDiamondLootLevelPlusSeven;
     @Getter
     private static String simlootMessageSuccess;
@@ -331,6 +333,10 @@ public class ItemSettingsConfig extends ConfigurationFile {
         noItemDurabilityMessage = ConfigurationEngine.setString(
                 List.of("Sets the characters prefixed to vanilla enchantments in item lore."),
                 file, fileConfiguration, "noItemDurabilityMessage", "&8[EliteMobs] $item &4is broken! It won't work until repaired!", true);
+        brokenItemSubtitleWarning = ConfigurationEngine.setString(
+                List.of("Subtitle shown to a player when their attack is cancelled because their held elite weapon is broken.",
+                        "Set to an empty string to disable the subtitle."),
+                file, fileConfiguration, "brokenItemSubtitleWarning", "&cYour weapon is broken!", true);
         minimumProcedurallyGeneratedDiamondLootLevelPlusSeven = ConfigurationEngine.setInt(
                 List.of("Sets the minimum level, +7, of bosses that can procedurally generated drop diamond gear in EliteMobs.",
                         "There is no procedurally generated netherite gear in EliteMobs, only custom loot."),

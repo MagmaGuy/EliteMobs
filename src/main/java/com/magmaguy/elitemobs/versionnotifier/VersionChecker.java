@@ -299,9 +299,12 @@ public class VersionChecker {
     }
 
     private static void checkContentVersion() {
+        if (MetadataHandler.shutdownRequested) return;
         Bukkit.getScheduler().runTaskAsynchronously(MetadataHandler.PLUGIN, () -> {
             try {
+                if (MetadataHandler.shutdownRequested) return;
                 String jsonResponse = fetchFromNightbreak("https://nightbreak.io/api/dlc");
+                if (MetadataHandler.shutdownRequested) return;
                 connectionFailed = false;
                 connectionRetryCount = 0;
 
@@ -310,9 +313,11 @@ public class VersionChecker {
                 processContentVersionData(remoteVersions);
 
                 // Prefetch access info after version check completes
+                if (MetadataHandler.shutdownRequested) return;
                 prefetchAccessInfoInternal();
 
             } catch (IOException e) {
+                if (MetadataHandler.shutdownRequested) return;
                 // Reset throttle so the next setup menu open can retry immediately
                 lastRefreshTimestamp = 0;
                 handleConnectionError("content version check", e);
@@ -517,6 +522,12 @@ public class VersionChecker {
         int prefetched = 0;
 
         for (EMPackage pkg : packageSnapshot) {
+            // Bail fast if the plugin is being disabled mid-loop — each
+            // checkAccess can take up to 10s on its HTTP timeout, and Bukkit
+            // nags ("not properly shutting down its async tasks") if this
+            // task is still alive when onDisable returns.
+            if (MetadataHandler.shutdownRequested) return;
+
             String slug = pkg.getContentPackagesConfigFields().getNightbreakSlug();
             if (slug == null || slug.isEmpty()) continue;
 
