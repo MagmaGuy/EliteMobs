@@ -203,7 +203,20 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
         super.setEliteLoot(customBossesConfigFields.isDropsEliteMobsLoot());
         super.setRandomLoot(customBossesConfigFields.isDropsRandomLoot());
         super.setVanillaLoot(customBossesConfigFields.isDropsVanillaLoot());
-        super.setLevel(customBossesConfigFields.getLevel());
+        // Only overwrite the existing level when the new config provides an
+        // explicit positive value. A config-level of -1 is the dynamic-level
+        // sentinel and must not clobber a level that was previously fixed
+        // (e.g. by an InstancedBossEntity constructor pulling the dungeon's
+        // selected level, or by a command that spawned the boss with an
+        // explicit level). Without this guard, every phase switch of a
+        // dynamic-level phase boss reset the boss back to -1 and the spawn()
+        // path immediately re-applied the get-nearest-player dynamic scaling
+        // — turning instanced dungeon bosses into player-scaling mobs mid-fight
+        // instead of holding the instance level for the whole encounter.
+        int newConfigLevel = customBossesConfigFields.getLevel();
+        if (newConfigLevel != -1 || super.level == -1) {
+            super.setLevel(newConfigLevel);
+        }
         setPluginName();
         super.setElitePowers(ElitePowerParser.parsePowers(customBossesConfigFields, this));
         if (this instanceof RegionalBossEntity) {

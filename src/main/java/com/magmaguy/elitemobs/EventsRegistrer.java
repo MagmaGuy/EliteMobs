@@ -318,6 +318,7 @@ public class EventsRegistrer {
         //Arenas
         register(new ArenaMenu.ArenaMenuEvents());
         register(new ArenaInstance.ArenaInstanceEvents());
+        register(new ArenaInstance.ArenaInstanceLoader());
         register(new MatchInstance.MatchInstanceEvents());
 
         //Combat tag

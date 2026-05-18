@@ -63,6 +63,20 @@ public class CustomModel implements CustomModelInterface {
         else if (ModelEngineChecker.modelEngineIsInstalled())
             modelPlugin = ModelPlugin.MODEL_ENGINE;
         else modelPlugin = ModelPlugin.NONE;
+        // When FMM is the model provider, subscribe to its reload event so
+        // NPCs that survive an FMM /reload get their display entity re-spawned.
+        // Without this, NPCs go invisible after every /freeminecraftmodels reload
+        // until the server itself restarts.
+        if (modelPlugin == ModelPlugin.FREE_MINECRAFT_MODELS) {
+            try {
+                Bukkit.getPluginManager().registerEvents(
+                        new com.magmaguy.elitemobs.thirdparty.custommodels.freeminecraftmodels.CustomModelFMM.FmmReloadListener(),
+                        com.magmaguy.elitemobs.MetadataHandler.PLUGIN);
+            } catch (Throwable t) {
+                // FMM not actually present at runtime (classloader issue) — leave the
+                // listener unregistered; reload-recovery just won't work for NPCs.
+            }
+        }
     }
 
     public static void reloadModels() {

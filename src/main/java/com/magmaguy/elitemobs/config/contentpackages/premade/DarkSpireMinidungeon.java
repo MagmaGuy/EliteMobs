@@ -39,7 +39,6 @@ public class DarkSpireMinidungeon extends ContentPackagesConfigFields {
         setSetupMenuDescription(List.of(
                 "&2A Dynamic Minidungeon where you choose the level!",
                 "&2Select from levels based on your guild rank!"));
-        setDungeonLockoutMinutes(1440);
         setNightbreakSlug("the-dark-spire");
     }
 }

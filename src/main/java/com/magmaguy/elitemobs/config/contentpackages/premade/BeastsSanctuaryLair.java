@@ -37,7 +37,6 @@ public class BeastsSanctuaryLair extends ContentPackagesConfigFields {
                 Map.of("name", "mythic", "levelSync", "-5", "id", 2)));
         setSetupMenuDescription(List.of(
                 "&2A Dynamic Lair where you choose the level!"));
-        setDungeonLockoutMinutes(1440);
         setNightbreakSlug("the-beasts-sanctuary");
     }
 }

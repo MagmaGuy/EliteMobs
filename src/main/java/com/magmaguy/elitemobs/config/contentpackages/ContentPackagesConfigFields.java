@@ -145,7 +145,10 @@ public class ContentPackagesConfigFields extends CustomConfigFields {
     private List<String> setupMenuDescription = new ArrayList<>();
     @Getter
     @Setter
-    private int dungeonLockoutMinutes = 0; // 0 = no lockout, otherwise lockout duration in minutes
+    // 72 hours by default — applies to every ContentPackagesConfigFields subclass,
+    // so individual premades no longer need to call setDungeonLockoutMinutes(...).
+    // Set to 0 in the YAML to disable the lockout for a specific package.
+    private int dungeonLockoutMinutes = 4320;
     @Getter
     @Setter
     private String nightbreakSlug = null; // Slug for Nightbreak API version checking
@@ -377,7 +380,7 @@ public class ContentPackagesConfigFields extends CustomConfigFields {
         this.modelNames = processStringList("modelNames", modelNames, null, false);
         if (modelNames != null) contentType = ContentType.MODELS_PACKAGE;
         this.setupMenuDescription = processStringList("setupMenuDescription", setupMenuDescription, new ArrayList<>(), false);
-        this.dungeonLockoutMinutes = processInt("dungeonLockoutMinutes", dungeonLockoutMinutes, 0, true);
+        this.dungeonLockoutMinutes = processInt("dungeonLockoutMinutes", dungeonLockoutMinutes, 4320, true);
         processAdditionalFields();
     }
 

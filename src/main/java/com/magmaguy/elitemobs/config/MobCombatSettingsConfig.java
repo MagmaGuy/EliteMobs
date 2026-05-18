@@ -1,5 +1,7 @@
 package com.magmaguy.elitemobs.config;
 
+import com.magmaguy.easyminecraftgoals.NMSAdapter;
+import com.magmaguy.easyminecraftgoals.NMSManager;
 import com.magmaguy.magmacore.config.ConfigurationFile;
 import lombok.Getter;
 
@@ -125,6 +127,8 @@ public class MobCombatSettingsConfig extends ConfigurationFile {
     private static int autoclickerThrottlePenaltySeconds;
     @Getter
     private static String autoclickerThrottleMessage;
+    @Getter
+    private static int damageIndicatorParticleCap;
     private static MobCombatSettingsConfig instance;
 
     public MobCombatSettingsConfig() {
@@ -350,5 +354,18 @@ public class MobCombatSettingsConfig extends ConfigurationFile {
         autoclickerThrottleMessage = ConfigurationEngine.setString(
                 List.of("Sets the message sent to players when the autoclicker throttle fires. Placeholder: $seconds for the remaining penalty duration."),
                 file, fileConfiguration, "autoclickerThrottleMessage", "&c[EliteMobs] &7You are attacking too fast. Damage to elites disabled for &e$seconds&7s.", true);
+        damageIndicatorParticleCap = ConfigurationEngine.setInt(
+                List.of("Caps the number of red 'damage indicator' particles the server is allowed to send the client per melee hit.",
+                        "Vanilla spawns one particle per 2 HP of damage dealt, packed into a single packet. With EliteMobs scaling player damage into the millions at high levels, that single packet asks the client to instantiate hundreds of thousands of particles locally, which freezes the client.",
+                        "Set to a small positive value (default 16) to collapse the burst into a normal-looking puff. The cap is purely cosmetic: damage, sounds, health bars, and every other game state are unaffected.",
+                        "Set to 0 (or any negative value) to disable the cap and let vanilla decide."),
+                fileConfiguration, "damageIndicatorParticleCap", 16);
+
+        // Push the cap into MagmaCore's netty interceptor. NMSManager is
+        // initialized before configs are loaded so the adapter is always
+        // present here, but guard for the case where the server version
+        // wasn't recognized and the adapter failed to load.
+        NMSAdapter adapter = NMSManager.getAdapter();
+        if (adapter != null) adapter.setDamageIndicatorParticleCap(damageIndicatorParticleCap);
     }
 }

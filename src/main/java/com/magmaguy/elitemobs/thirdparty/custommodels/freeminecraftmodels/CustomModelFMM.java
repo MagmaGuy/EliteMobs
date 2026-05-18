@@ -98,4 +98,31 @@ public class CustomModelFMM implements CustomModelInterface {
         if (dynamicEntity == null) return;
         dynamicEntity.setSyncMovement(syncMovement);
     }
+
+    /**
+     * Listens for {@link com.magmaguy.freeminecraftmodels.api.FmmReloadedEvent}
+     * and re-attaches the FMM display to every tracked NPC. Required because
+     * FMM's reload tears down every {@code DynamicEntity}, leaving every NPC's
+     * cached {@code customModel} pointing at a destroyed display entity — the
+     * villager survives but is no longer visually wrapped, so it shows as an
+     * invisible mob to viewers.
+     * <p>
+     * Registered in EventsRegistrer only when this class loads (i.e. FMM is on
+     * the classpath); without FMM the class is unreferenced and no listener
+     * registers.
+     */
+    public static class FmmReloadListener implements org.bukkit.event.Listener {
+        @org.bukkit.event.EventHandler(priority = org.bukkit.event.EventPriority.MONITOR)
+        public void onFmmReloaded(com.magmaguy.freeminecraftmodels.api.FmmReloadedEvent event) {
+            for (com.magmaguy.elitemobs.npcs.NPCEntity npc :
+                    new java.util.ArrayList<>(com.magmaguy.elitemobs.entitytracker.EntityTracker.getNpcEntities().values())) {
+                try {
+                    npc.refreshCustomModel();
+                } catch (Throwable t) {
+                    com.magmaguy.magmacore.util.Logger.warn(
+                            "Failed to refresh FMM model after reload for NPC " + npc.getUuid() + ": " + t.getMessage());
+                }
+            }
+        }
+    }
 }

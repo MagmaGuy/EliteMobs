@@ -28,10 +28,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public class ArenaInstance extends MatchInstance {
@@ -39,8 +41,16 @@ public class ArenaInstance extends MatchInstance {
     @Getter
     private static final HashMap<String, ArenaInstance> arenaInstances = new HashMap<>();
 
+    // Arenas whose configured worlds aren't loaded yet. On every WorldLoadEvent we
+    // try to drain matches whose corner1 world name equals the freshly-loaded
+    // world's name. Keyed by world name (lower-case) for deterministic lookup
+    // even when worlds are registered under odd-cased filenames. Multimap shape
+    // because multiple arenas can live in the same world.
+    private static final Map<String, List<CustomArenasConfigFields>> pendingArenas = new ConcurrentHashMap<>();
+
     public static void shutdown() {
         arenaInstances.clear();
+        pendingArenas.clear();
     }
 
     @Getter
@@ -148,10 +158,32 @@ public class ArenaInstance extends MatchInstance {
             return;
         }
         if (corner1.getWorld() == null || corner2.getWorld() == null || startLocation.getWorld() == null || exitLocation.getWorld() == null) {
-            //Logger.warn("Failed to correctly initialize arena " + customArenasConfigFields.getFilename() + " due to invalid world for corner1/corner2/startLocation/exitLocation");
+            // World not loaded yet (typical: EliteMobs enables before Multiverse / before
+            // server-startup world load finishes). Park the config in pendingArenas keyed by
+            // the corner1 world name; ArenaInstanceEvents.onWorldLoad will retry as worlds
+            // come up. Without this, the arena is silently dropped and NPCs reporting it as
+            // their target fail with "Invalid arena name!" until /em reload is run.
+            String worldName = extractWorldName(customArenasConfigFields.getCorner1());
+            if (worldName != null) {
+                pendingArenas.computeIfAbsent(worldName.toLowerCase(Locale.ROOT), k -> new ArrayList<>())
+                        .add(customArenasConfigFields);
+            }
             return;
         }
         new ArenaInstance(customArenasConfigFields, corner1, corner2, startLocation, exitLocation);
+    }
+
+    /**
+     * Pulls the world-name token out of a ConfigurationLocation string of shape
+     * {@code worldName,x,y,z[,yaw,pitch]}. Used to route pending arenas to the
+     * right bucket without materialising a Location (whose world is null at
+     * this point anyway).
+     */
+    private static String extractWorldName(String configurationLocationString) {
+        if (configurationLocationString == null) return null;
+        int comma = configurationLocationString.indexOf(',');
+        if (comma <= 0) return null;
+        return configurationLocationString.substring(0, comma).trim();
     }
 
     public void addSpawnPoints(List<String> rawSpawnPoints) {
@@ -362,6 +394,27 @@ public class ArenaInstance extends MatchInstance {
             if (PlayerData.getMatchInstance(event.getPlayer()) == null) return;
             if (!(PlayerData.getMatchInstance(event.getPlayer()) instanceof ArenaInstance arenaInstance)) return;
             arenaInstance.getRoundDamage().merge(event.getPlayer(), event.getDamage(), Double::sum);
+        }
+    }
+
+    /**
+     * Drains pendingArenas as worlds come online. Fixes the "Invalid arena
+     * name!" symptom on first server start where arena worlds (Multiverse or
+     * just slow startup) aren't loaded yet when EliteMobs's
+     * {@code asyncInitialization} runs, and the arena was therefore silently
+     * skipped instead of being registered.
+     */
+    public static class ArenaInstanceLoader implements Listener {
+        @EventHandler(priority = EventPriority.MONITOR)
+        public void onWorldLoad(WorldLoadEvent event) {
+            String worldKey = event.getWorld().getName().toLowerCase(Locale.ROOT);
+            List<CustomArenasConfigFields> pending = pendingArenas.remove(worldKey);
+            if (pending == null || pending.isEmpty()) return;
+            for (CustomArenasConfigFields fields : pending) {
+                // initializeArena re-parses locations; the world is now resolvable,
+                // so the second pass will succeed and the arena lands in arenaInstances.
+                initializeArena(fields);
+            }
         }
     }
 }
