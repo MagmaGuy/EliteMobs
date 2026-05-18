@@ -9,6 +9,7 @@ import com.magmaguy.elitemobs.config.SkillsConfig;
 import com.magmaguy.elitemobs.config.menus.premade.SkillBonusMenuConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.InstancedBossEntity;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.utils.DebugMessage;
 import com.magmaguy.elitemobs.utils.MessageThrottler;
@@ -20,6 +21,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Handles skill XP awards when elite mobs are killed.
@@ -59,6 +61,13 @@ public class SkillXPHandler implements Listener {
 
         if (totalDamage <= 0) return;
 
+        // Dungeon-boss lockout: players already on cooldown for this boss
+        // should not earn skill XP (DungeonBossLockoutHandler runs at LOW
+        // and populates lockoutPlayers before this NORMAL-priority handler).
+        Set<Player> lockedOutPlayers = (eliteEntity instanceof InstancedBossEntity instancedBoss)
+                ? instancedBoss.getLockoutPlayers()
+                : Set.of();
+
         // Award XP to each player who contributed
         for (Map.Entry<Player, Double> entry : eliteEntity.getDamagers().entrySet()) {
             Player player = entry.getKey();
@@ -67,6 +76,7 @@ public class SkillXPHandler implements Listener {
             // Skip NPCs and players not in memory
             if (player.hasMetadata("NPC")) continue;
             if (!PlayerData.isInMemory(player.getUniqueId())) continue;
+            if (lockedOutPlayers.contains(player)) continue;
 
             int rewardLevel = ScaledCombatRewardResolver.getRewardLevel(eliteEntity, player);
 

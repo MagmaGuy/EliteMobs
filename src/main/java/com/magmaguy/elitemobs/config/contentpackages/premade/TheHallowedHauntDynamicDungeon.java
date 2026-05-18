@@ -45,7 +45,6 @@ public class TheHallowedHauntDynamicDungeon extends ContentPackagesConfigFields 
         setSetupMenuDescription(List.of(
                 "&2A Dynamic Dungeon where you choose the level!",
                 "&2Select from levels based on your guild rank!"));
-        setDungeonLockoutMinutes(1440); // 24 hour lockout
         setNightbreakSlug("the-hallowed-haunt");
     }
 }

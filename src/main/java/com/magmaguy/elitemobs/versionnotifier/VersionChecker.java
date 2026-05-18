@@ -486,6 +486,18 @@ public class VersionChecker {
         checkPluginVersion();
         checkContentVersion();
 
+        // Refresh content + access info the moment a Nightbreak token shows up,
+        // whether via /nightbreaklogin in this classloader or via another
+        // MagmaCore-shading plugin writing the shared config file. Without
+        // this, /em setup keeps showing "no Nightbreak token linked" until the
+        // server restarts because the first /em setup open pre-login stamps
+        // the throttle cooldown for 5 minutes.
+        NightbreakAccount.addTokenChangeListener(() -> {
+            Logger.info("Nightbreak token detected — refreshing content access info.");
+            invalidateRefreshCooldown();
+            refreshContentAndAccess();
+        });
+
         // Schedule repeating task every 24 hours
         Bukkit.getScheduler().runTaskTimer(MetadataHandler.PLUGIN, () -> {
             Logger.info("Running scheduled 24-hour version and access check...");
@@ -504,6 +516,16 @@ public class VersionChecker {
         if (now - lastRefreshTimestamp < REFRESH_COOLDOWN_MS) return;
         lastRefreshTimestamp = now;
         checkContentVersion();
+    }
+
+    /**
+     * Forces a refresh on the next call, bypassing the cooldown. Used by the
+     * Nightbreak token-change listener — without this, opening /em setup
+     * pre-login stamps the cooldown even though the refresh short-circuited,
+     * and the legitimate post-login refresh gets throttled out for 5 minutes.
+     */
+    public static void invalidateRefreshCooldown() {
+        lastRefreshTimestamp = 0L;
     }
 
     /**

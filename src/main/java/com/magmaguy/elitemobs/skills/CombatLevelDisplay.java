@@ -15,8 +15,10 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Map;
@@ -189,5 +191,50 @@ public class CombatLevelDisplay implements Listener {
                 createDisplay(player);
             }
         }.runTaskLater(MetadataHandler.PLUGIN, 5L);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
+        // Same passenger-resync issue as bed entry: the dimension-change handshake
+        // makes the server re-broadcast the player's passenger list without our
+        // packet-only entity, leaving the display detached in the destination
+        // world. Tear it down preemptively and rebuild after the handshake
+        // settles. The MagmaCore tracker tries to remount on its own one tick
+        // later, but that races with the server's own sync, which can land last
+        // and wipe the mount.
+        if (!SkillsConfig.isSkillSystemEnabled()) return;
+        if (!SkillsConfig.isShowCombatLevelDisplay()) return;
+
+        Player player = event.getPlayer();
+        removeDisplay(player);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (!player.isOnline()) return;
+                createDisplay(player);
+            }
+        }.runTaskLater(MetadataHandler.PLUGIN, 20L);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerRespawn(PlayerRespawnEvent event) {
+        // Same passenger-resync class of issue as bed/world-change. On respawn
+        // the client tears down its entity tracking, but server-side the packet
+        // entity is still flagged visible to the player, so MagmaCore's tracker
+        // doesn't resend a spawn packet — and its follow-up remount references
+        // an entity ID the client no longer knows about. Tear it down here and
+        // rebuild so a fresh spawn + mount goes out.
+        if (!SkillsConfig.isSkillSystemEnabled()) return;
+        if (!SkillsConfig.isShowCombatLevelDisplay()) return;
+
+        Player player = event.getPlayer();
+        removeDisplay(player);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (!player.isOnline()) return;
+                createDisplay(player);
+            }
+        }.runTaskLater(MetadataHandler.PLUGIN, 20L);
     }
 }

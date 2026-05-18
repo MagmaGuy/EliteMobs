@@ -38,7 +38,6 @@ public class AirshipMinidungeon extends ContentPackagesConfigFields {
                 Map.of("name", "normal", "levelSync", "+5", "id", 0),
                 Map.of("name", "hard", "levelSync", "+0", "id", 1),
                 Map.of("name", "mythic", "levelSync", "-5", "id", 2)));
-        setDungeonLockoutMinutes(1440);
         setSetupMenuDescription(List.of(
                 "&2A dynamic Minidungeon!"));
         setNightbreakSlug("the-airship");

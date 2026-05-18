@@ -23,10 +23,28 @@ public class DungeonBossLockoutHandler implements Listener {
 
     /**
      * Creates a unique boss identifier from an InstancedBossEntity.
-     * Uses filename and spawn location (world stripped).
+     * <p>
+     * For phase bosses, {@link PhaseBossEntity#switchPhase} mutates both
+     * {@code customBossesConfigFields} and {@code spawnLocation} as the fight
+     * progresses (see PhaseBossEntity.java:66, 71, 81). The handler below
+     * runs at LOW priority after the boss dies, by which point the live
+     * config + spawn refer to the LAST phase, not the canonical phase-1
+     * identity the dungeon config knows the boss by. Using the live values
+     * leaks the identifier to a phase-N key (e.g. "phase3_filename:x,y,z")
+     * that nothing else reads, so the lockout effectively disappears.
+     * <p>
+     * {@link DungeonKillTargetObjective.DungeonKillTargetObjectiveListener}
+     * already canonicalises this way (DungeonKillTargetObjective.java:77-79).
+     * Doing the same here keeps the identifier stable across phase switches.
      */
     public static String getBossIdentifier(InstancedBossEntity boss) {
-        String filename = boss.getCustomBossesConfigFields().getFilename();
+        String filename;
+        if (boss.getPhaseBossEntity() != null
+                && boss.getPhaseBossEntity().getPhase1Config() != null) {
+            filename = boss.getPhaseBossEntity().getPhase1Config().getFilename();
+        } else {
+            filename = boss.getCustomBossesConfigFields().getFilename();
+        }
         // Use the boss's spawn location, stripping world name
         if (boss.getSpawnLocation() != null) {
             int x = boss.getSpawnLocation().getBlockX();
@@ -67,11 +85,9 @@ public class DungeonBossLockoutHandler implements Listener {
             }
 
             if (lockout.isLockedOut(bossIdentifier)) {
-                // Player is locked out - add to set and notify them
                 lockedOutPlayers.add(player);
                 notifyLockout(player, boss, lockout, bossIdentifier);
             } else {
-                // Player is not locked out - add the lockout now
                 lockout.addLockout(bossIdentifier, lockoutMinutes);
                 PlayerData.updateDungeonBossLockout(player.getUniqueId(), lockout);
             }
@@ -111,10 +127,10 @@ public class DungeonBossLockoutHandler implements Listener {
         if (config == null) return;
 
         int lockoutMinutes = config.getDungeonLockoutMinutes();
-        if (lockoutMinutes <= 0) return; // No lockout configured
+        if (lockoutMinutes <= 0) return;
 
-        // Process lockouts and get locked out players
-        Set<Player> lockedOutPlayers = processLockouts(instancedBoss, instancedBoss.getDamagers().keySet(), lockoutMinutes);
+        Set<Player> damagers = instancedBoss.getDamagers().keySet();
+        Set<Player> lockedOutPlayers = processLockouts(instancedBoss, damagers, lockoutMinutes);
 
         // Store locked out players on the boss so CustomBossDeath can skip their loot
         instancedBoss.setLockoutPlayers(lockedOutPlayers);

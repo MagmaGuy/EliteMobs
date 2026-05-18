@@ -218,6 +218,26 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
             customModel.setSyncMovement(getNPCsConfigFields().isSyncMovement());
     }
 
+    /**
+     * Re-spawns the FMM display entity attached to this NPC. Called after FMM
+     * reloads — its onDisable tears down every {@code DynamicEntity}, so our
+     * cached {@code customModel} now references a destroyed display entity and
+     * the NPC is invisible to viewers. The underlying Villager survives the
+     * FMM reload, so re-creating the display on top of it brings the visual
+     * back without disturbing AI / pathing / metadata.
+     */
+    public void refreshCustomModel() {
+        if (villager == null || !villager.isValid()) return;
+        if (!CustomModel.customModelsEnabled()) return;
+        if (getNPCsConfigFields().getCustomModel() == null
+                || getNPCsConfigFields().getCustomModel().isEmpty()) return;
+        if (!CustomModel.modelExists(getNPCsConfigFields().getCustomModel())) return;
+        // Drop the stale ref — the underlying display entity is already gone
+        // and calling .remove() on it would just walk FMM's now-empty registry.
+        customModel = null;
+        setCustomModel(villager);
+    }
+
     public Villager getVillager() {
         return villager;
     }
