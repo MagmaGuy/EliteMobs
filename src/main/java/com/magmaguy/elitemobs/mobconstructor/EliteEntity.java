@@ -739,14 +739,32 @@ public class EliteEntity {
 
     public void addGlobalReinforcement(CustomBossEntity customBossEntity) {
         this.globalReinforcementEntities.add(customBossEntity);
+        if (customBossEntity.summoningEntity == null) customBossEntity.setSummoningEntity(this);
     }
 
     public void addReinforcement(CustomBossEntity customBossEntity) {
         this.eliteReinforcementEntities.add(customBossEntity);
+        if (customBossEntity.summoningEntity == null) customBossEntity.setSummoningEntity(this);
     }
 
     public void addReinforcement(Entity entity) {
         this.nonEliteReinforcementEntities.add(entity);
+    }
+
+    /**
+     * Whether this entity is a boss's reinforcement (summoned by another elite) or a boss's mount.
+     * <p>
+     * Such entities must never award skill XP or coins. Dungeon lockout only applies to the
+     * {@link com.magmaguy.elitemobs.mobconstructor.custombosses.InstancedBossEntity} itself, so its
+     * mount and summoned adds — which are plain {@link CustomBossEntity}s, not InstancedBossEntities —
+     * would otherwise keep paying out on every kill regardless of the player's cooldown. GLOBAL
+     * reinforcements additionally respawn on a timer, making them an uncapped farm. Reinforcements are
+     * identified via {@link #summoningEntity} (set on every summon path, including the back-link added
+     * in {@link #addReinforcement(CustomBossEntity)} and {@link #addGlobalReinforcement(CustomBossEntity)});
+     * mounts via {@link CustomBossEntity#isMount()}.
+     */
+    public boolean isReinforcementOrMount() {
+        return summoningEntity != null || (this instanceof CustomBossEntity customBossEntity && customBossEntity.isMount());
     }
 
     /**

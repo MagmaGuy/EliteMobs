@@ -6,7 +6,6 @@ import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.skills.CombatLevelCalculator;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.SkillXPCalculator;
-import com.magmaguy.magmacore.util.Round;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -131,7 +130,7 @@ public class Placeholders extends PlaceholderExpansion {
             case "player_combat_level_roman":
                 return toTinyRoman(CombatLevelCalculator.calculateCombatLevel(player.getUniqueId()));
             case "player_money":
-                return "" + Round.twoDecimalPlaces(EconomyHandler.checkCurrency(player.getUniqueId()));
+                return EconomyHandler.formatCurrency(EconomyHandler.checkCurrency(player.getUniqueId()));
             case "player_top_tier":
             case "player_top_combat_level":
                 int highestLevel = 0;

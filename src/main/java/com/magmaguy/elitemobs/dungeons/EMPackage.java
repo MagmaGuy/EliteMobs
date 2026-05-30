@@ -5,7 +5,7 @@ import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.elitemobs.config.InitializeConfig;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
-import com.magmaguy.elitemobs.menus.SetupMenuIcons;
+import com.magmaguy.magmacore.menus.NightbreakSetupIcons;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
@@ -136,14 +136,14 @@ public abstract class EMPackage extends ContentPackage implements NightbreakMana
         return generateItemStackWithIcon(
                 List.of(DungeonsConfig.getContentInstalledLine1(), DungeonsConfig.getContentInstalledLine2()),
                 Material.GREEN_STAINED_GLASS_PANE,
-                SetupMenuIcons.MODEL_CHECKMARK);
+                NightbreakSetupIcons.MODEL_CHECKMARK);
     }
 
     protected ItemStack getNotInstalledItemStack() {
         return generateItemStackWithIcon(
                 List.of(DungeonsConfig.getContentNotInstalledLine1(), DungeonsConfig.getContentNotInstalledLine2()),
                 Material.YELLOW_STAINED_GLASS_PANE,
-                SetupMenuIcons.MODEL_GRAY_X);
+                NightbreakSetupIcons.MODEL_GRAY_X);
     }
 
     protected ItemStack getPartiallyInstalledItemStack() {
@@ -153,7 +153,7 @@ public abstract class EMPackage extends ContentPackage implements NightbreakMana
                         DungeonsConfig.getContentPartialLine3(),
                         DungeonsConfig.getContentPartialLine4()),
                 Material.ORANGE_STAINED_GLASS_PANE,
-                SetupMenuIcons.MODEL_GRAY_X);
+                NightbreakSetupIcons.MODEL_GRAY_X);
     }
 
     protected ItemStack getNotDownloadedItemStack() {
@@ -163,16 +163,16 @@ public abstract class EMPackage extends ContentPackage implements NightbreakMana
 
         if (slug == null || slug.isEmpty()) {
             // No Nightbreak integration - show unlocked (can download manually)
-            modelId = SetupMenuIcons.MODEL_UNLOCKED;
+            modelId = NightbreakSetupIcons.MODEL_UNLOCKED;
         } else if (!NightbreakAccount.hasToken()) {
             // Has Nightbreak slug but no token - show locked unlinked
-            modelId = SetupMenuIcons.MODEL_LOCKED_UNLINKED;
+            modelId = NightbreakSetupIcons.MODEL_LOCKED_UNLINKED;
         } else if (cachedAccessInfo != null && cachedAccessInfo.hasAccess) {
             // Has token and access - show unlocked (can download)
-            modelId = SetupMenuIcons.MODEL_UNLOCKED;
+            modelId = NightbreakSetupIcons.MODEL_UNLOCKED;
         } else {
             // Has token but no access - show locked unpaid
-            modelId = SetupMenuIcons.MODEL_LOCKED_UNPAID;
+            modelId = NightbreakSetupIcons.MODEL_LOCKED_UNPAID;
         }
 
         return generateItemStackWithIcon(
@@ -204,7 +204,7 @@ public abstract class EMPackage extends ContentPackage implements NightbreakMana
             itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         itemMeta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
         itemStack.setItemMeta(itemMeta);
-        SetupMenuIcons.applyItemModel(itemStack, SetupMenuIcons.MODEL_LOCKED_UNPAID);
+        NightbreakSetupIcons.applyItemModel(itemStack, NightbreakSetupIcons.MODEL_LOCKED_UNPAID);
         return itemStack;
     }
 
@@ -216,13 +216,13 @@ public abstract class EMPackage extends ContentPackage implements NightbreakMana
 
         if (slug == null || slug.isEmpty()) {
             // No Nightbreak integration - show update (can update manually)
-            modelId = SetupMenuIcons.MODEL_UPDATE;
+            modelId = NightbreakSetupIcons.MODEL_UPDATE;
         } else if (!NightbreakAccount.hasToken()) {
             // Has Nightbreak slug but no token - show update unlinked
-            modelId = SetupMenuIcons.MODEL_UPDATE_UNLINKED;
+            modelId = NightbreakSetupIcons.MODEL_UPDATE_UNLINKED;
         } else {
             // Has token - show update (can auto-update)
-            modelId = SetupMenuIcons.MODEL_UPDATE;
+            modelId = NightbreakSetupIcons.MODEL_UPDATE;
         }
 
         return generateItemStackWithIcon(
@@ -248,7 +248,7 @@ public abstract class EMPackage extends ContentPackage implements NightbreakMana
             itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         itemMeta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
         itemStack.setItemMeta(itemMeta);
-        SetupMenuIcons.applyItemModel(itemStack, SetupMenuIcons.MODEL_UPDATE_UNPAID);
+        NightbreakSetupIcons.applyItemModel(itemStack, NightbreakSetupIcons.MODEL_UPDATE_UNPAID);
         return itemStack;
     }
 
@@ -279,7 +279,7 @@ public abstract class EMPackage extends ContentPackage implements NightbreakMana
             itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         itemMeta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
         itemStack.setItemMeta(itemMeta);
-        SetupMenuIcons.applyItemModel(itemStack, modelId);
+        NightbreakSetupIcons.applyItemModel(itemStack, modelId);
         return itemStack;
     }
 

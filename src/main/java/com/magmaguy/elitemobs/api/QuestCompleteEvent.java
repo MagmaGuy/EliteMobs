@@ -5,7 +5,6 @@ import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.Quest;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
 
@@ -47,8 +46,8 @@ public class QuestCompleteEvent extends Event implements Cancellable {
             new EventCaller(new QuestRewardEvent(event.getPlayer(), event.quest));
             if (event.getQuest() instanceof CustomQuest customQuest &&
                     customQuest.getCustomQuestsConfigFields().getQuestCompleteSound() != null)
-                Bukkit.getPlayer(customQuest.getPlayerUUID()).playSound(
-                        Bukkit.getPlayer(customQuest.getPlayerUUID()),
+                event.getPlayer().playSound(
+                        event.getPlayer(),
                         customQuest.getCustomQuestsConfigFields().getQuestCompleteSound(),
                         1f, 1f);
             else

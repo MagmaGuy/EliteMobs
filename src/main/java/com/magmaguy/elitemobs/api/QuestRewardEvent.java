@@ -42,7 +42,7 @@ public class QuestRewardEvent extends Event {
     }
 
     private void doRewards() {
-        quest.getQuestObjectives().getQuestReward().doRewards();
+        quest.getQuestObjectives().getQuestReward().doRewards(player);
     }
 
     private void completeQuestData() {

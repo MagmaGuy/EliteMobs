@@ -14,6 +14,7 @@ public class WorldGuardDungeonFlag implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onSpawn(CreatureSpawnEvent event) {
         if (!EliteMobs.worldGuardIsEnabled) return;
+        if (WorldGuardSpawnEventBypasser.isForcedSpawn()) return;
         if (event.getEntity().getType().equals(EntityType.ARMOR_STAND) ||
                 event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.CUSTOM))
             return;

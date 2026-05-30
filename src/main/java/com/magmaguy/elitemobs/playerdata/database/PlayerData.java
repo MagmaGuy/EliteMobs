@@ -42,9 +42,8 @@ public class PlayerData {
     @Getter
     private static final HashMap<UUID, PlayerData> playerDataHashMap = new HashMap<>();
     private static Connection connection = null;
-    @Getter
-    @Setter
-    private double currency;
+    // Currency stored as cents (1.00 coin = 100 cents) to eliminate IEEE 754 drift.
+    private long currencyCents;
     @Getter
     @Setter
     private int score;
@@ -119,10 +118,16 @@ public class PlayerData {
     @Setter
     private String skillBonusSelections = "{}";
 
-    // Gambling debt - tracks how much the player owes from gambling
-    @Getter
-    @Setter
-    private double gamblingDebt = 0;
+    // Gambling debt - tracks how much the player owes from gambling. Stored as cents.
+    private long gamblingDebtCents = 0;
+
+    /*
+     * Set to true only once readExistingData()/writeNewData() has finished populating every field.
+     * The PlayerData object is published into playerDataHashMap (isInMemory == true) BEFORE its
+     * fields are read from the database, so map-presence alone does not mean the data is usable.
+     * Volatile so the main thread sees the completed field writes once this flips true.
+     */
+    private volatile boolean databaseDataLoaded = false;
 
     public PlayerData(UUID uuid) {
         Player player = Bukkit.getPlayer(uuid);
@@ -190,6 +195,17 @@ public class PlayerData {
         return playerDataHashMap.containsKey(uuid);
     }
 
+    /**
+     * Whether the player's data is both in memory AND fully populated from the database.
+     * isInMemory() can return true before the database read finishes (the object is published
+     * into the map at the very start of readExistingData/writeNewData), so callers that need
+     * real values - e.g. skill levels for gear restrictions - must use this instead.
+     */
+    public static boolean isDataLoaded(UUID uuid) {
+        PlayerData playerData = playerDataHashMap.get(uuid);
+        return playerData != null && playerData.databaseDataLoaded;
+    }
+
     public static String getDisplayName(UUID uuid) {
         if (!isInMemory(uuid))
             return getDatabaseString(uuid, "DisplayName");
@@ -202,23 +218,26 @@ public class PlayerData {
 
     public static double getCurrency(UUID uuid) {
         if (!isInMemory(uuid))
-            return getDatabaseDouble(uuid, "CurrencyV2");
-        return playerDataHashMap.get(uuid).currency;
+            return getDatabaseLong(uuid, "CurrencyCents") / 100.0;
+        return playerDataHashMap.get(uuid).currencyCents / 100.0;
     }
 
     public static double getCurrency(UUID uuid, boolean databaseAccess) {
         if (!isInMemory(uuid))
             if (databaseAccess)
-                return getDatabaseDouble(uuid, "CurrencyV2");
+                return getDatabaseLong(uuid, "CurrencyCents") / 100.0;
             else
                 return 0;
-        return playerDataHashMap.get(uuid).currency;
+        return playerDataHashMap.get(uuid).currencyCents / 100.0;
     }
 
     public static void setCurrency(UUID uuid, double currency) {
-        setDatabaseValue(uuid, "CurrencyV2", currency);
+        long cents = Math.round(currency * 100.0);
+        setDatabaseValue(uuid, "CurrencyCents", cents);
+        // TODO: remove dual-write of CurrencyV2 in EliteMobs 11.x (kept for downgrade safety)
+        setDatabaseValue(uuid, "CurrencyV2", cents / 100.0);
         if (playerDataHashMap.containsKey(uuid))
-            playerDataHashMap.get(uuid).currency = currency;
+            playerDataHashMap.get(uuid).currencyCents = cents;
     }
 
     public static List<Quest> getQuests(UUID uuid) {
@@ -523,7 +542,11 @@ public class PlayerData {
      */
     public static long getSkillXP(UUID uuid, SkillType skillType) {
         String columnName = skillType.getColumnName();
-        if (!isInMemory(uuid))
+        // Use isDataLoaded rather than isInMemory: during the async login load there is a window where
+        // the PlayerData object is already in the map but its skillXP fields are still 0. Reading them
+        // then would report skill level 1 and wrongly reject/drop the player's gear. Fall back to a
+        // direct database read until the in-memory fields are guaranteed populated.
+        if (!isDataLoaded(uuid))
             return getDatabaseLong(uuid, columnName);
         return getSkillXPByType(playerDataHashMap.get(uuid), skillType);
     }
@@ -667,9 +690,9 @@ public class PlayerData {
      */
     public static double getGamblingDebt(UUID uuid) {
         if (!isInMemory(uuid))
-            return getDatabaseDouble(uuid, "GamblingDebt");
+            return getDatabaseLong(uuid, "GamblingDebtCents") / 100.0;
         PlayerData data = playerDataHashMap.get(uuid);
-        return data != null ? data.gamblingDebt : 0;
+        return data != null ? data.gamblingDebtCents / 100.0 : 0;
     }
 
     /**
@@ -682,9 +705,12 @@ public class PlayerData {
     public static void setGamblingDebt(UUID uuid, double debt) {
         // Clamp debt to valid range (0 to max debt)
         debt = Math.max(0, Math.min(500, debt));
-        setDatabaseValue(uuid, "GamblingDebt", debt);
+        long cents = Math.round(debt * 100.0);
+        setDatabaseValue(uuid, "GamblingDebtCents", cents);
+        // TODO: remove dual-write of GamblingDebt in EliteMobs 11.x (kept for downgrade safety)
+        setDatabaseValue(uuid, "GamblingDebt", cents / 100.0);
         if (playerDataHashMap.containsKey(uuid))
-            playerDataHashMap.get(uuid).gamblingDebt = debt;
+            playerDataHashMap.get(uuid).gamblingDebtCents = cents;
     }
 
     /**
@@ -846,6 +872,7 @@ public class PlayerData {
         try {
             Logger.info("Opened database successfully");
             GenerateDatabase.generate();
+            migrateCurrencyToCents();
             for (Player player : Bukkit.getOnlinePlayers())
                 new PlayerData(player.getUniqueId());
         } catch (Exception e) {
@@ -855,6 +882,34 @@ public class PlayerData {
         }
 
         new PortOldData();
+    }
+
+    /**
+     * One-shot startup pass: backfill CurrencyCents / GamblingDebtCents from the legacy
+     * double columns (CurrencyV2 / GamblingDebt) for any row that hasn't been migrated yet.
+     * After this runs once, the cents columns are the source of truth and the read paths
+     * don't need any migrate-on-read branching.
+     */
+    private static void migrateCurrencyToCents() {
+        try {
+            Statement statement = getConnection().createStatement();
+            String currencySql = "UPDATE " + PLAYER_DATA_TABLE_NAME +
+                    " SET CurrencyCents = CAST(ROUND(CurrencyV2 * 100) AS INTEGER)" +
+                    " WHERE (CurrencyCents IS NULL OR CurrencyCents = 0) AND CurrencyV2 > 0;";
+            int currencyMigrated = statement.executeUpdate(currencySql);
+            String debtSql = "UPDATE " + PLAYER_DATA_TABLE_NAME +
+                    " SET GamblingDebtCents = CAST(ROUND(GamblingDebt * 100) AS INTEGER)" +
+                    " WHERE (GamblingDebtCents IS NULL OR GamblingDebtCents = 0) AND GamblingDebt > 0;";
+            int debtMigrated = statement.executeUpdate(debtSql);
+            statement.close();
+            if (currencyMigrated > 0)
+                Logger.info("Migrated " + currencyMigrated + " player currency rows to cent precision");
+            if (debtMigrated > 0)
+                Logger.info("Migrated " + debtMigrated + " player gambling debt rows to cent precision");
+        } catch (Exception e) {
+            Logger.warn("Failed to migrate legacy currency/gambling debt columns to cents!");
+            e.printStackTrace();
+        }
     }
 
     public static void closeConnection() {
@@ -869,7 +924,8 @@ public class PlayerData {
 
     private void readExistingData(Statement statement, UUID uuid, ResultSet resultSet) throws Exception {
         playerDataHashMap.put(uuid, this);
-        currency = resultSet.getDouble("CurrencyV2");
+        // CurrencyCents is the source of truth; startup migration backfills it from legacy CurrencyV2.
+        currencyCents = resultSet.getLong("CurrencyCents");
         score = resultSet.getInt("Score");
         kills = resultSet.getInt("Kills");
         highestLevelKilled = resultSet.getInt("HighestLevelKilled");
@@ -969,15 +1025,19 @@ public class PlayerData {
         String skillSelections = resultSet.getString("SkillBonusSelections");
         skillBonusSelections = (skillSelections != null) ? skillSelections : "{}";
 
-        // Read gambling debt
-        gamblingDebt = resultSet.getDouble("GamblingDebt");
+        // Read gambling debt (cents column is source of truth; startup migration backfills it).
+        gamblingDebtCents = resultSet.getLong("GamblingDebtCents");
+
+        // All fields are now populated - mark the data as fully loaded so getters stop falling back
+        // to the database and gear restriction checks read the player's real skill levels.
+        databaseDataLoaded = true;
 
         Logger.info("User " + uuid + " data successfully read!");
     }
 
     private void writeNewData(Statement statement, UUID uuid) throws Exception {
         playerDataHashMap.put(uuid, this);
-        currency = 0;
+        currencyCents = 0;
         score = 0;
         kills = 0;
         highestLevelKilled = 0;
@@ -996,12 +1056,13 @@ public class PlayerData {
         // Initialize skill bonus selections to empty
         skillBonusSelections = "{}";
         // Initialize gambling debt to 0
-        gamblingDebt = 0;
+        gamblingDebtCents = 0;
         statement = getConnection().createStatement();
         String sql = "INSERT INTO " + PLAYER_DATA_TABLE_NAME + " (" +
                 "PlayerUUID," +
                 " DisplayName," +
                 " CurrencyV2," +
+                " CurrencyCents," +
                 " Score," +
                 " Kills," +
                 " HighestLevelKilled," +
@@ -1017,12 +1078,15 @@ public class PlayerData {
                 " SkillXP_MACES," +
                 " SkillXP_SPEARS," +
                 " SkillBonusSelections," +
-                " GamblingDebt) " +
+                " GamblingDebt," +
+                " GamblingDebtCents) " +
                 //identifier
                 "VALUES ('" + uuid + "'," +
                 //display name
                 " '" + Bukkit.getPlayer(uuid).getName() + "'," +
-                //currency
+                //currency (legacy double, dual-written for downgrade safety)
+                " 0," +
+                //currencyCents (source of truth)
                 " 0," +
                 //score
                 "0," +
@@ -1038,10 +1102,15 @@ public class PlayerData {
                 "0,0,0,0,0,0,0,0,0," +
                 //skill bonus selections (empty JSON)
                 "'{}', " +
-                //gambling debt (starts at 0)
+                //gambling debt (legacy double, dual-written for downgrade safety)
+                "0," +
+                //gambling debt cents (source of truth)
                 "0);";
         statement.executeUpdate(sql);
         statement.close();
+        // New players start with all skill XP at 0; the in-memory fields above are already set, so
+        // the data is fully usable now.
+        databaseDataLoaded = true;
         Logger.info("No player entry detected, generating new entry!");
     }
 

@@ -46,28 +46,28 @@ public class CurrencyCommandsHandler {
 
         sender.sendMessage(
                         EconomySettingsConfig.getEconomyPayMessage()
-                                .replace("$amount_sent", amount + "")
-                                .replace("$amount_received", actuallyReceivedAmount + "")
-                                .replace("$taxes", taxes + "")
+                                .replace("$amount_sent", EconomyHandler.formatCurrency(amount))
+                                .replace("$amount_received", EconomyHandler.formatCurrency(actuallyReceivedAmount))
+                                .replace("$taxes", EconomyHandler.formatCurrency(taxes))
                                 .replace("$currency_name", EconomySettingsConfig.getCurrencyName())
                                 .replace("$receiver", recipient.getDisplayName()));
 
         sender.sendMessage(
                         EconomySettingsConfig.getEconomyCurrencyLeftMessage()
-                                .replace("$amount_left", String.valueOf(EconomyHandler.checkCurrency(sender.getUniqueId())))
+                                .replace("$amount_left", EconomyHandler.formatCurrency(EconomyHandler.checkCurrency(sender.getUniqueId())))
                                 .replace("$currency_name", EconomySettingsConfig.getCurrencyName()));
 
         recipient.sendMessage(
                         EconomySettingsConfig.getEconomyPaymentReceivedMessage()
-                                .replace("$amount_sent", amount + "")
-                                .replace("$amount_received", actuallyReceivedAmount + "")
-                                .replace("$taxes", taxes + "")
+                                .replace("$amount_sent", EconomyHandler.formatCurrency(amount))
+                                .replace("$amount_received", EconomyHandler.formatCurrency(actuallyReceivedAmount))
+                                .replace("$taxes", EconomyHandler.formatCurrency(taxes))
                                 .replace("$sender", sender.getDisplayName())
                                 .replace("$currency_name", EconomySettingsConfig.getCurrencyName()));
 
         recipient.sendMessage(
                         EconomySettingsConfig.getEconomyCurrencyLeftMessage()
-                                .replace("$amount_left", String.valueOf(EconomyHandler.checkCurrency(recipient.getUniqueId())))
+                                .replace("$amount_left", EconomyHandler.formatCurrency(EconomyHandler.checkCurrency(recipient.getUniqueId())))
                                 .replace("$currency_name", EconomySettingsConfig.getCurrencyName()));
 
     }
@@ -83,14 +83,14 @@ public class CurrencyCommandsHandler {
             return;
         }
         addCommand(player, amount);
-        commandSender.sendMessage(CommandMessagesConfig.getCurrencyAddedMessage().replace("$amount", String.valueOf(amount)).replace("$player", onlinePlayer));
-        commandSender.sendMessage(CommandMessagesConfig.getCurrencyNowHasMessage().replace("$amount", String.valueOf(EconomyHandler.checkCurrency(player.getUniqueId()))));
+        commandSender.sendMessage(CommandMessagesConfig.getCurrencyAddedMessage().replace("$amount", EconomyHandler.formatCurrency(amount)).replace("$player", onlinePlayer));
+        commandSender.sendMessage(CommandMessagesConfig.getCurrencyNowHasMessage().replace("$amount", EconomyHandler.formatCurrency(EconomyHandler.checkCurrency(player.getUniqueId()))));
     }
 
     public static void addAllCommand(CommandSender commandSender, double amount) {
         for (Player player : Bukkit.getOnlinePlayers())
             addCommand(player, amount);
-        commandSender.sendMessage(CommandMessagesConfig.getCurrencyAddedAllMessage().replace("$amount", String.valueOf(amount)));
+        commandSender.sendMessage(CommandMessagesConfig.getCurrencyAddedAllMessage().replace("$amount", EconomyHandler.formatCurrency(amount)));
     }
 
     public static void subtractCommand(String playerName, double amount) {
@@ -104,8 +104,8 @@ public class CurrencyCommandsHandler {
             return;
         }
         subtractCommand(onlinePlayer, amount);
-        commandSender.sendMessage(CommandMessagesConfig.getCurrencySubtractedMessage().replace("$amount", String.valueOf(amount)).replace("$player", onlinePlayer));
-        commandSender.sendMessage(CommandMessagesConfig.getCurrencyNowHasMessage().replace("$amount", String.valueOf(EconomyHandler.checkCurrency(player.getUniqueId()))));
+        commandSender.sendMessage(CommandMessagesConfig.getCurrencySubtractedMessage().replace("$amount", EconomyHandler.formatCurrency(amount)).replace("$player", onlinePlayer));
+        commandSender.sendMessage(CommandMessagesConfig.getCurrencyNowHasMessage().replace("$amount", EconomyHandler.formatCurrency(EconomyHandler.checkCurrency(player.getUniqueId()))));
     }
 
     public static void setCommand(CommandSender commandSender, String onlinePlayer, double amount) {
@@ -115,7 +115,7 @@ public class CurrencyCommandsHandler {
             return;
         }
         EconomyHandler.setCurrency(player.getUniqueId(), amount);
-        commandSender.sendMessage(CommandMessagesConfig.getCurrencySetMessage().replace("$player", onlinePlayer).replace("$currencyName", EconomySettingsConfig.getCurrencyName()).replace("$amount", String.valueOf(amount)));
+        commandSender.sendMessage(CommandMessagesConfig.getCurrencySetMessage().replace("$player", onlinePlayer).replace("$currencyName", EconomySettingsConfig.getCurrencyName()).replace("$amount", EconomyHandler.formatCurrency(amount)));
     }
 
 
@@ -126,13 +126,13 @@ public class CurrencyCommandsHandler {
             return;
         }
         double money = EconomyHandler.checkCurrency(player.getUniqueId());
-        commandSender.sendMessage(CommandMessagesConfig.getCurrencyCheckMessage().replace("$player", playerName).replace("$amount", String.valueOf(money)).replace("$currencyName", EconomySettingsConfig.getCurrencyName()));
+        commandSender.sendMessage(CommandMessagesConfig.getCurrencyCheckMessage().replace("$player", playerName).replace("$amount", EconomyHandler.formatCurrency(money)).replace("$currencyName", EconomySettingsConfig.getCurrencyName()));
     }
 
     public static void walletCommand(Player player) {
         player.sendMessage(
                         EconomySettingsConfig.getEconomyWalletCommand()
-                                .replace("$balance", String.valueOf(EconomyHandler.checkCurrency(player.getUniqueId())))
+                                .replace("$balance", EconomyHandler.formatCurrency(EconomyHandler.checkCurrency(player.getUniqueId())))
                                 .replace("$currency_name", EconomySettingsConfig.getCurrencyName()));
     }
 

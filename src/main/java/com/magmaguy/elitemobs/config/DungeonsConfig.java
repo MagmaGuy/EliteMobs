@@ -250,6 +250,8 @@ public class DungeonsConfig extends ConfigurationFile {
     @Getter
     private static String skillLevelUpBroadcast;
     @Getter
+    private static boolean skillLevelUpBroadcastEnabled;
+    @Getter
     private static String skillXpNoGainMessage;
     @Getter
     private static String skillXpCappedMessage;
@@ -342,7 +344,13 @@ public class DungeonsConfig extends ConfigurationFile {
                 List.of("&fCreate a new instance of the dungeon", "$dungeonName &ffor yourself and maybe", "&fsome friends!"),
                 true);
         allowSpectatorsInInstancedContent = ConfigurationEngine.setBoolean(
-                List.of("Sets is spectating instanced content will be available."),
+                List.of("Whether vanilla spectator mode is used inside instanced content (arenas & dungeons).",
+                        "When true (default): players may join as spectators, and dead players become",
+                        "spectators at a death banner so teammates can revive them (multiple lives).",
+                        "When false: the 'Spectate' option is hidden AND players no longer enter spectator",
+                        "mode on death - they are removed from the instance instead, giving every participant",
+                        "a single life. Set to false to fully prevent spectator mode (and the vanilla",
+                        "spectator-teleport exploit) inside instanced content."),
                 fileConfiguration, "allowSpectatorsInInstancedContent", true);
         instancedDungeonCompleteMessage = ConfigurationEngine.setString(
                 List.of("Sets the message that appears when an instanced dungeon is completed"),
@@ -740,6 +748,10 @@ public class DungeonsConfig extends ConfigurationFile {
                         "$skill is the placeholder for the skill display name.",
                         "$level is the placeholder for the new level."),
                 file, fileConfiguration, "skillLevelUpBroadcast", "&6$player &7reached &e$skill &7level &a$level&7!", true);
+        skillLevelUpBroadcastEnabled = ConfigurationEngine.setBoolean(
+                List.of("Sets whether the server-wide skill level-up broadcast (every 5 levels) is sent.",
+                        "When false, the personal level-up title/sound/particles still play, but no chat broadcast goes out."),
+                fileConfiguration, "skillLevelUpBroadcastEnabled", true);
         skillXpNoGainMessage = ConfigurationEngine.setString(
                 List.of("Sets the message shown when a player gains no XP because the mob is too low level.",
                         "$mobLevel is the placeholder for the mob's level.",

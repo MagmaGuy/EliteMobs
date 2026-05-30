@@ -129,6 +129,7 @@ public class ArrowRainSkill extends SkillBonus implements CooldownSkill {
                     ItemTagger.setArrowSkillType(arrow, SkillType.CROSSBOWS.name());
                     ItemTagger.setArrowSkillLevel(arrow, crossbowSkillLevel);
                     ItemTagger.setArrowDamageMultiplier(arrow, damageMultiplier);
+                    ItemTagger.setArrowLaunchVelocity(arrow, arrow.getVelocity().length());
                     EliteItemManager.tagArrow(arrow);
                 }
                 count++;

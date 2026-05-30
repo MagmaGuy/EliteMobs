@@ -46,6 +46,11 @@ public class SkillXPHandler implements Listener {
         if (eliteEntity.isTriggeredAntiExploit()) return;
         if (eliteEntity.getDamagers().isEmpty()) return;
 
+        // Mounts and reinforcements never award skill XP. They are not InstancedBossEntities,
+        // so dungeon lockout never applies to them, and GLOBAL reinforcements respawn on a timer —
+        // either way they would otherwise be an uncapped XP farm that bypasses boss cooldowns.
+        if (eliteEntity.isReinforcementOrMount()) return;
+
         // Custom bosses can disable skill XP
         if (eliteEntity instanceof CustomBossEntity customBoss) {
             if (!customBoss.getCustomBossesConfigFields().isDropsSkillXP()) return;
@@ -222,12 +227,14 @@ public class SkillXPHandler implements Listener {
                 0.1  // speed
         );
 
-        // Server-wide announcement
-        String announcement = DungeonsConfig.getSkillLevelUpBroadcast()
-                .replace("$player", player.getName())
-                .replace("$skill", SkillBonusMenuConfig.getSkillTypeDisplayName(skillType))
-                .replace("$level", String.valueOf(newLevel));
-        Bukkit.broadcastMessage(announcement);
+        // Server-wide announcement (only on milestone levels — multiples of 5)
+        if (DungeonsConfig.isSkillLevelUpBroadcastEnabled() && newLevel % 5 == 0) {
+            String announcement = DungeonsConfig.getSkillLevelUpBroadcast()
+                    .replace("$player", player.getName())
+                    .replace("$skill", SkillBonusMenuConfig.getSkillTypeDisplayName(skillType))
+                    .replace("$level", String.valueOf(newLevel));
+            Bukkit.broadcastMessage(announcement);
+        }
 
         // Update combat level display
         CombatLevelDisplay.updateDisplay(player);

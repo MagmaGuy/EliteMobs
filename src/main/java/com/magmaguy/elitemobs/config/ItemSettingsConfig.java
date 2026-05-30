@@ -363,11 +363,15 @@ public class ItemSettingsConfig extends ConfigurationFile {
                 List.of("Sets if EliteMobs will hide enchantment tooltips on EliteMobs items."),
                 fileConfiguration, "hideEnchants", true);
         weaponEntry = ConfigurationEngine.setString(
-                List.of("Sets the weapon-specific lore entry on an elite item. The $EDPS placeholder gets replaced with the elite DPS (damage per second) of the weapon."),
-                file, fileConfiguration, "weaponEntry", "&7Elite DPS: &2$EDPS", true);
+                List.of("Sets the weapon-specific lore entry on an elite item.",
+                        "$itemLevel - shows the weapon's item level (recommended; reflects actual combat power)",
+                        "$EDPS - shows the elite DPS (legacy, kept for compatibility; misleading under scaled/normalized combat since the formula replaces vanilla damage)"),
+                file, fileConfiguration, "weaponEntry", "&7Weapon Level: &2$itemLevel", true);
         armorEntry = ConfigurationEngine.setString(
-                List.of("Sets the armor-specific lore entry on an elite item. The $EDEF placeholder gets replaced with the elite DEF (defense) of the weapon."),
-                file, fileConfiguration, "armorEntry", "&7Elite Armor: &2$EDEF", true);
+                List.of("Sets the armor-specific lore entry on an elite item.",
+                        "$itemLevel - shows the armor's item level (recommended; reflects actual combat power)",
+                        "$EDEF - shows the elite armor value (legacy, kept for compatibility; misleading under scaled/normalized combat)"),
+                file, fileConfiguration, "armorEntry", "&7Armor Level: &2$itemLevel", true);
         levelRangeTooDifferent = ConfigurationEngine.setString(
                 List.of("Sets the message sent when a played kills a boss but the gear level is too different from the boss level to get coins"),
                 file, fileConfiguration, "levelRangeTooDifferent", "&8EM] &4Your gear is level $playerLevel and the boss is level $bossLevel, level difference is too high to get coins!", true);

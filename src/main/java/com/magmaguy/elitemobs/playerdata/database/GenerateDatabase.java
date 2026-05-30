@@ -17,6 +17,7 @@ public class GenerateDatabase {
                 "PlayerUUID VARCHAR(36) PRIMARY KEY NOT NULL, " +
                 "DisplayName TEXT, " +
                 "CurrencyV2 DOUBLE, " +
+                "CurrencyCents BIGINT, " +
                 "QuestStatus BLOB, " +
                 "Score INT, " +
                 "Kills INT, " +
@@ -39,7 +40,8 @@ public class GenerateDatabase {
                 "SkillXP_MACES BIGINT, " +
                 "SkillXP_SPEARS BIGINT, " +
                 "SkillBonusSelections BLOB, " +
-                "GamblingDebt DOUBLE" +
+                "GamblingDebt DOUBLE, " +
+                "GamblingDebtCents BIGINT" +
                 ");";
         statement.executeUpdate(sql);
         statement.close();
@@ -47,6 +49,7 @@ public class GenerateDatabase {
         // Check and add missing columns if any
         addEntryIfEmpty("DisplayName", ColumnValues.TEXT);
         addEntryIfEmpty("CurrencyV2", ColumnValues.REAL);
+        addEntryIfEmpty("CurrencyCents", ColumnValues.BIGINT);
         addEntryIfEmpty("QuestStatus", ColumnValues.BLOB);
         addEntryIfEmpty("Score", ColumnValues.INT);
         addEntryIfEmpty("Kills", ColumnValues.INT);
@@ -76,6 +79,7 @@ public class GenerateDatabase {
 
         // Gambling debt
         addEntryIfEmpty("GamblingDebt", ColumnValues.REAL);
+        addEntryIfEmpty("GamblingDebtCents", ColumnValues.BIGINT);
     }
 
     private static void addEntryIfEmpty(String columnName, ColumnValues columnValues) {

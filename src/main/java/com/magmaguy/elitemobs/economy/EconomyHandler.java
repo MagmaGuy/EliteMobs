@@ -38,6 +38,7 @@ public class EconomyHandler {
             VaultCompatibility.addVaultCurrency(user, amount);
             return;
         }
+        // Storage layer is now cent-precise (PlayerData stores long cents); Round.twoDecimalPlaces is belt-and-suspenders.
         PlayerData.setCurrency(user, Round.twoDecimalPlaces(checkCurrency(user) + amount));
     }
 
@@ -47,6 +48,7 @@ public class EconomyHandler {
             VaultCompatibility.subtractCurrency(user, amount);
             return;
         }
+        // Storage layer is now cent-precise (PlayerData stores long cents); Round.twoDecimalPlaces is belt-and-suspenders.
         PlayerData.setCurrency(user, Round.twoDecimalPlaces(checkCurrency(user) - amount));
     }
 
@@ -73,6 +75,13 @@ public class EconomyHandler {
             return VaultCompatibility.checkCurrency(user);
 
         return PlayerData.getCurrency(user, databaseAccess);
+    }
+
+    /**
+     * Formats a currency amount to 2 decimal places for player-facing display.
+     */
+    public static String formatCurrency(double amount) {
+        return String.format("%.2f", amount);
     }
 
 }

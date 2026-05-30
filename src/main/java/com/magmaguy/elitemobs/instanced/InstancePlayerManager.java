@@ -8,6 +8,7 @@ import com.magmaguy.elitemobs.api.instanced.MatchJoinEvent;
 import com.magmaguy.elitemobs.api.instanced.MatchLeaveEvent;
 import com.magmaguy.elitemobs.collateralminecraftchanges.AlternativeDurabilityLoss;
 import com.magmaguy.elitemobs.config.ArenasConfig;
+import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.elitemobs.instanced.arena.ArenaInstance;
 import com.magmaguy.elitemobs.instanced.dungeons.DungeonInstance;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
@@ -125,6 +126,24 @@ public class InstancePlayerManager {
             matchInstance.participants.remove(player);
             return;
         }
+        // When spectating is disabled the server wants vanilla spectator mode to never be
+        // applied inside instanced content (it's the whole point of the toggle, and it closes
+        // the spectator-teleport exploit surface entirely). Waiting for a revive *is* spectator
+        // mode, so that state can no longer exist: each participant effectively gets a single
+        // life, and a dead player is removed from the instance instead of becoming a spectator
+        // at a death banner.
+        if (!DungeonsConfig.isAllowSpectatorsInInstancedContent()) {
+            MatchInstance.MatchInstanceEvents.teleportBypass = true;
+            if (matchInstance.previousPlayerLocations.get(player) != null)
+                player.teleport(matchInstance.previousPlayerLocations.get(player));
+            else if (matchInstance.exitLocation != null)
+                player.teleport(matchInstance.exitLocation);
+            PlayerData.setMatchInstance(player, null);
+            matchInstance.participants.remove(player);
+            matchInstance.playerLives.remove(player);
+            return;
+        }
+
         new InstanceDeathLocation(player, matchInstance);
         matchInstance.addSpectator(player, true);
     }

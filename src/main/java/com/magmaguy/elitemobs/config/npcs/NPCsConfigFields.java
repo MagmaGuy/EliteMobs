@@ -12,6 +12,7 @@ import org.bukkit.entity.Villager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 public class NPCsConfigFields extends CustomConfigFields {
 
@@ -114,10 +115,22 @@ public class NPCsConfigFields extends CustomConfigFields {
         super(filename, isEnabled);
     }
 
-    public void setSpawnLocation(String spawnLocation) {
+    public boolean addSpawnLocation(String spawnLocation) {
+        if (spawnLocation == null || spawnLocation.isEmpty()) return false;
+        if (this.locations == null) this.locations = new ArrayList<>();
+        if (this.locations.contains(spawnLocation)) return false;
         this.locations.add(spawnLocation);
-        this.fileConfiguration.set("spawnLocations", locations);
+        saveSpawnLocations();
+        return true;
+    }
+
+    public void setSpawnLocation(String spawnLocation) {
+        addSpawnLocation(spawnLocation);
+    }
+
+    private void saveSpawnLocations() {
         try {
+            this.fileConfiguration.set("spawnLocations", locations);
             ConfigurationEngine.fileSaverCustomValues(fileConfiguration, this.file);
         } catch (Exception ex) {
             Logger.warn("Attempted to update the location status for an NPC with no config file! Did you delete it during runtime?");
@@ -179,13 +192,8 @@ public class NPCsConfigFields extends CustomConfigFields {
 
     public void removeNPC(String locationString) {
         if (locations == null) return;
-        locations.removeIf(entry -> entry.equals(locationString));
-        this.fileConfiguration.set("spawnLocations", locations);
-        try {
-            ConfigurationEngine.fileSaverCustomValues(fileConfiguration, this.file);
-        } catch (Exception ex) {
-            Logger.warn("Attempted to update the location status for an NPC with no config file! Did you delete it during runtime?");
-        }
+        locations.removeIf(entry -> Objects.equals(entry, locationString));
+        saveSpawnLocations();
     }
 
 }

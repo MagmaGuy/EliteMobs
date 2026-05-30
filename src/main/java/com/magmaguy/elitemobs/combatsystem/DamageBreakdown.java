@@ -193,7 +193,7 @@ public class DamageBreakdown {
             sb.append(String.format("§7Weapon Adjustment: §f%.2fx %s\n", weaponAdjustment,
                     weaponAdjustment > 1 ? "§a(over-level)" : weaponAdjustment < 1 ? "§c(under-level)" : "§7(matched)"));
             sb.append(String.format("§7%s: §f%.2f\n",
-                    isRangedAttack ? "Arrow Velocity" : "Attack Cooldown", cooldownOrVelocity));
+                    isRangedAttack ? "Arrow Velocity" : "Attack Charge", cooldownOrVelocity));
             if (isSweepAttack) {
                 sb.append(String.format("§7Sweep Reduction: §c%.0f%%\n", sweepMultiplier * 100));
             }

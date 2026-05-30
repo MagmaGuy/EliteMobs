@@ -159,6 +159,14 @@ public class WormholeEntry implements PersistentObject {
             staticModel.remove();
         }
         staticModel = StaticEntity.create(modelName, location.clone());
+        if (staticModel != null) {
+            // Decorative model — wormhole teleport is proximity-based (see WormholeManager),
+            // so the model must not respond to clicks. StaticEntity's default left-click
+            // callback damages the model by 1, and default internalHealth is 1, so a single
+            // punch removes it. Same no-op-callback pattern used by PlayerDisguiseEntity.
+            staticModel.setLeftClickCallback((player, entity) -> {});
+            staticModel.setRightClickCallback((player, entity) -> {});
+        }
     }
 
     /**
@@ -339,8 +347,15 @@ public class WormholeEntry implements PersistentObject {
             initializeTextDisplay();
         }
 
-        // Skip geometry rendering when custom model is active
+        // Skip geometry rendering when custom model is active. If the model came
+        // online after the wireframe path had already spawned line entities (e.g.
+        // FMM models finish loading during async init, after a few wireframe ticks
+        // have run), tear those leftover lines down here — otherwise the player
+        // sees both the model AND the orphaned wireframe stacked at the same spot.
         if (staticModel != null) {
+            if (linesInitialized || !lineDataList.isEmpty()) {
+                clearLines();
+            }
             return;
         }
 

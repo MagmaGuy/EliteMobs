@@ -25,6 +25,7 @@ import com.magmaguy.magmacore.util.Logger;
 import com.magmaguy.magmacore.util.TemporaryWorldManager;
 import lombok.Getter;
 import org.bukkit.Location;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -42,6 +43,7 @@ public class DungeonInstance extends MatchInstance {
 
     private final List<DungeonObjective> dungeonObjectives = new ArrayList<>();
     private boolean instanceRemovalScheduled = false;
+    private boolean removalEventCalled = false;
     @Getter
     private World world;
     @Getter
@@ -380,10 +382,19 @@ public class DungeonInstance extends MatchInstance {
     }
 
     private class RemoveInstanceTask extends BukkitRunnable {
+        private static final int MAX_DELETE_ATTEMPTS = 12;
+        private static final long DELETE_RETRY_DELAY_TICKS = 20L * 5L;
+
         private final DungeonInstance dungeonInstance;
+        private final int attempt;
 
         public RemoveInstanceTask(DungeonInstance dungeonInstance) {
+            this(dungeonInstance, 1);
+        }
+
+        private RemoveInstanceTask(DungeonInstance dungeonInstance, int attempt) {
             this.dungeonInstance = dungeonInstance;
+            this.attempt = attempt;
         }
 
         @Override
@@ -394,12 +405,8 @@ public class DungeonInstance extends MatchInstance {
                 return;
             }
 
-            new EventCaller(new InstancedDungeonRemoveEvent(dungeonInstance));
-            dungeonInstances.remove(dungeonInstance);
-
             World worldToDelete = world;
             String worldName = worldToDelete.getName();
-            world = null; // Clear reference before deletion to prevent race conditions
 
             // Log diagnostic info before attempting deletion
             int entityCount = worldToDelete.getEntities().size();
@@ -407,20 +414,73 @@ public class DungeonInstance extends MatchInstance {
             int loadedChunks = worldToDelete.getLoadedChunks().length;
 
             if (playerCount > 0) {
-                Logger.warn("Attempting to delete world " + worldName + " with " + playerCount + " players still in it! This will likely fail.");
-                for (org.bukkit.entity.Player p : worldToDelete.getPlayers()) {
-                    Logger.warn(" - Player still in world: " + p.getName());
-                }
+                Logger.warn("Delaying deletion of world " + worldName + " because " + playerCount + " players are still in it.");
+                evacuatePlayers(worldToDelete);
+                retryDeletion(worldName);
+                return;
+            }
+
+            if (!removalEventCalled) {
+                new EventCaller(new InstancedDungeonRemoveEvent(dungeonInstance));
+                removalEventCalled = true;
             }
 
             try {
-                // Disable auto-save to prevent new async save tasks from being queued during unload
-                worldToDelete.setAutoSave(false);
-                TemporaryWorldManager.permanentlyDeleteWorld(worldToDelete);
+                Logger.info("Deleting instanced dungeon world " + worldName + " with " + entityCount + " entities and " + loadedChunks + " loaded chunks.");
+                if (!TemporaryWorldManager.tryPermanentlyDeleteWorld(worldToDelete)) {
+                    retryDeletion(worldName);
+                    return;
+                }
+                world = null;
+                dungeonInstances.remove(dungeonInstance);
             } catch (Exception e) {
                 Logger.warn("Exception while deleting world " + worldName + ": " + e.getMessage());
                 e.printStackTrace();
+                retryDeletion(worldName);
             }
+        }
+
+        private void evacuatePlayers(World worldToDelete) {
+            Location fallbackLocation = getFallbackLocation(worldToDelete);
+            for (Player player : new HashSet<>(worldToDelete.getPlayers())) {
+                Logger.warn(" - Player still in world: " + player.getName());
+                Location destination = getSafeExitLocation(player, worldToDelete, fallbackLocation);
+                if (destination == null) {
+                    Logger.warn("Could not find a safe destination for " + player.getName() + " while deleting " + worldToDelete.getName() + ".");
+                    continue;
+                }
+                player.setSpectatorTarget(null);
+                MatchInstance.MatchInstanceEvents.teleportBypass = true;
+                player.teleport(destination);
+            }
+        }
+
+        private Location getFallbackLocation(World worldToDelete) {
+            for (World fallbackWorld : Bukkit.getWorlds())
+                if (!fallbackWorld.equals(worldToDelete))
+                    return fallbackWorld.getSpawnLocation();
+            return null;
+        }
+
+        private Location getSafeExitLocation(Player player, World worldToDelete, Location fallbackLocation) {
+            Location previousLocation = previousPlayerLocations.get(player);
+            if (isSafeExitLocation(previousLocation, worldToDelete)) return previousLocation;
+            if (isSafeExitLocation(exitLocation, worldToDelete)) return exitLocation;
+            return fallbackLocation;
+        }
+
+        private boolean isSafeExitLocation(Location location, World worldToDelete) {
+            if (location == null || location.getWorld() == null) return false;
+            if (location.getWorld().equals(worldToDelete)) return false;
+            return Bukkit.getWorld(location.getWorld().getUID()) != null;
+        }
+
+        private void retryDeletion(String worldName) {
+            if (attempt >= MAX_DELETE_ATTEMPTS) {
+                Logger.warn("Could not safely delete instanced dungeon world " + worldName + " after " + attempt + " attempts. Leaving it loaded to avoid save errors.");
+                return;
+            }
+            new RemoveInstanceTask(dungeonInstance, attempt + 1).runTaskLater(MetadataHandler.PLUGIN, DELETE_RETRY_DELAY_TICKS);
         }
     }
 }

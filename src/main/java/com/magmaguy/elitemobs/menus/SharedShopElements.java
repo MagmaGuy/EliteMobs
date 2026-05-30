@@ -28,12 +28,12 @@ public class SharedShopElements {
                 player.sendMessage(
                                 EconomySettingsConfig.getShopBuyMessage()
                                         .replace("$item_name", itemDisplayName)
-                                        .replace("$item_value", itemValue + "")
+                                        .replace("$item_value", EconomyHandler.formatCurrency(itemValue))
                                         .replace("$currency_name", EconomySettingsConfig.getCurrencyName()));
 
                 player.sendMessage(
                                 EconomySettingsConfig.getShopCurrentBalance()
-                                        .replace("$currency_amount", EconomyHandler.checkCurrency(player.getUniqueId()) + "")
+                                        .replace("$currency_amount", EconomyHandler.formatCurrency(EconomyHandler.checkCurrency(player.getUniqueId())))
                                         .replace("$currency_name", EconomySettingsConfig.getCurrencyName()));
 
 
@@ -57,12 +57,12 @@ public class SharedShopElements {
 
                 player.sendMessage(
                                 EconomySettingsConfig.getShopCurrentBalance()
-                                        .replace("$currency_amount", EconomyHandler.checkCurrency(player.getUniqueId()) + "")
+                                        .replace("$currency_amount", EconomyHandler.formatCurrency(EconomyHandler.checkCurrency(player.getUniqueId())))
                                         .replace("$currency_name", EconomySettingsConfig.getCurrencyName()));
 
                 player.sendMessage(
                                 EconomySettingsConfig.getShopItemPrice()
-                                        .replace("$item_value", itemValue + "")
+                                        .replace("$item_value", EconomyHandler.formatCurrency(itemValue))
                                         .replace("$currency_name", EconomySettingsConfig.getCurrencyName()));
 
             }

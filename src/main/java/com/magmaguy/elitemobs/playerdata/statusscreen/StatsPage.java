@@ -29,7 +29,7 @@ public class StatsPage {
         for (int i = 0; i < 13; i++) {
             if (PlayerStatusMenuConfig.getStatsTextLines()[i] == null) continue;
             TextComponent line = new TextComponent(PlayerStatusMenuConfig.getStatsTextLines()[i]
-                    .replace("$money", EconomyHandler.checkCurrency(targetPlayer.getUniqueId()) + "")
+                    .replace("$money", EconomyHandler.formatCurrency(EconomyHandler.checkCurrency(targetPlayer.getUniqueId())))
                     .replace("$guildtier", "N/A")
                     .replace("$kills", PlayerData.getKills(targetPlayer.getUniqueId()) + "")
                     .replace("$highestkill", PlayerData.getHighestLevelKilled(targetPlayer.getUniqueId()) + "")
@@ -58,7 +58,7 @@ public class StatsPage {
         Inventory inventory = Bukkit.createInventory(requestingPlayer, 27, PlayerStatusMenuConfig.getStatsChestMenuName());
         inventory.setItem(PlayerStatusMenuConfig.getStatsMoneySlot(),
                 replaceItemNamePlaceholder(PlayerStatusMenuConfig.getStatsMoneyItem().clone(), "$money",
-                        EconomyHandler.checkCurrency(targetPlayer.getUniqueId()) + ""));
+                        EconomyHandler.formatCurrency(EconomyHandler.checkCurrency(targetPlayer.getUniqueId()))));
         inventory.setItem(PlayerStatusMenuConfig.getStatsGuildTierSlot(),
                 replaceItemNamePlaceholder(PlayerStatusMenuConfig.getStatsGuildTierItem().clone(), "$tier", "N/A"));
         inventory.setItem(PlayerStatusMenuConfig.getStatsEliteKillsSlot(),
