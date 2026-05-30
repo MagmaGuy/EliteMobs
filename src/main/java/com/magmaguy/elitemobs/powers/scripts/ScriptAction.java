@@ -14,6 +14,8 @@ import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.powers.meta.CustomSummonPower;
 import com.magmaguy.elitemobs.powers.scripts.caching.ScriptActionBlueprint;
 import com.magmaguy.elitemobs.powers.scripts.enums.ActionType;
+import com.magmaguy.elitemobs.powers.scripts.enums.TargetType;
+import com.magmaguy.magmacore.scripting.zones.Shape;
 import com.magmaguy.magmacore.util.AttributeManager;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.Logger;
@@ -168,6 +170,20 @@ public class ScriptAction {
                         return;
                     }
 
+                    // Cancel if a zone shape's center has lost its world (e.g. the
+                    // referenced world was unloaded and its weak reference got cleared).
+                    // Without this, ScriptZone#filterByElite/Player/Living would log
+                    // "World is null" once per shape per tick forever while this task
+                    // keeps ticking with no useful work.
+                    if (zoneOriginWorldLost(scriptActionData)) {
+                        Logger.warn("Cancelling repeating script action '"
+                                + blueprint.getScriptName() + "' in '"
+                                + blueprint.getScriptFilename()
+                                + "' — zone shape origin world is null.");
+                        cancel();
+                        return;
+                    }
+
                     if (blueprint.getConditionsBlueprint() != null
                             && !scriptConditions.meetsActionConditions(scriptActionData)) {
                         cancel();
@@ -194,6 +210,27 @@ public class ScriptAction {
             }
             runActions(scriptActionData);
         }
+    }
+
+    // Returns true if this action targets a zone whose shape origin has lost its
+    // world reference, meaning the task should cancel rather than keep ticking
+    // and spamming "World is null in filterBy*" warnings.
+    private boolean zoneOriginWorldLost(ScriptActionData scriptActionData) {
+        TargetType targetType = blueprint.getScriptTargets().getTargetType();
+        ScriptActionData dataForShapes;
+        switch (targetType) {
+            case ZONE_FULL, ZONE_BORDER -> dataForShapes = scriptActionData;
+            case INHERIT_SCRIPT_ZONE_FULL, INHERIT_SCRIPT_ZONE_BORDER ->
+                    dataForShapes = scriptActionData.getInheritedScriptActionData();
+            default -> { return false; }
+        }
+        ScriptZone scriptZone = scriptActionData.getScriptZone();
+        if (scriptZone == null || !scriptZone.isValid() || dataForShapes == null) return false;
+        for (Shape shape : scriptZone.generateShapes(dataForShapes, false)) {
+            Location center = shape.getCenter();
+            if (center == null || center.getWorld() == null) return true;
+        }
+        return false;
     }
 
     /**

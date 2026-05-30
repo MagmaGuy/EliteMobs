@@ -57,12 +57,13 @@ public final class LuaEntityEnricher {
             return;
         }
 
+        final EliteEntity capturedEliteForFields = eliteEntity;
         LuaTable eliteTable = new LuaTable();
         eliteTable.set("level", LuaValue.valueOf(eliteEntity.getLevel()));
         String name = eliteEntity.getName();
         eliteTable.set("name", name != null ? LuaValue.valueOf(name) : LuaValue.NIL);
-        eliteTable.set("health", LuaValue.valueOf(eliteEntity.getHealth()));
-        eliteTable.set("max_health", LuaValue.valueOf(eliteEntity.getMaxHealth()));
+        LuaTableSupport.lazyField(eliteTable, "health", () -> LuaValue.valueOf(capturedEliteForFields.getHealth()));
+        LuaTableSupport.lazyField(eliteTable, "max_health", () -> LuaValue.valueOf(capturedEliteForFields.getMaxHealth()));
 
         boolean isCustomBoss = eliteEntity.isCustomBossEntity();
         eliteTable.set("is_custom_boss", LuaValue.valueOf(isCustomBoss));

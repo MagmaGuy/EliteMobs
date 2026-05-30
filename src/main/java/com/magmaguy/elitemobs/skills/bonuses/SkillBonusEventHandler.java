@@ -109,8 +109,9 @@ public class SkillBonusEventHandler implements Listener {
         // Save and cleanup
         PlayerSkillSelection.onPlayerLeave(player);
         SkillBonusRegistry.removeAllBonuses(player);
-        // Remove armor skill health bonus
-        ArmorSkillHealthBonus.removeHealthBonus(player);
+        // Keep the armor health modifier on quit so Bukkit doesn't clamp current HP
+        // to the lowered max and persist it. applyHealthBonus on join is idempotent
+        // and will refresh the modifier from the current armor level.
 
         // Clear player-specific data
         playerStacks.remove(uuid);

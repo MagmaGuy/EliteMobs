@@ -75,6 +75,7 @@ public class CommandHandler {
         emCommand.registerCommand(new ProtectionBypassCommand());
         emCommand.registerCommand(new FirstTimeSetupCommand());
         emCommand.registerCommand(new DebugCommand());
+        emCommand.registerCommand(new DebugInfoCommand());
         emCommand.registerCommand(new UpdateContentCommand());
         emCommand.registerCommand(new DownloadAllContentCommand());
         emCommand.registerCommand(new PeaceBannerGiveCommand());

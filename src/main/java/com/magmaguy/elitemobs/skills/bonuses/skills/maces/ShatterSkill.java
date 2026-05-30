@@ -142,7 +142,14 @@ public class ShatterSkill extends SkillBonus implements CooldownSkill {
                     if (eliteEntity != null) {
                         double baseDamage = player.getAttribute(Attribute.ATTACK_DAMAGE).getValue();
                         double damage = baseDamage * damageMultiplier;
-                        living.damage(damage, player);
+                        // Bypass the player→elite formula so this skill-computed AoE hit lands
+                        // as-is instead of being re-scaled and counted by the autoclicker throttle.
+                        com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = true;
+                        try {
+                            living.damage(damage, player);
+                        } finally {
+                            com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = false;
+                        }
                         living.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, SLOW_DURATION_TICKS, 1));
                     }
                 }

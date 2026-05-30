@@ -80,7 +80,7 @@ public class ItemEnchantmentMenu extends EliteMenu {
         EnumMap<Chance, Double> chances = getChanceBreakdown(inventory);
         for (String string : confirmButtonLore)
             newLore.add(string
-                    .replace("$price", price(inventory) + "")
+                    .replace("$price", EconomyHandler.formatCurrency(price(inventory)))
                     .replace("$currencyName", EconomySettingsConfig.getCurrencyName())
                     .replace("$successChance", (Round.twoDecimalPlaces(chances.get(Chance.SUCCESS) * 100)) + "")
                     .replace("$criticalFailureChance", (Round.twoDecimalPlaces(chances.get(Chance.CRITICAL_FAILURE) * 100)) + "")
@@ -234,9 +234,9 @@ public class ItemEnchantmentMenu extends EliteMenu {
             double price = price(event.getView().getTopInventory());
             if (EconomyHandler.checkCurrency(event.getWhoClicked().getUniqueId()) < price) {
                 event.getWhoClicked().sendMessage(SpecialItemSystemsConfig.getInsufficientFundsMessage()
-                        .replace("$price", Round.twoDecimalPlaces(price) + "")
+                        .replace("$price", EconomyHandler.formatCurrency(price))
                         .replace("$currencyName", EconomySettingsConfig.getCurrencyName())
-                        .replace("$currentAmount", EconomyHandler.checkCurrency(event.getWhoClicked().getUniqueId()) + "")
+                        .replace("$currentAmount", EconomyHandler.formatCurrency(EconomyHandler.checkCurrency(event.getWhoClicked().getUniqueId())))
                         .replace("$itemName", event.getView().getTopInventory().getItem(ITEM_SLOT).getItemMeta().getDisplayName()));
                 event.getWhoClicked().closeInventory();
                 return;
@@ -250,9 +250,9 @@ public class ItemEnchantmentMenu extends EliteMenu {
 
             EconomyHandler.subtractCurrency(event.getWhoClicked().getUniqueId(), price);
             event.getWhoClicked().sendMessage(SpecialItemSystemsConfig.getNewFundsMessage()
-                    .replace("$price", price + "")
+                    .replace("$price", EconomyHandler.formatCurrency(price))
                     .replace("$currencyName", EconomySettingsConfig.getCurrencyName())
-                    .replace("$currentAmount", EconomyHandler.checkCurrency(event.getWhoClicked().getUniqueId()) + ""));
+                    .replace("$currentAmount", EconomyHandler.formatCurrency(EconomyHandler.checkCurrency(event.getWhoClicked().getUniqueId()))));
 
             EnumMap<Chance, Double> chance = getChanceBreakdown(event.getView().getTopInventory());
             double rolledChance = ThreadLocalRandom.current().nextDouble();

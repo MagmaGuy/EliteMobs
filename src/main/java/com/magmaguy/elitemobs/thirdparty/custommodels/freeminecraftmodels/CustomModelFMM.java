@@ -1,17 +1,34 @@
 package com.magmaguy.elitemobs.thirdparty.custommodels.freeminecraftmodels;
 
+import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.thirdparty.custommodels.CustomModelInterface;
+import com.magmaguy.freeminecraftmodels.api.ModeledEntityHitByProjectileEvent;
 import com.magmaguy.freeminecraftmodels.api.ModeledEntityManager;
 import com.magmaguy.freeminecraftmodels.customentity.DynamicEntity;
 import com.magmaguy.freeminecraftmodels.customentity.ModeledEntityLeftClickCallback;
 import com.magmaguy.freeminecraftmodels.customentity.ModeledEntityRightClickCallback;
 import com.magmaguy.freeminecraftmodels.customentity.core.Bone;
+import com.magmaguy.freeminecraftmodels.customentity.core.OBBHitDetection;
 import lombok.Getter;
 import org.bukkit.Location;
+import org.bukkit.entity.AbstractArrow;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class CustomModelFMM implements CustomModelInterface {
     @Getter
@@ -123,6 +140,59 @@ public class CustomModelFMM implements CustomModelInterface {
                             "Failed to refresh FMM model after reload for NPC " + npc.getUuid() + ": " + t.getMessage());
                 }
             }
+        }
+    }
+
+    /**
+     * Routes FMM OBB projectile hits on EliteMobs-backed models through the normal
+     * Bukkit projectile damage event. FMM's default modeled-hit callback applies a
+     * small raw damage value directly; that can tint the model, but it does not
+     * reliably enter the EliteMobs player-vs-elite pipeline, so damage popups and
+     * health-bar updates never fire. By owning the FMM event first and cancelling it,
+     * EliteMobs gets exactly the same downstream path as a vanilla arrow hit on the
+     * underlying entity.
+     */
+    public static class FmmProjectileDamageBridge implements Listener {
+        private static final Set<UUID> BRIDGED_PROJECTILES = ConcurrentHashMap.newKeySet();
+
+        @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+        public void onFmmProjectileHit(ModeledEntityHitByProjectileEvent event) {
+            Entity underlying = event.getEntity().getUnderlyingEntity();
+            if (!(underlying instanceof LivingEntity)) return;
+
+            EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(underlying);
+            if (eliteEntity == null || !eliteEntity.isValid()) return;
+
+            Projectile projectile = event.getProjectile();
+            if (!(projectile.getShooter() instanceof Player player)) return;
+
+            event.setCancelled(true);
+            UUID projectileId = projectile.getUniqueId();
+            if (!BRIDGED_PROJECTILES.add(projectileId)) return;
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    BRIDGED_PROJECTILES.remove(projectileId);
+                }
+            }.runTaskLater(MetadataHandler.PLUGIN, 20L);
+
+            double damage = 1.0;
+            if (projectile instanceof AbstractArrow arrow) {
+                damage = Math.max(1.0, Math.ceil(arrow.getDamage() * projectile.getVelocity().length()));
+            }
+
+            boolean previousApplyDamage = OBBHitDetection.applyDamage;
+            boolean previousBypassProjectileRedirect = OBBHitDetection.bypassProjectileRedirect;
+            OBBHitDetection.applyDamage = true;
+            OBBHitDetection.bypassProjectileRedirect = true;
+            try {
+                EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter
+                        .applyModeledProjectileHit(player, eliteEntity, projectile, damage);
+            } finally {
+                OBBHitDetection.applyDamage = previousApplyDamage;
+                OBBHitDetection.bypassProjectileRedirect = previousBypassProjectileRedirect;
+            }
+            event.getEntity().getSkeleton().tint();
         }
     }
 }

@@ -50,7 +50,7 @@ public class MajorPowerPowerStance implements Listener {
                     for (int a = 0; a < multiDimensionalTrailTracker.length; a++)
                         localObjects.addAll(addObfuscatedEffects());
                     for (int j = 0; j < multiDimensionalTrailTracker[0].length; j++)
-                        if (localObjects.get(j) != null)
+                        if (j < localObjects.size() && localObjects.get(j) != null)
                             multiDimensionalTrailTracker[i][j] = localObjects.get(j);
 
                 }
@@ -69,7 +69,7 @@ public class MajorPowerPowerStance implements Listener {
             for (int a = 0; a < multiDimensionalTrailTracker.length; a++)
                 localObjects.addAll(addAllEffects());
             for (int j = 0; j < multiDimensionalTrailTracker[0].length; j++)
-                if (localObjects.get(j) != null)
+                if (j < localObjects.size() && localObjects.get(j) != null)
                     multiDimensionalTrailTracker[i][j] = localObjects.get(j);
         }
 

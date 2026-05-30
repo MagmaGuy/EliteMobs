@@ -5,14 +5,20 @@ import com.magmaguy.elitemobs.api.QuestAcceptEvent;
 import com.magmaguy.elitemobs.api.QuestCompleteEvent;
 import com.magmaguy.elitemobs.api.QuestProgressionEvent;
 import com.magmaguy.elitemobs.config.QuestsConfig;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
+import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
+import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.items.customloottable.CustomLootEntry;
 import com.magmaguy.elitemobs.items.customloottable.EliteCustomLootEntry;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.objectives.*;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
+import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.wormhole.WormholeNavigation;
 import com.magmaguy.magmacore.util.SpigotMessage;
 import lombok.Getter;
@@ -104,22 +110,23 @@ public class QuestTracking {
                 }
                 updateLocations(customQuest);
             }
-        }.runTaskTimerAsynchronously(MetadataHandler.PLUGIN, 0L, 20L * 60L);
+        }.runTaskTimer(MetadataHandler.PLUGIN, 0L, 20L * 60L);
     }
 
     public void updateLocations(Quest quest) {
         List<ObjectiveDestinations> destinations = new ArrayList<>();
         if (!quest.getQuestObjectives().isOver()) {
             questIsDone = false;
+            turnInNPCs.clear();
             for (Objective objective : quest.getQuestObjectives().getObjectives())
-                if (!objective.isObjectiveCompleted())
+                if (objective != null && !objective.isObjectiveCompleted())
                     if (objective instanceof CustomKillObjective)
                         destinations.addAll(getKillLocations((CustomKillObjective) objective));
                     else if (objective instanceof DialogObjective)
                         destinations.addAll(getDialogLocations((DialogObjective) objective));
                     else if (objective instanceof CustomFetchObjective)
                         destinations.addAll(getFetchLocations((CustomFetchObjective) objective));
-            Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, () -> objectiveDestinations = destinations);
+            objectiveDestinations = destinations;
         } else {
             questIsDone = true;
             getTurnInNPC();
@@ -128,55 +135,118 @@ public class QuestTracking {
 
     private List<ObjectiveDestinations> getKillLocations(CustomKillObjective customKillObjective) {
         List<ObjectiveDestinations> destinations = new ArrayList<>();
-        List<Location> locations = new ArrayList<>();
-        new ArrayList<EliteEntity>(EntityTracker.getEliteMobEntities().values()).forEach(eliteEntity -> {
-            if (eliteEntity instanceof CustomBossEntity)
-                if (((CustomBossEntity) eliteEntity).getPhaseBossEntity() != null &&
-                        ((CustomBossEntity) eliteEntity).getPhaseBossEntity().getPhase1Config().getFilename().equals(customKillObjective.getCustomBossFilename())) {
-                    locations.add(eliteEntity.getLocation());
-                } else if (((CustomBossEntity) eliteEntity).getCustomBossesConfigFields().getFilename()
-                        .equals(customKillObjective.getCustomBossFilename())) {
-                    locations.add(eliteEntity.getLocation());
-                }
-        });
+        List<Location> locations = getCustomBossLocations(customKillObjective.getCustomBossFilename());
         destinations.add(new ObjectiveDestinations(customKillObjective, locations));
         return destinations;
     }
 
     private List<ObjectiveDestinations> getDialogLocations(DialogObjective dialogObjective) {
         List<ObjectiveDestinations> destinations = new ArrayList<>();
-        EntityTracker.getNpcEntities().values().forEach(npcEntity -> {
-            List<Location> locations = new ArrayList<>();
-            if (npcEntity.getNPCsConfigFields().getFilename().equals(dialogObjective.getNpcFilename()))
-                locations.add(npcEntity.getSpawnLocation());
-            destinations.add(new ObjectiveDestinations(dialogObjective, locations));
-        });
+        destinations.add(new ObjectiveDestinations(dialogObjective, getNPCLocations(dialogObjective.getNpcFilename())));
         return destinations;
     }
 
     private List<ObjectiveDestinations> getFetchLocations(CustomFetchObjective customFetchObjective) {
         List<ObjectiveDestinations> destinations = new ArrayList<>();
         List<Location> locations = new ArrayList<>();
-        new ArrayList<>(EntityTracker.getEliteMobEntities().values()).forEach(eliteEntity -> {
-            if (eliteEntity instanceof CustomBossEntity customBossEntity)
-                for (CustomLootEntry customLootEntry : customBossEntity.getCustomBossesConfigFields().getCustomLootTable().getEntries())
-                    if (customLootEntry instanceof EliteCustomLootEntry eliteCustomLootEntry && eliteCustomLootEntry.getFilename().equals(customFetchObjective.getKey()))
-                        locations.add(eliteEntity.getLocation());
+        CustomBossesConfig.getCustomBosses().values().forEach(customBossesConfigFields -> {
+            if (customBossesConfigFields.getCustomLootTable() == null) return;
+            if (dropsCustomItem(customBossesConfigFields.getCustomLootTable().getEntries(), customFetchObjective.getKey()))
+                getCustomBossLocations(customBossesConfigFields.getFilename()).forEach(location -> addLocation(locations, location));
         });
         new ArrayList<>(TreasureChest.getTreasureChestHashMap().values()).forEach((treasureChest -> {
-            for (CustomLootEntry customLootEntry : treasureChest.getCustomTreasureChestConfigFields().getCustomLootTable().getEntries())
-                if (customLootEntry instanceof EliteCustomLootEntry eliteCustomLootEntry && eliteCustomLootEntry.getFilename().equals(customFetchObjective.getKey()))
-                    locations.add(treasureChest.getLocation());
+            if (treasureChest.getCustomTreasureChestConfigFields().getCustomLootTable() == null) return;
+            if (dropsCustomItem(treasureChest.getCustomTreasureChestConfigFields().getCustomLootTable().getEntries(), customFetchObjective.getKey()))
+                addLocation(locations, treasureChest.getLocation());
         }));
         destinations.add(new ObjectiveDestinations(customFetchObjective, locations));
         return destinations;
     }
 
     private void getTurnInNPC() {
-        EntityTracker.getNpcEntities().values().forEach(npcEntity -> {
-            if (npcEntity.getNPCsConfigFields().getFilename().equals(customQuest.getQuestTaker()))
-                turnInNPCs.add(npcEntity.getSpawnLocation());
+        turnInNPCs.clear();
+        turnInNPCs.addAll(getNPCLocations(customQuest.getQuestTaker()));
+    }
+
+    private boolean dropsCustomItem(List<CustomLootEntry> customLootEntries, String itemFilename) {
+        if (customLootEntries == null || itemFilename == null) return false;
+        for (CustomLootEntry customLootEntry : customLootEntries)
+            if (customLootEntry instanceof EliteCustomLootEntry eliteCustomLootEntry && eliteCustomLootEntry.getFilename().equals(itemFilename))
+                return true;
+        return false;
+    }
+
+    private List<Location> getNPCLocations(String npcFilename) {
+        List<Location> locations = new ArrayList<>();
+        if (npcFilename == null) return locations;
+        NPCsConfigFields npcsConfigFields = NPCsConfig.getNpcEntities().get(npcFilename);
+        if (npcsConfigFields == null) return locations;
+        addLocationStrings(locations, npcsConfigFields.getLocations());
+        addLocationString(locations, npcsConfigFields.getSpawnLocation());
+        return locations;
+    }
+
+    private List<Location> getCustomBossLocations(String customBossFilename) {
+        List<Location> locations = new ArrayList<>();
+        if (customBossFilename == null) return locations;
+        CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(customBossFilename);
+        if (customBossesConfigFields != null) {
+            RegionalBossEntity.getRegionalBossEntities(customBossesConfigFields)
+                    .forEach(regionalBossEntity -> addRegionalBossLocation(locations, regionalBossEntity));
+            if (locations.isEmpty())
+                addLocationStrings(locations, customBossesConfigFields.getSpawnLocations());
+        }
+        if (locations.isEmpty())
+            addLoadedCustomBossLocations(locations, customBossFilename);
+        return locations;
+    }
+
+    private void addRegionalBossLocation(List<Location> locations, RegionalBossEntity regionalBossEntity) {
+        Location location = regionalBossEntity.getLocation();
+        if (location == null)
+            location = regionalBossEntity.getPersistentLocation();
+        addLocation(locations, location);
+    }
+
+    private void addLoadedCustomBossLocations(List<Location> locations, String customBossFilename) {
+        new ArrayList<EliteEntity>(EntityTracker.getEliteMobEntities().values()).forEach(eliteEntity -> {
+            if (!(eliteEntity instanceof CustomBossEntity customBossEntity)) return;
+            if (customBossMatches(customBossEntity, customBossFilename))
+                addLocation(locations, eliteEntity.getLocation());
         });
+    }
+
+    private boolean customBossMatches(CustomBossEntity customBossEntity, String customBossFilename) {
+        if (customBossEntity.getPhaseBossEntity() != null)
+            return customBossEntity.getPhaseBossEntity().getPhase1Config().getFilename().equals(customBossFilename);
+        return customBossEntity.getCustomBossesConfigFields().getFilename().equals(customBossFilename);
+    }
+
+    private void addLocationStrings(List<Location> locations, List<String> rawLocations) {
+        if (rawLocations == null) return;
+        rawLocations.forEach(rawLocation -> addLocationString(locations, rawLocation));
+    }
+
+    private void addLocationString(List<Location> locations, String rawLocation) {
+        if (rawLocation == null || rawLocation.isBlank()) return;
+        addLocation(locations, ConfigurationLocation.serialize(rawLocation, true));
+    }
+
+    private void addLocation(List<Location> locations, Location location) {
+        if (location == null || location.getWorld() == null) return;
+        for (Location existingLocation : locations)
+            if (isSameBlockLocation(existingLocation, location))
+                return;
+        locations.add(location);
+    }
+
+    private boolean isSameBlockLocation(Location location1, Location location2) {
+        if (location1 == null || location2 == null || location1.getWorld() == null || location2.getWorld() == null)
+            return false;
+        return location1.getWorld().equals(location2.getWorld()) &&
+                location1.getBlockX() == location2.getBlockX() &&
+                location1.getBlockY() == location2.getBlockY() &&
+                location1.getBlockZ() == location2.getBlockZ();
     }
 
     public void stop() {
@@ -265,6 +335,7 @@ public class QuestTracking {
     }
 
     private LocationAndSymbol processLocations(Location location, Objective objective) {
+        if (location == null || location.getWorld() == null) return null;
         if (player.getWorld().equals(location.getWorld())) {
             Vector toTarget = toTargetVector(player, location);
             double angle = getAngle(toTarget, player);
@@ -358,7 +429,6 @@ public class QuestTracking {
         private ObjectiveDestinations(Objective objective, List<Location> destinations) {
             this.objective = objective;
             this.destinations = destinations;
-            objectiveDestinations.add(this);
         }
     }
 

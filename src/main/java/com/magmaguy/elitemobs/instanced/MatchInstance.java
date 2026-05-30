@@ -15,6 +15,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -163,7 +164,28 @@ public abstract class MatchInstance {
 
     private void spectatorWatchdog() {
         ((HashSet<Player>) spectators.clone()).forEach(player -> {
-            if (!player.isOnline()) removeSpectator(player);
+            if (!player.isOnline()) {
+                removeSpectator(player);
+                return;
+            }
+
+            // The vanilla "spectate entity" action attaches the spectator's camera to a
+            // target entity via setCamera. It does NOT fire a cancellable PlayerTeleportEvent,
+            // so it slips past onPlayerTeleport entirely, and the server's per-tick spectator
+            // override then drags the player's body to wherever that entity is - anywhere on
+            // the server, across worlds. We catch the camera attachment directly here
+            // (getSpectatorTarget is core Bukkit API, so this works on Spigot and Paper alike)
+            // and break it whenever the target isn't a fellow participant of this instance.
+            // The camera MUST be cleared before the teleport below: teleporting a player who is
+            // still spectating an entity desyncs the client on Paper <=1.21.10 (PaperMC#13473).
+            Entity spectatorTarget = player.getSpectatorTarget();
+            if (spectatorTarget != null && !spectatorTarget.equals(player)) {
+                boolean targetIsInThisInstance = spectatorTarget instanceof Player targetPlayer
+                        && (players.contains(targetPlayer) || spectators.contains(targetPlayer));
+                if (!targetIsInThisInstance)
+                    player.setSpectatorTarget(null);
+            }
+
             if (!isInRegion(player.getLocation())) {
                 MatchInstanceEvents.teleportBypass = true;
                 player.teleport(startLocation);

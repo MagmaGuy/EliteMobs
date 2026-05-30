@@ -30,6 +30,8 @@ public class BonusCoins extends BossPower {
     public static class BonusCoinsEvents implements Listener {
         @EventHandler
         public void onEliteDeath(EliteMobDeathEvent event) {
+            // Mounts and reinforcements never pay out coins — same uncapped-farm reasoning as skill XP.
+            if (event.getEliteEntity().isReinforcementOrMount()) return;
             BonusCoins bonusCoins = (BonusCoins) event.getEliteEntity().getPower("bonus_coins.yml");
             if (bonusCoins == null) return;
             for (Player player : event.getEliteEntity().getDamagers().keySet())

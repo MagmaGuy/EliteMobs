@@ -8,7 +8,6 @@ import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.items.ItemWorthCalculator;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
-import com.magmaguy.magmacore.util.Round;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -52,7 +51,7 @@ public class SellMenu extends EliteMenu implements Listener {
         List<String> lore = new ArrayList<>();
         for (String string : clonedConfirmButton.getItemMeta().getLore())
             lore.add(string
-                    .replace("$currency_amount", itemWorth + "")
+                    .replace("$currency_amount", EconomyHandler.formatCurrency(itemWorth))
                     .replace("$currency_name", EconomySettingsConfig.getCurrencyName()));
 
         ItemMeta clonedMeta = clonedConfirmButton.getItemMeta();
@@ -93,7 +92,7 @@ public class SellMenu extends EliteMenu implements Listener {
                 List<String> lore = new ArrayList<>();
                 for (String string : SellMenuConfig.confirmButton.getItemMeta().getLore())
                     lore.add(string
-                            .replace("$currency_amount", 0 + "")
+                            .replace("$currency_amount", EconomyHandler.formatCurrency(0))
                             .replace("$currency_name", EconomySettingsConfig.getCurrencyName()));
                 SellMenuConfig.confirmButton.getItemMeta().setLore(lore);
                 ItemMeta clonedMeta = clonedConfirmButton.getItemMeta();
@@ -186,7 +185,7 @@ public class SellMenu extends EliteMenu implements Listener {
                         player.sendMessage(
                                 EconomySettingsConfig.getShopSellMessage()
                                         .replace("$item_name", itemStack.getItemMeta().getDisplayName())
-                                        .replace("$currency_amount", Round.twoDecimalPlaces(itemValue) + "")
+                                        .replace("$currency_amount", EconomyHandler.formatCurrency(itemValue))
                                         .replace("$currency_name", EconomySettingsConfig.getCurrencyName()));
                     shopInventory.clear(validSlot);
                 }
@@ -194,12 +193,12 @@ public class SellMenu extends EliteMenu implements Listener {
                 if (amount >= 3)
                     player.sendMessage(
                             EconomySettingsConfig.getShopBatchSellMessage()
-                                    .replace("$currency_amount", totalItemValue + "")
+                                    .replace("$currency_amount", EconomyHandler.formatCurrency(totalItemValue))
                                     .replace("$currency_name", EconomySettingsConfig.getCurrencyName()));
 
                 player.sendMessage(
                         EconomySettingsConfig.getShopCurrentBalance()
-                                .replace("$currency_amount", EconomyHandler.checkCurrency(player.getUniqueId()) + "")
+                                .replace("$currency_amount", EconomyHandler.formatCurrency(EconomyHandler.checkCurrency(player.getUniqueId())))
                                 .replace("$currency_name", EconomySettingsConfig.getCurrencyName()));
                 updateConfirmButton(0);
                 return;

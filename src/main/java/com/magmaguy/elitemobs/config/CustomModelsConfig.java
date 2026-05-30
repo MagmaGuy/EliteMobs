@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.magmacore.config.ConfigurationFile;
+import com.magmaguy.magmacore.menus.NightbreakSetupIcons;
 
 import java.util.List;
 
@@ -32,7 +33,7 @@ public class CustomModelsConfig extends ConfigurationFile {
                 "This applies to procedurally generated items that receive custom skins."),
                 fileConfiguration, "useAttributeScaling", true);
         anvilHammer = ConfigurationEngine.setString(file, fileConfiguration, "anvilHammer", "elitemobs:ui/anvilhammer", false);
-        redCross = ConfigurationEngine.setString(file, fileConfiguration, "cancel", "elitemobs:ui/redcross", false);
+        redCross = ConfigurationEngine.setString(file, fileConfiguration, "cancel", NightbreakSetupIcons.MODEL_RED_CROSS, false);
         goldenQuestionMark = ConfigurationEngine.setString(file, fileConfiguration, "goldenQuestionMark", "elitemobs:ui/goldenquestionmark", false);
         bagOfCoins = ConfigurationEngine.setString(file, fileConfiguration, "bagOfCoins", "elitemobs:ui/bagofcoins", false);
         boxInput = ConfigurationEngine.setString(file, fileConfiguration, "boxInput", "elitemobs:ui/boxinput", false);

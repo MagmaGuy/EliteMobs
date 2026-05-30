@@ -174,9 +174,9 @@ public class GamblingEconomyHandler {
             double fromBalance = balance;
             double fromDebt = betAmount - balance;
 
-            // Take all remaining balance
+            // Take all remaining balance (subtractCurrency is Vault-aware; setCurrency is a no-op under Vault)
             if (fromBalance > 0) {
-                EconomyHandler.setCurrency(uuid, 0);
+                EconomyHandler.subtractCurrency(uuid, fromBalance);
             }
 
             // Add the rest to debt

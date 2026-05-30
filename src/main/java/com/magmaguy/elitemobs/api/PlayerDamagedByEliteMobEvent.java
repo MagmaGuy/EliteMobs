@@ -27,6 +27,7 @@ import com.magmaguy.elitemobs.skills.bonuses.skills.spears.PhalanxSkill;
 import com.magmaguy.elitemobs.skills.bonuses.skills.swords.ParrySkill;
 import com.magmaguy.elitemobs.skills.bonuses.skills.swords.RiposteSkill;
 import com.magmaguy.elitemobs.testing.CombatSimulator;
+import com.magmaguy.elitemobs.utils.DebugMessage;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.magmacore.util.AttributeManager;
 import lombok.Getter;
@@ -421,8 +422,11 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
             else
                 configMultiplier = MobCombatSettingsConfig.getDamageToPlayerMultiplier();
 
+            // Capture specialMultiplier before it is auto-reset (used in chat breakdown below)
+            double usedSpecialMultiplier = specialMultiplier;
+
             // Calculate final damage
-            double finalDamage = Math.max(scaledDamage, 1)
+            double preCapDamage = Math.max(scaledDamage, 1)
                     * potionMultiplier
                     * customBossDamageMultiplier
                     * specialMultiplier
@@ -432,7 +436,80 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
 
             // 8. 1-shot protection
             double actualMaxHealth = AttributeManager.getAttributeValue(player, "generic_max_health");
-            finalDamage = Math.min(finalDamage, actualMaxHealth - 1);
+            double finalDamage = Math.min(preCapDamage, actualMaxHealth - 1);
+
+            // Per-player diagnostic breakdown (toggle with /em debug)
+            if (DebugMessage.isDebugEnabled(player)) {
+                String combatPath;
+                String configKey;
+                if (eliteEntity.isScaledCombat()) {
+                    combatPath = "SCALED";
+                    configKey = "scaledDamageToPlayerMultiplier";
+                } else if (eliteEntity instanceof CustomBossEntity cbForLog && cbForLog.isNormalizedCombat()) {
+                    combatPath = "NORMALIZED";
+                    configKey = "normalizedDamageToPlayerMultiplier";
+                } else {
+                    combatPath = "DEFAULT (V2)";
+                    configKey = "damageToPlayerMultiplierV2";
+                }
+                boolean normalizedFlag = eliteEntity instanceof CustomBossEntity cbForFlag && cbForFlag.isNormalizedCombat();
+                String mobName = eliteEntity.getLivingEntity() != null
+                        ? eliteEntity.getLivingEntity().getType().name() : "?";
+                String entityClass = eliteEntity.getClass().getSimpleName();
+                DebugMessage.send(player, "§6═════ EM DAMAGE: ELITE → YOU ═════");
+                DebugMessage.send(player, "§7Mob: §f" + mobName + " §7Lv§f" + eliteEntity.getLevel()
+                        + " §8(EliteEntity class: §7" + entityClass + "§8)");
+                DebugMessage.send(player, "§7Classification: isNaturalEntity=§f" + eliteEntity.isNaturalEntity()
+                        + " §7isScaledCombat=§f" + eliteEntity.isScaledCombat()
+                        + " §7isNormalizedCombat=§f" + normalizedFlag);
+                DebugMessage.send(player, "§7Per-mob damageMultiplier=§f" + String.format("%.3f", eliteEntity.getDamageMultiplier())
+                        + " §7healthMultiplier=§f" + String.format("%.3f", eliteEntity.getHealthMultiplier())
+                        + " §8(from per-boss config field; defaults 1.0 for natural elites)");
+                DebugMessage.send(player, "§7Combat path: §e" + combatPath
+                        + " §8→ pulls config key §f" + configKey);
+                DebugMessage.send(player, "§e── Formula (eliteToPlayerDamageFormula) ──");
+                DebugMessage.send(player, "§7Player armor skill level: §f" + armorSkillLevel
+                        + " §7Effective mob level used in formula: §f" + mobLevel
+                        + " §8(armor level if scaled, otherwise real mob level)");
+                DebugMessage.send(player, "§7Base = playerMaxHP / TARGET_HITS_TO_KILL_PLAYER ("
+                        + LevelScaling.TARGET_HITS_TO_KILL_PLAYER + ")");
+                DebugMessage.send(player, "§7   = " + String.format("%.2f", playerMaxHealth) + " / "
+                        + LevelScaling.TARGET_HITS_TO_KILL_PLAYER + " = §f" + String.format("%.2f", baseDamage)
+                        + " §8(damage needed per hit to kill in TARGET_HITS hits)");
+                DebugMessage.send(player, "§7× Skill adjustment = 2^((mobLv − armorLv)/"
+                        + String.format("%.1f", LevelScaling.SKILL_SCALING_RATE) + ")");
+                DebugMessage.send(player, "§7   = 2^((" + mobLevel + " − " + armorSkillLevel + ")/"
+                        + String.format("%.1f", LevelScaling.SKILL_SCALING_RATE)
+                        + ") = §f" + String.format("%.3f", skillAdjustment)
+                        + " §8(>1 if mob over-level, <1 if you out-skill)");
+                DebugMessage.send(player, "§7× Gear adjustment = §f" + String.format("%.3f", gearAdjustment)
+                        + " §8(2.0×(1−gearReduction); 0.5 fully matched, 2.0 naked; damageType=" + damageType + ", gearScore=" + String.format("%.2f", gearScore) + ")");
+                DebugMessage.send(player, "§7= scaledDamage (after explosion attenuation if any) = §f"
+                        + String.format("%.2f", scaledDamage));
+                DebugMessage.send(player, "§e── Outer multipliers ──");
+                DebugMessage.send(player, "§7× max(scaledDamage, 1) = §f"
+                        + String.format("%.2f", Math.max(scaledDamage, 1))
+                        + " §8(floor so trivial hits still register 1)");
+                DebugMessage.send(player, "§7× Potion multiplier (incoming) = §f"
+                        + String.format("%.3f", potionMultiplier)
+                        + " §8(resistance/weakness on you)");
+                DebugMessage.send(player, "§7× Per-mob damageMultiplier = §f"
+                        + String.format("%.3f", customBossDamageMultiplier)
+                        + " §8(eliteEntity.getDamageMultiplier(); per-boss YAML 'damageMultiplier')");
+                DebugMessage.send(player, "§7× Special multiplier = §f"
+                        + String.format("%.3f", usedSpecialMultiplier)
+                        + " §8(transient ability modifier; auto-resets to 1 after use)");
+                DebugMessage.send(player, "§7× Config multiplier = §f"
+                        + String.format("%.3f", configMultiplier)
+                        + " §8(" + configKey + " in MobCombatSettings.yml)");
+                DebugMessage.send(player, "§e── Result ──");
+                DebugMessage.send(player, "§7Pre-cap product = §f" + String.format("%.2f", preCapDamage));
+                DebugMessage.send(player, "§71-shot cap (actualMaxHP − 1 = "
+                        + String.format("%.2f", actualMaxHealth - 1) + ") → final = §f"
+                        + String.format("%.2f", finalDamage));
+                DebugMessage.send(player, "§a⇒ Formula returns: §f" + String.format("%.2f", finalDamage)
+                        + " §8(may still be adjusted by blocking/bypass/skill bonuses after this)");
+            }
 
             return finalDamage;
         }
@@ -506,13 +583,17 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
 
             //Calculate the damage for the event
             double newDamage = eliteToPlayerDamageFormula(player, eliteEntity, event);
+            double damageAfterFormula = newDamage;
             // Test damage override: bypass defense formula during automated testing
-            if (CombatSimulator.isTestingActive() && CombatSimulator.getTestDamageOverride() >= 0) {
+            boolean testOverrideHit = CombatSimulator.isTestingActive() && CombatSimulator.getTestDamageOverride() >= 0;
+            if (testOverrideHit) {
                 newDamage = CombatSimulator.getTestDamageOverride();
             }
+            double damageAfterTestOverride = newDamage;
             //Blocking reduces damage by 80%
             if (blocking)
                 newDamage = newDamage - newDamage * MobCombatSettingsConfig.getBlockingDamageReduction();
+            double damageAfterBlocking = newDamage;
             //nullify vanilla reductions
             for (EntityDamageEvent.DamageModifier modifier : EntityDamageByEntityEvent.DamageModifier.values())
                 if (event.isApplicable(modifier) && modifier != EntityDamageEvent.DamageModifier.ABSORPTION)
@@ -520,11 +601,15 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
 
             //Check if we should be doing raw damage, which some powers have
 
+            boolean bypassTaken = bypass;
+            double rawBypassDamage = 0;
             if (bypass) {
                 //Use raw damage in case of bypass
-                newDamage = event.getOriginalDamage(EntityDamageEvent.DamageModifier.BASE);
+                rawBypassDamage = event.getOriginalDamage(EntityDamageEvent.DamageModifier.BASE);
+                newDamage = rawBypassDamage;
                 bypass = false;
             }
+            double damageEnteringEvent = newDamage;
 
             //Run the event, see if it will get cancelled or suffer further damage modifications
             PlayerDamagedByEliteMobEvent playerDamagedByEliteMobEvent = new PlayerDamagedByEliteMobEvent(eliteEntity, player, event, projectile, newDamage);
@@ -533,6 +618,57 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
 
             //In case damage got modified along the way
             newDamage = playerDamagedByEliteMobEvent.getDamage();
+            if (DebugMessage.isDebugEnabled(player)) {
+                DebugMessage.send(player, "§6── Post-formula adjustments ──");
+                DebugMessage.send(player, "§7After formula: §f" + String.format("%.2f", damageAfterFormula));
+                if (testOverrideHit)
+                    DebugMessage.send(player, "§7Test override (CombatSimulator) forced damage to §f"
+                            + String.format("%.2f", damageAfterTestOverride));
+                if (blocking)
+                    DebugMessage.send(player, "§7Blocking (× " + String.format("%.2f", 1 - MobCombatSettingsConfig.getBlockingDamageReduction())
+                            + ", blockingDamageReduction=" + String.format("%.2f", MobCombatSettingsConfig.getBlockingDamageReduction())
+                            + "): §f" + String.format("%.2f", damageAfterBlocking));
+                else
+                    DebugMessage.send(player, "§7Blocking: §cnot blocking §8(no reduction)");
+                if (bypassTaken)
+                    DebugMessage.send(player, "§cbypass=true §7→ formula damage discarded; raw event damage = §f"
+                            + String.format("%.2f", rawBypassDamage)
+                            + " §8(power flagged this hit to skip the formula)");
+                else
+                    DebugMessage.send(player, "§7bypass=false §8(formula damage kept)");
+                DebugMessage.send(player, "§7Entering PlayerDamagedByEliteMobEvent: §f" + String.format("%.2f", damageEnteringEvent));
+                DebugMessage.send(player, "§7After event listeners (skill bonuses, etc.): §f" + String.format("%.2f", newDamage)
+                        + " §8(Evasion/Fortify/Reactive-Shielding/Parry/Phalanx etc. fire here)");
+                DebugMessage.send(player, "§7Event cancelled? §f" + playerDamagedByEliteMobEvent.isCancelled());
+                if (!playerDamagedByEliteMobEvent.isCancelled())
+                    DebugMessage.send(player, "§a⇒ DAMAGE APPLIED TO YOU: §f" + String.format("%.2f", newDamage) + " §7HP");
+                // Compact one-line summary, see EliteMobDamagedByPlayerEvent for rationale.
+                String pathTag;
+                String keyTag;
+                double appliedKeyValue;
+                if (eliteEntity.isScaledCombat()) {
+                    pathTag = "SCALED";
+                    keyTag = "scaledDamageToPlayerMultiplier";
+                    appliedKeyValue = MobCombatSettingsConfig.getScaledDamageToPlayerMultiplier();
+                } else if (eliteEntity instanceof CustomBossEntity cbTag && cbTag.isNormalizedCombat()) {
+                    pathTag = "NORMALIZED";
+                    keyTag = "normalizedDamageToPlayerMultiplier";
+                    appliedKeyValue = MobCombatSettingsConfig.getNormalizedDamageToPlayerMultiplier();
+                } else {
+                    pathTag = "DEFAULT_V2";
+                    keyTag = "damageToPlayerMultiplierV2";
+                    appliedKeyValue = MobCombatSettingsConfig.getDamageToPlayerMultiplier();
+                }
+                String mobType = eliteEntity.getLivingEntity() != null
+                        ? eliteEntity.getLivingEntity().getType().name() : "?";
+                DebugMessage.damageSummary(player, String.format(
+                        "E->P source=%s Lv%d path=%s %s=%.3f formula=%.2f blocking=%s bypass=%s entered=%.2f finalApplied=%.2f cancelled=%s",
+                        mobType, eliteEntity.getLevel(), pathTag, keyTag, appliedKeyValue,
+                        damageAfterFormula, blocking, bypassTaken,
+                        damageEnteringEvent, newDamage,
+                        playerDamagedByEliteMobEvent.isCancelled()));
+                DebugMessage.send(player, "§6═════════════════════════════════════");
+            }
 
             if (playerDamagedByEliteMobEvent.isCancelled()) {
                 bypass = false;

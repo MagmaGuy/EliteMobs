@@ -121,7 +121,7 @@ public class WormholeManager {
 
             if (EconomyHandler.checkCurrency(player.getUniqueId()) < coinCost) {
                 player.sendMessage(WormholesConfig.getInsufficientCurrencyForWormholeMessage()
-                        .replace("$amount", "" + coinCost));
+                        .replace("$amount", EconomyHandler.formatCurrency(coinCost)));
                 return false;
             }
 

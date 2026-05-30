@@ -94,7 +94,7 @@ public class PlayerStatusScreenDialog {
             if (PlayerStatusMenuConfig.getStatsTextLines()[i] == null) continue;
 
             String line = PlayerStatusMenuConfig.getStatsTextLines()[i]
-                    .replace("$money", EconomyHandler.checkCurrency(player.getUniqueId()) + "")
+                    .replace("$money", EconomyHandler.formatCurrency(EconomyHandler.checkCurrency(player.getUniqueId())))
                     .replace("$guildtier", "N/A")
                     .replace("$kills", PlayerData.getKills(player.getUniqueId()) + "")
                     .replace("$highestkill", PlayerData.getHighestLevelKilled(player.getUniqueId()) + "")

@@ -126,7 +126,14 @@ public class ConsecrationSkill extends SkillBonus implements CooldownSkill {
 
                         EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(living);
                         if (eliteEntity != null) {
-                            living.damage(damagePerTick, player);
+                            // Bypass the player→elite formula so the flat AoE tick lands as-is
+                            // instead of being re-scaled and counted by the autoclicker throttle.
+                            com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = true;
+                            try {
+                                living.damage(damagePerTick, player);
+                            } finally {
+                                com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = false;
+                            }
                             // Small hit effect
                             living.getWorld().spawnParticle(Particle.FLAME,
                                 living.getLocation().add(0, 1, 0), 5, 0.2, 0.2, 0.2, 0.02);

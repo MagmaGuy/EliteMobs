@@ -10,6 +10,7 @@ import com.magmaguy.elitemobs.quests.DynamicQuestLevel;
 import com.magmaguy.elitemobs.quests.objectives.Objective;
 import com.magmaguy.elitemobs.quests.objectives.QuestObjectives;
 import com.magmaguy.elitemobs.skills.CombatLevelCalculator;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -57,8 +58,7 @@ public class QuestReward implements Serializable {
      * Gets the effective reward level. Uses the dynamic dungeon's selected level if the player is
      * in one, otherwise falls back to the player's combat level. Has a small chance of +1 bonus.
      */
-    private int getEffectiveRewardLevel() {
-        Player player = Bukkit.getPlayer(playerUUID);
+    private int getEffectiveRewardLevel(Player player) {
         int level;
         // If in a dynamic dungeon, use the dungeon's selected level
         if (player != null) {
@@ -77,7 +77,15 @@ public class QuestReward implements Serializable {
 
     public void doRewards() {
         Player player = Bukkit.getPlayer(playerUUID);
-        int effectiveLevel = getEffectiveRewardLevel();
+        doRewards(player);
+    }
+
+    public void doRewards(Player player) {
+        if (player == null) {
+            Logger.warn("Tried to give quest rewards to an offline or missing player with UUID " + playerUUID + ". Rewards were skipped to prevent an error.");
+            return;
+        }
+        int effectiveLevel = getEffectiveRewardLevel(player);
         // Drop custom loot table entries (currency, custom items) at the player's level
         customLootTable.questDrop(player, effectiveLevel);
         // For dynamic quests, generate a procedural item reward at the player's level
@@ -92,7 +100,7 @@ public class QuestReward implements Serializable {
 
     public List<ItemStack> previewRewards() {
         Player player = Bukkit.getPlayer(playerUUID);
-        int effectiveLevel = getEffectiveRewardLevel();
+        int effectiveLevel = getEffectiveRewardLevel(player);
         List<ItemStack> items = customLootTable.previewQuestDrop(player, effectiveLevel);
         if (generateProceduralReward) {
             ItemStack itemReward = LootTables.generateItemStack(effectiveLevel, player, null);

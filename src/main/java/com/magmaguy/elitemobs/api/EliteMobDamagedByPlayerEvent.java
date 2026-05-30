@@ -44,6 +44,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -103,8 +105,8 @@ import java.util.concurrent.ThreadLocalRandom;
  *       <td>{@link LevelScaling#calculateOffensiveSkillAdjustment}</td></tr>
  *   <tr><td>weaponAdjustment</td><td>two-part linear curve</td><td>[0.5, 1.25]</td>
  *       <td>{@link WeaponOffenseCalculator#getWeaponAdjustment}</td></tr>
- *   <tr><td>cooldownOrVelocity</td><td>attackCooldown or arrowVelocity/3.0</td><td>[0, 1]</td>
- *       <td>Bukkit API / {@link WeaponOffenseCalculator#normalizeArrowVelocity}</td></tr>
+ *   <tr><td>cooldownOrVelocity</td><td>tracked melee charge or arrowVelocity/3.0</td><td>[0, 1]</td>
+ *       <td>{@link PlayerAttackCooldownTracker} / {@link WeaponOffenseCalculator#normalizeArrowVelocity}</td></tr>
  *   <tr><td>sweepMultiplier</td><td>0.25 for sweep targets, 1.0 primary</td><td>{0.25, 1.0}</td>
  *       <td>{@link WeaponOffenseCalculator#getSweepMultiplier}</td></tr>
  *   <tr><td>enchantmentMultiplier</td><td>1.0 + eliteEnchantLvl × 0.025</td><td>[1.0, ~1.2]</td>
@@ -643,6 +645,43 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
         public static boolean bypass = false;
 
         /**
+         * Applies a projectile hit that was caught by a custom model hitbox rather
+         * than by Minecraft's native entity hitbox.
+         * <p>
+         * Some modeled-hit callbacks can call {@link LivingEntity#damage(double, Entity)}
+         * and still land raw damage without producing the {@link EntityDamageByEntityEvent}
+         * shape EliteMobs handles. This method explicitly fires the same event shape a
+         * normal arrow hit would produce, lets EliteMobs and other listeners modify it,
+         * then applies the final event damage to the mob's health.
+         */
+        public static void applyModeledProjectileHit(Player player, EliteEntity eliteEntity, Projectile projectile, double rawDamage) {
+            if (player == null || eliteEntity == null || projectile == null) return;
+            LivingEntity target = eliteEntity.getLivingEntity();
+            if (target == null || !target.isValid()) return;
+
+            EntityDamageByEntityEvent syntheticEvent = new EntityDamageByEntityEvent(
+                    projectile,
+                    target,
+                    EntityDamageEvent.DamageCause.PROJECTILE,
+                    DamageSource.builder(DamageType.MOB_ATTACK).build(),
+                    rawDamage);
+            new EventCaller(syntheticEvent);
+            if (syntheticEvent.isCancelled()) return;
+
+            double finalDamage = Math.max(0D, syntheticEvent.getDamage());
+            if (finalDamage <= 0D || !eliteEntity.isValid() || target.isDead()) return;
+
+            double newHealth = target.getHealth() - finalDamage;
+            target.setLastDamageCause(syntheticEvent);
+            if (newHealth <= 0D) {
+                eliteEntity.syncPluginHealth(0D);
+                target.setHealth(0D);
+            } else {
+                eliteEntity.setHealth(newHealth);
+            }
+        }
+
+        /**
          * Gets the total elite thorns enchantment level across all armor pieces.
          * Only counts levels above vanilla max (elite-only portion).
          */
@@ -720,7 +759,8 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
          *       — exponential scaling from player skill vs mob level</li>
          *   <li><b>Weapon adjustment</b> = {@link WeaponOffenseCalculator#getWeaponAdjustment}
          *       — two-part linear curve [0.5, 1.25] from weapon level vs mob level</li>
-         *   <li><b>Cooldown / velocity</b> = {@code player.getAttackCooldown()} (melee) or
+         *   <li><b>Cooldown / velocity</b> = tracked melee charge from
+         *       {@link PlayerAttackCooldownTracker} (melee) or
          *       {@link WeaponOffenseCalculator#normalizeArrowVelocity} (ranged) — [0, 1]</li>
          *   <li><b>Sweep multiplier</b> = {@link WeaponOffenseCalculator#SWEEP_DAMAGE_FRACTION}
          *       for sweep secondary targets, 1.0 for primary — handles sword sweep</li>
@@ -766,10 +806,14 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
             double baseDamage = NaturalEliteCombatTweak.getTweakedBaseDamageToElite(eliteEntity, mobLevel);
 
             // 2. Attack speed normalization (melee only)
+            // Hoisted out of the !isRanged block so the self-tracked attack-charge
+            // computation below can reuse the same weapon attack speed to derive the
+            // weapon's full-recharge window. Ranged weapons used in melee use default
+            // fist attack speed (4.0). For true ranged attacks this value is computed
+            // but unused (charge comes from arrow velocity instead).
+            double attackSpeed = isRangedWeaponMelee ? 4.0 : EliteItemManager.getAttackSpeed(weapon);
             double attackSpeedFactor = 1.0;
             if (!isRanged) {
-                // Ranged weapons used in melee use default fist attack speed (4.0)
-                double attackSpeed = isRangedWeaponMelee ? 4.0 : EliteItemManager.getAttackSpeed(weapon);
                 attackSpeedFactor = LevelScaling.REFERENCE_ATTACK_SPEED / attackSpeed;
             }
 
@@ -806,10 +850,43 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
 
             // 5. Attack cooldown (melee) or arrow velocity (ranged)
             double cooldownOrVelocity;
+            long ticksSinceLastHit = PlayerAttackCooldownTracker.NO_PREVIOUS_HIT;
             if (isRanged) {
-                cooldownOrVelocity = WeaponOffenseCalculator.normalizeArrowVelocity((Projectile) event.getDamager());
+                // Prefer the launch-time velocity stored in the projectile PDC. Reading
+                // velocity at impact under-reports because arrows decelerate from gravity
+                // and drag — long-range shots drop well below the 3.0 full-draw value
+                // and silently halve damage. Fall back to current velocity for arrows
+                // tagged before this field existed.
+                Projectile rangedProjectile = (Projectile) event.getDamager();
+                double launchVelocity = ItemTagger.getArrowLaunchVelocity(rangedProjectile);
+                if (launchVelocity >= 0) {
+                    cooldownOrVelocity = WeaponOffenseCalculator.normalizeArrowVelocity(launchVelocity);
+                } else {
+                    cooldownOrVelocity = WeaponOffenseCalculator.normalizeArrowVelocity(rangedProjectile);
+                }
+            } else if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK) {
+                // Sweep secondaries only fire as part of a full-strength primary swing
+                // (vanilla requires >0.9 attack charge to sweep at all), so treat them as
+                // fully charged here. The 0.25 sweep reduction is applied separately via
+                // sweepMultiplier — don't double-penalize the secondary targets.
+                cooldownOrVelocity = 1.0;
             } else {
-                cooldownOrVelocity = player.getAttackCooldown();
+                // Primary melee swing: reconstruct the attack charge ourselves instead of
+                // trusting Bukkit's Player#getAttackCooldown(). Inside an
+                // EntityDamageByEntityEvent the vanilla attack-strength ticker has already
+                // been consumed/reset for this swing, so getAttackCooldown() reports a
+                // near-zero charge even for a fully recharged swing — which silently gutted
+                // melee damage (a matched sword landed ~10% of its intended hit). We instead
+                // measure the real-time gap since this player's previous melee hit
+                // (GameClock-backed PlayerAttackCooldownTracker) and divide by the weapon's
+                // full-recharge window (20 / attackSpeed ticks), clamped to [0, 1] — the same
+                // shape as the vanilla attack-strength curve. Spam-clicking still yields a low
+                // charge (short gap); a properly paced full swing yields 1.0.
+                ticksSinceLastHit = PlayerAttackCooldownTracker.recordHit(player);
+                double rechargeTicks = attackSpeed > 0 ? 20.0 / attackSpeed : 20.0;
+                cooldownOrVelocity = ticksSinceLastHit == PlayerAttackCooldownTracker.NO_PREVIOUS_HIT
+                        ? 1.0 // first tracked swing (or first after a 5-min idle eviction): assume fully charged
+                        : Math.min(ticksSinceLastHit / rechargeTicks, 1.0);
             }
 
             // 6. Sweep reduction (secondary targets)
@@ -868,10 +945,58 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
                     " Wpn=" + String.format("%.2f", weaponAdjustment) +
                     " (Lv" + (int) weaponLevel + ")" +
                     " CD=" + String.format("%.2f", cooldownOrVelocity) +
+                    (ticksSinceLastHit != PlayerAttackCooldownTracker.NO_PREVIOUS_HIT
+                            ? " Δticks=" + ticksSinceLastHit
+                            : "") +
                     (potionMultiplier != 1.0 ? " Pot=" + String.format("%.2f", potionMultiplier) : "") +
                     (isSweep ? " Sweep=" + String.format("%.2f", sweepMultiplier) : "") +
                     (arrowDamageMultiplier != 1.0 ? " ArrowMult=" + String.format("%.2f", arrowDamageMultiplier) : "") +
                     " = " + String.format("%.1f", formulaDamage));
+
+            // Per-player diagnostic breakdown (toggle with /em debug)
+            if (DebugMessage.isDebugEnabled(player)) {
+                DebugMessage.send(player, "§e── Formula (playerToEliteDamageFormula) ──");
+                DebugMessage.send(player, "§7Inputs: weaponSkillLv=§f" + weaponSkillLevel
+                        + " §7weaponLv=§f" + ((int) weaponLevel)
+                        + " §7mobLv-in-formula=§f" + mobLevel
+                        + " §8(mob level is overridden by player skill level when scaled combat is on)");
+                DebugMessage.send(player, "§7Base = mobHP_at_this_level / TARGET_HITS_TO_KILL_MOB ("
+                        + String.format("%.1f", LevelScaling.TARGET_HITS_TO_KILL_MOB) + ")");
+                DebugMessage.send(player, "§7   = §f" + String.format("%.2f", baseDamage)
+                        + " §8(damage needed per hit to kill in TARGET_HITS hits; uses legacy or recommended HP curve)");
+                DebugMessage.send(player, "§7× Attack speed factor = REFERENCE_SPEED / weaponSpeed = §f"
+                        + String.format("%.3f", attackSpeedFactor) + " §8(1.0 for ranged; normalises DPS across weapons)");
+                DebugMessage.send(player, "§7× Skill adjustment = 2^((skillLv − mobLv)/"
+                        + String.format("%.1f", LevelScaling.OFFENSIVE_SKILL_SCALING_RATE) + ") = §f"
+                        + String.format("%.3f", skillAdjustment) + " §8(>1 if you out-skill the mob)");
+                DebugMessage.send(player, "§7× Weapon adjustment = §f" + String.format("%.3f", weaponAdjustment)
+                        + " §8(piecewise linear from weapon vs mob level; 0.5 under, 1.0 matched, 1.25 over)");
+                DebugMessage.send(player, "§7× " + (isRanged ? "Arrow velocity" : "Attack cooldown") + " = §f"
+                        + String.format("%.3f", cooldownOrVelocity)
+                        + " §8(0..1; partial swings/slow arrows scale damage down)");
+                if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
+                    String gapDisplay = ticksSinceLastHit == PlayerAttackCooldownTracker.NO_PREVIOUS_HIT
+                            ? "first hit (no prior swing tracked)"
+                            : ticksSinceLastHit + " ticks ("
+                                    + String.format("%.2f", ticksSinceLastHit / 20.0) + "s)";
+                    DebugMessage.send(player, "§7  ↳ ticks since last melee hit by this player = §f"
+                            + gapDisplay
+                            + " §8(the attack charge above is now derived from this real-time gap"
+                            + " ÷ the weapon's recharge window, NOT Bukkit getAttackCooldown())");
+                }
+                DebugMessage.send(player, "§7× Sweep multiplier = §f" + String.format("%.3f", sweepMultiplier)
+                        + " §8(SWEEP_DAMAGE_FRACTION for sweep secondaries, 1.0 otherwise)");
+                DebugMessage.send(player, "§7× Potion multiplier (outgoing) = §f"
+                        + String.format("%.3f", potionMultiplier) + " §8(strength/weakness on you)");
+                DebugMessage.send(player, "§7× Enchantment multiplier = §f"
+                        + String.format("%.3f", enchantmentMultiplier)
+                        + " §8(Smite/Bane elite-only levels above vanilla max)");
+                DebugMessage.send(player, "§7× Arrow damage multiplier = §f"
+                        + String.format("%.3f", arrowDamageMultiplier)
+                        + " §8(set by Multishot/Arrow Rain skills on extra arrows; 1.0 for normal shots)");
+                DebugMessage.send(player, "§7= formulaDamage (BEFORE outer combat/config multiplier and crit) = §f"
+                        + String.format("%.2f", formulaDamage));
+            }
 
             return formulaDamage;
         }
@@ -921,6 +1046,26 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
             double damagePercentage = formulaDamage / simulatedMobHP;
             double rescaledDamage = damagePercentage * actualBossMaxHP;
 
+            if (DebugMessage.isDebugEnabled(player)) {
+                DebugMessage.send(player, "§e── Scaled-combat rescale ──");
+                DebugMessage.send(player, "§7Real mob level (restored): §f" + realMobLevel
+                        + " §7  Simulated mob level used in formula: §f" + simulatedMobLevel
+                        + " §8(player's weapon skill level; 1 for ranged-in-melee)");
+                DebugMessage.send(player, "§7formulaDamage @ simulated level = §f"
+                        + String.format("%.2f", formulaDamage));
+                DebugMessage.send(player, "§7Simulated mob HP @ simulated level = §f"
+                        + String.format("%.2f", simulatedMobHP)
+                        + " §8(NaturalEliteCombatTweak.getTweakedMobHealthForLevel × healthMultiplier=§7"
+                        + String.format("%.2f", eliteEntity.getHealthMultiplier()) + "§8)");
+                DebugMessage.send(player, "§7Actual boss max HP = §f" + String.format("%.2f", actualBossMaxHP));
+                DebugMessage.send(player, "§7damagePercentage = formulaDamage / simulatedMobHP = §f"
+                        + String.format("%.4f", damagePercentage)
+                        + " §8(% of simulated mob HP this hit took)");
+                DebugMessage.send(player, "§7rescaledDamage = damagePercentage × actualBossMaxHP = §f"
+                        + String.format("%.2f", rescaledDamage)
+                        + " §8(equivalent % of REAL mob HP; combat feels level-agnostic)");
+            }
+
             return rescaledDamage;
         }
 
@@ -966,6 +1111,12 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
             double weaponLevel = WeaponOffenseCalculator.getEffectiveWeaponLevel(weapon);
             ItemTagger.setArrowWeaponLevel(projectile, weaponLevel);
 
+            // Capture the launch-time velocity magnitude. Arrows decelerate from gravity
+            // and drag in flight; reading projectile.getVelocity() at impact gives values
+            // well below 3.0 even for full-draw shots, which underflows the ranged damage
+            // multiplier and was the source of "bows do very little damage" reports.
+            ItemTagger.setArrowLaunchVelocity(projectile, projectile.getVelocity().length());
+
             SkillType skillType = getWeaponSkillType(player);
             if (skillType != null) {
                 ItemTagger.setArrowSkillType(projectile, skillType.name());
@@ -995,8 +1146,12 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
              */
 
             // Anti-autoclicker throttle: only count genuine melee swings against elites.
-            // Sweep secondaries, thorns, and projectiles don't represent additional clicks.
+            // Sweep secondaries, thorns, projectiles, and bypass damage (skill bleed/AoE ticks
+            // applied via entity.damage()) don't represent player clicks, so they must not count
+            // toward the throttle — otherwise one AoE swing into several mobs, or a bleed ticking
+            // alongside swings, trips the lockout and zeroes the player's real damage.
             if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK
+                    && !bypass
                     && com.magmaguy.elitemobs.combatsystem.antiexploit.AutoclickerThrottle.shouldBlockHit(player)) {
                 event.setDamage(0);
                 event.setCancelled(true);
@@ -1052,6 +1207,7 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
                 // Other damage types: use raw vanilla event damage
                 damage = event.getDamage();
             }
+            double damageAfterRawFormula = damage;
 
             // Boss-specific damage modifier
             double damageModifier = 1;
@@ -1080,6 +1236,8 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
                 breakdown.setCombatMultiplier(combatMultiplier);
             }
 
+            double damageAfterConfigMultipliers = damage;
+
             // Critical hit
             boolean criticalHit = false;
             if (validPlayer) {
@@ -1098,6 +1256,55 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
                         " | Damage: " + String.format("%.1f", damage) +
                         " | Elite HP: " + String.format("%.1f", eliteEntity.getHealth()) +
                         (criticalHit ? " | CRIT" : ""));
+            }
+            double damageAfterCrit = damage;
+
+            // Per-player diagnostic breakdown (toggle with /em debug)
+            if (DebugMessage.isDebugEnabled(player)) {
+                String combatPath;
+                String configKey;
+                if (eliteEntity.isScaledCombat()) {
+                    combatPath = "SCALED";
+                    configKey = "scaledDamageToEliteMultiplier";
+                } else if (eliteEntity instanceof CustomBossEntity cbForLog && cbForLog.isNormalizedCombat()) {
+                    combatPath = "NORMALIZED";
+                    configKey = "normalizedDamageToEliteMultiplier";
+                } else {
+                    combatPath = "DEFAULT (V2)";
+                    configKey = "damageToEliteMobMultiplierV2";
+                }
+                boolean normalizedFlag = eliteEntity instanceof CustomBossEntity cbForFlag && cbForFlag.isNormalizedCombat();
+                String mobName = eliteEntity.getLivingEntity() != null
+                        ? eliteEntity.getLivingEntity().getType().name() : "?";
+                String entityClass = eliteEntity.getClass().getSimpleName();
+                DebugMessage.send(player, "§6═════ EM DAMAGE: YOU → ELITE ═════");
+                DebugMessage.send(player, "§7Target: §f" + mobName + " §7Lv§f" + eliteEntity.getLevel()
+                        + " §8(EliteEntity class: §7" + entityClass + "§8)");
+                DebugMessage.send(player, "§7Classification: isNaturalEntity=§f" + eliteEntity.isNaturalEntity()
+                        + " §7isScaledCombat=§f" + eliteEntity.isScaledCombat()
+                        + " §7isNormalizedCombat=§f" + normalizedFlag);
+                DebugMessage.send(player, "§7Per-mob damageMultiplier=§f" + String.format("%.3f", eliteEntity.getDamageMultiplier())
+                        + " §7healthMultiplier=§f" + String.format("%.3f", eliteEntity.getHealthMultiplier())
+                        + " §8(per-boss config; defaults 1.0 for natural elites)");
+                DebugMessage.send(player, "§7Combat path: §e" + combatPath
+                        + " §8→ pulls config key §f" + configKey);
+                DebugMessage.send(player, "§7Cause: §f" + event.getCause()
+                        + " §7validPlayer=§f" + validPlayer
+                        + " §7bypass=§f" + bypass);
+                DebugMessage.send(player, "§e── Outer-handler multipliers ──");
+                DebugMessage.send(player, "§7Raw formula damage = §f" + String.format("%.2f", damageAfterRawFormula)
+                        + " §8(output of " + (eliteEntity.isScaledCombat() ? "scaledPlayerToEliteDamage" : "playerToEliteDamageFormula") + " above)");
+                DebugMessage.send(player, "§7× damageModifier = §f" + String.format("%.3f", damageModifier)
+                        + " §8(weak/resist material lookup from per-boss config)");
+                DebugMessage.send(player, "§7× combatMultiplier = §f" + String.format("%.3f", combatMultiplier)
+                        + " §8(" + configKey + " in MobCombatSettings.yml)");
+                DebugMessage.send(player, "§7= " + String.format("%.2f", damageAfterConfigMultipliers));
+                if (criticalHit)
+                    DebugMessage.send(player, "§e× Crit (× 1.5) = §f" + String.format("%.2f", damageAfterCrit) + " §6CRIT!");
+                else
+                    DebugMessage.send(player, "§7× Crit = §f1.000 §8(not a crit)");
+                DebugMessage.send(player, "§7Damage entering EliteMobDamagedByPlayerEvent: §f"
+                        + String.format("%.2f", damageAfterCrit));
             }
 
             // Finalize breakdown computation
@@ -1134,12 +1341,54 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
             new EventCaller(eliteMobDamagedByPlayerEvent);
 
             if (eliteMobDamagedByPlayerEvent.isCancelled()) {
+                if (DebugMessage.isDebugEnabled(player)) {
+                    DebugMessage.send(player, "§cEvent cancelled by a listener — no damage applied.");
+                    DebugMessage.send(player, "§6═════════════════════════════════════");
+                }
                 event.setCancelled(true);
                 return;
             }
 
             //In case things got modified along the way
             damage = eliteMobDamagedByPlayerEvent.getDamage();
+            if (DebugMessage.isDebugEnabled(player)) {
+                DebugMessage.send(player, "§7After event listeners (weapon skill bonuses etc.): §f"
+                        + String.format("%.2f", damage));
+                DebugMessage.send(player, "§a⇒ DAMAGE APPLIED TO MOB: §f" + String.format("%.2f", damage)
+                        + " §7HP (mob has §f" + String.format("%.2f", eliteEntity.getHealth()) + "§7 / §f"
+                        + String.format("%.2f", eliteEntity.getMaxHealth()) + "§7 HP)");
+                // Compact one-line summary — designed to be grep'd from server logs.
+                // Captures combat path + which config multiplier was active + final
+                // damage so a single grep "[EM-Damage]" lets admins scan across many
+                // hits and spot anomalies (e.g. NORMALIZED path firing for a
+                // regular world spawn, or combatMultiplier=1.0 despite a config
+                // change that should have taken effect).
+                String pathTag;
+                String keyTag;
+                double appliedKeyValue;
+                if (eliteEntity.isScaledCombat()) {
+                    pathTag = "SCALED";
+                    keyTag = "scaledDamageToEliteMultiplier";
+                    appliedKeyValue = MobCombatSettingsConfig.getScaledDamageToEliteMultiplier();
+                } else if (eliteEntity instanceof CustomBossEntity cbTag && cbTag.isNormalizedCombat()) {
+                    pathTag = "NORMALIZED";
+                    keyTag = "normalizedDamageToEliteMultiplier";
+                    appliedKeyValue = MobCombatSettingsConfig.getNormalizedDamageToEliteMultiplier();
+                } else {
+                    pathTag = "DEFAULT_V2";
+                    keyTag = "damageToEliteMobMultiplierV2";
+                    appliedKeyValue = MobCombatSettingsConfig.getDamageToEliteMultiplier();
+                }
+                String mobType = eliteEntity.getLivingEntity() != null
+                        ? eliteEntity.getLivingEntity().getType().name() : "?";
+                DebugMessage.damageSummary(player, String.format(
+                        "P->E target=%s Lv%d path=%s %s=%.3f rawFormula=%.2f dmgMod=%.3f cfgMult=%.3f crit=%s finalApplied=%.2f mobHP=%.1f/%.1f",
+                        mobType, eliteEntity.getLevel(), pathTag, keyTag, appliedKeyValue,
+                        damageAfterRawFormula, damageModifier, combatMultiplier,
+                        criticalHit ? "1.5" : "1.0", damage,
+                        eliteEntity.getHealth(), eliteEntity.getMaxHealth()));
+                DebugMessage.send(player, "§6═════════════════════════════════════");
+            }
 
             if (validPlayer) {
                 //Time to deal custom damage!
@@ -1158,6 +1407,13 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
             }
 
             event.setDamage(EntityDamageEvent.DamageModifier.BASE, damage);
+            // Also set the total directly. For ordinary hits this is a no-op (BASE already
+            // equals `damage`, other modifiers were nullified above). But for damage dealt
+            // programmatically via LivingEntity#damage(amount, source) — e.g. FreeMinecraftModels
+            // forwarding an arrow hit onto a custom-model elite's underlying entity — the
+            // BASE-modifier override alone does NOT change the applied amount (the original
+            // `amount` lands and one-shots the mob). The total setter forces our value.
+            event.setDamage(damage);
 
             eliteEntity.syncPluginHealth(((LivingEntity) event.getEntity()).getHealth());
 

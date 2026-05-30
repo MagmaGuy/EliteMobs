@@ -87,7 +87,15 @@ public class ImpalingStrikeSkill extends SkillBonus implements ProcSkill {
 
                 // Apply bleed damage every tick interval
                 if (ticksRemaining % BLEED_TICK_INTERVAL == 0) {
-                    livingTarget.damage(damagePerTick, player);
+                    // Bypass the player→elite formula so the flat bleed tick lands as-is
+                    // (mirrors LacerateSkill) instead of being re-scaled by the formula
+                    // and counted as a click by the autoclicker throttle.
+                    com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = true;
+                    try {
+                        livingTarget.damage(damagePerTick, player);
+                    } finally {
+                        com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = false;
+                    }
 
                     // Bleed particle effect
                     LivingEntity living = target.getLivingEntity();

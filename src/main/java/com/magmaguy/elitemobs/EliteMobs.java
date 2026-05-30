@@ -30,7 +30,6 @@ import com.magmaguy.elitemobs.config.potioneffects.PotionEffectsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.config.skillbonuses.SkillBonusesConfig;
 import com.magmaguy.elitemobs.config.wormholes.WormholeConfig;
-import com.magmaguy.elitemobs.dungeons.DungeonProtector;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
 import com.magmaguy.elitemobs.dungeons.EliteMobsWorld;
 import com.magmaguy.elitemobs.economy.VaultCompatibility;
@@ -191,6 +190,10 @@ public class EliteMobs extends JavaPlugin {
         Bukkit.getLogger().info("By MagmaGuy - v. " + MetadataHandler.PLUGIN.getDescription().getVersion());
 
         MagmaCore.onEnable(this);
+        MagmaCore.exportSharedAssets(this);
+        MagmaCore.enableWorldProtections(this);
+        com.magmaguy.magmacore.instance.InstanceProtector.setContainerAllowlist(
+                block -> com.magmaguy.elitemobs.treasurechest.TreasureChest.getTreasureChest(block.getLocation()) != null);
 
         if (VersionChecker.serverVersionOlderThan(21, 0)) {
             Logger.warn("You are running a Minecraft version older than 1.21.0! EliteMobs 9.0 and later are only compatible with Minecraft 1.21.0 or later, if you are running an older Minecraft version you will need to use a pre-9.0 version of EliteMobs.");
@@ -622,7 +625,7 @@ public class EliteMobs extends JavaPlugin {
         // Third pass memory leak fixes
         CrashFix.shutdown();
         com.magmaguy.elitemobs.commands.admin.RemoveCommand.shutdown();
-        DungeonProtector.shutdown();
+        com.magmaguy.magmacore.instance.InstanceProtector.shutdown();
         DungeonKillPercentageObjective.shutdown();
         DungeonKillTargetObjective.shutdown();
         ConfigurationLocation.shutdown();
@@ -630,6 +633,7 @@ public class EliteMobs extends JavaPlugin {
         ElitePlayerInventory.shutdown();
         KeepNeutralsAngry.shutdown();
         Navigation.shutdown();
+        com.magmaguy.elitemobs.combatsystem.PlayerAttackCooldownTracker.shutdown();
         GameClock.shutdown();
         DynamicQuest.shutdown();
         DungeonInstance.shutdown();

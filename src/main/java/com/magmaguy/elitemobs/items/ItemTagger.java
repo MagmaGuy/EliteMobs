@@ -38,6 +38,7 @@ public class ItemTagger {
     private static final NamespacedKey ARROW_SKILL_TYPE = new NamespacedKey(MetadataHandler.PLUGIN, "arrowSkillType");
     private static final NamespacedKey ARROW_SKILL_LEVEL = new NamespacedKey(MetadataHandler.PLUGIN, "arrowSkillLevel");
     private static final NamespacedKey ARROW_DAMAGE_MULTIPLIER = new NamespacedKey(MetadataHandler.PLUGIN, "arrowDamageMultiplier");
+    private static final NamespacedKey ARROW_LAUNCH_VELOCITY = new NamespacedKey(MetadataHandler.PLUGIN, "arrowLaunchVelocity");
 
     public static String itemValue = "ItemValue";
 
@@ -325,6 +326,27 @@ public class ItemTagger {
     public static double getArrowDamageMultiplier(@Nullable Projectile projectile) {
         if (projectile == null) return -1;
         Double val = projectile.getPersistentDataContainer().get(ARROW_DAMAGE_MULTIPLIER, PersistentDataType.DOUBLE);
+        return val != null ? val : -1;
+    }
+
+    /**
+     * Stores the projectile's velocity magnitude at launch time. The damage formula
+     * uses this for the ranged "draw strength" multiplier — arrows decelerate from
+     * gravity/drag, so reading {@code projectile.getVelocity()} at impact would
+     * silently halve bow damage on long-range shots.
+     */
+    public static void setArrowLaunchVelocity(@Nullable Projectile projectile, double velocity) {
+        if (projectile == null) return;
+        projectile.getPersistentDataContainer().set(ARROW_LAUNCH_VELOCITY, PersistentDataType.DOUBLE, velocity);
+    }
+
+    /**
+     * Reads the launch-time velocity magnitude stored on the projectile, or -1 if
+     * not tagged (e.g. arrows fired before this tag existed, or non-player projectiles).
+     */
+    public static double getArrowLaunchVelocity(@Nullable Projectile projectile) {
+        if (projectile == null) return -1;
+        Double val = projectile.getPersistentDataContainer().get(ARROW_LAUNCH_VELOCITY, PersistentDataType.DOUBLE);
         return val != null ? val : -1;
     }
 

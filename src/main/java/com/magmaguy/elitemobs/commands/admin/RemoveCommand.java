@@ -48,27 +48,28 @@ public class RemoveCommand {
 
         @EventHandler(priority = EventPriority.LOWEST)
         public void removeEliteEntity(EntityDamageByEntityEvent event) {
-            if (!removingPlayers.contains(event.getDamager().getUniqueId())) return;
+            if (!(event.getDamager() instanceof Player player)) return;
+            if (!removingPlayers.contains(player.getUniqueId())) return;
+
+            NPCEntity npcEntity = EntityTracker.getNPCEntity(event.getEntity());
+            if (npcEntity != null) {
+                npcEntity.remove(RemovalReason.REMOVE_COMMAND);
+                event.setCancelled(true);
+                return;
+            }
+
             EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(event.getEntity());
             if (eliteEntity == null) {
-                event.getDamager().sendMessage(CommandMessagesConfig.getRemovedNotEliteMobsMessage());
-                event.getDamager().sendMessage(CommandMessagesConfig.getRemovedHijackedMessage());
+                player.sendMessage(CommandMessagesConfig.getRemovedNotEliteMobsMessage());
+                player.sendMessage(CommandMessagesConfig.getRemovedHijackedMessage());
                 event.getEntity().remove();
+                event.setCancelled(true);
                 return;
             }
             if (eliteEntity instanceof RegionalBossEntity)
-                event.getDamager().sendMessage(CommandMessagesConfig.getRemovedSpawnLocationMessage()
+                player.sendMessage(CommandMessagesConfig.getRemovedSpawnLocationMessage()
                         .replace("$boss", ((RegionalBossEntity) eliteEntity).getCustomBossesConfigFields().getFilename()));
             eliteEntity.remove(RemovalReason.REMOVE_COMMAND);
-            event.setCancelled(true);
-        }
-
-        @EventHandler(priority = EventPriority.LOWEST)
-        public void removeNPC(EntityDamageByEntityEvent event) {
-            if (!removingPlayers.contains(event.getDamager().getUniqueId())) return;
-            NPCEntity npcEntity = EntityTracker.getNPCEntity(event.getEntity());
-            if (npcEntity == null) return;
-            npcEntity.remove(RemovalReason.REMOVE_COMMAND);
             event.setCancelled(true);
         }
 

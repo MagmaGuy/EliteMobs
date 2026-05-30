@@ -32,6 +32,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
@@ -127,7 +128,18 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
         }
     }
 
+    public static boolean hasLoadedNPC(NPCsConfigFields npCsConfigFields, String locationString) {
+        if (locationString == null) return false;
+        for (NPCEntity npcEntity : EntityTracker.getNpcEntities().values()) {
+            if (npcEntity.getNPCsConfigFields() != npCsConfigFields) continue;
+            if (!locationString.equals(npcEntity.locationString)) continue;
+            if (npcEntity.isValid()) return true;
+        }
+        return false;
+    }
+
     public void remove(RemovalReason removalReason) {
+        String removedLocationString = locationString;
         if (roleDisplay != null) {
             roleDisplay.remove();
             roleDisplay = null;
@@ -136,9 +148,9 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
         com.magmaguy.elitemobs.gambling.GamblingDenOwnerDisplay.removeDisplay(uuid);
         if (villager != null) {
             villager.remove();
-            EntityTracker.getNpcEntities().remove(villager.getUniqueId());
             this.villager = null;
         }
+        EntityTracker.getNpcEntities().remove(uuid);
 
         if (removalReason.equals(RemovalReason.WORLD_UNLOAD) && isInstancedDuplicate) {
             persistentObjectHandler.remove();
@@ -147,13 +159,14 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
 
         if (removalReason.equals(RemovalReason.REMOVE_COMMAND)) {
             if (npCsConfigFields.getLocations() != null && !npCsConfigFields.getLocations().isEmpty()) {
-                npCsConfigFields.removeNPC(locationString);
+                npCsConfigFields.removeNPC(removedLocationString);
                 locationString = null;
                 spawnLocation = null;
             } else {
                 npCsConfigFields.setEnabled(false);
                 spawnLocation = null;
             }
+            removeLoadedDuplicates(removedLocationString);
             if (persistentObjectHandler != null)
                 persistentObjectHandler.remove();
         } else if (persistentObjectHandler != null)
@@ -161,6 +174,35 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
                 persistentObjectHandler.updatePersistentLocation(getPersistentLocation());
             else
                 persistentObjectHandler.remove();
+    }
+
+    private void removeLoadedDuplicates(String removedLocationString) {
+        if (removedLocationString == null) return;
+        for (NPCEntity npcEntity : new ArrayList<>(EntityTracker.getNpcEntities().values())) {
+            if (npcEntity == this) continue;
+            if (npcEntity.getNPCsConfigFields() != npCsConfigFields) continue;
+            if (!removedLocationString.equals(npcEntity.locationString)) continue;
+            npcEntity.removeDuplicateInstance();
+        }
+    }
+
+    private void removeDuplicateInstance() {
+        if (roleDisplay != null) {
+            roleDisplay.remove();
+            roleDisplay = null;
+        }
+        com.magmaguy.elitemobs.gambling.GamblingDenOwnerDisplay.removeDisplay(uuid);
+        if (villager != null) {
+            villager.remove();
+            villager = null;
+        }
+        EntityTracker.getNpcEntities().remove(uuid);
+        if (persistentObjectHandler != null) {
+            persistentObjectHandler.remove();
+            persistentObjectHandler = null;
+        }
+        locationString = null;
+        spawnLocation = null;
     }
 
     private void spawn() {

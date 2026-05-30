@@ -47,7 +47,7 @@ import org.bukkit.inventory.ItemStack;
  *   attackSpeedFactor = 1.6 / actualAttackSpeed                                     [melee only]
  *   skillAdjustment = 2^((weaponSkillLevel - mobLevel) / 7.5)                       [from LevelScaling]
  *   weaponAdjustment = 0.5 + bonus(weaponLevel, mobLevel)                           [from THIS class]
- *   cooldownOrVelocity = player.getAttackCooldown() or normalizedArrowVelocity      [0 to 1]
+ *   cooldownOrVelocity = tracked melee charge or normalizedArrowVelocity            [0 to 1]
  *   sweepMultiplier = 0.25 for secondary sweep targets, 1.0 for primary             [from THIS class]
  * </pre>
  * <p>
@@ -258,6 +258,12 @@ public class WeaponOffenseCalculator {
      * Full-draw bow velocity magnitude is approximately 3.0.
      * Crossbow bolts are approximately 3.15.
      * We normalize against 3.0 and clamp to [0, 1].
+     * <p>
+     * <b>Note:</b> {@link Projectile#getVelocity()} returns the current velocity, which
+     * decays during flight due to gravity and drag. Long-range shots can drop below
+     * 1.5 by impact even at full draw, halving the resulting damage. Callers that
+     * have a launch-time velocity stored on the arrow should pass it directly via
+     * {@link #normalizeArrowVelocity(double)} instead.
      *
      * @param projectile The projectile to measure
      * @return Normalized velocity in [0, 1]
@@ -265,6 +271,17 @@ public class WeaponOffenseCalculator {
     public static double normalizeArrowVelocity(Projectile projectile) {
         double magnitude = projectile.getVelocity().length();
         return Math.min(magnitude / 3.0, 1.0);
+    }
+
+    /**
+     * Variant of {@link #normalizeArrowVelocity(Projectile)} that takes a pre-captured
+     * velocity magnitude (typically stored on the projectile at launch via
+     * {@code ItemTagger.setArrowLaunchVelocity}). Prefer this over the projectile
+     * overload at damage-application time so in-flight deceleration does not eat
+     * into bow/crossbow damage.
+     */
+    public static double normalizeArrowVelocity(double launchVelocityMagnitude) {
+        return Math.min(launchVelocityMagnitude / 3.0, 1.0);
     }
 
 }
