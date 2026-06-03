@@ -23,3 +23,5 @@ gradlew
 
 # Logs
 *.log
+# Local design docs and plan notes - not tracked
+docs/
