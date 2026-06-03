@@ -31,6 +31,10 @@ public class DynamicDungeonInstance extends DungeonInstance {
         super(contentPackagesConfigFields, lobbyLocation, startLocation, world, player, difficultyName);
         this.selectedLevel = selectedLevel;
 
+        //The super constructor can already have rolled this instance back (cancelled MatchInstantiateEvent or a
+        //failed initial join). Don't schedule a fresh task on a doomed/torn-down instance.
+        if (cancelled || isInstanceRemovalScheduled() || getWorld() == null) return;
+
         // Recalculate level sync for dynamic dungeons based on the player-selected level
         recalculateLevelSyncForDynamicLevel(selectedLevel);
 
@@ -70,20 +74,27 @@ public class DynamicDungeonInstance extends DungeonInstance {
         World world = DungeonUtils.loadWorld(instancedWorldName, dynamicDungeonConfigFields.getEnvironment(), dynamicDungeonConfigFields);
         if (world == null) {
             player.sendMessage(DungeonsConfig.getDynamicDungeonWorldLoadFailedMessage());
+            cleanupUnloadedWorldFolder(instancedWorldName);
             return null;
         }
 
-        // Initialize dungeon music for this dynamic instanced world
-        if (dynamicDungeonConfigFields.getSong() != null)
-            new CustomMusic(dynamicDungeonConfigFields.getSong(), dynamicDungeonConfigFields, world);
+        try {
+            // Initialize dungeon music for this dynamic instanced world
+            if (dynamicDungeonConfigFields.getSong() != null)
+                new CustomMusic(dynamicDungeonConfigFields.getSong(), dynamicDungeonConfigFields, world);
 
-        Location startLocation = ConfigurationLocation.serialize(dynamicDungeonConfigFields.getStartLocationString());
-        startLocation.setWorld(world);
-        Location lobbyLocation = ConfigurationLocation.serialize(dynamicDungeonConfigFields.getTeleportLocationString());
-        if (lobbyLocation != null) lobbyLocation.setWorld(world);
-        else lobbyLocation = startLocation;
+            Location startLocation = ConfigurationLocation.serialize(dynamicDungeonConfigFields.getStartLocationString());
+            startLocation.setWorld(world);
+            Location lobbyLocation = ConfigurationLocation.serialize(dynamicDungeonConfigFields.getTeleportLocationString());
+            if (lobbyLocation != null) lobbyLocation.setWorld(world);
+            else lobbyLocation = startLocation;
 
-        return new DynamicDungeonInstance(dynamicDungeonConfigFields, lobbyLocation, startLocation, world, player, difficultyName, selectedLevel);
+            return new DynamicDungeonInstance(dynamicDungeonConfigFields, lobbyLocation, startLocation, world, player, difficultyName, selectedLevel);
+        } catch (Exception exception) {
+            com.magmaguy.magmacore.util.Logger.warn("Failed to initialize dynamic dungeon world " + instancedWorldName + ": " + exception.getMessage());
+            cleanupLoadedWorld(world);
+            throw new RuntimeException(exception);
+        }
     }
 
     @Override
@@ -109,6 +120,8 @@ public class DynamicDungeonInstance extends DungeonInstance {
 
         @Override
         public void run() {
+            if (isInstanceRemovalScheduled() || getWorld() == null || !getDungeonInstances().contains(dynamicDungeonInstance))
+                return;
             getWorld().getEntities().forEach(entity -> {
                 if (entity instanceof org.bukkit.entity.LivingEntity) {
                     Object eliteEntity = com.magmaguy.elitemobs.entitytracker.EntityTracker.getEliteMobEntity(entity);

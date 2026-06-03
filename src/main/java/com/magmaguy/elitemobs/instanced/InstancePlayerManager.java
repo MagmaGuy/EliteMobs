@@ -21,6 +21,19 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class InstancePlayerManager {
 
+    static void restoreFullHealth(Player player) {
+        if (player == null || !player.isOnline() || player.isDead()) return;
+        player.setHealth(player.getMaxHealth());
+    }
+
+    private static void restoreFullHealthIfMatchFinished(Player player, MatchInstance matchInstance) {
+        if (matchInstance.state != MatchInstance.InstancedRegionState.COMPLETED &&
+                matchInstance.state != MatchInstance.InstancedRegionState.COMPLETED_DEFEAT &&
+                matchInstance.state != MatchInstance.InstancedRegionState.COMPLETED_VICTORY)
+            return;
+        restoreFullHealth(player);
+    }
+
     public static boolean addNewPlayer(Player player, MatchInstance matchInstance) {
         MatchJoinEvent event = new MatchJoinEvent(matchInstance, player);
         if (event.isCancelled()) return false;
@@ -76,6 +89,7 @@ public class InstancePlayerManager {
 
     public static void removePlayer(Player player, MatchInstance matchInstance) {
         new MatchLeaveEvent(matchInstance, player);
+        restoreFullHealthIfMatchFinished(player, matchInstance);
 
         //Remove match instance where needed
         PlayerData.setMatchInstance(player, null);
@@ -176,6 +190,7 @@ public class InstancePlayerManager {
     }
 
     public static void removeSpectator(MatchInstance matchInstance, Player player) {
+        restoreFullHealthIfMatchFinished(player, matchInstance);
         matchInstance.spectators.remove(player);
         if (!matchInstance.players.contains(player)) {
             PlayerData.setMatchInstance(player, null);

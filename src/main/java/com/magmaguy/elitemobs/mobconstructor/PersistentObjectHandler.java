@@ -20,6 +20,7 @@ import org.bukkit.event.world.WorldUnloadEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 public class PersistentObjectHandler {
 
@@ -105,6 +106,25 @@ public class PersistentObjectHandler {
     public void remove() {
         persistentObjects.remove(this.chunk, this);
         persistentObjects.remove(this.worldName, this);
+    }
+
+    /**
+     * Removes every handler whose stored location lives in the given world. Instanced dungeon chests
+     * (and any other persistent object inside an instanced world) get keyed by chunk hash while the
+     * world is loaded, so neither the instanced-world-name removal nor the WorldUnloadEvent sweep
+     * (which both key off the base blueprint world name) can reach them. Without this, the handler
+     * keeps its persistentLocation -> instanced World -> ServerLevel alive after the dungeon closes.
+     */
+    public static void removeForWorld(UUID worldUUID) {
+        if (worldUUID == null) return;
+        List<PersistentObjectHandler> copy = new ArrayList<>(persistentObjects.values());
+        for (PersistentObjectHandler handler : copy) {
+            Location handlerLocation = handler.persistentLocation;
+            if (handlerLocation != null &&
+                    handlerLocation.getWorld() != null &&
+                    handlerLocation.getWorld().getUID().equals(worldUUID))
+                handler.remove();
+        }
     }
 
     public static class PersistentObjectHandlerEvents implements Listener {

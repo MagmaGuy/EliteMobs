@@ -44,6 +44,19 @@ public class NaturalMobSpawnEventHandler implements Listener {
      * @return
      */
     public static int getNaturalMobLevel(Location spawnLocation, List<Player> nearbyPlayers) {
+        return getNaturalMobLevel(spawnLocation, nearbyPlayers, CreatureSpawnEvent.SpawnReason.NATURAL);
+    }
+
+    public static int getNaturalMobLevel(Location spawnLocation,
+                                        List<Player> nearbyPlayers,
+                                        CreatureSpawnEvent.SpawnReason spawnReason) {
+
+        if (spawnReason == NATURAL &&
+                spawnLocation.getWorld() != null &&
+                MobCombatSettingsConfig.isUseDistanceBasedNaturalEliteLevelsForWorld(spawnLocation.getWorld().getName())) {
+            if (nearbyPlayers.isEmpty()) return 0;
+            return SpawnRadiusDifficultyIncrementer.distanceFromSpawnLevel(spawnLocation);
+        }
 
         int eliteMobLevel = 1;
         int playerCount = 0;
@@ -63,11 +76,6 @@ public class NaturalMobSpawnEventHandler implements Listener {
         Each player adds a +2 tier bonus
          */
         eliteMobLevel += playerCount * 2 * MobTierCalculator.PER_TIER_LEVEL_INCREASE;
-
-        if (MobCombatSettingsConfig.isIncreaseDifficultyWithSpawnDistance()) {
-            int levelIncrement = SpawnRadiusDifficultyIncrementer.distanceFromSpawnLevelIncrease(spawnLocation);
-            eliteMobLevel += levelIncrement;
-        }
 
         if (playerCount == 0 || eliteMobLevel < 1) return 0;
 
@@ -138,7 +146,7 @@ public class NaturalMobSpawnEventHandler implements Listener {
 
         if (ThreadLocalRandom.current().nextDouble() >= validChance) return;
 
-        int eliteMobLevel = getNaturalMobLevel(livingEntity.getLocation(), nearbyPlayers);
+        int eliteMobLevel = getNaturalMobLevel(livingEntity.getLocation(), nearbyPlayers, event.getSpawnReason());
 
         //Takes worldguard minimum and maximum level flags into account
         if (EliteMobs.worldGuardIsEnabled) {

@@ -10,6 +10,7 @@ import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
 /**
@@ -20,6 +21,7 @@ public class WorldOperationQueue {
 
     private static final Queue<WorldOperation> operationQueue = new ConcurrentLinkedQueue<>();
     private static final AtomicBoolean isProcessing = new AtomicBoolean(false);
+    private static final AtomicInteger operationGeneration = new AtomicInteger(0);
 
     /**
      * Queues a world operation for execution.
@@ -33,7 +35,7 @@ public class WorldOperationQueue {
                                        Supplier<Boolean> asyncOperation,
                                        Runnable syncOperation,
                                        String operationName) {
-        WorldOperation operation = new WorldOperation(player, asyncOperation, syncOperation, operationName);
+        WorldOperation operation = new WorldOperation(player, asyncOperation, syncOperation, operationName, operationGeneration.get());
         operationQueue.add(operation);
 
         int queuePosition = operationQueue.size();
@@ -70,6 +72,14 @@ public class WorldOperationQueue {
                 return false;
             }
         }).thenAccept(success -> {
+            if (operation.generation != operationGeneration.get() || MetadataHandler.shutdownRequested) {
+                //Do NOT release isProcessing here: a generation mismatch means this is a stale operation from a
+                //previous plugin lifecycle (a reload bumped the generation). A newer-lifecycle operation may
+                //currently own the processing slot, so clearing the flag would let a second world clone run
+                //concurrently. shutdown() owns resetting isProcessing.
+                return;
+            }
+
             if (!success) {
                 if (operation.player.isOnline()) {
                     operation.player.sendMessage(DungeonsConfig.getDungeonPrepareFailedMessage());
@@ -83,6 +93,11 @@ public class WorldOperationQueue {
             new BukkitRunnable() {
                 @Override
                 public void run() {
+                    if (operation.generation != operationGeneration.get() || MetadataHandler.shutdownRequested) {
+                        //Stale operation from a previous lifecycle: do not touch isProcessing (a newer operation
+                        //may own it). shutdown() already reset the flag for the old lifecycle.
+                        return;
+                    }
                     try {
                         operation.syncOperation.run();
                     } catch (Exception e) {
@@ -93,10 +108,14 @@ public class WorldOperationQueue {
                         }
                     } finally {
                         isProcessing.set(false);
+                        if (operation.generation != operationGeneration.get() || MetadataHandler.shutdownRequested)
+                            return;
                         // Process next operation after a short delay to let the server breathe
                         new BukkitRunnable() {
                             @Override
                             public void run() {
+                                if (operation.generation != operationGeneration.get() || MetadataHandler.shutdownRequested)
+                                    return;
                                 processNextOperation();
                             }
                         }.runTaskLater(MetadataHandler.PLUGIN, 10L); // 0.5 second delay between operations
@@ -127,18 +146,21 @@ public class WorldOperationQueue {
      * Clears the queue (used during plugin shutdown).
      */
     public static void shutdown() {
+        operationGeneration.incrementAndGet();
         for (WorldOperation op : operationQueue) {
             if (op.player.isOnline()) {
                 op.player.sendMessage(DungeonsConfig.getDungeonCancelledShutdownMessage());
             }
         }
         operationQueue.clear();
+        isProcessing.set(false);
     }
 
     private record WorldOperation(
             Player player,
             Supplier<Boolean> asyncOperation,
             Runnable syncOperation,
-            String operationName
+            String operationName,
+            int generation
     ) {}
 }

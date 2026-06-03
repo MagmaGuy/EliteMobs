@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.skills.bonuses;
 
+import com.magmaguy.elitemobs.config.SkillsConfig;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.SkillXPCalculator;
@@ -153,6 +154,11 @@ public class SkillBonusRegistry {
      * @param skillType The skill type
      */
     public static void applyBonuses(Player player, SkillType skillType) {
+        if (SkillsConfig.isWorldExcludedFromSkills(player)) {
+            removeAllBonuses(player);
+            return;
+        }
+
         int level = getPlayerSkillLevel(player, skillType);
         List<String> activeSkillIds = PlayerSkillSelection.getActiveSkills(player.getUniqueId(), skillType);
 
@@ -171,6 +177,11 @@ public class SkillBonusRegistry {
      * @param player The player
      */
     public static void applyAllBonuses(Player player) {
+        if (SkillsConfig.isWorldExcludedFromSkills(player)) {
+            removeAllBonuses(player);
+            return;
+        }
+
         for (SkillType skillType : SkillType.values()) {
             applyBonuses(player, skillType);
         }
@@ -198,6 +209,8 @@ public class SkillBonusRegistry {
      * @return Map of bonus names to their values
      */
     public static Map<String, Double> getTotalBonuses(Player player, SkillType skillType) {
+        if (SkillsConfig.isWorldExcludedFromSkills(player)) return Collections.emptyMap();
+
         Map<String, Double> totals = new LinkedHashMap<>();
         int level = getPlayerSkillLevel(player, skillType);
         List<String> activeSkillIds = PlayerSkillSelection.getActiveSkills(player.getUniqueId(), skillType);
@@ -220,6 +233,8 @@ public class SkillBonusRegistry {
      * @return List of formatted bonus strings
      */
     public static List<String> getFormattedBonuses(Player player, SkillType skillType) {
+        if (SkillsConfig.isWorldExcludedFromSkills(player)) return Collections.emptyList();
+
         List<String> formatted = new ArrayList<>();
         int level = getPlayerSkillLevel(player, skillType);
         List<String> activeSkillIds = PlayerSkillSelection.getActiveSkills(player.getUniqueId(), skillType);

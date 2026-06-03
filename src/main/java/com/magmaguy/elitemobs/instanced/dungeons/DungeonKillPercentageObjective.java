@@ -39,4 +39,11 @@ public class DungeonKillPercentageObjective extends DungeonObjective {
         dungeonKillPercentageObjectiveList.add(this);
     }
 
+    //Without this, a finished dungeon's percentage objective stays in the static list holding a strong
+    //dungeonInstance reference until plugin shutdown (DungeonKillTargetObjective already self-removes).
+    @Override
+    public void unregister() {
+        dungeonKillPercentageObjectiveList.remove(this);
+    }
+
 }

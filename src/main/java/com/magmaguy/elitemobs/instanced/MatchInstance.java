@@ -27,7 +27,9 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -57,6 +59,9 @@ public abstract class MatchInstance {
     protected String permission = null;
     @Getter
     protected boolean cancelled = false;
+    private BukkitTask watchdogTask = null;
+    private BukkitTask instanceMessageTask = null;
+    private BukkitTask countdownTask = null;
 
 
     public MatchInstance(Location startLocation, Location exitLocation, int minPlayers, int maxPlayers) {
@@ -78,7 +83,10 @@ public abstract class MatchInstance {
 
     public static void shutdown() {
         HashSet<MatchInstance> cloneInstance = new HashSet<>(instances);
-        cloneInstance.forEach(MatchInstance::destroyMatch);
+        cloneInstance.forEach(matchInstance -> {
+            matchInstance.cancelScheduledTasks();
+            matchInstance.destroyMatch();
+        });
         instances.clear();
     }
 
@@ -139,7 +147,8 @@ public abstract class MatchInstance {
     }
 
     private void startWatchdogs() {
-        new WatchdogTask().runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
+        cancelTask(watchdogTask);
+        watchdogTask = new WatchdogTask().runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
     }
 
     public void countdownMatch() {
@@ -149,7 +158,8 @@ public abstract class MatchInstance {
             return;
         }
         state = InstancedRegionState.STARTING;
-        new CountdownTask().runTaskTimer(MetadataHandler.PLUGIN, 0L, 20L);
+        cancelTask(countdownTask);
+        countdownTask = new CountdownTask().runTaskTimer(MetadataHandler.PLUGIN, 0L, 20L);
     }
 
     private void playerWatchdog() {
@@ -210,13 +220,32 @@ public abstract class MatchInstance {
     }
 
     private void instanceMessages() {
-        new BukkitRunnable() {
+        cancelTask(instanceMessageTask);
+        instanceMessageTask = new BukkitRunnable() {
             @Override
             public void run() {
+                if (!instances.contains(MatchInstance.this)) {
+                    cancel();
+                    instanceMessageTask = null;
+                    return;
+                }
                 if (state == InstancedRegionState.WAITING)
                     announce(ArenasConfig.getArenaStartHintMessage().replace("$count", minPlayers + ""));
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 20*60L);
+    }
+
+    protected void cancelScheduledTasks() {
+        cancelTask(watchdogTask);
+        watchdogTask = null;
+        cancelTask(instanceMessageTask);
+        instanceMessageTask = null;
+        cancelTask(countdownTask);
+        countdownTask = null;
+    }
+
+    private void cancelTask(BukkitTask task) {
+        if (task != null) task.cancel();
     }
 
     protected void announce(String message) {
@@ -226,6 +255,11 @@ public abstract class MatchInstance {
     private class WatchdogTask extends BukkitRunnable {
         @Override
         public void run() {
+            if (!instances.contains(MatchInstance.this)) {
+                cancel();
+                watchdogTask = null;
+                return;
+            }
             playerWatchdog();
             spectatorWatchdog();
             intruderWatchdog();
@@ -239,6 +273,7 @@ public abstract class MatchInstance {
         public void run() {
             if (players.size() < minPlayers) {
                 cancel();
+                countdownTask = null;
                 endMatch();
                 return;
             }
@@ -248,6 +283,7 @@ public abstract class MatchInstance {
             if (counter >= 3) {
                 startMatch();
                 cancel();
+                countdownTask = null;
             }
         }
     }
@@ -285,19 +321,29 @@ public abstract class MatchInstance {
         if (state != InstancedRegionState.COMPLETED_VICTORY &&
                 state != InstancedRegionState.COMPLETED_DEFEAT)
             state = InstancedRegionState.COMPLETED;
+        restoreParticipantsHealth();
         //todo this should probable call resetMatch() and resetMatch() should probably be renamed because that's not what it does
         new MatchDestroyEvent(this);
     }
 
     protected void destroyMatch() {
+        boolean matchWasCompleted = state == InstancedRegionState.COMPLETED ||
+                state == InstancedRegionState.COMPLETED_VICTORY ||
+                state == InstancedRegionState.COMPLETED_DEFEAT;
+        if (matchWasCompleted) restoreParticipantsHealth();
         state = InstancedRegionState.WAITING;
         HashSet<Player> copy = new HashSet<>(participants);
         copy.forEach(this::removeAnyKind);
         players.clear();
         spectators.clear();
-        deathBanners.values().forEach(deathLocation -> deathLocation.clear(false));
+        new ArrayList<>(deathBanners.values()).forEach(deathLocation -> deathLocation.clear(false));
         deathBanners.clear();
         new MatchDestroyEvent(this);
+    }
+
+    private void restoreParticipantsHealth() {
+        HashSet<Player> copy = new HashSet<>(participants);
+        copy.forEach(InstancePlayerManager::restoreFullHealth);
     }
 
     protected InstanceDeathLocation getDeathLocationByPlayer(Player player) {

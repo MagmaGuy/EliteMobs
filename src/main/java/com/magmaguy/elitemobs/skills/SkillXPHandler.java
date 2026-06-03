@@ -82,6 +82,9 @@ public class SkillXPHandler implements Listener {
             if (player.hasMetadata("NPC")) continue;
             if (!PlayerData.isInMemory(player.getUniqueId())) continue;
             if (lockedOutPlayers.contains(player)) continue;
+            if (SkillsConfig.isWorldExcludedFromSkills(player)) continue;
+            if (deathLocation != null && deathLocation.getWorld() != null &&
+                    SkillsConfig.isWorldExcludedFromSkills(deathLocation.getWorld().getName())) continue;
 
             int rewardLevel = ScaledCombatRewardResolver.getRewardLevel(eliteEntity, player);
 

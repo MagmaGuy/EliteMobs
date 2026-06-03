@@ -52,9 +52,9 @@ public class DynamicDungeonPackage extends EMPackage implements CombatContent {
             return;
         } else {
             //Scans both legacy and Paper-26.1+ modern world layouts.
-            String dungeonName = file.getName();
+            String instancedWorldPattern = java.util.regex.Pattern.quote(contentPackagesConfigFields.getWorldName()) + "_\\d+$";
             for (String worldName : WorldFolderResolver.listAllWorldNames()) {
-                if (worldName.contains(dungeonName) && worldName.matches(".*_\\d{1,2}$")) {
+                if (worldName.matches(instancedWorldPattern)) {
                     WorldFolderResolver.deleteAllLayouts(worldName);
                     Logger.info("Removing previously instanced world " + worldName);
                 }

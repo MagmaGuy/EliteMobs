@@ -92,6 +92,20 @@ public class TreasureChest implements PersistentObject {
         treasureChestHashMap.clear();
     }
 
+    public static void removeInstancedTreasureChests(World world) {
+        if (world == null) return;
+        UUID worldUUID = world.getUID();
+        treasureChestHashMap.entrySet().removeIf(entry -> {
+            Location keyLocation = entry.getKey();
+            Location chestLocation = entry.getValue().location;
+            return isLocationInWorld(keyLocation, worldUUID) || isLocationInWorld(chestLocation, worldUUID);
+        });
+        instancedTreasureChests.values().forEach(treasureChest -> {
+            if (isLocationInWorld(treasureChest.location, worldUUID))
+                treasureChest.location = null;
+        });
+    }
+
     public static void shutdown() {
         treasureChestHashMap.clear();
         instancedTreasureChests.clear();
@@ -99,6 +113,10 @@ public class TreasureChest implements PersistentObject {
 
     public static TreasureChest getTreasureChest(Location location) {
         return getTreasureChestHashMap().get(location);
+    }
+
+    private static boolean isLocationInWorld(Location location, UUID worldUUID) {
+        return location != null && location.getWorld() != null && location.getWorld().getUID().equals(worldUUID);
     }
 
     private void initializeChest() {
