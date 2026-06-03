@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.menus.*;
 import com.magmaguy.elitemobs.menus.gambling.BettingMenu;
+import com.magmaguy.elitemobs.npcs.scripts.NPCScriptHook;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.QuestInteractionHandler;
 import com.magmaguy.magmacore.util.ChatColorConverter;
@@ -39,6 +40,8 @@ public class NPCInteractions implements Listener {
         if (cooldowns.contains(playerUUID)) return;
         cooldowns.add(playerUUID);
         Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> cooldowns.remove(playerUUID), 1);
+
+        npcEntity.runScripts(NPCScriptHook.ON_INTERACT, null, player);
 
         switch (npcEntity.getNPCsConfigFields().getInteractionType()) {
             case GUILD_GREETER:

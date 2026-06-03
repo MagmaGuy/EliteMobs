@@ -34,6 +34,14 @@ public class GroundPoundLuaConfig extends LuaPowersConfigFields {
                   }, 20)
                 end
 
+                local function physical_body(context)
+                  local mount = context.boss:get_mount()
+                  if mount ~= nil then
+                    return mount
+                  end
+                  return context.boss
+                end
+
                 return {
                   api_version = 1,
                   on_boss_damaged_by_player = function(context)
@@ -46,8 +54,9 @@ public class GroundPoundLuaConfig extends LuaPowersConfigFields {
                       if not context.boss:is_alive() then
                         return
                       end
-                      context.boss:set_velocity_vector(em.create_vector(0, 1.5, 0))
-                      cloud_particle(context, context.boss:get_location(), 10)
+                      local body = physical_body(context)
+                      body:set_velocity_vector(em.create_vector(0, 1.5, 0))
+                      cloud_particle(context, body:get_location(), 10)
                     end)
 
                     context.scheduler:run_after(20, function()
@@ -60,7 +69,8 @@ public class GroundPoundLuaConfig extends LuaPowersConfigFields {
                         return
                       end
 
-                      local boss_location = context.boss:get_location()
+                      local body = physical_body(context)
+                      local boss_location = body:get_location()
                       local feet_check = em.create_location(
                         boss_location.x,
                         boss_location.y - 0.2,
@@ -71,8 +81,8 @@ public class GroundPoundLuaConfig extends LuaPowersConfigFields {
                       )
 
                       if not context.world:is_passthrough_at_location(feet_check) then
-                        context.boss:set_velocity_vector(em.create_vector(0, -2, 0))
-                        cloud_particle(context, context.boss:get_location(), 10)
+                        body:set_velocity_vector(em.create_vector(0, -2, 0))
+                        cloud_particle(context, body:get_location(), 10)
                         context.scheduler:cancel_task(fall_task)
 
                         local land_task
@@ -84,23 +94,27 @@ public class GroundPoundLuaConfig extends LuaPowersConfigFields {
                             return
                           end
 
-                          if not context.world:is_on_floor_at_location(context.boss:get_location()) then
+                          local landing_body = physical_body(context)
+                          local landing_location = landing_body:get_location()
+                          if not context.world:is_on_floor_at_location(landing_location) then
                             return
                           end
 
                           context.scheduler:cancel_task(land_task)
-                          land_cloud_particle(context, context.boss:get_location())
+                          land_cloud_particle(context, landing_location)
 
                           for _, entity in ipairs(context.entities.get_nearby_entities(10, "all")) do
-                            local push = context.vectors.get_vector_between_locations(context.boss:get_location(), entity:get_location())
-                            push = context.vectors.normalize_vector(push)
-                            entity:set_velocity_vector({
-                              x = push.x * 2,
-                              y = 1.5,
-                              z = push.z * 2
-                            })
-                            if entity.is_alive ~= nil and entity:is_alive() then
-                              entity:apply_potion_effect("SLOWNESS", 60, 2)
+                            if entity.uuid ~= landing_body.uuid then
+                              local push = context.vectors.get_vector_between_locations(landing_location, entity:get_location())
+                              push = context.vectors.normalize_vector(push)
+                              entity:set_velocity_vector({
+                                x = push.x * 2,
+                                y = 1.5,
+                                z = push.z * 2
+                              })
+                              if entity.is_alive ~= nil and entity:is_alive() then
+                                entity:apply_potion_effect("SLOWNESS", 60, 2)
+                              end
                             end
                           end
                         end)

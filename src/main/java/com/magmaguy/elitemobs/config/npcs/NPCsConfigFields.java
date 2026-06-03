@@ -7,6 +7,7 @@ import com.magmaguy.magmacore.util.Logger;
 import com.magmaguy.magmacore.util.VersionChecker;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Villager;
 
 import java.util.ArrayList;
@@ -25,9 +26,8 @@ public class NPCsConfigFields extends CustomConfigFields {
     @Getter
     @Setter
     private String role = "";
-    @Getter
     @Setter
-    private Villager.Profession profession = Villager.Profession.NITWIT;
+    private Villager.Profession profession = null;
     @Getter
     private String spawnLocation;
     @Getter
@@ -84,6 +84,9 @@ public class NPCsConfigFields extends CustomConfigFields {
     @Getter
     @Setter
     private boolean syncMovement = true;
+    @Getter
+    @Setter
+    private List<String> scripts = new ArrayList<>();
 
     public NPCsConfigFields(String fileName,
                             boolean isEnabled,
@@ -143,11 +146,14 @@ public class NPCsConfigFields extends CustomConfigFields {
         this.name = translatable(filename, "name", processString("name", name, "", true));
         this.role = translatable(filename, "role", processString("role", role, "", true));
         try {
-            if (VersionChecker.serverVersionOlderThan(21, 4))
-                this.profession = Villager.Profession.valueOf(processString("profession", profession.toString(), Villager.Profession.NITWIT.toString(), false));
+            if (Bukkit.getServer() == null) {
+                processString("profession", professionConfigName(), "nitwit", false);
+            } else if (VersionChecker.serverVersionOlderThan(21, 4))
+                this.profession = Villager.Profession.valueOf(processString("profession", professionConfigName(), "NITWIT", false).toUpperCase(Locale.ROOT));
             else {
+                String professionString = processString("profession", professionConfigName(), "nitwit", false);
                 for (Villager.Profession value : Villager.Profession.values()) {
-                    if (value.getKey().getKey().toLowerCase(Locale.ROOT).equals(profession.toString().toLowerCase(Locale.ROOT))) {
+                    if (value.getKey().getKey().toLowerCase(Locale.ROOT).equals(professionString.toLowerCase(Locale.ROOT))) {
                         this.profession = value;
                         break;
                     }
@@ -178,6 +184,17 @@ public class NPCsConfigFields extends CustomConfigFields {
         this.instanced = processBoolean("instanced", instanced, false, false);
         this.scale = processDouble("scale", scale, 1, false);
         this.syncMovement = processBoolean("syncMovement", syncMovement, false, true);
+        this.scripts = processStringList("scripts", scripts, new ArrayList<>(), false);
+    }
+
+    public Villager.Profession getProfession() {
+        if (profession == null) return Villager.Profession.NITWIT;
+        return profession;
+    }
+
+    private String professionConfigName() {
+        if (profession == null) return "nitwit";
+        return profession.toString();
     }
 
     public void setEnabled(boolean enabled) {
