@@ -140,6 +140,13 @@ public class InstancedBossEntity extends RegionalBossEntity implements Persisten
                 persistentObjectHandler.remove();
                 persistentObjectHandler = null;
             }
+        if (removalReason.equals(RemovalReason.WORLD_UNLOAD) ||
+                removalReason.equals(RemovalReason.SHUTDOWN) ||
+                removalReason.equals(RemovalReason.ARENA_RESET)) {
+            dungeonInstance = null;
+            matchInstance = null;
+            lockoutPlayers.clear();
+        }
     }
 
     private static class InstancedBossContainer {

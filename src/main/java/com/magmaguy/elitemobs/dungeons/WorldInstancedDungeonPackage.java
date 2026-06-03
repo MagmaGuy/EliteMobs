@@ -58,9 +58,9 @@ public class WorldInstancedDungeonPackage extends EMPackage implements CombatCon
         } else {
             //This removes all instanced worlds not previously correctly removed
             //(scans both legacy and Paper-26.1+ modern world layouts).
-            String dungeonName = file.getName();
+            String instancedWorldPattern = java.util.regex.Pattern.quote(contentPackagesConfigFields.getWorldName()) + "_\\d+$";
             for (String worldName : WorldFolderResolver.listAllWorldNames()) {
-                if (worldName.contains(dungeonName) && worldName.matches(".*_\\d{1,2}$")) {
+                if (worldName.matches(instancedWorldPattern)) {
                     WorldFolderResolver.deleteAllLayouts(worldName);
                     Logger.info("Removing previously instanced world " + worldName);
                 }

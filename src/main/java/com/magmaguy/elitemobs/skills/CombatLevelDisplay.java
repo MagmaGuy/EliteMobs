@@ -46,6 +46,10 @@ public class CombatLevelDisplay implements Listener {
     public static void createDisplay(Player player) {
         if (!SkillsConfig.isSkillSystemEnabled()) return;
         if (!SkillsConfig.isShowCombatLevelDisplay()) return;
+        if (SkillsConfig.isWorldExcludedFromSkills(player)) {
+            removeDisplay(player);
+            return;
+        }
         if (NMSManager.getAdapter() == null) return;
 
         // Remove existing display if present
@@ -89,6 +93,11 @@ public class CombatLevelDisplay implements Listener {
      * @param player The player to update the display for
      */
     public static void updateDisplay(Player player) {
+        if (SkillsConfig.isWorldExcludedFromSkills(player)) {
+            removeDisplay(player);
+            return;
+        }
+
         FakeText fakeText = playerDisplays.get(player.getUniqueId());
         if (fakeText != null) {
             fakeText.setText(ChatColorConverter.convert(CombatLevelCalculator.getFormattedCombatLevel(player.getUniqueId())));

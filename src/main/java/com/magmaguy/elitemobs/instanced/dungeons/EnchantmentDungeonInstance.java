@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.instanced.dungeons;
 
-import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.elitemobs.config.SpecialItemSystemsConfig;
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
@@ -14,7 +13,6 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -81,12 +79,14 @@ public class EnchantmentDungeonInstance extends DungeonInstance {
 
     @Override
     public void endMatch() {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                removeInstance();
-            }
-        }.runTaskLater(MetadataHandler.PLUGIN, 20 * 10);
+        if (players.isEmpty()) {
+            removeInstance();
+            return;
+        }
+        //Enchantment challenges tear down quickly; route through the cancellable destroyMatchTask slot instead
+        //of a fire-and-forget BukkitRunnable so teardown can cancel it (the old runnable pinned the instance
+        //in CraftScheduler.pending for its whole delay -- the exact leak shape from the heap dump).
+        scheduleDelayedDestroy(20 * 10L);
     }
 
     @Override

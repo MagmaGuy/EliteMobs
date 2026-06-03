@@ -73,6 +73,14 @@ public class CustomMusic {
         playerSongSingleton.clear();
     }
 
+    public static void removeDungeonMusic(UUID worldUUID) {
+        CustomMusic customMusic = dungeonMusic.remove(worldUUID);
+        if (customMusic == null) return;
+        customMusic.stop();
+        customMusic.world = null;
+        playerSongSingleton.entrySet().removeIf(entry -> entry.getValue().equals(customMusic));
+    }
+
     private void parse(String rawString, int entryNumber) {
         String[] strings = rawString.split(" ");
         for (String string : strings) {

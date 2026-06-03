@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.combatsystem.ArmorDefenseCalculator;
 import com.magmaguy.elitemobs.combatsystem.LevelScaling;
 import com.magmaguy.elitemobs.combatsystem.PotionCombatModifierCalculator;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
+import com.magmaguy.elitemobs.config.SkillsConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
@@ -124,6 +125,7 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
      */
     public boolean applySkillBonuses() {
         if (player == null || player.hasMetadata("NPC")) return false;
+        if (SkillsConfig.isWorldExcludedFromSkills(player)) return false;
         if (!ElitePlayerInventory.playerInventories.containsKey(player.getUniqueId())) return false;
 
         int skillLevel = SkillBonusRegistry.getPlayerSkillLevel(player, SkillType.ARMOR);
@@ -368,9 +370,10 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
             if (ElitePlayerInventory.getPlayer(player) == null) return 0;
 
             // 1. Player stats
-            long armorSkillXP = PlayerData.getSkillXP(player.getUniqueId(), SkillType.ARMOR);
-            int armorSkillLevel = Math.max(1, SkillXPCalculator.levelFromTotalXP(armorSkillXP));
-            double playerMaxHealth = ArmorSkillHealthBonus.getConfiguredMaxHealthForArmorLevel(armorSkillLevel);
+            boolean skillsExcluded = SkillsConfig.isWorldExcludedFromSkills(player);
+            long armorSkillXP = skillsExcluded ? 0 : PlayerData.getSkillXP(player.getUniqueId(), SkillType.ARMOR);
+            int armorSkillLevel = skillsExcluded ? 1 : Math.max(1, SkillXPCalculator.levelFromTotalXP(armorSkillXP));
+            double playerMaxHealth = ArmorSkillHealthBonus.getConfiguredMaxHealthForPlayer(player, armorSkillLevel);
             int mobLevel = eliteEntity.getLevel();
 
             // Scaled combat: simulate the boss at the player's armor skill level
@@ -578,7 +581,7 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
                 }
 
                 // Trigger Riposte skill on successful block (melee only)
-                RiposteSkill.onPlayerBlock(player);
+                if (!SkillsConfig.isWorldExcludedFromSkills(player)) RiposteSkill.onPlayerBlock(player);
             }
 
             //Calculate the damage for the event

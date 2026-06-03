@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobHealEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.collateralminecraftchanges.KeepNeutralsAngry;
+import com.magmaguy.elitemobs.combatsystem.LevelScaling;
 import com.magmaguy.elitemobs.combatsystem.NaturalEliteCombatTweak;
 import com.magmaguy.elitemobs.combatsystem.antiexploit.AntiExploitMessage;
 import com.magmaguy.elitemobs.config.AntiExploitConfig;
@@ -89,10 +90,20 @@ public class EliteEntity {
     /**
      * Returns whether this entity uses scaled combat.
      * Natural elites use scaled combat when the global config is enabled.
+     * Distance-based natural elite levels intentionally disable scaled combat.
      * Custom bosses override this with their per-boss config.
      */
     public boolean isScaledCombat() {
-        return isNaturalEntity && MobCombatSettingsConfig.isUseScaledCombatForNaturalElites();
+        return isNaturalEntity &&
+                !isDistanceBasedNaturalEliteLevel() &&
+                MobCombatSettingsConfig.isUseScaledCombatForNaturalElites();
+    }
+
+    private boolean isDistanceBasedNaturalEliteLevel() {
+        Location location = spawnLocation != null ? spawnLocation : getLocation();
+        return location != null &&
+                location.getWorld() != null &&
+                MobCombatSettingsConfig.isUseDistanceBasedNaturalEliteLevelsForWorld(location.getWorld().getName());
     }
     protected EntityType entityType;
     @Getter
@@ -378,9 +389,9 @@ public class EliteEntity {
         else this.defaultMaxHealth = 20;
         // Use exponential HP scaling: +5 levels = 2x HP, -5 levels = 0.5x HP
         // This replaces the old damage modifier system for a better player experience
-        double calculatedHealth = com.magmaguy.elitemobs.combatsystem.LevelScaling.calculateMobHealth(level, this.defaultMaxHealth);
+        double calculatedHealth = LevelScaling.calculateMobHealth(level, this.defaultMaxHealth);
         calculatedHealth = NaturalEliteCombatTweak.getTweakedMobHealth(this, level, calculatedHealth);
-        this.maxHealth = calculatedHealth * healthMultiplier;
+        this.maxHealth = calculateSafeMaxHealth(calculatedHealth);
         if (livingEntity != null) AttributeManager.setAttribute(livingEntity, "generic_max_health", maxHealth);
         if (health == null) {
             if (livingEntity != null) livingEntity.setHealth(maxHealth);
@@ -394,12 +405,35 @@ public class EliteEntity {
     public void setNormalizedMaxHealth() {
         this.defaultMaxHealth = MobCombatSettingsConfig.getNormalizedBaselineHealth();
         // Use exponential HP scaling for normalized combat too
-        this.maxHealth = com.magmaguy.elitemobs.combatsystem.LevelScaling.calculateMobHealth(level, this.defaultMaxHealth) * healthMultiplier;
+        this.maxHealth = calculateSafeMaxHealth(LevelScaling.calculateMobHealth(level, this.defaultMaxHealth));
         if (livingEntity != null) {
             AttributeManager.setAttribute(livingEntity, "generic_max_health", maxHealth);
             livingEntity.setHealth(maxHealth);
         }
         this.health = maxHealth;
+    }
+
+    private double calculateSafeMaxHealth(double calculatedHealth) {
+        double safeCalculatedHealth = calculatedHealth;
+        if (!Double.isFinite(safeCalculatedHealth) || safeCalculatedHealth <= 0D) {
+            Logger.warn("EliteMobs calculated invalid base health " + calculatedHealth + " for " + entityType + " level " + level + ". Falling back to level 1 health.");
+            safeCalculatedHealth = LevelScaling.calculateMobHealth(1, this.defaultMaxHealth);
+        }
+
+        double safeHealthMultiplier = healthMultiplier;
+        if (!Double.isFinite(safeHealthMultiplier) || safeHealthMultiplier <= 0D) {
+            Logger.warn("EliteMobs found invalid health multiplier " + healthMultiplier + " for " + entityType + " level " + level + ". Falling back to 1.0.");
+            safeHealthMultiplier = 1D;
+        }
+
+        double minecraftMaxHealth = LevelScaling.getMinecraftMaxHealth();
+        double multipliedHealth = safeCalculatedHealth * safeHealthMultiplier;
+        if (!Double.isFinite(multipliedHealth) || multipliedHealth > minecraftMaxHealth) {
+            Logger.warn("EliteMobs calculated max health " + multipliedHealth + " for " + entityType + " level " + level + " with health multiplier " + safeHealthMultiplier + ". Capping it to " + minecraftMaxHealth + " to avoid invalid health values.");
+            return minecraftMaxHealth;
+        }
+
+        return Math.max(1D, multipliedHealth);
     }
 
     public void resetMaxHealth() {

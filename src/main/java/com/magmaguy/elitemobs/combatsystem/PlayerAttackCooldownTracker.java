@@ -8,7 +8,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Tracks each player's last melee-hit tick against an elite so the combat
+ * Tracks each player's last melee-hit tick so the combat
  * pipeline can derive melee attack charge from the real-time gap between
  * primary swings.
  *
@@ -51,7 +51,7 @@ public final class PlayerAttackCooldownTracker {
     }
 
     /**
-     * Records a hit from the given player and returns the number of game
+     * Records a melee hit from the given player and returns the number of game
      * ticks elapsed since their previously tracked hit, or
      * {@link #NO_PREVIOUS_HIT} when this is their first recorded hit since
      * plugin start (or since their last eviction).

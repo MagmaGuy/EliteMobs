@@ -53,6 +53,10 @@ public class SkillXPBar implements Listener {
     public static void showXPGain(Player player, SkillType skillType, long oldXP, long newXP, long xpGained) {
         if (!SkillsConfig.isSkillSystemEnabled()) return;
         if (!SkillsConfig.isShowXPBar()) return;
+        if (SkillsConfig.isWorldExcludedFromSkills(player)) {
+            removeAllBars(player);
+            return;
+        }
 
         UUID uuid = player.getUniqueId();
         playerBars.computeIfAbsent(uuid, k -> new HashMap<>());

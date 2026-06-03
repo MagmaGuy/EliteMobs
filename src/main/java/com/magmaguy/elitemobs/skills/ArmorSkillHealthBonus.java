@@ -32,6 +32,12 @@ public class ArmorSkillHealthBonus {
     public static void applyHealthBonus(Player player) {
         if (player == null || !player.isOnline()) return;
 
+        if (SkillsConfig.isWorldExcludedFromSkills(player)) {
+            removeHealthBonus(player);
+            clampHealthToCurrentMaxHealth(player);
+            return;
+        }
+
         if (!SkillsConfig.isArmorSkillHealthBonusEnabled()) {
             // Optional hard reset for servers that want to fully remove old extra-heart values.
             if (SkillsConfig.isForceDefaultHealthWhenArmorSkillHealthBonusDisabled()) {
@@ -59,6 +65,15 @@ public class ArmorSkillHealthBonus {
         if (maxHealth != null) {
             NamespacedKey key = new NamespacedKey(MetadataHandler.PLUGIN, MODIFIER_KEY_STRING);
             maxHealth.addModifier(new AttributeModifier(key, bonusHealth, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.ANY));
+        }
+    }
+
+    private static void clampHealthToCurrentMaxHealth(Player player) {
+        AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
+        if (maxHealth == null) return;
+        double currentMaxHealth = maxHealth.getValue();
+        if (player.getHealth() > currentMaxHealth) {
+            player.setHealth(currentMaxHealth);
         }
     }
 
@@ -110,6 +125,7 @@ public class ArmorSkillHealthBonus {
     public static double getBonusHealth(Player player) {
         if (player == null) return 0;
         if (!SkillsConfig.isArmorSkillHealthBonusEnabled()) return 0;
+        if (SkillsConfig.isWorldExcludedFromSkills(player)) return 0;
 
         long armorXP = PlayerData.getSkillXP(player.getUniqueId(), SkillType.ARMOR);
         int armorLevel = SkillXPCalculator.levelFromTotalXP(armorXP);
@@ -125,6 +141,15 @@ public class ArmorSkillHealthBonus {
     public static double getConfiguredMaxHealthForArmorLevel(int armorLevel) {
         if (!SkillsConfig.isArmorSkillHealthBonusEnabled()) return VANILLA_MAX_HEALTH;
         return VANILLA_MAX_HEALTH + Math.max(0, armorLevel - 1) * 2.0;
+    }
+
+    /**
+     * Gets the max health value used by combat calculations for this player.
+     * World exclusions disable armor skill health in the same way as disabling the mechanic.
+     */
+    public static double getConfiguredMaxHealthForPlayer(Player player, int armorLevel) {
+        if (SkillsConfig.isWorldExcludedFromSkills(player)) return VANILLA_MAX_HEALTH;
+        return getConfiguredMaxHealthForArmorLevel(armorLevel);
     }
 
     /**

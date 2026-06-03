@@ -41,7 +41,13 @@ public class ElitePlayerInventory {
     }
 
     public static ElitePlayerInventory getPlayer(Player player) {
-        return playerInventories.get(player.getUniqueId());
+        if (player == null) return null;
+
+        ElitePlayerInventory elitePlayerInventory = playerInventories.get(player.getUniqueId());
+        if (elitePlayerInventory != null) return elitePlayerInventory;
+
+        if (!player.isOnline() || player.hasMetadata("NPC")) return null;
+        return new ElitePlayerInventory(player);
     }
 
     public static void shutdown() {

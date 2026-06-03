@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.skills.bonuses.skills.maces;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
-import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.ProcSkill;
 import org.bukkit.Material;
@@ -47,12 +46,6 @@ public class CrushingBlowSkill extends SkillBonus implements ProcSkill {
     @Override
     public void onProc(Player player, Object context) {
         if (!(context instanceof EliteMobDamagedByPlayerEvent event)) return;
-
-        int skillLevel = SkillBonusRegistry.getPlayerSkillLevel(player, SkillType.MACES);
-        double armorIgnore = getArmorIgnore(skillLevel);
-
-        // Increase damage to simulate armor penetration
-        event.setDamage(event.getDamage() * (1.0 + armorIgnore));
 
         // Visual effect
         if (event.getEliteMobEntity().getLivingEntity() != null) {

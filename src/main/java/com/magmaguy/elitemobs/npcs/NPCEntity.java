@@ -113,7 +113,9 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
     public static void initializeInstancedNPCs(String blueprintWorldName, World newWorld, int playerCount, DungeonInstance dungeonInstance) {
         List<InstancedNPCContainer> rawNPCs = instancedNPCEntities.get(blueprintWorldName);
         for (InstancedNPCContainer instancedNPCContainer : rawNPCs) {
-            Location newLocation = instancedNPCContainer.getLocation();
+            //Clone (like the instanced boss path) so the shared blueprint container Location is not mutated to
+            //reference the live instanced world, which would pin that world's ServerLevel after the dungeon closes.
+            Location newLocation = instancedNPCContainer.getLocation().clone();
             newLocation.setWorld(newWorld);
             new NPCEntity(instancedNPCContainer.getNpcEntity().getNPCsConfigFields(), newLocation);
         }

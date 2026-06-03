@@ -7,6 +7,7 @@ import lombok.Getter;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class MobCombatSettingsConfig extends ConfigurationFile {
     @Getter
@@ -32,9 +33,27 @@ public class MobCombatSettingsConfig extends ConfigurationFile {
     @Getter
     private static boolean displayDamageOnHit;
     @Getter
+    private static boolean useDistanceBasedNaturalEliteLevels;
+    @Getter
+    private static List<String> distanceBasedNaturalEliteLevelWorlds;
+    @Getter
+    private static double blockDistanceBetweenLevelIncrements;
+    /**
+     * @deprecated Use {@link #useDistanceBasedNaturalEliteLevels}.
+     */
+    @Deprecated
+    @Getter
     private static boolean increaseDifficultyWithSpawnDistance;
+    /**
+     * @deprecated Use {@link #blockDistanceBetweenLevelIncrements}.
+     */
+    @Deprecated
     @Getter
     private static double distanceToIncrement;
+    /**
+     * @deprecated Distance-based natural elite levels always increase by 1 level per increment.
+     */
+    @Deprecated
     @Getter
     private static double levelToIncrement;
     @Getter
@@ -141,6 +160,20 @@ public class MobCombatSettingsConfig extends ConfigurationFile {
         ConfigurationEngine.fileSaverCustomValues(instance.fileConfiguration, instance.file);
     }
 
+    public static boolean isUseDistanceBasedNaturalEliteLevelsForWorld(String worldName) {
+        return useDistanceBasedNaturalEliteLevels &&
+                isWorldAllowedForDistanceBasedNaturalEliteLevels(worldName, distanceBasedNaturalEliteLevelWorlds);
+    }
+
+    static boolean isWorldAllowedForDistanceBasedNaturalEliteLevels(String worldName, List<String> configuredWorlds) {
+        if (configuredWorlds == null || configuredWorlds.isEmpty()) return true;
+        if (worldName == null || worldName.isBlank()) return false;
+        return configuredWorlds.stream()
+                .filter(Objects::nonNull)
+                .map(String::trim)
+                .anyMatch(configuredWorld -> !configuredWorld.isEmpty() && configuredWorld.equalsIgnoreCase(worldName));
+    }
+
     @Override
     public void initializeValues() {
         instance = this;
@@ -177,17 +210,42 @@ public class MobCombatSettingsConfig extends ConfigurationFile {
         displayDamageOnHit = ConfigurationEngine.setBoolean(
                 List.of("Sets if EliteMobs will show damage indicators for damage done to elites."),
                 fileConfiguration, "doDisplayMobDamageOnHit", true);
-        increaseDifficultyWithSpawnDistance = ConfigurationEngine.setBoolean(
-                List.of("Sets if the level of elites will increased based on the distance from spawn.",
-                        "This is a value added on top of their normal level, meaning that if a player is wearing level 100 gear near spawn and the boss has +1 level due from the distanced from spawn, the boss will spawn at level 101.",
-                        "This option is generally not recommended, especially if you have a random tp system on your server."),
-                fileConfiguration, "doIncreaseEliteMobLevelBasedOnSpawnDistance", false);
-        distanceToIncrement = ConfigurationEngine.setDouble(
-                List.of("Sets the distance between level increments for distance-based level increases."),
-                fileConfiguration, "distanceBetweenIncrements", 100);
-        levelToIncrement = ConfigurationEngine.setDouble(
-                List.of("Sets how many levels increase at each distance increment for distance-based level increases."),
-                fileConfiguration, "levelIncreaseAtIncrements", 1);
+        useDistanceBasedNaturalEliteLevels = ConfigurationEngine.setBoolean(
+                List.of("Sets if naturally spawned elite mobs use fixed distance-based levels instead of EliteMobs' normal player-aware scaling.",
+                        "This is disabled by default because EliteMobs scales much better to players without this feature.",
+                        "When enabled, natural elite levels are based only on their block distance from the world's spawn and the blockDistanceBetweenLevelIncrements setting.",
+                        "This only affects naturally spawned elites. Event mobs, custom bosses, regional bosses, instanced bosses and spawner elites do not use this setting.",
+                        "Consequences of enabling this:",
+                        "- Natural elites stop scaling to player progression in the normal EliteMobs way.",
+                        "- Scaled combat for natural elites no longer applies to these mobs because fixed world level matters again.",
+                        "- High-level players can farm predictable high-level regions.",
+                        "- Low-level players can be locked out of most of the map.",
+                        "- Players can outgrow their base area and be forced to move because nearby mobs stop giving useful progress.",
+                        "- Building location becomes a combat-balance decision.",
+                        "- Random teleport systems can place players in impossible or highly farmable level bands.",
+                        "- Moving world spawn reshuffles the level map.",
+                        "- Each world uses its own spawn point, so Nether, End and custom worlds can have surprising level rings.",
+                        "- The natural elite level cap creates a far-distance plateau where everything past the cap radius has the capped level.",
+                        "- WorldGuard min/max level flags can still clamp the calculated level.",
+                        "- Loot, XP and economy rewards tied to mob level become easier to target by coordinates.",
+                        "- Anti-farm protections still help but do not remove the incentive to farm fixed high-level regions."),
+                fileConfiguration, "useDistanceBasedNaturalEliteLevels", false);
+        distanceBasedNaturalEliteLevelWorlds = ConfigurationEngine.setList(
+                List.of("Sets which worlds use distance-based natural elite levels when useDistanceBasedNaturalEliteLevels is enabled.",
+                        "Leave this empty to apply distance-based natural elite levels to all valid worlds.",
+                        "Add exact world names here to limit the feature to only those worlds. Matching is case-insensitive.",
+                        "This still only affects naturally spawned elites. Event mobs, custom bosses, regional bosses, instanced bosses and spawner elites do not use this setting.",
+                        "Example:",
+                        "- world"),
+                file, fileConfiguration, "distanceBasedNaturalEliteLevelWorlds", Collections.emptyList(), false);
+        blockDistanceBetweenLevelIncrements = Math.max(1D, ConfigurationEngine.setDouble(
+                List.of("Sets the block distance between level increments for fixed distance-based natural elite levels.",
+                        "If this is 100, natural elite level increases by 1 every 100 blocks from the world's spawn.",
+                        "With the default of 100, a naturally spawned elite 10,000 blocks from spawn is level 100 before the natural elite level cap and WorldGuard limits are applied."),
+                fileConfiguration, "blockDistanceBetweenLevelIncrements", 100D));
+        increaseDifficultyWithSpawnDistance = useDistanceBasedNaturalEliteLevels;
+        distanceToIncrement = blockDistanceBetweenLevelIncrements;
+        levelToIncrement = 1;
         obfuscateMobPowers = ConfigurationEngine.setBoolean(
                 List.of("Sets if the powers of elites will be hidden until they enter combat. This is recommended for performance reasons."),
                 fileConfiguration, "hideEliteMobPowersUntilAggro", true);
