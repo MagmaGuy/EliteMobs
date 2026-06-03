@@ -1,26 +1,99 @@
 [![Crowdin](https://badges.crowdin.net/elitemobs/localized.svg)](https://crowdin.com/project/elitemobs)
-
 [![BStats](https://bstats.org/signatures/bukkit/EliteMobs.svg)](https://bstats.org/plugin/bukkit/EliteMobs/1081)
 
-EliteMobs is a Spigot plugin focused around the creation of bosses. It also adds several other features, such as quests,
-arenas, items, an extension to in-game progression and dungeons, to name a few.
+# EliteMobs
 
-Feature and configuration documentation: https://github.com/MagmaGuy/EliteMobs/wiki
+EliteMobs is a Spigot/Paper plugin built around custom bosses. On top of the boss system it adds an interlocking set of
+RPG-style features: quests, arenas, dungeons, custom and procedurally generated items and enchantments, an in-game
+economy, player progression and skills, NPCs, and shops.
 
-Discord support channel: https://discord.gg/QSA2wgh
+- Feature and configuration documentation: https://github.com/MagmaGuy/EliteMobs/wiki
+- Discord support channel: https://discord.gg/QSA2wgh
+- Webapp for creating content: https://magmaguy.com/webapp/webapp.html
 
-Webapp where you can create content: https://magmaguy.com/webapp/webapp.html
+## Features
 
-# Dev notes:
+- **Custom bosses** — Regional, instanced and event bosses defined in config, with a scriptable power system.
+- **Dungeons** — Installable, packageable instanced content with kill-percentage and kill-target objectives.
+- **Arenas** — Wave-based combat instances (optional MythicMobs integration for arena mobs).
+- **Quests** — Static and dynamic quests with objectives, tracking, rewards and quest NPCs.
+- **Items & enchantments** — Custom items plus procedurally generated gear, custom enchantments, and scrolls.
+- **Economy & shops** — Elite currency with custom, dynamic and sell shops; Vault integration.
+- **Progression** — Player ranks, level scaling, a skills system and the Adventurer's Guild hub.
+- **NPCs** — Configurable NPCs for shops, quests, ranks, repairs and more.
+- **Wormholes**, treasure chests, timed/custom world events, and an explosion-regeneration system.
+
+## Requirements
+
+- Java 21 (the plugin builds on a Java 21 toolchain).
+- A Spigot or Paper server. `plugin.yml` declares `api-version: 1.21.4`; the build compiles against the Spigot
+  `1.21.11` API.
+- No hard dependencies. All integrations are optional (`softdepend`): Multiverse-Core, WorldGuard, Vault,
+  PlaceholderAPI, HolographicDisplays, DiscordSRV, LibsDisguises, ModelEngine, Geyser-Spigot, MythicMobs, LevelledMobs,
+  InfernalMobs, FreeMinecraftModels. Vault is required for economy features; the others enable the corresponding
+  integration when present.
+
+## Installation
+
+1. Drop `EliteMobs.jar` into your server's `plugins/` folder.
+2. (Optional) Install any of the soft-dependency plugins above to enable their integrations.
+3. Start the server, then run the first-time setup (`/em setup`, requires `elitemobs.initialize`).
+
+## Commands
+
+Two commands are registered (see `plugin.yml`):
+
+| Command            | Aliases | Description    |
+|--------------------|---------|----------------|
+| `/elitemobs`       | `/em`   | Main command   |
+| `/adventurersguild`| `/ag`   | Main command   |
+
+Both are dispatched through MagmaCore's `CommandManager` (see `commands/CommandHandler.java`), which exposes a large set
+of player and admin subcommands. Run `/em help` in-game for the full list, or consult the wiki.
+
+## Permissions
+
+Permissions are defined in `plugin.yml`. The high-level nodes:
+
+- `elitemobs.*` — all commands (default: op).
+- `elitemobs.user` — recommended player permission set; bundles the player-facing nodes (shops, quests, ranks, repair,
+  scrap, teleports, NPC interactions, etc.) (default: true).
+- Individual nodes follow the `elitemobs.<area>.<action>` convention. Admin actions (setup, spawning, killing, loot
+  debug, currency manipulation, reloads, packaging) default to `op`; player actions default to `true`.
+
+See `plugin.yml` for the authoritative, per-node list.
+
+## Configuration
+
+EliteMobs is config-heavy. On first run it generates its files under `plugins/EliteMobs/`. Configuration is split by
+domain, mirroring the `com.magmaguy.elitemobs.config` package — including custom bosses, custom items, enchantments,
+quests, events, arenas, treasure chests, NPCs, spawns, powers (including Lua powers), mob properties, menus, potion
+effects, skill bonuses and wormholes. Translations are managed via Crowdin. See the
+[wiki](https://github.com/MagmaGuy/EliteMobs/wiki) for the configuration reference.
+
+## Building from source
+
+The project builds with Gradle (wrapper included) and shades its runtime dependencies into a single jar:
+
+```
+./gradlew shadowJar
+```
+
+On Windows:
+
+```
+gradlew.bat shadowJar
+```
+
+The shaded jar is written to `testbed/plugins/EliteMobs.jar`. The build relocates bStats and `easyminecraftgoals`, and
+shades MagmaCore and commons-io.
+
+# Dev notes
 
 ## Repository
 
----
-
-Maven repository:
-
 Maven:
-```
+```xml
 <repository>
   <id>magmaguy-repo-releases</id>
   <name>MagmaGuy's Repository</name>
@@ -30,7 +103,7 @@ Maven:
 <dependency>
   <groupId>com.magmaguy</groupId>
   <artifactId>EliteMobs</artifactId>
-  <version>9.1.9</version>
+  <version>10.4.0</version>
 </dependency>
 ```
 
@@ -43,20 +116,17 @@ repositories {
     }
 }
 
-dependencies{
+dependencies {
     //EliteMobs
-    compileOnly("com.magmaguy:EliteMobs:9.1.9")
+    compileOnly("com.magmaguy:EliteMobs:10.4.0")
 }
-
 ```
-
----
 
 ## Important classes
 
 The following is a list of key classes for the plugin:
 
-### EliteItemManager:
+### EliteItemManager
 
 `com.magmaguy.elitemobs.api.utils.EliteItemManager`
 
@@ -125,27 +195,27 @@ exploit. Uses:
 - Same as Bukkit's EntityDamagedByEntity event but for elites specifically
 - Can be cancelled
 
-### EliteMobDamagedByPlayerEvent:
+### EliteMobDamagedByPlayerEvent
 
 Used for listening to moments when a player damages an Elite. Uses:
 
 - Same as Bukkit's EntityDamagedByEntity event but for players damaging elites specifically
 - ***Important:*** can't be cancelled as it only fires after applying the damage
 
-### EliteMobDamagedEvent:
+### EliteMobDamagedEvent
 
 Used for listening to moments when an elite is damaged in general. Uses:
 
 - Same as Bukkit's EntityDamageEvent
 - ***Important*** Cancelling this event might not 100% work, report if it doesn't
 
-### EliteMobDeathEvent:
+### EliteMobDeathEvent
 
 Used to listening to moments when an elite is killed. Uses:
 
 - Same as Bukkit's EntityDeathEvent.
 
-### EliteMobEnterCombatEvent:
+### EliteMobEnterCombatEvent
 
 Used for listening to moments when an elite enters combat against a player. Note that bosses only enter combat after
 either striking a player or being struck, and not at the moment of targetting. Uses:
@@ -153,121 +223,121 @@ either striking a player or being struck, and not at the moment of targetting. U
 - Get the target (player only) of the Elite
 - Get the elite which entered in combat
 
-### EliteMobExitCombatEvent:
+### EliteMobExitCombatEvent
 
 Used for listening to moments when an elite leaves combat against a player. Uses:
 
 - Get the elite which just let combat.
 
-### EliteMobHealEvent:
+### EliteMobHealEvent
 
 Used when an elite gets healed.
 
 - Can be cancelled.
 
-### EliteMobRemoveEvent:
+### EliteMobRemoveEvent
 
 Used when an elite mob gets removed. Please note that not all removals are permanent as bosses can be removed because
 the chunks unload while still being persistent.
 
-### EliteMobsItemDetector: //todo: remove
+### EliteMobsItemDetector
 
 Used for detecting whether an ItemStack is an EliteMobs ItemStack (like a custom item or a procedurally generated item).
 Uses:
 
 - Detect if an ItemStack is an EliteMobs custom or dynamic item.
 
-### EliteMobSpawnEvent:
+### EliteMobSpawnEvent
 
 Used for detecting when an Elite spawns. Uses:
 
 - Detect when an Elite spawns.
 - Detect which Elite spawned.
 
-### EliteMobTargetPlayerEvent:
+### EliteMobTargetPlayerEvent
 
 Used for detecting when an Elite has targetted a player. Uses:
 
 - Detect when an Elite targets a player.
 - Cancel an Elite's detection of a player.
 
-### GenericAntiExploitEvent:
+### GenericAntiExploitEvent
 
 Used for listening to moments when the antiexploit runs a check but no players damaged it. Uses:
 
 - Detect when the antiexploit is doing a non-player based exploit check.
 - Cancel an antiexploit check.
 
-### NPCEntityRemoveEvent:
+### NPCEntityRemoveEvent
 
 Used when an npc gets removed. This removal may not be permanent, as it might just be a chunk unload.
 
-### NPCEntitySpawnEvent:
+### NPCEntitySpawnEvent
 
 Used when an npc gets spawned.
 
-### PlayerDamagedByEliteMobEvent:
+### PlayerDamagedByEliteMobEvent
 
 Used for listening to moments when players are damaged by an Elite. Uses:
 
 - Same as Bukkit's EntityDamageEvent.
 
-### PlayerPreTeleportEvent:
+### PlayerPreTeleportEvent
 
 Used when a player starts teleporting through EliteMobs features. There is a 3 second timer before the teleportation
 actually happens.
 
 - Can be cancelled.
 
-### PlayerTeleportEvent:
+### PlayerTeleportEvent
 
 Used when a player actually teleports through EliteMobs features.
 
 - Can be cancelled.
 
-### QuestAcceptEvent:
+### QuestAcceptEvent
 
 Used when a player accepts a quest.
 
 - Can be cancelled.
 
-### QuestCompleteEvent:
+### QuestCompleteEvent
 
 Used when a player completes a quest.
 
 - Can be cancelled.
 
-### QuestLeaveEvent:
+### QuestLeaveEvent
 
 Used when a player leaves a quest.
 
-### QuestObjectivesCompletedEvent:
+### QuestObjectivesCompletedEvent
 
 Used when all quest objectives for a quest are completed.
 
-### QuestProgressionEvent:
+### QuestProgressionEvent
 
 Used when a player progresses in a quest, such as by killing a quest mob or collecting a quest item.
 
-### QuestRewardEvent:
+### QuestRewardEvent
 
 Used when a player gets the reward from a quest.
 
-### SuperMobDamageEvent:
+### SuperMobDamageEvent
 
 Used when a Super Mob gets damaged.
 
 - Can be cancelled.
 
-### SuperMobDeathEvent:
+### SuperMobDeathEvent
 
 Used when a Super Mob dies.
 
-### SuperMobRemoveEvent:
+### SuperMobRemoveEvent
 
 Used when a Super Mob gets removed. Note that removals might be temporary due to chunk unloads.
 
-### SuperMobSpawnEvent:
+### SuperMobSpawnEvent
 
 Used when a Super Mob spawns.
 
@@ -316,4 +386,7 @@ to be documented
 
 Special Thanks to Illusion for spending a few hours proselytizing enums that are also have anonymous method
 implementations on their constructor.
- 
+
+## License
+
+EliteMobs is licensed under the GNU General Public License v3.0. See [LICENSE](LICENSE) for the full text.
