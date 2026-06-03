@@ -9,6 +9,7 @@ import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
 import com.magmaguy.elitemobs.api.ScriptZoneEnterEvent;
 import com.magmaguy.elitemobs.api.ScriptZoneLeaveEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
+import com.magmaguy.elitemobs.combatsystem.antiexploit.PreventMountExploit;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.events.BossCustomAttackDamage;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
@@ -172,10 +173,13 @@ final class LuaPowerEntityTables {
         LuaTable table = new LuaTable();
         table.set("name", LuaValue.valueOf(entity.getName()));
         table.set("uuid", LuaValue.valueOf(entity.getUniqueId().toString()));
+        table.rawset("__bukkit_uuid", LuaValue.valueOf(entity.getUniqueId().toString()));
         table.set("entity_type", LuaValue.valueOf(entity.getType().name()));
         table.set("is_player", LuaValue.FALSE);
         table.set("is_elite", LuaValue.FALSE);
+        table.set("is_mount", LuaValue.FALSE);
         table.set("is_valid", method(table, args -> LuaValue.valueOf(entity.isValid())));
+        addVehicleMethods(table, entity);
         table.set("current_location", support.toLocationTable(entity.getLocation()));
         table.set("get_location", method(table, args -> support.toLocationTable(entity.getLocation())));
         table.set("get_velocity", method(table, args -> support.toVectorTable(entity.getVelocity())));
@@ -277,11 +281,15 @@ final class LuaPowerEntityTables {
         LuaTable entity = new LuaTable();
         entity.set("name", LuaValue.valueOf(livingEntity.getName()));
         entity.set("uuid", LuaValue.valueOf(livingEntity.getUniqueId().toString()));
+        entity.rawset("__bukkit_uuid", LuaValue.valueOf(livingEntity.getUniqueId().toString()));
         entity.set("entity_type", LuaValue.valueOf(livingEntity.getType().name()));
         entity.set("is_player", LuaValue.valueOf(livingEntity instanceof Player));
         entity.set("is_monster", LuaValue.valueOf(livingEntity instanceof Monster));
-        entity.set("is_elite", LuaValue.valueOf(EntityTracker.getEliteMobEntity(livingEntity) != null));
+        EliteEntity trackedElite = EntityTracker.getEliteMobEntity(livingEntity);
+        entity.set("is_elite", LuaValue.valueOf(trackedElite != null));
+        entity.set("is_mount", LuaValue.valueOf(trackedElite instanceof CustomBossEntity customBossEntity && customBossEntity.isMount()));
         entity.set("is_valid", LuaValue.valueOf(livingEntity.isValid()));
+        addVehicleMethods(entity, livingEntity);
         entity.set("is_alive", method(entity, args -> LuaValue.valueOf(isAlive(livingEntity))));
         entity.set("is_ai_enabled", method(entity, args -> LuaValue.valueOf(livingEntity.hasAI())));
         entity.set("is_frozen", method(entity, args -> {
@@ -321,9 +329,9 @@ final class LuaPowerEntityTables {
         }));
         entity.set("restore_health", method(entity, args -> {
             double amount = args.checkdouble(1);
-            EliteEntity trackedElite = EntityTracker.getEliteMobEntity(livingEntity);
-            if (trackedElite != null) {
-                trackedElite.heal(amount);
+            EliteEntity healTargetElite = EntityTracker.getEliteMobEntity(livingEntity);
+            if (healTargetElite != null) {
+                healTargetElite.heal(amount);
             } else {
                 double maxHealth = AttributeManager.getAttributeBaseValue(livingEntity, "generic_max_health");
                 livingEntity.setHealth(Math.min(maxHealth, livingEntity.getHealth() + amount));
@@ -385,8 +393,8 @@ final class LuaPowerEntityTables {
             return LuaValue.NIL;
         }));
         entity.set("reset_custom_name", method(entity, args -> {
-            EliteEntity trackedElite = EntityTracker.getEliteMobEntity(livingEntity);
-            livingEntity.setCustomName(trackedElite != null ? trackedElite.getName() : livingEntity.getName());
+            EliteEntity namedElite = EntityTracker.getEliteMobEntity(livingEntity);
+            livingEntity.setCustomName(namedElite != null ? namedElite.getName() : livingEntity.getName());
             return LuaValue.NIL;
         }));
         entity.set("set_custom_name_visible", method(entity, args -> {
@@ -519,6 +527,51 @@ final class LuaPowerEntityTables {
     }
 
     // ── Shared helpers (package-private for LuaBossTableBuilder) ──────
+
+    private void addVehicleMethods(LuaTable entityTable, Entity entity) {
+        entityTable.set("is_inside_vehicle", method(entityTable, args -> LuaValue.valueOf(entity.isInsideVehicle())));
+        entityTable.set("has_vehicle", method(entityTable, args -> LuaValue.valueOf(entity.getVehicle() != null)));
+        entityTable.set("get_vehicle", method(entityTable, args -> {
+            Entity vehicle = entity.getVehicle();
+            return vehicle == null ? LuaValue.NIL : createEntityReferenceTable(vehicle);
+        }));
+        entityTable.set("set_vehicle", method(entityTable, args -> {
+            Entity vehicle = support.resolveEntityReference(args.arg1());
+            return LuaValue.valueOf(mountPassenger(vehicle, entity));
+        }));
+        entityTable.set("leave_vehicle", method(entityTable, args -> LuaValue.valueOf(entity.leaveVehicle())));
+        entityTable.set("has_passengers", method(entityTable, args -> LuaValue.valueOf(!entity.getPassengers().isEmpty())));
+        entityTable.set("get_passenger_count", method(entityTable, args -> LuaValue.valueOf(entity.getPassengers().size())));
+        entityTable.set("get_passengers", method(entityTable, args -> {
+            LuaTable passengers = new LuaTable();
+            int index = 1;
+            for (Entity passenger : entity.getPassengers()) {
+                passengers.set(index++, createEntityReferenceTable(passenger));
+            }
+            return passengers;
+        }));
+        entityTable.set("add_passenger", method(entityTable, args -> {
+            Entity passenger = support.resolveEntityReference(args.arg1());
+            return LuaValue.valueOf(mountPassenger(entity, passenger));
+        }));
+        entityTable.set("remove_passenger", method(entityTable, args -> {
+            Entity passenger = support.resolveEntityReference(args.arg1());
+            return LuaValue.valueOf(passenger != null && entity.removePassenger(passenger));
+        }));
+        entityTable.set("eject_passengers", method(entityTable, args -> LuaValue.valueOf(entity.eject())));
+    }
+
+    boolean mountPassenger(Entity vehicle, Entity passenger) {
+        if (vehicle == null || passenger == null || vehicle.equals(passenger) || !vehicle.isValid() || !passenger.isValid()) {
+            return false;
+        }
+        PreventMountExploit.bypass = true;
+        try {
+            return vehicle.addPassenger(passenger);
+        } finally {
+            PreventMountExploit.bypass = false;
+        }
+    }
 
     private boolean isAlive(LivingEntity livingEntity) {
         return livingEntity != null && livingEntity.isValid() && !livingEntity.isDead();

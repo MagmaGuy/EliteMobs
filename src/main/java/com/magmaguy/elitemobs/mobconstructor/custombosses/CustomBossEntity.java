@@ -463,6 +463,29 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
         mount = CustomBossMount.generateMount(this);
     }
 
+    @Nullable
+    public Entity getMountEntity() {
+        if (livingEntity != null && livingEntity.isInsideVehicle())
+            return livingEntity.getVehicle();
+        if (customBossMount != null && customBossMount.getLivingEntity() != null && customBossMount.getLivingEntity().isValid())
+            return customBossMount.getLivingEntity();
+        if (livingEntityMount != null && livingEntityMount.isValid())
+            return livingEntityMount;
+        if (mount != null && mount.getLivingEntity() != null && mount.getLivingEntity().isValid())
+            return mount.getLivingEntity();
+        return null;
+    }
+
+    @Nullable
+    public CustomBossEntity getCustomBossMount() {
+        return customBossMount != null ? customBossMount : mount;
+    }
+
+    @Nullable
+    public LivingEntity getLivingEntityMount() {
+        return livingEntityMount;
+    }
+
     private void startEscapeMechanismDelay() {
         escapeMechanism = CustomBossEscapeMechanism.startEscape(customBossesConfigFields.getTimeout(), this);
     }

@@ -547,7 +547,10 @@ final class LuaPowerSupport {
             return null;
         }
         LuaTable table = value.checktable();
-        LuaValue uuidValue = table.get("uuid");
+        LuaValue uuidValue = table.rawget("__bukkit_uuid");
+        if (!uuidValue.isstring()) {
+            uuidValue = table.get("uuid");
+        }
         if (!uuidValue.isstring()) {
             return null;
         }

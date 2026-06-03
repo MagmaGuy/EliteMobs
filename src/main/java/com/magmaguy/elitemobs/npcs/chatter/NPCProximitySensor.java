@@ -2,19 +2,23 @@ package com.magmaguy.elitemobs.npcs.chatter;
 
 import com.magmaguy.easyminecraftgoals.internal.FakeText;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.api.NPCProximityEnterEvent;
+import com.magmaguy.elitemobs.api.NPCProximityLeaveEvent;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.npcs.NPCInteractions;
+import com.magmaguy.elitemobs.npcs.scripts.NPCScriptHook;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.DynamicQuest;
 import com.magmaguy.elitemobs.quests.Quest;
+import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.elitemobs.utils.VisualDisplay;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -23,15 +27,15 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class NPCProximitySensor implements Listener {
 
-    private static final Set<UUID> nearbyPlayers = new HashSet<>();
+    private static final NPCProximityState proximityState = new NPCProximityState();
     private static BukkitTask proximityScanTask = null;
 
     public NPCProximitySensor() {
@@ -39,30 +43,52 @@ public class NPCProximitySensor implements Listener {
 
             @Override
             public void run() {
-                Set<UUID> unseenPlayerList = new HashSet<>(nearbyPlayers);
-                for (NPCEntity npcEntity : EntityTracker.getNpcEntities().values()) {
-                    if (!npcEntity.isValid()) continue;
-                    for (Entity entity : npcEntity.getVillager().getNearbyEntities(npcEntity.getNPCsConfigFields().getActivationRadius(),
-                            npcEntity.getNPCsConfigFields().getActivationRadius(), npcEntity.getNPCsConfigFields().getActivationRadius())) {
-                        if (!entity.getType().equals(EntityType.PLAYER)) continue;
-                        Player player = (Player) entity;
-                        UUID playerUUID = player.getUniqueId();
-                        Location rotatedLocation = npcEntity.getVillager().getLocation().setDirection(entity.getLocation().subtract(npcEntity.getVillager().getLocation()).toVector());
-                        npcEntity.getVillager().teleport(rotatedLocation);
-                        if (unseenPlayerList.contains(playerUUID)) {
-                            if (!npcEntity.getNPCsConfigFields().getInteractionType().equals(NPCInteractions.NPCInteractionType.CHAT))
-                                npcEntity.sayDialog(player);
-                            unseenPlayerList.remove(playerUUID);
-                        } else {
-                            npcEntity.sayGreeting(player);
-                            nearbyPlayers.add(playerUUID);
-                            startQuestIndicator(npcEntity, player);
+                Collection<NPCEntity> npcEntities = EntityTracker.getNpcEntities().values();
+                if (npcEntities.isEmpty() || Bukkit.getOnlinePlayers().isEmpty()) {
+                    proximityState.clear();
+                    return;
+                }
+
+                Map<NPCProximityKey, ProximityDetection> detections = new HashMap<>(Math.max(16, npcEntities.size()));
+                for (NPCEntity npcEntity : npcEntities) {
+                    LivingEntity villager = npcEntity.getVillager();
+                    if (villager == null || !villager.isValid()) continue;
+                    double activationRadius = npcEntity.getNPCsConfigFields().getActivationRadius();
+                    if (activationRadius <= 0) continue;
+                    double activationRadiusSquared = activationRadius * activationRadius;
+                    Location npcLocation = villager.getLocation();
+                    for (Entity entity : villager.getNearbyEntities(activationRadius, activationRadius, activationRadius)) {
+                        if (!(entity instanceof Player player)) continue;
+                        if (!player.isValid()) continue;
+                        Location playerLocation = player.getLocation();
+                        if (playerLocation.getWorld() == null || npcLocation.getWorld() == null ||
+                                !playerLocation.getWorld().getUID().equals(npcLocation.getWorld().getUID()) ||
+                                playerLocation.distanceSquared(npcLocation) > activationRadiusSquared)
+                            continue;
+                        Vector direction = playerLocation.toVector().subtract(npcLocation.toVector());
+                        if (direction.lengthSquared() > 0) {
+                            villager.teleport(npcLocation.clone().setDirection(direction));
                         }
+                        detections.put(new NPCProximityKey(npcEntity.getUuid(), player.getUniqueId()), new ProximityDetection(npcEntity, player));
                     }
                 }
 
-                nearbyPlayers.removeAll(unseenPlayerList);
-
+                NPCProximityState.ProximityChanges changes = proximityState.update(detections.keySet());
+                for (Map.Entry<NPCProximityKey, ProximityDetection> entry : detections.entrySet()) {
+                    ProximityDetection detection = entry.getValue();
+                    if (changes.entered().contains(entry.getKey())) {
+                        handleEnter(detection.npcEntity(), detection.player());
+                    } else if (!detection.npcEntity().getNPCsConfigFields().getInteractionType().equals(NPCInteractions.NPCInteractionType.CHAT)) {
+                        detection.npcEntity().sayDialog(detection.player());
+                    }
+                }
+                for (NPCProximityKey leftKey : changes.left()) {
+                    NPCEntity npcEntity = EntityTracker.getNpcEntities().get(leftKey.npcUuid());
+                    Player player = Bukkit.getPlayer(leftKey.playerUuid());
+                    if (npcEntity != null && player != null) {
+                        handleLeave(npcEntity, player);
+                    }
+                }
             }
 
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 20L * 5L);
@@ -74,7 +100,24 @@ public class NPCProximitySensor implements Listener {
             proximityScanTask.cancel();
             proximityScanTask = null;
         }
-        nearbyPlayers.clear();
+        proximityState.clear();
+    }
+
+    private void handleEnter(NPCEntity npcEntity, Player player) {
+        NPCProximityEnterEvent event = new NPCProximityEnterEvent(npcEntity, player, npcEntity.getNPCsConfigFields().getActivationRadius());
+        new EventCaller(event);
+        npcEntity.runScripts(NPCScriptHook.ON_PROXIMITY_ENTER, event, player);
+        npcEntity.sayGreeting(player);
+        startQuestIndicator(npcEntity, player);
+    }
+
+    private void handleLeave(NPCEntity npcEntity, Player player) {
+        NPCProximityLeaveEvent event = new NPCProximityLeaveEvent(npcEntity, player, npcEntity.getNPCsConfigFields().getActivationRadius());
+        new EventCaller(event);
+        npcEntity.runScripts(NPCScriptHook.ON_PROXIMITY_LEAVE, event, player);
+    }
+
+    private record ProximityDetection(NPCEntity npcEntity, Player player) {
     }
 
     private void startQuestIndicator(NPCEntity npcEntity, Player player) {

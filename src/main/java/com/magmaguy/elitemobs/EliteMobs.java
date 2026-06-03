@@ -65,6 +65,7 @@ import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProp
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.npcs.NPCInteractions;
 import com.magmaguy.elitemobs.npcs.chatter.NPCProximitySensor;
+import com.magmaguy.elitemobs.npcs.scripts.NPCScriptManager;
 import com.magmaguy.elitemobs.pathfinding.Navigation;
 import com.magmaguy.elitemobs.peacebanner.PeaceBannerItem;
 import com.magmaguy.elitemobs.peacebanner.PeaceBannerManager;
@@ -275,6 +276,8 @@ public class EliteMobs extends JavaPlugin {
         new ContentPackagesConfig();
         initializationContext.step("Custom Bosses Config");
         new CustomBossesConfig();
+        initializationContext.step("NPC Scripts");
+        NPCScriptManager.initialize();
         initializationContext.step("NPCs Config");
         new NPCsConfig();
         initializationContext.step("Wormholes Config");
@@ -645,6 +648,7 @@ public class EliteMobs extends JavaPlugin {
         DungeonInstance.shutdown();
         ArenaInstance.shutdown();
         LuaPowerManager.shutdown();
+        NPCScriptManager.shutdown();
         // Final pass memory leak fixes
         ElitePower.shutdown();
         EliteScriptBlueprint.shutdown();

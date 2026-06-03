@@ -85,6 +85,43 @@ function(landing_location, spawned_entity)
 end
 ```
 
+## Mount and vehicle helpers
+
+Mounted bosses keep separate entities and separate health pools. Lua can inspect the mount/vehicle relationship and move the physical mount when a boss is riding one:
+
+```lua
+local body = context.boss:get_mount()
+if body == nil then
+  body = context.boss
+end
+
+body:set_velocity_vector(em.create_vector(0, 1.5, 0))
+```
+
+Boss helpers:
+
+- `context.boss:has_mount()`
+- `context.boss:get_mount()`
+- `context.boss:set_mount(entity)`
+- `context.boss:clear_mount()`
+- `context.boss:dismount()`
+
+Entity helpers available on boss, player, living entity, and generic entity tables:
+
+- `entity:is_inside_vehicle()`
+- `entity:has_vehicle()`
+- `entity:get_vehicle()`
+- `entity:set_vehicle(vehicle)`
+- `entity:leave_vehicle()`
+- `entity:has_passengers()`
+- `entity:get_passenger_count()`
+- `entity:get_passengers()`
+- `entity:add_passenger(passenger)`
+- `entity:remove_passenger(passenger)`
+- `entity:eject_passengers()`
+
+Custom boss mounts expose `entity.is_mount == true`.
+
 ## Supported top-level fields
 
 - `api_version` (required)

@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.powers.lua;
 
+import com.magmaguy.elitemobs.config.luapowers.premade.GroundPoundLuaConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
 import com.magmaguy.magmacore.scripting.LuaEnvironmentFactory;
 import org.junit.jupiter.api.Test;
@@ -97,6 +98,16 @@ class LuaPowerDefinitionTest {
         assertTrue(definition.getHooks().contains(LuaPowerHook.ON_SPAWN));
         assertTrue(definition.getHooks().contains(LuaPowerHook.ON_DAMAGED_BY_PLAYER));
         assertTrue(definition.getHooks().contains(LuaPowerHook.ON_EXIT_COMBAT));
+    }
+
+    @Test
+    void validatesMountAwareGroundPoundPremade() {
+        GroundPoundLuaConfig groundPound = new GroundPoundLuaConfig();
+        LuaPowerDefinition definition = LuaPowerDefinition.validate(groundPound.getFilename(),
+                tempDir.resolve(groundPound.getFilename()).toFile(),
+                groundPound.getSource());
+
+        assertTrue(definition.getHooks().contains(LuaPowerHook.ON_DAMAGED_BY_PLAYER));
     }
 
 }
