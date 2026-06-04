@@ -6,7 +6,7 @@
  
     "overrides":[
  
-     {"predicate": {"custom_model_data":31173}, "model":"elitemobs:ui/redcross"}
+     {"predicate": {"custom_model_data":31173}, "model":"nightbreak:ui/redcross"}
 
 
      ]

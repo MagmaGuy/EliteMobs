@@ -338,6 +338,10 @@ public abstract class EMPackage extends ContentPackage implements NightbreakMana
             if (!player.isOnline()) return;
 
             if (accessInfo == null) {
+                if (NightbreakAccount.hasAuthFailure()) {
+                    sendInvalidTokenMessage(player);
+                    return;
+                }
                 player.sendMessage(DungeonsConfig.getContentAccessFailedMessage());
                 player.sendMessage(DungeonsConfig.getContentAccessFailedLink());
                 return;
@@ -398,6 +402,16 @@ public abstract class EMPackage extends ContentPackage implements NightbreakMana
         Logger.sendSimpleMessage(player, "");
         Logger.sendSimpleMessage(player, DungeonsConfig.getContentLinkAccountMessage());
         Logger.sendSimpleMessage(player, DungeonsConfig.getContentDownloadSeparator());
+    }
+
+    private void sendInvalidTokenMessage(Player player) {
+        player.sendMessage(DungeonsConfig.getContentInvalidTokenMessage());
+        player.spigot().sendMessage(
+                SpigotMessage.simpleMessage(DungeonsConfig.getContentInvalidTokenInstructions()),
+                SpigotMessage.hoverLinkMessage(
+                        InitializeConfig.getAccountLinkDisplay(),
+                        InitializeConfig.getAccountLinkHover(),
+                        "https://nightbreak.io/account/"));
     }
 
     protected ContentState getContentState() {

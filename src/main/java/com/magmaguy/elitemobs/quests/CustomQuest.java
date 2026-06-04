@@ -7,6 +7,7 @@ import com.magmaguy.elitemobs.config.QuestsConfig;
 import com.magmaguy.elitemobs.config.customquests.CustomQuestsConfig;
 import com.magmaguy.elitemobs.config.customquests.CustomQuestsConfigFields;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
+import com.magmaguy.elitemobs.quests.dialogue.QuestDialogueBossBarManager;
 import com.magmaguy.elitemobs.quests.objectives.QuestObjectives;
 import com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldowns;
 import com.magmaguy.elitemobs.quests.rewards.QuestReward;
@@ -19,6 +20,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.permissions.PermissionAttachment;
 
+import java.util.List;
 import java.util.UUID;
 
 public class CustomQuest extends Quest {
@@ -134,10 +136,11 @@ public class CustomQuest extends Quest {
             if (event.getQuest() instanceof CustomQuest customQuest) {
                 CustomQuestsConfigFields customQuestsConfigFields = customQuest.getCustomQuestsConfigFields();
                 customQuest.applyEndPermissions(event.getPlayer());
-                if (customQuest.getCustomQuestsConfigFields().getQuestCompleteDialog() != null &&
-                        !customQuest.getCustomQuestsConfigFields().getQuestCompleteDialog().isEmpty())
-                    for (String dialog : customQuest.getCustomQuestsConfigFields().getQuestCompleteDialog())
-                        event.getPlayer().sendMessage(dialog);
+                List<String> completeDialog = customQuestsConfigFields.getQuestCompleteDialog();
+                if (completeDialog != null && !completeDialog.isEmpty())
+                    if (!QuestDialogueBossBarManager.consumeRecentlyShownQuestCompleteDialog(event.getPlayer(), customQuest) &&
+                            !QuestDialogueBossBarManager.showRawDialogue(event.getPlayer(), customQuest.getQuestName(), completeDialog, null))
+                        completeDialog.forEach(event.getPlayer()::sendMessage);
                 for (String command : customQuestsConfigFields.getQuestCompleteCommands())
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
                             command.replace("$player", event.getPlayer().getName())

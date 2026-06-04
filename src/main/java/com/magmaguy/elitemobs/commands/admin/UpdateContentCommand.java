@@ -10,6 +10,7 @@ import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
 import com.magmaguy.magmacore.nightbreak.NightbreakAccount;
 import com.magmaguy.magmacore.nightbreak.NightbreakContentManager;
+import com.magmaguy.magmacore.nightbreak.NightbreakSetupMenuHelper;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -38,6 +39,10 @@ public class UpdateContentCommand extends AdvancedCommand {
         if (!NightbreakAccount.hasToken()) {
             sender.sendMessage(
                 CommandMessagesConfig.getUpdateNoTokenMessage());
+            return;
+        }
+        if (NightbreakAccount.hasAuthFailure()) {
+            NightbreakSetupMenuHelper.sendTokenUpdatePrompt(sender, "EliteMobs");
             return;
         }
 
@@ -113,7 +118,11 @@ public class UpdateContentCommand extends AdvancedCommand {
             String name = pkg.getContentPackagesConfigFields().getName();
             NightbreakContentManager.downloadAsync(MetadataHandler.PLUGIN, slug, importsFolder, null, success -> {
                 if (success) completed.incrementAndGet();
-                else { failed.incrementAndGet(); failedNames.add(name); }
+                else {
+                    if (abortIfAuthFailure(sender, player)) return;
+                    failed.incrementAndGet();
+                    failedNames.add(name);
+                }
                 downloadNextPackage(packages, index + 1, importsFolder, player, sender, completed, failed, failedNames);
             });
             return;
@@ -168,6 +177,7 @@ public class UpdateContentCommand extends AdvancedCommand {
                     }
                 }
             } else {
+                if (abortIfAuthFailure(sender, player)) return;
                 failed.incrementAndGet();
                 failedNames.add(name);
                 if (player == null || player.isOnline()) {
@@ -178,5 +188,13 @@ public class UpdateContentCommand extends AdvancedCommand {
             // Download next package
             downloadNextPackage(packages, index + 1, importsFolder, player, sender, completed, failed, failedNames);
         });
+    }
+
+    private static boolean abortIfAuthFailure(CommandSender sender, Player player) {
+        if (!NightbreakAccount.hasAuthFailure()) return false;
+        DownloadAllContentCommand.IS_BULK_DOWNLOADING.set(false);
+        CommandSender target = player != null && !player.isOnline() ? Bukkit.getConsoleSender() : sender;
+        NightbreakSetupMenuHelper.sendTokenUpdatePrompt(target, "EliteMobs");
+        return true;
     }
 }

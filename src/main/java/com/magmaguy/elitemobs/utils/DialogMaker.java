@@ -28,13 +28,9 @@ public class DialogMaker {
      */
     private static String processText(String text) {
         if (text == null) return null;
-        return ChatColor.stripColor(
-                ChatColor.translateAlternateColorCodes('&',
-                        text.replace("§0", "§f")
-                                .replace("&0", "&f")
-                                .replace("\r", "")
-                )
-        );
+        return text.replace("§0", "§f")
+                .replace("&0", "&f")
+                .replace("\r", "");
     }
 
     private static String processSingleLineText(String text) {
@@ -49,6 +45,10 @@ public class DialogMaker {
 
     public static void sendQuestMessage(List<? extends Quest> quests, Player player, NPCEntity npcEntity) {
         if (quests.isEmpty()) return;
+        if (quests.size() == 1) {
+            DialogManager.sendDialog(player, buildQuestDialogBuilder(quests, 0, player, npcEntity, false));
+            return;
+        }
         showQuestListDialog(quests, player, npcEntity);
     }
 
@@ -61,7 +61,7 @@ public class DialogMaker {
         // Add each quest as a dialog reference
         for (int i = 0; i < quests.size(); i++) {
             DialogManager.MultiActionDialogBuilder questDialog =
-                    buildQuestDialogBuilder(quests, i, player, npcEntity);
+                    buildQuestDialogBuilder(quests, i, player, npcEntity, true);
 
             listBuilder.addDialog(DialogManager.DialogReference.inline(questDialog));
         }
@@ -74,23 +74,26 @@ public class DialogMaker {
     }
 
     private static DialogManager.MultiActionDialogBuilder buildQuestDialogBuilder(
-            List<? extends Quest> quests, int questIndex, Player player, NPCEntity npcEntity) {
+            List<? extends Quest> quests, int questIndex, Player player, NPCEntity npcEntity, boolean addBackButton) {
 
         Quest quest = quests.get(questIndex);
         QuestMenu.QuestText questText = new QuestMenu.QuestText(quest, npcEntity, player);
 
         DialogManager.MultiActionDialogBuilder builder = new DialogManager.MultiActionDialogBuilder();
+        builder.afterAction(DialogManager.AfterAction.CLOSE);
 
         setDialogTitles(quest, builder, questText, questIndex, quests.size());
         addQuestBodySections(builder, quest, questText);
         addActionButtons(builder, quest, questText);
+        addExitButton(builder);
 
-        // Always add back button to return to quest list
-        String backCommand = "/elitemobs npc questList " + npcEntity.getUuid();
-        builder.addAction(DialogManager.ActionButton.of(
-                "← Back to Quest List",
-                new DialogManager.RunCommandAction(backCommand)
-        ).width(questDialogWidth));
+        if (addBackButton && npcEntity != null) {
+            String backCommand = "/elitemobs npc questList " + npcEntity.getUuid();
+            builder.addAction(DialogManager.ActionButton.of(
+                    "← Back to Quest List",
+                    new DialogManager.RunCommandAction(backCommand)
+            ).width(questDialogWidth));
+        }
 
         return builder;
     }
@@ -98,7 +101,7 @@ public class DialogMaker {
     private static void setDialogTitles(Quest quest, DialogManager.MultiActionDialogBuilder builder,
                                         QuestMenu.QuestText questText, int questIndex, int totalQuests) {
         // Main title
-        String title = processSingleLineText(questText.getHeader().toPlainText());
+        String title = processSingleLineText(componentText(questText.getHeader()));
         if (title != null && !title.isEmpty()) {
             builder.title(title);
         }
@@ -129,8 +132,9 @@ public class DialogMaker {
 
         StringBuilder text = new StringBuilder();
         for (TextComponent component : components) {
-            if (component.toPlainText() != null) {
-                text.append(processText(component.toPlainText())).append("\n");
+            String componentText = componentText(component);
+            if (componentText != null) {
+                text.append(processText(componentText)).append("\n");
             }
         }
 
@@ -143,8 +147,8 @@ public class DialogMaker {
                                                  TextComponent header, List<TextComponent> items,
                                                  Quest quest, boolean showItemsIfAvailable) {
         // Add header as text if present
-        if (header != null && header.toPlainText() != null) {
-            builder.addBody(DialogManager.PlainMessageBody.of(processText(header.toPlainText())).width(questDialogWidth));
+        if (header != null && componentText(header) != null) {
+            builder.addBody(DialogManager.PlainMessageBody.of(processText(componentText(header))).width(questDialogWidth));
         }
 
         // Check if we should and can display items
@@ -164,8 +168,8 @@ public class DialogMaker {
 
                     // Get the description from the corresponding TextComponent
                     String description = "";
-                    if (i < items.size() && items.get(i).toPlainText() != null) {
-                        description = processText(items.get(i).toPlainText());
+                    if (i < items.size() && componentText(items.get(i)) != null) {
+                        description = processText(componentText(items.get(i)));
                     }
 
                     // Create and add the ItemBody
@@ -192,8 +196,9 @@ public class DialogMaker {
             if (items != null && !items.isEmpty()) {
                 StringBuilder text = new StringBuilder();
                 for (TextComponent item : items) {
-                    if (item.toPlainText() != null) {
-                        text.append("  ").append(processText(item.toPlainText())).append("\n");
+                    String itemText = componentText(item);
+                    if (itemText != null) {
+                        text.append("  ").append(processText(itemText)).append("\n");
                     }
                 }
 
@@ -205,7 +210,7 @@ public class DialogMaker {
     }
 
     private static void addActionButtons(DialogManager.MultiActionDialogBuilder builder,
-                                         Quest quest, QuestMenu.QuestText questText) {
+                                          Quest quest, QuestMenu.QuestText questText) {
         if (quest instanceof CustomQuest && quest.isAccepted()) {
             builder.columns(2);
         } else builder.columns(1);
@@ -219,13 +224,20 @@ public class DialogMaker {
         }
     }
 
+    private static void addExitButton(DialogManager.MultiActionDialogBuilder builder) {
+        builder.addAction(DialogManager.ActionButton.of(
+                "Exit",
+                new DialogManager.CustomAction("elitemobs:close_quest_dialog")
+        ).width((int) (questDialogWidth / 3d)));
+    }
+
     private static void addButtonFromComponent(DialogManager.MultiActionDialogBuilder builder,
                                                TextComponent component) {
-        if (component == null || component.toPlainText() == null || component.toPlainText().isEmpty()) {
+        if (component == null || componentText(component) == null || componentText(component).isEmpty()) {
             return;
         }
 
-        String text = processSingleLineText(component.toPlainText());
+        String text = processSingleLineText(componentText(component));
         if (text.contains("[Abandon]")) text = "[Abandon]";
 
         String command = extractCommandFromComponent(component);
@@ -251,6 +263,13 @@ public class DialogMaker {
         }
 
         return null;
+    }
+
+    private static String componentText(TextComponent component) {
+        if (component == null) return null;
+        String text = component.toLegacyText();
+        if (text == null || text.isEmpty()) text = component.toPlainText();
+        return text;
     }
 
     /**

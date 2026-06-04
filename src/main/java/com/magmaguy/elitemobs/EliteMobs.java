@@ -84,6 +84,7 @@ import com.magmaguy.elitemobs.powerstances.MinorPowerStanceMath;
 import com.magmaguy.elitemobs.quests.DynamicQuest;
 import com.magmaguy.elitemobs.quests.Quest;
 import com.magmaguy.elitemobs.quests.QuestTracking;
+import com.magmaguy.elitemobs.quests.dialogue.QuestDialogueBossBarManager;
 import com.magmaguy.elitemobs.quests.menus.QuestInventoryMenu;
 import com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldowns;
 import com.magmaguy.elitemobs.skills.CombatLevelDisplay;
@@ -618,6 +619,7 @@ public class EliteMobs extends JavaPlugin {
         EarthquakeEnchantment.EarthquakeEnchantmentEvents.shutdown();
         BuyOrSellMenu.BuyOrSellMenuEvents.shutdown();
         Quest.shutdown();
+        QuestDialogueBossBarManager.shutdown();
         QuestInventoryMenu.shutdown();
         StatsPage.StatsPageEvents.shutdown();
         GearPage.GearPageEvents.shutdown();

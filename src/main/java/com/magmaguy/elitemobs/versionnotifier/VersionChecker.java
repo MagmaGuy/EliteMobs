@@ -542,6 +542,11 @@ public class VersionChecker {
         Map<String, NightbreakAccount.AccessInfo> slugCache = new HashMap<>();
         List<String> failedSlugs = new ArrayList<>();
         int prefetched = 0;
+        boolean authFailed = NightbreakAccount.hasAuthFailure();
+        if (authFailed) {
+            logNightbreakTokenRejected();
+            return;
+        }
 
         for (EMPackage pkg : packageSnapshot) {
             // Bail fast if the plugin is being disabled mid-loop — each
@@ -558,6 +563,10 @@ public class VersionChecker {
                 info = slugCache.get(slug);
             } else {
                 info = NightbreakAccount.getInstance().checkAccess(slug);
+                if (NightbreakAccount.hasAuthFailure()) {
+                    authFailed = true;
+                    break;
+                }
                 slugCache.put(slug, info);
                 if (info == null && !failedSlugs.contains(slug)) {
                     failedSlugs.add(slug);
@@ -572,9 +581,22 @@ public class VersionChecker {
         if (prefetched > 0) {
             Logger.info("Prefetched Nightbreak access info for " + prefetched + " content packages");
         }
+        if (authFailed) {
+            logNightbreakTokenRejected();
+            return;
+        }
         if (!failedSlugs.isEmpty()) {
             Logger.warn("Failed to prefetch access info for " + failedSlugs.size() + " slugs: " + String.join(", ", failedSlugs));
         }
+    }
+
+    private static void logNightbreakTokenRejected() {
+        String status = NightbreakAccount.getLastAuthFailureStatus() > 0
+                ? " (HTTP " + NightbreakAccount.getLastAuthFailureStatus() + ")"
+                : "";
+        Logger.warn("Nightbreak token needs to be updated" + status
+                + ". Get a new token at https://nightbreak.io/account/ and run "
+                + "/nightbreaklogin <token>, then run /em setup again.");
     }
 
     public static class VersionCheckerEvents implements Listener {

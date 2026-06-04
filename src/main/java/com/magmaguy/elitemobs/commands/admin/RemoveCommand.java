@@ -8,6 +8,7 @@ import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
 import org.bukkit.Material;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -40,42 +41,55 @@ public class RemoveCommand {
         }
     }
 
+    public static boolean isRemoving(Player player) {
+        return removingPlayers.contains(player.getUniqueId());
+    }
+
+    public static boolean removeTrackedEntity(Player player, Entity entity) {
+        return removeEntity(player, entity, false);
+    }
+
+    private static boolean removeEntity(Player player, Entity entity, boolean removeUntrackedEntity) {
+        if (entity == null) return false;
+
+        NPCEntity npcEntity = EntityTracker.getNPCEntity(entity);
+        if (npcEntity != null) {
+            npcEntity.remove(RemovalReason.REMOVE_COMMAND);
+            return true;
+        }
+
+        EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(entity);
+        if (eliteEntity == null) {
+            if (!removeUntrackedEntity) return false;
+            player.sendMessage(CommandMessagesConfig.getRemovedNotEliteMobsMessage());
+            player.sendMessage(CommandMessagesConfig.getRemovedHijackedMessage());
+            entity.remove();
+            return true;
+        }
+        if (eliteEntity instanceof RegionalBossEntity)
+            player.sendMessage(CommandMessagesConfig.getRemovedSpawnLocationMessage()
+                    .replace("$boss", ((RegionalBossEntity) eliteEntity).getCustomBossesConfigFields().getFilename()));
+        eliteEntity.remove(RemovalReason.REMOVE_COMMAND);
+        return true;
+    }
+
     public static class RemoveCommandEvents implements Listener {
         @EventHandler(ignoreCancelled = true)
         public void quitEvent(PlayerQuitEvent event) {
             removingPlayers.remove(event.getPlayer().getUniqueId());
         }
 
-        @EventHandler(priority = EventPriority.LOWEST)
+        @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
         public void removeEliteEntity(EntityDamageByEntityEvent event) {
             if (!(event.getDamager() instanceof Player player)) return;
-            if (!removingPlayers.contains(player.getUniqueId())) return;
-
-            NPCEntity npcEntity = EntityTracker.getNPCEntity(event.getEntity());
-            if (npcEntity != null) {
-                npcEntity.remove(RemovalReason.REMOVE_COMMAND);
-                event.setCancelled(true);
-                return;
-            }
-
-            EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(event.getEntity());
-            if (eliteEntity == null) {
-                player.sendMessage(CommandMessagesConfig.getRemovedNotEliteMobsMessage());
-                player.sendMessage(CommandMessagesConfig.getRemovedHijackedMessage());
-                event.getEntity().remove();
-                event.setCancelled(true);
-                return;
-            }
-            if (eliteEntity instanceof RegionalBossEntity)
-                player.sendMessage(CommandMessagesConfig.getRemovedSpawnLocationMessage()
-                        .replace("$boss", ((RegionalBossEntity) eliteEntity).getCustomBossesConfigFields().getFilename()));
-            eliteEntity.remove(RemovalReason.REMOVE_COMMAND);
+            if (!isRemoving(player)) return;
+            if (!removeEntity(player, event.getEntity(), true)) return;
             event.setCancelled(true);
         }
 
-        @EventHandler(priority = EventPriority.LOWEST)
+        @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
         public void removeTreasureChest(PlayerInteractEvent event) {
-            if (!removingPlayers.contains(event.getPlayer().getUniqueId())) return;
+            if (!isRemoving(event.getPlayer())) return;
             if (event.getClickedBlock() == null) return;
             TreasureChest treasureChest = TreasureChest.getTreasureChest(event.getClickedBlock().getLocation());
             if (treasureChest == null) return;

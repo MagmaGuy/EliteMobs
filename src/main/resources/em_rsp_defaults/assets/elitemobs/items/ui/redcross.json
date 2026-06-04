@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "elitemobs:ui/greencrown"
+    "model": "nightbreak:ui/redcross"
   }
 }

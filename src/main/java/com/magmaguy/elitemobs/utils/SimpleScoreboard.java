@@ -1,43 +1,19 @@
 package com.magmaguy.elitemobs.utils;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import org.bukkit.Bukkit;
+import com.magmaguy.magmacore.util.ScoreboardUtil;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.*;
+import org.bukkit.scoreboard.Scoreboard;
 
 import java.util.List;
 
 public class SimpleScoreboard {
 
     public static Scoreboard lazyScoreboard(Player player, String displayName, List<String> scoreboardContents) {
-        Scoreboard scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
-        int lineCount = Math.min(scoreboardContents.size(), 15);
-
-        Objective objective = scoreboard.registerNewObjective("test", Criteria.DUMMY, displayName);
-        objective.setDisplaySlot(DisplaySlot.SIDEBAR);
-        for (int i = 0; i < lineCount; i++) {
-            String scoreString = scoreboardContents.get(i);
-            if (scoreString.length() > 40) scoreString = scoreString.substring(0, 39);
-            Score score = objective.getScore(scoreString);
-            score.setScore(i);
-        }
-
-        player.setScoreboard(scoreboard);
-
-        return scoreboard;
+        return ScoreboardUtil.lazyScoreboard(MetadataHandler.PLUGIN, player, displayName, scoreboardContents);
     }
 
     public static Scoreboard temporaryScoreboard(Player player, String displayName, List<String> scoreboardContents, int ticksTimeout) {
-        Scoreboard scoreboard = lazyScoreboard(player, displayName, scoreboardContents);
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (player.getScoreboard().equals(scoreboard))
-                    player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
-            }
-        }.runTaskLater(MetadataHandler.PLUGIN, ticksTimeout);
-
-        return scoreboard;
+        return ScoreboardUtil.temporaryScoreboard(MetadataHandler.PLUGIN, player, displayName, scoreboardContents, ticksTimeout);
     }
 }

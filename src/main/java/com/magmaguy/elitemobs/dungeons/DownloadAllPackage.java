@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.config.InitializeConfig;
 import com.magmaguy.magmacore.menus.NightbreakSetupIcons;
 import com.magmaguy.magmacore.menus.ContentPackage;
 import com.magmaguy.magmacore.nightbreak.NightbreakAccount;
+import com.magmaguy.magmacore.nightbreak.NightbreakSetupMenuHelper;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
 import com.magmaguy.magmacore.util.Logger;
 import com.magmaguy.magmacore.util.SpigotMessage;
@@ -48,6 +49,13 @@ public class DownloadAllPackage extends ContentPackage {
             lore = List.of(
                     "&7No Nightbreak token linked.",
                     "&7Click for setup instructions.");
+        } else if (NightbreakAccount.hasAuthFailure()) {
+            iconModel = NightbreakSetupIcons.MODEL_RED_CROSS;
+            baseMaterial = Material.RED_STAINED_GLASS_PANE;
+            displayName = "&eUpdate Nightbreak Token";
+            lore = List.of(
+                    "&7Your saved Nightbreak token needs",
+                    "&7to be updated before downloads work.");
         } else {
             long notDownloadedCount = countNotDownloaded(allPackages);
             long outdatedCount = countOutdated(allPackages);
@@ -148,6 +156,10 @@ public class DownloadAllPackage extends ContentPackage {
                             InitializeConfig.getContentLinkHover(),
                             "https://nightbreak.io/plugin/elitemobs/"));
             Logger.sendSimpleMessage(player, DungeonsConfig.getContentDownloadSeparator());
+            return;
+        }
+        if (NightbreakAccount.hasAuthFailure()) {
+            NightbreakSetupMenuHelper.sendTokenUpdatePrompt(player, "EliteMobs");
             return;
         }
 
