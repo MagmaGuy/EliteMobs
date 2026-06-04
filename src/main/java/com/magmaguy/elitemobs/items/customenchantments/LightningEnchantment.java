@@ -39,9 +39,14 @@ public class LightningEnchantment extends CustomEnchantment {
             EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(entity);
             if (eliteEntity == null) return;
             double damage = ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getWeaponLevel(true) * 2.5;
-            EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = true;
             EntityDamageByEntityEvent entityDamageByEntityEvent = new EntityDamageByEntityEvent(player, eliteEntity.getLivingEntity(), EntityDamageEvent.DamageCause.CUSTOM, DamageSource.builder(DamageType.MOB_ATTACK).build(), damage);
-            new EventCaller(entityDamageByEntityEvent);
+            boolean previousBypass = EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass;
+            EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = true;
+            try {
+                new EventCaller(entityDamageByEntityEvent);
+            } finally {
+                EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = previousBypass;
+            }
         }));
     }
 
@@ -60,7 +65,7 @@ public class LightningEnchantment extends CustomEnchantment {
             if (playersInCooldown.contains(playerUUID)) return;
             double lightningChance = ElitePlayerInventory.playerInventories.get(playerUUID).getLightningChance(true);
             if (lightningChance <= 0) return;
-            if (lightningChance >= ThreadLocalRandom.current().nextDouble()) return;
+            if (ThreadLocalRandom.current().nextDouble() >= lightningChance) return;
             playersInCooldown.add(playerUUID);
             Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> playersInCooldown.remove(playerUUID), LightningConfig.minimumCooldown * 20L);
             playerLightning(event.getPlayer(), event.getEliteMobEntity().getLivingEntity().getLocation());
