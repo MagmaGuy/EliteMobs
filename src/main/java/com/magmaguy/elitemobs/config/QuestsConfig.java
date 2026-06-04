@@ -55,6 +55,12 @@ public class QuestsConfig extends ConfigurationFile {
     @Getter
     private static String completedColorCode;
     @Getter
+    private static boolean binaryObjectiveStatusEnabled;
+    @Getter
+    private static String binaryObjectiveIncompleteSymbol;
+    @Getter
+    private static String binaryObjectiveCompleteSymbol;
+    @Getter
     private static String killQuestChatProgressionMessage;
     @Getter
     private static String fetchQuestChatProgressionMessage;
@@ -126,6 +132,32 @@ public class QuestsConfig extends ConfigurationFile {
     private static String questBackToStatusMenu;
     @Getter
     private static String questAbandonText;
+    @Getter
+    private static boolean useQuestDialogueBossBars;
+    @Getter
+    private static boolean hideKeyedBossBarsDuringQuestDialogue;
+    @Getter
+    private static boolean hideQuestScoreboardDuringQuestDialogue;
+    @Getter
+    private static int questDialogueCharactersPerLine;
+    @Getter
+    private static int questDialogueCharactersPerTick;
+    @Getter
+    private static String questDialogueNamePrefix;
+    @Getter
+    private static String questDialogueNameSuffix;
+    @Getter
+    private static String questDialogueLinePrefix;
+    @Getter
+    private static String questDialogueLineSuffix;
+    @Getter
+    private static int questDialogueBoxOffsetX;
+    @Getter
+    private static int questDialogueNameOffsetX;
+    @Getter
+    private static int questDialogueLineOffsetX;
+    @Getter
+    private static int questDialoguePromptOffsetX;
 
     public QuestsConfig() {
         super("Quests.yml");
@@ -212,6 +244,16 @@ public class QuestsConfig extends ConfigurationFile {
                     : arenaObjective.getArenaFilename();
             newString = arenaQuestScoreboardProgressionLine.replace("$arenaName", arenaDisplayName);
         }
+        // Single-step objectives (e.g. "talk to") show a status symbol instead of a meaningless "0/1",
+        // and read as a struck-through checklist item once done. Counted objectives keep their x/y.
+        if (binaryObjectiveStatusEnabled && objective != null
+                && !(objective instanceof ArenaObjective) && objective.getTargetAmount() <= 1) {
+            String label = binaryObjectiveLabel(newString);
+            String body = (label.isEmpty() ? "" : label + " ") + ChatColor.stripColor(safeObjectiveName(objective));
+            if (objective.isObjectiveCompleted())
+                return binaryObjectiveCompleteSymbol + " " + completedColorCode + ChatColor.STRIKETHROUGH + body;
+            return binaryObjectiveIncompleteSymbol + " " + body;
+        }
         newString = newString.replace("$name", safeObjectiveName(objective));
         newString = newString.replace("$current", objective.getCurrentAmount() + "");
         newString = newString.replace("$target", objective.getTargetAmount() + "");
@@ -219,6 +261,16 @@ public class QuestsConfig extends ConfigurationFile {
             return newString.replace("$color", ongoingColorCode);
         else
             return newString.replace("$color", completedColorCode);
+    }
+
+    // Extracts the plain verb portion of a scoreboard template (the text before "$name", minus the
+    // leading bullet/colour codes), e.g. "&7➤ Talk to &f$name..." -> "Talk to". Keeps translations intact.
+    private static String binaryObjectiveLabel(String template) {
+        if (template == null) return "";
+        int index = template.indexOf("$name");
+        String before = index >= 0 ? template.substring(0, index) : template;
+        before = ChatColor.stripColor(before).replaceAll("^[^\\p{L}]+", "");
+        return before.trim();
     }
 
     private static String safeObjectiveName(Objective objective) {
@@ -280,16 +332,26 @@ public class QuestsConfig extends ConfigurationFile {
                 file, fileConfiguration, "ongoingQuestColorCode", "&c", false);
         completedColorCode = ConfigurationEngine.setString(
                 List.of("Sets the color codes for completed objectives."),
-                file, fileConfiguration, "completedQuestColorCode", "&2", false);
+                file, fileConfiguration, "completedQuestColorCode", "&a", false);
+        binaryObjectiveStatusEnabled = ConfigurationEngine.setBoolean(
+                List.of("Sets if single-step scoreboard objectives (target of 1, e.g. 'talk to') show a status symbol",
+                        "instead of a meaningless '0/1' counter. Completed objectives are shown struck through."),
+                fileConfiguration, "binaryObjectiveStatusEnabled", true);
+        binaryObjectiveIncompleteSymbol = ConfigurationEngine.setString(
+                List.of("Symbol shown before an incomplete single-step objective when binaryObjectiveStatusEnabled is true."),
+                file, fileConfiguration, "binaryObjectiveIncompleteSymbol", "&7➤", false);
+        binaryObjectiveCompleteSymbol = ConfigurationEngine.setString(
+                List.of("Symbol shown before a completed single-step objective when binaryObjectiveStatusEnabled is true."),
+                file, fileConfiguration, "binaryObjectiveCompleteSymbol", "&a✔", false);
         killQuestChatProgressionMessage = ConfigurationEngine.setString(
                 List.of("Sets the formatting for progression messages of kill quests."),
-                file, fileConfiguration, "killQuestChatProgressionMessage", "&8[EliteMobs]&c➤Kill $name:$color$current&0/$color$target", true);
+                file, fileConfiguration, "killQuestChatProgressionMessage", "&8[EliteMobs] &7➤ Kill &f$name&7: $color$current&7/$color$target", true);
         fetchQuestChatProgressionMessage = ConfigurationEngine.setString(
                 List.of("Sets the formatting for progression messages of fetch quests."),
-                file, fileConfiguration, "fetchQuestChatProgressionMessage", "&8[EliteMobs]&c➤Get $name:$color$current&0/$color$target", true);
+                file, fileConfiguration, "fetchQuestChatProgressionMessage", "&8[EliteMobs] &7➤ Get &f$name&7: $color$current&7/$color$target", true);
         dialogQuestChatProgressionMessage = ConfigurationEngine.setString(
                 List.of("Sets the formatting for progression messages of dialog quests."),
-                file, fileConfiguration, "dialogQuestChatProgressionMessage", "&8[EliteMobs]&c➤Talk to $name:$color$current&0/$color$target", true);
+                file, fileConfiguration, "dialogQuestChatProgressionMessage", "&8[EliteMobs] &7➤ Talk to &f$name&7: $color$current&7/$color$target", true);
         maximumActiveQuests = ConfigurationEngine.setInt(
                 List.of("Sets the maximum amount of accepted quests a player can have."),
                 fileConfiguration, "maximumActiveQuests", 10);
@@ -304,16 +366,16 @@ public class QuestsConfig extends ConfigurationFile {
 
         killQuestScoreboardProgressionLine = ConfigurationEngine.setString(
                 List.of("Sets the formatting for scoreboard progression messages of kill quests."),
-                file, fileConfiguration, "killQuestScoreboardProgressionMessage", "&c➤Kill $name:$color$current&0/$color$target", true);
+                file, fileConfiguration, "killQuestScoreboardProgressionMessage", "&7➤ Kill &f$name&7: $color$current&7/$color$target", true);
         fetchQuestScoreboardProgressionLine = ConfigurationEngine.setString(
                 List.of("Sets the formatting for scoreboard progression message of fetch quests."),
-                file, fileConfiguration, "fetchQuestScoreboardProgressionMessage", "&c➤Get $name:$color$current&0/$color$target", true);
+                file, fileConfiguration, "fetchQuestScoreboardProgressionMessage", "&7➤ Get &f$name&7: $color$current&7/$color$target", true);
         dialogQuestScoreboardProgressionLine = ConfigurationEngine.setString(
                 List.of("Sets the formatting for scoreboard progression messages of dialog quests."),
-                file, fileConfiguration, "dialogQuestScoreboardProgressionMessage", "&c➤Talk to $name:$color$current&0/$color$target", true);
+                file, fileConfiguration, "dialogQuestScoreboardProgressionMessage", "&7➤ Talk to &f$name&7: $color$current&7/$color$target", true);
         arenaQuestScoreboardProgressionLine = ConfigurationEngine.setString(
                 List.of("Sets the formatting for scoreboard progression messages of arena quests."),
-                file, fileConfiguration, "arenaQuestScoreboardProgressionMessage", "&c➤Complete $arenaName", true);
+                file, fileConfiguration, "arenaQuestScoreboardProgressionMessage", "&7➤ Complete &f$arenaName", true);
 
         questEntityTypes = setEntityTypes(fileConfiguration, file);
 
@@ -411,6 +473,48 @@ public class QuestsConfig extends ConfigurationFile {
         questAbandonText = ConfigurationEngine.setString(
                 List.of("Sets the text shown on the abandon quest button."),
                 file, fileConfiguration, "questAbandonText", "\u00A7l\u00A7c[Abandon]", true);
+        useQuestDialogueBossBars = ConfigurationEngine.setBoolean(
+                List.of("Experimental: shows quest NPC text through top-anchored boss bars before opening the quest menu."),
+                fileConfiguration, "useQuestDialogueBossBars", true);
+        hideKeyedBossBarsDuringQuestDialogue = ConfigurationEngine.setBoolean(
+                List.of("Experimental: temporarily hides Bukkit keyed boss bars from a player while quest dialogue boss bars are active.",
+                        "Anonymous boss bars from other plugins cannot be discovered through Bukkit."),
+                fileConfiguration, "hideKeyedBossBarsDuringQuestDialogue", true);
+        hideQuestScoreboardDuringQuestDialogue = ConfigurationEngine.setBoolean(
+                List.of("Experimental: hides the quest tracking scoreboard and compass boss bar while quest dialogue is active,",
+                        "so the dialogue box is not cluttered by the objective list. Restored when the dialogue closes."),
+                fileConfiguration, "hideQuestScoreboardDuringQuestDialogue", true);
+        questDialogueCharactersPerLine = ConfigurationEngine.setInt(
+                List.of("Experimental: maximum visible characters per boss-bar dialogue line before wrapping."),
+                fileConfiguration, "questDialogueCharactersPerLine", 48);
+        questDialogueCharactersPerTick = ConfigurationEngine.setInt(
+                List.of("Experimental: visible characters added per tick while quest dialogue types in."),
+                fileConfiguration, "questDialogueCharactersPerTick", 2);
+        questDialogueNamePrefix = ConfigurationEngine.setString(
+                List.of("Experimental: prefix placed before the NPC name boss-bar title. Use this for custom font offset glyphs."),
+                file, fileConfiguration, "questDialogueNamePrefix", "", false);
+        questDialogueNameSuffix = ConfigurationEngine.setString(
+                List.of("Experimental: suffix placed after the NPC name boss-bar title. Use this for custom font offset glyphs."),
+                file, fileConfiguration, "questDialogueNameSuffix", "", false);
+        questDialogueLinePrefix = ConfigurationEngine.setString(
+                List.of("Experimental: prefix placed before each dialogue line boss-bar title. Use this for custom font offset glyphs."),
+                file, fileConfiguration, "questDialogueLinePrefix", "", false);
+        questDialogueLineSuffix = ConfigurationEngine.setString(
+                List.of("Experimental: suffix placed after each dialogue line boss-bar title. Use this for custom font offset glyphs."),
+                file, fileConfiguration, "questDialogueLineSuffix", "", false);
+        questDialogueBoxOffsetX = ConfigurationEngine.setInt(
+                List.of("Experimental: horizontal pixel shift of the dialogue box image (positive = right).",
+                        "Default 0 keeps the box where the art places it (centered in the 256px font canvas)."),
+                fileConfiguration, "questDialogueBoxOffsetX", 34);
+        questDialogueNameOffsetX = ConfigurationEngine.setInt(
+                List.of("Experimental: horizontal pixel shift of the NPC name line (negative = left)."),
+                fileConfiguration, "questDialogueNameOffsetX", -80);
+        questDialogueLineOffsetX = ConfigurationEngine.setInt(
+                List.of("Experimental: horizontal pixel shift of each dialogue body line (negative = left)."),
+                fileConfiguration, "questDialogueLineOffsetX", 0);
+        questDialoguePromptOffsetX = ConfigurationEngine.setInt(
+                List.of("Experimental: horizontal pixel shift of the 'sneak to continue' prompt line (positive = right)."),
+                fileConfiguration, "questDialoguePromptOffsetX", 68);
 
     }
 }

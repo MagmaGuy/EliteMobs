@@ -1,37 +1,203 @@
 {
     "providers": [
-        {"type": "reference", "id": "minecraft:include/space"},
-        {"type": "reference", "id": "minecraft:include/default"},
-        {"type": "reference", "id": "minecraft:include/unifont"},
-        {"type": "bitmap", "file": "elitemobs:gui/ranksmenu.png", "ascent": 136, "height": 256, "chars":["󰸀"]},
-        {"type": "bitmap", "file": "elitemobs:gui/repairmenu.png", "ascent": 136, "height": 256, "chars":["󰸁"]},
-        {"type": "bitmap", "file": "elitemobs:gui/scrappermenu.png", "ascent": 136, "height": 256, "chars":["󰸂"]},
-        {"type": "bitmap", "file": "elitemobs:gui/refinemenu.png", "ascent": 136, "height": 256, "chars":["󰸃"]},
-        {"type": "bitmap", "file": "elitemobs:gui/smeltmenu.png", "ascent": 136, "height": 256, "chars":["󰸄"]},
-        {"type": "bitmap", "file": "elitemobs:gui/sellmenu.png", "ascent": 136, "height": 256, "chars":["󰸅"]},
-        {"type": "bitmap", "file": "elitemobs:gui/proceduralitemshop.png", "ascent": 136, "height": 256, "chars":["󰸆"]},
-        {"type": "bitmap", "file": "elitemobs:gui/customitemshop.png", "ascent": 136, "height": 256, "chars":["󰸇"]},
-        {"type": "bitmap", "file": "elitemobs:gui/buyorsell.png", "ascent": 136, "height": 256, "chars":["󰸈"]},
-        {"type": "bitmap", "file": "elitemobs:gui/unbind.png", "ascent": 136, "height": 256, "chars":["󰸉"]},
-        {"type": "bitmap", "file": "elitemobs:gui/arenamenu.png", "ascent": 136, "height": 256, "chars":["󰸊"]},
-        {"type": "bitmap", "file": "elitemobs:gui/setupmenu.png", "ascent": 136, "height": 256, "chars":["󰸋"]},
-        {"type": "bitmap", "file": "elitemobs:gui/skillsmenu.png", "ascent": 130, "height": 256, "chars":["󰸌"]},
-        {"type": "bitmap", "file": "elitemobs:gui/weaponselectmenu.png", "ascent": 130, "height": 256, "chars":["󰸍"]},
-
+        {
+            "type": "reference",
+            "id": "minecraft:include/space"
+        },
+        {
+            "type": "reference",
+            "id": "minecraft:include/default"
+        },
+        {
+            "type": "reference",
+            "id": "minecraft:include/unifont"
+        },
+        {
+            "type": "bitmap",
+            "file": "elitemobs:gui/ranksmenu.png",
+            "ascent": 136,
+            "height": 256,
+            "chars": [
+                "󰸀"
+            ]
+        },
+        {
+            "type": "bitmap",
+            "file": "elitemobs:gui/repairmenu.png",
+            "ascent": 136,
+            "height": 256,
+            "chars": [
+                "󰸁"
+            ]
+        },
+        {
+            "type": "bitmap",
+            "file": "elitemobs:gui/scrappermenu.png",
+            "ascent": 136,
+            "height": 256,
+            "chars": [
+                "󰸂"
+            ]
+        },
+        {
+            "type": "bitmap",
+            "file": "elitemobs:gui/refinemenu.png",
+            "ascent": 136,
+            "height": 256,
+            "chars": [
+                "󰸃"
+            ]
+        },
+        {
+            "type": "bitmap",
+            "file": "elitemobs:gui/smeltmenu.png",
+            "ascent": 136,
+            "height": 256,
+            "chars": [
+                "󰸄"
+            ]
+        },
+        {
+            "type": "bitmap",
+            "file": "elitemobs:gui/sellmenu.png",
+            "ascent": 136,
+            "height": 256,
+            "chars": [
+                "󰸅"
+            ]
+        },
+        {
+            "type": "bitmap",
+            "file": "elitemobs:gui/proceduralitemshop.png",
+            "ascent": 136,
+            "height": 256,
+            "chars": [
+                "󰸆"
+            ]
+        },
+        {
+            "type": "bitmap",
+            "file": "elitemobs:gui/customitemshop.png",
+            "ascent": 136,
+            "height": 256,
+            "chars": [
+                "󰸇"
+            ]
+        },
+        {
+            "type": "bitmap",
+            "file": "elitemobs:gui/buyorsell.png",
+            "ascent": 136,
+            "height": 256,
+            "chars": [
+                "󰸈"
+            ]
+        },
+        {
+            "type": "bitmap",
+            "file": "elitemobs:gui/unbind.png",
+            "ascent": 136,
+            "height": 256,
+            "chars": [
+                "󰸉"
+            ]
+        },
+        {
+            "type": "bitmap",
+            "file": "elitemobs:gui/arenamenu.png",
+            "ascent": 136,
+            "height": 256,
+            "chars": [
+                "󰸊"
+            ]
+        },
+        {
+            "type": "bitmap",
+            "file": "elitemobs:gui/setupmenu.png",
+            "ascent": 136,
+            "height": 256,
+            "chars": [
+                "󰸋"
+            ]
+        },
+        {
+            "type": "bitmap",
+            "file": "elitemobs:gui/skillsmenu.png",
+            "ascent": 130,
+            "height": 256,
+            "chars": [
+                "󰸌"
+            ]
+        },
+        {
+            "type": "bitmap",
+            "file": "elitemobs:gui/weaponselectmenu.png",
+            "ascent": 130,
+            "height": 256,
+            "chars": [
+                "󰸍"
+            ]
+        },
         {
             "type": "bitmap",
             "file": "elitemobs:ui/space_split.png",
             "ascent": -32768,
             "height": -19,
-            "chars": ["󰻱"]
+            "chars": [
+                "󰻱"
+            ]
         },
-
         {
             "type": "bitmap",
             "file": "elitemobs:ui/space_split.png",
             "ascent": -32768,
             "height": -185,
-            "chars": ["󰻵"]
+            "chars": [
+                "󰻵"
+            ]
+        },
+        {
+            "type": "bitmap",
+            "file": "elitemobs:gui/dialoguebox_l.png",
+            "ascent": 44,
+            "height": 256,
+            "chars": [
+                "󰼀"
+            ]
+        },
+        {
+            "type": "bitmap",
+            "file": "elitemobs:gui/dialoguebox_r.png",
+            "ascent": 44,
+            "height": 256,
+            "chars": [
+                "󰼋"
+            ]
+        },
+        {
+            "type": "space",
+            "advances": {
+                "󰼁": 1,
+                "󰼂": 2,
+                "󰼃": 4,
+                "󰼄": 8,
+                "󰼅": 16,
+                "󰼆": 32,
+                "󰼇": 64,
+                "󰼈": 128,
+                "󰼉": 256,
+                "󰼊": 512,
+                "󰼑": -1,
+                "󰼒": -2,
+                "󰼓": -4,
+                "󰼔": -8,
+                "󰼕": -16,
+                "󰼖": -32,
+                "󰼗": -64,
+                "󰼘": -128,
+                "󰼙": -256,
+                "󰼚": -512
+            }
         }
     ]
 }

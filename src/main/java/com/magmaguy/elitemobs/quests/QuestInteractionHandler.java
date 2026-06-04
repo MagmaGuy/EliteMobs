@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.QuestsConfig;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
+import com.magmaguy.elitemobs.quests.dialogue.QuestDialogueBossBarManager;
 import com.magmaguy.elitemobs.quests.menus.QuestMenu;
 import com.magmaguy.elitemobs.quests.objectives.CustomFetchObjective;
 import com.magmaguy.elitemobs.quests.objectives.Objective;
@@ -24,7 +25,9 @@ public class QuestInteractionHandler {
         });
 
         if (!dynamicQuests.isEmpty())
-            QuestMenu.generateDynamicQuestMenu(dynamicQuests, player, npcEntity);
+            if (!QuestDialogueBossBarManager.showQuestMenuIntro(dynamicQuests, player, npcEntity,
+                    () -> QuestMenu.generateDynamicQuestMenu(dynamicQuests, player, npcEntity)))
+                QuestMenu.generateDynamicQuestMenu(dynamicQuests, player, npcEntity);
     }
 
     public static void processNPCQuests(Player player, NPCEntity npcEntity) {
@@ -83,7 +86,9 @@ public class QuestInteractionHandler {
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    QuestMenu.generateCustomQuestMenu(customQuestList, player, npcEntity);
+                    if (!QuestDialogueBossBarManager.showQuestMenuIntro(customQuestList, player, npcEntity,
+                            () -> QuestMenu.generateCustomQuestMenu(customQuestList, player, npcEntity)))
+                        QuestMenu.generateCustomQuestMenu(customQuestList, player, npcEntity);
                 }
             }.runTaskLater(MetadataHandler.PLUGIN, 1);
     }

@@ -1,14 +1,18 @@
 package com.magmaguy.elitemobs.thirdparty.custommodels.freeminecraftmodels;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.commands.admin.RemoveCommand;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.thirdparty.custommodels.CustomModelInterface;
 import com.magmaguy.freeminecraftmodels.api.ModeledEntityHitByProjectileEvent;
+import com.magmaguy.freeminecraftmodels.api.ModeledEntityLeftClickEvent;
 import com.magmaguy.freeminecraftmodels.api.ModeledEntityManager;
+import com.magmaguy.freeminecraftmodels.api.ModeledEntityRightClickEvent;
 import com.magmaguy.freeminecraftmodels.customentity.DynamicEntity;
+import com.magmaguy.freeminecraftmodels.customentity.ModeledEntity;
 import com.magmaguy.freeminecraftmodels.customentity.ModeledEntityLeftClickCallback;
 import com.magmaguy.freeminecraftmodels.customentity.ModeledEntityRightClickCallback;
 import com.magmaguy.freeminecraftmodels.customentity.core.Bone;
@@ -20,6 +24,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -140,6 +145,26 @@ public class CustomModelFMM implements CustomModelInterface {
                             "Failed to refresh FMM model after reload for NPC " + npc.getUuid() + ": " + t.getMessage());
                 }
             }
+        }
+    }
+
+    public static class FmmRemoveBridge implements Listener {
+        @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
+        public void onFmmLeftClick(ModeledEntityLeftClickEvent event) {
+            removeModeledTarget(event.getPlayer(), event.getEntity(), event);
+        }
+
+        @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
+        public void onFmmRightClick(ModeledEntityRightClickEvent event) {
+            removeModeledTarget(event.getPlayer(), event.getEntity(), event);
+        }
+
+        private void removeModeledTarget(Player player, ModeledEntity modeledEntity, Cancellable event) {
+            if (!RemoveCommand.isRemoving(player)) return;
+            Entity underlyingEntity = modeledEntity.getUnderlyingEntity();
+            if (underlyingEntity == null) return;
+            if (!RemoveCommand.removeTrackedEntity(player, underlyingEntity)) return;
+            event.setCancelled(true);
         }
     }
 

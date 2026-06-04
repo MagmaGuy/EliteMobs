@@ -6,6 +6,8 @@ import com.magmaguy.magmacore.menus.NightbreakSetupIcons;
 import java.util.List;
 
 public class CustomModelsConfig extends ConfigurationFile {
+    private static final String LEGACY_RED_CROSS_MODEL = "elitemobs:ui/redcross";
+
     public static String anvilHammer;
     public static String bagOfCoins;
     public static String boxInput;
@@ -34,6 +36,10 @@ public class CustomModelsConfig extends ConfigurationFile {
                 fileConfiguration, "useAttributeScaling", true);
         anvilHammer = ConfigurationEngine.setString(file, fileConfiguration, "anvilHammer", "elitemobs:ui/anvilhammer", false);
         redCross = ConfigurationEngine.setString(file, fileConfiguration, "cancel", NightbreakSetupIcons.MODEL_RED_CROSS, false);
+        if (LEGACY_RED_CROSS_MODEL.equalsIgnoreCase(redCross)) {
+            redCross = NightbreakSetupIcons.MODEL_RED_CROSS;
+            fileConfiguration.set("cancel", redCross);
+        }
         goldenQuestionMark = ConfigurationEngine.setString(file, fileConfiguration, "goldenQuestionMark", "elitemobs:ui/goldenquestionmark", false);
         bagOfCoins = ConfigurationEngine.setString(file, fileConfiguration, "bagOfCoins", "elitemobs:ui/bagofcoins", false);
         boxInput = ConfigurationEngine.setString(file, fileConfiguration, "boxInput", "elitemobs:ui/boxinput", false);

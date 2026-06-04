@@ -188,6 +188,10 @@ public class DungeonsConfig extends ConfigurationFile {
     @Getter
     private static String contentAccessFailedLink;
     @Getter
+    private static String contentInvalidTokenMessage;
+    @Getter
+    private static String contentInvalidTokenInstructions;
+    @Getter
     private static String contentDownloadedReloadMessage;
 
     // WorldInstancedDungeonPackage messages
@@ -629,6 +633,13 @@ public class DungeonsConfig extends ConfigurationFile {
         contentAccessFailedLink = ConfigurationEngine.setString(
                 List.of("Sets the link shown when access checking fails."),
                 file, fileConfiguration, "contentAccessFailedLink", "&9https://nightbreak.io/plugin/elitemobs", true);
+        contentInvalidTokenMessage = ConfigurationEngine.setString(
+                List.of("Sets the message shown when Nightbreak rejects the saved token."),
+                file, fileConfiguration, "contentInvalidTokenMessage", "&e[EliteMobs] Nightbreak token needs to be updated.", true);
+        contentInvalidTokenInstructions = ConfigurationEngine.setString(
+                List.of("Sets the follow-up message shown after an invalid Nightbreak token.",
+                        "Followed by a clickable nightbreak.io/account link."),
+                file, fileConfiguration, "contentInvalidTokenInstructions", "&7Get a new token here, then run &e/nightbreaklogin <token>&7: ", true);
         contentDownloadedReloadMessage = ConfigurationEngine.setString(
                 List.of("Sets the message shown when content has been downloaded and a reload is triggered."),
                 file, fileConfiguration, "contentDownloadedReloadMessage", "&a[EliteMobs] Content downloaded! Reloading EliteMobs...", true);

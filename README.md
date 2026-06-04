@@ -103,7 +103,7 @@ Maven:
 <dependency>
   <groupId>com.magmaguy</groupId>
   <artifactId>EliteMobs</artifactId>
-  <version>10.4.0</version>
+  <version>10.5.0</version>
 </dependency>
 ```
 
@@ -118,7 +118,7 @@ repositories {
 
 dependencies {
     //EliteMobs
-    compileOnly("com.magmaguy:EliteMobs:10.4.0")
+    compileOnly("com.magmaguy:EliteMobs:10.5.0")
 }
 ```
 

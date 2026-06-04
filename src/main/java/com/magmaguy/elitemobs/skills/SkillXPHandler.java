@@ -98,17 +98,16 @@ public class SkillXPHandler implements Listener {
             // Get effective mob level (capped at +5 above combat level)
             int effectiveMobLevel = FarmingProtection.getEffectiveMobLevelForXP(player, rewardLevel);
 
-            // Check if mob is too low level for XP (5+ levels below)
+            // Combat-level reward cap has no lower boundary. Individual skills
+            // decide whether the mob is too low for that specific skill below.
             double xpMultiplier = FarmingProtection.getXPMultiplier(player, rewardLevel);
             if (xpMultiplier <= 0) {
-                // Notify player that mob is too low level
-                notifyLevelDifferenceLimit(player, rewardLevel, true);
-                continue; // No XP for low-level mobs
+                continue;
             }
 
             // Notify if XP is capped due to high mob level
             if (effectiveMobLevel < rewardLevel) {
-                notifyLevelDifferenceLimit(player, rewardLevel, false);
+                notifyCombatLevelCap(player, rewardLevel);
             }
 
             // Calculate base XP using effective mob level
@@ -126,10 +125,10 @@ public class SkillXPHandler implements Listener {
             if (earnedXP <= 0) continue;
 
             // Award weapon XP based on main hand weapon
-            long weaponXP = awardWeaponXP(player, earnedXP);
+            long weaponXP = awardWeaponXP(player, earnedXP, rewardLevel);
 
             // Award armor XP (always, at 1/3 rate)
-            long armorXP = awardArmorXP(player, earnedXP);
+            long armorXP = awardArmorXP(player, earnedXP, rewardLevel);
 
             // Show XP popup with total XP earned (weapon + armor)
             long totalXPEarned = weaponXP + armorXP;
@@ -144,7 +143,7 @@ public class SkillXPHandler implements Listener {
      *
      * @return The amount of XP awarded, or 0 if no weapon skill applies
      */
-    private long awardWeaponXP(Player player, long baseXP) {
+    private long awardWeaponXP(Player player, long baseXP, int rewardLevel) {
         Material weaponMaterial = player.getInventory().getItemInMainHand().getType();
         SkillType skillType = SkillType.fromMaterial(weaponMaterial);
 
@@ -154,6 +153,12 @@ public class SkillXPHandler implements Listener {
         // Get current XP before adding
         long oldXP = PlayerData.getSkillXP(player.getUniqueId(), skillType);
         int previousLevel = SkillXPCalculator.levelFromTotalXP(oldXP);
+
+        if (FarmingProtection.isLevelRewardProtectionEnabled() &&
+                !FarmingProtection.isSkillXPInRange(previousLevel, rewardLevel)) {
+            notifySkillXPTooLow(player, skillType, rewardLevel, previousLevel);
+            return 0;
+        }
 
         // Add XP with the skill's multiplier (weapons have 1.0x)
         long xpToAdd = SkillXPCalculator.applySkillMultiplier(skillType, baseXP);
@@ -178,10 +183,16 @@ public class SkillXPHandler implements Listener {
      *
      * @return The amount of XP awarded
      */
-    private long awardArmorXP(Player player, long baseXP) {
+    private long awardArmorXP(Player player, long baseXP, int rewardLevel) {
         // Get current XP before adding
         long oldXP = PlayerData.getSkillXP(player.getUniqueId(), SkillType.ARMOR);
         int previousLevel = SkillXPCalculator.levelFromTotalXP(oldXP);
+
+        if (FarmingProtection.isLevelRewardProtectionEnabled() &&
+                !FarmingProtection.isSkillXPInRange(previousLevel, rewardLevel)) {
+            notifySkillXPTooLow(player, SkillType.ARMOR, rewardLevel, previousLevel);
+            return 0;
+        }
 
         // Armor XP is at 1/3 rate (always awarded on kills)
         long armorXP = SkillXPCalculator.applySkillMultiplier(SkillType.ARMOR, baseXP);
@@ -251,30 +262,25 @@ public class SkillXPHandler implements Listener {
     }
 
     /**
-     * Notifies a player that their XP gain is limited due to level difference.
-     *
-     * @param player The player to notify
-     * @param mobLevel The level of the mob killed
-     * @param noXP True if no XP is given (mob too low), false if XP is capped (mob too high)
+     * Notifies a player that their combat-level reward is capped because the mob
+     * reward level is more than five levels above their combat level.
      */
-    private void notifyLevelDifferenceLimit(Player player, int mobLevel, boolean noXP) {
+    private void notifyCombatLevelCap(Player player, int mobLevel) {
         int combatLevel = CombatLevelCalculator.calculateCombatLevel(player.getUniqueId());
+        int cappedLevel = FarmingProtection.getEffectiveRewardLevel(combatLevel, mobLevel);
+        String message = DungeonsConfig.getSkillXpCappedMessage()
+                .replace("$mobLevel", String.valueOf(mobLevel))
+                .replace("$skill", "combat")
+                .replace("$playerLevel", String.valueOf(combatLevel))
+                .replace("$xp", String.valueOf(cappedLevel));
+        player.sendMessage(ChatColorConverter.convert(message));
+    }
 
-        String message;
-        if (noXP) {
-            message = DungeonsConfig.getSkillXpNoGainMessage()
-                    .replace("$mobLevel", String.valueOf(mobLevel))
-                    .replace("$skill", "combat")
-                    .replace("$playerLevel", String.valueOf(combatLevel));
-            MessageThrottler.pushNoXp(player, ChatColorConverter.convert(message));
-        } else {
-            int cappedLevel = combatLevel + 5;
-            message = DungeonsConfig.getSkillXpCappedMessage()
-                    .replace("$mobLevel", String.valueOf(mobLevel))
-                    .replace("$skill", "combat")
-                    .replace("$playerLevel", String.valueOf(combatLevel))
-                    .replace("$xp", String.valueOf(cappedLevel));
-            player.sendMessage(ChatColorConverter.convert(message));
-        }
+    private void notifySkillXPTooLow(Player player, SkillType skillType, int mobLevel, int skillLevel) {
+        String message = DungeonsConfig.getSkillXpNoGainMessage()
+                .replace("$mobLevel", String.valueOf(mobLevel))
+                .replace("$skill", SkillBonusMenuConfig.getSkillTypeDisplayName(skillType))
+                .replace("$playerLevel", String.valueOf(skillLevel));
+        MessageThrottler.pushNoXp(player, ChatColorConverter.convert(message));
     }
 }

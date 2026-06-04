@@ -75,6 +75,9 @@ public class CustomModel implements CustomModelInterface {
                 Bukkit.getPluginManager().registerEvents(
                         new com.magmaguy.elitemobs.thirdparty.custommodels.freeminecraftmodels.CustomModelFMM.FmmProjectileDamageBridge(),
                         com.magmaguy.elitemobs.MetadataHandler.PLUGIN);
+                Bukkit.getPluginManager().registerEvents(
+                        new com.magmaguy.elitemobs.thirdparty.custommodels.freeminecraftmodels.CustomModelFMM.FmmRemoveBridge(),
+                        com.magmaguy.elitemobs.MetadataHandler.PLUGIN);
             } catch (Throwable t) {
                 // FMM not actually present at runtime (classloader issue) — leave the
                 // listeners unregistered; reload-recovery/projectile bridging just won't

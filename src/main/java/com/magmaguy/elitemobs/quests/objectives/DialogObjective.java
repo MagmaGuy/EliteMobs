@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.Quest;
+import com.magmaguy.elitemobs.quests.dialogue.QuestDialogueBossBarManager;
 import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -32,7 +33,9 @@ public class DialogObjective extends Objective {
     public boolean checkProgress(Player player, QuestObjectives questObjectives) {
         if (super.currentAmount >= super.targetAmount) return false;
         progressObjective(questObjectives);
-        if (dialog != null) dialog.forEach(player::sendMessage);
+        if (dialog != null && !dialog.isEmpty())
+            if (!QuestDialogueBossBarManager.showRawDialogue(player, getObjectiveName(), dialog, null))
+                dialog.forEach(player::sendMessage);
         return true;
     }
 

@@ -50,11 +50,16 @@ public class LootTables implements Listener {
             if (!eliteEntity.isEliteLoot()) continue;
 
             int rewardLevel = ScaledCombatRewardResolver.getRewardLevel(eliteEntity, player);
+            int effectiveLootLevel = rewardLevel;
 
-            // Check if mob is too low level for loot (5+ levels below combat level)
+            // Combat level has no lower boundary for loot. High-level natural elites
+            // are capped to combat level + 5 for reward tier purposes.
             // Only applies to natural elites, not custom bosses
             if (!(eliteEntity instanceof CustomBossEntity) && !FarmingProtection.shouldDropLoot(player, rewardLevel)) {
-                continue; // No loot for low-level mobs
+                continue;
+            }
+            if (!(eliteEntity instanceof CustomBossEntity)) {
+                effectiveLootLevel = FarmingProtection.getEffectiveMobLevelForLoot(player, rewardLevel);
             }
 
             // Check if player is capped from farming natural elites
@@ -62,8 +67,8 @@ public class LootTables implements Listener {
                 continue; // Player is capped, no loot
             }
 
-            double itemLevel = setItemTier(rewardLevel);
-            double eliteLevel = rewardLevel;
+            double itemLevel = setItemTier(effectiveLootLevel);
+            double eliteLevel = effectiveLootLevel;
 
             if (eliteEntity.getPower("bonus_coins.yml") == null)
                 new ItemLootShower(itemLevel, eliteLevel, eliteEntity.getUnsyncedLivingEntity().getLocation(), player);
@@ -71,7 +76,8 @@ public class LootTables implements Listener {
             if (!(eliteEntity.isRandomLoot())) continue;
 
             // Skill-based gear restriction now handles equipping, not drops
-            generateLoot(eliteEntity, player);
+            if (eliteEntity instanceof CustomBossEntity) generateLoot(eliteEntity, player);
+            else generateLoot(eliteEntity, player, effectiveLootLevel);
 
             if (SpecialItemSystemsConfig.isDropSpecialLoot()) {
                 if (eliteEntity instanceof CustomBossEntity customBossEntity &&
@@ -106,8 +112,12 @@ public class LootTables implements Listener {
     }
 
     private static ItemStack generateLoot(EliteEntity eliteEntity, Player player) {
+        return generateLoot(eliteEntity, player, (int) MobTierCalculator.findMobTier(eliteEntity));
+    }
 
-        int mobTier = (int) MobTierCalculator.findMobTier(eliteEntity);
+    private static ItemStack generateLoot(EliteEntity eliteEntity, Player player, int rewardLevel) {
+
+        int mobTier = rewardLevel;
 
         /*
         Add some wiggle room to avoid making obtaining loot too linear

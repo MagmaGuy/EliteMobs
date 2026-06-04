@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
 import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.Quest;
+import com.magmaguy.elitemobs.quests.dialogue.QuestDialogueBossBarManager;
 import com.magmaguy.elitemobs.quests.rewards.QuestReward;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.elitemobs.utils.SimpleScoreboard;
@@ -116,12 +117,21 @@ public class QuestObjectives implements Serializable {
 
     public void displayTemporaryObjectivesScoreboard(Player player) {
         if (!QuestsConfig.isUseQuestScoreboards()) return;
+        if (scoreboardHiddenForDialogue(player)) return;
         SimpleScoreboard.temporaryScoreboard(player, ChatColorConverter.convert(getQuest().getQuestName()), getScoreboardObjectiveText(), 20 * 20);
     }
 
     public void displayLazyObjectivesScoreboard(Player player) {
         if (!QuestsConfig.isUseQuestScoreboards()) return;
+        if (scoreboardHiddenForDialogue(player)) return;
         SimpleScoreboard.lazyScoreboard(player, ChatColorConverter.convert(getQuest().getQuestName()), getScoreboardObjectiveText());
+    }
+
+    // While quest dialogue is active the scoreboard is suppressed; otherwise progressing an objective by
+    // talking to an NPC (which fires the dialogue) would re-show the sidebar on top of the dialogue box.
+    private boolean scoreboardHiddenForDialogue(Player player) {
+        return QuestsConfig.isHideQuestScoreboardDuringQuestDialogue()
+                && QuestDialogueBossBarManager.hasActiveSession(player);
     }
 
     private List<String> getScoreboardObjectiveText() {

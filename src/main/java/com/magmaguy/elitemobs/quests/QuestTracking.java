@@ -16,6 +16,7 @@ import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
+import com.magmaguy.elitemobs.quests.dialogue.QuestDialogueBossBarManager;
 import com.magmaguy.elitemobs.quests.objectives.*;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
@@ -56,6 +57,7 @@ public class QuestTracking {
     private BukkitTask compassTask;
     private BossBar compassBar;
     private boolean questIsDone = false;
+    private boolean stopped = false;
 
     public QuestTracking(Player player, CustomQuest customQuest) {
         this.player = player;
@@ -250,16 +252,26 @@ public class QuestTracking {
     }
 
     public void stop() {
+        if (stopped) return;
+        stopped = true;
         playerTrackingQuests.remove(player.getUniqueId());
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
-            }
-        }.runTask(MetadataHandler.PLUGIN);
-        locationRefresher.cancel();
-        compassTask.cancel();
-        compassBar.removeAll();
+        resetPlayerScoreboard();
+        if (locationRefresher != null) locationRefresher.cancel();
+        if (compassTask != null) compassTask.cancel();
+        if (compassBar != null) compassBar.removeAll();
+    }
+
+    private void resetPlayerScoreboard() {
+        if (!player.isOnline()) return;
+        Runnable resetScoreboard = () -> {
+            if (!player.isOnline() || Bukkit.getScoreboardManager() == null) return;
+            player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
+        };
+        if (Bukkit.isPrimaryThread()) {
+            resetScoreboard.run();
+        } else if (MetadataHandler.PLUGIN != null && MetadataHandler.PLUGIN.isEnabled()) {
+            Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, resetScoreboard);
+        }
     }
 
     private void startCompass() {
@@ -277,6 +289,13 @@ public class QuestTracking {
     }
 
     private void updateCompassContents() {
+        // While quest dialogue is showing, hide the compass bar and scoreboard so they don't clutter
+        // the dialogue box. This must be gated here because the compass re-adds the player every tick.
+        if (QuestsConfig.isHideQuestScoreboardDuringQuestDialogue()
+                && QuestDialogueBossBarManager.hasActiveSession(player)) {
+            compassBar.removePlayer(player);
+            return;
+        }
         //for reference, character 32 is straight ahead
         String compassText = "---------------------------------------------------------------";
         List<LocationAndSymbol> locationAndSymbols = projectLocations();
