@@ -13,6 +13,7 @@ import com.magmaguy.elitemobs.combatsystem.antiexploit.PreventMountExploit;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.events.BossCustomAttackDamage;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.magmacore.scripting.ScriptDefinition;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.pathfinding.Navigation;
 import com.magmaguy.elitemobs.utils.GameClock;
@@ -57,14 +58,14 @@ import java.util.Objects;
  */
 final class LuaPowerEntityTables {
 
-    private final LuaPowerDefinition definition;
+    private final ScriptDefinition definition;
     private final EliteEntity eliteEntity;
     private final LuaPowerSupport support;
     private final LuaPowerScriptApi.OwnedTaskController taskController;
     private final LuaPowerScriptApi.CallbackInvoker callbackInvoker;
     private final LuaBossTableBuilder bossTableBuilder;
 
-    LuaPowerEntityTables(LuaPowerDefinition definition,
+    LuaPowerEntityTables(ScriptDefinition definition,
                          EliteEntity eliteEntity,
                          LuaPowerSupport support,
                          LuaPowerScriptApi.OwnedTaskController taskController,

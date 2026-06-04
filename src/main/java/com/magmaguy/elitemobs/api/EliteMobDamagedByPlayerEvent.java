@@ -84,8 +84,9 @@ import java.util.concurrent.ThreadLocalRandom;
  *   <li><b>Symmetric with defensive formula</b> — weapon adjustment curve mirrors
  *       {@link ArmorDefenseCalculator}'s gear reduction; offensive skill scaling mirrors
  *       defensive skill scaling.</li>
- *   <li><b>Equal DPS across weapon types</b> — attack speed normalization ensures swords,
- *       axes, hoes, maces, etc. all have the same time-to-kill at matched combat.</li>
+ *   <li><b>Weapon pacing by feel</b> — melee attack-speed scaling preserves weapon identity
+ *       without fully equalizing theoretical DPS, because dungeon combat rewards burst
+ *       windows more than stationary target math predicts.</li>
  * </ol>
  *
  * <h2>Full Damage Formula</h2>
@@ -103,8 +104,8 @@ import java.util.concurrent.ThreadLocalRandom;
  *   <tr><th>Component</th><th>Formula</th><th>Range</th><th>Source</th></tr>
  *   <tr><td>baseDamage</td><td>normalizedMobHP / 3.0</td><td>scales with level</td>
  *       <td>{@link LevelScaling#calculateBaseDamageToElite}</td></tr>
- *   <tr><td>attackSpeedFactor</td><td>1.6 / actualAttackSpeed</td><td>melee only; 1.0 for ranged</td>
- *       <td>{@link LevelScaling#REFERENCE_ATTACK_SPEED}</td></tr>
+ *   <tr><td>attackSpeedFactor</td><td>tuned pacing factor from weapon family and speed</td><td>melee only; 1.0 for ranged</td>
+ *       <td>{@link WeaponOffenseCalculator#getAttackSpeedFactor}</td></tr>
  *   <tr><td>skillAdjustment</td><td>2^((skillLv - mobLv) / 7.5)</td><td>(0, ∞) centered at 1.0</td>
  *       <td>{@link LevelScaling#calculateOffensiveSkillAdjustment}</td></tr>
  *   <tr><td>weaponAdjustment</td><td>two-part linear curve</td><td>[0.5, 1.25]</td>
@@ -160,14 +161,12 @@ import java.util.concurrent.ThreadLocalRandom;
  * Hits to kill  = 70.0 / 23.33 = 3.0 ✓
  * </pre>
  *
- * <h3>Example 2: Equal DPS across weapon types (Lv25 axe vs Lv25 elite)</h3>
+ * <h3>Example 2: Tuned axe pacing (Lv25 axe vs Lv25 elite)</h3>
  * <pre>
  * baseDamage       = 23.33
- * attackSpeedFactor = 1.6 / 1.0 = 1.6  (axe is slower)
- * formulaDamage    = 23.33 × 1.6 = 37.33 per hit
- * Hits to kill     = 70.0 / 37.33 = 1.875
- * Time to kill     = 1.875 / 1.0 = 1.875 sec
- *   vs sword:       3.0 / 1.6 = 1.875 sec ✓ (identical DPS)
+ * attackSpeedFactor ≈ 1.26  (axe is slower, but no longer receives full inverse-speed burst)
+ * formulaDamage    = 23.33 × 1.26 = 29.5 per hit
+ * Hits to kill     = 70.0 / 29.5 = 2.37
  * </pre>
  *
  * <h3>Example 3: Under-leveled ranged (Lv20 bow vs Lv25 elite, healthMultiplier=2.0)</h3>
@@ -729,7 +728,7 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
         /**
          * Resolves the attack speed used for cooldown timing.
          * <p>
-         * The item speed is still used for per-hit damage normalization. This method
+         * The item speed is still used for per-hit damage pacing. This method
          * is only for the recharge window, where vanilla uses the player's live
          * ATTACK_SPEED attribute after equipment and modifier updates. If Bukkit ever
          * reports the unmodified player base speed (4.0) while the held weapon is
@@ -782,8 +781,8 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
          * <ol>
          *   <li><b>Base damage</b> = normalizedMobHP / {@link LevelScaling#TARGET_HITS_TO_KILL_MOB}
          *       — ensures constant hit count at all levels</li>
-         *   <li><b>Attack speed factor</b> = {@link LevelScaling#REFERENCE_ATTACK_SPEED} / actualSpeed
-         *       — normalizes DPS across weapon types (melee only; 1.0 for ranged)</li>
+         *   <li><b>Attack speed factor</b> = {@link WeaponOffenseCalculator#getAttackSpeedFactor}
+         *       — tuned melee pacing factor from weapon family and speed (melee only; 1.0 for ranged)</li>
          *   <li><b>Skill adjustment</b> = 2^((skillLv - mobLv) / {@link LevelScaling#OFFENSIVE_SKILL_SCALING_RATE})
          *       — exponential scaling from player skill vs mob level</li>
          *   <li><b>Weapon adjustment</b> = {@link WeaponOffenseCalculator#getWeaponAdjustment}
@@ -801,7 +800,7 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
          * <table border="1">
          *   <tr><th>Weapon</th><th>Speed</th><th>Dmg/Hit</th><th>Hits</th><th>TTK (sec)</th></tr>
          *   <tr><td>Sword</td><td>1.6</td><td>23.33</td><td>3.0</td><td>1.875</td></tr>
-         *   <tr><td>Axe</td><td>1.0</td><td>37.33</td><td>1.875</td><td>1.875</td></tr>
+         *   <tr><td>Axe</td><td>1.0</td><td>29.5</td><td>2.37</td><td>2.37</td></tr>
          *   <tr><td>Hoe</td><td>4.0</td><td>9.33</td><td>7.5</td><td>1.875</td></tr>
          *   <tr><td>Bow</td><td>N/A</td><td>23.33</td><td>3.0</td><td>N/A</td></tr>
          * </table>
@@ -835,16 +834,17 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
             // 1. Base damage — fraction of normalized mob HP
             double baseDamage = NaturalEliteCombatTweak.getTweakedBaseDamageToElite(eliteEntity, mobLevel);
 
-            // 2. Attack speed normalization (melee only).
-            // The damage factor uses the item's weapon speed so slow weapons hit harder
-            // per swing. The cooldown window below separately uses the player's live
+            // 2. Attack speed pacing (melee only).
+            // The damage factor uses the item's weapon family and speed so slow weapons
+            // still hit harder per swing without full inverse-speed burst. The cooldown
+            // window below separately uses the player's live
             // ATTACK_SPEED attribute when available, because that is what vanilla uses
             // for actual recharge timing after equipment and skill modifiers.
             double attackSpeed = isRangedWeaponMelee ? 4.0 : EliteItemManager.getAttackSpeed(weapon);
             double cooldownAttackSpeed = getCooldownAttackSpeed(player, attackSpeed, isRangedWeaponMelee);
             double attackSpeedFactor = 1.0;
             if (!isRanged) {
-                attackSpeedFactor = LevelScaling.REFERENCE_ATTACK_SPEED / attackSpeed;
+                attackSpeedFactor = WeaponOffenseCalculator.getAttackSpeedFactor(weapon, attackSpeed);
             }
 
             // 3 & 4. Resolve weapon level and skill level.
@@ -995,8 +995,8 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
                         + String.format("%.1f", LevelScaling.TARGET_HITS_TO_KILL_MOB) + ")");
                 DebugMessage.send(player, "§7   = §f" + String.format("%.2f", baseDamage)
                         + " §8(damage needed per hit to kill in TARGET_HITS hits; uses legacy or recommended HP curve)");
-                DebugMessage.send(player, "§7× Attack speed factor = REFERENCE_SPEED / weaponSpeed = §f"
-                        + String.format("%.3f", attackSpeedFactor) + " §8(1.0 for ranged; normalises DPS across weapons)");
+                DebugMessage.send(player, "§7× Attack speed factor = tuned melee pacing curve = §f"
+                        + String.format("%.3f", attackSpeedFactor) + " §8(1.0 for ranged; family+speed adjusted)");
                 if (!isRanged && cooldownAttackSpeed != attackSpeed) {
                     DebugMessage.send(player, "§7  ↳ cooldown speed = §f" + String.format("%.3f", cooldownAttackSpeed)
                             + " §8(player ATTACK_SPEED attribute used for recharge timing)");
@@ -1468,6 +1468,7 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
 
         private void runAntiexploit(EliteEntity eliteEntity, EntityDamageByEntityEvent event, EliteMobDamagedByPlayerEvent eliteMobDamagedByPlayerEvent) {
             if (EliteMobsWorld.isEliteMobsWorld(event.getDamager().getWorld().getUID())) return;
+            if (eliteEntity.isEnderDragon()) return;
             if (EliteMobs.worldGuardIsEnabled) {
                 Boolean regionQuery = WorldGuardFlagChecker.checkNullableFlag(eliteEntity.getLocation(), WorldGuardCompatibility.getELITEMOBS_ANTIEXPLOIT());
                 if (regionQuery != null && !regionQuery) return;

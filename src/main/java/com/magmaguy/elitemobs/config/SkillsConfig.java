@@ -24,6 +24,8 @@ public class SkillsConfig extends ConfigurationFile {
     @Getter
     private static boolean armorSkillHealthBonusEnabled;
     @Getter
+    private static boolean scalePlayerHealthDisplayToVanilla;
+    @Getter
     private static boolean forceDefaultHealthWhenArmorSkillHealthBonusDisabled;
     @Getter
     private static List<String> skillWorldExclusions;
@@ -76,6 +78,11 @@ public class SkillsConfig extends ConfigurationFile {
                 List.of("Whether Armor skill grants bonus max health (+1 heart per level above 1).",
                         "Set to false to disable this mechanic."),
                 fileConfiguration, "armorSkillHealthBonusEnabled", true);
+
+        scalePlayerHealthDisplayToVanilla = ConfigurationEngine.setBoolean(
+                List.of("Whether EliteMobs should scale the player's client-side health display back to the vanilla 10 hearts while keeping the real Armor skill max health.",
+                        "This is purely visual: players keep their full EliteMobs HP and combat calculations are unchanged."),
+                fileConfiguration, "scalePlayerHealthDisplayToVanilla", false);
 
         forceDefaultHealthWhenArmorSkillHealthBonusDisabled = ConfigurationEngine.setBoolean(
                 List.of("Only applies when armorSkillHealthBonusEnabled is false.",

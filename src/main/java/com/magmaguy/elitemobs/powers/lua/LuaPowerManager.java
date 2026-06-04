@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.powers.lua;
 import com.magmaguy.elitemobs.config.powers.LuaPowerConfigFields;
 import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
 import com.magmaguy.elitemobs.config.powers.PowersConfigFields.PowerType;
+import com.magmaguy.magmacore.scripting.ScriptDefinition;
 import com.magmaguy.magmacore.util.Logger;
 
 import java.io.File;
@@ -13,7 +14,7 @@ import java.util.*;
 
 public final class LuaPowerManager {
 
-    private static final Map<String, LuaPowerDefinition> definitions = new LinkedHashMap<>();
+    private static final Map<String, ScriptDefinition> definitions = new LinkedHashMap<>();
 
     private LuaPowerManager() {
     }
@@ -67,7 +68,10 @@ public final class LuaPowerManager {
                                                     PowerType powerType) throws IOException {
         String source = Files.readString(file.toPath(), StandardCharsets.UTF_8);
         source = source.replace("\r", "");
-        LuaPowerDefinition definition = LuaPowerDefinition.validate(registryKey, file, source);
+        // Boss Lua powers now produce a Magmacore ScriptDefinition (the unified runtime), parsed
+        // and hook-validated through EliteMobsScriptProvider, instead of the old LuaPowerDefinition.
+        ScriptDefinition definition = ScriptDefinition.validate(
+                registryKey, file, source, new EliteMobsScriptProvider(file.getParentFile().toPath()));
         definitions.put(registryKey, definition);
         return new LuaPowerConfigFields(registryKey, file, definition, effect, powerType);
     }

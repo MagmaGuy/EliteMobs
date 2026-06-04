@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.powers.lua;
 
 import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.magmacore.scripting.ScriptDefinition;
 import com.magmaguy.elitemobs.powers.scripts.ScriptActionData;
 import com.magmaguy.elitemobs.powers.scripts.ScriptParticles;
 import com.magmaguy.elitemobs.powers.scripts.ScriptRelativeVector;
@@ -50,14 +51,14 @@ final class LuaPowerScriptApi {
         void invoke(String failureContext, LuaFunction callback, LuaValue... args);
     }
 
-    private final LuaPowerDefinition definition;
+    private final ScriptDefinition definition;
     private final EliteEntity eliteEntity;
     private final LuaPowerSupport support;
     private final LuaPowerEntityTables entityTables;
     private final OwnedTaskController taskController;
     private final CallbackInvoker callbackInvoker;
 
-    LuaPowerScriptApi(LuaPowerDefinition definition,
+    LuaPowerScriptApi(ScriptDefinition definition,
                       EliteEntity eliteEntity,
                       LuaPowerSupport support,
                       LuaPowerEntityTables entityTables,

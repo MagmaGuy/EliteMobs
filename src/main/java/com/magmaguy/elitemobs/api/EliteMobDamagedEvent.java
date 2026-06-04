@@ -59,6 +59,7 @@ public class EliteMobDamagedEvent extends EliteDamageEvent {
 
             //happens if it dies
             if (!eliteEntity.isValid()) return;
+            if (eliteEntity.isEnderDragon()) return;
 
             if (EliteMobsWorld.isEliteMobsWorld(event.getEntity().getWorld().getUID())) return;
 

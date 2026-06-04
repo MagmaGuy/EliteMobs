@@ -14,10 +14,11 @@ import com.magmaguy.elitemobs.mobconstructor.PersistentMovingEntity;
 import com.magmaguy.elitemobs.mobconstructor.PersistentObject;
 import com.magmaguy.elitemobs.mobconstructor.PersistentObjectHandler;
 import com.magmaguy.elitemobs.npcs.chatter.NPCChatBubble;
-import com.magmaguy.elitemobs.npcs.scripts.NPCScriptDefinition;
-import com.magmaguy.elitemobs.npcs.scripts.NPCScriptHook;
-import com.magmaguy.elitemobs.npcs.scripts.NPCScriptInstance;
 import com.magmaguy.elitemobs.npcs.scripts.NPCScriptManager;
+import com.magmaguy.elitemobs.npcs.scripts.ScriptableNPC;
+import com.magmaguy.magmacore.scripting.ScriptDefinition;
+import com.magmaguy.magmacore.scripting.ScriptHook;
+import com.magmaguy.magmacore.scripting.ScriptInstance;
 import com.magmaguy.elitemobs.thirdparty.custommodels.CustomModel;
 import com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser;
@@ -61,7 +62,8 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
     private String locationString;
     @Getter
     private CustomModel customModel = null;
-    private final List<NPCScriptInstance> scriptInstances = new ArrayList<>();
+    private final List<ScriptInstance> scriptInstances = new ArrayList<>();
+    private ScriptableNPC scriptableNPC;
 
     /**
      * Spawns NPC based off of the values in the NPCsConfig config file. Runs at startup and on reload.
@@ -154,7 +156,7 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
         NPCEntityRemoveEvent npcEntityRemoveEvent = new NPCEntityRemoveEvent(villager, this, removalReason);
         if (villager != null)
             new EventCaller(npcEntityRemoveEvent);
-        runScripts(NPCScriptHook.ON_REMOVE, npcEntityRemoveEvent, null);
+        runScripts(ScriptableNPC.ON_REMOVE, npcEntityRemoveEvent, null);
         shutdownScriptInstances();
         if (roleDisplay != null) {
             roleDisplay.remove();
@@ -206,7 +208,7 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
         NPCEntityRemoveEvent npcEntityRemoveEvent = new NPCEntityRemoveEvent(villager, this, RemovalReason.REMOVE_COMMAND);
         if (villager != null)
             new EventCaller(npcEntityRemoveEvent);
-        runScripts(NPCScriptHook.ON_REMOVE, npcEntityRemoveEvent, null);
+        runScripts(ScriptableNPC.ON_REMOVE, npcEntityRemoveEvent, null);
         shutdownScriptInstances();
         if (roleDisplay != null) {
             roleDisplay.remove();
@@ -255,7 +257,7 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
         EntityTracker.registerNPCEntity(this);
         if (villager == null || !villager.isValid()) return;
         initializeScripts();
-        runScripts(NPCScriptHook.ON_SPAWN, null, null);
+        runScripts(ScriptHook.ON_SPAWN, null, null);
         initializeRole();
         setTimeout();
         // Create house earnings display if this is the gambling den owner
@@ -265,20 +267,23 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
     private void initializeScripts() {
         shutdownScriptInstances();
         if (npCsConfigFields.getScripts() == null || npCsConfigFields.getScripts().isEmpty()) return;
-        List<NPCScriptDefinition> definitions = new ArrayList<>();
+        List<ScriptDefinition> definitions = new ArrayList<>();
         for (String scriptFileName : npCsConfigFields.getScripts()) {
             if (scriptFileName == null || scriptFileName.isBlank()) continue;
-            NPCScriptDefinition definition = NPCScriptManager.getDefinition(scriptFileName);
+            String fileName = scriptFileName.toLowerCase(java.util.Locale.ROOT).endsWith(".lua")
+                    ? scriptFileName : scriptFileName + ".lua";
+            ScriptDefinition definition = NPCScriptManager.getDefinition(fileName);
             if (definition == null) {
                 Logger.warn("NPC " + npCsConfigFields.getFilename() + " references missing NPC Lua script " + scriptFileName + ".");
                 continue;
             }
             definitions.add(definition);
         }
-        definitions.sort(Comparator.comparingInt(NPCScriptDefinition::getPriority));
-        for (NPCScriptDefinition definition : definitions) {
+        definitions.sort(Comparator.comparingInt(ScriptDefinition::getPriority));
+        scriptableNPC = new ScriptableNPC(this);
+        for (ScriptDefinition definition : definitions) {
             try {
-                scriptInstances.add(new NPCScriptInstance(definition, this));
+                scriptInstances.add(new ScriptInstance(definition, scriptableNPC));
             } catch (Exception exception) {
                 Logger.warn("Failed to initialize NPC Lua script " + definition.getFileName() + " for NPC " + npCsConfigFields.getFilename() + ".");
                 exception.printStackTrace();
@@ -287,19 +292,20 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
     }
 
     private void shutdownScriptInstances() {
-        for (NPCScriptInstance scriptInstance : new ArrayList<>(scriptInstances)) {
+        for (ScriptInstance scriptInstance : new ArrayList<>(scriptInstances)) {
             scriptInstance.shutdown();
         }
         scriptInstances.clear();
+        scriptableNPC = null;
     }
 
-    public void runScripts(NPCScriptHook hook, Event event, Player player) {
-        for (NPCScriptInstance scriptInstance : new ArrayList<>(scriptInstances)) {
+    public void runScripts(ScriptHook hook, Event event, LivingEntity actor) {
+        for (ScriptInstance scriptInstance : new ArrayList<>(scriptInstances)) {
             if (scriptInstance.isClosed()) {
                 scriptInstances.remove(scriptInstance);
                 continue;
             }
-            scriptInstance.handleEvent(hook, event, player);
+            scriptInstance.handleEvent(hook, event, null, actor);
         }
     }
 

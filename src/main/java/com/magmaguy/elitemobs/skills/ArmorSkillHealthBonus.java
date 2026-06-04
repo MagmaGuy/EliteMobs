@@ -10,6 +10,10 @@ import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlotGroup;
 
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * Applies bonus max health to players based on their Armor skill level.
  * Players receive +1 heart (2 HP) per Armor skill level.
@@ -18,6 +22,8 @@ public class ArmorSkillHealthBonus {
 
     private static final String MODIFIER_KEY_STRING = "armor_skill_health";
     private static final double VANILLA_MAX_HEALTH = 20.0;
+    private static final double VANILLA_HEALTH_DISPLAY_SCALE = 20.0;
+    private static final Set<UUID> SCALED_HEALTH_DISPLAY_PLAYERS = ConcurrentHashMap.newKeySet();
 
     private ArmorSkillHealthBonus() {
         // Static utility class
@@ -34,11 +40,13 @@ public class ArmorSkillHealthBonus {
 
         if (SkillsConfig.isWorldExcludedFromSkills(player)) {
             removeHealthBonus(player);
+            resetPlayerHealthDisplay(player);
             clampHealthToCurrentMaxHealth(player);
             return;
         }
 
         if (!SkillsConfig.isArmorSkillHealthBonusEnabled()) {
+            resetPlayerHealthDisplay(player);
             // Optional hard reset for servers that want to fully remove old extra-heart values.
             if (SkillsConfig.isForceDefaultHealthWhenArmorSkillHealthBonusDisabled()) {
                 removeHealthBonus(player);
@@ -55,7 +63,10 @@ public class ArmorSkillHealthBonus {
         int armorLevel = SkillXPCalculator.levelFromTotalXP(armorXP);
 
         // No bonus at level 1 (base level)
-        if (armorLevel <= 1) return;
+        if (armorLevel <= 1) {
+            updatePlayerHealthDisplay(player);
+            return;
+        }
 
         // Calculate bonus: +1 heart (2 HP) per level above 1
         double bonusHealth = (armorLevel - 1) * 2.0;
@@ -66,6 +77,28 @@ public class ArmorSkillHealthBonus {
             NamespacedKey key = new NamespacedKey(MetadataHandler.PLUGIN, MODIFIER_KEY_STRING);
             maxHealth.addModifier(new AttributeModifier(key, bonusHealth, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.ANY));
         }
+
+        updatePlayerHealthDisplay(player);
+    }
+
+    private static void updatePlayerHealthDisplay(Player player) {
+        if (SkillsConfig.isScalePlayerHealthDisplayToVanilla()) {
+            player.setHealthScale(VANILLA_HEALTH_DISPLAY_SCALE);
+            player.setHealthScaled(true);
+            SCALED_HEALTH_DISPLAY_PLAYERS.add(player.getUniqueId());
+            return;
+        }
+
+        resetPlayerHealthDisplay(player);
+    }
+
+    /**
+     * Clears the client-side health scaling applied by EliteMobs, if EliteMobs applied it.
+     */
+    public static void resetPlayerHealthDisplay(Player player) {
+        if (player == null) return;
+        if (!SCALED_HEALTH_DISPLAY_PLAYERS.remove(player.getUniqueId())) return;
+        player.setHealthScaled(false);
     }
 
     private static void clampHealthToCurrentMaxHealth(Player player) {

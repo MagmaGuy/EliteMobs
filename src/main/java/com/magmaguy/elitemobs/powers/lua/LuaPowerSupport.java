@@ -8,6 +8,7 @@ import com.magmaguy.elitemobs.explosionregen.Explosion;
 import com.magmaguy.elitemobs.items.ItemLootShower;
 import com.magmaguy.elitemobs.items.LootTables;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.magmacore.scripting.ScriptDefinition;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.powers.ProjectileDamage;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
@@ -42,10 +43,10 @@ import java.util.*;
 
 final class LuaPowerSupport {
 
-    private final LuaPowerDefinition definition;
+    private final ScriptDefinition definition;
     private final EliteEntity eliteEntity;
 
-    LuaPowerSupport(LuaPowerDefinition definition, EliteEntity eliteEntity) {
+    LuaPowerSupport(ScriptDefinition definition, EliteEntity eliteEntity) {
         this.definition = definition;
         this.eliteEntity = eliteEntity;
     }

@@ -44,14 +44,15 @@ import org.bukkit.inventory.ItemStack;
  *
  * and:
  *   baseDamage      = normalizedMobHP / 3.0                                         [from LevelScaling]
- *   attackSpeedFactor = 1.6 / actualAttackSpeed                                     [melee only]
+ *   attackSpeedFactor = tuned pacing factor from vanilla-equivalent attack speed     [melee only]
  *   skillAdjustment = 2^((weaponSkillLevel - mobLevel) / 7.5)                       [from LevelScaling]
  *   weaponAdjustment = 0.5 + bonus(weaponLevel, mobLevel)                           [from THIS class]
  *   cooldownOrVelocity = tracked melee charge or normalizedArrowVelocity            [0 to 1]
  *   sweepMultiplier = 0.25 for secondary sweep targets, 1.0 for primary             [from THIS class]
  * </pre>
  * <p>
- * This class computes the {@code weaponAdjustment} and {@code sweepMultiplier}.
+ * This class computes the {@code attackSpeedFactor}, {@code weaponAdjustment}, and
+ * {@code sweepMultiplier}.
  *
  * <h2>Weapon Adjustment Curve (Two-Part Linear)</h2>
  * <pre>
@@ -97,7 +98,7 @@ import org.bukkit.inventory.ItemStack;
  * Mob:    level=25, healthMultiplier=1.0
  *
  * Step 1 — Base damage: mobHP(25) = 2.1875 * 2^5 = 70.0, baseDamage = 70.0/3 = 23.33
- * Step 2 — Attack speed factor: sword speed=1.6, factor = 1.6/1.6 = 1.0
+ * Step 2 — Attack speed factor: sword speed=1.6, factor = 1.0
  * Step 3 — Skill adjustment: 2^((25-25)/7.5) = 2^0 = 1.0
  * Step 4 — Weapon adjustment: weaponLevel(25) == mobLevel(25), bonus=0.50, adj = 1.0
  * Step 5 — Cooldown: full charge = 1.0
@@ -113,14 +114,13 @@ import org.bukkit.inventory.ItemStack;
  * Mob:    level=25, healthMultiplier=1.0
  *
  * Step 1 — Base damage: 23.33 (same as above)
- * Step 2 — Attack speed factor: axe speed=1.0, factor = 1.6/1.0 = 1.6
+ * Step 2 — Attack speed factor: axe speed=1.0, factor ≈ 1.26
  * Step 3 — Skill adjustment: 1.0 (matched)
  * Step 4 — Weapon adjustment: 1.0 (matched)
  * Step 5 — Cooldown: full charge = 1.0
  *
- * formulaDamage = 23.33 × 1.6 × 1.0 × 1.0 × 1.0 = 37.33
- * Hits to kill = 70.0 / 37.33 = 1.875, BUT axes swing 1.0/sec vs sword 1.6/sec
- * Time to kill = 1.875 / 1.0 = 1.875 sec  vs  3.0 / 1.6 = 1.875 sec ✓ (equal DPS)
+ * formulaDamage = 23.33 × 1.26 × 1.0 × 1.0 × 1.0 = 29.5
+ * Hits to kill = 70.0 / 29.5 = 2.37
  * </pre>
  *
  * <h3>Example 3: Lv20 bow vs Lv25 elite (ranged)</h3>
@@ -190,8 +190,61 @@ public class WeaponOffenseCalculator {
      */
     public static final double THORNS_PERCENT_PER_LEVEL = 0.02;
 
+    /**
+     * Burst-heavy melee families no longer receive the full
+     * {@code referenceSpeed / weaponSpeed} compensation. Dungeon feedback showed that
+     * axes, maces, and tridents convert slow-weapon burst into practical kills more
+     * efficiently than the theoretical DPS model predicts.
+     */
+    public static final double BURST_DAMPING_EXPONENT = 0.50;
+
     private WeaponOffenseCalculator() {
         // Utility class
+    }
+
+    /**
+     * Calculates the melee attack-speed factor for the player→elite formula.
+     * <p>
+     * Axes, maces, and tridents use a damped segment because feedback marked them as
+     * too burst-efficient. Weapon families that already tested well, unknown items,
+     * and non-weapons use the legacy linear factor, preserving swords, hoes, spears,
+     * fists, and bow/crossbow melee behavior.
+     *
+     * @param item        The held item, used to infer weapon family
+     * @param attackSpeed The vanilla-equivalent attack speed for the held item
+     * @return Damage multiplier applied per hit
+     */
+    public static double getAttackSpeedFactor(ItemStack item, double attackSpeed) {
+        String typeName = item == null || item.getType().isAir() ? null : item.getType().name();
+        return getAttackSpeedFactor(typeName, attackSpeed);
+    }
+
+    /**
+     * Test-friendly overload for {@link #getAttackSpeedFactor(ItemStack, double)}.
+     */
+    public static double getAttackSpeedFactor(String typeName, double attackSpeed) {
+        if (!Double.isFinite(attackSpeed) || attackSpeed <= 0D) return 1.0;
+        double legacyFactor = getLegacyAttackSpeedFactor(attackSpeed);
+        if (typeName == null || typeName.isEmpty()) return legacyFactor;
+
+        if (usesBurstDampedAttackSpeedFactor(typeName)) {
+            return Math.pow(legacyFactor, BURST_DAMPING_EXPONENT);
+        }
+        return legacyFactor;
+    }
+
+    public static double getLegacyAttackSpeedFactor(double attackSpeed) {
+        if (!Double.isFinite(attackSpeed) || attackSpeed <= 0D) return 1.0;
+        return LevelScaling.REFERENCE_ATTACK_SPEED / attackSpeed;
+    }
+
+    public static double getSpeedCurveAttackSpeedFactor(double attackSpeed) {
+        if (!Double.isFinite(attackSpeed) || attackSpeed <= 0D) return 1.0;
+        return Math.pow(getLegacyAttackSpeedFactor(attackSpeed), BURST_DAMPING_EXPONENT);
+    }
+
+    private static boolean usesBurstDampedAttackSpeedFactor(String typeName) {
+        return typeName.endsWith("_AXE") || typeName.equals("MACE") || typeName.equals("TRIDENT");
     }
 
     /**

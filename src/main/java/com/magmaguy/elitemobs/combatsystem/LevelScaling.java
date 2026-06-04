@@ -237,16 +237,17 @@ public class LevelScaling {
      * This is the core offensive balance constant. A mob with healthMultiplier=2.0
      * will take exactly 2× this many hits, at ALL levels.
      * <p>
-     * Note: This is defined in sword hits (1.6 attacks/sec). Faster weapons deal
-     * proportionally less per hit but the same DPS.
+     * Note: This is defined in sword hits (1.6 attacks/sec). Other melee weapons
+     * use a tuned pacing factor in {@link WeaponOffenseCalculator#getAttackSpeedFactor}
+     * instead of full theoretical DPS normalization.
      */
     public static final double TARGET_HITS_TO_KILL_MOB = 3.0;
 
     /**
      * Reference weapon attack speed used to define {@link #TARGET_HITS_TO_KILL_MOB}.
      * <p>
-     * Sword speed is 1.6 attacks/sec. All other weapon speeds are normalized
-     * against this reference so that DPS remains consistent across weapon types.
+     * Sword speed is 1.6 attacks/sec. Other melee weapon speeds are compared against
+     * this reference by {@link WeaponOffenseCalculator#getAttackSpeedFactor}.
      */
     public static final double REFERENCE_ATTACK_SPEED = 1.6;
 
