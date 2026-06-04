@@ -3,6 +3,8 @@ package com.magmaguy.elitemobs.powers.lua;
 import com.magmaguy.elitemobs.config.luapowers.premade.GroundPoundLuaConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
 import com.magmaguy.magmacore.scripting.LuaEnvironmentFactory;
+import com.magmaguy.magmacore.scripting.ScriptDefinition;
+import com.magmaguy.magmacore.scripting.ScriptHook;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import com.magmaguy.shaded.luaj.vm2.Globals;
@@ -16,14 +18,24 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Boss Lua powers now parse into Magmacore's unified {@link ScriptDefinition} via
+ * {@link EliteMobsScriptProvider} (the same runtime as NPCs / FMM props), rather than a
+ * bespoke LuaPowerDefinition. These tests verify hook parsing + sandboxing are preserved.
+ */
 class LuaPowerDefinitionTest {
 
     @TempDir
     Path tempDir;
 
+    private ScriptDefinition validate(String fileName, String source) {
+        return ScriptDefinition.validate(fileName, tempDir.resolve(fileName).toFile(), source,
+                new EliteMobsScriptProvider(tempDir));
+    }
+
     @Test
     void validatesSimpleLuaPower() {
-        LuaPowerDefinition definition = LuaPowerDefinition.validate("mycoolpower.lua", tempDir.resolve("mycoolpower.lua").toFile(), """
+        ScriptDefinition definition = validate("mycoolpower.lua", """
                 return {
                   api_version = 1,
                   priority = 5,
@@ -34,13 +46,13 @@ class LuaPowerDefinitionTest {
 
         assertEquals("mycoolpower.lua", definition.getFileName());
         assertEquals(5, definition.getPriority());
-        assertTrue(definition.getHooks().contains(LuaPowerHook.ON_SPAWN));
-        assertTrue(definition.getHooks().contains(LuaPowerHook.ON_DAMAGED_BY_PLAYER));
+        assertTrue(definition.getHooks().contains(ScriptHook.ON_SPAWN));
+        assertTrue(definition.getHooks().contains(ScriptableBoss.ON_DAMAGED_BY_PLAYER));
     }
 
     @Test
     void rejectsMissingApiVersion() {
-        assertThrows(IllegalArgumentException.class, () -> LuaPowerDefinition.validate("broken.lua", tempDir.resolve("broken.lua").toFile(), """
+        assertThrows(IllegalArgumentException.class, () -> validate("broken.lua", """
                 return {
                   on_spawn = function(context) end
                 }
@@ -49,7 +61,7 @@ class LuaPowerDefinitionTest {
 
     @Test
     void rejectsUnknownTopLevelFields() {
-        assertThrows(IllegalArgumentException.class, () -> LuaPowerDefinition.validate("broken.lua", tempDir.resolve("broken.lua").toFile(), """
+        assertThrows(IllegalArgumentException.class, () -> validate("broken.lua", """
                 return {
                   api_version = 1,
                   id = "not-allowed",
@@ -91,23 +103,19 @@ class LuaPowerDefinitionTest {
         String source = Files.readString(fixture, StandardCharsets.UTF_8);
         assertFalse(source.contains("context.script.compile"));
 
-        LuaPowerDefinition definition = LuaPowerDefinition.validate("master_blacksmith_goblin.lua",
-                tempDir.resolve("master_blacksmith_goblin.lua").toFile(),
-                source);
+        ScriptDefinition definition = validate("master_blacksmith_goblin.lua", source);
 
-        assertTrue(definition.getHooks().contains(LuaPowerHook.ON_SPAWN));
-        assertTrue(definition.getHooks().contains(LuaPowerHook.ON_DAMAGED_BY_PLAYER));
-        assertTrue(definition.getHooks().contains(LuaPowerHook.ON_EXIT_COMBAT));
+        assertTrue(definition.getHooks().contains(ScriptHook.ON_SPAWN));
+        assertTrue(definition.getHooks().contains(ScriptableBoss.ON_DAMAGED_BY_PLAYER));
+        assertTrue(definition.getHooks().contains(ScriptableBoss.ON_EXIT_COMBAT));
     }
 
     @Test
     void validatesMountAwareGroundPoundPremade() {
         GroundPoundLuaConfig groundPound = new GroundPoundLuaConfig();
-        LuaPowerDefinition definition = LuaPowerDefinition.validate(groundPound.getFilename(),
-                tempDir.resolve(groundPound.getFilename()).toFile(),
-                groundPound.getSource());
+        ScriptDefinition definition = validate(groundPound.getFilename(), groundPound.getSource());
 
-        assertTrue(definition.getHooks().contains(LuaPowerHook.ON_DAMAGED_BY_PLAYER));
+        assertTrue(definition.getHooks().contains(ScriptableBoss.ON_DAMAGED_BY_PLAYER));
     }
 
 }

@@ -1226,7 +1226,8 @@ public class SkillSystemTest implements Listener {
             if (breakdown != null) {
                 int weaponLevel = breakdown.getItemLevel();
                 double attackSpeed = type == SkillType.AXES ? 1.0 : 1.6;
-                expected = DamageBreakdown.calculateExpectedDamage(weaponLevel, level, 50, attackSpeed);
+                String weaponType = type == SkillType.AXES ? "DIAMOND_AXE" : "DIAMOND_SWORD";
+                expected = DamageBreakdown.calculateExpectedDamage(weaponLevel, level, 50, weaponType, attackSpeed);
             }
             combatSimulator.healDummy(dummyId);
         }

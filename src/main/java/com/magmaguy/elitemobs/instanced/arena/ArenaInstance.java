@@ -22,6 +22,7 @@ import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -126,8 +127,13 @@ public class ArenaInstance extends MatchInstance {
             String message = "";
             int wave = 0;
             for (String subString : splitString) {
-                String[] finalString = subString.split("=");
-                switch (finalString[0].toLowerCase(Locale.ROOT)) {
+                String[] finalString = subString.split("=", 2);
+                if (finalString.length < 2) {
+                    Logger.warn("Failed to parse arena message entry " + subString + " for arena " + customArenasConfigFields.getFilename());
+                    continue;
+                }
+                String key = ChatColor.stripColor(finalString[0]).toLowerCase(Locale.ROOT);
+                switch (key) {
                     case "wave":
                         try {
                             wave = Integer.parseInt(finalString[1]);

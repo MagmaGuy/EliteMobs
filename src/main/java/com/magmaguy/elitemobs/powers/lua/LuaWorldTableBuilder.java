@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.powers.lua;
 import com.magmaguy.elitemobs.collateralminecraftchanges.LightningSpawnBypass;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.magmacore.scripting.ScriptDefinition;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.powers.ProjectileDamage;
 import com.magmaguy.elitemobs.powers.meta.CustomSummonPower;
@@ -35,14 +36,14 @@ import java.util.Locale;
  */
 final class LuaWorldTableBuilder {
 
-    private final LuaPowerDefinition definition;
+    private final ScriptDefinition definition;
     private final EliteEntity eliteEntity;
     private final LuaPowerSupport support;
     private final LuaPowerEntityTables entityTables;
     private final LuaPowerScriptApi.OwnedTaskController taskController;
     private final LuaPowerScriptApi.CallbackInvoker callbackInvoker;
 
-    LuaWorldTableBuilder(LuaPowerDefinition definition,
+    LuaWorldTableBuilder(ScriptDefinition definition,
                          EliteEntity eliteEntity,
                          LuaPowerSupport support,
                          LuaPowerEntityTables entityTables,
@@ -57,7 +58,13 @@ final class LuaWorldTableBuilder {
     }
 
     LuaTable build() {
-        LuaTable world = new LuaTable();
+        // Start from Magmacore's canonical world table so every primitive defined there (and any
+        // future additions) is automatically available to boss scripts too — the single-source
+        // invariant. EliteMobs' richer / domain-specific methods are layered on below; same-named
+        // *_at_location methods intentionally override the generic Magmacore versions to preserve
+        // existing boss-script semantics (LightningSpawnBypass, particle-table options, etc.).
+        org.bukkit.World contextWorld = eliteEntity.getLocation() != null ? eliteEntity.getLocation().getWorld() : null;
+        LuaTable world = com.magmaguy.magmacore.scripting.tables.LuaWorldTable.build(contextWorld);
         world.set("play_sound_at_location", method(world, args -> {
             support.playSound(support.toLocation(args.arg1()), args.checkjstring(2), support.getFloat(args, 3, 1f), support.getFloat(args, 4, 1f));
             return LuaValue.NIL;

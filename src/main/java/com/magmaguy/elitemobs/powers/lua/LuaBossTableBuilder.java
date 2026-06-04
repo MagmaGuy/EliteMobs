@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.powers.lua;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.magmacore.scripting.ScriptDefinition;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.pathfinding.Navigation;
 import com.magmaguy.elitemobs.powers.meta.CustomSummonPower;
@@ -35,14 +36,14 @@ import java.util.Locale;
  */
 final class LuaBossTableBuilder {
 
-    private final LuaPowerDefinition definition;
+    private final ScriptDefinition definition;
     private final EliteEntity eliteEntity;
     private final LuaPowerSupport support;
     private final LuaPowerEntityTables entityTables;
     private final LuaPowerScriptApi.OwnedTaskController taskController;
     private final LuaPowerScriptApi.CallbackInvoker callbackInvoker;
 
-    LuaBossTableBuilder(LuaPowerDefinition definition,
+    LuaBossTableBuilder(ScriptDefinition definition,
                         EliteEntity eliteEntity,
                         LuaPowerSupport support,
                         LuaPowerEntityTables entityTables,

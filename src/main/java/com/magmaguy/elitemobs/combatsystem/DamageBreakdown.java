@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Where:
  * <ul>
  *   <li><b>Base Damage</b>: normalizedMobHP / TARGET_HITS_TO_KILL_MOB — scales with mob level</li>
- *   <li><b>Attack Speed Factor</b>: REFERENCE_ATTACK_SPEED / actualAttackSpeed — normalizes DPS across weapons</li>
+ *   <li><b>Attack Speed Factor</b>: tuned melee pacing curve from vanilla-equivalent attack speed</li>
  *   <li><b>Skill Adjustment</b>: 2^((skillLevel - mobLevel) / 7.5) — exponential skill scaling</li>
  *   <li><b>Weapon Adjustment</b>: two-part linear curve from weapon level vs mob level [0.5, 1.25]</li>
  *   <li><b>Cooldown/Velocity</b>: attack cooldown (melee) or arrow velocity (ranged) [0, 1]</li>
@@ -123,6 +123,11 @@ public class DamageBreakdown {
     /**
      * Calculates what the expected damage SHOULD be given proper gear at matched combat.
      * Uses the new multiplicative formula.
+     * <p>
+     * Without a weapon type, this uses the legacy speed factor because the live tuned
+     * path is weapon-family dependent. Prefer
+     * {@link #calculateExpectedDamage(int, int, int, String, double)} when the item
+     * material is known.
      *
      * @param weaponLevel The level of the weapon being used
      * @param skillLevel  The player's skill level
@@ -132,7 +137,26 @@ public class DamageBreakdown {
      */
     public static double calculateExpectedDamage(int weaponLevel, int skillLevel, int targetLevel, double attackSpeed) {
         double base = LevelScaling.calculateBaseDamageToElite(targetLevel);
-        double speedFactor = LevelScaling.REFERENCE_ATTACK_SPEED / attackSpeed;
+        double speedFactor = WeaponOffenseCalculator.getLegacyAttackSpeedFactor(attackSpeed);
+        double skillAdj = LevelScaling.calculateOffensiveSkillAdjustment(skillLevel, targetLevel);
+        double weaponAdj = WeaponOffenseCalculator.getWeaponAdjustment(weaponLevel, targetLevel);
+        return Math.max(base * speedFactor * skillAdj * weaponAdj, 1);
+    }
+
+    /**
+     * Calculates expected damage with a known weapon family. Passing the weapon type keeps
+     * test/debug math in sync with the tuned melee attack-speed curve used in live combat.
+     *
+     * @param weaponLevel The level of the weapon being used
+     * @param skillLevel  The player's skill level
+     * @param targetLevel The elite's level
+     * @param weaponType  Bukkit material name, e.g. DIAMOND_AXE, MACE, TRIDENT
+     * @param attackSpeed The weapon's attack speed
+     * @return Expected damage per hit
+     */
+    public static double calculateExpectedDamage(int weaponLevel, int skillLevel, int targetLevel, String weaponType, double attackSpeed) {
+        double base = LevelScaling.calculateBaseDamageToElite(targetLevel);
+        double speedFactor = WeaponOffenseCalculator.getAttackSpeedFactor(weaponType, attackSpeed);
         double skillAdj = LevelScaling.calculateOffensiveSkillAdjustment(skillLevel, targetLevel);
         double weaponAdj = WeaponOffenseCalculator.getWeaponAdjustment(weaponLevel, targetLevel);
         return Math.max(base * speedFactor * skillAdj * weaponAdj, 1);

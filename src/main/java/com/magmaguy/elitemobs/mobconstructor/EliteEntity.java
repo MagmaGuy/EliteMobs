@@ -275,6 +275,12 @@ public class EliteEntity {
         return this instanceof CustomBossEntity;
     }
 
+    public boolean isEnderDragon() {
+        return EntityType.ENDER_DRAGON.equals(entityType) ||
+                livingEntity != null && livingEntity.getType().equals(EntityType.ENDER_DRAGON) ||
+                unsyncedLivingEntity != null && unsyncedLivingEntity.getType().equals(EntityType.ENDER_DRAGON);
+    }
+
     /**
      * Returns the {@link LivingEntity} currently being used by the {@link EliteEntity}. Returns null if none is currently active, even
      * if one was active previously.
@@ -682,6 +688,7 @@ public class EliteEntity {
     }
 
     public void setTriggeredAntiExploit(boolean triggeredAntiExploit) {
+        if (triggeredAntiExploit && isEnderDragon()) return;
         this.triggeredAntiExploit = triggeredAntiExploit;
         if (triggeredAntiExploit) {
             this.eliteLoot = false;
@@ -740,6 +747,7 @@ public class EliteEntity {
     }
 
     public void incrementAntiExploit(int value, String cause) {
+        if (isEnderDragon()) return;
         antiExploitPoints += value;
         if (antiExploitPoints > AntiExploitConfig.getAntiExploitThreshold()) {
             setTriggeredAntiExploit(true);
@@ -748,10 +756,12 @@ public class EliteEntity {
     }
 
     public void decrementAntiExploit(int value) {
+        if (isEnderDragon()) return;
         antiExploitPoints -= value;
     }
 
     public void setInAntiExploitCooldown() {
+        if (isEnderDragon()) return;
         this.inAntiExploitCooldown = true;
         new BukkitRunnable() {
             @Override

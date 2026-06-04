@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.powers.lua;
 
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.magmacore.scripting.ScriptDefinition;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -21,7 +22,7 @@ import java.util.Collection;
  */
 final class LuaPowerContextTables {
 
-    private final LuaPowerDefinition definition;
+    private final ScriptDefinition definition;
     private final EliteEntity eliteEntity;
     private final LuaPowerSupport support;
     private final LuaPowerEntityTables entityTables;
@@ -29,7 +30,7 @@ final class LuaPowerContextTables {
     private final LuaPowerScriptApi.CallbackInvoker callbackInvoker;
     private final LuaWorldTableBuilder worldTableBuilder;
 
-    LuaPowerContextTables(LuaPowerDefinition definition,
+    LuaPowerContextTables(ScriptDefinition definition,
                           EliteEntity eliteEntity,
                           LuaPowerSupport support,
                           LuaPowerEntityTables entityTables,
@@ -48,49 +49,40 @@ final class LuaPowerContextTables {
 
     LuaTable createPlayersTable(LivingEntity eventActor) {
         LuaTable players = new LuaTable();
-        players.set("current_target", new VarArgFunction() {
-            @Override
-            public Varargs invoke(Varargs args) {
-                if (eventActor instanceof Player player) {
-                    return entityTables.createPlayerTable(player);
-                }
-                if (eliteEntity.getLivingEntity() instanceof Mob mob && mob.getTarget() instanceof Player player) {
-                    return entityTables.createPlayerTable(player);
-                }
-                return LuaValue.NIL;
+        players.set("current_target", method(players, args -> {
+            if (eventActor instanceof Player player) {
+                return entityTables.createPlayerTable(player);
             }
-        });
-        players.set("nearby_players", new VarArgFunction() {
-            @Override
-            public Varargs invoke(Varargs args) {
-                LuaTable results = new LuaTable();
-                if (eliteEntity.getLocation() == null || eliteEntity.getLocation().getWorld() == null) {
-                    return results;
-                }
-                double radius = args.checkdouble(1);
-                int index = 1;
-                for (Player player : eliteEntity.getLocation().getWorld().getPlayers()) {
-                    if (player.getLocation().distanceSquared(eliteEntity.getLocation()) <= radius * radius) {
-                        results.set(index++, entityTables.createPlayerTable(player));
-                    }
-                }
+            if (eliteEntity.getLivingEntity() instanceof Mob mob && mob.getTarget() instanceof Player player) {
+                return entityTables.createPlayerTable(player);
+            }
+            return LuaValue.NIL;
+        }));
+        players.set("nearby_players", method(players, args -> {
+            LuaTable results = new LuaTable();
+            if (eliteEntity.getLocation() == null || eliteEntity.getLocation().getWorld() == null) {
                 return results;
             }
-        });
-        players.set("all_players_in_world", new VarArgFunction() {
-            @Override
-            public Varargs invoke(Varargs args) {
-                LuaTable results = new LuaTable();
-                if (eliteEntity.getLocation() == null || eliteEntity.getLocation().getWorld() == null) {
-                    return results;
-                }
-                int index = 1;
-                for (Player player : eliteEntity.getLocation().getWorld().getPlayers()) {
+            double radius = args.checkdouble(1);
+            int index = 1;
+            for (Player player : eliteEntity.getLocation().getWorld().getPlayers()) {
+                if (player.getLocation().distanceSquared(eliteEntity.getLocation()) <= radius * radius) {
                     results.set(index++, entityTables.createPlayerTable(player));
                 }
+            }
+            return results;
+        }));
+        players.set("all_players_in_world", method(players, args -> {
+            LuaTable results = new LuaTable();
+            if (eliteEntity.getLocation() == null || eliteEntity.getLocation().getWorld() == null) {
                 return results;
             }
-        });
+            int index = 1;
+            for (Player player : eliteEntity.getLocation().getWorld().getPlayers()) {
+                results.set(index++, entityTables.createPlayerTable(player));
+            }
+            return results;
+        }));
         return players;
     }
 
@@ -98,104 +90,87 @@ final class LuaPowerContextTables {
 
     LuaTable createEntitiesTable(LivingEntity directTarget) {
         LuaTable entities = new LuaTable();
-        entities.set("get_nearby_entities", new VarArgFunction() {
-            @Override
-            public Varargs invoke(Varargs args) {
-                double radius = args.checkdouble(1);
-                String filter = args.narg() >= 2 && args.arg(2).isstring() ? args.arg(2).tojstring() : "living";
-                LuaTable results = new LuaTable();
-                if (eliteEntity.getLocation() == null || eliteEntity.getLocation().getWorld() == null) {
-                    return results;
-                }
-                int index = 1;
-                if ("all".equalsIgnoreCase(filter) || "entities".equalsIgnoreCase(filter)) {
-                    for (org.bukkit.entity.Entity entity : eliteEntity.getLocation().getWorld().getNearbyEntities(
-                            eliteEntity.getLocation(), radius, radius, radius)) {
-                        if (eliteEntity.getLivingEntity() != null &&
-                                entity.getUniqueId().equals(eliteEntity.getLivingEntity().getUniqueId())) {
-                            continue;
-                        }
-                        results.set(index++, entityTables.createEntityReferenceTable(entity));
-                    }
-                } else {
-                    for (LivingEntity livingEntity : support.filterEntities(eliteEntity.getLocation().getWorld(), filter)) {
-                        if (eliteEntity.getLivingEntity() != null &&
-                                livingEntity.getUniqueId().equals(eliteEntity.getLivingEntity().getUniqueId())) {
-                            continue;
-                        }
-                        if (livingEntity.getLocation().distanceSquared(eliteEntity.getLocation()) <= radius * radius) {
-                            results.set(index++, entityTables.createEntityTable(livingEntity));
-                        }
-                    }
-                }
+        entities.set("get_nearby_entities", method(entities, args -> {
+            double radius = args.checkdouble(1);
+            String filter = args.narg() >= 2 && args.arg(2).isstring() ? args.arg(2).tojstring() : "living";
+            LuaTable results = new LuaTable();
+            if (eliteEntity.getLocation() == null || eliteEntity.getLocation().getWorld() == null) {
                 return results;
             }
-        });
-        entities.set("get_entities_in_box", new VarArgFunction() {
-            @Override
-            public Varargs invoke(Varargs args) {
-                Location center = support.toLocation(args.arg1());
-                double halfX = args.checkdouble(2);
-                double halfY = args.checkdouble(3);
-                double halfZ = args.checkdouble(4);
-                String filter = args.narg() >= 5 && args.arg(5).isstring() ? args.arg(5).tojstring() : "living";
-                LuaTable results = new LuaTable();
-                if (center == null || center.getWorld() == null) {
-                    return results;
-                }
-                int index = 1;
-                double minX = center.getX() - halfX;
-                double maxX = center.getX() + halfX;
-                double minY = center.getY() - halfY;
-                double maxY = center.getY() + halfY;
-                double minZ = center.getZ() - halfZ;
-                double maxZ = center.getZ() + halfZ;
-                for (LivingEntity livingEntity : support.filterEntities(center.getWorld(), filter)) {
+            int index = 1;
+            if ("all".equalsIgnoreCase(filter) || "entities".equalsIgnoreCase(filter)) {
+                for (org.bukkit.entity.Entity entity : eliteEntity.getLocation().getWorld().getNearbyEntities(
+                        eliteEntity.getLocation(), radius, radius, radius)) {
                     if (eliteEntity.getLivingEntity() != null &&
-                            livingEntity.getUniqueId().equals(eliteEntity.getLivingEntity().getUniqueId())) {
+                            entity.getUniqueId().equals(eliteEntity.getLivingEntity().getUniqueId())) {
                         continue;
                     }
-                    Location entityLocation = livingEntity.getLocation();
-                    if (entityLocation.getX() >= minX && entityLocation.getX() <= maxX
-                            && entityLocation.getY() >= minY && entityLocation.getY() <= maxY
-                            && entityLocation.getZ() >= minZ && entityLocation.getZ() <= maxZ) {
-                        results.set(index++, entityTables.createEntityTable(livingEntity));
-                    }
+                    results.set(index++, entityTables.createEntityReferenceTable(entity));
                 }
-                return results;
-            }
-        });
-        entities.set("get_all_entities", new VarArgFunction() {
-            @Override
-            public Varargs invoke(Varargs args) {
-                String filter = args.narg() >= 1 && args.arg(1).isstring() ? args.arg(1).tojstring() : "living";
-                LuaTable results = new LuaTable();
-                if (eliteEntity.getLocation() == null || eliteEntity.getLocation().getWorld() == null) {
-                    return results;
-                }
-                int index = 1;
+            } else {
                 for (LivingEntity livingEntity : support.filterEntities(eliteEntity.getLocation().getWorld(), filter)) {
                     if (eliteEntity.getLivingEntity() != null &&
                             livingEntity.getUniqueId().equals(eliteEntity.getLivingEntity().getUniqueId())) {
                         continue;
                     }
-                    results.set(index++, entityTables.createEntityTable(livingEntity));
+                    if (livingEntity.getLocation().distanceSquared(eliteEntity.getLocation()) <= radius * radius) {
+                        results.set(index++, entityTables.createEntityTable(livingEntity));
+                    }
                 }
+            }
+            return results;
+        }));
+        entities.set("get_entities_in_box", method(entities, args -> {
+            Location center = support.toLocation(args.arg1());
+            double halfX = args.checkdouble(2);
+            double halfY = args.checkdouble(3);
+            double halfZ = args.checkdouble(4);
+            String filter = args.narg() >= 5 && args.arg(5).isstring() ? args.arg(5).tojstring() : "living";
+            LuaTable results = new LuaTable();
+            if (center == null || center.getWorld() == null) {
                 return results;
             }
-        });
-        entities.set("get_direct_target_entity", new VarArgFunction() {
-            @Override
-            public Varargs invoke(Varargs args) {
-                return directTarget == null ? LuaValue.NIL : entityTables.createEntityTable(directTarget);
+            int index = 1;
+            double minX = center.getX() - halfX;
+            double maxX = center.getX() + halfX;
+            double minY = center.getY() - halfY;
+            double maxY = center.getY() + halfY;
+            double minZ = center.getZ() - halfZ;
+            double maxZ = center.getZ() + halfZ;
+            for (LivingEntity livingEntity : support.filterEntities(center.getWorld(), filter)) {
+                if (eliteEntity.getLivingEntity() != null &&
+                        livingEntity.getUniqueId().equals(eliteEntity.getLivingEntity().getUniqueId())) {
+                    continue;
+                }
+                Location entityLocation = livingEntity.getLocation();
+                if (entityLocation.getX() >= minX && entityLocation.getX() <= maxX
+                        && entityLocation.getY() >= minY && entityLocation.getY() <= maxY
+                        && entityLocation.getZ() >= minZ && entityLocation.getZ() <= maxZ) {
+                    results.set(index++, entityTables.createEntityTable(livingEntity));
+                }
             }
-        });
-        entities.set("get_boss_spawn_location", new VarArgFunction() {
-            @Override
-            public Varargs invoke(Varargs args) {
-                return support.toLocationTable(eliteEntity.getSpawnLocation());
+            return results;
+        }));
+        entities.set("get_all_entities", method(entities, args -> {
+            String filter = args.narg() >= 1 && args.arg(1).isstring() ? args.arg(1).tojstring() : "living";
+            LuaTable results = new LuaTable();
+            if (eliteEntity.getLocation() == null || eliteEntity.getLocation().getWorld() == null) {
+                return results;
             }
-        });
+            int index = 1;
+            for (LivingEntity livingEntity : support.filterEntities(eliteEntity.getLocation().getWorld(), filter)) {
+                if (eliteEntity.getLivingEntity() != null &&
+                        livingEntity.getUniqueId().equals(eliteEntity.getLivingEntity().getUniqueId())) {
+                    continue;
+                }
+                results.set(index++, entityTables.createEntityTable(livingEntity));
+            }
+            return results;
+        }));
+        entities.set("get_direct_target_entity", method(entities, args ->
+                directTarget == null ? LuaValue.NIL : entityTables.createEntityTable(directTarget)));
+        entities.set("get_boss_spawn_location", method(entities, args ->
+                support.toLocationTable(eliteEntity.getSpawnLocation())));
         return entities;
     }
 
@@ -203,47 +178,38 @@ final class LuaPowerContextTables {
 
     LuaTable createVectorsTable() {
         LuaTable vectors = new LuaTable();
-        vectors.set("get_vector_between_locations", new VarArgFunction() {
-            @Override
-            public Varargs invoke(Varargs args) {
-                Location source = support.toLocation(args.arg1());
-                Location destination = support.toLocation(args.arg(2));
-                if (source == null || destination == null || source.getWorld() == null || destination.getWorld() == null ||
-                        !source.getWorld().getUID().equals(destination.getWorld().getUID())) {
-                    return support.toVectorTable(new Vector(0, 0, 0));
-                }
-                Vector vector = destination.toVector().subtract(source.toVector());
-                if (args.narg() >= 3 && args.arg(3).istable()) {
-                    support.applyVectorOptions(vector, args.arg(3).checktable());
-                }
-                return support.toVectorTable(vector);
+        vectors.set("get_vector_between_locations", method(vectors, args -> {
+            Location source = support.toLocation(args.arg1());
+            Location destination = support.toLocation(args.arg(2));
+            if (source == null || destination == null || source.getWorld() == null || destination.getWorld() == null ||
+                    !source.getWorld().getUID().equals(destination.getWorld().getUID())) {
+                return support.toVectorTable(new Vector(0, 0, 0));
             }
-        });
-        vectors.set("rotate_vector", new VarArgFunction() {
-            @Override
-            public Varargs invoke(Varargs args) {
-                Vector vector = support.toVector(args.arg1());
-                if (vector == null) {
-                    return support.toVectorTable(new Vector(0, 0, 0));
-                }
-                double pitch = args.narg() >= 2 ? args.arg(2).optdouble(0) : 0;
-                double yaw = args.narg() >= 3 ? args.arg(3).optdouble(0) : 0;
-                return support.toVectorTable(support.rotateVector(vector, pitch, yaw));
+            Vector vector = destination.toVector().subtract(source.toVector());
+            if (args.narg() >= 3 && args.arg(3).istable()) {
+                support.applyVectorOptions(vector, args.arg(3).checktable());
             }
-        });
-        vectors.set("normalize_vector", new VarArgFunction() {
-            @Override
-            public Varargs invoke(Varargs args) {
-                Vector vector = support.toVector(args.arg1());
-                if (vector == null) {
-                    return support.toVectorTable(new Vector(0, 0, 0));
-                }
-                if (vector.lengthSquared() > 0) {
-                    vector.normalize();
-                }
-                return support.toVectorTable(vector);
+            return support.toVectorTable(vector);
+        }));
+        vectors.set("rotate_vector", method(vectors, args -> {
+            Vector vector = support.toVector(args.arg1());
+            if (vector == null) {
+                return support.toVectorTable(new Vector(0, 0, 0));
             }
-        });
+            double pitch = args.narg() >= 2 ? args.arg(2).optdouble(0) : 0;
+            double yaw = args.narg() >= 3 ? args.arg(3).optdouble(0) : 0;
+            return support.toVectorTable(support.rotateVector(vector, pitch, yaw));
+        }));
+        vectors.set("normalize_vector", method(vectors, args -> {
+            Vector vector = support.toVector(args.arg1());
+            if (vector == null) {
+                return support.toVectorTable(new Vector(0, 0, 0));
+            }
+            if (vector.lengthSquared() > 0) {
+                vector.normalize();
+            }
+            return support.toVectorTable(vector);
+        }));
         return vectors;
     }
 
@@ -301,5 +267,28 @@ final class LuaPowerContextTables {
             results.set(index++, support.toLocationTable(location));
         }
         return results;
+    }
+
+    private VarArgFunction method(LuaTable owner, LuaCallback callback) {
+        return new VarArgFunction() {
+            @Override
+            public Varargs invoke(Varargs args) {
+                return callback.invoke(stripMethodSelf(args, owner));
+            }
+        };
+    }
+
+    private Varargs stripMethodSelf(Varargs args, LuaTable owner) {
+        if (args.narg() == 0 || !args.arg1().raweq(owner)) return args;
+        LuaValue[] strippedArgs = new LuaValue[Math.max(0, args.narg() - 1)];
+        for (int index = 2; index <= args.narg(); index++) {
+            strippedArgs[index - 2] = args.arg(index);
+        }
+        return LuaValue.varargsOf(strippedArgs);
+    }
+
+    @FunctionalInterface
+    private interface LuaCallback {
+        Varargs invoke(Varargs args);
     }
 }

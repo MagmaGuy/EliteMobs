@@ -7,7 +7,7 @@ import com.magmaguy.elitemobs.api.NPCProximityLeaveEvent;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.npcs.NPCInteractions;
-import com.magmaguy.elitemobs.npcs.scripts.NPCScriptHook;
+import com.magmaguy.elitemobs.npcs.scripts.ScriptableNPC;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.DynamicQuest;
@@ -106,7 +106,7 @@ public class NPCProximitySensor implements Listener {
     private void handleEnter(NPCEntity npcEntity, Player player) {
         NPCProximityEnterEvent event = new NPCProximityEnterEvent(npcEntity, player, npcEntity.getNPCsConfigFields().getActivationRadius());
         new EventCaller(event);
-        npcEntity.runScripts(NPCScriptHook.ON_PROXIMITY_ENTER, event, player);
+        npcEntity.runScripts(ScriptableNPC.ON_PROXIMITY_ENTER, event, player);
         npcEntity.sayGreeting(player);
         startQuestIndicator(npcEntity, player);
     }
@@ -114,7 +114,7 @@ public class NPCProximitySensor implements Listener {
     private void handleLeave(NPCEntity npcEntity, Player player) {
         NPCProximityLeaveEvent event = new NPCProximityLeaveEvent(npcEntity, player, npcEntity.getNPCsConfigFields().getActivationRadius());
         new EventCaller(event);
-        npcEntity.runScripts(NPCScriptHook.ON_PROXIMITY_LEAVE, event, player);
+        npcEntity.runScripts(ScriptableNPC.ON_PROXIMITY_LEAVE, event, player);
     }
 
     private record ProximityDetection(NPCEntity npcEntity, Player player) {

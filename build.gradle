@@ -142,6 +142,15 @@ shadowJar {
     // Relocate bStats
     relocate 'org.bstats', packagePath + '.bstats'
     relocate 'com.magmaguy.easyminecraftgoals', 'com.magmaguy.elitemobs.easyminecraftgoals'
+    // Per-plugin isolation of the shaded MagmaCore copy (and its bundled luaj/reflections).
+    // Previously EliteMobs shipped com.magmaguy.magmacore (and com.magmaguy.shaded.luaj) UNrelocated,
+    // leaking them onto the server classpath where they collided with other MagmaCore-shading
+    // plugins (e.g. FMM, which relocates its own copy). Relocate into the EliteMobs namespace so
+    // every MagmaCore-consuming plugin carries an isolated copy. Scripting is intra-plugin, so this
+    // does not affect cross-plugin bridges (which exchange only native Bukkit / EliteMobs types).
+    relocate 'com.magmaguy.magmacore', 'com.magmaguy.elitemobs.magmacore'
+    relocate 'com.magmaguy.shaded.luaj', 'com.magmaguy.elitemobs.shaded.luaj'
+    relocate 'com.magmaguy.shaded.reflections', 'com.magmaguy.elitemobs.shaded.reflections'
 
     minimize {
         // EMG NMS adapters are loaded via reflection — don't strip them
@@ -149,7 +158,20 @@ shadowJar {
     }
     archiveClassifier.set(null)
     archiveFileName.set(project.name + ".jar")
-    destinationDirectory.set(new File("testbed/plugins"))
+}
+
+// --- Shared dist mirror -----------------------------------------------------
+// Copy the finished shaded jar into the top-level dist/ folder so the testbeds
+// and the release tool pick every build up from one place. Gated on MC_DIST_DIR
+// (or -PmcDistDir) so clones/CI that don't set it just build to build/libs and
+// no machine-specific path is ever committed.
+def mcDistDir = System.getenv('MC_DIST_DIR') ?: project.findProperty('mcDistDir')
+if (mcDistDir) {
+    tasks.register('mirrorToDist', Copy) {
+        from tasks.named('shadowJar')
+        into mcDistDir
+    }
+    tasks.named('shadowJar') { finalizedBy('mirrorToDist') }
 }
 
 test {
