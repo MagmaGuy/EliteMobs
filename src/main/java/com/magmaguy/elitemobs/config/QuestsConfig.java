@@ -514,7 +514,7 @@ public class QuestsConfig extends ConfigurationFile {
                 fileConfiguration, "questDialogueLineOffsetX", 0);
         questDialoguePromptOffsetX = ConfigurationEngine.setInt(
                 List.of("Experimental: horizontal pixel shift of the 'sneak to continue' prompt line (positive = right)."),
-                fileConfiguration, "questDialoguePromptOffsetX", 68);
+                fileConfiguration, "questDialoguePromptOffsetX", 70);
 
     }
 }

@@ -25,9 +25,10 @@ public final class OffsetFontUtil {
     /**
      * The two box halves joined into one renderable string. A bitmap glyph advances by its width + 1px,
      * which would leave a 1px seam between the halves, so a -1px offset is inserted to butt them flush.
+     * The trailing +2px invisible advance shifts the centered visible art 1px left.
      */
     public static String boxGlyph() {
-        return BOX_GLYPH + pixels(-1) + BOX_GLYPH_RIGHT;
+        return BOX_GLYPH + pixels(-1) + BOX_GLYPH_RIGHT + pixels(2);
     }
 
     private static final int[] MAGNITUDES = {512, 256, 128, 64, 32, 16, 8, 4, 2, 1};
