@@ -168,19 +168,19 @@ public class SkillXPCalculator {
     /**
      * Calculates the XP multiplier for a boss based on its health and damage multipliers.
      * <p>
-     * HP component uses a slightly super-linear exponent (1.15) to reward the compounding
-     * difficulty of longer fights. Damage component is dampened since even small increases
-     * in damage significantly increase difficulty.
+     * HP component uses a sublinear exponent (0.6) to reward longer fights without making
+     * high-health bosses disproportionately profitable. Damage component is heavily dampened
+     * since even small increases in damage significantly increase difficulty.
      * <p>
-     * Formula: hpMultiplier^1.15 * (1 + (dmgMultiplier - 1) * 0.5)
+     * Formula: hpMultiplier^0.6 * (1 + (dmgMultiplier - 1) * 0.15)
      *
      * @param healthMultiplier The mob's health multiplier (e.g. 1.0 for normal, 10.0 for boss)
      * @param damageMultiplier The mob's damage multiplier (e.g. 0.8 for trash, 1.5 for boss)
      * @return The XP multiplier to apply (minimum 0.01 to avoid zero XP)
      */
     public static double calculateBossXPMultiplier(double healthMultiplier, double damageMultiplier) {
-        double hpComponent = Math.pow(Math.max(healthMultiplier, 0.01), 1.15);
-        double dmgComponent = 1.0 + (damageMultiplier - 1.0) * 0.5;
+        double hpComponent = Math.pow(Math.max(healthMultiplier, 0.01), 0.6);
+        double dmgComponent = 1.0 + (damageMultiplier - 1.0) * 0.15;
         if (dmgComponent < 0.1) dmgComponent = 0.1;
         return hpComponent * dmgComponent;
     }

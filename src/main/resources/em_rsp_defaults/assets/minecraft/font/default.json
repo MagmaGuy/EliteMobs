@@ -159,7 +159,7 @@
         {
             "type": "bitmap",
             "file": "elitemobs:gui/dialoguebox_l.png",
-            "ascent": 44,
+            "ascent": 45,
             "height": 256,
             "chars": [
                 "󰼀"
@@ -168,7 +168,7 @@
         {
             "type": "bitmap",
             "file": "elitemobs:gui/dialoguebox_r.png",
-            "ascent": 44,
+            "ascent": 45,
             "height": 256,
             "chars": [
                 "󰼋"
