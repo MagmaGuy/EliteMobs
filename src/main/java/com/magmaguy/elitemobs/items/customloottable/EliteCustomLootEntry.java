@@ -270,7 +270,7 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
         if (dungeonDifficultyID == null) return false;
         //Beyond this point the item is for instanced dungeons
         if (!dungeonDifficultyID.equals(difficultyID)) return true;
-        addGroupLoot(itemTier, eliteEntity);
+        addGroupLoot(CustomItem.limitItemLevel(player, itemTier), eliteEntity);
         return true;
     }
 

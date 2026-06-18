@@ -20,6 +20,7 @@ import com.magmaguy.elitemobs.quests.dialogue.QuestDialogueBossBarManager;
 import com.magmaguy.elitemobs.quests.objectives.*;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
+import com.magmaguy.elitemobs.utils.SimpleScoreboard;
 import com.magmaguy.elitemobs.wormhole.WormholeNavigation;
 import com.magmaguy.magmacore.util.SpigotMessage;
 import lombok.Getter;
@@ -265,7 +266,7 @@ public class QuestTracking {
         if (!player.isOnline()) return;
         Runnable resetScoreboard = () -> {
             if (!player.isOnline() || Bukkit.getScoreboardManager() == null) return;
-            player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
+            SimpleScoreboard.clearScoreboard(player);
         };
         if (Bukkit.isPrimaryThread()) {
             resetScoreboard.run();

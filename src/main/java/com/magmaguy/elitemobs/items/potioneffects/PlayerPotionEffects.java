@@ -66,9 +66,12 @@ public class PlayerPotionEffects implements Listener {
             // Don't override if existing effect has higher amplifier
             if (existingEffect.getAmplifier() > elitePotionEffect.getPotionEffect().getAmplifier())
                 return;
-            // Don't override if existing effect has more than 2 seconds (40 ticks) remaining
-            // This prevents overwriting long-duration potion effects with short-duration charm effects
-            if (existingEffect.getDuration() > 40)
+            // Night vision needs to be refreshed before it gets low enough to start flickering.
+            if (elitePotionEffect.getPotionEffect().getType().equals(PotionEffectType.NIGHT_VISION))
+                player.removePotionEffect(elitePotionEffect.getPotionEffect().getType());
+            // Don't override if existing effect has more than 2 seconds (40 ticks) remaining.
+            // This prevents overwriting long-duration potion effects with short-duration charm effects.
+            else if (existingEffect.getDuration() > 40)
                 return;
         }
 
