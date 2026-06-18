@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.CooldownSkill;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -72,7 +73,7 @@ public class DivineShieldSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public void onActivate(Player player, Object event) {
-        activateShield(player);
+        // Divine Shield is activated only by preventDeath(Player, double).
     }
 
     /**
@@ -86,6 +87,12 @@ public class DivineShieldSkill extends SkillBonus implements CooldownSkill {
      */
     public static boolean preventDeath(Player player, double incomingDamage) {
         if (!activePlayers.contains(player.getUniqueId())) return false;
+
+        try {
+            if (player.getInventory().getItemInMainHand().getType() != Material.MACE) return false;
+        } catch (NoSuchFieldError e) {
+            return false;
+        }
 
         SkillBonus skill = SkillBonusRegistry.getSkillById(SKILL_ID);
         if (!(skill instanceof DivineShieldSkill divineShield)) return false;
@@ -172,6 +179,16 @@ public class DivineShieldSkill extends SkillBonus implements CooldownSkill {
     @Override
     public double getBonusValue(int skillLevel) {
         return 1.0; // Binary effect
+    }
+
+    @Override
+    public boolean affectsDamage() {
+        return false;
+    }
+
+    @Override
+    public boolean triggersOnOffensiveHit() {
+        return false;
     }
 
     @Override

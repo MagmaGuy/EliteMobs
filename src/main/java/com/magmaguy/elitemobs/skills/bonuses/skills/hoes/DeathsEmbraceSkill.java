@@ -174,6 +174,11 @@ public class DeathsEmbraceSkill extends SkillBonus implements CooldownSkill {
     }
 
     @Override
+    public boolean triggersOnOffensiveHit() {
+        return false;
+    }
+
+    @Override
     public void shutdown() {
         cooldowns.clear();
         activePlayers.clear();

@@ -59,4 +59,14 @@ public interface CooldownSkill {
     default void onActivate(Player player, Object event) {
         // Default no-op - skills override this or handle activation in their own event handlers
     }
+
+    /**
+     * Whether generic player-to-elite hit handling should trigger this cooldown skill.
+     * Defensive cooldowns that activate from incoming damage should return false.
+     *
+     * @return true if outgoing hits can activate this skill
+     */
+    default boolean triggersOnOffensiveHit() {
+        return true;
+    }
 }

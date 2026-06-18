@@ -496,8 +496,10 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
             }
             case COOLDOWN -> {
                 if (skill instanceof CooldownSkill cooldownSkill) {
+                    if (!cooldownSkill.triggersOnOffensiveHit()) break;
                     if (!cooldownSkill.isOnCooldown(player)) {
                         cooldownSkill.onActivate(player, this);
+                        if (!cooldownSkill.isOnCooldown(player)) break;
                         skill.incrementProcCount(player);
                         SkillBonus.sendSkillActionBar(player, skill);
                         // Note: skills that conditionally activate (e.g. VorpalStrike on crits)
@@ -601,6 +603,7 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
             }
             case COOLDOWN -> {
                 if (skill instanceof CooldownSkill cooldownSkill) {
+                    if (!cooldownSkill.triggersOnOffensiveHit()) yield 1.0;
                     if (!cooldownSkill.isOnCooldown(player)) {
                         cooldownSkill.onActivate(player, this);
                         cooldownSkill.startCooldown(player, skillLevel);

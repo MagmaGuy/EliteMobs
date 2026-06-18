@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.config.customquests;
 
 import com.magmaguy.elitemobs.config.CustomConfigFields;
+import com.magmaguy.elitemobs.config.translations.TranslationsConfig;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,6 +10,8 @@ import org.bukkit.configuration.ConfigurationSection;
 import java.util.*;
 
 public class CustomQuestsConfigFields extends CustomConfigFields {
+
+    private static final Set<String> TRANSLATED_OBJECTIVE_DEFAULT_KEYS = Set.of("dialog", "npcName", "location");
 
     @Getter
     @Setter
@@ -167,17 +170,8 @@ public class CustomQuestsConfigFields extends CustomConfigFields {
             rawMap = new HashMap<>(customObjectives);
 
             Map<String, Map<String, Object>> parsedObjectives = new HashMap<>();
-            for (Map.Entry<String, Map<String, Object>> maps : customObjectives.entrySet()) {
-                Map<String, Object> parsedMap = new HashMap<>();
-                for (Map.Entry<String, Object> entry : maps.getValue().entrySet())
-                    if (entry.getKey().equals("dialog"))
-                        parsedMap.put(entry.getKey(), translatable(filename, "customObjectives." + maps.getKey() + "." + entry.getKey(), (List<String>) entry.getValue()));
-                    else if (entry.getKey().equals("npcName") || entry.getKey().equals("location"))
-                        parsedMap.put(entry.getKey(), translatable(filename, "customObjectives." + maps.getKey() + "." + entry.getKey(), (String) entry.getValue()));
-                    else
-                        parsedMap.put(entry.getKey(), entry.getValue());
-                parsedObjectives.put(maps.getKey(), parsedMap);
-            }
+            for (Map.Entry<String, Map<String, Object>> maps : customObjectives.entrySet())
+                parsedObjectives.put(maps.getKey(), parseQuestObjective(maps.getKey(), maps.getValue()));
             return parsedObjectives;
 
         } else
@@ -190,17 +184,35 @@ public class CustomQuestsConfigFields extends CustomConfigFields {
         //Parse for the specific translatable elements
         Map<String, Map<String, Object>> parsedObjectives = new HashMap<>();
         for (Map.Entry<String, Object> maps : rawMap.entrySet()) {
-            Map<String, Object> parsedMap = new HashMap<>();
-            for (Map.Entry<?, ?> entry : ((ConfigurationSection) maps.getValue()).getValues(false).entrySet())
-                if (entry.getKey().equals("dialog"))
-                    parsedMap.put((String) entry.getKey(), translatable(filename, "customObjectives." + maps.getKey() + "." + entry.getKey(), (List<String>) entry.getValue()));
-                else if (entry.getKey().equals("npcName") || entry.getKey().equals("location"))
-                    parsedMap.put((String) entry.getKey(), translatable(filename, "customObjectives." + maps.getKey() + "." + entry.getKey(), (String) entry.getValue()));
-                else
-                    parsedMap.put((String) entry.getKey(), entry.getValue());
+            Map<String, Object> objectiveValues = new HashMap<>(((ConfigurationSection) maps.getValue()).getValues(false));
+            if (!TranslationsConfig.isEnglish())
+                objectiveValues = restoreTranslatedObjectiveDefaults(objectiveValues, customObjectives.get(maps.getKey()));
+            Map<String, Object> parsedMap = parseQuestObjective(maps.getKey(), objectiveValues);
             parsedObjectives.put(maps.getKey(), parsedMap);
         }
         return parsedObjectives;
+    }
+
+    private Map<String, Object> parseQuestObjective(String objectiveName, Map<String, Object> objectiveValues) {
+        Map<String, Object> parsedMap = new HashMap<>();
+        for (Map.Entry<String, Object> entry : objectiveValues.entrySet())
+            if (entry.getKey().equals("dialog"))
+                parsedMap.put(entry.getKey(), translatable(filename, "customObjectives." + objectiveName + "." + entry.getKey(), (List<String>) entry.getValue()));
+            else if (entry.getKey().equals("npcName") || entry.getKey().equals("location"))
+                parsedMap.put(entry.getKey(), translatable(filename, "customObjectives." + objectiveName + "." + entry.getKey(), (String) entry.getValue()));
+            else
+                parsedMap.put(entry.getKey(), entry.getValue());
+        return parsedMap;
+    }
+
+    static Map<String, Object> restoreTranslatedObjectiveDefaults(Map<String, Object> objectiveValues, Map<String, Object> defaultObjectiveValues) {
+        if (defaultObjectiveValues == null || defaultObjectiveValues.isEmpty()) return objectiveValues;
+
+        Map<String, Object> restoredObjectiveValues = new HashMap<>(objectiveValues);
+        for (String defaultKey : TRANSLATED_OBJECTIVE_DEFAULT_KEYS)
+            if (!restoredObjectiveValues.containsKey(defaultKey) && defaultObjectiveValues.containsKey(defaultKey))
+                restoredObjectiveValues.put(defaultKey, defaultObjectiveValues.get(defaultKey));
+        return restoredObjectiveValues;
     }
 
 }
