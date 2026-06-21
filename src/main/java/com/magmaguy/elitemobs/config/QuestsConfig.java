@@ -158,6 +158,8 @@ public class QuestsConfig extends ConfigurationFile {
     private static int questDialogueLineOffsetX;
     @Getter
     private static int questDialoguePromptOffsetX;
+    @Getter
+    private static String questDialoguePromptText;
 
     public QuestsConfig() {
         super("Quests.yml");
@@ -515,6 +517,9 @@ public class QuestsConfig extends ConfigurationFile {
         questDialoguePromptOffsetX = ConfigurationEngine.setInt(
                 List.of("Experimental: horizontal pixel shift of the 'sneak to continue' prompt line (positive = right)."),
                 fileConfiguration, "questDialoguePromptOffsetX", 70);
+        questDialoguePromptText = ConfigurationEngine.setString(
+                List.of("Experimental: text shown on the prompt line of the dialogue box telling players how to advance."),
+                file, fileConfiguration, "questDialoguePromptText", "&7&oSneak to continue", true);
 
     }
 }

@@ -71,6 +71,18 @@ public class ElitePlayerInventory {
         return eliteDamage;
     }
 
+    public double getEliteEnchantmentDamage(boolean update) {
+        if (isUpdateLock) update = false;
+        double eliteEnchantmentDamage = helmet.getEliteEnchantmentDamage(player.getInventory().getHelmet(), update) +
+                chestplate.getEliteEnchantmentDamage(player.getInventory().getChestplate(), update) +
+                leggings.getEliteEnchantmentDamage(player.getInventory().getLeggings(), update) +
+                boots.getEliteEnchantmentDamage(player.getInventory().getBoots(), update) +
+                mainhand.getEliteEnchantmentDamage(player.getInventory().getItemInMainHand(), update) +
+                offhand.getEliteEnchantmentDamage(player.getInventory().getItemInOffHand(), update);
+        updateLock();
+        return eliteEnchantmentDamage;
+    }
+
     public double getEliteDefense(boolean update) {
         if (isUpdateLock) update = false;
         double defense = helmet.getEliteDefense(player.getInventory().getHelmet(), update) +

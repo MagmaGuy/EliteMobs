@@ -10,8 +10,6 @@ public class EliteSkeleton extends EliteMobProperties {
         this.entityType = EntityType.SKELETON;
         this.defaultMaxHealth = 20;
         this.baseDamage = MobPropertiesConfig.getMobProperties().get(EntityType.SKELETON).getBaseDamage();
-        super.addMajorPower("skeleton_pillar.yml");
-        super.addMajorPower("skeleton_tracking_arrow.yml");
         this.isEnabled = MobPropertiesConfig.getMobProperties().get(EntityType.SKELETON).isEnabled();
         eliteMobData.add(this);
     }

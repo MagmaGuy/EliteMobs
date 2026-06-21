@@ -23,6 +23,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -196,6 +197,17 @@ public class ItemEnchantmentMenu extends EliteMenu {
             }
         }
 
+        @EventHandler
+        public void onInventoryDrag(InventoryDragEvent event) {
+            if (!menus.contains(event.getView().getTopInventory())) return;
+            int topInventorySize = event.getView().getTopInventory().getSize();
+            for (int rawSlot : event.getRawSlots())
+                if (rawSlot < topInventorySize) {
+                    event.setCancelled(true);
+                    return;
+                }
+        }
+
         private void handleTopInventory(InventoryClickEvent event) {
             int clickedSlot = event.getSlot();
 
@@ -254,19 +266,31 @@ public class ItemEnchantmentMenu extends EliteMenu {
                     .replace("$currencyName", EconomySettingsConfig.getCurrencyName())
                     .replace("$currentAmount", EconomyHandler.formatCurrency(EconomyHandler.checkCurrency(event.getWhoClicked().getUniqueId()))));
 
+            Player player = (Player) event.getWhoClicked();
+            returnInputRemainder(event.getView().getTopInventory(), ENCHANTED_BOOK_SLOT, player);
+            returnInputRemainder(event.getView().getTopInventory(), LUCKY_TICKET_SLOT, player);
+
             EnumMap<Chance, Double> chance = getChanceBreakdown(event.getView().getTopInventory());
-            double rolledChance = ThreadLocalRandom.current().nextDouble();
-            if (rolledChance < chance.get(Chance.CRITICAL_FAILURE))
-                criticalFailure(event);
-            else if (rolledChance < chance.get(Chance.CHALLENGE))
-                challenge(event);
-            else if (rolledChance < chance.get(Chance.FAILURE))
-                failure(event);
-            else
-                success(event);
+            switch (rollChance(chance)) {
+                case SUCCESS -> success(event);
+                case CRITICAL_FAILURE -> criticalFailure(event);
+                case CHALLENGE -> challenge(event);
+                case FAILURE -> failure(event);
+            }
 
             event.getView().getTopInventory().clear();
             event.getWhoClicked().closeInventory();
+        }
+
+        private Chance rollChance(EnumMap<Chance, Double> chance) {
+            double rolledChance = ThreadLocalRandom.current().nextDouble();
+            double threshold = chance.get(Chance.SUCCESS);
+            if (rolledChance < threshold) return Chance.SUCCESS;
+            threshold += chance.get(Chance.CRITICAL_FAILURE);
+            if (rolledChance < threshold) return Chance.CRITICAL_FAILURE;
+            threshold += chance.get(Chance.CHALLENGE);
+            if (rolledChance < threshold) return Chance.CHALLENGE;
+            return Chance.FAILURE;
         }
 
         private void failure(InventoryClickEvent event) {
@@ -275,39 +299,60 @@ public class ItemEnchantmentMenu extends EliteMenu {
         }
 
         private void challenge(InventoryClickEvent event) {
-            ItemStack currentItem = event.getView().getTopInventory().getItem(ITEM_SLOT);
-            if (!EnchantmentDungeonInstance.setupRandomEnchantedChallengeDungeon((Player) event.getWhoClicked(),
-                    UpgradeSystem.upgrade(currentItem.clone(), event.getView().getTopInventory().getItem(ENCHANTED_BOOK_SLOT)),
-                    currentItem.clone())) {
+            Player player = (Player) event.getWhoClicked();
+            Inventory topInventory = event.getView().getTopInventory();
+            ItemStack currentItem = topInventory.getItem(ITEM_SLOT);
+            ItemStack challengeItem = cloneSingleItem(currentItem);
+            ItemStack enchantedBook = cloneSingleItem(topInventory.getItem(ENCHANTED_BOOK_SLOT));
+            if (!EnchantmentDungeonInstance.setupRandomEnchantedChallengeDungeon(player,
+                    UpgradeSystem.upgrade(challengeItem, enchantedBook),
+                    challengeItem)) {
                 success(event);
                 return;
             }
-            currentItem.setAmount(currentItem.getAmount() - 1);
-            if (currentItem.getAmount() > 0)
-                if (moveItemDown(event.getView().getTopInventory(), ITEM_SLOT, event.getWhoClicked(), false)) {
-                    event.getWhoClicked().sendMessage(
-                            DefaultConfig.getEnchantmentChallengeInventoryFullMessage());
-                }
+            returnInputRemainder(topInventory, ITEM_SLOT, player);
 
             event.getWhoClicked().sendMessage(DefaultConfig.getEnchantmentChallengeStartMessage());
             event.getWhoClicked().sendMessage(DefaultConfig.getEnchantmentChallengeConsequencesMessage());
-            broadcastEnchantmentMessage(currentItem, (Player) event.getWhoClicked(), SpecialItemSystemsConfig.getChallengeAnnouncement());
+            broadcastEnchantmentMessage(challengeItem, player, SpecialItemSystemsConfig.getChallengeAnnouncement());
         }
 
         private void criticalFailure(InventoryClickEvent event) {
+            returnInputRemainder(event.getView().getTopInventory(), ITEM_SLOT, (Player) event.getWhoClicked());
             event.getWhoClicked().sendMessage(DefaultConfig.getEnchantmentChallengeCriticalFailureMessage());
             broadcastEnchantmentMessage(event.getView().getTopInventory().getItem(ITEM_SLOT), (Player) event.getWhoClicked(), SpecialItemSystemsConfig.getCriticalFailureAnnouncement());
         }
 
         private void success(InventoryClickEvent event) {
-            ItemStack upgradedItem = UpgradeSystem.upgrade(event.getView().getTopInventory().getItem(ITEM_SLOT),
-                    event.getView().getTopInventory().getItem(ENCHANTED_BOOK_SLOT));
             Player player = (Player) event.getWhoClicked();
-            HashMap<Integer, ItemStack> leftovers = player.getInventory().addItem(upgradedItem);
-            if (!leftovers.isEmpty())
-                event.getWhoClicked().getWorld().dropItem(event.getWhoClicked().getLocation(), upgradedItem);
+            Inventory topInventory = event.getView().getTopInventory();
+            ItemStack upgradedItem = UpgradeSystem.upgrade(cloneSingleItem(topInventory.getItem(ITEM_SLOT)),
+                    cloneSingleItem(topInventory.getItem(ENCHANTED_BOOK_SLOT)));
+            returnInputRemainder(topInventory, ITEM_SLOT, player);
+            giveOrDrop(player, upgradedItem);
             event.getWhoClicked().sendMessage(DefaultConfig.getEnchantmentChallengeSuccessMessage());
             broadcastEnchantmentMessage(upgradedItem, (Player) event.getWhoClicked(), SpecialItemSystemsConfig.getSuccessAnnouncement());
+        }
+
+        private ItemStack cloneSingleItem(ItemStack itemStack) {
+            ItemStack clone = itemStack.clone();
+            clone.setAmount(1);
+            return clone;
+        }
+
+        private void returnInputRemainder(Inventory inventory, int slot, Player player) {
+            ItemStack itemStack = inventory.getItem(slot);
+            if (itemStack == null || itemStack.getAmount() <= 1) return;
+            ItemStack remainder = itemStack.clone();
+            remainder.setAmount(itemStack.getAmount() - 1);
+            itemStack.setAmount(1);
+            giveOrDrop(player, remainder);
+        }
+
+        private void giveOrDrop(Player player, ItemStack itemStack) {
+            HashMap<Integer, ItemStack> leftovers = player.getInventory().addItem(itemStack);
+            if (!leftovers.isEmpty())
+                leftovers.values().forEach(leftover -> player.getWorld().dropItem(player.getLocation(), leftover));
         }
 
         @EventHandler

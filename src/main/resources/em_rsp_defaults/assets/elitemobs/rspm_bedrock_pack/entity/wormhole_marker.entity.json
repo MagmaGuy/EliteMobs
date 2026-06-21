@@ -1,0 +1,28 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "elitemobs:wormhole_marker",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/wormhole_marker"
+      },
+      "geometry": {
+        "default": "geometry.elitemobs.wormhole_marker"
+      },
+      "animations": {
+        "idle": "animation.elitemobs.wormhole_marker.idle"
+      },
+      "scripts": {
+        "animate": [
+          "idle"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.elitemobs_wormhole_marker"
+      ]
+    }
+  }
+}

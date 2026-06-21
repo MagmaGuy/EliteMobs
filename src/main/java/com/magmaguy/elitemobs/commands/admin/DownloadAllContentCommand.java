@@ -29,11 +29,11 @@ public class DownloadAllContentCommand extends AdvancedCommand {
     static final AtomicBoolean IS_BULK_DOWNLOADING = new AtomicBoolean(false);
 
     public DownloadAllContentCommand() {
-        super(List.of("downloadall"));
+        super(List.of("downloadallcontent"));
         setPermission("elitemobs.downloadall");
         setSenderType(SenderType.ANY);
         setDescription("Downloads all available content packages via Nightbreak");
-        setUsage("/em downloadall");
+        setUsage("/em downloadallcontent");
     }
 
     @Override

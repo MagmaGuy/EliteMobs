@@ -1,12 +1,12 @@
 package com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs;
 
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
+import com.magmaguy.elitemobs.config.EliteMobPowersConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.PluginMobProperties;
-import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import lombok.Getter;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -24,11 +24,11 @@ public abstract class EliteMobProperties extends PluginMobProperties {
     @Getter
     private final HashSet<PowersConfigFields> validMajorPowers = new HashSet<>();
     @Getter
-    private final HashSet<PowersConfigFields> validDefensivePowers = (HashSet<PowersConfigFields>) ElitePower.getDefensivePowers().clone();
+    private final HashSet<PowersConfigFields> validDefensivePowers = EliteMobPowersConfig.getDefensivePowerFields();
     @Getter
-    private final HashSet<PowersConfigFields> validOffensivePowers = (HashSet<PowersConfigFields>) ElitePower.getOffensivePowers().clone();
+    private final HashSet<PowersConfigFields> validOffensivePowers = EliteMobPowersConfig.getOffensivePowerFields();
     @Getter
-    private final HashSet<PowersConfigFields> validMiscellaneousPowers = (HashSet<PowersConfigFields>) ElitePower.getMiscellaneousPowers().clone();
+    private final HashSet<PowersConfigFields> validMiscellaneousPowers = EliteMobPowersConfig.getMiscellaneousPowerFields();
 
     public static void initializeEliteMobValues() {
         new EliteBlaze();
@@ -75,6 +75,8 @@ public abstract class EliteMobProperties extends PluginMobProperties {
         new EliteBogged();
         new EliteBreeze();
         new EliteWither();
+
+        eliteMobData.forEach(EliteMobProperties::applyConfiguredPowerSettings);
     }
 
     public static void shutdown() {
@@ -120,8 +122,18 @@ public abstract class EliteMobProperties extends PluginMobProperties {
     }
 
     public void addMajorPower(String powerName) {
-        if (PowersConfig.getPower(powerName).isEnabled())
-            validMajorPowers.add(PowersConfig.getPower(powerName));
+        PowersConfigFields powersConfigFields = PowersConfig.getPower(powerName);
+        if (powersConfigFields != null && powersConfigFields.isEnabled())
+            validMajorPowers.add(powersConfigFields);
+    }
+
+    private void applyConfiguredPowerSettings() {
+        validMajorPowers.addAll(EliteMobPowersConfig.getMajorPowerFields(entityType));
+        HashSet<PowersConfigFields> disabledPowers = EliteMobPowersConfig.getDisabledPowerFields(entityType);
+        validMajorPowers.removeAll(disabledPowers);
+        validDefensivePowers.removeAll(disabledPowers);
+        validOffensivePowers.removeAll(disabledPowers);
+        validMiscellaneousPowers.removeAll(disabledPowers);
     }
 
     public void removeOffensivePower(String filename) {
@@ -129,7 +141,7 @@ public abstract class EliteMobProperties extends PluginMobProperties {
     }
 
     public void removeDefensivePower(String filename) {
-        validOffensivePowers.remove(PowersConfig.getPower(filename));
+        validDefensivePowers.remove(PowersConfig.getPower(filename));
     }
 
 }

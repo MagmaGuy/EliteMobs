@@ -83,6 +83,7 @@ public class WormholeEntry implements PersistentObject {
     private TextDisplay textDisplay = null;
     // Custom model for this entry point (FreeMinecraftModels only)
     private StaticEntity staticModel = null;
+    private BedrockWormholeMarker bedrockWormholeMarker = null;
     private String worldName;
     @Getter
     @Setter
@@ -262,6 +263,7 @@ public class WormholeEntry implements PersistentObject {
                 staticModel.remove();
                 staticModel = null;
             }
+            removeBedrockMarker();
         } finally {
             isProcessingChunkEvent = false;
         }
@@ -309,6 +311,7 @@ public class WormholeEntry implements PersistentObject {
             staticModel.remove();
             staticModel = null;
         }
+        removeBedrockMarker();
         clearLines();
     }
 
@@ -356,8 +359,11 @@ public class WormholeEntry implements PersistentObject {
             if (linesInitialized || !lineDataList.isEmpty()) {
                 clearLines();
             }
+            removeBedrockMarker();
             return;
         }
+
+        tickBedrockMarker(nearbyPlayers);
 
         // Track players who left the area - clear lines if player set changed significantly
         Set<UUID> currentNearbyPlayerUUIDs = new HashSet<>();
@@ -899,8 +905,29 @@ public class WormholeEntry implements PersistentObject {
      * walk back will get a freshly recreated set on next tick.
      */
     public void onNoNearbyPlayers() {
-        if (!linesInitialized && lineDataList.isEmpty()) return;
-        clearLines();
+        removeBedrockMarker();
+        if (linesInitialized || !lineDataList.isEmpty()) {
+            clearLines();
+        }
+    }
+
+    private void tickBedrockMarker(List<Player> nearbyPlayers) {
+        if (!WormholesConfig.isReducedParticlesMode() && !WormholesConfig.isNoParticlesMode()) {
+            removeBedrockMarker();
+            return;
+        }
+        if (bedrockWormholeMarker == null) {
+            bedrockWormholeMarker = new BedrockWormholeMarker();
+        }
+        bedrockWormholeMarker.tick(wormhole, location, nearbyPlayers);
+    }
+
+    private void removeBedrockMarker() {
+        if (bedrockWormholeMarker == null) {
+            return;
+        }
+        bedrockWormholeMarker.remove();
+        bedrockWormholeMarker = null;
     }
 
     /**

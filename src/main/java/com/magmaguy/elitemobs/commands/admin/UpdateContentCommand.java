@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class UpdateContentCommand extends AdvancedCommand {
 
     public UpdateContentCommand() {
-        super(List.of("updatecontent", "updateall"));
+        super(List.of("updatecontent", "updateallcontent"));
         setPermission("elitemobs.updatecontent");
         setSenderType(SenderType.ANY);
         setDescription("Updates all outdated content packages via Nightbreak");

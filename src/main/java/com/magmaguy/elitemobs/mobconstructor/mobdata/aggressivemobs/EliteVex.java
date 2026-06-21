@@ -11,7 +11,6 @@ public class EliteVex extends EliteMobProperties {
         this.defaultMaxHealth = 14;
         this.baseDamage = MobPropertiesConfig.getMobProperties().get(EntityType.VEX).getBaseDamage();
         this.isEnabled = MobPropertiesConfig.getMobProperties().get(EntityType.VEX).isEnabled();
-        super.removeDefensivePower("ground_pound.yml");
         eliteMobData.add(this);
     }
 

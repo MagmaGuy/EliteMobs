@@ -548,10 +548,10 @@ public class DungeonsConfig extends ConfigurationFile {
         // Setup menu tooltips (EMPackage)
         contentInstalledLine1 = ConfigurationEngine.setString(
                 List.of("Sets the first line of the tooltip for installed content in the setup menu."),
-                file, fileConfiguration, "contentInstalledLine1", "Content is installed!", true);
+                file, fileConfiguration, "contentInstalledLine1", "&aContent is installed and up to date.", true);
         contentInstalledLine2 = ConfigurationEngine.setString(
                 List.of("Sets the second line of the tooltip for installed content in the setup menu."),
-                file, fileConfiguration, "contentInstalledLine2", "Click to uninstall!", true);
+                file, fileConfiguration, "contentInstalledLine2", "&7Click to uninstall.", true);
         contentNotInstalledLine1 = ConfigurationEngine.setString(
                 List.of("Sets the first line of the tooltip for content that is downloaded but not installed."),
                 file, fileConfiguration, "contentNotInstalledLine1", "Content is not installed!", true);
@@ -610,17 +610,17 @@ public class DungeonsConfig extends ConfigurationFile {
                 List.of("Sets the separator line used in download messages."),
                 file, fileConfiguration, "contentDownloadSeparator", "<g:#8B0000:#CC4400:#DAA520>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬</g>", true);
         contentNightbreakPromptLine1 = ConfigurationEngine.setString(
-                List.of("Sets the first line of the Nightbreak account prompt."),
-                file, fileConfiguration, "contentNightbreakPromptLine1", "&eThis content can be downloaded automatically with a Nightbreak account.", true);
+                List.of("Sets the first line of the account token prompt."),
+                file, fileConfiguration, "contentNightbreakPromptLine1", "&eThis content can be downloaded automatically after connecting this server.", true);
         contentNightbreakPromptLine2 = ConfigurationEngine.setString(
-                List.of("Sets the second line of the Nightbreak account prompt.",
+                List.of("Sets the second line of the account token prompt.",
                         "Followed by a clickable nightbreak.io/account link."),
                 file, fileConfiguration, "contentNightbreakPromptLine2", "<g:#B8860B:#DAA520>Step 1:</g> &7Get your token at: ", true);
         contentNightbreakPromptLine3 = ConfigurationEngine.setString(
-                List.of("Sets the third line of the Nightbreak account prompt."),
+                List.of("Sets the third line of the account token prompt."),
                 file, fileConfiguration, "contentNightbreakPromptLine3", "<g:#B8860B:#DAA520>Step 2:</g> &7Run: &e/nightbreaklogin <your-token>", true);
         contentNightbreakPromptLine4 = ConfigurationEngine.setString(
-                List.of("Sets the fourth line of the Nightbreak account prompt.",
+                List.of("Sets the fourth line of the account token prompt.",
                         "Followed by a clickable content link."),
                 file, fileConfiguration, "contentNightbreakPromptLine4", "&8Or download manually at: ", true);
         contentCheckingAccessMessage = ConfigurationEngine.setString(
@@ -635,9 +635,9 @@ public class DungeonsConfig extends ConfigurationFile {
                 file, fileConfiguration, "contentAccessFailedLink", "&9https://nightbreak.io/plugin/elitemobs", true);
         contentInvalidTokenMessage = ConfigurationEngine.setString(
                 List.of("Sets the message shown when Nightbreak rejects the saved token."),
-                file, fileConfiguration, "contentInvalidTokenMessage", "&e[EliteMobs] Nightbreak token needs to be updated.", true);
+                file, fileConfiguration, "contentInvalidTokenMessage", "&e[EliteMobs] The saved account token needs to be updated.", true);
         contentInvalidTokenInstructions = ConfigurationEngine.setString(
-                List.of("Sets the follow-up message shown after an invalid Nightbreak token.",
+                List.of("Sets the follow-up message shown after an invalid account token.",
                         "Followed by a clickable nightbreak.io/account link."),
                 file, fileConfiguration, "contentInvalidTokenInstructions", "&7Get a new token here, then run &e/nightbreaklogin <token>&7: ", true);
         contentDownloadedReloadMessage = ConfigurationEngine.setString(
@@ -653,9 +653,9 @@ public class DungeonsConfig extends ConfigurationFile {
                 List.of("Sets the message prompting the player on how to get access."),
                 file, fileConfiguration, "contentGetAccessMessage", "&eYou can get access through:", true);
         contentNightbreakLink = ConfigurationEngine.setString(
-                List.of("Sets the Nightbreak link prefix in access info.",
+                List.of("Sets the plugin page link prefix in access info.",
                         "Followed by a clickable nightbreak.io/elitemobs link."),
-                file, fileConfiguration, "contentNightbreakLink", "&a\u2022 Nightbreak: ", true);
+                file, fileConfiguration, "contentNightbreakLink", "&a\u2022 Plugin page: ", true);
         contentPatreonLink = ConfigurationEngine.setString(
                 List.of("Sets the Patreon link prefix in access info.",
                         "Followed by a clickable Patreon link."),

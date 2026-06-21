@@ -1,5 +1,6 @@
 /.idea/
 /.gradle/
+/.run/
 /.claude/
 /testbed/
 /build/
@@ -25,3 +26,14 @@ gradlew
 *.log
 # Local design docs and plan notes - not tracked
 docs/
+
+# Local IDE/tooling and generated debris
+.vscode/
+*.iml
+.classpath
+.project
+.settings/
+target/
+out/
+codex-build.log
+dependency-reduced-pom.xml

@@ -1,9 +1,18 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.commands.admin.DownloadAllContentCommand;
-import com.magmaguy.elitemobs.commands.admin.UpdateContentCommand;
+import com.magmaguy.elitemobs.EliteMobs;
+import com.magmaguy.elitemobs.dungeons.EMPackage;
+import com.magmaguy.elitemobs.dungeons.MetaPackage;
 import com.magmaguy.magmacore.command.CommandManager;
+import com.magmaguy.magmacore.nightbreak.NightbreakDownloadContentCommand;
+import com.magmaguy.magmacore.nightbreak.NightbreakDownloadEverythingCommand;
+import com.magmaguy.magmacore.nightbreak.NightbreakDownloadPluginUpdateCommand;
+import com.magmaguy.magmacore.nightbreak.NightbreakRecommendedPluginsCommand;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 public class CommandHandler {
     private  static CommandManager emCommand;
@@ -50,6 +59,7 @@ public class CommandHandler {
         emCommand.registerCommand(new FireballCommand());
         emCommand.registerCommand(new RespawnAllCommand());
         emCommand.registerCommand(new PackageDungeonCommand());
+        emCommand.registerCommand(new DungeonResetLockoutCommand());
         emCommand.registerCommand(new LanguageCommand());
         emCommand.registerCommand(new PlaceWormholeCommand());
         emCommand.registerCommand(new LootStats());
@@ -76,8 +86,24 @@ public class CommandHandler {
         emCommand.registerCommand(new FirstTimeSetupCommand());
         emCommand.registerCommand(new DebugCommand());
         emCommand.registerCommand(new DebugInfoCommand());
-        emCommand.registerCommand(new UpdateContentCommand());
-        emCommand.registerCommand(new DownloadAllContentCommand());
+        emCommand.registerCommand(new NightbreakRecommendedPluginsCommand(MetadataHandler.PLUGIN, EliteMobs.NIGHTBREAK_PLUGIN_SPEC));
+        emCommand.registerCommand(new NightbreakDownloadPluginUpdateCommand(MetadataHandler.PLUGIN, EliteMobs.NIGHTBREAK_PLUGIN_SPEC));
+        emCommand.registerCommand(new NightbreakDownloadEverythingCommand<>(MetadataHandler.PLUGIN,
+                EliteMobs.NIGHTBREAK_PLUGIN_SPEC,
+                CommandHandler::nightbreakBulkPackages,
+                ReloadCommand::reload));
+        emCommand.registerCommand(new NightbreakDownloadContentCommand<>(MetadataHandler.PLUGIN,
+                EliteMobs.NIGHTBREAK_PLUGIN_SPEC,
+                CommandHandler::nightbreakBulkPackages,
+                ReloadCommand::reload,
+                false,
+                "elitemobs.downloadall"));
+        emCommand.registerCommand(new NightbreakDownloadContentCommand<>(MetadataHandler.PLUGIN,
+                EliteMobs.NIGHTBREAK_PLUGIN_SPEC,
+                CommandHandler::nightbreakBulkPackages,
+                ReloadCommand::reload,
+                true,
+                "elitemobs.updatecontent"));
         emCommand.registerCommand(new PeaceBannerGiveCommand());
         emCommand.registerCommand(new PeaceBannerListCommand());
 
@@ -90,6 +116,7 @@ public class CommandHandler {
         emCommand.registerCommand(new EnchantCommand());
         emCommand.registerCommand(new EliteScrollCommand());
         emCommand.registerCommand(new ScrollGetCommand());
+        emCommand.registerCommand(new ScrollGiveCommand());
         emCommand.registerCommand(new ScrapCommand());
         emCommand.registerCommand(new UnbindCommand());
         emCommand.registerCommand(new MoneyCheckCommand());
@@ -123,5 +150,16 @@ public class CommandHandler {
 
         adventurersGuildCommand =new CommandManager(MetadataHandler.PLUGIN, "adventurersguild");
         adventurersGuildCommand.registerCommand(new AdventurersGuildCommand());
+    }
+
+    private static List<EMPackage> nightbreakBulkPackages() {
+        Set<String> metaChildren = EMPackage.getMetaPackageChildFilenames();
+        List<EMPackage> packages = new ArrayList<>();
+        for (EMPackage emPackage : EMPackage.getEmPackages().values()) {
+            if (metaChildren.contains(emPackage.getContentPackagesConfigFields().getFilename())) continue;
+            if (emPackage instanceof MetaPackage metaPackage) metaPackage.refreshState();
+            packages.add(emPackage);
+        }
+        return packages;
     }
 }

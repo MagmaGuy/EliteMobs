@@ -11,8 +11,6 @@ public class ElitePhantom extends EliteMobProperties {
         this.defaultMaxHealth = 20;
         this.baseDamage = MobPropertiesConfig.getMobProperties().get(EntityType.PHANTOM).getBaseDamage();
         this.isEnabled = MobPropertiesConfig.getMobProperties().get(EntityType.PHANTOM).isEnabled();
-        removeOffensivePower("attack_lightning.yml");
-        super.removeDefensivePower("ground_pound.yml");
         eliteMobData.add(this);
     }
 

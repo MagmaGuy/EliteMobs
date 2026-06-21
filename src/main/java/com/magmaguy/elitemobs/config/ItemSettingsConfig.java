@@ -91,6 +91,8 @@ public class ItemSettingsConfig extends ConfigurationFile {
     @Getter
     private static String scrapFailedMessage;
     @Getter
+    private static String scrapNotConfiguredMessage;
+    @Getter
     private static boolean putLootDirectlyIntoPlayerInventory;
     @Getter
     private static int lootLevelDifferenceLockout;
@@ -318,6 +320,9 @@ public class ItemSettingsConfig extends ConfigurationFile {
         scrapFailedMessage = ConfigurationEngine.setString(
                 List.of("Sets message that appears when item scrapping fails."),
                 file, fileConfiguration, "scrapFailedMessageV2", "&8[EliteMobs] &cScrapping failed $amount times!", true);
+        scrapNotConfiguredMessage = ConfigurationEngine.setString(
+                List.of("Sets the message that appears when the scrapper has no scrap item configured to produce."),
+                file, fileConfiguration, "scrapNotConfiguredMessage", "&cThe scrapper has no scrap item configured — contact an admin.", true);
         putLootDirectlyIntoPlayerInventory = ConfigurationEngine.setBoolean(
                 List.of("Sets if elite loot should be placed directly into players' inventories."),
                 fileConfiguration, "putLootDirectlyIntoPlayerInventory", false);

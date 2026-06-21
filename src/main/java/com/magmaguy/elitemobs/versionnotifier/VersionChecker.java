@@ -1,19 +1,24 @@
 package com.magmaguy.elitemobs.versionnotifier;
 
+import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.config.InitializeConfig;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import com.magmaguy.magmacore.nightbreak.NightbreakAccount;
+import com.magmaguy.magmacore.nightbreak.NightbreakContentManager;
+import com.magmaguy.magmacore.nightbreak.NightbreakPluginUpdater;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.Logger;
 import com.magmaguy.magmacore.util.SpigotMessage;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.IOException;
@@ -22,7 +27,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class VersionChecker {
-    private static final List<EMPackage> outdatedPackages = new ArrayList<>();
+    private static final List<EMPackage> outdatedPackages = Collections.synchronizedList(new ArrayList<>());
     @Getter
     private static final boolean SHA1Updated = false;
     private static final int MAX_RETRY_ATTEMPTS = 3;
@@ -84,35 +89,26 @@ public class VersionChecker {
                     snapshot = true;
                     currentVersion = currentVersion.split("-")[0];
                 }
-                String publicVersion = "";
+                String publicVersion;
 
-                try {
-                    publicVersion = VersionChecker.readStringFromURL("https://api.spigotmc.org/legacy/update.php?resource=40090");
-                    Logger.info("Latest public release is " + publicVersion);
-                    Logger.info("Your version is " + MetadataHandler.PLUGIN.getDescription().getVersion());
-                } catch (IOException e) {
-                    handleConnectionError("plugin version check", e);
-                    return;
-                }
-
-                if (Double.parseDouble(currentVersion.split("\\.")[0]) < Double.parseDouble(publicVersion.split("\\.")[0])) {
-                    outOfDateHandler();
-                    return;
-                }
-
-                if (Double.parseDouble(currentVersion.split("\\.")[0]) == Double.parseDouble(publicVersion.split("\\.")[0])) {
-
-                    if (Double.parseDouble(currentVersion.split("\\.")[1]) < Double.parseDouble(publicVersion.split("\\.")[1])) {
-                        outOfDateHandler();
+                NightbreakAccount.VersionInfo versionInfo = NightbreakAccount.getPublicPluginVersion("elitemobs");
+                if (versionInfo != null && versionInfo.version != null && !versionInfo.version.isBlank()) {
+                    publicVersion = versionInfo.version;
+                } else {
+                    try {
+                        publicVersion = VersionChecker.readStringFromURL("https://api.spigotmc.org/legacy/update.php?resource=40090");
+                    } catch (IOException e) {
+                        handleConnectionError("plugin version check", e);
                         return;
                     }
+                }
 
-                    if (Double.parseDouble(currentVersion.split("\\.")[1]) == Double.parseDouble(publicVersion.split("\\.")[1])) {
-                        if (Double.parseDouble(currentVersion.split("\\.")[2]) < Double.parseDouble(publicVersion.split("\\.")[2])) {
-                            outOfDateHandler();
-                            return;
-                        }
-                    }
+                Logger.info("Latest public release is " + publicVersion);
+                Logger.info("Your version is " + MetadataHandler.PLUGIN.getDescription().getVersion());
+
+                if (NightbreakPluginUpdater.compareVersions(publicVersion, currentVersion) > 0) {
+                    outOfDateHandler();
+                    return;
                 }
 
                 if (!snapshot)
@@ -299,6 +295,10 @@ public class VersionChecker {
     }
 
     private static void checkContentVersion() {
+        checkContentVersion(null);
+    }
+
+    private static void checkContentVersion(Runnable onComplete) {
         if (MetadataHandler.shutdownRequested) return;
         Bukkit.getScheduler().runTaskAsynchronously(MetadataHandler.PLUGIN, () -> {
             try {
@@ -310,7 +310,7 @@ public class VersionChecker {
 
                 Map<String, Integer> remoteVersions = parseNightbreakDlcResponse(jsonResponse);
                 Logger.info("Parsed " + remoteVersions.size() + " content versions from Nightbreak API");
-                processContentVersionData(remoteVersions);
+                processContentVersionData(remoteVersions, true);
 
                 // Prefetch access info after version check completes
                 if (MetadataHandler.shutdownRequested) return;
@@ -326,6 +326,8 @@ public class VersionChecker {
                         !(e instanceof UnknownHostException || e instanceof ConnectException || e instanceof SocketTimeoutException)) {
                     Logger.info("Using local data for content version checks as remote server is unavailable.");
                 }
+            } finally {
+                completeRefresh(onComplete);
             }
         });
     }
@@ -336,14 +338,19 @@ public class VersionChecker {
      * @param remoteVersions Map of slug to version from Nightbreak
      */
     private static void processContentVersionData(Map<String, Integer> remoteVersions) {
+        processContentVersionData(remoteVersions, true);
+    }
+
+    private static void processContentVersionData(Map<String, Integer> remoteVersions, boolean notifyAdmins) {
         // Track newly found outdated packages
         List<EMPackage> newlyOutdated = new ArrayList<>();
+        Set<EMPackage> checkedPackages = new HashSet<>();
+        Set<EMPackage> currentlyOutdated = new HashSet<>();
 
         // Snapshot to avoid ConcurrentModificationException from async iteration
         List<EMPackage> packageSnapshot = new ArrayList<>(EMPackage.getEmPackages().values());
 
         for (EMPackage emPackage : packageSnapshot) {
-            if (!emPackage.isInstalled()) continue;
             // Skip non-default dungeons unless they have a nightbreak slug for version checking
             String slug = emPackage.getContentPackagesConfigFields().getNightbreakSlug();
             if (!emPackage.getContentPackagesConfigFields().isDefaultDungeon() && (slug == null || slug.isEmpty())) continue;
@@ -366,30 +373,54 @@ public class VersionChecker {
                 continue;
             }
 
+            checkedPackages.add(emPackage);
+            if (!emPackage.isInstalled()) {
+                emPackage.setOutOfDate(false);
+                outdatedPackages.remove(emPackage);
+                continue;
+            }
+
             Integer remoteVersion = remoteVersions.get(slug);
             if (remoteVersion == null) {
                 Logger.warn("No version info found on Nightbreak for content: " + emPackage.getContentPackagesConfigFields().getName() + " (slug: " + slug + ")");
+                emPackage.setOutOfDate(false);
+                outdatedPackages.remove(emPackage);
                 continue;
             }
 
             int localVersion = emPackage.getContentPackagesConfigFields().getDungeonVersion();
             if (remoteVersion > localVersion) {
                 emPackage.setOutOfDate(true);
-                if (!outdatedPackages.contains(emPackage)) {
-                    outdatedPackages.add(emPackage);
-                    newlyOutdated.add(emPackage);
+                currentlyOutdated.add(emPackage);
+                synchronized (outdatedPackages) {
+                    if (!outdatedPackages.contains(emPackage)) {
+                        outdatedPackages.add(emPackage);
+                        newlyOutdated.add(emPackage);
+                    }
                 }
                 Logger.warn("Content " + emPackage.getContentPackagesConfigFields().getName() +
                         " is outdated! You should go download the updated version! Your version: " +
                         localVersion + " / remote version: " + remoteVersion +
-                        " / Link: " + emPackage.getContentPackagesConfigFields().getDownloadLink());
+                        " / Link: " + emPackage.getContentPageUrl());
+            } else {
+                emPackage.setOutOfDate(false);
+                outdatedPackages.remove(emPackage);
             }
         }
 
+        synchronized (outdatedPackages) {
+            outdatedPackages.removeIf(emPackage -> checkedPackages.contains(emPackage) && !currentlyOutdated.contains(emPackage));
+        }
+
         // Notify online admins about newly found outdated packages
-        if (!newlyOutdated.isEmpty()) {
+        if (notifyAdmins && !newlyOutdated.isEmpty()) {
             notifyOnlineAdmins(newlyOutdated);
         }
+    }
+
+    private static void completeRefresh(Runnable onComplete) {
+        if (onComplete == null || MetadataHandler.shutdownRequested) return;
+        Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, onComplete);
     }
 
     /**
@@ -445,14 +476,19 @@ public class VersionChecker {
     private static void notifyOnlineAdmins(List<EMPackage> newlyOutdated) {
         // Must run on main thread to access Bukkit
         Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, () -> {
-            for (org.bukkit.entity.Player player : Bukkit.getOnlinePlayers()) {
+            for (Player player : Bukkit.getOnlinePlayers()) {
                 if (!player.hasPermission("elitemobs.versionnotification")) continue;
 
                 Logger.sendSimpleMessage(player, "<g:#8B0000:#CC4400:#DAA520>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬</g>");
+                NightbreakPluginUpdater.PluginUpdateCheck pluginUpdateCheck = currentPluginUpdateCheck();
+                if (hasPluginUpdateNotice(pluginUpdateCheck)) {
+                    sendPluginUpdateNotice(player, pluginUpdateCheck);
+                    Logger.sendSimpleMessage(player, "&8&m-----------------------------------------------------");
+                }
                 Logger.sendMessage(player, CommandMessagesConfig.getContentUpdatesAvailable().replace("$count", String.valueOf(newlyOutdated.size())));
                 for (EMPackage emPackage : newlyOutdated) {
                     String name = emPackage.getContentPackagesConfigFields().getName();
-                    player.sendMessage(CommandMessagesConfig.getContentUpdateEntry().replace("$name", name));
+                    sendContentPageEntry(player, emPackage, CommandMessagesConfig.getContentUpdateEntry().replace("$name", name));
                 }
                 player.spigot().sendMessage(
                         SpigotMessage.simpleMessage(CommandMessagesConfig.getVersionUseSetupMessage()),
@@ -486,14 +522,14 @@ public class VersionChecker {
         checkPluginVersion();
         checkContentVersion();
 
-        // Refresh content + access info the moment a Nightbreak token shows up,
+        // Refresh content + access info the moment an account token shows up,
         // whether via /nightbreaklogin in this classloader or via another
         // MagmaCore-shading plugin writing the shared config file. Without
-        // this, /em setup keeps showing "no Nightbreak token linked" until the
+        // this, /em setup keeps showing "no account token linked" until the
         // server restarts because the first /em setup open pre-login stamps
         // the throttle cooldown for 5 minutes.
         NightbreakAccount.addTokenChangeListener(() -> {
-            Logger.info("Nightbreak token detected — refreshing content access info.");
+            Logger.info("Account token detected; refreshing content access info.");
             invalidateRefreshCooldown();
             refreshContentAndAccess();
         });
@@ -511,16 +547,87 @@ public class VersionChecker {
      * Called when setup menu is opened to ensure fresh data.
      * Throttled to prevent excessive API calls when opened repeatedly.
      */
-    public static void refreshContentAndAccess() {
+    public static boolean refreshContentAndAccess() {
+        return refreshContentAndAccess(null);
+    }
+
+    public static boolean refreshContentAndAccess(Runnable onComplete) {
         long now = System.currentTimeMillis();
-        if (now - lastRefreshTimestamp < REFRESH_COOLDOWN_MS) return;
+        if (now - lastRefreshTimestamp < REFRESH_COOLDOWN_MS) return false;
         lastRefreshTimestamp = now;
-        checkContentVersion();
+        checkContentVersion(onComplete);
+        return true;
+    }
+
+    public static void applyCachedContentAndAccess() {
+        Map<String, Integer> cachedVersions = new HashMap<>();
+        NightbreakContentManager.getVersionCache().forEach((slug, versionInfo) -> {
+            if (slug != null && versionInfo != null && versionInfo.versionInt > 0) {
+                cachedVersions.put(slug, versionInfo.versionInt);
+            }
+        });
+        if (!cachedVersions.isEmpty()) {
+            processContentVersionData(cachedVersions, false);
+        }
+
+        NightbreakContentManager.getAccessCache().forEach((slug, accessInfo) -> {
+            if (slug == null || accessInfo == null) return;
+            for (EMPackage emPackage : EMPackage.getEmPackages().values()) {
+                if (slug.equals(emPackage.getContentPackagesConfigFields().getNightbreakSlug())) {
+                    emPackage.setCachedAccessInfo(accessInfo);
+                }
+            }
+        });
+    }
+
+    private static NightbreakPluginUpdater.PluginUpdateCheck currentPluginUpdateCheck() {
+        NightbreakPluginUpdater.CachedPluginUpdateCheck snapshot = NightbreakPluginUpdater.getCachedUpdateCheck(
+                (JavaPlugin) MetadataHandler.PLUGIN,
+                EliteMobs.NIGHTBREAK_PLUGIN_SPEC);
+        return snapshot.check();
+    }
+
+    private static boolean hasPluginUpdateNotice(NightbreakPluginUpdater.PluginUpdateCheck check) {
+        if (check != null) return check.updateAvailable();
+        return !pluginIsUpToDate;
+    }
+
+    private static void sendContentPageEntry(Player player, EMPackage emPackage, String displayText) {
+        String link = emPackage.getContentPageUrl();
+        if (link == null || link.isBlank()) {
+            player.sendMessage(ChatColorConverter.convert(displayText));
+            return;
+        }
+        player.spigot().sendMessage(
+                SpigotMessage.hoverLinkMessage(
+                        displayText,
+                        ChatColorConverter.convert(CommandMessagesConfig.getVersionClickDownloadHover()),
+                        link));
+    }
+
+    private static void sendPluginUpdateNotice(Player player, NightbreakPluginUpdater.PluginUpdateCheck check) {
+        Logger.sendSimpleMessage(player, "<g:#8B0000:#FF4500:#DAA520>EliteMobs plugin update available</g>");
+        if (check != null && check.remoteVersion() != null && !check.remoteVersion().isBlank()) {
+            Logger.sendSimpleMessage(player, "&7Installed plugin: &f" + check.localVersion()
+                    + " &8| &7Available plugin: &a" + check.remoteVersion());
+        }
+        Logger.sendSimpleMessage(player, "&eThis is separate from content updates. Downloading the plugin update requires a server restart.");
+        player.spigot().sendMessage(
+                SpigotMessage.commandHoverMessage(
+                        "&a[Download the EliteMobs plugin update]",
+                        "&eRuns /em downloadpluginupdate. Restart required after download.",
+                        "/em downloadpluginupdate"));
+        player.spigot().sendMessage(
+                SpigotMessage.simpleMessage("&7Manual download page: "),
+                SpigotMessage.hoverLinkMessage(
+                        "&9&nhttps://nightbreak.io/plugin/elitemobs/download/",
+                        "&7Click to open the public EliteMobs download page.",
+                        "https://nightbreak.io/plugin/elitemobs/download/"));
     }
 
     /**
      * Forces a refresh on the next call, bypassing the cooldown. Used by the
-     * Nightbreak token-change listener — without this, opening /em setup
+     * Account token-change listener; without this, opening /em setup
      * pre-login stamps the cooldown even though the refresh short-circuited,
      * and the legitimate post-login refresh gets throttled out for 5 minutes.
      */
@@ -594,7 +701,7 @@ public class VersionChecker {
         String status = NightbreakAccount.getLastAuthFailureStatus() > 0
                 ? " (HTTP " + NightbreakAccount.getLastAuthFailureStatus() + ")"
                 : "";
-        Logger.warn("Nightbreak token needs to be updated" + status
+        Logger.warn("The saved account token needs to be updated" + status
                 + ". Get a new token at https://nightbreak.io/account/ and run "
                 + "/nightbreaklogin <token>, then run /em setup again.");
     }
@@ -614,36 +721,30 @@ public class VersionChecker {
                         event.getPlayer().sendMessage(CommandMessagesConfig.getVersionCheckConnectionWarning());
                     }
 
-                    if (!pluginIsUpToDate)
-                        event.getPlayer().spigot().sendMessage(
-                                SpigotMessage.simpleMessage(CommandMessagesConfig.getVersionOutdatedMessage()),
-                                SpigotMessage.hoverLinkMessage(
-                                        InitializeConfig.getContentLinkDisplay(),
-                                        InitializeConfig.getContentLinkHover(),
-                                        "https://nightbreak.io/plugin/elitemobs/"));
+                    List<EMPackage> outdatedSnapshot;
+                    synchronized (outdatedPackages) {
+                        outdatedPackages.removeIf(emPackage -> !emPackage.isOutOfDate());
+                        outdatedSnapshot = new ArrayList<>(outdatedPackages);
+                    }
 
-                    if (!outdatedPackages.isEmpty()) {
+                    NightbreakPluginUpdater.PluginUpdateCheck pluginUpdateCheck = currentPluginUpdateCheck();
+                    boolean pluginUpdateAvailable = hasPluginUpdateNotice(pluginUpdateCheck);
+                    if (pluginUpdateAvailable && outdatedSnapshot.isEmpty()) {
                         Logger.sendSimpleMessage(event.getPlayer(), "<g:#8B0000:#CC4400:#DAA520>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬</g>");
-                        Logger.sendMessage(event.getPlayer(), CommandMessagesConfig.getDungeonsOutdatedMessage());
-                        for (EMPackage emPackage : outdatedPackages) {
-                            String name = emPackage.getContentPackagesConfigFields().getName();
-                            String link = emPackage.getContentPackagesConfigFields().getDownloadLink();
+                        sendPluginUpdateNotice(event.getPlayer(), pluginUpdateCheck);
+                        Logger.sendSimpleMessage(event.getPlayer(), "<g:#8B0000:#CC4400:#DAA520>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬</g>");
+                    }
 
-                            if (link != null && !link.isEmpty()) {
-                                // only send the hover-link if we actually have a URL
-                                event.getPlayer().spigot().sendMessage(
-                                        SpigotMessage.hoverLinkMessage(
-                                                CommandMessagesConfig.getVersionOutdatedEntryPrefix() + name,
-                                                ChatColorConverter.convert(CommandMessagesConfig.getVersionClickDownloadHover()),
-                                                link
-                                        )
-                                );
-                            } else {
-                                // fall back to plain text if link is missing
-                                event.getPlayer().sendMessage(
-                                        ChatColorConverter.convert(CommandMessagesConfig.getVersionOutdatedEntryPrefix() + name + CommandMessagesConfig.getVersionNoDownloadLink())
-                                );
-                            }
+                    if (!outdatedSnapshot.isEmpty()) {
+                        Logger.sendSimpleMessage(event.getPlayer(), "<g:#8B0000:#CC4400:#DAA520>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬</g>");
+                        if (pluginUpdateAvailable) {
+                            sendPluginUpdateNotice(event.getPlayer(), pluginUpdateCheck);
+                            Logger.sendSimpleMessage(event.getPlayer(), "&8&m-----------------------------------------------------");
+                        }
+                        Logger.sendMessage(event.getPlayer(), CommandMessagesConfig.getDungeonsOutdatedMessage());
+                        for (EMPackage emPackage : outdatedSnapshot) {
+                            String name = emPackage.getContentPackagesConfigFields().getName();
+                            sendContentPageEntry(event.getPlayer(), emPackage, CommandMessagesConfig.getVersionOutdatedEntryPrefix() + name);
                         }
 
                         event.getPlayer().spigot().sendMessage(
@@ -670,7 +771,7 @@ public class VersionChecker {
                                 ),
                                 SpigotMessage.simpleMessage(CommandMessagesConfig.getVersionSupportRoomMessage())
                         );
-                        // Suggest update command if Nightbreak token is registered
+                        // Suggest update command if an account token is registered
                         if (NightbreakAccount.hasToken()) {
                             event.getPlayer().spigot().sendMessage(
                                     SpigotMessage.commandHoverMessage(

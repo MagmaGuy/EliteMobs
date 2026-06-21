@@ -36,6 +36,10 @@ public class CommandMessagesConfig extends ConfigurationFile {
     private static String alreadyInInstanceMessage;
     @Getter
     private static String dungeonTeleportNotSetMessage;
+    @Getter
+    private static String dungeonLockoutPlayerNotValidMessage;
+    @Getter
+    private static String dungeonLockoutResetSuccessMessage;
 
     // Quest commands
     @Getter
@@ -547,6 +551,12 @@ public class CommandMessagesConfig extends ConfigurationFile {
         dungeonTeleportNotSetMessage = ConfigurationEngine.setString(
                 List.of("Sets the message sent when a dungeon teleport location is not set"),
                 file, fileConfiguration, "dungeonTeleportNotSetMessage", "[EliteMobs] Can't teleport you to the dungeon because the teleport location isn't set! If you are an admin, check the DungeonPackager config for this content and manually set the teleport location.", true);
+        dungeonLockoutPlayerNotValidMessage = ConfigurationEngine.setString(
+                List.of("Sets the message sent when a player name is not valid for the dungeon lockout reset command"),
+                file, fileConfiguration, "dungeonLockoutPlayerNotValidMessage", "[EliteMobs] Error - player name not valid! The player must be online.", true);
+        dungeonLockoutResetSuccessMessage = ConfigurationEngine.setString(
+                List.of("Sets the message sent when a player's dungeon boss lockouts are reset", "$player - the target player name", "$amount - the number of lockouts cleared"),
+                file, fileConfiguration, "dungeonLockoutResetSuccessMessage", "[EliteMobs] Cleared $amount dungeon boss lockout(s) for player $player", true);
 
         // Quest commands
         questPlayerNotValidMessage = ConfigurationEngine.setString(
@@ -1097,8 +1107,8 @@ public class CommandMessagesConfig extends ConfigurationFile {
                 List.of("Prefix for each outdated content entry in the list."),
                 file, fileConfiguration, "versionOutdatedEntryPrefix", "&c- ", true);
         versionNightbreakHover = ConfigurationEngine.setString(
-                List.of("Hover text for the Nightbreak content link."),
-                file, fileConfiguration, "versionNightbreakHover", "Click for Nightbreak link", true);
+                List.of("Hover text for the content link."),
+                file, fileConfiguration, "versionNightbreakHover", "Click for the content page", true);
         versionWikiHover = ConfigurationEngine.setString(
                 List.of("Hover text for the wiki link."),
                 file, fileConfiguration, "versionWikiHover", "Click for wiki link", true);
@@ -1121,14 +1131,14 @@ public class CommandMessagesConfig extends ConfigurationFile {
 
         // Download all content command
         downloadAllNoTokenMessage = ConfigurationEngine.setString(
-                List.of("Sets the message sent when no Nightbreak token is registered for download all"),
-                file, fileConfiguration, "downloadAllNoTokenMessage", "&c[EliteMobs] No Nightbreak token registered. Use /nightbreaklogin <token> first.", true);
+                List.of("Sets the message sent when no account token is registered for download all"),
+                file, fileConfiguration, "downloadAllNoTokenMessage", "&c[EliteMobs] No account token registered. Use /nightbreaklogin <token> first.", true);
         downloadAllNothingMessage = ConfigurationEngine.setString(
                 List.of("Sets the message sent when all available packages are already downloaded"),
                 file, fileConfiguration, "downloadAllNothingMessage", "&a[EliteMobs] No new content to download! All available packages are already downloaded.", true);
         downloadAllNoAccessMessage = ConfigurationEngine.setString(
                 List.of("Sets the message sent when no accessible content is found"),
-                file, fileConfiguration, "downloadAllNoAccessMessage", "&c[EliteMobs] No accessible content found. Link your Nightbreak account and ensure you have access.", true);
+                file, fileConfiguration, "downloadAllNoAccessMessage", "&c[EliteMobs] No accessible content found. Connect this server and ensure you have access.", true);
         downloadAllFoundMessage = ConfigurationEngine.setString(
                 List.of("Sets the message sent when downloadable packages are found", "$count - the number of packages"),
                 file, fileConfiguration, "downloadAllFoundMessage", "&e[EliteMobs] Found $count packages to download. Starting...", true);
@@ -1168,8 +1178,8 @@ public class CommandMessagesConfig extends ConfigurationFile {
 
         // Update content command
         updateNoTokenMessage = ConfigurationEngine.setString(
-                List.of("Sets the message sent when no Nightbreak token is registered"),
-                file, fileConfiguration, "updateNoTokenMessage", "&c[EliteMobs] No Nightbreak token registered. Use /nightbreaklogin <token> first.", true);
+                List.of("Sets the message sent when no account token is registered"),
+                file, fileConfiguration, "updateNoTokenMessage", "&c[EliteMobs] No account token registered. Use /nightbreaklogin <token> first.", true);
         updateAllUpToDateMessage = ConfigurationEngine.setString(
                 List.of("Sets the message sent when all content is up to date"),
                 file, fileConfiguration, "updateAllUpToDateMessage", "&a[EliteMobs] All content is up to date!", true);
