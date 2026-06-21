@@ -232,8 +232,8 @@ public class InitializeConfig extends ConfigurationFile {
                 List.of("Confirmation message sent after selecting recommended preset"),
                 file, fileConfiguration, "recommendedPresetClickConfirm", "<g:#228B22:#32CD32>Recommended installation</g> &7activated!", true);
         recommendedPresetClickNightbreakLogin = ConfigurationEngine.setString(
-                List.of("Nightbreak login prompt sent after selecting recommended preset"),
-                file, fileConfiguration, "recommendedPresetClickNightbreakLogin", "<g:#B8860B:#DAA520>Step 1:</g> &7Link your Nightbreak account: ", true);
+                List.of("Account token prompt sent after selecting recommended preset"),
+                file, fileConfiguration, "recommendedPresetClickNightbreakLogin", "<g:#B8860B:#DAA520>Step 1:</g> &7Connect this server: ", true);
         recommendedPresetClickDownloadAll = ConfigurationEngine.setString(
                 List.of("In-game content management message sent after selecting recommended preset"),
                 file, fileConfiguration, "recommendedPresetClickDownloadAll", "<g:#B8860B:#DAA520>Step 2:</g> &7Install & manage content in-game with ", true);
@@ -273,8 +273,8 @@ public class InitializeConfig extends ConfigurationFile {
                 List.of("Confirmation message sent after selecting content-only preset"),
                 file, fileConfiguration, "contentOnlyPresetClickConfirm", "<g:#DAA520:#F0C040>Content-only installation</g> &7activated!", true);
         contentOnlyPresetClickNightbreakLogin = ConfigurationEngine.setString(
-                List.of("Nightbreak login prompt sent after selecting content-only preset"),
-                file, fileConfiguration, "contentOnlyPresetClickNightbreakLogin", "<g:#B8860B:#DAA520>Step 1:</g> &7Link your Nightbreak account: ", true);
+                List.of("Account token prompt sent after selecting content-only preset"),
+                file, fileConfiguration, "contentOnlyPresetClickNightbreakLogin", "<g:#B8860B:#DAA520>Step 1:</g> &7Connect this server: ", true);
         contentOnlyPresetClickDownloadAll = ConfigurationEngine.setString(
                 List.of("In-game content management message sent after selecting content-only preset"),
                 file, fileConfiguration, "contentOnlyPresetClickDownloadAll", "<g:#B8860B:#DAA520>Step 2:</g> &7Install & manage content in-game with ", true);
@@ -357,11 +357,11 @@ public class InitializeConfig extends ConfigurationFile {
                 List.of("Hover tooltip for the Discord link"),
                 file, fileConfiguration, "discordLinkHover", "&7Click to join the Discord!", true);
         accountLinkDisplay = ConfigurationEngine.setString(
-                List.of("Display text for the clickable Nightbreak account link"),
+                List.of("Display text for the clickable account token link"),
                 file, fileConfiguration, "accountLinkDisplay", "&9&nnightbreak.io/account", true);
         accountLinkHover = ConfigurationEngine.setString(
-                List.of("Hover tooltip for the Nightbreak account link"),
-                file, fileConfiguration, "accountLinkHover", "&7Click to open the Nightbreak account page", true);
+                List.of("Hover tooltip for the account token link"),
+                file, fileConfiguration, "accountLinkHover", "&7Click to open the account token page", true);
         contentLinkDisplay = ConfigurationEngine.setString(
                 List.of("Display text for the clickable content browse link"),
                 file, fileConfiguration, "contentLinkDisplay", "&9&nnightbreak.io/elitemobs", true);

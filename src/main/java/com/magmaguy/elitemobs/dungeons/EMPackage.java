@@ -30,6 +30,8 @@ import java.util.*;
 
 public abstract class EMPackage extends ContentPackage implements NightbreakManagedContent {
 
+    private static final String ELITEMOBS_CONTENT_PAGE = "https://nightbreak.io/plugin/elitemobs/";
+
     protected static final HashMap<String, EMPackage> content = new HashMap<>();
     @Getter
     private static final Map<String, EMPackage> emPackages = new HashMap<>();
@@ -134,7 +136,7 @@ public abstract class EMPackage extends ContentPackage implements NightbreakMana
 
     protected ItemStack getInstalledItemStack() {
         return generateItemStackWithIcon(
-                List.of(DungeonsConfig.getContentInstalledLine1(), DungeonsConfig.getContentInstalledLine2()),
+                installedLore(),
                 Material.GREEN_STAINED_GLASS_PANE,
                 NightbreakSetupIcons.MODEL_CHECKMARK);
     }
@@ -157,7 +159,7 @@ public abstract class EMPackage extends ContentPackage implements NightbreakMana
     }
 
     protected ItemStack getNotDownloadedItemStack() {
-        // Determine icon based on Nightbreak token and access
+        // Determine icon based on account token and access
         String modelId;
         String slug = contentPackagesConfigFields.getNightbreakSlug();
 
@@ -210,7 +212,7 @@ public abstract class EMPackage extends ContentPackage implements NightbreakMana
 
     @Override
     protected ItemStack getOutOfDateUpdatableItemStack() {
-        // Determine icon based on Nightbreak token status
+        // Determine icon based on account token status
         String modelId;
         String slug = contentPackagesConfigFields.getNightbreakSlug();
 
@@ -283,6 +285,31 @@ public abstract class EMPackage extends ContentPackage implements NightbreakMana
         return itemStack;
     }
 
+    private List<String> installedLore() {
+        return List.of(
+                normalizedInstalledLoreLine(DungeonsConfig.getContentInstalledLine1(),
+                        "Content is installed!",
+                        "Content is installed and up to date.",
+                        "&a"),
+                normalizedInstalledLoreLine(DungeonsConfig.getContentInstalledLine2(),
+                        "Click to uninstall!",
+                        "Click to uninstall.",
+                        "&7"));
+    }
+
+    private static String normalizedInstalledLoreLine(String configuredLine,
+                                                      String oldDefault,
+                                                      String newDefault,
+                                                      String fallbackColor) {
+        String line = configuredLine == null || configuredLine.isBlank() ? newDefault : configuredLine;
+        if (line.trim().equalsIgnoreCase(oldDefault)) line = newDefault;
+        return hasFormatting(line) ? line : fallbackColor + line;
+    }
+
+    private static boolean hasFormatting(String line) {
+        return line.contains("&") || line.contains("§") || line.contains("<");
+    }
+
     public abstract void doInstall(Player player);
 
     public abstract void doUninstall(Player player);
@@ -308,7 +335,7 @@ public abstract class EMPackage extends ContentPackage implements NightbreakMana
             return;
         }
 
-        // If no Nightbreak token registered, prompt user
+        // If no account token is registered, prompt user
         if (!NightbreakAccount.hasToken()) {
             Logger.sendSimpleMessage(player, DungeonsConfig.getContentDownloadSeparator());
             Logger.sendSimpleMessage(player, DungeonsConfig.getContentNightbreakPromptLine1());
@@ -324,7 +351,7 @@ public abstract class EMPackage extends ContentPackage implements NightbreakMana
                     SpigotMessage.hoverLinkMessage(
                             InitializeConfig.getContentLinkDisplay(),
                             InitializeConfig.getContentLinkHover(),
-                            "https://nightbreak.io/plugin/elitemobs/"));
+                            getContentPageUrl()));
             Logger.sendSimpleMessage(player, DungeonsConfig.getContentDownloadSeparator());
             return;
         }
@@ -380,7 +407,7 @@ public abstract class EMPackage extends ContentPackage implements NightbreakMana
                 SpigotMessage.hoverLinkMessage(
                         InitializeConfig.getContentLinkDisplay(),
                         InitializeConfig.getContentLinkHover(),
-                        "https://nightbreak.io/plugin/elitemobs/"));
+                        getContentPageUrl()));
         if (cachedAccessInfo != null) {
             if (cachedAccessInfo.patreonLink != null && !cachedAccessInfo.patreonLink.isEmpty()) {
                 player.spigot().sendMessage(
@@ -467,6 +494,14 @@ public abstract class EMPackage extends ContentPackage implements NightbreakMana
     @Override
     public String getDownloadLink() {
         return contentPackagesConfigFields.getDownloadLink();
+    }
+
+    public String getContentPageUrl() {
+        String downloadLink = contentPackagesConfigFields.getDownloadLink();
+        if (downloadLink != null && !downloadLink.isBlank()) return downloadLink;
+        String slug = contentPackagesConfigFields.getNightbreakSlug();
+        if (slug != null && !slug.isBlank()) return ELITEMOBS_CONTENT_PAGE + "#" + slug;
+        return ELITEMOBS_CONTENT_PAGE;
     }
 
     @Override

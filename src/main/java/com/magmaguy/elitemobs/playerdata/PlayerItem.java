@@ -38,6 +38,7 @@ public class PlayerItem {
     private double eliteDamageReduction = 0;
     private double protectionProjectile = 0;
     private double eliteDamage = 0;
+    private double eliteEnchantmentDamage = 0;
     private double blastProtection = 0;
     private double loudStrikesBonus = 0;
 
@@ -111,6 +112,7 @@ public class PlayerItem {
 
         //Neither offhand nor armor contribute to baseline damage outside of the enchants, so we reset the damage before anything
         this.eliteDamage = 0;
+        this.eliteEnchantmentDamage = 0;
 
         //case when the item changed during runtime to another valid ItemStack
         this.itemStack = itemStack;
@@ -147,7 +149,7 @@ public class PlayerItem {
         this.earthquakeLevel = ItemTagger.getEnchantment(itemStack.getItemMeta(), new NamespacedKey(MetadataHandler.PLUGIN, EarthquakeEnchantment.key));
         this.thornsLevel = ItemTagger.getEnchantment(itemStack.getItemMeta(), Enchantment.THORNS.getKey());
         this.loudStrikesBonus = ItemTagger.getEnchantment(itemStack.getItemMeta(), new NamespacedKey(MetadataHandler.PLUGIN, LoudStrikesEnchantment.key)) / 3d;
-        eliteDamage += EliteItemManager.getEliteDamageFromEnchantments(itemStack);
+        eliteEnchantmentDamage = EliteItemManager.getEliteDamageFromEnchantments(itemStack);
 
         return true;
 
@@ -169,6 +171,7 @@ public class PlayerItem {
         eliteDamageReduction = 0;
         protectionProjectile = 0;
         eliteDamage = 0;
+        eliteEnchantmentDamage = 0;
         blastProtection = 0;
         loudStrikesBonus = 0;
         return true;
@@ -182,6 +185,11 @@ public class PlayerItem {
     public double getEliteDamage(ItemStack itemStack, boolean update) {
         if (update) fullUpdate(itemStack);
         return this.eliteDamage;
+    }
+
+    public double getEliteEnchantmentDamage(ItemStack itemStack, boolean update) {
+        if (update) fullUpdate(itemStack);
+        return this.eliteEnchantmentDamage;
     }
 
     public double getEliteDefense(ItemStack itemStack, boolean update) {

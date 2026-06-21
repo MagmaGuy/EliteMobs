@@ -21,6 +21,7 @@ import javax.annotation.Nullable;
 
 public class EliteItemManager {
     //This is a utility class for easy and fast interfacing with EliteMobs items! Use it as a shortcut to reading source.
+    public static final double DAMAGE_ENCHANTMENT_PERCENT_PER_LEVEL = 0.025;
 
     /**
      * Calculates the Elite DPS of an item aka EDPS. This is the damage per second dealt to Elites, which may or may not
@@ -30,7 +31,9 @@ public class EliteItemManager {
      * @return The EDPS of the ItemStack. Defaults to 4 as that is the unarmed DPS!
      */
     public static double getDPS(@Nullable ItemStack itemStack) {
-        return getDPS(getAttackSpeed(itemStack), getBaseDamage(itemStack)) + getDPS(getAttackSpeed(itemStack), getEliteMobsSpecificDamage(itemStack));
+        double attackSpeed = getAttackSpeed(itemStack);
+        double flatDamage = getBaseDamage(itemStack) + getEliteMobsSpecificDamage(itemStack);
+        return getDPS(attackSpeed, flatDamage * getEliteDamageEnchantmentMultiplier(itemStack));
     }
 
     /**
@@ -159,36 +162,36 @@ public class EliteItemManager {
     }
 
     /**
-     * Calculates the damage specific to EliteMobs. More specifically, scans for the elite enchantment level of sharpness
-     * or power and adds the elite damage stored on the item. Note that this only adds elite enchantments, not vanilla ones.
-     * Those get handled through vanilla means!
+     * Calculates the EliteMobs Sharpness/Power damage bonus. The returned value is a bonus amount
+     * (0.15 means +15% damage), not flat damage. Elite enchantment lore can split high levels into
+     * vanilla + elite display portions, but combat uses the total stored level so crossing the
+     * vanilla max level never reduces damage.
      *
-     * @return The bonus damage
+     * @return The bonus damage amount, where 0.15 means +15%
      */
     public static double getEliteDamageFromEnchantments(@Nullable ItemStack itemStack) {
         if (itemStack == null) return 0;
-        //Elite Items may have elite enchantments associated to an item
-        int enchantmentLevel = ItemTagger.getEnchantment(itemStack.getItemMeta(), Enchantment.SHARPNESS.getKey());
-        if (enchantmentLevel > 0 && ItemSettingsConfig.isUseEliteEnchantments()) {
-            enchantmentLevel -= Enchantment.SHARPNESS.getMaxLevel();
-            if (enchantmentLevel < 0) enchantmentLevel = 0;
-        } else {
-            enchantmentLevel = ItemTagger.getEnchantment(itemStack.getItemMeta(), Enchantment.POWER.getKey());
-            if (enchantmentLevel > 0 && ItemSettingsConfig.isUseEliteEnchantments())
-                enchantmentLevel -= Enchantment.POWER.getMaxLevel();
-            if (enchantmentLevel < 0) enchantmentLevel = 0;
-        }
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        if (itemMeta == null) return 0;
 
-        if (enchantmentLevel < 1)
-            //Note: this means sharpness works on bows and that power works on weapons. By default, this state is not reachable, so it doesn't really matter.
-            enchantmentLevel += itemStack.getEnchantmentLevel(Enchantment.POWER) + itemStack.getEnchantmentLevel(Enchantment.SHARPNESS);
-        if (enchantmentLevel == 0) return 0;
-        //This is how vanilla sharpness works. Might as well use it for everything.
-        return 1 + enchantmentLevel * 0.5;
+        // Note: this means Sharpness works on bows and Power works on weapons.
+        // By default, this state is not reachable, so it doesn't really matter.
+        int enchantmentLevel = ItemTagger.getEnchantment(itemMeta, Enchantment.SHARPNESS.getKey()) +
+                ItemTagger.getEnchantment(itemMeta, Enchantment.POWER.getKey());
+        return calculateDamageEnchantmentBonus(enchantmentLevel);
     }
 
-    public static double getEliteMobsSpecificDamage(ItemStack itemStack) {
-        return getEliteDamageFromEliteAttributes(itemStack) + getEliteDamageFromEnchantments(itemStack);
+    public static double getEliteDamageEnchantmentMultiplier(@Nullable ItemStack itemStack) {
+        return 1.0 + getEliteDamageFromEnchantments(itemStack);
+    }
+
+    static double calculateDamageEnchantmentBonus(int enchantmentLevel) {
+        if (enchantmentLevel < 1) return 0;
+        return enchantmentLevel * DAMAGE_ENCHANTMENT_PERCENT_PER_LEVEL;
+    }
+
+    public static double getEliteMobsSpecificDamage(@Nullable ItemStack itemStack) {
+        return getEliteDamageFromEliteAttributes(itemStack);
     }
 
     /**
@@ -199,9 +202,10 @@ public class EliteItemManager {
      */
     public static double getTotalDPS(@Nullable ItemStack itemStack) {
         if (itemStack == null) return 0;
-        double bonusDamage = getEliteMobsSpecificDamage(itemStack);
-        if (bonusDamage == 0) return 0;
-        return getDPS(getAttackSpeed(itemStack), bonusDamage);
+        double attackSpeed = getAttackSpeed(itemStack);
+        double baseDPS = getDPS(attackSpeed, getBaseDamage(itemStack));
+        double totalDPS = getDPS(itemStack);
+        return Math.max(totalDPS - baseDPS, 0);
     }
 
     /**

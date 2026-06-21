@@ -109,6 +109,8 @@ import com.magmaguy.magmacore.MagmaCore;
 import com.magmaguy.magmacore.initialization.PluginInitializationConfig;
 import com.magmaguy.magmacore.initialization.PluginInitializationContext;
 import com.magmaguy.magmacore.location.LocationQueryRegistry;
+import com.magmaguy.magmacore.nightbreak.NightbreakPluginSpec;
+import com.magmaguy.magmacore.nightbreak.NightbreakPluginUpdater;
 import com.magmaguy.magmacore.util.Logger;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
@@ -124,6 +126,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EliteMobs extends JavaPlugin {
+
+    public static final NightbreakPluginSpec NIGHTBREAK_PLUGIN_SPEC = new NightbreakPluginSpec(
+            "EliteMobs",
+            "em",
+            "elitemobs.downloadall",
+            "elitemobs.setup",
+            "elitemobs.setup",
+            "https://nightbreak.io/plugin/elitemobs/",
+            "Reloaded EliteMobs.");
 
     public static List<World> validWorldList = new ArrayList<>();
     public static boolean worldGuardIsEnabled = false;
@@ -151,6 +162,7 @@ public class EliteMobs extends JavaPlugin {
         new LuaPowersConfig();
         new PowersConfig();
         MobPropertiesConfig.initializeConfigs();
+        new EliteMobPowersConfig();
         CustomEnchantment.initializeCustomEnchantments();
 
         new MobCombatSettingsConfig();
@@ -235,6 +247,7 @@ public class EliteMobs extends JavaPlugin {
                     MetadataHandler.pluginState = PluginState.INITIALIZED;
                     Bukkit.getPluginManager().callEvent(new EliteMobsInitializedEvent());
                     Logger.info("EliteMobs fully initialized!");
+                    NightbreakPluginUpdater.autoDownloadPluginUpdateIfEnabled(this, NIGHTBREAK_PLUGIN_SPEC);
                     if (MetadataHandler.pendingReloadSender != null) {
                         Logger.sendMessage(MetadataHandler.pendingReloadSender, com.magmaguy.elitemobs.config.CommandMessagesConfig.getReloadSuccessMessage());
                         MetadataHandler.pendingReloadSender = null;

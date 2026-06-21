@@ -22,7 +22,7 @@ import java.util.Set;
 /**
  * A special ContentPackage that acts as a "Download All" button in the setup menu.
  * Behavior adapts to the server's content state:
- * - No token: shows Nightbreak setup instructions
+ * - No token: shows setup instructions
  * - Content not downloaded: downloads all available content
  * - Content out of date: updates all outdated content
  * - All up to date: shows success message
@@ -47,14 +47,14 @@ public class DownloadAllPackage extends ContentPackage {
             baseMaterial = Material.RED_STAINED_GLASS_PANE;
             displayName = "&cDownload All";
             lore = List.of(
-                    "&7No Nightbreak token linked.",
+                    "&7No account token linked.",
                     "&7Click for setup instructions.");
         } else if (NightbreakAccount.hasAuthFailure()) {
             iconModel = NightbreakSetupIcons.MODEL_RED_CROSS;
             baseMaterial = Material.RED_STAINED_GLASS_PANE;
-            displayName = "&eUpdate Nightbreak Token";
+            displayName = "&eUpdate Account Token";
             lore = List.of(
-                    "&7Your saved Nightbreak token needs",
+                    "&7Your saved account token needs",
                     "&7to be updated before downloads work.");
         } else {
             long notDownloadedCount = countNotDownloaded(allPackages);
@@ -186,7 +186,7 @@ public class DownloadAllPackage extends ContentPackage {
             return;
         }
 
-        // Download missing and/or update outdated content
+        // Download missing and/or update outdated content.
         Bukkit.dispatchCommand(player, "elitemobs downloadall");
     }
 

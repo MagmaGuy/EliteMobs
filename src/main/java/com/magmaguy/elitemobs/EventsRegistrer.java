@@ -329,6 +329,9 @@ public class EventsRegistrer {
         //Prevent elitemob on elitemob aggro
         register(new EnderDragonUnstuck.AggroPrevention());
 
+        //Prevent players from taming elitemobs (e.g. WOLF-type bosses with bones)
+        register(new TamePrevention());
+
         //Player effect when a rare item is on the ground
         register(new RareDropEffect());
 

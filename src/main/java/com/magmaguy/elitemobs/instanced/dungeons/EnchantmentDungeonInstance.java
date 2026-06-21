@@ -29,6 +29,7 @@ public class EnchantmentDungeonInstance extends DungeonInstance {
     @Getter
     @Setter
     private ItemStack currentItem;
+    private boolean challengeResolved = false;
 
     public EnchantmentDungeonInstance(ContentPackagesConfigFields contentPackagesConfigFields,
                                       Location lobbyLocation,
@@ -57,9 +58,9 @@ public class EnchantmentDungeonInstance extends DungeonInstance {
 
         if (!launchEvent(contentPackagesConfigFields, instancedWordName, player)) return false;
 
-        // Clone items before passing to lambda to avoid modification
-        ItemStack upgradedItemClone = upgradedItem.clone();
-        ItemStack currentItemClone = itemFromInventory.clone();
+        // Clone single-item snapshots before passing to lambda to avoid later stack mutation.
+        ItemStack upgradedItemClone = cloneSingleItem(upgradedItem);
+        ItemStack currentItemClone = cloneSingleItem(itemFromInventory);
 
         WorldOperationQueue.queueOperation(
                 player,
@@ -77,6 +78,12 @@ public class EnchantmentDungeonInstance extends DungeonInstance {
         return true;
     }
 
+    private static ItemStack cloneSingleItem(ItemStack itemStack) {
+        ItemStack clone = itemStack.clone();
+        clone.setAmount(1);
+        return clone;
+    }
+
     @Override
     public void endMatch() {
         if (players.isEmpty()) {
@@ -91,44 +98,35 @@ public class EnchantmentDungeonInstance extends DungeonInstance {
 
     @Override
     protected void victory() {
+        if (!markChallengeResolved()) return;
         super.victory();
         player.sendMessage(DungeonsConfig.getEnchantChallengeCompleteMessage());
         player.sendMessage(DungeonsConfig.getEnchantChallengeSuccessMessage());
         ItemEnchantmentMenu.broadcastEnchantmentMessage(upgradedItem, player, SpecialItemSystemsConfig.getSuccessAnnouncement());
-        //scanCurrentItemForRemoval();
         HashMap<Integer, ItemStack> leftOvers = player.getInventory().addItem(upgradedItem);
-        if (!leftOvers.isEmpty()) player.getWorld().dropItem(player.getLocation(), upgradedItem);
+        if (!leftOvers.isEmpty())
+            leftOvers.values().forEach(leftover -> player.getWorld().dropItem(player.getLocation(), leftover));
     }
 
     @Override
     protected void defeat() {
+        if (!markChallengeResolved()) return;
         super.defeat();
         if (ThreadLocalRandom.current().nextDouble() < SpecialItemSystemsConfig.getCriticalFailureChanceDuringChallengeChance()) {
             player.sendMessage(DungeonsConfig.getEnchantCriticalFailureMessage().replace("$item", currentItem.getItemMeta().getDisplayName()));
             ItemEnchantmentMenu.broadcastEnchantmentMessage(upgradedItem, player, SpecialItemSystemsConfig.getCriticalFailureAnnouncement());
-            //scanCurrentItemForRemoval();
         } else {
             player.sendMessage(DungeonsConfig.getEnchantChallengeFailedMessage().replace("$item", currentItem.getItemMeta().getDisplayName()));
             HashMap<Integer, ItemStack> leftOvers = player.getInventory().addItem(currentItem);
-            if (!leftOvers.isEmpty()) player.getWorld().dropItem(player.getLocation(), currentItem);
+            if (!leftOvers.isEmpty())
+                leftOvers.values().forEach(leftover -> player.getWorld().dropItem(player.getLocation(), leftover));
         }
     }
 
-    /*
-    private void scanCurrentItemForRemoval() {
-        if (player.getInventory().contains(currentItem))
-            player.getInventory().remove(currentItem);
-        else if (player.getInventory().getHelmet() != null && player.getInventory().getHelmet().equals(currentItem))
-            player.getInventory().setHelmet(null);
-        else if (player.getInventory().getChestplate() != null && player.getInventory().getChestplate().equals(currentItem))
-            player.getInventory().setChestplate(null);
-        else if (player.getInventory().getLeggings() != null && player.getInventory().getLeggings().equals(currentItem))
-            player.getInventory().setLeggings(null);
-        else if (player.getInventory().getBoots() != null && player.getInventory().getBoots().equals(currentItem))
-            player.getInventory().setBoots(null);
-        else if (player.getInventory().getItemInOffHand().equals(currentItem))
-            player.getInventory().setItemInOffHand(null);
+    private boolean markChallengeResolved() {
+        if (challengeResolved) return false;
+        challengeResolved = true;
+        return true;
     }
-     */
 
 }

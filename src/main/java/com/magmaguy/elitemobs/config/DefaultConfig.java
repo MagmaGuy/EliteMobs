@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.commands.ReloadCommand;
 import com.magmaguy.elitemobs.config.translations.TranslationsConfig;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.magmacore.config.ConfigurationFile;
+import com.magmaguy.magmacore.nightbreak.NightbreakPluginUpdater;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -83,6 +84,8 @@ public class DefaultConfig extends ConfigurationFile {
     private static String enchantmentChallengeStartMessage;
     @Getter
     private static boolean useRandomizedScalingForElites;
+    @Getter
+    private static boolean autoDownloadPluginUpdates;
 
     public static boolean useResourcePackModels(){
         return DefaultConfig.useResourcePackEvenIfResourcePackManagerIsNotInstalled || Bukkit.getPluginManager().isPluginEnabled("ResourcePackManager");
@@ -227,5 +230,6 @@ public class DefaultConfig extends ConfigurationFile {
                 List.of("Sets whether the scale (size) of the elites will be slightly randomized, for variety.",
                         "May mess with spawners, which may or may not be a good thing (I think it is >:] )"),
                 fileConfiguration, "useRandomizedScalingForElites", false);
+        autoDownloadPluginUpdates = NightbreakPluginUpdater.setAutoDownloadConfigDefault(fileConfiguration);
     }
 }

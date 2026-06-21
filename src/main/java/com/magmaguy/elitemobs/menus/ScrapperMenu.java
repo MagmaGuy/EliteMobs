@@ -147,6 +147,7 @@ public class ScrapperMenu extends EliteMenu {
                 if (event.getSlot() == ScrapperMenuConfig.confirmSlot) {
                     int successes = 0;
                     int failures = 0;
+                    boolean generationFailed = false;
                     for (Integer validSlot : validSlots) {
                         ItemStack itemStack = shopInventory.getItem(validSlot);
                         if (itemStack == null)
@@ -155,6 +156,7 @@ public class ScrapperMenu extends EliteMenu {
                         ItemStack scrapItem = RepairEnchantment.generateScrap(itemStack, player, null);
                         if (scrapItem == null) {
                             // Don't consume the item if scrap generation failed
+                            generationFailed = true;
                             continue;
                         }
 
@@ -173,6 +175,10 @@ public class ScrapperMenu extends EliteMenu {
                         player.sendMessage(ItemSettingsConfig.getScrapSucceededMessage().replace("$amount", successes + ""));
                     if (failures > 0)
                         player.sendMessage(ItemSettingsConfig.getScrapFailedMessage().replace("$amount", failures + ""));
+                    // Without this, a misconfigured scrap item (generateScrap returns null) leaves the button
+                    // looking dead: nothing is consumed and no success/failure message is sent.
+                    if (successes == 0 && failures == 0 && generationFailed)
+                        player.sendMessage(ItemSettingsConfig.getScrapNotConfiguredMessage());
 
                     return;
                 }

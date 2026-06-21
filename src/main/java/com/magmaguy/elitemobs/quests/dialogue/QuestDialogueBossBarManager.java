@@ -46,7 +46,6 @@ public class QuestDialogueBossBarManager {
     private static final int TOTAL_BARS = PROMPT_BAR_INDEX + 1;
     private static final int DIALOGUE_SLOWNESS_AMPLIFIER = 2;
     private static final int DIALOGUE_SLOWNESS_DURATION_TICKS = 20 * 30;
-    private static final String PROMPT_TEXT = "&7&oSneak to continue";
     private static final Map<UUID, DialogueSession> activeSessions = new ConcurrentHashMap<>();
     private static final Map<String, Long> recentlyShownTurnInDialogs = new ConcurrentHashMap<>();
 
@@ -423,7 +422,7 @@ public class QuestDialogueBossBarManager {
     private static String formatPrompt() {
         return OffsetFontUtil.shift(
                 ChatColorConverter.convert(QuestsConfig.getQuestDialogueLinePrefix()
-                        + PROMPT_TEXT
+                        + QuestsConfig.getQuestDialoguePromptText()
                         + QuestsConfig.getQuestDialogueLineSuffix()),
                 QuestsConfig.getQuestDialoguePromptOffsetX());
     }

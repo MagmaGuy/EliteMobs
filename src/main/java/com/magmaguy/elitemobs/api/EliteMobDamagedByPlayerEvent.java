@@ -94,6 +94,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * formulaDamage = baseDamage × attackSpeedFactor × skillAdjustment
  *               × weaponAdjustment × cooldownOrVelocity × sweepMultiplier
  *               × potionMultiplier
+ *               × equipmentEnchantmentMultiplier
  *               × enchantmentMultiplier
  *
  * finalDamage = max(formulaDamage, 1) × damageModifier × combatMultiplier × critMultiplier
@@ -114,6 +115,8 @@ import java.util.concurrent.ThreadLocalRandom;
  *       <td>{@link PlayerAttackCooldownTracker} / {@link WeaponOffenseCalculator#normalizeArrowVelocity}</td></tr>
  *   <tr><td>sweepMultiplier</td><td>0.25 for sweep targets, 1.0 primary</td><td>{0.25, 1.0}</td>
  *       <td>{@link WeaponOffenseCalculator#getSweepMultiplier}</td></tr>
+ *   <tr><td>equipmentEnchantmentMultiplier</td><td>1.0 + Sharpness / Power levels × 0.025 from equipped items</td><td>multiplicative</td>
+ *       <td>{@link ElitePlayerInventory#getEliteEnchantmentDamage}</td></tr>
  *   <tr><td>enchantmentMultiplier</td><td>1.0 + eliteEnchantLvl × 0.025</td><td>[1.0, ~1.2]</td>
  *       <td>Smite / Bane of Arthropods (elite-only levels)</td></tr>
  *   <tr><td>damageModifier</td><td>boss-specific damage reduction</td><td>[0, 1]</td>
@@ -795,6 +798,8 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
          *       {@link WeaponOffenseCalculator#normalizeArrowVelocity} (ranged) — [0, 1]</li>
          *   <li><b>Sweep multiplier</b> = {@link WeaponOffenseCalculator#SWEEP_DAMAGE_FRACTION}
          *       for sweep secondary targets, 1.0 for primary — handles sword sweep</li>
+         *   <li><b>Equipment enchantment multiplier</b> = 1.0 + Sharpness / Power levels × 0.025
+         *       summed from all equipped slots, preserving legacy global-slot behavior</li>
          *   <li><b>Enchantment multiplier</b> = 1.0 + eliteEnchantLevel × 0.025
          *       — Smite / Bane of Arthropods (elite-only levels above vanilla max)</li>
          * </ol>
@@ -929,12 +934,19 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
             // 7. Strength/Weakness potion scaling
             double potionMultiplier = PotionCombatModifierCalculator.getOutgoingDamageMultiplier(player);
 
-            // 8. Secondary enchantment multiplier (Smite/Bane)
+            // 8. Sharpness/Power percentage bonus from all equipped slots.
+            ElitePlayerInventory elitePlayerInventory = ElitePlayerInventory.getPlayer(player);
+            double equipmentEnchantmentBonus = elitePlayerInventory != null
+                    ? elitePlayerInventory.getEliteEnchantmentDamage(true)
+                    : 0D;
+            double equipmentEnchantmentMultiplier = 1.0 + equipmentEnchantmentBonus;
+
+            // 9. Secondary enchantment multiplier (Smite/Bane)
             LivingEntity target = eliteEntity.getLivingEntity();
             double enchantmentMultiplier = (target != null) ?
                     getSecondaryEnchantmentMultiplier(player, target) : 1.0;
 
-            // 9. Skill-spawned arrow damage multiplier (Multishot, Arrow Rain, etc.)
+            // 10. Skill-spawned arrow damage multiplier (Multishot, Arrow Rain, etc.)
             // Skills that spawn extra arrows store a damage multiplier in the arrow's PDC
             // to reduce their damage relative to the formula output.
             double arrowDamageMultiplier = 1.0;
@@ -949,6 +961,7 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
             double formulaDamage = baseDamage * attackSpeedFactor * skillAdjustment
                     * weaponAdjustment * cooldownOrVelocity * sweepMultiplier
                     * potionMultiplier
+                    * equipmentEnchantmentMultiplier
                     * enchantmentMultiplier * arrowDamageMultiplier;
 
             // Populate breakdown if tracking is active
@@ -961,6 +974,7 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
                 breakdown.setCooldownOrVelocity(cooldownOrVelocity);
                 breakdown.setSweepMultiplier(sweepMultiplier);
                 breakdown.setPotionMultiplier(potionMultiplier);
+                breakdown.setEquipmentEnchantmentMultiplier(equipmentEnchantmentMultiplier);
                 breakdown.setEnchantmentMultiplier(enchantmentMultiplier);
                 breakdown.setArrowDamageMultiplier(arrowDamageMultiplier);
                 breakdown.setPlayerSkillLevel(weaponSkillLevel);
@@ -984,6 +998,7 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
                             : "") +
                     (potionMultiplier != 1.0 ? " Pot=" + String.format("%.2f", potionMultiplier) : "") +
                     (isSweep ? " Sweep=" + String.format("%.2f", sweepMultiplier) : "") +
+                    (equipmentEnchantmentMultiplier != 1.0 ? " EquipEnchant=" + String.format("%.2f", equipmentEnchantmentMultiplier) + "x" : "") +
                     (arrowDamageMultiplier != 1.0 ? " ArrowMult=" + String.format("%.2f", arrowDamageMultiplier) : "") +
                     " = " + String.format("%.1f", formulaDamage));
 
@@ -1026,6 +1041,11 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
                         + " §8(SWEEP_DAMAGE_FRACTION for sweep secondaries, 1.0 otherwise)");
                 DebugMessage.send(player, "§7× Potion multiplier (outgoing) = §f"
                         + String.format("%.3f", potionMultiplier) + " §8(strength/weakness on you)");
+                DebugMessage.send(player, "§7× Equipment enchantment multiplier = §f"
+                        + String.format("%.3f", equipmentEnchantmentMultiplier)
+                        + " §8(Sharpness/Power from all equipped slots; +"
+                        + String.format("%.1f", equipmentEnchantmentBonus * 100)
+                        + "% damage)");
                 DebugMessage.send(player, "§7× Enchantment multiplier = §f"
                         + String.format("%.3f", enchantmentMultiplier)
                         + " §8(Smite/Bane elite-only levels above vanilla max)");

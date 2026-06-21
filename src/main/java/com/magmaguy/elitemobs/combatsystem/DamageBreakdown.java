@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * The offensive damage formula uses multiplicative layers:
  * <pre>
  * formulaDamage = baseDamage × attackSpeedFactor × skillAdjustment × weaponAdjustment × cooldownOrVelocity × sweepMultiplier × potionMultiplier
+ *               × equipmentEnchantmentMultiplier × enchantmentMultiplier × arrowDamageMultiplier
  * finalDamage = max(formulaDamage, 1) × damageModifier × combatMultiplier × critMultiplier
  * </pre>
  * <p>
@@ -25,6 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *   <li><b>Weapon Adjustment</b>: two-part linear curve from weapon level vs mob level [0.5, 1.25]</li>
  *   <li><b>Cooldown/Velocity</b>: attack cooldown (melee) or arrow velocity (ranged) [0, 1]</li>
  *   <li><b>Sweep Multiplier</b>: 0.25 for sweep secondary targets, 1.0 otherwise</li>
+ *   <li><b>Equipment Enchantment Multiplier</b>: Sharpness/Power percentage bonus from all equipped slots</li>
  *   <li><b>Damage Modifier</b>: boss-specific damage reduction</li>
  *   <li><b>Combat Multiplier</b>: global config multiplier</li>
  *   <li><b>Critical Strike</b>: 1.5x on critical hits</li>
@@ -44,6 +46,7 @@ public class DamageBreakdown {
     @Getter @Setter private double sweepMultiplier = 1.0;
     @Getter @Setter private double potionMultiplier = 1.0;
     @Getter @Setter private double thornsDamage = 0;
+    @Getter @Setter private double equipmentEnchantmentMultiplier = 1.0;
     @Getter @Setter private double enchantmentMultiplier = 1.0;
     @Getter @Setter private double arrowDamageMultiplier = 1.0;
 
@@ -180,6 +183,7 @@ public class DamageBreakdown {
             formulaDamage = baseDamage * attackSpeedFactor * skillAdjustment
                     * weaponAdjustment * cooldownOrVelocity * sweepMultiplier
                     * potionMultiplier
+                    * equipmentEnchantmentMultiplier
                     * enchantmentMultiplier * arrowDamageMultiplier;
         }
 
@@ -223,6 +227,9 @@ public class DamageBreakdown {
             }
             if (potionMultiplier != 1.0) {
                 sb.append(String.format("§7Potion Multiplier: §e%.2fx\n", potionMultiplier));
+            }
+            if (equipmentEnchantmentMultiplier != 1.0) {
+                sb.append(String.format("§7Equipment Enchantment Multiplier: §e%.2fx\n", equipmentEnchantmentMultiplier));
             }
             if (enchantmentMultiplier != 1.0) {
                 sb.append(String.format("§7Enchantment Multiplier: §e%.2fx\n", enchantmentMultiplier));

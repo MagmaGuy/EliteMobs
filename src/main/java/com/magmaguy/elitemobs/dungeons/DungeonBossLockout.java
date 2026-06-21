@@ -105,6 +105,31 @@ public class DungeonBossLockout implements Serializable {
     }
 
     /**
+     * Removes a single boss lockout.
+     * Useful for freeing a player from a specific lockout after a config change, since lockouts are
+     * stored as absolute timestamps and can otherwise outlive a shortened lockout duration.
+     *
+     * @param bossIdentifier The unique boss identifier
+     * @return true if a lockout was removed, false if none existed
+     */
+    public boolean removeLockout(String bossIdentifier) {
+        return lockouts.remove(bossIdentifier) != null;
+    }
+
+    /**
+     * Clears every boss lockout for this player.
+     * Useful for freeing a player from all lockouts after a config change, since lockouts are stored as
+     * absolute timestamps and can otherwise outlive a shortened lockout duration.
+     *
+     * @return the number of lockouts that were cleared
+     */
+    public int clearLockouts() {
+        int cleared = lockouts.size();
+        lockouts.clear();
+        return cleared;
+    }
+
+    /**
      * Cleans up expired lockouts from the map.
      */
     public void cleanupExpiredLockouts() {
