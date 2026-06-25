@@ -320,10 +320,10 @@ public class EliteItemSkins {
             case SWORD -> applyWeaponAttributes(meta, NETHERITE_SWORD_DAMAGE, SWORD_ATTACK_SPEED, levelMultiplier, EquipmentSlotGroup.MAINHAND);
             case AXE -> applyWeaponAttributes(meta, NETHERITE_AXE_DAMAGE, AXE_ATTACK_SPEED, levelMultiplier, EquipmentSlotGroup.MAINHAND);
             case SCYTHE -> applyWeaponAttributes(meta, NETHERITE_HOE_DAMAGE, HOE_ATTACK_SPEED, levelMultiplier, EquipmentSlotGroup.MAINHAND);
-            case HELMET -> applyArmorAttributes(meta, NETHERITE_HELMET_ARMOR, levelMultiplier, EquipmentSlotGroup.HEAD, "head");
-            case CHESTPLATE -> applyArmorAttributes(meta, NETHERITE_CHESTPLATE_ARMOR, levelMultiplier, EquipmentSlotGroup.CHEST, "chest");
-            case LEGGINGS -> applyArmorAttributes(meta, NETHERITE_LEGGINGS_ARMOR, levelMultiplier, EquipmentSlotGroup.LEGS, "legs");
-            case BOOTS -> applyArmorAttributes(meta, NETHERITE_BOOTS_ARMOR, levelMultiplier, EquipmentSlotGroup.FEET, "feet");
+            case HELMET -> applyArmorAttributes(meta, NETHERITE_HELMET_ARMOR, levelMultiplier, EquipmentSlotGroup.HEAD);
+            case CHESTPLATE -> applyArmorAttributes(meta, NETHERITE_CHESTPLATE_ARMOR, levelMultiplier, EquipmentSlotGroup.CHEST);
+            case LEGGINGS -> applyArmorAttributes(meta, NETHERITE_LEGGINGS_ARMOR, levelMultiplier, EquipmentSlotGroup.LEGS);
+            case BOOTS -> applyArmorAttributes(meta, NETHERITE_BOOTS_ARMOR, levelMultiplier, EquipmentSlotGroup.FEET);
             case BOW, CROSSBOW -> {
                 // Ranged weapons don't use attack_damage/attack_speed attributes for projectile damage.
                 // Arrow damage is based on velocity and Power enchantment, not item attributes.
@@ -365,13 +365,8 @@ public class EliteItemSkins {
 
     /**
      * Applies armor attribute modifiers (armor, toughness, knockback resistance).
-     *
-     * <p>The slotKey is appended to each modifier's NamespacedKey so the four armor
-     * pieces produce distinct modifier IDs. In MC 1.21+ attribute deduplication is
-     * by namespaced key alone (slot is not part of the dedup key), so without this
-     * suffix every piece would collide with the others and only one would take effect.
      */
-    private static void applyArmorAttributes(ItemMeta meta, double baseArmor, double levelMultiplier, EquipmentSlotGroup slot, String slotKey) {
+    private static void applyArmorAttributes(ItemMeta meta, double baseArmor, double levelMultiplier, EquipmentSlotGroup slot) {
         // Armor: base × (1 + level/100 × 0.5)
         // Scaling is halved to avoid hitting armor cap too quickly
         double scaledArmor = baseArmor * (1 + levelMultiplier * 0.5);
@@ -387,21 +382,21 @@ public class EliteItemSkins {
 
         meta.addAttributeModifier(Attribute.ARMOR,
                 new AttributeModifier(
-                        new NamespacedKey(MetadataHandler.PLUGIN, "elite_armor_" + slotKey),
+                        new NamespacedKey(MetadataHandler.PLUGIN, "elite_armor"),
                         scaledArmor,
                         AttributeModifier.Operation.ADD_NUMBER,
                         slot));
 
         meta.addAttributeModifier(Attribute.ARMOR_TOUGHNESS,
                 new AttributeModifier(
-                        new NamespacedKey(MetadataHandler.PLUGIN, "elite_toughness_" + slotKey),
+                        new NamespacedKey(MetadataHandler.PLUGIN, "elite_toughness"),
                         scaledToughness,
                         AttributeModifier.Operation.ADD_NUMBER,
                         slot));
 
         meta.addAttributeModifier(Attribute.KNOCKBACK_RESISTANCE,
                 new AttributeModifier(
-                        new NamespacedKey(MetadataHandler.PLUGIN, "elite_knockback_resist_" + slotKey),
+                        new NamespacedKey(MetadataHandler.PLUGIN, "elite_knockback_resist"),
                         scaledKnockbackResist,
                         AttributeModifier.Operation.ADD_NUMBER,
                         slot));

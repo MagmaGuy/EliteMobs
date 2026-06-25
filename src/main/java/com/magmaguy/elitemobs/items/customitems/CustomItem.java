@@ -198,7 +198,7 @@ public class CustomItem {
     public static int limitItemLevel(Player player, int originalLevel) {
         // Skill-based gear restriction now handles equipping, not drops
         // Items drop at their original level
-        return originalLevel + 1;
+        return originalLevel;
     }
 
     public Item dropPlayerLoot(Player player, int tier, Location location, EliteEntity eliteEntity) {
@@ -213,10 +213,10 @@ public class CustomItem {
                 break;
             case SCALABLE:
                 loot = location.getWorld().dropItem(location,
-                        ScalableItemConstructor.constructScalableItem(itemTier + 1, this, player, eliteEntity));
+                        ScalableItemConstructor.constructScalableItem(itemTier, this, player, eliteEntity));
                 break;
             case FIXED:
-                loot = location.getWorld().dropItem(location, generateItemStack(itemLevel + 1, player, eliteEntity));
+                loot = location.getWorld().dropItem(location, generateItemStack(itemLevel, player, eliteEntity));
             default:
         }
 

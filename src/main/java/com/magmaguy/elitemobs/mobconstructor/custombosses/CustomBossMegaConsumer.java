@@ -27,6 +27,7 @@ public class CustomBossMegaConsumer {
     private final int level;
     private final boolean bypassesWorldGuardSpawn;
     private final Location spawnLocation;
+    private boolean disguiseQueued = false;
     CustomBossEntity customBossEntity;
 
     /**
@@ -51,14 +52,18 @@ public class CustomBossMegaConsumer {
     }
 
     protected static void setName(LivingEntity livingEntity, CustomBossEntity customBossEntity, int level) {
-        String parsedName = ChatColorConverter.convert(MobLevelPlaceholderFormatter.replaceLevelPlaceholders(
-                customBossEntity.customBossesConfigFields.getName(), customBossEntity, level));
+        String parsedName = parseName(customBossEntity, level);
         livingEntity.setCustomName(parsedName);
         boolean showName = DefaultConfig.isAlwaysShowNametags() || customBossEntity.customBossesConfigFields.isAlwaysShowName();
         livingEntity.setCustomNameVisible(showName);
         if (Bukkit.getPluginManager().isPluginEnabled("LibsDisguises"))
             DisguiseEntity.setDisguiseNameVisibility(showName, livingEntity, parsedName);
         customBossEntity.setName(parsedName, false);
+    }
+
+    protected static String parseName(CustomBossEntity customBossEntity, int level) {
+        return ChatColorConverter.convert(MobLevelPlaceholderFormatter.replaceLevelPlaceholders(
+                customBossEntity.customBossesConfigFields.getName(), customBossEntity, level));
     }
 
     /**
@@ -81,6 +86,7 @@ public class CustomBossMegaConsumer {
                 WorldGuardSpawnEventBypasser.forceSpawn();
         }
 
+        disguiseQueued = queueDisguise(parseName(customBossEntity, level));
         LivingEntity livingEntity = (LivingEntity) spawnLocation.getWorld().spawn(spawnLocation,
                 customBossesConfigFields.getEntityType().getEntityClass(),
                 entity -> applyBossFeatures((LivingEntity) entity));
@@ -99,6 +105,7 @@ public class CustomBossMegaConsumer {
 
 
     private void setDisguise(LivingEntity livingEntity) {
+        if (disguiseQueued) return;
         if (customBossesConfigFields.getDisguise() == null ||
                 CustomModel.customModelsEnabled() &&
                         customBossesConfigFields.isCustomModelExists() &&
@@ -111,6 +118,23 @@ public class CustomBossMegaConsumer {
         } catch (Exception ex) {
             Logger.warn("Failed to load LibsDisguises disguise correctly!");
         }
+    }
+
+    private boolean queueDisguise(String displayName) {
+        if (customBossesConfigFields.getDisguise() == null ||
+                CustomModel.customModelsEnabled() &&
+                        customBossesConfigFields.isCustomModelExists() &&
+                        customBossesConfigFields.getCustomModel() != null &&
+                        !customBossesConfigFields.getCustomModel().isEmpty())
+            return false;
+        if (!Bukkit.getPluginManager().isPluginEnabled("LibsDisguises")) return false;
+        boolean showName = DefaultConfig.isAlwaysShowNametags() || customBossesConfigFields.isAlwaysShowName();
+        return DisguiseEntity.disguiseNext(
+                customBossesConfigFields.getDisguise(),
+                displayName,
+                showName,
+                customBossesConfigFields.getCustomDisguiseData(),
+                customBossesConfigFields.getFilename());
     }
 
     private void setCustomModel(LivingEntity livingEntity) {

@@ -22,7 +22,6 @@ public class EliteMobDeathEvent extends Event {
         this.entity = eliteEntity.getUnsyncedLivingEntity();
         this.eliteEntity = eliteEntity;
         this.entityDeathEvent = entityDeathEvent;
-        eliteEntity.remove(RemovalReason.DEATH);
     }
 
     /**
@@ -33,7 +32,18 @@ public class EliteMobDeathEvent extends Event {
     public EliteMobDeathEvent(EliteEntity eliteEntity) {
         this.entity = eliteEntity.getUnsyncedLivingEntity();
         this.eliteEntity = eliteEntity;
-        new EventCaller(new EliteMobRemoveEvent(eliteEntity, RemovalReason.DEATH));
+    }
+
+    public static void callAndRemove(EliteEntity eliteEntity, EntityDeathEvent entityDeathEvent) {
+        new EventCaller(new EliteMobDeathEvent(eliteEntity, entityDeathEvent));
+        eliteEntity.remove(RemovalReason.DEATH);
+    }
+
+    public static void callAndRemove(EliteEntity eliteEntity) {
+        new EventCaller(new EliteMobDeathEvent(eliteEntity));
+        eliteEntity.remove(RemovalReason.DEATH);
+        if (!eliteEntity.isCustomBossEntity())
+            new EventCaller(new EliteMobRemoveEvent(eliteEntity, RemovalReason.DEATH));
     }
 
 
@@ -63,7 +73,7 @@ public class EliteMobDeathEvent extends Event {
         public void onMobDeath(EntityDeathEvent event) {
             EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(event.getEntity());
             if (eliteEntity == null) return;
-            new EventCaller(new EliteMobDeathEvent(eliteEntity, event));
+            EliteMobDeathEvent.callAndRemove(eliteEntity, event);
         }
     }
 

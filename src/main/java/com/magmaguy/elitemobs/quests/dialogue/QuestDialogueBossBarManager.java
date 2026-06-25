@@ -8,6 +8,7 @@ import com.magmaguy.elitemobs.quests.DynamicQuest;
 import com.magmaguy.elitemobs.quests.Quest;
 import com.magmaguy.elitemobs.quests.QuestTracking;
 import com.magmaguy.elitemobs.quests.menus.QuestMenu;
+import com.magmaguy.elitemobs.thirdparty.geyser.GeyserDetector;
 import com.magmaguy.elitemobs.utils.BossBarUtil;
 import com.magmaguy.elitemobs.utils.SimpleScoreboard;
 import com.magmaguy.magmacore.util.ChatColorConverter;
@@ -61,7 +62,7 @@ public class QuestDialogueBossBarManager {
     }
 
     public static boolean showQuestMenuIntro(List<? extends Quest> quests, Player player, NPCEntity npcEntity, Runnable onComplete) {
-        if (!QuestsConfig.isUseQuestDialogueBossBars()) return false;
+        if (!canShowQuestDialogueBossBars(player)) return false;
         if (quests == null || quests.isEmpty()) return false;
         List<String> dialogueLines = new ArrayList<>();
         for (Quest quest : quests) {
@@ -73,10 +74,16 @@ public class QuestDialogueBossBarManager {
     }
 
     public static boolean showRawDialogue(Player player, String speakerName, List<String> dialogueLines, Runnable onComplete) {
-        if (!QuestsConfig.isUseQuestDialogueBossBars()) return false;
+        if (!canShowQuestDialogueBossBars(player)) return false;
         if (dialogueLines == null || dialogueLines.isEmpty()) return false;
         startDialogue(player, speakerName, dialogueLines, onComplete);
         return true;
+    }
+
+    private static boolean canShowQuestDialogueBossBars(Player player) {
+        return QuestsConfig.isUseQuestDialogueBossBars()
+                && player != null
+                && !GeyserDetector.bedrockPlayer(player);
     }
 
     public static boolean consumeRecentlyShownQuestCompleteDialog(Player player, Quest quest) {

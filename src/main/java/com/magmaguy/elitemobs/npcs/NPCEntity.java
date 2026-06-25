@@ -237,11 +237,13 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
                 !ItemSettingsConfig.isUseEliteItemScrolls()) return;
         if (EliteMobs.worldGuardIsEnabled)
             WorldGuardSpawnEventBypasser.forceSpawn();
+        String displayName = ChatColorConverter.convert(npCsConfigFields.getName());
+        boolean disguiseQueued = queueDisguise(displayName);
         villager = spawnLocation.getWorld().spawn(spawnLocation, Villager.class, villagerInstance -> {
             villagerInstance.setAI(false);
             villagerInstance.setPersistent(false);
             villagerInstance.setRemoveWhenFarAway(false);
-            villagerInstance.setCustomName(ChatColorConverter.convert(npCsConfigFields.getName()));
+            villagerInstance.setCustomName(displayName);
             villagerInstance.setCustomNameVisible(true);
             villagerInstance.setProfession(npCsConfigFields.getProfession());
             AttributeManager.setAttribute(villagerInstance, "generic_scale", npCsConfigFields.getScale());
@@ -252,7 +254,10 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
                 !getNPCsConfigFields().getCustomModel().isEmpty() &&
                 CustomModel.modelExists(getNPCsConfigFields().getCustomModel()))
             setCustomModel(villager);
-        else
+        else if (disguiseQueued) {
+            DisguiseEntity.setDisguiseNameVisibility(true, villager, displayName);
+            isDisguised = true;
+        } else
             setDisguise(villager);
         EntityTracker.registerNPCEntity(this);
         if (villager == null || !villager.isValid()) return;
@@ -321,6 +326,22 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
             Logger.warn("Failed to load LibsDisguises disguise correctly!");
             ex.printStackTrace();
         }
+    }
+
+    private boolean queueDisguise(String displayName) {
+        if (npCsConfigFields.getDisguise() == null) return false;
+        if (CustomModel.customModelsEnabled() &&
+                getNPCsConfigFields().getCustomModel() != null &&
+                !getNPCsConfigFields().getCustomModel().isEmpty() &&
+                CustomModel.modelExists(getNPCsConfigFields().getCustomModel()))
+            return false;
+        if (!Bukkit.getPluginManager().isPluginEnabled("LibsDisguises")) return false;
+        return DisguiseEntity.disguiseNext(
+                npCsConfigFields.getDisguise(),
+                displayName,
+                true,
+                npCsConfigFields.getCustomDisguiseData(),
+                npCsConfigFields.getFilename());
     }
 
     private void setCustomModel(LivingEntity livingEntity) {

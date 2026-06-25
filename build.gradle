@@ -32,7 +32,7 @@ processResources {
 }
 
 group 'com.magmaguy'
-version '10.6.0'
+version '10.7.1'
 
 repositories {
     maven {
@@ -85,7 +85,7 @@ repositories {
 
 dependencies {
     //Spigot API
-    compileOnly "org.spigotmc:spigot-api:1.21.11-R0.1-SNAPSHOT"
+    compileOnly "org.spigotmc:spigot-api:26.2-R0.1-SNAPSHOT"
     //WorldGuard API
     compileOnly group: 'com.sk89q.worldguard', name: 'worldguard-bukkit', version: '7.0.7'
     //Vault
@@ -121,7 +121,7 @@ dependencies {
     implementation (group: 'com.magmaguy', name: 'MagmaCore', version: '2.2.0-SNAPSHOT'){
         changing = true
     }
-    testImplementation "org.spigotmc:spigot-api:1.21.11-R0.1-SNAPSHOT"
+    testImplementation "org.spigotmc:spigot-api:26.2-R0.1-SNAPSHOT"
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 

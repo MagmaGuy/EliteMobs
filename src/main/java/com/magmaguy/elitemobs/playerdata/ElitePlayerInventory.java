@@ -1,15 +1,19 @@
 package com.magmaguy.elitemobs.playerdata;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.items.ItemTagger;
+import com.magmaguy.elitemobs.items.customenchantments.CriticalStrikesEnchantment;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffect;
 import com.magmaguy.elitemobs.skills.CombatLevelCalculator;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
@@ -187,8 +191,30 @@ public class ElitePlayerInventory {
 
     public double getCritChance(boolean update) {
         if (isUpdateLock) update = false;
-        double critChance = mainhand.getCritChance(player.getInventory().getItemInMainHand(), update);
+        double critChance = helmet.getCritChance(player.getInventory().getHelmet(), update) +
+                chestplate.getCritChance(player.getInventory().getChestplate(), update) +
+                leggings.getCritChance(player.getInventory().getLeggings(), update) +
+                boots.getCritChance(player.getInventory().getBoots(), update) +
+                mainhand.getCritChance(player.getInventory().getItemInMainHand(), update) +
+                offhand.getCritChance(player.getInventory().getItemInOffHand(), update) +
+                getStoredInventoryCritChance();
         updateLock();
+        return Math.min(1D, critChance);
+    }
+
+    private double getStoredInventoryCritChance() {
+        double critChance = 0;
+        ItemStack[] storageContents = player.getInventory().getStorageContents();
+        int heldSlot = player.getInventory().getHeldItemSlot();
+        NamespacedKey criticalStrikesKey = new NamespacedKey(MetadataHandler.PLUGIN, CriticalStrikesEnchantment.key);
+
+        for (int slot = 0; slot < storageContents.length; slot++) {
+            if (slot == heldSlot) continue;
+            ItemStack itemStack = storageContents[slot];
+            if (itemStack == null || !itemStack.hasItemMeta()) continue;
+            critChance += ItemTagger.getEnchantment(itemStack.getItemMeta(), criticalStrikesKey) / 10D;
+        }
+
         return critChance;
     }
 

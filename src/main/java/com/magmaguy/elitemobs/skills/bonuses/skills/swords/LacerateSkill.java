@@ -56,7 +56,7 @@ public class LacerateSkill extends SkillBonus implements ProcSkill {
 
         int skillLevel = getPlayerSkillLevel(player);
         // Bleed damage = % of the hit damage, not flat. Scales properly at all levels.
-        double bleedDamagePerTick = event.getDamage() * getBleedPercent(skillLevel);
+        double bleedDamagePerTick = event.getDamageWithoutCriticalStrike() * getBleedPercent(skillLevel);
 
         applyBleedEffect(player, eliteEntity, bleedDamagePerTick);
     }

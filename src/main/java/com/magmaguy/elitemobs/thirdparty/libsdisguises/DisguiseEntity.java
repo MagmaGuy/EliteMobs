@@ -18,20 +18,32 @@ public class DisguiseEntity {
      * @param disguiseName Raw name following config format
      */
     public static void disguise(String disguiseName, Entity entity, String customDisguiseData, String filename) {
-        if (disguiseName.contains("player:")) {
-            playerDisguise(disguiseName.replace("player:", ""), entity);
-            return;
-        }
+        Disguise disguise = buildDisguise(disguiseName, customDisguiseData, filename, entity.getCustomName());
+        if (disguise != null)
+            scheduleDisguise(disguise, entity);
+    }
 
-        if (disguiseName.contains("custom")) {
-            try {
-                customDisguise(disguiseName.replace("custom:", ""), entity, customDisguiseData, filename);
-            } catch (Exception ex) {
-                Logger.warn("Failed to assign custom disguise " + disguiseName + "! Did you configure the disguise correctly?");
-            }
-            return;
+    public static boolean disguiseNext(String disguiseName, String displayName, boolean nameVisible, String customDisguiseData, String filename) {
+        Disguise disguise = buildDisguise(disguiseName, customDisguiseData, filename, displayName);
+        if (disguise == null) return false;
+        configureDisguiseName(disguise, displayName, nameVisible);
+        try {
+            DisguiseAPI.disguiseNextEntity(disguise);
+            return true;
+        } catch (Throwable throwable) {
+            Logger.warn("Failed to queue LibsDisguises disguise for " + filename + " !");
+            Logger.warn("Does the installed LibsDisguises version support disguiseNextEntity?");
+            return false;
         }
+    }
 
+    private static Disguise buildDisguise(String disguiseName, String customDisguiseData, String filename, String entityName) {
+        if (disguiseName == null) return null;
+        if (disguiseName.contains("player:"))
+            return new PlayerDisguise(disguiseName.replace("player:", ""));
+
+        if (disguiseName.contains("custom"))
+            return customDisguise(disguiseName.replace("custom:", ""), customDisguiseData, filename);
 
         boolean baby = false;
         if (disguiseName.contains(":baby")) {
@@ -44,34 +56,20 @@ public class DisguiseEntity {
         try {
             disguiseType = DisguiseType.valueOf(disguiseName);
         } catch (Exception ex) {
-            Logger.warn("Disguise " + disguiseName + " is not a valid disguise name! Entity " + entity.getCustomName() + " will not have a disguise.");
-            return;
+            Logger.warn("Disguise " + disguiseName + " is not a valid disguise name! Entity " + entityName + " will not have a disguise.");
+            return null;
         }
 
         if (disguiseType.isMob())
-            livingEntityDisguise(disguiseType, entity, baby);
+            return new MobDisguise(disguiseType, !baby);
         else if (disguiseType.isMisc())
-            miscEntityDisguise(disguiseType, entity);
+            return new MiscDisguise(disguiseType);
         else
-            Logger.warn("Disguise " + disguiseName + " is not a valid disguise name! Entity " + entity.getCustomName() + " will not have a disguise.");
+            Logger.warn("Disguise " + disguiseName + " is not a valid disguise name! Entity " + entityName + " will not have a disguise.");
+        return null;
     }
 
-    private static void playerDisguise(String playerName, Entity entity) {
-        PlayerDisguise playerDisguise = new PlayerDisguise(playerName);
-        scheduleDisguise(playerDisguise, entity);
-    }
-
-    private static void livingEntityDisguise(DisguiseType disguiseType, Entity entity, boolean baby) {
-        MobDisguise mobDisguise = new MobDisguise(disguiseType, !baby);
-        scheduleDisguise(mobDisguise, entity);
-    }
-
-    private static void miscEntityDisguise(DisguiseType disguiseType, Entity entity) {
-        MiscDisguise miscDisguise = new MiscDisguise(disguiseType);
-        scheduleDisguise(miscDisguise, entity);
-    }
-
-    private static void customDisguise(String customDisguise, Entity entity, String customDisguiseData, String filename) {
+    private static Disguise customDisguise(String customDisguise, String customDisguiseData, String filename) {
         Disguise disguise = DisguiseAPI.getCustomDisguise(customDisguise);
         try {
             if (disguise == null)
@@ -81,10 +79,11 @@ public class DisguiseEntity {
                 }
             if (disguise == null)
                 throw new NullPointerException();
-            scheduleDisguise(disguise, entity);
+            return disguise;
         } catch (Exception ex) {
             Logger.warn("Failed to set custom disguise for " + filename + " !");
             Logger.warn("Does the disguise exist? Is LibsDisguises up-to-date?");
+            return null;
         }
     }
 
@@ -97,15 +96,15 @@ public class DisguiseEntity {
 
     private static void applyDisguise(Disguise disguise, Entity entity) {
         disguise.setEntity(entity);
-        disguise.setDisguiseName(entity.getCustomName());
-        disguise.setDynamicName(true);
-        if ((DefaultConfig.isAlwaysShowNametags() || entity.getType().equals(EntityType.VILLAGER))
-                && disguise instanceof PlayerDisguise) {
-            ((PlayerDisguise) disguise).setNameVisible(true);
-        } else if (disguise instanceof PlayerDisguise) {
-            ((PlayerDisguise) disguise).setNameVisible(false);
-        }
+        configureDisguiseName(disguise, entity.getCustomName(), DefaultConfig.isAlwaysShowNametags() || entity.getType().equals(EntityType.VILLAGER));
         disguise.startDisguise();
+    }
+
+    private static void configureDisguiseName(Disguise disguise, String displayName, boolean nameVisible) {
+        disguise.setDisguiseName(displayName);
+        disguise.setDynamicName(true);
+        if (disguise instanceof PlayerDisguise)
+            ((PlayerDisguise) disguise).setNameVisible(nameVisible);
     }
 
     public static void setDisguiseNameVisibility(boolean disguiseNameVisibility, Entity entity, String name) {

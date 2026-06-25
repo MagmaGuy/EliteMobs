@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.api;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.QuestsConfig;
 import com.magmaguy.elitemobs.config.SoundsConfig;
+import com.magmaguy.elitemobs.config.customquests.CustomQuestsConfigFields;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.Quest;
@@ -44,15 +45,16 @@ public class QuestLeaveEvent extends Event {
                         QuestsConfig.getQuestLeaveSubtitle().replace("$questName", event.getQuest().getQuestName()),
                         20, 60, 20);
             if (event.getQuest() instanceof CustomQuest customQuest) {
-                if (!customQuest.getCustomQuestsConfigFields().getTemporaryPermissions().isEmpty()) {
-                    PermissionAttachment permissionAttachment = event.getPlayer().addAttachment(MetadataHandler.PLUGIN);
-                    for (String permission : customQuest.getCustomQuestsConfigFields().getTemporaryPermissions())
-                        permissionAttachment.setPermission(permission, false);
-                }
+                CustomQuestsConfigFields customQuestsConfigFields = customQuest.getCustomQuestsConfigFields();
+                if (customQuestsConfigFields != null) {
+                    if (!customQuestsConfigFields.getTemporaryPermissions().isEmpty()) {
+                        PermissionAttachment permissionAttachment = event.getPlayer().addAttachment(MetadataHandler.PLUGIN);
+                        for (String permission : customQuestsConfigFields.getTemporaryPermissions())
+                            permissionAttachment.setPermission(permission, false);
+                    }
 
-                if (QuestTracking.getPlayerTrackingQuests().containsKey(event.getPlayer())) {
-                    QuestTracking questTracking = QuestTracking.getPlayerTrackingQuests().get(event.getPlayer());
-                    if (questTracking.getCustomQuest().getCustomQuestsConfigFields().equals(customQuest.getCustomQuestsConfigFields()))
+                    QuestTracking questTracking = QuestTracking.getPlayerTrackingQuests().get(event.getPlayer().getUniqueId());
+                    if (questTracking != null && customQuestsConfigFields.equals(questTracking.getCustomQuest().getCustomQuestsConfigFields()))
                         questTracking.stop();
                 }
             }

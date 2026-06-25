@@ -488,7 +488,7 @@ public class QuestsConfig extends ConfigurationFile {
                 fileConfiguration, "hideQuestScoreboardDuringQuestDialogue", true);
         questDialogueCharactersPerLine = ConfigurationEngine.setInt(
                 List.of("Experimental: maximum visible characters per boss-bar dialogue line before wrapping."),
-                fileConfiguration, "questDialogueCharactersPerLine", 48);
+                fileConfiguration, "questDialogueCharactersPerLineV2", 52);
         questDialogueCharactersPerTick = ConfigurationEngine.setInt(
                 List.of("Experimental: visible characters added per tick while quest dialogue types in."),
                 fileConfiguration, "questDialogueCharactersPerTick", 2);
@@ -506,17 +506,17 @@ public class QuestsConfig extends ConfigurationFile {
                 file, fileConfiguration, "questDialogueLineSuffix", "", false);
         questDialogueBoxOffsetX = ConfigurationEngine.setInt(
                 List.of("Experimental: horizontal pixel shift of the dialogue box image (positive = right).",
-                        "Default 0 keeps the box where the art places it (centered in the 256px font canvas)."),
-                fileConfiguration, "questDialogueBoxOffsetX", 34);
+                        "Default 0 keeps the box aligned with the shift-click quest dialogue menu art."),
+                fileConfiguration, "questDialogueBoxOffetXV2", 0);
         questDialogueNameOffsetX = ConfigurationEngine.setInt(
                 List.of("Experimental: horizontal pixel shift of the NPC name line (negative = left)."),
-                fileConfiguration, "questDialogueNameOffsetX", -80);
+                fileConfiguration, "questDialogueNameOffsetXV2", -90);
         questDialogueLineOffsetX = ConfigurationEngine.setInt(
                 List.of("Experimental: horizontal pixel shift of each dialogue body line (negative = left)."),
                 fileConfiguration, "questDialogueLineOffsetX", 0);
         questDialoguePromptOffsetX = ConfigurationEngine.setInt(
                 List.of("Experimental: horizontal pixel shift of the 'sneak to continue' prompt line (positive = right)."),
-                fileConfiguration, "questDialoguePromptOffsetX", 70);
+                fileConfiguration, "questDialoguePromptOffsetXV2", 74);
         questDialoguePromptText = ConfigurationEngine.setString(
                 List.of("Experimental: text shown on the prompt line of the dialogue box telling players how to advance."),
                 file, fileConfiguration, "questDialoguePromptText", "&7&oSneak to continue", true);
