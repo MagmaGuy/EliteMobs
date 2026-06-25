@@ -334,6 +334,11 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
         return handlers;
     }
 
+    public double getDamageWithoutCriticalStrike() {
+        if (!criticalStrike) return getDamage();
+        return getDamage() / 1.5D;
+    }
+
     /**
      * Unified method to apply all active skill bonuses to this damage event.
      * This is the single entry point for the skill bonus system to modify offensive damage.
@@ -1279,21 +1284,25 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
 
             // Boss-specific damage modifier
             double damageModifier = 1;
-            if (event.getCause().equals(EntityDamageEvent.DamageCause.PROJECTILE))
-                if (CustomProjectileData.getCustomProjectileDataHashMap().get((Projectile) event.getDamager()) == null)
-                    damageModifier = getCustomDamageModifier(eliteEntity, null);
-                else
-                    damageModifier = getCustomDamageModifier(eliteEntity, CustomProjectileData.getCustomProjectileDataHashMap().get(event.getDamager()).getProjectileShooterMaterial());
-            else damageModifier = getCustomDamageModifier(eliteEntity, player.getInventory().getItemInMainHand().getType());
+            if (!bypass) {
+                if (event.getCause().equals(EntityDamageEvent.DamageCause.PROJECTILE))
+                    if (CustomProjectileData.getCustomProjectileDataHashMap().get((Projectile) event.getDamager()) == null)
+                        damageModifier = getCustomDamageModifier(eliteEntity, null);
+                    else
+                        damageModifier = getCustomDamageModifier(eliteEntity, CustomProjectileData.getCustomProjectileDataHashMap().get(event.getDamager()).getProjectileShooterMaterial());
+                else damageModifier = getCustomDamageModifier(eliteEntity, player.getInventory().getItemInMainHand().getType());
+            }
 
             // Config combat multiplier
-            double combatMultiplier;
-            if (eliteEntity.isScaledCombat())
-                combatMultiplier = MobCombatSettingsConfig.getScaledDamageToEliteMultiplier();
-            else if (eliteEntity instanceof CustomBossEntity customBossEntity && customBossEntity.isNormalizedCombat())
-                combatMultiplier = MobCombatSettingsConfig.getNormalizedDamageToEliteMultiplier();
-            else
-                combatMultiplier = MobCombatSettingsConfig.getDamageToEliteMultiplier();
+            double combatMultiplier = 1;
+            if (!bypass) {
+                if (eliteEntity.isScaledCombat())
+                    combatMultiplier = MobCombatSettingsConfig.getScaledDamageToEliteMultiplier();
+                else if (eliteEntity instanceof CustomBossEntity customBossEntity && customBossEntity.isNormalizedCombat())
+                    combatMultiplier = MobCombatSettingsConfig.getNormalizedDamageToEliteMultiplier();
+                else
+                    combatMultiplier = MobCombatSettingsConfig.getDamageToEliteMultiplier();
+            }
 
             // Apply multipliers
             damage = Round.twoDecimalPlaces(damage * damageModifier * combatMultiplier);
@@ -1308,7 +1317,7 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
 
             // Critical hit
             boolean criticalHit = false;
-            if (validPlayer) {
+            if (validPlayer && !bypass) {
                 criticalHit = isCriticalHit(player);
                 if (criticalHit) {
                     damage *= 1.5;
@@ -1331,7 +1340,10 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
             if (DebugMessage.isDebugEnabled(player)) {
                 String combatPath;
                 String configKey;
-                if (eliteEntity.isScaledCombat()) {
+                if (bypass) {
+                    combatPath = "CUSTOM/BYPASS";
+                    configKey = "none";
+                } else if (eliteEntity.isScaledCombat()) {
                     combatPath = "SCALED";
                     configKey = "scaledDamageToEliteMultiplier";
                 } else if (eliteEntity instanceof CustomBossEntity cbForLog && cbForLog.isNormalizedCombat()) {
@@ -1434,7 +1446,11 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
                 String pathTag;
                 String keyTag;
                 double appliedKeyValue;
-                if (eliteEntity.isScaledCombat()) {
+                if (bypass) {
+                    pathTag = "CUSTOM";
+                    keyTag = "bypassDamage";
+                    appliedKeyValue = 1.0;
+                } else if (eliteEntity.isScaledCombat()) {
                     pathTag = "SCALED";
                     keyTag = "scaledDamageToEliteMultiplier";
                     appliedKeyValue = MobCombatSettingsConfig.getScaledDamageToEliteMultiplier();
@@ -1471,7 +1487,7 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
                 ((EnderDragon) eliteEntity.getLivingEntity()).setPhase(EnderDragon.Phase.DYING);
                 eliteEntity.setDying(true);
                 //remove the dragon after it is done with the light show, this death doesn't show up on events
-                Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> new EventCaller(new EliteMobDeathEvent(eliteEntity)), 200);
+                Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> EliteMobDeathEvent.callAndRemove(eliteEntity), 200);
             }
 
             event.setDamage(EntityDamageEvent.DamageModifier.BASE, damage);
@@ -1492,6 +1508,7 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
         private void runAntiexploit(EliteEntity eliteEntity, EntityDamageByEntityEvent event, EliteMobDamagedByPlayerEvent eliteMobDamagedByPlayerEvent) {
             if (EliteMobsWorld.isEliteMobsWorld(event.getDamager().getWorld().getUID())) return;
             if (eliteEntity.isEnderDragon()) return;
+            if (eliteMobDamagedByPlayerEvent.isCustomDamage()) return;
             if (EliteMobs.worldGuardIsEnabled) {
                 Boolean regionQuery = WorldGuardFlagChecker.checkNullableFlag(eliteEntity.getLocation(), WorldGuardCompatibility.getELITEMOBS_ANTIEXPLOIT());
                 if (regionQuery != null && !regionQuery) return;

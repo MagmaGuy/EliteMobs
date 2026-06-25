@@ -53,9 +53,10 @@ public class ImpalingStrikeSkill extends SkillBonus implements ProcSkill {
         if (eliteEntity == null || eliteEntity.getLivingEntity() == null) return;
 
         int skillLevel = SkillBonusRegistry.getPlayerSkillLevel(player, SkillType.SPEARS);
-        double bleedDamage = event.getDamage() * getBleedDamagePercent(skillLevel);
+        double baseDamage = event.getDamageWithoutCriticalStrike();
+        double bleedDamage = baseDamage * getBleedDamagePercent(skillLevel);
         // Cap bleed per tick to 15% of hit damage to prevent insane DoT
-        bleedDamage = Math.min(bleedDamage, event.getDamage() * 0.15);
+        bleedDamage = Math.min(bleedDamage, baseDamage * 0.15);
 
         applyBleed(player, eliteEntity, bleedDamage);
     }

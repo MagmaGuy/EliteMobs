@@ -54,7 +54,7 @@ public class WoundSkill extends SkillBonus implements ProcSkill {
 
         int skillLevel = SkillBonusRegistry.getPlayerSkillLevel(player, SkillType.AXES);
         // Bleed damage = % of the hit damage, scales properly at all levels
-        double bleedDamagePerTick = event.getDamage() * getBleedPercent(skillLevel);
+        double bleedDamagePerTick = event.getDamageWithoutCriticalStrike() * getBleedPercent(skillLevel);
         applyWound(player, target, bleedDamagePerTick);
     }
 

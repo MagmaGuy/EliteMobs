@@ -52,7 +52,7 @@ public class CustomQuestsConfigFields extends CustomConfigFields {
     private List<String> questCompleteDialog = new ArrayList<>();
     @Getter
     @Setter
-    //placeholders: $player, $getX, $getY, $getZ
+    //placeholders: $player, $getWorld, $getX, $getY, $getZ
     private List<String> questCompleteCommands = new ArrayList<>();
     @Getter
     @Setter

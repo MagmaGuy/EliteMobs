@@ -144,6 +144,7 @@ public class CustomQuest extends Quest {
                 for (String command : customQuestsConfigFields.getQuestCompleteCommands())
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
                             command.replace("$player", event.getPlayer().getName())
+                                    .replace("$getWorld", event.getPlayer().getWorld().getName())
                                     .replace("$getX", event.getPlayer().getLocation().getX() + "")
                                     .replace("$getY", event.getPlayer().getLocation().getY() + "")
                                     .replace("$getZ", event.getPlayer().getLocation().getZ() + ""));

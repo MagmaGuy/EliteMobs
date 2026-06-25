@@ -146,6 +146,10 @@ public class CustomFetchObjective extends Objective {
             for (Objective objective : event.getQuest().getQuestObjectives().getObjectives())
                 if (objective instanceof CustomFetchObjective)
                     ((CustomFetchObjective) objective).turnItemsIn(event.getPlayer());
+            for (Quest quest : PlayerData.getQuests(event.getPlayer().getUniqueId()))
+                for (Objective objective : quest.getQuestObjectives().getObjectives())
+                    if (objective instanceof CustomFetchObjective)
+                        objective.progressNonlinearObjective(quest.getQuestObjectives(), event.getPlayer());
         }
     }
 

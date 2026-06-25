@@ -1,0 +1,360 @@
+package com.magmaguy.elitemobs.dungeons;
+
+import com.magmaguy.elitemobs.config.CombatTagConfig;
+import com.magmaguy.elitemobs.config.DungeonsConfig;
+import com.magmaguy.elitemobs.treasurechest.TreasureChest;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.ItemFrame;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.*;
+import org.bukkit.event.entity.*;
+import org.bukkit.event.hanging.HangingBreakByEntityEvent;
+import org.bukkit.event.player.*;
+import org.bukkit.potion.PotionEffectType;
+
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.UUID;
+
+public class DungeonProtector implements Listener {
+    private static final HashSet<UUID> bypassingPlayers = new HashSet<>();
+
+    public static void shutdown() {
+        bypassingPlayers.clear();
+    }
+
+    public static boolean toggleBypass(UUID playerUUID) {
+        if (bypassingPlayers.contains(playerUUID)) {
+            bypassingPlayers.remove(playerUUID);
+            return false;
+        }
+        bypassingPlayers.add(playerUUID);
+        return true;
+    }
+
+    private boolean shouldBypass(Player player) {
+        return bypassingPlayers.contains(player.getUniqueId());
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventPlayerBlockDamage(BlockDamageEvent event) {
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getBlock().getWorld().getUID())) return;
+        if (shouldBypass(event.getPlayer())) return;
+        event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventPlayerBlockBreak(BlockBreakEvent event) {
+        UUID worldUID = event.getBlock().getWorld().getUID();
+        boolean isProtected = EliteMobsWorld.isEliteMobsWorld(worldUID);
+        if (!isProtected) return;
+        if (shouldBypass(event.getPlayer())) return;
+        event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventBlockBurnDamage(BlockBurnEvent event) {
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getBlock().getWorld().getUID())) return;
+        event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventPlayerBlockPlace(BlockCanBuildEvent event) {
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getBlock().getWorld().getUID())) return;
+        if (event.getPlayer() != null && shouldBypass(event.getPlayer())) return;
+        event.setBuildable(false);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventBlockExplosionEvent(BlockExplodeEvent event) {
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getBlock().getWorld().getUID())) return;
+        EliteMobsWorld eliteMobsWorld = EliteMobsWorld.getEliteMobsWorld(event.getBlock().getWorld().getUID());
+        if (!eliteMobsWorld.isAllowExplosions())
+            event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventEntityExplosionEvent(EntityExplodeEvent event) {
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getLocation().getWorld().getUID())) return;
+        EliteMobsWorld eliteMobsWorld = EliteMobsWorld.getEliteMobsWorld(event.getLocation().getWorld().getUID());
+        if (!eliteMobsWorld.isAllowExplosions())
+            event.blockList().clear();
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventTntPrimeEvent(TNTPrimeEvent event) {
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getBlock().getWorld().getUID())) return;
+        EliteMobsWorld eliteMobsWorld = EliteMobsWorld.getEliteMobsWorld(event.getBlock().getWorld().getUID());
+        if (!eliteMobsWorld.isAllowExplosions())
+            event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventBlockFadeEvent(BlockFadeEvent event) {
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getBlock().getWorld().getUID())) return;
+        if (event.getBlock().getType().equals(Material.FROSTED_ICE)) return;
+        event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventBonemeal(BlockFertilizeEvent event) {
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getBlock().getWorld().getUID())) return;
+        if (event.getPlayer() != null && shouldBypass(event.getPlayer())) return;
+        event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventLiquidFlow(BlockFromToEvent event) {
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getBlock().getWorld().getUID())) return;
+        if (EliteMobsWorld.getEliteMobsWorld(event.getBlock().getWorld().getUID()).getContentPackagesConfigFields().isAllowLiquidFlow())
+            return;
+        event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventBlockFire(BlockIgniteEvent event) {
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getBlock().getWorld().getUID())) return;
+        event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventBlockPlace(BlockPlaceEvent event) {
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getBlock().getWorld().getUID())) return;
+        if (shouldBypass(event.getPlayer())) return;
+        event.setCancelled(true);
+    }
+
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventLiquidPlace(PlayerBucketEmptyEvent event) {
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getBlock().getWorld().getUID())) return;
+        if (shouldBypass(event.getPlayer())) return;
+        event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventLeafDecay(LeavesDecayEvent event) {
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getBlock().getWorld().getUID())) return;
+        event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventVanillaMobSpawning(CreatureSpawnEvent event) {
+        if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.CUSTOM)) return;
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getLocation().getWorld().getUID())) return;
+        event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventFriendlyFireInDungeon(EntityDamageByEntityEvent event) {
+        if (DungeonsConfig.isFriendlyFireInDungeons()) return;
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getEntity().getLocation().getWorld().getUID())) return;
+        if (!(event.getEntity() instanceof Player)) return;
+        if (event.getDamager() instanceof Player || event.getDamager() instanceof Projectile projectile && projectile.getShooter() instanceof Player)
+            event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventDoorOpeningSpawning(PlayerInteractEvent event) {
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getPlayer().getWorld().getUID())) return;
+        if (event.getClickedBlock() == null) return;
+        if (shouldBypass(event.getPlayer())) return;
+        Material material = event.getClickedBlock().getType();
+        String materialName = material.toString().toLowerCase(Locale.ROOT);
+        if (materialName.endsWith("_door") ||
+                materialName.endsWith("_trapdoor") ||
+                materialName.endsWith("_fence_gate"))
+            event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventDoorOpeningSpawning(EntityChangeBlockEvent event) {
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getEntity().getWorld().getUID())) return;
+        event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventCobwebPotions(LingeringPotionSplashEvent event) {
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getEntity().getWorld().getUID())) return;
+        if (event.getEntity().getShooter() == null) return;
+        if (!(event.getEntity().getShooter() instanceof Player)) return;
+        event.getEntity().getEffects().forEach(potionEffect -> {
+            if (potionEffect.getType().equals(PotionEffectType.WEAVING)) event.setCancelled(true);
+        });
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventCobwebPotions(PotionSplashEvent event) {
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getEntity().getWorld().getUID())) return;
+        if (event.getEntity().getShooter() == null) return;
+        if (!(event.getEntity().getShooter() instanceof Player)) return;
+        event.getEntity().getEffects().forEach(potionEffect -> {
+            if (potionEffect.getType().equals(PotionEffectType.WEAVING)) event.setCancelled(true);
+        });
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventSignEdits(SignChangeEvent event) {
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getPlayer().getWorld().getUID())) return;
+        if (shouldBypass(event.getPlayer())) return;
+        event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventContainerAccess(PlayerInteractEvent event) {
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getPlayer().getWorld().getUID())) return;
+        if (shouldBypass(event.getPlayer())) return;
+
+        Block block = event.getClickedBlock();
+        if (block == null) return;
+
+        Material type = block.getType();
+
+        // Check if this is a container type
+        if (type == Material.CHEST || type == Material.TRAPPED_CHEST ||
+                type == Material.BARREL || type == Material.SHULKER_BOX ||
+                type.name().endsWith("_SHULKER_BOX")) {
+
+            // Allow treasure chest interaction
+            if (TreasureChest.getTreasureChest(block.getLocation()) != null) {
+                return;
+            }
+
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventDragonEggInteraction(PlayerInteractEvent event) {
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getPlayer().getWorld().getUID())) return;
+        if (shouldBypass(event.getPlayer())) return;
+
+        Block block = event.getClickedBlock();
+        if (block != null && block.getType() == Material.DRAGON_EGG) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventFlowerpotInteraction(PlayerInteractEvent event) {
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getPlayer().getWorld().getUID())) return;
+        if (shouldBypass(event.getPlayer())) return;
+
+        Block block = event.getClickedBlock();
+        if (block == null) return;
+
+        String materialName = block.getType().name();
+        if (block.getType() == Material.FLOWER_POT || materialName.startsWith("POTTED_")) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventElytraGlideStart(EntityToggleGlideEvent event) {
+        if (!(event.getEntity() instanceof Player player)) return;
+        if (!event.isGliding()) return;
+        if (!EliteMobsWorld.isEliteMobsWorld(player.getWorld().getUID())) return;
+        if (EliteMobsWorld.getEliteMobsWorld(player.getWorld().getUID()).getContentPackagesConfigFields().isAllowElytra())
+            return;
+        if (shouldBypass(player)) return;
+        event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventElytraOnWorldEnter(PlayerChangedWorldEvent event) {
+        Player player = event.getPlayer();
+        if (!player.isGliding()) return;
+        if (!EliteMobsWorld.isEliteMobsWorld(player.getWorld().getUID())) return;
+        if (EliteMobsWorld.getEliteMobsWorld(player.getWorld().getUID()).getContentPackagesConfigFields().isAllowElytra())
+            return;
+        if (shouldBypass(player)) return;
+        player.setGliding(false);
+    }
+
+    // Backstop for client-side desync: cancelling EntityToggleGlideEvent does not reliably stop
+    // gliding on the client in 1.21.6+, so we re-assert setGliding(false) on every move tick while
+    // the player is gliding in a protected world. Cheap — early-exits for non-gliders.
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void enforceNoElytraInProtectedWorld(PlayerMoveEvent event) {
+        Player player = event.getPlayer();
+        if (!player.isGliding()) return;
+        if (!EliteMobsWorld.isEliteMobsWorld(player.getWorld().getUID())) return;
+        if (EliteMobsWorld.getEliteMobsWorld(player.getWorld().getUID()).getContentPackagesConfigFields().isAllowElytra())
+            return;
+        if (shouldBypass(player)) return;
+        player.setGliding(false);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventFlyToggle(PlayerToggleFlightEvent event) {
+        if (!CombatTagConfig.isPreventFlyToggleInDungeons()) return;
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getPlayer().getWorld().getUID())) return;
+        if (event.getPlayer().isOp()) return;
+        if (shouldBypass(event.getPlayer())) return;
+        if (event.isFlying()) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventItemFrameBreak(HangingBreakByEntityEvent event) {
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getEntity().getWorld().getUID())) return;
+        // Check if a player caused the break (directly or via projectile)
+        if (event.getRemover() instanceof Player player) {
+            if (shouldBypass(player)) return;
+        } else if (event.getRemover() instanceof Projectile projectile && projectile.getShooter() instanceof Player player) {
+            if (shouldBypass(player)) return;
+        }
+        event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventItemFrameDamage(EntityDamageByEntityEvent event) {
+        if (!(event.getEntity() instanceof ItemFrame)) return;
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getEntity().getWorld().getUID())) return;
+        // Check if a player caused the damage (directly or via projectile)
+        if (event.getDamager() instanceof Player player) {
+            if (shouldBypass(player)) return;
+        } else if (event.getDamager() instanceof Projectile projectile && projectile.getShooter() instanceof Player player) {
+            if (shouldBypass(player)) return;
+        }
+        event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventItemFrameInteract(PlayerInteractEntityEvent event) {
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getPlayer().getWorld().getUID())) return;
+        if (shouldBypass(event.getPlayer())) return;
+        // Prevent taking items from or rotating item frames
+        if (event.getRightClicked() instanceof ItemFrame) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventArmorStandManipulate(PlayerArmorStandManipulateEvent event) {
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getPlayer().getWorld().getUID())) return;
+        if (shouldBypass(event.getPlayer())) return;
+        event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void preventArmorStandDamage(EntityDamageByEntityEvent event) {
+        if (!(event.getEntity() instanceof ArmorStand)) return;
+        if (!EliteMobsWorld.isEliteMobsWorld(event.getEntity().getWorld().getUID())) return;
+        // Check if a player caused the damage (directly or via projectile)
+        if (event.getDamager() instanceof Player player) {
+            if (shouldBypass(player)) return;
+        } else if (event.getDamager() instanceof Projectile projectile && projectile.getShooter() instanceof Player player) {
+            if (shouldBypass(player)) return;
+        }
+        event.setCancelled(true);
+    }
+
+}
