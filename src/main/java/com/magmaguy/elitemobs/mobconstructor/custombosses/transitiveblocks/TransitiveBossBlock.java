@@ -31,7 +31,7 @@ public class TransitiveBossBlock implements Listener {
         }
 
         //Minor optimization, does not replace blocks that are already identical
-        if (!location.getBlock().getBlockData().getMaterial().equals(blockData.getMaterial()))
+        if (!location.getBlock().getBlockData().equals(blockData))
             location.getBlock().setBlockData(blockData, blockData.getMaterial() == Material.WATER || blockData.getMaterial() == Material.LAVA);
 
     }
