@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.mobconstructor.custombosses;
 
 import com.magmaguy.elitemobs.api.EliteMobDamagedEvent;
-import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
+import com.magmaguy.elitemobs.api.EliteMobRemoveEvent;
 import com.magmaguy.elitemobs.api.ElitePhaseSwitchEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
@@ -149,8 +149,9 @@ public class PhaseBossEntity {
         }
 
         @EventHandler(priority = EventPriority.MONITOR)
-        public void onEliteDeath(EliteMobDeathEvent event) {
-            if (!(event.getEliteEntity() instanceof CustomBossEntity customBossEntity)) return;
+        public void onEliteRemove(EliteMobRemoveEvent event) {
+            if (!event.getRemovalReason().equals(RemovalReason.DEATH)) return;
+            if (!(event.getEliteMobEntity() instanceof CustomBossEntity customBossEntity)) return;
             if (customBossEntity.getPhaseBossEntity() != null)
                 customBossEntity.phaseBossEntity.silentReset();
         }
