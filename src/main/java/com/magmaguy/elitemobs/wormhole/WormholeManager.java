@@ -36,7 +36,9 @@ public class WormholeManager {
     private static WormholeManager instance;
     // Map to track players in cooldown with expiration timestamps
     @Getter
-    private final Map<UUID, PlayerWormholeData> playerTeleportData = new HashMap<>();
+    // Concurrent map: mutated from listeners while the per-tick task copies its values; the plain
+    // HashMap shared the same mid-copy ArrayIndexOutOfBoundsException risk as wormholeEntries.
+    private final Map<UUID, PlayerWormholeData> playerTeleportData = new java.util.concurrent.ConcurrentHashMap<>();
     private BukkitTask wormholeTask;
     private static final int TELEPORT_CHECK_INTERVAL = 5; // Check teleports every 5 ticks
     private int tickCounter = 0;
