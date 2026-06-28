@@ -26,7 +26,10 @@ import java.util.*;
 
 public class WormholeEntry implements PersistentObject {
     @Getter
-    private static final Set<WormholeEntry> wormholeEntries = new HashSet<>();
+    // Concurrent set: entries can be added/removed off the main thread (config/chunk load) while
+    // the per-tick wormhole task copies this set; the plain HashSet threw ArrayIndexOutOfBoundsException
+    // from keysToArray when the set was structurally modified mid-copy. newKeySet() copies safely.
+    private static final Set<WormholeEntry> wormholeEntries = java.util.concurrent.ConcurrentHashMap.newKeySet();
     private static final float LINE_WIDTH = 0.04f;
     // Map of RGB colors to concrete materials
     private static final Material[] CONCRETE_COLORS_BY_RGB = {
