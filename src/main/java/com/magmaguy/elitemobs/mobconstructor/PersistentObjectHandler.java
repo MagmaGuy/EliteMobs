@@ -1,9 +1,12 @@
 package com.magmaguy.elitemobs.mobconstructor;
 
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Multimaps;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.InstancedDungeonRemoveEvent;
 import com.magmaguy.elitemobs.utils.ChunkVectorizer;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -25,9 +28,14 @@ import java.util.UUID;
 public class PersistentObjectHandler {
 
     /*
-    This ArrayListMultiMap keeps two types of string keys: The first type is a world name and the second type is a chunk vector converted to a string
+    This ListMultimap keeps two types of string keys: The first type is a world name and the second type is a chunk vector converted to a string
+    Handlers are created from the async content-package initialization thread as well as from the main thread (chunk
+    and world events, boss spawns), so the backing multimap has to be synchronized. Guava only guards single
+    operations; every iteration over a collection view below additionally locks on the multimap itself, which is the
+    lock Multimaps#synchronizedListMultimap uses internally.
      */
-    private static final ArrayListMultimap<String, PersistentObjectHandler> persistentObjects = ArrayListMultimap.create();
+    private static final ListMultimap<String, PersistentObjectHandler> persistentObjects =
+            Multimaps.synchronizedListMultimap(ArrayListMultimap.create());
     private final PersistentObject persistentObject;
     private final String worldName;
     @Getter
@@ -61,11 +69,18 @@ public class PersistentObjectHandler {
     /**
      * Used to add persistent entities to the list. This inserts an arbitrary amount of persistent entities into a chunk.
      * Called when a SimplePersistentEntity is created.
+     * <p>
+     * Falls back to the world key when there is nothing to hash a chunk from. Returning without adding any key at all
+     * orphans the handler: it stops being reachable from chunk loads, world loads and world unloads alike, so the
+     * persistent object it guards can never come back and can never be cleaned up.
      *
      * @param simplePersistentEntity Entity to be added
      */
     private void addChunkKey(PersistentObjectHandler simplePersistentEntity) {
-        if (persistentLocation.getWorld() == null) return;
+        if (persistentLocation == null || persistentLocation.getWorld() == null) {
+            addWorldKey(simplePersistentEntity);
+            return;
+        }
         this.chunk = ChunkVectorizer.hash(persistentLocation.getBlockX() >> 4, persistentLocation.getBlockZ() >> 4, persistentLocation.getWorld().getUID()) + "";
         persistentObjects.put(simplePersistentEntity.chunk, simplePersistentEntity);
     }
@@ -80,8 +95,13 @@ public class PersistentObjectHandler {
         //convert persistent object handler to chunk-based detection
         //Start by removing old key
         remove();
-        //Assign world to the location
-        this.persistentLocation.setWorld(world);
+        //Assign world to the location. The handler can be constructed before the persistent object knows where it
+        //lives (regional bosses parsed while their world is still unloaded), so the location may only materialize
+        //once the implementation above has run - ask for it again rather than dereferencing a null field.
+        if (this.persistentLocation == null)
+            this.persistentLocation = persistentObject.getPersistentLocation();
+        if (this.persistentLocation != null)
+            this.persistentLocation.setWorld(world);
         //Assign key
         addChunkKey(this);
 
@@ -117,7 +137,7 @@ public class PersistentObjectHandler {
      */
     public static void removeForWorld(UUID worldUUID) {
         if (worldUUID == null) return;
-        List<PersistentObjectHandler> copy = new ArrayList<>(persistentObjects.values());
+        List<PersistentObjectHandler> copy = snapshotAll();
         for (PersistentObjectHandler handler : copy) {
             Location handlerLocation = handler.persistentLocation;
             if (handlerLocation != null &&
@@ -125,6 +145,45 @@ public class PersistentObjectHandler {
                     handlerLocation.getWorld().getUID().equals(worldUUID))
                 handler.remove();
         }
+    }
+
+    /**
+     * Guava's synchronized multimap only locks individual operations - copying a collection view still iterates it, so
+     * the copy has to happen while holding the multimap's own lock.
+     */
+    private static List<PersistentObjectHandler> snapshot(String key) {
+        synchronized (persistentObjects) {
+            return new ArrayList<>(persistentObjects.get(key));
+        }
+    }
+
+    private static List<PersistentObjectHandler> snapshotAll() {
+        synchronized (persistentObjects) {
+            return new ArrayList<>(persistentObjects.values());
+        }
+    }
+
+    /**
+     * Drains every handler that is currently filed under a world name and hands it back to chunk-based tracking.
+     * <p>
+     * World-less persistent objects are filed under their world name and, until this was made callable, the only thing
+     * that ever drained that key was {@link WorldLoadEvent}. That is not enough: worlds loaded by
+     * {@code TemporaryWorldManager} short-circuit and return the existing {@link World} when it is already loaded,
+     * which fires no event at all. Calling this directly from the dungeon world-load path makes the drain independent
+     * of the event. It is safe to call more than once for the same world - a drained handler is re-keyed by chunk hash,
+     * so a second pass finds an empty bucket - and a handler that failed to acquire a chunk key stays under the world
+     * key precisely so the next pass can retry it.
+     */
+    public static void loadWorld(World world) {
+        if (world == null) return;
+        for (PersistentObjectHandler persistentObjectHandler : snapshot(world.getName()))
+            try {
+                persistentObjectHandler.worldLoad(world);
+            } catch (Exception exception) {
+                //One broken persistent object must not strand every handler still queued behind it in the drain
+                Logger.warn("Failed to restore a persistent object in world " + world.getName() + " : " + exception.getMessage());
+                exception.printStackTrace();
+            }
     }
 
     public static class PersistentObjectHandlerEvents implements Listener {
@@ -151,22 +210,17 @@ public class PersistentObjectHandler {
 
         private static void unloadWorld(World world) {
             List<PersistentObjectHandler> copy = new ArrayList<>();
-            for (PersistentObjectHandler persistentObjectHandler : persistentObjects.values())
+            for (PersistentObjectHandler persistentObjectHandler : snapshotAll())
                 if (Objects.equals(persistentObjectHandler.worldName, world.getName()))
                     copy.add(persistentObjectHandler);
             copy.forEach(PersistentObjectHandler::worldUnload);
-        }
-
-        private static void loadWorld(World world) {
-            List<PersistentObjectHandler> copy = new ArrayList<>(persistentObjects.get(world.getName()));
-            copy.forEach(persistentObjectHandler -> persistentObjectHandler.worldLoad(world));
         }
 
         //Store world names and serialized locations
         @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
         public void chunkLoadEvent(ChunkLoadEvent event) {
             int chunkLocation = chunkLocation(event.getChunk());
-            List<PersistentObjectHandler> simplePersistentEntityList = new ArrayList<>(persistentObjects.get(chunkLocation + ""));
+            List<PersistentObjectHandler> simplePersistentEntityList = snapshot(chunkLocation + "");
             Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, () -> loadChunk(simplePersistentEntityList), 1L);
         }
 
@@ -177,13 +231,13 @@ public class PersistentObjectHandler {
 
         @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
         public void worldLoadEvent(WorldLoadEvent event) {
-            loadWorld(event.getWorld());
+            PersistentObjectHandler.loadWorld(event.getWorld());
         }
 
         @EventHandler (priority = EventPriority.LOWEST)
         public void chunkUnloadEvent(ChunkUnloadEvent event) {
             int chunkLocation = chunkLocation(event.getChunk());
-            List<PersistentObjectHandler> simplePersistentEntityList = new ArrayList<>(persistentObjects.get(chunkLocation + ""));
+            List<PersistentObjectHandler> simplePersistentEntityList = snapshot(chunkLocation + "");
             unloadChunk(simplePersistentEntityList);
         }
 

@@ -33,6 +33,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.time.Instant;
 import java.util.*;
@@ -51,6 +52,8 @@ public class TreasureChest implements PersistentObject {
     @Getter
     private Location location;
     private long restockTime;
+    private BukkitTask restockTask;
+    private PersistentObjectHandler persistentObjectHandler;
     @Getter
     @Setter
     private EMPackage emPackage = null;
@@ -70,43 +73,72 @@ public class TreasureChest implements PersistentObject {
             return;
 
         if (!customTreasureChestConfigFields.isInstanced()) {
-            initializeChest();
-            new PersistentObjectHandler(this);
-            treasureChestHashMap.put(location, this);
+            registerPersistentHandler();
+            registerChest();
+            scheduleRestock();
         } else
             instancedTreasureChests.put(worldName, this);
     }
 
+    /**
+     * Creates one runtime chest for one dungeon world from an immutable
+     * instanced blueprint. Runtime state (location, blacklist, handler, and
+     * restock task) must never be shared between simultaneous instances.
+     */
+    private TreasureChest(TreasureChest blueprint, World instancedWorld) {
+        this.customTreasureChestConfigFields = blueprint.customTreasureChestConfigFields;
+        this.locationString = blueprint.locationString;
+        this.worldName = blueprint.worldName;
+        this.location = ConfigurationLocation.serializeWithInstance(instancedWorld, locationString);
+        this.restockTime = 0;
+        this.emPackage = blueprint.emPackage;
+
+        if (!hasValidConfiguration() || location == null) return;
+        registerPersistentHandler();
+        registerChest();
+        scheduleRestock();
+    }
+
     public static void initializeInstancedTreasureChests(String instanceWorldName, World instancedWorld) {
         List<TreasureChest> chests = instancedTreasureChests.get(instanceWorldName);
-        chests.forEach(treasureChest -> {
-            treasureChest.location = ConfigurationLocation.serializeWithInstance(instancedWorld, treasureChest.locationString);
-            treasureChest.restockTime = 0;
-            new PersistentObjectHandler(treasureChest);
-            treasureChest.generateChest();
-            treasureChestHashMap.put(treasureChest.location, treasureChest);
-        });
+        chests.forEach(blueprint -> new TreasureChest(blueprint, instancedWorld));
     }
 
     public static void clearTreasureChests() {
+        Set<TreasureChest> activeChests = Collections.newSetFromMap(new IdentityHashMap<>());
+        activeChests.addAll(treasureChestHashMap.values());
+        activeChests.forEach(treasureChest -> {
+            treasureChest.cancelRestock();
+            treasureChest.unregisterPersistentHandler();
+        });
         treasureChestHashMap.clear();
     }
 
     public static void removeInstancedTreasureChests(World world) {
         if (world == null) return;
         UUID worldUUID = world.getUID();
+        Set<TreasureChest> removedChests = Collections.newSetFromMap(new IdentityHashMap<>());
         treasureChestHashMap.entrySet().removeIf(entry -> {
             Location keyLocation = entry.getKey();
             Location chestLocation = entry.getValue().location;
-            return isLocationInWorld(keyLocation, worldUUID) || isLocationInWorld(chestLocation, worldUUID);
+            boolean remove = isLocationInWorld(keyLocation, worldUUID) || isLocationInWorld(chestLocation, worldUUID);
+            if (remove) removedChests.add(entry.getValue());
+            return remove;
         });
         instancedTreasureChests.values().forEach(treasureChest -> {
-            if (isLocationInWorld(treasureChest.location, worldUUID))
-                treasureChest.location = null;
+            if (isLocationInWorld(treasureChest.location, worldUUID)) removedChests.add(treasureChest);
         });
+        removedChests.forEach(treasureChest -> treasureChest.deactivateInstance(worldUUID));
     }
 
     public static void shutdown() {
+        Set<TreasureChest> knownChests = Collections.newSetFromMap(new IdentityHashMap<>());
+        knownChests.addAll(treasureChestHashMap.values());
+        knownChests.addAll(instancedTreasureChests.values());
+        knownChests.forEach(treasureChest -> {
+            treasureChest.cancelRestock();
+            treasureChest.unregisterPersistentHandler();
+        });
         treasureChestHashMap.clear();
         instancedTreasureChests.clear();
     }
@@ -119,22 +151,74 @@ public class TreasureChest implements PersistentObject {
         return location != null && location.getWorld() != null && location.getWorld().getUID().equals(worldUUID);
     }
 
-    private void initializeChest() {
-        if (customTreasureChestConfigFields.isInstanced()) return;
-        if (location != null && location.getWorld() != null) {
-            long time = (restockTime - Instant.now().getEpochSecond()) * 20L;
-            if (time < 0)
-                generateChest();
-            else
-                Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, this::generateChest, time);
-        }
+    private void registerPersistentHandler() {
+        unregisterPersistentHandler();
+        persistentObjectHandler = new PersistentObjectHandler(this);
+    }
+
+    private void unregisterPersistentHandler() {
+        if (persistentObjectHandler == null) return;
+        persistentObjectHandler.remove();
+        persistentObjectHandler = null;
+    }
+
+    private boolean registerChest() {
+        if (!hasValidConfiguration() || !hasLoadedWorld()) return false;
+        treasureChestHashMap.put(location, this);
+        return true;
+    }
+
+    private boolean isRegistered() {
+        return location != null && treasureChestHashMap.get(location) == this;
+    }
+
+    private boolean hasValidConfiguration() {
+        return customTreasureChestConfigFields.isEnabled() &&
+                customTreasureChestConfigFields.getChestMaterial() != null;
+    }
+
+    private boolean hasLoadedWorld() {
+        if (location == null || location.getWorld() == null) return false;
+        return Bukkit.getWorld(location.getWorld().getUID()) != null;
+    }
+
+    private boolean canGenerateChest() {
+        if (!isRegistered() || !hasValidConfiguration() || !hasLoadedWorld()) return false;
+        return location.getWorld().isChunkLoaded(location.getBlockX() >> 4, location.getBlockZ() >> 4);
+    }
+
+    private void cancelRestock() {
+        if (restockTask != null && !restockTask.isCancelled()) restockTask.cancel();
+        restockTask = null;
+    }
+
+    private void deactivateInstance(UUID worldUUID) {
+        cancelRestock();
+        unregisterPersistentHandler();
+        if (!isLocationInWorld(location, worldUUID)) return;
+        treasureChestHashMap.remove(location, this);
+        location = null;
+    }
+
+    private void scheduleRestock() {
+        cancelRestock();
+        if (!isRegistered() || !hasValidConfiguration() || !hasLoadedWorld()) return;
+
+        long secondsUntilRestock = Math.max(0L, restockTime - Instant.now().getEpochSecond());
+        long delayTicks = secondsUntilRestock > Long.MAX_VALUE / 20L
+                ? Long.MAX_VALUE
+                : secondsUntilRestock * 20L;
+        restockTask = Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> {
+            restockTask = null;
+            if (canGenerateChest()) generateChest();
+        }, delayTicks);
     }
 
     private void generateChest() {
+        if (!canGenerateChest()) return;
         try {
-            if (!location.getWorld()
-                    .getBlockAt(location).getType().equals(customTreasureChestConfigFields.getChestMaterial()))
-                location.getWorld().getBlockAt(location).setType(customTreasureChestConfigFields.getChestMaterial());
+            if (!location.getBlock().getType().equals(customTreasureChestConfigFields.getChestMaterial()))
+                location.getBlock().setType(customTreasureChestConfigFields.getChestMaterial());
         } catch (Exception ex) {
             Logger.warn("Custom Treasure Chest " + customTreasureChestConfigFields.getFilename() + " has an invalid location and can not be placed.");
             return;
@@ -206,8 +290,7 @@ public class TreasureChest implements PersistentObject {
         restockTime = cooldownTime();
         customTreasureChestConfigFields.setRestockTime(location, restockTime);
 
-        if (!customTreasureChestConfigFields.isInstanced())
-            Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, this::generateChest, 20L * 60 * customTreasureChestConfigFields.getRestockTimer());
+        if (!customTreasureChestConfigFields.isInstanced()) scheduleRestock();
 
     }
 
@@ -297,10 +380,6 @@ public class TreasureChest implements PersistentObject {
         return null;
     }
 
-    private void lowRankMessage(Player player) {
-        // Guild rank removed - message removed
-    }
-
     private void groupTimerCooldownMessage(Player player, long targetTime) {
         player.sendMessage(DefaultConfig.getChestCooldownMessage().replace("$time", timeConverter(targetTime - Instant.now().getEpochSecond())));
     }
@@ -369,7 +448,7 @@ public class TreasureChest implements PersistentObject {
         if (seconds < 60 * 60 * 48)
             return Round.twoDecimalPlaces(seconds / 60D / 60) + "hours";
         else
-            return Round.twoDecimalPlaces(seconds / 60D / 60 / 48) + "days";
+            return Round.twoDecimalPlaces(seconds / 60D / 60 / 24) + "days";
     }
 
     private void saveRestockTimers() {
@@ -383,31 +462,36 @@ public class TreasureChest implements PersistentObject {
     }
 
     public void removeTreasureChest() {
+        cancelRestock();
+        unregisterPersistentHandler();
         CustomTreasureChestsConfig.removeTreasureChestEntry(location, customTreasureChestConfigFields.getFilename());
         if (location != null && location.getWorld() != null)
             location.getBlock().setBlockData(Material.AIR.createBlockData());
-        treasureChestHashMap.remove(location);
+        treasureChestHashMap.remove(location, this);
     }
 
     @Override
     public void chunkLoad() {
+        if (!registerChest()) return;
+        scheduleRestock();
     }
 
     @Override
     public void chunkUnload() {
+        cancelRestock();
     }
 
     @Override
     public void worldLoad(World world) {
         this.location = ConfigurationLocation.serialize(locationString);
-        initializeChest();
-        treasureChestHashMap.put(location, this);
+        if (!registerChest()) return;
+        scheduleRestock();
     }
 
     @Override
     public void worldUnload() {
-        treasureChestHashMap.remove(location);
-        //todo stop restock timer here
+        cancelRestock();
+        treasureChestHashMap.remove(location, this);
     }
 
     @Override
