@@ -60,13 +60,15 @@ public class PlayerItem {
     }
 
     private boolean fullUpdate(ItemStack itemStack) {
+        boolean itemIsEmpty = itemStack == null || itemStack.getType().isAir();
+        boolean cachedItemIsEmpty = this.itemStack == null || this.itemStack.getType().isAir();
 
-        //case when both are null
-        if (itemStack == null && this.itemStack == null)
+        // Case where both the live and cached slots are empty.
+        if (itemIsEmpty && cachedItemIsEmpty)
             return false;
 
-        //case when it became null
-        if (itemStack == null) {
+        // Case where the slot became empty.
+        if (itemIsEmpty) {
             if (displayingAsBroken) {
                 BossBarUtil.HideBrokenItemBossBar(equipmentSlot, player);
                 displayingAsBroken = false;
@@ -136,7 +138,7 @@ public class PlayerItem {
         this.continuousPotionEffects = ItemTagger.getPotionEffects(itemStack.getItemMeta(), ItemTagger.continuousPotionEffectKey);
         this.onHitPotionEffects = ItemTagger.getPotionEffects(itemStack.getItemMeta(), ItemTagger.onHitPotionEffectKey);
 
-        //Enchantments are global, any inventory slot will add to the total of any enchantment
+        // Enchantments contribute only while this item is directly equipped or held.
         this.eliteDamageReduction = EliteItemManager.getEliteDefense(itemStack) + EliteItemManager.getBonusEliteDefense(itemStack);
         this.protectionProjectile = ItemTagger.getEnchantment(itemStack.getItemMeta(), Enchantment.PROJECTILE_PROTECTION.getKey());
         this.blastProtection = ItemTagger.getEnchantment(itemStack.getItemMeta(), Enchantment.BLAST_PROTECTION.getKey());

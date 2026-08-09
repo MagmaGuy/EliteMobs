@@ -98,20 +98,23 @@ public class EliteItemManager {
         if (itemStack.getType() == Material.BOW) return 1.0;
         else if (itemStack.getType() == Material.CROSSBOW) return 0.8;
 
+        //Meta and attribute fetched once. getItemMeta() hands back a fresh copy of the item's meta
+        //on every call, so asking for it five times in this method meant five copies of an item
+        //that is not changing in between. That is paid for every item whose lore gets written,
+        //which at startup is every custom item in the pack.
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        var attackSpeedAttribute = AttributeManager.getAttribute("generic_attack_speed");
+
         //Check custom modifiers - this should only happen when third party plugins step in
         //Also weirdly enough if they are present the defaults go out of the window, they're not stacking
-        if (itemStack.getItemMeta() != null &&
-                itemStack.getItemMeta().getAttributeModifiers() != null &&
-                itemStack.getItemMeta().getAttributeModifiers(EquipmentSlot.HAND).containsKey(AttributeManager.getAttribute("generic_attack_speed")))
-            for (AttributeModifier attributeModifier : itemStack
-                    .getItemMeta()
-                    .getAttributeModifiers()
-                    .get(AttributeManager.getAttribute("generic_attack_speed")))
+        var handModifiers = itemMeta == null ? null : itemMeta.getAttributeModifiers(EquipmentSlot.HAND);
+        if (handModifiers != null && attackSpeedAttribute != null && handModifiers.containsKey(attackSpeedAttribute))
+            for (AttributeModifier attributeModifier : handModifiers.get(attackSpeedAttribute))
                 defaultAttackSpeed = attributeCrawler(defaultAttackSpeed, attributeModifier);
         else
             //Check the default modifiers - these are usually the only modifiers
             try {
-                for (AttributeModifier attributeModifier : itemStack.getType().getDefaultAttributeModifiers(EquipmentSlot.HAND).get(AttributeManager.getAttribute("generic_attack_speed")))
+                for (AttributeModifier attributeModifier : itemStack.getType().getDefaultAttributeModifiers(EquipmentSlot.HAND).get(attackSpeedAttribute))
                     defaultAttackSpeed = attributeCrawler(defaultAttackSpeed, attributeModifier);
             } catch (NoSuchMethodError e) {
                 //If you're on an ancient version you just get the default sword speed.

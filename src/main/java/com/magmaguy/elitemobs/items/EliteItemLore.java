@@ -15,6 +15,7 @@ import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.Round;
 import lombok.Getter;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
@@ -240,6 +241,12 @@ public class EliteItemLore {
                     string = "";
             }
 
+            if (string.contains("$itemMaxDurability")) {
+                if (itemStack.getType().getMaxDurability() <= 0 || itemMeta.isUnbreakable()) continue;
+                string = stringReplacer(string, "$itemMaxDurability", itemStack.getType().getMaxDurability());
+            }
+
+            string = stringReplacer(string, "$itemMaterial", materialDisplayName(itemStack.getType()));
             string = stringReplacer(string, "$EDPS", Round.twoDecimalPlaces(EliteItemManager.getDPS(itemStack)));
             string = stringReplacer(string, "$EDEF", Round.twoDecimalPlaces(EliteItemManager.getEliteDefense(itemStack) + EliteItemManager.getBonusEliteDefense(itemStack)));
             string = stringReplacer(string, "$prestigeLevel", prestigeLevel);
@@ -284,6 +291,21 @@ public class EliteItemLore {
             } else if (!string.isEmpty())
                 lore.add(ChatColorConverter.convert(string));
         }
+    }
+
+    /**
+     * Server-side English name for a material ("DIAMOND_SWORD" -> "Diamond Sword"). Lore is
+     * plain strings on the Spigot API, so a client-locale translation is not possible here.
+     */
+    static String materialDisplayName(Material material) {
+        String[] words = material.name().toLowerCase(Locale.ROOT).split("_");
+        StringBuilder displayName = new StringBuilder();
+        for (String word : words) {
+            if (word.isEmpty()) continue;
+            if (displayName.length() > 0) displayName.append(' ');
+            displayName.append(Character.toUpperCase(word.charAt(0))).append(word.substring(1));
+        }
+        return displayName.toString();
     }
 
     private String stringReplacer(String originalString, String placeholder, int value) {

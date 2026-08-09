@@ -233,37 +233,6 @@ public class ItemQualityColorizer {
 
     }
 
-    private static ItemMeta colorizeBoldNameAndLore(ChatColor chatColor, ItemMeta itemMeta) {
-
-        /*
-        Cancel colorization in case item already has a color (for custom and unique items)
-         */
-        if (itemMeta.getDisplayName().equals(ChatColor.stripColor(itemMeta.getDisplayName())))
-            itemMeta.setDisplayName(chatColor + "" + ChatColor.BOLD + itemMeta.getDisplayName());
-
-        List list = new ArrayList();
-
-        if (itemMeta.getLore() != null && !itemMeta.getLore().isEmpty()) {
-
-            for (String string : itemMeta.getLore()) {
-
-                if (!string.isEmpty()) {
-
-                    String colorizedString = chatColor + "" + ChatColor.BOLD + ChatColor.ITALIC + string;
-                    list.add(colorizedString);
-
-                }
-
-            }
-
-            itemMeta.setLore(list);
-
-        }
-
-        return itemMeta;
-
-    }
-
     private static int maxRankCalculator(ItemStack itemStack) {
 
         int maxRank = 0;

@@ -380,23 +380,31 @@ public class EliteItemSkins {
                 MAX_KNOCKBACK_RESISTANCE / 4.0 // Per-piece cap (total 4 pieces = 100%)
         );
 
+        // The modifier key MUST be unique per equipment slot. Minecraft de-duplicates
+        // attribute modifiers on a single attribute (e.g. ARMOR) by their key, so a
+        // shared key across helmet/chestplate/leggings/boots meant only one piece's
+        // bonus survived when a full set was worn — a full elite set protected the
+        // player like a single piece against vanilla mobs. Vanilla's own per-slot
+        // armor uses distinct keys (armor.helmet/chestplate/...) for exactly this reason.
+        String slotSuffix = "_" + slot.toString().toLowerCase(java.util.Locale.ROOT);
+
         meta.addAttributeModifier(Attribute.ARMOR,
                 new AttributeModifier(
-                        new NamespacedKey(MetadataHandler.PLUGIN, "elite_armor"),
+                        new NamespacedKey(MetadataHandler.PLUGIN, "elite_armor" + slotSuffix),
                         scaledArmor,
                         AttributeModifier.Operation.ADD_NUMBER,
                         slot));
 
         meta.addAttributeModifier(Attribute.ARMOR_TOUGHNESS,
                 new AttributeModifier(
-                        new NamespacedKey(MetadataHandler.PLUGIN, "elite_toughness"),
+                        new NamespacedKey(MetadataHandler.PLUGIN, "elite_toughness" + slotSuffix),
                         scaledToughness,
                         AttributeModifier.Operation.ADD_NUMBER,
                         slot));
 
         meta.addAttributeModifier(Attribute.KNOCKBACK_RESISTANCE,
                 new AttributeModifier(
-                        new NamespacedKey(MetadataHandler.PLUGIN, "elite_knockback_resist"),
+                        new NamespacedKey(MetadataHandler.PLUGIN, "elite_knockback_resist" + slotSuffix),
                         scaledKnockbackResist,
                         AttributeModifier.Operation.ADD_NUMBER,
                         slot));
