@@ -11,12 +11,12 @@
  },
   "guild.prestige": {
     "sounds": [
-      "custom/guild_prestige"
+      "custom/guild_rank_up"
     ]
  },
    "quest.progression": {
     "sounds": [
-      "custom/quest_progression"
+      "custom/quest_accept"
     ]
  },
    "quest.completion": {
