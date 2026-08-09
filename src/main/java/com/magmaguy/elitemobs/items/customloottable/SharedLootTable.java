@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.items.customloottable;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.config.InitializeConfig;
+import com.magmaguy.elitemobs.config.PartyConfig;
 import com.magmaguy.elitemobs.items.EliteItemLore;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.menus.LootMenu;
@@ -20,6 +21,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,6 +39,7 @@ import java.util.stream.Collectors;
  */
 public class SharedLootTable {
     private static final int DURATION_SECONDS = 60;
+    private static final long NANOS_PER_SECOND = 1_000_000_000L;
 
     @Getter
     private static final HashMap<EliteEntity, SharedLootTable> sharedLootTables = new HashMap<>();
@@ -46,7 +49,7 @@ public class SharedLootTable {
         List<SharedLootTable> tables = new ArrayList<>(sharedLootTables.values());
         for (SharedLootTable table : partyLootTables.values())
             if (!tables.contains(table)) tables.add(table);
-        tables.forEach(SharedLootTable::cleanupMenus);
+        tables.forEach(SharedLootTable::closeWithoutDistribution);
         sharedLootTables.clear();
         partyLootTables.clear();
     }
@@ -65,7 +68,7 @@ public class SharedLootTable {
         if (eligiblePlayers.size() < 2) return false;
 
         SharedLootTable table = partyLootTables.get(party.getId());
-        boolean created = table == null;
+        boolean created = table == null || table.closed;
         if (created) {
             table = new SharedLootTable(eliteEntity, eligiblePlayers, party.getId());
             partyLootTables.put(party.getId(), table);
@@ -82,14 +85,23 @@ public class SharedLootTable {
         tables.forEach(table -> table.removeParticipant(playerId));
     }
 
+    /** Removes a leaver only from their former party vote, preserving unrelated dungeon votes. */
+    public static void onPartyMemberLeave(UUID partyId, UUID playerId) {
+        SharedLootTable table = partyLootTables.get(partyId);
+        if (table != null) table.removeParticipant(playerId);
+    }
+
     private final List<LootRollEntry> loot = new ArrayList<>();
     private final EliteEntity eliteEntity;
     private final UUID partyId;
     private final Location fallbackDropLocation;
+    private final long hardDeadlineNanos;
     private final LinkedHashMap<UUID, Player> participants = new LinkedHashMap<>();
     private final Map<UUID, LootMenu> lootMenus = new HashMap<>();
     private final HashMap<UUID, PlayerTable> playerTables = new HashMap<>();
-    private long lastLootAddedNanos = System.nanoTime();
+    private long lastLootAddedNanos;
+    private BukkitTask distributionTask;
+    private boolean closed;
 
     /** Creates the original dungeon-wide vote pool from the elite's combat contributors. */
     public SharedLootTable(EliteEntity eliteEntity) {
@@ -108,10 +120,14 @@ public class SharedLootTable {
         this.eliteEntity = eliteEntity;
         this.partyId = partyId;
         this.fallbackDropLocation = eliteEntity.getLocation() == null ? null : eliteEntity.getLocation().clone();
+        this.lastLootAddedNanos = System.nanoTime();
+        this.hardDeadlineNanos = partyId == null
+                ? Long.MAX_VALUE
+                : lastLootAddedNanos + PartyConfig.getLootVoteMaximumLifetimeSeconds() * NANOS_PER_SECOND;
         addParticipants(initialParticipants);
         if (initialParticipants.size() > 1) messagePlayersLater(initialParticipants);
         if (initialParticipants.size() < 2)
-            Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, this::distribute, 1L);
+            distributionTask = Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, this::distribute, 1L);
         else
             scheduleDistribution(DURATION_SECONDS * 20L);
     }
@@ -135,7 +151,7 @@ public class SharedLootTable {
     }
 
     private void addLoot(ItemStack itemStack, Collection<Player> eligiblePlayers) {
-        if (itemStack == null) return;
+        if (itemStack == null || closed) return;
         loot.add(new LootRollEntry(
                 UUID.randomUUID(),
                 itemStack,
@@ -169,6 +185,7 @@ public class SharedLootTable {
     }
 
     private void messagePlayers(Collection<UUID> playerIds) {
+        if (closed) return;
         for (UUID playerId : playerIds) {
             Player player = activeParticipant(playerId);
             if (player == null) continue;
@@ -188,10 +205,15 @@ public class SharedLootTable {
     }
 
     private void scheduleDistribution(long ticks) {
-        new BukkitRunnable() {
+        if (closed) return;
+        if (distributionTask != null) distributionTask.cancel();
+        distributionTask = new BukkitRunnable() {
             @Override
             public void run() {
-                long deadline = lastLootAddedNanos + DURATION_SECONDS * 1_000_000_000L;
+                distributionTask = null;
+                if (closed) return;
+                long inactivityDeadline = lastLootAddedNanos + DURATION_SECONDS * NANOS_PER_SECOND;
+                long deadline = Math.min(inactivityDeadline, hardDeadlineNanos);
                 long remainingNanos = deadline - System.nanoTime();
                 if (remainingNanos > 0L) {
                     long remainingTicks = Math.max(1L, (remainingNanos + 49_999_999L) / 50_000_000L);
@@ -204,18 +226,25 @@ public class SharedLootTable {
     }
 
     private void distribute() {
-        for (LootRollEntry entry : loot) {
-            List<Player> eligiblePlayers = activeParticipants(entry.eligiblePlayers());
-            List<Player> needPlayers = new ArrayList<>();
-            for (Player player : eligiblePlayers) {
-                PlayerTable playerTable = playerTables.get(player.getUniqueId());
-                if (playerTable == null) continue;
-                if (playerTable.needs(entry.id())) needPlayers.add(player);
+        if (closed) return;
+        closed = true;
+        cancelDistributionTask();
+        try {
+            for (LootRollEntry entry : loot) {
+                List<Player> eligiblePlayers = activeParticipants(entry.eligiblePlayers());
+                List<Player> needPlayers = new ArrayList<>();
+                for (Player player : eligiblePlayers) {
+                    PlayerTable playerTable = playerTables.get(player.getUniqueId());
+                    if (playerTable == null) continue;
+                    if (playerTable.needs(entry.id())) needPlayers.add(player);
+                }
+                // Players who do not choose Need stay in the Greed pool by default.
+                rollLoot(entry.itemStack(), needPlayers.isEmpty() ? eligiblePlayers : needPlayers);
             }
-            rollLoot(entry.itemStack(), needPlayers.isEmpty() ? eligiblePlayers : needPlayers);
+        } finally {
+            removeFromRegistry();
+            cleanupMenus();
         }
-        removeFromRegistry();
-        cleanupMenus();
     }
 
     private void rollLoot(ItemStack item, List<Player> players) {
@@ -263,6 +292,19 @@ public class SharedLootTable {
         new ArrayList<>(lootMenus.values()).forEach(LootMenu::removeMenu);
         lootMenus.clear();
         playerTables.clear();
+    }
+
+    private void closeWithoutDistribution() {
+        if (closed) return;
+        closed = true;
+        cancelDistributionTask();
+        cleanupMenus();
+    }
+
+    private void cancelDistributionTask() {
+        if (distributionTask == null) return;
+        distributionTask.cancel();
+        distributionTask = null;
     }
 
     public PlayerTable getPlayerTable(Player player) {

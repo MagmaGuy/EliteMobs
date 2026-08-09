@@ -21,6 +21,7 @@ import com.magmaguy.elitemobs.mobconstructor.PersistentObjectHandler;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomMusic;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.InstancedBossEntity;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
+import com.magmaguy.elitemobs.parties.PartyDungeonReadyCheckManager;
 import com.magmaguy.elitemobs.parties.PartyManager;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
@@ -41,6 +42,7 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.io.File;
 import java.util.*;
+import java.util.function.BooleanSupplier;
 
 public class DungeonInstance extends MatchInstance {
     @Getter
@@ -88,6 +90,17 @@ public class DungeonInstance extends MatchInstance {
                            World world,
                            Collection<Player> initialPlayers,
                            String difficultyName) {
+        this(contentPackagesConfigFields, lobbyLocation, startLocation, world,
+                initialPlayers, difficultyName, () -> true);
+    }
+
+    protected DungeonInstance(ContentPackagesConfigFields contentPackagesConfigFields,
+                              Location lobbyLocation,
+                              Location startLocation,
+                              World world,
+                              Collection<Player> initialPlayers,
+                              String difficultyName,
+                              BooleanSupplier admissionAuthorization) {
         super(startLocation,
                 null, //todo: the end location is currently not definable
                 contentPackagesConfigFields.getMinPlayerCount(),
@@ -124,7 +137,7 @@ public class DungeonInstance extends MatchInstance {
             this.difficultyName = difficultyName;
             setDifficulty(difficultyName);
             super.permission = contentPackagesConfigFields.getPermission();
-            if (!addDungeonPlayers(initialPlayers)) {
+            if (!addDungeonPlayers(initialPlayers, admissionAuthorization)) {
                 if (initialPlayers.size() > 1)
                     PartyManager.sendConfiguredMessage(initialPlayers.iterator().next(),
                             PartyConfig.getDungeonPartyJoinFailedMessage());
@@ -181,17 +194,47 @@ public class DungeonInstance extends MatchInstance {
                 : prepareDungeonEntryRoster(player, instancedDungeonsConfigFields);
         if (entryMemberIds.isEmpty()) return;
 
+        PartyDungeonReadyCheckManager.request(
+                player,
+                entryMemberIds,
+                readyCheckDescription(instancedDungeonsConfigFields, difficultyName),
+                reservation -> launchInstancedDungeon(
+                        player,
+                        instancedDungeonsConfigFields,
+                        entryMemberIds,
+                        difficultyName,
+                        reservation));
+    }
+
+    private static boolean launchInstancedDungeon(Player player,
+                                                   ContentPackagesConfigFields instancedDungeonsConfigFields,
+                                                   List<UUID> entryMemberIds,
+                                                   String difficultyName,
+                                                   PartyDungeonReadyCheckManager.LaunchReservation reservation) {
+        if (!reservation.isValid()) return false;
+        if (resolveDungeonEntryRoster(
+                player, entryMemberIds, instancedDungeonsConfigFields, null).isEmpty()) return false;
         String instancedWorldName = WorldInstantiator.getNewWorldName(instancedDungeonsConfigFields.getWorldName());
 
-        if (!launchEvent(instancedDungeonsConfigFields, instancedWorldName, player)) return;
+        if (!launchEvent(instancedDungeonsConfigFields, instancedWorldName, player)) return false;
+        if (!reservation.isValid()) return false;
 
         WorldOperationQueue.queueOperation(
                 player,
-                () -> cloneWorldFiles(instancedDungeonsConfigFields, instancedWorldName) != null,
-                () -> initializeInstancedWorld(instancedDungeonsConfigFields, instancedWorldName, player,
-                        entryMemberIds, difficultyName),
-                instancedDungeonsConfigFields.getName()
+                () -> !reservation.isValid()
+                        || cloneWorldFiles(instancedDungeonsConfigFields, instancedWorldName) != null,
+                () -> {
+                    if (!reservation.isValid()) {
+                        cleanupUnloadedWorldFolder(instancedWorldName);
+                        return;
+                    }
+                    initializeInstancedWorld(instancedDungeonsConfigFields, instancedWorldName, player,
+                            entryMemberIds, difficultyName, reservation);
+                },
+                instancedDungeonsConfigFields.getName(),
+                reservation::release
         );
+        return true;
     }
 
     protected static boolean launchEvent(ContentPackagesConfigFields instancedDungeonsConfigFields, String instancedWordName, Player player) {
@@ -224,6 +267,20 @@ public class DungeonInstance extends MatchInstance {
                                                               Player player,
                                                               List<UUID> entryMemberIds,
                                                               String difficultyName) {
+        return initializeInstancedWorld(instancedDungeonsConfigFields, instancedWordName, player,
+                entryMemberIds, difficultyName, null);
+    }
+
+    protected static DungeonInstance initializeInstancedWorld(ContentPackagesConfigFields instancedDungeonsConfigFields,
+                                                              String instancedWordName,
+                                                              Player player,
+                                                              List<UUID> entryMemberIds,
+                                                              String difficultyName,
+                                                              PartyDungeonReadyCheckManager.LaunchReservation reservation) {
+        if (reservation != null && !reservation.isValid()) {
+            cleanupUnloadedWorldFolder(instancedWordName);
+            return null;
+        }
         World world = DungeonUtils.loadWorld(instancedWordName, instancedDungeonsConfigFields.getEnvironment(), instancedDungeonsConfigFields);
         if (world == null) {
             player.sendMessage(DungeonsConfig.getDungeonWorldLoadFailedMessage());
@@ -234,7 +291,7 @@ public class DungeonInstance extends MatchInstance {
         try {
             List<Player> entryPlayers = resolveDungeonEntryRoster(
                     player, entryMemberIds, instancedDungeonsConfigFields, null);
-            if (entryPlayers.isEmpty()) {
+            if (entryPlayers.isEmpty() || (reservation != null && !reservation.isValid())) {
                 cleanupLoadedWorld(world);
                 return null;
             }
@@ -255,7 +312,8 @@ public class DungeonInstance extends MatchInstance {
             //endLocation.setWorld(world);
             if (!instancedDungeonsConfigFields.isEnchantmentChallenge())
                 return new DungeonInstance(instancedDungeonsConfigFields, lobbyLocation, startLocation, world,
-                        entryPlayers, difficultyName);
+                        entryPlayers, difficultyName,
+                        reservation == null ? () -> true : reservation::isValid);
             else
                 return new EnchantmentDungeonInstance(instancedDungeonsConfigFields, lobbyLocation, startLocation,
                         world, entryPlayers.get(0), difficultyName);
@@ -268,29 +326,73 @@ public class DungeonInstance extends MatchInstance {
 
     @Override
     public boolean addNewPlayer(Player player) {
+        // Preserve the public MatchInstance API contract: direct callers admit only the
+        // requested player. Player-facing browsers use requestPartyEntry() for expansion.
+        return addDungeonPlayers(List.of(player));
+    }
+
+    /** Player-facing entry boundary. Low-level API admission remains available through addNewPlayer(). */
+    public boolean requestPartyEntry(Player player) {
         List<UUID> entryMemberIds = PartyManager.getDungeonEntryMemberIds(player);
-        List<Player> entryPlayers = resolveDungeonEntryRoster(
-                player, entryMemberIds, contentPackagesConfigFields, this);
-        if (entryPlayers.isEmpty()) return false;
+        if (resolveAdmissionRoster(player, entryMemberIds).isEmpty()) return false;
+        return PartyDungeonReadyCheckManager.request(
+                player,
+                entryMemberIds,
+                readyCheckDescription(),
+                reservation -> {
+                    try {
+                        return addEntryRoster(player, entryMemberIds, reservation::isValid);
+                    } finally {
+                        reservation.release();
+                    }
+                });
+    }
 
-        long playersNeedingAdmission = entryPlayers.stream().filter(candidate -> !players.contains(candidate)).count();
-        int availableSlots = maxPlayers - players.size();
-        if (playersNeedingAdmission > availableSlots) {
-            PartyManager.sendConfiguredMessage(player, PartyConfig.getDungeonPartyTooLargeMessage()
-                    .replace("$count", String.valueOf(playersNeedingAdmission))
-                    .replace("$max", String.valueOf(Math.max(0, availableSlots))));
-            return false;
-        }
+    protected boolean addEntryRoster(Player initiator,
+                                     List<UUID> entryMemberIds,
+                                     BooleanSupplier admissionAuthorization) {
+        if (!admissionAuthorization.getAsBoolean()) return false;
+        List<Player> entryPlayers = resolveAdmissionRoster(initiator, entryMemberIds);
+        if (entryPlayers.isEmpty() || !admissionAuthorization.getAsBoolean()) return false;
 
-        boolean added = addDungeonPlayers(entryPlayers);
+        boolean added = addDungeonPlayers(entryPlayers, admissionAuthorization);
         if (!added && entryMemberIds.size() > 1)
-            PartyManager.sendConfiguredMessage(player, PartyConfig.getDungeonPartyJoinFailedMessage());
+            PartyManager.sendConfiguredMessage(initiator, PartyConfig.getDungeonPartyJoinFailedMessage());
         return added;
     }
 
+    private List<Player> resolveAdmissionRoster(Player player, List<UUID> entryMemberIds) {
+        List<Player> entryPlayers = resolveDungeonEntryRoster(
+                player, entryMemberIds, contentPackagesConfigFields, this);
+        if (entryPlayers.isEmpty()) return List.of();
+
+        long playersNeedingAdmission = entryPlayers.stream().filter(candidate -> !players.contains(candidate)).count();
+        int availableSlots = maxPlayers - players.size();
+        if (playersNeedingAdmission <= availableSlots) return entryPlayers;
+        PartyManager.sendConfiguredMessage(player, PartyConfig.getDungeonPartyTooLargeMessage()
+                .replace("$count", String.valueOf(playersNeedingAdmission))
+                .replace("$max", String.valueOf(Math.max(0, availableSlots))));
+        return List.of();
+    }
+
+    protected static String readyCheckDescription(ContentPackagesConfigFields configFields, String difficultyName) {
+        String dungeonName = configFields.getName();
+        if (dungeonName == null || dungeonName.isBlank()) dungeonName = configFields.getFilename();
+        if (difficultyName == null || difficultyName.isBlank()) return dungeonName;
+        return dungeonName + " - " + difficultyName;
+    }
+
+    protected String readyCheckDescription() {
+        return readyCheckDescription(contentPackagesConfigFields, difficultyName);
+    }
+
     private boolean addDungeonPlayers(Collection<Player> entryPlayers) {
+        return addDungeonPlayers(entryPlayers, () -> true);
+    }
+
+    private boolean addDungeonPlayers(Collection<Player> entryPlayers, BooleanSupplier admissionAuthorization) {
         Set<UUID> existingPlayerIds = players.stream().map(Player::getUniqueId).collect(java.util.stream.Collectors.toSet());
-        if (!InstancePlayerManager.addNewPlayers(entryPlayers, this)) return false;
+        if (!InstancePlayerManager.addNewPlayers(entryPlayers, this, admissionAuthorization)) return false;
         for (Player entryPlayer : entryPlayers) {
             if (existingPlayerIds.contains(entryPlayer.getUniqueId())) continue;
             if (levelSync > 0)

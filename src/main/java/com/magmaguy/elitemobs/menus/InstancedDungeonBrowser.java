@@ -140,7 +140,7 @@ public class InstancedDungeonBrowser extends EliteMenu {
                         if (DungeonsConfig.isAllowSpectatorsInInstancedContent())
                             dungeonInstance.addSpectator((Player) event.getWhoClicked(), false);
                     }
-                    case WAITING -> dungeonInstance.addNewPlayer((Player) event.getWhoClicked());
+                    case WAITING -> dungeonInstance.requestPartyEntry((Player) event.getWhoClicked());
                     case COMPLETED ->
                             event.getWhoClicked().sendMessage(DungeonsConfig.getMatchAlreadyEndedMessage());
                 }

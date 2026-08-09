@@ -95,6 +95,11 @@ public class EnchantmentDungeonInstance extends DungeonInstance {
     }
 
     @Override
+    public boolean requestPartyEntry(Player player) {
+        return false;
+    }
+
+    @Override
     public void endMatch() {
         if (players.isEmpty()) {
             removeInstance();

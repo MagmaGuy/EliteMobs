@@ -22,6 +22,7 @@ public class WorldOperationQueue {
     private static final Queue<WorldOperation> operationQueue = new ConcurrentLinkedQueue<>();
     private static final AtomicBoolean isProcessing = new AtomicBoolean(false);
     private static final AtomicInteger operationGeneration = new AtomicInteger(0);
+    private static volatile WorldOperation activeOperation;
 
     /**
      * Queues a world operation for execution.
@@ -35,13 +36,28 @@ public class WorldOperationQueue {
                                        Supplier<Boolean> asyncOperation,
                                        Runnable syncOperation,
                                        String operationName) {
+        queueOperation(player, asyncOperation, syncOperation, operationName, () -> {
+        });
+    }
+
+    /**
+     * Queues a world operation. Once accepted into the queue, {@code terminalCallback} is
+     * invoked exactly once on success, failure, or shutdown cancellation.
+     */
+    public static void queueOperation(Player player,
+                                      Supplier<Boolean> asyncOperation,
+                                      Runnable syncOperation,
+                                      String operationName,
+                                      Runnable terminalCallback) {
         if (!Bukkit.isPrimaryThread()) {
             Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN,
-                    () -> queueOperation(player, asyncOperation, syncOperation, operationName));
+                    () -> queueOperation(player, asyncOperation, syncOperation, operationName, terminalCallback));
             return;
         }
 
-        WorldOperation operation = new WorldOperation(player, asyncOperation, syncOperation, operationName, operationGeneration.get());
+        WorldOperation operation = new WorldOperation(
+                player, asyncOperation, syncOperation, operationName, terminalCallback,
+                operationGeneration.get(), new AtomicBoolean(false));
         operationQueue.add(operation);
 
         int queuePosition = operationQueue.size() + (isProcessing.get() ? 1 : 0);
@@ -64,6 +80,7 @@ public class WorldOperationQueue {
             isProcessing.set(false);
             return;
         }
+        activeOperation = operation;
 
         // Notify queued players of updated positions
         notifyQueuePositions();
@@ -106,6 +123,7 @@ public class WorldOperationQueue {
                     operation.player.sendMessage(DungeonsConfig.getDungeonCopyFailedMessage());
                     operation.player.sendMessage(DungeonsConfig.getDungeonPrepareFailedMessage());
                 }
+                runTerminalCallback(operation);
                 isProcessing.set(false);
                 processNextOperation();
                 return;
@@ -120,6 +138,7 @@ public class WorldOperationQueue {
                     operation.player.sendMessage(DungeonsConfig.getDungeonLoadFailedMessage());
                 }
             } finally {
+                runTerminalCallback(operation);
                 isProcessing.set(false);
                 if (operation.generation != operationGeneration.get() || MetadataHandler.shutdownRequested) return;
                 new BukkitRunnable() {
@@ -154,12 +173,16 @@ public class WorldOperationQueue {
      */
     public static void shutdown() {
         operationGeneration.incrementAndGet();
+        WorldOperation currentOperation = activeOperation;
+        if (currentOperation != null) runTerminalCallback(currentOperation);
         for (WorldOperation op : operationQueue) {
             if (op.player.isOnline()) {
                 op.player.sendMessage(DungeonsConfig.getDungeonCancelledShutdownMessage());
             }
+            runTerminalCallback(op);
         }
         operationQueue.clear();
+        activeOperation = null;
         isProcessing.set(false);
     }
 
@@ -168,6 +191,20 @@ public class WorldOperationQueue {
             Supplier<Boolean> asyncOperation,
             Runnable syncOperation,
             String operationName,
-            int generation
+            Runnable terminalCallback,
+            int generation,
+            AtomicBoolean terminalized
     ) {}
+
+    private static void runTerminalCallback(WorldOperation operation) {
+        if (!operation.terminalized.compareAndSet(false, true)) return;
+        try {
+            operation.terminalCallback.run();
+        } catch (RuntimeException exception) {
+            Logger.warn("World operation '" + operation.operationName
+                    + "' terminal callback failed: " + exception.getMessage());
+        } finally {
+            if (activeOperation == operation) activeOperation = null;
+        }
+    }
 }

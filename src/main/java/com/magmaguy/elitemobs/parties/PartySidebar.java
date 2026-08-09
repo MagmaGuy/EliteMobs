@@ -36,18 +36,24 @@ public final class PartySidebar {
     private PartySidebar() {
     }
 
+    /** Whether the party UI, rather than the normal quest UI, currently owns the sidebar. */
+    public static boolean isEnabled() {
+        return PartyConfig.isEnabled() && PartyConfig.isSidebarEnabled();
+    }
+
     static void initialize() {
         if (refreshTask != null) refreshTask.cancel();
         secondsSinceActionRotation = 0;
         refreshTask = new BukkitRunnable() {
             @Override
             public void run() {
+                PartyManager.cleanupExpiredInvites();
+                cleanupExpiredViews();
+                if (!isEnabled()) return;
                 if (++secondsSinceActionRotation >= PartyConfig.getSidebarRotationSeconds()) {
                     showInviteAction = !showInviteAction;
                     secondsSinceActionRotation = 0;
                 }
-                PartyManager.cleanupExpiredInvites();
-                cleanupExpiredViews();
                 PartyManager.getParties().values().forEach(party -> party.getMembers().forEach(playerId -> {
                     Player player = Bukkit.getPlayer(playerId);
                     if (player != null) refresh(player);
@@ -66,7 +72,7 @@ public final class PartySidebar {
     }
 
     public static void showTemporaryQuest(Player player, String questName, List<String> questLines, int ticksTimeout) {
-        if (!PartyManager.isInParty(player.getUniqueId())) return;
+        if (!isEnabled() || !PartyManager.isInParty(player.getUniqueId())) return;
         UUID token = UUID.randomUUID();
         temporaryQuestViews.put(player.getUniqueId(),
                 new TemporaryQuestView(token, questName, List.copyOf(questLines),
@@ -84,6 +90,7 @@ public final class PartySidebar {
     }
 
     public static void refresh(Player player) {
+        if (!isEnabled()) return;
         Party party = PartyManager.getParty(player.getUniqueId());
         if (party == null || !player.isOnline()) return;
         if (QuestsConfig.isHideQuestScoreboardDuringQuestDialogue()
@@ -186,13 +193,16 @@ public final class PartySidebar {
 
     static void clearPlayer(Player player) {
         temporaryQuestViews.remove(player.getUniqueId());
-        lastRenderedSidebars.remove(player.getUniqueId());
+        if (lastRenderedSidebars.remove(player.getUniqueId()) == null) return;
+        if (QuestsConfig.isHideQuestScoreboardDuringQuestDialogue()
+                && QuestDialogueBossBarManager.hasActiveSession(player)) return;
         SimpleScoreboard.clearScoreboard(player);
         QuestTracking tracking = QuestTracking.getPlayerTrackingQuests().get(player.getUniqueId());
         if (tracking != null) tracking.refreshScoreboard();
     }
 
     private static QuestView currentQuestView(Player player) {
+        if (!QuestsConfig.isUseQuestScoreboards()) return null;
         TemporaryQuestView temporary = temporaryQuestViews.get(player.getUniqueId());
         if (temporary != null) {
             if (temporary.expiresAtNanos() > System.nanoTime())

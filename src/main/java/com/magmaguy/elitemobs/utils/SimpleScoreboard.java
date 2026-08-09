@@ -6,11 +6,14 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -24,11 +27,12 @@ public class SimpleScoreboard {
     private static final int LEGACY_SCOREBOARD_ENTRY_LIMIT = 40;
     private static final Map<UUID, Scoreboard> previousScoreboards = new ConcurrentHashMap<>();
     private static final Set<Scoreboard> managedScoreboards = Collections.newSetFromMap(new WeakHashMap<>());
+    private static final Map<Scoreboard, Set<String>> managedSidebarEntries = new WeakHashMap<>();
 
     public static Scoreboard lazyScoreboard(Player player, String displayName, List<String> scoreboardContents) {
         Scoreboard scoreboard = createManagedScoreboard(player);
         Objective objective = ScoreboardUtil.registerSidebarObjective(MetadataHandler.PLUGIN, scoreboard, SIDEBAR_OBJECTIVE, displayName);
-        setSidebarLines(objective, scoreboardContents);
+        setSidebarLines(objective, scoreboard, scoreboardContents);
         player.setScoreboard(scoreboard);
         return scoreboard;
     }
@@ -38,17 +42,28 @@ public class SimpleScoreboard {
         Scoreboard scoreboard = player.getScoreboard();
         if (!isManagedScoreboard(scoreboard)) return lazyScoreboard(player, displayName, scoreboardContents);
         Objective existing = scoreboard.getObjective(SIDEBAR_OBJECTIVE);
-        if (existing != null) existing.unregister();
-        Objective objective = ScoreboardUtil.registerSidebarObjective(
-                MetadataHandler.PLUGIN, scoreboard, SIDEBAR_OBJECTIVE, displayName);
-        setSidebarLines(objective, scoreboardContents);
+        Objective objective;
+        if (existing == null || !managedSidebarEntries.containsKey(scoreboard)) {
+            if (existing != null) existing.unregister();
+            objective = ScoreboardUtil.registerSidebarObjective(
+                    MetadataHandler.PLUGIN, scoreboard, SIDEBAR_OBJECTIVE, displayName);
+        } else {
+            // Party health changes frequently. Keep the same internal objective instead of
+            // unregistering it every refresh, which makes clients visibly blink the sidebar.
+            clearSidebarLines(scoreboard);
+            existing.setDisplayName(displayName);
+            existing.setDisplaySlot(DisplaySlot.SIDEBAR);
+            objective = existing;
+        }
+        setSidebarLines(objective, scoreboard, scoreboardContents);
         return scoreboard;
     }
 
     /** Lets periodic UI owners avoid rebuilding an unchanged EliteMobs sidebar objective. */
     public static boolean hasManagedSidebar(Player player) {
         if (player == null || !isManagedScoreboard(player.getScoreboard())) return false;
-        return player.getScoreboard().getObjective(SIDEBAR_OBJECTIVE) != null;
+        Objective objective = player.getScoreboard().getObjective(SIDEBAR_OBJECTIVE);
+        return objective != null && objective.equals(player.getScoreboard().getObjective(DisplaySlot.SIDEBAR));
     }
 
     public static Scoreboard temporaryScoreboard(Player player, String displayName, List<String> scoreboardContents, int ticksTimeout) {
@@ -77,6 +92,8 @@ public class SimpleScoreboard {
     public static void clearScoreboard(Player player) {
         Scoreboard previousScoreboard = previousScoreboards.remove(player.getUniqueId());
         if (!player.isOnline()) return;
+
+        managedSidebarEntries.remove(player.getScoreboard());
 
         if (previousScoreboard != null) {
             player.setScoreboard(previousScoreboard);
@@ -115,12 +132,31 @@ public class SimpleScoreboard {
                 (managedScoreboards.contains(scoreboard) || scoreboard.getObjective(SIDEBAR_OBJECTIVE) != null);
     }
 
-    private static void setSidebarLines(Objective objective, List<String> scoreboardContents) {
+    private static void setSidebarLines(Objective objective, Scoreboard scoreboard, List<String> scoreboardContents) {
         if (scoreboardContents == null) return;
         int lineCount = Math.min(scoreboardContents.size(), MAX_SIDEBAR_LINES);
+        Set<String> entries = new HashSet<>();
         for (int i = 0; i < lineCount; i++) {
-            Score score = objective.getScore(trimScoreboardEntry(scoreboardContents.get(i)));
+            String entry = trimScoreboardEntry(scoreboardContents.get(i));
+            Score score = objective.getScore(entry);
             score.setScore(i);
+            entries.add(entry);
+        }
+        managedSidebarEntries.put(scoreboard, entries);
+    }
+
+    private static void clearSidebarLines(Scoreboard scoreboard) {
+        Set<String> entries = managedSidebarEntries.remove(scoreboard);
+        if (entries == null) return;
+        for (String entry : entries) {
+            Map<Objective, Integer> otherScores = new HashMap<>();
+            for (Objective objective : scoreboard.getObjectives()) {
+                if (SIDEBAR_OBJECTIVE.equals(objective.getName())) continue;
+                Score score = objective.getScore(entry);
+                if (score.isScoreSet()) otherScores.put(objective, score.getScore());
+            }
+            scoreboard.resetScores(entry);
+            otherScores.forEach((objective, value) -> objective.getScore(entry).setScore(value));
         }
     }
 

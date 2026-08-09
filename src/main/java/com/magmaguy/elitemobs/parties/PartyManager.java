@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.parties;
 
 import com.magmaguy.elitemobs.config.PartyConfig;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
+import com.magmaguy.elitemobs.items.customloottable.SharedLootTable;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.magmacore.util.Logger;
@@ -42,11 +43,12 @@ public final class PartyManager implements Listener {
                 .map(Bukkit::getPlayer)
                 .filter(java.util.Objects::nonNull)
                 .toList();
-        PartySidebar.shutdown();
+        PartyDungeonReadyCheckManager.shutdown();
         parties.clear();
         partyByPlayer.clear();
         pendingInvites.clear();
         onlineMembers.forEach(PartySidebar::clearPlayer);
+        PartySidebar.shutdown();
     }
 
     public static Map<UUID, Party> getParties() {
@@ -172,6 +174,7 @@ public final class PartyManager implements Listener {
             return;
         }
 
+        PartyDungeonReadyCheckManager.cancelForRosterChange(party);
         partyByPlayer.put(player.getUniqueId(), party.getId());
         send(player, PartyConfig.getJoinedPartyMessage());
         broadcast(party, PartyConfig.getMemberJoinedMessage().replace("$player", player.getName()), player.getUniqueId());
@@ -246,6 +249,8 @@ public final class PartyManager implements Listener {
 
         UUID oldLeader = party.getLeader();
         String playerName = playerName(playerId);
+        PartyDungeonReadyCheckManager.cancelForRosterChange(party);
+        SharedLootTable.onPartyMemberLeave(party.getId(), playerId);
         party.removeMember(playerId);
         partyByPlayer.remove(playerId);
         pendingInvites.remove(playerId);
@@ -298,7 +303,7 @@ public final class PartyManager implements Listener {
         if (player != null) send(player, message);
     }
 
-    private static String format(String message) {
+    static String format(String message) {
         return (message == null ? "" : message).replace("$prefix", PartyConfig.getPrefix());
     }
 

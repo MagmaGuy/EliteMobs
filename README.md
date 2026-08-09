@@ -17,7 +17,7 @@ economy, player progression and skills, NPCs, and shops.
 - **Dungeons** — Installable, packageable instanced content with kill-percentage and kill-target objectives.
 - **Arenas** — Wave-based combat instances (optional MythicMobs integration for arena mobs).
 - **Quests** — Static and dynamic quests with objectives, tracking, rewards and quest NPCs.
-- **Parties** — Six-player, session-scoped groups with shared kill credit, need/greed Elite gear, and a compact sidebar.
+- **Parties** — Five-player, session-scoped groups with shared kill credit, need/greed Elite gear, and a compact sidebar.
 - **Items & enchantments** — Custom items plus procedurally generated gear, custom enchantments, and scrolls.
 - **Economy & shops** — Elite currency with custom, dynamic and sell shops; Vault integration.
 - **Progression** — Player ranks, level scaling, a skills system and the Adventurer's Guild hub.
@@ -57,11 +57,12 @@ of player and admin subcommands. Run `/em help` in-game for the full list, or co
 Parties are enabled by default through `Party.yml` and last only while their members remain logged in. A party contains
 one creator plus up to four invited players. Membership is never written to the player database.
 
-Entering or creating an instanced dungeon admits the initiating player's entire current party as one atomic group.
-Capacity, package permissions, active-instance state, party membership, and cancellable join events are validated for
-everyone before anybody is moved. Open-world dungeon teleports start the normal safe-teleport countdown for every
-available party member; an individual can still cancel their own teleport by moving. Personal item-enchantment
-challenges remain solo because they escrow the owner's item.
+Entering or creating an instanced dungeon starts a ready check for the initiating player's entire current party. The
+initiator is ready automatically; the dungeon is prepared only after every other member accepts the exact dungeon,
+difficulty and dynamic level shown in chat. Capacity, package permissions, active-instance state, party membership,
+and cancellable join events are validated for everyone before anybody is moved. Open-world dungeon teleports start
+the normal safe-teleport countdown for every available party member; an individual can still cancel their own
+teleport by moving. Personal item-enchantment challenges remain solo because they escrow the owner's item.
 
 | Command | Purpose |
 |---|---|
@@ -69,6 +70,8 @@ challenges remain solo because they escrow the owner's item.
 | `/em party invite <player>` | Invite an online player. Any current member may invite. |
 | `/em party accept` | Accept the most recent unexpired invitation. |
 | `/em party leave` | Leave the party. Leadership passes to the next member when necessary. |
+| `/em party ready <token>` | Accept the clickable instanced-dungeon ready check. |
+| `/em party decline <token>` | Decline and cancel the clickable ready check for the party. |
 
 Nearby party members in the same world receive credit for matching active kill objectives, including quest-specific
 boss kills. Quests remain separate per player: parties never accept quests, turn quests in, or collect rewards for
@@ -79,11 +82,15 @@ Normal Elite equipment and special Elite gear earned while at least two party me
 need/greed flow exposed by `/em loot`. Coins and Elite Scrolls remain personal. Each drop has an independent vote,
 large pools are paginated, overlapping roll sessions can be cycled by running `/em loot` again, and dungeon boss
 lockouts are applied before a player is admitted to a vote.
+Party vote pools retain the normal 60-second inactivity window but have a configurable hard lifetime of 120 seconds
+by default, so a steady stream of drops cannot keep one vote open forever. Players who make no selection remain in
+the Greed pool.
 
 The sidebar lists the leader and members with compact five-segment health bars and marks downed members clearly. While
 the viewer is in an instanced dungeon, each participating member also shows their remaining lives. It incorporates the
 currently tracked quest when space permits and alternates between the invite and leave command hints. Health colors and
 glyphs, `sharedProgressRange`, invitation expiry, rotation timing, styling, and messages are configurable in `Party.yml`.
+The combined sidebar itself can be disabled independently; normal EliteMobs quest scoreboards then remain in use.
 
 ## Permissions
 

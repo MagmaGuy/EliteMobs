@@ -213,7 +213,7 @@ public class QuestDialogueBossBarManager {
             // progressed during the dialogue); otherwise restore whatever board they had before.
             QuestTracking tracking = QuestTracking.getPlayerTrackingQuests().get(player.getUniqueId());
             if (tracking != null) tracking.refreshScoreboard();
-            else if (PartyManager.isInParty(player.getUniqueId())) PartySidebar.refresh(player);
+            else if (PartySidebar.isEnabled() && PartyManager.isInParty(player.getUniqueId())) PartySidebar.refresh(player);
             else SimpleScoreboard.clearScoreboard(player);
         }
 

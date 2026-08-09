@@ -8,6 +8,7 @@ import com.magmaguy.elitemobs.dungeons.utility.DungeonUtils;
 import com.magmaguy.elitemobs.instanced.WorldOperationQueue;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomMusic;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.InstancedBossEntity;
+import com.magmaguy.elitemobs.parties.PartyDungeonReadyCheckManager;
 import com.magmaguy.elitemobs.quests.DynamicQuest;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.WorldInstantiator;
@@ -21,6 +22,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.BooleanSupplier;
 import java.util.stream.Collectors;
 
 public class DynamicDungeonInstance extends DungeonInstance {
@@ -45,7 +47,20 @@ public class DynamicDungeonInstance extends DungeonInstance {
                                   Collection<Player> initialPlayers,
                                   String difficultyName,
                                   int selectedLevel) {
-        super(contentPackagesConfigFields, lobbyLocation, startLocation, world, initialPlayers, difficultyName);
+        this(contentPackagesConfigFields, lobbyLocation, startLocation, world,
+                initialPlayers, difficultyName, selectedLevel, () -> true);
+    }
+
+    private DynamicDungeonInstance(ContentPackagesConfigFields contentPackagesConfigFields,
+                                   Location lobbyLocation,
+                                   Location startLocation,
+                                   World world,
+                                   Collection<Player> initialPlayers,
+                                   String difficultyName,
+                                   int selectedLevel,
+                                   BooleanSupplier admissionAuthorization) {
+        super(contentPackagesConfigFields, lobbyLocation, startLocation, world,
+                initialPlayers, difficultyName, admissionAuthorization);
         this.selectedLevel = selectedLevel;
 
         //The super constructor can already have rolled this instance back (cancelled MatchInstantiateEvent or a
@@ -82,17 +97,50 @@ public class DynamicDungeonInstance extends DungeonInstance {
         List<UUID> entryMemberIds = prepareDungeonEntryRoster(player, dynamicDungeonConfigFields);
         if (entryMemberIds.isEmpty()) return;
 
+        PartyDungeonReadyCheckManager.request(
+                player,
+                entryMemberIds,
+                readyCheckDescription(dynamicDungeonConfigFields, difficultyName)
+                        + " - level " + selectedLevel,
+                reservation -> launchDynamicDungeon(
+                        player,
+                        dynamicDungeonConfigFields,
+                        entryMemberIds,
+                        difficultyName,
+                        selectedLevel,
+                        reservation));
+    }
+
+    private static boolean launchDynamicDungeon(Player player,
+                                                 ContentPackagesConfigFields dynamicDungeonConfigFields,
+                                                 List<UUID> entryMemberIds,
+                                                 String difficultyName,
+                                                 int selectedLevel,
+                                                 PartyDungeonReadyCheckManager.LaunchReservation reservation) {
+        if (!reservation.isValid()) return false;
+        if (resolveDungeonEntryRoster(
+                player, entryMemberIds, dynamicDungeonConfigFields, null).isEmpty()) return false;
         String instancedWorldName = WorldInstantiator.getNewWorldName(dynamicDungeonConfigFields.getWorldName());
 
-        if (!launchEvent(dynamicDungeonConfigFields, instancedWorldName, player)) return;
+        if (!launchEvent(dynamicDungeonConfigFields, instancedWorldName, player)) return false;
+        if (!reservation.isValid()) return false;
 
         WorldOperationQueue.queueOperation(
                 player,
-                () -> cloneWorldFiles(dynamicDungeonConfigFields, instancedWorldName) != null,
-                () -> initializeDynamicWorld(dynamicDungeonConfigFields, instancedWorldName, player,
-                        entryMemberIds, difficultyName, selectedLevel),
-                dynamicDungeonConfigFields.getName()
+                () -> !reservation.isValid()
+                        || cloneWorldFiles(dynamicDungeonConfigFields, instancedWorldName) != null,
+                () -> {
+                    if (!reservation.isValid()) {
+                        cleanupUnloadedWorldFolder(instancedWorldName);
+                        return;
+                    }
+                    initializeDynamicWorld(dynamicDungeonConfigFields, instancedWorldName, player,
+                            entryMemberIds, difficultyName, selectedLevel, reservation);
+                },
+                dynamicDungeonConfigFields.getName(),
+                reservation::release
         );
+        return true;
     }
 
     protected static DynamicDungeonInstance initializeDynamicWorld(ContentPackagesConfigFields dynamicDungeonConfigFields,
@@ -110,6 +158,21 @@ public class DynamicDungeonInstance extends DungeonInstance {
                                                                    List<UUID> entryMemberIds,
                                                                    String difficultyName,
                                                                    int selectedLevel) {
+        return initializeDynamicWorld(dynamicDungeonConfigFields, instancedWorldName, player,
+                entryMemberIds, difficultyName, selectedLevel, null);
+    }
+
+    protected static DynamicDungeonInstance initializeDynamicWorld(ContentPackagesConfigFields dynamicDungeonConfigFields,
+                                                                   String instancedWorldName,
+                                                                   Player player,
+                                                                   List<UUID> entryMemberIds,
+                                                                   String difficultyName,
+                                                                   int selectedLevel,
+                                                                   PartyDungeonReadyCheckManager.LaunchReservation reservation) {
+        if (reservation != null && !reservation.isValid()) {
+            cleanupUnloadedWorldFolder(instancedWorldName);
+            return null;
+        }
         World world = DungeonUtils.loadWorld(instancedWorldName, dynamicDungeonConfigFields.getEnvironment(), dynamicDungeonConfigFields);
         if (world == null) {
             player.sendMessage(DungeonsConfig.getDynamicDungeonWorldLoadFailedMessage());
@@ -120,7 +183,7 @@ public class DynamicDungeonInstance extends DungeonInstance {
         try {
             List<Player> entryPlayers = resolveDungeonEntryRoster(
                     player, entryMemberIds, dynamicDungeonConfigFields, null);
-            if (entryPlayers.isEmpty()) {
+            if (entryPlayers.isEmpty() || (reservation != null && !reservation.isValid())) {
                 cleanupLoadedWorld(world);
                 return null;
             }
@@ -136,7 +199,8 @@ public class DynamicDungeonInstance extends DungeonInstance {
             else lobbyLocation = startLocation;
 
             return new DynamicDungeonInstance(dynamicDungeonConfigFields, lobbyLocation, startLocation, world,
-                    entryPlayers, difficultyName, selectedLevel);
+                    entryPlayers, difficultyName, selectedLevel,
+                    reservation == null ? () -> true : reservation::isValid);
         } catch (Exception exception) {
             com.magmaguy.magmacore.util.Logger.warn("Failed to initialize dynamic dungeon world " + instancedWorldName + ": " + exception.getMessage());
             cleanupLoadedWorld(world);
@@ -156,9 +220,28 @@ public class DynamicDungeonInstance extends DungeonInstance {
         return true;
     }
 
+    @Override
+    protected boolean addEntryRoster(Player player,
+                                     List<UUID> entryMemberIds,
+                                     BooleanSupplier admissionAuthorization) {
+        Set<UUID> existingPlayerIds = getPlayers().stream()
+                .map(Player::getUniqueId)
+                .collect(Collectors.toSet());
+        if (!super.addEntryRoster(player, entryMemberIds, admissionAuthorization)) return false;
+        getPlayers().stream()
+                .filter(joinedPlayer -> !existingPlayerIds.contains(joinedPlayer.getUniqueId()))
+                .forEach(this::applyDynamicEntryState);
+        return true;
+    }
+
     private void applyDynamicEntryState(Player player) {
         player.sendMessage(DungeonsConfig.getDynamicDungeonLevelSetMessage().replace("$level", String.valueOf(selectedLevel)));
         DynamicQuest.adaptPlayerQuestsToLevel(player, selectedLevel);
+    }
+
+    @Override
+    protected String readyCheckDescription() {
+        return super.readyCheckDescription() + " - level " + selectedLevel;
     }
 
     private class SetBossLevelsTask extends BukkitRunnable {

@@ -15,6 +15,8 @@ import com.magmaguy.elitemobs.items.customloottable.EliteCustomLootEntry;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
+import com.magmaguy.elitemobs.parties.PartyManager;
+import com.magmaguy.elitemobs.parties.PartySidebar;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.dialogue.QuestDialogueBossBarManager;
 import com.magmaguy.elitemobs.quests.objectives.*;
@@ -266,7 +268,10 @@ public class QuestTracking {
         if (!player.isOnline()) return;
         Runnable resetScoreboard = () -> {
             if (!player.isOnline() || Bukkit.getScoreboardManager() == null) return;
-            SimpleScoreboard.clearScoreboard(player);
+            if (PartySidebar.isEnabled() && PartyManager.isInParty(player.getUniqueId()))
+                PartySidebar.refresh(player);
+            else
+                SimpleScoreboard.clearScoreboard(player);
         };
         if (Bukkit.isPrimaryThread()) {
             resetScoreboard.run();

@@ -16,6 +16,12 @@ public class PartyConfig extends ConfigurationFile {
     @Getter
     private static int inviteTimeoutSeconds;
     @Getter
+    private static int dungeonReadyCheckTimeoutSeconds;
+    @Getter
+    private static int lootVoteMaximumLifetimeSeconds;
+    @Getter
+    private static boolean sidebarEnabled;
+    @Getter
     private static int sidebarRotationSeconds;
 
     @Getter
@@ -70,6 +76,36 @@ public class PartyConfig extends ConfigurationFile {
     private static String dungeonPartyChangedMessage;
     @Getter
     private static String dungeonPartyJoinFailedMessage;
+    @Getter
+    private static String dungeonReadyCheckPendingMessage;
+    @Getter
+    private static String dungeonReadyCheckStartedMessage;
+    @Getter
+    private static String dungeonReadyCheckPromptMessage;
+    @Getter
+    private static String dungeonReadyCheckReadyButton;
+    @Getter
+    private static String dungeonReadyCheckReadyHover;
+    @Getter
+    private static String dungeonReadyCheckDeclineButton;
+    @Getter
+    private static String dungeonReadyCheckDeclineHover;
+    @Getter
+    private static String dungeonReadyCheckCancelPromptMessage;
+    @Getter
+    private static String dungeonReadyCheckCancelButton;
+    @Getter
+    private static String dungeonReadyCheckNoPendingMessage;
+    @Getter
+    private static String dungeonReadyCheckAlreadyReadyMessage;
+    @Getter
+    private static String dungeonReadyCheckPlayerReadyMessage;
+    @Getter
+    private static String dungeonReadyCheckCompleteMessage;
+    @Getter
+    private static String dungeonReadyCheckDeclinedMessage;
+    @Getter
+    private static String dungeonReadyCheckExpiredMessage;
 
     @Getter
     private static String sidebarTitle;
@@ -115,6 +151,17 @@ public class PartyConfig extends ConfigurationFile {
         inviteTimeoutSeconds = Math.max(5, ConfigurationEngine.setInt(
                 List.of("How long a party invitation remains valid."),
                 fileConfiguration, "inviteTimeoutSeconds", 60));
+        dungeonReadyCheckTimeoutSeconds = Math.max(5, ConfigurationEngine.setInt(
+                List.of("How long party members have to accept an instanced dungeon ready check."),
+                fileConfiguration, "dungeonReadyCheckTimeoutSeconds", 30));
+        lootVoteMaximumLifetimeSeconds = Math.max(60, ConfigurationEngine.setInt(
+                List.of("Hard maximum lifetime for one party need/greed vote session.",
+                        "New party drops still refresh the normal 60-second voting window, but can never extend a session past this limit."),
+                fileConfiguration, "lootVoteMaximumLifetimeSeconds", 120));
+        sidebarEnabled = ConfigurationEngine.setBoolean(
+                List.of("Shows the combined party status and tracked quest sidebar while players are in a party.",
+                        "Disabling this keeps parties active and falls back to the normal EliteMobs quest scoreboard."),
+                fileConfiguration, "sidebarEnabled", true);
         sidebarRotationSeconds = Math.max(3, ConfigurationEngine.setInt(
                 List.of("How often the party sidebar alternates between its invite and leave command hints."),
                 fileConfiguration, "sidebarRotationSeconds", 10));
@@ -154,6 +201,31 @@ public class PartyConfig extends ConfigurationFile {
                 "$prefixThe party changed while the dungeon was being prepared. Please try again.");
         dungeonPartyJoinFailedMessage = message("dungeonPartyJoinFailedMessage",
                 "$prefixThe party could not enter together, so nobody was moved.");
+        dungeonReadyCheckPendingMessage = message("dungeonReadyCheckPendingMessage",
+                "$prefixYour party already has a dungeon ready check in progress.");
+        dungeonReadyCheckStartedMessage = message("dungeonReadyCheckStartedMessage",
+                "$prefix&f$player &7wants to enter &f$dungeon&7. Waiting for the party (&f$ready&7/&f$total&7).");
+        dungeonReadyCheckPromptMessage = message("dungeonReadyCheckPromptMessage",
+                "$prefixReady to enter &f$dungeon&7? ");
+        dungeonReadyCheckReadyButton = message("dungeonReadyCheckReadyButton", "&a&l[READY]");
+        dungeonReadyCheckReadyHover = message("dungeonReadyCheckReadyHover", "&7Click to confirm dungeon entry");
+        dungeonReadyCheckDeclineButton = message("dungeonReadyCheckDeclineButton", " &c&l[DECLINE]");
+        dungeonReadyCheckDeclineHover = message("dungeonReadyCheckDeclineHover", "&7Click to cancel this party entry");
+        dungeonReadyCheckCancelPromptMessage = message("dungeonReadyCheckCancelPromptMessage",
+                "$prefixStarted the wrong dungeon? ");
+        dungeonReadyCheckCancelButton = message("dungeonReadyCheckCancelButton", "&c&l[CANCEL]");
+        dungeonReadyCheckNoPendingMessage = message("dungeonReadyCheckNoPendingMessage",
+                "$prefixThat dungeon ready check is no longer active.");
+        dungeonReadyCheckAlreadyReadyMessage = message("dungeonReadyCheckAlreadyReadyMessage",
+                "$prefixYou are already ready for this dungeon.");
+        dungeonReadyCheckPlayerReadyMessage = message("dungeonReadyCheckPlayerReadyMessage",
+                "$prefix&f$player &ais ready &7(&f$ready&7/&f$total&7).");
+        dungeonReadyCheckCompleteMessage = message("dungeonReadyCheckCompleteMessage",
+                "$prefix&aEveryone is ready! &7Preparing &f$dungeon&7...");
+        dungeonReadyCheckDeclinedMessage = message("dungeonReadyCheckDeclinedMessage",
+                "$prefix&f$player &cdeclined &7the ready check for &f$dungeon&7.");
+        dungeonReadyCheckExpiredMessage = message("dungeonReadyCheckExpiredMessage",
+                "$prefixThe ready check for &f$dungeon &7expired.");
 
         sidebarTitle = message("sidebarTitle", "&6&lElite Party");
         migrateDefault("sidebarLeaderLine", "&6♛ &f$player", "&6♛ &f$player$health$lives");

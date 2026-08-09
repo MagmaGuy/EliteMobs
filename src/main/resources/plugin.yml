@@ -112,7 +112,7 @@ permissions:
     description: Allows users to check their balance
     default: true
   elitemobs.party:
-    description: Allows players to create, join, invite to, and leave EliteMobs parties
+    description: Allows players to use EliteMobs party commands, including dungeon ready checks
     default: true
   elitemobs.place.admin:
     description: Allows admins to run all commands related to placing and spawning npcs, bosses, treasure chests and more

@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.BooleanSupplier;
 
 public class InstancePlayerManager {
 
@@ -56,6 +57,18 @@ public class InstancePlayerManager {
      * those events describe admission attempts and no player state has changed at that point.
      */
     public static boolean addNewPlayers(Collection<Player> requestedPlayers, MatchInstance matchInstance) {
+        return addNewPlayers(requestedPlayers, matchInstance, () -> true);
+    }
+
+    /**
+     * Atomically admits players while an external authorization remains valid. The predicate is
+     * rechecked after cancellable API preflights so those callbacks cannot revive a cancelled
+     * party launch by changing and then restoring unrelated match state.
+     */
+    public static boolean addNewPlayers(Collection<Player> requestedPlayers,
+                                        MatchInstance matchInstance,
+                                        BooleanSupplier authorization) {
+        if (authorization == null || !authorization.getAsBoolean()) return false;
         LinkedHashMap<UUID, Player> uniquePlayers = new LinkedHashMap<>();
         for (Player player : requestedPlayers)
             if (player != null) uniquePlayers.putIfAbsent(player.getUniqueId(), player);
@@ -65,11 +78,14 @@ public class InstancePlayerManager {
         if (playersToAdd.isEmpty()) return false;
 
         if (!canAdmitPlayers(playersToAdd, matchInstance, true)) return false;
-        for (Player player : playersToAdd)
+        for (Player player : playersToAdd) {
             if (!fireJoinEvent(matchInstance, player)) return false;
+            if (!authorization.getAsBoolean()) return false;
+        }
         // Join listeners execute synchronously and can change match/player state. Fail closed if
         // anything changed during the batch preflight instead of admitting only part of a party.
-        if (!canAdmitPlayers(playersToAdd, matchInstance, true)) return false;
+        if (!authorization.getAsBoolean()
+                || !canAdmitPlayers(playersToAdd, matchInstance, true)) return false;
 
         LinkedHashMap<UUID, Location> previousLocations = new LinkedHashMap<>();
         for (Player player : playersToAdd)

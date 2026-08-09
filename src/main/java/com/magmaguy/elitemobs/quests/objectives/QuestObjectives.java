@@ -120,7 +120,7 @@ public class QuestObjectives implements Serializable {
     public void displayTemporaryObjectivesScoreboard(Player player) {
         if (!QuestsConfig.isUseQuestScoreboards()) return;
         if (scoreboardHiddenForDialogue(player)) return;
-        if (PartyManager.isInParty(player.getUniqueId())) {
+        if (PartySidebar.isEnabled() && PartyManager.isInParty(player.getUniqueId())) {
             PartySidebar.showTemporaryQuest(
                     player,
                     ChatColorConverter.convert(getQuest().getQuestName()),
@@ -134,7 +134,7 @@ public class QuestObjectives implements Serializable {
     public void displayLazyObjectivesScoreboard(Player player) {
         if (!QuestsConfig.isUseQuestScoreboards()) return;
         if (scoreboardHiddenForDialogue(player)) return;
-        if (PartyManager.isInParty(player.getUniqueId())) {
+        if (PartySidebar.isEnabled() && PartyManager.isInParty(player.getUniqueId())) {
             PartySidebar.refresh(player);
             return;
         }

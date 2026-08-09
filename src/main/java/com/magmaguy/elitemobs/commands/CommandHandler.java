@@ -148,6 +148,8 @@ public class CommandHandler {
         emCommand.registerCommand(new PartyInviteCommand());
         emCommand.registerCommand(new PartyAcceptCommand());
         emCommand.registerCommand(new PartyLeaveCommand());
+        emCommand.registerCommand(new PartyReadyCommand());
+        emCommand.registerCommand(new PartyDeclineCommand());
 
         emCommand.registerCommand(new EliteMobsCommand());
         emCommand.registerCommand(new HelpCommand());

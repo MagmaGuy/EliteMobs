@@ -241,7 +241,7 @@ public class DynamicDungeonBrowser extends EliteMenu {
                                 if (DungeonsConfig.isAllowSpectatorsInInstancedContent())
                                     dungeonInstance.addSpectator(player, false);
                             }
-                            case WAITING -> dungeonInstance.addNewPlayer(player);
+                            case WAITING -> dungeonInstance.requestPartyEntry(player);
                             case COMPLETED, COMPLETED_VICTORY, COMPLETED_DEFEAT ->
                                     player.sendMessage(DungeonsConfig.getMatchAlreadyEndedMessage());
                         }
