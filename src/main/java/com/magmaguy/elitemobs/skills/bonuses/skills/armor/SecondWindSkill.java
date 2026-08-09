@@ -21,6 +21,17 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class SecondWindSkill extends SkillBonus implements CooldownSkill {
 
+    /**
+     * Share of max health restored when the skill fires.
+     * <p>
+     * Second Wind restores health rather than reducing a hit, so it carries no reduction term and
+     * sits outside the {@code E = uptime * reduction} defensive budget. Pinned to the value the old
+     * config scaling produced at the reference skill level of 50, so nothing changes at that level —
+     * this removes balance config from the skill and stops the heal growing past 100% of max health
+     * at very high levels.
+     */
+    private static final double HEAL_PERCENT = 0.40;
+
     private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
     private static final Map<UUID, Long> cooldownMap = new ConcurrentHashMap<>();
     private static final double HEALTH_THRESHOLD = 0.25; // 25% health
@@ -92,6 +103,8 @@ public class SecondWindSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public long getCooldownSeconds(int skillLevel) {
+        if (configFields != null && configFields.getCooldownSeconds() > 0)
+            return Math.max(1L, Math.round(configFields.calculateCooldown(skillLevel)));
         // Base 60 seconds cooldown
         return 60;
     }
@@ -174,8 +187,8 @@ public class SecondWindSkill extends SkillBonus implements CooldownSkill {
      * @return The heal percentage (0.0 to 1.0)
      */
     private double getHealPercent(int skillLevel) {
-        // Base 20% + up to 10% based on skill level
-        return 0.20 + getScaledValue(skillLevel) * 0.10;
+        if (configFields == null) return HEAL_PERCENT;
+        return Math.min(1.0, Math.max(0.0, 0.20 + configFields.calculateValue(skillLevel) * 0.10));
     }
 
     private int getPlayerSkillLevel(Player player) {

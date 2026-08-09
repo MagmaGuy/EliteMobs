@@ -45,7 +45,7 @@ public class ExecutionerSkill extends SkillBonus implements ConditionalSkill {
 
     @Override
     public double getConditionalBonus(int skillLevel) {
-        return BASE_DAMAGE_BONUS + (skillLevel * 0.008);
+        return scaled(BASE_DAMAGE_BONUS, 0.008, skillLevel);
     }
 
     public static double applyExecuteBonus(Player player, EliteMobDamagedByPlayerEvent event, double damage) {

@@ -25,7 +25,7 @@ public class RiposteSkill extends SkillBonus implements CooldownSkill {
 
     public static final String SKILL_ID = "swords_riposte";
     private static final double BASE_COOLDOWN = 10.0; // 10 seconds
-    private static final double BASE_DAMAGE_MULTIPLIER = 1.5; // 50% bonus damage
+    private static final double BASE_DAMAGE_MULTIPLIER = 1.83; // 83% bonus damage
 
     private static final Set<UUID> playersOnCooldown = ConcurrentHashMap.newKeySet();
     private static final Set<UUID> playersWithRiposteReady = ConcurrentHashMap.newKeySet();
@@ -39,6 +39,8 @@ public class RiposteSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public long getCooldownSeconds(int skillLevel) {
+        if (configFields != null && configFields.getCooldownSeconds() > 0)
+            return Math.max(1L, Math.round(configFields.calculateCooldown(skillLevel)));
         // Reduce cooldown by 0.5% per level, min 5 seconds
         double reduction = 1.0 - (skillLevel * 0.005);
         return (long) Math.max(5.0, BASE_COOLDOWN * reduction);
@@ -127,8 +129,9 @@ public class RiposteSkill extends SkillBonus implements CooldownSkill {
     }
 
     private double getDamageMultiplier(int skillLevel) {
-        // Base 50% bonus + 1% per level, capped at 2.5x
-        return Math.min(2.5, BASE_DAMAGE_MULTIPLIER + (skillLevel * 0.01));
+        // Power budget: block-then-strike lands on roughly 15% of hits, which earns a 2.33x
+        // hit at level 50 (E = 0.15 * 1.33 = 0.20). Base 83% bonus + 1% per level, capped at 3x.
+        return scaled(BASE_DAMAGE_MULTIPLIER, 0.01, 3.0, skillLevel);
     }
 
     @Override

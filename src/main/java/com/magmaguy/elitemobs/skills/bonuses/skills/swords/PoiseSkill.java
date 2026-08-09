@@ -41,7 +41,7 @@ public class PoiseSkill extends SkillBonus {
      */
     public static double getKnockbackReduction(int skillLevel) {
         // Base 20% + 0.3% per level, max 50%
-        return Math.min(0.50, BASE_KNOCKBACK_REDUCTION + (skillLevel * 0.003));
+        return scaled(BASE_KNOCKBACK_REDUCTION, 0.003, 0.50, skillLevel);
     }
 
     /**

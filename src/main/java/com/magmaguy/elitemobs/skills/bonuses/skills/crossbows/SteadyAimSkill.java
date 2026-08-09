@@ -20,7 +20,9 @@ public class SteadyAimSkill extends SkillBonus implements ConditionalSkill {
 
     public static final String SKILL_ID = "crossbows_steady_aim";
     private static final long STAND_TIME_REQUIRED = 1500; // 1.5 seconds
-    private static final double BASE_BONUS = 0.20; // 20% bonus
+    // Budgeted against how often the condition ACTUALLY holds. Crossbow users stand still to fire
+    // as a matter of course, so this is up roughly half the time: 1 + 0.20/0.50 = 1.40x.
+    private static final double BASE_BONUS = 0.25;
 
     private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
     private static final Map<UUID, Long> standingStillSince = new ConcurrentHashMap<>();
@@ -52,7 +54,9 @@ public class SteadyAimSkill extends SkillBonus implements ConditionalSkill {
 
     @Override
     public double getConditionalBonus(int skillLevel) {
-        return BASE_BONUS + (skillLevel * 0.003); // 20% base + 0.3% per level
+        // Power budget: standard conditional band - a 1.75x hit at level 50
+        // (E = 0.267 * 0.75 = 0.20).
+        return scaled(BASE_BONUS, 0.003, skillLevel); // 25% base + 0.3% per level -> 1.40x at level 50
     }
 
     public double calculateBonus(Player player, int skillLevel) {

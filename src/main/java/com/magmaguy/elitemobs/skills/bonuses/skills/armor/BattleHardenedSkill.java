@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.skills.bonuses.skills.armor;
 
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
-import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import org.bukkit.entity.Player;
 
@@ -17,6 +16,16 @@ import java.util.concurrent.ConcurrentHashMap;
  * Provides passive damage reduction
  */
 public class BattleHardenedSkill extends SkillBonus {
+
+    /**
+     * Flat damage reduction, on the shared defensive power budget.
+     * <p>
+     * Sustained power is {@code E = uptime * reduction} and the budget is 0.20. Battle Hardened is a
+     * true passive with no condition and no ramp, so uptime is 1.0 and the fair reduction is
+     * {@code 0.20 / 1.0}. Hardcoded on purpose: balance values no longer come from config, only
+     * presentation (name, lore, proc message) does.
+     */
+    private static final double DAMAGE_REDUCTION = 0.20;
 
     private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
@@ -59,43 +68,32 @@ public class BattleHardenedSkill extends SkillBonus {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        return applyLoreTemplates(Map.of("value", String.format("%.1f", getBonusValue(skillLevel) * 8.0)));
+        return applyLoreTemplates(Map.of("value", String.format("%.1f", getBonusValue(skillLevel) * 100)));
     }
 
+    /**
+     * The passive damage reduction applied to incoming damage.
+     * <p>
+     * This is the single source of truth for the skill: the generic PASSIVE branch in
+     * {@link com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent} applies this value directly
+     * as {@code damage * (1 - bonus)}, so it must already be the final reduction rather than the
+     * raw scaled value. Flat {@link #DAMAGE_REDUCTION}, still run through the shared defensive clamp
+     * so it can never negate or invert incoming damage.
+     */
     @Override
     public double getBonusValue(int skillLevel) {
-        return getScaledValue(skillLevel);
+        return clampDefensiveReduction(configFields == null
+                ? DAMAGE_REDUCTION
+                : configFields.calculateValue(skillLevel));
     }
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return applyFormattedBonusTemplate(Map.of("value", String.format("%.1f", getBonusValue(skillLevel) * 8.0)));
+        return applyFormattedBonusTemplate(Map.of("value", String.format("%.1f", getBonusValue(skillLevel) * 100)));
     }
 
     @Override
     public void shutdown() {
         activePlayers.clear();
-    }
-
-    /**
-     * Calculates damage reduction for incoming damage.
-     * Called from damage event handler.
-     *
-     * @param player The player taking damage
-     * @param originalDamage The original damage amount
-     * @return The modified damage amount
-     */
-    public double modifyIncomingDamage(Player player, double originalDamage) {
-        if (!isActive(player)) {
-            return originalDamage;
-        }
-
-        int skillLevel = getPlayerSkillLevel(player);
-        // Reduce damage by up to 8% based on skill level
-        return originalDamage * (1 - getScaledValue(skillLevel) * 0.08);
-    }
-
-    private int getPlayerSkillLevel(Player player) {
-        return SkillBonusRegistry.getPlayerSkillLevel(player, SkillType.ARMOR);
     }
 }

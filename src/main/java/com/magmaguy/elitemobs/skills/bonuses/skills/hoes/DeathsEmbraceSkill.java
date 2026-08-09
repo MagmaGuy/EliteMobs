@@ -37,6 +37,8 @@ public class DeathsEmbraceSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public long getCooldownSeconds(int skillLevel) {
+        if (configFields != null && configFields.getCooldownSeconds() > 0)
+            return Math.max(1L, Math.round(configFields.calculateCooldown(skillLevel)));
         // Base cooldown - 0.4s per level
         long reduction = (long) (skillLevel * 0.4);
         return Math.max(30, BASE_COOLDOWN - reduction);
@@ -113,11 +115,8 @@ public class DeathsEmbraceSkill extends SkillBonus implements CooldownSkill {
     }
 
     public double getPassiveDamageBonus(int skillLevel) {
-        if (configFields != null) {
-            return configFields.calculateValue(skillLevel);
-        }
-        // Base 5% + 0.1% per level
-        return BASE_PASSIVE_BONUS + (skillLevel * 0.001);
+        if (configFields != null) return configFields.calculateValue(skillLevel);
+        return scaled(BASE_PASSIVE_BONUS, 0.001, skillLevel);
     }
 
     @Override
@@ -164,7 +163,9 @@ public class DeathsEmbraceSkill extends SkillBonus implements CooldownSkill {
     @Override
     public String getFormattedBonus(int skillLevel) {
         return applyFormattedBonusTemplate(Map.of(
-                "passiveBonus", String.format("%.1f", getPassiveDamageBonus(skillLevel) * 100)
+                "passiveBonus", String.format("%.1f", getPassiveDamageBonus(skillLevel) * 100),
+                "healPercent", String.format("%.0f", HEAL_PERCENT * 100),
+                "cooldown", String.valueOf(getCooldownSeconds(skillLevel))
         ));
     }
 

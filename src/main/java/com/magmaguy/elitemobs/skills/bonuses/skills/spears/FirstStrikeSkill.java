@@ -25,7 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class FirstStrikeSkill extends SkillBonus implements ConditionalSkill {
 
     public static final String SKILL_ID = "spears_first_strike";
-    private static final double BASE_DAMAGE_BONUS = 0.30; // 30% bonus damage
+    private static final double BASE_DAMAGE_BONUS = 0.83; // 83% bonus damage
 
     private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
@@ -77,10 +77,11 @@ public class FirstStrikeSkill extends SkillBonus implements ConditionalSkill {
     }
 
     public double getDamageBonus(int skillLevel) {
-        if (configFields != null) {
-            return configFields.calculateValue(skillLevel);
-        }
-        return BASE_DAMAGE_BONUS + (skillLevel * 0.005);
+        if (configFields != null) return configFields.calculateValue(skillLevel);
+        // Power budget: only full-health targets qualify, roughly a 15% trigger rate, which
+        // earns a 2.33x hit at level 50 (E = 0.15 * 1.33 = 0.20). Hardcoded rather than read
+        // from config so every server runs the same numbers while the rebalance is validated.
+        return scaled(BASE_DAMAGE_BONUS, 0.01, skillLevel); // 83% base + 1% per level
     }
 
     @Override

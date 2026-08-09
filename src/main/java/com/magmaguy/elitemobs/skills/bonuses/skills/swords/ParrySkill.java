@@ -47,7 +47,7 @@ public class ParrySkill extends SkillBonus implements ConditionalSkill {
     @Override
     public double getConditionalBonus(int skillLevel) {
         // Base 30% + 0.5% per level damage reduction
-        return Math.min(0.60, BASE_DAMAGE_REDUCTION + (skillLevel * 0.005));
+        return scaled(BASE_DAMAGE_REDUCTION, 0.005, 0.60, skillLevel);
     }
 
     /**

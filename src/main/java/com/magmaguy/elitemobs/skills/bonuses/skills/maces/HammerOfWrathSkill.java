@@ -40,6 +40,8 @@ public class HammerOfWrathSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public long getCooldownSeconds(int skillLevel) {
+        if (configFields != null && configFields.getCooldownSeconds() > 0)
+            return Math.max(1L, Math.round(configFields.calculateCooldown(skillLevel)));
         return Math.max(15, BASE_COOLDOWN_SECONDS - (skillLevel / 5));
     }
 
@@ -73,13 +75,6 @@ public class HammerOfWrathSkill extends SkillBonus implements CooldownSkill {
         cooldowns.remove(player.getUniqueId());
     }
 
-    @Override
-    public void onActivate(Player player, Object event) {
-        if (event instanceof EliteMobDamagedByPlayerEvent dmgEvent) {
-            checkAndApply(player, dmgEvent);
-        }
-    }
-
     /**
      * Checks if Hammer of Wrath can be used on the target.
      * Returns the damage multiplier if applicable, 1.0 if not.
@@ -105,6 +100,17 @@ public class HammerOfWrathSkill extends SkillBonus implements CooldownSkill {
         return multiplier;
     }
 
+    /**
+     * Reports whether the health gate actually passed, so the caller only consumes the cooldown
+     * and the damage bonus on a real activation. Returning 1.0 from checkAndApply means the
+     * target was above the health threshold and the hammer did not fire.
+     */
+    @Override
+    public boolean tryActivate(Player player, Object event) {
+        if (!(event instanceof EliteMobDamagedByPlayerEvent damageEvent)) return false;
+        return checkAndApply(player, damageEvent) > 1.0;
+    }
+
     private void activateHammer(Player player, LivingEntity target, int skillLevel) {
         // Visual effects - divine hammer strike
         target.getWorld().spawnParticle(Particle.END_ROD,
@@ -113,15 +119,13 @@ public class HammerOfWrathSkill extends SkillBonus implements CooldownSkill {
             target.getLocation().add(0, 1, 0), 1, 0, 0, 0, 0);
         target.getWorld().playSound(target.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1.0f, 0.7f);
         target.getWorld().playSound(target.getLocation(), Sound.BLOCK_ANVIL_LAND, 1.0f, 0.5f);
-
-        startCooldown(player, skillLevel);
     }
 
     public double getDamageMultiplier(int skillLevel) {
-        if (configFields != null) {
-            return configFields.calculateValue(skillLevel);
-        }
-        return BASE_DAMAGE_MULTIPLIER + (skillLevel * 0.05);
+        if (configFields != null) return configFields.calculateValue(skillLevel);
+        // Hardcoded rather than read from config so every server runs the same numbers while the
+        // rebalance is being validated. The 10.0 ceiling is the same cap the config path applied.
+        return scaled(BASE_DAMAGE_MULTIPLIER, 0.05, 10.0, skillLevel);
     }
 
     @Override
@@ -160,7 +164,11 @@ public class HammerOfWrathSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public double getBonusValue(int skillLevel) {
-        return getDamageMultiplier(skillLevel);
+        // Return the bonus portion only (e.g., 2.0 for a 3.0x multiplier).
+        // processOffensiveSkill adds 1.0 + this, so total = the damage multiplier.
+        // The "below 30% health" gate is enforced by tryActivate, which the caller consults
+        // before ever reaching this value, so no gating is needed here.
+        return getDamageMultiplier(skillLevel) - 1.0;
     }
 
     @Override

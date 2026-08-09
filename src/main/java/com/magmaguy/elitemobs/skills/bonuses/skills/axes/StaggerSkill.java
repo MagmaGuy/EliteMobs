@@ -38,7 +38,8 @@ public class StaggerSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public double getProcChance(int skillLevel) {
-        return Math.min(0.35, BASE_PROC_CHANCE + (skillLevel * 0.002));
+        if (configFields != null) return configFields.calculateProcChance(skillLevel);
+        return scaled(BASE_PROC_CHANCE, 0.002, 0.35, skillLevel);
     }
 
     @Override

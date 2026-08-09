@@ -39,17 +39,10 @@ public class SkillBonusRegistry {
         bonusesById.put(bonus.getSkillId(), bonus);
     }
 
-    /**
-     * Unregisters a bonus.
-     *
-     * @param bonus The bonus to unregister
-     */
     public static void unregisterBonus(SkillBonus bonus) {
         List<SkillBonus> bonuses = bonusesBySkill.get(bonus.getSkillType());
-        if (bonuses != null) {
-            bonuses.remove(bonus);
-        }
-        bonusesById.remove(bonus.getSkillId());
+        if (bonuses != null) bonuses.remove(bonus);
+        bonusesById.remove(bonus.getSkillId(), bonus);
     }
 
     /**
@@ -97,49 +90,22 @@ public class SkillBonusRegistry {
         return all;
     }
 
-    /**
-     * Gets all enabled bonuses across all skill types.
-     *
-     * @return List of all enabled bonuses
-     */
     public static List<SkillBonus> getAllEnabledBonuses() {
-        return getAllBonuses().stream()
-                .filter(SkillBonus::isEnabled)
-                .toList();
+        return getAllBonuses().stream().filter(SkillBonus::isEnabled).toList();
     }
 
-    /**
-     * Gets bonuses for a skill type filtered by unlock tier.
-     *
-     * @param skillType  The skill type
-     * @param unlockTier The unlock tier (1-4)
-     * @return List of bonuses at that tier
-     */
     public static List<SkillBonus> getBonusesByTier(SkillType skillType, int unlockTier) {
         return getBonuses(skillType).stream()
-                .filter(b -> b.getUnlockTier() == unlockTier)
+                .filter(bonus -> bonus.getUnlockTier() == unlockTier)
                 .toList();
     }
 
-    /**
-     * Gets all unlockable bonuses for a player's skill level.
-     *
-     * @param skillType  The skill type
-     * @param skillLevel The player's skill level
-     * @return List of unlockable bonuses
-     */
     public static List<SkillBonus> getUnlockableBonuses(SkillType skillType, int skillLevel) {
         return getEnabledBonuses(skillType).stream()
-                .filter(b -> b.canUnlock(skillLevel))
+                .filter(bonus -> bonus.canUnlock(skillLevel))
                 .toList();
     }
 
-    /**
-     * Gets bonuses sorted by unlock tier.
-     *
-     * @param skillType The skill type
-     * @return List of bonuses sorted by tier
-     */
     public static List<SkillBonus> getBonusesSortedByTier(SkillType skillType) {
         return getBonuses(skillType).stream()
                 .sorted(Comparator.comparingInt(SkillBonus::getUnlockTier))
@@ -201,51 +167,29 @@ public class SkillBonusRegistry {
         }
     }
 
-    /**
-     * Gets the total bonus value from a specific skill for a player.
-     *
-     * @param player    The player
-     * @param skillType The skill type
-     * @return Map of bonus names to their values
-     */
     public static Map<String, Double> getTotalBonuses(Player player, SkillType skillType) {
         if (SkillsConfig.isWorldExcludedFromSkills(player)) return Collections.emptyMap();
 
         Map<String, Double> totals = new LinkedHashMap<>();
         int level = getPlayerSkillLevel(player, skillType);
-        List<String> activeSkillIds = PlayerSkillSelection.getActiveSkills(player.getUniqueId(), skillType);
-
-        for (String skillId : activeSkillIds) {
+        for (String skillId : PlayerSkillSelection.getActiveSkills(player.getUniqueId(), skillType)) {
             SkillBonus bonus = getSkillById(skillId);
-            if (bonus != null && bonus.isEnabled() && bonus.meetsLevelRequirement(level)) {
+            if (bonus != null && bonus.isEnabled() && bonus.meetsLevelRequirement(level))
                 totals.put(bonus.getBonusName(), bonus.getBonusValue(level));
-            }
         }
-
         return totals;
     }
 
-    /**
-     * Gets a formatted list of all active bonuses for a player's skill.
-     *
-     * @param player    The player
-     * @param skillType The skill type
-     * @return List of formatted bonus strings
-     */
     public static List<String> getFormattedBonuses(Player player, SkillType skillType) {
         if (SkillsConfig.isWorldExcludedFromSkills(player)) return Collections.emptyList();
 
         List<String> formatted = new ArrayList<>();
         int level = getPlayerSkillLevel(player, skillType);
-        List<String> activeSkillIds = PlayerSkillSelection.getActiveSkills(player.getUniqueId(), skillType);
-
-        for (String skillId : activeSkillIds) {
+        for (String skillId : PlayerSkillSelection.getActiveSkills(player.getUniqueId(), skillType)) {
             SkillBonus bonus = getSkillById(skillId);
-            if (bonus != null && bonus.isEnabled() && bonus.meetsLevelRequirement(level)) {
+            if (bonus != null && bonus.isEnabled() && bonus.meetsLevelRequirement(level))
                 formatted.add(bonus.getFormattedBonus(level));
-            }
         }
-
         return formatted;
     }
 
@@ -288,14 +232,5 @@ public class SkillBonusRegistry {
         }
         bonusesBySkill.clear();
         bonusesById.clear();
-    }
-
-    /**
-     * Initializes and registers all skill bonuses.
-     * Called on plugin startup after config is loaded.
-     */
-    public static void initializeSkillBonuses() {
-        // This will be called after SkillBonusesConfig loads all skill configs
-        // Individual skills register themselves via registerBonus()
     }
 }

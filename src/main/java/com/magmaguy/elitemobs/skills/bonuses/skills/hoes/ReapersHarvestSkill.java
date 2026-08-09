@@ -24,7 +24,7 @@ public class ReapersHarvestSkill extends SkillBonus implements ConditionalSkill 
 
     public static final String SKILL_ID = "hoes_reapers_harvest";
     private static final double HEALTH_THRESHOLD = 0.25; // 25% health
-    private static final double BASE_BONUS = 1.0; // 100% extra damage
+    private static final double BASE_BONUS = 0.50; // 50% extra damage
 
     private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
@@ -47,11 +47,8 @@ public class ReapersHarvestSkill extends SkillBonus implements ConditionalSkill 
 
     @Override
     public double getConditionalBonus(int skillLevel) {
-        if (configFields != null) {
-            return configFields.calculateValue(skillLevel);
-        }
-        // Base 100% + 2% per level
-        return BASE_BONUS + (skillLevel * 0.02);
+        if (configFields != null) return configFields.calculateValue(skillLevel);
+        return scaled(BASE_BONUS, 0.01, skillLevel); // 50% base + 1% per level
     }
 
     @Override
@@ -88,6 +85,8 @@ public class ReapersHarvestSkill extends SkillBonus implements ConditionalSkill 
 
     @Override
     public double getBonusValue(int skillLevel) {
+        // Already a bonus fraction (e.g., 1.0 for +100%), not a multiplier.
+        // processOffensiveSkill adds 1.0 + this, so total = 2.0x.
         return getConditionalBonus(skillLevel);
     }
 

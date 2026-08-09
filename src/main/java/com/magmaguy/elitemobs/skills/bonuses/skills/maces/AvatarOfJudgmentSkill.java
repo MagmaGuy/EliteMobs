@@ -31,7 +31,36 @@ public class AvatarOfJudgmentSkill extends SkillBonus implements CooldownSkill {
     public static final String SKILL_ID = "maces_avatar_of_judgment";
     private static final long BASE_COOLDOWN_SECONDS = 90;
     private static final int BUFF_DURATION_TICKS = 200; // 10 seconds
-    private static final double BASE_DAMAGE_BOOST = 2.0; // 200% damage
+
+    /**
+     * Skill level every balance figure on this class is quoted at, matching the rest of the
+     * rebalance.
+     */
+    public static final int REFERENCE_SKILL_LEVEL = 50;
+
+    /**
+     * Total damage multiplier while the Avatar buff is up. Quoted at {@link #REFERENCE_SKILL_LEVEL}.
+     * <p>
+     * Priced on the shared sustained-damage budget {@code E = trigger_rate * (multiplier - 1) = 0.20}.
+     * Unlike every other offensive skill the trigger rate here is not a per-swing proc but a duty
+     * cycle: the buff covers a {@value #BUFF_DURATION_TICKS} tick (10 second) window out of each
+     * cooldown, so {@code trigger_rate = 10 / getCooldownSeconds(50) = 10 / 74 = 0.135}.
+     * <p>
+     * At the old 5.0x the skill was worth {@code 0.135 * (5.0 - 1) = 0.541}, 2.7x its budget.
+     * Solving for budget at the unchanged cooldown gives {@code multiplier - 1 = 0.20 * 74 / 10 =
+     * 1.48}, hence 2.48x. Buying the same correction from the cooldown instead would need
+     * {@code 10 * 4.0 / 0.20 = 200} seconds, which is not a tier 4 cooldown any player would slot.
+     * <p>
+     * Flat rather than {@code base + level * rate}: the cooldown already shortens with level
+     * (74s at 50, 60s at 100), so a multiplier that also climbed with level would compound two
+     * ramps and put the skill back over budget. Flat and hardcoded also matches how the rest of
+     * the rebalance settled - balance values no longer come from config, only presentation does.
+     * <p>
+     * Read together with {@code EliteMobDamagedByPlayerEvent.applySkillBonuses()}, which merges
+     * {@link #getDamageBoost(int)} as the multiplier itself (not as {@code 1.0 + x} the way the
+     * mark/debuff bonuses are merged). The budgeted quantity is therefore {@code multiplier - 1}.
+     */
+    private static final double DAMAGE_BOOST_MULTIPLIER = 2.48;
 
     private static final Map<UUID, Long> cooldowns = new ConcurrentHashMap<>();
     private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
@@ -45,6 +74,8 @@ public class AvatarOfJudgmentSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public long getCooldownSeconds(int skillLevel) {
+        if (configFields != null && configFields.getCooldownSeconds() > 0)
+            return Math.max(1L, Math.round(configFields.calculateCooldown(skillLevel)));
         return Math.max(60, BASE_COOLDOWN_SECONDS - (skillLevel / 3));
     }
 
@@ -147,11 +178,16 @@ public class AvatarOfJudgmentSkill extends SkillBonus implements CooldownSkill {
         return buffedPlayers.contains(player.getUniqueId());
     }
 
+    /**
+     * The total damage multiplier applied while the Avatar buff is up.
+     * <p>
+     * This is the multiplier, not a bonus fraction - see {@link #DAMAGE_BOOST_MULTIPLIER} for how
+     * it is merged and why it is 2.48x. Do not shorten the cooldown alongside it: the two together
+     * are what keep the sustained value on budget.
+     */
     public double getDamageBoost(int skillLevel) {
-        if (configFields != null) {
-            return configFields.calculateValue(skillLevel);
-        }
-        return BASE_DAMAGE_BOOST + (skillLevel * 0.03);
+        if (configFields != null) return configFields.calculateValue(skillLevel);
+        return DAMAGE_BOOST_MULTIPLIER;
     }
 
     @Override

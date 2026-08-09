@@ -37,7 +37,8 @@ public class PrecisionThrustSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public double getProcChance(int skillLevel) {
-        return Math.min(0.30, BASE_PROC_CHANCE + (skillLevel * 0.002));
+        if (configFields != null) return configFields.calculateProcChance(skillLevel);
+        return scaled(BASE_PROC_CHANCE, 0.002, 0.30, skillLevel);
     }
 
     @Override
@@ -61,10 +62,11 @@ public class PrecisionThrustSkill extends SkillBonus implements ProcSkill {
     }
 
     public double getCritMultiplier(int skillLevel) {
-        if (configFields != null) {
-            return Math.min(3.0, configFields.calculateValue(skillLevel));
-        }
-        return Math.min(3.0, BASE_CRIT_MULTIPLIER + (skillLevel * 0.005));
+        if (configFields != null) return Math.min(3.0, configFields.calculateValue(skillLevel));
+        // Power budget: 20% proc rate at level 50 earns a 2.0x hit (E = 0.20 * 1.00 = 0.20).
+        // Hardcoded rather than read from config so every server runs the same numbers while
+        // the rebalance is being validated.
+        return scaled(BASE_CRIT_MULTIPLIER, 0.01, 3.0, skillLevel);
     }
 
     @Override
@@ -110,7 +112,8 @@ public class PrecisionThrustSkill extends SkillBonus implements ProcSkill {
     public String getFormattedBonus(int skillLevel) {
         return applyFormattedBonusTemplate(Map.of(
                 "chance", String.format("%.1f", getProcChance(skillLevel) * 100),
-                "critDamage", String.format("%.0f", getCritMultiplier(skillLevel) * 100)));
+                "critDamage", String.format("%.0f", getCritMultiplier(skillLevel) * 100),
+                "critBonus", String.format("%.0f", (getCritMultiplier(skillLevel) - 1) * 100)));
     }
 
     @Override

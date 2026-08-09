@@ -37,7 +37,8 @@ public class FrostbiteSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public double getProcChance(int skillLevel) {
-        return Math.min(0.35, BASE_PROC_CHANCE + (skillLevel * 0.002));
+        if (configFields != null) return configFields.calculateProcChance(skillLevel);
+        return scaled(BASE_PROC_CHANCE, 0.002, 0.35, skillLevel);
     }
 
     @Override
@@ -58,8 +59,11 @@ public class FrostbiteSkill extends SkillBonus implements ProcSkill {
                 Particle.SNOWFLAKE, event.getEliteMobEntity().getLivingEntity().getLocation().add(0, 1, 0), 15, 0.5, 0.5, 0.5, 0.05);
     }
 
+    /**
+     * Power budget: 25% proc rate at level 50 earns a 1.8x hit (E = 0.25 * 0.80 = 0.20).
+     */
     private double getDamageBonus(int skillLevel) {
-        return 1.1 + (skillLevel * 0.005); // 10% base + 0.5% per level
+        return scaled(1.4, 0.008, skillLevel); // 40% base + 0.8% per level
     }
 
     @Override
@@ -76,16 +80,19 @@ public class FrostbiteSkill extends SkillBonus implements ProcSkill {
     @Override
     public List<String> getLoreDescription(int skillLevel) {
         return applyLoreTemplates(Map.of(
-                "procChance", String.format("%.1f", getProcChance(skillLevel) * 100)
+                "procChance", String.format("%.1f", getProcChance(skillLevel) * 100),
+                "damageBonus", String.format("%.0f", (getDamageBonus(skillLevel) - 1.0) * 100)
         ));
     }
 
     @Override
-    public double getBonusValue(int skillLevel) { return getDamageBonus(skillLevel); }
+    // Return the bonus portion only (e.g., 0.1 for a 1.1x multiplier); processOffensiveSkill adds 1.0 + this
+    public double getBonusValue(int skillLevel) { return getDamageBonus(skillLevel) - 1.0; }
     @Override
     public String getFormattedBonus(int skillLevel) {
         return applyFormattedBonusTemplate(Map.of(
-                "procChance", String.format("%.0f", getProcChance(skillLevel) * 100)
+                "procChance", String.format("%.0f", getProcChance(skillLevel) * 100),
+                "damageBonus", String.format("%.0f", (getDamageBonus(skillLevel) - 1.0) * 100)
         ));
     }
     @Override

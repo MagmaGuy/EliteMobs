@@ -72,10 +72,13 @@ public class PhalanxSkill extends SkillBonus {
     }
 
     public double getDamageReduction(int skillLevel) {
-        if (configFields != null) {
-            return configFields.calculateValue(skillLevel);
-        }
-        return Math.min(0.35, BASE_DAMAGE_REDUCTION + (skillLevel * 0.002));
+        if (configFields != null)
+            return clampDefensiveReduction(configFields.calculateValue(skillLevel));
+        // Hardcoded rather than read from config so every server runs the same numbers while
+        // the rebalance is being validated. Self-caps at 35%, and the shared defensive clamp
+        // stays as a second line of defence against a reduction reaching 100%.
+        double reduction = Math.min(0.35, BASE_DAMAGE_REDUCTION + (skillLevel * 0.002));
+        return clampDefensiveReduction(reduction);
     }
 
     /**

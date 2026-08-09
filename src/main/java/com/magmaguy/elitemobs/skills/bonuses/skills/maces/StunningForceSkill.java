@@ -40,11 +40,11 @@ public class StunningForceSkill extends SkillBonus {
     }
 
     public double getKnockbackMultiplier(int skillLevel) {
-        return BASE_KNOCKBACK_MULTIPLIER + (skillLevel * 0.02);
+        return scaled(BASE_KNOCKBACK_MULTIPLIER, 0.02, skillLevel);
     }
 
     public double getRootChance(int skillLevel) {
-        return Math.min(0.35, BASE_ROOT_CHANCE + (skillLevel * 0.003));
+        return scaled(BASE_ROOT_CHANCE, 0.003, 0.35, skillLevel);
     }
 
     /**

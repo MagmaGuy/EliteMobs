@@ -37,8 +37,9 @@ public class UndertowSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public double getProcChance(int skillLevel) {
+        if (configFields != null) return configFields.calculateProcChance(skillLevel);
         // Base chance + 0.2% per level, capped at 40%
-        return Math.min(0.40, BASE_PROC_CHANCE + (skillLevel * 0.002));
+        return scaled(BASE_PROC_CHANCE, 0.002, 0.40, skillLevel);
     }
 
     @Override
@@ -66,10 +67,8 @@ public class UndertowSkill extends SkillBonus implements ProcSkill {
     }
 
     private double calculatePullStrength(int skillLevel) {
-        if (configFields != null) {
-            return BASE_PULL_STRENGTH + configFields.calculateValue(skillLevel);
-        }
-        return BASE_PULL_STRENGTH + (skillLevel * 0.01);
+        if (configFields != null) return BASE_PULL_STRENGTH + configFields.calculateValue(skillLevel);
+        return scaled(BASE_PULL_STRENGTH, 0.04, skillLevel);
     }
 
     private int getPlayerSkillLevel(Player player) {
@@ -113,13 +112,20 @@ public class UndertowSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public double getBonusValue(int skillLevel) {
+        // This is the pull strength (a velocity), not a damage fraction - see affectsDamage().
         return calculatePullStrength(skillLevel);
+    }
+
+    @Override
+    public boolean affectsDamage() {
+        return false; // Pulls the target via onProc, doesn't modify main hit damage
     }
 
     @Override
     public String getFormattedBonus(int skillLevel) {
         return applyFormattedBonusTemplate(Map.of(
-                "pullStrength", String.format("%.1f", calculatePullStrength(skillLevel))
+                "pullStrength", String.format("%.1f", calculatePullStrength(skillLevel)),
+                "procChance", String.format("%.1f", getProcChance(skillLevel) * 100)
         ));
     }
 

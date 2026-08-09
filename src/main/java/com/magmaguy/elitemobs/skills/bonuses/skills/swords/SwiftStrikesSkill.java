@@ -34,7 +34,7 @@ public class SwiftStrikesSkill extends SkillBonus {
      */
     public static double getSpeedBonus(int skillLevel) {
         // Base 5% + 0.1% per level, max 15%
-        return Math.min(0.15, BASE_SPEED_BONUS + (skillLevel * 0.001));
+        return scaled(BASE_SPEED_BONUS, 0.001, 0.15, skillLevel);
     }
 
     /**

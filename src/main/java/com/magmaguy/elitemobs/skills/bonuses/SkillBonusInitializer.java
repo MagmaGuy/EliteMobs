@@ -268,9 +268,13 @@ public class SkillBonusInitializer {
      * Helper method to register a skill and link it to its config.
      */
     private static void registerSkill(SkillBonus skill, SkillBonusConfigFields config) {
-        if (config != null) {
-            skill.setConfigFields(config);
-        }
+        // Prefer the instance SkillBonusesConfig built from disk. The object passed in here is
+        // freshly constructed and has never been through CustomConfig.initialize, so its fields
+        // are constructor defaults - binding it would make every skillbonuses/*.yml file inert,
+        // since the values a server operator edits would never be read back.
+        SkillBonusConfigFields loadedConfig = SkillBonusesConfig.getSkillBonus(skill.getSkillId());
+        if (loadedConfig != null) skill.setConfigFields(loadedConfig);
+        else if (config != null) skill.setConfigFields(config);
         SkillBonusRegistry.registerBonus(skill);
     }
 

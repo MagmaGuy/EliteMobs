@@ -88,6 +88,10 @@ public enum SkillType {
         return null;
     }
 
+    public static SkillType[] getWeaponSkills() {
+        return new SkillType[]{SWORDS, AXES, BOWS, CROSSBOWS, TRIDENTS, HOES, MACES, SPEARS};
+    }
+
     /**
      * Determines the skill type from a material, including armor pieces.
      * This is used for gear restrictions.
@@ -121,15 +125,6 @@ public enum SkillType {
         }
 
         return null;
-    }
-
-    /**
-     * Gets all weapon skill types (excludes ARMOR)
-     *
-     * @return Array of weapon skill types
-     */
-    public static SkillType[] getWeaponSkills() {
-        return new SkillType[]{SWORDS, AXES, BOWS, CROSSBOWS, TRIDENTS, HOES, MACES, SPEARS};
     }
 
     /**

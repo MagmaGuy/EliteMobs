@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.skills.bonuses.skills.tridents;
 
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
+import com.magmaguy.elitemobs.combatsystem.CombatDamageContext;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
@@ -49,51 +50,37 @@ public class DepthChargeSkill extends SkillBonus implements ConditionalSkill {
 
     @Override
     public double getConditionalBonus(int skillLevel) {
-        if (configFields != null) {
-            return BASE_DAMAGE_BONUS + configFields.calculateValue(skillLevel);
-        }
-        return BASE_DAMAGE_BONUS + (skillLevel * 0.01);
+        if (configFields != null) return BASE_DAMAGE_BONUS + configFields.calculateValue(skillLevel);
+        return scaled(BASE_DAMAGE_BONUS, 0.01, skillLevel);
     }
 
     /**
-     * Called when the skill activates (target is in water).
-     * Creates depth charge explosion effect.
+     * Preserved activation hook for the advertised splash effect. It is currently not dispatched
+     * by the generic conditional-skill path; keeping the hook avoids deleting a potentially
+     * disconnected feature or breaking an external caller while that product decision is open.
      */
     public void onActivate(Player player, EliteMobDamagedByPlayerEvent event) {
-        if (!isActive(player)) return;
-        if (!conditionMet(player, event)) return;
-
+        if (!isActive(player) || !conditionMet(player, event)) return;
         EliteEntity eliteEntity = event.getEliteMobEntity();
         if (eliteEntity == null || eliteEntity.getLivingEntity() == null) return;
 
         LivingEntity target = eliteEntity.getLivingEntity();
-        int skillLevel = getPlayerSkillLevel(player);
+        int skillLevel = com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry
+                .getPlayerSkillLevel(player, SkillType.TRIDENTS);
+        target.getWorld().spawnParticle(Particle.BUBBLE_COLUMN_UP,
+                target.getLocation(), 50, 2, 2, 2, 0.1);
 
-        // Create depth charge explosion
-        target.getWorld().spawnParticle(Particle.BUBBLE_COLUMN_UP, target.getLocation(), 50, 2, 2, 2, 0.1);
-
-        // Damage nearby aquatic enemies
-        // Use bypass to prevent recursive skill processing
         double aoeDamage = event.getDamage() * calculateAoeDamage(skillLevel);
-        EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = true;
-        try {
-            target.getNearbyEntities(AOE_RADIUS, AOE_RADIUS, AOE_RADIUS).stream()
-                    .filter(e -> e instanceof LivingEntity && !(e instanceof Player) && ((LivingEntity) e).isInWater())
-                    .forEach(e -> ((LivingEntity) e).damage(aoeDamage, player));
-        } finally {
-            EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = false;
-        }
+        target.getNearbyEntities(AOE_RADIUS, AOE_RADIUS, AOE_RADIUS).stream()
+                .filter(entity -> entity instanceof LivingEntity livingEntity
+                        && !(entity instanceof Player) && livingEntity.isInWater())
+                .forEach(entity -> CombatDamageContext.runPlayerToEliteBypass(
+                        () -> ((LivingEntity) entity).damage(aoeDamage, player)));
     }
 
     private double calculateAoeDamage(int skillLevel) {
-        if (configFields != null) {
-            return BASE_AOE_DAMAGE * configFields.calculateValue(skillLevel);
-        }
-        return BASE_AOE_DAMAGE + (skillLevel * 0.005);
-    }
-
-    private int getPlayerSkillLevel(Player player) {
-        return com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry.getPlayerSkillLevel(player, SkillType.TRIDENTS);
+        if (configFields != null) return BASE_AOE_DAMAGE * configFields.calculateValue(skillLevel);
+        return scaled(BASE_AOE_DAMAGE, 0.005, skillLevel);
     }
 
     @Override

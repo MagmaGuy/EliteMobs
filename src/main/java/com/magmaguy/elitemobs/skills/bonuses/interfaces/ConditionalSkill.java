@@ -26,4 +26,16 @@ public interface ConditionalSkill {
      * @return The bonus value (interpretation depends on skill type)
      */
     double getConditionalBonus(int skillLevel);
+
+    /**
+     * Player-aware variant for skills whose payout depends on the player's state and not just the
+     * skill level. Defaults to the level-only bonus.
+     *
+     * @param player     The player using the skill
+     * @param skillLevel The player's skill level
+     * @return The bonus value (interpretation depends on skill type)
+     */
+    default double getConditionalBonus(Player player, int skillLevel) {
+        return getConditionalBonus(skillLevel);
+    }
 }

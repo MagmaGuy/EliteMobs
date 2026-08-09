@@ -22,6 +22,17 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class EvasionSkill extends SkillBonus implements ProcSkill {
 
+    /**
+     * Dodge chance, on the shared defensive power budget.
+     * <p>
+     * Sustained power is {@code E = uptime * reduction} and the budget is 0.20. A dodge is a full
+     * negation, so its reduction term is 1.0 and the whole budget goes into the proc rate:
+     * {@code 0.20 / 1.0}. The old formula scaled from 10% to a 35% cap, i.e. up to 0.35 sustained
+     * power, nearly double budget at high levels. Hardcoded on purpose: balance values no longer
+     * come from config, only presentation does.
+     */
+    private static final double EVASION_CHANCE = 0.20;
+
     private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public EvasionSkill() {
@@ -89,8 +100,9 @@ public class EvasionSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public double getProcChance(int skillLevel) {
-        // Base 10% + 5% per scaled value, capped at 35%
-        return Math.min(0.35, 0.10 + getScaledValue(skillLevel) * 0.05);
+        if (configFields != null) return configFields.calculateProcChance(skillLevel);
+        // Flat 20%: a dodge negates the whole hit, so the proc rate is the entire power budget
+        return EVASION_CHANCE;
     }
 
     @Override

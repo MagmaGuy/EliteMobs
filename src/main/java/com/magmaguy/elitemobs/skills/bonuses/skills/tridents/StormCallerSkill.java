@@ -37,6 +37,7 @@ public class StormCallerSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public double getProcChance(int skillLevel) {
+        if (configFields != null) return configFields.calculateProcChance(skillLevel);
         // Base chance + 0.15% per level, capped at 35%
         return scaled(BASE_PROC_CHANCE, 0.0015, 0.35, skillLevel);
     }

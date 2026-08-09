@@ -19,6 +19,19 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class GritSkill extends SkillBonus implements ConditionalSkill {
 
+    /**
+     * Peak damage reduction, reached at 0% health, on the shared defensive power budget.
+     * <p>
+     * Sustained power is {@code E = uptime * reduction} and the budget is 0.20. Grit only pays out
+     * below {@link #HEALTH_THRESHOLD} (roughly half of a real fight) and ramps linearly from nothing
+     * at the threshold to this peak at 0 health, which halves it again: effective uptime 0.25, so
+     * the fair peak is {@code 0.20 / 0.25 = 0.80}. That lands exactly on
+     * {@link SkillBonus#MAX_DEFENSIVE_REDUCTION}, which is the most a single skill is allowed to take
+     * off a hit — Grit is the one armor skill the per-skill clamp binds by design. Hardcoded on
+     * purpose: balance values no longer come from config, only presentation does.
+     */
+    private static final double MAX_REDUCTION = 0.80;
+
     private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
     private static final double HEALTH_THRESHOLD = 0.50; // 50% health
 
@@ -67,7 +80,7 @@ public class GritSkill extends SkillBonus implements ConditionalSkill {
 
     @Override
     public double getBonusValue(int skillLevel) {
-        return getScaledValue(skillLevel);
+        return getConditionalBonus(skillLevel);
     }
 
     @Override
@@ -91,8 +104,8 @@ public class GritSkill extends SkillBonus implements ConditionalSkill {
 
     @Override
     public double getConditionalBonus(int skillLevel) {
-        // This will be scaled based on current health in modifyIncomingDamage
-        return getScaledValue(skillLevel);
+        // Peak value; scaled down by current health in modifyIncomingDamage
+        return getMaxReduction(skillLevel);
     }
 
     /**
@@ -102,8 +115,10 @@ public class GritSkill extends SkillBonus implements ConditionalSkill {
      * @return The maximum reduction percentage
      */
     private double getMaxReduction(int skillLevel) {
-        // Up to 50% damage reduction at 0% health
-        return 0.5 * getScaledValue(skillLevel);
+        double configuredReduction = configFields == null
+                ? MAX_REDUCTION
+                : 0.5 * configFields.calculateValue(skillLevel);
+        return clampDefensiveReduction(configuredReduction);
     }
 
     /**
@@ -129,7 +144,8 @@ public class GritSkill extends SkillBonus implements ConditionalSkill {
         double healthPercent = postDamageHealth / player.getMaxHealth();
         double lowHealthMultiplier = (HEALTH_THRESHOLD - healthPercent) / HEALTH_THRESHOLD; // 0 at 50%, 1 at 0%
 
-        double reduction = getMaxReduction(skillLevel) * lowHealthMultiplier;
+        // Clamped again after health scaling so the applied reduction can never invert the damage
+        double reduction = clampDefensiveReduction(getMaxReduction(skillLevel) * lowHealthMultiplier);
         return originalDamage * (1 - reduction);
     }
 

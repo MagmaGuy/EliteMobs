@@ -36,8 +36,9 @@ public class SoulDrainSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public double getProcChance(int skillLevel) {
+        if (configFields != null) return configFields.calculateProcChance(skillLevel);
         // Base chance + 0.2% per level
-        return Math.min(0.5, BASE_PROC_CHANCE + (skillLevel * 0.002));
+        return scaled(BASE_PROC_CHANCE, 0.002, 0.5, skillLevel);
     }
 
     @Override
@@ -66,10 +67,9 @@ public class SoulDrainSkill extends SkillBonus implements ProcSkill {
     }
 
     private double calculateDrainMultiplier(int skillLevel) {
-        if (configFields != null) {
-            return configFields.calculateValue(skillLevel);
-        }
-        return BASE_DRAIN_MULTIPLIER + (skillLevel * 0.002);
+        if (configFields != null)
+            return Math.min(1.0, Math.max(0.0, configFields.calculateValue(skillLevel)));
+        return scaled(BASE_DRAIN_MULTIPLIER, 0.002, skillLevel);
     }
 
     private int getPlayerSkillLevel(Player player) {

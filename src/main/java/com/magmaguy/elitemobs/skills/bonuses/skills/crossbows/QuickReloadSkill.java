@@ -75,7 +75,7 @@ public class QuickReloadSkill extends SkillBonus {
 
     private double getSpeedBonus(int skillLevel) {
         // Base 0.03 + 0.001 per level movement speed bonus (base walk speed is 0.1)
-        return 0.03 + (skillLevel * 0.001);
+        return scaled(0.03, 0.001, skillLevel);
     }
 
     @Override
@@ -91,13 +91,20 @@ public class QuickReloadSkill extends SkillBonus {
 
     @Override
     public List<String> getLoreDescription(int skillLevel) {
-        return applyLoreTemplates(Map.of("speedBonus", String.format("%.0f", getSpeedBonus(skillLevel) * 100)));
+        return applyLoreTemplates(Map.of(
+                "speedBonus", String.format("%.0f", getSpeedBonus(skillLevel) * 100),
+                // Relative to the vanilla walk speed base of 0.1, which is the figure a player can feel
+                "speedPercent", String.format("%.0f", getSpeedBonus(skillLevel) * 1000)));
     }
 
     @Override
     public double getBonusValue(int skillLevel) { return getSpeedBonus(skillLevel); }
     @Override
-    public String getFormattedBonus(int skillLevel) { return applyFormattedBonusTemplate(Map.of("speedBonus", String.format("%.0f", getSpeedBonus(skillLevel) * 100))); }
+    public String getFormattedBonus(int skillLevel) {
+        return applyFormattedBonusTemplate(Map.of(
+                "speedBonus", String.format("%.0f", getSpeedBonus(skillLevel) * 100),
+                "speedPercent", String.format("%.0f", getSpeedBonus(skillLevel) * 1000)));
+    }
     @Override
     public boolean affectsDamage() { return false; }
     @Override

@@ -39,7 +39,8 @@ public class ConcussionSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public double getProcChance(int skillLevel) {
-        return Math.min(0.35, BASE_PROC_CHANCE + (skillLevel * 0.002));
+        if (configFields != null) return configFields.calculateProcChance(skillLevel);
+        return scaled(BASE_PROC_CHANCE, 0.002, 0.35, skillLevel);
     }
 
     @Override
@@ -95,7 +96,13 @@ public class ConcussionSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public double getBonusValue(int skillLevel) {
+        // This is the proc chance, not a damage fraction - see affectsDamage().
         return getProcChance(skillLevel);
+    }
+
+    @Override
+    public boolean affectsDamage() {
+        return false; // Applies a weakness debuff via onProc, doesn't modify main hit damage
     }
 
     @Override

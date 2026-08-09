@@ -41,6 +41,8 @@ public class TidalSurgeSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public long getCooldownSeconds(int skillLevel) {
+        if (configFields != null && configFields.getCooldownSeconds() > 0)
+            return Math.max(1L, Math.round(configFields.calculateCooldown(skillLevel)));
         // Cooldown reduces by 0.1s per level, minimum 10 seconds
         return Math.max(10, BASE_COOLDOWN - (skillLevel / 10));
     }

@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.skills.bonuses.skills.maces;
 
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
-import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.StackingSkill;
 import org.bukkit.Particle;
@@ -21,9 +20,21 @@ import java.util.concurrent.ConcurrentHashMap;
 public class RighteousFurySkill extends SkillBonus implements StackingSkill {
 
     public static final String SKILL_ID = "maces_righteous_fury";
-    private static final int BASE_MAX_STACKS = 5;
-    private static final double BASE_STACK_BONUS = 0.05; // 5% per stack
-    private static final long STACK_DECAY_MS = 5000; // 5 seconds
+    /**
+     * There is exactly one stack cap. The skill used to carry two - a no-arg {@code getMaxStacks()}
+     * returning 5 and a level-scaled {@code getMaxStacks(int)} returning 5 + level/20 - with
+     * {@code addStack} enforcing the scaled one while the action bar printed the flat one, so a
+     * level 50 player watched their bar read "7/5". The cap is now flat and the per-stack value was
+     * re-priced so a full bar is still worth the same +40% it was worth at 7 stacks.
+     */
+    private static final int MAX_STACKS = 5;
+    private static final double BASE_STACK_BONUS = 0.03; // 3% per stack
+    /**
+     * Stacks fall off after 2.5s without a hit. The old 5s window never lapsed at any realistic
+     * mace swing cadence, so the bar stayed pinned at max and the skill behaved as a flat
+     * passive rather than the ramp its per-stack value is priced for.
+     */
+    private static final long STACK_DECAY_MS = 2500;
 
     private static final Map<UUID, Integer> playerStacks = new ConcurrentHashMap<>();
     private static final Map<UUID, Long> lastHitTime = new ConcurrentHashMap<>();
@@ -37,16 +48,15 @@ public class RighteousFurySkill extends SkillBonus implements StackingSkill {
 
     @Override
     public int getMaxStacks() {
-        return BASE_MAX_STACKS;
-    }
-
-    public int getMaxStacks(int skillLevel) {
-        return BASE_MAX_STACKS + (skillLevel / 20);
+        return MAX_STACKS;
     }
 
     @Override
     public double getBonusPerStack(int skillLevel) {
-        return BASE_STACK_BONUS + (skillLevel * 0.001);
+        // Power budget: ~50% uptime on the ramp, so a full bar (5 stacks) is worth +40% at level
+        // 50 (E = 0.50 * 0.40 = 0.20). The curve also still lands +20% at the level 10 unlock,
+        // matching what the old 5-stack/3.95%-per-stack pairing paid there.
+        return scaled(BASE_STACK_BONUS, 0.001, skillLevel);
     }
 
     @Override
@@ -57,11 +67,9 @@ public class RighteousFurySkill extends SkillBonus implements StackingSkill {
 
     @Override
     public void addStack(Player player) {
-        int skillLevel = SkillBonusRegistry.getPlayerSkillLevel(player, SkillType.MACES);
-        int maxStacks = getMaxStacks(skillLevel);
         int current = getCurrentStacks(player);
 
-        if (current < maxStacks) {
+        if (current < getMaxStacks()) {
             playerStacks.put(player.getUniqueId(), current + 1);
             // Visual effect
             player.getWorld().spawnParticle(Particle.FLAME,
@@ -118,20 +126,21 @@ public class RighteousFurySkill extends SkillBonus implements StackingSkill {
     @Override
     public List<String> getLoreDescription(int skillLevel) {
         return applyLoreTemplates(Map.of(
-                "maxStacks", String.valueOf(getMaxStacks(skillLevel)),
+                "maxStacks", String.valueOf(getMaxStacks()),
                 "damagePerStack", String.format("%.1f", getBonusPerStack(skillLevel) * 100)
         ));
     }
 
     @Override
     public double getBonusValue(int skillLevel) {
-        return getBonusPerStack(skillLevel) * getMaxStacks(skillLevel);
+        return getBonusPerStack(skillLevel) * getMaxStacks();
     }
 
     @Override
     public String getFormattedBonus(int skillLevel) {
         return applyFormattedBonusTemplate(Map.of(
-                "maxDamage", String.format("%.0f", getBonusValue(skillLevel) * 100)
+                "maxDamage", String.format("%.0f", getBonusValue(skillLevel) * 100),
+                "maxStacks", String.valueOf(getMaxStacks())
         ));
     }
 

@@ -35,7 +35,7 @@ public class ArrowRainSkill extends SkillBonus implements CooldownSkill {
 
     public static final String SKILL_ID = "crossbows_arrow_rain";
     private static final long BASE_COOLDOWN = 30; // 30 seconds
-    private static final double BASE_ARROW_DAMAGE = 0.30; // 30% of original
+    private static final double BASE_ARROW_DAMAGE = 0.12; // 12% of original, per arrow
 
     private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
     private static final Set<UUID> onCooldown = ConcurrentHashMap.newKeySet();
@@ -49,6 +49,8 @@ public class ArrowRainSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public long getCooldownSeconds(int skillLevel) {
+        if (configFields != null && configFields.getCooldownSeconds() > 0)
+            return Math.max(1L, Math.round(configFields.calculateCooldown(skillLevel)));
         return Math.max(15, BASE_COOLDOWN - (skillLevel / 5)); // 30s base, min 15s
     }
 
@@ -137,8 +139,13 @@ public class ArrowRainSkill extends SkillBonus implements CooldownSkill {
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 5);
     }
 
+    /**
+     * Power budget: the volley is 15 arrows, so the payload at level 50 is 15 x 0.21 = 3.2 hits
+     * worth of damage on a 16s cooldown (E = 0.062 * 3.2 = 0.20). The old 55% per arrow was
+     * 8.25 hits worth per volley, far over budget.
+     */
     private double getArrowDamageMultiplier(int skillLevel) {
-        return BASE_ARROW_DAMAGE + (skillLevel * 0.005); // 30% base + 0.5% per level
+        return scaled(BASE_ARROW_DAMAGE, 0.0018, 0.30, skillLevel); // 12% base + 0.18% per level
     }
 
     @Override
@@ -167,7 +174,10 @@ public class ArrowRainSkill extends SkillBonus implements CooldownSkill {
     }
 
     @Override
+    // Fraction of the hit dealt by each rained arrow, not a bonus to the main hit - see affectsDamage()
     public double getBonusValue(int skillLevel) { return getArrowDamageMultiplier(skillLevel); }
+    @Override
+    public boolean affectsDamage() { return false; } // The arrow volley deals its own damage, not the main hit
     @Override
     public String getFormattedBonus(int skillLevel) { return applyFormattedBonusTemplate(Map.of("arrowDamage", String.format("%.0f", getArrowDamageMultiplier(skillLevel) * 100))); }
     @Override

@@ -38,8 +38,9 @@ public class SnareSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public double getProcChance(int skillLevel) {
+        if (configFields != null) return configFields.calculateProcChance(skillLevel);
         // Base chance + 0.2% per level, capped at 45%
-        return Math.min(0.45, BASE_PROC_CHANCE + (skillLevel * 0.002));
+        return scaled(BASE_PROC_CHANCE, 0.002, 0.45, skillLevel);
     }
 
     @Override
@@ -59,9 +60,7 @@ public class SnareSkill extends SkillBonus implements ProcSkill {
     }
 
     private int calculateAmplifier(int skillLevel) {
-        if (configFields != null) {
-            return (int) Math.floor(configFields.calculateValue(skillLevel));
-        }
+        if (configFields != null) return (int) Math.floor(configFields.calculateValue(skillLevel));
         return (int) Math.floor(skillLevel * 0.05);
     }
 
@@ -112,7 +111,8 @@ public class SnareSkill extends SkillBonus implements ProcSkill {
     @Override
     public String getFormattedBonus(int skillLevel) {
         return applyFormattedBonusTemplate(Map.of(
-                "slownessLevel", String.valueOf(4 + calculateAmplifier(skillLevel))
+                "slownessLevel", String.valueOf(4 + calculateAmplifier(skillLevel)),
+                "procChance", String.format("%.1f", getProcChance(skillLevel) * 100)
         ));
     }
 

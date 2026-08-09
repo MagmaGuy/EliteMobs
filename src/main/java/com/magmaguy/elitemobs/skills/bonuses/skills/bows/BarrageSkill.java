@@ -20,7 +20,11 @@ public class BarrageSkill extends SkillBonus implements StackingSkill {
 
     public static final String SKILL_ID = "bows_barrage";
     private static final int MAX_STACKS = 5;
-    private static final long STACK_DECAY_TIME = 3000; // 3 seconds
+    /**
+     * Stacks drop entirely after 2.5s without a hit. The old 3s window was longer than a
+     * full-draw shot cycle, so the ramp never fell off and the bonus was effectively permanent.
+     */
+    private static final long STACK_DECAY_TIME = 2500;
     private static final double BASE_BONUS_PER_STACK = 0.05; // 5% per stack
 
     private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
@@ -64,7 +68,9 @@ public class BarrageSkill extends SkillBonus implements StackingSkill {
 
     @Override
     public double getBonusPerStack(int skillLevel) {
-        return BASE_BONUS_PER_STACK + (skillLevel * 0.001); // 5% base + 0.1% per level
+        // Power budget: ~50% uptime on the ramp, so full stacks are worth +40% at level 50
+        // (E = 0.50 * 0.40 = 0.20).
+        return scaled(BASE_BONUS_PER_STACK, 0.0006, skillLevel); // 5% base + 0.06% per level
     }
 
     @Override

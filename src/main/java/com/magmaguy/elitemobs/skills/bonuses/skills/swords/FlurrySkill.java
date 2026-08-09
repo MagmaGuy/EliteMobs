@@ -108,7 +108,7 @@ public class FlurrySkill extends SkillBonus implements StackingSkill {
     @Override
     public double getBonusPerStack(int skillLevel) {
         // Base 5% per stack + 0.1% per level
-        return ATTACK_SPEED_PER_STACK + (skillLevel * 0.001);
+        return scaled(ATTACK_SPEED_PER_STACK, 0.001, skillLevel);
     }
 
     /**
@@ -204,7 +204,9 @@ public class FlurrySkill extends SkillBonus implements StackingSkill {
 
     @Override
     public String getFormattedBonus(int skillLevel) {
-        return applyFormattedBonusTemplate(Map.of("maxBonus", String.format("%.1f", getBonusPerStack(skillLevel) * MAX_STACKS * 100)));
+        return applyFormattedBonusTemplate(Map.of(
+                "maxBonus", String.format("%.1f", getBonusPerStack(skillLevel) * MAX_STACKS * 100),
+                "maxStacks", String.valueOf(MAX_STACKS)));
     }
 
     @Override

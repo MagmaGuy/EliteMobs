@@ -8,6 +8,8 @@ import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.ProcSkill;
+import com.magmaguy.elitemobs.skills.bonuses.interfaces.TargetDebuffBonus;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -22,7 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Debuff stacks and lasts for a short duration.
  * Tier 2 unlock.
  */
-public class ExposeWeaknessSkill extends SkillBonus implements ProcSkill {
+public class ExposeWeaknessSkill extends SkillBonus implements ProcSkill, TargetDebuffBonus {
 
     public static final String SKILL_ID = "swords_expose_weakness";
     private static final double BASE_PROC_CHANCE = 0.20; // 20% chance
@@ -41,8 +43,9 @@ public class ExposeWeaknessSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public double getProcChance(int skillLevel) {
+        if (configFields != null) return configFields.calculateProcChance(skillLevel);
         // Base 20% + 0.3% per level
-        return Math.min(0.50, BASE_PROC_CHANCE + (skillLevel * 0.003));
+        return scaled(BASE_PROC_CHANCE, 0.003, 0.50, skillLevel);
     }
 
     @Override
@@ -107,7 +110,29 @@ public class ExposeWeaknessSkill extends SkillBonus implements ProcSkill {
 
     private double getDefenseReduction(int skillLevel) {
         // Base 10% + 0.2% per level
-        return BASE_DEFENSE_REDUCTION + (skillLevel * 0.002);
+        return scaled(BASE_DEFENSE_REDUCTION, 0.002, skillLevel);
+    }
+
+    @Override
+    public boolean appliesTo(LivingEntity target, Player attacker) {
+        return isDebuffed(target.getUniqueId());
+    }
+
+    @Override
+    public SkillType levelSource() {
+        return SkillType.SWORDS;
+    }
+
+    @Override
+    public double bonusFor(Player attacker, LivingEntity target, int level) {
+        // The debuff strength was locked in when the debuff was applied and is keyed on the
+        // target's UUID, not the attacker's level.
+        return getDamageMultiplier(target.getUniqueId()) - 1.0;
+    }
+
+    @Override
+    public String debugLabel() {
+        return "ExposeWeakness=";
     }
 
     @Override

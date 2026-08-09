@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.ProcSkill;
+import com.magmaguy.elitemobs.skills.bonuses.interfaces.TargetDebuffBonus;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -23,12 +24,12 @@ import java.util.concurrent.ConcurrentHashMap;
  * Marked enemies glow and take increased damage.
  * Tier 2 unlock.
  */
-public class DeathMarkSkill extends SkillBonus implements ProcSkill {
+public class DeathMarkSkill extends SkillBonus implements ProcSkill, TargetDebuffBonus {
 
     public static final String SKILL_ID = "hoes_death_mark";
-    private static final double BASE_PROC_CHANCE = 0.25; // 25% chance
+    private static final double BASE_PROC_CHANCE = 0.17; // 17% chance
     private static final long MARK_DURATION = 15000; // 15 seconds
-    private static final double BASE_DAMAGE_BONUS = 0.50; // 50% extra damage
+    private static final double BASE_DAMAGE_BONUS = 0.11; // 11% extra damage
 
     private static final Map<UUID, UUID> markedTargets = new ConcurrentHashMap<>(); // EntityUUID -> PlayerUUID
     private static final Map<UUID, Long> markExpiry = new ConcurrentHashMap<>();
@@ -42,8 +43,9 @@ public class DeathMarkSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public double getProcChance(int skillLevel) {
-        // Base chance + 0.3% per level
-        return Math.min(0.5, BASE_PROC_CHANCE + (skillLevel * 0.003));
+        if (configFields != null) return configFields.calculateProcChance(skillLevel);
+        // Base chance + 0.2% per level, ~27% at level 50
+        return scaled(BASE_PROC_CHANCE, 0.002, 0.40, skillLevel);
     }
 
     @Override
@@ -86,12 +88,38 @@ public class DeathMarkSkill extends SkillBonus implements ProcSkill {
         return markerUUID.equals(player.getUniqueId());
     }
 
+    /**
+     * Power budget: the trigger rate for a mark is the mark's <em>uptime</em>, not the proc chance.
+     * The old 1.75x number was priced as if only 26.7% of hits landed on a marked target, but a
+     * 15 second mark refreshed by a 27% proc at hoe attack speed (4 swings/sec, ~60 rolls per mark
+     * window) is up on essentially every hit of a sustained fight. Allowing ~5% downtime for target
+     * switching and approach, the honest trigger rate is 0.95, so the level 50 bonus is +21%
+     * (E = 0.95 * 0.21 = 0.20). Hardcoded rather than read from config so every server runs the
+     * same numbers while the rebalance is being validated.
+     */
     public double getMarkDamageBonus(int skillLevel) {
-        if (configFields != null) {
-            return configFields.calculateValue(skillLevel);
-        }
-        // Base 50% + 1% per level
-        return BASE_DAMAGE_BONUS + (skillLevel * 0.01);
+        if (configFields != null) return configFields.calculateValue(skillLevel);
+        return scaled(BASE_DAMAGE_BONUS, 0.002, skillLevel); // 11% base + 0.2% per level
+    }
+
+    @Override
+    public boolean appliesTo(LivingEntity target, Player attacker) {
+        return isMarkedForDeath(target, attacker);
+    }
+
+    @Override
+    public SkillType levelSource() {
+        return SkillType.HOES;
+    }
+
+    @Override
+    public double bonusFor(Player attacker, LivingEntity target, int level) {
+        return getMarkDamageBonus(level);
+    }
+
+    @Override
+    public String debugLabel() {
+        return "DeathMark=";
     }
 
     @Override
@@ -132,7 +160,13 @@ public class DeathMarkSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public double getBonusValue(int skillLevel) {
+        // Bonus fraction applied to marked targets, not to the hit that applies the mark - see affectsDamage().
         return getMarkDamageBonus(skillLevel);
+    }
+
+    @Override
+    public boolean affectsDamage() {
+        return false; // Proc applies the mark, bonus checked separately on marked targets
     }
 
     @Override

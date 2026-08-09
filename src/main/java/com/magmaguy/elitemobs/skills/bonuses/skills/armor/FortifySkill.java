@@ -19,6 +19,17 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class FortifySkill extends SkillBonus implements StackingSkill {
 
+    /**
+     * Damage reduction per stack, on the shared defensive power budget.
+     * <p>
+     * Sustained power is {@code E = uptime * reduction} and the budget is 0.20. Stacking skills ramp
+     * from empty and decay out of combat, so the effective uptime of the full stack is 0.50 (the
+     * same figure the offensive stacking skills are tuned against). That makes the fair reduction at
+     * max stacks {@code 0.20 / 0.50 = 0.40}, spread over {@link #getMaxStacks()} stacks. Hardcoded on
+     * purpose: balance values no longer come from config, only presentation does.
+     */
+    private static final double REDUCTION_PER_STACK = 0.08;
+
     private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
     private static final Map<UUID, Integer> stackMap = new ConcurrentHashMap<>();
     private static final Map<UUID, Long> lastDamageTime = new ConcurrentHashMap<>();
@@ -93,6 +104,7 @@ public class FortifySkill extends SkillBonus implements StackingSkill {
 
     @Override
     public int getMaxStacks() {
+        if (configFields != null && configFields.getMaxStacks() > 0) return configFields.getMaxStacks();
         return 5;
     }
 
@@ -124,8 +136,10 @@ public class FortifySkill extends SkillBonus implements StackingSkill {
 
     @Override
     public double getBonusPerStack(int skillLevel) {
-        // Base 5% damage reduction per stack
-        return 0.05 * getScaledValue(skillLevel);
+        double configuredReduction = configFields == null
+                ? REDUCTION_PER_STACK
+                : 0.05 * configFields.calculateValue(skillLevel);
+        return Math.min(MAX_DEFENSIVE_REDUCTION / getMaxStacks(), Math.max(0, configuredReduction));
     }
 
     /**
@@ -140,8 +154,9 @@ public class FortifySkill extends SkillBonus implements StackingSkill {
         int skillLevel = getPlayerSkillLevel(player);
         int currentStacks = getCurrentStacks(player);
 
-        // Calculate damage reduction from current stacks
-        double reduction = currentStacks * getBonusPerStack(skillLevel);
+        // Calculate damage reduction from current stacks, clamped so the accumulated
+        // stacks can never fully negate (or invert) the incoming damage
+        double reduction = clampDefensiveReduction(currentStacks * getBonusPerStack(skillLevel));
         double modifiedDamage = originalDamage * (1 - reduction);
 
         // Add a stack after calculating damage

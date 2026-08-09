@@ -43,6 +43,7 @@ public class LacerateSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public double getProcChance(int skillLevel) {
+        if (configFields != null) return configFields.calculateProcChance(skillLevel);
         // Base chance + 0.2% per level
         return scaled(BASE_PROC_CHANCE, 0.002, 0.5, skillLevel);
     }

@@ -26,8 +26,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class VorpalStrikeSkill extends SkillBonus implements CooldownSkill {
 
     public static final String SKILL_ID = "swords_vorpal_strike";
-    private static final double BASE_COOLDOWN = 30.0; // 30 seconds
-    private static final double BASE_DAMAGE_MULTIPLIER = 3.0; // Triple damage
+    private static final double BASE_COOLDOWN = 8.0; // 8 seconds
+    private static final double BASE_DAMAGE_MULTIPLIER = 1.45; // 45% bonus damage
 
     private static final Set<UUID> playersOnCooldown = ConcurrentHashMap.newKeySet();
     private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
@@ -40,9 +40,11 @@ public class VorpalStrikeSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public long getCooldownSeconds(int skillLevel) {
-        // Reduce cooldown by 0.3% per level, min 15 seconds
+        if (configFields != null && configFields.getCooldownSeconds() > 0)
+            return Math.max(1L, Math.round(configFields.calculateCooldown(skillLevel)));
+        // Reduce cooldown by 0.3% per level, min 4 seconds
         double reduction = 1.0 - (skillLevel * 0.003);
-        return (long) Math.max(15.0, BASE_COOLDOWN * reduction);
+        return (long) Math.max(4.0, BASE_COOLDOWN * reduction);
     }
 
     @Override
@@ -104,18 +106,31 @@ public class VorpalStrikeSkill extends SkillBonus implements CooldownSkill {
         SkillBonus.sendSkillActionBar(player, this);
     }
 
+    /**
+     * Power budget: the target rate for this skill is the standard proc band, so it is now a
+     * frequent crit follow-up (a 1.75x hit at level 50, E = 0.267 * 0.75 = 0.20) rather than a
+     * 25 second nuke. The cooldown above was cut to match; at the old 25s cooldown a 1.75x
+     * payoff would have been strictly worse than any tier 1 skill.
+     */
     private double getDamageMultiplier(int skillLevel) {
-        // Base 3x + 0.02x per level, capped at 4.0x
-        return Math.min(4.0, BASE_DAMAGE_MULTIPLIER + (skillLevel * 0.02));
+        // Base 1.45x + 0.006x per level, capped at 2.5x
+        return scaled(BASE_DAMAGE_MULTIPLIER, 0.006, 2.5, skillLevel);
     }
 
     /**
-     * Checks if this skill should proc on a critical hit.
+     * Vorpal Strike only fires on critical hits, so the gate lives here: on a non-crit this
+     * returns false without starting the cooldown, and the dispatcher consumes neither the
+     * cooldown nor the proc feedback. On success the cooldown is started inside
+     * {@link #onActivate(Player, Object)}, never by the dispatcher — the side-effect COOLDOWN
+     * branch verifies the skill went on cooldown to detect that it actually fired.
      */
-    public static boolean shouldProc(Player player, EliteMobDamagedByPlayerEvent event) {
-        if (!activePlayers.contains(player.getUniqueId())) return false;
-        if (!event.isCriticalStrike()) return false;
-        return !playersOnCooldown.contains(player.getUniqueId());
+    @Override
+    public boolean tryActivate(Player player, Object event) {
+        if (!(event instanceof EliteMobDamagedByPlayerEvent damageEvent)) return false;
+        if (!damageEvent.isCriticalStrike()) return false;
+        if (isOnCooldown(player)) return false;
+        onActivate(player, damageEvent);
+        return true;
     }
 
     @Override

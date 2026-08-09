@@ -25,7 +25,7 @@ public class PolearmMasterySkill extends SkillBonus {
 
     public static final String SKILL_ID = "spears_polearm_mastery";
     public static final String MODIFIER_KEY_STRING = "polearm_mastery_speed";
-    private static final double BASE_DAMAGE_BONUS = 0.20; // 20% damage bonus
+    private static final double BASE_DAMAGE_BONUS = 0.10; // 10% damage bonus
     private static final double BASE_ATTACK_SPEED_BONUS = 0.40; // 40% attack speed
 
     private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
@@ -37,10 +37,11 @@ public class PolearmMasterySkill extends SkillBonus {
     }
 
     public double getDamageBonus(int skillLevel) {
-        if (configFields != null) {
-            return configFields.calculateValue(skillLevel);
-        }
-        return BASE_DAMAGE_BONUS + (skillLevel * 0.003);
+        if (configFields != null) return configFields.calculateValue(skillLevel);
+        // Power budget: always-on passive, so the whole budget buys +20% at level 50
+        // (E = 1.00 * 0.20 = 0.20). Hardcoded rather than read from config so every server
+        // runs the same numbers while the rebalance is being validated.
+        return scaled(BASE_DAMAGE_BONUS, 0.002, skillLevel); // 10% base + 0.2% per level
     }
 
     /**
@@ -95,7 +96,7 @@ public class PolearmMasterySkill extends SkillBonus {
     }
 
     public double getAttackSpeedBonus(int skillLevel) {
-        return BASE_ATTACK_SPEED_BONUS + (skillLevel * 0.005);
+        return scaled(BASE_ATTACK_SPEED_BONUS, 0.005, skillLevel);
     }
 
     @Override

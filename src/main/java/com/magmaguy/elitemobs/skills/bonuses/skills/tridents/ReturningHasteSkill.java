@@ -1,10 +1,12 @@
 package com.magmaguy.elitemobs.skills.bonuses.skills.tridents;
 
+import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.StackingSkill;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageEvent;
 
 import java.util.List;
 import java.util.Map;
@@ -21,8 +23,12 @@ public class ReturningHasteSkill extends SkillBonus implements StackingSkill {
 
     public static final String SKILL_ID = "tridents_returning_haste";
     private static final int BASE_MAX_STACKS = 5;
-    private static final long STACK_DECAY_TIME = 5000; // 5 seconds
-    private static final double BASE_BONUS_PER_STACK = 0.1;
+    /**
+     * Stacks fall off after 3s without a throw. The old 5s window was longer than a
+     * throw-and-return cycle, so the ramp never decayed and the bonus sat at max permanently.
+     */
+    private static final long STACK_DECAY_TIME = 3000;
+    private static final double BASE_BONUS_PER_STACK = 0.05;
 
     // Track player stacks: PlayerUUID -> Stack count
     private static final Map<UUID, Integer> playerStacks = new ConcurrentHashMap<>();
@@ -39,9 +45,7 @@ public class ReturningHasteSkill extends SkillBonus implements StackingSkill {
 
     @Override
     public int getMaxStacks() {
-        if (configFields != null && configFields.getMaxStacks() > 0) {
-            return configFields.getMaxStacks();
-        }
+        if (configFields != null && configFields.getMaxStacks() > 0) return configFields.getMaxStacks();
         return BASE_MAX_STACKS;
     }
 
@@ -63,6 +67,16 @@ public class ReturningHasteSkill extends SkillBonus implements StackingSkill {
         lastThrowTime.put(player.getUniqueId(), System.currentTimeMillis());
     }
 
+    /**
+     * Only projectile hits (thrown trident) build stacks; melee trident hits do not. In test mode
+     * (rangedAttack flag set without a real Bukkit event) stacking is allowed.
+     */
+    @Override
+    public boolean stacksOnHit(EliteMobDamagedByPlayerEvent event) {
+        if (event.getEntityDamageByEntityEvent() == null) return event.isRangedAttack();
+        return event.getEntityDamageByEntityEvent().getCause() == EntityDamageEvent.DamageCause.PROJECTILE;
+    }
+
     @Override
     public void resetStacks(Player player) {
         playerStacks.remove(player.getUniqueId());
@@ -71,15 +85,9 @@ public class ReturningHasteSkill extends SkillBonus implements StackingSkill {
 
     @Override
     public double getBonusPerStack(int skillLevel) {
-        if (configFields != null) {
+        if (configFields != null)
             return BASE_BONUS_PER_STACK + (configFields.calculateValue(skillLevel) * 0.01);
-        }
-        return BASE_BONUS_PER_STACK + (skillLevel * 0.002);
-    }
-
-    @Override
-    public double getTotalStackBonus(Player player, int skillLevel) {
-        return getCurrentStacks(player) * getBonusPerStack(skillLevel);
+        return scaled(BASE_BONUS_PER_STACK, 0.0006, skillLevel); // 5% base + 0.06% per level
     }
 
     @Override

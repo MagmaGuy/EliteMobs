@@ -20,7 +20,10 @@ public class OverdrawSkill extends SkillBonus implements ConditionalSkill {
 
     public static final String SKILL_ID = "bows_overdraw";
     private static final long FULL_DRAW_TIME = 1500; // 1.5 seconds for full draw
-    private static final double BASE_BONUS = 0.15; // 15% base bonus
+    // Budgeted against how often the condition ACTUALLY holds, not how often it could.
+    // A bow user draws fully as a matter of course, so this is up on roughly 80% of shots -
+    // near-passive uptime, which only earns a near-passive multiplier (1 + 0.20/0.80 = 1.25x).
+    private static final double BASE_BONUS = 0.10;
 
     private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
     private static final Map<UUID, Long> drawStartTimes = new ConcurrentHashMap<>();
@@ -74,7 +77,9 @@ public class OverdrawSkill extends SkillBonus implements ConditionalSkill {
 
     @Override
     public double getConditionalBonus(int skillLevel) {
-        return BASE_BONUS + (skillLevel * 0.003); // 15% base + 0.3% per level
+        // Power budget: fully drawn shots are the common case, so this sits on the standard
+        // conditional band - a 1.75x hit at level 50 (E = 0.267 * 0.75 = 0.20).
+        return scaled(BASE_BONUS, 0.003, skillLevel); // 10% base + 0.3% per level -> 1.25x at level 50
     }
 
     public double calculateBonus(Player player, int skillLevel) {

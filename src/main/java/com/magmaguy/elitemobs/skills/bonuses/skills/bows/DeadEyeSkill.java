@@ -23,8 +23,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DeadEyeSkill extends SkillBonus implements CooldownSkill {
 
     public static final String SKILL_ID = "bows_dead_eye";
-    private static final long BASE_COOLDOWN = 45; // 45 seconds
-    private static final double BASE_DAMAGE_MULTIPLIER = 1.5; // 150% damage
+    private static final long BASE_COOLDOWN = 30; // 30 seconds
+    private static final double BASE_DAMAGE_MULTIPLIER = 3.3; // 330% damage
 
     private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
     private static final Set<UUID> onCooldown = ConcurrentHashMap.newKeySet();
@@ -38,7 +38,9 @@ public class DeadEyeSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public long getCooldownSeconds(int skillLevel) {
-        return Math.max(20, BASE_COOLDOWN - (skillLevel / 5)); // 45s base, min 20s
+        if (configFields != null && configFields.getCooldownSeconds() > 0)
+            return Math.max(1L, Math.round(configFields.calculateCooldown(skillLevel)));
+        return Math.max(15, BASE_COOLDOWN - (skillLevel / 5)); // 30s base, 20s at level 50, min 15s
     }
 
     @Override
@@ -86,8 +88,32 @@ public class DeadEyeSkill extends SkillBonus implements CooldownSkill {
         }
     }
 
+    /**
+     * Dead Eye is advertised - in its name, its description and its lore - as a critical-shot
+     * payoff, but it never implemented the gate. Relying on the default {@code tryActivate} meant
+     * the first arrow off cooldown always fired it, crit or not.
+     *
+     * @return true only on a critical strike, so a non-crit hit consumes neither the cooldown nor
+     * the damage bonus.
+     */
+    @Override
+    public boolean tryActivate(Player player, Object event) {
+        if (!(event instanceof EliteMobDamagedByPlayerEvent damageEvent)) return false;
+        if (!damageEvent.isCriticalStrike()) return false;
+        onActivate(player, event);
+        return true;
+    }
+
+    /**
+     * Power budget: the 20s cooldown at level 50 is a 1-in-20-shot trigger on its own, but the
+     * critical-hit gate above adds an expected wait of 1/critChance further shots before the skill
+     * can fire. At the ~25% crit chance a geared archer runs (capped at 40% by
+     * maximumCriticalStrikeChance) that is ~4 extra shots, so the real period is ~24 shots rather
+     * than 20. The payload rises from 5.0x to 5.8x to hold the same budget
+     * (E = 1/24 * 4.80 = 0.20).
+     */
     private double getDamageMultiplier(int skillLevel) {
-        return BASE_DAMAGE_MULTIPLIER + (skillLevel * 0.01); // 150% base + 1% per level
+        return scaled(BASE_DAMAGE_MULTIPLIER, 0.05, skillLevel); // 330% base + 5% per level
     }
 
     @Override

@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.ProcSkill;
+import com.magmaguy.elitemobs.skills.bonuses.interfaces.TargetDebuffBonus;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -22,12 +23,12 @@ import java.util.concurrent.ConcurrentHashMap;
  * Judgment (PROC) - Mark enemies for judgment, causing them to take bonus damage.
  * Tier 2 unlock.
  */
-public class JudgmentSkill extends SkillBonus implements ProcSkill {
+public class JudgmentSkill extends SkillBonus implements ProcSkill, TargetDebuffBonus {
 
     public static final String SKILL_ID = "maces_judgment";
-    private static final double BASE_PROC_CHANCE = 0.20;
+    private static final double BASE_PROC_CHANCE = 0.17;
     private static final long MARK_DURATION = 10000; // 10 seconds
-    private static final double BASE_DAMAGE_BONUS = 0.40; // 40% extra damage
+    private static final double BASE_DAMAGE_BONUS = 0.14; // 14% extra damage
 
     private static final Map<UUID, UUID> judgedTargets = new ConcurrentHashMap<>(); // EntityUUID -> PlayerUUID
     private static final Map<UUID, Long> markExpiry = new ConcurrentHashMap<>();
@@ -41,7 +42,9 @@ public class JudgmentSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public double getProcChance(int skillLevel) {
-        return Math.min(0.45, BASE_PROC_CHANCE + (skillLevel * 0.005));
+        if (configFields != null) return configFields.calculateProcChance(skillLevel);
+        // ~27% at level 50
+        return scaled(BASE_PROC_CHANCE, 0.002, 0.40, skillLevel);
     }
 
     @Override
@@ -84,11 +87,37 @@ public class JudgmentSkill extends SkillBonus implements ProcSkill {
         return judgerUUID.equals(player.getUniqueId());
     }
 
+    /**
+     * Power budget: the trigger rate for a mark is the mark's <em>uptime</em>, not the proc chance.
+     * The old 1.75x number was priced as if only 26.7% of hits landed on a judged target. A 10
+     * second mark refreshed by a 27% proc at mace attack speed (0.6 swings/sec, ~6 rolls per mark
+     * window) is up 1 - 0.73^6 = 85% of the time in a sustained fight, so the level 50 bonus is
+     * +24% (E = 0.85 * 0.24 = 0.20). Hardcoded rather than read from config so every server runs
+     * the same numbers while the rebalance is being validated.
+     */
     public double getJudgmentDamageBonus(int skillLevel) {
-        if (configFields != null) {
-            return configFields.calculateValue(skillLevel);
-        }
-        return BASE_DAMAGE_BONUS + (skillLevel * 0.005);
+        if (configFields != null) return configFields.calculateValue(skillLevel);
+        return scaled(BASE_DAMAGE_BONUS, 0.002, skillLevel); // 14% base + 0.2% per level
+    }
+
+    @Override
+    public boolean appliesTo(LivingEntity target, Player attacker) {
+        return isJudged(target, attacker);
+    }
+
+    @Override
+    public SkillType levelSource() {
+        return SkillType.MACES;
+    }
+
+    @Override
+    public double bonusFor(Player attacker, LivingEntity target, int level) {
+        return getJudgmentDamageBonus(level);
+    }
+
+    @Override
+    public String debugLabel() {
+        return "Judgment=";
     }
 
     @Override
@@ -129,7 +158,13 @@ public class JudgmentSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public double getBonusValue(int skillLevel) {
+        // Bonus fraction applied to judged targets, not to the hit that applies the judgment - see affectsDamage().
         return getJudgmentDamageBonus(skillLevel);
+    }
+
+    @Override
+    public boolean affectsDamage() {
+        return false; // Proc applies the judgment, bonus checked separately on judged targets
     }
 
     @Override

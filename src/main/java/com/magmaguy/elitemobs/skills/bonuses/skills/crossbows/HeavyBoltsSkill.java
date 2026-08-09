@@ -21,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class HeavyBoltsSkill extends SkillBonus {
 
     public static final String SKILL_ID = "crossbows_heavy_bolts";
-    private static final double BASE_DAMAGE_BONUS = 0.15; // 15% bonus
+    private static final double BASE_DAMAGE_BONUS = 0.10; // 10% bonus
     private static final double BASE_KNOCKBACK = 1.2;
 
     private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
@@ -48,11 +48,13 @@ public class HeavyBoltsSkill extends SkillBonus {
     }
 
     private double getDamageBonus(int skillLevel) {
-        return BASE_DAMAGE_BONUS + (skillLevel * 0.003); // 15% base + 0.3% per level
+        // Power budget: always-on passive, so the whole budget buys +20% at level 50
+        // (E = 1.00 * 0.20 = 0.20).
+        return scaled(BASE_DAMAGE_BONUS, 0.002, skillLevel); // 10% base + 0.2% per level
     }
 
     private double getKnockbackStrength(int skillLevel) {
-        return BASE_KNOCKBACK + (skillLevel * 0.01);
+        return scaled(BASE_KNOCKBACK, 0.01, skillLevel);
     }
 
     @Override

@@ -61,6 +61,26 @@ public interface CooldownSkill {
     }
 
     /**
+     * Attempts to activate the skill, reporting whether it actually fired.
+     * <p>
+     * A skill with its own gating condition (for example "target below 30% health") returns false
+     * when that condition fails. The caller then consumes neither the cooldown nor the damage
+     * bonus, so the condition genuinely governs the skill. Without this, a caller can only invoke
+     * {@link #onActivate} and has no way to learn whether anything happened — which previously let
+     * gated skills apply their damage bonus on every hit, bypassing their own condition entirely.
+     * <p>
+     * Skills that always fire when off cooldown need not override this.
+     *
+     * @param player The player activating the skill
+     * @param event  The triggering event (can be null)
+     * @return true if the skill actually fired
+     */
+    default boolean tryActivate(Player player, Object event) {
+        onActivate(player, event);
+        return true;
+    }
+
+    /**
      * Whether generic player-to-elite hit handling should trigger this cooldown skill.
      * Defensive cooldowns that activate from incoming damage should return false.
      *

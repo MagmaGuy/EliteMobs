@@ -23,7 +23,7 @@ public class PoseidonsFavorSkill extends SkillBonus {
 
     public static final String SKILL_ID = "tridents_poseidons_favor";
     private static final int BUFF_DURATION = 200; // 10 seconds
-    private static final double BASE_DAMAGE_BONUS = 0.15;
+    private static final double BASE_DAMAGE_BONUS = 0.10;
 
     // Track which players have this skill active
     private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
@@ -51,17 +51,16 @@ public class PoseidonsFavorSkill extends SkillBonus {
     }
 
     private int calculateAmplifier(int skillLevel) {
-        if (configFields != null) {
-            return (int) Math.floor(configFields.calculateValue(skillLevel));
-        }
-        return (int) Math.floor(skillLevel * 0.02);
+        if (configFields != null) return (int) Math.floor(configFields.calculateValue(skillLevel));
+        return Math.min(2, skillLevel / 25);
     }
 
     private double calculateDamageBonus(int skillLevel) {
-        if (configFields != null) {
-            return BASE_DAMAGE_BONUS * configFields.calculateValue(skillLevel);
-        }
-        return BASE_DAMAGE_BONUS + (skillLevel * 0.002);
+        if (configFields != null) return BASE_DAMAGE_BONUS * configFields.calculateValue(skillLevel);
+        // Power budget: always-on passive, so the whole budget buys +20% at level 50
+        // (E = 1.00 * 0.20 = 0.20). Hardcoded rather than read from config so every server
+        // runs the same numbers while the rebalance is being validated.
+        return scaled(BASE_DAMAGE_BONUS, 0.002, skillLevel); // 10% base + 0.2% per level
     }
 
     private int getPlayerSkillLevel(Player player) {

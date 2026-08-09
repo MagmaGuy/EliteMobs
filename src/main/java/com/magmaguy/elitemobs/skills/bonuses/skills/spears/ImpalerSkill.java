@@ -45,6 +45,8 @@ public class ImpalerSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public long getCooldownSeconds(int skillLevel) {
+        if (configFields != null && configFields.getCooldownSeconds() > 0)
+            return Math.max(1L, Math.round(configFields.calculateCooldown(skillLevel)));
         return Math.max(25, BASE_COOLDOWN_SECONDS - (skillLevel / 4));
     }
 
@@ -78,13 +80,6 @@ public class ImpalerSkill extends SkillBonus implements CooldownSkill {
         cooldowns.remove(player.getUniqueId());
     }
 
-    @Override
-    public void onActivate(Player player, Object event) {
-        if (event instanceof EliteMobDamagedByPlayerEvent dmgEvent) {
-            checkAndApply(player, dmgEvent);
-        }
-    }
-
     /**
      * Attempts to impale the target.
      * Returns the damage multiplier if successful, 1.0 otherwise.
@@ -105,6 +100,17 @@ public class ImpalerSkill extends SkillBonus implements CooldownSkill {
         activateImpale(player, eliteEntity, skillLevel);
 
         return multiplier;
+    }
+
+    /**
+     * Reports whether the impale actually landed, so the caller only consumes the cooldown and the
+     * damage bonus on a real activation. Returning 1.0 from checkAndApply means the target was
+     * already pinned (or the skill was unavailable) and nothing happened.
+     */
+    @Override
+    public boolean tryActivate(Player player, Object event) {
+        if (!(event instanceof EliteMobDamagedByPlayerEvent damageEvent)) return false;
+        return checkAndApply(player, damageEvent) > 1.0;
     }
 
     private void activateImpale(Player player, EliteEntity target, int skillLevel) {
@@ -145,15 +151,13 @@ public class ImpalerSkill extends SkillBonus implements CooldownSkill {
                 ticks++;
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
-
-        startCooldown(player, skillLevel);
     }
 
     public double getDamageMultiplier(int skillLevel) {
-        if (configFields != null) {
-            return configFields.calculateValue(skillLevel);
-        }
-        return BASE_DAMAGE_MULTIPLIER + (skillLevel * 0.05);
+        if (configFields != null) return configFields.calculateValue(skillLevel);
+        // Hardcoded rather than read from config so every server runs the same numbers while the
+        // rebalance is being validated. The 10.0 ceiling is the same cap the config path applied.
+        return scaled(BASE_DAMAGE_MULTIPLIER, 0.05, 10.0, skillLevel);
     }
 
     @Override
@@ -191,7 +195,11 @@ public class ImpalerSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public double getBonusValue(int skillLevel) {
-        return getDamageMultiplier(skillLevel);
+        // Return the bonus portion only (e.g., 3.0 for a 4.0x multiplier).
+        // processOffensiveSkill adds 1.0 + this, so total = the damage multiplier.
+        // The "target not already pinned" gate is enforced by tryActivate, which the caller
+        // consults before ever reaching this value, so no gating is needed here.
+        return getDamageMultiplier(skillLevel) - 1.0;
     }
 
     @Override

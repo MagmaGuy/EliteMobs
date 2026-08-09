@@ -37,10 +37,10 @@ public class LongReachSkill extends SkillBonus {
     }
 
     public double getReachBonus(int skillLevel) {
-        if (configFields != null) {
-            return configFields.calculateValue(skillLevel);
-        }
-        return BASE_REACH_BONUS + (skillLevel * 0.01);
+        if (configFields != null) return configFields.calculateValue(skillLevel);
+        // Extra blocks of reach, not a damage value. Hardcoded rather than read from config so
+        // every server runs the same numbers while the rebalance is being validated.
+        return scaled(BASE_REACH_BONUS, 0.01, skillLevel);
     }
 
     /**

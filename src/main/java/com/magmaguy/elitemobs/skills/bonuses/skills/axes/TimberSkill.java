@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class TimberSkill extends SkillBonus {
 
     public static final String SKILL_ID = "axes_timber";
-    private static final double BASE_DAMAGE_BONUS = 0.15;
+    private static final double BASE_DAMAGE_BONUS = 0.10;
     private static final double BASE_SHIELD_DISABLE_BONUS = 0.30;
 
     private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
@@ -29,12 +29,16 @@ public class TimberSkill extends SkillBonus {
               SkillBonusType.PASSIVE, 4, SKILL_ID);
     }
 
+    /**
+     * Power budget: always-on passive, so the whole budget buys +20% at level 50
+     * (E = 1.00 * 0.20 = 0.20).
+     */
     public static double getDamageBonus(int skillLevel) {
-        return BASE_DAMAGE_BONUS + (skillLevel * 0.002);
+        return scaled(BASE_DAMAGE_BONUS, 0.002, skillLevel);
     }
 
     public static double getShieldDisableBonus(int skillLevel) {
-        return BASE_SHIELD_DISABLE_BONUS + (skillLevel * 0.003);
+        return scaled(BASE_SHIELD_DISABLE_BONUS, 0.003, skillLevel);
     }
 
     public static boolean hasActiveSkill(UUID uuid) { return activePlayers.contains(uuid); }

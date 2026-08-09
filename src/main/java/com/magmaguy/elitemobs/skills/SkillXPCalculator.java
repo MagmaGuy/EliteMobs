@@ -128,28 +128,13 @@ public class SkillXPCalculator {
         return (double) progressXP / requiredXP;
     }
 
-    /**
-     * Calculates how many kills of a specific mob level are needed to reach the next level.
-     *
-     * @param currentLevel The player's current skill level
-     * @param mobLevel     The level of mobs being killed
-     * @return The number of kills needed (approximate, as it's integer division)
-     */
     public static long killsToNextLevel(int currentLevel, int mobLevel) {
-        long xpNeeded = xpToNextLevel(currentLevel);
         long xpPerKill = calculateMobXP(mobLevel);
-
         if (xpPerKill == 0) return Long.MAX_VALUE;
-        return (xpNeeded + xpPerKill - 1) / xpPerKill; // Ceiling division
+        long xpNeeded = xpToNextLevel(currentLevel);
+        return (xpNeeded + xpPerKill - 1) / xpPerKill;
     }
 
-    /**
-     * Applies the armor XP multiplier (1/3 rate).
-     * Armor levels more slowly than weapons to balance progression.
-     *
-     * @param baseXP The base XP from killing a mob
-     * @return The adjusted XP for armor skill
-     */
     public static long calculateArmorXP(long baseXP) {
         return baseXP / 3;
     }

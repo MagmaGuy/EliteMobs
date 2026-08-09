@@ -42,6 +42,7 @@ public class WoundSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public double getProcChance(int skillLevel) {
+        if (configFields != null) return configFields.calculateProcChance(skillLevel);
         return scaled(BASE_PROC_CHANCE, 0.003, 0.40, skillLevel);
     }
 

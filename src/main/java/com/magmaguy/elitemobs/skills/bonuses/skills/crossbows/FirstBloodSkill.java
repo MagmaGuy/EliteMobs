@@ -21,7 +21,7 @@ public class FirstBloodSkill extends SkillBonus implements ConditionalSkill {
 
     public static final String SKILL_ID = "crossbows_first_blood";
     private static final double HEALTH_THRESHOLD = 0.99; // Target must be at 99%+ health
-    private static final double BASE_BONUS = 0.50; // 50% bonus
+    private static final double BASE_BONUS = 0.83; // 83% bonus
 
     private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
@@ -40,9 +40,13 @@ public class FirstBloodSkill extends SkillBonus implements ConditionalSkill {
         return healthPercent >= HEALTH_THRESHOLD;
     }
 
+    /**
+     * Power budget: only full-health targets qualify, roughly a 15% trigger rate, which earns
+     * a 2.33x hit at level 50 (E = 0.15 * 1.33 = 0.20).
+     */
     @Override
     public double getConditionalBonus(int skillLevel) {
-        return BASE_BONUS + (skillLevel * 0.005); // 50% base + 0.5% per level
+        return scaled(BASE_BONUS, 0.01, skillLevel); // 83% base + 1% per level
     }
 
     @Override

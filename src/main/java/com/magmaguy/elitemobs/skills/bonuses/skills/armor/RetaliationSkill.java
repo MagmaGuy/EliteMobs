@@ -101,6 +101,7 @@ public class RetaliationSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public double getProcChance(int skillLevel) {
+        if (configFields != null) return configFields.calculateProcChance(skillLevel);
         // Base 25% chance
         return 0.25;
     }

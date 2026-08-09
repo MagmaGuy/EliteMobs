@@ -26,6 +26,42 @@ import java.util.concurrent.ConcurrentHashMap;
 public abstract class SkillBonus {
 
     /**
+     * Hard cap on how much any single defensive skill may reduce incoming damage.
+     * <p>
+     * Value: 0.80 (80%) — a player always takes at least 20% of the incoming hit from any one
+     * defensive skill. Defensive reductions scale with skill level and are otherwise unbounded,
+     * so without this ceiling several armor skills reach 100% reduction (immunity) and then go
+     * past it, which inverts the {@code damage * (1 - reduction)} formula and heals the player
+     * on hit. Mirrors {@link com.magmaguy.elitemobs.combatsystem.ArmorDefenseCalculator#GEAR_MAX_REDUCTION}
+     * for the gear side of the defensive stack.
+     */
+    public static final double MAX_DEFENSIVE_REDUCTION = 0.80;
+
+    /**
+     * Clamps a defensive damage reduction into the safe [0, {@link #MAX_DEFENSIVE_REDUCTION}] range.
+     *
+     * @param reduction The raw reduction (0.0 to 1.0)
+     * @return The clamped reduction, never negative and never above the shared ceiling
+     */
+    public static double clampDefensiveReduction(double reduction) {
+        return Math.max(0, Math.min(MAX_DEFENSIVE_REDUCTION, reduction));
+    }
+
+    /**
+     * The standard linear per-level scaling used by most skill payouts: {@code base + level * perLevel}.
+     */
+    protected static double scaled(double base, double perLevel, int level) {
+        return base + (level * perLevel);
+    }
+
+    /**
+     * Capped variant of {@link #scaled(double, double, int)}: {@code min(cap, base + level * perLevel)}.
+     */
+    protected static double scaled(double base, double perLevel, double cap, int level) {
+        return Math.min(cap, base + (level * perLevel));
+    }
+
+    /**
      * Sends a skill trigger action bar message to the player.
      *
      * @param player The player to send the message to
@@ -98,7 +134,7 @@ public abstract class SkillBonus {
     }
 
     /**
-     * Resets all proc counts. Used during shutdown or test cleanup.
+     * Resets all proc counts. Used during shutdown or diagnostic cleanup.
      */
     public void resetAllProcCounts() {
         procCounts.clear();
@@ -327,51 +363,40 @@ public abstract class SkillBonus {
     }
 
     /**
-     * Gets the scaled bonus value based on player's skill level.
-     * Uses the config's baseValue and scalingPerLevel.
-     *
-     * @param player The player
-     * @return The scaled bonus value
+     * Returns the configured linear bonus at the player's current level.
      */
     protected double getScaledValue(Player player) {
-        if (configFields == null) return 1.0;
-        int skillLevel = SkillBonusRegistry.getPlayerSkillLevel(player, skillType);
-        return configFields.calculateValue(skillLevel);
+        return getScaledValue(SkillBonusRegistry.getPlayerSkillLevel(player, skillType));
     }
 
     /**
-     * Gets the scaled bonus value for a specific skill level.
-     *
-     * @param skillLevel The skill level
-     * @return The scaled bonus value
+     * Returns the configured linear bonus at a specific skill level.
      */
     protected double getScaledValue(int skillLevel) {
-        if (configFields == null) return 1.0;
-        return configFields.calculateValue(skillLevel);
+        return configFields == null ? 1.0 : configFields.calculateValue(skillLevel);
     }
 
     /**
-     * Gets the proc chance based on player's skill level.
-     *
-     * @param player The player
-     * @return The proc chance (0.0 to 1.0)
+     * Returns the configured proc chance at the player's current skill level.
      */
     protected double getScaledProcChance(Player player) {
         if (configFields == null) return 0.1;
-        int skillLevel = SkillBonusRegistry.getPlayerSkillLevel(player, skillType);
-        return configFields.calculateProcChance(skillLevel);
+        return configFields.calculateProcChance(SkillBonusRegistry.getPlayerSkillLevel(player, skillType));
     }
 
     /**
-     * Gets the cooldown based on player's skill level.
-     *
-     * @param player The player
-     * @return The cooldown in seconds
+     * Returns the configured cooldown at the player's current skill level.
      */
     protected double getScaledCooldown(Player player) {
         if (configFields == null) return 30.0;
-        int skillLevel = SkillBonusRegistry.getPlayerSkillLevel(player, skillType);
-        return configFields.calculateCooldown(skillLevel);
+        return configFields.calculateCooldown(SkillBonusRegistry.getPlayerSkillLevel(player, skillType));
+    }
+
+    /**
+     * Returns the configured cooldown at a specific skill level.
+     */
+    protected double getScaledCooldown(int skillLevel) {
+        return configFields == null ? 30.0 : configFields.calculateCooldown(skillLevel);
     }
 
     /**

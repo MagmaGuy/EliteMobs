@@ -159,10 +159,16 @@ public class SkillBonusMenu {
                 .replace("%tier%", String.valueOf(skillConfig.getUnlockTier()))
                 .replace("%level%", String.valueOf(skillConfig.getRequiredLevel())));
 
-        // Add current value at player's level
+        // Render through the registered skill instance so the menu uses the same loaded config and
+        // skill-specific calculation that the runtime applies in combat.
         if (isUnlocked) {
-            double value = skillConfig.calculateValue(playerLevel);
-            lore.add(SkillBonusMenuConfig.getSkillValueLabel() + String.format("%.1f", value));
+            SkillBonus skill = SkillBonusRegistry.getSkillById(skillConfig.getSkillId());
+            if (skill != null) {
+                String formattedBonus = skill.getFormattedBonus(playerLevel);
+                lore.add(SkillBonusMenuConfig.getSkillValueLabel() + (formattedBonus.isEmpty()
+                        ? String.format("%.1f", skill.getBonusValue(playerLevel))
+                        : formattedBonus));
+            }
         }
 
         lore.add("");

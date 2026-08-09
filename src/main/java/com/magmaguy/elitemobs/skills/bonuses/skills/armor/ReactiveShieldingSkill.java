@@ -21,10 +21,22 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ReactiveShieldingSkill extends SkillBonus implements CooldownSkill {
 
+    /**
+     * Shield strength and its duty cycle, on the shared defensive power budget.
+     * <p>
+     * Sustained power is {@code E = uptime * reduction} and the budget is 0.20. The shield is the
+     * strongest single reduction the system allows ({@link SkillBonus#MAX_DEFENSIVE_REDUCTION}), so
+     * the budget is spent on uptime instead: {@code 0.20 / 0.80 = 0.25}, which is 5 seconds of shield
+     * per 20 second cooldown. The old 3s/30s duty cycle was 0.10 uptime, less than half of budget.
+     * Hardcoded on purpose: balance values no longer come from config, only presentation does.
+     */
+    private static final double SHIELD_REDUCTION = 0.80;
+    private static final long SHIELD_DURATION = 5000; // 5 seconds
+    private static final long COOLDOWN_SECONDS = 20;
+
     private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
     private static final Map<UUID, Long> cooldownMap = new ConcurrentHashMap<>();
     private static final Map<UUID, Long> shieldActiveMap = new ConcurrentHashMap<>();
-    private static final long SHIELD_DURATION = 3000; // 3 seconds
     private static final double BIG_HIT_THRESHOLD = 0.10; // 10% of max health
 
     public ReactiveShieldingSkill() {
@@ -97,8 +109,10 @@ public class ReactiveShieldingSkill extends SkillBonus implements CooldownSkill 
 
     @Override
     public long getCooldownSeconds(int skillLevel) {
-        // Base 30 seconds cooldown
-        return 30;
+        if (configFields != null && configFields.getCooldownSeconds() > 0)
+            return Math.max(1L, Math.round(configFields.calculateCooldown(skillLevel)));
+        // 5s shield / 20s cooldown = 0.25 uptime, the budgeted duty cycle for an 80% reduction
+        return COOLDOWN_SECONDS;
     }
 
     @Override
@@ -216,8 +230,10 @@ public class ReactiveShieldingSkill extends SkillBonus implements CooldownSkill 
      * @return The reduction percentage (0.0 to 1.0)
      */
     private double getShieldReduction(int skillLevel) {
-        // Base 50% + up to 25% more based on skill level
-        return 0.50 + getScaledValue(skillLevel) * 0.25;
+        double configuredReduction = configFields == null
+                ? SHIELD_REDUCTION
+                : 0.50 + configFields.calculateValue(skillLevel) * 0.25;
+        return clampDefensiveReduction(configuredReduction);
     }
 
     private int getPlayerSkillLevel(Player player) {

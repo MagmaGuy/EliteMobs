@@ -51,7 +51,7 @@ public class FinishingFlourishSkill extends SkillBonus implements ConditionalSki
     @Override
     public double getConditionalBonus(int skillLevel) {
         // Base 50% + 1% per level
-        return BASE_EXECUTE_BONUS + (skillLevel * 0.01);
+        return scaled(BASE_EXECUTE_BONUS, 0.01, skillLevel);
     }
 
     /**

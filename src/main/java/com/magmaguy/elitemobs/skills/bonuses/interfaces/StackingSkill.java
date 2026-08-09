@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.skills.bonuses.interfaces;
 
+import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import org.bukkit.entity.Player;
 
 /**
@@ -48,13 +49,31 @@ public interface StackingSkill {
     double getBonusPerStack(int skillLevel);
 
     /**
-     * Gets the total bonus based on current stacks.
-     *
-     * @param player     The player to calculate for
-     * @param skillLevel The player's skill level
-     * @return The total stacked bonus
+     * Gets the total bonus represented by the currently banked stacks.
      */
     default double getTotalStackBonus(Player player, int skillLevel) {
         return getCurrentStacks(player) * getBonusPerStack(skillLevel);
+    }
+
+    /**
+     * Whether this hit should add a stack. Skills that only stack on particular attack shapes
+     * (e.g. thrown-trident hits) override this with their predicate.
+     *
+     * @param event The damage event being processed
+     * @return true if the hit qualifies for a stack
+     */
+    default boolean stacksOnHit(EliteMobDamagedByPlayerEvent event) {
+        return true;
+    }
+
+    /**
+     * Whether stacks are banked by something other than the on-hit dispatcher (e.g. a kill
+     * listener). When true, the dispatcher only reads and displays the current stacks and never
+     * adds one per hit.
+     *
+     * @return true if stacks are added outside the on-hit path
+     */
+    default boolean banksStacksExternally() {
+        return false;
     }
 }

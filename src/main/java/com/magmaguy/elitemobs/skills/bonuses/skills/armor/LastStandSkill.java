@@ -89,6 +89,8 @@ public class LastStandSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public long getCooldownSeconds(int skillLevel) {
+        if (configFields != null && configFields.getCooldownSeconds() > 0)
+            return Math.max(1L, Math.round(configFields.calculateCooldown(skillLevel)));
         // Base 120 seconds (2 minutes) cooldown
         return 120;
     }

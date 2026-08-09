@@ -28,10 +28,7 @@ import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Central event handler for processing skill bonuses.
@@ -41,30 +38,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class SkillBonusEventHandler implements Listener {
 
-    // Cooldown tracking: skillId -> Set of player UUIDs on cooldown
-    private static final Map<String, Set<UUID>> skillCooldowns = new ConcurrentHashMap<>();
-
-    // Stack tracking: playerUUID -> skillId -> current stacks
-    private static final Map<UUID, Map<String, Integer>> playerStacks = new ConcurrentHashMap<>();
-
     public SkillBonusEventHandler() {
         // Register ourselves as listener
-    }
-
-    /**
-     * Starts a cooldown for a skill.
-     */
-    public static void startCooldown(String skillId, UUID playerUUID, int seconds) {
-        Set<UUID> cooldownSet = skillCooldowns.computeIfAbsent(skillId, k -> ConcurrentHashMap.newKeySet());
-        cooldownSet.add(playerUUID);
-
-        // Schedule cooldown removal
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                endCooldown(skillId, playerUUID);
-            }
-        }.runTaskLater(MetadataHandler.PLUGIN, seconds * 20L);
     }
 
     /**
@@ -105,7 +80,6 @@ public class SkillBonusEventHandler implements Listener {
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        UUID uuid = player.getUniqueId();
 
         // Save and cleanup
         PlayerSkillSelection.onPlayerLeave(player);
@@ -114,14 +88,6 @@ public class SkillBonusEventHandler implements Listener {
         // to the lowered max and persist it. applyHealthBonus on join is idempotent
         // and will refresh the modifier from the current armor level.
         ArmorSkillHealthBonus.resetPlayerHealthDisplay(player);
-
-        // Clear player-specific data
-        playerStacks.remove(uuid);
-
-        // Remove from all cooldowns
-        for (Set<UUID> cooldownSet : skillCooldowns.values()) {
-            cooldownSet.remove(uuid);
-        }
     }
 
     @EventHandler(priority = EventPriority.NORMAL)
@@ -145,45 +111,6 @@ public class SkillBonusEventHandler implements Listener {
         CombatLevelDisplay.createDisplay(player);
     }
 
-    // ==================== COOLDOWN MANAGEMENT ====================
-
-    /**
-     * Checks if a skill is on cooldown for a player.
-     */
-    public static boolean isOnCooldown(String skillId, UUID playerUUID) {
-        Set<UUID> cooldownSet = skillCooldowns.get(skillId);
-        return cooldownSet != null && cooldownSet.contains(playerUUID);
-    }
-
-    /**
-     * Sets the stacks for a skill.
-     */
-    public static void setStacks(UUID playerUUID, String skillId, int count) {
-        Map<String, Integer> stacks = playerStacks.computeIfAbsent(playerUUID, k -> new ConcurrentHashMap<>());
-        stacks.put(skillId, count);
-    }
-
-    /**
-     * Ends a cooldown for a skill.
-     */
-    public static void endCooldown(String skillId, UUID playerUUID) {
-        Set<UUID> cooldownSet = skillCooldowns.get(skillId);
-        if (cooldownSet != null) {
-            cooldownSet.remove(playerUUID);
-        }
-    }
-
-    // ==================== STACK MANAGEMENT ====================
-
-    /**
-     * Gets the current stacks for a skill.
-     */
-    public static int getStacks(UUID playerUUID, String skillId) {
-        Map<String, Integer> stacks = playerStacks.get(playerUUID);
-        if (stacks == null) return 0;
-        return stacks.getOrDefault(skillId, 0);
-    }
-
     /**
      * Gets weapon skill type from an item stack (for weapon switch handling).
      */
@@ -201,16 +128,6 @@ public class SkillBonusEventHandler implements Listener {
         } catch (NoSuchFieldError e) { /* pre-1.21 */ }
         if (typeName.endsWith("_SPEAR")) return SkillType.SPEARS;
         return null;
-    }
-
-    /**
-     * Resets stacks for a skill.
-     */
-    public static void resetStacks(UUID playerUUID, String skillId) {
-        Map<String, Integer> stacks = playerStacks.get(playerUUID);
-        if (stacks != null) {
-            stacks.remove(skillId);
-        }
     }
 
     // ==================== WEAPON SKILL EVENT HOOKS ====================
@@ -358,45 +275,10 @@ public class SkillBonusEventHandler implements Listener {
         }
     }
 
-    // ==================== UTILITY METHODS ====================
-
-    /**
-     * Determines the weapon skill type based on the player's main hand item.
-     */
-    public static SkillType getWeaponSkillType(Player player) {
-        ItemStack mainHand = player.getInventory().getItemInMainHand();
-        if (mainHand == null || mainHand.getType() == Material.AIR) return null;
-
-        Material type = mainHand.getType();
-        String typeName = type.name();
-
-        // Check weapon types
-        if (typeName.endsWith("_SWORD")) return SkillType.SWORDS;
-        if (typeName.endsWith("_AXE")) return SkillType.AXES;
-        if (type == Material.BOW) return SkillType.BOWS;
-        if (type == Material.CROSSBOW) return SkillType.CROSSBOWS;
-        if (type == Material.TRIDENT) return SkillType.TRIDENTS;
-        if (typeName.endsWith("_HOE")) return SkillType.HOES;
-
-        // Check for maces (1.21+)
-        try {
-            if (type == Material.MACE) return SkillType.MACES;
-        } catch (NoSuchFieldError e) {
-            // MACE doesn't exist pre-1.21
-        }
-
-        // Check for spears (1.21.11+)
-        if (typeName.endsWith("_SPEAR")) return SkillType.SPEARS;
-
-        return null;
-    }
-
     /**
      * Cleans up all static resources on shutdown.
      */
     public static void shutdown() {
-        skillCooldowns.clear();
-        playerStacks.clear();
         PlayerSkillSelection.shutdown();
     }
 }

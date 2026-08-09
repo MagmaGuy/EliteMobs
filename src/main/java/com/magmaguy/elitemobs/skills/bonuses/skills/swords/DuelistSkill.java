@@ -4,7 +4,6 @@ import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
-import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.ConditionalSkill;
 import org.bukkit.entity.Player;
@@ -23,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DuelistSkill extends SkillBonus implements ConditionalSkill {
 
     public static final String SKILL_ID = "swords_duelist";
-    private static final double BASE_DAMAGE_BONUS = 0.25; // 25% bonus
+    private static final double BASE_DAMAGE_BONUS = 0.45; // 45% bonus
     private static final double DETECTION_RADIUS = 10.0;
 
     private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
@@ -53,32 +52,9 @@ public class DuelistSkill extends SkillBonus implements ConditionalSkill {
 
     @Override
     public double getConditionalBonus(int skillLevel) {
-        // Base 25% + 0.5% per level
-        return BASE_DAMAGE_BONUS + (skillLevel * 0.005);
-    }
-
-    /**
-     * Applies the duelist bonus to damage if conditions are met.
-     */
-    public static double applyDuelistBonus(Player player, EliteMobDamagedByPlayerEvent event, double currentDamage) {
-        if (!activePlayers.contains(player.getUniqueId())) return currentDamage;
-
-        EliteEntity target = event.getEliteMobEntity();
-        if (target == null || target.getLivingEntity() == null) return currentDamage;
-
-        // Check condition
-        long nearbyElites = target.getLivingEntity().getNearbyEntities(DETECTION_RADIUS, DETECTION_RADIUS, DETECTION_RADIUS)
-                .stream()
-                .filter(e -> com.magmaguy.elitemobs.entitytracker.EntityTracker.isEliteMob(e))
-                .filter(e -> !e.getUniqueId().equals(target.getLivingEntity().getUniqueId()))
-                .count();
-
-        if (nearbyElites > 0) return currentDamage;
-
-        int skillLevel = SkillBonusRegistry.getPlayerSkillLevel(player, SkillType.SWORDS);
-        double bonus = BASE_DAMAGE_BONUS + (skillLevel * 0.005);
-
-        return currentDamage * (1 + bonus);
+        // Power budget: standard conditional band - a 1.75x hit at level 50
+        // (E = 0.267 * 0.75 = 0.20). Base 45% + 0.6% per level.
+        return scaled(BASE_DAMAGE_BONUS, 0.006, skillLevel);
     }
 
     @Override

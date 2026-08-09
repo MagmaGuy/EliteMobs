@@ -20,11 +20,18 @@ public class RangersFocusSkill extends SkillBonus implements StackingSkill {
 
     public static final String SKILL_ID = "bows_rangers_focus";
     private static final int MAX_STACKS = 8;
-    private static final double BASE_BONUS_PER_STACK = 0.04; // 4% per stack
+    private static final double BASE_BONUS_PER_STACK = 0.03; // 3% per stack
+    /**
+     * Focus is lost after 3s without landing a shot on the focused target. Without this the skill
+     * only ever reset on a target switch, so a player fighting one boss sat at max stacks forever
+     * and the bonus was a permanent passive rather than a ramp.
+     */
+    private static final long FOCUS_DECAY_TIME = 3000;
 
     private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
     private static final Map<UUID, Integer> playerStacks = new ConcurrentHashMap<>();
     private static final Map<UUID, UUID> targetedEnemy = new ConcurrentHashMap<>();
+    private static final Map<UUID, Long> lastHitTime = new ConcurrentHashMap<>();
 
     public RangersFocusSkill() {
         super(SkillType.BOWS, 75, "Ranger's Focus",
@@ -39,6 +46,10 @@ public class RangersFocusSkill extends SkillBonus implements StackingSkill {
 
     @Override
     public int getCurrentStacks(Player player) {
+        Long lastHit = lastHitTime.get(player.getUniqueId());
+        if (lastHit != null && System.currentTimeMillis() - lastHit > FOCUS_DECAY_TIME) {
+            resetStacks(player);
+        }
         return playerStacks.getOrDefault(player.getUniqueId(), 0);
     }
 
@@ -48,17 +59,21 @@ public class RangersFocusSkill extends SkillBonus implements StackingSkill {
         if (current < MAX_STACKS) {
             playerStacks.put(player.getUniqueId(), current + 1);
         }
+        lastHitTime.put(player.getUniqueId(), System.currentTimeMillis());
     }
 
     @Override
     public void resetStacks(Player player) {
         playerStacks.remove(player.getUniqueId());
         targetedEnemy.remove(player.getUniqueId());
+        lastHitTime.remove(player.getUniqueId());
     }
 
     @Override
     public double getBonusPerStack(int skillLevel) {
-        return BASE_BONUS_PER_STACK + (skillLevel * 0.0008); // 4% base + 0.08% per level
+        // Power budget: ~50% uptime on the ramp, so full stacks are worth +40% at level 50
+        // (E = 0.50 * 0.40 = 0.20).
+        return scaled(BASE_BONUS_PER_STACK, 0.0004, skillLevel); // 3% base + 0.04% per level
     }
 
     public UUID getTargetedEnemy(Player player) {
@@ -113,5 +128,6 @@ public class RangersFocusSkill extends SkillBonus implements StackingSkill {
         activePlayers.clear();
         playerStacks.clear();
         targetedEnemy.clear();
+        lastHitTime.clear();
     }
 }

@@ -22,8 +22,13 @@ public class MomentumSkill extends SkillBonus implements StackingSkill {
 
     public static final String SKILL_ID = "axes_momentum";
     private static final int MAX_STACKS = 8;
-    private static final double DAMAGE_PER_STACK = 0.04;
-    private static final int DECAY_TICKS = 80;
+    private static final double DAMAGE_PER_STACK = 0.03;
+    /**
+     * One stack falls off every 2 seconds without a hit. The old 4 second window was longer than
+     * any realistic axe swing interval, so stacks never decayed and the skill was permanently
+     * capped instead of ramping - which is what justifies the per-stack value above.
+     */
+    private static final int DECAY_TICKS = 40;
 
     private static final Map<UUID, Integer> playerStacks = new ConcurrentHashMap<>();
     private static final Map<UUID, BukkitRunnable> decayTasks = new ConcurrentHashMap<>();
@@ -60,13 +65,13 @@ public class MomentumSkill extends SkillBonus implements StackingSkill {
     public static double getDamageMultiplier(Player player, int skillLevel) {
         if (!activePlayers.contains(player.getUniqueId())) return 1.0;
         int stacks = playerStacks.getOrDefault(player.getUniqueId(), 0);
-        double bonus = Math.min(0.10, DAMAGE_PER_STACK + (skillLevel * 0.0005)) * stacks;
+        double bonus = scaled(DAMAGE_PER_STACK, 0.0004, 0.08, skillLevel) * stacks;
         return 1.0 + bonus;
     }
 
     @Override
     public double getBonusPerStack(int skillLevel) {
-        return Math.min(0.10, DAMAGE_PER_STACK + (skillLevel * 0.0005));
+        return scaled(DAMAGE_PER_STACK, 0.0004, 0.08, skillLevel);
     }
 
     private void resetDecayTimer(Player player) {
@@ -116,7 +121,11 @@ public class MomentumSkill extends SkillBonus implements StackingSkill {
     @Override
     public double getBonusValue(int skillLevel) { return getBonusPerStack(skillLevel) * MAX_STACKS; }
     @Override
-    public String getFormattedBonus(int skillLevel) { return applyFormattedBonusTemplate(Map.of("maxBonus", String.format("%.0f", getBonusValue(skillLevel) * 100))); }
+    public String getFormattedBonus(int skillLevel) {
+        return applyFormattedBonusTemplate(Map.of(
+                "maxBonus", String.format("%.0f", getBonusValue(skillLevel) * 100),
+                "maxStacks", String.valueOf(MAX_STACKS)));
+    }
 
     @Override
     public void shutdown() {

@@ -20,7 +20,13 @@ import java.util.concurrent.ConcurrentHashMap;
 public class RiptideMasterySkill extends SkillBonus implements ConditionalSkill {
 
     public static final String SKILL_ID = "tridents_riptide_mastery";
-    private static final double BASE_BONUS = 0.5;
+    // Budgeted against how often the condition ACTUALLY holds. "In water OR storming" is trivially
+    // satisfiable - stand in a pond - so realistic uptime is ~60%. Splitting that into the plain
+    // case and the 1.5x water-AND-storm case (in water ~45%, storming ~25%, so both ~11%) gives
+    // E = 0.49*b + 0.11*1.5b = 0.655*b; b = 0.31 at level 50 lands E = 0.20. The base was 0.18
+    // (1.33x) while the 1.5x branch was dead code that never reached a damage calculation; making
+    // it live would have pushed the skill over budget at its old value.
+    private static final double BASE_BONUS = 0.16;
 
     // Track which players have this skill active
     private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
@@ -42,18 +48,27 @@ public class RiptideMasterySkill extends SkillBonus implements ConditionalSkill 
         return calculateBonus(skillLevel);
     }
 
-    /**
-     * Calculates the conditional bonus with extra multiplier if both conditions met.
-     */
-    private double calculateBonus(int skillLevel) {
-        if (configFields != null) {
-            return BASE_BONUS + configFields.calculateValue(skillLevel);
-        }
-        return BASE_BONUS + (skillLevel * 0.01);
+    @Override
+    public double getConditionalBonus(Player player, int skillLevel) {
+        return getTotalBonus(player, skillLevel);
     }
 
     /**
-     * Gets the total bonus for a player, including the double bonus if both conditions are met.
+     * Base conditional bonus, before the water-AND-storm uplift in
+     * {@link #getTotalBonus(Player, int)}.
+     */
+    private double calculateBonus(int skillLevel) {
+        if (configFields != null) return BASE_BONUS + configFields.calculateValue(skillLevel);
+        return scaled(BASE_BONUS, 0.003, skillLevel); // 16% base + 0.3% per level -> 1.31x at level 50
+    }
+
+    /**
+     * Gets the total bonus for a player, including the extra bonus if both conditions are met.
+     * <p>
+     * Called from the CONDITIONAL branch of
+     * {@link com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent#processOffensiveSkill}, which
+     * has the player in hand; the interface's level-only {@code getConditionalBonus} cannot see
+     * whether the player is standing in water during a storm and so never applied the 1.5x.
      */
     public double getTotalBonus(Player player, int skillLevel) {
         if (!conditionMet(player, null)) return 0.0;

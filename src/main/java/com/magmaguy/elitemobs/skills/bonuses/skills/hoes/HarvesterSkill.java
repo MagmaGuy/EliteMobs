@@ -31,35 +31,26 @@ public class HarvesterSkill extends SkillBonus {
     }
 
     public double getDamageBonus(int skillLevel) {
-        if (configFields != null) {
-            return configFields.calculateValue(skillLevel);
-        }
-        // Base 10% + 0.2% per level
-        return BASE_DAMAGE_BONUS + (skillLevel * 0.002);
+        if (configFields != null) return configFields.calculateValue(skillLevel);
+        return scaled(BASE_DAMAGE_BONUS, 0.002, skillLevel); // 10% base + 0.2% per level
     }
 
     public double getLootBonus(int skillLevel) {
-        if (configFields != null) {
-            // Use a secondary value or same value for loot
-            return configFields.calculateValue(skillLevel) * 1.5;
-        }
-        // Base 15% + 0.3% per level
-        return BASE_LOOT_BONUS + (skillLevel * 0.003);
+        if (configFields != null) return configFields.calculateValue(skillLevel) * 1.5;
+        return scaled(BASE_LOOT_BONUS, 0.003, skillLevel);
     }
 
     /**
-     * Gets the loot quality multiplier for a player.
-     * Called from loot drop events.
+     * Returns the configured loot-quality multiplier for integrations that apply this skill to a
+     * reward path. The feature is intentionally preserved even though the in-tree loot pipeline
+     * does not currently call it; it is externally usable and may have been disconnected.
      */
     public static double getLootMultiplier(Player player) {
         if (!activePlayers.contains(player.getUniqueId())) return 1.0;
-
-        // Get the instance from registry
         SkillBonus skill = com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry.getSkillById(SKILL_ID);
         if (!(skill instanceof HarvesterSkill harvester)) return 1.0;
-
         int skillLevel = com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry
-            .getPlayerSkillLevel(player, SkillType.HOES);
+                .getPlayerSkillLevel(player, SkillType.HOES);
         return 1.0 + harvester.getLootBonus(skillLevel);
     }
 

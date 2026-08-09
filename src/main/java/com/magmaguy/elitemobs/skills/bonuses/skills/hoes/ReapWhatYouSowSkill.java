@@ -38,11 +38,8 @@ public class ReapWhatYouSowSkill extends SkillBonus implements ConditionalSkill 
 
     @Override
     public double getConditionalBonus(int skillLevel) {
-        if (configFields != null) {
-            return configFields.calculateValue(skillLevel);
-        }
-        // Base 50% + 1% per level
-        return BASE_BONUS + (skillLevel * 0.01);
+        if (configFields != null) return configFields.calculateValue(skillLevel);
+        return scaled(BASE_BONUS, 0.01, skillLevel); // 50% base + 1% per level
     }
 
     /**

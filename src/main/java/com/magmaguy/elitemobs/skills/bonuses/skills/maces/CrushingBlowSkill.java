@@ -17,30 +17,43 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Crushing Blow (PROC) - Chance to ignore enemy armor.
+ * Crushing Blow (PROC) - Chance to land a crushing hit for heavy bonus damage.
  * Tier 1 unlock.
+ * <p>
+ * The skill used to advertise armor penetration and was entirely cosmetic as a result: its
+ * {@code getArmorIgnore} value reached no damage code, {@code affectsDamage()} returned false, and
+ * {@code onProc} only played particles and a sound. Armor penetration is also unimplementable
+ * here - elite armor is cosmetic and every vanilla damage modifier except BASE is zeroed before
+ * the formula runs (see {@code EliteMobDamagedByPlayerEvent.onEliteMobAttacked}) - so the proc was
+ * converted into the bonus damage it was always meant to represent, priced to the standard budget.
  */
 public class CrushingBlowSkill extends SkillBonus implements ProcSkill {
 
     public static final String SKILL_ID = "maces_crushing_blow";
     private static final double BASE_PROC_CHANCE = 0.12;
-    private static final double BASE_ARMOR_IGNORE = 0.25; // 25% armor ignored
+    private static final double BASE_DAMAGE_MULTIPLIER = 1.34;
 
     private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public CrushingBlowSkill() {
         super(SkillType.MACES, 10, "Crushing Blow",
-              "Chance to ignore enemy armor on hit.",
+              "Chance to land a crushing hit that deals bonus damage.",
               SkillBonusType.PROC, 1, SKILL_ID);
     }
 
     @Override
     public double getProcChance(int skillLevel) {
-        return Math.min(0.30, BASE_PROC_CHANCE + (skillLevel * 0.003));
+        if (configFields != null) return configFields.calculateProcChance(skillLevel);
+        return scaled(BASE_PROC_CHANCE, 0.003, 0.30, skillLevel);
     }
 
-    public double getArmorIgnore(int skillLevel) {
-        return Math.min(0.60, BASE_ARMOR_IGNORE + (skillLevel * 0.005));
+    /**
+     * Power budget: a 27% proc rate at level 50 earns a 1.74x hit (E = 0.27 * 0.74 = 0.20).
+     * Hardcoded rather than read from config so every server runs the same numbers while the
+     * rebalance is being validated.
+     */
+    public double getDamageMultiplier(int skillLevel) {
+        return scaled(BASE_DAMAGE_MULTIPLIER, 0.008, skillLevel);
     }
 
     @Override
@@ -88,19 +101,22 @@ public class CrushingBlowSkill extends SkillBonus implements ProcSkill {
     public List<String> getLoreDescription(int skillLevel) {
         return applyLoreTemplates(Map.of(
                 "procChance", String.format("%.1f", getProcChance(skillLevel) * 100),
-                "armorIgnore", String.format("%.0f", getArmorIgnore(skillLevel) * 100)
+                "multiplier", String.format("%.1f", getDamageMultiplier(skillLevel))
         ));
     }
 
     @Override
     public double getBonusValue(int skillLevel) {
-        return getArmorIgnore(skillLevel);
+        // Return the bonus portion only (e.g., 0.74 for a 1.74x multiplier).
+        // processOffensiveSkill adds 1.0 + this, so total = the damage multiplier.
+        return getDamageMultiplier(skillLevel) - 1.0;
     }
 
     @Override
     public String getFormattedBonus(int skillLevel) {
         return applyFormattedBonusTemplate(Map.of(
-                "armorIgnore", String.format("%.0f", getArmorIgnore(skillLevel) * 100)
+                "multiplier", String.format("%.1f", getDamageMultiplier(skillLevel)),
+                "procChance", String.format("%.0f", getProcChance(skillLevel) * 100)
         ));
     }
 

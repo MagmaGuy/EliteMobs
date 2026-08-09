@@ -26,7 +26,7 @@ public class GrimReachSkill extends SkillBonus {
 
     public static final String SKILL_ID = "hoes_grim_reach";
     public static final String MODIFIER_KEY_STRING = "grim_reach_range";
-    private static final double BASE_DAMAGE_BONUS = 0.15; // 15% bonus
+    private static final double BASE_DAMAGE_BONUS = 0.10; // 10% bonus
 
     private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
@@ -37,11 +37,8 @@ public class GrimReachSkill extends SkillBonus {
     }
 
     public double getDamageMultiplier(int skillLevel) {
-        if (configFields != null) {
-            return configFields.calculateValue(skillLevel);
-        }
-        // Base 15% + 0.3% per level
-        return BASE_DAMAGE_BONUS + (skillLevel * 0.003);
+        if (configFields != null) return configFields.calculateValue(skillLevel);
+        return scaled(BASE_DAMAGE_BONUS, 0.002, skillLevel); // 10% base + 0.2% per level
     }
 
     /**
@@ -49,7 +46,7 @@ public class GrimReachSkill extends SkillBonus {
      */
     public static double getReachBonus(int skillLevel) {
         // 1.0 to 2.0 extra blocks
-        return Math.min(2.0, 1.0 + (skillLevel * 0.013));
+        return scaled(1.0, 0.013, 2.0, skillLevel);
     }
 
     /**
@@ -125,19 +122,23 @@ public class GrimReachSkill extends SkillBonus {
     @Override
     public List<String> getLoreDescription(int skillLevel) {
         return applyLoreTemplates(Map.of(
-                "bonusPercent", String.format("%.1f", getDamageMultiplier(skillLevel) * 100)
+                "bonusPercent", String.format("%.1f", getDamageMultiplier(skillLevel) * 100),
+                "reachBlocks", String.format("%.1f", getReachBonus(skillLevel))
         ));
     }
 
     @Override
     public double getBonusValue(int skillLevel) {
+        // Already a bonus fraction (e.g., 0.15 for +15%), not a multiplier.
+        // processOffensiveSkill adds 1.0 + this, so total = 1.15x.
         return getDamageMultiplier(skillLevel);
     }
 
     @Override
     public String getFormattedBonus(int skillLevel) {
         return applyFormattedBonusTemplate(Map.of(
-                "bonusPercent", String.format("%.1f", getDamageMultiplier(skillLevel) * 100)
+                "bonusPercent", String.format("%.1f", getDamageMultiplier(skillLevel) * 100),
+                "reachBlocks", String.format("%.1f", getReachBonus(skillLevel))
         ));
     }
 

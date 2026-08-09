@@ -21,7 +21,7 @@ public class HuntersPreySkill extends SkillBonus implements ConditionalSkill {
 
     public static final String SKILL_ID = "crossbows_hunters_prey";
     private static final double HEALTH_THRESHOLD = 0.50; // 50% health
-    private static final double BASE_BONUS = 0.25; // 25% bonus
+    private static final double BASE_BONUS = 0.45; // 45% bonus
 
     private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
@@ -42,7 +42,9 @@ public class HuntersPreySkill extends SkillBonus implements ConditionalSkill {
 
     @Override
     public double getConditionalBonus(int skillLevel) {
-        return BASE_BONUS + (skillLevel * 0.004); // 25% base + 0.4% per level
+        // Power budget: standard conditional band - a 1.75x hit at level 50
+        // (E = 0.267 * 0.75 = 0.20).
+        return scaled(BASE_BONUS, 0.006, skillLevel); // 45% base + 0.6% per level
     }
 
     @Override

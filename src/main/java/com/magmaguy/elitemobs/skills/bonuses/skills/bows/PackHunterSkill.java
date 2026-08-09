@@ -22,13 +22,15 @@ public class PackHunterSkill extends SkillBonus implements ConditionalSkill {
 
     public static final String SKILL_ID = "bows_pack_hunter";
     private static final double ALLY_RANGE = 10.0;
-    private static final double BASE_BONUS_PER_ALLY = 0.08; // 8% per ally
+    // Budgeted against how often the condition ACTUALLY holds. On a populated server an ally is
+    // nearby roughly half the time, so the fair multiplier is 1 + 0.20/0.50 = 1.40x.
+    private static final double BASE_BONUS_PER_ALLY = 0.20;
 
     private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public PackHunterSkill() {
         super(SkillType.BOWS, 10, "Pack Hunter",
-              "Deal bonus damage for each nearby ally.",
+              "Deal bonus damage while an ally is nearby.",
               SkillBonusType.CONDITIONAL, 1, SKILL_ID);
     }
 
@@ -50,7 +52,10 @@ public class PackHunterSkill extends SkillBonus implements ConditionalSkill {
 
     @Override
     public double getConditionalBonus(int skillLevel) {
-        return BASE_BONUS_PER_ALLY + (skillLevel * 0.001); // 8% base + 0.1% per level
+        // Power budget: standard conditional band - a 1.75x hit at level 50
+        // (E = 0.267 * 0.75 = 0.20). This is the value the damage path applies once the
+        // "at least one ally nearby" condition is met.
+        return scaled(BASE_BONUS_PER_ALLY, 0.004, skillLevel); // 20% base + 0.4% per level -> 1.40x at level 50
     }
 
     public double calculateBonus(Player player, int skillLevel) {
@@ -75,6 +80,8 @@ public class PackHunterSkill extends SkillBonus implements ConditionalSkill {
     @Override
     public List<String> getLoreDescription(int skillLevel) {
         return applyLoreTemplates(Map.of(
+                "bonusPercent", String.format("%.1f", getConditionalBonus(skillLevel) * 100),
+                // Kept so pre-existing skillbonuses/*.yml files that still use the old key keep rendering
                 "bonusPerAlly", String.format("%.1f", getConditionalBonus(skillLevel) * 100),
                 "range", String.valueOf((int) ALLY_RANGE)
         ));
@@ -85,7 +92,10 @@ public class PackHunterSkill extends SkillBonus implements ConditionalSkill {
     @Override
     public String getFormattedBonus(int skillLevel) {
         return applyFormattedBonusTemplate(Map.of(
-                "bonusPerAlly", String.format("%.1f", getConditionalBonus(skillLevel) * 100)
+                "bonusPercent", String.format("%.1f", getConditionalBonus(skillLevel) * 100),
+                // Kept so pre-existing skillbonuses/*.yml files that still use the old key keep rendering
+                "bonusPerAlly", String.format("%.1f", getConditionalBonus(skillLevel) * 100),
+                "range", String.valueOf((int) ALLY_RANGE)
         ));
     }
     @Override

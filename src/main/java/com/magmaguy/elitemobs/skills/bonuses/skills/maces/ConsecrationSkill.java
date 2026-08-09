@@ -46,6 +46,8 @@ public class ConsecrationSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public long getCooldownSeconds(int skillLevel) {
+        if (configFields != null && configFields.getCooldownSeconds() > 0)
+            return Math.max(1L, Math.round(configFields.calculateCooldown(skillLevel)));
         return Math.max(15, BASE_COOLDOWN_SECONDS - (skillLevel / 10));
     }
 

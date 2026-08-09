@@ -131,81 +131,41 @@ public class PlayerSkillSelection {
     }
 
     /**
-     * Checks if a skill is active for a player.
-     *
-     * @param uuid    The player's UUID
-     * @param skillId The skill ID to check
-     * @return true if the skill is active
+     * Checks whether a skill is active for a player.
      */
     public static boolean isSkillActive(UUID uuid, String skillId) {
         if (skillId == null || skillId.isBlank()) return false;
         String normalizedSkillId = skillId.toLowerCase(Locale.ROOT);
         ensureLoaded(uuid);
         Map<SkillType, List<String>> playerSkills = activeSkills.get(uuid);
-        if (playerSkills == null) {
-            return false;
-        }
+        if (playerSkills == null) return false;
 
-        if (sanitizeAllSkillLists(playerSkills)) {
-            saveToDatabase(uuid);
-        }
-
-        for (List<String> typeSkills : playerSkills.values()) {
-            if (typeSkills.contains(normalizedSkillId)) {
-                return true;
-            }
-        }
-        return false;
+        if (sanitizeAllSkillLists(playerSkills)) saveToDatabase(uuid);
+        return playerSkills.values().stream().anyMatch(skills -> skills.contains(normalizedSkillId));
     }
 
-    /**
-     * Gets the number of active skills for a skill type.
-     *
-     * @param uuid      The player's UUID
-     * @param skillType The skill type
-     * @return The number of active skills
-     */
     public static int getActiveSkillCount(UUID uuid, SkillType skillType) {
         return getActiveSkills(uuid, skillType).size();
     }
 
-    /**
-     * Checks if the player can add another skill for the given type.
-     *
-     * @param uuid      The player's UUID
-     * @param skillType The skill type
-     * @return true if another skill can be added
-     */
     public static boolean canAddSkill(UUID uuid, SkillType skillType) {
         return getActiveSkillCount(uuid, skillType) < MAX_ACTIVE_SKILLS;
     }
 
     /**
-     * Gets all active skill IDs for a player across all skill types.
-     *
-     * @param uuid The player's UUID
-     * @return List of all active skill IDs
+     * Returns a snapshot of all active skill identifiers across skill types.
      */
     public static List<String> getAllActiveSkills(UUID uuid) {
         ensureLoaded(uuid);
-        List<String> allSkills = new ArrayList<>();
         Map<SkillType, List<String>> playerSkills = activeSkills.get(uuid);
-        if (playerSkills != null) {
-            if (sanitizeAllSkillLists(playerSkills)) {
-                saveToDatabase(uuid);
-            }
-            for (List<String> typeSkills : playerSkills.values()) {
-                allSkills.addAll(typeSkills);
-            }
-        }
+        if (playerSkills == null) return List.of();
+        if (sanitizeAllSkillLists(playerSkills)) saveToDatabase(uuid);
+
+        List<String> allSkills = new ArrayList<>();
+        playerSkills.values().forEach(allSkills::addAll);
         return allSkills;
     }
 
-    /**
-     * Clears all active skills for a player.
-     *
-     * @param uuid The player's UUID
-     */
     public static void clearAllSkills(UUID uuid) {
         activeSkills.remove(uuid);
         saveToDatabase(uuid);
@@ -309,11 +269,6 @@ public class PlayerSkillSelection {
         activeSkills.remove(player.getUniqueId());
     }
 
-    /**
-     * Clears the cache for a specific player.
-     *
-     * @param uuid The player's UUID
-     */
     public static void clearCache(UUID uuid) {
         activeSkills.remove(uuid);
     }

@@ -185,13 +185,8 @@ public class ArmorSkillHealthBonus {
         return getConfiguredMaxHealthForArmorLevel(armorLevel);
     }
 
-    /**
-     * Gets the bonus health in hearts (for display purposes).
-     *
-     * @param player The player to check
-     * @return The bonus health in hearts
-     */
     public static int getBonusHearts(Player player) {
         return (int) (getBonusHealth(player) / 2.0);
     }
+
 }
