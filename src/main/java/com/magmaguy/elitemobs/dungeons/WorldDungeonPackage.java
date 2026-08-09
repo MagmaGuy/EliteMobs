@@ -33,12 +33,12 @@ public class WorldDungeonPackage extends WorldPackage implements Dungeon {
 
     private void initializeWormholeWorld() {
         if (contentPackagesConfigFields.getWormholeWorldName() != null &&
-                !contentPackagesConfigFields.getWormholeWorldName().isEmpty() &&
-                Bukkit.getWorld(contentPackagesConfigFields.getWormholeWorldName()) == null) {
+                !contentPackagesConfigFields.getWormholeWorldName().isEmpty()) {
             // Check if the wormhole world file exists before attempting to load it
             String wormholeWorldName = contentPackagesConfigFields.getWormholeWorldName();
             // Picks up the wormhole world at either legacy or Paper-26.1+ modern layout.
-            boolean wormholeWorldExists = WorldFolderResolver.folderExists(wormholeWorldName);
+            boolean wormholeWorldExists = Bukkit.getWorld(wormholeWorldName) != null ||
+                    WorldFolderResolver.folderExists(wormholeWorldName);
 
             if (wormholeWorldExists) {
                 wormholeWorld = DungeonUtils.loadWorld(this.getContentPackagesConfigFields().getWormholeWorldName(), this.getContentPackagesConfigFields().getEnvironment(), contentPackagesConfigFields);
@@ -59,25 +59,19 @@ public class WorldDungeonPackage extends WorldPackage implements Dungeon {
 
     @Override
     public void doUninstall(Player player) {
-        // Clear dungeon-specific data
+        // Call parent to unload worlds (handles wormholeWorld too) and persist isEnabled = false
+        super.doUninstall(player);
+        if (isInstalled) return;
+
         customBossEntityList.clear();
         treasureChestList.clear();
         npcEntities.clear();
-
-        // Call parent to unload worlds (handles wormholeWorld too) and persist isEnabled = false
-        super.doUninstall(player);
-
-        // Clear wormhole world reference after parent unloads it
         wormholeWorld = null;
     }
 
     private void getEntities() {
         for (RegionalBossEntity regionalBossEntity : RegionalBossEntity.getRegionalBossEntitySet())
-            if (regionalBossEntity != null &&
-                    regionalBossEntity.getWorldName() != null &&
-                    world != null &&
-                    regionalBossEntity.getWorldName().equals(world.getName()) ||
-                    wormholeWorld != null && regionalBossEntity.getWorldName().equals(wormholeWorld.getName()))
+            if (regionalBossEntity != null && matchesPackageWorld(regionalBossEntity.getWorldName()))
                 customBossEntityList.add(regionalBossEntity);
     }
 
@@ -90,19 +84,20 @@ public class WorldDungeonPackage extends WorldPackage implements Dungeon {
 
     private void getChests() {
         for (TreasureChest treasureChest : TreasureChest.getTreasureChestHashMap().values())
-            if (treasureChest.getWorldName() != null && world != null && treasureChest.getWorldName().equals(world.getName()) ||
-                    wormholeWorld != null &&
-                            treasureChest.getWorldName().equals(wormholeWorld.getName()))
+            if (treasureChest != null && matchesPackageWorld(treasureChest.getWorldName()))
                 treasureChestList.add(treasureChest);
     }
 
     private void getNPCs() {
-        if (world == null) return;
         for (NPCEntity npcEntity : EntityTracker.getNpcEntities().values())
-            if (npcEntity.getWorldName().equals(world.getName()) ||
-                    wormholeWorld != null &&
-                            npcEntity.getWorldName().equals(wormholeWorld.getName()))
+            if (npcEntity != null && matchesPackageWorld(npcEntity.getWorldName()))
                 npcEntities.add(npcEntity);
+    }
+
+    private boolean matchesPackageWorld(String worldName) {
+        if (worldName == null) return false;
+        return world != null && worldName.equals(world.getName()) ||
+                wormholeWorld != null && worldName.equals(wormholeWorld.getName());
     }
 
     @Override

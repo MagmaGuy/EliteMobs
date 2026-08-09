@@ -6,10 +6,13 @@ import com.magmaguy.magmacore.util.WorldFolderResolver;
 import org.bukkit.Bukkit;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,33 +33,40 @@ public class WorldInstantiator {
         // Wipe both legacy and Paper-26.1+ modern paths so the blueprint clone
         // doesn't collide with leftovers from a previous instance of this world.
         WorldFolderResolver.deleteAllLayouts(targetWorldName);
-        File destinationWorld = new File(Bukkit.getWorldContainer(), targetWorldName);
-
-        copyAll(blueprintWorld, destinationWorld);
-
-        return destinationWorld;
-    }
-
-    private static void copyAll(File directoryToClone, File targetDirectory) {
-        for (File child : directoryToClone.listFiles())
-            copy(child, Paths.get(targetDirectory.getPath() + File.separatorChar + child.getName()));
-    }
-
-    private static void copy(File file, Path targetPath) {
-        try {
-            if (!targetPath.getParent().toFile().exists()) targetPath.getParent().toFile().mkdirs();
-
-            if (file.isDirectory()) {
-                if (!targetPath.toFile().exists())
-                    targetPath.toFile().mkdirs();
-                for (File child : file.listFiles())
-                    copy(child, Paths.get(targetPath.toString() + File.separatorChar + child.getName()));
-            } else
-                Files.copy(file.toPath(), targetPath, StandardCopyOption.REPLACE_EXISTING);
-        } catch (Exception ex) {
-            Logger.warn("Failed to copy file " + file.toString() + " to " + targetPath.toString());
-            ex.printStackTrace();
+        if (WorldFolderResolver.folderExists(targetWorldName)) {
+            Logger.warn("Could not prepare instance world " + targetWorldName +
+                    " because an existing world folder could not be removed.");
+            return null;
         }
+
+        File destinationWorld = new File(Bukkit.getWorldContainer(), targetWorldName);
+        try {
+            copyAll(blueprintWorld.toPath(), destinationWorld.toPath());
+            return destinationWorld;
+        } catch (IOException | RuntimeException exception) {
+            Logger.warn("Failed to clone blueprint world " + blueprintWorld + " to " + destinationWorld +
+                    ": " + exception.getMessage());
+            WorldFolderResolver.deleteAllLayouts(targetWorldName);
+            return null;
+        }
+    }
+
+    private static void copyAll(Path sourceRoot, Path destinationRoot) throws IOException {
+        Files.walkFileTree(sourceRoot, new SimpleFileVisitor<>() {
+            @Override
+            public FileVisitResult preVisitDirectory(Path directory, BasicFileAttributes attributes)
+                    throws IOException {
+                Files.createDirectories(destinationRoot.resolve(sourceRoot.relativize(directory)));
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attributes) throws IOException {
+                Files.copy(file, destinationRoot.resolve(sourceRoot.relativize(file)),
+                        StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
+                return FileVisitResult.CONTINUE;
+            }
+        });
     }
 
     public static void recursivelyDelete(File file) {
