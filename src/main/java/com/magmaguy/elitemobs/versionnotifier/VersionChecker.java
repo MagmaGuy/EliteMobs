@@ -20,6 +20,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.io.IOException;
 import java.net.*;
@@ -37,6 +38,9 @@ public class VersionChecker {
     private static boolean connectionFailed = false;
     private static int connectionRetryCount = 0;
     private static final long CHECK_INTERVAL_TICKS = 20L * 60 * 60 * 24; // 24 hours in ticks
+    private static NightbreakAccount.TokenChangeListenerRegistration
+            tokenChangeListener;
+    private static BukkitTask scheduledCheckTask;
 
     private VersionChecker() {
     }
@@ -122,6 +126,14 @@ public class VersionChecker {
     }
 
     public static void shutdown() {
+        if (tokenChangeListener != null) {
+            tokenChangeListener.close();
+            tokenChangeListener = null;
+        }
+        if (scheduledCheckTask != null) {
+            scheduledCheckTask.cancel();
+            scheduledCheckTask = null;
+        }
         outdatedPackages.clear();
         connectionRetryCount = 0;
         connectionFailed = false;
@@ -528,14 +540,24 @@ public class VersionChecker {
         // this, /em setup keeps showing "no account token linked" until the
         // server restarts because the first /em setup open pre-login stamps
         // the throttle cooldown for 5 minutes.
-        NightbreakAccount.addTokenChangeListener(() -> {
-            Logger.info("Account token detected; refreshing content access info.");
-            invalidateRefreshCooldown();
-            refreshContentAndAccess();
-        });
+        if (tokenChangeListener != null) {
+            tokenChangeListener.close();
+        }
+        tokenChangeListener = NightbreakAccount.registerTokenChangeListener(
+                () -> {
+                    invalidateRefreshCooldown();
+                    if (NightbreakAccount.hasToken()) {
+                        Logger.info("Account token changed; refreshing content access info.");
+                        refreshContentAndAccess();
+                    }
+                });
 
         // Schedule repeating task every 24 hours
-        Bukkit.getScheduler().runTaskTimer(MetadataHandler.PLUGIN, () -> {
+        if (scheduledCheckTask != null) {
+            scheduledCheckTask.cancel();
+        }
+        scheduledCheckTask = Bukkit.getScheduler().runTaskTimer(
+                MetadataHandler.PLUGIN, () -> {
             Logger.info("Running scheduled 24-hour version and access check...");
             checkPluginVersion();
             checkContentVersion();
