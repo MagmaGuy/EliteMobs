@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.mobconstructor.custombosses;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
+import com.magmaguy.elitemobs.utils.BossBarOrderManager;
 import com.magmaguy.elitemobs.wormhole.WormholeNavigation;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -15,7 +16,6 @@ import org.bukkit.boss.BarFlag;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -31,6 +31,13 @@ import java.util.Map;
  */
 public class BossTrackingBar {
     private static final String DEFAULT_LOCATION_MESSAGE = "$name: $distance blocks away!";
+    private static final double NEARBY_RANGE = 30;
+    // Bars are only removed once a player is well past the range they were added at
+    // (hysteresis) — adding and removing at the same distance made bars flicker and
+    // re-stack for players hovering near the boundary.
+    private static final double NEARBY_BAR_REMOVAL_RANGE = NEARBY_RANGE + 6;
+    // Squared copy so the removal check can use distanceSquared and skip the sqrt per player per cycle.
+    private static final double NEARBY_BAR_REMOVAL_RANGE_SQUARED = NEARBY_BAR_REMOVAL_RANGE * NEARBY_BAR_REMOVAL_RANGE;
 
     private final CustomBossEntity customBossEntity;
     private final Map<Player, BossBar> bossBars = new HashMap<>();
@@ -69,11 +76,11 @@ public class BossTrackingBar {
     public void removeTrackingPlayer(Player player) {
         trackingPlayers.remove(player);
         BossBar bossBar = bossBars.remove(player);
-        if (bossBar != null) bossBar.removeAll();
+        if (bossBar != null) BossBarOrderManager.hide(player, bossBar);
     }
 
     public void remove() {
-        bossBars.values().forEach(BossBar::removeAll);
+        bossBars.forEach((player, bossBar) -> BossBarOrderManager.hide(player, bossBar));
         bossBars.clear();
         trackingPlayers.clear();
         if (bossBarUpdater != null)
@@ -146,29 +153,32 @@ public class BossTrackingBar {
                     return;
                 }
 
-                HashSet<Player> freshIteration = new HashSet<>();
-                for (Player player : trackingPlayers) {
-                    freshIteration.add(player);
+                //Tracking players always get a bar; nearby players get one while close
+                HashSet<Player> playersWithBars = new HashSet<>(trackingPlayers);
+                if (customBossEntity.isValid())
+                    for (Entity entity : customBossEntity.getLivingEntity().getNearbyEntities(NEARBY_RANGE, NEARBY_RANGE, NEARBY_RANGE))
+                        if (entity instanceof Player player)
+                            playersWithBars.add(player);
+
+                for (Player player : playersWithBars) {
+                    if (!player.isOnline()) continue;
                     if (!bossBars.containsKey(player)) createBossBar(player);
-                    updateBossBar(player, bossBars.get(player));
+                    else updateBossBar(player, bossBars.get(player));
                 }
 
-                //Remove players that have stopped
+                //Remove bars only for players that are offline, in another world, or well
+                //past the add range — never for players merely absent from trackingPlayers,
+                //which used to destroy and recreate every nearby player's bar each cycle
+                //and made the client re-stack all bars constantly
                 bossBars.entrySet().removeIf(entry -> {
-                    if (!trackingPlayers.contains(entry.getKey())) {
-                        entry.getValue().removeAll();
-                        return true;
-                    }
-                    return false;
+                    Player player = entry.getKey();
+                    if (player.isOnline() && trackingPlayers.contains(player)) return false;
+                    boolean shouldRemove = !player.isOnline()
+                            || !player.getWorld().equals(bossLocation.getWorld())
+                            || player.getLocation().distanceSquared(bossLocation) > NEARBY_BAR_REMOVAL_RANGE_SQUARED;
+                    if (shouldRemove) BossBarOrderManager.hide(player, entry.getValue());
+                    return shouldRemove;
                 });
-
-                //nearby player check
-                if (customBossEntity.isValid())
-                    for (Entity entity : customBossEntity.getLivingEntity().getNearbyEntities(30, 30, 30))
-                        if (entity.getType().equals(EntityType.PLAYER))
-                            if (!freshIteration.contains((Player) entity))
-                                createBossBar((Player) entity);
-
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 5);
     }
@@ -185,7 +195,9 @@ public class BossTrackingBar {
 
         bossBars.put(player, bossBar);
         updateBossBar(player, bossBar);
-        bossBar.addPlayer(player);
+        //The permanent per-boss sort key keeps this bar in the same stack slot on the
+        //client no matter when it gets shown relative to other bosses' bars
+        BossBarOrderManager.show(player, bossBar, BossBarOrderManager.sortKeyFor(customBossEntity.getEliteUUID()));
     }
 
     private String getLocationMessageTemplate() {

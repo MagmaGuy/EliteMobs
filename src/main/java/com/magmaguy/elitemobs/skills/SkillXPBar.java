@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.skills;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.SkillsConfig;
 import com.magmaguy.elitemobs.config.menus.premade.SkillBonusMenuConfig;
+import com.magmaguy.elitemobs.utils.BossBarOrderManager;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
@@ -108,6 +109,9 @@ public class SkillXPBar implements Listener {
         private final UUID playerUUID;
         private final SkillType skillType;
         private final BossBar bossBar;
+        // Stable per-(player, skill) sort key for the bar's lifetime, so the order manager keeps
+        // this bar in the same stack slot no matter when it is re-shown
+        private final long sortKey;
         private BukkitTask animationTask;
         private BukkitTask hideTask;
         private double currentDisplayProgress;
@@ -117,12 +121,13 @@ public class SkillXPBar implements Listener {
         SkillBarData(Player player, SkillType skillType) {
             this.playerUUID = player.getUniqueId();
             this.skillType = skillType;
+            this.sortKey = skillType.ordinal();
             this.bossBar = Bukkit.createBossBar(
                     getBarTitle(skillType, 1, 0),
                     getBarColor(skillType),
                     BarStyle.SOLID
             );
-            this.bossBar.addPlayer(player);
+            BossBarOrderManager.show(player, bossBar, sortKey);
             this.bossBar.setVisible(true);
             this.currentDisplayProgress = 0;
             this.targetProgress = 0;
@@ -152,9 +157,9 @@ public class SkillXPBar implements Listener {
                 hideTask = null;
             }
 
-            // Always remove and re-add player to ensure fresh reference
-            bossBar.removeAll();
-            bossBar.addPlayer(player);
+            // Show through the order manager (a no-op when already displayed) so the bar keeps a
+            // stable stack slot instead of being torn down and re-added on every update
+            BossBarOrderManager.show(player, bossBar, sortKey);
             bossBar.setVisible(true);
 
             // Calculate progress values
@@ -335,7 +340,9 @@ public class SkillXPBar implements Listener {
                 hideTask.cancel();
             }
             if (bossBar != null) {
-                bossBar.removeAll();
+                Player player = getPlayer();
+                if (player != null) BossBarOrderManager.hide(player, bossBar);
+                else bossBar.removeAll();
             }
         }
 

@@ -46,7 +46,9 @@ import com.magmaguy.elitemobs.powers.meta.CustomSummonPower;
 import com.magmaguy.elitemobs.powers.scripts.EliteScript;
 import com.magmaguy.elitemobs.powers.scripts.ScriptListener;
 import com.magmaguy.elitemobs.powers.specialpowers.EnderCrystalLightningRod;
+import com.magmaguy.elitemobs.powers.specialpowers.SpiritWalkSupport;
 import com.magmaguy.elitemobs.powers.specialpowers.TrackingFireballSupport;
+import com.magmaguy.elitemobs.powers.specialpowers.ZombieNecronomiconSupport;
 import com.magmaguy.elitemobs.powerstances.EffectEventHandlers;
 import com.magmaguy.elitemobs.powerstances.VisualEffectObfuscator;
 import com.magmaguy.elitemobs.quests.CustomQuest;
@@ -70,6 +72,7 @@ import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardEliteMobOnlySpawnF
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardExplosionBlockDamageFlag;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
+import com.magmaguy.elitemobs.utils.BossBarOrderManager;
 import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
@@ -177,6 +180,10 @@ public class EventsRegistrer {
 
         //special powers
         register(new EnderCrystalLightningRod.EnderCrystalLightningRodEvents());
+        // Lua/custom-boss definitions can invoke these support paths independently of the legacy
+        // YAML power toggle, so their removal cleanup must always be listening.
+        register(new SpiritWalkSupport());
+        register(new ZombieNecronomiconSupport());
 
         register(new EliteScript.EliteScriptEvents());
 
@@ -285,6 +292,7 @@ public class EventsRegistrer {
         BossHealthDisplay bossHealthDisplay = new BossHealthDisplay();
         register(bossHealthDisplay);
         BossHealthDisplay.startMasterUpdateTask();
+        register(new BossBarOrderManager.BossBarOrderManagerEvents());
 
         //Initialize items from custom events
         register(new FlamethrowerEnchantment.FlamethrowerEnchantmentEvents());
