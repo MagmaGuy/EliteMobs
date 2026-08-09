@@ -163,6 +163,14 @@ public class CustomModelMEG implements CustomModelInterface {
     }
 
     @Override
+    public boolean hasNametagBone() {
+        // ModelEngine manages its own nametag entity (see setName/setNameVisible above)
+        // rather than exposing nametag bones, so the capability cannot be probed here.
+        // Report true so that no false "model cannot show a name" warning is emitted.
+        return true;
+    }
+
+    @Override
     public void setSyncMovement(boolean syncMovement) {
         // Not implemented for ModelEngine
     }

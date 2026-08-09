@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.thirdparty.geyser;
 
+import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -15,17 +16,40 @@ public class GeyserDetector {
     private static Method geyserApiMethod;
     private static Method geyserConnectionByUuidMethod;
     private static Method geyserIsBedrockPlayerMethod;
+    private static boolean floodgateFailureLogged = false;
+    private static boolean geyserFailureLogged = false;
 
     private GeyserDetector() {
     }
 
     public static boolean bedrockPlayer(Player player) {
+        if (player == null) return false;
         UUID playerUUID = player.getUniqueId();
         return isFloodgatePlayer(playerUUID) || isGeyserPlayer(playerUUID);
     }
 
+    /**
+     * Returns whether this Bukkit server has an API capable of identifying Bedrock players.
+     * A Geyser/Floodgate installation which exists only on a proxy does not expose per-player
+     * identity to backend plugins, so callers must not create Bedrock-only fallback entities in
+     * that arrangement.
+     */
+    public static boolean canIdentifyBedrockPlayers() {
+        if (isFloodgatePluginEnabled()) {
+            initializeFloodgate();
+            if (floodgateGetInstanceMethod != null && floodgateIsFloodgatePlayerMethod != null)
+                return true;
+        }
+        if (isGeyserPluginEnabled()) {
+            initializeGeyser();
+            return geyserApiMethod != null &&
+                    (geyserConnectionByUuidMethod != null || geyserIsBedrockPlayerMethod != null);
+        }
+        return false;
+    }
+
     private static boolean isFloodgatePlayer(UUID playerUUID) {
-        if (!isPluginEnabled("floodgate") && !isPluginEnabled("Floodgate")) return false;
+        if (!isFloodgatePluginEnabled()) return false;
         initializeFloodgate();
         if (floodgateGetInstanceMethod == null || floodgateIsFloodgatePlayerMethod == null) return false;
 
@@ -35,14 +59,13 @@ public class GeyserDetector {
             Object response = floodgateIsFloodgatePlayerMethod.invoke(floodgateApi, playerUUID);
             return response instanceof Boolean && (Boolean) response;
         } catch (IllegalAccessException | InvocationTargetException e) {
+            logFloodgateFailure(e);
             return false;
         }
     }
 
     private static boolean isGeyserPlayer(UUID playerUUID) {
-        if (!isPluginEnabled("Geyser-Spigot") && !isPluginEnabled("Geyser-Bukkit") && !isPluginEnabled("Geyser")) {
-            return false;
-        }
+        if (!isGeyserPluginEnabled()) return false;
         initializeGeyser();
         if (geyserApiMethod == null) return false;
 
@@ -59,13 +82,14 @@ public class GeyserDetector {
                 return response instanceof Boolean && (Boolean) response;
             }
         } catch (IllegalAccessException | InvocationTargetException e) {
+            logGeyserFailure(e);
             return false;
         }
 
         return false;
     }
 
-    private static void initializeFloodgate() {
+    private static synchronized void initializeFloodgate() {
         if (floodgateChecked) return;
         floodgateChecked = true;
 
@@ -76,10 +100,11 @@ public class GeyserDetector {
         } catch (ClassNotFoundException | NoSuchMethodException e) {
             floodgateGetInstanceMethod = null;
             floodgateIsFloodgatePlayerMethod = null;
+            logFloodgateFailure(e);
         }
     }
 
-    private static void initializeGeyser() {
+    private static synchronized void initializeGeyser() {
         if (geyserChecked) return;
         geyserChecked = true;
 
@@ -98,7 +123,36 @@ public class GeyserDetector {
             geyserApiMethod = null;
             geyserConnectionByUuidMethod = null;
             geyserIsBedrockPlayerMethod = null;
+            logGeyserFailure(e);
         }
+    }
+
+    private static boolean isFloodgatePluginEnabled() {
+        return isPluginEnabled("floodgate") || isPluginEnabled("Floodgate");
+    }
+
+    private static boolean isGeyserPluginEnabled() {
+        return isPluginEnabled("Geyser-Spigot") || isPluginEnabled("Geyser-Bukkit") || isPluginEnabled("Geyser");
+    }
+
+    private static void logFloodgateFailure(Exception exception) {
+        if (floodgateFailureLogged) return;
+        floodgateFailureLogged = true;
+        Logger.warn("Floodgate is enabled, but EliteMobs could not use its player API. Bedrock-specific displays will be disabled: " + failureMessage(exception));
+    }
+
+    private static void logGeyserFailure(Exception exception) {
+        if (geyserFailureLogged) return;
+        geyserFailureLogged = true;
+        Logger.warn("Geyser is enabled, but EliteMobs could not use its player API. Bedrock-specific displays will be disabled: " + failureMessage(exception));
+    }
+
+    private static String failureMessage(Exception exception) {
+        Throwable cause = exception instanceof InvocationTargetException && exception.getCause() != null
+                ? exception.getCause()
+                : exception;
+        String message = cause.getMessage();
+        return cause.getClass().getSimpleName() + (message == null || message.isBlank() ? "" : ": " + message);
     }
 
     private static boolean isPluginEnabled(String pluginName) {

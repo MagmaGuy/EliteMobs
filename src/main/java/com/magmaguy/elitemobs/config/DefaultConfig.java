@@ -85,6 +85,8 @@ public class DefaultConfig extends ConfigurationFile {
     @Getter
     private static boolean useRandomizedScalingForElites;
     @Getter
+    private static double bedrockNPCRoleYOffset;
+    @Getter
     private static boolean autoDownloadPluginUpdates;
 
     public static boolean useResourcePackModels(){
@@ -230,6 +232,14 @@ public class DefaultConfig extends ConfigurationFile {
                 List.of("Sets whether the scale (size) of the elites will be slightly randomized, for variety.",
                         "May mess with spawners, which may or may not be a good thing (I think it is >:] )"),
                 fileConfiguration, "useRandomizedScalingForElites", false);
+        bedrockNPCRoleYOffset = ConfigurationEngine.setDouble(
+                List.of("Height (in blocks above the NPC's feet) of the role tag shown to Bedrock (Geyser) players.",
+                        "Bedrock clients can't render the Java TextDisplay role tag, so Bedrock players are instead shown",
+                        "an armor-stand name at this height, meant to sit just above the disguised NPC's name.",
+                        "Java players are unaffected (they keep the normal role tag). Tune this with a Bedrock client.",
+                        "Floodgate or Geyser must also run on this backend so EliteMobs can identify Bedrock players.",
+                        "A proxy-only install without a backend identity API cannot provide this fallback."),
+                fileConfiguration, "bedrockNPCRoleYOffset", 2.2);
         autoDownloadPluginUpdates = NightbreakPluginUpdater.setAutoDownloadConfigDefault(fileConfiguration);
     }
 }

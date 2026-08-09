@@ -25,6 +25,20 @@ public interface CustomModelInterface {
     Location getNametagBoneLocation();
 
     /**
+     * Whether this model is capable of rendering a nametag at all.
+     * <p>
+     * A model that defines no nametag anchor can never show a name: the underlying
+     * living entity is hidden by the model plugin, so its vanilla nametag is not
+     * rendered either, and the model has nowhere to draw one. A boss configured with
+     * {@code alwaysShowName: true} on such a model is therefore silently nameless.
+     * This exists so that misconfiguration can be reported instead of being invisible.
+     *
+     * @return false only when it is known that no nametag can ever render; true when
+     * a nametag anchor exists or when the model plugin cannot report the capability.
+     */
+    boolean hasNametagBone();
+
+    /**
      * Sets whether the model should sync movement with the base entity.
      * @param syncMovement true to sync movement, false otherwise
      */

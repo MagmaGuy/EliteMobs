@@ -185,6 +185,15 @@ public class CustomModel implements CustomModelInterface {
     }
 
     @Override
+    public boolean hasNametagBone() {
+        return switch (modelPlugin) {
+            case FREE_MINECRAFT_MODELS -> customModelFMM.hasNametagBone();
+            case MODEL_ENGINE -> customModelMEG.hasNametagBone();
+            default -> true;
+        };
+    }
+
+    @Override
     public void setSyncMovement(boolean syncMovement) {
         switch (modelPlugin) {
             case FREE_MINECRAFT_MODELS -> customModelFMM.setSyncMovement(syncMovement);

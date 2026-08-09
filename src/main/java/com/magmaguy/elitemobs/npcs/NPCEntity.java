@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.NPCEntityRemoveEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
@@ -20,6 +21,7 @@ import com.magmaguy.magmacore.scripting.ScriptDefinition;
 import com.magmaguy.magmacore.scripting.ScriptHook;
 import com.magmaguy.magmacore.scripting.ScriptInstance;
 import com.magmaguy.elitemobs.thirdparty.custommodels.CustomModel;
+import com.magmaguy.elitemobs.thirdparty.geyser.GeyserDetector;
 import com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
@@ -37,6 +39,7 @@ import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Event;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -58,6 +61,10 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
     private Location spawnLocation;
     private boolean isTalking = false;
     private TextDisplay roleDisplay;
+    // Bedrock role tag: Bedrock clients can't render the TextDisplay above, so disguised NPCs get
+    // an invisible armor-stand hologram (a vanilla custom name, which Bedrock DOES render) carrying
+    // the role text. It is hidden from Java players (who keep the TextDisplay) and shown to Bedrock.
+    private ArmorStand bedrockRoleArmorStand;
     private boolean isDisguised = false;
     private String locationString;
     @Getter
@@ -162,6 +169,7 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
             roleDisplay.remove();
             roleDisplay = null;
         }
+        removeBedrockRoleArmorStand();
         // Remove house earnings display if this is the gambling den owner
         com.magmaguy.elitemobs.gambling.GamblingDenOwnerDisplay.removeDisplay(uuid);
         if (villager != null) {
@@ -214,6 +222,7 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
             roleDisplay.remove();
             roleDisplay = null;
         }
+        removeBedrockRoleArmorStand();
         com.magmaguy.elitemobs.gambling.GamblingDenOwnerDisplay.removeDisplay(uuid);
         if (villager != null) {
             villager.remove();
@@ -463,6 +472,45 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
             textDisplay.setShadowed(false);
         });
         EntityTracker.registerVisualEffects(roleDisplay);
+
+        // A proxy-only Geyser installation does not expose Bedrock identity to backend plugins.
+        // In that arrangement this fallback is deliberately disabled instead of spawning an
+        // armor stand which would be hidden from every player. Installing Floodgate or Geyser on
+        // this backend makes the per-player fallback available.
+        if (isDisguised && villager != null && GeyserDetector.canIdentifyBedrockPlayers()) {
+            Location bedrockRoleLocation = villager.getLocation().clone();
+            bedrockRoleLocation.setY(villager.getLocation().getY() + DefaultConfig.getBedrockNPCRoleYOffset());
+            bedrockRoleArmorStand = bedrockRoleLocation.getWorld().spawn(bedrockRoleLocation, ArmorStand.class, armorStand -> {
+                armorStand.setVisible(false);
+                armorStand.setMarker(true);
+                armorStand.setGravity(false);
+                armorStand.setPersistent(false);
+                armorStand.setRemoveWhenFarAway(false);
+                armorStand.setCustomName(ChatColorConverter.convert(npCsConfigFields.getRole()));
+                armorStand.setCustomNameVisible(true);
+            });
+            EntityTracker.registerVisualEffects(bedrockRoleArmorStand);
+            for (Player onlinePlayer : Bukkit.getOnlinePlayers())
+                applyBedrockRoleVisibility(onlinePlayer);
+        }
+    }
+
+    /**
+     * Keeps the Bedrock role-tag armor stand visible to Bedrock (Geyser) players and hidden from
+     * Java players (who see the TextDisplay role tag instead). Java players would otherwise see a
+     * duplicate floating name. Safe to call repeatedly (e.g. on join).
+     */
+    public void applyBedrockRoleVisibility(Player player) {
+        if (player == null || !player.isOnline() || bedrockRoleArmorStand == null || bedrockRoleArmorStand.isDead()) return;
+        if (GeyserDetector.bedrockPlayer(player)) return; // Bedrock players SEE the armor-stand role tag
+        player.hideEntity(MetadataHandler.PLUGIN, bedrockRoleArmorStand);
+    }
+
+    private void removeBedrockRoleArmorStand() {
+        if (bedrockRoleArmorStand != null) {
+            bedrockRoleArmorStand.remove();
+            bedrockRoleArmorStand = null;
+        }
     }
 
     /**
@@ -536,6 +584,23 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
                 }
             }
         }
+
+        // A joining Java player would briefly see the Bedrock role armor stand (a duplicate name)
+        // until it's hidden from them, so re-apply the per-platform visibility once their entity
+        // tracking has settled. No-op for Bedrock players (they keep seeing it).
+        @EventHandler
+        public void onPlayerJoin(PlayerJoinEvent event) {
+            Player player = event.getPlayer();
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if (!player.isOnline()) return;
+                    for (NPCEntity npcEntity : new ArrayList<>(EntityTracker.getNpcEntities().values()))
+                        npcEntity.applyBedrockRoleVisibility(player);
+                }
+            }.runTaskLater(MetadataHandler.PLUGIN, 15L);
+        }
+
     }
 
     private class InstancedNPCContainer {

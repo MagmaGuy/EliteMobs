@@ -20,8 +20,15 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class CustomBossMegaConsumer {
+    /**
+     * Boss filenames already reported by {@link #warnIfNameCanNeverRender()}, so the
+     * warning is emitted once per boss rather than once per spawn.
+     */
+    private static final Set<String> NAMETAG_BONE_WARNINGS = ConcurrentHashMap.newKeySet();
     private final CustomBossesConfigFields customBossesConfigFields;
     private final HashSet<ElitePower> powers;
     private final int level;
@@ -143,11 +150,56 @@ public class CustomBossMegaConsumer {
             return;
         try {
             customBossEntity.setCustomModel(CustomModel.generateCustomModel(livingEntity, customBossesConfigFields.getCustomModel(), customBossEntity.getName()));
+            warnIfNameCanNeverRender();
         } catch (Exception exception) {
             customBossEntity.setCustomModel(null);
             Logger.warn("Failed to initialize Custom Model for Custom Boss " + customBossesConfigFields.getFilename());
             exception.printStackTrace();
         }
+    }
+
+    /**
+     * A modeled boss draws its name on a nametag anchor bone belonging to the model
+     * (for FreeMinecraftModels, a bone named {@code tag_*}). The underlying living entity
+     * is hidden by the model plugin, so its vanilla nametag never renders as a fallback.
+     * A model without such a bone is therefore permanently nameless, no matter what
+     * {@code name} and {@code alwaysShowName} say - and it fails completely silently,
+     * which makes it very hard to diagnose from a screenshot.
+     * <p>
+     * Warned once per boss file so a repeatedly spawning boss cannot spam the console.
+     */
+    private void warnIfNameCanNeverRender() {
+        CustomModel customModel = customBossEntity.getCustomModel();
+        if (customModel == null) return;
+        if (!nameCanNeverRender(
+                DefaultConfig.isAlwaysShowNametags(),
+                customBossesConfigFields.isAlwaysShowName(),
+                customBossesConfigFields.getName(),
+                customModel.hasNametagBone()))
+            return;
+        if (!NAMETAG_BONE_WARNINGS.add(customBossesConfigFields.getFilename())) return;
+        Logger.warn("Custom Boss " + customBossesConfigFields.getFilename() + " asks for a visible name but its model \"" +
+                customBossesConfigFields.getCustomModel() + "\" has no nametag anchor bone, so the name can never be shown. " +
+                "Add a bone whose name starts with \"tag_\" (for example \"tag_head\") to that model.");
+    }
+
+    /**
+     * Pure decision half of {@link #warnIfNameCanNeverRender()}, kept independent of entity
+     * spawning so the rule can be verified without constructing a modeled boss.
+     *
+     * @param alwaysShowNametagsGlobally the server-wide "always show nametags" setting
+     * @param alwaysShowNameForBoss      this boss's {@code alwaysShowName} setting
+     * @param configuredName             this boss's configured {@code name}
+     * @param modelHasNametagBone        whether the model can render a nametag at all
+     * @return true when the boss is asking for a name that its model can never draw
+     */
+    static boolean nameCanNeverRender(boolean alwaysShowNametagsGlobally,
+                                      boolean alwaysShowNameForBoss,
+                                      String configuredName,
+                                      boolean modelHasNametagBone) {
+        if (modelHasNametagBone) return false;
+        if (!alwaysShowNametagsGlobally && !alwaysShowNameForBoss) return false;
+        return configuredName != null && !configuredName.isEmpty();
     }
 
     private void setFrozen(LivingEntity livingEntity) {
