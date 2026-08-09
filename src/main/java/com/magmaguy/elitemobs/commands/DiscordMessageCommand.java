@@ -12,7 +12,7 @@ import java.util.List;
 public class DiscordMessageCommand extends AdvancedCommand {
     public DiscordMessageCommand() {
         super(List.of("discord"));
-        addArgument("message", new ListStringCommandArgument("Message to send to discord"));
+        addVarargsArgument("message", new ListStringCommandArgument("Message to send to discord"));
         setUsage("/em discord <message>");
         setPermission("elitemobs.discord.message");
         setDescription("Sends a message to the Discord via DiscordSRV, for debugging purposes");

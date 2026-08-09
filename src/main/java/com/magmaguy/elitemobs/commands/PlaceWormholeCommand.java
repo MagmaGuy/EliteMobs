@@ -6,8 +6,8 @@ import com.magmaguy.elitemobs.wormhole.Wormhole;
 import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
+import com.magmaguy.magmacore.command.arguments.DynamicListStringCommandArgument;
 import com.magmaguy.magmacore.command.arguments.IntegerCommandArgument;
-import com.magmaguy.magmacore.command.arguments.ListStringCommandArgument;
 import com.magmaguy.magmacore.util.Logger;
 
 import java.util.List;
@@ -16,7 +16,7 @@ public class PlaceWormholeCommand extends AdvancedCommand {
     public PlaceWormholeCommand() {
         super(List.of("place"));
         addLiteral("wormhole");
-        addArgument("filename", new ListStringCommandArgument(WormholeConfig.getWormholes().keySet().stream().toList(),"<filename>"));
+        addArgument("filename", new DynamicListStringCommandArgument(() -> WormholeConfig.getWormholes().keySet().stream().toList(), "<filename>"));
         addArgument("wormholeOption", new IntegerCommandArgument(List.of(1, 2), "<1>/<2>"));
         setUsage("/em place wormhole <filename> <1/2>");
         setPermission("elitemobs.place.admin");

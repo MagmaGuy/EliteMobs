@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
-import com.magmaguy.magmacore.command.arguments.ListStringCommandArgument;
+import com.magmaguy.magmacore.command.arguments.DynamicListStringCommandArgument;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ public class SpawnBossCommand extends AdvancedCommand {
     public SpawnBossCommand() {
         super(List.of("spawn"));
         addLiteral("boss");
-        addArgument("filename", new ListStringCommandArgument(CustomBossesConfig.getCustomBosses().keySet().stream().toList(),"<filename>"));
+        addArgument("filename", new DynamicListStringCommandArgument(() -> CustomBossesConfig.getCustomBosses().keySet().stream().toList(), "<filename>"));
         setUsage("/em spawn boss <filename>");
         setPermission("elitemobs.place.admin");
         setSenderType(SenderType.PLAYER);

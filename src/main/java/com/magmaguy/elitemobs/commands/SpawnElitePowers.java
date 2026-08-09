@@ -18,7 +18,7 @@ public class SpawnElitePowers extends AdvancedCommand {
         addLiteral("elite");
         addArgument("entityType", new EntityTypeCommandArgument());
         addArgument("level", new IntegerCommandArgument("<level>"));
-        addArgument("powers", new ListStringCommandArgument(ElitePower.getElitePowers().keySet().stream().toList(),"<powers>"));
+        addVarargsArgument("powers", new ListStringCommandArgument(ElitePower.getElitePowers().keySet().stream().toList(),"<powers>"));
         setUsage("/em spawn elite <entityType> <level> <power1> <power2> <power3> <...>");
         setPermission("elitemobs.place.admin");
         setSenderType(SenderType.PLAYER);

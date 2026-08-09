@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
 import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
-import com.magmaguy.magmacore.command.arguments.ListStringCommandArgument;
+import com.magmaguy.magmacore.command.arguments.DynamicListStringCommandArgument;
 import com.magmaguy.magmacore.util.Logger;
 
 import java.util.List;
@@ -14,7 +14,7 @@ public class SetupToggleCommand extends AdvancedCommand {
     public SetupToggleCommand() {
         super(List.of("setup"));
         addLiteral("toggle");
-        addArgument("empackages", new ListStringCommandArgument(EMPackage.getEmPackages().values().stream().map(emPackage -> emPackage.getContentPackagesConfigFields().getFilename()).collect(Collectors.toUnmodifiableList()),"empackages"));
+        addArgument("empackages", new DynamicListStringCommandArgument(() -> EMPackage.getEmPackages().values().stream().map(emPackage -> emPackage.getContentPackagesConfigFields().getFilename()).collect(Collectors.toUnmodifiableList()), "empackages"));
         setUsage("/em setup toggle <dungeonConfig>");
         setPermission("elitemobs.setup");
         setDescription("Allows you to toggle the installation of specified EliteMobs content.");

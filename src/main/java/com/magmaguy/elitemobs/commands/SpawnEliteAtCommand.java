@@ -21,7 +21,7 @@ public class SpawnEliteAtCommand extends AdvancedCommand {
         addArgument("z", new DoubleCommandArgument("<z>"));
         addArgument("entityType", new EntityTypeCommandArgument());
         addArgument("level", new IntegerCommandArgument("<level>"));
-        addArgument("powers", new ListStringCommandArgument(ElitePower.getElitePowers().keySet().stream().toList(), "<powers>"));
+        addVarargsArgument("powers", new ListStringCommandArgument(ElitePower.getElitePowers().keySet().stream().toList(), "<powers>"));
         setUsage("/em spawn eliteAt <world> <x> <y> <z> <entityType> <level> <power1> <power2> <power3> <...>");
         setPermission("elitemobs.place.admin");
         setSenderType(SenderType.PLAYER);

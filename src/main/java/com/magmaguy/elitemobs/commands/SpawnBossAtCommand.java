@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.arguments.DoubleCommandArgument;
-import com.magmaguy.magmacore.command.arguments.ListStringCommandArgument;
+import com.magmaguy.magmacore.command.arguments.DynamicListStringCommandArgument;
 import com.magmaguy.magmacore.command.arguments.WorldCommandArgument;
 import org.bukkit.util.Vector;
 
@@ -15,7 +15,7 @@ public class SpawnBossAtCommand extends AdvancedCommand {
     public SpawnBossAtCommand() {
         super(List.of("spawn"));
         addLiteral("bossAt");
-        addArgument("filename", new ListStringCommandArgument(new ArrayList<>(CustomBossesConfig.getCustomBosses().keySet()), "<filename>"));
+        addArgument("filename", new DynamicListStringCommandArgument(() -> new ArrayList<>(CustomBossesConfig.getCustomBosses().keySet()), "<filename>"));
         addArgument("worldName", new WorldCommandArgument("<worldName>"));
         addArgument("x", new DoubleCommandArgument("<x>"));
         addArgument("y", new DoubleCommandArgument("<y>"));

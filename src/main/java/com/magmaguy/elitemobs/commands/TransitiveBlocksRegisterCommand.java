@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.mobconstructor.custombosses.transitiveblocks.Trans
 import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
+import com.magmaguy.magmacore.command.arguments.DynamicListStringCommandArgument;
 import com.magmaguy.magmacore.command.arguments.ListStringCommandArgument;
 
 import java.util.List;
@@ -13,7 +14,7 @@ public class TransitiveBlocksRegisterCommand extends AdvancedCommand {
     public TransitiveBlocksRegisterCommand() {
         super(List.of("transitiveBlocks"));
         addLiteral("register");
-        addArgument("filename", new ListStringCommandArgument(CustomBossesConfig.getCustomBosses().keySet().stream().toList(), "<filename>"));
+        addArgument("filename", new DynamicListStringCommandArgument(() -> CustomBossesConfig.getCustomBosses().keySet().stream().toList(), "<filename>"));
         addArgument("type", new ListStringCommandArgument(List.of("ON_SPAWN", "ON_REMOVE"), "<type>"));
         setUsage("/em transitiveBlocks register <filename> <ON_SPAWN/ON_REMOVE>");
         setDescription("Registers transitive blocks for use by regional bosses.");

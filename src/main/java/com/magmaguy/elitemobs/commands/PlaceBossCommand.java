@@ -5,7 +5,7 @@ import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
-import com.magmaguy.magmacore.command.arguments.ListStringCommandArgument;
+import com.magmaguy.magmacore.command.arguments.DynamicListStringCommandArgument;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,11 +15,13 @@ public class PlaceBossCommand extends AdvancedCommand {
     public PlaceBossCommand() {
         super(List.of("place"));
         addLiteral("boss");
-        List<String> regionalBosses = new ArrayList<>();
-        for (Map.Entry<String, ? extends CustomBossesConfigFields> entry : CustomBossesConfig.getCustomBosses().entrySet())
-            if (entry.getValue().isRegionalBoss())
-                regionalBosses.add(entry.getKey());
-        addArgument("filename", new ListStringCommandArgument(regionalBosses, "<filename>"));
+        addArgument("filename", new DynamicListStringCommandArgument(() -> {
+            List<String> regionalBosses = new ArrayList<>();
+            for (Map.Entry<String, ? extends CustomBossesConfigFields> entry : CustomBossesConfig.getCustomBosses().entrySet())
+                if (entry.getValue().isRegionalBoss())
+                    regionalBosses.add(entry.getKey());
+            return regionalBosses;
+        }, "<filename>"));
         setUsage("/em place boss <filename>");
         setPermission("elitemobs.place.admin");
         setSenderType(SenderType.PLAYER);
