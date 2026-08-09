@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.mobconstructor;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobHealEvent;
+import com.magmaguy.elitemobs.api.EliteMobRemoveEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.collateralminecraftchanges.KeepNeutralsAngry;
 import com.magmaguy.elitemobs.combatsystem.LevelScaling;
@@ -45,6 +46,9 @@ public class EliteEntity {
 
     protected final HashMap<Player, Double> damagers = new HashMap<>();
     protected final UUID eliteUUID = UUID.randomUUID();
+    private boolean removalEventCalled = false;
+    private int removalCallDepth = 0;
+    private RemovalReason pendingRemovalEventReason;
     //Used for custom arbitrary tags from elite scripts
     private final HashSet<String> customMetadata = new HashSet<>();
     /*
@@ -311,6 +315,9 @@ public class EliteEntity {
 
     public void setLivingEntity(LivingEntity livingEntity, CreatureSpawnEvent.SpawnReason spawnReason) {
         if (livingEntity == null) return;
+        this.removalEventCalled = false;
+        this.pendingRemovalEventReason = null;
+        this.removalCallDepth = 0;
         if (!(this instanceof CustomBossEntity))
             this.spawnLocation = livingEntity.getLocation().clone();
         this.livingEntity = livingEntity;
@@ -587,14 +594,7 @@ public class EliteEntity {
                 try {
                     ElitePower.addPower(this, selectedField);
                     localFields.remove(selectedField);
-                    if (selectedField.getPowerType().equals(PowersConfigFields.PowerType.MAJOR_ZOMBIE) ||
-                            selectedField.getPowerType().equals(PowersConfigFields.PowerType.MAJOR_BLAZE) ||
-                            selectedField.getPowerType().equals(PowersConfigFields.PowerType.MAJOR_ENDERMAN) ||
-                            selectedField.getPowerType().equals(PowersConfigFields.PowerType.MAJOR_GHAST) ||
-                            selectedField.getPowerType().equals(PowersConfigFields.PowerType.MAJOR_SKELETON))
-                        this.majorPowerCount++;
-                    else
-                        this.minorPowerCount++;
+                    countPower(selectedField);
                 } catch (Exception ex) {
                     Logger.warn("Failed to instance new power!");
                 }
@@ -602,8 +602,28 @@ public class EliteEntity {
 
     }
 
+    /**
+     * Applies an explicit set of powers, as used by {@code /em spawn elite <type> <level> <power>}. The minor and major
+     * power counters get incremented here just like they do in {@link #randomizePowers(EliteMobProperties)}, otherwise
+     * the power stance rings would size themselves to zero powers and never render.
+     *
+     * @param powersConfigFields The powers to apply
+     */
     public void applyPowers(HashSet<PowersConfigFields> powersConfigFields) {
-        powersConfigFields.forEach(field -> ElitePower.addPower(this, field));
+        powersConfigFields.forEach(field -> {
+            ElitePower.addPower(this, field);
+            countPower(field);
+        });
+
+        new MinorPowerPowerStance(this);
+        new MajorPowerPowerStance(this);
+    }
+
+    private void countPower(PowersConfigFields powersConfigFields) {
+        if (PowersConfigFields.isMajorPowerType(powersConfigFields.getPowerType()))
+            this.majorPowerCount++;
+        else
+            this.minorPowerCount++;
     }
 
     public void setElitePowers(Collection<ElitePower> elitePowers) {
@@ -833,18 +853,58 @@ public class EliteEntity {
     }
 
     public void remove(RemovalReason removalReason) {
-        //This prevents the entity tracker from running this code twice when removing due to specific reasons
-        //Custom bosses have their own tracking removal rules
-        if (livingEntity != null && (!(this instanceof CustomBossEntity)))
-            EntityTracker.getEliteMobEntities().remove(eliteUUID);
-        if (livingEntity != null && !removalReason.equals(RemovalReason.DEATH))
-            livingEntity.remove();
-        if (livingEntity instanceof EnderDragon enderDragon && removalReason.equals(RemovalReason.DEATH)) {
-            enderDragon.setPhase(EnderDragon.Phase.DYING);
-            if (enderDragon.getDragonBattle() != null)
-                enderDragon.getDragonBattle().generateEndPortal(false);
+        beginRemovalCall();
+        try {
+            //This prevents the entity tracker from running this code twice when removing due to specific reasons
+            //Custom bosses have their own tracking removal rules
+            if (livingEntity != null && (!(this instanceof CustomBossEntity)))
+                EntityTracker.getEliteMobEntities().remove(eliteUUID);
+            if (livingEntity != null && !removalReason.equals(RemovalReason.DEATH))
+                livingEntity.remove();
+            if (livingEntity instanceof EnderDragon enderDragon && removalReason.equals(RemovalReason.DEATH)) {
+                enderDragon.setPhase(EnderDragon.Phase.DYING);
+                if (enderDragon.getDragonBattle() != null)
+                    enderDragon.getDragonBattle().generateEndPortal(false);
+            }
+            this.livingEntity = null;
+            //Custom bosses finish additional persistent/model/tracking cleanup in
+            //their override before publishing the terminal removal event.
+            if (!(this instanceof CustomBossEntity))
+                callRemoveEventOnce(removalReason);
+        } finally {
+            finishRemovalCall();
         }
-        this.livingEntity = null;
+    }
+
+    /**
+     * Publishes the terminal removal notification at most once. Removal can be
+     * reached through overlapping Bukkit death, tracker, shutdown, and custom
+     * boss cleanup paths, so the guard is set before dispatch to remain safe if
+     * a listener attempts another removal.
+     */
+    protected final void callRemoveEventOnce(RemovalReason removalReason) {
+        if (removalEventCalled) return;
+        pendingRemovalEventReason = removalReason;
+        if (removalCallDepth > 0) return;
+        publishPendingRemovalEvent();
+    }
+
+    protected final void beginRemovalCall() {
+        removalCallDepth++;
+    }
+
+    protected final void finishRemovalCall() {
+        if (removalCallDepth <= 0) return;
+        removalCallDepth--;
+        if (removalCallDepth == 0) publishPendingRemovalEvent();
+    }
+
+    private void publishPendingRemovalEvent() {
+        if (removalEventCalled || pendingRemovalEventReason == null) return;
+        RemovalReason removalReason = pendingRemovalEventReason;
+        pendingRemovalEventReason = null;
+        removalEventCalled = true;
+        new EventCaller(new EliteMobRemoveEvent(this, removalReason));
     }
 
     public void removeReinforcement(CustomBossEntity customBossEntity) {

@@ -134,18 +134,23 @@ public class InstancedBossEntity extends RegionalBossEntity implements Persisten
 
     @Override
     public void remove(RemovalReason removalReason) {
-        super.remove(removalReason);
-        if (removalReason.equals(RemovalReason.WORLD_UNLOAD))
-            if (persistentObjectHandler != null) {
-                persistentObjectHandler.remove();
-                persistentObjectHandler = null;
+        beginRemovalCall();
+        try {
+            super.remove(removalReason);
+            if (removalReason.equals(RemovalReason.WORLD_UNLOAD))
+                if (persistentObjectHandler != null) {
+                    persistentObjectHandler.remove();
+                    persistentObjectHandler = null;
+                }
+            if (removalReason.equals(RemovalReason.WORLD_UNLOAD) ||
+                    removalReason.equals(RemovalReason.SHUTDOWN) ||
+                    removalReason.equals(RemovalReason.ARENA_RESET)) {
+                dungeonInstance = null;
+                matchInstance = null;
+                lockoutPlayers.clear();
             }
-        if (removalReason.equals(RemovalReason.WORLD_UNLOAD) ||
-                removalReason.equals(RemovalReason.SHUTDOWN) ||
-                removalReason.equals(RemovalReason.ARENA_RESET)) {
-            dungeonInstance = null;
-            matchInstance = null;
-            lockoutPlayers.clear();
+        } finally {
+            finishRemovalCall();
         }
     }
 

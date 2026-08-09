@@ -25,6 +25,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import javax.annotation.Nullable;
+import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -128,7 +131,7 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
             public void run() {
                 save();
             }
-        }.runTaskTimerAsynchronously(MetadataHandler.PLUGIN, 20L * 5, 20L * 5);
+        }.runTaskTimer(MetadataHandler.PLUGIN, 20L * 5, 20L * 5);
     }
 
     public static void save() {
@@ -140,11 +143,20 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
                 if (!regionalBossEntity.removed)
                     spawnLocations.add(regionalBossEntity.rawString);
             customBossesConfigFields.getFileConfiguration().set("spawnLocations", spawnLocations);
-            try {
-                customBossesConfigFields.getFileConfiguration().save(customBossesConfigFields.getFile());
-            } catch (Exception ex) {
-                Logger.warn("Failed to save respawn timer for " + customBossesConfigFields.getFileConfiguration().getName() + " !");
-            }
+            //Serialize on the main thread so nothing off-thread ever touches the live FileConfiguration;
+            //only the resulting string is written to disk asynchronously.
+            String yaml = customBossesConfigFields.getFileConfiguration().saveToString();
+            File file = customBossesConfigFields.getFile();
+            String configName = customBossesConfigFields.getFileConfiguration().getName();
+            Bukkit.getScheduler().runTaskAsynchronously(MetadataHandler.PLUGIN, () -> {
+                synchronized (customBossesConfigFields) {
+                    try {
+                        Files.writeString(file.toPath(), yaml, StandardCharsets.UTF_8);
+                    } catch (Exception ex) {
+                        Logger.warn("Failed to save respawn timer for " + configName + " !");
+                    }
+                }
+            });
         }
     }
 
@@ -230,7 +242,7 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
             return;
         RegionalBossEntity regionalBossEntity = this;
         if (leashTask != null) leashTask.cancel();
-        leashTask = Bukkit.getScheduler().runTaskTimerAsynchronously(MetadataHandler.PLUGIN, () -> {
+        leashTask = Bukkit.getScheduler().runTaskTimer(MetadataHandler.PLUGIN, () -> {
             try {
                 if (!isValid()) {
                     cancelLeash();
@@ -240,7 +252,7 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
                     SpiritWalkSupport.spiritWalkRegionalBossAnimation(regionalBossEntity, getLivingEntity().getLocation(), getSpawnLocation());
             } catch (Exception ex) {
                 ex.printStackTrace();
-                Logger.warn("Async leash task errored!");
+                Logger.warn("Leash task errored!");
             }
         }, 20L * 3, 20L * 3);
     }
@@ -273,28 +285,33 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
 
     @Override
     public void remove(RemovalReason removalReason) {
-        cancelLeash();
-        super.remove(removalReason);
+        beginRemovalCall();
+        try {
+            cancelLeash();
+            super.remove(removalReason);
 
-        switch (removalReason) {
-            case REMOVE_COMMAND:
-                permanentlyRemove();
-                break;
-            case DEATH:
-            case BOSS_TIMEOUT:
-                //this is used for 1-time regional bosses, such as the ones spawned by BetterStructures
-                if (customBossesConfigFields.isRemoveAfterDeath()) {
+            switch (removalReason) {
+                case REMOVE_COMMAND:
                     permanentlyRemove();
                     break;
-                }
-                if (!(this instanceof InstancedBossEntity))
-                    respawn();
-                break;
-            case CHUNK_UNLOAD:
-                if (ChunkLocationChecker.chunkAtLocationIsLoaded(spawnLocation))
-                    respawn();
-            default:
-                break;
+                case DEATH:
+                case BOSS_TIMEOUT:
+                    //this is used for 1-time regional bosses, such as the ones spawned by BetterStructures
+                    if (customBossesConfigFields.isRemoveAfterDeath()) {
+                        permanentlyRemove();
+                        break;
+                    }
+                    if (!(this instanceof InstancedBossEntity))
+                        respawn();
+                    break;
+                case CHUNK_UNLOAD:
+                    if (ChunkLocationChecker.chunkAtLocationIsLoaded(spawnLocation))
+                        respawn();
+                default:
+                    break;
+            }
+        } finally {
+            finishRemovalCall();
         }
     }
 

@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.mobconstructor.custombosses;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobEnterCombatEvent;
 import com.magmaguy.elitemobs.api.EliteMobExitCombatEvent;
-import com.magmaguy.elitemobs.api.EliteMobRemoveEvent;
 import com.magmaguy.elitemobs.api.EliteMobSpawnEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.DefaultConfig;
@@ -553,16 +552,18 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
 
     @Override
     public void remove(RemovalReason removalReason) {
-        dynamicLevelBossEntities.remove(this);
-        if (livingEntity != null) persistentLocation = livingEntity.getLocation();
-        //Remove the living entity
-        super.remove(removalReason);
-        //Remove things tied to the living entity
-        if (customBossTrail != null) customBossTrail.terminateTrails();
-        if (livingEntityMount != null) livingEntityMount.remove();
-        if (customBossMount != null) customBossMount.remove(RemovalReason.REINFORCEMENT_CULL);
-        if (customBossesConfigFields.isCullReinforcements() || removalReason.equals(RemovalReason.PHASE_BOSS_RESET))
-            cullReinforcements(false);
+        beginRemovalCall();
+        try {
+            dynamicLevelBossEntities.remove(this);
+            if (livingEntity != null) persistentLocation = livingEntity.getLocation();
+            //Remove the living entity
+            super.remove(removalReason);
+            //Remove things tied to the living entity
+            if (customBossTrail != null) customBossTrail.terminateTrails();
+            if (livingEntityMount != null) livingEntityMount.remove();
+            if (customBossMount != null) customBossMount.remove(RemovalReason.REINFORCEMENT_CULL);
+            if (customBossesConfigFields.isCullReinforcements() || removalReason.equals(RemovalReason.PHASE_BOSS_RESET))
+                cullReinforcements(false);
 
         if (removalReason.equals(RemovalReason.PHASE_BOSS_PHASE_END))
             if (inCombat)
@@ -582,7 +583,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
         if (bossInstanceEnd) {
             if (!(this instanceof RegionalBossEntity) || this instanceof InstancedBossEntity)
                 EntityTracker.getEliteMobEntities().remove(super.eliteUUID);
-            new EventCaller(new EliteMobRemoveEvent(this, removalReason));
+            callRemoveEventOnce(removalReason);
             if (escapeMechanism != null) Bukkit.getScheduler().cancelTask(escapeMechanism);
             trackableCustomBosses.remove(this);
             if (persistentObjectHandler != null) {
@@ -619,8 +620,11 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
                 persistentObjectHandler.updatePersistentLocation(getPersistentLocation());
         }
 
-        if (!removalReason.equals(RemovalReason.PHASE_BOSS_PHASE_END) && bossMusic != null) {
-            bossMusic.stop();
+            if (!removalReason.equals(RemovalReason.PHASE_BOSS_PHASE_END) && bossMusic != null) {
+                bossMusic.stop();
+            }
+        } finally {
+            finishRemovalCall();
         }
     }
 
@@ -635,10 +639,27 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
         remove(RemovalReason.CHUNK_UNLOAD);
     }
 
+    /**
+     * Restores the world reference and, when the boss already sits in a loaded chunk, spawns it straight away.
+     * <p>
+     * Only re-attaching the world is not enough. A boss whose world was unloaded is filed in
+     * {@link com.magmaguy.elitemobs.mobconstructor.PersistentObjectHandler} under the world name, and the handler only
+     * hands it back to chunk-based tracking here. Bukkit loads a world's spawn chunks inside
+     * {@code Bukkit.createWorld} - before {@code WorldLoadEvent} is dispatched - so the {@code ChunkLoadEvent} for
+     * those chunks has already fired by the time this runs. Without spawning here the boss waits forever for a chunk
+     * event that will never come again. {@code WormholeEntry#worldLoad} has always done this; custom bosses did not.
+     */
     @Override
     public void worldLoad(World world) {
         if (spawnLocation != null)
             spawnLocation.setWorld(world);
+        if (persistentLocation != null)
+            persistentLocation.setWorld(world);
+        if (spawnLocation == null || spawnLocation.getWorld() == null) return;
+        //Deliberately mirrors WormholeEntry: leave unloaded chunks to the ChunkLoadEvent path rather than letting
+        //spawn() fail and log a protection/incompatibility warning for a chunk that simply is not there yet.
+        if (!ChunkLocationChecker.chunkAtLocationIsLoaded(spawnLocation)) return;
+        chunkLoad();
     }
 
     @Override
