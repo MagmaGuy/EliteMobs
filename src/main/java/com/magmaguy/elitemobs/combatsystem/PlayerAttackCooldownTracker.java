@@ -68,15 +68,6 @@ public final class PlayerAttackCooldownTracker {
         return previous == null ? NO_PREVIOUS_HIT : now - previous;
     }
 
-    /**
-     * Returns the game tick of the player's last recorded hit, or
-     * {@link #NO_PREVIOUS_HIT} if nothing is tracked for that UUID.
-     */
-    public static long getLastHitTick(UUID uuid) {
-        Long value = LAST_HIT_TICK.get(uuid);
-        return value == null ? NO_PREVIOUS_HIT : value;
-    }
-
     /** Forgets a player's last-hit tick. Safe to call for unknown UUIDs. */
     public static void forget(UUID uuid) {
         LAST_HIT_TICK.remove(uuid);

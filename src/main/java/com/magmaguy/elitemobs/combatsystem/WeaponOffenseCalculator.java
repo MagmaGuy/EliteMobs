@@ -238,11 +238,6 @@ public class WeaponOffenseCalculator {
         return LevelScaling.REFERENCE_ATTACK_SPEED / attackSpeed;
     }
 
-    public static double getSpeedCurveAttackSpeedFactor(double attackSpeed) {
-        if (!Double.isFinite(attackSpeed) || attackSpeed <= 0D) return 1.0;
-        return Math.pow(getLegacyAttackSpeedFactor(attackSpeed), BURST_DAMPING_EXPONENT);
-    }
-
     private static boolean usesBurstDampedAttackSpeedFactor(String typeName) {
         return typeName.endsWith("_AXE") || typeName.equals("MACE") || typeName.equals("TRIDENT");
     }

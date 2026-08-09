@@ -349,22 +349,6 @@ public class ArmorDefenseCalculator {
     }
 
     /**
-     * Combined defensive value for one armor piece: armor level + enchant bonus.
-     * <p>
-     * This is a convenience method used primarily for debugging and display.
-     * The gear score formula calls {@link #getEffectiveArmorLevel} and
-     * {@link #getEnchantBonus} separately because they're aggregated differently
-     * (armor level from 4 slots only, enchant bonus from 6 slots).
-     *
-     * @param item The item to evaluate
-     * @param type The damage type being defended against
-     * @return The total defensive value in armor-level units
-     */
-    public static double getDefensiveValue(ItemStack item, DamageType type) {
-        return getEffectiveArmorLevel(item) + getEnchantBonus(item, type);
-    }
-
-    /**
      * Computes the player's total gear score for the gear reduction formula.
      * <p>
      * The gear score combines two components with different slot sources:
