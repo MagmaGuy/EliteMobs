@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.powers.lua;
 
-import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.combatsystem.ScaledCombatRewardResolver;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.magmacore.util.TemporaryBlockManager;
@@ -140,8 +139,8 @@ final class LuaPowerSupport {
     }
 
     void playSound(Location location, String soundKey, float volume, float pitch) {
-        if (location == null || location.getWorld() == null) return;
-        location.getWorld().playSound(location, soundKey, volume, pitch);
+        com.magmaguy.magmacore.scripting.tables.LuaWorldTable.playSound(
+                location, soundKey, volume, pitch);
     }
 
     void spawnParticle(Location location, String particleKey, int count) {
