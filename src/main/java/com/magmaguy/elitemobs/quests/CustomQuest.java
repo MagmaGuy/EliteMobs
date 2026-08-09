@@ -53,9 +53,21 @@ public class CustomQuest extends Quest {
     }
 
     public static Quest startQuest(String questID, Player player) {
+        List<Quest> pendingQuests = pendingPlayerQuests.get(player.getUniqueId());
+        UUID parsedQuestID;
+        try {
+            parsedQuestID = UUID.fromString(questID);
+        } catch (IllegalArgumentException | NullPointerException exception) {
+            player.sendMessage(QuestsConfig.getInvalidQuestIdMessage().replace("$questId", String.valueOf(questID)));
+            return null;
+        }
+        if (pendingQuests == null) {
+            player.sendMessage(QuestsConfig.getInvalidQuestIdMessage().replace("$questId", questID));
+            return null;
+        }
         Quest quest = null;
-        for (Quest iteratedQuest : pendingPlayerQuests.get(player.getUniqueId()))
-            if (iteratedQuest.getQuestID().equals(UUID.fromString(questID))) {
+        for (Quest iteratedQuest : pendingQuests)
+            if (iteratedQuest.getQuestID().equals(parsedQuestID)) {
                 quest = iteratedQuest;
                 break;
             }

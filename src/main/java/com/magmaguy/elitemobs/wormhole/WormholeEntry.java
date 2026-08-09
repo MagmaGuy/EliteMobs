@@ -509,27 +509,6 @@ public class WormholeEntry implements PersistentObject {
     }
 
     /**
-     * Clear any lingering display blocks in the area before creating new lines
-     */
-    private void clearNearbyDisplayBlocks() {
-        if (location == null || location.getWorld() == null) return;
-
-        World world = location.getWorld();
-        double clearRadius = 5.0 * wormhole.getWormholeConfigFields().getSizeMultiplier();
-
-        // Get all display entities near the wormhole location
-        // Note: fakeText is packet-based and won't be in this list
-        world.getNearbyEntities(location, clearRadius, clearRadius, clearRadius).stream()
-                .filter(entity -> entity instanceof Display)
-                .forEach(entity -> {
-                    // Only remove block displays (DrawLine creates block displays)
-                    if (entity instanceof org.bukkit.entity.BlockDisplay) {
-                        entity.remove();
-                    }
-                });
-    }
-
-    /**
      * Update lines for current rotation frame
      */
     private void updateLines(List<Vector> currentFrame) {

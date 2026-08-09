@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.mobconstructor.custombosses.transitiveblocks;
 
 import com.magmaguy.elitemobs.api.EliteMobRemoveEvent;
 import com.magmaguy.elitemobs.api.EliteMobSpawnEvent;
+import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.magmacore.util.ChunkLocationChecker;
 import com.magmaguy.magmacore.util.Logger;
@@ -94,6 +95,15 @@ public class TransitiveBossBlock implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onBossRemove(EliteMobRemoveEvent event) {
         if (!(event.getEliteMobEntity() instanceof RegionalBossEntity regionalBossEntity)) return;
+        // Only apply the on-remove blocks when the boss is actually DEFEATED. EliteMobRemoveEvent
+        // also fires for SHUTDOWN/reload, BOSS_TIMEOUT, ARENA_RESET and admin removal (see
+        // CustomBossEntity.remove); applying the "cleared" block state on those meant a server
+        // restart (or despawn) would save the world with the boss's structure wrongly cleared
+        // even though it was never killed, and it would then rebuild via onSpawn on the next
+        // spawn — the "order of clearing on boss deaths" bug. Death/kill are the only genuine
+        // defeats, so the clearing must be gated to them.
+        RemovalReason reason = event.getRemovalReason();
+        if (reason != RemovalReason.DEATH && reason != RemovalReason.KILL_COMMAND) return;
         if (regionalBossEntity.getOnRemoveTransitiveBlocks() != null && !regionalBossEntity.getOnRemoveTransitiveBlocks().isEmpty())
             for (TransitiveBlock transitiveBlock : regionalBossEntity.getOnRemoveTransitiveBlocks())
                 setBlockData(regionalBossEntity, transitiveBlock, regionalBossEntity.getSpawnLocation());
