@@ -157,7 +157,7 @@ public class EventsRegistrer {
         register(new EliteMobEnterCombatEvent.EliteMobEnterCombatEventFilter());
         register(new PlayerPreTeleportEvent.PlayerPreTeleportEventEvents());
         register(new PlayerTeleportEvent.PlayerTeleportEventExecutor());
-        register(new EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter());
+        register(new EliteMobDamagedByPlayerEventFilter());
         register(new EliteExplosionEvent.EliteExplosionEvents());
 
         /*

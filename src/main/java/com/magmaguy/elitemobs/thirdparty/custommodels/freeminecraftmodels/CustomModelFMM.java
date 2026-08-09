@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.thirdparty.custommodels.freeminecraftmodels;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.commands.admin.RemoveCommand;
-import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
+import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEventFilter;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
@@ -116,6 +116,13 @@ public class CustomModelFMM implements CustomModelInterface {
     }
 
     @Override
+    public boolean hasNametagBone() {
+        if (dynamicEntity == null) return true;
+        List<Bone> nametagBones = dynamicEntity.getNametagBones();
+        return nametagBones != null && !nametagBones.isEmpty();
+    }
+
+    @Override
     public void setSyncMovement(boolean syncMovement) {
         if (dynamicEntity == null) return;
         dynamicEntity.setSyncMovement(syncMovement);
@@ -211,8 +218,8 @@ public class CustomModelFMM implements CustomModelInterface {
             OBBHitDetection.applyDamage = true;
             OBBHitDetection.bypassProjectileRedirect = true;
             try {
-                EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter
-                        .applyModeledProjectileHit(player, eliteEntity, projectile, damage);
+                EliteMobDamagedByPlayerEventFilter.applyModeledProjectileHit(
+                        player, eliteEntity, projectile, damage);
             } finally {
                 OBBHitDetection.applyDamage = previousApplyDamage;
                 OBBHitDetection.bypassProjectileRedirect = previousBypassProjectileRedirect;
