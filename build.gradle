@@ -8,7 +8,6 @@ plugins {
 
 //Fixes issues related to special characters being used
 compileJava.options.encoding = "UTF-8"
-compileTestJava.options.encoding = "UTF-8"
 
 //This allows any modules tagged as changing to be updated every time, which is extremely convenient for some of the shaded libs
 configurations.all {
@@ -121,11 +120,6 @@ dependencies {
     implementation (group: 'com.magmaguy', name: 'MagmaCore', version: '2.2.0-SNAPSHOT'){
         changing = true
     }
-    testImplementation "io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT"
-    testImplementation "org.mockbukkit.mockbukkit:mockbukkit-v1.21:4.110.0"
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
 }
 
 artifacts { // task 'build' runs generates uberjar
@@ -173,10 +167,6 @@ if (mcDistDir) {
         into mcDistDir
     }
     tasks.named('shadowJar') { finalizedBy('mirrorToDist') }
-}
-
-test {
-    useJUnitPlatform()
 }
 
 publishing {
