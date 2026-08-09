@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.GameMode;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -16,22 +17,29 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.function.Predicate;
+
 public class CombatTag implements Listener {
 
     private static Player playerFinder(EntityDamageByEntityEvent event) {
+        return playerFinder(event.getEntity(), event.getDamager(), EntityTracker::isEliteMob);
+    }
 
-        if (event.getDamager() instanceof Player && EntityTracker.isEliteMob(event.getEntity()))
-            return (Player) event.getDamager();
-        if (event.getEntity() instanceof Player && (EntityTracker.isEliteMob(event.getEntity()) ||
-                event.getDamager() instanceof Projectile && ((Projectile) event.getDamager()).getShooter() instanceof LivingEntity &&
-                        EntityTracker.isEliteMob(((LivingEntity) ((Projectile) event.getDamager()).getShooter()))))
-            return (Player) event.getEntity();
-        if (event.getDamager() instanceof Projectile && ((Projectile) event.getDamager()).getShooter() instanceof Player &&
-                EntityTracker.isEliteMob(event.getEntity()))
-            return (Player) ((Projectile) event.getDamager()).getShooter();
+    static Player playerFinder(Entity damaged, Entity damager, Predicate<Entity> isEliteMob) {
+        if (damager instanceof Player player && isEliteMob.test(damaged))
+            return player;
+        if (damaged instanceof Player player &&
+                (isEliteMob.test(damager) ||
+                        damager instanceof Projectile projectile &&
+                                projectile.getShooter() instanceof LivingEntity shooter &&
+                                isEliteMob.test(shooter)))
+            return player;
+        if (damager instanceof Projectile projectile &&
+                projectile.getShooter() instanceof Player player &&
+                isEliteMob.test(damaged))
+            return player;
 
         return null;
-
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -52,15 +60,22 @@ public class CombatTag implements Listener {
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    if (!player.isOnline() || player.isDead())
+                    if (!player.isOnline() || player.isDead()) {
+                        clearFlightSafetyEffect(player);
                         cancel();
+                        return;
+                    }
                     if (player.isOnGround()) {
                         cancel();
-                        player.removePotionEffect(PotionEffectType.SLOWNESS);
+                        clearFlightSafetyEffect(player);
                     }
                 }
             }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
         }
+    }
+
+    static void clearFlightSafetyEffect(Player player) {
+        player.removePotionEffect(PotionEffectType.SLOW_FALLING);
     }
 
 }
