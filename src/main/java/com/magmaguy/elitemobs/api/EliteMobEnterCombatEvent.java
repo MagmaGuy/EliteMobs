@@ -35,7 +35,7 @@ public class EliteMobEnterCombatEvent extends Event {
             CommandRunner.runCommandFromList(customBossEntity.getCustomBossesConfigFields().getOnCombatEnterCommands(), new ArrayList<>());
         //Phase bosses can launch this event through phase switches
         if (!eliteEntity.isInCombat())
-            Bukkit.getScheduler().runTaskTimerAsynchronously(MetadataHandler.PLUGIN, task -> {
+            Bukkit.getScheduler().runTaskTimer(MetadataHandler.PLUGIN, task -> {
                 if (!eliteEntity.isValid()) {
                     task.cancel();
                     Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, syncTask -> new EventCaller(new EliteMobExitCombatEvent(eliteEntity, EliteMobExitCombatEvent.EliteMobExitCombatReason.ELITE_NOT_VALID)));

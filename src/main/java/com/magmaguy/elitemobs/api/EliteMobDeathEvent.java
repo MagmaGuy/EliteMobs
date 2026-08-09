@@ -42,8 +42,6 @@ public class EliteMobDeathEvent extends Event {
     public static void callAndRemove(EliteEntity eliteEntity) {
         new EventCaller(new EliteMobDeathEvent(eliteEntity));
         eliteEntity.remove(RemovalReason.DEATH);
-        if (!eliteEntity.isCustomBossEntity())
-            new EventCaller(new EliteMobRemoveEvent(eliteEntity, RemovalReason.DEATH));
     }
 
 
