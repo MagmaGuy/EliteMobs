@@ -31,7 +31,7 @@ processResources {
 }
 
 group 'com.magmaguy'
-version '10.7.2'
+version '10.7.3'
 
 repositories {
     maven {
