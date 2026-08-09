@@ -8,17 +8,21 @@ import com.magmaguy.elitemobs.api.WorldInstanceEvent;
 import com.magmaguy.elitemobs.api.WorldUninstanceEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.DungeonsConfig;
+import com.magmaguy.elitemobs.config.PartyConfig;
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfig;
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
 import com.magmaguy.elitemobs.dungeons.EliteMobsWorld;
 import com.magmaguy.elitemobs.dungeons.utility.DungeonUtils;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
+import com.magmaguy.elitemobs.instanced.InstancePlayerManager;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.instanced.WorldOperationQueue;
 import com.magmaguy.elitemobs.mobconstructor.PersistentObjectHandler;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomMusic;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.InstancedBossEntity;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
+import com.magmaguy.elitemobs.parties.PartyManager;
+import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.EventCaller;
@@ -75,6 +79,15 @@ public class DungeonInstance extends MatchInstance {
                            World world,
                            Player player,
                            String difficultyName) {
+        this(contentPackagesConfigFields, lobbyLocation, startLocation, world, List.of(player), difficultyName);
+    }
+
+    public DungeonInstance(ContentPackagesConfigFields contentPackagesConfigFields,
+                           Location lobbyLocation,
+                           Location startLocation,
+                           World world,
+                           Collection<Player> initialPlayers,
+                           String difficultyName) {
         super(startLocation,
                 null, //todo: the end location is currently not definable
                 contentPackagesConfigFields.getMinPlayerCount(),
@@ -110,14 +123,17 @@ public class DungeonInstance extends MatchInstance {
             this.instancedWorldName = world.getName();
             this.difficultyName = difficultyName;
             setDifficulty(difficultyName);
-            if (!addNewPlayer(player)) {
+            super.permission = contentPackagesConfigFields.getPermission();
+            if (!addDungeonPlayers(initialPlayers)) {
+                if (initialPlayers.size() > 1)
+                    PartyManager.sendConfiguredMessage(initialPlayers.iterator().next(),
+                            PartyConfig.getDungeonPartyJoinFailedMessage());
                 dungeonInstances.add(this);
                 removeInstance();
                 return;
             }
             initializeEntitiesTask = new InitializeEntitiesTask(this, contentPackagesConfigFields, world).runTaskLater(MetadataHandler.PLUGIN, 20 * 3L);
             dungeonInstances.add(this);
-            super.permission = contentPackagesConfigFields.getPermission();
         } catch (RuntimeException exception) {
             deregisterFailedConstruction();
             throw exception;
@@ -130,11 +146,17 @@ public class DungeonInstance extends MatchInstance {
      * WatchdogTask can keep it (and its world's ServerLevel) alive. The cloned world itself is deleted by the
      * static cleanupLoadedWorld(world) call in the initializeInstancedWorld/initializeDynamicWorld catch block.
      */
-    private void deregisterFailedConstruction() {
+    protected final void deregisterFailedConstruction() {
         cancelScheduledTasks();
         cancelInitializeEntitiesTask();
         cancelDestroyMatchTask();
         cancelRemoveInstanceTask();
+        InstancePlayerManager.rollbackAdmissions(new HashSet<>(participants), this);
+        players.clear();
+        spectators.clear();
+        participants.clear();
+        playerLives.clear();
+        previousPlayerLocations.clear();
         for (DungeonObjective dungeonObjective : dungeonObjectives)
             if (dungeonObjective != null) dungeonObjective.unregister();
         instances.remove(this);
@@ -154,6 +176,11 @@ public class DungeonInstance extends MatchInstance {
                 return;
             }
 
+        List<UUID> entryMemberIds = instancedDungeonsConfigFields.isEnchantmentChallenge()
+                ? List.of(player.getUniqueId())
+                : prepareDungeonEntryRoster(player, instancedDungeonsConfigFields);
+        if (entryMemberIds.isEmpty()) return;
+
         String instancedWorldName = WorldInstantiator.getNewWorldName(instancedDungeonsConfigFields.getWorldName());
 
         if (!launchEvent(instancedDungeonsConfigFields, instancedWorldName, player)) return;
@@ -161,7 +188,8 @@ public class DungeonInstance extends MatchInstance {
         WorldOperationQueue.queueOperation(
                 player,
                 () -> cloneWorldFiles(instancedDungeonsConfigFields, instancedWorldName) != null,
-                () -> initializeInstancedWorld(instancedDungeonsConfigFields, instancedWorldName, player, difficultyName),
+                () -> initializeInstancedWorld(instancedDungeonsConfigFields, instancedWorldName, player,
+                        entryMemberIds, difficultyName),
                 instancedDungeonsConfigFields.getName()
         );
     }
@@ -187,6 +215,15 @@ public class DungeonInstance extends MatchInstance {
                                                               String instancedWordName,
                                                               Player player,
                                                               String difficultyName) {
+        return initializeInstancedWorld(instancedDungeonsConfigFields, instancedWordName, player,
+                List.of(player.getUniqueId()), difficultyName);
+    }
+
+    protected static DungeonInstance initializeInstancedWorld(ContentPackagesConfigFields instancedDungeonsConfigFields,
+                                                              String instancedWordName,
+                                                              Player player,
+                                                              List<UUID> entryMemberIds,
+                                                              String difficultyName) {
         World world = DungeonUtils.loadWorld(instancedWordName, instancedDungeonsConfigFields.getEnvironment(), instancedDungeonsConfigFields);
         if (world == null) {
             player.sendMessage(DungeonsConfig.getDungeonWorldLoadFailedMessage());
@@ -195,6 +232,13 @@ public class DungeonInstance extends MatchInstance {
         }
 
         try {
+            List<Player> entryPlayers = resolveDungeonEntryRoster(
+                    player, entryMemberIds, instancedDungeonsConfigFields, null);
+            if (entryPlayers.isEmpty()) {
+                cleanupLoadedWorld(world);
+                return null;
+            }
+
             // Initialize dungeon music for this instanced world
             if (instancedDungeonsConfigFields.getSong() != null)
                 new CustomMusic(instancedDungeonsConfigFields.getSong(), instancedDungeonsConfigFields, world);
@@ -210,9 +254,11 @@ public class DungeonInstance extends MatchInstance {
             //todo: will probably want to define this at some point Location endLocation = ConfigurationLocation.serialize(instancedDungeonsConfigFields.getEndLocation());
             //endLocation.setWorld(world);
             if (!instancedDungeonsConfigFields.isEnchantmentChallenge())
-                return new DungeonInstance(instancedDungeonsConfigFields, lobbyLocation, startLocation, world, player, difficultyName);
+                return new DungeonInstance(instancedDungeonsConfigFields, lobbyLocation, startLocation, world,
+                        entryPlayers, difficultyName);
             else
-                return new EnchantmentDungeonInstance(instancedDungeonsConfigFields, lobbyLocation, startLocation, world, player, difficultyName);
+                return new EnchantmentDungeonInstance(instancedDungeonsConfigFields, lobbyLocation, startLocation,
+                        world, entryPlayers.get(0), difficultyName);
         } catch (Exception exception) {
             Logger.warn("Failed to initialize instanced dungeon world " + instancedWordName + ": " + exception.getMessage());
             cleanupLoadedWorld(world);
@@ -222,10 +268,92 @@ public class DungeonInstance extends MatchInstance {
 
     @Override
     public boolean addNewPlayer(Player player) {
-        if (!super.addNewPlayer(player)) return false;
-        if (levelSync > 0)
-            player.sendMessage(DungeonsConfig.getDungeonDifficultyMessage().replace("$difficulty", difficultyName).replace("$levelSync", String.valueOf(levelSync)));
+        List<UUID> entryMemberIds = PartyManager.getDungeonEntryMemberIds(player);
+        List<Player> entryPlayers = resolveDungeonEntryRoster(
+                player, entryMemberIds, contentPackagesConfigFields, this);
+        if (entryPlayers.isEmpty()) return false;
+
+        long playersNeedingAdmission = entryPlayers.stream().filter(candidate -> !players.contains(candidate)).count();
+        int availableSlots = maxPlayers - players.size();
+        if (playersNeedingAdmission > availableSlots) {
+            PartyManager.sendConfiguredMessage(player, PartyConfig.getDungeonPartyTooLargeMessage()
+                    .replace("$count", String.valueOf(playersNeedingAdmission))
+                    .replace("$max", String.valueOf(Math.max(0, availableSlots))));
+            return false;
+        }
+
+        boolean added = addDungeonPlayers(entryPlayers);
+        if (!added && entryMemberIds.size() > 1)
+            PartyManager.sendConfiguredMessage(player, PartyConfig.getDungeonPartyJoinFailedMessage());
+        return added;
+    }
+
+    private boolean addDungeonPlayers(Collection<Player> entryPlayers) {
+        Set<UUID> existingPlayerIds = players.stream().map(Player::getUniqueId).collect(java.util.stream.Collectors.toSet());
+        if (!InstancePlayerManager.addNewPlayers(entryPlayers, this)) return false;
+        for (Player entryPlayer : entryPlayers) {
+            if (existingPlayerIds.contains(entryPlayer.getUniqueId())) continue;
+            if (levelSync > 0)
+                entryPlayer.sendMessage(DungeonsConfig.getDungeonDifficultyMessage()
+                        .replace("$difficulty", difficultyName)
+                        .replace("$levelSync", String.valueOf(levelSync)));
+        }
         return true;
+    }
+
+    protected static List<UUID> prepareDungeonEntryRoster(Player initiator,
+                                                           ContentPackagesConfigFields configFields) {
+        List<UUID> memberIds = PartyManager.getDungeonEntryMemberIds(initiator);
+        if (memberIds.size() > configFields.getMaxPlayerCount()) {
+            PartyManager.sendConfiguredMessage(initiator, PartyConfig.getDungeonPartyTooLargeMessage()
+                    .replace("$count", String.valueOf(memberIds.size()))
+                    .replace("$max", String.valueOf(configFields.getMaxPlayerCount())));
+            return List.of();
+        }
+        return resolveDungeonEntryRoster(initiator, memberIds, configFields, null).isEmpty()
+                ? List.of()
+                : memberIds;
+    }
+
+    protected static List<Player> resolveDungeonEntryRoster(Player initiator,
+                                                             Collection<UUID> memberIds,
+                                                             ContentPackagesConfigFields configFields,
+                                                             DungeonInstance allowedInstance) {
+        if (initiator == null || !initiator.isOnline()) return List.of();
+        boolean personalEnchantmentChallenge = configFields.isEnchantmentChallenge()
+                && memberIds.size() == 1
+                && memberIds.contains(initiator.getUniqueId());
+        if (!personalEnchantmentChallenge && !PartyManager.isDungeonEntryRosterCurrent(initiator, memberIds)) {
+            PartyManager.sendConfiguredMessage(initiator, PartyConfig.getDungeonPartyChangedMessage());
+            return List.of();
+        }
+
+        List<Player> entryPlayers = new ArrayList<>();
+        for (UUID memberId : memberIds) {
+            Player member = Bukkit.getPlayer(memberId);
+            String memberName = member == null ? Bukkit.getOfflinePlayer(memberId).getName() : member.getName();
+            if (member == null || !member.isOnline() || !member.isValid() || !PlayerData.isInMemory(memberId)) {
+                PartyManager.sendConfiguredMessage(initiator, PartyConfig.getDungeonPartyUnavailableMessage()
+                        .replace("$player", memberName == null ? "Unknown" : memberName));
+                return List.of();
+            }
+            MatchInstance currentInstance = PlayerData.getMatchInstance(member);
+            MatchInstance indexedInstance = MatchInstance.getAnyPlayerInstance(member);
+            if ((currentInstance != null && currentInstance != allowedInstance)
+                    || (indexedInstance != null && indexedInstance != allowedInstance)) {
+                PartyManager.sendConfiguredMessage(initiator, PartyConfig.getDungeonPartyInInstanceMessage()
+                        .replace("$player", member.getName()));
+                return List.of();
+            }
+            String permission = configFields.getPermission();
+            if (permission != null && !permission.isEmpty() && !member.hasPermission(permission)) {
+                PartyManager.sendConfiguredMessage(initiator, PartyConfig.getDungeonPartyNoPermissionMessage()
+                        .replace("$player", member.getName()));
+                return List.of();
+            }
+            entryPlayers.add(member);
+        }
+        return List.copyOf(entryPlayers);
     }
 
     @Override

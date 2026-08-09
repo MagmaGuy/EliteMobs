@@ -58,6 +58,18 @@ public class PartyConfig extends ConfigurationFile {
     private static String memberLeftMessage;
     @Getter
     private static String leaderChangedMessage;
+    @Getter
+    private static String dungeonPartyTooLargeMessage;
+    @Getter
+    private static String dungeonPartyUnavailableMessage;
+    @Getter
+    private static String dungeonPartyInInstanceMessage;
+    @Getter
+    private static String dungeonPartyNoPermissionMessage;
+    @Getter
+    private static String dungeonPartyChangedMessage;
+    @Getter
+    private static String dungeonPartyJoinFailedMessage;
 
     @Getter
     private static String sidebarTitle;
@@ -113,6 +125,18 @@ public class PartyConfig extends ConfigurationFile {
         leftPartyMessage = message("leftPartyMessage", "$prefixYou left the party.");
         memberLeftMessage = message("memberLeftMessage", "$prefix&f$player &cleft the party.");
         leaderChangedMessage = message("leaderChangedMessage", "$prefix&f$player &7is now the party leader.");
+        dungeonPartyTooLargeMessage = message("dungeonPartyTooLargeMessage",
+                "$prefixParty entry needs &f$count &7open spots, but this dungeon only has &f$max &7available.");
+        dungeonPartyUnavailableMessage = message("dungeonPartyUnavailableMessage",
+                "$prefixParty entry stopped because &f$player &7is no longer available.");
+        dungeonPartyInInstanceMessage = message("dungeonPartyInInstanceMessage",
+                "$prefixParty entry stopped because &f$player &7is already in another instance.");
+        dungeonPartyNoPermissionMessage = message("dungeonPartyNoPermissionMessage",
+                "$prefixParty entry stopped because &f$player &7does not have permission for this dungeon.");
+        dungeonPartyChangedMessage = message("dungeonPartyChangedMessage",
+                "$prefixThe party changed while the dungeon was being prepared. Please try again.");
+        dungeonPartyJoinFailedMessage = message("dungeonPartyJoinFailedMessage",
+                "$prefixThe party could not enter together, so nobody was moved.");
 
         sidebarTitle = message("sidebarTitle", "&6&lElite Party");
         sidebarLeaderLine = message("sidebarLeaderLine", "&6♛ &f$player");

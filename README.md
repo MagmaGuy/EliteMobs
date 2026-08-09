@@ -57,6 +57,12 @@ of player and admin subcommands. Run `/em help` in-game for the full list, or co
 Parties are enabled by default through `Party.yml` and last only while their members remain logged in. A party contains
 one creator plus up to five invited players. Membership is never written to the player database.
 
+Entering or creating an instanced dungeon admits the initiating player's entire current party as one atomic group.
+Capacity, package permissions, active-instance state, party membership, and cancellable join events are validated for
+everyone before anybody is moved. Open-world dungeon teleports start the normal safe-teleport countdown for every
+available party member; an individual can still cancel their own teleport by moving. Personal item-enchantment
+challenges remain solo because they escrow the owner's item.
+
 | Command | Purpose |
 |---|---|
 | `/em party create` | Create a party. |
@@ -348,12 +354,16 @@ Used when a player starts teleporting through EliteMobs features. There is a 3 s
 actually happens.
 
 - Can be cancelled.
+- Group dungeon entry preflights this event for every party member before any countdown starts. Cancelling one rejects
+  the initial group, although movement during the countdown can still cancel that player's own teleport.
 
 ### PlayerTeleportEvent
 
 Used when a player actually teleports through EliteMobs features.
 
 - Can be cancelled.
+- When the teleport timer is disabled, group dungeon entry preflights this event for every party member before executing
+  any EliteMobs teleport.
 
 ### QuestAcceptEvent
 

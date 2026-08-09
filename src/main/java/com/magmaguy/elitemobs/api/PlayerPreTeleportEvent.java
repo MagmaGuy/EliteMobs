@@ -11,6 +11,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.*;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.UUID;
+
 public class PlayerPreTeleportEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
@@ -20,6 +26,7 @@ public class PlayerPreTeleportEvent extends Event implements Cancellable {
     private final Location originalLocation;
     @Getter
     private final Player player;
+    private final boolean deferredStart;
     private boolean isCancelled = false;
 
     /**
@@ -30,9 +37,14 @@ public class PlayerPreTeleportEvent extends Event implements Cancellable {
      * @param destination Teleport destination
      */
     public PlayerPreTeleportEvent(Player player, Location destination) {
+        this(player, destination, false);
+    }
+
+    private PlayerPreTeleportEvent(Player player, Location destination, boolean deferredStart) {
         this.player = player;
         this.destination = destination.clone();
         this.originalLocation = player.getLocation().clone();
+        this.deferredStart = deferredStart;
     }
 
     public static void teleportPlayer(Player player, Location destination) {
@@ -41,6 +53,35 @@ public class PlayerPreTeleportEvent extends Event implements Cancellable {
             new EventCaller(new PlayerPreTeleportEvent(player, destination));
         else
             PlayerTeleportEvent.teleportPlayer(player, destination);
+    }
+
+    /**
+     * Starts a group teleport only after every member's cancellable EliteMobs event accepts it.
+     * Once accepted, each player keeps the ordinary movement-cancellable countdown.
+     *
+     * @return true when all events passed preflight and all countdowns/final teleports were started
+     */
+    public static boolean teleportPlayers(Collection<Player> players, Location destination) {
+        if (destination == null || destination.getWorld() == null) return false;
+        if (!CombatTagConfig.isEnableTeleportTimer())
+            return PlayerTeleportEvent.teleportPlayers(players, destination);
+
+        LinkedHashMap<UUID, Player> uniquePlayers = new LinkedHashMap<>();
+        for (Player player : players)
+            if (player != null) uniquePlayers.putIfAbsent(player.getUniqueId(), player);
+        if (uniquePlayers.isEmpty()) return false;
+
+        List<PlayerPreTeleportEvent> events = new ArrayList<>();
+        for (Player player : uniquePlayers.values()) {
+            if (!player.isOnline() || !player.isValid()) return false;
+            PlayerPreTeleportEvent event = new PlayerPreTeleportEvent(player, destination, true);
+            new EventCaller(event);
+            if (event.isCancelled()) return false;
+            events.add(event);
+        }
+        if (events.stream().anyMatch(event -> !event.player.isOnline() || !event.player.isValid())) return false;
+        events.forEach(PlayerPreTeleportEvent::startTeleport);
+        return true;
     }
 
     public static HandlerList getHandlerList() {
@@ -106,7 +147,7 @@ public class PlayerPreTeleportEvent extends Event implements Cancellable {
     public static class PlayerPreTeleportEventEvents implements Listener {
         @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
         public void onTeleportEvent(PlayerPreTeleportEvent event) {
-            event.startTeleport();
+            if (!event.deferredStart) event.startTeleport();
         }
     }
 

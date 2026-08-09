@@ -84,6 +84,16 @@ public class EnchantmentDungeonInstance extends DungeonInstance {
         return clone;
     }
 
+    /**
+     * Enchantment challenges escrow one player's item and therefore remain private after their
+     * owner is admitted by the constructor. They must never become a party carry or accept a
+     * browser join while the challenge is waiting to start.
+     */
+    @Override
+    public boolean addNewPlayer(Player player) {
+        return false;
+    }
+
     @Override
     public void endMatch() {
         if (players.isEmpty()) {

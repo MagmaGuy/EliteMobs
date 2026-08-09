@@ -17,9 +17,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -58,6 +60,33 @@ public final class PartyManager implements Listener {
 
     public static boolean isInParty(UUID playerId) {
         return getParty(playerId) != null;
+    }
+
+    /**
+     * Freezes the party roster used for a dungeon-entry attempt. The initiating player is first so
+     * launch ownership and feedback remain deterministic even when they are not the party leader.
+     */
+    public static List<UUID> getDungeonEntryMemberIds(Player initiator) {
+        UUID initiatorId = initiator.getUniqueId();
+        Party party = getParty(initiatorId);
+        if (!PartyConfig.isEnabled() || party == null) return List.of(initiatorId);
+
+        List<UUID> memberIds = new ArrayList<>(party.getMembersInDisplayOrder());
+        memberIds.remove(initiatorId);
+        memberIds.add(0, initiatorId);
+        return List.copyOf(memberIds);
+    }
+
+    /** Ensures nobody left or switched parties while an instanced world was being prepared. */
+    public static boolean isDungeonEntryRosterCurrent(Player initiator, Collection<UUID> memberIds) {
+        Set<UUID> snapshot = new HashSet<>(memberIds);
+        if (snapshot.size() != memberIds.size() || !snapshot.contains(initiator.getUniqueId())) return false;
+        if (!PartyConfig.isEnabled()) return snapshot.equals(Set.of(initiator.getUniqueId()));
+
+        Party party = getParty(initiator.getUniqueId());
+        if (party == null) return snapshot.equals(Set.of(initiator.getUniqueId()));
+        return party.getMembers().equals(snapshot)
+                && snapshot.stream().allMatch(memberId -> getParty(memberId) == party);
     }
 
     public static void create(Player creator) {
@@ -263,6 +292,10 @@ public final class PartyManager implements Listener {
 
     private static void send(Player player, String message) {
         Logger.sendSimpleMessage(player, format(message));
+    }
+
+    public static void sendConfiguredMessage(Player player, String message) {
+        if (player != null) send(player, message);
     }
 
     private static String format(String message) {

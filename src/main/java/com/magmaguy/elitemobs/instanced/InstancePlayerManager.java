@@ -16,10 +16,18 @@ import com.magmaguy.elitemobs.instanced.dungeons.DungeonInstance;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.magmacore.util.AttributeManager;
+import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.UUID;
 
 public class InstancePlayerManager {
 
@@ -37,40 +45,139 @@ public class InstancePlayerManager {
     }
 
     public static boolean addNewPlayer(Player player, MatchInstance matchInstance) {
+        return addNewPlayers(List.of(player), matchInstance);
+    }
+
+    /**
+     * Atomically admits a set of players. All ordinary constraints and every cancellable join
+     * event are checked before any match/player state is mutated, so a party is never split by a
+     * full instance, missing permission, another active match, or an API veto. A listener may see
+     * an uncancelled preflight event for an earlier member before a later member vetoes the batch;
+     * those events describe admission attempts and no player state has changed at that point.
+     */
+    public static boolean addNewPlayers(Collection<Player> requestedPlayers, MatchInstance matchInstance) {
+        LinkedHashMap<UUID, Player> uniquePlayers = new LinkedHashMap<>();
+        for (Player player : requestedPlayers)
+            if (player != null) uniquePlayers.putIfAbsent(player.getUniqueId(), player);
+        List<Player> playersToAdd = uniquePlayers.values().stream()
+                .filter(player -> !matchInstance.players.contains(player))
+                .toList();
+        if (playersToAdd.isEmpty()) return false;
+
+        if (!canAdmitPlayers(playersToAdd, matchInstance, true)) return false;
+        for (Player player : playersToAdd)
+            if (!fireJoinEvent(matchInstance, player)) return false;
+        // Join listeners execute synchronously and can change match/player state. Fail closed if
+        // anything changed during the batch preflight instead of admitting only part of a party.
+        if (!canAdmitPlayers(playersToAdd, matchInstance, true)) return false;
+
+        LinkedHashMap<UUID, Location> previousLocations = new LinkedHashMap<>();
+        for (Player player : playersToAdd)
+            previousLocations.put(player.getUniqueId(), player.getLocation());
+
+        // Keep the mutation phase deliberately small and non-callback-based. Once this loop has
+        // completed, every member is visible in the match before post-join API events are fired.
+        playersToAdd.forEach(player -> registerPlayer(
+                player,
+                matchInstance,
+                previousLocations.get(player.getUniqueId())));
+
+        List<BukkitTask> entryTasks = new ArrayList<>();
+        try {
+            for (Player player : playersToAdd)
+                entryTasks.add(scheduleEntry(player, matchInstance));
+        } catch (RuntimeException exception) {
+            entryTasks.forEach(BukkitTask::cancel);
+            rollbackRegistrations(playersToAdd, matchInstance);
+            Logger.warn("Failed to schedule an instance-entry batch: " + exception.getMessage());
+            return false;
+        }
+
+        playersToAdd.forEach(player -> notifyAdmission(player, matchInstance));
+        return true;
+    }
+
+    private static boolean canAdmitPlayers(List<Player> playersToAdd,
+                                           MatchInstance matchInstance,
+                                           boolean sendFeedback) {
         //Right now new players can't join ongoing instances
         if (!matchInstance.state.equals(MatchInstance.InstancedRegionState.WAITING)) {
-            player.sendMessage(ArenasConfig.getArenasOngoingMessage());
+            if (sendFeedback) playersToAdd.get(0).sendMessage(ArenasConfig.getArenasOngoingMessage());
             return false;
         }
         //Check if match is full
-        if (matchInstance.players.size() + 1 > matchInstance.maxPlayers) {
-            player.sendMessage(ArenasConfig.getArenaFullMessage());
+        if (matchInstance.players.size() + playersToAdd.size() > matchInstance.maxPlayers) {
+            if (sendFeedback) playersToAdd.get(0).sendMessage(ArenasConfig.getArenaFullMessage());
             return false;
         }
-        //Check permissions
-        if (matchInstance.getPermission() != null && !player.hasPermission(matchInstance.getPermission()))
-            return false;
+        for (Player player : playersToAdd) {
+            if (!player.isOnline() || !player.isValid() || !PlayerData.isInMemory(player.getUniqueId())
+                    || matchInstance.players.contains(player)) return false;
+            // Both indexes are checked. A disagreement between them is treated as occupied instead
+            // of allowing one player to become a member of two instances.
+            if (PlayerData.getMatchInstance(player) != null || MatchInstance.getAnyPlayerInstance(player) != null)
+                return false;
+            if (matchInstance.getPermission() != null && !player.hasPermission(matchInstance.getPermission()))
+                return false;
+        }
+        return true;
+    }
 
-        if (!fireJoinEvent(matchInstance, player)) return false;
-
-        //Add the player to the relevant fields
+    private static void registerPlayer(Player player, MatchInstance matchInstance, Location previousLocation) {
         matchInstance.participants.add(player);
         matchInstance.players.add(player);
         PlayerData.setMatchInstance(player, matchInstance);
-        player.sendMessage(ArenasConfig.getArenaJoinPlayerMessage().replace("$count", matchInstance.minPlayers + ""));
-        player.sendTitle(ArenasConfig.getJoinPlayerTitle(), ArenasConfig.getJoinPlayerSubtitle(), 60, 60 * 3, 60);
+        matchInstance.getPreviousPlayerLocations().put(player, previousLocation);
+    }
 
-        //Should be the first join of the player, do the join events
-        matchInstance.getPreviousPlayerLocations().put(player, player.getLocation());
-        if (matchInstance instanceof ArenaInstance arenaInstance)
-            new EventCaller(new PlayerJoinArenaEvent(arenaInstance, player));
-        else if (matchInstance instanceof DungeonInstance dungeonInstance)
-            new EventCaller(new PlayerJoinDungeonEvent(dungeonInstance, player));
+    private static void rollbackRegistrations(List<Player> players, MatchInstance matchInstance) {
+        for (Player player : players) {
+            matchInstance.players.remove(player);
+            matchInstance.participants.remove(player);
+            matchInstance.getPreviousPlayerLocations().remove(player);
+            if (PlayerData.getMatchInstance(player) == matchInstance)
+                PlayerData.setMatchInstance(player, null);
+        }
+    }
 
+    /** Clears a completed admission and balances its public join notifications without teleporting. */
+    public static void rollbackAdmissions(Collection<Player> admittedPlayers, MatchInstance matchInstance) {
+        for (Player player : admittedPlayers) {
+            boolean wasParticipant = matchInstance.participants.remove(player);
+            matchInstance.players.remove(player);
+            matchInstance.spectators.remove(player);
+            matchInstance.playerLives.remove(player);
+            matchInstance.getPreviousPlayerLocations().remove(player);
+            if (PlayerData.getMatchInstance(player) == matchInstance)
+                PlayerData.setMatchInstance(player, null);
+            if (wasParticipant) fireLeaveEvents(matchInstance, player);
+        }
+    }
 
-        new BukkitRunnable() {
+    private static void notifyAdmission(Player player, MatchInstance matchInstance) {
+        try {
+            player.sendMessage(ArenasConfig.getArenaJoinPlayerMessage().replace("$count", matchInstance.minPlayers + ""));
+            player.sendTitle(ArenasConfig.getJoinPlayerTitle(), ArenasConfig.getJoinPlayerSubtitle(), 60, 60 * 3, 60);
+        } catch (RuntimeException exception) {
+            Logger.warn("Failed to show instance join feedback to " + player.getName() + ": " + exception.getMessage());
+        }
+
+        try {
+            fireTypedJoinEvent(matchInstance, player);
+        } catch (RuntimeException exception) {
+            Logger.warn("A post-join API callback failed for " + player.getName() + ": " + exception.getMessage());
+        }
+    }
+
+    private static BukkitTask scheduleEntry(Player player, MatchInstance matchInstance) {
+        return new BukkitRunnable() {
             @Override
             public void run() {
+                if (!player.isOnline()
+                        || !matchInstance.players.contains(player)
+                        || PlayerData.getMatchInstance(player) != matchInstance)
+                    return;
+
                 //Teleport the player to the correct location
                 MatchInstance.MatchInstanceEvents.teleportBypass = true;
                 Location destination = (matchInstance.state.equals(MatchInstance.InstancedRegionState.WAITING) && matchInstance.lobbyLocation != null)
@@ -84,8 +191,6 @@ public class InstancePlayerManager {
                 matchInstance.playerLives.put(player, 3);
             }
         }.runTaskLater(MetadataHandler.PLUGIN, 1);
-
-        return true;
     }
 
     public static void removePlayer(Player player, MatchInstance matchInstance) {

@@ -17,6 +17,12 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
 public class DynamicDungeonInstance extends DungeonInstance {
     @Getter
     private final int selectedLevel;
@@ -28,17 +34,36 @@ public class DynamicDungeonInstance extends DungeonInstance {
                                   Player player,
                                   String difficultyName,
                                   int selectedLevel) {
-        super(contentPackagesConfigFields, lobbyLocation, startLocation, world, player, difficultyName);
+        this(contentPackagesConfigFields, lobbyLocation, startLocation, world,
+                List.of(player), difficultyName, selectedLevel);
+    }
+
+    public DynamicDungeonInstance(ContentPackagesConfigFields contentPackagesConfigFields,
+                                  Location lobbyLocation,
+                                  Location startLocation,
+                                  World world,
+                                  Collection<Player> initialPlayers,
+                                  String difficultyName,
+                                  int selectedLevel) {
+        super(contentPackagesConfigFields, lobbyLocation, startLocation, world, initialPlayers, difficultyName);
         this.selectedLevel = selectedLevel;
 
         //The super constructor can already have rolled this instance back (cancelled MatchInstantiateEvent or a
         //failed initial join). Don't schedule a fresh task on a doomed/torn-down instance.
         if (cancelled || isInstanceRemovalScheduled() || getWorld() == null) return;
 
-        // Recalculate level sync for dynamic dungeons based on the player-selected level
-        recalculateLevelSyncForDynamicLevel(selectedLevel);
+        try {
+            // Recalculate level sync for dynamic dungeons based on the player-selected level
+            recalculateLevelSyncForDynamicLevel(selectedLevel);
+            getPlayers().forEach(this::applyDynamicEntryState);
 
-        new SetBossLevelsTask(this, selectedLevel).runTaskLater(MetadataHandler.PLUGIN, 20 * 4L);
+            new SetBossLevelsTask(this, selectedLevel).runTaskLater(MetadataHandler.PLUGIN, 20 * 4L);
+        } catch (RuntimeException exception) {
+            // The base constructor has already registered this instance and admitted its players.
+            // Roll that state back if subclass initialization fails before construction completes.
+            deregisterFailedConstruction();
+            throw exception;
+        }
     }
 
     public static void setupDynamicDungeon(Player player, String dungeonConfigFieldsString, String difficultyName, int selectedLevel) {
@@ -54,6 +79,9 @@ public class DynamicDungeonInstance extends DungeonInstance {
                 return;
             }
 
+        List<UUID> entryMemberIds = prepareDungeonEntryRoster(player, dynamicDungeonConfigFields);
+        if (entryMemberIds.isEmpty()) return;
+
         String instancedWorldName = WorldInstantiator.getNewWorldName(dynamicDungeonConfigFields.getWorldName());
 
         if (!launchEvent(dynamicDungeonConfigFields, instancedWorldName, player)) return;
@@ -61,7 +89,8 @@ public class DynamicDungeonInstance extends DungeonInstance {
         WorldOperationQueue.queueOperation(
                 player,
                 () -> cloneWorldFiles(dynamicDungeonConfigFields, instancedWorldName) != null,
-                () -> initializeDynamicWorld(dynamicDungeonConfigFields, instancedWorldName, player, difficultyName, selectedLevel),
+                () -> initializeDynamicWorld(dynamicDungeonConfigFields, instancedWorldName, player,
+                        entryMemberIds, difficultyName, selectedLevel),
                 dynamicDungeonConfigFields.getName()
         );
     }
@@ -69,6 +98,16 @@ public class DynamicDungeonInstance extends DungeonInstance {
     protected static DynamicDungeonInstance initializeDynamicWorld(ContentPackagesConfigFields dynamicDungeonConfigFields,
                                                                    String instancedWorldName,
                                                                    Player player,
+                                                                   String difficultyName,
+                                                                   int selectedLevel) {
+        return initializeDynamicWorld(dynamicDungeonConfigFields, instancedWorldName, player,
+                List.of(player.getUniqueId()), difficultyName, selectedLevel);
+    }
+
+    protected static DynamicDungeonInstance initializeDynamicWorld(ContentPackagesConfigFields dynamicDungeonConfigFields,
+                                                                   String instancedWorldName,
+                                                                   Player player,
+                                                                   List<UUID> entryMemberIds,
                                                                    String difficultyName,
                                                                    int selectedLevel) {
         World world = DungeonUtils.loadWorld(instancedWorldName, dynamicDungeonConfigFields.getEnvironment(), dynamicDungeonConfigFields);
@@ -79,6 +118,13 @@ public class DynamicDungeonInstance extends DungeonInstance {
         }
 
         try {
+            List<Player> entryPlayers = resolveDungeonEntryRoster(
+                    player, entryMemberIds, dynamicDungeonConfigFields, null);
+            if (entryPlayers.isEmpty()) {
+                cleanupLoadedWorld(world);
+                return null;
+            }
+
             // Initialize dungeon music for this dynamic instanced world
             if (dynamicDungeonConfigFields.getSong() != null)
                 new CustomMusic(dynamicDungeonConfigFields.getSong(), dynamicDungeonConfigFields, world);
@@ -89,7 +135,8 @@ public class DynamicDungeonInstance extends DungeonInstance {
             if (lobbyLocation != null) lobbyLocation.setWorld(world);
             else lobbyLocation = startLocation;
 
-            return new DynamicDungeonInstance(dynamicDungeonConfigFields, lobbyLocation, startLocation, world, player, difficultyName, selectedLevel);
+            return new DynamicDungeonInstance(dynamicDungeonConfigFields, lobbyLocation, startLocation, world,
+                    entryPlayers, difficultyName, selectedLevel);
         } catch (Exception exception) {
             com.magmaguy.magmacore.util.Logger.warn("Failed to initialize dynamic dungeon world " + instancedWorldName + ": " + exception.getMessage());
             cleanupLoadedWorld(world);
@@ -99,14 +146,19 @@ public class DynamicDungeonInstance extends DungeonInstance {
 
     @Override
     public boolean addNewPlayer(Player player) {
+        Set<UUID> existingPlayerIds = getPlayers().stream()
+                .map(Player::getUniqueId)
+                .collect(Collectors.toSet());
         if (!super.addNewPlayer(player)) return false;
-        // Show additional info about the selected level for dynamic dungeons
-        player.sendMessage(DungeonsConfig.getDynamicDungeonLevelSetMessage().replace("$level", String.valueOf(selectedLevel)));
-
-        // Adapt player's active DynamicQuests to the dungeon's selected level
-        DynamicQuest.adaptPlayerQuestsToLevel(player, selectedLevel);
-
+        getPlayers().stream()
+                .filter(joinedPlayer -> !existingPlayerIds.contains(joinedPlayer.getUniqueId()))
+                .forEach(this::applyDynamicEntryState);
         return true;
+    }
+
+    private void applyDynamicEntryState(Player player) {
+        player.sendMessage(DungeonsConfig.getDynamicDungeonLevelSetMessage().replace("$level", String.valueOf(selectedLevel)));
+        DynamicQuest.adaptPlayerQuestsToLevel(player, selectedLevel);
     }
 
     private class SetBossLevelsTask extends BukkitRunnable {
