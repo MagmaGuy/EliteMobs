@@ -3,8 +3,6 @@ package com.magmaguy.elitemobs.powerstances;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
-import com.magmaguy.elitemobs.powers.meta.ElitePower;
-import com.magmaguy.elitemobs.powers.meta.MinorPower;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.Item;
@@ -30,6 +28,9 @@ public class MinorPowerPowerStance implements Listener {
             return;
         if (MobCombatSettingsConfig.isDisableVisualEffectsForSpawnerMobs() && !eliteEntity.isNaturalEntity())
             return;
+        //The ring drops item entities in the elite's world, so there is nothing to build before the elite exists
+        if (eliteEntity.getLivingEntity() == null)
+            return;
 
         this.eliteEntity = eliteEntity;
         if (eliteEntity.isMinorVisualEffect()) return;
@@ -50,7 +51,7 @@ public class MinorPowerPowerStance implements Listener {
                     for (int a = 0; a < multiDimensionalTrailTracker.length; a++)
                         localObjects.addAll(addObfuscatedEffects());
                     for (int j = 0; j < multiDimensionalTrailTracker[0].length; j++)
-                        if (localObjects.get(j) != null)
+                        if (j < localObjects.size() && localObjects.get(j) != null)
                             multiDimensionalTrailTracker[i][j] = localObjects.get(j);
 
                 }
@@ -68,8 +69,8 @@ public class MinorPowerPowerStance implements Listener {
             ArrayList<Object> localObjects = new ArrayList<>();
             for (int a = 0; a < multiDimensionalTrailTracker.length; a++)
                 localObjects.addAll(addAllEffects());
-            for (int j = 0; j < localObjects.size(); j++)
-                if (localObjects.get(j) != null)
+            for (int j = 0; j < multiDimensionalTrailTracker[0].length; j++)
+                if (j < localObjects.size() && localObjects.get(j) != null)
                     multiDimensionalTrailTracker[i][j] = localObjects.get(j);
         }
 
@@ -87,10 +88,8 @@ public class MinorPowerPowerStance implements Listener {
 
         ArrayList<Object> effects = new ArrayList<>();
 
-        for (ElitePower elitePower : eliteEntity.getElitePowers())
-            if (elitePower instanceof MinorPower)
-                if (eliteEntity.getPower(elitePower).getTrail() != null)
-                    effects.add(effectParser(eliteEntity.getPower(elitePower).getTrail()));
+        for (String trail : PowerStanceEffectSelector.selectTrails(eliteEntity, false))
+            effects.add(effectParser(trail));
 
         return effects;
 

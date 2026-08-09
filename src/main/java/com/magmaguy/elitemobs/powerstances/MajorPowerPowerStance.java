@@ -3,8 +3,6 @@ package com.magmaguy.elitemobs.powerstances;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
-import com.magmaguy.elitemobs.powers.meta.ElitePower;
-import com.magmaguy.elitemobs.powers.meta.MajorPower;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.Item;
@@ -28,6 +26,9 @@ public class MajorPowerPowerStance implements Listener {
         if (!MobCombatSettingsConfig.isEnableVisualEffectsForNaturalMobs())
             return;
         if (MobCombatSettingsConfig.isDisableVisualEffectsForSpawnerMobs() && !eliteEntity.isNaturalEntity())
+            return;
+        //The ring drops item entities in the elite's world, so there is nothing to build before the elite exists
+        if (eliteEntity.getLivingEntity() == null)
             return;
 
         this.eliteEntity = eliteEntity;
@@ -87,10 +88,8 @@ public class MajorPowerPowerStance implements Listener {
 
         ArrayList<Object> effects = new ArrayList<>();
 
-        for (ElitePower elitePower : eliteEntity.getElitePowers())
-            if (elitePower instanceof MajorPower)
-                if (eliteEntity.getPower(elitePower).getTrail() != null)
-                    effects.add(effectParser(eliteEntity.getPower(elitePower).getTrail()));
+        for (String trail : PowerStanceEffectSelector.selectTrails(eliteEntity, true))
+            effects.add(effectParser(trail));
 
         return effects;
 

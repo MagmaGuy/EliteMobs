@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.config.powers;
 
-import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import com.magmaguy.elitemobs.powers.scripts.caching.EliteScriptBlueprint;
@@ -144,6 +143,18 @@ public class PowersConfigFields extends CustomConfigFields {
     public void processAdditionalFields() {
     }
 
+    /**
+     * Null-safe classification of a power type into the major / minor buckets used by the power stance rings and by
+     * {@link com.magmaguy.elitemobs.mobconstructor.EliteEntity} when counting powers. Anything that isn't explicitly a
+     * MAJOR_* type counts as a minor power, which is how the counters have always behaved.
+     *
+     * @param powerType Power type to classify, may be null
+     * @return Whether the power type belongs to the major power bucket
+     */
+    public static boolean isMajorPowerType(PowerType powerType) {
+        return powerType != null && powerType.isMajor();
+    }
+
     public enum PowerType {
         OFFENSIVE,
         DEFENSIVE,
@@ -153,7 +164,15 @@ public class PowersConfigFields extends CustomConfigFields {
         MAJOR_BLAZE,
         MAJOR_ENDERMAN,
         MAJOR_GHAST,
-        UNIQUE
+        UNIQUE;
+
+        public boolean isMajor() {
+            return this == MAJOR_ZOMBIE ||
+                    this == MAJOR_SKELETON ||
+                    this == MAJOR_BLAZE ||
+                    this == MAJOR_ENDERMAN ||
+                    this == MAJOR_GHAST;
+        }
     }
 
 }

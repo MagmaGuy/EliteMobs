@@ -109,7 +109,7 @@ public class VisualItemProcessor {
 
             }
 
-        }.runTaskTimerAsynchronously(MetadataHandler.PLUGIN, 0, 5);
+        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 5);
 
     }
 
@@ -120,8 +120,8 @@ public class VisualItemProcessor {
 //        if (!item.isValid())
 //            return;
 
-        Location currentLocation = item.getLocation().clone();
-        Location newLocation = eliteEntity.getLivingEntity().getLocation().clone().add(new Vector(0, 1, 0)).add(vector);
+        Location currentLocation = item.getLocation();
+        Location newLocation = eliteEntity.getLivingEntity().getLocation().add(0, 1, 0).add(vector);
 
 //        if (currentLocation.distanceSquared(newLocation) > Math.pow(3, 2)) {
 //            item.teleport(newLocation);
