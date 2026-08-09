@@ -10,7 +10,7 @@ public class OasisMetaPack  extends ContentPackagesConfigFields {
     public OasisMetaPack() {
         super("oasis_meta_pack",
                 true,
-                "&2[025-055] The Oasis Adventure!",
+                "&2[020-055] The Oasis Adventure!",
                 new ArrayList<>(List.of("The tutorial adventure for players", "new to EliteMobs!")),
                 DiscordLinks.premiumMinidungeons,
                 new ArrayList<>(List.of(
