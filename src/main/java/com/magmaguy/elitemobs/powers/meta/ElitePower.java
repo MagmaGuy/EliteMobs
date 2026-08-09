@@ -135,12 +135,30 @@ public class ElitePower {
         });
     }
 
+    /**
+     * Validates a player hit for a power that may opt out of the cooldown system entirely.
+     * <p>
+     * {@code ignoreGlobalCooldown} has exactly one caller,
+     * {@link com.magmaguy.elitemobs.powers.meta.CustomSummonPower.CustomSummonPowerEvent#onHit}, and it exists so
+     * that ON_HIT reinforcements roll their own configured chance on every qualifying hit instead of queueing behind
+     * the boss's power rotation. The flag used to skip only {@link #isInGlobalCooldown()}, which is a per-power flag
+     * that {@link CustomSummonPower} never sets - so the flag was a no-op while the boss-wide cooldown below still
+     * rejected the hit.
+     * <p>
+     * That boss-wide flag is {@link EliteEntity#isInCooldown()}, set by {@link EliteEntity#doGlobalPowerCooldown(int)}
+     * whenever <i>any</i> other power fires: every {@link EliteScript} with a {@code Cooldowns.global} entry, and every
+     * Lua power calling {@code cooldowns.set_global(...)}. On a script-heavy boss those windows overlap almost
+     * continuously, so reinforcements were silently suppressed for most (on a busy boss, effectively all) of the fight,
+     * with no console output of any kind because the rejection happens before the summon is ever attempted.
+     *
+     * @param ignoreGlobalCooldown When true, no cooldown of any kind gates the hit
+     */
     protected static boolean eventIsValid(EliteMobDamagedByPlayerEvent event, ElitePower elitePower, boolean ignoreGlobalCooldown) {
         if (event.isCancelled()) return false;
         if (event.getEliteMobEntity().getLivingEntity() == null) return false;
         if (!event.getEliteMobEntity().getLivingEntity().hasAI()) return false;
-        if (!ignoreGlobalCooldown)
-            if (elitePower.isInGlobalCooldown()) return false;
+        if (ignoreGlobalCooldown) return true;
+        if (elitePower.isInGlobalCooldown()) return false;
         return !event.getEliteMobEntity().isInCooldown();
     }
 
@@ -172,6 +190,19 @@ public class ElitePower {
 
     public int getExecutionPriority() {
         return 0;
+    }
+
+    /**
+     * Since the Lua migration every power is either a {@link LuaElitePower} or an {@link EliteScript}, so the Java class
+     * of a power says nothing about whether it is a minor or a major power. The configured power type is the only
+     * reliable classification left, which is what the power stance rings filter on.
+     *
+     * @return The configured {@link PowersConfigFields.PowerType}, or null when the backing config isn't a power config
+     */
+    public PowersConfigFields.PowerType getPowerType() {
+        if (powersConfigFields instanceof PowersConfigFields fields)
+            return fields.getPowerType();
+        return null;
     }
 
     public static void registerConfiguredPower(PowersConfigFields configFields) {

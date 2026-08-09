@@ -15,11 +15,13 @@ import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEscapeMechanism;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.powers.specialpowers.EnderCrystalLightningRod;
+import com.magmaguy.elitemobs.utils.DebugMessage;
 import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -33,6 +35,14 @@ import static com.magmaguy.elitemobs.utils.MapListInterpreter.*;
 
 public class CustomSummonPower extends ElitePower implements Listener {
 
+    /**
+     * Tag for the reinforcement-summoning diagnostic trail. Everything emitted under it goes through
+     * {@link DebugMessage}, which is a no-op unless an admin has switched debug on with {@code /em debug}, so normal
+     * servers see nothing. Grep a submitted log for this tag to follow one hit from the damage listener all the way to
+     * the spawn call: it distinguishes "the ON_HIT listener never fired" from "a specific gate rejected the hit" from
+     * "the summon ran and the spawn silently produced no entity".
+     */
+    private static final String DEBUG_PREFIX = "[CustomSummon] ";
     private final List<CustomBossReinforcement> customBossReinforcements = new ArrayList<>();
     private final CustomBossesConfigFields customBossesConfigFields;
 
@@ -161,6 +171,12 @@ public class CustomSummonPower extends ElitePower implements Listener {
                     else {
                         customSpawn = parseString(entry.getKey(), entry.getValue(), customBossesConfigFields.getFilename());
                     }
+                    break;
+                case "difficultyid":
+                    //Valid key, but it is not consumed here: ElitePowerParser#parsePowers reads difficultyID and
+                    //drops the whole reinforcement entry before it ever reaches this parser when the instanced
+                    //dungeon's active difficulty doesn't match. Anything that gets here has already passed that
+                    //filter, so the key just has to be recognized instead of being reported as invalid.
                     break;
                 default:
                     Logger.warn("Invalid boss reinforcement!");
@@ -543,7 +559,21 @@ public class CustomSummonPower extends ElitePower implements Listener {
     }
 
     private void onHitSummonReinforcement(EliteEntity spawningEntity) {
+        if (DebugMessage.isAnyDebugEnabled())
+            DebugMessage.log(DEBUG_PREFIX + "onHitSummonReinforcement reached for " + customBossesConfigFields.getFilename()
+                    + " with " + customBossReinforcements.size() + " configured reinforcement entries");
         for (CustomBossReinforcement customBossReinforcement : customBossReinforcements) {
+            //Logged before the dispatch below so isSummoned still reflects the state that decided the outcome
+            if (DebugMessage.isAnyDebugEnabled()) {
+                if (!customBossReinforcement.summonType.equals(SummonType.ON_HIT)
+                        && !customBossReinforcement.summonType.equals(SummonType.ONCE))
+                    DebugMessage.log(DEBUG_PREFIX + "skipped entry " + customBossReinforcement.bossFileName
+                            + " : summon type is " + customBossReinforcement.summonType + " , not ON_HIT / ONCE");
+                else if (customBossReinforcement.summonType.equals(SummonType.ONCE) && customBossReinforcement.isSummoned)
+                    DebugMessage.log(DEBUG_PREFIX + "skipped entry " + customBossReinforcement.bossFileName
+                            + " : summon type ONCE and it has already been summoned");
+            }
+
             if (customBossReinforcement.summonType.equals(SummonType.ONCE) && !customBossReinforcement.isSummoned)
                 summonReinforcement(spawningEntity, customBossReinforcement);
 
@@ -597,8 +627,18 @@ public class CustomSummonPower extends ElitePower implements Listener {
     }
 
     private void summonReinforcement(EliteEntity eliteEntity, CustomBossReinforcement customBossReinforcement) {
-        if (customBossReinforcement.summonChance != null && ThreadLocalRandom.current().nextDouble() > customBossReinforcement.summonChance)
+        if (DebugMessage.isAnyDebugEnabled())
+            DebugMessage.log(DEBUG_PREFIX + "summonReinforcement reached for " + customBossesConfigFields.getFilename()
+                    + " -> " + customBossReinforcement.bossFileName
+                    + " (type=" + customBossReinforcement.summonType
+                    + ", amount=" + customBossReinforcement.amount
+                    + ", chance=" + customBossReinforcement.summonChance
+                    + ", summonerWorld=" + describeWorld(eliteEntity.getLocation()) + ")");
+        if (customBossReinforcement.summonChance != null && ThreadLocalRandom.current().nextDouble() > customBossReinforcement.summonChance) {
+            if (DebugMessage.isAnyDebugEnabled())
+                DebugMessage.log(DEBUG_PREFIX + "aborted: summonChance roll failed for " + customBossReinforcement.bossFileName);
             return;
+        }
         for (int i = 0; i < customBossReinforcement.amount; i++) {
             Location spawnLocation = eliteEntity.getLocation();
             if (customBossReinforcement.spawnLocationOffset != null) {
@@ -616,6 +656,10 @@ public class CustomSummonPower extends ElitePower implements Listener {
                     break;
                 }
 
+            if (DebugMessage.isAnyDebugEnabled())
+                DebugMessage.log(DEBUG_PREFIX + "resolved spawn location for " + customBossReinforcement.bossFileName
+                        + " : " + describeLocation(spawnLocation));
+
             if (CustomBossesConfig.getCustomBoss(customBossReinforcement.bossFileName).isRegionalBoss()) {
                 RegionalBossEntity regionalBossEntity = RegionalBossEntity.createTemporaryRegionalBossEntity(customBossReinforcement.bossFileName, spawnLocation);
                 if (regionalBossEntity == null) {
@@ -631,6 +675,9 @@ public class CustomSummonPower extends ElitePower implements Listener {
                 customBossReinforcement.isSummoned = true;
                 regionalBossEntity.setSummoningEntity(eliteEntity);
                 regionalBossEntity.initialize();
+                if (DebugMessage.isAnyDebugEnabled())
+                    DebugMessage.log(DEBUG_PREFIX + "queued regional reinforcement " + customBossReinforcement.bossFileName
+                            + " (regional bosses spawn through a delayed task, so a living entity is not expected yet)");
             } else {
                 CustomBossEntity customBossEntity = CustomBossEntity.createCustomBossEntity(customBossReinforcement.bossFileName);
                 if (customBossEntity == null) {
@@ -644,6 +691,11 @@ public class CustomSummonPower extends ElitePower implements Listener {
                 if (customBossReinforcement.inheritLevel)
                     customBossEntity.setLevel(eliteEntity.getLevel());
                 customBossEntity.spawn(false);
+                //Distinguishes "spawn was never attempted" from "spawn ran and silently produced nothing", which is
+                //what a protection plugin, an unloaded chunk or a rejected entity type looks like from out here.
+                if (DebugMessage.isAnyDebugEnabled())
+                    DebugMessage.log(DEBUG_PREFIX + "spawn() returned for " + customBossReinforcement.bossFileName
+                            + " , livingEntity=" + (customBossEntity.getLivingEntity() == null ? "null (spawn failed)" : "present"));
                 if (customBossEntity.getLivingEntity() != null)
                     customBossEntity.getLivingEntity().setVelocity(new Vector(ThreadLocalRandom.current().nextDouble(0.2), 0.2, ThreadLocalRandom.current().nextDouble(0.2)));
                 if (!customBossReinforcement.summonType.equals(SummonType.ON_DEATH))
@@ -652,6 +704,20 @@ public class CustomSummonPower extends ElitePower implements Listener {
                 customBossEntity.setSummoningEntity(eliteEntity);
             }
         }
+    }
+
+    /**
+     * Instanced dungeon worlds are the case this diagnostic exists for, so the world name is always worth printing.
+     */
+    private static String describeWorld(Location location) {
+        if (location == null) return "unknown world (null location)";
+        if (location.getWorld() == null) return "unknown world (null world)";
+        return location.getWorld().getName();
+    }
+
+    private static String describeLocation(Location location) {
+        if (location == null) return "null";
+        return describeWorld(location) + " " + location.getBlockX() + "," + location.getBlockY() + "," + location.getBlockZ();
     }
 
     private Location getFinalSpawnLocation(EliteEntity summoningEntity, Vector spawnLocationOffset) {
@@ -679,9 +745,65 @@ public class CustomSummonPower extends ElitePower implements Listener {
         public void onHit(EliteMobDamagedByPlayerEvent event) {
             CustomSummonPower customSummonPower = (CustomSummonPower) event.getEliteMobEntity().getPower("custom_summon.yml");
             if (customSummonPower == null) return;
-            if (!eventIsValid(event, customSummonPower, true)) return;
-            if (event.getDamage() < 3) return;
+            if (!eventIsValid(event, customSummonPower, true)) {
+                logOnHitGateRejection(event);
+                return;
+            }
+            if (event.getDamage() < 3) {
+                if (DebugMessage.isDebugEnabled(event.getPlayer()))
+                    logOnHitGate(event, "rejected: damage " + event.getDamage() + " is below the hard-coded 3 damage floor");
+                return;
+            }
+            logOnHitGate(event, "all gates passed, dispatching ON_HIT reinforcements");
             customSummonPower.onHitSummonReinforcement(event.getEliteMobEntity());
+        }
+
+        /**
+         * Reports which of {@code eventIsValid}'s conditions rejected the hit. The gates are evaluated in the same
+         * order as {@link ElitePower#eventIsValid(EliteMobDamagedByPlayerEvent, ElitePower, boolean)} so the reported
+         * reason is the one that actually short-circuited, not merely a condition that also happens to be true.
+         */
+        private static void logOnHitGateRejection(EliteMobDamagedByPlayerEvent event) {
+            if (!DebugMessage.isDebugEnabled(event.getPlayer())) return;
+            EliteEntity eliteEntity = event.getEliteMobEntity();
+            if (event.isCancelled()) {
+                logOnHitGate(event, "rejected: the damage event was cancelled");
+                return;
+            }
+            LivingEntity livingEntity = eliteEntity.getLivingEntity();
+            if (livingEntity == null) {
+                logOnHitGate(event, "rejected: the elite has no living entity");
+                return;
+            }
+            if (!livingEntity.hasAI()) {
+                logOnHitGate(event, "rejected: the living entity has AI disabled");
+                return;
+            }
+            logOnHitGate(event, "rejected: eventIsValid returned false but no individual gate reproduced it");
+        }
+
+        private static void logOnHitGate(EliteMobDamagedByPlayerEvent event, String outcome) {
+            if (!DebugMessage.isDebugEnabled(event.getPlayer())) return;
+            EliteEntity eliteEntity = event.getEliteMobEntity();
+            DebugMessage.log(event.getPlayer(), DEBUG_PREFIX + "ON_HIT gate for "
+                    + (eliteEntity instanceof CustomBossEntity customBossEntity
+                    ? customBossEntity.getCustomBossesConfigFields().getFilename()
+                    : eliteEntity.getName())
+                    + " in " + describeWorld(eliteEntity.getLocation()) + " : " + outcome);
+        }
+
+        /**
+         * The main {@link #onHit} handler is registered with {@code ignoreCancelled = true}, so a cancelled damage
+         * event never reaches it and cannot report itself as the reason nothing was summoned. This MONITOR-priority
+         * handler sees cancelled events and closes that blind spot, which is the difference between "the listener
+         * never fired" and "a gate rejected".
+         */
+        @EventHandler(priority = EventPriority.MONITOR)
+        public void onHitCancellationDiagnostic(EliteMobDamagedByPlayerEvent event) {
+            if (!DebugMessage.isAnyDebugEnabled()) return;
+            if (!event.isCancelled()) return;
+            if (event.getEliteMobEntity().getPower("custom_summon.yml") == null) return;
+            logOnHitGate(event, "rejected before the summon listener ran: the damage event was cancelled");
         }
 
         @EventHandler(ignoreCancelled = true)
