@@ -305,6 +305,8 @@ public class DungeonsConfig extends ConfigurationFile {
     private static String eventsSavingMessage;
     @Getter
     private static String eventsReloadingMessage;
+    @Getter
+    private static String contentConfigurationSaveFailedMessage;
 
     // Access info messages (EMPackage)
     @Getter
@@ -849,5 +851,8 @@ public class DungeonsConfig extends ConfigurationFile {
         eventsReloadingMessage = ConfigurationEngine.setString(
                 List.of("Sets the message shown when EliteMobs is reloading to apply event changes."),
                 file, fileConfiguration, "eventsReloadingMessage", "Reloading EliteMobs to apply event changes!", true);
+        contentConfigurationSaveFailedMessage = ConfigurationEngine.setString(
+                List.of("Sets the message shown when a content package configuration could not be saved."),
+                file, fileConfiguration, "contentConfigurationSaveFailedMessage", "&cCould not save all content configuration files. Check the console; EliteMobs was not reloaded.", true);
     }
 }
