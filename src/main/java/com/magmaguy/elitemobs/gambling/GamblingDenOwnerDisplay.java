@@ -28,6 +28,12 @@ public class GamblingDenOwnerDisplay {
      * Initializes the display updater task.
      */
     public static void initialize() {
+        if (updateTask != null) {
+            updateTask.cancel();
+            updateTask = null;
+        }
+        if (!GamblingConfig.isGamblingEnabled()) return;
+
         // Update display every second
         updateTask = new BukkitRunnable() {
             @Override
@@ -43,6 +49,7 @@ public class GamblingDenOwnerDisplay {
      * @param npcEntity The NPC entity
      */
     public static void createDisplay(NPCEntity npcEntity) {
+        if (!GamblingConfig.isGamblingEnabled()) return;
         if (npcEntity == null || npcEntity.getVillager() == null) return;
         if (!npcEntity.getNPCsConfigFields().getFilename().equals("gambling_den_owner.yml")) return;
 
@@ -81,6 +88,10 @@ public class GamblingDenOwnerDisplay {
      * Updates all house earnings displays.
      */
     private static void updateAllDisplays() {
+        if (!GamblingConfig.isGamblingEnabled()) {
+            shutdown();
+            return;
+        }
         String displayText = getDisplayText();
 
         earningsDisplays.entrySet().removeIf(entry -> {

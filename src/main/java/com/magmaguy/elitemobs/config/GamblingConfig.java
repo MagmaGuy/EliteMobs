@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.magmacore.config.ConfigurationFile;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 
 import java.util.List;
@@ -419,56 +420,76 @@ public class GamblingConfig extends ConfigurationFile {
         minBet = ConfigurationEngine.setInt(
                 List.of("Minimum bet amount for all gambling games."),
                 fileConfiguration, "minBet", 10);
+        minBet = requirePositiveInt("minBet", minBet, 10);
 
         // Debt Collector settings
         debtCollectorSpawnChance = ConfigurationEngine.setDouble(
                 List.of("Chance (0.0 to 1.0) that the Debt Collector will spawn during each check.",
                         "0.5 = 50% chance each check."),
                 fileConfiguration, "debtCollector.spawnChance", 0.5);
+        debtCollectorSpawnChance = requireProbability(
+                "debtCollector.spawnChance", debtCollectorSpawnChance, 0.5);
 
         debtCollectorCheckIntervalMinutes = ConfigurationEngine.setInt(
                 List.of("How often (in minutes) to check if the Debt Collector should spawn for players in debt."),
                 fileConfiguration, "debtCollector.checkIntervalMinutes", 60);
+        debtCollectorCheckIntervalMinutes = requirePositiveInt(
+                "debtCollector.checkIntervalMinutes", debtCollectorCheckIntervalMinutes, 60);
 
         debtCollectorTimeoutSeconds = ConfigurationEngine.setInt(
                 List.of("How long (in seconds) before the Debt Collector despawns if not killed."),
                 fileConfiguration, "debtCollector.timeoutSeconds", 600);
+        debtCollectorTimeoutSeconds = requirePositiveInt(
+                "debtCollector.timeoutSeconds", debtCollectorTimeoutSeconds, 600);
 
         debtReductionOnPlayerDeath = ConfigurationEngine.setDouble(
                 List.of("Amount of debt reduced when the Debt Collector kills a player.",
                         "The player 'paid' with their life."),
                 fileConfiguration, "debtCollector.debtReductionOnPlayerDeath", 50.0);
+        debtReductionOnPlayerDeath = requireNonNegativeFinite(
+                "debtCollector.debtReductionOnPlayerDeath", debtReductionOnPlayerDeath, 50.0);
 
         // Payout multipliers
         blackjackPayoutNormal = ConfigurationEngine.setDouble(
                 List.of("Payout multiplier for a normal blackjack win (not a blackjack)."),
                 fileConfiguration, "payouts.blackjack.normal", 2.0);
+        blackjackPayoutNormal = requireNonNegativeFinite(
+                "payouts.blackjack.normal", blackjackPayoutNormal, 2.0);
 
         blackjackPayoutBlackjack = ConfigurationEngine.setDouble(
                 List.of("Payout multiplier for getting a blackjack (21 with first two cards)."),
                 fileConfiguration, "payouts.blackjack.blackjack", 2.5);
+        blackjackPayoutBlackjack = requireNonNegativeFinite(
+                "payouts.blackjack.blackjack", blackjackPayoutBlackjack, 2.5);
 
         coinFlipPayout = ConfigurationEngine.setDouble(
                 List.of("Payout multiplier for winning a coin flip.",
                         "Set below 2.0 for house edge (1.9 = 5% house edge)."),
                 fileConfiguration, "payouts.coinFlip", 1.9);
+        coinFlipPayout = requireNonNegativeFinite("payouts.coinFlip", coinFlipPayout, 1.9);
 
         coinFlipEdgeChance = ConfigurationEngine.setDouble(
                 List.of("Chance (0.0 to 1.0) for the coin to land on its edge (bonus win).",
                         "Default 0.01 = 1% chance. Set to 0.0 to disable the edge mechanic."),
                 fileConfiguration, "payouts.coinFlip.edgeChance", 0.01);
+        coinFlipEdgeChance = requireProbability(
+                "payouts.coinFlip.edgeChance", coinFlipEdgeChance, 0.01);
 
         coinFlipEdgePayout = ConfigurationEngine.setDouble(
                 List.of("Payout multiplier when the coin lands on its edge.",
                         "Combined with the edge chance and normal payout, this determines the overall house edge.",
                         "With 1% edge chance and 1.9x normal payout: 5.0x edge = ~1% house edge, 10.0x edge = ~4% player edge."),
                 fileConfiguration, "payouts.coinFlip.edgePayout", 5.0);
+        coinFlipEdgePayout = requireNonNegativeFinite(
+                "payouts.coinFlip.edgePayout", coinFlipEdgePayout, 5.0);
 
         higherLowerMultiplier = ConfigurationEngine.setDouble(
                 List.of("Multiplier applied to the bet for each correct guess in Higher/Lower.",
                         "This stacks: 1st correct = 1.3x, 2nd = 1.69x, 3rd = 2.197x, etc.",
                         "With ~71% average win rate per guess: 1.3x = ~7.7% house edge, 1.5x = ~6.5% player edge."),
                 fileConfiguration, "payouts.higherLower.multiplierV2", 1.3);
+        higherLowerMultiplier = requireNonNegativeFinite(
+                "payouts.higherLower.multiplierV2", higherLowerMultiplier, 1.3);
 
         // Messages
         insufficientFundsMessage = ConfigurationEngine.setString(
@@ -1179,5 +1200,34 @@ public class GamblingConfig extends ConfigurationFile {
         bettingHigherLowerDescription = ConfigurationEngine.setString(
                 List.of("Description for the Higher or Lower game type."),
                 file, fileConfiguration, "betting.higherLowerDescription", "Guess if the next card is higher or lower!", true);
+    }
+
+    private int requirePositiveInt(String path, int value, int fallback) {
+        if (value > 0) return value;
+        return replaceInvalid(path, value, fallback, "a positive whole number");
+    }
+
+    private double requireProbability(String path, double value, double fallback) {
+        if (Double.isFinite(value) && value >= 0.0 && value <= 1.0) return value;
+        return replaceInvalid(path, value, fallback, "a finite number between 0 and 1");
+    }
+
+    private double requireNonNegativeFinite(String path, double value, double fallback) {
+        if (Double.isFinite(value) && value >= 0.0) return value;
+        return replaceInvalid(path, value, fallback, "a finite non-negative number");
+    }
+
+    private int replaceInvalid(String path, int value, int fallback, String requirement) {
+        Logger.warn("Invalid GamblingSettings.yml value for " + path + " (" + value + "); expected "
+                + requirement + ". Using " + fallback + ".");
+        fileConfiguration.set(path, fallback);
+        return fallback;
+    }
+
+    private double replaceInvalid(String path, double value, double fallback, String requirement) {
+        Logger.warn("Invalid GamblingSettings.yml value for " + path + " (" + value + "); expected "
+                + requirement + ". Using " + fallback + ".");
+        fileConfiguration.set(path, fallback);
+        return fallback;
     }
 }

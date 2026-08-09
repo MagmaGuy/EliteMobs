@@ -42,6 +42,12 @@ public class DebtCollectorManager implements Listener {
      * Initializes the Debt Collector system.
      */
     public static void initialize() {
+        if (checkTask != null) {
+            checkTask.cancel();
+            checkTask = null;
+        }
+        if (!GamblingConfig.isGamblingEnabled()) return;
+
         int checkIntervalMinutes = GamblingConfig.getDebtCollectorCheckIntervalMinutes();
         long checkIntervalTicks = 20L * 60L * checkIntervalMinutes;
 
@@ -59,6 +65,7 @@ public class DebtCollectorManager implements Listener {
      * Checks if a Debt Collector should spawn for a player and spawns one if conditions are met.
      */
     private static void checkAndSpawnDebtCollector(Player player) {
+        if (!GamblingConfig.isGamblingEnabled() || player == null || !player.isOnline()) return;
         UUID uuid = player.getUniqueId();
 
         // Must be in debt
@@ -94,6 +101,8 @@ public class DebtCollectorManager implements Listener {
      * Spawns a Debt Collector for a specific player.
      */
     public static void spawnDebtCollector(Player player) {
+        if (!GamblingConfig.isGamblingEnabled() || player == null || !player.isOnline()) return;
+
         // Find spawn location near player
         Location spawnLoc = findSpawnLocation(player);
         if (spawnLoc == null) {

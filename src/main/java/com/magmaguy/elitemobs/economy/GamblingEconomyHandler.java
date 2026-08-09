@@ -1,7 +1,9 @@
 package com.magmaguy.elitemobs.economy;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.GamblingConfig;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
+import com.magmaguy.magmacore.util.Logger;
 import com.magmaguy.magmacore.util.Round;
 import lombok.Getter;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -46,12 +48,17 @@ public class GamblingEconomyHandler {
      * Loads saved earnings from disk.
      */
     public static void initialize() {
+        unresolvedGames.clear();
+        if (!GamblingConfig.isGamblingEnabled()) return;
+
         houseDataFile = new File(MetadataHandler.PLUGIN.getDataFolder(), "house_earnings.yml");
         if (!houseDataFile.exists()) {
             try {
-                houseDataFile.createNewFile();
+                if (!houseDataFile.createNewFile()) {
+                    Logger.warn("Could not create house_earnings.yml; gambling totals will not persist.");
+                }
             } catch (IOException e) {
-                e.printStackTrace();
+                Logger.warn("Could not create house_earnings.yml: " + e.getMessage());
             }
         }
         houseDataConfig = YamlConfiguration.loadConfiguration(houseDataFile);
@@ -67,7 +74,7 @@ public class GamblingEconomyHandler {
         try {
             houseDataConfig.save(houseDataFile);
         } catch (IOException e) {
-            e.printStackTrace();
+            Logger.warn("Could not save house_earnings.yml: " + e.getMessage());
         }
     }
 
@@ -77,6 +84,7 @@ public class GamblingEconomyHandler {
      * @param amount The amount the house won
      */
     public static void recordHouseWin(double amount) {
+        if (!isPositiveAmount(amount)) return;
         houseEarnings += amount;
         saveHouseEarnings();
     }
@@ -87,6 +95,7 @@ public class GamblingEconomyHandler {
      * @param amount The amount the house lost
      */
     public static void recordHouseLoss(double amount) {
+        if (!isPositiveAmount(amount)) return;
         houseEarnings -= amount;
         saveHouseEarnings();
     }
@@ -120,10 +129,14 @@ public class GamblingEconomyHandler {
      * @return true if they can afford it (including credit)
      */
     public static boolean canAffordBet(UUID uuid, double betAmount) {
+        if (!GamblingConfig.isGamblingEnabled() || uuid == null) return false;
+        betAmount = Round.twoDecimalPlaces(betAmount);
+        if (!isPositiveAmount(betAmount)) return false;
         double balance = EconomyHandler.checkCurrency(uuid);
         double currentDebt = PlayerData.getGamblingDebt(uuid);
         double availableCredit = MAX_DEBT - currentDebt;
-        return (balance + availableCredit) >= betAmount;
+        double spendingPower = balance + availableCredit;
+        return Double.isFinite(spendingPower) && spendingPower >= betAmount;
     }
 
     /**
@@ -133,10 +146,12 @@ public class GamblingEconomyHandler {
      * @return The maximum amount they can bet
      */
     public static double getMaxBet(UUID uuid) {
+        if (!GamblingConfig.isGamblingEnabled() || uuid == null) return 0;
         double balance = EconomyHandler.checkCurrency(uuid);
         double currentDebt = PlayerData.getGamblingDebt(uuid);
         double availableCredit = MAX_DEBT - currentDebt;
-        return balance + availableCredit;
+        double maxBet = balance + availableCredit;
+        return Double.isFinite(maxBet) ? Math.max(0, maxBet) : 0;
     }
 
     /**
@@ -146,8 +161,10 @@ public class GamblingEconomyHandler {
      * @return The available credit amount
      */
     public static double getAvailableCredit(UUID uuid) {
+        if (!GamblingConfig.isGamblingEnabled() || uuid == null) return 0;
         double currentDebt = PlayerData.getGamblingDebt(uuid);
-        return Math.max(0, MAX_DEBT - currentDebt);
+        double availableCredit = MAX_DEBT - currentDebt;
+        return Double.isFinite(availableCredit) ? Math.max(0, availableCredit) : 0;
     }
 
     /**
@@ -159,11 +176,11 @@ public class GamblingEconomyHandler {
      * @return true if the bet was successfully placed, false if they can't afford it
      */
     public static boolean placeBet(UUID uuid, double betAmount) {
+        betAmount = Round.twoDecimalPlaces(betAmount);
         if (!canAffordBet(uuid, betAmount)) {
             return false;
         }
 
-        betAmount = Round.twoDecimalPlaces(betAmount);
         double balance = EconomyHandler.checkCurrency(uuid);
 
         if (balance >= betAmount) {
@@ -203,8 +220,10 @@ public class GamblingEconomyHandler {
      * @return The actual amount awarded (0 if already resolved or loss)
      */
     public static double resolveOutcome(UUID uuid, double payoutAmount) {
+        if (uuid == null) return 0;
         if (!unresolvedGames.remove(uuid)) return 0; // Already resolved or no active game
-        if (payoutAmount > 0) {
+        payoutAmount = Round.twoDecimalPlaces(payoutAmount);
+        if (isPositiveAmount(payoutAmount)) {
             awardWinnings(uuid, payoutAmount);
             return payoutAmount;
         }
@@ -219,7 +238,9 @@ public class GamblingEconomyHandler {
      * @param amount The amount won (including original bet if applicable)
      */
     public static void awardWinnings(UUID uuid, double amount) {
+        if (uuid == null) return;
         amount = Round.twoDecimalPlaces(amount);
+        if (!isPositiveAmount(amount)) return;
 
         // House pays out the winnings
         recordHouseLoss(amount);
@@ -293,6 +314,12 @@ public class GamblingEconomyHandler {
      * @return The total payout amount
      */
     public static double calculatePayout(double betAmount, double multiplier) {
-        return Round.twoDecimalPlaces(betAmount * multiplier);
+        if (!isPositiveAmount(betAmount) || !Double.isFinite(multiplier) || multiplier < 0) return 0;
+        double payout = Round.twoDecimalPlaces(betAmount * multiplier);
+        return Double.isFinite(payout) && payout >= 0 ? payout : 0;
+    }
+
+    private static boolean isPositiveAmount(double amount) {
+        return Double.isFinite(amount) && amount > 0;
     }
 }
