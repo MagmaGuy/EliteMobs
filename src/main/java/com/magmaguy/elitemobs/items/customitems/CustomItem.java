@@ -16,6 +16,7 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 
@@ -40,6 +41,10 @@ public class CustomItem {
     private static final List<CustomItem> scalableItems = new ArrayList<>();
     @Getter
     private static final HashMap<Integer, ArrayList<CustomItem>> limitedItems = new HashMap<>();
+    private static final CacheRegenerationLifecycle cacheRegenerationLifecycle = new CacheRegenerationLifecycle();
+    private static final Object cacheTaskLock = new Object();
+    private static TrackedCacheTask cacheRegenerationTask;
+    private static TrackedCacheTask cacheSwapTask;
     @Getter
     private final CustomItemsConfigFields customItemsConfigFields;
     @Getter
@@ -162,37 +167,223 @@ public class CustomItem {
      * Call this after all plugins have finished loading to ensure custom skins are applied.
      */
     public static void regenerateCachedItemStacks() {
-        // Clear existing cached ItemStacks
-        customItemStackList.clear();
-        customItemStackShopList.clear();
-        tieredLoot.clear();
-        weighedFixedItems.clear();
+        //Rebuilt off the main thread, then swapped in on it.
+        //
+        //Every item here is constructed from scratch, and constructing one rewrites its whole lore,
+        //which recalculates DPS, attack speed and defence. On a server with a few hundred custom
+        //items that added up to enough main-thread time for Paper's watchdog to start dumping
+        //threads mid-startup. The same construction already runs off the main thread when items are
+        //first loaded, so doing it here too is not new ground.
+        //
+        //The caches are populated by that earlier load, so they stay usable throughout: this only
+        //refreshes them with resource-pack models that were not available yet at that point. Worst
+        //case, an item shows its pre-pack appearance for a moment longer.
+        CacheRegenerationLifecycle.Attempt<CustomItem> attempt = cacheRegenerationLifecycle.beginIf(
+                () -> !com.magmaguy.elitemobs.MetadataHandler.shutdownRequested
+                        && com.magmaguy.elitemobs.MetadataHandler.PLUGIN != null
+                        && com.magmaguy.elitemobs.MetadataHandler.PLUGIN.isEnabled(),
+                () -> customItems.values());
+        if (attempt == null) return;
 
-        // Regenerate all cached ItemStacks with proper skins
-        for (CustomItem customItem : customItems.values()) {
-            if (customItem.getCustomItemsConfigFields() == null || !customItem.getCustomItemsConfigFields().isEnabled())
-                continue;
-            if (customItem.getCustomItemsConfigFields().getMaterial() == null) continue;
+        //Starting a newer rebuild makes any older worker/swap stale.
+        cancelTrackedCacheTasks();
 
-            // Regenerate loot menu items
-            customItemStackList.add(customItem.generateDefaultsItemStack(null, false, null));
-            if (!isShopExcluded(customItem.getItemType()))
-                customItemStackShopList.add(customItem.generateDefaultsItemStack(null, true, null));
-
-            // Regenerate tiered loot
-            ItemStack itemStack = customItem.generateDefaultsItemStack(null, false, null);
-            int itemTier = customItem.getItemLevel();
-            if (tieredLoot.get(itemTier) == null)
-                tieredLoot.put(itemTier, new ArrayList<>(Collections.singletonList(itemStack)));
-            else
-                tieredLoot.get(itemTier).add(itemStack);
-
-            // Regenerate weighed fixed items
-            if (customItem.getScalability() == Scalability.FIXED && customItem.getDropWeight() > 0) {
-                ItemStack weighedStack = customItem.generateDefaultsItemStack(null, false, null);
-                weighedFixedItems.put(weighedStack, customItem.getDropWeight());
+        BukkitTask scheduledTask;
+        try {
+            scheduledTask = org.bukkit.Bukkit.getScheduler().runTaskAsynchronously(
+                    com.magmaguy.elitemobs.MetadataHandler.PLUGIN,
+                    () -> rebuildCachedItemStacks(attempt));
+        } catch (RuntimeException exception) {
+            if (cacheRegenerationLifecycle.isCurrent(attempt.generation())
+                    && !com.magmaguy.elitemobs.MetadataHandler.shutdownRequested) {
+                Logger.warn("Failed to schedule the cached item stack refresh.");
+                exception.printStackTrace();
             }
+            return;
         }
+
+        if (!trackCacheTask(attempt.generation(), scheduledTask, true))
+            scheduledTask.cancel();
+    }
+
+    private static void rebuildCachedItemStacks(CacheRegenerationLifecycle.Attempt<CustomItem> attempt) {
+        try {
+            ArrayList<ItemStack> rebuiltItemStackList = new ArrayList<>();
+            ArrayList<ItemStack> rebuiltItemStackShopList = new ArrayList<>();
+            HashMap<Integer, ArrayList<ItemStack>> rebuiltTieredLoot = new HashMap<>();
+            HashMap<ItemStack, Double> rebuiltWeighedFixedItems = new HashMap<>();
+
+            try {
+                if (!buildCachedItemStacks(
+                        attempt,
+                        rebuiltItemStackList,
+                        rebuiltItemStackShopList,
+                        rebuiltTieredLoot,
+                        rebuiltWeighedFixedItems))
+                    return;
+            } catch (Exception exception) {
+                //Existing caches are left alone, so the server keeps the items it already had.
+                if (cacheRegenerationLifecycle.isCurrent(attempt.generation())
+                        && !com.magmaguy.elitemobs.MetadataHandler.shutdownRequested) {
+                    Logger.warn("Failed to refresh the cached item stacks; items will keep the appearance they were first built with.");
+                    exception.printStackTrace();
+                }
+                return;
+            }
+
+            if (!cacheRegenerationLifecycle.isCurrent(attempt.generation())) return;
+
+            BukkitTask scheduledSwap;
+            try {
+                scheduledSwap = org.bukkit.Bukkit.getScheduler().runTask(
+                        com.magmaguy.elitemobs.MetadataHandler.PLUGIN,
+                        () -> applyRebuiltItemStacks(
+                                attempt.generation(),
+                                rebuiltItemStackList,
+                                rebuiltItemStackShopList,
+                                rebuiltTieredLoot,
+                                rebuiltWeighedFixedItems));
+            } catch (RuntimeException exception) {
+                if (cacheRegenerationLifecycle.isCurrent(attempt.generation())
+                        && !com.magmaguy.elitemobs.MetadataHandler.shutdownRequested) {
+                    Logger.warn("Failed to apply the refreshed cached item stacks.");
+                    exception.printStackTrace();
+                }
+                return;
+            }
+
+            if (!trackCacheTask(attempt.generation(), scheduledSwap, false))
+                scheduledSwap.cancel();
+        } finally {
+            clearTrackedCacheTask(attempt.generation(), true);
+        }
+    }
+
+    private static boolean buildCachedItemStacks(CacheRegenerationLifecycle.Attempt<CustomItem> attempt,
+                                                 ArrayList<ItemStack> itemStackList,
+                                                 ArrayList<ItemStack> itemStackShopList,
+                                                 HashMap<Integer, ArrayList<ItemStack>> tieredLootTarget,
+                                                 HashMap<ItemStack, Double> weighedFixedItemsTarget) {
+        // Regenerate all cached ItemStacks with proper skins
+        for (CustomItem customItem : attempt.snapshot())
+            if (!cacheRegenerationLifecycle.runIfCurrent(
+                    attempt.generation(),
+                    () -> appendCachedItemStacks(
+                            customItem,
+                            itemStackList,
+                            itemStackShopList,
+                            tieredLootTarget,
+                            weighedFixedItemsTarget)))
+                return false;
+
+        return cacheRegenerationLifecycle.isCurrent(attempt.generation());
+    }
+
+    private static void appendCachedItemStacks(CustomItem customItem,
+                                               ArrayList<ItemStack> itemStackList,
+                                               ArrayList<ItemStack> itemStackShopList,
+                                               HashMap<Integer, ArrayList<ItemStack>> tieredLootTarget,
+                                               HashMap<ItemStack, Double> weighedFixedItemsTarget) {
+        if (customItem.getCustomItemsConfigFields() == null || !customItem.getCustomItemsConfigFields().isEnabled())
+            return;
+        if (customItem.getCustomItemsConfigFields().getMaterial() == null) return;
+
+        //Built once and copied, rather than built three times. This is the same call with the
+        //same arguments each time and the result is deterministic, so the extra two builds were
+        //producing identical stacks at full price — and that price is high, since constructing
+        //an item rewrites its whole lore, which recalculates DPS, attack speed and defence.
+        //Copies rather than one shared instance, so each list still owns a separate stack the
+        //way it did before.
+        ItemStack defaultsItemStack = customItem.generateDefaultsItemStack(null, false, null);
+
+        // Regenerate loot menu items
+        itemStackList.add(defaultsItemStack);
+        if (!isShopExcluded(customItem.getItemType()))
+            itemStackShopList.add(customItem.generateDefaultsItemStack(null, true, null));
+
+        // Regenerate tiered loot
+        ItemStack itemStack = defaultsItemStack.clone();
+        int itemTier = customItem.getItemLevel();
+        if (tieredLootTarget.get(itemTier) == null)
+            tieredLootTarget.put(itemTier, new ArrayList<>(Collections.singletonList(itemStack)));
+        else
+            tieredLootTarget.get(itemTier).add(itemStack);
+
+        // Regenerate weighed fixed items
+        if (customItem.getScalability() == Scalability.FIXED && customItem.getDropWeight() > 0) {
+            ItemStack weighedStack = defaultsItemStack.clone();
+            weighedFixedItemsTarget.put(weighedStack, customItem.getDropWeight());
+        }
+    }
+
+    private static void applyRebuiltItemStacks(long generation,
+                                               ArrayList<ItemStack> rebuiltItemStackList,
+                                               ArrayList<ItemStack> rebuiltItemStackShopList,
+                                               HashMap<Integer, ArrayList<ItemStack>> rebuiltTieredLoot,
+                                               HashMap<ItemStack, Double> rebuiltWeighedFixedItems) {
+        try {
+            cacheRegenerationLifecycle.runIfCurrent(generation, () -> {
+                //Refilled in place inside one main-thread task, so no main-thread reader ever observes a partially built cache. The collections are static final and aliased via their getters, so the references themselves must not be swapped.
+                customItemStackList.clear();
+                customItemStackList.addAll(rebuiltItemStackList);
+                customItemStackShopList.clear();
+                customItemStackShopList.addAll(rebuiltItemStackShopList);
+                tieredLoot.clear();
+                tieredLoot.putAll(rebuiltTieredLoot);
+                weighedFixedItems.clear();
+                weighedFixedItems.putAll(rebuiltWeighedFixedItems);
+            });
+        } finally {
+            clearTrackedCacheTask(generation, false);
+        }
+    }
+
+    /**
+     * Invalidates the active rebuild, waits for any currently constructed item to finish,
+     * and cancels both the worker and a queued main-thread cache swap.
+     */
+    public static void shutdownCacheRegeneration() {
+        cacheRegenerationLifecycle.cancel();
+        cancelTrackedCacheTasks();
+    }
+
+    private static boolean trackCacheTask(long generation, BukkitTask task, boolean regenerationTask) {
+        return cacheRegenerationLifecycle.runIfCurrent(generation, () -> {
+            synchronized (cacheTaskLock) {
+                TrackedCacheTask trackedCacheTask = new TrackedCacheTask(generation, task);
+                if (regenerationTask)
+                    cacheRegenerationTask = trackedCacheTask;
+                else
+                    cacheSwapTask = trackedCacheTask;
+            }
+        });
+    }
+
+    private static void clearTrackedCacheTask(long generation, boolean regenerationTask) {
+        synchronized (cacheTaskLock) {
+            TrackedCacheTask trackedCacheTask = regenerationTask ? cacheRegenerationTask : cacheSwapTask;
+            if (trackedCacheTask == null || trackedCacheTask.generation() != generation) return;
+            if (regenerationTask)
+                cacheRegenerationTask = null;
+            else
+                cacheSwapTask = null;
+        }
+    }
+
+    private static void cancelTrackedCacheTasks() {
+        TrackedCacheTask regenerationTask;
+        TrackedCacheTask swapTask;
+        synchronized (cacheTaskLock) {
+            regenerationTask = cacheRegenerationTask;
+            swapTask = cacheSwapTask;
+            cacheRegenerationTask = null;
+            cacheSwapTask = null;
+        }
+        if (regenerationTask != null) regenerationTask.task().cancel();
+        if (swapTask != null) swapTask.task().cancel();
+    }
+
+    private record TrackedCacheTask(long generation, BukkitTask task) {
     }
 
     public static int limitItemLevel(Player player, int originalLevel) {

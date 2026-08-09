@@ -11,6 +11,7 @@ import com.magmaguy.elitemobs.collateralminecraftchanges.KeepNeutralsAngry;
 import com.magmaguy.elitemobs.collateralminecraftchanges.PlayerDeathMessageByEliteMob;
 import com.magmaguy.elitemobs.commands.CommandHandler;
 import com.magmaguy.elitemobs.combatsystem.LevelScaling;
+import com.magmaguy.elitemobs.combatsystem.antiexploit.AutoclickerThrottle;
 import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.config.commands.CommandsConfig;
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfig;
@@ -79,6 +80,8 @@ import com.magmaguy.elitemobs.powers.scripts.ScriptAction;
 import com.magmaguy.elitemobs.powers.scripts.ScriptListener;
 import com.magmaguy.elitemobs.powers.scripts.caching.EliteScriptBlueprint;
 import com.magmaguy.elitemobs.powers.specialpowers.TrackingFireballSupport;
+import com.magmaguy.elitemobs.powers.specialpowers.SpiritWalkSupport;
+import com.magmaguy.elitemobs.powers.specialpowers.ZombieNecronomiconSupport;
 import com.magmaguy.elitemobs.powerstances.MajorPowerStanceMath;
 import com.magmaguy.elitemobs.powerstances.MinorPowerStanceMath;
 import com.magmaguy.elitemobs.quests.DynamicQuest;
@@ -206,6 +209,7 @@ public class EliteMobs extends JavaPlugin {
         Bukkit.getLogger().info("By MagmaGuy - v. " + MetadataHandler.PLUGIN.getDescription().getVersion());
 
         MagmaCore.onEnable(this);
+        com.magmaguy.magmacore.menus.NightbreakSetupIcons.setAdditionalResourcePackAvailableSupplier(DefaultConfig::useResourcePackModels);
         MagmaCore.exportSharedAssets(this);
         MagmaCore.enableWorldProtections(this);
         com.magmaguy.magmacore.instance.InstanceProtector.setContainerAllowlist(
@@ -280,7 +284,7 @@ public class EliteMobs extends JavaPlugin {
         //Initialize importer before loading content configs so that newly imported
         //files are on disk when the config classes scan for them.
         initializationContext.step("Content Importer");
-        MagmaCore.initializeImporter(this);
+        waitForModelRegistryRebuild(MagmaCore.initializeImporter(this));
         initializationContext.step("Custom Items");
         new CustomItemsConfig();
         CustomItem.initializeCustomItems();
@@ -302,6 +306,73 @@ public class EliteMobs extends JavaPlugin {
         new CustomQuestsConfig();
         initializationContext.step("Special Items Config");
         new SpecialItemSystemsConfig();
+    }
+
+    private static final String MODELS_PLUGIN = "FreeMinecraftModels";
+    // How long to let FreeMinecraftModels finish rebuilding before giving up and carrying on.
+    private static final long MODEL_REGISTRY_TIMEOUT_MS = 15_000L;
+    // How long to wait for the rebuild to even START. The importer fires the event and returns
+    // immediately, so FreeMinecraftModels may not have flipped to INITIALIZING yet; without this
+    // grace window the readiness check would pass instantly and the wait would be useless.
+    private static final long MODEL_REGISTRY_START_GRACE_MS = 2_000L;
+    private static final long MODEL_REGISTRY_POLL_MS = 100L;
+
+    /**
+     * Blocks the async initialization thread until FreeMinecraftModels has finished rebuilding its
+     * model registry, but only when this boot actually installed models.
+     * <p>
+     * The importer moves a DLC's models into FreeMinecraftModels and fires ModelInstallationEvent,
+     * which triggers an ASYNCHRONOUS registry rebuild. EliteMobs' dependency gate already ran long
+     * before that, so nothing stops the sync phase from spawning modelled bosses and wormholes while
+     * the registry is empty - they spawn without their model, get silently dropped, and are never
+     * retried. That is why a fresh install showed no training dummies and no portal until a restart:
+     * on the second boot there is nothing left to import, so no rebuild and no race.
+     * <p>
+     * This must stay on the async thread. The sync phase runs as a single main-thread task with no
+     * tick boundaries, so waiting there would freeze the server and risk tripping the watchdog.
+     * Timing out is deliberate: carrying on degrades to exactly the old behaviour, whereas waiting
+     * forever on a crashed or missing FreeMinecraftModels would hang startup, which is far worse.
+     */
+    private void waitForModelRegistryRebuild(com.magmaguy.magmacore.dlc.ConfigurationImporter importer) {
+        if (importer == null || !importer.isModelsInstalled()) return;
+
+        long deadline = System.currentTimeMillis() + MODEL_REGISTRY_START_GRACE_MS;
+        boolean rebuildObserved = false;
+        while (System.currentTimeMillis() < deadline) {
+            if (!com.magmaguy.magmacore.initialization.PluginInitializationManager.isPluginReady(MODELS_PLUGIN)) {
+                rebuildObserved = true;
+                break;
+            }
+            if (!sleepQuietly(MODEL_REGISTRY_POLL_MS)) return;
+        }
+        // Never went busy - either the rebuild already finished or FreeMinecraftModels is not
+        // installed, and isPluginReady treats an absent plugin as ready. Either way, nothing to wait for.
+        if (!rebuildObserved) return;
+
+        Logger.info("Imported new models; waiting for " + MODELS_PLUGIN + " to rebuild its model registry...");
+        deadline = System.currentTimeMillis() + MODEL_REGISTRY_TIMEOUT_MS;
+        while (System.currentTimeMillis() < deadline) {
+            if (com.magmaguy.magmacore.initialization.PluginInitializationManager.isPluginReady(MODELS_PLUGIN)) {
+                Logger.info(MODELS_PLUGIN + " finished rebuilding its model registry.");
+                return;
+            }
+            if (!sleepQuietly(MODEL_REGISTRY_POLL_MS)) return;
+        }
+        Logger.warn("Timed out after " + (MODEL_REGISTRY_TIMEOUT_MS / 1000) + "s waiting for " + MODELS_PLUGIN
+                + " to rebuild its model registry. Continuing startup anyway. Custom-modeled bosses, NPCs and "
+                + "wormholes from newly imported content may spawn without their models until the server is "
+                + "restarted - restarting resolves it because there is nothing left to import on the next boot.");
+    }
+
+    /** @return false if the thread was interrupted, in which case the caller should stop waiting. */
+    private boolean sleepQuietly(long millis) {
+        try {
+            Thread.sleep(millis);
+            return true;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return false;
+        }
     }
 
     private void syncInitialization(PluginInitializationContext initializationContext) {
@@ -351,9 +422,11 @@ public class EliteMobs extends JavaPlugin {
 
         //Initialize gambling system
         initializationContext.step("Gambling System");
-        com.magmaguy.elitemobs.economy.GamblingEconomyHandler.initialize();
-        com.magmaguy.elitemobs.gambling.DebtCollectorManager.initialize();
-        com.magmaguy.elitemobs.gambling.GamblingDenOwnerDisplay.initialize();
+        if (GamblingConfig.isGamblingEnabled()) {
+            com.magmaguy.elitemobs.economy.GamblingEconomyHandler.initialize();
+            com.magmaguy.elitemobs.gambling.DebtCollectorManager.initialize();
+            com.magmaguy.elitemobs.gambling.GamblingDenOwnerDisplay.initialize();
+        }
 
         //Get world list
         initializationContext.step("World Scanner");
@@ -401,6 +474,7 @@ public class EliteMobs extends JavaPlugin {
             if (!(pkg instanceof com.magmaguy.elitemobs.dungeons.WorldPackage)) return java.util.Collections.emptySet();
             java.util.Set<String> kinds = new java.util.HashSet<>();
             kinds.add("elitemobs");
+            kinds.add("dungeon");
             kinds.add("world_package");
             if (pkg instanceof com.magmaguy.elitemobs.dungeons.WorldDungeonPackage) kinds.add("open_world_dungeon");
             com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields.DungeonSizeCategory size =
@@ -526,7 +600,11 @@ public class EliteMobs extends JavaPlugin {
     @Override
     public void onDisable() {
         MetadataHandler.shutdownRequested = true;
+        CustomItem.shutdownCacheRegeneration();
         MagmaCore.requestInitializationShutdown(this);
+        AutoclickerThrottle.shutdown();
+        SpiritWalkSupport.shutdown();
+        ZombieNecronomiconSupport.shutdown();
         if (MetadataHandler.pluginState == PluginState.INITIALIZING) {
             Bukkit.getServer().getScheduler().cancelTasks(MetadataHandler.PLUGIN);
             MetadataHandler.pluginState = PluginState.UNINITIALIZED;
@@ -577,6 +655,8 @@ public class EliteMobs extends JavaPlugin {
         EliteMobsWorld.shutdown();
         Navigation.shutdown();
         BossBarUtil.shutdown();
+        com.magmaguy.elitemobs.utils.BossBarOrderManager.shutdown();
+        com.magmaguy.elitemobs.testing.SkillSystemTest.shutdown();
         ScriptAction.shutdown();
         CustomMusic.shutdown();
         CustomBossEntity.shutdown();

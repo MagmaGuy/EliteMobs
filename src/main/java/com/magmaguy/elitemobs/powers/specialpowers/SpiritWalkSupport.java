@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.powers.specialpowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobExitCombatEvent;
+import com.magmaguy.elitemobs.api.EliteMobRemoveEvent;
 import com.magmaguy.elitemobs.combatsystem.antiexploit.PreventMountExploit;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
@@ -13,6 +14,8 @@ import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -24,11 +27,11 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class SpiritWalkSupport {
+public class SpiritWalkSupport implements Listener {
 
     private static final Map<UUID, Integer> hitCounters = new ConcurrentHashMap<>();
 
-    private SpiritWalkSupport() {
+    public SpiritWalkSupport() {
     }
 
     public static void handleBossDamaged(EliteEntity eliteEntity, EntityDamageEvent.DamageCause cause) {
@@ -57,8 +60,17 @@ public class SpiritWalkSupport {
             return;
         }
 
-        hitCounters.put(eliteEntity.getEliteUUID(), 0);
+        hitCounters.remove(eliteEntity.getEliteUUID());
         initializeSpiritWalk(eliteEntity);
+    }
+
+    @EventHandler
+    public void onEliteMobRemove(EliteMobRemoveEvent event) {
+        hitCounters.remove(event.getEliteMobEntity().getEliteUUID());
+    }
+
+    public static void shutdown() {
+        hitCounters.clear();
     }
 
     public static void spiritWalkAnimation(EliteEntity eliteEntity, Location entityLocation, Location finalLocation) {
@@ -84,6 +96,7 @@ public class SpiritWalkSupport {
                     eliteEntity.getLivingEntity().setInvulnerable(false);
                     eliteEntity.getLivingEntity().removePotionEffect(PotionEffectType.GLOWING);
                     cancel();
+                    return;
                 }
 
                 eliteEntity.getLivingEntity().teleport(eliteEntity.getLivingEntity().getLocation().clone().add(toDestination.clone()));
@@ -161,6 +174,7 @@ public class SpiritWalkSupport {
                                 && eliteEntity instanceof RegionalBossEntity regionalBossEntity) {
                             CustomBossEntity.CustomBossEntityEvents.slowRegionalBoss(regionalBossEntity);
                         }
+                        return;
                     }
 
                     if (finalVehicle != null && !finalVehicle.isDead()) {
