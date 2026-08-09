@@ -244,6 +244,10 @@ public class SkillSystemTest implements Listener {
     }
 
     public void start() {
+        if (!PlayerData.isDataLoaded(playerUUID)) {
+            log("§cPlayer data is still loading; retry the combat diagnostic in a moment.");
+            return;
+        }
         if (!activeSessions.isEmpty()) {
             SkillSystemTest active = activeSessions.values().iterator().next();
             log("§cA combat diagnostic is already running for " + active.player.getName() + ".");

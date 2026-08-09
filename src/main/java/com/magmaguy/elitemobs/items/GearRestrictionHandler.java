@@ -37,6 +37,9 @@ public class GearRestrictionHandler {
      */
     public static boolean canEquip(Player player, ItemStack itemStack) {
         if (!AdventurersGuildConfig.isSkillBasedGearRestriction()) return true;
+        // Login hydration is asynchronous. Allow equipment until the complete snapshot is published
+        // instead of treating the temporary absence as skill level 1 and rejecting valid gear.
+        if (!PlayerData.isDataLoaded(player.getUniqueId())) return true;
         if (itemStack == null || itemStack.getType().isAir()) return true;
         if (!EliteItemManager.isEliteMobsItem(itemStack)) return true;
 
@@ -81,6 +84,7 @@ public class GearRestrictionHandler {
      */
     public static void sendRestrictionMessage(Player player, ItemStack itemStack) {
         if (!AdventurersGuildConfig.isSkillBasedGearRestriction()) return;
+        if (!PlayerData.isDataLoaded(player.getUniqueId())) return;
 
         SkillType skillType = SkillType.fromMaterialIncludingArmor(itemStack.getType());
         if (skillType == null) return;

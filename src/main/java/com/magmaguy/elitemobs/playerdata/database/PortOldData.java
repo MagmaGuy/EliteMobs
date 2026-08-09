@@ -6,8 +6,9 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
-import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.UUID;
 
 public class PortOldData {
@@ -23,28 +24,25 @@ public class PortOldData {
                 playerMoneyDataConfig = null;
 
         HashSet<UUID> uuids = new HashSet<>();
+        boolean invalidKeys = false;
 
         if (playerCache.exists()) {
             playerCacheConfig = YamlConfiguration.loadConfiguration(playerCache);
-            for (String string : playerCacheConfig.getKeys(false))
-                uuids.add(UUID.fromString(string));
+            invalidKeys |= collectValidUuids(playerCacheConfig, uuids, playerCache.getName());
         }
 
         if (playerMoneyData.exists()) {
             playerMoneyDataConfig = YamlConfiguration.loadConfiguration(playerMoneyData);
-            for (String string : playerMoneyDataConfig.getKeys(false))
-                uuids.add(UUID.fromString(string));
+            invalidKeys |= collectValidUuids(playerMoneyDataConfig, uuids, playerMoneyData.getName());
         }
 
-        if (uuids.isEmpty()) {
+        if (uuids.isEmpty() && !invalidKeys) {
             deleteConfigs(playerCache, playerMoneyData);
             return;
         }
 
-        boolean errored = false;
-
+        List<PlayerDataRepository.LegacyPlayerData> legacyPlayers = new ArrayList<>();
         for (UUID uuid : uuids) {
-
             String displayName = null;
             if (playerCacheConfig != null) {
                 if (playerCacheConfig.contains(uuid.toString()))
@@ -63,31 +61,17 @@ public class PortOldData {
                 currency = 0.0;
             }
 
-            try {
-                Statement statement = null;
-                statement = PlayerData.getConnection().createStatement();
-                String sql = "INSERT INTO " + PlayerData.getPLAYER_DATA_TABLE_NAME() +
-                        " (PlayerUUID, DisplayName, Currency) " +
-                        //identifier
-                        "VALUES ('" + uuid.toString() + "'," +
-                        //display name
-                        " '" + displayName + "'," +
-                        //currency
-                        " " + currency + ");";
-                statement.executeUpdate(sql);
-                statement.close();
-                PlayerData.getConnection().commit();
-                PlayerData.getConnection().close();
-            } catch (Exception e) {
-                Logger.warn("Warning: Failed to write values from old config files to new database system. Tell the dev!");
-                System.err.println(e.getClass().getName() + ": " + e.getMessage());
-                errored = true;
-            }
-
+            legacyPlayers.add(new PlayerDataRepository.LegacyPlayerData(uuid, displayName, currency));
         }
 
-        if (!errored)
-            deleteConfigs(playerCache, playerMoneyData);
+        try {
+            PlayerDataRepository.importLegacy(legacyPlayers);
+            if (!invalidKeys) deleteConfigs(playerCache, playerMoneyData);
+            else Logger.warn("Legacy player files were preserved because they contain invalid UUID keys.");
+        } catch (Exception exception) {
+            Logger.warn("Failed to transactionally import legacy player data; source files were preserved.");
+            Logger.warn(exception.getClass().getName() + ": " + exception.getMessage());
+        }
 
     }
 
@@ -97,14 +81,25 @@ public class PortOldData {
     }
 
     private void deleteConfig(File file) {
-        try {
-            if (file.exists() && file.isFile()) {
-                file.delete();
-                Logger.warn("Deleted data file " + file.getName() + " - was no longer in use, moved to SQLite");
-            }
-        } catch (Exception ex) {
-
+        if (!file.exists() || !file.isFile()) return;
+        if (file.delete()) {
+            Logger.warn("Deleted data file " + file.getName() + " - was no longer in use, moved to the player database");
+        } else {
+            Logger.warn("Legacy player data was imported, but " + file.getName() + " could not be deleted.");
         }
+    }
+
+    private boolean collectValidUuids(FileConfiguration configuration, HashSet<UUID> uuids, String sourceName) {
+        boolean invalid = false;
+        for (String key : configuration.getKeys(false)) {
+            try {
+                uuids.add(UUID.fromString(key));
+            } catch (IllegalArgumentException exception) {
+                invalid = true;
+                Logger.warn("Ignoring invalid player UUID '" + key + "' in " + sourceName + ".");
+            }
+        }
+        return invalid;
     }
 
 }

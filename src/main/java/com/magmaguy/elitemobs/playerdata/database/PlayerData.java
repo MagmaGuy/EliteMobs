@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.playerdata.database;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.config.DatabaseConfig;
 import com.magmaguy.elitemobs.dungeons.DungeonBossLockout;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.quests.CustomQuest;
@@ -31,7 +30,10 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class PlayerData {
 
@@ -40,8 +42,9 @@ public class PlayerData {
     @Getter
     private static final String PLAYER_DATA_TABLE_NAME = "PlayerData";
     @Getter
-    private static final HashMap<UUID, PlayerData> playerDataHashMap = new HashMap<>();
-    private static Connection connection = null;
+    private static final ConcurrentHashMap<UUID, PlayerData> playerDataHashMap = new ConcurrentHashMap<>();
+    private static final Set<UUID> loadingPlayers = ConcurrentHashMap.newKeySet();
+    private static final Map<UUID, List<DeferredDatabaseValue>> deferredDatabaseValues = new HashMap<>();
     // Currency stored as cents (1.00 coin = 100 cents) to eliminate IEEE 754 drift.
     private long currencyCents;
     @Getter
@@ -123,9 +126,8 @@ public class PlayerData {
 
     /*
      * Set to true only once readExistingData()/writeNewData() has finished populating every field.
-     * The PlayerData object is published into playerDataHashMap (isInMemory == true) BEFORE its
-     * fields are read from the database, so map-presence alone does not mean the data is usable.
-     * Volatile so the main thread sees the completed field writes once this flips true.
+     * The instance is published only after hydration and any writes deferred during the load have
+     * been applied, so map presence and this flag become visible together.
      */
     private volatile boolean databaseDataLoaded = false;
 
@@ -137,32 +139,36 @@ public class PlayerData {
         }
         PermissionAttachment permissionAttachment = player.addAttachment(MetadataHandler.PLUGIN);
         permissionAttachment.setPermission("elitequest.*", false);
+        String playerName = player.getName();
+        if (!loadingPlayers.add(uuid)) return;
         new BukkitRunnable() {
             @Override
             public void run() {
-                Statement statement = null;
                 try {
-                    statement = getConnection().createStatement();
-                    ResultSet resultSet = statement.executeQuery("SELECT * FROM " + PLAYER_DATA_TABLE_NAME + " WHERE PlayerUUID = '" + uuid + "';");
-                    if (resultSet.next()) {
-                        readExistingData(statement, uuid, resultSet);
-                    } else {
-                        writeNewData(statement, uuid);
-                    }
-                    resultSet.close();
-                    statement.close();
-                } catch (Exception e) {
-                    if (statement != null) {
-                        try {
-                            statement.close();
-                        } catch (SQLException throwables) {
-                            Logger.warn("Failed to close statement after failing player data creation!");
-                            throwables.printStackTrace();
+                    boolean exists = PlayerDataRepository.readPlayer(uuid, resultSet -> readExistingData(uuid, resultSet));
+                    if (!exists) writeNewData(uuid, playerName);
+
+                    synchronized (PlayerDataRepository.monitor()) {
+                        List<DeferredDatabaseValue> deferred = deferredDatabaseValues.remove(uuid);
+                        if (deferred != null && !deferred.isEmpty()) {
+                            for (DeferredDatabaseValue value : deferred)
+                                PlayerDataRepository.updateNow(uuid, value.column(), value.value());
+                            PlayerDataRepository.readPlayer(uuid, resultSet -> readExistingData(uuid, resultSet));
                         }
+                        databaseDataLoaded = true;
+                        playerDataHashMap.put(uuid, PlayerData.this);
+                        loadingPlayers.remove(uuid);
                     }
+                } catch (Exception e) {
                     Logger.warn("Something went wrong while generating a new player entry. This is bad! Tell the dev.");
                     Logger.warn(e.getClass().getName() + ": " + e.getMessage());
+                    playerDataHashMap.remove(uuid, PlayerData.this);
+                    synchronized (PlayerDataRepository.monitor()) {
+                        loadingPlayers.remove(uuid);
+                        deferredDatabaseValues.remove(uuid);
+                    }
                 }
+                if (databaseDataLoaded) scheduleBukkitInitialization(uuid);
             }
         }.runTaskAsynchronously(MetadataHandler.PLUGIN);
     }
@@ -197,9 +203,8 @@ public class PlayerData {
 
     /**
      * Whether the player's data is both in memory AND fully populated from the database.
-     * isInMemory() can return true before the database read finishes (the object is published
-     * into the map at the very start of readExistingData/writeNewData), so callers that need
-     * real values - e.g. skill levels for gear restrictions - must use this instead.
+     * New sessions are published atomically after hydration, but this explicit predicate keeps
+     * callers independent from that implementation detail.
      */
     public static boolean isDataLoaded(UUID uuid) {
         PlayerData playerData = playerDataHashMap.get(uuid);
@@ -386,52 +391,19 @@ public class PlayerData {
     }
 
     public static void setDatabaseValue(UUID uuid, String key, Object value) {
-        if (!MetadataHandler.PLUGIN.isEnabled()) {
-            executeDatabaseUpdate(uuid, key, value);
-            return;
-        }
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                executeDatabaseUpdate(uuid, key, value);
+        synchronized (PlayerDataRepository.monitor()) {
+            if (loadingPlayers.contains(uuid)) {
+                deferredDatabaseValues.computeIfAbsent(uuid, ignored -> new ArrayList<>())
+                        .add(new DeferredDatabaseValue(key, value));
+                return;
             }
-        }.runTaskAsynchronously(MetadataHandler.PLUGIN);
-    }
-
-    private static void executeDatabaseUpdate(UUID uuid, String key, Object value) {
-        try {
-            Statement statement = getConnection().createStatement();
-            String sql;
-            if (value instanceof String) {
-                sql = "UPDATE " + PLAYER_DATA_TABLE_NAME + " SET " + key + " = '" + value + "' WHERE PlayerUUID = '" + uuid.toString() + "';";
-            } else if (value instanceof Boolean) {
-                sql = "UPDATE " + PLAYER_DATA_TABLE_NAME + " SET " + key + " = " + (((Boolean) value) ? 1 : 0) + " WHERE PlayerUUID = '" + uuid.toString() + "';";
-            } else {
-                sql = "UPDATE " + PLAYER_DATA_TABLE_NAME + " SET " + key + " = " + value + " WHERE PlayerUUID = '" + uuid.toString() + "';";
-            }
-            statement.executeUpdate(sql);
-            statement.close();
-        } catch (Exception e) {
-            Logger.warn("Failed to update database value.");
-            e.printStackTrace();
         }
+        PlayerDataRepository.enqueueUpdate(uuid, key, value);
     }
 
     private static Object getDatabaseBlob(UUID uuid, String value) {
-        try {
-            Statement statement = getConnection().createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM " + PLAYER_DATA_TABLE_NAME + " WHERE PlayerUUID = '" + uuid.toString() + "';");
-            byte[] bytes = resultSet.getBytes(value);
-            resultSet.close();
-            statement.close();
-            if (bytes == null) return null;
-            return new String(bytes);
-        } catch (Exception e) {
-            Logger.warn("Failed to get blob value from database!");
-            Logger.warn("UUID: " + uuid + " | Value: " + value);
-            e.printStackTrace();
-            return null;
-        }
+        byte[] bytes = (byte[]) PlayerDataRepository.getBlob(uuid, value);
+        return bytes == null ? null : new String(bytes, StandardCharsets.UTF_8);
     }
 
     public static int getScore(UUID uuid) {
@@ -554,14 +526,11 @@ public class PlayerData {
      * @return The total XP for that skill
      */
     public static long getSkillXP(UUID uuid, SkillType skillType) {
-        String columnName = skillType.getColumnName();
-        // Use isDataLoaded rather than isInMemory: during the async login load there is a window where
-        // the PlayerData object is already in the map but its skillXP fields are still 0. Reading them
-        // then would report skill level 1 and wrongly reject/drop the player's gear. Fall back to a
-        // direct database read until the in-memory fields are guaranteed populated.
-        if (!isDataLoaded(uuid))
-            return getDatabaseLong(uuid, columnName);
-        return getSkillXPByType(playerDataHashMap.get(uuid), skillType);
+        PlayerData data = playerDataHashMap.get(uuid);
+        // Combat and inventory events must never block the server thread on JDBC while a login load
+        // is in flight. Their callers either defer enforcement until isDataLoaded() or safely treat
+        // an unavailable skill as zero for the brief loading window.
+        return data == null ? 0 : getSkillXPByType(data, skillType);
     }
 
     /**
@@ -587,6 +556,9 @@ public class PlayerData {
      * @return The new total XP for that skill
      */
     public static long addSkillXP(UUID uuid, SkillType skillType, long xpToAdd) {
+        // An increment is relative to the hydrated value. Never turn a temporary loading fallback
+        // of zero into an absolute write that would overwrite the player's real stored XP.
+        if (!isDataLoaded(uuid)) return 0;
         long currentXP = getSkillXP(uuid, skillType);
         long newXP = currentXP + xpToAdd;
         setSkillXP(uuid, skillType, newXP);
@@ -759,125 +731,23 @@ public class PlayerData {
     }
 
     private static Boolean getDatabaseBoolean(UUID uuid, String value) {
-        try {
-            Statement statement = getConnection().createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM " + PLAYER_DATA_TABLE_NAME + " WHERE PlayerUUID = '" + uuid.toString() + "';");
-            if (!resultSet.next()) {
-                resultSet.close();
-                statement.close();
-                return null;
-            }
-            boolean reply = resultSet.getBoolean(value);
-            resultSet.close();
-            statement.close();
-            return reply;
-        } catch (Exception e) {
-            Logger.warn("Failed to get boolean value from database!");
-            e.printStackTrace();
-            return null;
-        }
+        return PlayerDataRepository.getBoolean(uuid, value);
     }
 
     private static String getDatabaseString(UUID uuid, String value) {
-        try {
-            Statement statement = getConnection().createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM " + PLAYER_DATA_TABLE_NAME + " WHERE PlayerUUID = '" + uuid.toString() + "';");
-            if (!resultSet.next()) {
-                resultSet.close();
-                statement.close();
-                return null;
-            }
-            String reply = resultSet.getString(value);
-            resultSet.close();
-            statement.close();
-            return reply;
-        } catch (Exception e) {
-            Logger.warn("Failed to get string value from database!");
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    private static Double getDatabaseDouble(UUID uuid, String value) {
-        try {
-            Statement statement = getConnection().createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM " + PLAYER_DATA_TABLE_NAME + " WHERE PlayerUUID = '" + uuid.toString() + "';");
-            if (!resultSet.next()) {
-                resultSet.close();
-                statement.close();
-                return null;
-            }
-            double reply = resultSet.getDouble(value);
-            resultSet.close();
-            statement.close();
-            return reply;
-        } catch (Exception e) {
-            Logger.warn("Failed to get double value from database!");
-            e.printStackTrace();
-            return null;
-        }
+        return PlayerDataRepository.getString(uuid, value);
     }
 
     private static Integer getDatabaseInteger(UUID uuid, String value) {
-        try {
-            Statement statement = getConnection().createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM " + PLAYER_DATA_TABLE_NAME + " WHERE PlayerUUID = '" + uuid.toString() + "';");
-            if (!resultSet.next()) {
-                resultSet.close();
-                statement.close();
-                return null;
-            }
-            int reply = resultSet.getInt(value);
-            resultSet.close();
-            statement.close();
-            return reply;
-        } catch (Exception e) {
-            Logger.warn("Failed to get integer value from database!");
-            e.printStackTrace();
-            return null;
-        }
+        return PlayerDataRepository.getInteger(uuid, value);
     }
 
     private static Long getDatabaseLong(UUID uuid, String value) {
-        try {
-            Statement statement = getConnection().createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM " + PLAYER_DATA_TABLE_NAME + " WHERE PlayerUUID = '" + uuid.toString() + "';");
-            if (!resultSet.next()) {
-                resultSet.close();
-                statement.close();
-                return 0L;
-            }
-            long reply = resultSet.getLong(value);
-            resultSet.close();
-            statement.close();
-            return reply;
-        } catch (Exception e) {
-            Logger.warn("Failed to get long value from database!");
-            e.printStackTrace();
-            return 0L;
-        }
+        return PlayerDataRepository.getLong(uuid, value);
     }
 
     public static Connection getConnection() throws Exception {
-        File dataFolder = new File(MetadataHandler.PLUGIN.getDataFolder(), "data/" + DATABASE_NAME);
-        if (connection == null || connection.isClosed()) {
-            if (!DatabaseConfig.isUseMySQL()) {
-                Class.forName("org.sqlite.JDBC");
-                connection = DriverManager.getConnection("jdbc:sqlite:" + dataFolder);
-                connection.setAutoCommit(true);
-            } else {
-                Class.forName("com.mysql.jdbc.Driver");
-                String URL = "jdbc:mysql://" + DatabaseConfig.getMysqlHost() + ":"
-                        + DatabaseConfig.getMysqlPort() + "/" + DatabaseConfig.mysqlDatabaseName
-                        + "?useSSL=" + DatabaseConfig.useSSL
-                        + "&createDatabaseIfNotExist=true";
-                String USER = DatabaseConfig.getMysqlUsername();
-                String PASS = DatabaseConfig.getMysqlPassword();
-                connection = DriverManager.getConnection(URL, USER, PASS);
-                connection.setAutoCommit(true);
-            }
-        }
-        return connection;
+        return PlayerDataRepository.connection();
     }
 
     public static void initializeDatabaseConnection() {
@@ -885,7 +755,10 @@ public class PlayerData {
         try {
             Logger.info("Opened database successfully");
             GenerateDatabase.generate();
-            migrateCurrencyToCents();
+            PlayerDataRepository.migrateCurrencyToCents();
+            // Legacy import owns one transaction and completes before any asynchronous player load
+            // can observe or modify the migrated rows.
+            new PortOldData();
             for (Player player : Bukkit.getOnlinePlayers())
                 new PlayerData(player.getUniqueId());
         } catch (Exception e) {
@@ -893,50 +766,18 @@ public class PlayerData {
             Logger.warn("Failed to establish a connection to the SQLite database. Player data will not be saved! Is your MySQL configuration valid and is your MySQL server running?");
             e.printStackTrace();
         }
-
-        new PortOldData();
-    }
-
-    /**
-     * One-shot startup pass: backfill CurrencyCents / GamblingDebtCents from the legacy
-     * double columns (CurrencyV2 / GamblingDebt) for any row that hasn't been migrated yet.
-     * After this runs once, the cents columns are the source of truth and the read paths
-     * don't need any migrate-on-read branching.
-     */
-    private static void migrateCurrencyToCents() {
-        try {
-            Statement statement = getConnection().createStatement();
-            String currencySql = "UPDATE " + PLAYER_DATA_TABLE_NAME +
-                    " SET CurrencyCents = CAST(ROUND(CurrencyV2 * 100) AS INTEGER)" +
-                    " WHERE (CurrencyCents IS NULL OR CurrencyCents = 0) AND CurrencyV2 > 0;";
-            int currencyMigrated = statement.executeUpdate(currencySql);
-            String debtSql = "UPDATE " + PLAYER_DATA_TABLE_NAME +
-                    " SET GamblingDebtCents = CAST(ROUND(GamblingDebt * 100) AS INTEGER)" +
-                    " WHERE (GamblingDebtCents IS NULL OR GamblingDebtCents = 0) AND GamblingDebt > 0;";
-            int debtMigrated = statement.executeUpdate(debtSql);
-            statement.close();
-            if (currencyMigrated > 0)
-                Logger.info("Migrated " + currencyMigrated + " player currency rows to cent precision");
-            if (debtMigrated > 0)
-                Logger.info("Migrated " + debtMigrated + " player gambling debt rows to cent precision");
-        } catch (Exception e) {
-            Logger.warn("Failed to migrate legacy currency/gambling debt columns to cents!");
-            e.printStackTrace();
-        }
     }
 
     public static void closeConnection() {
-        playerDataHashMap.clear();
-        try {
-            if (connection == null) return;
-            connection.close();
-        } catch (Exception ex) {
-            Logger.warn("Could not correctly close database connection.");
+        synchronized (PlayerDataRepository.monitor()) {
+            playerDataHashMap.clear();
+            loadingPlayers.clear();
+            deferredDatabaseValues.clear();
+            PlayerDataRepository.close();
         }
     }
 
-    private void readExistingData(Statement statement, UUID uuid, ResultSet resultSet) throws Exception {
-        playerDataHashMap.put(uuid, this);
+    private void readExistingData(UUID uuid, ResultSet resultSet) throws Exception {
         // CurrencyCents is the source of truth; startup migration backfills it from legacy CurrencyV2.
         currencyCents = resultSet.getLong("CurrencyCents");
         score = resultSet.getInt("Score");
@@ -949,12 +790,8 @@ public class PlayerData {
         if (resultSet.getBytes("QuestStatus") != null) {
             try {
                 quests = (List<Quest>) ObjectSerializer.fromString(new String(resultSet.getBytes("QuestStatus"), StandardCharsets.UTF_8));
-                //Serializes ItemStack which require specific handling, necessary recovering the rewards
-                for (Quest quest : quests)
-                    if (quest instanceof CustomQuest)
-                        ((CustomQuest) quest).applyTemporaryPermissions(Bukkit.getPlayer(uuid));
             } catch (Exception ex) {
-                Logger.warn("Failed to serialize quest data for player " + Bukkit.getPlayer(uuid) + " ! This player's quest data will be wiped to prevent future errors.");
+                Logger.warn("Failed to deserialize quest data for player " + uuid + "! This player's quest data will be wiped to prevent future errors.");
                 try {
                     resetQuests(uuid);
                 } catch (Exception ex2) {
@@ -967,7 +804,6 @@ public class PlayerData {
         if (resultSet.getBytes("PlayerQuestCooldowns") != null) {
             try {
                 playerQuestCooldowns = (PlayerQuestCooldowns) ObjectSerializer.fromString(new String(resultSet.getBytes("PlayerQuestCooldowns"), StandardCharsets.UTF_8));
-                playerQuestCooldowns.startCooldowns(uuid);
             } catch (Exception exception) {
                 Logger.warn("Failed to get player quest cooldowns!  ! This player's quest cooldowns will be wiped to prevent future errors.");
                 try {
@@ -982,13 +818,15 @@ public class PlayerData {
         if (resultSet.getObject("UseBookMenus") != null) {
             useBookMenus = resultSet.getBoolean("UseBookMenus");
         } else {
-            setUseBookMenus(Bukkit.getPlayer(uuid), true);
+            useBookMenus = true;
+            setDatabaseValue(uuid, "UseBookMenus", true);
         }
 
         if (resultSet.getObject("DismissEMStatusScreenMessage") != null) {
             dismissEMStatusScreenMessage = resultSet.getBoolean("DismissEMStatusScreenMessage");
         } else {
-            setDismissEMStatusScreenMessage(Bukkit.getPlayer(uuid), false);
+            dismissEMStatusScreenMessage = false;
+            setDatabaseValue(uuid, "DismissEMStatusScreenMessage", false);
         }
 
         if (resultSet.getBytes("DungeonBossLockouts") != null) {
@@ -1041,15 +879,10 @@ public class PlayerData {
         // Read gambling debt (cents column is source of truth; startup migration backfills it).
         gamblingDebtCents = resultSet.getLong("GamblingDebtCents");
 
-        // All fields are now populated - mark the data as fully loaded so getters stop falling back
-        // to the database and gear restriction checks read the player's real skill levels.
-        databaseDataLoaded = true;
-
         Logger.info("User " + uuid + " data successfully read!");
     }
 
-    private void writeNewData(Statement statement, UUID uuid) throws Exception {
-        playerDataHashMap.put(uuid, this);
+    private void writeNewData(UUID uuid, String playerName) throws Exception {
         currencyCents = 0;
         score = 0;
         kills = 0;
@@ -1068,87 +901,60 @@ public class PlayerData {
         skillXP_SPEARS = 0;
         // Initialize skill bonus selections to empty
         skillBonusSelections = "{}";
+        useBookMenus = true;
+        dismissEMStatusScreenMessage = false;
+        dungeonBossLockout = new DungeonBossLockout();
+        questLockout = new com.magmaguy.elitemobs.quests.QuestLockout();
         // Initialize gambling debt to 0
         gamblingDebtCents = 0;
-        statement = getConnection().createStatement();
-        String sql = "INSERT INTO " + PLAYER_DATA_TABLE_NAME + " (" +
-                "PlayerUUID," +
-                " DisplayName," +
-                " CurrencyV2," +
-                " CurrencyCents," +
-                " Score," +
-                " Kills," +
-                " HighestLevelKilled," +
-                " Deaths," +
-                " QuestsCompleted," +
-                " SkillXP_ARMOR," +
-                " SkillXP_SWORDS," +
-                " SkillXP_AXES," +
-                " SkillXP_BOWS," +
-                " SkillXP_CROSSBOWS," +
-                " SkillXP_TRIDENTS," +
-                " SkillXP_HOES," +
-                " SkillXP_MACES," +
-                " SkillXP_SPEARS," +
-                " SkillBonusSelections," +
-                " GamblingDebt," +
-                " GamblingDebtCents) " +
-                //identifier
-                "VALUES ('" + uuid + "'," +
-                //display name
-                " '" + Bukkit.getPlayer(uuid).getName() + "'," +
-                //currency (legacy double, dual-written for downgrade safety)
-                " 0," +
-                //currencyCents (source of truth)
-                " 0," +
-                //score
-                "0," +
-                //kills
-                "0," +
-                //highestLevelKilled
-                "0," +
-                //deaths
-                "0," +
-                //questsCompleted
-                "0," +
-                //skill XP values (all start at 0)
-                "0,0,0,0,0,0,0,0,0," +
-                //skill bonus selections (empty JSON)
-                "'{}', " +
-                //gambling debt (legacy double, dual-written for downgrade safety)
-                "0," +
-                //gambling debt cents (source of truth)
-                "0);";
-        statement.executeUpdate(sql);
-        statement.close();
-        // New players start with all skill XP at 0; the in-memory fields above are already set, so
-        // the data is fully usable now.
-        databaseDataLoaded = true;
+        PlayerDataRepository.insertNewPlayer(uuid, playerName);
         Logger.info("No player entry detected, generating new entry!");
+    }
+
+    private void scheduleBukkitInitialization(UUID uuid) {
+        if (!MetadataHandler.PLUGIN.isEnabled()) return;
+        Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, () -> {
+            Player player = Bukkit.getPlayer(uuid);
+            if (player == null) {
+                playerDataHashMap.remove(uuid, this);
+                return;
+            }
+            for (Quest quest : new ArrayList<>(quests))
+                if (quest instanceof CustomQuest customQuest)
+                    customQuest.applyTemporaryPermissions(player);
+            if (playerQuestCooldowns != null)
+                playerQuestCooldowns.startCooldowns(uuid);
+        });
     }
 
     public static class PlayerDataEvents implements Listener {
         @EventHandler(priority = EventPriority.LOWEST)
         public void onPlayerLogin(PlayerJoinEvent event) {
+            UUID playerUuid = event.getPlayer().getUniqueId();
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    if (Bukkit.getPlayer(event.getPlayer().getUniqueId()) == null) return;
-                    new PlayerData(event.getPlayer().getUniqueId());
+                    if (Bukkit.getPlayer(playerUuid) == null) return;
+                    new PlayerData(playerUuid);
                 }
-            }.runTaskLaterAsynchronously(MetadataHandler.PLUGIN, 20);
+            }.runTaskLater(MetadataHandler.PLUGIN, 20);
         }
 
         @EventHandler
         public void onPlayerLogout(PlayerQuitEvent event) {
+            UUID playerUuid = event.getPlayer().getUniqueId();
+            String playerName = event.getPlayer().getName();
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    clearPlayerData(event.getPlayer().getUniqueId());
-                    setDisplayName(event.getPlayer().getUniqueId(), event.getPlayer().getName());
+                    clearPlayerData(playerUuid);
+                    setDisplayName(playerUuid, playerName);
                 }
-            }.runTaskLaterAsynchronously(MetadataHandler.PLUGIN, 20);
+            }.runTaskLater(MetadataHandler.PLUGIN, 20);
         }
+    }
+
+    private record DeferredDatabaseValue(String column, Object value) {
     }
 
 }

@@ -125,10 +125,10 @@ public class SkillXPHandler implements Listener {
             if (earnedXP <= 0) continue;
 
             // Award weapon XP based on main hand weapon
-            long weaponXP = awardWeaponXP(player, earnedXP, rewardLevel);
+            long weaponXP = awardWeaponXP(player, earnedXP, rewardLevel, eliteEntity.isScaledCombat());
 
             // Award armor XP (always, at 1/3 rate)
-            long armorXP = awardArmorXP(player, earnedXP, rewardLevel);
+            long armorXP = awardArmorXP(player, earnedXP, rewardLevel, eliteEntity.isScaledCombat());
 
             // Show XP popup with total XP earned (weapon + armor)
             long totalXPEarned = weaponXP + armorXP;
@@ -143,7 +143,8 @@ public class SkillXPHandler implements Listener {
      *
      * @return The amount of XP awarded, or 0 if no weapon skill applies
      */
-    private long awardWeaponXP(Player player, long baseXP, int rewardLevel) {
+    private long awardWeaponXP(Player player, long baseXP, int rewardLevel, boolean scaledCombat) {
+        if (!PlayerData.isDataLoaded(player.getUniqueId())) return 0;
         Material weaponMaterial = player.getInventory().getItemInMainHand().getType();
         SkillType skillType = SkillType.fromMaterial(weaponMaterial);
 
@@ -155,7 +156,7 @@ public class SkillXPHandler implements Listener {
         int previousLevel = SkillXPCalculator.levelFromTotalXP(oldXP);
 
         if (FarmingProtection.isLevelRewardProtectionEnabled() &&
-                !FarmingProtection.isSkillXPInRange(previousLevel, rewardLevel)) {
+                !FarmingProtection.isSkillXPInRange(previousLevel, rewardLevel, scaledCombat)) {
             notifySkillXPTooLow(player, skillType, rewardLevel, previousLevel);
             return 0;
         }
@@ -183,13 +184,14 @@ public class SkillXPHandler implements Listener {
      *
      * @return The amount of XP awarded
      */
-    private long awardArmorXP(Player player, long baseXP, int rewardLevel) {
+    private long awardArmorXP(Player player, long baseXP, int rewardLevel, boolean scaledCombat) {
+        if (!PlayerData.isDataLoaded(player.getUniqueId())) return 0;
         // Get current XP before adding
         long oldXP = PlayerData.getSkillXP(player.getUniqueId(), SkillType.ARMOR);
         int previousLevel = SkillXPCalculator.levelFromTotalXP(oldXP);
 
         if (FarmingProtection.isLevelRewardProtectionEnabled() &&
-                !FarmingProtection.isSkillXPInRange(previousLevel, rewardLevel)) {
+                !FarmingProtection.isSkillXPInRange(previousLevel, rewardLevel, scaledCombat)) {
             notifySkillXPTooLow(player, SkillType.ARMOR, rewardLevel, previousLevel);
             return 0;
         }
