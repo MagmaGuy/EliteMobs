@@ -142,7 +142,7 @@ public class LevelScaling {
      * EliteMobs writes this value to spigot.yml at startup under settings.attribute.maxHealth.max.
      * Runtime health clamping should use {@link #getMinecraftMaxHealth()} so it follows the server's active value.
      */
-    public static final double DEFAULT_MINECRAFT_MAX_HEALTH = Double.MAX_VALUE;
+    public static final double DEFAULT_MINECRAFT_MAX_HEALTH = 2048D;
 
     public static double getMinecraftMaxHealth() {
         try {
